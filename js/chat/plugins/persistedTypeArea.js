@@ -32,6 +32,7 @@ var PersistedTypeArea = function (megaChat) {
     };
     return self;
 };
+makeObservable(PersistedTypeArea);
 
 PersistedTypeArea.prototype.updatePersistedTypedValue = function (chatRoom, value) {
     var self = this;
@@ -52,8 +53,6 @@ PersistedTypeArea.prototype.removePersistedTypedValue = function (chatRoom) {
         self.data.removeItem(k);
     });
 };
-
-makeObservable(PersistedTypeArea);
 
 scope.PersistedTypeArea = PersistedTypeArea;
 })(window);

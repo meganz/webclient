@@ -23,9 +23,11 @@ mobile.sms = {
 
             // Set string for non achievement account
             var langString = l[20411];  // Verifying your mobile will make it easier for your contacts to find you...
+            var ach = M.maf;
+            mobile.sms.achievementUsed = ach && ach[9] && ach[9].rwd;
 
             // Make sure they are on an achievement account
-            if (typeof M.account.maf !== 'undefined') {
+            if (typeof M.account.maf !== 'undefined' && !mobile.sms.achievementUsed) {
 
                 // Convert storage and bandwidth to 'x GB'
                 var bonuses = M.account.maf.u;

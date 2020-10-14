@@ -615,7 +615,13 @@ var security = {
             var reset = function(step) {
                 hideLoading();
                 closeDialog();
-                security.showVerifyEmailDialog(step && step.to);
+
+                if (step === true) {
+                    loadSubPage('login');
+                }
+                else {
+                    security.showVerifyEmailDialog(step && step.to);
+                }
             };
             $('.fm-dialog:visible').addClass('hidden');
 
@@ -631,7 +637,7 @@ var security = {
                         console.debug('erv', [res]);
 
                         if (res === EEXPIRED || res === ENOENT) {
-                            return msgDialog('warninga', l[135], l[7719], false, reset);
+                            return msgDialog('warninga', l[135], res === EEXPIRED ? l[7719] : l[22128], false, reset);
                         }
                         if (!Array.isArray(res) || !res[6]) {
                             return msgDialog('warninga', l[135], l[47], res < 0 ? api_strerror(res) : l[253], reset);
@@ -643,8 +649,21 @@ var security = {
                         u_handle = res[4];
                         u_attr = {u: u_handle, email: res[1], privk: res[6].privk, evc: code, evk: res[6].k};
 
+                        if (is_mobile) {
+                            $('.fm-dialog-close', $dialog).addClass('hidden');
+                            $('.cancel-email-verify', $dialog).removeClass('hidden').rebind('click.cancel', function() {
+                                loadSubPage("start");
+                            });
+                        }
+                        else {
+                            $('.fm-dialog-close', $dialog).removeClass('hidden').rebind('click.cancel', function() {
+                                loadSubPage("start");
+                            });
+                            $('.cancel-email-verify', $dialog).addClass('hidden');
+                        }
+
                         $('.mail', $dialog).val(u_attr.email);
-                        $('.button', $dialog).rebind('click.ve', function() {
+                        $('.button.default-green-button', $dialog).rebind('click.ve', function() {
                             var $input = $('.pass', $dialog);
                             var pwd = $input.val();
 
@@ -708,7 +727,8 @@ var security = {
                                 })
                                 .catch(function(ex) {
                                     hideLoading();
-                                    msgDialog('warninga', l[135], l[47], ex < 0 ? api_strerror(ex) : ex, reset);
+                                    msgDialog('warninga', l[135], l[47], ex < 0 ? api_strerror(ex) : ex, 
+                                        reset.bind(null, false));
                                 });
                         });
 
@@ -721,6 +741,9 @@ var security = {
                     M.req('era').always(function(res) {
                         if (res === 0) {
                             $('.status-txt', $dialog).removeClass('hidden');
+                        }
+                        else if (res === ETEMPUNAVAIL) {
+                            msgDialog('warninga', l[135], l[23628], l[23629], loadSubPage.bind(null, 'contact'));
                         }
                         else {
                             msgDialog('warninga', l[135], l[47], api_strerror(res), loadSubPage.bind(null, 'contact'));

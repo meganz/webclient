@@ -18,10 +18,15 @@ RepayPage.prototype.initPage = function() {
         loadSubPage('start');
         return;
     }
+
+    if (!u_attr.email || isEphemeral()) {
+        return loadSubPage('registerb');
+    }
+
     var mySelf = this;
     loadingDialog.show();
 
-    var $repaySection = $('.main-mid-pad.bus-repay');
+    var $repaySection = $('.main-mid-pad.bus-repay').removeClass('hidden');
     var $leftSection = $('.main-left-block', $repaySection);
     var $paymentBlock = $('.bus-reg-radio-block', $leftSection);
 
@@ -45,9 +50,10 @@ RepayPage.prototype.initPage = function() {
         });
 
     // event handler for radio buttons
-    $('.bus-reg-radio', $paymentBlock)
+    $('.bus-reg-radio-option', $paymentBlock)
         .off('click.suba').on('click.suba', function businessRepayCheckboxClick() {
             var $me = $(this);
+            $me = $('.bus-reg-radio', $me);
             if ($me.hasClass('checkOn')) {
                 return;
             }

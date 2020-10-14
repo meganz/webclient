@@ -26,37 +26,42 @@ var redeem = {
         redeem.$backgroundOverlay = $('.fm-dialog-overlay');
         redeem.$successOverlay = $('.payment-result.success');
 
-        if (!u_type || u_type < 3) {
-            return redeem.goToCloud();
-        }
+        // If we are dealing with business voucher in signup process, things are different.
+        // so dont do following checks.
+        if (!window.bCreatedVoucher) {
+            if (!u_type || u_type < 3) {
+                return redeem.goToCloud();
+            }
 
-        if (u_attr && u_attr.b) {
-            // business user
-
-            msgDialog(
-                'warninga',
-                l[1578],
-                l[22888],
-                '',
-                function() {
-                    redeem.goToCloud();
-                }
-            );
-            return;
-        }
-
-        // Init functionality
-        if (localStorage.oldRedeemFlow) {
-            return this.showConfirmAccountDialog().then(this.addVoucher.bind(this)).catch(this.goToCloud.bind(this));
+            // Init functionality
+            if (localStorage.oldRedeemFlow) {
+                return this.showConfirmAccountDialog()
+                    .then(this.addVoucher.bind(this)).catch(this.goToCloud.bind(this));
+            }
         }
 
         this.getVoucherData().then(function(data) {
             var promise;
 
+            if (!data.businessmonths && u_attr && u_attr.b) {
+                // business user
+
+                msgDialog(
+                    'warninga',
+                    l[1578],
+                    l[22888],
+                    '',
+                    function() {
+                        redeem.goToCloud();
+                    }
+                );
+                return;
+            }
+
             redeem.voucherData = data;
 
             // Was the user already logged-in?
-            if (!sessionStorage.signinorup) {
+            if (!sessionStorage.signinorup && !window.bCreatedVoucher) {
                 // Show confirm dialog asking the user if he wants to redeem the voucher for this account.
                 promise = redeem.showConfirmAccountDialog();
             }
@@ -89,7 +94,10 @@ var redeem = {
                 // No longer needed.
                 delete localStorage.voucher;
                 delete localStorage[data.code];
-                mega.attr.remove('promocode', -2, true).dump();
+                if (u_attr['^!promocode']) {
+                    mega.attr.remove('promocode', -2, true).dump();
+                }
+
             };
 
             promise.then(addVoucher).catch(redeem.goToCloud.bind(redeem));
@@ -392,6 +400,8 @@ var redeem = {
         var storage = vd.storage;
         var bandwidth = vd.bandwidth;
         var numOfMonths = vd.months;
+        var intl = mega.intl.decimal;
+        var decimalSeparator = mega.intl.decimalSeparator;
         var planPrice = vd.price.split('.');
         var proName = pro.getProPlanName(proNum);
 
@@ -410,28 +420,28 @@ var redeem = {
 
         // "Your MEGA voucher for 4.99 &euro; was redeemed successfully"
         var titleText = redeem.$dialog.find('.title-text').html();
-        titleText = titleText.replace('%1', vd.value);
+        titleText = titleText.replace('%1', intl.format(vd.value));
 
         // "Your balance is now 18.00 &euro;."
         var balanceText = redeem.$dialog.find('.balance-text').html();
-            balanceText = balanceText.replace('%1', balance2dp);
+        balanceText = balanceText.replace('%1', intl.format(balance2dp));
 
         // "We suggest the PRO Lite plan based on your account balance."
         // "Click COMPLETE UPGRADE and enjoy your new PRO Lite plan."
         var upgradeText = redeem.$dialog.find('.complete-upgrade-text').html();
-            upgradeText = upgradeText.replace(/%1/g, proName);
-            upgradeText = upgradeText.replace('[S]', '<span class="complete-text">').replace('[/S]', '</span>');
+        upgradeText = upgradeText.replace(/%1/g, proName);
+        upgradeText = upgradeText.replace('[S]', '<span class="complete-text">').replace('[/S]', '</span>');
 
         // Update information
         redeem.$dialog.find('.reg-st3-membership-bl').removeClass('pro1 pro2 pro3 pro4');
         redeem.$dialog.find('.reg-st3-membership-bl').addClass('pro' + proNum);
         redeem.$dialog.find('.plan-name').html(proName);
-        redeem.$dialog.find('.price .dollars').text(planPriceDollars);
-        redeem.$dialog.find('.price .cents').text('.' + planPriceCents);
+        redeem.$dialog.find('.price .dollars').text(intl.format(planPriceDollars));
+        redeem.$dialog.find('.price .cents').text(decimalSeparator + intl.format(planPriceCents));
         redeem.$dialog.find('.price .period').text('/' + monthOrYearText);
-        redeem.$dialog.find('.reg-st3-storage .quota-amount').text(storageAmount);
+        redeem.$dialog.find('.reg-st3-storage .quota-amount').text(intl.format(storageAmount));
         redeem.$dialog.find('.reg-st3-storage .quota-unit').text(storageUnit);
-        redeem.$dialog.find('.reg-st3-bandwidth .quota-amount').text(bandwidthAmount);
+        redeem.$dialog.find('.reg-st3-bandwidth .quota-amount').text(intl.format(bandwidthAmount));
         redeem.$dialog.find('.reg-st3-bandwidth .quota-unit').text(bandwidthUnit);
         redeem.$dialog.find('.title-text').html(titleText);
         redeem.$dialog.find('.balance-text').html(balanceText);
@@ -556,44 +566,76 @@ var redeem = {
 
         // we may fired `ug` previously and it hence may does have an outdated PRO plan, let's patch it...
         if (typeof u_attr === 'object') {
-            u_attr.p = vd.proNum;
+            u_attr.p = window.bCreatedVoucher ? 100 : vd.proNum;
         }
 
-        if (signup) {
+        if (signup || (u_type === 3 && vd.businessmonths)) {
             // The user just signed up, redirect to the app onboarding
             sessionStorage.voucherData = JSON.stringify(vd);
             loadSubPage('downloadapp');
             return false;
         }
 
-        // Get the selected Pro plan details
-        var proNum = vd.proNum;
-        var proPlanName = pro.getProPlanName(proNum);
-        var $voucherBlock = $('.promo-voucher-block', redeem.$successOverlay).removeClass('hidden');
+        var $voucherBlock = $('.promo-voucher-block', redeem.$successOverlay);
+        var $voucherWrapper = $('.promo-voucher-inner-wrapper', $voucherBlock);
+        var proPlanName;
+        var quota;
+        if (vd.businessmonths) {
+            if (vd.businessmonths === 1) {
+                proPlanName = l[23492];
+            }
+            else if (vd.businessmonths === 12) {
+                proPlanName = l[23491];
+            }
+            else {
+                proPlanName = l[23493].replace('%n', vd.businessmonths);
+            }
+            quota = l[7094];
 
+            $voucherWrapper.removeClass('pro1 pro2 pro3 pro4').addClass('pro100');
+            $('.promo-voucher-card', $voucherBlock).removeClass('red-block').removeClass('yellow-block')
+                .addClass('blue-block');
+
+            $('.payment-result-txt', redeem.$successOverlay).safeHTML(l[19809].replace('{0}', '1'));
+            $('.payment-result-header', redeem.$successOverlay).safeHTML(l[23497] + '<br/>' + proPlanName);
+
+            history.replaceState({ subpage: 'fm' }, "", '/fm');
+
+            if (window.bCreatedVoucher) {
+                delete window.bCreatedVoucher;
+                mega.voucher.redeemSuccess = true;
+                $('.payment-result-button, .payment-close', redeem.$successOverlay).addClass('hidden');
+            }
+        }
+        else {
+            // Get the selected Pro plan details
+            var proNum = vd.proNum;
+            proPlanName = pro.getProPlanName(proNum);
+
+            $voucherWrapper.removeClass('pro1 pro2 pro3 pro4 pro100')
+                .addClass('pro' + vd.proNum);
+            if (vd.proNum === 4) {
+                $('.promo-voucher-card', $voucherBlock).removeClass('red-block').removeClass('blue-block')
+                    .addClass('yellow-block');
+            }
+            else {
+                $('.promo-voucher-card', $voucherBlock).removeClass('yellow-block').removeClass('blue-block')
+                    .addClass('red-block');
+            }
+            $('.payment-result-txt .plan-name', redeem.$successOverlay).text(proPlanName);
+            insertEmailToPayResult(redeem.$successOverlay);
+
+            $('.payment-result-header', redeem.$successOverlay).text((promo ? l[20430] : l[6961]) + '!');
+        }
+
+        $voucherBlock.removeClass('hidden');
         // Show the success
         redeem.showBackgroundOverlay();
         redeem.$successOverlay.removeClass('hidden');
-        redeem.$successOverlay.find('.payment-result-txt .plan-name').text(proPlanName);
-
-        $('.payment-result-header', redeem.$successOverlay).text((promo ? l[20430] : l[6961]) + '!');
-
-        insertEmailToPayResult(redeem.$successOverlay);
 
         // Show PRO plan details
-        $('.storage-amount', $voucherBlock).text(bytesToSize(vd.storage * 0x40000000, 0));
-        $('.transfer-amount', $voucherBlock).text(bytesToSize(vd.bandwidth * 0x40000000, 0));
-
-        $('.promo-voucher-inner-wrapper', $voucherBlock).removeClass('pro1 pro2 pro3 pro4')
-            .addClass('pro' + vd.proNum);
-        if (vd.proNum === 4) {
-            $('.promo-voucher-card', $voucherBlock).removeClass('red-block')
-                .addClass('yellow-block');
-        }
-        else {
-            $('.promo-voucher-card', $voucherBlock).removeClass('yellow-block')
-                .addClass('red-block');
-        }
+        $('.storage-amount', $voucherBlock).text(quota || bytesToSize(vd.storage * 0x40000000, 0));
+        $('.transfer-amount', $voucherBlock).text(quota || bytesToSize(vd.bandwidth * 0x40000000, 0));
 
         // Add click handlers for 'Go to my account' and Close buttons
         redeem.$successOverlay.find('.payment-result-button, .payment-close').rebind('click', function() {
@@ -618,51 +660,125 @@ var redeem = {
         'use strict';
 
         var infoFilling = function($dlg) {
-            var storageBytes = mega.voucher.storage * 1024 * 1024 * 1024;
-            var storageFormatted = numOfBytes(storageBytes, 0);
-            var storageSizeRounded = Math.round(storageFormatted.size);
+            var greenBtnText = l[968];
+            var whiteBtnText = l[171];
+            var titleText = l[22120];
+            var $greenBtn = $('.voucher-info-create', $dlg).removeClass('disabled');
+            var $whiteBtn = $('.voucher-info-login', $dlg).removeAttr('bFail');
+            var $dlgTitle = $('.dialog-title', $dlg).removeClass('red');
 
-            $('.size-head.v-storage', $dlg)
-                .text(storageSizeRounded + ' ' + storageFormatted.unit);
+            if (mega.voucher.businessmonths) {
+                $('.size-head.v-storage', $dlg).text(l[7094]);
+                $('.size-head.v-transfer', $dlg).text(l[7094]);
 
-            $('.plan-icon', $dlg).removeClass('pro1 pro2 pro3 pro4')
-                .addClass('pro' + mega.voucher.proNum);
+                $('.voucher-logo', $dlg).addClass('business-v');
+                $('.plan-icon', $dlg).removeClass('pro1 pro2 pro3 pro4').addClass('pro100');
 
+                var headerText;
+                if (mega.voucher.businessmonths === 1) {
+                    headerText = l[23492];
+                }
+                else if (mega.voucher.businessmonths === 12) {
+                    headerText = l[23491];
+                }
+                else {
+                    headerText = l[23493].replace('%n', mega.voucher.businessmonths);
+                }
+                $('.voucher-head .v-header-text', $dlg).text(headerText);
 
-            var bandwidthBytes = mega.voucher.bandwidth * 1024 * 1024 * 1024;
-            var bandwidthFormatted = numOfBytes(bandwidthBytes, 0);
-            var bandwidthSizeRounded = Math.round(bandwidthFormatted.size);
-
-            $('.size-head.v-transfer', $dlg)
-                .text(bandwidthSizeRounded + ' ' + bandwidthFormatted.unit);
-
-            if (mega.voucher.proNum === 4) {
-                $('.voucher-logo', $dlg).addClass('pro-l');
+                greenBtnText = l[19516];
+                if (window.bCreatedVoucher || u_type === 3) {
+                    greenBtnText = l[458];
+                    whiteBtnText = l[82];
+                    titleText = l[23496];
+                }
             }
             else {
-                $('.voucher-logo', $dlg).removeClass('pro-l');
-            }
+                var storageBytes = mega.voucher.storage * 1024 * 1024 * 1024;
+                var storageFormatted = numOfBytes(storageBytes, 0);
+                var storageSizeRounded = Math.round(storageFormatted.size);
 
-            $('.voucher-info-login', $dlg).off('click').on('click',
+                $('.size-head.v-storage', $dlg)
+                    .text(storageSizeRounded + ' ' + storageFormatted.unit);
+
+                $('.plan-icon', $dlg).removeClass('pro1 pro2 pro3 pro4 pro100')
+                    .addClass('pro' + mega.voucher.proNum);
+
+
+                var bandwidthBytes = mega.voucher.bandwidth * 1024 * 1024 * 1024;
+                var bandwidthFormatted = numOfBytes(bandwidthBytes, 0);
+                var bandwidthSizeRounded = Math.round(bandwidthFormatted.size);
+
+                $('.size-head.v-transfer', $dlg)
+                    .text(bandwidthSizeRounded + ' ' + bandwidthFormatted.unit);
+
+                if (mega.voucher.proNum === 4) {
+                    $('.voucher-logo', $dlg).addClass('pro-l');
+                }
+                else {
+                    $('.voucher-logo', $dlg).removeClass('pro-l');
+                }
+                $('.voucher-head .v-header-text', $dlg).text(l[22114]);
+
+                // Is this PRO voucher being used for a business registration?
+                if (window.bCreatedVoucher) {
+                    $greenBtn.addClass('disabled');
+                    titleText = l[23541];
+                    $dlgTitle.addClass('red');
+                    whiteBtnText = l[82];
+                    $whiteBtn.attr('bFail', 1);
+                }
+
+            }
+            $dlgTitle.text(titleText);
+
+            $greenBtn.text(greenBtnText);
+            $whiteBtn.text(whiteBtnText);
+
+            $whiteBtn.rebind(
+                'click',
                 function() {
                     closeDialog();
+                    if ($(this).attr('bFail')) {
+                        loadSubPage('registerb');
+                        return false;
+                    }
                     login_txt = l[7712];
                     loadSubPage('login');
                     return false;
                 });
 
-            $('.voucher-info-create', $dlg).off('click').on('click',
+            $greenBtn.rebind(
+                'click',
                 function() {
+                    if ($(this).hasClass('disabled')) {
+                        return false;
+                    }
                     closeDialog();
+                    if (window.bCreatedVoucher || (mega.voucher.businessmonths && u_type === 3)) {
+                        loadSubPage('redeem');
+                        return false;
+                    }
+                    if (mega.voucher.businessmonths) {
+                        window.businessVoucher = 1;
+                        loadSubPage('registerb');
+                        return false;
+                    }
                     register_txt = l[7712];
                     loadSubPage('register');
                     return false;
                 });
 
-            $('.close-voucher-redeem', $dlg).off('click').on('click',
+            $('.close-voucher-redeem', $dlg).rebind(
+                'click',
                 function() {
                     if (is_mobile) {
-                        loadSubPage('redeem');
+                        if (mega.voucher.businessmonths) {
+                            loadSubPage('registerb');
+                        }
+                        else {
+                            loadSubPage('redeem');
+                        }
                     }
                     else {
                         closeDialog();
@@ -760,13 +876,26 @@ var redeem = {
         return new MegaPromise(function(resolve, reject) {
             var parse = function(v) {
                 var b = v.promotional ? v.value : (v.balance + v.value);
-                var p = redeem.calculateBestProPlan(redeem.parseProPlans(v.plans), b);
-                v.planId = p[0];
-                v.proNum = p[1];
-                v.storage = p[2];
-                v.bandwidth = p[3];
-                v.months = p[4];
-                v.price = p[5];
+
+                var validPlanItem = v.item && v.item.al && v.item.s && v.item.t && v.item.m && v.item.p;
+
+                if (v.promotional && validPlanItem) {
+                    v.planId = v.item.id;
+                    v.proNum = v.item.al;
+                    v.storage = v.item.s;
+                    v.bandwidth = v.item.t;
+                    v.months = v.item.m;
+                    v.price = v.item.p;
+                }
+                else {
+                    var p = redeem.calculateBestProPlan(redeem.parseProPlans(v.plans), b);
+                    v.planId = p[0];
+                    v.proNum = p[1];
+                    v.storage = p[2];
+                    v.bandwidth = p[3];
+                    v.months = p[4];
+                    v.price = p[5];
+                }
 
                 if (v.available && v.proNum) {
                     return resolve(v);
@@ -800,7 +929,10 @@ var redeem = {
                         localStorage[code] = promo;
                     }
 
-                    if (v.value) {
+                    if (v.businessmonths) {
+                        return resolve(v);
+                    }
+                    else if (v.value) {
                         return parse(v);
                     }
                 }

@@ -171,7 +171,7 @@
 
                             if (action) {
                                 var name = file.name;
-
+                                var proceed = true;
                                 switch (action) {
                                     case ns.DONTCOPY:
                                         break;
@@ -179,10 +179,15 @@
                                         name = self.findNewName(name, node.p || target);
                                         /* falls through */
                                     case ns.REPLACE:
-                                        save(file, name, action, node);
+                                        proceed = save(file, name, action, node);
                                         break;
                                 }
-                                promptRecursion(a);
+                                if (proceed) {
+                                    promptRecursion(a);
+                                }
+                                else {
+                                    promptPromise.resolve();
+                                }
                             }
                             else {
                                 self.prompt(op, file, node, a.length, node.p || target)
@@ -384,12 +389,14 @@
                         $('.red-header', $a1).text(l[17551]);
                         $('.red-header', $a2).text(l[16500]);
                         $('.light-grey', $a1).text(l[17552]);
+                        $('.light-grey', $a2).text(l[19598]);
                     }
                     else {
                         $('.red-header', $a1).text(l[16496]);
                         $('.red-header', $a2).text(l[16500]);
                         $('.red-header', $a3).text(l[17095]);
                         $('.light-grey', $a1).text(l[16498]);
+                        $('.light-grey', $a2).text(l[16491]);
                         $('.light-grey', $a3).text(l[16515]);
                     }
                     break;
@@ -398,12 +405,14 @@
                         $('.red-header', $a1).text(l[17553]);
                         $('.red-header', $a2).text(l[16499]);
                         $('.light-grey', $a1).text(l[17554]);
+                        $('.light-grey', $a2).text(l[19598]);
                     }
                     else {
                         $('.red-header', $a1).text(l[16495]);
                         $('.red-header', $a2).text(l[16499]);
                         $('.red-header', $a3).text(l[17096]);
                         $('.light-grey', $a1).text(l[16497]);
+                        $('.light-grey', $a2).text(l[16491]);
                         $('.light-grey', $a3).text(l[16514]);
                     }
                     break;
@@ -417,8 +426,9 @@
                         $('.red-header', $a1).text(l[17093]);
                         $('.red-header', $a2).text(l[16490]);
                         $('.red-header', $a3).text(l[17094]);
-                        $('.light-grey', $a3).text(l[16493]);
                         $('.light-grey', $a1).safeHTML(l[17097]);
+                        $('.light-grey', $a2).text(l[16491]);
+                        $('.light-grey', $a3).text(l[16493]);
                     }
                     break;
                 case 'replace':
@@ -426,6 +436,7 @@
                     $('.red-header', $a2).text(l[16490]);
                     $('.red-header', $a3).text(l[17094]);
                     $('.light-grey', $a1).text(l[17602]);
+                    $('.light-grey', $a2).text(l[16491]);
                     $('.light-grey', $a3).text(l[16493]);
                     break;
                 case 'import':
@@ -518,9 +529,11 @@
             var $chk = $('.bottom-checkbox', $dialog).addClass('hidden');
 
             if (remaining) {
-                $chk.removeClass('hidden')
-                    .find('.radio-txt')
-                    .safeHTML(escapeHTML(l[16494]).replace('%1', '<span>' + remaining + '</span>'));
+                var remainingConflictText = remaining > 1 ?
+                    escapeHTML(l[16494]).replace('%1', '<span>' + remaining + '</span>') :
+                    l[23294];
+                $chk.removeClass('hidden');
+                $('.radio-txt', $chk).safeHTML(remainingConflictText);
             }
 
             uiCheckboxes($dialog);

@@ -820,9 +820,48 @@ class CloudBrowserDialog extends MegaRenderMixin {
         this.onSearchChange = this.onSearchChange.bind(this);
         this.onSearchIconClick = this.onSearchIconClick.bind(this);
         this.onSelected = this.onSelected.bind(this);
-        this.onTabButtonClick = this.onTabButtonClick.bind(this);
+        this.handleTabChange = this.handleTabChange.bind(this);
         this.onViewButtonClick = this.onViewButtonClick.bind(this);
         this.toggleSortBy = this.toggleSortBy.bind(this);
+    }
+    isSearch() {
+        return this.state.currentlyViewedEntry === 'search';
+    }
+    clearSelectionAndHighlight() {
+        this.onSelected([]);
+        this.onHighlighted([]);
+    }
+    getBreadcrumbNodeIcon(nodeId) {
+        switch (nodeId) {
+            case M.RootID:
+                return 'cloud-drive';
+            case M.RubbishID:
+                return 'recycle-item';
+            case M.InboxID:
+                return 'inbox-item';
+            case 'shares':
+                return 'contacts-item';
+            default:
+                return (nodeId && M.d[nodeId]) && fileIcon(M.d[nodeId]);
+        }
+    }
+    getBreadcrumbNodeText(nodeId, prevNodeId) {
+        switch (nodeId) {
+            case M.RootID:
+                // `Cloud Drive`
+                return __(l[164]);
+            case M.RubbishID:
+                // `Rubbish Bin`
+                return __(l[167]);
+            case M.InboxID:
+                // `Inbox`
+                return __(l[166]);
+            case 'shares':
+                // `username@mega.co.nz` || `Shared with me`
+                return prevNodeId && M.d[prevNodeId] ? M.d[prevNodeId].m : __(l[5589]);
+            default:
+                return M.d[nodeId] && M.d[nodeId].name;
+        }
     }
     toggleSortBy(colId) {
         var newState = {};
@@ -877,31 +916,36 @@ class CloudBrowserDialog extends MegaRenderMixin {
             'currentlyViewedEntry': M.RootID
         })
     }
-    onTabButtonClick(e, selectedTab) {
-        var $this = $(e.target);
+    onBreadcrumbNodeClick(e, nodeId /* , prevNodeId */) {
+        e.preventDefault();
+        e.stopPropagation();
 
-        $this.parent().find('.active').removeClass("active");
-        $this.addClass("active");
+        if (nodeId === 'shares') {
+            // Switch the active tab to `Incoming Shares`
+            return this.handleTabChange('shares');
+        }
 
-        var newState = {
-            'selectedTab': selectedTab,
-            'searchValue': '',
-        };
-        if (selectedTab === 'shares') {
-            newState['currentlyViewedEntry'] = 'shares';
+        // Click to open allowed only on folders as breadcrumb nodes
+        if (M.d[nodeId] && M.d[nodeId].t) {
+            this.setState({
+                selectedTab: M.d[nodeId].p ? 'shares' : 'clouddrive',
+                currentlyViewedEntry: nodeId,
+                selected: [],
+                searchValue: ''
+            }, () => this.clearSelectionAndHighlight());
         }
-        else {
-            newState['currentlyViewedEntry'] = M.RootID;
-        }
-        newState['isLoading'] = false;
-        this.setState(newState);
-        this.onSelected([]);
-        this.onHighlighted([]);
+    }
+    handleTabChange(selectedTab) {
+        this.setState({
+            selectedTab,
+            currentlyViewedEntry: selectedTab === 'shares' ? 'shares' : M.RootID,
+            searchValue: '',
+            isLoading: false
+        }, () => this.clearSelectionAndHighlight());
     }
     onSearchChange(e) {
         var searchValue = e.target.value;
         var newState = {
-            'selectedTab': 'search',
             'searchValue': searchValue
         };
         if (searchValue && searchValue.length >= 3) {
@@ -914,16 +958,15 @@ class CloudBrowserDialog extends MegaRenderMixin {
         }
 
         this.setState(newState);
-        this.onSelected([]);
-        this.onHighlighted([]);
+        this.clearSelectionAndHighlight();
     }
     resizeBreadcrumbs() {
-        var $breadcrumbsWrapper = $('.fm-breadcrumbs-wrapper.add-from-cloud', this.findDOMNode());
-        var $breadcrumbs = $breadcrumbsWrapper.find('.fm-breadcrumbs-block');
+        Soon(() => {
+            var $breadcrumbsWrapper = $('.fm-breadcrumbs-wrapper.add-from-cloud', this.findDOMNode());
+            var $breadcrumbs = $('.fm-breadcrumbs-block', $breadcrumbsWrapper);
 
-        setTimeout(function() {
             var wrapperWidth = $breadcrumbsWrapper.outerWidth();
-            var $el = $breadcrumbs.find('.right-arrow-bg');
+            var $el = $(this.isSearch() ? '.search-path-txt' : '.right-arrow-bg', $breadcrumbs);
             var i = 0;
             var j = 0;
             $el.removeClass('short-foldername ultra-short-foldername invisible');
@@ -932,7 +975,6 @@ class CloudBrowserDialog extends MegaRenderMixin {
             if ($breadcrumbs.outerWidth() > wrapperWidth) {
                 $breadcrumbsWrapper.addClass('long-path');
             }
-
 
             while ($breadcrumbs.outerWidth() > wrapperWidth) {
                 if (i < $el.length - 1) {
@@ -949,7 +991,7 @@ class CloudBrowserDialog extends MegaRenderMixin {
                     break;
                 }
             }
-        }, 0);
+        });
     }
     componentDidUpdate(prevProps, prevState) {
         if (prevState.currentlyViewedEntry !== this.state.currentlyViewedEntry) {
@@ -996,6 +1038,10 @@ class CloudBrowserDialog extends MegaRenderMixin {
 
             this.setState({entries: this.getEntries()});
         }
+        else if (prevState.highlighted !== this.state.highlighted) {
+            // resize the breadcrumbs on item select
+            this.resizeBreadcrumbs();
+        }
 
     }
     getEntries(newState) {
@@ -1012,7 +1058,7 @@ class CloudBrowserDialog extends MegaRenderMixin {
             M.getFilterBy(M.getFilterBySearchFn(self.state.searchValue))
                 .forEach(function(n) {
                     // skip contacts and invalid data.
-                    if (!n.h || n.h.length === 11) {
+                    if (!n.h || n.h.length === 11 || n.fv) {
                         return;
                     }
                     if (self.props.customFilterFn && !self.props.customFilterFn(n)) {
@@ -1097,89 +1143,91 @@ class CloudBrowserDialog extends MegaRenderMixin {
 
         const classes = `add-from-cloud ${self.props.className}`;
 
-        var folderIsHighlighted = false;
-        var share = false;
+        let folderIsHighlighted = false;
+        let share = false;
+        let isIncomingShare = false;
 
-        var breadcrumb = [];
+        let breadcrumb = [];
+        const entryId = self.isSearch() ? self.state.highlighted[0] : self.state.currentlyViewedEntry;
 
-        M.getPath(self.state.currentlyViewedEntry)
-            .forEach(function(breadcrumbNodeId, k) {
-                // skip [share owner handle] when returned by M.getPath.
-                if (M.d[breadcrumbNodeId] && M.d[breadcrumbNodeId].h && M.d[breadcrumbNodeId].h.length === 11) {
-                    return;
-                }
+        if (entryId !== undefined) {
+            M.getPath(entryId)
+                .forEach(function(nodeId, k, path) {
+                    var breadcrumbClasses = "";
+                    if (nodeId === M.RootID) {
+                        breadcrumbClasses += " cloud-drive";
 
-                var breadcrumbClasses = "";
-                if (breadcrumbNodeId === M.RootID) {
-                    breadcrumbClasses += " cloud-drive";
+                        if (self.state.currentlyViewedEntry !== M.RootID) {
+                            breadcrumbClasses += " has-next-button";
+                        }
+                    }
+                    else {
+                        breadcrumbClasses += " folder";
+                    }
 
-                    if (self.state.currentlyViewedEntry !== M.RootID) {
+                    if (k !== 0) {
                         breadcrumbClasses += " has-next-button";
                     }
-                }
-                else {
-                    breadcrumbClasses += " folder";
-                }
+                    if (nodeId === "shares") {
+                        breadcrumbClasses += " shared-with-me";
+                    }
 
-                if (k !== 0) {
-                    breadcrumbClasses += " has-next-button";
-                }
-                if (breadcrumbNodeId === "shares") {
-                    breadcrumbClasses += " shared-with-me";
-                }
+                    const prevNodeId = path[k - 1];
+                    const nodeName = self.getBreadcrumbNodeText(nodeId, prevNodeId);
+                    const nodeIcon = self.getBreadcrumbNodeIcon(nodeId);
 
-                var folderName = breadcrumbNodeId === M.RootID ? __(l[164]) :
-                    (
-                        breadcrumbNodeId === "shares" ?
-                            l[5589] :
-                            M.d[breadcrumbNodeId] && M.d[breadcrumbNodeId].name
-                    );
+                    // Flag that the specific node is part of the `Incoming Shares` node chain;
+                    // The `Attach` button is not available for isIncomingShare nodes.
+                    isIncomingShare = nodeId === 'shares';
 
-                (function (breadcrumbNodeId) {
-                    breadcrumb.unshift(
-                        <a className={"fm-breadcrumbs contains-directories " + breadcrumbClasses}
-                           key={breadcrumbNodeId}
-                           onClick={(e) => {
-                               e.preventDefault();
-                               e.stopPropagation();
-                               self.setState({
-                                   'currentlyViewedEntry': breadcrumbNodeId,
-                                   'selected': [],
-                                   'searchValue': ''
-                               });
-                               self.onSelected([]);
-                               self.onHighlighted([]);
-                           }}>
-                        <span className="right-arrow-bg simpletip" data-simpletip={folderName}>
-                            <span>{folderName}</span>
-                        </span>
-                        </a>
-                    );
-                })(breadcrumbNodeId);
-            });
+                    (function(nodeId, k) {
+                        breadcrumb.unshift(
+                            self.isSearch() ?
+                                <div
+                                    className="search-path-item"
+                                    key={nodeId}
+                                    onClick={(e) => self.onBreadcrumbNodeClick(e, nodeId, prevNodeId)}>
+                                    <div className="search-tip simpletip" data-simpletip={nodeName}>
+                                        <div className="search-path-icon">
+                                            <span className={`search-path-icon-span ${nodeIcon}`}></span>
+                                        </div>
+                                        <div className="search-path-txt">{nodeName}</div>
+                                    </div>
+                                    {k !== 0 && <div className="search-path-arrow"></div>}
+                                </div> :
+                                <a
+                                    className={"fm-breadcrumbs contains-directories " + breadcrumbClasses}
+                                    key={nodeId}
+                                    onClick={(e) => self.onBreadcrumbNodeClick(e, nodeId, prevNodeId)}>
+                                    <span className={`right-arrow-bg simpletip ${nodeIcon}`} data-simpletip={nodeName}>
+                                        <span>{nodeName}</span>
+                                    </span>
+                                </a>
+                        );
+                    })(nodeId, k);
+                });
+        }
 
-        self.state.highlighted.forEach(function(nodeId) {
+        this.state.highlighted.forEach(nodeId => {
             if (M.d[nodeId] && M.d[nodeId].t === 1) {
                 folderIsHighlighted = true;
             }
-
             share = M.getNodeShare(nodeId);
         });
 
-        var buttons = [];
-
-        if (!folderIsHighlighted || self.props.folderSelectable) {
+        let buttons = [];
+        if (!folderIsHighlighted || this.props.folderSelectable) {
             buttons.push({
-                "label": self.props.selectLabel,
+                "label": this.props.selectLabel,
                 "key": "select",
                 "className": "default-grey-button " +
-                    (self.state.selected.length === 0 || (share && share.down) ? "disabled" : null),
-                "onClick": function(e) {
-                    if (self.state.selected.length > 0) {
-                        self.props.onSelected(
-                            self.state.selected.filter(node => !M.getNodeShare(node).down)
+                    (this.state.selected.length === 0 || (share && share.down) ? "disabled" : null),
+                "onClick": e => {
+                    if (this.state.selected.length > 0) {
+                        this.props.onSelected(
+                            this.state.selected.filter(node => !M.getNodeShare(node).down)
                         );
-                        self.props.onAttachClicked();
+                        this.props.onAttachClicked();
                     }
 
                     e.preventDefault();
@@ -1187,40 +1235,79 @@ class CloudBrowserDialog extends MegaRenderMixin {
                 }
             });
         }
-        else if (folderIsHighlighted) {
-            buttons.push({
-                "label": self.props.openLabel,
-                "key": "select",
-                "className": "default-grey-button " + (share && share.down ? "disabled" : null),
-                "onClick": function(e) {
-                    if (self.state.highlighted.length > 0) {
-                        self.setState({'currentlyViewedEntry': self.state.highlighted[0]});
-                        self.onSelected([]);
-                        self.onHighlighted([]);
-                        self.browserEntries.setState({
-                            'selected': [],
-                            'searchValue': '',
-                            'highlighted': []
+
+        if (folderIsHighlighted) {
+            const { highlighted } = this.state;
+            const className = `default-grey-button ${share && share.down ? 'disabled' : null}`;
+            const highlightedNode = highlighted && highlighted.length && highlighted[0];
+            const allowAttachFolders = (
+                this.props.allowAttachFolders &&
+                !isIncomingShare
+            );
+
+            buttons.push(
+                allowAttachFolders ? {
+                    "label": l[8023],
+                    "key": "attach",
+                    className,
+                    onClick: () => {
+                        this.props.onClose();
+                        onIdle(() => {
+                            const createPublicLink = () => {
+                                M.createPublicLink(highlightedNode)
+                                    .then(({ link }) =>
+                                        this.props.room.sendMessage(link)
+                                    );
+                            };
+
+                            return (
+                                mega.megadrop.isDropExist(highlightedNode).length ?
+                                    msgDialog(
+                                        'confirmation',
+                                        // `Confirm removal`
+                                        l[1003],
+                                        // `By doing this you will cancel your MEGAdrop setup for the folder named %1`
+                                        l[17403].replace('%1', escapeHTML(highlightedNode.name)),
+                                        // `Do you want to proceed?`
+                                        l[18229],
+                                        (e) => {
+                                            if (e) {
+                                                mega.megadrop.pufRemove([highlightedNode]);
+                                                mega.megadrop.pufCallbacks[highlightedNode] = { del: createPublicLink };
+                                            }
+                                        }
+                                    ) :
+                                    createPublicLink()
+                            );
                         });
                     }
-                    e.preventDefault();
-                    e.stopPropagation();
-                }
-            });
+                } : null,
+                {
+                    "label": this.props.openLabel,
+                    "key": "select",
+                    className,
+                    onClick: e => {
+                        e.preventDefault();
+                        e.stopPropagation();
+
+                        this.setState({ currentlyViewedEntry: highlightedNode });
+                        this.clearSelectionAndHighlight();
+                        this.browserEntries.setState({ selected: [], searchValue: '', highlighted: [] });
+                    }
+                });
         }
 
         buttons.push({
-            "label": self.props.cancelLabel,
+            "label": this.props.cancelLabel,
             "key": "cancel",
-            "onClick": function(e) {
-                self.props.onClose(self);
+            "onClick": e => {
+                this.props.onClose(this);
                 e.preventDefault();
                 e.stopPropagation();
             }
         });
 
         var gridHeader = [];
-
         if (viewMode === "0") {
             gridHeader.push(
                 <table className="grid-table-header fm-dialog-table" key={"grid-table-header"}>
@@ -1261,25 +1348,34 @@ class CloudBrowserDialog extends MegaRenderMixin {
         return (
             <ModalDialogsUI.ModalDialog
                 title={self.props.title || __(l[8011])}
-                className={classes}
+                className={
+                    classes +
+                    // Amend the container height when the bottom breadcrumb is visible,
+                    // i.e. in search mode, incl. having file/folder selected
+                    (self.isSearch() && breadcrumb.length ? 'has-breadcrumbs-bottom' : '')
+                }
                 onClose={() => {
                     self.props.onClose(self);
                 }}
                 popupDidMount={self.onPopupDidMount}
                 buttons={buttons}>
                 <div className="fm-dialog-tabs">
-                    <div className={"fm-dialog-tab cloud active"}
-                        onClick={(e) => {
-                            self.onTabButtonClick(e, 'clouddrive');
-                        }}>
-                            {__(l[164])}
-                        </div>
-                    <div className={"fm-dialog-tab incoming"}
-                        onClick={(e) => {
-                            self.onTabButtonClick(e, 'shares');
-                        }}>
-                            {__(l[5542])}
-                        </div>
+                    <div
+                        className={`
+                            fm-dialog-tab cloud
+                            ${self.state.selectedTab === 'clouddrive' ? 'active' : ''}
+                        `}
+                        onClick={() => self.handleTabChange('clouddrive')}>
+                        {__(l[164]) /* `Cloud Drive` */}
+                    </div>
+                    <div
+                        className={`
+                            fm-dialog-tab incoming
+                            ${self.state.selectedTab === 'shares' ? 'active' : ''}
+                        `}
+                        onClick={() => self.handleTabChange('shares')}>
+                        {__(l[5542]) /* `Incoming Shares` */}
+                    </div>
                     <div className="clear"></div>
                 </div>
                 <div className="fm-picker-header">
@@ -1308,12 +1404,14 @@ class CloudBrowserDialog extends MegaRenderMixin {
                         </div>
                         <div className="clear"></div>
                     </div>
-                    <div className="fm-breadcrumbs-wrapper add-from-cloud">
-                         <div className="fm-breadcrumbs-block">
-                            {breadcrumb}
-                            <div className="clear"></div>
+                    {!self.isSearch() && (
+                        <div className="fm-breadcrumbs-wrapper add-from-cloud">
+                            <div className="fm-breadcrumbs-block">
+                                {breadcrumb}
+                                <div className="clear"></div>
+                            </div>
                         </div>
-                    </div>
+                    )}
                 </div>
 
                 {gridHeader}
@@ -1323,8 +1421,7 @@ class CloudBrowserDialog extends MegaRenderMixin {
                     currentlyViewedEntry={self.state.currentlyViewedEntry}
                     entries={self.state.entries || []}
                     onExpand={(node) => {
-                        self.onSelected([]);
-                        self.onHighlighted([]);
+                        self.clearSelectionAndHighlight();
                         self.setState({
                             'currentlyViewedEntry': node.h,
                             'searchValue': ''
@@ -1343,6 +1440,16 @@ class CloudBrowserDialog extends MegaRenderMixin {
                         }
                     }
                 />
+
+                <div className={`
+                    fm-breadcrumbs-wrapper add-from-cloud breadcrumbs-bottom
+                    ${self.isSearch() && breadcrumb.length ? '' : 'hidden'}
+                `}>
+                    <div className="fm-breadcrumbs-block">
+                        {breadcrumb}
+                        <div className="clear"></div>
+                    </div>
+                </div>
             </ModalDialogsUI.ModalDialog>
         );
     }

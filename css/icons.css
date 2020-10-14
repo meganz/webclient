@@ -1,7 +1,7 @@
 .tiny-icon, .semi-small-icon, .small-icon, .medium-icon, .semi-big-icon, .big-icon, .huge-icon, .icon56 {
     width: 20px;
     height: 20px;
-    background-image: url(../images/mega/new-chat-sprite_v16.png);
+    background-image: url(../images/mega/new-chat-sprite_v17.png);
     background-repeat: no-repeat;
     background-position: 0px -1447px;
     display: inline-block;
@@ -12,35 +12,23 @@
     height: 184px;
     margin: 21px auto;
     display: block;
-    background-image: url(../images/mega/new-chat-sprite_v16.png);
+    background-image: url(../images/mega/new-chat-sprite_v17.png);
     background-repeat: no-repeat;
     background-position: center -1838px;
 }
 .link-button > .small-icon {
     margin: 0 9px 0 0;
     -webkit-transition: opacity 100ms ease-in-out;
-    -moz-transition: opacity 100ms ease-in-out;
-    -o-transition: opacity 100ms ease-in-out;
-    -ms-transition: opacity 100ms ease-in-out;
     transition: opacity 100ms ease-in-out;
-    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=73);
-    -moz-opacity: 0.75;
-    -khtml-opacity: 0.75;
     opacity: 0.75;
 }
 .link-button > span + .small-icon {
     margin: 0 -3px 0 9px;
 }
 .link-button.red > .small-icon {
-    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=70);
-    -moz-opacity: 0.7;
-    -khtml-opacity: 0.7;
     opacity: 0.7;
 }
 .link-button:not(.disabled):hover > .small-icon {
-    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=90);
-    -moz-opacity: 0.9;
-    -khtml-opacity: 0.9;
     opacity: 0.9;
 }
 .tiny-icon {
@@ -87,6 +75,37 @@
     background-position: -42px -1474px;
 }
 .smiling-face {
+    background-position: -89px -853px;
+    width: 22px;
+    height: 22px;
+}
+.tiny-icon.laughing-face-with-plus {
+    background-position: -125px -498px;
+    width: 16px;
+    height: 16px;
+}
+.tiny-icon.laughing-face-with-plus.colorized, .hover-colorized:hover .tiny-icon.laughing-face-with-plus {
+    background-position: -164px -498px;
+}
+.small-icon.laughing-face-with-plus {
+    background-position: -125px -569px;
+}
+.small-icon.bold-left-arrow {
+    background-position: -199px -496px;
+}
+.small-icon.three-dots {
+    background-position: -200px -533px;
+}
+.small-icon.laughing-face, .right-aligned-msg-buttons.total-1 .tiny-icon.laughing-face-with-plus {
+    background-position: -122px -531px;
+    width: 22px;
+    height: 22px;
+}
+.small-icon.laughing-face.colorized,
+.right-aligned-msg-buttons.total-1 .hover-colorized:hover .tiny-icon.laughing-face-with-plus {
+    background-position: -160px -531px;
+}
+.laughing-face {
     background-position: -89px -853px;
     width: 22px;
     height: 22px;
@@ -139,6 +158,30 @@
 .tiny-icon.green-key {
     width: 16px;
     background-position: -212px -1237px;
+}
+
+/* Chat search icons */
+.small-icon.tiny-reset {
+    background-position: -170px -896px;
+}
+.small-icon.tiny-searching {
+    background-position: -50px -896px;
+}
+.small-icon.tiny-pause {
+    background-position: -110px -896px;
+}
+.small-icon.tiny-play {
+    background-position: -140px -896px;
+}
+.small-icon.tiny-complete {
+    background-position: -80px -896px;
+}
+
+.small-icon.white-play {
+    background-position: -3px -1747px;
+}
+.small-icon.white-pause {
+    background-position: -47px -1747px;
 }
 .small-icon.audio-call {
     background-position: -4px -38px;
@@ -270,6 +313,12 @@
 }
 .small-icon.grey-crossed-mic {
     background-position: -65px -3268px;
+}
+.small-icon.grey-call-on-hold {
+    background-position: -86px -1747px;
+}
+.small-icon.white-call-on-hold, li.active .small-icon.grey-call-on-hold {
+    background-position: -126px -1747px;
 }
 .small-icon.clock-icon {
     background-position: -2px -3200px;
@@ -517,7 +566,7 @@
     width: 32px;
     height: 32px;
     display: block;
-    background-image: url(../images/mega/new-chat-sprite_v16.png);
+    background-image: url(../images/mega/new-chat-sprite_v17.png);
     background-repeat: no-repeat;
 }
 .call-icon.handset-with-stop {
@@ -541,7 +590,8 @@
 .call-icon.crossed-handset {
     background-position: -58px -2368px;
 }
-.call-icon.diagonal-handset {
+.call-icon.diagonal-handset,
+.call-icon.call-started {
     background-position: -58px -2418px;
 }
 .call-icon.handset-with-down-arrow {
@@ -641,6 +691,9 @@
 .semi-big-icon.screenshare, .small-block .big-icon.screenshare {
     background-position: -198px -3127px;
 }
+.semi-big-icon.white-dots, .small-block .big-icon.white-dots {
+    background-position: -41px -1786px;
+}
 .semi-big-icon.grey-lock {
     background-position: -3px -3710px;
 }
@@ -680,6 +733,9 @@
 .big-icon.nwse-inset-resize, .button.active .big-icon.nwse-resize {
     background-position: -14px -3537px;
 }
+.big-icon.white-dots {
+    background-position: -159px -1733px;
+}
 .big-104px-icon {
     width: 104px;
     height: 104px;
@@ -707,7 +763,7 @@
 }
 
 .small-icon.membership.pro100 {
-    background-image: url(../images/mega/big-icons_5.png);
+    background-image: url(../images/mega/big-icons_v5.png);
     background-repeat: no-repeat;
     background-position: -149px -415px;
     position: relative;
@@ -729,7 +785,7 @@
     width: 18px;
 }
 .medium-icon.icons-img, .semi-big-icon.icons-img {
-    background-image: url(../images/mega/icons-sprite_v37.png);
+    background-image: url(../images/mega/icons-sprite_v39.png);
 }
 .medium-icon.icons-img.close {
         background-position: -47px -687px;
@@ -938,6 +994,16 @@
     width: 70px;
     height: 70px;
 }
+.big-icon.grey-play {
+    background-position: -164px -2589px;
+    width: 64px;
+    height: 64px;
+}
+.big-icon.white-pause {
+    background-position: 0px -2589px;
+    width: 64px;
+    height: 64px;
+}
 .big-icon.group-chat {
     width: 48px;
     height: 48px;
@@ -968,8 +1034,11 @@
     height: 106px;
     background-position: 0px -4455px;
 }
-.small-icon.fm-s, .big-icon.fm-s {
+.small-icon.fm-s, .big-icon.fm-s, .fm-s {
     background-image: url(../images/mega/fm-main-sprite_v15.png);
+}
+.small-icon.info-icon.fm-s {
+    background-position: -26px -12378px;
 }
 .small-icon.double-l-arrows.fm-s {
     background-position: -27px -1680px;
@@ -1072,7 +1141,7 @@
     background-position: -10px -1059px;
 }
 .tiny-icon.membership-status.pro100{
-    background-image: url(../images/mega/big-icons_5.png);
+    background-image: url(../images/mega/big-icons_v5.png);
     background-position: -127px -418px;
     width: 16px;
     height: 16px;
@@ -1154,15 +1223,15 @@
     background-position: 0px -99px;
 }
 .small-icon.red-lens {
-    background-image: url(../images/mega/icons-sprite_v37.png);
+    background-image: url(../images/mega/icons-sprite_v39.png);
     background-position: -192px -585px;
 }
 .small-icon.red-play {
-    background-image: url(../images/mega/icons-sprite_v37.png);
+    background-image: url(../images/mega/icons-sprite_v39.png);
     background-position: -233px -585px;
 }
 .small-icon.small-play-icon {
-    background-image: url(../images/mega/icons-sprite_v37.png);
+    background-image: url(../images/mega/icons-sprite_v39.png);
     background-position: -148px -634px;
 }
 .thumb .small-icon.small-play-icon {
@@ -1170,7 +1239,7 @@
 }
 /* Context menu icons */
 .small-icon.context {
-    background-image: url(../images/mega/icons-sprite_v37.png);
+    background-image: url(../images/mega/icons-sprite_v39.png);
 }
 .small-icon.context.standart-download {
     background-position: -1px -499px;
@@ -1263,6 +1332,10 @@
 }
 .small-icon.context.open-folder {
     background-position: -2px -1071px;
+}
+.small-icon.context.cloud-folder {
+    background-position: -124px -2261px;
+    opacity: 0.6;
 }
 .small-icon.context.info {
     background-position: -202px -71px;
@@ -1495,6 +1568,9 @@
 .dropdown-item:hover .small-icon.context.open-folder {
     background-position: -42px -1071px;
 }
+.dropdown-item:hover .small-icon.context.cloud-folder {
+    background-position: -163px -2261px;
+}
 .dropdown-item:hover .small-icon.context.info {
     background-position: -242px -71px;
 }
@@ -1574,7 +1650,7 @@
 
 /* Context-sprite */
 .context-sprite, i.context-sprite {
-    background-image: url(../images/mega/context-sprite_v1.png);
+    background-image: url(../images/mega/context-sprite_v2.png);
 }
 .small-icon.context-sprite.plusfolder {
     background-position: 0px 1px;
@@ -1595,7 +1671,15 @@
 .dropdown-item:hover .small-icon.context-sprite.plusfile {
     background-position: -198px 0px;
 }
-
+.small-icon.context-sprite.lock {
+    background-position: -37px -44px;
+}
+.small-icon.context-sprite.calendar {
+    background-position: 2px -44px;
+}
+.small-icon.context-sprite.light-red-cross {
+    background-position: -74px -44px;
+}
 /* End of Context menu icons */
 
 .huge-icon.storage-icon {
@@ -1746,8 +1830,8 @@
 .small-icon.icons-sprite.lens {
     background-position: -205px -1731px;
 }
-i.icons-sprite, i.small-icon.icons-sprite {
-    background-image: url(../images/mega/icons-sprite_v37.png);
+.icons-sprite, i.icons-sprite, i.small-icon.icons-sprite {
+    background-image: url(../images/mega/icons-sprite_v39.png);
 }
 .medium-icon.icons-sprite.mega {
     background-position: -49px -1004px;
@@ -1867,6 +1951,9 @@ i.icons-sprite, i.small-icon.icons-sprite {
     transform: rotate(-90deg);
     opacity: 0.6;
 }
+.small-icon.icons-sprite.prev-arrow.disabled, .small-icon.icons-sprite.next-arrow.disabled {
+    opacity: 0.2;
+}
 .small-icon.icons-sprite.next-arrow {
      transform: rotate(90deg);
 }
@@ -1928,6 +2015,15 @@ i.icons-sprite, i.small-icon.icons-sprite {
     background-position: -82px -1312px;
 }
 
+/* Top sprite */
+.top-sprite, i.top-sprite {
+    background-image: url(../images/mega/top-sprite_v8.png);
+    background-repeat: no-repeat;
+}
+.top-sprite.medium-icon.white-right-arrow {
+    background-position: -5px -2040px;
+}
+
 /* Account Icons */
 i.account-icon {
     width: 26px;
@@ -1963,9 +2059,6 @@ i.account-icon.menu {
     background-position: -5px -59px;
 }
 .link-button > .small-icon.colorized, .link-button:hover > .small-icon.colorized, .link-button.active > .small-icon, .link-button.red:hover > .small-icon, .link-button.red.active > .small-icon {
- filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
-    -moz-opacity: 1;
-    -khtml-opacity: 1;
     opacity: 1;
 }
 .small-icon.square-profile.colorized {
@@ -2030,9 +2123,6 @@ i.account-icon.menu {
 }
 
 .link-button > .small-icon.colorized, .link-button:hover > .small-icon.colorized, .link-button.active > .small-icon, .link-button.red:hover > .small-icon, .link-button.red.active > .small-icon {
- filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
-    -moz-opacity: 1;
-    -khtml-opacity: 1;
     opacity: 1;
 }
 .small-icon.square-profile.colorized {
@@ -2081,7 +2171,7 @@ i.account-icon.menu {
     margin-top: 4px;
 }
 .toast-icon.multi-files-icon {
-    background-image: url(../images/mega/icons-sprite_v37.png);
+    background-image: url(../images/mega/icons-sprite_v39.png);
     background-repeat: no-repeat;
     background-position: -5px -2019px;
     opacity: 0.6;
@@ -2117,4 +2207,48 @@ i.account-icon.menu {
 }
 .semi-huge-icon.big-icons-sprite.user-with-chain {
     background-position: -111px -1664px;
+}
+
+/* dialog-sprite */
+.small-icon.dialog-sprite.arrows-to-bottom {
+    background-position: -137px -5290px;
+}
+.small-icon.dialog-sprite.arrows-to-top, .active .small-icon.dialog-sprite.arrows-to-bottom {
+    background-position: -137px -5321px;
+}
+.small-icon.dialog-sprite.dark-cross, .download-complete .bar-table .small-icon.dialog-sprite.arrows-to-bottom {
+    background-position: -137px -5352px;
+}
+.small-icon.dialog-sprite.question-mark {
+    background-position: -112px -6983px;
+}
+.small-icon.dialog-sprite.chain {
+    background-position: -5px -6982px;
+}
+.small-icon.dialog-sprite.key {
+    background-position: -78px -6982px;
+}
+.small-icon.dialog-sprite.cog {
+    background-position: -39px -6982px;
+}
+.small-icon.dialog-sprite.grey-eye {
+    background-position: -5px -7012px;
+}
+.small-icon.dialog-sprite.grey-crossed-eye {
+    background-position: -40px -7012px;
+}
+.small-icon.dialog-sprite.white-eye {
+    background-position: -5px -7042px;
+}
+.small-icon.dialog-sprite.white-crossed-eye {
+    background-position: -40px -7042px;
+}
+.small-icon.dialog-sprite.small-cross {
+    background-position: -112px -7012px;
+}
+.small-icon.dialog-sprite.grey-lock {
+    background-position: -37px -4385px;
+}
+.medium-icon.dialog-sprite.right-arrow {
+    background-position: -136px -7008px;
 }

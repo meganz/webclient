@@ -106,15 +106,18 @@ mobile.cloud = {
     /**
      * After an action packet update to the cloud drive, this function
      * updates the folder and file count for each folder in the current view
+     * @param {String} [nodes] Optional, list of the nodes to be updated
      */
-    countAndUpdateSubFolderTotals: function() {
+    countAndUpdateSubFolderTotals: function(nodes) {
 
         'use strict';
 
-        // Loop through current view
-        for (var i = 0; i < M.v.length; i++) {
+        var list = nodes || M.v;
 
-            var node = M.v[i];
+        // Loop through current view
+        for (var i = 0; i < list.length; i++) {
+
+            var node = list[i];
             var nodeHandle = node.h;
             var nodeType = node.t;
 
@@ -533,8 +536,13 @@ mobile.cloud = {
             }
 
             if (share.isShareExist([node.h], true, true, false)) {
-                $template.find('.shared-folder').removeClass('hidden');
-                $template.find('.regular-folder').addClass('hidden');
+                $('.shared-folder', $template).removeClass('hidden');
+                $('.regular-folder', $template).addClass('hidden');
+            }
+
+            if (mega.megadrop.pufs[node.h]) {
+                $('.megadrop-folder', $template).removeClass('hidden');
+                $('.regular-folder', $template).addClass('hidden');
             }
         }
 
@@ -633,13 +641,7 @@ mobile.cloud = {
         // If a file row is tapped
         $fileRows.off('tap').on('tap', function() {
 
-            if (u_attr && u_attr.b && u_attr.b.s === -1) {
-                if (u_attr.b.m) {
-                    msgDialog('warningb', '', l[20401], l[20402]);
-                }
-                else {
-                    msgDialog('warningb', '', l[20462], l[20463]);
-                }
+            if (!validateUserAction()) {
                 return false;
             }
 

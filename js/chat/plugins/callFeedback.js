@@ -14,21 +14,6 @@ var CallFeedback = function(megaChat, options) {
 
     options.parentLogger = megaChat.logger;
 
-    megaChat.rebind("onInit.CallFeedback", function() {
-        self.attachToChat(megaChat)
-    });
-
-    return this;
-};
-
-/**
- * Entry point, for attaching to a specific `Chat` instance
- *
- * @param megaChat {Chat}
- */
-CallFeedback.prototype.attachToChat = function(megaChat) {
-    var self = this;
-
     megaChat
         .rebind('onRoomInitialized.CallFeedback', function(e, megaRoom) {
             megaRoom
@@ -50,7 +35,7 @@ CallFeedback.prototype.attachToChat = function(megaChat) {
                                         'text': __(l[1403]),
                                         'callback': function () {
                                             var feedbackDialog = mega.ui.FeedbackDialog.singleton(
-                                                $(this),
+                                                undefined,
                                                 undefined,
                                                 "call-ended"
                                             );

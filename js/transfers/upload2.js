@@ -1143,6 +1143,7 @@ var ulmanager = {
                 var gid = ulmanager.getGID(ul);
                 toAbort.push(gid);
                 $('.transfer-status', $('#' + gid).addClass('transfer-error')).text(l[20634]);
+                mega.tpw.errorDownloadUpload(mega.tpw.UPLOAD, ul, l[20634]);
             }
         });
 
@@ -1278,6 +1279,7 @@ ChunkUpload.prototype.onXHRready = function(xhrEvent) {
         }
         return Soon(this.done.bind(this));
     }
+    var self = this;
     var xhr = xhrEvent.target;
     var response = xhr.response;
     var isValidType = (response instanceof ArrayBuffer);
@@ -1320,6 +1322,18 @@ ChunkUpload.prototype.onXHRready = function(xhrEvent) {
                     this.file.response = (u8[35] === 1)
                         ? ab_to_base64(response)
                         : ab_to_str(response);
+
+                    if ($.getExportLinkInProgress) {
+                        this.logger.debug('Holding upload until link-export completed...', [this]);
+                        mBroadcaster.once('export-link:completed', function() {
+                            ulmanager.ulFinalize(self.file);
+                            self.bytes = null;
+                            self.file.retries = 0;
+                            self.done();
+                        });
+                        return;
+                    }
+
                     ulmanager.ulFinalize(this.file);
                     u8 = undefined;
                 }
@@ -1361,7 +1375,6 @@ ChunkUpload.prototype.onXHRready = function(xhrEvent) {
         }
     }
 
-    var self = this;
     this.oet = setTimeout(function() {
         if (!oIsFrozen(self)) {
             self.onXHRerror(null, xhr, errstr);

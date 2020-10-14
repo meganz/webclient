@@ -121,6 +121,7 @@ var EGOINGOVERQUOTA = -24;
 
 var EROLLEDBACK = -25;
 var EMFAREQUIRED = -26;     // Multi-Factor Authentication Required
+var EPAYWALL = -29;     // ODQ paywall state
 
 // custom errors
 var ETOOERR = -400;
@@ -216,8 +217,8 @@ function rand(n) {
  * @param {Function} callBack   optional callback function to be called.
  *                              if not specified the standard set_RSA will be called
  */
-function crypto_rsagenkey(callBack) {
-    var $promise = new MegaPromise();
+var crypto_rsagenkey = promisify(function _crypto_rsagenkey(resolve, reject, aSetRSA) {
+    'use strict';
     var logger = MegaLogger.getLogger('crypt');
 
     var startTime = new Date();
@@ -238,15 +239,14 @@ function crypto_rsagenkey(callBack) {
         };
     }
     else {
-        var w = new Worker('keygen.js');
+        var w = new Worker((is_extension ? '' : '/') + 'keygen.js');
 
         w.onmessage = function (e) {
             w.terminate();
             _done(e.data);
         };
 
-        var workerSeed = new Uint8Array(256);
-        asmCrypto.getRandomValues(workerSeed);
+        var workerSeed = mega.getRandomValues(256);
 
         w.postMessage([2048, 257, workerSeed]);
     }
@@ -257,20 +257,14 @@ function crypto_rsagenkey(callBack) {
                      + (endTime.getTime() - startTime.getTime()) / 1000.0
             + " seconds!");
 
-        if (callBack && typeof callBack === 'function') {
-            callBack(k);
-            $promise.resolve(); // release the promise
+        if (aSetRSA === false) {
+            resolve(k);
         }
         else {
-            u_setrsa(k)
-                .done(function () {
-                    $promise.resolve(k);
-                });
+            u_setrsa(k).then(resolve).catch(dump);
         }
     }
-
-    return $promise;
-}
+});
 
 function ApiQueue() { // double storage
     'use strict';
@@ -368,6 +362,7 @@ function api_reset() {
                         '[{[f2{'  : tree_node,       // tree node (versioned)
                         '['       : tree_residue,    // tree residue
                         '#'       : api_esplit });   // numeric error code
+
     // WSC interface (chunked mode)
     api_init(5, 'wsc', {
         '{[a{': sc_packet,     // SC command
@@ -533,21 +528,32 @@ if (typeof Uint8Array.prototype.indexOf !== 'function' || is_firefox_web_ext) {
 // this kludge emulates moz-chunked-arraybuffer with XHR-style callbacks
 function chunkedfetch(xhr, uri, postdata, httpMethod) {
     "use strict";
+
+    var fail = function(ex) {
+        if (d) {
+            console.error("Fetch error", ex);
+        }
+        // at this point fake a partial data to trigger a retry..
+        xhr.status = 206;
+        xhr.onloadend();
+    };
     var requestBody = {
         method: 'POST',
         body: postdata
     };
-    if (httpMethod && httpMethod === 'GET') {
+
+    if (httpMethod === 'GET') {
         requestBody.method = 'GET';
         delete requestBody.body;
     }
-    fetch(uri, requestBody).then(function (response) {
+
+    fetch(uri, requestBody).then(function(response) {
         var reader = response.body.getReader();
-        var evt = { loaded: 0 };
+        var evt = {loaded: 0};
         xhr.status = response.status;
         xhr.totalBytes = response.headers.get('Original-Content-Length') | 0;
 
-        function chunkedread() {
+        (function chunkedread() {
             return reader.read().then(function(r) {
                 if (r.done) {
                     // signal completion through .onloadend()
@@ -561,14 +567,9 @@ function chunkedfetch(xhr, uri, postdata, httpMethod) {
                     xhr.onprogress(evt);
                     chunkedread();
                 }
-            });
-        }
-
-        chunkedread();
-    }).catch(function(err) {
-        console.error("Fetch error: ", err);
-        xhr.onloadend();
-    });
+            }).catch(fail);
+        })();
+    }).catch(fail);
 }
 
 // send pending API request on channel q
@@ -629,7 +630,7 @@ function api_proc(q) {
                             catch (e) {}
                         }
 
-                        if (evt.loaded > 0 && bytes) {
+                        if (evt.loaded > 0 && bytes > 2) {
                             this.q.ctxsBuffer[0].progress(evt.loaded / bytes * 100);
                         }
                     }
@@ -710,13 +711,29 @@ function api_proc(q) {
 
                 if (typeof t === 'object') {
                     var ctxs = this.q.ctxsBuffer;
-
+                    var paywall;
                     for (var i = 0; i < ctxs.length; i++) {
                         var ctx = ctxs[i];
 
                         if (typeof ctx.callback === 'function') {
-                            ctx.callback(t[i], ctx, this, t);
+                            var res = t[i];
+
+                            if (res && res.err < 0) {
+                                // eslint-disable-next-line max-depth
+                                if (d) {
+                                    logger.debug('APIv2 Custom Error Detail', res, this.q.cmdsBuffer[i]);
+                                }
+                                ctx.v2APIError = res;
+                                res = res.err;
+                            }
+                            if (res === EPAYWALL) {
+                                paywall = true;
+                            }
+                            ctx.callback(res, ctx, this, t);
                         }
+                    }
+                    if (paywall) {
+                        api_reqerror(this.q, EPAYWALL, status);
                     }
 
                     // reset state for next request
@@ -812,7 +829,14 @@ function api_send(q) {
 }
 
 function api_reqerror(q, e, status) {
-    if (e == EAGAIN || e == ERATELIMIT) {
+    'use strict';
+    var c = e | 0;
+
+    if (typeof e === 'object' && e.err < 0) {
+        c = e.err | 0;
+    }
+
+    if (c === EAGAIN || c === ERATELIMIT) {
         // request failed - retry with exponential backoff
         if (q.backoff) {
             q.backoff = Math.min(600000, q.backoff << 1);
@@ -823,14 +847,14 @@ function api_reqerror(q, e, status) {
 
         q.timer = setTimeout(api_send, q.backoff, q);
 
-        e = EAGAIN;
+        c = EAGAIN;
     }
     else {
         q.failhandler(q.c, e);
     }
 
     if (mega.state & window.MEGAFLAG_LOADINGCLOUD) {
-        if (status === true && e == EAGAIN) {
+        if (status === true && c === EAGAIN) {
             mega.loadReport.EAGAINs++;
         }
         else if (status === 500) {
@@ -863,27 +887,37 @@ function api_retry() {
     }
 }
 
-function api_reqfailed(c, e) {
-    // does this failure belong to a folder link, but not on the SC channel?
-    if (apixs[c].sid[0] == 'n' && c != 2) {
-        // yes: handle as a failed folder link access
-        return folderreqerr(c, e);
+function api_reqfailed(channel, error) {
+    'use strict';
+
+    var e = error | 0;
+    var c = channel | 0;
+
+    if (typeof error === 'object' && error.err < 0) {
+        e = error.err | 0;
     }
 
-    if (e == ESID) {
+    // does this failure belong to a folder link, but not on the SC channel?
+    if (apixs[c].sid[0] === 'n' && c !== 2) {
+        // yes: handle as a failed folder link access
+        return folderreqerr(c, error);
+    }
+
+    if (e === ESID) {
         u_logout(true);
         Soon(function() {
             showToast('clipboard', l[19]);
         });
         loadingInitDialog.hide();
+        loadingDialog.hide('force'); // subjected loading dialog is not hide by loadsubpage, so force hide it.
         loadSubPage('login');
     }
-    else if ((c == 2 || c == 5) && e == ETOOMANY) {
+    else if ((c === 2 || c === 5) && e === ETOOMANY) {
         // too many pending SC requests - reload from scratch
         fm_fullreload(this.q, 'ETOOMANY');
     }
     // if suspended account
-    else if (e == EBLOCKED) {
+    else if (e === EBLOCKED) {
         var queue = apixs[c];
         queue.rawreq = false;
         queue.cmdsQueue.clear();
@@ -893,6 +927,16 @@ function api_reqfailed(c, e) {
 
         api_req({ a: 'whyamiblocked' }, {
             callback: function whyAmIBlocked(reasonCode) {
+                var setLogOutOnNavigation = function() {
+                    onIdle(function() {
+                        mBroadcaster.once('pagechange', function() {
+                            u_logout();
+                            location.reload(true);
+                        });
+                    });
+                    window.doUnloadLogOut = 0x9001;
+                    return false;
+                };
 
                 // On clicking OK, log the user out and redirect to contact page
                 loadingDialog.hide();
@@ -923,14 +967,15 @@ function api_reqfailed(c, e) {
                         sms.phoneInput.init(true);
                     }
 
-                    // Exit early to prevent logout because further API requests are
-                    // needed to verify by SMS and if logged out then it won't work
-                    return false;
+                    // Allow user to escape from SMS verification dialog in order to login a different account.
+                    return setLogOutOnNavigation();
                 }
                 else if (reasonCode === 700) {
                     var to = String(page).startsWith('emailverify') && 'login-to-account';
                     security.showVerifyEmailDialog(to);
-                    return false;
+
+                    // Allow user to escape from Email verification dialog in order to login a different account.
+                    return setLogOutOnNavigation();
                 }
                 else {
                     // Unknown reasonCode
@@ -942,6 +987,9 @@ function api_reqfailed(c, e) {
 
                 // if fm-overlay click handler was initialized, we remove the handler to prevent dialog skip
                 $('.fm-dialog-overlay').off('click.fm');
+                if (is_mobile) {
+                    parsepage(pages['mobile']);
+                }
                 msgDialog('warninga', dialogTitle,
                     reasonText,
                     false,
@@ -952,6 +1000,17 @@ function api_reqfailed(c, e) {
                 );
             }
         });
+    }
+    else if (e === EPAYWALL) {
+        if (window.M) {
+            if (M.account && u_attr && !u_attr.uspw) {
+                M.account = null;
+            }
+            if (window.loadingDialog) {
+                loadingDialog.hide();
+            }
+            M.showOverStorageQuota(e);
+        }
     }
     else {
         api_reqerror(apixs[c], EAGAIN, 0);
@@ -1091,11 +1150,19 @@ function getsc(force) {
         }
 
         api_cancel(apixs[5]);   // retire existing XHR that may still be completing the request
-        api_ready(apixs[5]);
-        api_req('sn=' + currsn, {}, 5);
+        if (currsn) {
+            api_ready(apixs[5]);
+            api_req('sn=' + currsn, {}, 5);
 
-        if (mega.state & window.MEGAFLAG_LOADINGCLOUD) {
-            mega.loadReport.scSent = Date.now();
+            if (mega.state & window.MEGAFLAG_LOADINGCLOUD) {
+                mega.loadReport.scSent = Date.now();
+            }
+        }
+        else {
+            if (d) {
+                console.error('Get WSC is called but without SN, it\'s a bug... please trace');
+            }
+            eventlog(99737);
         }
     }
 }
@@ -1151,6 +1218,10 @@ function waitsc() {
                     else if (delieveredResponse == EAGAIN || delieveredResponse == ERATELIMIT) {
                         // WSC is stopped at the beginning.
                         waittimeout = setTimeout(waitsc, waitbackoff);
+                    }
+                    else if (delieveredResponse == EBLOCKED) {
+                        // == because API response will be in a string
+                        api_reqfailed(5, EBLOCKED);
                     }
                 }
                 else if (!apixs[5].split) {
@@ -3105,7 +3176,7 @@ function crypto_share_rsa2aes() {
         });
     }
 }
-
+/* eslint-disable indent */
 // FIXME: add to translations?
 function api_strerror(errno) {
     switch (errno) {
@@ -3153,8 +3224,11 @@ function api_strerror(errno) {
         return "Not enough quota";
     case ESHAREROVERQUOTA:
         return l[19597] || 'Share owner is over storage quota.';
+    case EPAYWALL:
+        return "Over Disk Quota paywall";
     default:
         break;
     }
     return "Unknown error (" + errno + ")";
 }
+/* eslint-enable indent */

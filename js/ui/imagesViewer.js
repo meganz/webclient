@@ -9,6 +9,7 @@ var slideshowid;
     var zoom_mode;
     var origImgWidth;
     var slideshowplay;
+    var slideshowpause;
     var origImgHeight;
     var slideshowTimer;
     var mouseIdleTimer;
@@ -17,6 +18,7 @@ var slideshowid;
     var switchedSides = false;
     var fitToWindow = Object.create(null);
     var _pdfSeen = false;
+    var zoom_IO_times = 0;
 
     function slideshow_handle(raw) {
         var result;
@@ -213,10 +215,8 @@ var slideshowid;
 
             $removeButton.rebind('click', function() {
 
-                // check if this is a business expired account
-                if (u_attr && u_attr.b && u_attr.b.s === -1) {
+                if (M.isInvalidUserStatus()) {
                     history.back();
-                    showExpiredBusiness();
                     return false;
                 }
 
@@ -274,7 +274,7 @@ var slideshowid;
     }
 
     function slideshow_timereset() {
-        if (slideshowplay) {
+        if (slideshowplay && !slideshowpause) {
             clearTimeout(slideshowTimer);
             slideshowTimer = setTimeout(slideshow_next, 4000);
         }
@@ -295,6 +295,7 @@ var slideshowid;
         if (slideshow_stop) {
             $overlay.removeClass('slideshow').off('mousewheel.imgzoom');
             slideshowplay = false;
+            slideshowpause = false;
             $pauseButton.attr('data-state', 'pause');
             $pauseButton.find('i').removeClass('play').addClass('pause');
             clearTimeout(slideshowTimer);
@@ -322,11 +323,13 @@ var slideshowid;
             if ($(this).attr('data-state') === 'pause') {
                 $this.attr('data-state', 'play');
                 $this.find('i').removeClass('pause').addClass('play');
+                slideshowpause = true;
             }
             else {
                 $this.attr('data-state', 'pause');
                 $this.find('i').removeClass('play').addClass('pause');
                 slideshowTimer = setTimeout(slideshow_next, 4000);
+                slideshowpause = false;
             }
             return false;
         });
@@ -472,7 +475,30 @@ var slideshowid;
         var $img = $overlay.find('img.active');
         var $percLabel = $overlay.find('.viewer-button-label.zoom');
         var perc = parseFloat($percLabel.attr('data-perc'));
-        var newPerc = ((perc * (zoomout ? .90 : 1.10) / 100) || 1) / devicePixelRatio;
+        var newPerc = perc / 100 || 1;
+
+        if (zoomout) {
+            if (zoom_IO_times <= 0) {
+                newPerc *= 0.9;
+            }
+            else {
+                // It was zoomed in previously
+                newPerc /= 1.1;
+            }
+            zoom_IO_times--;
+        }
+        else {
+            if (zoom_IO_times >= 0) {
+                newPerc *= 1.1;
+            }
+            else {
+                // It was zoomed out previously
+                newPerc /= 0.9;
+            }
+            zoom_IO_times++;
+        }
+
+        newPerc /= devicePixelRatio;
         var newImgWidth = origImgWidth * newPerc;
         var newImgHeight = origImgHeight * newPerc;
 
@@ -574,35 +600,16 @@ var slideshowid;
         $percLabel.attr('data-perc', w_perc).text(Math.round(w_perc) + '%');
     }
 
-    /** Adding the current page to history if needed to preserve navigation correctness
-     * @returns {Void}      No return value should be expected
-     */
-    global.addingFakeHistoryState = function() {
-        // then pushing fake states of history/hash
-        if (!hashLogic) {
-            var isSearch = page.indexOf('fm/search/');
-            if (isSearch >= 0) {
-                var searchString = page.substring(isSearch + 10);
-                var tempPage = page.substring(0, isSearch + 10);
-                history.pushState({ subpage: tempPage, searchString: searchString }, "", "/" + tempPage);
-            }
-            else {
-                history.pushState({ subpage: page }, '', '/' + page);
-            }
-        }
-    };
-
     // Viewer Init
     function slideshow(id, close, hideCounter) {
-        if (!close && u_attr && u_attr.b && u_attr.b.s === -1) {
-            $.hideContextMenu();
-            M.showExpiredBusiness();
+        if (!close && M.isInvalidUserStatus()) {
             return;
         }
 
         var $overlay = $('.viewer-overlay');
         var $controls = $overlay.find('.viewer-top-bl, .viewer-bottom-bl, .viewer-slideshow-controls');
         var $document = $(document);
+        zoom_IO_times = 0;
 
         if (d) {
             console.log('slideshow', id, close, slideshowid);
@@ -643,11 +650,9 @@ var slideshowid;
                 _pdfSeen = false;
 
                 tryCatch(function() {
-                    var doc = document.getElementById('pdfpreviewdiv1');
-                    if (doc && (doc = doc.contentWindow.document)) {
-                        doc.open();
-                        doc.close();
-                    }
+                    var ev = document.createEvent("HTMLEvents");
+                    ev.initEvent("pdfjs-cleanup.meganz", true);
+                    document.getElementById('pdfpreviewdiv1').contentDocument.body.dispatchEvent(ev);
                 })();
             }
 
@@ -662,21 +667,22 @@ var slideshowid;
         // Checking if this the first preview (not a preview navigation)
         if (!slideshowid) {
             // then pushing fake states of history/hash
-            addingFakeHistoryState();
-
+            if (!history.state || history.state.view !== id) {
+                pushHistoryState();
+            }
             _hideCounter = hideCounter;
         }
 
         slideshowid = n.ch || n.h;
         if (window.selectionManager) {
-            selectionManager.clear_selection();
-            selectionManager.set_currently_selected(n.h);
+            selectionManager.resetTo(n.h);
         }
         else {
             $.selected = [n.h];
         }
         mBroadcaster.sendMessage('slideshow:open', n);
         sessionStorage.setItem('previewNode', id);
+        pushHistoryState(true, Object.assign({subpage: page}, history.state, {view: slideshowid}));
 
         // Turn off pick and pan mode
         slideshow_pickpan($overlay, 1);
@@ -708,14 +714,7 @@ var slideshowid;
                     }
                 }
                 else if (e.keyCode === 8 || e.key === 'Backspace') {
-                    // since Backspace event is processed with keydown at document level for cloudBrowser.
-                    // i prefered that to process it here, instead of unbind the previous handler.
-                    if (hashLogic || location.hash) {
-                        slideshow(0, 1);
-                    }
-                    else {
-                        history.back();
-                    }
+                    history.back();
                     return false;
                 }
             });
@@ -723,12 +722,7 @@ var slideshowid;
             // Close icon
             $overlay.find('.viewer-button.close,.viewer-error-close')
                 .rebind('click', function () {
-                    if (hashLogic || location.hash) {
-                        slideshow(0, 1);
-                    }
-                    else {
-                        history.back();
-                    }
+                    history.back();
                     return false;
                 });
 
@@ -864,7 +858,13 @@ var slideshowid;
         if (previews[n.h]) {
             if (previews[n.h].fromChat) {
                 previews[n.h].fromChat = null;
-                fetchsrc(n);
+
+                if (previews[n.h].full) {
+                    previewimg(n.h, previews[n.h].buffer);
+                }
+                else {
+                    fetchsrc(n);
+                }
             }
             else {
                 previewsrc(n.h);
@@ -1033,7 +1033,9 @@ var slideshowid;
 
             M.gfsfetch(n.link || n.h, 0, -1, progress).tryCatch(function(data) {
                 preview({type: filemime(n, 'image/jpeg')}, n.h, data.buffer);
-                previews[n.h].orientation = parseInt(EXIF.readFromArrayBuffer(data, true).Orientation) || 1;
+                if (!exifImageRotation.fromImage) {
+                    previews[n.h].orientation = parseInt(EXIF.readFromArrayBuffer(data, true).Orientation) || 1;
+                }
             }, function(ev) {
                 if (ev === EOVERQUOTA || Object(ev.target).status === 509) {
                     eventlog(99703, true);
@@ -1208,12 +1210,30 @@ var slideshowid;
 
     // a method to fetch scripts and files needed to run pdfviewer
     // and then excute them on iframe element [#pdfpreviewdiv1]
-    function prepareAndViewPdfViewer() {
-        M.require('pdfjs2', 'pdfviewer', 'pdfviewercss', 'pdforiginalviewerjs').done(function() {
+    function prepareAndViewPdfViewer(data) {
+        if (_pdfSeen) {
+            var success = false;
+            tryCatch(function() {
+                var elm = document.getElementById('pdfpreviewdiv1');
+                elm.classList.remove('hidden');
+
+                var ev = document.createEvent("HTMLEvents");
+                ev.initEvent("pdfjs-openfile.meganz", true);
+                ev.data = data.buffer || data.src;
+                elm.contentDocument.body.dispatchEvent(ev);
+                success = true;
+            })();
+
+            if (success) {
+                return;
+            }
+        }
+        M.require('pdfjs2', 'pdfviewer', 'pdfviewercss', 'pdfviewerjs').done(function() {
             var myPage = pages['pdfviewer'];
-            myPage = myPage.replace('^$#^1', window['pdfviewercss']);
-            myPage = myPage.replace('^$#^3', window['pdfjs2']);
-            myPage = myPage.replace('^$#^4', window['pdforiginalviewerjs']);
+            myPage = myPage.replace('viewer.css', window.pdfviewercss);
+            myPage = myPage.replace('../build/pdf.js', window.pdfjs2);
+            myPage = myPage.replace('viewer.js', window.pdfviewerjs);
+            localStorage.setItem('currPdfPrev2', JSON.stringify(data.src));
             // remove then re-add iframe to avoid History changes [push]
             var pdfIframe = document.getElementById('pdfpreviewdiv1');
             var newPdfIframe = document.createElement('iframe');
@@ -1255,9 +1275,7 @@ var slideshowid;
             $imgBlock.find('.img-wrap').addClass('hidden');
             // preview pdfs using pdfjs for all browsers #8036
             // to fix pdf compatibility - Bug #7796
-            localStorage.setItem('currPdfPrev2', JSON.stringify(src));
-            localStorage.setItem('pdfPrevTitle', $overlay.find('.viewer-filename').text());
-            prepareAndViewPdfViewer();
+            prepareAndViewPdfViewer(previews[id]);
             api_req({a: 'log', e: 99660, m: 'Previewed PDF Document.'});
             return;
         }
@@ -1316,7 +1334,6 @@ var slideshowid;
 
                 // Restore last good preview
                 if (previews[id].prev) {
-                    M.neuterArrayBuffer(previews[id].buffer);
                     URL.revokeObjectURL(previews[id].src);
                     previews[id] = previews[id].prev;
                     delete previews[id].prev;
@@ -1416,7 +1433,7 @@ var slideshowid;
 
         if (previews[id]) {
             if (previews[id].full) {
-                if (d) {
+                if (d && previews[id].fromChat !== null) {
                     console.warn('Not overwriting a full preview...', id);
                 }
                 if (id === slideshow_handle()) {
@@ -1484,7 +1501,6 @@ var slideshowid;
                 k = p.h;
 
                 size += p.buffer.byteLength;
-                M.neuterArrayBuffer(p.buffer);
                 p.buffer = p.full = preqs[k] = false;
 
                 if (p.prev) {
@@ -1492,7 +1508,7 @@ var slideshowid;
                     delete p.prev;
                 }
 
-                if (p.type.startsWith('image')) {
+                if (p.type.startsWith('image') || p.type === 'application/pdf') {
                     URL.revokeObjectURL(p.src);
                     if (previews[k] === p) {
                         previews[k] = false;

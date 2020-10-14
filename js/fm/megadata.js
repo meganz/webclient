@@ -52,9 +52,12 @@
  *     activity.
  */
 
-Object.defineProperty(this, 'MEGA_USER_STRUCT', {
-    value: Object.freeze({
+mBroadcaster.once('boot_done', function() {
+    'use strict';
+
+    var struct = {
         "u": undefined,
+        "b": undefined,
         "c": undefined,
         "m": undefined,
         "m2": undefined,
@@ -62,9 +65,8 @@ Object.defineProperty(this, 'MEGA_USER_STRUCT', {
         "h": undefined,
         "t": undefined,
         "p": undefined,
-        "presence": undefined,
+        "presence": 'unavailable',
         "presenceMtime": undefined,
-        "displayColor": NaN,
         "shortName": "",
         "firstName": "",
         "lastName": "",
@@ -74,7 +76,9 @@ Object.defineProperty(this, 'MEGA_USER_STRUCT', {
         "rTimeStamp": undefined,
         "avatar": undefined,
         "lastGreen": undefined
-    })
+    };
+
+    Object.defineProperty(window, 'MEGA_USER_STRUCT', {value: Object.freeze(Object.setPrototypeOf(struct, null))});
 });
 
 
@@ -186,28 +190,52 @@ function MegaData() {
 
         // this['check' + 'StorageQuota'] = dummy;
         this['show' + 'OverStorageQuota'] = function(data) {
+            if (data && (data === EPAYWALL || (data.isFull && Object(u_attr).uspw))) {
+                data = Object.create(null);
+                data.isFull = data.isAlmostFull = data.EPAYWALL = true;
+            }
             if (data.isAlmostFull) {
                 var ab = mobile.alertBanner;
                 var isPro = Object(u_attr).p;
 
                 var action = function() {
-                    var mStoragePossible = bytesToSize(pro.maxPlan[2] * 1024 * 1024 * 1024, 0) +
-                        ' (' + pro.maxPlan[2] + ' ' + l[17696] + ')';
-
-                    var msg = isPro ? l[22667].replace('%1', mStoragePossible) :
-                        l[22671].replace('%1', mStoragePossible)
-
-                    if (data.isFull) {
-
-                        ab.showError(msg); // Your account is full
-
-                        mobile.overStorageQuotaOverlay.show(msg);
+                    if (data.EPAYWALL) {
+                        if (!M.account) {
+                            M.accountData(function() {
+                                action();
+                            });
+                            return;
+                        }
+                        var overlayTexts = odqPaywallDialogTexts(u_attr || {}, M.account);
+                        ab.showError(overlayTexts.fmBannerText);
+                        mobile.overStorageQuotaOverlay.show(overlayTexts.dialogText, overlayTexts.dlgFooterText);
+                        ab.onTap(function() {
+                            loadSubPage('pro');
+                        });
                     }
                     else {
-                        ab.showWarning(isPro ? l[22668].replace('%1', mStoragePossible) :
-                            l[22672].replace('%1', bytesToSize(pro.maxPlan[2] * 1024 * 1024 * 1024, 0))
-                                .replace('%2', bytesToSize(pro.maxPlan[3] * 1024 * 1024 * 1024, 0))
-                        ); // Your account is almost full.
+                        var mStoragePossible = bytesToSize(pro.maxPlan[2] * 1024 * 1024 * 1024, 0) +
+                            ' (' + pro.maxPlan[2] + ' ' + l[17696] + ')';
+
+                        var msg = isPro ? l[22667].replace('%1', mStoragePossible) :
+                            l[22671].replace('%1', mStoragePossible);
+
+                        if (data.isFull) {
+
+                            ab.showError(msg); // Your account is full
+
+                            mobile.overStorageQuotaOverlay.show(msg);
+                        }
+                        else {
+                            ab.showWarning(isPro ? l[22668].replace('%1', mStoragePossible) :
+                                l[22672].replace('%1', bytesToSize(pro.maxPlan[2] * 1024 * 1024 * 1024, 0))
+                                    .replace('%2', bytesToSize(pro.maxPlan[3] * 1024 * 1024 * 1024, 0))
+                            ); // Your account is almost full.
+                        }
+                        // When the banner is taped, show pro page.
+                        ab.onTap(function() {
+                            loadSubPage('pro');
+                        });
                     }
                 };
 
@@ -217,11 +245,6 @@ function MegaData() {
                 else {
                     action();
                 }
-
-                // When the banner is taped, show pro page.
-                ab.onTap(function() {
-                    loadSubPage('pro');
-                });
             }
         };
 
@@ -234,6 +257,8 @@ function MegaData() {
             }
             return true;
         };
+
+        this['updFile' + 'ManagerUI'] = mobile.updFileManagerUI;
 
         var tf = [
             "renderTree", "buildtree", "initTreePanelSorting", "treeSearchUI",

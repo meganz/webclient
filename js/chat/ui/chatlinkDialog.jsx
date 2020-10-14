@@ -81,7 +81,6 @@ class ChatlinkDialog extends MegaRenderMixin {
         if (this.props.onClose) {
             this.props.onClose();
         }
-        affiliateUI.registeredDialog.show();
     }
     onTopicFieldChanged(e) {
         this.setState({'newTopic': e.target.value});
@@ -108,6 +107,7 @@ class ChatlinkDialog extends MegaRenderMixin {
         );
 
         return <ModalDialogsUI.ModalDialog
+            {...this.state}
             title={self.props.chatRoom.iAmOperator() && !self.props.chatRoom.topic ? l[9080] : ""}
             className={
                 "fm-dialog chat-rename-dialog export-chat-links-dialog group-chat-link" + (

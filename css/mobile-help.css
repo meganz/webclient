@@ -1528,6 +1528,8 @@
     width: calc(100% - 32px);
     margin: -12px auto 30px auto;
     border-radius: 6px;
+    overflow: hidden;
+    box-sizing: border-box;
 }
 #help2-main .main-content-pad {
     padding-top: 0;
@@ -2900,6 +2902,14 @@
             height: 260px;
         }
     }
+@media only screen and (max-width: 801px) {
+    #help2-main .support-section-header {
+        display: none !important;
+    }
+    #help2-main .support-section-header-clone {
+        display: none !important;
+    }
+}
 @media (min-width: 801px) and (max-width: 1060px) {
     #help2-main .main-directory-pad {
         margin: 0 auto;
@@ -2969,10 +2979,7 @@
         height: 260px;
         background-color: #f44;
     }
-    #help2-main .block-webclient, #help2-main .block-web-client, #help2-main .block-ios-desktop, #help2-main .block-windows-desktop, #help2-main .block-linux-desktop,
-    #help2-main .block-megasync, #help2-main .block-ios-megasync, #help2-main .block-windows-megasync, #help2-main .block-linux-megasync,
-    #help2-main .block-android, #help2-main .block-mobile, #help2-main .block-ios, #help2-main .block-windowsphone,
-    #help2-main .block-megachat {
+    #help2-main .block.link div {
         margin: 50px auto 32px;
     }
     #help2-main .first-support-block {
@@ -3153,10 +3160,7 @@
         border-bottom: none;
     }
 
-    #help2-main .block-webclient, #help2-main .block-web-client, #help2-main .block-ios-desktop, #help2-main .block-windows-desktop, #help2-main .block-linux-desktop,
-    #help2-main .block-megasync, #help2-main .block-ios-megasync, #help2-main .block-windows-megasync, #help2-main .block-linux-megasync,
-    #help2-main .block-android, #help2-main .block-mobile, #help2-main .block-ios, #help2-main .block-windowsphone,
-    #help2-main .block-megachat {
+    #help2-main .block.link div {
         margin: 24px auto 20px;
     }
     #help2-main .search-section-header .popular-question-list, #help2-main .popular-question-list {
@@ -3263,10 +3267,7 @@
         align-items: center;
         justify-content: center;*/
     }
-    #help2-main .block-webclient, #help2-main .block-web-client, #help2-main .block-ios-desktop, #help2-main .block-windows-desktop, #help2-main .block-linux-desktop,
-    #help2-main .block-megasync, #help2-main .block-ios-megasync, #help2-main .block-windows-megasync, #help2-main .block-linux-megasync,
-    #help2-main .block-android, #help2-main .block-mobile, #help2-main .block-ios, #help2-main .block-windowsphone,
-    #help2-main .block-megachat {
+    #help2-main .block.link div {
         margin: 24px auto 16px;
     }
     #help2-main .search-support-block .email-button span {
@@ -3717,7 +3718,7 @@
         font-size: 16px;
     }
     #help2-main .support-article-info li strong, #help2-main .support-article-info p strong {
-        font-size: 16px;
+        font-size: 13px;
         line-height: 26px;
         font-family: 'source_sans_prosemibold';
     }
@@ -4039,7 +4040,7 @@
         margin-bottom: 20px;
     }
     #help2-main .support-article-info li strong {
-        font-size: 16px;
+        font-size: 13px;
         color: #444;
         line-height: 26px;
         margin-bottom: 18px;
@@ -4721,11 +4722,6 @@
         padding-bottom: 6px;
         width: 82%;
         margin-left: 8%;
-    }
-    #help2-main .support-images-gallery img {
-        width: auto;
-        height: 230px !important;
-        max-width: inherit;
     }
     #help2-main .ui-autocomplete {
         width: calc(91% - 24px) !important;

@@ -3,105 +3,105 @@
  */
 
 // (the name must exist in the FMDB schema with index 'k')
-var IndexedDBKVStorage = function(name) {
+function IndexedDBKVStorage(name) {
+    'use strict';
+
     this.name = name;
-    this.logger = new MegaLogger("IDBKVStorage[" + name + "]");
-    this.destroy();
-};
+    this.dbcache = Object.create(null);     // items that reside in the DB
+    this.newcache = Object.create(null);    // new items that are pending flushing to the DB
+    this.delcache = Object.create(null);    // delete items that are pending deletion from the DB
+}
+
+IndexedDBKVStorage.prototype = Object.create(null);
 
 // sets fmdb reference and prefills the memory cache from the DB
 // (call this ONCE as soon as the user-specific IndexedDB is open)
 // (this is robust against an undefined fmdb reference)
-IndexedDBKVStorage.prototype.prefillMemCache = function(fmdb) {
+IndexedDBKVStorage.prototype.load = function() {
+    'use strict';
     var self = this;
-    this.fmdb = fmdb;
-
-    var promise = MegaPromise.resolve();
-
-    if (fmdb) {
-        promise = fmdb.get(this.name);
-        promise.done(function(r) {
-            for (var i = r.length; i--; ) {
-                self.dbcache[r[i].k] = r[i].v;
-            }
-        });
-    }
-
-    return promise;
+    return new MegaPromise(function(resolve) {
+        if (!window.fmdb) {
+            return resolve();
+        }
+        fmdb.get(self.name)
+            .always(function(r) {
+                for (var i = r.length; i--;) {
+                    self.dbcache[r[i].k] = r[i].v;
+                }
+                resolve();
+            });
+    });
 };
 
 // flush new items / deletions to the DB (in channel 0, this should
 // be followed by call to setsn())
 // will be a no-op if no fmdb set
 IndexedDBKVStorage.prototype.flush = function() {
-    if (this.fmdb) {
-        for (var k in this.delcache) {
-            this.fmdb.del(this.name, k);
-            delete this.dbcache[k];
-        }
-        this.delcache = Object.create(null);
+    'use strict';
+    var k;
+    var fmdb = window.fmdb || false;
 
-        for (var k in this.newcache) {
-            this.fmdb.add(this.name, { k : k, d : { v : this.newcache[k] }});
-            this.dbcache[k] = this.newcache[k];
+    for (k in this.delcache) {
+        if (fmdb) {
+            fmdb.del(this.name, k);
         }
-        this.newcache = Object.create(null);
+        delete this.dbcache[k];
     }
+
+    for (k in this.newcache) {
+        if (fmdb) {
+            fmdb.add(this.name, {k: k, d: {v: this.newcache[k]}});
+        }
+        this.dbcache[k] = this.newcache[k];
+    }
+
+    this.delcache = Object.create(null);
+    this.newcache = Object.create(null);
 };
 
 // set item in DB/cache
 // (must only be called in response to an API response triggered by an actionpacket)
-// FIXME: convert to synchronous operation
 IndexedDBKVStorage.prototype.setItem = function __IDBKVSetItem(k, v) {
-    var promise = new MegaPromise();
-
-    delete this.delcache[k];
-    this.newcache[k] = v;
-    this.saveState();
-
-    promise.resolve([k, v]);
-
-    return promise;
+    'use strict';
+    var self = this;
+    console.assert(v !== undefined);
+    return new MegaPromise(function(resolve) {
+        delete self.delcache[k];
+        self.newcache[k] = v;
+        self.saveState();
+        resolve([k, v]);
+    });
 };
 
 // get item - if not found, promise will be rejected
-// FIXME: convert to synchronous operation
 IndexedDBKVStorage.prototype.getItem = function __IDBKVGetItem(k) {
-    var promise = new MegaPromise();
+    'use strict';
+    var self = this;
+    return new MegaPromise(function(resolve, reject) {
+        if (!self.delcache[k]) {
 
-    if (!this.delcache[k]) {
-        if (typeof(this.newcache[k]) != 'undefined') {
-            // record recently (over)written
-            promise.resolve(this.newcache[k]);
-            return promise;
-        }
-        else {
+            if (self.newcache[k] !== undefined) {
+                // record recently (over)written
+                return resolve(self.newcache[k]);
+            }
+
             // record available in DB
-            if (typeof(this.dbcache[k]) != 'undefined') {
-                promise.resolve(this.dbcache[k]);
-                return promise;
+            if (self.dbcache[k] !== undefined) {
+                return resolve(self.dbcache[k]);
             }
         }
-    }
 
-    // record deleted or unavailable
-    promise.reject();
-    return promise;
-};
-
-// check if item exists
-IndexedDBKVStorage.prototype.hasItem = function __IDBKVHasItem(k) {
-    if (!this.delcache[k] && (typeof(this.newcache[k]) != 'undefined' || typeof(this.dbcache[k]) != 'undefined')) {
-        return MegaPromise.resolve();
-    }
-
-    return MegaPromise.reject();
+        // record deleted or unavailable
+        reject();
+    });
 };
 
 // remove item from DB/cache
 // (must only be called in response to an API response triggered by an actionpacket)
-// FIXME: convert to synchronous operation
 IndexedDBKVStorage.prototype.removeItem = function __IDBKVRemoveItem(k) {
+    'use strict';
+
     this.delcache[k] = true;
     delete this.newcache[k];
     this.saveState();
@@ -116,62 +116,45 @@ IndexedDBKVStorage.prototype.saveState = function() {
 
     delay('attribcache:savestate', function() {
         if (d) {
-            self.logger.debug('saveState(%s)...', currsn, fminitialized);
+            console.debug('attribcache:savestate(%s)...', currsn, fminitialized);
         }
 
-        if (window.fmdb && fmdb.db && currsn) {
-            setsn(currsn);
+        if (fminitialized && currsn) {
+            if (window.fmdb) {
+                setsn(currsn);
+            }
+            else {
+                self.flush();
+            }
         }
     }, 2600);
 };
 
-// iterate over all items, with prefix
-// FIXME: convert to synchronous operation
-IndexedDBKVStorage.prototype.eachPrefixItem = function __IDBKVEachItem(prefix, cb) {
-    for (var k in this.newcache) {
-        if (!this.delcache[k]) cb(this.newcache[k], k);
+// Clear DB Table and in-memory contents.
+IndexedDBKVStorage.prototype.clear = promisify(function __IDBKVClear(resolve, reject) {
+    'use strict';
+
+    console.error("This function should not be used under normal conditions...");
+    IndexedDBKVStorage.call(this, this.name);
+
+    if (window.fmdb && Object(fmdb.db).hasOwnProperty(this.name)) {
+        return fmdb.db[this.name].clear().then(resolve).catch(reject);
     }
 
-    for (var k in this.dbcache) {
-        if (!this.delcache[k] && typeof this.newcache[k] == 'undefined') cb(this.dbcache[k], k);
-    }
+    reject();
+});
 
-    return MegaPromise.resolve();
-};
+if (!is_karma) {
+    Object.freeze(IndexedDBKVStorage.prototype);
+}
+Object.freeze(IndexedDBKVStorage);
 
-// FIXME: check if this gets called for caches other than the ua attribCache
-// - if that is the case, also clear the underlying DB table
-IndexedDBKVStorage.prototype.destroy = function __IDBKVDestroy() {
-    this.dbcache = Object.create(null);     // items that reside in the DB
-    this.newcache = Object.create(null);    // new items that are pending flushing to the DB
-    this.delcache = Object.create(null);    // delete items that are pending deletion from the DB
-};
+var attribCache = false;
+mBroadcaster.once('boot_done', function() {
+    'use strict';
+    attribCache = new IndexedDBKVStorage('ua');
+    attribCache.bitMapsManager = new MegaDataBitMapManager();
 
-/**
- * Clear DB Table contents.
- * @returns {MegaPromise}
- */
-IndexedDBKVStorage.prototype.clear = function __IDBKVClear() {
-    var self = this;
-    var fmdb = this.fmdb;
-    var promise = new MegaPromise();
-
-    this.destroy();
-
-    if (fmdb && Object(fmdb.db).hasOwnProperty(this.name)) {
-
-        fmdb.db[this.name].clear().then(function() {
-            self.logger.debug("Table cleared.");
-        }).catch(function(err) {
-            self.logger.error("Unable to clear table!", err);
-        }).finally(function() {
-            promise.resolve();
-        });
-    }
-    else {
-        promise.reject();
-    }
-
-    return promise;
-};
-makeObservable(IndexedDBKVStorage);
+    // We no longer need this for anything else.
+    window.IndexedDBKVStorage = null;
+});

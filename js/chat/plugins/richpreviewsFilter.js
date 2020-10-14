@@ -17,15 +17,15 @@ var RichpreviewsFilter = function(megaChat) {
 
     megaChat
         .rebind('onRoomInitialized.richpreviewsFilter', function(e, megaRoom) {
-            $(megaRoom).rebind('onPendingMessageConfirmed.richpreviewsFilter', function(e, msgObj) {
+            megaRoom.rebind('onPendingMessageConfirmed.richpreviewsFilter', function(e, msgObj) {
                 self.onPendingMessageConfirmed(megaRoom, msgObj);
                 msgObj.confirmed = true;
             });
-            $(megaRoom).rebind('onMessageUpdating.richpreviewsFilter', function(e, msgObj) {
+            megaRoom.rebind('onMessageUpdating.richpreviewsFilter', function(e, msgObj) {
                 var msgId = msgObj.messageId;
                 RichpreviewsFilter._messageUpdating[msgObj.chatRoom.roomId + "_" + msgId] = true;
             });
-            $(megaRoom).rebind('onMessageUpdateDecrypted.richpreviewsFilter', function(e, msgObj) {
+            megaRoom.rebind('onMessageUpdateDecrypted.richpreviewsFilter', function(e, msgObj) {
                 [
                     msgObj.chatRoom.roomId + "_" + msgObj.messageId,
                     msgObj.chatRoom.roomId + "_" + msgObj.pendingMessageId
@@ -133,6 +133,8 @@ RichpreviewsFilter._RFC_REGEXP = new RegExp(
  */
 RichpreviewsFilter.retrievePreview = function(url) {
     "use strict";
+
+    url = String(url).split("#")[0];
 
     if (!RichpreviewsFilter._requests[url]) {
 

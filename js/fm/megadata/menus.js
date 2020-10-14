@@ -117,27 +117,26 @@ MegaData.prototype.menuItems = function menuItems() {
     var checkMegaSync = function _checkMegaSync(preparedItems) {
         $('.dropdown-item.download-item').addClass('contains-submenu');
         $('.dropdown-item.download-item').removeClass('msync-found');
-        megasync.isInstalled(function (err, is) {
-            if (!err || is) {
-                $('.dropdown-item.download-item').removeClass('contains-submenu');
-                $('.dropdown-item.download-item').addClass('msync-found');
-                if (megasync.currUser === u_handle && $.selected.length === 1 && M.d[$.selected[0]].t === 1) {
-                    var addItemAndResolvePromise = function _addItemAndResolvePromise(error, response) {
-                        if (!error && response === 0) {
-                            preparedItems['.syncmegasync-item'] = 1;
-                        }
-                        promise.resolve(preparedItems);
-                    };
-                    megasync.syncPossible($.selected[0], addItemAndResolvePromise);
-                }
-                else {
+
+        if (window.useMegaSync === 2 || window.useMegaSync === 3) {
+            $('.dropdown-item.download-item').removeClass('contains-submenu');
+            $('.dropdown-item.download-item').addClass('msync-found');
+            if (window.useMegaSync === 2 && $.selected.length === 1 && M.d[$.selected[0]].t === 1) {
+                var addItemAndResolvePromise = function _addItemAndResolvePromise(error, response) {
+                    if (!error && response === 0) {
+                        preparedItems['.syncmegasync-item'] = 1;
+                    }
                     promise.resolve(preparedItems);
-                }
+                };
+                megasync.syncPossible($.selected[0], addItemAndResolvePromise);
             }
             else {
                 promise.resolve(preparedItems);
             }
-        });
+        }
+        else {
+            promise.resolve(preparedItems);
+        }
     }
 
     if (nodes.length) {
@@ -178,6 +177,10 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
         if (selNode.t) {
             if (M.currentdirid !== selNode.h) {
                 items['.open-item'] = 1;
+            }
+
+            if (M.currentCustomView) {
+                items['.open-cloud-item'] = 1;
             }
 
             if (sourceRoot === M.RootID && !folderlink) {
@@ -245,10 +248,17 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
                 $('.add-star-item').safeHTML('<i class="small-icon context broken-heart"></i>@@', l[5872]);
             }
             else {
-                $('.add-star-item').safeHTML('<i class="small-icon context heart"/></i>@@', l[5871]);
+                $('.add-star-item').safeHTML('<i class="small-icon context heart"></i>@@', l[5871]);
             }
 
             M.colourLabelcmUpdate(selNode);
+
+            if (items['.edit-file-item']) {
+                $('.dropdown-item.edit-file-item span').text(l[865]);
+            }
+        }
+        else if (items['.edit-file-item']) {
+            $('.dropdown-item.edit-file-item span').text(l[16797]);
         }
     }
 
@@ -257,7 +267,7 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
         var viewChat = true;
         for (var i = $.selected.length; i--;) {
             var n = M.d[$.selected[i]];
-            if (!n || n.t) {
+            if (!n || (n.t && sourceRoot !== M.RootID)) {
                 viewChat = false;
                 break;
             }
@@ -403,6 +413,19 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
         m.find('.dropdown-section:visible:last hr').addClass('hidden');
 
         $(window).rebind('resize.ccmui', SoonFc(findNewPosition));
+
+        $('.jspContainer','#bodyel').rebind('mousewheel.context', function() {
+            $(this).off('mousewheel.context');
+            $.hideContextMenu();
+        });
+
+        // disable scrolling
+        var $psContainer = $(e.currentTarget).closest('.ps-container');
+        if ($psContainer.length) {
+            Ps.disable($psContainer[0]);
+            $.disabledContianer = $psContainer;
+        }
+
     };
 
     $.hideContextMenu();
@@ -570,11 +593,17 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
             if (!window.megaChatIsDisabled) {
                 flt += ',.startchat-item, .startaudiovideo-item, .send-files-item';
             }
-            $(menuCMI).filter(flt).show();
+            var $menuCmi = $(menuCMI);
+            $menuCmi.filter(flt).show();
 
             // Enable All buttons
-            $(menuCMI).filter('.startaudiovideo-item, .send-files-item')
+            $menuCmi.filter('.startaudiovideo-item, .send-files-item')
                 .removeClass('disabled disabled-submenu');
+
+            // disable remove for business accounts + business users
+            if (u_attr && u_attr.b && M.u[id] && M.u[id].b) {
+                $menuCmi.filter('.remove-contact').addClass('disabled');
+            }
 
             // Show Detail block
             $contactDetails.removeClass('hidden');
@@ -888,7 +917,7 @@ MegaData.prototype.reCalcMenuPosition = function(m, x, y, ico) {
     };
 
     var handleSmall = function(dPos) {
-        m.find('> .dropdown-section').wrapAll('<div id="cm_scroll" class="context-scrolling-block" />');
+        m.find('> .dropdown-section').wrapAll('<div id="cm_scroll" class="context-scrolling-block"></div>');
         m.append('<span class="context-top-arrow"></span><span class="context-bottom-arrow"></span>');
         m.addClass('mega-height');
         cmH = wH - TOP_MARGIN * 2;

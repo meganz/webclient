@@ -6,12 +6,18 @@ function UFSSizeCache() {
     this.cache = Object.create(null);
 }
 
+lazy(UFSSizeCache.prototype, 'tbsp', function() {
+    'use strict';
+    return Promise.resolve();
+});
+
 // add node n to the folders cache
 // assumptions:
 // - if n.p is set, n.t is 0 or 1
 // - if n.t is 0, n.s is always set
 // - if n.t is 1, n.s is never set or set and != 0
 UFSSizeCache.prototype.feednode = function(n) {
+    'use strict';
 
     if (n.p) {
         if (!this.cache[n.p]) {
@@ -45,6 +51,8 @@ UFSSizeCache.prototype.feednode = function(n) {
 
 // compute td / tf / tb for all folders
 UFSSizeCache.prototype.sum = function() {
+    'use strict';
+
     for (var h in this.cache) {
         var p = h;
 
@@ -63,13 +71,40 @@ UFSSizeCache.prototype.sum = function() {
     }
 };
 
+// @private
+UFSSizeCache.prototype._saveNodeState = function(n, entry) {
+    'use strict';
+
+    n.td = (n.td || 0) + entry[4];
+    n.tf = (n.tf || 0) + entry[5];
+    n.tb = (n.tb || 0) + entry[6];
+    n.tvf = (n.tvf || 0) + entry[7];
+    n.tvb = (n.tvb || 0) + entry[8];
+    this.addToDB(n);
+};
+
+// @private
+UFSSizeCache.prototype._saveTreeState = function(n, entry) {
+    'use strict';
+
+    this._saveNodeState(n, entry);
+
+    if (!entry[3]) {
+        while ((n = M.d[n.p])) {
+            this._saveNodeState(n, entry);
+        }
+    }
+};
+
 // Save computed td / tf / tb / tvf /tvb for all folders
 // if no root node is provided, cache is a full cloud tree
 UFSSizeCache.prototype.save = function(rootNode) {
+    'use strict';
     this.sum();
 
     if (d) {
         console.debug('ufsc.save(%s)', rootNode ? rootNode.h : 'undef', rootNode, this);
+        console.time('ufsc.save');
     }
 
     for (var h in this.cache) {
@@ -84,35 +119,65 @@ UFSSizeCache.prototype.save = function(rootNode) {
                 // continue;
             }
 
-            n.td = (n.td || 0) + this.cache[h][4];
-            n.tf = (n.tf || 0) + this.cache[h][5];
-            n.tb = (n.tb || 0) + this.cache[h][6];
-            n.tvf = (n.tvf || 0) + this.cache[h][7];
-            n.tvb = (n.tvb || 0) + this.cache[h][8];
-            this.addToDB(n);
-
-            if (!this.cache[h][3]) {
-                while ((n = M.d[n.p])) {
-                    n.td = (n.td || 0) + this.cache[h][4];
-                    n.tf = (n.tf || 0) + this.cache[h][5];
-                    n.tb = (n.tb || 0) + this.cache[h][6];
-                    n.tvf = (n.tvf || 0) + this.cache[h][7];
-                    n.tvb = (n.tvb || 0) + this.cache[h][8];
-                    this.addToDB(n);
-                }
-            }
+            this._saveTreeState(n, this.cache[h]);
             this.cache[h] = null;
         }
     }
 
-    if (d > 1) {
-        this._cache = this.cache;
+    if (d) {
+        console.timeEnd('ufsc.save');
+        if (d > 1) {
+            this._cache = this.cache;
+        }
     }
     delete this.cache;
 };
 
+// @see {@link UFSSizeCache.save}
+UFSSizeCache.prototype.saveInitialState = promisify(function(resolve) {
+    'use strict';
+
+    console.time('ufs.sum');
+    this.sum();
+    console.timeEnd('ufs.sum');
+
+    console.time('ufs.keys');
+    var keys = Object.keys(this.cache);
+    console.timeEnd('ufs.keys');
+
+    console.time('ufs.sis');
+    console.debug('Storing %d ufs cache entries...', keys.length);
+
+    var tick = 0;
+    var self = this;
+    onIdle(function _asyncLoop() {
+        var bulk = keys.splice(0, 12282);
+        for (var i = 0; i < bulk.length; ++i) {
+            var h = bulk[i];
+            var n = M.d[h];
+            if (n) {
+                self._saveTreeState(n, self.cache[h]);
+            }
+        }
+
+        if (keys.length) {
+            if (!(++tick % 6)) {
+                return onIdle(_asyncLoop);
+            }
+            self.tbsp.then(_asyncLoop);
+        }
+        else {
+            delete self.cache;
+            console.timeEnd('ufs.sis');
+            onIdle(resolve);
+        }
+    });
+});
+
 // Add node to indexedDB
 UFSSizeCache.prototype.addToDB = function(n) {
+    'use strict';
+
     if (fmdb) {
         fmdb.add('f', {
             h: n.h,
@@ -140,6 +205,7 @@ UFSSizeCache.prototype.addToDB = function(n) {
  * @param {Boolean} [ignoreDB] Whether updating local state only
  */
 UFSSizeCache.prototype.addTreeNode = function(n, ignoreDB) {
+    'use strict';
     var p = n.su ? 'shares' : n.p;
 
     if (!M.tree[p]) {
@@ -221,6 +287,7 @@ UFSSizeCache.prototype.delTreeNode = function(h, p) {
  * @param {Boolean} [ignoreDB] Hint: do not set it...
  */
 UFSSizeCache.prototype.addNode = function(n, ignoreDB) {
+    'use strict';
     var td, tf, tb, tvf, tvb;
 
     if (n.t) {

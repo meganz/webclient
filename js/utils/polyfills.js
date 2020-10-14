@@ -1,3 +1,8 @@
+/**
+ * @file Browser polyfills
+ * @desc This is the only file where we're allowed to extend native prototypes, as required for polyfills.
+ *//* eslint-disable no-extend-native */
+
 /** document.hasFocus polyfill */
 mBroadcaster.once('startMega', function() {
     if (typeof document.hasFocus !== 'function') {
@@ -46,6 +51,15 @@ if (!Object.hasOwnProperty('getOwnPropertyDescriptors')) {
     });
 }
 
+/** setPrototypeOf (weak) polyfill */
+if (Object.setPrototypeOf === undefined) {
+    Object.setPrototypeOf = function(target, proto) {
+        'use strict';
+        target.__proto__ = proto;
+        return target;
+    };
+}
+
 if (!String.prototype.startsWith) {
     // determines whether a string begins with the characters of a specified string
     String.prototype.startsWith = function(searchString, position) {
@@ -65,6 +79,33 @@ if (!String.prototype.endsWith) {
         return this.substr((pos | 0) - searchStr.length, searchStr.length) === searchStr;
     };
 }
+
+mBroadcaster.once('startMega', tryCatch(function() {
+    'use strict';
+
+    // FIXME: this is a silly polyfill for our exact needs atm..
+    if (window.Intl && !Intl.NumberFormat.prototype.formatToParts) {
+        Intl.NumberFormat.prototype.formatToParts = function(n) {
+            var result;
+
+            tryCatch(function() {
+                result = Number(n).toLocaleString(getCountryAndLocales().locales).match(/(\d+)(\D)(\d+)/);
+            }, function() {
+                result = Number(n).toLocaleString().match(/(\d+)(\D)(\d+)/);
+            })();
+
+            if (!result || result.length !== 4) {
+                result = [NaN, NaN, '.', NaN];
+            }
+
+            return [
+                {type: "integer", value: result[1]},
+                {type: "decimal", value: result[2]},
+                {type: "fraction", value: result[3]}
+            ];
+        };
+    }
+}, false));
 
 mBroadcaster.once('startMega', function() {
     "use strict";
@@ -124,7 +165,7 @@ mBroadcaster.once('startMega', function() {
     }
 });
 
-mBroadcaster.once('startMega', function() {
+mBroadcaster.once('boot_done', function() {
     'use strict';
 
     if (typeof window.devicePixelRatio === 'undefined') {
@@ -136,13 +177,70 @@ mBroadcaster.once('startMega', function() {
     }
 });
 
-mBroadcaster.once('startMega', function() {
+mBroadcaster.once('boot_done', function() {
+    'use strict';
+
+    // Pragmatic Device Memory API Polyfill...
+    // https://caniuse.com/#search=deviceMemory
+    if (navigator.deviceMemory === undefined) {
+        lazy(navigator, 'deviceMemory', function() {
+            var value = 0.5;
+            var uad = ua.details || false;
+
+            if (uad.engine === 'Gecko') {
+                value = 1 + uad.is64bit;
+
+                if (parseInt(uad.version) > 67) {
+                    value *= 3;
+                }
+            }
+            else if (uad.is64bit) {
+                value = 2;
+            }
+
+            return value;
+        });
+    }
+});
+
+mBroadcaster.once('boot_done', function() {
+    'use strict';
+
+    if (typeof window.queueMicrotask !== "function") {
+        var tbsp = Promise.resolve();
+
+        window.queueMicrotask = function(callback) {
+            tbsp.then(callback);
+        };
+    }
+});
+
+mBroadcaster.once('boot_done', function() {
     'use strict';
     Promise.prototype.always = function(fc) {
-        this.then(fc).catch(fc);
+        return this.then(fc).catch(fc);
+    };
+    Promise.prototype.dump = function(tag) {
+        // XXX: No more then/catch after invoking this!
+        this.then(console.debug.bind(console, tag || 'OK'))
+            .catch(console.warn.bind(console, tag || 'FAIL'));
         return this;
     };
-    Promise.prototype.dump = MegaPromise.prototype.dumpToConsole;
+
+    if (Promise.allSettled === undefined) {
+        Promise.allSettled = function(promises) {
+            var done = function(result) {
+                return {status: 'fulfilled', value: result};
+            };
+            var fail = function(result) {
+                return {status: 'rejected', reason: result};
+            };
+            var map = function(value) {
+                return Promise.resolve(value).then(done).catch(fail);
+            };
+            return Promise.all(promises.map(map));
+        };
+    }
 });
 
 mBroadcaster.once('boot_done', function() {
@@ -157,3 +255,58 @@ mBroadcaster.once('boot_done', function() {
 
     Object.defineProperty(mega, 'es2019', {value: mg && mg.length === 2 && mg[0] === 'm1' && mg[1] === 'm2'});
 });
+
+// https://github.com/uxitten/polyfill/blob/master/string.polyfill.js
+// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/padStart
+if (!String.prototype.padStart) {
+    String.prototype.padStart = function padStart(targetLength, padString) {
+        "use strict";
+        // truncate if number, or convert non-number to 0;
+        targetLength >>= 0;
+        padString = String(typeof padString === 'undefined' ? ' ' : padString);
+        if (this.length >= targetLength) {
+            return String(this);
+        }
+        targetLength -= this.length;
+        if (targetLength > padString.length) {
+            // append to original to ensure we are longer than needed
+            padString += padString.repeat(targetLength / padString.length);
+        }
+        return padString.slice(0, targetLength) + String(this);
+    };
+}
+if (!String.prototype.padEnd) {
+    String.prototype.padEnd = function padEnd(targetLength, padString) {
+        "use strict";
+        // floor if number or convert non-number to 0;
+        targetLength >>= 0;
+        padString = String(typeof padString === 'undefined' ? ' ' : padString);
+        if (this.length > targetLength) {
+            return String(this);
+        }
+        targetLength -= this.length;
+        if (targetLength > padString.length) {
+            // append to original to ensure we are longer than needed
+            padString += padString.repeat(targetLength / padString.length);
+        }
+        return String(this) + padString.slice(0, targetLength);
+    };
+}
+
+
+
+// XXX: The following are not polyfills obviously, but given this file is included always let's place them here for now
+
+// @private
+var nop = function() {
+    'use strict';
+};
+
+// @private
+var echo = function(a) {
+    'use strict';
+    return a;
+};
+
+// @private
+var dump = console.warn.bind(console, '[dump]');

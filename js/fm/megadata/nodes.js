@@ -57,7 +57,7 @@
 
         if (fminitialized) {
             // Handle Inbox/RubbishBin UI changes
-            delay(fmtopUI);
+            delay(fmLeftMenuUI);
         }
 
         if (this.d[h] && !this.d[h].t && this.d[h].tvf) {
@@ -116,7 +116,7 @@ MegaData.prototype.addNode = function(n, ignoreDB) {
     if (this.u[n.h] && this.u[n.h] !== n) {
         for (var k in n) {
             // merge changes from n->M.u[n.h]
-            if (n.hasOwnProperty(k) && k !== 'name') {
+            if (k !== 'name' && k in MEGA_USER_STRUCT) {
                 this.u[n.h][k] = n[k];
             }
         }
@@ -127,7 +127,7 @@ MegaData.prototype.addNode = function(n, ignoreDB) {
         newnodes.push(n);
 
         // Handle Inbox/RubbishBin UI changes
-        delay(fmtopUI);
+        delay(fmLeftMenuUI);
     }
 };
 
@@ -320,9 +320,7 @@ MegaData.prototype.isCustomView = function(pathOrID) {
 MegaData.prototype.clearRubbish = function(all) {
     "use strict";
 
-    if (u_attr && u_attr.b && u_attr.b.s === -1) {
-        $.hideContextMenu();
-        M.showExpiredBusiness();
+    if (M.isInvalidUserStatus()) {
         return;
     }
 
@@ -453,10 +451,7 @@ MegaData.prototype.copyNodes = function copynodes(cn, t, del, promise, tree) {
         promise.always(tmp);
     }
 
-    // check if this is a business expired account
-    if (u_attr && u_attr.b && u_attr.b.s === -1) {
-        $.hideContextMenu();
-        M.showExpiredBusiness();
+    if (M.isInvalidUserStatus()) {
         return;
     }
 
@@ -792,10 +787,8 @@ MegaData.prototype.copyNodes = function copynodes(cn, t, del, promise, tree) {
 MegaData.prototype.moveNodes = function moveNodes(n, t, quiet, folderDefaultConflictResolution) {
     'use strict'; /* jshint -W089, -W074 */
     var promise = new MegaPromise();
-    // check if this is a business expired account
-    if (u_attr && u_attr.b && u_attr.b.s === -1) {
-        $.hideContextMenu();
-        M.showExpiredBusiness();
+
+    if (M.isInvalidUserStatus()) {
         return;
     }
     if (!quiet) {
@@ -894,7 +887,7 @@ MegaData.prototype.moveNodes = function moveNodes(n, t, quiet, folderDefaultConf
             }
 
             renderPromise.always(function() {
-                Soon(fmtopUI);
+                Soon(fmLeftMenuUI);
                 $.tresizer();
 
                 onMoveNodesDone(ctx.pending.cnt);
@@ -1205,10 +1198,8 @@ MegaData.prototype.moveNodes = function moveNodes(n, t, quiet, folderDefaultConf
  */
 MegaData.prototype.safeMoveNodes = function safeMoveNodes(target, nodes) {
     var promise = new MegaPromise();
-    // check if this is a business expired account
-    if (u_attr && u_attr.b && u_attr.b.s === -1) {
-        $.hideContextMenu();
-        M.showExpiredBusiness();
+
+    if (M.isInvalidUserStatus()) {
         return;
     }
 
@@ -1274,10 +1265,8 @@ MegaData.prototype.safeMoveNodes = function safeMoveNodes(target, nodes) {
  */
 MegaData.prototype.safeRemoveNodes = function(handles) {
     'use strict';
-    // check if this is a business expired account
-    if (u_attr && u_attr.b && u_attr.b.s === -1) {
-        $.hideContextMenu();
-        M.showExpiredBusiness();
+
+    if (M.isInvalidUserStatus()) {
         return;
     }
     var masterPromise = new MegaPromise();
@@ -1340,10 +1329,8 @@ MegaData.prototype.safeRemoveNodes = function(handles) {
 MegaData.prototype.revertRubbishNodes = function(handles) {
     'use strict'; /* jshint -W089 */
     var masterPromise = new MegaPromise();
-    // check if this is a business expired account
-    if (u_attr && u_attr.b && u_attr.b.s === -1) {
-        $.hideContextMenu();
-        M.showExpiredBusiness();
+
+    if (M.isInvalidUserStatus()) {
         return;
     }
 
@@ -1526,10 +1513,8 @@ MegaData.prototype.moveToRubbish = function(handles) {
 MegaData.prototype.revokeShares = function(handles) {
     'use strict'; /* jshint -W089, -W074 */
     var promise = new MegaPromise();
-    // check if this is a business expired account
-    if (u_attr && u_attr.b && u_attr.b.s === -1) {
-        $.hideContextMenu();
-        M.showExpiredBusiness();
+
+    if (M.isInvalidUserStatus()) {
         return;
     }
 
@@ -1640,10 +1625,8 @@ MegaData.prototype.revokeShares = function(handles) {
 MegaData.prototype.revokeFolderShare = function(h, usr, isps) {
     'use strict';
     var promise = new MegaPromise();
-    // check if this is a business expired account
-    if (u_attr && u_attr.b && u_attr.b.s === -1) {
-        $.hideContextMenu();
-        M.showExpiredBusiness();
+
+    if (M.isInvalidUserStatus()) {
         return;
     }
 
@@ -1780,68 +1763,33 @@ MegaData.prototype.nodeUpdated = function(n, ignoreDB) {
  */
 MegaData.prototype.onFolderSizeChangeUIUpdate = function(node) {
     "use strict";
-    if (!node || !node.t || typeof M.currentdirid !== 'string') {
-        return;
-    }
+    var p = this.viewmode === 0 && this.currentdirid || false;
+    if (p && String(p).slice(-8) === node.p || M.currentCustomView || p === 'shares') {
+        var elm = document.getElementById(node.h);
 
-    var needCheck = false;
+        if (elm) {
+            var s1 = elm.querySelector('.size');
+            var s2 = elm.querySelector('.shared-folder-size');
 
-    var currDir = M.currentdirid;
-    if (currDir.indexOf(node.p) > -1) {
-        needCheck = true;
-    }
+            if (s1 || s2) {
+                var sizeText = bytesToSize(node.tb);
 
-    if (!needCheck && (node.sk || node.shares || node.su)) {
-        currDir = currDir.replace('out-shares', '')
-            .replace('shares', '').replace('public-links', '').replace('/', '');
+                if (s1) {
+                    s1.textContent = sizeText;
+                }
+                if (s2) {
+                    s2.textContent = sizeText;
 
-        if (currDir) {
-            // we are not in sharing/out-share/public link
-            return;
+                    if ((s2 = elm.querySelector('.shared-folder-info'))) {
+                        s2.textContent = fm_contains(node.tf, node.td);
+                    }
+                }
+            }
         }
-        needCheck = true;
-    }
 
-    if (!needCheck) {
-        return;
-    }
-
-    var reRender = false;
-    var dir = 1;
-
-    if (fmconfig && fmconfig.sortmodes && fmconfig.sortmodes[node.p] &&
-        fmconfig.sortmodes[node.p].n === 'size') {
-        reRender = true;
-        dir = fmconfig.sortmodes[node.p].d;
-    }
-    else if (fmconfig && this.fmsorting && fmconfig.sorting &&
-        fmconfig.sorting.n === 'size') {
-        reRender = true;
-        dir = fmconfig.sorting.n.d;
-    }
-
-    // in most cases, super fast update
-    if (!reRender) {
-        var sizeText = bytesToSize(node.tb);
-
-        $('.grid-table #' + node.h + ' .size').text(sizeText);
-        $('.grid-table #' + node.h + ' .shared-folder-size').text(sizeText);
-    }
-    else {
-        var scrollVal;
-        if (M.megaRender && M.megaRender.megaList) {
-            scrollVal = M.megaRender.megaList.getScrollLeft();
-        }
-        M.doSort('size', dir);
-        M.renderMain();
-        if (scrollVal) {
-            M.megaRender.megaList.scrollTo(0, scrollVal);
-            var $tableHeader = $('.files-grid-view.fm .grid-table-header');
-            $tableHeader.css('left', -1 * scrollVal);
-        }
+        // @todo consider bringing back an approach to re-sort by size, one that wouldn't lead to uncaught exceptions.
     }
 };
-
 
 /**
  * Fire DOM updating when a node gets a new name
@@ -2768,7 +2716,7 @@ MegaData.prototype.getRecentNodes = function(limit, until) {
         until = until || Math.round((Date.now() - 7776e6) / 1e3);
 
         resolve = (function(resolve) {
-            return function(nodes, limit) {
+            return function(nodes) {
                 var sort = M.getSortByDateTimeFn();
                 nodes = nodes.filter(function(n) {
                     return !n.fv;
@@ -2782,13 +2730,22 @@ MegaData.prototype.getRecentNodes = function(limit, until) {
 
         if (fmdb) {
             rubTree = rubTree.map(function(h) {
-                return ab_to_base64(fmdb.strcrypt(h));
+                return fmdb.toStore(h);
             });
+            var binRubFilter = function(n) {
+                for (var i = rubTree.length; i--;) {
+                    if (!indexedDB.cmp(rubTree[i], n.p)) {
+                        return false;
+                    }
+                }
+                return true;
+            };
+            var dbRubFilter = FMDB.$useBinaryKeys ? binRubFilter : rubFilter;
             var options = {
                 limit: limit,
 
                 query: function(db) {
-                    return db.orderBy('t').reverse().filter(rubFilter)
+                    return db.orderBy('t').reverse().filter(dbRubFilter)
                         .until(function(row) {
                             return until > row.t;
                         });
@@ -2891,7 +2848,7 @@ MegaData.prototype.getRecentActionsList = function(limit, until) {
             for (var i = 0; i < nodes.length; i++) {
                 var n = new MegaNode(nodes[i]);
                 var actionType = n.tvf ? "updated" : "added";
-                var blockType = (is_image3(n) || is_video(n) === 1) ? 'media' : 'files';
+                var blockType = is_image2(n) || is_video(n) === 1 ? 'media' : 'files';
                 index[n.u] = index[n.u] || Object.create(null);
                 index[n.u][n.p] = index[n.u][n.p] || Object.create(null);
                 index[n.u][n.p][actionType] = index[n.u][n.p][actionType] || Object.create(null);
@@ -3321,6 +3278,40 @@ MegaData.prototype.leaveShare = function(h) {
     return promise;
 };
 
+MegaData.prototype.createPublicLink = promisify(function(resolve, reject, handle) {
+    'use strict';
+
+    dbfetch.get(handle).then(function() {
+        return M.getNodeShare(handle).h === handle || !M.d[handle].t || M.getNodes(handle, 1);
+    }).then(function(nodes) {
+        return Array.isArray(nodes) ? api_setshare(handle, [{u: 'EXP', r: 0}], nodes) : {r: [0]};
+    }).then(function(res) {
+        return M.d[handle].ph || res.r && res.r[0] === 0 && M.req({a: 'l', i: requesti, n: handle});
+    }).then(function(ph) {
+        if (!ph || typeof ph !== 'string') {
+            return reject(EFAILED);
+        }
+        var n = M.getNodeByHandle(handle);
+        if (n.ph !== ph) {
+            M.nodeShare(handle, {h: handle, r: 0, u: 'EXP', ts: unixtime(), ph: ph});
+            n.ph = ph;
+            M.nodeUpdated(n);
+        }
+        var res = {
+            n: n,
+            ph: ph,
+            key: n.t ? u_sharekeys[n.h][0] : n.k
+        };
+        if (mega.flags.nlfe) {
+            res.link = getBaseUrl() + '/' + (n.t ? 'folder' : 'file') + '/' + res.ph + '#' + a32_to_base64(res.key);
+        }
+        else {
+            res.link = getBaseUrl() + '/#' + (n.t ? 'F' : '') + '!' + res.ph + '!' + a32_to_base64(res.key);
+        }
+        resolve(res);
+    }).catch(reject);
+});
+
 /**
  * Retrieve node share.
  * @param {String|Object} node cloud node or handle
@@ -3593,6 +3584,9 @@ MegaData.prototype.getUserByHandle = function(handle) {
     else if (this.opc[handle]) {
         user = this.opc[handle];
     }
+    else if (this.ipc[handle]) {
+        user = this.ipc[handle];
+    }
 
     if (!user && handle === u_handle) {
         user = u_attr;
@@ -3670,9 +3664,9 @@ MegaData.prototype.getNameByHandle = function(handle) {
     if (handle.length === 11) {
         var user = this.getUserByHandle(handle);
 
-        // If user exists locally, use Nickname (FirstName LastName) or FirstName LastName or fallback to email
+        // If user exists locally, use Nickname or FirstName LastName or fallback to email
         if (user) {
-            result = nicknames.getNicknameAndName(handle) || user.m;
+            result = nicknames.getNickname(handle) || user.m;
         }
         else if (window.megaChatIsReady && megaChat.chats[handle]) {
             var chat = megaChat.chats[handle];
@@ -3691,7 +3685,7 @@ MegaData.prototype.getNameByHandle = function(handle) {
         var node = this.getNodeByHandle(handle);
 
         if (node) {
-            result = node.name;
+            result = node.name || '';
         }
     }
 
@@ -3831,7 +3825,7 @@ MegaData.prototype.getDashboardData = function() {
     res.rubbish = { cnt: s[this.RubbishID].files, size: s[this.RubbishID].bytes };
     res.ishares = { cnt: s.inshares.items, size: s.inshares.bytes, xfiles: s.inshares.files };
     res.oshares = { cnt: s.outshares.items, size: s.outshares.bytes };
-    res.links = { cnt: s.links.files, size: s.links.bytes };
+    res.links = { cnt: s.links.folders, size: s.links.bytes, xfiles: s.links.files };
     res.versions = { cnt: s[this.RootID].vfiles, size: s[this.RootID].vbytes };
 
     return res;
@@ -3918,6 +3912,11 @@ MegaData.prototype.disableCircularTargets = function disableCircularTargets(pref
         }
         else if (d) {
             console.error('M.disableCircularTargets: Invalid node', handle, pref);
+        }
+
+        // Disable moving to rubbish from rubbish
+        if (M.getNodeRoot(handle) === M.RubbishID) {
+            $(pref + M.RubbishID).addClass('disabled');
         }
 
         // Disable all children folders
@@ -4098,18 +4097,20 @@ MegaData.prototype.importFolderLinkNodes = function importFolderLinkNodes(nodes)
             _import($.onImportCopyNodes);
         }
         else {
-            var kv = StorageDB(u_handle);
+            var kv = MegaDexie.create(u_handle);
             var key = 'import.' + localStorage.folderLinkImport;
 
             kv.get(key)
-                .done(function(data) {
+                .then(function(data) {
                     _import(data);
-                    kv.rem(key);
+                    kv.remove(key, true).dump(key);
                 })
-                .fail(function(e) {
+                .catch(function(ex) {
                     if (d) {
-                        console.error(e);
+                        console.error(ex);
                     }
+                    loadingDialog.hide('import');
+                    kv.remove(key, true).dump(key);
                     msgDialog('warninga', l[135], l[47]);
                 });
         }
@@ -4141,15 +4142,14 @@ MegaData.prototype.importFolderLinkNodes = function importFolderLinkNodes(nodes)
                         fallback();
                     }
                     else {
-                        StorageDB(u_handle)
+                        MegaDexie.create(u_handle)
                             .set('import.' + FLRootID, data)
-                            .done(function() {
-
+                            .then(function() {
                                 loadSubPage('fm');
                             })
-                            .fail(function(e) {
+                            .catch(function(ex) {
                                 if (d) {
-                                    console.warn('Cannot import using indexedDB...', e);
+                                    console.warn('Cannot import using indexedDB...', ex);
                                 }
                                 fallback();
                             });

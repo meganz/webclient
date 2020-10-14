@@ -389,7 +389,6 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
                 var defMime = 'image/jpeg';
                 var curMime = MediaInfoLib.isFileSupported(node) ? defMime : filemime(M.d[node], defMime);
                 file = new Blob([new Uint8Array(imagedata)], {type: curMime});
-                M.neuterArrayBuffer(imagedata);
             }
             if (mega.chrome && file.size > 6e8) {
                 console.warn('Aborting thumbnail creation due https://crbug.com/536816 ...');
@@ -450,6 +449,10 @@ function __render_thumb(img, u8, orientation, noMagicNumCheck) {
                 if (dv.byteLength > 24 && dv.getUint32(20) === 0x68656963) { // HEIC
                     break;
                 }
+                if (dv.byteLength > 24 && dv.getUint32(20) === 0x61766966) { // AVIF
+                    u8.type = 'image/avif';
+                    break;
+                }
                 if (dv.byteLength > 12 && dv.getUint32(8) === 0x57454250) { // WEBP
                     img.doesSupportAlpha = true;
                     break;
@@ -498,6 +501,21 @@ function __render_thumb(img, u8, orientation, noMagicNumCheck) {
     }
 }
 
+mBroadcaster.once('startMega', function() {
+    'use strict';
+    exifImageRotation.fromImage = getComputedStyle(document.documentElement).imageOrientation === 'from-image';
+
+    if (exifImageRotation.fromImage) {
+        if (d) {
+            console.info('This browser automatically rotates images based on the EXIF metadata.', [ua]);
+        }
+
+        if (window.safari || ua.details.engine === 'Gecko') {
+            exifImageRotation.fromImage = -1;
+        }
+    }
+});
+
 /**
  * Rotate images as per the extracted EXIF orientation
  * @param {Image|Object} target Image element where to render the result
@@ -506,20 +524,32 @@ function __render_thumb(img, u8, orientation, noMagicNumCheck) {
  */
 function exifImageRotation(target, buffer, orientation) {
     'use strict';
-    var blobURI = mObjectURL([buffer], 'image/jpeg');
+    var blobURI = mObjectURL([buffer], buffer.type || 'image/jpeg');
 
     orientation |= 0;
-    if (orientation < 2) {
+    if (orientation < 2 || exifImageRotation.fromImage < 0) {
         // No rotation needed.
         target.src = blobURI;
     }
     else {
+        var img = new Image();
+        var canvas = document.createElement('canvas');
         var signalError = function() {
             // let the target reach its onerror...
             target.src = 'data:text/xml,error';
+
+            if (exifImageRotation.fromImage) {
+                document.body.removeChild(img);
+                document.body.removeChild(canvas);
+            }
         };
 
-        var img = new Image();
+        if (exifImageRotation.fromImage) {
+            img.style.imageOrientation = 'none';
+            canvas.style.imageOrientation = 'none';
+            document.body.appendChild(img);
+            document.body.appendChild(canvas);
+        }
         img.onload = tryCatch(function() {
             var width = this.naturalWidth;
             var height = this.naturalHeight;
@@ -532,7 +562,9 @@ function exifImageRotation(target, buffer, orientation) {
                 return signalError();
             }
 
-            var canvas = document.createElement('canvas');
+            if (d) {
+                console.debug('exifImageRotation: %d x %d', width, height);
+            }
             var ctx = canvas.getContext('2d');
 
             ctx.save();
@@ -594,18 +626,24 @@ function exifImageRotation(target, buffer, orientation) {
             ctx.restore();
             target.src = canvas.toDataURL();
 
+            if (exifImageRotation.fromImage) {
+                document.body.removeChild(img);
+                document.body.removeChild(canvas);
+            }
+
         }, img.onerror = function(ev) {
             if (d) {
                 console.error('exifImageRotation failed...', ev);
             }
             signalError();
         });
-        img.src = blobURI;
+        onIdle(function() {
+            img.src = blobURI;
+        });
     }
 
     setTimeout(function() {
         URL.revokeObjectURL(blobURI);
-        M.neuterArrayBuffer(buffer);
     }, 1e4);
 }
 
@@ -635,10 +673,11 @@ function ppmtojpeg(ppm) {
             i = 0;
             j = 0;
             while (i < ppmLen && j < iLen) {
+                var a = ppm[i] | ppm[i + 1] | ppm[i + 2];
                 imageData.data[j] = ppm[i];         // R
                 imageData.data[j + 1] = ppm[i + 1]; // G
                 imageData.data[j + 2] = ppm[i + 2]; // B
-                imageData.data[j + 3] = 0xCE;       // A
+                imageData.data[j + 3] = a ? 208 : 0;// A
                 j += 4;
                 i += 3;
             }

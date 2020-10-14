@@ -64,7 +64,7 @@ function parseHTML(markup, forbidStyle, doc, baseURI, isXML) {
         }
     }
 
-    var dumb = {'SCRIPT': 1, 'STYLE': 1, 'SVG': 1, 'XML': 1, 'OBJECT': 1};
+    var dumb = {'SCRIPT': 1, 'STYLE': 1, 'SVG': 1, 'XML': 1, 'OBJECT': 1, 'IFRAME': 1, 'EMBED': 1, 'MARQUEE': 1};
 
     $.parseHTML(markup, doc)
         .forEach(function(node) {
@@ -81,7 +81,8 @@ function parseHTML(markup, forbidStyle, doc, baseURI, isXML) {
                     return dumb[nn] || domAttributeForEach(n, function(a) {
                         // console.warn('domAttrForEach(%s:%s)', a.name, a.value, [a], [n]);
 
-                        return a.name[0] === 'o' && a.name[1] === 'n';
+                        return a.name[0] === 'o' && a.name[1] === 'n'
+                            || nn !== 'IMG' && a.name[0] === 's' && a.name[1] === 'r' && a.name[2] === 'c';
                     });
                 });
             }

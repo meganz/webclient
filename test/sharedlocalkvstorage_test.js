@@ -35,34 +35,13 @@ describe("SharedLocalKVStorage Unit Test", function() {
 
 
     afterEach(function(done) {
-        var waiting = [];
-
-        var deleted = {};
-
         promiseHelpers.destroy();
 
-        shouldDropDatabases.forEach(function(v) {
-            if (!deleted[v.name]) {
-                if (v.persistAdapter) {
-                    if (v.persistAdapter.dbState === SharedLocalKVStorage.DB_STATE.READY) {
-                        deleted[v.name] = true;
-                        waiting.push(v.destroy());
-                    }
-                    else {
-                        v.persistAdapter.close();
-                    }
-                }
-                else if (v.db) {
-                    if (v.dbState === SharedLocalKVStorage.DB_STATE.READY) {
-                        deleted[v.name] = true;
-                        waiting.push(v.destroy());
-                    }
-                    else {
-                        v.close();
-                    }
-                }
-            }
+        var waiting = shouldDropDatabases.map(function(v) {
+            v = v.persistAdapter || v;
+            return v.dbState && v.destroy() || true;
         });
+
         MegaPromise.allDone(waiting).always(function() {
             mStub.restore();
             done();
@@ -124,7 +103,7 @@ describe("SharedLocalKVStorage Unit Test", function() {
             }
         ].forEach(function(testCase) {
             allDone.push(
-                SharedLocalKVStorage.Utils.DexieStorage.prototype._keys.apply(testCase, [testCase.prefix])
+                SharedLocalKVStorage.Utils.DexieStorage.prototype.keys.apply(testCase, [testCase.prefix])
                     .done(function(result) {
                         if (JSON.stringify(result) !== JSON.stringify(testCase.expected)) {
                             failed.push([result, testCase]);
@@ -236,6 +215,115 @@ describe("SharedLocalKVStorage Unit Test", function() {
         });
 
         pq.tick();
+    });
+
+    it("can preserve the order of keys *and* values *on* DB", function(done) {
+        var kvStorage = new SharedLocalKVStorage.Utils.DexieStorage("dc");
+        dropOnFinished(kvStorage);
+
+        var testSuite = [
+            ['setItem', '2z1', 'val1'],
+            ['removeItem', '2z1'],
+            ['setItem', '2z1', 'val6'],
+            ['setItem', '2a1', 'val2'],
+            ['setItem', '2b1', 'val3'],
+            ['setItem', '2a2', 'val7'],
+            ['getItem', '2z1'],
+            ['setItem', '2a2', 'val4'],
+            ['setItem', '2z1', 'val8'],
+            ['setItem', '2z1', 'val5']
+        ];
+
+        Promise.all(testSuite.map(function(test) {
+            return kvStorage[test[0]](test[1], test[2]);
+        })).then(function(r) {
+            expect(r.length).to.eql(10);
+            expect(r[6]).to.eql('val6');
+            return kvStorage.db.kv.toArray();
+        }).then(function(r) {
+            r = r.map(function(o) {
+                return o.i + ':' + SharedLocalKVStorage.decrypt(o.k) + ':' + SharedLocalKVStorage.decrypt(o.v);
+            });
+            expect(JSON.stringify(r)).to.eql('["2:2z1:val5","3:2a1:val2","4:2b1:val3","5:2a2:val4"]');
+            done();
+        }).catch(function(ex) {
+            console.error('Test failed', ex);
+        });
+    });
+
+    it('can create raw MegaDexie instances', function(done) {
+        var kv = MegaDexie.create('dc');
+        dropOnFinished(kv);
+
+        var testSuite = [
+            ['remove', 'dontExists', true],
+            ['set', 'k1', Array(78).join(Date.now())],
+            ['get', 'k1'],
+            ['set', 'k1', 'Doh'],
+            ['remove', 'k2', true],
+            ['set', 'k2', 4],
+            ['get', 'k2'],
+            ['remove', 'k1', true]
+        ];
+
+        Promise.all(testSuite.map(function(test) {
+            return kv[test[0]](test[1], test[2]);
+        })).then(function(r) {
+            expect(r.length).to.eql(8);
+            expect(r[2]).to.eql(testSuite[1][2]);
+            expect(r[6]).to.eql(testSuite[5][2]);
+            expect(r[3]).to.eql(undefined);
+            expect(r[4]).to.eql(1); // one row remaining
+            expect(r[7]).to.eql(1); // ^
+            // Read what is actually left on the database.
+            return kv.db.kv.toArray();
+        }).then(function(r) {
+            // There must be a single row in the database.
+            r = r.map(function(o) {
+                return o.i + ':' + SharedLocalKVStorage.decrypt(o.k) + ':' + SharedLocalKVStorage.decrypt(o.v);
+            });
+            expect(JSON.stringify(r)).to.eql('["2:k2:4"]');
+            return kv.remove('k2', true);
+        }).then(function() {
+            // Removing the last row in the database must delete it (as we tell to do so)
+            expect(kv.dbState).to.eq(SharedLocalKVStorage.DB_STATE.NOT_READY, 'unexpected db state');
+            expect(kv.db.idbdb).to.eq(null);
+            // There should be no issues attempting to destroy an already destroyed database instance.
+            return kv.destroy();
+        }).then(function() {
+            // We should be able to re-create the database using the exact same destroyed instance.
+            return Promise.all([kv.set('foo', testSuite[3][2]), kv.remove(true, true), kv.get('foo')]);
+        }).then(function(r) {
+            expect(r.length).to.eql(3);
+            expect(r[1]).to.eql(1); // one row in table
+            expect(r[2]).to.eql(testSuite[3][2]); // Doh
+            done();
+        }).catch(function(ex) {
+            console.error('Test failed', ex);
+        });
+    });
+
+    it("can work in binary mode", function(done) {
+        var kvStorage = new SharedLocalKVStorage.Utils.DexieStorage("dc.bin", SharedLocalKVStorage.DB_MODE.BINARY);
+        dropOnFinished(kvStorage);
+
+        var text = "Espa\xf1a";
+        var binary = new Uint8Array([69, 115, 112, 97, 241, 97]);
+
+        kvStorage.set(text, binary)
+            .then(function() {
+                return kvStorage.get(text);
+            })
+            .then(function(r) {
+                var cache = Object.assign({}, kvStorage.delcache, kvStorage.dbcache, kvStorage.newcache);
+                expect($.len(cache)).to.eql(0);
+                expect(r.byteLength).to.eql(text.length);
+                expect(String.fromCharCode.apply(null, new Uint8Array(r))).to.eql(text);
+                done();
+            })
+            .catch(function(ex) {
+                console.error('Test failed', ex);
+            });
     });
 
     it("basic single master set -> get item test", function(done) {
@@ -759,7 +847,7 @@ describe("SharedLocalKVStorage Unit Test", function() {
             sharedLocalKvInstance2,
             sharedLocalKvInstance3,
         ].forEach(function(kvInstance) {
-            $(kvInstance).bind('onChange.unittest', function(e, k, v) {
+            kvInstance.on('onChange.unittest', function(e, k, v) {
                 onChangeCalls.push({
                     'src': kvInstance.broadcaster.id,
                     'k': k,

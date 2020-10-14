@@ -11,14 +11,17 @@ mobile.register = {
 
     /**
      * Render the signin screen
+     * @param {Object} registerInfo     Information passed to register page, used in Business accounts
      */
-    show: function() {
-
+    show: function(registerInfo) {
         'use strict';
 
         // Cache the selector
         this.$screen = $('.mobile.signin-register-block');
         this.$registerScreen = this.$screen.find('.tab-block.register');
+
+        // Cache registerInfo
+        this.registerInfo = registerInfo;
 
         // Show the login/register screen
         this.$screen.removeClass('hidden');
@@ -39,6 +42,20 @@ mobile.register = {
         this.initKeyupEvents();
         this.initRegisterButton();
         this.initBlurEvents();
+
+        // If we have valid passed registerInfo for Business, modify the UI
+        if (registerInfo && registerInfo.firstname && registerInfo.lastname && registerInfo.e) {
+            var $temp = $('.mobile.signin-input.first-name', this.$registerScreen).addClass('hidden');
+            $('input', $temp).val(from8(base64urldecode(registerInfo.firstname)));
+
+            $temp = $('.mobile.signin-input.last-name', this.$registerScreen).addClass('hidden');
+            $('input', $temp).val(from8(base64urldecode(registerInfo.lastname)));
+
+            $temp = $('.mobile.signin-input.email-address', this.$registerScreen).addClass('hidden');
+            $('input', $temp).val(registerInfo.e);
+
+            $('.top-link.sign-in', this.$screen).addClass('hidden');
+        }
     },
 
     /**
@@ -54,11 +71,13 @@ mobile.register = {
         var $passwordField = this.$registerScreen.find('.password input');
         var $confirmPasswordField = this.$registerScreen.find('.password-confirm input');
         var $registerButton = this.$registerScreen.find('.register-button');
+        var $tncBlock = $('.confirm-terms', this.$registerScreen);
+        var $tncCheckbox = $('input', $tncBlock);
         var $allFields = $firstNameField.add($lastNameField).add($emailField)
                             .add($passwordField).add($confirmPasswordField);
 
         // Add keyup event to the input fields
-        $allFields.rebind('keyup.registerbuttoncheck', function(event) {
+        var registerButtonCheck = function(event) {
 
             var firstName = $firstNameField.val();
             var lastName = $lastNameField.val();
@@ -73,7 +92,7 @@ mobile.register = {
 
             // Change the button to red to enable it if they have entered something in all the fields
             if (firstName.length > 0 && lastName.length > 0 && email.length > 0 &&
-                    password.length > 0 && confirmPassword.length > 0 &&
+                    password.length > 0 && confirmPassword.length > 0 && $tncCheckbox[0].checked === true &&
                     !$emailField.parent().hasClass('incorrect')) {
 
                 // Activate the register button
@@ -88,7 +107,10 @@ mobile.register = {
                 // Grey it out if they have not completed one of the fields
                 $registerButton.removeClass('active');
             }
-        });
+        };
+
+        $allFields.rebind('keyup.registerbuttoncheck', registerButtonCheck);
+        $tncBlock.rebind('tap.registerbuttoncheck', registerButtonCheck);
     },
 
     /**
@@ -135,8 +157,10 @@ mobile.register = {
         var $passwordField = this.$registerScreen.find('.password input');
         var $confirmPasswordField = this.$registerScreen.find('.password-confirm input');
         var $confirmTermsCheckbox = this.$registerScreen.find('.confirm-terms input');
+        var $tncCheckbox = $('.confirm-terms input', this.$registerScreen);
         var $registerButton = this.$registerScreen.find('.register-button');
         var $containerFields = $emailField.parent().add($passwordField.parent()).add($confirmPasswordField.parent());
+        var registerInfo = this.registerInfo;
 
         // Add click/tap handler to login button
         $registerButton.off('tap').on('tap', function() {
@@ -150,7 +174,7 @@ mobile.register = {
 
             // If the fields are not completed, the button should not do anything and looks disabled anyway
             if (firstName.length < 1 || lastName.length < 1 || email.length < 1 ||
-                    password.length < 1 || confirmPassword.length < 1) {
+                    password.length < 1 || confirmPassword.length < 1 || $tncCheckbox[0].checked === false) {
 
                 return false;
             }
@@ -196,22 +220,64 @@ mobile.register = {
 
             // Set a flag indicating the registration came from the webclient.
             localStorage.signUpStartedInWebclient = '1';
+            loadingDialog.show();
 
-            // If they came from the Pro page, set the flag
-            var fromProPage = (localStorage.getItem('proPageContinuePlanNum') !== null) ? true : false;
+            // Business accounts have different flow
+            if (registerInfo || localStorage.businessSubAc) {
+                var signupcode = '';
+                window.businessSubAc = registerInfo || JSON.parse(localStorage.businessSubAc);
+                signupcode = window.businessSubAc.signupcode;
+                var ctx = {
+                    checkloginresult: function(u_ctx, r) {
+                        loadingDialog.hide();
+                        if (typeof r[0] === 'number' && r[0] < 0) {
+                            msgDialog('warningb', l[135], l[200]);
+                        }
+                        else {
+                            loadingDialog.hide();
+                            u_type = r;
 
-            // If the flag has been set to use the new registration method
-            var method = (security.register.newRegistrationEnabled()) ? 'new' : 'old';
+                            security.login.checkLoginMethod(
+                                email,
+                                password,
+                                null,
+                                false,
+                                mobile.signin.old.startLogin,
+                                mobile.signin.new.startLogin);
 
-            // Start the registration process
-            mobile.register[method].startRegistration(
-                firstName,
-                lastName,
-                email,
-                password,
-                fromProPage,
-                mobile.register[method].completeRegistration     // Complete callback
-            );
+                            // I need this event handler to be triggered only once after successful sub-user login
+                            mBroadcaster.once('fm:initialized', M.importWelcomePDF);
+                            delete localStorage.businessSubAc;
+                        }
+                    },
+                    businessUser: password   // we need the plain entered password in later stages
+                    // because u_checklogin take the byte array of the password.
+                };
+                u_checklogin(
+                    ctx,
+                    true,
+                    null,
+                    signupcode,
+                    firstName + ' ' + lastName);
+
+            }
+            else {
+                // If they came from the Pro page, set the flag
+                var fromProPage = localStorage.getItem('proPageContinuePlanNum') || false;
+
+                // If the flag has been set to use the new registration method
+                var method = (security.register.newRegistrationEnabled()) ? 'new' : 'old';
+
+                // Start the registration process
+                mobile.register[method].startRegistration(
+                    firstName,
+                    lastName,
+                    email,
+                    password,
+                    fromProPage,
+                    mobile.register[method].completeRegistration     // Complete callback
+                );
+            }
 
             // Prevent double taps
             return false;
@@ -447,7 +513,7 @@ mobile.register.old = {
     completeRegistration: function(firstName, lastName, email, password, fromProPage) {
 
         'use strict';
-
+        loadingDialog.hide();
         var registrationVars = {
             password: password,
             first: firstName,
@@ -617,7 +683,7 @@ mobile.register.new = {
     completeRegistration: function(result, firstName, lastName, email) {
 
         'use strict';
-
+        loadingDialog.hide();
         // Set some variables which are saved for use later
         var registrationVars = {
             first: firstName,
@@ -653,7 +719,12 @@ mobile.register.new = {
 
         // Show an error if the email is already in use
         else if (result === EEXIST) {
-            mobile.messageOverlay.show(l[9000]);    // Error. This email address is already in use.
+            mobile.messageOverlay.show(l[9000], '', function() {
+                if (isEphemeral()) {
+                    // Prevent the ephemeral session in mobile web if the email has been registered
+                    u_logout(true);
+                }
+            });    // Error. This email address is already in use.
         }
         else {
             // Show an error

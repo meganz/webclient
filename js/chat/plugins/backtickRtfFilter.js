@@ -249,7 +249,6 @@ BacktickRtfFilter.prototype.processBackticks = function(msgString, replaceGenCb)
             newString += msgString[i];
         }
     }
-    // console.error("finished:", [msgString, newString, state, placeholderString]);
 
     if (state !== BacktickRtfFilter.PARSER_STATE.REGULAR) {
         // have started parsing something, but string ended unexpectedly.

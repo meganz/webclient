@@ -34,7 +34,6 @@ module.exports = function(config) {
         'js/vendor/jsbn.js',
         'js/vendor/jsbn2.js',
         'js/vendor/nacl-fast.js',
-        'js/vendor/dexie.js',
         // For notifications.
         'js/vendor/notification.js',
         'js/vendor/moment.js',
@@ -50,6 +49,7 @@ module.exports = function(config) {
 
         // Shim for ES6 features some browsers may not have (PhantomJS, MSIE).
         'js/vendor/es6-shim.js',
+        'js/vendor/dexie.js',
 
         // == Our code ==
         'secureboot.js',
@@ -123,8 +123,9 @@ module.exports = function(config) {
         'js/vendor/avatar.js',
         'js/vendor/int64.js',
         'js/cms.js',
-        'js/appActivityHandler.js',
         'js/keepAlive.js',
+        'js/metatags.js',
+        'js/utils/trans.js',
 
         // Transfers
         'js/transfers/meths/filesystem.js',
@@ -140,6 +141,7 @@ module.exports = function(config) {
         'js/transfers/meths.js',
         {pattern: 'aesasm.js', included: false},
         {pattern: 'encrypter.js', included: false},
+
 
         // Our chat code.
         'js/chat/strongvelope.js',
@@ -183,7 +185,7 @@ module.exports = function(config) {
     // Fix up to make it work on the Jenkins server.
     urlRoot: '/base',
     proxies: {
-        '/': '/'
+        '/': './'
     },
 
     // Test results reporter to use.
@@ -232,39 +234,39 @@ module.exports = function(config) {
     // Enable/disable watching file and executing tests whenever any file changes.
     autoWatch: true,
 
+    client: {
+        mocha: {
+            // Increase default timeout of 2000ms
+            timeout: 4000
+        }
+    },
+
     // Start these browsers, currently available:
     // - Chrome
     // - ChromeCanary
+    // - ChromeHeadless
     // - Firefox
+    // - FirefoxHeadless (Requires version 55+)
+    // - FirefoxNightlyHeadless
+    // - FirefoxDeveloperHeadless
     // - Opera (has to be installed with `npm install karma-opera-launcher`)
     // - Safari (only Mac; has to be installed with `npm install karma-safari-launcher`)
-    // - PhantomJS
-    // - IE (only Windows; has to be installed with `npm install karma-ie-launcher`)
     browsers: [
-        'PhantomJS',
-        'PhantomJS_custom',
         'Firefox',
+        'FirefoxHeadless',
         'Firefox_Extension',
         'Firefox_NoCookies',
         'Firefox_Incognito',
         'Chrome',
+        'ChromeHeadless',
         'Chrome_Incognito',
         'Chrome_Unlimited',
         'Chrome_NoCookies'
     ],
 
     customLaunchers: {
-        'PhantomJS_custom': {
-            base: 'PhantomJS',
-            // debug: true,
-            flags: [
-                // '--debug=true',
-                '--local-storage-path=./test/phantomjs-storage',
-                '--offline-storage-path=./test/phantomjs-storage'
-            ]
-        },
         'Firefox_NoCookies': {
-            base: 'Firefox',
+            base: 'FirefoxHeadless',
             prefs: {
                 'network.cookie.cookieBehavior': 2
             }
@@ -274,15 +276,15 @@ module.exports = function(config) {
             flags: ['-private']
         },
         'Chrome_NoCookies': {
-            base: 'Chrome',
+            base: 'ChromeHeadless',
             flags: ['--disable-local-storage', '--disable-databases', '--unlimited-storage']
         },
         'Chrome_Incognito': {
-            base: 'Chrome',
+            base: 'ChromeHeadless',
             flags: ['--incognito']
         },
         'Chrome_Unlimited': {
-            base: 'Chrome',
+            base: 'ChromeHeadless',
             flags: ['--unlimited-storage']
         },
         'Firefox_Extension': {

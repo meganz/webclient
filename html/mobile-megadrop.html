@@ -1,0 +1,122 @@
+<div class="bottom-page scroll-block megadrop-upload">
+    <div class="pages-menu-wrap">
+        ((TOP))
+        ((PAGESMENU))
+    </div>
+
+    <!-- Template MEGAdrop upload item -->
+    <div class="wu-queue-item hidden" id="md_ultmpl">
+        <span class="wu-queue-item-name"></span>
+        <span class="wu-queue-item-stat">
+            <span class="wu-queue-item-curr hidden"></span>
+            <span class="wu-queue-item-size hidden"></span>
+        </span>
+        <span class="wu-queue-item-status"></span>
+        <div class="transfer-status hidden"></div>
+        <div class="clear"></div>
+    </div>
+    <!-- END Template MEGAdrop upload item -->
+
+    <div class="clear"></div>
+    <div class="widget-upload main-blur-block">
+        <div class="wu-wrapper">
+            <div class="wu-main">
+                <div class="wu-items" id="wu_items">
+                    <div class="wu-empty-upload">
+                        <div class="wu-large-logo">
+                        </div>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+                <div class="wu-data">
+                    <div class="wu-folder-name">
+                        <span class="wu-folder-name-text"></span>
+                    </div>
+                    <div class="wu-name">
+                        <span class="wu-name-text"></span>
+                    </div>
+                    <div class="clear"></div>
+                    <div class="wu-upload-form hidden">
+                        <div class="wu-queue"></div>
+                    </div>
+                </div>
+                <div class="wu-main-bottom">
+                    <div class="wu-upload-text">
+                            [$17404]
+                        </div>
+                    <div class="default-green-button wu-btn">
+                        <span>[$372]</span>
+                    </div>
+                </div>
+            </div>
+            <div class="wu-push"></div>
+        </div>
+        <div class="wu-footer" a href="https://www.mega.nz" target="_blank">
+            <div class="wu-logo"></div>
+            <div class="wu-copyrights">
+                &copy; [$0] <span>[$381]</span>
+            </div>
+        </div>
+    </div>
+    <div class="hidden">
+        <input id="fileselect5" type="file" multiple>
+    </div>
+
+    <!-- Mobile only UI -->
+    <div class="mobile-only">
+        <!-- Upload overlay !-->
+        <div class="mobile main-block upload-overlay hidden">
+            <div class="mobile content-row first">
+                <div class="mobile content-cell">
+                    <a class="mobile logo"></a>
+                    <!-- <div class="mobile fm-dialog-close"></div> -->
+                    <div class="mobile white-block">
+                        <div class="mobile ul-status-header">
+                            <span>[$1155], [$1607]</span>
+                            <!-- <a class="mobile text-button third see-all"><span>[$19284]</span></a> -->
+                        </div>
+                        <img alt="" class="mobile filetype-img" src="{staticpath}images/mobile/extensions/image.png"/>
+                        <div class="mobile filename"><em>[$5533]</em></div>
+                        <div class="mobile file-upload-info">
+                            <div class="mobile upload-speed"></div>
+                            <div class="mobile filesize"></div>
+                            <div class="mobile upload-percents"></div>
+                        </div>
+                        <!-- Progress bar is hidden, adding "uploading" to body class will show it !-->
+                        <!-- Set width to ".bar" block !-->
+                        <a class="mobile upload-progress ">
+                            <div class="mobile bar"></div>
+                            <span class="mobile text">[$17618]</span>
+                        </a>
+                        <!-- <a class="mobile red-button upload-another-file"> <i></i> <span>[$17618]</span> </a> -->
+                        <a class="mobile text-button third close-button"><span>[$1597]</span> </a>
+                        <!-- This remains hidden, only used as a template so the desktop upload code works -->
+                        <div class="mobile mobile-transfer-table-wrapper fm-block hidden">
+                            <div class="mobile fm-row">
+                                <div class="mobile fm-header fm-hr">
+                                    <div class="mobile fm-icon up left"></div>
+                                    <div class="mobile fm-header-txt"><span>[$1346]</span></div>
+                                </div>
+                            </div>
+                            <div class="mobile fm-row">
+                                <div class="mobile fm-content">
+                                    <div class="mobile-transfer-scrolling-table fm-scrolling">
+                                        <div class="mobile folders-files-text">5 files, 124 KB/s</div>
+                                        <table class="mobile-transfer-table">
+                                            <tr class="transfer-queued transfer-upload" id="ul_8001">
+                                                <td>
+                                                    <div class="transfer-type upload"></div>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="dark-overlay hidden" id="loading-overlay"></div>
+    </div>
+</div>

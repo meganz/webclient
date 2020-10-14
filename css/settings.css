@@ -22,7 +22,6 @@
     left: 0;
     top: 0;
     position: absolute;
-    background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2ZhZmFmYSIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNmYWZhZmEiIHN0b3Atb3BhY2l0eT0iMCIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
     background: -moz-linear-gradient(top, rgba(250,250,250,1) 0%, rgba(250,250,250,0) 100%);
     background: -webkit-linear-gradient(top, rgba(250,250,250,1) 0%, rgba(250,250,250,0) 100%);
     background: linear-gradient(to bottom, rgba(250,250,250,1) 0%, rgba(250,250,250,0) 100%);
@@ -53,7 +52,7 @@
     height: 16px;
     left: 16px;
     top: 10px;
-    background-image: url(../images/mega/icons-sprite_v37.png);
+    background-image: url(../images/mega/icons-sprite_v39.png);
     background-repeat: no-repeat;
     opacity: 0.3;
 }
@@ -65,7 +64,7 @@
     height: 24px;
     right: 16px;
     top: 6px;
-    background-image: url(../images/mega/icons-sprite_v37.png);
+    background-image: url(../images/mega/icons-sprite_v39.png);
     background-repeat: no-repeat;
     background-position: -98px -249px;
     opacity: 0;
@@ -504,7 +503,8 @@
     bottom: 0;
     background-color: rgba(0,0,0,0.1);
 }
-.fm-right-account-block .default-white-button {
+.fm-right-account-block .default-white-button,
+.settings-choose-homepage-dropdown {
     position: absolute;
     margin-left: 12px;
     display: inline-block;
@@ -541,7 +541,7 @@
 .fm-voucher-popup .mega-input-title-ontop {
     width: 222px;
 }
-.fm-right-account-block .mega-input-title-ontop input, 
+.fm-right-account-block .mega-input-title-ontop input,
 .fm-voucher-popup .mega-input-title-ontop input {
     width: 220px;
 }
@@ -569,16 +569,6 @@
 .mega-input-title-ontop.birth input::placeholder {
     opacity: 1;
 }
-.fm-right-account-block .underline-dropdown-input .list-arrow {
-    width: 16px;
-    height: 16px;
-    background-image: url(../images/mega/fm-main-sprite_v15.png);
-    background-repeat: no-repeat;
-    background-position: -4px -12309px;
-    right: 8px;
-    bottom:10px;
-    position: absolute;
-}
 .fm-right-account-block .mega-input-title-ontop .birth-arrow-container {
     width: 24px;
     height: 32px;
@@ -588,34 +578,29 @@
     cursor: pointer;
     margin-right: 4px;
 }
-.fm-right-account-block .mega-input-title-ontop .birth-arrow-container .up-control {
+.fm-right-account-block .birth-arrow-container .birth-arrow {
     width: 24px;
     height: 16px;
-    background-image: url(../images/mega/fm-main-sprite_v15.png);
-    background-repeat: no-repeat;
     background-position: 0px -12311px;
     opacity: 0.4;
     -o-transform: rotate(180deg);
-    -ms-transform: rotate(180deg); /* IE 9 */
-    -webkit-transform: rotate(180deg); /* Safari */
+    -ms-transform: rotate(180deg);
+    -webkit-transform: rotate(180deg);
     transform: rotate(180deg);
     transition: 0.3s;
 }
-.fm-right-account-block .mega-input-title-ontop .birth-arrow-container .down-control {
-    width: 24px;
-    height: 16px;
-    background-image: url(../images/mega/fm-main-sprite_v15.png);
-    background-repeat: no-repeat;
-    background-position: 0px -12311px;
-    opacity: 0.4;
-    transition: 0.3s;
+.fm-right-account-block .birth-arrow-container .down-control {
+    -o-transform: none;
+    -ms-transform: none;
+    -webkit-transform: none;
+    transform: none;
 }
-.fm-right-account-block .mega-input-title-ontop .birth-arrow-container .up-control:hover, .fm-right-account-block .mega-input-title-ontop .birth-arrow-container .down-control:hover {
+.fm-right-account-block .birth-arrow-container .birth-arrow:hover {
     opacity: 1;
 }
-.fm-right-account-block .underline-dropdown-input select{
+.fm-right-account-block .underline-dropdown-input select {
     background:transparent;
-    border:none;
+    border: none;
     font-size: 14px;
     color: #333333;
     height: 40px;
@@ -708,13 +693,15 @@
 }
 .settings-sub-section.phone-number-settings .phone-number {
     display: none;
-    color: #00bfa5;
-    font-family: 'LatoWeb';
-    font-size: 13px;
-    line-height: 24px;
-    position: absolute;
-    right: 0;
-    top: 22px;
+    font-size: 16px;
+    line-height: 22px;
+}
+.settings-sub-section.phone-number-settings .gsm-mod-rem-btns {
+    margin-top: 15px;
+    display:none;
+}
+.settings-sub-section.phone-number-settings.verified .gsm-mod-rem-btns {
+    display:block;
 }
 .settings-sub-section.phone-number-settings.verified .phone-number {
     display: block;
@@ -725,31 +712,32 @@
 .settings-sub-section.phone-number-settings.verified .add-phone-text {
     display: none;
 }
-.fm-right-account-block .dialog-feature-toggle {
+.dialog-feature-toggle {
     border: solid 1px rgba(0, 0, 0, 0.05);
     background-color: rgba(0, 0, 0, 0.25);
     border-radius: 40px;
     cursor: pointer;
     display: inline-block;
-    position: absolute;
     height: 22px;
     width: 38px;
-    right: 0;
-    top: 23px;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
     box-sizing: border-box;
 }
-.fm-right-account-block .content-txt + .dialog-feature-toggle {
-    top: 26px;
+.fm-right-account-block .dialog-feature-toggle {
+    position: absolute;
+    right: 0;
+    top: 23px;
 }
+.dialog-feature-toggle.toggle-on,
 .fm-right-account-block .dialog-feature-toggle.toggle-on {
     background-color: #00BFA5;
     background: -moz-linear-gradient(180deg, rgba(0,191,165,1) 0%, rgba(0,172,148,1) 100%);
     background: -webkit-linear-gradient(180deg, rgba(0,191,165,1) 0%, rgba(0,172,148,1) 100%);
     background: linear-gradient(to bottom, rgba(0,191,165,1) 0%, rgba(0,172,148,1) 100%);
 }
-.fm-right-account-block .dialog-feature-switch {
+.fm-right-account-block .content-txt + .dialog-feature-toggle {
+    top: 26px;
+}
+.dialog-feature-switch {
     background-color: #ffffff;
     border: 1px solid rgba(0, 0, 0, 0.05);
     border-radius: 8px;
@@ -760,6 +748,9 @@
     margin-top: 2px;
     width: 14px;
     transition: margin 0.15s linear;
+}
+.dialog-feature-toggle.toggle-on .dialog-feature-switch {
+    margin-left: 18px;
 }
 .fm-account-main .fm-account-profile .settings-left-block .account.qr-block {
     margin-bottom: 0px;
@@ -960,8 +951,25 @@
 .fm-account-security .fm-browsers-icon img {
     margin: 4px 0 0 0;
 }
+.fm-account-security .fm-flags-icon {
+    margin: 6px 0 0 0;
+    line-height: 0;
+}
 .fm-account-security .fm-flags-icon img {
     margin: 0;
+    width: 17px;
+    border-radius: 2px;
+    display: block;
+}
+.fm-account-security .fm-flags-icon::after {
+    content: '';
+    display: block;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    border-radius: 3px;
+    box-shadow: inset rgba(0, 0, 0, 0.1) 0px 0px 0px 1px;
 }
 .fm-account-security .tranfer-filetype-txt, .fm-account-security .fm-browsers-txt, .fm-flags-txt, .fm-member-icon-txt {
     height: auto;
@@ -1126,14 +1134,16 @@
 .fm-right-account-block .fm-breadcrumbs {
     cursor: pointer;
     max-width: calc(100% - 20px);
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 .fm-right-account-block .fm-breadcrumbs:nth-of-type(2) {
-    cursor: pointer;
     max-width: calc(100% - 74px);
-    overflow: hidden;
-    text-overflow: ellipsis;
+}
+.fm-right-account-block .megadrop-row .fm-picker-breadcrumbs .fm-breadcrumbs > span.right-arrow-bg {
+    cursor: pointer;
+    max-width: 100%;
+}
+.fm-right-account-block .megadrop-row .fm-picker-breadcrumbs .fm-breadcrumbs > span.right-arrow-bg span {
+    white-space: nowrap;
 }
 .fm-right-account-block .megadrop-row .fm-breadcrumbs:hover > span {
     text-decoration: underline;
@@ -1337,6 +1347,15 @@
     display: inline-block;
     margin-top: 4px;
 }
+.transfer-tools .green-notification .pages-sprite.sync {
+    display: inline-block;
+    vertical-align: top;
+    width: 40px;
+    height: 40px;
+    margin: 8px 8px 8px 0;
+    border-radius: 8px;
+    background-repeat: no-repeat;
+}
 .orange-notification.body {
     display: table;
     background-color: rgba(191,74,0,0.05);
@@ -1410,7 +1429,7 @@
     display: block;
     margin:12px auto;
     text-align: center;
-} 
+}
 .fm-account-main.low-width .last-block .content-txt {
     display: none;
 }

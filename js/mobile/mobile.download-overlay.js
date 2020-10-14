@@ -81,13 +81,7 @@ mobile.downloadOverlay = {
         // On Open in Browser button click/tap
         this.$overlay.find('.second.dl-browser').off('tap').on('tap', function() {
 
-            if (u_attr && u_attr.b && u_attr.b.s === -1) {
-                if (u_attr.b.m) {
-                    msgDialog('warningb', '', l[20401], l[20402]);
-                }
-                else {
-                    msgDialog('warningb', '', l[20462], l[20463]);
-                }
+            if (!validateUserAction()) {
                 return false;
             }
 
@@ -611,7 +605,7 @@ mobile.downloadOverlay = {
 
         // Display the download progress and speed
         $downloadPercent.text(percentCompleteRounded + '%');
-        $downloadProgressBar.width(percentComplete + '%');
+        $downloadProgressBar.css('width', percentComplete + '%');
         $downloadSpeed.text(speedText);
 
         // If the download is complete e.g. 99/100%, change button text to Decrypting... which can take some time
@@ -631,7 +625,7 @@ mobile.downloadOverlay = {
         var $downloadButtonText = this.$overlay.find('.download-progress span');
         var $downloadPercent = this.$overlay.find('.download-percents');
         var $downloadSpeed = this.$overlay.find('.download-speed');
-        this.$overlay.find('.download-progress .bar').width(100 + '%');
+        $('.download-progress .bar', this.$overlay).css('width', 100 + '%');
 
         // Change button text to full white and hide the download percentage and speed
         $downloadButton.addClass('complete').off('tap');

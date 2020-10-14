@@ -115,7 +115,7 @@ function u_checklogin3a(res, ctx) {
         u_attr = res;
         var exclude = [
             'aav', 'aas', '*!>alias', 'b', 'c', 'currk', 'email', 'flags', 'ipcc', 'k', 'lup',
-            'name', 'p', 'privk', 'pubk', 's', 'since', 'smsv', 'ts', 'u', 'ut'
+            'name', 'p', 'privk', 'pubk', 's', 'since', 'smsv', 'ts', 'u', 'ut', 'uspw'
         ];
 
         for (var n in u_attr) {
@@ -138,6 +138,13 @@ function u_checklogin3a(res, ctx) {
         delete localStorage.attr;
 
         u_storage.handle = u_handle = u_attr.u;
+
+        delete u_attr.u;
+        Object.defineProperty(u_attr, 'u', {
+            value: u_handle,
+            writable: false,
+            configurable: false
+        });
 
         init_storage(u_storage);
 
@@ -311,7 +318,9 @@ function u_logout(logout) {
             }
         }
 
-        loadfm.loaded = false;
+        if (window.loadfm) {
+            loadfm.loaded = false;
+        }
     }
 }
 
@@ -337,6 +346,10 @@ function u_setrsa(rsakey) {
         pubk: publicKeyEncodedB64
     };
 
+    if (!window.businessSubAc && localStorage.businessSubAc) {
+        window.businessSubAc = JSON.parse(localStorage.businessSubAc);
+    }
+
     // checking if we are creating keys for a business sub-user
     if (window.businessSubAc) {
         // we get current user's master user + its public key (master user pubkey)
@@ -347,7 +360,14 @@ function u_setrsa(rsakey) {
         // now we will encrypt the current user master-key using master-user public key. and include it in 'up' request
         // because master-user must be aware of evey sub-user's master-key.
         var subUserMasterKey = a32_to_str(u_k);
-        var masterAccountRSA_keyPub = crypto_decodepubkey(base64urldecode(buinsesPubKey));
+
+        var masterAccountRSA_keyPub;
+        if (typeof buinsesPubKey === 'string') {
+            masterAccountRSA_keyPub = crypto_decodepubkey(base64urldecode(buinsesPubKey));
+        }
+        else {
+            masterAccountRSA_keyPub = buinsesPubKey;
+        }
         var subUserMasterKeyEncRSA = crypto_rsaencrypt(subUserMasterKey, masterAccountRSA_keyPub);
         var subUserMasterKeyEncRSA_B64 = base64urlencode(subUserMasterKeyEncRSA);
 
@@ -361,6 +381,40 @@ function u_setrsa(rsakey) {
                 console.log("RSA key put result=" + res);
             }
 
+            if (res < 0) {
+                var onError = function(message, ex) {
+                    var submsg = l[135] + ': ' + (ex < 0 ? api_strerror(ex) : ex);
+
+                    console.warn('Unexpected RSA key put failure!', ex);
+                    msgDialog('warninga', '', message, submsg, M.logout.bind(M));
+                    $promise.reject(ex);
+                };
+
+                // Check whether this is a business sub-user attempting to confirm the account.
+                if (res === EARGS && !window.businessSubAc) {
+                    M.req('ug').then(function(u_attr) {
+                        if (u_attr.b && u_attr.b.m === 0 && u_attr.b.bu) {
+                            crypt.getPubKeyAttribute(u_attr.b.bu, 'RSA')
+                                .then(function(res) {
+                                    window.businessSubAc = {bu: u_attr.b.bu, bpubk: res};
+                                    mBroadcaster.once('fm:initialized', M.importWelcomePDF);
+                                    $promise.linkDoneAndFailTo(u_setrsa(rsakey));
+                                })
+                                .catch(onError.bind(null, l[22897]));
+                        }
+                        else {
+                            onError(l[47], res);
+                        }
+                    }).catch(onError.bind(null, l[47]));
+                }
+                else {
+                    // Something else happened, hang the procedure and start over...
+                    onError(l[47], res);
+                }
+
+                return;
+            }
+
             u_privk = rsakey;
             // If coming from a #confirm link in the new registration process and logging in from a clean browser
             // session the u_attr might not be set to an object yet, this will prevent an exception below
@@ -369,12 +423,6 @@ function u_setrsa(rsakey) {
             }
             u_attr.privk = u_storage.privk = base64urlencode(privateKeyEncoded);
             u_attr.pubk = u_storage.pubk = publicKeyEncodedB64;
-
-            if (buinessMaster) {
-                // u_attr.mu = buinessMaster;
-                // u_attr.b = 1;
-                delete window.businessSubAc; // performance measure, freeup memory since it's not useful (nor harmful)
-            }
 
             // Update u_attr and store user data on account activation
             u_checklogin({
@@ -404,6 +452,10 @@ function u_setrsa(rsakey) {
 
                         // No affiliate guide dialog for new users.
                         $.noAffGuide = 1;
+
+                        // free up memory since it's not useful any longer
+                        delete window.businessSubAc;
+                        delete localStorage.businessSubAc;
                     }
 
                     if (u_attr['^!promocode']) {
@@ -766,6 +818,32 @@ function processEmailChangeActionPacket(ap) {
     }
 }
 
+/**
+ * Contains a list of permitted landing pages.
+ * @var {array} allowedLandingPages
+ */
+var allowedLandingPages = ['fm', 'recents', 'chat'];
+
+/**
+ * Fetch the landing page.
+ * @return {string|int} The user selected landing page.
+ */
+function getLandingPage() {
+    'use strict';
+    return pfid ? false : allowedLandingPages[mega.config.get('uhp')] || 'fm';
+}
+
+/**
+ * Set the landing page.
+ * @param {string} page The user selected landing page from the `allowedLandingPages` array.
+ * @return {void}
+ */
+function setLandingPage(page) {
+    'use strict';
+    var index = allowedLandingPages.indexOf(page);
+    mega.config.set('uhp', index < 0 ? 0 : index);
+}
+
 (function(exportScope) {
     "use strict";
     var _lastUserInteractionCache = {};
@@ -860,7 +938,7 @@ function processEmailChangeActionPacket(ap) {
                 $elem.text(l[1051]);
             }
 
-            if ($.sortTreePanel && $.sortTreePanel.contacts.by === 'last-interaction') {
+            if (M.getTreePanelSortingValue('contacts') === 'last-interaction') {
                 // we need to resort
                 M.contacts();
             }
@@ -1360,8 +1438,10 @@ function processEmailChangeActionPacket(ap) {
                     mega.config.set('ul_maxSlots', 4);// Default ul slots value
                     ulQueue.setSize(4);
                 }
-                if (fmconfig.dl_maxSlots) {
-                    dlQueue.setSize(fmconfig.dl_maxSlots);
+                // quick&dirty(tm) hack, change me whenever we rewrite the underlying logic..
+                var dlSlots = $.tapioca ? 1 : fmconfig.dl_maxSlots;
+                if (dlSlots) {
+                    dlQueue.setSize(dlSlots);
                 }
                 else {
                     mega.config.set('dl_maxSlots', 4);// Default dl slots value
@@ -1370,6 +1450,15 @@ function processEmailChangeActionPacket(ap) {
                 if (fmconfig.font_size) {
                     $('body').removeClass('fontsize1 fontsize2')
                         .addClass('fontsize' + fmconfig.font_size);
+                }
+                if (fmconfig.fmColPrefs) {
+                    var prefs = getFMColPrefs(fmconfig.fmColPrefs);
+                    for (var colPref in prefs) {
+                        if (Object.prototype.hasOwnProperty.call(prefs, colPref)) {
+                            M.columnsWidth.cloud[colPref].viewed =
+                                prefs[colPref] > 0;
+                        }
+                    }
                 }
                 waiter.resolve();
                 waiter = undefined;

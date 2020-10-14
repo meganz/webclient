@@ -237,7 +237,16 @@
             MemoryIO.fileSizeLimit = 600 * 1024 * 1024;
         }
         else {
-            MemoryIO.fileSizeLimit = 1024 * 1024 * 1024 * (1 + uad.is64bit);
+            var GiB = mega.chrome ? 2 : parseFloat(navigator.deviceMemory) || 1;
+
+            if (mega.flags.dlmemcap > 0) {
+                GiB = mega.flags.dlmemcap;
+            }
+
+            if (d) {
+                console.info('Device Memory: %s GiB, limit: %s', navigator.deviceMemory, GiB);
+            }
+            MemoryIO.fileSizeLimit = 1024 * 1024 * 1024 * GiB;
         }
     });
 

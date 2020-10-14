@@ -214,12 +214,9 @@
 }
 @font-face {
     font-family: 'source_code_proregular';
-    src: url('../fonts/sourcecodepro-regular-webfont.eot');
-    src: url('../fonts/sourcecodepro-regular-webfont.eot?#iefix') format('embedded-opentype'),
-        url('../fonts/sourcecodepro-regular-webfont.woff2') format('woff2'),
-        url('../fonts/sourcecodepro-regular-webfont.woff') format('woff'),
-        url('../fonts/sourcecodepro-regular-webfont.ttf') format('truetype'),
-        url('../fonts/sourcecodepro-regular-webfont.svg#source_code_proregular') format('svg');
+    src: url('../fonts/sourcecodepro-regular-webfont.woff2') format('woff2'),
+         url('../fonts/sourcecodepro-regular-webfont.woff') format('woff'),
+         url('../fonts/sourcecodepro-regular-webfont.ttf') format('truetype');
     font-weight: normal;
     font-style: normal;
     text-rendering: optimizeLegibility;

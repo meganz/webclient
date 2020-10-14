@@ -53,6 +53,7 @@
         <a class="dropdown-item play-item"><i class="small-icon context videocam"></i><span>[$16275]</span></a>
         <a class="dropdown-item preview-item"><i class="small-icon context loupe"></i>[$1899]</a>
         <a class="dropdown-item open-item"><i class="small-icon context open-folder"></i>[$865]</a>
+        <a class="dropdown-item open-cloud-item"><i class="small-icon context cloud-folder"></i>[$23704]</a>
         <a class="dropdown-item createwidget-item">
             <i class="small-icon context create-widget"></i>
             <span>[$17450]</span>
@@ -127,7 +128,7 @@
             </span>
         </span>
         <a class="dropdown-item send-to-contact-item">
-            <i class="small-icon conversations"></i>[$6860]
+            <i class="small-icon conversations"></i>[$17764]
         </a>
         <a class="dropdown-item getlink-item">
             <i class="small-icon context get-link"></i>
@@ -304,104 +305,6 @@
 </div>
 
 <div class="main-blur-block">
-    <div class="fm-main notifications hidden">
-        <div class="nw-fm-left-icons-panel">
-            <a class="logo hidden"></a>
-            <div class="nw-fm-left-icon dashboard">
-                <div class="nw-fm-left-border"></div>
-                <div class="dark-tooltip">[$16668]</div>
-            </div>
-            <div class="nw-fm-left-icon cloud-drive">
-                <div class="nw-fm-left-border"></div>
-                <div class="dark-tooltip">[$164]</div>
-            </div>
-            <div class="nw-fm-left-icon recents">
-                <div class="nw-fm-left-border"></div>
-                <div class="dark-tooltip">[$20141]</div>
-            </div>
-            <div class="nw-fm-left-icon inbox">
-                <div class="nw-fm-left-border"></div>
-                <div class="dark-tooltip">[$166]</div>
-            </div>
-            <div class="nw-fm-left-icon shared-with-me">
-                <div class="nw-fm-left-border"></div>
-                <div class="dark-tooltip">[$5589]</div>
-            </div>
-            <div class="nw-fm-left-icon contacts">
-                <div class="nw-fm-left-border"></div>
-                <div class="contacts-indicator hidden"></div>
-                <div class="dark-tooltip">[$950]</div>
-            </div>
-            <div class="nw-fm-left-icon conversations">
-                <div class="nw-fm-left-border"></div>
-                <div class="new-messages-indicator hidden">
-                    <span class="chat-pending-call hidden"><i class="tiny-icon white-handset" /></span>
-                    <span class="chat-unread-count hidden"></span>
-                </div>
-                <div class="dark-tooltip">[$5902]</div>
-            </div>
-
-            <!-- Please add "filled" classname if user have deleted items !-->
-            <div class="nw-fm-left-icon rubbish-bin">
-                <div class="nw-fm-left-border"></div>
-                <div class="dark-tooltip">[$168]</div>
-                <div class="rubbish-bin-icon"></div>
-            </div>
-            <div class="nw-fm-left-icon settings">
-                <div class="nw-fm-left-border"></div>
-                <div class="dark-tooltip">[$569]</div>
-                <div class="settings-icon"></div>
-            </div>
-            <div class="nw-fm-left-icon transfers">
-                <div class="nw-fm-left-border file-transfer-icon"></div>
-                <div class="dark-tooltip">[$104]</div>
-                <div class="nw-fm-percentage download">
-                    <ul>
-                        <li class="nw-fm-chart0 right-c">
-                            <p>
-                                <span></span>
-                            </p>
-                        </li>
-                        <li class="nw-fm-chart0 left-c">
-                            <p>
-                                <span></span>
-                            </p>
-                        </li>
-                    </ul>
-                    <div class="transfer-bar-overlay"></div>
-                </div>
-
-                <div class="nw-fm-percentage upload">
-                    <ul>
-                        <li class="nw-fm-chart0 right-c">
-                            <p>
-                                <span></span>
-                            </p>
-                        </li>
-                        <li class="nw-fm-chart0 left-c">
-                            <p>
-                                <span></span>
-                            </p>
-                        </li>
-                    </ul>
-                    <div class="transfer-bar-overlay">
-                        <div></div>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-
-        <div class="new-notifications-bg"></div>
-        <div class="new-notifications-scroll">
-            <div class="new-notification-icon"></div>
-            <div class="new-notification-txt-bl">
-                <div class="new-notification-txt">[$862]</div>
-            </div>
-            <div class="new-notification-pad">
-            </div>
-        </div>
-    </div>
     <!-- Please add "fm-notification" class and "full"/"almost-full" class !-->
     <div class="fm-main default">
         <div class="nw-fm-left-icons-panel">
@@ -434,14 +337,14 @@
             <div class="nw-fm-left-icon conversations">
                 <div class="nw-fm-left-border"></div>
                 <div class="new-messages-indicator hidden">
-                    <span class="chat-pending-call hidden"><i class="tiny-icon white-handset" /></span>
+                    <span class="chat-pending-call hidden"><i class="tiny-icon white-handset"></i></span>
                     <span class="chat-unread-count hidden"></span>
                 </div>
                 <div class="dark-tooltip">[$5902]</div>
                 <div class="beta-text"></div>
             </div>
             <div class="bottom-icons">
-                <div class="nw-fm-left-icon user-management">
+                <div class="nw-fm-left-icon user-management hidden">
                     <div class="nw-fm-left-border"></div>
                     <div class="dark-tooltip">[$18677]</div>
                     <div class="beta-text"></div>
@@ -734,12 +637,20 @@
                         <div class="account left-pane big-txt plan-date-val"></div>
                         <div class="clear"></div>
                         <div class="account left-pane info-block business-users hidden">
-                            <div class="account left-pane small-txt">[$89]:</div>
+                            <div class="account left-pane small-txt">[$23255]</div>
                             <div class="account left-pane big-txt suba-status active">[$7666]</div>
-                             <div class="clear"></div>
-                            <div class="account left-pane small-txt">[$19607]:</div>
+                            <div class="clear"></div>
+                            <div class="account left-pane big-txt suba-days-left hidden"></div>
+                            <div class="clear"></div>
+                            <div class="account left-pane big-txt suba-pay-bill hidden">
+                                <div class="default-green-button small pay-bill-btn">
+                                    <span>[$23251]</span>
+                                </div>
+                            </div>
+                            <div class="clear"></div>
+                            <div class="account left-pane small-txt">[$19607]</div>
                             <div class="account left-pane big-txt suba-role">Administrator</div>
-                             <div class="clear"></div>
+                            <div class="clear"></div>
                         </div>
                         <div class="clear"></div>
                     </div>
@@ -798,7 +709,7 @@
                             [$7337]
                         </div>
                         <div class="sub-title-container slide-item">
-                            <div class="sub-title" data-scrollto="change-password">[$706]</div>
+                            <div class="sub-title" data-scrollto="change-password">[$23262]</div>
                             <div class="sub-title acc-setting-menu-change-em" data-scrollto="change-email">[$7743]</div>
                             <div class="sub-title" data-scrollto="backup-key">[$8839]</div>
                             <div class="sub-title" data-scrollto="two-factor-authentication">[$19194]</div>
@@ -1818,7 +1729,6 @@
                                 <div class="export-pdf-icon icon"></div>
                                 [$19288]
                             </div>
-                            <iframe id="invoicePdfPrinter" src="about:blank" class="hidden"></iframe>
                             <div class="invoice-container">
                                 <div class="mega-contact-container">
                                     <div class="mega-logo"></div>
@@ -2355,24 +2265,24 @@
                             <div class="settings-sub-section profile">
                                 <form autocomplete="disabled">
                                     <input type="text" class="titleTop required" value="" title="[$1096]" name="account-firstname" id="account-firstname" maxlength="40" />
-                                    <input type="text" class="titleTop" value="" title="[$1097]" name="account-lastname" id="account-lastname" maxlength="40" />
+                                    <input type="text" class="titleTop required" value="" title="[$1097]" name="account-lastname" id="account-lastname" maxlength="40" />
 
                                     <div class="mega-input-title-ontop birth ymd hidden">
                                         <div class="mega-input-title">[$995]</div>
                                         <input class="short-input byear" type="text" maxlength="4" placeholder="[$17697]" min="1900" data-title="Birth year">
                                         <div class="birth-arrow-container">
-                                            <div class="birth-arrow up-control"></div>
-                                            <div class="birth-arrow down-control"></div>
+                                            <div class="birth-arrow up-control fm-s"></div>
+                                            <div class="birth-arrow down-control fm-s"></div>
                                         </div>
                                         <input class="short-input bmonth" type="text" maxlength="2" placeholder="[$17698]" min="1" max="12" data-title="Birth month">
                                         <div class="birth-arrow-container">
-                                            <div class="birth-arrow up-control"></div>
-                                            <div class="birth-arrow down-control"></div>
+                                            <div class="birth-arrow up-control fm-s"></div>
+                                            <div class="birth-arrow down-control fm-s"></div>
                                         </div>
                                         <input class="short-input bdate" type="text" maxlength="2" placeholder="[$17699]" min="1" max="31" data-title="Birth date">
                                         <div class="birth-arrow-container">
-                                            <div class="birth-arrow up-control"></div>
-                                            <div class="birth-arrow down-control"></div>
+                                            <div class="birth-arrow up-control fm-s"></div>
+                                            <div class="birth-arrow down-control fm-s"></div>
                                         </div>
                                         <div class="message-container"></div>
                                     </div>
@@ -2380,18 +2290,18 @@
                                         <div class="mega-input-title">[$995]</div>
                                         <input class="short-input bdate" type="text" maxlength="2" placeholder="[$17699]" min="1" max="31" data-title="Birth date">
                                         <div class="birth-arrow-container">
-                                            <div class="birth-arrow up-control"></div>
-                                            <div class="birth-arrow down-control"></div>
+                                            <div class="birth-arrow up-control fm-s"></div>
+                                            <div class="birth-arrow down-control fm-s"></div>
                                         </div>
                                         <input class="short-input bmonth" type="text" maxlength="2" placeholder="[$17698]" min="1" max="12" data-title="Birth month">
                                         <div class="birth-arrow-container">
-                                            <div class="birth-arrow up-control"></div>
-                                            <div class="birth-arrow down-control"></div>
+                                            <div class="birth-arrow up-control fm-s"></div>
+                                            <div class="birth-arrow down-control fm-s"></div>
                                         </div>
                                         <input class="short-input byear" type="text" maxlength="4" placeholder="[$17697]" min="1900" data-title="Birth year">
                                         <div class="birth-arrow-container">
-                                            <div class="birth-arrow up-control"></div>
-                                            <div class="birth-arrow down-control"></div>
+                                            <div class="birth-arrow up-control fm-s"></div>
+                                            <div class="birth-arrow down-control fm-s"></div>
                                         </div>
                                         <div class="message-container"></div>
                                     </div>
@@ -2399,18 +2309,18 @@
                                         <div class="mega-input-title">[$995]</div>
                                         <input class="short-input bmonth" type="text" maxlength="2" placeholder="[$17698]" min="1" max="12" data-title="Birth month">
                                         <div class="birth-arrow-container">
-                                            <div class="birth-arrow up-control"></div>
-                                            <div class="birth-arrow down-control"></div>
+                                            <div class="birth-arrow up-control fm-s"></div>
+                                            <div class="birth-arrow down-control fm-s"></div>
                                         </div>
                                         <input class="short-input bdate" type="text" maxlength="2" placeholder="[$17699]" min="1" max="31" data-title="Birth date">
                                         <div class="birth-arrow-container">
-                                            <div class="birth-arrow up-control"></div>
-                                            <div class="birth-arrow down-control"></div>
+                                            <div class="birth-arrow up-control fm-s"></div>
+                                            <div class="birth-arrow down-control fm-s"></div>
                                         </div>
                                         <input class="short-input byear" type="text" maxlength="4" placeholder="[$17697]" min="1900" data-title="Birth year">
                                         <div class="birth-arrow-container">
-                                            <div class="birth-arrow up-control"></div>
-                                            <div class="birth-arrow down-control"></div>
+                                            <div class="birth-arrow up-control fm-s"></div>
+                                            <div class="birth-arrow down-control fm-s"></div>
                                         </div>
                                         <div class="message-container"></div>
                                     </div>
@@ -2431,8 +2341,12 @@
                             <div class="settings-sub-section phone-number-settings hidden">
                                 <div class="subtitle-txt">[$19152]</div>
                                 <div class="add-phone-text">[$20210]</div>
+                                <div class="phone-number right"></div>
                                 <div class="clear"></div>
-                                <div class="phone-number"></div>
+                                <div class="gsm-mod-rem-btns">
+                                    <div class="default-white-button rem-gsm right">[$83]</div>
+                                    <div class="default-green-button modify-gsm right">[$23423]</div>
+                                </div>
                                 <div class="default-white-button add-number-button">[$20222]</div>
                             </div>
                         </div>
@@ -2499,7 +2413,7 @@
                                     <div class="clear"></div>
                                 </div>
                             </div>
-                            <div class="settings-sub-section">
+                            <div class="settings-sub-section border">
                                 <div class="subtitle-txt">[$7228]</div>
                                 <div class="account radio-buttons bottom-pad">
                                     <div class="uifontsize radioOff" id="fontsize1_div">
@@ -2511,6 +2425,22 @@
                                     </div>
                                     <div class="radio-txt big">[$7230]</div>
                                     <div class="clear"></div>
+                                </div>
+                            </div>
+                            <div class="settings-sub-section">
+                                <div class="subtitle-txt">[$22744]</div>
+                                <div class="content-txt">[$22811]</div>
+                                <div class="underline-dropdown-input">
+                                    <div class="dialog-input default-select settings-choose-homepage-dropdown" id="account-hpage">
+                                        <span>[$164]</span>
+                                        <div class="default-select-dropdown hidden">
+                                            <div class="default-select-scroll">
+                                                <div class="default-dropdown-item" data-value="fm">[$164]</div>
+                                                <div class="default-dropdown-item" data-value="recents">[$20141]</div>
+                                                <div class="default-dropdown-item" data-value="chat">[$7997]</div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -2815,11 +2745,23 @@
                             </div>
                             <div class="switch-container">
                                 <div class="subtitle-txt">[$20895]</div>
-                                <div class="settings-sub-section">
+                                <div class="settings-sub-section border">
                                     <div class="content-txt">
                                         [$20896]
                                     </div>
                                     <div class="dialog-feature-toggle toggle-on" id="enotif-inactive" name="account-inactive">
+                                        <div class="dialog-feature-switch"></div>
+                                    </div>
+                                    <div class="clear"></div>
+                                </div>
+                            </div>
+                            <div class="switch-container">
+                                <div class="subtitle-txt">[$23280]</div>
+                                <div class="settings-sub-section">
+                                    <div class="content-txt">
+                                       [$23281]
+                                    </div>
+                                    <div class="dialog-feature-toggle toggle-on" id="enotif-referral-program" name="referral-program">
                                         <div class="dialog-feature-switch"></div>
                                     </div>
                                     <div class="clear"></div>
@@ -2832,7 +2774,7 @@
                 <div class="fm-account-security fm-account-sections">
                     <div class="account data-block change-password">
                         <div class="settings-left-block">
-                            <div class="title-txt">[$706]</div>
+                            <div class="title-txt">[$23262]</div>
                         </div>
                         <div class="settings-right-block">
                             <div class="settings-sub-section">
@@ -3174,6 +3116,19 @@
                                 <div class="dialog-feature-toggle toggle-on" id="dlThroughMEGAsync">
                                     <div class="dialog-feature-switch no-trans-init"></div>
                                 </div>
+                                <div class="green-notification body with-btn">
+                                    <div class="green-notification cell">
+                                        <i class="page-icon pages-sprite sync"></i>
+                                    </div>
+                                    <div class="green-notification cell text-cell">
+                                        <div class="versioning-body-text">
+                                            [$23462]
+                                        </div>
+                                    </div>
+                                    <div class="green-notification cell btn-cell">
+                                        <div class="default-green-button download-sync">[$58]</div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -3378,6 +3333,9 @@
                                 <div class="dialog-feature-toggle" id="richpreviews">
                                     <div class="dialog-feature-switch no-trans-init"></div>
                                 </div>
+                                <div class="status-container">
+                                    <div class="content-txt">[$23608]</div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -3547,6 +3505,7 @@
                                         </div>
                                         <div class="ff-name">[$16516]</div>
                                         <div class="ff-number">
+                                            <div class="folder-number"> </div>
                                             <div class="file-number"> </div>
                                         </div>
                                         <div class="ff-occupy"> </div>
@@ -3721,8 +3680,7 @@
                                         <i class="dropdown-white-arrow"></i>
                                         <div class="dropdown transfer-icon"></div>
                                         <p class="dropdown text-block centered-textalign">
-                                            <!-- replace by [$16124] when achievemnts are available !-->
-                                            [$16123]
+                                            [$16124]
                                         </p>
                                     </div>
                                 </div>
@@ -3995,6 +3953,13 @@
                             <div class="fm-recents previews-body">
                                 <a class="data-block-view template">
                                     <span class="data-block-bg">
+                                        <span class="data-block-indicators">
+                                            <span class="file-status-icon indicator"></span>
+                                            <span class="versioning-indicator">
+                                                <i class="small-icon icons-sprite grey-clock"></i>
+                                            </span>
+                                            <span class="data-item-icon indicator"></span>
+                                        </span>
                                         <span class="block-view-file-type image file"><img/></span>
                                         <span class="file-settings-icon active"></span>
                                         <div class="video-thumb-details">
@@ -4015,7 +3980,7 @@
             </div>
             <!-- END Templates for recents list -->
         </div>
-        
+
         <!-- Affiliate block. Init scrolling here !-->
         <div class="fm-affiliate body ">
             <div class="fm-affiliate content">
@@ -4080,7 +4045,7 @@
                         </div>
                         <div class="fm-affiliate commission-block pending">
                             <div class="title">[$22693]<sup>1</sup></div>
-                            <div class="price">0</div> 
+                            <div class="price">0</div>
                             <div class="euro-price">0</div>
                         </div>
                         <div class="fm-affiliate commission-block available">
@@ -4103,13 +4068,15 @@
                 </div>
 
                 <!-- Redemption block - Phase 2 !-->
-                <div  class="fm-affiliate dropdown-wrap">
-                    <div class="default-select affilite-redemtion disabled">[$22820]</div>
-                    <div class="default-select-dropdown hidden">
-                        <div class="default-dropdown-item active">[$22820]</div>
-                        <div class="default-dropdown-item label green">[$1418]</div>
-                        <div class="default-dropdown-item label orange">[$18443]</div>
-                        <div class="default-dropdown-item label red">[$22819]</div>
+                <div  class="fm-affiliate dropdown-wrap redemption">
+                    <div class="default-select affiliate-redemption">
+                        <span>[$22820]</span>
+                        <div class="default-select-dropdown hidden">
+                            <div class="default-dropdown-item active" data-type="all">[$22820]</div>
+                            <div class="default-dropdown-item label green" data-type="complete">[$23277]</div>
+                            <div class="default-dropdown-item label orange" data-type="processing">[$22833]</div>
+                            <div class="default-dropdown-item label red" data-type="failed">[$22819]</div>
+                        </div>
                     </div>
                 </div>
 
@@ -4117,25 +4084,25 @@
                     [$22808]
                 </div>
                 <div class="clear"></div>
-                <div class="mega-data-box">
+                <div class="mega-data-box redemption">
                     <table class="fm-affiliate redeem-table clone">
                         <tr>
-                            <th class="sortable">[$19297]</th>
-                            <th class="sortable">[$17023]</th>
-                            <th class="sortable">[$22809]</th>
-                            <th class="sortable">[$477]</th>
-                            <th class="sortable">[$89]</th>
+                            <th class="sortable" data-type="rid">[$19297]</th>
+                            <th class="sortable" data-type="ts">[$17023]</th>
+                            <th class="sortable" data-type="gw">[$22809]</th>
+                            <th class="sortable" data-type="a">[$477]</th>
+                            <th class="sortable" data-type="s">[$89]</th>
                             <th></th>
                         </tr>
                     </table>
-                    
+
                     <!-- Empty content block !-->
                     <div class="fm-affiliate no-redemption">
                         [$22822]
                     </div>
-                    
+
                     <!-- Redeem content block !-->
-                    <div class="fm-affiliate redeem-scroll expanded-item hidden">
+                    <div class="fm-affiliate redeem-scroll hidden">
                         <table class="fm-affiliate redeem-table main">
                             <tr>
                                 <th>[$19297]</th>
@@ -4143,64 +4110,53 @@
                                 <th>[$22809]</th>
                                 <th>[$477]</th>
                                 <th>[$89]</th>
+                                <th>[$148]</th> <!-- Adding `Close` header to avoid column resizing !-->
                             </tr>
-                            <tr class="expanded">
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td><span class="colored-label orange">Processing</span></td>
-                                <td><a class="link open">View</a></td>
+                            <tr class="fm-affiliate redeem-summary template hidden">
+                                <td class="receipt"></td>
+                                <td class="date"></td>
+                                <td class="method"></td>
+                                <td class="amount"></td>
+                                <td class="status"><span class="colored-label"></span></td>
+                                <td><a class="link open">[$16797]</a><a class="link close">[$148]</a></td>
                             </tr>
-                            <tr class="fm-affiliate redeem-details">
+                            <tr class="fm-affiliate redeem-details template">
                                 <td colspan="6">
                                     <div class="fm-affiliate redeem-cell">
                                         <div class="fm-affiliate redeem-data">
-                                            <span class="strong">Receipt:</span>
-                                            <span></span>
+                                            <span class="strong">[$23398]</span>
+                                            <span class="receipt"></span>
                                         </div>
                                         <div class="fm-affiliate redeem-data">
-                                            <span class="strong">Method:</span>
-                                            <span></span>
+                                            <span class="strong">[$23308]</span>
+                                            <span class="method"></span>
                                         </div>
                                          <div class="fm-affiliate redeem-data">
-                                            <span class="strong full-size">Withdraw info:</span>
-                                            <span class="grey">Country</span>
-                                            <span></span>
-                                             <span class="grey">Currency</span>
-                                            <span></span>
+                                            <span class="strong full-size">[$23309]</span>
+                                            <span class="grey">[$481]</span>
+                                            <span class="country"></span>
+                                            <span class="grey">[$20952]</span>
+                                            <span class="currency"></span>
                                         </div>
-                                        <div class="fm-affiliate redeem-data">
-                                            <span class="strong full-size">Bank account:</span>
-                                            <span class="grey">Account name</span>
-                                            <span></span>
-                                            <span class="grey">Account number</span>
-                                            <span></span>
-                                            <span class="grey">Account type</span>
-                                            <span>Save account</span>
-                                            <span class="grey">SWIFT BIC</span>
-                                            <span></span>
-                                        </div>
+                                        <div class="fm-affiliate redeem-data account-details"></div>
                                     </div>
                                     <div class="fm-affiliate redeem-cell">
                                         <div class="fm-affiliate redeem-data">
-                                            <span class="strong full-size">Amount:</span>
-                                            <span class="grey">Request amount</span>
-                                            <span></span>
-                                            <span class="grey">Fee charged</span>
-                                            <span><span class="euro">&euro;0</span></span>
-                                            <span class="grey">Received amount</span>
-                                            <span></span>
+                                            <span class="strong full-size">[$23399]</span>
+                                            <span class="grey">[$23400]</span>
+                                            <span class="request-amount"></span>
+                                            <span class="grey">[$23401]</span>
+                                            <span class="fee-charged"><span class="euro">&euro;0</span></span>
+                                            <span class="grey">[$23402]</span>
+                                            <span class="recived-amount"></span>
                                         </div>
                                         <div class="fm-affiliate redeem-data">
-                                            <span class="strong full-size">Status: <span class="status red">Failed</span></span>
-                                            <span class="grey full-size">
-                                                The funds from this failed redemption were returned to your MEGA available commission balance. Please check your withdraw details carefully before future redemptions.
-                                            </span>
+                                            <span class="strong full-size">[$23255]<span class="status"></span></span>
+                                            <span class="grey full-size status-message"></span>
                                         </div>
                                     </div>
                                     <div class="clear"></div>
-                                    <a class="link close">Close</a>
+                                    <a class="link close">[$148]</a>
                                 </td>
                             </tr>
                         </table>

@@ -2,8 +2,6 @@
  * mega.attr.* related code
  */
 
-var attribCache = false;
-
 (function _userAttributeHandling(global) {
     "use strict";
 

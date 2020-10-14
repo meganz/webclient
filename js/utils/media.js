@@ -112,33 +112,54 @@ is_image.raw = {
     //   if (tr.childNodes.length > 2 && ~tr.childNodes[2].textContent.indexOf('RAW'))
     //     raw[tr.childNodes[0].textContent] = tr.childNodes[2].textContent;
     "3FR": "Hasselblad RAW (TIFF-based)",
+    "ARI": "Arri Alexa RAW Format",
+    "ARQ": "Sony Alpha Pixel-Shift RAW (TIFF-based)",
     "ARW": "Sony Alpha RAW (TIFF-based)",
+    "BAY": "Casio RAW Camera Image File Format",
+    "BMQ": "NuCore Raw Image File",
+    "CAP": "Phase One Digital Camera Raw Image",
+    "CINE": "Phantom Software Raw Image File.",
     "CR2": "Canon RAW 2 (TIFF-based)",
+    "CR3": "Canon RAW 3 (QuickTime-based)",
     "CRW": "Canon RAW Camera Image File Format (CRW spec.)",
     "CIFF": "Canon RAW Camera Image File Format (CRW spec.)",
     "CS1": "Sinar CaptureShop 1-shot RAW (PSD-based)",
+    "DC2": "Kodak DC25 Digital Camera File",
     "DCR": "Kodak Digital Camera RAW (TIFF-based)",
+    "DSC": "Kodak Digital Camera RAW Image (TIFF-based)",
     "DNG": "Digital Negative (TIFF-based)",
+    "DRF": "Kodak Digital Camera RAW Image (TIFF-based)",
+    "EIP": "Phase One Intelligent Image Quality RAW (TIFF-based)",
     "ERF": "Epson RAW Format (TIFF-based)",
+    "FFF": "Hasselblad RAW (TIFF-based)",
+    "IA": "Sinar Raw Image File",
     "IIQ": "Phase One Intelligent Image Quality RAW (TIFF-based)",
     "K25": "Kodak DC25 RAW (TIFF-based)",
+    "KC2": "Kodak DCS200 Digital Camera Raw Image Format",
     "KDC": "Kodak Digital Camera RAW (TIFF-based)",
+    "MDC": "Minolta RD175 Digital Camera Raw Image",
     "MEF": "Mamiya (RAW) Electronic Format (TIFF-based)",
     "MOS": "Leaf Camera RAW File",
     "MRW": "Minolta RAW",
     "NEF": "Nikon (RAW) Electronic Format (TIFF-based)",
     "NRW": "Nikon RAW (2) (TIFF-based)",
+    "OBM": "Olympus RAW Format (TIFF-based)",
     "ORF": "Olympus RAW Format (TIFF-based)",
+    "ORI": "Olympus RAW Format (TIFF-based?)",
     "PEF": "Pentax (RAW) Electronic Format (TIFF-based)",
+    "PTX": "Pentax (RAW) Electronic Format (TIFF-based)",
+    "PXN": "Logitech Digital Camera Raw Image Format",
+    "QTK": "Apple Quicktake 100/150 Digital Camera Raw Image",
     "RAF": "FujiFilm RAW Format",
     "RAW": "Panasonic RAW (TIFF-based)",
+    "RDC": "Digital Foto Maker Raw Image File",
     "RW2": "Panasonic RAW 2 (TIFF-based)",
     "RWL": "Leica RAW (TIFF-based)",
+    "RWZ": "Rawzor Digital Camera Raw Image Format",
     "SR2": "Sony RAW 2 (TIFF-based)",
     "SRF": "Sony RAW Format (TIFF-based)",
     "SRW": "Samsung RAW format (TIFF-based)",
-    // "TIF": "Tagged Image File Format",
-    // "TIFF": "Tagged Image File Format",
+    "STI": "Sinar Capture Shop Raw Image File",
     "X3F": "Sigma/Foveon RAW"
 };
 
@@ -153,14 +174,22 @@ function is_text(node) {
         return false;
     }
 
-    if (!fileext(node.name)) {
+    var fext = fileext(node.name);
+    if (!fext) {
         return true;
     }
 
     var fType = filetype(node, true)[0];
-    return fType === 'text' || fType === 'web-data' || fType === 'web-lang';
-}
+    if (fType === 'text' || fType === 'web-data' || fType === 'web-lang') {
+        return true;
+    }
 
+    if (fmconfig.editorext && fmconfig.editorext.indexOf(fext.toLowerCase()) > -1) {
+        return true;
+    }
+
+    return false;
+}
 
 var mThumbHandler = {
     sup: Object.create(null),
@@ -381,15 +410,13 @@ mThumbHandler.add('PDF', function PDFThumbHandler(ab, cb) {
     M.require('pdfjs').then(function() {
         if (!PDFThumbHandler.q) {
             PDFThumbHandler.q = function PDFThumbQueueHandler(task, done) {
-                var canvas;
-                var pdfTask;
                 var buffer = task[0];
                 var callback = task[1];
                 var tag = 'pdf-thumber.' + makeUUID();
                 var logger = PDFThumbHandler.q.logger;
                 var finish = function(buf) {
                     if (done) {
-                        pdfTask.destroy().then(done).catch(done);
+                        onIdle(done);
                         done = null;
                     }
 
@@ -404,34 +431,17 @@ mThumbHandler.add('PDF', function PDFThumbHandler(ab, cb) {
                     console.time(tag);
                 }
 
-                pdfTask = PDFJS.getDocument(buffer);
-                buffer = null;
+                if (!window.pdfjsLib || typeof pdfjsLib.getPreviewImage !== 'function') {
+                    if (d) {
+                        logger.warn('unexpected pdf.js instance/state...');
+                    }
+                    return finish();
+                }
 
-                pdfTask.then(function(pdf) {
-                    return pdf.getPage(1);
-                }).then(function(page) {
-                    var scale = 2.5;
-                    var viewport = page.getViewport(scale);
-
-                    // Prepare canvas using PDF page dimensions
-                    canvas = document.createElement('canvas');
-                    var context = canvas.getContext('2d');
-                    canvas.height = viewport.height;
-                    canvas.width = viewport.width;
-
-                    // Render PDF page into canvas context
-                    var renderContext = {
-                        viewport: viewport,
-                        canvasContext: context
-                    };
-
-                    return page.render(renderContext);
-                }).then(function() {
-                    var buffer = dataURLToAB(canvas.toDataURL('image/png'));
+                pdfjsLib.getPreviewImage(buffer).then(function(buffer) {
 
                     if (d) {
-                        logger.log('[%s] pdf2img %sx%s (%s bytes)',
-                            tag, canvas.width, canvas.height, buffer.byteLength);
+                        logger.log('[%s] %sx%s (%s bytes)', tag, buffer.width, buffer.height, buffer.byteLength);
                     }
 
                     finish(buffer);
@@ -446,12 +456,8 @@ mThumbHandler.add('PDF', function PDFThumbHandler(ab, cb) {
             PDFThumbHandler.q = new MegaQueue(PDFThumbHandler.q, mega.maxWorkers, 'pdf-thumber');
 
             if (d) {
-                console.info('Using pdf.js %s (%s)', PDFJS.version, PDFJS.build);
+                console.info('Using pdf.js %s (%s)', pdfjsLib.version, pdfjsLib.build);
             }
-
-            PDFJS.verbosity = d ? 10 : 0;
-            PDFJS.isEvalSupported = false;
-            PDFJS.workerSrc = (is_extension ? '' : '/') + 'pdf.worker.js';
         }
         var q = PDFThumbHandler.q;
 
@@ -491,6 +497,30 @@ mThumbHandler.add('SVG', function SVGThumbHandler(ab, cb) {
 if (!mega.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').pop()) | 0) < 56) {
     delete mThumbHandler.sup.SVG;
 }
+
+if (!window.fetchStreamSupport) {
+    delete mThumbHandler.sup.PDF;
+}
+
+mBroadcaster.once('startMega', function() {
+    'use strict';
+
+    var img = new Image();
+    img.onload = function() {
+        if (this.naturalWidth === 1) {
+            if (d) {
+                console.info('This browser does support AVIF.');
+            }
+            is_image.def.AVIF = 1;
+        }
+    };
+
+    img.src = 'data:image/avif;base64,AAAAHGZ0eXBtaWYxAAAAAG1pZjFhdmlmbWlhZgAAAPJtZXRhAAAAAAAAAC' +
+        'toZGxyAAAAAAAAAABwaWN0AAAAAAAAAAAAAAAAZ28tYXZpZiB2MAAAAAAOcGl0bQAAAAAAAQAAAB5pbG9jAAAAA' +
+        'ARAAAEAAQAAAAABFgABAAAAGAAAAChpaW5mAAAAAAABAAAAGmluZmUCAAAAAAEAAGF2MDFJbWFnZQAAAABnaXBy' +
+        'cAAAAEhpcGNvAAAAFGlzcGUAAAAAAAAAAQAAAAEAAAAQcGFzcAAAAAEAAAABAAAADGF2MUOBAAwAAAAAEHBpeGk' +
+        'AAAAAAwgICAAAABdpcG1hAAAAAAAAAAEAAQQBAoOEAAAAIG1kYXQSAAoFGAAOwCAyDR/wAABgBgAAAACsyvA=';
+});
 
 
 // ---------------------------------------------------------------------------------------------------------------
@@ -2310,9 +2340,6 @@ FullScreenManager.prototype.enterFullscreen = function() {
                 db.version(1).stores({kv: '&k'});
                 db.open().then(read).catch(console.warn.bind(console, dbname));
                 timer = setTimeout(apiReq, 1400);
-
-                // save the db name for our getDatabaseNames polyfill
-                localStorage['_$mdb$' + dbname] = 1;
             }
             else {
                 apiReq();

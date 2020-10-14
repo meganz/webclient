@@ -535,6 +535,11 @@ mobile.slideshow = {
     close: function() {
         'use strict';
 
+        if (!mobile.slideshow.$overlay) {
+            // was not opened
+            return;
+        }
+
         // Hide the dialog
         mobile.slideshow.$overlay.addClass('hidden');
 

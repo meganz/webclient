@@ -127,6 +127,9 @@ var mobile = {
         // Unhide back button, then add on click/tap handler
         $page.find('.fm-icon.back').removeClass('hidden').off('tap').on('tap', function() {
 
+            // Hide current page
+            $page.addClass('hidden');
+
             // If page to go back to is specified, render that
             if (typeof targetPage !== 'undefined') {
                 loadSubPage(targetPage);
@@ -134,6 +137,33 @@ var mobile = {
             else {
                 // Otherwise open the previous folder/page
                 window.history.back();
+            }
+
+            // Prevent double taps
+            return false;
+        });
+    },
+
+    /**
+     * Initialise the back arrow icon in the header to go back to a specific page without URL
+     * @param {Object} $page The jQuery selector for the current page
+     * @param {Object} $page The jQuery selector for the previuos page
+     */
+    initStepBackButton: function($page, $targetPage) {
+
+        'use strict';
+
+        // Unhide back button, then add on click/tap handler
+        $('.fm-icon.back', $page).removeClass('hidden').rebind('tap', function() {
+
+            // If page to go back to is specified, show that and hide current one
+            if (typeof $targetPage === 'object') {
+
+                // Hide current page
+                $page.addClass('hidden');
+
+                // Show previous page
+                $targetPage.removeClass('hidden');
             }
 
             // Prevent double taps
@@ -310,9 +340,12 @@ var mobile = {
         'use strict';
 
         var $megaIcon = $('.mobile.fm-icon.mega');
+        var $overlay = $('.nav-overlay', 'body');
 
         // On Mega icon click
         $megaIcon.off('tap').on('tap', function() {
+            $overlay.addClass('hidden');
+
             if ($(this).hasClass('non-responsive')) {
                 return;
             }
@@ -548,6 +581,105 @@ var mobile = {
                 e.preventDefault();
             }
         });
+    },
+
+    updFileManagerUI: function() {
+
+        'use strict';
+
+        var UImain = false;
+
+        if (d) {
+            console.time('rendernew');
+        }
+
+        var countUpdNodes = {};
+        var promises = [];
+        var seenByCountUpd = {};
+
+        var _setCountUpdNode = promisify(function(resolve, reject, node) {
+
+            var promise = MegaPromise.resolve();
+
+            if (!M.d[node.p]) {
+                promise = dbfetch.get(node.p);
+            }
+
+            promise.always(function() {
+
+                var parents = M.getPath(node.h);
+                var pIndex = parents.indexOf(M.currentdirid);
+                var pInCurrentView = parents[--pIndex];
+
+                if (pIndex > -1 && !countUpdNodes[pInCurrentView]) {
+                    countUpdNodes[pInCurrentView] = M.d[pInCurrentView];
+                }
+
+                resolve(node.h);
+            });
+        });
+
+        for (var i = newnodes.length; i--;) {
+
+            var newNode = newnodes[i];
+
+            if (newNode.p === this.currentdirid || newNode.h === this.currentdirid) {
+                UImain = M.v.length || !mobile.uploadOverlay.uploading;
+            }
+
+            if (!seenByCountUpd[newNode.p]) {
+
+                seenByCountUpd[newNode.p] = 1;
+                promises.push(_setCountUpdNode(newNode));
+            }
+        }
+
+        Promise.allSettled(promises).always(function() {
+
+            countUpdNodes = Object.values(countUpdNodes);
+
+            if (countUpdNodes.length) {
+                mobile.cloud.countAndUpdateSubFolderTotals(countUpdNodes);
+            }
+        });
+
+        var masterPromise = new MegaPromise();
+
+        if (d) {
+            console.log('rendernew, dir=%s, root=%s, mode=%d', this.currentdirid, this.currentrootid, this.viewmode);
+            console.log('rendernew.stat', UImain);
+        }
+
+        var renderPromise = MegaPromise.resolve();
+
+        if (UImain) {
+            if (M.v.length) {
+                var emptyBeforeUpd = M.v.length === 0;
+                M.filterByParent(M.currentdirid);
+                M.sort();
+                M.renderMain(!emptyBeforeUpd);
+            }
+            else {
+                renderPromise = M.openFolder(M.currentdirid, true);
+            }
+        }
+
+        renderPromise.always(function() {
+
+            if (UImain) {
+                mBroadcaster.sendMessage('mediainfo:collect');
+                $.tresizer();
+            }
+
+            if (d) {
+                console.timeEnd('rendernew');
+            }
+
+            masterPromise.resolve();
+        });
+
+        newnodes = [];
+        return masterPromise;
     }
 };
 
@@ -671,26 +803,10 @@ mega.tpw = {
     clearRows: function() {}
 };
 
-mega.megadrop = {
-    pufs: function() { return mobile.megadrop.pufs; },
-    isInit: function() { return false; },
-    pufProcessDb: function(data) { mobile.megadrop.pufProcessDb(data); },
-    onRename: function() { return false; },
-    pupProcessPUP: function(ap) {  mobile.megadrop.processPUP(ap); },
-    pufProcessPUH:  function(ap) { mobile.megadrop.processPUH(ap); },
-    pufRemove: function(ids) { return mobile.megadrop.pufRemove(ids); },
-    processUPHAP: function (ap) { mobile.megadrop.processUPH(ap); },
-    preMoveCheck: function(handles, target) {
-        var sel = Array.isArray(handles) ? handles : [handles];
-        var p = new MegaPromise();
-        p.resolve(sel, target);
-        return p;
-    },
-    isDropExist: function (sel) { return mobile.megadrop.isDropExist(sel); }
-};
-
 var nicknames = {
     cache: {},
+    // eslint-disable-next-line no-empty-function
+    getNickname: function() {},
     getNicknameAndName: function() {},
     decryptAndCacheNicknames: function() {},
     updateNicknamesFromActionPacket: function() {}
@@ -890,6 +1006,7 @@ function openRecents() {
 
 // Not required for mobile
 function fmtopUI() {}
+function fmLeftMenuUI() {}
 function sharedUInode() {}
 function addToMultiInputDropDownList() {}
 function removeFromMultiInputDDL() {}
@@ -902,4 +1019,41 @@ accountUI.account = {
     renderBirthDay: function() {},
     renderCountry: function() {},
     renderRubsched: function() {},
+};
+
+/** Global function to be used in mobile mode, checking if the action can be taken by the user.
+ * It checks the user validity (Expired business, or ODQ Paywall)
+ * @param   {Boolean} hideContext   Hide context menu
+ * @returns {Boolean}               True if the caller can proceed. False if not
+ */
+function validateUserAction(hideContext) {
+    if (mega.paywall) {
+        if (u_attr.b && u_attr.b.s === -1) {
+            if (u_attr.b.m) {
+                msgDialog('warningb', '', l[20401], l[20402]);
+            }
+            else {
+                msgDialog('warningb', '', l[20462], l[20463]);
+            }
+            return false;
+        }
+        else if (u_attr.uspw) {
+            if (hideContext) {
+                mobile.cloud.contextMenu.hide();
+            }
+            M.showOverStorageQuota(EPAYWALL);
+            return false;
+        }
+    }
+    return true;
+}
+
+// eslint-disable-next-line no-useless-concat
+window['slide' + 'show'] = function(h, close) {
+    if (close) {
+        mobile.slideshow.close();
+    }
+    else {
+        mobile.slideshow.init(h);
+    }
 };

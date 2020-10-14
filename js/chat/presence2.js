@@ -205,6 +205,8 @@ var UserPresence = function userpresence(
     this.lastseencb = lastseencb;          // called when info is received when a user was last seen (OPCODE_LASTGREEN)
 };
 
+inherits(UserPresence, MegaDataEmitter);
+
 UserPresence.PRESENCE = {
     UNAVAILABLE: 15, // black/hidden/unavailable
     OFFLINE: 1, // grey
@@ -295,7 +297,7 @@ UserPresence.prototype.reconnect = function presence_reconnect(self) {
                 self.sendkeepalive();
 
                 self.connectionRetryManager.gotConnected();
-                $(self).trigger('onConnected');
+                self.trigger('onConnected');
             }
             else {
                 // if canceled while trying to connect, drop the connection or it would stay idle.
@@ -309,7 +311,7 @@ UserPresence.prototype.reconnect = function presence_reconnect(self) {
                 self.s.close();
             }
 
-            $(self).trigger('onDisconnected');
+            self.trigger('onDisconnected');
 
             if (self.keepalivesendtimer) {
                 clearTimeout(self.keepalivesendtimer);
@@ -328,7 +330,7 @@ UserPresence.prototype.reconnect = function presence_reconnect(self) {
 
         self.s.onerror = function () {
             self.logger.error("websocket closed - error:", arguments);
-            $(self).trigger('onDisconnected');
+            self.trigger('onDisconnected');
 
             if (self.keepalivesendtimer) {
                 clearTimeout(self.keepalivesendtimer);
@@ -496,7 +498,7 @@ UserPresence.prototype.disconnect = function(userForced) {
 
     self.connectionRetryManager.gotDisconnected();
 
-    $(self).trigger('onDisconnected');
+    self.trigger('onDisconnected');
     // on FF, the onclose/onerror won't get triggered, maybe because of the websocket is waiting for the "close"
     // packet to be sent correctly
     if (self.connectedcb) {

@@ -57,13 +57,6 @@ function MegaPromise(fn) {
     }
 }
 
-if (typeof Promise !== "undefined") {
-    MegaPromise._origPromise = Promise;
-} else {
-    MegaPromise._origPromise = undefined;
-    window.Promise = MegaPromise;
-}
-
 /**
  * Set this to any number (millisecond) and a timer would check if all promises are resolved in that time. If they are
  * still in 'pending' state, they will trigger an error (this is a debugging helper, not something that you should
@@ -467,24 +460,34 @@ MegaPromise.prototype.dumpToConsole = function(msg) {
 MegaPromise.prototype.dump = MegaPromise.prototype.dumpToConsole;
 
 /**
+ * Check if what we have is *potentially* another Promise implementation (Native, Bluebird, Q, etc)
+ * @param {*|Object} p What we expect to be a promise.
+ * @returns {Boolean} whether it is
+ */
+MegaPromise.isAnotherPromise = function(p) {
+    'use strict';
+    return !(p instanceof MegaPromise) && typeof Object(p).then === 'function';
+};
+
+/**
  * Implementation of Promise.all/$.when, with a little bit more flexible way of handling different type of promises
  * passed in the `promisesList`
  *
  * @returns {MegaPromise}
  */
 MegaPromise.all = function(promisesList) {
+    'use strict';
 
-    var _jQueryPromisesList = [];
-    promisesList.forEach(function(v, k) {
-        if (MegaPromise._origPromise && v instanceof MegaPromise._origPromise) {
-            v = MegaPromise.asMegaPromiseProxy(v);
+    var _jQueryPromisesList = promisesList.map(function(p) {
+        if (MegaPromise.isAnotherPromise(p)) {
+            p = MegaPromise.asMegaPromiseProxy(p);
         }
-        _jQueryPromisesList.push(v);
-    });
 
-    // return MegaPromise.asMegaPromiseProxy(
-        // $.when.apply($, _jQueryPromisesList)
-    // );
+        if (d) {
+            console.assert(p instanceof MegaPromise);
+        }
+        return p;
+    });
 
     var promise = new MegaPromise();
 
@@ -530,12 +533,20 @@ MegaPromise.allDone = function(promisesList, timeout) {
     for (var i = promisesList.length; i--;) {
         var v = promisesList[i];
 
-        if (MegaPromise._origPromise && v instanceof MegaPromise._origPromise) {
+        if (MegaPromise.isAnotherPromise(v)) {
             v = MegaPromise.asMegaPromiseProxy(v);
         }
 
-        v.done(alwaysCb);
-        v.fail(alwaysCb);
+        if (v instanceof MegaPromise) {
+            v.done(alwaysCb);
+            v.fail(alwaysCb);
+        }
+        else {
+            if (d) {
+                console.warn('non-promise provided...', v);
+            }
+            alwaysCb(v);
+        }
     }
 
     if (timeout) {

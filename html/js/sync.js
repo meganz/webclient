@@ -81,6 +81,9 @@ function initMegasync() {
 
     resetMegasync();
 
+    // Hide windows options as default
+    $('.megaapp-windows', $content).addClass('hidden');
+
     // Preload linux options if on a linux client
     if (pf.indexOf('LINUX') >= 0) {
         $('.nav-buttons-bl a.linux').addClass('active');
@@ -91,8 +94,22 @@ function initMegasync() {
         var $this = $(this);
         var osData = $this.attr('data-os');
 
+        // Hide windows options as default
+        $('.megaapp-windows', $content).addClass('hidden');
+
         if (osData === 'windows') {
-            window.location = megasync.getMegaSyncUrl('windows');
+            if (ua.details.is64bit && !ua.details.isARM) {
+                // Download app for Windows 64bit
+                window.location = megasync.getMegaSyncUrl('windows');
+                $('.megaapp-windows-info.64bit', $content).addClass('hidden');
+            }
+            else {
+                // Download app for Windows 32bit
+                window.location = megasync.getMegaSyncUrl('windows_x32');
+                $('.megaapp-windows-info.32bit', $content).addClass('hidden');
+            }
+
+            $('.megaapp-windows', $content).removeClass('hidden');
             resetMegasync();
         }
         else if (osData === 'mac') {
@@ -107,6 +124,16 @@ function initMegasync() {
             megasync.getLinuxReleases(renderLinuxOptions);
         }
 
+        return false;
+    });
+
+    $('.megaapp-windows-info.32bit a', $content).rebind('click.megasyncWin32', function() {
+        window.location = megasync.getMegaSyncUrl('windows_x32');
+        return false;
+    });
+
+    $('.megaapp-windows-info.64bit a', $content).rebind('click.megasyncWin64', function() {
+        window.location = megasync.getMegaSyncUrl('windows');
         return false;
     });
 

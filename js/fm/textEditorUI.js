@@ -27,7 +27,7 @@ mega.textEditorUI = new function TextEditorUI() {
      * @returns {Void}              void
      */
     var validateAction = function(msg, submsg, callback) {
-        if (savedFileData && !$saveButton.hasClass('disabled')) {
+        if (!$saveButton.hasClass('disabled')) {
             msgDialog(
                 'confirmation',
                 '',
@@ -36,6 +36,9 @@ mega.textEditorUI = new function TextEditorUI() {
                 function(e) {
                     if (e) {
                         callback();
+                    }
+                    else {
+                        editor.focus();
                     }
                 }
             );
@@ -119,6 +122,18 @@ mega.textEditorUI = new function TextEditorUI() {
         $editorContianer = $('#mega-text-editor', $containerDialog);
         $saveButton = $('.buttons-holder .save-btn', $editorContianer);
 
+        $('.editor-textarea-container', $editorContianer).resizable({
+            handles: 'e',
+            resize: function() {
+                var cm = $('.editor-textarea-container .CodeMirror', $editorContianer)[0];
+                if (cm) {
+                    cm = cm.CodeMirror;
+                    if (cm) {
+                        cm.setSize();
+                    }
+                }
+            }
+        });
 
         /* eslint-disable sonarjs/no-duplicate-string */
         $('.txt-editor-menu', $editorContianer).rebind(
@@ -151,15 +166,13 @@ mega.textEditorUI = new function TextEditorUI() {
                         l[22750],
                         l[22751],
                         function() {
-                            // eslint-disable-next-line no-unused-expressions
-                            !hashLogic && history.back();
+                            history.back();
                             mega.textEditorUI.doClose();
                         }
                     );
                 }
                 else {
-                    // eslint-disable-next-line no-unused-expressions
-                    !hashLogic && history.back();
+                    history.back();
                     mega.textEditorUI.doClose();
                 }
                 return false;
@@ -180,6 +193,11 @@ mega.textEditorUI = new function TextEditorUI() {
                     mega.fileTextEditor.setFile(versionHandle || fileHandle, editor.getValue()).done(function(fh) {
                         if (versionHandle) {
                             mega.fileTextEditor.removeOldVersion(versionHandle);
+                        }
+                        else if (M.d[fileHandle] && M.d[fileHandle].s === 0) {
+                            mega.fileTextEditor.removeOldVersion(fileHandle);
+                            fileHandle = fh;
+                            fh = '';
                         }
                         versionHandle = fh;
                         savedFileData = editor.getValue();
@@ -285,6 +303,53 @@ mega.textEditorUI = new function TextEditorUI() {
             }
         );
 
+        var hotkey = 'ctrlKey';
+        if (ua.details.os === 'Apple') {
+            $('.open-f .menu-item-shortcut', $editorContianer).text(' ');
+            $('.close-f .menu-item-shortcut', $editorContianer).text(' ');
+            $('.save-f .menu-item-shortcut', $editorContianer).text('\u2318 S');
+            $('.save-as-f .menu-item-shortcut', $editorContianer).text('\u21E7\u2318 S');
+            $('.print-f .menu-item-shortcut', $editorContianer).text('\u2318 P');
+            hotkey = 'metaKey';
+        }
+
+        $editorContianer.rebind(
+            'keydown.txt-editor',
+            function keydownHandler(event) {
+                if (event[hotkey]) {
+                    switch (event.code) {
+                        case 'KeyS':
+                            if (event.shiftKey) {
+                                $('.editor-btn-container .save-as-f', $editorContianer).trigger('click');
+                            }
+                            else {
+                                $saveButton.trigger('click');
+                            }
+                            return false;
+                        case 'KeyO':
+                            if (event.shiftKey) {
+                                return true;
+                            }
+                            $('.editor-btn-container .open-f', $editorContianer).trigger('click');
+                            return false;
+                        case 'KeyQ':
+                            if (event.shiftKey) {
+                                return true;
+                            }
+                            $('.editor-btn-container .close-f', $editorContianer).trigger('click');
+                            return false;
+                        case 'KeyP':
+                            if (event.shiftKey) {
+                                return true;
+                            }
+                            $('.editor-btn-container .print-f', $editorContianer).trigger('click');
+                            return false;
+                    }
+                }
+                return true;
+            }
+        );
+
         initialized = true;
         /* eslint-enable sonarjs/no-duplicate-string */
     };
@@ -309,8 +374,8 @@ mega.textEditorUI = new function TextEditorUI() {
     this.setupEditor = function(fName, txt, handle, isReadonly) {
         M.require('codemirror_js', 'codemirrorscroll_js').done(function() {
             init();
+            pushHistoryState();
             $containerDialog.removeClass('hidden');
-            addingFakeHistoryState();
             window.textEditorVisible = true;
             $myTextarea = $('#txtar', $editorContianer);
             if (!editor) {
@@ -323,7 +388,7 @@ mega.textEditorUI = new function TextEditorUI() {
             // Without parentheses && will be applied first,
             // I want JS to start from left and go in with first match
             // eslint-disable-next-line no-extra-parens
-            if (isReadonly || folderlink || (M.currentrootid === 'shares' && M.getNodeRights(handle) < 2)) {
+            if (isReadonly || folderlink || (M.currentrootid === 'shares' && M.getNodeRights(handle) < 1)) {
                 editor.options.readOnly = true;
                 $('.txt-editor-menu', $editorContianer).addClass('disabled');
                 $('.txt-editor-btn.save-btn', $editorContianer).addClass('hidden');

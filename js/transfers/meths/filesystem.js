@@ -46,6 +46,8 @@
     var TEMPORARY = window.TEMPORARY || 0,
         PERSISTENT = window.PERSISTENT || 1;
 
+    var TEST_METHOD_SWITCHOVER = !!localStorage.testDLMethodSwitchover;
+
     function storage_s2n(s) {
         return s.toLowerCase() === 'persistent' ? PERSISTENT : TEMPORARY;
     }
@@ -595,6 +597,10 @@
 
                         if (resumeOffset) {
                             if (resumeOffset === dl_fw.length) {
+                                if (TEST_METHOD_SWITCHOVER && canSwitchDownloadMethod(dl, dl_id, fileEntry)) {
+                                    console.info('---------- TESTING DOWNLOAD METHOD SWITCHOVER --------');
+                                    return;
+                                }
                                 dl_fw.seek(resumeOffset);
                                 onIdle(beginDownload);
                                 return;

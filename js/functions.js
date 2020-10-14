@@ -7,12 +7,19 @@ function clickURLs() {
     'use strict';
     var nodeList = document.querySelectorAll('a.clickurl');
 
-    if (nodeList) {
+    if (nodeList.length) {
         $(nodeList).rebind('click', function() {
             var $this = $(this);
             var url = $this.attr('href') || $this.data('fxhref');
 
             if (url) {
+                var target = $this.attr('target');
+
+                if (target === '_blank') {
+                    open(getBaseUrl() + url);
+                    return false;
+                }
+
                 if (window.loadingDialog && $this.hasClass('pages-nav')) {
                     loadingDialog.quiet = true;
                     onIdle(function() {
@@ -23,6 +30,21 @@ function clickURLs() {
                 return false;
             }
         });
+        if (is_extension) {
+            $(nodeList).rebind('auxclick', function(e) {
+
+                // if this is middle click on mouse to open it on new tab and this is extension
+                if (e.which === 2) {
+
+                    var $this = $(this);
+                    var url = $this.attr('href') || $this.data('fxhref');
+
+                    open(getBaseUrl() + url);
+
+                    return false;
+                }
+            });
+        }
     }
     nodeList = undefined;
 }
@@ -267,7 +289,7 @@ function updateIpcRequests() {
 function countrydetails(isocode) {
     var cdetails = {
         name: M.getCountryName(isocode),
-        icon: isocode.toLowerCase() + '.gif'
+        icon: isocode.toLowerCase() + '.png'
     };
     return cdetails;
 }
@@ -363,6 +385,11 @@ function bytesToSize(bytes, precision, format) {
         resultUnit = s_b;
     }
 
+    if (window.lang !== 'en') {
+        // @todo measure the performance degradation by invoking this here now..
+        resultSize = mega.intl.decimal.format(resultSize);
+    }
+
     // XXX: If ever adding more HTML here, make sure it's safe and/or sanitize it.
     if (format === 2) {
         return resultSize + '<span>' + resultUnit + '</span>';
@@ -427,36 +454,14 @@ function isValidEmail(email) {
  * Adds on, bind, unbind, one and trigger methods to a specific class's prototype.
  *
  * @param kls class on which prototype this method should add the on, bind, unbind, etc methods
+ * @deprecated
  */
 function makeObservable(kls) {
     'use strict';
-
-    var target = kls.prototype || kls;
-    var aliases = [['on'], ['off'], ['bind', 'on'], ['unbind', 'off'], ['one'], ['trigger'], ['rebind']];
-
-    aliases.forEach(function(fn) {
-        var prop = fn[0];
-        fn = fn[1] || prop;
-
-        Object.defineProperty(target, prop, {
-            value: function() {
-                return this.$__eventEmitter___[fn].apply(this.$__eventEmitter___, arguments);
-            },
-            writable: true,
-            configurable: true
-        });
-    });
-
-    Object.defineProperty(target, '$__eventEmitter___', {
-        get: function() {
-            // TODO: Get a real event emitter and deprecate jQuery here.
-            Object.defineProperty(this, '$__eventEmitter___', {value: $(this)});
-            return this.$__eventEmitter___;
-        },
-        configurable: true
-    });
-
-    target = aliases = kls = undefined;
+    if (d > 1) {
+        console.warn('makeObservable() is deprecated.');
+    }
+    inherits(kls, MegaDataEmitter);
 }
 
 /**
@@ -625,11 +630,11 @@ function createTimeoutPromise(validateFunction, tick, timeout,
 
     var $promise = new MegaPromise();
     resolveRejectArgs = resolveRejectArgs || [];
-    if (!$.isArray(resolveRejectArgs)) {
+    if (!Array.isArray(resolveRejectArgs)) {
         resolveRejectArgs = [resolveRejectArgs];
     }
 
-    $promise.verify = function() {
+    $promise.verify = SoonFc(20, function _ctpVerify() {
         if (validateFunction()) {
             if (window.d && typeof(window.promisesDebug) !== 'undefined') {
                 console.debug("Resolving timeout promise", name,
@@ -638,7 +643,8 @@ function createTimeoutPromise(validateFunction, tick, timeout,
             }
             $promise.resolve.apply($promise, resolveRejectArgs);
         }
-    };
+    });
+
     $promise.stopTimers = function() {
         if (tickInterval !== false) {
             clearInterval(tickInterval);
@@ -705,8 +711,10 @@ function createTimeoutPromise(validateFunction, tick, timeout,
  */
 function AssertionFailed(message) {
     this.message = message;
-    this.stack = M.getStack();
+    // karma env?
+    this.stack = M && M.getStack ? M.getStack() : String(new Error().stack);
 }
+
 AssertionFailed.prototype = Object.create(Error.prototype);
 AssertionFailed.prototype.name = 'AssertionFailed';
 
@@ -858,8 +866,9 @@ function RegExpEscape(text) {
 
 function unixtimeToTimeString(timestamp) {
     var date = new Date(timestamp * 1000);
+    var hourSeparator = locale === 'fr' ? ' h ' : ':';
     return addZeroIfLenLessThen(date.getHours(), 2)
-        + ":" + addZeroIfLenLessThen(date.getMinutes(), 2);
+        + hourSeparator + addZeroIfLenLessThen(date.getMinutes(), 2);
 }
 
 
@@ -937,10 +946,14 @@ function MurmurHash3(key, seed) {
  * @param {String} keyr If a wrong key was used
  * @return {MegaPromise}
  */
-function mKeyDialog(ph, fl, keyr) {
+function mKeyDialog(ph, fl, keyr, selector) {
     "use strict";
 
     var promise = new MegaPromise();
+    var $dialog = $(is_mobile ? '#mobile-decryption-key-overlay' : '.fm-dialog.dlkey-dialog').removeClass('hidden');
+    var $button = $(is_mobile ? '.mobile.decrypt-button' : '.fm-dialog-new-folder-button', $dialog);
+    var $input = $(is_mobile ? '.mobile.decryption-key' : 'input', $dialog);
+
     if (keyr) {
         $('.fm-dialog.dlkey-dialog .instruction-message')
             .text(l[9048]);
@@ -957,45 +970,50 @@ function mKeyDialog(ph, fl, keyr) {
         name: 'unknown.unknown'
     }));
 
-    var $newFolderBtn = $('.fm-dialog.dlkey-dialog .fm-dialog-new-folder-button');
-    $newFolderBtn.addClass('disabled').removeClass('active');
-    $('.fm-dialog.dlkey-dialog').removeClass('hidden');
+    $button.addClass('disabled').removeClass('active');
     fm_showoverlay();
 
-    $('.fm-dialog.dlkey-dialog input').off('input keypress').on('input keypress', function(e) {
-        var length = $('.fm-dialog.dlkey-dialog input').val().length;
+    $input.rebind('input keypress', function(e) {
+        var length = String($(this).val() || '').length;
 
         if (length) {
-            $newFolderBtn.removeClass('disabled').addClass('active');
+            $button.removeClass('disabled').addClass('active');
             if (e.keyCode === 13) {
-                $newFolderBtn.click();
+                $button.click();
             }
         }
         else {
-            $newFolderBtn.removeClass('active').addClass('disabled');
+            $button.removeClass('active').addClass('disabled');
         }
     });
 
-    $newFolderBtn.rebind('click', function() {
+    $button.rebind('click.keydlg', function() {
 
         if ($(this).hasClass('active')) {
 
             // Trim the input from the user for whitespace, newlines etc on either end
-            var key = $.trim($('.fm-dialog.dlkey-dialog input').val());
+            var key = $.trim($input.val());
 
             if (key) {
 
-                // Remove the ! from the key which is exported from the export dialog
-                key = key.replace('!', '');
+                // Remove the !,# from the key which is exported from the export dialog
+                key = key.replace('!', '').replace('#', '');
 
                 var newHash = (fl ? '/#F!' : '/#!') + ph + '!' + key;
+
+                var currLink = getSitePath();
+
+                if (isPublickLinkV2(currLink)) {
+                    newHash = (fl ? '/folder/' : '/file/') + ph + '#' + key + (selector ? selector : '');
+                }
 
                 if (getSitePath() !== newHash) {
                     promise.resolve(key);
 
                     fm_hideoverlay();
-                    $('.fm-dialog.dlkey-dialog').addClass('hidden');
+                    $dialog.addClass('hidden');
                     loadSubPage(newHash);
+
                 }
             }
             else {
@@ -1238,6 +1256,14 @@ function getAppBaseUrl() {
         base += l.pathname;
     }
     return base;
+}
+
+if (d && location.hostname === 'localhost') {
+    // eslint-disable-next-line no-func-assign
+    getBaseUrl = function() {
+        'use strict';
+        return location.origin;
+    };
 }
 
 /**
@@ -1551,6 +1577,17 @@ function assertStateChange(currentState, newState, allowedStatesMap, enumMap) {
 function mLogout(aCallback, force) {
     "use strict";
 
+    // If user are trying logged out from paid ephemral session, warn user that they cannot get back the paid session.
+    if (isNonActivatedAccount()) {
+        msgDialog('warninga:!^' + l[78] + '!' + l[79], 'warning', l[23443], l[23444], function(response) {
+            if (!response) {
+                M.logout();
+            }
+        });
+
+        return;
+    }
+
     if (!force && mega.ui.passwordReminderDialog) {
         var passwordReminderLogout = mega.ui.passwordReminderDialog.recheckLogoutDialog();
 
@@ -1578,32 +1615,6 @@ function mLogout(aCallback, force) {
     else {
         M.logout();
     }
-}
-
-/**
- * Perform a strict logout, by removing databases
- * and cleaning sessionStorage/localStorage.
- *
- * @param {String} aUserHandle optional
- */
-function mCleanestLogout(aUserHandle) {
-    if (u_type !== 0 && u_type !== 3) {
-        throw new Error('Operation not permitted.');
-    }
-
-    mLogout(function() {
-        MegaDB.dropAllDatabases(aUserHandle)
-            .always(function(r) {
-                console.debug('mCleanestLogout', r);
-
-                localStorage.clear();
-                sessionStorage.clear();
-
-                setTimeout(function() {
-                    location.reload(true);
-                }, 7e3);
-            });
-    });
 }
 
 // Initialize Rubbish-Bin Cleaning Scheduler
@@ -1943,11 +1954,11 @@ function passwordManager(form) {
             if (hashLogic || isPublicLink(path)) {
                 path = path.replace('/', '/#');
 
-                if (is_chrome_web_ext || is_firefox_web_ext) {
-                    path = path.replace('/#', '/mega/secure.html#');
+                if (is_extension) {
+                    path = path.replace('/#', '/' + urlrootfile + '#');
                 }
             }
-            history.replaceState({ success: true, subpage: path.replace('#','').replace('/','') }, '', path);
+            history.replaceState({ success: true, subpage: getCleanSitePath(path) }, '', path);
             $form.find('input').val('');
         }, 1000);
         return false;
@@ -2434,6 +2445,46 @@ if (typeof sjcl !== 'undefined') {
     };
 })(window);
 
+/**
+ * Transoms the numerical preferences to preferences view object
+ * @param {Number} pref     Integer value representing the preferences
+ * @returns {Object}        View preferences object
+ */
+function getFMColPrefs(pref) {
+    'use strict';
+    if (pref === undefined) {
+        return;
+    }
+    var columnsPreferences = Object.create(null);
+    columnsPreferences.fav = pref & 4;
+    columnsPreferences.label = pref & 1;
+    columnsPreferences.size = pref & 8;
+    columnsPreferences.type = pref & 64;
+    columnsPreferences.timeAd = pref & 32;
+    columnsPreferences.timeMd = pref & 16;
+    columnsPreferences.versions = pref & 2;
+
+    return columnsPreferences;
+}
+
+/**
+ * Get the number needed for bitwise operator
+ * @param {String} colName      Column name
+ * @returns {Number}            Number to be used in bitwise operator
+ */
+function getNumberColPrefs(colName) {
+    'use strict';
+    switch (colName) {
+        case 'fav': return 4;
+        case 'label': return 1;
+        case 'size': return 8;
+        case 'type': return 64;
+        case 'timeAd': return 32;
+        case 'timeMd': return 16;
+        case 'versions': return 2;
+        default: return null;
+    }
+}
 
 // Constructs an extensible hashmap-like class...
 function Hash(a, b, c, d) {
@@ -2524,170 +2575,6 @@ Hash.prototype = Object.create(null, {
         }
     }
 });
-
-
-// this is to change pdf.viewer.js on the fly, as we cant change the original file
-function modifyPdfViewerScript(pdfViewerSrcCode) {
-    'use strict';
-    pdfViewerSrcCode = pdfViewerSrcCode
-        .replace('defaultFilename = \'compressed.tracemonkey - pldi - 09.pdf\';',
-        'defaultFilename = \'document.pdf\';');
-
-    var pdfImagesPath = 'PDFJS.imageResourcesPath = \'' + (is_extension ? '' : '/') + 'images/pdfV/\';';
-    var pdfWorkerPath = 'PDFJS.workerSrc = \'' + (is_extension ? '' : '/') + 'pdf.worker.js\';';
-
-    pdfViewerSrcCode = pdfViewerSrcCode
-        .replace('PDFJS.imageResourcesPath = \'./images/\';',
-        pdfImagesPath);
-
-    pdfViewerSrcCode = pdfViewerSrcCode
-        .replace('PDFJS.workerSrc = \'../build/pdf.worker.js\';',
-        pdfWorkerPath);
-
-    pdfViewerSrcCode = pdfViewerSrcCode
-        .replace('setTitleUsingUrl: function pdfViewSetTitleUsingUrl(url) {',
-        'setTitleUsingUrl: function pdfViewSetTitleUsingUrl(url) { return;');
-
-    pdfViewerSrcCode = pdfViewerSrcCode
-        .replace('var filename = getPDFFileNameFromURL(this.url);',
-        'var filename = PDFViewerApplication.appConfig.pdfDocTitile;');
-
-    pdfViewerSrcCode = pdfViewerSrcCode
-        .replace('var filename = pdfjsLib.getFilenameFromUrl(item.filename);',
-        'var filename = PDFViewerApplication.appConfig.pdfDocTitile;');
-
-    pdfViewerSrcCode = pdfViewerSrcCode
-        .replace('validateFileURL(file);',
-        ' ');
-
-    pdfViewerSrcCode = pdfViewerSrcCode
-        .replace('mozL10n.setLanguage(PDFJS.locale);',
-        ' ');
-
-    pdfViewerSrcCode = pdfViewerSrcCode
-        .replace('document.getElementsByTagName(\'html\')[0].dir = mozL10n.getDirection();',
-        ' ');
-
-    pdfViewerSrcCode = pdfViewerSrcCode
-        .replace('\'fileName\': getPDFFileNameFromURL(this.url),',
-        '\'fileName\': data.info.Title,');
-
-    pdfViewerSrcCode = pdfViewerSrcCode
-        .replace('debuggerScriptPath: \'./debugger.js\',',
-        ' ');
-
-    pdfViewerSrcCode = pdfViewerSrcCode
-        .replace('PDFJS.cMapUrl = \'../web/cmaps/\';',
-        'PDFJS.cMapUrl = \'' + staticpath + 'cmaps/\';');
-
-    pdfViewerSrcCode = pdfViewerSrcCode
-        .replace('PDFJS.cMapPacked = true;',
-        'PDFJS.cMapPacked = false;');
-
-    // algorithm to remove 'mozL10n.get'
-    var st = 5000; // start from char 50000
-
-    var getMsgFromLine = function (startPos, endPos, file) { // this method cuts the last parameter
-        var firstParam = true;
-        var secondParam = false;
-        var finalParam = false;
-        var msg = '';
-        var lastLoc = -1;
-        for (var k = startPos; k < endPos; k++) {
-            if (!finalParam) {
-                if (file.charAt(k) === ',') {
-                    if (firstParam) {
-                        firstParam = false;
-                        secondParam = true;
-                    }
-                    else if (secondParam) {
-                        secondParam = false;
-                        finalParam = true;
-                    }
-                }
-                else if (secondParam && file.charAt(k) === '{') {
-                    while (file.charAt(k) !== '}') {
-                        k++;
-                    }
-                }
-            }
-            else {
-                var counter = 0;
-                for (var h = k; h < endPos; h++) {
-                    if (file.charAt(h) === ')') {
-                        if (counter === 0) {
-                            lastLoc = h + 1;
-                            break;
-                        }
-                        else {
-                            counter--;
-                        }
-                    }
-                    else if (file.charAt(h) === '(') {
-                        counter++;
-                    }
-                    msg += file.charAt(h);
-                }
-                break;
-            }
-        }
-        return {
-            message: msg, endLocation: lastLoc
-        };
-    };
-
-    var loc = -1;
-    loc = pdfViewerSrcCode.indexOf('mozL10n.get(', st);
-    while (loc !== -1) {
-        var endPos = pdfViewerSrcCode.indexOf(';', loc);
-        var currRes = getMsgFromLine(loc, endPos, pdfViewerSrcCode);
-        pdfViewerSrcCode = pdfViewerSrcCode.substring(0, loc)
-            + currRes.message
-            + pdfViewerSrcCode.substring(currRes.endLocation, pdfViewerSrcCode.length);
-        loc = pdfViewerSrcCode.indexOf('mozL10n.get', loc + 1);
-    }
-    // end algorithm to remove 'mozL10n.get'
-
-    pdfViewerSrcCode = pdfViewerSrcCode
-        .replace('items.numPages.textContent =  \'of {{pagesCount}}\'',
-        'items.numPages.textContent = \'of \' + pagesCount');
-    pdfViewerSrcCode = pdfViewerSrcCode
-        .replace('items.numPages.textContent =  \'({{pageNumber}} of {{pagesCount}})\'',
-        'items.numPages.textContent = pageNumber + \' of \' + pagesCount');
-    pdfViewerSrcCode = pdfViewerSrcCode
-        .replace('return  \'{{date}}, {{time}}\'',
-        'return dateString + \',\' + timeString');
-    pdfViewerSrcCode = pdfViewerSrcCode
-        .replace('items.customScaleOption.textContent =  \'{{scale}}%\'',
-        'items.customScaleOption.textContent = customScale + \' %\'');
-    pdfViewerSrcCode = pdfViewerSrcCode
-        .replace('return  \'{{size_kb}} KB ({{size_b}} bytes)\'',
-        'return kb + \' KB (\' + fileSize + \' bytes)\'');
-    pdfViewerSrcCode = pdfViewerSrcCode
-        .replace('return  \'{{size_mb}} MB ({{size_b}} bytes)\'',
-        'return (kb / 1024) + \' MB (\' + fileSize + \' bytes)\'');
-
-    var finalFunctionOnViewLoad = 'function webViewerLoad() { '
-        + 'var config = getViewerConfiguration(); '
-        + 'var pdfRef = JSON.parse(localStorage.getItem(\'currPdfPrev2\')); '
-        + 'localStorage.removeItem(\'currPdfPrev2\'); '
-        + 'config.pdfDocTitile = localStorage.getItem(\'pdfPrevTitle\'); '
-        + 'localStorage.removeItem(\'pdfPrevTitle\'); '
-        + 'config.defaultUrl = pdfRef; '
-        + 'config.toolbar.openFile.setAttribute(\'hidden\', \'true\'); '
-        + 'config.secondaryToolbar.openFileButton.setAttribute(\'hidden\', \'true\'); '
-        + 'window.PDFViewerApplication = pdfjsWebApp.PDFViewerApplication; '
-        + 'pdfjsWebApp.PDFViewerApplication.run(config);} '
-        + 'document.addEventListener(\'DOMContentLoaded\', webViewerLoad, true); '
-        + '}) ]);';
-
-    var placeToCut = pdfViewerSrcCode.indexOf('function webViewerLoad() {');
-    pdfViewerSrcCode = pdfViewerSrcCode.substring(0, placeToCut);
-
-    pdfViewerSrcCode += finalFunctionOnViewLoad;
-
-    return pdfViewerSrcCode;
-}
 
 function invalidLinkError() {
     'use strict';
@@ -2876,4 +2763,209 @@ function registerLinuxDownloadButton($links) {
         return false;
     });
 }
+/* eslint-disable complexity */
+/**
+ * Function that takes users attributes, then prepare content texts of ODQ paywall dialog
+ * @param {Object} user_attr        u_attr or {}
+ * @param {Object} accountData      M.account, caller must populate then pass
+ * @returns {Object}                contains {dialogText, dlgFooterText,fmBannerText}
+ */
+function odqPaywallDialogTexts(user_attr, accountData) {
+    'use strict';
 
+    var dialogText = l[23525];
+    var dlgFooterText = l[23524];
+    var fmBannerText = l[23534];
+
+    if (user_attr.uspw) {
+        if (user_attr.uspw.dl) {
+            var deadline = new Date(user_attr.uspw.dl * 1000);
+            var currDate = new Date();
+            var remainDays = Math.floor((deadline - currDate) / 864e5);
+            var remainHours = Math.floor((deadline - currDate) / 36e5);
+
+            if (remainDays > 0) {
+                dlgFooterText = remainDays > 1 ? l[23521].replace('%1', remainDays) : l[23522];
+                fmBannerText = remainDays > 1 ? l[23532].replace('%1', remainDays) : l[23533];
+            }
+            else if (remainDays === 0 && remainHours > 0) {
+                dlgFooterText = l[23523].replace('%1', remainHours);
+            }
+        }
+        if (user_attr.uspw.wts && user_attr.uspw.wts.length) {
+            dialogText = l[23520];
+            if (user_attr.uspw.wts.length === 1) {
+                dialogText = l[23530];
+                dialogText = dialogText.replace('%2', time2date(user_attr.uspw.wts[0], 1));
+            }
+            if (user_attr.uspw.wts.length === 2) {
+                dialogText = dialogText.replace('%2', time2date(user_attr.uspw.wts[0], 1)).replace('%3', '')
+                    .replace('%4', time2date(user_attr.uspw.wts[1], 1));
+            }
+            else if (user_attr.uspw.wts.length === 3) {
+                dialogText = dialogText.replace('%2', time2date(user_attr.uspw.wts[0], 1))
+                    .replace('%3', time2date(user_attr.uspw.wts[1], 1))
+                    .replace('%4', time2date(user_attr.uspw.wts[2], 1));
+            }
+            else {
+                // more than 3
+                var datesString = time2date(user_attr.uspw.wts[1], 1);
+                for (var k = 2; k < user_attr.uspw.wts.length - 1; k++) {
+                    datesString += ', ' + time2date(user_attr.uspw.wts[k], 1);
+                }
+
+                dialogText = dialogText.replace('%2', time2date(user_attr.uspw.wts[0], 1))
+                    .replace('%3', datesString)
+                    .replace('%4', time2date(user_attr.uspw.wts[user_attr.uspw.wts.length - 1], 1));
+            }
+        }
+    }
+
+    var filesText = l[23253]; // 0 files
+    var totalFiles = accountData.stats[M.RootID].files +
+        (accountData.stats[M.RubbishID] ? accountData.stats[M.RubbishID].files : 0) +
+        (accountData.stats[M.InboxID] ? accountData.stats[M.InboxID].files : 0);
+    if (totalFiles === 1) {
+        filesText = l[835];
+    }
+    else if (totalFiles > 1) {
+        filesText = l[833].replace('[X]', totalFiles);
+    }
+
+    dialogText = dialogText.replace('%1', user_attr.email || ' ');
+    dialogText = dialogText.replace('%6', bytesToSize(accountData.space_used))
+        .replace('%5', filesText);
+
+    // In here, it's guaranteed that we have pro.membershipPlans,
+    // but we will check for error free logic in case of changes
+    var minPlanId = -1;
+    var neededPro = 4;
+    if (pro.membershipPlans && pro.membershipPlans.length) {
+        var spaceUsedGB = accountData.space_used / 1073741824; // = 1024*1024*1024
+        var minPlan = 9000000;
+        for (var h = 0; h < pro.membershipPlans.length; h++) {
+            if (pro.membershipPlans[h][4] === 1 && pro.membershipPlans[h][2] > spaceUsedGB &&
+                pro.membershipPlans[h][2] < minPlan) {
+                minPlan = pro.membershipPlans[h][2];
+                minPlanId = pro.membershipPlans[h][1];
+            }
+        }
+    }
+    if (minPlanId === -1) {
+        // weirdly, we dont have plans loaded, or no plan matched the storage.
+        if (user_attr.p) {
+            neededPro = user_attr.p + 1;
+            if (neededPro === 3) {
+                neededPro = 100;
+            }
+            else if (neededPro === 5) {
+                neededPro = 1;
+            }
+        }
+    }
+    else {
+        neededPro = minPlanId;
+    }
+
+    dialogText = dialogText.replace('%7', pro.getProPlanName(neededPro));
+
+    return {
+        dialogText: dialogText,
+        dlgFooterText: dlgFooterText,
+        fmBannerText: fmBannerText
+    };
+}
+
+
+function getTaxName(countryCode) {
+    'use strict';
+    switch (countryCode) {
+        case "AT": return "USt";
+        case "BE": return "TVA";
+        case "HR": return "PDV";
+        case "CZ": return "DPH";
+        case "DK": return "moms";
+        case "EE": return "km";
+        case "FI": return "ALV";
+        case "FR": return "TVA";
+        case "DE": return "USt";
+        case "HU": return "AFA";
+        case "IT": return "IVA";
+        case "LV": return "PVN";
+        case "LT": return "PVM";
+        case "LU": return "TVA";
+        case "NL": return "BTW";
+        case "PL": return "PTU";
+        case "PT": return "IVA";
+        case "RO": return "TVA";
+        case "SK": return "DPH";
+        case "SI": return "DDV";
+        case "SE": return "MOMS";
+        case "AL": return "TVSH";
+        case "AD": return "IGI";
+        case "AR": return "IVA";
+        case "AM": return "AAH";
+        case "AU": return "GST";
+        case "BO": return "IVA";
+        case "BA": return "PDV";
+        case "BR": return "ICMS";
+        case "CA": return "GST";
+        case "CL": return "IVA";
+        case "CO": return "IVA";
+        case "DO": return "ITBIS";
+        case "EC": return "IVA";
+        case "SV": return "IVA";
+        case "FO": return "MVG";
+        case "GT": return "IVA";
+        case "IS": return "VSK";
+        case "ID": return "PPN";
+        case "JE": return "GST";
+        case "JO": return "GST";
+        case "LB": return "TVA";
+        case "LI": return "MWST";
+        case "MK": return "DDV";
+        case "MY": return "GST";
+        case "MV": return "GST";
+        case "MX": return "IVA";
+        case "MD": return "TVA";
+        case "MC": return "TVA";
+        case "ME": return "PDV";
+        case "MA": return "GST";
+        case "NZ": return "GST";
+        case "NO": return "MVA";
+        case "PK": return "GST";
+        case "PA": return "ITBMS";
+        case "PY": return "IVA";
+        case "PE": return "IGV";
+        case "PH": return "RVAT";
+        case "RU": return "NDS";
+        case "SG": return "GST";
+        case "CH": return "MWST";
+        case "TN": return "TVA";
+        case "TR": return "KDV";
+        case "UA": return "PDV";
+        case "UY": return "IVA";
+        case "UZ": return "QQS";
+        case "VN": return "GTGT";
+        case "VE": return "IVA";
+        case "ES": return "NIF";
+
+        default: return "VAT";
+    }
+}
+/* eslint-enable complexity */
+
+/**
+ * Validate entered address is on correct structure, if there is more type of bitcoin structure please update.
+ * Reference - https://stackoverflow.com/a/59756959
+ * Use in Referral program redemption
+ * @param {String} address Bitcoin address
+ *
+ * @returns {Boolean} result Validity of entered address
+ */
+function validateBitcoinAddress(address) {
+
+    'use strict';
+
+    return address.match(/(^[13][\1-9A-HJ-NP-Za-km-z]{25,34}$)|(^(bc1)[\dA-HJ-NP-Za-z]{8,87}$)/) === null;
+}

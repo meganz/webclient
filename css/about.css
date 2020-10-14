@@ -111,8 +111,9 @@ body:not(.mobile) .about.top-info a:hover {
 .en .about.numbers-info {
     max-width: 232px;
 }
-.en .about.numbers-info.short {
-    max-width: 165px;
+.en .about.numbers-info.short .numbers-txt {
+    max-width: 145px;
+    display: inline-block;
 }
 .about-numbers .bottom-page.horizontal-centered-bl.wide {
     max-width: 1146px;
@@ -129,7 +130,6 @@ body:not(.mobile) .about.top-info a:hover {
     color: #373737;
     font-family: 'LatoWebBold', 'source_sans_probold', Arial;
     padding: 98px 0 10px 0;
-    text-transform: capitalize;
 }
 .about.leaders-block {
     font-size: 0;
@@ -437,7 +437,7 @@ body:not(.mobile) .about.white-button:hover {
 }
 .about.top-info.top-pad {
     padding: 44px 0 0 0;
-} 
+}
 .about.data-header {
     display: inline-block;
     margin: 76px 20px 65px 20px;
@@ -504,9 +504,6 @@ body:not(.mobile) .about.white-button:hover {
     }
     .id .about .bottom-page.big-icon-info {
         font-size: 26px;
-    }
-    .bottom-page.big-header {
-        font-size: 30px;
     }
 }
 @media only screen and (max-width: 783px) {
@@ -600,10 +597,6 @@ body:not(.mobile) .about.white-button:hover {
     }
     .about.hiring {
         margin: 30px auto 0 auto;
-    }
-    .bottom-page.big-header {
-        font-size: 26px;
-        line-height: 38px;
     }
     .about.top-info {
         padding: 36px 0 18px 0;

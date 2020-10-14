@@ -47,6 +47,10 @@ BusinessRegister.prototype.initPage = function(preSetNb, preSetName, preSetTel, 
     });
     nbUsersMegaInput.showMessage('*' + l[19501]);
 
+    $nbUsersInput.rebind('wheel.registerb', function(e) {
+        e.preventDefault();
+    });
+
     var cnameMegaInput = new mega.ui.MegaInputs($cnameInput);
     var telMegaInput = new mega.ui.MegaInputs($telInput);
     var fnameMegaInput = new mega.ui.MegaInputs($fnameInput);
@@ -140,9 +144,7 @@ BusinessRegister.prototype.initPage = function(preSetNb, preSetName, preSetTel, 
         }
 
         // clear the payment block
-        $pageContainer.find('.bus-reg-radio-block').empty();
-
-        var $paymentBlock = $('.bus-reg-radio-block', $pageContainer);
+        var $paymentBlock = $('.bus-reg-radio-block', $pageContainer).empty();
 
         var radioHtml = '<div class="bus-reg-radio-option"> <div class="bus-reg-radio payment-[x] checkOff"></div>';
         var textHtml = '<div class="provider">[x]</div>';
@@ -152,17 +154,21 @@ BusinessRegister.prototype.initPage = function(preSetNb, preSetName, preSetTel, 
             return failureExit(l[20431]);
         }
 
-        var paymentGatewayToAdd = '';
-        for (var k = 0; k < list.length; k++) {
-            var payRadio = radioHtml.replace('[x]', list[k].gatewayName);
-            var payText = textHtml.replace('[x]', list[k].displayName);
-            var payIcon = iconHtml.replace('[x]', list[k].gatewayName);
-            paymentGatewayToAdd += payRadio + payText + payIcon;
+        if (!window.businessVoucher) {
+            var paymentGatewayToAdd = '';
+            for (var k = 0; k < list.length; k++) {
+                var payRadio = radioHtml.replace('[x]', list[k].gatewayName);
+                var payText = textHtml.replace('[x]', list[k].displayName);
+                var payIcon = iconHtml.replace('[x]', list[k].gatewayName);
+                paymentGatewayToAdd += payRadio + payText + payIcon;
+            }
+            if (paymentGatewayToAdd) {
+                $paymentBlock.safeAppend(paymentGatewayToAdd);
+            }
         }
-        if (paymentGatewayToAdd) {
-            $paymentBlock.append(paymentGatewayToAdd);
-        }
-
+        $paymentBlock.safeAppend(
+            radioHtml.replace('[x]', 'Voucher') + textHtml.replace('[x]', l[23494]) + '</div>'
+        );
 
         // setting the first payment provider as chosen
         $($pageContainer.find('.bus-reg-radio-block .bus-reg-radio')[0]).removeClass('checkOff')
@@ -190,15 +196,16 @@ BusinessRegister.prototype.initPage = function(preSetNb, preSetName, preSetTel, 
         if (!users) {
             users = mySelf.minUsers; // minimum val
         }
+        var intl = mega.intl.number;
         var $gadget = $('.bus-reg-plan', $pageContainer);
-        $gadget.find('.business-plan-price span.big').text(mySelf.planPrice.toFixed(2) + ' \u20ac');
-        $gadget.find('.business-base-plan span.right')
-            .text((mySelf.planPrice * mySelf.minUsers).toFixed(2) + ' \u20ac'); // minimum
-        $gadget.find('.business-users-plan span.right')
-            .text((mySelf.planPrice * (users - mySelf.minUsers)).toFixed(2) + ' \u20ac');
-        $gadget.find('.business-plan-total span.right').text((mySelf.planPrice * users).toFixed(2) + ' \u20ac');
+        $('.business-plan-price span.big', $gadget).text(intl.format(mySelf.planPrice) + ' \u20ac');
+        $('.business-base-plan span.right', $gadget)
+            .text(intl.format(mySelf.planPrice * mySelf.minUsers) + ' \u20ac'); // minimum
+        $('.business-users-plan span.right', $gadget)
+            .text(intl.format(mySelf.planPrice * (users - mySelf.minUsers)) + ' \u20ac');
+        $('.business-plan-total span.right', $gadget).text(intl.format(mySelf.planPrice * users) + ' \u20ac');
 
-        $gadget.find('.business-users-plan .left').text(l[19504].replace('{0}', users - mySelf.minUsers));
+        $('.business-users-plan .left', $gadget).text(l[19504].replace('{0}', users - mySelf.minUsers));
     };
 
     // event handler for clicking on terms anchor
@@ -240,6 +247,22 @@ BusinessRegister.prototype.initPage = function(preSetNb, preSetName, preSetTel, 
                 }
             }
         });
+
+    // event handlers for focus and blur on checkBoxes
+    var $regChk = $('.bus-reg-checkbox input', $pageContainer);
+    $regChk.rebind(
+        'focus.chkRegisterb',
+        function regsiterbInputFocus() {
+            $(this).parent().addClass('focused');
+        }
+    );
+
+    $regChk.rebind(
+        'blur.chkRegisterb',
+        function regsiterbInputBlur() {
+            $(this).parent().removeClass('focused');
+        }
+    );
 
     /**input values validation
      * @param {Object}  $element    the single element to validate, if not passed all will be validated
@@ -343,7 +366,9 @@ BusinessRegister.prototype.initPage = function(preSetNb, preSetName, preSetTel, 
     );
 
     // event handler for register button, validation + basic check
-    $('#business-reg-btn, #business-reg-btn-mob', $pageContainer).off('click.suba').on('click.suba',
+    var $regBtns = $('#business-reg-btn, #business-reg-btn-mob', $pageContainer);
+    $regBtns.rebind(
+        'click.regBtns',
         function registerBusinessAccButtonClickHandler() {
 
             if ($(this).hasClass('disabled')) {
@@ -361,6 +386,37 @@ BusinessRegister.prototype.initPage = function(preSetNb, preSetName, preSetTel, 
                 $passInput.val());
         }
     );
+
+    $regBtns.rebind(
+        'keydown.regBtns',
+        function regBusinessKeyDownHandler(e) {
+            if (e.keyCode === 9) {
+                e.preventDefault();
+                $nbUsersInput.focus();
+            }
+            else if (e.keyCode === 32 || e.keyCode === 13) {
+                e.preventDefault();
+                $(this).triggerHandler('click');
+            }
+            return false;
+        }
+    );
+
+    // event handlers for focus and blur on registerBtn
+    $regBtns.rebind(
+        'focus.regBtns',
+        function regsiterbBtnFocus() {
+            $(this).addClass('focused');
+        }
+    );
+
+    $regBtns.rebind(
+        'blur.regBtns',
+        function regsiterbBtnBlur() {
+            $(this).removeClass('focused');
+        }
+    );
+
 
     M.require('businessAcc_js').done(function afterLoadingBusinessClass() {
         var business = new BusinessAccount();
@@ -395,6 +451,12 @@ BusinessRegister.prototype.initPage = function(preSetNb, preSetName, preSetTel, 
  */
 BusinessRegister.prototype.doRegister = function(nbusers, cname, fname, lname, tel, email, pass) {
     "use strict";
+    var $paymentMethod = $('.bus-reg-radio-option .bus-reg-radio.checkOn', '.bus-reg-body');
+    var pMethod;
+    if ($paymentMethod.hasClass('payment-Voucher')) {
+        pMethod = 'voucher';
+    }
+
     if (is_mobile) {
         parsepage(pages['mobile']);
     }
@@ -439,7 +501,9 @@ BusinessRegister.prototype.doRegister = function(nbusers, cname, fname, lname, t
             var userInfo = {
                 fname: fname,
                 lname: lname,
-                nbOfUsers: nbusers
+                nbOfUsers: nbusers,
+                pMethod: pMethod,
+                isUpgrade: isUpgrade
             };
             mySelf.goToPayment(userInfo);
         });
@@ -462,8 +526,15 @@ BusinessRegister.prototype.doRegister = function(nbusers, cname, fname, lname, t
  */
 BusinessRegister.prototype.goToPayment = function(userInfo) {
     "use strict";
-
-    addressDialog.init(this.planInfo, userInfo, this);
+    if (userInfo.pMethod === 'voucher') {
+        if (!userInfo.isUpgrade) {
+            window.bCreatedVoucher = true;
+        }
+        loadSubPage('redeem');
+    }
+    else {
+        addressDialog.init(this.planInfo, userInfo, this);
+    }
 
 };
 

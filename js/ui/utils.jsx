@@ -1,7 +1,7 @@
 var React = require("react");
 var ReactDOM = require("react-dom");
 
-import {MegaRenderMixin} from "../stores/mixins.js";
+import {MegaRenderMixin, schedule, SoonFcWrap} from "../stores/mixins.js";
 
 /**
  * jScrollPane helper
@@ -107,7 +107,7 @@ class JScrollPane extends MegaRenderMixin {
         $elem.rebind('forceResize.jsp'+self.getUniqueId(), function(e, forced, scrollPositionYPerc, scrollToElement) {
             self.onResize(forced, scrollPositionYPerc, scrollToElement);
         });
-        $(window).rebind('resize.jsp' + self.getUniqueId(), self.onResize.bind(self));
+        chatGlobalEventManager.addEventListener('resize', 'jsp' + self.getUniqueId(), self.onResize.bind(self));
         self.onResize();
     }
     componentWillUnmount() {
@@ -115,7 +115,7 @@ class JScrollPane extends MegaRenderMixin {
         var $elem = $(ReactDOM.findDOMNode(this));
         $elem.off('jsp-will-scroll-y.jsp' + this.getUniqueId());
 
-        $(window).off('resize.jsp' + this.getUniqueId());
+        chatGlobalEventManager.removeEventListener('resize', 'jsp' + this.getUniqueId());
     }
     eventuallyReinitialise(forced, scrollPositionYPerc, scrollToElement) {
         var self = this;
@@ -215,7 +215,7 @@ class RenderTo extends React.Component {
             super.componentDidMount();
         }
         this.popup = document.createElement("div");
-        this.popup.className = this.props.className ? this.props.className : "";
+        this._setClassNames();
         if (this.props.style) {
             $(this.popup).css(this.props.style);
         }
@@ -226,9 +226,9 @@ class RenderTo extends React.Component {
                 self.props.popupDidMount(self.popup);
             }
         });
-
     }
     componentDidUpdate() {
+        this._setClassNames();
         this._renderLayer();
     }
     componentWillUnmount() {
@@ -241,6 +241,9 @@ class RenderTo extends React.Component {
         }
         this.props.element.removeChild(this.popup);
     }
+    _setClassNames() {
+        this.popup.className = this.props.className ? this.props.className : "";
+    }
     _renderLayer(cb) {
         ReactDOM.render(this.props.children, this.popup, cb);
     }
@@ -251,7 +254,7 @@ class RenderTo extends React.Component {
 };
 
 
-class EmojiFormattedContent extends React.Component {
+export class EmojiFormattedContent extends React.Component {
     _eventuallyUpdateInternalState(props) {
         if (!props) {
             props = this.props;
@@ -287,30 +290,12 @@ class EmojiFormattedContent extends React.Component {
 
         return <span dangerouslySetInnerHTML={{__html: this._formattedContent}}></span>;
     }
-};
-
-function SoonFcWrap( milliseconds ) {
-    return function( target, propertyKey, descriptor) {
-        const originalMethod = descriptor.value;
-        var _timerId = 0;
-        descriptor.value = function () {
-            if (_timerId) {
-                clearTimeout(_timerId);
-            }
-            var self = this;
-            var args = arguments;
-            // Like SoonFc, but with context fix.
-            _timerId = setTimeout(function() {
-                originalMethod.apply(self, args);
-            }, milliseconds);
-        };
-        return descriptor;
-    }
-};
+}
 
 export default {
     JScrollPane,
     RenderTo,
     EmojiFormattedContent,
+    schedule,
     SoonFcWrap
 };

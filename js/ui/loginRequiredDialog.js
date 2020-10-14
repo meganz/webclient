@@ -81,7 +81,7 @@
         var $inputs = $dialog.find('input');
         var $button = $dialog.find('.big-red-button');
 
-        if (typeof page !== 'undefined' && page === 'chat') {
+        if (M.chat) {
             $('.fm-dialog-subheading', $dialog).removeClass('hidden');
             $('.fm-dialog-subheading > a', $dialog).rebind('click.doSignup', function() {
                 closeDialog();

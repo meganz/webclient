@@ -143,7 +143,6 @@
     };
     RtcGlobalEventHandler.prototype.onClientAvChange = function() {};
     RtcGlobalEventHandler.prototype.onOwnNetworkQualityChange = function(quality) {
-        this.megaChat.networkQuality = quality;
         if (this.megaChat.activeCallManagerCall) {
             this.megaChat.activeCallManagerCall.room.trackDataChange();
         }
@@ -153,7 +152,7 @@
      * Called if there is no audio for > 10s after the call had started.
      */
     RtcGlobalEventHandler.prototype.onNoInputAudioDetected = function() {
-        showToast("warning", "We'd detected that your audio is not working. Please check your mic.");
+        showToast("warning", l[23451]);
     };
 
 

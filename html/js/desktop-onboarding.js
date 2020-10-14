@@ -3,6 +3,7 @@
 
     function goToCloud() {
         loadSubPage(sessionStorage.onDesktopOnboardingRedirectTo || 'fm');
+        delete sessionStorage.voucherData;
         return false;
     }
 
@@ -21,31 +22,46 @@
         if (sessionStorage.voucherData) {
             var $voucherBlock = $('.promo-voucher-section', $wrapper).removeClass('hidden');
             var vd = JSON.parse(sessionStorage.voucherData);
-            delete sessionStorage.voucherData;
 
             // Change texts accordingly.
             $('.top-dark-info.' + (is_mobile ? 'mobile-download' : 'pre-download')).text(l[20415]);
             $('.top-description.' + (is_mobile ? 'mobile-download' : 'pre-download')).safeHTML(l[19512]);
-            $('.plan-name', $wrapper).text(pro.getProPlanName(vd.proNum));
+
+            var $promoCard = $('.promo-voucher-card', $voucherBlock);
+
+            if (vd.businessmonths) {
+                $('.plan-name', $wrapper).text(l[19530]);
+                $voucherBlock.removeClass('pro1 pro2 pro3 pro4').addClass('pro100');
+
+                $promoCard.removeClass('red-block yellow-block')
+                    .addClass('blue-block');
+
+                // Show PRO plan details
+                $('.storage-amount', $voucherBlock).text(l[7094]);
+                $('.transfer-amount', $voucherBlock).text(l[7094]);
+            }
+            else {
+                $('.plan-name', $wrapper).text(pro.getProPlanName(vd.proNum));
+                $voucherBlock.removeClass('pro1 pro2 pro3 pro4 pro100')
+                    .addClass('pro' + vd.proNum);
+
+                if (vd.proNum === 4) {
+                    $promoCard.removeClass('red-block blue-block')
+                        .addClass('yellow-block');
+                }
+                else {
+                    $promoCard.removeClass('yellow-block blue-block')
+                        .addClass('red-block');
+                }
+
+                // Show PRO plan details
+                $('.storage-amount', $voucherBlock).text(bytesToSize(vd.storage * 0x40000000, 0));
+                $('.transfer-amount', $voucherBlock).text(bytesToSize(vd.bandwidth * 0x40000000, 0));
+            }
 
             if (!is_mobile) {
                 $('.voucher-message', $wrapper).text(l[20133]);
             }
-            $voucherBlock.removeClass('pro1 pro2 pro3 pro4')
-                .addClass('pro' + vd.proNum);
-
-            if (vd.proNum === 4) {
-                $('.promo-voucher-card', $voucherBlock).removeClass('red-block')
-                    .addClass('yellow-block');
-            }
-            else {
-                $('.promo-voucher-card', $voucherBlock).removeClass('yellow-block')
-                    .addClass('red-block');
-            }
-
-            // Show PRO plan details
-            $('.storage-amount', $voucherBlock).text(bytesToSize(vd.storage * 0x40000000, 0));
-            $('.transfer-amount', $voucherBlock).text(bytesToSize(vd.bandwidth * 0x40000000, 0));
 
             $('.redeemed-v', $wrapper).removeClass('hidden');
         }

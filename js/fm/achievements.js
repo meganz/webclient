@@ -603,11 +603,11 @@ mega.achievem.initInviteDialogMultiInputPlugin = function initInviteDialogMultiI
     var contacts = M.getContactsEMails();
     var errorTimer = null;
 
-    $dialog.position({
-        'my': 'center center',
-        'at': 'center center',
-        'of': $(window)
-    });
+    // $dialog.position({
+    //     'my': 'center center',
+    //     'at': 'center center',
+    //     'of': $(window)
+    // });
 
     $this.tokenInput(contacts, {
         theme: "invite",
@@ -796,6 +796,7 @@ mega.achievem.initInviteDialogMultiInputPlugin = function initInviteDialogMultiI
             if (!error) {
                 $('.fm-dialog.invite-dialog').addClass('success');
                 $('.fm-dialog.invite-dialog button.back').removeClass('hidden');
+                $('.fm-dialog.invite-dialog .share-added-contact.token-input-token-invite').remove();
             }
             else {
                 console.warn('Unable to send invitation(s), no account access.');

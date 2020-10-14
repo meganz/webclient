@@ -254,7 +254,8 @@ MegaData.prototype.buildtree = function(n, dialog, stype, sDeepIndex) {
             containsc = this.tree[curItemHandle] || '';
             name = folders[idx].name;
 
-            if (curItemHandle === M.RootID || Object(fmconfig.treenodes).hasOwnProperty(typefix + curItemHandle)) {
+            if (curItemHandle === M.RootID || Object(fmconfig.treenodes).hasOwnProperty(typefix + curItemHandle) ||
+                dialog && Object($.openedDialogNodes).hasOwnProperty(curItemHandle)) {
                 if (containsc) {
                     buildnode = true;
                 }
@@ -465,6 +466,13 @@ MegaData.prototype.initTreePanelSorting = function() {
     }
 };
 
+MegaData.prototype.getTreePanelSortingValue = function(column, property) {
+    'use strict';
+
+    column = $.sortTreePanel && $.sortTreePanel[column] || false;
+    return column[property || 'by'];
+};
+
 var treesearch = false;
 
 MegaData.prototype.treeSearchUI = function() {
@@ -511,11 +519,17 @@ MegaData.prototype.treeSearchUI = function() {
         // Make a search
         !M.chat && $('.nw-fm-search-icon').show().rebind('click', function() {
             var $self = $(this);
+            var $input = $self.prev();
 
-            treesearch = false;
-            M.redrawTree();
-            $self.prev().val('');
-            $self.parent().find('input').trigger("blur").trigger('cleared');
+            if ($input.val() === '') {
+                $input.trigger('focus');
+            }
+            else {
+                treesearch = false;
+                M.redrawTree();
+                $input.val('');
+                $input.trigger('blur').trigger('cleared');
+            }
         });
 
         $('.nw-fm-tree-header input')
@@ -791,8 +805,8 @@ MegaData.prototype.treeSortUI = function() {
 MegaData.prototype.treePanelType = function() {
     'use strict';
 
-    var remove = /(?:active|nw-fm-left-icon|ui-droppable|filled|glow|asc|desc)/g;
-    return $.trim($('.nw-fm-left-icon.active').attr('class').replace(remove, ''));
+    var remove = /active|nw-fm-left-icon|ui-droppable|filled|glow|asc|desc/g;
+    return $.trim(String($('.nw-fm-left-icon.active').attr('class') || 'unknown').replace(remove, ''));
 };
 
 /**
@@ -1125,12 +1139,12 @@ MegaData.prototype.addTreeUI = function() {
 /**
  * Invokes debounced tree panel initialization.
  */
-MegaData.prototype.addTreeUIDelayed = function() {
+MegaData.prototype.addTreeUIDelayed = function(ms) {
     'use strict';
 
     delay('treeUI', function() {
         M.addTreeUI();
-    }, 30);
+    }, ms || 30);
 };
 
 /**

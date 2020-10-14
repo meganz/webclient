@@ -37,7 +37,6 @@ var login_next = false;
 var loggedout = false;
 var anonymouschat = false;
 var flhashchange = false;
-var folderLinkVisitLogged = false;
 var avatars = {};
 var mega_title = 'MEGA';
 var pchandle = false;
@@ -62,17 +61,6 @@ mBroadcaster.once('startMega', function() {
         $('body').safeAppend(translate(pages['dialogs-common'].replace(/{staticpath}/g, staticpath)));
         delete pages['dialogs-common'];
     }
-
-    if (!hashLogic) {
-        $(window).rebind('popstate.mega', function(event) {
-            var state = event.originalEvent.state || {};
-            var add = '';
-            if (state.searchString) {
-                add = state.searchString;
-            }
-            loadSubPage((state.subpage || state.fmpage || location.hash) + add, event);
-        });
-    }
 });
 
 mBroadcaster.once('startMega:desktop', function() {
@@ -86,6 +74,10 @@ mBroadcaster.once('startMega:desktop', function() {
             $body.safeAppend(translate(pages[p[i]].replace(/{staticpath}/g, staticpath)));
             delete pages[p[i]];
         }
+    }
+
+    if ((p = document.querySelector('.viewer-image-bl'))) {
+        mCreateElement('iframe', {type: 'content', 'class': 'hidden', src: 'about:blank', id: 'pdfpreviewdiv1'}, p);
     }
 });
 
@@ -114,28 +106,38 @@ function startMega() {
 }
 
 function topMenu(close) {
+    'use strict';
+
+    var $topMenuIcon =  $('.top-icon.menu', 'body');
+    var $topMenu = $('.top-menu-popup', 'body');
+    var $mobileOverlay = $('.mobile.dark-overlay', 'body');
 
     if (close) {
         $.topMenu = '';
-        $('.top-icon.menu').removeClass('active');
-        $('.top-menu-popup').addClass('hidden');
+        $topMenuIcon.removeClass('active');
+        $topMenu.addClass('hidden');
 
         // If on mobile, hide the menu and also remove the close click/tap handler on the dark background overlay
         if (is_mobile) {
             $('html').removeClass('overlayed');
-            $('.mobile.dark-overlay').addClass('hidden').removeClass('active').off('tap');
+            $mobileOverlay.addClass('hidden').removeClass('active').unbind('tap.topmenu');
         }
         $(window).off('resize.topmenu');
     }
     else {
         $.topMenu = 'topmenu';
-        $('.top-icon.menu').addClass('active');
-        $('.top-menu-popup').removeClass('hidden');
+        $topMenuIcon.addClass('active');
+        $topMenu.removeClass('hidden');
+
+        if (u_type) {
+            $('.top-menu-logged .loader', $topMenu).addClass('loading');
+            M.getStorageQuota().then(topMenuDataUpdate).catch(dump);
+        }
 
         if (!is_mobile) {
             topMenuScroll();
             $(window).rebind('resize.topmenu', function () {
-                if ($('.top-icon.menu').hasClass('active')) {
+                if ($topMenuIcon.hasClass('active')) {
                     topMenuScroll();
                 }
             });
@@ -147,13 +149,44 @@ function topMenu(close) {
 
             // Show the dark backround overlay behind the menu and if it's clicked, close the menu
             $('html').addClass('overlayed');
-            $('.mobile.dark-overlay').removeClass('hidden').addClass('active').off('tap').on('tap', function () {
+            $mobileOverlay.removeClass('hidden').addClass('active').rebind('tap.topmenu', function() {
                 topMenu(true);
                 return false;
             });
         }
     }
 }
+
+/* Update used storage info*/
+function topMenuDataUpdate(data) {
+    'use strict';
+    var storageHtml;
+    var $storageBlock = $('.top-menu-logged', '.top-menu-popup').removeClass('going-out exceeded');
+    var space_used = bytesToSize(data.used);
+    var space = bytesToSize(data.max);
+    var perc = data.percent;
+
+    if (perc >= 100) {
+        $storageBlock.addClass('exceeded');
+    }
+    else if (perc > 80) {
+        $storageBlock.addClass('going-out');
+    }
+
+    // Show only space_used  for business accounts
+    if (u_attr && u_attr.b) {
+        storageHtml = '<span>' +  space_used + '</span>';
+    }
+    else {
+        storageHtml = l[1607].replace('%1', '<span>' +  space_used + '</span>')
+            .replace('%2', space);
+    }
+
+    $('.loader', $storageBlock).removeClass('loading');
+    $('.storage-txt', $storageBlock).safeHTML(storageHtml);
+    $('.storage span', $storageBlock).outerWidth(perc + '%');
+}
+
 
 function topMenuScroll() {
     $('.top-menu-scroll').jScrollPane({
@@ -167,8 +200,8 @@ function topMenuScroll() {
 function scrollMenu() {
     "use strict";
 
-    $('.bottom-pages .fmholder').rebind('scroll.devmenu', function () {
-        if (page === 'doc' || page === 'cpage' || page === 'sdk' || page === 'dev') {
+    $('.bottom-pages .fmholder').rebind('scroll.devmenu', function() {
+        if (page === 'doc' || page.substr(0, 9) === 'corporate' || page === 'sdk' || page === 'dev') {
             var $menu = $('.new-left-menu-block');
             var topPos = $(this).scrollTop();
             if (topPos > 0) {
@@ -194,13 +227,15 @@ function topPopupAlign(button, popup, topPos) {
             pageWidth,
             popupRightPos,
             arrowRightPos,
-            buttonTopPos;
+            buttonTopPos,
+            headerWidth;
 
         if ($button.length && $popup.length) {
-            pageWidth = $('body').width();
+            pageWidth = $('body').outerWidth();
+            headerWidth = $('.top-head').outerWidth();
             $popup.removeAttr('style');
             $popupArrow.removeAttr('style');
-            popupRightPos = pageWidth
+            popupRightPos = headerWidth
                 - $button.offset().left
                 - $button.outerWidth() / 2
                 - $popup.outerWidth() / 2;
@@ -229,28 +264,21 @@ function topPopupAlign(button, popup, topPos) {
     };
 
     // If top menu is opened - set timeout to count correct positions
-    if (!$('.top-menu-popup').hasClass('hidden')) {
+    if (!$('.top-menu-popup', 'body').hasClass('hidden')) {
         setTimeout(function () {
             $.popupAlign();
         }, 250);
-    } else {
+    }
+    else {
         $.popupAlign();
     }
 }
 
 function init_page() {
     page = page || (u_type ? 'fm' : 'start');
-    var mobilePageParsed = false;
-    var ar;
 
     if (!window.M) {
         return console.warn('Something went wrong, the initialization did not completed...');
-    }
-
-    // Check if we should show browser update page.
-    if (!showLegacyMobilePage && (localStorage.testie11 || is_internet_explorer_11) && showUpdatePage()) {
-        localStorage.prevPage = page;
-        window.location = (is_extension ? '' : '/') + 'update.html';
     }
 
     // If they are transferring from mega.co.nz
@@ -262,48 +290,59 @@ function init_page() {
         }
     }
 
-    // cleaning local-storage used attr for business signup
-    if (localStorage.businessSubAc && page !== 'register') {
-        delete localStorage.businessSubAc;
-    }
-
     // Users that logged in and are suspended (requiring special SMS unlock) are not allowed to go anywhere else in the
     // site until they validate their account. So if they clicked the browser back button, then they should get logged
     // out or they will end up with with a partially logged in account stuck in an infinite loop. This logout is not
     // triggered on the mobile web sms/ pages because a session is still required to talk with the API to get unlocked.
-    if ((typeof sms !== 'undefined' && sms.isSuspended) ||
-        (typeof mobile !== 'undefined' && mobile.sms.isSuspended && page.substr(0, 3) !== 'sms')) {
-
-        u_logout(true);
+    if (window.doUnloadLogOut) {
+        return false;
     }
 
     dlkey = false;
-    if (page[0] === '!' && page.length > 1) {
 
-        ar = page.substr(1, page.length - 1).split('!');
-        if (ar[0]) {
-            dlid = ar[0].replace(/[^\w-]+/g, "");
-        }
-
-        if (ar[1]) {
-            dlkey = ar[1].replace(/[^\w-]+/g, "");
-        }
-        $.playbackOptions = ar[2];
-
+    var fileLinkReloading = function() {
         if (M.hasPendingTransfers() && $.lastSeenFilelink !== getSitePath()) {
             page = 'download';
 
             M.abortTransfers()
-                .done(function () {
+                .done(function() {
                     location.reload();
                 })
-                .fail(function () {
+                .fail(function() {
                     loadSubPage($.lastSeenFilelink);
                 });
 
             return;
         }
         $.lastSeenFilelink = getSitePath();
+    };
+
+    var pageBeginLetters = page.substr(0, 2);
+
+    if (page.length > 2 && (page[0] === '!' || pageBeginLetters === 'F!')) {
+        // Convering old links to new links format.
+        page = page[0] === 'F' ? page.replace('F!', 'folder/').replace('!', '#')
+            .replace('!', '/folder/').replace('?', '/file/')
+            : page.replace('!', 'file/').replace('!', '#');
+
+        history.replaceState({ subpage: page }, "", (hashLogic ? '#' : '/') + page);
+        return init_page();
+    }
+
+    if (page.substr(0, 5) === 'file/') {
+        var phLen = page.indexOf('#');
+
+        if (phLen < 0) {
+            phLen = page.length;
+        }
+        dlid = page.substr(5, phLen - 5).replace(/[^\w-]+/g, "");
+
+        // check if we have key
+        if (page.length - phLen > 2) {
+            dlkey = page.substr(phLen + 1, page.length - phLen - 1);
+        }
+
+        fileLinkReloading();
     }
 
     // Set class if gbot
@@ -346,7 +385,7 @@ function init_page() {
 
         $html.height(window.innerHeight);
 
-        $(window).rebind('resize.htmlheight', function () {
+        $(window).rebind('resize.htmlheight', function() {
             $html.height(window.innerHeight);
         });
     }
@@ -366,7 +405,7 @@ function init_page() {
     }
 
     var oldPFKey = pfkey;
-    var pageBeginLetters = page.substr(0, 2);
+
     // contact link handling...
     if (pageBeginLetters === 'C!' && page.length > 2) {
         var ctLink = page.substring(2, page.length);
@@ -376,13 +415,13 @@ function init_page() {
             }
             else {
                 page = 'fm/contacts';
-                mBroadcaster.once('fm:initialized', function () {
+                mBroadcaster.once('fm:initialized', function() {
                     openContactInfoLink(ctLink);
                 });
             }
         }
         else {
-            var processContactLink = function () {
+            var processContactLink = function() {
                 if (!mega.ui.contactLinkCardDialog) {
                     // because there's a strange solution applied by someone to clear the top-mobile
                     // and to re-do everything in the header in mobile.html !!
@@ -411,53 +450,84 @@ function init_page() {
         }
     }
 
-    if (pageBeginLetters === 'F!' && page.length > 2) {
-        if (page.indexOf('?') > 0) {
-            page = page.split('?');
-            $.autoSelectNode = page[1];
-            page = page[0];
-        }
-        ar = page.substr(2, page.length - 1).split(/[^!\w-]/, 1)[0].split('!');
+    var newLinkSelector = '';
+    if (page.substr(0, 7) === 'folder/') {
+        var phLen = page.indexOf('#');
+        var possibleS = -1;
 
-        pfid = false;
-        if (ar[0]) {
-            pfid = ar[0].replace(/[^\w-]+/g, "");
+        if (phLen < 0) {
+            phLen = page.length;
+            possibleS = page.indexOf('/f', 7);
+            if (possibleS > -1) {
+                phLen = possibleS;
+            }
         }
 
+        pfid = page.substr(7, phLen - 7).replace(/[^\w-]+/g, "");
+
+        // check if we have key
         pfkey = false;
-        if (ar[1]) {
-            pfkey = ar[1].replace(/[^\w-]+/g, "").substr(0, 22);
-        }
-
         pfhandle = false;
-        if (ar[2]) {
-            pfhandle = ar[2].replace(/[^\w-]+/g, "");
-        }
+        if (page.length - phLen > 2) {
+            if (possibleS === -1) {
+                phLen++;
+            }
 
-        // If the visit to the folder link has not been logged yet
-        if (folderLinkVisitLogged === false) {
+            var linkRemaining = page.substr(phLen, page.length - phLen);
 
-            // Log to see how many public folder views on mobile webclient
-            if (is_mobile) {
-                api_req({ a: 'log', e: 99631, m: 'Loaded public folder link on mobile webclient' });
+            var fileSelectorPlace = linkRemaining.indexOf('/file/');
+
+            var folderSelectorPlace = linkRemaining.indexOf('/folder/');
+
+            var selectorIsValid = false;
+
+            if (fileSelectorPlace > -1 || folderSelectorPlace > -1) {
+                selectorIsValid = true;
+            }
+
+            if (selectorIsValid && fileSelectorPlace > -1 && folderSelectorPlace > -1) {
+                selectorIsValid = false;
+            }
+
+            var keyCutPlace;
+            if (selectorIsValid) {
+                if (fileSelectorPlace > -1) {
+                    keyCutPlace = fileSelectorPlace;
+
+                    if (linkRemaining.length - 6 - fileSelectorPlace > 2) {
+                        $.autoSelectNode = linkRemaining.substring(fileSelectorPlace + 6, linkRemaining.length);
+                        $.autoSelectNode = $.autoSelectNode.replace(/[^\w-]+/g, "");
+                    }
+                }
+                else {
+                    keyCutPlace = folderSelectorPlace;
+
+                    if (linkRemaining.length - 8 - folderSelectorPlace > 2) {
+                        pfhandle = linkRemaining.substring(folderSelectorPlace + 8, linkRemaining.length);
+                        pfhandle = pfhandle.replace(/[^\w-]+/g, "");
+                        newLinkSelector = '/folder/' + pfhandle;
+                    }
+
+                }
             }
             else {
-                // Otherwise log to see how many public folder views on regular webclient
-                api_req({ a: 'log', e: 99632, m: 'Loaded public folder link on regular webclient' });
+                keyCutPlace = Math.min(fileSelectorPlace, folderSelectorPlace);
+                if (keyCutPlace === -1) {
+                    keyCutPlace = linkRemaining.length;
+                }
             }
+            pfkey = linkRemaining.substring(0, keyCutPlace).replace(/[^\w-]+/g, "") || false;
 
-            // Don't log this again for this session
-            folderLinkVisitLogged = true;
         }
 
         n_h = pfid;
         if (!flhashchange || pfkey !== oldPFKey || pfkey.length !== 22 || pfid.length !== 8) {
-
             closeDialog();
+            eventlog(is_mobile ? 99631 : 99632, true);
 
-            if (pfid.length !== 8) {
-                folderreqerr(false, EARGS);
-                return;
+            if (pfid.length !== 8 || window['preflight-folder-link-error:' + pfid]) {
+                folderreqerr(false, window['preflight-folder-link-error:' + pfid] || EARGS);
+                return false;
             }
 
             if (pfkey.length === 22) {
@@ -475,16 +545,16 @@ function init_page() {
                 }
                 else {
                     // Insert placeholder background page while waiting for user input
-                    parsepage(pages['placeholder']);
+                    parsepage(pages.placeholder);
 
                     // Show the decryption key dialog on top
-                    mKeyDialog(pfid, true, pfkey)
-                        .fail(function () {
+                    mKeyDialog(pfid, true, pfkey, newLinkSelector)
+                        .fail(function() {
                             loadSubPage('start');
                         });
                     pfkey = false;
                 }
-                return;
+                return false;
             }
 
             if (fminitialized && (!folderlink || pfkey !== oldPFKey)) {
@@ -494,6 +564,7 @@ function init_page() {
                 delete $.mcImport;
             }
         }
+
         if (pfhandle) {
             page = 'fm/' + pfhandle;
         }
@@ -534,19 +605,7 @@ function init_page() {
         return false;
     }
 
-    // is chat link?
-    if (is_mobile && page.substr(0, 4) === 'chat') {
-        var chatInfo = window.location.toString().split("chat/");
-        if (chatInfo[1] && chatInfo[1].split) {
-            chatInfo = chatInfo[1].split("#");
-            var chatHandle = chatInfo[0];
-            var chatKey = chatInfo[1];
-            parsepage(pages['mobile']);
-            mobile.chatlink.show(chatHandle, chatKey);
-            return;
-        }
-    }
-    if ((pfkey || dlkey) && location.hash[0] !== '#') {
+    if ((pfkey && !flhashchange || dlkey) && !location.hash) {
         return location.replace(getAppBaseUrl());
     }
 
@@ -564,10 +623,10 @@ function init_page() {
         && (page !== 'refer')
         && (page !== 'contact')
         && (page !== 'mobileapp')
+        && (page !== 'nas')
         && (page !== 'uwp')
         && (page !== 'extensions')
         && (page !== 'sync')
-        && (page !== 'bird')
         && (page !== 'cmd')
         && (page !== 'terms')
         && (page !== 'privacy')
@@ -577,6 +636,8 @@ function init_page() {
         && (page !== 'security')
         && (page !== 'downloadapp')
         && (page !== 'unsub')
+        && (page.indexOf('file/') === -1)
+        && (page.indexOf('folder/') === -1)
         && localStorage.awaitingConfirmationAccount) {
 
         var acc = JSON.parse(localStorage.awaitingConfirmationAccount);
@@ -617,60 +678,16 @@ function init_page() {
         return false;
     }
 
-    // Password protected link decryption dialog
     if (page.substr(0, 2) === 'P!' && page.length > 2) {
-        // Check if TextEncoder function is available for the stringToByteArray function
-        // and we need to exclude Edge explicitly, since now it has supported Text Encoder but it doesnt support
-        // SubtleCrypto.importKey() with 'PBKDF2' (the algorithm we are using).
-        // And we need to exclude IE explicitly, since it returns non promise type to SubtleCrypto.importKey() call
-        if (window.TextEncoder && ua.details.browser !== 'Edge' && ua.details.browser !== 'Internet Explorer') {
-            // Show the password overlay for mobile
-            if (is_mobile) {
-                parsepage(pages['mobile']);
-                mobile.decryptionPasswordOverlay.show(page);
-                mobilePageParsed = true;
-            }
-            else {
-                // Otherwise insert background page, show the password
-                // decryption dialog and pass in the current URL hash
-                parsepage(pages['placeholder']);
-                exportPassword.decrypt.init(page);
-            }
-        }
-        else { // not supported browser, appologize from user
-            var msgToUser = l[18420];
-            if (!is_mobile) {
-                if (u_type) {
-                    mBroadcaster.once('boot_done', function () {
-                        setTimeout(
-                            msgDialog('info', 'Pwssword protected link not supported', // not visible
-                                msgToUser), 1000);
-                    });
-                    page = 'fm';
-                }
-                else {
-                    msgDialog('info', 'Pwssword protected link not supported', // not visible
-                        msgToUser);
-                    page = 'start';
-                }
-            }
-            else {
-                if (u_type) {
-                    loadSubPage('fm');
-                }
-                else {
-                    parsepage(pages['mobile']);
-                    mobile.signin.show();
-                }
-                msgDialog('info', 'Pwssword protected link not supported', // not visible
-                    msgToUser);
-                mobilePageParsed = true;
-            }
-        }
-    }
+        // Password protected link decryption dialog
+        parsepage(pages.placeholder);
 
-    if (mobilePageParsed) {
-        mobilePageParsed = false;
+        if (is_mobile) {
+            mobile.decryptionPasswordOverlay.show(page);
+        }
+        else {
+            exportPassword.decrypt.init(page);
+        }
     }
     else if (page.substr(0, 10) == 'blogsearch') {
         blogsearch = decodeURIComponent(page.substr(11, page.length - 1));
@@ -681,16 +698,14 @@ function init_page() {
         parsepage(pages['blogarticle']);
         init_blog();
     }
-
-
     else if (page.substr(0, 6) == 'verify') {
         parsepage(pages['change_email']);
         emailchange.main();
     }
-    else if (page.substr(0, 9) == 'corporate') {
+    else if (page.substr(0, 9) === 'corporate') {
         function doRenderCorpPage() {
-            if (window.corpTemplate) {
-                parsepage(window.corpTemplate);
+            if (window.corpTemplate && (new Date() - window.corpTemplate.ts < 72e5)) {
+                parsepage(window.corpTemplate.template);
                 topmenuUI();
                 loadingDialog.hide();
                 CMS.loaded('corporate');
@@ -698,43 +713,27 @@ function init_page() {
             }
 
             loadingDialog.show();
-            CMS.watch('corporate', function () {
-                window.corpTemplate = null;
-                doRenderCorpPage();
-            });
-            CMS.get('corporate', function (err, content) {
-                parsepage(window.corpTemplate = content.html);
+
+            CMS.get('corporate', function(err, content) {
+                window.corpTemplate = {
+                    template: content.html,
+                    ts: new Date()
+                };
+                parsepage(window.corpTemplate.template);
                 topmenuUI();
                 loadingDialog.hide();
             });
         }
 
         doRenderCorpPage();
-        page = 'cpage';
         bottompage.init();
     }
-    else if (page.substr(0, 5) == 'page_') {
-        var cpage = decodeURIComponent(page.substr(5, page.length - 2));
-
-        function doRenderCMSPage() {
-            loadingDialog.show();
-            CMS.watch(cpage, function () {
-                doRenderCMSPage();
-            });
-
-            CMS.get(cpage, function (err, content) {
-                parsepage(content.html);
-                topmenuUI();
-                loadingDialog.hide();
-            });
-        }
-
-        doRenderCMSPage();
-        page = 'cpage';
-        bottompage.init();
-        return;
+    else if (page.substr(0, 5) === 'blog/') {
+        // eslint-disable-next-line dot-notation
+        parsepage(pages['blogarticle']);
+        init_blogarticle();
     }
-    else if (page.substr(0, 4) == 'blog' && page.length > 4 && page.length < 10) {
+    else if (page.substr(0, 5) === 'blog_' && page.length > 4 && page.length < 10) {
         blogid = page.substr(5, page.length - 2);
         page = 'blogarticle';
         parsepage(pages['blogarticle']);
@@ -951,6 +950,13 @@ function init_page() {
             init_login();
         }
     }
+    else if (is_mobile && isEphemeral() && is_fm()) {
+        // Log out and redirect to start page it's the ephemeral session on mobile web
+        u_logout(true);
+        page = '';
+        loadSubPage('start');
+        return false;
+    }
     else if (is_mobile && u_type && page === 'fm/dashboard') {
         loadSubPage('fm');
         return false;
@@ -1008,6 +1014,11 @@ function init_page() {
         mobile.affiliate.initMainPage();
         return false;
     }
+    else if (is_mobile && u_type && page === 'fm/refer/redeem') {
+        parsepage(pages.mobile);
+        mobile.affiliate.initRedeemPage();
+        return false;
+    }
     else if (is_mobile && u_type && page === 'fm/refer/guide') {
         parsepage(pages.mobile);
         mobile.affiliate.initGuidePage();
@@ -1051,7 +1062,7 @@ function init_page() {
 
         return false;
     }
-    else if (is_mobile && page.substr(0, 3) === 'sms') {
+    else if (is_mobile && !isEphemeral() && page.substr(0, 3) === 'sms') {
 
         parsepage(pages['mobile']);
 
@@ -1091,12 +1102,9 @@ function init_page() {
     else if (page.substr(0, 8) === 'megadrop') {
         if (is_mobile) {
             parsepage(pages['mobile']);
-            mobile.megadrop.show();
         }
-        else {
-            var pupHandle = page.substr(9, 11);
-            mega.megadrop.pupCheck(pupHandle);
-        }
+        var pupHandle = page.substr(9, 11);
+        mega.megadrop.pupCheck(pupHandle);
     }
     else if (page == 'dashboard') {
         loadSubPage('fm/dashboard');
@@ -1516,6 +1524,13 @@ function init_page() {
             $('.uwp-windows-section').get(0).scrollIntoView({behavior: "smooth"});
         });
     }
+    else if (page === 'nas') {
+        parsepage(pages.nas);
+    }
+    else if (page === 'nzippmember' || page === 'nziphotographer') {
+        parsepage(pages.nzipp);
+        nzippCampaign.init();
+    }
     else if (page === 'refer') {
         parsepage(pages.affiliate);
         affiliateprogram.init();
@@ -1533,9 +1548,6 @@ function init_page() {
         $('body').addClass('business');
         var businessP = new BusinessProductPage();
         businessP.init();
-    }
-    else if (page === 'bird') {
-        parsepage(pages['megabird']);
     }
     else if (page.substr(0, 4) == 'sync') {
         parsepage(pages['sync']);
@@ -1585,11 +1597,12 @@ function init_page() {
                 }
             }
         }
+
         if (is_mobile) {
-            parsepage(pages['mobile']);
+            parsepage(pages.mobile);
         }
         else {
-            parsepage(pages['download']);
+            parsepage(pages.download);
         }
         dlinfo(dlid, dlkey, false);
         topmenuUI();
@@ -1614,6 +1627,10 @@ function init_page() {
      * If voucher code from url e.g. #voucherZUSA63A8WEYTPSXU4985
      */
     else if (page.substr(0, 7) === 'voucher') {
+
+        if (mega.voucher && mega.voucher.redeemSuccess) {
+            return loadSubPage('pro');
+        }
 
         // Get the voucher code from the URL.
         var voucherCode = page.substr(7);
@@ -1649,6 +1666,10 @@ function init_page() {
             });
         }
         else {
+            // Show the voucher info to the user before proceeding to redeem.
+            if (typeof redeem !== 'undefined' && mega.voucher && mega.voucher.businessmonths) {
+                return redeem.showVoucherInfoDialog();
+            }
             // Otherwise go to the Redeem page which will detect the voucher code and show a dialog
             loadSubPage('redeem');
             return false;
@@ -1657,7 +1678,7 @@ function init_page() {
 
     // Load the direct voucher redeem page
     else if (page.substr(0, 6) === 'redeem') {
-        if (localStorage.voucher && u_type > 2) {
+        if (localStorage.voucher && (u_type > 2 || window.bCreatedVoucher)) {
             // To complete the redeem voucher process after user logs in if the voucher code exists
             parsepage(pages[is_mobile ? 'mobile' : 'redeem']);
             redeem.init();
@@ -1676,26 +1697,7 @@ function init_page() {
         loadSubPage('redeem');
         return false;
     }
-    // If they recently tried to join a chat link, forward to the chat link page.
-    else if (
-        localStorage.getItem('autoJoinOnLoginChat') !== null && u_type === 3 &&
-        getSitePath().indexOf("/chat/") !== 0
-    ) {
-        var autoLoginChatInfo = typeof localStorage.autoJoinOnLoginChat !== "undefined" ?
-            JSON.parse(localStorage.autoJoinOnLoginChat) : false;
-
-        if (unixtime() - 2 * 60 * 60 < autoLoginChatInfo[1]) {
-            loadSubPage("/chat/" + autoLoginChatInfo[0] + autoLoginChatInfo[2]);
-            return false;
-        }
-        else {
-            localStorage.removeItem('autoJoinOnLoginChat');
-            // the only way tto not refactor this whole piece of code is to simply do a recurrsion, after the
-            // autoJoin... is removed.
-            return init_page();
-        }
-
-    } else if (localStorage.getItem('addContact') !== null && u_type === 3) {
+    else if (localStorage.getItem('addContact') !== null && u_type === 3) {
         var contactRequestInfo = JSON.parse(localStorage.getItem('addContact'));
         var contactHandle = contactRequestInfo.u;
         var contactRequestTime = contactRequestInfo.unixTime;
@@ -1708,29 +1710,14 @@ function init_page() {
         };
 
         if ((unixtime() - TWO_HOURS_IN_SECONDS) < contactRequestTime) {
-            attribCache.getItem(contactHandle + "_uge")
-            .done(function(email) {
-                addContact(u_attr.email, email);
-            })
-            .fail(function() {
-                asyncApiReq({
-                    'a': 'uge',
-                    'u': contactHandle
+            M.syncContactEmail(contactHandle, new MegaPromise())
+                .then(function(email) {
+                    addContact(u_attr.email, email);
                 })
-                .done(function(email) {
-                    if (isValidEmail(email) && isString(email)) {
-                        attribCache.setItem(contactHandle + "_uge", email);
-                        addContact(u_attr.email, email);
-                    }
-                    else {
-                        localStorage.removeItem('addContact');
-                    }
-                })
-                .fail(function(e) {
-                    console.error(e);
+                .catch(function(ex) {
+                    console.error(ex);
                     localStorage.removeItem('addContact');
                 });
-            });
         }
     } else if (is_fm()) {
         var id = false;
@@ -1785,7 +1772,7 @@ function init_page() {
             }
         }
 
-        if (page.substr(0, 5) === "chat/") {
+        if (page.substr(0, 4) === "chat") {
             id = page;
             page = "chat";
             if (u_type === false) {
@@ -1794,7 +1781,16 @@ function init_page() {
                 pchandle = id.substr(5, 8);
 
                 loadingInitDialog.show();
-                init_chat(0x104DF11E5);
+                init_chat(0x104DF11E5)
+                    .always(function() {
+                        M.chat = true;
+                        megaChat.renderListing(id)
+                            .always(function() {
+                                // @todo is this needed?..
+                                megaChat.renderMyStatus();
+                            });
+                    })
+                    .dump('init_chat');
             }
             else if (u_type === 0) {
                 // ephemeral
@@ -1813,8 +1809,8 @@ function init_page() {
             if (is_mobile) {
                 $('#fmholder').safeHTML(translate(pages['mobile'].replace(/{staticpath}/g, staticpath)));
             }
-            else if ($('#fmholder').html() === '') {
-                $('#fmholder').safeHTML(translate(pages['fm'].replace(/{staticpath}/g, staticpath)));
+            else {
+                fm_addhtml();
             }
 
             if (!anonymouschat) {
@@ -1894,6 +1890,7 @@ function init_page() {
             if (!$('.transfer-table tr#dl_' + Object(fdl_queue_var).ph).length) {
                 var fdl = dlmanager.getDownloadByHandle(Object(fdl_queue_var).ph);
                 if (fdl && fdl_queue_var.dlkey === dlpage_key) {
+                    $.tapioca = Array.isArray(fdl.url);
 
                     Soon(function () {
                         M.putToTransferTable(fdl);
@@ -1914,12 +1911,12 @@ function init_page() {
     }
     else if (page.substr(0, 2) == 'fm' && !u_type) {
         if (loggedout || (u_type === false && page !== 'fm/refer')) {
-            loadSubPage('start');
+            loadSubPage('start', 'override');
             return false;
         }
         login_next = page;
         login_txt = l[1298];
-        loadSubPage('login');
+        loadSubPage('login', 'override');
     }
     else if (typeof init_start === 'function') {
         page = 'start';
@@ -1949,6 +1946,10 @@ function init_page() {
 
     topmenuUI();
 
+    if (!window.is_karma && mega.metatags) {
+        mega.metatags.checkPageMatchesURL();
+    }
+
     loggedout = false;
     flhashchange = false;
 
@@ -1958,50 +1959,79 @@ function init_page() {
 function topmenuUI() {
     'use strict';
 
-    var $topMenu = $('.top-menu-popup');
-    var $topHeader = $('.top-head');
+    var $topMenu = $('.top-menu-popup', 'body');
+    var $topHeader = is_mobile ? $('.fm-header', 'body') : $('.top-head', 'body');
+    var $loginButton = $('.top-login-button', $topHeader);
+    var $menuFmItem = $('.top-menu-item.fm', $topMenu);
+    var $menuLogoutButton = $('.top-white-button.logout', $topMenu);
+    var $menuAuthButtons = $('.top-menu-item.register,.top-menu-item.login', $topMenu);
+    var $menuLoggedBlock = $('.top-menu-logged', $topMenu);
+    var $menuRefreshItem = $('.top-menu-item.refresh-item', $topMenu);
+    var $menuHomeItem = $('.top-menu-item.start', $topMenu);
+    var $menuBackupItem = $('.top-menu-item.backup', $topMenu);
+    var $menuAffiliateItem = $('.top-menu-item.affiliate', $topMenu);
+    var $menuUserinfo = $('.user-info', $menuLoggedBlock);
+    var $menuUsername = $('.name', $menuUserinfo);
+    var $menuAvatar = $('.avatar-block', $menuLoggedBlock);
+    var $menuUpgradeAccount = $('.upgrade-your-account', $topMenu);
+    var $headerWarningIcon = $('.top-icon.warning', $topHeader);
+    var $headerActivityBlock = $('.activity-status-block .activity-status,.activity-status-block', $topHeader);
+    var $headerActivityStatus = $('.activity-status-block', $headerActivityBlock);
+    var $headerPlanIcon = $('.membership-status-block i', $topHeader);
+    var $headerIndividual = $('.left.individual', $topHeader);
+    var $headerSearch = $('.top-search-bl', $topHeader);
+    var $headerNotificationIcon = $('.top-icon.notification', $topHeader);
+    var $headerAvatar = $('.fm-avatar', $topHeader);
+    var $headerRegisterBotton = $('.create-account-button', $topHeader);
+    var $headerAchievements = $('.top-icon.achievements', $topHeader);
 
     if (u_type === 0) {
-        $topHeader.find('.top-login-button').text(l[967]);
+        $loginButton.text(l[967]);
     }
 
-    $topMenu.find('.top-menu-item.upgrade-your-account,.top-menu-item.backup').addClass('hidden');
-    $topMenu.find('.top-menu-item.start').removeClass('hidden');
-    $topMenu.find('.top-menu-item.fm').addClass('hidden');
-    $topMenu.find('.top-menu-item.logout').addClass('hidden');
-    $topMenu.find('.top-menu-item.register,.top-menu-item.login').addClass('hidden');
-    $topMenu.find('.top-menu-item.account').addClass('hidden');
-    $topMenu.find('.top-menu-item.refresh-item').addClass('hidden');
-    $('.top-menu-item.affiliate', $topMenu).addClass('hidden');
-    $topHeader.find('.top-icon.warning').addClass('hidden');
-    $topHeader.find('.activity-status-block .activity-status,.activity-status-block').addClass('hidden');
-    $topHeader.find('.membership-status-block i').attr('class', 'tiny-icon membership-status free');
-    $topHeader.find('.membership-status, .top-head .user-name, .top-icon.achievements').addClass('hidden');
-    $topHeader.find('.left.individual').text(l[19702]); // try Mega Business
-    $topHeader.find('.left.individual').removeClass('hidden');
+    $menuLoggedBlock.addClass('hidden').removeClass('business-acc');
+    $menuBackupItem.addClass('hidden').next('.top-menu-divider').addClass('hidden');
+    $menuHomeItem.removeClass('hidden');
+    $menuFmItem.addClass('hidden');
+    $menuLogoutButton.addClass('hidden');
+    $menuAuthButtons.addClass('hidden');
+    $menuRefreshItem.addClass('hidden');
+    $menuAffiliateItem.addClass('hidden');
+    $menuUsername.addClass('hidden');
+    $menuUpgradeAccount.removeClass('hidden');
+    $menuAvatar.removeClass('presence');
+
+    $headerWarningIcon.addClass('hidden');
+    $headerActivityBlock.addClass('hidden');
+    $headerActivityStatus.addClass('hidden');
+    $headerPlanIcon.attr('class', 'tiny-icon membership-status free');
+    $headerIndividual.text(l[19702]).removeClass('hidden'); // try Mega Business
+    $headerAchievements.addClass('hidden');
+    $('.membership-status, .top-head .user-name', $topHeader).addClass('hidden');
 
     if (fminitialized) {
-        $topHeader.find('.top-search-bl').removeClass('hidden');
-        $topHeader.find('.top-icon.notification').removeClass('hidden');
+        $headerSearch.removeClass('hidden');
+        $headerNotificationIcon.removeClass('hidden');
     }
     else {
-        $topHeader.find('.top-search-bl').addClass('hidden');
-        $topHeader.find('.top-icon.notification').addClass('hidden');
+        $headerSearch.addClass('hidden');
+        $headerNotificationIcon.addClass('hidden');
     }
 
     if (folderlink) {
-        $topHeader.find('.top-icon.notification').addClass('hidden');
+        $headerNotificationIcon.addClass('hidden');
     }
     if (page === 'download') {
-        $topMenu.find('.top-menu-item.refresh-item').removeClass('hidden');
+        $menuRefreshItem.removeClass('hidden');
     }
     if (page === 'business' || page ==='registerb') {
-        $topHeader.find('.left.individual').text(l[19529]); // try Mega MEGA Indivisual
+        $headerIndividual.text(l[19529]); // try Mega MEGA Indivisual
     }
 
     var avatar = window.useravatar && useravatar.mine();
     if (!avatar) {
-        $topHeader.find('.fm-avatar').addClass('hidden');
+        $headerAvatar.addClass('hidden');
+        $menuAvatar.addClass('hidden');
     }
 
     // Show active item in main menu
@@ -2018,17 +2048,13 @@ function topmenuUI() {
     }
 
     // Get all menu items
-    var $topMenuItems = $topMenu.find('.top-menu-item');
+    var $topMenuItems = $('.top-menu-item', $topMenu);
 
     // Remove red bar from all menu items
     $topMenuItems.removeClass('active');
 
     // If in mobile My Account section, show red bar
-    if (is_mobile && page.indexOf('fm/account') === 0) {
-        $topMenuItems.filter('.account').addClass('active');
-    }
-    // If in mobile Cloud Drive, show red bar
-    else if (is_mobile && page.indexOf('fm') === 0) {
+    if (is_mobile && page.indexOf('fm') === 0) {
         $topMenuItems.filter('.fm').addClass('active');
     }
     else if (section) {
@@ -2046,21 +2072,26 @@ function topmenuUI() {
     }
 
     if (u_type === 3 && u_attr.fullname) {
-        $topHeader.find('.user-name').text(u_attr.fullname).removeClass('hidden');
+        $('.user-name', $topHeader).text(u_attr.fullname).removeClass('hidden');
+        $menuUsername.text(u_attr.fullname).removeClass('hidden');
+    }
+
+    if (u_type && u_attr.email) {
+        $('.email', $menuUserinfo).text(u_attr.email);
     }
 
     if (mega.flags.refpr) {
-        $('.top-menu-item.affiliate', $topMenu).removeClass('hidden');
+        $menuAffiliateItem.removeClass('hidden');
     }
 
     // Show language in top menu
-    $topMenu.find('.top-menu-item.languages .right-el').text(lang);
+    $('.top-menu-item.languages span', $topMenu).text(languages[lang][2]);
 
     // Show version in top menu
-    var $versionButton = $topMenu.find('.top-mega-version').text('v. ' + M.getSiteVersion());
+    var $versionButton = $('.top-mega-version', $topMenu).text('v. ' + M.getSiteVersion());
     var versionClickCounter = 0;
     var versionClickTimeout = null;
-    $versionButton.rebind('click', function() {
+    $versionButton.rebind('click.versionupdate', function() {
         clearTimeout(versionClickTimeout);
         if (++versionClickCounter >= 3) {
             mega.developerSettings.show();
@@ -2073,30 +2104,32 @@ function topmenuUI() {
     if (u_type) {
         $('body').removeClass('not-logged').addClass('logged');
 
-        $topMenu.find('.top-menu-item.start').addClass('hidden');
-        $topMenu.find('.top-menu-item.fm').removeClass('hidden');
-        $topMenu.find('.top-menu-item.logout,.top-menu-item.backup').removeClass('hidden');
-        $topMenu.find('.top-menu-item.account').removeClass('hidden');
-        $topMenu.find('.upgrade-your-account').removeClass('hidden');
+        $menuHomeItem.addClass('hidden');
+        $menuFmItem.removeClass('hidden');
+        $menuLogoutButton.removeClass('hidden');
+        $menuBackupItem.removeClass('hidden').next('.top-menu-divider').removeClass('hidden');
+        $menuLoggedBlock.removeClass('hidden');
+
         // for top menu, load avatar and show for logged in user
         useravatar.loadAvatar(u_handle).always(function(){
-            $topHeader.find('.fm-avatar').safeHTML(useravatar.contact(u_handle));
+            $headerAvatar.safeHTML(useravatar.contact(u_handle));
+            $menuAvatar.safeHTML(useravatar.contact(u_handle));
         });
 
-        $topHeader.find('.top-login-button').addClass('hidden');
-        $topHeader.find('.membership-status').removeClass('hidden');
-        $topHeader.find('.top-change-language').addClass('hidden');
-        $topHeader.find('.create-account-button').addClass('hidden');
-        $topHeader.find('.membership-status-block').removeClass('hidden');
-        $topHeader.find('.left.individual').addClass('hidden');
+        $loginButton.addClass('hidden');
+        $('.membership-status', $topHeader).removeClass('hidden');
+        $('.top-change-language', $topHeader).addClass('hidden');
+        $headerRegisterBotton.addClass('hidden');
+        $('.membership-status-block', $topHeader).removeClass('hidden');
+        $headerIndividual.addClass('hidden');
 
         // Show the rocket icon if achievements are enabled
         mega.achievem.enabled()
             .done(function () {
-                $topHeader.find('.top-icon.achievements').removeClass('hidden');
+                $headerAchievements.removeClass('hidden');
             })
             .fail(function () {
-                $topHeader.find('.top-icon.achievements').addClass('hidden');
+                $headerAchievements.addClass('hidden');
             });
 
         // If a Lite/Pro plan has been purchased
@@ -2113,38 +2146,43 @@ function topmenuUI() {
             if (proNum === 4) {
                 cssClass = 'lite';
                 $('body').addClass('lite');
-            } else {
+            }
+            else {
                 cssClass = 'pro' + proNum;
             }
 
             // Show the Pro badge
-            $topMenu.find('.top-menu-item.account .right-el').text(purchasedPlan);
-            $topHeader.find('.membership-status-block i').attr('class', 'tiny-icon membership-status ' + cssClass);
+            $('.plan', $menuLoggedBlock).text(purchasedPlan);
+            $headerPlanIcon.attr('class', 'tiny-icon membership-status ' + cssClass);
         }
         else {
             // Show the free badge
-            $('.top-menu-item.account .right-el', $topMenu).addClass('free-account').text(l[1150]);
-            $topHeader.find('.membership-status').attr('class', 'tiny-icon membership-status free');
+            $('.plan', $menuLoggedBlock).text(l[1150]);
+            $('.membership-status', $topHeader).attr('class', 'tiny-icon membership-status free');
             $('body').removeClass('lite').addClass('free');
         }
 
         if (is_fm()) {
-            $topMenu.find('.top-menu-item.refresh-item').removeClass('hidden');
+            $menuRefreshItem.removeClass('hidden');
         }
 
         // If the chat is disabled don't show the green status icon in the header
         if (!pfid && !megaChatIsDisabled) {
-            $topHeader.find('.activity-status-block, .activity-status-block .activity-status').removeClass('hidden');
+            $headerActivityBlock.removeClass('hidden');
+            $headerActivityStatus.removeClass('hidden');
+            $menuAvatar.addClass('presence');
             if (megaChatIsReady) {
-                megaChat.renderMyStatus();
+                megaChat._renderMyStatus();
             }
         }
 
         // if this is a business account sub-user
-        if (u_attr && u_attr.b && u_attr.b.s !== -1) {
-            $topHeader.find('.top-icon.achievements').addClass('hidden');
-            $topMenu.find('.upgrade-your-account').addClass('hidden');
-            $topMenu.find('.resellers').addClass('hidden');
+        if (u_attr && u_attr.b) {
+            $menuLoggedBlock.addClass('business-acc');
+            if (u_attr.b.s !== -1) {
+                $headerAchievements.addClass('hidden');
+                $menuUpgradeAccount.addClass('hidden');
+            }
         }
 
         // Show PRO plan expired warning popup (if applicable)
@@ -2156,7 +2194,7 @@ function topmenuUI() {
         }
         else if (!confirmok && page !== 'key') {
 
-            $topMenu.find('.top-menu-item.register').text(l[968]);
+            $('.top-menu-item.register span', $topMenu).text(l[968]);
 
             // If they have purchased Pro but not activated yet, show a warning
             if (isNonActivatedAccount()) {
@@ -2171,17 +2209,17 @@ function topmenuUI() {
             }
         }
 
-        $topMenu.find('.top-menu-item.upgrade-your-account.pro').removeClass('hidden');
-        $topHeader.find('.membership-status-block').addClass('hidden');
-        $topHeader.find('.top-icon.notification').addClass('hidden');
-        $topHeader.find('.top-icon.achievements').addClass('hidden');
-        $topHeader.find('.create-account-button').removeClass('hidden');
+        $menuLoggedBlock.addClass('hidden');
+        $('.membership-status-block', $topHeader).addClass('hidden');
+        $headerNotificationIcon.addClass('hidden');
+        $headerAchievements.addClass('hidden');
+        $headerRegisterBotton.removeClass('hidden');
 
         if (u_type === 0 && is_fm()) {
-            $topHeader.find('.left.individual').addClass('hidden');
+            $headerIndividual.addClass('hidden');
         }
 
-        $('.create-account-button').rebind('click', function () {
+        $headerRegisterBotton.rebind('click.register', function() {
             if ($(this).hasClass('business-reg')) {
                 loadSubPage('registerb');
             }
@@ -2189,13 +2227,13 @@ function topmenuUI() {
                 loadSubPage('register');
             }
         });
-        $topHeader.find('.top-login-button').removeClass('hidden');
-        $('.top-login-button').rebind('click', function () {
+
+        $loginButton.removeClass('hidden').rebind('click.auth', function() {
             if (u_type === 0) {
                 mLogout();
             }
             else {
-                var c = $topHeader.find('.dropdown.top-login-popup').attr('class');
+                var c = $('.dropdown.top-login-popup', $topHeader).attr('class');
                 if (c && c.indexOf('hidden') > -1) {
                     tooltiplogin.init();
                 }
@@ -2205,12 +2243,19 @@ function topmenuUI() {
             }
         });
 
+        if (page === 'login') {
+            $loginButton.addClass('hidden');
+        }
+        if (page === 'register' || page === 'registerb') {
+            $headerRegisterBotton.addClass('hidden');
+        }
+
         // Only show top language change icon if not logged in
         if (u_type === false) {
 
             // Get current language
             var $topChangeLang = $('.top-change-language', $topHeader);
-            var $topChangeLangName = $topChangeLang.find('.top-change-language-name');
+            var $topChangeLangName = $('.top-change-language-name', $topChangeLang);
 
             //TODO: Change translated values on short translated
             //var languageName = ln[lang];
@@ -2218,7 +2263,7 @@ function topmenuUI() {
             // Init the top header change language button
             $topChangeLangName.text(lang);
             $topChangeLang.removeClass('hidden');
-            $topChangeLang.rebind('click', function () {
+            $topChangeLang.rebind('click.changelang', function() {
 
                 // Add log to see how often they click to change language
                 api_req({ a: 'log', e: 99600, m: 'Language menu opened from top header' });
@@ -2228,11 +2273,11 @@ function topmenuUI() {
             });
         }
 
-        $topMenu.find('.top-menu-item.register,.top-menu-item.login').removeClass('hidden');
+        $menuAuthButtons.removeClass('hidden');
 
         if (u_type === 0) {
-            $topMenu.find('.top-menu-item.login').addClass('hidden');
-            $topMenu.find('.top-menu-item.logout').removeClass('hidden');
+            $('.top-menu-item.login', $topMenu).addClass('hidden');
+            $menuLogoutButton.removeClass('hidden');
         }
     }
 
@@ -2243,31 +2288,32 @@ function topmenuUI() {
         if (e) {
             c = $(e.target).attr('class');
         }
-        if (!e || ($(e.target).parents('.top-menu-popup').length == 0
+        if (!e || ($(e.target).parents('.top-menu-popup').length === 0
             && !$(e.target).hasClass('top-menu-popup')
+            && !$('.top-menu-popup', 'body').hasClass('hidden')
             && ((c && c.indexOf('top-icon menu') == -1) || !c))) {
             topMenu(1);
         }
-        if (!e || ($(e.target).parents('.top-warning-popup').length == 0
+        if (!e || ($(e.target).parents('.top-warning-popup').length === 0
             && !$(e.target).hasClass('top-menu-popup')
             && ((c && c.indexOf('top-icon warning') == -1) || !c))) {
             $topHeader.find('.top-warning-popup').addClass('hidden');
-            $topHeader.find('.top-icon.warning').removeClass('active');
+            $headerWarningIcon.removeClass('active');
         }
-        if (!e || ($(e.target).parents('.top-user-status-popup').length == 0
-            && ((c && c.indexOf('activity-status') == -1 && c.indexOf('loading') == -1) || !c))) {
+        if (!e || ($(e.target).parents('.top-user-status-popup').length === 0
+            && ((c && c.indexOf('activity-status') === -1 && c.indexOf('loading') === -1) || !c))) {
             $topHeader.find('.top-user-status-popup').addClass('hidden');
-            $topHeader.find('.activity-status-block').removeClass('active');
+            $headerActivityBlock.removeClass('active');
         }
         if (!e || ($(e.target).parents('.notification-popup').length == 0
-            && ((c && c.indexOf('top-icon notification') == -1) || !c))) {
+            && ((c && c.indexOf('top-icon notification') === -1) || !c))) {
 
             if (typeof notify === 'object') {
                 notify.closePopup();
             }
         }
-        if (!e || ($(e.target).parents('.dropdown.top-login-popup').length == 0
-            && ((c && c.indexOf('top-login-button') == -1) || !c))) {
+        if (!e || ($(e.target).parents('.dropdown.top-login-popup').length === 0
+            && ((c && c.indexOf('top-login-popup') === -1 && c.indexOf('top-login-button') === -1) || !c))) {
             $topHeader.find('.dropdown.top-login-popup').addClass('hidden');
         }
         if ((!e || $(e.target).parents('.create-new-folder').length == 0)
@@ -2289,18 +2335,18 @@ function topmenuUI() {
         }
     };
 
-    $('#pageholder, #startholder').rebind('click.hidetopmenu', function(e) {
+    $('#pageholder, #startholder', 'body').rebind('mousedown.hidetopmenu', function(e) {
         if (typeof $.hideTopMenu === 'function') {
             $.hideTopMenu(e);
         }
     });
 
-    $topHeader.find('.top-icon.achievements').rebind('click', function () {
+    $headerAchievements.rebind('click.achievements', function() {
         mega.achievem.achievementsListDialog();
     });
 
     // try individual button in business mode
-    $topHeader.find('.top-centered-margin .individual').rebind('click', function () {
+    $headerIndividual.rebind('click.individual', function() {
         if (page === 'business' || page === 'registerb') {
             loadSubPage('start');
         }
@@ -2309,15 +2355,15 @@ function topmenuUI() {
         }
     });
 
-    $('.top-icon.menu, .top-icon.close').rebind('click', function () {
+    $('.top-icon.menu', 'body').rebind('click.openmenu', function() {
         topMenu();
     });
 
-    $topMenu.find('.top-icon.close').rebind('click', function () {
+    $('.top-menu-icon.close', $topMenu).rebind('click.closemenu', function() {
         topMenu(1);
     });
 
-    $topHeader.find('.activity-status-block').rebind('click.topui', function (e) {
+    $headerActivityBlock.rebind('click.topui', function() {
         var $this = $(this);
         if ($this.attr('class').indexOf('active') == -1) {
             $this.addClass('active');
@@ -2331,101 +2377,116 @@ function topmenuUI() {
             $topHeader.find('.top-user-status-popup').addClass('hidden');
         }
     });
-    $topHeader.find('.top-user-status-popup .dropdown-item')
+    $('.top-user-status-popup .dropdown-item', $topHeader)
         .rebind('click.topui', function (e) {
-            if ($(this).attr('class').indexOf('active') == -1) {
+            var $this = $(this);
+
+            if ($this.attr('class').indexOf('active') === -1) {
                 $topHeader.find('.top-user-status-popup .dropdown-item')
                     .removeClass('active');
                 $(this).addClass('active');
-                $topHeader.find('.activity-status-block .activity-status')
-                    .attr('class', 'top ' + $(this).find('.activity-status').attr('class'));
-                $topHeader.find('.activity-status-block').removeClass('active');
+                $headerActivityStatus.attr('class', 'top ' + $('.activity-status', $this).attr('class'));
+                $headerActivityBlock.removeClass('active');
 
-                $topHeader.find('.top-user-status-popup').addClass('hidden');
+                $('.top-user-status-popup', $topHeader).addClass('hidden');
 
                 if (!megaChatIsReady && !megaChatIsDisabled) {
                     var presence = $(this).data("presence");
                     localStorage.megaChatPresence = presence;
                     localStorage.megaChatPresenceMtime = unixtime();
 
-                    $topHeader.find('.activity-status-block').addClass("fadeinout");
+                    $headerActivityBlock.addClass("fadeinout");
                     loadSubPage('fm/chat');
                 }
             }
         });
 
-    $topMenu.find('.top-menu-item').rebind('click', function () {
-        var className = $(this).attr('class') || '';
+    $('.top-menu-item', $topMenu)
+        .rebind('click.menuitem tap.menuitem', function() {
+            var $this = $(this);
+            var className = $this.attr('class') || '';
 
-        if (className.indexOf('submenu-item') > -1) {
-            if (className.indexOf('expanded') > -1) {
-                $(this).removeClass('expanded');
-            } else {
-                $(this).addClass('expanded');
-            }
-            if (!is_mobile) {
-                setTimeout(topMenuScroll, 200);
-            }
-        }
-        else {
-            if ($('.light-overlay').is(':visible')) {
-                loadingInitDialog.hide();
-            }
-            topMenu(1);
-
-            var subpage;
-            var subPages = [
-                'about', 'account', 'backup', 'blog', 'cmd', 'contact',
-                'copyright', 'corporate', 'credits', 'doc', 'extensions',
-                'help', 'login', 'mega', 'bird', 'privacy', 'gdpr', 'mobileapp','mobile', 'privacycompany',
-                'register', 'resellers', 'sdk', 'sync', 'sitemap', 'sourcecode', 'support',
-                'sync', 'takedown', 'terms', 'start', 'uwp', 'security', 'downloadapp', 'affiliate'
-            ];
-            var moveTo = {'account': 'fm/account', 'affiliate': 'refer'};
-
-            for (var i = subPages.length; i--;) {
-                if (className.indexOf(subPages[i]) > -1) {
-                    subpage = subPages[i];
-                    break;
+            if (className.indexOf('submenu-item') > -1) {
+                if (className.indexOf('expanded') > -1) {
+                    $(this).removeClass('expanded');
+                }
+                else {
+                    $(this).addClass('expanded');
+                }
+                if (!is_mobile) {
+                    setTimeout(topMenuScroll, 200);
                 }
             }
+            else {
+                if ($('.light-overlay', 'body').is(':visible')) {
+                    loadingInitDialog.hide();
+                }
+                topMenu(1);
 
-            if (className.indexOf('upgrade-your-account') > -1) {
-                loadSubPage('pro');
+                var subpage;
+                /*  TODO: Add bird when its done */
+                var subPages = [
+                    'about', 'account', 'backup', 'blog', 'cmd', 'contact',
+                    'copyright', 'corporate', 'credits', 'doc', 'extensions',
+                    'help', 'login', 'mega', 'nzippmember', 'nziphotographer', 'privacy', 'gdpr', 'mobileapp',
+                    'mobile', 'privacycompany', 'register', 'resellers', 'sdk', 'sync', 'sitemap', 'sourcecode',
+                    'support', 'sync', 'takedown', 'terms', 'start', 'uwp', 'security', 'downloadapp', 'affiliate',
+                    'nas'
+                ];
+                var moveTo = { 'account': 'fm/account', 'affiliate': 'refer', 'about': 'about/main' };
+
+                for (var i = subPages.length; i--;) {
+                    if (className.indexOf(subPages[i]) > -1) {
+                        subpage = subPages[i];
+                        break;
+                    }
+                }
+
+                if (is_mobile && className.indexOf('fm') > -1) {
+                    mobile.loadCloudDrivePage();
+                }
+                else if (!is_mobile && subpage === 'backup') {
+                    M.showRecoveryKeyDialog(2);
+                }
+                else if (subpage) {
+                    // Clear login_next variable before load subpages each time
+                    login_next = false;
+                    loadSubPage(moveTo[subpage] || subpage);
+                }
+                else if (className.indexOf('feedback') > -1) {
+                    // Show the Feedback dialog
+                    var feedbackDialog = mega.ui.FeedbackDialog.singleton($(this));
+                    feedbackDialog._type = 'top-button';
+                }
+                else if (className.indexOf('refresh') > -1) {
+                    M.reload();
+                }
+                else if (!is_mobile && className.indexOf('languages') > -1) {
+                    langDialog.show();
+                }
+                else if (className.indexOf('logout') > -1) {
+                    mLogout();
+                }
+                else if (className.indexOf('transparency') > -1) {
+                    window.open('https://mega.nz/Mega_Transparency_Report_201909.pdf', '_blank');
+                }
             }
-            else if (is_mobile && className.indexOf('fm') > -1) {
-                mobile.loadCloudDrivePage();
-            }
-            else if (subpage === 'backup') {
-                M.showRecoveryKeyDialog(2);
-            }
-            else if (subpage) {
-                // Clear login_next variable before load subpages each time
-                login_next = false;
-                loadSubPage(moveTo[subpage] || subpage);
-            }
-            else if (className.indexOf('feedback') > -1) {
-                // Show the Feedback dialog
-                var feedbackDialog = mega.ui.FeedbackDialog.singleton($(this));
-                feedbackDialog._type = 'top-button';
-            }
-            else if (className.indexOf('refresh') > -1) {
-                M.reload();
-            }
-            else if (!is_mobile && className.indexOf('languages') > -1) {
-                langDialog.show();
-            }
-            else if (className.indexOf('logout') > -1) {
-                mLogout();
-            }
-            else if (className.indexOf('transparency') > -1) {
-                window.open('https://mega.nz/Mega_Transparency_Report_201909.pdf', '_blank');
-            }
-        }
-        return false;
+            return false;
+        });
+
+    $menuAvatar.rebind('click.openaccount', function() {
+        loadSubPage('fm/account');
     });
 
-    $topMenu.find('.top-social-bl a').rebind('click', function (e) {
+    $menuUserinfo.rebind('click.openaccount', function() {
+        loadSubPage('fm/account');
+    });
+
+    $menuUpgradeAccount.rebind('click.openpricing', function() {
+        loadSubPage('pro');
+    });
+
+    $('.top-social-bl a', $topMenu).rebind('click.opensocialnw', function(e) {
         e.preventDefault();
         window.open($(this).attr('href'));
     });
@@ -2435,28 +2496,28 @@ function topmenuUI() {
         mobile.languageMenu.init();
     }
 
-    $topHeader.find('.top-search-bl').rebind('click', function () {
+    $headerSearch.rebind('click.resetval', function() {
         if ($.trim($('.top-search-input').val()) === "") {
             $(this).addClass('active');
             $('.top-search-input').trigger("focus");
         }
     });
 
-    $topHeader.find('.top-search-input').rebind('blur', function () {
-        $(this).closest('.top-search-bl').removeClass('active');
+    $('.top-search-input', $headerSearch).rebind('blur.searchblur', function() {
+        $headerSearch.removeClass('active');
         if ($(this).val() == '') {
-            $topHeader.find('.top-search-bl').removeClass('contains-value');
-            $topHeader.find('.top-search-button').addClass('hidden');
-            $topHeader.find('.top-clear-button').addClass('hidden');
+            $headerSearch.removeClass('contains-value');
+            $('.top-search-button', $headerSearch).addClass('hidden');
+            $('.top-clear-button', $headerSearch).addClass('hidden');
         }
         else {
-            $topHeader.find('.top-search-bl').addClass('contains-value');
-            $topHeader.find('.top-search-button').addClass('hidden');
-            $topHeader.find('.top-clear-button').removeClass('hidden');
+            $headerSearch.addClass('contains-value');
+            $('.top-search-button', $headerSearch).addClass('hidden');
+            $('.top-clear-button', $headerSearch).removeClass('hidden');
         }
     });
 
-    $topHeader.find('.top-clear-button').rebind('click', function (e) {
+    $('.top-clear-button', $headerSearch).rebind('click.searchclear', function(e) {
 
         // stop propaation to not calling .top-search-bl click
         e.stopPropagation();
@@ -2466,47 +2527,49 @@ function topmenuUI() {
             M.nn = false;
             M.openFolder();
         }
-        $topHeader.find('.top-search-bl').removeClass('contains-value active');
-        $topHeader.find('.top-clear-button').removeClass('hidden');
-        $topHeader.find('.top-search-input').val('').trigger('blur');
+        $headerSearch.removeClass('contains-value active');
+        $('.top-clear-button', $headerSearch).removeClass('hidden');
+        $('.top-search-input', $headerSearch).val('').trigger('blur');
         // if current page is search result reset it.
         if (page.indexOf('/search/') !== -1) {
             loadSubPage(page.slice(0, page.indexOf('/search/')));
         }
     });
 
-    $topHeader.find('.top-search-input').rebind('focus', function () {
+    $('.top-search-input', $headerSearch).rebind('focus.searchfocus', function() {
         if ($(this).closest('.top-search-bl').hasClass('active')) {
-            $topHeader.find('.top-search-button').removeClass('hidden');
-            $topHeader.find('.top-clear-button').addClass('hidden');
+            $('.top-search-button', $headerSearch).removeClass('hidden');
+            $('.top-clear-button', $headerSearch).addClass('hidden');
         }
     });
 
-    $topHeader.find('#search-fake-form').rebind('submit', function () {
+    $('#search-fake-form', $headerSearch).rebind('submit.searchsumbit', function() {
         return false;
     })
 
-    $topHeader.find('.top-search-button').rebind('click mousedown', function _topSearchHandler() {
-        var val = $.trim($('.top-search-input').val());
+    $('.top-search-button', $headerSearch)
+        .rebind('click.search mousedown.search', function _topSearchHandler() {
 
-        // if current page is search and value is empty result move to root.
-        if (!val && page.indexOf('/search/') !== -1) {
-            $topHeader.find('.top-clear-button').addClass('hidden');
-            loadSubPage(page.slice(0, page.indexOf('/search/')));
-        }
-        else if (val.length > 2 || !asciionly(val)) {
-            var $this = $(this);
+            var val = $.trim($('.top-search-input', $headerSearch).val());
 
-            M.fmSearchNodes(val).then(function() {
-                $this.trigger('blur');
-            });
-        }
-    });
+            // if current page is search and value is empty result move to root.
+            if (!val && page.indexOf('/search/') !== -1) {
+                $('.top-clear-button', $headerSearch).addClass('hidden');
+                loadSubPage(page.slice(0, page.indexOf('/search/')));
+            }
+            else if (val.length >= 2 || !asciionly(val)) {
+                var $this = $(this);
+
+                M.fmSearchNodes(val).then(function() {
+                    $this.trigger('blur');
+                });
+            }
+        });
 
     // Press enter to start searching
-    $topHeader.find('.top-search-input').rebind('keyup', function(e) {
+    $('.top-search-input', $headerSearch).rebind('keyup.search', function(e) {
         if (e.keyCode === 13) {
-            $topHeader.find('.top-search-button').click();
+            $('.top-search-button', $headerSearch).click();
         }
     });
 
@@ -2548,7 +2611,7 @@ function topmenuUI() {
             clearTimeout($.liTooltipTimer);
         });
 
-    $topHeader.find('.fm-avatar').rebind('click', function () {
+    $headerAvatar.rebind('click.headeravatar', function() {
 
         // If the user has an avatar already set, take them to the profile page where they can change or remove it
         if ($(this).find('img').length > 0) {
@@ -2561,7 +2624,7 @@ function topmenuUI() {
     });
 
     // If the user name in the header is clicked, take them to the account overview page
-    $topHeader.find('.user-name').rebind('click', function () {
+    $('.user-name', $topHeader).rebind('click.showaccount', function() {
         loadSubPage('fm/account');
     });
 
@@ -2611,13 +2674,13 @@ function topmenuUI() {
     });
 
     if (String(M.currentdirid).substr(0, 7) === 'search/' && M.currentdirid[7] !== '~') {
-        $topHeader.find('.top-search-bl').addClass('contains-value');
-        $topHeader.find('.top-clear-button').removeClass("hidden");
+        $headerSearch.addClass('contains-value');
+        $('.top-clear-button', $headerSearch).removeClass("hidden");
         var searchVal = M.currentdirid.substr(7);
         if (hashLogic) {
             searchVal = decodeURIComponent(searchVal);
         }
-        $topHeader.find('.top-search-bl input').val(searchVal);
+        $('input', $headerSearch).val(searchVal);
     }
 
     // Initialise the header icon for mobile
@@ -2648,7 +2711,7 @@ function is_fm() {
             || page.substr(0, 2) === 'fm' || page.substr(0, 7) === 'account';
     }
 
-    if (!r && (page.substr(0, 5) === 'chat/' || page === "chat")) {
+    if (!r && page.substr(0, 4) === "chat") {
         r = true;
     }
 
@@ -2672,80 +2735,26 @@ function getTemplate(name) {
 }
 
 function pagemetadata() {
-    var mega_desc = false;
+    'use strict';
+    if (window.is_karma) {
+        return;
+    }
+    var metas = mega.metatags.getPageMetaTags(page);
+    var mega_desc = metas.mega_desc || mega.whoami;
+    mega_title = metas.mega_title || 'MEGA';
 
-    if (page === 'refer') {
-        mega_title = 'MEGA Referral Program';
-    }
-    else if (page === 'uwp') {
-        mega_title = 'Windows 10 app - MEGA';
-    }
-    else if (page === 'mobileapp') {
-        mega_title = 'MEGA - Mobile Apps';
-        mega_desc = 'Securely manage your files and collaborate everyone from anywhere.';
-    }
-    else if (page == 'sync') {
-        mega_title = 'MEGAsync - Download';
-        mega_desc = 'MEGAsync securely synchronizes data between your computer and your MEGA account. Available for Windows, Mac and Linux.';
-    }
-    else if (page == 'extensions') {
-        mega_title = 'Browser Extensions - MEGA';
-    }
-    else if (page == 'bird') {
-        mega_title = 'MEGAbird - Download';
-    }
-    else if (page == 'cmd') {
-        mega_title = 'MEGAcmd - Download';
-        mega_desc = 'MEGAcmd is an interactive, text console based, scriptable MEGA client.';
-    }
-    else if (page === 'downloadapp') {
-        mega_title = 'Download our App';
-        mega_desc = 'MEGAcmd is an interactive, text console based, scriptable MEGA client.';
-    }
-    else if (page == 'pro') {
-        mega_title = 'Plans & pricing - MEGA';
-        mega_desc = 'Upgrade to a MEGA PRO account for additional storage and transfer quota. MEGA provides one the cheapest cloud storage deals on the Internet.';
-    }
-    else if (page == 'register') {
-        mega_title = 'Register - MEGA';
-        mega_desc = 'Create your free MEGA account and get free 50 GB.';
-    }
-    else if (page == 'login') {
-        mega_title = 'Login - MEGA';
-    }
-    else if (page == 'recovery') {
-        mega_title = 'Recovery - MEGA';
-        mega_desc = 'Forgot your MEGA password? Start your recovery process here.';
-    }
-    else if (page == 'terms') {
-        mega_title = 'Terms of Service - MEGA';
-    }
-    else if (page == 'privacy') {
-        mega_title = 'Privacy Policy - MEGA';
-    }
-    else if (page === 'gdpr') {
-        mega_title = l[18421] + ' - MEGA';
-    }
-    else if (page == 'copyright') {
-        mega_title = 'Copyright - MEGA';
-    }
-    else if (page == 'takedown') {
-        mega_title = 'Takedown Guidance - MEGA';
-    }
-    else if (typeof Object(window.dlmanager).isStreaming === 'object') {
-        mega_title = 'MEGA - ' + dlmanager.isStreaming._megaNode.name;
-    }
-    else {
-        mega_title = 'MEGA';
-    }
-    if (!mega_desc) {
-        mega_desc = mega.whoami;
-    }
     $('meta[name=description]').remove();
     $('head').append('<meta name="description" content="' + String(mega_desc).replace(/[<">]/g, '') + '">');
     document.title = mega_title;
     megatitle();
+
+    if (pagemetadata.last !== page) {
+        mBroadcaster.sendMessage('pagemetadata', metas);
+    }
+    pagemetadata.last = page;
 }
+
+pagemetadata.last = null;
 
 
 function parsepage(pagehtml) {
@@ -2778,7 +2787,7 @@ function parsepage(pagehtml) {
     }
     pagehtml = ($.mTransferWidgetPage + pagehtml).replace(/{staticpath}/g, staticpath);
 
-    $('#startholder').safeHTML('<div class="nav-overlay"></div>' + pagehtml).removeClass('hidden');
+    $('#startholder', $body).safeHTML(pagehtml).removeClass('hidden');
 
     $body.addClass('bottom-pages');
     $('body, html, .bottom-pages .fmholder').stop(true, true).scrollTop(0);
@@ -2813,7 +2822,6 @@ function parsetopmenu() {
 function loadSubPage(tpage, event) {
     'use strict';
 
-    pagemetadata();
     tpage = getCleanSitePath(tpage);
 
     if (typeof dlPageCleanup === 'function' && tpage[0] !== '!') {
@@ -2830,20 +2838,36 @@ function loadSubPage(tpage, event) {
 
     if (window.textEditorVisible) {
         // if we are loading a page and text editor was visible, then hide it.
-        // eslint-disable-next-line no-unused-expressions
-        mega && mega.textEditorUI && mega.textEditorUI.doClose();
+        mega.textEditorUI.doClose();
     }
 
     if (window.versiondialogid) {
         fileversioning.closeFileVersioningDialog(window.versiondialogid);
     }
 
+    if (event && Object(event.state).view) {
+        onIdle(function() {
+            slideshow(event.state.view);
+        });
+        return false;
+    }
+
     if (folderlink) {
         flhashchange = true;
     }
-
-    if ((tpage === page) && !folderlink) {
+    else if (tpage === page) {
         return false;
+    }
+
+    if (M.chat && megaChatIsReady) {
+        // navigating within the chat, skip the bloatware
+        if (tpage.indexOf('chat') > -1) {
+            megaChat.navigate(tpage, event);
+            return false;
+        }
+
+        // clear the flag if navigating to an static page..
+        M.chat = tpage.substr(0, 2) === 'fm';
     }
 
     // TODO: check what this was for and its relevance
@@ -2863,34 +2887,50 @@ function loadSubPage(tpage, event) {
     }
 
     if (page) {
+        var tmp = [];
+
         for (var p in subpages) {
             if (page.substr(0, p.length) === p) {
                 for (var i in subpages[p]) {
                     if (!jsl_loaded[jsl2[subpages[p][i]].n]) {
-                        jsl.push(jsl2[subpages[p][i]]);
+                        tmp.push(jsl2[subpages[p][i]]);
                     }
                 }
             }
         }
+
+        if (tmp.length) {
+            if (d) {
+                console.info('loadSubPage: About to load required resources...', tmp);
+            }
+
+            if (jsl.length) {
+                if (d) {
+                    console.warn('loadSubPage: There are pending requests running, holding it..');
+                }
+
+                var oldSL = silent_loading;
+                silent_loading = function() {
+                    if (oldSL) {
+                        tryCatch(oldSL)();
+                    }
+                    page = false;
+                    loadSubPage(tpage, event);
+                };
+
+                return;
+            }
+
+            jsl = tmp;
+        }
     }
 
-    if (hashLogic || isPublicLink(page)) {
-        document.location.hash = '#' + page;
-    }
-    else if (event && event.type === 'popstate') {
+    if (event && event.type === 'popstate' || event === 'override') {
         // In case we navigated to a location.hash, clean it up replacing the current history entry.
-        history.replaceState({subpage: page}, "", '/' + page);
+        pushHistoryState(true, page);
     }
     else {
-        var isSearch = page.indexOf('fm/search/');
-        if (isSearch >= 0) {
-            var searchString = page.substring(isSearch + 10);
-            var tempPage = page.substring(0, isSearch + 10);
-            history.pushState({ subpage: tempPage, searchString: searchString }, "", "/" + tempPage);
-        }
-        else {
-            history.pushState({ subpage: page }, "", "/" + page);
-        }
+        pushHistoryState(page);
     }
 
     // since hash changing above will fire popstate event, which in its turn will call
@@ -2912,29 +2952,36 @@ function loadSubPage(tpage, event) {
     mBroadcaster.sendMessage('pagechange', tpage);
 }
 
+window.addEventListener('popstate', function(event) {
+    'use strict';
 
-window.onhashchange = function () {
-    if (window.skipHashChange) {
-        delete window.skipHashChange;
-        return false;
-    }
-    if (hashLogic) {
-        hash = getCleanSitePath(location.hash);
-        if (hash !== page) {
-            loadSubPage(hash);
-        }
-    }
-};
+    var state = event.state || {};
+    var add = state.searchString || '';
+    loadSubPage((state.subpage || state.fmpage || getCleanSitePath() || location.hash) + add, event);
+}, {
+    capture: true,
+    passive: true,
+});
 
 window.onbeforeunload = function () {
+    'use strict';
+
     if (dlmanager.isDownloading || ulmanager.isUploading) {
         return $.memIOSaveAttempt ? null : l[377];
     }
 
+    if (window.doUnloadLogOut) {
+        u_logout();
+        delete window.doUnloadLogOut;
+    }
     mBroadcaster.crossTab.leave();
 };
 
 window.onunload = function () {
+    'use strict';
+    if (window.doUnloadLogOut) {
+        u_logout();
+    }
     mBroadcaster.crossTab.leave();
 
     if (typeof dlpage_ph === 'string') {
@@ -2943,10 +2990,36 @@ window.onunload = function () {
     }
 };
 
-mBroadcaster.once('boot_done', function () {
+mBroadcaster.once('boot_done', function() {
+    'use strict';
     M = new MegaData();
-    attribCache = new IndexedDBKVStorage('ua', { murSeed: 0x800F0002 });
-    attribCache.bitMapsManager = new MegaDataBitMapManager();
+
+    if (d) {
+        if (!window.crossOriginIsolated) {
+            if (window.crossOriginIsolated === false) {
+                console.warn('cross-origin isolation is not enabled...');
+            }
+            return;
+        }
+
+        (function memoryMeasurement() {
+            var performMeasurement = tryCatch(function() {
+                performance.measureMemory()
+                    .then(function(result) {
+                        onIdle(memoryMeasurement);
+                        console.info('Memory usage:', result);
+                    });
+            });
+
+            if (!performance.measureMemory) {
+                console.debug('performance.measureMemory() is not available.');
+                return;
+            }
+            var interval = -Math.log(Math.random()) * 2e4;
+            console.info('Scheduling memory measurement in %d seconds.', Math.round(interval / 1e3));
+            setTimeout(performMeasurement, interval);
+        })();
+    }
 });
 
 // After open folder call, check if we should restore any previously opened preview node.
@@ -2956,6 +3029,6 @@ mBroadcaster.once('mega:openfolder', function() {
     if (sessionStorage && sessionStorage.previewNode) {
         var previewNode = sessionStorage.previewNode;
         sessionStorage.removeItem('previewNode');
-        (is_mobile ? mobile.slideshow.init : slideshow)(previewNode);
+        slideshow(previewNode);
     }
 });

@@ -108,10 +108,13 @@ function initFileblocksScrolling2() {
 }
 
 function initSelectScrolling(scrollBlock) {
-
     "use strict";
 
     var $scrollBlock = $(scrollBlock);
+
+    if ($scrollBlock.length === 0) {
+        return false;
+    }
 
     // Remember current position of scroll
     var currentPos = $scrollBlock.data('jsp') ? $scrollBlock.data('jsp').getContentPositionY() : 0;
@@ -119,7 +122,12 @@ function initSelectScrolling(scrollBlock) {
 
     // Need to reselect scrollblock due to update.
     $scrollBlock = $(scrollBlock);
-    $scrollBlock.jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5});
+    $scrollBlock.jScrollPane({
+        enableKeyboardNavigation: false,
+        showArrows: true,
+        arrowSize: 5,
+        contentWidth: 0
+    });
     $scrollBlock.data('jsp').scrollToY(currentPos);
     jScrollFade(scrollBlock);
 }
@@ -253,10 +261,11 @@ function clearScrollPanel($from) {
 function reselect(n) {
     'use strict';
 
-    // ToDo: does the reselect() function work on mobile? i.e. does it highlights nodes in the $.selected array?
-    // Perhaps we need a mobile version of it anyway... the exception only happens with debugging turned on
     if (d) {
         console.debug('reselect(%s)', n, [window.selectionManager]);
+    }
+    if (window.selectionManager) {
+        return selectionManager.reinitialize();
     }
     $('.ui-selected').removeClass('ui-selected');
 

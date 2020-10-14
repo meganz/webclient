@@ -1,0 +1,276 @@
+<!doctype html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Group Chat</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <link rel="stylesheet" type="text/css" href="../../css/fonts.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/general.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/style.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/account.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/settings.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/user-card.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/business.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/top-menu.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/avatars.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/icons.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/buttons.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/dropdowns.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/popups.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/data-blocks-view.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/affiliate-program.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/dialogs-common.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/dialogs.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/retina-images.css" />
+
+    <script type="text/javascript" src="../../js/vendor/jquery.js"></script>
+    <script type="text/javascript" src="../../js/vendor/jquery.jscrollpane.js"></script>
+    <script type="text/javascript" src="../../js/vendor/jquery.mousewheel.js"></script>
+    <script type="text/javascript" src="../../js/jquery.misc.js"></script>
+    <script type="text/javascript">
+        var is_chrome_firefox = document.location.protocol === 'chrome:' && document.location.host === 'mega' || document.location.protocol === 'mega:';
+    </script>
+    <script type="text/javascript" src="../../js/utils/dom.js"></script>
+    <script type="text/javascript" src="../../js/ui/megaInputs.js"></script>
+    <script type="text/javascript" src="../../js/ui/megaInputs-titleTop.js"></script>
+
+    <script type="text/javascript">
+
+        $(document).ready(function() {
+            var $dialog = $('.fm-dialog.affiliate-redeem');
+            var $inputs = $('.titleTop', $dialog);
+            var megaInputs = new mega.ui.MegaInputs($inputs);
+
+            function dialogPositioning() {
+
+                $dialog.css({
+                    'margin-top' : '-' + $dialog.outerHeight()/2 + 'px'
+                });
+            }
+
+            dialogPositioning();
+        });
+        
+        
+
+    </script>
+</head>
+<body class="logged fontsize2 en">
+    
+    <div class="dark-overlay"></div>
+    
+    <div class="fm-dialog affiliate-redeem lato contrast">
+        <div class="fm-dialog-close"></div>
+        <div class="fm-dialog-title dark">Commission redemption</div>
+        <div class="affiliate-redeem body">
+            <!-- Please add/remove "hidden, "orange"" !-->
+            <div class="affiliate-redeem timing">
+                Please complete this redemption request in: <span>12min 30s</span> <i>?</i>
+            </div>
+            
+            <!-- Step1 block. Payment !-->
+            <div class="affiliate-redeem cells left step1 hidden">
+                <div class="affiliate-redeem header">
+                    How much you like to redeem?
+                </div>
+                <div class="affiliate-redeem input-wrap">
+                    <div class="input">
+                        <span class="currency">NZD</span>
+                        <input type="number" name="affiliate-redemption" value="99.99">
+                    </div>
+                    <div class="button">
+                        <div class="default-green-button gradient">
+                            Redeem all
+                        </div>
+                    </div>
+                </div>
+                <div class="affiliate-redeem available-comission">
+                    Available commission: <span>NZD $65</span>
+                </div>
+                <div class="affiliate-redeem header">
+                    How would you like to get paid?
+                </div>
+                <div class="affiliate-redeem payment-type">
+                    <div class="radioOff small green">
+                        <input type="radio" id="rad8" class="uisorting megaInputs radioOff" value="0">
+                    </div>
+                    <div class="radio-txt">Bank transfer</div>
+                    <div class="radioOn small green">
+                        <input type="radio" id="rad9" class="uisorting megaInputs radioOn" value="1">
+                    </div>
+                    <div class="radio-txt">Bitcoin</div>
+                    <div class="clear"></div>
+                </div>
+            </div>
+
+            <!-- Step2. Withdraw details !-->
+            <div class="affiliate-redeem cells left step2">
+                <div class="affiliate-redeem header">
+                    Withdraw method
+                </div>
+                <div class="affiliate-redeem withdraw-txt">
+                    <div class="left">Bank Transfer</div>
+                    <a href="">Change</a>
+                    <div class="clear"></div>
+                </div>
+                <div class="affiliate-redeem header">
+                    Withdraw details
+                </div>
+                <form autocomplete="disabled" class="withdraw-details">
+                    <div class="mega-input-title-ontop underline-dropdown-input affi-withdraw-country">
+                        <div class="mega-input-title">Country</div>
+                        <div class="list-arrow"></div>
+                        <div class="dialog-input default-select country" id="affi-country">
+                            <span>New Zealand</span>
+                            <div class="default-select-dropdown hidden"><div class="default-select-scroll"></div></div>
+                        </div>
+                    </div>
+
+                    <!-- Currency dropdown for bank transfer !-->
+                    <div class="mega-input-title-ontop underline-dropdown-input affi-withdraw-currency">
+                        <div class="mega-input-title">Currency</div>
+                        <div class="list-arrow"></div>
+                        <div class="dialog-input default-select country" id="affi-currency">
+                            <span>NZD</span>
+                            <div class="default-select-dropdown hidden"><div class="default-select-scroll"></div></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Bitcoin address input and tip !-->
+                    <div class="affiliate-redeem bitcoin-data  hidden">
+                        <input type="text" class="titleTop" value="" title="Bitcoin adress" name="affi-bitcoin-adress" id="affi-bitcoint-adress" />
+                        <div class="affiliate-redeem bitcoin-tip">
+                            <i>i</i>
+                            MEGA only accepts standard Bitcoin; <br>please enter a valid Bitcoin address.
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Step3. Withdraw details !-->
+            <div class="affiliate-redeem cells left step3 hidden">
+                <div class="affiliate-redeem header">
+                    Account details
+                </div>
+                <form class="account-details">
+                    
+                    <!-- Auto fill checkbox. Please add/remove "hidden" class !-->
+                    <div class="affiliate-redeem auto-fill-checkbox">
+                        <div class="checkdiv checkboxOn">
+                            <input type="checkbox" id="affi-save-info" />
+                        </div>
+                        <label for="affi-save-info" class="radio-txt"> Auto filled with default information </label>
+                        <div class="clear"></div>
+                    </div>
+                    
+                    <input type="text" class="titleTop" value="" title="Full account name" name="affi-account-name" id="affi-account-name" />
+                    <input type="text" class="titleTop" value="" title="Account type" name="affi-account-type" id="affi-account-type" />
+                    <input type="text" class="titleTop" value="" title="Account number" name="affi-account-number" id="affi-account-number" />
+                    <input type="text" class="titleTop" value="" title="SWIFT BIC" name="affi-swift-bic" id="affi-swift-bic" />
+                    
+                    <!-- Save information checkbox. Please add/remove "hidden" class !-->
+                    <div class="affiliate-redeem save-data-checkbox hidden">
+                        <div class="checkdiv checkboxOff">
+                            <input type="checkbox" id="affi-save-info" />
+                        </div>
+                        <label for="affi-save-info" class="radio-txt"> Save as default account information </label>
+                        <div class="clear"></div>
+                    </div>
+                    
+                     <!-- Save information green tip. Please add/remove "hidden" class !-->
+                    <div class="affiliate-redeem save-data-tip">
+                        <div>Do you want to save these changes as your new default account information?</div>
+                        <div class="right accept">Yes</div>
+                        <div class="right cancel">No</div>
+                        <div class="clear"></div>
+                    </div>
+                    
+                </form>
+            </div>
+            
+            <!-- Step4. Transfer info !-->
+            <div class="affiliate-redeem cells left border step4 hidden">
+                <div class="fm-affiliate redeem-data">
+                    <span class="strong">Receipt:</span>
+                    <span>N39#MK03</span>
+                </div>
+                <div class="fm-affiliate redeem-data">
+                    <span class="strong">Method:</span>
+                    <span>Bank Transfer</span>
+                </div>
+                 <div class="fm-affiliate redeem-data">
+                    <span class="strong full-size">Withdraw info:</span>
+                    <span class="grey">Country</span>
+                    <span>New Zealand</span>
+                     <span class="grey">Currency</span>
+                    <span>$NZD</span>
+                </div>
+                <div class="fm-affiliate redeem-data">
+                    <span class="strong full-size">Bank account:</span>
+                    <span class="grey">Account name</span>
+                    <span>Jay Chongn</span>
+                    <span class="grey">Account number</span>
+                    <span>1947 2837 3833 9458 3333</span>
+                    <span class="grey">Account type</span>
+                    <span>Save account</span>
+                    <span class="grey">SWIFT BIC</span>
+                    <span>2934 - B9384</span>
+                </div>
+            </div>
+            
+            <div class="affiliate-redeem cells right">
+                <div class="affiliate-redeem summary-wrap">
+                    <div class="affiliate-redeem header">
+                        Summary
+                    </div>
+                    <div class="affiliate-redeem summary">
+                        <div class="info">
+                            Request amount:
+                        </div>
+                        <div class="info price requested">
+                            <span>NZD 57.00</span>
+                        </div>
+                        <hr>
+                        <div class="info">
+                            Fee:
+                        </div>
+                        <div class="info price fee">
+                            <!-- Local currency tip.Please Add/Rove "hidden" class !-->
+                            <span class="local">&euro;3.00</span><span>NZD 3.22*</span>
+                        </div>
+                        <div class="clear"></div>
+                    </div>
+                    <div class="affiliate-redeem amount">
+                        <div class="info">
+                            Received amount:
+                        </div>
+                        <div class="info price received">
+                            <!-- Local currency tip.Please Add/Rove "hidden" class !-->
+                            <span class="local">NZD 53.78</span>
+                            <span>NZD 53.78</span>
+                        </div>
+                        <div class="clear"></div>
+                    </div>
+                </div>
+                <!-- Local currency tip.Please Add/Rove "hidden" class !-->
+                <div class="affiliate-redeem local-info">
+                    * Fee in your local currency is an estimate only, you will be charged the displayed price in Euros for all transactions.
+                </div>
+            </div>
+            <div class="clear"></div>
+            
+            <div class="affiliate-redeem button back">
+                <i class="semi-big-icon icons-sprite grey-right-arrow"></i>
+                <span>Back</span>
+            </div>
+            
+            <!-- We have  4  labels: "Payment details", "Account details", "Confirm page" and "Confirm redemption" !-->
+            <div class="button default-green-button gradient height-48 big-txt">
+                <span>Account details</span>
+                <i class="small-icon icons-sprite white-right-arrow"></i>
+            </div>
+        </div>
+    </div>
+    
+</body>
+</html>

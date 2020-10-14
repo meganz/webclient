@@ -12,61 +12,12 @@
         var self = this;
         self.chatd = chatd;
 
-        var loggerOpts = {};
-        if (localStorage.chatdPersistDebug) {
-            loggerOpts['isEnabled'] = true;
-            loggerOpts['minLogLevel'] = function () {
-                return MegaLogger.LEVELS.DEBUG;
-            };
-            loggerOpts['transport'] = function (level, args) {
-                var fn = "log";
-                if (level === MegaLogger.LEVELS.DEBUG) {
-                    fn = "debug";
-                }
-                else if (level === MegaLogger.LEVELS.LOG) {
-                    fn = "log";
-                }
-                else if (level === MegaLogger.LEVELS.INFO) {
-                    fn = "info";
-                }
-                else if (level === MegaLogger.LEVELS.WARN) {
-                    fn = "warn";
-                }
-                else if (level === MegaLogger.LEVELS.ERROR) {
-                    fn = "error";
-                }
-                else if (level === MegaLogger.LEVELS.CRITICAL) {
-                    fn = "error";
-                }
-                args.push("[" + fn + "]");
-                console.warn.apply(console, args);
-            };
-        }
-        else {
-            loggerOpts['isEnabled'] = true;
-            loggerOpts['minLogLevel'] = function () {
-                return MegaLogger.LEVELS.WARN;
-            };
-        }
-
-        self.logger = new MegaLogger("ChatdPersist", loggerOpts);
+        self.logger = new MegaLogger("ChatdPersist");
 
         self.dbName = "chatd_" + VERSION;
-
-        self.schemaCb = function(db) {
-            db
-                .version(1).stores({
-                    /* extra data fields, non indexed: msgObject */
-                    'msgs': "++id, chatId, msgId, userId, orderValue, &[chatId+msgId], [chatId+orderValue], keyId",
-                    'keys': "++chatId_userId_keyId, chatId, userId", /* extra data fields, non indexed: key */
-                    'ptrs': "++chatId_pointer" /* extra data fields, non indexed: value*/
-                });
-        };
-
         self.dbState = ChatdPersist.DB_STATE.NOT_READY;
 
         self._queuePerChat = {};
-        self._queueTransactionPerChat = {};
         self._msgActionsQueuePerChat = {};
 
         self._histRequestFlagsPerChat = {};
@@ -86,13 +37,18 @@
         'MSG': 2
     };
 
+    ChatdPersist.encrypt = SharedLocalKVStorage.encrypt;
+    ChatdPersist.decrypt = SharedLocalKVStorage.decrypt;
+    ChatdPersist.DB_STATE = SharedLocalKVStorage.DB_STATE;
+    ChatdPersist._requiresDbReady = SharedLocalKVStorage.Utils._requiresDbReady;
+
     /**
      * Returns true if this is the Master tab (e.g. if having multiple tabs)
      *
-     * @returns {bool}
+     * @returns {Boolean}
      */
     ChatdPersist.isMasterTab = function() {
-        return mBroadcaster.crossTab.master ? true : false;
+        return !!mBroadcaster.crossTab.master;
     };
 
     /**
@@ -100,12 +56,6 @@
      */
     ChatdPersist.prototype.init = function() {
         var self = this;
-
-
-        ChatdPersist._requiresDbReady.call(undefined, function() {
-            self.onDbOpen();
-            return MegaPromise.resolve();
-        }).call(self);
 
         self.chatd.rebind('onMessageKeysDone.chatdPersist', function(e, data) {
             if (!ChatdPersist.isMasterTab()) {
@@ -121,20 +71,10 @@
                 return;
             }
 
-            // jscs:disable disallowImplicitTypeConversion
             var isFromHist = !!self._histRequestFlagsPerChat[data.chatId];
-            // jscs:enable disallowImplicitTypeConversion
 
             data.keys.forEach(function(key) {
-                if (!isFromHist) {
-                    self.chatd.chatdPersist.persistKey(
-                        data.chatId,
-                        key.keyid,
-                        key.userId,
-                        key.key
-                    );
-                }
-                else {
+                if (isFromHist) {
                     self.chatd.chatdPersist.addToQueue(
                         data.chatId,
                         ChatdPersist.QUEUE_TYPE.KEY,
@@ -144,6 +84,9 @@
                             key.key
                         ]
                     );
+                }
+                else {
+                    self.chatd.chatdPersist.persistKey(data.chatId, key.keyid, key.userId, key.key).always(nop);
                 }
             });
         });
@@ -168,14 +111,12 @@
                 key = key && key.substr(u_handle.length - 1, key.length) || key;
 
                 if (key) {
-                    self.persistKey(chatId, keyId, u_handle, key);
+                    self.persistKey(chatId, keyId, u_handle, key).always(nop);
                 }
             }
             else {
                 self.logger.warn("Could not find chatId:", chatId, " so KeyIdDone is not processed.");
             }
-
-
         });
 
 
@@ -184,7 +125,7 @@
                 // don't do anything if this is not the master tab!
                 return;
             }
-            self.setPointer(data.chatId, 'ls', data.messageId);
+            self.setPointer(data.chatId, 'ls', data.messageId).always(nop);
         });
 
         self.chatd.rebind('onMessagesHistoryDone.chatdPersist', function(e, data) {
@@ -213,231 +154,61 @@
 
         megaChat.rebind('onRoomDestroy.chatdPersist', function(e, chatRoom) {
             var chatId = chatRoom.chatId;
-            self.db.transaction('rw', self.db.msgs, self.db.keys, self.db.ptrs, function(m, k, p, trans) {
+            self.transaction(function() {
                 self._encryptedWhere('keys', {'chatId': chatId})
-                    .done(function(results) {
+                    .then(function(results) {
                         results.forEach(function(r) {
                             self.db.keys.delete(ChatdPersist.encrypt(r.chatId_userId_keyId));
                         });
-                    });
+                    })
+                    .catch(dump);
 
                 self._encryptedWhere('msgs', {'chatId': chatId})
-                    .done(function(results) {
+                    .then(function(results) {
                         results.forEach(function(r) {
                             self.db.msgs.delete(r.id);
                         });
-                    });
-
+                    })
+                    .catch(dump);
 
                 // TODO: Pointers. They are not used at the moment.
-            })
-                .then(function() {
-                    self.logger.debug("onRoomDestroy transaction finished successfully.");
-                }, function(error) {
-                    // Log or display the error
-                    self.logger.error('onRoomDestroy transaction error', error.stack || error);
-                });
+            }).then(function() {
+                self.logger.debug("onRoomDestroy transaction finished successfully.");
+            }).catch(dump);
         });
 
     };
 
-
-    ChatdPersist.DB_STATE = {
-        'NOT_READY': 0,
-        'READY': 1,
-        'INITIALISING': 2,
-        'FAILED': 3,
-    };
-
-    ChatdPersist.prototype.deleteAllMessages = function(chatId) {
+    ChatdPersist.prototype.transaction = promisify(function(resolve, reject, dispatcher) {
+        if (!ChatdPersist.isMasterTab()) {
+            // don't do anything if this is not the master tab!
+            return reject(EACCESS);
+        }
         var self = this;
+        var args = ['rw'].concat(this.db.tables, dispatcher);
 
-        if (self._msgActionsQueuePerChat[chatId]) {
-            clearTimeout(self._msgActionsQueuePerChat[chatId].timer);
-            self._msgActionsQueuePerChat[chatId].promise &&
-                self._msgActionsQueuePerChat[chatId].promise.reject();
-            delete self._msgActionsQueuePerChat[chatId];
-        }
-        self.db.transaction('rw', self.db.msgs, function() {
-            self._encryptedWhere('msgs', {'chatId': chatId})
-                .done(function (results) {
-                    results.forEach(function (r) {
-                        self.db.msgs.delete(r.id);
-                    });
+        this.db.transaction.apply(this.db, args)
+            .then(resolve)
+            .catch(function(ex) {
+                self.logger.error('Transaction failed.', ex);
+                self.onDbCrashCritical();
+                reject(ex);
+            });
+    });
+
+    ChatdPersist.prototype.deleteAllMessages = mutex('chatdpersist:mutex', function(resolve, reject, chatId) {
+        var self = this;
+        self._expungeMessageActionsQueue(chatId);
+
+        self.transaction(function() {
+            return self._encryptedWhere('msgs', {'chatId': chatId})
+                .then(function(results) {
+                    for (var i = results.length; i--;) {
+                        self.db.msgs.delete(results[i].id);
+                    }
                 });
-        });
-    };
-
-    /**
-     * Alias for FMDB.prototype.strcrypt
-     *
-     * @param val
-     * @returns {*}
-     */
-    ChatdPersist.encrypt = function(val) {
-        if (localStorage.chatdPersistDebug) {
-            return JSON.stringify(val);
-        }
-        return ab_to_base64(FMDB.prototype.strcrypt(JSON.stringify(val)));
-    };
-
-    /**
-     * Alias for FMDB.prototype.strdecrypt
-     * @param val
-     * @returns {String}
-     */
-    ChatdPersist.decrypt = function(val) {
-        if (localStorage.chatdPersistDebug) {
-            return JSON.parse(val);
-        }
-
-        try {
-            return JSON.parse(FMDB.prototype.strdecrypt(base64_to_ab(val)));
-        }
-        catch (e) {
-            return "";
-        }
-    };
-
-    /**
-     * Basic wrapper for functions that return a promise and require a db connection to be initialized.
-     *
-     * @param fn {Function}
-     * @param methodName {String}
-     * @returns {Function}
-     * @private
-     */
-    ChatdPersist._requiresDbReady = function cdpdbDBConnRequired(fn, methodName) {
-        return function __requiresDBConnWrapper() {
-            var self = this;
-            var args = arguments;
-            var promise = new MegaPromise();
-
-            if (!u_handle) {
-                promise.reject();
-                return promise;
-            }
-
-
-
-            // lazy db init
-            if (self.dbState === ChatdPersist.DB_STATE.NOT_READY && !self.dbLoadingPromise) {
-                self.dbState = ChatdPersist.DB_STATE.INITIALISING;
-
-                self.dbLoadingPromise = new MegaPromise();
-
-
-                self.db = new Dexie("$ctdb_" + u_handle + "_" + self.dbName);
-
-                self.schemaCb(self.db);
-
-                // typically...we could have used a .finally catch-all clause here, but because of Promises A+,
-                // and forcing the exceptions triggered by any resolve/reject callbacks the code needs to be
-                // duplicated in a setTimeout call.
-                self.db.open()
-                    .then(
-                        function() {
-                            window.addEventListener("unhandledrejection", function (event) {
-                                if (event.promise && event.promise._PSD) {
-                                    // found Dexie error!
-                                    self.logger.error("Unhandled rejection from Dexie: ", event.reason);
-                                    self.onDbCrashCritical();
-                                }
-                            });
-
-                            self.dbState = ChatdPersist.DB_STATE.READY;
-                            // resolve in a separate thread, causing the current Dexie.Promise to not fail if the
-                            // dbLoadingPromise .done cbs fail with a JS exception
-                            setTimeout(function() {
-                                self.dbLoadingPromise.resolve();
-
-                                delete self.dbLoadingPromise;
-
-                                // recursion
-                                promise.linkDoneAndFailTo(
-                                    ChatdPersist._requiresDbReady(fn).apply(self, args)
-                                );
-                            }, 0);
-                        },
-                        function(e) {
-                            self.logger.error("Failed to initialise db.", e && e.message ? e.message : e);
-
-                            self.dbState = ChatdPersist.DB_STATE.FAILED;
-
-                            // resolve in a separate thread, causing the current Dexie.Promise to not fail if the
-                            // dbLoadingPromise .done cbs fail with a JS exception
-                            setTimeout(function() {
-                                self.dbLoadingPromise.reject("DB_OPEN_FAILED");
-
-                                delete self.dbLoadingPromise;
-
-                                self.onDbCrashOnOpen();
-                            }, 0);
-                        }
-                    )
-                    .catch(function(e) {
-                        self.logger.error("DbOpen failed, reason: ", e);
-
-                        self.dbState = ChatdPersist.DB_STATE.FAILED;
-                        // resolve in a separate thread, causing the current Dexie.Promise to not fail if the
-                        // dbLoadingPromise .done cbs fail with a JS exception
-                        setTimeout(function() {
-                            self.dbLoadingPromise.reject("DB_OPEN_FAILED");
-                            delete self.dbLoadingPromise;
-
-                            self.onDbCrashOnOpen();
-                        }, 0);
-                    });
-            }
-            else if (
-                self.dbState === ChatdPersist.DB_STATE.NOT_READY &&
-                self.dbLoadingPromise &&
-                self.dbLoadingPromise.state() === 'pending'
-            ) {
-                // DB open is in progress.
-                promise.linkDoneAndFailTo(
-                    ChatdPersist._requiresDbReady(fn).apply(self, args)
-                );
-            }
-            else if (self.dbState === ChatdPersist.DB_STATE.READY) {
-
-                promise.linkDoneAndFailTo(
-                    fn.apply(self, args)
-                );
-            }
-            else if (self.dbState === ChatdPersist.DB_STATE.FAILED) {
-                promise.reject("DB_FAILED");
-            }
-            else {
-                if (!self.dbLoadingPromise) {
-                    self.logger.error(
-                        "DB Loading promise is missing, but the current DB loading state is: ", self.dbState, ".",
-                        "Halting."
-                    );
-
-                    promise.reject("DB_LOADING_PROMISE_MISSING");
-                }
-                else {
-
-                    self.dbLoadingPromise
-                        .done(function() {
-                            promise.linkDoneAndFailTo(
-                                fn.apply(self, args)
-                            );
-                        })
-                        .fail(function() {
-                            self.logger.error(
-                                "DB Loading Failed."
-                            );
-
-                            promise.reject("DB_FAILED");
-                        });
-                }
-            }
-
-            return promise;
-        };
-    };
+        }).always(resolve);
+    });
 
     /**
      * A hashmap of table -> [column, ...] for stuff you don't want to be encrypted.
@@ -460,19 +231,31 @@
         ]
     };
 
-    ChatdPersist.prototype.onDbOpen = function() {
+    /**
+     * Database connection.
+     * @name db
+     * @memberOf ChatdPersist.prototype
+     */
+    lazy(ChatdPersist.prototype, 'db', function() {
+        return new MegaDexie('CHATD', this.dbName, 'ctdb_', true, {
+            /* extra data fields, non indexed: msgObject */
+            'msgs': "++id, chatId, msgId, userId, orderValue, &[chatId+msgId], [chatId+orderValue], keyId",
+            'keys': "++chatId_userId_keyId, chatId, userId", /* extra data fields, non indexed: key */
+            'ptrs': "++chatId_pointer" /* extra data fields, non indexed: value*/
+        });
+    });
+
+    ChatdPersist.prototype._OpenDB = function() {
         // pre-cache pointers
         var self = this;
         self._pointersCache = {};
 
-        self.db.ptrs.toArray()
+        return self.db.ptrs.toArray()
             .then(function(r) {
-                if ($.isArray(r)) {
-                    r.forEach(function(v) {
-                        self._pointersCache[ChatdPersist.decrypt(v.chatId_pointer)] =
-                            ChatdPersist.decrypt(v.value);
-                    });
+                for (var i = 0; i < r.length; ++i) {
+                    self._pointersCache[ChatdPersist.decrypt(r[i].chatId_pointer)] = ChatdPersist.decrypt(r[i].value);
                 }
+                return r;
             });
     };
 
@@ -493,6 +276,9 @@
         // we need to reinit and retrigger regular JOIN + HIST
         var self = this;
         var shards = self.chatd.shards;
+
+        self.logger.warn('re-init without persistence.', shards);
+
         Object.keys(shards).forEach(function(shardId) {
             var shard = shards[shardId];
             var chatIds = shard.chatIds;
@@ -511,7 +297,7 @@
         self.logger.warn('DB crashed, disabling chatdPersist (is this an FF incognito?)');
     };
 
-    ChatdPersist.prototype._stopChatdPersist = function() {
+    ChatdPersist.prototype._stopChatdPersist = function(drop) {
         var self = this;
 
         // already destroying/destroyed?
@@ -523,7 +309,13 @@
         self._reinitWithoutChardPersist();
 
         if (ChatdPersist.isMasterTab()) {
-            self.db.close();
+            if (drop) {
+                self.drop().then(nop).catch(dump);
+            }
+            else if (self.hasOwnProperty('db')) {
+                self.db.close();
+            }
+            self.dbState = ChatdPersist.DB_STATE.FAILED;
         }
     };
 
@@ -535,15 +327,7 @@
             return;
         }
 
-        self._stopChatdPersist();
-
-        if (ChatdPersist.isMasterTab()) {
-            // using Soon, since db.close's promise is not reliable.
-            Soon(function () {
-                ChatdPersist.forceDrop();
-            });
-        }
-
+        self._stopChatdPersist(true);
         self.logger.error('DB crashed, disabling chatdPersist (out of IDB space? broken indexedDB data?)');
     }, 500);
 
@@ -553,13 +337,11 @@
      *
      * @param table {String}
      * @param data {Object}
-     * @returns {MegaPromise}
+     * @returns {Promise}
      * @private
      */
-    ChatdPersist.prototype._encryptedAdd = function(table, data) {
+    ChatdPersist.prototype._encryptedAdd = promisify(function(resolve, reject, table, data) {
         var self = this;
-        assert(self.db[table], 'invalid/missing table: ' + table);
-        var promise = new MegaPromise();
         var encryptedData = Object.assign({}, data);
         Object.keys(encryptedData).forEach(function(k) {
             if (ChatdPersist.DONT_ENCRYPT[table].indexOf(k) === -1) {
@@ -567,17 +349,8 @@
             }
         });
 
-        self.db[table][table === "msgs" ? "put" : "add"](encryptedData)
-            .then(
-                function() {
-                    promise.resolve(arguments[0]);
-                },
-                function() {
-                    promise.reject(arguments[0]);
-                }
-            );
-        return promise;
-    };
+        self.db[table][table === "msgs" ? "put" : "add"](encryptedData).then(resolve).catch(reject);
+    });
 
     /**
      * Internal method that retrieve data by key (`keyName`) with value of `keyValue` from `table` (and handles
@@ -586,41 +359,34 @@
      * @param table {String}
      * @param keyValue {String}
      * @param [keyName] {String}
-     * @returns {MegaPromise}
+     * @returns {Promise}
      * @private
      */
-    ChatdPersist.prototype._encryptedGet = function(table, keyValue, keyName) {
+    ChatdPersist.prototype._encryptedGet = promisify(function(resolve, reject, table, keyValue, keyName) {
         var self = this;
-        assert(self.db[table], 'invalid/missing table: ' + table);
-        var promise = new MegaPromise();
-
         var v = keyValue;
         if (ChatdPersist.DONT_ENCRYPT[table].indexOf(keyName) === -1) {
             v = ChatdPersist.encrypt(keyValue);
         }
 
         self.db[table].get(v)
-            .then(
-                function(result) {
-                    if (!result) {
-                        promise.reject(arguments[0]);
-                    }
-                    else {
-                        var decryptedData = Object.assign({}, result);
-                        Object.keys(decryptedData).forEach(function(k) {
-                            if (ChatdPersist.DONT_ENCRYPT[table].indexOf(k) === -1) {
-                                decryptedData[k] = ChatdPersist.decrypt(decryptedData[k]);
-                            }
-                        });
-                        promise.resolve(decryptedData);
-                    }
-                },
-                function() {
-                    promise.reject(arguments[0]);
+            .then(function(result) {
+                if (!result) {
+                    return reject(result);
                 }
-            );
-        return promise;
-    };
+
+                var decryptedData = Object.assign({}, result);
+                // eslint-disable-next-line local-rules/misc-warnings
+                Object.keys(decryptedData).forEach(function(k) {
+                    if (ChatdPersist.DONT_ENCRYPT[table].indexOf(k) === -1) {
+                        decryptedData[k] = ChatdPersist.decrypt(decryptedData[k]);
+                    }
+                });
+
+                resolve(decryptedData);
+            })
+            .catch(reject);
+    });
 
     /**
      * Internal method that goes thru an array (`results`) and decrypt whatever was defined as encrypted initially (e.g
@@ -649,13 +415,11 @@
      *
      * @param table {String}
      * @param whereObj {Object} Can be an object like Column -> Value to do .equals on.
-     * @returns {MegaPromise}
+     * @returns {Promise}
      * @private
      */
-    ChatdPersist.prototype._encryptedWhere = function(table, whereObj) {
+    ChatdPersist.prototype._encryptedWhere = promisify(function(resolve, reject, table, whereObj) {
         var self = this;
-        assert(self.db[table], 'invalid/missing table: ' + table);
-        var promise = new MegaPromise();
         var q = self.db[table];
 
         Object.keys(whereObj).forEach(function(k) {
@@ -669,19 +433,14 @@
         q.toArray().then(
             function(results) {
                 if (!results || results.length === 0) {
-                    promise.reject(results);
+                    reject(results);
                 }
                 else {
-                    promise.resolve(self._decryptResultsArray(table, results));
+                    resolve(self._decryptResultsArray(table, results));
                 }
-            },
-            function() {
-                promise.reject(arguments[0]);
-            }
-        );
-
-        return promise;
-    };
+            })
+            .catch(reject);
+    });
 
 
     /**
@@ -690,40 +449,33 @@
      * @param chatId {String}
      * @param userId {String}
      * @param keyId {String}
-     * @returns {MegaPromise}
+     * @returns {Promise}
      */
-    ChatdPersist.prototype.getKey = function(chatId, userId, keyId) {
+    ChatdPersist.prototype.getKey = promisify(function(resolve, reject, chatId, userId, keyId) {
         var self = this;
-        var promise = new MegaPromise();
         self._encryptedGet('keys', chatId + "_" + userId + "_" + keyId)
-            .then(
-                function() {
-                    if (typeof arguments[0] === 'undefined') {
-                        promise.reject(arguments[0]);
-                    }
-                    else {
-                        promise.resolve(arguments[0]);
-                    }
-                },
-                function() {
-                    promise.reject(arguments[0]);
+            .then(function(value) {
+                if (value === undefined) {
+                    reject(value);
                 }
-            );
-        return promise;
-    };
+                else {
+                    resolve(value);
+                }
+            })
+            .catch(reject);
+    });
 
     /**
      * Retrieve multiple keys by running on 1 query
      *
      * @param keys {Array} array of hashes (chatId_userId_keyId)
-     * @returns {MegaPromise}
+     * @returns {Promise}
      */
-    ChatdPersist.prototype.getKeys = function(keys) {
+    ChatdPersist.prototype.getKeys = promisify(function(resolve, reject, keys) {
         var self = this;
-        var promise = new MegaPromise();
 
         if (keys.length === 0) {
-            return MegaPromise.resolve([]);
+            return resolve([]);
         }
 
         var encKeys = keys.map(function(v) {
@@ -731,21 +483,16 @@
         });
 
         self.db.keys.where("chatId_userId_keyId").anyOf(encKeys).toArray()
-            .then(
-                function() {
-                    if (typeof arguments[0] === 'undefined') {
-                        promise.reject(arguments[0]);
-                    }
-                    else {
-                        promise.resolve(self._decryptResultsArray('keys', arguments[0]));
-                    }
-                },
-                function() {
-                    promise.reject(arguments[0]);
+            .then(function(value) {
+                if (value === undefined) {
+                    reject(value);
                 }
-            );
-        return promise;
-    };
+                else {
+                    resolve(self._decryptResultsArray('keys', value));
+                }
+            })
+            .catch(reject);
+    });
 
     /**
      * Add a key to the db.
@@ -755,7 +502,7 @@
      * @param keyId {String}
      * @param userId {String}
      * @param key {String}
-     * @returns {MegaPromise}
+     * @returns {Promise}
      */
     ChatdPersist.prototype.addKey = function(chatId, keyId, userId, key) {
         var self = this;
@@ -778,19 +525,18 @@
      * @param keyId {String}
      * @param userId {String}
      * @param key {String}
-     * @returns {MegaPromise}
+     * @returns {Promise}
      */
-    ChatdPersist.prototype.persistKey = function(chatId, keyId, userId, key) {
+    ChatdPersist.prototype.persistKey = promisify(function(resolve, reject, chatId, keyId, userId, key) {
         var self = this;
-        var promise = new MegaPromise();
 
         if (!ChatdPersist.isMasterTab()) {
             // don't do anything if this is not the master tab!
-            return;
+            return reject(EACCESS);
         }
 
         self.getKey(chatId, userId, keyId)
-            .done(function(found) {
+            .then(function(found) {
                 if (found && found.userId !== userId) {
                     self.logger.error("Key: ", chatId, keyId, "already exists, but its assigned to different user:",
                         userId, "!=", found.userId, "Halting.");
@@ -798,15 +544,12 @@
                 else {
                     self.logger.debug("Key: ", chatId, keyId, "already exists. Ignoring.");
                 }
-                promise.reject();
+                queueMicrotask(reject);
             })
-            .fail(function() {
-                promise.linkDoneAndFailTo(
-                    self.addKey(chatId, keyId, userId, key)
-                );
+            .catch(function() {
+                self.addKey(chatId, keyId, userId, key).then(resolve).catch(reject);
             });
-        return promise;
-    };
+    });
 
 
     /**
@@ -816,39 +559,26 @@
      * @param chatId {String}
      * @param pointerName {String}
      * @param pointerValue {String}
-     * @returns {MegaPromise}
+     * @returns {Promise}
      */
-    ChatdPersist.prototype.setPointer = function(chatId, pointerName, pointerValue) {
+    ChatdPersist.prototype.setPointer = promisify(function(resolve, reject, chatId, pointerName, pointerValue) {
         var self = this;
-        var promise = new MegaPromise();
         if (self._pointersCache) {
             if (self._pointersCache[chatId + "_" + pointerName] === pointerValue) {
-                promise.reject();
-                return promise;
+                return queueMicrotask(reject);
             }
             self._pointersCache[chatId + "_" + pointerName] = pointerValue;
         }
         if (!ChatdPersist.isMasterTab()) {
             // don't do anything if this is not the master tab!
-            promise.resolve();
-            return promise;
+            return resolve();
         }
 
         self.db['ptrs'].put({
             'chatId_pointer': ChatdPersist.encrypt(chatId + "_" + pointerName),
             'value': ChatdPersist.encrypt(pointerValue)
-        })
-            .then(
-                function() {
-                    promise.resolve(arguments[0]);
-                },
-                function() {
-                    promise.reject(arguments[0]);
-                }
-            );
-
-        return promise;
-    };
+        }).then(resolve).catch(reject);
+    });
 
     /**
      * Get a pointer's value.
@@ -856,33 +586,27 @@
      * @param chatId {String}
      * @param pointerName {String}
      * @param [defaultValue] {*} What to return if that pointer is not found?
-     * @returns {MegaPromise}
+     * @returns {Promise}
      */
-    ChatdPersist.prototype.getPointer = function(chatId, pointerName, defaultValue) {
+    ChatdPersist.prototype.getPointer = promisify(function(resolve, reject, chatId, pointerName, defaultValue) {
         var self = this;
-        var promise = new MegaPromise();
 
         if (self._pointersCache && self._pointersCache[chatId + "_" + pointerName]) {
-            promise.resolve(self._pointersCache[chatId + "_" + pointerName]);
-            return promise;
+            return resolve(self._pointersCache[chatId + "_" + pointerName]);
         }
-        self._encryptedGet('ptrs', chatId + "_" + pointerName)
-            .then(
-                function(result) {
-                    promise.resolve(result.value);
-                },
-                function() {
-                    if (typeof arguments[0] === 'undefined' && defaultValue) {
-                        promise.resolve(defaultValue);
-                    }
-                    else {
-                        promise.reject(arguments[0]);
-                    }
-                }
-            );
 
-        return promise;
-    };
+        self._encryptedGet('ptrs', chatId + "_" + pointerName)
+            .then(function(result) {
+                resolve(result.value);
+            })
+            .catch(function(ex) {
+                if (ex === undefined && defaultValue) {
+                    return resolve(defaultValue);
+                }
+
+                reject(ex);
+            });
+    });
 
 
     /**
@@ -892,9 +616,8 @@
         ['MessageId', 'msgId'],
         ['OrderValue', 'orderValue'],
     ].forEach(function(meta) {
-        ChatdPersist.prototype["getMessageBy" + meta[0]] = function (chatId, val) {
+        ChatdPersist.prototype["getMessageBy" + meta[0]] = promisify(function(resolve, reject, chatId, val) {
             var self = this;
-            var promise = new MegaPromise();
             var whereObj = {};
 
             if (
@@ -907,21 +630,14 @@
             whereObj["[chatId+" + meta[1] + "]"] = [ChatdPersist.encrypt(chatId), val];
 
             self._encryptedWhere('msgs', whereObj)
-                .then(
-                    function () {
-                        if (typeof arguments[0] === 'undefined') {
-                            promise.reject(arguments[0]);
-                        }
-                        else {
-                            promise.resolve(arguments[0]);
-                        }
-                    },
-                    function () {
-                        promise.reject(arguments[0]);
+                .then(function(value) {
+                    if (value === undefined) {
+                        return reject(value);
                     }
-                );
-            return promise;
-        };
+                    resolve(value);
+                })
+                .catch(reject);
+        });
     });
 
     /**
@@ -953,15 +669,15 @@
      * @param orderValue {Number}
      * @param keyId {Number}
      * @param msgObject {String} JSON version of the Message instance
-     * @returns {MegaPromise}
+     * @returns {Promise}
      */
     ChatdPersist.prototype.addMessage = function(
         chatId, msgId, userId, orderValue, keyId, msgObject
     ) {
         var self = this;
 
-        if (!msgObject || !msgObject.toPersistableObject) {
-            return MegaPromise.resolve();
+        if (!(msgObject instanceof Message)) {
+            return Promise.resolve();
         }
 
         return self._encryptedAdd(
@@ -984,16 +700,14 @@
      * @param chatId {String}
      * @param msgObject {String} JSON version of the actual Message instance
      * @param isEdit {boolean} pass true if this is a message edit.
-     * @returns {MegaPromise}
+     * @returns {Promise}
      */
-    ChatdPersist.prototype.persistMessage = function(
-        chatId, msgObject, isEdit
-    ) {
+    ChatdPersist.prototype.persistMessage = promisify(function(resolve, reject, chatId, msgObject, isEdit) {
         var self = this;
 
         if (!ChatdPersist.isMasterTab()) {
             // don't do anything if this is not the master tab!
-            return MegaPromise.reject(EACCESS);
+            return reject(EACCESS);
         }
 
         var msgId = msgObject.messageId;
@@ -1003,14 +717,13 @@
 
         if (keyId === true || ((keyId & 0xffff0000) >>> 0) === (0xffff0000 >>> 0)) {
             self.logger.critical(".persistMessage, received a temp keyId");
-            return MegaPromise.reject(EINTERNAL);
+            return reject(EINTERNAL);
         }
 
-        var promise = new MegaPromise();
-        var args = toArray.apply(null, arguments);
+        var args = toArray.apply(null, arguments).slice(2);
 
         self.getMessageByMessageId(chatId, msgId)
-            .done(function(found) {
+            .then(function(found) {
                 assert(found.length <= 1, 'Found duplicate msgs (by msgid) in chatdPersist index.');
 
                 found = found && found.length === 1 ? found[0] : false;
@@ -1023,75 +736,57 @@
                 ) {
                     self.logger.error("Message: ", chatId, msgId, "already exists, but its assigned to different " +
                         "user:", userId, "!=", found.userId, "Halting.");
-                    promise.reject();
+                    reject();
                 }
                 else if (!isEdit) {
                     self.logger.debug("Message: ", chatId, msgId, "already exists. Its ok, ignoring.");
-                    promise.reject();
+                    reject();
                 }
                 else {
                     // this is an edit .persistMessage
                     self.db.msgs.delete(found.id)
                         .then(function() {
-                            promise.linkDoneAndFailTo(
-                                self.persistMessage.apply(self, args)
-                            );
-                        });
+                            return self.persistMessage.apply(self, args);
+                        })
+                        .then(resolve)
+                        .catch(reject);
                 }
             })
-            .fail(function(e) {
-                if (e instanceof Dexie.DexieError) {
-                    self.logger.error("Found DexieError: ", e);
-                    promise.reject();
+            .catch(function(ex) {
+                if (ex instanceof Dexie.DexieError) {
+                    self.logger.error("Found DexieError: ", ex);
+                    reject();
                 }
                 else {
-                    promise.linkDoneAndFailTo(
-                        self.addMessage(chatId, msgId, userId, orderValue, keyId, msgObject)
-                    );
+                    self.addMessage(chatId, msgId, userId, orderValue, keyId, msgObject).then(resolve).catch(reject);
                 }
             });
-        return promise;
-    };
+    });
 
     /**
      * Delete a persisted message by id or key
      *
      * @param chatId {String}
      * @param msgIdOrObj {String|Object} ID or msgObject
-     * @returns {MegaPromise}
+     * @returns {Promise}
      */
-    ChatdPersist.prototype.unpersistMessage = function(
-        chatId, msgIdOrObj
-    ) {
+    ChatdPersist.prototype.unpersistMessage = promisify(function(resolve, reject, chatId, msgIdOrObj) {
         var self = this;
 
         if (!ChatdPersist.isMasterTab()) {
             // don't do anything if this is not the master tab!
-            return;
+            return reject(EACCESS);
         }
 
         var msgId = typeof msgIdOrObj === "object" ? msgIdOrObj.messageId : msgIdOrObj;
 
-        var promise = new MegaPromise();
-
         self.getMessageByMessageId(chatId, msgId)
-            .done(function(r) {
-                self.db.msgs.delete(r.id || r[0] && r[0].id)
-                    .then(
-                        function() {
-                            promise.resolve();
-                        },
-                        function() {
-                            promise.reject();
-                        });
-
+            .then(function(r) {
+                return self.db.msgs.delete(r.id || r[0] && r[0].id);
             })
-            .fail(function() {
-                promise.reject();
-            });
-
-        return promise;
-    };
+            .then(resolve)
+            .catch(reject);
+    });
 
 
     /**
@@ -1101,7 +796,7 @@
      * @param action {String} "push", "replace" or "remove"
      * @param chatId {String}
      * @param args {Array} Array of arguments for calling .persistMessage/unpersistMessage
-     * @returns {MegaPromise|undefined}
+     * @returns {void}
      */
     ChatdPersist.prototype.persistMessageBatched = function(
         action, chatId, args
@@ -1139,24 +834,28 @@
         }
 
         if (!self._msgActionsQueuePerChat[chatId]) {
-            self._msgActionsQueuePerChat[chatId] = {
-                'actions': [],
-                'timer': null,
-                'promise': new MegaPromise()
-            };
+            self._msgActionsQueuePerChat[chatId] = [];
         }
+        self._msgActionsQueuePerChat[chatId].push([action, args]);
 
-        if (self._msgActionsQueuePerChat[chatId].timer) {
-            clearTimeout(self._msgActionsQueuePerChat[chatId]);
+        delay('chatdpersist:flush:' + chatId, function() {
+            self._flushMessageActionsQueue(chatId).always(nop);
+        }, 850);
+    };
+
+    /**
+     * Internal helper that removes the "message actions" queues.
+     *
+     * @param chatId
+     * @private
+     */
+    ChatdPersist.prototype._expungeMessageActionsQueue = function(chatId) {
+        var self = this;
+
+        if (self._msgActionsQueuePerChat[chatId]) {
+            delay.cancel('chatdpersist:flush:' + chatId);
+            delete self._msgActionsQueuePerChat[chatId];
         }
-
-        self._msgActionsQueuePerChat[chatId].timer = setTimeout(function() {
-            self._flushMessageActionsQueue(chatId);
-        }, 350);
-
-        self._msgActionsQueuePerChat[chatId].actions.push([action, arguments[2]]);
-
-        return self._msgActionsQueuePerChat[chatId].promise;
     };
 
     /**
@@ -1165,40 +864,29 @@
      * @param chatId
      * @private
      */
-    ChatdPersist.prototype._flushMessageActionsQueue = function(chatId) {
+    ChatdPersist.prototype._flushMessageActionsQueue = mutex('chatdpersist:mutex', function(resolve, reject, chatId) {
         var self = this;
         var queue = self._msgActionsQueuePerChat[chatId];
+        delete self._msgActionsQueuePerChat[chatId];
 
         if (!queue) {
             // already flushed/empty?
-            return;
+            return queueMicrotask(resolve);
         }
 
         if (!ChatdPersist.isMasterTab()) {
-            delete self._msgActionsQueuePerChat[chatId];
             // don't do anything if this is not the master tab!
-            return;
-        }
-        if (self._queueTransactionPerChat[chatId]) {
-            self._queueTransactionPerChat[chatId].always(function() {
-                self._flushMessageActionsQueue(chatId);
-            });
-            return;
+            return queueMicrotask(resolve);
         }
 
-        var queueLength = queue.actions.length;
-        delete self._msgActionsQueuePerChat[chatId];
+        var queueLength = queue.length;
 
         (function next() {
-            var queueEntry = queue.actions.shift();
+            var queueEntry = queue.shift();
 
             if (!queueEntry) {
                 self.logger.debug("Flushed message actions queue for chat %s: %d items.", chatId, queueLength);
-
-                if (queue.promise instanceof MegaPromise) {
-                    queue.promise.resolve(queueLength);
-                }
-                return;
+                return resolve();
             }
 
             if (queueEntry[0] === 'push') {
@@ -1221,7 +909,7 @@
                 next();
             }
         })();
-    };
+    });
 
     /**
      * Internal Helper method to query messages from the db.
@@ -1264,24 +952,21 @@
 
     /**
      * Internal helper method for paginating messages
-     * @param startFromOrderValue {Number} The starting (e.g. highest) orderValue number from which to go back when
+     * @param offset {Number} The starting (e.g. highest) orderValue number from which to go back when
      * paging
      * @param pageSize {Number}
      * @param chatId {String}
-     * @returns {MegaPromise}
+     * @returns {Promise}
      * @private
      */
-    ChatdPersist.prototype._paginateMessages = function(startFromOrderValue, pageSize, chatId) {
+    ChatdPersist.prototype._paginateMessages = promisify(function(resolve, reject, offset, pageSize, chatId) {
         assert(chatId, 'missing chatId, when calling _paginateMessages. Halting.');
 
         var self = this;
-
-        var promise = new MegaPromise();
-
         var messages;
         var keys = {};
         var keysThatRequireLoading = {};
-        var q = self._queryMessages(startFromOrderValue, pageSize, chatId)
+        self._queryMessages(offset, pageSize, chatId)
             .toArray()
             .then(
                 function(results) {
@@ -1302,37 +987,34 @@
                     });
 
                     self.getKeys(Object.keys(keysThatRequireLoading))
-                        .done(function (results) {
+                        .then(function(results) {
                             results.forEach(function(v) {
                                 var keyId = v.chatId_userId_keyId.split(v.userId + "_");
                                 keyId = keyId[1];
                                 keys[v.chatId_userId_keyId] = [keyId, v.key, v.userId, v.chatId_userId_keyId];
                             });
                         })
-                        .fail(function () {
+                        .catch(function() {
                             self.logger.warn("Failed to retrieve key for msgId: ", msg.msgId, msg.keyId);
                         })
                         .always(function() {
-                            promise.resolve([messages, keys]);
+                            resolve([messages, keys]);
                         });
-                },
-                function() {
-                    self.logger.error("_paginateMessages fail:", arguments);
-                    promise.reject(arguments[0]);
-                }
-            );
-
-        return promise;
-    };
+                })
+            .catch(function(ex) {
+                self.logger.error("_paginateMessages fail:", ex);
+                reject(ex);
+            });
+    });
 
     /**
      * The public method/way of retrieving chat history from chatdPersist.
      *
      * @param chatId {String}
      * @param len {Number}
-     * @returns {MegaPromise}
+     * @returns {Promise}
      */
-    ChatdPersist.prototype.retrieveChatHistory = function(chatId, len) {
+    ChatdPersist.prototype.retrieveChatHistory = promisify(function(resolve, reject, chatId, len) {
         var self = this;
 
         var waitingPromises = [];
@@ -1362,7 +1044,7 @@
 
         waitingPromises.push(
             self._paginateMessages(lastRetrOrdValue, parseInt(len, 10), chatId)
-                .done(function(response) {
+                .then(function(response) {
                     messages = response[0];
                     messages.forEach(function(msg) {
                         lownum = msg.orderValue > lownum + 1 ? msg.orderValue - 1 : lownum;
@@ -1371,6 +1053,7 @@
 
                     keys = response[1];
                 })
+                .catch(nop)
         );
 
         var lastSeen = false;
@@ -1379,17 +1062,16 @@
             // is initial...retrieve last seen, last delivered
             waitingPromises.push(
                 self.getPointer(chatId, "ls")
-                    .done(function(r) {
+                    .then(function(r) {
                         lastSeen = r;
                     })
+                    .catch(nop)
             );
         }
 
-        var masterPromise = new MegaPromise();
-
-        MegaPromise.allDone(waitingPromises).done(function() {
+        Promise.allSettled(waitingPromises).always(function() {
             if (messages && messages.length > 0) {
-                masterPromise.resolve([
+                resolve([
                     messages,
                     keys,
                     lownum,
@@ -1399,13 +1081,10 @@
             }
             else {
                 // no messages persisted?
-                masterPromise.reject();
+                resolve([]);
             }
         });
-
-
-        return masterPromise;
-    };
+    });
 
     /**
      * Calculates the lowest and highest ids for a chatId from our local db.
@@ -1415,62 +1094,25 @@
      */
     ChatdPersist.prototype.getLowHighIds = function(chatId) {
         var self = this;
-
-        var promise = new MegaPromise();
-
         var encChatId = ChatdPersist.encrypt(chatId);
-
-        var low = false;
-        var high = false;
-
-        var lowNum;
-        var highNum;
-
-        var p1 = MegaPromise.asMegaPromiseProxy(
-            self.db.msgs
-                .where('[chatId+orderValue]')
-                .between([encChatId, -Infinity], [encChatId, Infinity]).last()
-        ).then(
-                function(r) {
-                    if (r) {
-                        high = r.msgId;
-                        highNum = r.orderValue;
-                    }
-                    else {
-                        promise.reject();
-                    }
-                },
-                function() {
-                    promise.reject();
-                });
-
-        var p2 = MegaPromise.asMegaPromiseProxy(
-            self.db.msgs
-                .where('[chatId+orderValue]')
-                .between([encChatId, -Infinity], [encChatId, Infinity]).first()
-        ).then(
-                function(r) {
-                    if (r) {
-                        low = r.msgId;
-                        lowNum = r.orderValue;
-                    }
-                    else {
-                        promise.reject();
-                    }
-                },
-                function() {
-                    promise.reject();
-                });
-
-        MegaPromise.allDone([
-            p1,
-            p2,
-        ])
-            .done(function() {
-                promise.resolve([low, high, lowNum, highNum]);
-            });
-
-        return promise;
+        return new MegaPromise(function(resolve, reject) {
+            // @todo do a single DB query (?)..
+            Promise.all([
+                self.db.msgs
+                    .where('[chatId+orderValue]')
+                    .between([encChatId, -Infinity], [encChatId, Infinity]).last(),
+                self.db.msgs
+                    .where('[chatId+orderValue]')
+                    .between([encChatId, -Infinity], [encChatId, Infinity]).first()
+            ]).then(function(result) {
+                var low = result[1];
+                var high = result[0];
+                if (!(low && high)) {
+                    return reject();
+                }
+                resolve([low.msgId, high.msgId, low.orderValue, high.orderValue]);
+            }).catch(reject);
+        });
     };
 
     /**
@@ -1521,156 +1163,91 @@
      *
      * @param chatId {String}
      */
-    ChatdPersist.prototype.persistQueue = function (chatId) {
+    ChatdPersist.prototype.persistQueue = mutex('chatdpersist:mutex', function(resolve, reject, chatId) {
         var self = this;
         if (!self._queuePerChat[chatId]) {
-            return;
+            return queueMicrotask(resolve);
         }
         if (!ChatdPersist.isMasterTab()) {
             delete self._queuePerChat[chatId];
             // don't do anything if this is not the master tab!
-            return;
-        }
-        if (self._queueTransactionPerChat[chatId]) {
-            self._queueTransactionPerChat[chatId].always(function() {
-                self.persistQueue(chatId);
-            });
-            return;
+            return queueMicrotask(resolve);
         }
 
-        var promise = self._queueTransactionPerChat[chatId] = new MegaPromise();
-        self._queueTransactionPerChat[chatId].always(function() {
-            delete self._queueTransactionPerChat[chatId];
-        });
+        self.transaction(function(msgs, keys, trans) {
+            var promises = [];
+            // eslint-disable-next-line local-rules/misc-warnings
+            self._queuePerChat[chatId].forEach(function(queueEntry) {
+                if (trans.active !== true) {
+                    self.logger.error('transaction got inactive. this should never happen.');
+                    delete self._queuePerChat[chatId];
+                }
 
-        self.db.transaction('rw', self.db.msgs, self.db.keys, function(msgs, keys, trans) {
-                self._queuePerChat[chatId].forEach(function(queueEntry) {
-                    if (trans.active !== true) {
-                        self.logger.error('transaction got inactive. this should never happen.');
-                        delete self._queuePerChat[chatId];
-                    }
-
-                    if (queueEntry[0] === ChatdPersist.QUEUE_TYPE.KEY) {
-                        self.persistKey.apply(self, [chatId].concat(queueEntry[1]));
-                    }
-                    else {
-                        self.logger.error("Unknown queue type entry found in queue: ", chatId, queueEntry);
-                    }
-                });
-            })
-            .then(function() {
-                self.logger.debug(
-                    "Transaction commited for chat: ", chatId,
-                    ". Total of: ",
-                    self._queuePerChat[chatId] ? self._queuePerChat[chatId].length : '(unknown)', 'items'
-                );
-                delete self._queuePerChat[chatId];
-                promise.resolve();
-            })
-            .catch(function (error) {
-                // Log or display the error
-                self.logger.error('transaction error', error.stack || error);
-                self.onDbCrashCritical();
-                promise.reject();
+                if (queueEntry[0] === ChatdPersist.QUEUE_TYPE.KEY) {
+                    promises.push(self.persistKey.apply(self, [chatId].concat(queueEntry[1])).always(nop));
+                }
+                else {
+                    self.logger.error("Unknown queue type entry found in queue: ", chatId, queueEntry);
+                }
             });
-
-        return promise;
-    };
+            return Promise.allSettled(promises);
+        }).then(function() {
+            if (d) {
+                var len = self._queuePerChat[chatId] ? self._queuePerChat[chatId].length : '(unknown)';
+                self.logger.debug("Transaction committed for chat: %s. Total of: %s items", chatId, len);
+            }
+            delete self._queuePerChat[chatId];
+            resolve();
+        }).catch(reject);
+    });
 
     /**
      * Persist/do a truncate for a chat `chatId` with the orderValue of the message to start the truncate from is
      * `firstNumToStartFrom`
      * @param chatId {String}
      * @param firstNumToStartFrom {Number}
-     * @returns {MegaPromise}
+     * @returns {Promise}
      */
-    ChatdPersist.prototype.persistTruncate = function(chatId, firstNumToStartFrom) {
+    ChatdPersist.prototype.persistTruncate = promisify(function(resolve, reject, chatId, firstNumToStartFrom) {
         var self = this;
         if (!ChatdPersist.isMasterTab()) {
             // don't do anything if this is not the master tab!
             return MegaPromise.reject();
         }
 
-        var promise = new MegaPromise();
         var stats = {'delkeys': 0, 'delmsgs': 0, 'failmsgs': 0, 'failkeys': 0};
-        self.db.transaction('rw', self.db.msgs, self.db.keys, function(msgs, keys, trans) {
-                // TODO: This code would cause issues, because clients may re-use keys, from older messages,
-                // which this code would delete, since they were before the truncate msgnum
-                // self._paginateMessages(firstNumToStartFrom, Infinity, chatId)
-                //     .done(function(response) {
-                //         var keys = response[1];
-                //         delete response;
-                //         Object.keys(keys).forEach(function(k) {
-                //             var keyMeta = keys[k];
-                //             self.logger.debug('deleting key: ', keyMeta[3]);
-                //             self.db.keys.delete(ChatdPersist.encrypt(keyMeta[3]))
-                //                 .then(function() {
-                //                         stats['delkeys']++;
-                //                     },
-                //                     function() {
-                //                         stats['failkeys']++;
-                //                     });
-                //         });
-                //     });
-
-                var delpromise = self._queryMessages(firstNumToStartFrom, Infinity, chatId)
-                    .eachPrimaryKey(function(pk) {
-                        self.db.msgs.delete(pk)
-                            .then(
-                                function() {
-                                    stats['delmsgs']++;
-                                },
-                                function() {
-                                    stats['failmsgs']++;
-                                }
-                            );
-
-                    });
-
-                return delpromise;
-            })
-            .then(function() {
-                self.logger.debug(
-                    "Truncate Transaction commited (" + chatId + "). Stats: " + JSON.stringify(stats, null, 4, '\t')
-                );
-                promise.resolve();
-            })
-            .catch(function (error) {
-                // Log or display the error
-                self.logger.error('transaction error', error.stack || error);
-                self.onDbCrashCritical();
-                promise.reject();
-            });
-
-
-        var chatRoom = self.chatd.megaChat.getChatById(chatId);
-        if (chatRoom && chatRoom.type !== "public") {
-            promise.always(function() {
-
-                if (
-                    chatRoom &&
-                    chatRoom.messagesBuff.isDecrypting &&
-                    chatRoom.messagesBuff.isDecrypting.state() === 'pending'
-                ) {
-                    chatRoom.messagesBuff.isDecrypting.done(function() {
-                        Soon(function() {
-                            self._cleanupMessagesAfterTruncate(chatId, firstNumToStartFrom);
+        self.transaction(function() {
+            return self._queryMessages(firstNumToStartFrom, Infinity, chatId)
+                .eachPrimaryKey(function(pk) {
+                    self.db.msgs.delete(pk)
+                        .then(function() {
+                            stats.delmsgs++;
+                        })
+                        .catch(function() {
+                            stats.failmsgs++;
                         });
-                    });
-                }
-                else {
-                    self._cleanupMessagesAfterTruncate(chatId, firstNumToStartFrom);
-                }
-            });
-        }
-
-        return promise;
-    };
+                });
+        }).then(function() {
+            if (d) {
+                self.logger.debug("Truncate Transaction committed for %s, stats: %o", chatId, stats);
+            }
+        }).catch(function(ex) {
+            self.logger.warn(ex);
+        }).then(function() {
+            var chatRoom = self.chatd.megaChat.getChatById(chatId);
+            return chatRoom && chatRoom.messagesBuff.isDecrypting;
+        }).always(function() {
+            onIdle(resolve);
+            // if all messages are from chatdPersist, chatd's buf would be empty,
+            // but messagesBuff would still contain messages to be removed.
+            self._cleanupMessagesAfterTruncate(chatId, firstNumToStartFrom);
+        });
+    });
 
     ChatdPersist.prototype._cleanupMessagesAfterTruncate = function(chatId, firstNumToStartFrom) {
         var self = this;
         var chatRoom = self.chatd.megaChat.getChatById(chatId);
-        var editedMessage = chatRoom.messagesBuff.getByOrderValue(firstNumToStartFrom);
+        var editedMessage = chatRoom && chatRoom.messagesBuff.getByOrderValue(firstNumToStartFrom);
         if (editedMessage) {
             editedMessage.dialogType = 'truncated';
             editedMessage.textContents = "";
@@ -1683,7 +1260,7 @@
             chatRoom.messagesBuff.messages.replace(editedMessage.messageId, editedMessage);
 
 
-            var messageKeys = chatRoom.messagesBuff.messages.keys();
+            var messageKeys = clone(chatRoom.messagesBuff.messages.keys());
 
             for (var i = 0; i < messageKeys.length; i++) {
                 var v = chatRoom.messagesBuff.messages[messageKeys[i]];
@@ -1699,93 +1276,57 @@
         }
     };
 
-    ChatdPersist.prototype.clearChatHistoryForChat = function(chatId) {
+    ChatdPersist.prototype.clearChatHistoryForChat = mutex('chatdpersist:mutex', function(resolve, reject, chatId) {
         var self = this;
         if (!ChatdPersist.isMasterTab()) {
             // don't do anything if this is not the master tab!
-            return MegaPromise.reject();
+            return queueMicrotask(reject);
         }
 
-        if (self._queueTransactionPerChat[chatId]) {
-            self._queueTransactionPerChat[chatId].always(function() {
-                self.clearChatHistoryForChat(chatId);
-            });
-
-            return;
-        }
-
-        if (self._msgActionsQueuePerChat[chatId]) {
-            if (self._msgActionsQueuePerChat[chatId].timer) {
-                clearTimeout(self._msgActionsQueuePerChat[chatId].timer);
-            }
-            delete self._msgActionsQueuePerChat[chatId];
-        }
         if (self._queuePerChat[chatId]) {
             // ensure the queue is ready.
             delete self._queuePerChat[chatId];
         }
+        self._expungeMessageActionsQueue(chatId);
 
-        var promise = new MegaPromise();
-        self.db.transaction('rw', self.db.msgs, self.db.keys, function(msgs, keys, trans) {
-                var delpromise = self._queryMessages(0, Infinity, chatId)
-                    .eachPrimaryKey(function(pk) {
-                        self.db.msgs.delete(pk);
-                    });
-
-                return delpromise;
-            })
-            .then(function() {
-                self.logger.debug("clearChatHistoryForChat Transaction commited.");
-                promise.resolve();
-            })
-            .catch(function (error) {
-                // Log or display the error
-                self.logger.error('clearChatHistoryForChat transaction error', error.stack || error);
-                self.onDbCrashCritical();
-                promise.reject();
-            });
-
-        promise.always(function() {
+        self.transaction(function() {
+            return self._queryMessages(0, Infinity, chatId)
+                .eachPrimaryKey(function(pk) {
+                    self.db.msgs.delete(pk);
+                });
+        }).then(function() {
+            self.logger.debug("clearChatHistoryForChat Transaction commited.");
+        }).catch(function(ex) {
+            self.logger.debug('clearChatHistoryForChat transaction error', ex);
+        }).then(function() {
             var chatRoom = self.chatd.megaChat.getChatById(chatId);
-            var messageKeys = chatRoom.messagesBuff.messages.keys();
+            var messageKeys = clone(chatRoom.messagesBuff.messages.keys());
 
             for (var i = 0; i < messageKeys.length; i++) {
                 var v = chatRoom.messagesBuff.messages[messageKeys[i]];
                 chatRoom.messagesBuff.messages.removeByKey(v.messageId);
             }
+            self._expungeMessageActionsQueue(chatId);
+        }).always(resolve);
+    });
 
-            if (self._msgActionsQueuePerChat[chatId]) {
-                if (self._msgActionsQueuePerChat[chatId].timer) {
-                    clearTimeout(self._msgActionsQueuePerChat[chatId].timer);
-                }
-                // ensure the queue is ready.
-                delete self._msgActionsQueuePerChat[chatId];
-            }
-        });
-
-        return promise;
-    };
-
-    ChatdPersist.prototype.retrieveAndLoadKeysFor = function(chatId, userId, keyId) {
+    ChatdPersist.prototype.retrieveAndLoadKeysFor = promisify(function(resolve, reject, chatId, userId, keyId) {
         var self = this;
-        var promise = new MegaPromise();
 
         if (keyId === 0) {
-            return promise.resolve();
+            return resolve();
         }
 
-        self.chatd.chatdPersist.getKey(
-            chatId,
-            userId,
-            keyId
-            )
-            .done(function (key) {
-                var keysArr = [{
-                    userId: key.userId,
-                    keyid: keyId,
-                    keylen: key.key.length,
-                    key: key.key
-                }];
+        self.chatd.chatdPersist.getKey(chatId, userId, keyId)
+            .then(function(key) {
+                var keysArr = [
+                    {
+                        userId: key.userId,
+                        keyid: keyId,
+                        keylen: key.key.length,
+                        key: key.key
+                    }
+                ];
 
                 self.chatd.trigger('onMessageKeysDone', {
                     chatId: chatId,
@@ -1793,9 +1334,9 @@
                     chatdPersist: true
                 });
 
-                promise.resolve();
+                resolve();
             })
-            .fail(function (e) {
+            .catch(function() {
                 if (d) {
                     console.error("Failed to retrieve key for retrieveAndLoadKeysFor", [
                         chatId,
@@ -1803,11 +1344,9 @@
                         keyId
                     ]);
                 }
-                promise.reject();
+                reject();
             });
-
-        return promise;
-    };
+    });
 
     ChatdPersist.prototype.modifyPersistedMessage = function(chatId, messageInfo) {
         var self = this;
@@ -1815,68 +1354,83 @@
         var chatRoom = self.chatd.megaChat.getChatById(chatId);
 
         self.getMessageByMessageId(chatId, messageInfo.messageId)
-            .fail(function(e) {
-                if (d) {
-                    console.error(
-                        "Failed to apply message update to msgId:", chatId, messageInfo.messageId, messageInfo
-                    );
-                }
-            })
-            .done(function(r) {
+            .then(function(r) {
                 var msg = r[0];
                 if (!msg) {
-                    if (d) {
-                        console.error(
-                            "Failed to apply message update to msgId:", chatId, messageInfo.messageId, messageInfo
-                        );
-                    }
-                    return;
+                    throw new Error('No message.');
                 }
 
-
-                chatRoom.protocolHandler.decryptFrom(
+                return chatRoom.protocolHandler.decryptFrom(
                     messageInfo.message,
                     messageInfo.userId,
                     messageInfo.keyid,
                     false
-                )
-                    .fail(function(e) {
-                        if (d) {
-                            console.error(
-                                "Failed to decrypt and apply message update to msgId:",
-                                chatId,
-                                messageInfo.messageId,
-                                messageInfo
-                            );
-                        }
-                    })
-                    .done(function(decrypted) {
-                        if (decrypted) {
-                            var msgInstance =  new Message(
-                                chatRoom,
-                                self,
-                                {
-                                    'messageId': msg.msgId,
-                                    'userId': msg.userId,
-                                    'keyid': msg.keyId,
-                                    'message': messageInfo.message,
-                                    'delay': msg.msgObject.delay,
-                                    'orderValue': msg.orderValue,
-                                    'updated': messageInfo.updated,
-                                    'sent': messageInfo.sent
-                                }
-                            );
+                );
+            })
+            .then(function(r) {
+                var msgInstance = new Message(
+                    chatRoom,
+                    self,
+                    {
+                        'messageId': msg.msgId,
+                        'userId': msg.userId,
+                        'keyid': msg.keyId,
+                        'message': messageInfo.message,
+                        'delay': msg.msgObject.delay,
+                        'orderValue': msg.orderValue,
+                        'updated': messageInfo.updated,
+                        'sent': messageInfo.sent,
+                        '_reactions': messageInfo._reactions,
+                        '_queuedReactions': messageInfo._queuedReactions
+                    }
+                );
 
-                            self.chatd.megaChat.plugins.chatdIntegration._processDecryptedMessage(
-                                chatRoom,
-                                msgInstance,
-                                decrypted
-                            );
+                if (!self.chatd.megaChat.plugins.chatdIntegration._processDecryptedMessage(chatRoom, msgInstance, r)) {
+                    throw new Error('Failed to decrypt message.');
+                }
 
-                            self.persistMessage(chatId, msgInstance, true);
-                        }
-                    });
+                return self.persistMessage(chatId, msgInstance, true);
+            })
+            .then(dump)
+            .catch(function(ex) {
+                self.logger.error("Failed to apply message update", chatId, messageInfo.messageId, messageInfo, ex);
             });
+    };
+
+    /**
+     * Persist message's reactions.
+     * @param {Message} message The message instance
+     * @returns {Promise} whether succeeded
+     */
+    ChatdPersist.prototype.modifyPersistedReactions = function(message) {
+        var self = this;
+        return new Promise(function(resolve, reject) {
+            assert(message instanceof Message, 'Not a message instance.');
+            const chatId = message.chatRoom.chatId;
+            self.getMessageByMessageId(chatId, message.messageId)
+                .then(function(r) {
+                    if (r && r[0]) {
+                        assert(r[0].msgId === message.messageId, 'Unexpected message.');
+                        r[0].msgObject._reactions = message._reactions;
+                        self.persistMessageBatched(
+                            "replace",
+                            chatId,
+                            [undefined, Message.fromPersistableObject(megaChat.getChatById(chatId), r[0])]
+                        );
+                        return r[0].msgId;
+                    }
+                })
+                .then(resolve)
+                .catch(function(ex) {
+                    if (Array.isArray(ex) && !ex.length) {
+                        self.logger.debug('Message is not yet persisted, deferring saving reactions...', message);
+                        return resolve();
+                    }
+
+                    self.logger.error('Cannot persist message reactions...', ex);
+                    reject(ex);
+                });
+        });
     };
 
     /**
@@ -1892,7 +1446,7 @@
         promises.push(MegaPromise.asMegaPromiseProxy(self.db.ptrs.clear()));
 
         return MegaPromise.allDone(promises)
-            .done(function() {
+            .then(function() {
                 if (localStorage.chatdPersistDebug) {
                     console.warn('ChatdPersist.clear finished.');
                 }
@@ -1902,21 +1456,10 @@
     /**
      * Drop the current indexedDB
      *
-     * @returns {MegaPromise}
+     * @returns {Promise}
      */
     ChatdPersist.prototype.drop = function() {
-        var self = this;
-        return MegaPromise.asMegaPromiseProxy(self.db.delete());
-    };
-
-    /**
-     * Basically same as .drop, but can be called without ChatdPersist to be initialized (e.g. if its
-     * disabled, because of IDB crash).
-     *
-     * @returns {MegaPromise}
-     */
-    ChatdPersist.forceDrop = function() {
-        return MegaPromise.asMegaPromiseProxy(Dexie.delete("$ctdb_" + u_handle + "_" + "chatd_" + VERSION));
+        return this.hasOwnProperty('db') ? this.db.delete() : Promise.resolve();
     };
 
     [
@@ -1931,14 +1474,11 @@
         "retrieveChatHistory",
         "getLowHighIds",
         "haveChatHistory",
+        "transaction",
         "clear"
     ]
         .forEach(function(methodName) {
             var origFunc = ChatdPersist.prototype[methodName];
-            if (is_karma) {
-                ChatdPersist.prototype["_" + methodName] = origFunc;
-            }
-
             ChatdPersist.prototype[methodName] = ChatdPersist._requiresDbReady(origFunc, methodName);
         });
 
@@ -1948,7 +1488,7 @@
                 return;
             }
             megaChat.plugins.chatdIntegration.chatd.chatdPersist._paginateMessages(0, 99999, chatRoom.chatId)
-                .done(function(r) {
+                .then(function(r) {
                     var foundErrors = false;
                     var orderValues = {};
                     var prevOrderValue = false;
@@ -1995,7 +1535,8 @@
                             msgs.length, "messages"
                         );
                     }
-                });
+                })
+                .catch(dump);
         });
     };
 

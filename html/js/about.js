@@ -9,23 +9,36 @@ var aboutus = {
         // Cache selectors
         var $page = $('.bottom-page.scroll-block.about', 'body');
 
+        this.fetchCMS();
+
         aboutus.openSubSection($page);
-        this.randomMemberOrderMix($page);
-        if (page === 'about/main') {
-            this.dynamicCount($page);
+    },
+
+    fetchCMS: function() {
+        "use strict";
+
+        if (this.members) {
+            this.insMembersInHTML(this.members);
+        }
+        else {
+            var self = this;
+            M.xhr({ url: (localStorage.cms || "https://cms2.mega.nz/") + "unsigned/team_en", type: 'json' })
+                .then(function(ev, members) {
+                    self.members = members;
+                    self.insMembersInHTML(members);
+                });
         }
     },
 
     /**
      * Show blocks related to subpage name
      * @param {Object} $page The jQuery selector for the current page
-     * @param {Scring} subsection Subsection name to show
+     * @param {String} subsection Subsection name to show
      * @returns {void}
      */
     showSubsectionContent: function($page, subsection) {
         "use strict";
 
-        loadSubPage('/about/' + subsection);
 
         $('.about.main-menu.item.active', $page).removeClass('active');
         $('.about.main-menu.item.about-' + subsection, $page).addClass('active');
@@ -55,62 +68,86 @@ var aboutus = {
         }
         else {
             subsection = 'main';
+            this.dynamicCount($page);
         }
 
         aboutus.showSubsectionContent($page, subsection);
 
         // Init main menu click
         $('.about.main-menu.item', $page).rebind('click.about', function() {
-            aboutus.showSubsectionContent($page, $(this).data('page'));
+            loadSubPage('/about/' + $(this).data('page'));
         });
-    },
-
-    /**
-     * Lets mix order of memebers list
-     * @param {Object} $page The jQuery selector for the current page
-     * @returns {void}
-     */
-    randomMemberOrderMix: function($page) {
-
-        "use strict";
-
-        var $aboutMember = $('.about.members', $page);
-        var $randomed = $aboutMember.children().sort(function() {
-            return 0.5 - Math.random();
-        });
-
-        for (var i = 0; i < $randomed.length; i++) {
-            $aboutMember[0].appendChild($randomed[i]);
-        }
     },
 
     dynamicCount: function($page) {
 
         "use strict";
 
-        loadingDialog.show();
+        var fillStats = function(muser, dactive, bfiles, mcountries) {
+            // Locale of million and biliion will comes
+            $('.about-register-count .num span', $page).text(muser);
+            $('.about-daily-active .num span', $page).text(dactive);
+            $('.about-files-count .num span', $page).text(bfiles);
+            $('.about-mega-countries .num span', $page).text(mcountries);
+        };
+        var self = this;
 
-        api_req({a: "dailystats"}, {
-            callback: function(res) {
+        if (this.aboutStats && (new Date() - this.aboutStats.aboutStatsTime < 36e5)) {
+            fillStats(
+                this.aboutStats.muser,
+                this.aboutStats.dactive,
+                this.aboutStats.bfiles,
+                this.aboutStats.mcountries);
+        }
+        else {
+            loadingDialog.show();
 
-                loadingDialog.hide();
+            api_req({ a: "dailystats" }, {
+                callback: function(res) {
 
-                var muser = 175;
-                var dactive = 10;
-                var bfiles = 75;
-                var mcountries = 200;
+                    loadingDialog.hide();
 
-                if (typeof res === 'object') {
-                    muser = res.confirmedusers.total / 1000000 | 0;
-                    bfiles = res.files.total / 1000000000 | 0;
+                    var muser = 175;
+                    var dactive = 10;
+                    var bfiles = 75;
+                    var mcountries = 200;
+
+                    if (typeof res === 'object') {
+                        muser = res.confirmedusers.total / 1000000 | 0;
+                        bfiles = res.files.total / 1000000000 | 0;
+                    }
+
+                    fillStats(muser, dactive, bfiles, mcountries);
+                    self.aboutStats = {
+                        muser: muser,
+                        dactive: dactive,
+                        bfiles: bfiles,
+                        mcountries: mcountries,
+                        aboutStatsTime: new Date()
+                    };
                 }
+            });
+        }
+    },
 
-                // Locale of million and biliion will comes
-                $('.about-register-count .num span', $page).text(muser);
-                $('.about-daily-active .num span', $page).text(dactive);
-                $('.about-files-count .num span', $page).text(bfiles);
-                $('.about-mega-countries .num span', $page).text(mcountries);
-            }
+    insMembersInHTML: function(members) {
+        'use strict';
+        members.sort(function() {
+            return 0.5 - Math.random();
         });
+        var aboutContent = '';
+        var memPhoto;
+        var cmsUrl = CMS.getUrl();
+        for (var i = members.length; i--;) {
+            memPhoto = (members[i].photo || '').replace(/(?:{|%7B)cmspath(?:%7D|})/, cmsUrl);
+            aboutContent +=
+                '<div class="bottom-page inline-block col-6 fadein">' +
+                '<img class="shadow" src="' + escapeHTML(memPhoto)
+                + '" alt="' + escapeHTML(members[i].name) + '">' +
+                '<span class="bold">' + escapeHTML(members[i].name) + '</span>' +
+                '<span>' + escapeHTML(members[i].role) + '</span>' +
+                '</div>';
+        }
+        $('.members', '.bottom-page').safeHTML(aboutContent);
     }
 };

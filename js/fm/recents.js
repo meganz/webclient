@@ -75,34 +75,16 @@ function RecentsRender() {
 
     this._actionChildren = {};
 
-    if (!localStorage.recentsDays) {
-        localStorage.recentsDays = 90;
-    }
-    if (!localStorage.recentsNodeLimit) {
-        localStorage.recentsNodeLimit = 10000;
-    }
-    this._defaultRangeTimestamp = Math.floor((Date.now() - (localStorage.recentsDays * 86400000)) / 1000); // 90 days
-    this._defaultRangeLimit = localStorage.recentsNodeLimit;
+    var recentsDays = parseInt(localStorage.recentsDays) || 90;
+    var recentsNodeLimit = parseInt(localStorage.recentsNodeLimit) || 10000;
+
+    this._defaultRangeTimestamp = Math.floor((Date.now() - recentsDays * 86400000) / 1000); // 90 days
+    this._defaultRangeLimit = recentsNodeLimit;
 
     var self = this;
 
     // Init Dependencies
-    if (!window.fmShortcuts) {
-        window.fmShortcuts = new FMShortcuts();
-    }
-
-    if (!window.selectionManager) {
-        window.selectionManager = new SelectionManager(
-            this.$container,
-            $.selected && $.selected.length > 0
-        );
-
-        if ($.selected) {
-            $.selected.forEach(function(h) {
-                selectionManager.add_to_selection(h);
-            });
-        }
-    }
+    M.initShortcutsAndSelection(this.$container);
 
     // Default click handlers
     this.$container.rebind("click contextmenu", function(e) {
@@ -121,6 +103,10 @@ function RecentsRender() {
 RecentsRender.prototype.render = function(limit, until, forceInit) {
     'use strict';
     var self = this;
+
+    if (M.currentdirid !== "recents") {
+        return;
+    }
 
     // Switch to recents panel.
     M.onSectionUIOpen('recents');
@@ -368,9 +354,16 @@ RecentsRender.prototype.handleByUserHandle = function($newRow, action) {
     var self = this;
     var user = M.getUserByHandle(action.user);
     var $userNameContainer = $newRow.find(".file-name .action-user-name");
+
     $userNameContainer
         .removeClass("hidden")
-        .text(user.name)
+        .text(M.getNameByHandle(action.user) || l[24061])
+
+    if (!user.h) {
+        // unknown/deleted contact, no business here...
+        return;
+    }
+    $userNameContainer
         .attr('id', user.h)
         .rebind("contextmenu", function(e) {
             self.markSelected($userNameContainer, $newRow);
@@ -387,7 +380,9 @@ RecentsRender.prototype.handleByUserHandle = function($newRow, action) {
             return false;
         })
         .rebind("dblclick", function() {
-            M.openFolder(user.h);
+            if (user.h) {
+                M.openFolder(user.h);
+            }
             return false;
         });
 };
@@ -466,8 +461,6 @@ RecentsRender.prototype.generateRow = function (action, actionId) {
         $newRow.find(".action-icon.tiny-icon").removeClass("top-arrow").addClass("refresh");
     }
 
-
-
     if (action.type === "media" && action.length > 1) {
         this._renderMedia($newRow, action, actionId);
     } else {
@@ -494,10 +487,29 @@ RecentsRender.prototype._renderFiles = function($newRow, action, actionId) {
     var self = this;
     var isCreated = action.action === "added";
     var isOtherUser = action.user !== u_handle;
+    var $icon = $(".medium-file-icon", $newRow);
+    var iconClass = fileIcon(action[0]);
 
     // handle icon
-    var $icon = $newRow.find(".medium-file-icon");
-    $icon.addClass(fileIcon(action[0]));
+    $icon.addClass(iconClass);
+
+    if (action.length === 1 && (iconClass === 'image' && is_image2(action[0]) ||
+        iconClass === 'video' && is_video(action[0]) || iconClass === 'pdf')) {
+
+        $icon.addClass('thumb').safeHTML('<img>');
+
+        if (M.d[action[0].h]) {
+            M.d[action[0].h].seen = true;
+        }
+        action[0].seen = true;
+
+        if (iconClass === 'video') {
+            $icon.safeAppend(
+                '<div class="video-thumb-details">' +
+                    '<i class="small-icon small-play-icon"></i>' +
+                '</div>');
+        }
+    }
 
     // handle filename.
     var $fileName = $newRow.find(".file-name");
@@ -530,7 +542,7 @@ RecentsRender.prototype._renderFiles = function($newRow, action, actionId) {
         .replace("%2", action.length - 1)
         .replace("%3", '<span class="link action-user-name"></span>')
         .replace("[A]", '<span class="link more-less-toggle">')
-        .replace("[/A]", '<i class="small-icon icons-sprite gray-arrow"/></span>');
+        .replace("[/A]", '<i class="small-icon icons-sprite gray-arrow"></i></span>');
 
     $fileName.safeHTML(titleString);
 
@@ -694,6 +706,8 @@ RecentsRender.prototype._renderMedia = function($newRow, action, actionId) {
     var mediaCounts = self._countMedia(action);
     var videos = mediaCounts.videos;
     var images = mediaCounts.images;
+    var pdfs = mediaCounts.pdfs;
+
     // Create & append new image container, fire async method to collect thumbnail.
     var renderThumb = function(i) {
         return new Promise(function (resolve) {
@@ -725,6 +739,14 @@ RecentsRender.prototype._renderMedia = function($newRow, action, actionId) {
 
             if (M.d[node.h]) {
                 M.d[node.h].seen = true;
+
+                if (M.d[node.h].shares && M.d[node.h].shares.EXP) {
+                    $newThumb.addClass('linked');
+                }
+            }
+
+            if (!node.t && node.tvf) {
+                $newThumb.addClass('versioning');
             }
             node.seen = true;
 
@@ -735,6 +757,9 @@ RecentsRender.prototype._renderMedia = function($newRow, action, actionId) {
                 if (node && node.data && node.data.playtime) {
                     $newThumb.find('.video-thumb-details span').text(secondsToTimeShort(node.data.playtime));
                 }
+            }
+            else if (fileIcon(node) === 'pdf') {
+                $(".block-view-file-type", $newThumb).removeClass("image").addClass("pdf");
             }
 
             var $contextMenuHandle = $newThumb.find(".file-settings-icon");
@@ -817,41 +842,28 @@ RecentsRender.prototype._renderMedia = function($newRow, action, actionId) {
     var $title = $newRow.find(".file-name");
     var $titleString;
 
-    var makeTitle = function (selfString, createdByString, modifiedByString) {
+    var makeTitle = function() {
+
+        var numOfFiles = images + videos + pdfs;
+        var currentStringSet = [l[7470].replace('%d', '%1'), l[24059], l[24060]];
+
         if (isOtherUser) {
             if (isCreated) {
-                $titleString = createdByString;
+                $titleString = currentStringSet[1];
             } else {
-                $titleString = modifiedByString;
+                $titleString = currentStringSet[2];
             }
             $titleString = $titleString
                 .replace("%3", '<span class="link action-user-name"></span>')
                 .replace("[A]", '<span class="link title">')
                 .replace("[/A]", '</span>');
         } else {
-            $titleString = '<span class="link title">' + selfString + '</span>';
+            $titleString = '<span class="link title">' + currentStringSet[0] + '</span>';
         }
-        return $titleString.replace("%1", images).replace("%2", videos);
+        return $titleString.replace("%1", numOfFiles);
     };
 
-    if (images > 1 && videos > 1) {
-        $titleString = makeTitle(l[19947], l[19945], l[19946]);
-    }
-    else if (images > 1 && videos === 1) {
-        $titleString = makeTitle(l[19948], l[19949], l[19950]);
-    }
-    else if (images === 1 && videos > 1) {
-        $titleString = makeTitle(l[19951], l[19952], l[19953]);
-    }
-    else if (images === 1 && videos === 1) {
-        $titleString = makeTitle(l[19954], l[19955], l[19956]);
-    }
-    else if (images > 0) {
-        $titleString = makeTitle(l[19960], l[19961], l[19962]);
-    }
-    else if (videos > 0) {
-        $titleString = makeTitle(l[19957], l[19958], l[19959]);
-    }
+    $titleString = makeTitle();
     $title.safeHTML($titleString);
 
     // Attach title click to open folder.
@@ -869,8 +881,19 @@ RecentsRender.prototype._renderMedia = function($newRow, action, actionId) {
     if (images === 0) {
         $frontIcon.removeClass("image").addClass("video");
     }
-    if (videos > 0) {
+
+    if (videos === 0) {
+        $frontIcon.removeClass('video').addClass('pdf');
+    }
+    else {
         $rearIcon.removeClass("image").addClass("video");
+    }
+
+    if (pdfs === 0) {
+        $frontIcon.removeClass('pdf').addClass('image');
+    }
+    else {
+        $rearIcon.removeClass("image").addClass("pdf");
     }
 
     // Attach resize listener to the image block.
@@ -948,13 +971,24 @@ RecentsRender.prototype._countMedia = function(action) {
     'use strict';
     var counts = {
         images: 0,
-        videos: 0
+        videos: 0,
+        pdfs: 0
     };
-    for (var nodeIndex = 0; nodeIndex < action.length; nodeIndex++) {
-        if (is_image(action[nodeIndex])) {
-            counts.images += 1;
-        } else {
-            counts.videos += 1;
+
+    for (var idx = action.length; idx--;) {
+        var n = action[idx];
+
+        if (is_video(n)) {
+            counts.videos++;
+        }
+        else if (is_image3(n)) {
+            counts.images++;
+        }
+        else if (fileIcon(n) === 'pdf') {
+            counts.pdfs++;
+        }
+        else if (d) {
+            console.warn('What is this?...', n);
         }
     }
     return counts;
@@ -1156,6 +1190,7 @@ RecentsRender.prototype._updateState = function(actions) {
 
     var removed = [];
     var added = [];
+    var removedAsExpanded = [];
     var newActionIdMap = {};
     var i;
     var k;
@@ -1186,6 +1221,12 @@ RecentsRender.prototype._updateState = function(actions) {
             delete this._renderCache[action.id];
             delete this._renderFunctions[action.id];
             delete this.actionIdMap[action.id];
+
+            // If this is expaned action and it is about to removed, save states with ts.
+            if (this._expandedStates[action.id]) {
+                removedAsExpanded.push(action.ts);
+            }
+
             this._dynamicList.remove(action.id);
             if (this._actionChildren[action.id]) {
                 for (k = 0; k < this._actionChildren[action.id].length; k++) {
@@ -1200,7 +1241,7 @@ RecentsRender.prototype._updateState = function(actions) {
     }
 
     if (stateChanged) {
-        this._applyStateChange(added, removed);
+        this._applyStateChange(added, removed, removedAsExpanded);
     }
 };
 
@@ -1210,7 +1251,7 @@ RecentsRender.prototype._updateState = function(actions) {
  * @param removed
  * @private
  */
-RecentsRender.prototype._applyStateChange = function(added, removed) {
+RecentsRender.prototype._applyStateChange = function(added, removed, removedAsExpanded) {
     'use strict';
     var action;
     var i;
@@ -1225,6 +1266,14 @@ RecentsRender.prototype._applyStateChange = function(added, removed) {
     // Inject new actions.
     var handled = 0;
     i = 0;
+
+    var currentScrollTop = this._dynamicList.getScrollTop();
+
+    var keepExpanded = function(id) {
+        $('.toggle-expanded-state', '.action-' + id).trigger('click');
+        this._dynamicList.scrollToYPosition(currentScrollTop);
+    };
+
     while (i < actions.length && handled < added.length) {
         action = actions[i];
         if (added[handled].ts > action.ts) {
@@ -1240,6 +1289,11 @@ RecentsRender.prototype._applyStateChange = function(added, removed) {
             actions.splice(pos, 0, added[handled]);
             this._populateNodeActionMap(added[handled]);
             this._dynamicList.insert(after, added[handled].id);
+
+            if (removedAsExpanded.indexOf(added[handled].ts) > -1) {
+                onIdle(keepExpanded.bind(this, added[handled].id));
+            }
+
             handled++;
         }
         i++;

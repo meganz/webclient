@@ -88,5 +88,6 @@
     'chat-message',
     'achievements',
     'quota',
-    'account-inactive'
+    'account-inactive',
+    'referral-program'
 ]);

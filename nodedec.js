@@ -538,7 +538,6 @@ function base64urlencode(data) {
     return (r ? enc.slice(0, r - 3) : enc);
 }
 
-// b64 is also used by mega.js fetchfchunked()!
 var b64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_=";
 var b64a = b64.split('');
 
@@ -784,6 +783,9 @@ function MegaNode(node) {
         return Object(node || null);
     }
     Object.assign(this, node);
+
+    // XXX: While setPrototypeOf() did seem faster, it does increases mem usage by ~1GB for 1M-nodes account..(v8 bug?)
+    // return Object.setPrototypeOf(node, MegaNode.prototype);
 }
 
 MegaNode.prototype = Object.create(null, {

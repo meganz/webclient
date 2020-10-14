@@ -25,7 +25,7 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
 
     this.megaChat = megaChat;
 
-    MegaDataObject.attachToExistingJSObject(
+    MegaDataObject.call(
         this,
         {
             state: null,
@@ -51,8 +51,7 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
             archivedSelected: false,
             showArchived: false,
             observers: 0
-        },
-        true
+        }
     );
 
     this.roomId = roomId;
@@ -75,7 +74,7 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
 
     this.callRequest = null;
     this.shownMessages = {};
-
+    this.activeSearches = 0;
     self.members = {};
 
     if (type === "private") {
@@ -121,19 +120,23 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
     // Events
     if (d) {
         this.rebind('onStateChange.chatRoomDebug', function(e, oldState, newState) {
-            self.logger.debug("Will change state from: ",
-                ChatRoom.stateToText(oldState), " to ", ChatRoom.stateToText(newState)
+            self.logger.debug(
+                "Will change state from: ",
+                ChatRoom.stateToText(oldState),
+                " to ",
+                ChatRoom.stateToText(newState)
             );
         });
     }
 
     self.rebind('onStateChange.chatRoom', function(e, oldState, newState) {
-        if (newState === ChatRoom.STATE.READY) {
-            if (!self.isReadOnly() && self.chatd && self.isOnline() && self.chatIdBin) {
-                // this should never happen, but just in case...
-                self.getChatIdMessages().resend();
-            }
-            self.loadContactNames();
+        if (newState === ChatRoom.STATE.READY && !self.isReadOnly()
+            && self.chatd && self.isOnline() && self.chatIdBin) {
+
+            // this should never happen, but just in case...
+            var cim = self.getChatIdMessages();
+            cim.restore();
+            cim.resend();
         }
     });
 
@@ -299,7 +302,7 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
         }
         else {
             var contact = M.u[eventData.userId];
-            if (contact && contact.addChangeListener && contact.removeChangeListener) {
+            if (contact instanceof MegaDataMap) {
                 if (eventData.priv === 255 || eventData.priv === -1) {
                     if (contact._onMembUpdUIListener) {
                         contact.removeChangeListener(contact._onMembUpdUIListener);
@@ -350,42 +353,34 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
         }
     });
 
-    self.rebind('onCallParticipantsUpdated.chatRoom', function (e, userid, clientid, participants) {
-        self.callParticipantsUpdated();
-    });
+    self.rebind('onClientLeftCall.chatRoom', () => self.callParticipantsUpdated());
+    self.rebind('onClientJoinedCall.chatRoom', () => self.callParticipantsUpdated());
+    self.rebind('onCallParticipantsUpdated.chatRoom', () => self.callParticipantsUpdated());
 
+    self.initialMessageHistLoaded = false;
 
-    self.rebind('onClientLeftCall.chatRoom', self.callParticipantsUpdated.bind(self));
-    self.rebind('onClientJoinedCall.chatRoom', self.callParticipantsUpdated.bind(self));
+    var timer = null;
+    var _historyIsAvailable = (ev) => {
+        self.initialMessageHistLoaded = ev ? true : -1;
 
-    self.initialMessageHistLoaded = new MegaPromise();
-    self._initialMessageHistLoadedTimer = null;
-    self.initialMessageHistLoaded.always(function() {
+        clearTimeout(timer);
         self.unbind('onMarkAsJoinRequested.initHist');
         self.unbind('onHistoryDecrypted.initHist');
         self.unbind('onMessagesHistoryDone.initHist');
-    });
 
-    var _historyIsAvailable = function() {
-        if (self.initialMessageHistLoaded.state() === 'pending') {
-            self.initialMessageHistLoaded.resolve();
-            if (self._initialMessageHistLoadedTimer) {
-                clearTimeout(self._initialMessageHistLoadedTimer);
-            }
-        }
+        self.megaChat.safeForceUpdate();
     };
     self.rebind('onHistoryDecrypted.initHist', _historyIsAvailable);
     self.rebind('onMessagesHistoryDone.initHist', _historyIsAvailable);
 
-    self.rebind('onMarkAsJoinRequested.initHist', function(e, eventData) {
-        self._initialMessageHistLoadedTimer = setTimeout(function () {
+    self.rebind('onMarkAsJoinRequested.initHist', () => {
+        timer = setTimeout(function() {
             if (d) {
-                console.warn("Timed out waiting to load hist for:", self.chatId || self.roomId);
+                self.logger.warn("Timed out waiting to load hist for:", self.chatId || self.roomId);
             }
-            self.initialMessageHistLoaded.reject();
-        }, 30000);
+            _historyIsAvailable(false);
+        }, 3e5);
     });
-
 
 
     this.membersSetFromApi = new ChatRoom.MembersSet(this);
@@ -396,10 +391,7 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
     return this;
 };
 
-/**
- * Add support for .on, .bind, .unbind, etc
- */
-makeObservable(ChatRoom);
+inherits(ChatRoom, MegaDataObject);
 
 /**
  * Room states
@@ -607,6 +599,8 @@ ChatRoom.prototype.isArchived = function() {
     return (self.flags & ChatRoom.ARCHIVED);
 };
 
+
+
 /**
  * Check whether a chat is displayable.
  *
@@ -639,7 +633,7 @@ ChatRoom.prototype.persistToFmdb = function() {
             var roomInfo = {
                 'id': self.chatId,
                 'cs': self.chatShard,
-                'g' : (self.type === "group") ? 1 : 0,
+                'g': self.type === "group" || self.type === "public" ? 1 : 0,
                 'u' : users,
                 'ts': self.ctime,
                 'ct': self.ct,
@@ -794,16 +788,48 @@ ChatRoom.prototype.getParticipants = function() {
  * @returns {Array}
  */
 ChatRoom.prototype.getParticipantsExceptMe = function(userHandles) {
-    var self = this;
-    if (!userHandles) {
-        userHandles = self.getParticipants();
+    var res = clone(userHandles || this.getParticipants());
+    array.remove(res, u_handle, true);
+    return res;
+};
+
+/**
+ * getParticipantsTruncated
+ * @description Returns comma-separated string of truncated member names based on passed room; allows to specify the
+ * maximum amount of members to be retrieved, as well the desired maximum length for the truncation.
+ * @param {number} maxMembers The maximum amount of members to be retrieved
+ * @param {number} maxLength The maximum length of characters for the truncation
+ * @returns {string}
+ */
+
+ChatRoom.prototype.getParticipantsTruncated = function(maxMembers, maxLength) {
+    maxMembers = maxMembers || 5;
+    maxLength = maxLength || 30;
+    var truncatedParticipantNames = [];
+
+    const members =  Object.keys(this.members);
+    for (var i = 0; i < members.length; i++) {
+        var handle = members[i];
+        var name = M.getNameByHandle(handle);
+
+        if (!handle || !name || handle === u_handle) {
+            continue;
+        }
+
+        if (i > maxMembers) {
+            break;
+        }
+
+        truncatedParticipantNames.push(
+            name.length > maxLength ? name.substr(0, maxLength) + '...' : name
+        );
     }
-    var handlesWithoutMyself = clone(userHandles);
-    var index = $.inArray(u_handle, handlesWithoutMyself);
-    if (index >= 0) {
-        handlesWithoutMyself.splice($.inArray(u_handle, handlesWithoutMyself), 1);
+
+    if (truncatedParticipantNames.length === maxMembers) {
+        truncatedParticipantNames.push('...');
     }
-    return handlesWithoutMyself;
+
+    return truncatedParticipantNames.join(', ');
 };
 
 /**
@@ -822,28 +848,26 @@ ChatRoom.prototype.getRoomTitle = function(ignoreTopic, encapsTopicInQuotes) {
     }
     else {
         if (!ignoreTopic && self.topic && self.topic.substr) {
-            return (encapsTopicInQuotes ? '"' : "") + self.topic.substr(0, 30) + (encapsTopicInQuotes ? '"' : "");
+            return (encapsTopicInQuotes ? '"' : "") + self.getTruncatedRoomTopic() + (encapsTopicInQuotes ? '"' : "");
         }
 
-        participants = self.members && Object.keys(self.members).length > 0 ? Object.keys(self.members) : [];
-        var names = [];
-        for (var i = 0; i < Math.min(participants.length, 5); i++) {
-            var contactHash = participants[i];
-
-            if (contactHash && M.u[contactHash] && contactHash !== u_handle) {
-                var name = M.u[contactHash] ? M.getNameByHandle(contactHash) : false;
-                names.push(
-                    name
-                );
-            }
-        }
+        var names = self.getParticipantsTruncated();
         var def = __(l[19077]).replace('%s1', new Date(self.ctime * 1000).toLocaleString());
-        if (names.length === 0) {
-            return def;
-        }
 
-        return names.length > 0 ? names.join(", ") : def;
+        return names.length > 0 ? names : def;
     }
+};
+
+/**
+ * getTruncatedRoomTopic
+ * @description Returns truncated room topic based on the passed maximum character length.
+ * @param {number} maxLength The maximum length of characters for the truncation
+ * @returns {string}
+ */
+
+ChatRoom.prototype.getTruncatedRoomTopic = function(maxLength) {
+    maxLength = maxLength || 30;
+    return this.topic && this.topic.length > maxLength ? this.topic.substr(0, maxLength) + '...' : this.topic;
 };
 
 /**
@@ -920,7 +944,7 @@ ChatRoom.prototype.leave = function(triggerLeaveRequest) {
 
     if (triggerLeaveRequest) {
         if (self.type === "group" || self.type === "public") {
-            $(self).trigger('onLeaveChatRequested');
+            self.trigger('onLeaveChatRequested');
         }
         else {
             self.logger.error("Can't leave room of type: " + self.type);
@@ -1105,76 +1129,71 @@ ChatRoom.prototype.show = function() {
 
     if (self.isCurrentlyActive) {
         if (!self.messagesBlockEnabled && self.callManagerCall && self.getUnreadCount() > 0) {
-            $(self).trigger('toggleMessages');
+            self.trigger('toggleMessages');
         }
         return false;
     }
     self.megaChat.hideAllChats();
 
+    if (d) {
+        self.logger.debug(' ---- show');
+    }
+
+    $.tresizer();
+    onIdle(function() {
+        self.scrollToChat();
+        self.trackDataChange();
+    });
     self.isCurrentlyActive = true;
     self.lastShownInUI = Date.now();
-
-    $('.files-grid-view').addClass('hidden');
-    $('.fm-blocks-view').addClass('hidden');
-    $('.contacts-grid-view').addClass('hidden');
-    $('.fm-contacts-blocks-view').addClass('hidden');
-
-    $('.fm-right-files-block.in-chat').removeClass('hidden');
-    $('.fm-right-files-block:not(.in-chat)').addClass('hidden');
-
-    //$('.nw-conversations-item').removeClass('selected');
-
-
-    if (self.megaChat.currentlyOpenedChat && self.megaChat.currentlyOpenedChat != self.roomId) {
-        var oldRoom = self.megaChat.getCurrentRoom();
-        if (oldRoom) {
-            oldRoom.hide();
-        }
-    }
-
-    M.onSectionUIOpen('conversations');
-
-    self.megaChat.currentlyOpenedChat = self.roomId;
-    self.megaChat.lastOpenedChat = self.roomId;
-    if (self.isArchived()) {
-        self.showArchived = true;
-    }
-    else {
-        self.showArchived = false;
-    }
+    self.showArchived = self.isArchived();
     self.megaChat.setAttachments(self.roomId);
+    self.megaChat.lastOpenedChat = self.roomId;
+    self.megaChat.currentlyOpenedChat = self.roomId;
 
     self.trigger('activity');
     self.trigger('onChatShown');
 
-    if (self.type !== 'public') {
-        $('.section.conversations').addClass('privatechat');
+    var tmp = self.megaChat.domSectionNode;
+
+    if (self.type === 'public') {
+        tmp.classList.remove('privatechat');
     }
     else {
-        $('.section.conversations').removeClass('privatechat');
+        tmp.classList.add('privatechat');
     }
 
-    Soon(function() {
-        megaChat.chats.trackDataChange();
-    });
-    $('.conversation-panel[data-room-id="' + self.chatId + '"]').removeClass('hidden');
-    $.tresizer();
+    if ((tmp = tmp.querySelector('.conversation-panels'))) {
+        tmp.classList.remove('hidden');
 
-    self.scrollToChat();
+        if ((tmp = tmp.querySelector('.conversation-panel[data-room-id="' + self.chatId + '"]'))) {
+            tmp.classList.remove('hidden');
+        }
+    }
+
+    if ((tmp = document.getElementById('conversation_' + self.roomId))) {
+        // do not wait for ConversationsListItem to set the active class..
+        tmp.classList.add('active');
+    }
 };
 
-
 ChatRoom.prototype.scrollToChat = function() {
+    this._scrollToOnUpdate = true;
+
     if (megaChat.$chatTreePanePs) {
-        var $li = $('ul.conversations-pane li#conversation_' + this.roomId + '');
-        if ($li && $li[0]) {
-            var pos = $li[0].offsetTop;
-            if (!megaChat.$chatTreePanePs.inViewport($li[0])) {
-                megaChat.$chatTreePanePs.doProgramaticScroll(pos, true);
+        var li = document.querySelector('ul.conversations-pane li#conversation_' + this.roomId);
+        if (li) {
+            var pos = li.offsetTop;
+            if (!verge.inViewport(li, -72 /* 2 x 36 px height buttons */)) {
+                var treePane = document.querySelector('.conversationsApp .fm-tree-panel');
+                var wrapOuterHeight = $(treePane).outerHeight();
+                var itemOuterHeight = $('li:first', treePane).outerHeight();
+                megaChat.$chatTreePanePs.doProgramaticScroll(
+                    Math.max(0, pos - wrapOuterHeight / 2 + itemOuterHeight),
+                    true
+                );
                 this._scrollToOnUpdate = false;
             }
-        } else {
-            this._scrollToOnUpdate = true;
         }
     }
 };
@@ -1190,14 +1209,8 @@ ChatRoom.prototype.isActive = function() {
  * Shows the current room (changes url if needed)
  */
 ChatRoom.prototype.setActive = function() {
-    // We need to delay this, since it can get called BY openFolder and it would then call again openFolder, which
-    // would cause .currentdirid to not be set correctly.
-    var self = this;
-    Soon(function() {
-        loadSubPage(self.getRoomUrl());
-    });
+    loadSubPage(this.getRoomUrl());
 };
-
 
 /**
  * Returns true if messages are still being retrieved from chatd OR in decrypting state
@@ -1205,9 +1218,8 @@ ChatRoom.prototype.setActive = function() {
  * @returns {MegaPromise|boolean}
  */
 ChatRoom.prototype.isLoading = function() {
-    var self = this;
-    var mb = self.messagesBuff;
-    return (mb.messagesHistoryIsLoading() || (mb.isDecrypting && mb.isDecrypting.state() === 'pending'));
+    var mb = this.messagesBuff;
+    return mb.messagesHistoryIsLoading() || mb.isDecrypting;
 };
 
 /**
@@ -1254,13 +1266,27 @@ ChatRoom.prototype.activateWindow = function() {
 ChatRoom.prototype.hide = function() {
     var self = this;
 
+    if (d) {
+        self.logger.debug(' ---- hide', self.isCurrentlyActive);
+    }
     self.isCurrentlyActive = false;
     self.lastShownInUI = Date.now();
 
     if (self.megaChat.currentlyOpenedChat === self.roomId) {
         self.megaChat.currentlyOpenedChat = null;
     }
-    $('.conversation-panel[data-room-id="' + self.chatId + '"]').addClass('hidden');
+
+    var tmp = self.megaChat.domSectionNode.querySelector('.conversation-panel[data-room-id="' + self.chatId + '"]');
+    if (tmp) {
+        tmp.classList.add('hidden');
+    }
+
+    if ((tmp = document.getElementById('conversation_' + self.roomId))) {
+        // do not wait for ConversationsListItem to remove the active class..
+        tmp.classList.remove('active');
+    }
+
+    self.trigger('onChatHidden', self.isCurrentlyActive);
 };
 
 /**
@@ -1443,94 +1469,137 @@ ChatRoom.prototype._sendNodes = function(nodeids, users) {
 };
 
 
-
 /**
  * Attach/share (send as message) file/folder nodes to the chat
- * @param ids
+ * @param {Array|String} nodes ufs-node handle, or an array of them.
+ * @returns {Promise}
  */
-ChatRoom.prototype.attachNodes = function(ids) {
-    var self = this;
-
+ChatRoom.prototype.attachNodes = mutex('chatroom-attach-nodes', function _(resolve, reject, nodes) {
+    var i;
+    var step = 0;
     var users = [];
+    var self = this;
+    var copy = Object.create(null);
+    var send = Object.create(null);
+    var members = self.getParticipantsExceptMe();
+    var attach = promisify(function(resolve, reject, nodes) {
+        console.assert(self.type === 'public' || users.length, 'No users to send to?!');
 
-    $.each(self.getParticipantsExceptMe(), function(k, v) {
-        var contact = M.u[v];
-        if (contact && contact.u) {
-            users.push(
-                contact.u
-            );
-        }
-    });
+        self._sendNodes(nodes, users).then(function() {
+            for (var i = nodes.length; i--;) {
+                var n = M.getNodeByHandle(nodes[i]);
+                console.assert(n.h, 'wtf..');
 
-    var $masterPromise = new MegaPromise();
-
-    var waitingPromises = [];
-    ids.forEach(function(nodeId) {
-        var proxyPromise = new MegaPromise();
-
-        if (M.d[nodeId] && (M.d[nodeId].u !== u_handle || M.getNodeRoot(nodeId) === "shares")) {
-            // I'm not the owner of this file.
-            // can be a d&d to a chat or Send to contact from a share
-            M.myChatFilesFolder.get(true)
-                .then(function(myChatFilesFolder) {
-                    M.copyNodes(
-                            [nodeId],
-                            myChatFilesFolder.h,
-                            false,
-                            new MegaPromise()
-                        )
-                        .then(function(copyNodesResponse) {
-                            if (copyNodesResponse && copyNodesResponse[0]) {
-                                proxyPromise.linkDoneAndFailTo(self.attachNodes([copyNodesResponse[0]]));
-                            }
-                            else {
-                                proxyPromise.reject();
-                            }
-                        })
-                        .catch(function(err) {
-                            proxyPromise.reject(err);
-                        });
-                })
-                .catch(function(err) {
-                    proxyPromise.reject(err);
-                });
-        }
-        else {
-            self._sendNodes([nodeId], users)
-                .then(function() {
-                    var nodesMeta = [];
-                    var node = M.d[nodeId];
-                    nodesMeta.push({
-                        'h': node.h,
-                        'k': node.k,
-                        't': node.t,
-                        's': node.s,
-                        'name': node.name,
-                        'hash': node.hash,
-                        'fa': node.fa,
-                        'ts': node.ts
-                    });
-
+                if (n.h) {
                     // 1b, 1b, JSON
                     self.sendMessage(
                         Message.MANAGEMENT_MESSAGE_TYPES.MANAGEMENT +
                         Message.MANAGEMENT_MESSAGE_TYPES.ATTACHMENT +
-                        JSON.stringify(nodesMeta)
+                        JSON.stringify([
+                            {
+                                h: n.h, k: n.k, t: n.t, s: n.s, fa: n.fa, ts: n.ts, hash: n.hash, name: n.name
+                            }
+                        ])
                     );
-
-                    proxyPromise.resolve([nodeId]);
-                })
-                .catch(function(r) {
-                    proxyPromise.reject(r);
-                });
-        }
-        waitingPromises.push(proxyPromise);
+                }
+            }
+            resolve();
+        }).catch(reject);
     });
 
-    $masterPromise.linkDoneAndFailTo(MegaPromise.allDone(waitingPromises));
+    var done = function() {
+        if (--step < 1) {
+            resolve();
+        }
+    };
+    var fail = function(ex) {
+        console.error(ex);
+        done();
+    };
 
-    return $masterPromise;
-};
+    if (d && !_.logger) {
+        _.logger = new MegaLogger('attachNodes', {}, self.logger);
+    }
+
+    for (i = members.length; i--;) {
+        var usr = M.getUserByHandle(members[i]);
+        if (usr.u) {
+            users.push(usr.u);
+        }
+    }
+
+    if (!Array.isArray(nodes)) {
+        nodes = [nodes];
+    }
+
+    for (i = nodes.length; i--;) {
+        var n = M.getNodeByHandle(nodes[i]);
+        (n && (n.u !== u_handle || M.getNodeRoot(n.h) === "shares") ? copy : send)[n.h] = 1;
+    }
+    copy = Object.keys(copy);
+    send = Object.keys(send);
+
+    if (d) {
+        _.logger.debug('copy:%d, send:%d', copy.length, send.length, copy, send);
+    }
+
+    if (send.length) {
+        step++;
+        attach(send).then(done).catch(fail);
+    }
+
+    if (copy.length) {
+        step++;
+        M.myChatFilesFolder.get(true)
+            .then(function(target) {
+                var rem = [];
+                var c = Object.keys(M.c[target.h] || {});
+
+                for (var i = copy.length; i--;) {
+                    var n = M.getNodeByHandle(copy[i]);
+                    console.assert(n.h, 'wtf..');
+
+                    for (var y = c.length; y--;) {
+                        var b = M.getNodeByHandle(c[y]);
+
+                        if (n.h === b.h || b.hash === n.hash) {
+                            if (d) {
+                                _.logger.info('deduplication %s:%s', n.h, b.h, [n], [b]);
+                            }
+                            rem.push(n.h);
+                            copy.splice(i, 1);
+                            break;
+                        }
+                    }
+                }
+
+                var next = function(res) {
+                    if (!Array.isArray(res)) {
+                        return fail(res);
+                    }
+                    attach([].concat(rem, res)).then(done).catch(fail);
+                };
+
+                if (copy.length) {
+                    M.copyNodes(copy, target.h, false, next).dump('attach-nodes');
+                }
+                else {
+                    if (d) {
+                        _.logger.info('No new nodes to copy.', [rem]);
+                    }
+                    next([]);
+                }
+            })
+            .catch(fail);
+    }
+
+    if (!step) {
+        if (d) {
+            _.logger.warn('Nothing to do here...');
+        }
+        onIdle(done);
+    }
+});
 
 ChatRoom.prototype.onUploadStart = function(data) {
     var self = this;
@@ -1546,28 +1615,26 @@ ChatRoom.prototype.uploadFromComputer = function() {
 
 /**
  * Attach/share (send as message) contact details
- * @param ids
+ * @param ids {Array} list of contact identifiers
+ * @returns {void}
  */
+
 ChatRoom.prototype.attachContacts = function(ids) {
-    var self = this;
+    for (let i = 0; i < ids.length; i++) {
+        const nodeId = ids[i];
+        const node = M.u[nodeId];
 
-    var nodesMeta = [];
-    $.each(ids, function(k, nodeId) {
-        var node = M.u[nodeId];
-
-        nodesMeta.push({
-            'u': node.u,
-            'email': node.m,
-            'name': node.name || node.m
-        });
-    });
-
-    // 1b, 1b, JSON
-    self.sendMessage(
-        Message.MANAGEMENT_MESSAGE_TYPES.MANAGEMENT +
-        Message.MANAGEMENT_MESSAGE_TYPES.CONTACT +
-        JSON.stringify(nodesMeta)
-    );
+        // 1b, 1b, JSON
+        this.sendMessage(
+            Message.MANAGEMENT_MESSAGE_TYPES.MANAGEMENT +
+            Message.MANAGEMENT_MESSAGE_TYPES.CONTACT +
+            JSON.stringify([{
+                u: node.u,
+                email: node.m,
+                name: node.name || node.m
+            }])
+        );
+    }
 };
 
 
@@ -1578,16 +1645,16 @@ ChatRoom.prototype.attachContacts = function(ids) {
  */
 ChatRoom.prototype.getMessageById = function(messageId) {
     var self = this;
-    var found = false;
-    $.each(self.messagesBuff.messages, function(k, v) {
-        if (v.messageId === messageId) {
-            found = v;
-            // break;
-            return false;
+    var msgs = self.messagesBuff.messages;
+    var msgKeys = msgs.keys();
+    for (var i = 0; i < msgKeys.length; i++) {
+        var k = msgKeys[i];
+        var v = msgs[k];
+        if (v && v.messageId === messageId) {
+            return v;
         }
-    });
-
-    return found;
+    }
+    return false;
 };
 
 /**
@@ -1795,6 +1862,10 @@ ChatRoom.prototype.haveActiveCall = function() {
     return this.callManagerCall && this.callManagerCall.isActive() === true;
 };
 
+ChatRoom.prototype.haveActiveOnHoldCall = function() {
+    return this.callManagerCall && this.callManagerCall.rtcCall.isOnHold();
+};
+
 ChatRoom.prototype.havePendingGroupCall = function() {
     var self = this;
     var haveCallParticipants = self.getCallParticipants().length > 0;
@@ -1888,35 +1959,30 @@ ChatRoom.prototype.callParticipantsUpdated = function(
 
 ChatRoom.prototype.onPublicChatRoomInitialized = function() {
     var self = this;
-    var autoLoginChatInfo = typeof localStorage.autoJoinOnLoginChat !== "undefined" ?
-        JSON.parse(localStorage.autoJoinOnLoginChat) : false;
 
-    if (
-        self.type === "public" &&
-        autoLoginChatInfo &&
-        autoLoginChatInfo[0] === self.publicChatHandle
-    ) {
+    if (self.type !== "public" || !localStorage.autoJoinOnLoginChat) {
+        return;
+    }
+
+    var autoLoginChatInfo = tryCatch(JSON.parse.bind(JSON))(localStorage.autoJoinOnLoginChat) || false;
+
+    if (autoLoginChatInfo[0] === self.publicChatHandle) {
+        localStorage.removeItem("autoJoinOnLoginChat");
 
         if (unixtime() - 2 * 60 * 60 < autoLoginChatInfo[1]) {
-            var doJoinEventually = function (state) {
+            var doJoinEventually = function(state) {
                 if (state === ChatRoom.STATE.READY) {
                     self.joinViaPublicHandle();
-                    localStorage.removeItem("autoJoinOnLoginChat");
                     self.unbind('onStateChange.' + self.publicChatHandle);
                 }
             };
 
-            doJoinEventually(self.state);
-
             self.rebind('onStateChange.' + self.publicChatHandle, function (e, oldState, newState) {
                 doJoinEventually(newState);
             });
-        }
-        else {
-            // auto join expired.
-            localStorage.removeItem("autoJoinOnLoginChat");
-        }
 
+            doJoinEventually(self.state);
+        }
     }
 };
 
@@ -1924,19 +1990,74 @@ ChatRoom.prototype.isUIMounted = function() {
     return this._uiIsMounted;
 };
 
-ChatRoom.prototype.loadContactNames = function() {
-    var contacts = this.getParticipantsExceptMe();
-    for (var i = 0; i < Math.min(5, contacts.length); i++) {
-        var handle = contacts[i];
-        if (!M.u[handle]) {
-            continue;
-        }
-        if (!M.u[handle].name) {
-            M.syncUsersFullname(handle, this.publicChatHandle);
-        }
-        if (!M.u[handle].m && !anonymouschat) {
-            M.syncContactEmail(handle);
-        }
+ChatRoom.prototype.attachSearch = function() {
+    this.activeSearches++;
+};
+
+ChatRoom.prototype.detachSearch = function() {
+    if (--this.activeSearches === 0) {
+        this.messagesBuff.detachMessages();
+    }
+    this.activeSearches = Math.max(this.activeSearches, 0);
+    this.trackDataChange();
+};
+
+ChatRoom.prototype.scrollToMessageId = function(msgId, index, retryActive) {
+    var self = this;
+    if (!self.isCurrentlyActive && !retryActive) {
+        // room not shown yet, retry only once again after 1.5s
+        setTimeout(function() {
+            self.scrollToMessageId(msgId, index, true);
+        }, 1500);
+        return;
+    }
+
+    assert(self.isCurrentlyActive, 'chatRoom is not visible');
+    self.isScrollingToMessageId = true;
+
+    if (!self.$rConversationPanel) {
+        self.one('onComponentDidMount.scrollToMsgId' + msgId, function() {
+            self.scrollToMessageId(msgId, index);
+        });
+        return;
+    }
+    var ps = self.$rConversationPanel.messagesListScrollable;
+    assert(ps);
+
+    var msgObj = self.messagesBuff.getMessageById(msgId);
+    if (msgObj) {
+        var elem = $('.' + msgId + '.message.body')[0];
+        self.scrolledToBottom = false;
+
+        ps.scrollToElement(elem, true);
+
+        // cleanup the stored old scroll position, so that the auto scroll won't scroll back to previous position
+        // after all onResizes and componentDidUpdates
+        self.$rConversationPanel.lastScrollPosition = undefined;
+        self.isScrollingToMessageId = false;
+    }
+    else if (self.messagesBuff.isRetrievingHistory) {
+        // wait for messages to be received
+        self.one('onHistoryDecrypted.scrollToMsgId' + msgId, function() {
+            // wait for UI to update (so that the element is now available in the dom)
+            self.one('onComponentDidUpdate.scrollToMsgId' + msgId, function() {
+                self.scrollToMessageId(msgId, index);
+            });
+        });
+    }
+    else if (self.messagesBuff.haveMoreHistory()) {
+        self.messagesBuff.retrieveChatHistory(!index || index <= 0 ? undefined : index);
+        ps.doProgramaticScroll(0, true);
+        // wait for messages to be received
+        self.one('onHistoryDecrypted.scrollToMsgId' + msgId, function() {
+            // wait for UI to update (so that the element is now available in the dom)
+            self.one('onComponentDidUpdate.scrollToMsgId' + msgId, function() {
+                self.scrollToMessageId(msgId);
+            });
+        });
+    }
+    else {
+        self.isScrollingToMessageId = false;
     }
 };
 

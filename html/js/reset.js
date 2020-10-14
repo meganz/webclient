@@ -134,10 +134,16 @@ function delete_reset_pw() {
     var password = $('#withoutkey-password').val();
     var confirmPassword = $('#withoutkey-password2').val();
     var passwordValidationResult = security.isValidPassword(password, confirmPassword);
-    
+
     // If bad result
     if (passwordValidationResult !== true) {
-        msgDialog('warninga', l[135], passwordValidationResult);
+        msgDialog('warninga', l[135], passwordValidationResult, '', function() {
+            // Clear the park account form after warning passwords aren't matching
+            $('#withoutkey-password').data('MegaInputs').setValue('');
+            $('#withoutkey-password2').data('MegaInputs').setValue('');
+            $('.new-registration-checkbox .register-check').removeClass('checkboxOn').addClass('checkboxOff');
+            init_reset_pw();
+        });
         return false;
     }
     else if ($('.new-registration-checkbox .register-check').hasClass('checkboxOff')) {

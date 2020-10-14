@@ -155,26 +155,28 @@ BusinessAccount.prototype.editSubAccount =
         request.lp = 1;
     }
 
-    api_req(request, {
-        callback: function (res) {
-            if ($.isNumeric(res)) {
-                operationPromise.reject(0, res, 'API returned error');
-            }
-            else if (typeof res === 'string') {
-                operationPromise.resolve(1); // user edit succeeded
-            }
-            else if (typeof res === 'object') {
-                operationPromise.resolve(1, res, request); // user edit involved email change
-            }
-            else {
-                operationPromise.reject(0, 4, 'API returned error, ret=' + res);
-                if (d) {
-                    console.error('API returned error, ret=' + res);
+        api_req(
+            request,
+            {
+                callback: function(res) {
+                    if ($.isNumeric(res)) {
+                        operationPromise.reject(0, res, 'API returned error');
+                    }
+                    else if (typeof res === 'string') {
+                        operationPromise.resolve(1, null, request); // user edit succeeded
+                    }
+                    else if (typeof res === 'object') {
+                        operationPromise.resolve(1, res, request); // user edit involved email change
+                    }
+                    else {
+                        operationPromise.reject(0, 4, 'API returned error, ret=' + res);
+                        if (d) {
+                            console.error('API returned error, ret=' + res);
+                        }
+                    }
                 }
-            }
-        }
 
-    });
+            });
 
     return operationPromise;
 };
@@ -621,7 +623,7 @@ BusinessAccount.prototype.decryptSubAccountInvitationLink = function (link, pass
         }
         return null;
     }
-    
+
 };
 
 /**
@@ -1029,7 +1031,7 @@ BusinessAccount.prototype.getInvoiceDetails = function (invoiceID, forceUpdate) 
                 mega.buinsessAccount.invoicesDetailsList = mega.buinsessAccount.invoicesDetailsList
                     || Object.create(null);
                 res.timestamp = currTime;
-                
+
                 mega.buinsessAccount.invoicesDetailsList[invoiceID] = res;
                 operationPromise.resolve(1, res); // invoice detail
             }
@@ -1258,8 +1260,8 @@ BusinessAccount.prototype.setMasterUserAttributes =
         }
         else {
             var businessKey = mySelf.creatBusinessAccountMasterKey();
-            var generateRSA = crypto_rsagenkey(
-                function(businessRSA) {
+            crypto_rsagenkey(false)
+                .then(function(businessRSA) {
 
                     request_upb.k = a32_to_base64(encrypt_key(u_k_aes, businessKey));
                     request_upb.pubk = base64urlencode(crypto_encodepubkey(businessRSA));
@@ -1494,80 +1496,7 @@ BusinessAccount.prototype.getTaxCodeName = function(countryCode) {
     });
 
     return operationPromise; */
-    switch (countryCode) {
-        case "AT": return "USt";
-        case "BE": return "TVA";
-        case "HR": return "PDV";
-        case "CZ": return "DPH";
-        case "DK": return "moms";
-        case "EE": return "km";
-        case "FI": return "ALV";
-        case "FR": return "TVA";
-        case "DE": return "USt";
-        case "HU": return "AFA";
-        case "IT": return "IVA";
-        case "LV": return "PVN";
-        case "LT": return "PVM";
-        case "LU": return "TVA";
-        case "NL": return "BTW";
-        case "PL": return "PTU";
-        case "PT": return "IVA";
-        case "RO": return "TVA";
-        case "SK": return "DPH";
-        case "SI": return "DDV";
-        case "SE": return "MOMS";
-        case "AL": return "TVSH";
-        case "AD": return "IGI";
-        case "AR": return "IVA";
-        case "AM": return "AAH";
-        case "AU": return "GST";
-        case "BO": return "IVA";
-        case "BA": return "PDV";
-        case "BR": return "ICMS";
-        case "CA": return "GST";
-        case "CL": return "IVA";
-        case "CO": return "IVA";
-        case "DO": return "ITBIS";
-        case "EC": return "IVA";
-        case "SV": return "IVA";
-        case "FO": return "MVG";
-        case "GT": return "IVA";
-        case "IS": return "VSK";
-        case "ID": return "PPN";
-        case "JE": return "GST";
-        case "JO": return "GST";
-        case "LB": return "TVA";
-        case "LI": return "MWST";
-        case "MK": return "DDV";
-        case "MY": return "GST";
-        case "MV": return "GST";
-        case "MX": return "IVA";
-        case "MD": return "TVA";
-        case "MC": return "TVA";
-        case "ME": return "PDV";
-        case "MA": return "GST";
-        case "NZ": return "GST";
-        case "NO": return "MVA";
-        case "PK": return "GST";
-        case "PA": return "ITBMS";
-        case "PY": return "IVA";
-        case "PE": return "IGV";
-        case "PH": return "RVAT";
-        case "RU": return "NDS";
-        case "SG": return "GST";
-        case "CH": return "MWST";
-        case "TN": return "TVA";
-        case "TR": return "KDV";
-        case "UA": return "PDV";
-        case "UY": return "IVA";
-        case "UZ": return "QQS";
-        case "VN": return "GTGT";
-        case "VE": return "IVA";
-        case "ES": return "NIF";
-
-        default: return "VAT";
-    }
-
+    return getTaxName(countryCode);
 };
 
 /**

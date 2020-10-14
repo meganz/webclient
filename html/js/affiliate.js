@@ -173,7 +173,8 @@ var affiliateprogram = {
             var $target = $(e.target);
 
             if (!$target.is('.top-login-button') && !$target.is('.dropdown-lnk') &&
-                !$target.is('.notification') && !$target.closest('.dropdown').length) {
+                !$target.is('.notification') && !$target.is('.activity-status') &&
+                !$target.closest('.dropdown').length) {
 
                 $('.dropdown:visible', self.$contentBlock).addClass('hidden');
                 $('.dropdown-lnk.active', self.$contentBlock).removeClass('active');
@@ -301,9 +302,11 @@ var affiliateprogram = {
             var $this = $(this);
 
             if (is_mobile) {
+
                 var affguide = '/fm/refer/guide';
 
-                if (u_storage.sid) {
+                var openGenerateRefLink = function() {
+
                     loadSubPage(affguide);
 
                     var $affguidepage = $('.affiliate-guide-page');
@@ -311,8 +314,12 @@ var affiliateprogram = {
                     $('.expandable:first', $affguidepage).trigger('tap');
                     $('.generate', $affguidepage).trigger('tap');
                 }
+
+                if (u_storage.sid) {
+                    openGenerateRefLink();
+                }
                 else {
-                    login_next = affguide;
+                    login_next = openGenerateRefLink;
                     loadSubPage('login');
                 }
             }
@@ -366,26 +373,34 @@ var affiliateprogram = {
 
         'use strict';
 
+        var self = this;
+
         M.req("dailystats").then(function(res) {
 
             var text = l[22759];
+            var text2 = l[22784];
             var userCount = res.confirmedusers.total / 1000000 | 0;
-            var eastAsianCount = (userCount / 100).toFixed(1);
+            var eastAsianCount = (userCount / 10 | 0) / 10; // this need to round down.
 
             // Special way of counting number in Korean and Janpanese
             if (locale === 'ko' || locale === 'jp') {
                 userCount = eastAsianCount.toString().split('.');
                 text = text.replace('1', userCount[0]).replace('5', userCount[1]);
+                text2 = text2.replace('1', userCount[0]).replace('7', userCount[1]);
             }
             else if (locale === 'zh-Hans' || locale === 'zh-Hant') {
                 text = text.replace('1.5', eastAsianCount);
+                text2 = text2.replace('1.7', eastAsianCount);
             }
             else {
                 text = text.replace('150', userCount);
+                text2 = text2.replace('170', userCount);
             }
 
-            $('.affiliate-page.top-info').text(text);
+            $('.affiliate-page.top-info', self.$contentBlock).text(text);
+            $('.dynamic-count-txt', self.$contentBlock).safeHTML(text2);
         }).catch(function(ex) {
+
             // We do not need to do anything here, over 150 million is still valid.
             if (d) {
                 console.error('Dynamic count update failed.', ex);

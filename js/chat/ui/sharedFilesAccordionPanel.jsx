@@ -169,7 +169,7 @@ class SharedFilesAccordionPanel extends MegaRenderMixin {
                 </div>;
             }
             else {
-                var keys = mb.sharedFiles.keys().reverse();
+                var keys = clone(mb.sharedFiles.keys()).reverse();
                 for (var i = startPos; i < endPos; i++) {
                     var message = mb.sharedFiles[keys[i]];
                     if (!message) {

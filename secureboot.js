@@ -4077,8 +4077,8 @@ function inherits(target, source) {
     }
 }
 
+// eslint-disable-next-line strict
 function lazy(target, property, stub) {
-    'use strict';
     Object.defineProperty(target, property, {
         get: function() {
             Object.defineProperty(this, property, {

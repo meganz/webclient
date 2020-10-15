@@ -2137,7 +2137,10 @@ Chat.prototype.getEmojiDataSet = function(name) {
         self._emojiDataLoading = {};
     }
     if (!self._emojiData) {
-        self._emojiData = {};
+        self._emojiData = {
+            'emojisUtf': {},
+            'emojisSlug': {}
+        };
     }
 
     if (self._emojiData[name]) {

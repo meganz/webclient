@@ -3841,6 +3841,10 @@
     "24059": "[A]%1 Datei[\/A] von %3 erstellt",
     "24060": "[A]%1 Datei[\/A] von %3 ge\u00e4ndert",
     "24061": "unbekannt",
+    "24068": "Sie (zur Stornierung anklicken) [G]reagierten mit %s[\/G]",
+    "24069": "%s [G]reagierte mit %s2[\/G]",
+    "24070": "Reaktion hinzuf\u00fcgen...",
+    "24071": "Sie",
     "24073": "Dieser Benutzer ist gesperrt und wird daher die neue E-Mail-Adresse bis zu seiner Reaktivierung nicht best\u00e4tigen k\u00f6nnen",
     "24074": "Weitere Windows-Downloads: [A]64-Bit-Version[\/A]"
 }

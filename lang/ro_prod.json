@@ -3841,6 +3841,10 @@
     "24059": "[A]%1 fi\u0219iere[\/A] create de %3",
     "24060": "[A]%1 fi\u0219iere[\/A] modificate de %3",
     "24061": "necunoscut",
+    "24068": "You (click to remove) [G]reacted with %s[\/G]",
+    "24069": "%s [G]reacted with %s2[\/G]",
+    "24070": "Adaug\u0103 reac\u021bie...",
+    "24071": "Tu",
     "24073": "This user is disabled, therefore the user wont be able to confirm the email change until you re-activate them.",
     "24074": "Other downloads for Windows: [A]64-bit version[\/A]"
 }

@@ -3841,6 +3841,10 @@
     "24059": "[A]%1 archivos[\/A] creados por %3",
     "24060": "[A]%1 archivos[\/A] modificados por %3",
     "24061": "desconocido",
+    "24068": "[G]Has reaccionado con %s[\/G] (haz clic para eliminar)",
+    "24069": "%s [G]ha reaccionado con %s2[\/G]",
+    "24070": "A\u00f1adir reacci\u00f3n...",
+    "24071": "T\u00fa",
     "24073": "Este usuario est\u00e1 desactivado, por lo tanto no podr\u00e1 confirmar el cambio de correo electr\u00f3nico hasta que lo vuelvas a activar.",
     "24074": "Disponible tambi\u00e9n para Windows: [A]versi\u00f3n 64-bit[\/A]"
 }

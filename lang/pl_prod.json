@@ -3841,6 +3841,10 @@
     "24059": "[A]%1 plik\u00f3w[\/A] utworzonych przez %3",
     "24060": "[A]%1 plik\u00f3w[\/A] zmodyfikowanych przez %3",
     "24061": "nieznane",
+    "24068": "Ty (kliknij, aby usun\u0105\u0107) [G]zareagowa\u0142e\u015b z %s[\/G]",
+    "24069": "%s [G]zareagowa\u0142 z %s2[\/G]",
+    "24070": "Dodaj reakcj\u0119...",
+    "24071": "Ty",
     "24073": "Ten u\u017cytkownik jest wy\u0142\u0105czony, dlatego nie b\u0119dzie m\u00f3g\u0142 potwierdzi\u0107 zmiany adresu e-mail, dop\u00f3ki go ponownie nie aktywujesz.",
     "24074": "Inne pliki do pobrania dla systemu Windows: [A]wersja 64-bitowa[\/A]"
 }

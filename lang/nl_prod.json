@@ -3841,6 +3841,10 @@
     "24059": "[A]%1 bestanden [\/A] gemaakt door %3",
     "24060": "[A]%1 bestanden [\/A] gewijzigd door %3",
     "24061": "onbekend",
+    "24068": "U (klik om te verwijderen) [G] reageerde met %s[\/G]",
+    "24069": "%s [G]reageerde met %s2[\/G]",
+    "24070": "Reactie toevoegen...",
+    "24071": "U",
     "24073": "Deze gebruiker is uitgeschakeld, daarom kan de gebruiker de e-mailwijziging pas bevestigen als u hem opnieuw activeert.",
     "24074": "Andere downloads voor Windows: [A]64-bits versie [\/A]"
 }

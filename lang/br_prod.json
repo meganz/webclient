@@ -3841,6 +3841,10 @@
     "24059": "[A]%1 arquivos[\/A] criados por %3",
     "24060": "[A]%1 arquivos[\/A] alterados por %3",
     "24061": "desconhecido",
+    "24068": "Voc\u00ea (clique para remover) [G]reagiu com %s[\/G]",
+    "24069": "%s [G]reagiu com %s2[\/G]",
+    "24070": "Adicionar rea\u00e7\u00e3o",
+    "24071": "Voc\u00ea",
     "24073": "Este usu\u00e1rio foi desativado. Se voc\u00ea n\u00e3o reativar esta conta, n\u00e3o ser\u00e1 poss\u00edvel confirmar a altera\u00e7\u00e3o do email.",
     "24074": "Tamb\u00e9m dispon\u00edvel para Windows: [A]vers\u00e3o de 64 bits[\/A]"
 }

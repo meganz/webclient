@@ -5,6 +5,7 @@
     padding-bottom: 0;
     padding-left: 0 !important;
     padding-right: 0 !important;
+    padding-top: 64px
 }
 
 .help-home-page .main-mid-pad {
@@ -920,15 +921,17 @@
     position: relative;
     left: 0;
     right: 0;
-    top: 64px;
+    top: 0;
     display: block;
 /*    line-height: 30px;*/
     font-family: 'source_sans_proregular';
     font-size: 14px;
     color: #fff;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
+    -webkit-transition: top 600ms ease-in-out;
+    -moz-transition: top 600ms ease-in-out;
+    -o-transition: top 600ms ease-in-out;
+    -ms-transition: top 600ms ease-in-out;
+    transition: top 600ms ease-in-out;
     user-select: none;
     z-index: 999;
 /*    margin-top: 12px;*/
@@ -2831,9 +2834,6 @@
             padding-left: 80px;
             padding-right: 80px;
         }
-/*        #help2-main .support-section-header {
-            display: none !important;
-        }*/
         #help2-main .first-support-block {
             padding-left: 80px;
             padding-right: 80px;
@@ -2903,9 +2903,9 @@
         }
     }
 @media only screen and (max-width: 801px) {
-    #help2-main .support-section-header {
-        display: none !important;
-    }
+    /*#help2-main .support-section-header {*/
+    /*    display: none !important;*/
+    /*}*/
     #help2-main .support-section-header-clone {
         display: none !important;
     }
@@ -3119,7 +3119,7 @@
     #help2-main .section-title {
         font-size: 32px;
         line-height: 40
-        padding-top:96px;
+        padding-top: 0;
     }
     #help2-main .support-article, #help2-main .d-section-container {
         width: calc(100% - 136px);
@@ -3128,7 +3128,7 @@
         font-size: 40px;
         width: 90%;
         margin: 0 auto;
-        padding-top: 96px;
+        padding-top: 0;
         line-height: 56px;
     }
     #help2-main .sidebar-menu-container {
@@ -3196,7 +3196,7 @@
         font-size: 30px;
         width: 90%;
         margin: 0 auto;
-        padding-top: 96px;
+        padding-top: 0;
         line-height: 40px;
     }
     #help2-main .article-end {
@@ -3428,7 +3428,7 @@
         width: 90%;
         margin-left: auto;
         margin-right: auto;
-        padding-top: 96px;
+        padding-top: 0;
         margin-top: 0px;
     }
     #help2-main .howto-section-subtitle {
@@ -3620,7 +3620,7 @@
         color: #fff;
         width: 90%;
         margin: 0px auto;
-        padding-top: 96px;
+        padding-top: 0;
     }
     #help2-main .support-search-container {
         margin:0 auto;
@@ -3861,7 +3861,7 @@
         color: #fff;
         width: 90%;
         margin:0 auto;
-        padding-top: 96px;
+        padding-top: 0;
     }
     #help2-main .first-search-section {
         background-color: #f44;
@@ -4385,7 +4385,7 @@
     #help2-main .search-section .section-title {
         font-size: 30px;
         line-height: 40px;
-        padding-top: 96px;
+        padding-top: 0;
 /*        padding-left: 10%;
         padding-right: 10%;*/
     }
@@ -4420,7 +4420,7 @@
         margin: 0 24px;
         width: auto;
    }
-   /* 
+   /*
     #help2-main .support-section-header, #help2-main .support-section-header-clone {
         display: none !important;
     }*/
@@ -4983,9 +4983,9 @@
 }
 /*floating effect*/
 #help2-main .support-section-header.floating.activated {
-    top: 0px;
+    top: 0;
 }
 #help2-main .support-section-header.floating {
     position: fixed;
-    top: -76px;
+    top: -38px;
 }

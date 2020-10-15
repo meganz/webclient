@@ -18100,7 +18100,10 @@ Chat.prototype.getEmojiDataSet = function (name) {
   }
 
   if (!self._emojiData) {
-    self._emojiData = {};
+    self._emojiData = {
+      'emojisUtf': {},
+      'emojisSlug': {}
+    };
   }
 
   if (self._emojiData[name]) {

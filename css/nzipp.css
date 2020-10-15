@@ -365,7 +365,7 @@ body:not(.mobile) .nzipp.campaign-button.landing:hover {
     margin: -3px 0 24px 40px;
     display: none;
 }
-.nzipp.campaign-textarea:first-child {
+.nzipp.campaign-textarea:first-child, .nzipp.campaign-textarea.visible {
     display: block;
     width: 100%;
     margin: 12px 0 24px 0;

@@ -3127,7 +3127,7 @@
         font-size: 40px;
         width: 90%;
         margin: 0 auto;
-        padding-top: 0;
+        padding-top: 70px;
         line-height: 56px;
     }
     #help2-main .sidebar-menu-container {
@@ -3195,7 +3195,7 @@
         font-size: 30px;
         width: 90%;
         margin: 0 auto;
-        padding-top: 0;
+        padding-top: 60px;
         line-height: 40px;
     }
     #help2-main .article-end {
@@ -3619,7 +3619,7 @@
         color: #fff;
         width: 90%;
         margin: 0px auto;
-        padding-top: 0;
+        padding-top: 60px;
     }
     #help2-main .support-search-container {
         margin:0 auto;
@@ -3860,7 +3860,7 @@
         color: #fff;
         width: 90%;
         margin:0 auto;
-        padding-top: 0;
+        padding-top: 60px;
     }
     #help2-main .first-search-section {
         background-color: #f44;

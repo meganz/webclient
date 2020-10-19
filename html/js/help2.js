@@ -472,12 +472,12 @@ var Help = (function() {
 
             $('#help2-main .search').val(sText);
             if (articles.length === 0) {
-                $('.search-404-block').show();
-                $('.main-search-pad,.sidebar-menu-container').hide();
+                $('.search-404-block').removeClass('hidden');
+                $('.main-search-pad,.sidebar-menu-container').addClass('hidden');
             } else {
-                $('.search-404-block').hide();
+                $('.search-404-block').addClass('hidden');
                 if (!is_mobile) {
-                    $('.main-search-pad,.sidebar-menu-container').show();
+                    $('.main-search-pad,.sidebar-menu-container').removeClass('hidden');
                 }
             }
 

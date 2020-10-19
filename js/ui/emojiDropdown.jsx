@@ -491,7 +491,7 @@ export class DropdownEmojiSelector extends MegaRenderMixin {
                             <input
                                 ref={this.emojiSearchField}
                                 type="search"
-                                placeholder={__(l[102])}
+                                placeholder={l[102]}
                                 onChange={this.onSearchChange}
                                 autoFocus={true}
                                 value={this.state.searchValue} />

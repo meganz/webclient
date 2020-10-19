@@ -106,12 +106,12 @@ class WhosTyping extends MegaRenderMixin {
 
             var msg;
             if (areMultipleUsersTyping === true) {
-                msg = __(l[8872])
+                msg = l[8872]
                     .replace("%1", namesDisplay[0])
                     .replace("%2", namesDisplay[1]);
             }
             else {
-                msg = __(l[8629]).replace("%1", namesDisplay[0]);
+                msg = l[8629].replace("%1", namesDisplay[0]);
             }
 
             typingElement = <div className="typing-block">

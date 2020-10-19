@@ -427,8 +427,14 @@ MegaData.prototype.buildtree = function(n, dialog, stype, sDeepIndex) {
         console.groupEnd();
     }
 
-    if (!sDeepIndex && d) {
-        console.timeEnd('buildtree');
+    if (!sDeepIndex) {
+        if (d) {
+            console.timeEnd('buildtree');
+        }
+
+        if (_ts_l) {
+            mBroadcaster.sendMessage('treesearch', _ts_l, stype);
+        }
     }
 };
 

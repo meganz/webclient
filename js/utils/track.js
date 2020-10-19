@@ -1,4 +1,4 @@
-/* @function window.trk */
+/** @function window.trk */
 lazy(self, 'trk', function() {
     'use strict';
     const queue = [];
@@ -100,6 +100,14 @@ lazy(self, 'trk', function() {
         return res;
     };
 
+    const uri = (page) => {
+        const map = {'download': 'file', '!': 'embed'};
+        const uri = /^(fm|file|folder|chat|embed|download|!)\b/.test(page) && RegExp.$1;
+
+        console.assert(pvId);
+        return String(map[uri] || page).replace(/[^\d/_a-z-].*$/, '~');
+    };
+
     const disable = async(reason) => {
         delete window.trk;
         delete storage.utm; // <- SHOULD? @todo
@@ -137,8 +145,7 @@ lazy(self, 'trk', function() {
             pvId = Math.random().toString(28).slice(-6);
         }
 
-        let uri = page.startsWith('fm') ? 'fm' : page;
-        queue.push([ts, action, data, utm.lts, uri.replace(/[^\d/_a-z].*$/, '~'), pvId]);
+        queue.push([ts, action, data, utm.lts, uri(page), pvId]);
         delay('trk:dsp', dsp, 2e4);
         return save();
     };
@@ -148,36 +155,38 @@ lazy(self, 'trk', function() {
     window.addEventListener('visibilitychange', dsp);
 
     return async(action, data) => {
-        return disabled ? -0xDEADF00D : enqueue(action, data);
+        return disabled ? EACCESS : enqueue(action, data);
     };
 });
 
 
 (function trkEventHandler() {
     'use strict';
-    // eslint-disable-next-line one-var
-    let b1, b2, lastMetaTags = null;
+    const bev = [];
     const log = console.warn.bind(console, '[trk.debug]');
     const split = (t, s) => String(s).split(t).map(String.trim).filter(String);
-    const pubLinkMap = {'!': 'file', 'F!': 'folder', 'P!': 'pp', 'E!': 'embed', 'D!': 'drop'};
+    const filter = (s, p, r) => String(s || '').replace(p || /["'<=>]/g, r || '');
+    const pubLinkMap = {'!': 'embed', 'F!': 'folder', 'P!': 'pp', 'E!': 'embed', 'D!': 'drop'};
     const pubLinkRex = /^(?:chat|file|folder|embed|drop|pp)\b/;
+    let lastMetaTags = null;
 
     const isPubLink = (page) => {
-        if (!page && window.is_embed) {
-            return 'embed';
-        }
         page = getCleanSitePath(page).replace(/^[D-FP]?!/, m => pubLinkMap[m] + '/');
         return pubLinkRex.test(page) ? page.split(/\W/)[0] : false;
     };
 
     const shutdown = (v) => {
-        if (v === -0xDEADF00D) {
-            mBroadcaster.removeListener(b1);
-            mBroadcaster.removeListener(b2);
+        if (v === EACCESS || v === ENOENT) {
+            delay.cancel('trk.ping');
+            delay.cancel('trk.live-loop');
+            for (let i = bev.length; i--;) {
+                mBroadcaster.removeListener(bev[i]);
+            }
             if (d) {
                 log('shutdown');
             }
         }
+        return v;
     };
 
     const getCleanPath = (page) => {
@@ -221,7 +230,15 @@ lazy(self, 'trk', function() {
         return path.map(String.trim).filter(String);
     };
 
-    const nav = (sections) => {
+    const siteSearchData = (term, section, count) => {
+        const res = {search: Array(1 + term.length).join('a'), search_cat: filter(section), search_count: count | 0};
+        if (d) {
+            log(res);
+        }
+        return res;
+    };
+
+    const nav = async(sections) => {
         if (!sections || !sections.length) {
             let link = isPubLink();
 
@@ -240,11 +257,33 @@ lazy(self, 'trk', function() {
             }
         }
 
-        if (d) {
-            log('nav', sections);
+        let last = sections.join('/');
+        if (last === nav.last) {
+            if (d) {
+                log('nav.de-dup', last);
+            }
+            return EEXIST;
         }
-        trk(['nav'].concat(sections).join(' / ')).then(shutdown).catch(log);
+        nav.last = last;
+
+        (function _(v) {
+            if (v !== EACCESS) {
+                delay('trk.ping', () => trk({ping: 1}).then(_).dump('trk.ping'), 9e4);
+            }
+        })();
+
+        let data = {};
+        if (sections[0] === 'cloud-drive' && sections[1] === 'search') {
+            data = siteSearchData(sections[2], sections[0], M.v.length);
+            sections = sections.slice(0, 2);
+        }
+
+        if (d) {
+            log('nav', sections, data);
+        }
+        return trk(['nav'].concat(sections).join(' / '), data).then(shutdown);
     };
+    nav.last = null;
 
     const onPageMetaData = (meta) => {
         if (isPubLink() || page.startsWith('fm')) {
@@ -275,9 +314,10 @@ lazy(self, 'trk', function() {
 
         title = title.map(s => s.toLowerCase());
 
-        nav(title);
+        nav(title).catch(log);
     };
 
+    // these pages will perform an straight redirection and/or are being lazy-loaded, so we will log them later
     const pageChangeExclude = {
         'help': 1,
         'chat': 1,
@@ -293,7 +333,7 @@ lazy(self, 'trk', function() {
         }
 
         if ((!lastMetaTags || lastMetaTags.page !== page) && !pageChangeExclude[page]) {
-            return nav();
+            return nav().catch(log);
         }
 
         if (d > 1) {
@@ -301,8 +341,17 @@ lazy(self, 'trk', function() {
         }
     };
 
-    b1 = mBroadcaster.addListener('pagechange', SoonFc(80, onPageChange));
-    b2 = mBroadcaster.addListener('pagemetadata', tryCatch(onPageMetaData));
+    const onTreeSearch = (term, section, count) => {
+        if (count === undefined) {
+            const tsp = '.content-panel.active :not(.tree-item-on-search-hidden) > .nw-fm-tree-item.ui-draggable';
+            count = document.querySelectorAll(tsp).length;
+        }
+        trk(siteSearchData(term, 'ts:' + section, count)).then(shutdown).catch(dump);
+    };
+
+    bev.push(mBroadcaster.addListener('treesearch', SoonFc(60, onTreeSearch)));
+    bev.push(mBroadcaster.addListener('pagechange', SoonFc(80, onPageChange)));
+    bev.push(mBroadcaster.addListener('pagemetadata', tryCatch(onPageMetaData)));
 
     mBroadcaster.once('startMega', () => {
         if (!/help|chat/.test(page)) {

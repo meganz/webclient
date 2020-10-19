@@ -227,7 +227,7 @@ export default class GenericConversationMessage extends ConversationMessageMixin
                 <DropdownItem
                     icon="context remove-link"
                     key="removeLinkButton"
-                    label={__(l[6821])}
+                    label={l[6821]}
                     onClick={self._removeLink.bind(self, h)}
                 />
             );

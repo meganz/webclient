@@ -478,6 +478,7 @@ MegaData.prototype.contacts = function() {
     }
 
     var html = '';
+    var count = 0;
     var onlinestatus;
 
     // status can be: "online"/"away"/"busy"/"offline"
@@ -501,12 +502,17 @@ MegaData.prototype.contacts = function() {
                     + '"><div class="nw-contact-status"></div><div class="nw-contact-name">'
                     + htmlentities(name)
                     + '<a class="button start-chat-button"><span></span></a></div></div>';
+                ++count;
             }
             $('.fm-start-chat-dropdown').addClass('hidden');
         }
     }
 
     $('.content-panel.contacts').html(html);
+
+    if (treesearch) {
+        mBroadcaster.sendMessage('treesearch', treesearch, 'contacts', count);
+    }
 
     if (megaChatIsReady) {
         var $dropdown = $('.fm-start-chat-dropdown');

@@ -62,7 +62,7 @@ class PrivilegeChange extends ConversationMessageMixin {
             newPrivilegeText = l[8873];
         }
 
-        var text = __(l[8915])
+        var text = l[8915]
             .replace(
                 "%s1",
                 '<strong className="dark-grey-txt">' + htmlentities(newPrivilegeText) + '</strong>'

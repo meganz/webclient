@@ -94,7 +94,7 @@ export default class Attachment extends AbstractGenericMessage {
                                 revokeButton = (
                                     <DropdownItem
                                         icon="red-cross"
-                                        label={__(l[83]) /* `Remove` */}
+                                        label={l[83] /* `Remove` */}
                                         className="red"
                                         onClick={() => {
                                             chatRoom.megaChat.plugins.chatdIntegration.updateMessage(
@@ -121,7 +121,7 @@ export default class Attachment extends AbstractGenericMessage {
                             else if (!NODE_DOESNT_EXISTS_ANYMORE[v.h]) {
                                 downloadButton = <DropdownItem
                                     icon="rounded-grey-down-arrow"
-                                    label={__(l[1187]) /* `Download` */}
+                                    label={l[1187] /* `Download` */}
                                     onClick={() => this.props.onDownloadStart(v)} />;
 
                                 if (M.getNodeRoot(v.h) !== M.RubbishID) {
@@ -131,7 +131,7 @@ export default class Attachment extends AbstractGenericMessage {
                                 firstGroupOfButtons.push(
                                     <DropdownItem
                                         icon="context info"
-                                        label={__(l[6859]) /* `Info` */}
+                                        label={l[6859] /* `Info` */}
                                         key="infoDialog"
                                         onClick={() => {
                                             $.selected = [v.h];
@@ -145,7 +145,7 @@ export default class Attachment extends AbstractGenericMessage {
                                 linkButtons.push(
                                     <DropdownItem
                                         icon="small-icon conversations"
-                                        label={__(l[17764]) /* `Send to chat` */}
+                                        label={l[17764] /* `Send to chat` */}
                                         key="sendToChat"
                                         onClick={() => {
                                             $.selected = [v.h];
@@ -206,19 +206,19 @@ export default class Attachment extends AbstractGenericMessage {
                         {previewButton && <hr/>}
                         <DropdownItem
                             icon="rounded-grey-down-arrow"
-                            label={__(l[1187]) /* `Download` */}
+                            label={l[1187] /* `Download` */}
                             onClick={() => this.props.onDownloadStart(v)}
                         />
                         {this._isUserRegistered() &&
                             <>
                                 <DropdownItem
                                     icon="grey-cloud"
-                                    label={__(l[1988]) /* `Save file` */}
+                                    label={l[1988] /* `Save file` */}
                                     onClick={() => this.props.onAddToCloudDrive(v, false)}
                                 />
                                 <DropdownItem
                                     icon="conversations"
-                                    label={__(l[17764]) /* `Send to chat` */}
+                                    label={l[17764] /* `Send to chat` */}
                                     onClick={() => this.props.onAddToCloudDrive(v, true)}
                                 />
                             </>
@@ -286,7 +286,7 @@ export default class Attachment extends AbstractGenericMessage {
                 <div className={attachmentClasses} key={'atch-' + v.ch}>
                     <div className="message shared-info">
                         <div className="message data-title">
-                            {__(l[17669]) /* `Uploaded this file:` */}
+                            {l[17669] /* `Uploaded this file:` */}
                             <span className="file-name">{v.name}</span>
                         </div>
                         <div className="message file-size">

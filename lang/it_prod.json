@@ -3841,6 +3841,10 @@
     "24059": "[A]%1 file[\/A] creati da %3",
     "24060": "[A]%1 file[\/A] modificati da %3",
     "24061": "sconosciuto",
+    "24068": "Tu (clicca per rimuovere) [G]hai reagito con %s[\/G]",
+    "24069": "%s [G]ha reagito con %s2[\/G]",
+    "24070": "Aggiungi reazione",
+    "24071": "Tu",
     "24073": "Questo utente \u00e8 disabilitato, quindi l\u2019utente non pu\u00f2 confermare il cambiamento dell\u2019email finch\u00e9 non riattivo il suo account.",
     "24074": "Altri download per Windows: [A]versione 64 bit[\/A]"
 }

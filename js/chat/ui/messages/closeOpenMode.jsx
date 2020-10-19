@@ -48,7 +48,7 @@ class CloseOpenModeMessage extends ConversationMessageMixin {
                     {datetime}
 
                     <div className="message text-block">
-                        {__(l[20569])}
+                        {l[20569]}
                     </div>
                 </div>
             </div>

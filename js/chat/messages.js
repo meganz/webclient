@@ -110,8 +110,8 @@ Message._getTextContentsForDialogType = function(message) {
                 otherContact = M.u[message.meta.included[0]];
                 if (contact && otherContact) {
                     textMessage = (contact.u === otherContact.u) ?
-                                __('joined the group chat.') :
-                                l[8907].replace("%s", contactName);
+                        l[23756] :
+                        l[8907].replace("%s", contactName);
                     var otherContactName = htmlentities(M.getNameByHandle(message.meta.included[0]));
                     contact = otherContact;
                     contactName = otherContactName;
@@ -629,19 +629,19 @@ Message.prototype.getManagementMessageSummaryText = function() {
     if (messageHasAttachment || messageIsVoiceClip) {
         var nodes = JSON.parse(this.textContents.substr(2, this.textContents.length));
         if (nodes.length === 1) {
-            return __(l[8894]).replace("%s", nodes[0].name);
+            return l[8894].replace("%s", nodes[0].name);
         }
         else {
-            return __(l[8895]).replace("%s", nodes.length);
+            return l[8895].replace("%s", nodes.length);
         }
     }
     else if (this.textContents.substr(1, 1) === Message.MANAGEMENT_MESSAGE_TYPES.CONTACT) {
         var nodes = JSON.parse(this.textContents.substr(2, this.textContents.length));
         if (nodes.length === 1) {
-            return __(l[8896]).replace("%s", nodes[0].name);
+            return l[8896].replace("%s", nodes[0].name);
         }
         else {
-            return __(l[8897]).replace("%s", nodes.length);
+            return l[8897].replace("%s", nodes.length);
         }
     }
     else if (this.textContents.substr(1, 1) === Message.MANAGEMENT_MESSAGE_TYPES.CONTAINS_META) {
@@ -650,7 +650,7 @@ Message.prototype.getManagementMessageSummaryText = function() {
         return meta.textMessage || "";
     }
     else if (this.textContents.substr(1, 1) === Message.MANAGEMENT_MESSAGE_TYPES.REVOKE_ATTACHMENT) {
-        return __(l[8892]);
+        return l[8892];
     }
 };
 

@@ -3841,6 +3841,10 @@
     "24059": "[A]%1 fichiers[\/A] cr\u00e9\u00e9s par %3",
     "24060": "[A]%1 fichiers[\/A] modifi\u00e9s par %3",
     "24061": "une personne inconnue",
+    "24068": "Vous (cliquez pour le supprimer) [G]avez r\u00e9agi avez %s[\/G]",
+    "24069": "%s [G]a r\u00e9agi avez %s2[\/G]",
+    "24070": "Ajouter une r\u00e9action\u2026",
+    "24071": "Vous",
     "24073": "Le compte de cet utilisateur est d\u00e9sactiv\u00e9. Par cons\u00e9quent, l\u2019utilisateur ne pourra pas confirmer le changement d\u2019adresse courriel tant que vous ne l\u2019aurez pas r\u00e9activ\u00e9.",
     "24074": "Autres t\u00e9l\u00e9chargements pour Windows\u00a0: [A]version\u00a064\u00a0bits[\/A]"
 }

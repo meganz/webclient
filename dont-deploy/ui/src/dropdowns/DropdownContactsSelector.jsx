@@ -19,7 +19,7 @@ export default class extends Component {
         <Button
             className="link-button dropdown-element"
             icon="rounded-grey-plus"
-            label={__("Add participant…")}
+            label="Add participant…"
             contacts={sampleData.contacts.singleContact}
             >
             <DropdownContactsSelector
@@ -41,7 +41,7 @@ export default class extends Component {
                 <Button
                     className="link-button dropdown-element"
                     icon="rounded-grey-plus"
-                    label={__("Add participant…")}
+                    label="Add participant…"
                     contacts={sampleData.contacts.singleContact}
                     >
                     <DropdownContactsSelector

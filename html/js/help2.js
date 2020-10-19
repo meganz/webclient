@@ -92,7 +92,8 @@ var Help = (function() {
             var state = $link.data('state');
             if (state) {
                 var splitPlace = state.lastIndexOf('/');
-                state = state.substr(0, splitPlace) + '#' + state.substr(splitPlace + 1);
+                state = state.substr(splitPlace + 1).includes('#') ?
+                    state : state.substr(0, splitPlace) + '#' + state.substr(splitPlace + 1);
                 var newpage = getCleanSitePath(state);
                 if (newpage !== page && page.substr(0, 4) === 'help') {
                     page = newpage;
@@ -173,7 +174,7 @@ var Help = (function() {
                     url = url.replace('#', '/');
                 }
                 var pos = url.lastIndexOf('/');
-                url = url.substring(0, pos) + '#' + url.substring(pos + 1);
+                url = url.substring(pos + 1).includes('#') ? url : url.substring(0, pos) + '#' + url.substring(pos + 1);
                 $el.attr('href', url);
             }
         }
@@ -801,10 +802,11 @@ var Help = (function() {
                 entry.value = entry.title;
                 var cleanID = entry.id.replace('//', '/');
                 var urlParts = cleanID.split('/');
-                if (urlParts.length === 3) {
-                    var qu = urlParts.pop();
-                    cleanID = urlParts.join('/') + '#' + qu;
-                    addToStructIndex(urlParts[0], urlParts[1], entry.title, entry.body);
+                var questionSplit = urlParts[1].split('#');
+                if (urlParts.length === 3 || questionSplit.length === 2) {
+                    var qu = questionSplit[1] || urlParts.pop();
+                    cleanID = urlParts[0] + '/' + questionSplit[0] + '#' + qu;
+                    addToStructIndex(urlParts[0], questionSplit[0], entry.title, entry.body);
                 }
                 entry.url = 'help/client/' + cleanID;
                 entry.id = cleanID;

@@ -852,7 +852,7 @@ ChatRoom.prototype.getRoomTitle = function(ignoreTopic, encapsTopicInQuotes) {
         }
 
         var names = self.getParticipantsTruncated();
-        var def = __(l[19077]).replace('%s1', new Date(self.ctime * 1000).toLocaleString());
+        var def = l[19077].replace('%s1', new Date(self.ctime * 1000).toLocaleString());
 
         return names.length > 0 ? names : def;
     }
@@ -1850,7 +1850,7 @@ ChatRoom.prototype.truncate = function() {
                         msgDialog(
                             'warninga',
                             l[135],
-                            __(l[8880])
+                            l[8880]
                         );
                     }
                 });

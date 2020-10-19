@@ -636,9 +636,14 @@ function getCountryAndLocales() {
         country = u_attr.country ? u_attr.country : u_attr.ipcc || 'ISO';
     }
 
-    var locales = country ? locale + '-' + country : locale;
+    // cnl is exist and has same country as u_attr return cached version.
+    if ($.cnl && $.cnl.country === country) {
+        return $.cnl;
+    }
 
-    return {country: country, locales: locales};
+    var locales = mega.intl.test(locale + '-' + country) || mega.intl.test(locale) || 'ISO';
+
+    return $.cnl = {country: country, locales: locales};
 }
 
 //----------------------------------------------------------------------------

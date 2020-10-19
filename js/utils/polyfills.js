@@ -255,3 +255,58 @@ mBroadcaster.once('boot_done', function() {
 
     Object.defineProperty(mega, 'es2019', {value: mg && mg.length === 2 && mg[0] === 'm1' && mg[1] === 'm2'});
 });
+
+// https://github.com/uxitten/polyfill/blob/master/string.polyfill.js
+// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/padStart
+if (!String.prototype.padStart) {
+    String.prototype.padStart = function padStart(targetLength, padString) {
+        "use strict";
+        // truncate if number, or convert non-number to 0;
+        targetLength >>= 0;
+        padString = String(typeof padString === 'undefined' ? ' ' : padString);
+        if (this.length >= targetLength) {
+            return String(this);
+        }
+        targetLength -= this.length;
+        if (targetLength > padString.length) {
+            // append to original to ensure we are longer than needed
+            padString += padString.repeat(targetLength / padString.length);
+        }
+        return padString.slice(0, targetLength) + String(this);
+    };
+}
+if (!String.prototype.padEnd) {
+    String.prototype.padEnd = function padEnd(targetLength, padString) {
+        "use strict";
+        // floor if number or convert non-number to 0;
+        targetLength >>= 0;
+        padString = String(typeof padString === 'undefined' ? ' ' : padString);
+        if (this.length > targetLength) {
+            return String(this);
+        }
+        targetLength -= this.length;
+        if (targetLength > padString.length) {
+            // append to original to ensure we are longer than needed
+            padString += padString.repeat(targetLength / padString.length);
+        }
+        return String(this) + padString.slice(0, targetLength);
+    };
+}
+
+
+
+// XXX: The following are not polyfills obviously, but given this file is included always let's place them here for now
+
+// @private
+var nop = function() {
+    'use strict';
+};
+
+// @private
+var echo = function(a) {
+    'use strict';
+    return a;
+};
+
+// @private
+var dump = console.warn.bind(console, '[dump]');

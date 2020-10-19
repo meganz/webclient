@@ -805,6 +805,8 @@ mega.tpw = {
 
 var nicknames = {
     cache: {},
+    // eslint-disable-next-line no-empty-function
+    getNickname: function() {},
     getNicknameAndName: function() {},
     decryptAndCacheNicknames: function() {},
     updateNicknamesFromActionPacket: function() {}

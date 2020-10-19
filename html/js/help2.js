@@ -553,7 +553,8 @@ var Help = (function() {
                 args.push(sec);
                 question = clearQuestion(location.hash);
             }
-            else if (args.length === 2 && !location.hash && args[1].length > 20) {
+            else if (args.length === 2 && !location.hash && args[1].length === 24 &&
+                args[1].indexOf('-') === -1) {
                 // old buggos short urls
                 return loadSubPage('help/s/' + args.pop());
             }

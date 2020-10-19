@@ -478,6 +478,7 @@ MegaData.prototype.contacts = function() {
     }
 
     var html = '';
+    var count = 0;
     var onlinestatus;
 
     // status can be: "online"/"away"/"busy"/"offline"
@@ -501,12 +502,17 @@ MegaData.prototype.contacts = function() {
                     + '"><div class="nw-contact-status"></div><div class="nw-contact-name">'
                     + htmlentities(name)
                     + '<a class="button start-chat-button"><span></span></a></div></div>';
+                ++count;
             }
             $('.fm-start-chat-dropdown').addClass('hidden');
         }
     }
 
     $('.content-panel.contacts').html(html);
+
+    if (treesearch) {
+        mBroadcaster.sendMessage('treesearch', treesearch, 'contacts', count);
+    }
 
     if (megaChatIsReady) {
         var $dropdown = $('.fm-start-chat-dropdown');
@@ -698,8 +704,8 @@ MegaData.prototype.syncUsersFullname = function(userId, chatHandle, promise) {
                 user.name += (user.name.length > 0 ? " " : "") + lastName;
             }
 
-            // Get the nickname (if available) and name
-            var userName = nicknames.getNicknameAndName(userId);
+            // Get the nickname if available otherwise get the user name
+            var userName = nicknames.getNickname(userId);
 
             if (M.currentdirid === 'shares') {// Update right panel list and block view
                 $('.shared-grid-view .' + userId + ' .fm-chat-user').text(userName);
@@ -1290,7 +1296,7 @@ MegaData.prototype.addContactUI = function() {
         $container.find('.nw-contact-block-avatar').empty().append(avatar);
         $container.find('.onlinestatus').removeClass('away offline online busy').addClass(onlinestatus[1]);
         $container.find('.fm-chat-user-status').text(onlinestatus[0]);
-        $container.find('.contact-details-user-name').text(this.getNameByHandle(user.u));
+        $('.contact-details-user-name', $container).text(nicknames.getNicknameAndName(user.u));
         $container.find('.contact-details-email').text(user.m);
         $('.contact-share-notification').text(l[20435].replace('%1', this.getNameByHandle(user.u)));
 

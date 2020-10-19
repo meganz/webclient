@@ -10,9 +10,7 @@ NODE = node
 # Build-depends - make sure you keep BUILD_DEP_ALL and BUILD_DEP_ALL_NAMES up-to-date
 KARMA  = $(NODE_PATH)/karma/bin/karma
 JSDOC  = $(NODE_PATH)/.bin/jsdoc
-JSHINT = $(NODE_PATH)/.bin/jshint
 RSG = $(NODE_PATH)/.bin/rsg
-JSCS = $(NODE_PATH)/.bin/jscs
 BUILD_DEP_ALL = $(KARMA) $(JSDOC)
 BUILD_DEP_ALL_NAMES = karma jsdoc
 
@@ -28,9 +26,9 @@ ifneq ($(HEADLESS),)
     HEADLESS_RUN = "xvfb-run"
 endif
 
-# If no browser set, run on our custom PhantomJS2.
+# If no browser set, run ChromeHeadless by default.
 ifeq ($(BROWSER),)
-    BROWSER = PhantomJS_custom
+    BROWSER = ChromeHeadless
 endif
 
 # If no Karma flags set, set a default.
@@ -44,9 +42,9 @@ ifdef SINGLE_RUN
 endif
 
 # All browsers to test with on the test-all target.
-TESTALL_BROWSERS = PhantomJS_custom,Chrome_Unlimited,Firefox
+TESTALL_BROWSERS = ChromeHeadless,FirefoxHeadless,Chrome_NoCookies,Chrome_Incognito
 ifeq ($(OS), Windows_NT)
-    TESTALL_BROWSERS := $(TESTALL_BROWSERS),IE,FirefoxNightly,FirefoxDeveloper,Firefox_NoCookies,Chrome_NoCookies,Chrome_Incognito
+    TESTALL_BROWSERS := $(TESTALL_BROWSERS),FirefoxNightlyHeadless,FirefoxDeveloperHeadless
 endif
 
 all: test-ci api-doc ui-styleguide dist test-shared
@@ -55,7 +53,6 @@ test-no-workflows:
 	SKIP_WORKFLOWS=true $(MAKE) $(SILENT_MAKE) test
 
 test: $(KARMA)
-	@rm -rf test/phantomjs-storage
 	$(HEADLESS_RUN) $(NODE) $(KARMA) start $(KARMA_FLAGS) karma.conf.js --browsers $(BROWSER) $(OPTIONS)
 
 test-ci: $(KARMA)
@@ -65,7 +62,7 @@ test-debug: $(KARMA)
 	KARMA_FLAGS="--preprocessors= --debug ${SINGLE_RUN_FLAG}" $(MAKE) $(SILENT_MAKE) test
 
 test-all:
-	KARMA_FLAGS="--singleRun=true" BROWSER=$(TESTALL_BROWSERS) $(MAKE) $(SILENT_MAKE) test
+	KARMA_FLAGS="--preprocessors= --singleRun=true" BROWSER=$(TESTALL_BROWSERS) $(MAKE) $(SILENT_MAKE) test
 
 api-doc: $(JSDOC)
 	$(NODE) $(JSDOC) --destination doc/api/ --private \
@@ -74,17 +71,9 @@ api-doc: $(JSDOC)
 ui-styleguide: $(RSG)
 	$(RSG) "./dont-deploy/ui/src/**/*.jsx" -c styleguide.json
 
-jshint: $(JSHINT)
-	@-$(NODE) $(JSHINT) --verbose .
-
-jscs: $(JSCS)
-	@-$(NODE) $(JSCS) --verbose .
-
 pkg-upgrade:
 	@npm outdated --depth=0
 	@npm outdated --depth=0 | grep -v Package | awk '{print $$1}' | xargs -I% npm install %@latest $(OPTIONS)
-
-checks: jshint jscs
 
 clean:
 	rm -rf doc/api/ coverage/ build/ test-results.xml jscpd-report.xml test/phantomjs-storage dont-deploy/ui/out/
@@ -94,5 +83,5 @@ clean-all: clean
 	rm -f $(BUILD_DEP_ALL)
 	rm -rf $(BUILD_DEP_ALL_NAMES:%=$(NODE_PATH)/%) $(DEP_ALL_NAMES:%=$(NODE_PATH)/%)
 
-.PHONY: all test test-no-workflows test-all test-ci api-doc jshint jscs checks
+.PHONY: all test test-no-workflows test-all test-ci api-doc
 .PHONY: clean clean-all pkg-upgrade

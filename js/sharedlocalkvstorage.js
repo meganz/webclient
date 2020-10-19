@@ -77,14 +77,11 @@ var SharedLocalKVStorage = function(name, manualFlush, broadcaster) {
     self._listeners = {};
     self._initPersistance();
 
-    self.isMaster = false;
-
-
     Object.defineProperty(this, 'isMaster', {
         get: function() {
-            return self.broadcaster.crossTab.master ? true : false;
+            return !!self.broadcaster.crossTab.master;
         },
-        set: function(value) {
+        set: function() {
             throw new Error(".isMaster is read only!");
         }
     });
@@ -517,6 +514,46 @@ SharedLocalKVStorage.decrypt = function(val) {
 };
 
 SharedLocalKVStorage.Utils = Object.create(null);
+
+SharedLocalKVStorage.Utils.lazyInitCall = function(proto, method, master, fn) {
+    'use strict';
+    if (fn === undefined) {
+        fn = master;
+        master = true;
+    }
+    proto[method] = function __SLKVLazyInitCall() {
+        var self = this;
+
+        if (master && !mBroadcaster.crossTab.master) {
+            // the method shall dealt with it.
+            return fn.apply(self, arguments);
+        }
+
+        var args = toArray.apply(null, arguments);
+        return new Promise(function(resolve, reject) {
+            var name = self.__slkvLazyInitMutex || (self.__slkvLazyInitMutex = 'lIMutex' + makeUUID().slice(-13));
+            mutex.lock(name).then(function(unlock) {
+                var onReadyState = function() {
+                    delete self.__slkvLazyInitMutex;
+                    return (self[method] = fn).apply(self, args).then(resolve).catch(reject);
+                };
+
+                if (Object.hasOwnProperty.call(self, '__slkvLazyInitReady')) {
+                    return onReadyState().always(unlock);
+                }
+
+                self.lazyInit()
+                    .then(function() {
+                        Object.defineProperty(self, '__slkvLazyInitReady', {value: 1});
+                        return onReadyState();
+                    })
+                    .always(unlock);
+            }).catch(reject);
+        });
+    };
+
+    return proto[method];
+};
 
 SharedLocalKVStorage.Utils._requiresMutex = function SLKVMutexWrapper(origFunc, methodName) {
     'use strict';

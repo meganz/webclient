@@ -79,6 +79,37 @@
     width: 22px;
     height: 22px;
 }
+.tiny-icon.laughing-face-with-plus {
+    background-position: -125px -498px;
+    width: 16px;
+    height: 16px;
+}
+.tiny-icon.laughing-face-with-plus.colorized, .hover-colorized:hover .tiny-icon.laughing-face-with-plus {
+    background-position: -164px -498px;
+}
+.small-icon.laughing-face-with-plus {
+    background-position: -125px -569px;
+}
+.small-icon.bold-left-arrow {
+    background-position: -199px -496px;
+}
+.small-icon.three-dots {
+    background-position: -200px -533px;
+}
+.small-icon.laughing-face, .right-aligned-msg-buttons.total-1 .tiny-icon.laughing-face-with-plus {
+    background-position: -122px -531px;
+    width: 22px;
+    height: 22px;
+}
+.small-icon.laughing-face.colorized,
+.right-aligned-msg-buttons.total-1 .hover-colorized:hover .tiny-icon.laughing-face-with-plus {
+    background-position: -160px -531px;
+}
+.laughing-face {
+    background-position: -89px -853px;
+    width: 22px;
+    height: 22px;
+}
 .tiny-icon.eye {
     width: 14px;
     height: 14px;
@@ -1982,6 +2013,15 @@
 }
 .medium-icon.right-arrow.icons-sprite {
     background-position: -82px -1312px;
+}
+
+/* Top sprite */
+.top-sprite, i.top-sprite {
+    background-image: url(../images/mega/top-sprite_v8.png);
+    background-repeat: no-repeat;
+}
+.top-sprite.medium-icon.white-right-arrow {
+    background-position: -5px -2040px;
 }
 
 /* Account Icons */

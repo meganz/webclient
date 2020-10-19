@@ -775,10 +775,10 @@ Chat.prototype.updateSectionUnreadCount = SoonFc(function() {
 }, 100);
 
 /**
- * Destroy all MegaChat databases.
+ * Drop all MegaChat databases.
  * @returns {Promise}
  */
-Chat.prototype.destroyDatabases = promisify(function(resolve, reject) {
+Chat.prototype.dropAllDatabases = promisify(function(resolve, reject) {
     const chatd = this.plugins.chatdIntegration.chatd || false;
     const promises = [];
 
@@ -790,8 +790,13 @@ Chat.prototype.destroyDatabases = promisify(function(resolve, reject) {
         promises.push(chatd.messagesQueueKvStorage.clear());
     }
 
+    if (Reactions.hasOwnProperty('_db')) {
+        promises.push(Reactions._db.clear());
+    }
+
     Promise.allSettled(promises).then(resolve).catch(reject);
 });
+
 
 /**
  * Destroy this MegaChat instance (leave all rooms then disconnect)
@@ -1559,6 +1564,7 @@ Chat.prototype.navigate = promisify(function megaChatNavigate(resolve, reject, l
 
     M.currentdirid = String(page = location).replace('fm/', '');
     history[method]({subpage: location}, "", (hashLogic ? '#' : '/') + location);
+    mBroadcaster.sendMessage('pagechange', page);
 });
 
 if (is_mobile) {
@@ -2131,7 +2137,10 @@ Chat.prototype.getEmojiDataSet = function(name) {
         self._emojiDataLoading = {};
     }
     if (!self._emojiData) {
-        self._emojiData = {};
+        self._emojiData = {
+            'emojisUtf': {},
+            'emojisSlug': {}
+        };
     }
 
     if (self._emojiData[name]) {
@@ -2159,6 +2168,9 @@ Chat.prototype.getEmojiDataSet = function(name) {
         }).then(function(ev, data) {
             self._emojiData[name] = data;
             delete self._emojiDataLoading[name];
+            if (name === "emojis") {
+                self._mapEmojisToAliases();
+            }
             promise.resolve(data);
         }).catch(function(ev, error) {
             if (d) {
@@ -2172,20 +2184,37 @@ Chat.prototype.getEmojiDataSet = function(name) {
     }
 };
 
+
+Chat.prototype._mapEmojisToAliases = function() {
+    var self = this;
+    var emojis = self._emojiData.emojis;
+    if (!emojis) {
+        return;
+    }
+
+    self._emojiData.emojisSlug = {};
+    self._emojiData.emojisUtf = {};
+    for (var i = 0; i < emojis.length; i++) {
+        var emoji = emojis[i];
+        self._emojiData.emojisSlug[emoji.n] = emoji;
+        self._emojiData.emojisUtf[emoji.u] = emoji;
+    }
+};
+
 /**
  * Method for checking if an emoji by that slug exists
  * @param slug
  */
 Chat.prototype.isValidEmojiSlug = function(slug) {
     var self = this;
-    var emojiData = self._emojiData['emojis'];
+    var emojiData = self._emojiData.emojis;
     if (!emojiData) {
         self.getEmojiDataSet('emojis');
         return false;
     }
 
     for (var i = 0; i < emojiData.length; i++) {
-        if (emojiData[i]['n'] === slug) {
+        if (emojiData[i].n === slug) {
             return true;
         }
     }
@@ -2288,6 +2317,33 @@ Chat.prototype.getChatById = function(chatdId) {
     return found;
 };
 
+
+/**
+ * Retrieves a message of idb if not in memory
+ *
+ * @param {String} chatId chatId
+ * @param {String} messageId messageId
+ * @returns {Promise}
+ * @private
+ */
+Chat.prototype.getMessageByMessageId = promisify(function(resolve, reject, chatId, messageId) {
+    var chatRoom = this.getChatById(chatId);
+    var msg = chatRoom.messagesBuff.getMessageById(messageId);
+    if (msg) {
+        return resolve(msg);
+    }
+
+    var cdp = this.plugins.chatdIntegration.chatd.chatdPersist;
+    if (!cdp) {
+        return reject();
+    }
+
+    cdp.getMessageByMessageId(chatId, messageId)
+        .then(r => Message.fromPersistableObject(chatRoom, r[0]))
+        .then(resolve)
+        .catch(reject);
+});
+
 /**
  * Returns true if there is a chat room with an active (started/starting) call.
  *
@@ -2350,18 +2406,45 @@ Chat.prototype.openChatAndAttachNodes = function(targets, nodes) {
 
     return new MegaPromise(function(resolve, reject) {
         var promises = [];
+        var folderNodes = [];
+        var fileNodes = [];
+
+        var handleRejct = function(reject, roomId, ex) {
+            if (d) {
+                self.logger.warn('Cannot openChat for %s and hence nor attach nodes to it.', roomId, ex);
+            }
+            reject(ex);
+        };
+
         var attachNodes = function(roomId) {
             return new MegaPromise(function(resolve, reject) {
-                self.smartOpenChat(roomId)
-                    .then(function(room) {
-                        room.attachNodes(nodes).then(resolve.bind(self, room)).catch(reject);
-                    })
-                    .catch(function(ex) {
-                        if (d) {
-                            self.logger.warn('Cannot openChat for %s and hence nor attach nodes to it.', roomId, ex);
-                        }
-                        reject(ex);
-                    });
+                self.smartOpenChat(roomId).then(function(room) {
+                    room.attachNodes(fileNodes).then(resolve.bind(self, room)).catch(reject);
+                }).catch(ex => {
+                    handleRejct(reject, roomId, ex);
+                });
+            });
+        };
+
+        var attachFolders = roomId => {
+            return new MegaPromise((resolve, reject) => {
+
+                var createPublicLink = (nodeId, room) => {
+                    M.createPublicLink(nodeId)
+                        .then(({ link }) => {
+                            room.sendMessage(link);
+                            resolve(room);
+                        })
+                        .catch(reject);
+                };
+
+                self.smartOpenChat(roomId).then(room => {
+                    for (var i = folderNodes.length; i--;) {
+                        createPublicLink(folderNodes[i], room);
+                    }
+                }).catch(ex => {
+                    handleRejct(reject, roomId, ex);
+                });
             });
         };
 
@@ -2369,36 +2452,59 @@ Chat.prototype.openChatAndAttachNodes = function(targets, nodes) {
             targets = [targets];
         }
 
-        for (var i = targets.length; i--;) {
-            promises.push(attachNodes(targets[i]));
-        }
-
-        MegaPromise.allDone(promises).unpack(function(result) {
-            var room;
-
-            for (var i = result.length; i--;) {
-                if (result[i] instanceof ChatRoom) {
-                    room = result[i];
-                    break;
-                }
-            }
-
-            if (room) {
-                showToast('send-chat', nodes.length > 1 ? l[17767] : l[17766]);
-                var roomUrl = room.getRoomUrl().replace("fm/", "");
-                M.openFolder(roomUrl).always(resolve);
+        for (var i = nodes.length; i--;) {
+            if (M.d[nodes[i]].t) {
+                folderNodes.push(nodes[i]);
             }
             else {
-                if (d) {
-                    self.logger.warn('openChatAndAttachNodes failed in whole...', result);
+                fileNodes.push(nodes[i]);
+            }
+        }
+
+        var _afterMDcheck = () => {
+            for (var i = targets.length; i--;) {
+                if (fileNodes.length > 0) {
+                    promises.push(attachNodes(targets[i]));
                 }
-                reject(result);
+                if (folderNodes.length > 0) {
+                    promises.push(attachFolders(targets[i]));
+                }
             }
 
-            if (d) {
-                console.groupEnd();
-            }
-        });
+            MegaPromise.allDone(promises).unpack(function(result) {
+                var room;
+
+                for (var i = result.length; i--;) {
+                    if (result[i] instanceof ChatRoom) {
+                        room = result[i];
+                        break;
+                    }
+                }
+
+                if (room) {
+                    showToast('send-chat', nodes.length > 1 ? l[17767] : l[17766]);
+                    var roomUrl = room.getRoomUrl().replace("fm/", "");
+                    M.openFolder(roomUrl).always(resolve);
+                }
+                else {
+                    if (d) {
+                        self.logger.warn('openChatAndAttachNodes failed in whole...', result);
+                    }
+                    reject(result);
+                }
+
+                if (d) {
+                    console.groupEnd();
+                }
+            });
+        };
+
+        if (mega.megadrop.isDropExist(folderNodes).length) {
+            mega.megadrop.showRemoveWarning(folderNodes).then(_afterMDcheck);
+        }
+        else {
+            _afterMDcheck();
+        }
     });
 };
 

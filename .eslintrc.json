@@ -4,7 +4,6 @@
         "es6": true,
         "jquery": true,
         "mocha": true,
-        "phantomjs": true,
         "worker": true
     },
     "parserOptions": {

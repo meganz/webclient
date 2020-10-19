@@ -329,7 +329,7 @@ var _text_layer = __w_pdfjs_require__(21);
 
 var _svg = __w_pdfjs_require__(22);
 
-const pdfjsVersion = '2.6.181';
+const pdfjsVersion = '2.6.182';
 const pdfjsBuild = '277a92d2.meganz';
 {
   const {
@@ -1689,6 +1689,30 @@ const createObjectURL = function createObjectURLClosure() {
 
 exports.createObjectURL = createObjectURL;
 
+if (Promise.allSettled === undefined) {
+  Promise.allSettled = function (promises) {
+    const done = function (result) {
+      return {
+        status: "fulfilled",
+        value: result
+      };
+    };
+
+    const fail = function (result) {
+      return {
+        status: "rejected",
+        reason: result
+      };
+    };
+
+    const map = function (value) {
+      return Promise.resolve(value).then(done).catch(fail);
+    };
+
+    return Promise.all(promises.map(map));
+  };
+}
+
 /***/ }),
 /* 3 */
 /***/ (function(module, exports, __w_pdfjs_require__) {
@@ -1927,7 +1951,7 @@ function _fetchDocument(worker, source, pdfDataRangeTransport, docId) {
 
   return worker.messageHandler.sendWithPromise("GetDocRequest", {
     docId,
-    apiVersion: '2.6.181',
+    apiVersion: '2.6.182',
     source: {
       data: source.data,
       url: source.url,
@@ -3697,7 +3721,7 @@ async function getPreviewImage(data, pageNum = 1, scale = 2.5) {
   return buffer;
 }
 
-const version = '2.6.181';
+const version = '2.6.182';
 exports.version = version;
 const build = '277a92d2.meganz';
 exports.build = build;
@@ -3880,7 +3904,7 @@ const defaultOptions = {
     kind: OptionKind.WORKER
   },
   workerSrc: {
-    value: (global.is_extension ? "" : "/") + "pdf.worker.js?v=2.6.181",
+    value: (global.is_extension ? "" : "/") + "pdf.worker.js?v=2.6.182",
     kind: OptionKind.WORKER
   }
 };

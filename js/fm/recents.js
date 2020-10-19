@@ -75,14 +75,11 @@ function RecentsRender() {
 
     this._actionChildren = {};
 
-    if (!localStorage.recentsDays) {
-        localStorage.recentsDays = 90;
-    }
-    if (!localStorage.recentsNodeLimit) {
-        localStorage.recentsNodeLimit = 10000;
-    }
-    this._defaultRangeTimestamp = Math.floor((Date.now() - (localStorage.recentsDays * 86400000)) / 1000); // 90 days
-    this._defaultRangeLimit = localStorage.recentsNodeLimit;
+    var recentsDays = parseInt(localStorage.recentsDays) || 90;
+    var recentsNodeLimit = parseInt(localStorage.recentsNodeLimit) || 10000;
+
+    this._defaultRangeTimestamp = Math.floor((Date.now() - recentsDays * 86400000) / 1000); // 90 days
+    this._defaultRangeLimit = recentsNodeLimit;
 
     var self = this;
 
@@ -360,7 +357,7 @@ RecentsRender.prototype.handleByUserHandle = function($newRow, action) {
 
     $userNameContainer
         .removeClass("hidden")
-        .text(M.getNameByHandle(action.user))
+        .text(M.getNameByHandle(action.user) || l[24061])
 
     if (!user.h) {
         // unknown/deleted contact, no business here...
@@ -845,43 +842,10 @@ RecentsRender.prototype._renderMedia = function($newRow, action, actionId) {
     var $title = $newRow.find(".file-name");
     var $titleString;
 
-    // Ternary key based title string set. Can be extended by adding more type
-    var titleStrings = {
-        "222": [l[23871], l[23872], l[23873]],
-        "221": [l[23874], l[23875], l[23876]],
-        "220": [l[19947], l[19945], l[19946]],
-        "212": [l[23877], l[23878], l[23879]],
-        "211": [l[23882], l[23881], l[23880]],
-        "210": [l[19948], l[19949], l[19950]],
-        "202": [l[23883], l[23884], l[23885]],
-        "201": [l[23886], l[23887], l[23888]],
-        "200": [l[19960], l[19961], l[19962]],
-        "122": [l[23889], l[23891], l[23891]],
-        "121": [l[23892], l[23893], l[23894]],
-        "120": [l[19951], l[19952], l[19953]],
-        "112": [l[23895], l[23896], l[23897]],
-        "111": [l[23898], l[23899], l[23900]],
-        "110": [l[19954], l[19955], l[19956]],
-        "102": [l[23901], l[23902], l[23903]],
-        "101": [l[23904], l[23905], l[23906]],
-        "022": [l[23907], l[23908], l[23909]],
-        "021": [l[23910], l[23911], l[23912]],
-        "020": [l[19957], l[19958], l[19959]],
-        "012": [l[23913], l[23914], l[23915]],
-        "011": [l[23916], l[23917], l[23918]],
-        "002": [l[23919], l[23920], l[23921]],
-
-        // Below set should be arrived on this point.
-        // "100": [],
-        // "010": [],
-        // "001": [],
-        // "000": [],
-    };
-
     var makeTitle = function() {
 
-        var titleTernary = '' + Math.min(images, 2) + Math.min(videos, 2) + Math.min(pdfs, 2);
-        var currentStringSet = titleStrings[titleTernary];
+        var numOfFiles = images + videos + pdfs;
+        var currentStringSet = [l[7470].replace('%d', '%1'), l[24059], l[24060]];
 
         if (isOtherUser) {
             if (isCreated) {
@@ -896,7 +860,7 @@ RecentsRender.prototype._renderMedia = function($newRow, action, actionId) {
         } else {
             $titleString = '<span class="link title">' + currentStringSet[0] + '</span>';
         }
-        return $titleString.replace("%1", images).replace("%2", videos).replace('%4', pdfs);
+        return $titleString.replace("%1", numOfFiles);
     };
 
     $titleString = makeTitle();

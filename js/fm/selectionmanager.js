@@ -148,7 +148,8 @@ var SelectionManager = function($selectable, resume) {
 
         var self = this;
         onIdle(function() {
-            if (!self.selected_list.length) {
+            var list = self.selected_list;
+            if (list && !list.length) {
                 self.hideSelectionBar();
             }
         });
@@ -187,7 +188,9 @@ var SelectionManager = function($selectable, resume) {
      */
     this._getSafeListItem = function(item) {
         if (typeof item !== 'string') {
-            item = item && item[item.length - 1] || false;
+            if (!(item instanceof MegaNode)) {
+                item = item && item[item.length - 1] || false;
+            }
 
             if (item && typeof item !== 'string') {
                 item = idMapper(item) || false;
@@ -547,6 +550,7 @@ var SelectionManager = function($selectable, resume) {
             this._$jqSelectable.off('selectableselecting.sm' + this.idx + ' selectableselected.sm' + this.idx);
         }
         $('.fm-right-files-block').off('selectablecreate.sm');
+        oDestroy(this);
     };
 
     /**

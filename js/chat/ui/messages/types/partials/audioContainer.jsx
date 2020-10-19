@@ -43,6 +43,9 @@ export default class AudioContainer extends React.Component {
     }
 
     componentWillUnmount() {
+        if (super.componentWillUnmount) {
+            super.componentWillUnmount();
+        }
         URL.revokeObjectURL(this.state.audioBlobUrl);
     }
 

@@ -2736,6 +2736,10 @@ function closeDialog(ev) {
         delete $.selectFolderCallback;
     }
 
+    if (typeof redeem !== 'undefined' && redeem.$dialog) {
+        redeem.$dialog.addClass('hidden');
+    }
+
     delete $.dialog;
     treesearch = false;
 

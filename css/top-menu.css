@@ -669,6 +669,9 @@
     margin: 22px 20px;
     min-width: 170px;
 }
+.pages-menu.submenu-link.hidden {
+    display: none;
+}
 .pages-menu.submenu-link i {
     width: 32px;
     height: 32px;

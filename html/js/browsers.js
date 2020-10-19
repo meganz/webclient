@@ -12,7 +12,7 @@ var browserspage = {
         if (is_mobile)  {
             browserspage.setBrowserData('firefox');
         }
-        else if (window.opr)  {
+        else if (window.opr) {
             browserspage.setBrowserData('opera');
         }
         else if (ua.details.browser === 'Edgium') {
@@ -39,23 +39,15 @@ var browserspage = {
 
         if (browser === 'chrome')  {
             $('.a1', $browserLinks).text('Firefox');
-            $('.a2', $browserLinks).text('Opera');
             $('.a3', $browserLinks).text('Edge');
         }
         else if (browser === 'firefox')  {
             $('.a1', $browserLinks).text('Chrome');
-            $('.a2', $browserLinks).text('Opera');
-            $('.a3', $browserLinks).text('Edge');
-        }
-        else if (browser === 'opera')  {
-            $('.a1', $browserLinks).text('Chrome');
-            $('.a2', $browserLinks).text('Firefox');
             $('.a3', $browserLinks).text('Edge');
         }
         else if (browser === 'edge')  {
             $('.a1', $browserLinks).text('Chrome');
-            $('.a2', $browserLinks).text('Firefox');
-            $('.a3', $browserLinks).text('Opera');
+            $('.a3', $browserLinks).text('Firefox');
         }
         else {
             browser = 'unsupported';

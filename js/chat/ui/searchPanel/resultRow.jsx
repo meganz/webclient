@@ -205,7 +205,7 @@ class MemberRow extends MegaRenderMixin {
                             <span dangerouslySetInnerHTML={{
                                 __html: highlight(
                                     megaChat.plugins.emoticonsFilter.processHtmlMessage(
-                                        htmlentities(nicknames.getNicknameAndName(data))
+                                        htmlentities(nicknames.getNickname(data))
                                     ),
                                     matches,
                                     true
@@ -228,7 +228,7 @@ class MemberRow extends MegaRenderMixin {
                             <MembersAmount room={room} />
                         </> :
                         <>
-                            <EmojiFormattedContent>{nicknames.getNicknameAndName(data)}</EmojiFormattedContent>
+                            <EmojiFormattedContent>{nicknames.getNickname(data)}</EmojiFormattedContent>
                             <LastActivity contact={contact} showLastGreen={true} />
                         </>
                     }

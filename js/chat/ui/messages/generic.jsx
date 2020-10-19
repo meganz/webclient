@@ -7,6 +7,7 @@ import VoiceClip from './types/voiceClip.jsx';
 import Text from './types/text.jsx';
 import { DropdownItem } from '../../../ui/dropdowns.jsx';
 
+
 // eslint-disable-next-line id-length
 const CLICKABLE_ATTACHMENT_CLASSES =
     '.message.data-title, .message.file-size, .data-block-view.semi-big, .data-block-view.medium';
@@ -18,6 +19,7 @@ export default class GenericConversationMessage extends ConversationMessageMixin
         this.state = {
             editing: this.props.editing
         };
+        this.pid = '__geom_' + String(Math.random()).substr(2);
     }
 
     isBeingEdited = () => this.state.editing === true || this.props.editing === true;

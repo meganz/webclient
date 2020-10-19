@@ -175,6 +175,7 @@ function getCleanSitePath(path) {
     }
     else if (path[0].indexOf('mt=') === 0) {
         window.uTagMT = String(path[0]).replace('mt=', '');
+        path = [''];
     }
 
     return path[0];
@@ -2403,6 +2404,7 @@ else if (!browserUpdate) {
     jsl.push({f:'js/utils/watchdog.js', n: 'js_utils_watchdog_js', j: 1});
     jsl.push({f:'js/utils/workers.js', n: 'js_utils_workers_js', j: 1});
     jsl.push({f:'js/utils/trans.js', n: 'js_utils_trans_js', j: 1});
+    jsl.push({f:'js/utils/track.js', n: 'js_utils_track_js', j: 1});
 
     jsl.push({f:'js/vendor/dexie.js', n: 'dexie_js', j:1,w:5});
     jsl.push({f:'js/functions.js', n: 'functions_js', j:1});
@@ -2773,6 +2775,7 @@ else if (!browserUpdate) {
         jsl.push({f:'js/utils/timers.js', n: 'js_utils_timers_js', j: 1});
         jsl.push({f:'js/utils/watchdog.js', n: 'js_utils_watchdog_js', j: 1});
         jsl.push({f:'js/utils/workers.js', n: 'js_utils_workers_js', j: 1});
+        jsl.push({f:'js/utils/track.js', n: 'js_utils_track_js', j: 1});
 
         jsl.push({f:'js/crypto.js', n: 'crypto_js', j: 1, w: 5});
         jsl.push({f:'js/account.js', n: 'user_js', j: 1});
@@ -2878,6 +2881,9 @@ else if (!browserUpdate) {
         'redeem_js': {f:'html/js/redeem.js', n: 'redeem_js', j:1},
         'browsers': {f:'html/browsers.html', n: 'browsers', j:0},
         'browsers_js': {f:'html/js/browsers.js', n: 'browsers_js', j:1},
+        'nzipp': {f:'html/nzipp.html', n: 'nzipp', j:0},
+        'nzipp_js': {f:'html/js/nzipp.js', n: 'nzipp_js', j:1},
+        'nzipp_css': {f:'css/nzipp.css', n: 'nzipp_css', j:2},
         'megabird': {f:'html/megabird.html', n: 'megabird', j:0},
         'uwp': {f:'html/uwp.html', n: 'uwp', j:0},
         'pdfjs2': {f:'js/vendor/pdf.js', n: 'pdfjs2', j:4 },
@@ -2949,6 +2955,7 @@ else if (!browserUpdate) {
             'richpreviewsFilt_js': {f:'js/chat/plugins/richpreviewsFilter.js', n: 'richpreviewsFilt_js', j:1, w:1},
             'chatStats_js': {f:'js/chat/plugins/chatStats.js', n: 'chatStats_js', j:1, w:1},
             'crm_js': {f:'js/connectionRetryManager.js', n: 'crm_js', j:1},
+            'chat_reactions_js': {f:'js/chat/reactions.js', n: 'chat_reactions_js', j:1},
             'chat_messages_Js': {f:'js/chat/messages.js', n: 'chat_messages_Js', j:1},
             'presence2_js': {f:'js/chat/presence2.js', n: 'presence2_js', j:1},
             'chat_react_minified_js': {f:'js/chat/bundle.js', n: 'chat_react_minified_js', j:1},
@@ -3007,7 +3014,9 @@ else if (!browserUpdate) {
         'unsub': ['unsub', 'unsub_js'],
         'security': ['securitypractice', 'securitypractice_js', 'filesaver'],
         'developersettings': ['developersettings', 'developersettings_js'],
-        'megadrop': ['megadrop', 'nomegadrop']
+        'megadrop': ['megadrop', 'nomegadrop'],
+        'nzippmember': ['nzipp', 'nzipp_js', 'nzipp_css'],
+        'nziphotographer': ['nzipp', 'nzipp_js', 'nzipp_css'],
     };
 
     if (is_mobile) {
@@ -3659,8 +3668,9 @@ else if (!browserUpdate) {
                     }
                 }
 
-                callback(response);
-                boot_done();
+                if (!callback(response)) {
+                    boot_done();
+                }
             };
 
             xhr.open("POST", apipath + 'cs?id=0' + mega.urlParams() + (params || ''), true);
@@ -3772,6 +3782,21 @@ else if (!browserUpdate) {
             return;
         }
 
+        if (page[0] === 'F' && page[1] === '!' || page.substr(0, 7) === 'folder/') {
+            var n = page.split(/\W+/);
+
+            if (n && !n[2] && n[1] && n[1].length === 8) {
+                xhr('&n=' + n[1], null, function(res) {
+                    res |= 0;
+
+                    if (res === -9 || res === -16) {
+                        window['preflight-folder-link-error:' + n[1]] = res;
+                    }
+                    return -1;
+                });
+            }
+        }
+
         if (!(parseInt(localStorage.voucherExpiry) > Date.now())) {
             delete localStorage.voucher;
         }
@@ -3861,6 +3886,7 @@ else if (!browserUpdate) {
 
         if (d) console.log('boot_done', loginresponse === true, dl_res === true, !jsl_done, !jj_done);
 
+        // eslint-disable-next-line max-len
         if (loginresponse === true || dl_res === true || gmf_res === true || voucher === true || !jsl_done || !jj_done) {
             return;
         }
@@ -4052,8 +4078,8 @@ function inherits(target, source) {
     }
 }
 
+// eslint-disable-next-line strict
 function lazy(target, property, stub) {
-    'use strict';
     Object.defineProperty(target, property, {
         get: function() {
             Object.defineProperty(this, property, {

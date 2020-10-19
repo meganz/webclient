@@ -44,6 +44,18 @@ export default class AbstractGenericMessage extends ConversationMessageMixin {
         );
     }
 
+    renderMessageActionButtons(buttons) {
+        if (!buttons) {
+            return null;
+        }
+        var cnt = buttons.length;
+
+        if (cnt === 0) {
+            return null;
+        }
+        return <div className={"right-aligned-msg-buttons total-" + cnt}>{buttons}</div>;
+
+    }
     render() {
         const { message, grouped, additionalClasses } = this.props;
 
@@ -69,7 +81,12 @@ export default class AbstractGenericMessage extends ConversationMessageMixin {
                             {this.getTimestampAsString()}
                         </div>
                     )}
+                    {
+                        !this.props.hideActionButtons && this.getMessageActionButtons &&
+                        this.renderMessageActionButtons(this.getMessageActionButtons())
+                    }
                     {this.getContents && this.getContents()}
+                    {this.getEmojisImages()}
                 </div>
             </div>
         );

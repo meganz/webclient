@@ -711,8 +711,10 @@ function createTimeoutPromise(validateFunction, tick, timeout,
  */
 function AssertionFailed(message) {
     this.message = message;
-    this.stack = M.getStack();
+    // karma env?
+    this.stack = M && M.getStack ? M.getStack() : String(new Error().stack);
 }
+
 AssertionFailed.prototype = Object.create(Error.prototype);
 AssertionFailed.prototype.name = 'AssertionFailed';
 
@@ -948,6 +950,10 @@ function mKeyDialog(ph, fl, keyr, selector) {
     "use strict";
 
     var promise = new MegaPromise();
+    var $dialog = $(is_mobile ? '#mobile-decryption-key-overlay' : '.fm-dialog.dlkey-dialog').removeClass('hidden');
+    var $button = $(is_mobile ? '.mobile.decrypt-button' : '.fm-dialog-new-folder-button', $dialog);
+    var $input = $(is_mobile ? '.mobile.decryption-key' : 'input', $dialog);
+
     if (keyr) {
         $('.fm-dialog.dlkey-dialog .instruction-message')
             .text(l[9048]);
@@ -964,31 +970,29 @@ function mKeyDialog(ph, fl, keyr, selector) {
         name: 'unknown.unknown'
     }));
 
-    var $newFolderBtn = $('.fm-dialog.dlkey-dialog .fm-dialog-new-folder-button');
-    $newFolderBtn.addClass('disabled').removeClass('active');
-    $('.fm-dialog.dlkey-dialog').removeClass('hidden');
+    $button.addClass('disabled').removeClass('active');
     fm_showoverlay();
 
-    $('.fm-dialog.dlkey-dialog input').off('input keypress').on('input keypress', function(e) {
-        var length = $('.fm-dialog.dlkey-dialog input').val().length;
+    $input.rebind('input keypress', function(e) {
+        var length = String($(this).val() || '').length;
 
         if (length) {
-            $newFolderBtn.removeClass('disabled').addClass('active');
+            $button.removeClass('disabled').addClass('active');
             if (e.keyCode === 13) {
-                $newFolderBtn.click();
+                $button.click();
             }
         }
         else {
-            $newFolderBtn.removeClass('active').addClass('disabled');
+            $button.removeClass('active').addClass('disabled');
         }
     });
 
-    $newFolderBtn.rebind('click', function() {
+    $button.rebind('click.keydlg', function() {
 
         if ($(this).hasClass('active')) {
 
             // Trim the input from the user for whitespace, newlines etc on either end
-            var key = $.trim($('.fm-dialog.dlkey-dialog input').val());
+            var key = $.trim($input.val());
 
             if (key) {
 
@@ -1007,8 +1011,7 @@ function mKeyDialog(ph, fl, keyr, selector) {
                     promise.resolve(key);
 
                     fm_hideoverlay();
-                    $('.fm-dialog.dlkey-dialog').addClass('hidden');
-
+                    $dialog.addClass('hidden');
                     loadSubPage(newHash);
 
                 }
@@ -1612,32 +1615,6 @@ function mLogout(aCallback, force) {
     else {
         M.logout();
     }
-}
-
-/**
- * Perform a strict logout, by removing databases
- * and cleaning sessionStorage/localStorage.
- *
- * @param {String} aUserHandle optional
- */
-function mCleanestLogout(aUserHandle) {
-    if (u_type !== 0 && u_type !== 3) {
-        throw new Error('Operation not permitted.');
-    }
-
-    mLogout(function() {
-        MegaDB.dropAllDatabases(aUserHandle)
-            .always(function(r) {
-                console.debug('mCleanestLogout', r);
-
-                localStorage.clear();
-                sessionStorage.clear();
-
-                setTimeout(function() {
-                    location.reload(true);
-                }, 7e3);
-            });
-    });
 }
 
 // Initialize Rubbish-Bin Cleaning Scheduler

@@ -408,13 +408,7 @@ function dashboardUI() {
 
                 // Get more transfer quota button
                 $('.account.widget.bandwidth .free .more-quota').rebind('click', function() {
-                    // if the account have achievements, show them, otherwise #pro
-                    if (M.maf) {
-                        mega.achievem.achievementsListDialog();
-                    }
-                    else {
-                        loadSubPage('pro');
-                    }
+                    loadSubPage('pro');
                     return false;
                 });
             }
@@ -440,9 +434,9 @@ function dashboardUI() {
                 $('.dashboard .upgrade-account').addClass('hidden').hide();
             }
             $('.business-dashboard .user-management-storage .storage-transfer-data')
-                .text(bytesToSize(account.space_used));
+                .text(bytesToSize(account.space_used, 2));
             $('.business-dashboard .user-management-transfer .storage-transfer-data')
-                .text(bytesToSize(account.tfsq.used));
+                .text(bytesToSize(account.tfsq.used, 2));
 
             var $dataStats = $('.business-dashboard .subaccount-view-used-data');
 
@@ -465,31 +459,31 @@ function dashboardUI() {
 
             var folderNumText = ffNumText(account.stats[M.RootID].folders, 'folder');
             var fileNumText = ffNumText(account.stats[M.RootID].files, 'file');
-            $('.ba-root .ff-occupy', $dataStats).text(bytesToSize(account.stats[M.RootID].bytes));
+            $('.ba-root .ff-occupy', $dataStats).text(bytesToSize(account.stats[M.RootID].bytes, 2));
             $('.ba-root .folder-number', $dataStats).text(folderNumText);
             $('.ba-root .file-number', $dataStats).text(fileNumText);
 
             folderNumText = ffNumText(account.stats.inshares.items, 'folder');
             fileNumText = ffNumText(account.stats.inshares.files, 'file');
-            $('.ba-inshare .ff-occupy', $dataStats).text(bytesToSize(account.stats.inshares.bytes));
+            $('.ba-inshare .ff-occupy', $dataStats).text(bytesToSize(account.stats.inshares.bytes, 2));
             $('.ba-inshare .folder-number', $dataStats).text(folderNumText);
             $('.ba-inshare .file-number', $dataStats).text(fileNumText);
 
             folderNumText = ffNumText(account.stats.outshares.items, 'folder');
             fileNumText = ffNumText(account.stats.outshares.files, 'file');
-            $('.ba-outshare .ff-occupy', $dataStats).text(bytesToSize(account.stats.outshares.bytes));
+            $('.ba-outshare .ff-occupy', $dataStats).text(bytesToSize(account.stats.outshares.bytes, 2));
             $('.ba-outshare .folder-number', $dataStats).text(folderNumText);
             $('.ba-outshare .file-number', $dataStats).text(fileNumText);
 
             folderNumText = ffNumText(account.stats[M.RubbishID].folders, 'folder');
             fileNumText = ffNumText(account.stats[M.RubbishID].files, 'file');
-            $('.ba-rubbish .ff-occupy', $dataStats).text(bytesToSize(account.stats[M.RubbishID].bytes));
+            $('.ba-rubbish .ff-occupy', $dataStats).text(bytesToSize(account.stats[M.RubbishID].bytes, 2));
             $('.ba-rubbish .folder-number', $dataStats).text(folderNumText);
             $('.ba-rubbish .file-number', $dataStats).text(fileNumText);
 
             folderNumText = ffNumText(account.stats.links.folders, 'folder');
             fileNumText = ffNumText(account.stats.links.files, 'file');
-            $('.ba-pub-links .ff-occupy', $dataStats).text(bytesToSize(account.stats.links.bytes));
+            $('.ba-pub-links .ff-occupy', $dataStats).text(bytesToSize(account.stats.links.bytes, 2));
             $('.ba-pub-links .folder-number', $dataStats).text(folderNumText);
             $('.ba-pub-links .file-number', $dataStats).text(fileNumText);
 

@@ -52,8 +52,10 @@ var accountChangePassword = {
                 }
             });
 
-            // Reset strength after re-rendering.
-            $newPasswordField.trigger('keyup.pwdchg');
+            if ($newPasswordField.val().length) {
+                // Reset strength after re-rendering.
+                $newPasswordField.trigger('keyup.pwdchg');
+            }
         };
 
         bindStrengthChecker();

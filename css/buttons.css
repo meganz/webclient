@@ -508,7 +508,7 @@ body:not(.rtl) .default-white-button::first-letter {
     display: block;
 }
 .contacts-info:hover .tiny-button,
-.message.content-area:hover > .tiny-button,
+.message.content-area:hover > .right-aligned-msg-buttons > .tiny-button,
 .default-white-button.tiny-button.active,
 .shared-link.thumb:hover .tiny-button,
 .message.shared-data.thumb:hover .tiny-button,
@@ -640,7 +640,7 @@ body:not(.rtl) .default-white-button::first-letter {
 .default-big-button.green span {
     background: transparent;
     box-shadow: 0px 0.5px 1px 0px rgba(0,0,0,0.05);
-    
+
 }
 .default-big-button.green span::before {
     box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.05);

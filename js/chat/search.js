@@ -416,6 +416,9 @@ ChatSearch.doSearch = promisify(function(resolve, reject, s, onResult, searchMes
                 resolve(results);
             }
             eventlog(99734, JSON.stringify([1, s.length, reason | 0, resultId, unixtime() - stime]));
+
+            // @todo indicate whether chats and/or messages (?)
+            mBroadcaster.sendMessage('treesearch', s, 'chat', resultId);
         },
         'onDestroy': function(ex) {
             delete ChatSearch.doSearch.cs;

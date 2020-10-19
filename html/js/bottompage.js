@@ -524,7 +524,7 @@ var bottompage = {
                         $topHeader.addClass('activated');
                     }
                 }
-                else if (topPos <= 300 && topPos >= 250) {
+                else if (topPos <= 300 && topPos >= 50) {
                     $topHeader.removeClass('activated');
                 }
                 else {

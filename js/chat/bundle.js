@@ -1516,7 +1516,7 @@ class ContactButton extends _stores_mixins_js3__["ContactAwareComponent"] {
       moreDropdowns.push(react1.a.createElement(_ui_dropdowns_jsx7__["DropdownItem"], {
         key: "view0",
         icon: "human-profile",
-        label: __(l[187]),
+        label: l[187],
         onClick: () => {
           loadSubPage('fm/account');
         }
@@ -1536,7 +1536,7 @@ class ContactButton extends _stores_mixins_js3__["ContactAwareComponent"] {
           key: "startCall",
           className: "contains-submenu",
           icon: "context handset",
-          label: __(l[19125]),
+          label: l[19125],
           onClick: startAudioCall
         }));
         moreDropdowns.push(react1.a.createElement("div", {
@@ -1545,12 +1545,12 @@ class ContactButton extends _stores_mixins_js3__["ContactAwareComponent"] {
         }, react1.a.createElement("div", null, react1.a.createElement(_ui_dropdowns_jsx7__["DropdownItem"], {
           key: "startAudio",
           icon: "context handset",
-          label: __(l[1565]),
+          label: l[1565],
           onClick: startAudioCall
         })), react1.a.createElement("div", null, react1.a.createElement(_ui_dropdowns_jsx7__["DropdownItem"], {
           key: "startVideo",
           icon: "context videocam",
-          label: __(l[1566]),
+          label: l[1566],
           onClick: () => {
             megaChat.createAndShowPrivateRoom(contact.u).then(function (room) {
               room.setActive();
@@ -1562,7 +1562,7 @@ class ContactButton extends _stores_mixins_js3__["ContactAwareComponent"] {
         moreDropdowns.push(react1.a.createElement(_ui_dropdowns_jsx7__["DropdownItem"], {
           key: "startChat",
           icon: "context conversation",
-          label: __(l[5885]),
+          label: l[5885],
           onClick: () => {
             loadSubPage('fm/chat/p/' + contact.u);
           }
@@ -1575,7 +1575,7 @@ class ContactButton extends _stores_mixins_js3__["ContactAwareComponent"] {
       moreDropdowns.push(react1.a.createElement(_ui_dropdowns_jsx7__["DropdownItem"], {
         key: "send-files-item",
         icon: "context arrow-in-circle",
-        label: __(l[6834]),
+        label: l[6834],
         onClick: () => {
           megaChat.openChatAndSendFilesDialog(contact.u);
         }
@@ -1583,7 +1583,7 @@ class ContactButton extends _stores_mixins_js3__["ContactAwareComponent"] {
       moreDropdowns.push(react1.a.createElement(_ui_dropdowns_jsx7__["DropdownItem"], {
         key: "share-item",
         icon: "context share-folder",
-        label: __(l[6775]),
+        label: l[6775],
         onClick: () => {
           openCopyShareDialog(contact.u);
         }
@@ -1592,7 +1592,7 @@ class ContactButton extends _stores_mixins_js3__["ContactAwareComponent"] {
       moreDropdowns.push(react1.a.createElement(_ui_dropdowns_jsx7__["DropdownItem"], {
         key: "view2",
         icon: "small-icon icons-sprite grey-plus",
-        label: __(l[101]),
+        label: l[101],
         onClick: () => {
           loadingDialog.show();
           const isAnonymousUser = !u_handle || u_type !== 3;
@@ -1644,7 +1644,7 @@ class ContactButton extends _stores_mixins_js3__["ContactAwareComponent"] {
       moreDropdowns.push(react1.a.createElement(_ui_dropdowns_jsx7__["DropdownItem"], {
         key: "set-nickname",
         icon: "small-icon context writing-pen",
-        label: __(l[20828]),
+        label: l[20828],
         onClick: () => {
           nicknames.setNicknameDialog.init(contact.u);
         }
@@ -1843,7 +1843,7 @@ class ContactFingerprint extends _stores_mixins_js3__["MegaRenderMixin"] {
       if (typeof verifyState.method === "undefined" || verifyState.method < authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON) {
         verifyButton = react1.a.createElement(_ui_buttons_jsx6__["Button"], {
           className: "dropdown-verify active",
-          label: __(l[7692]),
+          label: l[7692],
           icon: "grey-key",
           onClick: () => {
             $(document).trigger('closeDropdowns');
@@ -1860,7 +1860,7 @@ class ContactFingerprint extends _stores_mixins_js3__["MegaRenderMixin"] {
         className: "dropdown-fingerprint"
       }, react1.a.createElement("div", {
         className: "contact-fingerprint-title"
-      }, react1.a.createElement("span", null, __(l[6872])), react1.a.createElement(ContactVerified, {
+      }, react1.a.createElement("span", null, l[6872]), react1.a.createElement(ContactVerified, {
         contact: contact
       })), react1.a.createElement("div", {
         className: "contact-fingerprint-txt"
@@ -2657,7 +2657,7 @@ class ContactPickerWidget extends _stores_mixins_js3__["MegaRenderMixin"] {
     }), react1.a.createElement("input", {
       autoFocus: true,
       type: "search",
-      placeholder: __(l[8010]),
+      placeholder: l[8010],
       ref: "contactSearchField",
       onChange: this.onSearchChange.bind(this),
       value: this.state.searchValue
@@ -3377,7 +3377,7 @@ class SelectContactDialog extends _stores_mixins_js1__["MegaRenderMixin"] {
     var self = this;
     var classes = "send-contact contrast small-footer " + self.props.className;
     return React.createElement(ModalDialog, {
-      title: __(l[8628]),
+      title: l[8628],
       className: classes,
       selected: self.state.selected,
       onClose: () => {
@@ -3427,8 +3427,8 @@ class SelectContactDialog extends _stores_mixins_js1__["MegaRenderMixin"] {
 
 SelectContactDialog.clickTime = 0;
 SelectContactDialog.defaultProps = {
-  'selectLabel': __(l[1940]),
-  'cancelLabel': __(l[82]),
+  'selectLabel': l[1940],
+  'cancelLabel': l[82],
   'hideable': true
 };
 
@@ -3549,8 +3549,8 @@ class ConfirmDialog extends _stores_mixins_js1__["MegaRenderMixin"] {
 }
 
 ConfirmDialog.defaultProps = {
-  'confirmLabel': __(l[6826]),
-  'cancelLabel': __(l[82]),
+  'confirmLabel': l[6826],
+  'cancelLabel': l[82],
   'dontShowAgainCheckbox': true,
   'hideable': true
 };
@@ -4880,7 +4880,7 @@ class DropdownEmojiSelector extends _stores_mixins_js1__["MegaRenderMixin"] {
     }), React.createElement("input", {
       ref: this.emojiSearchField,
       type: "search",
-      placeholder: __(l[102]),
+      placeholder: l[102],
       onChange: this.onSearchChange,
       autoFocus: true,
       value: this.state.searchValue
@@ -5816,7 +5816,7 @@ class cloudBrowserModalDialog_BrowserEntries extends mixins["MegaRenderMixin"] {
         className: "dialog-empty-icon"
       }), external_React_default.a.createElement("div", {
         className: "dialog-empty-header"
-      }, __(l[5533]))));
+      }, l[5533])));
     } else if (!self.props.entries.length && self.props.currentlyViewedEntry === 'search') {
       return external_React_default.a.createElement("div", {
         className: "dialog-empty-block dialog-fm folder"
@@ -5909,16 +5909,16 @@ class cloudBrowserModalDialog_CloudBrowserDialog extends mixins["MegaRenderMixin
   getBreadcrumbNodeText(nodeId, prevNodeId) {
     switch (nodeId) {
       case M.RootID:
-        return __(l[164]);
+        return l[164];
 
       case M.RubbishID:
-        return __(l[167]);
+        return l[167];
 
       case M.InboxID:
-        return __(l[166]);
+        return l[166];
 
       case 'shares':
-        return prevNodeId && M.d[prevNodeId] ? M.d[prevNodeId].m : __(l[5589]);
+        return prevNodeId && M.d[prevNodeId] ? M.d[prevNodeId].m : l[5589];
 
       default:
         return M.d[nodeId] && M.d[nodeId].name;
@@ -6360,17 +6360,17 @@ class cloudBrowserModalDialog_CloudBrowserDialog extends mixins["MegaRenderMixin
         onClick: self.toggleSortBy
       }), external_React_default.a.createElement(BrowserCol, {
         id: "name",
-        label: __(l[86]),
+        label: l[86],
         sortBy: self.state.sortBy,
         onClick: self.toggleSortBy
       }), external_React_default.a.createElement(BrowserCol, {
         id: "size",
-        label: __(l[87]),
+        label: l[87],
         sortBy: self.state.sortBy,
         onClick: self.toggleSortBy
       }), external_React_default.a.createElement(BrowserCol, {
         id: "ts",
-        label: __(l[16169]),
+        label: l[16169],
         sortBy: self.state.sortBy && self.state.sortBy[0] === "ts" ? ["ts", self.state.sortBy[1] === "desc" ? "asc" : "desc"] : self.state.sortBy,
         onClick: self.toggleSortBy
       })))));
@@ -6391,7 +6391,7 @@ class cloudBrowserModalDialog_CloudBrowserDialog extends mixins["MegaRenderMixin
     }
 
     return external_React_default.a.createElement(modalDialogs["a" ].ModalDialog, {
-      title: self.props.title || __(l[8011]),
+      title: self.props.title || l[8011],
       className: classes + (self.isSearch() && breadcrumb.length ? 'has-breadcrumbs-bottom' : ''),
       onClose: () => {
         self.props.onClose(self);
@@ -6403,10 +6403,10 @@ class cloudBrowserModalDialog_CloudBrowserDialog extends mixins["MegaRenderMixin
     }, external_React_default.a.createElement("div", {
       className: "\n                            fm-dialog-tab cloud\n                            " + (self.state.selectedTab === 'clouddrive' ? 'active' : '') + "\n                        ",
       onClick: () => self.handleTabChange('clouddrive')
-    }, __(l[164])), external_React_default.a.createElement("div", {
+    }, l[164]), external_React_default.a.createElement("div", {
       className: "\n                            fm-dialog-tab incoming\n                            " + (self.state.selectedTab === 'shares' ? 'active' : '') + "\n                        ",
       onClick: () => self.handleTabChange('shares')
-    }, __(l[5542])), external_React_default.a.createElement("div", {
+    }, l[5542]), external_React_default.a.createElement("div", {
       className: "clear"
     })), external_React_default.a.createElement("div", {
       className: "fm-picker-header"
@@ -6433,7 +6433,7 @@ class cloudBrowserModalDialog_CloudBrowserDialog extends mixins["MegaRenderMixin
       }
     }, ">"), external_React_default.a.createElement("input", {
       type: "search",
-      placeholder: __(l[102]),
+      placeholder: l[102],
       value: self.state.searchValue,
       onChange: self.onSearchChange
     }), clearSearchBtn), external_React_default.a.createElement("div", {
@@ -6477,9 +6477,9 @@ class cloudBrowserModalDialog_CloudBrowserDialog extends mixins["MegaRenderMixin
 }
 
 cloudBrowserModalDialog_CloudBrowserDialog.defaultProps = {
-  'selectLabel': __(l[8023]),
-  'openLabel': __(l[1710]),
-  'cancelLabel': __(l[82]),
+  'selectLabel': l[8023],
+  'openLabel': l[1710],
+  'cancelLabel': l[82],
   'hideable': true,
   className: ''
 };
@@ -7404,13 +7404,13 @@ let typingArea_TypingArea = (_dec = Object(mixins["SoonFcWrap"])(60), _dec2 = Ob
         className: "default-white-button right",
         icon: "",
         onClick: self.onSaveClicked.bind(self),
-        label: __(l[776])
+        label: l[776]
       }), typingArea_React.createElement(ui_buttons["Button"], {
         key: "cancel",
         className: "default-white-button right",
         icon: "",
         onClick: self.onCancelClicked.bind(self),
-        label: __(l[1718])
+        label: l[1718]
       })];
     }
 
@@ -7653,9 +7653,9 @@ class whosTyping_WhosTyping extends mixins["MegaRenderMixin"] {
       var msg;
 
       if (areMultipleUsersTyping === true) {
-        msg = __(l[8872]).replace("%1", namesDisplay[0]).replace("%2", namesDisplay[1]);
+        msg = l[8872].replace("%1", namesDisplay[0]).replace("%2", namesDisplay[1]);
       } else {
-        msg = __(l[8629]).replace("%1", namesDisplay[0]);
+        msg = l[8629].replace("%1", namesDisplay[0]);
       }
 
       typingElement = whosTyping_React.createElement("div", {
@@ -7957,7 +7957,7 @@ class participantsList_ParticipantsListInner extends mixins["MegaRenderMixin"] {
             className: "red",
             key: "remove",
             icon: "rounded-stop",
-            label: __(l[8867]),
+            label: l[8867],
             onClick: onRemoveClicked.bind(this, contactHash)
           }));
         }
@@ -7966,11 +7966,11 @@ class participantsList_ParticipantsListInner extends mixins["MegaRenderMixin"] {
           dropdowns.push(external_React_default.a.createElement("div", {
             key: "setPermLabel",
             className: "dropdown-items-info"
-          }, __(l[8868])));
+          }, l[8868]));
           dropdowns.push(external_React_default.a.createElement(DropdownsUI.DropdownItem, {
             key: "privOperator",
             icon: "gentleman",
-            label: __(l[8875]),
+            label: l[8875],
             className: "tick-item " + (room.members[contactHash] === FULL ? "active" : ""),
             disabled: contactHash === u_handle,
             onClick: onSetPrivClicked.bind(this, contactHash, FULL)
@@ -7980,7 +7980,7 @@ class participantsList_ParticipantsListInner extends mixins["MegaRenderMixin"] {
             icon: "conversation-icon",
             className: "tick-item " + (room.members[contactHash] === OPERATOR ? "active" : ""),
             disabled: contactHash === u_handle,
-            label: __(l[8874]),
+            label: l[8874],
             onClick: onSetPrivClicked.bind(this, contactHash, OPERATOR)
           }));
           dropdowns.push(external_React_default.a.createElement(DropdownsUI.DropdownItem, {
@@ -7988,7 +7988,7 @@ class participantsList_ParticipantsListInner extends mixins["MegaRenderMixin"] {
             icon: "eye-icon",
             className: "tick-item " + (room.members[contactHash] === READONLY ? "active" : ""),
             disabled: contactHash === u_handle,
-            label: __(l[8873]),
+            label: l[8873],
             onClick: onSetPrivClicked.bind(this, contactHash, READONLY)
           }));
         }
@@ -8463,19 +8463,19 @@ class contact_Contact extends abstractGenericMessage_AbstractGenericMessage {
       contact: M.u[contact.u]
     }), HAS_RELATIONSHIP && external_React_default.a.createElement(external_React_default.a.Fragment, null, external_React_default.a.createElement(ui_dropdowns["DropdownItem"], {
       icon: "human-profile",
-      label: __(l[5868]),
+      label: l[5868],
       onClick: () => {
         loadSubPage("fm/" + contact.u);
       }
     }), external_React_default.a.createElement("hr", null), external_React_default.a.createElement(ui_dropdowns["DropdownItem"], {
       icon: "conversations",
-      label: __(l[8632]),
+      label: l[8632],
       onClick: () => {
         loadSubPage("fm/chat/p/" + contact.u);
       }
     })), !HAS_RELATIONSHIP && external_React_default.a.createElement(ui_dropdowns["DropdownItem"], {
       icon: "rounded-grey-plus",
-      label: __(l[71]),
+      label: l[71],
       onClick: () => this._handleAddContact(contactEmail)
     }), this._getContactDeleteButton(message)));
   }
@@ -8631,7 +8631,7 @@ class attachment_Attachment extends abstractGenericMessage_AbstractGenericMessag
             if (message.isEditable && message.isEditable()) {
               revokeButton = external_React_default.a.createElement(ui_dropdowns["DropdownItem"], {
                 icon: "red-cross",
-                label: __(l[83]),
+                label: l[83],
                 className: "red",
                 onClick: () => {
                   chatRoom.megaChat.plugins.chatdIntegration.updateMessage(chatRoom, message.internalId || message.orderValue, "");
@@ -8652,7 +8652,7 @@ class attachment_Attachment extends abstractGenericMessage_AbstractGenericMessag
             } else if (!NODE_DOESNT_EXISTS_ANYMORE[v.h]) {
               downloadButton = external_React_default.a.createElement(ui_dropdowns["DropdownItem"], {
                 icon: "rounded-grey-down-arrow",
-                label: __(l[1187]),
+                label: l[1187],
                 onClick: () => this.props.onDownloadStart(v)
               });
 
@@ -8662,7 +8662,7 @@ class attachment_Attachment extends abstractGenericMessage_AbstractGenericMessag
 
               firstGroupOfButtons.push(external_React_default.a.createElement(ui_dropdowns["DropdownItem"], {
                 icon: "context info",
-                label: __(l[6859]),
+                label: l[6859],
                 key: "infoDialog",
                 onClick: () => {
                   $.selected = [v.h];
@@ -8672,7 +8672,7 @@ class attachment_Attachment extends abstractGenericMessage_AbstractGenericMessag
               this.props.onAddFavouriteButtons(v.h, firstGroupOfButtons);
               linkButtons.push(external_React_default.a.createElement(ui_dropdowns["DropdownItem"], {
                 icon: "small-icon conversations",
-                label: __(l[17764]),
+                label: l[17764],
                 key: "sendToChat",
                 onClick: () => {
                   $.selected = [v.h];
@@ -8707,15 +8707,15 @@ class attachment_Attachment extends abstractGenericMessage_AbstractGenericMessag
           vertOffset: 3
         }, previewButton, previewButton && external_React_default.a.createElement("hr", null), external_React_default.a.createElement(ui_dropdowns["DropdownItem"], {
           icon: "rounded-grey-down-arrow",
-          label: __(l[1187]),
+          label: l[1187],
           onClick: () => this.props.onDownloadStart(v)
         }), this._isUserRegistered() && external_React_default.a.createElement(external_React_default.a.Fragment, null, external_React_default.a.createElement(ui_dropdowns["DropdownItem"], {
           icon: "grey-cloud",
-          label: __(l[1988]),
+          label: l[1988],
           onClick: () => this.props.onAddToCloudDrive(v, false)
         }), external_React_default.a.createElement(ui_dropdowns["DropdownItem"], {
           icon: "conversations",
-          label: __(l[17764]),
+          label: l[17764],
           onClick: () => this.props.onAddToCloudDrive(v, true)
         }))));
       }
@@ -8780,7 +8780,7 @@ class attachment_Attachment extends abstractGenericMessage_AbstractGenericMessag
         className: "message shared-info"
       }, external_React_default.a.createElement("div", {
         className: "message data-title"
-      }, __(l[17669]), external_React_default.a.createElement("span", {
+      }, l[17669], external_React_default.a.createElement("span", {
         className: "file-name"
       }, v.name)), external_React_default.a.createElement("div", {
         className: "message file-size"
@@ -9105,7 +9105,7 @@ class voiceClip_VoiceClip extends abstractGenericMessage_AbstractGenericMessage 
         horizOffset: 4
       }, external_React_default.a.createElement(ui_dropdowns["DropdownItem"], {
         icon: "red-cross",
-        label: __(l[1730]),
+        label: l[1730],
         className: "red",
         onClick: e => this.props.onDelete(e, message)
       })));
@@ -9794,7 +9794,7 @@ class text_Text extends abstractGenericMessage_AbstractGenericMessage {
       });
     } else {
       if (message.updated > 0 && !message.metaType) {
-        textMessage = textMessage + " <em>" + __(l[8887]) + "</em>";
+        textMessage = textMessage + " <em>" + l[8887] + "</em>";
       }
 
       if (this.props.initTextScrolling) {
@@ -10023,7 +10023,7 @@ class generic_GenericConversationMessage extends mixin["ConversationMessageMixin
       arr.push(external_React_default.a.createElement(ui_dropdowns["DropdownItem"], {
         icon: "context remove-link",
         key: "removeLinkButton",
-        label: __(l[6821]),
+        label: l[6821],
         onClick: self._removeLink.bind(self, h)
       }));
       return true;
@@ -10330,7 +10330,7 @@ class AltPartsConvMessage extends alterParticipants_ConversationMessageMixin {
         className: "message avatar-wrapper small-rounded-avatar"
       });
       var otherDisplayName = generateAvatarMeta(otherContact.u).fullName;
-      var text = h === contact.u ? __('joined the group chat.') : __(l[8907]).replace("%s", '<strong className="dark-grey-txt">' + htmlentities(displayName) + '</strong>');
+      var text = h === contact.u ? l[23756] : l[8907].replace("%s", '<strong className="dark-grey-txt">' + htmlentities(displayName) + '</strong>');
 
       self._ensureNameIsLoaded(otherContact.u);
 
@@ -10370,9 +10370,9 @@ class AltPartsConvMessage extends alterParticipants_ConversationMessageMixin {
       var text;
 
       if (otherContact.u === contact.u) {
-        text = __(l[8908]);
+        text = l[8908];
       } else {
-        text = __(l[8906]).replace("%s", '<strong className="dark-grey-txt">' + htmlentities(displayName) + '</strong>');
+        text = l[8906].replace("%s", '<strong className="dark-grey-txt">' + htmlentities(displayName) + '</strong>');
       }
 
       messages.push(alterParticipants_React.createElement("div", {
@@ -10456,7 +10456,7 @@ class TruncatedMessage extends truncated_ConversationMessageMixin {
       chatRoom: chatRoom
     }), datetime, truncated_React.createElement("div", {
       className: "message text-block"
-    }, __(l[8905]))));
+    }, l[8905])));
   }
 
 }
@@ -10525,8 +10525,7 @@ class PrivilegeChange extends privilegeChange_ConversationMessageMixin {
       newPrivilegeText = l[8873];
     }
 
-    var text = __(l[8915]).replace("%s1", '<strong className="dark-grey-txt">' + htmlentities(newPrivilegeText) + '</strong>').replace("%s2", '<strong className="dark-grey-txt">' + htmlentities(displayName) + '</strong>');
-
+    var text = l[8915].replace("%s1", '<strong className="dark-grey-txt">' + htmlentities(newPrivilegeText) + '</strong>').replace("%s2", '<strong className="dark-grey-txt">' + htmlentities(displayName) + '</strong>');
     messages.push(privilegeChange_React.createElement("div", {
       className: "message body",
       "data-id": "id" + message.messageId,
@@ -10593,8 +10592,7 @@ class TopicChange extends topicChange_ConversationMessageMixin {
       this._formattedTopic = formattedTopic;
     }
 
-    var text = __(l[9081]).replace("%s", '<strong className="dark-grey-txt">"' + formattedTopic + '"</strong>');
-
+    var text = l[9081].replace("%s", '<strong className="dark-grey-txt">"' + formattedTopic + '"</strong>');
     messages.push(topicChange_React.createElement("div", {
       className: "message body",
       "data-id": "id" + message.messageId,
@@ -11000,7 +10998,7 @@ class incomingSharesAccordionPanel_IncSharesAccordionPanel extends mixins["MegaR
           className: "transfer-filetype-icon inbound-share"
         })), incomingSharesAccordionPanel_React.createElement("span", {
           className: "txt"
-        }, __(l[19797]) ? __(l[19797]) : "Show All"))) : null);
+        }, l[19797] ? l[19797] : "Show All"))) : null);
       }
 
       contents = incomingSharesAccordionPanel_React.createElement("div", {
@@ -11086,7 +11084,7 @@ class CloseOpenModeMessage extends closeOpenMode_ConversationMessageMixin {
       className: "message user-card-name"
     }, displayName), datetime, closeOpenMode_React.createElement("div", {
       className: "message text-block"
-    }, __(l[20569]))));
+    }, l[20569])));
   }
 
 }
@@ -12591,7 +12589,7 @@ class conversationpanel_ConversationRightArea extends mixins["MegaRenderMixin"] 
         }
       }, external_React_default.a.createElement("i", {
         className: "small-icon colorized audio-call"
-      }), external_React_default.a.createElement("span", null, __(l[5896])));
+      }), external_React_default.a.createElement("span", null, l[5896]));
     }
 
     if (startVideoCallButton !== null) {
@@ -12604,7 +12602,7 @@ class conversationpanel_ConversationRightArea extends mixins["MegaRenderMixin"] 
         }
       }, external_React_default.a.createElement("i", {
         className: "small-icon colorized video-call"
-      }), external_React_default.a.createElement("span", null, __(l[5897])));
+      }), external_React_default.a.createElement("span", null, l[5897]));
     }
 
     var AVseperator = external_React_default.a.createElement("div", {
@@ -12664,7 +12662,7 @@ class conversationpanel_ConversationRightArea extends mixins["MegaRenderMixin"] 
     const addParticipantBtn = external_React_default.a.createElement(ui_buttons["Button"], {
       className: "link-button green light",
       icon: "rounded-plus colorized",
-      label: __(l[8007]),
+      label: l[8007],
       disabled: !(!room.isReadOnly() && room.iAmOperator() && !self.allContactsInChat(excludedParticipants))
     }, external_React_default.a.createElement(ui_dropdowns["DropdownContactsSelector"], {
       contacts: this.props.contacts,
@@ -12672,9 +12670,9 @@ class conversationpanel_ConversationRightArea extends mixins["MegaRenderMixin"] 
       exclude: excludedParticipants,
       multiple: true,
       className: "popup add-participant-selector",
-      singleSelectedButtonLabel: __(l[8869]),
-      multipleSelectedButtonLabel: __(l[8869]),
-      nothingSelectedButtonLabel: __(l[8870]),
+      singleSelectedButtonLabel: l[8869],
+      multipleSelectedButtonLabel: l[8869],
+      nothingSelectedButtonLabel: l[8870],
       onSelectDone: this.props.onAddParticipantSelected.bind(this),
       positionMy: "center top",
       positionAt: "left bottom",
@@ -12770,7 +12768,7 @@ class conversationpanel_ConversationRightArea extends mixins["MegaRenderMixin"] 
     }), external_React_default.a.createElement("span", null, l[20597])) : null, external_React_default.a.createElement(ui_buttons["Button"], {
       className: "link-button light dropdown-element",
       icon: "rounded-grey-up-arrow colorized",
-      label: __(l[23753]),
+      label: l[23753],
       disabled: room.isReadOnly()
     }, external_React_default.a.createElement(ui_dropdowns["Dropdown"], {
       className: "wide-dropdown send-files-selector light",
@@ -12779,17 +12777,17 @@ class conversationpanel_ConversationRightArea extends mixins["MegaRenderMixin"] 
       onClick: () => {}
     }, external_React_default.a.createElement("div", {
       className: "dropdown info-txt"
-    }, __(l[23753]) ? __(l[23753]) : "Send..."), external_React_default.a.createElement(ui_dropdowns["DropdownItem"], {
+    }, l[23753] ? l[23753] : "Send..."), external_React_default.a.createElement(ui_dropdowns["DropdownItem"], {
       className: "link-button light",
       icon: "grey-cloud colorized",
-      label: __(l[19794]) ? __(l[19794]) : "My Cloud Drive",
+      label: l[19794] ? l[19794] : "My Cloud Drive",
       onClick: () => {
         self.props.onAttachFromCloudClicked();
       }
     }), external_React_default.a.createElement(ui_dropdowns["DropdownItem"], {
       className: "link-button light",
       icon: "grey-computer colorized",
-      label: __(l[19795]) ? __(l[19795]) : "My computer",
+      label: l[19795] ? l[19795] : "My computer",
       onClick: () => {
         self.props.onAttachFromComputerClicked();
       }
@@ -12806,7 +12804,7 @@ class conversationpanel_ConversationRightArea extends mixins["MegaRenderMixin"] 
       }
     }, external_React_default.a.createElement("i", {
       className: "small-icon colorized clear-arrow"
-    }), external_React_default.a.createElement("span", null, __(l[8871]))), room.iAmOperator() && room.type === "public" ? external_React_default.a.createElement("div", {
+    }), external_React_default.a.createElement("span", null, l[8871])), room.iAmOperator() && room.type === "public" ? external_React_default.a.createElement("div", {
       className: "chat-enable-key-rotation-paragraph"
     }, external_React_default.a.createElement("div", {
       className: "chat-button-seperator"
@@ -12842,7 +12840,7 @@ class conversationpanel_ConversationRightArea extends mixins["MegaRenderMixin"] 
       }
     }, external_React_default.a.createElement("i", {
       className: "small-icon colorized " + (room.isArchived() ? "unarchive" : "archive")
-    }), external_React_default.a.createElement("span", null, room.isArchived() ? __(l[19065]) : __(l[16689]))), room.type !== "private" ? external_React_default.a.createElement("div", {
+    }), external_React_default.a.createElement("span", null, room.isArchived() ? l[19065] : l[16689])), room.type !== "private" ? external_React_default.a.createElement("div", {
       className: "link-button light red " + (room.type !== "private" && !anonymouschat && room.membersSetFromApi.members.hasOwnProperty(u_handle) && room.membersSetFromApi.members[u_handle] !== -1 ? "" : "disabled"),
       onClick: e => {
         if ($(e.target).closest('.disabled').length > 0) {
@@ -13415,17 +13413,17 @@ let conversationpanel_ConversationPanel = (conversationpanel_dec = utils["defaul
           }
         }), external_React_default.a.createElement("div", {
           className: "info"
-        }, __(l[8080]), external_React_default.a.createElement("p", null, external_React_default.a.createElement("i", {
+        }, l[8080], external_React_default.a.createElement("p", null, external_React_default.a.createElement("i", {
           className: "semi-big-icon grey-lock"
         }), external_React_default.a.createElement("span", {
           dangerouslySetInnerHTML: {
-            __html: __(l[8540]).replace("[S]", "<strong>").replace("[/S]", "</strong>")
+            __html: l[8540].replace("[S]", "<strong>").replace("[/S]", "</strong>")
           }
         })), external_React_default.a.createElement("p", null, external_React_default.a.createElement("i", {
           className: "semi-big-icon grey-tick"
         }), external_React_default.a.createElement("span", {
           dangerouslySetInnerHTML: {
-            __html: __(l[8539]).replace("[S]", "<strong>").replace("[/S]", "</strong>")
+            __html: l[8539].replace("[S]", "<strong>").replace("[/S]", "</strong>")
           }
         })))));
       }
@@ -13782,7 +13780,7 @@ let conversationpanel_ConversationPanel = (conversationpanel_dec = utils["defaul
     if (self.state.confirmDeleteDialog === true) {
       confirmDeleteDialog = external_React_default.a.createElement(modalDialogs["a" ].ConfirmDialog, {
         chatRoom: room,
-        title: __(l[8004]),
+        title: l[8004],
         name: "delete-message",
         onClose: () => {
           self.setState({
@@ -13832,7 +13830,7 @@ let conversationpanel_ConversationPanel = (conversationpanel_dec = utils["defaul
         className: "fm-dialog-content"
       }, external_React_default.a.createElement("div", {
         className: "dialog secondary-header"
-      }, __(l[8879])), external_React_default.a.createElement(generic_GenericConversationMessage, {
+      }, l[8879]), external_React_default.a.createElement(generic_GenericConversationMessage, {
         className: " dialog-wrapper",
         message: self.state.messageToBeDeleted,
         hideActionButtons: true,
@@ -13845,7 +13843,7 @@ let conversationpanel_ConversationPanel = (conversationpanel_dec = utils["defaul
     if (self.state.pasteImageConfirmDialog) {
       confirmDeleteDialog = external_React_default.a.createElement(modalDialogs["a" ].ConfirmDialog, {
         chatRoom: room,
-        title: __(l[20905]),
+        title: l[20905],
         name: "paste-image-chat",
         onClose: () => {
           self.setState({
@@ -13878,7 +13876,7 @@ let conversationpanel_ConversationPanel = (conversationpanel_dec = utils["defaul
         className: "fm-dialog-content"
       }, external_React_default.a.createElement("div", {
         className: "dialog secondary-header"
-      }, __(l[20906])), external_React_default.a.createElement("img", {
+      }, l[20906]), external_React_default.a.createElement("img", {
         src: self.state.pasteImageConfirmDialog[2],
         style: {
           maxWidth: "90%",
@@ -13900,7 +13898,7 @@ let conversationpanel_ConversationPanel = (conversationpanel_dec = utils["defaul
     if (self.state.truncateDialog === true) {
       confirmDeleteDialog = external_React_default.a.createElement(modalDialogs["a" ].ConfirmDialog, {
         chatRoom: room,
-        title: __(l[8871]),
+        title: l[8871],
         name: "truncate-conversation",
         dontShowAgainCheckbox: false,
         onClose: () => {
@@ -13919,13 +13917,13 @@ let conversationpanel_ConversationPanel = (conversationpanel_dec = utils["defaul
         className: "fm-dialog-content"
       }, external_React_default.a.createElement("div", {
         className: "dialog secondary-header"
-      }, __(l[8881]))));
+      }, l[8881])));
     }
 
     if (self.state.archiveDialog === true) {
       confirmDeleteDialog = external_React_default.a.createElement(modalDialogs["a" ].ConfirmDialog, {
         chatRoom: room,
-        title: __(l[19068]),
+        title: l[19068],
         name: "archive-conversation",
         onClose: () => {
           self.setState({
@@ -13943,13 +13941,13 @@ let conversationpanel_ConversationPanel = (conversationpanel_dec = utils["defaul
         className: "fm-dialog-content"
       }, external_React_default.a.createElement("div", {
         className: "dialog secondary-header"
-      }, __(l[19069]))));
+      }, l[19069])));
     }
 
     if (self.state.unarchiveDialog === true) {
       confirmDeleteDialog = external_React_default.a.createElement(modalDialogs["a" ].ConfirmDialog, {
         chatRoom: room,
-        title: __(l[19063]),
+        title: l[19063],
         name: "unarchive-conversation",
         onClose: () => {
           self.setState({
@@ -13967,7 +13965,7 @@ let conversationpanel_ConversationPanel = (conversationpanel_dec = utils["defaul
         className: "fm-dialog-content"
       }, external_React_default.a.createElement("div", {
         className: "dialog secondary-header"
-      }, __(l[19064]))));
+      }, l[19064])));
     }
 
     if (self.state.renameDialog === true) {
@@ -13986,7 +13984,7 @@ let conversationpanel_ConversationPanel = (conversationpanel_dec = utils["defaul
       var renameDialogValue = typeof self.state.renameDialogValue !== 'undefined' ? self.state.renameDialogValue : self.props.chatRoom.getRoomTitle();
       confirmDeleteDialog = external_React_default.a.createElement(modalDialogs["a" ].ModalDialog, {
         chatRoom: room,
-        title: __(l[9080]),
+        title: l[9080],
         name: "rename-group",
         className: "chat-rename-dialog",
         onClose: () => {
@@ -14171,7 +14169,7 @@ let conversationpanel_ConversationPanel = (conversationpanel_dec = utils["defaul
       className: "dropdown notification-text"
     }, external_React_default.a.createElement("i", {
       className: "small-icon conversations"
-    }), __(l[8882]))), external_React_default.a.createElement("div", {
+    }), l[8882])), external_React_default.a.createElement("div", {
       className: "dropdown body dropdown-arrow down-arrow tooltip not-sent-notification-manual hidden"
     }, external_React_default.a.createElement("i", {
       className: "dropdown-white-arrow"
@@ -14179,7 +14177,7 @@ let conversationpanel_ConversationPanel = (conversationpanel_dec = utils["defaul
       className: "dropdown notification-text"
     }, external_React_default.a.createElement("i", {
       className: "small-icon conversations"
-    }), __(l[8883]))), external_React_default.a.createElement("div", {
+    }), l[8883])), external_React_default.a.createElement("div", {
       className: "dropdown body dropdown-arrow down-arrow tooltip not-sent-notification-cancel hidden"
     }, external_React_default.a.createElement("i", {
       className: "dropdown-white-arrow"
@@ -14187,7 +14185,7 @@ let conversationpanel_ConversationPanel = (conversationpanel_dec = utils["defaul
       className: "dropdown notification-text"
     }, external_React_default.a.createElement("i", {
       className: "small-icon conversations"
-    }), __(l[8884]))), external_React_default.a.createElement("div", {
+    }), l[8884])), external_React_default.a.createElement("div", {
       className: "chat-topic-block " + topicBlockClass + (self.props.chatRoom.havePendingGroupCall() || self.props.chatRoom.haveActiveCall() ? " have-pending-group-call" : "")
     }, external_React_default.a.createElement("div", {
       className: "chat-topic-buttons"
@@ -14342,10 +14340,10 @@ let conversationpanel_ConversationPanel = (conversationpanel_dec = utils["defaul
       vertOffset: 4
     }, external_React_default.a.createElement("div", {
       className: "dropdown info-txt"
-    }, __(l[23753]) ? __(l[23753]) : "Send..."), external_React_default.a.createElement(ui_dropdowns["DropdownItem"], {
+    }, l[23753] ? l[23753] : "Send..."), external_React_default.a.createElement(ui_dropdowns["DropdownItem"], {
       className: "link-button light",
       icon: "grey-cloud colorized",
-      label: __(l[19794]) ? __(l[19794]) : "My Cloud Drive",
+      label: l[19794] ? l[19794] : "My Cloud Drive",
       onClick: () => {
         self.setState({
           'attachCloudDialog': true
@@ -14354,7 +14352,7 @@ let conversationpanel_ConversationPanel = (conversationpanel_dec = utils["defaul
     }), external_React_default.a.createElement(ui_dropdowns["DropdownItem"], {
       className: "link-button light",
       icon: "grey-computer colorized",
-      label: __(l[19795]) ? __(l[19795]) : "My computer",
+      label: l[19795] ? l[19795] : "My computer",
       onClick: () => {
         self.uploadFromComputer();
       }
@@ -14363,7 +14361,7 @@ let conversationpanel_ConversationPanel = (conversationpanel_dec = utils["defaul
     }), external_React_default.a.createElement(ui_dropdowns["DropdownItem"], {
       className: "link-button light",
       icon: "square-profile colorized",
-      label: __(l[8628]),
+      label: l[8628],
       onClick: () => {
         self.setState({
           'sendContactDialog': true
@@ -15315,7 +15313,7 @@ let conversations_ConversationsListItem = (_dec = utils["default"].SoonFcWrap(40
     if (chatRoom.isArchived()) {
       archivedDiv = React.createElement("div", {
         className: "archived-badge"
-      }, __(l[19067]));
+      }, l[19067]);
     }
 
     var contactId;
@@ -15423,7 +15421,7 @@ let conversations_ConversationsListItem = (_dec = utils["default"].SoonFcWrap(40
       const emptyMessage = this.loadingShown ? l[7006] : l[8000];
       lastMessageDiv = React.createElement("div", null, React.createElement("div", {
         className: lastMsgDivClasses
-      }, __(emptyMessage)));
+      }, emptyMessage));
       lastMessageDatetimeDiv = React.createElement("div", {
         className: "date-time"
       }, l[19077].replace("%s1", getTimeMarker(chatRoom.ctime, true)));
@@ -15568,7 +15566,7 @@ class conversations_ArchConversationsListItem extends mixins["MegaRenderMixin"] 
       var emptyMessage = chatRoom.messagesBuff.messagesHistoryIsLoading() || this.loadingShown || chatRoom.messagesBuff.joined === false ? l[7006] : l[8000];
       lastMessageDiv = React.createElement("div", null, React.createElement("div", {
         className: "conversation-message"
-      }, __(emptyMessage)));
+      }, emptyMessage));
     }
 
     if (chatRoom.type !== "public") {
@@ -15592,7 +15590,7 @@ class conversations_ArchConversationsListItem extends mixins["MegaRenderMixin"] 
       className: "tiny-icon blue-key"
     }) : undefined), lastMessageDiv, lastMessageDatetimeDiv), React.createElement("div", {
       className: "archived-badge"
-    }, __(l[19067]))), React.createElement("td", {
+    }, l[19067])), React.createElement("td", {
       width: "330"
     }, React.createElement("div", {
       className: "archived-on"
@@ -15603,7 +15601,7 @@ class conversations_ArchConversationsListItem extends mixins["MegaRenderMixin"] 
     })), React.createElement("div", {
       className: "button default-white-button semi-big unarchive-chat right",
       onClick: this.props.onUnarchiveConversationClicked.bind(this)
-    }, React.createElement("span", null, __(l[19065])))));
+    }, React.createElement("span", null, l[19065]))));
   }
 
 }
@@ -15912,7 +15910,7 @@ class conversations_ArchivedConversationsList extends mixins["MegaRenderMixin"] 
       if (room) {
         confirmUnarchiveDialog = React.createElement(modalDialogs["a" ].ConfirmDialog, {
           chatRoom: room,
-          title: __(l[19063]),
+          title: l[19063],
           name: "unarchive-conversation",
           onClose: () => {
             self.setState({
@@ -15929,7 +15927,7 @@ class conversations_ArchivedConversationsList extends mixins["MegaRenderMixin"] 
           className: "fm-dialog-content"
         }, React.createElement("div", {
           className: "dialog secondary-header"
-        }, __(l[19064]))));
+        }, l[19064])));
       }
     }
 
@@ -15948,12 +15946,12 @@ class conversations_ArchivedConversationsList extends mixins["MegaRenderMixin"] 
       onClick: self.onSortNameClicked
     }, React.createElement("div", {
       className: "is-chat arrow name " + nameOrderClass
-    }, __(l[86]))), React.createElement("th", {
+    }, l[86])), React.createElement("th", {
       width: "330",
       onClick: self.onSortTimeClicked
     }, React.createElement("div", {
       className: "is-chat arrow interaction " + timerOrderClass
-    }, __(l[5904])))))), React.createElement("div", {
+    }, l[5904]))))), React.createElement("div", {
       className: "grid-scrolling-table archive-chat-list"
     }, React.createElement("table", {
       className: "grid-table arc-chat-messages-block"
@@ -16248,11 +16246,11 @@ let conversations_ConversationsApp = (_dec3 = utils["default"].SoonFcWrap(80), (
       }, React.createElement("div", {
         className: "fm-not-logged-description",
         dangerouslySetInnerHTML: {
-          __html: __(l[8762]).replace("[S]", "<span className='red'>").replace("[/S]", "</span>")
+          __html: l[8762].replace("[S]", "<span className='red'>").replace("[/S]", "</span>")
         }
       }), React.createElement("div", {
         className: "fm-not-logged-button create-account"
-      }, __(l[968])))));
+      }, l[968]))));
     } else if (!megaChat.currentlyOpenedChat && megaChat.allChatsHadInitialLoadedHistory() === false && megaChat.displayArchivedChats !== true) {
       loadingOrEmpty = React.createElement("div", {
         className: "fm-empty-messages"
@@ -16362,14 +16360,14 @@ let conversations_ConversationsApp = (_dec3 = utils["default"].SoonFcWrap(80), (
       className: "small-icon blue-chain colorized"
     }), React.createElement("div", {
       className: "heading"
-    }, __(l[20638]))), React.createElement("div", {
+    }, l[20638])), React.createElement("div", {
       className: arcBtnClass,
       onClick: this.archiveChatsClicked.bind(this)
     }, React.createElement("i", {
       className: arcIconClass
     }), React.createElement("div", {
       className: "heading"
-    }, __(l[19066])), React.createElement("div", {
+    }, l[19066]), React.createElement("div", {
       className: "indicator"
     }, archivedChatsCount)))), rightPane);
   }
@@ -19300,9 +19298,7 @@ ChatRoom.prototype.getRoomTitle = function (ignoreTopic, encapsTopicInQuotes) {
     }
 
     var names = self.getParticipantsTruncated();
-
-    var def = __(l[19077]).replace('%s1', new Date(self.ctime * 1000).toLocaleString());
-
+    var def = l[19077].replace('%s1', new Date(self.ctime * 1000).toLocaleString());
     return names.length > 0 ? names : def;
   }
 };
@@ -20072,7 +20068,7 @@ ChatRoom.prototype.truncate = function () {
         v: Chatd.VERSION
       }).fail(function (r) {
         if (r === -2) {
-          msgDialog('warninga', l[135], __(l[8880]));
+          msgDialog('warninga', l[135], l[8880]);
         }
       });
     }
@@ -20726,8 +20722,8 @@ class startGroupChatWizard_StartGroupChatWizard extends mixins["MegaRenderMixin"
 }
 startGroupChatWizard_StartGroupChatWizard.clickTime = 0;
 startGroupChatWizard_StartGroupChatWizard.defaultProps = {
-  'selectLabel': __(l[1940]),
-  'cancelLabel': __(l[82]),
+  'selectLabel': l[1940],
+  'cancelLabel': l[82],
   'hideable': true,
   'flowType': 1
 };

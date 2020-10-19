@@ -268,7 +268,7 @@ export default class Text extends AbstractGenericMessage {
         }
         else {
             if (message.updated > 0 && !message.metaType) {
-                textMessage = textMessage + " <em>" + __(l[8887]) /* `(edited)` */ + "</em>";
+                textMessage = textMessage + " <em>" + l[8887] /* `(edited)` */ + "</em>";
             }
             if (this.props.initTextScrolling) {
                 messageDisplayBlock =

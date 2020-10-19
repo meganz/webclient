@@ -121,7 +121,7 @@ export class ContactButton extends ContactAwareComponent {
             if (contact.c === 2 && contact.u === u_handle) {
                 moreDropdowns.push(
                     <DropdownItem
-                        key="view0" icon="human-profile" label={__(l[187])} onClick={() => {
+                        key="view0" icon="human-profile" label={l[187]} onClick={() => {
                             loadSubPage('fm/account');
                         }} />
                 );
@@ -139,7 +139,7 @@ export class ContactButton extends ContactAwareComponent {
             if (megaChat.currentlyOpenedChat && megaChat.currentlyOpenedChat === contact.u) {
                 moreDropdowns.push(
                     <DropdownItem
-                        key="startCall" className="contains-submenu" icon="context handset" label={__(l[19125])}
+                        key="startCall" className="contains-submenu" icon="context handset" label={l[19125]}
                         onClick={startAudioCall} />
                 );
 
@@ -149,12 +149,12 @@ export class ContactButton extends ContactAwareComponent {
                     <div className="dropdown body submenu" key="dropdownGroup">
                         <div>
                             <DropdownItem
-                                key="startAudio" icon="context handset" label={__(l[1565])}
+                                key="startAudio" icon="context handset" label={l[1565]}
                                 onClick={startAudioCall} />
                         </div>
                         <div>
                             <DropdownItem
-                                key="startVideo" icon="context videocam" label={__(l[1566])} onClick={() => {
+                                key="startVideo" icon="context videocam" label={l[1566]} onClick={() => {
                                     megaChat.createAndShowPrivateRoom(contact.u)
                                         .then(function(room) {
                                             room.setActive();
@@ -168,7 +168,7 @@ export class ContactButton extends ContactAwareComponent {
             else {
                 moreDropdowns.push(
                     <DropdownItem
-                        key="startChat" icon="context conversation" label={__(l[5885])} onClick={() => {
+                        key="startChat" icon="context conversation" label={l[5885]} onClick={() => {
                             loadSubPage('fm/chat/p/' + contact.u);
                         }} />
                 );
@@ -180,13 +180,13 @@ export class ContactButton extends ContactAwareComponent {
 
             moreDropdowns.push(
                 <DropdownItem
-                    key="send-files-item" icon="context arrow-in-circle" label={__(l[6834])} onClick={() => {
+                    key="send-files-item" icon="context arrow-in-circle" label={l[6834]} onClick={() => {
                         megaChat.openChatAndSendFilesDialog(contact.u);
                     }} />
             );
             moreDropdowns.push(
                 <DropdownItem
-                    key="share-item" icon="context share-folder" label={__(l[6775])} onClick={() => {
+                    key="share-item" icon="context share-folder" label={l[6775]} onClick={() => {
                         openCopyShareDialog(contact.u);
                     }} />
                 );
@@ -196,7 +196,7 @@ export class ContactButton extends ContactAwareComponent {
                     <DropdownItem
                         key="view2"
                         icon="small-icon icons-sprite grey-plus"
-                        label={__(l[101])}
+                        label={l[101]}
                         onClick={() => {
                             loadingDialog.show();
                             const isAnonymousUser = (!u_handle || u_type !== 3);
@@ -253,7 +253,7 @@ export class ContactButton extends ContactAwareComponent {
             );
             moreDropdowns.push(
                 <DropdownItem
-                    key="set-nickname" icon="small-icon context writing-pen" label={__(l[20828])} onClick={() => {
+                    key="set-nickname" icon="small-icon context writing-pen" label={l[20828]} onClick={() => {
                         nicknames.setNicknameDialog.init(contact.u);
                     }} />
             );
@@ -474,7 +474,7 @@ export class ContactFingerprint extends MegaRenderMixin {
             ) {
                 verifyButton = <Button
                     className="dropdown-verify active"
-                    label={__(l[7692])}
+                    label={l[7692]}
                     icon="grey-key"
                     onClick={() => {
                         $(document).trigger('closeDropdowns');
@@ -487,7 +487,7 @@ export class ContactFingerprint extends MegaRenderMixin {
         if (infoBlocks.length > 0) {
             fingerprintCode = <div className="dropdown-fingerprint">
                 <div className="contact-fingerprint-title">
-                    <span>{__(l[6872])}</span>
+                    <span>{l[6872]}</span>
                     <ContactVerified contact={contact} />
                 </div>
                 <div className="contact-fingerprint-txt">
@@ -1323,7 +1323,7 @@ export class ContactPickerWidget extends MegaRenderMixin {
                     <input
                         autoFocus
                         type="search"
-                        placeholder={__(l[8010])}
+                        placeholder={l[8010]}
                         ref="contactSearchField"
                         onChange={this.onSearchChange.bind(this)}
                         value={this.state.searchValue}

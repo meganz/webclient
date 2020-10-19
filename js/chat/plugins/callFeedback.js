@@ -32,7 +32,7 @@ var CallFeedback = function(megaChat, options) {
                                         'type': 'primary',
                                         'classes': 'default-white-button small-text left',
                                         'icon': 'refresh-circle',
-                                        'text': __(l[1403]),
+                                        'text': l[1403],
                                         'callback': function () {
                                             var feedbackDialog = mega.ui.FeedbackDialog.singleton(
                                                 undefined,
@@ -52,7 +52,7 @@ var CallFeedback = function(megaChat, options) {
                                     'noThanks': {
                                         'type': 'secondary',
                                         'classes': 'default-white-button small-text left red',
-                                        'text': __(l[8898]),
+                                        'text': l[8898],
                                         'callback': function () {
                                             megaRoom.messagesBuff.removeMessageById(msgId);
                                             megaRoom.trigger('resize');

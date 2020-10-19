@@ -102,7 +102,7 @@ export default class Contact extends AbstractGenericMessage {
                         <>
                             <DropdownItem
                                 icon="human-profile"
-                                label={__(l[5868]) /* `View profile` */}
+                                label={l[5868] /* `View profile` */}
                                 onClick={() => {
                                     loadSubPage("fm/" + contact.u);
                                 }}
@@ -110,7 +110,7 @@ export default class Contact extends AbstractGenericMessage {
                             <hr/>
                             <DropdownItem
                                 icon="conversations"
-                                label={__(l[8632]) /* `Start new chat` */}
+                                label={l[8632] /* `Start new chat` */}
                                 onClick={() => {
                                     loadSubPage("fm/chat/p/" + contact.u);
                                 }}
@@ -121,7 +121,7 @@ export default class Contact extends AbstractGenericMessage {
                     {!HAS_RELATIONSHIP && (
                         <DropdownItem
                             icon="rounded-grey-plus"
-                            label={__(l[71]) /* `Add contact` */}
+                            label={l[71] /* `Add contact` */}
                             onClick={() => this._handleAddContact(contactEmail)}
                         />
                     )}

@@ -103,7 +103,7 @@ class IncSharesAccordionPanel extends MegaRenderMixin {
                                 <span className="transfer-filetype-icon inbound-share">
                                     <span className="transfer-filetype-icon inbound-share"></span>
                                 </span>
-                                <span className="txt">{__(l[19797]) ? __(l[19797]) : "Show All"}</span>
+                                <span className="txt">{l[19797] ? l[19797] : "Show All"}</span>
                             </div>
                         </div> : null}
                 </div>;

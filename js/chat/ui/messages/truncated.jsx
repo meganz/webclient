@@ -52,7 +52,7 @@ class TruncatedMessage extends ConversationMessageMixin {
                     {datetime}
 
                     <div className="message text-block">
-                        {__(l[8905])}
+                        {l[8905]}
                     </div>
                 </div>
             </div>

@@ -184,8 +184,8 @@ class ModalDialog extends MegaRenderMixin {
 class SelectContactDialog extends MegaRenderMixin {
     static clickTime = 0;
     static defaultProps = {
-        'selectLabel': __(l[1940]),
-        'cancelLabel': __(l[82]),
+        'selectLabel': l[1940],
+        'cancelLabel': l[82],
         'hideable': true
     };
 
@@ -213,7 +213,7 @@ class SelectContactDialog extends MegaRenderMixin {
 
         return (
             <ModalDialog
-                title={__(l[8628])}
+                title={l[8628]}
                 className={classes}
                 selected={self.state.selected}
                 onClose={() => {
@@ -265,8 +265,8 @@ class SelectContactDialog extends MegaRenderMixin {
 
 class ConfirmDialog extends MegaRenderMixin {
     static defaultProps = {
-        'confirmLabel': __(l[6826]),
-        'cancelLabel': __(l[82]),
+        'confirmLabel': l[6826],
+        'cancelLabel': l[82],
         'dontShowAgainCheckbox': true,
         'hideable': true
     };

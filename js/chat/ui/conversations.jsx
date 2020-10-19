@@ -96,7 +96,7 @@ class ConversationsListItem extends MegaRenderMixin {
         var nameClassString = "user-card-name conversation-name";
         var archivedDiv = "";
         if (chatRoom.isArchived()) {
-            archivedDiv = <div className="archived-badge">{__(l[19067])}</div>;
+            archivedDiv = <div className="archived-badge">{l[19067]}</div>;
         }
 
         var contactId;
@@ -216,7 +216,7 @@ class ConversationsListItem extends MegaRenderMixin {
             lastMessageDiv =
                 <div>
                     <div className={lastMsgDivClasses}>
-                        {__(emptyMessage)}
+                        {emptyMessage}
                     </div>
                 </div>;
 
@@ -403,7 +403,7 @@ class ArchConversationsListItem extends MegaRenderMixin {
             lastMessageDiv =
                 <div>
                     <div className={lastMsgDivClasses}>
-                        {__(emptyMessage)}
+                        {emptyMessage}
                     </div>
                 </div>;
         }
@@ -424,7 +424,7 @@ class ArchConversationsListItem extends MegaRenderMixin {
                     {lastMessageDiv}
                     {lastMessageDatetimeDiv}
                 </div>
-                <div className="archived-badge">{__(l[19067])}</div>
+                <div className="archived-badge">{l[19067]}</div>
                 </td>
                 <td width="330">
                     <div className="archived-on">
@@ -433,7 +433,7 @@ class ArchConversationsListItem extends MegaRenderMixin {
                     </div>
                     <div className="button default-white-button semi-big unarchive-chat right"
                         onClick={this.props.onUnarchiveConversationClicked.bind(this)}
-                        ><span>{__(l[19065])}</span></div>
+                        ><span>{l[19065]}</span></div>
                 </td>
             </tr>
         );
@@ -737,7 +737,7 @@ class ArchivedConversationsList extends MegaRenderMixin {
             if (room) {
             confirmUnarchiveDialog = <ModalDialogsUI.ConfirmDialog
                             chatRoom={room}
-                            title={__(l[19063])}
+                            title={l[19063]}
                             name="unarchive-conversation"
                             onClose={() => {
                                 self.setState({'confirmUnarchiveDialogShown': false});
@@ -750,7 +750,7 @@ class ArchivedConversationsList extends MegaRenderMixin {
                             <div className="fm-dialog-content">
 
                                 <div className="dialog secondary-header">
-                                    {__(l[19064])}
+                                    {l[19064]}
                                 </div>
                             </div>
                         </ModalDialogsUI.ConfirmDialog>
@@ -763,10 +763,10 @@ class ArchivedConversationsList extends MegaRenderMixin {
                     <tbody>
                         <tr>
                         <th className="calculated-width" onClick = {self.onSortNameClicked}>
-                            <div className={"is-chat arrow name " + nameOrderClass} >{__(l[86])}</div>
+                            <div className={"is-chat arrow name " + nameOrderClass} >{l[86]}</div>
                         </th>
                         <th width="330" onClick = {self.onSortTimeClicked}>
-                            <div className={"is-chat arrow interaction " + timerOrderClass}>{__(l[5904])}</div>
+                            <div className={"is-chat arrow interaction " + timerOrderClass}>{l[5904]}</div>
                         </th>
                         </tr>
                     </tbody>
@@ -1087,12 +1087,12 @@ class ConversationsApp extends MegaRenderMixin {
                     <div className="fm-empty-cloud-txt">{l[6870]}</div>
                     <div className="fm-not-logged-text">
                         <div className="fm-not-logged-description" dangerouslySetInnerHTML={{
-                            __html: __(l[8762])
+                            __html: l[8762]
                                 .replace("[S]", "<span className='red'>")
                                 .replace("[/S]", "</span>")
                         }}></div>
                         <div className="fm-not-logged-button create-account">
-                            {__(l[968])}
+                            {l[968]}
                         </div>
                     </div>
                 </div>
@@ -1205,13 +1205,13 @@ class ConversationsApp extends MegaRenderMixin {
                         }}>
                             <i className="small-icon blue-chain colorized"></i>
                             <div className="heading">
-                                {__(l[20638])}
+                                {l[20638]}
                             </div>
                         </div>
                         <div className={arcBtnClass}  onClick={this.archiveChatsClicked.bind(this)}>
                             <i className={arcIconClass}></i>
                             <div className="heading">
-                                {__(l[19066])}
+                                {l[19066]}
                             </div>
                             <div className="indicator">
                                 {archivedChatsCount}

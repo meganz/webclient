@@ -747,7 +747,7 @@ class BrowserEntries extends MegaRenderMixin {
                     <div className="dialog-empty-pad">
                         <div className="dialog-empty-icon"></div>
                         <div className="dialog-empty-header">
-                            {__(l[5533])}
+                            {l[5533]}
                         </div>
                     </div>
                 </div>
@@ -793,9 +793,9 @@ class BrowserEntries extends MegaRenderMixin {
 
 class CloudBrowserDialog extends MegaRenderMixin {
     static defaultProps = {
-        'selectLabel': __(l[8023]),
-        'openLabel': __(l[1710]),
-        'cancelLabel': __(l[82]),
+        'selectLabel': l[8023],
+        'openLabel': l[1710],
+        'cancelLabel': l[82],
         'hideable': true,
         className: ''
     };
@@ -849,16 +849,16 @@ class CloudBrowserDialog extends MegaRenderMixin {
         switch (nodeId) {
             case M.RootID:
                 // `Cloud Drive`
-                return __(l[164]);
+                return l[164];
             case M.RubbishID:
                 // `Rubbish Bin`
-                return __(l[167]);
+                return l[167];
             case M.InboxID:
                 // `Inbox`
-                return __(l[166]);
+                return l[166];
             case 'shares':
                 // `username@mega.co.nz` || `Shared with me`
-                return prevNodeId && M.d[prevNodeId] ? M.d[prevNodeId].m : __(l[5589]);
+                return prevNodeId && M.d[prevNodeId] ? M.d[prevNodeId].m : l[5589];
             default:
                 return M.d[nodeId] && M.d[nodeId].name;
         }
@@ -1312,20 +1312,28 @@ class CloudBrowserDialog extends MegaRenderMixin {
             gridHeader.push(
                 <table className="grid-table-header fm-dialog-table" key={"grid-table-header"}>
                     <tbody>
-                    <tr>
-                        <BrowserCol id="grid-header-star" sortBy={self.state.sortBy} onClick={self.toggleSortBy} />
-                        <BrowserCol id="name" label={__(l[86])} sortBy={self.state.sortBy}
-                                    onClick={self.toggleSortBy}/>
-                        <BrowserCol id="size" label={__(l[87])} sortBy={self.state.sortBy}
-                                    onClick={self.toggleSortBy}/>
-                        <BrowserCol id="ts" label={__(l[16169])}
-                                    sortBy={
-                                        self.state.sortBy && self.state.sortBy[0] === "ts" ?
-                                            ["ts", self.state.sortBy[1] === "desc" ? "asc" : "desc"] :
-                                            self.state.sortBy
-                                    }
-                                    onClick={self.toggleSortBy}/>
-                    </tr>
+                        <tr>
+                            <BrowserCol id="grid-header-star" sortBy={self.state.sortBy} onClick={self.toggleSortBy} />
+                            <BrowserCol
+                                id="name"
+                                label={l[86]}
+                                sortBy={self.state.sortBy}
+                                onClick={self.toggleSortBy} />
+                            <BrowserCol
+                                id="size"
+                                label={l[87]}
+                                sortBy={self.state.sortBy}
+                                onClick={self.toggleSortBy} />
+                            <BrowserCol
+                                id="ts"
+                                label={l[16169]}
+                                sortBy={
+                                    self.state.sortBy && self.state.sortBy[0] === "ts" ?
+                                        ["ts", self.state.sortBy[1] === "desc" ? "asc" : "desc"] :
+                                        self.state.sortBy
+                                }
+                                onClick={self.toggleSortBy} />
+                        </tr>
                     </tbody>
                 </table>
             );
@@ -1347,7 +1355,7 @@ class CloudBrowserDialog extends MegaRenderMixin {
 
         return (
             <ModalDialogsUI.ModalDialog
-                title={self.props.title || __(l[8011])}
+                title={self.props.title || l[8011]}
                 className={
                     classes +
                     // Amend the container height when the bottom breadcrumb is visible,
@@ -1366,7 +1374,7 @@ class CloudBrowserDialog extends MegaRenderMixin {
                             ${self.state.selectedTab === 'clouddrive' ? 'active' : ''}
                         `}
                         onClick={() => self.handleTabChange('clouddrive')}>
-                        {__(l[164]) /* `Cloud Drive` */}
+                        {l[164] /* `Cloud Drive` */}
                     </div>
                     <div
                         className={`
@@ -1374,7 +1382,7 @@ class CloudBrowserDialog extends MegaRenderMixin {
                             ${self.state.selectedTab === 'shares' ? 'active' : ''}
                         `}
                         onClick={() => self.handleTabChange('shares')}>
-                        {__(l[5542]) /* `Incoming Shares` */}
+                        {l[5542] /* `Incoming Shares` */}
                     </div>
                     <div className="clear"></div>
                 </div>
@@ -1398,7 +1406,7 @@ class CloudBrowserDialog extends MegaRenderMixin {
                                     self.onSearchIconClick(e);
                                 }}>
                             ></i>
-                            <input type="search" placeholder={__(l[102])}  value={self.state.searchValue}
+                            <input type="search" placeholder={l[102]}  value={self.state.searchValue}
                                 onChange={self.onSearchChange} />
                             {clearSearchBtn}
                         </div>

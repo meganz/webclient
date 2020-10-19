@@ -35,7 +35,7 @@ export default class VoiceClip extends AbstractGenericMessage {
                     >
                         <DropdownItem
                             icon="red-cross"
-                            label={__(l[1730]) /* `Delete` */}
+                            label={l[1730] /* `Delete` */}
                             className="red"
                             onClick={(e) => this.props.onDelete(e, message)}
                         />

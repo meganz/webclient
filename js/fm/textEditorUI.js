@@ -382,7 +382,8 @@ mega.textEditorUI = new function TextEditorUI() {
                 editor = CodeMirror.fromTextArea($myTextarea[0], {
                     lineNumbers: true,
                     scrollbarStyle: "overlay",
-                    autofocus: true
+                    autofocus: true,
+                    lineWrapping: true
                 });
             }
             // Without parentheses && will be applied first,

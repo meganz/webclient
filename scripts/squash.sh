@@ -4,7 +4,7 @@
 #
 # Use -h for help.
 #
-# $Id: squash.sh,v 2.0.0 2020/10/18 14:07:57 dc Exp $
+# $Id: squash.sh,v 2.0.1 2020/10/19 18:07:34 dc Exp $
 
 ask() {
     read -r -n 1 -p "$1 [Yn]: "
@@ -46,7 +46,8 @@ while [ $# -gt 0 ]; do
             echo "Options:"
             echo "-t <branch>     Target branch (default: develop)"
             echo "-b <branch>     Source branch (default: current)"
-            echo "-r              Remote to use (default: origin)"
+            echo "-r <remote>     Remote to use (default: origin)"
+            echo "-m <message>    New commit message (preserving co-authors)"
             echo "-u              Pull target branch before squashing."
             echo "-p              Push changes after squashing."
             echo "-a              Reset commit author."
@@ -67,6 +68,10 @@ while [ $# -gt 0 ]; do
         -r|-remote)
             shift
             remote=$1
+            ;;
+        -m|-message)
+            shift
+            opt_message=$1
             ;;
         -p|-push)
             opt_push=1
@@ -172,10 +177,25 @@ if [[ -n "$commit_message" ]]; then
     [[ $? -ne 0 ]] && fatal "commit amend failed."
 fi
 
-# @todo add an additional Co-authored-by when resetting the author
 if [[ "$opt_resetauthor" = "1" ]]; then
     git commit --amend --no-edit --reset-author
     [[ $? -ne 0 ]] && fatal "reset-author failed."
+
+    [[ -z "$opt_message" ]] && opt_message=fix
+    coauthorr="Co-authored-by: $author"
+fi
+
+if [[ -n "$opt_message" ]]; then
+    if [[ "$opt_message" = "fix" ]]; then
+        opt_message=$(get_firstcommit $path)
+        if [[ -n "$coauthorr" ]]; then
+            opt_message=$opt_message$'\n'$coauthorr
+        fi
+    elif [[ -n "$coauthor" ]]; then
+        opt_message=$opt_message$'\n\n'$coauthor
+    fi
+    git commit --amend --no-edit -m "$opt_message"
+    [[ $? -ne 0 ]] && fatal "amend commit message failed."
 fi
 
 if [[ "$opt_signoff" = "1" ]]; then

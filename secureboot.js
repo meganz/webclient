@@ -2167,7 +2167,7 @@ else if (!browserUpdate) {
             try
             {
                 var crashes = JSON.parse(localStorage.crashes || '{}');
-                var checksum = MurmurHash3(JSON.stringify(dump), 0x4ef5391a);
+                var checksum = wchecksum(JSON.stringify(dump), 0x4ef5391a);
 
                 if (crashes.v != sbid) crashes = { v : sbid };
 
@@ -4016,6 +4016,18 @@ function tryCatch(fn, onerror)
     };
     fn.foo.bar = fn;
     return fn.foo;
+}
+
+/** fast weak checksum */
+function wchecksum(data, seed) {
+    'use strict';
+    seed = seed || 0x9f00eb1f;
+
+    var l = data.length;
+    while (l--) {
+        seed += data.charCodeAt(l) * l;
+    }
+    return seed >>> 0;
 }
 
 var onIdle = function(handler) {

@@ -4,7 +4,7 @@
 #
 # Use -h for help.
 #
-# $Id: squash.sh,v 2.0.1 2020/10/19 18:07:34 dc Exp $
+# $Id: squash.sh,v 2.0.2 2020/10/20 15:24:38 dc Exp $
 
 ask() {
     read -r -n 1 -p "$1 [Yn]: "
@@ -208,6 +208,9 @@ if [[ "$opt_push" = "1" ]]; then
     [[ $? -ne 0 ]] && fatal "push failed."
 fi
 
-[[ "$source_branch" != "$current_branch" ]] && git checkout $current_branch
+if [[ "$source_branch" != "$current_branch" ]]; then
+    git checkout $current_branch
+    [[ $? -ne 0 ]] && fatal "$current_branch checkout failed."
+fi
 
 exit $?

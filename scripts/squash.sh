@@ -4,7 +4,7 @@
 #
 # Use -h for help.
 #
-# $Id: squash.sh,v 2.0.2 2020/10/20 15:24:38 dc Exp $
+# $Id: squash.sh,v 2.0.3 2020/10/20 15:27:46 dc Exp $
 
 ask() {
     read -r -n 1 -p "$1 [Yn]: "
@@ -213,4 +213,4 @@ if [[ "$source_branch" != "$current_branch" ]]; then
     [[ $? -ne 0 ]] && fatal "$current_branch checkout failed."
 fi
 
-exit $?
+exit 0

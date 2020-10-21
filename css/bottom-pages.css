@@ -3516,7 +3516,7 @@ body:not(.mobile) .bottom-page.dark-button.hover:hover {
     display: inline-block;
 }
 .bottom-page .security-illustration {
-    background-image: url(../images/mega/bottom-page/security-page-v2.png);
+    background-image: url(../images/mega/security-page_v2.png);
     width: 375px;
     height: 249px;
     background-size: 750px auto;
@@ -3591,7 +3591,7 @@ body:not(.mobile) .bottom-page.dark-button.hover:hover {
     margin-right: 8px;
 }
 .bottom-page.password-manager-app-select .app-link-icon {
-    background: url(../images/mega/bottom-page/security-page-v2.png);
+    background: url(../images/mega/security-page_v2.png);
     background-repeat: no-repeat;
     display: inline-block;
     height: 32px;
@@ -6727,7 +6727,7 @@ body:not(.mobile) .bottom-page.dropdown .dropdown-item:hover, .bottom-page.dropd
         background-size: 360px auto;
     }
     .bottom-page .security-illustration, .bottom-page.password-manager-app-select .app-link-icon {
-        background-image: url(../images/mega/bottom-page/security-page-v2@2x.png);
+        background-image: url(../images/mega/security-page_v2@2x.png);
         background-size: 750px auto;
     }
     .onboarding-suggestions .onboard-image, .onboarding-suggestions .default-green-button.redirect-clouddrive::after, .redeem-promo-page .onboard-image {

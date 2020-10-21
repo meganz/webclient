@@ -3608,10 +3608,6 @@ body:not(.mobile) .bottom-page.dark-button.hover:hover {
 }
 .bottom-page.password-manager-app-select .lastpass .app-link-icon {
     background-position: -102px -1016px;
-    width: 88px;
-}
-.auth-app-select-tooltip .lastpass .app-link-text {
-    margin-left: 124px;
 }
 .securitypractice .bottom-page.large-subheader {
     margin-top: 32px;

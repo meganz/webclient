@@ -683,6 +683,9 @@ body:not(.mobile) .bottom-page.scroll-button:hover {
 .inline-block.mid-pad.max-width {
     max-width: 485px;
 }
+.bottom-page.vertical-pad-96 {
+    padding: 96px 0;
+}
 .bottom-page.mid-pad {
     padding: 27px 0 28px 0;
 }
@@ -1239,7 +1242,7 @@ body:not(.mobile) .bottom-btn-container .bus-plan.button-48-height.red:hover {
     display: block;
     width: calc(100% - 36px);
     text-align: center;
-    margin: 20px auto 12px;
+    margin: 20px auto 0;
 }
 .video-info-block span.video-duration-badge {
     background: #00BFA5;
@@ -3513,7 +3516,7 @@ body:not(.mobile) .bottom-page.dark-button.hover:hover {
     display: inline-block;
 }
 .bottom-page .security-illustration {
-    background-image: url(../images/mega/bottom-page/security-page-v1.png);
+    background-image: url(../images/mega/bottom-page/security-page-v2.png);
     width: 375px;
     height: 249px;
     background-size: 750px auto;
@@ -3528,26 +3531,18 @@ body:not(.mobile) .bottom-page.dark-button.hover:hover {
 .bottom-page .security-illustration.create-password {
     background-position: -375px 0;
 }
-.bottom-page .security-illustration.store-password {
-    background-position: 0 -259px;
-}
 .bottom-page .security-illustration.backup-password {
-    background-position: -375px -259px;
+    background-position: -375px -299px;
+    height: 170px;
 }
 .bottom-page .security-illustration.twofactor {
     background-position: 0px -498px;
-}
-.bottom-page .security-illustration.twofactor {
-    background-position: 0px -498px;
-}
-.bottom-page .security-illustration.device-encrypt {
-    background-position: -375px -498px;
-}
-.bottom-page .security-illustration.endpoint-security {
-    background-position: 0 -747px;
 }
 .bottom-page .security-illustration.transparency-opensource {
-    background-position: -375px -747px;
+    background-position: -375px -507px;
+}
+.bottom-page .security-illustration.safe {
+    background-position: 26px -247px;
 }
 .bottom-page .security-illustration.exclamation-triangle {
     background-position: -392px -1016px;
@@ -3596,7 +3591,7 @@ body:not(.mobile) .bottom-page.dark-button.hover:hover {
     margin-right: 8px;
 }
 .bottom-page.password-manager-app-select .app-link-icon {
-    background: url(../images/mega/bottom-page/security-page-v1.png);
+    background: url(../images/mega/bottom-page/security-page-v2.png);
     background-repeat: no-repeat;
     display: inline-block;
     height: 32px;
@@ -3621,6 +3616,9 @@ body:not(.mobile) .bottom-page.dark-button.hover:hover {
 .securitypractice .bottom-page.large-subheader {
     margin-top: 32px;
 }
+.securitypractice .bottom-page.business-header {
+    padding-top: 0;
+}
 .bottom-page.business-text.password-warning {
     margin-top: 24px;
     display: table;
@@ -3642,6 +3640,11 @@ body:not(.mobile) .securitypractice .business-text a.red:hover {
 }
 .securitypractice .improved-recovery-steps h5.main-italic-header {
     max-width: 100%;
+}
+.securitypractice .improved-recovery-steps .recover-paste-block {
+    background: #fff;
+    border: 1px solid rgba(38,47,59,0.10);
+    margin: 24px 0 4px 0;
 }
 .securitypractice .improved-recovery-steps .recover-paste-block .right-section > div {
     margin-right: 0;
@@ -5138,19 +5141,29 @@ body:not(.mobile) .bottom-page.dropdown .dropdown-item:hover, .bottom-page.dropd
     .dark-blue-bg .bottom-page.dark-button {
         margin: 0;
     }
+    .securitypractice .huge-bott-pad.top-bl {
+        padding-bottom: 0;
+    }
     .securitypractice .right-cell-65, .securitypractice .right-cell-35, .securitypractice .left-cell-65, .securitypractice .left-cell-35 {
         display: block;
-        margin: 0 auto;
         width: 100%;
     }
+    .securitypractice .bottom-page.business-header  {
+        padding-top: 34px;
+    }
     .securitypractice .business-info-block {
-        max-width: 720px;
+        max-width: none;
     }
     .securitypractice .right-cell-35.order1 {
         display: none;
     }
     .securitypractice .bottom-page.table.changed-order .right-cell-35.order2 {
         display: block;
+    }
+    .bottom-page .security-img.safe {
+        background-size: auto 100%;
+        max-width: 100%;
+        margin: 20px auto;
     }
     .onboarding-suggestions .bottom-page.horizontal-centered-bl {
         max-width: 720px;
@@ -6714,7 +6727,7 @@ body:not(.mobile) .bottom-page.dropdown .dropdown-item:hover, .bottom-page.dropd
         background-size: 360px auto;
     }
     .bottom-page .security-illustration, .bottom-page.password-manager-app-select .app-link-icon {
-        background-image: url(../images/mega/bottom-page/security-page-v1@2x.png);
+        background-image: url(../images/mega/bottom-page/security-page-v2@2x.png);
         background-size: 750px auto;
     }
     .onboarding-suggestions .onboard-image, .onboarding-suggestions .default-green-button.redirect-clouddrive::after, .redeem-promo-page .onboard-image {

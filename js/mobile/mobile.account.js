@@ -179,8 +179,8 @@ mobile.account = {
         var proPlanName = pro.getProPlanName(proNum);
 
         // Show the Pro name and icon class
-        $page.find('.icon.pro-mini').addClass(proClassName);
-        $page.find('.pro-plan-name').text(proPlanName);
+        $('.plan-icon', $page).addClass(proClassName);
+        $('.pro-plan-name', $page).text(proPlanName);
     },
 
     /**

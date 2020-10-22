@@ -404,6 +404,7 @@ var redeem = {
         var decimalSeparator = mega.intl.decimalSeparator;
         var planPrice = vd.price.split('.');
         var proName = pro.getProPlanName(proNum);
+        var euroSign = ' \u20ac';
 
         // Get dollars and cents
         var planPriceDollars = planPrice[0];
@@ -433,22 +434,20 @@ var redeem = {
         upgradeText = upgradeText.replace('[S]', '<span class="complete-text">').replace('[/S]', '</span>');
 
         // Update information
-        redeem.$dialog.find('.reg-st3-membership-bl').removeClass('pro1 pro2 pro3 pro4');
-        redeem.$dialog.find('.reg-st3-membership-bl').addClass('pro' + proNum);
-        redeem.$dialog.find('.plan-name').html(proName);
-        redeem.$dialog.find('.price .dollars').text(intl.format(planPriceDollars));
-        redeem.$dialog.find('.price .cents').text(decimalSeparator + intl.format(planPriceCents));
-        redeem.$dialog.find('.price .period').text('/' + monthOrYearText);
-        redeem.$dialog.find('.reg-st3-storage .quota-amount').text(intl.format(storageAmount));
-        redeem.$dialog.find('.reg-st3-storage .quota-unit').text(storageUnit);
-        redeem.$dialog.find('.reg-st3-bandwidth .quota-amount').text(intl.format(bandwidthAmount));
-        redeem.$dialog.find('.reg-st3-bandwidth .quota-unit').text(bandwidthUnit);
-        redeem.$dialog.find('.title-text').html(titleText);
-        redeem.$dialog.find('.balance-text').html(balanceText);
-        redeem.$dialog.find('.complete-upgrade-text').html(upgradeText);
-        redeem.$dialog.find('.pro-plan').text(proName);
-        redeem.$dialog.find('.complete-upgrade-button').attr('data-plan-id', planId);
-        redeem.$dialog.find('.choose-plan-button').addClass('hidden');
+        $('.plan-icon', redeem.$dialog).removeClass('pro1 pro2 pro3 pro4 business')
+            .addClass('pro' + proNum);
+        $('.plan-title', redeem.$dialog).safeHTML(proName);
+        $('.price', redeem.$dialog).text(intl.format(planPriceDollars)
+            + decimalSeparator + intl.format(planPriceCents) + euroSign);
+        $('.plan-period', redeem.$dialog).text('/' + monthOrYearText);
+        $('.title-text', redeem.$dialog).safeHTML(titleText);
+        $('.storage span', redeem.$dialog).safeHTML(intl.format(storageAmount) + ' ' + storageUnit);
+        $('.transfer span', redeem.$dialog).safeHTML(intl.format(bandwidthAmount) + ' ' + bandwidthUnit);
+        $('.balance-text', redeem.$dialog).safeHTML(balanceText);
+        $('.complete-upgrade-text', redeem.$dialog).safeHTML(upgradeText);
+        $('.pro-plan', redeem.$dialog).text(proName);
+        $('.complete-upgrade-button', redeem.$dialog).attr('data-plan-id', planId);
+        $('.choose-plan-button', redeem.$dialog).addClass('hidden');
 
         // Button functionality
         redeem.initCloseButton();
@@ -577,9 +576,11 @@ var redeem = {
         }
 
         var $voucherBlock = $('.promo-voucher-block', redeem.$successOverlay);
-        var $voucherWrapper = $('.promo-voucher-inner-wrapper', $voucherBlock);
+        var $voucherIcon = $('.plan-icon', $voucherBlock);
         var proPlanName;
-        var quota;
+        var sQuota;
+        var tQuota;
+
         if (vd.businessmonths) {
             if (vd.businessmonths === 1) {
                 proPlanName = l[23492];
@@ -590,9 +591,10 @@ var redeem = {
             else {
                 proPlanName = l[23493].replace('%n', vd.businessmonths);
             }
-            quota = l[7094];
+            sQuota = l[24091];
+            tQuota = l[7094];
 
-            $voucherWrapper.removeClass('pro1 pro2 pro3 pro4').addClass('pro100');
+            $voucherIcon.removeClass('pro1 pro2 pro3 pro4').addClass('business');
             $('.promo-voucher-card', $voucherBlock).removeClass('red-block').removeClass('yellow-block')
                 .addClass('blue-block');
 
@@ -612,7 +614,7 @@ var redeem = {
             var proNum = vd.proNum;
             proPlanName = pro.getProPlanName(proNum);
 
-            $voucherWrapper.removeClass('pro1 pro2 pro3 pro4 pro100')
+            $voucherIcon.removeClass('pro1 pro2 pro3 pro4 business')
                 .addClass('pro' + vd.proNum);
             if (vd.proNum === 4) {
                 $('.promo-voucher-card', $voucherBlock).removeClass('red-block').removeClass('blue-block')
@@ -634,8 +636,10 @@ var redeem = {
         redeem.$successOverlay.removeClass('hidden');
 
         // Show PRO plan details
-        $('.storage-amount', $voucherBlock).text(quota || bytesToSize(vd.storage * 0x40000000, 0));
-        $('.transfer-amount', $voucherBlock).text(quota || bytesToSize(vd.bandwidth * 0x40000000, 0));
+        $('.storage-amount', $voucherBlock)
+            .safeHTML(l[23789].replace('%1', sQuota || bytesToSize(vd.storage * 0x40000000, 0)));
+        $('.transfer-amount', $voucherBlock)
+            .safeHTML(l[23790].replace('%1', tQuota || bytesToSize(vd.bandwidth * 0x40000000, 0)));
 
         // Add click handlers for 'Go to my account' and Close buttons
         redeem.$successOverlay.find('.payment-result-button, .payment-close').rebind('click', function() {
@@ -668,11 +672,11 @@ var redeem = {
             var $dlgTitle = $('.dialog-title', $dlg).removeClass('red');
 
             if (mega.voucher.businessmonths) {
-                $('.size-head.v-storage', $dlg).text(l[7094]);
-                $('.size-head.v-transfer', $dlg).text(l[7094]);
+                $('.v-storage', $dlg).safeHTML(l[24097]);
+                $('.v-transfer', $dlg).safeHTML(l[24098]);
 
                 $('.voucher-logo', $dlg).addClass('business-v');
-                $('.plan-icon', $dlg).removeClass('pro1 pro2 pro3 pro4').addClass('pro100');
+                $('.plan-icon', $dlg).removeClass('pro1 pro2 pro3 pro4').addClass('business');
 
                 var headerText;
                 if (mega.voucher.businessmonths === 1) {
@@ -696,21 +700,19 @@ var redeem = {
             else {
                 var storageBytes = mega.voucher.storage * 1024 * 1024 * 1024;
                 var storageFormatted = numOfBytes(storageBytes, 0);
-                var storageSizeRounded = Math.round(storageFormatted.size);
+                var storageValue = Math.round(storageFormatted.size) + ' ' + storageFormatted.unit;
 
-                $('.size-head.v-storage', $dlg)
-                    .text(storageSizeRounded + ' ' + storageFormatted.unit);
+                $('.v-storage', $dlg).safeHTML(l[23789].replace('%1', '<span>' + storageValue + '</span>'));
 
-                $('.plan-icon', $dlg).removeClass('pro1 pro2 pro3 pro4 pro100')
+                $('.plan-icon', $dlg).removeClass('pro1 pro2 pro3 pro4 business')
                     .addClass('pro' + mega.voucher.proNum);
 
 
                 var bandwidthBytes = mega.voucher.bandwidth * 1024 * 1024 * 1024;
                 var bandwidthFormatted = numOfBytes(bandwidthBytes, 0);
-                var bandwidthSizeRounded = Math.round(bandwidthFormatted.size);
+                var bandwidthValue = Math.round(bandwidthFormatted.size) + ' ' + bandwidthFormatted.unit;
 
-                $('.size-head.v-transfer', $dlg)
-                    .text(bandwidthSizeRounded + ' ' + bandwidthFormatted.unit);
+                $('.v-transfer', $dlg).safeHTML(l[23790].replace('%1', '<span>' + bandwidthValue + '</span>'));
 
                 if (mega.voucher.proNum === 4) {
                     $('.voucher-logo', $dlg).addClass('pro-l');

@@ -47,7 +47,7 @@ var astroPayDialog = {
         this.$dialog = $('.astropay-dialog');
         this.$backgroundOverlay = $('.fm-dialog-overlay');
         this.$pendingOverlay = $('.payment-result.pending.original');
-        this.$propayPage = $('.membership-step2');
+        this.$propayPage = $('.payment-section', 'body');
 
         // Store the provider details
         this.selectedProvider = selectedProvider;
@@ -1245,7 +1245,7 @@ var addressDialog = {
         }
         else {
             // here it means we are coming from business account register page
-            proNum = 'bus-plan-icon64'; // business account Plan icon
+            proNum = 'business'; // business account Plan icon
             proPlan = l[19510];
             proPrice = (this.userInfo.nbOfUsers * this.businessPlan.p).toFixed(2);
             if (this.businessPlan.pastInvoice && this.businessPlan.currInvoice) {
@@ -1264,7 +1264,7 @@ var addressDialog = {
         monthsWording = pro.propay.getNumOfMonthsWording(numOfMonths);
 
         // Update template
-        this.$dialog.find('.plan-icon').removeClass('pro1 pro2 pro3 pro4 bus-plan-icon64')
+        this.$dialog.find('.plan-icon').removeClass('pro1 pro2 pro3 pro4 business')
             .addClass(proNum);
         this.$dialog.find('.payment-plan-title').text(proPlan);
         this.$dialog.find('.payment-plan-txt .duration').text(monthsWording);
@@ -1763,7 +1763,7 @@ var addressDialog = {
         // check if we are coming from business account register
         if (!this.businessPlan || !this.userInfo) {
             // Get the value for whether the user wants the plan to renew automatically
-            var autoRenewCheckedValue = $('.membership-step2 .renewal-options-list input:checked').val();
+            var autoRenewCheckedValue = $('.renewal-options-list input:checked', '.payment-section').val();
 
             // If the provider supports recurring payments and the user wants the plan to renew automatically
             if (autoRenewCheckedValue === 'yes') {

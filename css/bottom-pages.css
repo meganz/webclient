@@ -155,6 +155,12 @@
 }
 .new-bottom-page p span.red, .new-bottom-page h2 span.red, .new-bottom-page p a, .new-bottom-page h2 a, .new-bottom-pages p a, .new-bottom-pages .investors-pdf-block a, .new-bottom-page li a, .new-bottom-pages li a, .download.error-text a, .bottom-pages-dialog a {
     color: #F0373B;
+    overflow-wrap: break-word;
+}
+.mobile .investors-pdf-block {
+    font-size: 14px;
+    line-height: 24px;
+    padding: 20px 0;
 }
 .new-bottom-pages h2 span.number, .new-bottom-pages h2.list span.number, .new-bottom-pages h2.sub-list span.number {
     margin: 0 10px 0 0;
@@ -166,7 +172,7 @@
     padding: 0 0 0 57px;
 }
 .new-bottom-pages, .main-mid-pad.new-bottom-pages {
-    padding: 46px 15px 73px 15px;
+    padding: 46px 40px 73px 40px;
 }
 .new-bottom-pages ul {
     padding-left: 15px;
@@ -184,7 +190,80 @@
     padding: 0;
     border: 0;
 }
+
+/* Credits */
+.new-bottom-pages.credits {
+    overflow: hidden;
+}
+.credits-main-pad {
+    margin: -3px -25px -3px -25px;
+    font-size: 0;
+    text-align: center;
+}
+.credits-block {
+    margin: 50px 25px 3px 25px;
+    width: 100%;
+    max-width: 280px;
+    min-height: 200px;
+    box-shadow: 0px 0px 0px 2px #d9d9d9;
+    border-radius: 5px;
+    padding: 20px;
+    box-sizing: border-box;
+    display: inline-block;
+    vertical-align: top;
+    -webkit-transition: box-shadow 200ms ease-in-out;
+    transition: box-shadow 200ms ease-in-out;
+}
+.credits-block:hover {
+    box-shadow: 0px 0px 0px 5px #d42400;
+}
+.credits-logo-block {
+    height: 83px;
+    display: block;
+}
+.credits-logo-block img {
+    max-width: 235px;
+    width: 100%
+}
+.credits-description {
+    font-size: 14px;
+    line-height: 26px;
+    color: #333333;
+    display: block;
+}
+.credits-title {
+    display: block;
+    font-size: 20px;
+    line-height: 31px;
+    letter-spacing: -0.1px;
+    color: #666666;
+    font-family: 'Open Sans Semibold Italic', Arial;
+    padding: 5px 0 0 0;
+}
+.credits-info {
+    display: block;
+    font-size: 13px;
+    line-height: 24px;
+    letter-spacing: -0.1px;
+    color: #D82D00;
+    font-family: 'Open Sans Semibold Italic', Arial;
+    padding-top: 2px;
+}
+.nihilogics.credits-logo-block img {
+    margin: -10px 0 0 0;
+}
+.nihilogics.credits-logo-block .credits-info {
+    margin: -20px 0 0 0;
+}
+.standford img {
+    float: left;
+    margin: -3px -180px 0 0;
+}
+
+
 /* end of Old bottom pages stylinng */
+
+
 /* Bottom pages common styles*/
 body.bottom-pages .fmholder {
     overflow: hidden;
@@ -452,7 +531,8 @@ body:not(.mobile) .bottom-page.scroll-button:hover {
     font-size: 0;
     overflow: hidden;
 }
-.dark-blue-gradient .bottom-page.big-header, .dark-blue-gradient .bottom-page.small-info {
+.dark-blue-gradient .bottom-page.big-header, .dark-blue-gradient .bottom-page.small-info,
+.dark-blue-bg .bottom-page.big-header, .dark-blue-bg .bottom-page.small-info{
     color: white;
 }
 .bottom-page.grey-block {
@@ -856,6 +936,9 @@ body:not(.mobile) .bottom-page.scroll-button:hover {
 .bottom-page.small-info.mid-pad {
     padding: 7px 0 0 0;
 }
+.bottom-page.small-info.top-pad-24 {
+    padding: 24px 0 0 0;
+}
 .bottom-page.medium-txt.dark {
     color: #333333;
 }
@@ -934,7 +1017,7 @@ body:not(.mobile) .bottom-page.scroll-button:hover {
     vertical-align: top;
     width: 8px;
     height: 13px;
-    background-image: url(../images/mega/startpage-sprite_v11.png);
+    background-image: url(../images/mega/startpage-sprite_v12.png);
     background-position: -165px -7px;
     background-repeat: no-repeat;
 }
@@ -970,7 +1053,7 @@ body:not(.mobile) .bottom-page.scroll-button:hover {
     width: 102px;
     height: 102px;
     margin: 10px auto 26px auto;
-    background-image: url(../images/mega/startpage-sprite_v11.png);
+    background-image: url(../images/mega/startpage-sprite_v12.png);
     background-position: 0 -533px;
     background-repeat: no-repeat;
     padding: 0;
@@ -1300,7 +1383,7 @@ iframe.security-video-container {
     margin: 12px auto 5px auto;
     width: 22px;
     height: 24px;
-    background-image: url(../images/mega/startpage-sprite_v11.png);
+    background-image: url(../images/mega/startpage-sprite_v12.png);
     background-position: -0px -73px;
     opacity: 0.5;
     -webkit-transition: opacity 200ms ease-in-out;
@@ -1489,44 +1572,6 @@ iframe.security-video-container {
 }
 /* end of Bottom pages nav bar */
 
-/* Plans block */
-.bottom-page.plans-block {
-    padding: 10px 0 68px 0;
-    font-size: 0;
-}
-.bottom-page.plans-block.no-pad {
-    padding: 0;
-}
-.bottom-page .reg-st3-membership-bl {
-    width: 230px;
-    margin: 0 0 0 12px;
-    float: none;
-    display: inline-block;
-}
-.reg-st3-membership-bl.hidden {
-    display: none;
-}
-.bottom-page .reg-st3-membership-bl:first-child {
-    margin: 0;
-}
-.bottom-page.plans-info {
-    font-size: 14px;
-    line-height: 32px;
-    height: 32px;
-    color: #777777;
-    display: inline-block;
-    background-color: white;
-    -moz-border-radius: 16px;
-    -webkit-border-radius: 16px;
-    border-radius: 16px;
-    -webkit-box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
-    -moz-box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
-    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
-    padding: 0 12px;
-    margin: 24px 0 31px 0;
-}
-/* end of Plans block */
-
 /* MEGAcmd */
 .bottom-page.full-block {
     overflow: hidden;
@@ -1553,10 +1598,6 @@ iframe.security-video-container {
 }
 .megacmd .bottom-page.horizontal-centered-bl.wide {
     max-width: 1246px;
-    padding: 0 40px;
-}
-.bottom-page.horizontal-centered-bl.mid-wide {
-    max-width: 1194px;
     padding: 0 40px;
 }
 .bottom-page.green-block {
@@ -2613,10 +2654,6 @@ body:not(.mobile) .bottom-page.top-dark-button:hover {
 .uwp .bottom-page.horizontal-centered-bl.ultra-wide {
     overflow: visible;
 }
-.uwp .bottom-page.horizontal-centered-bl.mid-wide {
-    max-width: 1194px;
-    padding: 0 40px;
-}
 .uwp .business-intro .mid-txt {
     line-height: 36px;
     color: #262F3B;
@@ -3315,8 +3352,11 @@ body:not(.mobile) .bottom-page.dark-button.hover:hover {
     font-size: 14px;
     line-height: 24px;
     color: #676D75;
-    font-family: 'LatoWebLight';
+    font-family: 'LatoWebLight', Arial;
     padding: 100px 0 25px 0;
+}
+.bottom-page.top-description.invisible {
+    opacity: 0;
 }
 .bottom-page.big-link {
     font-size: 16px;
@@ -3324,7 +3364,6 @@ body:not(.mobile) .bottom-page.dark-button.hover:hover {
     display: inline-block;
     color: #333333;
     font-family: 'LatoWebBold';
-    display: inline-block;
     margin-bottom: 72px;
 }
 .bottom-page.big-link span {
@@ -3645,6 +3684,10 @@ body:not(.mobile) .securitypractice .business-text a.red:hover {
 .securitypractice .improved-recovery-steps .recover-paste-block .right-section > div {
     margin-right: 0;
 }
+.securitypractice .bottom-page.auth-app-select-tooltip,
+.securitypractice .bottom-page.password-manager-app-select{
+    z-index: 10;
+}
 .securitypractice .auth-app-select-tooltip .app-link-arrow {
     top: 21px
 }
@@ -3899,7 +3942,7 @@ a.opensource-icon-txt.coming-soon {
 .default-green-button.redirect-clouddrive.hidden, .default-green-button.download-app.hidden {
     display: none;
 }
-.onboarding-suggestions .bottom-page.horizontal-centered-bl {
+.onboard-container-size .bottom-page.horizontal-centered-bl {
     min-height: 680px;
     z-index: 999;
     padding: 0 20px;
@@ -3907,7 +3950,7 @@ a.opensource-icon-txt.coming-soon {
     height: 640px;
     padding-top: 24px;
 }
-.onboarding-suggestions .bottom-page.horizontal-centered-bl.resize {
+.onboard-container-size .bottom-page.horizontal-centered-bl.resize {
     min-height: 600px;
 }
 .onboarding-suggestions .download-app {
@@ -4189,7 +4232,7 @@ a.opensource-icon-txt.coming-soon {
 }
 .split-buttons div.radioOn .radio-txt {
     color: #495057;
-    font-family: 'LatoWebBold', 'source_sans_prosemibold', sans-serif;
+    font-family: 'LatoWebBold', Arial;
 }
 .onboarding-suggestions .megaapp-linux-info {
     padding: 0;
@@ -4228,7 +4271,7 @@ a.opensource-icon-txt.coming-soon {
     min-width: 1024px;
 }
 .onboarding-suggestions .os-mac-windows-toggle, .onboarding-suggestions .os-linux-toggle {
-    font-family: 'LatoWebBold', 'source_sans_prosemibold', sans-serif;
+    font-family: 'LatoWebBold', Arial;
 }
 .onboarding-suggestions .megaapp-linux .megaapp-dropdown-list {
     z-index: 9999;
@@ -4272,6 +4315,12 @@ a.opensource-icon-txt.coming-soon {
     top: 0;
     left: 0;
 }
+.mobile .payment-method {
+    width: 50%;
+}
+.pro-crest-container .plan-icon {
+    margin: 14px 0 0 14px;
+}
 .onboarding-suggestions .pro-crest-container::after, .onboarding-suggestions .storage-block::after {
     content: '';
     border-right: 1px solid #ddd;
@@ -4289,38 +4338,46 @@ a.opensource-icon-txt.coming-soon {
     position: relative;
     height: 100%;
     box-sizing: border-box;
-    left: 60px;
+    margin-left: 60px;
+    display: table;
+    height: 60px;
 }
 .onboarding-suggestions .storage-block, .onboarding-suggestions .transfer-block {
     width: 49%;
     box-sizing: border-box;
     position: relative;
     height: 100%;
-    display: table;
+    display: table-cell;
     text-align: center;
-    float: left;
-}
-.onboarding-suggestions .storage-amount, .onboarding-suggestions .transfer-amount {
-    font-family: 'LatoWebBold';
-    font-size: 17px;
-    line-height: 25px
-}
-.onboarding-suggestions .promo-voucher-card.yellow-block .storage-amount, .onboarding-suggestions .promo-voucher-card.yellow-block .transfer-amount {
-    color: #fff;
-}
-.onboarding-suggestions .promo-voucher-card.yellow-block .transfer-text, .onboarding-suggestions .promo-voucher-card.yellow-block .storage-text {
-    color: #fff;
-    opacity: .8;
-}
-.onboarding-suggestions .storage-text, .onboarding-suggestions .transfer-text {
     font-size: 14px;
-    margin-top: 4px;
-    text-transform: uppercase;
     line-height: 20px;
+    vertical-align: middle;
+}
+.onboarding-suggestions .storage-amount span, .onboarding-suggestions .transfer-amount span {
+    font-family: 'LatoWebBold', Arial;
+    font-size: 17px;
+    line-height: 25px;
+    display: block;
+}
+.onboarding-suggestions .promo-voucher-card.yellow-block .storage-amount,
+.onboarding-suggestions .promo-voucher-card.yellow-block .transfer-amount {
+    color: #fff;
 }
 .onboarding-suggestions .pro-detail-aligners {
-    display: table-cell;
-    vertical-align: middle;
+    font-size: 12px;
+    line-height: 20px;
+    text-transform: uppercase;
+    white-space: normal;
+    padding: 0 10px;
+}
+.en .onboarding-suggestions .pro-detail-aligners {
+    font-size: 14px;
+}
+.onboarding-suggestions .pro-detail-aligners span {
+    font-family: 'LatoWebBold', Arial;
+    font-size: 17px;
+    line-height: 25px;
+    display: block;
 }
 .onboarding-suggestions .promo-voucher-background {
     display: none;
@@ -4336,7 +4393,7 @@ a.opensource-icon-txt.coming-soon {
     background-color: #F4F4F6;
     box-sizing: border-box;
 }
-.onboarding-suggestions.promo-vouchers .bottom-page.horizontal-centered-bl {
+.promo-vouchers .onboard-container-size .bottom-page.horizontal-centered-bl {
     display: table-cell;
     vertical-align: middle;
     padding: 0 110px;
@@ -4392,6 +4449,7 @@ a.opensource-icon-txt.coming-soon {
 .mobile .megasync .top-bl .medium-txt.small-lineheight, .mobile .megacmd .top-bl .top-header, .mobile .megacmd .top-header {
     padding-bottom: 63px;
 }
+
 /* Affiliate program page styles*/
 .affiliate-page .bottom-page.full-block {
     position: static;
@@ -4631,12 +4689,15 @@ body:not(.mobile) .affiliate.refer-cell:hover .affiliate.refer-header {
     cursor: pointer;
     -webkit-transition: box-shadow 200ms ease-in-out;
     transition: box-shadow 200ms ease-in-out;
-    padding: 15px 10px;
+    padding: 15px 12px;
     display: inline-block;
     min-width: 170px;
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
     box-sizing: border-box;
+}
+.bottom-page.green-button.hidden {
+    display: none;
 }
 .en .bottom-page.green-button {
     font-size: 18px;
@@ -5013,7 +5074,7 @@ body:not(.mobile) .bottom-page.dropdown .dropdown-item:hover, .bottom-page.dropd
     .onboarding-suggestions.promo-vouchers .promo-voucher-card {
         width: 320px;
     }
-    .onboarding-suggestions .storage-amount, .onboarding-suggestions .transfer-amount {
+    .onboarding-suggestions .storage-amount span, .onboarding-suggestions .transfer-amount span {
         font-size: 16px;
         line-height: 24px;
     }
@@ -5031,9 +5092,6 @@ body:not(.mobile) .bottom-page.dropdown .dropdown-item:hover, .bottom-page.dropd
     }
     .onboarding-suggestions .onboard-image-wrapper .onboard-image.transfer-speed {
         left: 340px;
-    }
-    .en .bottom-page.green-button {
-        font-size: 16px;
     }
     .affiliate.refer-cell {
         width: 50%;
@@ -5117,17 +5175,6 @@ body:not(.mobile) .bottom-page.dropdown .dropdown-item:hover, .bottom-page.dropd
 }
 
 @media only screen and (max-width: 970px) {
-    .bottom-page .reg-st3-membership-bl {
-        width: 252px;
-        margin: -2px 0 0 -2px;
-    }
-    .bottom-page .reg-st3-membership-bl:first-child {
-        margin: 0;
-    }
-    .bottom-page.plans-block {
-        width: 502px;
-        margin: 0 auto;
-    }
     .bottom-page.apps-buttons {
         padding: 40px 0 0 0;
     }
@@ -5534,6 +5581,9 @@ body:not(.mobile) .bottom-page.dropdown .dropdown-item:hover, .bottom-page.dropd
     .bottom-page.huge-bott-pad, .bottom-page.big-bott-pad {
         padding-bottom: 63px;
     }
+    .bottom-page.big-top-pad, .bottom-page.huge-top-pad {
+        padding-top: 63px;
+    }
     .bottom-page.ultra-huge-top-pad {
         padding-top: 60px;
     }
@@ -5550,6 +5600,9 @@ body:not(.mobile) .bottom-page.dropdown .dropdown-item:hover, .bottom-page.dropd
     .bottom-page .inline-block.col-3, .bottom-page .inline-block.col-2 {
         width: 100%;
         display: table;
+    }
+    .bottom-page .inline-block.col-4 {
+        width: 50%;
     }
     .col-2.cmd-pad, .col-2.cmd-pad:nth-child(odd) {
         padding-left: 0;
@@ -5952,9 +6005,6 @@ body:not(.mobile) .bottom-page.dropdown .dropdown-item:hover, .bottom-page.dropd
     .bottom-page.dark-button, .bottom-page.dark-button:first-child, .dark-blue-bg .bottom-page.dark-button, .dark-blue-bg .bottom-page.dark-button:first-child {
         margin: 0 8px 16px 8px;
     }
-    .bottom-page.big-top-pad, .bottom-page.huge-top-pad {
-        padding-top: 63px;
-    }
     .bottom-page.big-header {
         padding: 5px 0 34px 0;
     }
@@ -5973,7 +6023,7 @@ body:not(.mobile) .bottom-page.dropdown .dropdown-item:hover, .bottom-page.dropd
         padding-right: 0;
         padding-top: 6px;
     }
-    .bottom-page.horizontal-centered-bl, .bottom-page.horizontal-centered-bl.wide, .bottom-page.horizontal-centered-bl.mid-wide, .bottom-page.horizontal-centered-bl.side-paddings, .bottom-page.half-sized-cell, .absolute-pos .bottom-page.half-sized-cell, .top-bl .bottom-page.half-sized-cell, .top-bl .bottom-page .img-description, .android .top-bl .bottom-page.half-sized-cell, .bottom-page.horizontal-centered-bl.ultra-wide {
+    .bottom-page.horizontal-centered-bl, .bottom-page.horizontal-centered-bl.wide, .bottom-page.horizontal-centered-bl.mid-wide, .bottom-page.horizontal-centered-bl.side-paddings, .bottom-page.half-sized-cell, .absolute-pos .bottom-page.half-sized-cell, .top-bl .bottom-page.half-sized-cell, .top-bl .bottom-page .img-description, .android .top-bl .bottom-page.half-sized-cell, .bottom-page.horizontal-centered-bl.ultra-wide, .new-bottom-pages, .main-mid-pad.new-bottom-pages {
         padding-left: 24px;
         padding-right: 24px;
     }
@@ -5992,14 +6042,6 @@ body:not(.mobile) .bottom-page.dropdown .dropdown-item:hover, .bottom-page.dropd
     .bottom-page.business-header.small-txt {
         padding-top: 23px;
         padding-bottom: 10px;
-    }
-    .bottom-page.plans-block {
-        max-width: 252px;
-        width: 100%;
-    }
-    .bottom-page .reg-st3-membership-bl {
-        margin: 0;
-        width: 100%;
     }
     .bottom-page.left-cell, .bottom-page.right-cell {
         width: 100%;
@@ -6478,6 +6520,14 @@ body:not(.mobile) .bottom-page.dropdown .dropdown-item:hover, .bottom-page.dropd
         letter-spacing: 0;
         font-size: 21px;
     }
+    
+    /* Credits */
+    .credits-main-pad {
+        margin: -3px 0;
+    }
+    .credits-block {
+        margin: 50px 0 3px 0;
+    }
 }
 
 @media only screen and (max-width: 408px) {
@@ -6508,6 +6558,9 @@ body:not(.mobile) .bottom-page.dropdown .dropdown-item:hover, .bottom-page.dropd
     }
     .affitiate.calc-price {
         font-size: 40px;
+    }
+    .es .onboarding-suggestions .pro-detail-aligners {
+        font-size: 10px;
     }
 }
 
@@ -6765,6 +6818,8 @@ body:not(.mobile) .bottom-page.unsub .tip-wrapper .underline-btn-txt {
     box-sizing: border-box;
 }
 /*end of subscription page*/
+
+/* Dev section. TODO; Reslice */
 .new-affiliate-mid-header, .new-affiliate-bot-header {
     font-size: 16px;
     line-height: 20px;
@@ -6772,6 +6827,15 @@ body:not(.mobile) .bottom-page.unsub .tip-wrapper .underline-btn-txt {
     color: #3F4646;
     font-family: 'Open Sans Semibold Italic', Arial;
     padding: 23px 0 4px 0;
+}
+.new-affiliate-pad.new-affiliate-mid-header {
+    padding: 39px 0 37px 0;
+}
+.new-affiliate-bot-txt {
+    line-height: 25px;
+    font-size: 14px;
+    color: #333333;
+    margin: 0 0 20px 0;
 }
 .new-affiliate-mid-header.new-affiliate-bot-pad {
     padding: 39px 0 10px 0;

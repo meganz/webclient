@@ -46,9 +46,9 @@ pro.propay = {
             return;
         }
 
-        var $stepTwo = $('.membership-step2');
-        var $selectedPlanName = $stepTwo.find('.selected-plan-text .plan-name');
-        var $purchaseButton = $stepTwo.find('.membership-bott-button');
+        var $stepTwo = $('.payment-section', '.fmholder');
+        var $selectedPlanName = $('.top-header.plan-title .plan-name', $stepTwo);
+        var $purchaseButton = $('.big-green-button.purchase', $stepTwo);
 
         // Preload loading/transferring/processing animation
         pro.propay.preloadAnimation();
@@ -77,7 +77,7 @@ pro.propay = {
         $selectedPlanName.text(pro.propay.planName);
 
         // Initialise the main purchase button
-        $purchaseButton.rebind('click', function() {
+        $purchaseButton.rebind('click.purchase', function() {
 
             pro.propay.startPurchaseProcess();
             return false;
@@ -102,11 +102,6 @@ pro.propay = {
                 // Load payment providers and do the rest of the rendering
                 pro.propay.loadPaymentGatewayOptions();
             });
-
-            l[22670] = l[22670].replace('%1', bytesToSize(pro.minPlan[2] * 1024 * 1024 * 1024, 0)).
-                replace('%2', bytesToSize(pro.maxPlan[2] * 1024 * 1024 * 1024, 0));
-
-            $('.storage-txt-small').safeHTML(l[22670]);
         });
     },
 
@@ -137,8 +132,8 @@ pro.propay = {
      */
     preloadAnimation: function() {
 
-        pro.propay.$backgroundOverlay = $('.fm-dialog-overlay');
-        pro.propay.$loadingOverlay = $('.payment-processing');
+        pro.propay.$backgroundOverlay = $('.fm-dialog-overlay', 'body');
+        pro.propay.$loadingOverlay = $('.payment-processing', 'body');
 
         // Check if using retina display
         var retina = (window.devicePixelRatio > 1) ? '@2x' : '';
@@ -167,9 +162,9 @@ pro.propay = {
         api_req({ a: 'ufpqfull', t: 0, d: enableAllPaymentGateways }, {
             callback: function(gatewayOptions) {
 
-                var $stepTwo = $('.membership-step2');
-                var $placeholderText = $stepTwo.find('.loading-placeholder-text');
-                var $pricingBox = $stepTwo.find('.membership-selected-block');
+                var $stepTwo = $('.payment-section', '.fmholder');
+                var $placeholderText = $('.loading-placeholder-text', $stepTwo);
+                var $pricingBox = $('.pricing-page.plan', $stepTwo);
 
                 // If an API error (negative number) exit early
                 if ((typeof gatewayOptions === 'number') && (gatewayOptions < 0)) {
@@ -291,8 +286,8 @@ pro.propay = {
                 $durationOption.removeClass('template');
                 $durationOption.attr('data-plan-index', i);
                 $durationOption.attr('data-plan-months', numOfMonths);
-                $durationOption.find('.duration').text(monthsWording);
-                $durationOption.find('.price').text(price + currencySymbol);
+                $('.duration', $durationOption).text(monthsWording);
+                $('.price', $durationOption).text(price + currencySymbol);
 
                 // Show amount they will save
                 if (numOfMonths === 12) {
@@ -308,8 +303,8 @@ pro.propay = {
                         discount = (priceTwelveMonths - priceTenMonths).toFixed(2);
                     }
 
-                    $durationOption.find('.save-money').removeClass('hidden');
-                    $durationOption.find('.save-money .amount').text(discount + currencySymbol);
+                    $('.save-money', $durationOption).removeClass('hidden');
+                    $('.save-money .amount', $durationOption).text(discount + currencySymbol);
                 }
 
                 // Update the list of duration options
@@ -328,19 +323,27 @@ pro.propay = {
 
             // If it can find it then select the radio option. Note: In some
             // cases this may not be available (e.g. with upcoming A/B testing
-            if ($monthOption.length) {
-                $monthOption.find('input').prop('checked', true);
-                $monthOption.find('.membership-radio').addClass('checked');
-                $monthOption.find('.membership-radio-label').addClass('checked');
+            if (!sessionStorage['pro.period'] && $monthOption.length) {
+                $('input', $monthOption).prop('checked', true);
+                $('.membership-radio', $monthOption).addClass('checked');
+                $('.membership-radio-label', $monthOption).addClass('checked');
                 return true;
             }
         }
 
-        // Otherwise pre-select the first option available
-        var $firstOption = $('.duration-options-list .payment-duration:not(.template)').first();
-        $firstOption.find('input').prop('checked', true);
-        $firstOption.find('.membership-radio').addClass('checked');
-        $firstOption.find('.membership-radio-label').addClass('checked');
+        // Otherwise pre-select the chosen period from previous page
+        var selectedPeriod = sessionStorage['pro.period'] ? sessionStorage['pro.period'] : 1;
+        var $selectedOption = $('.payment-duration[data-plan-months="'
+            + selectedPeriod + '"]', '.duration-options-list');
+
+        // Otherwise pre-select monthly payment
+        if (!$selectedOption) {
+            $selectedOption = $('.payment-duration:not(.template)', '.duration-options-list').first();
+        }
+
+        $('input', $selectedOption).prop('checked', true);
+        $('.membership-radio', $selectedOption).addClass('checked');
+        $('.membership-radio-label', $selectedOption).addClass('checked');
     },
 
     /**
@@ -369,7 +372,7 @@ pro.propay = {
      */
     initPlanDurationClickHandler: function() {
 
-        var $durationOptions = $('.duration-options-list .payment-duration');
+        var $durationOptions = $('.payment-duration', '.payment-section');
 
         // Add click handler
         $durationOptions.rebind('click', function() {
@@ -378,14 +381,14 @@ pro.propay = {
             var planIndex = $this.attr('data-plan-index');
 
             // Remove checked state on the other buttons
-            $durationOptions.find('.membership-radio').removeClass('checked');
-            $durationOptions.find('.membership-radio-label').removeClass('checked');
-            $durationOptions.find('input').prop('checked', false);
+            $('.membership-radio', $durationOptions).removeClass('checked');
+            $('.membership-radio-label', $durationOptions).removeClass('checked');
+            $('input', $durationOptions).prop('checked', false);
 
             // Add checked state to just to the clicked one
-            $this.find('.membership-radio').addClass('checked');
-            $this.find('.membership-radio-label').addClass('checked');
-            $this.find('input').prop('checked', true);
+            $('.membership-radio', $this).addClass('checked');
+            $('.membership-radio-label', $this).addClass('checked');
+            $('input', $this).prop('checked', true);
 
             // Update the main price and wording for one-time or recurring
             pro.propay.updateMainPrice(planIndex);
@@ -401,13 +404,15 @@ pro.propay = {
 
         // If not passed in (e.g. inital load), get it from the currently selected duration radio option
         if (typeof planIndex === 'undefined') {
-            planIndex = $('.duration-options-list .membership-radio.checked').parent().attr('data-plan-index');
+            planIndex = $('.duration-options-list .membership-radio.checked', '.payment-section')
+                .parent().attr('data-plan-index');
         }
 
         // Change the wording to month or year
         var currentPlan = pro.membershipPlans[planIndex];
         var numOfMonths = currentPlan[pro.UTQA_RES_INDEX_MONTHS];
-        var monthOrYearWording = (numOfMonths !== 12) ? l[931] : l[932];
+        var monthOrYearWording = numOfMonths === 1 ? l[931] : l[932];
+        var bandwidthText = numOfMonths === 1 ? l[23808] : l[24065];
         var intl = mega.intl.number;
 
         // Get the current plan price
@@ -426,64 +431,56 @@ pro.propay = {
         var storageBytes = storageGigabytes * 1024 * 1024 * 1024;
         var storageFormatted = numOfBytes(storageBytes, 0);
         var storageSizeRounded = Math.round(storageFormatted.size);
+        var storageValue = storageSizeRounded + ' ' + storageFormatted.unit;
 
         // Get the current plan's bandwidth, then convert the number to 'x GBs' or 'x TBs'
         var bandwidthGigabytes = currentPlan[pro.UTQA_RES_INDEX_TRANSFER];
         var bandwidthBytes = bandwidthGigabytes * 1024 * 1024 * 1024;
         var bandwidthFormatted = numOfBytes(bandwidthBytes, 0);
         var bandwidthSizeRounded = Math.round(bandwidthFormatted.size);
+        var bandwidthValue = bandwidthSizeRounded + ' ' + bandwidthFormatted.unit;
 
         // Set selectors
-        var $step2 = $('.membership-step2');
-        var $chargeAmount = $step2.find('.charge-information .amount');
-        var $pricingBox = $step2.find('.membership-pad-bl');
-        var $planName = $pricingBox.find('.reg-st3-bott-title.title');
-        var $priceNum = $pricingBox.find('.reg-st3-bott-title.price');
-        var $priceDollars = $priceNum.find('.big');
-        var $priceCents = $priceNum.find('.small');
-        var $pricePeriod = $pricingBox.find('.reg-st3-bott-title.price .period');
-        var $storageAmount = $pricingBox.find('.storage-amount');
-        var $storageUnit = $pricingBox.find('.storage-unit');
-        var $bandwidthAmount = $pricingBox.find('.bandwidth-amount');
-        var $bandwidthUnit = $pricingBox.find('.bandwidth-unit');
-        var $euroPrice = $('.euro-price', $priceNum);
-        var $currncyAbbrev = $('.local-currency-code', $priceNum);
-
-        $priceDollars.removeClass('tooBig tooBig2');
-        $priceCents.removeClass('toosmall toosmall2');
+        var $step2 = $('.payment-section', '.fmholder');
+        var $chargeAmount = $('.charge-information .amount', $step2);
+        var $pricingBox = $('.pricing-page.plan', $step2);
+        var $planName = $('.plan-title', $pricingBox);
+        var $priceNum = $('.plan-price .price', $pricingBox);
+        var $pricePeriod = $('.plan-period', $pricingBox);
+        var $storageAmount = $('.plan-feature.storage', $pricingBox);
+        var $storageTip = $('i', $storageAmount);
+        var $bandwidthAmount = $('.plan-feature.transfer', $pricingBox);
+        var $bandwidthTip = $('i', $bandwidthAmount);
+        var $euroPrice = $('.euro-price', $pricingBox);
+        var $currncyAbbrev = $('.plan-currency', $pricingBox);
 
         var euroSign = '\u20ac';
         var localPrice;
         var localD;
         var localC;
         if (currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE]) {
-            $pricingBox.addClass('local-currency');
-            $euroPrice.removeClass('hidden');
-            $currncyAbbrev.removeClass('hidden');
+            $step2.addClass('local-currency');
             $currncyAbbrev.text(currentPlan[pro.UTQA_RES_INDEX_LOCALPRICECURRENCY]);
             $euroPrice.text(intl.format(currentPlan[pro.UTQA_RES_INDEX_PRICE]) +
                 ' ' + euroSign);
             localPrice = '' + currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE];
-            $('.reg-st3-txt-localcurrencyprogram').removeClass('hidden');
+            $('.local-currency-tip', $step2).removeClass('hidden');
         }
         else {
-            $pricingBox.removeClass('local-currency');
-            $euroPrice.addClass('hidden');
-            $currncyAbbrev.addClass('hidden');
-            $('.reg-st3-txt-localcurrencyprogram').addClass('hidden');
+            $step2.removeClass('local-currency');
+            $('.local-currency-tip', $step2).addClass('hidden');
         }
 
-        // If mobile, set the plan icon and name at the top
+        // If mobile, name at the top
         if (is_mobile) {
-            var $mobilePlanIcon = $step2.find('.payment-options .membership-icon');
-            var $mobilePlanName = $step2.find('.payment-options .plan-name');
+            var $mobilePlanName = $('.payment-options .plan-name', $step2);
 
-            $mobilePlanIcon.addClass('pro' + pro.propay.planNum);
             $mobilePlanName.text(pro.propay.planName);
         }
 
         // Update the style of the dialog to be Pro I-III or Lite, also change the plan name
         $pricingBox.addClass('pro' + pro.propay.planNum);
+        $('.plan-icon', $step2).addClass('pro' + pro.propay.planNum);
         $pricingBox.attr('data-payment', pro.propay.planNum);
         $planName.text(pro.propay.planName);
 
@@ -496,13 +493,9 @@ pro.propay = {
             if (localD.length > 9) {
                 // localD = localD.substr(0, 5);
                 if (localD.length > 11) {
-                    $priceDollars.addClass('tooBig2');
-                    $priceCents.addClass('toosmall2');
                     localC = '0';
                 }
                 else {
-                    $priceDollars.addClass('tooBig');
-                    $priceCents.addClass('toosmall');
                     localC = '00';
                 }
                 localD = Number.parseInt(localD) + 1;
@@ -514,12 +507,10 @@ pro.propay = {
                     localC = (localC + '0').substr(0, 2);
                 }
             }
-            $priceDollars.text(localPrice);
-            $priceCents.text('');
+            $priceNum.text(localPrice);
         }
         else {
-            $priceDollars.text(dollars);
-            $priceCents.text(decimal + cents + ' ' + euroSign);    // EUR symbol
+            $priceNum.text(dollars + decimal + cents + ' ' + euroSign);    // EUR symbol
         }
         $pricePeriod.text('/' + monthOrYearWording);
 
@@ -527,12 +518,18 @@ pro.propay = {
         $chargeAmount.text(dollars + decimal + cents);
 
         // Update storage
-        $storageAmount.text(storageSizeRounded);
-        $storageUnit.text(storageFormatted.unit);
+        if ($storageTip && $storageTip.data('simpletip')) {
+            $('span', $storageAmount)
+                .safeHTML(l[23789].replace('%1', '<span>' + storageValue + '</span>'));
+            $storageTip.data('simpletip', l[23807].replace('%1', '[U]' + storageValue + '[/U]'));
+        }
 
         // Update bandwidth
-        $bandwidthAmount.text(bandwidthSizeRounded);
-        $bandwidthUnit.text(bandwidthFormatted.unit);
+        if ($bandwidthTip && $bandwidthTip.data('simpletip')) {
+            $('span', $bandwidthAmount)
+                .safeHTML(l[23790].replace('%1', '<span>' + bandwidthValue + '</span>'));
+            $bandwidthTip.data('simpletip', bandwidthText.replace('%1', '[U]' + bandwidthValue + '[/U]'));
+        }
     },
 
     /* jshint -W074 */  // Old code, refactor another day
@@ -549,13 +546,14 @@ pro.propay = {
             return false;
         }
 
-        var $step2 = $('.membership-step2');
-        var $paymentDialog = $('.payment-dialog');
-        var $paymentAddressDialog = $('.payment-address-dialog');
+        var $step2 = $('.payment-section', '.fmholder');
+        var $paymentDialog = $('.payment-dialog', 'body');
+        var $paymentAddressDialog = $('.payment-address-dialog', 'body');
+        var $numbers;
 
         // Update whether this selected option is recurring or one-time
-        var $selectDurationOption = $step2.find('.duration-options-list .membership-radio.checked');
-        var selectedGatewayName = $step2.find('.payment-options-list input:checked').val();
+        var $selectDurationOption = $('.duration-options-list .membership-radio.checked', $step2);
+        var selectedGatewayName = $('.payment-options-list input:checked', $step2).val();
         var selectedProvider = pro.propay.allGateways.filter(function(val) {
             return (val.gatewayName === selectedGatewayName);
         })[0];
@@ -571,7 +569,7 @@ pro.propay = {
 
         // Get the value for whether the user wants the plan to renew automatically
         var recurringEnabled = false;
-        var autoRenewCheckedValue = $step2.find('.renewal-options-list input:checked').val();
+        var autoRenewCheckedValue = $('.renewal-options-list input:checked', $step2).val();
 
         // If the provider supports recurring payments and the user wants the plan to renew automatically
         if (selectedProvider.supportsRecurring && (autoRenewCheckedValue === 'yes')) {
@@ -587,7 +585,7 @@ pro.propay = {
         var chargeInfoDuration = l[10642].replace('%1', price);
 
         // Find the pricing period in the pricing box and the plan duration options
-        var $sidePanelPeriod = $step2.find('.reg-st3-bott-title.price .period');
+        var $sidePanelPeriod = $('.pricing-page.plan .period', $step2);
 
         // Change the charge information below the recurring yes/no question
         if ((recurringEnabled) && (numOfMonths === 1)) {
@@ -618,41 +616,46 @@ pro.propay = {
         // Always show the extra Question 3 recurring option section if the provider supports recurring.
         // The user can then toggle whether they want a recurring plan or not with the radio buttons.
         if (selectedProvider.supportsRecurring) {
-            $step2.find('.renewal-option').removeClass('hidden');
+            $('.renewal-option', $step2).removeClass('hidden');
         }
         else {
             // Otherwise it's a one off only provider, hide the extra information
-            $step2.find('.renewal-option').addClass('hidden');
+            $('.renewal-option', $step2).addClass('hidden');
         }
 
+        $numbers = $('.number:visible', $step2);
+
         // Reorder options numbering
-        $step2.find('.number:visible').each(function(idx, node) { $(node).text(idx + 1); });
+        for (var i = 0, length = $numbers.length; i < length; i++) {
+            $($numbers[i]).text(i + 1);
+        }
 
         // Show recurring info box next to Purchase button and update dialog text for recurring
         if (recurringEnabled) {
-            $step2.find('.subscription-instructions').removeClass('hidden');
-            $step2.find('.subscription-instructions').rebind('click', function() {
+            $('.subscription-instructions', $step2).removeClass('hidden');
+            $('.subscription-instructions', $step2).rebind('click', function() {
                 bottomPageDialog(false, 'terms', l[1712], true);
             });
-            $paymentAddressDialog.find('.payment-note-first.recurring').removeClass('hidden');
-            $paymentAddressDialog.find('.payment-note-first.one-time').addClass('hidden');
+            $('.payment-note-first.recurring', $paymentAddressDialog).removeClass('hidden');
+            $('.payment-note-first.one-time', $paymentAddressDialog).addClass('hidden');
         }
         else {
             // Hide recurring info box next to Purchase button and update dialog text for one-time
-            $step2.find('.subscription-instructions').addClass('hidden');
-            $paymentAddressDialog.find('.payment-note-first.recurring').addClass('hidden');
-            $paymentAddressDialog.find('.payment-note-first.one-time').removeClass('hidden');
+            $('.subscription-instructions', $step2).addClass('hidden');
+            $('.payment-note-first.recurring', $paymentAddressDialog).addClass('hidden');
+            $('.payment-note-first.one-time', $paymentAddressDialog).removeClass('hidden');
         }
 
         // Update depending on recurring or one off payment
-        $step2.find('.membership-bott-button').text(subscribeOrPurchase);
-        $step2.find('.payment-instructions').safeHTML(subscribeOrPurchaseInstruction);
-        $step2.find('.choose-renewal .duration-text').text(autoRenewMonthOrYearQuestion);
-        $step2.find('.charge-information').text(chargeInfoDuration);
-        $paymentDialog.find('.payment-buy-now').text(subscribeOrPurchase);
-        $paymentAddressDialog.find('.payment-buy-now').text(subscribeOrPurchase);
-        $paymentAddressDialog.find('.payment-note-first.recurring .duration').text(recurringMonthlyOrAnnuallyMessage);
-        $paymentAddressDialog.find('.payment-plan-txt .recurring').text(recurringOrNonRecurring);
+        $('.big-green-button.purchase', $step2).text(subscribeOrPurchase);
+        $('.payment-instructions', $step2).safeHTML(subscribeOrPurchaseInstruction);
+        $('.choose-renewal .duration-text', $step2).text(autoRenewMonthOrYearQuestion);
+        $('.charge-information', $step2).text(chargeInfoDuration);
+        $('.payment-buy-now', $paymentDialog).text(subscribeOrPurchase);
+        $('.payment-buy-now', $paymentAddressDialog).text(subscribeOrPurchase);
+        $('.payment-note-first.recurring .duration', $paymentAddressDialog)
+            .text(recurringMonthlyOrAnnuallyMessage);
+        $('.payment-plan-txt .recurring', $paymentAddressDialog).text(recurringOrNonRecurring);
     },
     /* jshint +W074 */
 
@@ -661,7 +664,7 @@ pro.propay = {
      */
     initRenewalOptionClickHandler: function() {
 
-        var $renewalOptions = $('.renewal-options-list .renewal-option');
+        var $renewalOptions = $('.renewal-options-list .renewal-option', 'body');
 
         // Add click handler
         $renewalOptions.rebind('click', function() {
@@ -669,14 +672,14 @@ pro.propay = {
             var $this = $(this);
 
             // Remove checked state on the other buttons
-            $renewalOptions.find('.membership-radio').removeClass('checked');
-            $renewalOptions.find('.membership-radio-label').removeClass('checked');
-            $renewalOptions.find('input').prop('checked', false);
+            $('.membership-radio', $renewalOptions).removeClass('checked');
+            $('.membership-radio-label', $renewalOptions).removeClass('checked');
+            $('input', $renewalOptions).prop('checked', false);
 
             // Add checked state to just to the clicked one
-            $this.find('.membership-radio').addClass('checked');
-            $this.find('.membership-radio-label').addClass('checked');
-            $this.find('input').prop('checked', true);
+            $('.membership-radio', $this).addClass('checked');
+            $('.membership-radio-label', $this).addClass('checked');
+            $('input', $this).prop('checked', true);
 
             // Update the wording for one-time or recurring
             pro.propay.updateTextDependingOnRecurring();
@@ -691,7 +694,8 @@ pro.propay = {
     renderPaymentProviderOptions: function(gatewayOptions, primaryOrSecondary) {
 
         // Get their plan price from the currently selected duration radio button
-        var selectedPlanIndex = $('.duration-options-list .membership-radio.checked').parent().attr('data-plan-index');
+        var selectedPlanIndex = $('.duration-options-list .membership-radio.checked', 'body')
+            .parent().attr('data-plan-index');
         var selectedPlan = pro.membershipPlans[selectedPlanIndex];
         var selectedPlanNum = selectedPlan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL];
         var selectedPlanPrice = selectedPlan[pro.UTQA_RES_INDEX_PRICE];
@@ -702,11 +706,12 @@ pro.propay = {
         var gatewayHtml = '';
 
         // Cache the template selector
-        var $template = $('.payment-options-list.primary .payment-method.template');
+        var $template = $('.payment-options-list.primary .payment-method.template', 'body');
 
         // Remove existing providers and so they are re-rendered
-        $('.payment-options-list.' + primaryOrSecondary + ' .payment-method:not(.template)').remove();
-        $('.loading-placeholder-text').hide();
+        $('.payment-options-list.' + primaryOrSecondary
+          + ' .payment-method:not(.template)', 'body').remove();
+        $('.loading-placeholder-text', 'body').addClass('hidden');
 
         // Loop through gateway providers (change to use list from API soon)
         for (var i = 0, length = gatewayOptions.length; i < length; i++) {
@@ -740,11 +745,11 @@ pro.propay = {
 
             // Create a radio button with icon for each payment gateway
             $gateway.removeClass('template');
-            $gateway.find('input').attr('name', gatewayName);
-            $gateway.find('input').attr('id', gatewayName);
-            $gateway.find('input').val(gatewayName);
-            $gateway.find('.provider-icon').addClass(gatewayName);
-            $gateway.find('.provider-name').text(displayName).prop('title', displayName);
+            $('input', $gateway).attr('name', gatewayName);
+            $('input', $gateway).attr('id', gatewayName);
+            $('input', $gateway).val(gatewayName);
+            $('.provider-icon', $gateway).addClass(gatewayName);
+            $('.provider-name', $gateway).text(displayName).prop('title', displayName);
 
             // Build the html
             gatewayHtml += $gateway.prop('outerHTML');
@@ -760,10 +765,10 @@ pro.propay = {
     initPaymentMethodRadioButtons: function() {
 
         // Cache selector
-        var $paymentOptionsList = $('.payment-options-list');
+        var $paymentOptionsList = $('.payment-options-list', '.fmholder');
 
         // Add click handler to all payment methods
-        $paymentOptionsList.find('.payment-method').rebind('click', function() {
+        $('.payment-method', $paymentOptionsList).rebind('click.changeState', function() {
 
             var $this = $(this);
 
@@ -774,14 +779,14 @@ pro.propay = {
             }
 
             // Remove checked state from all radio inputs
-            $paymentOptionsList.find('.membership-radio').removeClass('checked');
-            $paymentOptionsList.find('.provider-details').removeClass('checked');
-            $paymentOptionsList.find('input').prop('checked', false);
+            $('.membership-radio', $paymentOptionsList).removeClass('checked');
+            $('.provider-details', $paymentOptionsList).removeClass('checked');
+            $('input', $paymentOptionsList).prop('checked', false);
 
             // Add checked state for this radio button
-            $this.find('input').prop('checked', true);
-            $this.find('.membership-radio').addClass('checked');
-            $this.find('.provider-details').addClass('checked');
+            $('input', $this).prop('checked', true);
+            $('.membership-radio', $this).addClass('checked');
+            $('.provider-details', $this).addClass('checked');
 
             pro.propay.updateTextDependingOnRecurring();
             pro.propay.updateDurationOptionsOnProviderChange();
@@ -814,8 +819,8 @@ pro.propay = {
                 // Get the elements which need to be set
                 var $membershipRadio = $gatewayInput.parent();
                 var $providerDetails = $membershipRadio.next();
-                var $secondaryPaymentOptions = $('.payment-options-list.secondary');
-                var $showMoreButton = $('.membership-step2 .provider-show-more');
+                var $secondaryPaymentOptions = $('.payment-options-list.secondary', 'body');
+                var $showMoreButton = $('.provider-show-more', '.payment-section');
 
                 // Set to checked
                 $gatewayInput.prop('checked', true);
@@ -855,9 +860,9 @@ pro.propay = {
         var $option = (parseFloat(pro.propay.proBalance) > 0) ? $payOptions.first() : $payOptions.eq(1);
 
         // Check the radio button option
-        $option.find('input').prop('checked', true);
-        $option.find('.membership-radio').addClass('checked');
-        $option.find('.provider-details').addClass('checked');
+        $('input', $option).prop('checked', true);
+        $('.membership-radio', $option).addClass('checked');
+        $('.provider-details', $option).addClass('checked');
     },
 
     /**
@@ -866,20 +871,20 @@ pro.propay = {
      */
     updateDurationOptionsOnProviderChange: function() {
 
-        var $durationOptionsList = $('.duration-options-list');
-        var $durationOptions = $durationOptionsList.find('.payment-duration:not(.template)');
-        var selectedPlanIndex = $durationOptionsList.find('.membership-radio.checked').parent()
+        var $durationOptionsList = $('.duration-options-list', 'body');
+        var $durationOptions = $('.payment-duration:not(.template)', $durationOptionsList);
+        var selectedPlanIndex = $('.membership-radio.checked', $durationOptionsList).parent()
                                     .attr('data-plan-index');
-        var selectedGatewayName = $('.payment-options-list input:checked').val();
+        var selectedGatewayName = $('.payment-options-list input:checked', 'body').val();
         var selectedProvider = pro.propay.allGateways.filter(function(val) {
             return (val.gatewayName === selectedGatewayName);
         })[0];
 
         // Reset all options, they will be hidden or checked again if necessary below
         $durationOptions.removeClass('hidden');
-        $durationOptions.find('.membership-radio').removeClass('checked');
-        $durationOptions.find('.membership-radio-label').removeClass('checked');
-        $durationOptions.find('input').prop('checked', false);
+        $('.membership-radio', $durationOptions).removeClass('checked');
+        $('.membership-radio-label', $durationOptions).removeClass('checked');
+        $('input', $durationOptions).prop('checked', false);
 
         // Loop through renewal period options (1 month, 1 year)
         $.each($durationOptions, function(key, durationOption) {
@@ -904,17 +909,17 @@ pro.propay = {
         // Select the first remaining option or previously selected (if its not hidden)
         var $newDurationOption;
         var newPlanIndex;
-        $newDurationOption = $durationOptionsList.find('[data-plan-index=' + selectedPlanIndex + ']');
+        $newDurationOption = $('[data-plan-index=' + selectedPlanIndex + ']', $durationOptionsList);
         if ($newDurationOption.length && !$newDurationOption.hasClass('hidden')) {
             newPlanIndex = selectedPlanIndex;
         }
         else {
-            $newDurationOption = $durationOptionsList.find('.payment-duration:not(.template, .hidden)').first();
+            $newDurationOption = $('.payment-duration:not(.template, .hidden)', $durationOptionsList).first();
             newPlanIndex = $newDurationOption.attr('data-plan-index');
         }
-        $newDurationOption.find('.membership-radio').addClass('checked');
-        $newDurationOption.find('.membership-radio-label').addClass('checked');
-        $newDurationOption.find('input').prop('checked', true);
+        $('.membership-radio', $newDurationOption).addClass('checked');
+        $('.membership-radio-label', $newDurationOption).addClass('checked');
+        $('input', $newDurationOption).prop('checked', true);
 
         // Update the text for one-time or recurring
         pro.propay.updateMainPrice(newPlanIndex);
@@ -929,16 +934,16 @@ pro.propay = {
         // If there are more than 6 payment options, enable the button to show more
         if (pro.propay.allGateways.length > 6) {
 
-            var $showMoreButton = $('.membership-step2 .provider-show-more');
+            var $showMoreButton = $('.provider-show-more', '.payment-section');
 
             // Show the button
             $showMoreButton.removeClass('hidden');
 
             // On clicking 'Click here to show more payment options'
-            $showMoreButton.click(function() {
+            $showMoreButton.rebind('click.shoMore', function() {
 
                 // Show the other payment options and then hide the button
-                $('.payment-options-list.secondary').removeClass('hidden');
+                $('.payment-options-list.secondary', 'body').removeClass('hidden');
                 $showMoreButton.hide();
 
                 // Trigger resize or you can't scroll to the bottom of the page anymore
@@ -953,9 +958,9 @@ pro.propay = {
     startPurchaseProcess: function() {
 
         // Get the selected payment duration and gateway
-        var $step2 = $('.membership-step2');
-        var $selectedPaymentDuration = $step2.find('.duration-options-list .membership-radio.checked');
-        var $selectedPaymentGateway = $step2.find('.payment-options-list input:checked');
+        var $step2 = $('.payment-section',  'body');
+        var $selectedPaymentDuration = $('.duration-options-list .membership-radio.checked', $step2);
+        var $selectedPaymentGateway = $('.payment-options-list input:checked', $step2);
 
         // Selected payment method and package
         var selectedPaymentGatewayName = $selectedPaymentGateway.val();
@@ -1126,7 +1131,7 @@ pro.propay = {
                     pro.lastPaymentProviderId = sabadell.gatewayId; // 17
 
                     // Get the value for whether the user wants the plan to renew automatically
-                    var autoRenewCheckedValue = $('.membership-step2 .renewal-options-list input:checked').val();
+                    var autoRenewCheckedValue = $('.renewal-options-list input:checked', '.payment-section').val();
 
                     // If the provider supports recurring payments and the user wants the plan to renew automatically
                     if (autoRenewCheckedValue === 'yes') {
@@ -1238,7 +1243,8 @@ pro.propay = {
     showLoadingOverlay: function(messageType) {
 
         // Show the loading gif
-        pro.propay.$backgroundOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
+        pro.propay.$backgroundOverlay.removeClass('hidden')
+            .addClass('payment-dialog-overlay');
         pro.propay.$loadingOverlay.removeClass('hidden');
 
         // Prevent clicking on the background overlay while it's loading, which makes
@@ -1261,7 +1267,7 @@ pro.propay = {
         }
 
         // Display message
-        pro.propay.$loadingOverlay.find('.payment-animation-txt').text(message);
+        $('.payment-animation-txt', pro.propay.$loadingOverlay).text(message);
     },
 
     /**
@@ -1269,7 +1275,8 @@ pro.propay = {
      */
     hideLoadingOverlay: function() {
 
-        pro.propay.$backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
+        pro.propay.$backgroundOverlay.addClass('hidden')
+            .removeClass('payment-dialog-overlay');
         pro.propay.$loadingOverlay.addClass('hidden');
     },
 

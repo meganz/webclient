@@ -161,7 +161,7 @@ body.en .download .bottom-page.top-bl {
     right: 90px;
 }
 .startpage.small-icon, .startpage.mid-icon {
-    background-image: url(../images/mega/startpage-sprite_v11.png);
+    background-image: url(../images/mega/startpage-sprite_v12.png);
     background-position: -243px 14px;
     background-repeat: no-repeat;
     width: 20px;
@@ -245,7 +245,7 @@ body.en .download .bottom-page.top-bl {
     word-break: break-word;
 }
 .startpage.rating-block span {
-    background-image: url(../images/mega/startpage-sprite_v11.png);
+    background-image: url(../images/mega/startpage-sprite_v12.png);
     background-position: -161px -618px;
     background-repeat: no-repeat;
     width: 14px;
@@ -265,7 +265,7 @@ body.en .download .bottom-page.top-bl {
     margin: -16px 0 0 0;
     background-color: white;
     border-radius: 100%;
-    background-image: url(../images/mega/startpage-sprite_v11.png);
+    background-image: url(../images/mega/startpage-sprite_v12.png);
     background-position: -220px -650px;
     -webkit-transition: opacity 200ms ease-in-out;
     transition: opacity 200ms ease-in-out;
@@ -377,7 +377,7 @@ body.en .download .bottom-page.top-bl {
     box-sizing: border-box;
     padding: 0 4px;
     vertical-align: top;
-    background-image: url(../images/mega/startpage-sprite_v11.png);
+    background-image: url(../images/mega/startpage-sprite_v12.png);
     background-position: -243px 14px;
     background-repeat: no-repeat;
 }
@@ -404,7 +404,7 @@ body.en .download .bottom-page.top-bl {
     -webkit-border-radius: 100%;
     border-radius: 100%;
     background-color: #CECECE;
-    background-image: url(../images/mega/startpage-sprite_v11.png);
+    background-image: url(../images/mega/startpage-sprite_v12.png);
     background-position: -214px -688px;
     cursor: pointer;
     -webkit-transition: background-color 200ms ease-in-out, opacity 200ms ease-in-out;
@@ -506,7 +506,7 @@ body.en .download .bottom-page.top-bl {
     width: 106px;
     height: 20px;
     margin: 20px auto 0 auto;
-    background-image: url(../images/mega/startpage-sprite_v11.png);
+    background-image: url(../images/mega/startpage-sprite_v12.png);
     background-position: -108px -1447px;
 }
 .startpage.italic-text {
@@ -531,7 +531,7 @@ body.en .download .bottom-page.top-bl {
     height: 26px;
     left: 14px;
     top: -25px;
-    background-image: url(../images/mega/startpage-sprite_v11.png);
+    background-image: url(../images/mega/startpage-sprite_v12.png);
     background-position: -115px -2739px;
 }
 .startpage.quote-icon.close {
@@ -550,14 +550,14 @@ body.en .download .bottom-page.top-bl {
     font-family: 'montserrat', 'open_sans', sans-serif;
 }
 .startpage.medium-icon.declaration {
-    background-position: 1px -2723px;
+    background-position: -201px -2088px;
     margin: 27px auto 22px auto;
 }
 .startpage.medium-icon {
     width: 66px;
     height: 66px;
     margin: 20px auto 12px auto;
-    background-image: url(../images/mega/startpage-sprite_v11.png);
+    background-image: url(../images/mega/startpage-sprite_v12.png);
     background-position: 1px -2723px;
     background-repeat: no-repeat;
 }
@@ -606,10 +606,35 @@ body.en .download .bottom-page.top-bl {
     width: 44px;
     height: 44px;
 }
-.startpage-sprite {
-    background-image: url(../images/mega/startpage-sprite_v11.png);
+.startpage-sprite, i.startpage-sprite,
+.bottom-menu.logo
+{
+    background-image: url(../images/mega/startpage-sprite_v12.png);
     background-repeat: no-repeat;
 }
+
+/* Social newtock icons */
+.startpage-sprite.social-i {
+    width: 36px;
+    height: 36px;
+    display: block;
+}
+.startpage-sprite.social-i.fb {
+    background-position: 2px -2208px;
+}
+.startpage-sprite.social-i.instagram {
+    background-position: -48px -2207px;
+}
+.startpage-sprite.social-i.twitter {
+    background-position: -98px -2207px;
+}
+.startpage-sprite.social-i.linkedin {
+    background-position: -148px -2208px;
+}
+.startpage-sprite.social-i.youtube {
+    background-position: -198px -2208px;
+}
+
 .page-icon.x48.dropbox {
         background-position: -104px -475px;
 }
@@ -626,6 +651,7 @@ body.en .download .bottom-page.top-bl {
 .expanded .page-icon.x44.arrow-icon {
     background-position: -184px -646px;
 }
+
 .bottom-page.compare-block .page-icon {
     margin: 0 auto 0 auto;
 }
@@ -941,7 +967,7 @@ div.startpage.software-img.soft-slide[data-slide="2"] {
 .bottom-page.st-special-pad {
     padding-top: 118px;
 }
-.startpage.software-controls {
+.startpage.software-controls, .startpage.default-controls {
     display: none;
     padding: 48px 0 0 0;
     white-space: nowrap;
@@ -985,7 +1011,7 @@ div.startpage.software-img.soft-slide[data-slide="2"] {
 .startpage.nav-button.next i {
     background-position: -190px -610px;
 }
-.startpage.software-controls span {
+.startpage.software-controls span, .startpage.default-controls  span {
     display: inline-block;
     width: 14px;
     height: 14px;
@@ -999,7 +1025,7 @@ div.startpage.software-img.soft-slide[data-slide="2"] {
     transition: opacity 200ms ease-in-out;
     margin: 9px 0;
 }  
-.startpage.software-controls span.active {
+.startpage.software-controls span.active, .startpage.default-controls span.active {
     opacity: 1;
 }
 
@@ -1053,11 +1079,11 @@ div.startpage.software-img.soft-slide[data-slide="2"] {
 }
 .red .startpage.features-header {
     background-color: #F97A75;
-    background-position: center -2851px;
+    background-position: center -1621px;
 }
 .blue .startpage.features-header {
     background-color: #4898E8;
-    background-position: center -3081px;
+    background-position: center -1851px;
 }
 .startpage.features-content {
     font-size: 16px;
@@ -1097,8 +1123,25 @@ div.startpage.software-img.soft-slide[data-slide="2"] {
 }
 
 @media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {
-    .reg-st3-membership-icon, .membership-icon, .mobile.membership-icon, .pro-icon, div.pro-feature-icon, .startpage.mega-logo, .startpage.upload-cloud-icon, .startpage.white-question, .pages-nav.nav-icon, .bottom-page.big-icon, .startpage.medium-icon, .small-red-link i, .flip-bg, .startpage.quote-icon, .bottom-menu.logo, .loginrequired-dialog .fm-notification-icon, .top-arrow-icon, .mobile.icon, .startpage.small-icon, .startpage.mid-icon, .startpage.rating-block span, .startpage.carousel-control, .startpage.scroll-to-top, .startpage.os-icons, .startpage.scroll-to-top, .startpage.quote-icon, .startpage-sprite {
-        background-image: url(../images/mega/startpage-sprite_v11@2x.png) !important;
+    .pages-nav.nav-icon,
+    .bottom-page.big-icon,
+    .startpage.medium-icon,
+    .small-red-link i,
+    .flip-bg,
+    .startpage.quote-icon,
+    .top-arrow-icon,
+    .startpage.small-icon,
+    .startpage.mid-icon,
+    .startpage.rating-block span,
+    .startpage.carousel-control,
+    .startpage.os-icons,
+    .startpage.scroll-to-top,
+    .startpage.quote-icon,
+    .bottom-menu.logo,
+    .startpage-sprite,
+    i.startpage-sprite
+    {
+        background-image: url(../images/mega/startpage-sprite_v12@2x.png) !important;
         background-size: 267px auto;
     }
     .bottom-page.large-icon, .cropped-page .bottom-page.big-icon {

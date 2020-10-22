@@ -1254,7 +1254,7 @@ mBroadcaster.once('boot_done', function populate_l() {
             .replace(/\[B\]/g, '<b>').replace(/\[\/B\]/g, '</b>')
             .replace(/\[I\]/g, '<i>').replace(/\[\/I\]/g, '</i>')
             .replace(/\[BR\]/g, '<br/>')
-            .replace(/\[Br\]/g, '<br/>')
+            .replace(/\[Br]/g, '<br/>')
             .replace(/\[A\]/g, '<a href="/pro" class="clickurl">').replace(/\[\/A\]/g, '</a>');
     }
 

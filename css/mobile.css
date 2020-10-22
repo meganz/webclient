@@ -8936,9 +8936,6 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll, .mob
     font-weight: 500;
     letter-spacing: .2px;
 }
-.bottom-page.auth-app-select-tooltip .lastpass .app-link-text {
-    margin-left: 122px;
-}
 .bottom-page.auth-app-select-tooltip .app-link-arrow {
     background-image: url(../images/mega/2fa-auth-apps.png);
     background-position: -14px -77px;

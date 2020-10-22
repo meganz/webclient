@@ -514,6 +514,7 @@ MegaData.prototype.addWebDownload = function(n, z, preview, zipname) {
         }
 
         api_req({a: 'log', e: 99655, m: 'ZipIO Download started.'});
+        mBroadcaster.sendMessage('trk:event', 'download', 'started', 'zip');
     }
 
     if (!preview) {
@@ -685,6 +686,7 @@ MegaData.prototype.dlcomplete = function(dl) {
         id = 'zip_' + z;
 
         api_req({a: 'log', e: 99656, m: 'ZipIO Download completed.'});
+        mBroadcaster.sendMessage('trk:event', 'download', 'completed', 'zip');
     }
     else {
         id = 'dl_' + id;
@@ -1210,6 +1212,7 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders, target) 
 
                     mBroadcaster.sendMessage('upload:start', data);
                 }
+                mBroadcaster.sendMessage('trk:event', 'upload', 'started');
             });
         }
     }.bind(this);
@@ -1582,6 +1585,7 @@ MegaData.prototype.ulerror = function(ul, error) {
             oDestroy(ul);
         }
         mBroadcaster.sendMessage('upload:error', id, error);
+        mBroadcaster.sendMessage('trk:event', 'upload', 'error', 'code', error);
 
         if (error === EOVERQUOTA) {
             if (mBroadcaster.hasListener('upload:error')) {
@@ -1635,6 +1639,7 @@ MegaData.prototype.ulcomplete = function(ul, h, faid) {
     }
 
     mBroadcaster.sendMessage('upload:completion', ul.id, h || -0xBADF, faid, ul.chatid);
+    mBroadcaster.sendMessage('trk:event', 'upload', 'completed');
 
     if (ul.skipfile) {
         showToast('megasync', l[372] + ' "' + ul.name + '" (' + l[1668] + ')');

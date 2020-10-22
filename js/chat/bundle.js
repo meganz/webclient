@@ -7633,6 +7633,10 @@ class whosTyping_WhosTyping extends mixins["MegaRenderMixin"] {
         var contact = M.u[u_h];
 
         if (contact && contact.firstName) {
+          if (contact.nickname !== '') {
+            return contact.nickname;
+          }
+
           return contact.firstName;
         } else {
           var avatarMeta = generateAvatarMeta(u_h);

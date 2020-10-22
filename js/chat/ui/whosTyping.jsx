@@ -84,6 +84,9 @@ class WhosTyping extends MegaRenderMixin {
             var names = Object.keys(self.state.currentlyTyping).map((u_h) => {
                 var contact = M.u[u_h];
                 if (contact && contact.firstName) {
+                    if (contact.nickname !== '') {
+                        return contact.nickname;
+                    }
                     return contact.firstName;
                 }
                 else {

@@ -3604,6 +3604,18 @@ var _ui_emojiDropdown_jsx3__ = __webpack_require__(13);
 class ConversationMessageMixin extends _stores_mixins_js1__["ContactAwareComponent"] {
   constructor(props) {
     super(props);
+
+    this.getCurrentUserReactions = () => {
+      const {
+        reactions
+      } = this.props.message.reacts;
+      return Object.keys(reactions).filter(utf => {
+        var _reactions$utf;
+
+        return (_reactions$utf = reactions[utf]) == null ? void 0 : _reactions$utf[u_handle];
+      });
+    };
+
     this.__cmmUpdateTickCount = 0;
     this._contactChangeListeners = false;
     this.onAfterRenderWasTriggered = false;
@@ -3782,10 +3794,18 @@ class ConversationMessageMixin extends _stores_mixins_js1__["ContactAwareCompone
     const s = megaChat._emojiData.emojisSlug[slug] || meta;
 
     if (s && message.reacts.getReaction(u_handle, s.u)) {
-      chatRoom.messagesBuff.userDelReaction(message.messageId, slug, meta);
-    } else {
-      chatRoom.messagesBuff.userAddReaction(message.messageId, slug, meta);
+      return chatRoom.messagesBuff.userDelReaction(message.messageId, slug, meta);
     }
+
+    if (Object.keys(message.reacts.reactions).length <= 50) {
+        if (this.getCurrentUserReactions().length <= 24) {
+          return chatRoom.messagesBuff.userAddReaction(message.messageId, slug, meta);
+        }
+
+        return console.error('You had reached the maximum limit of 24 reactions');
+      }
+
+    return console.error('This message reached the maximum limit of 50 reactions');
   }
 
   _emojiOnActiveStateChange(newVal) {

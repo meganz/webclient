@@ -177,21 +177,32 @@ class ConversationMessageMixin extends ContactAwareComponent {
         }
     }
 
-
+    getCurrentUserReactions = () => {
+        const { reactions } = this.props.message.reacts;
+        return Object.keys(reactions).filter(utf => reactions[utf]?.[u_handle]);
+    };
 
     emojiSelected(e, slug, meta) {
-        const {chatRoom, message} = this.props;
+        const { chatRoom, message } = this.props;
+
         if (chatRoom.isReadOnly()) {
             return false;
         }
-        const s = megaChat._emojiData.emojisSlug[slug] || meta;
 
+        const s = megaChat._emojiData.emojisSlug[slug] || meta;
         if (s && message.reacts.getReaction(u_handle, s.u)) {
-            chatRoom.messagesBuff.userDelReaction(message.messageId, slug, meta);
+            return chatRoom.messagesBuff.userDelReaction(message.messageId, slug, meta);
         }
-        else {
-            chatRoom.messagesBuff.userAddReaction(message.messageId, slug, meta);
+
+        if (Object.keys(message.reacts.reactions).length <= 50 /* total reactions*/) {
+            if (this.getCurrentUserReactions().length <= 24) {
+                return chatRoom.messagesBuff.userAddReaction(message.messageId, slug, meta);
+            }
+
+            return console.error('You had reached the maximum limit of 24 reactions');
         }
+
+        return console.error('This message reached the maximum limit of 50 reactions');
     }
     _emojiOnActiveStateChange(newVal) {
         this.setState(() => {
@@ -205,6 +216,7 @@ class ConversationMessageMixin extends ContactAwareComponent {
         const {chatRoom, message} = this.props;
         var isReadOnlyClass = chatRoom.isReadOnly() ? " disabled" : "";
 
+        // console.error(message._reactions, message.reacts);
         var emojisImages = message._reactions && message.reacts.reactions &&
             Object.keys(message.reacts.reactions).map(utf => {
                 var reaction = message.reacts.reactions[utf];

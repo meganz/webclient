@@ -1147,9 +1147,21 @@ pro.propay = {
                     bq: fromBandwidthDialog,        // Log for bandwidth quota triggered
                     extra: extra                    // Extra information for the specific gateway
                 }, {
-                    callback: function(utcResult) {
+                    m: pro.lastPaymentProviderId,
+                    callback: tryCatch(function(utcResult, ctx) {
                         pro.propay.processUtcResults(utcResult);
-                    }
+
+                        if (typeof utcResult === 'number' && utcResult < 0) {
+                            mBroadcaster.sendMessage('trk:event', 'account', 'upg', 'error', utcResult);
+                        }
+                        else {
+                            if ('trk' in window) {
+                                trk({ec_id: saleId, revenue: price}).dump('trk:utc');
+                            }
+
+                            mBroadcaster.sendMessage('trk:event', 'account', 'upg', u_attr.b ? 'bus' : 'norm', ctx.m);
+                        }
+                    })
                 });
             }
         });

@@ -471,6 +471,7 @@ function u_setrsa(rsakey) {
                             console.error(ex);
                         }
                     }
+                    mBroadcaster.sendMessage('trk:event', 'account', 'regist', u_attr.b ? 'bus' : 'norm', u_type);
 
                     $promise.resolve(rsakey);
                     ui_keycomplete();

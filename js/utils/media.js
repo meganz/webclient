@@ -1820,6 +1820,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
 
                 eventlog(99669, JSON.stringify(info));
             }
+            mBroadcaster.sendMessage('trk:event', 'videostream', 'error');
         });
 
         s.on('playing', function() {
@@ -1842,6 +1843,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
             if (/av0?1\b/i.test(s.hasVideo)) {
                 eventlog(99721, JSON.stringify([1, s.hasVideo, s.hasAudio, s.options.type]));
             }
+            mBroadcaster.sendMessage('trk:event', 'videostream', 'playing');
         });
 
         if (typeof dataURLToAB === 'function') {

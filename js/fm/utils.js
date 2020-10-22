@@ -1261,6 +1261,7 @@ MegaUtils.prototype.fmSearchNodes = function(searchTerm) {
                 M.renderMain();
                 M.onSectionUIOpen('cloud-drive');
                 onIdle(resolve);
+                // mBroadcaster.sendMessage('!sitesearch', searchTerm, 'folder-link', M.v.length);
             }
             else {
                 var handles = [];

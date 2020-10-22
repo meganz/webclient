@@ -861,7 +861,8 @@ function srvlog2(type /*, ...*/) {
  * @constructor
  */
 function RegExpEscape(text) {
-    return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
+    'use strict';
+    return text.replace(/[\s#$()*+,.?[\\\]^{|}-]/g, "\\$&");
 }
 
 function unixtimeToTimeString(timestamp) {

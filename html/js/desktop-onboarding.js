@@ -8,12 +8,11 @@
     }
 
     function renderPage() {
-        parsepage(pages['downloadapp']);
         var syncurl = megasync.getMegaSyncUrl();
         var $wrapper = $('.bottom-page.scroll-block.onboarding-suggestions');
 
         $('.post-download', $wrapper).addClass('hidden');
-        $('.pre-download', $wrapper).removeClass('hidden');
+        $('.pre-download', $wrapper).removeClass('hidden invisible');
         $('.redeemed-v', $wrapper).addClass('hidden');
 
         $('.top-head .left.individual').addClass('hidden');
@@ -22,6 +21,8 @@
         if (sessionStorage.voucherData) {
             var $voucherBlock = $('.promo-voucher-section', $wrapper).removeClass('hidden');
             var vd = JSON.parse(sessionStorage.voucherData);
+            var storageValue;
+            var bandwidthValue;
 
             // Change texts accordingly.
             $('.top-dark-info.' + (is_mobile ? 'mobile-download' : 'pre-download')).text(l[20415]);
@@ -31,18 +32,22 @@
 
             if (vd.businessmonths) {
                 $('.plan-name', $wrapper).text(l[19530]);
-                $voucherBlock.removeClass('pro1 pro2 pro3 pro4').addClass('pro100');
+                $('.plan-icon', $voucherBlock).removeClass('pro1 pro2 pro3 pro4').addClass('business');
 
                 $promoCard.removeClass('red-block yellow-block')
                     .addClass('blue-block');
 
                 // Show PRO plan details
-                $('.storage-amount', $voucherBlock).text(l[7094]);
-                $('.transfer-amount', $voucherBlock).text(l[7094]);
+                $('.storage-amount', $voucherBlock).safeHTML(l[24097]);
+                $('.transfer-amount', $voucherBlock).safeHTML(l[24098]);
             }
             else {
+
+                storageValue = bytesToSize(vd.storage * 0x40000000, 0);
+                bandwidthValue = bytesToSize(vd.bandwidth * 0x40000000, 0);
+
                 $('.plan-name', $wrapper).text(pro.getProPlanName(vd.proNum));
-                $voucherBlock.removeClass('pro1 pro2 pro3 pro4 pro100')
+                $('.plan-icon', $voucherBlock).removeClass('pro1 pro2 pro3 pro4 business')
                     .addClass('pro' + vd.proNum);
 
                 if (vd.proNum === 4) {
@@ -55,8 +60,10 @@
                 }
 
                 // Show PRO plan details
-                $('.storage-amount', $voucherBlock).text(bytesToSize(vd.storage * 0x40000000, 0));
-                $('.transfer-amount', $voucherBlock).text(bytesToSize(vd.bandwidth * 0x40000000, 0));
+                $('.storage-amount', $voucherBlock)
+                    .safeHTML(l[23789].replace('%1', '<span>' + storageValue + '</span>'));
+                $('.transfer-amount', $voucherBlock)
+                    .safeHTML(l[23790].replace('%1', '<span>' + bandwidthValue + '</span>'));
             }
 
             if (!is_mobile) {

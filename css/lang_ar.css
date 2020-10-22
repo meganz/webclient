@@ -78,7 +78,8 @@ body.rtl .cmd-bg .bottom-page.horizontal-centered-bl,
 body.rtl .inline-block.col-2.cmd-pad .bottom-page.dark-title,
 body.rtl .inline-block.col-2.cmd-pad .bottom-page.dark-txt,
 body.rtl .top-login-warning,
-body.rtl .bottom-menu.body,
+body.rtl .bottom-menu.body .link,
+body.rtl .bottom-menu.company-info,
 body.rtl .membership-pad-bl .reg-st3-name-aligner span,
 body.rtl .fm-dialog.payment-address-dialog,
 body.rtl .fm-dialog.loginrequired-dialog,
@@ -149,22 +150,16 @@ body.rtl .download.big-button.button.to-clouddrive.transition {
     padding-left: 12px;
     padding-right: 12px;
 }
-/*body.rtl .membership-st2-info span.number {
-    left: initial;
-    right: -20px;
-}*/
-body.rtl .membership-st2-info .membership-st2-head,
-body.rtl .membership-st2-info .payment-method .provider-name,
-body.rtl .membership-st2-info .membership-radio-label,
+body.rtl .payment-section .payment-method .provider-name,
+body.rtl .payment-section .membership-radio-label,
 body.rtl .main-mid-pad.third-section .payment-instructions,
 body.rtl .main-top-info-block .main-top-info-text {
     direction: rtl;
     text-align: left;
 }
 
-body.rtl .mobile .membership-st2-info .membership-st2-head,
-body.rtl .mobile .membership-st2-info .payment-method .provider-name,
-body.rtl .mobile .membership-st2-info .membership-radio-label,
+body.rtl .mobile .payment-section .payment-method .provider-name,
+body.rtl .mobile .payment-section .membership-radio-label,
 body.rtl .mobile .main-mid-pad.third-section .payment-instructions,
 body.rtl .mobile .main-top-info-block .main-top-info-text,
 body.rtl .info-block.recovery-key,

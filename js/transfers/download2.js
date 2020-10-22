@@ -1414,10 +1414,15 @@ var dlmanager = {
         'use strict';
 
         var self = this;
+        var unbindEvents = function() {
+            $(window).unbind('resize.overQuotaDialog');
+            $('.fm-dialog-overlay', 'body').unbind('click.closeOverQuotaDialog');
+        };
         var closeDialog = function() {
             if ($.dialog === 'download-pre-warning') {
                 $.dialog = 'was-pre-warning';
             }
+            unbindEvents();
             window.closeDialog();
         };
         var open = function(url) {
@@ -1437,8 +1442,8 @@ var dlmanager = {
                 api_req({a: 'log', e: 99640, m: 'on overquota pro-plans clicked'});
             }
 
-            if ($(this).hasClass('reg-st3-membership-bl')) {
-                open(getAppBaseUrl() + '#propay_' + $(this).data('payment'));
+            if ($(this).hasClass('plan-button')) {
+                open(getAppBaseUrl() + '#propay_' + $(this).closest('.plan').data('payment'));
             }
             else {
                 open(getAppBaseUrl() + '#pro');
@@ -1475,7 +1480,7 @@ var dlmanager = {
 
             if (is_mobile) {
                 // desktop has a 'continue' button, on mobile we do treat the close button as such
-                $dialog.find('.fm-dialog-close').rebind('click', this.onLimitedBandwidth.bind(this));
+                $('.fm-dialog-close', $dialog).rebind('click', this.onLimitedBandwidth.bind(this));
             }
         }
         else {
@@ -1486,6 +1491,12 @@ var dlmanager = {
             $('.continue', $dialog).attr('style', 'display:none');
 
             $('.video-theatre-mode:visible').addClass('paused');
+
+            $('.fm-dialog-close', $dialog).add($('.fm-dialog-overlay'))
+                .rebind('click.closeOverQuotaDialog', function() {
+
+                    unbindEvents();
+                });
 
             if (page === 'download') {
                 var $dtb = $('.download.top-bar');
@@ -1514,7 +1525,7 @@ var dlmanager = {
             }
         }
 
-        $('.upgrade, .mobile.upgrade-to-pro, .reg-st3-membership-bl', $dialog).rebind('click', onclick);
+        $('.upgrade, .mobile.upgrade-to-pro, .plan-button', $dialog).rebind('click', onclick);
 
         $('.bottom-tips a', $dialog).rebind('click', function() {
             open(getAppBaseUrl() +
@@ -1679,14 +1690,73 @@ var dlmanager = {
     },
 
     prepareLimitedBandwidthDialogPlans: function ($dialog) {
-        var $pricingBoxes = $dialog.find('.reg-st3-membership-bl');
-        var classType;
+        var $pricingBoxes = $('.plan', $dialog);
 
-        classType = pro.proplan.updateEachPriceBlock("D", $pricingBoxes, $dialog);
+        pro.proplan.initPlanPeriodControls($dialog);
+        pro.proplan.updateEachPriceBlock("D", $pricingBoxes, $dialog, 1);
+    },
 
-        classType = (classType === 1) ? "" : "2";
-        $pricingBoxes.find('.big').removeClass('tooBig tooBig2').addClass('tooBig' + classType);
-        $pricingBoxes.find('.small').removeClass('toosmall toosmall2').addClass('toosmall' + classType);
+    setPlanPrices: function($dialog) {
+        'use strict';
+
+        var $scrollBlock = $('.scrollable', $dialog);
+
+        // Set scroll to top
+        $scrollBlock.scrollTop(0);
+
+        // Load the membership plans
+        pro.loadMembershipPlans(function() {
+
+            // Render the plan details
+            dlmanager.prepareLimitedBandwidthDialogPlans($dialog);
+
+            if (!is_mobile) {
+
+                // Check if touch device
+                var is_touch = function() {
+                    return 'ontouchstart' in window || 'onmsgesturechange' in window;
+                };
+
+                // Change dialog height to fit browser height
+                var updateDialogHeight = function() {
+
+                    var dialogHeight;
+                    var contentHeight;
+
+                    $dialog.css('height', '');
+                    dialogHeight = $dialog.outerHeight();
+                    contentHeight = $('.fm-dialog-body', $dialog).outerHeight();
+
+                    if (dialogHeight < contentHeight) {
+                        $dialog.outerHeight(contentHeight);
+                    }
+
+                    if (!is_touch()) {
+
+                        // Update previous scrolling
+                        if ($scrollBlock.is('.ps-container')) {
+                            Ps.update($scrollBlock[0]);
+                        }
+                        else {
+                            // Initialize scrolling
+                            Ps.initialize($scrollBlock[0]);
+                        }
+                    }
+                };
+
+                // Change dialog height to fit browser height
+                Soon(updateDialogHeight);
+
+                $(window).rebind('resize.overQuotaDialog', function() {
+
+                    // Change dialog height to fit browser height
+                    updateDialogHeight();
+
+                    // Change dialog position
+                    dialogPositioning($dialog);
+                });
+            }
+        });
     },
 
     showLimitedBandwidthDialog: function(res, callback, flags) {
@@ -1697,10 +1767,10 @@ var dlmanager = {
         loadingDialog.hide();
         this.onLimitedBandwidth = function() {
             if (callback) {
-                $dialog.removeClass('registered achievements exceeded pro slider');
+                $dialog.removeClass('registered achievements exceeded pro slider uploads');
                 $('.bottom-tips a', $dialog).off('click');
                 $('.continue, .continue-download, .fm-dialog-close', $dialog).off('click');
-                $('.upgrade, .reg-st3-membership-bl, .mobile.upgrade-to-pro', $dialog).off('click');
+                $('.upgrade, .pricing-page.plan, .mobile.upgrade-to-pro', $dialog).off('click');
                 $('.get-more-bonuses', $dialog).off('click');
                 if ($.dialog === 'download-pre-warning') {
                     $.dialog = false;
@@ -1729,16 +1799,12 @@ var dlmanager = {
             eventlog(99617);// overquota pre-warning shown.
 
             // Load the membership plans
-            pro.loadMembershipPlans(function() {
-
-                // Render the plan details
-                dlmanager.prepareLimitedBandwidthDialogPlans($dialog);
-            });
+            dlmanager.setPlanPrices($dialog);
 
             uiCheckboxes($dialog, 'ignoreLimitedBandwidth');
             dlmanager._overquotaClickListeners($dialog, flags, res || true);
 
-            return $dialog.removeClass('exceeded');
+            return $dialog.removeClass('exceeded registered achievements pro slider uploads');
         });
     },
 
@@ -1766,13 +1832,6 @@ var dlmanager = {
 
         var asyncTaskID = false;
         var $dialog = $('.fm-dialog.limited-bandwidth-dialog');
-
-        // Load the membership plans
-        pro.loadMembershipPlans(function () {
-
-            // Render the plan details
-            dlmanager.prepareLimitedBandwidthDialogPlans($dialog);
-        });
 
         $(document).fullScreen(false);
         this._setOverQuotaState(dlTask);
@@ -1879,6 +1938,9 @@ var dlmanager = {
                 .rebind('dialog-closed', doCloseModal)
                 .find('.fm-dialog-close')
                 .rebind('click.quota', doCloseModal);
+
+            // Load the membership plans
+            dlmanager.setPlanPrices($dialog);
 
             api_req({a: 'log', e: 99648, m: 'on overquota dialog shown'});
 

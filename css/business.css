@@ -210,6 +210,12 @@ i.medium-icon.business-sprite {
 .business-price .big {
     font-size: 48px;
 }
+.business-storage-info {
+    font-size: 16px;
+    line-height: 19px;
+    color: #333333;
+    padding: 10px 0px 7px;
+}
 .business-price-info {
     font-size: 16px;
     line-height: 18px;
@@ -285,10 +291,10 @@ i.medium-icon.business-sprite {
 .business-icon.win {
     background-position: -183px -156px;
 }
-.business-red-info {
+.business-storageZ-info {
     font-size: 16px;
     line-height: 19px;
-    color: #F0373A;
+    color: #333333;
     padding: 10px 0 7px 0;
 }
 .business-hr {

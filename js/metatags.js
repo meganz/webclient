@@ -276,7 +276,7 @@ mega.metatags = new function() {
             mTags.mega_desc = l[18775] || mTags.en_desc;
             mTags.image = 'https://cms2.mega.nz/75bc1e26149f8962b723a42205434feb.png';
         }
-        else if (page === 'pro') {
+        else if (page === 'pro' || page.substr(0, 6) === 'propay') {
             mTags.en_title = 'Plans & pricing - MEGA';
             mTags.en_desc = 'Upgrade to a MEGA PRO account for additional storage and transfer quota. '
                 + 'MEGA provides one of the cheapest cloud storage deals on the Internet.';

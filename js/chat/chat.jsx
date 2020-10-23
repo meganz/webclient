@@ -342,12 +342,28 @@ Chat.prototype.init = promisify(function(resolve, reject) {
             self.registerUploadListeners();
             self.trigger("onInit");
             mBroadcaster.sendMessage('chat_initialized');
+            setInterval(self._syncDnd.bind(self), 60000);
 
             return true;
         })
         .then(resolve)
         .catch(reject);
 });
+
+Chat.prototype._syncDnd = function() {
+    const chats = this.chats;
+    if (chats && chats.length > 0) {
+        chats.forEach(({ chatId }) => {
+            const dnd = pushNotificationSettings.getDnd(chatId);
+            if (dnd && dnd < unixtime()) {
+                if (this.logger) {
+                    this.logger.debug(`Chat.prototype._syncDnd chatId=${chatId}`);
+                }
+                pushNotificationSettings.disableDnd(chatId);
+            }
+        });
+    }
+};
 
 /**
  * Load chat UI Flags from mega.config

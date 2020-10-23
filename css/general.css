@@ -1,5 +1,5 @@
-/* 
- * IMPORTANT! Please DO NOT change this file before confirmed with designers! 
+/*
+ * IMPORTANT! Please DO NOT change this file before confirmed with designers!
  */
 /*
  *  This global css file includes components:
@@ -132,7 +132,7 @@ a.green, a.green:link, a.green:visited, a.green:hover, a.green:active {
     height: 56px;
     position: relative;
     width:100%;
-    margin:0px; 
+    margin:0px;
     display: inline-block;
     vertical-align: top;
     margin-bottom: 20px;
@@ -274,9 +274,9 @@ a.green, a.green:link, a.green:visited, a.green:hover, a.green:active {
 /* end of Disabled class */
 
 /* three extra status for the inputs: error, active, valued */
-.mega-input-title-ontop.active .mega-input-title, 
+.mega-input-title-ontop.active .mega-input-title,
 .mega-input-title-ontop.valued .mega-input-title,
-.mega-input-title-ontop.birth .mega-input-title, 
+.mega-input-title-ontop.birth .mega-input-title,
 .mega-input-title-ontop.underline-dropdown-input .mega-input-title {
     top: 0;
     color: #aaa;
@@ -584,3 +584,51 @@ a.green, a.green:link, a.green:visited, a.green:hover, a.green:active {
     text-decoration: none;
 }
 
+/* Default toggle checkbox.*/
+/*
+ * <div class="dialog-feature-toggle">
+ * *<div class="dialog-feature-toggle"></div>
+ * </div>
+* 'toggle-on' is addition class if checkbox is active
+* 'red' is addition class if active state is red
+*/
+/* TODO: rename the component to a more default*/
+.dialog-feature-toggle {
+    border: solid 1px rgba(0, 0, 0, 0.05);
+    background: rgba(0,0,0,0.15);
+    background: linear-gradient(to bottom, rgba(0,0,0,0.15) 0%,rgba(0,0,0,0.1) 100%);
+    border-radius: 40px;
+    cursor: pointer;
+    display: inline-block;
+    float: right;
+    height: 22px;
+    width: 38px;
+    box-sizing: border-box;
+}
+.dialog-feature-toggle.toggle-on {
+    background-color: #00BFA5;
+    background: linear-gradient(to bottom, rgba(0,191,165,1) 0%, rgba(0,172,148,1) 100%);
+    box-shadow: 0 1px 2px 0 rgba(0,0,0,0.15);
+}
+.dialog-feature-toggle.red.toggle-on {
+    background: rgb(255,51,58);
+    background: linear-gradient(to bottom, rgba(255,51,58,1) 0%,rgba(217,0,7,1) 100%);
+}
+.dialog-feature-switch {
+    background-color: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    border-radius: 100%;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.15);
+    height: 16px;
+    width: 16px;
+    margin: 1px 0 0 1px;
+    box-sizing: content-box;
+    -webkit-background-clip: padding-box;
+    background-clip: padding-box;
+    -webkit-transition: margin-left 100ms ease-in-out;
+    transition: margin-left 100ms ease-in-out;
+    cursor: pointer;
+}
+.toggle-on .dialog-feature-switch {
+    margin-left: 17px;
+}

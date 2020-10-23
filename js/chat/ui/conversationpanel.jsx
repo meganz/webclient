@@ -24,6 +24,7 @@ import { CloseOpenModeMessage } from './messages/closeOpenMode.jsx';
 import { ChatHandleMessage } from './messages/chatHandle.jsx';
 import { ChatlinkDialog } from './../ui/chatlinkDialog.jsx';
 import { ConversationAVPanel } from './conversationaudiovideopanel.jsx';
+import PushSettingsDialog from './pushSettingsDialog.jsx';
 
 var ENABLE_GROUP_CALLING_FLAG = true;
 
@@ -240,6 +241,48 @@ export class ConversationRightArea extends MegaRenderMixin {
                 </Button>
         );
 
+        //
+        // Push notification settings
+        // ----------------------------------------------------------------------
+
+        const { pushSettingsValue, onPushSettingsToggled, onPushSettingsClicked } = this.props;
+        const pushSettingsBtn = room.membersSetFromApi.members.hasOwnProperty(u_handle) && !anonymouschat && (
+            <div className="push-settings">
+                <Button
+                    className="link-button light push-settings-button"
+                    icon={"small-icon colorized " + (
+                        pushSettingsValue || pushSettingsValue === 0 ?
+                            "muted" :
+                            "mute"
+                    )}
+                    label={l[16709] /* `Mute chat` */}
+                    secondLabel={(() => {
+                        if (pushSettingsValue !== null && pushSettingsValue !== undefined) {
+                            return pushSettingsValue === 0 ?
+                                // `Until I Turn It On Again``
+                                PushSettingsDialog.options[Infinity] :
+                                // `Muted until %s`
+                                l[23539].replace(
+                                    '%s',
+                                    `<strong>
+                                        ${escapeHTML(unixtimeToTimeString(pushSettingsValue))}
+                                    </strong>`
+                                );
+                        }
+                    })()}
+                    secondLabelClass="label--green"
+                    toggle={{
+                        enabled: !pushSettingsValue && pushSettingsValue !== 0,
+                        onClick: () =>
+                            !pushSettingsValue && pushSettingsValue !== 0 ?
+                                onPushSettingsClicked() :
+                                onPushSettingsToggled()
+                    }}
+                    onClick={() => onPushSettingsClicked()}>
+                </Button>
+            </div>
+        );
+
         var expandedPanel = {};
         if (room.type === "group" || room.type === "public") {
             expandedPanel['participants'] = true;
@@ -376,6 +419,10 @@ export class ConversationRightArea extends MegaRenderMixin {
                                         }} />
                                 </Dropdown>
                             </Button>
+
+                            {AVseperator}
+                            {pushSettingsBtn}
+                            {pushSettingsBtn && AVseperator}
 
                             {endCallButton}
 
@@ -520,8 +567,10 @@ export class ConversationPanel extends MegaRenderMixin {
             confirmDeleteDialog: false,
             pasteImageConfirmDialog: false,
             nonLoggedInJoinChatDialog: false,
+            pushSettingsDialog: false,
+            pushSettingsValue: null,
             messageToBeDeleted: null,
-            editing: false
+            editing: false,
         };
 
         this.handleKeyDown = SoonFc(120, (ev) => this._handleKeyDown(ev));
@@ -1632,6 +1681,31 @@ export class ConversationPanel extends MegaRenderMixin {
             </ModalDialogsUI.ConfirmDialog>
         }
 
+        //
+        // Push notification settings
+        // ----------------------------------------------------------------------
+
+        let pushSettingsDialog = null;
+        if (self.state.pushSettingsDialog === true) {
+            const state = { pushSettingsDialog: false, pushSettingsValue: null };
+            pushSettingsDialog = (
+                <PushSettingsDialog
+                    room={room}
+                    pushSettingsValue={this.state.pushSettingsValue}
+                    onClose={() =>
+                        this.setState({ ...state, pushSettingsValue: this.state.pushSettingsValue })
+                    }
+                    onConfirm={pushSettingsValue =>
+                        self.setState({ ...state, pushSettingsValue }, () =>
+                            pushNotificationSettings.setDnd(
+                                room.chatId,
+                                pushSettingsValue === Infinity ? 0 : unixtime() + pushSettingsValue * 60
+                            )
+                        )
+                    }
+                />
+            );
+        }
 
         var confirmTruncateDialog = null;
         if (self.state.truncateDialog === true) {
@@ -1835,6 +1909,7 @@ export class ConversationPanel extends MegaRenderMixin {
                         roomFlags={this.props.chatRoom.flags}
                         members={this.props.chatRoom.membersSetFromApi}
                         messagesBuff={room.messagesBuff}
+                        pushSettingsValue={pushNotificationSettings.getDnd(this.props.chatRoom.chatId)}
                         onAttachFromComputerClicked={function() {
                             self.uploadFromComputer();
                         }}
@@ -1875,6 +1950,16 @@ export class ConversationPanel extends MegaRenderMixin {
                         }}
                         onAttachFromCloudClicked={function() {
                             self.setState({'attachCloudDialog': true});
+                        }}
+                        onPushSettingsClicked={function() {
+                            self.setState({ 'pushSettingsDialog': true });
+                        }}
+                        onPushSettingsToggled={function() {
+                            return room.dnd || room.dnd === 0 ?
+                                self.setState({ pushSettingsValue: null }, () =>
+                                    pushNotificationSettings.disableDnd(room.chatId)
+                                ) :
+                                pushNotificationSettings.setDnd(room.chatId, 0);
                         }}
                         onAddParticipantSelected={function(contactHashes) {
                             self.props.chatRoom.scrolledToBottom = true;
@@ -1926,6 +2011,7 @@ export class ConversationPanel extends MegaRenderMixin {
                     {sendContactDialog}
                     {confirmDeleteDialog}
                     {confirmTruncateDialog}
+                    {pushSettingsDialog}
 
 
                     <div className="dropdown body dropdown-arrow down-arrow tooltip not-sent-notification hidden">

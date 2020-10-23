@@ -3182,6 +3182,7 @@ accountUI.contactAndChat = {
         this.status.render(presenceInt, autoaway, autoawaylock, autoawaytimeout, persist, persistlock, lastSeen);
         this.status.bindEvents(presenceInt, autoawaytimeout);
         this.richURL.render();
+        this.dnd.render();
     },
 
     status: {
@@ -3312,6 +3313,263 @@ accountUI.contactAndChat = {
                         RichpreviewsFilter.confirmationDoNever();
                     }
                 });
+        }
+    },
+
+    dnd: {
+
+        /**
+         * Cached references for common DOM elements
+         */
+
+        DOM: {
+            container: '.fm-account-main',
+            toggle: '#push-settings-toggle',
+            button: '#push-settings-button',
+            dialog: '.push-settings-dialog',
+            status: '.push-settings-status',
+        },
+
+        /**
+         * @see PushNotificationSettings.GROUPS
+         */
+
+        group: 'CHAT',
+
+        /**
+         * hasDnd
+         * @description Get the current push notification setting
+         * @returns {Boolean}
+         */
+
+        hasDnd: function() {
+            'use strict';
+            return (
+                pushNotificationSettings &&
+                pushNotificationSettings.getDnd(this.group) ||
+                pushNotificationSettings.getDnd(this.group) === 0
+            );
+        },
+
+        /**
+         * getTimeString
+         * @description Returns human readable and formatted string based on the
+         * current push notification setting (timestamp)
+         * @example `Notification will be silent until XX:XX`
+         * @returns {String}
+         */
+
+        getTimeString: function() {
+            'use strict';
+            var dnd = pushNotificationSettings.getDnd(this.group);
+            if (dnd) {
+                return (
+                    // `Notifications will be silent until %s`
+                    l[23540].replace('%s', '<span>' + escapeHTML(unixtimeToTimeString(dnd)) + '</span>')
+                );
+            }
+            return '&nbsp;';
+        },
+
+        /**
+         * renderStatus
+         * @param hasDnd Boolean the push notification setting status
+         * @returns {*}
+         */
+
+        renderStatus: function(hasDnd) {
+            'use strict';
+            var $status = $(this.DOM.status, this.DOM.container);
+            return hasDnd ? $status.safeHTML(this.getTimeString()).removeClass('hidden') : $status.addClass('hidden');
+        },
+
+        /**
+         * setInitialState
+         * @description Invoked immediately upon loading the module, sets the initial state -- conditionally
+         * sets the toggle state, renders formatted timestamp
+         */
+
+        setInitialState: function() {
+            'use strict';
+            if (this.hasDnd()) {
+                var dnd = pushNotificationSettings.getDnd(this.group);
+                if (dnd && dnd < unixtime()) {
+                    pushNotificationSettings.disableDnd(this.group);
+                    return;
+                }
+                $(this.DOM.toggle, this.DOM.container).addClass('toggle-on');
+                this.renderStatus(true);
+            }
+        },
+
+        /**
+         * setMorningOption
+         * @description Handles the `Until tomorrow morning, 08:00` / `Until this morning, 08:00` option.
+         */
+
+        setMorningOption: function() {
+            'use strict';
+            var container = '.radio-txt.morning-option';
+            var $label = $('span', container);
+            var $radio = $('input', container);
+
+            // 00:01 ~ 07:59 -> `Until this morning, 08:00`
+            // 08:00 ~ 00:00 -> `Until tomorrow morning, 08:00`
+            var targetTomorrow = (new Date().getHours()) >= 8;
+
+            var date = new Date();
+            // Start of the day -> 08:00
+            date.setHours(0, 1, 0, 0);
+            date.setHours(date.getHours() + 8);
+            if (targetTomorrow) {
+                // +1 day if we target `tomorrow morning`
+                date.setDate(date.getDate() + 1);
+            }
+            var difference = Math.abs(date - new Date());
+            var minutesUntil = Math.floor(difference / 1000 / 60);
+
+            // TODO: add translation
+            $label.safeHTML(targetTomorrow ? 'Until tomorrow morning, 08:00' : 'Until this morning, 08:00');
+            $radio.val(minutesUntil);
+        },
+
+        /**
+         * handleToggle
+         * @description Handles the toggle switch -- conditionally adds or removes the toggle active state,
+         * disables or sets the `Until I Turn It On Again` default setting
+         * @param ev Object the event object
+         */
+
+        handleToggle: function(ev) {
+            'use strict';
+
+            var hasDnd = this.hasDnd();
+            var group = this.group;
+
+            if (hasDnd) {
+                pushNotificationSettings.disableDnd(group);
+                this.renderStatus(false);
+                $(ev.currentTarget).removeClass('toggle-on');
+            }
+            else {
+                this.handleDialogOpen();
+            }
+        },
+
+        /**
+         * handleDialogOpen
+         * @description
+         * Handles the dialog toggle, incl. attaches additional handler that sets the given setting if any is selected
+         */
+
+        handleDialogOpen: function() {
+            'use strict';
+
+            var self = this;
+            var $dialog = $(this.DOM.dialog);
+            var time = unixtime();
+
+            this.setMorningOption();
+            M.safeShowDialog('push-settings-dialog', $dialog);
+
+            // Init radio button UI.
+            accountUI.inputs.radio.init('.custom-radio', $dialog, '');
+
+            // Bind the `Done` specific event handling
+            $('.push-settings-done', $dialog).rebind('click.dndUpdate', function() {
+                var $radio = $('input[type="radio"]:checked', $dialog);
+                var value = parseInt($radio.val(), 10);
+
+                pushNotificationSettings.setDnd(self.group, value === 0 ? 0 : time + value * 60);
+                $(self.DOM.toggle, self.DOM.container).addClass('toggle-on');
+                closeDialog();
+                self.renderStatus(true);
+            });
+        },
+
+        /**
+         * bindEvents
+         * @description
+         * Bind the initial event handlers, excl. the `Done` found within the dialog
+         */
+
+        bindEvents: function() {
+            'use strict';
+            $(this.DOM.toggle, this.DOM.container).rebind('click.dndToggleSwitch', this.handleToggle.bind(this));
+            $(this.DOM.button, this.DOM.container).rebind('click.dndDialogOpen', this.handleDialogOpen.bind(this));
+            $('.fm-dialog-close, .push-settings-close', this.DOM.dialog).rebind('click.dndDialogClose', closeDialog);
+        },
+
+        /**
+         * render
+         * @description
+         * Initial render, invoked upon mounting the module
+         */
+
+        render: function() {
+            'use strict';
+            this.setInitialState();
+            this.bindEvents();
+        }
+    },
+
+    delayRender: function(presenceInt, autoaway) {
+
+        'use strict';
+
+        var self = this;
+
+        if (!megaChatIsReady) {
+            if (megaChatIsDisabled) {
+                console.error('Mega Chat is disabled, cannot proceed to Contact and Chat settings');
+            }
+            else {
+                // If chat is not ready waiting for chat_initialized broadcaster.
+                loadingDialog.show();
+                mBroadcaster.once('chat_initialized', self.delayRender.bind(self, presenceInt, autoaway));
+            }
+            return true;
+        }
+        loadingDialog.hide();
+
+        if (!presenceInt || !presenceInt.userPresence) {
+            setTimeout(function() {
+                throw new Error('presenceInt is not ready...');
+            });
+            return true;
+            // ^ FIXME too..!
+        }
+
+        // Only call this if the call of this function is the first one, made by fm.js -> accountUI
+        if (autoaway === undefined) {
+            presenceInt.rebind('settingsUIUpdated.settings', function(
+                e,
+                autoaway,
+                autoawaylock,
+                autoawaytimeout,
+                persist,
+                persistlock,
+                lastSeen
+            ) {
+                self.init(autoaway, autoawaylock, autoawaytimeout, persist, persistlock, lastSeen);
+            });
+
+            presenceInt.userPresence.updateui();
+            return true;
+        }
+
+        if (typeof (megaChat) !== 'undefined' && typeof(presenceInt) !== 'undefined') {
+            presenceInt.rebind('settingsUIUpdated.settings', function(
+                e,
+                autoaway,
+                autoawaylock,
+                autoawaytimeout,
+                persist,
+                persistlock,
+                lastSeen
+            ) {
+                self.init(autoaway, autoawaylock, autoawaytimeout, persist, persistlock, lastSeen);
+            });
         }
     },
 };

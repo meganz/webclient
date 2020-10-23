@@ -6170,6 +6170,33 @@ a.affiliate-guide.grey-link:hover {
 }
 /* end of  Affiliate redemtion request dialog */
 
+/* Push notification settings dialog */
+.fm-dialog.push-settings-dialog {
+    width: 360px;
+    font-family: 'LatoWeb', Arial;
+}
+.fm-dialog.push-settings-dialog .radio-txt {
+    cursor: pointer;
+    position: relative;
+    display: block;
+    padding-top: 5px;
+    padding-left: 30px;
+    padding: 5px 0 11px 36px;
+    font-size: 16px;
+    color: #333;
+    float: none;
+}
+.fm-dialog.push-settings-dialog .custom-radio {
+    left: 6px;
+    top: 6px;
+    position: absolute;
+    margin: 0;
+}
+.fm-dialog.push-settings-dialog .buttons-block {
+    padding: 0 16px 16px 16px;
+}
+/* End of Push notification settings dialog */
+
 
 /* File folder picker dialog (upload, share etc)*/
 /* Important TODO - Reslice this dialog:
@@ -8209,3 +8236,4 @@ a.affiliate-guide.grey-link:hover {
     font-size: 14px;
 }
 /* end of Set password dialog*/
+

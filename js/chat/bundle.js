@@ -3791,21 +3791,36 @@ class ConversationMessageMixin extends _stores_mixins_js1__["ContactAwareCompone
       return false;
     }
 
-    const s = megaChat._emojiData.emojisSlug[slug] || meta;
+    const {
+      reactions
+    } = this.props.message.reacts;
+    const CURRENT_USER_REACTIONS = this.getCurrentUserReactions().length;
+    const REACTIONS_LIMIT = {
+      TOTAL: localStorage.REACTIONS_LIMIT_TOTAL || 50,
+      PER_PERSON: localStorage.REACTIONS_LIMIT_PER_PERSON || 24
+    };
 
-    if (s && message.reacts.getReaction(u_handle, s.u)) {
+    const addReaction = () => chatRoom.messagesBuff.userAddReaction(message.messageId, slug, meta);
+
+    const emoji = megaChat._emojiData.emojisSlug[slug] || meta;
+
+    if (emoji && message.reacts.getReaction(u_handle, emoji.u)) {
       return chatRoom.messagesBuff.userDelReaction(message.messageId, slug, meta);
     }
 
-    if (Object.keys(message.reacts.reactions).length <= 50) {
-        if (this.getCurrentUserReactions().length <= 24) {
-          return chatRoom.messagesBuff.userAddReaction(message.messageId, slug, meta);
-        }
+    if (emoji && reactions[emoji.u] && CURRENT_USER_REACTIONS < REACTIONS_LIMIT.PER_PERSON) {
+      return addReaction();
+    }
 
-        return console.error('You had reached the maximum limit of 24 reactions');
-      }
+    if (CURRENT_USER_REACTIONS >= REACTIONS_LIMIT.PER_PERSON) {
+      return msgDialog('info', '', "You had reached the maximum limit of " + REACTIONS_LIMIT.PER_PERSON + " reactions");
+    }
 
-    return console.error('This message reached the maximum limit of 50 reactions');
+    if (Object.keys(reactions).length >= REACTIONS_LIMIT.TOTAL) {
+      return msgDialog('info', '', "This message reached the maximum limit of " + REACTIONS_LIMIT.TOTAL + " reactions");
+    }
+
+    return addReaction();
   }
 
   _emojiOnActiveStateChange(newVal) {

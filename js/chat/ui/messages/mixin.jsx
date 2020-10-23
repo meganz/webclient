@@ -189,21 +189,44 @@ class ConversationMessageMixin extends ContactAwareComponent {
             return false;
         }
 
-        const s = megaChat._emojiData.emojisSlug[slug] || meta;
-        if (s && message.reacts.getReaction(u_handle, s.u)) {
+        const { reactions } = this.props.message.reacts;
+        const CURRENT_USER_REACTIONS = this.getCurrentUserReactions().length;
+        const REACTIONS_LIMIT = {
+            // TODO: remove localStorage debug flags
+            TOTAL: localStorage.REACTIONS_LIMIT_TOTAL || 50,
+            PER_PERSON: localStorage.REACTIONS_LIMIT_PER_PERSON || 24
+        };
+        const addReaction = () => chatRoom.messagesBuff.userAddReaction(message.messageId, slug, meta);
+        const emoji = megaChat._emojiData.emojisSlug[slug] || meta;
+
+        // Remove reaction
+        if (emoji && message.reacts.getReaction(u_handle, emoji.u)) {
             return chatRoom.messagesBuff.userDelReaction(message.messageId, slug, meta);
         }
 
-        if (Object.keys(message.reacts.reactions).length <= 50 /* total reactions*/) {
-            if (this.getCurrentUserReactions().length <= 24) {
-                return chatRoom.messagesBuff.userAddReaction(message.messageId, slug, meta);
-            }
-
-            return console.error('You had reached the maximum limit of 24 reactions');
+        // Add reaction to already added reaction, e.g. slot
+        if (emoji && reactions[emoji.u] && CURRENT_USER_REACTIONS < REACTIONS_LIMIT.PER_PERSON) {
+            return addReaction();
         }
 
-        return console.error('This message reached the maximum limit of 50 reactions');
+        if (CURRENT_USER_REACTIONS >= REACTIONS_LIMIT.PER_PERSON) {
+            return (
+                // TODO: add translations
+                msgDialog('info', '', `You had reached the maximum limit of ${REACTIONS_LIMIT.PER_PERSON} reactions`)
+            );
+        }
+
+        if (Object.keys(reactions).length >= REACTIONS_LIMIT.TOTAL) {
+            return (
+                // TODO: add translations
+                msgDialog('info', '', `This message reached the maximum limit of ${REACTIONS_LIMIT.TOTAL} reactions`)
+            );
+        }
+
+        // Add new reaction
+        return addReaction();
     }
+
     _emojiOnActiveStateChange(newVal) {
         this.setState(() => {
             return {
@@ -260,7 +283,6 @@ class ConversationMessageMixin extends ContactAwareComponent {
                         .replace("%s", slug);
                 }
                 else {
-                    // TODO: Add translation
                     tipText = mega.utils.trans.listToString(
                         names,
                         (l[24069] || "%s [G]reacted with %s2[/G]").replace("%s2", slug)
@@ -346,7 +368,7 @@ class ConversationMessageMixin extends ContactAwareComponent {
 
     getMessageActionButtons() {
         // reaction button
-        const {chatRoom, message} = this.props;
+        const { chatRoom, message } = this.props;
 
         return message instanceof Message && message.isSentOrReceived() && !chatRoom.isReadOnly() ?
             <Button

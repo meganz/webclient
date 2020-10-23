@@ -204,7 +204,7 @@ class ConversationMessageMixin extends ContactAwareComponent {
             return chatRoom.messagesBuff.userDelReaction(message.messageId, slug, meta);
         }
 
-        // Add reaction to already added reaction, e.g. slot
+        // Add reaction to already added reaction (+1 to specific slot)
         if (emoji && reactions[emoji.u] && CURRENT_USER_REACTIONS < REACTIONS_LIMIT.PER_PERSON) {
             return addReaction();
         }

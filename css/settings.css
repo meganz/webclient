@@ -712,22 +712,11 @@
 .settings-sub-section.phone-number-settings.verified .add-phone-text {
     display: none;
 }
-.dialog-feature-toggle {
-    border: solid 1px rgba(0, 0, 0, 0.05);
-    background-color: rgba(0, 0, 0, 0.25);
-    border-radius: 40px;
-    cursor: pointer;
-    display: inline-block;
-    height: 22px;
-    width: 38px;
-    box-sizing: border-box;
-}
 .fm-right-account-block .dialog-feature-toggle {
     position: absolute;
     right: 0;
     top: 23px;
 }
-.dialog-feature-toggle.toggle-on,
 .fm-right-account-block .dialog-feature-toggle.toggle-on {
     background-color: #00BFA5;
     background: -moz-linear-gradient(180deg, rgba(0,191,165,1) 0%, rgba(0,172,148,1) 100%);
@@ -736,21 +725,6 @@
 }
 .fm-right-account-block .content-txt + .dialog-feature-toggle {
     top: 26px;
-}
-.dialog-feature-switch {
-    background-color: #ffffff;
-    border: 1px solid rgba(0, 0, 0, 0.05);
-    border-radius: 8px;
-    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.15);
-    cursor: pointer;
-    height: 14px;
-    margin-left: 2px;
-    margin-top: 2px;
-    width: 14px;
-    transition: margin 0.15s linear;
-}
-.dialog-feature-toggle.toggle-on .dialog-feature-switch {
-    margin-left: 18px;
 }
 .fm-account-main .fm-account-profile .settings-left-block .account.qr-block {
     margin-bottom: 0px;
@@ -1718,4 +1692,22 @@
 }
 .account-history-drop-items {
     line-height: 30px;
+}
+/* Settings -- DND */
+.account.push-notification-settings {
+    /* [...] */
+}
+.account.push-notification-settings .content-txt {
+    padding: 0;
+}
+.account.push-notification-settings .push-settings-status {
+    padding: 24px 0 0;
+}
+.account.push-notification-settings .push-settings-status span {
+    color: #00BFA5;
+}
+.account.push-notification-settings #push-settings-button {
+    position: relative;
+    top: auto;
+    margin: 0 0 10px;
 }

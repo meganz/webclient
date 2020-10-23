@@ -1238,7 +1238,6 @@ div.radioOn::after, div.radioOff::after {
 }
 div.radioOn::after {
     background: rgb(255,51,58);
-    background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2ZmMzMzYSIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNkOTAwMDciIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
     background: -moz-linear-gradient(top, rgba(255,51,58,1) 0%, rgba(217,0,7,1) 100%);
     background: -webkit-linear-gradient(top, rgba(255,51,58,1) 0%, rgba(217,0,7,1) 100%);
     background: linear-gradient(to bottom, rgba(255,51,58,1) 0%, rgba(217,0,7,1) 100%);
@@ -1247,6 +1246,9 @@ div.radioOn::after {
 div.radioOn.small, div.radioOff.small {
     width: 16px;
     height: 16px;
+}
+div.radioOn.green-active {
+    box-shadow: 0 0 0 1px rgba(0,191,165, 0.5);
 }
 div.radioOn.green-active::after {
     background: #00e5c5;
@@ -1327,6 +1329,7 @@ div.radioOn.green-active::after {
     position: absolute;
     z-index: 1;
     cursor: pointer;
+    margin: 0;
 }
 .bp-main {
     color: #595959;
@@ -7240,7 +7243,6 @@ table {
 }
 .fm-right-header .link-button, .fm-transfers-header .link-button {
     margin-top: 8px;
-    font-size: 14px;
     -webkit-transition: opacity 200ms ease-in-out, color 200ms ease-in-out;
     -moz-transition: opacity 200ms ease-in-out, color 200ms ease-in-out;
     -o-transition: opacity 200ms ease-in-out, color 200ms ease-in-out;
@@ -8612,15 +8614,12 @@ body:not(.en) .warning-dialog-a.wide {
     height: 20px;
     margin-top: 48px;
 }
-.qr-dialog .dialog-feature-toggle, .qr-settings .dialog-feature-toggle {
-    border: solid 1px rgba(0, 0, 0, 0.05);
-    background: linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.1) 100%);
+.qr-dialog .dialog-feature-toggle {
     display: inline-block;
     float: right;
 }
-.qr-dialog .dialog-feature-toggle.toggle-on, .qr-settings .dialog-feature-toggle.toggle-on {
+.qr-dialog .dialog-feature-toggle.toggle-on {
     background: linear-gradient(180deg, #F0373B 0%, #D90007 100%);
-    box-shadow: 0 1px 2px 0 rgba(0,0,0,0.15);
 }
 .qr-dialog .qr-txt-desc {
     height: 19px;
@@ -19264,7 +19263,7 @@ div div.nt-main-date,
     -moz-border-radius: 100%;
     -webkit-border-radius: 100%;
     border-radius: 100%;
-    background-image: url(../images/mega/new-chat-sprite_v17.png);
+    background-image: url(../images/mega/new-chat-sprite_v18.png);
     background-repeat: no-repeat;
     background-position: -7px -1353px;
     -webkit-box-shadow: 0px 0px 0px 2px rgba(255,255,255,1);
@@ -24571,37 +24570,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 }
 
 .user-management-account-settings .dialog-feature-toggle {
-    border: solid 1px rgba(0, 0, 0, 0.05);
-    background: linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.1) 100%);
-    border-radius: 40px;
-    cursor: pointer;
-    display: inline-block;
-    float: right;
-    height: 20px;
-    margin:24px 3px 0 0;
-    width: 40px;
-}
-
-.user-management-account-settings .dialog-feature-toggle .dialog-feature-switch {
-    background-color: #ffffff;
-    border: 1px solid rgba(0, 0, 0, 0.05);
-    border-radius: 8px;
-    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.15);
-    cursor: pointer;
-    height: 14px;
-    margin-left: 2px;
-    margin-top: 2px;
-    width: 14px;
-}
-
-.user-management-account-settings .dialog-feature-toggle.toggle-on {
-    background: linear-gradient(180deg, #00BFA5 0%, #00BFA5 100%);
-    box-shadow: 0 1px 2px 0 rgba(0,0,0,0.15);
-}
-
-.user-management-account-settings .dialog-feature-toggle .dialog-feature-switch {
-    margin-right: 2px;
-    float: right;
+    margin: 24px 3px 0 0;
 }
 
 .user-management-dialog .invite-people-dialog.dialog {

@@ -1392,7 +1392,7 @@ __webpack_require__.d(__webpack_exports__, "Avatar", function() { return Avatar;
 __webpack_require__.d(__webpack_exports__, "ContactCard", function() { return ContactCard; });
 __webpack_require__.d(__webpack_exports__, "ContactItem", function() { return ContactItem; });
 __webpack_require__.d(__webpack_exports__, "ContactPickerWidget", function() { return ContactPickerWidget; });
-var _extends0__ = __webpack_require__(9);
+var _extends0__ = __webpack_require__(8);
 var _extends0 = __webpack_require__.n(_extends0__);
 var react1__ = __webpack_require__(0);
 var react1 = __webpack_require__.n(react1__);
@@ -2962,7 +2962,7 @@ module.exports = ReactDOM;
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 __webpack_require__.d(__webpack_exports__, "Button", function() { return Button; });
-var _extends0__ = __webpack_require__(9);
+var _extends0__ = __webpack_require__(8);
 var _extends0 = __webpack_require__.n(_extends0__);
 var react1__ = __webpack_require__(0);
 var react1 = __webpack_require__.n(react1__);
@@ -3128,7 +3128,10 @@ class Button extends _stores_mixins_js2__["MegaRenderMixin"] {
       disabled,
       style,
       icon,
-      label
+      label,
+      toggle,
+      secondLabel,
+      secondLabelClass
     } = this.props;
     var extraAttrs = this.props.attrs;
     return react1.a.createElement("div", _extends0()({
@@ -3137,7 +3140,23 @@ class Button extends _stores_mixins_js2__["MegaRenderMixin"] {
       onClick: this.onClick
     }, extraAttrs), icon && react1.a.createElement("i", {
       className: "small-icon " + icon
-    }), label && react1.a.createElement("span", null, label), this.renderChildren());
+    }), label && react1.a.createElement("span", null, label), secondLabel && react1.a.createElement("span", {
+      className: secondLabelClass ? secondLabelClass : '',
+      dangerouslySetInnerHTML: {
+        __html: this.props.secondLabel
+      }
+    }), toggle && react1.a.createElement("div", {
+      className: "\n                            dialog-feature-toggle\n                            " + (toggle.className ? toggle.className : '') + "\n                            " + (toggle.enabled ? 'toggle-on' : '') + "\n                        ",
+      onClick: ev => {
+        ev.stopPropagation();
+
+        if (this.props.toggle.onClick) {
+          this.props.toggle.onClick();
+        }
+      }
+    }, react1.a.createElement("div", {
+      className: "dialog-feature-switch"
+    })), this.renderChildren());
   }
 
 }
@@ -3176,6 +3195,30 @@ function _applyDecoratedDescriptor(target, property, decorators, descriptor, con
 }
 
 module.exports = _applyDecoratedDescriptor;
+
+/***/ }),
+
+/***/ (function(module, exports) {
+
+function _extends() {
+  module.exports = _extends = Object.assign || function (target) {
+    for (var i = 1; i < arguments.length; i++) {
+      var source = arguments[i];
+
+      for (var key in source) {
+        if (Object.prototype.hasOwnProperty.call(source, key)) {
+          target[key] = source[key];
+        }
+      }
+    }
+
+    return target;
+  };
+
+  return _extends.apply(this, arguments);
+}
+
+module.exports = _extends;
 
 /***/ }),
 
@@ -3559,30 +3602,6 @@ __webpack_exports__["a"] = ({
   SelectContactDialog,
   ConfirmDialog
 });
-
-/***/ }),
-
-/***/ (function(module, exports) {
-
-function _extends() {
-  module.exports = _extends = Object.assign || function (target) {
-    for (var i = 1; i < arguments.length; i++) {
-      var source = arguments[i];
-
-      for (var key in source) {
-        if (Object.prototype.hasOwnProperty.call(source, key)) {
-          target[key] = source[key];
-        }
-      }
-    }
-
-    return target;
-  };
-
-  return _extends.apply(this, arguments);
-}
-
-module.exports = _extends;
 
 /***/ }),
 
@@ -4461,7 +4480,7 @@ __webpack_exports__["a"] = ({
 
 "use strict";
 __webpack_require__.d(__webpack_exports__, "a", function() { return DropdownEmojiSelector; });
-var _extends0__ = __webpack_require__(9);
+var _extends0__ = __webpack_require__(8);
 var _extends0 = __webpack_require__.n(_extends0__);
 var _stores_mixins_js1__ = __webpack_require__(1);
 
@@ -5143,6 +5162,10 @@ __webpack_require__.d(__webpack_exports__, "ConversationRightArea", function() {
 __webpack_require__.d(__webpack_exports__, "ConversationPanel", function() { return conversationpanel_ConversationPanel; });
 __webpack_require__.d(__webpack_exports__, "ConversationPanels", function() { return conversationpanel_ConversationPanels; });
 
+// EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/extends.js
+var helpers_extends = __webpack_require__(8);
+var extends_default = __webpack_require__.n(helpers_extends);
+
 // EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/applyDecoratedDescriptor.js
 var applyDecoratedDescriptor = __webpack_require__(7);
 var applyDecoratedDescriptor_default = __webpack_require__.n(applyDecoratedDescriptor);
@@ -5165,7 +5188,7 @@ var mixins = __webpack_require__(1);
 var ui_buttons = __webpack_require__(6);
 
 // EXTERNAL MODULE: ./js/ui/modalDialogs.jsx
-var modalDialogs = __webpack_require__(8);
+var modalDialogs = __webpack_require__(9);
 
 // EXTERNAL MODULE: ./js/ui/tooltips.jsx
 var tooltips = __webpack_require__(12);
@@ -8048,10 +8071,6 @@ participantsList_ParticipantsListInner.defaultProps = {
   'scrollHeight': 128,
   'chatRoom': undefined
 };
-
-// EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/extends.js
-var helpers_extends = __webpack_require__(9);
-var extends_default = __webpack_require__.n(helpers_extends);
 
 // EXTERNAL MODULE: ./js/chat/ui/messages/mixin.jsx
 var mixin = __webpack_require__(10);
@@ -12451,10 +12470,80 @@ class conversationaudiovideopanel_ConversationAVPanel extends mixins["MegaRender
 }
 
 
+// CONCATENATED MODULE: ./js/chat/ui/pushSettingsDialog.jsx
+
+
+
+
+class pushSettingsDialog_PushSettingsDialog extends mixins["MegaRenderMixin"] {
+  constructor(props) {
+    super(props);
+
+    this.renderOptions = () => {
+      return Object.keys(pushSettingsDialog_PushSettingsDialog.options).map(key => {
+        key = parseInt(key, 10) || Infinity;
+        return external_React_default.a.createElement("label", {
+          key: key,
+          className: "radio-txt"
+        }, pushSettingsDialog_PushSettingsDialog.options[key], external_React_default.a.createElement("div", {
+          className: "custom-radio small green-active " + (this.state.pushSettingsValue === key ? "radioOn" : "radioOff")
+        }, external_React_default.a.createElement("input", {
+          type: "radio",
+          name: "time-selector",
+          value: key,
+          checked: this.state.pushSettingsValue === key,
+          onChange: () => this.setState({
+            pushSettingsValue: key
+          })
+        })));
+      });
+    };
+
+    this.state = {
+      pushSettingsValue: this.props.pushSettingsValue || Infinity
+    };
+  }
+
+  render() {
+    return external_React_default.a.createElement(modalDialogs["a" ].ModalDialog, extends_default()({}, this.state, {
+      name: "push-settings",
+      title: l[16214],
+      className: "push-settings-dialog",
+      onClose: this.props.onClose
+    }), external_React_default.a.createElement("div", {
+      className: "fm-dialog-content"
+    }, external_React_default.a.createElement("div", {
+      className: "dialog secondary-header"
+    }, l[22015]), external_React_default.a.createElement("div", {
+      className: "fm-dialog-body"
+    }, this.renderOptions()), external_React_default.a.createElement("div", {
+      className: "buttons-block"
+    }, external_React_default.a.createElement("div", {
+      className: "default-green-button gradient right",
+      onClick: () => this.props.onConfirm(this.state.pushSettingsValue)
+    }, l[726]), external_React_default.a.createElement("div", {
+      className: "default-white-button right",
+      onClick: this.props.onClose
+    }, l[82]), external_React_default.a.createElement("div", {
+      className: "clear"
+    }))));
+  }
+
+}
+pushSettingsDialog_PushSettingsDialog.options = {
+  30: l[22012],
+  60: l[19048],
+  360: l[22013],
+  1440: l[22014],
+  Infinity: l[22011]
+};
+pushSettingsDialog_PushSettingsDialog.default = pushSettingsDialog_PushSettingsDialog.options[pushSettingsDialog_PushSettingsDialog.options.length - 1];
 // CONCATENATED MODULE: ./js/chat/ui/conversationpanel.jsx
 
 
+
 var conversationpanel_dec, conversationpanel_dec2, _dec3, _dec4, conversationpanel_class, conversationpanel_temp;
+
 
 
 
@@ -12679,6 +12768,29 @@ class conversationpanel_ConversationRightArea extends mixins["MegaRenderMixin"] 
       arrowHeight: -32,
       selectFooter: true
     }));
+    const {
+      pushSettingsValue,
+      onPushSettingsToggled,
+      onPushSettingsClicked
+    } = this.props;
+    const pushSettingsBtn = room.membersSetFromApi.members.hasOwnProperty(u_handle) && !anonymouschat && external_React_default.a.createElement("div", {
+      className: "push-settings"
+    }, external_React_default.a.createElement(ui_buttons["Button"], {
+      className: "link-button light push-settings-button",
+      icon: "small-icon colorized " + (pushSettingsValue || pushSettingsValue === 0 ? "muted" : "mute"),
+      label: l[16709],
+      secondLabel: (() => {
+        if (pushSettingsValue !== null && pushSettingsValue !== undefined) {
+          return pushSettingsValue === 0 ? pushSettingsDialog_PushSettingsDialog.options[Infinity] : l[23539].replace('%s', "<strong>\n                                        " + escapeHTML(unixtimeToTimeString(pushSettingsValue)) + "\n                                    </strong>");
+        }
+      })(),
+      secondLabelClass: "label--green",
+      toggle: {
+        enabled: !pushSettingsValue && pushSettingsValue !== 0,
+        onClick: () => !pushSettingsValue && pushSettingsValue !== 0 ? onPushSettingsClicked() : onPushSettingsToggled()
+      },
+      onClick: () => onPushSettingsClicked()
+    }));
     var expandedPanel = {};
 
     if (room.type === "group" || room.type === "public") {
@@ -12791,7 +12903,7 @@ class conversationpanel_ConversationRightArea extends mixins["MegaRenderMixin"] 
       onClick: () => {
         self.props.onAttachFromComputerClicked();
       }
-    }))), endCallButton, external_React_default.a.createElement("div", {
+    }))), AVseperator, pushSettingsBtn, pushSettingsBtn && AVseperator, endCallButton, external_React_default.a.createElement("div", {
       className: "link-button light " + (dontShowTruncateButton || !room.members.hasOwnProperty(u_handle) ? "disabled" : ""),
       onClick: e => {
         if ($(e.target).closest('.disabled').length > 0) {
@@ -12923,6 +13035,8 @@ let conversationpanel_ConversationPanel = (conversationpanel_dec = utils["defaul
       confirmDeleteDialog: false,
       pasteImageConfirmDialog: false,
       nonLoggedInJoinChatDialog: false,
+      pushSettingsDialog: false,
+      pushSettingsValue: null,
       messageToBeDeleted: null,
       editing: false
     };
@@ -13895,6 +14009,25 @@ let conversationpanel_ConversationPanel = (conversationpanel_dec = utils["defaul
       })));
     }
 
+    let pushSettingsDialog = null;
+
+    if (self.state.pushSettingsDialog === true) {
+      const state = {
+        pushSettingsDialog: false,
+        pushSettingsValue: null
+      };
+      pushSettingsDialog = external_React_default.a.createElement(pushSettingsDialog_PushSettingsDialog, {
+        room: room,
+        pushSettingsValue: this.state.pushSettingsValue,
+        onClose: () => this.setState(extends_default()({}, state, {
+          pushSettingsValue: this.state.pushSettingsValue
+        })),
+        onConfirm: pushSettingsValue => self.setState(extends_default()({}, state, {
+          pushSettingsValue
+        }), () => pushNotificationSettings.setDnd(room.chatId, pushSettingsValue === Infinity ? 0 : unixtime() + pushSettingsValue * 60))
+      });
+    }
+
     if (self.state.truncateDialog === true) {
       confirmDeleteDialog = external_React_default.a.createElement(modalDialogs["a" ].ConfirmDialog, {
         chatRoom: room,
@@ -14086,6 +14219,7 @@ let conversationpanel_ConversationPanel = (conversationpanel_dec = utils["defaul
       roomFlags: this.props.chatRoom.flags,
       members: this.props.chatRoom.membersSetFromApi,
       messagesBuff: room.messagesBuff,
+      pushSettingsValue: pushNotificationSettings.getDnd(this.props.chatRoom.chatId),
       onAttachFromComputerClicked: function () {
         self.uploadFromComputer();
       },
@@ -14137,6 +14271,16 @@ let conversationpanel_ConversationPanel = (conversationpanel_dec = utils["defaul
           'attachCloudDialog': true
         });
       },
+      onPushSettingsClicked: function () {
+        self.setState({
+          'pushSettingsDialog': true
+        });
+      },
+      onPushSettingsToggled: function () {
+        return room.dnd || room.dnd === 0 ? self.setState({
+          pushSettingsValue: null
+        }, () => pushNotificationSettings.disableDnd(room.chatId)) : pushNotificationSettings.setDnd(room.chatId, 0);
+      },
       onAddParticipantSelected: function (contactHashes) {
         self.props.chatRoom.scrolledToBottom = true;
 
@@ -14161,7 +14305,7 @@ let conversationpanel_ConversationPanel = (conversationpanel_dec = utils["defaul
           $('.js-messages-scroll-area', self.findDOMNode()).trigger('forceResize', [true]);
         });
       }
-    }) : null, privateChatDialog, chatLinkDialog, nonLoggedInJoinChatDialog, attachCloudDialog, sendContactDialog, confirmDeleteDialog, null, external_React_default.a.createElement("div", {
+    }) : null, privateChatDialog, chatLinkDialog, nonLoggedInJoinChatDialog, attachCloudDialog, sendContactDialog, confirmDeleteDialog, null, pushSettingsDialog, external_React_default.a.createElement("div", {
       className: "dropdown body dropdown-arrow down-arrow tooltip not-sent-notification hidden"
     }, external_React_default.a.createElement("i", {
       className: "dropdown-white-arrow"
@@ -14470,7 +14614,7 @@ function isStartCallDisabled(room) {
 __webpack_require__.r(__webpack_exports__);
 
 // EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/extends.js
-var helpers_extends = __webpack_require__(9);
+var helpers_extends = __webpack_require__(8);
 var extends_default = __webpack_require__.n(helpers_extends);
 
 // EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/applyDecoratedDescriptor.js
@@ -14489,7 +14633,7 @@ var buttons = __webpack_require__(6);
 // EXTERNAL MODULE: ./js/ui/dropdowns.jsx
 var dropdowns = __webpack_require__(2);
 
-// EXTERNAL MODULE: ./js/chat/ui/conversationpanel.jsx + 29 modules
+// EXTERNAL MODULE: ./js/chat/ui/conversationpanel.jsx + 30 modules
 var conversationpanel = __webpack_require__(17);
 
 // EXTERNAL MODULE: external "React"
@@ -15203,7 +15347,7 @@ class searchPanel_SearchPanel extends mixins["MegaRenderMixin"] {
 
 }
 // EXTERNAL MODULE: ./js/ui/modalDialogs.jsx
-var modalDialogs = __webpack_require__(8);
+var modalDialogs = __webpack_require__(9);
 
 // CONCATENATED MODULE: ./js/chat/ui/conversations.jsx
 
@@ -16667,9 +16811,30 @@ Chat.prototype.init = promisify(function (resolve, reject) {
     self.registerUploadListeners();
     self.trigger("onInit");
     mBroadcaster.sendMessage('chat_initialized');
+    setInterval(self._syncDnd.bind(self), 60000);
     return true;
   }).then(resolve).catch(reject);
 });
+
+Chat.prototype._syncDnd = function () {
+  const chats = this.chats;
+
+  if (chats && chats.length > 0) {
+    chats.forEach(({
+      chatId
+    }) => {
+      const dnd = pushNotificationSettings.getDnd(chatId);
+
+      if (dnd && dnd < unixtime()) {
+        if (this.logger) {
+          this.logger.debug("Chat.prototype._syncDnd chatId=" + chatId);
+        }
+
+        pushNotificationSettings.disableDnd(chatId);
+      }
+    });
+  }
+};
 
 Chat.prototype.loadChatUIFlagsFromConfig = function (val) {
   var self = this;
@@ -18684,7 +18849,9 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
     publicLink: null,
     archivedSelected: false,
     showArchived: false,
-    observers: 0
+    observers: 0,
+    dnd: null,
+    alwaysNotify: null
   });
   this.roomId = roomId;
   this.instanceIndex = ChatRoom.INSTANCE_INDEX++;
@@ -20457,7 +20624,7 @@ var miniui = ({
 var ui_contacts = __webpack_require__(3);
 
 // EXTERNAL MODULE: ./js/ui/modalDialogs.jsx
-var modalDialogs = __webpack_require__(8);
+var modalDialogs = __webpack_require__(9);
 
 // CONCATENATED MODULE: ./js/chat/ui/startGroupChatWizard.jsx
 var startGroupChatWizard_React = __webpack_require__(0);

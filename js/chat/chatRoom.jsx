@@ -50,7 +50,9 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
             publicLink: null,
             archivedSelected: false,
             showArchived: false,
-            observers: 0
+            observers: 0,
+            dnd: null,
+            alwaysNotify: null
         }
     );
 

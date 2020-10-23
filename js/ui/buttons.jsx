@@ -156,7 +156,7 @@ export class Button extends MegaRenderMixin {
     }
 
     render() {
-        const { className, disabled, style, icon, label } = this.props;
+        const { className, disabled, style, icon, label, toggle, secondLabel, secondLabelClass } = this.props;
 
         var extraAttrs = this.props.attrs;
         return (
@@ -172,6 +172,27 @@ export class Button extends MegaRenderMixin {
                 {...extraAttrs}>
                 {icon && <i className={`small-icon ${icon}`} />}
                 {label && <span>{label}</span>}
+                {secondLabel && (
+                    <span
+                        className={secondLabelClass ? secondLabelClass : ''}
+                        dangerouslySetInnerHTML={{ __html: this.props.secondLabel }} />
+                )}
+                {toggle && (
+                    <div
+                        className={`
+                            dialog-feature-toggle
+                            ${toggle.className ? toggle.className : ''}
+                            ${toggle.enabled ? 'toggle-on' : ''}
+                        `}
+                        onClick={(ev) => {
+                            ev.stopPropagation();
+                            if (this.props.toggle.onClick) {
+                                this.props.toggle.onClick();
+                            }
+                        }}>
+                        <div className="dialog-feature-switch" />
+                    </div>
+                )}
                 {this.renderChildren()}
             </div>
         );

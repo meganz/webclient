@@ -1972,6 +1972,7 @@ function topmenuUI() {
     var $menuPricingItem = $('.top-menu-item.pro', $topMenu);
     var $menuBackupItem = $('.top-menu-item.backup', $topMenu);
     var $menuAffiliateItem = $('.top-menu-item.affiliate', $topMenu);
+    var $menuFeedbackItem = $('.top-menu-item.feedback', $topMenu);
     var $menuUserinfo = $('.user-info', $menuLoggedBlock);
     var $menuUsername = $('.name', $menuUserinfo);
     var $menuAvatar = $('.avatar-block', $menuLoggedBlock);
@@ -2112,6 +2113,7 @@ function topmenuUI() {
         $menuLogoutButton.removeClass('hidden');
         $menuBackupItem.removeClass('hidden').next('.top-menu-divider').removeClass('hidden');
         $menuLoggedBlock.removeClass('hidden');
+        $menuFeedbackItem.removeClass('hidden');
 
         // for top menu, load avatar and show for logged in user
         useravatar.loadAvatar(u_handle).always(function(){

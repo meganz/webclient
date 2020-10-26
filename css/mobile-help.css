@@ -1556,8 +1556,9 @@
     border-top-right-radius: 6px;
     bottom: 0;
     box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.15);
-    margin-left: 324px;
-    padding-bottom: 40px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-bottom: 150px;
     padding-top: 10px;
     width: 700px;
     height: auto;
@@ -3117,7 +3118,6 @@
     }
     #help2-main .section-title {
         font-size: 32px;
-        line-height: 40;
         padding-top: 0;
     }
     #help2-main .support-article, #help2-main .d-section-container {
@@ -3180,11 +3180,11 @@
     }
     #help2-main .search-support-block {
         padding-top: 0px;
-        padding-left: 0px;
-        padding-right: 0px;
+        padding-left: 7.5%;
+        padding-right: 7.5%;
     }
     #help2-main .support-block-title {
-        margin: 48px 0px 20px;
+        margin: 48px 20px 20px;
     }
     #help2-main .search-support-block .support-block-subheading {
         margin-right: 0;
@@ -3278,7 +3278,7 @@
         padding-right: 0px;
     }
     #help2-main .support-block-title {
-        margin: 48px 0px 20px;
+        margin: 48px 20px 20px;
     }
     #help2-main .search-support-block .support-block-subheading {
         margin-right: 0;
@@ -3755,7 +3755,7 @@
         padding-right: 0px;
     }
     #help2-main .support-block-title {
-        margin: 48px 0px 20px;
+        margin: 48px 20px 20px;
     }
     #help2-main .search-support-block .support-block-subheading {
         margin-right: 0;
@@ -4739,7 +4739,7 @@
         padding-right: 0px;
     }
     #help2-main .support-block-title {
-        margin: 48px 0px 20px;
+        margin: 48px 20px 20px;
     }
     #help2-main .search-support-block .support-block-subheading {
         margin-right: 0;

@@ -1568,7 +1568,8 @@ function closeMsg() {
 }
 
 function dialogPositioning(s) {
-    $(s).css('margin-top', '-' + $(s).height() / 2 + 'px');
+    $(s).css('margin-left', '-' + $(s).outerWidth() / 2 + 'px');
+    $(s).css('margin-top', '-' + $(s).outerHeight() / 2 + 'px');
 }
 
 /**

@@ -722,15 +722,72 @@ body.de .fm-dialog.new-group-chat {
 /* End of confirm truncate dialog */
 
 /* Limited available bandwidth dialog */
-.fm-dialog.limited-bandwidth-dialog {
-    width: 724px;
-    margin: -323px 0 0 -362px;
+.fm-dialog.limited-bandwidth-dialog:not(.pro) {
+    width: 1200px;
+    max-width: calc(100% - 40px);
+    max-height: calc(100% - 40px);
+    min-width: 700px;
+    overflow: hidden;
 }
-.fm-dialog.limited-bandwidth-dialog.achievements {
-    margin-top: -348px;
+.limited-bandwidth-dialog .centered-content {
+    height: 100%;
+    padding: 40px 40px 40px 40px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
 }
-.fm-dialog.limited-bandwidth-dialog.hidden-bottom, .logged .fm-dialog.limited-bandwidth-dialog:not(.achievements) {
-    margin-top: -271px;
+.limited-bandwidth-dialog .radio-txt {
+    color: #666;
+    padding-top: 19px;
+}
+.limited-bandwidth-dialog .pricing-page.radio-buttons {
+    margin: 0 12px 14px 0;
+    display: block;
+    height: 28px;
+    float: right;
+}
+.limited-bandwidth-dialog .pricing-page.local-currency-tip {
+    font-size: 14px;
+}
+.exceeded .pricing-page.local-currency-tip {
+    padding-bottom: 12px;
+}
+.limited-bandwidth-dialog hr {
+    margin: 0 12px -1px 0;
+    border: 1px solid #D5D5D5;
+    border-width: 1px 0 0 0;
+    padding: 0;
+    position: relative;
+    width: 100%;
+    z-index: 1;
+}
+.dialog-scroll-overlay {
+    border: 0;
+    position: absolute;
+    left: 0;
+    width: 100%;
+    margin: -12px 0 0 0;
+    height: 12px;
+    background: linear-gradient(to bottom, rgba(255,255,255,0) 0%,rgba(255,255,255,1) 100%);
+}
+.exceeded:not(.local-currency) .dialog-scroll-overlay {
+    display: none;
+}
+.limited-bandwidth-dialog .dialog-cards {
+    margin: 0 -12px 0 0;
+    overflow: auto;
+}
+.limited-bandwidth-dialog .scrollable {
+    overflow: scroll;
+    -webkit-overflow-scrolling: touch;
+    padding: 0 12px 0 0;
+    position: relative;
+    box-sizing: border-box;
+    height: 100%;
+}
+.limited-bandwidth-dialog .pricing-page.plans-block {
+    border-top: 0;
+    max-width: none;
 }
 .limited-bandwidth-dialog .registered, .limited-bandwidth-dialog.registered .not-registered, .limited-bandwidth-dialog .dialog.big-buttons-block .get-more-bonuses {
     display: none;
@@ -750,19 +807,17 @@ body.de .fm-dialog.new-group-chat {
 .dialog.header-before-icon {
     font-size: 20px;
     line-height: 25px;
-    color: #666666;
-    padding: 12px 0 8px 0;
+    color: #333;
+    padding: 2px 0 8px 0;
+    font-family: 'montserrat', Arial;
 }
 .dialog.p-after-icon {
     font-size: 14px;
-    line-height: 24px;
+    line-height: 21px;
     color: #666666;
-    padding: 5px 0 0 0;
-    margin: 0 auto;
-    max-width: 504px;
-}
-.dialog.p-after-icon.msg-prewarning {
-    max-width: 616px;
+    padding: 5px 0 16px 0;
+    margin: 0;
+    box-sizing: border-box;
 }
 .dialog.big-buttons-block {
     font-size: 0;
@@ -776,16 +831,18 @@ body.de .fm-dialog.new-group-chat {
 .fm-dialog-body .centered-checkbox {
     padding: 2px 0 10px 0;
 }
+.fm-dialog-body .centered-checkbox:empty {
+    padding: 0;
+}
 .dialog.bottom-tips {
     font-size: 12px;
     line-height: 15px;
-    color: #999999;
+    color: #666;
     text-align: center;
-    padding: 0 0 0 0;
+    margin: 25px 0 -15px 0;
 }
 .dialog.bottom-tips span {
     display: block;
-    padding: 2px 0 5px 0;
 }
 .fm-dialog:not(.exceeded) .dialog.bottom-tips span {
     display: inline-block;
@@ -794,127 +851,6 @@ body.de .fm-dialog.new-group-chat {
     color: #FF333A;
     cursor: pointer;
     display: inline-block;
-    margin-bottom: 12px;
-}
-.fm-dialog:not(.exceeded) .reg-st3-membership-bl {
-    width: 178px;
-    margin-left: -7px;
-    display: inline-block;
-    position: relative;
-    float: none;
-}
-.fm-dialog:not(.exceeded) .dialog.transfer-plans {
-    padding: 4px 0 6px 0;
-    font-size: 0;
-    margin: 0;
-}
-.fm-dialog:not(.exceeded) .membership-gray-block {
-    background: none;
-    border-bottom: 0;
-}
-.fm-dialog:not(.exceeded) .pro-plan-descr {
-    position: absolute;
-    min-width: 169px;
-    bottom: 156px;
-    left: 50%;
-    -webkit-transform: translateX(-50%);
-    -ms-transform: translateX(-50%);
-    transform: translateX(-50%);
-    background-color: white;
-    -webkit-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
-    -moz-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
-    box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
-    -moz-border-radius: 6px;
-    -webkit-border-radius: 6px;
-    border-radius: 6px;
-    white-space: nowrap;
-    z-index: 10;
-    visibility: hidden;
-    -webkit-transition: all 100ms ease-in-out;
-    -moz-transition: all 100ms ease-in-out;
-    -o-transition: all 100ms ease-in-out;
-    -ms-transition: all 100ms ease-in-out;
-    transition: all 100ms ease-in-out;
-    filter:progid:DXImageTransform.Microsoft.Alpha(opacity=0);
-    -moz-opacity: 0;
-    -khtml-opacity: 0;
-    opacity: 0;
-}
-.fm-dialog:not(.exceeded) .pro-plan-descr::before {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    left: 0;
-    top: 0;
-    -webkit-box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.05);
-    -moz-box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.05);
-    box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.05);
-    content: '';
-    display: block;
-    -moz-border-radius: 6px;
-    -webkit-border-radius: 6px;
-    border-radius: 6px;
-}
-.fm-dialog:not(.exceeded) .pro-plan-descr::after {
-    content: '';
-    display: block;
-    background-image: url(../images/mega/top-login-sprite_v11.png);
-    background-repeat: no-repeat;
-    background-position: -24px -2256px;
-    position: absolute;
-    left: 50%;
-    margin-left: -12px;
-    bottom: -11px;
-    width: 24px;
-    height: 11px;
-    z-index: 123;
-}
-.fm-dialog:not(.exceeded) .membership-pad-bl:hover .pro-plan-descr {
-    visibility: visible;
-    bottom: 161px;
-    filter:progid:DXImageTransform.Microsoft.Alpha(opacity=100);
-    -moz-opacity: 1;
-    -khtml-opacity: 1;
-    opacity: 1;
-}
-.fm-dialog:not(.exceeded) .reg-st3-bandwidth {
-    padding: 1px 16px 14px 16px;
-}
-.fm-dialog:not(.exceeded) .reg-st3-storage {
-    padding: 19px 16px 14px 16px;
-}
-.fm-dialog:not(.exceeded) .reg-st3-big-txt {
-    display: inline-block;
-    padding-left: 36px;
-}
-.fm-dialog:not(.exceeded) .reg-st3-mid-txt {
-    display: inline-block;
-    padding-left: 5px;
-}
-.fm-dialog:not(.exceeded) .pro-feature-icon {
-    width: 26px;
-    height: 26px;
-    margin-top: -4px;
-    background-position: -59px -1443px;
-}
-.fm-dialog:not(.exceeded) .pro-feature-icon.bandwidth {
-    background-position: -59px -1481px;
-}
-.fm-dialog:not(.exceeded) .dialog.transfer-overquota-txt {
-    display: none;
-}
-.fm-dialog:not(.exceeded) .reg-st3-bott-title {
-    padding-bottom: 14px;
-
-}
-.limited-bandwidth-dialog:not(.exceeded) .centered-content {
-    background: rgb(255,255,255);
-    background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2ZmZmZmZiIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNmNWY1ZjUiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
-    background: -moz-linear-gradient(top, rgba(255,255,255,1) 0%, rgba(245,245,245,1) 100%);
-    background: -webkit-linear-gradient(top, rgba(255,255,255,1) 0%, rgba(245,245,245,1) 100%);
-    background: linear-gradient(to bottom, rgba(255,255,255,1) 0%, rgba(245,245,245,1) 100%);
-    border-top-left-radius: inherit;
-    border-top-right-radius: inherit;
 }
 .dialog.limited-bottom {
     padding: 0 0 0 0;
@@ -922,54 +858,57 @@ body.de .fm-dialog.new-group-chat {
 }
 .dialog.limited-bottom .download.big-button {
     min-width: 100px;
-    margin: 6px 0 -3px 0;
+    margin: 40px 0 -3px 0;
+}
+.local-currency .dialog.limited-bottom .download.big-button {
+    margin-top: 20px;
+}
+@media only screen and (max-height: 768px) {
+    .limited-bandwidth-dialog .pricing-page.plan-button {
+        margin: 12px 0 20px 0;
+    }
+    .limited-bandwidth-dialog .plans-row .pricing-page.plan-info {
+        padding-bottom: 194px;
+    }
+    .limited-bandwidth-dialog .pricing-page.plan-info {
+        font-size: 14px;
+        line-height: 21px;
+    }
+    .limited-bandwidth-dialog .pricing-page.plan-label {
+        margin-bottom: 10px;
+    }
+    .dialog.p-after-icon,
+    .dialog.transfer-overquota-txt {
+        padding-bottom: 8px;
+    }
 }
 /* End of Limited available bandwidth dialog */
 
 /* Transfer quota exceeded dialog */
-.fm-dialog.limited-bandwidth-dialog.exceeded:not(.pro) {
-    width: 964px;
-    margin: -358px 0 0 -482px;
-}
-.logged .fm-dialog.limited-bandwidth-dialog.exceeded:not(.pro):not(.achievements), .hidden-bottom.fm-dialog.limited-bandwidth-dialog.exceeded {
-    margin-top: -321px;
-}
-.fm-dialog.limited-bandwidth-dialog.exceeded.pro.slider {
-    margin-top: -282px;
-}
-.limited-bandwidth-dialog .plan-blocks, .exceeded:not(.pro) .limited-bl, .big-104px-icon.full, .exceeded .semi-huge-icon.almost-full, .dialog.header-before-icon.exceeded, .exceeded .dialog.header-before-icon.limited, .limited-bandwidth-dialog .fm-dialog-close, .default-big-button.upgrade.pro, .exceeded.pro .default-big-button.upgrade, .exceeded.pro .default-big-button.continue, .exceeded.pro .dialog.p-after-icon, .dialog.pro-exceeded-bl, .dialog.ransfer-slider, .dialog.pro-exceeded-slider, .semi-huge-icon.speedometer.full {
+.limited-bandwidth-dialog .step1-block, .exceeded:not(.pro) .limited-bl, .big-104px-icon.full, .exceeded .semi-huge-icon.almost-full, .dialog.header-before-icon.exceeded, .exceeded .dialog.header-before-icon.limited, .limited-bandwidth-dialog .fm-dialog-close, .default-big-button.upgrade.pro, .exceeded.pro .default-big-button.upgrade, .exceeded.pro .default-big-button.continue, .exceeded.pro .dialog.p-after-icon, .dialog.pro-exceeded-bl, .dialog.ransfer-slider, .dialog.pro-exceeded-slider, .semi-huge-icon.speedometer.full {
     display: none;
 }
-.fm-dialog:not(.exceeded) .dialog.limited-bottom, .fm-dialog:not(.exceeded) .plan-blocks , .exceeded:not(.pro) .plan-blocks, .exceeded .dialog.header-before-icon.exceeded, .exceeded:not(.pro) .fm-dialog-close, .pro.exceeded .dialog.pro-exceeded-bl, .slider .dialog.pro-exceeded-slider {
+.fm-dialog:not(.exceeded) .dialog.limited-bottom, .fm-dialog:not(.exceeded) .step1-block , .exceeded:not(.pro) .step1-block, .exceeded .dialog.header-before-icon.exceeded, .exceeded:not(.pro) .fm-dialog-close, .pro.exceeded .dialog.pro-exceeded-bl, .slider .dialog.pro-exceeded-slider {
     display: block;
 }
 .exceeded:not(.pro) .semi-huge-iconspeedometer, .exceeded:not(.pro) .dialog.bottom-tips span, .exceeded.pro .default-big-button.upgrade.pro, .logged .exceeded:not(.pro):not(.achievements) .big-104px-icon.full, .logged .exceeded.achievements:not(.pro) .semi-huge-icon.speedometer.full, .not-logged .exceeded:not(.pro) .semi-huge-icon.speedometer.full {
     display: inline-block;
 }
-.limited-bandwidth-dialog:not(.exceeded) .centered-content, .not-logged .limited-bandwidth-dialog.exceeded:not(.pro):not(.hidden-bottom) .centered-content, .logged .limited-bandwidth-dialog.exceeded.achievements:not(.pro):not(.hidden-bottom) .centered-content {
-    background: rgb(255,255,255);
-    background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2ZmZmZmZiIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNmNWY1ZjUiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
-    background: -moz-linear-gradient(top, rgba(255,255,255,1) 0%, rgba(245,245,245,1) 100%);
-    background: -webkit-linear-gradient(top, rgba(255,255,255,1) 0%, rgba(245,245,245,1) 100%);
-    background: linear-gradient(to bottom, rgba(255,255,255,1) 0%, rgba(245,245,245,1) 100%);
-    border-top-left-radius: inherit;
-    border-top-right-radius: inherit;
-}
-.limited-bandwidth-dialog.hidden-bottom .centered-content, .logged .limited-bandwidth-dialog:not(.exceeded):not(.achievements) .centered-content  {
-    border-bottom-left-radius: inherit;
-    border-bottom-right-radius: inherit;
-}
 .dialog.transfer-overquota-txt {
     font-size: 14px;
-    line-height: 25px;
+    line-height: 21px;
     color: #666666;
-    padding: 8px 0 22px 0;
+    margin: 0 0 16px;
+    box-sizing: border-box;
 }
 .dialog.transfer-overquota-txt span {
     font-size: 20px;
     color: #333333;
     border-bottom: 2px solid #FF333A;
     padding: 0 2px;
+}
+.fm-dialog:not(.exceeded) .dialog.transfer-overquota-txt {
+    display: none;
 }
 .dialog.overquota-bottom-bl {
     display: none;
@@ -1040,13 +979,11 @@ body.de .fm-dialog.new-group-chat {
 }
 .dialog.transfer-overquota-txt span.countdown {
     margin: 0 5px;
+    vertical-align: top;
 }
 .dialog.transfer-overquota-txt span span {
     color: #777777;
     border: 0;
-}
-.exceeded:not(.pro) .dialog.p-after-icon {
-    max-width: none;
 }
 .dialog.transfer-plans {
     padding: 8px 0 0 0;
@@ -1123,6 +1060,7 @@ body.de .fm-dialog.new-group-chat {
     background-color: #D90007;
 }
 .fm-dialog.limited-bandwidth-dialog.pro.exceeded {
+    width: 724px;
     margin-top: -210px;
 }
 .dialog-slider-txt {
@@ -1175,18 +1113,6 @@ body.de .fm-dialog.new-group-chat {
 }
 .fm-dialog.exceeded.pro.slider .checkboxOff, .fm-dialog.exceeded.pro.slider .checkboxOn {
     margin-top: 10px;
-}
-
-.fm-dialog.limited-bandwidth-dialog .storage-icon {
-    display: none;
-}
-
-.fm-dialog.limited-bandwidth-dialog.uploads .dialog-top-icon {
-    display: none !important;
-}
-
-.fm-dialog.limited-bandwidth-dialog.uploads .storage-icon {
-    display: inline-block;
 }
 
 .fm-dialog.exceeded.uploads .transfer-overquota-txt,
@@ -3252,7 +3178,7 @@ li.token-input-token-invite .input-close {
     left: 2px;
     top: 0;
     position: absolute;
-    background-image: url(../images/mega/icons-sprite_v39.png);
+    background-image: url(../images/mega/icons-sprite_v40.png);
     background-position: -6px -743px;
 }
 .fm-versioning.scroll-bl {
@@ -4292,6 +4218,9 @@ li.token-input-token-invite .input-close {
     padding-bottom: 40px;
     text-align: center;
 }
+.voucher-info-redeem .dialog-title {
+    padding: 0 40px;
+}
 .voucher-info-redeem .voucher-logo {
     width: 370px;
     height: 100px;
@@ -4319,7 +4248,7 @@ li.token-input-token-invite .input-close {
     background-color: rgba(0,0,0,0.1);
     text-align: center;
 }
-.voucher-info-redeem .voucher-logo .voucher-head .v-header-text{
+.voucher-info-redeem .voucher-logo .voucher-head .v-header-text {
     height: 24px;
     color: #FFFFFF;
     font-size: 18px;
@@ -4329,9 +4258,6 @@ li.token-input-token-invite .input-close {
     padding-bottom: 6px;
 }
 .voucher-logo .plan-icon {
-    background-position: -0px -1620px;
-    height: 32px;
-    width: 32px;
     left: unset;
     top: unset;
     margin: initial;
@@ -4339,23 +4265,6 @@ li.token-input-token-invite .input-close {
     margin-left: 14px;
     position: relative;
     display: inline-block;
-}
-.voucher-logo .plan-icon.pro1 {
-    background-position: -0px -1670px;
-}
-.voucher-logo .plan-icon.pro2 {
-    background-position: -0px -1720px;
-}
-.voucher-logo .plan-icon.pro3 {
-    background-position: -0px -1770px;
-}
-.voucher-logo .plan-icon.pro4 {
-    background-position: -0px -1620px;
-}
-.voucher-logo .plan-icon.pro100 {
-    background-image: url(../images/mega/business-p-32.png) !important;
-    background-size: 32px auto;
-    background-position: unset;
 }
 .voucher-logo .v-separator {
     height: 32px;
@@ -4370,26 +4279,20 @@ li.token-input-token-invite .input-close {
     width: 135px;
     display: inline-block;
     text-align: center;
-}
-.voucher-logo .plan-info .size-head{
-	height: 21px;
-	color: #FFFFFF;
-	font-size: 17px;
-	line-height: 21px;
-	text-align: center;
-}
-body.ru .voucher-logo .plan-info .size-head {
-    font-size: 12px;
-}
-.voucher-logo .plan-info .size-bottom {
-    height: 15px;
-    color: #FFFFFF;
-    font-size: 12px;
+    font-family: 'LatoWeb', Arial;
+    font-size: 10px;
     line-height: 15px;
+    color: #FFFFFF;
     text-transform: uppercase;
 }
-.voucher-logo .plan-info .size-bottom {
-    font-size: 10px;
+.voucher-logo .plan-info span {
+	height: 21px;
+	font-size: 17px;
+	line-height: 21px;
+    display: block;
+}
+body.ru .voucher-logo.business-v .plan-info span {
+    font-size: 12px;
 }
 .payment-reminder-logo {
     background-position: -20px -969px;
@@ -5066,14 +4969,6 @@ body .hidden-bar + .register-side-pane.container {
 }
 .loginrequired-dialog .fm-notification-body {
     padding: 0 20px 16px 20px;
-}
-.loginrequired-dialog .fm-notification-icon {
-    width: 70px;
-    height: 70px;
-    background-image: url(../images/mega/startpage-sprite_v11.png);
-    background-position: center -210px;
-    background-repeat: no-repeat;
-    margin: 4px 16px 0 0px;
 }
 /* login dialog */
 .pro-login-dialog {
@@ -6274,6 +6169,33 @@ a.affiliate-guide.grey-link:hover {
     background-repeat: repeat-x;
 }
 /* end of  Affiliate redemtion request dialog */
+
+/* Push notification settings dialog */
+.fm-dialog.push-settings-dialog {
+    width: 360px;
+    font-family: 'LatoWeb', Arial;
+}
+.fm-dialog.push-settings-dialog .radio-txt {
+    cursor: pointer;
+    position: relative;
+    display: block;
+    padding-top: 5px;
+    padding-left: 30px;
+    padding: 5px 0 11px 36px;
+    font-size: 16px;
+    color: #333;
+    float: none;
+}
+.fm-dialog.push-settings-dialog .custom-radio {
+    left: 6px;
+    top: 6px;
+    position: absolute;
+    margin: 0;
+}
+.fm-dialog.push-settings-dialog .buttons-block {
+    padding: 0 16px 16px 16px;
+}
+/* End of Push notification settings dialog */
 
 
 /* File folder picker dialog (upload, share etc)*/
@@ -8314,3 +8236,4 @@ a.affiliate-guide.grey-link:hover {
     font-size: 14px;
 }
 /* end of Set password dialog*/
+

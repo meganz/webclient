@@ -49,6 +49,11 @@ var Help = (function() {
         });
     }
 
+    function safeUserInput(data) {
+        'use strict';
+        return mURIDecode(String(data || '').replace(/\+/g, ' ')).replace(/[\s"'+/<>-]+/g, ' ').trim();
+    }
+
     function searchAnimations() {
         var topPos = 0;
         var $container = $('#help2-main');
@@ -212,8 +217,8 @@ var Help = (function() {
         $container.find('form').rebind('submit', function(e) {
             e.preventDefault();
 
-            var searchVal = $('input[type="text"]', $(this)).val();
-            if (searchVal !== "") {
+            var searchVal = safeUserInput($('input[type="text"]', $(this)).val());
+            if (searchVal) {
                 // Log search submitted
                 api_req({ a: 'log', e: 99619, m: 'Help2 regular search feature used' });
                 loadSubPage(url('search', searchVal));
@@ -448,15 +453,14 @@ var Help = (function() {
 
     var urls = {
         'search': function(args) {
-            var searchTerm = mURIDecode(String(args[1] ? args[1] : "").replace(/\+/g, ' '));
-            var sText = searchTerm.replace(/[+-]/g, ' ');
-            var search = sText.replace(/%([\da-f]+)/g, function(all, number) {
-                return String.fromCharCode(parseInt(number, 16));
-            });
-            var words = search.split(lang === 'ct' || lang === 'jp' ? '' : /\s+/)
+            var searchTerm = safeUserInput(args.slice(1).join('/'))
+                .replace(/%([\da-f]+)/g, function(all, number) {
+                    return String.fromCharCode(parseInt(number, 16));
+                });
+            var words = searchTerm.split(lang === 'ct' || lang === 'jp' ? '' : /\s+/)
                 .filter(String)
                 .map(function(pattern) {
-                    return new RegExp(pattern, 'i');
+                    return new RegExp(RegExpEscape(pattern), 'i');
                 });
 
             var articles = idx.all.filter(function(doc) {
@@ -465,13 +469,18 @@ var Help = (function() {
                 }).length === words.length;
             });
 
+            // cleanup any bogus data entered by the user..
+            page = 'help/search/' + searchTerm;
+            pushHistoryState(true, page.replace(/\s+/g, '+'));
+
+            M.v.length = articles.length;
             parsepage(Data.help_search_tpl.html);
 
             if (words.length === 0) {
                 articles = [];
             }
 
-            $('#help2-main .search').val(sText);
+            $('#help2-main .search').val(searchTerm);
             if (articles.length === 0) {
                 $('.search-404-block').show();
                 $('.main-search-pad,.sidebar-menu-container').hide();

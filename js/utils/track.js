@@ -3,25 +3,26 @@ lazy(self, 'trk', function() {
     'use strict';
     const queue = [];
     const storage = localStorage;
+    const nav = Object.create(null);
     const apipath = storage.bap || window.apipath;
     const parse = tryCatch(JSON.parse.bind(JSON));
     const stringify = tryCatch(JSON.stringify.bind(JSON));
     const encode = tryCatch(s => base64urlencode(to8(s)));
     const res = tryCatch(() => screen.width + 'x' + screen.height);
-    const ref = tryCatch(() => new URL(document.referrer).host, false);
+    const ref = tryCatch(() => new URL(document.referrer).origin, false);
     const utm = storage.utm && parse(storage.utm) || {};
     let disabled = !storage.trk && (!is_livesite || window.buildOlderThan10Days || !mega.flags.sra);
-    let pvId;
 
     const send = async(data) => {
         // @notice Dear user, don't hesitate to disable sendBeacon in your browser if you feel concerned about this.
         if (typeof navigator.sendBeacon !== 'function') {
             return EACCESS;
         }
+        const s = stringify([data]);
         if (d) {
-            console.warn('beacon', data);
+            console.warn('beacon', data, s.length);
         }
-        return navigator.sendBeacon(apipath + 'cs?id=0&utm=1' + mega.urlParams(), stringify([data]));
+        return navigator.sendBeacon(apipath + 'cs?id=0&utm=1&sid=' + (storage.sid || 0) + mega.urlParams(), s);
     };
 
     const save = async() => {
@@ -33,7 +34,7 @@ lazy(self, 'trk', function() {
 
     const dsp = async() => {
         delay.cancel('trk:dsp');
-        if (!queue.length) {
+        if (!queue.length || navigator.onLine === false) {
             return null;
         }
 
@@ -90,31 +91,46 @@ lazy(self, 'trk', function() {
             res[k] = v > 0 ? v : res[k];
         };
 
+        add('gt_ms', window.pageLoadTime);
         add('pf_net', ptm.connectEnd - ptm.fetchStart);
         add('pf_tfr', ptm.responseEnd - ptm.responseStart);
         add('pf_dm1', ptm.domInteractive - ptm.domLoading);
         add('pf_dm2', ptm.domComplete - ptm.domInteractive);
         add('pf_srv', ptm.responseStart - ptm.requestStart);
-        add('pf_onl', window.pageLoadTime || ptm.loadEventEnd - ptm.loadEventStart);
+        add('pf_onl', ptm.loadEventEnd - ptm.loadEventStart);
 
         return res;
     };
 
-    const uri = (page) => {
-        const map = {'download': 'file', '!': 'embed'};
-        const uri = /^(fm|file|folder|chat|embed|download|!)\b/.test(page) && RegExp.$1;
+    const gClickHandler = async(ev) => {
+        const t = ev.target || false;
 
-        console.assert(pvId);
-        return String(map[uri] || page).replace(/[^\d/_a-z-].*$/, '~');
+        if (M.chat) {
+            return;
+        }
+        let a = t;
+        while (a && a.nodeName !== 'A') {
+            a = a.parentNode;
+        }
+
+        if (a && a.target === '_blank') {
+            let link = a.origin === getBaseUrl() && String(a.href || '').split('#')[0] || a.origin;
+            if (link) {
+                console.assert(nav.pv);
+                await trk(nav.pv, {link: link});
+            }
+        }
     };
 
     const disable = async(reason) => {
         delete window.trk;
         delete storage.utm; // <- SHOULD? @todo
         window.trk = () => Promise.resolve(EACCESS);
-        window.removeEventListener("pagehide", dsp);
-        window.removeEventListener("beforeunload", dsp);
+        window.removeEventListener('online', dsp);
+        window.removeEventListener('pagehide', dsp);
+        window.removeEventListener('beforeunload', dsp);
         window.removeEventListener('visibilitychange', dsp);
+        window.removeEventListener('click', gClickHandler, true);
         if (d) {
             console.warn('trk.disabled', reason);
         }
@@ -122,14 +138,25 @@ lazy(self, 'trk', function() {
         return EACCESS;
     };
 
+    const uri = (page) => {
+        const map = {'download': 'file', '!': 'embed'};
+        const uri = /^(fm|file|folder|chat|embed|download|!)\b/.test(page) && RegExp.$1;
+
+        console.assert(nav.id);
+        return String(map[uri] || uri || page).replace(/[^\d/_a-z-].*$/, '~');
+    };
+
     const enqueue = async(action, data) => {
-        const ts = unixtime();
+        let ca = 1;
+        const now = new Date();
+        const ts = Math.round(now.getTime() / 1e3);
 
         if (!utm.cid) {
             const cid = await sra().catch(echo);
             if (typeof cid !== 'string' || cid.length !== 16) {
                 return disable(cid);
             }
+            onIdle(dsp);
             utm.fts = ts;
             utm.cid = cid;
         }
@@ -139,20 +166,43 @@ lazy(self, 'trk', function() {
             action = undefined;
         }
         else if (action.startsWith('nav')) {
-            if (!pvId) {
+            if (!nav.id) {
                 data = Object.assign({}, data, await pf().catch(nop));
             }
-            pvId = Math.random().toString(28).slice(-6);
+
+            if (nav.pv !== action) {
+                nav.pv = action;
+                nav.id = Math.random().toString(28).slice(-6);
+            }
+            ca = 0;
         }
 
-        queue.push([ts, action, data, utm.lts, uri(page), pvId]);
+        data = Object.assign({
+            h: now.getHours(),
+            m: now.getMinutes(),
+            s: now.getSeconds(),
+            lang: mega.intl.locale
+        }, data);
+
+        if (data.ec_id) {
+            data.idgoal = 0;
+            data._ects = utm.ets;
+            utm.ets = ts;
+        }
+        if (ca) {
+            data.ca = ca;
+        }
+
+        queue.push([ts, action, data, utm.lts, uri(page), nav.id]);
         delay('trk:dsp', dsp, 2e4);
         return save();
     };
 
-    window.addEventListener("pagehide", dsp);
-    window.addEventListener("beforeunload", dsp);
+    window.addEventListener('online', dsp);
+    window.addEventListener('pagehide', dsp);
+    window.addEventListener('beforeunload', dsp);
     window.addEventListener('visibilitychange', dsp);
+    window.addEventListener('click', gClickHandler, true);
 
     return async(action, data) => {
         return disabled ? EACCESS : enqueue(action, data);
@@ -231,7 +281,11 @@ lazy(self, 'trk', function() {
     };
 
     const siteSearchData = (term, section, count) => {
-        const res = {search: Array(1 + term.length).join('a'), search_cat: filter(section), search_count: count | 0};
+        if (section !== 'help') {
+            // anonymize search term/keyword
+            term = Array(1 + term.length).join('a');
+        }
+        const res = {search: filter(term), search_cat: filter(section), search_count: count | 0};
         if (d) {
             log(res);
         }
@@ -273,8 +327,8 @@ lazy(self, 'trk', function() {
         })();
 
         let data = {};
-        if (sections[0] === 'cloud-drive' && sections[1] === 'search') {
-            data = siteSearchData(sections[2], sections[0], M.v.length);
+        if ((sections[0] === 'cloud-drive' || sections[0] === 'help') && sections[1] === 'search') {
+            data = sections[2] && siteSearchData(sections[2], sections[0], M.v.length) || data;
             sections = sections.slice(0, 2);
         }
 
@@ -341,14 +395,36 @@ lazy(self, 'trk', function() {
         }
     };
 
+    const onSiteEvent = async(category, action, name, value) => {
+        if (d) {
+            log('event', category, action, name, value);
+        }
+
+        if (category === 'download' && action === 'completed' && page === category) {
+            await trk({download: getBaseUrl() + '/file/' + dlpage_ph});
+        }
+        trk({
+            e_c: filter(category),
+            e_a: filter(action),
+            e_n: filter(name) || undefined,
+            e_v: parseFloat(value) || undefined
+        });
+    };
+
+    const onSiteSearch = (term, section, count) => {
+        trk(siteSearchData(term, section, count)).then(shutdown).catch(dump);
+    };
+
     const onTreeSearch = (term, section, count) => {
         if (count === undefined) {
             const tsp = '.content-panel.active :not(.tree-item-on-search-hidden) > .nw-fm-tree-item.ui-draggable';
             count = document.querySelectorAll(tsp).length;
         }
-        trk(siteSearchData(term, 'ts:' + section, count)).then(shutdown).catch(dump);
+        onSiteSearch(term, 'ts:' + section, count);
     };
 
+    bev.push(mBroadcaster.addListener('trk:event', onSiteEvent));
+    bev.push(mBroadcaster.addListener('sitesearch', SoonFc(40, onSiteSearch)));
     bev.push(mBroadcaster.addListener('treesearch', SoonFc(60, onTreeSearch)));
     bev.push(mBroadcaster.addListener('pagechange', SoonFc(80, onPageChange)));
     bev.push(mBroadcaster.addListener('pagemetadata', tryCatch(onPageMetaData)));

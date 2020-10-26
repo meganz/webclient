@@ -81,7 +81,10 @@ var ChatNotifications = function(megaChat, options) {
                             !mega.active
                         );
 
-                        if (message.source === Message.SOURCE.CHATD) {
+                        if (
+                            pushNotificationSettings.isAllowedForChatId(megaRoom.chatId) &&
+                            message.source === Message.SOURCE.CHATD
+                        ) {
                             n = self.notifications.notify(
                                 'incoming-chat-message',
                                 {
@@ -115,6 +118,10 @@ var ChatNotifications = function(megaChat, options) {
                         if (message.type === "incoming-call") {
                             return; // already caught by the onIncomingCall...
                         }
+                        if (!pushNotificationSettings.isAllowedForChatId(megaRoom.chatId)) {
+                            return;
+                        }
+
                         n = self.notifications.notify(
                             'alert-info-message',
                             {
@@ -162,6 +169,10 @@ var ChatNotifications = function(megaChat, options) {
                     onIdle(resetChatNotificationCounters);
                 })
                 .rebind('onCallRequestSent.chatNotifications', function(e, callManagerCall, mediaOptions) {
+                    if (!pushNotificationSettings.isAllowedForChatId(megaRoom.chatId)) {
+                        return;
+                    }
+
                     var sid = callManagerCall.id;
                     var n = self.notifications.notify(
                         'outgoing-call',
@@ -211,6 +222,10 @@ var ChatNotifications = function(megaChat, options) {
                         title = room.getRoomTitle();
                     }
 
+                    if (!pushNotificationSettings.isAllowedForChatId(room.chatId)) {
+                        return;
+                    }
+
                     var n = self.notifications.notify(
                         'call-terminated',
                         {
@@ -247,6 +262,10 @@ var ChatNotifications = function(megaChat, options) {
              callManagerCall,
              dialogMessage
         ) {
+
+            if (!pushNotificationSettings.isAllowedForChatId(room.chatId)) {
+                return;
+            }
 
             var n = self.notifications.notify(
                 'incoming-voice-video-call',

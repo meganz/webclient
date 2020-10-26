@@ -796,7 +796,7 @@ mBroadcaster.once('boot_done', function populate_l() {
         '</a>');
     l[1148] = l[1148].replace('[A]', '<span class="red">').replace('[/A]', '</span>');
     l[6978] = l[6978].replace('[A]', '<span class="red">').replace('[/A]', '</span>');
-    l[1151] = l[1151].replace('[A]', '<span class="red">').replace('[/A]', '</span>');
+    l[1151] = l[1151].replace('[A]', '<span>').replace('[/A]', '</span>');
     l[731] = l[731].replace('[A]', '<a href="/terms" class="clickurl">').replace('[/A]', '</a>');
     if (lang === 'en') {
         l[965] = 'Legal & policies';
@@ -1085,14 +1085,14 @@ mBroadcaster.once('boot_done', function populate_l() {
     l[20708] = escapeHTML(l[20708]).replace('[S]', '<span>').replace('[/S]', '</span>');
     l[20709] = escapeHTML(l[20709]).replace('[S]', '<span>').replace('[/S]', '</span>');
     l[20710] = escapeHTML(l[20710]).replace('[S]', '<span>').replace('[/S]', '</span>');
-    l[20713] = escapeHTML(l[20713]).replace('[B]%1[/B]', '<b></b>');
+    l[20713] = escapeHTML(l[20713]).replace('[B]%1[/B]', '<b>%1</b>');
     l[20714] = escapeHTML(l[20714])
-        .replace('[B1]%1[/B1]', '<b class="plan-time"></b>')
-        .replace('[B2]%2[/B2]', '<b class="plan-name"></b>');
+        .replace('[B1]%1[/B1]', '<b class="plan-time">%1</b>')
+        .replace('[B2]%2[/B2]', '<b class="plan-name">%2</b>');
     l[20750] = escapeHTML(l[20750]).replace('[S]', '<span>').replace('[/S]', '</span>');
     l[20756] = escapeHTML(l[20756]).replace('[S]', '<span>').replace('[/S]', '</span>');
     l[20757] = escapeHTML(l[20757]).replace('[S]', '<span>').replace('[/S]', '</span>');
-    l[20759] = escapeHTML(l[20759]).replace('[B]%1[/B]', '<b></b>');
+    l[20759] = escapeHTML(l[20759]).replace('[B]%1[/B]', '<b>%1</b>');
     l[20923] = escapeHTML(l[20923]).replace('[S]', '<span>').replace('[/S]', '</span>');
     l['20923c'] = l[20923].replace('%1', 'Chrome');
     l['20923f'] = l[20923].replace('%1', 'Firefox');
@@ -1233,6 +1233,8 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[A3]', '<a href="" class="red a3">').replace('[/A3]', '</a>');
     l[23449] = escapeHTML(l[23449]).replace(/\[R\/]/g, '<sup>&reg;</sup>');
     l[24074] = escapeHTML(l[24074]).replace('[A]', '<a>').replace('[/A]', '</a>');
+    l[24141] = escapeHTML(l[24141]).replace('[A]', '<a class="red" href="https://mega.nz/blog_48">')
+        .replace('[/A]', '</a>');
 
     var common = [
         15536, 16106, 16107, 16119, 16120, 16123, 16124, 16135, 16136, 16137, 16138, 16304, 16313, 16315, 16316,
@@ -1241,7 +1243,7 @@ mBroadcaster.once('boot_done', function populate_l() {
         18298, 18302, 18303, 18304, 18305, 18314, 18315, 18316, 18419, 19807, 19808, 19810, 19811, 19812, 19813,
         19814, 19854, 19821, 19930, 20402, 20462, 20966, 20967, 20969, 20970, 20971, 20973, 22117, 22667, 22668,
         22674, 22669, 22671, 22784, 22789, 22881, 22883, 23098, 23351, 23521, 23522, 23523, 23524, 23532, 23533,
-        23534, 23296, 23299, 23304
+        23534, 23296, 23299, 23304, 23819, 24077, 24097, 24098, 24099,  24139
     ];
     for (i = common.length; i--;) {
         var num = common[i];
@@ -1252,6 +1254,7 @@ mBroadcaster.once('boot_done', function populate_l() {
             .replace(/\[B\]/g, '<b>').replace(/\[\/B\]/g, '</b>')
             .replace(/\[I\]/g, '<i>').replace(/\[\/I\]/g, '</i>')
             .replace(/\[BR\]/g, '<br/>')
+            .replace(/\[Br]/g, '<br/>')
             .replace(/\[A\]/g, '<a href="/pro" class="clickurl">').replace(/\[\/A\]/g, '</a>');
     }
 

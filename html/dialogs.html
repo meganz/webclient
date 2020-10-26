@@ -920,6 +920,75 @@
     </div>
 </div>
 
+<div class="fm-dialog push-settings-dialog hidden">
+    <div class="fm-dialog-header">
+        <div class="fm-dialog-title">[$16214]</div>
+        <div class="dialog secondary-header">[$22015]</div>
+        <div class="fm-dialog-close"></div>
+        <div class="clear"></div>
+    </div>
+    <div class="fm-dialog-body">
+        <label class="radio-txt">
+            [$22012]
+            <div class="custom-radio small green-active radioOff">
+                <input
+                    type="radio"
+                    name="push-settings-radio"
+                    value="30"
+                    class="custom-radio" />
+            </div>
+        </label>
+        <label class="radio-txt">
+            [$19048]
+            <div class="custom-radio small green-active radioOff">
+                <input
+                    type="radio"
+                    name="push-settings-radio"
+                    value="60"
+                    class="custom-radio" />
+            </div>
+        </label>
+        <label class="radio-txt">
+            [$22013]
+            <div class="custom-radio small green-active radioOff">
+                <input
+                    type="radio"
+                    name="push-settings-radio"
+                    value="360"
+                    class="custom-radio" />
+            </div>
+        </label>
+        <label class="radio-txt">
+            [$22014]
+            <div class="custom-radio small green-active radioOff">
+                <input
+                    type="radio"
+                    name="push-settings-radio"
+                    value="1440"
+                    class="custom-radio" />
+            </div>
+        </label>
+        <label class="radio-txt morning-option">
+            <span>
+                <!-- // ... -->
+            </span>
+            <div class="custom-radio small green-active radioOn">
+                <input
+                    type="radio"
+                    name="push-settings-radio"
+                    value="0"
+                    class="custom-radio radioOn"
+                    checked />
+            </div>
+        </label>
+    </div>
+    <div class="buttons-block">
+        <div class="default-green-button gradient right push-settings-done">[$726]</div>
+        <div class="default-white-button right push-settings-close">[$82]</div>
+        <div class="clear"></div>
+    </div>
+</div>
+
 <div class="fm-dialog properties-dialog multiple shared hidden">
     <div class="fm-dialog-header">
         <div class="fm-dialog-title">[$892]</div>
@@ -1473,7 +1542,7 @@
         <div class="clear"></div>
     </div>
     <div class="fm-notification-body">
-        <div class="fm-notification-icon"></div>
+        <div class="icon pricing-sprite plan-icon"></div>
         <div class="fm-notification-info">
             [$15]
         </div>
@@ -1651,9 +1720,7 @@
     <div class="btn-close-dialog"></div>
     <div class="payment-dialog-body">
 
-        <div class="plan-icon pro1">
-            <div class="reg-st3-membership-icon"></div>
-        </div>
+        <div class="pricing-sprite plan-icon pro1"></div>
         <div class="payment-plan-info">
             <div class="payment-plan-title">PRO I</div>
             <div class="payment-plan-txt">1 month <span>([$6965])</span></div>
@@ -1738,9 +1805,7 @@
     <div class="btn-close-dialog"></div>
     <div class="payment-address-dialog-body">
 
-        <div class="plan-icon pro1">
-            <div class="reg-st3-membership-icon"></div>
-        </div>
+        <div class="pricing-sprite plan-icon pro1"></div>
         <div class="payment-plan-info">
             <div class="payment-plan-title">PRO I</div>
             <div class="payment-plan-txt"><span class="duration">[$922]</span> <span class="recurring">([$6965])</span></div>
@@ -2315,9 +2380,7 @@
 <div class="fm-dialog voucher-dialog hidden">
     <div class="btn-close-dialog"></div>
     <div class="voucher-dialog-body">
-        <div class="plan-icon pro1">
-            <div class="reg-st3-membership-icon"></div>
-        </div>
+        <div class="pricing-sprite plan-icon pro1"></div>
         <div class="voucher-plan-info">
             <div class="voucher-plan-title">PRO I</div>
             <div class="voucher-plan-txt">
@@ -2377,7 +2440,7 @@
     <div class="fm-notifications-bottom">
         <div class="default-white-button right accept"><span>[$870]</span></div>
         <div class="default-white-button right cancel"><span>[$1597]</span></div>
-        <a class="powered-by-astropay" href="https://www.astropay.com/" target="_blank" rel="noopener noreferrer"></a>
+        <a class="pricing-sprite powered-by-astropay" href="https://www.astropay.com/" target="_blank" rel="noopener noreferrer"></a>
         <div class="clear"></div>
     </div>
 </div>
@@ -2475,31 +2538,19 @@
     </div>
     <div class="account-information">
         <div class="left-information">
-            <div class="reg-st3-membership-bl">
-                <div class="membership-pad-bl">
-                    <div class="membership-gray-block">
-                        <div class="reg-st3-membership-icon"></div>
-                        <div class="reg-st3-bott-title plan-name"></div>
-                        <div class="reg-st3-bott-title price">
-                            <span class="num"><span class="dollars"></span><span class="small"><span class="cents"></span> &euro;</span></span><span class="period">/[$913]</span>
-                        </div>
+            <div class="pricing-page plan">
+                <div class="pricing-page plan-icon pricing-sprite"></div>
+                <div class="pricing-page plan-title"></div>
+                <div class="pricing-page plan-content">
+                    <div class="pricing-page plan-price">
+                        <span class="price"></span>
                     </div>
-                    <div class="reg-st3-storage">
-                        <div class="pro-feature-icon"></div>
-                        <div class="reg-st3-big-txt">
-                            <span class="quota-amount"></span> <span class="quota-unit"></span>
-                        </div>
-                        <div class="reg-st3-mid-txt">[$495]</div>
-                        <div class="clear"></div>
+                    <div class="pricing-page plan-currency"></div>
+                     <div class="pricing-page plan-period">
+                        /[$931]
                     </div>
-                    <div class="reg-st3-bandwidth">
-                        <div class="pro-feature-icon bandwidth"></div>
-                        <div class="reg-st3-big-txt">
-                            <span class="quota-amount"></span> <span class="quota-unit"></span>
-                        </div>
-                        <div class="reg-st3-mid-txt">[$16120]</div>
-                        <div class="clear"></div>
-                    </div>
+                     <div class="pricing-page plan-data storage"><span></span> [$495]</div>
+                    <div class="pricing-page plan-data transfer"><span></span> [$18057]</div>
                 </div>
             </div>
         </div>
@@ -2550,7 +2601,7 @@
     <div class="invoice-right-bg"></div>
     <div class="right-side">
         <div class="invoice-date-time"></div>
-        <div class="plan-icon"><div class="reg-st3-membership-icon"></div></div>
+        <div class="pricing-sprite plan-icon"></div>
         <div class="plan-name"></div>
         <div class="plan-duration"></div>
         <div class="plan-price-euros">
@@ -2580,21 +2631,17 @@
     </div>
 </div>
 
-<div class="fm-dialog limited-bandwidth-dialog hidden">
+<div class="fm-dialog limited-bandwidth-dialog lato hidden">
     <div class="fm-dialog-close"></div>
     <div class="fm-dialog-body centered-content">
         <div class="dialog header-before-icon limited">[$16164]</div>
         <div class="dialog header-before-icon exceeded">[$17]</div>
 
-        <i class="semi-huge-icon speedometer almost-full dialog-top-icon"></i>
-        <i class="big-104px-icon speedometer full dialog-top-icon"></i>
-        <i class="semi-huge-icon speedometer full dialog-top-icon"></i>
-        <i class="huge-icon storage-icon full"></i>
-
         <p class="dialog p-after-icon msg-overquota">[$120]</p>
         <p class="dialog p-after-icon msg-prewarning">
             [$17090]
         </p>
+        <div class="dialog transfer-overquota-txt step1-block">[$7100]</div>
 
         <div class="dialog pro-exceeded-bl">
 
@@ -2663,228 +2710,292 @@
                 </div>
             </div>
 
-            <div class="centered-checkbox dialog-bottom">
-                <!--div class="checkdiv checkboxOff">
-                    <input type="checkbox" name="limit-warning-checkbox" id="limit-warning-checkbox" class="checkboxOff">
+            <div class="centered-checkbox dialog-bottom"></div>
+        </div>
+        <div class="step1-block">
+            <div class="pricing-page radio-buttons individual-el right">
+                <div class="radioOn">
+                    <input id="d-pro-monthly-payment" name="d-pro-payment-period" type="radio" class="radioOn megaInputs" value="1" checked>
                 </div>
-                <label for="limit-warning-checkbox" class="radio-txt medium">[$229]</label-->
+                <label class="radio-txt" for="d-pro-monthly-payment">[$23779]</label>
+                <div class="radioOff">
+                    <input id="d-pro-yearly-payment" name="d-pro-payment-period" type="radio" class="megaInputs radioOff" value="12">
+                </div>
+                <label class="radio-txt" for="d-pro-yearly-payment">[$23780]</label>
             </div>
+            <div class="clear"></div>
+            <hr />
         </div>
 
-        <div class="plan-blocks step1-block">
-            <div class="dialog transfer-plans">
-                <div class="reg-st3-membership-bl pro4 selected" data-payment="4">
-                    <div class="membership-pad-bl">
-                        <div class="reg-st3-bott-title title">
-                            <div class="membership-icon tiny"></div>
-                            <span>[$8413]</span>
-                        </div>
-                        <div class="membership-gray-block">
-                            <div class="reg-st3-bott-title price">
-                                <span class="num">
-                                    <span class="big"></span><span class="small"></span>
-                                </span>
-                                <span class="green-star-img"></span>
-                                <span class="local-currency-code hidden">MXN</span>
-                                <span class="period">/[$913]</span>
-                                <div class="euro-price hidden">4.99 &euro;</div>
+         <div class="step1-block dialog-cards">
+            <div class="scrollable">
+                <div class="pricing-page plans-block">
+                    <div class="pricing-page plans-row">
+                        <div class="pricing-page plan pro4" data-payment="4">
+                            <div class="pricing-page plan-label"></div>
+                            <div class="pricing-page plan-title"></div>
+                            <div class="pricing-page plan-info">
+                                [$23950]
+                            </div>
+                            <div class="pricing-page plan-content">
+                                <div class="pricing-page plan-price">
+                                    <span class="price"></span><span class="asterisk">*</span>
+                                </div>
+                                <div class="pricing-page plan-currency"></div>
+                                 <div class="pricing-page plan-period">
+                                    /[$931]
+                                </div>
+                                <div class="pricing-page euro-price"></div>
+                                <div class="clear"></div>
+                                <div class="pricing-page plan-button">
+                                </div>
                             </div>
                         </div>
-                        <div class="pro-plan-descr">
-                            <div class="reg-st3-storage">
-                                <div class="pro-feature-icon"></div>
-                                <div class="reg-st3-big-txt ">
-                                    <span class="storage-amount">1</span>
-                                    <span class="storage-unit">TB</span>
-                                </div>
-                                <div class="reg-st3-mid-txt">[$495]</div>
-                                <div class="clear"></div>
+                        <div class="pricing-page plan pro1" data-payment="1">
+                            <div class="pricing-page plan-label">[$23948]</div>
+                            <div class="pricing-page plan-title">
                             </div>
-                            <div class="reg-st3-bandwidth">
-                                <div class="pro-feature-icon bandwidth"></div>
-                                <div class="reg-st3-big-txt">
-                                    <span class="bandwidth-amount">2</span> <span class="bandwidth-unit">TB</span>
+                            <div class="pricing-page plan-info">
+                                [$23949]
+                            </div>
+                            <div class="pricing-page plan-content">
+                                <div class="pricing-page plan-price">
+                                    <span class="price"></span><span class="asterisk">*</span>
                                 </div>
-                                <div class="reg-st3-mid-txt">[$16120]</div>
+                                <div class="pricing-page plan-currency"></div>
+                                 <div class="pricing-page plan-period">
+                                    /[$931]
+                                </div>
+                                <div class="pricing-page euro-price"></div>
                                 <div class="clear"></div>
+                                <div class="pricing-page plan-button">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="pricing-page plan pro2" data-payment="2">
+                            <div class="pricing-page plan-label"></div>
+                            <div class="pricing-page plan-title">
+                            </div>
+                            <div class="pricing-page plan-info">
+                                [$23952]
+                            </div>
+                            <div class="pricing-page plan-content">
+                                <div class="pricing-page plan-price">
+                                    <span class="price"></span><span class="asterisk">*</span>
+                                </div>
+                                <div class="pricing-page plan-currency"></div>
+                                 <div class="pricing-page plan-period">
+                                    /[$931]
+                                </div>
+                                <div class="pricing-page euro-price"></div>
+                                <div class="clear"></div>
+                                <div class="pricing-page plan-button">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="pricing-page plan pro3" data-payment="3">
+                            <div class="pricing-page plan-label">[$506]</div>
+                            <div class="pricing-page plan-title">
+                            </div>
+                            <div class="pricing-page plan-info">
+                                [$24066]
+                            </div>
+                            <div class="pricing-page plan-content">
+                                <div class="pricing-page plan-price">
+                                    <span class="price"></span><span class="asterisk">*</span>
+                                </div>
+                                <div class="pricing-page plan-currency"></div>
+                                 <div class="pricing-page plan-period">
+                                    /[$931]
+                                </div>
+                                <div class="pricing-page euro-price"></div>
+                                <div class="clear"></div>
+                                <div class="pricing-page plan-button">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="pricing-page plans-row">
+                        <div class="pricing-page plan pro4 details" data-payment="4">
+                            <div class="pricing-page plan-feature storage strong">
+                                <span>[$23789]</span>
+                                <i class="pricing-sprite i-icon simpletip" data-simpletip="[$23807]" data-simpletipposition="top"  data-simpletipoffset="3" data-simpletip-class="pricing-tip transformed" data-simpletipwrapper=".content"></i>
+                            </div>
+                             <div class="pricing-page plan-feature strong transfer">
+                                <span>[$23790]</span>
+                                <i class="pricing-sprite i-icon simpletip" data-simpletip="[$23808]" data-simpletipposition="top"  data-simpletipoffset="3" data-simpletip-class="pricing-tip transformed" data-simpletipwrapper=".content"></i>
+                            </div>
+                            <div class="pricing-page plan-feature">
+                                <span>[$23791]</span>
+                                <i class="pricing-sprite i-icon simpletip" data-simpletip="[$23792]" data-simpletipposition="top"  data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
+                            </div>
+                            <div class="pricing-page plan-feature">
+                                <span>[$23793]</span>
+                                <i class="pricing-sprite i-icon simpletip" data-simpletip="[$23799]" data-simpletipposition="top"  data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
+                            </div>
+                              <div class="pricing-page plan-feature">
+                                <span>[$23958]</span>
+                                <i class="pricing-sprite i-icon simpletip" data-simpletip="[$23801]" data-simpletipposition="top"  data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
+                            </div>
+                            <div class="pricing-page plan-feature">
+                                <span>[$19475]</span>
+                                <i class="pricing-sprite i-icon simpletip" data-simpletip="[$24032]" data-simpletipposition="top"  data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
+                            </div>
+                            <div class="pricing-page plan-feature">
+                                <span>[$23803]</span>
+                                <i class="pricing-sprite i-icon simpletip" data-simpletip="[$23804]" data-simpletipposition="top"  data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
+                            </div>
+                            <div class="pricing-page plan-feature">
+                                <span>[$23959]</span>
+                                <i class="pricing-sprite i-icon simpletip" data-simpletip="[$23806]" data-simpletipposition="top"  data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
+                            </div>
+                            <div class="pricing-page plan-feature">
+                                <span>[$23956]</span>
+                                <i class="pricing-sprite i-icon simpletip" data-simpletip="[$24051]" data-simpletipposition="top"  data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
+                            </div>
+                        </div>
+                        <div class="pricing-page plan pro1 details" data-payment="1">
+                            <div class="pricing-page plan-feature storage strong">
+                                <span>[$23789]</span>
+                                <i class="pricing-sprite i-icon simpletip" data-simpletip="[$23807]" data-simpletipposition="top"  data-simpletipoffset="3" data-simpletip-class="pricing-tip transformed" data-simpletipwrapper=".content"></i>
+                            </div>
+                             <div class="pricing-page plan-feature strong transfer">
+                                <span>[$23790]</span>
+                                <i class="pricing-sprite i-icon simpletip" data-simpletip="[$23808]" data-simpletipposition="top"  data-simpletipoffset="3" data-simpletip-class="pricing-tip transformed" data-simpletipwrapper=".content"></i>
+                            </div>
+                            <div class="pricing-page plan-feature">
+                                <span>[$23791]</span>
+                                <i class="pricing-sprite i-icon simpletip" data-simpletip="[$23792]" data-simpletipposition="top"  data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
+                            </div>
+                            <div class="pricing-page plan-feature">
+                                <span>[$23793]</span>
+                                <i class="pricing-sprite i-icon simpletip" data-simpletip="[$23799]" data-simpletipposition="top"  data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
+                            </div>
+                              <div class="pricing-page plan-feature">
+                                <span>[$23958]</span>
+                                <i class="pricing-sprite i-icon simpletip" data-simpletip="[$23801]" data-simpletipposition="top"  data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
+                            </div>
+                            <div class="pricing-page plan-feature">
+                                <span>[$19475]</span>
+                                <i class="pricing-sprite i-icon simpletip" data-simpletip="[$24032]" data-simpletipposition="top"  data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
+                            </div>
+                            <div class="pricing-page plan-feature">
+                                <span>[$23803]</span>
+                                <i class="pricing-sprite i-icon simpletip" data-simpletip="[$23804]" data-simpletipposition="top"  data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
+                            </div>
+                            <div class="pricing-page plan-feature">
+                                <span>[$23959]</span>
+                                <i class="pricing-sprite i-icon simpletip" data-simpletip="[$23806]" data-simpletipposition="top"  data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
+                            </div>
+                            <div class="pricing-page plan-feature">
+                                <span>[$23956]</span>
+                                <i class="pricing-sprite i-icon simpletip" data-simpletip="[$24051]" data-simpletipposition="top"  data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
+                            </div>
+                        </div>
+                        <div class="pricing-page plan pro2 details" data-payment="2">
+                            <div class="pricing-page plan-feature storage strong">
+                                <span>[$23789]</span>
+                                <i class="pricing-sprite i-icon simpletip" data-simpletip="[$23807]" data-simpletipposition="top"  data-simpletipoffset="3" data-simpletip-class="pricing-tip transformed" data-simpletipwrapper=".content"></i>
+                            </div>
+                             <div class="pricing-page plan-feature strong transfer">
+                                <span>[$23790]</span>
+                                <i class="pricing-sprite i-icon simpletip" data-simpletip="[$23808]" data-simpletipposition="top"  data-simpletipoffset="3" data-simpletip-class="pricing-tip transformed" data-simpletipwrapper=".content"></i>
+                            </div>
+                            <div class="pricing-page plan-feature">
+                                <span>[$23791]</span>
+                                <i class="pricing-sprite i-icon simpletip" data-simpletip="[$23792]" data-simpletipposition="top"  data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
+                            </div>
+                            <div class="pricing-page plan-feature">
+                                <span>[$23793]</span>
+                                <i class="pricing-sprite i-icon simpletip" data-simpletip="[$23799]" data-simpletipposition="top"  data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
+                            </div>
+                              <div class="pricing-page plan-feature">
+                                <span>[$23958]</span>
+                                <i class="pricing-sprite i-icon simpletip" data-simpletip="[$23801]" data-simpletipposition="top"  data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
+                            </div>
+                            <div class="pricing-page plan-feature">
+                                <span>[$19475]</span>
+                                <i class="pricing-sprite i-icon simpletip" data-simpletip="[$24032]" data-simpletipposition="top"  data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
+                            </div>
+                            <div class="pricing-page plan-feature">
+                                <span>[$23803]</span>
+                                <i class="pricing-sprite i-icon simpletip" data-simpletip="[$23804]" data-simpletipposition="top"  data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
+                            </div>
+                            <div class="pricing-page plan-feature">
+                                <span>[$23959]</span>
+                                <i class="pricing-sprite i-icon simpletip" data-simpletip="[$23806]" data-simpletipposition="top"  data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
+                            </div>
+                            <div class="pricing-page plan-feature">
+                                <span>[$23956]</span>
+                                <i class="pricing-sprite i-icon simpletip" data-simpletip="[$24051]" data-simpletipposition="top"  data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
+                            </div>
+                        </div>
+                        <div class="pricing-page plan pro3 details" data-payment="3">
+                            <div class="pricing-page plan-feature storage strong">
+                                <span>[$23789]</span>
+                                <i class="pricing-sprite i-icon simpletip" data-simpletip="[$23807]" data-simpletipposition="top"  data-simpletipoffset="3" data-simpletip-class="pricing-tip transformed" data-simpletipwrapper=".content"></i>
+                            </div>
+                             <div class="pricing-page plan-feature strong transfer">
+                                <span>[$23790]</span>
+                                <i class="pricing-sprite i-icon simpletip" data-simpletip="[$23808]" data-simpletipposition="top"  data-simpletipoffset="3" data-simpletip-class="pricing-tip transformed" data-simpletipwrapper=".content"></i>
+                            </div>
+                            <div class="pricing-page plan-feature">
+                                <span>[$23791]</span>
+                                <i class="pricing-sprite i-icon simpletip" data-simpletip="[$23792]" data-simpletipposition="top"  data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
+                            </div>
+                            <div class="pricing-page plan-feature">
+                                <span>[$23793]</span>
+                                <i class="pricing-sprite i-icon simpletip" data-simpletip="[$23799]" data-simpletipposition="top"  data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
+                            </div>
+                              <div class="pricing-page plan-feature">
+                                <span>[$23958]</span>
+                                <i class="pricing-sprite i-icon simpletip" data-simpletip="[$23801]" data-simpletipposition="top"  data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
+                            </div>
+                            <div class="pricing-page plan-feature">
+                                <span>[$19475]</span>
+                                <i class="pricing-sprite i-icon simpletip" data-simpletip="[$24032]" data-simpletipposition="top"  data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
+                            </div>
+                            <div class="pricing-page plan-feature">
+                                <span>[$23803]</span>
+                                <i class="pricing-sprite i-icon simpletip" data-simpletip="[$23804]" data-simpletipposition="top"  data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
+                            </div>
+                            <div class="pricing-page plan-feature">
+                                <span>[$23959]</span>
+                                <i class="pricing-sprite i-icon simpletip" data-simpletip="[$23806]" data-simpletipposition="top"  data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
+                            </div>
+                            <div class="pricing-page plan-feature">
+                                <span>[$23956]</span>
+                                <i class="pricing-sprite i-icon simpletip" data-simpletip="[$24051]" data-simpletipposition="top"  data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="reg-st3-membership-bl pro1" data-payment="1">
-                    <div class="membership-pad-bl">
-                        <div class="reg-st3-bott-title title">
-                            <div class="membership-icon tiny"></div>
-                            <span>[$5819]</span>
-                        </div>
-                        <div class="membership-gray-block">
-                            <div class="reg-st3-bott-title price">
-                                <span class="num">
-                                    <span class="big"></span><span class="small"></span>
-                                </span>
-                                <span class="green-star-img"></span>
-                                <span class="local-currency-code hidden">MXN</span>
-                                <span class="period">/[$913]</span>
-                                <div class="euro-price hidden">4.99 &euro;</div>
-                            </div>
-                        </div>
-                        <div class="pro-plan-descr">
-                            <div class="reg-st3-storage">
-                                <div class="pro-feature-icon"></div>
-                                <div class="reg-st3-big-txt ">
-                                    <span class="storage-amount">1</span>
-                                    <span class="storage-unit">TB</span>
-                                </div>
-                                <div class="reg-st3-mid-txt">[$495]</div>
-                                <div class="clear"></div>
-                            </div>
-                            <div class="reg-st3-bandwidth">
-                                <div class="pro-feature-icon bandwidth"></div>
-                                <div class="reg-st3-big-txt">
-                                    <span class="bandwidth-amount">2</span> <span class="bandwidth-unit">TB</span>
-                                </div>
-                                <div class="reg-st3-mid-txt">[$16120]</div>
-                                <div class="clear"></div>
-                            </div>
-                        </div>
-                    </div>
+                <div class="pricing-page local-currency-tip">
+                    * [$18770]
                 </div>
-                <div class="reg-st3-membership-bl pro2" data-payment="2">
-                    <div class="membership-pad-bl">
-                        <div class="reg-st3-bott-title title">
-                            <div class="membership-icon tiny"></div>
-                            <span>[$6125]</span>
-                        </div>
-                        <div class="membership-gray-block">
-                            <div class="reg-st3-bott-title price">
-                                <span class="num">
-                                    <span class="big"></span><span class="small"></span>
-                                </span>
-                                <span class="green-star-img"></span>
-                                <span class="local-currency-code hidden">MXN</span>
-                                <span class="period">/[$913]</span>
-                                <div class="euro-price hidden">4.99 &euro;</div>
-                            </div>
-                        </div>
-                        <div class="pro-plan-descr">
-                            <div class="reg-st3-storage">
-                                <div class="pro-feature-icon"></div>
-                                <div class="reg-st3-big-txt ">
-                                    <span class="storage-amount">1</span>
-                                    <span class="storage-unit">TB</span>
-                                </div>
-                                <div class="reg-st3-mid-txt">[$495]</div>
-                                <div class="clear"></div>
-                            </div>
-                            <div class="reg-st3-bandwidth">
-                                <div class="pro-feature-icon bandwidth"></div>
-                                <div class="reg-st3-big-txt">
-                                    <span class="bandwidth-amount">2</span> <span class="bandwidth-unit">TB</span>
-                                </div>
-                                <div class="reg-st3-mid-txt">[$16120]</div>
-                                <div class="clear"></div>
-                            </div>
-                        </div>
+
+                <div class="dialog limited-bottom">
+                    <div class="download big-button continue-download green transition">
+                        <i class="medium-icon icons-sprite download big"></i>
+                        <span>[$17091]</span>
                     </div>
-                </div>
-                <div class="reg-st3-membership-bl pro3" data-payment="3">
-                    <div class="membership-pad-bl">
-                        <div class="reg-st3-bott-title title">
-                            <div class="membership-icon tiny"></div>
-                            <span>[$6126]</span>
+                    <div class="centered-checkbox dialog-bottom">
+                        <div class="checkdiv checkboxOff">
+                            <input type="checkbox" name="limit-warning-checkbox" id="limit-warning-checkbox" class="checkboxOff">
                         </div>
-                        <div class="membership-gray-block">
-                            <div class="reg-st3-bott-title price">
-                                <span class="num">
-                                    <span class="big"></span><span class="small"></span>
-                                </span>
-                                <span class="green-star-img"></span>
-                                <span class="local-currency-code hidden">MXN</span>
-                                <span class="period">/[$913]</span>
-                                <div class="euro-price hidden">4.99 &euro;</div>
-                            </div>
-                        </div>
-                        <div class="pro-plan-descr">
-                            <div class="reg-st3-storage">
-                                <div class="pro-feature-icon"></div>
-                                <div class="reg-st3-big-txt ">
-                                    <span class="storage-amount">1</span>
-                                    <span class="storage-unit">TB</span>
-                                </div>
-                                <div class="reg-st3-mid-txt">[$495]</div>
-                                <div class="clear"></div>
-                            </div>
-                            <div class="reg-st3-bandwidth">
-                                <div class="pro-feature-icon bandwidth"></div>
-                                <div class="reg-st3-big-txt">
-                                    <span class="bandwidth-amount">2</span> <span class="bandwidth-unit">TB</span>
-                                </div>
-                                <div class="reg-st3-mid-txt">[$16120]</div>
-                                <div class="clear"></div>
-                            </div>
-                        </div>
+                        <label for="limit-warning-checkbox" class="radio-txt">[$229]</label>
                     </div>
-                </div>
-                <div class="clear"></div>
-                <div class="reg-st3-txt-localcurrencyprogram hidden" align="center">
-                    <span class="green-star-img"></span>
-                    <span class="green-star-desc">
-                        [$18770]
-                    </span>
                 </div>
             </div>
-
-            <div class="dialog transfer-overquota-txt">[$7100]</div>
-
-        </div>
+            <div class="dialog-scroll-overlay"></div>
+         </div>
 
         <div class="dialog bottom-tips">
             <span>[$16355]</span>
             <a>[$16354]</a>
         </div>
 
-        <div class="dialog limited-bottom">
-            <div class="download big-button continue-download green transition">
-                <i class="medium-icon icons-sprite download big"></i>
-                <span>[$17091]</span>
-            </div>
-            <div class="centered-checkbox dialog-bottom">
-                <div class="checkdiv checkboxOff">
-                    <input type="checkbox" name="limit-warning-checkbox" id="limit-warning-checkbox" class="checkboxOff">
-                </div>
-                <label for="limit-warning-checkbox" class="radio-txt">[$229]</label>
-            </div>
-        </div>
 
-    </div>
-    <div class="dialog overquota-bott-bl">
-        <div class="dialog overquota-bott-txt">
-            <i class="semi-huge-icon storage"></i>
-            <span class="not-logged no-achievements">
-                [$16902]
-            </span>
-            <span class="not-logged achievements">
-                [$16903]
-            </span>
-            <span class="logged achievements">
-                [$16904]
-            </span>
-        </div>
-        <div class="dialog overquota-bott-buttons">
-            <!-- [$6826] - Login !-->
-            <div class="default-big-button button-without-outline login">
-                <span>[$193]</span>
-            </div>
-            <!-- [$16309] - Get more bonuses !-->
-            <!-- [$16352] - Register for bonuses !-->
-            <div class="default-big-button button-without-outline grey-gradient get-more-bonuses">
-                <span class="registered">[$16309]</span>
-                <span class="not-registered">[$16352]</span>
-            </div>
-            <div class="default-big-button button-without-outline grey-gradient create-account">
-                <span>[$1108]</span>
-            </div>
-        </div>
     </div>
 </div>
 
@@ -4341,7 +4452,7 @@
             <div class="dialog input-wrapper ">
                 <!-- Please add 'wrong' class is password is incorrect !-->
                 <div class="dialog big-input-bg">
-                    <input type="text" value="" name="test-pass1" id="test-pass" readonly placeholder="[$16896]" autocomplete="user-password">
+                    <input type="password" value="" name="test-pass1" id="test-pass" readonly placeholder="[$16896]" autocomplete="user-password">
                 </div>
                 <div class="dialog input-button">
                     <div class="default-white-button semi-big grey-txt confirm-password button-prd-confirm">
@@ -5502,17 +5613,14 @@
         <div class="voucher-head">
             <div class="v-header-text lato"> [$22114]</div>
         </div>
-        <div class="plan-icon membership-icon pro1">
+        <div class="pricing-sprite plan-icon pro1 x32"></div>
+        <div class="v-separator"></div>
+        <div class="plan-info  v-storage">
+            <span></span>
         </div>
         <div class="v-separator"></div>
-        <div class="plan-info ">
-            <div class="size-head v-storage lato-semibold"> 1TB </div>
-            <div class="size-bottom lato"> [$495] </div>
-        </div>
-        <div class="v-separator"></div>
-        <div class="plan-info ">
-            <div class="size-head v-transfer lato-semibold"> 1TB </div>
-            <div class="size-bottom lato"> [$18057] </div>
+        <div class="plan-info v-transfer">
+            <span></span>
         </div>
     </div>
     <div class="dialog-title">[$22120]</div>

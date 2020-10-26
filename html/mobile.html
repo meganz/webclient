@@ -55,12 +55,12 @@
                 <span>[$164]</span>
             </div>
 
-            <div class="top-menu-item submenu-item">
+            <div class="top-menu-item submenu-item hidden">
                 <i class="top-menu-icon menus-sprite features"></i>
-                <span>[$23377]</span>
+                <span>[$23854]</span>
                 <i class="top-menu-icon menus-sprite right-arrow"></i>
             </div>
-             <div class="top-submenu">
+             <div class="top-submenu hidden">
                 <div class="top-menu-item security">[$7337]</div>
                 <div class="top-menu-item storage hidden">Storage &amp; Transfer</div>
                 <div class="top-menu-item encryption hidden">End-to-End Encryption</div>
@@ -71,16 +71,16 @@
 
             <div class="top-menu-item submenu-item">
                 <i class="top-menu-icon menus-sprite platforms"></i>
-                <span>[$23327]</span>
+                <span>[$23854]</span>
                 <i class="top-menu-icon menus-sprite right-arrow"></i>
             </div>
              <div class="top-submenu">
-                <div class="top-menu-item mobile">[$955]</div>
                 <div class="top-menu-item sync">[$956]</div>
+                <div class="top-menu-item mobile">[$955]</div>
+                <div class="top-menu-item uwp">UWP</div>
+                <div class="top-menu-item cmd">MEGAcmd</div>
                 <div class="top-menu-item extensions">[$16603]</div>
                 <div class="top-menu-item bird hidden">MEGAbird</div>
-                <div class="top-menu-item cmd">MEGAcmd</div>
-                <div class="top-menu-item uwp">[$20028]</div>
                 <div class="top-menu-item nas">NAS</div>
             </div>
 
@@ -90,7 +90,9 @@
                 <i class="top-menu-icon menus-sprite right-arrow"></i>
             </div>
              <div class="top-submenu">
+                <div class="top-menu-item security">[$7337]</div>
                 <div class="top-menu-item about">[$16112]</div>
+                <div class="top-menu-item pro">[$1361]</div>
                 <div class="top-menu-item affiliate">[$22682]</div>
                 <div class="top-menu-item blog blogarticle">[$389]</div>
             </div>
@@ -754,7 +756,7 @@
                     </div>
                 </div>
                 <div class="mobile account-type-block">
-                    <div class="mobile icon pro-mini"></div>
+                    <div class="mobile pricing-sprite plan-icon x32 mini"></div>
                     <div class="mobile account-type-text">[$17022]</div>
                     <div class=" pro-plan-block">
                         <span class="mobile pro-plan-name"></span>
@@ -1501,7 +1503,7 @@
             <a class="mobile logo"></a>
             <div class="mobile white-block">
                 <div class="mobile dialog-information">
-                    <div class="mobile membership-icon free"></div>
+                    <div class="mobile pricing-sprite plan-icon free x32"></div>
                     <div class="mobile first-message">[$7179]</div>
                     <div class="mobile second-message">[$17548]</div>
                 </div>
@@ -2985,7 +2987,7 @@
 
 
 <!-- Pro page step 2 - Provider and plan options !-->
-<div class="mobile fm-block membership-step2 hidden">
+<div class="mobile fm-block membership-step2 payment-section lato hidden">
     <div class="mobile fm-row">
         <div class="mobile fm-header fm-hr">
             <div class="mobile fm-icon back left js-back-to-plans"></div>
@@ -2996,141 +2998,120 @@
     <div class="mobile fm-row">
         <div class="mobile fm-content">
             <div class="mobile fm-scrolling">
-                <div class="mobile page-title">[$6975]</div>
                 <div class="mobile payment-options-container">
                     <div class="mobile payment-options">
                         <div class="mobile pro-card-container">
-                            <div class="mobile membership-icon"></div>
+                            <div class="mobile pricing-sprite plan-icon x32"></div>
                             <span class="mobile right-banner-block">
-                                <div class="mobile small-text">You selected:</div>
+                                <div class="mobile small-text">[$22150]</div>
                                 <div class="mobile plan-name"></div>
                             </span>
-                            <div class="mobile small-text show-plans js-back-to-plans">Change</div>
+                            <div class="mobile small-text show-plans js-back-to-plans">[$1776]</div>
                         </div>
-                        <div class="mobile subtle-bottom-border"></div>
-                        <div class="pro-gray-block">
-                            <div class="main-mid-pad">
-                                <div class="register-st3-main-bl">
-                                    <div class="membership-st2-info">
-                                        <div class="membership-payment-pad">
-                                            <div class="membership-info-pad">
-                                                <div class="membership-st2-head">
-                                                    <span class="option-question provider">[$7992]</span>
-                                                </div>
-                                                <div class="payment-options-list primary">
-                                                    <div class="payment-method template">
-                                                        <div class="membership-radio">
-                                                            <input type="radio" name="" value="">
-                                                            <div></div>
-                                                        </div>
-                                                        <div class="provider-details">
-                                                            <div class="provider-icon"></div>
-                                                            <div class="provider-name"></div>
-                                                        </div>
-                                                    </div>
-                                                    <span class="loading-placeholder-text">[$5533]</span>
-                                                </div>
-                                                <div class="payment-options-list secondary hidden"></div>
-                                                <div class="provider-show-more hidden">
-                                                    <div class="left-bar">
-                                                        <div class="left-bar-grey">&nbsp;</div>
-                                                    </div>
-                                                    <div class="button">[$7993]</div>
-                                                    <div class="right-bar">
-                                                        <div class="right-bar-grey">&nbsp;</div>
-                                                    </div>
-                                                </div>
 
-                                            </div>
-                                        </div>
+                        <div class="pro-payment-block">
 
-                                        <div class="payment-period">
-                                            <div class="membership-info-pad">
-                                                <div class="membership-st2-head">
-                                                    <span class="option-question duration">[$7994]</span>
-                                                </div>
-                                                <div class="duration-options-list">
-                                                    <div class="payment-duration template">
-                                                        <div class="membership-radio">
-                                                            <input type="radio">
-                                                            <div class="payment-icon"></div>
-                                                        </div>
-                                                        <div class="membership-radio-label">
-                                                            <span class="duration">[$922]</span>
-                                                            <strong><span class="price">0.00</span></strong>
-                                                        </div>
-                                                        <div class="clear"></div>
-                                                        <div class="save-money hidden">
-                                                            [$16649]
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="orange-notification body with-btn argentina-only hidden">
-                                                    <div class="orange-notification">
-                                                        <i class="icons-sprite fvnotice"></i>
-                                                    </div>
-                                                    <div class="orange-notification cell text-cell">
-                                                        <div class="versioning-body-text">[$23132]</div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
+                            <div class="membership-st2-head">
+                                <span class="option-question provider">[$7992]</span>
+                            </div>
+                            <div class="options-list payment-options-list primary">
+                                <div class="payment-method half-sized template">
+                                    <div class="membership-radio">
+                                        <input type="radio" name="" value="">
+                                    </div>
+                                    <div class="provider-details radio-label">
+                                        <div class="provider-icon"></div>
+                                        <div class="provider-name"></div>
+                                    </div>
+                                </div>
+                                <span class="loading-placeholder-text">[$5533]</span>
+                            </div>
+                            <div class="payment-options-list secondary hidden"></div>
+                            <div class="provider-show-more hidden">
+                                <div class="left-bar">
+                                    <div class="left-bar-grey">&nbsp;</div>
+                                </div>
+                                <div class="button">[$7993]</div>
+                                <div class="right-bar">
+                                    <div class="right-bar-grey">&nbsp;</div>
+                                </div>
+                            </div>
 
-                                        <div class="renewal-option hidden">
-                                            <div class="membership-info-pad">
-                                                <div class="membership-st2-head choose-renewal">
-                                                    <span class="option-question renewal">[$10638]</span>
-                                                </div>
-                                                <div class="renewal-options-list">
-                                                    <div class="renewal-option">
-                                                        <div class="membership-radio checked">
-                                                            <input type="radio" name="renewal-option" checked="checked" value="yes">
-                                                            <div class="payment-icon"></div>
-                                                        </div>
-                                                        <div class="membership-radio-label checked">
-                                                            <span>[$78]</span>
-                                                        </div>
-                                                    </div>
-                                                    <div class="renewal-option">
-                                                        <div class="membership-radio">
-                                                            <input type="radio" name="renewal-option" value="no">
-                                                            <div class="payment-icon"></div>
-                                                        </div>
-                                                        <div class="membership-radio-label">
-                                                            <span>[$79]</span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
+                            <div class="payment-period">
+                                <div class="membership-st2-head">
+                                    <span class="option-question duration">[$7994]</span>
+                                </div>
+                                <div class="options-list duration-options-list">
+                                    <div class="payment-duration half-sized template">
+                                        <div class="membership-radio">
+                                            <input type="radio">
+                                            <div class="payment-icon"></div>
                                         </div>
-                                        <div class="charge-information-container">
-                                            <div class="charge-information">[$10640]</div>
+                                        <div class="membership-radio-label radio-label">
+                                            <span class="duration">[$922]</span>
+                                            <strong><span class="price">0.00</span></strong>
+                                        </div>
+                                        <div class="save-money hidden">
+                                            [$16649]
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="orange-notification body with-btn argentina-only hidden">
+                                    <div class="orange-notification">
+                                        <i class="icons-sprite fvnotice"></i>
+                                    </div>
+                                    <div class="orange-notification cell text-cell">
+                                        <div class="versioning-body-text">[$23132]</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="renewal-option hidden">
+                                <div class="membership-st2-head choose-renewal">
+                                    <span class="option-question renewal">[$10638]</span>
+                                </div>
+                                <div class="options-list renewal-options-list">
+                                    <div class="renewal-option half-sized">
+                                        <div class="membership-radio checked">
+                                            <input type="radio" name="renewal-option" checked="checked" value="yes">
+                                            <div class="payment-icon"></div>
+                                        </div>
+                                        <div class="membership-radio-label  radio-label checked">
+                                            <span>[$78]</span>
+                                        </div>
+                                    </div>
+                                    <div class="renewal-option half-sized">
+                                        <div class="membership-radio">
+                                            <input type="radio" name="renewal-option" value="no">
+                                            <div class="payment-icon"></div>
+                                        </div>
+                                        <div class="membership-radio-label radio-label">
+                                            <span>[$79]</span>
                                         </div>
                                     </div>
                                 </div>
                             </div>
+                            <div class="charge-information-container">
+                                <div class="charge-information">[$10640]</div>
+                            </div>
+                        </div>
+
+                        <div class="membership-st2-head">
+                            [$7995]
+                        </div>
+
+                        <div class="payment-info">
+                            [$7996]
                         </div>
 
                         <div class="main-mid-pad third-section">
-                            <div class="membership-bott-button">
+                            <div class="button big-green-button purchase">
                                 [$6190]
                             </div>
                             <div class="clear"></div>
                         </div>
                     </div>
                     <div class="mobile external-payment-options">[$7156]</div>
-                    <div class="main-mid-pad q-m">
-                        <div class="membership-question-mark">
-                            <span></span>
-                        </div>
-                        <div class="pro-bottom-icon-block">
-                            <div class="pro-bottom-header">[$924]</div>
-                            <div class="pro-bottom-txt">[$925]</div>
-                            <div class="pro-bottom-button">
-                                [$399]
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
@@ -3161,7 +3142,7 @@
                                     <input id="astropay-tax-field" class="astropay-tax-field" type="text" placeholder="[$7989]">
                                 </div>
                                 <div class="accept"><span>[$6190]</span></div>
-                                <a class="powered-by-astropay" href="https://www.astropay.com/" target="_blank" rel="noopener noreferrer"></a>
+                                <a class="pricing-sprite powered-by-astropay" href="https://www.astropay.com/" target="_blank" rel="noopener noreferrer"></a>
                             </div>
                         </div>
                     </div>
@@ -3176,9 +3157,7 @@
 <div class="mobile fm-block main-block full-page-scrollable payment-address-dialog hidden">
     <div class="mobile header-scroll-suggester"></div>
     <div class="pro-plan-details">
-        <div class="plan-icon">
-            <div class="reg-st3-membership-icon"></div>
-        </div>
+        <div class="pricing-sprite plan-icon x32"></div>
         <div class="payment-plan-info">
             <div class="payment-plan-title"></div>
             <div class="payment-plan-txt">
@@ -3293,27 +3272,22 @@
                 <div class="balance-text">[$7707]</div>
 
                 <div class="reg-st3-membership-bl">
-                    <div class="membership-pad-bl">
-                        <div class="left-pricing-block">
-                            <div class="reg-st3-membership-icon"></div>
-                            <div class="reg-st3-bott-title plan-name"></div>
+                    <div class="pricing-page plan">
+                        <div class="left">
+                            <div class="pricing-page plan-icon pricing-sprite x32"></div>
+                            <div class="pricing-page plan-title"></div>
                         </div>
-                        <div class="right-pricing-block">
-                            <div class="reg-st3-bott-title price">
-                                <span class="num">
-                                    <span class="dollars"></span><span class="small"><span class="cents"></span>&euro;</span>
-                                </span>
-                                <span class="period"> / [$913]</span>
+                        <div class="pricing-page plan-content">
+                            <div class="pricing-page plan-price">
+                                <span class="price"></span>
                             </div>
-                            <div class="reg-st3-storage">
-                                <span class="quota-amount"></span> <span class="quota-unit"></span> <span class="reg-st3-mid-txt">[$495]</span>
+                             <div class="pricing-page plan-period">
+                                /[$931]
                             </div>
-                            <div class="reg-st3-bandwidth">
-                                <span class="quota-amount"></span> <span class="quota-unit"></span> <span class="reg-st3-mid-txt">Transfer</span>
-                            </div>
+                            <div class="pricing-page plan-data storage"><span></span> [$495]</div>
+                            <div class="pricing-page plan-data transfer"><span></span> [$18057]</div>
                         </div>
                     </div>
-
                     <div class="complete-upgrade-text">
                         [$7708]
                     </div>
@@ -3333,9 +3307,7 @@
 <div class="mobile voucher-dialog fm-dialog-mobile hidden">
 
     <div class="pro-plan-details">
-        <div class="plan-icon pro1">
-            <div class="reg-st3-membership-icon"></div>
-        </div>
+        <div class="pricing-sprite plan-icon pro1 x32"></div>
         <div class="voucher-plan-info">
             <div class="voucher-plan-title"></div>
             <div class="voucher-plan-txt">
@@ -3428,20 +3400,16 @@
                                 <div class="mobile promo-voucher-inner-wrapper">
                                     <div class="mobile pro-crest-container">
                                         <div class="mobile pro-crest">
-                                            <div class="mobile membership-icon"></div>
+                                            <div class="mobile pricing-sprite plan-icon x32"></div>
                                         </div>
                                     </div>
                                     <div class="mobile pro-detail-wrapper">
                                         <div class="mobile storage-block">
-                                            <div class="mobile pro-detail-aligners">
-                                                <div class="mobile storage-amount">XXX GB</div>
-                                                <div class="mobile storage-text">[$19923]</div>
+                                            <div class="mobile pro-detail-aligners storage-amount">
                                             </div>
                                         </div>
                                         <div class="mobile transfer-block">
-                                            <div class="mobile pro-detail-aligners">
-                                                <div class="mobile transfer-amount">XX TB</div>
-                                                <div class="mobile transfer-text">[$19924]</div>
+                                            <div class="mobile pro-detail-aligners transfer-amount">
                                             </div>
                                         </div>
                                     </div>

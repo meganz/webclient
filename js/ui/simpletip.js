@@ -44,6 +44,10 @@
      * Example:
      * ```<a href="#" data-simpletip="Hey! custom style." data-simpletip-style='{"width":"200px"}'>Mouse over me</a>```
      *
+     * E) Add any custom class to tooltip by `data-simpletip-class='custom-class'`
+     * Example:
+     * ```<a href="#" data-simpletip="Hey! custom class" data-simpletip-class='small-tip'>Mouse over me</a>```
+     *
      * How to trigger content update:
      * 1) Create new instance of the simpletip that contains conditional `data-simpletip` attribute.
      * ```<a href="#" data-simpletip={condition ? 'Mute' : 'Unmute' }></a>```
@@ -96,7 +100,7 @@
             return false;
         }
 
-        var contents = $this.attr('data-simpletip');
+        var contents = $this.data('simpletip');
         if (contents) {
             var $node = $template.clone();
             var $textContainer = $('span', $node);
@@ -105,7 +109,7 @@
             // e.g. "Mute" -> "Unmute"
             $this.rebind(SIMPLETIP_UPDATED_EVENT, function() {
                 $textContainer.safeHTML(
-                    sanitize($this.attr('data-simpletip'))
+                    sanitize($this.data('simpletip'))
                 );
             });
             $this.rebind(SIMPLETIP_CLOSE_EVENT, function() {
@@ -115,7 +119,7 @@
 
             $currentNode = $node;
             $currentTriggerer = $this;
-            var wrapper = $this.attr('data-simpletipwrapper') || "";
+            var wrapper = $this.data('simpletipwrapper') || "";
             if (wrapper) {
                 wrapper += ",";
             }
@@ -125,9 +129,14 @@
                 $currentNode.css(customStyle);
             }
 
+            var customClass = $this.data('simpletip-class');
+            if (customClass) {
+                $currentNode.addClass(customClass);
+            }
+
             var my = "center top";
             var at = "center bottom";
-            if ($this.attr('data-simpletipposition') === "top") {
+            if ($this.data('simpletipposition') === "top") {
                 my = "center bottom";
                 at = "center top";
             }
@@ -138,32 +147,32 @@
                 collision: "flipfit",
                 within: $this.parents('.ps-container,' + wrapper + 'body').first(),
                 using: function(obj, info) {
-                        var vertClass = info.vertical !== "top" ? "t" : "b";
-                        var horizClass = info.horizontal !== "left" ? "l" : "r";
-                        this.classList.remove(
-                            "simpletip-v-t", "simpletip-v-b", "simpletip-h-l", "simpletip-h-r"
-                        );
-                        this.classList.add("simpletip-h-" + horizClass, "simpletip-v-" + vertClass, "visible");
+                    var vertClass = info.vertical === "top" ? "b" : "t";
+                    var horizClass = info.horizontal === "left" ? "r" : "l";
+                    this.classList.remove(
+                        "simpletip-v-t", "simpletip-v-b", "simpletip-h-l", "simpletip-h-r"
+                    );
+                    this.classList.add("simpletip-h-" + horizClass, "simpletip-v-" + vertClass, "visible");
 
-                        var topOffset = 0;
-                        if (vertClass === "t") {
-                            topOffset = -6;
-                        }
-                        if ($this.attr('data-simpletipoffset')) {
-                            var offset = parseInt($this.attr('data-simpletipoffset'), 10);
-                            if (vertClass === "t") {
-                                topOffset += offset * -1;
-                            }
-                            else {
-                                topOffset += offset;
-                            }
-                        }
-
-                        $(this).css({
-                            left: obj.left + 'px',
-                            top: obj.top + topOffset + 'px'
-                        });
+                    var topOffset = 0;
+                    if (vertClass === "t") {
+                        topOffset = -6;
                     }
+                    if ($this.data('simpletipoffset')) {
+                        var offset = parseInt($this.data('simpletipoffset'), 10);
+                        if (vertClass === "t") {
+                            topOffset += offset * -1;
+                        }
+                        else {
+                            topOffset += offset;
+                        }
+                    }
+
+                    $(this).css({
+                        left: obj.left + 'px',
+                        top: obj.top + topOffset + 'px'
+                    });
+                }
             });
 
             // Calculate Arrow position
@@ -182,7 +191,7 @@
             });
         }
     });
-    $(document.body).rebind('mouseover.simpletip', function(e) {
+    $(document.body).rebind('mouseover.simpletip, touchmove.simpletip', function(e) {
         if ($currentNode && !e.target.classList.contains('simpletip') && !$(e.target).parents('.simpletip').length > 0
             && !e.target.classList.contains('tooltip-arrow')) {
             unmount();

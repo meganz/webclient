@@ -84,10 +84,6 @@ body.pro:after {
     background-image: url(../images/mega/browsers-page@2x.png);
     background-size: 892px auto;
 }
-.membership-question-mark span, .membership-date, .membership-st2-select span, .membership-payment-icon, .membership-radio-label, .astropay-dialog .powered-by-astropay {
-    background-image: url(../images/mega/pro-new-sprite-v8@2x.png);
-    background-size: 755px auto;
-}
 .privacy-company-icon, .privacy-company-bott .st-quote-left, .privacy-company-bott .st-quote-right {
     background-image: url(../images/mega/privacy-sprite_v2@2x.png);
     background-size: 130px auto;
@@ -197,7 +193,7 @@ i.small-icon.icons-sprite,
 .dropdown-dark-arrow,
 .transfer-task-status::before
 {
-    background-image: url(../images/mega/icons-sprite_v39@2x.png);
+    background-image: url(../images/mega/icons-sprite_v40@2x.png);
     background-size: 262px auto;
 }
 #help2-main .ui-autocomplete .client, #help2-main .ios-desktop-icon, #help2-main .windows-desktop-icon, #help2-main .linux-desktop-icon, #help2-main .webclient-icon {
@@ -257,10 +253,6 @@ i.account-icon,
 .download.big-icon, .fm-dialog-close.big, .megasync-img::before, .megasync-slider.button::after {
     background-image: url(../images/mega/download-dialog_v2@2x.png);
     background-size: 853px auto;
-}
-.upload-overlay-icon {
-    background-image: url(../images/mega/startpage-sprite_v11@2x.png);
-    background-size: 267px auto;
 }
 .properties-file-icon div {
     background-image: url(../images/mega/properties-sprite_v2@2x.png);
@@ -356,7 +348,7 @@ i.dialog-sprite,
     background-size: 160px auto;
 }
 .tiny-icon, .semi-small-icon, .small-icon, .medium-icon, .semi-big-icon, .big-icon, .huge-icon, .huge-grey-warning, .round-icon, .call-icon, .verified .verified_icon, .icon-dropdown:not(.disabled):hover, .icon-dropdown.active, .user-card-verified, div.message.richpreview.confirmation-icon, .dropdown-fingerprint, div.chat-topic-icon::before, div.chat-share-nav.button::before, div.chat-topic-icon::before, div.chat-share-nav.button::before, .chat-topic-block.privateChat .privateChatDiv, .privateChat + .privateChatDiv {
-    background-image: url(../images/mega/new-chat-sprite_v17@2x.png);
+    background-image: url(../images/mega/new-chat-sprite_v18@2x.png);
     background-size: 237px auto;
 }
 .invitation-dialog.table-cell span.desc,
@@ -590,7 +582,32 @@ i.dialog-sprite,
     background-image: url(../images/mega/fm-main-sprite_v15@2x.png);
     background-size: 48px auto;
 }
-.user-management-view .icon48, .user-management-dialog .icon48, .user-management-view .icon56, .user-management-dialog .icon56, .user-management-view-data .user-management-view-overall-usage .user-management-storage .img, .user-management-view-data .user-management-view-overall-usage .user-management-transfer .img, .user-management-landing-page .mega-56px-icon, .user-management-view .icon64, .user-management-dialog .icon64, .user-management-view .id-card-icon.icon, .fm-right-header-user-management .id-card-icon.icon, .user-management-dialog .id-card-icon.icon, .user-management-dialog .dialog-heading-img, .user-management-dialog .sent-email-logo, .bus-reg-btn .next-arrow, .bus-reg-btn-2 .next-arrow, .bus-plan-icon64, .bus-reg-featureImg100, .bus-confirm-body .bus-confirmImg, .user-management-account-settings .setting-icon24, .user-management-dialog .icon102, .user-management-storage .img, .user-management-transfer .img, .card-container .dialog-heading-img, .user-management-dialog .icon102, .user-management-storage .img, .user-management-transfer .img {
+.user-management-view .icon48,
+.user-management-dialog .icon48,
+.user-management-view .icon56,
+.user-management-dialog .icon56,
+.user-management-view-data .user-management-view-overall-usage .user-management-storage .img,
+.user-management-view-data .user-management-view-overall-usage .user-management-transfer .img,
+.user-management-landing-page .mega-56px-icon,
+.user-management-view .icon64,
+.user-management-dialog .icon64,
+.user-management-view .id-card-icon.icon,
+.fm-right-header-user-management .id-card-icon.icon,
+.user-management-dialog .id-card-icon.icon,
+.user-management-dialog .dialog-heading-img,
+.user-management-dialog .sent-email-logo,
+.bus-reg-btn .next-arrow,
+.bus-reg-btn-2 .next-arrow,
+.bus-reg-featureImg100,
+.bus-confirm-body .bus-confirmImg,
+.user-management-account-settings .setting-icon24,
+.user-management-dialog .icon102,
+.user-management-storage .img,
+.user-management-transfer .img,
+.card-container .dialog-heading-img,
+.user-management-dialog .icon102,
+.user-management-storage .img,
+.user-management-transfer .img {
     background-image: url(../images/mega/big-icons_v5@2x.png);
     background-size: 192px auto;
 }

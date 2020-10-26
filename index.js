@@ -1564,6 +1564,7 @@ function init_page() {
         parsepage(pages['resellers']);
     }
     else if (page === 'downloadapp') {
+        parsepage(pages.downloadapp);
         desktopOnboarding();
     }
     else if (page == 'takedown') {
@@ -1968,6 +1969,7 @@ function topmenuUI() {
     var $menuLoggedBlock = $('.top-menu-logged', $topMenu);
     var $menuRefreshItem = $('.top-menu-item.refresh-item', $topMenu);
     var $menuHomeItem = $('.top-menu-item.start', $topMenu);
+    var $menuPricingItem = $('.top-menu-item.pro', $topMenu);
     var $menuBackupItem = $('.top-menu-item.backup', $topMenu);
     var $menuAffiliateItem = $('.top-menu-item.affiliate', $topMenu);
     var $menuUserinfo = $('.user-info', $menuLoggedBlock);
@@ -1992,6 +1994,7 @@ function topmenuUI() {
     $menuLoggedBlock.addClass('hidden').removeClass('business-acc');
     $menuBackupItem.addClass('hidden').next('.top-menu-divider').addClass('hidden');
     $menuHomeItem.removeClass('hidden');
+    $menuPricingItem.removeClass('hidden');
     $menuFmItem.addClass('hidden');
     $menuLogoutButton.addClass('hidden');
     $menuAuthButtons.addClass('hidden');
@@ -2179,9 +2182,14 @@ function topmenuUI() {
         // if this is a business account sub-user
         if (u_attr && u_attr.b) {
             $menuLoggedBlock.addClass('business-acc');
+
             if (u_attr.b.s !== -1) {
+
                 $headerAchievements.addClass('hidden');
                 $menuUpgradeAccount.addClass('hidden');
+
+                // Hide Pricing menu item for Business sub accounts and admin expired
+                $menuPricingItem.addClass('hidden');
             }
         }
 
@@ -2347,8 +2355,15 @@ function topmenuUI() {
 
     // try individual button in business mode
     $headerIndividual.rebind('click.individual', function() {
-        if (page === 'business' || page === 'registerb') {
-            loadSubPage('start');
+        if (page === 'business') {
+            sessionStorage.setItem('pro.subsection', 'individual');
+            loadSubPage('pro');
+        }
+        else if (page === 'registerb') {
+            loadSubPage('register');
+        }
+        else if (page === 'register') {
+            loadSubPage('registerb');
         }
         else {
             loadSubPage('business');
@@ -2431,7 +2446,7 @@ function topmenuUI() {
                     'help', 'login', 'mega', 'nzippmember', 'nziphotographer', 'privacy', 'gdpr', 'mobileapp',
                     'mobile', 'privacycompany', 'register', 'resellers', 'sdk', 'sync', 'sitemap', 'sourcecode',
                     'support', 'sync', 'takedown', 'terms', 'start', 'uwp', 'security', 'downloadapp', 'affiliate',
-                    'nas'
+                    'nas', 'pro'
                 ];
                 var moveTo = { 'account': 'fm/account', 'affiliate': 'refer', 'about': 'about/main' };
 

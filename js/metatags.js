@@ -82,6 +82,11 @@ mega.metatags = new function() {
         document.head.appendChild(canonical);
     };
 
+    var ucFirst = function(s) {
+        s = String(s || '');
+        return s.charAt(0).toUpperCase() + s.slice(1);
+    };
+
     /* eslint-disable complexity */
     this.addStrucuturedData = function(type, data) {
 
@@ -276,7 +281,7 @@ mega.metatags = new function() {
             mTags.mega_desc = l[18775] || mTags.en_desc;
             mTags.image = 'https://cms2.mega.nz/75bc1e26149f8962b723a42205434feb.png';
         }
-        else if (page === 'pro') {
+        else if (page === 'pro' || page.substr(0, 6) === 'propay') {
             mTags.en_title = 'Plans & pricing - MEGA';
             mTags.en_desc = 'Upgrade to a MEGA PRO account for additional storage and transfer quota. '
                 + 'MEGA provides one of the cheapest cloud storage deals on the Internet.';
@@ -570,6 +575,14 @@ mega.metatags = new function() {
             mTags.en_desc = 'MEGA\'s Help Centre';
             mTags.mega_title = l[24021] || mTags.en_title;
             mTags.mega_desc = l[24022] || mTags.en_desc;
+        }
+        else if (page.substr(0, 11) === 'help/search') {
+            var term = ucFirst(page.substr(12));
+            mTags.en_title = term + ' - Search Help - MEGA';
+            mTags.en_desc = 'MEGA\'s Search - Help Centre - ' + term;
+            mTags.mega_title = l[24033].replace('$1', term).replace('$2', l[102]);
+            mTags.mega_desc = l[24034].replace('$1', l[102]).replace('$2', term);
+            mTags.section = 'help';
         }
         else if (page.indexOf('help/') > -1 && page.length > 5) {
             var linkParts = page.split('/');

@@ -438,6 +438,8 @@ ClassFile.prototype.destroy = function() {
             Zips[this.dl.zipid].done(this);
         }
         else {
+            mBroadcaster.sendMessage('trk:event', 'download', 'completed');
+
             this.dl.onDownloadProgress(
                 this.dl.dl_id, 100,
                 this.dl.size,
@@ -491,6 +493,9 @@ ClassFile.prototype.run = function(task_done) {
     if (!GlobalProgress[this.gid].started) {
         GlobalProgress[this.gid].started = true;
         this.dl.onDownloadStart(this.dl);
+        if (!this.dl.zipid) {
+            mBroadcaster.sendMessage('trk:event', 'download', 'started');
+        }
     }
 
     this.dl.ready = function() {

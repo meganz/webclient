@@ -1213,6 +1213,15 @@
             u_attr['^!afficon'] = 1;
         };
 
+        uaPacketParserHandler['^!ps'] = function(userHandle) {
+            mega.attr.get(userHandle, 'ps', -2, 1, function(res) {
+                if (fminitialized && typeof pushNotificationSettings !== 'undefined') {
+                    u_attr['^!ps'] = res;
+                    pushNotificationSettings.init();
+                }
+            });
+        };
+
         if (d) {
             global._uaPacketParserHandler = uaPacketParserHandler;
         }

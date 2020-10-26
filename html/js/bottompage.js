@@ -7,6 +7,7 @@ var bottompage = {
      * Initialise the page
      */
     init: function() {
+
         "use strict";
 
         var $content = $('.bottom-page.scroll-block', '.fmholder');
@@ -64,6 +65,37 @@ var bottompage = {
         // Init scroll button
         bottompage.initBackToScroll();
         bottompage.initScrollToContent();
+
+        // Show/hide Referal Program and Pricing menu items for different acctount types
+        bottompage.changeMenuItemsList($content);
+    },
+
+    /**
+     * Show/hide necessary menu items for different acctount types
+     */
+    changeMenuItemsList: function($content) {
+        "use strict";
+
+        var $bottomMenu = $('.bottom-menu.body', $content);
+        var $pagesMenu = $('.pages-menu.body', $content);
+
+        // Show/Hide Affiliate program link in bottom menu
+        if (mega.flags.refpr) {
+            $('.bottom-menu.affiliate', $bottomMenu).removeClass('hidden');
+        }
+        else {
+            $('.bottom-menu.affiliate', $bottomMenu).addClass('hidden');
+        }
+
+        // Show/Hide Pricing link for Business sub accounts and admin expired
+        if (u_attr && u_attr.b && u_attr.b.s !== -1) {
+            $('.bottom-menu.pro', $bottomMenu).addClass('hidden');
+            $('.pages-menu.link.pro', $pagesMenu).addClass('hidden');
+        }
+        else {
+            $('.bottom-menu.pro', $bottomMenu).removeClass('hidden');
+            $('.pages-menu.link.pro', $pagesMenu).removeClass('hidden');
+        }
     },
 
     /**
@@ -168,6 +200,8 @@ var bottompage = {
     initBackToScroll: function() {
         "use strict";
 
+        var $body = $('body');
+
         $('#startholder').rebind('scroll.bottompage', function() {
             sessionStorage.setItem('scrpos' + MurmurHash3(page).toString(16), $(this).scrollTop() | 0);
             if (page === 'download') {
@@ -176,12 +210,17 @@ var bottompage = {
         });
 
         window.onpopstate = function() {
+
             var sessionData = sessionStorage['scrpos' + MurmurHash3(page).toString(16)];
 
-            if ($('body').hasClass('bottom-pages') && sessionData) {
-                $('#startholder').scrollTop(sessionData);
+            if ($body.hasClass('bottom-pages') && sessionData) {
+
+                // Scroll to saved position and reset previous focus
+                $('#startholder', $body).scrollTop(sessionData).trigger('mouseover');
+
                 if (page === 'download') {
-                    $('.download.top-bar').removeClass('expanded initial').css('height', '');
+
+                    $('.download.top-bar', $body).removeClass('expanded initial').css('height', '');
                     $(window).unbind('resize.download-bar');
                 }
             }
@@ -397,7 +436,7 @@ var bottompage = {
 
     initFloatingTop: function() {
         var topHeader;
-        var navBar = '.pages-menu.body';
+        var $navBar = $('.pages-menu.body', 'body');
 
         if (page === 'download') {
             topHeader = '.download.top-bar';
@@ -411,11 +450,12 @@ var bottompage = {
 
         function topResize() {
             var $topHeader = $(topHeader, 'body');
-            var $navBar = $(navBar, 'body');
+
             if ($topHeader.hasClass('floating')) {
-                $topHeader.width($topHeader.parent().outerWidth());
+                $topHeader.outerWidth($topHeader.parent().outerWidth());
+
                 if (page !== 'download') {
-                    $navBar.width($navBar.outerWidth());
+                    $navBar.outerWidth($topHeader.parent().outerWidth());
                 }
             }
             else {
@@ -424,13 +464,12 @@ var bottompage = {
             }
         }
 
-        $(window).rebind('resize.topheader', function (e) {
+        $(window).rebind('resize.topheader', function() {
             topResize();
         });
 
         $('.bottom-pages .fmholder').rebind('scroll.topmenu', function() {
             var $topHeader = $(topHeader);
-            var $navBar = $(navBar);
             var topPos = $(this).scrollTop();
             var navTopPos;
 

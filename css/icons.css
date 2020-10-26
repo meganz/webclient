@@ -1,7 +1,7 @@
 .tiny-icon, .semi-small-icon, .small-icon, .medium-icon, .semi-big-icon, .big-icon, .huge-icon, .icon56 {
     width: 20px;
     height: 20px;
-    background-image: url(../images/mega/new-chat-sprite_v17.png);
+    background-image: url(../images/mega/new-chat-sprite_v18.png);
     background-repeat: no-repeat;
     background-position: 0px -1447px;
     display: inline-block;
@@ -12,7 +12,7 @@
     height: 184px;
     margin: 21px auto;
     display: block;
-    background-image: url(../images/mega/new-chat-sprite_v17.png);
+    background-image: url(../images/mega/new-chat-sprite_v18.png);
     background-repeat: no-repeat;
     background-position: center -1838px;
 }
@@ -566,7 +566,7 @@
     width: 32px;
     height: 32px;
     display: block;
-    background-image: url(../images/mega/new-chat-sprite_v17.png);
+    background-image: url(../images/mega/new-chat-sprite_v18.png);
     background-repeat: no-repeat;
 }
 .call-icon.handset-with-stop {
@@ -780,12 +780,12 @@
     background-position: -7px -16px;
 }
 .medium-icon.down-arrow {
-    background-image: url(../images/mega/pages-sprite.png);
+    background-image: url(../images/mega/pages-sprite_v7.png);
     background-position: 0 -712px;
     width: 18px;
 }
 .medium-icon.icons-img, .semi-big-icon.icons-img {
-    background-image: url(../images/mega/icons-sprite_v39.png);
+    background-image: url(../images/mega/icons-sprite_v40.png);
 }
 .medium-icon.icons-img.close {
         background-position: -47px -687px;
@@ -1223,15 +1223,15 @@
     background-position: 0px -99px;
 }
 .small-icon.red-lens {
-    background-image: url(../images/mega/icons-sprite_v39.png);
+    background-image: url(../images/mega/icons-sprite_v40.png);
     background-position: -192px -585px;
 }
 .small-icon.red-play {
-    background-image: url(../images/mega/icons-sprite_v39.png);
+    background-image: url(../images/mega/icons-sprite_v40.png);
     background-position: -233px -585px;
 }
 .small-icon.small-play-icon {
-    background-image: url(../images/mega/icons-sprite_v39.png);
+    background-image: url(../images/mega/icons-sprite_v40.png);
     background-position: -148px -634px;
 }
 .thumb .small-icon.small-play-icon {
@@ -1239,7 +1239,7 @@
 }
 /* Context menu icons */
 .small-icon.context {
-    background-image: url(../images/mega/icons-sprite_v39.png);
+    background-image: url(../images/mega/icons-sprite_v40.png);
 }
 .small-icon.context.standart-download {
     background-position: -1px -499px;
@@ -1831,7 +1831,7 @@
     background-position: -205px -1731px;
 }
 .icons-sprite, i.icons-sprite, i.small-icon.icons-sprite {
-    background-image: url(../images/mega/icons-sprite_v39.png);
+    background-image: url(../images/mega/icons-sprite_v40.png);
 }
 .medium-icon.icons-sprite.mega {
     background-position: -49px -1004px;
@@ -2098,6 +2098,12 @@ i.account-icon.menu {
 .small-icon.archive.colorized {
     background-position: -90px -736px;
 }
+.small-icon.mute.colorized {
+    background-position: -50px -1017px;
+}
+.small-icon.muted.colorized {
+    background-position: -210px -1017px;
+}
 .small-icon.grey-cloud.colorized {
     background-position: -50px -934px;
     width: 22px;
@@ -2171,7 +2177,7 @@ i.account-icon.menu {
     margin-top: 4px;
 }
 .toast-icon.multi-files-icon {
-    background-image: url(../images/mega/icons-sprite_v39.png);
+    background-image: url(../images/mega/icons-sprite_v40.png);
     background-repeat: no-repeat;
     background-position: -5px -2019px;
     opacity: 0.6;

@@ -1843,6 +1843,10 @@ FullScreenManager.prototype.enterFullscreen = function() {
             if (/av0?1\b/i.test(s.hasVideo)) {
                 eventlog(99721, JSON.stringify([1, s.hasVideo, s.hasAudio, s.options.type]));
             }
+            if (/^h(?:ev|vc)1\b/i.test(s.hasVideo)) {
+                var audio = s.hasAudio || '~' + s.hasUnsupportedAudio;
+                eventlog(99738, JSON.stringify([1, s.hasVideo, audio, s.options.type]));
+            }
             mBroadcaster.sendMessage('trk:event', 'videostream', 'playing');
         });
 
@@ -3093,6 +3097,9 @@ FullScreenManager.prototype.enterFullscreen = function() {
                 else if (videocodec === 'av01') {
                     return MediaSource.isTypeSupported('video/mp4; codecs="av01.2.23M.12"') ? 1 : 0;
                 }
+                else if (videocodec === 'hev1' || videocodec === 'hvc1') {
+                    return MediaSource.isTypeSupported('video/mp4; codecs="' + videocodec + '.1.6.L93.90"') ? 1 : 0;
+                }
                 return canPlayMSEAudio();
 
             case 'Matroska':
@@ -3136,6 +3143,13 @@ FullScreenManager.prototype.enterFullscreen = function() {
 
         return 0;
     };
+
+    if (sessionStorage.vsPlayAnything) {
+        MediaAttribute.isTypeSupported = function() {
+            console.warn.apply(console, arguments);
+            return 1;
+        };
+    }
 
     var mediaTypeCache = Object.create(null);
 

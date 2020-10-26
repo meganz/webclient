@@ -3832,11 +3832,11 @@ class ConversationMessageMixin extends _stores_mixins_js1__["ContactAwareCompone
     }
 
     if (CURRENT_USER_REACTIONS >= REACTIONS_LIMIT.PER_PERSON) {
-      return msgDialog('info', '', "You had reached the maximum limit of " + REACTIONS_LIMIT.PER_PERSON + " reactions");
+      return msgDialog('info', '', l[24205].replace('%1', REACTIONS_LIMIT.PER_PERSON));
     }
 
     if (Object.keys(reactions).length >= REACTIONS_LIMIT.TOTAL) {
-      return msgDialog('info', '', "This message reached the maximum limit of " + REACTIONS_LIMIT.TOTAL + " reactions");
+      return msgDialog('info', '', l[24206].replace('%1', REACTIONS_LIMIT.TOTAL));
     }
 
     return addReaction();

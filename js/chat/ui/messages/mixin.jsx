@@ -211,15 +211,13 @@ class ConversationMessageMixin extends ContactAwareComponent {
 
         if (CURRENT_USER_REACTIONS >= REACTIONS_LIMIT.PER_PERSON) {
             return (
-                // TODO: add translations
-                msgDialog('info', '', `You had reached the maximum limit of ${REACTIONS_LIMIT.PER_PERSON} reactions`)
+                msgDialog('info', '', l[24205].replace('%1', REACTIONS_LIMIT.PER_PERSON))
             );
         }
 
         if (Object.keys(reactions).length >= REACTIONS_LIMIT.TOTAL) {
             return (
-                // TODO: add translations
-                msgDialog('info', '', `This message reached the maximum limit of ${REACTIONS_LIMIT.TOTAL} reactions`)
+                msgDialog('info', '', l[24206].replace('%1', REACTIONS_LIMIT.TOTAL))
             );
         }
 

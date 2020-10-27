@@ -981,7 +981,7 @@
 /*    float: left;*/
     display: inline-block;
     margin-left: 5%;
-    line-height: 36px;
+    line-height: 28px;
     transition-property: color;
     -moz-transition-property: color; /* Firefox 4 */
     -webkit-transition-property: color; /* Safari and Chrome */
@@ -2569,7 +2569,7 @@
     background-position: -124px -416px;
     width: 16px;
     margin-right: 16px;
-    margin-top: 12px;
+    margin-top: 9px;
     margin-left: 0;
 }
 #help2-main .support-go-back {

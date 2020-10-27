@@ -162,15 +162,15 @@ CallNotificationsEngine.ActionMeta = function (
 CallNotificationsEngine.ACTIONS_META = {
     'JOIN': new CallNotificationsEngine.ActionMeta(
         'green',
-        "%NAME joined the call",
-        "%NAMES and %NAME_LAST joined the call",
+        l[24152],
+        l[24153],
         false,
         true
     ),
     'LEFT': new CallNotificationsEngine.ActionMeta(
         'green',
-        "%NAME left the call",
-        "%NAMES and %NAME_LAST left the call",
+        l[24154],
+        l[24155],
         false,
         true
     ),
@@ -287,7 +287,7 @@ CallNotificationsEngine.Notification.prototype.getTitle = function() {
     if (this.actors && this.actors.length > 1) {
         var names = [];
         this.actors.forEach(function(userId) {
-            names.push(M.u[base64urlencode(userId)].name || M.u[base64urlencode(userId)].m);
+            names.push(nicknames.getNickname(base64urlencode(userId)));
         });
         var last = names.pop();
         return meta.pluralTitle
@@ -296,7 +296,7 @@ CallNotificationsEngine.Notification.prototype.getTitle = function() {
     }
     else if (this.actors && this.actors.length === 1) {
         return meta.singularTitle.replace(
-            "%NAME", M.u[base64urlencode(this.actors[0])].name || M.u[base64urlencode(this.actors[0])].m
+            "%NAME", nicknames.getNickname(base64urlencode(this.actors[0]))
         );
     }
     else {

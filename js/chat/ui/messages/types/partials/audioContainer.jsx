@@ -1,6 +1,5 @@
 import React from 'react';
 import AudioPlayer from './audioPlayer.jsx';
-import PropTypes from 'prop-types';
 
 export default class AudioContainer extends React.Component {
     state = {
@@ -67,11 +66,6 @@ export default class AudioContainer extends React.Component {
         );
     }
 }
-
-AudioContainer.propTypes = {
-    h: PropTypes.string.isRequired,
-    mime: PropTypes.string.isRequired,
-};
 
 AudioContainer.defaultProps = {
     h: null,

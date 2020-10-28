@@ -15,9 +15,6 @@ var BABEL_LOADER_OPTIONS = {
         ['babel-plugin-minify-dead-code-elimination', {
             'keepFnName': true,
             'keepClassName': true
-        }],
-        ['babel-plugin-transform-react-remove-prop-types', {
-            'classNameMatchers': ['Contact', 'Avatar', 'Mega']
         }]
     ],
     presets: [
@@ -128,9 +125,6 @@ var webpackConfigs = {
             "react-dom": "ReactDOM",
         },
         plugins: [
-            new webpack.IgnorePlugin({
-                resourceRegExp: /prop-types/
-            }),
             new webpack.BannerPlugin({
                 "banner": "/** @file automatically generated, do not edit it. */",
                 "raw": true

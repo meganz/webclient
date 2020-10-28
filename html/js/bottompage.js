@@ -60,6 +60,7 @@ var bottompage = {
         else {
             $('body').addClass('mobile');
             bottompage.initMobileNavButtons($content);
+            bottompage.initMobileFloatingTop();
         }
 
         // Init scroll button
@@ -526,6 +527,56 @@ var bottompage = {
                 $navBar.removeClass('floating activated').removeAttr('style');
             }
         });
+    },
+
+    initMobileFloatingTop: function() {
+        'use strict';
+        var topHeader;
+
+        // Currently only applies to help page
+        if (page.substr(0, 4) === 'help') {
+            topHeader = '.bottom-page .top-head, .old .top-head, .support-section-header';
+        }
+
+        function topResize() {
+            var $topHeader = $(topHeader, 'body');
+            if ($topHeader.hasClass('floating')) {
+                $topHeader.width($topHeader.parent().outerWidth());
+            }
+            else {
+                $topHeader.css('width',  '');
+            }
+        }
+        if (topHeader) {
+            $(window).rebind('resize.topheader', function() {
+                topResize();
+            });
+
+            $(window).rebind('scroll.topmenu', function() {
+                var $topHeader = $(topHeader);
+                var topPos = $(this).scrollTop();
+
+                if (topPos > 300) {
+                    $topHeader.addClass('floating');
+                    topResize();
+                    if (topPos > 400) {
+                        $topHeader.addClass('activated');
+                    }
+                }
+                else if (topPos <= 300 && topPos >= 50) {
+                    $topHeader.removeClass('activated');
+                }
+                else {
+                    $topHeader.removeClass('floating activated').css('width',  '');
+                }
+
+                if (topPos > 300) {
+                    $(window).unbind('resize.pagesmenu');
+                    topResize();
+                }
+            });
+        }
+
     },
 
     videoResizing: function() {

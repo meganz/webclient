@@ -5,6 +5,7 @@
     padding-bottom: 0;
     padding-left: 0 !important;
     padding-right: 0 !important;
+    padding-top: 64px
 }
 
 .help-home-page .main-mid-pad {
@@ -414,7 +415,7 @@
     position: relative;
     display: block;
     margin-bottom: 0;
-    padding-top: 87px;
+    padding-top: 60px;
 }
 #help2-main .overlay-section-title {
     color: #222;
@@ -850,12 +851,13 @@
     border: none;
     font-family: 'source_sans_proregular';
     font-size: 15px;
+    line-height: 32px;
     color: #333;
     margin-top: 6px;
     padding-left: 18px;
     padding-right: 8px;
     height: 30px;
-    width: 86%;
+    width: 78%;
     z-index: 900;
 }
 #help2-main ::-webkit-input-placeholder {
@@ -916,21 +918,23 @@
 }
 #help2-main .support-section-header {
     width: 100%;
-    position: fixed;
+    position: relative;
     left: 0;
     right: 0;
     display: block;
-    line-height: 30px;
+/*    line-height: 30px;*/
     font-family: 'source_sans_proregular';
     font-size: 14px;
     color: #fff;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
+    -webkit-transition: top 600ms ease-in-out;
+    -moz-transition: top 600ms ease-in-out;
+    -o-transition: top 600ms ease-in-out;
+    -ms-transition: top 600ms ease-in-out;
+    transition: top 600ms ease-in-out;
     user-select: none;
     z-index: 999;
-    margin-top: 12px;
-    top: 50px;
+/*    margin-top: 12px;*/
+    background-color: #f44;
 }
 #help2-main .support-nav-breadcrumb {
     display: inline-block;
@@ -974,10 +978,10 @@
     min-width: 50px;
 }
 #help2-main .support-go-back {
-    float: left;
+/*    float: left;*/
     display: inline-block;
-    margin-left: 36px;
-    line-height: 36px;
+    margin-left: 5%;
+    line-height: 28px;
     transition-property: color;
     -moz-transition-property: color; /* Firefox 4 */
     -webkit-transition-property: color; /* Safari and Chrome */
@@ -990,6 +994,27 @@
     -moz-transition-timing-function: ease; /* Firefox 4 */
     -webkit-transition-timing-function: ease; /* Safari and Chrome */
     -o-transition-timing-function: ease; /* Opera */
+}
+#help2-main .support-go-back-heading {
+    color: #fff;
+    margin-left: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    float: left;
+}
+#help2-main .nav-arrow {
+    display: inline-block;
+    float: left;
+    position: relative;
+    background-image: url("../images/mega/help2/welcome_icons_v3.png");
+    background-repeat: no-repeat;
+    height: 16px;
+    background-position: -97px -471px;
+    width: 16px;
+    cursor: pointer;
+    margin-top: 1px;
+    margin-right: 4px;
 }
 #help2-main .support-search {
     float: right;
@@ -1020,7 +1045,8 @@
 #help2-main .support-search-container {
     z-index: 999;
     position: relative;
-    margin: 0 auto 46px;
+/*    margin: 0 auto 46px;*/
+    padding: 0 0 46px;
 }
 #help2-main .sidebar-menu-link {
     position: relative;
@@ -1530,8 +1556,9 @@
     border-top-right-radius: 6px;
     bottom: 0;
     box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.15);
-    margin-left: 324px;
-    padding-bottom: 40px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-bottom: 150px;
     padding-top: 10px;
     width: 700px;
     height: auto;
@@ -1544,7 +1571,7 @@
     margin-bottom: 100px;
     margin-left: auto;
     margin-right: auto;
-    margin-top: 180px;
+    margin-top: 96px;
     padding-left: 50px;
     padding-right: 50px;
     position: relative;
@@ -2542,7 +2569,7 @@
     background-position: -124px -416px;
     width: 16px;
     margin-right: 16px;
-    margin-top: 12px;
+    margin-top: 9px;
     margin-left: 0;
 }
 #help2-main .support-go-back {
@@ -2605,12 +2632,7 @@
     position: relative;
     color: #333;
 }
-#help2-main .support-go-back-heading {
-    display: inline-block;
-    min-width: 50px;
-    color: #fff;
-    cursor: pointer;
-}
+
 #help2-main .support-section-header-clone .support-go-back-heading  {
     color: #333;
     display: inline-block;
@@ -2802,7 +2824,7 @@
     display: none;
 }
 @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
-    #help2-main .getstart-img, #help2-main .usemega-img, #help2-main .browsearticle-button .article-arrow, #help2-main .block-megachat, #help2-main .block-megasync, #help2-main .block-business, #help2-main .feedback-logo, #help2-main .yes-icon, #help2-main .no-icon, #help2-main .support-link-icon, #help2-main .support-email-icon, #help2-main .block-ios-desktop, #help2-main .block-windows-desktop, #help2-main .block-linux-desktop, #help2-main .support-search-icon, #help2-main .support-go-back-icon, #help2-main input.submit, #help2-main .device-menu-icon, #help2-main .result-filter-icon, #help2-main .megachat-icon, #help2-main .megasync-icon, #help2-main .ios-icon, #help2-main .ios-desktop-icon, #help2-main .windows-desktop-icon, #help2-main .linux-desktop-icon, #help2-main .windowsphone-icon, #help2-main .android-icon, #help2-main .block-webclient, #help2-main .block-mobile, #help2-main .block-ios, #help2-main .block-windowsphone, #help2-main .block-ios-megasync, #help2-main .block-windows-megasync, #help2-main .block-linux-megasync, #help2-main .close-icon, #help2-main .iOS-mobile-block, #help2-main .android-mobile-block, #help2-main .window-mobile-block, #help2-main .support-section-header-clone .support-go-back-icon, #help2-main .support-section-header-clone .support-search-icon, #help2-main .block-android, #help2-main .cmd-icon, #help2-main .block-cmd, #help2-main .block-uwp {
+    #help2-main .getstart-img, #help2-main .usemega-img, #help2-main .browsearticle-button .article-arrow, #help2-main .block-megachat, #help2-main .block-megasync, #help2-main .block-business, #help2-main .feedback-logo, #help2-main .yes-icon, #help2-main .no-icon, #help2-main .support-link-icon, #help2-main .support-email-icon, #help2-main .block-ios-desktop, #help2-main .block-windows-desktop, #help2-main .block-linux-desktop, #help2-main .support-search-icon, #help2-main .support-go-back-icon, #help2-main input.submit, #help2-main .device-menu-icon, #help2-main .result-filter-icon, #help2-main .megachat-icon, #help2-main .megasync-icon, #help2-main .ios-icon, #help2-main .ios-desktop-icon, #help2-main .windows-desktop-icon, #help2-main .linux-desktop-icon, #help2-main .windowsphone-icon, #help2-main .android-icon, #help2-main .block-webclient, #help2-main .block-mobile, #help2-main .block-ios, #help2-main .block-windowsphone, #help2-main .block-ios-megasync, #help2-main .block-windows-megasync, #help2-main .block-linux-megasync, #help2-main .close-icon, #help2-main .iOS-mobile-block, #help2-main .android-mobile-block, #help2-main .window-mobile-block, #help2-main .support-section-header-clone .support-go-back-icon, #help2-main .support-section-header-clone .support-search-icon, #help2-main .block-android, #help2-main .cmd-icon, #help2-main .block-cmd, #help2-main .block-uwp, #help2-main .nav-arrow, #help2-main .ui-autocomplete .client, #help2-main .ios-desktop-icon, #help2-main .windows-desktop-icon, #help2-main .linux-desktop-icon, #help2-main .webclient-icon {
         background-image: url(../images/mega/help2/welcome_icons_v3@2x.png);
         background-size: 250px 700px;
     }
@@ -2811,9 +2833,6 @@
     #help2-main .popular-question-block {
             padding-left: 80px;
             padding-right: 80px;
-        }
-        #help2-main .support-section-header {
-            display: none !important;
         }
         #help2-main .first-support-block {
             padding-left: 80px;
@@ -2884,9 +2903,9 @@
         }
     }
 @media only screen and (max-width: 801px) {
-    #help2-main .support-section-header {
-        display: none !important;
-    }
+    /*#help2-main .support-section-header {*/
+    /*    display: none !important;*/
+    /*}*/
     #help2-main .support-section-header-clone {
         display: none !important;
     }
@@ -2896,9 +2915,9 @@
         margin: 0 auto;
         width: 700px;
     }
-    #help2-main .support-section-header {
+/*    #help2-main .support-section-header {
         display: none !important;
-    }
+    }*/
     #help2-main .support-section-header-clone {
         display: none !important;
     }
@@ -3032,9 +3051,9 @@
 @media (min-width: 601px) and (max-width: 800px) {
      #help2-main .search-section-header .popular-question-list, #help2-main .popular-question-list {
         width: 100%;
-    }#help2-main .support-search-container {
+    }/*#help2-main .support-search-container {
         display: none;
-    }
+    }*/
     #help2-main .main-content-pad {
         margin: 0 auto;
     }
@@ -3081,12 +3100,14 @@
         height: 280px;
     }
     #help2-main .first-search-section {
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        display: block;
+        height: auto;
     }
-    #help2-main .support-section-header {
+/*    #help2-main .support-section-header {
         display: none !important;
+    }*/
+    #help2-main .support-search {
+        display: none;
     }
     #help2-main .support-section-header-clone {
         display: none !important;
@@ -3096,17 +3117,17 @@
         padding-right: 0%;
     }
     #help2-main .section-title {
-        font-size: 44px;
-        padding-top:0px;
+        font-size: 32px;
+        padding-top: 0;
     }
     #help2-main .support-article, #help2-main .d-section-container {
         width: calc(100% - 136px);
     }
     #help2-main .first-search-section .section-title {
         font-size: 40px;
-        width: 80%;
+        width: 90%;
         margin: 0 auto;
-        padding-top: 60px;
+        padding-top: 70px;
         line-height: 56px;
     }
     #help2-main .sidebar-menu-container {
@@ -3154,16 +3175,29 @@
         position: absolute;
         text-align: center;
     }
+    #help2-main .search-support-block .email-button span {
+        float: none;
+    }
+    #help2-main .search-support-block {
+        padding-top: 0px;
+        padding-left: 7.5%;
+        padding-right: 7.5%;
+    }
+    #help2-main .support-block-title {
+        margin: 48px 20px 20px;
+    }
+    #help2-main .search-support-block .support-block-subheading {
+        margin-right: 0;
+    }
 }
 @media (min-width: 481px) and (max-width: 600px) {
     #help2-main .first-search-section .section-title {
-        font-size: 46px;
-        width: 80%;
+        font-size: 30px;
+        width: 90%;
         margin: 0 auto;
         padding-top: 60px;
-        line-height: 56px;
+        line-height: 40px;
     }
-
     #help2-main .article-end {
         display: none;
     }
@@ -3206,7 +3240,7 @@
         font-size: 16px;
         color: #444;
     }
-        #help2-main #container {
+    #help2-main #container {
         min-width: 481px;
     }
     #help2-main .search-section-header .popular-question-list:nth-child(2), #help2-main .popular-question-list:nth-child(2) {
@@ -3221,25 +3255,42 @@
     }
     #help2-main .search-section-header .popular-question-list, #help2-main .popular-question-list {
         width: 100%;
-    }#help2-main .support-search-container {
+    }/*#help2-main .support-search-container {
+        display: none;
+    }*/
+    #help2-main .support-search {
         display: none;
     }
     #help2-main .first-search-section {
-        display: flex;
+/*        display: flex;
         align-items: center;
-        justify-content: center;
+        justify-content: center;*/
     }
     #help2-main .block.link div {
         margin: 24px auto 16px;
+    }
+    #help2-main .search-support-block .email-button span {
+        float: none;
+    }
+    #help2-main .search-support-block {
+        padding-top: 0px;
+        padding-left: 0px;
+        padding-right: 0px;
+    }
+    #help2-main .support-block-title {
+        margin: 48px 20px 20px;
+    }
+    #help2-main .search-support-block .support-block-subheading {
+        margin-right: 0;
     }
 }
 @media (min-width: 376px) and (max-width: 480px) {
     body {
         min-width: 376px;
     }
-    #help2-main .support-section-header {
+/*    #help2-main .support-section-header {
         display: none;
-    }
+    }*/
     #help2-main .support-image-instructions {
         padding-top: 0px;
     }
@@ -3257,14 +3308,9 @@
         margin-top: -12px;
     }
     #help2-main .first-search-section {
-        display: flex;
-        align-items:left;
         background-color: #F44;
         height: 60vh;
-        max-height: 320px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
+        max-height: 280px;
     }
     #help2-main .main-pad-container {
         background-color: #F44;
@@ -3308,6 +3354,7 @@
     .help-home-page .help-background-block {
         min-width: 376px;
         max-width: 480px;
+        max-height: 380px;
         background-color: #F44;
     }
     .main-scroll-block .jspPane {
@@ -3343,9 +3390,10 @@
         margin: 24px auto -6px;
     }
     #help2-main form#support-search {
-        display: none;
+/*        display: none;*/
+        width: 100%
     }
-        #help2-main .mobile-navigation-header {
+    #help2-main .mobile-navigation-header {
         background-color: #f55;
         display: flex;
         width: 100%;
@@ -3373,13 +3421,13 @@
         cursor: pointer;
     }
     #help2-main .section-title {
-        font-size: 44px;
-        line-height: 54px;
+        font-size: 30px;
+        line-height: 40px;
         color: #fff;
-        width: 80%;
+        width: 90%;
         margin-left: auto;
         margin-right: auto;
-        padding-top: 68px;
+        padding-top: 0;
         margin-top: 0px;
     }
     #help2-main .howto-section-subtitle {
@@ -3389,7 +3437,7 @@
         padding-right: 0;
         text-align: center;
         margin: 8px auto;
-        width: 80%
+        width: 90%
     }
     #help2-main .mobile-header-platforms, #help2-main .mobile-header-search, #help2-main .mobile-header-faqs, #help2-main .mobile-header-back{
         flex-grow: 1;
@@ -3566,20 +3614,25 @@
         margin-right: 24px;
     }
     #help2-main .first-search-section .section-title {
-        font-size: 42px;
-        line-height: 56px;
+        font-size: 30px;
+        line-height: 40px;
         color: #fff;
-        margin: 0px auto 0;
-        padding-top: 54px;
+        width: 90%;
+        margin: 0px auto;
+        padding-top: 60px;
     }
     #help2-main .support-search-container {
         margin:0 auto;
+        width: 90%;
+/*        display: none;*/
+    }
+    #help2-main .support-search {
         display: none;
     }
     #help2-main .main-title-section {
         min-height: 0px;
         padding-top: 0px;
-       margin-bottom: 0px;
+        margin-bottom: 0px;
         padding-bottom: 16px;
     }
     #help2-main .related-articles, #help2-main .related-tags {
@@ -3590,9 +3643,9 @@
         font-family: 'source_sans_prosemibold';
         line-height: 26px;
     }
-    #help2-main .support-section-header, #help2-main .support-section-header-clone {
+/*    #help2-main .support-section-header, #help2-main .support-section-header-clone {
         display: none !important;
-    }
+    }*/
     #help2-main .support-article-info li {
         margin-left: 32px;
         margin-right: 32px;
@@ -3625,6 +3678,37 @@
     #help2-main .selected-bullet {
 
     }
+    #help2-main .ui-autocomplete {
+        width: 94% !important;
+    }
+    #help2-main .main-search-pad {
+        display: block;
+        width: calc(100% - 32px);
+        padding-top: 0px;
+        margin-bottom: 140px;
+        border-radius: 0px;
+        margin-top: 0px;
+        background-color: rgba(0,0,0,0);
+        border: none;
+        box-shadow: none;
+        max-width: 480px;
+        margin: 0 auto;
+    }
+    #help2-main .search-result {
+        margin-top: 8px;
+        margin: 0 auto;
+        padding-left: 24px;
+        padding-right: 24px;
+        padding-top: 24px;
+        padding-bottom: 8px;
+        cursor: pointer;
+        display: block;
+        position: relative;
+        background-color: #fff;
+        margin-bottom: 8px;
+        border-radius: 4px;
+        box-shadow: 0 1px 6px 0 rgba(0,0,0,0.1);
+    }
     #help2-main .support-article-info li {
         line-height: 26px;
         margin-bottom: 14px;
@@ -3649,7 +3733,7 @@
         line-height: 26px;
     }
     #help2-main .support-article-info .mobile-support-image-instructions ul {
-            list-style-image: disc;
+        list-style-image: disc;
         list-style-position: disc;
         list-style-type: disc;
         display: block;
@@ -3661,6 +3745,20 @@
         padding-left:32px;
         padding-right: 32px;
         text-align: left;
+    }
+    #help2-main .search-support-block .email-button span {
+        float: none;
+    }
+    #help2-main .search-support-block {
+        padding-top: 0px;
+        padding-left: 0px;
+        padding-right: 0px;
+    }
+    #help2-main .support-block-title {
+        margin: 48px 20px 20px;
+    }
+    #help2-main .search-support-block .support-block-subheading {
+        margin-right: 0;
     }
 }
 @media only screen and (min-device-width: 320px) and (max-device-width: 375px){
@@ -3694,7 +3792,7 @@
         min-width: 320px;
         max-width: 376px;
         width: 100%;
-        height: 120px;
+        height: 308px;
         background-color: #f44;
     }
     .help-home-page .search-section .help-background-block {
@@ -3718,10 +3816,8 @@
         max-height: 320px;
     }
     #help2-main form#support-search {
-        width: 300px;
+        width: 90%;
         margin: 0 auto;
-        min-width: 300px;
-        max-width: 360px;
     }
     #help2-main .search-close {
         position: relative;
@@ -3735,7 +3831,7 @@
         margin: 18px auto 0;
     }
     #help2-main input.search {
-        width: 86%;
+        width: 78%;
         margin: 6px auto 0;
         min-width: 200px;
         max-width: 268px;
@@ -3743,36 +3839,33 @@
     #help2-main .support-search-container {
         padding-left: 0%;
         padding-right: 0%;
+/*        display: none;*/
+        margin-top:24px;
+/*        width: 90%;*/
+    }
+    #help2-main .support-search {
         display: none;
-        margin-top:00px;
     }
     #help2-main .section-title {
         font-size: 36px;
         line-height: 48px;
         color: #fff;
-        width: 80%;
+        width: 90%;
         margin-left: auto;
         margin-right: auto;
     }
     #help2-main .first-search-section .section-title {
-        font-size: 36px;
-        line-height: 48px;
+        font-size: 30px;
+        line-height: 40px;
         color: #fff;
-        width: 80%;
-        margin-left: auto;
-        margin-right: auto;
-        margin-top: 0px;
+        width: 90%;
+        margin:0 auto;
         padding-top: 60px;
     }
     #help2-main .first-search-section {
-        display: flex;
-        align-items:left;
         background-color: #f44;
         height: 60vh;
         max-height: 320px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
     }
     #help2-main .mobile-navigation-header {
         background-color: #f55;
@@ -3786,7 +3879,7 @@
         position: fixed;
         top: 48px;
         z-index: 9999;
-}
+    }
     #help2-main .mobile-device-block {
         display: block;
     }
@@ -4285,13 +4378,15 @@
     #help2-main .search {
         width: 80%;
         left: 0;
-        line-height: 43px;
+        line-height: 32px;
         margin-top: 15px;
     }
     #help2-main .search-section .section-title {
         font-size: 30px;
-        padding-left: 10%;
-        padding-right: 10%;
+        line-height: 40px;
+        padding-top: 0;
+/*        padding-left: 10%;
+        padding-right: 10%;*/
     }
     #help2-main .popular-question-items {
         -webkit-columns: 1;
@@ -4321,12 +4416,13 @@
         width: 100%;
     }
     #help2-main .getstart-subheading, #help2-main .usemega-subheading, #help2-main .support-block-subheading {
-        margin: 0 24px 0 24px;
+        margin: 0 24px;
         width: auto;
-    }
+   }
+   /*
     #help2-main .support-section-header, #help2-main .support-section-header-clone {
         display: none !important;
-    }
+    }*/
     #help2-main .browsearticle-button span {
         font-size: 14px;
         margin-top: 20px;
@@ -4445,7 +4541,7 @@
     }
     #help2-main .main-search-pad {
         display:block;
-        width: auto;
+        width: calc(100% - 32px);
         padding-top: 0px;
         margin-bottom: 140px;
         border-radius: 0px;
@@ -4465,11 +4561,11 @@
     }
     #help2-main .search-section .support-search-container {
         display: block;
-        margin-top: 10px;
+        margin-top: 24px;
     }
-    #help2-main .search-section .section-title {
+/*    #help2-main .search-section .section-title {
         display: none;
-    }
+    }*/
     #help2-main .search-result-content {
         font-size: 14px;
         line-height: 24px;
@@ -4549,7 +4645,7 @@
     #help2-main .search-section {
         z-index: 10;
         max-width: 375px;
-        margin-top: -10px;
+        margin-top: 0px;
     }
     #help2-main .search-section-header {
         margin-top: -48px;
@@ -4627,14 +4723,27 @@
         margin-left: 8%;
     }
     #help2-main .ui-autocomplete {
-        width: 300px;
+        width: calc(91% - 24px) !important;
     }
     #help2-main .support-article-info .support-image-instructions p strong, #help2-main .support-article-info .mobile-support-image-instructions p strong {
         font-size: 15px;
         line-height: 26px;
         font-family: 'source_sans_prosemibold';
     }
-
+    #help2-main .search-support-block .email-button span {
+        float: none;
+    }
+    #help2-main .search-support-block {
+        padding-top: 0px;
+        padding-left: 0px;
+        padding-right: 0px;
+    }
+    #help2-main .support-block-title {
+        margin: 48px 20px 20px;
+    }
+    #help2-main .search-support-block .support-block-subheading {
+        margin-right: 0;
+    }
 }
 @media (min-width: 768px) and (max-width: 2000px) and (orientation: landscape) {
     #help2-main .mobile-support-image-container .nav-dots-container {
@@ -4693,13 +4802,14 @@
     margin-top: 14px;
 }
 #help2-main .ui-autocomplete li {
+    position: relative;
     font-size: 14px;
     color: #444;
     letter-spacing: 0.2px;
-    padding-left: 8px;
+/*    padding-left: 8px;
     padding-right: 5px;
     padding-top: 9px;
-    padding-bottom: 9px;
+    padding-bottom: 9px;*/
     text-decoration: none;
     width: auto;
     text-overflow: ellipsis;
@@ -4741,6 +4851,16 @@
     -webkit-transition-timing-function: ease; /* Safari and Chrome */
     -o-transition-timing-function: ease; /* Opera */
 }
+
+
+
+
+
+
+
+
+
+
 #help2-main .support-images-gallery {
     max-width: 95%;
     margin-left: auto;
@@ -4781,4 +4901,90 @@
 }
 .mobile .mobile-support-images-gallery .img-swap {
     height: auto !important;
+}
+/* icons for search autocomplete */
+#help2-main .ui-autocomplete .label-text {
+    border-radius: 4px;
+    display: block;
+    font-size: 14px;
+    letter-spacing: 0.2px;
+    line-height: 20px;
+    overflow: hidden;
+    padding: 9px 9px 9px 40px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    position: relative;
+}
+#help2-main .ui-autocomplete .client {
+    background-color: rgba(0, 0, 0, 0);
+    background-image: url("../images/mega/help2/welcome_icons_v3.png");
+    background-repeat: no-repeat;
+    display: inline-block;
+    height: 20px;
+    left: 10px;
+    margin-right: 12px;
+    padding: 0;
+    position: absolute;
+    top: 9px;
+    width: 20px;
+    z-index: 1;
+}
+#help2-main .ui-autocomplete .client.ui-state-active {
+    background-color: rgba(0, 0, 0, 0);
+    border: 0 none;
+    transition-duration: 0.3s;
+    transition-property: border-radius, box-shadow, background-image, background-color;
+    transition-timing-function: ease;
+}
+#help2-main .ui-autocomplete .ui-menu-item .ios {
+    background-position: -148px -300px;
+}
+#help2-main .ui-autocomplete .ui-menu-item .ios.ui-state-active {
+    background-position: -201px -300px;
+}
+#help2-main .ui-autocomplete .ui-menu-item .windows {
+    background-position: -149px -333px;
+}
+#help2-main .ui-autocomplete .ui-menu-item .windows.ui-state-active {
+    background-position: -201px -333px;
+}
+#help2-main .ui-autocomplete .ui-menu-item .android {
+    background-position: -148px -366px;
+}
+#help2-main .ui-autocomplete .ui-menu-item .android.ui-state-active {
+    background-position: -201px -366px;
+}
+#help2-main .ui-autocomplete .ui-menu-item .web {
+    background-position: -147px -428px
+}
+#help2-main .ui-autocomplete .ui-menu-item .web.ui-state-active {
+    background-position: -199px -428px;
+}
+#help2-main .ui-autocomplete .ui-menu-item .megasync {
+    background-position: -179px -302px;
+}
+#help2-main .ui-autocomplete .ui-menu-item .megasync.ui-state-active {
+    background-position: -231px -302px;
+}
+#help2-main .ui-autocomplete .ui-menu-item .megachat {
+    background-position: -178px -333px;
+}
+#help2-main .ui-autocomplete .ui-menu-item .megachat.ui-state-active {
+    background-position: -230px -333px;
+}
+#help2-main .ui-autocomplete .ui-menu-item .cmd,
+#help2-main .ui-autocomplete .ui-menu-item .megacmd {
+    background-position: -178px -367px;
+}
+#help2-main .ui-autocomplete .ui-menu-item .cmd.ui-state-active,
+#help2-main .ui-autocomplete .ui-menu-item .megacmd.ui-state-active {
+    background-position: -230px -367px;
+}
+/*floating effect*/
+#help2-main .support-section-header.floating.activated {
+    top: 0;
+}
+#help2-main .support-section-header.floating {
+    position: fixed;
+    top: -38px;
 }

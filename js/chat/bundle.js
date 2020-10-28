@@ -3623,6 +3623,18 @@ var _ui_emojiDropdown_jsx3__ = __webpack_require__(13);
 class ConversationMessageMixin extends _stores_mixins_js1__["ContactAwareComponent"] {
   constructor(props) {
     super(props);
+
+    this.getCurrentUserReactions = () => {
+      const {
+        reactions
+      } = this.props.message.reacts;
+      return Object.keys(reactions).filter(utf => {
+        var _reactions$utf;
+
+        return (_reactions$utf = reactions[utf]) == null ? void 0 : _reactions$utf[u_handle];
+      });
+    };
+
     this.__cmmUpdateTickCount = 0;
     this._contactChangeListeners = false;
     this.onAfterRenderWasTriggered = false;
@@ -3798,13 +3810,36 @@ class ConversationMessageMixin extends _stores_mixins_js1__["ContactAwareCompone
       return false;
     }
 
-    const s = megaChat._emojiData.emojisSlug[slug] || meta;
+    const {
+      reactions
+    } = this.props.message.reacts;
+    const CURRENT_USER_REACTIONS = this.getCurrentUserReactions().length;
+    const REACTIONS_LIMIT = {
+      TOTAL: localStorage.REACTIONS_LIMIT_TOTAL || 50,
+      PER_PERSON: localStorage.REACTIONS_LIMIT_PER_PERSON || 24
+    };
 
-    if (s && message.reacts.getReaction(u_handle, s.u)) {
-      chatRoom.messagesBuff.userDelReaction(message.messageId, slug, meta);
-    } else {
-      chatRoom.messagesBuff.userAddReaction(message.messageId, slug, meta);
+    const addReaction = () => chatRoom.messagesBuff.userAddReaction(message.messageId, slug, meta);
+
+    const emoji = megaChat._emojiData.emojisSlug[slug] || meta;
+
+    if (emoji && message.reacts.getReaction(u_handle, emoji.u)) {
+      return chatRoom.messagesBuff.userDelReaction(message.messageId, slug, meta);
     }
+
+    if (emoji && reactions[emoji.u] && CURRENT_USER_REACTIONS < REACTIONS_LIMIT.PER_PERSON) {
+      return addReaction();
+    }
+
+    if (CURRENT_USER_REACTIONS >= REACTIONS_LIMIT.PER_PERSON) {
+      return msgDialog('info', '', l[24205].replace('%1', REACTIONS_LIMIT.PER_PERSON));
+    }
+
+    if (Object.keys(reactions).length >= REACTIONS_LIMIT.TOTAL) {
+      return msgDialog('info', '', l[24206].replace('%1', REACTIONS_LIMIT.TOTAL));
+    }
+
+    return addReaction();
   }
 
   _emojiOnActiveStateChange(newVal) {

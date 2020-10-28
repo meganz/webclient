@@ -177,22 +177,54 @@ class ConversationMessageMixin extends ContactAwareComponent {
         }
     }
 
-
+    getCurrentUserReactions = () => {
+        const { reactions } = this.props.message.reacts;
+        return Object.keys(reactions).filter(utf => reactions[utf]?.[u_handle]);
+    };
 
     emojiSelected(e, slug, meta) {
-        const {chatRoom, message} = this.props;
+        const { chatRoom, message } = this.props;
+
         if (chatRoom.isReadOnly()) {
             return false;
         }
-        const s = megaChat._emojiData.emojisSlug[slug] || meta;
 
-        if (s && message.reacts.getReaction(u_handle, s.u)) {
-            chatRoom.messagesBuff.userDelReaction(message.messageId, slug, meta);
+        const { reactions } = this.props.message.reacts;
+        const CURRENT_USER_REACTIONS = this.getCurrentUserReactions().length;
+        const REACTIONS_LIMIT = {
+            // TODO: remove localStorage debug flags
+            TOTAL: localStorage.REACTIONS_LIMIT_TOTAL || 50,
+            PER_PERSON: localStorage.REACTIONS_LIMIT_PER_PERSON || 24
+        };
+        const addReaction = () => chatRoom.messagesBuff.userAddReaction(message.messageId, slug, meta);
+        const emoji = megaChat._emojiData.emojisSlug[slug] || meta;
+
+        // Remove reaction
+        if (emoji && message.reacts.getReaction(u_handle, emoji.u)) {
+            return chatRoom.messagesBuff.userDelReaction(message.messageId, slug, meta);
         }
-        else {
-            chatRoom.messagesBuff.userAddReaction(message.messageId, slug, meta);
+
+        // Add reaction to already added reaction (+1 to specific slot)
+        if (emoji && reactions[emoji.u] && CURRENT_USER_REACTIONS < REACTIONS_LIMIT.PER_PERSON) {
+            return addReaction();
         }
+
+        if (CURRENT_USER_REACTIONS >= REACTIONS_LIMIT.PER_PERSON) {
+            return (
+                msgDialog('info', '', l[24205].replace('%1', REACTIONS_LIMIT.PER_PERSON))
+            );
+        }
+
+        if (Object.keys(reactions).length >= REACTIONS_LIMIT.TOTAL) {
+            return (
+                msgDialog('info', '', l[24206].replace('%1', REACTIONS_LIMIT.TOTAL))
+            );
+        }
+
+        // Add new reaction
+        return addReaction();
     }
+
     _emojiOnActiveStateChange(newVal) {
         this.setState(() => {
             return {
@@ -205,6 +237,7 @@ class ConversationMessageMixin extends ContactAwareComponent {
         const {chatRoom, message} = this.props;
         var isReadOnlyClass = chatRoom.isReadOnly() ? " disabled" : "";
 
+        // console.error(message._reactions, message.reacts);
         var emojisImages = message._reactions && message.reacts.reactions &&
             Object.keys(message.reacts.reactions).map(utf => {
                 var reaction = message.reacts.reactions[utf];
@@ -248,7 +281,6 @@ class ConversationMessageMixin extends ContactAwareComponent {
                         .replace("%s", slug);
                 }
                 else {
-                    // TODO: Add translation
                     tipText = mega.utils.trans.listToString(
                         names,
                         (l[24069] || "%s [G]reacted with %s2[/G]").replace("%s2", slug)
@@ -334,7 +366,7 @@ class ConversationMessageMixin extends ContactAwareComponent {
 
     getMessageActionButtons() {
         // reaction button
-        const {chatRoom, message} = this.props;
+        const { chatRoom, message } = this.props;
 
         return message instanceof Message && message.isSentOrReceived() && !chatRoom.isReadOnly() ?
             <Button

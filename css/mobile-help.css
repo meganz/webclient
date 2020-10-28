@@ -1007,7 +1007,7 @@
     display: inline-block;
     float: left;
     position: relative;
-    background-image: url(https://nz.static.mega.co.nz/3/images/mega/help2/welcome_icons_v3.png);
+    background-image: url("../images/mega/help2/welcome_icons_v3.png");
     background-repeat: no-repeat;
     height: 16px;
     background-position: -97px -471px;

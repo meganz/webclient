@@ -3815,8 +3815,8 @@ class ConversationMessageMixin extends _stores_mixins_js1__["ContactAwareCompone
     } = this.props.message.reacts;
     const CURRENT_USER_REACTIONS = this.getCurrentUserReactions().length;
     const REACTIONS_LIMIT = {
-      TOTAL: localStorage.REACTIONS_LIMIT_TOTAL || 50,
-      PER_PERSON: localStorage.REACTIONS_LIMIT_PER_PERSON || 24
+      TOTAL: 50,
+      PER_PERSON: 24
     };
 
     const addReaction = () => chatRoom.messagesBuff.userAddReaction(message.messageId, slug, meta);

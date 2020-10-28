@@ -191,11 +191,7 @@ class ConversationMessageMixin extends ContactAwareComponent {
 
         const { reactions } = this.props.message.reacts;
         const CURRENT_USER_REACTIONS = this.getCurrentUserReactions().length;
-        const REACTIONS_LIMIT = {
-            // TODO: remove localStorage debug flags
-            TOTAL: localStorage.REACTIONS_LIMIT_TOTAL || 50,
-            PER_PERSON: localStorage.REACTIONS_LIMIT_PER_PERSON || 24
-        };
+        const REACTIONS_LIMIT = { TOTAL: 50, PER_PERSON: 24 };
         const addReaction = () => chatRoom.messagesBuff.userAddReaction(message.messageId, slug, meta);
         const emoji = megaChat._emojiData.emojisSlug[slug] || meta;
 

@@ -361,8 +361,13 @@ MegaDataMap.prototype.trackDataChange = function() {
 
         do {
             args.unshift(that);
-            that._dataChangeIndex++;
-            that._dispatchChangeListeners(args);
+
+            if (that === self) {
+                that._dispatchChangeListeners(args);
+            }
+            else {
+                that._enqueueChangeListenersDsp(args);
+            }
 
         } while ((that = that._parent) instanceof MegaDataMap);
     });
@@ -440,12 +445,21 @@ MegaDataMap.prototype.removeChangeListener = function(cb) {
     return false;
 };
 
+MegaDataMap.prototype._enqueueChangeListenersDsp = function(args) {
+    var self = this;
+
+    delay('mdm:cl:q.' + this.__ident_0, function() {
+        self._dispatchChangeListeners(args);
+    }, 40);
+};
+
 MegaDataMap.prototype._dispatchChangeListeners = function(args) {
     var listeners = this._dataChangeListeners;
 
     if (d > 1) {
         console.debug('%s: dispatching %s awaiting listeners', this, listeners.length, [this]);
     }
+    this._dataChangeIndex++;
 
     for (var i = listeners.length; i--;) {
         var result;

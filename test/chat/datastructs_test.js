@@ -248,6 +248,37 @@ describe("Mega Data Structs Test", function() {
         expect(sortedMap.getItem(0).orderValue).to.eql(500);
     });
 
+    it('does preserve the order and uniqueness change listeners are dispatched.', function(done) {
+        var tmp;
+        var last = null;
+        var stack = [];
+        var save = function() {
+            stack.push(this.__ident_0.split('.').pop());
+        };
+        var add = function() {
+            var r = new MegaDataObject({'prop': false});
+            r.addChangeListener(save);
+            return r;
+        };
+        for (var i = 4; i--;) {
+            tmp = add();
+            tmp._parent = last;
+            last = tmp;
+        }
+
+        for (var j = 7; j--;) {
+            tmp = add();
+            tmp._parent = last;
+            tmp.trackDataChange();
+        }
+
+        setTimeout(function() {
+            expect(stack.length).to.eql(11);
+            expect(stack.join('|')).to.eql('46|51|52|53|54|55|56|47|48|49|50');
+            done();
+        }, 60);
+    });
+
     it('MegaDataEmitter - basic', function() {
         var obj = new MegaDataObject();
         var stack = [];

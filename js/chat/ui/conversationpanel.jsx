@@ -769,16 +769,12 @@ export class ConversationPanel extends MegaRenderMixin {
             self.eventuallyUpdate();
         });
 
-        this._messagesBuffChangeHandler = chatRoom.messagesBuff.addChangeListener(function() {
+        this._messagesBuffChangeHandler = chatRoom.messagesBuff.addChangeListener(SoonFc(function() {
             // wait for scrolling (if such is happening at the moment) to finish
-            Soon(function() {
-                if (self.isComponentEventuallyVisible()) {
-                    $('.js-messages-scroll-area', self.findDOMNode()).trigger('forceResize', [true]);
-                }
-            });
-        });
-
-
+            if (self.isComponentEventuallyVisible()) {
+                $('.js-messages-scroll-area', self.findDOMNode()).trigger('forceResize', [true]);
+            }
+        }));
     }
     componentWillUnmount() {
         super.componentWillUnmount();

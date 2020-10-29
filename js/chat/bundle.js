@@ -1396,13 +1396,11 @@ var _extends0__ = __webpack_require__(8);
 var _extends0 = __webpack_require__.n(_extends0__);
 var react1__ = __webpack_require__(0);
 var react1 = __webpack_require__.n(react1__);
-
-var _stores_mixins_js3__ = __webpack_require__(1);
-var _ui_utils_jsx4__ = __webpack_require__(4);
-var _ui_perfectScrollbar_jsx5__ = __webpack_require__(11);
-var _ui_buttons_jsx6__ = __webpack_require__(6);
-var _ui_dropdowns_jsx7__ = __webpack_require__(2);
-
+var _stores_mixins_js2__ = __webpack_require__(1);
+var _ui_utils_jsx3__ = __webpack_require__(4);
+var _ui_perfectScrollbar_jsx4__ = __webpack_require__(11);
+var _ui_buttons_jsx5__ = __webpack_require__(6);
+var _ui_dropdowns_jsx6__ = __webpack_require__(2);
 
 
 
@@ -1417,7 +1415,7 @@ var _attchRerenderCbContacts = function (others) {
   this.addDataStructListenerForProperties(this.props.contact, ['name', 'firstName', 'lastName', 'nickname', 'm', 'avatar'].concat(others ? others : EMPTY_ARR));
 };
 
-class ContactsListItem extends _stores_mixins_js3__["ContactAwareComponent"] {
+class ContactsListItem extends _stores_mixins_js2__["ContactAwareComponent"] {
   constructor(...args) {
     super(...args);
     this.attachRerenderCallback = _attchRerenderCbContacts;
@@ -1449,7 +1447,7 @@ ContactsListItem.defaultProps = {
   'manualDataChangeTracking': true,
   'skipQueuedUpdatesOnResize': true
 };
-class ContactButton extends _stores_mixins_js3__["ContactAwareComponent"] {
+class ContactButton extends _stores_mixins_js2__["ContactAwareComponent"] {
   constructor(...args) {
     super(...args);
     this.attachRerenderCallbacks = _attchRerenderCbContacts;
@@ -1513,7 +1511,7 @@ class ContactButton extends _stores_mixins_js3__["ContactAwareComponent"] {
     }
 
     if (contact.c === 2 && contact.u === u_handle) {
-      moreDropdowns.push(react1.a.createElement(_ui_dropdowns_jsx7__["DropdownItem"], {
+      moreDropdowns.push(react1.a.createElement(_ui_dropdowns_jsx6__["DropdownItem"], {
         key: "view0",
         icon: "human-profile",
         label: l[187],
@@ -1532,7 +1530,7 @@ class ContactButton extends _stores_mixins_js3__["ContactAwareComponent"] {
       };
 
       if (megaChat.currentlyOpenedChat && megaChat.currentlyOpenedChat === contact.u) {
-        moreDropdowns.push(react1.a.createElement(_ui_dropdowns_jsx7__["DropdownItem"], {
+        moreDropdowns.push(react1.a.createElement(_ui_dropdowns_jsx6__["DropdownItem"], {
           key: "startCall",
           className: "contains-submenu",
           icon: "context handset",
@@ -1542,12 +1540,12 @@ class ContactButton extends _stores_mixins_js3__["ContactAwareComponent"] {
         moreDropdowns.push(react1.a.createElement("div", {
           className: "dropdown body submenu",
           key: "dropdownGroup"
-        }, react1.a.createElement("div", null, react1.a.createElement(_ui_dropdowns_jsx7__["DropdownItem"], {
+        }, react1.a.createElement("div", null, react1.a.createElement(_ui_dropdowns_jsx6__["DropdownItem"], {
           key: "startAudio",
           icon: "context handset",
           label: l[1565],
           onClick: startAudioCall
-        })), react1.a.createElement("div", null, react1.a.createElement(_ui_dropdowns_jsx7__["DropdownItem"], {
+        })), react1.a.createElement("div", null, react1.a.createElement(_ui_dropdowns_jsx6__["DropdownItem"], {
           key: "startVideo",
           icon: "context videocam",
           label: l[1566],
@@ -1559,7 +1557,7 @@ class ContactButton extends _stores_mixins_js3__["ContactAwareComponent"] {
           }
         }))));
       } else {
-        moreDropdowns.push(react1.a.createElement(_ui_dropdowns_jsx7__["DropdownItem"], {
+        moreDropdowns.push(react1.a.createElement(_ui_dropdowns_jsx6__["DropdownItem"], {
           key: "startChat",
           icon: "context conversation",
           label: l[5885],
@@ -1572,7 +1570,7 @@ class ContactButton extends _stores_mixins_js3__["ContactAwareComponent"] {
       moreDropdowns.push(react1.a.createElement("hr", {
         key: "files-separator"
       }));
-      moreDropdowns.push(react1.a.createElement(_ui_dropdowns_jsx7__["DropdownItem"], {
+      moreDropdowns.push(react1.a.createElement(_ui_dropdowns_jsx6__["DropdownItem"], {
         key: "send-files-item",
         icon: "context arrow-in-circle",
         label: l[6834],
@@ -1580,7 +1578,7 @@ class ContactButton extends _stores_mixins_js3__["ContactAwareComponent"] {
           megaChat.openChatAndSendFilesDialog(contact.u);
         }
       }));
-      moreDropdowns.push(react1.a.createElement(_ui_dropdowns_jsx7__["DropdownItem"], {
+      moreDropdowns.push(react1.a.createElement(_ui_dropdowns_jsx6__["DropdownItem"], {
         key: "share-item",
         icon: "context share-folder",
         label: l[6775],
@@ -1589,7 +1587,7 @@ class ContactButton extends _stores_mixins_js3__["ContactAwareComponent"] {
         }
       }));
     } else if (!contact.c || contact.c === 2 && contact.u !== u_handle) {
-      moreDropdowns.push(react1.a.createElement(_ui_dropdowns_jsx7__["DropdownItem"], {
+      moreDropdowns.push(react1.a.createElement(_ui_dropdowns_jsx6__["DropdownItem"], {
         key: "view2",
         icon: "small-icon icons-sprite grey-plus",
         label: l[101],
@@ -1641,7 +1639,7 @@ class ContactButton extends _stores_mixins_js3__["ContactAwareComponent"] {
       moreDropdowns.push(react1.a.createElement("hr", {
         key: "nicknames-separator"
       }));
-      moreDropdowns.push(react1.a.createElement(_ui_dropdowns_jsx7__["DropdownItem"], {
+      moreDropdowns.push(react1.a.createElement(_ui_dropdowns_jsx6__["DropdownItem"], {
         key: "set-nickname",
         icon: "small-icon context writing-pen",
         label: l[20828],
@@ -1691,12 +1689,12 @@ class ContactButton extends _stores_mixins_js3__["ContactAwareComponent"] {
 
     return this.props.noContextMenu ? react1.a.createElement("div", {
       className: "user-card-name light"
-    }, label) : react1.a.createElement(_ui_buttons_jsx6__["Button"], {
+    }, label) : react1.a.createElement(_ui_buttons_jsx5__["Button"], {
       className: classes,
       icon: icon,
       disabled: self.props.dropdownDisabled,
       label: label
-    }, react1.a.createElement(_ui_dropdowns_jsx7__["Dropdown"], {
+    }, react1.a.createElement(_ui_dropdowns_jsx6__["Dropdown"], {
       className: "contact-card-dropdown",
       positionMy: dropdownPosition,
       positionAt: dropdownPosition,
@@ -1712,7 +1710,7 @@ ContactButton.defaultProps = {
   'manualDataChangeTracking': true,
   'skipQueuedUpdatesOnResize': true
 };
-class ContactVerified extends _stores_mixins_js3__["MegaRenderMixin"] {
+class ContactVerified extends _stores_mixins_js2__["MegaRenderMixin"] {
   attachRerenderCallbacks() {
     this.addDataStructListenerForProperties(this.props.contact, ['fingerprint']);
   }
@@ -1752,7 +1750,7 @@ ContactVerified.defaultProps = {
   'manualDataChangeTracking': true,
   'skipQueuedUpdatesOnResize': true
 };
-class ContactPresence extends _stores_mixins_js3__["MegaRenderMixin"] {
+class ContactPresence extends _stores_mixins_js2__["MegaRenderMixin"] {
   render() {
     var contact = this.props.contact;
     var className = this.props.className || '';
@@ -1772,7 +1770,7 @@ ContactPresence.defaultProps = {
   'manualDataChangeTracking': true,
   'skipQueuedUpdatesOnResize': true
 };
-class LastActivity extends _stores_mixins_js3__["ContactAwareComponent"] {
+class LastActivity extends _stores_mixins_js2__["ContactAwareComponent"] {
   constructor(props) {
     super(props);
   }
@@ -1795,13 +1793,13 @@ class LastActivity extends _stores_mixins_js3__["ContactAwareComponent"] {
   }
 
 }
-class ContactAwareName extends _stores_mixins_js3__["ContactAwareComponent"] {
+class ContactAwareName extends _stores_mixins_js2__["ContactAwareComponent"] {
   render() {
     return this.props.contact ? react1.a.createElement("span", null, this.props.children) : null;
   }
 
 }
-class MembersAmount extends _stores_mixins_js3__["ContactAwareComponent"] {
+class MembersAmount extends _stores_mixins_js2__["ContactAwareComponent"] {
   constructor(props) {
     super(props);
   }
@@ -1814,7 +1812,7 @@ class MembersAmount extends _stores_mixins_js3__["ContactAwareComponent"] {
   }
 
 }
-class ContactFingerprint extends _stores_mixins_js3__["MegaRenderMixin"] {
+class ContactFingerprint extends _stores_mixins_js2__["MegaRenderMixin"] {
   attachRerenderCallbacks() {
     this.addDataStructListenerForProperties(this.props.contact, ['fingerprint']);
   }
@@ -1841,7 +1839,7 @@ class ContactFingerprint extends _stores_mixins_js3__["MegaRenderMixin"] {
       var verifyState = u_authring.Ed25519[contact.u] || {};
 
       if (typeof verifyState.method === "undefined" || verifyState.method < authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON) {
-        verifyButton = react1.a.createElement(_ui_buttons_jsx6__["Button"], {
+        verifyButton = react1.a.createElement(_ui_buttons_jsx5__["Button"], {
           className: "dropdown-verify active",
           label: l[7692],
           icon: "grey-key",
@@ -1875,7 +1873,7 @@ ContactFingerprint.defaultProps = {
   'manualDataChangeTracking': true,
   'skipQueuedUpdatesOnResize': true
 };
-class Avatar extends _stores_mixins_js3__["ContactAwareComponent"] {
+class Avatar extends _stores_mixins_js2__["ContactAwareComponent"] {
   constructor(...args) {
     super(...args);
     this.attachRerenderCallbacks = _attchRerenderCbContacts;
@@ -1965,7 +1963,7 @@ Avatar.defaultProps = {
   'manualDataChangeTracking': true,
   'skipQueuedUpdatesOnResize': true
 };
-class ContactCard extends _stores_mixins_js3__["ContactAwareComponent"] {
+class ContactCard extends _stores_mixins_js2__["ContactAwareComponent"] {
   attachRerenderCallbacks() {
     _attchRerenderCbContacts.call(this, ['presence']);
   }
@@ -2120,7 +2118,7 @@ ContactCard.defaultProps = {
   'manualDataChangeTracking': true,
   'skipQueuedUpdatesOnResize': true
 };
-class ContactItem extends _stores_mixins_js3__["ContactAwareComponent"] {
+class ContactItem extends _stores_mixins_js2__["ContactAwareComponent"] {
   constructor(...args) {
     super(...args);
     this.attachRerenderCallbacks = _attchRerenderCbContacts;
@@ -2167,7 +2165,7 @@ ContactItem.defaultProps = {
   'manualDataChangeTracking': true,
   'skipQueuedUpdatesOnResize': true
 };
-class ContactPickerWidget extends _stores_mixins_js3__["MegaRenderMixin"] {
+class ContactPickerWidget extends _stores_mixins_js2__["MegaRenderMixin"] {
   constructor(props) {
     super(props);
     this.state = {
@@ -2467,7 +2465,7 @@ class ContactPickerWidget extends _stores_mixins_js3__["MegaRenderMixin"] {
 
         multipleContacts = react1.a.createElement("div", {
           className: "horizontal-contacts-list"
-        }, react1.a.createElement(_ui_perfectScrollbar_jsx5__["PerfectScrollbar"], {
+        }, react1.a.createElement(_ui_perfectScrollbar_jsx4__["PerfectScrollbar"], {
           className: "perfectScrollbarContainer selected-contact-block horizontal-only",
           selected: this.state.selected,
           ref: function (psSelected) {
@@ -2593,7 +2591,7 @@ class ContactPickerWidget extends _stores_mixins_js3__["MegaRenderMixin"] {
           className: "fm-empty-description small"
         }, l[19115]));
       } else {
-        contactsList = react1.a.createElement(_ui_utils_jsx4__["default"].JScrollPane, {
+        contactsList = react1.a.createElement(_ui_utils_jsx3__["default"].JScrollPane, {
           className: "contacts-search-scroll",
           selected: this.state.selected,
           changedHashProp: this.props.changedHashProp,
@@ -8855,8 +8853,6 @@ class attachment_Attachment extends abstractGenericMessage_AbstractGenericMessag
 }
 // CONCATENATED MODULE: ./js/chat/ui/messages/types/partials/audioPlayer.jsx
 
-
-
 class audioPlayer_AudioPlayer extends external_React_default.a.Component {
   constructor(props) {
     super(props);
@@ -9049,8 +9045,6 @@ class audioPlayer_AudioPlayer extends external_React_default.a.Component {
 
 }
 // CONCATENATED MODULE: ./js/chat/ui/messages/types/partials/audioContainer.jsx
-
-
 
 
 class audioContainer_AudioContainer extends external_React_default.a.Component {
@@ -9390,8 +9384,6 @@ class MetaRichprevConfirmation extends metaRichpreviewConfirmation_ConversationM
 
 
 // CONCATENATED MODULE: ./js/chat/ui/messages/types/partials/geoLocation.jsx
-
-
 
 
 function GeoLocation(props) {

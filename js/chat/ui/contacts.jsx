@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import {ContactAwareComponent} from '../../stores/mixins.js';
 import {MegaRenderMixin} from '../../stores/mixins.js';
 import utils from '../../ui/utils.jsx';
@@ -53,11 +52,7 @@ export class ContactsListItem extends ContactAwareComponent {
             </div>
         );
     }
-};
-
-ContactsListItem.propTypes = {
-    chatRoom: PropTypes.object.isRequired
-};
+}
 
 export class ContactButton extends ContactAwareComponent {
     static defaultProps = {
@@ -316,14 +311,7 @@ export class ContactButton extends ContactAwareComponent {
                 </Button>
         );
     }
-};
-
-ContactButton.propTypes = {
-    chatRoom: PropTypes.oneOfType([
-        PropTypes.object,
-        PropTypes.bool
-    ])
-};
+}
 
 export class ContactVerified extends MegaRenderMixin {
     static defaultProps = {
@@ -588,14 +576,7 @@ export class Avatar extends ContactAwareComponent {
 
         return displayedAvatar;
     }
-};
-
-Avatar.propTypes = {
-    chatRoom: PropTypes.oneOfType([
-        PropTypes.object,
-        PropTypes.bool
-    ])
-};
+}
 
 export class ContactCard extends ContactAwareComponent {
     static defaultProps = {
@@ -751,14 +732,7 @@ export class ContactCard extends ContactAwareComponent {
             {userCard}
         </div>;
     }
-};
-
-ContactCard.propTypes = {
-    chatRoom: PropTypes.oneOfType([
-        PropTypes.object,
-        PropTypes.bool
-    ])
-};
+}
 
 export class ContactItem extends ContactAwareComponent {
     static defaultProps = {
@@ -798,15 +772,7 @@ export class ContactItem extends ContactAwareComponent {
             </div>
         </div>;
     }
-};
-
-
-ContactItem.propTypes = {
-    chatRoom: PropTypes.oneOfType([
-        PropTypes.object,
-        PropTypes.bool
-    ])
-};
+}
 
 export class ContactPickerWidget extends MegaRenderMixin {
     static defaultProps = {

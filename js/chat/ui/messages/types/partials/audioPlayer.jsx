@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 
 export default class AudioPlayer extends React.Component {
     state = {
@@ -183,11 +182,3 @@ export default class AudioPlayer extends React.Component {
         );
     }
 }
-
-AudioPlayer.propTypes = {
-    source: PropTypes.string,
-    audioId: PropTypes.string.isRequired,
-    loading: PropTypes.bool.isRequired,
-    getAudioFile: PropTypes.func.isRequired,
-    playtime: PropTypes.number.isRequired
-};

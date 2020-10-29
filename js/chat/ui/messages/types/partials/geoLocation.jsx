@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 
 function GeoLocation(props) {
     const { latitude, lng } = props;
@@ -49,10 +48,5 @@ function GeoLocation(props) {
         </div>
     );
 }
-
-GeoLocation.propTypes = {
-    latitude: PropTypes.string.isRequired,
-    lng: PropTypes.string.isRequired,
-};
 
 export default GeoLocation;

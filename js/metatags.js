@@ -468,26 +468,20 @@ mega.metatags = new function() {
             mTags.mega_title = l[24012] || mTags.en_title;
             mTags.mega_desc = l[19517] || mTags.en_desc;
         }
-        else if (page === 'corporate' || page === 'corporate/investors') {
-            mTags.en_title = 'Investors - MEGA';
-            mTags.en_desc = 'MEGA investor relations';
-            mTags.mega_title = l[24013] || mTags.en_title;
-            mTags.mega_desc = l[24014] || mTags.en_desc;
+        else if (page === 'corporate' || page === 'corporate/media') {
+            mTags.en_title = 'Media - MEGA';
+            mTags.en_desc = 'MEGA Media';
+            mTags.mega_title = l[24015] || mTags.en_title;
+            mTags.mega_desc = l[24089] || mTags.en_desc;
             if (page === 'corporate') {
-                addCanonical(getBaseUrl() + '/corporate/investors');
+                addCanonical(getBaseUrl() + '/corporate/media');
             }
         }
-        else if (page === 'corporate/media') {
-            mTags.en_title = 'Media - MEGA';
-            mTags.en_desc = 'MEGA corporate media';
-            mTags.mega_title = l[24015] || mTags.en_title;
-            mTags.mega_desc = l[24016] || mTags.en_desc;
-        }
-        else if (page === 'corporate/shareholder-reports') {
-            mTags.en_title = 'Shareholder Reports - MEGA';
-            mTags.en_desc = 'MEGA shareholder reports';
-            mTags.mega_title = l[24017] || mTags.en_title;
-            mTags.mega_desc = l[24018] || mTags.en_desc;
+        else if (page === 'corporate/reviews') {
+            mTags.en_title = 'Reviews - MEGA';
+            mTags.en_desc = 'MEGA reviews';
+            mTags.mega_title = l[24086] || mTags.en_title;
+            mTags.mega_desc = l[24087] || mTags.en_desc;
         }
         else if (typeof Object(window.dlmanager).isStreaming === 'object') {
             mTags.mega_title = dlmanager.isStreaming._megaNode.name + ' - MEGA';

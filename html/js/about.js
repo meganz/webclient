@@ -68,7 +68,7 @@ var aboutus = {
         }
         else {
             subsection = 'main';
-            this.dynamicCount($page);
+            CMS.dynamicStatsCount($page);
         }
 
         aboutus.showSubsectionContent($page, subsection);
@@ -77,57 +77,6 @@ var aboutus = {
         $('.about.main-menu.item', $page).rebind('click.about', function() {
             loadSubPage('/about/' + $(this).data('page'));
         });
-    },
-
-    dynamicCount: function($page) {
-
-        "use strict";
-
-        var fillStats = function(muser, dactive, bfiles, mcountries) {
-            // Locale of million and biliion will comes
-            $('.about-register-count .num span', $page).text(muser);
-            $('.about-daily-active .num span', $page).text(dactive);
-            $('.about-files-count .num span', $page).text(bfiles);
-            $('.about-mega-countries .num span', $page).text(mcountries);
-        };
-        var self = this;
-
-        if (this.aboutStats && (new Date() - this.aboutStats.aboutStatsTime < 36e5)) {
-            fillStats(
-                this.aboutStats.muser,
-                this.aboutStats.dactive,
-                this.aboutStats.bfiles,
-                this.aboutStats.mcountries);
-        }
-        else {
-            loadingDialog.show();
-
-            api_req({ a: "dailystats" }, {
-                callback: function(res) {
-
-                    loadingDialog.hide();
-
-                    var muser = 175;
-                    var dactive = 10;
-                    var bfiles = 75;
-                    var mcountries = 200;
-
-                    if (typeof res === 'object') {
-                        muser = res.confirmedusers.total / 1000000 | 0;
-                        bfiles = res.files.total / 1000000000 | 0;
-                    }
-
-                    fillStats(muser, dactive, bfiles, mcountries);
-                    self.aboutStats = {
-                        muser: muser,
-                        dactive: dactive,
-                        bfiles: bfiles,
-                        mcountries: mcountries,
-                        aboutStatsTime: new Date()
-                    };
-                }
-            });
-        }
     },
 
     insMembersInHTML: function(members) {

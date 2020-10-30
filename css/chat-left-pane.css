@@ -274,9 +274,8 @@ li.active .call-duration i {
 }
 .left-pane-button .heading {
     overflow: hidden;
-    display: inline-block;
-    float: left;
-    width: calc(64%);
+    display: block;
+    width: calc(100% - 72px);
     text-overflow: ellipsis;
     white-space: nowrap;
     font-size: 13px;
@@ -289,6 +288,7 @@ li.active .call-duration i {
 }
 .left-pane-button .indicator {
     position: absolute;
+    bottom: 0;
     right: 0;
     font-size: 11px;
     line-height: 16px;

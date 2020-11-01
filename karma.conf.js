@@ -267,20 +267,29 @@ module.exports = function(config) {
     customLaunchers: {
         'Firefox_NoCookies': {
             base: 'FirefoxHeadless',
+            displayName: 'Firefox Headless (NoCookies)',
             prefs: {
                 'network.cookie.cookieBehavior': 2
             }
         },
         'Firefox_Incognito': {
-            base: 'Firefox',
+            base: 'FirefoxHeadless',
+            displayName: 'Firefox Headless (PBM)',
             flags: ['-private']
         },
         'Chrome_NoCookies': {
             base: 'ChromeHeadless',
-            flags: ['--disable-local-storage', '--disable-databases', '--unlimited-storage']
+            displayName: 'Chrome Headless (NoCookies)',
+            flags: ['--disable-local-storage', '--disable-databases', '--site-per-process']
+        },
+        'Chrome_Mobile': {
+            base: 'Chrome_NoCookies',
+            displayName: 'Chrome HeadLess (Mobile)',
+            flags: ['--use-mobile-user-agent', '--webview-sandboxed-renderer'],
         },
         'Chrome_Incognito': {
             base: 'ChromeHeadless',
+            displayName: 'Chrome Headless (Incognito)',
             flags: ['--incognito']
         },
         'Chrome_Unlimited': {

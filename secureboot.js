@@ -265,11 +265,7 @@ function geoStaticPath() {
             }
         }
     }
-    catch(ex) {
-        setTimeout(function() {
-            throw ex;
-        }, 2100);
-    }
+    catch (ex) {}
 
     return defaultStaticPath;
 }
@@ -3430,7 +3426,9 @@ else if (!browserUpdate) {
 
             pageLoadTime = now - pageLoadTime;
 
-            mega.ipcc = (String(document.cookie).match(/geoip\s*=\s*([A-Z]{2})/) || [])[1];
+            tryCatch(function() {
+                mega.ipcc = (String(document.cookie).match(/geoip\s*=\s*([A-Z]{2})/) || [])[1];
+            })();
         });
 
         scriptTest(
@@ -3641,13 +3639,23 @@ else if (!browserUpdate) {
             '    </div>'+
             '</div>';
 
-    if (is_iframed) {
+    if (is_iframed || window.top !== window) {
         try {
+            // if this does fail, we're under a mis-configured sandbox, and loading Worker()ers won't work.
+            tmp = 1 + (document.cookie | 0);
+
             document.body.textContent = '';
             document.body.style.background = is_drop ? '#fff' : '#000';
             jsl_progress = function() {};
         }
-        catch (ex) {}
+        catch (ex) {
+            if (ex.code === 18 || ex.name === 'SecurityError') {
+                window.onload = window.onerror = null;
+                tmp = String(ex.message || ex.name || ex);
+                document.body.textContent = tmp.substr(tmp.lastIndexOf(':') + 1);
+                throw ex;
+            }
+        }
     }
 
     var u_storage, loginresponse, u_sid, dl_res, voucher, gmf_res;

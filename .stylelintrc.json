@@ -1,0 +1,18 @@
+{
+    "extends": "stylelint-config-standard",
+    "plugins": [
+        "stylelint-no-unsupported-browser-features",
+        "stylelint-order"
+    ],
+    "rules": {
+        "indentation": [4],
+        "declaration-no-important": null,
+        "no-missing-end-of-source-newline": true,
+        "order/properties-alphabetical-order": true,
+        "plugin/no-unsupported-browser-features": [true, {
+                "severity": "warning"
+            }
+        ],
+        "selector-list-comma-newline-after": "always"
+    }
+}

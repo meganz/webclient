@@ -1212,7 +1212,6 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders, target) 
 
                     mBroadcaster.sendMessage('upload:start', data);
                 }
-                mBroadcaster.sendMessage('trk:event', 'upload', 'started');
             });
         }
     }.bind(this);
@@ -1708,6 +1707,7 @@ MegaData.prototype.ulstart = function(ul) {
     ul.starttime = new Date().getTime();
     fm_tfsupdate();// this will call $.transferHeader()
     this.ulprogress(ul, 0, 0, 0);
+    mBroadcaster.sendMessage('trk:event', 'upload', 'started');
 };
 
 MegaData.prototype.openTransfersPanel = function openTransfersPanel() {

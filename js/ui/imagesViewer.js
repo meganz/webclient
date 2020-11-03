@@ -1260,6 +1260,9 @@ var slideshowid;
             return;
         }
 
+        var type = typeof previews[id].type === 'string' && previews[id].type || 'image/jpeg';
+        mBroadcaster.sendMessage.apply(mBroadcaster, ['trk:event', 'preview'].concat(type.split('/')));
+
         $overlay.removeClass('pdf video video-theatre-mode');
         $imgBlock.find('embed').addClass('hidden');
         $imgBlock.find('video').addClass('hidden');

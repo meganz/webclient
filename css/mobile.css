@@ -5059,12 +5059,11 @@ div.radioOn.small, div.radioOff.small {
     position: initial;
 }
 .mobile.alert-banner .alert-text-container .alert-text {
-    display: inline-block;
-    vertical-align: middle;
     line-height: 18px;
 }
-.mobile.alert-banner .alert-text-container .alert-text a{
-    color:white;
+.mobile.alert-banner .alert-text-container .alert-text a {
+    color: white;
+    text-decoration: underline;
 }
 .mobile.alert-banner .alert-icon.close {
     height: 30px;

@@ -16232,7 +16232,7 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
     background-image: url(../images/mega/dialog-sprite_v15.png);
     background-repeat: no-repeat;
     background-position: -91px -826px;
-    -webkit-transition: opacity 200ms ease-in-out
+    -webkit-transition: opacity 200ms ease-in-out;
     transition: opacity 200ms ease-in-out;
     opacity: 0.5;
     cursor: pointer;

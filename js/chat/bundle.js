@@ -4536,7 +4536,7 @@ class DropdownEmojiSelector extends _stores_mixins_js1__["MegaRenderMixin"] {
     this.data_emojis = null;
     this.data_emojiByCategory = null;
     this.customCategoriesOrder = ["frequently_used", "people", "nature", "food", "activity", "travel", "objects", "symbols", "flags"];
-    this.frequentlyUsedEmojis = ['slight_smile', 'grinning', 'smile', 'wink', 'yum', 'rolling_eyes', 'stuck_out_tongue'];
+    this.frequentlyUsedEmojis = ['slight_smile', 'grinning', 'smile', 'rofl', 'wink', 'yum', 'rolling_eyes', 'stuck_out_tongue', 'smiling_face_with_3_hearts', 'kissing_heart', 'sob', 'mask', 'eyes', 'thumbsup', 'pray', 'white_check_mark', 'sparkles', 'fire'];
     this.heightDefs = {
       'categoryTitleHeight': 55,
       'emojiRowHeight': 35,

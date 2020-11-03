@@ -792,11 +792,11 @@ MegaData.prototype.syncPendingContacts = function(actionPacket) {
     }
 };
 
-MegaData.prototype.syncContactEmail = function(userHash, promise) {
+MegaData.prototype.syncContactEmail = function(userHash, promise, forced) {
     'use strict';
     var user = userHash in this.u && this.u[userHash] || false;
 
-    if (!user || anonymouschat) {
+    if (!forced && (!user || anonymouschat || user.c !== 1 && user.c !== 2)) {
         return promise ? promise.reject() : false;
     }
 

@@ -894,7 +894,7 @@ class ContactAwareComponent extends MegaRenderMixin {
     }
 
     const syncName = !contact.firstName && !contact.lastName;
-    const syncMail = !contact.m && !anonymouschat;
+    const syncMail = (contact.c === 1 || contact.c === 2) && !contact.m && !anonymouschat;
     const syncAvtr = !avatars[contactHandle] && !ContactAwareComponent.unavailableAvatars[contactHandle];
 
     const loader = () => {
@@ -1495,7 +1495,7 @@ class ContactButton extends _stores_mixins_js2__["ContactAwareComponent"] {
     }, username, react1.a.createElement(ContactPresence, {
       className: "small",
       contact: contact
-    })), react1.a.createElement("span", {
+    })), contact && (contact.c === 1 || contact.c === 2) && react1.a.createElement("span", {
       className: "email"
     }, contact.m))));
     moreDropdowns.push(react1.a.createElement(ContactFingerprint, {
@@ -1606,7 +1606,7 @@ class ContactButton extends _stores_mixins_js2__["ContactAwareComponent"] {
               }));
             }
           } else {
-            M.syncContactEmail(contact.u, new MegaPromise()).done(function (email) {
+            M.syncContactEmail(contact.u, new MegaPromise(), true).done(function (email) {
               var exists = false;
               var opcKeys = Object.keys(M.opc);
 
@@ -1636,9 +1636,12 @@ class ContactButton extends _stores_mixins_js2__["ContactAwareComponent"] {
     }
 
     if (u_attr && contact.u !== u_handle) {
-      moreDropdowns.push(react1.a.createElement("hr", {
-        key: "nicknames-separator"
-      }));
+      if (moreDropdowns.length > 0 && !(moreDropdowns.length === 2 && moreDropdowns[1] && moreDropdowns[1].key === "fingerprint")) {
+        moreDropdowns.push(react1.a.createElement("hr", {
+          key: "nicknames-separator"
+        }));
+      }
+
       moreDropdowns.push(react1.a.createElement(_ui_dropdowns_jsx6__["DropdownItem"], {
         key: "set-nickname",
         icon: "small-icon context writing-pen",

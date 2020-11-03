@@ -8162,7 +8162,7 @@ class abstractGenericMessage_AbstractGenericMessage extends mixin["ConversationM
     }
 
     return external_React_default.a.createElement("div", {
-      className: "right-aligned-msg-buttons total-" + cnt
+      className: "right-aligned-msg-buttons " + (cnt && cnt > 1 ? "total-" + cnt : '')
     }, buttons);
   }
 

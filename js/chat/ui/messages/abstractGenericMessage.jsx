@@ -53,8 +53,12 @@ export default class AbstractGenericMessage extends ConversationMessageMixin {
         if (cnt === 0) {
             return null;
         }
-        return <div className={"right-aligned-msg-buttons total-" + cnt}>{buttons}</div>;
 
+        return (
+            <div className={`right-aligned-msg-buttons ${cnt && cnt > 1 ? `total-${cnt}` : ''}`}>
+                {buttons}
+            </div>
+        );
     }
     render() {
         const { message, grouped, additionalClasses } = this.props;

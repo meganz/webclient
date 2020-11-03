@@ -94,9 +94,7 @@ export class ContactButton extends ContactAwareComponent {
                         {username}
                         <ContactPresence className="small" contact={contact} />
                     </div>
-                    <span className="email">
-                            {contact.m}
-                        </span>
+                    {contact && (contact.c === 1 || contact.c === 2) && <span className="email">{contact.m}</span>}
                 </div>
             </div>
         );
@@ -206,7 +204,7 @@ export class ContactButton extends ContactAwareComponent {
                                 }
                             }
                             else {
-                                M.syncContactEmail(contact.u, new MegaPromise())
+                                M.syncContactEmail(contact.u, new MegaPromise(), true)
                                     .done(function(email) {
                                         var exists = false;
                                         var opcKeys = Object.keys(M.opc);
@@ -243,9 +241,15 @@ export class ContactButton extends ContactAwareComponent {
         if (u_attr && contact.u !== u_handle) {
 
             // Add a Set Nickname button for contacts and non-contacts (who are visible in a group chat)
-            moreDropdowns.push(
-                <hr key="nicknames-separator" />
-            );
+
+            if (
+                moreDropdowns.length > 0 &&
+                !(moreDropdowns.length === 2 && moreDropdowns[1] && moreDropdowns[1].key === "fingerprint")
+            ) {
+                moreDropdowns.push(
+                    <hr key="nicknames-separator" />
+                );
+            }
             moreDropdowns.push(
                 <DropdownItem
                     key="set-nickname" icon="small-icon context writing-pen" label={l[20828]} onClick={() => {

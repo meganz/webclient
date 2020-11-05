@@ -578,8 +578,6 @@ var redeem = {
         var $voucherBlock = $('.promo-voucher-block', redeem.$successOverlay);
         var $voucherIcon = $('.plan-icon', $voucherBlock);
         var proPlanName;
-        var sQuota;
-        var tQuota;
 
         if (vd.businessmonths) {
             if (vd.businessmonths === 1) {
@@ -591,8 +589,6 @@ var redeem = {
             else {
                 proPlanName = l[23493].replace('%n', vd.businessmonths);
             }
-            sQuota = l[24091];
-            tQuota = l[7094];
 
             $voucherIcon.removeClass('pro1 pro2 pro3 pro4').addClass('business');
             $('.promo-voucher-card', $voucherBlock).removeClass('red-block').removeClass('yellow-block')
@@ -602,6 +598,10 @@ var redeem = {
             $('.payment-result-header', redeem.$successOverlay).safeHTML(l[23497] + '<br/>' + proPlanName);
 
             history.replaceState({ subpage: 'fm' }, "", '/fm');
+
+            // Show Business plan details
+            $('.storage-amount', $voucherBlock).safeHTML(l[23954]);
+            $('.transfer-amount', $voucherBlock).safeHTML(l[23813]);
 
             if (window.bCreatedVoucher) {
                 delete window.bCreatedVoucher;
@@ -628,18 +628,18 @@ var redeem = {
             insertEmailToPayResult(redeem.$successOverlay);
 
             $('.payment-result-header', redeem.$successOverlay).text((promo ? l[20430] : l[6961]) + '!');
+
+            // Show PRO plan details
+            $('.storage-amount', $voucherBlock)
+                .safeHTML(l[23789].replace('%1', bytesToSize(vd.storage * 0x40000000, 0)));
+            $('.transfer-amount', $voucherBlock)
+                .safeHTML(l[23790].replace('%1', bytesToSize(vd.bandwidth * 0x40000000, 0)));
         }
 
         $voucherBlock.removeClass('hidden');
         // Show the success
         redeem.showBackgroundOverlay();
         redeem.$successOverlay.removeClass('hidden');
-
-        // Show PRO plan details
-        $('.storage-amount', $voucherBlock)
-            .safeHTML(l[23789].replace('%1', sQuota || bytesToSize(vd.storage * 0x40000000, 0)));
-        $('.transfer-amount', $voucherBlock)
-            .safeHTML(l[23790].replace('%1', tQuota || bytesToSize(vd.bandwidth * 0x40000000, 0)));
 
         // Add click handlers for 'Go to my account' and Close buttons
         redeem.$successOverlay.find('.payment-result-button, .payment-close').rebind('click', function() {

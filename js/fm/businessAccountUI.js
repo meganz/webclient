@@ -1636,8 +1636,7 @@ BusinessAccountUI.prototype.showExp_GraceUIElements = function() {
     var msg = '';
     if (u_attr.b.s === -1) { // expired
         if (u_attr.b.m) {
-            msg = l[20400].replace(/\[S\]/g, '<span>').replace(/\[\/S\]/g, '</span>')
-                .replace('[A]', '<a href="/repay" class="clickurl">').replace('[/A]', '</a>');
+            msg = l[24431];
         }
         else {
             msg = l[20462];

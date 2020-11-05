@@ -1680,6 +1680,12 @@ function init_page() {
         var contactRequestInfo = JSON.parse(localStorage.getItem('addContact'));
         var contactHandle = contactRequestInfo.u;
         var contactRequestTime = contactRequestInfo.unixTime;
+        M.setUser(contactHandle, {
+            u: contactHandle,
+            h: contactHandle,
+            c: undefined
+        });
+
         var TWO_HOURS_IN_SECONDS = 7200;
 
         var addContact = function (ownerEmail, targetEmail) {
@@ -1689,7 +1695,7 @@ function init_page() {
         };
 
         if ((unixtime() - TWO_HOURS_IN_SECONDS) < contactRequestTime) {
-            M.syncContactEmail(contactHandle, new MegaPromise())
+            M.syncContactEmail(contactHandle, new MegaPromise(), true)
                 .then(function(email) {
                     addContact(u_attr.email, email);
                 })

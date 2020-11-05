@@ -1,6 +1,6 @@
 .corporate-content .header-img {
-    max-width: 100%;
     height: auto;
+    max-width: 100%;
     margin-bottom: 20px;
 }
 
@@ -104,14 +104,14 @@
 }
 
 .corporate-content div.media-asset-card {
-    display: table-cell;
+    border: 1px solid #e6e6e6;
     border-radius: 5px;
     box-shadow: 0 2px 4px 0 rgba(230, 230, 230, 0.5);
-    border: 1px solid #E6E6E6;
-    position: relative;
-    max-width: 420px;
-    width: 50%;
+    display: table-cell;
     height: 420px;
+    max-width: 420px;
+    position: relative;
+    width: 50%;
 }
 
 .corporate-content .media-asset-card div.media-asset-card-content img {
@@ -240,6 +240,7 @@ body:not(.mobile) .corporate.main-menu.item:hover span {
     .corporate-content .media-page-overview {
         padding: 50px 10vw 0;
     }
+
     .corporate-content .media-page-media-assets {
         padding: 70px 0;
     }
@@ -263,8 +264,8 @@ body:not(.mobile) .corporate.main-menu.item:hover span {
     }
 
     .corporate-content span.overview-info-lg {
-        font-size: 20px;
         display: block;
+        font-size: 20px;
     }
 
     .corporate-content .info-link {
@@ -292,7 +293,7 @@ body:not(.mobile) .corporate.main-menu.item:hover span {
     }
 
     .corporate.numbers-info .num {
-        font-size: 49px
+        font-size: 49px;
     }
 
     .corporate-content .media-page-users-stats {
@@ -300,7 +301,7 @@ body:not(.mobile) .corporate.main-menu.item:hover span {
     }
 
     .corporate-content .media-asset-card div.media-asset-card-content {
-        padding: 35px 50px 50px
+        padding: 35px 50px 50px;
     }
 
     .corporate-content .contact-us {
@@ -334,7 +335,7 @@ body:not(.mobile) .corporate.main-menu.item:hover span {
     }
 
     .corporate-content .media-asset-card div.media-asset-card-content {
-        padding: 35px 25px 50px
+        padding: 35px 25px 50px;
     }
 
     .corporate-content .media-asset-card .media-asset-card-content p {
@@ -343,10 +344,10 @@ body:not(.mobile) .corporate.main-menu.item:hover span {
 
     .corporate-content div.media-asset-card {
         display: block;
-        width: auto;
         height: 390px;
-        max-width: 390px;
         margin: 15px auto 0;
+        max-width: 390px;
+        width: auto;
     }
 
     .corporate-content .contact-us {

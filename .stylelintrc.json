@@ -13,6 +13,11 @@
                 "severity": "warning"
             }
         ],
-        "selector-list-comma-newline-after": "always"
+        "selector-list-comma-newline-after": "always",
+        "block-no-empty": [
+            true,
+            { "ignore": [ "comments" ] }
+        ],
+        "property-disallowed-list": [ "text-transform" ]
     }
 }

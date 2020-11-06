@@ -1,7 +1,7 @@
 .tiny-icon, .semi-small-icon, .small-icon, .medium-icon, .semi-big-icon, .big-icon, .huge-icon, .icon56 {
     width: 20px;
     height: 20px;
-    background-image: url(../images/mega/new-chat-sprite_v18.png);
+    background-image: url(../images/mega/new-chat-sprite_v19.png);
     background-repeat: no-repeat;
     background-position: 0px -1447px;
     display: inline-block;
@@ -12,7 +12,7 @@
     height: 184px;
     margin: 21px auto;
     display: block;
-    background-image: url(../images/mega/new-chat-sprite_v18.png);
+    background-image: url(../images/mega/new-chat-sprite_v19.png);
     background-repeat: no-repeat;
     background-position: center -1838px;
 }
@@ -176,6 +176,26 @@
 .small-icon.tiny-complete {
     background-position: -80px -896px;
 }
+
+/* Chat GIPHY icons */
+.small-icon.thin-back-icon {
+    background-position: 1px -4642px;
+}
+.small-icon.gif {
+    background-position: -39px -4641px;
+    width: 22px;
+    height: 22px;
+}
+.small-icon.giphy {
+    width: 84px;
+    background-position: -85px -4642px;
+}
+.huge-icon.sad-smile {
+    width: 100px;
+    height: 100px;
+    background-position: -3px -4688px;
+}
+
 
 .small-icon.white-play {
     background-position: -3px -1747px;
@@ -566,7 +586,7 @@
     width: 32px;
     height: 32px;
     display: block;
-    background-image: url(../images/mega/new-chat-sprite_v18.png);
+    background-image: url(../images/mega/new-chat-sprite_v19.png);
     background-repeat: no-repeat;
 }
 .call-icon.handset-with-stop {

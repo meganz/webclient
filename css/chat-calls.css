@@ -371,7 +371,7 @@ video.localViewport {
 }
 .call-header .call-video-icon, .call-header .call-video-icon-warn {
     margin-right: 8px;
-    background-image: url(../images/mega/new-chat-sprite_v18.png);
+    background-image: url(../images/mega/new-chat-sprite_v19.png);
     background-position: -84px -466px;
     height: 12px;
     width: 20px;
@@ -391,7 +391,7 @@ video.localViewport {
 }
 .call-header .call-switch-view {
     margin-right: 16px;
-    background-image: url(../images/mega/new-chat-sprite_v18.png);
+    background-image: url(../images/mega/new-chat-sprite_v19.png);
     background-position: -160px -464px;
     width: 16px;
     height: 16px;

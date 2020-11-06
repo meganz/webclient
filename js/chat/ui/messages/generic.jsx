@@ -5,6 +5,7 @@ import Contact from './types/contact.jsx';
 import Attachment from './types/attachment.jsx';
 import VoiceClip from './types/voiceClip.jsx';
 import Text from './types/text.jsx';
+import Giphy from './types/giphy.jsx';
 import { DropdownItem } from '../../../ui/dropdowns.jsx';
 
 
@@ -409,12 +410,14 @@ export default class GenericConversationMessage extends ConversationMessageMixin
 
         // --
 
+
         const MESSAGE = {
             TYPE: {
                 ATTACHMENT: textContents[1] === Message.MANAGEMENT_MESSAGE_TYPES.ATTACHMENT,
                 CONTACT: textContents[1] === Message.MANAGEMENT_MESSAGE_TYPES.CONTACT,
                 REVOKE_ATTACHMENT: textContents[1] === Message.MANAGEMENT_MESSAGE_TYPES.REVOKE_ATTACHMENT,
                 VOICE_CLIP: textContents[1] === Message.MANAGEMENT_MESSAGE_TYPES.VOICE_CLIP,
+                GIPHY: message.metaType && message.metaType === Message.MESSAGE_META_TYPE.GIPHY,
                 TEXT: textContents[0] !== Message.MANAGEMENT_MESSAGE_TYPES.MANAGEMENT,
                 INLINE: !(message instanceof Message) && message.type && !!message.type.length,
                 REVOKED: message.revoked
@@ -457,6 +460,13 @@ export default class GenericConversationMessage extends ConversationMessageMixin
                 return (
                     <Local {...MESSAGE.props} />
                 );
+            case MESSAGE.TYPE.GIPHY:
+                return (
+                    <Giphy
+                        {...MESSAGE.props}
+                        onDelete={MESSAGE.onDelete}
+                    />
+                );
             case MESSAGE.TYPE.TEXT:
                 return (
                     <Text
@@ -469,6 +479,8 @@ export default class GenericConversationMessage extends ConversationMessageMixin
                         spinnerElement={spinnerElement}
                     />
                 );
+            default:
+                return null;
         }
     }
 }

@@ -947,7 +947,6 @@ body:not(.mobile) .plan.pro3:not(.current) .pricing-page.plan-button:hover {
     box-shadow: 0 0 0 4px transparent;
     -webkit-transition: background-color 200ms ease-in-out, box-shadow 200ms ease-in-out;
     transition: background-color 200ms ease-in-out, box-shadow 200ms ease-in-out;
-    text-transform: capitalize;
 }
 body:not(.mobile) .pricing-page.slider-dot:hover {
     background-color: #00BFA5;
@@ -966,11 +965,11 @@ body:not(.mobile) .pricing-page.slider-dot:hover {
     left: 100%;
 }
 .pricing-page.slider-dot .label {
-    min-width: 200px;
+    min-width: 210px;
     position: absolute;
     top: 90px;
     left: 50%;
-    margin-left: -100px;
+    margin-left: -105px;
     font-size: 24px;
     line-height: 36px;
     text-align: center;

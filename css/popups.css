@@ -385,6 +385,15 @@ body.tl .dropdown.body.popup.contacts-search {
 }
 /* End of Emoji one popup */
 
+/* GIF panel */
+.popup-scroll-area.gif-popup {
+    max-height: 520px;
+    position: relative;
+    z-index: 10;
+    overflow: hidden;
+}
+/* End of GIF panel */
+
 /* simpletip */
 .dark-direct-tooltip.simpletip-tooltip {
     display: block;

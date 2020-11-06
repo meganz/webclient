@@ -48,7 +48,8 @@ export default class AbstractGenericMessage extends ConversationMessageMixin {
         if (!buttons) {
             return null;
         }
-        var cnt = buttons.length;
+
+        const cnt = buttons.length;
 
         if (cnt === 0) {
             return null;
@@ -60,8 +61,9 @@ export default class AbstractGenericMessage extends ConversationMessageMixin {
             </div>
         );
     }
+
     render() {
-        const { message, grouped, additionalClasses } = this.props;
+        const { message, grouped, additionalClasses, hideActionButtons } = this.props;
 
         if (message.deleted) {
             return null;
@@ -85,10 +87,9 @@ export default class AbstractGenericMessage extends ConversationMessageMixin {
                             {this.getTimestampAsString()}
                         </div>
                     )}
-                    {
-                        !this.props.hideActionButtons && this.getMessageActionButtons &&
+                    {!hideActionButtons && this.getMessageActionButtons && (
                         this.renderMessageActionButtons(this.getMessageActionButtons())
-                    }
+                    )}
                     {this.getContents && this.getContents()}
                     {this.getEmojisImages()}
                 </div>

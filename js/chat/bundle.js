@@ -104,9 +104,9 @@ __webpack_require__.d(__webpack_exports__, "SoonFcWrap", function() { return Soo
 __webpack_require__.d(__webpack_exports__, "trycatcher", function() { return trycatcher; });
 __webpack_require__.d(__webpack_exports__, "MegaRenderMixin", function() { return MegaRenderMixin; });
 __webpack_require__.d(__webpack_exports__, "ContactAwareComponent", function() { return ContactAwareComponent; });
-var _applyDecoratedDescriptor0__ = __webpack_require__(7);
+var _applyDecoratedDescriptor0__ = __webpack_require__(8);
 var _applyDecoratedDescriptor0 = __webpack_require__.n(_applyDecoratedDescriptor0__);
-var react_dom1__ = __webpack_require__(5);
+var react_dom1__ = __webpack_require__(6);
 var react_dom1 = __webpack_require__.n(react_dom1__);
 var react2__ = __webpack_require__(0);
 var react2 = __webpack_require__.n(react2__);
@@ -446,6 +446,10 @@ let MegaRenderMixin = (_dec = logcall(), _dec2 = SoonFcWrap(50, true), _dec3 = l
               if (this._requiresUpdateOnResize) {
                 this.debouncedForceUpdate();
               }
+            }
+
+            if (this.onVisibilityChange) {
+              this.onVisibilityChange(this.__intersectionVisibility);
             }
           }, {
             threshold: 0.1
@@ -1392,14 +1396,14 @@ __webpack_require__.d(__webpack_exports__, "Avatar", function() { return Avatar;
 __webpack_require__.d(__webpack_exports__, "ContactCard", function() { return ContactCard; });
 __webpack_require__.d(__webpack_exports__, "ContactItem", function() { return ContactItem; });
 __webpack_require__.d(__webpack_exports__, "ContactPickerWidget", function() { return ContactPickerWidget; });
-var _extends0__ = __webpack_require__(8);
+var _extends0__ = __webpack_require__(7);
 var _extends0 = __webpack_require__.n(_extends0__);
 var react1__ = __webpack_require__(0);
 var react1 = __webpack_require__.n(react1__);
 var _stores_mixins_js2__ = __webpack_require__(1);
 var _ui_utils_jsx3__ = __webpack_require__(4);
 var _ui_perfectScrollbar_jsx4__ = __webpack_require__(11);
-var _ui_buttons_jsx5__ = __webpack_require__(6);
+var _ui_buttons_jsx5__ = __webpack_require__(5);
 var _ui_dropdowns_jsx6__ = __webpack_require__(2);
 
 
@@ -2694,7 +2698,7 @@ __webpack_require__.d(__webpack_exports__, "EmojiFormattedContent", function() {
 var _stores_mixins_js0__ = __webpack_require__(1);
 var React = __webpack_require__(0);
 
-var ReactDOM = __webpack_require__(5);
+var ReactDOM = __webpack_require__(6);
 
 
 
@@ -2952,18 +2956,12 @@ __webpack_exports__["default"] = ({
 
 /***/ }),
 
-/***/ (function(module, exports) {
-
-module.exports = ReactDOM;
-
-/***/ }),
-
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 __webpack_require__.d(__webpack_exports__, "Button", function() { return Button; });
-var _extends0__ = __webpack_require__(8);
+var _extends0__ = __webpack_require__(7);
 var _extends0 = __webpack_require__.n(_extends0__);
 var react1__ = __webpack_require__(0);
 var react1 = __webpack_require__.n(react1__);
@@ -3166,6 +3164,36 @@ class Button extends _stores_mixins_js2__["MegaRenderMixin"] {
 
 /***/ (function(module, exports) {
 
+module.exports = ReactDOM;
+
+/***/ }),
+
+/***/ (function(module, exports) {
+
+function _extends() {
+  module.exports = _extends = Object.assign || function (target) {
+    for (var i = 1; i < arguments.length; i++) {
+      var source = arguments[i];
+
+      for (var key in source) {
+        if (Object.prototype.hasOwnProperty.call(source, key)) {
+          target[key] = source[key];
+        }
+      }
+    }
+
+    return target;
+  };
+
+  return _extends.apply(this, arguments);
+}
+
+module.exports = _extends;
+
+/***/ }),
+
+/***/ (function(module, exports) {
+
 function _applyDecoratedDescriptor(target, property, decorators, descriptor, context) {
   var desc = {};
   Object.keys(descriptor).forEach(function (key) {
@@ -3199,30 +3227,6 @@ module.exports = _applyDecoratedDescriptor;
 
 /***/ }),
 
-/***/ (function(module, exports) {
-
-function _extends() {
-  module.exports = _extends = Object.assign || function (target) {
-    for (var i = 1; i < arguments.length; i++) {
-      var source = arguments[i];
-
-      for (var key in source) {
-        if (Object.prototype.hasOwnProperty.call(source, key)) {
-          target[key] = source[key];
-        }
-      }
-    }
-
-    return target;
-  };
-
-  return _extends.apply(this, arguments);
-}
-
-module.exports = _extends;
-
-/***/ }),
-
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3233,7 +3237,7 @@ var _tooltips_jsx2__ = __webpack_require__(12);
 var _forms_jsx3__ = __webpack_require__(14);
 var React = __webpack_require__(0);
 
-var ReactDOM = __webpack_require__(5);
+var ReactDOM = __webpack_require__(6);
 
 
 
@@ -3614,7 +3618,7 @@ __webpack_require__.d(__webpack_exports__, "ConversationMessageMixin", function(
 var react0__ = __webpack_require__(0);
 var react0 = __webpack_require__.n(react0__);
 var _stores_mixins_js1__ = __webpack_require__(1);
-var _ui_buttons_jsx2__ = __webpack_require__(6);
+var _ui_buttons_jsx2__ = __webpack_require__(5);
 var _ui_emojiDropdown_jsx3__ = __webpack_require__(13);
 
 
@@ -3994,7 +3998,7 @@ class ConversationMessageMixin extends _stores_mixins_js1__["ContactAwareCompone
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 __webpack_require__.d(__webpack_exports__, "PerfectScrollbar", function() { return PerfectScrollbar; });
-var _applyDecoratedDescriptor0__ = __webpack_require__(7);
+var _applyDecoratedDescriptor0__ = __webpack_require__(8);
 var _applyDecoratedDescriptor0 = __webpack_require__.n(_applyDecoratedDescriptor0__);
 var _stores_mixins_js1__ = __webpack_require__(1);
 
@@ -4328,7 +4332,7 @@ let PerfectScrollbar = (_dec = Object(_stores_mixins_js1__["SoonFcWrap"])(30, tr
 var _stores_mixins_js0__ = __webpack_require__(1);
 var React = __webpack_require__(0);
 
-var ReactDOM = __webpack_require__(5);
+var ReactDOM = __webpack_require__(6);
 
 var utils = __webpack_require__(4);
 
@@ -4516,7 +4520,7 @@ __webpack_exports__["a"] = ({
 
 "use strict";
 __webpack_require__.d(__webpack_exports__, "a", function() { return DropdownEmojiSelector; });
-var _extends0__ = __webpack_require__(8);
+var _extends0__ = __webpack_require__(7);
 var _extends0 = __webpack_require__.n(_extends0__);
 var _stores_mixins_js1__ = __webpack_require__(1);
 
@@ -5022,7 +5026,7 @@ DropdownEmojiSelector.defaultProps = {
 var _stores_mixins_js0__ = __webpack_require__(1);
 var React = __webpack_require__(0);
 
-var ReactDOM = __webpack_require__(5);
+var ReactDOM = __webpack_require__(6);
 
 var utils = __webpack_require__(4);
 
@@ -5199,11 +5203,11 @@ __webpack_require__.d(__webpack_exports__, "ConversationPanel", function() { ret
 __webpack_require__.d(__webpack_exports__, "ConversationPanels", function() { return conversationpanel_ConversationPanels; });
 
 // EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/extends.js
-var helpers_extends = __webpack_require__(8);
+var helpers_extends = __webpack_require__(7);
 var extends_default = __webpack_require__.n(helpers_extends);
 
 // EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/applyDecoratedDescriptor.js
-var applyDecoratedDescriptor = __webpack_require__(7);
+var applyDecoratedDescriptor = __webpack_require__(8);
 var applyDecoratedDescriptor_default = __webpack_require__.n(applyDecoratedDescriptor);
 
 // EXTERNAL MODULE: external "React"
@@ -5211,7 +5215,7 @@ var external_React_ = __webpack_require__(0);
 var external_React_default = __webpack_require__.n(external_React_);
 
 // EXTERNAL MODULE: external "ReactDOM"
-var external_ReactDOM_ = __webpack_require__(5);
+var external_ReactDOM_ = __webpack_require__(6);
 var external_ReactDOM_default = __webpack_require__.n(external_ReactDOM_);
 
 // EXTERNAL MODULE: ./js/ui/utils.jsx
@@ -5221,7 +5225,7 @@ var utils = __webpack_require__(4);
 var mixins = __webpack_require__(1);
 
 // EXTERNAL MODULE: ./js/ui/buttons.jsx
-var ui_buttons = __webpack_require__(6);
+var ui_buttons = __webpack_require__(5);
 
 // EXTERNAL MODULE: ./js/ui/modalDialogs.jsx
 var modalDialogs = __webpack_require__(9);
@@ -6560,11 +6564,11 @@ var emojiDropdown = __webpack_require__(13);
 // CONCATENATED MODULE: ./js/chat/ui/emojiAutocomplete.jsx
 var React = __webpack_require__(0);
 
-var ReactDOM = __webpack_require__(5);
+var ReactDOM = __webpack_require__(6);
 
 
 
-var ButtonsUI = __webpack_require__(6);
+var ButtonsUI = __webpack_require__(5);
 
 class emojiAutocomplete_EmojiAutocomplete extends mixins["MegaRenderMixin"] {
   constructor(props) {
@@ -6809,6 +6813,459 @@ emojiAutocomplete_EmojiAutocomplete.defaultProps = {
   'disableCheckingVisibility': true,
   'maxEmojis': 12
 };
+// EXTERNAL MODULE: ./js/ui/perfectScrollbar.jsx
+var perfectScrollbar = __webpack_require__(11);
+
+// CONCATENATED MODULE: ./js/chat/ui/gifPanel/searchField.jsx
+
+
+
+class searchField_SearchField extends mixins["MegaRenderMixin"] {
+  constructor(props) {
+    super(props);
+  }
+
+  render() {
+    const {
+      value,
+      searching,
+      onChange,
+      onReset,
+      onBack
+    } = this.props;
+    return external_React_default.a.createElement("div", {
+      className: "gif-panel-search"
+    }, external_React_default.a.createElement("div", {
+      className: "gif-search-field"
+    }, searching ? external_React_default.a.createElement("i", {
+      className: "small-icon thin-back-icon",
+      onClick: onBack
+    }) : external_React_default.a.createElement("i", {
+      className: "small-icon thin-search-icon"
+    }), external_React_default.a.createElement("input", {
+      ref: searchField_SearchField.inputRef,
+      type: "text",
+      placeholder: LABELS.SEARCH,
+      autoFocus: true,
+      value: value,
+      onChange: onChange
+    }), searching && external_React_default.a.createElement("i", {
+      className: "small-icon tiny-reset",
+      onClick: onReset
+    })), external_React_default.a.createElement("div", {
+      className: "giphy-logo"
+    }, external_React_default.a.createElement("img", {
+      src: staticpath + 'images/mega/giphy.gif',
+      alt: "PWRD BY GIPHY"
+    })));
+  }
+
+}
+searchField_SearchField.inputRef = external_React_default.a.createRef();
+
+searchField_SearchField.focus = () => searchField_SearchField.inputRef && searchField_SearchField.inputRef.current && searchField_SearchField.inputRef.current.focus();
+
+searchField_SearchField.hasValue = () => searchField_SearchField.inputRef && searchField_SearchField.inputRef.current && !!searchField_SearchField.inputRef.current.value.length;
+// CONCATENATED MODULE: ./js/chat/ui/gifPanel/result.jsx
+
+
+
+class result_Result extends mixins["MegaRenderMixin"] {
+  constructor(props) {
+    super(props);
+    this.resultRef = external_React_default.a.createRef();
+  }
+
+  componentDidMount() {
+    var _this$props$onMount, _this$props;
+
+    super.componentDidMount();
+    (_this$props$onMount = (_this$props = this.props).onMount) == null ? void 0 : _this$props$onMount.call(_this$props, this.resultRef.current);
+  }
+
+  componentWillUnmount() {
+    var _this$props$onUnmount, _this$props2;
+
+    super.componentWillUnmount();
+    (_this$props$onUnmount = (_this$props2 = this.props).onUnmount) == null ? void 0 : _this$props$onUnmount.call(_this$props2, this.resultRef.current, 'unobserve');
+  }
+
+  render() {
+    const {
+      image,
+      title,
+      onClick
+    } = this.props;
+    return external_React_default.a.createElement("div", {
+      className: "\n                    " + NODE_CONTAINER_CLASS + "\n                    " + (onClick ? 'clickable' : '') + "\n                ",
+      style: {
+        height: parseInt(image.height)
+      }
+    }, external_React_default.a.createElement("div", {
+      ref: this.resultRef,
+      className: NODE_CLASS,
+      style: {
+        backgroundImage: HAS_INTERSECTION_OBSERVER ? '' : "url(" + image.url + ")"
+      },
+      "data-url": image.url,
+      onClick: onClick
+    }, external_React_default.a.createElement("span", null, title)));
+  }
+
+}
+// CONCATENATED MODULE: ./js/chat/ui/gifPanel/resultContainer.jsx
+
+
+
+
+const HAS_INTERSECTION_OBSERVER = typeof IntersectionObserver !== 'undefined';
+const NODE_CONTAINER_CLASS = 'node-container';
+const NODE_CLASS = 'node';
+const RESULT_CONTAINER_CLASS = 'gif-panel-results';
+const RESULTS_END_CLASS = 'results-end';
+class resultContainer_ResultContainer extends mixins["MegaRenderMixin"] {
+  constructor(props) {
+    super(props);
+    this.intersectionObserver = null;
+
+    this.initializeIntersectionObserver = () => {
+      if (HAS_INTERSECTION_OBSERVER) {
+        this.intersectionObserver = new IntersectionObserver(entries => {
+          for (let i = 0; i < entries.length; i++) {
+            var _target$classList, _target$classList2;
+
+            const entry = entries[i];
+            const target = entry.target;
+
+            if ((_target$classList = target.classList) == null ? void 0 : _target$classList.contains(NODE_CLASS)) {
+              target.style.backgroundImage = entry.isIntersecting ? "url(" + target.dataset.url + ")" : null;
+            }
+
+            if (entry.isIntersecting && ((_target$classList2 = target.classList) == null ? void 0 : _target$classList2.contains(RESULTS_END_CLASS))) {
+              this.props.onPaginate();
+            }
+          }
+        });
+      }
+    };
+
+    this.toggleIntersectionObserver = (node, action = 'observe') => {
+      if (node && this.intersectionObserver) {
+        this.intersectionObserver[action](node);
+      }
+    };
+  }
+
+  componentDidMount() {
+    super.componentDidMount();
+    this.initializeIntersectionObserver();
+  }
+
+  componentWillUnmount() {
+    super.componentWillUnmount();
+
+    if (this.intersectionObserver) {
+      this.intersectionObserver.disconnect();
+      this.intersectionObserver = null;
+    }
+  }
+
+  componentWillReceiveProps(nextProps) {
+    super.componentWillReceiveProps(nextProps);
+
+    if (nextProps !== this.props) {
+      this.safeForceUpdate();
+    }
+  }
+
+  render() {
+    const {
+      loading,
+      results,
+      bottom,
+      onClick
+    } = this.props;
+
+    if (loading && results.length < 1) {
+      return external_React_default.a.createElement("div", {
+        className: RESULT_CONTAINER_CLASS
+      }, Array.from({
+        length: 25
+      }, (element, index) => external_React_default.a.createElement("div", {
+        key: index,
+        className: NODE_CONTAINER_CLASS
+      }, external_React_default.a.createElement("div", {
+        className: NODE_CLASS,
+        style: {
+          height: Math.floor(Math.random() * 150) + 100
+        }
+      }))));
+    }
+
+    if (!loading && results.length < 1) {
+      return external_React_default.a.createElement("div", {
+        className: "no-results-container"
+      }, external_React_default.a.createElement("div", {
+        className: "no-results-content"
+      }, external_React_default.a.createElement("i", {
+        className: "huge-icon sad-smile"
+      }), external_React_default.a.createElement("span", null, LABELS.NO_RESULTS)));
+    }
+
+    if (results.length) {
+      return external_React_default.a.createElement(external_React_default.a.Fragment, null, external_React_default.a.createElement("div", {
+        className: RESULT_CONTAINER_CLASS
+      }, results.map(({
+        slug,
+        images: {
+          fixed_width_downsampled
+        },
+        title
+      }, index) => {
+        return external_React_default.a.createElement(result_Result, {
+          key: slug + "--" + index,
+          image: fixed_width_downsampled,
+          title: title,
+          onClick: () => onClick(results[index]),
+          onMount: this.toggleIntersectionObserver,
+          onUnmount: this.toggleIntersectionObserver
+        });
+      })), external_React_default.a.createElement("div", {
+        className: RESULTS_END_CLASS,
+        ref: node => this.toggleIntersectionObserver(node),
+        style: {
+          visibility: bottom ? 'visible' : 'hidden'
+        }
+      }, external_React_default.a.createElement("img", {
+        className: "emoji",
+        alt: "\\ud83d\\ude10",
+        src: staticpath + "/images/mega/twemojis/2_v2/72x72/1f610.png"
+      }), external_React_default.a.createElement("strong", null, LABELS.END_OF_RESULTS)));
+    }
+
+    return null;
+  }
+
+}
+// CONCATENATED MODULE: ./js/chat/ui/gifPanel/gifPanel.jsx
+
+
+
+
+
+
+const GIF_PANEL_CLASS = 'gif-panel-wrapper';
+const MAX_HEIGHT = 550;
+const API = {
+  HOSTNAME: 'https://giphy.mega.nz/',
+  ENDPOINT: 'v1/gifs',
+  SCHEME: 'giphy://',
+  convert: path => {
+    if (path && typeof path === 'string') {
+      const FORMAT = [API.SCHEME, API.HOSTNAME];
+
+      if (path.indexOf(API.SCHEME) === 0 || path.indexOf(API.HOSTNAME) === 0) {
+        return String.prototype.replace.apply(path, path.indexOf(API.SCHEME) === 0 ? FORMAT : FORMAT.reverse());
+      }
+    }
+  },
+  LIMIT: 25,
+  OFFSET: 25
+};
+const LABELS = {
+  SEARCH: l[24025],
+  END_OF_RESULTS: l[24156],
+  NO_RESULTS: l[24050]
+};
+class gifPanel_GifPanel extends mixins["MegaRenderMixin"] {
+  constructor(props) {
+    super(props);
+    this.delayProcID = null;
+    this.defaultState = {
+      value: '',
+      searching: false,
+      results: [],
+      loading: true,
+      offset: 0,
+      bottom: false
+    };
+    this.state = extends_default()({}, this.defaultState);
+
+    this.getContainerHeight = () => window.innerHeight * 0.6 > MAX_HEIGHT ? MAX_HEIGHT : window.innerHeight * 0.6;
+
+    this.getFormattedPath = path => {
+      const PATH = path + (path.indexOf('?') === -1 ? '?' : '&');
+      const LIMIT = "limit=" + API.LIMIT;
+      return API.HOSTNAME + API.ENDPOINT + "/" + (PATH + LIMIT);
+    };
+
+    this.bindEvents = () => {
+      $(document).rebind('mousedown.gifPanel', ev => {
+        const $target = ev && $(ev.target);
+
+        if ($target.parents(".gif-panel-wrapper").length === 0 && !$target.is('i.small-icon.tiny-reset')) {
+          this.props.onToggle();
+        }
+      }).rebind('keydown.gifPanel', ({
+        keyCode
+      }) => {
+        if (keyCode && keyCode === 27) {
+            return searchField_SearchField.hasValue() ? this.doReset() : this.props.onToggle();
+          }
+      });
+    };
+
+    this.doFetch = path => {
+      this.setState({
+        loading: true
+      }, () => {
+        fetch(this.getFormattedPath(path)).then(response => response.json()).then(({
+          data
+        }) => {
+          if (this.isMounted()) {
+            if (data && data.length) {
+              return this.setState(state => ({
+                results: [...state.results, ...data],
+                loading: false
+              }));
+            }
+
+            return this.setState({
+              bottom: true,
+              loading: false
+            }, () => this.resultContainerRef.reinitialise());
+          }
+        }).catch(ex => console.error('doFetch > error ->', ex));
+      });
+    };
+
+    this.doPaginate = () => {
+      const {
+        value,
+        loading,
+        searching
+      } = this.state;
+
+      if (!loading) {
+        this.setState(state => ({
+          offset: state.offset + API.OFFSET
+        }), () => {
+          this.doFetch(searching ? "search?q=" + escape(value) + "&offset=" + this.state.offset : "trending?offset=" + this.state.offset);
+        });
+      }
+    };
+
+    this.doReset = () => {
+      this.setState(extends_default()({}, this.defaultState), () => {
+        this.doFetch('trending');
+        onIdle(() => searchField_SearchField.focus());
+        this.resultContainerRef.scrollToY(0);
+      });
+    };
+
+    this.handleChange = ev => {
+      const value = ev.target.value;
+      const searching = value.length >= 2;
+
+      if (value.length === 0) {
+        return this.doReset();
+      }
+
+      this.setState(state => extends_default()({}, this.defaultState, {
+        value,
+        searching,
+        results: searching ? [] : state.results
+      }), () => {
+        this.resultContainerRef.scrollToY(0);
+        this.delayProcID = searching ? delay('gif-search', () => this.doFetch("search?q=" + escape(value)), 1600) : null;
+      });
+    };
+
+    this.handleBack = () => this.doReset();
+
+    this.doSend = result => {
+      const {
+        mp4,
+        webp,
+        mp4_size,
+        webp_size,
+        width,
+        height
+      } = result.images.fixed_height;
+      const message = Message.MANAGEMENT_MESSAGE_TYPES.MANAGEMENT + Message.MANAGEMENT_MESSAGE_TYPES.CONTAINS_META + Message.MESSAGE_META_TYPE.GIPHY + JSON.stringify({
+        textMessage: result.title,
+        src: API.convert(mp4),
+        src_webp: API.convert(webp),
+        s: mp4_size,
+        s_webp: webp_size,
+        w: width,
+        h: height
+      });
+      this.props.chatRoom.sendMessage(message);
+      this.props.onToggle();
+    };
+  }
+
+  componentDidMount() {
+    super.componentDidMount();
+
+    if (this.state.results && this.state.results.length === 0) {
+      this.doFetch('trending');
+    }
+
+    this.bindEvents();
+  }
+
+  componentWillUnmount() {
+    super.componentWillUnmount();
+
+    if (this.delayProcID) {
+      delay.cancel(this.delayProcID);
+    }
+  }
+
+  render() {
+    const {
+      value,
+      searching,
+      results,
+      loading,
+      bottom
+    } = this.state;
+    return external_React_default.a.createElement("div", {
+      className: "gif-panel-wrapper"
+    }, external_React_default.a.createElement("div", {
+      className: "gif-panel",
+      style: {
+        height: this.getContainerHeight()
+      }
+    }, external_React_default.a.createElement("div", {
+      className: "gif-panel-header"
+    }, external_React_default.a.createElement(searchField_SearchField, {
+      value: value,
+      searching: searching,
+      onChange: this.handleChange,
+      onReset: this.doReset,
+      onBack: this.handleBack
+    })), external_React_default.a.createElement("div", {
+      className: "gif-panel-content"
+    }, external_React_default.a.createElement(perfectScrollbar["PerfectScrollbar"], {
+      ref: container => {
+        this.resultContainerRef = container;
+      },
+      options: {
+        'suppressScrollX': true
+      }
+    }, external_React_default.a.createElement(resultContainer_ResultContainer, {
+      results: results,
+      loading: loading,
+      bottom: bottom,
+      onPaginate: this.doPaginate,
+      onClick: this.doSend
+    })))));
+  }
+
+}
 // CONCATENATED MODULE: ./js/chat/ui/typingArea.jsx
 
 
@@ -6816,7 +7273,8 @@ var _dec, _dec2, _class, _class2, _temp;
 
 var typingArea_React = __webpack_require__(0);
 
-var typingArea_ReactDOM = __webpack_require__(5);
+var typingArea_ReactDOM = __webpack_require__(6);
+
 
 
 
@@ -6829,7 +7287,8 @@ let typingArea_TypingArea = (_dec = Object(mixins["SoonFcWrap"])(60), _dec2 = Ob
     this.state = {
       emojiSearchQuery: false,
       typedMessage: initialText ? initialText : "",
-      textareaHeight: 20
+      textareaHeight: 20,
+      gifPanelActive: false
     };
   }
 
@@ -7562,10 +8021,23 @@ let typingArea_TypingArea = (_dec = Object(mixins["SoonFcWrap"])(60), _dec2 = Ob
     var disabledTextarea = room.pubCu25519KeyIsMissing === true || this.props.disabled ? true : false;
     return typingArea_React.createElement("div", {
       className: "typingarea-component" + self.props.className + (disabledTextarea ? " disabled" : "")
-    }, typingArea_React.createElement("div", {
+    }, this.state.gifPanelActive && typingArea_React.createElement(gifPanel_GifPanel, {
+      active: this.state.gifPanelActive,
+      chatRoom: this.props.chatRoom,
+      onToggle: () => this.setState({
+        gifPanelActive: false
+      })
+    }), typingArea_React.createElement("div", {
       className: "chat-textarea " + self.props.className
-    }, emojiAutocomplete, self.props.children, typingArea_React.createElement(ui_buttons["Button"], {
-      className: "popup-button",
+    }, emojiAutocomplete, self.props.children, self.props.editing ? null : typingArea_React.createElement(ui_buttons["Button"], {
+      className: "\n                            popup-button\n                            gif-button\n                            " + (this.state.gifPanelActive ? 'active' : '') + "\n                        ",
+      icon: "small-icon gif",
+      disabled: this.props.disabled,
+      onClick: () => this.setState(state => ({
+        gifPanelActive: !state.gifPanelActive
+      }))
+    }), typingArea_React.createElement(ui_buttons["Button"], {
+      className: "popup-button emoji-button",
       icon: "smiling-face",
       disabled: this.props.disabled
     }, typingArea_React.createElement(emojiDropdown["a" ], {
@@ -7602,7 +8074,7 @@ let typingArea_TypingArea = (_dec = Object(mixins["SoonFcWrap"])(60), _dec2 = Ob
 // CONCATENATED MODULE: ./js/chat/ui/whosTyping.jsx
 var whosTyping_React = __webpack_require__(0);
 
-var whosTyping_ReactDOM = __webpack_require__(5);
+var whosTyping_ReactDOM = __webpack_require__(6);
 
 
 
@@ -7741,9 +8213,6 @@ class whosTyping_WhosTyping extends mixins["MegaRenderMixin"] {
 
 }
 
-
-// EXTERNAL MODULE: ./js/ui/perfectScrollbar.jsx
-var perfectScrollbar = __webpack_require__(11);
 
 // CONCATENATED MODULE: ./js/ui/accordion.jsx
 var accordion_React = __webpack_require__(0);
@@ -8158,7 +8627,7 @@ class abstractGenericMessage_AbstractGenericMessage extends mixin["ConversationM
       return null;
     }
 
-    var cnt = buttons.length;
+    const cnt = buttons.length;
 
     if (cnt === 0) {
       return null;
@@ -8173,7 +8642,8 @@ class abstractGenericMessage_AbstractGenericMessage extends mixin["ConversationM
     const {
       message,
       grouped,
-      additionalClasses
+      additionalClasses,
+      hideActionButtons
     } = this.props;
 
     if (message.deleted) {
@@ -8188,7 +8658,7 @@ class abstractGenericMessage_AbstractGenericMessage extends mixin["ConversationM
     }, this.getName && this.getName(), this.getMessageTimestamp ? this.getMessageTimestamp() : grouped ? null : external_React_default.a.createElement("div", {
       className: "message date-time simpletip",
       "data-simpletip": time2date(this.getTimestamp())
-    }, this.getTimestampAsString()), !this.props.hideActionButtons && this.getMessageActionButtons && this.renderMessageActionButtons(this.getMessageActionButtons()), this.getContents && this.getContents(), this.getEmojisImages()));
+    }, this.getTimestampAsString()), !hideActionButtons && this.getMessageActionButtons && this.renderMessageActionButtons(this.getMessageActionButtons()), this.getContents && this.getContents(), this.getEmojisImages()));
   }
 
 }
@@ -9711,7 +10181,7 @@ class text_Text extends abstractGenericMessage_AbstractGenericMessage {
       }
     }
 
-    var parentButtons;
+    let parentButtons;
 
     if (super.getMessageActionButtons) {
       parentButtons = super.getMessageActionButtons();
@@ -9823,6 +10293,7 @@ class text_Text extends abstractGenericMessage_AbstractGenericMessage {
         initialText: msgContents,
         chatRoom: chatRoom,
         showButtons: true,
+        editing: true,
         className: "edit-typing-area",
         onUpdate: () => onUpdate ? onUpdate : null,
         onConfirm: messageContents => {
@@ -9876,7 +10347,94 @@ class text_Text extends abstractGenericMessage_AbstractGenericMessage {
   }
 
 }
+// CONCATENATED MODULE: ./js/chat/ui/messages/types/giphy.jsx
+
+
+
+
+
+class giphy_Giphy extends abstractGenericMessage_AbstractGenericMessage {
+  constructor(props) {
+    super(props);
+    this.gifRef = external_React_default.a.createRef();
+    this.state = {
+      src: undefined
+    };
+
+    this.toggle = () => {
+      const video = this.gifRef.current;
+      video[video.paused ? 'play' : 'pause']();
+    };
+  }
+
+  onVisibilityChange(isIntersecting) {
+    this.setState({
+      src: isIntersecting ? API.convert(this.props.message.meta.src) : undefined
+    }, () => {
+      var _this$gifRef, _this$gifRef$current;
+
+      (_this$gifRef = this.gifRef) == null ? void 0 : (_this$gifRef$current = _this$gifRef.current) == null ? void 0 : _this$gifRef$current[isIntersecting ? 'load' : 'pause']();
+      this.safeForceUpdate();
+    });
+  }
+
+  getMessageActionButtons() {
+    const {
+      onDelete,
+      message
+    } = this.props;
+    const $$BUTTONS = [message.isEditable() && external_React_default.a.createElement(ui_buttons["Button"], {
+      key: "delete-GIPHY-button",
+      className: "default-white-button tiny-button",
+      icon: "tiny-icon icons-sprite grey-dots"
+    }, external_React_default.a.createElement(ui_dropdowns["Dropdown"], {
+      className: "white-context-menu attachments-dropdown",
+      noArrow: true,
+      positionMy: "left bottom",
+      positionAt: "right bottom",
+      horizOffset: 4
+    }, external_React_default.a.createElement(ui_dropdowns["DropdownItem"], {
+      icon: "red-cross",
+      label: l[1730],
+      className: "red",
+      onClick: e => onDelete(e, message)
+    }))), super.getMessageActionButtons && super.getMessageActionButtons()];
+    return $$BUTTONS.filter(button => button);
+  }
+
+  getContents() {
+    const {
+      message,
+      hideActionButtons
+    } = this.props;
+    const {
+      s,
+      w,
+      h,
+      src
+    } = message.meta;
+    const autoPlay = parseInt(s, 10) < 4e6;
+    return external_React_default.a.createElement("video", {
+      className: "giphy-block",
+      ref: this.gifRef,
+      title: message.textContents,
+      autoPlay: autoPlay,
+      loop: true,
+      muted: true,
+      controls: false,
+      width: w,
+      height: h,
+      style: {
+        cursor: autoPlay ? 'default' : 'pointer'
+      },
+      onClick: () => !autoPlay && this.toggle(),
+      src: hideActionButtons ? API.convert(src) : this.state.src
+    });
+  }
+
+}
 // CONCATENATED MODULE: ./js/chat/ui/messages/generic.jsx
+
 
 
 
@@ -10252,6 +10810,7 @@ class generic_GenericConversationMessage extends mixin["ConversationMessageMixin
         CONTACT: textContents[1] === Message.MANAGEMENT_MESSAGE_TYPES.CONTACT,
         REVOKE_ATTACHMENT: textContents[1] === Message.MANAGEMENT_MESSAGE_TYPES.REVOKE_ATTACHMENT,
         VOICE_CLIP: textContents[1] === Message.MANAGEMENT_MESSAGE_TYPES.VOICE_CLIP,
+        GIPHY: message.metaType && message.metaType === Message.MESSAGE_META_TYPE.GIPHY,
         TEXT: textContents[0] !== Message.MANAGEMENT_MESSAGE_TYPES.MANAGEMENT,
         INLINE: !(message instanceof Message) && message.type && !!message.type.length,
         REVOKED: message.revoked
@@ -10290,6 +10849,11 @@ class generic_GenericConversationMessage extends mixin["ConversationMessageMixin
       case MESSAGE.TYPE.INLINE:
         return external_React_default.a.createElement(local_Local, MESSAGE.props);
 
+      case MESSAGE.TYPE.GIPHY:
+        return external_React_default.a.createElement(giphy_Giphy, extends_default()({}, MESSAGE.props, {
+          onDelete: MESSAGE.onDelete
+        }));
+
       case MESSAGE.TYPE.TEXT:
         return external_React_default.a.createElement(text_Text, extends_default()({}, MESSAGE.props, {
           onEditToggle: editing => this.setState({
@@ -10301,6 +10865,9 @@ class generic_GenericConversationMessage extends mixin["ConversationMessageMixin
           isBeingEdited: MESSAGE.isBeingEdited,
           spinnerElement: spinnerElement
         }));
+
+      default:
+        return null;
     }
   }
 
@@ -10676,7 +11243,7 @@ var sharedFilesAccordionPanel_dec, sharedFilesAccordionPanel_class;
 
 var sharedFilesAccordionPanel_React = __webpack_require__(0);
 
-var sharedFilesAccordionPanel_ReactDOM = __webpack_require__(5);
+var sharedFilesAccordionPanel_ReactDOM = __webpack_require__(6);
 
 
 
@@ -10938,7 +11505,7 @@ let sharedFilesAccordionPanel_SharedFilesAccordionPanel = (sharedFilesAccordionP
 // CONCATENATED MODULE: ./js/chat/ui/incomingSharesAccordionPanel.jsx
 var incomingSharesAccordionPanel_React = __webpack_require__(0);
 
-var incomingSharesAccordionPanel_ReactDOM = __webpack_require__(5);
+var incomingSharesAccordionPanel_ReactDOM = __webpack_require__(6);
 
 
 
@@ -11146,7 +11713,7 @@ class CloseOpenModeMessage extends closeOpenMode_ConversationMessageMixin {
 // CONCATENATED MODULE: ./js/chat/ui/messages/chatHandle.jsx
 var chatHandle_React = __webpack_require__(0);
 
-var chatHandle_ReactDOM = __webpack_require__(5);
+var chatHandle_ReactDOM = __webpack_require__(6);
 
 var chatHandle_utils = __webpack_require__(4);
 
@@ -14646,11 +15213,11 @@ function isStartCallDisabled(room) {
 __webpack_require__.r(__webpack_exports__);
 
 // EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/extends.js
-var helpers_extends = __webpack_require__(8);
+var helpers_extends = __webpack_require__(7);
 var extends_default = __webpack_require__.n(helpers_extends);
 
 // EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/applyDecoratedDescriptor.js
-var applyDecoratedDescriptor = __webpack_require__(7);
+var applyDecoratedDescriptor = __webpack_require__(8);
 var applyDecoratedDescriptor_default = __webpack_require__.n(applyDecoratedDescriptor);
 
 // EXTERNAL MODULE: ./js/ui/utils.jsx
@@ -14660,12 +15227,12 @@ var utils = __webpack_require__(4);
 var mixins = __webpack_require__(1);
 
 // EXTERNAL MODULE: ./js/ui/buttons.jsx
-var buttons = __webpack_require__(6);
+var buttons = __webpack_require__(5);
 
 // EXTERNAL MODULE: ./js/ui/dropdowns.jsx
 var dropdowns = __webpack_require__(2);
 
-// EXTERNAL MODULE: ./js/chat/ui/conversationpanel.jsx + 30 modules
+// EXTERNAL MODULE: ./js/chat/ui/conversationpanel.jsx + 35 modules
 var conversationpanel = __webpack_require__(17);
 
 // EXTERNAL MODULE: external "React"
@@ -16574,7 +17141,7 @@ module.exports = __webpack_require__(18);
 __webpack_require__.r(__webpack_exports__);
 var react0__ = __webpack_require__(0);
 var react0 = __webpack_require__.n(react0__);
-var react_dom1__ = __webpack_require__(5);
+var react_dom1__ = __webpack_require__(6);
 var react_dom1 = __webpack_require__.n(react_dom1__);
 var _ui_conversations_jsx2__ = __webpack_require__(18);
 
@@ -18016,16 +18583,8 @@ Chat.prototype._doLoadImages = function () {
   };
 
   var loadOriginal = function (n) {
-    M.gfsfetch(n.h, 0, -1).then(function (data) {
-      var handler = is_image(n);
-
-      if (typeof handler === 'function') {
-        handler(data, chatImageParser.bind(this, n.h));
-      } else {
-        chatImageParser(n.h, data);
-      }
-    }).catch(function (ex) {
-      var type = String(n.fa).indexOf(':1*') > 0 ? 1 : 0;
+    const origFallback = ex => {
+      const type = String(n.fa).indexOf(':1*') > 0 ? 1 : 0;
 
       if (d) {
         console.debug('Failed to load original image on chat.', n.h, n, ex);
@@ -18036,7 +18595,23 @@ Chat.prototype._doLoadImages = function () {
       delay('ChatRoom[' + self.roomId + ']:origFallback' + type, function () {
         api_getfileattr(imagesToBeLoaded, type, onSuccess, onError);
       });
-    });
+    };
+
+    M.gfsfetch(n.h, 0, -1).then(function (data) {
+      var handler = is_image(n);
+
+      if (typeof handler === 'function') {
+        handler(data, buffer => {
+          if (buffer) {
+            chatImageParser(n.h, buffer);
+          } else {
+            origFallback(EFAILED);
+          }
+        });
+      } else {
+        chatImageParser(n.h, data);
+      }
+    }).catch(origFallback);
   };
 
   if ($.len(originals)) {
@@ -18049,6 +18624,7 @@ Chat.prototype._doLoadImages = function () {
       self._startedLoadingImage(handle);
     });
   });
+  imagesToBeLoaded = Object.create(null);
 };
 
 Chat.prototype._getImageNodes = function (h, src) {
@@ -20510,7 +21086,7 @@ var ui_forms = __webpack_require__(14);
 // CONCATENATED MODULE: ./js/ui/miniui.jsx
 var React = __webpack_require__(0);
 
-var ReactDOM = __webpack_require__(5);
+var ReactDOM = __webpack_require__(6);
 
 
 
@@ -20661,7 +21237,7 @@ var modalDialogs = __webpack_require__(9);
 // CONCATENATED MODULE: ./js/chat/ui/startGroupChatWizard.jsx
 var startGroupChatWizard_React = __webpack_require__(0);
 
-var startGroupChatWizard_ReactDOM = __webpack_require__(5);
+var startGroupChatWizard_ReactDOM = __webpack_require__(6);
 
 
 

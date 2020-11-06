@@ -3301,18 +3301,14 @@ accountUI.contactAndChat = {
             }
 
             // Auto-away switch
+            const { previewGenerationConfirmation, confirmationDoConfirm, confirmationDoNever } = RichpreviewsFilter;
             accountUI.inputs.switch.init(
                 '#richpreviews',
                 $('#richpreviews').parent(),
-                RichpreviewsFilter.previewGenerationConfirmation,
-                function(val) {
-                    if (val) {
-                        RichpreviewsFilter.confirmationDoConfirm();
-                    }
-                    else {
-                        RichpreviewsFilter.confirmationDoNever();
-                    }
-                });
+                // previewGenerationConfirmation -> -1 (unset, default) || true || false
+                previewGenerationConfirmation && previewGenerationConfirmation > 0,
+                val => val ? confirmationDoConfirm() : confirmationDoNever()
+            );
         }
     },
 

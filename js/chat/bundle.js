@@ -18583,16 +18583,8 @@ Chat.prototype._doLoadImages = function () {
   };
 
   var loadOriginal = function (n) {
-    M.gfsfetch(n.h, 0, -1).then(function (data) {
-      var handler = is_image(n);
-
-      if (typeof handler === 'function') {
-        handler(data, chatImageParser.bind(this, n.h));
-      } else {
-        chatImageParser(n.h, data);
-      }
-    }).catch(function (ex) {
-      var type = String(n.fa).indexOf(':1*') > 0 ? 1 : 0;
+    const origFallback = ex => {
+      const type = String(n.fa).indexOf(':1*') > 0 ? 1 : 0;
 
       if (d) {
         console.debug('Failed to load original image on chat.', n.h, n, ex);
@@ -18603,7 +18595,23 @@ Chat.prototype._doLoadImages = function () {
       delay('ChatRoom[' + self.roomId + ']:origFallback' + type, function () {
         api_getfileattr(imagesToBeLoaded, type, onSuccess, onError);
       });
-    });
+    };
+
+    M.gfsfetch(n.h, 0, -1).then(function (data) {
+      var handler = is_image(n);
+
+      if (typeof handler === 'function') {
+        handler(data, buffer => {
+          if (buffer) {
+            chatImageParser(n.h, buffer);
+          } else {
+            origFallback(EFAILED);
+          }
+        });
+      } else {
+        chatImageParser(n.h, data);
+      }
+    }).catch(origFallback);
   };
 
   if ($.len(originals)) {
@@ -18616,6 +18624,7 @@ Chat.prototype._doLoadImages = function () {
       self._startedLoadingImage(handle);
     });
   });
+  imagesToBeLoaded = Object.create(null);
 };
 
 Chat.prototype._getImageNodes = function (h, src) {

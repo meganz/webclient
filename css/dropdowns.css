@@ -772,7 +772,7 @@
     background-repeat: no-repeat;
     cursor: pointer;
     -webkit-transition: opacity 100ms ease-in-out;
-    transition: opacity 100ms ease-in-out
+    transition: opacity 100ms ease-in-out;
     opacity: 0.53;
 }
 .dropdown.close-button:hover {

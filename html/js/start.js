@@ -46,31 +46,31 @@ function init_start() {
         }
     });
 
-    if (mega.flags.refpr) {
-        var slidingTimer;
+    // if (mega.flags.refpr) {
+    //     var slidingTimer;
 
-        var doSlide = function() {
-            // eslint-disable-next-line no-unused-expressions
-            slidingTimer && clearTimeout(slidingTimer);
-            var $banners = $('.bottom-page.top-banner', $page);
+    //     var doSlide = function() {
+    //         // eslint-disable-next-line no-unused-expressions
+    //         slidingTimer && clearTimeout(slidingTimer);
+    //         var $banners = $('.bottom-page.top-banner', $page);
 
-            if ($banners.filter('.active').hasClass('banner1')) {
-                $banners.removeClass('active');
-                $banners.filter('.banner2').addClass('active');
-                $page.addClass('white-pages-menu');
-            }
-            else {
-                $banners.removeClass('active');
-                $banners.filter('.banner1').addClass('active');
-                $page.removeClass('white-pages-menu');
-            }
-            slidingTimer = setTimeout(doSlide, 10000);
-        };
-        slidingTimer = setTimeout(doSlide, 10000);
-        // Top banner controls init
-        $('.bottom-page.banner-control', $page).removeClass('hidden').rebind('click.top-banner', doSlide);
-        $('.mid-green-link.refer', $page).removeClass('hidden');
-    }
+    //         if ($banners.filter('.active').hasClass('banner1')) {
+    //             $banners.removeClass('active');
+    //             $banners.filter('.banner2').addClass('active');
+    //             $page.addClass('white-pages-menu');
+    //         }
+    //         else {
+    //             $banners.removeClass('active');
+    //             $banners.filter('.banner1').addClass('active');
+    //             $page.removeClass('white-pages-menu');
+    //         }
+    //         slidingTimer = setTimeout(doSlide, 10000);
+    //     };
+    //     slidingTimer = setTimeout(doSlide, 10000);
+    //     // Top banner controls init
+    //     $('.bottom-page.banner-control', $page).removeClass('hidden').rebind('click.top-banner', doSlide);
+    //     $('.mid-green-link.refer', $page).removeClass('hidden');
+    // }
 
     $('.dropbox span', $page).text(intl.format(dropboxPrice));
 

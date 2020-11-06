@@ -4,7 +4,7 @@
 #
 # Use -h for help.
 #
-# $Id: squash.sh,v 2.0.3 2020/10/20 15:27:46 dc Exp $
+# $Id: squash.sh,v 2.1.0 2020/11/06 18:42:16 dc Exp $
 
 ask() {
     read -r -n 1 -p "$1 [Yn]: "
@@ -125,12 +125,6 @@ if [ -z "$remote" ]; then
     [[ -z "$remote" ]] && remote=origin
 fi
 
-path=$target_branch..$source_branch
-author=$(git log --no-merges --oneline --format="%an <%ae>" $path | tail -1)
-coauthor=$(git shortlog -se --no-merges $path | $GREP_BINARY -ve "$author" | $AWK_BINARY '{$1=""; print "Co-authored-by:"$0}')
-
-[[ -n "$coauthor" ]] && commit_message=$(get_firstcommit $path)$'\n\n'$coauthor
-
 if [ "$opt_pull" = "1" ]; then
     git checkout $target_branch
     [[ $? -ne 0 ]] && fatal "$target_branch checkout failed."
@@ -150,6 +144,12 @@ else
     git checkout $source_branch 2>/dev/null
     [[ $? -ne 0 ]] && fatal "$source_branch checkout failed."
 fi
+
+path=$target_branch..$source_branch
+author=$(git log --no-merges --oneline --format="%an <%ae>" $path | tail -1)
+coauthor=$(git shortlog -se --no-merges $path | $GREP_BINARY -ve "$author" | $AWK_BINARY '{$1=""; print "Co-authored-by:"$0}')
+
+[[ -n "$coauthor" ]] && commit_message=$(get_firstcommit $path)$'\n\n'$coauthor
 
 SED_ARGS=' -i "2,\$s/pick/fixup/"'
 GIT_EDITOR="$SED_BINARY$SED_ARGS"  git rebase -i --autosquash $target_branch

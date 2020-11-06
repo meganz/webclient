@@ -1,10 +1,11 @@
 // libs
 var React = require("react");
 var ReactDOM = require("react-dom");
-import {MegaRenderMixin, SoonFcWrap} from './../../stores/mixins.js';
-import {DropdownEmojiSelector} from './../../ui/emojiDropdown.jsx';
-import {Button} from './../../ui/buttons.jsx';
-import {EmojiAutocomplete} from './emojiAutocomplete.jsx';
+import { MegaRenderMixin, SoonFcWrap } from './../../stores/mixins.js';
+import { DropdownEmojiSelector } from './../../ui/emojiDropdown.jsx';
+import { Button } from './../../ui/buttons.jsx';
+import { EmojiAutocomplete } from './emojiAutocomplete.jsx';
+import GifPanel from './gifPanel/gifPanel.jsx';
 
 export class TypingArea extends MegaRenderMixin {
     static defaultProps = {
@@ -19,7 +20,8 @@ export class TypingArea extends MegaRenderMixin {
         this.state = {
             emojiSearchQuery: false,
             typedMessage: initialText ? initialText : "",
-            textareaHeight: 20
+            textareaHeight: 20,
+            gifPanelActive: false
         };
     }
     onEmojiClicked(e, slug) {
@@ -754,7 +756,6 @@ export class TypingArea extends MegaRenderMixin {
             textareaScrollBlockStyles['height'] = newHeight;
         }
 
-
         var emojiAutocomplete = null;
         if (self.state.emojiSearchQuery) {
 
@@ -849,19 +850,38 @@ export class TypingArea extends MegaRenderMixin {
         var disabledTextarea = room.pubCu25519KeyIsMissing === true || this.props.disabled ? true : false;
 
         return <div className={"typingarea-component" + self.props.className + (disabledTextarea ? " disabled" : "")}>
+            {this.state.gifPanelActive &&
+                <GifPanel
+                    active={this.state.gifPanelActive}
+                    chatRoom={this.props.chatRoom}
+                    onToggle={() => this.setState({ gifPanelActive: false })}
+                />
+            }
             <div className={"chat-textarea " + self.props.className}>
                 {emojiAutocomplete}
                 {self.props.children}
+                {self.props.editing ? null : (
+                    <Button
+                        className={`
+                            popup-button
+                            gif-button
+                            ${this.state.gifPanelActive ? 'active' : ''}
+                        `}
+                        icon="small-icon gif"
+                        disabled={this.props.disabled}
+                        onClick={() =>
+                            this.setState(state => ({ gifPanelActive: !state.gifPanelActive }))
+                        }
+                    />
+                )}
                 <Button
-                    className="popup-button"
+                    className="popup-button emoji-button"
                     icon="smiling-face"
-                    disabled={this.props.disabled}
-                >
+                    disabled={this.props.disabled}>
                     <DropdownEmojiSelector
                         className="popup emoji"
                         vertOffset={17}
-                        onClick={self.onEmojiClicked.bind(self)}
-                    />
+                        onClick={self.onEmojiClicked.bind(self)} />
                 </Button>
                 <hr />
                 <div className="chat-textarea-scroll textarea-scroll jScrollPaneContainer"

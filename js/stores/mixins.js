@@ -359,6 +359,10 @@ export class MegaRenderMixin extends React.Component {
                                     this.debouncedForceUpdate();
                                 }
                             }
+
+                            if (this.onVisibilityChange) {
+                                this.onVisibilityChange(this.__intersectionVisibility);
+                            }
                         },
                         {
                             threshold: 0.1

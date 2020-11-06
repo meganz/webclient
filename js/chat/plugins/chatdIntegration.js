@@ -931,6 +931,9 @@ ChatdIntegration.prototype._parseMessage = function(chatRoom, message) {
                 else if (origTextContents[2] === Message.MESSAGE_META_TYPE.GEOLOCATION) {
                     message.metaType = Message.MESSAGE_META_TYPE.GEOLOCATION;
                 }
+                else if (origTextContents[2] === Message.MESSAGE_META_TYPE.GIPHY) {
+                    message.metaType = Message.MESSAGE_META_TYPE.GIPHY;
+                }
                 else {
                     message.metaType = -1;
                 }

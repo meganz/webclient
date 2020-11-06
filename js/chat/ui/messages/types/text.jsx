@@ -31,7 +31,7 @@ export default class Text extends AbstractGenericMessage {
 
 
     getMessageActionButtons() {
-        const {chatRoom, message, isBeingEdited} = this.props;
+        const { chatRoom, message, isBeingEdited } = this.props;
 
         if (isBeingEdited()) {
             return [];
@@ -141,13 +141,10 @@ export default class Text extends AbstractGenericMessage {
             }
         }
 
-
-        var parentButtons;
+        let parentButtons;
         if (super.getMessageActionButtons) {
             parentButtons = super.getMessageActionButtons();
         }
-
-
 
         let returnedButtons = [];
         if (messageActionButtons) {
@@ -156,8 +153,10 @@ export default class Text extends AbstractGenericMessage {
         if (parentButtons) {
             returnedButtons.push(parentButtons);
         }
+
         return returnedButtons;
     }
+
     getContents() {
         const { message, chatRoom, onUpdate, isBeingEdited, spinnerElement } = this.props;
 
@@ -247,6 +246,7 @@ export default class Text extends AbstractGenericMessage {
                     initialText={msgContents}
                     chatRoom={chatRoom}
                     showButtons={true}
+                    editing={true}
                     className="edit-typing-area"
                     onUpdate={() => onUpdate ? onUpdate : null}
                     onConfirm={messageContents => {

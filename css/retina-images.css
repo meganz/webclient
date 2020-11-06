@@ -348,7 +348,7 @@ i.dialog-sprite,
     background-size: 160px auto;
 }
 .tiny-icon, .semi-small-icon, .small-icon, .medium-icon, .semi-big-icon, .big-icon, .huge-icon, .huge-grey-warning, .round-icon, .call-icon, .verified .verified_icon, .icon-dropdown:not(.disabled):hover, .icon-dropdown.active, .user-card-verified, div.message.richpreview.confirmation-icon, .dropdown-fingerprint, div.chat-topic-icon::before, div.chat-share-nav.button::before, div.chat-topic-icon::before, div.chat-share-nav.button::before, .chat-topic-block.privateChat .privateChatDiv, .privateChat + .privateChatDiv {
-    background-image: url(../images/mega/new-chat-sprite_v18@2x.png);
+    background-image: url(../images/mega/new-chat-sprite_v19@2x.png);
     background-size: 237px auto;
 }
 .invitation-dialog.table-cell span.desc,

@@ -892,7 +892,9 @@ function api_reqfailed(channel, error) {
 
     var e = error | 0;
     var c = channel | 0;
-
+    if (d) {
+        console.error('API req failed. Channel=' + c + '  Error: ', e);
+    }
     if (typeof error === 'object' && error.err < 0) {
         e = error.err | 0;
     }

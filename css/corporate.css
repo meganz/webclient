@@ -383,7 +383,7 @@ body:not(.mobile) .corporate.main-menu.item:hover span {
     }
 
     .corporate.numbers-info .numbers-txt {
-        font-size: 21px;
-        line-height: 16px;
+        font-size: 19px;
+        line-height: 24px;
     }
 }

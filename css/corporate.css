@@ -269,9 +269,9 @@ body:not(.mobile) .corporate.main-menu.item:hover span {
     }
 
     .corporate-content .info-link {
+        font-size: 24px !important;
         padding-left: 28px;
         padding-right: 28px;
-        font-size: 24px !important;
     }
 
     .corporate-content .media-page-key-features h2 {
@@ -300,8 +300,8 @@ body:not(.mobile) .corporate.main-menu.item:hover span {
     }
 
     .corporate-content .media-page-users-stats {
-        padding: 0 60px;
         height: 550px;
+        padding: 0 60px;
     }
 
     .corporate.numbers-info .numbers-txt {
@@ -375,11 +375,11 @@ body:not(.mobile) .corporate.main-menu.item:hover span {
     }
 
     .corporate-content span.overview-info-sm {
-        font-size: 14px
+        font-size: 14px;
     }
 
     .corporate-content span.overview-info-lg {
-        font-size: 17px
+        font-size: 17px;
     }
 
     .corporate-content .info-link {
@@ -399,11 +399,12 @@ body:not(.mobile) .corporate.main-menu.item:hover span {
     }
 
     .corporate-content .media-page-users-stats {
+        height: 450px;
         padding: 0 28px;
     }
 
     .corporate-content .media-asset-card .media-asset-card-content p {
-        font-size: 18px !important
+        font-size: 18px !important;
     }
 
     .corporate-content .media-page-key-features .key-feature-part p.key-feature-text {
@@ -423,12 +424,8 @@ body:not(.mobile) .corporate.main-menu.item:hover span {
         padding: 48px 0;
     }
 
-    .corporate-content .media-page-users-stats {
-        height: 450px;
-    }
-
     .corporate-content .numbers-info {
-        padding-bottom: 20px
+        padding-bottom: 20px;
     }
 }
 

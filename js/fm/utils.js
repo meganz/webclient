@@ -1312,29 +1312,43 @@ MegaUtils.prototype.checkForDuplication = function(id) {
         return;
     }
 
+    if (d) {
+        console.time('checkForDuplication');
+    }
+
     // at this point we have V prepared.
 
     var names = Object.create(null);
 
     // count duplications O(n)
-    for (var k = 0; k < M.v.length; k++) {
-        if (!names[M.v[k].name]) {
-            names[M.v[k].name] = Object.create(null);
-            names[M.v[k].name][M.v[k].t] = Object.create(null);
-            names[M.v[k].name][M.v[k].t].total = 1;
-            names[M.v[k].name][M.v[k].t].list = [M.v[k].h];
-        }
-        else {
-            if (!names[M.v[k].name][M.v[k].t]) {
-                names[M.v[k].name][M.v[k].t] = Object.create(null);
-                names[M.v[k].name][M.v[k].t].total = 1;
-                names[M.v[k].name][M.v[k].t].list = [M.v[k].h];
+    for (let i = M.v.length; i--;) {
+        const n = M.v[i] || false;
+
+        if (!n.name || missingkeys[n.h]) {
+            if (d) {
+                console.debug('name-less node', missingkeys[n.h], [n]);
             }
-            else {
-                names[M.v[k].name][M.v[k].t].total++;
-                names[M.v[k].name][M.v[k].t].list.push(M.v[k].h);
-            }
+            continue;
         }
+
+        let target = names[n.name];
+        if (!target) {
+            names[n.name] = target = Object.create(null);
+        }
+
+        target = target[n.t];
+        if (!target) {
+            names[n.name][n.t] = target = Object.create(null);
+            target.total = 0;
+            target.list = [];
+        }
+
+        target.total++;
+        target.list.push(n.h);
+    }
+
+    if (d) {
+        console.timeEnd('checkForDuplication');
     }
 
     // extract duplication O(n), if we have any

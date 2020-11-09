@@ -256,6 +256,45 @@ mBroadcaster.once('boot_done', function() {
     Object.defineProperty(mega, 'es2019', {value: mg && mg.length === 2 && mg[0] === 'm1' && mg[1] === 'm2'});
 });
 
+
+/**
+ * Instantiate a sub-class, similar to our inherits() but with es6 classes.
+ * @param {String} name The name of the class
+ * @param {Object} sup The instance of inherit from
+ * @param {Object} [target] where to define the property
+ * @returns {class} the dynamically created class
+ */
+const mSubClass = (name, sup, target) => {
+    'use strict';
+
+    const cl = {
+        [name]:
+            class extends sup {
+                constructor(...args) {
+                    super(...args);
+                    this.name = name;
+                }
+            }
+    }[name];
+
+    if (target !== null) {
+        Object.defineProperty(target || window, name, {value: cl});
+    }
+
+    return cl;
+};
+
+tryCatch((mock) => {
+    'use strict';
+    mock('SyntaxError');
+    mock('SecurityError');
+})(async(name) => {
+    'use strict';
+    if (window[name] === undefined || !tryCatch(() => new window[name]('test'), false)()) {
+        mSubClass(name, Error);
+    }
+});
+
 // https://github.com/uxitten/polyfill/blob/master/string.polyfill.js
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/padStart
 if (!String.prototype.padStart) {

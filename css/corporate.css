@@ -70,7 +70,7 @@
 
 .corporate-content .media-page-key-features {
     background-color: white;
-    padding: 15px 125px 0 125px;
+    padding: 15px 125px 50px 125px;
 }
 
 .corporate-content .media-page-key-features h2 {
@@ -269,6 +269,8 @@ body:not(.mobile) .corporate.main-menu.item:hover span {
     }
 
     .corporate-content .info-link {
+        padding-left: 28px;
+        padding-right: 28px;
         font-size: 24px !important;
     }
 
@@ -277,11 +279,12 @@ body:not(.mobile) .corporate.main-menu.item:hover span {
     }
 
     .corporate-content .media-page-key-features .key-feature-part {
-        padding: 0 60px 10px;
+        padding: 0 0 10px;
     }
 
     .corporate-content .media-page-key-features .key-feature-part p.key-feature-text {
-        line-height: 23px;
+        font-size: 16px !important;
+        line-height: 30px;
     }
 
     .corporate-content .media-page-users-stats h2 {
@@ -297,11 +300,21 @@ body:not(.mobile) .corporate.main-menu.item:hover span {
     }
 
     .corporate-content .media-page-users-stats {
+        padding: 0 60px;
         height: 550px;
+    }
+
+    .corporate.numbers-info .numbers-txt {
+        font-size: 19px;
+        line-height: 24px;
     }
 
     .corporate-content .media-asset-card div.media-asset-card-content {
         padding: 35px 50px 50px;
+    }
+
+    .corporate-content .media-asset-card .media-asset-card-content p {
+        font-size: 20px !important;
     }
 
     .corporate-content .contact-us {
@@ -316,10 +329,6 @@ body:not(.mobile) .corporate.main-menu.item:hover span {
 
     .corporate-content span.overview-info-sm {
         margin: 10px 0 0;
-    }
-
-    .corporate-content span.overview-info-lg {
-        line-height: 0;
     }
 
     .corporate-content .numbers-info {
@@ -356,34 +365,71 @@ body:not(.mobile) .corporate.main-menu.item:hover span {
 }
 
 @media only screen and (max-width: 569px) {
-    .corporate-content .media-page-key-features .key-feature-part {
-        padding: 0 0 10px;
+    .corporate-content .media-page-overview .col-4 {
+        padding-left: 28px;
+        padding-right: 28px;
+    }
+
+    .corporate-content span.overview-info-sm {
+        font-size: 14px
+    }
+
+    .corporate-content span.overview-info-lg {
+        font-size: 17px
+    }
+
+    .corporate-content .info-link {
+        font-size: 20px !important;
+    }
+
+    .corporate-content .new-bottom-pages h2 {
+        font-size: 20px;
     }
 
     .corporate-content .media-page-key-features h2 {
-        padding: 70px 0;
+        padding: 45px 0;
     }
 
     .corporate-content .media-page-key-features {
-        padding: 15px 10px 0;
+        padding: 15px 56px 0;
+    }
+
+    .corporate-content .media-page-users-stats {
+        padding: 0 28px;
+    }
+
+    .corporate-content .media-asset-card .media-asset-card-content p {
+        font-size: 18px !important
     }
 
     .corporate-content .media-page-key-features .key-feature-part p.key-feature-text {
-        font-size: 20px !important;
+        font-size: 16px !important;
+    }
+
+    .corporate.numbers-info .num {
+        font-size: 20px;
+    }
+
+    .corporate.numbers-info .numbers-txt {
+        font-size: 15px;
+        line-height: 20px;
+    }
+
+    .corporate-content .media-page-users-stats h2 {
+        padding: 48px 0;
+    }
+
+    .corporate-content .media-page-users-stats {
+        height: 450px;
+    }
+
+    .corporate-content .numbers-info {
+        padding-bottom: 20px
     }
 }
 
 @media only screen and (max-width: 419px) {
     .corporate-content .bottom-page.full-block.active blockquote {
         padding: 0;
-    }
-
-    .corporate.numbers-info .num {
-        font-size: 39px;
-    }
-
-    .corporate.numbers-info .numbers-txt {
-        font-size: 19px;
-        line-height: 24px;
     }
 }

@@ -242,7 +242,7 @@ body:not(.mobile) .corporate.main-menu.item:hover span {
     }
 
     .corporate-content .media-page-media-assets {
-        padding: 70px 0;
+        padding: 70px 0 0;
     }
 }
 
@@ -260,7 +260,7 @@ body:not(.mobile) .corporate.main-menu.item:hover span {
     }
 
     .corporate-content .media-page-overview {
-        padding: 50px 0;
+        padding: 50px 0 0;
     }
 
     .corporate-content span.overview-info-lg {
@@ -370,6 +370,10 @@ body:not(.mobile) .corporate.main-menu.item:hover span {
         padding-right: 28px;
     }
 
+    .corporate-content .media-page-overview .col-4 br {
+        display: none;
+    }
+
     .corporate-content span.overview-info-sm {
         font-size: 14px
     }
@@ -391,7 +395,7 @@ body:not(.mobile) .corporate.main-menu.item:hover span {
     }
 
     .corporate-content .media-page-key-features {
-        padding: 15px 56px 0;
+        padding: 15px 56px 40px;
     }
 
     .corporate-content .media-page-users-stats {

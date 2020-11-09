@@ -19511,7 +19511,6 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
     if (newState === ChatRoom.STATE.READY && !self.isReadOnly() && self.chatd && self.isOnline() && self.chatIdBin) {
       var cim = self.getChatIdMessages();
       cim.restore();
-      cim.resend();
     }
   });
   self.rebind('onMessagesBuffAppend.lastActivity', function (e, msg) {

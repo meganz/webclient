@@ -138,7 +138,6 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
             // this should never happen, but just in case...
             var cim = self.getChatIdMessages();
             cim.restore();
-            cim.resend();
         }
     });
 

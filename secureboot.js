@@ -3800,7 +3800,7 @@ else if (!browserUpdate) {
             var n = page.split(/\W+/);
 
             if (n && !n[2] && n[1] && n[1].length === 8) {
-                xhr('&n=' + n[1], null, function(res) {
+                xhr('&v=1&n=' + n[1], null, function(res) {
                     res |= 0;
 
                     if (res === -9 || res === -16) {

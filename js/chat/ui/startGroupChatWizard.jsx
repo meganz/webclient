@@ -16,7 +16,16 @@ export class StartGroupChatWizard extends MegaRenderMixin {
         'selectLabel': l[1940],
         'cancelLabel': l[82],
         'hideable': true,
-        'flowType': 1
+        'flowType': 1,
+        'pickerClassName': '',
+        'showSelectedNum': false,
+        'disableFrequents': false,
+        'notSearchInEmails': false,
+        'autoFocusSearchField': true,
+        'disableDoubleClick': false,
+        'newEmptySearchResult': false,
+        'newNoContact': false,
+        'closeDlgOnClickOverlay': true
     };
 
     constructor(props) {
@@ -84,7 +93,12 @@ export class StartGroupChatWizard extends MegaRenderMixin {
             failedToEnableChatlink = false;
         }
 
-        if (self.state.step === 0 && haveContacts) {
+        var extraFooterElement;
+        if (this.props.extraFooterElement) {
+            self.state.step = 0;
+            extraFooterElement = <div className="extraFooterElement"></div>;
+        }
+        else if (self.state.step === 0 && haveContacts) {
             // always allow Next even if .selected is empty.
             allowNext = true;
 
@@ -259,11 +273,22 @@ export class StartGroupChatWizard extends MegaRenderMixin {
         return (
             <ModalDialogsUI.ModalDialog
                 step={self.state.step}
-                title={this.props.flowType === 2 && self.state.createChatLink ? l[20638] : l[19483]}
+                title={this.props.flowType === 2 && self.state.createChatLink
+                    ? l[20638] : this.props.customDialogTitle || l[19483]}
                 className={classes}
-                selected={self.state.selected}
+                showSelectedNum={self.props.showSelectedNum}
+                selectedNum={self.state.selected.length}
+                closeDlgOnClickOverlay={self.props.closeDlgOnClickOverlay}
                 onClose={() => {
                     self.props.onClose(self);
+                }}
+                popupDidMount={(elem) => {
+                    if (this.props.extraFooterElement) {
+                        elem.querySelector('.extraFooterElement')?.appendChild(this.props.extraFooterElement);
+                    }
+                    if (this.props.onExtraFooterElementDidMount) {
+                        this.props.onExtraFooterElementDidMount(elem);
+                    }
                 }}
                 triggerResizeOnUpdate={true}
                 buttons={buttons}>
@@ -281,7 +306,18 @@ export class StartGroupChatWizard extends MegaRenderMixin {
                     readOnly={self.state.step !== 0}
                     allowEmpty={true}
                     showMeAsSelected={self.state.step === 1}
+                    className={self.props.pickerClassName}
+                    disableFrequents={self.props.disableFrequents}
+                    notSearchInEmails={self.props.notSearchInEmails}
+                    autoFocusSearchField={self.props.autoFocusSearchField}
+                    disableDoubleClick={self.props.disableDoubleClick}
+                    selectedWidthSize={self.props.selectedWidthSize}
+                    emptySelectionMsg={self.props.emptySelectionMsg}
+                    newEmptySearchResult={self.props.newEmptySearchResult}
+                    newNoContact={self.props.newNoContact}
+                    highlightSearchValue={self.props.highlightSearchValue}
                 />
+                {extraFooterElement}
             </ModalDialogsUI.ModalDialog>
         );
     }

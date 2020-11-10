@@ -1564,6 +1564,11 @@ scparser.$finalize = function() {
                     if (M.currentrootid === 'shares' || M.currentrootid === 'out-shares') {
                         M.openFolder(M.currentdirid, true);
                     }
+
+                    if ($.dialog === 'share') {
+                        // Re-render the content of access list in share dialog
+                        renderShareDialogAccessList();
+                    }
                 });
 
                 scsharesuiupd = false;

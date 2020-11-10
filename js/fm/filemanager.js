@@ -172,12 +172,14 @@ FileManager.prototype.initFileManagerUI = function() {
     $('.fm-dialog-overlay').rebind('click.fm', function(ev) {
         if ($.dialog === 'pro-login-dialog'
             || $.dialog === 'affiliate-redeem-dialog'
+            || $.dialog === 'share'
+            || $.dialog === 'share-add'
             || String($.dialog).startsWith('verify-email')
             || localStorage.awaitingConfirmationAccount) {
 
             return false;
         }
-        showWarningTokenInputLose().done(function() {
+        showLoseChangesWarning().done(function() {
             closeDialog(ev);
         });
         $.hideContextMenu();
@@ -2361,6 +2363,9 @@ FileManager.prototype.initUIKeyEvents = function() {
             topMenu(1);
         }
         else if (e.keyCode == 27 && $.dialog) {
+            if ($.dialog === 'share-add' || $.dialog === 'share') {
+                return false;
+            }
             closeDialog();
         }
         else if (e.keyCode == 27 && $('.default-select.active').length) {
@@ -4070,7 +4075,8 @@ FileManager.prototype.getLinkAction = function() {
         move: ['createfolder'],
         register: ['terms'],
         selectFolder: ['createfolder'],
-        saveAs: ['createfolder']
+        saveAs: ['createfolder'],
+        share: ['share-add']
     };
 
     var _openDialog = function(name, dsp) {

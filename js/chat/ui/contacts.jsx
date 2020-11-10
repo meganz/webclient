@@ -645,6 +645,8 @@ export class ContactCard extends ContactAwareComponent {
         var noContextMenu = this.props.noContextMenu ? this.props.noContextMenu : "";
         var noContextButton = this.props.noContextButton ? this.props.noContextButton : "";
         var dropdownRemoveButton = self.props.dropdownRemoveButton ? self.props.dropdownRemoveButton : [];
+        var highlightSearchValue = self.props.highlightSearchValue ? self.props.highlightSearchValue : false;
+        var searchValue = self.props.searchValue ? self.props.searchValue : "";
 
         var usernameBlock;
         if (!noContextMenu) {
@@ -658,6 +660,24 @@ export class ContactCard extends ContactAwareComponent {
             />;
         }
         else {
+            if (highlightSearchValue && searchValue.length > 0) {
+                var matches = [];
+                var regex = new RegExp(searchValue, 'gi');
+                var result;
+
+                // eslint-disable-next-line no-cond-assign
+                while (result = regex.exec(username)) {
+                    matches.push({idx: result.index, str: result[0]});
+                }
+
+                username = <span dangerouslySetInnerHTML={{
+                    __html: megaChat.highlight(
+                        username,
+                        matches,
+                        false
+                    )
+                }}></span>;
+            }
             usernameBlock = <div className="user-card-name light">{username}</div>;
         }
 
@@ -783,7 +803,13 @@ export class ContactPickerWidget extends MegaRenderMixin {
         multipleSelectedButtonLabel: false,
         singleSelectedButtonLabel: false,
         nothingSelectedButtonLabel: false,
-        allowEmpty: false
+        allowEmpty: false,
+        disableFrequents: false,
+        notSearchInEmails: false,
+        autoFocusSearchField: false,
+        disableDoubleClick: false,
+        newEmptySearchResult: false,
+        newNoContact: false
     }
     constructor(props) {
         super(props);
@@ -840,7 +866,7 @@ export class ContactPickerWidget extends MegaRenderMixin {
 
         self._frequents = megaChat.getFrequentContacts();
         self._frequents.always(function(r) {
-            self._foundFrequents = clone(r).reverse().splice(0, 30);
+            self._foundFrequents = self.props.disableFrequents ? [] : clone(r).reverse().splice(0, 30);
             self.safeForceUpdate();
         });
     }
@@ -895,10 +921,13 @@ export class ContactPickerWidget extends MegaRenderMixin {
         var avatarMeta = generateAvatarMeta(v.u);
 
         if (self.state.searchValue && self.state.searchValue.length > 0) {
+            var userName = ChatSearch._normalize_str(avatarMeta.fullName.toLowerCase());
+            var userEmail = ChatSearch._normalize_str(v.m.toLowerCase());
+
             // DON'T add to the contacts list if the contact's name or email does not match the search value
             if (
-                avatarMeta.fullName.toLowerCase().indexOf(self.state.searchValue.toLowerCase()) === -1 &&
-                v.m.toLowerCase().indexOf(self.state.searchValue.toLowerCase()) === -1
+                userName.indexOf(self.state.searchValue.toLowerCase()) === -1 &&
+                (userEmail.indexOf(self.state.searchValue.toLowerCase()) === -1 || self.props.notSearchInEmails)
             ) {
                 return false;
             }
@@ -929,9 +958,10 @@ export class ContactPickerWidget extends MegaRenderMixin {
                     var contactHash = contact.u;
 
                     // differentiate between a click and a double click.
+                    // disable the doulbe click for add contacts to share dialog
                     if (
-                        (contactHash === self.lastClicked && (new Date() - self.clickTime) < 500) ||
-                        !self.props.multiple
+                        (contactHash === self.lastClicked && (new Date() - self.clickTime) < 500
+                            && !self.props.disableDoubleClick) || !self.props.multiple
                     ) {
                         // is a double click
                         if (self.props.onSelected) {
@@ -965,12 +995,16 @@ export class ContactPickerWidget extends MegaRenderMixin {
                         }
                         self.setState({'selected': selected});
                         self.setState({'searchValue': ''});
-                        self.refs.contactSearchField.focus();
+                        if (self.props.autoFocusSearchField) {
+                            self.refs.contactSearchField.focus();
+                        }
                     }
                     self.clickTime = new Date();
                     self.lastClicked = contactHash;
                 }}
                 noContextMenu={true}
+                searchValue={self.state.searchValue}
+                highlightSearchValue={self.props.highlightSearchValue}
                 key={v.u}
             />
         );
@@ -1059,21 +1093,25 @@ export class ContactPickerWidget extends MegaRenderMixin {
                     }
                     self.setState({'selected': selected});
                     self.setState({'searchValue': ''});
-                    self.refs.contactSearchField.focus();
+                    if (self.props.autoFocusSearchField) {
+                        self.refs.contactSearchField.focus();
+                    }
                 }
                 self.clickTime = new Date();
                 self.lastClicked = contactHash;
             };
-            var selectedWidth = self.state.selected.length * 54;
+            var selectedWidthSize = self.props.selectedWidthSize || 54;
+            var selectedWidth = self.state.selected.length * selectedWidthSize;
 
             if (!self.state.selected || self.state.selected.length === 0) {
                 selectedContacts = false;
+                var emptySelectionMsg = self.props.emptySelectionMsg || l[8889];
 
                 multipleContacts = <div className="horizontal-contacts-list">
                     <div className="contacts-list-empty-txt">{
                         self.props.nothingSelectedButtonLabel ?
                             self.props.nothingSelectedButtonLabel
-                            : l[8889]
+                            : emptySelectionMsg
                     }</div>
                 </div>;
             }
@@ -1217,20 +1255,30 @@ export class ContactPickerWidget extends MegaRenderMixin {
         var contactsList;
         if (haveContacts) {
             if (frequentContacts.length === 0 && noOtherContacts) {
-                contactsList = <div className="chat-contactspicker-no-contacts">
-                    <div className="contacts-list-header">
-                        {l[165]}
-                    </div>
-                    <div className="fm-empty-contacts-bg"></div>
-                    <div className="fm-empty-cloud-txt small">{l[784]}</div>
-                    <div className="fm-empty-description small">{l[19115]}</div>
-                </div>;
+                if (self.props.newEmptySearchResult) {
+                    contactsList = <div className="chat-contactspicker-no-contacts searching">
+                        <div className="fm-empty-contacts-bg"></div>
+                        <div className="fm-empty-cloud-txt small">{l[8674]}</div>
+                    </div>;
+                }
+                else {
+                    contactsList = <div className="chat-contactspicker-no-contacts">
+                        <div className="contacts-list-header">
+                            {l[165]}
+                        </div>
+                        <div className="fm-empty-contacts-bg"></div>
+                        <div className="fm-empty-cloud-txt small">{l[784]}</div>
+                        <div className="fm-empty-description small">{l[19115]}</div>
+                    </div>;
+                }
             }
             else {
                 contactsList = <utils.JScrollPane className="contacts-search-scroll"
-                                                  selected={this.state.selected}
-                                                  changedHashProp={this.props.changedHashProp}
-                                                  searchValue={this.state.searchValue}>
+                    selected={this.state.selected}
+                    changedHashProp={this.props.changedHashProp}
+                    contacts={contacts}
+                    frequentContacts={frequentContacts}
+                    searchValue={this.state.searchValue}>
                     <div>
                         <div className="contacts-search-subsection"
                              style={{'display': (!hideFrequents ? "" : "none")}}>
@@ -1262,6 +1310,16 @@ export class ContactPickerWidget extends MegaRenderMixin {
                 </utils.JScrollPane>;
             }
         }
+        else if (self.props.newNoContact) {
+            multipleContacts = "";
+            contactsList = <div className="chat-contactspicker-no-contacts">
+                <div className="fm-empty-contacts-bg"></div>
+                <div className="fm-empty-cloud-txt small">{l[784]}</div>
+                <div className="fm-empty-description small">{l[19115]}</div>
+            </div>;
+
+            extraClasses += " no-contacts";
+        }
         else {
             contactsList = <div className="chat-contactspicker-no-contacts">
                 <div className="contacts-list-header">
@@ -1285,6 +1343,8 @@ export class ContactPickerWidget extends MegaRenderMixin {
         }
 
         var displayStyle = (self.state.searchValue && self.state.searchValue.length > 0) ? "" : "none";
+        var totalContactsNum = contacts.length + frequentContacts.length;
+        var searchPlaceholderMsg = totalContactsNum === 1 ? l[23749] : l[23750].replace("[X]", totalContactsNum);
         return <div className={this.props.className + " " + extraClasses}>
             {multipleContacts}
             {!self.props.readOnly && haveContacts ?
@@ -1293,7 +1353,7 @@ export class ContactPickerWidget extends MegaRenderMixin {
                     <input
                         autoFocus
                         type="search"
-                        placeholder={l[8010]}
+                        placeholder={searchPlaceholderMsg}
                         ref="contactSearchField"
                         onChange={this.onSearchChange.bind(this)}
                         value={this.state.searchValue}

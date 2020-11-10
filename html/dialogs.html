@@ -1268,56 +1268,77 @@
 
 <!--Share Dialog-->
 <div class="fm-dialog share-dialog hidden">
-    <div class="fm-dialog-header">
-        <div class="fm-dialog-title">[$5631]</div>
-        <div class="fm-dialog-close"></div>
-        <div class="clear"></div>
-    </div>
-    <div class="fm-dialog-body">
-        <div class="permissions-menu hidden">
-            <div class="permissions-menu-arrow"></div>
-            <div class="permissions-menu-item read-only"><span></span>[$55]</div>
-            <div class="permissions-menu-item read-and-write"><span></span>[$56]</div>
-            <div class="permissions-menu-item full-access"><span></span>[$57]</div>
+    <div class="share-dialog-top">
+        <div class="share-dialog-header">
+            <div class="fm-dialog-close"></div>
         </div>
-        <!-- Please hide "share-dialog-img" if contacts list is not empty !-->
-        <div class="share-dialog-img hidden"></div>
-        <!-- Please unhide "share-dialog-contacts" if contacts list is not empty !-->
-        <div class="share-dialog-contacts">
-            <!--Content goes here-->
-        </div>
-        <div class="multiple-input">
-            <i class="small-icon icons-sprite email"></i>
-            <div>
-                <input type="text" class="share-multiple-input" id="share-multiple-input" name="" />
+        <div class="share-dialog-top-body">
+            <div class="share-dialog-title">[$1344]</div>
+            <div class="share-dialog-shared-item">
+                <div class="share-dialog-folder-icon"></div>
+                <div class="share-dialog-folder-info-block">
+                    <div class="share-dialog-folder-name"></div>
+                    <div class="share-dialog-folder-info"></div>
+                </div>
             </div>
-            <div class="clear"></div>
+            <div class="share-dialog-copy-link-wrapper">
+                <div class="share-dialog-green-button copy-link">[$17835]</div>
+            </div>
+            <div class="share-dialog-copy-link-msg hidden">
+                <div class="copy-link-icon"></div>
+                <div class="copy-link-txt">[$23705]</div>
+            </div>
         </div>
-        <div class="multiple-input-warning">
-            <span>[$5918]</span>
+    </div>
+    <div class="share-dialog-bottom">
+        <div class="share-dialog-bottom-body">
+            <div class="share-dialog-permissions-menu hidden">
+                <div class="permission-item full-access"><span class="permission-item-text">[$57]</span></div>
+                <div class="permission-item read-and-write"><span class="permission-item-text">[$5610]</span></div>
+                <div class="permission-item read-only"><span class="permission-item-text">[$55]</span></div>
+            </div>
+            <div class="share-dialog-access-title">[$23706]</div>
+            <div class="share-dialog-access-list"></div>
+            <div class="share-dialog-access-add">
+                <i class="share-dialog-access-add-icon"></i>
+                <span class="share-dialog-access-add-txt">[$23707]</span>
+            </div>
+            <div class="share-dialog-buttons-wrapper">
+                <div class="share-dialog-white-button remove-share disabled">[$23737]</div>
+                <div class="share-dialog-green-button done-share disabled">[$726]</div>
+            </div>
+            <div class="share-dialog-bottom-msg">[$23708]</div>
         </div>
-        <div class="share-message">
-            <div class="share-message-scrolling">
-                <div class="share-message-textarea textarea-scroll">
-                    <textarea>[$6853]</textarea>
-                    <div class="share-message-hidden"></div>
+    </div>
+
+    <div class="share-add-dialog-bottom">
+        <div class="share-add-dialog-bottom-body">
+            <div class="multiple-input">
+                <i class="small-icon icons-sprite email"></i>
+                <div>
+                    <input type="text" class="share-multiple-input" id="share-multiple-input" name=""/>
+                </div>
+            </div>
+            <div class="multiple-input-warning">
+                <span>[$5918]</span>
+            </div>
+            <div class="share-message hidden">
+                <div class="share-message-scrolling">
+                    <div class="share-message-textarea textarea-scroll">
+                        <textarea placeholder="[$19110]"></textarea>
+                        <div class="share-message-hidden"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="share-add-dialog-buttons-wrapper">
+                <div class="share-add-dialog-cancel-button"><span>[$82]</span></div>
+                <div class="share-add-dialog-add-button-wrapper">
+                    <div class="share-dialog-green-button add-share disabled">[$726]</div>
                 </div>
             </div>
         </div>
     </div>
-    <div class="fm-notifications-bottom">
-        <div class="share-dialog-icon permissions-icon">
-            <span></span>
-            l[7534]
-        </div>
-        <div class="default-green-button right dialog-share-button button">
-            <span>[$726]</span>
-        </div>
-        <div class="default-white-button right dialog-cancel-button button">
-            <span>[$82]</span>
-        </div>
-        <div class="clear"></div>
-    </div>
+
 </div><!--End Share Dialog-->
 <!--Contact Fingerprint Dialog-->
 <div class="fm-dialog fingerprint-dialog hidden">

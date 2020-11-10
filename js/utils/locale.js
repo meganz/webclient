@@ -1038,6 +1038,8 @@ mBroadcaster.once('boot_done', function populate_l() {
     l[20193] = l[20193].replace('[B]', '<b>').replace('[/B]', '</b>');
     l[20194] = l[20194].replace('[B]', '<b>').replace('[/B]', '</b>');
     l[20195] = l[20195].replace('[B]', '<b>').replace('[/B]', '</b>');
+    l[23708] = l[23708].replace('[B]', '<b>').replace('[/B]', '</b>');
+    l[23709] = l[23709].replace('[B]', '<b>').replace('[/B]', '</b>');
 
     // Mobile only
     if (is_mobile) {

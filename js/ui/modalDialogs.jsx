@@ -15,7 +15,10 @@ export class ExtraFooterElement extends MegaRenderMixin {
 
 class ModalDialog extends MegaRenderMixin {
     static defaultProps = {
-        'hideable': true
+        'hideable': true,
+        'closeDlgOnClickOverlay': true,
+        'showSelectedNum': false,
+        'selectedNum': 0
     };
 
     constructor (props) {
@@ -35,8 +38,12 @@ class ModalDialog extends MegaRenderMixin {
         $('textarea:focus').trigger("blur");
 
 
-        document.querySelector('.conversationsApp').removeEventListener('click', this.onBlur);
-        document.querySelector('.conversationsApp').addEventListener('click', this.onBlur);
+        var convApp = document.querySelector('.conversationsApp');
+        if (convApp) {
+            convApp.removeEventListener('click', this.onBlur);
+            convApp.addEventListener('click', this.onBlur);
+        }
+
 
         $('.fm-modal-dialog').rebind('click.modalDialogOv' + this.getUniqueId(), function(e) {
             if ($(e.target).is('.fm-modal-dialog')) {
@@ -51,7 +58,9 @@ class ModalDialog extends MegaRenderMixin {
         });
 
         $('.fm-dialog-overlay').rebind('click.modalDialog' + self.getUniqueId(), function() {
-            self.onBlur();
+            if (self.props.closeDlgOnClickOverlay) {
+                self.onBlur();
+            }
             return false;
         });
     }
@@ -61,13 +70,19 @@ class ModalDialog extends MegaRenderMixin {
         if (
             (!e || !$(e.target).closest(".fm-dialog").is($element))
         ) {
-            document.querySelector('.conversationsApp').removeEventListener('click', this.onBlur);
+            var convApp = document.querySelector('.conversationsApp');
+            if (convApp) {
+                convApp.removeEventListener('click', this.onBlur);
+            }
             this.onCloseClicked();
         }
     }
     componentWillUnmount() {
         super.componentWillUnmount();
-        document.querySelector('.conversationsApp').removeEventListener('click', this.onBlur);
+        var convApp = document.querySelector('.conversationsApp');
+        if (convApp) {
+            convApp.removeEventListener('click', this.onBlur);
+        }
         $(document).off('keyup.modalDialog' + this.getUniqueId());
         $(this.domNode).off('dialog-closed.modalDialog' + this.getUniqueId());
         $(document.body).removeClass('overlayed');
@@ -96,6 +111,7 @@ class ModalDialog extends MegaRenderMixin {
 
         var classes = "fm-dialog " + self.props.className;
 
+        var selectedNumEle = null;
         var footer = null;
 
         var extraFooterElements = [];
@@ -124,6 +140,9 @@ class ModalDialog extends MegaRenderMixin {
             }
         }.bind(this));
 
+        if (self.props.showSelectedNum && self.props.selectedNum) {
+            selectedNumEle = <div className="selected-num"><span>{self.props.selectedNum}</span></div>;
+        }
 
         if (self.props.buttons) {
             var buttons = [];
@@ -165,7 +184,8 @@ class ModalDialog extends MegaRenderMixin {
                 <div className={classes}>
                     <div className="fm-dialog-close" onClick={self.onCloseClicked}></div>
                     {
-                        self.props.title ? <div className="fm-dialog-title">{self.props.title}</div> : null
+                        self.props.title ?
+                            <div className="fm-dialog-title">{self.props.title}{selectedNumEle}</div> : null
                     }
 
                     <div className="fm-dialog-content">

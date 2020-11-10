@@ -2027,6 +2027,8 @@ class ContactCard extends _stores_mixins_js2__["ContactAwareComponent"] {
     var noContextMenu = this.props.noContextMenu ? this.props.noContextMenu : "";
     var noContextButton = this.props.noContextButton ? this.props.noContextButton : "";
     var dropdownRemoveButton = self.props.dropdownRemoveButton ? self.props.dropdownRemoveButton : [];
+    var highlightSearchValue = self.props.highlightSearchValue ? self.props.highlightSearchValue : false;
+    var searchValue = self.props.searchValue ? self.props.searchValue : "";
     var usernameBlock;
 
     if (!noContextMenu) {
@@ -2041,6 +2043,25 @@ class ContactCard extends _stores_mixins_js2__["ContactAwareComponent"] {
         dropdownRemoveButton: dropdownRemoveButton
       });
     } else {
+      if (highlightSearchValue && searchValue.length > 0) {
+        var matches = [];
+        var regex = new RegExp(searchValue, 'gi');
+        var result;
+
+        while (result = regex.exec(username)) {
+          matches.push({
+            idx: result.index,
+            str: result[0]
+          });
+        }
+
+        username = react1.a.createElement("span", {
+          dangerouslySetInnerHTML: {
+            __html: megaChat.highlight(username, matches, false)
+          }
+        });
+      }
+
       usernameBlock = react1.a.createElement("div", {
         className: "user-card-name light"
       }, username);
@@ -2232,7 +2253,7 @@ class ContactPickerWidget extends _stores_mixins_js2__["MegaRenderMixin"] {
     self._frequents = megaChat.getFrequentContacts();
 
     self._frequents.always(function (r) {
-      self._foundFrequents = clone(r).reverse().splice(0, 30);
+      self._foundFrequents = self.props.disableFrequents ? [] : clone(r).reverse().splice(0, 30);
       self.safeForceUpdate();
     });
   }
@@ -2284,7 +2305,11 @@ class ContactPickerWidget extends _stores_mixins_js2__["MegaRenderMixin"] {
     var avatarMeta = generateAvatarMeta(v.u);
 
     if (self.state.searchValue && self.state.searchValue.length > 0) {
-      if (avatarMeta.fullName.toLowerCase().indexOf(self.state.searchValue.toLowerCase()) === -1 && v.m.toLowerCase().indexOf(self.state.searchValue.toLowerCase()) === -1) {
+      var userName = ChatSearch._normalize_str(avatarMeta.fullName.toLowerCase());
+
+      var userEmail = ChatSearch._normalize_str(v.m.toLowerCase());
+
+      if (userName.indexOf(self.state.searchValue.toLowerCase()) === -1 && (userEmail.indexOf(self.state.searchValue.toLowerCase()) === -1 || self.props.notSearchInEmails)) {
         return false;
       }
     }
@@ -2313,7 +2338,7 @@ class ContactPickerWidget extends _stores_mixins_js2__["MegaRenderMixin"] {
 
         var contactHash = contact.u;
 
-        if (contactHash === self.lastClicked && new Date() - self.clickTime < 500 || !self.props.multiple) {
+        if (contactHash === self.lastClicked && new Date() - self.clickTime < 500 && !self.props.disableDoubleClick || !self.props.multiple) {
           if (self.props.onSelected) {
             self.props.onSelected([contactHash]);
           }
@@ -2347,13 +2372,18 @@ class ContactPickerWidget extends _stores_mixins_js2__["MegaRenderMixin"] {
           self.setState({
             'searchValue': ''
           });
-          self.refs.contactSearchField.focus();
+
+          if (self.props.autoFocusSearchField) {
+            self.refs.contactSearchField.focus();
+          }
         }
 
         self.clickTime = new Date();
         self.lastClicked = contactHash;
       },
       noContextMenu: true,
+      searchValue: self.state.searchValue,
+      highlightSearchValue: self.props.highlightSearchValue,
       key: v.u
     }));
     return true;
@@ -2438,22 +2468,27 @@ class ContactPickerWidget extends _stores_mixins_js2__["MegaRenderMixin"] {
           self.setState({
             'searchValue': ''
           });
-          self.refs.contactSearchField.focus();
+
+          if (self.props.autoFocusSearchField) {
+            self.refs.contactSearchField.focus();
+          }
         }
 
         self.clickTime = new Date();
         self.lastClicked = contactHash;
       };
 
-      var selectedWidth = self.state.selected.length * 54;
+      var selectedWidthSize = self.props.selectedWidthSize || 54;
+      var selectedWidth = self.state.selected.length * selectedWidthSize;
 
       if (!self.state.selected || self.state.selected.length === 0) {
         selectedContacts = false;
+        var emptySelectionMsg = self.props.emptySelectionMsg || l[8889];
         multipleContacts = react1.a.createElement("div", {
           className: "horizontal-contacts-list"
         }, react1.a.createElement("div", {
           className: "contacts-list-empty-txt"
-        }, self.props.nothingSelectedButtonLabel ? self.props.nothingSelectedButtonLabel : l[8889]));
+        }, self.props.nothingSelectedButtonLabel ? self.props.nothingSelectedButtonLabel : emptySelectionMsg));
       } else {
         selectedContacts = true;
         onContactSelectDoneCb = onContactSelectDoneCb.bind(self);
@@ -2586,22 +2621,34 @@ class ContactPickerWidget extends _stores_mixins_js2__["MegaRenderMixin"] {
 
     if (haveContacts) {
       if (frequentContacts.length === 0 && noOtherContacts) {
-        contactsList = react1.a.createElement("div", {
-          className: "chat-contactspicker-no-contacts"
-        }, react1.a.createElement("div", {
-          className: "contacts-list-header"
-        }, l[165]), react1.a.createElement("div", {
-          className: "fm-empty-contacts-bg"
-        }), react1.a.createElement("div", {
-          className: "fm-empty-cloud-txt small"
-        }, l[784]), react1.a.createElement("div", {
-          className: "fm-empty-description small"
-        }, l[19115]));
+        if (self.props.newEmptySearchResult) {
+          contactsList = react1.a.createElement("div", {
+            className: "chat-contactspicker-no-contacts searching"
+          }, react1.a.createElement("div", {
+            className: "fm-empty-contacts-bg"
+          }), react1.a.createElement("div", {
+            className: "fm-empty-cloud-txt small"
+          }, l[8674]));
+        } else {
+          contactsList = react1.a.createElement("div", {
+            className: "chat-contactspicker-no-contacts"
+          }, react1.a.createElement("div", {
+            className: "contacts-list-header"
+          }, l[165]), react1.a.createElement("div", {
+            className: "fm-empty-contacts-bg"
+          }), react1.a.createElement("div", {
+            className: "fm-empty-cloud-txt small"
+          }, l[784]), react1.a.createElement("div", {
+            className: "fm-empty-description small"
+          }, l[19115]));
+        }
       } else {
         contactsList = react1.a.createElement(_ui_utils_jsx3__["default"].JScrollPane, {
           className: "contacts-search-scroll",
           selected: this.state.selected,
           changedHashProp: this.props.changedHashProp,
+          contacts: contacts,
+          frequentContacts: frequentContacts,
           searchValue: this.state.searchValue
         }, react1.a.createElement("div", null, react1.a.createElement("div", {
           className: "contacts-search-subsection",
@@ -2624,6 +2671,18 @@ class ContactPickerWidget extends _stores_mixins_js2__["MegaRenderMixin"] {
           style: innerDivStyles
         }, contacts)) : undefined));
       }
+    } else if (self.props.newNoContact) {
+      multipleContacts = "";
+      contactsList = react1.a.createElement("div", {
+        className: "chat-contactspicker-no-contacts"
+      }, react1.a.createElement("div", {
+        className: "fm-empty-contacts-bg"
+      }), react1.a.createElement("div", {
+        className: "fm-empty-cloud-txt small"
+      }, l[784]), react1.a.createElement("div", {
+        className: "fm-empty-description small"
+      }, l[19115]));
+      extraClasses += " no-contacts";
     } else {
       contactsList = react1.a.createElement("div", {
         className: "chat-contactspicker-no-contacts"
@@ -2653,6 +2712,8 @@ class ContactPickerWidget extends _stores_mixins_js2__["MegaRenderMixin"] {
     }
 
     var displayStyle = self.state.searchValue && self.state.searchValue.length > 0 ? "" : "none";
+    var totalContactsNum = contacts.length + frequentContacts.length;
+    var searchPlaceholderMsg = totalContactsNum === 1 ? l[23749] : l[23750].replace("[X]", totalContactsNum);
     return react1.a.createElement("div", {
       className: this.props.className + " " + extraClasses
     }, multipleContacts, !self.props.readOnly && haveContacts ? react1.a.createElement("div", {
@@ -2662,7 +2723,7 @@ class ContactPickerWidget extends _stores_mixins_js2__["MegaRenderMixin"] {
     }), react1.a.createElement("input", {
       autoFocus: true,
       type: "search",
-      placeholder: l[8010],
+      placeholder: searchPlaceholderMsg,
       ref: "contactSearchField",
       onChange: this.onSearchChange.bind(this),
       value: this.state.searchValue
@@ -2685,7 +2746,13 @@ ContactPickerWidget.defaultProps = {
   multipleSelectedButtonLabel: false,
   singleSelectedButtonLabel: false,
   nothingSelectedButtonLabel: false,
-  allowEmpty: false
+  allowEmpty: false,
+  disableFrequents: false,
+  notSearchInEmails: false,
+  autoFocusSearchField: false,
+  disableDoubleClick: false,
+  newEmptySearchResult: false,
+  newNoContact: false
 };
 
 /***/ }),
@@ -3267,8 +3334,13 @@ class ModalDialog extends _stores_mixins_js1__["MegaRenderMixin"] {
     $(document.body).addClass('overlayed');
     $('.fm-dialog-overlay').removeClass('hidden');
     $('textarea:focus').trigger("blur");
-    document.querySelector('.conversationsApp').removeEventListener('click', this.onBlur);
-    document.querySelector('.conversationsApp').addEventListener('click', this.onBlur);
+    var convApp = document.querySelector('.conversationsApp');
+
+    if (convApp) {
+      convApp.removeEventListener('click', this.onBlur);
+      convApp.addEventListener('click', this.onBlur);
+    }
+
     $('.fm-modal-dialog').rebind('click.modalDialogOv' + this.getUniqueId(), function (e) {
       if ($(e.target).is('.fm-modal-dialog')) {
         self.onBlur();
@@ -3280,7 +3352,10 @@ class ModalDialog extends _stores_mixins_js1__["MegaRenderMixin"] {
       }
     });
     $('.fm-dialog-overlay').rebind('click.modalDialog' + self.getUniqueId(), function () {
-      self.onBlur();
+      if (self.props.closeDlgOnClickOverlay) {
+        self.onBlur();
+      }
+
       return false;
     });
   }
@@ -3289,14 +3364,24 @@ class ModalDialog extends _stores_mixins_js1__["MegaRenderMixin"] {
     var $element = $(this.findDOMNode());
 
     if (!e || !$(e.target).closest(".fm-dialog").is($element)) {
-      document.querySelector('.conversationsApp').removeEventListener('click', this.onBlur);
+      var convApp = document.querySelector('.conversationsApp');
+
+      if (convApp) {
+        convApp.removeEventListener('click', this.onBlur);
+      }
+
       this.onCloseClicked();
     }
   }
 
   componentWillUnmount() {
     super.componentWillUnmount();
-    document.querySelector('.conversationsApp').removeEventListener('click', this.onBlur);
+    var convApp = document.querySelector('.conversationsApp');
+
+    if (convApp) {
+      convApp.removeEventListener('click', this.onBlur);
+    }
+
     $(document).off('keyup.modalDialog' + this.getUniqueId());
     $(this.domNode).off('dialog-closed.modalDialog' + this.getUniqueId());
     $(document.body).removeClass('overlayed');
@@ -3324,6 +3409,7 @@ class ModalDialog extends _stores_mixins_js1__["MegaRenderMixin"] {
   render() {
     var self = this;
     var classes = "fm-dialog " + self.props.className;
+    var selectedNumEle = null;
     var footer = null;
     var extraFooterElements = [];
     var otherElements = [];
@@ -3343,6 +3429,12 @@ class ModalDialog extends _stores_mixins_js1__["MegaRenderMixin"] {
         }));
       }
     }.bind(this));
+
+    if (self.props.showSelectedNum && self.props.selectedNum) {
+      selectedNumEle = React.createElement("div", {
+        className: "selected-num"
+      }, React.createElement("span", null, self.props.selectedNum));
+    }
 
     if (self.props.buttons) {
       var buttons = [];
@@ -3387,7 +3479,7 @@ class ModalDialog extends _stores_mixins_js1__["MegaRenderMixin"] {
       onClick: self.onCloseClicked
     }), self.props.title ? React.createElement("div", {
       className: "fm-dialog-title"
-    }, self.props.title) : null, React.createElement("div", {
+    }, self.props.title, selectedNumEle) : null, React.createElement("div", {
       className: "fm-dialog-content"
     }, otherElements), footer));
   }
@@ -3395,7 +3487,10 @@ class ModalDialog extends _stores_mixins_js1__["MegaRenderMixin"] {
 }
 
 ModalDialog.defaultProps = {
-  'hideable': true
+  'hideable': true,
+  'closeDlgOnClickOverlay': true,
+  'showSelectedNum': false,
+  'selectedNum': 0
 };
 
 class SelectContactDialog extends _stores_mixins_js1__["MegaRenderMixin"] {
@@ -15274,34 +15369,6 @@ const USER_CARD_CLASS = "user-card";
 
 const roomIsGroup = room => room && room.type === 'group' || room.type === 'public';
 
-const highlight = (text, matches, dontEscape) => {
-  if (!text) {
-    return;
-  }
-
-  text = dontEscape ? text : escapeHTML(text);
-
-  if (matches) {
-    let tags = [];
-    text = text.replace(/<[^>]+>/g, match => {
-      return "@@!" + (tags.push(match) - 1) + "!@@";
-    });
-    let regexes = [];
-
-    for (let i = 0; i < matches.length; i++) {
-      regexes.push(RegExpEscape(matches[i].str));
-    }
-
-    regexes = regexes.join('|');
-    text = text.replace(new RegExp(regexes, 'g'), word => "<strong>" + word + "</strong>");
-    text = text.replace(/\@\@\!\d+\!\@\@/, match => {
-      return tags[parseInt(match.replace("@@!", "").replace("!@@"), 10)];
-    });
-  }
-
-  return text;
-};
-
 const openResult = (room, messageId, index) => {
   $(document).trigger('chatSearchResultOpen');
 
@@ -15350,7 +15417,7 @@ class resultRow_MessageRow extends mixins["MegaRenderMixin"] {
     }), external_React_default.a.createElement("div", {
       className: "summary",
       dangerouslySetInnerHTML: {
-        __html: highlight(summary, matches, true)
+        __html: megaChat.highlight(summary, matches, true)
       }
     }), external_React_default.a.createElement("span", {
       className: "date"
@@ -15380,7 +15447,7 @@ class resultRow_ChatRow extends mixins["MegaRenderMixin"] {
       className: "graphic"
     }, external_React_default.a.createElement("span", {
       dangerouslySetInnerHTML: {
-        __html: highlight(megaChat.plugins.emoticonsFilter.processHtmlMessage(htmlentities(room.topic)), matches, true)
+        __html: megaChat.highlight(megaChat.plugins.emoticonsFilter.processHtmlMessage(htmlentities(room.topic)), matches, true)
       }
     }))), external_React_default.a.createElement("div", {
       className: "clear"
@@ -15408,11 +15475,11 @@ class resultRow_MemberRow extends mixins["MegaRenderMixin"] {
         className: "graphic"
       }, isGroup ? external_React_default.a.createElement("span", {
         dangerouslySetInnerHTML: {
-          __html: highlight(megaChat.plugins.emoticonsFilter.processHtmlMessage(htmlentities(room.topic || room.getRoomTitle())), matches, true)
+          __html: megaChat.highlight(megaChat.plugins.emoticonsFilter.processHtmlMessage(htmlentities(room.topic || room.getRoomTitle())), matches, true)
         }
       }) : external_React_default.a.createElement(external_React_default.a.Fragment, null, external_React_default.a.createElement("span", {
         dangerouslySetInnerHTML: {
-          __html: highlight(megaChat.plugins.emoticonsFilter.processHtmlMessage(htmlentities(nicknames.getNickname(data))), matches, true)
+          __html: megaChat.highlight(megaChat.plugins.emoticonsFilter.processHtmlMessage(htmlentities(nicknames.getNickname(data))), matches, true)
         }
       }), external_React_default.a.createElement(contacts["ContactPresence"], {
         contact: contact
@@ -19374,6 +19441,34 @@ Chat.prototype.loginOrRegisterBeforeJoining = function (chatHandle, forceRegiste
   }
 };
 
+Chat.prototype.highlight = (text, matches, dontEscape) => {
+  if (!text) {
+    return;
+  }
+
+  text = dontEscape ? text : escapeHTML(text);
+
+  if (matches) {
+    let tags = [];
+    text = text.replace(/<[^>]+>/g, match => {
+      return "@@!" + (tags.push(match) - 1) + "!@@";
+    });
+    let regexes = [];
+
+    for (let i = 0; i < matches.length; i++) {
+      regexes.push(RegExpEscape(matches[i].str));
+    }
+
+    regexes = regexes.join('|');
+    text = text.replace(new RegExp(regexes, 'g'), word => "<strong>" + word + "</strong>");
+    text = text.replace(/\@\@\!\d+\!\@\@/, match => {
+      return tags[parseInt(match.replace("@@!", "").replace("!@@"), 10)];
+    });
+  }
+
+  return text;
+};
+
 window.Chat = Chat;
 
 if (false) {}
@@ -21318,7 +21413,14 @@ class startGroupChatWizard_StartGroupChatWizard extends mixins["MegaRenderMixin"
       failedToEnableChatlink = false;
     }
 
-    if (self.state.step === 0 && haveContacts) {
+    var extraFooterElement;
+
+    if (this.props.extraFooterElement) {
+      self.state.step = 0;
+      extraFooterElement = startGroupChatWizard_React.createElement("div", {
+        className: "extraFooterElement"
+      });
+    } else if (self.state.step === 0 && haveContacts) {
       allowNext = true;
       buttons.push({
         "label": l[556],
@@ -21470,11 +21572,24 @@ class startGroupChatWizard_StartGroupChatWizard extends mixins["MegaRenderMixin"
 
     return startGroupChatWizard_React.createElement(modalDialogs["a" ].ModalDialog, {
       step: self.state.step,
-      title: this.props.flowType === 2 && self.state.createChatLink ? l[20638] : l[19483],
+      title: this.props.flowType === 2 && self.state.createChatLink ? l[20638] : this.props.customDialogTitle || l[19483],
       className: classes,
-      selected: self.state.selected,
+      showSelectedNum: self.props.showSelectedNum,
+      selectedNum: self.state.selected.length,
+      closeDlgOnClickOverlay: self.props.closeDlgOnClickOverlay,
       onClose: () => {
         self.props.onClose(self);
+      },
+      popupDidMount: elem => {
+        if (this.props.extraFooterElement) {
+          var _elem$querySelector;
+
+          (_elem$querySelector = elem.querySelector('.extraFooterElement')) == null ? void 0 : _elem$querySelector.appendChild(this.props.extraFooterElement);
+        }
+
+        if (this.props.onExtraFooterElementDidMount) {
+          this.props.onExtraFooterElementDidMount(elem);
+        }
       },
       triggerResizeOnUpdate: true,
       buttons: buttons
@@ -21490,8 +21605,18 @@ class startGroupChatWizard_StartGroupChatWizard extends mixins["MegaRenderMixin"
       multiple: true,
       readOnly: self.state.step !== 0,
       allowEmpty: true,
-      showMeAsSelected: self.state.step === 1
-    }));
+      showMeAsSelected: self.state.step === 1,
+      className: self.props.pickerClassName,
+      disableFrequents: self.props.disableFrequents,
+      notSearchInEmails: self.props.notSearchInEmails,
+      autoFocusSearchField: self.props.autoFocusSearchField,
+      disableDoubleClick: self.props.disableDoubleClick,
+      selectedWidthSize: self.props.selectedWidthSize,
+      emptySelectionMsg: self.props.emptySelectionMsg,
+      newEmptySearchResult: self.props.newEmptySearchResult,
+      newNoContact: self.props.newNoContact,
+      highlightSearchValue: self.props.highlightSearchValue
+    }), extraFooterElement);
   }
 
 }
@@ -21500,7 +21625,16 @@ startGroupChatWizard_StartGroupChatWizard.defaultProps = {
   'selectLabel': l[1940],
   'cancelLabel': l[82],
   'hideable': true,
-  'flowType': 1
+  'flowType': 1,
+  'pickerClassName': '',
+  'showSelectedNum': false,
+  'disableFrequents': false,
+  'notSearchInEmails': false,
+  'autoFocusSearchField': true,
+  'disableDoubleClick': false,
+  'newEmptySearchResult': false,
+  'newNoContact': false,
+  'closeDlgOnClickOverlay': true
 };
 window.StartGroupChatDialogUI = {
   StartGroupChatWizard: startGroupChatWizard_StartGroupChatWizard

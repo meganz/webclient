@@ -477,7 +477,7 @@ var slideshowid;
         var perc = parseFloat($percLabel.attr('data-perc'));
         var newPerc = perc / 100 || 1;
 
-        if (zoomout) {
+        if (zoomout && (newPerc * 0.9 >= 0.05)) {
             if (zoom_IO_times <= 0) {
                 newPerc *= 0.9;
             }
@@ -487,7 +487,7 @@ var slideshowid;
             }
             zoom_IO_times--;
         }
-        else {
+        else if (!zoomout && (newPerc * 1.1 <= 64)) {
             if (zoom_IO_times >= 0) {
                 newPerc *= 1.1;
             }

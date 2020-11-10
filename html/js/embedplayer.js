@@ -360,6 +360,7 @@ mBroadcaster.once('startMega', function() {
         $('.button.signup', $block).text(l[209]);
         $('.button.login', $block).text(l[16345]);
         $('.transfer-body', $block).text(l[19615]);
+        $('.transfer-heading', $block).text(l[17]);
         $('.upgrade-option .button', $block).text(l[17542]);
         $('.upgrade-option', $block).addClass('hidden');
         $('.signin-register-option', $block).addClass('hidden');
@@ -501,10 +502,33 @@ function showToast() {
 }
 
 function msgDialog(type, title, msg, submsg, callback, checkbox) {
+    'use strict';
+
     if (d) {
-        console.debug('msgDialog', arguments)
+        console.debug('msgDialog', type, title, msg, submsg);
     }
-    alert(String(msg) + (submsg ? '\n\n' + submsg : ''));
+    // alert(String(msg) + (submsg ? '\n\n' + submsg : ''));
+
+    var $wrapper = $('.video-wrapper').addClass('main-blur-block');
+    var $block = $('.transfer-limitation-block').removeClass('hidden');
+
+    $('.transfer-heading', $block).text(title);
+    $('.transfer-body', $block).text(String(msg) + (submsg ? '\n\n' + submsg : ''));
+
+    $('.upgrade-option', $block).removeClass('hidden');
+    $('.upgrade-option .button', $block).text(l[16518]);
+    $('.signin-register-option', $block).addClass('hidden');
+
+    $('.upgrade-option .button', $block).rebind('click', function() {
+        $('.viewonmega-item').trigger('click');
+        return false;
+    });
+
+    $('.close-overlay', $block).rebind('click', function() {
+        $block.addClass('hidden');
+        $wrapper.removeClass('main-blur-block');
+        location.reload(true);
+    });
 }
 
 function pagemetadata() {

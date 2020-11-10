@@ -12,6 +12,7 @@ function CreateWorkers(url, message, size) {
     "use strict";
 
     var worker = [];
+    var backoff = 400;
     var instances = [];
     var wid = url + '!' + makeUUID();
 
@@ -56,6 +57,14 @@ function CreateWorkers(url, message, size) {
         }
     };
 
+    var workerLoadFailure = function(ex) {
+        if (d) {
+            console.error(wid, ex);
+        }
+        msgDialog('warninga', l[47], '' + ex, l[20858]);
+        throw ex;
+    };
+
     var create = function(i) {
         var w;
 
@@ -67,8 +76,12 @@ function CreateWorkers(url, message, size) {
             if (e.name === 'QuotaExceededError') {
                 return false;
             }
-            msgDialog('warninga', '' + url, '' + e, location.hostname);
-            throw e;
+            console.assert(navigator.onLine !== false, e);
+            if (navigator.onLine === false) {
+                // this should not happens, onerror shall be reached instead, if some fancy browser does it fix this!
+                return false;
+            }
+            workerLoadFailure(e);
         }
 
         w.id = i;
@@ -123,13 +136,30 @@ function CreateWorkers(url, message, size) {
             console.warn('[%s] Worker #%s error on %s:%d, %s.',
                 wid, i, ex.filename || 0, ex.lineno | 0, ex.message || 'Failed to load', ex, task);
 
-            onIdle(_.bind(self, task, done));
-
             try {
                 worker[i].terminate();
             }
             catch (e) {}
             worker[i] = instances[i] = null;
+
+            if (navigator.onLine === false) {
+                console.info('[%s] Worker #%s Offline.', wid, i);
+                window.addEventListener('online', function online() {
+                    window.removeEventListener('online', online);
+                    onIdle(_.bind(self, task, done));
+                });
+                return;
+            }
+
+            if (!('message' in ex)) {
+                ex = new SecurityError("Failed to construct 'Worker': Access to the script denied by the CSP \u2620 ");
+                return workerLoadFailure(ex);
+            }
+
+            if ((backoff | 0) < 100) {
+                backoff = 200;
+            }
+            setTimeout(_.bind(self, task, done), Math.min(8e3, backoff <<= 1));
         };
 
         if (d > 1) {

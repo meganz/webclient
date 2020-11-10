@@ -761,6 +761,11 @@ MegaData.prototype.syncUsersFullname = function(userId, chatHandle, promise) {
             );
         }
 
+        if ($.dialog === 'share') {
+            // Re-render the content of access list in share dialog to update contacts' latest names
+            renderShareDialogAccessList();
+        }
+
         if (promise) {
             promise.resolve();
         }

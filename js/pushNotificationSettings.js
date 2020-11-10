@@ -21,7 +21,7 @@
      * @constructor
      */
     var PushNotificationSettings = function() {
-        this.data = undefined;
+        this.data = {};
         mBroadcaster.once('chat_initialized', this.init.bind(this));
         return this;
     };

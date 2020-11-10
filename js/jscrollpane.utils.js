@@ -225,14 +225,14 @@ function dialogScroll(s) {
 }
 
 function handleDialogScroll(num, dc) {
-    var SCROLL_NUM = 5;// Number of items in dialog before scroll is implemented
-    //
-    // Add scroll in case that we have more then 5 items in list
+    var SCROLL_NUM = 8;// Number of items in dialog before scroll is implemented
+
+    // Add scroll in case that we have more then 8 items in list
     if (num > SCROLL_NUM) {
-        dialogScroll(dc + ' .share-dialog-contacts');
+        dialogScroll(dc + ' .share-dialog-access-list');
     }
     else {
-        var $x = $(dc + ' .share-dialog-contacts').jScrollPane();
+        var $x = $(dc + ' .share-dialog-access-list').jScrollPane();
         var el = $x.data('jsp');
         el.destroy();
     }

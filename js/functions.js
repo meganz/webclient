@@ -2187,29 +2187,26 @@ if (typeof sjcl !== 'undefined') {
         var promise = MegaPromise.resolve();
         var targets = [];
         var $shareDialog = $('.share-dialog');
-        var $newContacts;
-        var permissionLevel;
-        var iconPermLvl;
-        var permissionClass;
         var selectedNode;
+        var userEmail;
+        var permissionLevel;
 
         // Share button enabled
-        if ($.dialog === 'share' && !$shareDialog.find('.dialog-share-button').is('.disabled')) {
+        if ($.dialog === 'share' && !$('.done-share', $shareDialog).is('.disabled')) {
             selectedNode = $.selected[0];
-            $newContacts = $shareDialog.find('.token-input-list-mega .token-input-token-mega');
 
             // Is there a new contacts planned for addition to share
-            if ($newContacts.length) {
-
-                // Determin current group permission level
-                iconPermLvl = $shareDialog.find('.permissions-icon')[0];
-                permissionClass = checkMultiInputPermission($(iconPermLvl));
-                permissionLevel = sharedPermissionLevel(permissionClass[0]);
+            if (Object.keys($.addContactsToShare).length > 0) {
 
                 // Add new planned contact to list
-                $.each($newContacts, function(ind, val) {
-                    targets.push({u: $(val).contents().eq(1).text(), r: permissionLevel});
-                });
+                for (var i in $.addContactsToShare) {
+                    userEmail = $.addContactsToShare[i].u;
+                    permissionLevel = $.addContactsToShare[i].r;
+
+                    if (userEmail && permissionLevel !== undefined) {
+                        targets.push({u: userEmail, r: permissionLevel});
+                    }
+                }
             }
 
             closeDialog();
@@ -2234,8 +2231,8 @@ if (typeof sjcl !== 'undefined') {
             .always(function() {
                 var promises = [];
 
-                if (Object($.changedPermissions).length > 0) {
-                    promises.push(doShare($.selected[0], $.changedPermissions, true));
+                if (Object.keys($.changedPermissions).length > 0) {
+                    promises.push(doShare($.selected[0], Object.values($.changedPermissions), true));
                 }
                 promises.push(self.addContactToFolderShare());
 
@@ -2250,13 +2247,11 @@ if (typeof sjcl !== 'undefined') {
     };
 
 
-    Share.prototype.removeFromPermissionQueue = function(handleOrEmail) {
-
-        $.changedPermissions.forEach(function(value, index) {
-            if (value.u === handleOrEmail) {
-                $.changedPermissions.splice(index, 1);
-            }
-        });
+    Share.prototype.removeFromPermissionQueue = function(handle) {
+        // Remove the permission change belongs to the specific contact since got removed already
+        if ($.changedPermissions[handle]) {
+            delete $.changedPermissions[handle];
+        }
     };
 
     Share.prototype.removeContactFromShare = function() {
@@ -2264,12 +2259,12 @@ if (typeof sjcl !== 'undefined') {
         var self = this;
         var promises = [];
 
-        if (Object($.removedContactsFromShare).length > 0) {
+        if (Object.keys($.removedContactsFromShare).length > 0) {
 
-            $.removedContactsFromShare.forEach(function(elem) {
-                var userEmail = elem.userEmail;
+            Object.values($.removedContactsFromShare).forEach(function(elem) {
+                var userEmailOrHandle = elem.userEmailOrHandle;
                 var selectedNodeHandle = elem.selectedNodeHandle;
-                var handleOrEmail = elem.handleOrEmail;
+                var userHandle = elem.userHandle;
                 var step = 2;
                 var packet = null;
                 var idtag = mRandomToken('s2');
@@ -2298,13 +2293,13 @@ if (typeof sjcl !== 'undefined') {
                 api_req({
                     a: 's2',
                     n:  selectedNodeHandle,
-                    s: [{ u: userEmail, r: ''}],
+                    s: [{ u: userEmailOrHandle, r: ''}],
                     ha: '',
                     i: idtag
                 }, {
-                    userEmail: userEmail,
+                    userEmailOrHandle: userEmailOrHandle,
                     selectedNodeHandle: selectedNodeHandle,
-                    handleOrEmail: handleOrEmail,
+                    userHandle: userHandle,
 
                     callback : function(res, ctx) {
 
@@ -2313,18 +2308,18 @@ if (typeof sjcl !== 'undefined') {
                             // to user if needed
 
                             // If it was a user handle, the share is a full share
-                            if (M.u[ctx.handleOrEmail]) {
-                                M.delNodeShare(ctx.selectedNodeHandle, ctx.handleOrEmail);
-                                setLastInteractionWith(ctx.handleOrEmail, "0:" + unixtime());
+                            if (M.u[ctx.userHandle]) {
+                                M.delNodeShare(ctx.selectedNodeHandle, ctx.userHandle);
+                                setLastInteractionWith(ctx.userHandle, "0:" + unixtime());
 
-                                self.removeFromPermissionQueue(ctx.handleOrEmail);
+                                self.removeFromPermissionQueue(ctx.userHandle);
                             }
                             // Pending share
                             else {
-                                var pendingContactId = M.findOutgoingPendingContactIdByEmail(ctx.userEmail);
+                                var pendingContactId = M.findOutgoingPendingContactIdByEmail(ctx.userEmailOrHandle);
                                 M.deletePendingShare(ctx.selectedNodeHandle, pendingContactId);
 
-                                self.removeFromPermissionQueue(ctx.userEmail);
+                                self.removeFromPermissionQueue(pendingContactId);
                             }
 
                             resolve();

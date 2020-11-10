@@ -4,11 +4,11 @@
 
 /* Common styles */
 .fm-dialog-close, .btn-close-dialog, .export-links-warning-close {
+    background-image: url(../images/mega/dialog-sprite_v18.png);
     cursor: pointer;
     height: 30px;
     width: 30px;
     background-position: -53px -4825px;
-    background-image: url(../images/mega/dialog-sprite_v15.png);
     background-repeat: no-repeat;
     position: absolute;
     right: 10px;
@@ -2233,10 +2233,10 @@ li.token-input-token-invite .input-close {
     color: orange;
 }
 .fm-dialog.storage-dialog .odq-warning .odq-warn-icon {
+    background-image: url(../images/mega/dialog-sprite_v18.png);
     width: 60px;
     height: 60px;
     display: inline-block;
-    background-image: url(../images/mega/dialog-sprite_v15.png);
     background-position: -50px -6711px;
 }
 .fm-dialog.storage-dialog .odq-warning {
@@ -3448,7 +3448,8 @@ li.token-input-token-invite .input-close {
     display: inline-block;
     vertical-align: top;
 }
-/* end of Drag and Drop overlay *
+
+/* end of Drag and Drop overlay */
 
 /*  Park account warning styles */
 .park-account-dialog.fm-dialog {
@@ -4398,13 +4399,13 @@ body.ru .voucher-logo.business-v .plan-info span {
     letter-spacing: 1px;
 }
 .verify-ph-icon, .verify-ph-success-icon {
+    background-image: url(../images/mega/dialog-sprite_v18.png);
     width: 122px;
     height: 154px;
     position: absolute;
     bottom: 0;
     left: 50%;
     margin: 0 0 0 -61px;
-    background-image: url(../images/mega/dialog-sprite_v15.png);
 }
 .verify-ph-icon {
     background-position: -19px -6008px;
@@ -7998,11 +7999,11 @@ a.affiliate-guide.grey-link:hover {
     opacity: 0.8;
 }
 .embed-content-block .tab-icon.url {
-    background-image: url(../images/mega/dialog-sprite_v14.png);
+    background-image: url(../images/mega/dialog-sprite_v18.png);
     background-position: -128px -5818px;
 }
 .embed-content-block .tab-icon.embed {
-    background-image: url(../images/mega/dialog-sprite_v14.png);
+    background-image: url(../images/mega/dialog-sprite_v18.png);
     background-position: -88px -5818px;
 }
 .embed-content-block .fm-subheading {

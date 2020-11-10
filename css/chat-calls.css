@@ -688,7 +688,6 @@ video.localViewport {
     width: inherit;
     height: inherit;
     border-radius: inherit;
-    display: table;
     background-color: inherit;
 }
 .participantsContainer .avatar-wrapper.avatar-letter, .call.local-video .avatar-wrapper.avatar-letter, .call.local-audio .avatar-wrapper.avatar-letter {
@@ -701,8 +700,10 @@ video.localViewport {
     font-size: 40px;
 }
 .call-block .avatar-wrapper span {
-    display: table-cell;
-    vertical-align: middle;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
 /* sizing, depending on participants count */
 .group-chat .call-block.grid.participants-less-4 .participantsContainer .avatar-wrapper {

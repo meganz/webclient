@@ -1730,7 +1730,7 @@ Chatd.Shard.prototype.exec = function(a) {
                 // Resending of pending message should be done via the integration code,
                 // since it have more info and a direct relation with the UI related actions on pending messages
                 // (persistence, user can click resend/cancel/etc).
-                self.resendpending();
+                // self.resendpending();
                 var chat = chatd.chatIdMessages[chatid];
                 if (chat) {
                     var loginState = chat.loginState();
@@ -1738,7 +1738,7 @@ Chatd.Shard.prototype.exec = function(a) {
                         chat._setLoginState(LoginState.HISTDONE); // logged in
                         self.chatd.rtcHandler.onChatOnline(chat);
                     }
-                    chat.restoreIfNeeded(cmd.substr(1, 8));
+                    // chat.restoreIfNeeded(cmd.substr(1, 8));
                 }
                 self.chatd.trigger('onMessagesHistoryDone', {
                     // TODO: Should we trigger this for unknown chats as well?
@@ -3382,16 +3382,18 @@ Chatd.Messages.prototype.restore = function() {
             self.removefrompersist(trivialkeys[keyid]);
         }
         if (count > 0) {
-            self.chatd.trigger('onMessageKeyRestore',
-                {
-                    chatId: base64urlencode(self.chatId),
-                    keyxid : tempkeyid,
-                    keys  : keys
-                }
-            );
+            self.chatd.trigger('onMessageKeyRestore', {
+                chatId: base64urlencode(self.chatId),
+                keyxid : tempkeyid,
+                keys  : keys
+            });
             self.resend(true);
         }
+        else if (self.sendingList && self.sendingList.length > 0) {
+            self.resend();
+        }
     };
+
     MegaPromise.allDone(promises).always(function() {
         _resendPending();
     });

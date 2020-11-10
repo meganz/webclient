@@ -19510,7 +19510,7 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
   self.rebind('onStateChange.chatRoom', function (e, oldState, newState) {
     if (newState === ChatRoom.STATE.READY && !self.isReadOnly() && self.chatd && self.isOnline() && self.chatIdBin) {
       var cim = self.getChatIdMessages();
-      cim.restore();
+      cim.restore(true);
     }
   });
   self.rebind('onMessagesBuffAppend.lastActivity', function (e, msg) {

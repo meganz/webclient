@@ -922,7 +922,8 @@ SharedLocalKVStorage.Utils.DexieStorage.prototype.eachPrefixItem = function __SL
         var feedback = function(store) {
             var keys = Object.keys(store);
 
-            for (var i = keys.length; i--;) {
+            var keyl = keys.length;
+            for (var i = 0; i < keyl; i++) {
                 var k = keys[i];
 
                 if (!self.delcache[k] && k.startsWith(prefix)) {

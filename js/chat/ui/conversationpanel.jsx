@@ -2036,50 +2036,34 @@ export class ConversationPanel extends MegaRenderMixin {
                         </div>
                     </div>
 
-                    <div className={"chat-topic-block " + topicBlockClass + (
-                        self.props.chatRoom.havePendingGroupCall() || self.props.chatRoom.haveActiveCall() ?
-                            " have-pending-group-call" : ""
-                    )}>
+                    <div
+                        className={`
+                            chat-topic-block
+                            ${topicBlockClass}
+                            ${room.havePendingCall() || room.haveActiveCall() ? 'have-pending-group-call' : ''}
+                        `}>
                         <div className="chat-topic-buttons">
                             <Button
                                 className="right"
                                 disableCheckingVisibility={true}
                                 icon={"small-icon " + (
-                                    !room.megaChat.chatUIFlags['convPanelCollapse'] ?
+                                    !room.megaChat.chatUIFlags.convPanelCollapse ?
                                         "arrow-in-square" :
                                         "arrow-in-square active"
                                 )}
-                                onClick={function() {
-                                    room.megaChat.toggleUIFlag('convPanelCollapse');
-                                }}
-                            >
-                            </Button>
-                            <span>
-                                <div
-                                     className="button right"
-                                     onClick={function() {
-                                         if (!startCallDisabled) {
-                                             room.startVideoCall();
-                                         }
-                                     }}>
-                                    <i className={"small-icon small-icon video-call colorized" + startCallButtonClass
-                                }></i>
-                                </div>
-
-                                <div
-                                     className="button right"
-                                     onClick={function() {
-                                         if (!startCallDisabled) {
-                                             room.startAudioCall();
-                                         }
-                                     }}>
-                                    <i className={"small-icon small-icon audio-call colorized" + startCallButtonClass
-                                    }></i>
-                                </div>
-                            </span>
+                                onClick={() => room.megaChat.toggleUIFlag('convPanelCollapse')} />
+                            <Button
+                                className="button right"
+                                icon={`small-icon small-icon video-call colorized ${startCallButtonClass}`}
+                                onClick={() => !startCallDisabled && room.startVideoCall()} />
+                            <Button
+                                className="button right"
+                                icon={`small-icon small-icon audio-call colorized ${startCallButtonClass}`}
+                                onClick={() => !startCallDisabled && room.startAudioCall()} />
                         </div>
-                         {topicInfo}
+                        {topicInfo}
                     </div>
+
                     <div className={"messages-block " + additionalClass}>
                         <div className="messages scroll-area">
                             <PerfectScrollbar

@@ -15024,35 +15024,23 @@ let conversationpanel_ConversationPanel = (conversationpanel_dec = utils["defaul
     }, external_React_default.a.createElement("i", {
       className: "small-icon conversations"
     }), l[8884])), external_React_default.a.createElement("div", {
-      className: "chat-topic-block " + topicBlockClass + (self.props.chatRoom.havePendingGroupCall() || self.props.chatRoom.haveActiveCall() ? " have-pending-group-call" : "")
+      className: "\n                            chat-topic-block\n                            " + topicBlockClass + "\n                            " + (room.havePendingCall() || room.haveActiveCall() ? 'have-pending-group-call' : '') + "\n                        "
     }, external_React_default.a.createElement("div", {
       className: "chat-topic-buttons"
     }, external_React_default.a.createElement(ui_buttons["Button"], {
       className: "right",
       disableCheckingVisibility: true,
-      icon: "small-icon " + (!room.megaChat.chatUIFlags['convPanelCollapse'] ? "arrow-in-square" : "arrow-in-square active"),
-      onClick: function () {
-        room.megaChat.toggleUIFlag('convPanelCollapse');
-      }
-    }), external_React_default.a.createElement("span", null, external_React_default.a.createElement("div", {
+      icon: "small-icon " + (!room.megaChat.chatUIFlags.convPanelCollapse ? "arrow-in-square" : "arrow-in-square active"),
+      onClick: () => room.megaChat.toggleUIFlag('convPanelCollapse')
+    }), external_React_default.a.createElement(ui_buttons["Button"], {
       className: "button right",
-      onClick: function () {
-        if (!startCallDisabled) {
-          room.startVideoCall();
-        }
-      }
-    }, external_React_default.a.createElement("i", {
-      className: "small-icon small-icon video-call colorized" + startCallButtonClass
-    })), external_React_default.a.createElement("div", {
+      icon: "small-icon small-icon video-call colorized " + startCallButtonClass,
+      onClick: () => !startCallDisabled && room.startVideoCall()
+    }), external_React_default.a.createElement(ui_buttons["Button"], {
       className: "button right",
-      onClick: function () {
-        if (!startCallDisabled) {
-          room.startAudioCall();
-        }
-      }
-    }, external_React_default.a.createElement("i", {
-      className: "small-icon small-icon audio-call colorized" + startCallButtonClass
-    })))), topicInfo), external_React_default.a.createElement("div", {
+      icon: "small-icon small-icon audio-call colorized " + startCallButtonClass,
+      onClick: () => !startCallDisabled && room.startAudioCall()
+    })), topicInfo), external_React_default.a.createElement("div", {
       className: "messages-block " + additionalClass
     }, external_React_default.a.createElement("div", {
       className: "messages scroll-area"

@@ -60,6 +60,7 @@
     margin-right: 4px;
 }
 .messages-block {
+    overflow: hidden;
     height: -webkit-calc(100% - 49px);
     height: -moz-calc(100% - 49px);
     height: calc(100% - 49px);
@@ -68,6 +69,7 @@
     margin-right: 256px;
 }
 .messages-block.small-block {
+    overflow: visible;
     height: 240px;
 }
 .messages.scroll-area {

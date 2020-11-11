@@ -28,7 +28,10 @@ lazy(self, 'trk', function() {
         if (d) {
             log(s.length, data);
         }
-        return navigator.sendBeacon(apipath + 'cs?id=0&utm=1&sid=' + (storage.sid || 0) + mega.urlParams(), s);
+        let url = apipath + 'cs?id=0&utm=1';
+        if (storage.sid) url += '&sid=' + storage.sid;
+        url += mega.urlParams();
+        return navigator.sendBeacon(url, s);
     };
 
     const save = async(lts) => {

@@ -2344,7 +2344,7 @@ function initShareDialogMultiInput(alreadyAddedContacts) {
                     .siblings('.token-input-delete-token-mega').trigger('click');
             }
             else {
-                if (typeof(M.findOutgoingPendingContactIdByEmail(email.id)) === 'undefined') {
+                if (typeof M.findOutgoingPendingContactIdByEmail(email.id) === 'undefined') {
                     // Show a text area where the user can add a custom message to the pending share request
                     $('.share-message', $scope).removeClass('hidden');
                     initTextareaScrolling($('.share-message-textarea textarea', $scope), 72);
@@ -2357,15 +2357,31 @@ function initShareDialogMultiInput(alreadyAddedContacts) {
         },
         onDelete: function() {
             var $scope = $('.share-add-dialog');
-            var iNewItemsNum = $('.token-input-list-mega .token-input-token-mega', $scope).length;
+            var $newEmails = $('.token-input-list-mega .token-input-token-mega', $scope);
+            var newEmailsNum = $newEmails.length;
+            var noNewContacts = true;
 
             setTimeout(function() {
                 $('.token-input-input-token-mega input', $scope).trigger("blur");
             }, 0);
 
-            // If no new item is in multiInput box and contact picker, disable the button
+            for (var i = 0; i < newEmailsNum; i++) {
+                var newEmail = $($newEmails[i]).contents().eq(1).text();
+                if (typeof M.findOutgoingPendingContactIdByEmail(newEmail) === 'undefined') {
+                    noNewContacts = false;
+                    break;
+                }
+            }
+
+            // If no new email that hasn't been sent contact request, clear and hide the personal message input box
+            if (noNewContacts) {
+                $('.share-message', $scope).addClass('hidden');
+                $('.share-message textarea', $scope).val('');
+            }
+
+            // If no new email is in multiInput box and contact picker, disable the button
             if (JSON.stringify(clone($.contactPickerSelected).sort()) === JSON.stringify(alreadyAddedContacts.sort())
-                && iNewItemsNum === 0) {
+                && newEmailsNum === 0) {
                 $('.add-share', $scope).addClass('disabled');
             }
 

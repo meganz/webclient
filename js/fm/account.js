@@ -3424,8 +3424,9 @@ accountUI.contactAndChat = {
             var difference = Math.abs(date - new Date());
             var minutesUntil = Math.floor(difference / 1000 / 60);
 
-            // TODO: add translation
-            $label.safeHTML(targetTomorrow ? 'Until tomorrow morning, 08:00' : 'Until this morning, 08:00');
+            $label.safeHTML(
+                targetTomorrow ? l[23671] || 'Until tomorrow morning, 08:00' : l[23670] || 'Until this morning, 08:00'
+            );
             $radio.val(minutesUntil);
         },
 

@@ -411,7 +411,7 @@ pro.proplan = {
         var $saveArrow = $('.save-green-arrow:visible', $stepOne);
         var savePercsReposition;
 
-        if (page === 'pro' && $savePercs.length && $saveArrow.length) {
+        if ((page === 'pro' || page === 'payment') && $savePercs.length && $saveArrow.length) {
 
             // Set text to "save" block
             $savePercs.safeHTML(l[16649]);

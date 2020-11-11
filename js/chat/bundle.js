@@ -12678,7 +12678,7 @@ class conversationaudiovideopanel_ConversationAVPanel extends mixins["MegaRender
     this.setState({
       'fullScreenModeEnabled': newVal,
       'messagesBlockEnabled': newVal ? false : this.state.messagesBlockEnabled
-    });
+    }, () => this.props.onMessagesToggle && this.props.onMessagesToggle(this.state.messagesBlockEnabled));
   }
 
   toggleLocalVideoDisplay(e) {

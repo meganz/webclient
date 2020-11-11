@@ -57,13 +57,22 @@ export default class GifPanel extends MegaRenderMixin {
         const PATH = path + (path.indexOf('?') === -1 ? '?' : '&');
         const LIMIT = `limit=${API.LIMIT}`;
         return `${API.HOSTNAME + API.ENDPOINT}/${PATH + LIMIT}`;
-    }
+    };
+
+    clickedOutsideComponent = ev => {
+        const $target = ev && $(ev.target);
+        const outsideElements = ['.small-icon.tiny-reset', '.small-icon.gif'];
+
+        return (
+            $target.parents(`.${GIF_PANEL_CLASS}`).length === 0 &&
+            outsideElements.every(outsideElement => !$target.is(outsideElement))
+        );
+    };
 
     bindEvents = () => {
         $(document)
             .rebind('mousedown.gifPanel', ev => {
-                const $target = ev && $(ev.target);
-                if ($target.parents(`.${GIF_PANEL_CLASS}`).length === 0 && !$target.is('i.small-icon.tiny-reset')) {
+                if (this.clickedOutsideComponent(ev)) {
                     this.props.onToggle();
                 }
             })
@@ -73,6 +82,13 @@ export default class GifPanel extends MegaRenderMixin {
                     return SearchField.hasValue() ? this.doReset() : this.props.onToggle();
                 }
             });
+    };
+
+    unbindEvents = () => {
+        if (this.delayProcID) {
+            delay.cancel(this.delayProcID);
+        }
+        $(document).unbind('.gifPanel');
     };
 
     doFetch = path => {
@@ -167,9 +183,7 @@ export default class GifPanel extends MegaRenderMixin {
 
     componentWillUnmount() {
         super.componentWillUnmount();
-        if (this.delayProcID) {
-            delay.cancel(this.delayProcID);
-        }
+        this.unbindEvents();
     }
 
     render() {

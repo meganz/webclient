@@ -2020,7 +2020,7 @@ class ContactCard extends _stores_mixins_js2__["ContactAwareComponent"] {
     var username = (this.props.namePrefix ? this.props.namePrefix : "") + (M.getNameByHandle(contact.u) || contact.m);
 
     if (contact.u === u_handle) {
-      username += " (" + escapeHTML(l[19285]).replace(':', '') + ")";
+      username += " (" + escapeHTML(l[8885]) + ")";
     }
 
     var dropdowns = this.props.dropdowns ? this.props.dropdowns : [];

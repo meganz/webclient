@@ -639,7 +639,7 @@ export class ContactCard extends ContactAwareComponent {
             (M.getNameByHandle(contact.u) || contact.m);
 
         if (contact.u === u_handle) {
-            username += " (" + escapeHTML(l[19285]).replace(':', '') + ")";
+            username += " (" + escapeHTML(l[8885]) + ")";
         }
         var dropdowns = this.props.dropdowns ? this.props.dropdowns : [];
         var noContextMenu = this.props.noContextMenu ? this.props.noContextMenu : "";

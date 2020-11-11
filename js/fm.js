@@ -1900,7 +1900,7 @@ function renderContactRowContent(userEmail, type, id, av, userName, permClass) {
         presence = M.onlineStatusClass(M.d[id].presence === 'unavailable' ? 1 : M.d[id].presence)[1];
     }
 
-    userName += type === '1' ? ' (' + l[24356] + ')' : '';
+    userName += type === '1' ? ' (' + l[8885] + ')' : '';
     permClass = type === '1' ? 'owner' : permClass;
     var ownerClass = type === '1' ? ' owner' : '';
 

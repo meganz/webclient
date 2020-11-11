@@ -28,7 +28,7 @@ var corporate = {
         var self = this;
         pages.forEach(function(c) {
             $('.corporate-content', self.$page).safeAppend(
-                c.content.replaceAll(/(?:{|%7B)cmspath(?:%7D|})/g, CMS.getUrl())
+                c.content.replace(/(?:{|%7B)cmspath(?:%7D|})/g, CMS.getUrl())
             );
         });
     },

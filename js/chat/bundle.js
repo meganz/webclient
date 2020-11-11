@@ -7194,11 +7194,14 @@ class gifPanel_GifPanel extends mixins["MegaRenderMixin"] {
       return API.HOSTNAME + API.ENDPOINT + "/" + (PATH + LIMIT);
     };
 
+    this.clickedOutsideComponent = ev => {
+      const $target = ev && $(ev.target);
+      return $target.parents(".gif-panel-wrapper").length === 0 && ['.small-icon.tiny-reset', '.small-icon.gif'].every(outsideElement => !$target.is(outsideElement));
+    };
+
     this.bindEvents = () => {
       $(document).rebind('mousedown.gifPanel', ev => {
-        const $target = ev && $(ev.target);
-
-        if ($target.parents(".gif-panel-wrapper").length === 0 && !$target.is('i.small-icon.tiny-reset')) {
+        if (this.clickedOutsideComponent(ev)) {
           this.props.onToggle();
         }
       }).rebind('keydown.gifPanel', ({
@@ -7208,6 +7211,14 @@ class gifPanel_GifPanel extends mixins["MegaRenderMixin"] {
             return searchField_SearchField.hasValue() ? this.doReset() : this.props.onToggle();
           }
       });
+    };
+
+    this.unbindEvents = () => {
+      if (this.delayProcID) {
+        delay.cancel(this.delayProcID);
+      }
+
+      $(document).unbind('.gifPanel');
     };
 
     this.doFetch = path => {
@@ -7313,10 +7324,7 @@ class gifPanel_GifPanel extends mixins["MegaRenderMixin"] {
 
   componentWillUnmount() {
     super.componentWillUnmount();
-
-    if (this.delayProcID) {
-      delay.cancel(this.delayProcID);
-    }
+    this.unbindEvents();
   }
 
   render() {
@@ -8117,7 +8125,6 @@ let typingArea_TypingArea = (_dec = Object(mixins["SoonFcWrap"])(60), _dec2 = Ob
     return typingArea_React.createElement("div", {
       className: "typingarea-component" + self.props.className + (disabledTextarea ? " disabled" : "")
     }, this.state.gifPanelActive && typingArea_React.createElement(gifPanel_GifPanel, {
-      active: this.state.gifPanelActive,
       chatRoom: this.props.chatRoom,
       onToggle: () => this.setState({
         gifPanelActive: false

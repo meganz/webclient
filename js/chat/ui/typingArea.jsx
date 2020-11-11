@@ -852,9 +852,10 @@ export class TypingArea extends MegaRenderMixin {
         return <div className={"typingarea-component" + self.props.className + (disabledTextarea ? " disabled" : "")}>
             {this.state.gifPanelActive &&
                 <GifPanel
-                    active={this.state.gifPanelActive}
                     chatRoom={this.props.chatRoom}
-                    onToggle={() => this.setState({ gifPanelActive: false })}
+                    onToggle={() =>
+                        this.setState({ gifPanelActive: false })
+                    }
                 />
             }
             <div className={"chat-textarea " + self.props.className}>

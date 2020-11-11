@@ -98,6 +98,22 @@ MegaData.prototype.openSharingDialog = function() {
 MegaData.prototype.initShareAddDialog = function(alreadyAddedContacts, $extraFooterElement) {
     "use strict";
 
+    // If chat is not ready.
+    if (!megaChatIsReady) {
+        if (megaChatIsDisabled) {
+            console.error('Mega Chat is disabled, cannot proceed');
+        }
+        else {
+            // Waiting for chat_initialized broadcaster.
+            loadingDialog.show();
+            mBroadcaster.once('chat_initialized',
+                              this.initShareAddDialog.bind(this, alreadyAddedContacts, $extraFooterElement));
+        }
+        return false;
+    }
+
+    loadingDialog.hide();
+
     var dialogPlacer = document.createElement('div');
     $.contactPickerSelected = alreadyAddedContacts; // Global variable for the selected item from the contacts picker
 

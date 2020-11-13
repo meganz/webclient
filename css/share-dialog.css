@@ -758,4 +758,12 @@
         height: 176px !important;
         min-height: 176px;
     }
+
+    .fm-dialog.share-add-dialog .chat-contactspicker-no-contacts.searching {
+        height: 176px;
+    }
+
+    .fm-dialog.share-add-dialog .chat-contactspicker-no-contacts.searching .fm-empty-contacts-bg {
+        margin: 16px auto 0 auto;
+    }
 }

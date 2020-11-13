@@ -1496,9 +1496,10 @@ MegaUtils.prototype.transferFromMegaCoNz = function(data) {
 
             // Performs a regular login as part of the transfer from mega.co.nz
             _rawXHR(apipath + 'cs?id=0&sid=' + u_sid, {'a': 'ug'}, function(data) {
+
                 var ctx = {
                     checkloginresult: function(ctx, result) {
-                        u_type = result;
+                        u_type = result === ESID ? false : result;
                         if (toPage.substr(0, 1) === '!' && toPage.length > 7) {
                             _rawXHR(apipath + 'cs?id=0&domain=meganz',
                                 {'a': 'g', 'p': toPage.substr(1, 8)},

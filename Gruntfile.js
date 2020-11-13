@@ -347,7 +347,7 @@ var Secureboot = function() {
                 size = 0;
             }else {
                 // if (f.f === 'sjcl.js' && ++sjcl) fileLimit = 78e4; // bigger files for embed player
-                var fsize = fs.statSync(f.f)['size'];
+                var fsize = f.f.startsWith('js/mobile/') ? 0 : fs.statSync(f.f)['size'];
                 if (size + fsize > fileLimit) {
                     size = 0;
                     groups.push(null);

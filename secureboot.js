@@ -2921,6 +2921,7 @@ else if (!browserUpdate) {
             'chat_emoji_css':{f:'css/chat-emoji.css', n: 'chat_emoji_css', j:2,'w':2,'c':1,'cache':1,'d':1},
 
             /* chat related js */
+            'search_js': {f:'js/chat/search.js', n: 'search_js', j:1},
             'pushnotificationsettings_js': {f:'js/pushNotificationSettings.js', n: 'pushnotificationsettings_js', j:1},
             'react_js': {f:'js/vendor/react.js', n: 'react_js', j:1},
             'reactdom_js': {f:'js/vendor/react-dom.js', n: 'reactdom_js', j:1},
@@ -2960,8 +2961,8 @@ else if (!browserUpdate) {
             'chat_reactions_js': {f:'js/chat/reactions.js', n: 'chat_reactions_js', j:1},
             'chat_messages_Js': {f:'js/chat/messages.js', n: 'chat_messages_Js', j:1},
             'presence2_js': {f:'js/chat/presence2.js', n: 'presence2_js', j:1},
-            'chat_react_minified_js': {f:'js/chat/bundle.js', n: 'chat_react_minified_js', j:1},
-            'search_js': {f:'js/chat/search.js', n: 'search_js', j:1}
+            // leave the bundle at the end.
+            'chat_react_minified_js': {f:'js/chat/bundle.js', n: 'chat_react_minified_js', j:1}
         }
     };
 

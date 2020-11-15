@@ -1,6 +1,7 @@
 var fs = require('fs');
 var fileLimit = 512*1024;
-var useHtmlMin = false;
+const useHtmlMin = false;
+const usePostCSS = true;
 
 var Secureboot = function() {
     var content = fs.readFileSync("secureboot.js").toString().split("\n");
@@ -55,7 +56,7 @@ var Secureboot = function() {
     ns.addHeader = function(lines, files) {
         lines.push("    /* Bundle Includes:");
         files.forEach(function(file) {
-            lines.push("     *   " + file);
+            lines.push("     *   " + file.replace('build/', ''));
         });
         lines.push("     */");
     }
@@ -97,7 +98,7 @@ var Secureboot = function() {
                     lines.push(content[i]);
                     continue;
                 }
-                file = file[0].substr(1, file[0].length-2);
+                file = (usePostCSS ? 'build/' : '') + file[0].substr(1, file[0].length - 2);
                 if (cssGroups[cssKeys[0]] && cssGroups[cssKeys[0]][0] == file) {
                     ns.addHeader(lines, cssGroups[cssKeys[0]]);
                     lines.push("    jsl.push({f:'" + cssKeys[0] + "', n: '" + cssKeys[0].replace(/[^a-z0-9]/ig, "-") + "', j: 2, w: " + getWeight(cssKeys[0]) + "});");
@@ -255,6 +256,11 @@ var Secureboot = function() {
     ns.getCSS = function() {
         return jsl.filter(function(f) {
             return f.f.match(/(?:css|jsx)$/);
+        }).map(function(f) {
+            if (usePostCSS && String(f.f).startsWith('css/')) {
+                f.f = 'build/' + f.f;
+            }
+            return f;
         });
     };
 
@@ -298,16 +304,10 @@ var Secureboot = function() {
     };
 
     ns.getGroups = function(header) {
-        var groups = this.getJSGroups();
-        var css = this.getCSSGroups();
-        for (var i in css) {
-            if (css.hasOwnProperty(i)) {
-                groups[i] = css[i];
-            }
-        }
+        const groups = Object.assign({}, this.getJSGroups(), this.getCSSGroups());
+
         if (header) {
             var lines = [];
-            var tmp = [];
             var file;
             var i = 0;
             for (var e in groups) {
@@ -319,15 +319,7 @@ var Secureboot = function() {
                     groups[e].unshift(file);
                 }
             }
-            setTimeout(function() {
-                console.error('delete');
-                tmp.forEach(function(file) {
-                    console.error(file);
-                    fs.unlink(file);
-                });
-            }, 100);
         }
-
 
         return groups;
     };
@@ -375,20 +367,76 @@ var Secureboot = function() {
     return ns;
 }();
 
+const log = console.log;
+console.log = function(s) {
+    if (s && s[0] !== '>') {
+        log.apply(console, arguments);
+    }
+};
 
 module.exports = function(grunt) {
     // Project configuration.
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
+        postcss: {
+            options: {
+                safe: true,
+                failOnError: true,
+                sequential: true,
+                processors: [
+                    require('cssnano')({
+                        preset: [
+                            'default', {
+                                svgo: false,
+                                discardDuplicates: false,
+                                normalizeWhitespace: false,
+                            }
+                        ]
+                    }),
+                    (css) => {
+                        css.walk((node) => {
+                            const {type} = node;
+
+                            if (type === 'decl') {
+                                if (node.raws.before) {
+                                    const prev = node.prev();
+
+                                    if (prev && prev.type !== 'rule') {
+                                        node.raws.before = node.raws.before.replace(/;/g, '');
+                                    }
+                                    node.raws.before = node.raws.before.replace(/[\t ]+/g, '\t');
+                                }
+
+                                node.raws.between = ':';
+                                node.raws.semicolon = false;
+                            }
+                            else if (type === 'rule' || type === 'atrule') {
+                                node.raws.after = '\n';
+                                node.raws.before = '\n';
+                                node.raws.between = '';
+                                node.raws.semicolon = false;
+                            }
+                        });
+                    }
+                ]
+            },
+            dist: {expand: true, flatten: true, src: ['css/*.css', 'css/**/*.css'], dest: 'build/css/'}
+        },
         concat: {
             prod: {
                 options: {
                     sourceMap: false,
                     process: function(content, filename) {
+                        if (String(filename).endsWith('.css')) {
+                            content = content.replace(/(?:\.\.\/)+/g, '../');
+                        }
                         return content.trim() + "\n";
                     }
                 },
-                files: Secureboot.getGroups(true),
+                get files() {
+                    console.log = log;
+                    return Secureboot.getGroups(true);
+                },
             }
         },
         htmlmin: {
@@ -419,14 +467,17 @@ module.exports = function(grunt) {
 
     // Load the plugin that provides the "uglify" task.
     grunt.loadNpmTasks('grunt-htmljson');
-    grunt.loadNpmTasks('grunt-contrib-htmlmin');
     grunt.loadNpmTasks('grunt-contrib-concat');
-
 
     // Default task(s).
     var tasks = ['concat', 'htmljson', 'secureboot'];
     if (useHtmlMin) {
+        grunt.loadNpmTasks('grunt-contrib-htmlmin');
         tasks.unshift('htmlmin');
+    }
+    if (usePostCSS) {
+        grunt.loadNpmTasks('@lodder/grunt-postcss');
+        tasks.unshift('postcss');
     }
     grunt.registerTask('secureboot', function() {
         console.log("Write secureboot.prod.js");

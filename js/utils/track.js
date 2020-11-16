@@ -375,7 +375,7 @@ lazy(self, 'trk', function() {
 
         (function _(v) {
             if (v !== EACCESS) {
-                delay('trk.ping', () => trk({ping: 1}).then(_).dump('trk.ping'), 9e4);
+                delay('trk.ping', () => trk({ping: 1}).then(_), 9e4);
             }
         })();
 

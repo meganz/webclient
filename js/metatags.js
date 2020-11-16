@@ -229,17 +229,9 @@ mega.metatags = new function() {
             mTags.mega_desc = l[22712] || mTags.en_desc;
             mTags.image = 'https://cms2.mega.nz/07834c8d2b3b05bc352966fe02fe597b.png';
         }
-        else if (page === 'uwp' || page === 'wp') {
-            mTags.en_title = 'MEGA App for Windows 10 - MEGA';
-            mTags.en_desc = 'Your files, wherever you are, whenever you need them - across all your Windows 10 devices';
-            mTags.mega_title = l[23964] || mTags.en_title;
-            mTags.mega_desc = l[19663] || mTags.en_desc;
-            mTags.image = 'https://cms2.mega.nz/3f16d936a620162a88f5442b3742f5e0.png';
-            if (page === 'uwp') {
-                addCanonical(getBaseUrl() + '/wp');
-            }
-        }
-        else if (page === 'mobileapp' || page === 'mobile' || page === 'android' || page === 'ios') {
+        else if (page === 'mobileapp' || page === 'mobile'
+            || page === 'android' || page === 'ios' || page === 'uwp' || page === 'wp') {
+
             mTags.en_title = 'MEGA Mobile Apps - MEGA';
             mTags.en_desc = 'Securely manage your files and collaborate with everyone from anywhere.';
             mTags.mega_title = l[23965] || mTags.en_title;

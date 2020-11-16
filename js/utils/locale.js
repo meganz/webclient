@@ -1279,6 +1279,22 @@ mBroadcaster.once('boot_done', function populate_l() {
 lazy(mega, 'intl', function _() {
     'use strict';
     const ns = Object.create(null);
+    const Intl = window.Intl || {};
+    if (!Intl.NumberFormat) {
+        // weak silly polyfill
+        Intl.NumberFormat = function mIntlNumberFormat() { /* dummy */ };
+        Intl.NumberFormat.prototype = {
+            constructor: Intl.NumberFormat,
+            format: (n) => parseFloat(n).toString(),
+            formatToParts: function(n) {
+                const [i, f] = this.format(n).split(/[,.]/);
+                return [
+                    {type: 'integer', value: i | 0}, {type: 'decimal', value: '.'}, {type: 'fraction', value: f | 0}
+                ];
+            }
+        };
+        // @todo add Collator whenever needed.
+    }
 
     /** @property mega.intl.number */
     lazy(ns, 'number', function() {

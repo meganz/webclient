@@ -142,20 +142,6 @@ function CreateWorkers(url, message, size) {
             catch (e) {}
             worker[i] = instances[i] = null;
 
-            if (navigator.onLine === false) {
-                console.info('[%s] Worker #%s Offline.', wid, i);
-                window.addEventListener('online', function online() {
-                    window.removeEventListener('online', online);
-                    onIdle(_.bind(self, task, done));
-                });
-                return;
-            }
-
-            if (!('message' in ex)) {
-                ex = new SecurityError("Failed to construct 'Worker': Access to the script denied by the CSP \u2620 ");
-                return workerLoadFailure(ex);
-            }
-
             if ((backoff | 0) < 100) {
                 backoff = 200;
             }

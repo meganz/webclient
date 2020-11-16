@@ -1297,7 +1297,8 @@ lazy(mega, 'intl', function _() {
 
     /** @property mega.intl.decimalSeparator */
     lazy(ns, 'decimalSeparator', function() {
-        return this.number.formatToParts(1.1).find(obj => obj.type === 'decimal').value;
+        const value = tryCatch(() => this.number.formatToParts(1.1).find(obj => obj.type === 'decimal').value, false)();
+        return value || '.';
     });
 
     /** @property mega.intl.locale */

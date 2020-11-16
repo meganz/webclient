@@ -905,7 +905,9 @@ FullScreenManager.prototype.enterFullscreen = function() {
 
         // programmatic timeupdate helper
         setTimeUpdate = function() {
-            onTimeUpdate(streamer.currentTime, duration || streamer.duration);
+            if (streamer) {
+                onTimeUpdate(streamer.currentTime, duration || streamer.duration);
+            }
         };
         $video.rebind('timeupdate.xyz', setTimeUpdate);
 

@@ -100,7 +100,7 @@
             return false;
         }
 
-        var contents = $this.data('simpletip');
+        var contents = $this.attr('data-simpletip');
         if (contents) {
             var $node = $template.clone();
             var $textContainer = $('span', $node);
@@ -109,7 +109,7 @@
             // e.g. "Mute" -> "Unmute"
             $this.rebind(SIMPLETIP_UPDATED_EVENT, function() {
                 $textContainer.safeHTML(
-                    sanitize($this.data('simpletip'))
+                    sanitize($this.attr('data-simpletip'))
                 );
             });
             $this.rebind(SIMPLETIP_CLOSE_EVENT, function() {
@@ -119,24 +119,24 @@
 
             $currentNode = $node;
             $currentTriggerer = $this;
-            var wrapper = $this.data('simpletipwrapper') || "";
+            var wrapper = $this.attr('data-simpletipwrapper') || "";
             if (wrapper) {
                 wrapper += ",";
             }
 
-            var customStyle = $this.data('simpletip-style');
+            var customStyle = $this.attr('data-simpletip-style');
             if (customStyle) {
                 $currentNode.css(customStyle);
             }
 
-            var customClass = $this.data('simpletip-class');
+            var customClass = $this.attr('data-simpletip-class');
             if (customClass) {
                 $currentNode.addClass(customClass);
             }
 
             var my = "center top";
             var at = "center bottom";
-            if ($this.data('simpletipposition') === "top") {
+            if ($this.attr('data-simpletipposition') === "top") {
                 my = "center bottom";
                 at = "center top";
             }
@@ -158,8 +158,8 @@
                     if (vertClass === "t") {
                         topOffset = -6;
                     }
-                    if ($this.data('simpletipoffset')) {
-                        var offset = parseInt($this.data('simpletipoffset'), 10);
+                    if ($this.attr('data-simpletipoffset')) {
+                        var offset = parseInt($this.attr('data-simpletipoffset'), 10);
                         if (vertClass === "t") {
                             topOffset += offset * -1;
                         }

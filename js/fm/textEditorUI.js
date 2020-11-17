@@ -290,6 +290,25 @@ mega.textEditorUI = new function TextEditorUI() {
 
         $('.editor-btn-container .print-f', $editorContianer).rebind('click.txt-editor', printText);
 
+        $('.editor-btn-container .wrap-text', $editorContianer).rebind(
+            'click.txt-editor',
+            function wrapTextMenuClick() {
+                const $tick = $('span.menu-item-shortcut', $(this));
+                if ($tick.hasClass('green-tick')) {
+                    $tick.removeClass('green-tick tiny-icon');
+                    if (editor) {
+                        editor.setOption('lineWrapping', false);
+                    }
+                }
+                else {
+                    $tick.addClass('green-tick tiny-icon');
+                    if (editor) {
+                        editor.setOption('lineWrapping', true);
+                    }
+                }
+            }
+        );
+
         $('.editor-btn-container .txt-editor-download-btn', $editorContianer).rebind(
             'click.txt-editor',
             function downloadBtnClicked() {

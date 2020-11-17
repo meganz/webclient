@@ -707,7 +707,11 @@ Object.defineProperty(mega, 'flags', {
 Object.defineProperty(mega, 'paywall', {
     get: function() {
         'use strict';
-        return typeof u_attr === 'object' && (u_attr.uspw || u_attr.b && u_attr.b.s === -1) || false;
+        var res = typeof u_attr === 'object' && (u_attr.uspw || u_attr.b && u_attr.b.s === -1) || false;
+        if (res) {
+            window.onerror = null;
+        }
+        return res;
     }
 });
 

@@ -2304,14 +2304,13 @@ function initShareDialogMultiInput(alreadyAddedContacts) {
         emailCheck: true,
         preventDoublet: false,
         tokenValue: "id",
-        propertyToSearch: "name",
+        propertyToSearch: "id",
         resultsLimit: 5,
         minChars: 1,
         accountHolder: (M.u[u_handle] || {}).m || '',
         scrollLocation: 'share',
         // Exclude from dropdownlist only emails/names which exists in multi-input (tokens)
         excludeCurrent: true,
-
         onEmailCheck: function() {
             errorMsg(l[2465]); // Please enter a valid email address
         },

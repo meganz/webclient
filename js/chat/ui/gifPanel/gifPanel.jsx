@@ -28,7 +28,8 @@ export const API = {
 export const LABELS = {
     SEARCH: l[24025],
     END_OF_RESULTS: l[24156],
-    NO_RESULTS: l[24050]
+    NO_RESULTS: l[24050],
+    NOT_AVAILABLE: l[24512]
 };
 
 export default class GifPanel extends MegaRenderMixin {
@@ -40,8 +41,9 @@ export default class GifPanel extends MegaRenderMixin {
         results: [],
         loading: true,
         offset: 0,
-        bottom: false
-    }
+        bottom: false,
+        unavailable: false
+    };
 
     state = { ...this.defaultState };
 
@@ -92,7 +94,7 @@ export default class GifPanel extends MegaRenderMixin {
     };
 
     doFetch = path => {
-        this.setState({ loading: true }, () => {
+        this.setState({ loading: true, unavailable: false }, () => {
             fetch(this.getFormattedPath(path))
                 .then(response => response.json())
                 .then(({ data }) => {
@@ -105,7 +107,11 @@ export default class GifPanel extends MegaRenderMixin {
                         );
                     }
                 })
-                .catch(ex => console.error('doFetch > error ->', ex));
+                .catch(ex =>
+                    this.setState({ unavailable: true }, () =>
+                        console.error('doFetch > error ->', ex, this.state)
+                    )
+                );
         });
     };
 
@@ -187,7 +193,7 @@ export default class GifPanel extends MegaRenderMixin {
     }
 
     render() {
-        const { value, searching, results, loading, bottom } = this.state;
+        const { value, searching, results, loading, bottom, unavailable } = this.state;
 
         return (
             <div className="gif-panel-wrapper">
@@ -200,7 +206,8 @@ export default class GifPanel extends MegaRenderMixin {
                             searching={searching}
                             onChange={this.handleChange}
                             onReset={this.doReset}
-                            onBack={this.handleBack} />
+                            onBack={this.handleBack}
+                        />
                     </div>
 
                     <div className="gif-panel-content">
@@ -213,8 +220,10 @@ export default class GifPanel extends MegaRenderMixin {
                                 results={results}
                                 loading={loading}
                                 bottom={bottom}
+                                unavailable={unavailable}
                                 onPaginate={this.doPaginate}
-                                onClick={this.doSend} />
+                                onClick={this.doSend}
+                            />
                         </PerfectScrollbar>
                     </div>
                 </div>

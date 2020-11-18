@@ -497,7 +497,7 @@ def inspectcss(file, ln, line, result):
 
     # check potentially invalid url()s
     match = re.search(r'url\([^)]+images/mega/', line)
-    if match and not re.search(r'url\([\'"]?\.\./images/mega/', line):
+    if match and not re.search(r'url\([\'"]?(\.\./)+images/mega/', line):
         fatal += 1
         result.append('{}:{}: {}\n{}^ Potentially invalid url()'
             .format(file, ln, line, indent))

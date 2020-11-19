@@ -818,7 +818,7 @@
 
             focus_with_timeout(input_box);
         }
-        
+
         function resize_input() {
             if (input_val === (input_val = input_box.val())) {
                 return;
@@ -902,7 +902,7 @@
 
         // Add a token to the token list based on user input
         function add_token(item) {
-
+            item[$(input).data("settings").tokenValue] = item[$(input).data("settings").tokenValue].toLowerCase();
             var callback = $(input).data("settings").onAdd;
 
             if ($(input).data("settings").emailCheck) {

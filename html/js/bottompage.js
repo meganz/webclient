@@ -55,13 +55,14 @@ var bottompage = {
         if (!is_mobile) {
             $('body').removeClass('mobile');
             bottompage.initNavButtons($content);
-            bottompage.initFloatingTop();
         }
         else {
             $('body').addClass('mobile');
             bottompage.initMobileNavButtons($content);
-            bottompage.initMobileFloatingTop();
         }
+
+        // Init floating top menu
+        bottompage.initFloatingTop();
 
         // Init scroll button
         bottompage.initBackToScroll();
@@ -221,8 +222,8 @@ var bottompage = {
 
                 if (page === 'download') {
 
-                    $('.download.top-bar', $body).removeClass('expanded initial').css('height', '');
-                    $(window).unbind('resize.download-bar');
+                    // Collapse download bar
+                    expandDlBar(1);
                 }
             }
         };
@@ -435,148 +436,95 @@ var bottompage = {
         });
     },
 
+    // Init floating  top bar, product pages menu or help center navigation bar
     initFloatingTop: function() {
-        var topHeader;
-        var $navBar = $('.pages-menu.body', 'body');
 
-        if (page === 'download') {
-            topHeader = '.download.top-bar';
-        }
-        else if (page.substr(0, 4) === 'help') {
-            topHeader = '.bottom-page .top-head, .old .top-head, .support-section-header';
-        }
-        else {
-            topHeader = '.bottom-page .top-head, .old .top-head';
-        }
+        var $fmHolder = $('.fmholder', 'body');
+        var $topHeader;
+        var $productPagesMenu = $('.pages-menu.body', $fmHolder);
 
-        function topResize() {
-            var $topHeader = $(topHeader, 'body');
+        // Resize top menu / produc pages menu or help center navigation bar
+        // Required to avoid "jumpng" effect when we change "position" property
+        var topResize = function() {
 
             if ($topHeader.hasClass('floating')) {
                 $topHeader.outerWidth($topHeader.parent().outerWidth());
-
-                if (page !== 'download') {
-                    $navBar.outerWidth($topHeader.parent().outerWidth());
-                }
             }
             else {
                 $topHeader.css('width',  '');
-                $navBar.removeAttr('style');
             }
         }
+
+        if (page === 'download') {
+
+            // Select download bar as it contains top header and product page menu
+            $topHeader = $('.download.top-bar', $fmHolder);
+        }
+        else {
+
+            // Select Top header, product page menu and help page navigation bar
+            $topHeader = $('.bottom-page .top-head, .old .top-head, '
+                + '.pages-menu-wrap .pages-menu.body, .support-section-header', $fmHolder);
+        }
+
+        if (!$topHeader.length) {
+
+            return $(window).unbind('resize.topheader');
+        }
+
+        // Init menus resizing
+        topResize();
 
         $(window).rebind('resize.topheader', function() {
             topResize();
         });
 
-        $('.bottom-pages .fmholder').rebind('scroll.topmenu', function() {
-            var $topHeader = $(topHeader);
-            var topPos = $(this).scrollTop();
-            var navTopPos;
+        // Select bottom pages scrolling block or window for mobile
+        $(window).add('.bottom-pages .fmholder').rebind('scroll.topmenu', function() {
 
-            if (topPos > 300) {
+            var topPos = $(this).scrollTop();
+
+            if (topPos > 400) {
+
+                // Make menus floating but not visible
                 $topHeader.addClass('floating');
-                topResize();
+                $('.submenu.active, .submenu-item.active', $productPagesMenu).removeClass('active');
+
+                // Show floating menus
                 if (topPos > 600) {
                     $topHeader.addClass('activated');
                 }
-            }
-            else if (topPos <= 300 && topPos >= 50) {
-                $topHeader.removeClass('activated');
+                else {
 
-                // Hide all popup as top bar not visisble for this part
-                notify.closePopup();
-                alarm.hideAllWarningPopups(true);
+                    // Hide floating menus
+                    $topHeader.removeClass('activated');
+
+                    // Hide all popup as top bar not visisble for this part
+                    notify.closePopup();
+                    alarm.hideAllWarningPopups(true);
+                }
             }
-            else {
+            else if (topPos <= 200) {
+
+                // Return menus static positions
                 $topHeader.removeClass('floating activated').css('width',  '');
             }
 
             // Download bar collapse/expand
             if (page === 'download') {
 
-                var dlStarted = $topHeader.hasClass('downloading') || $topHeader.hasClass('download-complete');
+                if (topPos > 50 && $topHeader.hasClass('expanded')) {
 
-                if ((topPos > 150 && $topHeader.is('.expanded')) || dlStarted) {
-                    $topHeader.removeClass('expanded initial').addClass('auto');
-                    $('.pages-menu .submenu, .pages-menu .submenu-item', $topHeader).removeClass('active');
+                    // Collapse download bar
+                    expandDlBar(1);
                 }
-                else if (topPos < 50 && $topHeader.is('.auto')) {
+                else if (topPos < 10 && $topHeader.hasClass('auto')) {
+
+                    // Expand download bar
                     expandDlBar();
                 }
-                return;
-            }
-
-            if ($navBar.length === 0) {
-                return;
-            }
-
-            if (topPos > 300) {
-                $navBar.addClass('floating');
-                $(window).unbind('resize.pagesmenu');
-                $('.submenu.active, .submenu-item.active', $navBar).removeClass('active');
-                topResize();
-                if (topPos > 600) {
-                    $navBar.addClass('activated');
-                }
-            }
-            else if (topPos <= 300 && topPos >= 50) {
-                $navBar.removeClass('activated');
-            }
-            else {
-                $navBar.removeClass('floating activated').removeAttr('style');
             }
         });
-    },
-
-    initMobileFloatingTop: function() {
-        'use strict';
-        var topHeader;
-
-        // Currently only applies to help page
-        if (page.substr(0, 4) === 'help') {
-            topHeader = '.bottom-page .top-head, .old .top-head, .support-section-header';
-        }
-
-        function topResize() {
-            var $topHeader = $(topHeader, 'body');
-            if ($topHeader.hasClass('floating')) {
-                $topHeader.width($topHeader.parent().outerWidth());
-            }
-            else {
-                $topHeader.css('width',  '');
-            }
-        }
-        if (topHeader) {
-            $(window).rebind('resize.topheader', function() {
-                topResize();
-            });
-
-            $(window).rebind('scroll.topmenu', function() {
-                var $topHeader = $(topHeader);
-                var topPos = $(this).scrollTop();
-
-                if (topPos > 300) {
-                    $topHeader.addClass('floating');
-                    topResize();
-                    if (topPos > 400) {
-                        $topHeader.addClass('activated');
-                    }
-                }
-                else if (topPos <= 300 && topPos >= 50) {
-                    $topHeader.removeClass('activated');
-                }
-                else {
-                    $topHeader.removeClass('floating activated').css('width',  '');
-                }
-
-                if (topPos > 300) {
-                    $(window).unbind('resize.pagesmenu');
-                    topResize();
-                }
-            });
-        }
-
     },
 
     videoResizing: function() {

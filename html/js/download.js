@@ -10,18 +10,38 @@ var dlResumeInfo;
 var mediaCollectFn;
 var maxDownloadSize = Math.pow(2, 53);
 
-function expandDlBar() {
+function expandDlBar(close) {
     'use strict';
 
-    var $topBar = $('.download.top-bar');
+    var $downloadPage = $('.scroll-block.download', '.fmholder');
+    var $topBar = $('.download.top-bar', $downloadPage);
+    var $registerPane = $('.register-side-pane.container', $downloadPage);
 
+    if (close) {
+
+        // Show Register pane if user isn't logged in
+        if (!u_type && !is_mobile && !$registerPane.hasClass('visible') && !$registerPane.hasClass('closed')) {
+
+            setTimeout(showRegisterSidePane, 200);
+        }
+
+        // Collapse download bar
+        $topBar.removeClass('expanded initial').css('height', '');
+
+        return $(window).unbind('resize.download-bar');
+    }
+
+    // Expand download bar
     $topBar.addClass('expanded');
 
     (function _resizer() {
         // Set height to  top  bar if it doesn't fit min height
         if ($topBar.hasClass('expanded')) {
+
             var contentHeight = $('.download.main-pad', $topBar).outerHeight(true);
+
             if (contentHeight > $('.download-content', $topBar).outerHeight()) {
+
                 $topBar.css({
                     'height': contentHeight +
                         $('.download.bar-table', $topBar).outerHeight() +
@@ -29,6 +49,7 @@ function expandDlBar() {
                 });
             }
         }
+
         $(window).rebind('resize.download-bar', _resizer);
     })();
 }
@@ -453,9 +474,6 @@ function dl_g(res, ctx) {
                         dlPageStartDownload();
                     }
                     else {
-                        if (!u_type && !is_mobile) {
-                            setTimeout(showRegisterSidePane, 1000);
-                        }
                         watchdog.query('dling')
                             .always(function(res) {
                                 var proceed = true;
@@ -672,6 +690,7 @@ function dl_g(res, ctx) {
         setTimeout(function() {
 
             // Expand Download Bar
+            $topBar.addClass('initial auto');
             expandDlBar();
 
             // Expand top bar if its clicked
@@ -684,20 +703,35 @@ function dl_g(res, ctx) {
                     && !$target.closest('.pages-menu').length
                     && !$topBar.hasClass('download-complete')) {
 
+                    // Expand Download Bar
+                    $topBar.addClass('auto');
                     expandDlBar();
                 }
             });
 
-            // Collapse/Expand top bar events
+            // Collapse/Expand top bar
             $('.top-expand-button, .top-expand-txt', $topBar).rebind('click', function() {
+
                 if ($topBar.hasClass('download-complete') && !$topBar.hasClass('expanded')) {
+
+                    // Change download bar UI: Expand/Collapse button is changed to Close pane.
                     $topBar.addClass('hidden-bar');
+
                     return false;
                 }
                 else if ($(this).hasClass('active')) {
-                    $topBar.removeClass('expanded initial auto').css('height', '');
-                    return $(window).unbind('resize.download-bar');
+
+                    // Stop auto expanding the bar on scroll, as its collapsed manually
+                    $topBar.removeClass('auto');
+
+                    // Collapse download bar
+                    expandDlBar(1);
+
+                    return false;
                 }
+
+                // Expand download bar
+                $topBar.addClass('auto');
                 expandDlBar();
             });
 
@@ -712,7 +746,8 @@ function dl_g(res, ctx) {
                     || ev.originalEvent.detail * 40 || ev.originalEvent.deltaY * 40 || null;
 
                 if ((delta > 120 || delta < -120) && $this.is('.activated')) {
-                    $this.removeClass('expanded initial').css('height', '');
+
+                    expandDlBar(1);
                 }
             });
         }, 100);
@@ -734,11 +769,15 @@ function dl_g(res, ctx) {
 
 // Show register side panel
 function showRegisterSidePane(close) {
+
     'use strict';
-    var $pane = $('.register-side-pane.container');
+
+    var $pane = $('.register-side-pane.container', '.scroll-block.download');
 
     if (close || !$pane.length) {
+
         $pane.removeClass('visible');
+
         return false;
     }
 
@@ -748,8 +787,11 @@ function showRegisterSidePane(close) {
         showLogin: true,
         initFormEvents: true,
         controls: function() {
+
             $('.fm-dialog-close', $pane).rebind('click.registerSidePane', function() {
-                $pane.removeClass('visible');
+
+                $pane.removeClass('visible').addClass('closed');
+
                 return false;
             });
         },
@@ -774,12 +816,7 @@ function dlPageStartDownload(isDlWithMegaSync) {
     'use strict';
     var $downloadPage = $('.download.top-bar');
 
-    // Collapse top bar
-    if (!$downloadPage.hasClass('video-theatre-mode')) {
-        $downloadPage.removeClass('expanded initial').css('height', '');
-    }
     $('.download .pause-transfer').removeClass('hidden active').find('span').text(l[9112]);
-    $(window).unbind('resize.download-bar');
 
     // Initializing...
     $downloadPage.addClass('downloading').removeClass('resumable');
@@ -1178,8 +1215,10 @@ function dlPageCleanup() {
     }
 
     if (dl_node) {
-        $(window).unbind('resize.download-bar');
-        $('.download.top-bar').removeClass('expanded initial');
+
+        // Collapse download bar
+        expandDlBar(1);
+
         $(window).trigger('video-destroy');
         dl_node = false;
     }

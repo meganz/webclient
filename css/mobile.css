@@ -2678,7 +2678,7 @@ input[type='checkbox'] {
     padding-bottom: 2px;
     margin-bottom: 8px;
     margin-left: 16px;
-    margin-right: 11px;
+    margin-right: 16px;
 }
 .register-pass-status-line1, .register-pass-status-line2, .register-pass-status-line3, .register-pass-status-line4, .register-pass-status-line5 {
     background-color: rgba(0, 0, 0, 0.1);
@@ -10794,7 +10794,7 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll, .mob
     }
     .new-registration {
         margin-left: 24px;
-        margin-right: 19px;
+        margin-right: 24px;
     }
     .mobile.signin-button, .mobile.register-button,
     .mobile.resend-button, .mobile.register-cancel-button, .mobile.create-account-button {

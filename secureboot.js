@@ -707,7 +707,11 @@ Object.defineProperty(mega, 'flags', {
 Object.defineProperty(mega, 'paywall', {
     get: function() {
         'use strict';
-        return typeof u_attr === 'object' && (u_attr.uspw || u_attr.b && u_attr.b.s === -1) || false;
+        var res = typeof u_attr === 'object' && (u_attr.uspw || u_attr.b && u_attr.b.s === -1) || false;
+        if (res) {
+            window.onerror = null;
+        }
+        return res;
     }
 });
 
@@ -2886,7 +2890,6 @@ else if (!browserUpdate) {
         'nzipp_js': {f:'html/js/nzipp.js', n: 'nzipp_js', j:1},
         'nzipp_css': {f:'css/nzipp.css', n: 'nzipp_css', j:2},
         'megabird': {f:'html/megabird.html', n: 'megabird', j:0},
-        'uwp': {f:'html/uwp.html', n: 'uwp', j:0},
         'pdfjs2': {f:'js/vendor/pdf.js', n: 'pdfjs2', j:4 },
         'pdfviewer': {f:'html/pdf.viewer.html', n: 'pdfviewer', j:0 },
         'pdfviewercss': {f:'css/pdf.viewer.css', n: 'pdfviewercss', j:4 },
@@ -3013,8 +3016,8 @@ else if (!browserUpdate) {
         'plugin': ['browsers', 'browsers_js'],
         'extensions': ['browsers', 'browsers_js'],
         'bird': ['megabird'],
-        'wp': ['uwp'],
-        'uwp': ['uwp'],
+        'wp': ['mobileapp'],
+        'uwp': ['mobileapp'],
         'unsub': ['unsub', 'unsub_js'],
         'security': ['securitypractice', 'securitypractice_js', 'filesaver'],
         'developersettings': ['developersettings', 'developersettings_js'],

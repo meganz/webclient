@@ -78,18 +78,16 @@
     border-bottom: 1px solid rgba(0,0,0,0.1);
 }
 #mega-text-editor .top-menu-content {
-    padding: 12px 0 24px 0;
+    padding: 8px 0 8px 0;
 }
 #mega-text-editor .top-menu-item {
-    padding-right: 10px;
-    padding-left: 17px;
     cursor: pointer;
     font-size: 14px;
-    font-family: 'source_sans_prosemibold';
+    font-family: 'LatoWebBold';
     line-height: 21px;
     min-height: 32px;
     color: #333;
-    padding: 5px 10px 5px 17px;
+    padding: 0px 8px 0px 8px;
     -webkit-transition: all 200ms ease-in-out;
     -moz-transition: all 200ms ease-in-out;
     -o-transition: all 200ms ease-in-out;
@@ -101,6 +99,19 @@
     box-sizing: border-box;
     position: relative;
     margin: 0;
+}
+#mega-text-editor .top-menu-item .top-menu-item-bg {
+    padding-left: 8px;
+    padding-right: 8px;
+    height: 32px;
+    box-sizing: border-box;
+    border-radius: 4px;
+    border: 1px solid rgba(0,0,0,0);
+}
+#mega-text-editor .top-menu-item .top-menu-item-bg:hover {
+    border: 1px solid rgba(0,0,0,0.07);
+    
+    background-color: rgba(0,0,0,0.02);
 }
 #mega-text-editor .top-menu-item .right-el {
     float: right;
@@ -273,13 +284,18 @@
     opacity: 0.1;
     background-color: #000000;
     position: relative;
-    top: 12px;
+    top: 7px;
 }
 #mega-text-editor .top-menu-divider {
-    height: 24px;
+    height: 16px;
     margin: 0;
     background: none;
 }
 #mega-text-editor .top-menu-item span {
-    font-size: 14px;
+    font-size: 13px;
+    padding-top: 5px;
+    color: #333333;
+}
+#mega-text-editor .top-menu-item span.tiny-icon.green-tick {
+    margin-top: 6px;
 }

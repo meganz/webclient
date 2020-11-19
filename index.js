@@ -624,7 +624,6 @@ function init_page() {
         && (page !== 'contact')
         && (page !== 'mobileapp')
         && (page !== 'nas')
-        && (page !== 'uwp')
         && (page !== 'extensions')
         && (page !== 'sync')
         && (page !== 'cmd')
@@ -1492,14 +1491,14 @@ function init_page() {
         });
         $('.credits-main-pad').html(html + '<div class="clear"></div>');
     }
-    else if (page === 'mobile' || page === 'android' || page === 'ios') {
+    else if (page === 'mobile' || page === 'android' || page === 'ios' || page === 'uwp' || page === 'wp') {
         parsepage(pages['mobileapp']);
 
         // On clicking the 'Learn more' button
-        $('.uwp-windows-scrollto-button').rebind('click', function() {
+        $('.bottom-page.big-link', '.top-bl').rebind('click.scrollToContent', function() {
 
             // Scroll to the Windows Phone section
-            $('.uwp-windows-section').get(0).scrollIntoView({behavior: "smooth"});
+            $('.full-block', '.scroll-block').get(0).scrollIntoView({behavior: "smooth"});
         });
     }
     else if (page === 'nas') {
@@ -1516,10 +1515,6 @@ function init_page() {
     else if (page === 'extensions') {
         parsepage(pages['browsers']);
         browserspage.init();
-    }
-    else if (page === 'uwp' || page === 'wp') {
-        parsepage(pages['uwp']);
-        bottompage.initTabs();
     }
     else if (page === 'business') {
         parsepage(pages['business']);
@@ -2431,7 +2426,7 @@ function topmenuUI() {
                     'copyright', 'corporate', 'credits', 'doc', 'extensions',
                     'help', 'login', 'mega', 'nzippmember', 'nziphotographer', 'privacy', 'gdpr', 'mobileapp',
                     'mobile', 'privacycompany', 'register', 'resellers', 'sdk', 'sync', 'sitemap', 'sourcecode',
-                    'support', 'sync', 'takedown', 'terms', 'start', 'uwp', 'security', 'downloadapp', 'affiliate',
+                    'support', 'sync', 'takedown', 'terms', 'start', 'security', 'downloadapp', 'affiliate',
                     'nas', 'pro'
                 ];
                 var moveTo = {

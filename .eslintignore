@@ -31,3 +31,4 @@ contrib/Electron/main.js
 *.xml
 js/chat/emojidata/emojis.json
 eslint-local-rules.js
+Gruntfile.js

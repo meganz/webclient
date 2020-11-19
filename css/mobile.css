@@ -6124,10 +6124,19 @@ textarea.mobile.support-text-field {
 }
 .mobile.update-password .new-registration, .mobile.park-account-block .new-registration {
     margin-left: 24px;
-    margin-right: 20px;
+    margin-right: 24px;
 }
 .mobile.update-password .mobile.register-button.account-recovery, .mobile.park-account-block .park-account {
     margin: 8px 24px;
+}
+
+.mobile.park-account-block .park-account.update-password-button {
+    margin-top: 160px;
+}
+
+.mobile.park-account-block .confirm-data-loss .radio-txt {
+    padding-right: 0;
+    padding-top: 0;
 }
 /* Achievements page */
 .mobile.main-block.achievements-page, .mobile.main-block.achievements-invite-friends-page, .mobile.main-block.achievements-how-it-works-page {

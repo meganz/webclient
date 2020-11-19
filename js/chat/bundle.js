@@ -7018,6 +7018,17 @@ const NODE_CONTAINER_CLASS = 'node-container';
 const NODE_CLASS = 'node';
 const RESULT_CONTAINER_CLASS = 'gif-panel-results';
 const RESULTS_END_CLASS = 'results-end';
+
+const Nil = ({
+  children
+}) => external_React_default.a.createElement("div", {
+  className: "no-results-container"
+}, external_React_default.a.createElement("div", {
+  className: "no-results-content"
+}, external_React_default.a.createElement("i", {
+  className: "huge-icon sad-smile"
+}), external_React_default.a.createElement("span", null, children)));
+
 class resultContainer_ResultContainer extends mixins["MegaRenderMixin"] {
   constructor(props) {
     super(props);
@@ -7078,8 +7089,13 @@ class resultContainer_ResultContainer extends mixins["MegaRenderMixin"] {
       loading,
       results,
       bottom,
+      unavailable,
       onClick
     } = this.props;
+
+    if (unavailable) {
+      return external_React_default.a.createElement(Nil, null, LABELS.NOT_AVAILABLE);
+    }
 
     if (loading && results.length < 1) {
       return external_React_default.a.createElement("div", {
@@ -7098,13 +7114,7 @@ class resultContainer_ResultContainer extends mixins["MegaRenderMixin"] {
     }
 
     if (!loading && results.length < 1) {
-      return external_React_default.a.createElement("div", {
-        className: "no-results-container"
-      }, external_React_default.a.createElement("div", {
-        className: "no-results-content"
-      }, external_React_default.a.createElement("i", {
-        className: "huge-icon sad-smile"
-      }), external_React_default.a.createElement("span", null, LABELS.NO_RESULTS)));
+      return external_React_default.a.createElement(Nil, null, LABELS.NO_RESULTS);
     }
 
     if (results.length) {
@@ -7170,7 +7180,8 @@ const API = {
 const LABELS = {
   SEARCH: l[24025],
   END_OF_RESULTS: l[24156],
-  NO_RESULTS: l[24050]
+  NO_RESULTS: l[24050],
+  NOT_AVAILABLE: l[24512]
 };
 class gifPanel_GifPanel extends mixins["MegaRenderMixin"] {
   constructor(props) {
@@ -7182,7 +7193,8 @@ class gifPanel_GifPanel extends mixins["MegaRenderMixin"] {
       results: [],
       loading: true,
       offset: 0,
-      bottom: false
+      bottom: false,
+      unavailable: false
     };
     this.state = extends_default()({}, this.defaultState);
 
@@ -7223,7 +7235,8 @@ class gifPanel_GifPanel extends mixins["MegaRenderMixin"] {
 
     this.doFetch = path => {
       this.setState({
-        loading: true
+        loading: true,
+        unavailable: false
       }, () => {
         fetch(this.getFormattedPath(path)).then(response => response.json()).then(({
           data
@@ -7241,7 +7254,9 @@ class gifPanel_GifPanel extends mixins["MegaRenderMixin"] {
               loading: false
             }, () => this.resultContainerRef.reinitialise());
           }
-        }).catch(ex => console.error('doFetch > error ->', ex));
+        }).catch(ex => this.setState({
+          unavailable: true
+        }, () => console.error('doFetch > error ->', ex, this.state)));
       });
     };
 
@@ -7333,7 +7348,8 @@ class gifPanel_GifPanel extends mixins["MegaRenderMixin"] {
       searching,
       results,
       loading,
-      bottom
+      bottom,
+      unavailable
     } = this.state;
     return external_React_default.a.createElement("div", {
       className: "gif-panel-wrapper"
@@ -7363,6 +7379,7 @@ class gifPanel_GifPanel extends mixins["MegaRenderMixin"] {
       results: results,
       loading: loading,
       bottom: bottom,
+      unavailable: unavailable,
       onPaginate: this.doPaginate,
       onClick: this.doSend
     })))));

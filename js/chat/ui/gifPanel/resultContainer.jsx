@@ -9,6 +9,15 @@ export const NODE_CLASS = 'node';
 const RESULT_CONTAINER_CLASS = 'gif-panel-results';
 const RESULTS_END_CLASS = 'results-end';
 
+const Nil = ({ children }) => (
+    <div className="no-results-container">
+        <div className="no-results-content">
+            <i className="huge-icon sad-smile"/>
+            <span>{children}</span>
+        </div>
+    </div>
+);
+
 export default class ResultContainer extends MegaRenderMixin {
     intersectionObserver = null;
 
@@ -68,7 +77,11 @@ export default class ResultContainer extends MegaRenderMixin {
     }
 
     render() {
-        const { loading, results, bottom, onClick } = this.props;
+        const { loading, results, bottom, unavailable, onClick } = this.props;
+
+        if (unavailable) {
+            return <Nil>{LABELS.NOT_AVAILABLE}</Nil>;
+        }
 
         if (loading && results.length < 1) {
             return (
@@ -83,14 +96,7 @@ export default class ResultContainer extends MegaRenderMixin {
         }
 
         if (!loading && results.length < 1) {
-            return (
-                <div className="no-results-container">
-                    <div className="no-results-content">
-                        <i className="huge-icon sad-smile" />
-                        <span>{LABELS.NO_RESULTS}</span>
-                    </div>
-                </div>
-            );
+            return <Nil>{LABELS.NO_RESULTS}</Nil>;
         }
 
         if (results.length) {

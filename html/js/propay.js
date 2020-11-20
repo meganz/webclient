@@ -518,17 +518,17 @@ pro.propay = {
         $chargeAmount.text(dollars + decimal + cents);
 
         // Update storage
-        if ($storageTip && $storageTip.data('simpletip')) {
+        if ($storageTip && $storageTip.attr('data-simpletip')) {
             $('span', $storageAmount)
                 .safeHTML(l[23789].replace('%1', '<span>' + storageValue + '</span>'));
-            $storageTip.data('simpletip', l[23807].replace('%1', '[U]' + storageValue + '[/U]'));
+            $storageTip.attr('data-simpletip', l[23807].replace('%1', '[U]' + storageValue + '[/U]'));
         }
 
         // Update bandwidth
         if ($bandwidthTip && $bandwidthTip.data('simpletip')) {
             $('span', $bandwidthAmount)
                 .safeHTML(l[23790].replace('%1', '<span>' + bandwidthValue + '</span>'));
-            $bandwidthTip.data('simpletip', bandwidthText.replace('%1', '[U]' + bandwidthValue + '[/U]'));
+            $bandwidthTip.attr('data-simpletip', bandwidthText.replace('%1', '[U]' + bandwidthValue + '[/U]'));
         }
     },
 

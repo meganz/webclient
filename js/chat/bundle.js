@@ -17234,7 +17234,7 @@ __webpack_require__(22);
 const EMOJI_DATASET_VERSION = 3;
 const CHAT_ONHISTDECR_RECNT = "onHistoryDecrypted.recent";
 const LOAD_ORIGINALS = {
-  'image/gif': 4e6,
+  'image/gif': 25e6,
   'image/png': 2e5,
   'image/webp': 2e5
 };

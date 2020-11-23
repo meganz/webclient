@@ -2014,7 +2014,7 @@ function generateShareDialogRow(displayNameOrEmail, email, shareRights, userHand
     }
 
     // Add contact
-    $.sharedTokens.push(email);
+    $.sharedTokens.push(email.toLowerCase());
 
     rowId = (userHandle) ? userHandle : email;
     if (u_attr && userHandle === u_attr.u) {
@@ -2137,7 +2137,7 @@ function shareDialogAccessListBinds() {
             }
 
             // Remove it from multi-input tokens
-            var sharedIndex = $.sharedTokens.indexOf(userEmail);
+            var sharedIndex = $.sharedTokens.indexOf(userEmail.toLowerCase());
             if (sharedIndex > -1) {
                 $.sharedTokens.splice(sharedIndex, 1);
             }

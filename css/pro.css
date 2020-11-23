@@ -376,12 +376,6 @@ i.pricing-sprite,
 }
 
 /* Pricing page */
-.capitalized-first-letter {
-    text-transform: lowercase;
-}
-.capitalized-first-letter:first-letter {
-    text-transform: uppercase;
-}
 .pricing-section .top-bl {
     padding-bottom: 34px;
 }
@@ -535,10 +529,6 @@ i.pricing-sprite,
     line-height: 34px;
     color: #373737;
     font-family: 'montserrat_light', 'montserrat', Arial;
-    text-transform: uppercase;
-}
-.pricing-page.plan-title.top-header {
-    text-transform: none;
 }
 .pricing-page.plan-info {
     font-size: 16px;
@@ -783,13 +773,6 @@ body:not(.mobile) .plan.pro3:not(.current) .pricing-page.plan-button:hover {
 }
 .pricing-page.plan-feature span {
     display: inline-block;
-    text-transform: lowercase;
-}
-.pricing-page.plan-feature span:first-letter {
-    text-transform: uppercase;
-}
-.pricing-page.plan-feature span span {
-    text-transform: none;
 }
 .pricing-page.plan-feature.strong {
     font-family: 'LatoWebBold', Arial;
@@ -861,15 +844,8 @@ body:not(.mobile) .plan.pro3:not(.current) .pricing-page.plan-button:hover {
     border-radius: 4px;
     position: fixed;
 }
-.dark-direct-tooltip.pricing-tip.transformed {
-    text-transform: lowercase;
-}
-.dark-direct-tooltip.pricing-tip.transformed:first-letter {
-    text-transform: uppercase;
-}
 .dark-direct-tooltip.pricing-tip.transformed u {
     text-decoration: none;
-    text-transform: none;
 }
 .dark-direct-tooltip.pricing-tip.transformed span {
     position: relative;
@@ -1100,7 +1076,6 @@ body:not(.mobile) .pricing-page.slider-dot:hover {
 }
 .slide1 .pricing-page.compare-period.free {
     display: block;
-    text-transform: uppercase;
 }
 .slide1 .pricing-page.compare-storage {
     display: none;
@@ -1276,7 +1251,6 @@ body:not(.mobile) .pricing-page.slider-dot:hover {
     padding-bottom: 28px;
 }
 .payment-section .button.purchase {
-    text-transform: uppercase;
     margin-top: 65px;
 }
 .payment-page.header {
@@ -1943,7 +1917,6 @@ body.mobile .redeem-promo-page .mega-input-title-ontop {
         height: 18px;
         padding: 0 8px;
         border-radius: 9px;
-        text-transform: uppercase;
     }
     .pricing-page .save-green-arrow {
         width: 24px;

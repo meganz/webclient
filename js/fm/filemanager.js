@@ -2210,7 +2210,7 @@ FileManager.prototype.initUIKeyEvents = function() {
         );
 
         // selection manager may not be available on empty folders.
-        var is_selection_manager_available = !!selectionManager;
+        var is_selection_manager_available = !!window.selectionManager;
 
         var sl = false;
         var s = [];

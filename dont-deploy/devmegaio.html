@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <script>
+        /*
+         * Devboot is a temp solution that is used for testing purposes
+         * ... (no PHP there ;)). So if anyone wonders whats the
+         * "dont-deploy" folder, it contains stuff which are used for
+         * development/debugging/internal demo purposes and it should
+         * not be deployed to production.
+         *
+         * The devboot.html also setups the localStorage so that:
+         *
+         * 0) Clear the localStorage
+         *
+         * 1) Debug mode is enabled - e.g. a lot of stuff will be
+         *    printed in the dev console, via console.* and the
+         *    MegaLogger.
+         *
+         * 2) Static path is dynamically set to ../../ (relative to
+         *    dont-deploy/devboot.html). This means that the staticPath
+         *    should be correctly set even if you have your project
+         *    running in localhost/meganz-webclient/ or customVhost/ +
+         *    it will work with http OR https.
+         *
+         * 3) Will enable the megaChat (<-- major thing, may change a
+         *    lot of stuff)
+         *
+         * 4) Will force the secureboot to load the actual .js files
+         *    instead of just pushing ALL javascript files into a single
+         *    blog: (this was really helpful for debugging the JS code
+         *    using the Chrome debugger).
+         *
+         * 5) Will enable stopOnAssertFail, which in case of assertion
+         *    fail (mainly in the chat.js code) will run a debugger;
+         *    (something pretty handy during development)
+         */
+
+        var devhost = window.location.host;
+        var pathSuffix = window.location.pathname;
+        pathSuffix = pathSuffix.split("/").slice(0, -2).join("/");
+
+        localStorage.clear();
+        //localStorage.staticpath = window.location.protocol + "//" + devhost + pathSuffix + "/";
+
+        // Disable the cryptographic hash verification logic.
+        localStorage.dd = '1';
+        localStorage.apipath = 'https://staging.api.mega.co.nz/';
+        //localStorage.apipath = 'https://api-sandbox3.developers.mega.co.nz/';
+        //localStorage.apipath = 'https://api-sandbox4.developers.mega.co.nz/';
+
+        // localStorage.contextmenu = '1';
+        // localStorage.bTest = true;
+
+        localStorage.jj = '1';
+        // localStorage.stopOnAssertFail = '1';
+
+        // Turn on full debugging.
+        localStorage.d = '1'; // Using console.*
+        // localStorage.businessTestDate = 1;
+        localStorage.minLogLevel = '0'; // Using MegaLogger, '0' = MegaLogger.LEVELS.DEBUG.
+        // localStorage.hashLogic = 1;
+        localStorage.testIO = 1;
+        // Chat stuff.
+        // localStorage.dxmpp = '1';
+        // localStorage.chatDisabled = '1';
+
+        if (window.location.host == "mega.dev") { // Lyubo's local env settings
+            // localStorage.mpencDebug = '1';
+            localStorage.dxmpp = '1';
+            // localStorage.stopOnAssertFail = '1';
+            localStorage.contextmenu = '1';
+
+            // MegaLogger setup.
+            // TODO: muteList -> loggerMuteList
+            localStorage.muteList = JSON.stringify([
+                "mdbEncryptionPlugin",
+                "querySet\\[chatMessages\\]",
+                "mDBEncryptionPlugin"
+            ]);
+        }
+
+        window.location = '../';
+
+    </script>
+</head>
+<body>
+
+</body>
+</html>

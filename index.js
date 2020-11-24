@@ -2783,10 +2783,10 @@ function parsepage(pagehtml) {
         pagehtml = pagehtml.replace(/\/#/g, '/' + urlrootfile + '#');
     }
 
-    if (!$.mTransferWidgetPage) {
+    if (!$.mTransferWidgetPage && pages.transferwidget) {
         $.mTransferWidgetPage = translate(pages.transferwidget);
     }
-    pagehtml = ($.mTransferWidgetPage + pagehtml).replace(/{staticpath}/g, staticpath);
+    pagehtml = (($.mTransferWidgetPage || '') + pagehtml).replace(/{staticpath}/g, staticpath);
 
     $('#startholder', $body).safeHTML(pagehtml).removeClass('hidden');
 
@@ -2967,7 +2967,7 @@ window.addEventListener('popstate', function(event) {
 window.onbeforeunload = function () {
     'use strict';
 
-    if (dlmanager.isDownloading || ulmanager.isUploading) {
+    if (window.dlmanager && (dlmanager.isDownloading || ulmanager.isUploading)) {
         return $.memIOSaveAttempt ? null : l[377];
     }
 

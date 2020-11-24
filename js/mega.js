@@ -2951,6 +2951,7 @@ function processPH(publicHandles) {
 
             if (fminitialized && M.currentdirid === 'public-links') {
                 removeUInode(nodeId, value.p);
+                selectionManager.remove_from_selection(nodeId);
             }
 
             if (UiExportLink) {

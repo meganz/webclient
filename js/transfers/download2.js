@@ -777,6 +777,32 @@ var dlmanager = {
         }
     },
 
+    logDecryptionError: function(dl, skipped) {
+        'use strict';
+
+        if (dl && Array.isArray(dl.url)) {
+            // Decryption error from direct CloudRAID download
+
+            var str = "";
+            if (dl.cloudRaidSettings) {
+                str += "f:" + dl.cloudRaidSettings.onFails;
+                str += " t:" + dl.cloudRaidSettings.timeouts;
+                str += " sg:" + dl.cloudRaidSettings.startglitches;
+                str += " tmf:" + dl.cloudRaidSettings.toomanyfails;
+            }
+
+            eventlog(99720, JSON.stringify([3, dl && dl.id, str, skipped ? 1 : 0]));
+        }
+        else if (String(dl && dl.url).length > 256) {
+            // Decryption error from proxied CloudRAID download
+
+            eventlog(99706, JSON.stringify([2, dl && dl.id, skipped ? 1 : 0]));
+        }
+        else {
+            eventlog(99711, JSON.stringify([2, dl && dl.id, skipped ? 1 : 0]));
+        }
+    },
+
     dlReportStatus: function DM_reportstatus(dl, code) {
         this.logger.warn('dlReportStatus', code, this.getGID(dl), dl);
 
@@ -807,26 +833,7 @@ var dlmanager = {
         }
 
         if (eekey) {
-            if (dl && Array.isArray(dl.url)) {
-                // Decryption error from native CloudRAID download
-
-                var str = "";
-                if (dl.cloudRaidSettings) {
-                    str += "f:" + dl.cloudRaidSettings.onFails;
-                    str += " t:" + dl.cloudRaidSettings.timeouts;
-                    str += " sg:" + dl.cloudRaidSettings.startglitches;
-                    str += " tmf:" + dl.cloudRaidSettings.toomanyfails;
-                }
-
-                eventlog(99720, JSON.stringify([2, dl && dl.id, str]));
-            }
-            else if (String(dl && dl.url).length > 256) {
-                // Decryption error from proxied CloudRAID download
-                eventlog(99706, JSON.stringify([1, dl && dl.id]));
-            }
-            else {
-                eventlog(99711, JSON.stringify([1, dl && dl.id]));
-            }
+            this.logDecryptionError(dl);
         }
 
         if (code === ETEMPUNAVAIL) {

@@ -58,8 +58,8 @@
     top: 0;
     max-height: 0;
     overflow: hidden;
-    -webkit-transition: opacity 200ms ease-in-out;
-    transition: opacity 200ms ease-in-out;
+    -webkit-transition: opacity 400ms ease-in-out;
+    transition: opacity 400ms ease-in-out;
     box-shadow: none;
     background-color: transparent;
 }

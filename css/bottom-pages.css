@@ -3519,6 +3519,7 @@ body:not(.mobile) .securitypractice .business-text a.red:hover {
     max-width: 100%;
     display: inline-block;
     text-overflow: ellipsis;
+    vertical-align: top;
 }
 /* end of Browser extensions page */
 /* Bird */

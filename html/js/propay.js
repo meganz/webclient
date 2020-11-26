@@ -577,7 +577,7 @@ pro.propay = {
         }
 
         // Set text
-        var subscribeOrPurchase = (recurringEnabled) ? l[6172] : l[6190].toLowerCase();
+        var subscribeOrPurchase = (recurringEnabled) ? l[23675] : l[6190];
         var subscribeOrPurchaseInstruction = (recurringEnabled) ? l[22074] : l[7996];
         var recurringOrNonRecurring = (recurringEnabled) ? '(' + l[6965] + ')' : l[6941];
         var recurringMonthlyOrAnnuallyMessage = (numOfMonths === 1) ? l[10628] : l[10629];

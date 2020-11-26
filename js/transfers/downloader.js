@@ -426,8 +426,15 @@ ClassFile.prototype.destroy = function() {
         }
     }
     else {
-        if (!this.emptyFile && !dlmanager.checkLostChunks(this.dl)
-                && (typeof skipcheck === 'undefined' || !skipcheck)) {
+        var skipMacIntegrityCheck = 1;// typeof skipcheck !== 'undefined' && skipcheck;
+        var macIntegritySuccess = this.emptyFile || dlmanager.checkLostChunks(this.dl);
+
+        if (skipMacIntegrityCheck && !macIntegritySuccess) {
+            console.warn('MAC Integrity failed, but ignoring...', this.dl);
+            dlmanager.logDecryptionError(this.dl, true);
+        }
+
+        if (!macIntegritySuccess && !skipMacIntegrityCheck) {
             dlmanager.dlReportStatus(this.dl, EKEY);
 
             if (this.dl.zipid) {

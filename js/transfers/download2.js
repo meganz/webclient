@@ -989,12 +989,12 @@ var dlmanager = {
                     return file.macs[v];
                 });
 
-            mac = condenseMacs(t, [
+            mac = condenseMacs_checkGaps(t, [
                 dl_key[0] ^ dl_key[4],
                 dl_key[1] ^ dl_key[5],
                 dl_key[2] ^ dl_key[6],
                 dl_key[3] ^ dl_key[7]
-            ], file.mac);
+            ], file.mac, dl_key[6], dl_key[7]);
         }
 
         if (have_ab && (dl_key[6] !== (mac[0] ^ mac[1]) || dl_key[7] !== (mac[2] ^ mac[3]))) {

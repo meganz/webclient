@@ -38,7 +38,8 @@
                     .addClass('blue-block');
 
                 // Show PRO plan details
-                $('.storage-amount', $voucherBlock).safeHTML(l[24097]);
+                $('.storage-amount', $voucherBlock)
+                    .safeHTML(l[23789].replace('%1', '<span>15 ' + l[20160] + '</span>'));
                 $('.transfer-amount', $voucherBlock).safeHTML(l[24098]);
             }
             else {

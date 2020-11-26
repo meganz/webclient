@@ -528,7 +528,7 @@ i.pricing-sprite,
     font-size: 28px;
     line-height: 34px;
     color: #373737;
-    font-family: 'montserrat_light', 'montserrat', Arial;
+    font-family: montserrat_light, montserrat, Arial, sans-serif;
 }
 .pricing-page.plan-info {
     font-size: 16px;

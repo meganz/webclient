@@ -24,20 +24,23 @@ BusinessRegister.prototype.initPage = function(preSetNb, preSetName, preSetTel, 
     var $pageContainer = $('.bus-reg-body');
     var mySelf = this;
 
-    var $nbUsersInput = $pageContainer.find('#business-nbusrs').val(preSetNb || '');
-    var $cnameInput = $pageContainer.find('#business-cname').val(preSetName || '');
-    var $telInput = $pageContainer.find('#business-tel').val(preSetTel || '');
-    var $fnameInput = $pageContainer.find('#business-fname').val(preSetFname || '');
-    var $lnameInput = $pageContainer.find('#business-lname').val(preSetLname || '');
-    var $emailInput = $pageContainer.find('#business-email').val(preSetEmail || '');
-    var $passInput = $pageContainer.find('#business-pass').val('');
-    var $rPassInput = $pageContainer.find('#business-rpass').val('');
-    $pageContainer.find('.bus-reg-radio-block .bus-reg-radio').removeClass('checkOn').addClass('checkOff');
-    $pageContainer.find('.mega-terms.bus-reg-agreement .bus-reg-checkbox').removeClass('checkOn');
-    $pageContainer.find('.ok-to-auto.bus-reg-agreement .bus-reg-checkbox').addClass('checkOn');
-    $pageContainer.find('.bus-reg-agreement.mega-terms .bus-reg-txt').safeHTML(l['208s']);
-    $pageContainer.find('.bus-reg-plan .business-base-plan .left')
+    var $nbUsersInput = $('#business-nbusrs', $pageContainer).val(preSetNb || '');
+    var $cnameInput = $('#business-cname', $pageContainer).val(preSetName || '');
+    var $telInput = $('#business-tel', $pageContainer).val(preSetTel || '');
+    var $fnameInput = $('#business-fname', $pageContainer).val(preSetFname || '');
+    var $lnameInput = $('#business-lname', $pageContainer).val(preSetLname || '');
+    var $emailInput = $('#business-email', $pageContainer).val(preSetEmail || '');
+    var $passInput = $('#business-pass', $pageContainer).val('');
+    var $rPassInput = $('#business-rpass', $pageContainer).val('');
+    var $storageInfo = $('.business-plan-note span', $pageContainer);
+
+    $('.bus-reg-radio-block .bus-reg-radio', $pageContainer).removeClass('checkOn').addClass('checkOff');
+    $('.mega-terms.bus-reg-agreement .bus-reg-checkbox', $pageContainer).removeClass('checkOn');
+    $('.ok-to-auto.bus-reg-agreement .bus-reg-checkbox', $pageContainer).addClass('checkOn');
+    $('.bus-reg-agreement.mega-terms .bus-reg-txt', $pageContainer).safeHTML(l['208s']);
+    $('.bus-reg-plan .business-base-plan .left', $pageContainer)
         .text(l[19503].replace('[0]', this.minUsers));
+    $storageInfo.text(l[23789].replace('%1', '15 ' + l[20160]));
 
     var nbUsersMegaInput = new mega.ui.MegaInputs($nbUsersInput, {
         onHideError: function() {

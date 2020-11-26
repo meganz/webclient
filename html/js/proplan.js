@@ -820,7 +820,10 @@ pro.proplan = {
 
         var $stepOne = $('.pricing-section', 'body');
         var $pricingBoxes = $('.pricing-page.plan', $stepOne);
-        var $businessPrice = $('.plan-price', $pricingBoxes.filter('.business'));
+        var $businessBoxes = $pricingBoxes.filter('.business');
+        var $businessPrice = $('.plan-price', $businessBoxes);
+        var $businessStorageInfo = $('.plan-feature.storage-b span', $businessBoxes);
+        var businessStorageAmount = '15 ' + l[20160];
         var euroSign = '\u20ac';
 
         var updateResults = pro.proplan.updateEachPriceBlock("P", $pricingBoxes, undefined, 1);
@@ -835,6 +838,10 @@ pro.proplan = {
 
         $businessPrice.text(
             $businessPrice.text().replace('.', mega.intl.decimalSeparator)
+        );
+
+        $businessStorageInfo.safeHTML(
+            l[23789].replace('%1', '<span>' + businessStorageAmount + '</span>')
         );
     },
 

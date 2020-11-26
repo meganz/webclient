@@ -1239,6 +1239,12 @@ mBroadcaster.once('boot_done', function populate_l() {
     l[24141] = escapeHTML(l[24141]).replace('[A]', '<a class="red" href="https://mega.nz/blog_48">')
         .replace('[/A]', '</a>');
     l[24431] = escapeHTML(l[24431]).replace('[A]', '<a href="/repay" class="clickurl">').replace('[/A]', '</a>');
+    l[24547] = escapeHTML(l[24547]).replace('[A1]', '<a target="_blank" href="/sourcecode" class="clickurl">')
+        .replace('[/A1]', '</a>')
+        .replace('[A2]', '<a target="_blank" href="/security" class="clickurl">')
+        .replace('[/A2]', '</a>')
+        .replace(/\[S]/g, '<span>').replace(/\[\/S]/g, '</span>')
+        .replace(/\[BR]/g, '<br/>');
 
     var common = [
         15536, 16106, 16107, 16119, 16120, 16123, 16124, 16135, 16136, 16137, 16138, 16304, 16313, 16315, 16316,
@@ -1247,7 +1253,7 @@ mBroadcaster.once('boot_done', function populate_l() {
         18298, 18302, 18303, 18304, 18305, 18314, 18315, 18316, 18419, 19807, 19808, 19810, 19811, 19812, 19813,
         19814, 19854, 19821, 19930, 20402, 20462, 20966, 20967, 20969, 20970, 20971, 20973, 22117, 22667, 22668,
         22674, 22669, 22671, 22784, 22789, 22881, 22883, 23098, 23351, 23521, 23522, 23523, 23524, 23532, 23533,
-        23534, 23296, 23299, 23304, 23819, 24077, 24097, 24098, 24099,  24139
+        23534, 23296, 23299, 23304, 23819, 24077, 24097, 24098, 24099,  24139, 24540, 24542, 24543, 24544, 24546
     ];
     for (i = common.length; i--;) {
         var num = common[i];

@@ -558,7 +558,8 @@ catch(e) {
         );
         browserUpdate = 1;
     }
-    }
+}
+
 is_litesite = is_litesite || (localStorage.testIO && !is_embed);
 if (location.host === 'mega.io') {
     tmp = document.head.querySelector('meta[property="og:url"]');
@@ -2072,7 +2073,12 @@ else if (!browserUpdate) {
                     dump.m = [].concat(lns.slice(0,2), "[..!]", lns.slice(-2)).join(" ");
                 }
             }
-            dump.m = (is_mobile ? '[mobile] ' : is_embed ? '[embed] ' : is_drop ? '[drop] ' : '') + dump.m.replace(/\s+/g, ' ');
+            dump.m = (
+                is_mobile ? '[mobile] ' :
+                    is_embed ? '[embed] ' :
+                        is_drop ? '[drop] ' :
+                            is_litesite ? '[lite] ' : ''
+            ) + dump.m.replace(/\s+/g, ' ');
 
             if (!window.jsl_done && !window.u_checked) {
                 // Alert the user if there was an uncaught exception while
@@ -2795,6 +2801,7 @@ else if (!browserUpdate) {
         jsl.push({f:'html/embedplayer.html', n: 'index', j: 0});
         jsl.push({f:'css/embedplayer.css', n: 'embedplayer_css', j: 2, w: 5});
     }
+
     if (is_litesite) {
         jsl = [{f: langFilepath, n: 'lang', j: 3}];
         jsl.push({f:'js/vendor/jquery.js', n: 'jquery', j:1, w:10});

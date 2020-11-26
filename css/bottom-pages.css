@@ -350,11 +350,6 @@ html.gbot {
 .bottom-page.top-bl .table {
     overflow: visible;
 }
-.bottom-page.img-wrap::before {
-    content: '';
-    display: block;
-    height: 100%;
-}
 .mobile .bottom-page.top-bl {
     max-height: 1024px;
 }
@@ -382,9 +377,9 @@ html.gbot {
     overflow-y: hidden;
 }
 .fmholder .bottom-page.scroll-block {
-    height: 100%;
     position: relative;
     display: block;
+    height: 100%;
 }
 .bottom-page.vertical-centered-bl {
     display: table;
@@ -417,6 +412,7 @@ html.gbot {
     display: table;
     width: 100%;
     margin: 0 auto;
+    table-layout: fixed;
     text-align: center;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
@@ -5320,9 +5316,10 @@ body:not(.mobile) .bottom-page.dropdown .dropdown-item:hover, .bottom-page.dropd
         text-align: left;
         padding-left: 15px;
     }
-    .bottom-page .inline-block.col-3, .bottom-page .inline-block.col-2 {
-        width: 100%;
-        display: table;
+    .bottom-page .inline-block.col-3,
+    .bottom-page .inline-block.col-2 {
+        width: auto;
+        display: block;
     }
     .bottom-page .inline-block.col-4 {
         width: 50%;

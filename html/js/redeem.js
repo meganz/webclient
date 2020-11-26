@@ -600,7 +600,7 @@ var redeem = {
             history.replaceState({ subpage: 'fm' }, "", '/fm');
 
             // Show Business plan details
-            $('.storage-amount', $voucherBlock).safeHTML(l[23954]);
+            $('.storage-amount', $voucherBlock).safeHTML(l[23789].replace('%1', '15 ' + l[20160]));
             $('.transfer-amount', $voucherBlock).safeHTML(l[23813]);
 
             if (window.bCreatedVoucher) {
@@ -672,7 +672,7 @@ var redeem = {
             var $dlgTitle = $('.dialog-title', $dlg).removeClass('red');
 
             if (mega.voucher.businessmonths) {
-                $('.v-storage', $dlg).safeHTML(l[24097]);
+                $('.v-storage', $dlg).safeHTML(l[23789].replace('%1', '<span>15 ' + l[20160] + '</span>'));
                 $('.v-transfer', $dlg).safeHTML(l[24098]);
 
                 $('.voucher-logo', $dlg).addClass('business-v');

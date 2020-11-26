@@ -56,6 +56,7 @@ var is_bot = !is_extension && /bot|crawl/i.test(ua);
 var is_old_windows_phone = /Windows Phone 8|IEMobile\/9|IEMobile\/10|IEMobile\/11/i.test(ua);
 var is_uc_browser = /ucbrowser/.test(ua);
 var is_livesite = location.host === 'mega.nz' || location.host === 'mega.io' || is_extension;
+var is_litesite = !is_embed && location.host === 'mega.io';
 self.fetchStreamSupport = (
     window.fetch && !window.MSBlobBuilder
     && typeof ReadableStream === 'function'
@@ -557,8 +558,8 @@ catch(e) {
         );
         browserUpdate = 1;
     }
-}
-
+    }
+is_litesite = is_litesite || (localStorage.testIO && !is_embed);
 if (location.host === 'mega.io') {
     tmp = document.head.querySelector('meta[property="og:url"]');
     if (tmp) {
@@ -674,6 +675,9 @@ var mega = {
     urlParams: function() {
         if (!this._urlParams) {
             var params = '&domain=meganz'; // domain origin
+            if (location.host === 'mega.io') {
+                params = '&domain=megaio';
+            }
 
             // If using an extension, the version is passed through to the API for the helpdesk tool
             if (is_extension) {
@@ -904,6 +908,15 @@ else {
     }
 
     page = getCleanSitePath(page);
+    if (is_litesite) {
+        window.redirect = {
+            'login': true, 'register': 1, 'registerb': 1, 'recovery': 1, 'reset': 1, 'cancel': 1, 'newsignup': 1,
+            'recover': 1, 'redeem': true, 'megadrop': true, 'support': 1, 'copyrightnotice': 1
+        };
+        if (redirect[page]) {
+            window.location.replace('https://mega.nz/' + page);
+        }
+    }
 	// put try block around it to allow the page to be rendered in Google cache
 	try
 	{
@@ -2372,7 +2385,6 @@ else if (!browserUpdate) {
 
     // Get the language file path e.g. lang/en.json or 'lang/en_7a8e15911490...f1878e1eb3.json'
     var langFilepath = getLanguageFilePath(lang);
-
     jsl.push({f:langFilepath, n: 'lang', j:3});
     jsl.push({f:'sjcl.js', n: 'sjcl_js', j:1});
     jsl.push({f:'nodedec.js', n: 'nodedec_js', j:1});
@@ -2456,8 +2468,6 @@ else if (!browserUpdate) {
     jsl.push({f:'html/js/bottompage.js', n: 'bottompage_js', j:1});
     jsl.push({f:'html/pagesmenu.html', n: 'pagesmenu', j:0});
     jsl.push({f:'html/bottom2.html', n: 'bottom2',j:0});
-    jsl.push({f:'html/business.html', n: 'business',j:0});
-    jsl.push({f:'html/js/business.js', n: 'business_pp_js', j:1});
     jsl.push({f:'html/megainfo.html', n: 'megainfo', j:0});
     jsl.push({f:'js/filedrag.js', n: 'filedrag_js', j:1});
     jsl.push({f:'js/thumbnail.js', n: 'thumbnail_js', j:1});
@@ -2549,13 +2559,6 @@ else if (!browserUpdate) {
     // Everything else...
     jsl.push({f:'index.js', n: 'index', j:1,w:4});
 
-    if (is_mobile) {
-        jsl.push({f:'html/top-mobile.html', n: 'top-mobile', j:0});
-    }
-    else {
-        jsl.push({f:'html/top.html', n: 'top', j:0});
-    }
-
     jsl.push({f:'html/transferwidget.html', n: 'transferwidget', j:0});
     jsl.push({f:'js/filetypes.js', n: 'filetypes_js', j:1});
     jsl.push({f:'js/fm/removenode.js', n: 'fm_removenode_js', j: 1});
@@ -2584,6 +2587,7 @@ else if (!browserUpdate) {
     jsl.push({f:'js/megadrop.js', n: 'megadrop_js', j:1});
 
     if (!is_mobile) {
+        jsl.push({f:'html/top.html', n: 'top', j:0});
         jsl.push({f:'css/style.css', n: 'style_css', j:2, w:30, c:1, d:1, cache:1});
         jsl.push({f:'js/vendor/megalist.js', n: 'megalist_js', j:1, w:5});
         jsl.push({f:'js/vendor/megaDynamicList.js', n: 'mega_dynamic_list_js', j:1, w:5});
@@ -2677,6 +2681,7 @@ else if (!browserUpdate) {
 
     // Load files common to all mobile pages
     if (is_mobile) {
+        jsl.push({f:'html/top-mobile.html', n: 'top-mobile', j:0});
         jsl.push({f:'css/mobile.css', n: 'mobile_css', j: 2, w: 30, c: 1, d: 1, m: 1});
         jsl.push({f:'css/mobile-help.css', n: 'mobile_css', j: 2, w: 30, c: 1, d: 1, m: 1});
         jsl.push({f:'css/mobile-top-menu.css', n: 'mobile_top_menu_css',  j: 2, w: 30, c: 1, d: 1, m: 1});
@@ -2790,6 +2795,86 @@ else if (!browserUpdate) {
         jsl.push({f:'html/embedplayer.html', n: 'index', j: 0});
         jsl.push({f:'css/embedplayer.css', n: 'embedplayer_css', j: 2, w: 5});
     }
+    if (is_litesite) {
+        jsl = [{f: langFilepath, n: 'lang', j: 3}];
+        jsl.push({f:'js/vendor/jquery.js', n: 'jquery', j:1, w:10});
+        jsl.push({f:'js/jquery.protect.js', n: 'jqueryprotect_js', j: 1});
+        jsl.push({f:'js/vendor/jquery-ui.js', n: 'jqueryui_js', j:1, w:10});
+        jsl.push({f:'js/vendor/jquery.mousewheel.js', n: 'jquerymouse_js', j:1});
+        jsl.push({f:'js/vendor/jquery.jscrollpane.js', n: 'jscrollpane_js', j:1});
+        jsl.push({f:'js/jscrollpane.utils.js', n: 'jscrollpane_utils_js', j: 1});
+        jsl.push({f:'js/jquery.misc.js', n: 'jquerymisc_js', j:1});
+        jsl.push({f:'js/utils/browser.js', n: 'js_utils_browser_js', j: 1});
+        jsl.push({f:'js/utils/locale.js', n: 'js_utils_locale_js', j: 1});
+        jsl.push({f:'js/utils/dom.js', n: 'js_utils_dom_js', j: 1});
+        jsl.push({f:'js/utils/network.js', n: 'js_utils_network_js', j: 1});
+        jsl.push({f:'js/utils/timers.js', n: 'js_utils_timers_js', j: 1});
+        jsl.push({f:'js/megaPromise.js', n: 'megapromise_js', j:1,w:5});
+        jsl.push({f:'index.js', n: 'index', j:1,w:4});
+        jsl.push({f:'js/staticPages.js', n: 'staticPages_js', j:1});
+        jsl.push({f:'js/metatags.js', n: 'metatags_js', j:1 });
+        jsl.push({f:'html/js/start.js', n: 'start_js', j:1});
+        jsl.push({f:'html/js/bottompage.js', n: 'bottompage_js', j:1});
+        jsl.push({f:'css/bottom-pages.css', n: 'bottom-pages_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/startpage.css', n: 'startpage_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'html/start.html', n: 'start', j:0});
+        jsl.push({f:'css/bottom-menu.css', n: 'bottom-menu_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'html/bottom2.html', n: 'bottom2',j:0});
+        jsl.push({f:'html/megainfo.html', n: 'megainfo', j:0});
+        jsl.push({f:'html/pagesmenu.html', n: 'pagesmenu', j:0});
+        jsl.push({f:'css/fonts.css', n: 'fonts_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'html/js/megasync.js', n: 'megasync_js', j: 1});
+        jsl.push({f:'css/business.css', n: 'business_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/retina-images.css', n: 'retina_images_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
+        jsl.push({f:'js/cms.js', n: 'cms_js', j:1});
+        jsl.push({f:'html/proplan.html', n: 'proplan', j:0});
+        jsl.push({f:'html/propay.html', n: 'propay', j:0});
+        jsl.push({f:'html/js/pro.js', n: 'pro_js', j:1});
+        jsl.push({f:'html/js/proplan.js', n: 'proplan_js', j:1});
+        jsl.push({f:'html/js/propay.js', n: 'propay_js', j:1});
+        jsl.push({f:'html/js/propay-dialogs.js', n: 'propay_js', j:1});
+        jsl.push({f:'css/pro.css', n: 'pro_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/about.css', n: 'about_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/media-viewer.css', n: 'media_viewer_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/corporate.css', n: 'corporate_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'html/staticdialog.html', n: 'staticdialog', j:0});
+        jsl.push({f:'js/ui/languageDialog.js', n: 'languagedialog_js', j:1});
+        jsl.push({f:'css/dialogs-common.css', n: 'dialogs-common_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'js/utils/clipboard.js', n: 'js_utils_clipboard_js', j: 1});
+        jsl.push({f:'js/ui/simpletip.js', n: 'simpletip_js', j:1,w:1});
+        if (lang === 'ar' || lang === 'fa') {
+            jsl.push({f:'css/lang_ar.css', n: 'lang_arabic_css', j: 2, w: 30, c: 1, d: 1, m: 1 });
+        }
+        if (lang === 'th') {
+            jsl.push({f:'css/lang_th.css', n: 'lang_thai_css', j: 2, w: 30, c: 1, d: 1, m: 1 });
+        }
+        if (is_mobile) {
+            jsl.push({f:'html/top-mobile.html', n: 'top-mobile', j:0});
+            jsl.push({f:'css/mobile.css', n: 'mobile_css', j: 2, w: 30, c: 1, d: 1, m: 1});
+            jsl.push({f:'css/mobile-help.css', n: 'mobile_css', j: 2, w: 30, c: 1, d: 1, m: 1});
+            jsl.push({f:'css/mobile-top-menu.css', n: 'mobile_top_menu_css',  j: 2, w: 30, c: 1, d: 1, m: 1});
+            jsl.push({f:'html/mobile.html', n: 'mobile', j: 0, w: 1});
+            jsl.push({f:'js/vendor/jquery.mobile.js', n: 'jquery_mobile_js', j: 1, w: 5});
+            jsl.push({f:'js/mobile/mobile.js', n: 'mobile_js', j: 1, w: 1});
+            jsl.push({f:'js/mobile/mobile.language-menu.js', n: 'mobile_language_menu_js', j: 1, w: 1});
+            jsl.push({f:'js/mobile/mobile.titlemenu.js', n: 'mobile_titlemenu_js', j: 1, w: 1});
+            jsl.push({f:'js/mobile/mobile.message-overlay.js', n: 'mobile_message_overlay_js', j: 1, w: 1});
+            jsl.push({f:'css/psa.css', n: 'psa_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
+            jsl.push({f:'js/mobile/mobile.terms.js', n: 'mobile_terms_js', j: 1, w: 1});
+        }
+        else {
+            jsl.push({f:'css/style.css', n: 'style_css', j:2, w:30, c:1, d:1, cache:1});
+            jsl.push({f:'css/dialogs.css', n: 'dialogs_css', j:2,w:5,c:1,d:1,cache:1});
+            jsl.push({f:'html/top.html', n: 'top', j:0});
+            jsl.push({f:'css/top-menu.css', n: 'top_menu_css', j:2, w:30, c:1, d:1, cache:1});
+            jsl.push({f:'css/buttons.css', n: 'buttons_css', j:2,w:5,c:1,d:1,cache:1});
+            jsl.push({f:'css/help2.css', n: 'help_css', j:2,w:5,c:1,d:1,cache:1});
+            jsl.push({f:'css/dropdowns.css', n: 'dropdowns_css', j:2,w:5,c:1,d:1,cache:1});
+            jsl.push({f:'css/popups.css', n: 'popups_css', j:2,w:5,c:1,d:1,cache:1});
+        }
+        // end of staticPages
+
+    }
 
     if (is_drop) {
         u_checked = true;
@@ -2899,6 +2984,8 @@ else if (!browserUpdate) {
         'megadrop_js': {f:'js/megadrop.js', n: 'megadrop_js', j:1 },
         'businessAcc_js': {f:'js/fm/megadata/businessaccount.js', n: 'businessAcc_js', j:1 },
         'businessAccUI_js': {f:'js/fm/businessAccountUI.js', n: 'businessAccUI_js', j:1 },
+        'business': {f:'html/business.html', n: 'business',j:0},
+        'businessjs': {f:'html/js/business.js', n: 'business_pp_js', j:1},
         'charts_js': {f:'js/vendor/Chart.js', n: 'charts_js', j:1},
         'charthelper_js': {f:'js/ui/chart.helper.js', n: 'charthelper_js', j:1},
         'business_invoice': {f:'html/invoicePDF.html', n: 'business_invoice', j:0},
@@ -3024,6 +3111,7 @@ else if (!browserUpdate) {
         'megadrop': ['megadrop', 'nomegadrop'],
         'nzippmember': ['nzipp', 'nzipp_js', 'nzipp_css'],
         'nziphotographer': ['nzipp', 'nzipp_js', 'nzipp_css'],
+        'business': ['business', 'businessjs']
     };
 
     if (is_mobile) {
@@ -4221,29 +4309,6 @@ mBroadcaster.once('startMega', function() {
         onIdle(function() {
             M.transferFromMegaCoNz(data);
         });
-    }
-
-    if (location.host === 'mega.io') {
-        window.addEventListener('click', function(ev) {
-            var target = ev.target || false;
-
-            if (target.nodeName === 'A' && target.classList.contains('top-login-button')) {
-                ev.preventDefault();
-                ev.stopPropagation();
-                location.href = "https://mega.nz/login";
-            }
-        }, true);
-
-        var redirect = {login: 1, register: 1};
-        var checkPage = function _(page) {
-            if (redirect[page] || String(page).substr(0, 9) === 'registerb') {
-                location.href = "https://mega.nz/" + page;
-                loadSubPage('start');
-            }
-        };
-
-        checkPage(page);
-        mBroadcaster.addListener('pagechange', checkPage);
     }
 
     if (window.uTagMT) {

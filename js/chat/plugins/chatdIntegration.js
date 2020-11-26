@@ -52,9 +52,9 @@ var ChatdIntegration = function(megaChat) {
         self.chatd.destroyed = true;
     });
 
-    mBroadcaster.addListener('onChatdChatUpdatedActionPacket', SoonFc(10, function(actionPacket) {
+    mBroadcaster.addListener('onChatdChatUpdatedActionPacket', function(actionPacket) {
         self.openChat(actionPacket).dump('onChatdChatUpdatedActionPacket');
-    }));
+    });
 
     self.chatd.rebind('onNumByHandle.chatdInt', function(e, eventData) {
         var chatRoom = megaChat.getChatById(eventData.chatId);

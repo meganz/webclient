@@ -724,8 +724,9 @@ mBroadcaster.once('boot_done', function populate_l() {
     var i;
 
     if (d) {
+        let dstringids = localStorage.dstringids;
         for (i = 32000; i--;) {
-            l[i] = (l[i] || '(translation-missing)');
+            l[i] = dstringids ? '[$' + i + ']' : (l[i] || '(missing-$' + i + ')')
         }
     }
     l[0] = 'MEGA ' + new Date().getFullYear();

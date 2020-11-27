@@ -1971,20 +1971,6 @@ if (showLegacyMobilePage) {
 else if (!browserUpdate) {
     d = window.d || 0;
     jj = window.jj || 0;
-    var onBetaW = location.hostname === 'beta.mega.nz' || location.hostname.indexOf("developers.") === 0;
-
-    if (typeof console == "undefined") { this.console = { log: function() {}, error: function() {}}}
-    if (d && !console.time) (function(c)
-    {
-        var timers = {};
-        c.time = function(n) { timers[n] = new Date().getTime()};
-        c.timeEnd = function(n) {
-            if (timers[n]) {
-                c.log(n + ': ' + (new Date().getTime() - timers[n]) + 'ms');
-                delete timers[n];
-            }
-        };
-    })(console);
 
     // Do not report exceptions if this build is older than 10 days
     var exTimeLeft = ((buildVersion.timestamp + (10 * 86400)) * 1000) > Date.now();
@@ -1995,7 +1981,7 @@ else if (!browserUpdate) {
         window.buildOlderThan10Days = false;
     }
 
-    if (!d && exTimeLeft && (location.host === 'mega.nz' || is_extension || onBetaW))
+    if (!d && exTimeLeft && is_livesite)
     {
         var __cdumps = [], __cd_t;
         window.onerror = function __MEGAExceptionHandler(msg, url, ln, cn, errobj)
@@ -2900,11 +2886,6 @@ else if (!browserUpdate) {
     // If the TextEncoder is not supported natively (IE, Edge) then load the polyfill
     if (typeof TextEncoder !== 'function') {
         jsl.push({f:'js/vendor/encoding.js', n: 'encoding_js', j:1});
-    }
-
-    // only used on beta
-    if (onBetaW) {
-        jsl.push({f:'js/betacrashes.js', n: 'betacrashes_js', j: 1});
     }
 
     var jsl2 =

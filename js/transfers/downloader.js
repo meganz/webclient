@@ -426,7 +426,7 @@ ClassFile.prototype.destroy = function() {
         }
     }
     else {
-        var skipMacIntegrityCheck = 1;// typeof skipcheck !== 'undefined' && skipcheck;
+        var skipMacIntegrityCheck = typeof skipcheck !== 'undefined' && skipcheck;
         var macIntegritySuccess = this.emptyFile || dlmanager.checkLostChunks(this.dl);
 
         if (skipMacIntegrityCheck && !macIntegritySuccess) {
@@ -556,7 +556,7 @@ ClassFile.prototype.run = function(task_done) {
                         this.dl.byteOffset, resumeOffset);
                 }
 
-                this.dl.mac = this.dl.resumeInfo.mac = [0, 0, 0, 0];
+                this.dl.macs = this.dl.resumeInfo.macs = Object.create(null);
                 this.dl.byteOffset = this.dl.resumeInfo.byteOffset = 0;
 
                 api_req({a: 'log', e: 99651, m: 'download resume attempt failed'});

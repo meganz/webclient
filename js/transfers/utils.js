@@ -165,12 +165,12 @@ Speedometer.prototype.progress = function(p) {
 };
 
 // compute final MAC from block MACs
-function condenseMacs(macs, key, initialMac) {
+function condenseMacs(macs, key) {
     'use strict';
 
     var i, j, mblk;
-    var mac = initialMac || [0, 0, 0, 0];
-    var aes = new sjcl.cipher.aes([key[0], key[1], key[2], key[3]]);
+    var mac = [0, 0, 0, 0];
+    var aes = Array.isArray(key) ? new sjcl.cipher.aes([key[0], key[1], key[2], key[3]]) : key;
 
     for (i = 0; i < macs.length; i++) {
         mblk = macs[i];
@@ -186,67 +186,6 @@ function condenseMacs(macs, key, initialMac) {
     }
 
     return mac;
-}
-
-// compute final MAC from block MACs
-function condenseMacs_gaps(macs, key, macG, gapStart, gapEnd) {
-    'use strict';
-
-    var i, j, mblk;
-    var aes = new sjcl.cipher.aes([key[0], key[1], key[2], key[3]]);
-
-    for (i = 0; i < macs.length; i++) {
-        if (i < gapStart || i >= gapEnd) {
-
-            mblk = macs[i];
-
-            for (j = 0; j < mblk.length; j += 4) {
-                macG[0] ^= mblk[j];
-                macG[1] ^= mblk[j + 1];
-                macG[2] ^= mblk[j + 2];
-                macG[3] ^= mblk[j + 3];
-
-                macG = aes.encrypt(macG);
-            }
-        }
-    }
-
-    return macG;
-}
-
-// compute final MAC from block MACs, allow for EOF chunk race gaps
-function condenseMacs_checkGaps(macs, key, initialMac, dlk6, dlk7) {
-    'use strict';
-
-    var initialMacCopy1 = Array.from(initialMac) || [0, 0, 0, 0];
-
-    // normal case, correct file, correct mac
-    var fullmac = condenseMacs(macs, key, initialMacCopy1);
-    if (dlk6 === (fullmac[0] ^ fullmac[1]) && dlk7 === (fullmac[2] ^ fullmac[3])) {
-        return fullmac;
-    }
-
-    // up to two onnections lost the race, up to 32MB (ie chunks) each
-    var end = macs.length;
-    var finalN = Math.min(32 * 2, end);
-
-    // most likely - a single connection gap (possibly two combined)
-    for (var countBack = 1; countBack <= finalN; ++countBack)
-    {
-        var start1 = end - countBack;
-        for (var len1 = 1; len1 <= 64 && start1 + len1 <= end; ++len1)
-        {
-            var initialMacCopy2 = Array.from(initialMac) || [0, 0, 0, 0];
-
-            var mac = condenseMacs_gaps(macs, key, initialMacCopy2, start1, start1 + len1);
-            if (dlk6 === (mac[0] ^ mac[1]) && dlk7 === (mac[2] ^ mac[3])) {
-                //logger.info('Resolved mac gap %d %d of %d', start1, start1+len1, end);
-                return mac;
-            }
-        }
-    }
-
-    return fullmac;
 }
 
 function chksum(buf) {

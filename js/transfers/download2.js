@@ -59,7 +59,7 @@ var dlmanager = {
     isDownloading: false,
     dlZipID: 0,
     gotHSTS: false,
-    resumeInfoTag: 'dlmr!',
+    resumeInfoTag: 'dlrv2!',
     resumeInfoCache: Object.create(null),
     logger: MegaLogger.getLogger('dlmanager'),
 
@@ -148,7 +148,7 @@ var dlmanager = {
             return MegaPromise.reject(EINCOMPLETE);
         }
 
-        dl.resumeInfo.mac = dl.mac;
+        dl.resumeInfo.macs = dl.macs;
         dl.resumeInfo.byteOffset = byteOffset;
 
         if (d) {
@@ -336,7 +336,7 @@ var dlmanager = {
 
         dl.url = gres.g;
         dl.urls = dl_urls;
-        dl.mac = resumeInfo.mac || [0, 0, 0, 0];
+        dl.macs = resumeInfo.macs || dl.macs || Object.create(null);
         dl.resumeInfo = resumeInfo || Object.create(null);
         dl.byteOffset = dl.resumeInfo.byteOffset = byteOffset;
 
@@ -972,32 +972,9 @@ var dlmanager = {
 
     checkLostChunks: function DM_checkLostChunks(file) {
         'use strict';
-
-        var mac;
         var dl_key = file.key;
 
-        if (file.hasResumeSupport) {
-            mac = file.mac;
-        }
-        else {
-            var t = Object.keys(file.macs)
-                .map(Number)
-                .sort(function(a, b) {
-                    return a - b;
-                })
-                .map(function(v) {
-                    return file.macs[v];
-                });
-
-            mac = condenseMacs_checkGaps(t, [
-                dl_key[0] ^ dl_key[4],
-                dl_key[1] ^ dl_key[5],
-                dl_key[2] ^ dl_key[6],
-                dl_key[3] ^ dl_key[7]
-            ], file.mac, dl_key[6], dl_key[7]);
-        }
-
-        if (have_ab && (dl_key[6] !== (mac[0] ^ mac[1]) || dl_key[7] !== (mac[2] ^ mac[3]))) {
+        if (!this.verifyIntegrity(file)) {
             return false;
         }
 
@@ -1020,6 +997,65 @@ var dlmanager = {
         }
 
         return true;
+    },
+
+    /** compute final MAC from block MACs, allow for EOF chunk race gaps */
+    verifyIntegrity: function(dl) {
+        'use strict';
+        const match = (mac) => dl.key[6] === (mac[0] ^ mac[1]) && dl.key[7] === (mac[2] ^ mac[3]);
+        const macs = Object.keys(dl.macs).map(Number).sort((a, b) => a - b).map(v => dl.macs[v]);
+        const aes = new sjcl.cipher.aes([
+            dl.key[0] ^ dl.key[4], dl.key[1] ^ dl.key[5], dl.key[2] ^ dl.key[6], dl.key[3] ^ dl.key[7]
+        ]);
+
+        let mac = condenseMacs(macs, aes);
+
+        // normal case, correct file, correct mac
+        if (match(mac)) {
+            return true;
+        }
+
+        // up to two connections lost the race, up to 32MB (ie chunks) each
+        const end = macs.length;
+        const max = Math.min(32 * 2, end);
+        const gap = (macs, gapStart, gapEnd) => {
+            let mac = [0, 0, 0, 0];
+
+            for (let i = 0; i < macs.length; ++i) {
+                if (i < gapStart || i >= gapEnd) {
+                    let mblk = macs[i];
+
+                    for (let j = 0; j < mblk.length; j += 4) {
+                        mac[0] ^= mblk[j];
+                        mac[1] ^= mblk[j + 1];
+                        mac[2] ^= mblk[j + 2];
+                        mac[3] ^= mblk[j + 3];
+
+                        mac = aes.encrypt(mac);
+                    }
+                }
+            }
+            return mac;
+        };
+
+        // most likely - a single connection gap (possibly two combined)
+        for (let countBack = 1; countBack <= max; ++countBack) {
+            const start1 = end - countBack;
+
+            for (let len1 = 1; len1 <= 64 && start1 + len1 <= end; ++len1) {
+                mac = gap(macs, start1, start1 + len1);
+
+                if (match(mac)) {
+                    if (d) {
+                        this.logger.warn(dl.owner + ' Resolved MAC Gap %d-%d/%d', start1, start1 + len1, end);
+                    }
+                    eventlog(99739);
+                    return true;
+                }
+            }
+        }
+
+        return false;
     },
 
     dlWriter: function DM_dl_writer(dl, is_ready) {
@@ -1080,21 +1116,6 @@ var dlmanager = {
                         task.offset,
                         abLen
                     ).set(abDup || task.data);
-                }
-
-                if (dl.hasResumeSupport) {
-                    if (d > 1) {
-                        logger.debug('Condense MACs @ offset %s-%s', task.offset, dl.writer.pos, Object.keys(dl.macs));
-                    }
-
-                    for (var pos = task.offset; dl.macs[pos] && pos < dl.writer.pos; pos += 1048576) {
-                        dl.mac[0] ^= dl.macs[pos][0];
-                        dl.mac[1] ^= dl.macs[pos][1];
-                        dl.mac[2] ^= dl.macs[pos][2];
-                        dl.mac[3] ^= dl.macs[pos][3];
-                        dl.mac = dl.aes.encrypt(dl.mac);
-                        delete dl.macs[pos];
-                    }
                 }
 
                 dlmanager.setResumeInfo(dl, dl.writer.pos)

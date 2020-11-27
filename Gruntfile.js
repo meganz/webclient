@@ -74,6 +74,7 @@ var Secureboot = function() {
         var jsKeys   = Object.keys(jsGroups);
         var cssGroups = this.getCSSGroups();
         var cssKeys   = Object.keys(cssGroups);
+        var allowExtraHTML = false;
         for (var i in content) {
             var file = null;
             if (content[i].match(/jsl\.push.+(js)/)) {
@@ -82,7 +83,10 @@ var Secureboot = function() {
                     lines.push(content[i]);
                     continue;
                 }
-                file = file[0].substr(1, file[0].length-2);
+                file = file[0].substr(1, file[0].length - 2);
+                if (file === 'js/staticPages.js') {
+                    allowExtraHTML = true;
+                }
                 if (jsGroups[jsKeys[0]] && jsGroups[jsKeys[0]][0] == file) {
                     ns.addHeader(lines, jsGroups[jsKeys[0]]);
                     lines.push("    jsl.push({f:'" + jsKeys[0] + "', n: '" + jsKeys[0].replace(/[^a-z0-9]/ig, "-") + "', j: 1, w: " + getWeight(jsKeys[0]) + "});");
@@ -109,8 +113,11 @@ var Secureboot = function() {
                     lines.push(content[i]);
                 }
             } else if (content[i].match(/jsl\.push.+html/) && content[i].indexOf('embedplayer') < 0) {
-                if (!addedHtml) {
+                if (!addedHtml || allowExtraHTML ) {
                     lines.push("    jsl.push({f:'html/templates.json', n: 'templates', j: 0, w: " + getWeight("html/templates.json") +  "});");
+                    if (allowExtraHTML) {
+                        allowExtraHTML = false;
+                    }
                 }
                 addedHtml = true;
             } else {

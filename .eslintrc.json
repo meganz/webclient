@@ -25,9 +25,8 @@
         "unicorn"
     ],
     "extends": [
-        "plugin:es/no-2019",
-        "plugin:es/no-2018",
         "eslint:recommended",
+        "plugin:es/restrict-to-es2017",
         "plugin:no-unsanitized/DOM",
         "plugin:react/recommended",
         "plugin:sonarjs/recommended"
@@ -159,13 +158,8 @@
         "es/no-atomics": 2,
         "es/no-exponential-operators": 2,
         "es/no-generators": 2,
+        "es/no-promise-all-settled": "off",
         "es/no-trailing-function-commas": 2,
-        // es2020
-        "es/no-dynamic-import": 2,
-        //"es/no-export-ns-from": 2,
-        "es/no-global-this": 2,
-        //"es/no-import-meta": 2,
-        //"es/no-nullish-coalescing-operators": 2,
 
         "jquery/no-ajax": 2,
         "jquery/no-deferred": 2,

@@ -331,24 +331,26 @@ MegaData.prototype.clearRubbish = function(all) {
 
     if (all) {
         loadingDialog.show();
-        for (var h in M.c[M.RubbishID]) {
-            if (M.c[M.RubbishID][h]) {
-                ulmanager.ulClearTargetDeleted(h);
-            }
-        }
+        ulmanager.ulClearTargetDeleted(M.getTreeHandles(M.RubbishID));
         return M.req('dr').finally(loadingDialog.hide.bind(loadingDialog));
     }
 
     var selids;
+    var fail = 0;
     var success = 0;
     var idtag = mRandomToken('cr');
     var promise = new MegaPromise();
 
-    var apiReq = function apiReq(handle) {
-        api_req({ a: 'd', n: handle, i: idtag }, {
+    var apiReq = function apiReq(handle, i) {
+        api_req({a: 'd', n: handle, i: i}, {
             callback: function(res) {
                 if (res !== 0) {
                     console.warn('Failed to delete node with handle: ' + handle + ' Result: ' + res);
+
+                    if (++fail === selids.length && typeof M.scAckQueue[idtag] === 'function') {
+                        onIdle(M.scAckQueue[idtag]);
+                        delete M.scAckQueue[idtag];
+                    }
                 }
                 else {
                     success++;
@@ -379,11 +381,13 @@ MegaData.prototype.clearRubbish = function(all) {
                 promise.reject(selids.length - success);
             }
         };
-        selids.forEach(function (handle) {
-            // Check is there a upload target the deleted folder.
-            ulmanager.ulClearTargetDeleted(handle);
-            apiReq(handle);
-        });
+
+        for (var i = selids.length; i--;) {
+            apiReq(selids[i], i ? idtag.substr(-5) : idtag);
+        }
+
+        // Check is there a upload target the deleted folder.
+        ulmanager.ulClearTargetDeleted(selids);
     }
     else {
         promise.reject(EINCOMPLETE);

@@ -1145,26 +1145,34 @@ var ulmanager = {
      * Abort and Clear items in upload list those are targeting a deleted folder.
      * This is triggered by `d` action packet.
      *
-     * @param {Object} deletedNodeId  Node id of deleted node
+     * @param {String|Array} handles  handle(s) of deleted node(s)
      */
-    ulClearTargetDeleted: function (deletedNodeId) {
+    ulClearTargetDeleted: function(handles) {
         'use strict';
 
+        if (!ul_queue.length) {
+            return false;
+        }
+        if (!Array.isArray(handles)) {
+            handles = [handles];
+        }
+
         var toAbort = [];
-        ul_queue.filter(isQueueActive).forEach(function(ul) {
-            if (ul.target === deletedNodeId) {
+        for (var i = ul_queue.length; i--;) {
+            var ul = isQueueActive(ul_queue[i]) && ul_queue[i] || false;
+
+            if (ul && handles.indexOf(ul.target) !== -1) {
                 var gid = ulmanager.getGID(ul);
                 toAbort.push(gid);
                 $('.transfer-status', $('#' + gid).addClass('transfer-error')).text(l[20634]);
                 mega.tpw.errorDownloadUpload(mega.tpw.UPLOAD, ul, l[20634]);
             }
-        });
+        }
 
         if (toAbort.length) {
             eventlog(99726);
             ulmanager.abort(toAbort);
         }
-
     }
 };
 

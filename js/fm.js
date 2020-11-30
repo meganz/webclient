@@ -1029,8 +1029,9 @@ function avatarDialog(close) {
  * @constructor
  */
 function FMShortcuts() {
-
+    'use strict';
     var current_operation = null;
+    mBroadcaster.addListener('crossTab:fms!cut/copy', ev => (current_operation = ev.data));
 
     $(window).rebind('keydown.fmshortcuts', function(e) {
         var isContactRootOrShareRoot = false;
@@ -1080,6 +1081,7 @@ function FMShortcuts() {
                 'op': charTyped == "c" ? 'copy' : 'cut',
                 'src': items
             };
+            mBroadcaster.crossTab.notify('fms!cut/copy', current_operation);
 
             return false; // stop prop.
         }
@@ -1093,14 +1095,12 @@ function FMShortcuts() {
                 return false; // stop prop.
             }
 
-            var handles = [];
-            $.each(current_operation.src, function(k, v) {
-                handles.push(v);
-            });
+            var handles = current_operation.src;
 
-            if (current_operation.op == "copy") {
+            if (current_operation.op === "copy") {
                 M.copyNodes(handles, M.currentdirid);
-            } else if (current_operation.op == "cut") {
+            }
+            else if (current_operation.op === "cut") {
                 M.moveNodes(handles, M.currentdirid);
                 current_operation = null;
             }

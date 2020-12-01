@@ -146,6 +146,15 @@ function addNewContact($addButton, cd) {
 
             var currentContactsEmails = [];
 
+            var pushAsAddedEmails = function() {
+                if (currentContactsEmails.indexOf(email) === -1) {
+                    // if invitation is sent, push as added Emails.
+                    promises.push(M.inviteContact(M.u[u_handle].m, email, emailText).done(function(res) {
+                        addedEmails.push(res);
+                    }));
+                }
+            };
+
             M.u.forEach(function(contact) {
                 // Active contacts with email set
                 if (contact.c === 1 && contact.m) {
@@ -158,13 +167,19 @@ function addNewContact($addButton, cd) {
                 $mails.each(function(index, value) {
                     // Extract email addresses one by one
                     email = $(value).contents().eq(1).text();
-                    if (currentContactsEmails.indexOf(email) === -1) {
-                        // if invitation is sent, push as added Emails.
-                        promises.push(M.inviteContact(M.u[u_handle].m, email, emailText).done(function(res) {
-                            addedEmails.push(res);
-                        }));
-                    }
+
+                    pushAsAddedEmails();
                 });
+            }
+
+            if ($.dialog === 'share' && Object.keys($.addContactsToShare).length > 0) {
+                // Invite new contacts to share
+                for (var i in $.addContactsToShare) {
+                    email = $.addContactsToShare[i].u;
+                    emailText = $.addContactsToShare[i].msg;
+
+                    pushAsAddedEmails();
+                }
             }
 
             // after all process is done, and there is added email(s), show invitation sent dialog.
@@ -516,15 +531,16 @@ function contactsInfoDialog(title, username, msg, close) {
 }
 
 /**
- * publicLinkInit
-  *
- * Set piublick link and init CopyToClipboard events
+ * setContactLink
  *
+ * Set public link and init CopyToClipboard events
+ * @param {Node|jQuery} [$container] optional container node, used to scope the `public-contact-link`
+ * @returns {undefined|Boolean}
  */
-function setContactLink() {
+function setContactLink($container) {
     "use strict";
 
-    var $publicLink = $('.public-contact-link:visible');
+    var $publicLink = $container ? $('.public-contact-link', $container) : $('.public-contact-link:visible');
     // multiple link data may exists!
     var linkData = $publicLink.attr('data-lnk');
     var account = M.account || false;
@@ -542,7 +558,7 @@ function setContactLink() {
     }
     else {
         api_req({ a: 'clc' }, {
-            callback: function (res, ctx) {
+            callback: function(res) {
                 if (typeof res === 'string') {
                     contactPrefix =  res.match('^C!') ? '' : 'C!';
                     res = 'https://mega.nz/' + contactPrefix + res;
@@ -558,17 +574,22 @@ function setContactLink() {
         var leftPos = $this.offset().left + $this.width() / 2 - $tooltip.outerWidth() / 2;
         var topPos = $this.offset().top - $tooltip.outerHeight() - 10;
 
-        $tooltip.addClass('visible').css({
-            'left': leftPos,
-            'top': topPos
-        });
+        $tooltip
+            .addClass('visible')
+            .removeClass('hidden')
+            .css({
+                'left': leftPos,
+                'top': topPos
+            });
     });
 
     $publicLink.rebind('mouseout.publiclnk', function() {
-        $('.dropdown.tooltip.small').removeClass('visible');
+        $('.dropdown.tooltip.small')
+            .removeClass('visible')
+            .addClass('hidden');
     });
 
-    $publicLink.rebind('click', function() {
+    $publicLink.rebind('click.publiclnk', function() {
         var linkData = $(this).attr('data-lnk') || '';
 
         if (linkData.length) {
@@ -639,7 +660,7 @@ function contactAddDialog(close, dontWarnBusiness) {
 
     M.safeShowDialog('add-user-popup', $d);
 
-    setContactLink();
+    setContactLink($d);
 
     var $textarea = $d.find('.add-user-textarea textarea');
 
@@ -687,7 +708,7 @@ function contactAddDialog(close, dontWarnBusiness) {
     });
 
     $('.add-user-popup .fm-dialog-close').rebind('click', function() {
-        showWarningTokenInputLose().done(closeDialog);
+        showLoseChangesWarning().done(closeDialog);
     });
 }
 
@@ -819,6 +840,11 @@ function fmtopUI() {
     $('.fm-clearbin-button').rebind('click', function() {
         doClearbin(true);
     });
+}
+
+function fmLeftMenuUI() {
+
+    "use strict";
 
     // handle the Inbox section use cases
     if (M.hasInboxItems()) {
@@ -835,8 +861,8 @@ function fmtopUI() {
     // handle the RubbishBin icon changes
     var $icon = $('.nw-fm-left-icon.rubbish-bin');
     var rubNodes = Object.keys(M.c[M.RubbishID] || {});
+
     if (rubNodes.length) {
-        $('.fm-tree-header.recycle-item').addClass('recycle-notification contains-subfolders');
 
         if (!$icon.hasClass('filled')) {
             $icon.addClass('filled');
@@ -849,11 +875,14 @@ function fmtopUI() {
         }
     }
     else {
-        $('.fm-tree-header.recycle-item')
-            .removeClass('recycle-notification expanded contains-subfolders')
-            .prev('.fm-connector-first').removeClass('active');
-
         $icon.removeClass('filled glow');
+    }
+
+    if (mega.flags.refpr) {
+        $('.nw-fm-left-icon.affiliate').removeClass('hidden');
+    }
+    else {
+        $('.nw-fm-left-icon.affiliate').addClass('hidden');
     }
 }
 
@@ -1042,7 +1071,7 @@ function FMShortcuts() {
             (e.ctrlKey || e.metaKey) &&
             !isContactRootOrShareRoot
         ) {
-            var items = selectionManager.get_selected();
+            var items = clone(selectionManager.get_selected());
             if (items.length === 0 || M.currentdirid === 'ipc' || M.currentdirid === 'opc') {
                 return; // dont do anything.
             }
@@ -1082,12 +1111,12 @@ function FMShortcuts() {
             charCode === 8 &&
             !isContactRootOrShareRoot
         ) {
-            var items = selectionManager.get_selected();
-            if (items.length === 0 || (M.getNodeRights(M.currentdirid || '') | 0) < 2) {
+            var remItems = selectionManager.get_selected();
+            if (remItems.length === 0 || (M.getNodeRights(M.currentdirid || '') | 0) < 2) {
                 return; // dont do anything.
             }
 
-            fmremove(items);
+            fmremove(remItems);
 
             // force remove, no confirmation
             if (e.ctrlKey || e.metaKey) {
@@ -1102,7 +1131,31 @@ function FMShortcuts() {
 
 
 
+function fm_addhtml() {
+    'use strict';
 
+    var elm = document.getElementById('fmholder');
+    if (elm) {
+        if (!elm.textContent) {
+            $(elm).safeHTML(translate(String(pages.fm).replace(/{staticpath}/g, staticpath)));
+        }
+
+        if (!document.getElementById('invoicePdfPrinter')) {
+            elm = document.querySelector('.invoice-container');
+            if (elm && elm.parentNode) {
+                elm.parentNode.insertBefore(mCreateElement('iframe', {
+                    type: 'content',
+                    'class': 'hidden',
+                    src: 'about:blank',
+                    id: 'invoicePdfPrinter'
+                }), elm);
+            }
+        }
+    }
+    else {
+        console.error('fmholder container not found...');
+    }
+}
 
 function fm_hideoverlay() {
     "use strict";
@@ -1124,15 +1177,14 @@ function fm_showoverlay() {
 
 /**
  * Looking for a already existing name of URL (M.v)
- * @param {Integer} nodeType file:0 folder:1
  * @param {String} value New file/folder name
  * @param {String} target {optional}Target handle to check the duplication inside. if not provided M.v will be used
  */
-function duplicated(nodeType, value, target) {
+function duplicated(value, target) {
     "use strict";
     if (!target) {
         var items = M.v.filter(function (item) {
-            return item.name === value && item.t === nodeType;
+            return item.name === value;
         });
 
         return items.length !== 0;
@@ -1141,7 +1193,7 @@ function duplicated(nodeType, value, target) {
         if (M.c[target]) {
             // Check if a folder/file with the same name already exists.
             for (var handle in M.c[target]) {
-                if (M.d[handle] && M.d[handle].t === nodeType && M.d[handle].name === value) {
+                if (M.d[handle] && M.d[handle].name === value) {
                     return true;
                 }
             }
@@ -1180,11 +1232,11 @@ function renameDialog() {
                     }
                     else if (M.isSafeName(value)) {
                         var targetFolder = n.p;
-                        if (!duplicated(nodeType, value, targetFolder)) {
-                            M.rename(n.h, value);
+                        if (duplicated(value, targetFolder)) {
+                            errMsg = l[23219];
                         }
                         else {
-                            errMsg = nodeType ? l[17579] : l[17578];
+                            M.rename(n.h, value);
                         }
                     }
                     else {
@@ -1283,7 +1335,7 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
     $.warningCallback = callback;
 
     $('#msgDialog').removeClass('clear-bin-dialog confirmation-dialog warning-dialog-b warning-dialog-a ' +
-        'notification-dialog remove-dialog delete-contact loginrequired-dialog multiple wide');
+        'notification-dialog remove-dialog delete-contact loginrequired-dialog multiple wide with-close-btn');
     $('#msgDialog .icon').removeClass('fm-bin-clear-icon .fm-notification-icon');
     $('#msgDialog .confirmation-checkbox').addClass('hidden');
 
@@ -1292,37 +1344,40 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
         $('#msgDialog .icon').addClass('fm-bin-clear-icon');
         $('#msgDialog .fm-notifications-bottom')
             .safeHTML(
-                '<div class="default-green-button button right notification-button confirm semi-big">' +
+                '<div class="button default-green-button semi-big right confirm">' +
                     '<span>@@</span>' +
                 '</div>' +
-                '<div class="default-white-button right notification-button cancel semi-big"><span>@@</span></div>' +
+                '<div class="button default-white-button semi-big right cancel"><span>@@</span></div>' +
                 '<div class="clear"></div>', extraButton || l[1018], l[82]);
 
         $('#msgDialog .default-green-button').rebind('click', function() {
             closeMsg();
             if ($.warningCallback) {
                 $.warningCallback(true);
+                $.warningCallback = null;
             }
         });
         $('#msgDialog .default-white-button').rebind('click', function() {
             closeMsg();
             if ($.warningCallback) {
                 $.warningCallback(false);
+                $.warningCallback = null;
             }
         });
     }
     else if (type === 'delete-contact') {
         $('#msgDialog').addClass('delete-contact');
         $('#msgDialog .fm-notifications-bottom')
-            .safeHTML('<div class="default-green-button right notification-button confirm button semi-big">' +
+            .safeHTML('<div class="button default-green-button semi-big right confirm">' +
                 '<span>@@</span></div>' +
-                '<div class="default-white-button right notification-button cancel semi-big"><span>@@</span></div>' +
+                '<div class="button default-white-button semi-big right cancel"><span>@@</span></div>' +
                 '<div class="clear"></div>', l[78], l[79]);
 
         $('#msgDialog .default-green-button').rebind('click', function() {
             closeMsg();
             if ($.warningCallback) {
                 $.warningCallback(true);
+                $.warningCallback = null;
             }
         });
         /*!1*/
@@ -1330,6 +1385,7 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
             closeMsg();
             if ($.warningCallback) {
                 $.warningCallback(false);
+                $.warningCallback = null;
             }
         });
     }
@@ -1337,10 +1393,10 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
         if (extraButton) {
             $('#msgDialog .fm-notifications-bottom')
                 .safeHTML(
-                    '<div class="default-green-button right notification-button confirm  button semi-big">' +
+                    '<div class="button default-green-button semi-big right confirm">' +
                         '<span>@@</span>' +
                     '</div>' +
-                    '<div class="default-white-button right notification-button cancel semi-big">' +
+                    '<div class="button default-white-button semi-big right cancel">' +
                         '<span>@@</span>' +
                     '</div>' +
                     '<div class="clear"></div>', doneButton, extraButton
@@ -1350,6 +1406,7 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
                 closeMsg();
                 if ($.warningCallback) {
                     $.warningCallback(false);
+                    $.warningCallback = null;
                 }
             });
             /*!2*/
@@ -1357,13 +1414,14 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
                 closeMsg();
                 if ($.warningCallback) {
                     $.warningCallback(true);
+                    $.warningCallback = null;
                 }
             });
         }
         else {
             $('#msgDialog .fm-notifications-bottom')
                 .safeHTML(
-                    '<div class="default-white-button right notification-button semi-big"><span>@@</span></div>' +
+                    '<div class="button default-white-button semi-big right"><span>@@</span></div>' +
                     '<div class="clear"></div>', l[81]
                 );
 
@@ -1371,6 +1429,7 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
                 closeMsg();
                 if ($.warningCallback) {
                     $.warningCallback(true);
+                    $.warningCallback = null;
                 }
             });
         }
@@ -1397,16 +1456,17 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
                         'id="confirmation-checkbox" class="checkboxOff">' +
                 '</div>' +
                 '<label for="export-checkbox" class="radio-txt">@@</label></div>' +
-                '<div class="default-green-button right notification-button confirm button semi-big">' +
+                '<div class="button default-green-button semi-big right confirm">' +
                     '<span>@@</span>' +
                 '</div>' +
-                '<div class="default-white-button right notification-button cancel semi-big"><span>@@</span></div>' +
+                '<div class="button default-white-button semi-big right cancel"><span>@@</span></div>' +
                 '<div class="clear"></div>', l[229], doneButton || l[78], extraButton || l[79]);
 
         $('#msgDialog .default-green-button').rebind('click', function() {
             closeMsg();
             if ($.warningCallback) {
                 $.warningCallback(true);
+                $.warningCallback = null;
             }
         });
         /*!3*/
@@ -1414,6 +1474,7 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
             closeMsg();
             if ($.warningCallback) {
                 $.warningCallback(false);
+                $.warningCallback = null;
             }
         });
         $('#msgDialog .icon').addClass('fm-notification-icon');
@@ -1442,71 +1503,41 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
             });
         }
     }
-    else if (type === 'loginrequired') {
-
-        $('#msgDialog').addClass('loginrequired-dialog');
-
-        $('#msgDialog .fm-notifications-bottom')
-            .addClass('hidden')
-            .html('');
-
-        $('#msgDialog .default-white-button').rebind('click', function() {
-            closeMsg();
-            if ($.warningCallback) {
-                $.warningCallback(true);
-            }
-        });
-        $('#msgDialog').addClass('notification-dialog');
-        title = l[5841];
-        msg = '<p>' + escapeHTML(l[5842]) + '</p>\n' +
-            '<a class="top-login-button clickurl" href="/login">' + escapeHTML(l[171]) + '</a>\n' +
-            '<a class="create-account-button clickurl" href="/register">' + escapeHTML(l[1076]) + '</a><br/>';
-
-        var $selectedPlan = $('.reg-st3-membership-bl.selected');
-        var plan = 1;
-        if ($selectedPlan.is(".pro4")) { plan = 4; }
-        else if ($selectedPlan.is(".pro1")) { plan = 1; }
-        else if ($selectedPlan.is(".pro2")) { plan = 2; }
-        else if ($selectedPlan.is(".pro3")) { plan = 3; }
-
-        $('.loginrequired-dialog .fm-notification-icon')
-            .removeClass('plan1')
-            .removeClass('plan2')
-            .removeClass('plan3')
-            .removeClass('plan4')
-            .addClass('plan' + plan);
-    }
-    else if (type === 'import_login' || type === 'import_register') {
-        var buttonLabel = type === 'import_login' ? l[171] : l[170];
-
-        $('#msgDialog').addClass('warning-dialog-a wide');
+    else if (type === 'import_login_or_register') {
+        // Show import confirmation dialog if a user isn't logged in
+        $('#msgDialog').addClass('warning-dialog-a wide with-close-btn');
         $('#msgDialog .fm-notifications-bottom')
             .safeHTML('<div class="bottom-bar-link">@@</div>' +
-                '<div class="default-green-button right notification-button confirm button semi-big">' +
+                '<div class="button default-green-button semi-big right confirm">' +
                     '<span>@@</span>' +
                 '</div>' +
-                '<div class="default-white-button right notification-button cancel semi-big">' +
+                '<div class="button default-white-button semi-big right cancel">' +
                     '<span>@@</span>' +
                 '</div>' +
-                '<div class="clear"></div></div>', l[20754], buttonLabel, l[79]);
+                '<div class="clear"></div></div>', l[20754], l[170], l[171]);
 
+        // Register a new account to complete the import
         $('#msgDialog .default-green-button').rebind('click', function() {
             closeMsg();
             if ($.warningCallback) {
-                $.warningCallback(true);
+                $.warningCallback('register');
+                $.warningCallback = null;
             }
         });
-        /*!4*/
+        // Login to complete the import
         $('#msgDialog .default-white-button').rebind('click', function() {
             closeMsg();
             if ($.warningCallback) {
-                $.warningCallback(undefined);
+                $.warningCallback('login');
+                $.warningCallback = null;
             }
         });
+        // Have an ephemeral account to complete the import
         $('#msgDialog .bottom-bar-link').rebind('click', function() {
             closeMsg();
             if ($.warningCallback) {
-                $.warningCallback(false);
+                $.warningCallback('ephemeral');
+                $.warningCallback = null;
             }
         });
     }
@@ -1516,7 +1547,7 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
     $('#msgDialog .fm-notification-info h1').safeHTML(msg);
     clickURLs();
     if (submsg) {
-        $('#msgDialog .fm-notification-info p').text(submsg);
+        $('#msgDialog .fm-notification-info p').safeHTML(submsg);
         $('#msgDialog .fm-notification-info p').removeClass('hidden');
     }
     else {
@@ -1527,6 +1558,7 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
         closeMsg();
         if ($.warningCallback) {
             $.warningCallback(false);
+            $.warningCallback = null;
         }
     });
     $('#msgDialog').removeClass('hidden');
@@ -1551,7 +1583,8 @@ function closeMsg() {
 }
 
 function dialogPositioning(s) {
-    $(s).css('margin-top', '-' + $(s).height() / 2 + 'px');
+    $(s).css('margin-left', '-' + $(s).outerWidth() / 2 + 'px');
+    $(s).css('margin-top', '-' + $(s).outerHeight() / 2 + 'px');
 }
 
 /**
@@ -1595,6 +1628,9 @@ function openContactInfoLink(contactLink) {
 
                     return false;
                 });
+
+                // This contact link is valid to be affilaited
+                M.affiliate.storeAffiliate(contactLink, 4);
             }
         }
         else {
@@ -1608,7 +1644,13 @@ function openContactInfoLink(contactLink) {
                     openContactInfoLink(contactLink);
                 });
 
-                return loadSubPage(page);
+                // This contact link is not checked but stored for register case
+                // and also user click `add contact` anyway so it's user's call
+                M.affiliate.storeAffiliate(contactLink, 4);
+
+                login_next = page;
+                login_txt = l[1298];
+                return loadSubPage('login');
             });
         }
         $dialog.removeClass('hidden');
@@ -1642,21 +1684,20 @@ function openContactInfoLink(contactLink) {
  * @returns {null} no returned value
  */
 function openAccessQRDialog() {
+    "use strict";
+
     var $dialog = $('.fm-dialog.qr-dialog');
 
     var QRdialogPrepare = function _QRdialogPrepare() {
+
+        var curAvatar;
+
         $dialog.removeClass('hidden');
         $dialog.removeClass('disabled');
+
         if (M.account.contactLink && M.account.contactLink.length) {
-            var myHost = '';
-            if (!is_extension) {
-                var cutPlace = location.href.indexOf('/fm/');
-                myHost = location.href.substr(0, cutPlace);
-            }
-            else {
-                myHost = 'https://mega.nz';
-            }
-            myHost += '/' + M.account.contactLink;
+
+            var myHost = getBaseUrl() + '/' + M.account.contactLink;
             var QRoptions = {
                 width: 222,
                 height: 222,
@@ -1664,107 +1705,117 @@ function openAccessQRDialog() {
                 foreground: '#D90007',
                 text: myHost
             };
-            $('.qr-icon-big', $dialog).text('').qrcode(QRoptions);
 
+            $('.qr-icon-big', $dialog).text('').qrcode(QRoptions);
             $('.qr-http-link', $dialog).text(myHost);
-            var curAvatar = useravatar.contact(u_handle);
+
+            curAvatar = useravatar.contact(u_handle);
             $('.avatar-container-qr', $dialog).html(curAvatar);
+
             var handleAutoAccept = function _handleAutoAccept(autoAcc) {
+
                 if (autoAcc === '0') {
-                    $dialog.find('.qr-dialog-label .dialog-feature-toggle').removeClass('toggle-on')
-                        .find('.dialog-feature-switch').css('marginLeft', '2px');
+
+                    $('.qr-dialog-label .dialog-feature-toggle', $dialog).removeClass('toggle-on');
                 }
-                else { // if  it's 1 or not set
-                    $dialog.find('.qr-dialog-label .dialog-feature-toggle').addClass('toggle-on')
-                        .find('.dialog-feature-switch').css('marginLeft', '22px');
+                else {
+
+                    // if  it's 1 or not set
+                    $('.qr-dialog-label .dialog-feature-toggle', $dialog).addClass('toggle-on');
                 }
             };
-            mega.attr.get(u_handle, 'clv', -2, 0).always(handleAutoAccept);
 
+            mega.attr.get(u_handle, 'clv', -2, 0).always(handleAutoAccept);
         }
     };
 
-    $dialog.find('.fm-dialog-close')
-        .rebind('click', function () {
-            closeDialog();
-            return false;
-        });
-    $dialog.find('#qr-dlg-close')
-        .rebind('click', function () {
-            closeDialog();
-            return false;
-        });
-    $dialog.find('.qr-dialog-label .dialog-feature-toggle').rebind('click', function () {
-        var me = $(this);
-        if (me.hasClass('toggle-on')) {
-            me.find('.dialog-feature-switch').animate({ marginLeft: '2px' }, 150, 'swing', function () {
-                me.removeClass('toggle-on');
-                mega.attr.set('clv', 0, -2, 0);
-            });
+    $('.fm-dialog-close, #qr-dlg-close', $dialog).rebind('click', function() {
+
+        closeDialog();
+        return false;
+    });
+
+    $('.qr-dialog-label .dialog-feature-toggle', $dialog).rebind('click', function() {
+
+        var $this = $(this);
+
+        if ($this.hasClass('toggle-on')) {
+
+            $this.removeClass('toggle-on');
+            mega.attr.set('clv', 0, -2, 0);
         }
         else {
-            me.find('.dialog-feature-switch').animate({ marginLeft: '22px' }, 150, 'swing', function () {
-                me.addClass('toggle-on');
-                mega.attr.set('clv', 1, -2, 0);
-            });
+
+            $this.addClass('toggle-on');
+            mega.attr.set('clv', 1, -2, 0);
         }
     });
-    $dialog.find('.reset-qr-label')
-        .rebind('click', function () {
-            var msgTitle = l[18227]; // 'QR Code Regenerate';
-            var msgMsg = l[18228] + ' '; // 'You are about to generate a new QR code. ' +
-                // 'Your <b>existing</b> QR code and invitation link will no longer work. ';
-            var msgQuestion = l[18229]; // 'Do you want to proceed?';
-            msgDialog('confirmation', msgTitle, msgMsg,
-                msgQuestion,
-                function (regenQR) {
-                    if (regenQR) {
-                        $dialog.addClass('disabled');
-                        var delQR = {
-                            a: 'cld',
-                            cl: M.account.contactLink.substring(2, M.account.contactLink.length)
-                        };
-                        var reGenQR = { a: 'clc' };
 
-                        api_req(delQR, {
-                            callback: function (res, ctx) {
-                                if (res === 0) { // success
-                                    api_req(reGenQR, {
-                                        callback: function (res2, ctx2) {
-                                            if (typeof res2 !== 'string') {
-                                                res2 = '';
-                                            }
-                                            else {
-                                                res2 = 'C!' + res2;
-                                            }
-                                            M.account.contactLink = res2;
-                                            QRdialogPrepare();
-                                        }
-                                    });
+    $('.reset-qr-label', $dialog).rebind('click', function() {
+
+        // QR Code Regenerate
+        var msgTitle = l[18227];
+        // You are about to generate a new QR code.
+        // Your <b>existing</b> QR code and invitation link will no longer work.
+        var msgMsg = l[18228] + ' ';
+        // Do you want to proceed?
+        var msgQuestion = l[18229];
+
+        msgDialog('confirmation', msgTitle, msgMsg, msgQuestion, function(regenQR) {
+
+            if (regenQR) {
+                $dialog.addClass('disabled');
+                var delQR = {
+                    a: 'cld',
+                    cl: M.account.contactLink.substring(2, M.account.contactLink.length)
+                };
+                var reGenQR = { a: 'clc' };
+
+                api_req(delQR, {
+                    callback: function(res) {
+                        // success
+                        if (res === 0) {
+
+                            api_req(reGenQR, {
+                                callback: function(res2) {
+
+                                    if (typeof res2 === 'string') {
+                                        res2 = 'C!' + res2;
+                                    }
+                                    else {
+                                        res2 = '';
+                                    }
+
+                                    M.account.contactLink = res2;
+                                    QRdialogPrepare();
                                 }
-                                else {
-                                    $dialog.removeClass('disabled');
-                                }
-                            }
-                        });
+                            });
+                        }
+                        else {
+                            $dialog.removeClass('disabled');
+                        }
                     }
                 });
-
+            }
         });
+    });
+
     if (is_extension || M.execCommandUsable()) {
-        $('#qr-dlg-cpy-lnk').removeClass('hidden');
-        $('#qr-dlg-cpy-lnk').rebind('click', function () {
+
+        $('#qr-dlg-cpy-lnk').removeClass('hidden').rebind('click', function() {
             var links = $.trim($('.qr-http-link', $dialog).text());
             var toastTxt = l[7654];
+
             copyToClipboard(links, toastTxt);
         });
     }
     else {
         $('#qr-dlg-cpy-lnk').addClass('hidden');
     }
+
     if (ua.details.browser === "Chrome") {
-        $dialog.find('#qr-dlg-sv-img').removeClass('hidden');
-        $dialog.find('#qr-dlg-sv-img').rebind('click', function () {
+
+        $('#qr-dlg-sv-img', $dialog).removeClass('hidden').rebind('click', function() {
             var canvasQR = $('.qr-icon-big canvas', $dialog)[0];
             var genImageURL = canvasQR.toDataURL();
             var link = document.createElement("a");
@@ -1776,10 +1827,12 @@ function openAccessQRDialog() {
         });
     }
     else {
-        $dialog.find('#qr-dlg-sv-img').addClass('hidden');
+
+        $('#qr-dlg-sv-img', $dialog).addClass('hidden');
     }
 
-    M.safeShowDialog('qr-dialog', function () {
+    M.safeShowDialog('qr-dialog', function() {
+
         QRdialogPrepare();
         return $dialog;
     });
@@ -1792,95 +1845,87 @@ function openAccessQRDialog() {
 /**
  * shareDialogContentCheck
  *
- * Taking care about share dialog button 'Done'/share enabled/disabled and scroll
+ * Taking care about share dialog buttons enabled/disabled and scroll
  *
  */
 function shareDialogContentCheck() {
 
-    var dc = '.share-dialog',
-        itemsNum = 0,
-        newItemsNum = 0,
-        $btn = $('.default-green-button.dialog-share-button');
-    var $groupPermissionDropDown = $('.share-dialog .permissions-icon');
+    var dc = '.fm-dialog.share-dialog';
+    var itemsNum = $('.share-dialog-access-list .share-dialog-access-node', dc).length;
+    var $doneBtn = $('.done-share', dc);
+    var $removeBtn = $('.remove-share', dc);
 
-    newItemsNum = $(dc + ' .token-input-token-mega').length;
-    itemsNum = $(dc + ' .share-dialog-contacts .share-dialog-contact-bl').length;
+    // Hide the share dialog bottom hint message as default
+    $('.share-dialog-bottom-msg', dc).css('opacity', 0);
 
-    if (itemsNum) {
+    // Taking care about the sharing access list scrolling
+    handleDialogScroll(itemsNum, dc);
 
-        $(dc + ' .share-dialog-img').addClass('hidden');
-        $(dc + ' .share-dialog-contacts').removeClass('hidden');
-        handleDialogScroll(itemsNum, dc);
+    // Taking care about the Remove Share button enabled/disabled
+    if (itemsNum > 1) {
+        $removeBtn.removeClass('disabled');
     }
     else {
-        $(dc + ' .share-dialog-img').removeClass('hidden');
-        $(dc + ' .share-dialog-contacts').addClass('hidden');
+        $removeBtn.addClass('disabled');
     }
 
-    // If new items are availble in multiInput box
-    // or permission is changed on some of existing items
-    if (newItemsNum || $.changedPermissions.length || $.removedContactsFromShare.length) {
-        $btn.removeClass('disabled');
+    // Taking care about the Done button enabled/disabled
+    if (Object.keys($.addContactsToShare).length
+        || Object.keys($.changedPermissions).length
+        || Object.keys($.removedContactsFromShare).length) {
+        $doneBtn.removeClass('disabled');
     }
     else {
-        $btn.addClass('disabled');
-    }
-
-    if (newItemsNum) {
-        $groupPermissionDropDown.removeClass('disabled');
-    }
-    else {
-        $groupPermissionDropDown.addClass('disabled');
+        $doneBtn.addClass('disabled');
     }
 }
 
-function addShareDialogContactToContent(userEmail, type, id, av, userName, permClass, permText) {
-
-    var html = '',
-        htmlEnd = '',
-        item = '',
-        exportClass = '';
-
-    var contactEmailHtml = '';
-
-    if (userEmail !== userName) {
-        contactEmailHtml = '<div class="contact-email">'
-            + htmlentities(userEmail)
-            + '</div>';
+/**
+ * Generate the html DOM element for a single share contact of the folder
+ *
+ * @param {string} userEmail contact email
+ * @param {string} type  type of contact e.g. type 1 indicates the owner of the folder
+ * @param {string} id    contact handle
+ * @param {string} av    contact avatar
+ * @param {string} userName  contact name
+ * @param {string} permClass permission classname
+ *
+ * @returns {string}
+ */
+function renderContactRowContent(userEmail, type, id, av, userName, permClass) {
+    "use strict";
+    var html = '';
+    var presence = type === '1' ? M.onlineStatusClass(M.u[id].presence)[1] : '';
+    if (M.d[id] && M.d[id].presence) {
+        presence = M.onlineStatusClass(M.d[id].presence === 'unavailable' ? 1 : M.d[id].presence)[1];
     }
 
-    item = av
-        + '<div class="fm-share-user-info">'
-        + '<div class="fm-share-centered">'
-        + '<div class="fm-chat-user">' + htmlentities(userName) + '</div>'
-        + contactEmailHtml
+    userName += type === '1' ? ' (' + l[8885] + ')' : '';
+    permClass = type === '1' ? 'owner' : permClass;
+    var ownerClass = type === '1' ? ' owner' : '';
+
+    html = '<div class="share-dialog-access-node' + ownerClass + '" id=' + id + '>'
+        + '<div class="access-node-info-block">'
+        + av
+        + '<div class="access-node-username">' + htmlentities(userName) + '</div>'
+        + '<div class="access-node-status ustatus ' + id + " " + presence + '">'
+        + '<div class="nw-contact-status"></div></div>'
         + '</div>'
+        + '<div class="access-node-remove"></div>'
+        + '<div class="access-node-permission-wrapper">'
+        + '<div class="access-node-permission ' + permClass + '"></div></div>'
+        + '<div class="clear"></div>'
         + '</div>';
 
-    html = '<div class="share-dialog-contact-bl ' + type + '" id="sdcbl_' + id + '">'
-           + item
-           + '<div class="share-dialog-remove-button"></div>'
-           + '<div class="share-dialog-permissions ' + permClass + '">'
-           + '<span></span>' + permText
-           +  '</div>';
-
-
-    htmlEnd = '<div class="clear"></div>'
-              + '</div>';
-
-    return html + htmlEnd;
+    return html;
 }
 
 function fillShareDialogWithContent() {
-
-    $.sharedTokens = [];// GLOBAL VARIABLE, Hold items currently visible in share folder content (above multi-input)
-    $.changedPermissions = [];// GLOBAL VAR, changed permissions shared dialog
-    $.removedContactsFromShare = [];// GLOBAL VAR, removed contacts from a share
-
     var pendingShares = {};
     var nodeHandle    = String($.selected[0]);
     var node          = M.getNodeByHandle(nodeHandle);
     var userHandles   = M.getNodeShareUsers(node, 'EXP');
+    $.sharedTokens = [];// GLOBAL VARIABLE, Hold items currently visible in share folder content (above multi-input)
 
     if (M.ps[nodeHandle]) {
         pendingShares = Object(M.ps[nodeHandle]);
@@ -1888,6 +1933,20 @@ function fillShareDialogWithContent() {
     }
     var seen = Object.create(null);
 
+    // Fill the owner of the folder on the top of the access list
+    if (u_attr) {
+        generateShareDialogRow(u_attr.name, u_attr.email, 2, u_attr.u);
+    }
+
+    // Remove items in the removed contacts list
+    for (var rmContact in $.removedContactsFromShare) {
+        var rmContactIndex = userHandles.indexOf(rmContact);
+        if (rmContactIndex > -1) {
+            userHandles.splice(rmContactIndex, 1);
+        }
+    }
+
+    // Existing contacts in shares
     userHandles.forEach(function(handle) {
         var user = M.getUser(handle) || Object(M.opc[handle]);
 
@@ -1902,6 +1961,23 @@ function fillShareDialogWithContent() {
             seen[user.m] = 1;
         }
     });
+
+    // New added contacts
+    for (var newContact in $.addContactsToShare) {
+        var newContactName;
+        var newContactEmail = $.addContactsToShare[newContact].u;
+
+        if (!seen[newContactEmail]) {
+            if (newContact.startsWith('#new_')) {
+                newContactName = $.addContactsToShare[newContact].u;
+            }
+            else {
+                newContactName  = M.getNameByHandle(newContact) || newContactEmail;
+            }
+            generateShareDialogRow(newContactName, newContactEmail, $.addContactsToShare[newContact].r, newContact);
+            seen[newContactEmail] = 1;
+        }
+    }
 }
 
 /**
@@ -1915,7 +1991,7 @@ function generateShareDialogRow(displayNameOrEmail, email, shareRights, userHand
 
     var rowId = '',
         html = '',
-        av =  useravatar.contact(email, 'small-rounded-avatar square'),
+        av =  useravatar.contact(email, 'access-node-avatar'),
         perm = '',
         permissionLevel = 0;
 
@@ -1923,25 +1999,169 @@ function generateShareDialogRow(displayNameOrEmail, email, shareRights, userHand
         permissionLevel = shareRights;
     }
 
+    // Restore the latest changed permission
+    if ($.changedPermissions[userHandle]) {
+        permissionLevel = $.changedPermissions[userHandle].r;
+    }
+
     // Permission level
     if (permissionLevel === 1) {
-        perm = ['read-and-write', l[56]];
+        perm = 'read-and-write';
     } else if (permissionLevel === 2) {
-        perm = ['full-access', l[57]];
+        perm = 'full-access';
     } else {
-        perm = ['read-only', l[55]];
+        perm = 'read-only';
     }
 
     // Add contact
-    $.sharedTokens.push(email);
-
-    // Update token.input plugin
-    removeFromMultiInputDDL('.share-multiple-input', {id: email, name: email});
+    $.sharedTokens.push(email.toLowerCase());
 
     rowId = (userHandle) ? userHandle : email;
-    html = addShareDialogContactToContent(email, '', rowId, av, displayNameOrEmail, perm[0], perm[1]);
+    if (u_attr && userHandle === u_attr.u) {
+        html = renderContactRowContent(email, '1', rowId, av, displayNameOrEmail, perm);
+    }
+    else {
+        html = renderContactRowContent(email, '', rowId, av, displayNameOrEmail, perm);
+    }
 
-    $('.share-dialog .share-dialog-contacts').safeAppend(html);
+    $('.share-dialog .share-dialog-access-list').safeAppend(html);
+}
+
+/**
+ * Hide the permission menu in the share dialog
+ */
+function hideShareDialogPermMenu() {
+    "use strict";
+    var $shareDialog = $('.fm-dialog.share-dialog');
+    var $permissionMenu = $('.share-dialog-permissions-menu', $shareDialog);
+
+    $permissionMenu.fadeOut(200);
+    $('.permission-item', $permissionMenu).removeClass('active');
+    $('.share-dialog-access-node', $shareDialog).removeClass('active');
+}
+
+/**
+ * Show the permission menu in the share dialog with the position x and y
+ *
+ * @param {Object} $this    The selected contact element in the DOM
+ * @param {Number} x        The x position of showing the menu
+ * @param {Number} y        The y position of showing the menu
+ */
+function showShareDialogPermMenu($this, x, y) {
+    "use strict";
+    var $shareDialog = $('.fm-dialog.share-dialog');
+    var $permissionMenu = $('.share-dialog-permissions-menu', $shareDialog);
+    var permissionLevel = checkMultiInputPermission($this);
+
+    $('.permission-item', $permissionMenu).removeClass('active');
+    $('.permission-item.' + permissionLevel[0], $permissionMenu).addClass('active');
+    $permissionMenu.css('right', x + 'px');
+    $permissionMenu.css('top', y + 'px');
+    $permissionMenu.fadeIn(200);
+}
+
+/**
+ * Bind events to various components in the access list of share dialog after rendering
+ */
+function shareDialogAccessListBinds() {
+    "use strict";
+    var $shareDialog = $('.fm-dialog.share-dialog');
+
+    // Open the permissions menu
+    $('.access-node-permission-wrapper', $shareDialog).rebind('click', function(e) {
+        e.stopPropagation();
+        var $this = $(this);
+        var $selectedContact = $this.parent('.share-dialog-access-node');
+
+        if ($selectedContact.is('.owner')) {
+            return false;
+        }
+
+        var $scrollBlock = $('.share-dialog-access-list .jspPane', $shareDialog);
+        var scrollPos = 0;
+        var x = 0;
+        var y = 0;
+
+        if ($scrollBlock.length) {
+            scrollPos = $scrollBlock.position().top;
+        }
+
+        if ($selectedContact.is('.active')) {
+            hideShareDialogPermMenu();
+            $selectedContact.removeClass('active');
+        }
+        else {
+            $('.share-dialog-access-node', $shareDialog).removeClass('active');
+            x = 45;
+            y = $this.position().top + 74 + scrollPos;
+
+            showShareDialogPermMenu($('.access-node-permission', $(this)), x, y);
+            $selectedContact.addClass('active');
+        }
+    });
+
+    // Remove the specific contact from share
+    $('.access-node-remove', $shareDialog).rebind('click', function() {
+        var $deletedContact = $(this).parent('.share-dialog-access-node');
+
+        if ($deletedContact.is('.owner')) {
+            return false;
+        }
+
+        var userHandle = $deletedContact.attr('id');
+        var selectedNodeHandle = $.selected[0];
+
+        $deletedContact.remove();
+
+        if (userHandle !== '') {
+            var userEmail = '';
+            if ($.addContactsToShare[userHandle]) {
+                userEmail = $.addContactsToShare[userHandle].u;
+                delete $.addContactsToShare[userHandle];
+            }
+            else {
+                // Due to pending shares, the id could be an email instead of a handle
+                var userEmailOrHandle = Object(M.opc[userHandle]).m || userHandle;
+                userEmail = Object(M.opc[userHandle]).m || M.getUserByHandle(userHandle).m;
+
+                $.removedContactsFromShare[userHandle] = {
+                    'selectedNodeHandle': selectedNodeHandle,
+                    'userEmailOrHandle': userEmailOrHandle,
+                    'userHandle': userHandle
+                };
+
+                // Remove the permission change if exists
+                if ($.changedPermissions[userHandle]) {
+                    delete $.changedPermissions[userHandle];
+                }
+            }
+
+            // Remove it from multi-input tokens
+            var sharedIndex = $.sharedTokens.indexOf(userEmail.toLowerCase());
+            if (sharedIndex > -1) {
+                $.sharedTokens.splice(sharedIndex, 1);
+            }
+        }
+
+        shareDialogContentCheck();
+    });
+
+    // Hide the permission menu once scrolling
+    $('.share-dialog-access-list', $shareDialog).rebind('jsp-scroll-y.closeMenu', function() {
+        hideShareDialogPermMenu();
+    });
+
+    // Show the full access message once hover contacts with the full-access permission
+    $('.share-dialog-access-node', $shareDialog).rebind('mouseover', function() {
+        if ($('.access-node-permission', $(this)).is('.full-access')) {
+            $('.share-dialog-bottom-msg', $shareDialog).safeHTML(l[23709]).css('opacity', 1);
+        }
+    });
+
+    // Hide the full access message once mouse leave contacts
+    $('.share-dialog-access-node', $shareDialog).rebind('mouseout', function() {
+        $('.share-dialog-bottom-msg', $shareDialog).css('opacity', 0);
+    });
 }
 
 /**
@@ -2043,108 +2263,125 @@ function sharedPermissionLevel(value) {
 }
 
 /**
- * initShareDialogMultiInputPlugin
- *
  * Initialize share dialog multi input plugin
+ *
+ * @param {array} alreadyAddedContacts  Array of already added contacts
  */
-function initShareDialogMultiInputPlugin() {
+function initShareDialogMultiInput(alreadyAddedContacts) {
     "use strict";
 
-    // Plugin configuration
-    var contacts = M.getContactsEMails();
+    var $scope = $('.share-add-dialog');
+    var $input = $('.share-multiple-input', $scope);
+    var listedContacts = []; // All listed contact emails
 
     var errorMsg = function(msg) {
+        var $warning = $('.multiple-input-warning span', $scope);
 
-        var $shareDialog = $('.share-dialog');
-        var $warning = $shareDialog.find('.multiple-input-warning span');
-
+        $('#token-input-share-multiple-input', $scope).val('');
         $warning.text(msg);
-        $shareDialog.addClass('error');
+        $scope.addClass('error');
 
         setTimeout(function() {
-            $shareDialog.removeClass('error');
+            $scope.removeClass('error');
         }, 3000);
     };
 
-    var $scope = $('.share-dialog');
-    var $input = $('.share-multiple-input', $scope);
+    Object.values(M.getContactsEMails(true)).forEach(function(item) {
+        listedContacts.push(item.id);
+    });
 
     // Clear old values in case the name/nickname updated since last opening
     $input.tokenInput('destroy');
 
-    $input.tokenInput(contacts, {
+    $input.tokenInput([], {
         theme: "mega",
-        placeholder: l[19108],// Enter one or more email address
+        placeholder: l[23711],
         searchingText: "",
         noResultsText: "",
         addAvatar: true,
         autocomplete: null,
-        searchDropdown: true,
+        searchDropdown: false,
         emailCheck: true,
         preventDoublet: false,
         tokenValue: "id",
-        propertyToSearch: "name",
+        propertyToSearch: "id",
         resultsLimit: 5,
         minChars: 1,
         accountHolder: (M.u[u_handle] || {}).m || '',
         scrollLocation: 'share',
         // Exclude from dropdownlist only emails/names which exists in multi-input (tokens)
         excludeCurrent: true,
-
         onEmailCheck: function() {
-            errorMsg(l[7415]); // Looks like there's a malformed email
+            errorMsg(l[2465]); // Please enter a valid email address
         },
         onReady: function() {
             dialogPositioning($scope);
         },
-        onDoublet: function(u) {
-            errorMsg(l[7413]); // You already have a contact with that email
+        onDoublet: function() {
+            errorMsg(l[23714]); // This folder has already been shared with this email address
         },
         onHolder: function() {
-            errorMsg(l[7414]); // There's no need to add your own email address
+            errorMsg(l[23715]); // It is not necessary to share this folder with yourself
         },
-        onAdd: function(item) {
-            var $scope = $('.share-dialog');
-            // If the user is not already a contact, then show a text area
-            // where they can add a custom message to the pending share request
-            if (checkIfContactExists(item.id) === false) {
-                $('.share-message', $scope).show();
-                initTextareaScrolling($('.share-message-textarea textarea', $scope), 72);
+        onAdd: function(email) {
+            if (listedContacts.indexOf(email.id) > -1) {
+                // If the entered email is one of existing contacts in the picker, select it automatically for users
+                var $listedItemHandle = M.getUserByEmail(email.id).h;
+                var $listedItemEle = $('.contacts-search-subsection .' + $listedItemHandle, $scope);
+
+                if ($('.contacts-search-scroll', $scope).is('.jspScrollable') && !window.safari) {
+                    // Auto-scroll to the selected element except for Safari since the graphic glitch issue
+                    $('.contacts-search-scroll.jspScrollable', $scope)
+                        .data('jsp').scrollToElement($listedItemEle.parent());
+                }
+
+                if ($.contactPickerSelected.indexOf($listedItemHandle) === -1) {
+                    $listedItemEle.trigger('click');
+                }
+
+                $('.token-input-token-mega .' + $listedItemHandle, $scope)
+                    .siblings('.token-input-delete-token-mega').trigger('click');
             }
+            else {
+                if (typeof M.findOutgoingPendingContactIdByEmail(email.id) === 'undefined') {
+                    // Show a text area where the user can add a custom message to the pending share request
+                    $('.share-message', $scope).removeClass('hidden');
+                    initTextareaScrolling($('.share-message-textarea textarea', $scope), 72);
+                }
 
-            $('.dialog-share-button', $scope).removeClass('disabled');
-
-            // Enable group permission change drop down list
-            $('.permissions-icon', $scope).removeClass('disabled');
+                $('.add-share', $scope).removeClass('disabled');
+            }
 
             dialogPositioning($scope);
         },
         onDelete: function() {
-            var $scope = $('.share-dialog');
-            var $btn = $('.dialog-share-button', $scope);
-            var iNewItemsNum;
-            var iItemsNum;
+            var $scope = $('.share-add-dialog');
+            var $newEmails = $('.token-input-list-mega .token-input-token-mega', $scope);
+            var newEmailsNum = $newEmails.length;
+            var noNewContacts = true;
 
             setTimeout(function() {
-                $scope.find('.token-input-input-token-mega input').trigger("blur");
+                $('.token-input-input-token-mega input', $scope).trigger("blur");
             }, 0);
 
-            iNewItemsNum = $scope.find('.token-input-list-mega .token-input-token-mega').length;
-            iItemsNum = $scope.find('.share-dialog-contacts .share-dialog-contact-bl').length;
-
-            // If new items are still availble in multiInput box
-            // or permission is changed on some of existing items
-            if (iNewItemsNum  || $.changedPermissions.length || $.removedContactsFromShare.length) {
-                $btn.removeClass('disabled');
-            }
-            else {
-                $btn.addClass('disabled');
+            for (var i = 0; i < newEmailsNum; i++) {
+                var newEmail = $($newEmails[i]).contents().eq(1).text();
+                if (typeof M.findOutgoingPendingContactIdByEmail(newEmail) === 'undefined') {
+                    noNewContacts = false;
+                    break;
+                }
             }
 
-            if (!iNewItemsNum) {
+            // If no new email that hasn't been sent contact request, clear and hide the personal message input box
+            if (noNewContacts) {
+                $('.share-message', $scope).addClass('hidden');
+                $('.share-message textarea', $scope).val('');
+            }
 
-                // Disable group permission change drop down list
-                $('.permissions-icon', $scope).addClass('disabled');
+            // If no new email is in multiInput box and contact picker, disable the button
+            if (JSON.stringify(clone($.contactPickerSelected).sort()) === JSON.stringify(alreadyAddedContacts.sort())
+                && newEmailsNum === 0) {
+                $('.add-share', $scope).addClass('disabled');
             }
 
             dialogPositioning($scope);
@@ -2152,337 +2389,219 @@ function initShareDialogMultiInputPlugin() {
     });
 }
 
+/**
+ * Render the content of access list in share dialog
+ */
+function renderShareDialogAccessList() {
+    "use strict";
 
+    var $shareDialog = $('.fm-dialog.share-dialog');
+
+    // Remove all contacts from the access list
+    $('.share-dialog-access-node').remove();
+
+    // Clear the scroll panel in access list
+    clearScrollPanel($('.share-dialog-access-list', $shareDialog));
+
+    // Fill the shared folder's access list
+    fillShareDialogWithContent();
+
+    // Take care about share button enabled/disabled and the access list scrolling
+    shareDialogContentCheck();
+
+    // Bind events to components in the access list after rendering
+    shareDialogAccessListBinds();
+
+    dialogPositioning($shareDialog);
+}
+
+/**
+ * Initializes the share dialog
+ */
 function initShareDialog() {
     "use strict";
 
     var $dialog = $('.share-dialog');
 
-    $.shareTokens = [];
-
-    /*if (!u_type) {
-        return; // not for ephemeral
-    }*/
-
-    // Prevents double initialization of token input
-    if (!$('.share-multiple-input', $dialog).tokenInput("getSettings")) {
-
-        initShareDialogMultiInputPlugin();
-    }
-
-    var menuPermissionState = function($this) {
-
-        var mi = '.permissions-menu .permissions-menu-item';
-        var cls = checkMultiInputPermission($this);
-
-        $(mi, $dialog).removeClass('active');
-
-        $(mi + '.' + cls[0], $dialog).addClass('active');
-    };
-
-    var handlePermissionMenu = function($this, m, x, y) {
-
-        m.css('left', x + 'px');
-        m.css('top', y + 'px');
-        menuPermissionState($this);
-        $this.addClass('active');
-        m.fadeIn(200);
-    };
-
     $dialog.rebind('click', function(e) {
-
-        var hideMenus = function() {
-
-            // share dialog permission menu
-            $('.permissions-menu', $this).fadeOut(200);
-            $('.import-contacts-dialog').fadeOut(200);
-            $('.permissions-icon', $this).removeClass('active');
-            $('.share-dialog-permissions', $this).removeClass('active');
-            closeImportContactNotification('.share-dialog');
-            $('.import-contacts-service', $this).removeClass('imported');
-        };
-
         var $this = $(this);
 
+        // Hide the permission menu once click outside range of it
         if (typeof e.originalEvent.path !== 'undefined') {
-
-            // This's sensitive to dialog DOM element positioning
-            var trg = e.originalEvent.path[0];
+            var trg0 = e.originalEvent.path[0];
             var trg1 = e.originalEvent.path[1];
             var trg2 = e.originalEvent.path[2];
 
-            if (!$(trg).is('.permissions-icon,.import-contacts-link,.share-dialog-permissions')
-                && !$(trg1).is('.permissions-icon,.import-contacts-link,.share-dialog-permissions')
-                && !$(trg2).is('.permissions-icon,.import-contacts-link,.share-dialog-permissions'))
-            {
-                hideMenus();
+            if (!$(trg0).is('.permission-item-text,.permission-item,.share-dialog-permissions-menu')
+                && !$(trg1).is('.permission-item-text,.permission-item,.share-dialog-permissions-menu')
+                && !$(trg2).is('.permission-item-text,.permission-item,.share-dialog-permissions-menu')) {
+                hideShareDialogPermMenu();
             }
         }
         else if ($this.get(0) === e.currentTarget) {
-            hideMenus();
+            hideShareDialogPermMenu();
         }
     });
 
-    $('.fm-dialog-close, .dialog-cancel-button', $dialog).rebind('click', function() {
-        $('.export-links-warning').addClass('hidden');
-        showWarningTokenInputLose().done(closeDialog);
+    var $shareAddFooterElement = $('.share-add-dialog-bottom', $dialog);
+    $shareAddFooterElement.detach();
+
+    // Close the share dialog
+    $('.fm-dialog-close', $dialog).rebind('click', function() {
+        showLoseChangesWarning().done(closeDialog);
     });
 
-    /*
-     * On share dialog, done/share button
-     *
-     * Adding new contacts to shared item
-     */
-    $('.dialog-share-button', $dialog).rebind('click', function(e) {
-        e.stopPropagation();
-        // since addNewContact goes by itself and fetch data from HTML. we cant intercept exited
-        // contacts here.
-        addNewContact($(this), false).done(function() {
-            var share = new mega.Share();
-            share.updateNodeShares().always(function() {
-                $('.token-input-token-mega').remove();
-            });
-        });
-    });
-
-    $dialog.off('click', '.share-dialog-remove-button');
-    $dialog.on('click', '.share-dialog-remove-button', function() {
-
+    // Change the permission for the specific contact or group
+    // eslint-disable-next-line complexity
+    $('.share-dialog-permissions-menu .permission-item', $dialog).rebind('click', function(e) {
         var $this = $(this);
-
-        var handleOrEmail = $this.parent().attr('id').replace('sdcbl_', '');
-
-        $this.parent()
-            .fadeOut(200)
-            .remove();
-
-        var selectedNodeHandle = $.selected[0];
-        if (handleOrEmail !== '') {
-
-            // Due to pending shares, the id could be an email instead of a handle
-            var userEmail = Object(M.opc[handleOrEmail]).m || handleOrEmail;
-
-            $.removedContactsFromShare.push({
-                'selectedNodeHandle': selectedNodeHandle,
-                'userEmail': userEmail,
-                'handleOrEmail': handleOrEmail
-            });
-
-            $.sharedTokens.splice($.sharedTokens.indexOf(userEmail), 1);
-        }
-
-        shareDialogContentCheck();
-    });
-
-    // related to specific contact
-    $dialog.off('click', '.share-dialog-permissions');
-    $dialog.on('click', '.share-dialog-permissions', function(e) {
-
-        var $this = $(this);
-        var $m = $('.permissions-menu', $dialog);
-        var scrollBlock = $('.share-dialog-contacts .jspPane', $dialog);
-        var scrollPos = 0;
-        var x = 0;
-        var y = 0;
-
-        $m.removeClass('search-permissions');
-
-        if (scrollBlock.length) {
-            scrollPos = scrollBlock.position().top;
-        }
-
-        // fadeOut this popup
-        if ($this.is('.active')) {
-            $m.fadeOut(200);
-            $this.removeClass('active');
-        }
-        else {
-            $('.share-dialog-permissions', $dialog).removeClass('active');
-            $('.permissions-icon', $dialog).removeClass('active');
-            closeImportContactNotification('.share-dialog');
-
-            x = $this.position().left;
-            y = $this.position().top + 3 + scrollPos;
-
-            handlePermissionMenu($this, $m, x, y);
-        }
-
-        e.stopPropagation();
-    });
-
-    // related to multi-input contacts
-    $('.permissions-icon', $dialog).rebind('click', function(e) {
-
-        var $this = $(this);
-        var $m = $('.permissions-menu');
-        var x = 0;
-        var y = 0;
-
-        if (!$this.is('.disabled')) {
-
-            // fadeOut permission menu for this icon
-            if ($this.is('.active')) {
-                $m.fadeOut(200);
-                $this.removeClass('active');
-            }
-            else {
-                $('.share-dialog-permissions', $dialog).removeClass('active');
-                $('.permissions-icon', $dialog).removeClass('active');
-                $m.addClass('search-permissions');
-                closeImportContactNotification('.share-dialog');
-
-                x = $this.position().left - 28;
-                y = $this.position().top - 57;
-
-                handlePermissionMenu($this, $m, x, y);
-            }
-        }
-
-        e.stopPropagation();
-    });
-
-    /* Handles permission changes
-     * 1. Group permission change '.share-dialog .permissions-icon.active'
-     * 2. Specific perm. change '.share-dialog .share-dialog-permissions.active'
-    */
-    $('.permissions-menu-item', $dialog).rebind('click', function(e) {
-
-        var $this = $(this);
-        var id;
-        var perm;
-        var $existingContacts;
         var shares = M.d[$.selected[0]].shares;
         var newPermLevel = checkMultiInputPermission($this);
-        var $itemPermLevel = $('.share-dialog-permissions.active', $dialog);
-        var $groupPermLevel = $('.permissions-icon.active', $dialog);
-        var currPermLevel = [];
+        var newPerm = sharedPermissionLevel(newPermLevel[0]);
+        var $selectedContact =  $('.share-dialog-access-node.active', $dialog);
 
-        $('.permissions-menu', $dialog).fadeOut(200);
+        hideShareDialogPermMenu();
 
-        // Single contact permission change, .share-dialog-permissions
-        if ($itemPermLevel.length) {
+        var pushNewPermissionIn = function(id) {
+            if (!shares || !shares[id] || shares[id].r !== newPerm) {
+                // If it's a pending contact, provide the email
+                var userEmailOrHandle = Object(M.opc[id]).m || id;
 
-            currPermLevel = checkMultiInputPermission($itemPermLevel);
-            id = $itemPermLevel.parent().attr('id').replace('sdcbl_', '');
+                $.changedPermissions[id] = {u: userEmailOrHandle, r: newPerm};
+            }
+        };
 
-            if (id !== '') {
-                perm = sharedPermissionLevel(newPermLevel[0]);
+        if (e.shiftKey) {
+            // Change the permission for all listed contacts
 
-                if (!shares || !shares[id] || shares[id].r !== perm) {
-                    if (M.opc[id]) {
-                        // it's a pending contact, provide back the email
-                        id = M.opc[id].m || id;
+            for (var key in $.addContactsToShare) {
+                $.addContactsToShare[key].r = newPerm;
+            }
+
+            $.changedPermissions = {};
+
+            $('.share-dialog-access-node:not(.owner)', $dialog).get().forEach(function(item) {
+                var itemId = $(item).attr('id');
+                if (itemId !== undefined && itemId !== '' && !$.addContactsToShare[itemId]) {
+                    pushNewPermissionIn(itemId);
+                }
+            });
+
+            $('.share-dialog-access-node:not(.owner) .access-node-permission', $dialog)
+                .removeClass('full-access read-and-write read-only')
+                .addClass(newPermLevel[0]);
+        }
+        else {
+            // Change the permission for the specific contact
+            var userHandle = $selectedContact.attr('id');
+
+            if (userHandle !== undefined && userHandle !== '') {
+                if ($.addContactsToShare[userHandle]) {
+                    // Change the permission for new added share contacts
+                    $.addContactsToShare[userHandle].r = newPerm;
+                }
+                else {
+                    // Change the permission for existing share contacts
+                    if ($.changedPermissions[userHandle]) {
+                        // Remove the previous permission change if exists
+                        delete $.changedPermissions[userHandle];
                     }
-                    $.changedPermissions.push({ u: id, r: perm });
+
+                    pushNewPermissionIn(userHandle);
                 }
             }
 
-            $itemPermLevel
-                .removeClass(currPermLevel[0])
-                .removeClass('active')
-                .safeHTML('<span></span>@@', newPermLevel[1])
+            $('.access-node-permission', $selectedContact)
+                .removeClass('full-access read-and-write read-only')
                 .addClass(newPermLevel[0]);
         }
-        else if ($groupPermLevel.length) {// Group permission change, .permissions-icon
 
-            // $.changedPermissions = [];// Reset global var
-
-            currPermLevel = checkMultiInputPermission($groupPermLevel);
-
-            // Get all items from dialog content block (avatar, name/email, permission)
-            /*$existingContacts = $('.share-dialog-contact-bl');
-            $.each($existingContacts, function(index, value) {
-
-                extract id of contact
-                id = $(value).attr('id').replace('sdcbl_', '');
-
-                if (id !== '') {
-                    perm = sharedPermissionLevel(newPermLevel[0]);
-
-                    if (!shares || !shares[id] || shares[id].r !== perm) {
-                        $.changedPermissions.push({ u: id, r: perm });
-                    }
-                }
-            });*/
-
-            $groupPermLevel
-                .removeClass(currPermLevel[0])
-                .removeClass('active')
-                .safeHTML('<span></span>@@', newPermLevel[1])
-                .addClass(newPermLevel[0]);
-
-            /*$('.share-dialog-contact-bl .share-dialog-permissions')
-                .removeClass('read-only')
-                .removeClass('read-and-write')
-                .removeClass('full-access')
-                .safeHTML('<span></span>@@', newPermLevel[1])
-                .addClass(newPermLevel[0]);*/
+        // Share button enable/disable control
+        if (Object.keys($.changedPermissions).length > 0) {
+            $('.done-share', $dialog).removeClass('disabled');
+        }
+        else if (Object.keys($.removedContactsFromShare).length === 0
+            && Object.keys($.addContactsToShare).length === 0) {
+            $('.done-share', $dialog).addClass('disabled');
         }
 
-        if ($.changedPermissions.length > 0) {// Enable Done button
-            $dialog.find('.default-green-button.dialog-share-button').removeClass('disabled');
-        }
-
-        $dialog.find('.permissions-icon.active').removeClass('active');
-        $dialog.find('.share-dialog-permissions.active').removeClass('active');
-
-        e.stopPropagation();
         return false;
     });
 
-    //Pending info block
-    $dialog.find('.pending-indicator').rebind('mouseover', function() {
-        var x = $(this).position().left;
-        var y = $(this).position().top;
-        var infoBlock = $('.share-pending-info', $dialog);
-        var scrollPos = 0;
-        if ($('.share-dialog-contacts .jspPane', $dialog)) {
-            scrollPos = $dialog.find('.share-dialog-contacts .jspPane').position().top;
-        }
-        var infoHeight = infoBlock.outerHeight();
-        infoBlock.css({
-            'left': x,
-            'top': y - infoHeight + scrollPos
+    // Open the share add dialog
+    $('.share-dialog-access-add', $dialog).rebind('click', function() {
+        var alreadyAddedContacts = [];
+
+        $('.share-dialog-access-node:not(.owner)', $dialog).get().forEach(function(item) {
+            var itemId = $(item).attr('id');
+            if (!itemId.startsWith('#new_') && M.u[itemId]) {
+                alreadyAddedContacts.push(itemId);
+            }
         });
-        infoBlock.fadeIn(200);
-    });
-    $dialog.find('.pending-indicator').rebind('mouseout', function() {
-        $dialog.find('.share-pending-info').fadeOut(200);
+
+        M.initShareAddDialog(alreadyAddedContacts, $shareAddFooterElement);
     });
 
-    // Personal message
-    $dialog.find('.share-message textarea').rebind('focus', function() {
+    $('.done-share', $dialog).rebind('click', function() {
+        if (!$(this).is('.disabled')) {
+            addNewContact($(this), false).done(function() {
+                var share = new mega.Share();
 
-        var $this = $(this);
-        $dialog.find('.share-message').addClass('focused');
-
-        if ($this.val() === l[6853]) {
-
-            // Clear the default message
-            $this.val('');
-
-            onIdle(function() {
-                $this.select();
-            });
-
-            $this.mouseup(function mouseUpHandler() {
-                $this.off("mouseup", mouseUpHandler);
-                return false;
+                share.updateNodeShares();
             });
         }
+
+        return false;
     });
 
-    $dialog.find('.share-message textarea').rebind('blur', function() {
-        $dialog.find('.share-message').removeClass('focused');
+    $('.remove-share', $dialog).rebind('click', function() {
+        if (!$(this).is('.disabled')) {
+            $.removedContactsFromShare = {};
+            var nodeHandle = String($.selected[0]);
+            var userHandles = M.getNodeShareUsers(nodeHandle, 'EXP');
+
+            if (M.ps[nodeHandle]) {
+                var pendingShares = Object(M.ps[nodeHandle]);
+                userHandles = userHandles.concat(Object.keys(pendingShares));
+            }
+
+            userHandles.forEach(function(userHandle) {
+                var userEmailOrHandle = Object(M.opc[userHandle]).m || userHandle;
+
+                $.removedContactsFromShare[userHandle] = {
+                    'selectedNodeHandle': nodeHandle,
+                    'userEmailOrHandle': userEmailOrHandle,
+                    'userHandle': userHandle
+                };
+            });
+
+            var share = new mega.Share();
+            loadingDialog.show();
+            share.removeContactFromShare().always(function() {
+                loadingDialog.hide();
+                closeDialog();
+            });
+        }
+        return false;
+    });
+
+    // Show the group change permission message once hover permission items in the menu
+    $('.share-dialog-permissions-menu .permission-item', $dialog).rebind('mouseover', function() {
+        $('.share-dialog-bottom-msg', $dialog).safeHTML(l[23708]).css('opacity', 1);
+    });
+
+    // Hide the group change permission message once mouse leave permission items
+    $('.share-dialog-permissions-menu .permission-item', $dialog).rebind('mouseout', function() {
+        $('.share-dialog-bottom-msg', $dialog).css('opacity', 0);
     });
 }
 
 function addImportedDataToSharedDialog(data) {
     $.each(data, function(ind, val) {
-        $('.share-dialog .share-multiple-input').tokenInput("add", {id: val, name: val});
+        $('.share-add-dialog .share-multiple-input').tokenInput("add", {id: val, name: val});
     });
 
-    closeImportContactNotification('.share-dialog');
+    closeImportContactNotification('.share-add-dialog');
 }
 
 function addImportedDataToAddContactsDialog(data) {
@@ -2511,29 +2630,50 @@ function closeImportContactNotification(c) {
 }
 
 /**
- * Check the dialog has token input that is already filled up by user.
- * Warn user closing dialog will lose all inserted input.
+ * Check the dialog has token input that is already filled up by user or any unsaved changes.
+ * Warn user closing dialog will lose all inserted input and unsaved changes.
  */
 
-function showWarningTokenInputLose() {
-
+function showLoseChangesWarning() {
     "use strict";
+
+    var $dialog = $('.fm-dialog:visible');
+    if ($dialog.length !== 1) {
+        console.warn('Unexpected number of dialogs...', [$dialog]);
+        return MegaPromise.resolve();
+    }
 
     var promise = new MegaPromise();
 
     // If there is any tokenizer on the dialog and it is triggered by dom event.
-    var $tokenInput = $('.fm-dialog:visible li[class*="token-input-input"]');
+    var $tokenInput = $('li[class*="token-input-input"]', $dialog);
 
     // Make sure all input is tokenized.
-    $tokenInput.find('input').trigger('blur');
+    if ($tokenInput.length) {
+        $('input', $tokenInput).trigger('blur');
+    }
 
     // If tokenizer is on the dialog, check it has input already. If it has, warn user.
-    var $tokenItems = $('li[class*="token-input-token"]');
+    var $tokenItems = $('li[class*="token-input-token"]', $dialog);
 
     if ($tokenItems.length) {
+        // Warn user closing dialog will lose all inserted input
         msgDialog('confirmation', '', l[20474], l[18229], function(e) {
             if (e) {
                 $tokenItems.remove();
+                promise.resolve();
+            }
+            else {
+                promise.reject();
+            }
+        });
+    }
+    else if ($.dialog === 'share' && Object.keys($.addContactsToShare || []).length > 0
+        || Object.keys($.changedPermissions || []).length > 0
+        || Object.keys($.removedContactsFromShare || []).length > 0)  {
+        // Warn user closing dialog will lose all unsaved changes
+        msgDialog('confirmation', '', l[24208], l[18229], function(e) {
+            if (e) {
                 promise.resolve();
             }
             else {
@@ -2589,7 +2729,7 @@ function closeDialog(ev) {
     if ($.dialog === 'terms' && $.registerDialog) {
         $('.fm-dialog.bottom-pages-dialog').addClass('hidden');
     }
-    else if ($.dialog === 'createfolder' && ($.copyDialog || $.moveDialog || $.selectFolderDialog)) {
+    else if ($.dialog === 'createfolder' && ($.copyDialog || $.moveDialog || $.selectFolderDialog || $.saveAsDialog)) {
         $('.fm-dialog.create-folder-dialog').addClass('hidden');
         $('.fm-dialog.create-folder-dialog .create-folder-size-icon').removeClass('hidden');
     }
@@ -2597,6 +2737,9 @@ function closeDialog(ev) {
         $('.copyrights-dialog').addClass('hidden');
 
         delete $.copyrightsDialog;
+    }
+    else if ($.dialog === 'share-add') {
+        $('.fm-dialog.share-add-dialog').addClass('hidden');
     }
     else {
         if ($.dialog === 'properties') {
@@ -2617,15 +2760,17 @@ function closeDialog(ev) {
         $('.add-contact-multiple-input').tokenInput("clearOnCancel");
         $('.share-multiple-input').tokenInput("clearOnCancel");
 
-        // share dialog
-        $('.share-dialog-contact-bl').remove();
-        $('.import-contacts-service').removeClass('imported');
+        if ($.dialog === 'share') {
+            // share dialog
+            $('.share-dialog-access-node').remove();
+            hideShareDialogPermMenu();
 
-        // share dialog permission menu
-        $('.permissions-menu').hide();
-        $('.permissions-icon').removeClass('active');
-        closeImportContactNotification('.share-dialog');
-        closeImportContactNotification('.add-user-popup');
+            delete $.sharedTokens;
+            delete $.contactPickerSelected;
+            delete $.addContactsToShare;
+            delete $.changedPermissions;
+            delete $.removedContactsFromShare;
+        }
 
         $('.copyrights-dialog').addClass('hidden');
 
@@ -2636,6 +2781,9 @@ function closeDialog(ev) {
         delete $.shareToContactId;
         delete $.copyrightsDialog;
         delete $.selectFolderDialog;
+        delete $.saveAsDialog;
+        delete $.nodeSaveAs;
+        delete $.shareDialog;
 
         /* copy/move dialog - save to */
         delete $.saveToDialogCb;
@@ -2655,6 +2803,14 @@ function closeDialog(ev) {
         if ($(ev && ev.target).is('.fm-dialog-overlay, .dialog-cancel-button, .fm-dialog-close')) {
             delete $.onImportCopyNodes;
         }
+
+        if ($.msgDialog) {
+            if ($.warningCallback) {
+                onIdle($.warningCallback.bind(null, null));
+                $.warningCallback = null;
+            }
+            delete $.msgDialog;
+        }
     }
     $('.fm-dialog, .overlay.arrange-to-back').removeClass('arrange-to-back');
     // $('.fm-dialog .dialog-sorting-menu').remove();
@@ -2670,13 +2826,19 @@ function closeDialog(ev) {
             delete $.cfpromise;
         }
     }
+    else {
+        delete $.mcImport;
+    }
 
     if ($.dialog === 'selectFolder') {
         delete $.selectFolderCallback;
     }
 
+    if (typeof redeem !== 'undefined' && redeem.$dialog) {
+        redeem.$dialog.addClass('hidden');
+    }
+
     delete $.dialog;
-    delete $.mcImport;
     treesearch = false;
 
     if ($.registerDialog) {
@@ -2689,12 +2851,19 @@ function closeDialog(ev) {
         $.dialog = $.propertiesDialog;
     }
 
-    if ($.copyDialog || $.moveDialog || $.selectFolderDialog) {
+    if ($.copyDialog || $.moveDialog || $.selectFolderDialog || $.saveAsDialog) {
         // the createfolder dialog was closed
-        $.dialog = $.copyDialog || $.moveDialog || $.selectFolderDialog;
+        // eslint-disable-next-line local-rules/hints
+        $.dialog = $.copyDialog || $.moveDialog || $.selectFolderDialog || $.saveAsDialog;
 
         $('.fm-dialog').addClass('arrange-to-back');
         $('.fm-dialog.fm-picker-dialog').removeClass('arrange-to-back');
+    }
+
+    if ($.shareDialog) {
+        // if the share-add dialog was closed from the share dialog
+        // eslint-disable-next-line local-rules/hints
+        $.dialog = $.shareDialog;
     }
 
     mBroadcaster.sendMessage('closedialog');
@@ -2703,9 +2872,7 @@ function closeDialog(ev) {
 function createFolderDialog(close) {
     "use strict";
 
-    // Checking if this a business user with expired status
-    if (u_attr && u_attr.b && u_attr.b.s === -1) {
-        M.showExpiredBusiness();
+    if (M.isInvalidUserStatus()) {
         return;
     }
 
@@ -2717,14 +2884,15 @@ function createFolderDialog(close) {
         if ($.cftarget) {
             delete $.cftarget;
         }
-        closeDialog();
+        if ($.dialog === 'createfolder') {
+            closeDialog();
+        }
         return true;
-
     }
-    var doCreateFolder = function (v) {
-        var target = $.cftarget = $.cftarget || M.currentCustomView.nodeID || M.currentdirid;
 
-        if (!M.isSafeName(v)) {
+    var doCreateFolder = function(v) {
+
+        if (!M.isSafeName(v, true)) {
             $dialog.removeClass('active');
             $input.addClass('error');
             return;
@@ -2734,43 +2902,61 @@ function createFolderDialog(close) {
             if ($.cftarget) {
                 specifyTarget = $.cftarget;
             }
-            if (duplicated(1, v, specifyTarget)) {
+            if (duplicated(v, specifyTarget)) {
                 $dialog.addClass('duplicate');
                 $input.addClass('error');
 
-                setTimeout(function () {
-                    $dialog.removeClass('duplicate');
-                    $input.removeClass('error');
-
-                    $input.trigger("focus");
-                }, 2000);
+                setTimeout(
+                    function() {
+                        $input.removeClass('error');
+                        $dialog.removeClass('duplicate');
+                        $input.trigger("focus");
+                    },
+                    2000
+                );
 
                 return;
             }
         }
 
-        loadingDialog.pshow();
-        $dialog.addClass('hidden');
+        var target = $.cftarget = $.cftarget || M.currentCustomView.nodeID || M.currentdirid;
+        var awaitingPromise = $.cfpromise;
+        delete $.cfpromise;
 
-        M.createFolder(target, v, new MegaPromise())
-            .done(function(h) {
+        closeDialog();
+        loadingDialog.pshow();
+
+        M.createFolder(target, v.split(/[/\\]/))
+            .then(function(h) {
                 if (d) {
                     console.log('Created new folder %s->%s', target, h);
                 }
                 loadingDialog.phide();
-                if ($.cfpromise) {
-                    $.cfpromise.resolve(h);
-                    delete $.cfpromise;
+
+                if (awaitingPromise) {
+                    // dispatch an awaiting promise expecting to perform its own action instead of the default one
+                    awaitingPromise.resolve(h);
+                }
+                else {
+                    // By default auto-select the newly created folder as long no awaiting promise
+                    M.openFolder(Object(M.d[h]).p || target)
+                        .always(function() {
+                            $.selected = [h];
+                            reselect(1);
+                        });
                 }
                 createFolderDialog(1);
             })
-            .fail(function(error) {
+            .catch(function(ex) {
                 loadingDialog.phide();
-                $dialog.removeClass('hidden');
-                msgDialog('warninga', l[135], l[47], api_strerror(error));
+
+                msgDialog('warninga', l[135], l[47], ex < 0 ? api_strerror(ex) : ex, function() {
+                    if (awaitingPromise) {
+                        awaitingPromise.reject(ex);
+                    }
+                });
             });
     };
-
 
     $input.rebind('focus', function() {
         if ($(this).val() === l[157]) {
@@ -2826,37 +3012,159 @@ function createFolderDialog(close) {
     });
 }
 
-function chromeDialog(close) {
-    'use strict';
+function createFileDialog(close, action, params) {
+    "use strict";
 
-    var $dialog = $('.fm-dialog.chrome-dialog');
+
+    var closeFunction = function() {
+        if ($.cftarget) {
+            delete $.cftarget;
+        }
+        closeDialog();
+        return false;
+    };
+
 
     if (close) {
-        closeDialog();
-        return true;
+        return closeFunction();
     }
-    M.safeShowDialog('chrome', $dialog);
 
-    $('.chrome-dialog .browsers-button,.chrome-dialog .fm-dialog-close').rebind('click', function()
-    {
-        chromeDialog(1);
+    if (!action) {
+        action = function(name, t) {
+            loadingDialog.pshow();
+            M.addNewFile(name, t)
+                .done(function(nh) {
+                    if (d) {
+                        console.log('Created new file %s->%s', t, name);
+                    }
+                    loadingDialog.phide();
+
+                    if ($.selectddUIgrid.indexOf('.grid-scrolling-table') > -1 ||
+                        $.selectddUIgrid.indexOf('.file-block-scrolling') > -1) {
+                        var $grid = $($.selectddUIgrid);
+                        var $newElement = $('#' + nh, $grid);
+
+                        var jsp = $grid.data('jsp');
+                        if (jsp) {
+                            jsp.scrollToElement($newElement);
+                        }
+                        else if (M.megaRender && M.megaRender.megaList && M.megaRender.megaList._wasRendered) {
+                            M.megaRender.megaList.scrollToItem(nh);
+                            $newElement = $('#' + nh, $grid);
+                        }
+
+                        // now let's select the item. we can not use the click handler due
+                        // to redraw if element was out of viewport.
+                        $($.selectddUIgrid + ' ' + $.selectddUIitem).removeClass('ui-selected');
+                        $newElement.addClass('ui-selected');
+                        $.gridLastSelected = $newElement;
+                        selectionManager.clear_selection();
+                        selectionManager.add_to_selection(nh);
+
+                        loadingDialog.show('common', l[23130]);
+
+                        mega.fileTextEditor.getFile(nh).done(
+                            function(data) {
+                                loadingDialog.hide();
+                                mega.textEditorUI.setupEditor(M.d[nh].name, data, nh);
+                            }
+                        ).fail(function() {
+                            loadingDialog.hide();
+                        });
+
+                    }
+
+                })
+                .fail(function(error) {
+                    loadingDialog.phide();
+                    msgDialog('warninga', l[135], l[47], api_strerror(error));
+                });
+        };
+    }
+
+    // there's no jquery parent for this container.
+    // eslint-disable-next-line local-rules/jquery-scopes
+    var $dialog = $('.fm-dialog.create-file-dialog');
+    var $input = $('input', $dialog);
+    $input.val('.txt')[0].setSelectionRange(0, 0);
+
+    var doCreateFile = function(v) {
+        var target = $.cftarget = $.cftarget || M.currentdirid;
+
+        v = $.trim(v);
+
+        if (!M.isSafeName(v)) {
+            $dialog.removeClass('active');
+            $input.addClass('error');
+            return;
+        }
+        else if (duplicated(v, target)) {
+            $dialog.addClass('duplicate');
+            $input.addClass('error');
+
+            return;
+        }
+        closeFunction();
+        action(v, target, params);
+    };
+
+
+    $input.rebind('focus.fileDialog', function() {
+        if ($(this).val() === l[17506]) {
+            $input.val('');
+        }
+        $dialog.addClass('focused');
     });
-    $('#chrome-checkbox').rebind('click', function()
-    {
-        if ($(this).attr('class').indexOf('checkboxOn') === -1)
-        {
-            localStorage.chromeDialog = 1;
-            $(this).attr('class', 'checkboxOn');
-            $(this).parent().attr('class', 'checkboxOn');
-            $(this).prop('checked', true);
+
+    $input.rebind('blur.fileDialog', function() {
+        $dialog.removeClass('focused');
+    });
+
+    $input.rebind('keyup.fileDialog', function() {
+        if ($input.val() === '' || $input.val() === l[17506]) {
+            $dialog.removeClass('active');
         }
-        else
-        {
-            delete localStorage.chromeDialog;
-            $(this).attr('class', 'checkboxOff');
-            $(this).parent().attr('class', 'checkboxOff');
-            $(this).prop('checked', false);
+        else {
+            $dialog.addClass('active');
+            $input.removeClass('error');
         }
+    });
+
+    $input.rebind('keypress.fileDialog', function(e) {
+
+        if (e.which === 13 && $(this).val() !== '') {
+            doCreateFile($(this).val());
+        }
+        else {
+            $input.removeClass('error');
+            $dialog.removeClass('duplicate');
+        }
+    });
+
+    // eslint-disable-next-line sonarjs/no-duplicate-string
+    $('.fm-dialog-close, .cancel-create-file', $dialog).rebind('click.fileDialog', closeFunction);
+
+    $('.fm-dialog-input-clear', $dialog).rebind('click.fileDialog', function() {
+        $input.val('');
+        $dialog.removeClass('active');
+    });
+
+    $('.create-file', $dialog).rebind('click.fileDialog', function() {
+        var v = $input.val();
+
+        if (v === '' || v === l[17506]) {
+            msgDialog('warninga', '', l[8566]);
+        }
+        else {
+            doCreateFile(v);
+        }
+    });
+
+    M.safeShowDialog('createfile', function() {
+        $dialog.removeClass('hidden');
+        $('.fm-dialog-body.mid-pad input', $dialog).focus();
+        $dialog.removeClass('active');
+        return $dialog;
     });
 }
 
@@ -3115,6 +3423,9 @@ function fm_resize_handler(force) {
         return;
     }
     if (d) {
+        if (d > 1) {
+            console.warn('fm_resize_handler');
+        }
         console.time('fm_resize_handler');
     }
 
@@ -3136,6 +3447,20 @@ function fm_resize_handler(force) {
             .css({
                 'width': $(document.body).outerWidth() - $('.fm-left-panel').outerWidth() - 46 /* margins of icons */
             });
+
+        // Lets make manually matching width of the header table with the contents table, due to width mismatching bug.
+        var $fNameTh = $('.files-grid-view .grid-table-header:visible th[megatype="fname"]');
+        var fNameThStyle = $fNameTh.length && $fNameTh.attr('style') || '';
+
+        if (fNameThStyle.indexOf('calc(100% -') === -1) {
+            delete M.columnsWidth.cloud.fname.currpx;
+        }
+        else {
+            var fNameThWidth = $fNameTh.outerWidth();
+
+            $('.files-grid-view .grid-table:visible td[megatype="fname"]').css('width', fNameThWidth);
+            M.columnsWidth.cloud.fname.currpx = fNameThWidth;
+        }
 
         initTreeScroll();
     }
@@ -3218,7 +3543,10 @@ function fm_resize_handler(force) {
         }
         initDashboardScroll();
     }
-    else {
+    else if (M.currentdirid === 'refer') {
+        initAffiliateScroll();
+    }
+    else if (!M.chat) {
         if (M.viewmode) {
             initFileblocksScrolling();
         }
@@ -3232,28 +3560,34 @@ function fm_resize_handler(force) {
     }
 
     if (M.currentdirid !== 'transfers') {
+        var treePaneWidth = Math.round($('.fm-left-panel:visible').outerWidth());
+        var leftPaneWidth = Math.round($('.nw-fm-left-icons-panel:visible').outerWidth());
+
         if (megaChatIsReady && megaChat.resized) {
             megaChat.resized();
         }
 
         $('.fm-right-files-block, .fm-right-account-block, .fm-right-block.dashboard').css({
-            'margin-left': ($('.fm-left-panel:visible').width() + $('.nw-fm-left-icons-panel').width()) + "px"
+            'margin-left': (treePaneWidth + leftPaneWidth) + "px"
         });
 
-        $('.popup.transfer-widget').width($('.fm-left-panel:visible').width() - 9);
+        $('.popup.transfer-widget').outerWidth(treePaneWidth - 9);
     }
 
     if (M.currentrootid === 'shares') {
-        var shared_block_height = $('.shared-details-block').height() - $('.shared-top-details').height();
+        var $sharedDetailsBlock = $('.shared-details-block', '.fm-main');
+        var sharedDetailsHeight = Math.round($sharedDetailsBlock.outerHeight());
+        var sharedHeaderHeight = Math.round($('.shared-top-details').outerHeight());
+        var sharedBlockHeight = sharedDetailsHeight - sharedHeaderHeight;
 
-        if ($('.shared-details-block').parents('.fm-main').hasClass('fm-notification')) {
-            shared_block_height -= 24;
+        if ($sharedDetailsBlock.closest('.fm-main').hasClass('fm-notification')) {
+            sharedBlockHeight -= 24;
         }
 
-        if (shared_block_height > 0) {
-            $('.shared-details-block .files-grid-view, .shared-details-block .fm-blocks-view').css({
-                'height': shared_block_height + "px",
-                'min-height': shared_block_height + "px"
+        if (sharedBlockHeight > 0) {
+            $('.files-grid-view, .fm-blocks-view', $sharedDetailsBlock).css({
+                'height': sharedBlockHeight + "px",
+                'min-height': sharedBlockHeight + "px"
             });
         }
     }
@@ -3675,38 +4009,43 @@ function FMResizablePane(element, opts) {
 /**
  * bindDropdownEvents Bind custom select event
  *
- * @param {Selector} $dropdown  Class .dropdown elements selector
+ * @param {Selector} $select  Class .dropdown elements selector
  * @param {String}   saveOption Addition option for account page only. Allows to show "Show changes" notification
  * @param {String}   classname/id of  content block for dropdown aligment
  */
-function bindDropdownEvents($dropdown, saveOption, contentBlock) {
+function bindDropdownEvents($select, saveOption, contentBlock) {
+    'use strict';
 
-    var $dropdownsItem = $dropdown.find('.default-dropdown-item');
-    var $contentBlock = contentBlock ? $(contentBlock) : $(window);
-    var $hiddenInput = $dropdown.find('.dropdown-hidden-input');
+    var $dropdownsItem = $('.default-dropdown-item', $select);
+    var $contentBlock = contentBlock ? $(contentBlock) : $('body');
+    var $hiddenInput = $('.dropdown-hidden-input', $select);
 
     // hidden input for keyboard search
     if (!$hiddenInput.length) {
-        $hiddenInput = $('<input class="dropdown-hidden-input">');
-        $dropdown.prepend($hiddenInput);
+
+        // Skip tab action for hidden input by tabindex="-1"
+        $select.safePrepend('<input class="dropdown-hidden-input" tabindex="-1" autocomplete="disabled">');
+        $hiddenInput = $('input.dropdown-hidden-input', $select);
     }
 
-    $dropdown.rebind('click', function(e) {
+    $select.rebind('click.defaultselect', function(e) {
 
         var $this = $(this);
+        var $dropdown = $('.default-select-dropdown', $this);
+        var $outsideArea = $('.fmholder, .fm-dialog:not(.hidden)', 'body');
 
         if (!$this.hasClass('active')) {
             var jsp;
-            var scrollBlock = '#' + $this.attr('id') + ' .default-select-scroll';
-            var $dropdown = $this.find('.default-select-dropdown');
-            var $activeDropdownItem = $this.find('.default-dropdown-item.active');
+            var scrollBlock = ('#' + $this.attr('id')).replace(/\./g, '\\.') + ' .default-select-scroll';
+            var $activeDropdownItem = $('.default-dropdown-item.active', $this);
             var dropdownOffset;
             var dropdownBottPos;
             var dropdownHeight;
             var contentBlockHeight;
 
             //Show select dropdown
-            $('.active .default-select-dropdown').addClass('hidden');
+            $('.default-select.active', 'body').removeClass('active');
+            $('.active .default-select-dropdown', 'body').addClass('hidden');
             $this.addClass('active');
             $dropdown.removeAttr('style');
             $dropdown.removeClass('hidden');
@@ -3730,23 +4069,30 @@ function bindDropdownEvents($dropdown, saveOption, contentBlock) {
             }
 
             //Dropdown scrolling initialization
-            initSelectScrolling(scrollBlock);
-            jsp = $(scrollBlock).data('jsp');
+            if ($(scrollBlock).length) {
+                initSelectScrolling(scrollBlock);
+                jsp = $(scrollBlock).data('jsp');
 
-            // Prevent horizontal scrolling
-            $(scrollBlock).jScrollPane({
-                contentWidth: '0px'
-            });
-
-            if (jsp && $activeDropdownItem.length) {
-                jsp.scrollToElement($activeDropdownItem);
+                if (jsp && $activeDropdownItem.length) {
+                    jsp.scrollToElement($activeDropdownItem);
+                }
             }
 
             $hiddenInput.trigger('focus');
+
+            $outsideArea.rebind('mousedown.defaultselect', function(e) {
+
+                if (!$this.has($(e.target)).length && !$this.is(e.target)) {
+                    $this.removeClass('active');
+                    $dropdown.addClass('hidden');
+                    $outsideArea.unbind('mousedown.defaultselect');
+                }
+            });
         }
-        else if (!$(e.target).parents('.jspVerticalBar').length) {
-            $this.find('.default-select-dropdown').addClass('hidden');
+        else if (!$(e.target).closest('.jspVerticalBar').length) {
             $this.removeClass('active');
+            $dropdown.addClass('hidden');
+            $outsideArea.unbind('mousedown.defaultselect');
         }
     });
 
@@ -3756,9 +4102,9 @@ function bindDropdownEvents($dropdown, saveOption, contentBlock) {
         var $select = $(this).closest('.default-select');
 
         // Select dropdown item
-        $select.find('.default-dropdown-item').removeClass('active');
+        $('.default-dropdown-item', $select).removeClass('active');
         $this.addClass('active');
-        $select.find('span').text($this.text());
+        $('span', $select).text($this.text());
         $hiddenInput.trigger('focus');
 
         if (saveOption) {
@@ -3766,13 +4112,23 @@ function bindDropdownEvents($dropdown, saveOption, contentBlock) {
 
             // Save changes for account page
             if (nameLen) {
-                $this.parents('.settings-right-block').find('.save-block').removeClass('hidden');
+                $('.save-block', $this.closest('.settings-right-block')).removeClass('hidden');
             }
         }
     });
 
+    $dropdownsItem.rebind('mouseenter.settingsGeneral', function() {
+
+        var $this = $(this);
+
+        // If contents width is bigger than size of dropdown
+        if (this.offsetWidth < this.scrollWidth) {
+            $this.addClass('simpletip').attr('data-simpletip', $this.text());
+        }
+    });
+
     // Typing search and arrow key up and down features for dropdowns
-    $hiddenInput.rebind('keyup', function(e) {
+    $hiddenInput.rebind('keyup.defaultselect', function(e) {
         var charCode = e.which || e.keyCode; // ff
         if ((charCode > 64 && charCode < 91) || (charCode > 96 && charCode < 123)) {
             var inputValue = $hiddenInput.val();
@@ -3781,8 +4137,8 @@ function bindDropdownEvents($dropdown, saveOption, contentBlock) {
             });
 
             if ($filteredItem[0]) {
-                var jsp = $dropdown.find('.default-select-scroll').data('jsp');
-                $dropdown.find('.default-dropdown-item.active').removeClass('active');
+                var jsp = $('.default-select-scroll', $select).data('jsp');
+                $('.default-dropdown-item.active', $select).removeClass('active');
                 jsp.scrollToElement($($filteredItem[0]), 1);
                 $($filteredItem[0]).addClass('active');
             }
@@ -3791,7 +4147,7 @@ function bindDropdownEvents($dropdown, saveOption, contentBlock) {
             e.preventDefault();
             e.stopPropagation();
 
-            var $current = $(this).closest('.default-select').find('.default-dropdown-item.active');
+            var $current = $('.default-dropdown-item.active',  $select);
 
             if (charCode === 38) { // Up key
                 $current.removeClass('active').prev().addClass('active');
@@ -3805,20 +4161,13 @@ function bindDropdownEvents($dropdown, saveOption, contentBlock) {
         }
     });
 
-    $hiddenInput.rebind('keydown', function() {
+    $hiddenInput.rebind('keydown.defaultselect', function() {
         delay('dropbox:clearHidden', function() {
             // Combination language bug fixs for MacOS.
             $hiddenInput.val('').trigger('blur').trigger('focus');
         }, 750);
     });
     // End of typing search for dropdowns
-
-    $('#fmholder, .fm-dialog, #startholder').rebind('click.defaultselect', function(e) {
-
-        if (!$dropdown.has($(e.target)).length && !$dropdown.is(e.target)) {
-            $dropdown.removeClass('active').find('.default-select-dropdown').addClass('hidden');
-        }
-    });
 }
 
 /**

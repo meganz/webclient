@@ -81,7 +81,7 @@
         var $inputs = $dialog.find('input');
         var $button = $dialog.find('.big-red-button');
 
-        if (typeof page !== 'undefined' && page === 'chat') {
+        if (M.chat) {
             $('.fm-dialog-subheading', $dialog).removeClass('hidden');
             $('.fm-dialog-subheading > a', $dialog).rebind('click.doSignup', function() {
                 closeDialog();
@@ -170,7 +170,7 @@
         var $passwordInput = $dialog.find('#login-password3');
         var $rememberMeCheckbox = $dialog.find('.login-check input');
 
-        var email = $emailInput.val();
+        var email = $emailInput.val().trim();
         var password = $passwordInput.val();
         var rememberMe = $rememberMeCheckbox.is('.checkboxOn');  // ToDo check if correct
         var twoFactorPin = null;

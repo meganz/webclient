@@ -75,22 +75,5 @@ describe("Initialization Unit Tests", function() {
         assert.ok(M.req.calledWith('hah'));
         expect(console.warn.callCount).to.eql(2);
         warn.restore();
-
-        var iDBState = 'OK';
-        try {
-            var tmp = !!window.indexedDB;
-        }
-        catch (ex) {
-            iDBState = ex.name;
-        }
-
-        if (iDBState === 'SecurityError') {
-            assert.strictEqual(window.mDB, undefined);
-        }
-        else {
-            // Check mDB.js's startMega was called
-            expect(window.mDB).to.eql(0x7f);
-            expect(indexedDB.getDatabaseNames).to.be.a('function');
-        }
     });
 });

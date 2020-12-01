@@ -48,6 +48,11 @@ function setTransferStatus(dl, status, ethrow, lock, fatalError) {
     else {
         if (fatalError) {
             dlmanager.onDownloadFatalError = status;
+
+            if (is_mobile && lock !== 2 && dl) {
+                mobile.downloadOverlay.close();
+                mobile.messageOverlay.show(status);
+            }
         }
 
         $('.transfer-table #' + id + ' .transfer-status')
@@ -94,10 +99,15 @@ function dlFatalError(dl, error, ethrow, lock) {
         error = String(Object(error).message || error).replace(/\s+/g, ' ').trim();
 
         if (error.indexOf(l[16871]) < 0 && error.indexOf(l[16872]) < 0 && error.indexOf(l[1668]) < 0) {
-            if (error.indexOf(l[5945]) > -1) {
-                error = error.substr(l[5945].length).trim();
+            if (error.indexOf(String(l[5945]).split('[')[0]) > -1) {
+                error = '5945, ' + (error.match(/\[(.*)]/) || '  ')[1];
             }
-            srvlog('dlFatalError: ' + error.substr(0, 60) + (window.Incognito ? ' (Incognito)' : ''));
+            // srvlog('dlFatalError: ' + error.substr(0, 60) + (window.Incognito ? ' (Incognito)' : ''));
+            // ^ Let's stop logging Incognito issues, they are too common and we do have fallback logic anyway
+            // Also stop obsolete browsers (e.g. attempting to use FlashIO, sigh) from logging errors
+            if (!window.Incognito && mega.es2019 && !/^[\d\s,.]+$/.test(error)) {
+                srvlog('dlFatalError: ' + error.substr(0, 72));
+            }
         }
     });
 
@@ -155,12 +165,12 @@ Speedometer.prototype.progress = function(p) {
 };
 
 // compute final MAC from block MACs
-function condenseMacs(macs, key, initialMac) {
+function condenseMacs(macs, key) {
     'use strict';
 
     var i, j, mblk;
-    var mac = initialMac || [0, 0, 0, 0];
-    var aes = new sjcl.cipher.aes([key[0], key[1], key[2], key[3]]);
+    var mac = [0, 0, 0, 0];
+    var aes = Array.isArray(key) ? new sjcl.cipher.aes([key[0], key[1], key[2], key[3]]) : key;
 
     for (i = 0; i < macs.length; i++) {
         mblk = macs[i];

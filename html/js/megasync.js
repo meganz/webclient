@@ -25,9 +25,11 @@ var megasync = (function() {
     }
     var retryTimer;
     var clients = {
-        windows: 'https://mega.nz/MEGAsyncSetup.exe',
+        windows: 'https://mega.nz/MEGAsyncSetup64.exe',
+        windows_x32: 'https://mega.nz/MEGAsyncSetup32.exe',
         mac: 'https://mega.nz/MEGAsyncSetup.dmg'
     };
+    var usemsync = localStorage.usemsync;
 
     var linuxClients;
     var listeners = [];
@@ -64,7 +66,7 @@ var megasync = (function() {
     /** a function to switch the url to communicate with MEGASync */
     function switchMegasyncUrlToHttpWhenPossible() {
 
-        if (!ua || !ua.details || !ua.details.browser || !ua.details.version) {
+        if (!ua || !ua.details || !ua.details.browser || !ua.details.version || is_extension) {
             return ShttpMegasyncUrl;
         }
 
@@ -96,6 +98,9 @@ var megasync = (function() {
             else {
                 return ShttpMegasyncUrl;
             }
+        }
+        else if (ua.details.browser === 'Edgium') {
+            return httpMegasyncUrl;
         }
         else {
             return ShttpMegasyncUrl;
@@ -370,7 +375,9 @@ var megasync = (function() {
         if (overlayHeight < (listHeight + listPosition)) {
             $arrow.removeClass('hidden');
             $downArrow.removeClass('inactive');
-            $pane.height(overlayHeight - listPosition - 72);
+            var paneHeight = overlayHeight - listPosition - 72;
+            paneHeight = paneHeight < 120 ? 120 : paneHeight;
+            $pane.height(paneHeight);
             $pane.jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 8, animateScroll: true});
 
             var jspAPI = $pane.data('jsp');
@@ -493,22 +500,26 @@ var megasync = (function() {
         if (lastCheckStatus && lastCheckTime) {
             api_req({ a: 'log', e: 99800, m: 'MEGASync is not responding' });
 
-            msgDialog('confirmation', 'MEGASync is not responding',
+            msgDialog(
+                'confirmation',
+                'MEGASync is not responding',
                 l[17795],
                 // 'MEGASync stopped responding, it could be closed or too busy',
                 l[17796],
                 // 'Do you want to re-initialize connection with MEGASync, ' +
                 // 'and turn it off if MEGASync did not respond?',
-                function (disableMsync) {
+                function(disableMsync) {
                     if (disableMsync) {
                         lastCheckStatus = null;
                         lastCheckTime = null;
+                        ns.periodicCheck();
                         if (nextIfYes && typeof nextIfYes === 'function') {
                             nextIfYes();
                         }
                     }
 
-                });
+                }
+            );
         }
         else {
             showDownloadDialog();
@@ -890,7 +901,8 @@ var megasync = (function() {
     };
 
     ns.isInstalled = function (next) {
-        if (!fmconfig.dlThroughMEGAsync && page !== "download") {
+        if ((!fmconfig.dlThroughMEGAsync && page !== "download")
+            || (!is_livesite && !usemsync)) {
             next(true, false); // next with error=true and isworking=false
         }
         else if (!lastCheckStatus || !lastCheckTime) {
@@ -956,6 +968,35 @@ var megasync = (function() {
     ns.megaSyncRequest = megaSyncRequest;
     ns.megaSyncIsNotResponding = megaSyncIsNotResponding;
 
+    var periodicCheckTimeout;
+
+    ns.periodicCheck = function() {
+        if (periodicCheckTimeout) {
+            clearTimeout(periodicCheckTimeout);
+        }
+        ns.isInstalled(function(err, is) {
+            if (!err || is) {
+                if (megasync.currUser === u_handle) {
+                    window.useMegaSync = 2;
+                    periodicCheckTimeout = setTimeout(ns.periodicCheck, defaultStatusThreshold);
+                }
+                else {
+                    window.useMegaSync = 3;
+                    periodicCheckTimeout = setTimeout(ns.periodicCheck, statusThresholdWhenDifferentUsr);
+                }
+            }
+            else {
+                window.useMegaSync = 4;
+                periodicCheckTimeout = setTimeout(ns.periodicCheck, statusThresholdWhenDifferentUsr);
+            }
+        });
+    };
+    if ((is_livesite && !is_mobile) || usemsync) {
+        mBroadcaster.once('fm:initialized', ns.periodicCheck);
+    }
+    else {
+        ns.periodicCheck = function() { };
+    }
 
     return ns;
 })();

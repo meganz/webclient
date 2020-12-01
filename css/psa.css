@@ -114,11 +114,11 @@
     background-color: #686565;
 }
 .bottom-info.fm-dialog-close {
+    background-image: url(../images/mega/dialog-sprite_v18.png);
     cursor: pointer;
     height: 30px;
     width: 30px;
     background-position: -53px -4825px;
-    background-image: url(../images/mega/dialog-sprite_v8.png);
     background-repeat: no-repeat;
     position: absolute;
     right: 10px;

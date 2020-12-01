@@ -51,6 +51,10 @@ function dashboardUI() {
         else {
             $('.business-dashboard .go-to-usermanagement-btn').addClass('hidden');
         }
+        if (u_attr.b.s !== 1 || !u_attr.b.m) {
+            $('.left-pane.small-txt.plan-date-info', '.dashboard').addClass('hidden');
+            $('.left-pane.big-txt.plan-date-val', '.dashboard').addClass('hidden');
+        }
     }
     else {
         $('.fm-right-block.dashboard .non-business-dashboard').removeClass('hidden');
@@ -69,7 +73,6 @@ function dashboardUI() {
         avatarDialog();
     });
 
-    $('.data-float-bl .icon-button').rebind('mouseover.dashboardPlus', FileSelectHandlerMegaSyncMouse);
 
     // Data plus, upload file
     $('.data-float-bl .icon-button').rebind('click', function() {
@@ -110,22 +113,14 @@ function dashboardUI() {
 
         // QR Code
         var drawQRCanvas = function _drawQRCanvas() {
-            var myHost = '';
-            if (!is_extension) {
-                var cutPlace = location.href.indexOf('/fm/');
-                myHost = location.href.substr(0, cutPlace);
-            }
-            else {
-                myHost = 'https://mega.nz';
-            }
-            myHost += '/' + M.account.contactLink;
+
             if (account.contactLink && account.contactLink.length) {
                 var QRoptions = {
                     width: 106,
                     height: 106,
                     correctLevel: QRErrorCorrectLevel.H,    // high
                     foreground: '#D90007',
-                    text: myHost
+                    text: getBaseUrl() + '/' + account.contactLink
                 };
                 // Render the QR code
                 $('.account.qr-icon').text('').qrcode(QRoptions);
@@ -241,6 +236,9 @@ function dashboardUI() {
                         'data-simpletip-style=\'{"max-width":"220px", "text-align":"center"}\' data-simpletip="' +
                         escapeHTML(l[20965]) + '"></div>');
                 }
+                else if (u_attr.b && u_attr.b.m) {
+                    $('.account.left-pane.plan-date-info').text(l[987]);
+                }
                 else {
                     $('.account.left-pane.plan-date-info').text(l[20153]);
                 }
@@ -253,17 +251,27 @@ function dashboardUI() {
                 if (u_attr.b.s === 1) {
                     $businessLeft.find('.suba-status').addClass('active').removeClass('disabled pending')
                         .text(l[7666]);
-                    if (u_attr.b.m) { // master
-                        timestamp = account.srenew[0];
-                        if ((Date.now() / 1000) - timestamp > 0) {
-                            $businessLeft.find('.suba-status').addClass('pending').removeClass('disabled active')
-                                .text(l[19609]);
-                        }
+                }
+                else if (u_attr.b.s === 2 && u_attr.b.m) {
+                    $('.suba-status', $businessLeft).addClass('pending').removeClass('disabled active')
+                        .text(l[19609]);
+                    if (u_attr.b.sts && u_attr.b.sts[0] && u_attr.b.sts[0].s === -1) {
+                        var expiryDate = new Date(u_attr.b.sts[0].ts * 1000);
+                        var currentTime = new Date();
+                        var remainingDays = Math.floor((expiryDate - currentTime) / 864e5);
+                        remainingDays = remainingDays < 0 ? 0 : remainingDays;
+                        var daysLeft = l[16284].replace('%1', remainingDays);
+                        $('.suba-days-left', $businessLeft).removeClass('hidden').text(daysLeft);
+                        $('.suba-pay-bill', $businessLeft).removeClass('hidden');
                     }
                 }
                 else {
-                    $businessLeft.find('.suba-status').addClass('disabled').removeClass('pending active')
+                    $('.suba-status', $businessLeft).addClass('disabled').removeClass('pending active')
                         .text(l[19608]);
+
+                    if (u_attr.b.m) {
+                        $('.suba-pay-bill', $businessLeft).removeClass('hidden');
+                    }
                 }
 
                 if (u_attr.b.m) { // master
@@ -271,6 +279,10 @@ function dashboardUI() {
                 }
                 else {
                     $businessLeft.find('.suba-role').text(l[5568]);
+                }
+                if (u_attr.b.s !== 1 || !u_attr.b.m) {
+                    $('.left-pane.small-txt.plan-date-info', '.dashboard').addClass('hidden');
+                    $('.left-pane.big-txt.plan-date-val', '.dashboard').addClass('hidden');
                 }
 
                 var $businessDashboard = $('.fm-right-block.dashboard .business-dashboard').removeClass('hidden');
@@ -287,7 +299,8 @@ function dashboardUI() {
         }
 
         /* Registration date, bandwidth notification link */
-        $('.dashboard .default-green-button.upgrade-account, .bandwidth-info a').rebind('click', function() {
+        $('.default-green-button.upgrade-account, .bandwidth-info a, .pay-bill-btn','.dashboard')
+            .rebind('click.dboard', function() {
             if (u_attr && u_attr.b && u_attr.b.m && (u_attr.b.s === -1 || u_attr.b.s === 2)) {
                 loadSubPage('repay');
             }
@@ -395,13 +408,7 @@ function dashboardUI() {
 
                 // Get more transfer quota button
                 $('.account.widget.bandwidth .free .more-quota').rebind('click', function() {
-                    // if the account have achievements, show them, otherwise #pro
-                    if (M.maf) {
-                        mega.achievem.achievementsListDialog();
-                    }
-                    else {
-                        loadSubPage('pro');
-                    }
+                    loadSubPage('pro');
                     return false;
                 });
             }
@@ -427,30 +434,58 @@ function dashboardUI() {
                 $('.dashboard .upgrade-account').addClass('hidden').hide();
             }
             $('.business-dashboard .user-management-storage .storage-transfer-data')
-                .text(bytesToSize(account.space_used));
+                .text(bytesToSize(account.space_used, 2));
             $('.business-dashboard .user-management-transfer .storage-transfer-data')
-                .text(bytesToSize(account.tfsq.used));
+                .text(bytesToSize(account.tfsq.used, 2));
 
             var $dataStats = $('.business-dashboard .subaccount-view-used-data');
 
-            $dataStats.find('.ba-root .ff-occupy').text(bytesToSize(account.stats[M.RootID].bytes));
-            $dataStats.find('.ba-root .folder-number').text(account.stats[M.RootID].folders + ' ' + l[2035]);
-            $dataStats.find('.ba-root .file-number').text(account.stats[M.RootID].files + ' ' + l[2034]);
+            var ffNumText = function(value, type) {
+                var counter = value || 0;
+                var numTextOutput = "";
 
-            $dataStats.find('.ba-inshare .ff-occupy').text(bytesToSize(account.stats['inshares'].bytes));
-            $dataStats.find('.ba-inshare .folder-number').text(account.stats['inshares'].items + ' ' + l[2035]);
-            $dataStats.find('.ba-inshare .file-number').text(account.stats['inshares'].files + ' ' + l[2034]);
+                if (counter === 0) {
+                    numTextOutput = type === 'file' ? l[23259] : l[23258];
+                }
+                else if (counter === 1) {
+                    numTextOutput = type === 'file' ? l[23257] : l[23256];
+                }
+                else {
+                    numTextOutput = (type === 'file' ? l[23261] : l[23260]).replace('[X]', counter);
+                }
 
-            $dataStats.find('.ba-outshare .ff-occupy').text(bytesToSize(account.stats['outshares'].bytes));
-            $dataStats.find('.ba-outshare .folder-number').text(account.stats['outshares'].items + ' ' + l[2035]);
-            $dataStats.find('.ba-outshare .file-number').text(account.stats['outshares'].files + ' ' + l[2034]);
+                return numTextOutput;
+            };
 
-            $dataStats.find('.ba-rubbish .ff-occupy').text(bytesToSize(account.stats[M.RubbishID].bytes));
-            $dataStats.find('.ba-rubbish .folder-number').text(account.stats[M.RubbishID].folders + ' ' + l[2035]);
-            $dataStats.find('.ba-rubbish .file-number').text(account.stats[M.RubbishID].files + ' ' + l[2034]);
+            var folderNumText = ffNumText(account.stats[M.RootID].folders, 'folder');
+            var fileNumText = ffNumText(account.stats[M.RootID].files, 'file');
+            $('.ba-root .ff-occupy', $dataStats).text(bytesToSize(account.stats[M.RootID].bytes, 2));
+            $('.ba-root .folder-number', $dataStats).text(folderNumText);
+            $('.ba-root .file-number', $dataStats).text(fileNumText);
 
-            $dataStats.find('.ba-pub-links .ff-occupy').text(bytesToSize(account.stats['links'].bytes));
-            $dataStats.find('.ba-pub-links .file-number').text(account.stats['links'].files);
+            folderNumText = ffNumText(account.stats.inshares.items, 'folder');
+            fileNumText = ffNumText(account.stats.inshares.files, 'file');
+            $('.ba-inshare .ff-occupy', $dataStats).text(bytesToSize(account.stats.inshares.bytes, 2));
+            $('.ba-inshare .folder-number', $dataStats).text(folderNumText);
+            $('.ba-inshare .file-number', $dataStats).text(fileNumText);
+
+            folderNumText = ffNumText(account.stats.outshares.items, 'folder');
+            fileNumText = ffNumText(account.stats.outshares.files, 'file');
+            $('.ba-outshare .ff-occupy', $dataStats).text(bytesToSize(account.stats.outshares.bytes, 2));
+            $('.ba-outshare .folder-number', $dataStats).text(folderNumText);
+            $('.ba-outshare .file-number', $dataStats).text(fileNumText);
+
+            folderNumText = ffNumText(account.stats[M.RubbishID].folders, 'folder');
+            fileNumText = ffNumText(account.stats[M.RubbishID].files, 'file');
+            $('.ba-rubbish .ff-occupy', $dataStats).text(bytesToSize(account.stats[M.RubbishID].bytes, 2));
+            $('.ba-rubbish .folder-number', $dataStats).text(folderNumText);
+            $('.ba-rubbish .file-number', $dataStats).text(fileNumText);
+
+            folderNumText = ffNumText(account.stats.links.folders, 'folder');
+            fileNumText = ffNumText(account.stats.links.files, 'file');
+            $('.ba-pub-links .ff-occupy', $dataStats).text(bytesToSize(account.stats.links.bytes, 2));
+            $('.ba-pub-links .folder-number', $dataStats).text(folderNumText);
+            $('.ba-pub-links .file-number', $dataStats).text(fileNumText);
 
             var verFiles = 0;
             var verBytes = 0;
@@ -571,12 +606,14 @@ dashboardUI.updateChatWidget = function() {
     });
 };
 dashboardUI.updateCloudDataWidget = function() {
+    var file0 = l[23253];
     var file1 = 835;
     var files = 833;
+    var folder0 = l[23254];
     var folder1 = 834;
     var folders = 832;
     var data = M.getDashboardData();
-    var locale = [files, folders, files, folders, folders, files];
+    var locale = [files, folders, files, folders, folders, folders];
     var map = ['files', 'folders', 'rubbish', 'ishares', 'oshares', 'links', 'versions'];
     var intl = typeof Intl !== 'undefined' && Intl.NumberFormat && new Intl.NumberFormat();
 
@@ -614,13 +651,16 @@ dashboardUI.updateCloudDataWidget = function() {
             }
             else if (intl) {
                 cnt = intl.format(props.cnt || 0);
+                if (cnt === "0") {
+                    str = locale[idx] === files ? file0 : folder0;
+                }
             }
 
             if (props.xfiles > 1) {
                 str += ', ' + String(l[833]).replace('[X]', props.xfiles);
             }
 
-            elm.children[1].textContent = idx < 5 ? String(str).replace('[X]', cnt) : cnt;
+            elm.children[1].textContent = idx < 6 ? String(str).replace('[X]', cnt) : cnt;
             if (props.cnt > 0) {
                 elm.children[2].textContent = bytesToSize(props.size);
                 $(elm).removeClass('empty');

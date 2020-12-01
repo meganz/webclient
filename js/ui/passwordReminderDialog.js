@@ -216,6 +216,10 @@
         });
 
         $(self.passwordField).rebind('keypress.prd', function(e) {
+            if (!self.dialog) {
+                console.warn('This event should no longer be reached...');
+                return;
+            }
             if (e.which === 13 || e.keyCode === 13) {
                 $(self.dialog.querySelector('.button-prd-confirm')).triggerHandler('click');
                 return false;
@@ -223,10 +227,13 @@
         });
 
         $(self.dialog.querySelector('.fm-dialog-close')).rebind('click.prd', function() {
-            self.hide();
-            if (self._dialogActionPromise && self._dialogActionPromise.state() === 'pending') {
-                self._dialogActionPromise.reject();
-            }
+            self.dismiss();
+            return false;
+        });
+
+        // Handle forgot password button.
+        $(self.dialog.querySelector('.forgot-password')).rebind('click.prd', function() {
+            self.onChangePassClicked();
             return false;
         });
 
@@ -244,6 +251,17 @@
             self.passwordReminderAttribute.dontShowAgain === 1
         );
 
+    };
+
+    /**
+     * Dismiss the dialog, rejecting the action promise and hide from view.
+     * @return {false}
+     */
+    PasswordReminderDialog.prototype.dismiss = function() {
+        if (self._dialogActionPromise && self._dialogActionPromise.state() === 'pending') {
+            self._dialogActionPromise.reject();
+        }
+        this.hide();
     };
 
     PasswordReminderDialog.prototype.onButtonClicked = function(element, evt) {
@@ -268,21 +286,15 @@
 
         this.resetUI();
 
-        // If the user's Account Authentication Version is set for the new registration process (version 2)
-        if (u_attr.aav === 2) {
-
-            // Derive the keys from the password
-            security.getDerivedEncryptionKey(enteredPassword, function(derivedEncryptionKeyArray32) {
-                self.completeOnConfirmClicked(derivedEncryptionKeyArray32);
+        // Derive the keys from the password
+        security.getDerivedEncryptionKey(enteredPassword)
+            .then(function(derivedKey) {
+                self.completeOnConfirmClicked(derivedKey);
+            })
+            .catch(function(ex) {
+                console.warn(ex);
+                self.completeOnConfirmClicked('');
             });
-        }
-        else {
-            // Derive the key from the password using the old registration method (version 1)
-            var derivedEncryptionKeyArray32 = prepare_key_pw(enteredPassword);
-
-            // Continue the verification
-            self.completeOnConfirmClicked(derivedEncryptionKeyArray32);
-        }
     };
 
     PasswordReminderDialog.prototype.completeOnConfirmClicked = function(derivedEncryptionKeyArray32) {
@@ -577,12 +589,11 @@
         this.firstText = this.dialog.querySelector('.pass-reminder.info-txt');
 
         if (this.firstText) {
-            var link = "https://mega.nz/help/s/576c763f886688e6028b4582";
 
             $(this.firstText).html(
                 escapeHTML(!this.isLogout ? l[16900] : l[20633])
                     .replace('[A]', '<a \n' +
-                        'href="' + link + '" target="_blank" class="red">')
+                        'href="https://mega.nz/security" target="_blank" class="red">')
                     .replace('[/A]', '</a>')
             );
         }
@@ -730,6 +741,7 @@
 
         $(window).off('resize.prd');
         $(document.body).off(MouseDownEvent);
+        $(this.passwordField).off('keypress.prd');
     };
 
     PasswordReminderDialog.prototype.recheckLogoutDialog = function() {

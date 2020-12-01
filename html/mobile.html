@@ -1,83 +1,191 @@
 <!-- Mobile main menu !-->
 <div class="mobile dark-overlay"></div>
 <div class="mobile top-menu-popup hidden">
-    <div class="top-icon close"></div>
+    <i class="top-menu-icon menus-sprite close"></i>
     <div class="top-menu-scroll">
         <div class="top-menu-content">
-            <div class="top-menu-item start">[$1888]</div>
-            <div class="top-menu-item fm">[$164]</div>
-            <div class="top-menu-item account"><span class="right-el">[$435]</span><span>[$187]</span></div>
-            <div class="top-menu-item upgrade-your-account not-mobile-ready">[$433]</div>
-            <div class="top-menu-item backup not-mobile-ready"><span class="right-el"><i class="semi-small-icon yellow-triangle"></i></span><span>[$8921]</span></div>
-            <div class="top-menu-item refresh-item not-mobile-ready">[$85]</div>
-            <div class="top-menu-item logout">[$967]</div>
-            <div class="top-menu-item login">[$171]</div>
-            <div class="top-menu-item register">[$968]</div>
+
+            <div class="top-menu-logged">
+                <div class="avatar-block">
+                    <img alt="" />
+                </div>
+                <div class="user-info">
+                    <div class="name"></div>
+                    <div class="email"></div>
+                </div>
+                <div class="clear"></div>
+
+                <div class="plan"></div>
+                <div class="storage">
+                    <span></span>
+                </div>
+                <div class="loader menus-sprite"></div>
+                <div class="storage-txt">
+                </div>
+                <div class="top-green-button upgrade-your-account">
+                    [$433]
+                </div>
+                <div class="top-menu-item small refresh-item">
+                    <i class="top-menu-icon menus-sprite refresh"></i>
+                    <span>[$23433]</span>
+                </div>
+            </div>
+            <div class="top-menu-item start">
+                <i class="top-menu-icon menus-sprite mega"></i>
+                <span>[$1888]</span>
+            </div>
+            <div class="top-menu-item login">
+                <i class="top-menu-icon menus-sprite login"></i>
+                <span>[$171]</span>
+            </div>
+            <div class="top-menu-item register">
+                <i class="top-menu-icon menus-sprite register"></i>
+                <span>[$968]</span>
+            </div>
+            <div class="top-menu-divider small-pad bg"></div>
+
+             <div class="top-menu-item backup small-pad">
+                 <i class="top-menu-icon menus-sprite export"></i>
+                 <span>[$8921]</span>
+            </div>
+            <div class="top-menu-divider small-pad bg hidden"></div>
+
+            <div class="top-menu-item fm">
+                <i class="top-menu-icon menus-sprite mega"></i>
+                <span>[$164]</span>
+            </div>
+
+            <div class="top-menu-item submenu-item hidden">
+                <i class="top-menu-icon menus-sprite features"></i>
+                <span>[$23854]</span>
+                <i class="top-menu-icon menus-sprite right-arrow"></i>
+            </div>
+             <div class="top-submenu hidden">
+                <div class="top-menu-item security">[$7337]</div>
+                <div class="top-menu-item storage hidden">Storage &amp; Transfer</div>
+                <div class="top-menu-item encryption hidden">End-to-End Encryption</div>
+                <div class="top-menu-item security-chat hidden">Security Chat</div>
+                <div class="top-menu-item back hidden">Backup</div>
+                <div class="top-menu-item share hidden">Share &amp; Collaborate</div>
+            </div>
+
+            <div class="top-menu-item submenu-item">
+                <i class="top-menu-icon menus-sprite platforms"></i>
+                <span>[$23854]</span>
+                <i class="top-menu-icon menus-sprite right-arrow"></i>
+            </div>
+             <div class="top-submenu">
+                <div class="top-menu-item sync">[$956]</div>
+                <div class="top-menu-item mobile">[$955]</div>
+                <div class="top-menu-item cmd">MEGAcmd</div>
+                <div class="top-menu-item extensions">[$16603]</div>
+                <div class="top-menu-item bird hidden">MEGAbird</div>
+                <div class="top-menu-item nas">[$24478]</div>
+            </div>
+
+            <div class="top-menu-item submenu-item">
+                <i class="top-menu-icon menus-sprite company"></i>
+                <span>[$23328]</span>
+                <i class="top-menu-icon menus-sprite right-arrow"></i>
+            </div>
+             <div class="top-submenu">
+                <div class="top-menu-item security">[$7337]</div>
+                <div class="top-menu-item about">[$16112]</div>
+                <div class="top-menu-item pro">[$1361]</div>
+                <div class="top-menu-item affiliate">[$22682]</div>
+                <div class="top-menu-item blog blogarticle">[$389]</div>
+                 <div class="top-menu-item corporate">[$24093]</div>
+             </div>
+
+            <div class="top-menu-item submenu-item">
+                <i class="top-menu-icon menus-sprite support"></i>
+                <span>[$383]</span>
+                <i class="top-menu-icon menus-sprite right-arrow"></i>
+            </div>
+             <div class="top-submenu">
+                <div class="top-menu-item help">[$384]</div>
+                <div class="top-menu-item contact">[$399]</div>
+                <div class="top-menu-item support">[$516]</div>
+                <div class="top-menu-item feedback not-mobile-ready">[$1356]</div>
+            </div>
+
+            <div class="top-menu-item submenu-item">
+                <i class="top-menu-icon menus-sprite develop"></i>
+                <span>[$392]</span>
+                <i class="top-menu-icon menus-sprite right-arrow"></i>
+            </div>
+             <div class="top-submenu">
+                <div class="top-menu-item sourcecode">[$7411]</div>
+                <div class="top-menu-item sdk">[$962]</div>
+                <div class="top-menu-item doc">[$963]</div>
+            </div>
+
+            <div class="top-menu-item submenu-item">
+                <i class="top-menu-icon menus-sprite legal"></i>
+                <span>[$16114]</span>
+                <i class="top-menu-icon menus-sprite right-arrow"></i>
+            </div>
+             <div class="top-submenu">
+                <div class="top-menu-item terms">[$385]</div>
+                <div class="top-menu-item privacy">[$386]</div>
+                <div class="top-menu-item copyright">[$387]</div>
+                <div class="top-menu-item takedown">[$966]</div>
+                <div class="top-menu-item transparency">[$22681]</div>
+                <div class="top-menu-item gdpr">[$18501]</div>
+            </div>
+
             <div class="top-menu-divider"></div>
 
-            <div class="top-menu-item blog blogarticle not-mobile-ready">[$389]</div>
-            <div class="top-menu-item help">[$384]</div>
-            <div class="top-menu-item security">[$7337]</div>
-            <div class="top-menu-item support not-mobile-ready">[$516]</div>
-            <div class="top-menu-item upgrade-your-account pro">[$16111]</div>
-            <div class="top-menu-item resellers not-mobile-ready">[$391]</div>
-            <div class="top-menu-item submenu-item languages"><span class="right-el">EN</span><span>[$670]</span></div>
+            <div class="top-menu-item submenu-item languages small-pad">
+                 <i class="top-menu-icon menus-sprite globe"></i>
+                 <span></span>
+                 <i class="top-menu-icon menus-sprite right-arrow inline down"></i>
+            </div>
             <div class="top-submenu language-items">
                 <div class="top-menu-item language-template">
                     <span class="lang-name"></span>
                     <span class="beta-text">[$5907]</span>
                 </div>
             </div>
-            <div class="top-menu-divider not-mobile-ready"></div>
 
-            <div class="top-menu-item about not-mobile-ready">[$16112]</div>
-            <div class="top-menu-item privacycompany not-mobile-ready">[$16113]</div>
-            <div class="top-menu-item contact">[$399]</div>
-            <div class="top-menu-item feedback not-mobile-ready">[$1356]</div>
-            <div class="top-menu-divider"></div>
-
-            <div class="top-menu-item submenu-item">[$961]</div>
-            <div class="top-submenu">
-                <div class="top-menu-item mobile">[$955]</div>
-                <div class="top-menu-item sync">[$956]</div>
-                <div class="top-menu-item extensions">[$16603]</div>
-                <div class="top-menu-item bird">MEGAbird</div>
-                <div class="top-menu-item cmd">MEGAcmd</div>
-                <div class="top-menu-item uwp">[$20028]</div>
-            </div>
-
-            <div class="top-menu-item submenu-item">[$392]</div>
-            <div class="top-submenu">
-                <div class="top-menu-item sourcecode">[$7411]</div>
-                <div class="top-menu-item sdk">[$962]</div>
-                <div class="top-menu-item doc">[$963]</div>
-            </div>
-
-            <div class="top-menu-item submenu-item">[$16114]</div>
-            <div class="top-submenu">
-                <div class="top-menu-item terms">[$385]</div>
-                <div class="top-menu-item privacy">[$386]</div>
-                <div class="top-menu-item copyright not-mobile-ready">[$387]</div>
-                <div class="top-menu-item takedown">[$966]</div>
-                <div class="top-menu-item transparency">[$22681]</div>
-                <div class="top-menu-item gdpr">[$18501]</div>
-            </div>
+            <div class="top-menu-divider small-pad"></div>
 
             <div class="top-social-bl">
-                <a href="https://www.facebook.com/MEGAprivacy" target="_blank" rel="noopener noreferrer" class="st-bottom-button st-facebook-button"></a>
-                <a href="https://www.twitter.com/MEGAprivacy" target="_blank" rel="noopener noreferrer" class="st-bottom-button st-twitter-button"></a>
+                <div class="top-social-txt">
+                    [$23329]
+                </div>
+                <a href="https://www.facebook.com/MEGAprivacy" target="_blank" rel="noopener noreferrer" class="top-social-button">
+                     <i class="top-menu-icon menus-sprite fb"></i>
+                </a>
+                <a href="https://www.instagram.com/MEGA_privacy/" target="_blank" rel="noopener noreferrer" class="top-social-button">
+                    <i class="top-menu-icon menus-sprite instagram"></i>
+                </a>
+                <a href="https://twitter.com/MEGAprivacy" target="_blank" rel="noopener noreferrer" class="top-social-button">
+                    <i class="top-menu-icon menus-sprite twitter"></i>
+                </a>
+                <a href="https://www.linkedin.com/company/mega-the-privacy-company" target="_blank" rel="noopener noreferrer" class="top-social-button">
+                    <i class="top-menu-icon menus-sprite linkedin"></i>
+                </a>
+                <a href="https://www.youtube.com/channel/UCL0n8SACU_eghsvHxbizKCA" target="_blank" rel="noopener noreferrer" class="top-social-button">
+                    <i class="top-menu-icon menus-sprite youtube"></i>
+                </a>
+                <div class="clear"></div>
             </div>
 
             <div class="top-mega-version">
                 v. dev
             </div>
+            <div class="top-menu-item top-white-button logout">
+                [$967]
+            </div>
+            <div class="clear"></div>
         </div>
     </div>
 </div>
 
 
 <!-- Loading overlay -->
-<div class="dark-overlay hidden"></div>
+<div class="dark-overlay hidden" id="loading-overlay"></div>
 <div class="titlemenu-overlay hidden"></div>
 <div class="light-overlay hidden"></div>
 <div class="slideshow-overlay hidden"></div>
@@ -85,7 +193,7 @@
 
 
 <!-- Loading progress / spinner -->
-<div class="mobile loading-spinner hidden">
+<div class="mobile loading-spinner hidden" id="loading-spinner">
     <div class="main-loader"></div>
     <ul class="loading-info">
         <li class="step3">[$8579]</li>
@@ -102,8 +210,10 @@
 <div class="mobile main-block inital-folder-view hidden">
     <div class="mobile content-row first">
         <div class="mobile content-cell">
-            <a href="" class="mobile logo"></a>
-            <div class="mobile fm-icon top-icon menu right dl-page"></div>
+            <div class="fm-header">
+                <a href="" class="mobile logo"></a>
+                <div class="mobile fm-icon top-icon menu right dl-page"></div>
+            </div>
             <div class="mobile white-block">
                 <img alt="" src="{staticpath}images/mobile/extensions/folder.png" class="mobile filetype-img" />
                 <div class="mobile filename"></div>
@@ -170,6 +280,7 @@
                     <div class="mobile fm-item-img">
                         <img class="regular-folder" alt="" src="{staticpath}images/mobile/extensions/folder.png" />
                         <img class="shared-folder hidden" alt="" src="{staticpath}images/mobile/extensions/outgoing-share-folder.png" />
+                        <img class="megadrop-folder hidden" alt="" src="{staticpath}images/mobile/extensions/puf-folder.png" />
                     </div>
                     <div class="mobile fm-icon open-context-menu right hidden"></div>
                     <div class="mobile fm-icon link right hidden"></div>
@@ -255,7 +366,7 @@
         <div class="mobile bottom-action-bar">
             <div class="mobile fm-icon scroll-to-top left hidden"></div>
             <div class="mobile fm-icon upload-file right">
-                <input class="upload-select-file hidden" type="file">
+                <input class="upload-select-file hidden" id="fileselect1" multiple type="file"/>
             </div>
             <div class="mobile fm-icon mobile-create-new-folder right"></div>
             <div class="mobile fm-icon rubbish-bin-highlight empty-rubbish-bin right hidden"></div>
@@ -300,7 +411,11 @@
             <a class="mobile logo"></a>
             <div class="mobile fm-dialog-close"></div>
             <div class="mobile white-block">
-                <img alt="" src="{staticpath}images/mobile/extensions/image.png" class="mobile filetype-img" />
+                <div class="mobile ul-status-header">
+                    <span>[$1155], [$1607]</span>
+                    <a class="mobile text-button third see-all"><span>[$19284]</span></a>
+                </div>
+                <img alt="" class="mobile filetype-img" src="{staticpath}images/mobile/extensions/image.png"/>
                 <div class="mobile filename"><em>[$5533]</em></div>
                 <div class="mobile file-upload-info">
                     <div class="mobile upload-speed"></div>
@@ -314,37 +429,30 @@
                     <span class="mobile text">[$6110]</span>
                 </a>
                 <a class="mobile red-button upload-another-file hidden"> <i></i> <span>[$17618]</span> </a>
-                <a class="mobile text-button third close-button"><span>[$148]</span> </a>
+                <a class="mobile text-button third close-button"><span>[$1597]</span> </a>
                 <!-- This remains hidden, only used as a template so the desktop upload code works -->
-                <table class="upload-table hidden">
-                    <tr id="ul_8001" class="transfer-queued transfer-upload">
-                        <td>
-                            <div class="transfer-type upload">
-                                <ul>
-                                    <li class="right-c"><p><span></span></p></li>
-                                    <li class="left-c"><p><span></span></p></li>
-                                </ul>
+                <div class="mobile mobile-transfer-table-wrapper fm-block hidden">
+                    <div class="mobile fm-row">
+                        <div class="mobile fm-header fm-hr">
+                            <div class="mobile fm-icon up left"></div>
+                            <div class="mobile fm-header-txt"><span>[$1346]</span></div>
+                        </div>
+                    </div>
+                    <div class="mobile fm-row">
+                        <div class="mobile fm-content">
+                            <div class="mobile-transfer-scrolling-table fm-scrolling">
+                                <div class="mobile folders-files-text">5 files, 124 KB/s</div>
+                                <table class="mobile-transfer-table">
+                                    <tr class="transfer-queued transfer-upload" id="ul_8001">
+                                        <td>
+                                            <div class="transfer-type upload"></div>
+                                        </td>
+                                    </tr>
+                                </table>
                             </div>
-                        </td>
-                        <td>
-                            <span class="transfer-filetype-icon"></span>
-                            <span class="tranfer-filetype-txt">fileName</span>
-                        </td>
-                        <td>fileName</td>
-                        <td>fileSize</td>
-                        <td>
-                            <span class="eta"></span><span class="speed">pauseTxt</span>
-                        </td>
-                        <td>
-                            <span class="transfer-status">$[7227]</span>
-                        </td>
-                        <td class="grid-url-field">
-                            <a class="grid-url-arrow"></a>
-                            <a class="clear-transfer-icon"></a>
-                        </td>
-                        <td><span class="row-number"></span></td>
-                    </tr>
-                </table>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -403,6 +511,9 @@
                 </div>
                 <div class="mobile buttons">
                     <a class="mobile default-white-button test-password-button button-prd-confirm">[$870]</a>
+                    <div class="mobile prd-reset-password-text">
+                        [$1934]<a class="pass-reminder forgot-password">[$737]</a>
+                    </div>
                     <a class="mobile green-button change-password-button change-pass">[$706]</a>
                     <div class="mobile dialog-body-text">[$16899]</div>
                     <a class="mobile green-button export-key-button button-prd-backup">[$8859]</a>
@@ -425,6 +536,36 @@
     </div>
 </div>
 
+
+<!-- Affiliate  redemtion history context menu -->
+<div class="mobile context-menu-container small affliate-history hidden">
+    <div class="mobile context-menu-header">
+        [$22821]
+    </div>
+    <div class="context-menu-item active" data-filter="all">
+        <div class="mobile colored-label"></div>
+        <span class="mobile text">[$22820]</span>
+    </div>
+     <div class="context-menu-item" data-filter="complete">
+        <div class="mobile colored-label green"></div>
+        <span class="mobile text">[$23277]</span>
+    </div>
+     <div class="context-menu-item" data-filter="processing">
+        <div class="mobile colored-label orange"></div>
+        <span class="mobile text">[$22833]</span>
+    </div>
+     <div class="context-menu-item" data-filter="failed">
+        <div class="mobile colored-label red"></div>
+        <span class="mobile text">[$22819]</span>
+    </div>
+    <div class="light-grey-bar"></div>
+    <div class="context-menu-item close-button">
+        <div class="mobile fm-icon close"></div>
+        <span class="mobile text">[$82]</span>
+    </div>
+</div>
+
+
 <!-- Folder context menu with extra options -->
 <div class="mobile context-menu-container folder hidden">
     <div class="item-info"></div>
@@ -432,6 +573,18 @@
     <div class="context-menu-item open-folder">
         <div class="mobile fm-icon open-folder"></div>
         <span class="mobile text">[$17086]</span>
+    </div>
+    <div class="context-menu-item create-megadrop">
+        <div class="mobile fm-icon create-megadrop"></div>
+        <span class="mobile text">[$17450]</span>
+    </div>
+    <div class="context-menu-item manage-megadrop">
+        <div class="mobile fm-icon manage-megadrop"></div>
+        <span class="mobile text">[$17399]</span>
+    </div>
+    <div class="context-menu-item cancel-megadrop">
+        <div class="mobile fm-icon cancel-megadrop"></div>
+        <span class="mobile text">[$17400]</span>
     </div>
     <div class="context-menu-item download-file-button">
         <div class="mobile fm-icon download"></div>
@@ -507,11 +660,15 @@
         <span class="mobile text">[$164]</span>
     </div>
     <div class="title-menu-item open-my-account">
-        <div class="mobile fm-icon account"></div>
+        <div class="mobile fm-icon account light"></div>
         <span class="mobile text">[$187]</span>
     </div>
+    <div class="title-menu-item open-affiliate">
+        <div class="mobile fm-icon dollar light"></div>
+        <span class="mobile text">[$22682]</span>
+    </div>
     <div class="title-menu-item open-rubbish-bin">
-        <div class="mobile fm-icon rubbish-bin"></div>
+        <div class="mobile fm-icon rubbish-bin light"></div>
         <span class="mobile text">[$167]</span>
     </div>
     <div class="light-grey-bar"></div>
@@ -578,109 +735,748 @@
         <div class="mobile fm-icon top-icon menu right"></div>
         <div class="mobile fm-icon top-icon dropdown-handle open-title-menu right"></div>
         <div class="mobile fm-header-txt"><span>[$187]</span></div>
-
     </div>
     <div class="mobile content-row">
         <div class="mobile content-cell">
-            <div class="mobile avatar-name-block">
-                <div class="mobile main-avatar">
-                    <div class="mobile avatar-bg"><span></span></div>
-                    <div class="mobile avatar-wrapper avatar">
-                        <img alt="" />
+            <div class="mobile account-page-contents">
+                <div class="mobile avatar-name-block">
+                    <div class="mobile main-avatar">
+                        <div class="mobile avatar-bg"><span></span></div>
+                        <div class="mobile avatar-wrapper avatar">
+                            <img alt="" />
+                        </div>
+                    </div>
+                    <div class="mobile user-info">
+                        <div class="mobile user-name"></div>
+                        <div class="mobile user-email"></div>
+                        <div class="mobile user-phone hidden">
+                            <span class="user-phone-number"></span>
+                            <span class="user-phone-verified-icon"></span>
+                        </div>
                     </div>
                 </div>
-                <div class="mobile user-info">
-                    <div class="mobile user-name"></div>
-                    <div class="mobile user-email"></div>
-                    <div class="mobile user-phone hidden">
-                        <span class="user-phone-number"></span>
-                        <span class="user-phone-verified-icon"></span>
+                <div class="mobile account-type-block">
+                    <div class="mobile pricing-sprite plan-icon x32 mini"></div>
+                    <div class="mobile account-type-text">[$17022]</div>
+                    <div class=" pro-plan-block">
+                        <span class="mobile pro-plan-name"></span>
+                        <span class="mobile promo-voucher-badge hidden">Promotion</span>
+                    </div>
+                </div>
+                <div class="mobile account-usage-block">
+                    <div class="mobile fm-icon cloud"></div>
+                    <div class="mobile account-usage-text">[$5799]</div>
+                    <div class="mobile storage-usage">
+                        [$20197]
+                        (<span class="percentage">0</span>%)
+                    </div>
+                    <div class="mobile storage-usage business hidden">
+                        <span class="used">0 GB</span>
+                    </div>
+                    <div class="over-quota-message">[$16136]</div>
+                </div>
+                <div class="mobile button-block account-upgrade-block">
+                    <div class="mobile fm-icon credit-card"></div>
+                    <div class="mobile account-upgrade-text">[$5814]</div>
+                    <div class="mobile fm-icon right-arrow"></div>
+                </div>
+                <div class="mobile button-block account-achievements-block hidden">
+                    <div class="mobile fm-icon rocket"></div>
+                    <div class="mobile achievements-heading">[$16117]</div>
+                    <div class="mobile achievements-text">[$17464]</div>
+                    <div class="mobile fm-icon right-arrow"></div>
+                </div>
+                <div class="mobile button-block account-cancel-subscription-block hidden">
+                    <div class="mobile fm-icon cancel-subscription"></div>
+                    <div class="mobile subscription-heading">[$7165]</div>
+                    <div class="mobile subscription-text"></div>
+                    <div class="mobile fm-icon right-arrow"></div>
+                </div>
+                <div class="mobile button-block account-recovery-key-block">
+                    <div class="mobile fm-icon recovery-key"></div>
+                    <div class="mobile recovery-key-heading">[$8839]</div>
+                    <div class="mobile recovery-key-text">[$17688]</div>
+                    <div class="mobile fm-icon right-arrow"></div>
+                </div>
+                <div class="mobile button-block account-twofactor-block hidden"><!-- Add enabled class -->
+                    <div class="mobile fm-icon lock"></div>
+                    <div class="mobile two-factor-heading enabled">[$19290]</div>
+                    <div class="mobile two-factor-heading disabled">[$19289]</div>
+                    <div class="mobile two-factor-indication-wrapper">
+                        <span class="mobile two-factor-indicator"></span>
+                        <span class="mobile two-factor-text enabled">[$17601]</span>
+                        <span class="mobile two-factor-text disabled">[$7070]</span>
+                    </div>
+                    <div class="mobile fm-icon right-arrow"></div>
+                </div>
+                <div class="mobile button-block account-add-phone-block hidden">
+                    <div class="mobile fm-icon phone"></div>
+                    <div class="mobile two-factor-heading">[$20222]</div>
+                    <div class="mobile fm-icon right-arrow"></div>
+                </div>
+                <div class="mobile button-block account-notifications-block">
+                    <div class="mobile fm-icon notification"></div>
+                    <div class="mobile account-upgrade-text">[$862]</div>
+                    <div class="mobile fm-icon right-arrow"></div>
+                </div>
+                <div class="mobile button-block account-session-history-block">
+                    <div class="mobile fm-icon device"></div>
+                    <div class="mobile two-factor-heading">[$429]</div>
+                    <div class="mobile fm-icon right-arrow"></div>
+                </div>
+                <div class="mobile button-block account-change-password-block">
+                    <div class="mobile fm-icon password"></div>
+                    <div class="mobile two-factor-heading">[$706]</div>
+                    <div class="mobile fm-icon right-arrow"></div>
+                </div>
+                <div class="mobile button-block acount-cancellation-block">
+                    <div class="mobile fm-icon broken-heart"></div>
+                    <div class="mobile account-upgrade-text">[$16115]</div>
+                    <div class="mobile fm-icon right-arrow"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Affiliate main page -->
+<div class="mobile main-block affiliate-page grey-bg hidden">
+    <div class="mobile fm-header fm-hr fixed">
+        <div class="mobile fm-icon top-icon dollar left"></div>
+        <div class="mobile fm-icon top-icon menu right"></div>
+        <div class="mobile fm-icon top-icon dropdown-handle open-title-menu right"></div>
+        <div class="mobile fm-header-txt"><span>[$22682]</span></div>
+    </div>
+    <div class="mobile top-hr-pad">
+
+        <div class="mobile button-block affiliate-guide clickable" data-link="guide">
+            <div class="mobile fm-icon stairs"></div>
+            <div class="mobile label">[$22683]</div>
+            <div class="mobile fm-icon right-arrow"></div>
+        </div>
+
+        <div class="mobile button-block affiliate-comission">
+            <div class="content">
+                <div class="mobile fm-icon dollar"></div>
+                <div class="mobile label">[$22690]<div class="mobile fm-icon info commission-info"></div></div>
+            </div>
+            <div class="mobile affiliate-comission-bl">
+                <div class="cell active">
+                    <span class="info">[$22692]</span>
+                    <span class="total price local"></span>
+                    <span class="total price euro"></span>
+                </div>
+                <div class="cell">
+                    <span class="info">[$22693]</span>
+                    <span class="pending price local"></span>
+                    <span class="pending price euro"></span>
+                </div>
+                <div class="cell">
+                    <span class="info">[$22694]</span>
+                    <span class="available price local"></span>
+                    <span class="available price euro"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="mobile affiliate-redeem">
+            <div class="mobile fm-green-button gradient redeem disabled">
+                <span>[$458]</span>
+            </div>
+        </div>
+
+        <div class="mobile button-block affiliate-history clickable" data-link="history">
+            <div class="mobile fm-icon dollar-file"></div>
+            <div class="mobile label">[$22808]</div>
+            <div class="mobile fm-icon right-arrow"></div>
+        </div>
+
+        <div class="mobile button-block affiliate-registration">
+            <div class="mobile affiliate-number"></div>
+            <div class="content">
+                <div class="mobile fm-icon account"></div>
+                <div class="mobile label">[$22699]</div>
+            </div>
+            <div class="mobile affiliate-compare">
+            </div>
+        </div>
+
+        <div class="mobile button-block affiliate-purchases">
+             <div class="mobile affiliate-number"></div>
+            <div class="content">
+                <div class="mobile fm-icon box"></div>
+                <div class="mobile label">[$22703]</div>
+            </div>
+            <div class="mobile affiliate-compare">
+            </div>
+        </div>
+
+        <div class="mobile button-block affiliate-distribution clickable" data-link="distribution">
+            <div class="mobile fm-icon map-pointer"></div>
+            <div class="mobile label">[$22709]</div>
+            <div class="mobile fm-icon right-arrow"></div>
+        </div>
+
+    </div>
+</div>
+
+<!-- Affiliate guide page -->
+<div class="mobile main-block affiliate-guide-page grey-bg hidden">
+    <div class="mobile fm-header fm-hr fixed">
+        <div class="mobile fm-icon top-icon menu right"></div>
+        <div class="mobile fm-icon back left"></div>
+        <div class="mobile fm-header-txt"><span>[$22683]</span></div>
+    </div>
+    <div class="mobile top-hr-pad">
+
+        <div class="mobile button-block expandable">
+            <div class="content">
+                <div class="mobile button-number">1</div>
+                <div class="mobile label">[$22719]</div>
+                <div class="mobile fm-icon right-arrow"></div>
+            </div>
+            <div class="full-info">
+                <div class="mobile button-block no-bg generate">
+                    <div class="mobile fm-icon shining-chain"></div>
+                    <div class="mobile label grey">[$22771][$22723]</div>
+                    <div class="mobile fm-icon right-arrow big"></div>
+                </div>
+
+                <div class="mobile button-block no-bg">
+                    <div class="mobile fm-icon big-linked-folder"></div>
+                    <div class="mobile label grey">[$22772][$22724]</div>
+                </div>
+
+                <div class="mobile button-block no-bg">
+                    <div class="mobile fm-icon big-linked-chat"></div>
+                    <div class="mobile label grey">[$22725.m]</div>
+                </div>
+
+                <div class="mobile button-block no-bg">
+                    <div class="mobile fm-icon big-new-user"></div>
+                    <div class="mobile label grey">[$22726.m]</div>
+                </div>
+
+                <div class="mobile button-block no-bg">
+                    <div class="mobile label grey no-icon small">
+                        *[$22898]
                     </div>
                 </div>
             </div>
-            <div class="mobile account-type-block">
-                <div class="mobile icon pro-mini"></div>
-                <div class="mobile account-type-text">[$17022]</div>
-                <div class=" pro-plan-block">
-                    <span class="mobile pro-plan-name"></span>
-                    <span class="mobile promo-voucher-badge hidden">Promotion</span>
+        </div>
+
+        <div class="mobile button-block expandable">
+            <div class="content">
+                <div class="mobile button-number">2</div>
+                <div class="mobile label">[$22824]</div>
+                <div class="mobile fm-icon right-arrow"></div>
+            </div>
+            <div class="full-info">
+                <div class="mobile button-block no-bg">
+                    <div class="mobile fm-icon green-tick"></div>
+                    <div class="mobile label">[$22727]</div>
+                    <div class="mobile label-info">[$22728]</div>
+                </div>
+
+                <div class="mobile button-block no-bg">
+                    <div class="mobile fm-icon green-tick"></div>
+                    <div class="mobile label">[$22757]</div>
+                    <div class="mobile label-info">[$22729]</div>
                 </div>
             </div>
-            <div class="mobile account-usage-block">
-                <div class="mobile fm-icon cloud"></div>
-                <div class="mobile account-usage-text">[$5799]</div>
-                <div class="mobile storage-usage">
-                    [$20197]
-                    (<span class="percentage"></span>%)
+        </div>
+
+        <div class="mobile button-block expandable">
+            <div class="content">
+                <div class="mobile button-number">3</div>
+                <div class="mobile label">[$23180]</div>
+                <div class="mobile fm-icon right-arrow"></div>
+            </div>
+            <div class="full-info">
+                [$23181.m]
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Affiliate history page -->
+<div class="mobile main-block affiliate-history-page grey-bg hidden">
+    <div class="mobile fm-header fm-hr fixed">
+        <div class="mobile fm-icon top-icon menu right"></div>
+        <div class="mobile fm-icon back left"></div>
+        <div class="mobile fm-header-txt"><span>[$22808]</span></div>
+    </div>
+
+    <div class="mobile affiliate-history-dropdown">
+        <span>[$22820]</span>
+        <i class="mobile fm-icon down-arrow"></i>
+    </div>
+    <div class="mobile top-hr-pad">
+
+        <!--Affiliate - no redemptions !-->
+        <div class="mobile affiliate-empty-data hidden">
+            [$22822]
+        </div>
+
+        <!--Affiliate redemptions !-->
+        <div class="mobile affiliate-redemptions-list"></div>
+
+        <div class="mobile affiliate-redemption-item template">
+            <div class="mobile button-block data-list affiliate-transfer">
+                <div class="mobile fm-icon method-icon"></div>
+                <div class="mobile label small">
+                    <span class="sum"></span>
+                    <span class="transfer"></span>
                 </div>
-                <div class="mobile storage-usage business hidden">
-                    <span class="used">0 GB</span>
+                <div class="mobile  label-info small">
+                    <span class="date"></span>
+                    <span class="status"></span>
                 </div>
-                <div class="over-quota-message">[$16136]</div>
-            </div>
-            <div class="mobile button-block account-upgrade-block">
-                <div class="mobile fm-icon credit-card"></div>
-                <div class="mobile account-upgrade-text">[$5814]</div>
-                <div class="mobile fm-icon right-arrow"></div>
-            </div>
-            <div class="mobile button-block account-achievements-block hidden">
-                <div class="mobile fm-icon rocket"></div>
-                <div class="mobile achievements-heading">[$16117]</div>
-                <div class="mobile achievements-text">[$17464]</div>
-                <div class="mobile fm-icon right-arrow"></div>
-            </div>
-            <div class="mobile button-block account-cancel-subscription-block hidden">
-                <div class="mobile fm-icon cancel-subscription"></div>
-                <div class="mobile subscription-heading">[$7165]</div>
-                <div class="mobile subscription-text"></div>
-                <div class="mobile fm-icon right-arrow"></div>
-            </div>
-            <div class="mobile button-block account-recovery-key-block">
-                <div class="mobile fm-icon recovery-key"></div>
-                <div class="mobile recovery-key-heading">[$8839]</div>
-                <div class="mobile recovery-key-text">[$17688]</div>
-                <div class="mobile fm-icon right-arrow"></div>
-            </div>
-            <div class="mobile button-block account-twofactor-block hidden"><!-- Add enabled class -->
-                <div class="mobile fm-icon lock"></div>
-                <div class="mobile two-factor-heading enabled">[$19290]</div>
-                <div class="mobile two-factor-heading disabled">[$19289]</div>
-                <div class="mobile two-factor-indication-wrapper">
-                    <span class="mobile two-factor-indicator"></span>
-                    <span class="mobile two-factor-text enabled">[$17601]</span>
-                    <span class="mobile two-factor-text disabled">[$7070]</span>
-                </div>
-                <div class="mobile fm-icon right-arrow"></div>
-            </div>
-            <div class="mobile button-block account-add-phone-block hidden">
-                <div class="mobile fm-icon phone"></div>
-                <div class="mobile two-factor-heading">[$20222]</div>
-                <div class="mobile fm-icon right-arrow"></div>
-            </div>
-            <div class="mobile button-block account-notifications-block">
-                <div class="mobile fm-icon notification"></div>
-                <div class="mobile account-upgrade-text">[$862]</div>
-                <div class="mobile fm-icon right-arrow"></div>
-            </div>
-            <div class="mobile button-block account-session-history-block">
-                <div class="mobile fm-icon device"></div>
-                <div class="mobile two-factor-heading">[$429]</div>
-                <div class="mobile fm-icon right-arrow"></div>
-            </div>
-            <div class="mobile button-block account-change-password-block">
-                <div class="mobile fm-icon password"></div>
-                <div class="mobile two-factor-heading">[$706]</div>
-                <div class="mobile fm-icon right-arrow"></div>
-            </div>
-            <div class="mobile button-block acount-cancellation-block">
-                <div class="mobile fm-icon broken-heart"></div>
-                <div class="mobile account-upgrade-text">[$16115]</div>
                 <div class="mobile fm-icon right-arrow"></div>
             </div>
         </div>
     </div>
 </div>
 
+<!-- Affiliate redemption details page -->
+<div class="mobile main-block affiliate-details-page grey-bg hidden">
+    <div class="mobile fm-header fm-hr fixed">
+        <div class="mobile fm-icon top-icon menu right"></div>
+        <div class="mobile fm-icon back left"></div>
+        <div class="mobile fm-header-txt"><span>[$1724]</span></div>
+    </div>
+
+    <div class="mobile top-hr-pad">
+
+        <div class="mobile affiliate redeem-details selectable">
+            <div class="mobile affiliate redeem-data">
+                <span class="strong">[$23398]</span>
+                <span class="receipt"></span>
+            </div>
+            <div class="mobile affiliate redeem-data">
+                <span class="strong">[$23308]</span>
+                <span class="method"></span>
+            </div>
+             <div class="mobile affiliate redeem-data">
+                <span class="strong full-size">[$23309]</span>
+                <span class="grey">[$481]</span>
+                <span class="country"></span>
+                 <span class="grey">[$20952]</span>
+                <span class="currency"></span>
+            </div>
+            <div class="mobile affiliate redeem-data account-details"></div>
+            <div class="mobile affiliate redeem-data">
+                <span class="strong full-size">[$23399]</span>
+                <span class="grey">[$23400]</span>
+                <span class="request-amount">0<span class="euro">&euro;0</span></span>
+                <span class="grey">[$23401]</span>
+                <span class="fee-charged">0<span class="euro">&euro;0</span></span>
+                <span class="grey">[$23402]</span>
+                <span class="recived-amount">0<span class="euro">&euro;0</span></span>
+            </div>
+            <div class="mobile affiliate redeem-data">
+                <span class="strong">[$23255]</span>
+                <span class="status"></span>
+                <span class="grey full-size status-message"></span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Affiliate redeem page -->
+<div class="mobile main-block affiliate-redeem-page hidden">
+    <div class="mobile fm-header fm-hr fixed">
+        <div class="mobile fm-icon top-icon menu right"></div>
+        <div class="mobile fm-icon back left"></div>
+        <div class="mobile fm-header-txt"><span>[$23403]</span></div>
+    </div>
+
+    <!-- Please add "hidden" class on STEP 6 !-->
+    <div class="mobile affiliate redeem-progress">
+        <div class="text">
+            [$23404]
+        </div>
+        <div class="mobile affiliate timing hidden">
+            <div class="timing-block">
+                [$23296]
+            </div>
+        </div>
+        <div class="bar">
+            <div class="progress">
+                <span>0%</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Redeem Step 1. Select transfer type. !-->
+    <div class="mobile affiliate redeem-body step1 hidden">
+        <div class="mobile affiliate redeem-wrap payment-type">
+            <div class="mobile affiliate redeem-header">
+                [$23405]
+            </div>
+            <div class="payment-type-wrapper hidden">
+                <div class="radioOn small">
+                    <input type="radio" id="affiliate-payment-type2" class="radioOn" value="2" name="affiliate-payment-type">
+                </div>
+                <label class="radio-txt" for="affiliate-payment-type2">[$6802]</label>
+            </div>
+            <div class="hr"></div>
+            <div class="payment-type-wrapper hidden">
+                <div class="radioOff small">
+                    <input type="radio" id="affiliate-payment-type1" class="radioOff" value="1" name="affiliate-payment-type">
+                </div>
+                <label class="radio-txt" for="affiliate-payment-type1">[$23301]</label>
+            </div>
+            <div class="clear"></div>
+            <div class="mobile affiliate-bitcoin-org">
+                <a href="https://bitcoin.org/" target="_blank">[$23536]</a>
+            </div>
+        </div>
+        <div class="default-green-button h-40 redeem-button" data-step="1">
+            [$556]
+        </div>
+        <div class="mobile affiliate cancel-redeem">
+            [$82]
+        </div>
+    </div>
+
+    <!-- Redeem Step 2. How much to redeem !-->
+    <div class="mobile affiliate redeem-body step2 hidden">
+        <div class="mobile affiliate redeem-header">
+            [$23297]
+        </div>
+
+        <div class="mobile default-input affiliate-redeem-sum">
+            <span>
+                EUR
+            </span>
+            <input type="number" value="" name="affiliate-redemption" id="affiliate-redemption-amount" step="any">
+        </div>
+        <div class="default-white-button h-40 redeem-all-button">
+            [$23298]
+        </div>
+        <div class="mobile affiliate comission">
+            [$23299]
+        </div>
+
+        <div class="default-green-button h-40 redeem-button" data-step="2">
+            [$556]
+        </div>
+        <div class="mobile affiliate cancel-redeem">
+            [$82]
+        </div>
+    </div>
+
+    <!-- Redeem Step3. Withdraw details !-->
+    <div class="mobile affiliate redeem-body step3 hidden">
+        <div class="mobile affiliate redeem-header no-pad">
+            [$23303]
+        </div>
+
+        <div class="mobile  default-select-label ">
+            [$481]
+        </div>
+        <div class="mobile default-grey-select country">
+            <span></span>
+            <select id="affi-country"></select>
+        </div>
+
+        <!-- Currency dropdown for bank transfer !-->
+        <div class="affiliate-redeem bank-data hidden">
+            <div class="mobile  default-select-label">
+                [$20952]
+            </div>
+            <div class="mobile default-grey-select currency">
+                <span></span>
+                <select id="affi-currency"></select>
+            </div>
+            <div class="mobile affiliate-currency-tip">
+                <i>i</i>
+                [$23512]
+            </div>
+        </div>
+
+        <!-- Bitcoin address input and tip !-->
+        <div class="affiliate-redeem bitcoin-data">
+            <div class="mobile default-input top-pad">
+                <input type="text" value="" name="affi-bitcoin-address" id="affi-bitcoin-address" placeholder="[$23361]">
+            </div>
+            <div class="mobile affiliate-bitcoin-tip">
+                <i>i</i>
+                [$23304]
+            </div>
+        </div>
+
+        <div class="default-green-button h-40 redeem-button" data-step="3">
+            [$556]
+        </div>
+        <div class="mobile affiliate cancel-redeem">
+            [$82]
+        </div>
+    </div>
+
+    <!-- Redeem Step4. Account details !-->
+    <div class="mobile affiliate redeem-body step4 hidden">
+        <div class="mobile affiliate redeem-header">
+            [$427]
+        </div>
+
+        <form autocomplete="disabled">
+
+            <!-- Auto fill checkbox. Please add/remove "hidden" class !-->
+            <div class="affiliate-redeem auto-fill-checkbox">
+                <div class="square checkboxOff">
+                    <i></i>
+                    <input class="checkbox"  id="affi-auto-fill" name="affi-auto-fill" type="checkbox">
+                </div>
+                <div class="checkbox-label small radio-txt" for="affi-auto-fill">
+                    [$23305]
+                </div>
+                <div class="clear"></div>
+            </div>
+
+            <div class="mobile affi-dynamic-acc-input template">
+                <div class="mobile default-input-label"></div>
+                <div class="mobile default-input">
+                    <input type="text" value="" placeholder="" name=""/>
+                </div>
+            </div>
+
+            <div class="mobile affi-dynamic-acc-select template">
+                <div class="mobile default-select-label"></div>
+                <div class="mobile default-grey-select">
+                    <span></span>
+                    <select>
+                        <option value=""></option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="affi-dynamic-acc-name"></div>
+            <div class="affi-dynamic-acc-type"></div>
+            <div class="affi-dynamic-acc-info"></div>
+
+            <!-- Save information checkbox. Please add/remove "hidden" class !-->
+            <div class="affiliate-redeem save-data-checkbox">
+                <div class="square checkdiv checkboxOff">
+                    <i></i>
+                    <input class="checkbox hidden" type="checkbox" id="affi-save-info" name="affi-save-info">
+                </div>
+                <div class="checkbox-label small radio-txt" for="affi-save-info">
+                    [$23306]
+                </div>
+                <div class="clear"></div>
+            </div>
+
+        </form>
+
+        <div class="default-green-button h-40 redeem-button" data-step="4">
+            [$556]
+        </div>
+        <div class="mobile affiliate cancel-redeem">
+            [$82]
+        </div>
+    </div>
+
+    <!-- Redeem Step5. Redeem details !-->
+    <div class="mobile affiliate redeem-body no-pad step5 hidden">
+        <div class="mobile affiliate redeem-sum-body">
+            <div class="mobile affiliate redeem-sum-header">
+                <span>[$23406]</span>
+            </div>
+            <div class="mobile affiliate redeem-summary">
+                <div class="info">
+                    [$23312]
+                </div>
+                <div class="info price requested">
+                    <span class="euro">0</span><span class="local">0</span>
+                </div>
+                <hr>
+                <div class="info">
+                    [$23313]
+                </div>
+                <div class="info price fee">
+                    <!-- Local currency tip.Please Add/Rove "hidden" class !-->
+                    <span class="euro">0</span><span class="local">0</span>
+                </div>
+                <hr>
+                <div class="info bold">
+                    [$23314]
+                </div>
+                <div class="info bold price received">
+                    <!-- Local currency tip.Please Add/Rove "hidden" class !-->
+                    <span class="euro">0</span><span class="local">0</span>
+                </div>
+                <dv class="clear"></dv>
+                <!-- Local currency tip.Please Add/Remove "hidden" class !-->
+                <div class="affiliate-redeem local-info">
+                    [$23315]
+                </div>
+            </div>
+        </div>
+
+        <div class="mobile affiliate redeem-pad">
+            <div class="mobile affiliate redeem-data">
+                <span class="strong">[$23308]</span>
+                <span class="method"></span>
+            </div>
+             <div class="mobile affiliate redeem-data">
+                <span class="strong full-size">[$23309]</span>
+                <span class="grey">[$481]</span>
+                <span class="country"></span>
+                <span class="grey">[$20952]</span>
+                <span class="currency"></span>
+            </div>
+            <div class="mobile affiliate redeem-data account-details"></div>
+
+            <div class="default-green-button h-40 redeem-button" data-step="5">
+                [$23368]
+            </div>
+            <div class="mobile affiliate cancel-redeem">
+                [$82]
+            </div>
+        </div>
+    </div>
+
+    <!-- Redeem Step6. Redeemption progress !-->
+    <div class="mobile affiliate redeem-body last step6 hidden">
+        <div class="mobile affiliate submit-header">
+            [$23316]
+        </div>
+        <div class="mobile affiliate redeem-wrap  last-step">
+
+            <!-- Please add "loading" or "complete" classname !-->
+            <div class="progress-circle complete">
+                <div class="affiliate-request status">
+                    <!-- Please set width in percents !-->
+                    <div class="affiliate-request progress"><span class="mobile-sprite"></span></div>
+                </div>
+                <div class="affiliate-request status-txt">
+                    [$23403]
+                </div>
+            </div>
+            <div class="mobile fm-icon vertical-dots"></div>
+
+            <!-- Please add "loading" or "complete" classname !-->
+            <div class="progress-circle loading">
+                <div class="affiliate-request status">
+                    <!-- Please set width in percents !-->
+                    <div class="affiliate-request progress"><span class="mobile-sprite"></span></div>
+                </div>
+                <div class="affiliate-request status-txt">
+                    [$22833]
+                </div>
+            </div>
+            <div class="mobile fm-icon vertical-dots"></div>
+
+            <!-- Please add "loading" or "complete" classname !-->
+            <div class="progress-circle">
+                <div class="affiliate-request status">
+                    <!-- Please set width in percents !-->
+                    <div class="affiliate-request progress"><span class="mobile-sprite"></span></div>
+                </div>
+                <div class="affiliate-request status-txt">
+                    [$23277]
+                </div>
+            </div>
+        </div>
+
+        <div class="default-green-button h-40 redeem-button close" data-step="6">
+            [$81]
+        </div>
+    </div>
+</div>
+
+<!-- Affiliate guide page -->
+<div class="mobile main-block affiliate-distrib-page hidden">
+    <div class="mobile fm-header fm-hr fixed">
+        <div class="mobile fm-icon top-icon menu right"></div>
+        <div class="mobile fm-icon back left"></div>
+        <div class="mobile fm-header-txt"><span>[$22709]</span></div>
+    </div>
+    <div class="mobile fm-affiliate distribution-head">
+        <div class="mobile fm-affiliate tab-button active" data-table="geo-dist-reg">
+            [$22710]
+        </div>
+        <div class="mobile fm-affiliate tab-button" data-table="geo-dist-pur">
+            [$22711]
+        </div>
+    </div>
+    <div class="mobile top-hr-pad">
+        <div class="mobile content geo-dist-reg">
+             <div class="mobile fm-affiliate list"></div>
+        </div>
+        <div class="mobile content geo-dist-pur hidden">
+             <div class="mobile fm-affiliate list"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Generate your unique MEGA referral URL !-->
+<div class="mobile main-block generate-url overlay hidden">
+    <div class="mobile content-row first">
+        <div class="mobile content-cell">
+            <div class="mobile fm-dialog-close"></div>
+            <div class="mobile generate-url white-block">
+                <div class="mobile generate-icon fm-icon big-shining-chain"></div>
+                <div class="mobile generate-url header">[$22741]</div>
+                <div class="mobile generate-url info">
+                    [$22742]
+                </div>
+                <div class="mobile generate-url input-label">
+                    [$22743]
+                </div>
+                <div class="mobile generate-url url-block">
+                    <i class="mobile fm-icon small grey-down-arrow"></i>
+                    <div class="url"></div>
+                    <div class="mobile generate-url page-names">
+                        <span data-page="start" class="active">[$22744]</span>
+                        <span data-page="business">[$19530]</span>
+                        <span data-page="mobile">[$955]</span>
+                        <span data-page="sync">[$956]</span>
+                        <span data-page="security">[$7337]</span>
+                        <span data-page="privacycompany">[$16113]</span>
+                        <span class="hidden" data-page="bird">MEGAbird</span>
+                        <span data-page="pro">[$16111]</span>
+                        <span data-page="help">[$384]</span>
+                        <span data-page="about">[$16112]</span>
+                        <span data-page="extensions">[$16541]</span>
+                        <span data-page="refer">[$22745]</span>
+                    </div>
+                    <div class="mobile generate-url button done">
+                        [$726]
+                    </div>
+                </div>
+
+                <div class="mobile generate-url button copy-button">
+                    [$22823]
+                </div>
+
+                <div class="mobile generate-url bottom-lnk">
+                    [$82]
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Affiliation commission info overlay -->
+<div class="mobile main-block commission-overlay overlay hidden">
+    <div class="mobile content-row first">
+        <div class="mobile content-cell">
+            <div class="mobile fm-dialog-close"></div>
+            <div class="mobile commission-overlay white-block">
+                <div class="mobile generate-url header">[$22690]</div>
+                <div class="mobile commission-overlay info">
+                    [$22881]<br>
+                    [$22882]
+                    <span class="note">[$22875]</span><br>
+                    <span class="non-euro-only">[$22883]</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 <!-- Cancel subscription information overlay for Google/Apple subscriptions -->
 <div class="mobile main-block cancel-subscription-information-overlay hidden">
@@ -706,7 +1502,7 @@
             <a class="mobile logo"></a>
             <div class="mobile white-block">
                 <div class="mobile dialog-information">
-                    <div class="mobile membership-icon free"></div>
+                    <div class="mobile pricing-sprite plan-icon free x32"></div>
                     <div class="mobile first-message">[$7179]</div>
                     <div class="mobile second-message">[$17548]</div>
                 </div>
@@ -756,31 +1552,31 @@
                     <div class="mobile red-heading">[$6844]</div>
                     <form class="mobile inline-labels radio-button-form">
                         <div class="mobile radio-option">
-                            <div class="radioOff"><input type="radio" name="feedback-radio" value="1" data-english-log-text="I don't use my account anymore"></div>
-                            <label class="radio-txt">[$6845]</label>
-                        </div>
-                        <div class="mobile radio-option">
-                            <div class="radioOff"><input type="radio" name="feedback-radio" value="2" data-english-log-text="I have another MEGA account"></div>
-                            <label class="radio-txt">[$6226]</label>
-                        </div>
-                        <div class="mobile radio-option">
-                            <div class="radioOff"><input type="radio" name="feedback-radio" value="3" data-english-log-text="I have experienced too many problems"></div>
-                            <label class="radio-txt">[$6227]</label>
-                        </div>
-                        <div class="mobile radio-option">
-                            <div class="radioOff"><input type="radio" name="feedback-radio" value="4" data-english-log-text="My favourite browser is not technologically compatible and I don't want to change"></div>
-                            <label class="radio-txt">[$6846]</label>
-                        </div>
-                        <div class="mobile radio-option">
-                            <div class="radioOff"><input type="radio" name="feedback-radio" value="5" data-english-log-text="I find the interface too confusing to use"></div>
+                            <div class="radioOff"><input class="radioOff" type="radio" name="feedback-radio" value="5" data-english-log-text="I find the interface too confusing to use"></div>
                             <label class="radio-txt">[$6229]</label>
                         </div>
                         <div class="mobile radio-option">
-                            <div class="radioOff"><input type="radio" name="feedback-radio" value="6" data-english-log-text="MEGA has under delivered on its promise"></div>
+                            <div class="radioOff"><input class="radioOff" type="radio" name="feedback-radio" value="1" data-english-log-text="I don't use my account anymore"></div>
+                            <label class="radio-txt">[$6845]</label>
+                        </div>
+                        <div class="mobile radio-option">
+                            <div class="radioOff"><input class="radioOff" type="radio" name="feedback-radio" value="2" data-english-log-text="I have another MEGA account"></div>
+                            <label class="radio-txt">[$6226]</label>
+                        </div>
+                        <div class="mobile radio-option">
+                            <div class="radioOff"><input class="radioOff" type="radio" name="feedback-radio" value="3" data-english-log-text="I have experienced too many problems"></div>
+                            <label class="radio-txt">[$6227]</label>
+                        </div>
+                        <div class="mobile radio-option">
+                            <div class="radioOff"><input class="radioOff" type="radio" name="feedback-radio" value="4" data-english-log-text="I am moving to another cloud storage provider"></div>
+                            <label class="radio-txt">[$23422]</label>
+                        </div>
+                        <div class="mobile radio-option">
+                            <div class="radioOff"><input class="radioOff" type="radio" name="feedback-radio" value="6" data-english-log-text="MEGA has under delivered on its promise"></div>
                             <label class="radio-txt">[$6847]</label>
                         </div>
                         <div class="mobile radio-option">
-                            <div class="radioOff"><input type="radio" name="feedback-radio" value="7" data-english-log-text="Other"></div>
+                            <div class="radioOff"><input class="radioOff" type="radio" name="feedback-radio" value="7" data-english-log-text="Other"></div>
                             <label class="radio-txt">[$2007]</label>
                         </div>
                     </form>
@@ -1016,6 +1812,13 @@
                     <div class="notification-setting-row">
                         <div class="content-txt">[$20896]</div>
                         <div class="dialog-feature-toggle toggle-on" id="enotif-inactive" name="account-inactive">
+                            <div class="dialog-feature-switch"></div>
+                        </div>
+                        <div class="clear"></div>
+                    </div>
+                    <div class="notification-setting-row">
+                        <div class="content-txt">[$23281]</div>
+                        <div class="dialog-feature-toggle toggle-on" id="enotif-referral-program" name="referral-program">
                             <div class="dialog-feature-switch"></div>
                         </div>
                         <div class="clear"></div>
@@ -1301,7 +2104,7 @@
                             <label for="mobile-park-confim-data-loss" class="radio-txt">[$1950]</label>
                         </div>
                         <div class="mobile register-button park-account update-password-button">
-                            <span class="label">[$1947]</span>
+                            <span class="label">[$1951]</span>
                         </div>
                     </form>
                 </div>
@@ -1542,9 +2345,11 @@
 <div class="mobile main-block hidden" id="mobile-ui-main">
     <div class="mobile content-row first">
         <div class="mobile content-cell">
-            <a class="mobile logo" href="https://mega.nz"></a>
-            <div class="mobile fm-icon top-icon menu right dl-page"></div>
-            <div class="mobile fm-dialog-close hidden"></div>
+            <div class="fm-header">
+                <a class="mobile logo" href="https://mega.nz"></a>
+                <div class="mobile fm-icon top-icon menu right dl-page"></div>
+                <div class="mobile fm-dialog-close hidden"></div>
+            </div>
             <div class="mobile white-block">
                 <img alt="" src="{staticpath}images/mobile/extensions/image.png" class="mobile filetype-img" />
                 <div class="mobile bottom-page scroll-block download" id="video-container">
@@ -1562,6 +2367,22 @@
                             <div class="bounce2"></div>
                             <div class="bounce3"></div>
                         </div>
+
+                        <div class="viewer-vad-control lato hidden">
+                            <div  class="thumb">
+                                <img alt="" />
+                            </div>
+                            <div class="counter">
+                                0
+                            </div>
+                            <div class="label">
+                                <span>[$22879]</span><i class="mobile fm-icon small-skip-icon"></i>
+                            </div>
+                        </div>
+                        <div class="video-progress-bar vad" title="">
+                            <div class="video-time-bar"></div>
+                        </div>
+
                         <div class="viewer-bottom-bl">
                             <div id="video-controls" class="video-controls" data-state="hidden">
                                 <div data-state="play" class="viewer-button left playpause">
@@ -1610,8 +2431,8 @@
             <div class="mobile app-info-cell">
                 <div class="mobile app-info-block">
                     <div class="mobile wrong-file-block">
-                        <div class="mobile error-txt file-too-large hidden">[$8951]</div>
-                        <div class="mobile error-txt file-unsupported hidden">[$8952]</div>
+                        <div class="mobile error-txt file-too-large hidden">[$8951]<br><span class="asterisk-msg">*[$16362]</span></div>
+                        <div class="mobile error-txt file-unsupported hidden">[$8952]<br><span class="asterisk-msg">*[$16362]</span></div>
                     </div>
                     <div class="mobile application-txt standalone-download-message hidden">
                         [$8950]
@@ -1689,9 +2510,14 @@
             <div class="mobile fm-dialog-close"></div>
             <div class="mobile white-block">
                 <div class="mobile empty-icon over-storage-quota"></div>
+                <div class="odq-subtitle hidden"></div>
                 <div class="mobile rb-empty-overlay-title dialog-heading-text">[$16302]</div>
                 <div class="mobile">
                     <div class="mobile rb-empty-overlay-message dialog-body-text">[$16358] </div>
+                </div>
+                <div class="odq-warning hidden">
+                    <div class="odq-warn-icon"></div>
+                    <div class="odq-warn-text"></div>
                 </div>
                 <div class="mobile buttons">
                     <a class="mobile dialog-button action-invite-friends"> <i></i> <span>[$17465]</span> </a>
@@ -1809,7 +2635,7 @@
                 </div>
                 <textarea id="mobile-public-link" class="mobile public-link" readonly></textarea>
                 <div class="mobile buttons inline-buttons">
-                    <a class="mobile red-button first copy disabled"> <i></i> <span>[$1394]</span> </a>
+                    <a class="mobile green-button first copy disabled"> <i></i> <span>[$1394]</span> </a>
                     <a class="mobile red-button second remove disabled"> <i></i> <span>[$6821]</span> </a>
                 </div>
                  <a class="mobile text-button third cancel"><span>[$148]</span> </a>
@@ -1818,6 +2644,36 @@
     </div>
 </div>
 
+<!-- Megadrop info overlay !-->
+<div class="mobile main-block hidden overlay" id="mobile-ui-megadrop-info">
+    <div class="wu-main">
+        <div class="wu-items">
+            <div class="wu-empty-upload">
+                <div class="wu-large-logo">
+                </div>
+            </div>
+            <div class="clear"></div>
+        </div>
+        <div class="wu-data">
+            <div class="wu-folder-name">
+                <span class="wu-folder-name-text"></span>
+            </div>
+            <div class="wu-title">
+                <span class="wu-title-text"></span>
+            </div>
+            <div class="clear"></div>
+        </div>
+        <div class="wu-main-bottom">
+            <div class="wu-upload-text">
+                    [$17413]
+                </div>
+            <div class="default-green-button wu-btn">
+                <span>[$372]</span>
+            </div>
+        </div>
+        <a class="mobile text-button third cancel"><span>[$82]</span></a>
+    </div>
+</div>
 
 <!-- Generic error overlay !-->
 <div class="mobile main-block error-overlay hidden" id="mobile-ui-error">
@@ -2130,7 +2986,7 @@
 
 
 <!-- Pro page step 2 - Provider and plan options !-->
-<div class="mobile fm-block membership-step2 hidden">
+<div class="mobile fm-block membership-step2 payment-section lato hidden">
     <div class="mobile fm-row">
         <div class="mobile fm-header fm-hr">
             <div class="mobile fm-icon back left js-back-to-plans"></div>
@@ -2141,133 +2997,120 @@
     <div class="mobile fm-row">
         <div class="mobile fm-content">
             <div class="mobile fm-scrolling">
-                <div class="mobile page-title">[$6975]</div>
                 <div class="mobile payment-options-container">
                     <div class="mobile payment-options">
                         <div class="mobile pro-card-container">
-                            <div class="mobile membership-icon"></div>
+                            <div class="mobile pricing-sprite plan-icon x32"></div>
                             <span class="mobile right-banner-block">
-                                <div class="mobile small-text">You selected:</div>
+                                <div class="mobile small-text">[$22150]</div>
                                 <div class="mobile plan-name"></div>
                             </span>
-                            <div class="mobile small-text show-plans js-back-to-plans">Change</div>
+                            <div class="mobile small-text show-plans js-back-to-plans">[$1776]</div>
                         </div>
-                        <div class="mobile subtle-bottom-border"></div>
-                        <div class="pro-gray-block">
-                            <div class="main-mid-pad">
-                                <div class="register-st3-main-bl">
-                                    <div class="membership-st2-info">
-                                        <div class="membership-payment-pad">
-                                            <div class="membership-info-pad">
-                                                <div class="membership-st2-head">
-                                                    <span class="option-question provider">[$7992]</span>
-                                                </div>
-                                                <div class="payment-options-list primary">
-                                                    <div class="payment-method template">
-                                                        <div class="membership-radio">
-                                                            <input type="radio" name="" value="">
-                                                            <div></div>
-                                                        </div>
-                                                        <div class="provider-details">
-                                                            <div class="provider-icon"></div>
-                                                            <div class="provider-name"></div>
-                                                        </div>
-                                                    </div>
-                                                    <span class="loading-placeholder-text">[$5533]</span>
-                                                </div>
-                                                <div class="payment-options-list secondary hidden"></div>
-                                                <div class="provider-show-more hidden">
-                                                    <div class="left-bar">
-                                                        <div class="left-bar-grey">&nbsp;</div>
-                                                    </div>
-                                                    <div class="button">[$7993]</div>
-                                                    <div class="right-bar">
-                                                        <div class="right-bar-grey">&nbsp;</div>
-                                                    </div>
-                                                </div>
 
-                                            </div>
-                                        </div>
+                        <div class="pro-payment-block">
 
-                                        <div class="payment-period">
-                                            <div class="membership-info-pad">
-                                                <div class="membership-st2-head">
-                                                    <span class="option-question duration">[$7994]</span>
-                                                </div>
-                                                <div class="duration-options-list">
-                                                    <div class="payment-duration template">
-                                                        <div class="membership-radio">
-                                                            <input type="radio">
-                                                            <div class="payment-icon"></div>
-                                                        </div>
-                                                        <div class="membership-radio-label">
-                                                            <span class="duration">[$922]</span>
-                                                            <strong><span class="price">0.00</span></strong>
-                                                        </div>
-                                                        <div class="clear"></div>
-                                                        <div class="save-money hidden">
-                                                            [$16649]
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
+                            <div class="membership-st2-head">
+                                <span class="option-question provider">[$7992]</span>
+                            </div>
+                            <div class="options-list payment-options-list primary">
+                                <div class="payment-method half-sized template">
+                                    <div class="membership-radio">
+                                        <input type="radio" name="" value="">
+                                    </div>
+                                    <div class="provider-details radio-label">
+                                        <div class="provider-icon"></div>
+                                        <div class="provider-name"></div>
+                                    </div>
+                                </div>
+                                <span class="loading-placeholder-text">[$5533]</span>
+                            </div>
+                            <div class="payment-options-list secondary hidden"></div>
+                            <div class="provider-show-more hidden">
+                                <div class="left-bar">
+                                    <div class="left-bar-grey">&nbsp;</div>
+                                </div>
+                                <div class="button">[$7993]</div>
+                                <div class="right-bar">
+                                    <div class="right-bar-grey">&nbsp;</div>
+                                </div>
+                            </div>
 
-                                        <div class="renewal-option hidden">
-                                            <div class="membership-info-pad">
-                                                <div class="membership-st2-head choose-renewal">
-                                                    <span class="option-question renewal">[$10638]</span>
-                                                </div>
-                                                <div class="renewal-options-list">
-                                                    <div class="renewal-option">
-                                                        <div class="membership-radio checked">
-                                                            <input type="radio" name="renewal-option" checked="checked" value="yes">
-                                                            <div class="payment-icon"></div>
-                                                        </div>
-                                                        <div class="membership-radio-label checked">
-                                                            <span>[$78]</span>
-                                                        </div>
-                                                    </div>
-                                                    <div class="renewal-option">
-                                                        <div class="membership-radio">
-                                                            <input type="radio" name="renewal-option" value="no">
-                                                            <div class="payment-icon"></div>
-                                                        </div>
-                                                        <div class="membership-radio-label">
-                                                            <span>[$79]</span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
+                            <div class="payment-period">
+                                <div class="membership-st2-head">
+                                    <span class="option-question duration">[$7994]</span>
+                                </div>
+                                <div class="options-list duration-options-list">
+                                    <div class="payment-duration half-sized template">
+                                        <div class="membership-radio">
+                                            <input type="radio">
+                                            <div class="payment-icon"></div>
                                         </div>
-                                        <div class="charge-information-container">
-                                            <div class="charge-information">[$10640]</div>
+                                        <div class="membership-radio-label radio-label">
+                                            <span class="duration">[$922]</span>
+                                            <strong><span class="price">0.00</span></strong>
+                                        </div>
+                                        <div class="save-money hidden">
+                                            [$16649]
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="orange-notification body with-btn argentina-only hidden">
+                                    <div class="orange-notification">
+                                        <i class="icons-sprite fvnotice"></i>
+                                    </div>
+                                    <div class="orange-notification cell text-cell">
+                                        <div class="versioning-body-text">[$23132]</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="renewal-option hidden">
+                                <div class="membership-st2-head choose-renewal">
+                                    <span class="option-question renewal">[$10638]</span>
+                                </div>
+                                <div class="options-list renewal-options-list">
+                                    <div class="renewal-option half-sized">
+                                        <div class="membership-radio checked">
+                                            <input type="radio" name="renewal-option" checked="checked" value="yes">
+                                            <div class="payment-icon"></div>
+                                        </div>
+                                        <div class="membership-radio-label  radio-label checked">
+                                            <span>[$78]</span>
+                                        </div>
+                                    </div>
+                                    <div class="renewal-option half-sized">
+                                        <div class="membership-radio">
+                                            <input type="radio" name="renewal-option" value="no">
+                                            <div class="payment-icon"></div>
+                                        </div>
+                                        <div class="membership-radio-label radio-label">
+                                            <span>[$79]</span>
                                         </div>
                                     </div>
                                 </div>
                             </div>
+                            <div class="charge-information-container">
+                                <div class="charge-information">[$10640]</div>
+                            </div>
+                        </div>
+
+                        <div class="membership-st2-head">
+                            [$7995]
+                        </div>
+
+                        <div class="payment-info">
+                            [$7996]
                         </div>
 
                         <div class="main-mid-pad third-section">
-                            <div class="membership-bott-button">
+                            <div class="button big-green-button purchase">
                                 [$6190]
                             </div>
                             <div class="clear"></div>
                         </div>
                     </div>
                     <div class="mobile external-payment-options">[$7156]</div>
-                    <div class="main-mid-pad q-m">
-                        <div class="membership-question-mark">
-                            <span></span>
-                        </div>
-                        <div class="pro-bottom-icon-block">
-                            <div class="pro-bottom-header">[$924]</div>
-                            <div class="pro-bottom-txt">[$925]</div>
-                            <div class="pro-bottom-button">
-                                [$399]
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
@@ -2298,7 +3141,7 @@
                                     <input id="astropay-tax-field" class="astropay-tax-field" type="text" placeholder="[$7989]">
                                 </div>
                                 <div class="accept"><span>[$6190]</span></div>
-                                <a class="powered-by-astropay" href="https://www.astropay.com/" target="_blank" rel="noopener noreferrer"></a>
+                                <a class="pricing-sprite powered-by-astropay" href="https://www.astropay.com/" target="_blank" rel="noopener noreferrer"></a>
                             </div>
                         </div>
                     </div>
@@ -2313,9 +3156,7 @@
 <div class="mobile fm-block main-block full-page-scrollable payment-address-dialog hidden">
     <div class="mobile header-scroll-suggester"></div>
     <div class="pro-plan-details">
-        <div class="plan-icon">
-            <div class="reg-st3-membership-icon"></div>
-        </div>
+        <div class="pricing-sprite plan-icon x32"></div>
         <div class="payment-plan-info">
             <div class="payment-plan-title"></div>
             <div class="payment-plan-txt">
@@ -2375,6 +3216,11 @@
                                 <select id="address-dialog-states" class="states default-select" tabindex="8" disabled>
                                     <option value="">[$7352]</option>
                                 </select>
+
+                                <div class="mobile signin-input">
+                                    <input class="taxcode" type="text" value="" placeholder="[$7347]" tabindex="9">
+                                </div>
+
                                 <div class="mobile remember-billing-info-wrapper">
                                     <div class="checkbox checkboxOn square">
                                         <i></i>
@@ -2425,27 +3271,22 @@
                 <div class="balance-text">[$7707]</div>
 
                 <div class="reg-st3-membership-bl">
-                    <div class="membership-pad-bl">
-                        <div class="left-pricing-block">
-                            <div class="reg-st3-membership-icon"></div>
-                            <div class="reg-st3-bott-title plan-name"></div>
+                    <div class="pricing-page plan">
+                        <div class="left">
+                            <div class="pricing-page plan-icon pricing-sprite x32"></div>
+                            <div class="pricing-page plan-title"></div>
                         </div>
-                        <div class="right-pricing-block">
-                            <div class="reg-st3-bott-title price">
-                                <span class="num">
-                                    <span class="dollars"></span><span class="small"><span class="cents"></span>&euro;</span>
-                                </span>
-                                <span class="period"> / [$913]</span>
+                        <div class="pricing-page plan-content">
+                            <div class="pricing-page plan-price">
+                                <span class="price"></span>
                             </div>
-                            <div class="reg-st3-storage">
-                                <span class="quota-amount"></span> <span class="quota-unit"></span> <span class="reg-st3-mid-txt">[$495]</span>
+                             <div class="pricing-page plan-period">
+                                /[$931]
                             </div>
-                            <div class="reg-st3-bandwidth">
-                                <span class="quota-amount"></span> <span class="quota-unit"></span> <span class="reg-st3-mid-txt">Transfer</span>
-                            </div>
+                            <div class="pricing-page plan-data storage"><span></span> [$495]</div>
+                            <div class="pricing-page plan-data transfer"><span></span> [$18057]</div>
                         </div>
                     </div>
-
                     <div class="complete-upgrade-text">
                         [$7708]
                     </div>
@@ -2465,9 +3306,7 @@
 <div class="mobile voucher-dialog fm-dialog-mobile hidden">
 
     <div class="pro-plan-details">
-        <div class="plan-icon pro1">
-            <div class="reg-st3-membership-icon"></div>
-        </div>
+        <div class="pricing-sprite plan-icon pro1 x32"></div>
         <div class="voucher-plan-info">
             <div class="voucher-plan-title"></div>
             <div class="voucher-plan-txt">
@@ -2560,20 +3399,16 @@
                                 <div class="mobile promo-voucher-inner-wrapper">
                                     <div class="mobile pro-crest-container">
                                         <div class="mobile pro-crest">
-                                            <div class="mobile membership-icon"></div>
+                                            <div class="mobile pricing-sprite plan-icon x32"></div>
                                         </div>
                                     </div>
                                     <div class="mobile pro-detail-wrapper">
                                         <div class="mobile storage-block">
-                                            <div class="mobile pro-detail-aligners">
-                                                <div class="mobile storage-amount">XXX GB</div>
-                                                <div class="mobile storage-text">[$19923]</div>
+                                            <div class="mobile pro-detail-aligners storage-amount">
                                             </div>
                                         </div>
                                         <div class="mobile transfer-block">
-                                            <div class="mobile pro-detail-aligners">
-                                                <div class="mobile transfer-amount">XX TB</div>
-                                                <div class="mobile transfer-text">[$19924]</div>
+                                            <div class="mobile pro-detail-aligners transfer-amount">
                                             </div>
                                         </div>
                                     </div>
@@ -3355,31 +4190,6 @@
     </div>
 </div>
 
-
-<!-- MEGAdrop public folder not supported page -->
-<div class="mobile fm-block megadrop hidden">
-    <div class="mobile fm-row">
-        <div class="mobile fm-header fm-hr">
-            <div class="mobile fm-icon top-icon menu right"></div>
-            <div class="mobile fm-icon mega left"></div>
-        </div>
-    </div>
-
-    <div class="mobile fm-row">
-        <div class="mobile fm-content">
-            <div class="mobile fm-scrolling">
-                <div class="mobile content">
-                    <h1>[$17687]</h1>
-                    <p>
-                        <span>[$17686]</span>
-                    </p>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-
 <!-- Get Support page -->
 <div class="mobile main-block get-support hidden">
     <div class="mobile fm-header fm-hr">
@@ -3851,6 +4661,20 @@
     <div class="download video-block hidden">
         <div class="download play-video-button"></div>
         <video data-autoplayvideo="false" class="mobile-gallery" data-playvideoonclick="false"></video>
+        <div class="viewer-vad-control lato hidden">
+            <div  class="thumb">
+                <img alt="" />
+            </div>
+            <div class="counter">
+                0
+            </div>
+            <div class="label">
+                <span>[$22879]</span><i class="mobile fm-icon small-skip-icon"></i>
+            </div>
+        </div>
+        <div class="video-progress-bar vad" title="">
+            <div class="video-time-bar"></div>
+        </div>
         <div class="viewer-bottom-bl">
             <div class="video-controls" data-state="hidden">
                 <div data-state="play" class="viewer-button left playpause">

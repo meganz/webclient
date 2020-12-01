@@ -16,7 +16,7 @@ function BusinessRegister() {
 
 
 /** a function to rest business registration page to its initial state*/
-BusinessRegister.prototype.initPage = function () {
+BusinessRegister.prototype.initPage = function(preSetNb, preSetName, preSetTel, preSetFname, preSetLname, preSetEmail) {
     "use strict";
 
     loadingDialog.show();
@@ -24,20 +24,23 @@ BusinessRegister.prototype.initPage = function () {
     var $pageContainer = $('.bus-reg-body');
     var mySelf = this;
 
-    var $nbUsersInput = $pageContainer.find('#business-nbusrs').val('');
-    var $cnameInput = $pageContainer.find('#business-cname').val('');
-    var $telInput = $pageContainer.find('#business-tel').val('');
-    var $fnameInput = $pageContainer.find('#business-fname').val('');
-    var $lnameInput = $pageContainer.find('#business-lname').val('');
-    var $emailInput = $pageContainer.find('#business-email').val('');
-    var $passInput = $pageContainer.find('#business-pass').val('');
-    var $rPassInput = $pageContainer.find('#business-rpass').val('');
-    $pageContainer.find('.bus-reg-radio-block .bus-reg-radio').removeClass('checkOn').addClass('checkOff');
-    $pageContainer.find('.mega-terms.bus-reg-agreement .bus-reg-checkbox').removeClass('checkOn');
-    $pageContainer.find('.ok-to-auto.bus-reg-agreement .bus-reg-checkbox').addClass('checkOn');
-    $pageContainer.find('.bus-reg-agreement.mega-terms .bus-reg-txt').safeHTML(l['208s']);
-    $pageContainer.find('.bus-reg-plan .business-base-plan .left')
+    var $nbUsersInput = $('#business-nbusrs', $pageContainer).val(preSetNb || '');
+    var $cnameInput = $('#business-cname', $pageContainer).val(preSetName || '');
+    var $telInput = $('#business-tel', $pageContainer).val(preSetTel || '');
+    var $fnameInput = $('#business-fname', $pageContainer).val(preSetFname || '');
+    var $lnameInput = $('#business-lname', $pageContainer).val(preSetLname || '');
+    var $emailInput = $('#business-email', $pageContainer).val(preSetEmail || '');
+    var $passInput = $('#business-pass', $pageContainer).val('');
+    var $rPassInput = $('#business-rpass', $pageContainer).val('');
+    var $storageInfo = $('.business-plan-note span', $pageContainer);
+
+    $('.bus-reg-radio-block .bus-reg-radio', $pageContainer).removeClass('checkOn').addClass('checkOff');
+    $('.mega-terms.bus-reg-agreement .bus-reg-checkbox', $pageContainer).removeClass('checkOn');
+    $('.ok-to-auto.bus-reg-agreement .bus-reg-checkbox', $pageContainer).addClass('checkOn');
+    $('.bus-reg-agreement.mega-terms .bus-reg-txt', $pageContainer).safeHTML(l['208s']);
+    $('.bus-reg-plan .business-base-plan .left', $pageContainer)
         .text(l[19503].replace('[0]', this.minUsers));
+    $storageInfo.text(l[23789].replace('%1', '15 ' + l[20160]));
 
     var nbUsersMegaInput = new mega.ui.MegaInputs($nbUsersInput, {
         onHideError: function() {
@@ -46,6 +49,10 @@ BusinessRegister.prototype.initPage = function () {
         }
     });
     nbUsersMegaInput.showMessage('*' + l[19501]);
+
+    $nbUsersInput.rebind('wheel.registerb', function(e) {
+        e.preventDefault();
+    });
 
     var cnameMegaInput = new mega.ui.MegaInputs($cnameInput);
     var telMegaInput = new mega.ui.MegaInputs($telInput);
@@ -79,7 +86,7 @@ BusinessRegister.prototype.initPage = function () {
     $('.bus-confirm-body.verfication').addClass('hidden'); // hiding verification part
 
     // function to show first step of registration
-    var unhidePage = function () {
+    var unhidePage = function() {
         $pageContainer.removeClass('hidden');  // viewing the main sign-up part
         $('.bus-confirm-body.confirm').addClass('hidden'); // hiding confirmation part
         $('.bus-confirm-body.verfication').addClass('hidden'); // hiding verification part
@@ -126,7 +133,7 @@ BusinessRegister.prototype.initPage = function () {
 
     $('.bus-reg-btn, .bus-reg-btn-2', $pageContainer).addClass('disabled');
 
-    var fillPaymentGateways = function (status, list) {
+    var fillPaymentGateways = function(status, list) {
 
         var failureExit = function(msg) {
 
@@ -140,38 +147,41 @@ BusinessRegister.prototype.initPage = function () {
         }
 
         // clear the payment block
-        $pageContainer.find('.bus-reg-radio-block').empty();
+        var $paymentBlock = $('.bus-reg-radio-block', $pageContainer).empty();
 
-        var $paymentBlock = $('.bus-reg-radio-block', $pageContainer);
-
-        var radioHtml = '<div class="bus-reg-radio payment-[x] checkOff"></div>';
+        var radioHtml = '<div class="bus-reg-radio-option"> <div class="bus-reg-radio payment-[x] checkOff"></div>';
         var textHtml = '<div class="provider">[x]</div>';
-        var iconHtml = '<div class="provider-icon [x]"></div>';
+        var iconHtml = '<div class="provider-icon [x]"></div> </div>';
 
         if (!list.length) {
             return failureExit(l[20431]);
         }
 
-        var paymentGatewayToAdd = '';
-        for (var k = 0; k < list.length; k++) {
-            var payRadio = radioHtml.replace('[x]', list[k].gatewayName);
-            var payText = textHtml.replace('[x]', list[k].displayName);
-            var payIcon = iconHtml.replace('[x]', list[k].gatewayName);
-            paymentGatewayToAdd += payRadio + payText + payIcon;
+        if (!window.businessVoucher) {
+            var paymentGatewayToAdd = '';
+            for (var k = 0; k < list.length; k++) {
+                var payRadio = radioHtml.replace('[x]', list[k].gatewayName);
+                var payText = textHtml.replace('[x]', list[k].displayName);
+                var payIcon = iconHtml.replace('[x]', list[k].gatewayName);
+                paymentGatewayToAdd += payRadio + payText + payIcon;
+            }
+            if (paymentGatewayToAdd) {
+                $paymentBlock.safeAppend(paymentGatewayToAdd);
+            }
         }
-        if (paymentGatewayToAdd) {
-            $paymentBlock.append(paymentGatewayToAdd);
-        }
-
+        $paymentBlock.safeAppend(
+            radioHtml.replace('[x]', 'Voucher') + textHtml.replace('[x]', l[23494]) + '</div>'
+        );
 
         // setting the first payment provider as chosen
         $($pageContainer.find('.bus-reg-radio-block .bus-reg-radio')[0]).removeClass('checkOff')
             .addClass('checkOn');
 
         // event handler for radio buttons
-        $('.bus-reg-radio', $paymentBlock)
+        $('.bus-reg-radio-option', $paymentBlock)
             .off('click.suba').on('click.suba', function businessRegisterationCheckboxClick() {
                 var $me = $(this);
+                $me = $me.find('.bus-reg-radio');
                 if ($me.hasClass('checkOn')) {
                     return;
                 }
@@ -185,19 +195,20 @@ BusinessRegister.prototype.initPage = function () {
         unhidePage();
     };
 
-    var updatePriceGadget = function (users) {
+    var updatePriceGadget = function(users) {
         if (!users) {
             users = mySelf.minUsers; // minimum val
         }
+        var intl = mega.intl.number;
         var $gadget = $('.bus-reg-plan', $pageContainer);
-        $gadget.find('.business-plan-price span.big').text(mySelf.planPrice.toFixed(2) + ' \u20ac');
-        $gadget.find('.business-base-plan span.right')
-            .text((mySelf.planPrice * mySelf.minUsers).toFixed(2) + ' \u20ac'); // minimum
-        $gadget.find('.business-users-plan span.right')
-            .text((mySelf.planPrice * (users - mySelf.minUsers)).toFixed(2) + ' \u20ac');
-        $gadget.find('.business-plan-total span.right').text((mySelf.planPrice * users).toFixed(2) + ' \u20ac');
+        $('.business-plan-price span.big', $gadget).text(intl.format(mySelf.planPrice) + ' \u20ac');
+        $('.business-base-plan span.right', $gadget)
+            .text(intl.format(mySelf.planPrice * mySelf.minUsers) + ' \u20ac'); // minimum
+        $('.business-users-plan span.right', $gadget)
+            .text(intl.format(mySelf.planPrice * (users - mySelf.minUsers)) + ' \u20ac');
+        $('.business-plan-total span.right', $gadget).text(intl.format(mySelf.planPrice * users) + ' \u20ac');
 
-        $gadget.find('.business-users-plan .left').text(l[19504].replace('{0}', users - mySelf.minUsers));
+        $('.business-users-plan .left', $gadget).text(l[19504].replace('{0}', users - mySelf.minUsers));
     };
 
     // event handler for clicking on terms anchor
@@ -240,11 +251,27 @@ BusinessRegister.prototype.initPage = function () {
             }
         });
 
+    // event handlers for focus and blur on checkBoxes
+    var $regChk = $('.bus-reg-checkbox input', $pageContainer);
+    $regChk.rebind(
+        'focus.chkRegisterb',
+        function regsiterbInputFocus() {
+            $(this).parent().addClass('focused');
+        }
+    );
+
+    $regChk.rebind(
+        'blur.chkRegisterb',
+        function regsiterbInputBlur() {
+            $(this).parent().removeClass('focused');
+        }
+    );
+
     /**input values validation
      * @param {Object}  $element    the single element to validate, if not passed all will be validated
      * @returns {Boolean}   whether the validation passed or not*/
-    var inputsValidator = function ($element) {
-        
+    var inputsValidator = function($element) {
+
         var passed = true;
 
         if (mySelf.isLoggedIn === false) {
@@ -342,7 +369,9 @@ BusinessRegister.prototype.initPage = function () {
     );
 
     // event handler for register button, validation + basic check
-    $('#business-reg-btn, #business-reg-btn-mob', $pageContainer).off('click.suba').on('click.suba',
+    var $regBtns = $('#business-reg-btn, #business-reg-btn-mob', $pageContainer);
+    $regBtns.rebind(
+        'click.regBtns',
         function registerBusinessAccButtonClickHandler() {
 
             if ($(this).hasClass('disabled')) {
@@ -360,6 +389,37 @@ BusinessRegister.prototype.initPage = function () {
                 $passInput.val());
         }
     );
+
+    $regBtns.rebind(
+        'keydown.regBtns',
+        function regBusinessKeyDownHandler(e) {
+            if (e.keyCode === 9) {
+                e.preventDefault();
+                $nbUsersInput.focus();
+            }
+            else if (e.keyCode === 32 || e.keyCode === 13) {
+                e.preventDefault();
+                $(this).triggerHandler('click');
+            }
+            return false;
+        }
+    );
+
+    // event handlers for focus and blur on registerBtn
+    $regBtns.rebind(
+        'focus.regBtns',
+        function regsiterbBtnFocus() {
+            $(this).addClass('focused');
+        }
+    );
+
+    $regBtns.rebind(
+        'blur.regBtns',
+        function regsiterbBtnBlur() {
+            $(this).removeClass('focused');
+        }
+    );
+
 
     M.require('businessAcc_js').done(function afterLoadingBusinessClass() {
         var business = new BusinessAccount();
@@ -392,15 +452,21 @@ BusinessRegister.prototype.initPage = function () {
  * @param {String} email        email
  * @param {String} pass         password
  */
-BusinessRegister.prototype.doRegister = function (nbusers, cname, fname, lname, tel, email, pass) {
+BusinessRegister.prototype.doRegister = function(nbusers, cname, fname, lname, tel, email, pass) {
     "use strict";
+    var $paymentMethod = $('.bus-reg-radio-option .bus-reg-radio.checkOn', '.bus-reg-body');
+    var pMethod;
+    if ($paymentMethod.hasClass('payment-Voucher')) {
+        pMethod = 'voucher';
+    }
+
     if (is_mobile) {
         parsepage(pages['mobile']);
     }
     loadingDialog.show();
     var mySelf = this;
 
-    var afterEmphermalAccountCreation = function (isUpgrade) {
+    var afterEmphermalAccountCreation = function(isUpgrade) {
         // at this point i know BusinessAccount Class is required before
         var business = new BusinessAccount();
         var settingPromise = business.setMasterUserAttributes(nbusers, cname, tel, fname, lname,
@@ -408,17 +474,28 @@ BusinessRegister.prototype.doRegister = function (nbusers, cname, fname, lname, 
         settingPromise.always(function settingAttrHandler(st, res) {
             if (st === 0) {
                 if (res[1] && res[1] === EEXIST) {
-                    msgDialog('warninga', l[1578], l[7869], '', function () {
-                        loadingDialog.hide();
-                        var $emailInput = $('.bus-reg-body #business-email');
-                        $emailInput.megaInputsShowError(l[1297]);
-                        $emailInput.focus();
-                    });
+                    msgDialog(
+                        'warninga',
+                        l[1578],
+                        l[7869],
+                        '',
+                        function() {
+                            loadingDialog.hide();
+                            if (is_mobile) {
+                                parsepage(pages['registerb']);
+                                mySelf.initPage(nbusers, cname, tel, fname, lname, email);
+
+                            }
+                            var $emailInput = $('.bus-reg-body #business-email');
+                            $emailInput.megaInputsShowError(l[1297]);
+                            $emailInput.focus();
+                        }
+                    );
                 }
                 else {
-                    msgDialog('warninga', l[1578], l[19508], '', function () {
+                    msgDialog('warninga', l[1578], l[19508], '', function() {
                         loadingDialog.hide();
-                        mySelf.initPage();
+                        mySelf.initPage(nbusers, cname, tel, fname, lname, email);
                     });
                 }
                 return;
@@ -427,7 +504,9 @@ BusinessRegister.prototype.doRegister = function (nbusers, cname, fname, lname, 
             var userInfo = {
                 fname: fname,
                 lname: lname,
-                nbOfUsers: nbusers
+                nbOfUsers: nbusers,
+                pMethod: pMethod,
+                isUpgrade: isUpgrade
             };
             mySelf.goToPayment(userInfo);
         });
@@ -448,10 +527,17 @@ BusinessRegister.prototype.doRegister = function (nbusers, cname, fname, lname, 
  * show the payment dialog
  * @param {Object} userInfo     user info (fname, lname and nbOfUsers)
  */
-BusinessRegister.prototype.goToPayment = function (userInfo) {
+BusinessRegister.prototype.goToPayment = function(userInfo) {
     "use strict";
-
-    addressDialog.init(this.planInfo, userInfo, this);
+    if (userInfo.pMethod === 'voucher') {
+        if (!userInfo.isUpgrade) {
+            window.bCreatedVoucher = true;
+        }
+        loadSubPage('redeem');
+    }
+    else {
+        addressDialog.init(this.planInfo, userInfo, this);
+    }
 
 };
 
@@ -460,15 +546,15 @@ BusinessRegister.prototype.goToPayment = function (userInfo) {
  * @param {Object} payDetails       payment collected details from payment dialog
  * @param {Object} businessPlan     business plan details
  */
-BusinessRegister.prototype.processPayment = function (payDetails, businessPlan) {
+BusinessRegister.prototype.processPayment = function(payDetails, businessPlan) {
     "use strict";
     loadingDialog.show();
 
     var mySelf = this;
 
-    var finalizePayment = function (st, res) {
+    var finalizePayment = function(st, res) {
         if (st === 0) {
-            msgDialog('warninga', '', l[19511], '', function () {
+            msgDialog('warninga', '', l[19511], '', function() {
                 loadingDialog.hide();
                 addressDialog.closeDialog();
             });
@@ -504,7 +590,7 @@ BusinessRegister.prototype.processPayment = function (payDetails, businessPlan) 
                 }
             }
 
-            
+
         }
 
         if (showWarnDialog) {
@@ -514,7 +600,7 @@ BusinessRegister.prototype.processPayment = function (payDetails, businessPlan) 
             redirectToPaymentGateway();
         }
 
-        
+
     };
 
     // at this point i know BusinessAccount class is required before

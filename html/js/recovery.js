@@ -1,6 +1,6 @@
 /**
  * a class to view and control account recovery (password forgetting) prcess
- * 
+ *
  */
 
 function AccountRecoveryControl() {
@@ -52,6 +52,11 @@ function AccountRecoveryControl() {
     $('.content-highlight-block', this.$recoveryContents).rebind('click', function () {
         window.open("https://mega.nz/help");
     });
+
+    if ($.prefillEmail) {
+        this.$emailInput.val($.prefillEmail);
+        delete $.prefillEmail;
+    }
 
     var emailMegaInput = new mega.ui.MegaInputs(this.$emailInput);
 
@@ -118,7 +123,7 @@ function AccountRecoveryControl() {
             else {
                 self.checkAccount(enteredEmail);
             }
-            
+
         }
     };
 
@@ -657,8 +662,7 @@ AccountRecoveryControl.prototype.showParkWarning = function _showParkWarning(eas
         .removeClass('checkboxOn').addClass('checkboxOff');
     $('.parkbtn', $dialog).addClass('disabled');
     $('.checkbox-block.park-account-checkbox', $dialog).removeClass('hidden');
-    var enteredEmail = $('#recover-input1', self.$recoveryContents).val();
-    var $emailInput = $('#recover-input1-di', $dialog).val(enteredEmail).blur();
+    var $emailInput = $('#recover-input1-di', $dialog);
     var warn2 = l[18311];
     var warn1 = l[18312];
     $('#warn2-check', $dialog).safeHTML(warn2);
@@ -677,6 +681,8 @@ AccountRecoveryControl.prototype.showParkWarning = function _showParkWarning(eas
         $('.mobile #startholder.fmholder').removeClass('no-scroll');
     }
 
+    // Pre-fill the email address the user entered at the step one
+    $emailInput.val($('.improved-recovery-steps #recover-input1').val());
     var emailMegaInput = new mega.ui.MegaInputs($emailInput);
 
     var closeDialogLocal = function _closeDialog() {
@@ -726,7 +732,7 @@ AccountRecoveryControl.prototype.showParkWarning = function _showParkWarning(eas
     });
 
     $('.closebtn, .fm-dialog-close', $dialog).rebind('click', closeDialogLocal);
-    
+
     if (!is_mobile) {
         $(document).rebind('keydown.parkwarn', function (e) {
             if (e.keyCode === 27) {

@@ -1,0 +1,769 @@
+.fm-dialog.share-dialog {
+    background-color: #FFFFFF;
+    border-radius: 24px;
+    box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.1);
+    height: auto;
+    min-height: 10px;
+    overflow: hidden;
+    width: 560px;
+}
+
+.fm-dialog.share-dialog .share-dialog-bottom {
+    background-color: #FAFAFA;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.fm-dialog.share-dialog .share-dialog-green-button,
+.fm-dialog.share-add-dialog .share-dialog-green-button {
+    background: linear-gradient(180deg, #00BFA5 0%, #00A690 100%);
+    border: 1px solid #009985;
+    border-radius: 4px;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.15);
+    box-sizing: border-box;
+    cursor: pointer;
+    height: 38px;
+    width: auto;
+}
+
+.fm-dialog.share-dialog .share-dialog-white-button {
+    background: linear-gradient(180deg, #FFFFFF 0%, #FAFAFA 100%);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    border-radius: 4px;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.15);
+    box-sizing: border-box;
+    cursor: pointer;
+    height: 38px;
+    width: auto;
+}
+
+.fm-dialog.share-dialog .share-dialog-top-body {
+    padding: 44px 44px 15px 44px;
+    position: relative;
+}
+
+.fm-dialog.share-dialog .share-dialog-bottom-body {
+    padding: 24px 0 20px 36px;
+    position: relative;
+}
+
+.share-dialog-top-body .share-dialog-title {
+    color: #333333;
+    font-family: LatoWeb;
+    font-size: 18px;
+    letter-spacing: 0;
+    line-height: 22px;
+    padding: 8px 0 12px 4px;
+}
+
+.share-dialog-top-body .share-dialog-shared-item {
+    display: inline-block;
+    height: 48px;
+    max-width: 75%;
+}
+
+.ru .share-dialog-top-body .share-dialog-shared-item {
+    max-width: 65%;
+}
+
+.share-dialog-top-body .share-dialog-copy-link-wrapper {
+    /* Hide the copy link button temporarily, show it once we get the new feature */
+    /* display: inline-block; */
+    display: none;
+    float: right;
+    padding-right: 4px;
+    vertical-align: middle;
+}
+
+.share-dialog-top-body .copy-link {
+    color: #FFFFFF;
+    display: inline-block;
+    font-family: LatoWeb;
+    font-size: 14px;
+    letter-spacing: 0;
+    line-height: 20px;
+    padding: 8px 13px;
+}
+
+.share-dialog-top-body .share-dialog-copy-link-msg {
+    padding: 12px 4px 0 0;
+    text-align: right;
+}
+
+.share-dialog-top-body .copy-link-icon {
+    background-image: url(../images/mega/fm-main-sprite_v15.png);
+    background-position: -15px -4824px;
+    background-repeat: no-repeat;
+    display: inline-block;
+    height: 16px;
+    padding-left: 8px;
+    vertical-align: middle;
+    width: 16px;
+}
+
+.share-dialog-top-body .copy-link-txt {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.share-dialog-top-body .share-dialog-folder-icon {
+    background-image: url(../images/mega/files-icons_v3.png);
+    background-position: -211px -4315px;
+    background-repeat: no-repeat;
+    display: inline-block;
+    height: 48px;
+    padding-left: 6px;
+    vertical-align: middle;
+    width: 48px;
+}
+
+.share-dialog-top-body .share-dialog-folder-icon.shared {
+    background-position: -211px -5035px;
+}
+
+.share-dialog-top-body .share-dialog-folder-info-block {
+    display: inline-block;
+    max-width: calc(100% - 60px);
+    vertical-align: middle;
+}
+
+.share-dialog-top-body .share-dialog-folder-name {
+    color: #333333;
+    font-family: LatoWeb;
+    font-size: 14px;
+    letter-spacing: 0;
+    line-height: 18px;
+    overflow: hidden;
+    padding-bottom: 2px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.share-dialog-top-body .share-dialog-folder-info {
+    color: #666666;
+    font-family: LatoWeb;
+    font-size: 14px;
+    letter-spacing: 0;
+    line-height: 18px;
+    width: 300px;
+}
+
+.share-dialog-bottom-body .share-dialog-permissions-menu {
+    background-color: #FFFFFF;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 14px;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.2);
+    box-sizing: border-box;
+    min-width: 200px;
+    padding: 4px 0;
+    position: absolute;
+    width: auto;
+    z-index: 100;
+}
+
+.share-dialog-permissions-menu .permission-item {
+    cursor: pointer;
+    height: 32px;
+    padding: 4px 30px 4px 49px;
+    position: relative;
+    vertical-align: middle;
+}
+
+.share-dialog-permissions-menu .permission-item span {
+    color: #333333;
+    font-family: LatoWeb;
+    font-size: 14px;
+    line-height: 32px;
+    margin: 0;
+    padding: 5px 0;
+    vertical-align: middle;
+}
+
+.share-dialog-permissions-menu .permission-item.active span {
+    font-weight: bold;
+}
+
+.share-dialog-permissions-menu .permission-item::before {
+    content: '';
+    display: block;
+    height: 24px;
+    left: 14px;
+    margin-top: 4px;
+    position: absolute;
+    width: 24px;
+}
+
+.share-dialog-permissions-menu .permission-item.active span::after {
+    background-image: url(../images/mega/fm-main-sprite_v15.png);
+    background-position: -15px -643px;
+    background-repeat: no-repeat;
+    content: '';
+    height: 8px;
+    margin-left: 8px;
+    position: absolute;
+    top: 15px;
+    width: 12px;
+}
+
+.share-dialog-bottom-body .share-dialog-access-title {
+    color: #111111;
+    font-family: LatoWeb;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0;
+    line-height: 20px;
+    margin: 0 12px 15px 0;
+}
+
+.share-dialog-bottom-body .share-dialog-access-list {
+    margin-left: 12px;
+    max-height: 300px;
+    overflow: hidden;
+    padding: 0;
+    position: relative;
+}
+
+.share-dialog-bottom-body .share-dialog-access-list .jspVerticalBar {
+    right: 11px;
+}
+
+.share-dialog-bottom-body .share-dialog-access-add {
+    color: #00A68F;
+    cursor: pointer;
+    display: inline-block;
+    line-height: 18px;
+    margin-top: 12px;
+    padding: 7px 12px;
+    position: relative;
+    transition: all 200ms ease-in-out;
+    vertical-align: middle;
+    -moz-transition: all 200ms ease-in-out;
+    -ms-transition: all 200ms ease-in-out;
+    -o-transition: all 200ms ease-in-out;
+    -webkit-transition: all 200ms ease-in-out;
+}
+
+.share-dialog-bottom-body .share-dialog-access-add:hover {
+    color: #333;
+}
+
+.share-dialog-bottom-body .share-dialog-access-node {
+    height: 32px;
+    vertical-align: middle;
+}
+
+.share-dialog-access-node .access-node-info-block {
+    display: inline-block;
+    vertical-align: middle;
+    width: 428px;
+}
+
+.share-dialog-access-node .access-node-avatar {
+    border-radius: 4px;
+    display: inline-block;
+    height: 24px;
+    line-height: 24px;
+    vertical-align: middle;
+    width: 24px;
+}
+
+.share-dialog-access-node .access-node-username {
+    color: #333333;
+    display: inline-block;
+    font-family: LatoWeb;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0;
+    line-height: 20px;
+    max-width: 80%;
+    overflow: hidden;
+    padding: 0 8px;
+    text-overflow: ellipsis;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+.share-dialog-access-node .access-node-status {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.share-dialog-access-node .access-node-status .nw-contact-status {
+    margin: 0;
+}
+
+.share-dialog-access-node .access-node-permission-wrapper {
+    display: inline-block;
+    float: right;
+    height: 24px;
+    margin-right: 3px;
+    vertical-align: middle;
+    width: 24px;
+}
+
+.share-dialog-access-node .access-node-permission-wrapper {
+    border: 1px solid rgba(0, 0, 0, 0);
+    border-radius: 16px;
+    cursor: pointer;
+}
+
+.share-dialog-access-node.owner .access-node-permission-wrapper {
+    cursor: default;
+}
+
+.share-dialog-access-node:not(.owner) .access-node-permission-wrapper:hover,
+.share-dialog-access-node.active .access-node-permission-wrapper {
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    border-radius: 16px;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.15);
+}
+
+.share-dialog-access-node .access-node-permission {
+    height: 18px;
+    padding: 3px;
+    width: 18px;
+}
+
+.share-dialog-access-node .access-node-permission.read-only,
+.share-dialog-permissions-menu .permission-item.read-only:before {
+    background-image: url(../images/mega/fm-main-sprite_v15.png);
+    background-position: -13px -4289px;
+    background-repeat: no-repeat;
+}
+
+.share-dialog-access-node .access-node-permission.read-and-write,
+.share-dialog-permissions-menu .permission-item.read-and-write:before {
+    background-image: url(../images/mega/fm-main-sprite_v15.png);
+    background-position: -11px -4327px;
+    background-repeat: no-repeat;
+}
+
+.share-dialog-access-node .access-node-permission.full-access,
+.share-dialog-permissions-menu .permission-item.full-access:before {
+    background-image: url(../images/mega/fm-main-sprite_v15.png);
+    background-position: -13px -4251px;
+    background-repeat: no-repeat;
+}
+
+.share-dialog-access-node .access-node-permission.owner {
+    background-image: url(../images/mega/dialog-sprite_v18.png);
+    background-position: -44px -7074px;
+    background-repeat: no-repeat;
+}
+
+.share-dialog-access-node .access-node-remove {
+    background-image: url(../images/mega/dialog-sprite_v18.png);
+    background-position: -15px -7078px;
+    background-repeat: no-repeat;
+    display: inline-block;
+    float: right;
+    height: 16px;
+    margin-right: 24px;
+    margin-top: 5px;
+    opacity: 0;
+    vertical-align: middle;
+    width: 16px;
+}
+
+.share-dialog-access-node:not(.owner):hover .access-node-remove {
+    cursor: pointer;
+    opacity: 1;
+}
+
+.share-dialog-bottom-body .share-dialog-access-add-icon {
+    background-image: url(../images/mega/new-chat-sprite_v18.png);
+    background-position: -51px -817px;
+    background-repeat: no-repeat;
+    display: inline-block;
+    height: 18px;
+    vertical-align: middle;
+    width: 18px;
+}
+
+.share-dialog-bottom-body .share-dialog-access-add-txt {
+    display: inline-block;
+    font-family: 'source_sans_prosemibold';
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0;
+    line-height: 18px;
+    padding-left: 11px;
+    vertical-align: middle;
+}
+
+.share-dialog-bottom-body .share-dialog-buttons-wrapper {
+    padding-right: 48px;
+    text-align: right;
+}
+
+.share-dialog-bottom-body .done-share,
+.share-add-dialog-bottom-body .add-share {
+    color: #FFFFFF;
+    display: inline-block;
+    font-family: LatoWeb;
+    font-size: 14px;
+    letter-spacing: 0;
+    line-height: 20px;
+    padding: 8px 17px;
+}
+
+.share-dialog-bottom-body .remove-share {
+    color: #333333;
+    display: inline-block;
+    font-family: LatoWeb;
+    font-size: 14px;
+    letter-spacing: 0;
+    line-height: 20px;
+    margin-right: 11px;
+    padding: 8px 17px;
+}
+
+.share-dialog-bottom-body .remove-share.disabled {
+    display: none;
+}
+
+.share-dialog-bottom-body .share-dialog-bottom-msg {
+    color: #666666;
+    font-family: LatoWeb;
+    font-size: 11px;
+    line-height: 20px;
+    opacity: 0;
+    padding: 8px 48px 0 0;
+    text-align: center;
+}
+
+.fm-modal-dialog .fm-dialog.share-add-dialog {
+    background-color: #FFFFFF;
+    border-radius: 24px;
+    box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.1);
+    height: auto;
+    overflow: hidden;
+    width: 432px;
+    z-index: 1100;
+}
+
+.fm-dialog.new-group-chat.share-add-dialog .fm-dialog-content {
+    padding: 0;
+}
+
+.fm-dialog.new-group-chat.share-add-dialog .share-add-dialog-top {
+    padding: 0 24px;
+}
+
+.fm-dialog.share-add-dialog .fm-dialog-footer {
+    display: none;
+}
+
+.fm-dialog.share-add-dialog .share-add-dialog-bottom {
+    background-color: #FAFAFA;
+    border-radius: 0 0 24px 24px;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.fm-dialog.share-add-dialog .share-add-dialog-bottom-body {
+    padding: 24px 47px;
+    position: relative;
+}
+
+.fm-dialog.share-add-dialog .fm-dialog-title {
+    color: #333333;
+    font-family: LatoWeb;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0;
+    line-height: 30px;
+    text-align: center;
+}
+
+.fm-dialog.share-add-dialog .fm-dialog-title .selected-num {
+    background-color: #666666;
+    border-radius: 9px;
+    display: inline-block;
+    line-height: 18px;
+    margin-left: 10px;
+    margin-top: -3px;
+    padding: 0 5px;
+    vertical-align: middle;
+    height: 18px;
+    min-width: 18px;
+    text-align: center;
+    box-sizing: border-box;
+}
+
+.fm-dialog.share-add-dialog .fm-dialog-title .selected-num span {
+    color: #FFFFFF;
+    font-family: LatoWeb;
+    font-size: 10px;
+    font-weight: 600;
+    text-align: center;
+    vertical-align: top;
+}
+
+.share-add-dialog-bottom-body .multiple-input {
+    background-color: #FFFFFF;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.share-add-dialog-bottom-body .multiple-input input,
+.share-add-dialog-bottom-body .multiple-input .token-input-token-mega {
+    color: #333333;
+    font-size: 13px;
+}
+
+.share-add-dialog-bottom-body .multiple-input input::placeholder {
+    color: #999999;
+}
+
+.share-add-dialog-bottom-body .multiple-input input:focus::placeholder {
+    color: #CCCCCC;
+}
+
+.share-add-dialog-bottom-body .multiple-input-warning {
+    font-size: 12px;
+    line-height: 20px;
+    margin: 6px 0 6px 0;
+    text-align: center;
+    text-transform: none;
+}
+
+.share-add-dialog-bottom-body .share-message {
+    background-color: #FFFFFF;
+    border-radius: 4px;
+    box-sizing: border-box;
+    margin: 11px 0 0 0;
+}
+
+.share-add-dialog-bottom-body .share-message textarea {
+    color: #333333;
+    font-family: LatoWeb;
+    font-size: 13px;
+    padding: 0 9px;
+}
+
+.share-add-dialog-bottom-body .share-message textarea::placeholder {
+    color: #999999;
+}
+
+.share-add-dialog-bottom-body .share-message textarea:focus::placeholder {
+    color: transparent;
+}
+
+.share-add-dialog-bottom-body .share-message .share-message-hidden {
+    padding: 0 9px;
+    z-index: -100;
+}
+
+.share-add-dialog-bottom-body .share-add-dialog-buttons-wrapper {
+    height: 38px;
+    margin-top: 14px;
+    vertical-align: middle;
+}
+
+.share-add-dialog-bottom-body .share-add-dialog-cancel-button {
+    color: #000000;
+    display: inline-block;
+    font-family: LatoWeb;
+    height: 20px;
+    vertical-align: middle;
+    width: 100px;
+}
+
+.share-add-dialog-bottom-body .share-add-dialog-cancel-button span {
+    cursor: pointer;
+}
+
+.share-add-dialog-bottom-body .share-add-dialog-add-button-wrapper {
+    display: inline-block;
+    text-align: right;
+    vertical-align: middle;
+    width: calc(100% - 103px);
+}
+
+/* Overwrite the style of elements in the contact picker rendered by react */
+.fm-dialog.share-add-dialog .horizontal-contacts-list {
+    background-color: #FAFAFA;
+    border: 1px solid #EEEEEE;
+    border-radius: 8px;
+    box-sizing: border-box;
+    height: 80px;
+    margin: 0 24px 9px 24px;
+}
+
+.fm-dialog.share-add-dialog .horizontal-contacts-list .selected-contact-card {
+    height: 60px;
+    margin: 10px 0 0 0;
+    width: 62px;
+}
+
+.fm-dialog.share-add-dialog .horizontal-contacts-list .selected-contact-card .remove-contact-bttn {
+    cursor: pointer;
+}
+
+.fm-dialog.share-add-dialog .horizontal-contacts-list .selected-contact-card .small-rounded-avatar img {
+    height: 36px;
+    width: 36px;
+}
+
+.fm-dialog.share-add-dialog .horizontal-contacts-list .selected-contact-card .user-card-name.light {
+    max-width: calc(100% - 10px);
+}
+
+.fm-dialog.share-add-dialog .horizontal-contacts-list div.ps-container > .ps-scrollbar-x-rail > .ps-scrollbar-x {
+    background-color: #333333;
+    border-radius: 2px;
+    height: 4px;
+    margin-bottom: 1px;
+    opacity: 1;
+}
+
+.fm-dialog.share-add-dialog .horizontal-contacts-list div.ps-container > .ps-scrollbar-x-rail > .ps-scrollbar-x::before {
+    bottom: 0;
+    content: "";
+    cursor: pointer;
+    left: 0;
+    position: absolute;
+    right: 0;
+    top: -8px;
+}
+
+.fm-dialog.share-add-dialog .contacts-search-header {
+    margin: 0 24px 12px 24px;
+}
+
+.fm-dialog.share-add-dialog .contacts-search-header input {
+    color: #333333;
+}
+
+.fm-dialog.share-add-dialog .contacts-search-header input::placeholder {
+    color: #999999;
+}
+
+.fm-dialog.share-add-dialog .contacts-search-header input:focus::placeholder {
+    color: #CCCCCC;
+}
+
+.fm-dialog.share-add-dialog .contacts-search-scroll {
+    height: 240px !important;
+    min-height: 240px;
+}
+
+.fm-dialog.share-add-dialog .contacts-search-subsection .contacts-list-header {
+    margin: 0 24px;
+}
+
+.fm-dialog.share-add-dialog .contacts-search-subsection .contacts-search-list {
+    margin-left: 24px;
+    padding: 12px 0 0 0;
+    width: 336px;
+}
+
+.fm-dialog.share-add-dialog .contacts-search-list .contacts-info.body {
+    border-bottom: none;
+    height: 32px;
+    padding: 4px 0;
+}
+
+.fm-dialog.share-add-dialog .contacts-search-list .small-rounded-avatar {
+    height: 24px;
+    line-height: 24px;
+    width: 24px;
+}
+
+.fm-dialog.share-add-dialog .contacts-search-list .small-rounded-avatar img {
+    height: 24px;
+    width: 24px;
+}
+
+.fm-dialog.share-add-dialog .contacts-search-list .user-card-tick-wrap {
+    height: 18px;
+    right: 0;
+    top: 7px;
+    width: 18px;
+}
+
+.fm-dialog.share-add-dialog .contacts-search-list .selected .user-card-tick-wrap {
+    background-color: #00BFA5;
+    border: #009985;
+}
+
+.fm-dialog.share-add-dialog .contacts-search-list .small-icon.mid-green-tick {
+    background-position: -85px -621px;
+}
+
+.fm-dialog.share-add-dialog .contacts-search-list .user-card-data {
+    padding: 4px 40px 0 32px;
+}
+
+.fm-dialog.share-add-dialog .contacts-search-list .user-card-data .user-card-name {
+    color: #666666;
+    font-weight: 600;
+    max-width: 80%;
+}
+
+.fm-dialog.share-add-dialog .contacts-search-list .user-card-data .user-card-name strong {
+    color: #000000;
+    font-family: 'LatoWebSemibold', 'source_sans_prosemibold';
+}
+
+.fm-dialog.share-add-dialog .contacts-search-list .user-card-status {
+    display: inline;
+    margin-left: 5px;
+}
+
+.fm-dialog.share-add-dialog .contacts-search-list .user-card-status span {
+    display: none;
+}
+
+.fm-dialog.share-add-dialog .chat-contactspicker-no-contacts .fm-empty-contacts-bg {
+    margin: 63px 12px 0 0;
+}
+
+.fm-dialog.share-add-dialog .chat-contactspicker-no-contacts .fm-empty-cloud-txt.small {
+    margin-top: 16px;
+}
+
+.fm-dialog.share-add-dialog .chat-contactspicker-no-contacts .fm-empty-description.small {
+    padding: 1px 32px 38px 20px;
+}
+
+.fm-dialog.share-add-dialog .chat-contactspicker-no-contacts.searching {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    height: 240px;
+    justify-items: center;
+}
+
+.fm-dialog.share-add-dialog .chat-contactspicker-no-contacts.searching .fm-empty-contacts-bg {
+    background-image: url(../images/mega/dialog-sprite_v18.png);
+    background-position: 0 -7103px;
+    background-repeat: no-repeat;
+    background-size: auto;
+    height: 96px;
+    margin: 43px auto 0 auto;
+    width: 96px;
+}
+
+.fm-dialog.share-add-dialog .chat-contactspicker-no-contacts.searching .fm-empty-cloud-txt.small {
+    margin-top: 0;
+    padding: 0;
+}
+
+@media only screen and (max-height: 768px) {
+    .share-add-dialog-bottom-body .multiple-input {
+        max-height: 72px;
+    }
+
+    .fm-dialog.share-add-dialog .contacts-search-scroll {
+        height: 176px !important;
+        min-height: 176px;
+    }
+
+    .fm-dialog.share-add-dialog .chat-contactspicker-no-contacts.searching {
+        height: 176px;
+    }
+
+    .fm-dialog.share-add-dialog .chat-contactspicker-no-contacts.searching .fm-empty-contacts-bg {
+        margin: 16px auto 0 auto;
+    }
+}

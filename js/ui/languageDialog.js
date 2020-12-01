@@ -32,11 +32,18 @@ var langDialog = {
 
         // Generate the HTML for tier one and tier two languages (second param set to true shows beta icon)
         var tierOneHtml = langDialog.renderLanguages(tierOneLangCodes, false);
-        var tierTwoHtml = langDialog.renderLanguages(tierTwoLangCodes, true);
 
         // Display the HTML
         $tierOneLanguages.safeHTML(tierOneHtml);
-        $tierTwoLanguages.safeHTML(tierTwoHtml);
+
+        if (tierTwoLangCodes.length) {
+
+            var tierTwoHtml = langDialog.renderLanguages(tierTwoLangCodes, true);
+            $tierTwoLanguages.safeHTML(tierTwoHtml);
+        }
+        else {
+            $('.show-more-languages', langDialog.$dialog).addClass('hidden');
+        }
 
         // Cache some selectors for performance
         var $languageLinks = langDialog.$dialog.find('.nlanguage-lnk');
@@ -213,7 +220,7 @@ var langDialog = {
 
                 // Set a language user attribute on the API (This is a private but unencrypted user
                 // attribute so that the API can read it and send emails in the correct language)
-                if (typeof u_attr !== 'undefined') {
+                if (typeof u_attr !== 'undefined' && u_attr) {
                     mega.attr.set(
                         'lang',
                         selectedLangCode,       // E.g. en, es, pt

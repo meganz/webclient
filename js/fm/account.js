@@ -168,6 +168,8 @@ accountUI.renderAccountPage = function(account) {
     // Reinitialize Scroll bar
     initAccountScroll();
     mBroadcaster.sendMessage('settingPageReady');
+    fmLeftMenuUI();
+
     loadingDialog.hide();
 };
 
@@ -196,6 +198,20 @@ accountUI.general = {
             }
             else {
                 loadSubPage('pro');
+            }
+        });
+
+        $('.download-sync').rebind('click', function() {
+
+            var pf = navigator.platform.toUpperCase();
+
+            // If this is Linux let them goes to sync page to select linux type
+            if (pf.indexOf('LINUX') > -1) {
+                loadSubPage('sync');
+            }
+            // else directly give link of the file.
+            else {
+                window.location = megasync.getMegaSyncUrl();
             }
         });
     },
@@ -247,8 +263,8 @@ accountUI.general = {
             var b2 = bytesToSize(account.tfsq.max, 0).split(' ');
             var usedB = bytesToSize(account.tfsq.used);
             $bandwidthChart.find('.chart.data .size-txt').text(usedB);
-            $bandwidthChart.find('.chart.data .pecents-txt').text((b2[0]));
-            $bandwidthChart.find('.chart.data .gb-txt').text((b2[1]));
+            $('.chart.data .pecents-txt', $bandwidthChart).text(b2[0]);
+            $('.chart.data .gb-txt', $bandwidthChart).text(b2[1]);
             $bandwidthChart.find('.chart.data .content-txt').text('/');
             if ((u_attr.p || account.tfsq.ach) && b2[0] > 0) {
                 if (this.perc_c_b > 0) {
@@ -291,7 +307,8 @@ accountUI.general = {
 
             /* New Used Storage chart */
             var $storageChart = $('.fm-account-blocks.storage');
-            this.perc_c_s = Math.floor(account.space_used / account.space * 100);
+            var usedPercentage = Math.round(account.space_used / account.space * 100);
+            this.perc_c_s = usedPercentage;
             if (this.perc_c_s > 100) {
                 this.perc_c_s = 100;
             }
@@ -318,10 +335,22 @@ accountUI.general = {
 
             // Maximum disk space
             var b2 = bytesToSize(account.space, 0).split(' ');
-            $storageChart.find('.chart.data .pecents-txt').text(b2[0]);
-            $storageChart.find('.chart.data .gb-txt').text(b2[1]);
-            $storageChart.find('.chart.data .perc-txt').text(this.perc_c_s + '%');
-            $storageChart.find('.chart.data .size-txt').text(bytesToSize(account.space_used));
+            $('.chart.data .pecents-txt', $storageChart).text(b2[0]);
+            $('.chart.data .gb-txt', $storageChart).text(b2[1]);
+            $('.chart.data .perc-txt', $storageChart).text(usedPercentage + '%');
+            $('.chart.data .size-txt', $storageChart).text(bytesToSize(account.space_used));
+            $('.fm-right-block.dashboard .fm-account-blocks.storage .chart-indicator').css(
+                'left',
+                usedPercentage > 100 ?
+                    180 + (Math.floor(Math.log(usedPercentage) * Math.LOG10E) - 2) * 15 + 'px'
+                    : ''
+            );
+            $('.dashboard-container .fm-account-blocks.storage .chart-indicator').css(
+                'left',
+                usedPercentage > 100 ?
+                    150 + (Math.floor(Math.log(usedPercentage) * Math.LOG10E) - 2) * 15 + 'px'
+                    : ''
+            );
             /** End New Used Storage chart */
         },
 
@@ -379,12 +408,13 @@ accountUI.general = {
             $('.small-icon.membership').addClass('pro' + planNum);
         }
         else {
-            $('.account.membership-plan').text(l[435]);
+            $('.account.membership-plan').text(l[1150]);
         }
 
         // update avatar
         $('.fm-account-avatar').safeHTML(useravatar.contact(u_handle, '', 'div', false));
         $('.fm-avatar').safeHTML(useravatar.contact(u_handle));
+        $('.avatar-block', '.top-menu-popup').safeHTML(useravatar.contact(u_handle));
 
         // Show first name or last name
         $('.membership-big-txt.name').text(u_attr.fullname);
@@ -735,11 +765,14 @@ accountUI.account = {
             var $text = $addPhoneBanner.find('.add-phone-text');
             var $addPhoneButton = $addPhoneBanner.find('.js-add-phone-button');
             var $skipButton = $addPhoneBanner.find('.skip-button');
+            // M.maf is cached in its getter, however, repeated gets will cause unnecessary checks.
+            var ach = M.maf;
 
             // If SMS verification enable is not on level 2 (Opt-in and unblock SMS allowed) then do nothing. Or if
             // they already have already added a phone number then don't show this banner again. Or if they clicked the
             // skip button then don't show the banner.
-            if (u_attr.flags.smsve !== 2 || typeof u_attr.smsv !== 'undefined' || fmconfig['skipsmsbanner']) {
+            if (u_attr.flags.smsve !== 2 || typeof u_attr.smsv !== 'undefined' || fmconfig.skipsmsbanner
+                || (ach && ach[9] && ach[9].rwd)) {
 
                 // If not a business account
                 if (typeof u_attr.b === 'undefined') {
@@ -822,7 +855,7 @@ accountUI.account = {
                 .attr('max', i);
 
             if (u_attr.birthyear) {
-                $input.val(u_attr.birthyear);
+                $input.val(u_attr.birthyear).trigger('input');
             }
         },
 
@@ -832,7 +865,7 @@ accountUI.account = {
 
             if (u_attr.birthmonth) {
                 var $input = $('.mega-input-title-ontop.birth.' + $.dateTimeFormat['structure'] + ' .bmonth');
-                $input.val(u_attr.birthmonth);
+                $input.val(u_attr.birthmonth).trigger('input');
                 this.zerofill($input[0]);
             }
         },
@@ -843,7 +876,7 @@ accountUI.account = {
 
             if (u_attr.birthday) {
                 var $input = $('.mega-input-title-ontop.birth.' + $.dateTimeFormat['structure'] + ' .bdate');
-                $input.val(u_attr.birthday);
+                $input.val(u_attr.birthday).trigger('input');
                 this.zerofill($input[0]);
             }
         },
@@ -898,13 +931,67 @@ accountUI.account = {
                 var $text = $phoneSettings.find('.add-phone-text');
                 var $phoneNumber = $phoneSettings.find('.phone-number');
                 var $addNumberButton = $phoneSettings.find('.add-number-button');
+                var $removeNumberButton = $('.rem-gsm', $phoneSettings);
+                var $modifyNumberButton = $('.modify-gsm', $phoneSettings);
 
                 // If the phone is already added, show that
                 if (typeof u_attr.smsv !== 'undefined') {
                     $phoneSettings.addClass('verified');
                     $phoneNumber.text(u_attr.smsv);
+
+                    /**
+                     * Send remove command to API, and update UI if needed
+                     * @param {String} msg                  Message dialog's text to show for confirmation
+                     * @param {String} desc                 Message dialog's description to show for confirmation
+                     * @param {Boolean} showSuccessMsg      Show message dialog on success
+                     */
+                    var removeNumber = function(msg, desc, showSuccessMsg) {
+
+                        msgDialog('confirmation', '', msg, desc, function(answer) {
+                            if (answer) {
+                                // lock UI
+                                loadingDialog.show();
+
+                                api_req(
+                                    { a: 'smsr' },
+                                    {
+                                        callback: tryCatch(function(res) {
+                                            // Unlock UI regardless of the result
+                                            loadingDialog.hide();
+                                            if (res === 0) {
+                                                // success
+                                                // no APs, we need to rely on this response.
+                                                delete u_attr.smsv;
+
+                                                // update only relevant sections in UI
+                                                accountUI.account.profiles.renderPhoneBanner();
+                                                accountUI.account.profiles.renderPhoneDetails();
+
+                                                if (showSuccessMsg) {
+                                                    msgDialog('info', '', l[23427]);
+                                                }
+                                                else {
+                                                    sms.phoneInput.init();
+                                                }
+                                            }
+                                            else {
+                                                msgDialog('warningb', '', l[23428]);
+                                            }
+                                        }, function() {
+                                            loadingDialog.hide();
+                                            msgDialog('warningb', '', l[23428]);
+                                        })
+                                    }
+                                );
+                            }
+                        });
+                    };
+
+                    $removeNumberButton.rebind('click.gsmremove', removeNumber.bind(null, l[23425], l[23426], true));
+                    $modifyNumberButton.rebind('click.gsmmodify', removeNumber.bind(null, l[23429], l[23430], false));
                 }
                 else {
+                    $phoneSettings.removeClass('verified');
                     // Otherwise set the text for x GB storage and quota
                     sms.renderAddPhoneText($text);
 
@@ -950,9 +1037,10 @@ accountUI.account = {
             var $personalInfoBlock = $('.profile-form');
             var $birthdayBlock = $('.mega-input-title-ontop.birth.' + $.dateTimeFormat['structure'],
                 $personalInfoBlock);
-            var $firstNameField = $personalInfoBlock.find('#account-firstname');
+            var $firstNameField = $('#account-firstname', $personalInfoBlock);
+            var $lastNameField = $('#account-lastname', $personalInfoBlock);
             var $saveBlock = $('.fm-account-sections .save-block');
-            var $saveButton = $saveBlock.find('.fm-account-save');
+            var $saveButton = $('.fm-account-save', $saveBlock);
 
             // Avatar
             $('.fm-account-avatar, .settings-sub-section.avatar .avatar', $personalInfoBlock)
@@ -961,7 +1049,7 @@ accountUI.account = {
                 });
 
             // All profile text inputs
-            $firstNameField.add('#account-lastname', $personalInfoBlock).add('.byear, .bmonth, .bdate', $birthdayBlock)
+            $firstNameField.add($lastNameField).add('.byear, .bmonth, .bdate', $birthdayBlock)
                 .rebind('input.settingsGeneral, change.settingsGeneral', function() {
 
                     var $this = $(this);
@@ -995,8 +1083,16 @@ accountUI.account = {
                         }
                     }
 
-                    if ($firstNameField.val() && $firstNameField.val().trim().length > 0
-                        && !$personalInfoBlock.find('.errored').length) {
+                    var enteredFirst = $firstNameField.val().trim();
+                    var enteredLast = $lastNameField.val().trim();
+
+                    if (enteredFirst.length > 0 && enteredLast.length > 0 &&
+                        !$('.errored', $personalInfoBlock).length &&
+                        (enteredFirst !== u_attr.firstname ||
+                        enteredLast !== u_attr.lastname ||
+                        ($('.bdate', $birthdayBlock).val() | 0) !== (u_attr.birthday | 0) ||
+                        ($('.bmonth', $birthdayBlock).val() | 0) !== (u_attr.birthmonth | 0) ||
+                        ($('.byear', $birthdayBlock).val() | 0)  !== (u_attr.birthyear | 0))) {
                         $saveBlock.removeClass('closed');
                     }
                     else {
@@ -1111,6 +1207,7 @@ accountUI.account = {
                         callback: function (res) {
                             if (res === u_handle) {
                                 $('.user-name').text(u_attr.name);
+                                $('.top-menu-logged .name', '.top-menu-popup').text(u_attr.name);
                                 showToast('settings', l[7698]);
                                 accountUI.account.profiles.bindEvents();
                                 // update megadrop username for existing megadrop
@@ -1119,6 +1216,11 @@ accountUI.account = {
                         }
                     });
                 }
+
+                // Reset current Internationalization API usage upon save.
+                onIdle(function() {
+                    mega.intl.reset();
+                });
 
                 $saveBlock.addClass('closed');
                 $saveButton.removeClass('disabled');
@@ -1136,22 +1238,12 @@ accountUI.account = {
 
             this.$QRSettings =  $('.qr-settings');
 
-            var myHost = '';
-            if (!is_extension) {
-                var cutPlace = location.href.indexOf('/fm/');
-                myHost = location.href.substr(0, cutPlace);
-            }
-            else {
-                myHost = 'https://mega.nz';
-            }
-
-            myHost += '/' + account.contactLink;
             var QRoptions = {
                 width: 106,
                 height: 106,
                 correctLevel: QRErrorCorrectLevel.H,    // high
                 foreground: '#dc0000',
-                text: myHost
+                text: getBaseUrl() + '/' + account.contactLink
             };
 
             var defaultValue = (account.contactLink && account.contactLink.length);
@@ -1316,6 +1408,8 @@ accountUI.account = {
 
             'use strict';
 
+            var self = this;
+
             // Date/time format setting
             accountUI.inputs.radio.init(
                 '.uidateformat',
@@ -1338,7 +1432,40 @@ accountUI.account = {
                     mega.config.setn('font_size', parseInt(val));
                 }
             );
-        }
+
+            self.initHomePageDropdown();
+
+        },
+
+        /**
+         * Render and bind events for the home page dropdown.
+         * @returns {void}
+         */
+        initHomePageDropdown: function() {
+
+            'use strict';
+
+            var $hPageSelect = $('.fm-account-main .default-select.settings-choose-homepage-dropdown');
+            var $textField = $('span', $hPageSelect);
+
+            // Mark active item.
+            var $activeItem = $('.default-dropdown-item[data-value="' + getLandingPage() + '"]', $hPageSelect);
+            $activeItem.addClass('active');
+            $textField.text($activeItem.text());
+
+            // Initialize scrolling. This is to prevent scroll losing bug with action packet.
+            initSelectScrolling('#account-hpage .default-select-scroll');
+
+            // Bind Dropdowns events
+            bindDropdownEvents($hPageSelect, 1, '.fm-account-main');
+
+            $('.default-dropdown-item', $hPageSelect).rebind('click.saveChanges', function() {
+                var $selectedOption = $('.default-dropdown-item.active', $hPageSelect);
+                var newValue = $selectedOption.attr('data-value') || 'fm';
+                showToast('settings', l[16168]);
+                setLandingPage(newValue);
+            });
+        },
     },
 
     cancelAccount: {
@@ -1481,6 +1608,10 @@ accountUI.plan = {
                 var paymentType = (account.sgw.length > 0) ? account.sgw[0] : ''; // Credit Card etc
                 var gatewayId = (account.sgwids.length > 0) ? account.sgwids[0] : null; // Gateway ID e.g. 15, etc
 
+                if (paymentType.indexOf('Credit Card') === 0) {
+                    paymentType = paymentType.replace('Credit Card', l[6952]);
+                }
+
                 // Display the date their subscription will renew if known
                 if (timestamp > 0) {
                     var dateString = time2date(timestamp, 2);
@@ -1575,7 +1706,7 @@ accountUI.plan = {
             }
             else {
                 // free account:
-                $('.account.plan-info.accounttype span').text(l[435]);
+                $('.account.plan-info.accounttype span').text(l[1150]);
                 $('.account.plan-info.expiry').text(l[436]);
                 $('.btn-cancel-sub').addClass('hidden');
                 if (account.mxfer) {
@@ -1767,7 +1898,10 @@ accountUI.plan = {
 
             "use strict";
 
-            $('.account.plan-info.balance span').safeHTML('&euro; @@', account.balance[0][0]);
+            $('.account.plan-info.balance span').safeHTML(
+                '&euro; @@',
+                mega.intl.number.format(account.balance[0][0])
+            );
         },
 
         bindEvents: function() {
@@ -1881,6 +2015,7 @@ accountUI.plan = {
             var html = '<tr><th>' + l[475] + '</th><th>' + l[476] +
                 '</th><th>' + l[477] + '</th><th>' + l[478] + '</th></tr>';
             if (account.purchases.length) {
+                var intl = mega.intl.number;
                 // Render every purchase made into Purchase History on Account page
                 $(account.purchases).each(function(index, purchaseTransaction) {
 
@@ -1909,7 +2044,7 @@ accountUI.plan = {
                         + '</span>'
                         + '<span class="fm-member-icon-txt"> ' + item + '</span>'
                         + '</td>'
-                        + '<td>&euro;' + htmlentities(price) + '</td>'
+                        + '<td>&euro;' + escapeHTML(intl.format(price)) + '</td>'
                         + '<td>' + paymentMethod + '</td>'
                         + '</tr>';
                 });
@@ -1947,6 +2082,7 @@ accountUI.plan = {
             var html = '<tr><th>' + l[475] + '</th><th>' + l[484] +
                 '</th><th>' + l[485] + '</th><th>' + l[486] + '</th></tr>';
             if (account.transactions.length) {
+                var intl = mega.intl.number;
                 $(account.transactions).each(function(i, el) {
 
                     if (i === $.transactionlimit) {
@@ -1957,10 +2093,10 @@ accountUI.plan = {
                     var debit = '';
 
                     if (el[2] > 0) {
-                        credit = '<span class="green">&euro;' + htmlentities(el[2]) + '</span>';
+                        credit = '<span class="green">&euro;' + escapeHTML(intl.format(el[2])) + '</span>';
                     }
                     else {
-                        debit = '<span class="red">&euro;' + htmlentities(el[2]) + '</span>';
+                        debit = '<span class="red">&euro;' + escapeHTML(intl.format(el[2])) + '</span>';
                     }
                     html += '<tr><td>' + time2date(el[1]) + '</td><td>' + htmlentities(el[0]) + '</td><td>'
                         + credit + '</td><td>' + debit + '</td></tr>';
@@ -2400,16 +2536,16 @@ accountUI.security = {
             // If not the current session
             if (!currentSession) {
                 if (activeSession) {
-                    status = '<span class="active-session-txt">' + l[7666] + '</span>';     // Active
+                    status = '<span class="active-session-txt">' + l[23754] + '</span>';     // Logged-in
                 }
                 else {
                     status = '<span class="expired-session-txt">' + l[1664] + '</span>';    // Expired
                 }
             }
 
-            // If unknown country code use question mark gif
-            if (!country.icon || country.icon === '??.gif') {
-                country.icon = 'ud.gif';
+            // If unknown country code use question mark png
+            if (!country.icon || country.icon === '??.png') {
+                country.icon = 'ud.png';
             }
 
             // Generate row html
@@ -2752,6 +2888,8 @@ accountUI.transfers = {
 
         'use strict';
 
+        this.$page = $('.fm-account-sections.fm-account-transfers');
+
         // Upload and Download - Bandwidth
         this.uploadAndDownload.bandwidth.render(account);
 
@@ -2948,6 +3086,8 @@ accountUI.transfers = {
 
                 'use strict';
 
+                var $section = $('.transfer-tools', accountUI.transfers.$page);
+
                 accountUI.inputs.switch.init(
                     '#dlThroughMEGAsync',
                     $('#dlThroughMEGAsync').parent(),
@@ -2955,6 +3095,16 @@ accountUI.transfers = {
                     function(val) {
                         mega.config.setn('dlThroughMEGAsync', val);
                     });
+
+                megasync.isInstalled(function(err, is) {
+
+                    if (!err && is) {
+                        $('.green-notification', $section).addClass('hidden');
+                    }
+                    else {
+                        $('.green-notification', $section).removeClass('hidden');
+                    }
+                });
             }
         }
     },
@@ -2990,20 +3140,49 @@ accountUI.transfers = {
 accountUI.contactAndChat = {
 
     init: function(autoaway, autoawaylock, autoawaytimeout, persist, persistlock, lastSeen) {
-
         'use strict';
+        if (window.megaChatIsDisabled) {
+            console.error('Mega Chat is disabled, cannot proceed to Contact and Chat settings');
+            return;
+        }
+
+        var self = this;
+
+        if (!megaChatIsReady) {
+            // If chat is not ready waiting for chat_initialized broadcaster.
+            loadingDialog.show();
+            var args = toArray.apply(null, arguments);
+            mBroadcaster.once('chat_initialized', function() {
+                self.init.apply(self, args);
+            });
+            return true;
+        }
+        loadingDialog.hide();
+        $.tresizer();
 
         var presenceInt = megaChat.plugins.presencedIntegration;
-        var delaying = this.delayRender(presenceInt, autoaway);
 
-        if (delaying) {
-            return;
+        if (!presenceInt || !presenceInt.userPresence) {
+            setTimeout(function() {
+                throw new Error('presenceInt is not ready...');
+            });
+            return true;
+        }
+
+        presenceInt.rebind('settingsUIUpdated.settings', function() {
+            self.init.apply(self, toArray.apply(null, arguments).slice(1));
+        });
+
+        // Only call this if the call of this function is the first one, made by fm.js -> accountUI
+        if (autoaway === undefined) {
+            presenceInt.userPresence.updateui();
+            return true;
         }
 
         this.status.render(presenceInt, autoaway, autoawaylock, autoawaytimeout, persist, persistlock, lastSeen);
         this.status.bindEvents(presenceInt, autoawaytimeout);
-
         this.richURL.render();
+        this.dnd.render();
     },
 
     status: {
@@ -3117,19 +3296,217 @@ accountUI.contactAndChat = {
 
             'use strict';
 
+            if (typeof RichpreviewsFilter === 'undefined') {
+                return;
+            }
+
             // Auto-away switch
+            const { previewGenerationConfirmation, confirmationDoConfirm, confirmationDoNever } = RichpreviewsFilter;
             accountUI.inputs.switch.init(
                 '#richpreviews',
                 $('#richpreviews').parent(),
-                RichpreviewsFilter.previewGenerationConfirmation,
-                function(val) {
-                    if (val) {
-                        RichpreviewsFilter.confirmationDoConfirm();
-                    }
-                    else {
-                        RichpreviewsFilter.confirmationDoNever();
-                    }
-                });
+                // previewGenerationConfirmation -> -1 (unset, default) || true || false
+                previewGenerationConfirmation && previewGenerationConfirmation > 0,
+                val => val ? confirmationDoConfirm() : confirmationDoNever()
+            );
+        }
+    },
+
+    dnd: {
+
+        /**
+         * Cached references for common DOM elements
+         */
+
+        DOM: {
+            container: '.fm-account-main',
+            toggle: '#push-settings-toggle',
+            button: '#push-settings-button',
+            dialog: '.push-settings-dialog',
+            status: '.push-settings-status',
+        },
+
+        /**
+         * @see PushNotificationSettings.GROUPS
+         */
+
+        group: 'CHAT',
+
+        /**
+         * hasDnd
+         * @description Get the current push notification setting
+         * @returns {Boolean}
+         */
+
+        hasDnd: function() {
+            'use strict';
+            return (
+                pushNotificationSettings &&
+                pushNotificationSettings.getDnd(this.group) ||
+                pushNotificationSettings.getDnd(this.group) === 0
+            );
+        },
+
+        /**
+         * getTimeString
+         * @description Returns human readable and formatted string based on the
+         * current push notification setting (timestamp)
+         * @example `Notification will be silent until XX:XX`
+         * @returns {String}
+         */
+
+        getTimeString: function() {
+            'use strict';
+            var dnd = pushNotificationSettings.getDnd(this.group);
+            if (dnd) {
+                return (
+                    // `Notifications will be silent until %s`
+                    l[23540].replace('%s', '<span>' + escapeHTML(unixtimeToTimeString(dnd)) + '</span>')
+                );
+            }
+            return '&nbsp;';
+        },
+
+        /**
+         * renderStatus
+         * @param hasDnd Boolean the push notification setting status
+         * @returns {*}
+         */
+
+        renderStatus: function(hasDnd) {
+            'use strict';
+            var $status = $(this.DOM.status, this.DOM.container);
+            return hasDnd ? $status.safeHTML(this.getTimeString()).removeClass('hidden') : $status.addClass('hidden');
+        },
+
+        /**
+         * setInitialState
+         * @description Invoked immediately upon loading the module, sets the initial state -- conditionally
+         * sets the toggle state, renders formatted timestamp
+         */
+
+        setInitialState: function() {
+            'use strict';
+            if (this.hasDnd()) {
+                var dnd = pushNotificationSettings.getDnd(this.group);
+                if (dnd && dnd < unixtime()) {
+                    pushNotificationSettings.disableDnd(this.group);
+                    return;
+                }
+                $(this.DOM.toggle, this.DOM.container).addClass('toggle-on');
+                this.renderStatus(true);
+            }
+        },
+
+        /**
+         * setMorningOption
+         * @description Handles the `Until tomorrow morning, 08:00` / `Until this morning, 08:00` option.
+         */
+
+        setMorningOption: function() {
+            'use strict';
+            var container = '.radio-txt.morning-option';
+            var $label = $('span', container);
+            var $radio = $('input', container);
+
+            // 00:01 ~ 07:59 -> `Until this morning, 08:00`
+            // 08:00 ~ 00:00 -> `Until tomorrow morning, 08:00`
+            var targetTomorrow = (new Date().getHours()) >= 8;
+
+            var date = new Date();
+            // Start of the day -> 08:00
+            date.setHours(0, 1, 0, 0);
+            date.setHours(date.getHours() + 8);
+            if (targetTomorrow) {
+                // +1 day if we target `tomorrow morning`
+                date.setDate(date.getDate() + 1);
+            }
+            var difference = Math.abs(date - new Date());
+            var minutesUntil = Math.floor(difference / 1000 / 60);
+
+            $label.safeHTML(
+                targetTomorrow ? l[23671] || 'Until tomorrow morning, 08:00' : l[23670] || 'Until this morning, 08:00'
+            );
+            $radio.val(minutesUntil);
+        },
+
+        /**
+         * handleToggle
+         * @description Handles the toggle switch -- conditionally adds or removes the toggle active state,
+         * disables or sets the `Until I Turn It On Again` default setting
+         * @param ev Object the event object
+         */
+
+        handleToggle: function(ev) {
+            'use strict';
+
+            var hasDnd = this.hasDnd();
+            var group = this.group;
+
+            if (hasDnd) {
+                pushNotificationSettings.disableDnd(group);
+                this.renderStatus(false);
+                $(ev.currentTarget).removeClass('toggle-on');
+            }
+            else {
+                this.handleDialogOpen();
+            }
+        },
+
+        /**
+         * handleDialogOpen
+         * @description
+         * Handles the dialog toggle, incl. attaches additional handler that sets the given setting if any is selected
+         */
+
+        handleDialogOpen: function() {
+            'use strict';
+
+            var self = this;
+            var $dialog = $(this.DOM.dialog);
+            var time = unixtime();
+
+            this.setMorningOption();
+            M.safeShowDialog('push-settings-dialog', $dialog);
+
+            // Init radio button UI.
+            accountUI.inputs.radio.init('.custom-radio', $dialog, '');
+
+            // Bind the `Done` specific event handling
+            $('.push-settings-done', $dialog).rebind('click.dndUpdate', function() {
+                var $radio = $('input[type="radio"]:checked', $dialog);
+                var value = parseInt($radio.val(), 10);
+
+                pushNotificationSettings.setDnd(self.group, value === 0 ? 0 : time + value * 60);
+                $(self.DOM.toggle, self.DOM.container).addClass('toggle-on');
+                closeDialog();
+                self.renderStatus(true);
+            });
+        },
+
+        /**
+         * bindEvents
+         * @description
+         * Bind the initial event handlers, excl. the `Done` found within the dialog
+         */
+
+        bindEvents: function() {
+            'use strict';
+            $(this.DOM.toggle, this.DOM.container).rebind('click.dndToggleSwitch', this.handleToggle.bind(this));
+            $(this.DOM.button, this.DOM.container).rebind('click.dndDialogOpen', this.handleDialogOpen.bind(this));
+            $('.fm-dialog-close, .push-settings-close', this.DOM.dialog).rebind('click.dndDialogClose', closeDialog);
+        },
+
+        /**
+         * render
+         * @description
+         * Initial render, invoked upon mounting the module
+         */
+
+        render: function() {
+            'use strict';
+            this.setInitialState();
+            this.bindEvents();
         }
     },
 
@@ -3162,13 +3539,15 @@ accountUI.contactAndChat = {
 
         // Only call this if the call of this function is the first one, made by fm.js -> accountUI
         if (autoaway === undefined) {
-            $(presenceInt).rebind('settingsUIUpdated.settings', function(e,
-                                                                              autoaway,
-                                                                              autoawaylock,
-                                                                              autoawaytimeout,
-                                                                              persist,
-                                                                              persistlock,
-                                                                              lastSeen) {
+            presenceInt.rebind('settingsUIUpdated.settings', function(
+                e,
+                autoaway,
+                autoawaylock,
+                autoawaytimeout,
+                persist,
+                persistlock,
+                lastSeen
+            ) {
                 self.init(autoaway, autoawaylock, autoawaytimeout, persist, persistlock, lastSeen);
             });
 
@@ -3177,13 +3556,15 @@ accountUI.contactAndChat = {
         }
 
         if (typeof (megaChat) !== 'undefined' && typeof(presenceInt) !== 'undefined') {
-            $(presenceInt).rebind('settingsUIUpdated.settings', function(e,
-                                                                              autoaway,
-                                                                              autoawaylock,
-                                                                              autoawaytimeout,
-                                                                              persist,
-                                                                              persistlock,
-                                                                              lastSeen) {
+            presenceInt.rebind('settingsUIUpdated.settings', function(
+                e,
+                autoaway,
+                autoawaylock,
+                autoawaytimeout,
+                persist,
+                persistlock,
+                lastSeen
+            ) {
                 self.init(autoaway, autoawaylock, autoawaytimeout, persist, persistlock, lastSeen);
             });
         }

@@ -103,7 +103,7 @@ var pro = {
         if (M.account) {
             M.account.lastupdate = 0;
             // If pro page is opened from account/plan update M.currentdirid to force call openfolder
-            M.currentdirid = M.currentdirid.substr(0, 7) === 'account' ? false : M.currentdirid;
+            M.currentdirid = String(M.currentdirid).substr(0, 7) === 'account' ? false : M.currentdirid;
         }
 
         // if (localStorage.justGotRegistered) {
@@ -223,7 +223,7 @@ var pro = {
             case 100:
                 return 'Business';    // product name should not be translated
             default:
-                return l[435];      // FREE
+                return l[1150];      // FREE
         }
     },
 

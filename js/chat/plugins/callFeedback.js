@@ -14,21 +14,6 @@ var CallFeedback = function(megaChat, options) {
 
     options.parentLogger = megaChat.logger;
 
-    megaChat.rebind("onInit.CallFeedback", function() {
-        self.attachToChat(megaChat)
-    });
-
-    return this;
-};
-
-/**
- * Entry point, for attaching to a specific `Chat` instance
- *
- * @param megaChat {Chat}
- */
-CallFeedback.prototype.attachToChat = function(megaChat) {
-    var self = this;
-
     megaChat
         .rebind('onRoomInitialized.CallFeedback', function(e, megaRoom) {
             megaRoom
@@ -47,10 +32,10 @@ CallFeedback.prototype.attachToChat = function(megaChat) {
                                         'type': 'primary',
                                         'classes': 'default-white-button small-text left',
                                         'icon': 'refresh-circle',
-                                        'text': __(l[1403]),
+                                        'text': l[1403],
                                         'callback': function () {
                                             var feedbackDialog = mega.ui.FeedbackDialog.singleton(
-                                                $(this),
+                                                undefined,
                                                 undefined,
                                                 "call-ended"
                                             );
@@ -67,7 +52,7 @@ CallFeedback.prototype.attachToChat = function(megaChat) {
                                     'noThanks': {
                                         'type': 'secondary',
                                         'classes': 'default-white-button small-text left red',
-                                        'text': __(l[8898]),
+                                        'text': l[8898],
                                         'callback': function () {
                                             megaRoom.messagesBuff.removeMessageById(msgId);
                                             megaRoom.trigger('resize');

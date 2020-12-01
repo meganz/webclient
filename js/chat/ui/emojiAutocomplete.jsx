@@ -1,11 +1,10 @@
 var React = require("react");
 var ReactDOM = require("react-dom");
-import MegaRenderMixin from './../../stores/mixins.js';
+import {MegaRenderMixin} from './../../stores/mixins.js';
 var ButtonsUI = require('./../../ui/buttons.jsx');
 
 
-export class EmojiAutocomplete extends MegaRenderMixin(React.Component) {
-    static data_emojis = null;
+export class EmojiAutocomplete extends MegaRenderMixin {
     static defaultProps = {
         'requiresUpdateOnResize': true,
         'emojiSearchQuery': false,
@@ -17,19 +16,19 @@ export class EmojiAutocomplete extends MegaRenderMixin(React.Component) {
         this.state = {
             'selected': 0
         };
+        this.loading = false;
+        this.data_emojis = [];
     }
     preload_emojis() {
-        var self = this;
-        if (!self.loadingPromise) {
-            self.loadingPromise = megaChat.getEmojiDataSet('emojis')
-                .done(function (emojis) {
-                    self.data_emojis = emojis;
-                    Soon(function() {
-                        self.data_emojis = emojis;
-                        self.safeForceUpdate();
-                    });
+        if (this.loading === false) {
+            this.loading = true;
+            megaChat.getEmojiDataSet('emojis')
+                .then(emojis => {
+                    this.loading = 0;
+                    this.data_emojis = emojis;
+                    this.safeForceUpdate();
                 });
-        };
+        }
     }
     unbindKeyEvents() {
         $(document).off('keydown.emojiAutocomplete' + this.getUniqueId());
@@ -165,7 +164,7 @@ export class EmojiAutocomplete extends MegaRenderMixin(React.Component) {
 
         self.preload_emojis();
 
-        if (self.loadingPromise && self.loadingPromise.state() === 'pending') {
+        if (self.loading) {
             return <div className="textarea-autofill-bl">
                 <div className="textarea-autofill-info">
                     {l[5533]}

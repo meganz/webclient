@@ -180,7 +180,7 @@ function megaUtilsGFSFetch(aData, aStartOffset, aEndOffset, aProgress) {
             }
             else {
                 error = 0;
-                api_req(req, {callback: callback}, pfid ? 1 : 0);
+                M.req(req, pfid ? 1 : 0).always(callback);
             }
         }
 

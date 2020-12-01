@@ -6,7 +6,7 @@ var watchdog = Object.freeze({
     // Tag prepended to messages to identify watchdog-events
     eTag: '$WDE$!_',
     // ID to identify tab's origin
-    wdID: (Math.random() * Date.now()),
+    wdID: (Math.random() * Date.now() << 4).toString(26),
     // Hols promises waiting for a query reply
     queryQueue: Object.create(null),
     // Holds query replies if cached
@@ -43,18 +43,26 @@ var watchdog = Object.freeze({
         }
     },
 
+    /** Periodic removal of watchdog entries out of localStorage */
+    drain: SoonFc(7e3, function() {
+        'use strict';
+        this.clear();
+    }),
+
     /**
      * Notify watchdog event/message
      * @param {String} msg  The message
      * @param {String} data Any data sent to other tabs, optional
      */
-    notify: function(msg, data) {
-        data = {origin: this.wdID, data: data, sid: Math.random()};
+    notify: tryCatch(function(msg, data) {
+        'use strict';
+        this.drain();
+        data = {origin: this.wdID, data: data, sid: ++mIncID};
         localStorage.setItem(this.eTag + msg, JSON.stringify(data));
         if (d) {
             console.log('mWatchDog Notifying', this.eTag + msg, msg === 'setsid' ? '' : localStorage[this.eTag + msg]);
         }
-    },
+    }),
 
     /**
      * Perform a query to other tabs and wait for reply through a Promise
@@ -69,7 +77,7 @@ var watchdog = Object.freeze({
      */
     query: function(what, timeout, cache, data, expectsSingleAnswer) {
         var self = this;
-        var token = mRandomToken();
+        var token = (Math.random() * Date.now() << 4).toString(19);
         var promise = new MegaPromise();
 
         if (this.replyCache[what]) {
@@ -134,12 +142,12 @@ var watchdog = Object.freeze({
     /**
      * Register event handling overrider
      * @param {String} event The event name
-     * @param {Function|*} callback
+     * @param {Function|*} [callback] Optional function to invoke on overriding
      */
     registerOverrider: function(event, callback) {
         'use strict';
 
-        this.overrides[event] = callback;
+        this.overrides[event] = callback || true;
     },
 
     /**
@@ -212,7 +220,7 @@ var watchdog = Object.freeze({
 
             case 'loadfm_done':
                 if (this.Strg.login === strg.origin) {
-                    location.assign(location.pathname);
+                    location.reload(true);
                 }
                 break;
 
@@ -292,7 +300,9 @@ var watchdog = Object.freeze({
                 break;
 
             default:
-                mBroadcaster.sendMessage("watchdog:" + msg, strg);
+                if (mBroadcaster.sendMessage("watchdog:" + msg, strg)) {
+                    break;
+                }
 
                 if (msg.startsWith('Q!')) {
                     var value = false;

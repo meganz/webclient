@@ -98,11 +98,17 @@ function removeUInode(h, parent) {
             if (!hasItems) {
                 $('.files-grid-view').addClass('hidden');
                 $('.grid-table.fm tr').remove();
-                $('.fm-empty-cloud').removeClass('hidden');
+
+                if (folderlink) {
+                    $('.fm-empty-folder').removeClass('hidden');
+                }
+                else {
+                    $('.fm-empty-cloud').removeClass('hidden');
+                }
             }
             break;
         default:
-            if (M.chat) {
+            if (M.chat || M.currentdirid.indexOf('fm/user-management') >= 0) {
                 break;
             }
             if (i == 0 && n) {
@@ -340,13 +346,6 @@ function fmremovesync(selectedNodes) {
                     });
             }
         });
-
-        // ToDo: is this necessary?
-        // $('.fm-dialog-button.notification-button').each(function(i, e) {
-        //     if ($(e).text() === l[1018]) {
-        //         $(e).safeHTML('<span>@@</span>', l[83]);
-        //     }
-        // });
     }
 
     // Remove contacts

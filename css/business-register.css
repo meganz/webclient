@@ -37,7 +37,7 @@
 }
 
 .bus-reg-icon {
-    background-image: url(../images/mega/top-sprite_v7.png);
+    background-image: url(../images/mega/top-sprite_v8.png);
     width: 24px;
     height: 24px;
 }
@@ -47,11 +47,11 @@
 }
 
 .bus-reg-radio-block {
-	margin-top: 32px 0;
-	width: 100%;
-	height: 24px;
-	position: relative;
-	padding-bottom: 12px;
+    margin-top: 32px 0;
+    width: 100%;
+    height: 100%;
+    position: relative;
+    padding-bottom: 12px;
 }
 .card-container.bus-repay .bus-reg-radio-block {
 	margin: 0;
@@ -91,6 +91,11 @@
 	left: 2px;
 	top: 2px;
 	content: " ";
+}
+.bus-reg-body .bus-reg-radio-option,
+.bus-repay-block .bus-reg-radio-option {
+    display: inline-block;
+    cursor: pointer;
 }
 .bus-reg-body .bus-reg-radio.checkOn::before, .card-container.bus-repay .bus-reg-radio.checkOn::before {
 	background: rgb(0,191,165);
@@ -145,6 +150,9 @@ background: linear-gradient(to bottom, rgba(0,191,165,1) 0%, rgba(0,148,128,1) 1
     vertical-align: top;
     margin-top: 2px;
 }
+.bus-reg-checkbox.focused {
+    box-shadow: 0 0 0 1px rgba(240, 55, 58, 0.5);
+}
 
 .bus-reg-checkbox.checkOn::before {
 	background-position: 0px -2381px;
@@ -154,9 +162,6 @@ background: linear-gradient(to bottom, rgba(0,191,165,1) 0%, rgba(0,148,128,1) 1
     position: absolute;
     width: 12px;
     height: 12px;
-    -moz-border-radius: 3px;
-    -webkit-border-radius: 3px;
-    border-radius: 3px;
     -webkit-box-shadow: 0 0 0 1px rgba(0,0,0,0.2);
     -moz-box-shadow: 0 0 0 1px rgba(0,0,0,0.2);
     box-shadow: 0 0 0 1px rgba(0,0,0,0.2);
@@ -198,6 +203,10 @@ background: linear-gradient(to bottom, rgba(0,191,165,1) 0%, rgba(0,148,128,1) 1
 	background-color: rgba(223,29,32,1);
 }
 
+.bus-reg-btn:focus, .bus-reg-btn-2:focus {
+	box-shadow: 0 0 0 3px rgba(240, 55, 58, 0.5);
+}
+
 .bus-reg-btn-2 {
 	display: none;
 }
@@ -214,7 +223,7 @@ background: linear-gradient(to bottom, rgba(0,191,165,1) 0%, rgba(0,148,128,1) 1
 	width: 24px;
 	height: 24px;
 	background-position: -93px -414px;
-    background-image: url(../images/mega/big-icons_v4.png);
+    background-image: url(../images/mega/big-icons_v5.png);
     display: inline-block;
     margin-left: 12px;
     margin-top: 12px;
@@ -236,19 +245,11 @@ background: linear-gradient(to bottom, rgba(0,191,165,1) 0%, rgba(0,148,128,1) 1
     background-color: #fff;
 }
 
-.bus-plan-icon64 {
-	width: 64px;
-	height: 64px;
-	background-position: -128px -339px;
-    background-image: url(../images/mega/big-icons_v4.png);
-    background-repeat: no-repeat;
-	margin:40px auto 0;
+.bus-reg-plan .plan-icon {
+	margin: 40px auto 0;
 }
-.bus-reg-plan.repay .bus-plan-icon64 {
+.bus-reg-plan.repay .plan-icon {
 	margin: 16px auto 0;
-}
-.payment-address-dialog-body .bus-plan-icon64 {
-    margin-top: 0px;
 }
 .bus-reg-plan .business-plan-title {
     font-size: 20px;
@@ -259,17 +260,24 @@ background: linear-gradient(to bottom, rgba(0,191,165,1) 0%, rgba(0,148,128,1) 1
     text-align: center;
 }
 .bus-reg-plan .business-plan-price {
-	width: 90%;
-	height: 72px;
-	margin:16px auto;
-	background-color: #00BFA5;
-	border-radius: 4px;
-	color:#fff;
-	font-size: 16px;
-	text-align: center;
-	line-height: 72px;
+    width: 90%;
+    min-height: 72px;
+    margin: 16px auto;
+    background-color: #00BFA5;
+    border-radius: 4px;
+    color: #fff;
+    font-size: 16px;
+    text-align: center;
+    line-height: 40px;
+    padding: 16px 0 6px 0;
+    box-sizing: border-box;
 }
-
+.ru .bus-reg-plan .business-plan-price {
+    font-size: 14px;
+}
+.mobile.ru .bus-reg-plan .business-plan-price  .sub-unit {
+    display: block;
+}
 .bus-reg-plan .business-plan-price .big {
 	font-size: 40px;
 	font-weight: 600;
@@ -343,8 +351,7 @@ background: linear-gradient(to bottom, rgba(0,191,165,1) 0%, rgba(0,148,128,1) 1
 }
 
 .bus-reg-bottom-page .page-header {
-	padding-top:64px;
-	width: 100%;
+    padding: 64px 20px 0 20px;
 	font-size: 36px;
 	font-family: montserrat, open_sans, sans-serif;
 	font-weight: 300;
@@ -365,7 +372,7 @@ background: linear-gradient(to bottom, rgba(0,191,165,1) 0%, rgba(0,148,128,1) 1
 	width: 100px;
 	height: 100px;
 	margin: auto;
-	background-image: url(../images/mega/big-icons_v4.png);
+	background-image: url(../images/mega/big-icons_v5.png);
     background-repeat: no-repeat;
 }
 
@@ -418,7 +425,7 @@ background: linear-gradient(to bottom, rgba(0,191,165,1) 0%, rgba(0,148,128,1) 1
 .bus-confirm-body .bus-confirmImg {
 	width:160px;
 	height: 120px;
-	background-image: url(../images/mega/big-icons_v4.png);
+	background-image: url(../images/mega/big-icons_v5.png);
     background-repeat: no-repeat;
     background-position: -16px -809px;
 	margin:0 auto 48px auto;

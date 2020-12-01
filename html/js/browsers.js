@@ -12,8 +12,11 @@ var browserspage = {
         if (is_mobile)  {
             browserspage.setBrowserData('firefox');
         }
-        else if (window.opr)  {
+        else if (window.opr) {
             browserspage.setBrowserData('opera');
+        }
+        else if (ua.details.browser === 'Edgium') {
+            browserspage.setBrowserData('edge');
         }
         else if (mega.chrome)  {
             browserspage.setBrowserData('chrome');
@@ -35,20 +38,20 @@ var browserspage = {
         var $browserLinks = $topBlock.find('.top-copyrights .available');
 
         if (browser === 'chrome')  {
-            $browserLinks.find('.a1').text('Firefox');
-            $browserLinks.find('.a2').text('Opera');
+            $('.a1', $browserLinks).text('Firefox');
+            $('.a3', $browserLinks).text('Edge');
         }
         else if (browser === 'firefox')  {
-            $browserLinks.find('.a1').text('Chrome');
-            $browserLinks.find('.a2').text('Opera');
+            $('.a1', $browserLinks).text('Chrome');
+            $('.a3', $browserLinks).text('Edge');
         }
-        else if (browser === 'opera')  {
-            $browserLinks.find('.a1').text('Chrome');
-            $browserLinks.find('.a2').text('Firefox');
+        else if (browser === 'edge')  {
+            $('.a1', $browserLinks).text('Chrome');
+            $('.a3', $browserLinks).text('Firefox');
         }
         else {
             browser = 'unsupported';
-            $browserLinks.find('a').removeClass('mac linux').text('');
+            $('a', $browserLinks).removeClass('mac linux').text('');
         }
 
         if (is_ios) {
@@ -58,7 +61,7 @@ var browserspage = {
             browser = browser + ' android';
         }
     
-        $topBlock.removeClass('unsupported chrome firefox opera ios android')
+        $topBlock.removeClass('unsupported edge chrome firefox opera ios android')
             .addClass(browser);
     },
 

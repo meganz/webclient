@@ -1,0 +1,114 @@
+{
+    "extends": "stylelint-config-standard",
+    "plugins": [
+        "stylelint-no-unsupported-browser-features",
+        "stylelint-order"
+    ],
+    "rules": {
+        "indentation": null,
+        "declaration-no-important": null,
+        "rule-empty-line-before": null,
+        "no-descending-specificity": null,
+        "custom-property-empty-line-before": null,
+        "declaration-empty-line-before": null,
+
+
+        "no-missing-end-of-source-newline": true,
+        "max-empty-lines": 2,
+        "property-disallowed-list": [ "text-transform" ],
+        "length-zero-no-unit": [
+            true,
+            {
+                "ignore": [ "custom-properties" ]
+            }
+        ],
+        "block-no-empty": [
+            true,
+            {
+                "ignore": [
+                    "comments"
+                ]
+            }
+        ],
+
+
+        "order/properties-alphabetical-order": [
+            true,
+            {
+                "severity": "warning"
+            }
+        ],
+        "plugin/no-unsupported-browser-features": [
+            true,
+            {
+                "severity": "warning"
+            }
+        ],
+        "selector-list-comma-newline-after": [
+            "always",
+            {
+                "severity": "warning"
+            }
+        ],
+        "color-hex-case": [
+            "lower",
+            {
+                "severity": "warning"
+            }
+        ],
+        "color-hex-length": [
+            "short",
+            {
+                "severity": "warning"
+            }
+        ],
+        "comment-empty-line-before": [
+            "always",
+            {
+                "severity": "warning"
+            }
+        ],
+        "comment-whitespace-inside": [
+            "always",
+            {
+                "severity": "warning"
+            }
+        ],
+        "function-comma-space-after": [
+            "always",
+            {
+                "severity": "warning"
+            }
+        ],
+        "no-duplicate-selectors": [
+            true,
+            {
+                "severity": "warning"
+            }
+        ],
+        "declaration-colon-space-after": [
+            "always",
+            {
+                "severity": "warning"
+            }
+        ],
+        "value-list-comma-space-after": [
+            "always",
+            {
+                "severity": "warning"
+            }
+        ],
+        "block-opening-brace-space-before": [
+            "always",
+            {
+                "severity": "warning"
+            }
+        ],
+        "max-line-length": [
+            120,
+            {
+                "severity": "warning"
+            }
+        ]
+    }
+}

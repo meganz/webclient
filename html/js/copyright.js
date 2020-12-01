@@ -19,63 +19,57 @@ copyright.updateUI = function() {
  */
 copyright.validateEmail = function(email) {
     'use strict';
-    var re1 = /[a-z0-9!#$%&'*+\/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+\/=?^_`{|}~-]+)*/;
-    var re2 = /@([a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/;
-    var re = new RegExp(re1.source + re2.source);
-    var match = re.exec(email);
-    return match !== null;
+    return isValidEmail(email);
 };
+
+copyright.ourDomains = {'mega.co.nz': 1, 'mega.nz': 1, 'mega.io': 1};
 
 /**
  * Validate that the user has entered a link that is, or can be easily turned into, a valid MEGA link
  * @param {String} url The url to validate as a mega public link
- * @return {Number} The (integer) number of handles found
+ * @return {Array} The link type at idx 0, handle found as idx 1, and sub-node as idx 2 if any.
  */
 copyright.validateUrl = function(url) {
     'use strict';
-    if (!/^\s*https?:\/\/mega\./i.test(url)) {
-        return 0;
+    url = tryCatch(() => new URL(mURIDecode(url).trim()), false)();
+    const ext = url && String(url.protocol).endsWith('-extension:');
+
+    if (!url || !this.ourDomains[url.host] && !ext) {
+        return null;
     }
-    url = copyright.decodeURIm(url);
-    var handles = copyright.getHandles(url);
-    return Object.keys(handles).length;
-};
+    let path = (ext ? '' : url.pathname) + url.hash;
 
-/**
- * Find any valid or semi-valid MEGA link handles from the data
- * @param {String} data The data to scan for handles
- * @return {Object} hashset of handles
- */
-copyright.getHandles = function(data) {
-    'use strict';
+    if (url.hash) {
+        const hash = String(url.hash).replace('#', '');
 
-    var handles = {};
-    var passwordLinkPattern = /(#P!)([\w-]+)\b/gi;
-
-    // Find the handles for any password protected link
-    data = data.replace(passwordLinkPattern, function(fullUrlHash, passwordLinkId, urlEncodedData) {
-
-        // Decode the Base64 URL encoded data and get the 6 bytes for the handle, then re-encode the handle to Base64
-        var bytes = exportPassword.base64UrlDecode(urlEncodedData);
-        var handle = bytes.subarray(2, 8);
-        var handleBase64 = exportPassword.base64UrlEncode(handle);
-
-        // Add the handle
-        handles[handleBase64] = 1;
-
-        // Remove the link so the bottom code doesn't detect it as well
-        return '';
-    });
-
-    var p = /.(?:F?!|\w+\=)([\w-]{8})(?:!([\w-]+))?\b/gi;
-
-    (data.replace(/<\/?\w[^>]+>/g, '').replace(/\s+/g, '') + data).replace(p, function(a, id) {
-        if (!handles[id]) {
-            handles[id] = 1;
+        if (hash[0] === '!' || hash[0] === 'F' && hash[1] === '!') {
+            path = hash[0] === 'F'
+                ? hash.replace('F!', '/folder/').replace('!', '#').replace('!', '/folder/').replace('?', '/file/')
+                : hash.replace('!', '/file/').replace('!', '#');
         }
-    });
+        else if (hash[0] === 'P' && hash[1] === '!') {
+            const a = base64urldecode(hash.substr(2));
+            const b = String.fromCharCode(a.charCodeAt(2))
+                    + String.fromCharCode(a.charCodeAt(3))
+                    + String.fromCharCode(a.charCodeAt(4))
+                    + String.fromCharCode(a.charCodeAt(5))
+                    + String.fromCharCode(a.charCodeAt(6))
+                    + String.fromCharCode(a.charCodeAt(7));
+            path = '/file/' + base64urlencode(b);
+        }
+    }
 
-    return handles;
+    const match = path.match(/^[#/]*(file|folder|embed)[!#/]+([\w-]{8})\b/i);
+    if (!match) {
+        console.warn('Invalid url.', url);
+        return null;
+    }
+    const result = [match[1], match[2]];
+
+    if (match[1] === 'folder') {
+        result.push((path.replace(match[0], '').match(/(?:file|folder)\/([\w-]{8})/i) || [])[1]);
+    }
+    return result;
 };
 
 /**
@@ -85,8 +79,8 @@ copyright.getHandles = function(data) {
  */
 copyright.isFolderWithoutSubHandle = function(url) {
     'use strict';
-    var hasSubLinkCheck = /\#\F\!.*\?/;
-    return copyright.isFolderLink(url) && !hasSubLinkCheck.test(url);
+    url = this.isFolderLink(url);
+    return url && !url[2];
 };
 
 /**
@@ -96,30 +90,8 @@ copyright.isFolderWithoutSubHandle = function(url) {
  */
 copyright.isFolderLink = function(url) {
     'use strict';
-    return /\#\F\!/.test(url);
-};
-
-/**
- * Iteratively remove any %% stuff from the data
- * @param {String} data The data string to decode
- * @return {String} the decoded data
- */
-copyright.decodeURIm = function(data) {
-    'use strict';
-    for (var lmt = 7; --lmt && /%[a-f\d]{2}/i.test(data);) {
-        try {
-            data = decodeURIComponent(data);
-        }
-        catch (ex) {
-            break;
-        }
-    }
-
-    while (data.indexOf('%25') !== -1) {
-        data = data.replace(/%25/g, '%');
-    }
-
-    return data.replace(/%21/g, '!');
+    url = this.validateUrl(url) || !1;
+    return url[0] === 'folder' && url;
 };
 
 /**
@@ -186,13 +158,17 @@ copyright.step2Submit = function() {
             copyright.step2Submit();
         };
         $('.contenturl').each(function(i, e) {
-            proceed = true;
             var cVal = String($(copyrightwork[i]).val()).trim();
             var urls = String($(e).val()).split(/\n/);
-            urls = urls.map(String.trim).filter(function(url) {
-                return url !== "";
-            });
-            
+            urls = urls.map(String.trim).filter(String);
+
+            proceed = urls.length > 0;
+            if (!proceed) {
+                msgDialog('warninga', l[135], escapeHTML(l[659]));
+                copyright.markInputWrong(e);
+                return false;
+            }
+
             for (var k = 0; k < urls.length; k++) {
                 var eVal = urls[k];
                 if (eVal !== ''  && cVal === '' || invalidWords.indexOf(cVal.toLowerCase()) !== -1) {
@@ -539,11 +515,12 @@ copyright.init_cndispute = function() {
             // The 'copyright notice dispute' api request. Pull the values straight from the inputs
             // as we have already validated them
             var url = $('input.contenturl').val();
-            var handles = copyright.getHandles(url);
+            var handles = copyright.validateUrl(url);
 
             var requestParameters = {
                 a: 'cnd',
-                ph: Object.keys(handles)[0],
+                ph: handles[1],
+                ufsh: handles[2],
                 desc: $('input.copyrightwork').val(),
                 comments: $('input.copyrightexplanation').val(),
                 name: $('input.copyrightowner').val(),
@@ -559,12 +536,6 @@ copyright.init_cndispute = function() {
                 otherremarks: $('input.otherremarks').val()
             };
 
-            // If URL has a subnode handle, then also send the ufsh parameter.
-            var subNodeHandle = /\#.*\!.*\?([A-z0-9_-]{8})/.exec(url);
-            if (subNodeHandle && subNodeHandle[1]) {
-                requestParameters.ufsh = subNodeHandle[1];
-            }
-            
             api_req(requestParameters, {
                 callback: function(response) {
                     loadingDialog.hide();
@@ -669,3 +640,4 @@ copyright.markInputWrong = function(elm) {
         })
         .parent().css('box-shadow', '0px 0px 8px #f00');
 };
+

@@ -1,963 +1,10 @@
-.register-st3-main-bl, .register-st5-main-bl {
-    margin: 0 -8px;
-    padding: 16px 0 14px;
-    position: relative;
-}
-.membership-step2 .register-st3-main-bl, .membership-step2 .register-st5-main-bl {
-    margin: 0 -2px 0 0;
-}
-.register-st4-main-bl {
-    margin: 0;
-    padding: 24px 0 0 0;
-}
-.reg-st3-membership-bl {
-    float: left;
-    width: 236px;
-    -moz-box-sizing: border-box;
-    -webkit-box-sizing: border-box;
-    box-sizing: border-box;
-    background-color: rgba(0,0,0,0);
-    margin: 0 0 0 4px;
-    cursor: pointer;
-    padding: 8px;
-    cursor: pointer;
-    -moz-border-radius: 5px;
-    -webkit-border-radius: 5px;
-    border-radius: 5px;
-}
-.reg-st3-membership-bl.pro4 {
-    margin: 0;
-}
-.key .plans .reg-st3-membership-bl {
-    width: 100%;
-    width: -webkit-calc(20% - 3.2px);
-    width: -moz-calc(20% - 3.2px);
-    width: calc(20% - 3.2px);
-}
-.key .plans .reg-st3-membership-bl.free {
-    display: inline-block;
-    margin: 0;
-}
-.key .bottom-page.horizontal-centered-bl.plans {
-    max-width: 1280px;
-}
-.key .plans .reg-st3-membership-bl {
-    margin: 0 0 0 4px;
-}
-.membership-step1 .sub-optimal-plan .membership-gray-block, .membership-step1 .sub-optimal-plan .reg-st3-storage, .membership-step1 .sub-optimal-plan .reg-st3-bandwidth {
-    opacity: 0.7;
-}
-.membership-pad-bl {
-    background-color: white;
-    -moz-border-radius: 3px;
-    -webkit-border-radius: 3px;
-    border-radius: 3px;
-    position: relative;
-    -webkit-transition: all 200ms ease-in-out;
-    -moz-transition: all 200ms ease-in-out;
-    -o-transition: all 200ms ease-in-out;
-    -ms-transition: all 200ms ease-in-out;
-    transition: all 200ms ease-in-out;
-}
-.membership-pad-bl:hover {
-    -webkit-box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.05);
-    -moz-box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.05);
-    box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.05);
-}
-.membership-step2 .membership-pad-bl:hover {
-    cursor: default;
-    -webkit-box-shadow: none;
-    -moz-box-shadow: none;
-    box-shadow: none;
-}
-.membership-pad-bl div {
-    position: relative;
-}
-div.pro-popular-txt {
-    position: absolute;
-    width: 100%;
-    text-align: center;
-    font-size: 14px;
-    line-height: 18px;
-    color: #FF2229;
-    margin: 9px 0 0 0;
-}
-.membership-pad-bl::before, .membership-pad-bl::after {
-    -webkit-box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.05);
-    -moz-box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.05);
-    box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.05);
-    content: '';
-    display: block;
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    left: 0;
-    top: 0;
-    -moz-border-radius: inherit;
-    -webkit-border-radius: inherit;
-    border-radius: inherit;
-}
-.membership-pad-bl::before {
-    -webkit-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
-    -moz-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
-    box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
-    background-color: white;
-}
-.membership-gray-block {
-    height: 97px;
-    background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2ZhZmFmYSIgc3RvcC1vcGFjaXR5PSIwLjMiLz4KICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iI2VlZWVlZSIgc3RvcC1vcGFjaXR5PSIwLjMiLz4KICA8L2xpbmVhckdyYWRpZW50PgogIDxyZWN0IHg9IjAiIHk9IjAiIHdpZHRoPSIxIiBoZWlnaHQ9IjEiIGZpbGw9InVybCgjZ3JhZC11Y2dnLWdlbmVyYXRlZCkiIC8+Cjwvc3ZnPg==);
-    background: -moz-linear-gradient(top, rgba(250,250,250,0.3) 0%, rgba(238,238,238,0.3) 100%);
-    background: -webkit-linear-gradient(top, rgba(250,250,250,0.3) 0%, rgba(238,238,238,0.3) 100%);
-    background: linear-gradient(to bottom, rgba(250,250,250,0.3) 0%, rgba(238,238,238,0.3) 100%);
-    position: relative;
-    border-top: 1px solid rgba(0,0,0,0.05);
-    border-bottom: 1px solid rgba(0,0,0,0.05);
-    -moz-box-sizing: border-box;
-    -webkit-box-sizing: border-box;
-    box-sizing: border-box;
-}
-.membership-button {
-    height: 56px;
-    -moz-box-sizing: border-box;
-    -webkit-box-sizing: border-box;
-    box-sizing: border-box;
-    cursor: pointer;
-    padding: 4px;
-    -moz-border-radius: 8px;
-    -webkit-border-radius: 8px;
-    border-radius: 8px;
-    background-color: rgba(17,17,17,0.05);
-    -webkit-transition: all 200ms ease-in-out;
-    -moz-transition: all 200ms ease-in-out;
-    -o-transition: all 200ms ease-in-out;
-    -ms-transition: all 200ms ease-in-out;
-    transition: all 200ms ease-in-out;
-    margin: 12px 12px 0 12px;
-    color: #333333;
-}
-.membership-button span {
-    display: block;
-    height: 48px;
-    text-align: center;
-    -webkit-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
-    -moz-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
-    box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
-    background-color: white;
-    -moz-border-radius: 4px;
-    -webkit-border-radius: 4px;
-    border-radius: 4px;
-    text-transform: uppercase;
-    font-size: 16px;
-    line-height: 47px;
-}
-.membership-button:hover {
-    background-color: #D90007;
-    color: #D90007;
-}
-.pro4 .membership-button:hover {
-    background-color: #FFA500;
-    color: #FFA500;
-}
-.free .membership-button:hover {
-    background-color: #31B500;
-    color: #31B500;
-}
-.membership-new-offer {
-    position: absolute;
-    width: 98px;
-    height: 98px;
-}
-.reg-st3-membership-icon, .membership-icon {
-    width: 70px;
-    height: 70px;
-    background-image: url(../images/mega/startpage-sprite_v10.png);
-    background-position: center -210px;
-    background-repeat: no-repeat;
-    margin: 0 0 18px -35px;
-    position: absolute;
-    left: 50%;
-    top: 28px;
-}
-.loginrequired-dialog .fm-notification-icon {
-    background-image: url(../images/mega/startpage-sprite_v10.png);
-    background-position: center -210px;
-    background-repeat: no-repeat;
-}
-.membership-popup .membership-icon, .fm-account-mutliple-bl .membership-icon {
-    position: static;
-    float: left;
-    margin: 20px 3px 0 17px;
-}
-.fm-account-mutliple-bl .membership-icon {
-    margin: 0;
-}
-.free .reg-st3-membership-icon, .loginrequired-dialog .fm-notification-icon.plan0, .free.membership-icon {
-    background-position: center -1561px;
-}
-.pro4 .reg-st3-membership-icon, .loginrequired-dialog .fm-notification-icon.plan1, .pro4.membership-icon {
-    background-position: center -1751px;
-}
-.pro1 .reg-st3-membership-icon, .loginrequired-dialog .fm-notification-icon.plan2, .pro1.membership-icon {
-    background-position: center -1841px;
-}
-.pro2 .reg-st3-membership-icon, .loginrequired-dialog .fm-notification-icon.plan3, .pro2.membership-icon {
-    background-position: center -1931px;
-}
-.pro3 .reg-st3-membership-icon, .loginrequired-dialog .fm-notification-icon.plan4, .pro3.membership-icon {
-    background-position: center -1661px;
-}
-.membership-icon.tiny {
-    display: inline-block;
-    vertical-align: top;
-    width: 22px;
-    height:22px;
-    margin: -1px 10px 0 0;
-    position: static;
-}
-.free .membership-icon.tiny {
-    background-position: left -1999px;
-}    
-.pro4 .membership-icon.tiny {
-    background-position: left -1839px;
-}
-.pro1 .membership-icon.tiny {
-    background-position: left -1879px;
-}
-.pro2 .membership-icon.tiny {
-    background-position: left -1919px;
-}
-.pro3 .membership-icon.tiny {
-    background-position: left -1959px;
-}
-.bottom-page.horizontal-centered-bl.key3-top, .key .pro-top {
-    display: none;
-}
-.key .bottom-page.horizontal-centered-bl.key3-top {
-    display: block;
-}
-.main-mid-pad.bott-notification {
-    margin-bottom: 38px;
-}
-.pro-bottom-info {
-    background-color: rgba(255,156,0,0.05);
-    -moz-border-radius: 8px;
-    -webkit-border-radius: 8px;
-    border-radius: 8px;
-    padding: 20px 20px 24px 20px;
-    text-align:left;
-}
-.pro-bottom-info-header {
-    color: #333333;
-    padding-left: 40px;
-    padding: 4px 0 8px 48px;
-    font-size: 18px;
-    line-height: 24px;
-    position: relative;
-    font-family: 'montserrat', 'open_sans', sans-serif;
-}
-.pro-bottom-info p {
-    font-size: 14px;
-    line-height: 18px;
-    color: #333333;
-    margin: 0;
-    padding: 16px 0 0 0;
-}
-.pro-bottom-info p span {
-    color: #FF333A;
-}
-.main-mid-pad.q-m {
-    padding-top: 14px;
-}
-.membership-question-mark {
-    margin: 0 auto 0 auto;
-    width: 68px;
-    height: 68px;
-    -moz-border-radius: 100%;
-    -webkit-border-radius: 100%;
-    border-radius: 100%;
-    background-color: rgba(0,0,0,0.05);
-    padding: 4px;
-    -moz-box-sizing: border-box;
-    -webkit-box-sizing: border-box;
-    box-sizing: border-box;
-}
-.membership-question-mark span {
-    -moz-box-sizing: border-box;
-    -webkit-box-sizing: border-box;
-    box-sizing: border-box;
-    width: 60px;
-    height: 60px;
-    -webkit-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
-    -moz-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
-    box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
-    background-color: white;
-    -moz-border-radius: 100%;
-    -webkit-border-radius: 100%;
-    border-radius: 100%;
-    background-image: url(../images/mega/pro-new-sprite-v8.png);
-    background-position: center -252px;
-    background-repeat: no-repeat;
-    display: block;
-}
-.membership-st2-info {
-    float: left;
-    padding-left: 50px;
-    width: 644px;
-    font-size: 14px;
-}
-.membership-date {
-    float: left;
-    margin: 7px 0 0 0;
-    width: 96px;
-    height: 96px;
-    background-color: white;
-    -moz-border-radius: 8px;
-    -webkit-border-radius: 8px;
-    border-radius: 8px;
-    background-image: url(../images/mega/pro-new-sprite-v8.png);
-    background-position: -292px -401px;
-    background-repeat: no-repeat;
-    -webkit-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
-    -moz-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
-    box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
-}
-.membership-date .month {
-    font-size: 10px;
-    line-height: 14px;
-    display: block;
-    color: white;
-    padding: 9px 0 0 24px;
-}
-.membership-date .day {
-    text-align: center;
-    font-size: 60px;
-    line-height: 62px;
-    font-family: 'source_sans_proextralight';
-    margin: -6px 0 0 0;
-    display: block;
-    color: white;
-}
-.membership-info-pad {
-    margin-left: 122px
-}
-.membership-st2-head {
-    font-size: 19px;
-    line-height: 24px;
-    color: #333333;
-    padding-top: 15px;
-}
-.membership-st2-select, .membership-st2-dropdown {
-    width: 308px;
-    height: 40px;
-    background-color: rgba(0,0,0,0);
-    padding: 4px;
-    -moz-box-sizing: border-box;
-    -webkit-box-sizing: border-box;
-    box-sizing: border-box;
-    -moz-border-radius: 8px;
-    -webkit-border-radius: 8px;
-    border-radius: 8px;
-    cursor: pointer;
-    margin: 17px -4px 0 -4px;
-    -webkit-transition: all 200ms ease-in-out;
-    -moz-transition: all 200ms ease-in-out;
-    -o-transition: all 200ms ease-in-out;
-    -ms-transition: all 200ms ease-in-out;
-    transition: all 200ms ease-in-out;
-    position: relative;
-}
-.membership-st2-select:hover {
-    background-color: rgba(0,0,0,0.15);
-}
-.membership-st2-select.active:hover {
-    background-color: rgba(0,0,0,0);
-}
-.active .membership-st2-dropdown {
-    display: block;
-}
-.membership-st2-dropdown {
-    position: absolute;
-    height: auto;
-    margin: 0;
-    z-index: 10;
-    border: 4px solid rgba(0,0,0,0.15);
-    padding: 4px 0;
-    -webkit-background-clip: padding-box;
-    background-clip: padding-box;
-    background-color: white;
-    top: -4px;
-    left: 0;
-    display: none;
-}
-.membership-st2-select.active {
-    display: block;
-}
-.membership-dropdown-item {
-    font-size: 14px;
-    line-height: 31px;
-    color: #666666;
-    height: 32px;
-    padding: 0 12px;
-    -webkit-transition: all 200ms ease-in-out;
-    -moz-transition: all 200ms ease-in-out;
-    -o-transition: all 200ms ease-in-out;
-    -ms-transition: all 200ms ease-in-out;
-    transition: all 200ms ease-in-out;
-}
-.membership-dropdown-item strong {
-    font-family: 'source_sans_proregular', Arial;
-}
-.membership-dropdown-item:hover, .membership-dropdown-item.selected {
-    background-color: rgba(0,0,0,0.05);
-}
-.membership-radio input {
-    width: inherit;
-    height: inherit;
-    position: absolute;
-    z-index: 10;
- filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
-    -moz-opacity: 0;
-    -khtml-opacity: 0;
-    opacity: 0;
-    cursor: pointer;
-    padding: 0;
-    margin: 0;
-}
-.membership-st2-select span {
-    background-color: white;
-    display: block;
-    -moz-border-radius: 4px;
-    -webkit-border-radius: 4px;
-    border-radius: 4px;
-    height: 32px;
-    -webkit-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
-    -moz-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
-    box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
-    background-image: url(../images/mega/pro-new-sprite-v8.png);
-    background-position: right -643px;
-    background-repeat: no-repeat;
-    font-size: 14px;
-    line-height: 31px;
-    color: #666666;
-    padding: 0 12px;
-}
-.membership-payment-pad {
-    padding: 0;
-}
-.membership-payment-icon {
-    width: 110px;
-    height: 110px;
-    float: left;
-    background-image: url(../images/mega/pro-new-sprite-v8.png);
-    background-position: -287px -553px;
-    background-repeat: no-repeat;
-    margin: 0 0 0 -7px;
-}
-.membership-payment-pad .membership-st2-head {
-    padding: 12px 0;
-}
-.membership-radio.checked {
-    background-color: #3B99FC;
-}
-.membership-radio {
-    background-color: #bbbbbb;
-    -moz-border-radius: 100%;
-    -webkit-border-radius: 100%;
-    border-radius: 100%;
-    display: inline-block;
-    height: 16px;
-    line-height: 26px;
-    margin: 0 12px 0 0;
-    position: relative;
-    vertical-align: middle;
-    width: 16px;
-}
-.payment-options-list {
-    overflow: hidden;
-}
-.payment-options-list.secondary {
-    margin-bottom: 45px;
-    margin-top: 20px;
-}
-.payment-options-list .payment-method {
-    cursor: pointer;
-    float: left;
-    margin-bottom: 15px;
-    width: 214px;
-}
-.payment-options-list .payment-method.template {
-    display: none;
-}
-.payment-options-list .payment-method.disabled {
-    cursor: auto;
-    opacity: 0.5;
-}
-.payment-options-list .payment-method.disabled .membership-radio div {
-    cursor: auto;
-}
-.membership-radio div {
-    width: 14px;
-    height: 14px;
-    background-color: white;
-    -moz-border-radius: 100%;
-    -webkit-border-radius: 100%;
-    border-radius: 100%;
-    margin: 1px;
-}
-.membership-radio.checked div {
-    -webkit-box-shadow: 0px 1px 1px 0px #1076E2;
-    -moz-box-shadow: 0px 1px 1px 0px #1076E2;
-    box-shadow: 0px 1px 1px 0px #1076E2;
-    width: 6px;
-    height: 6px;
-    margin: 5px;
-}
-.membership-radio-label {
-    background-image: url("../images/mega/pro-new-sprite-v8.png");
-    background-repeat: no-repeat;
-    color: #333333;
-    display: inline-block;
-    font-family: 'source_sans_prosemibold', Arial;
-    font-size: 14px;
-    height: 26px;
-    line-height: 26px;
-    padding-left: 28px;
-    vertical-align: middle;
-}
-.membership-radio-label.prepaid-balance {
-    background-position: -444px -569px;
-}
-.membership-radio-label.credit-card {
-    background-position: -444px -524px;
-}
-.membership-radio-label.union-pay {
-    background-position: -444px -487px;
-}
-.membership-radio-label.fortumo {
-    background-position: -444px -412px;
-}
-.membership-radio-label.centili {
-    background-position: -444px -373px;
-}
-.membership-radio-label.paysafecard {
-    background-position: -444px -333px;
-}
-.membership-radio-label.wire-transfer {
-    background-position: -444px -450px;
-}
-.membership-radio-label.bitcoin {
-    background-position: -444px -614px;
-}
-.duration-options-list {
-    -webkit-column-count: 2;
-    -moz-column-count: 2;
-    column-count: 2;
-    -webkit-column-width: 270px;
-    -moz-column-width: 270px;
-    column-width: 270px;
-    display: inline-block;
-}
-.duration-options-list .payment-duration.template {
-    display: none;
-}
-.duration-options-list:hover .membership-radio-label, .renewal-option:hover .membership-radio-label {
-    cursor: pointer;
-    font-family: "source_sans_prosemibold", sans-serif;
-}
-.payment-duration .save-money {
-    background-color: #29c969;
-    border-radius: 8px;
-    color: #fff;
-    display: inline-block;
-    font-size: 13px;
-    line-height: 24px;
-    padding-bottom: 0;
-    padding-left: 14px;
-    padding-right: 14px;
-    margin-left: 20px;
-}
-.payment-duration .save-money.hidden {
-    display: none;
-}
-.membership-bott-price {
-    font-size: 72px;
-    line-height: 74px;
-    color: rgb(102,102,102);
-    font-family: 'source_sans_prolight';
-    padding: 30px 0 0 0;
-    -webkit-transition: all 200ms ease-in-out;
-    -moz-transition: all 200ms ease-in-out;
-    -o-transition: all 200ms ease-in-out;
-    -ms-transition: all 200ms ease-in-out;
-    transition: all 200ms ease-in-out;
-}
-.membership-bott-price strong {
-    font-family: 'source_sans_prolight';
-}
-.membership-bott-price strong span {
-}
-.membership-bott-price span {
-    font-size: 36px;
-    padding-right: 10px;
-}
-.membership-bott-price span.period {
-    color: #999999;
-}
-.membership-bott-descr {
-    font-size: 14px;
-    line-height: 24px;
-    color: #D90007;
-    margin-top: -12px;
-}
-.inactive .membership-bott-button:hover, .inactive .membership-bott-button {
-    cursor: default;
-    background-color: white;
-    color: #D90007;
-}
-.inactive .membership-bott-price, .inactive .membership-bott-button {
- filter: progid:DXImageTransform.Microsoft.Alpha(opacity=10);
-    -moz-opacity: 0.1;
-    -khtml-opacity: 0.1;
-    opacity: 0.1;
-}
-.membership-center {
-    text-align: center;
-}
-.membership-center p {
-    color: #666666;
-    padding: 0 0 8px 0;
-    font-size: 14px;
-}
-.membership-center p.last {
-    padding: 0 0 20px 0;
-}
-.reg-st3-storage, .reg-st3-bandwidth {
-    padding: 21px 24px 0 24px;
-    text-align: left;
-    position: relative;
-}
-.reg-st3-storage div, .reg-st3-bandwidth div {
-    padding-left: 56px;
-}
-div.pro-feature-icon {
-    position: absolute;
-    width: 34px;
-    height: 34px;
-    background-image: url(../images/mega/startpage-sprite_v10.png);
-    background-position: 1px -1435px;
-    margin: 0 0 0 -1px;
-    display: block;
-    padding: 0;
-    background-repeat: no-repeat;
-}
-.pro-feature-icon.bandwidth {
-    background-position: 1px -1481px;
-}
-.pro-bottom-info div.pro-feature-icon {
-    margin: -6px 0 0 -1px;
-    left: 0;
-}
-.reg-st3-bandwidth {
-    padding-top: 19px;
-    padding-bottom: 20px;
-}
-.reg-st3-big-txt {
-    color: #333333;
-    font-size: 16px;
-    line-height: 18px;
-}
-.reg-st3-big-txt span.bandwidth-amount {
-    font-size: 16px;
-    text-transform: none;
-}
-.reg-st3-mid-txt {
-    color: #999999;
-    font-size: 13px;
-    line-height: 19px;
-    text-transform: uppercase;
-}
-.reg-st3-button {
-    width: 205px;
-    height: 40px;
-    -moz-box-sizing: border-box;
-    -webkit-box-sizing: border-box;
-    box-sizing: border-box;
-    -moz-border-radius: 5px;
-    -webkit-border-radius: 5px;
-    border-radius: 5px;
-    border: 2px solid #d9d9d9;
-    margin: 8px;
-}
-/* PRO page step 2 */
-.membership-step2 .pro-gray-block {
-    margin-top: 8px;
-}
-.membership-step2 .register-st3-main-bl {
-    padding-top: 35px;
-}
-.membership-step2 h3.main-italic-header {
-    color: #555;
-    font-size: 21px;
-    letter-spacing: 0.2px;
-    padding-bottom: 6px;
-    text-align: center;
-}
-.membership-step2 .reg-st3-top-txt-block {
-    float: none;
-    max-width: none;
-    padding-bottom: 32px;
-}
-.membership-step2 .reg-st3-txt.other-payment-providers {
-    color: #aaa;
-    font-size: 13px;
-    letter-spacing: 0.2px;
-    text-align: center;
-}
-.membership-step2 .membership-radio.checked {
-    background-color: #fff;
-    border: 1px solid #ff4444;
-    border-radius: 100%;
-    display: inline-block;
-    height: 16px;
-    line-height: 26px;
-    position: relative;
-    vertical-align: middle;
-    width: 16px;
-}
-.membership-step2 .membership-radio.checked div {
-    background-color: #ff4444;
-    border-radius: 100%;
-    box-shadow: none;
-    height: 12px;
-    margin: 2px;
-    width: 12px;
-}
-.membership-step2 .membership-radio {
-    background-color: transparent;
-    border: 1px solid #bbb;
-    margin: 0 7px 0 0;
-}
-.membership-step2 .membership-radio div {
-    background-color: white;
-    border-radius: 100%;
-    height: 15px;
-    width: 15px;
-}
-.membership-step2 .membership-payment-pad .membership-st2-head, .membership-step2 .membership-info-pad .membership-st2-head {
-    color: #444;
-    font-family: "source_sans_prosemibold", sans-serif;
-    font-size: 14px;
-    letter-spacing: 0.4px;
-    padding: 0 0 25px;
-}
-.membership-step2 .main-mid-pad.grey-bg {
-    background-color: #f2f2f2;
-}
-.membership-step2 .register-st3-main-bl {
-    overflow: hidden;
-    padding-top: 56px;
-}
-.membership-step2 .right-block {
-    float: right;
-    width: 234px;
-}
-.membership-step2 .reg-st3-membership-bl:first-child {
-    box-sizing: border-box;
-    float: none;
-    width: 220px;
-    text-align: right;
-    margin: -32px 0 0 12px;
-    padding: 0;
-}
-.membership-step2 .subscription-instructions {
-    border: 1px solid #eee;
-    border-radius: 4px;
-    box-sizing: border-box;
-    color: #888;
-    background-color: #fff;
-    display: block;
-    font-size: 13px;
-    text-align: center;
-    line-height: 1.5;
-    margin: 12px 0 4px 12px;
-    padding: 8px;
-    -webkit-transition: all 200ms ease-in-out;
-    -moz-transition: all 200ms ease-in-out;
-    -o-transition: all 200ms ease-in-out;
-    -ms-transition: all 200ms ease-in-out;
-    transition: all 200ms ease-in-out;
-    cursor: pointer;
-}
-.membership-step2 .subscription-instructions:hover {
-    background-color: #fafafa;
-}
-.membership-step2 .subscription-instructions.hidden {
-    display: none;
-}
-.membership-step2 .membership-new-offer {
-    display: none;
-}
-.membership-step2 .membership-radio-label {
-    background: rgba(0, 0, 0, 0) none repeat scroll 0 0;
-    color: #444;
-    cursor: pointer;
-    font-family: "source_sans_proregular", sans-serif;
-    font-size: 13px;
-    padding-left: 0;
-    position: relative;
-}
-.membership-step2 .membership-radio-label.checked {
-    font-family: "source_sans_prosemibold", sans-serif;
-}
-.membership-step2 .membership-radio-label > strong {
-    color: #555;
-    font-family: "source_sans_proregular", sans-serif;
-}
-.membership-step2 .membership-radio-label .hyphen {
-    color: #999;
-    padding: 0 10px;
-}
-.membership-step2 .membership-info-pad {
-    margin-left: 0;
-    position: relative;
-}
-.membership-step2 .membership-st2-head {
-    color: #444;
-    font-family: "source_sans_prosemibold", sans-serif;
-    font-size: 14px;
-    letter-spacing: 0.4px;
-    padding: 0 0 16px 0;
-    position: relative;
-}
-.membership-step2 .membership-st2-head .number {
-    background-color: #ff3333;
-    border-radius: 100%;
-    color: #fff;
-    font-family: "source_sans_proregular", sans-serif;
-    font-size: 14px;
-    height: 30px;
-    left: -50px;
-    line-height: 28px;
-    position: absolute;
-    text-align: center;
-    top: -3px;
-    width: 30px;
-}
-.membership-step2 .membership-st2-head.choose-renewal {
-    margin-top: 30px;
-    padding-bottom: 5px;
-}
-.membership-step2 .renewal-options-list {
-    -webkit-column-count: 2;
-    -moz-column-count: 2;
-    column-count: 2;
-    -webkit-column-width: 100px;
-    -moz-column-width: 100px;
-    column-width: 100px;
-    display: inline-block;
-    margin-top: 25px;
-}
-.membership-step2 .renewal-option .charge-information {
-    color: #939da3;
-    font-size: 13px;
-    letter-spacing: 0.2px;
-}
-body:not(.de) .membership-step2 .charge-information .duration-text {
-    text-transform: lowercase;
-}
-.membership-step2 .payment-period {
-    margin-top: 30px;
-}
-.membership-step2 .membership-bott-button {
-    float: right;
-    text-transform: uppercase;
-    min-width: 220px;
-    margin: 46px 0 0 0;
-}
-.membership-step2 .payment-instructions {
-    color: #555;
-    font-size: 14px;
-    line-height: 28px;
-    max-width: 470px;
-    float: left;
-    padding-left: 50px;
-}
-.membership-step2 .payment-instructions .purchase {
-    color: #ff4444;
-    text-transform: uppercase;
-}
-.membership-step2 .provider-show-more {
-    display: table;
-    margin-top: 25px;
-    width: 100%;
-}
-.membership-step2 .provider-show-more.hidden {
-    display: none;
-}
-.membership-step2 .provider-show-more .button {
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    color: #999;
-    cursor: pointer;
-    display: table-cell;
-    padding: 3px 15px;
-    white-space: nowrap;
-    background-color: white;
-}
-.membership-step2 .provider-show-more:hover .button {
-    border-color: #ccc;
-    color: #999;
-}
-.membership-step2 .provider-show-more .left-bar, .membership-step2 .provider-show-more .right-bar {
-    display: table-cell;
-    width: 50%;
-}
-.membership-step2 .provider-show-more .left-bar {
-    padding-right: 10px;
-}
-.membership-step2 .provider-show-more .right-bar {
-    padding-left: 10px;
-}
-.membership-step2 .provider-show-more .left-bar-grey, .membership-step2 .provider-show-more .right-bar-grey {
-    border-top: 1px solid #ececec;
-    position: relative;
-    top: 8px;
-}
-.membership-step2 .provider-show-more:hover .left-bar-grey, .membership-step2 .provider-show-more:hover .right-bar-grey {
-    border-color: #ddd;
-}
-.membership-step2 .provider-details {
-    display: inline-block;
-    font-family: "source_sans_prosemibold", Helvetica, Arial, sans-serif;
-    font-size: 13px;
-    line-height: 26px;
-    vertical-align: middle;
-}
-.membership-step2 .provider-details .provider-name {
-    display: inline-block;
-    font-family: "source_sans_proregular", Helvetica, Arial, sans-serif;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    vertical-align: middle;
-    white-space: nowrap;
-    width: 150px;
-}
-.membership-step2 .payment-method:hover .provider-name, .membership-step2 .provider-details.checked .provider-name {
-    font-family: "source_sans_prosemibold", Helvetica, Arial, sans-serif;
-}
-.membership-step2 .provider-details .provider-icon {
-    margin-right: 4px;
-}
-.main-mid-pad.third-section {
-    padding: 62px 15px 63px 15px;
-}
 .provider-icon {
-    background-image: url("../images/mega/payment-provider-icons-v3.png");
+    background-image: url(../images/mega/payment-provider-icons-v3.png);
     background-position: 0 0;
     background-repeat: no-repeat;
     display: inline-block;
     height: 20px;
-    vertical-align: middle;
+    vertical-align: top;
     width: 20px;
 }
 .provider-icon.astropay {
@@ -1185,299 +232,392 @@ body:not(.de) .membership-step2 .charge-information .duration-text {
 .provider-icon.sabadellMC {
     background-position: 0 -1980px;
 }
-.membership-new-offer text {
-    font-weight: normal;
-}
-.membership-step2 .pro4 .membership-new-offer {
-    display: block;
-}
-.membership-step2 .membership-button {
-    display: none;
-}
-.reg-st3-bott-title {
-    font-size: 20px;
-    line-height: 20px;
-    color: #666666;
-    text-align: center;
-    padding: 15px 10px 18px 10px;
-}
-.reg-st3-bott-title.price {
-    padding-top: 8px;
-    font-size: 48px;
-    line-height: 48px;
-    color: #333333;
-    padding-top: 12px;
-}
-.reg-st3-bott-title span.small {
-    font-size: 36px;
-}
-.reg-st3-bott-title span.period {
-    font-size: 20px;
-    line-height: 20px;
-    color: #FF333A;
-    display: block;
-    margin-top: -5px;
-}
-.free .reg-st3-bott-title span.period.free {
-    color:#31B500;
-}
-.free.local-currency .reg-st3-bott-title span.period.free {
-    margin-top: 12px;
-}
-.pro4 .reg-st3-bott-title span.period {
-    color: #FFA500;
-}
-.free .right.reg-st3-bott-title {
-    color: #6BB219;
-}
-.pro1 .right.reg-st3-bott-title, .pro2 .right.reg-st3-bott-title, .pro3 .right.reg-st3-bott-title {
-    color: #C21D00;
-}
-.register-st3-main-bl .register-st2-button {
-    float: right;
-    margin: 50px 8px 57px 0;
-}
-.register-st4-main-bl .register-st2-button {
-    margin: 28px 0 18px 0;
-    float: right;
-}
-.register-st4-main-bl .register-st2-button.back {
-    float: left;
-}
-.reg-st3-top-txt-block, .reg-st4-top-txt-block, .reg-st5-top-txt-block {
-    padding: 20px 0 45px 0;
-    float: left;
-    max-width: 866px;
-}
-.reg-st3-top-txt-block .red {
-    cursor: default;
-}
-.sync-top-txt-block {
-    padding: 10px 0 50px 0;
-}
-.ff-top-txt-block, .chrome-top-txt-block {
-    padding: 10px 0 10px 0;
-}
-.reg-st3-top-txt-block {
-    max-width: 730px;
-}
-.key .reg-st3-top-txt-block {
-    max-width: none;
-    text-align: center;
-    float: none;
-}
-.reg-st5-top-txt-block {
-    float: none;
-    margin-right: 0;
-}
-.reg-st3-top-txt-block h3.main-italic-header, .reg-st5-top-txt-block h3.main-italic-header, .sync-top-txt-block h3.main-italic-header {
-    padding-bottom: 6px;
-}
-.membership-step2 h3.main-italic-header {
-    padding-bottom: 5px;
-    padding-top: 21px;
-}
-.reg-st4-top-txt-block h3.main-italic-header {
-    padding-bottom: 5px;
-}
-.reg-st3-txt, .reg-st4-txt, .reg-st5-txt, .affiliate-txt-pad {
-    font-size: 14px;
-    line-height: 20px;
-    color: #3F4646;
-}
-.key .reg-st3-top-txt-block h3.main-italic-header {
-    color: #D90007;
-    font-size: 40px;
-    line-height: 50px;
-    padding-top: 20px;
-    font-family: 'source_sans_prolight', Arial;
-}
-.key .reg-st3-top-txt-block .reg-st3-txt, .key .reg-st3-top-txt-block .reg-st3-txt span {
-    font-size: 16px;
-    line-height: 20px;
-    color: #333333;
-}
-.membership-step2 .other-payment-providers {
-    margin-top: 3px;
-}
-.affiliate-txt-pad {
-    padding-top: 6px;
-}
-.reg-st3-txt a, .reg-st4-txt a, .reg-st5-txt a {
-    color: #D62700;
-    cursor: pointer;
-}
-.reg-st3-right-checkbox-block {
-    float: right;
-    margin-top: 74px;
-}
-.reg-st3-checkbox-label {
-    font-size: 14px;
-    line-height: 23px;
-    color: #3F4646;
-    font-family: 'source_sans_prosemibold', Arial;
-    float: right;
-}
-.reg-st3-checkbox-label.red {
-    color: #FF4D4A;
-}
-.on_off.reg-checkbox {
-    margin: 0 15px 0 15px;
-    float: right;
-}
-.reg-st3-save-icon {
-    height: 82px;
-    width: 82px;
-    float: left;
-    background-image: url(../images/mega/register-big-sprite-v15.png);
-    background-position: center -960px;
+
+/* Pricing icons */
+.pricing-sprite,
+i.pricing-sprite,
+.pricing-page.slider .ui-slider-handle {
+    background-image: url(../images/mega/pricing-sprite_v1.png);
     background-repeat: no-repeat;
-    margin-top: 28px;
 }
-.reg-st3-save-txt {
-    text-align: center;
-    color: white;
-    font-size: 17px;
-    font-family: 'Open Sans Semibold Italic', Arial;
-    line-height: 21px;
-    letter-spacing: -0.1px;
-    padding-top: 20px;
+.pricing-sprite.powered-by-astropay {
+    height: 25px;
+    width: 100px;
+    background-position: -14px -815px;
 }
-.reg-st3-save-txt.ru, .reg-st3-save-txt.es, .reg-st3-save-txt.de, .reg-st3-save-txt.br, .reg-st3-save-txt.dk, .reg-st3-save-txt.sl, .reg-st3-save-txt.vn, .reg-st3-save-txt.ca, .reg-st3-save-txt.bs, .reg-st3-save-txt.tr, .reg-st3-save-txt.sr {
-    font-size: 15px;
-    line-height: 18px;
-    padding-top: 23px;
+.pricing-sprite.save-green-arrow {
+    width: 30px;
+    height: 26px;
+    background-position: -249px -741px;
 }
-.reg-st3-save-txt.es, .reg-st3-save-txt.de, .reg-st3-save-txt.br, .reg-st3-save-txt.dk, .reg-st3-save-txt.sl, .reg-st3-save-txt.sr {
-    font-size: 14px;
+.pricing-sprite.i-icon {
+    width: 11px;
+    height: 11px;
+    background-position: -190px -748px;
+    background-color: #D3D3D3;
+    border-radius: 100%;
 }
-.reg-st3-save-txt.ca {
-    font-size: 13px;
+.pricing-sprite.big-red-cross {
+    width: 42px;
+    height: 42px;
+    background-position: -14px -733px;
 }
-.reg-st3-save-txt.fr {
-    font-size: 13px;
-    line-height: 16px;
-    padding-top: 25px;
+.pricing-sprite.x95 {
+    width: 95px;
+    height: 95px;
 }
-.reg-st3-save-txt.it, .reg-st3-save-txt.nl, .reg-st3-save-txt.hr {
-    font-size: 16px;
-    padding-top: 20px;
+.pricing-sprite.x80 {
+    width: 80px;
+    height: 80px;
+    background-size: 300px auto;
 }
-.eu.reg-st3-save-txt {
-    font-size: 15px;
+.pricing-sprite.x95.storage {
+    background-position: 1px 1px;
 }
-.reg-st3-save-txt.el, .reg-st3-save-txt.pl, .reg-st3-save-txt.hu, .reg-st3-save-txt.uk, .reg-st3-save-txt.lt {
-    font-size: 13px;
-    line-height: 14px;
-    padding-top: 27px;
+.pricing-sprite.x95.collaboration {
+    background-position: -139px 1px;
 }
-.reg-st3-save-txt.ro {
-    font-size: 11px;
-    line-height: 14px;
-    padding-top: 27px;
+.pricing-sprite.x95.chat {
+    background-position: -279px 1px;
 }
-.reg-st3-save-txt.cz {
-    font-size: 17px;
-    padding-top: 20px;
+.pricing-sprite.x95.backups {
+    background-position: -279px -139px;
 }
-.mi.reg-st3-save-txt {
-    font-size: 11px;
-    line-height: 12px;
-    padding-top: 18px;
+.pricing-sprite.x95.creative {
+    background-position: 0px -139px;
 }
-.mi.reg-st3-percents {
-    font-size: 17px;
-    line-height: 18px;
+.pricing-sprite.x95.finance {
+    background-position: -280px -419px;
 }
-.ar .diagonal, .ar .reg-st3-checkbox-label {
-    font-size: 19px;
+.pricing-sprite.x95.government {
+    background-position: -280px -279px;
 }
-.ar .diagonal, .th .diagonal {
-    font-size: 19px;
-    line-height: 20px;
-    right: 11px;
-    margin: 33px 0 0 0;
+.pricing-sprite.x95.education {
+    background-position: -140px -139px;
 }
-.reg-st3-percents {
-    text-align: center;
-    font-family: 'source_sans_prosemibold', Arial;
-    font-size: 24px;
-    line-height: 24px;
-    color: white;
+.pricing-sprite.x95.hr {
+    background-position: 0 -419px;
 }
-.reg-st4-progressbar {
-    float: right;
-    margin: 50px 2px 0 0;
-    position: relative;
+.pricing-sprite.x95.sales {
+    background-position: -140px -279px;
 }
-.reg-st4-canvas-block {
-    height: 404px;
-    border: 2px solid #dbdbdb;
-    -moz-box-sizing: border-box;
-    -webkit-box-sizing: border-box;
-    box-sizing: border-box;
-    -webkit-border-radius: 25px;
-    -moz-border-radius: 25px;
-    border-radius: 25px;
-    display: block;
-    overflow: hidden;
+.pricing-sprite.x95.it {
+    background-position: 0px -279px;
 }
-.reg-st4-canvas-block canvas {
-    height: 400px;
+.pricing-sprite.x95.marketing {
+    background-position: -138px -419px;
 }
-.reg-st4-score {
-    margin: 27px 100px 0 100px;
-    text-align: center;
-    font-size: 31px;
-    line-height: 32px;
-    color: #3F4646
+.pricing-sprite.x80.storage {
+    background-position: 2px 2px;
 }
-.reg-st4-score span {
-    font-size: 14px;
-    color: #D82C00
+.pricing-sprite.x80.collaboration {
+    background-position: -110px 2px;
 }
-.reg-st4-progressbar .top-login-input-tooltip {
-    top: 10px;
+.pricing-sprite.x80.chat {
+    background-position: -223px 2px;
 }
-.reg-st4-progressbar .top-login-tooltip-arrow {
-    background-position: -3px -546px;
+.pricing-sprite.x80.backups {
+    background-position: -223px -111px;
 }
-.reg-st4-progressbar .top-loginp-tooltip-txt {
-    color: #CCCCCC;
-    white-space: pre-wrap;
-    font-size: 13px;
-    min-width: 220px;
-    height: auto;
-    padding: 8px 10px;
-    line-height: 16px;
+/*Plans icons */
+.plan-icon.pricing-sprite {
+    width: 60px;
+    height: 60px;
+    background-position: -100%;
 }
-.reg-st4-progressbar .top-loginp-tooltip-txt span {
-    color: #1999EB;
-}
-.reg-st5-progressbar {
-    width: 140px;
-    height: 140px;
-    margin: 50px auto 0 auto;
-    text-align: center;
-    font-size: 13px;
-}
-.reg-st5-info-icon {
+.plan-icon.pricing-sprite.x32 {
     width: 32px;
     height: 32px;
-    margin: 30px auto 20px auto;
-    background-image: url(../images/mega/register-big-sprite-v15.png);
-    background-position: 1px -1631px;
-    background-repeat: no-repeat;
 }
-.reg-st5-info-txt {
-    text-align: center;
-    font-size: 14px;
-    color: #333333;
+.plan-icon.pricing-sprite.x32.mini {
+    -ms-transform: scale(0.8);
+    -webkit-transform: scale(0.8);
+    transform: scale(0.8);
+}
+.plan-icon.pricing-sprite.free,
+.plan-icon.pricing-sprite.pro0 {
+    background-position: -6px -575px;
+}
+.plan-icon.pricing-sprite.pro4 {
+    background-position: -86px -575px;
+}
+.plan-icon.pricing-sprite.pro1 {
+    background-position: -166px -575px;
+}
+.plan-icon.pricing-sprite.pro2 {
+    background-position: -6px -655px;
+}
+.plan-icon.pricing-sprite.pro3 {
+    background-position: -86px -655px;
+}
+.plan-icon.pricing-sprite.business,
+.plan-icon.pricing-sprite.pro100 {
+    background-position: -166px -655px;
+}
+.plan-icon.pricing-sprite.x32.free,
+.plan-icon.pricing-sprite.x32.pro0 {
+    background-position: -249px -579px;
+}
+.plan-icon.pricing-sprite.x32.pro4 {
+    background-position: -289px -579px;
+}
+.plan-icon.pricing-sprite.x32.pro1 {
+    background-position: -329px -579px;
+}
+.plan-icon.pricing-sprite.x32.pro2 {
+    background-position: -249px -619px;
+}
+.plan-icon.pricing-sprite.x32.pro3 {
+    background-position: -289px -619px;
+}
+.plan-icon.pricing-sprite.x32.business,
+.plan-icon.pricing-sprite.x32.pro100 {
+    background-position: -329px -619px;
+}
+
+/* Pricing page */
+.pricing-section .top-bl {
+    padding-bottom: 34px;
+}
+.pricing-page.top-header {
+    font-family: 'montserrat_light', 'montserrat', Arial;
+    font-size: 46px;
+    line-height: 63px;
+    color: #373737;
+    padding: 64px 0 51px;
+    max-width: 921px;
+    margin: auto;
+}
+.pricing-page.top-header.not-logged, .not-logged .pricing-page.top-header.default {
+    display: none;
+}
+.not-logged .pricing-page.top-header.not-logged {
+    display: block;
+}
+.pricing-page.medium-txt {
+    font-size: 20px;
+    line-height: 24px;
+    color: #373737;
+}
+.pricing-page.top-small-txt {
+    font-size: 16px;
     line-height: 20px;
+    padding: 14px 0 0 0;
+    color: #F1373B;
 }
-.reg-st5-complete-block {
+
+/* Plans */
+.plans-bottom-pad {
+    padding-bottom: 130px;
+}
+.pricing-page.plans-switcher {
+    margin: 45px 0 86px 0;
+    border-radius: 28px;
+    background-color: #FFF;
+    display: inline-block;
+    box-shadow: 0 0 0 1px #E6E6E6;
+    font-size: 0;
+    white-space: nowrap;
+}
+.pricing-page.plans-switcher .button {
+    border-radius: 28px;
+    font-size: 22px;
+    line-height: 50px;
+    color: #373737;
+    padding: 0 20px;
+    height: 50px;
+    cursor: pointer;
+    display: inline-block;
+}
+.pricing-page.plans-switcher .button.active {
+    background-color: #00C0A6;
+    font-family: 'LatoWebBold', Arial;
+    color: white;
+}
+.pricing-page.radio-buttons {
+    position: relative;
+}
+.pricing-page label.radio-txt {
+    font-size: 14px;
+    color: #373737;
+    font-family: 'LatoWebBold', Arial;
+    padding-top: 7px;
+    cursor: pointer;
+}
+ .pricing-page.radio-buttons label.radio-txt:last-child {
+    padding-right: 0;
+}
+.pricing-page .save-green-arrow {
+    position: absolute;
+    top: -41px;
+    left: 18px;
+    cursor: default;
+}
+.pricing-page.save-percs {
+    position: absolute;
+    top: -13px;
+    color: #FFF;
+    font-size: 14px;
+    line-height: 24px;
+    white-space: nowrap;
+    height: 24px;
+    padding: 0 10px;
+    border-radius: 12px;
+    box-shadow: 0 0 0 4px #FAFAFA;
+    background-color: #00A886;
+    z-index: 1;
+    cursor: default;
+}
+.pricing-page.plans-wrap {
+    overflow: hidden;
+    overflow-x: scroll;
+    padding: 35px 0 0 0;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+}
+.pricing-page.plans-wrap::-webkit-scrollbar {
+  display: none;
+}
+.pricing-page.plans-block {
+    border: 1px solid #D5D5D5;
+    border-width: 1px 0 1px 0;
+    font-size: 0;
+    line-height: 0;
+    white-space: nowrap;
+    display: table;
+    table-layout: fixed;
+    box-sizing: border-box;
+}
+.pricing-section .pricing-page.plans-block {
+    margin: 0 auto;
+    max-width: 1112px;
+}
+.pricing-page.plan {
     text-align: center;
-    margin: 38px 0 38px 0;
+    box-sizing: border-box;
+    border: 1px solid #D5D5D5;
+    position: relative;
+    background-color: #FFF;
+}
+.pricing-page.plan.details {
+    text-align: left;
+    padding: 11px 0 17px 0;
+    border-top: 0;
+}
+
+/* Plan elements */
+.pricing-page.plan-label {
+    font-size: 16px;
+    line-height: 22px;
+    color: #FFF;
+    display: inline-block;
+    min-width: 100px;
+    height: 22px;
+    box-sizing: border-box;
+    padding: 0 10px;
+    background-color: #00BFA5;
+    border-radius: 0 0 4px 4px;
+    margin-top: -1px;
+    margin: -1px 0 20px 0;
+}
+.pricing-page.plan-label:empty {
+    background-color: transparent;
+}
+.pricing-page.plan-title {
+    font-size: 28px;
+    line-height: 34px;
+    color: #373737;
+    font-family: montserrat_light, montserrat, Arial, sans-serif;
+}
+.pricing-page.plan-info {
+    font-size: 16px;
+    line-height: 24px;
+    color: #666;
+    padding: 8px 10px 20px 10px;
+    white-space: normal;
+    box-sizing: border-box;
+    max-width: 374px;
+    margin: auto;
+}
+.pricing-page.plan-price {
+    font-size: 37px;
+    line-height: 45px;
+    padding: 0 15px;
+    color: #373737;
+    font-family: 'montserrat_light', 'montserrat', Arial;
+}
+.pricing-page.plan-price .asterisk {
+    font-size: 20px;
+    color: #373737;
+    vertical-align: top;
+    display: none;
+    margin-top: -5px;
+}
+.local-currency .pricing-page.plan-price .asterisk {
+    display: inline-block;
+}
+.pricing-page.plan-currency, .pricing-page.plan-period, .pricing-page.plan-data {
+    font-size: 16px;
+    line-height: 19px;
+    color: #373737;
+    font-family: 'montserrat_light', 'montserrat', Arial;
+}
+.pricing-page.plan-data {
+    font-size: 15px;
+    margin-top: 10px;
+    color: #777;
+}
+.pricing-page.plan-price + .pricing-page.plan-period {
+    padding-top: 6px;
+}
+.pricing-page.euro-price {
+    font-size: 13px;
+    line-height: 18px;
+    padding: 0 5px;
+    height: 20px;
+    box-sizing: border-box;
+    color: #666;
+    background-color: #FFF;
+    border: 1px solid #EBEBEB;
+    border-radius: 10px;
+    display: inline-block;
+    margin: 8px 0 0 0;
+}
+.pricing-page.euro-price:empty {
+    border: 0;
+    background-color: transparent;
+}
+.pricing-page.plan-button {
+    font-size: 16px;
+    line-height: 46px;
+    font-family: 'LatoWebBold', Arial;
+    color: #00BFA5;
+    text-align: center;
+    display: inline-block;
+    box-sizing: border-box;
+    padding: 0 10px;
+    min-width: 154px;
+    height: 48px;
+    border-radius: 2px;
+    border: 1px solid #00BFA5;
+    margin: 12px 0 48px 0;
+    -webkit-transition: background-color 200ms ease-in-out, color 200ms ease-in-out;
+    transition: background-color 200ms ease-in-out, color 200ms ease-in-out;
+    cursor: pointer;
+}
+.en .pricing-page.plan-button {
+    font-size: 18px;
+}
+body:not(.mobile) .pricing-page.plan-button:hover {
+    background-color: #00BFA5;
+    border: 1px solid #00BFA5;
+    color: white;
+}
+body:not(.mobile) .current .pricing-page.plan-button:hover {
+    background-color: transparent;
+    border-color: #9B9B9B;
+    color: #666;
 }
 .reg-st5-complete-button {
     height: 40px;
@@ -1496,423 +636,95 @@ body:not(.de) .membership-step2 .charge-information .duration-text {
     cursor: pointer;
 }
 
-.pro-gray-block .reg-st3-button {
-    width: auto;
+/* If plan block is a part of a Plans list */
+.pricing-page.plans-row {
+    display: table-row;
 }
-.pro-gray-block .register-st3-main-bl .register-st2-button {
-    float: right;
-    margin: 50px 0 47px 0;
+.plans-row .pricing-page.plan {
+    width: 25%;
+    display: table-cell;
+    vertical-align: top;
+    border-width: 0 0 0 1px;
 }
-.pro-gray-block .no-plans-suitable {
-    font-size: 18px;
-    margin-bottom: 15px;
-    padding-top: 50px;
-    text-align: center;
-}
-.pro-gray-block .no-plans-suitable .current-storage {
-    color: #777;
-    font-size: 26px;
-    font-weight: bold;
-    margin-bottom: 30px;
-    text-align: center;
-}
-.pro-gray-block .no-plans-suitable .text {
-    color: #777;
-    display: inline;
-    padding-right: 10px;
-    position: relative;
-}
-.pro-gray-block .no-plans-suitable a {
-    color: #bf1900;
-    font-weight: bold;
-}
-.pro-gray-block .no-plans-suitable .terabytes {
-    color: #bf1900;
-    display: inline-block;
-    text-align: left;
-}
-.pro-gray-block .no-plans-suitable .terabytes::first-letter {
-    font-size: 41px;
-}
-.no-plans-suitable-text {
-    font-weight: bold;
-}
-.pro-gray-block .btn-request-plan {
-    background-color: #fff;
-    border: 4px solid #777;
-    border-radius: 8px;
-    -moz-box-sizing: border-box;
-    -webkit-box-sizing: border-box;
-    box-sizing: border-box;
-    color: #777;
-    cursor: pointer;
-    display: inline-block;
-    font-size: 16px;
-    margin: 33px 12px 0;
-    padding: 15px 40px;
-    text-align: center;
-    transition: all 200ms ease-in-out 0s;
-}
-.pro-gray-block .btn-request-plan:hover {
-    border-color: #bf1900;
-    color: #bf1900;
-}
-.pro-icons-block {
-    width: 300px;
-    float: left;
-    text-align: center;
-    padding: 31px 20px 15px 20px;
-    margin-left: 20px;
-    -moz-box-sizing: border-box;
-    -webkit-box-sizing: border-box;
-    box-sizing: border-box;
-}
-.pro-icons-block::before {
-    content: '';
-    height: 100%;
-    display: block;
-    width: 1px;
-    background-color: rgba(0,0,0,0.05);
-    position: absolute;
-    margin: 0 0 0 -20px;
-    top: 0;
-}
-.pro-icons-block.storage {
-    margin-left: 0;
-}
-.pro-icons-block.storage::before {
+.plans-row .pricing-page.plan.free {
     display: none;
 }
-.pro-icons-block.transfer::before {
-    margin: 0 0 0 -40px;
+.plans-row .pricing-page.plan:first-child {
+    border-left-color: transparent;
 }
-.pro-icons-block.transfer {
-    margin-left: 0;
-    padding-left: 40px;
-    width: 320px;
+.plans-row .pricing-page.plan.details {
+    border-top: 1px solid #D5D5D5;
 }
-.pro-icon-header {
-    font-size: 18px;
-    line-height: 23px;
-    color: #333333;
-    padding: 19px 0 12px 0;
+.plans-row .pricing-page.plan-info {
+    padding-bottom: 230px;
 }
-.pro-icon {
-    width: 102px;
-    height: 102px;
-    margin: 0 auto;
-    background-image: url(../images/mega/startpage-sprite_v10.png);
-    background-position: -160px -673px;
-}
-.transfer .pro-icon {
-    background-position: -1px -813px;
-}
-.featured .pro-icon {
-    background-position: -160px -953px;
-}
-.pro-icon-txt {
-    font-size: 14px;
-    line-height: 18px;
-    color: #666666;
-}
-.pro-icon-txt span, .pro-icon-header span {
-    color: #FF333A;
-}
-.pro-gray-block {
-    background-color: #f2f2f2;
-    margin-top: 23px;
-}
-.pro-mid-header {
-    padding-top: 34px;
-    margin-bottom: -8px;
-    font-size: 16px;
-    line-height: 18px;
-    letter-spacing: -0.1px;
-    color: #333333;
-    font-family: 'Open Sans Semibold Italic', Arial;
-}
-.diagonal {
-    color: white;
-    font-family: 'source_sans_prorsemibold', Arial;
-    text-transform: uppercase;
-    font-size: 13px;
-    line-height: 16px;
-    width: 108px;
-    -webkit-transform: rotate(-45deg);
-    -moz-transform: rotate(-45deg);
-    -ms-transform: rotate(-45deg);
-    -o-transform: rotate(-45deg);
-    text-align: center;
+.plans-row .pricing-page.plan-content {
     position: absolute;
-    right: 10px;
-    margin: 34px 0 0 0;
-}
-.pro-icons-pad {
-    padding: 0 20px 0 20px;
-    margin: 32px auto 18px auto;
-    position: relative;
-}
-.pro-star-button {
-    display: inline-block;
-    height: 24px;
-    background-color: white;
-    color: #D90007;
-    font-size: 13px;
-    letter-spacing: -0.1px;
-    font-family: 'Open Sans Semibold Italic';
-    padding: 0 10px;
-    line-height: 23px;
-    -webkit-border-radius: 13px;
-    -moz-border-radius: 13px;
-    border-radius: 13px;
-}
-.pro-price-txt {
-    font-size: 41px;
-    line-height: 44px;
-    color: white;
-    text-align: center;
-    padding: 5px 0 0 0;
-}
-.mid-txt {
-    font-size: 21px;
-}
-.small-txt {
-    font-size: 14px;
-}
-.pro-star-txt {
-    color: white;
-    font-size: 14px;
-    line-height: 21px;
-    text-align: center;
-    padding: 0 0 0 0;
-    font-style: italic;
-    margin-top: -8px;
-}
-.pro-bottom-block {
-    background-color: #f2f2f2;
-}
-.pro-bottom-button, .membership-bott-button, .membership-free-button {
-    height: 56px;
-    display: inline-block;
-    color: #FFFFFF;
-    padding: 0 15px 0 15px;
-    font-size: 18px;
-    line-height: 56px;
-    -moz-border-radius: 3px;
-    -webkit-border-radius: 3px;
-    border-radius: 3px;
-    display: inline-block;
-    background-color: rgba(255,51,58,0.8);
-    cursor: pointer;
-    -moz-box-sizing: border-box;
-    -webkit-box-sizing: border-box;
-    box-sizing: border-box;
-    text-align: center;
-    margin-top: 25px;
-    min-width: 208px;
-    -webkit-transition: all 200ms ease-in-out;
-    -moz-transition: all 200ms ease-in-out;
-    -o-transition: all 200ms ease-in-out;
-    -ms-transition: all 200ms ease-in-out;
-    transition: all 200ms ease-in-out;
-}
-.membership-free-button {
-    background-color: 4px solid rgba(101,204,76,0.8);
-    float: right;
-    margin: 42px 0 0 0;
-}
-.membership-free-button:hover {
-    background-color: 4px solid rgba(101,204,76,1);
-}
-.pro-bottom-button:hover, .membership-bott-button:hover {
-    background-color: rgba(255,51,58,1);
-}
-.pro-bottom-icon-block {
-    margin: 0 0 0 0;
-    padding: 25px 0 0 0;
-    text-align: center;
-}
-.pro-bottom-header {
-    font-size: 18px;
-    line-height: 24px;
-    color: #333333;
-    font-family: 'montserrat', 'open_sans', sans-serif;
-}
-.pro-bottom-header span {
-    color: #FF4D4A;
-}
-.pro-bottom-txt {
-    font-size: 14px;
-    line-height: 23px;
-    color: #424242;
-    padding-top: 9px;
+    width: 100%;
+    left: 0;
+    bottom: 0;
 }
 
-.horizontal-plans.nav-dots-container .nav-dot-style {
-    display: none;
+/* Plan icon positioning */
+.pricing-page.plan .plan-icon {
+    margin: 24px auto 8px auto;
 }
-/* New PRO page styles */
-.bottom-page.top-info {
-    padding: 50px 0;
-    text-align: center;
-}
-.mobile .bottom-page.top-info {
-    padding: 70px 0 50px 0;
-}
-.bottom-page.top-info .big-header {
-    padding-top: 0;
-}
-.key .bottom-page.plans-block.no-pad {
-    padding: 0 11px;
-}
-.bottom-page.blocks-div {
-    display: none;
+/* Green button for Create new account*/
+.pricing-page.plan .bottom-page.green-button {
+    margin: 21px 0 46px 0;
 }
 
-.reg-st3-membership-bl.pro4 .pro-popular-txt {
-    display: none;
+/* PRO 3 colors */
+.plan.pro3 .pricing-page.plan-label {
+    background-color: #C57C05;
 }
-.reg-st3-bott-title.price .green-star-img {
-    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAjdJREFUSA3VVUFrE0EUfm+yiUcFkXryFilaFApWRWq3jehBGpqDHgXFJld/gOjFP5Fa6l3BxhQPCtKVHpQqBQ96MILgpZYg6k1rdp7vxZ1hk8zq7NGBYd5+7/u+NzM7OwuQo80+XJqRnkMCQR5yDHAr4Vd8dcqXOPto+QwBzUmX2FfnXSCO9W1jmo4NljViViKNh+27p+KefpHGCoE6HVUXX6YxV+y1Ah2T2Xvr4cJsMhX8cwUz7aUTukebKY0NVYBTz6v1VxZwBLbAJbpf2Fn7fghiXQZUZdD6MCCWWTNJRGMOLadxh/EtIOqAUu+BdAcKqjM2v/fTA7zMhw4Aw8f3Duqfv9oEcByASi6j/Bju8szfqD3FqoouXv0MCm4A0o/8RhkK8WJP8bZbNL26PIWgn/B27MuQecG8bd8I1IWN2vX+e7MFRD291pzEHjwlgv1ebkMkRPhCAZzfmG9smdTAMZVEUak5fjVdQ/AfsSvatLloB1ZgzCqtlSO7uhfxSz9gsL+P2C2pIHy2cO3dMG9gBSaZELfNs8e47TIXnbNAuL4ut+y4h7GhjCca82xHZwH99QN/YHm+CSr90VhfGzgL8HGdsAzPIEvjLEAIR4d9+XxvBlg4J13i4bxLI5yMPxryCvjy6Dd8W0C6GdXqrQSQ4WS42lyICe8wL5mMaEabewVAEzzLjwrxSqW2eCyqNdLmfRfBJCcc4fKfzllgpCRfFXi21WzUXzeLI8kMQLiiEW0G5T+GfwMQdbz1JI11qwAAAABJRU5ErkJggg==');
-    width: 12px;
-    background-size: 12px 12px;
-    height: 11px;
-    margin-top: 10px;
-    display: none;
+.plan.pro3 .pricing-page.plan-price {
+    color: #C57C05;
+}
+.plan.pro3:not(.current) .pricing-page.plan-button {
+    color: #C57C05;
+    border-color: #C57C05;
+}
+body:not(.mobile) .plan.pro3:not(.current) .pricing-page.plan-button:hover {
+    background-color: #C57C05;
+    color: #FFF;
+}
+
+/* Current plan tips */
+.plan-tag-description {
+    opacity: 0;
+    font-size: 13px;
+    line-height: 20px;
+    font-family: 'LatoWeb', Arial;
+    visibility: hidden;
+    transition: opacity 300ms ease-in-out;
     position: absolute;
-    margin-left: 4px;
-}
-.reg-st3-txt-localcurrencyprogram .green-star-img {
-    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAjdJREFUSA3VVUFrE0EUfm+yiUcFkXryFilaFApWRWq3jehBGpqDHgXFJld/gOjFP5Fa6l3BxhQPCtKVHpQqBQ96MILgpZYg6k1rdp7vxZ1hk8zq7NGBYd5+7/u+NzM7OwuQo80+XJqRnkMCQR5yDHAr4Vd8dcqXOPto+QwBzUmX2FfnXSCO9W1jmo4NljViViKNh+27p+KefpHGCoE6HVUXX6YxV+y1Ah2T2Xvr4cJsMhX8cwUz7aUTukebKY0NVYBTz6v1VxZwBLbAJbpf2Fn7fghiXQZUZdD6MCCWWTNJRGMOLadxh/EtIOqAUu+BdAcKqjM2v/fTA7zMhw4Aw8f3Duqfv9oEcByASi6j/Bju8szfqD3FqoouXv0MCm4A0o/8RhkK8WJP8bZbNL26PIWgn/B27MuQecG8bd8I1IWN2vX+e7MFRD291pzEHjwlgv1ebkMkRPhCAZzfmG9smdTAMZVEUak5fjVdQ/AfsSvatLloB1ZgzCqtlSO7uhfxSz9gsL+P2C2pIHy2cO3dMG9gBSaZELfNs8e47TIXnbNAuL4ut+y4h7GhjCca82xHZwH99QN/YHm+CSr90VhfGzgL8HGdsAzPIEvjLEAIR4d9+XxvBlg4J13i4bxLI5yMPxryCvjy6Dd8W0C6GdXqrQSQ4WS42lyICe8wL5mMaEabewVAEzzLjwrxSqW2eCyqNdLmfRfBJCcc4fKfzllgpCRfFXi21WzUXzeLI8kMQLiiEW0G5T+GfwMQdbz1JI11qwAAAABJRU5ErkJggg==');
-    width: 12px;
-    background-size: 12px 12px;
-    height: 11px;
-    display: inline-block;
-    margin-top: 10px;
-    margin-left: 4px;
-}
-.reg-st3-txt-localcurrencyprogram {
-    font-size: 16px;
-    font-family: 'source_sans_proregular';
-    margin-top: 14px;
-    color: #666666;
-    line-height: 24px;
-    padding: 0 30px;
-}
-.fm-dialog .reg-st3-txt-localcurrencyprogram {
-    font-size: 12px;
+    z-index: 10;
+    background: white;
+    box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.15);
+    border-radius: 4px;
+    padding: 5px 10px;
+    box-sizing: border-box;
     white-space: normal;
 }
-.local-currency .reg-st3-bott-title.price .green-star-img {
-    display: inline-block;
-}
-.reg-st3-bott-title.price .euro-price {
-    font-size: 16px;
-    background-color: #fff;
-    line-height: 24px;
-    border: 1px solid #eaeaea;
-    border-radius: 6px;
-    margin: 14px auto;
-    width: -webkit-max-content;
-    width: -moz-fit-content;
-    color: #9aa0ac;
-    padding: 0 12px;
-    box-shadow: 0 1px 2px 0 rgba(0,0,0,0.06);
-}
-.local-currency .membership-gray-block {
-    height: 160px;
-}
-.local-currency .num .big {
-    font-size: 36px;
-}
-.local-currency .num .big.tooBig {
-    font-size: 30px;
-}
-.local-currency .num .big.tooBig2 {
-    font-size: 24px;
-}
-.local-currency .num .small {
-    font-size: 24px;
-}
-.local-currency .num .small.toosmall {
-    font-size: 18px;
-}
-.local-currency .num .small.toosmall2 {
-    font-size: 14px;
-}
-.local-currency .reg-st3-storage {
-    padding-top: 32px;
-}
-.reg-st3-bott-title.price .local-currency-code {
-    display: none;
-}
-.local-currency .reg-st3-bott-title.price .local-currency-code {
-    font-size: 13px;
-    color: #000;
-    line-height: 16px;
-    margin-top: -5px;
-    margin-bottom: 4px;
-    display: block;
-}
-.local-currency .local-code-block {
-    display: block;
-    font-size: 16px;
-    line-height: initial;
-}
-.local-currency .num {
-    line-height: 40px;
-}
-.plans-block .current, .plans-block .next {
+.plan-tag-description span {
     position: relative;
 }
-.plans-block .current-plan-tag, .plans-block .next-plan-tag {
-    display: none;
-    position: absolute;
-    font-size: 13px;
-    left: 50%;
-    transform: translateX(-50%);
-    top: 12px;
-    z-index: 100;
-    color: white;
-    padding: 4px 7px;
-    border-radius: 23px;
-    line-height: 17px;
-    white-space: nowrap;
+.plan-tag-description b {
+    font-family: 'LatoWebBold', Arial;
+    font-weight: normal;
 }
-.plans-block .current .current-plan-tag, .plans-block .next .next-plan-tag {
-    display: inline-block;
-}
-.plans-block .plan-tag-description {
-    opacity: 0;
-    top: 12px;
-    transition: top 300ms ease-in-out, opacity 300ms ease-in-out;
-    position: absolute;
-}
-.plans-block .current:not(.renew):hover .plan-tag-description.current, .plans-block .next:hover .plan-tag-description.next, .plans-block .renew:hover .plan-tag-description.renew {
+.plan-tag-description.visible {
     opacity: 1;
-    font-size: 13px;
-    left: 50%;
-    transform: translateX(-50%) translateY(-100%);
-    top: -5px;
-    z-index: 100;
-    background: white;
-    width: 100%;
-    box-shadow: 0px 1px 3px 1px rgba(0, 0, 0, 0.2);
-    -webkit-box-shadow: 0px 1px 3px 1px rgba(0, 0, 0, 0.2);
-    -moz-box-shadow: 0px 1px 3px 1px rgba(0, 0, 0, 0.2);
-    border-radius: 5px;
-    padding: 10px;
-    box-sizing: border-box;
+    visibility: visible;
 }
-.plans-block .current .plan-tag-description:after, .plans-block .next .plan-tag-description:after {
+.plan-tag-description:after {
     content: "";
     position: absolute;
-    box-shadow: -2px 2px 2px 0 rgba(0, 0, 0, 0.1);
-    -webkit-box-shadow: -2px 2px 2px 0 rgba(0, 0, 0, 0.1);
-    -moz-box-shadow: -2px 2px 2px 0 rgba(0, 0, 0, 0.1);
+    box-shadow: -1px 1px 2px 0 rgba(0, 0, 0, 0.1);
     display: block;
-    height: 0;
-    width: 0;
+    height: 10px;
+    width: 10px;
     left: calc(50% - 5px);
     bottom: -4px;
     transform: rotate(-45deg);
@@ -1922,14 +734,22 @@ body:not(.de) .membership-step2 .charge-information .duration-text {
     -webkit-transform: rotate(-45deg);
     background-color: white;
 }
-.plans-block .current:hover .plan-tag-description:after, .plans-block .next:hover .plan-tag-description:after {
-    height: 10px;
-    width: 10px;
+.plan-tag-description:before {
+    content: '';
+    display: block;
+    border-radius: inherit;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+    position: absolute;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.05);
 }
-.plans-block .plan-tag-description b.plan-name {
+.plan-tag-description b.plan-name {
     color: #FF333A;
+    white-space: nowrap;
 }
-.plans-block .pro4 .plan-tag-description b.plan-name {
+.plan-tag-description .pro4 b.plan-name {
     color: #FFA500;
 }
 .plans-block .next .next-plan-tag, .plans-block .current .current-plan-tag {
@@ -1939,32 +759,717 @@ body:not(.de) .membership-step2 .charge-information .duration-text {
     background-color: #FFA500;
 }
 
-/* end of New PRO page styles */
-
-
-/* onboarding page PRO cards*/
-
-.onboarding-suggestions .mobile.membership-icon {
-    background-position: -0px -1620px;
-    left: 50%;
-    top: 50%;
-    margin: -16px 0 0 -15px;
-    height: 32px;
-    width: 32px;
+/* Details block */
+.pricing-page.plan-feature {
+    font-size: 15px;
+    line-height: 20px;
+    color: #666;
+    padding: 7px 39px 7px 16px;
+    position: relative;
+    white-space: normal;
+    box-sizing: border-box;
+    max-width: 366px;
+    margin: auto;
+}
+.pricing-page.plan-feature span {
+    display: inline-block;
+}
+.pricing-page.plan-feature.strong {
+    font-family: 'LatoWebBold', Arial;
+    color: #373737;
+}
+.pricing-page.plan .i-icon:hover {
+    background-color: #BCB9B9;
+}
+.pricing-page.local-currency-tip {
+    font-size: 14px;
+    line-height: 20px;
+    color: #666;
+    padding: 20px 0 0 0;
+    text-align: center;
+    display: none;
+    box-sizing: border-box;
+}
+.local-currency .pricing-page.local-currency-tip:not(.hidden) {
+    display: block;
+}
+.pricing-section .bottom-page.green-button {
+    min-width: 270px;
+}
+.pricing-section .green-button.free-button {
+    margin: 40px 0 0 0;
+}
+.pricing-section .startpage.default-controls {
+    padding: 40px 0 0 0;
+}
+.pricing-page.plan .i-icon {
     position: absolute;
+    right: 18px;
+    top: 13px;
+    -webkit-transition: background-color 200ms ease-in-out;
+    transition: background-color 200ms ease-in-out;
 }
 
-.onboarding-suggestions .pro1 .mobile.membership-icon {
-    background-position: -0px -1670px;
+/* Current plan */
+.pricing-page.plan.current {
+    border-left: 1px solid transparent;
+    background-color: #EEF8FF;
 }
-.onboarding-suggestions .pro2 .mobile.membership-icon {
-    background-position: -0px -1720px;
+.pricing-page.plan.current + .plan {
+    border-left: 1px solid transparent;
 }
-.onboarding-suggestions .pro3 .mobile.membership-icon {
-    background-position: -0px -1770px;
+.current .pricing-page.plan-button {
+    color: #A1A1A1;
+    border-color: #C2C2C2;
+    background-color: transparent;
 }
-.onboarding-suggestions .pro4 .mobile.membership-icon {
-    background-position: -0px -1620px;
+
+/* Business plan */
+.pricing-page.plan.business {
+    background-color: #EEF8FF;
+    display: block;
+    margin: 0 auto;
+    max-width: 475px;
+}
+
+/* simpletip custom style: pro-tip */
+.dark-direct-tooltip.simpletip-tooltip.pricing-tip {
+    max-width: 164px;
+    text-align: center;
+    font-size: 12px;
+    line-height: 14px;
+    font-family: 'LatoWeb', Arial;
+    box-sizing: border-box;
+    padding: 8px;
+    border-radius: 4px;
+    position: fixed;
+}
+.dark-direct-tooltip.pricing-tip.transformed u {
+    text-decoration: none;
+}
+.dark-direct-tooltip.pricing-tip.transformed span {
+    position: relative;
+}
+.dark-direct-tooltip.pricing-tip i.small-icon.icons-sprite.tooltip-arrow {
+    height: 11px;
+    width: 11px;
+    bottom: -3px;
+    background: none;
+}
+.dark-direct-tooltip.pricing-tip i:before {
+    content: '';
+    display: block;
+    width: 10px;
+    height: 11px;
+    transform: rotate(-45deg);
+    -moz-transform: rotate(-45deg);
+    -ms-transform: rotate(-45deg);
+    -o-transform: rotate(-45deg);
+    -webkit-transform: rotate(-45deg);
+    background: #333333;
+}
+
+/* jQ Slider */
+.pricing-page.slider-wrap {
+    margin: 126px 70px 283px 70px;
+    max-width: 973px;
+    position: relative;
+}
+.pricing-page.slider.ui-widget-content {
+    width: auto;
+    max-width: 973px;
+    height: 24px;
+    background-color: #E8E8E8;
+    border-radius: 10px;
+    margin: 0;
+    position: static;
+}
+.pricing-page.slider .ui-slider-range {
+    background-color: #00C0A6;
+    height: 24px;
+    border-radius: 10px;
+    -webkit-transition: width 200ms ease-in-out;
+    transition: width 200ms ease-in-out;
+}
+.pricing-page.slider .ui-slider-handle {
+    width: 65px;
+    height: 65px;
+    border-radius: 100%;
+    background-color: #00A886;
+    margin: 0 0 0 -32px;
+    top: -21px;
+    border: 0;
+    box-shadow: 0 2px 4px 0 rgba(114, 114, 144, 0.5);
+    background-position: -84px -721px;
+    position: absolute;
+    display: block;
+    -webkit-transition: left 200ms ease-in-out;
+    transition: left 200ms ease-in-out;
+    z-index: 1;
+}
+.pricing-page.slider .ui-slider-handle::before {
+    display: none;
+}
+.pricing-page.slider-dot {
+    width: 40px;
+    height: 40px;
+    border-radius: 100%;
+    background-color: #D3D3D3;
+    position: absolute;
+    left: 0;
+    top: 0;
+    margin: -9px 0 0 -20px;
+    cursor: pointer;
+    box-shadow: 0 0 0 4px transparent;
+    -webkit-transition: background-color 200ms ease-in-out, box-shadow 200ms ease-in-out;
+    transition: background-color 200ms ease-in-out, box-shadow 200ms ease-in-out;
+}
+body:not(.mobile) .pricing-page.slider-dot:hover {
+    background-color: #00BFA5;
+}
+.pricing-page.slider-dot.active {
+    box-shadow: 0 0 0 4px #FFF;
+    background-color: #00BFA5;
+}
+.pricing-page.slider-dot.d2 {
+    left: 33.333333%;
+}
+.pricing-page.slider-dot.d3 {
+    left: 66.666666%;
+}
+.pricing-page.slider-dot.d4 {
+    left: 100%;
+}
+.pricing-page.slider-dot .label {
+    min-width: 210px;
+    position: absolute;
+    top: 90px;
+    left: 50%;
+    margin-left: -105px;
+    font-size: 24px;
+    line-height: 36px;
+    text-align: center;
+    color: #666;
+}
+.en .pricing-page.slider-dot .label {
+    font-size: 30px;
+}
+.pricing-page.slider-dot span {
+    font-family: 'LatoWebBold', Arial;
+    color: #333;
+    display: block;
+}
+
+/* Comapre block */
+.pricing-page.compare-block {
+    display: table;
+    table-layout: fixed;
+    width: 100%;
+    max-width: 1009px;
+    margin: 0 auto;
+}
+.pricing-page.compare-cell {
+    display: table-cell;
+    border: 1px solid #DEDEDE;
+    border-width: 1px 1px 1px 0;
+    width: 33.333333%;
+    box-sizing: border-box;
+    padding: 20px 10px;
+    vertical-align: top;
+}
+.pricing-page.compare-cell:first-child {
+    border: 1px  solid #DEDEDE;
+}
+.pricing-page.compare-cell .page-icon {
+    margin: 1px auto 0 auto;
+}
+.pricing-page.compare-title {
+    font-size: 18px;
+    line-height: 22px;
+    color: #333;
+    font-family: 'LatoWebBold', Arial;
+    padding: 16px 0 0 0;
+}
+.pricing-page.compare-storage {
+    font-size: 30px;
+    line-height: 36px;
+    color: #333;
+    font-family: 'LatoWebBold', Arial;
+    padding: 18px 0 20px 0;
+}
+.pricing-page.compare-price {
+    font-size: 42px;
+    line-height: 74px;
+    height: 75px;
+    color: #00BFA5;
+    font-family: 'LatoWebBold', Arial;
+    padding: 0 0 0 0;
+}
+.en .pricing-page.compare-price {
+    font-size: 62px;
+}
+.pricing-page.compare-price.blue {
+    color: #007EE5;
+}
+.pricing-page.compare-price.yellow {
+    color: #E8B508;
+}
+.pricing-page.compare-price span {
+    display: inline-block;
+}
+.pricing-page.compare-price .currency {
+    font-size: 33px;
+    padding: 0 4px 0 2px;
+}
+.pricing-page.compare-price .currency:empty {
+    padding-left: 0;
+}
+.pricing-page.compare-price .star {
+    font-size: 9px;
+    font-family: Arial;
+    color: #373737;
+    vertical-align: top;
+    margin: -14px 0 0 0;
+}
+.pricing-page .star.green {
+    font-size: 9px;
+    font-family: Arial;
+    color: #00C0A6;
+    vertical-align: top;
+}
+.pricing-page.compare-price .star.green {
+    padding-left: 5px;
+    display: none;
+}
+.slide2 .pricing-page.compare-price .star.green {
+    display: inline-block;
+}
+.pricing-page.compare-period {
+    font-size: 20px;
+    line-height: 24px;
+    color: #333;
+    font-family: 'LatoWebBold', Arial;
+    height: 24px;
+    padding: 0 0 0 0;
+}
+.pricing-page.compare-info {
+    font-size: 15px;
+    line-height: 18px;
+    color: #666;
+    padding: 29px 0 0 0;
+}
+.pricing-page.compare-tip {
+    font-size: 14px;
+    line-height: 18px;
+    color: #666;
+    padding: 23px 0 0 0;
+    display: none;
+}
+.pricing-page.compare-tip .star.green {
+    padding-right: 7px;
+    display: inline-block;
+}
+/* Free slide */
+.pricing-page.compare-period.free,
+.slide1 .pricing-page.compare-period.default{
+    display: none;
+}
+.slide1 .pricing-page.compare-period.free {
+    display: block;
+}
+.slide1 .pricing-page.compare-storage {
+    display: none;
+}
+.slide1 .pricing-page.compare-price {
+    padding-top: 32px;
+}
+.slide1 .pricing-page.compare-info  {
+    padding-top: 70px;
+}
+/* Second slide */
+.slide2 + .pricing-page.compare-tip {
+    display: block;
+}
+
+/* Not supported plan */
+.not-supported .pricing-page.compare-price, .not-supported .pricing-page.compare-period, .not-supported .pricing-page.compare-period, .not-supported .pricing-page.compare-info {
+    display: none;
+}
+.pricing-page.compare-ns {
+    font-size: 15px;
+    line-height: 18px;
+    color: #373737;
+    display: none;
+}
+.pricing-page.compare-ns span {
+    white-space: nowrap;
+}
+.pricing-page.big-red-cross {
+    margin: 31px auto 20px auto;
+    display: none;
+}
+.not-supported .pricing-page.compare-ns, .not-supported .pricing-page.big-red-cross {
+    display: block;
+}
+
+/* MEGA solutions for all plans */
+.pricing-page.solutions-wrap {
+    margin: 8px auto 0 auto;
+    display: table;
+    table-layout: fixed;
+    width: 100%;
+    max-width: 864px;
+    border-spacing: 40px;
+}
+.pricing-page.solution-row {
+    display: table-row;
+}
+.pricing-page.solution {
+    display: table-cell;
+    width: 50%;
+    border-radius: 4px;
+    box-shadow:  0 2px 4px 0 rgba(230, 230, 230, 0.5);
+    border: 1px solid #E6E6E6;
+    height: 346px;
+    vertical-align: top;
+    -webkit-transition: border-color 200ms ease-in-out, background-color 200ms ease-in-out;
+    transition: border-color 200ms ease-in-out, background-color 200ms ease-in-out;
+    position: relative;
+}
+.pricing-page.solution.active, body .pricing-page.solution:hover {
+    background-color: #F6FFFE;
+    border-color: #91E2D7;
+}
+.pricing-page.solution-poster {
+    position: absolute;
+    width: 100%;
+    left: 0;
+    top: 50%;
+    -webkit-transform: translateY(-50%);
+    -moz-transform:translateY(-50%);
+    -o-transform: translateY(-50%);
+    -ms-transform: translateY(-50%);
+    transform: translateY(-50%);
+    -webkit-transition: opacity 200ms ease-in-out;
+    transition: opacity 200ms ease-in-out;
+    box-sizing: border-box;
+    padding: 22px;
+}
+.pricing-page.solution-details {
+    position: relative;
+    z-index: 1;
+    background-color: #F6FFFE;
+    opacity: 0;
+    -webkit-transition: opacity 500ms ease-in-out;
+    transition: opacity 500ms ease-in-out;
+    box-sizing: border-box;
+    padding: 22px;
+}
+.pricing-page.solution:hover .pricing-page.solution-poster {
+    opacity: 0;
+}
+.pricing-page.solution:hover .pricing-page.solution-details {
+    opacity: 1;
+}
+.pricing-page.solution .x95, .pricing-page.solution .x80 {
+    margin: 0 auto;
+}
+.pricing-page.solution-name {
+    font-size: 26px;
+    line-height: 32px;
+    color: #373737;
+    font-family: 'montserrat', Arial;
+    min-height: 64px;
+    margin: 24px auto 0 auto;
+    padding: 0 28px;
+}
+.pricing-page.solution-name.small {
+    margin: 15px auto 7px auto;
+    transform: scale(0.8);
+    transform-origin: top;
+}
+.pricing-page.solution-txt {
+    font-size: 16px;
+    line-height: 24px;
+    color: #666;
+    padding-left: 30px;
+    position: relative;
+    text-align: left;
+}
+.pricing-page.solution-txt span {
+    display: inline-block;
+}
+.pricing-page.solution-txt i {
+    position: absolute;
+    left: 0;
+    top: 2px;
+}
+
+/* MEGA roles */
+.pricing-page.roles-wrap {
+    font-size: 0;
+    line-height: 0;
+    padding: 0 0 144px 0;
+}
+.pricing-page.roles-wrap .col-4 {
+    padding: 140px 0 0 0;
+}
+.pricing-page.roles-wrap .x95  {
+    margin: 0 auto;
+}
+.pricing-page.role-name {
+    font-size: 28px;
+    line-height: 34px;
+    color: #373737;
+    font-family: 'LatoWebBold', Arial;
+    padding: 30px 0 0 0;
+}
+
+/* Business bottom block */
+.pricing-page.white-info {
+    max-width: 1035px;
+    margin: auto;
+    font-size: 16px;
+    line-height: 24px;
+    color: #FFF;
+    padding: 30px 0 0 0;
+    font-family: 'montserrat_light', 'montserrat', Arial;
+}
+.pricing-button.green-button {
+    margin: 80px 0 -10px 0;
+}
+
+/* Playment page */
+.payment-section .top-header.plan-title {
+    padding-bottom: 20px;
+}
+.payment-page.plan-wrap {
+    float: right;
+    width: 300px;
+}
+.payment-section.local-currency .pricing-page.plan.main {
+    padding-bottom: 28px;
+}
+.payment-section .button.purchase {
+    margin-top: 65px;
+}
+.payment-page.header {
+    color: rgb(68, 68, 68);
+    font-size: 14px;
+    line-height: 28px;
+    padding: 0px 0px 25px;
+    position: relative;
+    font-family: 'LatoWebBold', Arial;
+}
+.payment-page.header.choose-renewal {
+    padding-bottom: 5px;
+}
+.payment-page.header .number {
+    background-color: rgb(255, 51, 51);
+    color: #FFF;
+    font-size: 14px;
+    left: -50px;
+    line-height: 30px;
+    position: absolute;
+    text-align: center;
+    top: -3px;
+    width: 30px;
+    height: 30px;
+    border-radius: 100%;
+}
+.payment-method.template {
+    display: none;
+}
+.payment-method {
+    margin-bottom: 15px;
+    width: 33.333333%;
+    display: inline-block;
+}
+.payment-duration {
+    margin-bottom: 15px;
+    display: inline-block;
+    width: 50%;
+    vertical-align: top;
+}
+.payment-page.info-block {
+    text-align: left;
+    margin: 0 320px 0 50px;
+    position: relative;
+}
+.third-section .payment-page.info-block {
+    float: left;
+}
+.payment-page.info-block .provider-details {
+    display: inline-block;
+    font-size: 14px;
+    line-height: 26px;
+    vertical-align: top;
+    max-width: calc(100% - 60px);
+    white-space: nowrap;
+    cursor: pointer;
+}
+.payment-options-list.secondary {
+    margin-bottom: 45px;
+    margin-top: 20px;
+}
+.membership-radio {
+    border-radius: 100%;
+    display: inline-block;
+    height: 16px;
+    position: relative;
+    vertical-align: top;
+    width: 16px;
+    background-color: #fff;
+    margin: 4px 10px 0 0;
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.1);
+}
+.membership-radio::before, .membership-radio:after {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    content: '';
+    left: 0;
+    top: 0;
+    border-radius: 100%;
+    box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
+    box-sizing: border-box;
+    border: 2px solid white;
+}
+.membership-radio:after {
+    background-color: rgba(0,0,0,0.05);
+}
+.membership-radio.checked::after {
+    content: '';
+    border-radius: 100%;
+    background-color: rgba(0,0,0,0.05);
+    background: linear-gradient(to bottom, rgba(255,51,58,1) 0%, rgba(217,0,7,1) 100%);
+    opacity: 0.8;
+}
+.membership-radio.checked {
+    box-shadow: 0 0 0 1px rgba(255, 51, 58, 0.5);
+}
+.membership-radio input {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    z-index: 10;
+    opacity: 0;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+}
+.payment-duration.template {
+    display: none;
+}
+.membership-radio-label {
+    background: rgba(0, 0, 0, 0) none repeat scroll 0 0;
+    color: #444;
+    cursor: pointer;
+    font-size: 14px;
+    line-height: 26px;
+    position: relative;
+    display: inline-block;
+    vertical-align: top;
+}
+.membership-radio-label strong {
+    font-family: 'LatoWebBold', Arial;
+    font-weight: normal;
+}
+.payment-period, .renewal-option {
+    margin-top: 30px;
+}
+ .renewal-options-list .renewal-option {
+    display: inline-block;
+    margin: 0;
+    width: 50%;
+}
+.renewal-option .charge-information {
+    color: #939da3;
+    font-size: 13px;
+    padding-bottom: 25px;
+}
+.payment-duration .save-money {
+    background-color: #29c969;
+    border-radius: 8px;
+    color: #fff;
+    display: inline-block;
+    vertical-align: top;
+    font-size: 13px;
+    line-height: 24px;
+    padding-bottom: 0;
+    padding-left: 14px;
+    padding-right: 14px;
+    margin-left: 20px;
+}
+.payment-duration .save-money.hidden {
+    display: none;
+}
+.provider-details .provider-icon {
+    margin: 3px 4px 0 0;
+}
+.provider-details .provider-name {
+    display: inline-block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: top;
+    white-space: nowrap;
+    max-width: 95%;
+}
+.provider-show-more {
+    margin-top: 25px;
+    text-align: center;
+}
+.provider-show-more .button {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    color: #999;
+    cursor: pointer;
+    display: inline-block;
+    padding: 3px 15px;
+    white-space: nowrap;
+    background-color: white;
+    font-size: 13px;
+    line-height: 20px;
+}
+.loading-placeholder-text {
+    font-size: 14px;
+    line-height: 26px;
+}
+.payment-instructions {
+    color: #555;
+    font-size: 14px;
+    line-height: 28px;
+    max-width: 470px;
+    float: left;
+}
+.reg-st5-info-icon {
+    width: 32px;
+    height: 32px;
+    background-image: url(../images/mega/register-big-sprite-v15.png);
+    margin: 30px auto 20px;
+    background-position: 1px -1631px;
+    background-repeat: no-repeat;
+}
+.payment-section .subscription-instructions {
+    box-sizing: border-box;
+    color: rgb(136, 136, 136);
+    background-color: rgb(255, 255, 255);
+    display: block;
+    font-size: 13px;
+    text-align: center;
+    line-height: 1.5;
+    cursor: pointer;
+    border-width: 1px;
+    border-style: solid;
+    border-color: rgb(238, 238, 238);
+    border-image: initial;
+    border-radius: 4px;
+    margin: 12px 0 0 0;
+    padding: 8px;
+    transition: all 200ms ease-in-out 0s;
+}
+.payment-section .subscription-instructions.hidden {
+    display: none;
 }
 
 /* Promotion Voucher code, I will remove once I have more time */
@@ -2020,7 +1525,6 @@ body.mobile .redeem-promo-page .mega-input-title-ontop {
 .redeem-promo-page .button-block {
     display: block;
 }
-
 /* three extra status for the inputs: error, active, correctinput */
 .dialog-input-title-ontop.correctinput .title {
    visibility: visible;
@@ -2037,74 +1541,502 @@ body.mobile .redeem-promo-page .mega-input-title-ontop {
 .dialog-input-title-ontop:not(.birth).active input::placeholder{
    opacity: 0;
 }
-/*.dialog-input-title-ontop.active::after{
-   background-color: rgba(0,0,0,0.6);
+
+/* Retina images */
+@media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {
+    .pricing-sprite,
+    i.pricing-sprite,
+    .pricing-page.slider .ui-slider-handle {
+        background-image: url(../images/mega/pricing-sprite_v1@2x.png);
+        background-size: 373px auto;
+    }
+    .redeem-promo-page .onboard-image {
+        background-image: url(../images/mega/onboarding_download_v2@2x.png);
+        background-size: 600px auto;
+    }
 }
 
-.dialog-input-title-ontop.error::after{
-   background-color: rgba(217,0,7,0.5);
+/* Adaptive layout */
+@media only screen and (max-width: 1194px) {
+    .pricing-section .pricing-page.plans-block {
+        border: 0;
+        border-spacing: 10px 0;
+        padding: 0 30px;
+        max-width: 1194px;
+        min-width: 892px;
+    }
+    .pricing-section .plans-row .pricing-page.plan {
+        border-radius: 4px 4px 0 0;
+        border-width: 1px;
+        border-color: #D5D5D5;
+    }
+    .pricing-section .plans-row .pricing-page.plan.details {
+        border-radius: 0 0 4px 4px;
+        border-width: 0 1px 1px 1px;
+    }
+    .pricing-section .plans-row .pricing-page.plan:first-child,
+    .pricing-section .plans-row .pricing-page.plan.current {
+        border-color: #D5D5D5;
+    }
+    .local-currency .pricing-page.plan-price {
+        font-size: 27px;
+    }
 }
-.dialog-input-title-ontop.error input.dialog-input.errored{
-   color: rgba(217,0,7,1);
+
+@media only screen and (max-width: 1114px) {
+
+    /* Payment page */
+    .payment-page.plan-wrap{
+        width: 220px;
+    }
+    .payment-page.info-block {
+        margin: 0 240px 0 50px;
+    }
 }
-.dialog-input-title-ontop.error .title {
-   visibility: visible;
-   filter:progid:DXImageTransform.Microsoft.Alpha(opacity=100);
-   -moz-opacity: 1;
-   -khtml-opacity: 1;
-   opacity: 1;
-   top:0;
-}*/
-/*.dialog-input-title-ontop .message-container {
-   font-size: 13px;
-   padding: 4px 0 0 0px;
-   color: rgba(229,76,81,1);
-   white-space: nowrap;
-   text-overflow: ellipsis;
-   position: absolute;
-   top: 56px;
-   left: 0px;
-   display:none;
-   text-align: left;
+
+@media only screen and (max-width: 890px) {
+    .pricing-section .startpage.default-controls:not(.hidden) {
+        display: inline-block;
+    }
+
+    /* Plans page header */
+    .pricing-page.top-header {
+        font-size: 40px;
+        line-height: 63px;
+        letter-spacing: -0.33px;
+        max-width: 681px;
+        padding-bottom: 17px;
+    }
+    .pricing-page.medium-txt {
+        font-size: 16px;
+        line-height: 24px;
+        color: #666;
+    }
+    
+    /*Plans block */
+    .pricing-page.local-currency-tip {
+        font-size: 12px;
+    }
+    .pricing-page.plan-label {
+        margin: -1px 0 3px 0;
+    }
+    .pricing-page.plan-title {
+        font-size: 22px;
+    }
+    .pricing-page.plan-info {
+        font-size: 14px;
+        line-height: 21px;
+        padding: 5px 10px 31px 10px;
+    }
+    .pricing-page.plan-price {
+        font-size: 30px;
+        line-height: 37px;
+    }
+    .plans-row .pricing-page.plan-info {
+        padding-bottom: 195px;
+    }
+    .pricing-page.plan-currency {
+        margin-top: 10px;
+    }
+    .pricing-page.plan-button {
+        margin-bottom: 20px;
+    }
+    .pricing-page.plan-feature {
+        font-size: 13px;
+        padding: 7px 32px 7px 14px;
+    }
+    .pricing-page.plan .i-icon {
+        right: 14px;
+    }
+    
+    /* jQ slider */
+    .pricing-page.slider-wrap {
+        margin: 70px 70px 143px 70px;
+    }
+    .pricing-page.slider.ui-widget-content,
+    .pricing-page.slider .ui-slider-range {
+        height: 10px;
+    }
+    .pricing-page.slider-dot {
+        width: 28px;
+        height: 28px;
+        margin: -10px 0 0 -14px;
+    }
+    .pricing-page.slider .ui-slider-handle {
+        width: 43px;
+        height: 43px;
+        margin: 0 0 0 -22px;
+        top: -17px;
+        background-size: 245px auto;
+        background-position: -55px -474px;
+    }
+    .pricing-page.slider-dot .label, .en .pricing-page.slider-dot .label {
+        font-size: 16px;
+        line-height: 28px;
+        top: 52px;
+    }
+    .pricing-page.slider-dot span {
+        font-size: 18px;
+    }
+    
+    /* Compare blocks */
+    .pricing-section .page-icon.x48 {
+        width: 36px;
+        height: 36px;
+    }
+    .pricing-section .page-icon.x48.mega {
+        background-position: -4px -263px;
+        background-size: 150px auto;
+    }
+    .pricing-section .page-icon.x48.dropbox {
+        background-position: -73px -336px;
+        background-size: 190px auto;
+    }
+    .pricing-section .page-icon.x48.gdrive {
+        background-position: -129px -336px;
+        background-size: 190px auto;
+    }
+    .pricing-page.compare-cell {
+        padding: 14px 5px;
+    }
+    .pricing-page.compare-title {
+        font-size: 13px;
+        line-height: 16px;
+        padding: 11px 0 0 0;
+    }
+    .pricing-page.compare-storage {
+        font-size: 22px;
+        line-height: 28px;
+        padding: 13px 0 14px 0;
+    }
+    .pricing-page.compare-price {
+        font-size: 34px;
+        line-height: 52px;
+        height: 52px;
+    }
+    .en .pricing-page.compare-price {
+        font-size: 44px;
+    }
+    .pricing-page.compare-price .currency {
+        font-size: 23px;
+    }
+    .pricing-page.compare-price .star {
+        font-size: 7px;
+        margin: -10px 0 0 0;
+    }
+    .pricing-page .star.green, .pricing-page.compare-price .star.green {
+        font-size: 7px;
+    }
+    .pricing-page.compare-period {
+        font-size: 14px;
+        line-height: 22px;
+        height: 22px;
+    }
+    .pricing-page.compare-ns {
+        font-size: 11px;
+        line-height: 13px;
+    }
+    .pricing-page.compare-info {
+        padding: 17px 0 0 0;
+        font-size: 11px;
+        line-height: 13px;
+    }
+    .pricing-page.big-red-cross {
+        width: 32px;
+        height: 32px;
+        background-position: -10px -530px;
+        background-size: 270px auto;
+        margin: 16px auto 30px auto;
+    }
+    .pricing-page.compare-tip {
+        padding: 19px 0 0 0;
+    }
+    /*  Free slide */
+    .slide1 .pricing-page.compare-info {
+        padding-top: 40px;
+    }
+    
+    /*  MEGA Solutions */
+    .pricing-page.solution-name {
+        font-size: 22px;
+    }
+    .pricing-page.solution-txt {
+        font-size: 14px;
+    }
+    .pricing-section .bottom-page.small-info.top-pad-24 {
+        padding: 18px 0 0 0;
+    }
+    .pricing-page.solutions-wrap {
+        width: auto;
+        margin: 64px 22px -18px 22px;
+        border-spacing: 18px;
+    }
+    
+    /*  MEGA roles */
+    .pricing-page.roles-wrap {
+        padding: 0 0 48px 0;
+    }
+    .pricing-page.roles-wrap .col-4 {
+        padding: 96px 0 0 0;
+    }
+    .pricing-page.role-name {
+        font-size: 20px;
+        line-height: 24px;
+        padding: 22px 0 0 0;
+    }
+    
+    /* Payment page */
+    .payment-section .button.purchase {
+        float: none;
+        display: inline-block;
+        margin: 40px 0 20px 0;
+    }
+    .payment-instructions {
+        max-width: none;
+    }
+    .payment-page.info-block .payment-method {
+        width: 50%;
+    }
+    .third-section .payment-page.info-block {
+        float: none;
+    }
+    .payment-page.plan-wrap {
+        float: none;
+        width: auto;
+        max-width: 300px;
+        margin: 0 auto 60px auto;
+    }
+    .payment-page.info-block {
+        margin: 0 0 0 50px;
+    }
 }
-.dialog-input-title-ontop.error .message-container {
-   display: inline-block;
+
+@media only screen and (max-width: 784px) {
+    .bottom-page.horizontal-centered-bl.pricing-pad {
+        padding: 0 40px;
+    }
+
+    /* pricing top header */
+    .pricing-page.top-header {
+        font-size: 36px;
+        line-height: 48px;
+        padding-top: 70px;
+    }
+    
+    /* Plan cards */
+    .plans-bottom-pad {
+        padding-bottom: 88px;
+    }
+    .fr .pricing-page.plan-button, .ru .pricing-page.plan-button, .br .pricing-page.plan-button {
+        font-size: 14px;
+    }
+
+    /* Compare */
+    .pricing-page.compare-cell {
+        display: block;
+        width: auto;
+        max-width: 360px;
+        margin: 16px auto 0 auto;
+        border: 1px solid #DEDEDE;
+    }
+    .pricing-page.solutions-wrap {
+        display: block;
+        margin: 40px 0 0 0;
+    }
+    .pricing-page.solution-row {
+        display: block;
+    }
+    .pricing-page.solution {
+        display: block;
+        width: auto;
+        max-width: 360px;
+        height: auto;
+        margin: 16px auto 0 auto;
+    }
+    .pricing-page.solution-name {
+        font-size: 20px;
+        line-height: 24px;
+        min-height: 0;
+    }
+    .pricing-page.solution-name.small {
+        transform: none;
+        margin: 20px auto 20px auto;
+        padding: 0;
+    }
+    .fr .pricing-page.slider-dot .label, .ru .pricing-page.slider-dot .label {
+        width: 100px;
+        min-width: 100px;
+        margin-left: -50px;
+    }
+    .br .pricing-page.slider-dot .label, .es .pricing-page.slider-dot .label {
+        font-size: 12px;
+    }
+    
+    /* Roles */
+    .pricing-page.roles-wrap .col-4 {
+        padding: 54px 0 0 0;
+    }
+    
+    /* Business bottom block */
+    .pricing-button.green-button {
+        margin: 40px 0 0 0;
+    }
+    .pricing-page.white-info {
+        font-size: 14px;
+    }
 }
-.dialog-input-title-ontop.active:not(.birth) input.dialog-input::placeholder,
-.dialog-input-title-ontop.correctinput:not(.birth) input.dialog-input::placeholder,
-.dialog-input-title-ontop.error:not(.birth) input.dialog-input::placeholder {
-   opacity: 0;
+
+@media only screen and (max-width: 565px) {
+    .pricing-page.top-header {
+        font-size: 26px;
+        line-height: 38px;
+        padding-top: 60px;
+    }
+    
+    /* Plans */
+    .pricing-section .pricing-page.plans-block {
+        padding: 0 14px;
+        min-width: 872px;
+    }
+    .pricing-page.plans-switcher {
+        margin: 45px 0 52px 0;
+        border-radius: 18px;
+    }
+    .pricing-page.plans-switcher .button {
+        border-radius: 18px;
+        font-size: 14px;
+        line-height: 36px;
+        height: 36px;
+    }
+    .pricing-page.save-percs,
+    .cn .pricing-page.save-percs {
+        top: -16px;
+        left: 25px;
+        font-size: 10px;
+        line-height: 18px;
+        height: 18px;
+        padding: 0 8px;
+        border-radius: 9px;
+    }
+    .pricing-page .save-green-arrow {
+        width: 24px;
+        height: 0;
+        top: -10px;
+    }
+    .pricing-page.radio-buttons:not(.hidden) {
+        float: none;
+        display: inline-block;
+    }
+    .pricing-page label.radio-txt {
+        font-size: 13px;
+    }
+    .pricing-page.plans-wrap {
+        padding: 40px 0 0 0;
+    }
+    
+    /* Compare */
+    .pricing-page.slider-wrap {
+        margin: 45px 35px 95px 35px;
+    }
+    .pricing-page.slider-dot.active {
+        box-shadow: 0 0 0 2px #FFF;
+    }
+    .pricing-page.slider-dot .label, .en .pricing-page.slider-dot .label {
+        font-size: 14px;
+        line-height: 26px;
+        top: 24px;
+    }
+    .pricing-page.slider-dot span {
+        font-size: 14px;
+    }
+    .pricing-page.slider.ui-widget-content, .pricing-page.slider .ui-slider-range {
+        height: 6px;
+    }
+    .pricing-page.slider-dot {
+        width: 14px;
+        height: 14px;
+        margin: -4px 0 0 -7px;
+    }
+    .pricing-page.slider .ui-slider-handle {
+        width: 22px;
+        height: 22px;
+        margin: 0 0 0 -11px;
+        top: -8px;
+        background-size: 128px auto;
+        background-position: -29px -248px;
+    }
+    
+    /* Solutions */
+    .pricing-page.solutions-wrap {
+        display: block;
+        margin: 20px 0 0 0;
+    }
+    
+    /* Payment page */
+    .payment-page.info-block .payment-method,
+    .payment-page.info-block .payment-duration {
+        width: 100%;
+    }
 }
-.dialog-input-title-ontop:hover::after {
-   background-color: rgba(0,0,0,0.5);
-}*/
-@media only screen and (max-width: 1133px) {
-.key .reg-st3-membership-bl {
-    padding: 4px;
-    -moz-border-radius: 12px;
-    -webkit-border-radius: 12px;
-    border-radius: 12px;
+
+@media only screen and (max-width: 420px) {
+    /* Pricing header */
+    .pricing-page.top-header {
+        font-size: 20px;
+        line-height: 28px;
+    }
+    .pricing-page.medium-txt {
+        font-size: 14px;
+        line-height: 24px;
+        color: #3737337;
+    }
+    .pricing-page.top-small-txt {
+        font-size: 14px;
+        line-height: 24px;
+    }
+    
+    .bottom-page.horizontal-centered-bl.pricing-pad {
+        padding: 0 24px;
+    }
+    .pricing-section .bottom-page.small-info.top-pad-24 {
+        font-size: 14px;
+        line-height: 24px;
+    }
+    
+    /* Compare */
+    .pricing-page label.radio-txt {
+        font-size: 13px;
+    }
+    .br .pricing-page.slider-dot .label, .es .pricing-page.slider-dot .label {
+        font-size: 10px;
+    }
+    .ru .pricing-page.slider-dot .label {
+        font-size: 10px;
+        width: 80px;
+        min-width: 80px;
+        margin-left: -40px;
+    }
+    .br .pricing-page.slider-wrap, .ru .pricing-page.slider-wrap,  .es .pricing-page.slider-wrap {
+        margin: 45px 20px 95px 20px;
+    }
+    .es .pricing-page label.radio-txt {
+        font-size: 10px;
+        padding-right: 10px;
+    }
+    
+    /* Solutions */
+    .pricing-page.solutions-wrap {
+        display: block;
+        margin-top: 20px;
+    }
 }
-}
-@media only screen and (max-width: 970px) {
-.key .bottom-page.plans-block {
-    width: auto;
-}
-.key .bottom-page.blocks-div {
-    display: block;
-}
-.key .plans .reg-st3-membership-bl {
-        width: 222px;
-    padding: 8px;
-    margin: -2px 0 0 -2px;
-}
-.key .plans .reg-st3-membership-bl:first-child {
-    margin-left: 0;
-}
-}
-@media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {
-.redeem-promo-page .onboard-image {
-    background-image: url(../images/mega/onboarding_download_v2@2x.png);
-    background-size: 600px auto;
-}
+
+@media only screen and (max-width: 380px) {
+    .fr .pricing-page label.radio-txt, .ru .pricing-page label.radio-txt, .br .pricing-page label.radio-txt {
+        font-size: 10px;
+        padding-right: 10px;
+    }
+    .es .pricing-page div.radioOn, .es .pricing-page div.radioOff {
+        margin-right: 5px;
+    }
 }

@@ -4,79 +4,88 @@ function init_start() {
     "use strict";
 
     var carouselInterval;
-    var darkSliderInterval;
-    var swipeInterval = 10000;
-
-    // Set prices for personal and business plans
-    if (l[20624] && l[20624]) {
-        $('.startpage.plan-price.personal')
-            .safeHTML(l[20624].replace('%1', '<span class="price"><span class="big">4.</span>99 &euro;</span>'));
-
-        $('.startpage.plan-price.business')
-            .safeHTML(l[20625].replace('%1', '<span class="price"><span class="big">10.</span>00 &euro;</span>'));
-    }
-
-    // Load the membership plans
-    pro.loadMembershipPlans(function () {
-
-        // Render the plan details
-        pro.proplan.populateMembershipPlans();
-
-        // Check which plans are applicable or grey them out if not
-        pro.proplan.checkApplicablePlans();
-    });
+    var sliderInterval;
+    var swipeInterval = 5000;
+    var intl = mega.intl.number;
+    var dropboxPrice = 4.9;
+    var megaPrice = 1.56;
+    var gdrivePrice = 4.9;
+    var $page = $('.bottom-page.scroll-block.startpage', '.fmholder');
 
     if (u_type > 0) {
-        $('.startpage.register:not(.business-reg)').text(l[164]);
-        $('.mid-green-link.register-lnk, .startpage.register').attr('href', '/fm');
-        
+        $('.startpage.register:not(.business-reg)', $page).text(l[164]);
+        $('.mid-green-link.register-lnk.fm, .startpage.register', $page).attr('href', '/fm');
+        $('.mid-green-link.register-lnk.chat', $page).attr('href', '/fm/chat');
+
         if (is_mobile) {
-            $('.startpage.account').attr('href', '/fm/account');
+            $('.startpage.account', $page).attr('href', '/fm/account');
         }
         else {
-            $('.startpage.account').attr('href', '/fm/dashboard');
+            $('.startpage.account', $page).attr('href', '/fm/dashboard');
         }
         if (u_type === 3) {
-            $('.business-reg').addClass('hidden').attr('href', '');
+            $('.business-reg', $page).addClass('hidden').attr('href', '');
         }
     }
     else {
-        $('.mid-green-link.register-lnk, .startpage.register').attr('href', '/register');
-        $('.business-reg').removeClass('hidden').attr('href', '/registerb');
+        $('.mid-green-link.register-lnk, .startpage.register', $page).attr('href', '/register');
+        $('.business-reg', $page).removeClass('hidden').attr('href', '/registerb');
     }
 
-    $('.bottom-menu.logo').rebind('click.clickurl', function(e) {
+    $('.bottom-menu.body .logo', '.fmholder').rebind('click.clickurl', function(e) {
+        var $scrollableBlock;
+
         e.preventDefault();
 
         if (page === 'start') {
-            $('.fmholder, html, body').animate({ scrollTop: 0 }, 1600);
+            $scrollableBlock = is_mobile ? $(window) : $('.fmholder', 'body');
+            $scrollableBlock.animate({ scrollTop: 0 }, 1600);
         }
         else {
             loadSubPage('start');
         }
     });
 
-    // Init Scroll to Top button event
-    $('.startpage.scroll-to-top').rebind('click', function () {
-        if ($(this).hasClass('up')) { 
-            $('.fmholder, html, body').animate({
-                scrollTop: 0
-            }, 1600);
-        }
-        else {
-            $('.fmholder, html, body').animate({
-                scrollTop: $('.bottom-page.content').outerHeight()
-            }, 1600);
-        }
-    });
+    // if (mega.flags.refpr) {
+    //     var slidingTimer;
+
+    //     var doSlide = function() {
+    //         // eslint-disable-next-line no-unused-expressions
+    //         slidingTimer && clearTimeout(slidingTimer);
+    //         var $banners = $('.bottom-page.top-banner', $page);
+
+    //         if ($banners.filter('.active').hasClass('banner1')) {
+    //             $banners.removeClass('active');
+    //             $banners.filter('.banner2').addClass('active');
+    //             $page.addClass('white-pages-menu');
+    //         }
+    //         else {
+    //             $banners.removeClass('active');
+    //             $banners.filter('.banner1').addClass('active');
+    //             $page.removeClass('white-pages-menu');
+    //         }
+    //         slidingTimer = setTimeout(doSlide, 10000);
+    //     };
+    //     slidingTimer = setTimeout(doSlide, 10000);
+    //     // Top banner controls init
+    //     $('.bottom-page.banner-control', $page).removeClass('hidden').rebind('click.top-banner', doSlide);
+    //     $('.mid-green-link.refer', $page).removeClass('hidden');
+    // }
+
+    $('.dropbox span', $page).text(intl.format(dropboxPrice));
+
+    $('.mega span', $page).text(intl.format(megaPrice));
+
+    $('.gdrive span', $page).text(intl.format(gdrivePrice));
 
     /**
      * detectSwipe
      *
-     * {Object} $textarea. DOM swipable area.
-     * {Function} func. Function which will be called after swipe direction is detected
+     * @param {Object} $el DOM swipable area.
+     * @param {Object} $slides DOM slides selector.
+     * @param {Function} func Function which will be called after swipe is detected
      */
-    function detectSwipe($el, func) {
+    function detectSwipe($el, $slides, func) {
         var swipeStartX = 0;
         var swipeEndX = 0;
         var swipeStartY = 0;
@@ -107,7 +116,7 @@ function init_start() {
             }
 
             if (direc !== '' && typeof func === 'function') {
-                func(direc);
+                func($slides, direc);
             }
 
             direc = '';
@@ -119,23 +128,19 @@ function init_start() {
     /**
      * carouselSwitch
      *
-     * {String} direction. Sets what Reviews Carousel slide should be shown. Expected values: 'next' or 'prev'.
+     * @param {Object} $slides DOM slides selector.
+     * @param {String} direction Sets what Reviews Carousel slide should be shown. Expected values: 'next' or 'prev'.
      */
-    function carouselSwitch(direction) {
-        var $currentSlide;
+    function carouselSwitch($slides, direction) {
+        var $currentSlide = $slides.filter('.current');
         var currentSlide;
         var slideNum;
         var nextSlide;
         var prevSlide;
-        /*
-        if (carouselInterval) {
-            clearInterval(carouselInterval);
-        }
-        */
-        $currentSlide = $('.startpage.carousel-slide.current').length ?
-            $('.startpage.carousel-slide.current') : $('.startpage.carousel-slide').last();
+
+        $currentSlide = $currentSlide.length ? $currentSlide : $currentSlide.last();
         currentSlide = parseInt($currentSlide.attr('data-sl'));
-        slideNum = $('.startpage.carousel-slide').length;
+        slideNum = $slides.length;
 
         if (direction === 'next') {
             currentSlide = currentSlide + 1 <= slideNum ? currentSlide + 1 : 1;
@@ -147,158 +152,113 @@ function init_start() {
         nextSlide = currentSlide + 1 <= slideNum ? currentSlide + 1 : 1;
         prevSlide = currentSlide - 1 >= 1 ? currentSlide - 1 : slideNum;
 
-        $('.startpage.carousel-slide').removeClass('current next prev');
-        $('.startpage.carousel-slide.slide' + currentSlide).addClass('current');
-        $('.startpage.carousel-slide.slide' + prevSlide).addClass('prev');
-        $('.startpage.carousel-slide.slide' + nextSlide).addClass('next');
-        /*
-        carouselInterval = setInterval(function() {
-            carouselSwitch('next');
-        },  swipeInterval);
-        */
+        $slides.removeClass('current next prev');
+        $slides.filter('.slide' + currentSlide).addClass('current');
+        $slides.filter('.slide' + prevSlide).addClass('prev');
+        $slides.filter('.slide' + nextSlide).addClass('next');
     }
 
     // Reviews carousel. Controls init
     $('.startpage.carousel-control').rebind('click', function () {
         if ($(this).hasClass('next')) {
-            carouselSwitch('next');
+            carouselSwitch($('.startpage.carousel-slide', $page), 'next');
         }
         else {
-            carouselSwitch('prev');
+            carouselSwitch($('.startpage.carousel-slide', $page), 'prev');
         }
     });
 
     /**
-     * darkSliderSwitch
+     * showSlide
      *
-     * {String} direction. Sets what DarkSlider slide should be shown. Expected values: 'next' or 'prev'.
+     * @param {Object} $slides DOM slides selector.
+     * @param {String} slide Number of next slider slide which should be shown. Can also be "next" or "prev".
+     * @param {Boolean} autoSlide Inits auto sliding. Optional.
      */
-    function darkSliderSwitch(direction) {
-        var $slider = $('.dark-slider-wrap');
-        var currentSlide = parseInt($slider.find('.slide.active').attr('data-sl'));
-        var slideNum = $slider.find('.slide').length;
+    function showSlide($slides, slide, autoSlide) {
+        var $slidesNavDots = $slides.filter('.nav');
+        var slidesNum = $slidesNavDots.length;
+        var currentSlide = parseInt($slidesNavDots.filter('.active').data('slide'));
 
-        if (direction === 'next') {
-            currentSlide = currentSlide + 1 <= slideNum ? currentSlide + 1 : 1;
-        }
-        else {
-            currentSlide = currentSlide - 1 >= 1 ? currentSlide - 1 : slideNum;
+        // Init auto slide
+        clearInterval(sliderInterval);
+
+        // Init auto slide
+        if (autoSlide) {
+            sliderInterval = setInterval(function() {
+                showSlide($slides, 'next', true);
+            }, swipeInterval);
         }
 
-        showDarkSlide(currentSlide);
+        if (slide === 'next') {
+            slide = currentSlide + 1 <= slidesNum ? currentSlide + 1 : 1;
+        }
+        else if (slide === 'prev') {
+            slide = currentSlide - 1 >= 1 ? currentSlide - 1 : slidesNum;
+        }
+
+        $slides.removeClass('active').parent('.software-content').removeClass('expanded');
+        $slides.filter('[data-slide="' + slide + '"]')
+            .addClass('active').parent('.software-content').addClass('expanded');
     }
 
     /**
-     * showDarkSlide
+     * initSlider
      *
-     * {Num} slideNum. Number of next DarkSlider slide which should be shown.
-     */
-    function showDarkSlide(slideNum) {
-        var $slider;
-        /**
-        if (darkSliderInterval) {
-            clearInterval(darkSliderInterval);
-        }
-        **/
-        $slider = $('.dark-slider-wrap');
-        $slider.find('.dark-slider-info').removeClass('active');
-        $slider.find('.dark-slider-info.sl' + slideNum).addClass('active');
-        $slider.find('.dark-slider-nav span').removeClass('active');
-        $slider.find('.dark-slider-nav span.sl' + slideNum).addClass('active');
-        $slider.find('.dark-slider .slide').removeClass('active');
-        $slider.find('.dark-slider .dark-slide' + slideNum).addClass('active');
-        $slider.find('.square-nav-button').removeClass('active');
-        $slider.find('.square-nav-button.sl' + slideNum).addClass('active');
-        /*
-        darkSliderInterval = setInterval(function() {
-            darkSliderSwitch('next');
-        },  swipeInterval);
-        */
-    }
-
-    // DarkSlider. Controls init
-    $('.bottom-page.square-nav-button, .startpage.dark-slider-nav span').rebind('click', function () {
-        var $this = $(this);
-        var slideNum = $this.attr('data-sl');
-
-        if (!$this.hasClass('active')) {
-            showDarkSlide(slideNum);
-        }
-    });
-
-    // Init Animations
-    setTimeout(function() {
-        $('.startpage .bottom-page.top').addClass('start-animation');
-    },  700);
-
-    /**
-     * isVisibleBlock
+     * Wrapper should have "slidername-wrap" class  (e.g ".slider-wrap").
+     * Navigation bar should have "slidername-nav" class  (e.g ".slider-nav").
      *
-     * {Object} $row. DOM element which should be checked
+     * @param {String} sliderClass Slider Classname with dot (e.g ".slider"). All slides should have this class.
+     * @param {Boolean} autoSlide Enables/disables auto sliding. Optional.
+     * @param {String} buttonsClass Addition navigtion buttons Classname with dot (e.g ".slider-buttons"). Optional.
      */
-    function isVisibleBlock($row) {
-        if ($row.length === 0) {
-            return false;
-        }
+    function initSlider(sliderClass, autoSlide, buttonsClass) {
+        var $slider = $(sliderClass + '-wrap', $page);
+        var $slides  = $(sliderClass,  $slider);
+        var $slidesNav = $(sliderClass  + '-nav');
+        var $slidesNavDots = $('.nav', $slidesNav);
+        var $buttons = $(buttonsClass);
 
-        var $window = $(window);
-        var elementTop = $row.offset().top;
-        var elementBottom = elementTop + $row.outerHeight();
-        var viewportTop = $window.scrollTop();
-        var viewportBottom = viewportTop + $window.outerHeight();
+        // Show first slide
+        showSlide($slides, 1, autoSlide);
 
-        return elementBottom - 80 > viewportTop && elementTop  < viewportBottom;
-    }
+        // Slider controls click even
+        $slidesNavDots.add($buttons).rebind('click.slider', function() {
+            var $this = $(this);
+            var slideNum = $this.data('slide');
 
-    /**
-     * showAnimated
-     */
-    function showAnimated() {
-        $('.animated').each(function() {
-            if (isVisibleBlock($(this))) {
-                if (!$(this).hasClass('start-animation')) {
-                    $(this).addClass('start-animation');
-                }
+            if (!$this.hasClass('active')) {
+                showSlide($slides, slideNum, autoSlide);
             }
-            else if ($(this).hasClass('start-animation')) {
-                $(this).removeClass('start-animation');
+
+            // Init subslider for desktop (with autosliding)
+            if ($this.data('subslide') && !is_mobile) {
+                initSlider('.' + $this.data('subslide'), true);
+            }
+        });
+
+        // Slider Prev/Next buttons
+        $('.nav-button', $slidesNav).rebind('click.slider', function() {
+            var $this = $(this);
+
+            if ($this.hasClass('next')) {
+                showSlide($slides, 'next', autoSlide);
+            }
+            else {
+                showSlide($slides, 'prev', autoSlide);
             }
         });
     }
 
-    showAnimated();
+    carouselSwitch($('.startpage.carousel-slide', $page), 'next');
 
-    $('#startholder').add(window).rebind('scroll.startpage', function() {
-        if (page === 'start' || page === 'download') {
+    // Init Software block Slider
+    initSlider('.soft-slide', false, '.software-header');
 
-            showAnimated();
-            if (!isVisibleBlock($('.bottom-page.light-blue.top, .bottom-page.top-bl'))) {
-                $('.startpage.scroll-to-top').addClass('up');
-            }
-            else {
-                $('.startpage.scroll-to-top').removeClass('up');
-            }
-        }
-    });
-
-    showDarkSlide(3);
-    carouselSwitch('next');
-
-    // Init swipes for Mobile
+    // Init Mobile events
     if (is_mobile) {
-        detectSwipe($('.startpage.carousel'), carouselSwitch);
-        detectSwipe($('.dark-slider-wrap'), darkSliderSwitch);
-
-        // Show text info is Icons block was clicked (Why Use MEGA section and similar)
-        $('.startpage.square-block').rebind('click', function () {
-            if (!$(this).hasClass('active')) {
-                $('.startpage.square-block.active').removeClass('active');
-                $(this).addClass('active');
-            }
-            else {
-                $(this).removeClass('active');
-            }
-        });
+        detectSwipe($('.startpage.carousel', $page), $('.startpage.carousel-slide', $page), carouselSwitch);
+        detectSwipe($('.soft-slide-wrap', $page), $('.soft-slide', $page), showSlide);
     }
 
     if (!is_mobile && page === 'start') {
@@ -321,6 +281,7 @@ function init_start() {
         'users': '',
         'files': ''
     };
+
     if (is_mobile) {
         $(window).add('#startholder').rebind('scroll.counter', function () {
             if (page === 'start') {
@@ -472,7 +433,10 @@ function start_countUpdate() {
         if (total.length === startCountRenderData[type].length) {
             for (var i = 0, len = total.length; i < len; i++) {
                 if (startCountRenderData[type][i] !== total[i]) {
-                    startCountRenderData[type + '_blocks'][i].textContent = total[i];
+                    var elm = startCountRenderData[type + '_blocks'][i];
+                    if (elm) {
+                        elm.textContent = total[i];
+                    }
                 }
             }
         }

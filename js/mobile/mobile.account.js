@@ -30,7 +30,9 @@ mobile.account = {
         mobile.account.fetchAndDisplayTwoFactorAuthStatus($page);
         mobile.account.initChangePasswordButton($page);
         mobile.account.initNotificationButton($page);
-        mobile.account.initTitleMenu();
+
+        // Init the titleMenu for this page.
+        mobile.titleMenu.init();
 
         // Initialise the top menu
         topmenuUI();
@@ -40,23 +42,6 @@ mobile.account = {
 
         // Add a server log
         api_req({ a: 'log', e: 99672, m: 'Mobile web My Account page accessed' });
-    },
-
-    /**
-     * Init the titleMenu for this page.
-     */
-    initTitleMenu: function() {
-        'use strict';
-
-        mobile.titleMenu.init();
-
-        var $titleHeaderTextContainer = $(".fm-header-txt");
-
-        // Attach event handlers local to this page controller.
-        $titleHeaderTextContainer.off('tap').on('tap', function() {
-            mobile.titleMenu.open();
-            return false;
-        });
     },
 
     /**
@@ -194,8 +179,8 @@ mobile.account = {
         var proPlanName = pro.getProPlanName(proNum);
 
         // Show the Pro name and icon class
-        $page.find('.icon.pro-mini').addClass(proClassName);
-        $page.find('.pro-plan-name').text(proPlanName);
+        $('.plan-icon', $page).addClass(proClassName);
+        $('.pro-plan-name', $page).text(proPlanName);
     },
 
     /**
@@ -210,13 +195,14 @@ mobile.account = {
         var $usedStorage = $accountUsageBlock.find('.used');
         var $totalStorage = $accountUsageBlock.find('.total');
         var $percentageUsed = $accountUsageBlock.find('.percentage');
+        var $message = $('.over-quota-message', $accountUsageBlock).text(l[16136]).removeClass('odq-red-alert');
 
         // Format percentage used to X.XX%, used space to 'X.X GB' and total space to 'X GB' format
         var spaceUsed = M.account.cstrg;
         var spaceTotal = M.account.mstrg;
         var percentageUsed = spaceUsed / spaceTotal * 100;
-        var percentageUsedText = percentageUsed.toFixed(2);
-        var spaceUsedText = bytesToSize(spaceUsed, 1);
+        var percentageUsedText = Math.round(percentageUsed);
+        var spaceUsedText = bytesToSize(spaceUsed, 2);
         var spaceTotalText = bytesToSize(spaceTotal, 0);
 
         // Display the used and total storage e.g. 0.02% (4.8 GB of 200 GB)
@@ -227,6 +213,11 @@ mobile.account = {
         // Colour text red and show a message if over quota, or use orange if close to using all quota
         if (percentageUsed >= 100) {
             $accountUsageBlock.addClass('over-quota');
+            if (u_attr.uspw) {
+                $message.safeHTML(
+                    odqPaywallDialogTexts(u_attr, M.account).fmBannerText)
+                    .addClass('odq-red-alert');
+            }
         }
         else if (percentageUsed >= 85) {
             $accountUsageBlock.addClass('warning');

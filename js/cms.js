@@ -2,28 +2,35 @@
     /** Our trusted public keys {{{ */
     var signPubKey = {
         "__global": [
-            "rRHOm8BpMsYsSnSlk1AD2xxm9vKIFd\/tMoKxc35FTXQ=", // Elroy
-            "gKfbvYMQhEamAEb2tIcL0NpslOGbXkHC1opfPXfZIlE=", // Gustavo
-            "WJbsItfJfXhGZlq6D1tz\/Wy\/AVjmvQoK7ZgBSOrrCQE=", // Guy
-            "nJ0DVETXN6Fgd+nK70bsngaPlbM9zedn14Exh\/fAoyU=" // Shuan
+            "rRHOm8BpMsYsSnSlk1AD2xxm9vKIFd\/tMoKxc35FTXQ=", // Elroy v2
+            "WJbsItfJfXhGZlq6D1tz\/Wy\/AVjmvQoK7ZgBSOrrCQE=", // Guy v2
+            "nJ0DVETXN6Fgd+nK70bsngaPlbM9zedn14Exh\/fAoyU=", // Shaun v2
+            "WpDw5Q4L/7AfEMsGeW79BAheALabCdK3uYNNZB+Bq5o=", // Elroy v3
+            "TJi9yWiE3tj15ER3W2kLcV4uVuE2GftUm54XQQLPTGg=", // Guy v3
+            "nX9lIbNNyZPnnMr7aFMENHlescfDbp+ZmUIpGTcDp0w=", // Shaun v3
+            "c/1i2Cq85V8n1I3tixV4bjLTRn9ZqYqtOVhxavHKoYM=", // Mark v3
+            "PuXh6QXVRVVKPPdeLfYgG0VNxG6mUn2XioNCnxHzq1A=" // Harry v3
         ]
     };
     /** }}} */
 
     var IMAGE_PLACEHOLDER = staticpath + "/images/img_loader@2x.png";
-    var isReady = false;
+    var isReady = true;
 
-    mBroadcaster.once('startMega', function() {
-        for (var sub in signPubKey) {
-            if (!signPubKey.hasOwnProperty(sub)) {
-                continue;
+    if (!is_litesite) {
+        isReady = false;
+        mBroadcaster.once('startMega', function() {
+            for (var sub in signPubKey) {
+                if (!signPubKey.hasOwnProperty(sub)) {
+                    continue;
+                }
+                for (var l = 0; l < signPubKey[sub].length; ++l) {
+                    signPubKey[sub][l] = asmCrypto.base64_to_bytes(signPubKey[sub][l]);
+                }
             }
-            for (var l = 0; l < signPubKey[sub].length; ++l) {
-                signPubKey[sub][l] = asmCrypto.base64_to_bytes(signPubKey[sub][l]);
-            }
-        }
-        isReady = true;
-    });
+            isReady = true;
+        });
+    }
 
     var cmsRetries = 1; // how many times to we keep retyring to ping the CMS before using the snapshot?
     var fetching = {};
@@ -108,7 +115,10 @@
     }
 
     function verify_cms_content(content, signature, objectId) {
-        var hash  = asmCrypto.SHA256.bytes(content);
+        if (is_litesite) {
+            return true;
+        }
+        var hash = asmCrypto.SHA256.bytes(content);
         signature = asmCrypto.string_to_bytes(ab_to_str(signature));
         var i;
 
@@ -139,6 +149,29 @@
         return false;
     }
 
+    function parse_cms_content(content) {
+        if (content && typeof content !== 'string') {
+            content = ab_to_str(content);
+        }
+
+        return String(content)
+            .replace(/\s+/g, ' ')
+            // eslint-disable-next-line no-use-before-define
+            .replace(/(?:{|%7B)cmspath(?:%7D|})/g, CMS.getUrl())
+            .replace(/<a[^>]+>/g, function(m) {
+                if (m.indexOf('href=&quot;') > 0) {
+                    m = m.replace(/&quot;/g, '"');
+                }
+                if (/href=["']\w+:/.test(m)) {
+                    m = m.replace('>', ' target="_blank" rel="noopener noreferrer">');
+                }
+                if (/href=["'][#/]/.test(m)) {
+                    m = m.replace('>', ' class="clickurl">');
+                }
+                return m;
+            });
+    }
+
     function process_cms_response(bytes, next, as, id) {
         var viewer = new Uint8Array(bytes);
 
@@ -161,7 +194,7 @@
         if (verify_cms_content(content, signature, id)) {
             switch (mime) {
             case 3: // html
-                content = ab_to_str(content).replace(/(?:{|%7B)cmspath(?:%7D|})/g, CMS.getUrl());
+                    content = parse_cms_content(content);
                 next(false, { html: content, mime: mime});
                 return loaded(id);
 
@@ -292,7 +325,7 @@
             delete fetching[id];
             cmsBackoff = 0; /* reset backoff */
         };
-        var url = CMS.getUrl() + id;
+        var url = CMS.getUrl() + '/' + id;
         q.open("GET", url);
         q.responseType = 'arraybuffer';
         q.send();
@@ -330,8 +363,7 @@
     var reRendered = {};
 
     var CMS = {
-        watch: function(type, callback)
-        {
+        watch: function(type, callback) {
             curType = type;
             curCallback = callback;
         },
@@ -466,7 +498,7 @@
         },
 
         getUrl: function() {
-            return localStorage.cms || "https://cms2.mega.nz/";
+            return localStorage.cms || "https://cms2.mega.nz";
         },
 
         on: function(id, callback)
@@ -492,6 +524,55 @@
                 html = html.replace(IMAGE_PLACEHOLDER + "' data-img='loading_" + id, assets[id], 'g');
             }
             return html;
+        },
+
+        fillStats: function($page, muser, dactive, bfiles, mcountries) {
+            // Locale of million and biliion will comes
+            $('.register-count .num', $page).text(muser + 'M+');
+            $('.daily-active .num', $page).text(dactive + 'M+');
+            $('.files-count .num', $page).text(bfiles + 'B+');
+            $('.mega-countries .num', $page).text(mcountries + '+');
+        },
+
+        dynamicStatsCount: function($page) {
+            if (this.statsCache && new Date() - this.statsCache.statsTime < 36e5) {
+                this.fillStats(
+                    $page,
+                    this.statsCache.muser,
+                    this.statsCache.dactive,
+                    this.statsCache.bfiles,
+                    this.statsCache.mcountries
+                );
+            }
+            else {
+                loadingDialog.show();
+
+                api_req({a: "dailystats"}, {
+                    callback: function(res) {
+
+                        loadingDialog.hide();
+
+                        var muser = 175;
+                        var dactive = 10;
+                        var bfiles = 75;
+                        var mcountries = 200;
+
+                        if (typeof res === 'object') {
+                            muser = res.confirmedusers.total / 1000000 | 0;
+                            bfiles = res.files.total / 1000000000 | 0;
+                        }
+
+                        CMS.fillStats($page, muser, dactive, bfiles, mcountries);
+                        CMS.statsCache = {
+                            muser: muser,
+                            dactive: dactive,
+                            bfiles: bfiles,
+                            mcountries: mcountries,
+                            statsTime: new Date()
+                        };
+                    }
+                });
+            }
         }
     };
 
@@ -499,20 +580,3 @@
     window.CMS = CMS;
 
 })(this);
-
-CMS.on('corporate', function()
-{
-    $('.new-left-menu-link').rebind('click', function() {
-        loadSubPage('corporate/' + $(this).attr('id'));
-        $('.old .fmholder').animate({ scrollTop: 0 }, 0);
-    });
-    var ctype = getSitePath().substr(11);
-    if ($('#' + ctype).length === 1) {
-        $('.new-right-content-block').addClass('hidden');
-        $('.new-right-content-block.' + ctype).removeClass('hidden');
-        $('.new-left-menu-link').removeClass('active');
-        $('#' + ctype).addClass('active');
-    } else {
-        $('.new-left-menu-link:first').trigger('click');
-    }
-});

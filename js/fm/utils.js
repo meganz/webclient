@@ -18,32 +18,55 @@ MegaUtils.prototype = new MegaApi();
 MegaUtils.prototype.constructor = MegaUtils;
 
 // TODO: refactor api_req-related functions here.
-MegaApi.prototype.setDomain = function(aDomain, aSave) {
+MegaApi.prototype.setAPIPath = function(aDomain, aSave) {
+    'use strict';
+
+    if (aDomain === 'debug') {
+        aDomain = location.host + ':444';
+    }
     apipath = 'https://' + aDomain + '/';
 
     if (aSave) {
         localStorage.apipath = apipath;
     }
+
+    return apipath;
 };
 
 MegaApi.prototype.staging = function(aSave) {
-    this.setDomain('staging.api.mega.co.nz', aSave);
+    this.setAPIPath('staging.api.mega.co.nz', aSave);
 };
 
 MegaApi.prototype.prod = function(aSave) {
-    this.setDomain('eu.api.mega.co.nz', aSave);
+    this.setAPIPath('g.api.mega.co.nz', aSave);
 };
 
 MegaApi.prototype._apiReqInflight = Object.create(null);
 MegaApi.prototype._apiReqPollCache = Object.create(null);
 
+MegaApi.prototype._apiReqReplyCache = Object.create(null);
+MegaApi.prototype._apiReqCacheIndex = {
+    g: function(req) {
+        'use strict';
+
+        if (req.g) {
+            // cache for four seconds.
+            return -4;
+        }
+
+        // cache for the session lifetime
+        return true;
+    }
+};
+
 /**
  * Perform an API request, with capability of de-duplicating pending requests.
  * @param {Object|String} params The request parameters as an object.
  *                               If an string is provided, assumes a plain request with no additional parameters.
+ * @param {Number} [ch] The channel to fire the request on.
  * @returns {MegaPromise} The promise is rejected if API gives a negative number.
  */
-MegaApi.prototype.req = function(params) {
+MegaApi.prototype.req = function(params, ch) {
     'use strict';
 
     if (typeof params === 'string') {
@@ -59,7 +82,25 @@ MegaApi.prototype.req = function(params) {
         return this._apiReqInflight[key];
     }
 
+    var self = this;
     var promise = new MegaPromise();
+
+    if (this._apiReqReplyCache[key]) {
+        var entry = this._apiReqReplyCache[key];
+
+        if (Date.now() > entry[1]) {
+            delete this._apiReqReplyCache[key];
+        }
+        else {
+            onIdle(function() {
+                if (d) {
+                    console.info('Returning cached api request...', params, entry);
+                }
+                promise.resolve(entry[0]);
+            });
+            return promise;
+        }
+    }
     this._apiReqInflight[key] = promise;
 
     promise.always(function() {
@@ -68,14 +109,25 @@ MegaApi.prototype.req = function(params) {
 
     api_req(params, {
         callback: tryCatch(function(res) {
+            delete this.callback;
+
             if (typeof res === 'number' && res < 0) {
                 promise.reject.apply(promise, arguments);
             }
             else {
+                var cIdx = self._apiReqCacheIndex[params.a];
+
+                if (cIdx) {
+                    if (typeof cIdx === 'function') {
+                        cIdx = cIdx(params);
+                    }
+
+                    self._apiReqReplyCache[key] = [clone(res), cIdx < 0 ? Date.now() + -cIdx * 1e3 : Infinity];
+                }
                 promise.resolve.apply(promise, arguments);
             }
         }, promise.reject.bind(promise, EFAILED))
-    });
+    }, ch | 0);
 
     return promise;
 };
@@ -180,8 +232,13 @@ MegaApi.prototype.req.poll = function(seconds, params) {
 MegaApi.prototype.reqA = function(params) {
     'use strict';
 
+    var self = this;
     var promise = new MegaPromise();
-    MegaPromise.allDone(params.map(this.req.bind(this))).unpack(promise.resolve.bind(promise));
+    var mapfn = function(v) {
+        return self.req(v);
+    };
+
+    MegaPromise.allDone(params.map(mapfn)).unpack(promise.resolve.bind(promise));
 
     return promise;
 };
@@ -338,6 +395,32 @@ MegaUtils.prototype.getStack = function megaUtilsGetStack() {
     }
 
     return stack;
+};
+
+/**
+ * Get function caller.
+ * @returns {String} caller
+ */
+MegaUtils.prototype.getCaller = function megaUtilsGetCaller() {
+    'use strict';
+    var stackIdx = 2;
+    var stack = M.getStack().split('\n');
+
+    for (var i = stack.length; i--;) {
+        if (stack[i].indexOf('getCaller') > 0) {
+            stackIdx = i;
+            break;
+        }
+    }
+
+    stack = String(stack.splice(++stackIdx + (stack[0] === 'Error')));
+
+    var m = stack.match(/at\s(\S+)/);
+    if (m) {
+        return String(m[1]).split(/[\s:]/)[0];
+    }
+
+    return '<unknown>';
 };
 
 /**
@@ -565,25 +648,8 @@ MegaUtils.prototype.reload = function megaUtilsReload() {
                         M.clearFileSystemStorage()
                     ];
 
-                    if (
-                        typeof(megaChat) !== 'undefined' &&
-                        megaChat.plugins.chatdIntegration &&
-                        megaChat.plugins.chatdIntegration.chatd.chatdPersist
-                    ) {
-                        waitingPromises.push(
-                            megaChat.plugins.chatdIntegration.chatd.chatdPersist.drop()
-                        );
-                    }
-                    else if (
-                        typeof(megaChat) !== 'undefined' &&
-                        megaChat.plugins.chatdIntegration &&
-                        !megaChat.plugins.chatdIntegration.chatd.chatdPersist &&
-                        typeof(ChatdPersist) !== 'undefined'
-                    ) {
-                        // chatdPersist was disabled, potential crash, try to delete the db manually
-                        waitingPromises.push(
-                            ChatdPersist.forceDrop()
-                        );
+                    if (window.megaChatIsReady) {
+                        waitingPromises.push(megaChat.dropAllDatabases());
                     }
 
                     MegaPromise.allDone(waitingPromises).then(function(r) {
@@ -704,42 +770,6 @@ MegaUtils.prototype.clearFileSystemStorage = function megaUtilsClearFileSystemSt
     })(0);
 
     return promise;
-};
-
-/**
- * Neuter an ArrayBuffer
- * @param {Mixed} ab ArrayBuffer/TypedArray
- */
-MegaUtils.prototype.neuterArrayBuffer = function neuter(ab) {
-    'use strict';
-
-    if (!(ab instanceof ArrayBuffer)) {
-        ab = ab && ab.buffer;
-    }
-
-    try {
-        if (typeof ArrayBuffer.transfer === 'function') {
-            ArrayBuffer.transfer(ab, 0); // ES7
-        }
-        else {
-            if (!neuter.dataWorker) {
-                var blobURI = mObjectURL(['var d'], 'text/javascript');
-                setTimeout(function() {
-                    URL.revokeObjectURL(blobURI);
-                }, 2e3);
-                neuter.dataWorker = new Worker(blobURI);
-            }
-            neuter.dataWorker.postMessage(ab, [ab]);
-        }
-        if (ab.byteLength !== 0) {
-            throw new Error('Silently failed! -- ' + ua);
-        }
-    }
-    catch (ex) {
-        if (d > 1) {
-            console.warn('Cannot neuter ArrayBuffer', ab, ex);
-        }
-    }
 };
 
 /**
@@ -999,60 +1029,52 @@ MegaUtils.prototype.logout = function megaUtilsLogout() {
                     location.reload();
                 }
                 else if (is_mobile) {
-
                     // Always go back to the Login page on logout on mobile
                     loadSubPage('login');
-                    location.reload();
+                    return location.reload();
+                }
+
+                var sitePath = getSitePath();
+                if (sitePath.indexOf('fm/search/') > -1 || sitePath.indexOf('/chat') > -1) {
+                    location.replace(getBaseUrl());
+                }
+                else if (location.href.indexOf('fm/user-management/invdet') > -1) {
+                    var myHost = getBaseUrl() + '/fm/user-management/invoices';
+                    location.replace(myHost);
                 }
                 else {
-                    var myHost;
-                    if (location.href.indexOf('/fm/search/') > -1) {
-                        myHost = location.href.substr(0, location.href.lastIndexOf('/fm/search/'));
-                        location.replace(myHost);
-                    }
-                    else if (location.href.indexOf('/fm/chat/') > -1){
-                        myHost = location.href.substr(0, location.href.lastIndexOf('/fm/chat/'));
-                        location.replace(myHost);
-                    }
-                    else {
-                        location.reload();
-                    }
+                    location.reload();
                 }
             }
         };
 
         loadingDialog.show();
         mega.config.flush().always(finishLogout);
+        var promises = [];
 
         if (fmdb && fmconfig.dbDropOnLogout) {
-            step++;
-            var promises = [];
             promises.push(fmdb.drop());
-            if (
-                typeof(megaChat) !== 'undefined' &&
-                megaChat.plugins.chatdIntegration &&
-                megaChat.plugins.chatdIntegration.chatd
-            ) {
-                var chatd = megaChat.plugins.chatdIntegration.chatd;
-                if (chatd.chatdPersist) {
-                    promises.push(
-                        chatd.chatdPersist.drop()
-                    );
-                }
-                if (chatd.messagesQueueKvStorage) {
-                    promises.push(
-                        chatd.messagesQueueKvStorage.clear()
-                    );
-                }
-            }
-
-            MegaPromise.allDone(promises).always(finishLogout);
         }
-        if (!megaChatIsDisabled) {
-            if (typeof(megaChat) !== 'undefined' && typeof(megaChat.userPresence) !== 'undefined') {
+
+        if (window.megaChatIsReady) {
+            if (megaChat.userPresence) {
                 megaChat.userPresence.disconnect();
             }
+
+            if (fmconfig.dbDropOnLogout) {
+                promises.push(megaChat.dropAllDatabases());
+            }
         }
+
+        if (window.is_eplusplus) {
+            promises.push(M.delPersistentData('e++ck'));
+        }
+
+        if (promises.length) {
+            ++step;
+            Promise.allSettled(promises).always(finishLogout);
+        }
+
         if (u_privk && !loadfm.loading) {
             // Use the 'Session Management Logout' API call to kill the current session
             api_req({'a': 'sml'}, {callback: finishLogout});
@@ -1117,7 +1139,9 @@ MegaUtils.prototype.getSiteVersion = function() {
 
         // If an extension use the version of that (because sometimes there are independent deployments of extensions)
         if (is_extension) {
-            version = (mega.chrome) ? buildVersion.chrome + ' ' + l[957] : buildVersion.firefox + ' ' + l[959];
+            version = (mega.chrome) ? buildVersion.chrome + ' ' +
+                (ua.details.browser === 'Edgium' ? l[23326] : l[957]) :
+                buildVersion.firefox + ' ' + l[959];
         }
     }
 
@@ -1200,7 +1224,7 @@ MegaUtils.prototype.fmSearchNodes = function(searchTerm) {
                             if (r.length) {
                                 ts = add(r);
 
-                                if (--max && r.length === options.limit) {
+                                if (--max && r.length >= options.limit) {
                                     return onIdle(_);
                                 }
                             }
@@ -1244,6 +1268,7 @@ MegaUtils.prototype.fmSearchNodes = function(searchTerm) {
                 M.renderMain();
                 M.onSectionUIOpen('cloud-drive');
                 onIdle(resolve);
+                // mBroadcaster.sendMessage('!sitesearch', searchTerm, 'folder-link', M.v.length);
             }
             else {
                 var handles = [];
@@ -1281,11 +1306,14 @@ MegaUtils.prototype.fmSearchNodes = function(searchTerm) {
 MegaUtils.prototype.checkForDuplication = function(id) {
     'use strict';
     if (M.currentrootid === M.RubbishID
-        || (M.currentrootid === 'shares' && M.getNodeRights(id) < 2)) {
+        || id === 'shares'
+        || String(id).indexOf('search/') > -1
+        || M.getNodeRights(id) < 2) {
         return;
     }
-    if (folderlink) {
-        return;
+
+    if (d) {
+        console.time('checkForDuplication');
     }
 
     // at this point we have V prepared.
@@ -1293,24 +1321,34 @@ MegaUtils.prototype.checkForDuplication = function(id) {
     var names = Object.create(null);
 
     // count duplications O(n)
-    for (var k = 0; k < M.v.length; k++) {
-        if (!names[M.v[k].name]) {
-            names[M.v[k].name] = Object.create(null);
-            names[M.v[k].name][M.v[k].t] = Object.create(null);
-            names[M.v[k].name][M.v[k].t].total = 1;
-            names[M.v[k].name][M.v[k].t].list = [M.v[k].h];
-        }
-        else {
-            if (!names[M.v[k].name][M.v[k].t]) {
-                names[M.v[k].name][M.v[k].t] = Object.create(null);
-                names[M.v[k].name][M.v[k].t].total = 1;
-                names[M.v[k].name][M.v[k].t].list = [M.v[k].h];
+    for (let i = M.v.length; i--;) {
+        const n = M.v[i] || false;
+
+        if (!n.name || missingkeys[n.h]) {
+            if (d) {
+                console.debug('name-less node', missingkeys[n.h], [n]);
             }
-            else {
-                names[M.v[k].name][M.v[k].t].total++;
-                names[M.v[k].name][M.v[k].t].list.push(M.v[k].h);
-            }
+            continue;
         }
+
+        let target = names[n.name];
+        if (!target) {
+            names[n.name] = target = Object.create(null);
+        }
+
+        target = target[n.t];
+        if (!target) {
+            names[n.name][n.t] = target = Object.create(null);
+            target.total = 0;
+            target.list = [];
+        }
+
+        target.total++;
+        target.list.push(n.h);
+    }
+
+    if (d) {
+        console.timeEnd('checkForDuplication');
     }
 
     // extract duplication O(n), if we have any
@@ -1339,9 +1377,13 @@ MegaUtils.prototype.checkForDuplication = function(id) {
             }
         }
 
-        if (d && !Object.keys(dups).length && !Object.keys(dupsFolders).length) {
-            console.error("Strange case, no Duplications were found in the time when" +
-                "we have a mismatch in length " + id);
+        if (!Object.keys(dups).length && !Object.keys(dupsFolders).length) {
+            if (d) {
+                console.warn("No Duplications were found in the time when"
+                    + "we have a mismatch in lengths "
+                    + id + '. We have names intersected between files and folders');
+            }
+            return;
         }
 
         var resultObject = Object.create(null);
@@ -1351,6 +1393,27 @@ MegaUtils.prototype.checkForDuplication = function(id) {
         return resultObject;
     }
 };
+
+mBroadcaster.addListener('mega:openfolder', SoonFc(300, function(id) {
+    'use strict';
+
+    var dups = M.checkForDuplication(id);
+    if (dups && (dups.files || dups.folders)) {
+        var $bar = $('.duplicated-items-found').removeClass('hidden');
+
+        $('.files-grid-view.fm').addClass('duplication-found');
+        $('.fm-blocks-view.fm').addClass('duplication-found');
+        $('.fix-me-btn', $bar).rebind('click.df', function() {
+            fileconflict.resolveExistedDuplication(dups, id);
+        });
+        $('.fix-me-close', $bar).rebind('click.df', function() {
+            $('.files-grid-view.fm').removeClass('duplication-found');
+            $('.fm-blocks-view.fm').removeClass('duplication-found');
+            $('.duplicated-items-found').addClass('hidden');
+        });
+    }
+}));
+
 
 /**
  * Handle a redirect from the mega.co.nz/#pro page to mega.nz/#pro page
@@ -1392,18 +1455,23 @@ MegaUtils.prototype.transferFromMegaCoNz = function(data) {
             // If the user is already logged in but with a different account just load that account instead. The
             // hash they came from e.g. a folder link may not be valid for this account so just load the file manager.
             else if (u_k && (JSON.stringify(u_k) !== JSON.stringify(urlParts[0]))) {
-                if (!urlParts[2] || String(urlParts[2]).match(/^fm/)) {
-                    loadSubPage('fm');
-                    return false;
-                }
-                else {
-                    loadSubPage(toPage);
-                    // if user click MEGAsync pro upgrade button and logged in as different account on webclient.
-                    if (String(urlParts[2]).startsWith('pro')) {
-                        later(msgDialog.bind(null, 'warninga', l[882], l[19341]));
+                // if user click MEGAsync pro upgrade button and logged in as different account on webclient.
+                msgDialog(
+                    'warninga',
+                    l[882],
+                    l[19341],
+                    '',
+                    function() {
+                        if (!urlParts[2] || String(urlParts[2]).match(/^fm/)) {
+                            loadSubPage('fm');
+                            return false;
+                        }
+                        loadSubPage(toPage);
+                        return false;
                     }
-                    return false;
-                }
+                );
+
+                return false;
             }
 
             // Likely that they have never logged in here before so we must set this
@@ -1428,7 +1496,7 @@ MegaUtils.prototype.transferFromMegaCoNz = function(data) {
             var _rawXHR = function(url, data, callback) {
                 M.xhr(url, JSON.stringify([data]))
                     .always(function(ev, data) {
-                        var resp;
+                        var resp = data | 0;
                         if (typeof data === 'string' && data[0] === '[') {
                             try {
                                 resp = JSON.parse(data)[0];
@@ -1442,9 +1510,10 @@ MegaUtils.prototype.transferFromMegaCoNz = function(data) {
 
             // Performs a regular login as part of the transfer from mega.co.nz
             _rawXHR(apipath + 'cs?id=0&sid=' + u_sid, {'a': 'ug'}, function(data) {
+
                 var ctx = {
                     checkloginresult: function(ctx, result) {
-                        u_type = result;
+                        u_type = result === ESID ? false : result;
                         if (toPage.substr(0, 1) === '!' && toPage.length > 7) {
                             _rawXHR(apipath + 'cs?id=0&domain=meganz',
                                 {'a': 'g', 'p': toPage.substr(1, 8)},
@@ -1460,42 +1529,13 @@ MegaUtils.prototype.transferFromMegaCoNz = function(data) {
                         }
                     }
                 };
-                if (data) {
-                    api_setsid(u_sid);
-                    u_storage.sid = u_sid;
-                    u_checklogin3a(data, ctx);
-                }
-                else {
-                    u_checklogin(ctx, false);
-                }
+                api_setsid(u_sid);
+                u_storage.sid = u_sid;
+                u_checklogin3a(data, ctx);
             });
             return false;
         }
     }
-};
-
-/** Don't report `newmissingkeys` unless there are *new* missing keys */
-MegaUtils.prototype.checkNewMissingKeys = function() {
-    var result = true;
-
-    try {
-        var keys = Object.keys(missingkeys).sort();
-        var hash = MurmurHash3(JSON.stringify(keys));
-        var prop = u_handle + '_lastMissingKeysHash';
-        var oldh = parseInt(localStorage[prop]);
-
-        if (oldh !== hash) {
-            localStorage[prop] = hash;
-        }
-        else {
-            result = false;
-        }
-    }
-    catch (ex) {
-        console.error(ex);
-    }
-
-    return result;
 };
 
 /**
@@ -1505,7 +1545,7 @@ MegaUtils.prototype.checkNewMissingKeys = function() {
  */
 MegaUtils.prototype.getSafeName = function(name) {
     // http://msdn.microsoft.com/en-us/library/aa365247(VS.85)
-    name = ('' + name).replace(/[:\/\\<">|?*]+/g, '.').replace(/\s*\.+/g, '.');
+    name = ('' + name).replace(/["*/:<>?\\|]+/g, '.');
 
     if (name.length > 250) {
         name = name.substr(0, 250) + '.' + name.split('.').pop();
@@ -1530,9 +1570,10 @@ MegaUtils.prototype.getSafeName = function(name) {
  *
  * this method will be called to control, renamings from webclient UI.
  * @param {String} name The filename
+ * @param {Boolean} [allowPathSep] whether to allow ether / or \ as a mean for nested folder creation requirements.
  * @returns {Boolean}
  */
-MegaUtils.prototype.isSafeName = function (name) {
+MegaUtils.prototype.isSafeName = function(name, allowPathSep) {
     'use strict';
     // below are mainly denied in windows or android.
     // we can enhance this as much as we can as
@@ -1542,10 +1583,7 @@ MegaUtils.prototype.isSafeName = function (name) {
     if (name.trim().length <= 0) {
         return false;
     }
-    if (name.search(/[\\\/<>:*\"\|?]/) >= 0 || name.length > 250) {
-        return false;
-    }
-    return true;
+    return !(name.search(allowPathSep ? /["*:<>?|]/ : /["*/:<>?\\|]/) >= 0 || name.length > 250);
 };
 
 /**
@@ -1644,6 +1682,9 @@ MegaUtils.prototype.checkStorageQuota = function checkStorageQuota(timeout) {
                 if (is_mobile) {
                     mobile.overStorageQuotaOverlay.close();
                 }
+                if (u_attr) {
+                    delete u_attr.uspw;
+                }
             }
             M.showOverStorageQuota(data);
         });
@@ -1700,34 +1741,48 @@ MegaUtils.prototype.isTypedArray = function(obj) {
     return obj && obj.BYTES_PER_ELEMENT > 0;
 };
 
+/** @property MegaUtils.mTextEncoder */
+lazy(MegaUtils.prototype, 'mTextEncoder', function() {
+    'use strict';
+    return new TextEncoder();
+});
 
 /**
  * Convert data to ArrayBuffer
  * @param {*} data the data to convert
- * @returns {MegaPromise}
+ * @returns {Promise}
  */
-MegaUtils.prototype.toArrayBuffer = function(data) {
+MegaUtils.prototype.toArrayBuffer = promisify(function(resolve, reject, data) {
     'use strict';
 
-    var promise = new MegaPromise();
+    if (typeof data === 'string' && data.substr(0, 5) === 'data:') {
+        data = dataURLToAB(data);
+    }
 
     if (data instanceof Blob) {
-        promise = this.readBlob(data);
+        this.readBlob(data).then(resolve).catch(reject);
+    }
+    else if (typeof data === 'string' && data.substr(0, 5) === 'blob:') {
+        M.xhr({url: data, type: 'arraybuffer'})
+            .then(function(ev, data) {
+                resolve(data);
+            })
+            .catch(function(ex, detail) {
+                reject(detail || ex);
+            });
     }
     else if (this.isTypedArray(data)) {
         if (data.byteLength !== data.buffer.byteLength) {
-            promise.resolve(data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength));
+            resolve(data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength));
         }
         else {
-            promise.resolve(data.buffer);
+            resolve(data.buffer);
         }
     }
     else if (data instanceof ArrayBuffer) {
-        promise.resolve(data);
+        resolve(data);
     }
     else {
-        var ab;
-
         if (typeof data !== 'string') {
             try {
                 data = JSON.stringify(data);
@@ -1735,27 +1790,10 @@ MegaUtils.prototype.toArrayBuffer = function(data) {
             catch (_) {
             }
         }
-        data = String(data);
 
-        if (typeof TextEncoder !== 'undefined') {
-            ab = new TextEncoder().encode(data).buffer;
-        }
-        else {
-            data = to8(data);
-
-            ab = new ArrayBuffer(data.length);
-            var u8 = new Uint8Array(ab);
-
-            for (var i = data.length; i--;) {
-                u8[i] = data.charCodeAt(i);
-            }
-        }
-
-        promise.resolve(ab);
+        resolve(this.mTextEncoder.encode('' + data).buffer);
     }
-
-    return promise;
-};
+});
 
 /**
  * Save files locally
@@ -1794,9 +1832,10 @@ MegaUtils.prototype.saveAs = function(data, filename) {
     }
     else {
         this.toArrayBuffer(data)
-            .tryCatch(function(ab) {
+            .then(function(ab) {
                 saveToDisk(new Uint8Array(ab));
-            }, function() {
+            })
+            .catch(function() {
                 promise.reject.apply(promise, arguments);
             });
     }
@@ -1808,47 +1847,38 @@ MegaUtils.prototype.saveAs = function(data, filename) {
  * Read a Blob
  * @param {Blob|File} blob The blob to read
  * @param {String} [meth] The FileReader method to use, defaults to readAsArrayBuffer
- * @returns {MegaPromise}
+ * @returns {Promise}
  */
 MegaUtils.prototype.readBlob = function(blob, meth) {
     'use strict';
-
-    var reader = new FileReader();
-    var promise = new MegaPromise();
-
-    reader.onload = function() {
-        promise.resolve(this.result);
-    };
-    reader.onerror = function() {
-        promise.reject.apply(promise, arguments);
-    };
-    reader[meth || 'readAsArrayBuffer'](blob);
-
-    return promise;
+    return new Promise(function(resolve, reject) {
+        var reader = new FileReader();
+        reader.onload = function() {
+            resolve(this.result);
+        };
+        reader.onerror = reject;
+        reader[meth || 'readAsArrayBuffer'](blob);
+    });
 };
 
 /**
  * Read a FileSystem's FileEntry
  * @param {FileEntry} entry the.file.entry
  * @param {String} [meth] The FileReader method to use, defaults to readAsArrayBuffer
- * @returns {MegaPromise}
+ * @returns {Promise}
  */
 MegaUtils.prototype.readFileEntry = function(entry, meth) {
     'use strict';
-
-    var promise = new MegaPromise();
-    var reject = promise.reject.bind(promise);
-
-    if (String(entry) === '[object FileEntry]') {
-        entry.file(function(file) {
-            promise.linkDoneAndFailTo(M.readBlob(file, meth));
-        }, reject);
-    }
-    else {
-        reject(EACCESS);
-    }
-
-    return promise;
+    return new Promise(function(resolve, reject) {
+        if (String(entry) === '[object FileEntry]') {
+            entry.file(function(file) {
+                M.readBlob(file, meth).then(resolve).catch(reject);
+            }, reject);
+        }
+        else {
+            reject(EARGS);
+        }
+    });
 };
 
 /**
@@ -1964,8 +1994,7 @@ MegaUtils.prototype.onPersistentDB.fallback = promisify(function(resolve, reject
 });
 
 // Get FileSystem storage ignoring polyfills.
-Object.defineProperty(MegaUtils.prototype, 'requestFileSystem', {
-    get: function() {
+lazy(MegaUtils.prototype, 'requestFileSystem', function() {
         'use strict';
 
         if (!is_chrome_firefox) {
@@ -1975,7 +2004,6 @@ Object.defineProperty(MegaUtils.prototype, 'requestFileSystem', {
                 return requestFileSystem.bind(window);
             }
         }
-    }
 });
 
 /**
@@ -2151,19 +2179,9 @@ MegaUtils.prototype.getPersistentData = promisify(function(resolve, reject, k) {
         var tmpPromise = this.getFileSystemEntry(k);
 
         tmpPromise.then(function(entry) {
-            tmpPromise = self.readFileEntry(entry, 'readAsText');
-
-            tmpPromise.then(function(data) {
-                try {
-                    return resolve(JSON.parse(data));
-                }
-                catch (_) {
-                }
-
-                resolve(data);
-            });
-
-            tmpPromise.catch(reject);
+            return self.readFileEntry(entry, 'readAsText');
+        }).then(function(data) {
+            resolve(JSON.parse(data));
         }).catch(function(ex) {
             if (ex && ex.name === 'SecurityError') {
                 // Running on Incognito mode?
@@ -2206,10 +2224,7 @@ MegaUtils.prototype.setPersistentData = promisify(function(resolve, reject, k, v
                         resolve();
                     };
 
-                    tmpPromise = M.toArrayBuffer(v)
-                        .tryCatch(function(ab) {
-                            writer.write(new Blob([ab]));
-                        }, writer.onerror.bind(writer));
+                    writer.write(new Blob([tryCatch(JSON.stringify.bind(JSON))(v) || '{}']));
                 };
 
                 writer.onerror = function(e) {
@@ -2315,29 +2330,27 @@ MegaUtils.prototype.getPersistentDataEntries = promisify(function(resolve, rejec
                     return resolve(entries);
                 }
 
-                (function _readEntries(idx) {
-                    var next = function() {
-                        onIdle(_readEntries.bind(this, ++idx));
-                    };
+                var promises = [];
+                for (var i = 0; i < entries.length; ++i) {
+                    promises.push(M.readFileEntry(result[entries[i]], 'readAsText'));
+                }
 
-                    if (idx === entries.length) {
+                Promise.allSettled(promises)
+                    .then(function(r) {
+                        var parse = tryCatch(JSON.parse.bind(JSON), false);
+
+                        for (var i = 0; i < r.length; ++i) {
+                            if (r[i].status === 'fulfilled') {
+                                result[entries[i]] = parse(r[i].value);
+                            }
+                            else {
+                                console.warn('Failed to read filesystem entry...', entries[i], r[i].reason);
+                                result[entries[i]] = false;
+                            }
+                        }
                         resolve(result);
-                    }
-                    else {
-                        M.readFileEntry(result[entries[idx]], 'readAsText')
-                            .fail(next)
-                            .done(function(data) {
-                                try {
-                                    result[entries[idx]] = JSON.parse(data);
-                                }
-                                catch (_) {
-                                    result[entries[idx]] = data;
-                                }
-
-                                next();
-                            });
-                    }
-                })(0);
+                    })
+                    .catch(reject);
             }).catch(function(ex) {
                 if (Object(ex).name === "SecurityError") {
                     // Running on Incognito mode?

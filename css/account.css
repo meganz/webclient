@@ -5,7 +5,7 @@
     padding-top: 94px;
 }
 .bottom-page.sign .main-left-block {
-    width: 456px;
+    width: 486px;
     padding:64px 0;
 }
 .account.register-form, .account.login-form {
@@ -44,12 +44,29 @@
     margin-left: 4px;
     color: #aaa;
 }
+.account.register-form .dialog-dark-bottom.login, .account.login-form .dialog-dark-bottom.register {
+    width: calc(100% + 96px);
+    margin-left: -48px;
+    padding: 0 48px;
+    color: #ddd;
+    line-height: 48px;
+}
+.main-left-block.confirm .account.login-form .dialog-dark-bottom.register,
+.main-left-block.businessSubAc .account.register-form .dialog-dark-bottom.login  {
+    display: none;
+}
+.account.register-form .dialog-dark-bottom.login a, .account.login-form .dialog-dark-bottom.register a {
+    font-size: 15px;
+    color: #fff;
+    font-family: 'LatoWebBold', 'source_sans_prosemibold', Arial;
+    margin-left: 4px;
+}
 .account.top-header {
-    font-family: 'montserrat_light', 'LatoWeb', 'source_sans_proregular', Arial;
-    font-size: 32px;
+    font-family: 'montserrat', 'LatoWeb', 'source_sans_proregular', Arial;
+    font-size: 28px;
     line-height: 44px;
     color: #333;
-    padding: 40px 0 48px 0;
+    padding: 48px 0 40px 0;
 }
 .fm-dialog-header .account.top-header {
     padding: 40px 0px 10px 40px;
@@ -164,6 +181,7 @@
     opacity: 0;
 }
 .account.input-wrapper .select-arrow {
+    z-index: -1;
     left: auto;
     right: 5px;
     -webkit-transition: transform 200ms ease-in-out;
@@ -608,11 +626,11 @@ body.ar .sms-verification-number-input {
 }
 
 /* New register page */
-.big-illustration.register, .big-illustration.login {
+.big-illustration {
     width: 400px;
     height: 142px;
     display: inline-block;
-    background-image: url(../images/mega/register-sprite_v2.png);
+    background-image: url(../images/mega/register-sprite_v3.png);
     background-repeat: no-repeat;
 }
 .big-illustration.register.shield {
@@ -676,7 +694,7 @@ body.ar .sms-verification-number-input {
     -moz-box-shadow: none;
     box-shadow: none;
     margin: 0;
-    opacity: 0.8;
+    opacity: 0.4;
     -webkit-transition: all 250ms ease-in-out;
     -moz-transition: all 250ms ease-in-out;
     -o-transition: all 250ms ease-in-out;

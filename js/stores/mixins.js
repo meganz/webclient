@@ -1,6 +1,8 @@
 import ReactDOM from "react-dom";
 import React from "react";
 
+var INTERSECTION_OBSERVER_AVAILABLE = typeof IntersectionObserver !== 'undefined';
+
 // copied from Facebook's shallowEqual, used in PureRenderMixin, because it was defined as a _private_ module and
 // adapted to be a bit more optimal for functions...
 function shallowEqual(objA, objB) {
@@ -47,10 +49,10 @@ var DEBOUNCED_UPDATE_TIMEOUT = 60;
 var REENABLE_UPDATES_AFTER_TIMEOUT = 300;
 
 var MAX_TRACK_CHANGES_RECURSIVE_DEPTH = 1;
-var _propertyTrackChangesVars = {
-    _dataChangedHistory: {},
-    _listenersMap: {}
-};
+
+let _propertyTrackChangesVars = Object.create(null);
+_propertyTrackChangesVars._listenersMap = Object.create(null);
+_propertyTrackChangesVars._dataChangedHistory = Object.create(null);
 
 if (window._propertyTrackChangesVars) {
     _propertyTrackChangesVars = window._propertyTrackChangesVars;
@@ -60,7 +62,6 @@ else {
 }
 
 window.megaRenderMixinId = window.megaRenderMixinId ? window.megaRenderMixinId : 0;
-
 
 var FUNCTIONS = [
     'render',
@@ -77,7 +78,7 @@ var FUNCTIONS = [
     'updateScroll',
     'isActive',
     'onMessagesScrollReinitialise',
-    'specificShouldComponentUpdate',
+    'specShouldComponentUpdate',
     'attachAnimationEvents',
     'eventuallyReinitialise',
     'reinitialise',
@@ -97,35 +98,201 @@ if (localStorageProfileRenderFns) {
     window.REACT_RENDER_CALLS = {};
 }
 
-var ID_CURRENT = 0;
+let ID_CURRENT = 1;
+const DEBUG_THIS = d > 1 ? d : false;
 
-export default superClass => class MegaRenderMixin extends superClass {
-    constructor (props) {
+const scheduler = (func, name, debug) => {
+    let dbug = debug !== false && DEBUG_THIS;
+    let idnt = null;
+    let task = null;
+    let fire = () => {
+        if (dbug) {
+            console.warn('Dispatching scheduled task for %s.%s...', idnt, name);
+        }
+        if (task) {
+            queueMicrotask(task);
+            task = null;
+        }
+    };
+    const _scheduler = function() {
+        if (dbug) {
+            if (!idnt) {
+                idnt = name[0] === '(' && this.getReactId && this.getReactId() || this;
+            }
+            console.warn('Scheduling task from %s.%s...', idnt, name, [this], !!task);
+        }
+        if (!task) {
+            queueMicrotask(fire);
+        }
+        let idx = arguments.length;
+        const args = new Array(idx);
+        while (idx--) {
+            args[idx] = arguments[idx];
+        }
+        task = () => {
+            func.apply(this, args);
+        };
+    };
+    if (DEBUG_THIS) {
+        Object.defineProperty(_scheduler, smbl(name), {value: func});
+    }
+    return _scheduler;
+};
+
+export const timing = (min, max) => {
+    return function(target, key, de) {
+        if (DEBUG_THIS > 2) {
+            de[key] = de.value;
+            _timing(de, min, max);
+            de.value = de[key];
+        }
+        return de;
+    };
+};
+
+export const logcall = () => {
+    return function(target, key, descriptor) {
+        if (DEBUG_THIS > 3) {
+            const func = descriptor.value;
+            descriptor.value = function() {
+                console.group('[logcall] Entering into %s.%s...', this, key);
+                var r = func.apply(this, arguments);
+                console.info('[logcall] Leaving %s.%s...', this, key);
+                console.groupEnd();
+                return r;
+            };
+        }
+        return descriptor;
+    };
+};
+
+export const schedule = (local, debug) => {
+    return function(target, property, descriptor) {
+        if (local) {
+            const func = descriptor.value;
+            descriptor = {
+                configurable: true,
+                get: function _unusedScheduler() {
+                    Object.defineProperty(this, property, {
+                        value: scheduler(func, '(' + property + ')', debug)
+                    });
+                    return this[property];
+                }
+            };
+        }
+        else {
+            descriptor.value = scheduler(descriptor.value, property, debug);
+        }
+
+        return descriptor;
+    };
+};
+
+export const SoonFcWrap = (milliseconds, local) => {
+    return function(target, propertyKey, descriptor) {
+        descriptor.value = SoonFc(descriptor.value, !local, milliseconds);
+        return descriptor;
+    };
+};
+
+export const trycatcher = () => (t, p, d) => (d.value = tryCatch(d.value)) && d;
+
+export class MegaRenderMixin extends React.Component {
+    constructor(props) {
         super(props);
-        this.__intersectionObserver = this.__intersectionObserver.bind(this);
+
+        /** @property MegaRenderMixin.__internalReactID */
+        lazy(this, '__internalReactID', function() {
+            let key = '';
+            let fib = DEBUG_THIS && this._reactInternalFiber;
+            while (fib) {
+                let tmp = fib.key;
+                if (tmp && tmp[0] !== '.' && key.indexOf(tmp) < 0) {
+                    key += tmp + '/';
+                }
+                if ((tmp = fib.memoizedProps)) {
+                    if (tmp.contact) {
+                        tmp = tmp.contact.u + (tmp.chatRoom ? '@' + tmp.chatRoom.roomId : '');
+                    }
+                    else if (tmp.chatRoom) {
+                        tmp = tmp.chatRoom.roomId;
+                    }
+                    else {
+                        tmp = 0;
+                    }
+                    if (tmp && key.indexOf(tmp) < 0) {
+                        key += tmp + '/';
+                    }
+                }
+                fib = fib._debugOwner;
+            }
+            key = key ? '[' + key.substr(0, key.length - 1) + ']' : '';
+            return '::' + this.constructor.name + '[' + ('000' + ID_CURRENT++).slice(-4) + ']' + key;
+        });
+
+        /** @property MegaRenderMixin.__internalUniqueID */
+        lazy(this, '__internalUniqueID', function() {
+            return (this.__internalReactID + makeUUID().substr(-12)).replace(/[^a-zA-Z0-9]/g, '');
+        });
+
+        Object.defineProperty(this, 'isMounted', {
+            value: function MegaRenderMixin_isMounted() {
+                return !!this.__isMounted;
+            }
+        });
+
+        if (DEBUG_THIS > 2) {
+            Object.defineProperty(this, 'safeForceUpdate', {
+                value: function MegaRenderMixin_safeForceUpdate_debug() {
+                    console.group('%s.safeForceUpdate: mounted:%s, visible:%s',
+                        this.getReactId(), this.__isMounted, this.isComponentEventuallyVisible());
+
+                    if (this.__isMounted) {
+                        this.forceUpdate(() => {
+                            console.warn('%s.safeForceUpdate finished.', this.getReactId());
+                            console.groupEnd();
+                        });
+                    }
+                }
+            });
+        }
+
+        if (DEBUG_THIS) {
+            if (!megaChat.__components) {
+                megaChat.__components = new WeakMap();
+            }
+            megaChat.__components.set(this, Object.getPrototypeOf(this));
+        }
     }
-    isMounted() {
-        return !!this.__isMounted;
-    }
+
+    @logcall()
     componentWillUnmount() {
         if (super.componentWillUnmount) {
             super.componentWillUnmount();
         }
         this.__isMounted = false;
-        $(window).off('resize.megaRenderMixing' + this.getUniqueId());
-        $(window).off('resize.megaRenderMixing2' + this.getUniqueId());
+        chatGlobalEventManager.removeEventListener('resize', 'megaRenderMixing' + this.getUniqueId());
+        chatGlobalEventManager.removeEventListener('hashchange', 'hc' + this.getUniqueId());
 
-        window.removeEventListener('hashchange', this.queuedUpdateOnResize.bind(this));
-
-        if (
-            typeof this.__intersectionVisibility !== 'undefined' &&
-            this.__intersectionObserver &&
-            this.__intersectionObserver.unobserve
-        ) {
-            this.__intersectionObserver.disconnect();
-            delete this.__intersectionObserver;
-            this.__intersectionVisibility = undefined;
+        if (this.__intersectionObserverInstance) {
+            var node = this.findDOMNode();
+            if (node) {
+                this.__intersectionObserverInstance.unobserve(node);
+            }
+            this.__intersectionObserverInstance.disconnect();
+            this.__intersectionObserverInstance = undefined;
         }
+
+        var instanceId = this.getUniqueId();
+        var listeners = _propertyTrackChangesVars._listenersMap[instanceId];
+        if (listeners) {
+            for (var k in listeners) {
+                var v = listeners[k];
+                v[0].removeChangeListener(v[1]);
+            }
+        }
+        _propertyTrackChangesVars._listenersMap[instanceId] = null;
+        _propertyTrackChangesVars._dataChangedHistory[instanceId] = null;
 
         if (this._dataStructListeners) {
             this._internalDetachRenderCallbacks();
@@ -135,65 +302,34 @@ export default superClass => class MegaRenderMixin extends superClass {
             this.detachRerenderCallbacks();
         }
     }
+
     getReactId() {
-        // Since react dropped their _rootNodeId's, we would use some hacky locally generated id
-        if (!this._id) {
-            this._id = this._reactInternalFiber.type.name + new String(ID_CURRENT++);
-        }
-        return this._id;
+        return this.__internalReactID;
     }
+
     getUniqueId() {
-        if (!this._reactInternalFiber) {
-            assert(this._uniqueId, 'missing unique id.');
-            return this._uniqueId;
-        }
-        this._uniqueId = this.getReactId().replace(/[^a-zA-Z0-9]/g, "");
-        return this._uniqueId;
+        return this.__internalUniqueID;
     }
-    debouncedForceUpdate(timeout) {
-        var self = this;
-        if (typeof(self.skippedUpdates) === 'undefined') {
-            self.skippedUpdates = 0;
-        }
 
-        if (self.debounceTimer) {
-            clearTimeout(self.debounceTimer);
-            // console.error(self.getUniqueId(), self.skippedUpdates + 1);
-            self.skippedUpdates++;
-        }
-        var TIMEOUT_VAL = timeout || DEBOUNCED_UPDATE_TIMEOUT;
-
-        if (self.skippedUpdates > MAX_ALLOWED_DEBOUNCED_UPDATES) {
-            TIMEOUT_VAL = 0;
-        }
-
-        self.debounceTimer = setTimeout(function() {
-            self.eventuallyUpdate();
-            self.debounceTimer = null;
-            self.skippedUpdates = 0;
-        }, TIMEOUT_VAL);
+    @SoonFcWrap(50, true)
+    debouncedForceUpdate() {
+        this.eventuallyUpdate();
     }
-    __intersectionObserver(entries) {
-        if (entries[0].intersectionRatio <= 0) {
-            this.__intersectionVisibility = false;
-        }
-        else {
-            this.__intersectionVisibility = true;
-        }
-    }
+
+    @logcall()
     componentDidMount() {
         if (super.componentDidMount) {
             super.componentDidMount();
         }
         this.__isMounted = true;
-        if (this.props.requiresUpdateOnResize) {
-            $(window).rebind('resize.megaRenderMixing' + this.getUniqueId(), this.onResizeDoUpdate.bind(this));
-        }
-        if (!this.props.skipQueuedUpdatesOnResize) {
-            $(window).rebind('resize.megaRenderMixing2' + this.getUniqueId(), this.queuedUpdateOnResize.bind(this));
+        this._wasRendered = true;
+
+        if (this.props.requiresUpdateOnResize || !this.props.skipQueuedUpdatesOnResize) {
+            chatGlobalEventManager.addEventListener('resize',
+                'megaRenderMixing' + this.getUniqueId(), () => this.onResizeDoUpdate());
         }
 
-        window.addEventListener('hashchange', this.queuedUpdateOnResize.bind(this));
+        chatGlobalEventManager.addEventListener('hashchange', 'hc' + this.getUniqueId(), () => this.onResizeDoUpdate());
 
         // init on data structure change events
         if (this.props) {
@@ -204,23 +340,36 @@ export default superClass => class MegaRenderMixin extends superClass {
             this._recurseAddListenersIfNeeded("s", this.state);
         }
 
-        //$(window).rebind(
-        //    'DOMContentLoaded.lazyRenderer' + this.getUniqueId() + ' ' +
-        //    'load.lazyRenderer' + this.getUniqueId() + ' ' +
-        //    'resize.lazyRenderer' + this.getUniqueId() + ' ' +
-        //    'hashchange.lazyRenderer' + this.getUniqueId() + ' ' +
-        //    'scroll.lazyRenderer' + this.getUniqueId(),
-        //    this.requiresLazyRendering
-        //);
-        //
-        //this.requiresLazyRendering();
-
-        if (typeof IntersectionObserver !== 'undefined') {
+        if (INTERSECTION_OBSERVER_AVAILABLE && !this.customIsEventuallyVisible) {
             var node = this.findDOMNode();
             if (node) {
                 this.__intersectionVisibility = false;
-                this.__intersectionObserver = new IntersectionObserver(this.__intersectionObserver);
-                this.__intersectionObserver.observe(node);
+
+                setTimeout(() => {
+                    // bug in IntersectionObserver, that caused the intersection observer to not fire the initial
+                    // visibility call once its initialized
+                    this.__intersectionObserverInstance = new IntersectionObserver(
+                        ([entry]) => {
+                            if (entry.intersectionRatio < 0.2 && !entry.isIntersecting) {
+                                this.__intersectionVisibility = false;
+                            }
+                            else {
+                                this.__intersectionVisibility = true;
+                                if (this._requiresUpdateOnResize) {
+                                    this.debouncedForceUpdate();
+                                }
+                            }
+
+                            if (this.onVisibilityChange) {
+                                this.onVisibilityChange(this.__intersectionVisibility);
+                            }
+                        },
+                        {
+                            threshold: 0.1
+                        }
+                    );
+                    this.__intersectionObserverInstance.observe(node);
+                }, 150);
             }
         }
 
@@ -229,93 +378,79 @@ export default superClass => class MegaRenderMixin extends superClass {
         }
     }
     findDOMNode() {
-        if (this.domNode) {
-            // injected by RenderTo and ModalDialogs
-            return this.domNode;
+        if (!this.domNode) {
+            this.domNode = ReactDOM.findDOMNode(this);
         }
-
-        return ReactDOM.findDOMNode(this);
+        return this.domNode;
     }
     isComponentVisible() {
-        var domNode = $(this.findDOMNode());
-
         // .__isMounted is faster then .isMounted() or any other operation
         if (!this.__isMounted) {
             return false;
+        }
+        if (this.customIsEventuallyVisible) {
+            var result = this.customIsEventuallyVisible();
+            if (result !== -1) {
+                return result;
+            }
         }
 
         if (this.__intersectionVisibility === false) {
             return false;
         }
-        else {
+        else if (this.__intersectionVisibility === true) {
             return true;
         }
+        const domNode = this.findDOMNode();
 
         // offsetParent should NOT trigger a reflow/repaint
-        if (!this.props.hideable && (!domNode || domNode[0].offsetParent === null)) {
+        if (!this.props.hideable && (!domNode || domNode.offsetParent === null)) {
             return false;
         }
-        if (!domNode.is(":visible")) {
+        if (!$(domNode).is(":visible")) {
             return false;
         }
-        if (!verge.inX(domNode[0]) && !verge.inY(domNode[0])) {
-            return false;
-        }
-        return true;
+        return verge.inViewport(domNode);
     }
     /**
      * Lightweight version of .isComponentVisible
      * @returns {bool}
      */
     isComponentEventuallyVisible() {
-        var domNode = this.findDOMNode();
-
-
-        if (this.componentSpecificIsComponentEventuallyVisible) {
-            return this.componentSpecificIsComponentEventuallyVisible();
-        }
-
         // .__isMounted is faster then .isMounted() or any other operation
         if (!this.__isMounted) {
             return false;
         }
 
-        if (this.props.isVisible) {
-            return true;
+        if (this.customIsEventuallyVisible) {
+            return this.customIsEventuallyVisible();
         }
 
-        if (this.__intersectionVisibility === false) {
-            return false;
-        }
-        else {
-            return true;
+        if (typeof this.props.isVisible !== 'undefined') {
+            return this.props.isVisible;
         }
 
-
-        // offsetParent should NOT trigger a reflow/repaint
-        if (!this.props.hideable && (!domNode || domNode.offsetParent === null)) {
-            return false;
-        }
-        return true;
+        return this.__intersectionVisibility !== false;
     }
-    eventuallyUpdate() {
-        var self = this;
 
-        if (self._updatesDisabled === true) {
+    @SoonFcWrap(80, true)
+    eventuallyUpdate() {
+        if (!window.megaChat || megaChat.isLoggingOut
+            || this._updatesDisabled || !this._wasRendered || !this.__isMounted) {
+
             return;
         }
-        if (!self._wasRendered || (self._wasRendered && !self.isMounted())) {
-            return;
-        }
-        if (!self.__isMounted) {
-            return;
-        }
-        if (!self.isComponentEventuallyVisible()) {
+
+        if (!this.isComponentEventuallyVisible()) {
             this._requiresUpdateOnResize = true;
             return;
         }
 
-        self.safeForceUpdate();
+        if (this._requiresUpdateOnResize) {
+            this._requiresUpdateOnResize = false;
+        }
+
+        this.forceUpdate();
     }
     tempDisableUpdates(forHowLong) {
         var self = this;
@@ -334,24 +469,18 @@ export default superClass => class MegaRenderMixin extends superClass {
             self.tempEnableUpdates();
         }, timeout);
     }
+
     tempEnableUpdates() {
         clearTimeout(this._updatesReenableTimer);
         this._updatesDisabled = false;
         this.eventuallyUpdate();
     }
-    queuedUpdateOnResize() {
-        if (this._requiresUpdateOnResize && this.isMounted() && this.isComponentEventuallyVisible()) {
-            this._requiresUpdateOnResize = false;
-            this.eventuallyUpdate();
-        }
-    }
-    onResizeDoUpdate() {
-        if (!this.isMounted() || this._pendingForceUpdate === true) {
-            return;
-        }
 
+    @SoonFcWrap(350, true)
+    onResizeDoUpdate() {
         this.eventuallyUpdate();
     }
+
     // onHashChangeDoUpdate() {
     //     if (!this.isMounted() || this._pendingForceUpdate === true) {
     //         return;
@@ -359,44 +488,40 @@ export default superClass => class MegaRenderMixin extends superClass {
     //
     //     this.eventuallyUpdate();
     // }
+
+    _getUniqueIDForMap(map, payload) {
+        return map + '.' + payload;
+    }
+
     _recurseAddListenersIfNeeded(idx, map, depth) {
-        var self = this;
-        depth = depth ? depth : 0;
+        depth |= 0;
 
+        if (map instanceof MegaDataMap) {
+            var cacheKey = this._getUniqueIDForMap(map, idx);
+            var instanceId = this.getUniqueId();
 
-        if (typeof map._dataChangeIndex !== "undefined") {
-            var cacheKey = this.getReactId() + "_" + map._dataChangeTrackedId + "_" + "_" + this.getElementName() +
-                "_" + idx;
-            if (map.addChangeListener && !_propertyTrackChangesVars._listenersMap[cacheKey]) {
-                _propertyTrackChangesVars._listenersMap[cacheKey] = map.addChangeListener(function () {
-                    self.throttledOnPropOrStateUpdated(map, idx);
-                });
+            if (!_propertyTrackChangesVars._listenersMap[instanceId]) {
+                _propertyTrackChangesVars._listenersMap[instanceId] = Object.create(null);
+            }
+            if (!_propertyTrackChangesVars._listenersMap[instanceId][cacheKey]) {
+                _propertyTrackChangesVars._listenersMap[instanceId][cacheKey]
+                    = [map, map.addChangeListener(() => this.onPropOrStateUpdated())];
             }
         }
-        if (depth+1 > MAX_TRACK_CHANGES_RECURSIVE_DEPTH) {
-            return;
-        }
 
-        if (!self.props.manualDataChangeTracking) {
-            var mapKeys = map._dataChangeIndex !== undefined ? map.keys() : Object.keys(map);
+        if (depth++ < MAX_TRACK_CHANGES_RECURSIVE_DEPTH && !this.props.manualDataChangeTracking) {
+            var mapKeys = map instanceof MegaDataMap ? map.keys() : Object.keys(map);
 
             for (var i = 0; i < mapKeys.length; i++) {
                 var k = mapKeys[i];
                 if (map[k]) {
-                    self._recurseAddListenersIfNeeded(idx + "_" + k, map[k], depth + 1);
+                    this._recurseAddListenersIfNeeded(idx + "_" + k, map[k], depth);
                 }
             }
         }
     }
-    _checkDataStructForChanges(idx, valA, valB, depth) {
-        var self = this;
-        var foundChanges = false;
-        var v = valA;
-        var rv = valB;
 
-        // alias
-        var dataChangeHistory = _propertyTrackChangesVars._dataChangedHistory;
-
+    _checkDataStructForChanges(idx, v, rv, depth) {
         if (!v && v === rv) { // null, undefined, false is ok
             // console.error('r === rv, !v', k, referenceMap, map);
             return false; // continue/skip
@@ -404,50 +529,37 @@ export default superClass => class MegaRenderMixin extends superClass {
         if (!rv && v) { // null, undefined, false is ok
             return true;
         }
-
-        if (v === null && rv !== null) {
-            return true;
-        }
-        else if (v === null && rv === null) {
-            return false;
+        if (v === null) {
+            return rv !== null;
         }
 
-        if (typeof v._dataChangeIndex !== "undefined") {
-            var cacheKey = this.getReactId() + "_" + v._dataChangeTrackedId + "_" + "_" + this.getElementName() +
-                "_" + idx;
+        if (v instanceof MegaDataMap) {
+            var cacheKey = this._getUniqueIDForMap(v, idx);
+            var dataChangeHistory = _propertyTrackChangesVars._dataChangedHistory;
 
-            if (dataChangeHistory[cacheKey] !== v._dataChangeIndex) {
+            var instanceId = this.getUniqueId();
+            if (!dataChangeHistory[instanceId]) {
+                dataChangeHistory[instanceId] = Object.create(null);
+            }
+
+            if (dataChangeHistory[instanceId][cacheKey] !== v._dataChangeIndex) {
                 if (window.RENDER_DEBUG) {
                     console.error(
-                        "changed: ", self.getElementName(), cacheKey, v._dataChangeTrackedId, v._dataChangeIndex, v
+                        "changed: ", this.getElementName(), cacheKey, v._dataChangeTrackedId, v._dataChangeIndex, v
                     );
                 }
 
-                foundChanges = true;
-                dataChangeHistory[cacheKey] = v._dataChangeIndex;
-            } else {
-                // console.error("NOT changed: ", k, v._dataChangeTrackedId, v._dataChangeIndex, v);
+                dataChangeHistory[instanceId][cacheKey] = v._dataChangeIndex;
+                return true;
             }
-        } else if (
-            !(v instanceof Uint8Array) && typeof v === "object" && v !== null &&
-            depth <= MAX_TRACK_CHANGES_RECURSIVE_DEPTH) {
-            if (self._recursiveSearchForDataChanges(idx, v, rv, depth + 1) === true) {
-                foundChanges = true;
-            } else {
-                // console.error("NOT (recursive) changed: ", k, v);
-            }
-        } else if (!(v instanceof Uint8Array) && v && v.forEach && depth < MAX_TRACK_CHANGES_RECURSIVE_DEPTH) {
-            v.forEach(function(v, k) {
-                if (self._recursiveSearchForDataChanges(idx, v[k], rv[k], depth + 1) === true) {
-                    foundChanges = true;
-                    return false; // break
-                }
-            });
-        } else {
-            // console.error("NOT tracked/changed: ", k, v);
+
+            return false;
         }
-        return foundChanges;
+
+        return depth < MAX_TRACK_CHANGES_RECURSIVE_DEPTH && v && v.byteLength === undefined
+            && typeof v === "object" && this._recursiveSearchForDataChanges(idx, v, rv, depth + 1) === true;
     }
+
     _recursiveSearchForDataChanges(idx, map, referenceMap, depth) {
         var self = this;
         depth = depth || 0;
@@ -501,16 +613,16 @@ export default superClass => class MegaRenderMixin extends superClass {
             return true;
         }
 
-        var mapKeys = map._dataChangeIndex ? map.keys() : Object.keys(map);
+        const mapKeys = map instanceof MegaDataMap ? map.keys() : Object.keys(map);
 
-        var foundChanges = false;
-        mapKeys.forEach(function(k) {
-            if (foundChanges === true) {
-                return false; // break
+        for (let i = mapKeys.length; i--;) {
+            let k = mapKeys[i];
+            if (this._checkDataStructForChanges(idx + "_" + k, map[k], referenceMap[k], depth)) {
+                return true;
             }
-            foundChanges = self._checkDataStructForChanges(idx + "_" + k, map[k], referenceMap[k], depth);
-        });
-        return foundChanges;
+        }
+
+        return false;
     }
     shouldComponentUpdate(nextProps, nextState) {
         var shouldRerender = false;
@@ -531,9 +643,9 @@ export default superClass => class MegaRenderMixin extends superClass {
             }
             return false;
         }
-        if (this.componentSpecificIsComponentEventuallyVisible) {
-            // we asume `componentSpecificIsComponentEventuallyVisible` is super quick/does have low CPU usage
-            if (!this._queueUpdateWhenVisible && !this.componentSpecificIsComponentEventuallyVisible()) {
+        if (this.customIsEventuallyVisible) {
+            // we asume `customIsEventuallyVisible` is super quick/does have low CPU usage
+            if (!this._queueUpdateWhenVisible && !this.customIsEventuallyVisible()) {
                 this._queueUpdateWhenVisible = true;
                 if (window.RENDER_DEBUG) {
                     console.error(
@@ -542,15 +654,15 @@ export default superClass => class MegaRenderMixin extends superClass {
                     );
                 }
             }
-            else if (this._queueUpdateWhenVisible && this.componentSpecificIsComponentEventuallyVisible()) {
+            else if (this._queueUpdateWhenVisible && this.customIsEventuallyVisible()) {
                 delete this._queueUpdateWhenVisible;
                 return true;
             }
         }
 
         // component specific control of the React lifecycle
-        if (this.specificShouldComponentUpdate) {
-            var r = this.specificShouldComponentUpdate(nextProps, nextState);
+        if (this.specShouldComponentUpdate) {
+            var r = this.specShouldComponentUpdate(nextProps, nextState);
             if (r === false) {
                 if (window.RENDER_DEBUG) {
                     console.error(
@@ -613,7 +725,8 @@ export default superClass => class MegaRenderMixin extends superClass {
             if (this.state) {
                 this._recurseAddListenersIfNeeded("s", this.state);
             }
-        } else {
+        }
+        else {
             if (window.RENDER_DEBUG) {
                 console.error(
                     "shouldUpdate? No.", "F4", this.getElementName(), this.props, nextProps, this.state, nextState
@@ -623,28 +736,18 @@ export default superClass => class MegaRenderMixin extends superClass {
 
         return shouldRerender;
     }
+
     onPropOrStateUpdated() {
-        if (window.RENDER_DEBUG) console.error("onPropOrStateUpdated", this, this.getElementName(), arguments);
-
-        if (!this.isMounted() || this._pendingForceUpdate === true || this._updatesDisabled === true) {
-            return;
-        }
-        if (megaChat && megaChat.isLoggingOut) {
-            return false;
-        }
-
-        this.forceUpdate();
+        this.eventuallyUpdate();
     }
+
     getElementName() {
         return this._reactInternalFiber.elementType.name;
     }
+
     safeForceUpdate() {
-        try {
-            if (this.__isMounted) {
-                this.forceUpdate();
-            }
-        } catch (e) {
-            console.error("safeForceUpdate: ", e);
+        if (this.__isMounted) {
+            this.forceUpdate();
         }
     }
 
@@ -718,26 +821,19 @@ export default superClass => class MegaRenderMixin extends superClass {
         }
     }
 
-    throttledOnPropOrStateUpdated() {
-        if (this.throttledOnPropOrStateUpdatedHandler) {
-            _cancelOnIdleOrTimeout(this.throttledOnPropOrStateUpdatedHandler);
-        }
-        _onIdleOrTimeout(this.onPropOrStateUpdated.bind(this), 300);
-    }
-
     _internalDetachRenderCallbacks() {
-        if (!this._dataStructListeners) {
-            return;
-        }
+        const items = this._dataStructListeners || false;
 
-        this._dataStructListeners.forEach(function(row) {
-            if (row[0] === 'dsprops') {
-                row[2].removeChangeListener(row[1]);
+        for (let i = items.length; i--;) {
+            let item = items[i];
+
+            if (item[0] === 'dsprops') {
+                console.assert(item[2].removeChangeListener(item[1]), 'listener not found..');
             }
-        });
+        }
     }
     addDataStructListenerForProperties(obj, properties) {
-        if (!obj) {
+        if (!(obj instanceof MegaDataMap)) {
             // this should not happen, but in rare cases it does...so we should just skip.
             return;
         }
@@ -745,15 +841,96 @@ export default superClass => class MegaRenderMixin extends superClass {
         if (!this._dataStructListeners) {
             this._dataStructListeners = [];
         }
+        properties = array.to.object(properties);
 
-
-        var self = this;
-        var id = obj.addChangeListener(function(obj, data, k) {
-            if (properties.indexOf(k) > -1) {
-                self.throttledOnPropOrStateUpdated();
-            }
-        });
+        var id = obj.addChangeListener((obj, data, k) => properties[k] && this.onPropOrStateUpdated());
 
         this._dataStructListeners.push(['dsprops', id, obj]);
     }
-};
+}
+
+
+export class ContactAwareComponent extends MegaRenderMixin {
+    static unavailableAvatars = Object.create(null);
+
+    constructor(props) {
+        super(props);
+        this.loadContactInfo();
+    }
+
+    loadContactInfo() {
+        const contact = this.props.contact;
+        const contactHandle = contact && (contact.h || contact.u);
+
+        if (!(contactHandle in M.u)) {
+            return;
+        }
+
+        const syncName = !contact.firstName && !contact.lastName;
+        const syncMail = (contact.c === 1 || contact.c === 2) && !contact.m && !anonymouschat;
+        const syncAvtr = !avatars[contactHandle] && !ContactAwareComponent.unavailableAvatars[contactHandle];
+
+        const loader = () => {
+            if (!this.isComponentEventuallyVisible()) {
+                // console.warn('xyz', 'no longer visible', [this]);
+                this.__isLoadingContactInfo = null;
+                this._requiresUpdateOnResize = true;
+                return;
+            }
+
+            const promises = [];
+            const chatHandle = pchandle || (this.props.chatRoom && this.props.chatRoom.publicChatHandle);
+
+            if (syncName) {
+                promises.push(M.syncUsersFullname(contactHandle, chatHandle, new MegaPromise()));
+            }
+
+            if (syncMail) {
+                promises.push(M.syncContactEmail(contactHandle, new MegaPromise()));
+            }
+
+            if (syncAvtr) {
+                promises.push(
+                    useravatar.loadAvatar(contactHandle, chatHandle)
+                        .catch(function() {
+                            ContactAwareComponent.unavailableAvatars[contactHandle] = true;
+                        })
+                );
+            }
+
+            // force stuck in "Loading" state
+            // promises.push([function() { return new MegaPromise(); }]);
+
+            MegaPromise.allDone(promises)
+                .always(() => {
+                    this.eventuallyUpdate();
+                    this.__isLoadingContactInfo = false;
+                });
+        };
+
+        if (syncName || syncMail || syncAvtr) {
+            this.__isLoadingContactInfo = setTimeout(loader, 300);
+        }
+    }
+
+    componentDidUpdate() {
+        super.componentDidUpdate();
+
+        if (this.__isLoadingContactInfo === null) {
+            // console.warn('xyz', 'LOADING', [this]);
+            this.loadContactInfo();
+        }
+    }
+
+    componentWillUnmount() {
+        super.componentWillUnmount();
+
+        if (this.__isLoadingContactInfo) {
+            clearTimeout(this.__isLoadingContactInfo);
+        }
+    }
+
+    isLoadingContactInfo() {
+        return !!this.__isLoadingContactInfo;
+    }
+}

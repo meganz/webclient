@@ -244,6 +244,9 @@ mobile.slideshow = {
         // Show the dialog
         mobile.slideshow.$overlay.removeClass('hidden');
 
+        // Update preview state.
+        sessionStorage.setItem('previewNode', nodeHandle);
+
         if (is_video(node)) {
             var videoHtmlTemplate = $('.mobile-video-template');
             var videoHtmlDiv = videoHtmlTemplate.html();
@@ -267,6 +270,14 @@ mobile.slideshow = {
                             $(this).click();
                             return false;
                         });
+
+                        // Autoplay the video / audio file
+                        if ($.autoplay === nodeHandle) {
+                            onIdle(function() {
+                                $('.play-video-button', mobile.slideshow.$overlay).trigger('click');
+                            });
+                            delete $.autoplay;
+                        }
                     }
                 });
             });
@@ -524,6 +535,11 @@ mobile.slideshow = {
     close: function() {
         'use strict';
 
+        if (!mobile.slideshow.$overlay) {
+            // was not opened
+            return;
+        }
+
         // Hide the dialog
         mobile.slideshow.$overlay.addClass('hidden');
 
@@ -531,6 +547,8 @@ mobile.slideshow = {
         mobile.slideshow.cleanupCurrentlyViewedInstance();
         mobile.slideshow.$overlay.find('.slides.mid img').remove();
         mobile.slideshow.$overlay.find('.slides.mid').prepend('<img alt="" /></div>');
+        sessionStorage.removeItem('previewNode');
+        sessionStorage.removeItem('previewTime');
     },
 
     /**

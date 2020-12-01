@@ -43,7 +43,8 @@ var gfsttfbhosts = Object.create(null);
 var __ccXID = 0;
 
 if (localStorage.aTransfers) {
-    Soon(function() {
+    onIdle(function() {
+        'use strict';
         var data = {};
         var now = Date.now();
         try {
@@ -425,8 +426,15 @@ ClassFile.prototype.destroy = function() {
         }
     }
     else {
-        if (!this.emptyFile && !dlmanager.checkLostChunks(this.dl)
-                && (typeof skipcheck === 'undefined' || !skipcheck)) {
+        var skipMacIntegrityCheck = typeof skipcheck !== 'undefined' && skipcheck;
+        var macIntegritySuccess = this.emptyFile || dlmanager.checkLostChunks(this.dl);
+
+        if (skipMacIntegrityCheck && !macIntegritySuccess) {
+            console.warn('MAC Integrity failed, but ignoring...', this.dl);
+            dlmanager.logDecryptionError(this.dl, true);
+        }
+
+        if (!macIntegritySuccess && !skipMacIntegrityCheck) {
             dlmanager.dlReportStatus(this.dl, EKEY);
 
             if (this.dl.zipid) {
@@ -437,6 +445,8 @@ ClassFile.prototype.destroy = function() {
             Zips[this.dl.zipid].done(this);
         }
         else {
+            mBroadcaster.sendMessage('trk:event', 'download', 'completed');
+
             this.dl.onDownloadProgress(
                 this.dl.dl_id, 100,
                 this.dl.size,
@@ -490,6 +500,9 @@ ClassFile.prototype.run = function(task_done) {
     if (!GlobalProgress[this.gid].started) {
         GlobalProgress[this.gid].started = true;
         this.dl.onDownloadStart(this.dl);
+        if (!this.dl.zipid) {
+            mBroadcaster.sendMessage('trk:event', 'download', 'started');
+        }
     }
 
     this.dl.ready = function() {
@@ -543,7 +556,7 @@ ClassFile.prototype.run = function(task_done) {
                         this.dl.byteOffset, resumeOffset);
                 }
 
-                this.dl.mac = this.dl.resumeInfo.mac = [0, 0, 0, 0];
+                this.dl.macs = this.dl.resumeInfo.macs = Object.create(null);
                 this.dl.byteOffset = this.dl.resumeInfo.byteOffset = 0;
 
                 api_req({a: 'log', e: 99651, m: 'download resume attempt failed'});

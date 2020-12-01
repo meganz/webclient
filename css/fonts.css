@@ -214,12 +214,9 @@
 }
 @font-face {
     font-family: 'source_code_proregular';
-    src: url('../fonts/sourcecodepro-regular-webfont.eot');
-    src: url('../fonts/sourcecodepro-regular-webfont.eot?#iefix') format('embedded-opentype'),
-        url('../fonts/sourcecodepro-regular-webfont.woff2') format('woff2'),
-        url('../fonts/sourcecodepro-regular-webfont.woff') format('woff'),
-        url('../fonts/sourcecodepro-regular-webfont.ttf') format('truetype'),
-        url('../fonts/sourcecodepro-regular-webfont.svg#source_code_proregular') format('svg');
+    src: url('../fonts/sourcecodepro-regular-webfont.woff2') format('woff2'),
+         url('../fonts/sourcecodepro-regular-webfont.woff') format('woff'),
+         url('../fonts/sourcecodepro-regular-webfont.ttf') format('truetype');
     font-weight: normal;
     font-style: normal;
     text-rendering: optimizeLegibility;
@@ -256,12 +253,28 @@
     text-rendering: optimizeLegibility;
 }
 @font-face {
-    font-family: 'montserrat_light';
-    src: url('../fonts/montserrat-light-webfont.eot');
-    src: url('../fonts/montserrat-light-webfont.eot?#iefix') format('embedded-opentype'),
-        url('../fonts/montserrat-light-webfont.woff') format('woff'),
-        url('../fonts/montserrat-light-webfont.ttf') format('truetype');
+    font-family: 'montserrat_bold';
+    src: url('../fonts/montserrat-bold-webfont.eot');
+    src: url('../fonts/montserrat-bold-webfont.eot?#iefix') format('embedded-opentype'),
+         url('../fonts/montserrat-bold-webfont.woff2') format('woff2'),
+         url('../fonts/montserrat-bold-webfont.woff') format('woff'),
+         url('../fonts/montserrat-bold-webfont.ttf') format('truetype');
     font-weight: normal;
     font-style: normal;
     text-rendering: optimizeLegibility;
+}
+@font-face {
+    font-family: 'montserrat_light';
+    src: url('../fonts/montserrat-light-webfont.eot');
+    src: url('../fonts/montserrat-light-webfont.eot?#iefix') format('embedded-opentype'),
+        url('../fonts/montserrat-light-webfont.woff2') format('woff2'),
+        url('../fonts/montserrat-light-webfont.woff') format('woff'),
+        url('../fonts/montserrat-light-webfont.ttf') format('truetype');
+     font-weight: normal;
+     font-style: normal;
+     text-rendering: optimizeLegibility;
+ }
+@font-face {
+    font-family: 'Source Code Pro';
+    src: url('../fonts/SourceCodePro-Regular.ttf');
 }

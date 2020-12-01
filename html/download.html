@@ -1,4 +1,4 @@
-<div class="bottom-page scroll-block startpage download light-grey-top">
+<div class="bottom-page scroll-block startpage download light-blue-top animated-page">
     <div class="bottom-page content">
 
         <div class="download top-bar initial">
@@ -15,7 +15,7 @@
                 <div class="download bar-cell progress-cell">
                     <span class="download speed-block">
                         <i class="small-icon icons-sprite green-down-arrow"></i>
-                        <span class="dark-numbers">&mdash; KB/s</span>
+                        <span class="dark-numbers">&mdash; [$23062.k]</span>
                         <span class="light-txt"></span>
                     </span>
                     <div class="download progress-block">
@@ -83,7 +83,7 @@
                         </a>
                     </div>
                     <a class="button top-expand-button transition">
-                        <i class="small-icon icons-sprite arrows-to-bottom"></i>
+                        <i class="small-icon dialog-sprite arrows-to-bottom"></i>
                         <div class="dark-tooltip top">[$20172]</div>
                     </a>
                     <a class="button main-top top-icon menu">
@@ -107,6 +107,22 @@
                                         <div class="bounce1"></div>
                                         <div class="bounce2"></div>
                                         <div class="bounce3"></div>
+                                    </div>
+
+                                     <div class="viewer-vad-control lato hidden">
+                                        <div  class="thumb">
+                                            <img />
+                                        </div>
+                                        <div class="counter">
+                                            0
+                                        </div>
+                                        <div class="label">
+                                            <span>[$22879]</span><i class="small-icon icons-sprite skip"></i>
+                                        </div>
+                                    </div>
+
+                                    <div class="video-progress-bar vad">
+                                        <div class="video-time-bar"></div>
                                     </div>
 
                                     <div class="viewer-bottom-bl">
@@ -144,7 +160,7 @@
                                         <div class="block-view-file-type"></div>
                                     </div>
                                     <div class="download thumb-block">
-                                        <img alt="" scr="">
+                                        <img />
                                     </div>
 
                                     <div class="download file-info">
@@ -153,6 +169,9 @@
                                             <span class="extension"></span>
                                             <a class="download img-preview-button hidden">
                                                 <i class="small-icon icons-sprite lens transition"></i>
+                                            </a>
+                                            <a class="download txt-view-button hidden">
+                                                <i class="small-icon icons-sprite edit-file "></i>
                                             </a>
                                             <div class="video-share-button">
                                                 <i class="small-icon icons-sprite share transition"></i>
@@ -360,7 +379,7 @@
                             </div>
                         <div class="top-expand-wrap">
                             <a class="button top-expand-button transition active">
-                                <i class="small-icon icons-sprite arrows-to-top"></i>
+                                <i class="small-icon dialog-sprite arrows-to-top"></i>
                             </a>
                             <div class="button top-expand-txt transition active">
                                 [$20762]
@@ -439,29 +458,68 @@
             </form>
         </div>
 
-        <div class="bottom-page light-blue centered-textalign top">
-            <div class="startpage top-header">
-                [$20552]
-            </div>
-            <div class="startpage top-info">
-                [$20553]
-            </div>
-            <a href="/account" class="startpage button-48-height white account top-button clickurl"> [$187]</a>
-            <a href="/register" class="startpage button-48-height register top-button clickurl">
-                [$968]
-            </a>
-            <div class="startpage img-wrap">
-                <img class="startpage img1 i1 abs" src="{staticpath}images/mega/bottom-page/start_img1-2@2x.png" alt="MEGA">
-                <img class="startpage img1 i2 abs" src="{staticpath}images/mega/bottom-page/start_img1-1@2x.png" alt="MEGA">
-                <img class="startpage img1 i3 abs" src="{staticpath}images/mega/bottom-page/start_img1-3@2x.png" alt="MEGA">
-                <img class="startpage img1 i4" src="{staticpath}images/mega/bottom-page/start_img1-4@2x.png" alt="MEGA">
-            </div>
-            <div class="startpage scroll-to-top"></div>
+       <div  class="bottom-page banners">
 
+            <!-- Startpage banner!-->
+            <div class="bottom-page top-banner banner1 active">
+                <div class="bottom-page light-blue centered-textalign top-bl">
+                    <div class="startpage top-header top-to-bott">
+                        [$20552]
+                    </div>
+                    <div class="startpage top-info top-to-bott">
+                        [$20553]
+                    </div>
+                    <a href="/account" class="startpage button-48-height white account top-button clickurl top-to-bott"> [$187]</a>
+                    <a href="/register" class="startpage button-48-height register top-button clickurl top-to-bott">
+                        [$968]
+                    </a>
+                    <div class="startpage img-wrap anim">
+                        <img class="startpage img1 i1 abs " src="{staticpath}images/mega/bottom-page/start_img1-2@2x.png" alt="MEGA">
+                        <img class="startpage img1 i2 abs" src="{staticpath}images/mega/bottom-page/start_img1-1@2x.png" alt="MEGA">
+                        <img class="startpage img1 i3" src="{staticpath}images/mega/bottom-page/start_img1-3a@2x.png" alt="MEGA">
+                    </div>
+                </div>
+                <div class="startpage top-notice">
+                    *[$16362]
+                </div>
+            </div>
+
+            <!-- Affiliate banner !-->
+            <div class="bottom-page top-banner affiliate-page banner2">
+                <div class="bottom-page centered-textalign top-bl">
+                    <div class="bottom-page horizontal-centered-bl mid-wide">
+                        <div class="affiliate-page top-header top-to-bott">
+                            [$22712]
+                        </div>
+                        <div class="affiliate-page top-info top-to-bott">
+                            [$22759]
+                        </div>
+                        <div class="affiliate-page buttons top-to-bott">
+                            <a href="/fm/refer" class="bottom-page white-button clickurl dashboard">
+                                [$22740]
+                            </a>
+                            <a href="/register" class="bottom-page white-button  clickurl join ">
+                                [$22760]
+                            </a>
+                        </div>
+                    </div>
+                    <div class="affiliate img-wrap">
+                        <img class="affiliate img1 i2 abs" src="{staticpath}images/mega/bottom-page/affiliate-img1@2x.png" alt="MEGA Affiliate Program">
+                        <img class="affiliate img1 i1 abs" src="{staticpath}images/mega/bottom-page/affiliate-img2@2x.png" alt="MEGA Affiliate Program">
+                        <img class="affiliate img1 i3" src="{staticpath}images/mega/bottom-page/affiliate-img3@2x.png" alt="MEGA Affiliate Program">
+                    </div>
+                </div>
+            </div>
+        
         </div>
-         <div class="startpage top-notice">
-            *[$16362]
-         </div>
+
+        <div class="startpage scroll-to-top"></div>
+        <div class="bottom-page banner-control prev hidden">
+            <i class="bottom-page icon x56 new-pages-sprite left-arrow"></i>
+        </div>
+        <div class="bottom-page banner-control next hidden">
+            <i class="bottom-page icon x56 new-pages-sprite right-arrow"></i>
+        </div>
 
         ((MEGAINFO))
     </div>

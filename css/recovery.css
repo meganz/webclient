@@ -392,7 +392,7 @@
     background-position: -6px -773px;
     width: 24px;
     height: 24px;
-    background-image: url(../images/mega/top-sprite_v7.png);
+    background-image: url(../images/mega/top-sprite_v8.png);
     background-repeat: no-repeat;
     padding-left: 66px;
     margin: 0 -39px 0 0;
@@ -510,8 +510,7 @@
 .improved-recovery-steps .nav-back-icon {
     width: 18px;
     height: 16px;
-    display: inline-block;
-    background-image: url(../images/mega/icons-sprite_v33.png);
+    background-image: url(../images/mega/icons-sprite_v40.png);
     background-repeat: no-repeat;
     background-position: -204px -196px;
     background-size: 262px auto;
@@ -719,9 +718,6 @@
     min-width: 95px;
     margin: 5px 5px 5px 0;
 }
-.securitypractice .improved-recovery-steps .recover-paste-block .right-section > div {
-    margin-left: 8px;
-}
 .improved-recovery-steps .recover-paste-block .right-section > div.no-hover:hover{
     background-color: initial;
 }
@@ -789,11 +785,6 @@
     margin: 30px auto 0;
     height: auto;
     position: relative;
-}
-.securitypractice .improved-recovery-steps .recover-paste-block {
-    background: #fff;
-    border: 1px solid rgba(38,47,59,0.10);
-    margin-top: 24px;
 }
 .improved-recovery-steps .recover-upload-block {
     margin-bottom: 0;

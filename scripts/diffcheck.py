@@ -233,6 +233,7 @@ def reduce_eslint(file_line_mapping, **extra):
     # Go through output and collect only relevant lines to the result.
     result = ['\nESLint output:\n==============\n']
     eslint_expression = re.compile(r'(.+): line (\d+), col \d+, .+')
+    warning_result = []
     for line in output:
         parse_result = eslint_expression.findall(line)
         # Check if we've got a relevant line.
@@ -241,16 +242,108 @@ def reduce_eslint(file_line_mapping, **extra):
             file_name = tuple(re.split(PATH_SPLITTER, file_name))
             # Check if the line is part of our selection list.
             if line_no in file_line_mapping[file_name]:
-                result.append(line)
-
                 if re.search(r': line \d+, col \d+, Warning - ', line):
                     warnings += 1
+                    warning_result.append(line)
+                else:
+                    result.append(line)
+
+    result = result + warning_result;
 
     # Add the number of errors and return in a nicely formatted way.
     error_count = len(result) - 1
     if error_count == 0:
         return '', 0
-    result.append('\n{} issue(s)'.format(error_count))
+    if warnings:
+        result.append('\n{} issue(s) found, {} Errors and {} Wanings'.format(error_count, error_count - warnings, warnings))
+    else:
+        result.append('\n{} error(s) found.'.format(error_count))
+    return '\n'.join(result), error_count - warnings
+
+
+def reduce_stylelint(file_line_mapping, **extra):
+    """
+    Runs StyleLint on the project with the default configured rules. The output
+    is reduced to only contain entries from the Git change set.
+
+    :param file_line_mapping: Mapping of files with changed lines (obtained
+        `get_git_line_sets()`).
+    :param extra: Optional keyword arguments:
+        `norules`: If true, omit verbose output of violated rule identifier
+                   (default: `False` to include rules).
+    :return: A tuple containing the formatted string suitable for output and
+        an integer containing the number of failed rules.
+    """
+    norules = extra['norules'] if 'norules' in extra else False
+    # Get the StyleLint output.
+    os.chdir(PROJECT_PATH)
+    rules = config.STYLELINT_RULES if not norules else ''
+    files_to_test = pick_files_to_test(file_line_mapping, ['css'])
+
+    if len(files_to_test) == 0:
+        logging.info('StyleLint: No modified CSS files found.')
+        return '', 0
+
+    if os.name == 'nt':
+        files_to_test = [x.replace('\\', '/') for x in files_to_test]
+
+    logging.info('Obtaining StyleLint output ...')
+    command = config.STYLELINT_COMMAND.format(binary=config.STYLELINT_BIN,
+                                           rules=rules,
+                                           files=' '.join(files_to_test))
+    warnings = 0
+    output = None
+    try:
+        output = subprocess.check_output(command.split())
+    except subprocess.CalledProcessError as ex:
+        # StyleLint found something, so it has returned an error code.
+        # But we still want the output in the same fashion.
+        output = ex.output
+        # unless no output given, e.g. stderr used for something unexpected.
+        if not output and ex.returncode is 1:
+            return '*** StyleLint: {} ***'.format(ex), 0
+    except OSError as ex:
+        if ex.errno == 2:
+            logging.error('StyleLint not installed.'
+                          ' Try to do so with `npm install`.')
+        else:
+            logging.error('Error calling StyleLint: {}'.format(ex))
+        return '*** StyleLint: {} ***'.format(ex), 0
+    output = output.decode('utf8').replace(PROJECT_PATH + os.path.sep, '').split('\n')
+
+    # Go through output and collect only relevant lines to the result.
+    result = ['\nStyleLint output:\n=================\n']
+    cmdout_expression = re.compile(r'(.+): line (\d+), col \d+, .+')
+    warning_result = []
+    for line in output:
+        parse_result = cmdout_expression.findall(line)
+        # Check if we've got a relevant line.
+        if parse_result:
+            file_name, line_no = parse_result[0][0], int(parse_result[0][1])
+            file_name = tuple(re.split(PATH_SPLITTER, file_name))
+            # Check if the line is part of our selection list, or if a css syntax
+            # error happened within a file since that will halt further parsing
+            if line_no in file_line_mapping[file_name] or re.search(r'CssSyntaxError', line):
+                if re.search(r': line \d+, col \d+, warning - ', line):
+                    warnings += 1
+                    # plugin/no-unsupported-browser-features is too verbose
+                    # with e.g. Chrome 58,59,60,61,62,63,64,65,66,67,68,69
+                    if re.search(r'Unexpected browser feature', line):
+                        line = re.sub(r'(\w+ \d+)(,\d+)+,(\d+)', r'\1-\3', line)
+                    warning_result.append(line)
+                else:
+                    result.append(line)
+
+    result = result + warning_result;
+
+    # Add the number of errors and return in a nicely formatted way.
+    error_count = len(result) - 1
+    if error_count == 0:
+        return '', 0
+    if warnings:
+        result.append('\n{} issue(s) found, {} Errors and {} Wanings'.format(error_count, error_count - warnings, warnings))
+    else:
+        result.append('\n{} error(s) found.'.format(error_count))
     return '\n'.join(result), error_count - warnings
 
 def strip_ansi_codes(s):
@@ -273,7 +366,7 @@ def reduce_htmlhint(file_line_mapping, **extra):
     # Get the HTMLHint output.
     os.chdir(PROJECT_PATH)
     rules = config.HTMLHINT_RULES if not norules else ''
-    files_to_test = pick_files_to_test(file_line_mapping, ['htm', 'html'], re.compile('dont-deploy'))
+    files_to_test = pick_files_to_test(file_line_mapping, ['htm', 'html'], re.compile(r'dont-deploy|html[\\/]pdf'))
 
     if len(files_to_test) == 0:
         logging.info('HTMLHint: No modified HTML files found.')
@@ -391,8 +484,8 @@ def analyse_files_for_special_chars(filename, result):
                 for column, character in enumerate(line):
                     code = ord(character)
                     if code >= 128:
-                        result.append('Found non-ASCII character {} ({}) at file {}, line {}, column {}'
-                                     .format(code, character.encode("utf-8"), filename, linenumber + 1, column))
+                        result.append(u'Found non-ASCII character {} ({}) at file {}, line {}, column {}'
+                                     .format(code, character, filename, linenumber + 1, column))
                         test_fail = True
 
     return test_fail
@@ -404,7 +497,7 @@ def inspectcss(file, ln, line, result):
 
     # check potentially invalid url()s
     match = re.search(r'url\([^)]+images/mega/', line)
-    if match and not re.search(r'url\([\'"]?\.\./images/mega/', line):
+    if match and not re.search(r'url\([\'"]?(\.\./)+images/mega/', line):
         fatal += 1
         result.append('{}:{}: {}\n{}^ Potentially invalid url()'
             .format(file, ln, line, indent))
@@ -466,7 +559,7 @@ def reduce_validator(file_line_mapping, **extra):
     """
 
     exclude = ['vendor', 'asm', 'sjcl', 'dont-deploy', 'secureboot', 'test']
-    special_chars_exclude = ['secureboot', 'test', 'emoji', 'dont-deploy']
+    special_chars_exclude = ['secureboot', 'test', 'emoji', 'dont-deploy', 'pdf.worker']
     logging.info('Analyzing modified files ...')
     result = ['\nValidator output:\n=================']
     warning = 'This is a security product. Do not add unverifiable code to the repository!'
@@ -476,7 +569,7 @@ def reduce_validator(file_line_mapping, **extra):
     diff_files = get_git_diff_files()
     if any(['images/mega' in f for f in diff_files]):
         base_sprites = get_sprite_images()
-        target_sprites = map_list_to_dict([split_sprite_name(f) for f in filter_list(diff_files, r'@2x')])
+        target_sprites = get_sprite_images(get_current_branch())
         for file, version in target_sprites.iteritems():
             if file in base_sprites and base_sprites[file] > version:
                 fatal += 1
@@ -731,6 +824,7 @@ def main(base, target, norules, branch, jscpd):
     """
     CHECKER_MAPPING = {'eslint': reduce_eslint,
                        'htmlhint': reduce_htmlhint,
+                       'stylelint': reduce_stylelint,
                        'validator': reduce_validator,
                        'cppcheck': reduce_cppcheck,
                        'nsiqcppstyle': reduce_nsiqcppstyle,
@@ -763,7 +857,7 @@ def main(base, target, norules, branch, jscpd):
     warnings = count - total_errors
     if count:
         logging.info('Output of reduced results ...')
-        print('\n\n'.join(results).rstrip())
+        print('\n\n'.join(results).rstrip().encode("utf-8"))
 
     if jscpd and copypaste_detector(file_line_mapping):
         total_errors += 1
@@ -778,7 +872,7 @@ def main(base, target, norules, branch, jscpd):
             print('WARNING: {} authors have contributed in this branch, '
                   'consider squashing your commits only\n         by manually running '
                   '"git rebase -i --autosquash {}", unless they do not care.'.format(authors, base))
-        sys.exit(1)
+        sys.exit(0)
 
     if warnings:
         print('\nAll fine, but there were some warnings you may want to look into.')

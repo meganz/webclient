@@ -21,7 +21,10 @@ describe("account unit test", function() {
 
     afterEach(function(done) {
         mStub.restore();
-        attribCache.clear().always(done);
+        attribCache.dbcache = Object.create(null);     // items that reside in the DB
+        attribCache.newcache = Object.create(null);    // new items that are pending flushing to the DB
+        attribCache.delcache = Object.create(null);    // delete items that are pending deletion from the DB
+        done();
     });
 
     describe('user attributes', function() {
@@ -149,9 +152,6 @@ describe("account unit test", function() {
 
             it("private attribute, internal callback OK, custom callback", function() {
                 mStub(ns._logger, '_log');
-
-                mStub(window, 'assertUserHandle');
-                mStub(window, 'base64urldecode').callsFake(_echo);
                 mStub(tlvstore, 'blockDecrypt').callsFake(_echo);
                 mStub(tlvstore, 'tlvRecordsToContainer').callsFake(_echo);
                 var myCallback = sinon.spy();

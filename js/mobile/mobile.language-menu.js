@@ -120,7 +120,7 @@ mobile.languageMenu = {
 
                 // Set a language user attribute on the API (This is a private but unencrypted user
                 // attribute so that the API can read it and send emails in the correct language)
-                if (typeof u_attr !== 'undefined') {
+                if (typeof u_attr !== 'undefined' && u_attr) {
                     mega.attr.set(
                         'lang',
                         selectedLangCode,       // E.g. en, es, pt

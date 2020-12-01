@@ -32,6 +32,7 @@ mobile.cloud = {
         }
 
         // jQuery selectors
+        var $otherPages = $('#fmholder > div:not(.hidden)');
         var $fileManager = $('.mobile.file-manager-block');
 
 
@@ -58,6 +59,9 @@ mobile.cloud = {
         // Hide the loading progress
         loadingDialog.hide();
         loadingInitDialog.hide();
+
+        // Hide other pages that may be showing and show the Cloud Drive
+        $otherPages.addClass('hidden');
 
         // Show the file manager after everything is ready
         $fileManager.removeClass('hidden');
@@ -102,15 +106,18 @@ mobile.cloud = {
     /**
      * After an action packet update to the cloud drive, this function
      * updates the folder and file count for each folder in the current view
+     * @param {String} [nodes] Optional, list of the nodes to be updated
      */
-    countAndUpdateSubFolderTotals: function() {
+    countAndUpdateSubFolderTotals: function(nodes) {
 
         'use strict';
 
-        // Loop through current view
-        for (var i = 0; i < M.v.length; i++) {
+        var list = nodes || M.v;
 
-            var node = M.v[i];
+        // Loop through current view
+        for (var i = 0; i < list.length; i++) {
+
+            var node = list[i];
             var nodeHandle = node.h;
             var nodeType = node.t;
 
@@ -529,8 +536,13 @@ mobile.cloud = {
             }
 
             if (share.isShareExist([node.h], true, true, false)) {
-                $template.find('.shared-folder').removeClass('hidden');
-                $template.find('.regular-folder').addClass('hidden');
+                $('.shared-folder', $template).removeClass('hidden');
+                $('.regular-folder', $template).addClass('hidden');
+            }
+
+            if (mega.megadrop.pufs[node.h]) {
+                $('.megadrop-folder', $template).removeClass('hidden');
+                $('.regular-folder', $template).addClass('hidden');
             }
         }
 
@@ -628,6 +640,10 @@ mobile.cloud = {
 
         // If a file row is tapped
         $fileRows.off('tap').on('tap', function() {
+
+            if (!validateUserAction()) {
+                return false;
+            }
 
             // Get the node handle and node
             var $currentFileRow = $(this);
@@ -883,9 +899,9 @@ mobile.cloud = {
      */
     scrollToFile: function(handle, animationTime) {
         'use strict';
+        var elm = document.getElementById(handle);
+
         animationTime = animationTime === 0 ? 0 : (animationTime || 500);
-        $('.mobile.fm-scrolling').animate({
-            scrollTop: document.getElementById(handle).offsetTop
-        }, animationTime);
+        $('.mobile.fm-scrolling').animate({scrollTop: elm && elm.offsetTop || 0}, animationTime);
     }
 };

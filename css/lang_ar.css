@@ -69,7 +69,7 @@ body.rtl .ultra-huge-pad .business-big-header,
 body.rtl .business-mid-header.left-txt-align,
 body.rtl .business-txt-cols,
 body.rtl .bottom-page.large-header.centered-txt,
-body.rtl .uwp-windows-scrollto-button,
+body.rtl .bottom-page.big-link.scrolldown,
 body.rtl .bottom-page.bott-pad.angle-pad.blue-bg,
 /*body.rtl .bottom-page.full-block,*/
 body.rtl .bottom-page.vertical-pull-up,
@@ -78,7 +78,8 @@ body.rtl .cmd-bg .bottom-page.horizontal-centered-bl,
 body.rtl .inline-block.col-2.cmd-pad .bottom-page.dark-title,
 body.rtl .inline-block.col-2.cmd-pad .bottom-page.dark-txt,
 body.rtl .top-login-warning,
-body.rtl .bottom-menu.body,
+body.rtl .bottom-menu.body .link,
+body.rtl .bottom-menu.company-info,
 body.rtl .membership-pad-bl .reg-st3-name-aligner span,
 body.rtl .fm-dialog.payment-address-dialog,
 body.rtl .fm-dialog.loginrequired-dialog,
@@ -86,7 +87,19 @@ body.rtl .fm-dialog.pass-reminder,
 body.rtl .membership-st2-info .save-money,
 body.rtl .main-mid-pad.third-section .reg-st3-txt-localcurrencyprogram,
 body.rtl .mobile.main-block.park-account-change-password,
-body.rtl .rtl-block-if-rtl {
+body.rtl .button.download.mid-button.to-clouddrive.transition,
+body.rtl .button.download.big-button.to-clouddrive.transition,
+body.rtl .download.transfer-wrapper .download.checkbox-txt,
+body.rtl .about.top-info,
+body.rtl .subuser-sec-profile-container,
+body.rtl .rtl-block-if-rtl,
+body.rtl h1.step-main-question,
+body.rtl .recover-account-body-text,
+body.rtl .col-3.inline-block,
+body.rtl .app-instruction-block option,
+body.rtl .improved-recovery-steps .button-container,
+body.rtl .improved-recovery-steps .info-container,
+body.rtl .fm-dialog.reset-success {
     direction: rtl;
 }
 body.rtl .bottom-page.blue-block.top-pad.bott-pad.mcmd-pg-p,
@@ -109,13 +122,15 @@ body.rtl .big-bott-pad.sync-2 .bottom-page.business-header,
 body.rtl .big-bott-pad.sync-2 .bottom-page.business-text,
 body.rtl .big-bott-pad.sync-4 .bottom-page.vertical-centered-cell.left-cell,
 body.rtl .inline-block.col-2.cmd-pad .bottom-page.dark-txt,
-body.rtl .align-right-if-rtl {
+body.rtl .align-right-if-rtl,
+body.rtl .improved-recovery-steps .park-account-checkbox label {
     text-align: right;
     text-align: justify;
 }
 
 body.rtl .horizontal-centered-bl.huge-pad .bottom-page.business-header,
-body.rtl .horizontal-centered-bl.huge-pad .bottom-page.business-text {
+body.rtl .horizontal-centered-bl.huge-pad .bottom-page.business-text,
+body.rtl .about.top-info {
     text-align: center;
 }
 
@@ -131,24 +146,25 @@ body.rtl .bus-reg-info-block .bus-reg-checkbox {
     margin-left: 12px;
     margin-right: 0px;
 }
-/*body.rtl .membership-st2-info span.number {
-    left: initial;
-    right: -20px;
-}*/
-body.rtl .membership-st2-info .membership-st2-head,
-body.rtl .membership-st2-info .payment-method .provider-name,
-body.rtl .membership-st2-info .membership-radio-label,
+body.rtl .download.big-button.button.to-clouddrive.transition {
+    padding-left: 12px;
+    padding-right: 12px;
+}
+body.rtl .payment-section .payment-method .provider-name,
+body.rtl .payment-section .membership-radio-label,
 body.rtl .main-mid-pad.third-section .payment-instructions,
 body.rtl .main-top-info-block .main-top-info-text {
     direction: rtl;
     text-align: left;
 }
 
-body.rtl .mobile .membership-st2-info .membership-st2-head,
-body.rtl .mobile .membership-st2-info .payment-method .provider-name,
-body.rtl .mobile .membership-st2-info .membership-radio-label,
+body.rtl .mobile .payment-section .payment-method .provider-name,
+body.rtl .mobile .payment-section .membership-radio-label,
 body.rtl .mobile .main-mid-pad.third-section .payment-instructions,
-body.rtl .mobile .main-top-info-block .main-top-info-text {
+body.rtl .mobile .main-top-info-block .main-top-info-text,
+body.rtl .info-block.recovery-key,
+body.rtl .info-block.recovery-key .main-italic-header,
+body.rtl .info-block.recovery-warning .main-italic-header {
     direction: rtl;
     text-align: unset;
 }
@@ -248,4 +264,57 @@ body.rtl .user-management-account-settings .mega-input-title-ontop.short-input s
 body.rtl .user-management-account-settings .mega-input-title-ontop.short-input .list-arrow {
     left: 8px;
     right: auto;
+}
+
+/* Megadrop related for Arabic */
+body.ar .wu-stat .wu-total-curr {
+    width: 50%;
+}
+body.ar .wu-stat .wu-total-speed {
+    width: 35%;
+}
+body.ar .wu-stat .wu-total-perc {
+    width: 15%;
+}
+body.ar .improved-recovery-steps .recover-button.yes::before {
+    background-position: -133px -720px;
+}
+
+body.ar .improved-recovery-steps .recover-button.no::before {
+    background-position: -133px -740px;
+}
+body.ar .improved-recovery-steps .recover-button.yes::before,
+body.ar .improved-recovery-steps .recover-button.no::before {
+    content: '';
+    background-image: url(../images/mega/recover-account-sprite_v1.png);
+    background-repeat: no-repeat;
+    background-size: 344px auto;
+    display: inline-block;
+    width: 20px;
+    height: 11px;
+    margin-left: 8px;
+}
+body.ar .improved-recovery-steps .recover-button.yes::after,
+body.ar .improved-recovery-steps .recover-button.no::after {
+    content: none;
+}
+body.ar .improved-recovery-steps .recover-button.yes.default-grey-button::before,
+body.ar .improved-recovery-steps .recover-button.yes.red-button::before {
+    content: none;
+}
+
+body.ar .improved-recovery-steps .checkbox-container .settings-row {
+    overflow-y: hidden;
+}
+
+body.ar .fm-dialog.reset-success .reset-description-txt a {
+    font-weight: bold;
+}
+
+@media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {
+    body.ar .improved-recovery-steps .recover-button.yes::before,
+    body.ar .improved-recovery-steps .recover-button.no::before {
+        background-image: url(../images/mega/recover-account-sprite_v1@2x.png);
+        background-size: 344px auto;
+    }
 }

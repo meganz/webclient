@@ -47,9 +47,26 @@
 }
 .chat-textarea .popup-button {
     position: absolute;
-    right: 13px;
     top: 13px;
     cursor: pointer;
+}
+.chat-textarea .popup-button.emoji-button {
+    right: 13px;
+}
+.chat-textarea .popup-button.gif-button {
+    right: 48px;
+    width: 22px;
+    height: 22px;
+    border-radius: 4px;
+    background: #999;
+}
+.chat-textarea .popup-button.gif-button.active,
+.chat-textarea .popup-button.gif-button:hover {
+    background: rgb(153,51,255);
+    background: linear-gradient(45deg, rgba(153,51,255,1) 0%,rgba(230,70,182,1) 100%);
+}
+.chat-textarea .popup-button.gif-button i {
+    display: block;
 }
 .chat-textarea .popup-button.left {
     left: 0px;
@@ -111,7 +128,7 @@
     font-size: 14px;
     line-height: 20px;
     font-family: 'LatoWeb', 'source_sans_proregular';
-    width: 100%;
+    width: calc(100% - 14px);
     border: 0;
     padding: 0;
     margin: 0;

@@ -1,13 +1,18 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import MegaRenderMixin from './../../stores/mixins.js';
+import {MegaRenderMixin} from './../../stores/mixins.js';
 import {Avatar} from './../ui/contacts.jsx';
 import utils from './../../ui/utils.jsx';
 
+import { DropdownItem, Dropdown } from './../../ui/dropdowns.jsx';
+import { Button } from './../../ui/buttons.jsx';
+
+// eslint-disable-next-line id-length
 var DEBUG_PARTICIPANTS_MULTIPLICATOR = 1;
 
 
 // 7+1 for myself  = 8
+// eslint-disable-next-line id-length
 var MAX_PARTICIPANTS_FOR_GRID_MODE = 7;
 
 var VIEW_MODES = {
@@ -15,7 +20,143 @@ var VIEW_MODES = {
     "CAROUSEL": 2,
 };
 
-class ConversationAudioVideoPanel extends MegaRenderMixin(React.Component) {
+function muteOrHoldIconStyle(opts, contact) {
+    var props = {};
+    if (opts.onHold) {
+        props.className = "small-icon icon-audio-muted on-hold simpletip";
+        props["data-simpletip"] = l[23542].replace("%s", M.getNameByHandle(contact.u));
+    }
+    else if (!opts.audio) {
+        props.className = "small-icon icon-audio-muted";
+    }
+    else {
+        props.className = "small-icon hidden";
+    }
+    return props;
+}
+
+class RemoteVideoPlayer extends MegaRenderMixin {
+    constructor(props) {
+        super(props);
+        this.state = {};
+    }
+    render() {
+        var self = this;
+        var sess = self.props.sess;
+        var sid = sess.stringSid;
+        var peerMedia = Av.toMediaOptions(this.props.peerAv);
+        // Show avatar for remote video
+        var contact = M.u[base64urlencode(sess.peer)];
+
+        if (!self.props.video) {
+            assert(contact);
+            return <div
+                className={"call user-audio is-avatar " + (self.props.isActive ? "active" : "") +
+                " stream" + sid}
+                onClick={(e) => {
+                    let onPlayerClick = self.props.onPlayerClick;
+                    if (onPlayerClick) { // only set for carousel bottom bar
+                        onPlayerClick(sid);
+                    }
+                }}>
+                {
+                    sess.peerNetworkQuality() === 0 ?
+                        <div className="icon-connection-issues"></div> : null
+                }
+                <div className="center-avatar-wrapper" style={{left: "auto"}}>
+                    <div {...muteOrHoldIconStyle(peerMedia, contact)}></div>
+                    <Avatar contact={contact}  className="avatar-wrapper" simpletip={contact.name}
+                        simpletipWrapper="#call-block"
+                        simpletipOffset={8}
+                        simpletipPosition="top"
+                        hideVerifiedBadge={true}
+                    />
+                </div>
+                <div className="audio-level"
+                    ref={function(ref) {
+                        self.audioLevelDiv = ref;
+                    }}
+                />
+            </div>;
+        }
+        else { // show remote video for that peer
+            return <div
+                className={"call user-video is-video " + (self.props.isActive ? "active" : "") +
+                " stream" + sid + (peerMedia.screen ?  " is-screen" : "")}
+                onClick={(e) => {
+                    let onPlayerClick = self.props.onPlayerClick;
+                    if (onPlayerClick) { // only set for carousel bottom bar
+                        onPlayerClick(sid);
+                    }
+                }}>
+                {
+                    sess.peerNetworkQuality() === 0 ?
+                        <div className="icon-connection-issues"></div> : null
+                }
+                <div {...muteOrHoldIconStyle(peerMedia, contact)}></div>
+                <div className="audio-level"
+                    ref={function(ref) {
+                        self.audioLevelDiv = ref;
+                    }}
+                />
+                <video
+                    autoPlay={true}
+                    className="rmtViewport rmtVideo"
+                    ref="player"
+                />
+            </div>;
+        }
+    }
+    indicateAudioLevel(level) {
+        if (this.audioLevelDiv) {
+            this.audioLevelDiv.style.width = Math.round(level * 100) +'%';
+        }
+    }
+    componentDidMount() {
+        var self = this;
+        if (!self.props.noAudioLevel) {
+            self.props.sess.audioIndicator = this;
+        }
+        super.componentDidMount();
+        self.relinkToStream();
+    }
+    componentWillUnmount() {
+        super.componentWillUnmount();
+        if (this.player) {
+            RTC.detachMediaStream(this.player);
+            delete this.player;
+        }
+    }
+    componentDidUpdate() {
+        super.componentDidUpdate();
+        this.relinkToStream();
+    }
+    relinkToStream() {
+        var self = this;
+        let player = self.refs.player;
+        if (self.props.video) {
+            assert(player);
+            let sess = self.props.sess;
+            if (player.srcObject) {
+                if (player.srcObject.id === sess.remoteStream.id && !player.paused) {
+                    // player already connected and playing this stream
+                    return;
+                }
+                // player was connected to some other session, detach it
+                RTC.detachMediaStream(player);
+            }
+            RTC.attachMediaStream(player, sess.remoteStream);
+        } else {
+            if (player) {
+                RTC.detachMediaStream(player);
+            }
+        }
+    }
+};
+
+
+
+class ConversationAVPanel extends MegaRenderMixin {
     constructor(props) {
         super(props);
         this.state = {
@@ -24,29 +165,60 @@ class ConversationAudioVideoPanel extends MegaRenderMixin(React.Component) {
             'localMediaDisplay': true,
             'viewMode': VIEW_MODES.GRID,
             'selectedStreamSid': false,
-        }
+        };
     }
-    specificShouldComponentUpdate() {
+    specShouldComponentUpdate() {
         if (this.state.fullScreenModeEnabled) {
             return true;
         }
     }
-    getCurrentStreamId() {
+    getActiveSid() {
         var self = this;
-        var chatRoom = self.props.chatRoom;
-        if (!chatRoom.callManagerCall || !chatRoom.callManagerCall.isActive()) {
-            return;
+        var call = self.props.chatRoom.callManagerCall;
+        if (!call) {
+            return false;
         }
-
-        var streams = chatRoom.callManagerCall._streams;
-        var activeStream = self.state.selectedStreamSid || Object.keys(streams)[0];
-        return activeStream;
+        var rtcCall = call.rtcCall;
+        var selected = self.state.selectedStreamSid;
+        if (selected && selected !== "local" && !rtcCall.sessions[base64urldecode(selected)]) {
+            // session doesn't exist anymore, we will select another active peer below
+            selected = null;
+        }
+        if (selected) {
+            return selected;
+        }
+        // we have no active peer, select the first session
+        let sess = Object.values(rtcCall.sessions)[0];
+        return sess ? sess.stringSid : "local";
+    }
+    haveScreenSharingPeer() {
+        var call = this.props.chatRoom.callManagerCall;
+        if (!call) {
+            return false;
+        }
+        var rtcCall = call.rtcCall;
+        if (!rtcCall.sessions) {
+            return false;
+        }
+        var sessions = rtcCall.sessions;
+        /* eslint-disable guard-for-in */
+        for (var sid in sessions) {
+            var av = sessions[sid].peerAv;
+            if ((av != null) && (av & Av.Screen)) {
+                return true;
+            }
+        }
+        /* eslint-enable guard-for-in */
+        return false;
     }
     getViewMode() {
         var chatRoom = this.props.chatRoom;
         var callManagerCall = chatRoom.callManagerCall;
         if (callManagerCall) {
-            var participantsCount = Object.keys(callManagerCall._streams).length * DEBUG_PARTICIPANTS_MULTIPLICATOR;
+            var participantsCount = Object.keys(callManagerCall.rtcCall.sessions).length;
+            if (DEBUG_PARTICIPANTS_MULTIPLICATOR) {
+                participantsCount *= DEBUG_PARTICIPANTS_MULTIPLICATOR;
+            }
             if (participantsCount > MAX_PARTICIPANTS_FOR_GRID_MODE) {
                 return VIEW_MODES.CAROUSEL;
             }
@@ -54,23 +226,23 @@ class ConversationAudioVideoPanel extends MegaRenderMixin(React.Component) {
         if (chatRoom.type === "private") {
             return VIEW_MODES.GRID;
         }
-        var streamKeys = Object.keys(callManagerCall._streams);
-        for (var i = 0; i < streamKeys.length; i++) {
-            var sid = streamKeys[i];
-            if (callManagerCall.getRemoteMediaOptions(sid.split(":")[2]).screen) {
-                return VIEW_MODES.CAROUSEL;
-            }
+        if (this.haveScreenSharingPeer()) {
+            return VIEW_MODES.CAROUSEL;
         }
 
         return this.state.viewMode;
     }
     onPlayerClick(sid) {
-        if (this.getViewMode() === VIEW_MODES.CAROUSEL) {
-            this.setState({'selectedStreamSid': sid});
+        if (this.getViewMode() !== VIEW_MODES.CAROUSEL) {
+            return;
         }
+        this.setState({'selectedStreamSid': sid});
     }
     _hideBottomPanel() {
         var self = this;
+        if (!self.isMounted()) {
+            return;
+        }
         var room = self.props.chatRoom;
         if (!room.callManagerCall || !room.callManagerCall.isActive()) {
             return;
@@ -79,29 +251,17 @@ class ConversationAudioVideoPanel extends MegaRenderMixin(React.Component) {
         var $container = $(ReactDOM.findDOMNode(self));
 
         self.visiblePanel = false;
-        $('.call.bottom-panel, .call.local-video, .call.local-audio, .participantsContainer', $container)
-            .removeClass('visible-panel');
-    }
-    getRemoteSid(sid) {
-        var fullSid = sid || this.state.selectedStreamSid;
-        if (!fullSid) {
-            return false;
-        }
-        var sid = fullSid.split(":")[2];
-
-        if (!sid) {
-            return false;
-        }
-        return sid;
+        $container.removeClass('visible-panel');
+        $(document).trigger('closeDropdowns');
     }
     resizeVideos() {
         var self = this;
         var chatRoom = self.props.chatRoom;
-
-        if (!chatRoom.callManagerCall || !chatRoom.callManagerCall.isActive()) {
+        if (chatRoom.type === "private") {
             return;
         }
-        if (chatRoom.type === "private") {
+        var callManagerCall = chatRoom.callManagerCall;
+        if (!callManagerCall || !callManagerCall.isActive()) {
             return;
         }
 
@@ -127,30 +287,20 @@ class ConversationAudioVideoPanel extends MegaRenderMixin(React.Component) {
         var newWidth;
 
         if (self.getViewMode() === VIEW_MODES.CAROUSEL) {
-            $('.participantsContainer', $container).height('auto');
-            var activeStreamHeight = (
+            var activeStreamHeight =
                 $container.outerHeight() - $('.call-header').outerHeight() -
                 $('.participantsContainer', $container).outerHeight()
-            );
+            ;
 
-            var callManagerCall = chatRoom.callManagerCall;
-            var mediaOpts;
-            if (this.state.selectedStreamSid === "local") {
-                mediaOpts = callManagerCall.getMediaOptions();
-            }
-            else {
-                mediaOpts = callManagerCall.getRemoteMediaOptions(self.getRemoteSid());
-            }
-            var audioIsMuted = mediaOpts.audio;
+            var activeSid = this.getActiveSid();
+            var mediaOpts = (activeSid === "local")
+                ? callManagerCall.getMediaOptions()
+                : callManagerCall.getRemoteMediaOptions(activeSid);
 
             $('.activeStream', $container).height(
                 activeStreamHeight
             );
 
-            $('.activeStream .user-audio .avatar-wrapper', $container)
-                .width(activeStreamHeight - 20)
-                .height(activeStreamHeight - 20)
-                .css('font-size', (100/240 * activeStreamHeight) + "px");
 
             $('.user-video, .user-audio, .user-video video', $container)
                 .width('')
@@ -161,27 +311,24 @@ class ConversationAudioVideoPanel extends MegaRenderMixin(React.Component) {
             $video = $('.activeStream video', $container);
             $mutedIcon = $('.activeStream .icon-audio-muted', $container);
 
-
-
             if ($video.length > 0 && $mutedIcon.length > 0) {
                 if ($video.outerHeight() > 0 && $video[0].videoWidth > 0 && $video[0].videoHeight > 0) {
                     var actualWidth = Math.min(
                         $video.outerWidth(),
-                        ($video[0].videoWidth / $video[0].videoHeight) * $video.outerHeight()
+                        $video[0].videoWidth / $video[0].videoHeight * $video.outerHeight()
                     );
-                    if (!audioIsMuted) {
-                        $mutedIcon.removeClass('hidden');
+                    if (mediaOpts.audio) {
+                        $mutedIcon.addClass('hidden');
                     }
                     else {
-                        $mutedIcon.addClass('hidden');
+                        $mutedIcon.removeClass('hidden');
                     }
 
                     $mutedIcon.css({
                         'right': 'auto',
-                        'top': 24 + 8,
-                        'left': (
-                                ($video.outerWidth() / 2 + actualWidth / 2) - $mutedIcon.outerWidth() - 24
-                        )
+                        'left':
+                            $video.outerWidth() / 2 + actualWidth / 2 - $mutedIcon.outerWidth() - 24
+
                     });
                 }
                 else {
@@ -194,12 +341,8 @@ class ConversationAudioVideoPanel extends MegaRenderMixin(React.Component) {
             }
 
         }
-        else {
-            $('.participantsContainer', $container).height(
-                    $container.outerHeight() - $('.call-header', $container).outerHeight()
-            );
-
-            newWidth = totalWidth/totalStreams;
+        else { // grid mode
+            newWidth = totalWidth / totalStreams;
         }
 
 
@@ -209,7 +352,8 @@ class ConversationAudioVideoPanel extends MegaRenderMixin(React.Component) {
         );
         $resizables.width(newWidth);
 
-        $resizables.each(function (i, elem) {
+        for (var i = 0; i < $resizables.length; i++) {
+            var elem = $resizables[i];
             var $elem = $(elem);
 
             $('video', elem)
@@ -219,7 +363,7 @@ class ConversationAudioVideoPanel extends MegaRenderMixin(React.Component) {
             $elem
                 .width(newWidth)
                 .height(newWidth);
-        });
+        }
     }
     componentDidMount() {
         super.componentDidMount();
@@ -227,22 +371,22 @@ class ConversationAudioVideoPanel extends MegaRenderMixin(React.Component) {
         this.initialRender = false;
     }
     componentDidUpdate() {
+        super.componentDidUpdate();
         var self = this;
         var room = self.props.chatRoom;
-        if (!room.callManagerCall || !room.callManagerCall.isActive()) {
+        var callManagerCall = room.callManagerCall;
+        if (!callManagerCall || !callManagerCall.isActive()) {
             return;
         }
 
         var $container = $(ReactDOM.findDOMNode(self));
 
-
         var mouseoutThrottling = null;
-        $container.rebind('mouseover.chatUI' + self.props.chatRoom.roomId, function() {
+        $container.rebind('mouseover.chatUI' + room.roomId, function() {
             var $this = $(this);
             clearTimeout(mouseoutThrottling);
             self.visiblePanel = true;
-            $('.call.bottom-panel, .call.local-video, .call.local-audio, .participantsContainer', $container)
-                .addClass('visible-panel');
+            $container.addClass('visible-panel');
 
             if ($this.hasClass('full-sized-block')) {
                 $('.call.top-panel', $container).addClass('visible-panel');
@@ -252,10 +396,14 @@ class ConversationAudioVideoPanel extends MegaRenderMixin(React.Component) {
         $container.rebind('mouseout.chatUI' + self.props.chatRoom.roomId, function() {
             var $this = $(this);
             clearTimeout(mouseoutThrottling);
+            if ($('.dropdown.call-actions').length > 0) {
+                return;
+            }
+
             mouseoutThrottling = setTimeout(function() {
                 self.visiblePanel = false;
                 self._hideBottomPanel();
-                $('.call.top-panel', $container).removeClass('visible-panel');
+                $container.removeClass('visible-panel');
             }, 500);
         });
 
@@ -263,6 +411,20 @@ class ConversationAudioVideoPanel extends MegaRenderMixin(React.Component) {
         // Hidding Control panel if cursor is idle
         var idleMouseTimer;
         var forceMouseHide = false;
+        var hideBottomPanel = function() {
+            self.visiblePanel = false;
+
+            self._hideBottomPanel();
+
+            $container.addClass('no-cursor');
+            $container.removeClass('visible-panel');
+
+            forceMouseHide = true;
+            setTimeout(function() {
+                forceMouseHide = false;
+            }, 400);
+        };
+
         $container.rebind('mousemove.chatUI' + self.props.chatRoom.roomId,function(ev) {
             var $this = $(this);
             if (self._bottomPanelMouseOver) {
@@ -271,24 +433,12 @@ class ConversationAudioVideoPanel extends MegaRenderMixin(React.Component) {
             clearTimeout(idleMouseTimer);
             if (!forceMouseHide) {
                 self.visiblePanel = true;
-                $('.call.bottom-panel, .call.local-video, .call.local-audio', $container).addClass('visible-panel');
+                $container.addClass('visible-panel');
                 $container.removeClass('no-cursor');
                 if ($this.hasClass('full-sized-block')) {
                     $('.call.top-panel', $container).addClass('visible-panel');
                 }
-                idleMouseTimer = setTimeout(function() {
-                    self.visiblePanel = false;
-
-                    self._hideBottomPanel();
-
-                    $container.addClass('no-cursor');
-                    $('.call.top-panel', $container).removeClass('visible-panel');
-
-                    forceMouseHide = true;
-                    setTimeout(function() {
-                        forceMouseHide = false;
-                    }, 400);
-                }, 2000);
+                idleMouseTimer = setTimeout(hideBottomPanel, 20000);
             }
         });
 
@@ -299,19 +449,7 @@ class ConversationAudioVideoPanel extends MegaRenderMixin(React.Component) {
         $('.call.bottom-panel', $container).rebind('mouseleave.chatUI' + self.props.chatRoom.roomId,function(ev) {
             self._bottomPanelMouseOver = false;
 
-            idleMouseTimer = setTimeout(function() {
-                self.visiblePanel = false;
-
-                self._hideBottomPanel();
-
-                $container.addClass('no-cursor');
-                $('.call.top-panel', $container).removeClass('visible-panel');
-
-                forceMouseHide = true;
-                setTimeout(function() {
-                    forceMouseHide = false;
-                }, 400);
-            }, 2000);
+            idleMouseTimer = setTimeout(hideBottomPanel, 20000);
         });
 
 
@@ -336,40 +474,22 @@ class ConversationAudioVideoPanel extends MegaRenderMixin(React.Component) {
                     return false;
                 }
 
-                var right = Math.max(0, $container.outerWidth() - ui.position.left);
-                var bottom = Math.max(0, $container.outerHeight() - ui.position.top);
+                var right = Math.max(0, $container.outerWidth(true) - ui.position.left);
+                var bottom = Math.max(0, $container.outerHeight(true) - ui.position.top);
 
 
                 // contain in the $container
-                right = Math.min(right, $container.outerWidth() - 8);
-                bottom = Math.min(bottom, $container.outerHeight() - 8);
+                right = Math.min(right, $container.outerWidth(true) - 8);
+                bottom = Math.min(bottom, $container.outerHeight(true) - 8);
 
-                right = right - ui.helper.outerWidth();
-                bottom = bottom - ui.helper.outerHeight();
-
-                var minBottom = $(this).is(".minimized") ? 48 : 8;
-
-                if (bottom < minBottom) {
-                    bottom = minBottom;
-                    $(this).addClass('bottom-aligned');
-                }
-                else {
-                    $(this).removeClass('bottom-aligned');
-                }
-
-                if (right < 8) {
-                    right = 8;
-                    $(this).addClass('right-aligned');
-                }
-                else {
-                    $(this).removeClass('right-aligned');
-                }
+                right -= ui.helper.outerWidth(true);
+                bottom -= ui.helper.outerHeight(true);
 
                 ui.offset = {
                     left: 'auto',
                     top: 'auto',
-                    right: right,
-                    bottom: bottom,
+                    right: right < 8 ? 8 : right,
+                    bottom: bottom < 8 ? 8 : bottom,
                     height: "",
                     width: ""
                 };
@@ -383,88 +503,20 @@ class ConversationAudioVideoPanel extends MegaRenderMixin(React.Component) {
 
         // REposition the $localMediaDisplay if its OUT of the viewport (in case of dragging -> going back to normal
         // size mode from full screen...)
-        $(window).rebind('resize.chatUI_' + room.roomId, function(e) {
+        chatGlobalEventManager.addEventListener('resize', 'chatUI_' + room.roomId, function() {
             if ($container.is(":visible")) {
                 if (!elementInViewport($localMediaDisplay[0])) {
-                    $localMediaDisplay
-                        .addClass('right-aligned')
-                        .addClass('bottom-aligned')
-                        .css({
-                            'right': 8,
-                            'bottom': 8,
-                        });
+                    $localMediaDisplay.removeAttr('style');
                 }
             }
             self.resizePanes();
             self.resizeVideos();
         });
-
-
-        (self.remoteVideoRefs || []).forEach(function(remoteVideo) {
-            if (
-                remoteVideo &&
-                remoteVideo.src === "" &&
-                remoteVideo.currentTime === 0 &&
-                !remoteVideo.srcObject
-            ) {
-                var stream = room.callManagerCall._streams[remoteVideo.id.split("remotevideo_")[1]];
-                RTC.attachMediaStream(remoteVideo, stream);
-                // attachMediaStream would do the .play call
-            }
-        });
-
-
-        var localStream = room.callManagerCall.localStream();
-        if (
-            localStream &&
-            self.refs.localViewport &&
-            self.refs.localViewport.src === "" &&
-            self.refs.localViewport.currentTime === 0 &&
-            !self.refs.localViewport.srcObject
-        ) {
-            RTC.attachMediaStream(self.refs.localViewport, localStream);
-            // attachMediaStream would do the .play call
-        }
-
-        var bigLocalViewport = $('.bigLocalViewport')[0];
-        var smallLocalViewport = $('.smallLocalViewport')[0];
-
-        if (
-            smallLocalViewport && bigLocalViewport && !bigLocalViewport.src && !bigLocalViewport.srcObject &&
-            localStream &&
-            bigLocalViewport &&
-            bigLocalViewport.src === "" &&
-            bigLocalViewport.currentTime === 0
-        ) {
-            RTC.attachMediaStream(bigLocalViewport, localStream);
-        }
-
-        $(room).rebind('toggleMessages.av', function() {
+        room.rebind('toggleMessages.av', function() {
             self.toggleMessages();
         });
 
         room.messagesBlockEnabled = self.state.messagesBlockEnabled;
-
-        var self = this;
-        this.props.chatRoom.callManagerCall.rebind('onAudioLevelChange.ui', function(e, sid, level) {
-            var elm = $(".stream" + sid.replace(/:/g, "_"));
-
-            if (elm.length === 0) {
-                return;
-            }
-
-            if (level > 10) {
-                $('.avatar-wrapper', elm).css({
-                    'box-shadow': '0px 0px 0px 3px rgba(255, 255, 255, ' + Math.min(0.90, level / 100) + ')'
-                });
-            }
-            else {
-                $('.avatar-wrapper', elm).css({
-                    'box-shadow': '0px 0px 0px 0px rgba(255, 255, 255, 0)'
-                });
-            }
-        });
-
 
         this.props.chatRoom.rebind('onLocalMuteInProgress.ui', function() {
             self.setState({'muteInProgress': true});
@@ -473,12 +525,13 @@ class ConversationAudioVideoPanel extends MegaRenderMixin(React.Component) {
             self.setState({'muteInProgress': false});
         });
 
-        if (self.initialRender === false && ReactDOM.findDOMNode(self)) {
+        if (self.initialRender === false && $container) {
             self.bindInitialEvents();
         }
-
         self.resizePanes();
         self.resizeVideos();
+
+        $('.simpletip', $container).trigger('simpletipUpdated');
     }
     resizePanes() {
         var self = this;
@@ -522,8 +575,8 @@ class ConversationAudioVideoPanel extends MegaRenderMixin(React.Component) {
         }
 
         $(document).off("fullscreenchange.megaChat_" + room.roomId);
-        $(window).off('resize.chatUI_' + room.roomId);
-        $(room).off('toggleMessages.av');
+        chatGlobalEventManager.removeEventListener('resize', 'chatUI_' + room.roomId);
+        room.off('toggleMessages.av');
 
         var $rootContainer = $container.parents('.conversation-panel');
         $('.call-block', $rootContainer).height('');
@@ -545,13 +598,14 @@ class ConversationAudioVideoPanel extends MegaRenderMixin(React.Component) {
             if (predefHeight) {
                 $container.height(parseInt(localStorage.chatAvPaneHeight, 10));
             }
+            $('.simpletip', $container).trigger('simpletipClose');
         }
 
         this.setState({
             'messagesBlockEnabled': !this.state.messagesBlockEnabled
         });
 
-        if (this.state.messagesBlockEnabled === false) {
+        if (!this.state.messagesBlockEnabled) {
             Soon(function() {
                 $(window).trigger('resize');
             });
@@ -562,12 +616,16 @@ class ConversationAudioVideoPanel extends MegaRenderMixin(React.Component) {
         e.stopPropagation();
 
         var newVal = !this.state.fullScreenModeEnabled;
+        var $container = $(ReactDOM.findDOMNode(this));
         $(document).fullScreen(newVal);
+        $('.simpletip', $container).trigger('simpletipClose');
 
         this.setState({
             'fullScreenModeEnabled': newVal,
-            'messagesBlockEnabled': newVal === true ? false : this.state.messagesBlockEnabled
-        });
+            'messagesBlockEnabled': newVal ? false : this.state.messagesBlockEnabled
+        }, () =>
+            this.props.onMessagesToggle && this.props.onMessagesToggle(this.state.messagesBlockEnabled)
+        );
     }
     toggleLocalVideoDisplay(e) {
         e.preventDefault();
@@ -575,29 +633,22 @@ class ConversationAudioVideoPanel extends MegaRenderMixin(React.Component) {
 
         var $container = $(ReactDOM.findDOMNode(this));
         var $localMediaDisplay = $('.call.local-video, .call.local-audio', $container);
+        var newVal = !this.state.localMediaDisplay;
+        $localMediaDisplay.removeAttr('style');
 
-        $localMediaDisplay
-            .addClass('right-aligned')
-            .addClass('bottom-aligned')
-            .css({
-                'width': '',
-                'height': '',
-                'right': 8,
-                'bottom': !this.state.localMediaDisplay === true ? 8 : 8
-            });
-
-        this.setState({localMediaDisplay: !this.state.localMediaDisplay});
+        this.setState({localMediaDisplay: newVal});
     }
     render() {
         var chatRoom = this.props.chatRoom;
-        this.remoteVideoRefs = this.remoteVideoRefs || [];
-
         var self = this;
+        var callManagerCall = chatRoom.callManagerCall;
 
-        if (!chatRoom.callManagerCall || !chatRoom.callManagerCall.isStarted()) {
+        if (!callManagerCall || !callManagerCall.isStarted()) {
             self.initialRender = false;
             return null;
         }
+        var rtcCall = callManagerCall.rtcCall;
+        assert(rtcCall);
 
         var participants = chatRoom.getParticipantsExceptMe();
 
@@ -609,160 +660,85 @@ class ConversationAudioVideoPanel extends MegaRenderMixin(React.Component) {
             );
         });
 
-
-        var callManagerCall = chatRoom.callManagerCall;
-
-        var remoteCamEnabled = null;
-
-
-        if (callManagerCall.getRemoteMediaOptions().video) {
-            remoteCamEnabled = <i className="small-icon blue-videocam" />;
-        }
-
-
         var localPlayerElement = null;
-        var remotePlayerElement = null;
-        var activeStreamIdOrPlayer = (
-            (chatRoom.type === "group" || chatRoom.type === "public") && self.getViewMode() === VIEW_MODES.CAROUSEL ?
-                self.getCurrentStreamId() :
-                false
-        );
-
-        var visiblePanelClass = "";
-        var localPlayerStream = callManagerCall.localStream();
-
-        if (this.visiblePanel === true) {
-            visiblePanelClass += " visible-panel";
+        var remotePlayerElements = [];
+        var onRemotePlayerClick; // handler that exists only for the thumbnail views in the carosel bottom bar
+        var isCarousel = (self.getViewMode() === VIEW_MODES.CAROUSEL);
+        if (isCarousel) {
+            var activeSid = self.getActiveSid();
+            var activePlayer;
+            onRemotePlayerClick = self.onPlayerClick.bind(self);
         }
 
-
-
-        remotePlayerElement = [];
-
-        var realStreams = Object.keys(callManagerCall._streams);
-        var streams = [];
+        var sessions = rtcCall.sessions;
+        var realSids = Object.keys(sessions);
+        var sids = [];
         if (!DEBUG_PARTICIPANTS_MULTIPLICATOR) {
-            streams = realStreams;
+            sids = realSids;
         }
         else {
-            // UI debug mode.
-            var initialCount = realStreams.length;
-            if (initialCount > 0) {
-                for (var i = 0; i < initialCount * DEBUG_PARTICIPANTS_MULTIPLICATOR; i++) {
-                    streams.push(realStreams[(i || 0) % initialCount]);
+            // UI debug mode - simulate more participants
+            // by duplicating each session DEBUG_PARTICIPANTS_MULTIPLICATOR times.
+            var initialCount = realSids.length;
+            for (var i = 0; i < initialCount; i++) {
+                for (var j = 0; j < DEBUG_PARTICIPANTS_MULTIPLICATOR; j++) {
+                    sids.push(realSids[i]);
                 }
             }
         }
 
-        streams.forEach(function(streamId, k) {
-            var stream = callManagerCall._streams[streamId];
-            var userId = streamId.split(":")[0];
-            var clientId = streamId.split(":")[1];
-            var sessionId = streamId.split(":")[2];
-            var remotePlayerStream = stream;
-            var mediaOpts = callManagerCall.getRemoteMediaOptions(sessionId);
+        var visiblePanelClass = this.visiblePanel ? " visible-panel" : "";
+        var localMedia = Av.toMediaOptions(rtcCall.localAv());
+        var haveAnyRemoteVideo = false;
+        sids.forEach(function(binSid, i) {
+            // we use 'i' to uniquely identify views when we have several views for each peer for debug purposes
+            let sess = sessions[binSid];
+            let sid = sess.stringSid;
+            let playerIsActive = activeSid === sid;
+            let av = sess.peerAv();
+            let hasVideo = ((av & Av.Video) != 0) && !sess.call.isOnHold() && !sess.peerIsOnHold();
 
-
-            if (
-                !remotePlayerStream ||
-                (
-                    mediaOpts.video === false && mediaOpts.screen === false
-                )
-            ) {
-                // TODO: When rtc is ready
-                var contact = M.u[userId];
-                var player = <div
-                    className={"call user-audio is-avatar " + (activeStreamIdOrPlayer === streamId ? "active" : "") +
-                    " stream" + streamId.replace(/:/g, "_")}
-                    key={streamId + "_" + k}
-                    onClick={(e) => {
-                        self.onPlayerClick(streamId);
-                    }}>
-                    {
-                        callManagerCall.peerQuality[streamId] === 0 ?
-                            <div className="icon-connection-issues"></div> : null
-                    }
-                    <div className="center-avatar-wrapper">
-                        {
-                            callManagerCall.getRemoteMediaOptions(sessionId).audio === false ?
-                                <div className="small-icon icon-audio-muted"></div> :
-                                <div className="small-icon icon-audio-muted hidden"></div>
-
-                        }
-                        <Avatar contact={contact}  className="avatar-wrapper" simpletip={contact.name}
-                                           simpletipWrapper="#call-block"
-                                           simpletipOffset={8}
-                                           simpletipPosition="top"
-                                           hideVerifiedBadge={true} />
-                    </div>
-                </div>;
-
-                if (activeStreamIdOrPlayer === streamId) {
-                    activeStreamIdOrPlayer = player;
-                }
-                remotePlayerElement.push(player);
+            let player = <RemoteVideoPlayer
+                sess = {sess}
+                key = {sid + "_" + i}
+                peerAv = {av}
+                video = {hasVideo}
+                isActive = {playerIsActive}
+                onPlayerClick = { onRemotePlayerClick }
+            />;
+            if (playerIsActive && isCarousel) {
+                activePlayer = <RemoteVideoPlayer
+                    sess = {sess}
+                    key = {"carousel_active"}
+                    peerAv = {av}
+                    video = {hasVideo}
+                    isCarouselMain = {true}
+                    noAudioLevel = {true}
+                />;
             }
-            else {
-                player = <div
-                    className={"call user-video is-video " + (activeStreamIdOrPlayer === streamId ? "active" : "") +
-                    " stream" + streamId.replace(/:/g, "_") + (mediaOpts.screen ?  " is-screen" : "")}
-                    key={streamId + "_"+ k}
-                    onClick={(e) => {
-                        self.onPlayerClick(streamId);
-                    }}>
-                    {
-                        callManagerCall.peerQuality[streamId] === 0 ?
-                            <div className="icon-connection-issues"></div> : null
-                    }
-                    {
-                        callManagerCall.getRemoteMediaOptions(sessionId).audio === false ?
-                            <div className="small-icon icon-audio-muted"></div> :
-                            <div className="small-icon icon-audio-muted hidden"></div>
-                    }
-                    <video
-                        autoPlay={true}
-                        className="rmtViewport rmtVideo"
-                        id={"remotevideo_" + streamId}
-                        ref={function(ref) {
-                            if (ref && self.remoteVideoRefs.indexOf(ref) === -1) {
-                                self.remoteVideoRefs.push(ref);
-                            }
-                        }}
-                    />
-                </div>;
-
-                if (activeStreamIdOrPlayer === streamId) {
-                    activeStreamIdOrPlayer = player;
-                }
-                remotePlayerElement.push(player);
-            }
+            remotePlayerElements.push(player);
         });
 
         if (this.getViewMode() === VIEW_MODES.GRID) {
-            if (!localPlayerStream || (
-                callManagerCall.getMediaOptions().video === false && callManagerCall.getMediaOptions().screen === false
-            )) {
+            if (!localMedia.video) {
+                // no local video, display our avatar
                 localPlayerElement = <div className={
                     "call local-audio right-aligned bottom-aligned is-avatar" +
-                    (this.state.localMediaDisplay ? "" : " minimized ") +
-                    visiblePanelClass
+                    (this.state.localMediaDisplay ? "" : " minimized ")
                 }>
                     {
-                        chatRoom.megaChat.networkQuality === 0 ?
+                        megaChat.rtc.ownNetworkQuality() === 0 ?
                             <div className="icon-connection-issues"></div> : null
                     }
                     <div className="default-white-button tiny-button call"
-                         onClick={this.toggleLocalVideoDisplay.bind(this)}>
+                        onClick={this.toggleLocalVideoDisplay.bind(this)}>
                         <i className="tiny-icon grey-minus-icon"/>
                     </div>
-                    <div className={"center-avatar-wrapper " + (this.state.localMediaDisplay ? "" : "hidden")}>
-                        {
-                            callManagerCall.getMediaOptions().audio === false ?
-                                <div className="small-icon icon-audio-muted"></div> :
-                                <div className="small-icon icon-audio-muted hidden"></div>
-                        }
+                    <div className="center-avatar-wrapper">
+                        <div {...muteOrHoldIconStyle(localMedia, M.u[u_handle])}></div>
                         <Avatar
                             contact={M.u[u_handle]}
+                            chatRoom={this.props.chatRoom}
                             className={
                                 "call avatar-wrapper is-avatar " +
                                 (this.state.localMediaDisplay ? "" : "hidden")
@@ -773,83 +749,77 @@ class ConversationAudioVideoPanel extends MegaRenderMixin(React.Component) {
                 </div>;
             }
             else {
+                // we have local video (grid mode)
                 localPlayerElement = <div
                     className={
                         "call local-video right-aligned is-video bottom-aligned" +
                         (this.state.localMediaDisplay ? "" : " minimized ") +
-                        visiblePanelClass +
-                        (activeStreamIdOrPlayer === "local" ? " active " : "") +
-                        (callManagerCall.getMediaOptions().screen ? " is-screen" : "")
+                        (activeSid === "local" ? " active " : "") +
+                        (localMedia.screen ? " is-screen" : "")
                     }>
                     {
-                        chatRoom.megaChat.networkQuality === 0 ?
+                        megaChat.rtc.ownNetworkQuality() === 0 ?
                             <div className="icon-connection-issues"></div> : null
                     }
                     <div className="default-white-button tiny-button call"
-                         onClick={this.toggleLocalVideoDisplay.bind(this)}>
+                        onClick={this.toggleLocalVideoDisplay.bind(this)}>
                         <i className="tiny-icon grey-minus-icon"/>
                     </div>
-                    {
-                        callManagerCall.getMediaOptions().audio === false ?
-                            <div className="small-icon icon-audio-muted"></div> :
-                            <div className="small-icon icon-audio-muted hidden"></div>
-                    }
+                    <div {...muteOrHoldIconStyle(localMedia, M.u[u_handle])}></div>
                     <video
-                        ref="localViewport"
                         className="localViewport"
                         defaultmuted={"true"}
                         muted={true}
                         volume={0}
-                        id={"localvideo_" + callManagerCall.id}
+                        id={"localvideo_" + base64urlencode(rtcCall.id)}
                         style={{display: !this.state.localMediaDisplay ? "none" : ""}}
-
+                        ref={function(ref) {
+                            if (ref && !RTC.isAttachedToStream(ref)) {
+                                RTC.attachMediaStream(ref, rtcCall.localStream());
+                            }
+                        }}
                     />
                 </div>;
             }
         }
-        else {
-            // carousel
-            var localPlayer;
-            if (!localPlayerStream || (
-                callManagerCall.getMediaOptions().video === false && callManagerCall.getMediaOptions().screen === false
-            )) {
-                localPlayer =  <div className={
-                    "call user-audio local-carousel is-avatar" + (activeStreamIdOrPlayer === "local" ? " active " : "")
-                } key="local"
-                                    onClick={(e) => {
-                                        self.onPlayerClick("local");
-                                    }}>
+        else { // carousel
+            let localPlayer;
+            if (!localMedia.video) {
+                // display avatar for local video
+                localPlayer =
+                <div
+                    className={
+                        "call user-audio local-carousel is-avatar" + (activeSid === "local" ? " active " : "")
+                    }
+                    key="local"
+                    onClick={(e) => {
+                        self.onPlayerClick("local");
+                    }}>
                     {
-                        chatRoom.megaChat.networkQuality === 0 ?
+                        megaChat.rtc.ownNetworkQuality() === 0 ?
                             <div className="icon-connection-issues"></div> : null
                     }
                     <div className="center-avatar-wrapper">
-                        {
-                            callManagerCall.getMediaOptions().audio === false ?
-                                <div className="small-icon icon-audio-muted"></div> :
-                                <div className="small-icon icon-audio-muted hidden"></div>
-                        }
+                        <div {...muteOrHoldIconStyle(callManagerCall.getMediaOptions(), M.u[u_handle])}></div>
                         <Avatar
                             contact={M.u[u_handle]} className="call avatar-wrapper"
+                            chatRoom={this.props.chatRoom}
                             hideVerifiedBadge={true}
                         />
                     </div>
                 </div>;
 
-                remotePlayerElement.push(localPlayer);
-
-
-                if (activeStreamIdOrPlayer === "local") {
-                    activeStreamIdOrPlayer = localPlayer;
+                if (activeSid === "local") {
+                    activePlayer = localPlayer;
                 }
             }
-            else {
+            else { // we have local video (carousel mode)
                 localPlayer = <div
                     className={
                         "call user-video local-carousel is-video" + (
-                            activeStreamIdOrPlayer === "local" ? " active " : ""
+                            activeSid === "local" ? " active " : ""
                         ) + (
-                            callManagerCall.getMediaOptions().screen ? " is-screen" : ""
+                            localMedia.screen ? " is-screen" : ""
                         )
                     }
                     key="local-video"
@@ -857,96 +827,80 @@ class ConversationAudioVideoPanel extends MegaRenderMixin(React.Component) {
                         self.onPlayerClick("local");
                     }}>
                     {
-                        chatRoom.megaChat.networkQuality === 0 ?
+                        megaChat.rtc.ownNetworkQuality() === 0 ?
                             <div className="icon-connection-issues"></div> : null
                     }
-                    {callManagerCall.getMediaOptions().audio === false ?
-                        <div className="small-icon icon-audio-muted"></div> :
-                        <div className="small-icon icon-audio-muted hidden"></div>
-
-                    }
+                    <div {...muteOrHoldIconStyle(localMedia, M.u[u_handle])}></div>
                     <video
                         ref="localViewport"
                         className="localViewport smallLocalViewport"
                         defaultmuted={"true"}
                         muted={true}
                         volume={0}
-                        id={"localvideo_" + callManagerCall.id}
+                        id={"localvideo_" + base64urlencode(rtcCall.id)}
+                        ref={function(ref){
+                            if (ref && !RTC.isAttachedToStream(ref)) {
+                                RTC.attachMediaStream(ref, rtcCall.localStream());
+                            }
+                        }}
                     />
                 </div>;
 
-                remotePlayerElement.push(localPlayer);
-
-
-                if (activeStreamIdOrPlayer === "local") {
-                    activeStreamIdOrPlayer = <div
+                if (activeSid === "local") {
+                    activePlayer = <div
                         className={
                             "call user-video is-video local-carousel local-carousel-big " + (
-                                callManagerCall.getMediaOptions().screen ? " is-screen" : ""
+                                localMedia.screen ? " is-screen" : ""
                             )
                         }
                         key="local-video2">
                         {
-                            chatRoom.megaChat.networkQuality === 0 ?
+                            megaChat.rtc.ownNetworkQuality() === 0 ?
                                 <div className="icon-connection-issues"></div> : null
                         }
-                        {
-                            callManagerCall.getMediaOptions().audio === false ?
-                                <div className="small-icon icon-audio-muted"></div> :
-                                <div className="small-icon icon-audio-muted hidden"></div>
-                        }
+                        <div {...muteOrHoldIconStyle(localMedia, M.u[u_handle])}></div>
                         <video
                             className="localViewport bigLocalViewport"
                             defaultmuted={"true"}
                             muted={true}
                             volume={0}
-                            id={"localvideo_big_" + callManagerCall.id}
+                            id={"localvideo_big_" + base64urlencode(rtcCall.id)}
+                            ref={function(ref) {
+                                if (ref && !RTC.isAttachedToStream(ref)) {
+                                    RTC.attachMediaStream(ref, rtcCall.localStream());
+                                }
+                            }}
                         />
                     </div>;
                 }
             }
+            remotePlayerElements.push(localPlayer);
         }
-
-
 
         var unreadDiv = null;
         var unreadCount = chatRoom.messagesBuff.getUnreadCount();
         if (unreadCount > 0) {
-            unreadDiv = <div className="unread-messages">{unreadCount > 9 ? "9+" : unreadCount}</div>
+            unreadDiv = <div className="unread-messages">{unreadCount > 9 ? "9+" : unreadCount}</div>;
         }
 
         var additionalClass = "";
-        additionalClass = (this.state.fullScreenModeEnabled === true ? " full-sized-block" : "");
+        additionalClass = this.state.fullScreenModeEnabled ? " full-sized-block" : "";
         if (additionalClass.length === 0) {
-            additionalClass = (this.state.messagesBlockEnabled === true ? " small-block" : "");
+            additionalClass = this.state.messagesBlockEnabled ? " small-block" : "";
         }
 
-        var participantsCount = Object.keys(callManagerCall._streams).length * DEBUG_PARTICIPANTS_MULTIPLICATOR;
+        var participantsCount = Object.keys(rtcCall.sessions).length * DEBUG_PARTICIPANTS_MULTIPLICATOR;
 
-        additionalClass += " participants-count-" + (
+        additionalClass += " participants-count-" +
             participantsCount
-        );
+        ;
 
         var header = null;
-
-        var videoSessionCount = 0;
-        if (chatRoom.callManagerCall && chatRoom.callManagerCall.getCurrentVideoSlotsUsed) {
-            videoSessionCount = chatRoom.callManagerCall.getCurrentVideoSlotsUsed();
-        }
-
-
+        var videoSessionCount = rtcCall.getAudioVideoSenderCount().video;
+        var videoSendersMaxed = videoSessionCount >= RtcModule.kMaxCallVideoSenders;
+        var notifBar = null;
 
         if (chatRoom.type === "group" || chatRoom.type === "public") {
-            var haveScreenShare = false;
-            var streamKeys = Object.keys(callManagerCall._streams);
-            for (var x = 0; x < streamKeys.length; x++) {
-                var sid = streamKeys[x];
-                if (callManagerCall.getRemoteMediaOptions(sid.split(":")[2]).screen) {
-                    haveScreenShare = true;
-                    break;
-                }
-            }
-
             header = (
                 <div className="call-header">
                     <div className="call-topic">
@@ -960,7 +914,8 @@ class ConversationAudioVideoPanel extends MegaRenderMixin(React.Component) {
 
                     <a className={
                         "call-switch-view " + (self.getViewMode() === VIEW_MODES.GRID ? " grid" : " carousel") +
-                        (participantsCount > MAX_PARTICIPANTS_FOR_GRID_MODE || haveScreenShare ? " disabled" : "")
+                        (participantsCount > MAX_PARTICIPANTS_FOR_GRID_MODE ||
+                            this.haveScreenSharingPeer() ? " disabled" : "")
                     } onClick={function(e) {
                         if (participantsCount > MAX_PARTICIPANTS_FOR_GRID_MODE) {
                             return;
@@ -975,13 +930,13 @@ class ConversationAudioVideoPanel extends MegaRenderMixin(React.Component) {
                         });
                     }}></a>
                     <div className={"call-av-counter" + (
-                        videoSessionCount >= RtcModule.kMaxCallVideoSenders ? " limit-reached" : ""
+                        videoSendersMaxed ? " limit-reached" : ""
                     )}>{videoSessionCount} / {RtcModule.kMaxCallVideoSenders}</div>
 
                     <div
                         className={
                             "call-video-icon" + (
-                                chatRoom.callManagerCall.hasVideoSlotLimitReached() ? " call-video-icon-warn" : ""
+                                videoSendersMaxed.video ? " call-video-icon-warn" : ""
                         )}>
                     </div>
                     <div className="call-header-duration"
@@ -990,15 +945,11 @@ class ConversationAudioVideoPanel extends MegaRenderMixin(React.Component) {
                     </div>
                 </div>
             );
-        }
+            var nEngine = callManagerCall.callNotificationsEngine;
+            var notif = nEngine.getCurrentNotification();
 
-        var notifBar = null;
-
-        if (chatRoom.type === "group" || chatRoom.type === "public") {
-            var notif = chatRoom.callManagerCall.callNotificationsEngine.getCurrentNotification();
-
-            if (!chatRoom.callManagerCall.callNotificationsEngine._bound) {
-                chatRoom.callManagerCall.callNotificationsEngine.rebind('onChange.cavp', function () {
+            if (!nEngine._bound) {
+                nEngine.rebind('onChange.cavp', function () {
                     if (chatRoom.isCurrentlyActive) {
                         self.safeForceUpdate();
                         var $notif = $('.in-call-notif:visible');
@@ -1010,7 +961,7 @@ class ConversationAudioVideoPanel extends MegaRenderMixin(React.Component) {
                             });
                     }
                 });
-                chatRoom.callManagerCall.callNotificationsEngine._bound = true;
+                nEngine._bound = true;
             }
 
             if (notif) {
@@ -1021,32 +972,45 @@ class ConversationAudioVideoPanel extends MegaRenderMixin(React.Component) {
             }
         }
         var networkQualityBar = null;
+        var onHoldBar = null;
 
-        if (chatRoom.megaChat.networkQuality <= 1) {
-            var networkQualityMessage = "Slow connection.";
-
+        var netq = megaChat.rtc.ownNetworkQuality();
+        if (netq != null && netq <= 1) {
+            var networkQualityMessage =  l[23213];
             networkQualityBar = <div className={"in-call-notif yellow" + (notifBar ? " after-green-notif" : "") }>
                 {networkQualityMessage}
             </div>;
         }
 
-        additionalClass += (self.getViewMode() === VIEW_MODES.GRID ? " grid" : " carousel");
+        var otherPartyIsOnHold = false;
+        if (realSids.length === 1 && !rtcCall.isOnHold()) {
+            /* UI contains only 1 session */
+            var session = sessions[realSids[0]];
+            otherPartyIsOnHold = !!session.peerIsOnHold();
+        }
+
+        if (rtcCall.isOnHold() || otherPartyIsOnHold) {
+            networkQualityBar = <div className={"in-call-notif gray" + (notifBar ? " after-green-notif" : "") }>
+                {l[23457]}
+            </div>;
+        }
+
+        additionalClass += self.getViewMode() === VIEW_MODES.GRID ? " grid" : " carousel";
 
         var players = null;
         if (self.getViewMode() === VIEW_MODES.GRID) {
             players = <div className="participantsWrapper" key="container">
-                <div className="participantsContainer" key="partsContainer">{remotePlayerElement}</div>
+                <div className="participantsContainer" key="partsContainer">{remotePlayerElements}</div>
                 {localPlayerElement}
             </div>;
         }
-        else {
-
-            players = <div key="container">
+        else { // carousel
+            players = <div className="activeStreamWrap" key="container">
                 <div className="activeStream" key="activeStream">
-                    {activeStreamIdOrPlayer}
+                    {activePlayer}
                 </div>
                 <div className="participantsContainer" key="partsContainer">
-                    {remotePlayerElement}
+                    {remotePlayerElements}
                     {localPlayerElement}
                 </div>
             </div>;
@@ -1055,6 +1019,9 @@ class ConversationAudioVideoPanel extends MegaRenderMixin(React.Component) {
         var topPanel = null;
 
         if (chatRoom.type !== "group") {
+            var remoteCamEnabled = haveAnyRemoteVideo
+                ? <i className="small-icon blue-videocam" />
+                : null;
             topPanel = <div className="call top-panel">
                 <div className="call top-user-info">
                     <span className="user-card-name white">{displayNames.join(", ")}</span>{remoteCamEnabled}
@@ -1067,119 +1034,194 @@ class ConversationAudioVideoPanel extends MegaRenderMixin(React.Component) {
         }
 
         if (participantsCount < 4) {
-            additionalClass = additionalClass + " participants-less-4";
+            additionalClass += " participants-less-4";
         }
         else if (participantsCount < 8) {
-            additionalClass = additionalClass + " participants-less-8";
+            additionalClass += " participants-less-8";
         }
         else if (participantsCount < 16) {
-            additionalClass = additionalClass + " participants-less-16";
+            additionalClass += " participants-less-16";
         }
         else {
-            additionalClass = additionalClass + " participants-a-lot";
+            additionalClass += " participants-a-lot";
         }
 
-        var reconnectingDiv = null;
-        if (chatRoom.callReconnecting === true) {
-            reconnectingDiv = <div className="callReconnecting">
+
+        var hugeOverlayDiv = null;
+        if (chatRoom.callReconnecting) {
+            hugeOverlayDiv = <div className="callReconnecting">
                     <i className="huge-icon crossed-phone"></i>
                 </div>;
         }
+        else if (rtcCall.isOnHold() || otherPartyIsOnHold) {
+            hugeOverlayDiv = <div className="callReconnecting dark">
+                <div className="call-on-hold body">
+                    <div
+                        className={"call-on-hold icon " + (otherPartyIsOnHold ? "" : "white-bg")}
+                        onClick={otherPartyIsOnHold ? undefined : function() {
+                            rtcCall.releaseOnHold();
+                        }}>
+                            <i className={"big-icon " + (otherPartyIsOnHold ? "white-pause" : "grey-play")}></i>
+                    </div>
+                    <div className="call-on-hold txt">
+                        {otherPartyIsOnHold ? l[23458] : l[23459]}
+                    </div>
+                </div>
+            </div>;
+            additionalClass += " call-is-on-hold";
+        }
+        var micMuteBtnDisabled = rtcCall.isLocalMuteInProgress() || rtcCall.isRecovery || rtcCall.isOnHold();
+        var camMuteBtnDisabled = micMuteBtnDisabled || (!localMedia.video && videoSendersMaxed);
+        var screenShareBtnDisabled = micMuteBtnDisabled || !RTC.supportsScreenCapture;
 
         return <div className={"call-block" + additionalClass} id="call-block">
             <div className={"av-resize-handler ui-resizable-handle ui-resizable-s " + (
-                this.state.messagesBlockEnabled === true && this.state.fullScreenModeEnabled === false ?
-                    "" : "hidden"
+                (this.state.messagesBlockEnabled && !this.state.fullScreenModeEnabled)
+                ? ""
+                : "hidden"
             )}></div>
             {header}
             {notifBar}
             {networkQualityBar}
+            {onHoldBar}
             {players}
-            {reconnectingDiv}
+            {hugeOverlayDiv}
 
             {topPanel}
 
-
             <div className="call bottom-panel">
                 <div className={"button call left" + (unreadDiv ? " unread" : "")}
-                     onClick={this.toggleMessages.bind(this)}>
+                    onClick={this.toggleMessages.bind(this)}>
                     {unreadDiv}
-                    <i className="big-icon conversations"></i>
+                    <i
+                        className="big-icon conversations simpletip"
+                        data-simpletip={this.state.messagesBlockEnabled ? l[22892] : l[22891]}
+                        data-simpletipoffset="5"
+                    >
+                    </i>
                 </div>
-                <div className={"button call " + (this.state.muteInProgress ? " disabled" : "")} onClick={function(e) {
-                    if (self.state.muteInProgress || $(this).is(".disabled")) {
-                        return;
-                    }
-                    if (callManagerCall.getMediaOptions().audio === true) {
-                        callManagerCall.muteAudio();
-                    }
-                    else {
-                        callManagerCall.unmuteAudio();
-                    }
-                }}>
-                    <i className={
-                        "big-icon " + (callManagerCall.getMediaOptions().audio ? " microphone" : " crossed-microphone")
-                    }></i>
-                </div>
-                <div className={
-                    "button call" + (callManagerCall.hasVideoSlotLimitReached() === true &&
-                    callManagerCall.getMediaOptions().video === false ? " disabled" : "") +
-                        (this.state.muteInProgress ? " disabled" : "")
-                } onClick={function(e) {
-                    if (
-                        self.state.muteInProgress ||
-                        $(this).is(".disabled")
-                    ) {
-                        return;
-                    }
-                    var videoMode = callManagerCall.videoMode();
-                    if (videoMode === Av.Video) {
-                        callManagerCall.muteVideo();
-                    } else {
-                        callManagerCall.unmuteVideo();
-                    }
-                }}>
-                    <i className={
-                        "big-icon " +
-                        ((callManagerCall.videoMode() === Av.Video) ? " videocam" : " crossed-videocam")
-                    }></i>
+                <div className={"button call " +
+                    (micMuteBtnDisabled ? " disabled" : "")}
+                    onClick={function(e) {
+                        if (micMuteBtnDisabled || rtcCall.isLocalMuteInProgress()) {
+                            return;
+                        }
+                        rtcCall.enableAudio(!localMedia.audio);
+                    }}>
+                    <i
+                        className={
+                            "big-icon simpletip " +
+                            (localMedia.audio ? "microphone" : "crossed-microphone")
+                        }
+                        data-simpletip={localMedia.audio ? l[16214] : l[16708]}
+                        data-simpletipoffset="5"
+                    >
+                    </i>
                 </div>
 
                 <div className={
-                    "button call" + ((RTC.supportsScreenCapture && chatRoom.callManagerCall
-                        && callManagerCall.rtcCall && !this.state.muteInProgress) ? "" : " disabled")
-                } onClick={function(e) {
-                    if (chatRoom.callManagerCall) {
-                        if (callManagerCall.isScreenCaptureEnabled()) {
-                            callManagerCall.stopScreenCapture();
-                        } else {
-                            callManagerCall.startScreenCapture();
+                    "button call" + (camMuteBtnDisabled ? " disabled" : "")
+                    } onClick={function(e) {
+                        if (camMuteBtnDisabled || rtcCall.isLocalMuteInProgress()) {
+                            return;
                         }
-                    }
-                }}>
-                    <i className={"big-icon " + (
-                        callManagerCall.isScreenCaptureEnabled() ?
-                            "screenshare" : "crossed-screenshare"
-                    )}></i>
+                        var videoMode = callManagerCall.videoMode();
+                        if (videoMode === Av.Video) {
+                            rtcCall.disableVideo().catch(() => {});
+                        }
+                        else {
+                            rtcCall.enableCamera().catch(() => {});
+                        }
+                    }}>
+                    <i
+                        className={
+                            "big-icon simpletip " +
+                            (callManagerCall.videoMode() === Av.Video ? "videocam" : "crossed-videocam")
+                        }
+                        data-simpletip={callManagerCall.videoMode() === Av.Video ? l[22894] : l[22893]}
+                        data-simpletipoffset="5"
+                    >
+                    </i>
                 </div>
+
+                <div className={
+                    "button call" + (screenShareBtnDisabled ? " disabled" : "")
+                    } onClick={function(e) {
+                        if (screenShareBtnDisabled || rtcCall.isLocalMuteInProgress()) {
+                            return;
+                        }
+                        if (rtcCall.isScreenCaptureEnabled()) {
+                            rtcCall.disableVideo().catch(() => {});
+                        } else {
+                            rtcCall.enableScreenCapture().catch(() => {});
+                        }
+                    }}>
+                    <i
+                        className={
+                            "big-icon simpletip " +
+                            (rtcCall.isScreenCaptureEnabled() ? "screenshare" : "crossed-screenshare")
+                        }
+                        data-simpletip={
+                            rtcCall.isScreenCaptureEnabled() ? l[22890] : l[22889]
+                        }
+                        data-simpletipoffset="5"
+                    >
+                    </i>
+                </div>
+
+                <Button
+                    className="call"
+                    disabled={rtcCall.isRecovery && rtcCall.isOnHold()}
+                    icon="big-icon white-dots">
+                    <Dropdown
+                        className="dark black call-actions"
+                        noArrow={true}
+                        positionMy="center top"
+                        positionAt="center bottom"
+                        vertOffset={10}
+                    >
+
+                        {rtcCall.isOnHold() ?
+                            <DropdownItem
+                                icon="white-play"
+                                label={l[23459]}
+                                onClick={function() {
+                                    rtcCall.releaseOnHold();
+                                }}
+                            /> :
+                            <DropdownItem
+                                icon="white-pause"
+                                label={l[23460]}
+                                onClick={function() {
+                                    rtcCall.putOnHold();
+                                }}
+                            />}
+
+                    </Dropdown>
+                </Button>
 
                 <div className="button call" onClick={function(e) {
-                    if (chatRoom.callManagerCall) {
-                        chatRoom.callManagerCall.endCall();
-                    }
+                    callManagerCall.endCall();
                 }}>
-                    <i className="big-icon horizontal-red-handset"></i>
+                    <i
+                        className="big-icon horizontal-red-handset simpletip"
+                        data-simpletip={l[5884]}
+                        data-simpletipoffset="5"
+                    >
+                    </i>
                 </div>
 
-
                 <div className="button call right" onClick={this.fullScreenModeToggle.bind(this)}>
-                    <i className="big-icon nwse-resize"></i>
+                    <i
+                        className="big-icon nwse-resize simpletip"
+                        data-simpletip={this.state.fullScreenModeEnabled ? l[22895] : l[17803]}>
+                    </i>
                 </div>
             </div>
         </div>;
     }
-};
+}
 
 export {
-    ConversationAudioVideoPanel
+    ConversationAVPanel
 };

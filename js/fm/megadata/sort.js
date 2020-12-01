@@ -238,9 +238,17 @@ MegaData.prototype.getSortByRtsFn = function() {
 MegaData.prototype.sortByFav = function(d) {
     "use strict";
 
-    this.sortfn = this.sortByFavFn(d);
+    var fn = this.sortfn = this.sortByFavFn(d);
     this.sortd = d;
-    this.sort();
+
+    if (!d) {
+        d = 1;
+    }
+
+    // label sort is not doing folder sorting first. therefore using view sort directly to avoid.
+    this.v.sort(function(a, b) {
+        return fn(a, b, d);
+    });
 };
 
 MegaData.prototype.sortByFavFn = function(d) {
@@ -248,7 +256,7 @@ MegaData.prototype.sortByFavFn = function(d) {
 
     return function(a, b) {
         if ((a.t & M.IS_FAV || a.fav) && (b.t & M.IS_FAV || b.fav)) {
-            return M.doFallbackSortWithName(a, b, d);
+            return M.doFallbackSortWithFolder(a, b, d);
         }
         if (a.t & M.IS_FAV || a.fav) {
             return -1 * d;
@@ -257,7 +265,7 @@ MegaData.prototype.sortByFavFn = function(d) {
             return d;
         }
         else {
-            return M.doFallbackSortWithName(a, b, d);
+            return M.doFallbackSortWithFolder(a, b, d);
         }
     };
 };
@@ -449,6 +457,41 @@ MegaData.prototype.getSortByStatusFn = function(d) {
 
 MegaData.prototype.sortByStatus = function(d) {
     this.sortfn = this.getSortByStatusFn(d);
+    this.sortd = d;
+    this.sort();
+};
+
+MegaData.prototype.getSortByVersionFn = function() {
+    'use strict';
+    var sortfn;
+
+    sortfn = function(a, b, d) {
+
+        var av = a.tvf || 0;
+        var ab = a.tvb || 0;
+        var bv = b.tvf || 0;
+        var bb = b.tvb || 0;
+
+        if (av < bv) {
+            return -1 * d;
+        }
+        else if (av > bv) {
+            return d;
+        }
+        else if (ab < bb) {
+            return -1 * d;
+        }
+        else if (ab > bb) {
+            return d;
+        }
+    };
+
+    return sortfn;
+};
+
+MegaData.prototype.sortByVersion = function(d) {
+    'use strict';
+    this.sortfn = this.getSortByVersionFn();
     this.sortd = d;
     this.sort();
 };

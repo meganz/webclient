@@ -1,95 +1,76 @@
 // libs
 var React = require("react");
 var ReactDOM = require("react-dom");
-import MegaRenderMixin from './../../stores/mixins.js';
+import { MegaRenderMixin, SoonFcWrap } from './../../stores/mixins.js';
 import { DropdownEmojiSelector } from './../../ui/emojiDropdown.jsx';
 import { Button } from './../../ui/buttons.jsx';
 import { EmojiAutocomplete } from './emojiAutocomplete.jsx';
-import utils from './../../ui/utils.jsx';
+import GifPanel from './gifPanel/gifPanel.jsx';
 
-export class TypingArea extends MegaRenderMixin(React.Component) {
-    static validEmojiCharacters = new RegExp("[\w\:\-\_0-9]", "gi");
+export class TypingArea extends MegaRenderMixin {
     static defaultProps = {
         'textareaMaxHeight': "40%"
     };
+
     constructor(props) {
         super(props);
 
         var initialText = this.props.initialText;
 
-        this.state ={
+        this.state = {
             emojiSearchQuery: false,
             typedMessage: initialText ? initialText : "",
-            textareaHeight: 20
+            textareaHeight: 20,
+            gifPanelActive: false
         };
     }
-    onEmojiClicked(e, slug, meta) {
+    onEmojiClicked(e, slug) {
         if (this.props.disabled) {
             e.preventDefault();
             e.stopPropagation();
             return;
         }
 
-        var self = this;
+        slug = slug[0] === ':' || slug.substr(-1) === ':' ? slug : `:${slug}:`;
 
-        var txt = ":" + slug + ":";
-        if (slug.substr(0, 1) == ":" || slug.substr(-1) == ":") {
-            txt = slug;
-        }
+        const textarea = $('.messages-textarea', this.$container)[0];
+        const cursorPosition = this.getCursorPosition(textarea);
 
-        self.setState({
-            typedMessage: self.state.typedMessage + " " + txt + " "
+        this.setState({
+            typedMessage:
+                this.state.typedMessage.slice(0, cursorPosition) +
+                slug +
+                this.state.typedMessage.slice(cursorPosition)
+        }, () => {
+            // `Sample |message` -> `Sample :smile:| message`
+            textarea.selectionEnd = cursorPosition + slug.length;
         });
-
-        var $container = $(ReactDOM.findDOMNode(this));
-        var $textarea = $('.chat-textarea:visible textarea:visible', $container);
-
-        setTimeout(function () {
-            $textarea.click();
-            moveCursortoToEnd($textarea[0]);
-        }, 100);
     }
-
     stoppedTyping() {
-        if (this.props.disabled) {
+        if (this.props.disabled || !this.props.chatRoom) {
             return;
         }
-        var self = this;
-        var room = this.props.chatRoom;
 
-        self.iAmTyping = false;
-
-        delete self.lastTypingStamp;
-
-        room.trigger('stoppedTyping');
+        this.iAmTyping = false;
+        this.props.chatRoom.trigger('stoppedTyping');
     }
     typing() {
-        if (this.props.disabled) {
+        if (this.props.disabled || !this.props.chatRoom) {
             return;
         }
 
         var self = this;
-        var room = this.props.chatRoom;
+        var now = Date.now();
 
-        if (self.stoppedTypingTimeout) {
-            clearTimeout(self.stoppedTypingTimeout);
-        }
+        delay(this.getReactId(), () => self.iAmTyping && self.stoppedTyping(), 4e3);
 
-        self.stoppedTypingTimeout = setTimeout(function() {
-            if (room && self.iAmTyping) {
-                self.stoppedTyping();
-            }
-        }, 4000);
-
-        if (
-            (room && !self.iAmTyping) ||
-            (room && self.iAmTyping && (unixtime() - self.lastTypingStamp) >= 4)
-        ) {
+        if (!self.iAmTyping || now - self.lastTypingStamp > 4e3) {
             self.iAmTyping = true;
-            self.lastTypingStamp = unixtime();
-            room.trigger('typing');
+            self.lastTypingStamp = now;
+            self.props.chatRoom.trigger('typing');
         }
     }
+
     triggerOnUpdate(forced) {
         var self = this;
         if (!self.props.onUpdate || !self.isMounted()) {
@@ -98,14 +79,13 @@ export class TypingArea extends MegaRenderMixin(React.Component) {
 
         var shouldTriggerUpdate = forced ? forced : false;
 
-        if (!shouldTriggerUpdate && self.state.typedMessage != self.lastTypedMessage) {
+        if (!shouldTriggerUpdate && self.state.typedMessage !== self.lastTypedMessage) {
             self.lastTypedMessage = self.state.typedMessage;
             shouldTriggerUpdate = true;
         }
 
         if (!shouldTriggerUpdate) {
-            var $container = $(ReactDOM.findDOMNode(this));
-            var $textarea = $('.chat-textarea:visible textarea:visible', $container);
+            var $textarea = $('.chat-textarea:visible textarea:visible', self.$container);
             if (!self._lastTextareaHeight || self._lastTextareaHeight !== $textarea.height()) {
                 self._lastTextareaHeight = $textarea.height();
                 shouldTriggerUpdate = true;
@@ -115,16 +95,8 @@ export class TypingArea extends MegaRenderMixin(React.Component) {
             }
         }
 
-
-
         if (shouldTriggerUpdate) {
-            if (self.onUpdateThrottling) {
-                clearTimeout(self.onUpdateThrottling);
-            }
-
-            self.onUpdateThrottling = setTimeout(function() {
-                self.props.onUpdate();
-            }, 70);
+            self.props.onUpdate();
         }
     }
     onCancelClicked(e) {
@@ -143,8 +115,7 @@ export class TypingArea extends MegaRenderMixin(React.Component) {
             return;
         }
 
-        var $container = $(ReactDOM.findDOMNode(self));
-        var val = $.trim($('.chat-textarea:visible textarea:visible', $container).val());
+        var val = $.trim($('.chat-textarea:visible textarea:visible', self.$container).val());
 
         if (self.onConfirmTrigger(val) !== true) {
             self.setState({typedMessage: ""});
@@ -198,6 +169,7 @@ export class TypingArea extends MegaRenderMixin(React.Component) {
 
             if (self.onConfirmTrigger(val) !== true) {
                 self.setState({typedMessage: ""});
+                $(document).trigger('closeDropdowns');
             }
             e.preventDefault();
             e.stopPropagation();
@@ -293,7 +265,6 @@ export class TypingArea extends MegaRenderMixin(React.Component) {
             ) {
                 // cancel prefill mode, user typed some character, out of the current emoji position.
                 self.prefillMode = false;
-
                 self.setState({
                     'emojiSearchQuery': false,
                     'emojiStartPos': false,
@@ -302,10 +273,10 @@ export class TypingArea extends MegaRenderMixin(React.Component) {
                 return;
             }
 
-            var char = String.fromCharCode(key);
             if (self.prefillMode) {
                 return; // halt next checks if its in prefill mode.
             }
+            var char = String.fromCharCode(key);
 
             if (
                 key === 16 /* shift */ ||
@@ -318,7 +289,7 @@ export class TypingArea extends MegaRenderMixin(React.Component) {
                 key === 40 /* down */ ||
                 key === 38 /* up */ ||
                 key === 9 /* tab */ ||
-                char.match(self.validEmojiCharacters)
+                /[\w:-]/.test(char)
             ) {
 
 
@@ -411,33 +382,40 @@ export class TypingArea extends MegaRenderMixin(React.Component) {
             return;
         }
 
-        var $container = $(ReactDOM.findDOMNode(this));
-        if ($('.chat-textarea:visible textarea:visible', $container).length > 0) {
-            if (!$('.chat-textarea:visible textarea:visible:first', $container).is(":focus")) {
-                moveCursortoToEnd($('.chat-textarea:visible:first textarea', $container)[0]);
-            }
+        if (
+            $('.chat-textarea:visible textarea:visible', this.$container).length > 0 &&
+            !$('.chat-textarea:visible textarea:visible:first', this.$container).is(":focus")
+        ) {
+            moveCursortoToEnd($('.chat-textarea:visible:first textarea', this.$container)[0]);
         }
     }
     componentDidMount() {
         super.componentDidMount();
         var self = this;
-        $(window).rebind('resize.typingArea' + self.getUniqueId(), self.handleWindowResize.bind(this));
+        this.$container = $(ReactDOM.findDOMNode(this));
 
-        var $container = $(ReactDOM.findDOMNode(this));
+        chatGlobalEventManager.addEventListener(
+            'resize',
+            'typingArea' + self.getUniqueId(),
+            () => self.handleWindowResize()
+        );
+
         // initTextareaScrolling($('.chat-textarea-scroll textarea', $container), 100, true);
         self._lastTextareaHeight = 20;
         if (self.props.initialText) {
             self.lastTypedMessage = this.props.initialText;
         }
 
-        $('.jScrollPaneContainer', $container).rebind('forceResize.typingArea' + self.getUniqueId(), function() {
+        $('.jScrollPaneContainer', self.$container).rebind('forceResize.typingArea' + self.getUniqueId(), function() {
             self.updateScroll(false);
         });
-        self.triggerOnUpdate(true);
-        if ($container.is(":visible")) {
-            self.updateScroll(false);
+
+        if (!this.scrollingInitialised) {
+            this.initScrolling();
         }
 
+        self.triggerOnUpdate(true);
+        self.updateScroll(false);
     }
     componentWillMount() {
         var self = this;
@@ -469,7 +447,7 @@ export class TypingArea extends MegaRenderMixin(React.Component) {
                         }
                     });
             }
-            $(megaChat.plugins.persistedTypeArea.data).rebind(
+            megaChat.plugins.persistedTypeArea.data.rebind(
                 'onChange.typingArea' + self.getUniqueId(),
                 function(e, k, v) {
                     if (chatRoom.roomId == k) {
@@ -483,16 +461,14 @@ export class TypingArea extends MegaRenderMixin(React.Component) {
     componentWillUnmount() {
         super.componentWillUnmount();
         var self = this;
-        var chatRoom = self.props.chatRoom;
         self.triggerOnUpdate();
         // window.removeEventListener('resize', self.handleWindowResize);
-        $(window).unbind('resize.typingArea' + self.getUniqueId());
+        chatGlobalEventManager.removeEventListener('resize', 'typingArea' + self.getUniqueId());
     }
     componentDidUpdate() {
         var self = this;
-        var room = this.props.chatRoom;
 
-        if (room.isCurrentlyActive && self.isMounted()) {
+        if (self.isComponentEventuallyVisible()) {
             if ($(
                 document.querySelector('textarea:focus,select:focus,input:focus')
             ).filter(":visible").length === 0) {
@@ -510,8 +486,7 @@ export class TypingArea extends MegaRenderMixin(React.Component) {
             this.updateScroll();
         }
         if (self.onUpdateCursorPosition) {
-            var $container = $(ReactDOM.findDOMNode(this));
-            var el = $('.chat-textarea:visible:first textarea:visible', $container)[0];
+            var el = $('.chat-textarea:visible:first textarea:visible', self.$container)[0];
             el.selectionStart = el.selectionEnd = self.onUpdateCursorPosition;
             self.onUpdateCursorPosition = false;
         }
@@ -521,7 +496,6 @@ export class TypingArea extends MegaRenderMixin(React.Component) {
         self.scrollingInitialised = true;
         var $node = $(self.findDOMNode());
         var $textarea = $('textarea:first', $node);
-        var $textareaClone = $('message-preview', $node);
         self.textareaLineHeight = parseInt($textarea.css('line-height'));
         var $textareaScrollBlock = $('.textarea-scroll', $node);
         $textareaScrollBlock.jScrollPane({
@@ -548,15 +522,13 @@ export class TypingArea extends MegaRenderMixin(React.Component) {
         }
         return textareaMaxHeight;
     }
-    @utils.SoonFcWrap(10)
+
+    @SoonFcWrap(60)
     updateScroll(keyEvents) {
         var self = this;
 
         // DONT update if not visible...
-        if (!this.props.chatRoom.isCurrentlyActive) {
-            return;
-        }
-        if (!this.isMounted()) {
+        if (!this.isComponentEventuallyVisible()) {
             return;
         }
 
@@ -708,25 +680,28 @@ export class TypingArea extends MegaRenderMixin(React.Component) {
         }
         return pos;
     }
+
     onTypeAreaSelect(e) {
         this.updateScroll(true);
     }
-    handleWindowResize(e, scrollToBottom) {
-        var self = this;
 
-        if(!self.isMounted()) {
-            return;
-        }
-        if (!self.props.chatRoom.isCurrentlyActive) {
+    customIsEventuallyVisible() {
+        return this.props.chatRoom.isCurrentlyActive;
+    }
+
+    @SoonFcWrap(54, true)
+    handleWindowResize(e) {
+        if (!this.isComponentEventuallyVisible()) {
             return;
         }
 
         if (e) {
-            self.updateScroll(false);
+            this.updateScroll(false);
         }
-        self.triggerOnUpdate();
+        this.triggerOnUpdate();
 
     }
+
     isActive() {
         return document.hasFocus() && this.$messages && this.$messages.is(":visible");
     }
@@ -759,14 +734,14 @@ export class TypingArea extends MegaRenderMixin(React.Component) {
                     className="default-white-button right"
                     icon=""
                     onClick={self.onSaveClicked.bind(self)}
-                    label={__(l[776])} />,
+                    label={l[776]} />,
 
                 <Button
                     key="cancel"
                     className="default-white-button right"
                     icon=""
                     onClick={self.onCancelClicked.bind(self)}
-                    label={__(l[1718])} />
+                    label={l[1718]} />
             ];
         }
 
@@ -780,7 +755,6 @@ export class TypingArea extends MegaRenderMixin(React.Component) {
         if (newHeight > 0) {
             textareaScrollBlockStyles['height'] = newHeight;
         }
-
 
         var emojiAutocomplete = null;
         if (self.state.emojiSearchQuery) {
@@ -805,11 +779,6 @@ export class TypingArea extends MegaRenderMixin(React.Component) {
                         self.onUpdateCursorPosition = fwdPos;
 
                         self.prefillMode = true;
-
-                        // console.error("prefilling", [pre, emojiAlias, post], self.state.emojiStartPos,
-                        // self.state.emojiStartPos + emojiAlias.length, (
-                        //     post ? (post.substr(0, 1) !== " " ? 1 : 0) : 1
-                        // ));
 
                         // in case of concat'ed emojis like:
                         // :smile::smile:
@@ -881,19 +850,39 @@ export class TypingArea extends MegaRenderMixin(React.Component) {
         var disabledTextarea = room.pubCu25519KeyIsMissing === true || this.props.disabled ? true : false;
 
         return <div className={"typingarea-component" + self.props.className + (disabledTextarea ? " disabled" : "")}>
+            {this.state.gifPanelActive &&
+                <GifPanel
+                    chatRoom={this.props.chatRoom}
+                    onToggle={() =>
+                        this.setState({ gifPanelActive: false })
+                    }
+                />
+            }
             <div className={"chat-textarea " + self.props.className}>
                 {emojiAutocomplete}
                 {self.props.children}
+                {self.props.editing ? null : (
+                    <Button
+                        className={`
+                            popup-button
+                            gif-button
+                            ${this.state.gifPanelActive ? 'active' : ''}
+                        `}
+                        icon="small-icon gif"
+                        disabled={this.props.disabled}
+                        onClick={() =>
+                            this.setState(state => ({ gifPanelActive: !state.gifPanelActive }))
+                        }
+                    />
+                )}
                 <Button
-                    className="popup-button"
+                    className="popup-button emoji-button"
                     icon="smiling-face"
-                    disabled={this.props.disabled}
-                >
+                    disabled={this.props.disabled}>
                     <DropdownEmojiSelector
                         className="popup emoji"
                         vertOffset={17}
-                        onClick={self.onEmojiClicked.bind(self)}
-                    />
+                        onClick={self.onEmojiClicked.bind(self)} />
                 </Button>
                 <hr />
                 <div className="chat-textarea-scroll textarea-scroll jScrollPaneContainer"

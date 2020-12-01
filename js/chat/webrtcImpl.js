@@ -27,6 +27,30 @@
     };
 
     RtcGlobalEventHandler.CRYPTO_HELPERS = {
+        loadCryptoForPeer: function(peerHandle) {
+            var b64Handle = base64urlencode(peerHandle);
+            return pubCu25519[b64Handle] ? Promise.resolve() :crypt.getPubCu25519(b64Handle);
+            /** For simulating delay
+            return new Promise(function(resolve, reject) {
+                setTimeout(function() {
+                    if (pubCu25519[b64Handle]) {
+                        resolve();
+                    } else {
+                        crypt.getPubCu25519(b64Handle)
+                        .then(function() {
+                            resolve();
+                        })
+                    }
+                }, 2000);
+            });
+            */
+        },
+        preloadCryptoForPeer: function(peerHandle) {
+            var b64Handle = base64urlencode(peerHandle);
+            if (!pubCu25519[b64Handle]) {
+                crypt.getPubCu25519(b64Handle);
+            };
+        },
         encryptNonceTo: function (peerHandle, nonce256) {
             assert(nonce256 && nonce256.length === 32, "encryptNonceTo: nonce length is not 256 bits");
             var key = webrtcCalculateSharedKey(peerHandle);
@@ -119,7 +143,6 @@
     };
     RtcGlobalEventHandler.prototype.onClientAvChange = function() {};
     RtcGlobalEventHandler.prototype.onOwnNetworkQualityChange = function(quality) {
-        this.megaChat.networkQuality = quality;
         if (this.megaChat.activeCallManagerCall) {
             this.megaChat.activeCallManagerCall.room.trackDataChange();
         }
@@ -129,7 +152,7 @@
      * Called if there is no audio for > 10s after the call had started.
      */
     RtcGlobalEventHandler.prototype.onNoInputAudioDetected = function() {
-        showToast("warning", "We'd detected that your audio is not working. Please check your mic.");
+        showToast("warning", l[23451]);
     };
 
 

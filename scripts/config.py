@@ -13,7 +13,7 @@ import os
 
 # Checkers to run. Available options for checkers are:
 # "eslint", "cppcheck", "nsiqcppstyle", "vera++", 'htmlhint'
-checkers = ['validator', 'htmlhint', 'eslint']
+checkers = ['validator', 'htmlhint', 'eslint', 'stylelint']
 
 # Extra options for designated checkers.
 # This configuration needs an entry for every encountered checker if the
@@ -22,6 +22,7 @@ extra_options = {
     'eslint': {'norules': False},
     'htmlhint': {},
     'validator': {},
+    'stylelint': {},
     'cppcheck': {},
     'nsiqcppstyle': {},
     'vera++': {}
@@ -31,15 +32,17 @@ extra_options = {
 ESLINT_BIN = 'node_modules/.bin/eslint'
 JSCPD_BIN = 'node_modules/.bin/jscpd'
 HTMLHINT_BIN = 'node_modules/.bin/htmlhint'
+STYLELINT_BIN = 'node_modules/.bin/stylelint'
 CPPCHECK_BIN = 'cppcheck'
 VERAPP_BIN = 'vera++'
 
 NSIQCPPSTYLE_BIN = '/usr/local/nsiqcppstyle/nsiqcppstyle.py'
 ESLINT_RULES = '-f compact'
+STYLELINT_RULES = '-f compact'
 JSCS_RULES = ''
 JSCPD_RULES = '-l 13 -r console'
 HTMLHINT_RULES = '--config ./.htmlhintrc'
-VALIDATOR_IGNORE_FILES = ['js/cmsSnapshot.js', 'js/chat/bundle.js', 'nacl-fast.js', 'makecache.js']
+VALIDATOR_IGNORE_FILES = ['js/cmsSnapshot.js', 'js/chat/bundle.js', 'nacl-fast.js', 'makecache.js', 'pdf.worker.js']
 VALIDATOR_LINELEN_THRESHOLD = 120 # Max chars per line to trigger.
 
 # Vera++ rules like this should be superseded by a "profile", but it
@@ -56,6 +59,7 @@ VERAPP_RULES = ['F001', 'F002',
 # Command line configuration.
 ESLINT_COMMAND = '{binary} {rules} {files}'
 HTMLHINT_COMMAND = '{binary} {rules} {files}'
+STYLELINT_COMMAND = '{binary} {rules} {files}'
 
 CPPCHECK_COMMAND = ("{command}"
                     " --template={{file}};{{line}};{{severity}};{{id}};{{message}}"
@@ -77,10 +81,12 @@ if os.name == 'nt':
     ESLINT_BIN = '{}.cmd'.format(ESLINT_BIN).replace('/', '\\')
     JSCPD_BIN = '{}.cmd'.format(JSCPD_BIN).replace('/', '\\')
     HTMLHINT_BIN = '{}.cmd'.format(HTMLHINT_BIN).replace('/', '\\')
+    STYLELINT_BIN = '{}.cmd'.format(STYLELINT_BIN).replace('/', '\\')
     CPPCHECK_BIN += '.exe'
     VERAPP_BIN += '.exe'
     ESLINT_COMMAND = 'cmd /c {}'.format(ESLINT_COMMAND)
     HTMLHINT_COMMAND = 'cmd /c {}'.format(HTMLHINT_COMMAND)
+    STYLELINT_COMMAND = 'cmd /c {}'.format(STYLELINT_COMMAND)
     VALIDATOR_IGNORE_FILES = [x.replace('/', '\\') for x in VALIDATOR_IGNORE_FILES]
 
 # Overlay project-config with a potentially available local configuration.

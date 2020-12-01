@@ -1,10 +1,10 @@
 var React = require("react");
 var ReactDOM = require("react-dom");
 var utils = require("./utils.jsx");
-import MegaRenderMixin from "../stores/mixins.js";
+import {MegaRenderMixin} from "../stores/mixins.js";
 
 
-class Handler extends MegaRenderMixin(React.Component) {
+class Handler extends MegaRenderMixin {
     static defaultProps = {
         'hideable': true
     };
@@ -16,7 +16,7 @@ class Handler extends MegaRenderMixin(React.Component) {
     }
 };
 
-class Contents extends MegaRenderMixin(React.Component) {
+class Contents extends MegaRenderMixin {
      static defaultProps = {
         'hideable': true
     };
@@ -41,7 +41,7 @@ class Contents extends MegaRenderMixin(React.Component) {
 };
 
 
-class Tooltip extends MegaRenderMixin(React.Component) {
+class Tooltip extends MegaRenderMixin {
     constructor (props) {
         super(props);
         this.state = {
@@ -54,11 +54,11 @@ class Tooltip extends MegaRenderMixin(React.Component) {
     componentDidUpdate(oldProps, oldState) {
         var self = this;
         if (oldState.active === true && this.state.active === false) {
-            $(window).off('resize.tooltip' + this.getUniqueId());
+            chatGlobalEventManager.removeEventListener('resize', 'tooltip' + this.getUniqueId());
         }
         if(self.state.active === true) {
             self.repositionTooltip();
-            $(window).rebind('resize.tooltip' + this.getUniqueId(), function() {
+            chatGlobalEventManager.addEventListener('resize', 'tooltip' + this.getUniqueId(), function() {
                 self.repositionTooltip();
             });
         }

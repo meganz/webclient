@@ -1,12 +1,13 @@
 {
     "env": {
         "browser": true,
+        "es6": true,
         "jquery": true,
         "mocha": true,
-        "phantomjs": true,
         "worker": true
     },
     "parserOptions": {
+        "ecmaVersion": 2017,
         "ecmaFeatures": {
             "jsx": true
         }
@@ -14,6 +15,7 @@
     "plugins": [
         "compat",
         "dollar-sign",
+        "es",
         "jquery",
         "local-rules",
         "no-unsanitized",
@@ -24,6 +26,7 @@
     ],
     "extends": [
         "eslint:recommended",
+        "plugin:es/restrict-to-es2017",
         "plugin:no-unsanitized/DOM",
         "plugin:react/recommended",
         "plugin:sonarjs/recommended"
@@ -60,10 +63,10 @@
         "func-call-spacing": [2, "never"],
         "function-call-argument-newline": [2, "consistent"],
         "guard-for-in": 1,
-        "id-length": [2, {"min": 1, "max": 26}],
+        "id-length": [2, {"min": 1, "max": 29}],
         "keyword-spacing": [2, {}],
         "linebreak-style": 2,
-        "max-classes-per-file": [2, 2],
+        "max-classes-per-file": [1, 4],
         "max-depth": [2, 5],
         "max-len": [2, 120],
         "max-params": [2, 7],
@@ -137,18 +140,26 @@
 
         "indent": [2, 4, {
             "SwitchCase": 1,
-            // "outerIIFEBody": 0,
+            "outerIIFEBody": "off",
             "FunctionDeclaration": {"parameters": "first"},
             "FunctionExpression": {"parameters": "first"},
             "CallExpression": {"arguments": "first"},
             "ArrayExpression": "first",
-            "ObjectExpression": "first"
+            "ObjectExpression": "first",
+            "ignoredNodes": ["JSXElement"]
         }],
 
         // ESLint plugins configuration follows
 
         "compat/compat": 1,
         "dollar-sign/dollar-sign": 2,
+
+        // es2017
+        "es/no-atomics": 2,
+        "es/no-exponential-operators": 2,
+        "es/no-generators": 2,
+        "es/no-promise-all-settled": "off",
+        "es/no-trailing-function-commas": 2,
 
         "jquery/no-ajax": 2,
         "jquery/no-deferred": 2,
@@ -184,7 +195,12 @@
         "unicorn/prefer-event-key": 1,
         "unicorn/prefer-starts-ends-with": 2,
         "unicorn/prefer-text-content": 2,
-        "unicorn/regex-shorthand": 2
+        "unicorn/regex-shorthand": 2,
+
+        "react/no-find-dom-node": "off",
+        "react/prop-types": "off",
+        "react/no-is-mounted": "off",
+        "react/jsx-indent": ["error", 4]
     },
 
     "overrides": [
@@ -195,6 +211,10 @@
             "parserOptions": {
                 "ecmaVersion": 6,
                 "sourceType": "module"
+            },
+            "rules": {
+                "complexity": [2, 28],
+                "no-negated-condition": "off"
             }
         }
     ]

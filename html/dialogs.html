@@ -7,6 +7,7 @@
         <li class="step3">[$8579]</li>
         <li class="step2">[$8578]</li>
         <li class="step1">[$8577]</li>
+        <li class="status-txt">[$8577]</li>
     </ul>
     <div class="loader-progressbar">
         <div class="loader-percents"></div>
@@ -63,9 +64,12 @@
             <strong>[$17089]</strong>
         </div>
         <div class="reset-small-txt">[$6844]</div>
-
+        <br/>
         <form>
-            <div class="radioOn" id="res1_div"><input type="radio" name="feedback-radio" id="res1" value="1"></div>
+            <div class="radioOn" id="res5_div"><input type="radio" name="feedback-radio" id="res5" value="5"></div>
+            <label for="res5" class="radio-txt">[$6229]</label>
+
+            <div class="radioOff" id="res1_div"><input type="radio" name="feedback-radio" id="res1" value="1"></div>
             <label for="res1" class="radio-txt">[$6845]</label>
 
             <div class="radioOff" id="res2_div"><input type="radio" name="feedback-radio" id="res2" value="2"></div>
@@ -75,10 +79,7 @@
             <label for="res3" class="radio-txt">[$6227]</label>
 
             <div class="radioOff" id="res4_div"><input type="radio" name="feedback-radio" id="res4" value="4"></div>
-            <label for="res4" class="radio-txt">[$6846]</label>
-
-            <div class="radioOff" id="res5_div"><input type="radio" name="feedback-radio" id="res5" value="5"></div>
-            <label for="res5" class="radio-txt">[$6229]</label>
+            <label for="res4" class="radio-txt">[$23422]</label>
 
             <div class="radioOff" id="res6_div"><input type="radio" name="feedback-radio" id="res6" value="6"></div>
             <label for="res6" class="radio-txt">[$6847]</label>
@@ -185,15 +186,37 @@
         </div>
         <div class="duplicated-input-warning">
             <div class="arrow"></div>
-            <span>[$17579]</span>
+            <span>[$23219]</span>
         </div>
     </div>
     <div class="fm-notifications-bottom">
         <div class="fm-dialog-new-folder-button default-green-button button right"><span>[$455]</span></div>
-         <div class="create-folder-button-cancel default-white-button right"><span>[$82]</span></div>
+        <div class="create-folder-button-cancel default-white-button right"><span>[$82]</span></div>
         <div class="clear"></div>
     </div>
 </div>
+
+<div class="fm-dialog create-file-dialog filled-input hidden">
+    <div class="fm-dialog-close"></div>
+    <div class="nw-fm-dialog-title">[$17505]</div>
+    <div class="fm-dialog-body mid-pad">
+        <div class="create-folder-input-bl">
+            <div class="transfer-filetype-icon text">
+            </div>
+            <input name="dialog-new-file" type="text" value="" placeholder="[$17506]" autofocus />
+        </div>
+        <div class="duplicated-input-warning">
+            <div class="arrow"></div>
+            <span>[$17578]</span>
+        </div>
+    </div>
+    <div class="fm-notifications-bottom">
+        <div class="fm-dialog-new-file-button default-green-button button right create-file"><span>[$455]</span></div>
+        <div class="create-file-button-cancel default-white-button right cancel-create-file"><span>[$82]</span></div>
+        <div class="clear"></div>
+    </div>
+</div>
+
 
 <div class="fm-dialog dlkey-dialog hidden">
     <div class="fm-dialog-header">
@@ -287,7 +310,7 @@
             </div>
             <div class="fm-dialog-new-folder-input">
                 <div class="fm-dialog-new-folder-pad decryption-password">
-                    <span class="icon"></span>
+                    <i class="small-icon dialog-sprite grey-lock"></i>
                     <input class="password-decrypt-input" type="password" placeholder="[$9073]" value="" autocomplete="new-password" />
                 </div>
             </div>
@@ -320,21 +343,19 @@
     <div class="reg-success-special">
         <div class="reg-success-txt">[$217]</div>
         <div class="reg-success-txt chat-header">[$20647]</div>
+        <div class="reg-resend-email-txt"></div>
         <div class="reg-success-txt chat-message">[$20648]</div>
-        <div class="reg-grey-bar"></div>
-        <div class="reg-resend-email">
+        <div class="reg-resend-email hidden">
             <div class="reg-resend-input-bl">
                 <input type="text" value="" maxlength="190" />
                 <div class="reg-resend-email-meg">[$1100]</div>
             </div>
             <div class="reg-resend-button-bl">
-                <div class="resend-email-button">
-                    [$8744]
-                </div>
+                <div class="resend-email-button">[$8744]</div>
             </div>
         </div>
     </div>
-    <div class="reg-success-txtb">[$9029]</div>
+    <div class="reg-success-txtb">[$22900]</div>
 </div>
 
 <div class="fm-dialog rename-dialog hidden">
@@ -400,6 +421,11 @@
                         <div class="transfer-filetype-icon generic file"></div>
                         <div class="summary-ff-name">[$5533]</div>
                         <div class="delete-img icon"></div>
+                        <input class="summary-ff-name hidden" type="text" value="" placeholder="[$17506]" />
+                    </div>
+                    <div class="duplicated-input-warning">
+                        <div class="arrow"></div>
+                        <span>[$17578]</span>
                     </div>
                 </div>
             </div>
@@ -573,105 +599,127 @@
             <div class="checkdiv checkboxOff"> <input type="checkbox" name="confirmation-checkbox" id="confirmation-checkbox" class="checkboxOff"> </div>
             <label for="export-checkbox" class="radio-txt">[$229]</label>
         </div>
-        <div class="default-green-button right notification-button button"><span>[$1018]</span></div>
-        <div class="default-white-button right notification-button button"><span>[$82]</span></div>
+        <div class="button default-green-button right"><span>[$1018]</span></div>
+        <div class="button default-white-button right"><span>[$82]</span></div>
         <div class="clear"></div>
     </div>
 </div>
 
+<!-- Export links dialog  !-->
+<div class="fm-dialog export-links-dialog lato big-radius hidden">
+    <div class="fm-dialog-close"></div>
 
-<div class="fm-dialog export-links-dialog hidden">
-    <div class="fm-dialog-header">
-        <div class="fm-dialog-title">[$1031]</div>
-        <div class="fm-dialog-close"></div>
-        <div class="clear"></div>
+    <!-- Or [$8734] for multiple linkls !-->
+    <div class="export-links-dialog header get-link">
+        [$59]
     </div>
 
-    <!-- Share link & Embed Tab link -->
-    <div class="fm-dialog-tab hidden">
-        <div class="fm-tab-wrapper">
-            <div class="fm-tab tab-url-link active">
-                <span>[$5622]</span>
-            </div>
-            <div class="fm-tab tab-embed-link">
-                <span>[$17407]</span>
-            </div>
-        </div>
+    <div class="export-links-dialog header embed">
+        [$17407]
     </div>
 
-    <!-- Please add "expiry-date" class to show new features. Please add "pro-only" class for free accounts !-->
-    <div class="export-content-block">
-        <div class="fm-links-export-options">
-            <div class="fm-link-select-label">[$7649]</div>
-            <div class="fm-links-radio-buttons">
-                <div class="separate-link-and-key">
-                    <div class="link-handle" data-keyoptions="public-handle">
-                        <span class="icon"></span>
-                        <span class="text">[$7947]</span>
-                    </div>
-                    <div class="button-separator"></div>
-                    <div class="link-decryption-key" data-keyoptions="decryption-key">
-                        <span class="icon"></span>
-                        <span class="text">[$7971]</span>
-                    </div>
+    <div class="clear"></div>
+
+    <div class="export-links-dialog body">
+        <div class="export-links-dialog options">
+            <div class="export-links-dialog key">
+                <div class="checkdiv small-green dialog-sprite checkboxOff">
+                    <input type="checkbox" name="export-keys-opt" id="export-keys-opt">
                 </div>
-                <div class="link-handle-and-key" data-keyoptions="full-link">
-                    <span class="icon"></span>
-                    <span class="text">[$7948]</span>
-                </div>
-            </div>
-        </div>
-        <div class="clear"></div>
-        <div class="extra-options">
-            <div class="fm-expiry-dropdown">
-                <div class="fm-link-select-label">
-                    <span class="set-expiry-text">[$8953]</span><span class="pro-only-feature"> ([$8695])</span>:
-                    <div class="dialog-feature-toggle expiry"><div class="dialog-feature-switch"></div></div>
-                </div>
-                <div class="expiry-date-select-container default-select hidden">
-                    <input type="text" id="link-expiry-datepicker"
-                        class="fm-dialogs-select expiry-date-select"
-                        value="" placeholder="[$17697]-[$17698]-[$17699]" />
-                </div>
-                <div class="disabled-overlay hidden"></div>
-            </div>
-            <div class="fm-password-protect-dropdown">
-                <div class="fm-link-select-label">
-                    <span class="set-password-text">[$9063]</span><span class="pro-only-feature"> ([$8695])</span>: <span class="password-strength"></span>
-                    <div class="dialog-feature-toggle"><div class="dialog-feature-switch"></div></div>
-                </div>
-                <div class="password-entry-container hidden">
-                    <div class="password-protect-inputs">
-                        <div class="password-protect-input-container">
-                            <div class="estimator-loading-icon"></div>
-                            <input class="password-protect-input first" type="password" placeholder="[$9074]">
+                <label for="export-keys-opt" class="radio-txt">
+                    [$23620]
+                </label>
+
+                <div class="rounded-tip-button">
+                    <i class="small-icon dialog-sprite question-mark"></i>
+                    <div class="dropdown body dropdown-arrow down-arrow keys-tip">
+                        <i class="dropdown-white-arrow"></i>
+                        <div class="flying-file dialog-sprite"></div>
+                        <div class="tip-header">
+                            [$1028]
                         </div>
-                        <div class="spacer"></div>
-                        <div class="password-protect-input-container">
-                            <input class="password-protect-input second" type="password" placeholder="[$9075]">
+                        <div class="tip-text">
+                            [$23621]
+                        </div>
+                        <a href="/help/client/webclient/contacts-and-sharing/how-do-i-get-a-decryption-key-for-my-link-576c7cf4886688e6028b458a" target="_blank" class="tip-link clickurl">[$8742]</a>
+                    </div>
+                </div>
+                <div class="clear"></div>
+            </div>
+
+            <div class="export-links-dialog pro">
+                <div class="half-sized-block">
+                    <div class="export-links-dialog sub-header expiry">
+                        <span class="info">[$23622]</span> <span class="pro-only-feature">[$8695]</span>
+                    </div>
+                    <div class="button default-white-button semi-big gradient left expiry">
+                        <span class="label">[$8953]</span>
+                        <input type="text" class="set-date common" value="" />
+                        <div class="sub-button hidden">
+                             <i class="small-icon dialog-sprite small-cross"></i>
                         </div>
                     </div>
-                    <div class="password-protect-error"></div>
-                    <div class="default-white-button left fm-dialog-button encrypt-link-button">
-                        <span class="encrypt-text">[$9061]</span>
-                        <i class="small-icon encryption-in-progress hidden"></i>
-                    </div>
+                    <div class="clear"></div>
                 </div>
-                <div class="disabled-overlay hidden"></div>
+                <div class="half-sized-block">
+                    <div class="export-links-dialog sub-header">
+                        [$23623] <span class="pro-only-feature">[$8695]</span>
+                    </div>
+                    <div class="button default-white-button semi-big gradient left password">
+                        <span>[$17454]</span>
+                    </div>
+                    <div class="button default-white-button semi-big gradient left remove hidden">
+                        <span>[$83]</span>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+                <div class="clear"></div>
             </div>
-            <div class="clear"></div>
         </div>
-        <div class="reveal-feature-toggle-container">
-            <div class="reveal-feature-toggle">[$9064]</div><div class="get-pro hidden">[$8696]</div>
+
+        <div class="dark-direct-tooltip custom-html">
+            <i class="small-icon icons-sprite tooltip-arrow"></i>
+            <div class="content"></div>
         </div>
-        <div id="export-link-body" class="export-link-body"></div>
+
+        <div class="dropdown body export hidden">
+            <div class="dropdown-item link-button light set-exp-date">
+                <i class="small-icon context-sprite calendar colorized"></i>
+                <span>[$8953]</span>
+            </div>
+            <div class="dropdown-item link-button light set-password">
+                <i class="small-icon context-sprite lock colorized"></i>
+                <span>[$17454]</span>
+            </div>
+            <hr>
+            <div class="dropdown-item link-button light remove-item">
+                <i class="small-icon context-sprite light-red-cross colorized"></i>
+                <span>[$6821]</span>
+            </div>
+        </div>
+
+        <!-- Please use "separately" classname if its availbable to copy keys separately !-->
+        <div class="export-links-dialog links">
+            <div class="export-links-dialog links-scroll"></div>
+            <div class="export-links-dialog links-scroll-overlays"></div>
+            <div class="export-links-dialog bottom">
+                <div class="button default-green-button semi-big gradient right copy keys hidden">
+                    [$23624]
+                </div>
+                <!-- Or [$23625] for "Copy All Links" !-->
+                <div class="button default-green-button semi-big gradient right copy links">
+                    [$20840]
+                </div>
+                <div class="clear"></div>
+            </div>
+        </div>
     </div>
 
-    <!-- Embed code block - Hidden unless it is selected from the context menu via Embed video or when the tab is selected -->
+    <!-- Embed code block - Hidden unless it is selected from the context menu via Embed video or when the tab is selected !-->
     <div class="embed-content-block hidden">
         <div class="wrapper embed-video">
             <div class="video-thumbnail-container">
-                <!-- Render video thumnail here. Display using 16:9 ratio, if you can't display normally and the video should centre itself -->
+                <!-- Render video thumnail here. Display using 16:9 ratio, if you can't display normally and the video should centre itself !-->
                 <div class="video-thumbnail"><img /></div>
                 <div class="file-information-container">
                     <div class="video-filename">
@@ -735,7 +783,7 @@
                         <div class="checkdiv checkboxOff">
                             <input type="checkbox" id="enable-autoplay" class="checkboxOff" />
                         </div>
-                        <label for="enable-autoplay" class="radio-txt">[$22188]<div class="small-icon info-icon simpletip" data-simpletip-style="{&quot;text-align&quot;:&quot;center&quot;}" data-simpletip="Currently, only the Chrome browser supports autoplay embed video with sound.[BR]To autoplay on other browsers, please mute the video with the option below."></div></label>
+                        <label for="enable-autoplay" class="radio-txt">[$22188]<div class="small-icon info-icon fm-s simpletip" data-simpletip-style="{&quot;text-align&quot;:&quot;center&quot;}" data-simpletip="[$23718]"></div></label>
                     </div>
                 </div>
                 <div class="settings-row">
@@ -748,29 +796,47 @@
                 </div>
             </div>
         </div>
-    </div>
-    <div class="fm-notifications-bottom">
-        <div class="export-description hidden">
-            [$7682]
+        <div class="bottom">
+            <div class="button default-green-button semi-big gradient right copy links">
+                [$17408]
+            </div>
+            <div class="clear"></div>
         </div>
-        <!-- Preview video should only be visible when the embed video tab is selected -->
-        <div class="default-white-button left preview-embed button hidden">
-            <span>[$1899]</span>
-        </div>
-        <div class="default-green-button right links-button copy-to-clipboard button" id="clipboardbtn1">
-            <span></span>
-        </div>
-        <div class="clear"></div>
     </div>
 </div>
 
-
-<div class="export-links-warning hidden">
-    <div class="export-links-warning-close"></div>
-    <div class="export-warning-content">
-        <p>
-            <span class="orange">[$368]</span> [$7680]
-        </p>
+<!-- Set password dialog  !-->
+<div class="fm-dialog set-password-dialog lato big-radius hidden">
+    <div class="fm-dialog-title">
+        [$17454]
+    </div>
+    <div class="set-password-dialog body">
+        <div  class="set-password-dialog existing-pass hidden">
+            <div  class="set-password-dialog existing-tip">
+                [$23669]
+            </div>
+            <div  class="set-password-dialog existing-input">
+                <div  class="set-password-dialog existing-input-wrap">
+                    <i class="small-icon dialog-sprite grey-eye"></i>
+                    <input type="password" value="" readonly>
+                </div>
+                <div class="button default-green-button semi-big gradient no-hover copy">
+                    [$63]
+                </div>
+            </div>
+        </div>
+        <div class="set-password-dialog pass-wrapper">
+            <input class="titleTop with-icon enter-pass" type="password" placeholder="[$9074]" data-icon="bus-reg-icon pw1" />
+            <div class="set-password-dialog strength"></div>
+            <input class="titleTop with-icon confirm-pass" type="password" placeholder="[$1114]"  data-icon="bus-reg-icon pw2" />
+        </div>
+        <div class="button default-green-button semi-big gradient right confirm">
+            [$870]
+        </div>
+        <div class="button default-white-button semi-big right cancel">
+            [$82]
+        </div>
+        <div class="clear"></div>
     </div>
 </div>
 
@@ -844,29 +910,6 @@
     </div>
 </div>
 
-
-<div class="fm-dialog chrome-dialog hidden">
-    <div class="fm-dialog-header">
-        <div class="fm-dialog-title">[$1034]</div>
-        <div class="fm-dialog-close"></div>
-        <div class="clear"></div>
-    </div>
-    <div class="chrome-dialog-body">
-        <div class="chrome-dialog-logo"></div>
-        <div class="chrome-dialog-notification">
-            <div class="chrome-dialog-arrow"></div>
-            [$1035]
-        </div>
-    </div>
-    <div class="fm-notifications-bottom">
-        <div class="checkboxOff"> <input type="checkbox" name="chrome-checkbox" id="chrome-checkbox" class="checkboxOff"> </div>
-        <label for="chrome-checkbox" class="radio-txt">[$229]</label>
-        <div class="default-white-button right browsers-button"><span>[$148]</span></div>
-        <div class="clear"></div>
-    </div>
-</div>
-
-
 <div class="fm-dialog avatar-dialog hidden">
     <div class="fm-dialog-header">
         <div class="fm-dialog-title">[$993]</div>
@@ -874,6 +917,75 @@
         <div class="clear"></div>
     </div>
     <div class="avatar-body">
+    </div>
+</div>
+
+<div class="fm-dialog push-settings-dialog hidden">
+    <div class="fm-dialog-header">
+        <div class="fm-dialog-title">[$16214]</div>
+        <div class="dialog secondary-header">[$22015]</div>
+        <div class="fm-dialog-close"></div>
+        <div class="clear"></div>
+    </div>
+    <div class="fm-dialog-body">
+        <label class="radio-txt">
+            [$22012]
+            <div class="custom-radio small green-active radioOff">
+                <input
+                    type="radio"
+                    name="push-settings-radio"
+                    value="30"
+                    class="custom-radio" />
+            </div>
+        </label>
+        <label class="radio-txt">
+            [$19048]
+            <div class="custom-radio small green-active radioOff">
+                <input
+                    type="radio"
+                    name="push-settings-radio"
+                    value="60"
+                    class="custom-radio" />
+            </div>
+        </label>
+        <label class="radio-txt">
+            [$22013]
+            <div class="custom-radio small green-active radioOff">
+                <input
+                    type="radio"
+                    name="push-settings-radio"
+                    value="360"
+                    class="custom-radio" />
+            </div>
+        </label>
+        <label class="radio-txt">
+            [$22014]
+            <div class="custom-radio small green-active radioOff">
+                <input
+                    type="radio"
+                    name="push-settings-radio"
+                    value="1440"
+                    class="custom-radio" />
+            </div>
+        </label>
+        <label class="radio-txt morning-option">
+            <span>
+                <!-- // ... -->
+            </span>
+            <div class="custom-radio small green-active radioOn">
+                <input
+                    type="radio"
+                    name="push-settings-radio"
+                    value="0"
+                    class="custom-radio radioOn"
+                    checked />
+            </div>
+        </label>
+    </div>
+    <div class="buttons-block">
+        <div class="default-green-button gradient right push-settings-done">[$726]</div>
+        <div class="default-white-button right push-settings-close">[$82]</div>
+        <div class="clear"></div>
     </div>
 </div>
 
@@ -895,7 +1007,7 @@
                 <span>Wiremu tane</span>
             </div>
             <div class="properties-context-item show-more">
-                <span>[$10663]</span>
+                <span></span>
             </div>
 
             <div class="context-menu-divider"></div>
@@ -1002,7 +1114,7 @@
         </div>
     </div>
     <div class="fm-notifications-bottom">
-        <div class="default-white-button right notification-button">
+        <div class="button default-white-button right">
             <div class="download-save-your-file">
             </div>
             <span>[$241]</span>
@@ -1022,10 +1134,10 @@
         </div>
         <div class="duplicated-input-warning">
             <div class="arrow"></div>
-            <span>[$17579]</span><!--  -->
+            <span>[$23219]</span><!--  -->
         </div>
     </div>
-     <div class="fm-notifications-bottom">
+    <div class="fm-notifications-bottom">
         <div class="create-folder-button default-green-button button right"><span>[$455]</span></div>
         <div class="create-folder-button-cancel default-white-button right"><span>[$82]</span></div>
         <div class="clear"></div>
@@ -1156,54 +1268,77 @@
 
 <!--Share Dialog-->
 <div class="fm-dialog share-dialog hidden">
-    <div class="fm-dialog-header">
-        <div class="fm-dialog-title">[$5631]</div>
-        <div class="fm-dialog-close"></div>
-        <div class="clear"></div>
+    <div class="share-dialog-top">
+        <div class="share-dialog-header">
+            <div class="fm-dialog-close"></div>
+        </div>
+        <div class="share-dialog-top-body">
+            <div class="share-dialog-title">[$1344]</div>
+            <div class="share-dialog-shared-item">
+                <div class="share-dialog-folder-icon"></div>
+                <div class="share-dialog-folder-info-block">
+                    <div class="share-dialog-folder-name"></div>
+                    <div class="share-dialog-folder-info"></div>
+                </div>
+            </div>
+            <div class="share-dialog-copy-link-wrapper">
+                <div class="share-dialog-green-button copy-link">[$17835]</div>
+            </div>
+            <div class="share-dialog-copy-link-msg hidden">
+                <div class="copy-link-icon"></div>
+                <div class="copy-link-txt">[$23705]</div>
+            </div>
+        </div>
     </div>
-    <div class="fm-dialog-body">
-        <div class="permissions-menu hidden">
-            <div class="permissions-menu-arrow"></div>
-            <div class="permissions-menu-item read-only"><span></span>[$55]</div>
-            <div class="permissions-menu-item read-and-write"><span></span>[$56]</div>
-            <div class="permissions-menu-item full-access"><span></span>[$57]</div>
+    <div class="share-dialog-bottom">
+        <div class="share-dialog-bottom-body">
+            <div class="share-dialog-permissions-menu hidden">
+                <div class="permission-item full-access"><span class="permission-item-text">[$57]</span></div>
+                <div class="permission-item read-and-write"><span class="permission-item-text">[$5610]</span></div>
+                <div class="permission-item read-only"><span class="permission-item-text">[$55]</span></div>
+            </div>
+            <div class="share-dialog-access-title">[$23706]</div>
+            <div class="share-dialog-access-list"></div>
+            <div class="share-dialog-access-add">
+                <i class="share-dialog-access-add-icon"></i>
+                <span class="share-dialog-access-add-txt">[$23707]</span>
+            </div>
+            <div class="share-dialog-buttons-wrapper">
+                <div class="share-dialog-white-button remove-share disabled">[$23737]</div>
+                <div class="share-dialog-green-button done-share disabled">[$726]</div>
+            </div>
+            <div class="share-dialog-bottom-msg">[$23708]</div>
         </div>
-        <!-- Please hide "share-dialog-img" if contacts list is not empty !-->
-        <div class="share-dialog-img hidden"></div>
-        <!-- Please unhide "share-dialog-contacts" if contacts list is not empty !-->
-        <div class="share-dialog-contacts">
-            <!--Content goes here-->
-        </div>
-        <div class="multiple-input">
-            <i class="small-icon icons-sprite email"></i>
-            <input type="text" class="share-multiple-input" id="share-multiple-input" name="" />
-            <div class="clear"></div>
-        </div>
-        <div class="multiple-input-warning">
-            <span>[$5918]</span>
-        </div>
-        <div class="share-message">
-            <div class="share-message-scrolling">
-                <div class="share-message-textarea textarea-scroll">
-                    <textarea>[$6853]</textarea>
-                    <div class="share-message-hidden"></div>
+    </div>
+
+    <div class="share-add-dialog-bottom">
+        <div class="share-add-dialog-bottom-body">
+            <div class="multiple-input">
+                <i class="small-icon icons-sprite email"></i>
+                <div>
+                    <input type="text" class="share-multiple-input" id="share-multiple-input" name=""/>
+                </div>
+            </div>
+            <div class="multiple-input-warning">
+                <span>[$5918]</span>
+            </div>
+            <div class="share-message hidden">
+                <div class="share-message-scrolling">
+                    <div class="share-message-textarea textarea-scroll">
+                        <textarea placeholder="[$19110]"></textarea>
+                        <div class="share-message-hidden"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="share-add-dialog-buttons-wrapper">
+                <div class="share-add-dialog-cancel-button"><span>[$82]</span></div>
+                <div class="share-add-dialog-add-button-wrapper">
+                    <div class="share-dialog-green-button add-share disabled">[$726]</div>
                 </div>
             </div>
         </div>
     </div>
-    <div class="fm-notifications-bottom">
-        <div class="share-dialog-icon permissions-icon">
-            <span></span>
-            l[7534]
-        </div>
-        <div class="default-green-button right dialog-share-button button">
-            <span>[$726]</span>
-        </div>
-        <div class="default-white-button right dialog-cancel-button button">
-            <span>[$82]</span>
-        </div>
-        <div class="clear"></div>
-    </div>
+
 </div><!--End Share Dialog-->
 <!--Contact Fingerprint Dialog-->
 <div class="fm-dialog fingerprint-dialog hidden">
@@ -1331,7 +1466,7 @@
             <input class="titleTop input-email" type="text" name="login-name3" id="login-name3" placeholder="[$195]" maxlength="190" />
             <input class="titleTop input-password" type="password" name="login-password3" id="login-password3" placeholder="[$909]" />
             <div class="login-page-forgot-bl">
-                <a class="top-login-forgot-pass clickurl" href="/recovery" tabindex="-1">[$1934]</a>
+                <a class="top-login-forgot-pass" tabindex="-1">[$1934]</a>
                 <div class="clear"></div>
             </div>
             <div class="account checkbox-block left">
@@ -1428,15 +1563,13 @@
         <div class="clear"></div>
     </div>
     <div class="fm-notification-body">
-        <div class="fm-notification-icon"></div>
+        <div class="icon pricing-sprite plan-icon"></div>
         <div class="fm-notification-info">
             [$15]
         </div>
         <div class="clear"></div>
     </div>
     <div class="fm-notifications-bottom">
-        <div class="default-white-button right notification-button"><span>[$1018]</span></div>
-        <div class="default-white-button right notification-button"><span>[$82]</span></div>
         <div class="default-white-button right pro-login"><span>[$171]</span></div>
         <div class="default-white-button right pro-register"><span>[$1076]</span></div>
         <div class="clear"></div>
@@ -1452,11 +1585,11 @@
         <div class="feedback-dialog-header">[$7238]</div>
         <div class="fm-mega-dialog-pad">
             <div class="rating">
-                <a class="unhappy"></a>
-                <a class="sad"></a>
-                <a class="neutral"></a>
-                <a class="happy"></a>
-                <a class="awesome"></a>
+                <a class="unhappy dialog-sprite"></a>
+                <a class="sad dialog-sprite"></a>
+                <a class="neutral dialog-sprite"></a>
+                <a class="happy dialog-sprite"></a>
+                <a class="awesome dialog-sprite"></a>
                 <div class="clear"></div>
             </div>
             <div class="feedback-dialog-textarea">
@@ -1467,7 +1600,7 @@
             </div>
             <div class="reply">
                 <div class="feedback-label-txt">
-                    <div class="checkdiv checkboxOff">
+                    <div class="checkdiv checkboxOff small-green dialog-sprite">
                         <input type="checkbox" name="contact_me" id="contact_me" />
                     </div>
 
@@ -1480,17 +1613,17 @@
             </div>
             <div class="stats">
                 <div class="feedback-label-txt">
-                    <div class="checkdiv checkboxOff">
+                    <div class="checkdiv checkboxOff small-green dialog-sprite">
                         <input type="checkbox" name="send_stats" id="send_stats" />
                     </div>
 
                     <label for="send_stats" class="radio-txt">
                         [$6945]
                     </label>
-                    <span class="membership-question stats-button">
-                        <span class="membership-notification">
+                    <span class="feedback-question dialog-sprite">
+                        <span class="dropdown body dropdown-arrow down-arrow">
+                            <i class="dropdown-white-arrow"></i>
                             <span>[$17701]</span>
-                            <span class="membership-arrow"></span>
                         </span>
                     </span>
                 </div>
@@ -1506,7 +1639,7 @@
 </div>
 
 
-<div class="fm-dialog fm-mega-dialog collected-data-review-dialog hidden">
+<div class="fm-dialog collected-data-review-dialog hidden">
     <div class="fm-dialog-close"></div>
     <div class="nw-fm-dialog-title"></div>
     <div class="fm-mega-dialog-pad">
@@ -1608,9 +1741,7 @@
     <div class="btn-close-dialog"></div>
     <div class="payment-dialog-body">
 
-        <div class="plan-icon pro1">
-            <div class="reg-st3-membership-icon"></div>
-        </div>
+        <div class="pricing-sprite plan-icon pro1"></div>
         <div class="payment-plan-info">
             <div class="payment-plan-title">PRO I</div>
             <div class="payment-plan-txt">1 month <span>([$6965])</span></div>
@@ -1695,9 +1826,7 @@
     <div class="btn-close-dialog"></div>
     <div class="payment-address-dialog-body">
 
-        <div class="plan-icon pro1">
-            <div class="reg-st3-membership-icon"></div>
-        </div>
+        <div class="pricing-sprite plan-icon pro1"></div>
         <div class="payment-plan-info">
             <div class="payment-plan-title">PRO I</div>
             <div class="payment-plan-txt"><span class="duration">[$922]</span> <span class="recurring">([$6965])</span></div>
@@ -1742,6 +1871,9 @@
             </div>
             <div class="fm-account-input code">
                 <input class="postcode" type="text" value="" placeholder="[$10659]" tabindex="8">
+            </div>
+            <div class="fm-account-input vat-tax">
+                <input class="taxcode" type="text" value="" placeholder="[$7347]" tabindex="9">
             </div>
             <div class="clear"></div>
         </div>
@@ -2269,9 +2401,7 @@
 <div class="fm-dialog voucher-dialog hidden">
     <div class="btn-close-dialog"></div>
     <div class="voucher-dialog-body">
-        <div class="plan-icon pro1">
-            <div class="reg-st3-membership-icon"></div>
-        </div>
+        <div class="pricing-sprite plan-icon pro1"></div>
         <div class="voucher-plan-info">
             <div class="voucher-plan-title">PRO I</div>
             <div class="voucher-plan-txt">
@@ -2331,7 +2461,7 @@
     <div class="fm-notifications-bottom">
         <div class="default-white-button right accept"><span>[$870]</span></div>
         <div class="default-white-button right cancel"><span>[$1597]</span></div>
-        <a class="powered-by-astropay" href="https://www.astropay.com/" target="_blank" rel="noopener noreferrer"></a>
+        <a class="pricing-sprite powered-by-astropay" href="https://www.astropay.com/" target="_blank" rel="noopener noreferrer"></a>
         <div class="clear"></div>
     </div>
 </div>
@@ -2429,31 +2559,19 @@
     </div>
     <div class="account-information">
         <div class="left-information">
-            <div class="reg-st3-membership-bl">
-                <div class="membership-pad-bl">
-                    <div class="membership-gray-block">
-                        <div class="reg-st3-membership-icon"></div>
-                        <div class="reg-st3-bott-title plan-name"></div>
-                        <div class="reg-st3-bott-title price">
-                            <span class="num"><span class="dollars"></span><span class="small"><span class="cents"></span> &euro;</span></span><span class="period">/[$913]</span>
-                        </div>
+            <div class="pricing-page plan">
+                <div class="pricing-page plan-icon pricing-sprite"></div>
+                <div class="pricing-page plan-title"></div>
+                <div class="pricing-page plan-content">
+                    <div class="pricing-page plan-price">
+                        <span class="price"></span>
                     </div>
-                    <div class="reg-st3-storage">
-                        <div class="pro-feature-icon"></div>
-                        <div class="reg-st3-big-txt">
-                            <span class="quota-amount"></span> <span class="quota-unit"></span>
-                        </div>
-                        <div class="reg-st3-mid-txt">[$495]</div>
-                        <div class="clear"></div>
+                    <div class="pricing-page plan-currency"></div>
+                     <div class="pricing-page plan-period">
+                        /[$931]
                     </div>
-                    <div class="reg-st3-bandwidth">
-                        <div class="pro-feature-icon bandwidth"></div>
-                        <div class="reg-st3-big-txt">
-                            <span class="quota-amount"></span> <span class="quota-unit"></span>
-                        </div>
-                        <div class="reg-st3-mid-txt">[$16120]</div>
-                        <div class="clear"></div>
-                    </div>
+                     <div class="pricing-page plan-data storage"><span></span> [$495]</div>
+                    <div class="pricing-page plan-data transfer"><span></span> [$18057]</div>
                 </div>
             </div>
         </div>
@@ -2504,7 +2622,7 @@
     <div class="invoice-right-bg"></div>
     <div class="right-side">
         <div class="invoice-date-time"></div>
-        <div class="plan-icon"><div class="reg-st3-membership-icon"></div></div>
+        <div class="pricing-sprite plan-icon"></div>
         <div class="plan-name"></div>
         <div class="plan-duration"></div>
         <div class="plan-price-euros">
@@ -2534,21 +2652,17 @@
     </div>
 </div>
 
-<div class="fm-dialog limited-bandwidth-dialog hidden">
+<div class="fm-dialog limited-bandwidth-dialog lato hidden">
     <div class="fm-dialog-close"></div>
     <div class="fm-dialog-body centered-content">
         <div class="dialog header-before-icon limited">[$16164]</div>
         <div class="dialog header-before-icon exceeded">[$17]</div>
 
-        <i class="semi-huge-icon speedometer almost-full dialog-top-icon"></i>
-        <i class="big-104px-icon speedometer full dialog-top-icon"></i>
-        <i class="semi-huge-icon speedometer full dialog-top-icon"></i>
-        <i class="huge-icon storage-icon full"></i>
-
         <p class="dialog p-after-icon msg-overquota">[$120]</p>
         <p class="dialog p-after-icon msg-prewarning">
             [$17090]
         </p>
+        <div class="dialog transfer-overquota-txt step1-block">[$7100]</div>
 
         <div class="dialog pro-exceeded-bl">
 
@@ -2617,228 +2731,292 @@
                 </div>
             </div>
 
-            <div class="centered-checkbox dialog-bottom">
-                <!--div class="checkdiv checkboxOff">
-                    <input type="checkbox" name="limit-warning-checkbox" id="limit-warning-checkbox" class="checkboxOff">
+            <div class="centered-checkbox dialog-bottom"></div>
+        </div>
+        <div class="step1-block">
+            <div class="pricing-page radio-buttons individual-el right">
+                <div class="radioOn">
+                    <input id="d-pro-monthly-payment" name="d-pro-payment-period" type="radio" class="radioOn megaInputs" value="1" checked>
                 </div>
-                <label for="limit-warning-checkbox" class="radio-txt medium">[$229]</label-->
+                <label class="radio-txt" for="d-pro-monthly-payment">[$23779]</label>
+                <div class="radioOff">
+                    <input id="d-pro-yearly-payment" name="d-pro-payment-period" type="radio" class="megaInputs radioOff" value="12">
+                </div>
+                <label class="radio-txt" for="d-pro-yearly-payment">[$23780]</label>
             </div>
+            <div class="clear"></div>
+            <hr />
         </div>
 
-        <div class="plan-blocks step1-block">
-            <div class="dialog transfer-plans">
-                <div class="reg-st3-membership-bl pro4 selected" data-payment="4">
-                    <div class="membership-pad-bl">
-                        <div class="reg-st3-bott-title title">
-                            <div class="membership-icon tiny"></div>
-                            <span>[$8413]</span>
-                        </div>
-                        <div class="membership-gray-block">
-                            <div class="reg-st3-bott-title price">
-                                <span class="num">
-                                    <span class="big"></span><span class="small"></span>
-                                </span>
-                                <span class="green-star-img"></span>
-                                <span class="local-currency-code hidden">MXN</span>
-                                <span class="period">/[$913]</span>
-                                <div class="euro-price hidden">4.99 &euro;</div>
+         <div class="step1-block dialog-cards">
+            <div class="scrollable">
+                <div class="pricing-page plans-block">
+                    <div class="pricing-page plans-row">
+                        <div class="pricing-page plan pro4" data-payment="4">
+                            <div class="pricing-page plan-label"></div>
+                            <div class="pricing-page plan-title"></div>
+                            <div class="pricing-page plan-info">
+                                [$23950]
+                            </div>
+                            <div class="pricing-page plan-content">
+                                <div class="pricing-page plan-price">
+                                    <span class="price"></span><span class="asterisk">*</span>
+                                </div>
+                                <div class="pricing-page plan-currency"></div>
+                                 <div class="pricing-page plan-period">
+                                    /[$931]
+                                </div>
+                                <div class="pricing-page euro-price"></div>
+                                <div class="clear"></div>
+                                <div class="pricing-page plan-button">
+                                </div>
                             </div>
                         </div>
-                        <div class="pro-plan-descr">
-                            <div class="reg-st3-storage">
-                                <div class="pro-feature-icon"></div>
-                                <div class="reg-st3-big-txt ">
-                                    <span class="storage-amount">1</span>
-                                    <span class="storage-unit">TB</span>
-                                </div>
-                                <div class="reg-st3-mid-txt">[$495]</div>
-                                <div class="clear"></div>
+                        <div class="pricing-page plan pro1" data-payment="1">
+                            <div class="pricing-page plan-label">[$23948]</div>
+                            <div class="pricing-page plan-title">
                             </div>
-                            <div class="reg-st3-bandwidth">
-                                <div class="pro-feature-icon bandwidth"></div>
-                                <div class="reg-st3-big-txt">
-                                    <span class="bandwidth-amount">2</span> <span class="bandwidth-unit">TB</span>
+                            <div class="pricing-page plan-info">
+                                [$23949]
+                            </div>
+                            <div class="pricing-page plan-content">
+                                <div class="pricing-page plan-price">
+                                    <span class="price"></span><span class="asterisk">*</span>
                                 </div>
-                                <div class="reg-st3-mid-txt">[$16120]</div>
+                                <div class="pricing-page plan-currency"></div>
+                                 <div class="pricing-page plan-period">
+                                    /[$931]
+                                </div>
+                                <div class="pricing-page euro-price"></div>
                                 <div class="clear"></div>
+                                <div class="pricing-page plan-button">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="pricing-page plan pro2" data-payment="2">
+                            <div class="pricing-page plan-label"></div>
+                            <div class="pricing-page plan-title">
+                            </div>
+                            <div class="pricing-page plan-info">
+                                [$23952]
+                            </div>
+                            <div class="pricing-page plan-content">
+                                <div class="pricing-page plan-price">
+                                    <span class="price"></span><span class="asterisk">*</span>
+                                </div>
+                                <div class="pricing-page plan-currency"></div>
+                                 <div class="pricing-page plan-period">
+                                    /[$931]
+                                </div>
+                                <div class="pricing-page euro-price"></div>
+                                <div class="clear"></div>
+                                <div class="pricing-page plan-button">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="pricing-page plan pro3" data-payment="3">
+                            <div class="pricing-page plan-label">[$506]</div>
+                            <div class="pricing-page plan-title">
+                            </div>
+                            <div class="pricing-page plan-info">
+                                [$24066]
+                            </div>
+                            <div class="pricing-page plan-content">
+                                <div class="pricing-page plan-price">
+                                    <span class="price"></span><span class="asterisk">*</span>
+                                </div>
+                                <div class="pricing-page plan-currency"></div>
+                                 <div class="pricing-page plan-period">
+                                    /[$931]
+                                </div>
+                                <div class="pricing-page euro-price"></div>
+                                <div class="clear"></div>
+                                <div class="pricing-page plan-button">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="pricing-page plans-row">
+                        <div class="pricing-page plan pro4 details" data-payment="4">
+                            <div class="pricing-page plan-feature storage strong">
+                                <span>[$23789]</span>
+                                <i class="pricing-sprite i-icon simpletip" data-simpletip="[$23807]" data-simpletipposition="top"  data-simpletipoffset="3" data-simpletip-class="pricing-tip transformed" data-simpletipwrapper=".content"></i>
+                            </div>
+                             <div class="pricing-page plan-feature strong transfer">
+                                <span>[$23790]</span>
+                                <i class="pricing-sprite i-icon simpletip" data-simpletip="[$23808]" data-simpletipposition="top"  data-simpletipoffset="3" data-simpletip-class="pricing-tip transformed" data-simpletipwrapper=".content"></i>
+                            </div>
+                            <div class="pricing-page plan-feature">
+                                <span>[$23791]</span>
+                                <i class="pricing-sprite i-icon simpletip" data-simpletip="[$23792]" data-simpletipposition="top"  data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
+                            </div>
+                            <div class="pricing-page plan-feature">
+                                <span>[$23793]</span>
+                                <i class="pricing-sprite i-icon simpletip" data-simpletip="[$23799]" data-simpletipposition="top"  data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
+                            </div>
+                              <div class="pricing-page plan-feature">
+                                <span>[$23958]</span>
+                                <i class="pricing-sprite i-icon simpletip" data-simpletip="[$23801]" data-simpletipposition="top"  data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
+                            </div>
+                            <div class="pricing-page plan-feature">
+                                <span>[$24550]</span>
+                                <i class="pricing-sprite i-icon simpletip" data-simpletip="[$24032]" data-simpletipposition="top"  data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
+                            </div>
+                            <div class="pricing-page plan-feature">
+                                <span>[$23803]</span>
+                                <i class="pricing-sprite i-icon simpletip" data-simpletip="[$23804]" data-simpletipposition="top"  data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
+                            </div>
+                            <div class="pricing-page plan-feature">
+                                <span>[$23959]</span>
+                                <i class="pricing-sprite i-icon simpletip" data-simpletip="[$23806]" data-simpletipposition="top"  data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
+                            </div>
+                            <div class="pricing-page plan-feature">
+                                <span>[$23956]</span>
+                                <i class="pricing-sprite i-icon simpletip" data-simpletip="[$24051]" data-simpletipposition="top"  data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
+                            </div>
+                        </div>
+                        <div class="pricing-page plan pro1 details" data-payment="1">
+                            <div class="pricing-page plan-feature storage strong">
+                                <span>[$23789]</span>
+                                <i class="pricing-sprite i-icon simpletip" data-simpletip="[$23807]" data-simpletipposition="top"  data-simpletipoffset="3" data-simpletip-class="pricing-tip transformed" data-simpletipwrapper=".content"></i>
+                            </div>
+                             <div class="pricing-page plan-feature strong transfer">
+                                <span>[$23790]</span>
+                                <i class="pricing-sprite i-icon simpletip" data-simpletip="[$23808]" data-simpletipposition="top"  data-simpletipoffset="3" data-simpletip-class="pricing-tip transformed" data-simpletipwrapper=".content"></i>
+                            </div>
+                            <div class="pricing-page plan-feature">
+                                <span>[$23791]</span>
+                                <i class="pricing-sprite i-icon simpletip" data-simpletip="[$23792]" data-simpletipposition="top"  data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
+                            </div>
+                            <div class="pricing-page plan-feature">
+                                <span>[$23793]</span>
+                                <i class="pricing-sprite i-icon simpletip" data-simpletip="[$23799]" data-simpletipposition="top"  data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
+                            </div>
+                              <div class="pricing-page plan-feature">
+                                <span>[$23958]</span>
+                                <i class="pricing-sprite i-icon simpletip" data-simpletip="[$23801]" data-simpletipposition="top"  data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
+                            </div>
+                            <div class="pricing-page plan-feature">
+                                <span>[$24550]</span>
+                                <i class="pricing-sprite i-icon simpletip" data-simpletip="[$24032]" data-simpletipposition="top"  data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
+                            </div>
+                            <div class="pricing-page plan-feature">
+                                <span>[$23803]</span>
+                                <i class="pricing-sprite i-icon simpletip" data-simpletip="[$23804]" data-simpletipposition="top"  data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
+                            </div>
+                            <div class="pricing-page plan-feature">
+                                <span>[$23959]</span>
+                                <i class="pricing-sprite i-icon simpletip" data-simpletip="[$23806]" data-simpletipposition="top"  data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
+                            </div>
+                            <div class="pricing-page plan-feature">
+                                <span>[$23956]</span>
+                                <i class="pricing-sprite i-icon simpletip" data-simpletip="[$24051]" data-simpletipposition="top"  data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
+                            </div>
+                        </div>
+                        <div class="pricing-page plan pro2 details" data-payment="2">
+                            <div class="pricing-page plan-feature storage strong">
+                                <span>[$23789]</span>
+                                <i class="pricing-sprite i-icon simpletip" data-simpletip="[$23807]" data-simpletipposition="top"  data-simpletipoffset="3" data-simpletip-class="pricing-tip transformed" data-simpletipwrapper=".content"></i>
+                            </div>
+                             <div class="pricing-page plan-feature strong transfer">
+                                <span>[$23790]</span>
+                                <i class="pricing-sprite i-icon simpletip" data-simpletip="[$23808]" data-simpletipposition="top"  data-simpletipoffset="3" data-simpletip-class="pricing-tip transformed" data-simpletipwrapper=".content"></i>
+                            </div>
+                            <div class="pricing-page plan-feature">
+                                <span>[$23791]</span>
+                                <i class="pricing-sprite i-icon simpletip" data-simpletip="[$23792]" data-simpletipposition="top"  data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
+                            </div>
+                            <div class="pricing-page plan-feature">
+                                <span>[$23793]</span>
+                                <i class="pricing-sprite i-icon simpletip" data-simpletip="[$23799]" data-simpletipposition="top"  data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
+                            </div>
+                              <div class="pricing-page plan-feature">
+                                <span>[$23958]</span>
+                                <i class="pricing-sprite i-icon simpletip" data-simpletip="[$23801]" data-simpletipposition="top"  data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
+                            </div>
+                            <div class="pricing-page plan-feature">
+                                <span>[$24550]</span>
+                                <i class="pricing-sprite i-icon simpletip" data-simpletip="[$24032]" data-simpletipposition="top"  data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
+                            </div>
+                            <div class="pricing-page plan-feature">
+                                <span>[$23803]</span>
+                                <i class="pricing-sprite i-icon simpletip" data-simpletip="[$23804]" data-simpletipposition="top"  data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
+                            </div>
+                            <div class="pricing-page plan-feature">
+                                <span>[$23959]</span>
+                                <i class="pricing-sprite i-icon simpletip" data-simpletip="[$23806]" data-simpletipposition="top"  data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
+                            </div>
+                            <div class="pricing-page plan-feature">
+                                <span>[$23956]</span>
+                                <i class="pricing-sprite i-icon simpletip" data-simpletip="[$24051]" data-simpletipposition="top"  data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
+                            </div>
+                        </div>
+                        <div class="pricing-page plan pro3 details" data-payment="3">
+                            <div class="pricing-page plan-feature storage strong">
+                                <span>[$23789]</span>
+                                <i class="pricing-sprite i-icon simpletip" data-simpletip="[$23807]" data-simpletipposition="top"  data-simpletipoffset="3" data-simpletip-class="pricing-tip transformed" data-simpletipwrapper=".content"></i>
+                            </div>
+                             <div class="pricing-page plan-feature strong transfer">
+                                <span>[$23790]</span>
+                                <i class="pricing-sprite i-icon simpletip" data-simpletip="[$23808]" data-simpletipposition="top"  data-simpletipoffset="3" data-simpletip-class="pricing-tip transformed" data-simpletipwrapper=".content"></i>
+                            </div>
+                            <div class="pricing-page plan-feature">
+                                <span>[$23791]</span>
+                                <i class="pricing-sprite i-icon simpletip" data-simpletip="[$23792]" data-simpletipposition="top"  data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
+                            </div>
+                            <div class="pricing-page plan-feature">
+                                <span>[$23793]</span>
+                                <i class="pricing-sprite i-icon simpletip" data-simpletip="[$23799]" data-simpletipposition="top"  data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
+                            </div>
+                              <div class="pricing-page plan-feature">
+                                <span>[$23958]</span>
+                                <i class="pricing-sprite i-icon simpletip" data-simpletip="[$23801]" data-simpletipposition="top"  data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
+                            </div>
+                            <div class="pricing-page plan-feature">
+                                <span>[$24550]</span>
+                                <i class="pricing-sprite i-icon simpletip" data-simpletip="[$24032]" data-simpletipposition="top"  data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
+                            </div>
+                            <div class="pricing-page plan-feature">
+                                <span>[$23803]</span>
+                                <i class="pricing-sprite i-icon simpletip" data-simpletip="[$23804]" data-simpletipposition="top"  data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
+                            </div>
+                            <div class="pricing-page plan-feature">
+                                <span>[$23959]</span>
+                                <i class="pricing-sprite i-icon simpletip" data-simpletip="[$23806]" data-simpletipposition="top"  data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
+                            </div>
+                            <div class="pricing-page plan-feature">
+                                <span>[$23956]</span>
+                                <i class="pricing-sprite i-icon simpletip" data-simpletip="[$24051]" data-simpletipposition="top"  data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="reg-st3-membership-bl pro1" data-payment="1">
-                    <div class="membership-pad-bl">
-                        <div class="reg-st3-bott-title title">
-                            <div class="membership-icon tiny"></div>
-                            <span>[$5819]</span>
-                        </div>
-                        <div class="membership-gray-block">
-                            <div class="reg-st3-bott-title price">
-                                <span class="num">
-                                    <span class="big"></span><span class="small"></span>
-                                </span>
-                                <span class="green-star-img"></span>
-                                <span class="local-currency-code hidden">MXN</span>
-                                <span class="period">/[$913]</span>
-                                <div class="euro-price hidden">4.99 &euro;</div>
-                            </div>
-                        </div>
-                        <div class="pro-plan-descr">
-                            <div class="reg-st3-storage">
-                                <div class="pro-feature-icon"></div>
-                                <div class="reg-st3-big-txt ">
-                                    <span class="storage-amount">1</span>
-                                    <span class="storage-unit">TB</span>
-                                </div>
-                                <div class="reg-st3-mid-txt">[$495]</div>
-                                <div class="clear"></div>
-                            </div>
-                            <div class="reg-st3-bandwidth">
-                                <div class="pro-feature-icon bandwidth"></div>
-                                <div class="reg-st3-big-txt">
-                                    <span class="bandwidth-amount">2</span> <span class="bandwidth-unit">TB</span>
-                                </div>
-                                <div class="reg-st3-mid-txt">[$16120]</div>
-                                <div class="clear"></div>
-                            </div>
-                        </div>
-                    </div>
+                <div class="pricing-page local-currency-tip">
+                    * [$18770]
                 </div>
-                <div class="reg-st3-membership-bl pro2" data-payment="2">
-                    <div class="membership-pad-bl">
-                        <div class="reg-st3-bott-title title">
-                            <div class="membership-icon tiny"></div>
-                            <span>[$6125]</span>
-                        </div>
-                        <div class="membership-gray-block">
-                            <div class="reg-st3-bott-title price">
-                                <span class="num">
-                                    <span class="big"></span><span class="small"></span>
-                                </span>
-                                <span class="green-star-img"></span>
-                                <span class="local-currency-code hidden">MXN</span>
-                                <span class="period">/[$913]</span>
-                                <div class="euro-price hidden">4.99 &euro;</div>
-                            </div>
-                        </div>
-                        <div class="pro-plan-descr">
-                            <div class="reg-st3-storage">
-                                <div class="pro-feature-icon"></div>
-                                <div class="reg-st3-big-txt ">
-                                    <span class="storage-amount">1</span>
-                                    <span class="storage-unit">TB</span>
-                                </div>
-                                <div class="reg-st3-mid-txt">[$495]</div>
-                                <div class="clear"></div>
-                            </div>
-                            <div class="reg-st3-bandwidth">
-                                <div class="pro-feature-icon bandwidth"></div>
-                                <div class="reg-st3-big-txt">
-                                    <span class="bandwidth-amount">2</span> <span class="bandwidth-unit">TB</span>
-                                </div>
-                                <div class="reg-st3-mid-txt">[$16120]</div>
-                                <div class="clear"></div>
-                            </div>
-                        </div>
+
+                <div class="dialog limited-bottom">
+                    <div class="download big-button continue-download green transition">
+                        <i class="medium-icon icons-sprite download big"></i>
+                        <span>[$17091]</span>
                     </div>
-                </div>
-                <div class="reg-st3-membership-bl pro3" data-payment="3">
-                    <div class="membership-pad-bl">
-                        <div class="reg-st3-bott-title title">
-                            <div class="membership-icon tiny"></div>
-                            <span>[$6126]</span>
+                    <div class="centered-checkbox dialog-bottom">
+                        <div class="checkdiv checkboxOff">
+                            <input type="checkbox" name="limit-warning-checkbox" id="limit-warning-checkbox" class="checkboxOff">
                         </div>
-                        <div class="membership-gray-block">
-                            <div class="reg-st3-bott-title price">
-                                <span class="num">
-                                    <span class="big"></span><span class="small"></span>
-                                </span>
-                                <span class="green-star-img"></span>
-                                <span class="local-currency-code hidden">MXN</span>
-                                <span class="period">/[$913]</span>
-                                <div class="euro-price hidden">4.99 &euro;</div>
-                            </div>
-                        </div>
-                        <div class="pro-plan-descr">
-                            <div class="reg-st3-storage">
-                                <div class="pro-feature-icon"></div>
-                                <div class="reg-st3-big-txt ">
-                                    <span class="storage-amount">1</span>
-                                    <span class="storage-unit">TB</span>
-                                </div>
-                                <div class="reg-st3-mid-txt">[$495]</div>
-                                <div class="clear"></div>
-                            </div>
-                            <div class="reg-st3-bandwidth">
-                                <div class="pro-feature-icon bandwidth"></div>
-                                <div class="reg-st3-big-txt">
-                                    <span class="bandwidth-amount">2</span> <span class="bandwidth-unit">TB</span>
-                                </div>
-                                <div class="reg-st3-mid-txt">[$16120]</div>
-                                <div class="clear"></div>
-                            </div>
-                        </div>
+                        <label for="limit-warning-checkbox" class="radio-txt">[$229]</label>
                     </div>
-                </div>
-                <div class="clear"></div>
-                <div class="reg-st3-txt-localcurrencyprogram hidden" align="center">
-                    <span class="green-star-img"></span>
-                    <span class="green-star-desc">
-                        [$18770]
-                    </span>
                 </div>
             </div>
-
-            <div class="dialog transfer-overquota-txt">[$7100]</div>
-
-        </div>
+            <div class="dialog-scroll-overlay"></div>
+         </div>
 
         <div class="dialog bottom-tips">
             <span>[$16355]</span>
             <a>[$16354]</a>
         </div>
 
-        <div class="dialog limited-bottom">
-            <div class="download big-button continue-download green transition">
-                <i class="medium-icon icons-sprite download big"></i>
-                <span>[$17091]</span>
-            </div>
-            <div class="centered-checkbox dialog-bottom">
-                <div class="checkdiv checkboxOff">
-                    <input type="checkbox" name="limit-warning-checkbox" id="limit-warning-checkbox" class="checkboxOff">
-                </div>
-                <label for="limit-warning-checkbox" class="radio-txt">[$229]</label>
-            </div>
-        </div>
 
-    </div>
-    <div class="dialog overquota-bott-bl">
-        <div class="dialog overquota-bott-txt">
-            <i class="semi-huge-icon storage"></i>
-            <span class="not-logged no-achievements">
-                [$16902]
-            </span>
-            <span class="not-logged achievements">
-                [$16903]
-            </span>
-            <span class="logged achievements">
-                [$16904]
-            </span>
-        </div>
-        <div class="dialog overquota-bott-buttons">
-            <!-- [$6826] - Login !-->
-            <div class="default-big-button button-without-outline login">
-                <span>[$193]</span>
-            </div>
-            <!-- [$16309] - Get more bonuses !-->
-            <!-- [$16352] - Register for bonuses !-->
-            <div class="default-big-button button-without-outline grey-gradient get-more-bonuses">
-                <span class="registered">[$16309]</span>
-                <span class="not-registered">[$16352]</span>
-            </div>
-            <div class="default-big-button button-without-outline grey-gradient create-account">
-                <span>[$1108]</span>
-            </div>
-        </div>
     </div>
 </div>
 
@@ -2912,7 +3090,8 @@
                 <div class="big-icon achievements-icon"></div>
                 <div class="fm-account-header">
                     <span>[$20186]</span>
-                    <div class="medium-icon new-dialog-icon"></div></div>
+                    <div class="medium-icon new-dialog-icon"></div>
+                </div>
                 <span class="quota-txt">0</span>
             </div>
         </div>
@@ -3323,29 +3502,39 @@
         <div class="storage-dialog body-p long">
             [$16304]
         </div>
+        <div class="odq-warning hidden">
+            <div class="odq-divider"></div>
+            <div class="odq-body">
+                <div class="odq-warn-icon"></div>
+                <div class="storage-dialog body-p"></div>
+            </div>
+            <div class="odq-divider"></div>
+        </div>
         <div class="button default-red-button inline big choose-plan">
             [$8696]
         </div>
-        <div class="storage-dialog divider-txt">
-            <span> [$174] </span>
-        </div>
-        <div class="storage-dialog no-achievements-bl">
-            <!--div class="storage-dialog body-p medium">
-                [$16306]
-            </div-->
-            <div class="storage-dialog body-p small">
-                [$16306]
+        <div class="full-extras">
+            <div class="storage-dialog divider-txt">
+                <span> [$174] </span>
             </div>
-        </div>
-        <div class="storage-dialog achievements-bl">
-            <div class="storage-dialog body-p">
-                [$16308]
+            <div class="storage-dialog no-achievements-bl">
+                <!--div class="storage-dialog body-p medium">
+            [$16306]
+        </div-->
+                <div class="storage-dialog body-p small">
+                    [$16306]
+                </div>
             </div>
-            <div class="button default-white-button inline big get-bonuses">
-                [$16309]
-            </div>
-            <div class="storage-dialog body-p small top-pad">
-                [$16310]
+            <div class="storage-dialog achievements-bl">
+                <div class="storage-dialog body-p">
+                    [$16308]
+                </div>
+                <div class="button default-white-button inline big get-bonuses">
+                    [$16309]
+                </div>
+                <div class="storage-dialog body-p small top-pad">
+                    [$16310]
+                </div>
             </div>
         </div>
     </div>
@@ -3519,8 +3708,8 @@
 
     </div>
     <div class="fm-notifications-bottom no-bott-pad">
-        <div class="default-white-button right notification-button skip-button hidden"><span>[$1379]</span></div>
-        <div class="default-white-button right notification-button cancel-button"><span>[$82]</span></div>
+        <div class="button default-white-button right skip-button hidden"><span>[$1379]</span></div>
+        <div class="button default-white-button right cancel-button"><span>[$82]</span></div>
         <!-- Please add "hidden" class !-->
         <div class="bottom-checkbox">
             <div class="checkdiv checkboxOff">
@@ -3601,6 +3790,134 @@
     </div>
 </div>
 
+<div class="txt-editor-frame hidden">
+    <div id="mega-text-editor">
+        <div class="editor-textarea-container">
+            <div class="editor-btn-container">
+                <div class="buttons-holder left">
+                    <div class="default-white-button txt-editor-menu">
+                        <i class="account-icon menu"></i>
+                    </div>
+                    <div class="default-white-button txt-editor-download-btn">
+                        <i class="small-icon  context download"></i>
+                        <span>[$58]</span>
+                    </div>
+                </div>
+                <div class="buttons-holder right">
+                    <div class="default-white-button txt-editor-btn close-btn">
+                        <span>[$148]</span>
+                    </div>
+                    <div class="default-green-button gradient txt-editor-btn save-btn disabled">
+                        <span>[$776]</span>
+                    </div>
+                </div>
+                <div class="top-menu-popup-editor">
+                    <div class="top-menu-content">
+                        <div class="top-menu-item new-f">
+                            <div class="top-menu-item-bg">
+                                <span>
+                                    [$19976]
+                                </span>
+                            </div>
+                        </div>
+                        <div class="top-menu-item open-f">
+                            <div class="top-menu-item-bg">
+                                <span>
+                                    [$22661]
+                                </span>
+                                <span class="menu-item-shortcut">
+                                    ctrl O
+                                </span>
+                            </div>
+                        </div>
+                        <div class="top-menu-divider">
+                            <div class="txt-editor-sp-menu"></div>
+                        </div>
+
+                        <div class="top-menu-item get-link-f">
+                            <div class="top-menu-item-bg">
+                                <span>
+                                    [$22662]
+                                </span>
+                            </div>
+                        </div>
+                        <div class="top-menu-item send-contact-f">
+                            <div class="top-menu-item-bg">
+                                <span class="right-el"><i class="semi-small-icon send-to-contact-menu"></i></span><span>[$17764]</span>
+                            </div>
+                        </div>
+                        <div class="top-menu-divider">
+                            <div class="txt-editor-sp-menu"></div>
+                        </div>
+
+                        <div class="top-menu-item close-f">
+                            <div class="top-menu-item-bg">
+                                <span>
+                                    [$148]
+                                </span>
+                                <span class="menu-item-shortcut">
+                                    ctrl Q
+                                </span>
+                            </div>
+                        </div>
+                        <div class="top-menu-item save-f ">
+                            <div class="top-menu-item-bg">
+                                <span>
+                                    [$776]
+                                </span>
+                                <span class="menu-item-shortcut">
+                                    ctrl S
+                                </span>
+                            </div>
+                        </div>
+                        <div class="top-menu-item save-as-f">
+                            <div class="top-menu-item-bg">
+                                <span>
+                                    [$22664]
+                                </span>
+                                <span class="menu-item-shortcut">
+                                    shift ctrl S
+                                </span>
+                            </div>
+                        </div>
+                        <div class="top-menu-divider">
+                            <div class="txt-editor-sp-menu"></div>
+                        </div>
+                        <div class="top-menu-item wrap-text">
+                            <div class="top-menu-item-bg">
+                                <span>
+                                    [$24137]
+                                </span>
+                                <span class="menu-item-shortcut tiny-icon green-tick">
+                                </span>
+                            </div>
+                        </div>
+                        <div class="top-menu-divider">
+                            <div class="txt-editor-sp-menu"></div>
+                        </div>
+                        <div class="top-menu-item print-f">
+                            <div class="top-menu-item-bg">
+                                <span>
+                                    [$22665]
+                                </span>
+                                <span class="menu-item-shortcut">
+                                    ctrl P
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="editor-file-name-title">
+                    <span class="transfer-filetype-icon text file"></span>
+                    <span class="txt-editor-opened-f-name"> </span>
+                </div>
+            </div>
+            <div id="text-editor-textarea">
+                <textarea id="txtar"></textarea>
+            </div>
+        </div>
+    </div>
+</div>
 <div class="viewer-overlay hidden">
     <div class="viewer-body">
         <div class="viewer-top-bl">
@@ -3640,9 +3957,7 @@
                 <img alt="" class="img1" />
                 <img alt="" class="img2" />
             </div>
-            <embed type="application/pdf" class="hidden">
             <video id="video" data-autoplayvideo="false" data-playvideoonclick="false"></video>
-            <iframe id="pdfpreviewdiv1" src="about:blank" class="hidden"></iframe>
         </div>
 
         <div class="play-video-button"></div>
@@ -3692,6 +4007,22 @@
                 <i class="semi-big-icon icons-img cross"></i>
             </div>
             <div class="clear"></div>
+        </div>
+
+        <div class="viewer-vad-control lato hidden">
+            <div  class="thumb">
+                <img alt="" />
+            </div>
+            <div class="counter">
+                0
+            </div>
+            <div class="label">
+                <span>[$22879]</span><i class="small-icon icons-sprite skip"></i>
+            </div>
+        </div>
+
+        <div class="video-progress-bar vad" title="">
+            <div class="video-time-bar"></div>
         </div>
 
         <div class="viewer-bottom-bl">
@@ -4171,13 +4502,16 @@
             <div class="dialog input-wrapper ">
                 <!-- Please add 'wrong' class is password is incorrect !-->
                 <div class="dialog big-input-bg">
-                    <input type="text" value="" name="test-pass1" id="test-pass" readonly placeholder="[$16896]" autocomplete="user-password">
+                    <input type="password" value="" name="test-pass1" id="test-pass" readonly placeholder="[$16896]" autocomplete="user-password">
                 </div>
                 <div class="dialog input-button">
                     <div class="default-white-button semi-big grey-txt confirm-password button-prd-confirm">
                         <span>[$6080]</span>
                     </div>
                 </div>
+            </div>
+            <div class="pass-reminder second-option-wrapper">
+                [$1934] <a class="pass-reminder forgot-password">[$737]</a>
             </div>
             <div class="pass-reminder result-block">
                 <!-- Please remove 'hidden' class is password is correct !-->
@@ -4368,8 +4702,8 @@
     </div>
     <div class="fm-notifications-bottom">
         <div class="button default-white-button left preview-widget">
-                    <span>[$17409]</span>
-                </div>
+            <span>[$17409]</span>
+        </div>
         <div class="button default-green-button right copy-widget-code url">
             <span>[$17835]</span>
         </div>
@@ -4777,7 +5111,7 @@
                 </div>
                 <div class="recovery-key-info-block">
                     <div class="recovery-key-name">
-                        MEGA-RECOVERYKEY.txt
+                        [$20830].txt
                     </div>
                     <div class="recovery-key-size">
                         22 [$20434]
@@ -4873,7 +5207,7 @@
         </form>
 
         <!-- Step 2 - Verify Code (from SMS) -->
-        <form id="verify-dialog_code_form" class="js-verify-code-page hidden" autocomplete="off" >
+        <form id="verify-dialog_code_form" class="js-verify-code-page hidden" autocomplete="off">
             <div class="verify-ph-info long">
                 <span>[$20217]</span>
                 <span class="phone-num js-user-phone-number"></span>
@@ -4920,7 +5254,7 @@
                     <div class="icon56 achievements-icon bonus-image"></div>
                     <div class="verify-ph-bonus-intro-wrapper">
                         <div class="big-num js-transfer-quota"></div>
-                         <div class="body-txt">[$20406]</div>
+                        <div class="body-txt">[$20406]</div>
                     </div>
                 </div>
             </div>
@@ -4956,7 +5290,7 @@
         <p class="first-paragraph">[$19853]</p>
         <p class="first-paragraph post-register">[$20188]</p>
         <p class="second-paragraph">[$19854]</p>
-        <p class="second-paragraph post-register">[$20189]<br/><a href="https://mega.nz/security" class="red" target="_blank" rel="noopener noreferrer">[$8742]</a>.</p>
+        <p class="second-paragraph post-register">[$20189]<br /><a href="https://mega.nz/security" class="red" target="_blank" rel="noopener noreferrer">[$8742]</a>.</p>
         <div class="recover-paste-block">
             <div class="left-section">
                 <h5 class="main-italic-header">[$8963]</h5>
@@ -5010,13 +5344,13 @@
             </div>
         </div>
         <div class="clear"></div>
-            <div class="default-green-button height-48 close-dialog">
-                <span class="label">[$81]</span>
-            </div>
+        <div class="default-green-button height-48 close-dialog">
+            <span class="label">[$81]</span>
+        </div>
     </div>
 </div>
 <!-- user management dialog !-->
-<div class="user-management-add-user-dialog user-management-dialog fm-dialog hidden">
+<div class="fm-dialog user-management-add-user-dialog user-management-dialog lato hidden">
     <div class="mega-logo icon56 dialog-heading-img hidden"></div>
     <div class="sent-email-logo dialog-heading-img"></div>
     <!-- For the dialog-title, toggle left-version class to change alignment style!-->
@@ -5064,7 +5398,7 @@
     </div><!-- END folder container -->
     <div class="dialog-button-container white-bg">
         <div class="invite-link-option">
-            <div class="enable-pw-txt" >[$19599]</div>
+            <div class="enable-pw-txt">[$19599]</div>
             <div class="dialog-feature-toggle">
                 <div class="dialog-feature-switch"></div>
             </div>
@@ -5329,22 +5663,460 @@
         <div class="voucher-head">
             <div class="v-header-text lato"> [$22114]</div>
         </div>
-        <div class="plan-icon membership-icon pro1">
+        <div class="pricing-sprite plan-icon pro1 x32"></div>
+        <div class="v-separator"></div>
+        <div class="plan-info  v-storage">
+            <span></span>
         </div>
         <div class="v-separator"></div>
-        <div class="plan-info ">
-            <div class="size-head v-storage lato-semibold"> 1TB </div>
-            <div class="size-bottom lato"> [$495] </div>
-        </div>
-        <div class="v-separator"></div>
-        <div class="plan-info ">
-            <div class="size-head v-transfer lato-semibold"> 1TB </div>
-            <div class="size-bottom lato"> [$18057] </div>
+        <div class="plan-info v-transfer">
+            <span></span>
         </div>
     </div>
     <div class="dialog-title">[$22120]</div>
     <div class="button-block">
         <div class="default-white-button huge voucher-info-login">[$171]</div>
         <div class="default-green-button huge voucher-info-create">[$968]</div>
+    </div>
+</div>
+
+<!-- Affiliate guide dialogs !-->
+<div class="fm-dialog affiliate-guide hidden">
+    <div class="fm-dialog-close"></div>
+    <div class="affiliate-guide body step1 active">
+        <div class="fm-dialog-title small">[$22682]</div>
+        <div class="affiliate-guide big-illustration"></div>
+        <div class="affiliate-guide big-header">
+            [$22712]
+        </div>
+        <div class="affiliate-guide content active">
+            <div class="affiliate-guide cell">
+                <div class="half-sized">
+                    <i class="small-icon icons-sprite bold-green-tick"></i>
+                    <div class="affiliate-guide header">[$22713]</div>
+                    <i class="small-icon icons-sprite bold-green-tick"></i>
+                    <div class="affiliate-guide header">[$22714]</div>
+                </div>
+                <div class="half-sized">
+                    <i class="small-icon icons-sprite bold-green-tick"></i>
+                    <div class="affiliate-guide header">[$22715]</div>
+                    <i class="small-icon icons-sprite bold-green-tick"></i>
+                    <div class="affiliate-guide header">[$22716]</div>
+                </div>
+                <div class="clear"></div>
+            </div>
+        </div>
+        <div class="default-green-button height-40 right how-it-works">
+            <span>[$1070]</span>
+            <i class="small-icon icons-sprite white-right-arrow"></i>
+        </div>
+        <a href="/refer" class="affiliate-guide grey-link clickurl" target="_blank">[$22717]</a>
+        <div class="clear"></div>
+    </div>
+    <div class="affiliate-guide body step2">
+        <div class="affiliate-guide top-block">
+            <div class="fm-dialog-title">[$22718]</div>
+            <div class="affiliate-guide nav-button slide1 active" data-slide="1">
+                <span class="num">1</span>
+                <span class="txt">[$22719]</span>
+            </div>
+            <div class="affiliate-guide nav-button slide2" data-slide="2">
+                <span class="num">2</span>
+                <span class="txt">[$22720]</span>
+            </div>
+            <div class="affiliate-guide nav-button slide3" data-slide="3">
+                <span class="num">3</span>
+                <span class="txt">[$22721]</span>
+            </div>
+        </div>
+        <div class="affiliate-guide slides">
+        <div class="affiliate-guide content slide1 active">
+            <div class="affiliate-guide cell">
+                <div class="affiliate-guide feature-block">
+                    <i class="semi-huge-icon big-icons-sprite chain"></i>
+                    [$22771][$22723]
+                </div>
+                <div class="affiliate-guide feature-block">
+                    <i class="semi-huge-icon big-icons-sprite folder-with-chain"></i>
+                    [$22772][$22724]
+                </div>
+                <div class="affiliate-guide feature-block">
+                    <i class="semi-huge-icon big-icons-sprite chat-with-chain"></i>
+                    [$22725]
+                </div>
+                <div class="affiliate-guide feature-block">
+                    <i class="semi-huge-icon big-icons-sprite user-with-chain"></i>
+                    [$22726]
+                </div>
+                <div class="clear"></div>
+            </div>
+        </div>
+        <div class="affiliate-guide content slide2">
+            <div class="affiliate-guide cell">
+                <i class="small-icon icons-sprite bold-green-tick"></i>
+                <div class="affiliate-guide header">[$22727]</div>
+                <div class="affiliate-guide info">[$22728]</div>
+                <i class="small-icon icons-sprite bold-green-tick"></i>
+                <div class="affiliate-guide header">[$22757]</div>
+                <div class="affiliate-guide info">[$22729]</div>
+            </div>
+        </div>
+        <div class="affiliate-guide content slide3">
+            <div class="affiliate-guide cell info rules">
+                [$23181.d]
+            </div>
+        </div>
+        </div>
+        <div class="affiliate-guide button-block">
+            <div class="affiliate-guide bottom-button back hidden">
+                <i class="semi-big-icon icons-sprite grey-right-arrow"></i>
+                <span>[$18068]</span>
+            </div>
+            <div class="affiliate-guide bottom-button next">
+                <span>[$556]</span>
+                <i class="semi-big-icon icons-sprite grey-right-arrow"></i>
+            </div>
+            <div class="default-green-button height-40 right dashboard hidden">
+                <span>[$22740]</span>
+            </div>
+            <div class="clear"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Generate referral URL dialog !-->
+<div class="fm-dialog generate-url hidden">
+    <div class="fm-dialog-close"></div>
+    <div class="fm-dialog-title">[$22741]</div>
+    <div class="generate-url header">
+        [$22742]
+    </div>
+    <div class="generate-url url-block">
+        <div class="generate-url copy-button">
+            [$63]
+        </div>
+        <i class="small-icon fm-s small-chain"></i>
+        <div class="url"></div>
+    </div>
+    <div class="generate-url info">
+        [$22743]
+    </div>
+     <div class="generate-url page-names">
+        <span data-page="start" class="active">[$22744]</span>
+        <span data-page="business">[$19530]</span>
+        <span data-page="mobile">[$955]</span>
+        <span data-page="sync">[$956]</span>
+        <span data-page="security">[$7337]</span>
+        <span data-page="privacycompany">[$16113]</span>
+        <span data-page="bird" class="hidden">MEGAbird</span>
+        <span data-page="pro">[$16111]</span>
+        <span data-page="help">[$384]</span>
+        <span data-page="about">[$16112]</span>
+        <span data-page="extensions">[$16541]</span>
+        <span data-page="refer">[$22745]</span>
+        <span data-page="more">[$22746]</span>
+    </div>
+    <div class="generate-url custom-block hidden">
+        <div class="generate-url header custom">
+            [$22747]
+        </div>
+        <div class="generate-url url-block">
+            <input type="text" class="url-input">
+            <div class="generate-url custom-button">
+                <i class="small-icon icons-sprite white-right-arrow"></i>
+            </div>
+        </div>
+        <div class="error-message">[$22805]</div>
+    </div>
+</div>
+
+<!-- Joinned to affiliate program dialog !-->
+<div class="fm-dialog joined-to-affiliate lato hidden">
+    <div class="fm-dialog-close"></div>
+    <div class="fm-dialog-body">
+        <i class="icon56 inline big-icons-sprite coin"></i>
+        <div class="header">[$22748]</div>
+        <div class="text">[$22749]</div>
+    </div>
+    <div class="fm-notifications-bottom">
+        <div class="default-green-button button right"><span>[$1070]</span></div>
+        <div class="default-white-button button left cancel-button"><span>[$5700]</span></div>
+        <div class="clear"></div>
+    </div>
+</div>
+
+<!-- Affiliate program redemption dialog !-->
+<div class="fm-dialog affiliate-redeem lato contrast hidden">
+    <div class="fm-dialog-close"></div>
+    <div class="fm-dialog-title dark">[$23295]</div>
+    <div class="affiliate-redeem body">
+        <div class="affiliate-redeem timing hidden">
+            [$23296]
+        </div>
+        <div class="clear"></div>
+
+         <!-- Steps !-->
+        <!-- Add class "scrollable" to any cell if we want to init scrolling !-->
+
+        <!-- Step1 block. Payment !-->
+        <div class="affiliate-redeem cells left step1">
+            <div class="affiliate-redeem cell-content">
+            <div class="affiliate-redeem header">
+                [$23297]
+            </div>
+            <div class="affiliate-redeem input-wrap">
+                <div class="input">
+                    <span class="currency">&euro;</span>
+                    <input type="number" name="affiliate-redemption-amount" id="affiliate-redemption-amount" value="" step="any">
+                </div>
+                <div class="button">
+                    <div class="default-green-button gradient redeem-all-btn">
+                        [$23298]
+                    </div>
+                </div>
+            </div>
+            <div class="affiliate-redeem available-comission">
+                [$23299]
+            </div>
+                <div class="amount-message-container red hidden"></div>
+            <div class="affiliate-redeem header">
+                [$23300]
+            </div>
+            <div class="affiliate-redeem payment-type">
+                <div class="affiliate-redeem payment-type-wrapper hidden">
+                    <div class="radioOn small green-active">
+                        <input type="radio" id="affiliate-payment-type2" name="affiliate-payment-type" class="radioOn" value="2">
+                    </div>
+                    <label for="affiliate-payment-type2" class="radio-txt">[$6802]</label>
+                </div>
+                <div class="affiliate-redeem payment-type-wrapper hidden">
+                    <div class="radioOff small green-active">
+                        <input type="radio" id="affiliate-payment-type1" name="affiliate-payment-type" class="radioOff" value="1">
+                    </div>
+                    <label for="affiliate-payment-type1" class="radio-txt">[$23301]</label>
+                </div>
+                <div class="clear"></div>
+                <div class="affiliate-redeem bitcoin-org">
+                    <a href="https://bitcoin.org/" target="_blank">[$23536]</a>
+                </div>
+            </div>
+            </div>
+        </div>
+
+        <!-- Step2. Withdraw details !-->
+        <div class="affiliate-redeem cells left step2 hidden">
+            <div class="affiliate-redeem cell-content">
+                <div class="affiliate-redeem header">
+                    [$23302]
+                </div>
+                <div class="affiliate-redeem withdraw-txt">
+                    <div class="left method-chosen"></div>
+                    <a href="">[$1776]</a>
+                    <div class="clear"></div>
+                </div>
+                <div class="affiliate-redeem header">
+                    [$23303]
+                </div>
+                <form autocomplete="disabled" class="withdraw-details">
+                    <div class="mega-input-title-ontop underline-dropdown-input affi-withdraw-country">
+                        <div class="mega-input-title">[$481]</div>
+                        <div class="list-arrow"></div>
+                        <div class="dialog-input default-select country" id="affi-country">
+                            <span></span>
+                            <div class="default-select-dropdown hidden"><div class="default-select-scroll"></div></div>
+                        </div>
+                    </div>
+
+                    <!-- Currency dropdown for bank transfer !-->
+                    <div class="mega-input-title-ontop underline-dropdown-input affi-withdraw-currency">
+                        <div class="mega-input-title">[$20952]</div>
+                        <div class="list-arrow"></div>
+                        <div class="dialog-input default-select currency" id="affi-currency">
+                            <span></span>
+                            <div class="default-select-dropdown hidden"><div class="default-select-scroll"></div></div>
+                        </div>
+                    </div>
+                    <div class="affiliate-redeem currency-tip">
+                        <i>i</i>
+                        [$23512]
+                    </div>
+                    <!-- Bitcoin address input and tip !-->
+                    <div class="affiliate-redeem bitcoin-data hidden">
+                        <input type="text" class="titleTop" value="" title="[$23361]" name="affi-bitcoin-address" id="affi-bitcoin-address" />
+                        <div class="affiliate-redeem bitcoin-tip">
+                            <i>i</i>
+                            [$23304]
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Step3. Withdraw details !-->
+        <div class="affiliate-redeem cells left step3 scrollable hidden">
+            <div class="affiliate-redeem cell-content">
+                <div class="affiliate-redeem header">
+                    [$427]
+                </div>
+                <form class="account-details">
+
+                    <!-- Auto fill checkbox. Please add/remove "hidden" class !-->
+                    <div class="affiliate-redeem auto-fill-checkbox hidden">
+                        <div class="checkdiv checkboxOn">
+                            <input type="checkbox" id="affi-auto-fill" />
+                        </div>
+                        <label for="affi-auto-fill" class="radio-txt"> [$23305] </label>
+                        <div class="clear"></div>
+                    </div>
+
+                    <input type="text" class="affi-dynamic-acc-input titleTop template" value="" title="" name="" id="" />
+
+                    <div class="mega-input-title-ontop underline-dropdown-input affi-dynamic-acc-select template">
+                        <div class="mega-input-title"></div>
+                        <div class="list-arrow"></div>
+                        <div class="dialog-input default-select" id="">
+                            <span></span>
+                            <div class="default-select-dropdown hidden"><div class="default-select-scroll"></div></div>
+                        </div>
+                    </div>
+
+                    <div class="affi-dynamic-acc-name">
+                        <input type="text" class="titleTop" value="" title="[$23362]" name="affi-account-name" id="affi-account-name" />
+                    </div>
+                    <div class="affi-dynamic-acc-type"></div>
+                    <div class="affi-dynamic-acc-info"></div>
+
+                    <!-- Save information checkbox. Please add/remove "hidden" class !-->
+                    <div class="affiliate-redeem save-data-checkbox">
+                        <div class="checkdiv checkboxOff">
+                            <input type="checkbox" id="affi-save-info" />
+                        </div>
+                        <label for="affi-save-info" class="radio-txt"> [$23306] </label>
+                        <div class="clear"></div>
+                    </div>
+
+                     <!-- Save information green tip. Please add/remove "hidden" class !-->
+                    <div class="affiliate-redeem save-data-tip hidden">
+                        <div>[$23307]</div>
+                        <div class="right accept">[$78]</div>
+                        <div class="right cancel">[$79]</div>
+                        <div class="clear"></div>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+
+        <!-- Step4. Transfer info !-->
+        <div class="affiliate-redeem cells left step4 scrollable hidden">
+             <div class="affiliate-redeem cell-content">
+                <div class="fm-affiliate redeem-data">
+                    <span class="strong">[$23308]</span>
+                    <span class="method"></span>
+                </div>
+                <div class="fm-affiliate redeem-data">
+                    <span class="strong full-size">[$23309]</span>
+                    <span class="grey">[$481]</span>
+                    <span class="country"></span>
+                    <span class="grey">[$20952]</span>
+                    <span class="currency"></span>
+                </div>
+                <div class="fm-affiliate redeem-data account-details">
+                    <span class="strong full-size">[$23310]</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="affiliate-redeem cells right">
+            <div class="affiliate-redeem summary-wrap">
+                <div class="affiliate-redeem header">
+                    [$23311]
+                </div>
+                <div class="affiliate-redeem summary">
+                    <div class="info">
+                        [$23312]
+                    </div>
+                    <div class="info price requested">
+                        <span class="euro hidden">------</span><span class="local">------</span>
+                        <div class="clear"></div>
+                    </div>
+                    <hr>
+                    <div class="info">
+                        [$23313]
+                    </div>
+                    <div class="info price fee">
+                        <span class="euro hidden">------</span><span class="local">------</span>
+                        <div class="clear"></div>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+                <div class="affiliate-redeem amount">
+                    <div class="info">
+                        [$23314]
+                    </div>
+                    <div class="info price received">
+                        <span class="euro hidden">------</span><span class="local">------</span>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+            </div>
+            <div class="affiliate-redeem local-info hidden">
+                [$23315]
+            </div>
+        </div>
+        <div class="clear"></div>
+
+        <div class="affiliate-redeem button back prev-btn hidden">
+            <i class="semi-big-icon icons-sprite grey-right-arrow"></i>
+            <span>[$822]</span>
+        </div>
+        <div class="button default-green-button gradient next-btn height-48 big-txt disabled">
+            <span></span>
+            <i class="small-icon icons-sprite white-right-arrow"></i>
+        </div>
+    </div>
+</div>
+
+<!-- Affiliate program redemption request dialog !-->
+<div class="fm-dialog affiliate-request big-radius lato hidden">
+    <div class="affiliate-request body">
+        <div class="fm-dialog-title small dark">[$23316]</div>
+        <div class="dialog-sprite dots"></div>
+        <!-- Please add "loading" or "complete" classname !-->
+        <div class="affiliate-request status-cell complete">
+            <div class="affiliate-request status">
+                <!-- Please set width in percents !-->
+                <div class="affiliate-request progress"><span class="dialog-sprite"></span></div>
+            </div>
+            <div class="affiliate-request status-txt">
+                [$23317]
+            </div>
+        </div>
+        <!-- Please add "loading" or "complete" classname !-->
+        <div class="affiliate-request status-cell loading">
+            <div class="affiliate-request status">
+                <!-- Please set width in percents !-->
+                <div class="affiliate-request progress"><span class="dialog-sprite"></span></div>
+            </div>
+            <div class="affiliate-request status-txt">
+                [$22833]
+            </div>
+        </div>
+        <!-- Please add "loading" or "complete" classname !-->
+        <div class="affiliate-request status-cell">
+            <div class="affiliate-request status">
+                <!-- Please set width in percents !-->
+                <div class="affiliate-request progress"><span class="dialog-sprite"></span></div>
+            </div>
+            <div class="affiliate-request status-txt">
+                [$23277]
+            </div>
+        </div>
+        <div class="affiliate-request status-message">
+
+        </div>
+        <div class="button default-green-button gradient height-48 big-txt">
+            <span>[$81]</span>
+        </div>
     </div>
 </div>

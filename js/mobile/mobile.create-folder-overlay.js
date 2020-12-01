@@ -66,7 +66,6 @@ mobile.createFolderOverlay = {
             var folderName = $folderNameInput.val();
             var trimmedFolderName = $.trim(folderName);
             var folderNameExists = mobile.createFolderOverlay.checkIfFolderNameAlreadyExists(trimmedFolderName);
-            var promise = new MegaPromise();
 
             // If invalid folder name, show an error
             if (trimmedFolderName === '' || !M.isSafeName(trimmedFolderName)) {
@@ -77,7 +76,7 @@ mobile.createFolderOverlay = {
 
                 // Otherwise if the folder name already exists, show an error
                 $folderNameWarningBlock.removeClass('hidden');
-                $folderNameWarningText.text(l[5644]);           // Folder already exists
+                $folderNameWarningText.text(l[23219]);           // Folder already exists
             }
             else {
 
@@ -86,7 +85,7 @@ mobile.createFolderOverlay = {
                 $createFolderButton.addClass('loading');
 
                 // Try creating the folder
-                M.createFolder(M.currentdirid, trimmedFolderName, promise)
+                M.createFolder(M.currentdirid, trimmedFolderName)
                     .always(function(result) {
 
                         // Hide the loading dialog and loading button
@@ -113,8 +112,6 @@ mobile.createFolderOverlay = {
                             // Add a server log
                             api_req({ a: 'log', e: 99677, m: 'Mobile web new folder created' });
                         }
-
-                        promise.resolve();
                     });
             }
 
@@ -186,11 +183,10 @@ mobile.createFolderOverlay = {
         for (var i = 0; i < M.v.length; i++) {
 
             var node = M.v[i];
-            var nodeType = node.t;
             var nodeName = node.name;
 
             // If the node is a folder and the new folder name matches an existing folder name
-            if (nodeType === 1 && nodeName === newFolderName) {
+            if (nodeName === newFolderName) {
                 return true;
             }
         }

@@ -32,21 +32,37 @@ mobile.overStorageQuotaOverlay = {
     /**
      * Show the Overlay
      */
-    show: function(msg) {
+    show: function(msg, subMsg) {
         'use strict';
 
         var display = function() {
+            msg = msg || l[16302];
+            var $odq = $('.odq-warning', mobile.overStorageQuotaOverlay.$overlay).addClass('hidden');
+            var $header = $('.rb-empty-overlay-title.dialog-heading-text', mobile.overStorageQuotaOverlay.$overlay)
+                .text(l[16302]);
+            var $btn = $('.action-upgrade-account', mobile.overStorageQuotaOverlay.$overlay)
+                .text(l[129]);
+            var $cancel = $('a.cancel', mobile.overStorageQuotaOverlay.$overlay)
+                .text(l[148]);
+            var $subTitle = $('.odq-subtitle', mobile.overStorageQuotaOverlay.$overlay)
+                .addClass('hidden');
 
-            if (msg) {
-                mobile.overStorageQuotaOverlay.$overlay.find('.rb-empty-overlay-message.dialog-body-text')
-                    .safeHTML(msg);
+            $('.rb-empty-overlay-message.dialog-body-text', mobile.overStorageQuotaOverlay.$overlay)
+                .safeHTML(msg);
+            if (subMsg) {
+                $('.odq-warn-text', $odq).safeHTML(subMsg);
+                $odq.removeClass('hidden');
+                $header.text(l[23519]);
+                $btn.text(l[433]);
+                $cancel.text(l[2005]);
+                $subTitle.removeClass('hidden').text(l[16302]);
             }
 
             mobile.overStorageQuotaOverlay.$fileManagerBlock.addClass('disable-scroll');
             mobile.overStorageQuotaOverlay.$overlay.removeClass('hidden').addClass('overlay');
         };
 
-        
+
 
         // Init the overlay if this is the first time we are opening it.
         if (!this.$overlay) {
@@ -74,24 +90,29 @@ mobile.overStorageQuotaOverlay = {
     initControlButtons: function() {
         'use strict';
 
-        var $inviteButton = this.$overlay.find(".action-invite-friends");
+        var $inviteButton = this.$overlay.find(".action-invite-friends").removeClass('hidden');
         var $upgradeButton = this.$overlay.find(".action-upgrade-account");
 
-        if (M.account.maf) {
-            $inviteButton.off('tap').on('tap', function() {
-                mobile.overStorageQuotaOverlay.close();
-                loadSubPage('fm/account/invites');
-                return false;
-            });
-        } else {
+        if (!M.account.maf || (u_attr.uspw)) {
             $inviteButton.addClass('hidden');
         }
+        else {
+            $inviteButton.rebind(
+                'tap',
+                function() {
+                    mobile.overStorageQuotaOverlay.close();
+                    loadSubPage('fm/account/invites');
+                    return false;
+                });
+        }
 
-        $upgradeButton.off('tap').on('tap', function() {
-            mobile.overStorageQuotaOverlay.close();
-            loadSubPage('pro');
-            return false;
-        });
+        $upgradeButton.rebind(
+            'tap',
+            function() {
+                mobile.overStorageQuotaOverlay.close();
+                loadSubPage('pro');
+                return false;
+            });
     },
 
     /**

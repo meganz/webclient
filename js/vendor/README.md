@@ -36,6 +36,11 @@ Unless otherwise noted, they were released under a [MIT License].
 > The bitcoin-math library is released under the [BSD 2-Clause License](https://opensource.org/licenses/BSD-2-Clause).
 
 ---
+[datepicker.js]: A Lightweight customizable cross-browser jQuery datepicker
+
+> **This is a fork**, [See the changes](https://github.com/t1m0n/air-datepicker/compare/master...meganz:master)
+
+---
 [dexie.js]: A Minimalistic Wrapper for IndexedDB
 
 > Released under the [Apache License Version 2.0](http://www.apache.org/licenses/).
@@ -86,6 +91,11 @@ Unless otherwise noted, they were released under a [MIT License].
 [jquery-ui.js]: jQuery-UI - jQuery User Interface library.
 
 > This is a custom build created from: [https://jqueryui.com/download/#!...](https://jqueryui.com/download/#!version=1.12.1&themeParams=none&components=111101011101111110100010110110001000001000000000)
+
+---
+[jquery-ui-touch.js]: jQuery UI Touch Punch is a small hack that enables the use of touch events on sites using the jQuery UI user interface library.
+
+> **This is a fork**, [See the changes](https://github.com/furf/jquery-ui-touch-punch/compare/master...meganz:master)
 
 ---
 [jquery.mobile.js]: jQuery Mobile - Make apps that are accessible on all smartphone, tablet and desktop devices.
@@ -142,12 +152,19 @@ Unless otherwise noted, they were released under a [MIT License].
 ---
 [pdf.js]: PDF Reader in JavaScript.
 
-> This is released under [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0).
+> Released under [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0).
+
+> **This is a fork**, [Compare the changes](https://github.com/mozilla/pdf.js/compare/master...meganz:master)
 
 ---
-[pdf.viewer.js]: PDF Reader Viewer in JavaScript.
+[codemirror.js]: Text editor in JavaScript Ver. 5.49.2
 
-> This is released under [Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0).
+> This is released under [MIT License](https://github.com/codemirror/CodeMirror/blob/master/LICENSE).
+> **This is a fork**, [See the changes](https://github.com/codemirror/CodeMirror/compare/master...meganz:master)
+
+---
+[simplescrollbars.js]: Custom scroll bar for code-mirror
+> This is released under [MIT License](https://codemirror.net/LICENSE).
 
 ---
 [Chart.js]: Charts drawing class in JavaScript. V2.7.3
@@ -157,7 +174,7 @@ Unless otherwise noted, they were released under a [MIT License].
 ---
 [react-dom.js, react.js]: A declarative, efficient, and flexible JavaScript library for building user interfaces.
 
-> react.js and react-dom.js were patched using `./scripts/patch-react-non-asciis.php fixit` so that non-ascii 
+> react.js and react-dom.js were patched using `./scripts/patch-react-non-asciis.php fixit` so that non-ascii
 characters were removed from the files
 ---
 [smartcrop.js]: Content aware image cropping.
@@ -225,6 +242,7 @@ characters were removed from the files
 [autolinker.js]: <https://github.com/meganz/Autolinker.js>
 [avatar.js]: <https://github.com/meganz/avatar-picker>
 [bitcoin-math.js]: <https://github.com/meganz/bitcoin-math>
+[datepicker.js]: <https://github.com/meganz/air-datepicker>
 [dexie.js]: <https://github.com/dfahlander/Dexie.js>
 [dcraw.js]: <https://github.com/meganz/dcraw.js>
 [encoding.js, encoding-indexes.js]: <https://github.com/inexorabletash/text-encoding/tree/v0.6.3>
@@ -248,8 +266,7 @@ characters were removed from the files
 [moment.js]: <https://github.com/moment/moment/tree/2.10.6>
 [nacl-fast.js]: <https://github.com/dchest/tweetnacl-js/tree/v0.13.1>
 [notification.js]: <https://github.com/MrSwitch/notification.js/tree/v0.0.1>
-[pdf.js]: <https://github.com/mozilla/pdfjs-dist/tree/v1.9.638>
-[pdf.viewer.js]: <https://github.com/mozilla/pdf.js/releases/download/v1.8.188/pdfjs-1.8.188-dist.zip>
+[pdf.js]: <https://github.com/mega.nz/pdf.js>
 [qrcode.js]: <https://github.com/jeromeetienne/jquery-qrcode/blob/2bad93deab2f0ec66451b0cc962d56fad6fba403/src/qrcode.js>
 [react-dom.js, react.js]: https://github.com/facebook/react/releases/tag/v16.8.6
 [smartcrop.js]: <https://github.com/meganz/smartcrop.js>
@@ -258,3 +275,4 @@ characters were removed from the files
 [webp.js]: <https://github.com/meganz/libwebp>
 [zxcvbn.js]: <https://github.com/dropbox/zxcvbn/tree/1.0.1>
 [chat/adapter.js]: <https://github.com/webrtc/adapter>
+

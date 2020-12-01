@@ -318,7 +318,7 @@ var versiondialogid;
 
                     var v = versionList[i];
                     var curTimeMarker;
-                    var msgDate = new Date(v.ts * 1000);
+                    var msgDate = new Date(v.ts * 1000 || 0);
                     var iso = (msgDate.toISOString());
                     if (todayOrYesterday(iso)) {
                         // if in last 2 days, use the time2lastSeparator
@@ -333,7 +333,7 @@ var versiondialogid;
                         html += '<div class="fm-versioning data"><span>' + curTimeMarker + '</span></div>';
                     }
                     var actionHtml = (v.u === u_handle) ? l[16480]
-                                    : l[16476].replace('%1', M.u[v.u].m);
+                        : l[16476].replace('%1', M.u[v.u] && M.u[v.u].m || l[7381]);
                     if (i < versionList.length - 1) {
                         if (v.name !== versionList[i + 1].name) {
                             actionHtml = l[17156].replace('%1',
@@ -510,21 +510,24 @@ var versiondialogid;
             });
 
             $('.fm-versioning .pad .top-column .default-white-button .rubbish-bin-icon').parent()
-                    .rebind('click', function() {
-                var apiReq = function(handle) {
-                    api_req({a: 'd',
-                             n: handle,
-                             v: 1
-                            });
-                };
-                if (!$(this).hasClass('disabled')) {
-                    msgDialog('remove', l[1003], l[13749], l[1007], function(e) {
-                        if (e) {
-                            apiReq(current_sel_version);
-                            current_sel_version = false;
-                        }
-                    });
-                }
+                .rebind('click', function() {
+                    $('.fm-versioning.overlay').addClass('arrange-to-back');
+                    var apiReq = function(handle) {
+                        api_req({
+                            a: 'd',
+                            n: handle,
+                            v: 1
+                        });
+                    };
+                    if (!$(this).hasClass('disabled')) {
+                        msgDialog('remove', l[1003], l[13749], l[1007], function(e) {
+                            if (e) {
+                                apiReq(current_sel_version);
+                                current_sel_version = false;
+                            }
+                            $('.fm-versioning.overlay').removeClass('arrange-to-back');
+                        });
+                    }
             });
 
             $('.fm-versioning .pad .top-column .default-white-button .reverted-clock').parent()
@@ -591,11 +594,13 @@ var versiondialogid;
                         };
                         var self = this;
                         if (!$(this).hasClass('disabled')) {
+                            $('.fm-versioning.overlay').addClass('arrange-to-back');
                             msgDialog('remove', l[1003], l[13749], l[1007], function(e) {
                                 if (e) {
                                     apiReq(self.id.substring(4));
                                     current_sel_version = false;
                                 }
+                                $('.fm-versioning.overlay').removeClass('arrange-to-back');
                             });
                         }
                     });

@@ -16,7 +16,32 @@ var nicknames = {
     /**
      * Gets the user's nickname if it's available
      * @param {String} userId The Base64 string of the user handle
-     * @returns {String} Returns the display name in format Nickname (FirstName LastName), or (FirstName LastName),
+     * @returns {string} Returns the user's name if set, otherwise returns FirstName LastName,
+     *                  or FirstName if the last name is not set
+     */
+    getNickname: function(userId) {
+
+        'use strict';
+
+        var userName = '';
+
+        if (M.u && typeof M.u[userId] !== 'undefined') {
+            // Set format to FirstName LastName (or just FirstName if the last name is not set)
+            userName = (M.u[userId].name || M.u[userId].m).trim();
+
+            // Check if a nickname for this contact exists
+            if (M.u[userId].nickname !== '') {
+                userName = M.u[userId].nickname;
+            }
+        }
+
+        return userName;
+    },
+
+    /**
+     * Gets the user's nickname and name if the nickname is available
+     * @param {String} userId The Base64 string of the user handle
+     * @returns {String} Returns the display name in format Nickname (FirstName LastName), or FirstName LastName,
      *                   or FirstName if the last name is not set
      */
     getNicknameAndName: function(userId) {

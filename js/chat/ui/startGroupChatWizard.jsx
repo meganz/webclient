@@ -1,7 +1,7 @@
 var React = require("react");
 var ReactDOM = require("react-dom");
 import utils from "./../../ui/utils.jsx";
-import MegaRenderMixin from "./../../stores/mixins.js";
+import {MegaRenderMixin} from "./../../stores/mixins.js";
 import Tooltips from "./../../ui/tooltips.jsx";
 import Forms from "./../../ui/forms.jsx";
 import MiniUI from "./../../ui/miniui.jsx";
@@ -9,13 +9,23 @@ import {ContactPickerWidget} from './contacts.jsx';
 import ModalDialogsUI from './../../ui/modalDialogs.jsx';
 
 
-export class StartGroupChatWizard extends MegaRenderMixin(React.Component) {
+export class StartGroupChatWizard extends MegaRenderMixin {
+    inputRef = React.createRef();
     static clickTime = 0;
     static defaultProps = {
-        'selectLabel': __(l[1940]),
-        'cancelLabel': __(l[82]),
+        'selectLabel': l[1940],
+        'cancelLabel': l[82],
         'hideable': true,
-        'flowType': 1
+        'flowType': 1,
+        'pickerClassName': '',
+        'showSelectedNum': false,
+        'disableFrequents': false,
+        'notSearchInEmails': false,
+        'autoFocusSearchField': true,
+        'disableDoubleClick': false,
+        'newEmptySearchResult': false,
+        'newNoContact': false,
+        'closeDlgOnClickOverlay': true
     };
 
     constructor(props) {
@@ -83,7 +93,12 @@ export class StartGroupChatWizard extends MegaRenderMixin(React.Component) {
             failedToEnableChatlink = false;
         }
 
-        if (self.state.step === 0 && haveContacts) {
+        var extraFooterElement;
+        if (this.props.extraFooterElement) {
+            self.state.step = 0;
+            extraFooterElement = <div className="extraFooterElement"></div>;
+        }
+        else if (self.state.step === 0 && haveContacts) {
             // always allow Next even if .selected is empty.
             allowNext = true;
 
@@ -174,70 +189,106 @@ export class StartGroupChatWizard extends MegaRenderMixin(React.Component) {
                 checkboxClassName = "checkboxOff";
             }
 
-            chatInfoElements = <div>
-                <div className={"contacts-search-header left-aligned top-pad" +
-                (failedToEnableChatlink ? " failed" : "")}>
-                    <i className="small-icon conversations"></i>
-                    <input type="search"
-                           placeholder={l[18509]} value={self.state.groupName}
-                           maxLength={30}
-                           onKeyDown={function(e) {
-                               var code = e.which || e.keyCode;
-                               if (allowNext && code === 13) {
-                                   if (self.state.step === 1) {
-                                       self.onFinalizeClick();
-                                   }
-                               }
-                           }}
-                           onChange={function(e) {
-                               self.setState({
-                                   'groupName': e.target.value,
-                                   'failedToEnableChatlink': false
-                               });
-                    }} />
-                </div>
-                {this.props.flowType !== 2 ?
-                <div className="group-chat-dialog content">
-                    <MiniUI.ToggleCheckbox className={"right"} checked={self.state.keyRotation} onToggle={function(v) {
-                        self.setState({'keyRotation': v});
-                    }} />
-                    <div className="group-chat-dialog header">
-                        {!self.state.keyRotation ? l[20576] : l[20631]}
+            chatInfoElements = (
+                <>
+                    <div
+                        className={`
+                            contacts-search-header left-aligned top-pad
+                            ${failedToEnableChatlink ? 'failed' : ''}
+                        `}>
+                        <i className="small-icon conversations" />
+                        <input
+                            autoFocus
+                            type="search"
+                            ref={this.inputRef}
+                            placeholder={l[18509]}
+                            value={this.state.groupName}
+                            maxLength={30}
+                            onKeyDown={e => {
+                                const code = e.which || e.keyCode;
+                                if (allowNext && code === 13 && self.state.step === 1) {
+                                    this.onFinalizeClick();
+                                }
+                            }}
+                            onChange={e =>
+                                this.setState({ groupName: e.target.value, failedToEnableChatlink: false })
+                            }
+                        />
                     </div>
-                    <div className="group-chat-dialog description">{l[20484]}</div>
+                    {this.props.flowType === 2 ? null : (
+                        <div className="group-chat-dialog content">
+                            <MiniUI.ToggleCheckbox
+                                className="right"
+                                checked={this.state.keyRotation}
+                                onToggle={keyRotation =>
+                                    this.setState({ keyRotation }, () =>
+                                        this.inputRef.current.focus()
+                                    )
+                                }
+                            />
+                            <div className="group-chat-dialog header">
+                                {this.state.keyRotation ? l[20631] : l[20576]}
+                            </div>
+                            <div className="group-chat-dialog description">
+                                {l[20484]}
+                            </div>
 
-                    <div className={"group-chat-dialog checkbox " + (
-                        self.state.keyRotation ? "disabled" : ""
-                    ) + (failedToEnableChatlink ? " failed" : "")} onClick={SoonFc(function(e) {
-                        // this is somehow called twice if clicked on the label...
-                        self.setState({'createChatLink': !self.state.createChatLink});
-                    }, 75)}>
-                        <div className={"checkdiv " + checkboxClassName}>
-                            <input type="checkbox"
-                                  name="group-encryption"
-                                  id="group-encryption"
-                                  className="checkboxOn hidden" />
+                            <div
+                                className={`
+                                    group-chat-dialog checkbox
+                                    ${this.state.keyRotation ? 'disabled' : ''}
+                                    ${failedToEnableChatlink ? 'failed' : ''}
+                                `}
+                                onClick={() => {
+                                    delay(
+                                        'chatWizard-createChatLink',
+                                        () => {
+                                            this.setState(state => ({ createChatLink: !state.createChatLink }));
+                                            this.inputRef.current.focus();
+                                        },
+                                        100
+                                    );
+                                }}>
+                                <div className={`checkdiv ${checkboxClassName}`}>
+                                    <input
+                                        type="checkbox"
+                                        name="group-encryption"
+                                        id="group-encryption"
+                                        className="checkboxOn hidden"
+                                    />
+                                </div>
+                                <label htmlFor="group-encryption" className="radio-txt lato mid">{l[20575]}</label>
+                                <div className="clear" />
+                            </div>
                         </div>
-                        <label htmlFor="group-encryption" className="radio-txt lato mid">{l[20575]}</label>
-                        <div className="clear"></div>
-                    </div>
-                </div> : null}
-                {failedToEnableChatlink ?
-                    <div className="group-chat-dialog description chatlinks-intermediate-msg">
-                        {l[20573]}
-                    </div> : null}
-            </div>;
+                    )}
+                    {failedToEnableChatlink ? (
+                        <div className="group-chat-dialog description chatlinks-intermediate-msg">{l[20573]}</div>
+                    ) : null}
+                </>
+            );
         }
 
 
         return (
             <ModalDialogsUI.ModalDialog
                 step={self.state.step}
-                title={l[19483]}
+                title={this.props.flowType === 2 && self.state.createChatLink
+                    ? l[20638] : this.props.customDialogTitle || l[19483]}
                 className={classes}
-                selected={self.state.selected}
+                showSelectedNum={self.props.showSelectedNum}
+                selectedNum={self.state.selected.length}
+                closeDlgOnClickOverlay={self.props.closeDlgOnClickOverlay}
                 onClose={() => {
                     self.props.onClose(self);
+                }}
+                popupDidMount={(elem) => {
+                    if (this.props.extraFooterElement) {
+                        elem.querySelector('.extraFooterElement')?.appendChild(this.props.extraFooterElement);
+                    }
+                    if (this.props.onExtraFooterElementDidMount) {
+                        this.props.onExtraFooterElementDidMount(elem);
+                    }
                 }}
                 triggerResizeOnUpdate={true}
                 buttons={buttons}>
@@ -255,8 +306,27 @@ export class StartGroupChatWizard extends MegaRenderMixin(React.Component) {
                     readOnly={self.state.step !== 0}
                     allowEmpty={true}
                     showMeAsSelected={self.state.step === 1}
+                    className={self.props.pickerClassName}
+                    disableFrequents={self.props.disableFrequents}
+                    notSearchInEmails={self.props.notSearchInEmails}
+                    autoFocusSearchField={self.props.autoFocusSearchField}
+                    disableDoubleClick={self.props.disableDoubleClick}
+                    selectedWidthSize={self.props.selectedWidthSize}
+                    emptySelectionMsg={self.props.emptySelectionMsg}
+                    newEmptySearchResult={self.props.newEmptySearchResult}
+                    newNoContact={self.props.newNoContact}
+                    highlightSearchValue={self.props.highlightSearchValue}
                 />
+                {extraFooterElement}
             </ModalDialogsUI.ModalDialog>
         );
     }
+};
+
+window.StartGroupChatDialogUI = {
+    StartGroupChatWizard,
+};
+
+export default {
+    StartGroupChatWizard
 };

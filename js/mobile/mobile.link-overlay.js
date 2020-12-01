@@ -17,6 +17,9 @@ mobile.linkOverlay = {
         // Store the selector as it is re-used
         this.$overlay = $('#mobile-ui-copy-link');
 
+        // Lets make sure remove megadrop class from this overlay
+        this.$overlay.removeClass('megadrop');
+
         // Get initial overlay details
         var node = M.d[nodeHandle];
         var fileName = node.name;
@@ -25,6 +28,7 @@ mobile.linkOverlay = {
         var fileSizeFormatted = fileSize.size + ' ' + fileSize.unit;
         var fileIconName = fileIcon(node);
         var fileIconPath = mobile.imagePath + fileIconName + '.png';
+        var self = this;
 
         // Set file name, size and image
         this.$overlay.find('.filename').text(fileName);
@@ -34,6 +38,7 @@ mobile.linkOverlay = {
         // By default show the remove and copy buttons as disabled
         this.$overlay.find('.copy').addClass('disabled');
         this.$overlay.find('.remove').addClass('disabled');
+        $('#mobile-public-link', this.$overlay).val('');
 
         mobile.initOverlayPopstateHandler(this.$overlay);
 
@@ -67,8 +72,12 @@ mobile.linkOverlay = {
         };
 
         var mdList = mega.megadrop.isDropExist(nodeHandle);
+
         if (mdList.length) {
-            mega.megadrop.pufRemove(mdList).done(tmpFn.bind(this));
+
+            mega.megadrop.showRemoveWarning(mdList).done(function() {
+                mega.megadrop.pufRemove(mdList).done(tmpFn.bind(self));
+            });
         }
         else {
             tmpFn.call(this);
@@ -137,6 +146,12 @@ mobile.linkOverlay = {
         // Format the public link with key
         var publicUrl = this.formatLink(nodeHandle);
 
+        if (!publicUrl) {
+            // Something went wrong...
+            msgDialog('warninga', l[17564], l[17565]);
+            return false;
+        }
+
         // Cache some selectors
         var $overlay = mobile.linkOverlay.$overlay;
         var $publicLinkTextField = $overlay.find('.public-link');
@@ -182,29 +197,41 @@ mobile.linkOverlay = {
      *                   https://mega.nz/#!X4NiADjR!BRqpTTSy-4UvHLz_6sHlpnGS-dS0E_RIVCpGAtjFmZQ
      */
     formatLink: function(nodeHandle) {
-
         'use strict';
 
-        var node = M.d[nodeHandle];
-        var key = null;
+        var node = M.getNodeByHandle(nodeHandle);
+        var key = node.k;
         var type = '';
 
-        // If folder
+        if (!node.ph) {
+            if (d) {
+                console.warn('No public handle for node %s', nodeHandle);
+            }
+            return false;
+        }
+
         if (node.t) {
             type = 'F';
             key = u_sharekeys[node.h] && u_sharekeys[node.h][0];
         }
+
+        var nodeUrlWithPublicHandle;
+        var nodeDecryptionKey;
+
+        if (mega.flags.nlfe) {
+            type = (type) ? '/folder/' : '/file/';
+            nodeUrlWithPublicHandle = getBaseUrl() + type + node.ph + '#';
+            nodeDecryptionKey = (key ? a32_to_base64(key) : '');
+        }
         else {
-            // Otherwise for file
-            key = node.k;
+            nodeUrlWithPublicHandle = getBaseUrl() + '/#' + type + '!' + node.ph;
+            nodeDecryptionKey = key ? '!' + a32_to_base64(key) : '';
         }
 
         // Create the URL
-        var nodeUrlWithPublicHandle = getBaseUrl() + '/#' + type + '!' + node.ph;
-        var nodeDecryptionKey = key ? '!' + a32_to_base64(key) : '';
         var publicUrl = nodeUrlWithPublicHandle + nodeDecryptionKey;
 
-        return publicUrl;
+        return nodeUrlWithPublicHandle + nodeDecryptionKey;
     },
 
     /**

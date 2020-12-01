@@ -1,0 +1,552 @@
+@media only screen and (min-width: 783px) {
+ .top-to-bott.anim, .anim.img1, .anim.img-wrap::before, .anim.img-wrap::after, .startpage.top-notice,  .bottom-page.anim {
+    -webkit-transition: all 200ms ease-in-out ;
+    transition: all 200ms ease-in-out ;
+    -webkit-transition-timing-function: ease-in-out;
+    transition-timing-function: ease-in-out;
+    opacity: 0;
+}
+ .top-to-bott.anim, .start-animation .anim.img1, .start-animation .anim.img-wrap::before, .start-animation .anim.img-wrap::after, .start-animation .startpage.top-notice {
+    opacity: 0;
+}
+.start-animation .anim.i2, .start-animation .anim.img-wrap::before, .start-animation .anim.img-wrap::after {
+    -webkit-animation-name: top-fade-in;
+    -webkit-animation-duration: 0.5s;
+    -webkit-animation-delay: 0.5s;
+    -webkit-animation-fill-mode: forwards;
+    animation-name: top-fade-in;
+    animation-duration: 0.5s;
+    animation-delay: 0.5s;
+    animation-fill-mode: forwards;
+}
+ .top-to-bott.anim {
+    -webkit-animation-name: top-ease-out;
+    -webkit-animation-duration: 0.15s;
+    -webkit-animation-fill-mode: forwards;
+    animation-name: top-ease-out;
+    animation-duration: 0.15s;
+    animation-fill-mode: forwards;
+}
+.start-animation .anim.i3, .start-animation .anim.i4 {
+    -webkit-animation-name: top-fade-in-down;
+    -webkit-animation-duration: 0.5s;
+    -webkit-animation-delay: 0.3s;
+    -webkit-animation-fill-mode: forwards;
+    animation-name: top-fade-in-down;
+    animation-duration: 0.5s;
+    animation-delay: 0.3s;
+    animation-fill-mode: forwards;
+}
+.start-animation .startpage.top-notice {
+    -webkit-animation-name: top-fade-in;
+    -webkit-animation-duration: 0.15s;
+    -webkit-animation-delay: 2.2s;
+    -webkit-animation-fill-mode: forwards;
+    animation-name: top-fade-in;
+    animation-duration: 0.15s;
+    animation-delay: 2.2s;
+    animation-fill-mode: forwards;
+}
+.start-animation .anim.i1 {
+    -webkit-animation-name: top-bg1;
+    -webkit-animation-duration: 0.2s;
+    -webkit-animation-delay: 1s;
+    -webkit-animation-fill-mode: forwards;
+    animation-name: top-bg1;
+    animation-duration: 0.2s;
+    animation-delay: 1s;
+    animation-fill-mode: forwards;
+}
+.bottom-page.left-cell.animated {
+    transform: translateX(10%);
+    opacity: 0;
+}
+.bottom-page.left-cell.animated.order1, .bottom-page.right-cell.animated {
+    transform: translateX(-10%);
+    opacity: 0;
+}
+.bottom-page.left-cell.animated.start-animation, .bottom-page.right-cell.animated.start-animation {
+    -webkit-animation-name: sfrom-r-to-l;
+    -webkit-animation-duration: 1s;
+    -webkit-animation-delay: 0.5s;
+    -webkit-animation-fill-mode: forwards;
+    animation-name: sfrom-r-to-l;
+    animation-duration: 1s;
+    animation-delay: 0.5s;
+    animation-fill-mode: forwards;
+}
+.bottom-page.left-cell.animated.start-animation.order1 {
+    -webkit-animation-name: sfrom-l-to-r;
+    -webkit-animation-duration: 1s;
+    -webkit-animation-delay: 0.5s;
+    -webkit-animation-fill-mode: forwards;
+    animation-name: sfrom-l-to-r;
+    animation-duration: 1s;
+    animation-delay: 0.5s;
+    animation-fill-mode: forwards;
+}
+.start-animation .startpage.img2-progress span {
+     -webkit-animation-name: st-progress;
+    -webkit-animation-duration: 7s;
+    -webkit-animation-delay: 1.1s;
+    -webkit-animation-fill-mode: forwards;
+    animation-name: st-progress;
+    animation-duration: 7s;
+    animation-delay: 1.1s;
+    animation-iteration-count: infinite;
+}
+.start-animation .startpage.img2-progress.pr2 span {
+    -webkit-animation-duration: 12s;
+    animation-duration: 12s;
+}
+.startpage-filetypes.animated .img3 {
+    opacity: 0;
+    -webkit-transition: opacity 1200ms ease-in-out, transform 1200ms ease-in-out;
+    transition: opacity 1200ms ease-in-out, transform 1200ms ease-in-out;
+    transform: translateY(-10px);
+    transition-timing-function: ease-in-out;
+}
+.startpage-filetypes.start-animation.animated .icon.main {
+    opacity: 1;
+    transform: translateY(0px);
+}
+.animated .lock.main {
+    transform: scale(1.02);
+}
+.startpage-filetypes.start-animation.animated .lock.main {
+    -webkit-animation-name: show-locks, locks-bouncing;
+    -webkit-animation-duration: 1.5s, 0.3s;
+    -webkit-animation-delay: 0.7s, 0.7s;
+    -webkit-animation-fill-mode: forwards, forwards;
+    -webkit-animation-iteration-count: 1, 1;
+    animation-name: show-locks, locks-bouncing;
+    animation-duration: 1.5s, 0.3s;
+    animation-delay: 0.7s, 0.7s;
+    animation-fill-mode: forwards, forwards;
+    animation-iteration-count: 1, 1;
+}
+.startpage-filetypes.start-animation.animated .shadow {
+    transform: translateY(2%);
+}
+.startpage-filetypes.start-animation.animated .icon.shadow {
+    -webkit-animation-name: show-locks;
+    -webkit-animation-duration: 1.5s;
+    -webkit-animation-delay: 0.5s;
+    -webkit-animation-fill-mode: forwards;
+    animation-name: show-locks;
+    animation-duration: 1.5s;
+    animation-delay: 0.5s;
+    animation-fill-mode: forwards;
+}
+.startpage-filetypes.start-animation.animated .lock.shadow {
+    -webkit-animation-name: show-shadow-locks;
+    -webkit-animation-duration: 1.5s;
+    -webkit-animation-delay: 0.5s;
+    -webkit-animation-fill-mode: forwards;
+    animation-name: show-shadow-locks;
+    animation-duration: 1.5s;
+    animation-delay: 0.5s;
+    animation-fill-mode: forwards;
+}
+.animated.start-animation .startpage-chat-content span {
+    -webkit-animation-name: scroll-chat;
+    -webkit-animation-duration: 6s;
+    -webkit-animation-delay: 1s;
+    -webkit-animation-iteration-count: infinite;
+    animation-name: scroll-chat;
+    animation-duration: 6s;
+    animation-delay: 1s;
+    animation-iteration-count: infinite;
+}
+.animated.start-animation .startpage-busines-cont {
+    opacity: 0;
+}
+.animated.start-animation .startpage-busines-cont.c1 {
+    -webkit-animation-name: show-c1;
+    -webkit-animation-duration: 1s;
+    -webkit-animation-delay: 1s;
+    -webkit-animation-fill-mode: forwards;
+    -webkit-perspective-origin: 50% 50%;
+    animation-name: show-c1;
+    animation-duration: 1s;
+    animation-delay: 1s;
+    animation-fill-mode: forwards;
+    perspective-origin: 50% 50%;
+}
+.animated.start-animation .startpage-busines-cont.c2 {
+    -webkit-animation-name: show-c2;
+    -webkit-animation-duration: 1.4s;
+    -webkit-animation-delay: 1.5s;
+    -webkit-animation-fill-mode: forwards;
+    -webkit-perspective-origin: 50% 50%;
+    animation-name: show-c2;
+    animation-duration: 1.4s;
+    animation-delay: 1.5s;
+    animation-fill-mode: forwards;
+    perspective-origin: 50% 50%;
+}
+.
+.bottom-page.big-header.animated.start-animation .startpage.carousel.start-animation {
+    -webkit-animation-name: show-features;
+    -webkit-animation-duration: 0.6s;
+    -webkit-animation-delay: 0.3s;
+    -webkit-animation-fill-mode: forwards;
+    animation-name: show-features;
+    animation-duration: 0.6s;
+    animation-delay: 0.3s;
+    animation-fill-mode: forwards;
+}
+
+.scale.animated {
+    opacity: 0;
+    transform: scale(0.9);
+    -webkit-transition: all 500ms ease-in-out;
+    transition: all 500ms ease-in-out;
+}
+.scale.animated.start-animation {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.fadein {
+    opacity: 0;
+}
+.fadein.start-animation {
+    opacity: 1;
+    -webkit-transition: opacity 500ms ease-in-out;
+    transition: opacity 500ms ease-in-out;
+    -webkit-transition-delay: 300ms;
+    transition-delay: 300ms;
+}
+
+.affiliate.refer-cell.animated {
+    opacity: 0;
+    position: relative;
+    -webkit-transition: all 200ms ease-in-out ;
+    transition: all 200ms ease-in-out ;
+}
+.affiliate.refer-cell.animated.start-animation:hover {
+    transform: scale(1.06) !important;
+}
+.affiliate.refer-cell.animated.start-animation {
+    -webkit-transition: opacity 500ms ease-in-out, transform 300ms ease-in-out;
+    transition: opacity 500ms ease-in-out, transform 300ms ease-in-out;
+    -webkit-transition-delay: 300ms, 0ms;
+    transition-delay: 300ms, 0ms;
+    opacity: 1;
+}
+
+.animated.col-3 {
+    opacity: 0;
+    position: relative;
+    transform: translate(0, -5%);
+}
+ .animated.col-3.start-animation {
+    -webkit-transition: all 500ms ease-in-out;
+    transition: all 500ms ease-in-out;
+    -webkit-transition-delay: 500ms;
+    transition-delay: 500ms;
+    -webkit-transition-timing-function: ease-in-out;
+    transition-timing-function: ease-in-out;
+    opacity: 1;
+    transform: translate(0, 0);
+}
+}
+ @-webkit-keyframes top-bg1 {
+0% {
+transform: translateY(30%) scale(0.6);
+ opacity: 0;
+}
+ 100% {
+transform: translateY(0) scale(1);
+ opacity: 1;
+}
+}
+ @keyframes top-bg1 {
+0% {
+transform: translateY(30%) scale(0.6);
+ opacity: 0;
+}
+ 100% {
+transform: translateY(0) scale(1);
+ opacity: 1;
+}
+}
+@-webkit-keyframes top-fade-in {
+0% {
+ opacity: 0;
+}
+ 100% {
+ opacity: 1;
+}
+}
+@keyframes top-fade-in {
+0% {
+ opacity: 0;
+}
+ 100% {
+ opacity: 1;
+}
+}
+@-webkit-keyframes top-fade-in-down {
+0% {
+ opacity: 0;
+ top:-10px;
+}
+ 100% {
+ opacity: 1;
+ top:0px;
+}
+}
+@keyframes top-fade-in-down {
+0% {
+ opacity: 0;
+ top:-10px;
+}
+ 100% {
+ opacity: 1;
+ top:0px;
+}
+}
+@-webkit-keyframes top-ease-out {
+0% {
+ opacity: 0;
+ transform: translateY(-10px);
+}
+ 100% {
+ opacity: 1;
+ transform: translateY(0);
+}
+}
+@keyframes top-ease-out {
+0% {
+ opacity: 0;
+ transform: translateY(-10px);
+}
+ 100% {
+ opacity: 1;
+ transform: translateY(0);
+}
+}
+ @-webkit-keyframes tiny-translate {
+0% {
+ opacity: 0;
+ transform: translateY(-1%);
+}
+ 100% {
+ opacity: 1;
+ transform: translateY(0);
+}
+}
+@keyframes tiny-translate {
+0% {
+ opacity: 0;
+ transform: translateY(-1%);
+}
+ 100% {
+ opacity: 1;
+ transform: translateY(0);
+}
+}
+ @-webkit-keyframes sfrom-r-to-l {
+0% {
+ transform: translateX(10%);
+ opacity: 0;
+}
+ 100% {
+ transform: translateX(0);
+ opacity: 1;
+}
+}
+@keyframes sfrom-r-to-l {
+0% {
+ transform: translateX(10%);
+ opacity: 0;
+}
+ 100% {
+ transform: translateX(0);
+ opacity: 1;
+}
+}
+@-webkit-keyframes sfrom-l-to-r {
+0% {
+ transform: translateX(-10%);
+ opacity: 0;
+}
+ 100% {
+ transform: translateX(0);
+ opacity: 1;
+}
+}
+@keyframes sfrom-l-to-r {
+0% {
+ transform: translateX(-10%);
+ opacity: 0;
+}
+ 100% {
+ transform: translateX(0);
+ opacity: 1;
+}
+}
+ @-webkit-keyframes st-progress {
+0% {
+ width: 0%;
+}
+ 100% {
+ width: 100%;
+}
+}
+@keyframes st-progress {
+0% {
+ width: 0%;
+}
+ 100% {
+ width: 100%;
+}
+}
+ @-webkit-keyframes locks-bouncing {
+0% {
+ transform: scale(1.02);
+}
+100% {
+ transform: scale(1);
+}
+}
+@keyframes locks-bouncing {
+0% {
+ transform: scale(1.02);
+}
+100% {
+ transform: scale(1);
+}
+}
+@-webkit-keyframes show-locks {
+0% {
+ opacity: 0;
+}
+ 100% {
+ opacity: 1;
+}
+}
+@keyframes show-locks {
+0% {
+ opacity: 0;
+}
+ 100% {
+ opacity: 1;
+}
+}
+@-webkit-keyframes show-shadow-locks {
+0% {
+ opacity: 0;
+}
+ 100% {
+ opacity: 0.05;
+}
+}
+@keyframes show-shadow-locks {
+0% {
+ opacity: 0;
+}
+ 100% {
+ opacity: 0.05;
+}
+}
+ @-webkit-keyframes scroll-chat {
+0% {
+ top: 0;
+}
+ 50% {
+ top: -472px;
+}
+ 100% {
+ top: 0;
+}
+}
+@keyframes scroll-chat {
+0% {
+ top: 0;
+}
+ 50% {
+ top: -472px;
+}
+ 100% {
+ top: 0;
+}
+}
+ @-webkit-keyframes show-c1 {
+0% {
+ opacity: 0;
+ transform: rotate(-15deg);
+}
+ 100% {
+ opacity: 1;
+ transform: rotate(0deg);
+}
+}
+@keyframes show-c1 {
+0% {
+ opacity: 0;
+ transform: rotate(-15deg);
+}
+ 100% {
+ opacity: 1;
+ transform: rotate(0deg);
+}
+}
+@-webkit-keyframes show-c2 {
+0% {
+ opacity: 0;
+ transform: rotate(-15deg);
+}
+ 100% {
+ opacity: 1;
+ transform: rotate(0deg);
+}
+}
+@keyframes show-c2 {
+0% {
+ opacity: 0;
+ transform: rotate(-15deg);
+}
+ 100% {
+ opacity: 1;
+ transform: rotate(0deg);
+}
+}
+ @-webkit-keyframes move-blocks {
+0% {
+ opacity: 0;
+ transform: scale(0.5);
+}
+ 100% {
+ opacity: 1;
+ transform: scale(1);
+}
+}
+@keyframes move-blocks {
+0% {
+ opacity: 0;
+ transform: scale(0.5);
+}
+ 100% {
+ opacity: 1;
+ transform: scale(1);
+}
+}
+ @-webkit-keyframes show-features {
+0% {
+ opacity: 0;
+}
+ 100% {
+ opacity: 1;
+}
+}
+@keyframes show-features {
+0% {
+ opacity: 0;
+}
+ 100% {
+ opacity: 1;
+}
+}

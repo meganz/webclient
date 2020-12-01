@@ -164,6 +164,10 @@ mobile.cloud.actionBar = {
         // On clicking the Create Folder icon
         $createFolderIcon.off('tap').on('tap', function() {
 
+            if (!validateUserAction()) {
+                return false;
+            }
+
             // Show the create folder overlay
             mobile.createFolderOverlay.init();
 
@@ -187,6 +191,10 @@ mobile.cloud.actionBar = {
 
         // On the upload icon click/tap
         $uploadIcon.off('tap').on('tap', function() {
+
+            if (!validateUserAction()) {
+                return false;
+            }
 
             if (ulmanager.ulOverStorageQuota) {
                 ulmanager.ulShowOverStorageQuotaDialog();

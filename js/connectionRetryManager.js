@@ -9,10 +9,12 @@
  */
 var ConnectionRetryManager = function(opts, parentLogger) {
     var self = this;
+    self._$connectingPromise = null;
     self._lastConnectionRetryTime = 0;
     self._connectionRetryInProgress = null;
     self._connectionRetries = 0;
     self._is_paused = false;
+    self._debug = false;
 
     if (localStorage.connectionRetryManagerDebug) {
         var _connectionState = ConnectionRetryManager.CONNECTION_STATE.DISCONNECTED;
@@ -30,6 +32,7 @@ var ConnectionRetryManager = function(opts, parentLogger) {
             enumerable: true,
             configurable: true
         });
+        self._debug = true;
     }
     else {
         self._connectionState = ConnectionRetryManager.CONNECTION_STATE.DISCONNECTED;
@@ -167,14 +170,15 @@ ConnectionRetryManager.CONNECTION_STATE = {
 ConnectionRetryManager.prototype.gotDisconnected = function(){
     var self = this;
 
-    if (localStorage.connectionRetryManagerDebug) {
+    if (self._debug) {
         self.logger.warn("gotDisconnected");
     }
-    if (self._$connectingPromise && self._$connectingPromise.state() === 'pending') {
-        if (localStorage.connectionRetryManagerDebug) {
+    if (self._$connectingPromise) {
+        if (self._debug) {
             self.logger.warn("rejecting previous connectingPromise");
         }
         self._$connectingPromise.reject();
+        self._$connectingPromise = null;
     }
 
     if (
@@ -221,7 +225,7 @@ ConnectionRetryManager.prototype.gotDisconnected = function(){
 ConnectionRetryManager.prototype.gotConnected = function(){
     var self = this;
 
-    if (localStorage.connectionRetryManagerDebug) {
+    if (self._debug) {
         self.logger.warn("got connected", self.logger.name + "#" + self._connectionRetries);
     }
 
@@ -240,12 +244,12 @@ ConnectionRetryManager.prototype.gotConnected = function(){
 
     $(window).off("online.megaChatRetry" + self._instanceIdx);
     $(window).rebind("offline.megaChatRetry" + self._instanceIdx, function() {
-        if (localStorage.connectionRetryManagerDebug) {
+        if (self._debug) {
             self.logger.warn("OS notified we are offline.");
         }
         self._isOffline = true;
         if (!self.options.functions.isUserForcedDisconnect()) {
-            if (localStorage.connectionRetryManagerDebug) {
+            if (self._debug) {
                 self.logger.warn("is user forced disconnect");
             }
             self.options.functions.forceDisconnect(self);
@@ -256,7 +260,7 @@ ConnectionRetryManager.prototype.gotConnected = function(){
     });
 
     if (self._$connectingPromise) {
-        if (localStorage.connectionRetryManagerDebug) {
+        if (self._debug) {
             self.logger.error("got connected, triggering verify:", self.logger.name);
         }
 
@@ -279,6 +283,14 @@ ConnectionRetryManager.prototype.startedConnecting = function(waitForPromise, de
     if (self._is_paused) {
         return MegaPromise.reject();
     }
+
+    if (self._$connectingPromise) {
+        if (self._debug) {
+            self.logger.warn("rejecting previous connectingPromise, stuck?", self._$connectingPromise);
+        }
+        self._$connectingPromise.reject(EAGAIN);
+    }
+
     self._$connectingPromise = createTimeoutPromise(
         function() {
             return self.options.functions.isConnected();
@@ -290,18 +302,22 @@ ConnectionRetryManager.prototype.startedConnecting = function(waitForPromise, de
         name
     )
         .always(function() {
-            delete self._$connectingPromise;
+            self._$connectingPromise = null;
         })
         .done(function() {
-            if (localStorage.connectionRetryManagerDebug) {
+            if (self._debug) {
                 self.logger.warn("startedConnecting succeeded.", self.logger.name + "#" + self._connectionRetries);
             }
         })
-        .fail(function() {
-            if (localStorage.connectionRetryManagerDebug) {
+        .fail(function(ex) {
+            if (ex === EAGAIN) {
+                return;
+            }
+            if (self._debug) {
                 self.logger.warn(
                     "startedConnecting failed, retrying.",
-                    self.logger.name + "#" + self._connectionRetries
+                    self.logger.name + "#" + self._connectionRetries,
+                    ex
                 );
             }
             self.doConnectionRetry();
@@ -318,6 +334,7 @@ ConnectionRetryManager.prototype.pause = function() {
 
 ConnectionRetryManager.prototype.unpause = function() {
     this._is_paused = false;
+    // @todo resume timers?
 };
 
 /**
@@ -333,10 +350,11 @@ ConnectionRetryManager.prototype.doConnectionRetry = function(immediately) {
     }
     if (self._$connectingPromise) {
         if (self._connectionRetries >= self.options.maxConnectionRetries) {
-            self._$connectingPromise.reject(arguments);
+            self._$connectingPromise.reject(ETEMPUNAVAIL);
+            self._$connectingPromise = null;
         }
         else if (!immediately) {
-            if (localStorage.connectionRetryManagerDebug) {
+            if (self._debug) {
                 self.logger.warn("recycling previous ._$connectingPromise.");
             }
             return self._$connectingPromise;
@@ -417,7 +435,7 @@ ConnectionRetryManager.prototype.doConnectionRetry = function(immediately) {
 
         self._lastConnectionRetryTime = unixtime();
 
-        if (localStorage.connectionRetryManagerDebug) {
+        if (self._debug) {
             self.logger.warn(
                 "calling startedConnecting: ",
                 connectionRetryTimeout, self.logger.name + "#" + self._connectionRetries
@@ -460,6 +478,7 @@ ConnectionRetryManager.prototype.resetConnectionRetries = function() {
     clearTimeout(self._connectionRetryInProgress);
     if (self._$connectingPromise) {
         self._$connectingPromise.reject();
+        self._$connectingPromise = null;
     }
 };
 

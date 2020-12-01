@@ -46,6 +46,8 @@
     var TEMPORARY = window.TEMPORARY || 0,
         PERSISTENT = window.PERSISTENT || 1;
 
+    var TEST_METHOD_SWITCHOVER = !!localStorage.testDLMethodSwitchover;
+
     function storage_s2n(s) {
         return s.toLowerCase() === 'persistent' ? PERSISTENT : TEMPORARY;
     }
@@ -581,13 +583,24 @@
                                 }, onError);
 
                                 logger.debug('Truncating file to offset ' + dl_position);
-                                dl_fw.truncate(dl_position);
+                                onIdle(tryCatch(function() {
+                                    dl_fw.truncate(dl_position);
+                                }, function(ex) {
+                                    logger.warn(ex);
+                                    if (!canSwitchDownloadMethod(dl, dl_id, fileEntry)) {
+                                        dlFatalError(dl, ex);
+                                    }
+                                }));
                             }
                         };
                         zfileEntry = fileEntry;
 
                         if (resumeOffset) {
                             if (resumeOffset === dl_fw.length) {
+                                if (TEST_METHOD_SWITCHOVER && canSwitchDownloadMethod(dl, dl_id, fileEntry)) {
+                                    console.info('---------- TESTING DOWNLOAD METHOD SWITCHOVER --------');
+                                    return;
+                                }
                                 dl_fw.seek(resumeOffset);
                                 onIdle(beginDownload);
                                 return;
@@ -763,7 +776,10 @@
         };
 
         this.download = function(name, path) {
-            logger.debug('download', name, path, dl_fw, zfileEntry);
+            if (d) {
+                var _logger = logger || dlmanager.logger;
+                _logger.debug('download', name, path, dl_fw, zfileEntry);
+            }
 
             var saveLink = function(objectURL) {
                 var node = document.getElementById('dllink');

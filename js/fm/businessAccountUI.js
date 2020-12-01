@@ -7,7 +7,7 @@ function BusinessAccountUI() {
         /**@type {BusinessAccount} */
         this.business = new BusinessAccount();
         mega.buinsessController = this.business;
-        mBroadcaster.addListener('business:subuserUpdate', this.UIEventsHandler);
+        mBroadcaster.addListener('business:subuserUpdate', this.UIEventsHandler.bind(this));
         this.initialized = false;
     }
     else {
@@ -118,6 +118,7 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
     }
 
     var mySelf = this;
+    this.business.hasSubs = false;
 
     var subAccountsView;
     if (!isBlockView) {
@@ -129,11 +130,14 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
     $('.fm-right-files-block').removeClass('hidden');
     $('.fm-empty-user-management').addClass('hidden');
 
-    this.URLchanger('');
+    if (!quickWay) {
+        this.URLchanger('');
+    }
 
     if (!Object.keys(currSubAccounts).length) { // no subs
         return this.viewLandingPage();
     }
+    this.business.hasSubs = true;
 
     loadingDialog.pshow();
 
@@ -622,7 +626,7 @@ BusinessAccountUI.prototype.showLinkPasswordDialog = function (invitationLink) {
             if (e.keyCode === 13 || e.code === 'Enter' || e.key === 'Enter') {
                 return $('.decrypt-sub-user-link', $dialog).trigger('click');
             }
-            
+
         });
 
         $('.decrypt-sub-user-link', $dialog).on('click', function decryptOkBtnHandler() {
@@ -638,7 +642,7 @@ BusinessAccountUI.prototype.showLinkPasswordDialog = function (invitationLink) {
                 var business = new BusinessAccount();
 
                 var failureAction = function (st, res, desc) {
-                    
+
                     loadingDialog.phide();
                     var msg = l[17920]; // not valid password
                     if (res) {
@@ -653,7 +657,7 @@ BusinessAccountUI.prototype.showLinkPasswordDialog = function (invitationLink) {
                 var decryptedTokenBase64 = business.decryptSubAccountInvitationLink(invitationLink, enteredPassword);
                 if (decryptedTokenBase64) {
                     var getInfoPromise = business.getSignupCodeInfo(decryptedTokenBase64);
-                    
+
                     getInfoPromise.fail(failureAction);
 
                     getInfoPromise.done(function signupCodeGettingSuccessHandler(status, res) {
@@ -730,7 +734,7 @@ BusinessAccountUI.prototype.openInvitationLink = function (signupCode) {
                 res.signupcode = signupCode;
                 localStorage.businessSubAc = JSON.stringify(res);
                 if (is_mobile) {
-                    mobile.register.showConfirmAccountScreen(res, true);
+                    mobile.register.show(res);
                 }
                 else {
                     loadSubPage('register');
@@ -895,7 +899,7 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
         $subAccountContainer.find('.profile-button-container .migrate-data').text(l[19095]).removeClass('hidden');
     }
     $subAccountContainer.find('.user-management-view-status.text').text(this.subUserStatus(subUser.s));
-    
+
     var subUserDefaultAvatar = useravatar.contact(subUserHandle);
     $('.subaccount-img-big', $subAccountContainer).safeHTML(subUserDefaultAvatar);
     $('.user-management-subuser-avatars', $subHeader).safeHTML(subUserDefaultAvatar);
@@ -1033,10 +1037,10 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
         if (!subUserStats) {
             return;
         }
-        
+
         var totalStorage = 0;
         var totalBandwidth = 0;
-        
+
         var emptyArray = [0, 0, 0, 0, 0];
 
         var rootInfo = subUserStats["2"] || emptyArray;
@@ -1048,7 +1052,7 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
 
         totalStorage = subUserStats["ts"] || 0;
         totalBandwidth = subUserStats["dl"] || 0;
-            
+
         var totalStorageFormatted = numOfBytes(totalStorage, 2);
         var totalBandwidthFormatted = numOfBytes(totalBandwidth, 2);
         var rootTotalFormatted = numOfBytes(rootInfo[0], 2);
@@ -1082,37 +1086,67 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
         var $versionsSection = $('.user-management-view-data .subaccount-view-used-data' +
             ' .used-storage-info.ba-version', $subAccountContainer);
 
-        $cloudDriveSection.find('.ff-occupy').text(rootTotalFormatted.size + ' ' + rootTotalFormatted.unit);
-        $cloudDriveSection.find('.folder-number').text(rootInfo[2] + ' ' + l[2035]);
-        $cloudDriveSection.find('.file-number').text(rootInfo[1] + ' ' + l[2034]);
+        var ffNumText = function(value, type) {
+            var counter = value || 0;
+            var numTextOutput = "";
 
-        $inShareSection.find('.ff-occupy').text(inshareInternalTotalFormatted.size + ' ' +
+            if (counter === 0) {
+                numTextOutput = type === 'file' ? l[23259] : l[23258];
+            }
+            else if (counter === 1) {
+                numTextOutput = type === 'file' ? l[23257] : l[23256];
+            }
+            else {
+                numTextOutput = (type === 'file' ? l[23261] : l[23260]).replace('[X]', counter);
+            }
+
+            return numTextOutput;
+        };
+
+        var cloudDriveFolderNumText = ffNumText(rootInfo[2], 'folder');
+        var cloudDriveFileNumText = ffNumText(rootInfo[1], 'file');
+        $('.ff-occupy', $cloudDriveSection).text(rootTotalFormatted.size + ' ' + rootTotalFormatted.unit);
+        $('.folder-number', $cloudDriveSection).text(cloudDriveFolderNumText);
+        $('.file-number', $cloudDriveSection).text(cloudDriveFileNumText);
+
+        var inShareInFolderNumText = ffNumText(inshareInternalInfo[2], 'folder');
+        var inShareInFileNumText = ffNumText(inshareInternalInfo[1], 'file');
+        $('.ff-occupy', $inShareSection).text(inshareInternalTotalFormatted.size + ' ' +
             inshareInternalTotalFormatted.unit);
-        $inShareSection.find('.folder-number').text(inshareInternalInfo[2] + ' ' + l[2035]);
-        $inShareSection.find('.file-number').text(inshareInternalInfo[1] + ' ' + l[2034]);
+        $('.folder-number', $inShareSection).text(inShareInFolderNumText);
+        $('.file-number', $inShareSection).text(inShareInFileNumText);
 
-        $inShareExSection.find('.ff-occupy').text(inshareExternalTotalFormatted.size + ' ' +
+        var inShareExFolderNumText = ffNumText(inshareExternalInfo[2], 'folder');
+        var inShareExFileNumText = ffNumText(inshareExternalInfo[1], 'file');
+        $('.ff-occupy', $inShareExSection).text(inshareExternalTotalFormatted.size + ' ' +
             inshareExternalTotalFormatted.unit);
-        $inShareExSection.find('.folder-number').text(inshareExternalInfo[2] + ' ' + l[2035]);
-        $inShareExSection.find('.file-number').text(inshareExternalInfo[1] + ' ' + l[2034]);
+        $('.folder-number', $inShareExSection).text(inShareExFolderNumText);
+        $('.file-number', $inShareExSection).text(inShareExFileNumText);
 
-        $outShareExternalSection.find('.ff-occupy').text(outshareTotalFormatted.size + ' ' +
+        var outShareExFolderNumText = ffNumText(outshareInfo[2], 'folder');
+        var outShareExFileNumText = ffNumText(outshareInfo[1], 'file');
+        $('.ff-occupy', $outShareExternalSection).text(outshareTotalFormatted.size + ' ' +
             outshareTotalFormatted.unit);
-        $outShareExternalSection.find('.folder-number').text(outshareInfo[2] + ' ' + l[2035]);
-        $outShareExternalSection.find('.file-number').text(outshareInfo[1] + ' ' + l[2034]);
+        $('.folder-number', $outShareExternalSection).text(outShareExFolderNumText);
+        $('.file-number', $outShareExternalSection).text(outShareExFileNumText);
 
-        $outShareSection.find('.ff-occupy').text(outshareTotalInternalFormatted.size + ' ' +
+        var outShareInFolderNumText = ffNumText(outshareInternalInfo[2], 'folder');
+        var outShareInFileNumText = ffNumText(outshareInternalInfo[1], 'file');
+        $('.ff-occupy', $outShareSection).text(outshareTotalInternalFormatted.size + ' ' +
             outshareTotalInternalFormatted.unit);
-        $outShareSection.find('.folder-number').text(outshareInternalInfo[2] + ' ' + l[2035]);
-        $outShareSection.find('.file-number').text(outshareInternalInfo[1] + ' ' + l[2034]);
+        $('.folder-number', $outShareSection).text(outShareInFolderNumText);
+        $('.file-number', $outShareSection).text(outShareInFileNumText);
 
-        $rubbishSection.find('.ff-occupy').text(rubbishTotalFormatted.size + ' ' + rubbishTotalFormatted.unit);
-        $rubbishSection.find('.folder-number').text(rubbishInfo[2] + ' ' + l[2035]);
-        $rubbishSection.find('.file-number').text(rubbishInfo[1] + ' ' + l[2034]);
+        var rubbishFolderNumText = ffNumText(rubbishInfo[2], 'folder');
+        var rubbishFileNumText = ffNumText(rubbishInfo[1], 'file');
+        $('.ff-occupy', $rubbishSection).text(rubbishTotalFormatted.size + ' ' + rubbishTotalFormatted.unit);
+        $('.folder-number', $rubbishSection).text(rubbishFolderNumText);
+        $('.file-number', $rubbishSection).text(rubbishFileNumText);
 
-        $versionsSection.find('.ff-occupy').text(versionsTotalFormatted.size + ' ' + versionsTotalFormatted.unit);
-        $versionsSection.find('.file-number').text((rootInfo[4] + rubbishInfo[4]
-            + inshareInternalInfo[4] + inshareExternalInfo[4] + outshareInfo[4]) + ' ' + l[2034]);
+        var versionsFileNumText = ffNumText(rootInfo[4] + rubbishInfo[4]
+            + inshareInternalInfo[4] + inshareExternalInfo[4] + outshareInfo[4], 'file');
+        $('.ff-occupy', $versionsSection).text(versionsTotalFormatted.size + ' ' + versionsTotalFormatted.unit);
+        $('.file-number', $versionsSection).text(versionsFileNumText);
     };
 
     // viewing the right buttons
@@ -1121,7 +1155,7 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
     // getting quotas
     var quotasPromise = this.business.getQuotaUsage();
     quotasPromise.done(fillQuotaInfo);
-    
+
 
     $businessAccountContainer.removeClass('hidden'); // BA container
     $subAccountContainer.removeClass('hidden').attr('id', 'sub-' + subUserHandle); // sub-info container
@@ -1297,7 +1331,7 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
                     // These labels appear in the legend and in the tooltips when hovering different arcs
                     labels: [
                         l[164],
-                        l[19223],
+                        l[19187],
                         l[16770],
                         l[167]
                     ]
@@ -1564,7 +1598,7 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
     };
 
     populateMonthDropDownList();
-    
+
 };
 
 BusinessAccountUI.prototype.initBusinessAccountHeader = function ($accountContainer) {
@@ -1602,8 +1636,7 @@ BusinessAccountUI.prototype.showExp_GraceUIElements = function() {
     var msg = '';
     if (u_attr.b.s === -1) { // expired
         if (u_attr.b.m) {
-            msg = l[20400].replace(/\[S\]/g, '<span>').replace(/\[\/S\]/g, '</span>')
-                .replace('[A]', '<a href="/repay" class="clickurl">').replace('[/A]', '</a>');
+            msg = l[24431];
         }
         else {
             msg = l[20462];
@@ -1700,7 +1733,7 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = function () {
                 '%country', '%zip']);
             return;
         }
-        
+
     };
 
     // event handler for header clicking
@@ -1757,7 +1790,7 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = function () {
     var cZip = '';
 
     loadCountries();
-    
+
     if (u_attr['%name']) {
         cName = u_attr['%name'];
     }
@@ -2007,7 +2040,7 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = function () {
         });
 
     unhideSection();
-    
+
 };
 
 
@@ -2097,7 +2130,7 @@ BusinessAccountUI.prototype.viewBusinessInvoicesPage = function () {
             // $newInvoiceRow.find('.inv-date').text(invoiceDate.toLocaleDateString());
             $newInvoiceRow.find('.inv-date').text(time2date(invoicesList[k].ts, 1));
             $newInvoiceRow.find('.inv-desc').text(invoicesList[k].d);
-            $newInvoiceRow.find('.inv-total').text('\u20ac' + invoicesList[k].tot);
+            $('.inv-total', $newInvoiceRow).text(formatCurrency(invoicesList[k].tot));
             $newInvoiceRow.removeClass('hidden'); // if it was hidden
             $newInvoiceRow.off('click.suba').on('click.suba', function invoiceDetailButtonClick() {
                 var clickedInvoiceId = $(this).closest("tr").attr('id');
@@ -2195,7 +2228,7 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
     };
 
     var fillInvoiceDetailPage = function (st, invoiceDetail) {
-        
+
 
         if (st !== 1 || !validateInvoice(invoiceDetail)) {
             msgDialog('warningb', '', l[19302]);
@@ -2254,7 +2287,7 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
             var $invItem = $invItemContentTemplate.clone(true);
             $invItem.find('.inv-pay-date').text(time2date(invoiceDetail.items[k].ts, 1));
             $invItem.find('.inv-pay-desc').text(invoiceDetail.items[k].d);
-            $invItem.find('.inv-pay-amou').text(Number(invoiceDetail.items[k].net).toFixed(2));
+            $('.inv-pay-amou', $invItem).text(formatCurrency(invoiceDetail.items[k].net));
             $invItem.insertAfter($invItemHeader);
             taxSum += invoiceDetail.items[k].tax;
         }
@@ -2264,10 +2297,9 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
                 .text((invoiceDetail.taxname || invoiceDetail.u.taxnum[0])
                     + ': ' + Number(invoiceDetail.taxrate).toFixed(2) + '%');
         }
-        $invoiceItemsContainer.find('.inv-payment-price.inv-li-gst .inv-gst-val')
-            .text('\u20ac' + Number(taxSum).toFixed(2));
-        $invoiceItemsContainer.find('.inv-payment-price.inv-li-total .inv-total-val')
-            .text('\u20ac' + Number(invoiceDetail.tot).toFixed(2));
+        $('.inv-payment-price.inv-li-gst .inv-gst-val', $invoiceItemsContainer).text(formatCurrency(taxSum));
+        $('.inv-payment-price.inv-li-total .inv-total-val', $invoiceItemsContainer)
+            .text(formatCurrency(invoiceDetail.tot));
 
         if (taxSum > 0) {
             $invoiceTopTitle.find('.inv-title.invv').text(l[19989]);
@@ -2289,26 +2321,26 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
             function invoiceDetailExportClickHandler() {
                 M.require('business_invoice').done(
                     function exportOverviewPageToPDF() {
-                        
+
                         var myPage = pages['business_invoice'];
                         myPage = translate(myPage);
 
                         // now prepare the invoice.
-                        myPage = myPage.replace('{0Date}', time2date(invoiceDetail.ts, 1));
-                        myPage = myPage.replace('{1InvoiceTitle}', $invoiceTopTitle.find('.inv-title.invv').text());
-                        myPage = myPage.replace('{1InvoiceNB}', invoiceDetail.n);
-                        myPage = myPage.replace('{2VATNB}', invoiceDetail.mega.taxnum[1]);
-                        myPage = myPage.replace('{2VATTXT}', invoiceDetail.mega.taxnum[0]);
-                        myPage = myPage.replace('{3CompanyName}', invoiceDetail.u.cname);
-                        myPage = myPage.replace('{4CompanyEmail}', invoiceDetail.u.e);
-                        myPage = myPage.replace('{5CompanyAddress}', validAddressSentFromApi.join(', '));
+                        myPage = myPage.replace('{0Date}', escapeHTML(time2date(invoiceDetail.ts, 1)));
+                        myPage = myPage.replace('{1InvoiceTitle}', escapeHTML($invoiceTopTitle.find('.inv-title.invv').text()));
+                        myPage = myPage.replace('{1InvoiceNB}', escapeHTML(invoiceDetail.n));
+                        myPage = myPage.replace('{2VATNB}', escapeHTML(invoiceDetail.mega.taxnum[1]));
+                        myPage = myPage.replace('{2VATTXT}', escapeHTML(invoiceDetail.mega.taxnum[0]));
+                        myPage = myPage.replace('{3CompanyName}', escapeHTML(invoiceDetail.u.cname));
+                        myPage = myPage.replace('{4CompanyEmail}', escapeHTML(invoiceDetail.u.e));
+                        myPage = myPage.replace('{5CompanyAddress}', escapeHTML(validAddressSentFromApi.join(', ')));
                         myPage = myPage.replace('{6CompanyCountry}',
-                            invoiceDetail.u.addr[invoiceDetail.u.addr.length - 1]);
+                            escapeHTML(invoiceDetail.u.addr[invoiceDetail.u.addr.length - 1]));
                         var cVat = '---';
                         if (invoiceDetail.u.taxnum && invoiceDetail.u.taxnum[1]) {
                             cVat = invoiceDetail.u.taxnum[0] + ': ' + invoiceDetail.u.taxnum[1];
                         }
-                        myPage = myPage.replace('{7CompanyVat}', cVat);
+                        myPage = myPage.replace('{7CompanyVat}', escapeHTML(cVat));
                         var itemDate = '---';
                         var itemDec = '---';
                         var itemAmount = '---';
@@ -2317,14 +2349,14 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
                             itemDec = invoiceDetail.items[0].d;
                             itemAmount = invoiceDetail.items[0].net;
                         }
-                        myPage = myPage.replace('{8itemDate}', itemDate);
-                        myPage = myPage.replace('{9itemDesc}', itemDec);
+                        myPage = myPage.replace('{8itemDate}', escapeHTML(itemDate));
+                        myPage = myPage.replace('{9itemDesc}', escapeHTML(itemDec));
                         myPage = myPage.replace('{10itemAmount}', Number(itemAmount).toFixed(2));
 
                         myPage = myPage.replace('{15totalVal}',
-                            $invoiceItemsContainer.find('.inv-payment-price.inv-li-gst .inv-gst-perc')[0].textContent);
+                            escapeHTML($invoiceItemsContainer.find('.inv-payment-price.inv-li-gst .inv-gst-perc')[0].textContent));
                         myPage = myPage.replace('{11itemVat}',
-                            $invoiceItemsContainer.find('.inv-payment-price.inv-li-gst .inv-gst-val')[0].textContent);
+                            escapeHTML($invoiceItemsContainer.find('.inv-payment-price.inv-li-gst .inv-gst-val')[0].textContent));
                         myPage = myPage.replace('{12totalCost}', '\u20ac' + Number(invoiceDetail.tot).toFixed(2));
 
                         var pdfPrintIframe = document.getElementById('invoicePdfPrinter');
@@ -2348,7 +2380,7 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
                 );
             }
         );
-        
+
         $invoiceDetailContainer.jScrollPane({
             enableKeyboardNavigation: false, showArrows: true,
             arrowSize: 8, animateScroll: true
@@ -2587,7 +2619,7 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function (result, callback) {
                 $me.find('.dialog-feature-switch').animate({ marginRight: '22px' }, 150, 'swing', function () {
                     $me.removeClass('toggle-on').addClass('toggle-off');
                 });
-                
+
             }
             else {
                 $me.find('.dialog-feature-switch').animate({ marginRight: '2px' }, 150, 'swing', function () {
@@ -3019,13 +3051,31 @@ BusinessAccountUI.prototype.showEditSubUserDialog = function (subUserHandle) {
         else {
             // no extra info ... just show operation success message
             if (!res) {
-                msgDialog('info', '', l[19525]);
+                var infoSubMessage = '';
+                if (subUser && subUser.s === 11 && req && req.email) {
+                    // The admin changed a disabled user's email
+                    infoSubMessage = l[24073];
+                }
+                msgDialog('info', '', l[19525], infoSubMessage);
             }
             else {
                 // we received LP + handle --> changes included email change
                 // calling show add sub-user dialog with "result" passed will show the result dialog
                 res.m = req.email;
-                mySelf.showAddSubUserDialog(res);
+                if (subUser && subUser.s === 11) {
+                    msgDialog(
+                        'info',
+                        '',
+                        l[24073],
+                        '',
+                        function() {
+                            mySelf.showAddSubUserDialog(res);
+                        }
+                    );
+                }
+                else {
+                    mySelf.showAddSubUserDialog(res);
+                }
             }
 
         }
@@ -3354,28 +3404,11 @@ BusinessAccountUI.prototype.sortSubusers = function(subusers, field) {
  */
 BusinessAccountUI.prototype.URLchanger = function (subLocation) {
     "use strict";
-    try {
-
-        if (hashLogic) {
-            var newHash = '#fm/user-management' + subLocation;
-            if (document.location.hash !== newHash) {
-                document.location.hash = newHash;
-                page = newHash;
-                M.currentdirid = page;
-            }
-        }
-        else {
-            var newSubPage = (subLocation) ? ('fm/user-management/' + subLocation)
-                : 'fm/user-management';
-            if (page !== newSubPage) {
-                history.pushState({ subpage: newSubPage }, "", "/" + newSubPage);
-                page = newSubPage;
-                M.currentdirid = page;
-            }
-        }
-    }
-    catch (ex) {
-        console.error(ex);
+    var newSubPage = subLocation ? 'fm/user-management/' + subLocation : 'fm/user-management';
+    if (page !== newSubPage) {
+        pushHistoryState(newSubPage);
+        page = newSubPage;
+        M.currentdirid = page;
     }
 };
 
@@ -3391,6 +3424,7 @@ BusinessAccountUI.prototype.UIEventsHandler = function (subuser) {
     }
 
     var $usersLeftPanel = $('.fm-tree-panel .content-panel.user-management');
+    var self = this;
 
     // private function to update left panel
     var updateLeftSubUserPanel = function (subuser) {
@@ -3404,6 +3438,17 @@ BusinessAccountUI.prototype.UIEventsHandler = function (subuser) {
             $userRow = $userLaeftPanelRow.clone(true);
             $userRow.removeClass('hidden selected');
             $userRow.attr('id', subuser.u);
+            if (self && !self.business.hasSubs) {
+                $userRow.rebind(
+                    'click.subuser',
+                    function() {
+                        $('.content-panel.user-management .nw-user-management-item').removeClass('selected');
+                        $(this).addClass('selected');
+                        self.viewSubAccountInfoUI(subuser.u);
+                    }
+                );
+            }
+
             $usersLeftPanel.append($userRow);
         }
 
@@ -3432,6 +3477,10 @@ BusinessAccountUI.prototype.UIEventsHandler = function (subuser) {
 
     if (!$usersLeftPanel.hasClass('hidden') && $usersLeftPanel.hasClass('active')) {
         updateLeftSubUserPanel(subuser);
+    }
+
+    if (M.currentdirid && M.currentdirid.indexOf('user-management') === -1) {
+        return;
     }
 
     // if we are in table view

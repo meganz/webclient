@@ -333,7 +333,7 @@ function pageregister() {
 
                             // I need this event handler to be triggered only once after successful sub-user login
                             mBroadcaster.once('fm:initialized', M.importWelcomePDF);
-
+                            delete localStorage.businessSubAc;
                         }
                     },
                     businessUser: $password.val()   // we need the plain enterd password in later stages
@@ -347,7 +347,6 @@ function pageregister() {
                     null,
                     signupcode,
                     $firstName.val() + ' ' + $lastName.val());
-                delete localStorage.businessSubAc;
             }
             else if (u_type === false) {
                 loadingDialog.show();
@@ -403,11 +402,15 @@ function init_register() {
     });
 
     $button.rebind('click.initregister', function() {
+
+        if ($(this).hasClass('disabled')) {
+            return false;
+        }
         pageregister();
     });
 
     $button.rebind('keydown.initregister', function (e) {
-        if (e.keyCode === 13) {
+        if (e.keyCode === 13 && !$(this).hasClass('disabled')) {
             pageregister();
         }
     });
@@ -424,7 +427,7 @@ function init_register() {
         return false;
     });
 
-    var $regInfoContainer = $('.main-mid-pad.big-pad.register1 .main-left-block');
+    var $regInfoContainer = $('.main-mid-pad.big-pad.register1 .main-left-block').removeClass('businessSubAc');
     $('.mega-input-title-ontop', $regInfoContainer).removeClass('hidden');
     $('.account.top-header', $regInfoContainer).safeHTML(l[1095]);
 
@@ -442,6 +445,8 @@ function init_register() {
         $email.addClass('hidden');
         $lastName.addClass('hidden');
         $firstName.addClass('hidden');
+        $regInfoContainer.addClass('businessSubAc');
+        $('.checkbox-block.pw-remind .radio-txt', $formWrapper).safeHTML(l[23748]);
     }
 
     // Init inputs events

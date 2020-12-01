@@ -37,18 +37,25 @@ else {
 }
 
 function keyPressEntropy(e) {
+    'use strict';
+    lastactive = Date.now();
+
     bioSeed[bioCounter++ & 255] ^= (e.keyCode << 16) | timeValue();
+
+    if (typeof onactivity === 'function') {
+        delay('ev:on.activity', onactivity, 800);
+    }
 }
 
 var mouseApiRetryT = false;
 
 function mouseMoveEntropy(e) {
-
+    'use strict';
     lastactive = Date.now();
 
     var v = (((e.screenX << 8) | (e.screenY & 255)) << 16) | timeValue();
 
-    if (!localStorage.randseed) {
+    if (saveRandSeed.needed) {
         if (bioCounter < 45) {
             // `bioCounter` is incremented once per 4 move events in average
             // 45 * 4 = 180 first move events should provide at about 270 bits of entropy
@@ -75,24 +82,27 @@ function mouseMoveEntropy(e) {
             asmCrypto.random.seed(bioSeed);
             saveRandSeed();
         }
-
-        if (typeof arkanoid_entropy !== 'undefined') {
-            arkanoid_entropy();
-        }
     }
 
     if (!mouseApiRetryT || mouseApiRetryT < lastactive) {
         mouseApiRetryT = lastactive + 2000;
         api_retry();
     }
+
+    if (typeof onactivity === 'function') {
+        delay('ev:on.activity', onactivity, 700);
+    }
 }
 
 // Store some random bits for reseeding RNG in the future
 function saveRandSeed() {
+    'use strict';
     var randseed = new Uint8Array(32);
     asmCrypto.getRandomValues(randseed);
     localStorage.randseed = base64urlencode(asmCrypto.bytes_to_string(randseed));
+    saveRandSeed.needed = false;
 }
+saveRandSeed.needed = !localStorage.randseed;
 
 // ----------------------------------------
 
@@ -110,6 +120,7 @@ function eventsEnd() {
 // Start collection of entropy.
 
 function eventsCollect() {
+    'use strict';
     if (!d) {
         asmCrypto.random.skipSystemRNGWarning = true;
     }
@@ -119,6 +130,13 @@ function eventsCollect() {
             console.log("Initially seeding PRNG with a stored seed");
         }
         asmCrypto.random.seed(asmCrypto.string_to_bytes(base64urldecode(localStorage.randseed)));
+    }
+
+    if (mega.getRandomValues.strong) {
+        if (d > 1) {
+            console.log("Initially seeding PRNG with strong random values");
+        }
+        asmCrypto.random.seed(mega.getRandomValues(384));
     }
 
     if ((document.implementation.hasFeature("Events", "2.0"))

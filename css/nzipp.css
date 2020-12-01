@@ -1,0 +1,613 @@
+/*
+Common styles
+*/
+.nzipp-content {
+    padding-top: 105px;
+    font-family: 'LatoWeb', Arial;
+}
+.mobile .nzipp-content {
+    padding-top: 0;
+}
+.nzipp.campaign-button {
+    font-size: 18px;
+    line-height: 48px;
+    font-family: 'LatoWebBold', Arial;
+    color: #FFF;
+    text-align: center;
+    box-sizing: border-box;
+    padding: 0 15px;
+    min-width: 180px;
+    height: 48px;
+    background-color: #00C0A6;
+    border-radius: 2px;
+    display: inline-block;
+    -webkit-transition: box-shadow 200ms ease-in-out;
+    transition: box-shadow 200ms ease-in-out;
+    cursor: pointer;
+}
+body:not(.mobile) .nzipp.campaign-button:hover {
+    box-shadow: 0px 0px 0px 4px rgba(0,191,165,0.3);
+}
+.nzipp.campaign-button span {
+    display: inline-block;
+    vertical-align: top;
+}
+.nzipp.campaign-button i {
+    display: inline-block;
+    vertical-align: top;
+    margin: 11px 0 0 8px;
+}
+
+/* Campaign-sprite */
+.campaign-sprite, i.campaign-sprite {
+    background-image: url(../images/mega/bottom-page/nzipp/campaign-sprite_v1.png);
+    background-repeat: no-repeat;
+}
+.campaign-sprite.triangle {
+    width: 18px;
+    height: 18px;
+    background-position: -59px 2px;
+}
+
+/* Radio and checkbox buttons*/
+.campaign-label {
+    margin: 0 0 24px 0;
+    display: table;
+    position: relative;
+    cursor: pointer;
+}
+.campaign-label .wrap {
+    width: 16px;
+    height: 16px;
+    border-radius: 3px;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.15);
+    position: absolute;
+    margin: 2px 0 0 0;
+    background-color: white;
+}
+.campaign-label .wrap::before {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: inherit;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.05);
+}
+/* Checkbox */
+.campaign-label .wrap.checkbox {
+    background-position: -27px 1px;
+}
+.campaign-label .wrap.checkbox.checked {
+    background-color: #F24A4F;
+    background-position: 3px 1px;
+}
+/*  Radio */
+.campaign-label .wrap.radio {
+    border-radius: 100%;
+}
+.campaign-label .wrap.radio::after {
+    content: '';
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    margin: 2px;
+    border-radius: 100%;
+    background-color: rgba(0, 0, 0, 0.05);
+}
+.campaign-label .wrap.radio.checked::after {
+    background: rgb(255,51,58);
+    background: linear-gradient(to bottom, rgba(255,51,58,1) 0%, rgba(217,0,7,1) 100%);
+}
+.campaign-label .wrap input {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    opacity: 0;
+}
+.campaign-label .label-txt {
+    display: inline-block;
+    margin: 0 0 0 40px;
+    font-size: 18px;
+    line-height: 21px;
+    color: #373737;
+    float: none;
+}
+.campaign-label .checked + .label-txt {
+    color: #000;
+}
+/* Textarea */
+.campaign-textarea {
+    width: 100%;
+    height: 134px;
+    box-sizing: border-box;
+    padding: 18px 25px;
+    font-size: 18px;
+    line-height: 22px;
+    border-radius: 4px;
+    border: 1px solid #D7D7D7;
+    outline: none;
+    font-family: 'LatoWeb', Arial;
+    box-shadow: none;
+    -moz-appearance: none;
+    -webkit-appearance: none;
+    resize: none;
+}
+/* Input */
+.campaign-inputfield {
+    width: 100%;
+    width: calc(100% - 40px);
+    box-sizing: border-box;
+    padding: 0 10px;
+    color: #000;
+    font-size: 14px;
+    line-height: 32px;
+    border-radius: 4px;
+    border: 1px solid #D7D7D7;
+    outline: none;
+    font-family: 'LatoWeb', Arial;
+    box-shadow: none;
+}
+/* Form error messaage */
+.campaign-error {
+    font-size: 12px;
+    line-height: 18px;
+    color: #D90007;
+    font-family: 'LatoWebBold', Arial;
+    position: absolute;
+    width: 100%;
+    padding: 0 0 0 25px;
+    box-sizing: border-box;
+    opacity: 0;
+    -webkit-transition: opacity 200ms ease-in-out,visibiliy 200ms ease-in-out;
+    transition: opacity 200ms ease-in-out,visibiliy 200ms ease-in-out;
+    visibility: hidden;
+}
+.campaign-error.visible {
+    opacity: 1;
+    visibility: visible;
+}
+.campaign-error i {
+    position: absolute;
+    left: 0;
+    top: 0;
+    display: block;
+}
+
+/*
+NZIPP Landing page
+*/
+.nzipp-landing.top-bl {
+    display: table;
+    width: 100%;
+    position: relative;
+    background-color: #ED5564;
+    height: 362px;
+    color: white;
+}
+.nzipp-landing.top-bg {
+    position: absolute;
+    width: 50%;
+    left: 50%;
+    top: 0;
+    height: 100%;
+    background-image: url(../images/mega/bottom-page/nzipp/nzipp1.jpg);
+    background-repeat: no-repeat;
+    background-position: left bottom;
+    background-size: cover;
+}
+.photo .nzipp-landing.top-bg {
+    background-image: url(../images/mega/bottom-page/nzipp/nzipp2.jpg);
+}
+.nzipp-landing.top-info {
+    text-align: left;
+    width: 50%;
+    position: relative;
+    padding: 46px 0;
+}
+.nzipp-landing.top-info.photographer,
+.photo .nzipp-landing.top-info.member {
+    display: none;
+}
+.photo .nzipp-landing.top-info.photographer {
+    display: block;
+}
+.nzipp-landing.top-header {
+    font-size: 36px;
+    line-height: 44px;
+    font-family: 'montserrat', Arial;
+}
+.nzipp-landing.top-subheader {
+    font-size: 28px;
+    line-height: 42px;
+    font-family: 'montserrat', Arial;
+    padding: 20px 0;
+}
+.nzipp-landing.top-details {
+    font-size: 16px;
+    line-height: 24px;
+    max-width: 442px;
+}
+.nzipp-landing.campaign-info {
+    font-size: 24px;
+    line-height: 36px;
+    padding: 45px 0 0 0;
+    color: #000;
+}
+.nzipp.campaign-button.landing {
+    margin: 34px 0 0 0;
+    min-width: 192px;
+    background-color: #ED5564;
+}
+body:not(.mobile) .nzipp.campaign-button.landing:hover {
+    box-shadow: 0 0 0 4px rgba(237,85,100,0.2);
+}
+.nzipp-landing.img03 {
+    max-width: 450px;
+    width: 100%;
+    padding: 0 0 0 40px;
+    margin: 45px 0 0 0;
+    box-sizing: border-box;
+}
+
+
+/*
+ NZIPP Interview pages 
+*/
+.nzipp-interview.top-bl {
+    background-color: #00C0A6;
+    color: white;
+    min-height: 240px;
+}
+.nzipp-interview.top-header {
+    font-size: 36px;
+    line-height: 44px;
+    padding: 62px 0;
+    font-family: 'montserrat', Arial;
+    text-align: left;
+}
+.nzipp-interview.form-content {
+    padding: 60px 0;
+    max-width: 850px;
+    margin: 0 auto;
+    text-align: left;
+    box-sizing: border-box;
+    min-height: 456px;
+    position: relative;
+}
+.nzipp-interview.header {
+    font-size: 18px;
+    line-height: 24px;
+    color: #000;
+    padding: 0 0 30px 0;
+}
+.nzipp .mega-input-title-ontop {
+    margin-bottom: 40px;
+}
+.nzipp .mega-input-title-ontop.halfSize-l,
+.nzipp .mega-input-title-ontop.halfSize-r {
+    width: 47%;
+}
+.nzipp-interview.progress {
+    height: 6px;
+    background-color: #D8D8D8;
+    border-radius: 3px;
+    margin: 38px 0 0 0;
+    font-size: 0;
+    white-space: nowrap;
+    overflow: hidden;
+}
+.nzipp-interview.progress span {
+    width: 8.333333%;
+    height: 6px;
+    -webkit-transition: background-color 200ms ease-in-out;
+    transition: background-color 200ms ease-in-out;
+    border-left: 2px solid #FFF;
+    display: inline-block;
+    box-sizing: border-box;
+    vertical-align: top;
+}
+.nzipp-interview.progress span:first-child {
+    border: 0;
+}
+.nzipp-interview.progress span.active {
+    background-color: #00C0A6;
+}
+.nzipp-interview.progress-info {
+    font-size: 18px;
+    line-height: 22px;
+    color: #373737;
+    padding: 18px 0 0 0;
+    text-align: left;
+}
+.nzipp-interview.progress-info.clone {
+    font-size: 12px;
+    padding: 0 0 14px 0;
+    text-align: center;
+    display: none;
+}
+.nzipp .ui-selectmenu-button {
+    float: left;
+    margin: 0;
+    font-size: 14px;
+    font-family: 'LatoWeb', Arial;
+}
+/* Select, input */
+.nzipp-select, .nzipp.campaign-inputfield {
+    margin: -3px 0 24px 40px;
+    max-width: 150px;
+    display: none;
+}
+.active + .nzipp-select, .active +.nzipp.campaign-inputfield {
+    display: block;
+}
+.mobile .nzipp-select select {
+    font-size: 14px;
+    float: left;
+    color: #666666;
+    border: none;
+    border-radius: 3px;
+    height: 32px;
+    line-height: 32px;
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.05);
+    background: rgba(106,106,106,0.05);
+    outline: none;
+    background-image: none !important;
+    margin: 0;
+    -moz-appearance: none;
+    -webkit-appearance: none;
+    width: 100%;
+}
+/* Textarea */
+.nzipp.campaign-textarea {
+    width: calc(100% - 40px);
+    margin: -3px 0 24px 40px;
+    display: none;
+}
+.nzipp.campaign-textarea:first-child, .nzipp.campaign-textarea.visible {
+    display: block;
+    width: 100%;
+    margin: 12px 0 24px 0;
+}
+.active + .nzipp.campaign-textarea {
+    display: block;
+}
+/* Interview  result */
+.nzipp-interview-result {
+    font-size: 24px;
+    line-height: 36px;
+    color: #000;
+    text-align: left;
+    max-width: 622px;
+    min-height: 456px;
+    padding: 60px 0;
+    box-sizing: border-box;
+}
+.nzipp-interview-result a, .nzipp-interview-result:visited {
+    font-family: 'LatoWebBold', Arial;
+    text-decoration: underline;
+    color: black;
+}
+.nzipp .interview-result .failed,
+.nzipp .interview-result.error .success {
+    display: none;
+}
+.nzipp .interview-result.error .failed {
+    display: block;
+}
+.nzipp-result.img04 {
+    max-width: 528px;
+    max-height: 100%;
+    float: right;
+    margin: 50px -40px 50px 0;
+}
+.nzipp-result.img04.clone {
+    display: none;
+}
+
+/*
+Adaptive
+*/
+@media only screen and (max-width: 2280px) {
+
+    /*
+    NZIPP Landing page
+    */
+    .nzipp-landing.top-bg {
+        width: 60%;
+        left: 40%;
+    }
+}
+
+@media only screen and (max-width: 890px) {
+
+    /*
+    NZIPP Landing page
+    */
+    .nzipp-landing.top-bg {
+        display: none;
+    }
+    .nzipp-landing.top-info {
+        width: auto;
+        text-align: center;
+    }
+    .nzipp-landing.top-details {
+        margin: auto;
+    }
+}
+
+@media only screen and (max-width: 783px) {
+
+    /*
+    NZIPP Landing page
+    */
+    .nzipp-landing.vertical-centered-cell {
+        height: auto;
+    }
+    .nzipp-landing.top-header {
+        font-size: 24px;
+        line-height: 36px;
+        font-family: 'montserrat_light', Arial;
+    }
+    .nzipp-landing.top-subheader {
+        font-size: 20px;
+        line-height: 24px;
+        padding: 8px 0 40px 0;
+        min-height: 96px;
+        box-sizing: border-box;
+    }
+    .nzipp-landing.top-details {
+        font-size: 14px;
+        line-height: 21px;
+        padding-bottom: 10px;
+    }
+    .nzipp-landing.campaign-info {
+        font-size: 20px;
+        line-height: 30px;
+        padding: 28px 0 0 0;
+    }
+    .nzipp-content .inline-block.col-2 {
+        text-align: center;
+    }
+    .nzipp-landing.campaign-button {
+        margin: 50px 0 0 0;
+    }
+    .nzipp-landing.img03 {
+        padding: 0;
+        margin: 55px 0 0 0;
+    }
+
+    /*
+    NZIPP Interview page
+    */
+    .nzipp-interview.top-bl {
+        min-height: 176px;
+    }
+    .nzipp-interview.top-header {
+        font-size: 24px;
+        line-height: 36px;
+        font-family: 'montserrat_light', Arial;
+        padding: 30px 0;
+    }
+    .nzipp-interview.form-content {
+        padding: 32px 0 60px 0;
+        min-height: 20px;
+    }
+    .nzipp-interview.header {
+        font-size: 16px;
+        padding: 0 0 20px 0;
+    }
+    .campaign-label {
+        margin: 0 0 20px 0;
+    }
+    .campaign-label .label-txt {
+        font-size: 14px;
+    }
+    .nzipp.campaign-button.interview {
+        font-size: 14px;
+        float: none;
+    }
+    .nzipp.campaign-button.interview i {
+        display: none;
+        font-family: 'LatoWeb', Arial;
+    }
+    .nzipp-interview.progress {
+        display: none;
+    }
+    .nzipp-interview.progress-info {
+        display: none;
+    }
+    .nzipp-interview.progress-info.clone {
+        display: block;
+    }
+    .campaign-textarea {
+        font-size: 14px;
+        line-height: 17px;
+        padding: 8px;
+        height: 85px;
+    }
+    .campaign-textarea:first-child {
+        height: 114px;
+    }
+    .nzipp-result.img04 {
+        max-width: 264px;
+        width: 100%;
+        float: none;
+        margin: 0 0 36px 0;
+        display: none;
+    }
+    .nzipp-result.img04.clone {
+        display: inline-block;
+    }
+    .interview-result .nzipp-interview.top-header {
+        font-size: 24px;
+        line-height: 36px;
+        padding: 30px 0;
+        text-align: center;
+    }
+    .nzipp-interview-result {
+        font-size: 20px;
+        line-height: 30px;
+        min-height: auto;
+        padding: 28px 0;
+        text-align: center;
+    }
+}
+
+@media only screen and (max-width: 625px) {
+
+    /*
+    Common styles
+    */
+    .nzipp-content {
+        padding-top: 36px;
+    }
+    
+    /*
+    NZIPP Interview page
+    */
+    .nzipp-interview.top-bl {
+        min-height: 122px;
+    }
+    .nzipp-interview.top-header {
+        font-size: 16px;
+        line-height: 24px;
+        padding: 18px 0;
+    }
+    .nzipp-interview.form-content {
+        padding: 12px 0 38px 0;
+    }
+    .nzipp-interview.header {
+        font-size: 14px;
+    }
+    .nzipp .mega-input-title-ontop.halfSize-l, .nzipp .mega-input-title-ontop.halfSize-r {
+        float: none;
+        width: 100%;
+        margin-bottom: 20px;
+    }
+}
+
+@media only screen and (max-width: 500px) {
+
+    /*
+    NZIPP Interview page
+    */
+    .nzipp-select, .nzipp .campaign-inputfield {
+        max-width: none;
+    }
+}
+
+/*
+Retina
+*/
+@media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {
+
+    /*
+    Campaign-sprite
+    */
+    .campaign-sprite, i.campaign-sprite {
+        background-image: url(../images/mega/bottom-page/nzipp/campaign-sprite_v1@2x.png);
+        background-size: 75px auto;
+    }
+}

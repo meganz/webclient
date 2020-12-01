@@ -55,7 +55,7 @@ var PresencedIntegration = function(megaChat) {
         self.init();
     });
 
-    $(self).rebind('onPeerStatus.mystatus', function(e, handle, presence) {
+    self.rebind('onPeerStatus.mystatus', function(e, handle, presence) {
         if (handle === u_handle) {
             megaChat.renderMyStatus();
         }
@@ -65,6 +65,7 @@ var PresencedIntegration = function(megaChat) {
     return self;
 };
 
+inherits(PresencedIntegration, MegaDataEmitter);
 
 PresencedIntegration.FLAGS = {
     'IS_WEBRTC': 0x80,
@@ -128,12 +129,21 @@ PresencedIntegration.prototype.init = function() {
                 // may be a logout or reload!
                 return;
             }
+
+            if (d) {
+                console.time('presenced:init');
+            }
+
             // set my own presence
             M.u.forEach(function(v, k) {
                 if (k !== u_handle) {
                     v.presence = 'unavailable';
                 }
             });
+
+            if (d) {
+                console.timeEnd('presenced:init');
+            }
 
             megaChat.renderMyStatus();
         },
@@ -157,7 +167,7 @@ PresencedIntegration.prototype.init = function() {
      */
     megaChat.userPresence = self.userPresence = userPresence;
 
-    $(userPresence).rebind('onConnected.presencedIntegration', function(e) {
+    userPresence.rebind('onConnected.presencedIntegration', function() {
         if (!u_handle || !M.u[u_handle]) {
             // a logout was triggered in the same moment just before the connect
             return;
@@ -174,7 +184,7 @@ PresencedIntegration.prototype.init = function() {
         M.u[u_handle].presence = self.getMyPresenceSetting();
     });
 
-    $(userPresence).rebind('onDisconnected.presencedIntegration', function(e) {
+    userPresence.rebind('onDisconnected.presencedIntegration', function() {
         if (!u_handle || !M.u[u_handle]) {
             // may be a logout or reload!
             return;
@@ -187,18 +197,26 @@ PresencedIntegration.prototype.init = function() {
 
     userPresence.connectionRetryManager.requiresConnection();
 
+    if (d) {
+        console.time('presenced:init.peers');
+    }
+
     // init .peers
+    var peers = [];
     M.u.forEach(function(v, k) {
-        if (k === u_handle || !v) {
-            return;
+        if (v && k !== u_handle) {
+            if (v.c === 1) {
+                peers.push(k);
+            }
+            v.presence = 'unavailable';
         }
-
-        if (v.c === 1) {
-            self.eventuallyAddPeer(k);
-        }
-
-        v.presence = 'unavailable';
     });
+    if (peers.length) {
+        userPresence.addremovepeers(peers, false);
+    }
+    if (d) {
+        console.timeEnd('presenced:init.peers');
+    }
 };
 
 PresencedIntegration.prototype._updateuicb = function presencedIntegration_updateuicb(
@@ -227,9 +245,9 @@ PresencedIntegration.prototype._updateuicb = function presencedIntegration_updat
         self._destroyAutoawayEvents();
     }
 
-    $(self).trigger('settingsUIUpdated', [autoaway, autoawaylock, autoawaytimeout, persist, persistlock, lastSeen]);
+    self.trigger('settingsUIUpdated', [autoaway, autoawaylock, autoawaytimeout, persist, persistlock, lastSeen]);
 
-    $(self).trigger(
+    self.trigger(
         'onPeerStatus',
         [
             u_handle,
@@ -252,26 +270,24 @@ PresencedIntegration.prototype._peerstatuscb = function(user_hash, presence, isW
     var contact = M.u[user_hash];
 
     if (contact) {
+        if (contact.presence === UserPresence.PRESENCE.ONLINE && presence !== UserPresence.PRESENCE.ONLINE) {
+            contact.lastGreen = unixtime();
+        }
         contact.presence = presence;
     }
     else {
         // unknown contact, add it to the contact list.
-        M.u.set(
-            user_hash,
-            new MegaDataObject(MEGA_USER_STRUCT, true, {
-                'h': user_hash,
-                'u': user_hash,
-                'm': '',
-                'c': undefined
-            })
-        );
-        contact = M.u[user_hash];
+        contact = M.setUser(user_hash);
         contact.presence = presence;
+        if (presence === UserPresence.PRESENCE.ONLINE) {
+            contact.lastGreen = unixtime();
+        }
+
         M.syncUsersFullname(user_hash);
         M.syncContactEmail(user_hash);
     }
 
-    $(self).trigger(
+    self.trigger(
         'onPeerStatus',
         [
             user_hash,
@@ -379,18 +395,26 @@ PresencedIntegration.prototype._initAutoawayEvents = function() {
     'use strict';
 
     var self = this;
-    $(document.body).rebind('mousemove.presencedInt keypress.presencedInt', function() {
-        delay('ui_signalactivity', function() {
-            self.userPresence.ui_signalactivity();
-        }, 1000);
-    });
+    var oldOA;
+
+    this._destroyAutoawayEvents();
+    this._destroyAutoawayEvents = function() {
+        window.onactivity = oldOA;
+        delete this._destroyAutoawayEvents;
+    };
+
+    oldOA = window.onactivity;
+    window.onactivity = function() {
+        self.userPresence.ui_signalactivity();
+        if (oldOA) {
+            onIdle(oldOA);
+        }
+    };
 };
 
 PresencedIntegration.prototype._destroyAutoawayEvents = function() {
     'use strict';
-
-    $(document.body).off('mousemove.presencedInt');
-    $(document.body).off('keypress.presencedInt');
+    /* dummy */
 };
 
 /**
@@ -444,19 +468,15 @@ PresencedIntegration.prototype.eventuallyRemovePeer = function(user_handle, chat
 };
 
 PresencedIntegration.prototype.eventuallyAddPeer = function(user_handle, isNewChat) {
-    if (typeof(megaChat) !== 'undefined' && !megaChat.userPresence) {
-        return;
-    }
+    'use strict';
 
-    if (!M.u[user_handle] || M.u[user_handle].c !== 1) {
-        return;
-    }
-
-    var self = this;
-    var megaChat = self.megaChat;
-
-    var binUserHandle = base64urldecode(user_handle);
-    if (M.u[user_handle].c === 1 && !megaChat.userPresence.peers[binUserHandle]) {
-        megaChat.userPresence.addremovepeers([user_handle], false);
+    if (this.userPresence) {
+        var user = user_handle in M.u && M.u[user_handle] || false;
+        if (user.c === 1) {
+            var binUserHandle = base64urldecode(user_handle);
+            if (!this.userPresence.peers[binUserHandle]) {
+                this.userPresence.addremovepeers([user_handle], false);
+            }
+        }
     }
 };

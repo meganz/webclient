@@ -93,19 +93,23 @@
         mega.ui.Dialog.call(this, Object.assign({}, defaultOptions, opts));
 
         uiCheckboxes(self.$dialog, function(enabled) {
-            if (enabled) {
-                loadingDialog.show();
 
-                generateAnonymousReport()
-                    .done(function(report) {
-                        self._report = report;
-                    })
-                    .always(function() {
-                        loadingDialog.hide();
-                    });
-            }
-            else {
-                self._report = {};
+            if (this.id === 'send_stats') {
+
+                if (enabled) {
+                    loadingDialog.show();
+
+                    generateAnonymousReport()
+                        .done(function(report) {
+                            self._report = report;
+                        })
+                        .always(function() {
+                            loadingDialog.hide();
+                        });
+                }
+                else {
+                    self._report = {};
+                }
             }
         });
 
@@ -170,7 +174,7 @@
 
         initTextareaScrolling($('.feedback-dialog-scr textarea'), 80);
 
-        $('.stats-button', self.$dialog).rebind('click.feedbackDialog', function() {
+        $('.feedback-question', self.$dialog).rebind('click.feedbackDialog', function() {
             var dialog = self.$dataReportDialog;
             if (!dialog) {
                 dialog = self.$dataReportDialog = new mega.ui.Dialog({

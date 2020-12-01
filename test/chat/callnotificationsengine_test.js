@@ -18,7 +18,8 @@ describe("CallNotificationsEngine tests", function () {
 
         fakeChatRoom = {
             "roomId": "roomId1",
-            'chatId': "chatdId1"
+            'chatId': "chatdId1",
+            rebind: function() {}
         };
     });
 

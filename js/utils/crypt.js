@@ -19,9 +19,6 @@ var u_pubCu25519;
 /** Cache for contacts' public Curve25519 keys. */
 var pubCu25519 = {};
 
-/** Cache for fingerprint mismatch warns of user/keyType. */
-var warnedFingerprint = {};
-
 var crypt = (function() {
     "use strict";
 
@@ -156,8 +153,9 @@ var crypt = (function() {
                     }
                 }
                 else {
-                    logger.error(keyType + ' pub key for ' + userhandle
-                        + ' could not be retrieved: ' + res);
+                    if (d > 1 || is_karma) {
+                        logger.warn(keyType + ' pub key for ' + userhandle + ' could not be retrieved: ' + res);
+                    }
                     masterPromise.reject(res, [res, userData]);
                 }
             };
@@ -437,6 +435,22 @@ var crypt = (function() {
         // Get the pub key and update local variable and the cache.
         var getPubKeyPromise = ns.getPubKeyAttribute(userhandle, keyType);
 
+        // 2020-03-31: nowadays there is no point on verifying non-contacts...
+        var isNonContact = !is_karma && M.getUserByHandle(userhandle).c !== 1;
+        if (isNonContact) {
+            if (d) {
+                logger[d > 1 ? 'warn' : 'info']('Skipping %s verification for non-contact "%s"', keyType, userhandle);
+            }
+
+            getPubKeyPromise.done(function(pubKey) {
+                pubKeyCache[userhandle] = pubKey;
+                masterPromise.resolve(pubKey);
+                __callbackAttachAfterDone(masterPromise);
+            });
+            masterPromise.linkFailTo(getPubKeyPromise);
+            return masterPromise;
+        }
+
         getPubKeyPromise.done(function __resolvePubKey(result) {
             var pubKey = result;
             authMethod = ns._getPubKeyAuthentication(userhandle, pubKey, keyType);
@@ -667,6 +681,32 @@ var crypt = (function() {
         return ns.getPubKey(userhandle, 'RSA', callback);
     };
 
+    /**
+     * Retrieve and cache all public keys for the given user/handle
+     * @param {String} userHandle 11-chars-long user-handle
+     * @returns {MegaPromise} fulfilled on completion
+     */
+    ns.getAllPubKeys = function(userHandle) {
+        return new MegaPromise(function(resolve, reject) {
+            var promises = [];
+            assertUserHandle(userHandle);
+
+            if (!pubCu25519[userHandle]) {
+                promises.push(crypt.getPubCu25519(userHandle));
+            }
+
+            if (!pubEd25519[userHandle]) {
+                promises.push(crypt.getPubEd25519(userHandle));
+            }
+
+            if (!u_pubkeys[userHandle]) {
+                promises.push(crypt.getPubRSA(userHandle));
+            }
+
+            MegaPromise.allDone(promises).then(resolve).catch(reject);
+        });
+    };
+
 
     /**
      * Computes a user's Ed25519 key finger print. This function uses the
@@ -815,16 +855,8 @@ var crypt = (function() {
 
         // Show warning dialog if it hasn't been locally overriden (as needed by poor user Fiup who added 600
         // contacts during the 3 week broken period and none of them are signing back in to heal their stuff).
-        if (localStorage.hideCryptoWarningDialogs !== '1') {
-            M.onFileManagerReady(function() {
-                if (!warnedFingerprint[userHandle]) {
-                    warnedFingerprint[userHandle] = {};
-                }
-                if (!warnedFingerprint[userHandle][keyType]) {
-                    mega.ui.CredentialsWarningDialog.singleton(userHandle, keyType, prevFingerprint, newFingerprint);
-                }
-            });
-        }
+        authring.showCryptoWarningDialog('credentials', userHandle, keyType, prevFingerprint, newFingerprint)
+            .dump('cred-fail');
 
         // Remove the cached key, so the key will be fetched and checked against
         // the stored fingerprint again next time.
@@ -847,20 +879,9 @@ var crypt = (function() {
      */
     ns._showKeySignatureFailureException = function(userHandle, keyType) {
 
-        // Log occurrence of this dialog.
-        api_req({
-            a: 'log',
-            e: 99607,
-            m: 'Signature/MITM warning dialog shown to user for key ' + keyType + ' for user ' + userHandle
-        });
-
         // Show warning dialog if it hasn't been locally overriden (as need by poor user Fiup who added 600
         // contacts during the 3 week broken period and none of them are signing back in to heal their stuff).
-        if (localStorage.hideCryptoWarningDialogs !== '1') {
-            M.onFileManagerReady(function() {
-                mega.ui.KeySignatureWarningDialog.singleton(userHandle, keyType);
-            });
-        }
+        authring.showCryptoWarningDialog('signature', userHandle, keyType).dump('sign-fail');
 
         logger.error(keyType + ' signature does not verify for user ' + userHandle + '!');
     };

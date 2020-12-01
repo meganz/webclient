@@ -1,0 +1,97 @@
+<!--
+ * Dialogs for mobile and desktop devices.
+!-->
+
+<div class="common-dialogs">
+
+    <!-- Email verfifcation required dialog !-->
+    <div class="fm-dialog verify-email big-radius hidden">
+        <div class="verify-email header">
+            <div class="verify-email header-txt">[$19906]</div>
+            <div class="dialog-top-icon dialog-sprite yellow-triangle"></div>
+        </div>
+        <div class="verify-email body lato">
+            <div class="text">
+                [$22247]
+            </div>
+            <div class="text red">
+                <div class="dropdown body dropdown-arrow down-arrow">
+                    <i class="dropdown-white-arrow"></i>
+                    <div class="popup-body">
+                        <div class="dialog-top-icon dialog-sprite locked-account"></div>
+                        <div  class="verify-email header-txt grey">
+                            [$22249]
+                        </div>
+                        <div class="text small">
+                            [$22250]
+                        </div>
+                        <div class="text small">
+                            [$22251]
+                        </div>
+                    </div>
+                </div>
+                <span>[$22248]</span>
+            </div>
+            <div class="clear"></div>
+            <div class="button default-green-button height-48 gradient send-email">
+                <span>[$22252]</span>
+            </div>
+            <!-- Remove "hidden" class if Email is sent !-->
+            <div class="verify-email status-txt hidden">
+                [$16827]
+            </div>
+        </div>
+    </div>
+    <!-- end of Email verfifcation required dialog !-->
+
+    <!-- Login to your MEGA account dialog !-->
+    <div class="fm-dialog verify-email-login-to-account type-480px227 big-radius hidden">
+        <div class="fm-dialog-close"></div>
+        <div class="fm-dialog-header">
+            <div class="fm-dialog-title medium">[$1768]</div>
+        </div>
+        <div class="login-set-pass body">
+            <div class="dialog-top-icon dialog-sprite locked-account"></div>
+            <div class="text">
+                [$22253]
+            </div>
+            <form class="account dialog-login-form">
+                <input class="titleTop mail" data-icon="bus-reg-icon email" data-wrapper-class="small-txt disabled"
+                       disabled name="susp-login-name" placeholder="[$195]" type="text" value="[$5533]"/>
+                <input class="titleTop pass" data-icon="bus-reg-icon pw" data-wrapper-class="small-txt"
+                       name="susp-login-password" placeholder="[$909]" type="password"/>
+                <div class="button default-green-button gradient right" tabindex="0">[$556]</div>
+                <div class="button default-white-button gradient right cancel-email-verify hidden">[$82]</div>
+                <div class="clear"></div>
+            </form>
+        </div>
+    </div>
+    <!-- end of Login to your MEGA account dialog !-->
+
+    <!--Set new password dialog !-->
+    <div class="fm-dialog verify-email-set-new-pass type-480px227 big-radius hidden">
+        <div class="fm-dialog-header">
+            <div class="fm-dialog-title medium">[$22254]</div>
+        </div>
+        <div class="login-set-pass body">
+            <div class="text">
+                [$22250]
+            </div>
+            <div class="text">
+                [$22251]
+            </div>
+            <form class="account dialog-login-form-low-pad">
+                <input class="titleTop strengthChecker pw1" data-icon="bus-reg-icon pw1" data-wrapper-class="small-txt"
+                       name="verify-email-set-new-pass1" placeholder="[$9074]" type="password"/>
+                <input class="titleTop pw2" data-icon="bus-reg-icon pw2" data-wrapper-class="small-txt"
+                       name="verify-email-set-new-pass2" placeholder="[$9075]" type="password"/>
+                <div class="button default-green-button gradient right" tabindex="0">
+                    Finish
+                </div>
+                <div class="clear"></div>
+            </form>
+        </div>
+    </div>
+    <!-- end of Set new password dialog !-->
+
+</div>

@@ -62,7 +62,7 @@ a, a:link, a:visited, a:hover, a:active {
     height: 50px;
 }
 .logo {
-    background-image: url('https://eu.static.mega.co.nz/3/images/mega/browsers-page-v2.png');
+    background-image: url('https://eu.static.mega.co.nz/3/images/mega/browsers-page-v3.png');
     background-position: -50px -165px;
     background-repeat: no-repeat;
     cursor: pointer;
@@ -103,7 +103,7 @@ a, a:link, a:visited, a:hover, a:active {
     color: #333333;
     font-size: 14px;
     margin: 20px 0 42px 0;
-    background-image: url('https://eu.static.mega.co.nz/3/images/mega/browsers-page-v2.png');
+    background-image: url('https://eu.static.mega.co.nz/3/images/mega/browsers-page-v3.png');
     background-position: -50px -50px;
     background-repeat: no-repeat;
     line-height: 16px;
@@ -123,7 +123,7 @@ a, a:link, a:visited, a:hover, a:active {
     display: block;
     width: 176px;
     height: 176px;
-    background-image: url('https://eu.static.mega.co.nz/3/images/mega/browsers-page-v2.png');
+    background-image: url('https://eu.static.mega.co.nz/3/images/mega/browsers-page-v3.png');
     background-repeat: no-repeat;
     position: relative;
     -moz-border-radius: 8px;
@@ -148,6 +148,9 @@ a, a:link, a:visited, a:hover, a:active {
 }
 .edge .browsers-logo-lnk {
     background-position: -11px -1674px;
+}
+.edgium .browsers-logo-lnk {
+    background-position: -11px -1872px;
 }
 .safari .browsers-logo-lnk {
     background-position: -11px -1073px;
@@ -204,6 +207,9 @@ span.browsers-update {
 }
 .browsers-recommendations.partial-support {
     background-color: #b2b2b2;
+}
+.browsers-recommendations.no-support {
+    background-color: #D22400;
 }
 .browsers-bottom {
     bottom: 0;
@@ -264,7 +270,7 @@ a.continue-button.hidden {
 @media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {
 
     .logo, .browsers-notification, .browsers-logo-lnk {
-        background-image: url(https://eu.static.mega.co.nz/3/images/mega/browsers-page-v2@2x.png);
+        background-image: url(https://eu.static.mega.co.nz/3/images/mega/browsers-page-v3@2x.png);
         background-size: 201px auto;
     }
     .nw-bottom-copyrights {

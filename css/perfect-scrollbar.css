@@ -4,23 +4,22 @@
     touch-action: none;
     overflow: hidden !important;
     -ms-overflow-style: none;
-    min-width: 100%
-}
-.ps-container.ps-in-scrolling.ps-x > .ps-scrollbar-x-rail, .ps-container.ps-in-scrolling.ps-y > .ps-scrollbar-y-rail {
-    opacity: 1;
+    min-width: 100%;
+    max-width: 100%;
 }
 
  @supports (-ms-overflow-style: none) {
- .ps-container {
- overflow: auto !important;
-}
+    .ps-container {
+         overflow: auto !important;
+    }
 }
 
 @media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
-.ps-container {
-    overflow: auto !important;
+    .ps-container {
+        overflow: auto !important;
+    }
 }
-}
+
 .ps-container.ps-active-x > .ps-scrollbar-x-rail,  .ps-container.ps-active-y > .ps-scrollbar-y-rail {
     display: block;
     background-color: transparent;
@@ -32,71 +31,66 @@
     display: none;
     position: absolute;
     /* please don't change 'position' */
-    -webkit-border-radius: 4px;
-    -moz-border-radius: 4px;
-    border-radius: 4px;
-    opacity: 0;
-    -webkit-transition: background-color .2s linear, opacity .2s linear;
-    -moz-transition: background-color .2s linear, opacity .2s linear;
-    -o-transition: background-color .2s linear, opacity .2s linear;
-    transition: background-color .2s linear, opacity .2s linear;
-    bottom: 2px;
-    /* there must be 'bottom' for ps-scrollbar-x-rail */
-    height: 8px;
+    height: 14px;
+    bottom: 0;
     margin: 0 2px;
 }
 .ps-container > .ps-scrollbar-x-rail > .ps-scrollbar-x {
     position: absolute;
     /* please don't change 'position' */
-    background-color: #aaa;
-    -webkit-border-radius: 4px;
-    -moz-border-radius: 4px;
-    border-radius: 4px;
-    -webkit-transition: background-color .2s linear;
-    -moz-transition: background-color .2s linear;
-    -o-transition: background-color .2s linear;
-    transition: background-color .2s linear;
-    bottom: 0;
-    /* there must be 'bottom' for ps-scrollbar-x */
+    background-color: #000;
     height: 8px;
+    bottom: 3px;
+    opacity: 0;
+    cursor: pointer;
+    border-radius: 8px;
+    -webkit-transition: opacity 200ms ease-in-out;
+    transition: opacity 200ms ease-in-out;
+}
+.ps-container:hover > .ps-scrollbar-x-rail .ps-scrollbar-x, .ps-outfocused-scrolling > .ps-scrollbar-x-rail .ps-scrollbar-x {
+    opacity: 0.2;
+}
+.ps-container > .ps-scrollbar-x-rail:hover .ps-scrollbar-x, .ps-in-scrolling > .ps-scrollbar-x-rail .ps-scrollbar-x {
+    opacity: 0.3;
 }
 .ps-container > .ps-scrollbar-y-rail {
     display: none;
     position: absolute;
     /* please don't change 'position' */
-    -webkit-border-radius: 4px;
-    -moz-border-radius: 4px;
-    border-radius: 4px;
-    opacity: 0;
-    -webkit-transition: background-color .2s linear, opacity .2s linear;
-    -moz-transition: background-color .2s linear, opacity .2s linear;
-    -o-transition: background-color .2s linear, opacity .2s linear;
-    transition: background-color .2s linear, opacity .2s linear;
-    /* there must be 'right' for ps-scrollbar-y-rail */
-    width: 10px;
+    width: 14px;
+    right: 0;
     margin: 2px 0;
 }
 .ps-container > .ps-scrollbar-y-rail > .ps-scrollbar-y {
     position: absolute;
     /* please don't change 'position' */
-    background-color: #aaa;
-    -webkit-border-radius: 4px;
-    -moz-border-radius: 4px;
-    border-radius: 4px;
-    -webkit-transition: background-color .2s linear;
-    -moz-transition: background-color .2s linear;
-    -o-transition: background-color .2s linear;
-    transition: background-color .2s linear;
-    right: 0;
-    /* there must be 'right' for ps-scrollbar-y */
+    background-color: #000;
     width: 8px;
+    right: 3px;
+    opacity: 0;
+    cursor: pointer;
+    border-radius: 8px;
+    -webkit-transition: opacity 200ms ease-in-out;
+    transition: opacity 200ms ease-in-out;
+    min-height: 15px;
+}
+.ps-container:hover > .ps-scrollbar-y-rail .ps-scrollbar-y, .ps-outfocused-scrolling > .ps-scrollbar-y-rail .ps-scrollbar-y {
+    opacity: 0.2;
+}
+.ps-container > .ps-scrollbar-y-rail:hover .ps-scrollbar-y, .ps-in-scrolling > .ps-scrollbar-y-rail .ps-scrollbar-y {
+    opacity: 0.3;
+}
+.ps-container > .ps-scrollbar-y-rail > .ps-scrollbar-y::before {
+    position: absolute;
+    content: '';
+    width: calc(100% + 6px);
+    height: 100%;
+    left: -3px;
+    top: 0;
 }
 .ps-container:hover.ps-in-scrolling {
     pointer-events: none;
 }
-.ps-container:hover.ps-in-scrolling.ps-x > .ps-scrollbar-x-rail, .ps-container:hover.ps-in-scrolling.ps-y > .ps-scrollbar-y-rail {
-    opacity: 1;
-}
-.ps-container:hover > .ps-scrollbar-x-rail:hover, .ps-container:hover > .ps-scrollbar-y-rail:hover {
-    opacity: 1;
+.perfectScrollbarContainer {
+    position: relative;
 }

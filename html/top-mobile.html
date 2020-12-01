@@ -1,6 +1,10 @@
 <!-- Mobile top header -->
 <div class="mobile fm-header ">
     <a class="mobile fm-icon mega left"></a>
+    <div class="mobile pages-menu-dropdown">
+        <span>[$169]</span>
+        <i class="top-menu-icon menus-sprite right-arrow"></i>
+    </div>
     <div class="mobile fm-icon top-icon menu right"></div>
     <div class="mobile fm-header-txt"><span class="mobile main-top-header-text"></span></div>
 </div>
@@ -28,88 +32,192 @@
 <!-- Mobile main menu !-->
 <div class="mobile dark-overlay"></div>
 <div class="mobile top-menu-popup hidden">
-    <div class="top-icon close"></div>
+    <i class="top-menu-icon menus-sprite close"></i>
     <div class="top-menu-scroll">
         <div class="top-menu-content">
-            <div class="top-menu-item start">[$1888]</div>
-            <div class="top-menu-item fm">[$164]</div>
-            <div class="top-menu-item account"><span class="right-el">[$435]</span><span>[$187]</span></div>
-            <div class="top-menu-item upgrade-your-account not-mobile-ready">[$433]</div>
-            <div class="top-menu-item backup not-mobile-ready"><span class="right-el"><i class="semi-small-icon yellow-triangle"></i></span><span>[$8921]</span></div>
-            <div class="top-menu-item refresh-item not-mobile-ready">[$85]</div>
-            <div class="top-menu-item logout">[$967]</div>
-            <div class="top-menu-item login">[$171]</div>
-            <div class="top-menu-item register">[$968]</div>
+
+            <div class="top-menu-logged">
+                <div class="avatar-block">
+                    <img alt="" />
+                </div>
+                <div class="user-info">
+                    <div class="name"></div>
+                    <div class="email"></div>
+                </div>
+                <div class="clear"></div>
+
+                <div class="plan"></div>
+                <div class="storage">
+                    <span></span>
+                </div>
+                <div class="loader menus-sprite"></div>
+                <div class="storage-txt">
+                </div>
+                <div class="top-green-button upgrade-your-account">
+                    [$433]
+                </div>
+            </div>
+
+            <div class="top-menu-item start">
+                <i class="top-menu-icon menus-sprite mega"></i>
+                <span>[$1888]</span>
+            </div>
+            <div class="top-menu-item login">
+                <i class="top-menu-icon menus-sprite login"></i>
+                <span>[$171]</span>
+            </div>
+            <div class="top-menu-item register">
+                <i class="top-menu-icon menus-sprite register"></i>
+                <span>[$968]</span>
+            </div>
+            <div class="top-menu-divider small-pad bg"></div>
+
+             <div class="top-menu-item backup small-pad">
+                 <i class="top-menu-icon menus-sprite export"></i>
+                 <span>[$8921]</span>
+            </div>
+            <div class="top-menu-divider small-pad bg hidden"></div>
+
+            <div class="top-menu-item fm">
+                <i class="top-menu-icon menus-sprite mega"></i>
+                <span>[$164]</span>
+            </div>
+
+            <div class="top-menu-item submenu-item hidden">
+                <i class="top-menu-icon menus-sprite features"></i>
+                <span>[$23377]</span>
+                <i class="top-menu-icon menus-sprite right-arrow"></i>
+            </div>
+             <div class="top-submenu hidden">
+                <div class="top-menu-item storage hidden">Storage &amp; Transfer</div>
+                <div class="top-menu-item encryption hidden">End-to-End Encryption</div>
+                <div class="top-menu-item security-chat hidden">Security Chat</div>
+                <div class="top-menu-item back hidden">Backup</div>
+                <div class="top-menu-item share hidden">Share &amp; Collaborate</div>
+            </div>
+
+            <div class="top-menu-item submenu-item">
+                <i class="top-menu-icon menus-sprite platforms"></i>
+                <span>[$23854]</span>
+                <i class="top-menu-icon menus-sprite right-arrow"></i>
+            </div>
+             <div class="top-submenu">
+                <div class="top-menu-item sync">[$956]</div>
+                <div class="top-menu-item mobile">[$955]</div>
+                <div class="top-menu-item cmd">MEGAcmd</div>
+                <div class="top-menu-item extensions">[$16603]</div>
+                <div class="top-menu-item bird hidden">MEGAbird</div>
+                <div class="top-menu-item nas">[$24478]</div>
+            </div>
+
+            <div class="top-menu-item submenu-item">
+                <i class="top-menu-icon menus-sprite company"></i>
+                <span>[$23328]</span>
+                <i class="top-menu-icon menus-sprite right-arrow"></i>
+            </div>
+             <div class="top-submenu">
+                <div class="top-menu-item security">[$7337]</div>
+                <div class="top-menu-item about">[$16112]</div>
+                <div class="top-menu-item pro">[$1361]</div>
+                <div class="top-menu-item affiliate">[$22682]</div>
+                <div class="top-menu-item blog blogarticle">[$389]</div>
+                 <div class="top-menu-item corporate">[$24093]</div>
+             </div>
+
+            <div class="top-menu-item submenu-item">
+                <i class="top-menu-icon menus-sprite support"></i>
+                <span>[$383]</span>
+                <i class="top-menu-icon menus-sprite right-arrow"></i>
+            </div>
+             <div class="top-submenu">
+                <div class="top-menu-item help">[$384]</div>
+                <div class="top-menu-item contact">[$399]</div>
+                <div class="top-menu-item support">[$516]</div>
+                <div class="top-menu-item feedback not-mobile-ready">[$1356]</div>
+            </div>
+
+            <div class="top-menu-item submenu-item">
+                <i class="top-menu-icon menus-sprite develop"></i>
+                <span>[$392]</span>
+                <i class="top-menu-icon menus-sprite right-arrow"></i>
+            </div>
+             <div class="top-submenu">
+                <div class="top-menu-item sourcecode">[$7411]</div>
+                <div class="top-menu-item sdk">[$962]</div>
+                <div class="top-menu-item doc">[$963]</div>
+            </div>
+
+            <div class="top-menu-item submenu-item">
+                <i class="top-menu-icon menus-sprite legal"></i>
+                <span>[$16114]</span>
+                <i class="top-menu-icon menus-sprite right-arrow"></i>
+            </div>
+             <div class="top-submenu">
+                <div class="top-menu-item terms">[$385]</div>
+                <div class="top-menu-item privacy">[$386]</div>
+                <div class="top-menu-item copyright">[$387]</div>
+                <div class="top-menu-item takedown">[$966]</div>
+                <div class="top-menu-item transparency">[$22681]</div>
+                <div class="top-menu-item gdpr">[$18501]</div>
+            </div>
+
             <div class="top-menu-divider"></div>
 
-            <div class="top-menu-item blog blogarticle not-mobile-ready">[$389]</div>
-            <div class="top-menu-item help">[$384]</div>
-            <div class="top-menu-item security">[$7337]</div>
-            <div class="top-menu-item support not-mobile-ready">[$516]</div>
-            <div class="top-menu-item upgrade-your-account pro">[$16111]</div>
-            <div class="top-menu-item resellers not-mobile-ready">[$391]</div>
-            <div class="top-menu-item submenu-item languages"><span class="right-el">EN</span><span>[$670]</span></div>
+            <div class="top-menu-item submenu-item languages small-pad">
+                 <i class="top-menu-icon menus-sprite globe"></i>
+                 <span></span>
+                 <i class="top-menu-icon menus-sprite right-arrow inline down"></i>
+            </div>
             <div class="top-submenu language-items">
                 <div class="top-menu-item language-template">
                     <span class="lang-name"></span>
                     <span class="beta-text">[$5907]</span>
                 </div>
             </div>
-            <div class="top-menu-divider not-mobile-ready"></div>
 
-            <div class="top-menu-item about not-mobile-ready">[$16112]</div>
-            <div class="top-menu-item privacycompany not-mobile-ready">[$16113]</div>
-            <div class="top-menu-item contact">[$399]</div>
-            <div class="top-menu-item feedback not-mobile-ready">[$1356]</div>
-            <div class="top-menu-divider"></div>
-
-            <div class="top-menu-item submenu-item">[$961]</div>
-            <div class="top-submenu">
-                <div class="top-menu-item mobile">[$955]</div>
-                <div class="top-menu-item sync">[$956]</div>
-                <div class="top-menu-item extensions">[$16603]</div>
-                <div class="top-menu-item bird">MEGAbird</div>
-                <div class="top-menu-item cmd">MEGAcmd</div>
-                <div class="top-menu-item uwp">[$20028]</div>
-            </div>
-
-            <div class="top-menu-item submenu-item">[$392]</div>
-            <div class="top-submenu">
-                <div class="top-menu-item sourcecode">[$7411]</div>
-                <div class="top-menu-item sdk">[$962]</div>
-                <div class="top-menu-item doc">[$963]</div>
-            </div>
-
-            <div class="top-menu-item submenu-item">[$16114]</div>
-            <div class="top-submenu">
-                <div class="top-menu-item terms">[$385]</div>
-                <div class="top-menu-item privacy">[$386]</div>
-                <div class="top-menu-item copyright not-mobile-ready">[$387]</div>
-                <div class="top-menu-item takedown">[$966]</div>
-                <div class="top-menu-item transparency">[$22681]</div>
-                <div class="top-menu-item gdpr">[$18501]</div>
-            </div>
+            <div class="top-menu-divider small-pad"></div>
 
             <div class="top-social-bl">
-                <a href="https://www.facebook.com/MEGAprivacy" target="_blank" rel="noopener noreferrer" class="st-bottom-button st-facebook-button"></a>
-                <a href="https://www.twitter.com/MEGAprivacy" target="_blank" rel="noopener noreferrer" class="st-bottom-button st-twitter-button"></a>
+                <div class="top-social-txt">
+                    [$23329]
+                </div>
+                <a href="https://www.facebook.com/MEGAprivacy" target="_blank" rel="noopener noreferrer" class="top-social-button">
+                     <i class="top-menu-icon menus-sprite fb"></i>
+                </a>
+                <a href="https://www.instagram.com/MEGA_privacy/" target="_blank" rel="noopener noreferrer" class="top-social-button">
+                    <i class="top-menu-icon menus-sprite instagram"></i>
+                </a>
+                <a href="https://twitter.com/MEGAprivacy" target="_blank" rel="noopener noreferrer" class="top-social-button">
+                    <i class="top-menu-icon menus-sprite twitter"></i>
+                </a>
+                <a href="https://www.linkedin.com/company/mega-the-privacy-company" target="_blank" rel="noopener noreferrer" class="top-social-button">
+                    <i class="top-menu-icon menus-sprite linkedin"></i>
+                </a>
+                <a href="https://www.youtube.com/channel/UCL0n8SACU_eghsvHxbizKCA" target="_blank" rel="noopener noreferrer" class="top-social-button">
+                    <i class="top-menu-icon menus-sprite youtube"></i>
+                </a>
+                <div class="clear"></div>
             </div>
 
             <div class="top-mega-version">
                 v. dev
             </div>
+            <div class="top-menu-item top-white-button logout">
+                [$967]
+            </div>
+            <div class="clear"></div>
         </div>
     </div>
 </div>
 
 <!-- Loading overlay -->
-<div class="dark-overlay hidden"></div>
+<div class="dark-overlay hidden" id="loading-overlay"></div>
 <div class="light-overlay hidden"></div>
 <div class="slideshow-overlay hidden"></div>
 <div class="fm-dialog-overlay hidden"></div>
 
 <!-- Loading progress / spinner -->
-<div class="mobile loading-spinner hidden">
+<div class="mobile loading-spinner hidden" id="loading-spinner">
     <div class="main-loader"></div>
     <ul class="loading-info">
         <li class="step3">[$8579]</li>

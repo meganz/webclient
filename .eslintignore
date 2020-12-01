@@ -22,6 +22,7 @@ keygen.js
 makecache.js
 karma.conf.js
 nacl-fast.js
+pdf.worker.js
 js/cmsSnapshot.js
 js/chat/bundle.js
 js/transfers/meths/firefox-extension.js
@@ -30,3 +31,4 @@ contrib/Electron/main.js
 *.xml
 js/chat/emojidata/emojis.json
 eslint-local-rules.js
+Gruntfile.js

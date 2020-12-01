@@ -24,6 +24,9 @@ var QuickFinder = function(searchable_elements, containers) {
     var last_key = null;
     var next_idx = 0;
 
+    // Defined allowed dialogs' name
+    var allowedDialogs = {'copy':true, 'move':true};
+
     // hide on page change
     if (QuickFinder._pageChangeListenerId) {
         mBroadcaster.removeListener(QuickFinder._pageChangeListenerId);
@@ -32,17 +35,19 @@ var QuickFinder = function(searchable_elements, containers) {
         if (self.is_active()) {
             self.deactivate();
         }
+        // Clear the repeat key press setting if change the page
+        last_key = null;
     });
 
     $(window).rebind('keypress.quickFinder', function(e) {
+        if (!window.M || M.chat) {
+            return;
+        }
 
         e = e || window.event;
         // DO NOT start the search in case that the user is typing something in a form field... (eg.g. contacts -> add
         // contact field)
-        if ($(e.target).is("input, textarea, select") || $.dialog) {
-            return;
-        }
-        if (M.chat) {
+        if ($(e.target).is("input, textarea, select") || ($.dialog && !allowedDialogs[$.dialog])) {
             return;
         }
 
@@ -70,10 +75,48 @@ var QuickFinder = function(searchable_elements, containers) {
 
 
             var foundIds = [];
+            var isCopyToChat = false;
 
             charTyped = charTyped.toLowerCase();
 
-            foundIds = M.v.filter(function(v) {
+            var nodesList = M.v;
+            if ($.dialog && allowedDialogs[$.dialog]) {
+                // Assign different nodes list depending on different panels
+                var activePanel = $('.dialog-content-block').closest('.fm-picker-dialog-tree-panel.active');
+                if (activePanel.hasClass('cloud-drive')) {
+                    nodesList = Object.values(M.tree[M.RootID]);
+                }
+                else if (activePanel.hasClass('shared-with-me')) {
+                    nodesList = Object.values(M.tree.shares);
+                }
+                else if (activePanel.hasClass('conversations')) {
+                    isCopyToChat = true;
+                    nodesList = [];
+                    var allContactElements = $('span.nw-contact-item', activePanel).get();
+
+                    for (var c = 0; c < allContactElements.length; c++) {
+                        var $contactElement = $(allContactElements[c]);
+                        var contactHandle = $contactElement.attr('id').replace('cpy-dlg-chat-itm-spn-', '');
+                        var contactName = $('span.nw-contact-name', $contactElement).text();
+                        nodesList.push({name: contactName, h: contactHandle});
+                    }
+                }
+                else {
+                    // Other panels rather than cloud-drive, share-with-me and send-to-chat
+                    return;
+                }
+
+                if (!isCopyToChat) {
+                    // Sort the node list by name except for the conversations panel
+                    nodesList.sort(function(a, b) {
+                        var aName = a.name.toUpperCase();
+                        var bName = b.name.toUpperCase();
+                        return M.compareStrings(aName, bName, d);
+                    });
+                }
+            }
+
+            foundIds = nodesList.filter(function(v) {
                 var nameStr = "";
                 if (v.name) {
                     nameStr = v.name;
@@ -89,7 +132,40 @@ var QuickFinder = function(searchable_elements, containers) {
                 if (nameStr && nameStr[0] && nameStr[0].toLowerCase() === charTyped) {
                     return true;
                 }
+
+                return false;
             });
+
+            if ($.dialog && allowedDialogs[$.dialog]) {
+                if (foundIds.length > 0) {
+                    // Fetch the first node after quick finding
+                    var dialogQuickIndex = 0;
+                    var $dialogQuickFindNode;
+
+                    if (isCopyToChat) {
+                        // When it's in the conversations panel
+                        $dialogQuickFindNode = $('#cpy-dlg-chat-itm-spn-' + foundIds[0].h);
+                    }
+                    else {
+                        // When it's in the cloud-drive or share-with-me panel
+                        for (var i = 0; i < foundIds.length; i++) {
+                            $dialogQuickFindNode = $('.nw-fm-tree-item#mctreea_' + foundIds[dialogQuickIndex].h);
+                            if (!$dialogQuickFindNode.hasClass('disabled')) {
+                                // cloud-drive panel: Acquire the first node except for $.selected itself
+                                // share-with-me panel: Acquire the first node with the write permission
+                                break;
+                            }
+                            $dialogQuickFindNode = null;
+                            dialogQuickIndex++;
+                        }
+                    }
+
+                    if ($dialogQuickFindNode && !$dialogQuickFindNode.hasClass('selected')) {
+                        $dialogQuickFindNode.trigger('click');
+                    }
+                }
+                return;
+            }
 
             if (
                 /* repeat key press, but show start from the first element */
@@ -108,9 +184,7 @@ var QuickFinder = function(searchable_elements, containers) {
             }
             last_key = charTyped;
             if (foundIds[next_idx]) {
-                var nextId = SelectionManager.dynamicNodeIdRetriever(foundIds[next_idx]);
-                selectionManager.clear_selection();
-                selectionManager.set_currently_selected(nextId, true);
+                var nextId = selectionManager.resetTo(foundIds[next_idx], true);
 
                 if (!M.megaRender.megaList) {
                     $(searchable_elements).parents(".ui-selectee, .ui-draggable").removeClass('ui-selected');
@@ -135,9 +209,9 @@ var QuickFinder = function(searchable_elements, containers) {
         }
         else if (charCode >= 33 && charCode <= 36)
         {
-            var e = '.files-grid-view.fm';
+            var elem = '.files-grid-view.fm';
             if (M.viewmode == 1) {
-                e = '.fm-blocks-view.fm';
+                elem = '.fm-blocks-view.fm';
             }
 
             if (M.megaRender && M.megaRender.megaList) {
@@ -156,26 +230,24 @@ var QuickFinder = function(searchable_elements, containers) {
                         break;
                 }
             }
-            else {
-                if ($(e + ':visible').length) {
-                    e = $('.grid-scrolling-table:visible, .file-block-scrolling:visible');
-                    var jsp = e.data('jsp');
+            else if ($(elem + ':visible').length) {
+                elem = $('.grid-scrolling-table:visible, .file-block-scrolling:visible');
+                var jsp = elem.data('jsp');
 
-                    if (jsp) {
-                        switch (charCode) {
-                            case 33: /* Page Up   */
-                                jsp.scrollByY(-e.height(), !0);
-                                break;
-                            case 34: /* Page Down */
-                                jsp.scrollByY(e.height(), !0);
-                                break;
-                            case 35: /* End       */
-                                jsp.scrollToBottom(!0);
-                                break;
-                            case 36: /* Home      */
-                                jsp.scrollToY(0, !0);
-                                break;
-                        }
+                if (jsp) {
+                    switch (charCode) {
+                        case 33: /* Page Up   */
+                            jsp.scrollByY(-elem.height(), !0);
+                            break;
+                        case 34: /* Page Down */
+                            jsp.scrollByY(elem.height(), !0);
+                            break;
+                        case 35: /* End       */
+                            jsp.scrollToBottom(!0);
+                            break;
+                        case 36: /* Home      */
+                            jsp.scrollToY(0, !0);
+                            break;
                     }
                 }
             }
@@ -216,7 +288,7 @@ var QuickFinder = function(searchable_elements, containers) {
 };
 
 var quickFinder = new QuickFinder(
-    '.tranfer-filetype-txt, .file-block-title, td span.contacts-username',
+    '.tranfer-filetype-txt, .file-block-title, td span.contacts-username, li span.nw-fm-tree-folder',
     '.files-grid-view, .fm-blocks-view.fm, .contacts-grid-table, .contacts-blocks-scrolling,' +
-    '.contact-requests-grid, .sent-requests-grid'
+    '.contact-requests-grid, .sent-requests-grid, .fm-picker-dialog .dialog-content-block'
 );

@@ -1,9 +1,9 @@
 var React = require("react");
 var ReactDOM = require("react-dom");
-import MegaRenderMixin from './../../stores/mixins.js';
+import {MegaRenderMixin} from './../../stores/mixins.js';
 var RenderDebugger = require('./../../stores/mixins.js').RenderDebugger;
 
-class WhosTyping extends MegaRenderMixin(React.Component) {
+class WhosTyping extends MegaRenderMixin {
     constructor(props) {
         super(props);
         this.state = {
@@ -84,6 +84,9 @@ class WhosTyping extends MegaRenderMixin(React.Component) {
             var names = Object.keys(self.state.currentlyTyping).map((u_h) => {
                 var contact = M.u[u_h];
                 if (contact && contact.firstName) {
+                    if (contact.nickname !== '') {
+                        return contact.nickname;
+                    }
                     return contact.firstName;
                 }
                 else {
@@ -106,12 +109,12 @@ class WhosTyping extends MegaRenderMixin(React.Component) {
 
             var msg;
             if (areMultipleUsersTyping === true) {
-                msg = __(l[8872])
+                msg = l[8872]
                     .replace("%1", namesDisplay[0])
                     .replace("%2", namesDisplay[1]);
             }
             else {
-                msg = __(l[8629]).replace("%1", namesDisplay[0]);
+                msg = l[8629].replace("%1", namesDisplay[0]);
             }
 
             typingElement = <div className="typing-block">

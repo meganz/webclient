@@ -1,10 +1,10 @@
 import React from 'react';
-import MegaRenderMixin from './../../stores/mixins.js';
+import {MegaRenderMixin} from './../../stores/mixins.js';
 import ModalDialogsUI  from './../../ui/modalDialogs.jsx';
 import utils  from './../../ui/utils.jsx';
 
 
-class ChatlinkDialog extends MegaRenderMixin(React.Component) {
+class ChatlinkDialog extends MegaRenderMixin {
     static defaultProps = {
         'requiresUpdateOnResize': true,
         'disableCheckingVisibility': true,
@@ -95,7 +95,7 @@ class ChatlinkDialog extends MegaRenderMixin(React.Component) {
         const self = this;
 
         const closeButton = (
-            <div 
+            <div
                 key="close"
                 className={"default-red-button right links-button"}
                 onClick={function(e) {
@@ -107,6 +107,7 @@ class ChatlinkDialog extends MegaRenderMixin(React.Component) {
         );
 
         return <ModalDialogsUI.ModalDialog
+            {...this.state}
             title={self.props.chatRoom.iAmOperator() && !self.props.chatRoom.topic ? l[9080] : ""}
             className={
                 "fm-dialog chat-rename-dialog export-chat-links-dialog group-chat-link" + (

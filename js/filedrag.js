@@ -182,39 +182,15 @@
 
     function FileSelectHandlerMegaSyncClick(e) {
 
-        if (u_attr && u_attr.b && u_attr.b.s === -1) {
+        if (M.isInvalidUserStatus()) {
             e.preventDefault();
-            $.hideContextMenu();
-            M.showExpiredBusiness();
             return false;
         }
 
         if (page === "chat" || page.indexOf('/chat/') > -1) {
             return true;
         }
-        if (useMegaSync === -1) {
-            e.preventDefault();
-            e.stopPropagation();
-            megasync.isInstalled(function (err, is) {
-                if (!err || is) {
-                    if (megasync.currUser === u_handle) {
-                        useMegaSync = 2;
-                    }
-                    else {
-                        useMegaSync = 3;
-                    }
-                }
-                else {
-                    useMegaSync = 3;
-                }
-            });
-            return false;
-        }
-        else if (useMegaSync === 3) {
-            useMegaSync = -1
-            return true;
-        }
-        else if (useMegaSync === 2) {
+        if (window.useMegaSync === 2) {
             e.preventDefault();
             e.stopPropagation();
             var target;
@@ -234,7 +210,7 @@
 
             var uploadCmdIsFine = function _uploadCmdIsFine(error, response) {
                 if (error) {
-                    useMegaSync = 3;
+                    window.useMegaSync = 3;
                 }
             };
 
@@ -251,40 +227,10 @@
             return false;
         }
         else {
-            if (localStorage.dd && localStorage.jj && localStorage.d) {
-                console.warn('Strange value of UseMegaSync found = ' + useMegaSync);
-            }
             return true;
         }
     }
-    scope.FileSelectHandlerMegaSyncMouse = function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        if (useMegaSync === -1) {
-            megasync.isInstalled(function (err, is) {
-                if (!err || is) {
-                    if (megasync.currUser === u_handle) {
-                        useMegaSync = 2;
-                    }
-                    else {
-                        useMegaSync = 3;
-                    }
-                }
-                else {
-                    useMegaSync = 3;
-                }
-            });
-            return false;
-        }
-        else if (useMegaSync === 2 && ++usageMegaSync > 3) {
-            useMegaSync = -1;
-            usageMegaSync = 0;
-            return false;
-        }
-        else {
-            return false;
-        }
-    }
+
     function FileDragLeave(e) {
         if (d) {
             console.log('DragLeave');
@@ -314,9 +260,7 @@
             e.preventDefault();
         }
 
-        if (u_attr && u_attr.b && u_attr.b.s === -1) {
-            $.hideContextMenu();
-            M.showExpiredBusiness();
+        if (M.isInvalidUserStatus()) {
             return false;
         }
 
@@ -361,9 +305,10 @@
             return true;
         }
 
-        if (page == 'start') {
-            if ($('#fmholder').html() == '') {
-                $('#fmholder').html(translate(pages['fm'].replace(/{staticpath}/g, staticpath)));
+        if (page === 'start' && !is_mobile) {
+            console.assert(typeof fm_addhtml === 'function');
+            if (typeof fm_addhtml === 'function') {
+                fm_addhtml();
             }
         }
 
@@ -375,6 +320,32 @@
             }
         }
 
+        if (localStorage.testDCRaw) {
+            (function _rawNext(files) {
+                var file = files.pop();
+                if (!file) {
+                    return console.info('No more files.');
+                }
+                var id = Math.random() * 9999 | 0;
+                window.__render_thumb = function(img, u8) {
+                    console.timeEnd('createthumbnail' + id);
+                    console.info('testDCRaw result', toArray.apply(null, arguments));
+                    onIdle(_rawNext.bind(null, files));
+                    M.saveAs(u8, file.name + '.png');
+                };
+                var img = is_image(file.name);
+                var raw = typeof img === 'string' && img;
+
+                if (!img || !raw) {
+                    console.warn('This is not a RAW image...', file.name, [file], img);
+                    return _rawNext(files);
+                }
+
+                createthumbnail(file, false, id, null, null, {raw: raw});
+
+            })(toArray.apply(null, files));
+            return;
+        }
         if (localStorage.testMediaInfo) {
             return MediaInfoLib.test(files);
         }
@@ -460,6 +431,9 @@
             if (page == 'start') {
                 start_upload();
             }
+            if (!window.InitFileDrag) {
+                return;
+            }
             $('.fm-file-upload input').remove();
             $('.fm-file-upload').append('<input type="file" id="fileselect1" title="' + l[99] + '" multiple="">');
             $('.fm-folder-upload input').remove();
@@ -521,7 +495,6 @@
                 o.addEventListener("change", FileSelectHandler, false);
                 if (!is_mobile && i) {
                     o.addEventListener("click", FileSelectHandlerMegaSyncClick, true);
-                    o.addEventListener("mouseover", FileSelectHandlerMegaSyncMouse, true);
                 }
             }
         }
@@ -553,6 +526,11 @@
         document.getElementsByTagName("body")[0].addEventListener("dragleave", fnLeave, false);
         document.getElementsByTagName("body")[0].addEventListener("drop", fnHandler, false);
         document.getElementsByTagName("body")[0].addEventListener("dragstart", onDragStartHandler, false);
+
+        if (is_mobile && (ua.details.engine === 'Gecko' || is_ios && is_ios < 13)) {
+            // https://bugzilla.mozilla.org/show_bug.cgi?id=1456557
+            $('input[multiple]').removeAttr('multiple');
+        }
 
 
         if (is_chrome_firefox) {

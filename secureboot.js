@@ -5,8 +5,6 @@ var m;
 var browserUpdate = 0;
 var apipath;
 var pageLoadTime;
-var maintenance = false;
-var androidsplash = false;
 var silent_loading = false;
 var cookiesDisabled = false;
 var storageQuotaError = false;
@@ -18,6 +16,8 @@ var defaultStaticPath = 'https://eu.static.mega.co.nz/3/'; // EU should never fa
 var ua = window.navigator.userAgent.toLowerCase();
 var uv = window.navigator.appVersion.toLowerCase();
 var storage_version = '1'; // clear localStorage when version doesn't match
+var contenterror = 0;
+var nocontentcheck = false;
 var l, d = false;
 
 // Cache location.search parameters early as the URL may get rewritten later
@@ -37,13 +37,13 @@ if (typeof process !== 'undefined') {
 
 var tmp = getCleanSitePath();
 var is_selenium = !ua.indexOf('mozilla/5.0 (selenium; ');
-var is_embed = location.pathname === '/embed' || tmp.substr(0, 2) === 'E!';
+var is_embed = String(location.pathname).substr(0, 6) === '/embed' || tmp.substr(0, 2) === 'E!';
 var is_drop = location.pathname === '/drop' || tmp.substr(0, 2) === 'D!';
 var is_iframed = is_embed || is_drop;
 var is_karma = !is_iframed && /^localhost:987[6-9]/.test(window.top.location.host);
 var is_chrome_firefox = document.location.protocol === 'chrome:' &&       // Only true for Palemoon/Legacy FF extension
     document.location.host === 'mega' || document.location.protocol === 'mega:';
-var is_msie = ua.indexOf('msie') !== 1 || uv.appVersion.indexOf('trident') > -1;
+var is_msie = ua.indexOf('msie') !== -1 || uv.indexOf('trident') > -1;
 var location_sub = document.location.href.substr(0, 16);
 var is_chrome_web_ext = location_sub === 'chrome-extension' || location_sub === 'ms-browser-exten';
 var is_firefox_web_ext = location_sub === 'moz-extension://';
@@ -54,9 +54,15 @@ var is_microsoft = /msie|edge|trident/i.test(ua);
 var is_android = /android/.test(ua);
 var is_bot = !is_extension && /bot|crawl/i.test(ua);
 var is_old_windows_phone = /Windows Phone 8|IEMobile\/9|IEMobile\/10|IEMobile\/11/i.test(ua);
-var is_internet_explorer_11 = Boolean(window.MSInputMethodContext) && Boolean(document.documentMode);
 var is_uc_browser = /ucbrowser/.test(ua);
-var fetchStreamSupport = window.fetch && typeof ReadableStream === 'function' && typeof AbortController === 'function' && !window.MSBlobBuilder;
+var is_livesite = location.host === 'mega.nz' || location.host === 'mega.io' || is_extension;
+var is_litesite = !is_embed && location.host === 'mega.io';
+self.fetchStreamSupport = (
+    window.fetch && !window.MSBlobBuilder
+    && typeof ReadableStream === 'function'
+    && typeof AbortController === 'function'
+    && typeof Object(AbortController.prototype).abort === 'function'
+);
 var staticServerLoading = {
     loadFailuresOriginal: 0,        // Count of failures on the original static server (from any thread)
     loadFailuresDefault: {},        // Count of failures on the EU static server per file
@@ -97,6 +103,7 @@ function isMobile() {
 }
 
 function getSitePath() {
+    'use strict';
     var hash = location.hash.replace('#', '');
 
     if (hashLogic || isPublicLink(hash)) {
@@ -110,28 +117,100 @@ function getSitePath() {
         }
     }
 
-    return (document.location.pathname.substr(0, 6) === '/chat/') ?
-            document.location.pathname + '#' + hash :
-            document.location.pathname;
+    if (isPublickLinkV2(document.location.pathname)
+        || isHelpLink(document.location.pathname)) {
+        return document.location.pathname + document.location.hash;
+    }
+
+    return hash && location.pathname.substr(0, 6) === '/chat/' ? location.pathname + '#' + hash : location.pathname;
 }
 
 // remove dangling characters from the pathname/hash
 function getCleanSitePath(path) {
+    'use strict';
+
     if (path === undefined) {
         path = getSitePath();
     }
 
-    path = mURIDecode(path).replace(/^[/#]+|\/+$/g, '');
+    // cleanup and handle affiliate tags.
+    path = mURIDecode(path).replace(/^[#/]+|\/+$/g, '').split(/(\/\w+=)/);
 
-    return path;
+    if (path.length > 1) {
+        for (var s = 1; s < path.length; s += 2) {
+            path[String(path[s]).replace(/\W/g, '')] = mURIDecode(path[s + 1]);
+        }
+
+        if (path.uao) {
+            var target = window.mega || window;
+            target.uaoref = path.uao;
+        }
+        if (path.aff) {
+            if (path.aff_time) {
+                // eslint-disable-next-line sonarjs/no-inverted-boolean-check
+                if (!(localStorage.affts > (path.aff_time *= 1000))) {
+                    localStorage.affid = path.aff;
+                    localStorage.affts = path.aff_time;
+
+                    // Future proof, currently only public link affiliate data is coming from other agent.
+                    // Later, url from other agents will contains type for it to support other type.
+                    localStorage.afftype = path.aff_type || 2;
+                }
+            }
+            else {
+                // if only aff parameter is passed, treat it as aff referral url.
+                localStorage.affid = path.aff;
+                localStorage.affts = Date.now();
+                localStorage.afftype = 1;
+            }
+        }
+        if (path.mt) {
+            window.uTagMT = path.mt;
+        }
+    }
+    else if (path[0].indexOf('aff=') === 0) {
+        localStorage.affid = String(path[0]).replace('aff=', '');
+        localStorage.affts = Date.now();
+        localStorage.afftype = 1;
+        path = [''];
+    }
+    else if (path[0].indexOf('mt=') === 0) {
+        window.uTagMT = String(path[0]).replace('mt=', '');
+        path = [''];
+    }
+
+    return path[0];
 }
 
 // Check whether the provided `page` points to a public link
 function isPublicLink(page) {
-    page = mURIDecode(page).replace(/^[/#]+/, '');
+    'use strict';
+    page = getCleanSitePath(page);
 
     var types = {'F!': 1, 'P!': 1, 'E!': 1, 'D!': 1};
     return (page[0] === '!' || types[page.substr(0, 2)]) ? page : false;
+}
+
+function isPublickLinkV2(page) {
+    'use strict';
+    page = getCleanSitePath(page);
+
+    var types = {'file': 6, 'folder': 8, 'embed': 7};
+    return page.length > types[page.split('/')[0]];
+}
+function isHelpLink(page) {
+    'use strict';
+    page = getCleanSitePath(page);
+    return page.indexOf('help/') === 0;
+}
+
+// Check whether the provided `page` points to a chat link
+function isChatLink(page) {
+
+    'use strict';
+
+    page = mURIDecode(page).replace(/^[#/]+/, '');
+    return page.indexOf('chat/') === 0 ? page : false;
 }
 
 // Safer wrapper around decodeURIComponent
@@ -187,11 +266,7 @@ function geoStaticPath() {
             }
         }
     }
-    catch(ex) {
-        setTimeout(function() {
-            throw ex;
-        }, 2100);
-    }
+    catch (ex) {}
 
     return defaultStaticPath;
 }
@@ -231,9 +306,11 @@ if (is_chrome_firefox) {
 
 var myURL = window.URL;
 
-// Check whether we should redirect the user to the browser update.html page (triggered for IE10 and worse browsers)
-browserUpdate = browserUpdate || !myURL || typeof DataView === 'undefined' ||
-    (window.chrome && !document.exitPointerLock);
+// Check whether we should redirect the user to the browser update.html page (triggered for Edge 18 and worse browsers)
+browserUpdate = browserUpdate || !myURL || typeof DataView === 'undefined' || window.MSBlobBuilder
+    || typeof history !== 'object' || typeof history.replaceState !== 'function'
+    || window.chrome && !document.exitPointerLock
+;
 
 if (!String.prototype.trim) {
     String.prototype.trim = function() {
@@ -416,17 +493,17 @@ if (!browserUpdate) try
         }, 4000);
     }
 
-    var contenterror = 0;
-    var nocontentcheck = false;
-
-    if (!is_extension && (window.dd || (location.host !== 'mega.nz' && location.host !== 'webcache.googleusercontent.com'))) {
+    if (!is_extension && (window.dd ||
+        (location.host !== 'mega.nz' &&
+            location.host !== 'mega.io' &&
+            location.host !== 'webcache.googleusercontent.com'))) {
 
         if (location.host === 'smoketest.mega.nz') {
             staticpath = 'https://smoketest.static.mega.nz/3/';
             defaultStaticPath = staticpath;
         }
         else {
-            nocontentcheck = true;
+            nocontentcheck = sessionStorage.dbgContentCheck ? 0 : true;
             var devhost = window.location.host;
 
             // Set the static path and default static path for debug mode to be the same
@@ -483,10 +560,28 @@ catch(e) {
     }
 }
 
+is_litesite = is_litesite || (localStorage.testIO && !is_embed);
+if (location.host === 'mega.io') {
+    tmp = document.head.querySelector('meta[property="og:url"]');
+    if (tmp) {
+        tmp.content = 'https://mega.io/';
+    }
+    tmp = document.head.querySelector('meta[property="twitter:url"]');
+    if (tmp) {
+        tmp.content = 'https://mega.io/';
+    }
+    tmp = document.head.querySelector('link[rel="icon"]');
+    if (tmp) {
+        tmp.href = 'https://mega.io/favicon.ico?v=3';
+    }
+    tmp = undefined;
+}
+
 var mega = {
     ui: {},
     state: 0,
     utils: {},
+    uaoref: window.uaoref,
     updateURL: defaultStaticPath + 'current_ver.txt',
     chrome: (
         typeof window.chrome === 'object'
@@ -496,10 +591,10 @@ var mega = {
     browserBrand: [
         0, 'Torch', 'Epic'
     ],
-    whoami: 'We make secure cloud storage simple. Create an account and get 50 GB ' +
+    whoami: 'We make secure cloud storage simple. Create an account and get up to 50 GB ' +
             'free on MEGA\'s end-to-end encrypted cloud collaboration platform today!',
 
-    maxWorkers: Math.min(navigator.hardwareConcurrency || 4, 12),
+    maxWorkers: Math.min(navigator.hardwareConcurrency || 4, 6),
 
     /** An object with flags detailing which features are enabled on the API
      *  XXX: This is now meant to be a legacy private property, use `mega.flags` instead.
@@ -528,6 +623,13 @@ var mega = {
         }
 
         return 0;
+    },
+
+    /** get cryptographically strong random values. */
+    getRandomValues: function(len) {
+        'use strict';
+        var seed = new Uint8Array(len || 128);
+        return asmCrypto.getRandomValues(seed);
     },
 
     /** Load performance report */
@@ -559,6 +661,7 @@ var mega = {
                         }
                     });
 
+                    r.scSent = now;
                     delete sessionStorage.lightTreeReload;
                 }
             }
@@ -573,6 +676,9 @@ var mega = {
     urlParams: function() {
         if (!this._urlParams) {
             var params = '&domain=meganz'; // domain origin
+            if (location.host === 'mega.io') {
+                params = '&domain=megaio';
+            }
 
             // If using an extension, the version is passed through to the API for the helpdesk tool
             if (is_extension) {
@@ -588,7 +694,7 @@ var mega = {
             var apiut = localStorage.apiut ? '&ut=' + localStorage.apiut : "";
             params += apiut;
 
-            params += '&lang=' + lang;
+            params += '&v=2&lang=' + window.lang;
             this._urlParams = params;
         }
 
@@ -602,6 +708,42 @@ Object.defineProperty(mega, 'flags', {
         return typeof u_attr === 'object' && u_attr.flags || this.apiMiscFlags || false;
     }
 });
+
+Object.defineProperty(mega, 'paywall', {
+    get: function() {
+        'use strict';
+        var res = typeof u_attr === 'object' && (u_attr.uspw || u_attr.b && u_attr.b.s === -1) || false;
+        if (res) {
+            window.onerror = null;
+        }
+        return res;
+    }
+});
+
+Object.defineProperty(mega, 'active', {
+    get: (function() {
+        'use strict';
+        // Number of milliseconds past the user will be considered inactive.
+        var THRESHOLD = 3e4;
+        return function() {
+            return Date.now() - lastactive < THRESHOLD;
+        };
+    })()
+});
+
+if (window.crypto && typeof crypto.getRandomValues === 'function') {
+    (function(crypto, rand) {
+        'use strict';
+        mega.getRandomValues = function(len) {
+            var seed = new Uint8Array(len || 128);
+            return rand.call(crypto, seed);
+        };
+        mega.getRandomValues.strong = true;
+    })(crypto, crypto.getRandomValues);
+}
+
+// nb: can overflow..
+Object.defineProperty(window, 'mIncID', {value: 0, writable: true});
 
 var hashLogic = false;
 if (localStorage.hashLogic) hashLogic=true;
@@ -618,7 +760,8 @@ if (is_bot) {
 
 if (String(location.pathname).indexOf('%') > 0) {
     tmp = mURIDecode(location.pathname);
-    if (tmp.indexOf('%') < 0 && !(/[^\x00-\x7f]/.test(tmp))) {
+    if (tmp.indexOf('%') < 0 && sessionStorage.uutmpl !== tmp) {
+        sessionStorage.uutmpl = tmp;
         location.assign(tmp);
     }
 }
@@ -677,35 +820,83 @@ if (!browserUpdate && is_extension)
     }
     else {
         // WebExtensions
-        tmp = 'mega';
-        if (typeof chrome.runtime.getManifest === 'function' && !Object(chrome.runtime.getManifest()).update_url) {
-            tmp = localStorage.chromextdevpath || tmp;
+        urlrootfile = 'mega/secure.html';
+
+        tmp = 'extStageReload' + (is_iframed | 0) + (is_embed | 0) + (is_drop | 0);
+
+        if (typeof chrome !== 'object' || typeof chrome.runtime !== 'object') {
+            var stage = sessionStorage[tmp] | 0;
+            if (stage < 4) {
+                sessionStorage[tmp] = ++stage;
+                location.reload(true);
+            }
+
+            console.error('Something went wrong...', window.chrome, window.chrome && chrome.runtime);
         }
-        bootstaticpath = chrome.extension.getURL(tmp + '/');
-        urlrootfile = tmp + '/secure.html';
+        else {
+            delete sessionStorage[tmp];
+            tmp = typeof chrome.runtime.getManifest === 'function' && chrome.runtime.getManifest() || false;
+
+            if (tmp.version === '109101.103.97') {
+                urlrootfile = 'webclient/index.html';
+
+                if (typeof chrome.runtime.getPackageDirectoryEntry === 'function') {
+                    chrome.runtime.getPackageDirectoryEntry(function(root) {
+                        'use strict';
+                        root.getDirectory('webclient', {create: false}, function(dir) {
+                            dir.getDirectory('images', {create: false}, function(dir) {
+                                if (dir && dir.isDirectory && dir.name === 'images') {
+                                    staticpath = bootstaticpath;
+                                }
+                            });
+                        });
+                    });
+                }
+            }
+        }
+
+        bootstaticpath = chrome.extension.getURL(urlrootfile.split('/')[0] + '/');
+    }
+
+    if (localStorage.useBootStaticPath) {
+        staticpath = bootstaticpath;
     }
 
     Object.defineProperty(window, 'eval', {
-        value : function eval(code) {
+        value : function evil(code) {
+            'use strict';
             throw new Error('Unsafe eval is not allowed, code: ' + String(code).replace(/\s+/g,' ').substr(0,60) + '...');
         }
     });
 }
 
-
 var page;
+
 if (hashLogic) {
     // legacy support:
     page = getCleanSitePath(document.location.hash);
 }
-else if (getSitePath().substr(0, 6) === '/chat/') {
-    page = getSitePath().substring(1).split("#")[0] + "#" + document.location.hash.split("#")[1];
+else if ((tmp = getSitePath()).substr(0, 6) === '/chat/') {
+    page = tmp.substr(1);
     history.replaceState({subpage: page}, "", '/' + page);
 }
 else if ((page = isPublicLink(document.location.hash))) {
     // folder or file link: always keep the hash URL to ensure that keys remain client side
     // history.replaceState so that back button works in new URL paradigm
     history.replaceState({subpage: page}, "", '#' + page);
+}
+else if (isPublickLinkV2(document.location.pathname)) {
+    page = getCleanSitePath();
+    history.replaceState({ subpage: page }, "", '/' + page);
+
+    if (is_embed) {
+        page = page.split(/[#/]/);
+        page = '!' + page[1] + '!' + page[2];
+    }
+}
+else if (isHelpLink(document.location.pathname)) {
+    page = getCleanSitePath();
+    history.replaceState({ subpage: page }, "", '/' + page);
 }
 else {
     if (document.location.hash.length > 0) {
@@ -716,7 +907,17 @@ else {
         // new URL paradigm, look for desired page in the location.pathname:
         page = document.location.pathname;
     }
+
     page = getCleanSitePath(page);
+    if (is_litesite) {
+        window.redirect = {
+            'login': true, 'register': 1, 'registerb': 1, 'recovery': 1, 'reset': 1, 'cancel': 1, 'newsignup': 1,
+            'recover': 1, 'redeem': true, 'megadrop': true, 'support': 1, 'copyrightnotice': 1
+        };
+        if (redirect[page]) {
+            window.location.replace('https://mega.nz/' + page);
+        }
+    }
 	// put try block around it to allow the page to be rendered in Google cache
 	try
 	{
@@ -726,50 +927,6 @@ else {
 	{
 		console.log('Probably Google Cache?');
 	}
-}
-
-// Determine whether to show the legacy mobile page for these links so that they redirect back to the app
-var showLegacyMobilePage = (m && (page.substr(0, 6) === 'verify' || page.substr(0, 6) === 'fm/ipc' ||
-    page.substr(0, 9) === 'newsignup' || page.substr(0, 7) === 'account' ||
-    (is_old_windows_phone && page.substr(0, 7) === 'confirm')));
-
-/**
- * Determines whether to show the Site Update page for IE11 users. For IE11 users they are shown the Site Update page
- * once initially with option to continue to the site, then they are shown again after 2 weeks, then 1 week, then 4
- * days, then 2 days, then every day after that.
- * @returns {Boolean} Returns true if it should show the page, false if not
- */
-var showUpdatePage = function() {
-
-    'use strict';
-
-
-    // Always show the site update page for IE11 users except for public links only
-    if (isPublicLink(page)) {
-        return false;
-    }
-
-    var showSiteUpdateAfter = localStorage.getItem('showSiteUpdateAfter');
-
-    // If they've already seen the update page in the past
-    if (showSiteUpdateAfter !== null) {
-
-        // Convert from JSON string
-        var showSiteUpdateAfterObj = JSON.parse(showSiteUpdateAfter);
-
-        // If it is not yet time to show the update page again, don't show it
-        if (showSiteUpdateAfterObj.showAgainDateTime >= Date.now()) {
-            return false;
-        }
-    }
-
-    return true;
-};
-
-// If IE 11 and they are due to see the Site Update page again, set flag to redirect to update page.
-// This won't be shown for the legacy mobile page so that the apps keep working.
-if (!showLegacyMobilePage && (localStorage.testie11 || is_internet_explorer_11) && showUpdatePage()) {
-    browserUpdate = true;
 }
 
 // If they need to update their browser, store the current page before going to the update page
@@ -797,9 +954,6 @@ var languages = {
     'ro': [['ro', 'ro-'], 'Romanian', 'Română'],
     'ru': [['ru', 'ru-mo'], 'Russian', 'Pусский'],
     'th': [['||'], 'Thai', 'ไทย'],
-    'tr': [['tr', 'tr-'], 'Turkish', 'Türkçe'],
-    'tl': [['en-ph'], 'Tagalog', 'Tagalog'],
-    'uk': [['||'], 'Ukrainian', 'Українська'],
     'vi': [['vn', 'vi'], 'Vietnamese', 'Tiếng Việt']
 };
 
@@ -818,6 +972,22 @@ var asmCryptoSha256Js = '!function(exports,global){function IllegalStateError(){
 function addScript(data) {
     "use strict";
     return mCreateElement('script', {type: 'text/javascript'}, 'head', data);
+}
+
+function scriptTest(data, callback) {
+    'use strict';
+    var feat = addScript([data]);
+    var load = feat.onload;
+    feat.onload = function() {
+        if (load) {
+            setTimeout(load);
+        }
+        callback(false);
+        this.onload = this.onerror = null;
+        this.parentNode.removeChild(this);
+        URL.revokeObjectURL(this.src);
+    };
+    feat.onerror = callback;
 }
 
 function mCreateElement(aNode, aAttrs, aChildNodes, aTarget, aData) {
@@ -1141,6 +1311,7 @@ function mObjectURL(data, type)
                     if (msg !== 'pong') {
                         this.setMaster();
                     } else {
+                        this.notify('ack-pong');
                         delete localStorage[ev.key];
                     }
                     this.listen();
@@ -1173,9 +1344,7 @@ function mObjectURL(data, type)
             // as earlier as possible, e.g. now.
             localStorage.ctInstances = (parseInt(localStorage.ctInstances) || 0) + 1;
 
-            setTimeout(function() {
-                setup();
-            }, parseInt(localStorage.ctInstances) === 1 ? 0 : 2000);
+            setTimeout(setup, parseInt(localStorage.ctInstances) === 1 ? 0 : 2100 + Math.floor(Math.random() * 900));
         },
 
         listen: function crossTab_listen(aListener) {
@@ -1233,17 +1402,38 @@ function mObjectURL(data, type)
             }
         },
 
-        notify: function crossTab_notify(msg, data) {
-            data = { origin: this.ctID, data: data, sid: Math.random()};
+        drain: function() {
+            'use strict';
+            if (typeof delay === 'function') {
+                var tag = this.eTag;
+                delay('crosstab:drain', function() {
+                    var entries = Object.keys(localStorage)
+                        .filter(function(k) {
+                            return k.startsWith(tag);
+                        });
+                    console.debug('Removing crossTab entries...', entries);
+
+                    for (var i = entries.length; i--;) {
+                        delete localStorage[entries[i]];
+                    }
+                }, 8e3);
+            }
+        },
+
+        notify: tryCatch(function crossTab_notify(msg, data) {
+            'use strict';
+            this.drain();
+            data = { origin: this.ctID, data: data, sid: ++mIncID };
             localStorage.setItem(this.eTag + msg, JSON.stringify(data));
             if (d) console.log('crossTab Notifying', this.eTag + msg, localStorage[this.eTag + msg]);
-        },
+        }),
 
         setMaster: function crossTab_setMaster() {
             this.master = (Math.random() * Date.now()).toString(36);
 
             localStorage.ctInstances = (this.slaves.length + 1);
             mBroadcaster.sendMessage('crossTab:master', this.master);
+            this.notify('pong');
 
             // (function liveLoop(tag) {
             // if (tag === mBroadcaster.crossTab.master) {
@@ -1277,6 +1467,11 @@ function mObjectURL(data, type)
             }
 
             switch (msg) {
+                case 'ack-pong':
+                    if (!this.master || this.slaves.indexOf(strg.origin) >= 0) {
+                        break;
+                    }
+                    /* fallthrough */
                 case 'ping':
                     this.slaves.push(strg.origin);
                     if (this.master) {
@@ -1643,6 +1838,11 @@ if (is_ios) {
     }
 }
 
+// Determine whether to show the legacy mobile page for these links so that they redirect back to the app
+var showLegacyMobilePage = (m && (page.substr(0, 6) === 'verify' || page.substr(0, 6) === 'fm/ipc' ||
+    page.substr(0, 9) === 'newsignup' || page.substr(0, 7) === 'account' ||
+    (is_old_windows_phone && page.substr(0, 7) === 'confirm')));
+
 /**
  * Some legacy secureboot mobile code that has been refactored to keep just the blog working and also redirect to the
  * app if any cancel, verify, fm/ipc, newsignup, recover or account links are clicked in the app
@@ -1805,6 +2005,7 @@ else if (!browserUpdate) {
                 return String(s)
                     .replace(/resource:.+->\s/,'')
                     .replace(/blob:[^:\s]+/, '..')
+                    .replace(/([^'])\w+:\/\/[^\s:]+/, '$1..')
                     .replace(/\.\.:\/\/[^:\s]+/, '..')
                     .replace('chrome://mega/content','..')
                     .replace(/file:.+extensions/,'..fx')
@@ -1812,6 +2013,16 @@ else if (!browserUpdate) {
                     .trim();
             }
             if (__cdumps.length > 3) return false;
+
+            if (url && ln < 2) {
+                console.debug([errobj || msg]);
+                return;
+            }
+
+            var expectedSourceOrigin = url || ln > 10;
+            if (url === '@srvlog') {
+                url = '';
+            }
 
             var dump = {
                 l: ln,
@@ -1862,17 +2073,24 @@ else if (!browserUpdate) {
                     dump.m = [].concat(lns.slice(0,2), "[..!]", lns.slice(-2)).join(" ");
                 }
             }
-            dump.m = (is_mobile ? '[mobile] ' : is_embed ? '[embed] ' : is_drop ? '[drop] ' : '') + dump.m.replace(/\s+/g, ' ');
+            dump.m = (
+                is_mobile ? '[mobile] ' :
+                    is_embed ? '[embed] ' :
+                        is_drop ? '[drop] ' :
+                            is_litesite ? '[lite] ' : ''
+            ) + dump.m.replace(/\s+/g, ' ');
 
             if (!window.jsl_done && !window.u_checked) {
                 // Alert the user if there was an uncaught exception while
                 // loading the site, this should only happen on some fancy
                 // browsers other than what we use during development, and
                 // hopefully they'll report it back to us for troubleshoot
-                if (url || ln > 10) {
-                    siteLoadError(dump.m, url + ':' + ln);
+                if (expectedSourceOrigin) {
+                    return siteLoadError(dump.m, url + ':' + ln);
                 }
-                else {
+            }
+
+            if (!expectedSourceOrigin) {
                     console.error(dump.m, arguments);
 
                     onIdle(function() {
@@ -1884,7 +2102,6 @@ else if (!browserUpdate) {
                             )
                         );
                     });
-                }
                 return;
             }
 
@@ -1969,7 +2186,7 @@ else if (!browserUpdate) {
             try
             {
                 var crashes = JSON.parse(localStorage.crashes || '{}');
-                var checksum = MurmurHash3(JSON.stringify(dump), 0x4ef5391a);
+                var checksum = wchecksum(JSON.stringify(dump), 0x4ef5391a);
 
                 if (crashes.v != sbid) crashes = { v : sbid };
 
@@ -2070,7 +2287,7 @@ else if (!browserUpdate) {
         var userLangs, userLang, ourLangs, k, v, j, i, u;
 
         // If a search bot, they may set the URL as e.g. mega.nz/pro?es so get the language from that
-        if (is_bot && locationSearchParams !== '') {
+        if ((is_bot || sessionStorage.botSim ) && locationSearchParams !== '') {
             userLangs = locationSearchParams.replace('?', '');
         }
         else {
@@ -2174,12 +2391,13 @@ else if (!browserUpdate) {
 
     // Get the language file path e.g. lang/en.json or 'lang/en_7a8e15911490...f1878e1eb3.json'
     var langFilepath = getLanguageFilePath(lang);
-
     jsl.push({f:langFilepath, n: 'lang', j:3});
     jsl.push({f:'sjcl.js', n: 'sjcl_js', j:1});
     jsl.push({f:'nodedec.js', n: 'nodedec_js', j:1});
     jsl.push({f:'js/vendor/jquery.js', n: 'jquery', j:1, w:10});
+    jsl.push({f:'js/jquery.protect.js', n: 'jqueryprotect_js', j: 1});
     jsl.push({f:'js/vendor/jquery-ui.js', n: 'jqueryui_js', j:1, w:10});
+    jsl.push({f:'js/vendor/jquery-ui-touch.js', n: 'jqueryui_touch_js', j:1, w:10});
     jsl.push({f:'js/vendor/jquery.mousewheel.js', n: 'jquerymouse_js', j:1});
     jsl.push({f:'js/vendor/jquery.jscrollpane.js', n: 'jscrollpane_js', j:1});
     jsl.push({f:'js/jscrollpane.utils.js', n: 'jscrollpane_utils_js', j: 1});
@@ -2205,7 +2423,9 @@ else if (!browserUpdate) {
     jsl.push({f:'js/utils/watchdog.js', n: 'js_utils_watchdog_js', j: 1});
     jsl.push({f:'js/utils/workers.js', n: 'js_utils_workers_js', j: 1});
     jsl.push({f:'js/utils/trans.js', n: 'js_utils_trans_js', j: 1});
+    jsl.push({f:'js/utils/track.js', n: 'js_utils_track_js', j: 1});
 
+    jsl.push({f:'js/vendor/dexie.js', n: 'dexie_js', j:1,w:5});
     jsl.push({f:'js/functions.js', n: 'functions_js', j:1});
     jsl.push({f:'js/crypto.js', n: 'crypto_js', j:1,w:5});
     jsl.push({f:'js/account.js', n: 'user_js', j:1});
@@ -2225,7 +2445,6 @@ else if (!browserUpdate) {
     jsl.push({f:'js/vendor/jsbn.js', n: 'jsbn_js', j:1, w:2});
     jsl.push({f:'js/vendor/jsbn2.js', n: 'jsbn2_js', j:1, w:2});
     jsl.push({f:'js/vendor/nacl-fast.js', n: 'nacl_js', j:1,w:7});
-    jsl.push({f:'js/vendor/dexie.js', n: 'dexie_js', j:5,w:5});
 
     jsl.push({f:'js/authring.js', n: 'authring_js', j:1});
     jsl.push({f:'html/js/login.js', n: 'login_js', j:1});
@@ -2244,19 +2463,19 @@ else if (!browserUpdate) {
     jsl.push({f:'css/business.css', n: 'business_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/pro.css', n: 'pro_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/startpage.css', n: 'startpage_css', j:2,w:5,c:1,d:1,cache:1});
-    jsl.push({f:'css/top-menu.css', n: 'top_menu_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
     jsl.push({f:'css/icons.css', n: 'icons_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
     jsl.push({f:'css/spinners.css', n: 'spinners_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
     jsl.push({f:'css/business-register.css', n: 'business-register_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/psa.css', n: 'psa_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
+    jsl.push({f:'css/about.css', n: 'about_css', j:2,w:5,c:1,d:1,cache:1});
+    jsl.push({f:'css/corporate.css', n: 'corporate_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'html/start.html', n: 'start', j:0});
     jsl.push({f:'html/js/start.js', n: 'start_js', j:1});
     jsl.push({f:'html/js/bottompage.js', n: 'bottompage_js', j:1});
     jsl.push({f:'html/pagesmenu.html', n: 'pagesmenu', j:0});
     jsl.push({f:'html/bottom2.html', n: 'bottom2',j:0});
-    jsl.push({f:'html/business.html', n: 'business',j:0});
-    jsl.push({f:'html/js/business.js', n: 'business_pp_js', j:1});
     jsl.push({f:'html/megainfo.html', n: 'megainfo', j:0});
+    jsl.push({f:'js/filedrag.js', n: 'filedrag_js', j:1});
     jsl.push({f:'js/thumbnail.js', n: 'thumbnail_js', j:1});
     jsl.push({f:'js/vendor/exif.js', n: 'exif_js', j:1, w:3});
     jsl.push({f:'js/vendor/smartcrop.js', n: 'smartcrop_js', j:1, w:7});
@@ -2272,10 +2491,12 @@ else if (!browserUpdate) {
     jsl.push({f:'html/repay.html', n: 'repay', j:0 });
     jsl.push({f:'html/js/repay.js', n: 'repay_js', j:1 });
     jsl.push({f:'js/ui/passwordReminderDialog.js', n: 'prd_js', j:1,w:1});
+    jsl.push({f:'html/dialogs-common.html', n: 'dialogs-common', j:0,w:2});
+    jsl.push({f:'css/dialogs-common.css', n: 'dialogs-common_css', j:2,w:5,c:1,d:1,cache:1});
+    jsl.push({f:'js/metatags.js', n: 'metatags_js', j:1 });
 
     if (!is_mobile) {
         jsl.push({f:'js/ui/nicknames.js', n: 'nicknames_js', j:1});
-        jsl.push({f:'js/filedrag.js', n: 'filedrag_js', j:1});
         jsl.push({f:'js/vendor/verge.js', n: 'verge', j:1, w:5});
         jsl.push({f:'js/jquery.tokeninput.js', n: 'jquerytokeninput_js', j:1});
         jsl.push({f:'js/jquery.checkboxes.js', n: 'checkboxes_js', j:1});
@@ -2308,6 +2529,13 @@ else if (!browserUpdate) {
         jsl.push({f:'html/megadrop.html', n: 'megadrop', j:0});
         jsl.push({f:'html/nomegadrop.html', n: 'nomegadrop', j:0});
         jsl.push({f:'js/fm/transfer-progress-widget.js', n: 'tpw_js', j:1});
+        jsl.push({f:'js/fm/fileTextEditor.js', n: 'filetexteditor_js', j:1});
+        jsl.push({f:'js/fm/textEditorUI.js', n: 'texteditorui_js', j:1});
+        jsl.push({f:'css/codemirror.css', n: 'codemirror_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/txteditor.css', n: 'txteditor_css', j:2,w:5,c:1,d:1,cache:1});
+
+        // Bottom pages for desktop
+        jsl.push({f:'css/bottom-pages-animations.css', n: 'bottom-pages-animations_css', j:2,w:5,c:1,d:1,cache:1});
     } // !is_mobile
 
     if (is_chrome_firefox && parseInt(Services.appinfo.version) > 27) {
@@ -2332,16 +2560,10 @@ else if (!browserUpdate) {
     jsl.push({f:'js/transfers/reader.js', n: 'upload_reader_js', j: 1, w: 2});
     jsl.push({f:'js/transfers/zip64.js', n: 'zip_js', j: 1});
     jsl.push({f:'js/transfers/cloudraid.js', n: 'cloudraid_js', j: 1});
+    jsl.push({f:'js/vendor/int64.js', n: 'int64_js', j:1});
 
     // Everything else...
     jsl.push({f:'index.js', n: 'index', j:1,w:4});
-
-    if (is_mobile) {
-        jsl.push({f:'html/top-mobile.html', n: 'top-mobile', j:0});
-    }
-    else {
-        jsl.push({f:'html/top.html', n: 'top', j:0});
-    }
 
     jsl.push({f:'html/transferwidget.html', n: 'transferwidget', j:0});
     jsl.push({f:'js/filetypes.js', n: 'filetypes_js', j:1});
@@ -2368,7 +2590,10 @@ else if (!browserUpdate) {
     jsl.push({f:'js/notifyConfig.js', n: 'notify_config_js', j:1});
     jsl.push({f:'js/emailNotify.js', n: 'email_notify_js', j:1});
 
+    jsl.push({f:'js/megadrop.js', n: 'megadrop_js', j:1});
+
     if (!is_mobile) {
+        jsl.push({f:'html/top.html', n: 'top', j:0});
         jsl.push({f:'css/style.css', n: 'style_css', j:2, w:30, c:1, d:1, cache:1});
         jsl.push({f:'js/vendor/megalist.js', n: 'megalist_js', j:1, w:5});
         jsl.push({f:'js/vendor/megaDynamicList.js', n: 'mega_dynamic_list_js', j:1, w:5});
@@ -2385,8 +2610,7 @@ else if (!browserUpdate) {
         jsl.push({f:'js/ui/imagesViewer.js', n: 'imagesViewer_js', j:1});
         jsl.push({f:'js/notify.js', n: 'notify_js', j:1});
         jsl.push({f:'js/vendor/avatar.js', n: 'avatar_js', j:1, w:3});
-        jsl.push({f:'js/vendor/int64.js', n: 'int64_js', j:1});
-        jsl.push({f:'js/megadrop.js', n: 'megadrop_js', j:1});
+        jsl.push({f:'js/fm/affiliate.js', n: 'fm_affiliate_js', j: 1});
 
         jsl.push({f:'js/ui/onboarding.js', n: 'onboarding_js', j:1,w:1});
         jsl.push({f:'js/ui/sms.js', n: 'sms_js', j: 1, w: 1});
@@ -2399,8 +2623,10 @@ else if (!browserUpdate) {
         jsl.push({f:'css/account.css', n: 'account_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/buttons.css', n: 'buttons_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/dropdowns.css', n: 'dropdowns_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/jq-ui-custom.css', n: 'jq_ui_custom_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/labels-and-filters.css', n: 'labels-and-filters_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/dialogs.css', n: 'dialogs_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/share-dialog.css', n: 'share_dialog_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/media-viewer.css', n: 'media_viewer_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/popups.css', n: 'popups_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/data-blocks-view.css', n: 'data_blocks_view_css', j:2,w:5,c:1,d:1,cache:1});
@@ -2410,6 +2636,8 @@ else if (!browserUpdate) {
         jsl.push({f:'css/settings.css', n: 'settings_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/media-print.css', n: 'media_print_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/animations.css', n: 'animations_css', j:2, w:30, c:1, d:1, cache:1});
+        jsl.push({f:'css/affiliate-program.css', n: 'animations_css', j:2, w:30, c:1, d:1, cache:1});
+        jsl.push({f:'css/top-menu.css', n: 'top_menu_css', j:2, w:30, c:1, d:1, cache:1});
 
         jsl.push({f:'html/key.html', n: 'key', j:0});
         jsl.push({f:'html/login.html', n: 'login', j:0});
@@ -2438,6 +2666,8 @@ else if (!browserUpdate) {
     jsl.push({f:'js/fm/megadata/tree.js', n: 'fm_megadata_tree_js', j: 1});
     jsl.push({f:'html/js/megasync.js', n: 'megasync_js', j: 1});
     jsl.push({f:'js/fm/linkinfohelper.js', n: 'fm_linkinfohelper_js', j: 1});
+    jsl.push({f:'js/fm/affiliatedata.js', n: 'fm_affiliatedata_js', j: 1});
+    jsl.push({f:'js/fm/affiliateRedemption.js', n: 'fm_affiliateredemption_js', j: 1});
 
     if (localStorage.makeCache) {
         jsl.push({f:'makecache.js', n: 'makecache', j:1});
@@ -2457,9 +2687,14 @@ else if (!browserUpdate) {
 
     // Load files common to all mobile pages
     if (is_mobile) {
+        jsl.push({f:'html/top-mobile.html', n: 'top-mobile', j:0});
         jsl.push({f:'css/mobile.css', n: 'mobile_css', j: 2, w: 30, c: 1, d: 1, m: 1});
         jsl.push({f:'css/mobile-help.css', n: 'mobile_css', j: 2, w: 30, c: 1, d: 1, m: 1});
+        jsl.push({f:'css/mobile-top-menu.css', n: 'mobile_top_menu_css',  j: 2, w: 30, c: 1, d: 1, m: 1});
+        jsl.push({f:'css/mobile-megadrop.css', n: 'mobile_megadrop_css', j:2, w:30, c:1, d:1, cache:1});
         jsl.push({f:'html/mobile.html', n: 'mobile', j: 0, w: 1});
+        jsl.push({f:'html/mobile-megadrop.html', n: 'mobile-megadrop', j: 0, w: 1});
+        jsl.push({f:'html/mobile-nomegadrop.html', n: 'mobile-nomegadrop', j: 0, w: 1});
         jsl.push({f:'js/vendor/jquery.mobile.js', n: 'jquery_mobile_js', j: 1, w: 5});
         jsl.push({f:'js/mobile/mobile.js', n: 'mobile_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.account.js', n: 'mobile_account_js', j: 1, w: 1});
@@ -2471,6 +2706,7 @@ else if (!browserUpdate) {
         jsl.push({f:'js/mobile/mobile.achieve.how-it-works.js', n: 'mobile_achieve_how_it_works_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.achieve.invites.js', n: 'mobile_achieve_invites_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.achieve.referrals.js', n: 'mobile_achieve_referrals_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.affiliate.js', n: 'mobile_affiliate_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.backup.js', n: 'mobile_backup_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.cloud.js', n: 'mobile_cloud_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.cloud.action-bar.js', n: 'mobile_cloud_action_bar_js', j: 1, w: 1});
@@ -2498,7 +2734,6 @@ else if (!browserUpdate) {
         jsl.push({f:'js/mobile/mobile.support.js', n: 'mobile_support_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.terms.js', n: 'mobile_terms_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.upload-overlay.js', n: 'mobile_upload_overlay_js', j: 1, w: 1});
-        jsl.push({f:'js/mobile/mobile.megadrop.js', n: 'mobile_megadrop_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.contact-link.js', n: 'mobile_contactlink_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.twofactor.js', n: 'mobile_twofactor_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.twofactor.intro.js', n: 'mobile_twofactor_info_js', j: 1, w: 1});
@@ -2524,8 +2759,8 @@ else if (!browserUpdate) {
     }
 
     jsl.push({f:'css/toast.css', n: 'toast_css', j:2,w:5,c:1,d:1,cache:1});
-    jsl.push({f:'css/retina-images.css', n: 'retina_images_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
     jsl.push({f:'css/general.css', n: 'general_css', j:2, w:5, c:1, d:1, cache: 1});
+    jsl.push({f:'css/retina-images.css', n: 'retina_images_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
 
     // We need to keep a consistent order in loaded resources, so that if users
     // send us logs we won't get different line numbers on stack-traces from
@@ -2554,6 +2789,7 @@ else if (!browserUpdate) {
         jsl.push({f:'js/utils/timers.js', n: 'js_utils_timers_js', j: 1});
         jsl.push({f:'js/utils/watchdog.js', n: 'js_utils_watchdog_js', j: 1});
         jsl.push({f:'js/utils/workers.js', n: 'js_utils_workers_js', j: 1});
+        jsl.push({f:'js/utils/track.js', n: 'js_utils_track_js', j: 1});
 
         jsl.push({f:'js/crypto.js', n: 'crypto_js', j: 1, w: 5});
         jsl.push({f:'js/account.js', n: 'user_js', j: 1});
@@ -2566,6 +2802,87 @@ else if (!browserUpdate) {
         jsl.push({f:'css/embedplayer.css', n: 'embedplayer_css', j: 2, w: 5});
     }
 
+    if (is_litesite) {
+        jsl = [{f: langFilepath, n: 'lang', j: 3}];
+        jsl.push({f:'js/vendor/jquery.js', n: 'jquery', j:1, w:10});
+        jsl.push({f:'js/jquery.protect.js', n: 'jqueryprotect_js', j: 1});
+        jsl.push({f:'js/vendor/jquery-ui.js', n: 'jqueryui_js', j:1, w:10});
+        jsl.push({f:'js/vendor/jquery.mousewheel.js', n: 'jquerymouse_js', j:1});
+        jsl.push({f:'js/vendor/jquery.jscrollpane.js', n: 'jscrollpane_js', j:1});
+        jsl.push({f:'js/jscrollpane.utils.js', n: 'jscrollpane_utils_js', j: 1});
+        jsl.push({f:'js/jquery.misc.js', n: 'jquerymisc_js', j:1});
+        jsl.push({f:'js/utils/browser.js', n: 'js_utils_browser_js', j: 1});
+        jsl.push({f:'js/utils/locale.js', n: 'js_utils_locale_js', j: 1});
+        jsl.push({f:'js/utils/dom.js', n: 'js_utils_dom_js', j: 1});
+        jsl.push({f:'js/utils/network.js', n: 'js_utils_network_js', j: 1});
+        jsl.push({f:'js/utils/timers.js', n: 'js_utils_timers_js', j: 1});
+        jsl.push({f:'js/megaPromise.js', n: 'megapromise_js', j:1,w:5});
+        jsl.push({f:'index.js', n: 'index', j:1,w:4});
+        jsl.push({f:'js/staticPages.js', n: 'staticPages_js', j:1});
+        jsl.push({f:'js/metatags.js', n: 'metatags_js', j:1 });
+        jsl.push({f:'html/js/start.js', n: 'start_js', j:1});
+        jsl.push({f:'html/js/bottompage.js', n: 'bottompage_js', j:1});
+        jsl.push({f:'css/bottom-pages.css', n: 'bottom-pages_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/startpage.css', n: 'startpage_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'html/start.html', n: 'start', j:0});
+        jsl.push({f:'css/bottom-menu.css', n: 'bottom-menu_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'html/bottom2.html', n: 'bottom2',j:0});
+        jsl.push({f:'html/megainfo.html', n: 'megainfo', j:0});
+        jsl.push({f:'html/pagesmenu.html', n: 'pagesmenu', j:0});
+        jsl.push({f:'css/fonts.css', n: 'fonts_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'html/js/megasync.js', n: 'megasync_js', j: 1});
+        jsl.push({f:'css/business.css', n: 'business_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/retina-images.css', n: 'retina_images_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
+        jsl.push({f:'js/cms.js', n: 'cms_js', j:1});
+        jsl.push({f:'html/proplan.html', n: 'proplan', j:0});
+        jsl.push({f:'html/propay.html', n: 'propay', j:0});
+        jsl.push({f:'html/js/pro.js', n: 'pro_js', j:1});
+        jsl.push({f:'html/js/proplan.js', n: 'proplan_js', j:1});
+        jsl.push({f:'html/js/propay.js', n: 'propay_js', j:1});
+        jsl.push({f:'html/js/propay-dialogs.js', n: 'propay_js', j:1});
+        jsl.push({f:'css/pro.css', n: 'pro_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/about.css', n: 'about_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/media-viewer.css', n: 'media_viewer_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/corporate.css', n: 'corporate_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'html/staticdialog.html', n: 'staticdialog', j:0});
+        jsl.push({f:'js/ui/languageDialog.js', n: 'languagedialog_js', j:1});
+        jsl.push({f:'css/dialogs-common.css', n: 'dialogs-common_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'js/utils/clipboard.js', n: 'js_utils_clipboard_js', j: 1});
+        jsl.push({f:'js/ui/simpletip.js', n: 'simpletip_js', j:1,w:1});
+        if (lang === 'ar' || lang === 'fa') {
+            jsl.push({f:'css/lang_ar.css', n: 'lang_arabic_css', j: 2, w: 30, c: 1, d: 1, m: 1 });
+        }
+        if (lang === 'th') {
+            jsl.push({f:'css/lang_th.css', n: 'lang_thai_css', j: 2, w: 30, c: 1, d: 1, m: 1 });
+        }
+        if (is_mobile) {
+            jsl.push({f:'html/top-mobile.html', n: 'top-mobile', j:0});
+            jsl.push({f:'css/mobile.css', n: 'mobile_css', j: 2, w: 30, c: 1, d: 1, m: 1});
+            jsl.push({f:'css/mobile-help.css', n: 'mobile_css', j: 2, w: 30, c: 1, d: 1, m: 1});
+            jsl.push({f:'css/mobile-top-menu.css', n: 'mobile_top_menu_css',  j: 2, w: 30, c: 1, d: 1, m: 1});
+            jsl.push({f:'html/mobile.html', n: 'mobile', j: 0, w: 1});
+            jsl.push({f:'js/vendor/jquery.mobile.js', n: 'jquery_mobile_js', j: 1, w: 5});
+            jsl.push({f:'js/mobile/mobile.js', n: 'mobile_js', j: 1, w: 1});
+            jsl.push({f:'js/mobile/mobile.language-menu.js', n: 'mobile_language_menu_js', j: 1, w: 1});
+            jsl.push({f:'js/mobile/mobile.titlemenu.js', n: 'mobile_titlemenu_js', j: 1, w: 1});
+            jsl.push({f:'js/mobile/mobile.message-overlay.js', n: 'mobile_message_overlay_js', j: 1, w: 1});
+            jsl.push({f:'css/psa.css', n: 'psa_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
+            jsl.push({f:'js/mobile/mobile.terms.js', n: 'mobile_terms_js', j: 1, w: 1});
+        }
+        else {
+            jsl.push({f:'css/style.css', n: 'style_css', j:2, w:30, c:1, d:1, cache:1});
+            jsl.push({f:'css/dialogs.css', n: 'dialogs_css', j:2,w:5,c:1,d:1,cache:1});
+            jsl.push({f:'html/top.html', n: 'top', j:0});
+            jsl.push({f:'css/top-menu.css', n: 'top_menu_css', j:2, w:30, c:1, d:1, cache:1});
+            jsl.push({f:'css/buttons.css', n: 'buttons_css', j:2,w:5,c:1,d:1,cache:1});
+            jsl.push({f:'css/help2.css', n: 'help_css', j:2,w:5,c:1,d:1,cache:1});
+            jsl.push({f:'css/dropdowns.css', n: 'dropdowns_css', j:2,w:5,c:1,d:1,cache:1});
+            jsl.push({f:'css/popups.css', n: 'popups_css', j:2,w:5,c:1,d:1,cache:1});
+        }
+        // end of staticPages
+
+    }
+
     if (is_drop) {
         u_checked = true;
         jsl = [{f: langFilepath, n: 'lang', j: 3}];
@@ -2573,7 +2890,6 @@ else if (!browserUpdate) {
         jsl.push({f:'css/embeddrop.css', n: 'embeddrop_css', j: 2, w: 5});
     }
     else {
-        jsl.push({f:'js/jquery.protect.js', n: 'jqueryprotect_js', j: 1});
         jsl.push({f:'js/vendor/asmcrypto.js', n: 'asmcrypto_js', j: 1, w: 5});
 
         if (typeof Number.isNaN !== 'function' || typeof Set === 'undefined' || !Object.assign) {
@@ -2595,7 +2911,13 @@ else if (!browserUpdate) {
     {
         'dcrawjs': {f:'js/vendor/dcraw.js', n: 'dcraw_js', j: 1},
         'about': {f:'html/about.html', n: 'about', j:0},
+        'about_js': {f:'html/js/about.js', n: 'about_js', j:1},
+        'corporate': {f:'html/corporate.html', n: 'corporate', j:0},
+        'corporate_js': {f:'html/js/corporate.js', n: 'corporate_js', j:1},
+        'datepicker_js': {f:'js/vendor/datepicker.js', n: 'datepicker_js', j:1},
         'sourcecode': {f:'html/sourcecode.html', n: 'sourcecode', j:0},
+        'affiliate': {f:'html/affiliate.html', n: 'affiliate', j:0},
+        'affiliate_js': {f:'html/js/affiliate.js', n: 'affiliate_js', j:1},
         'blog': {f:'html/blog.html', n: 'blog', j:0},
         'blog_js': {f:'html/js/blog.js', n: 'blog_js', j:1},
         'blogarticle': {f:'html/blogarticle.html', n: 'blogarticle', j:0},
@@ -2613,7 +2935,6 @@ else if (!browserUpdate) {
         'privacy': {f:'html/privacy.html', n: 'privacy', j:0},
         'gdpr': {f:'html/gdpr.html', n: 'gdpr', j:0},
         'gdpr_js': {f:'html/js/gdpr.js', n: 'gdpr_js', j:1},
-        'mega': {f:'html/mega.html', n: 'mega', j:0},
         'terms': {f:'html/terms.html', n: 'terms', j:0},
         'backup': {f:'html/backup.html', n: 'backup', j:0},
         'backup_js': {f:'html/js/backup.js', n: 'backup_js', j:1},
@@ -2627,6 +2948,7 @@ else if (!browserUpdate) {
         'recovery': {f:'html/recovery.html', n: 'recovery', j:0},
         'recovery_js': {f:'html/js/recovery.js', n: 'recovery_js', j:1},
         'credits': {f:'html/credits.html', n: 'credits', j:0},
+        'creditscss': {f:'css/credits.css', n: 'creditscss', j:2},
         'takedown': {f:'html/takedown.html', n: 'takedown', j:0},
         'dev': {f:'html/dev.html', n: 'dev', j:0},
         'dev_js': {f:'html/js/dev.js', n: 'dev_js', j:1},
@@ -2638,6 +2960,7 @@ else if (!browserUpdate) {
         'cmd': {f:'html/megacmd.html', n: 'cmd', j:0},
         'mobileapp': {f:'html/mobileapp.html', n: 'mobileapp', j:0},
         'megacmd_js': {f:'html/js/megacmd.js', n: 'megacmd_js', j:1},
+        'nas': {f:'html/nas.html', n: 'nas', j:0},
         'cms_snapshot_js': {f:'js/cmsSnapshot.js', n: 'cms_snapshot_js', j:1},
         'support_js': {f:'html/js/support.js', n: 'support_js', j:1},
         'support': {f:'html/support.html', n: 'support', j:0},
@@ -2655,23 +2978,30 @@ else if (!browserUpdate) {
         'redeem_js': {f:'html/js/redeem.js', n: 'redeem_js', j:1},
         'browsers': {f:'html/browsers.html', n: 'browsers', j:0},
         'browsers_js': {f:'html/js/browsers.js', n: 'browsers_js', j:1},
+        'nzipp': {f:'html/nzipp.html', n: 'nzipp', j:0},
+        'nzipp_js': {f:'html/js/nzipp.js', n: 'nzipp_js', j:1},
+        'nzipp_css': {f:'css/nzipp.css', n: 'nzipp_css', j:2},
         'megabird': {f:'html/megabird.html', n: 'megabird', j:0},
-        'uwp': {f:'html/uwp.html', n: 'uwp', j:0},
-        'pdfviewer': {f:'html/pdfViewer.html', n: 'pdfviewer', j:0 },
-        'pdfviewercss': {f:'css/pdfViewer.css', n: 'pdfviewercss', j:4 },
         'pdfjs2': {f:'js/vendor/pdf.js', n: 'pdfjs2', j:4 },
-        'pdforiginalviewerjs': {f:'js/vendor/pdf.viewer.js', n: 'pdforiginalviewerjs', j:4 },
+        'pdfviewer': {f:'html/pdf.viewer.html', n: 'pdfviewer', j:0 },
+        'pdfviewercss': {f:'css/pdf.viewer.css', n: 'pdfviewercss', j:4 },
+        'pdfviewerjs': {f:'js/vendor/pdf.viewer.js', n: 'pdfviewerjs', j:4 },
         'megadrop': {f:'html/megadrop.html', n: 'megadrop', j:0 },
         'nomegadrop': {f:'html/nomegadrop.html', n: 'nomegadrop', j:0 },
         'megadrop_js': {f:'js/megadrop.js', n: 'megadrop_js', j:1 },
         'businessAcc_js': {f:'js/fm/megadata/businessaccount.js', n: 'businessAcc_js', j:1 },
         'businessAccUI_js': {f:'js/fm/businessAccountUI.js', n: 'businessAccUI_js', j:1 },
+        'business': {f:'html/business.html', n: 'business',j:0},
+        'businessjs': {f:'html/js/business.js', n: 'business_pp_js', j:1},
         'charts_js': {f:'js/vendor/Chart.js', n: 'charts_js', j:1},
+        'charthelper_js': {f:'js/ui/chart.helper.js', n: 'charthelper_js', j:1},
         'business_invoice': {f:'html/invoicePDF.html', n: 'business_invoice', j:0},
         'securitypractice': {f:'html/security-practice.html', n: 'securitypractice', j:0},
         'securitypractice_js': {f:'html/js/security-practice.js', n: 'securitypractice_js', j:1},
         'downloadapp_js': {f:'html/js/desktop-onboarding.js', n: 'downloadapp_js', j:1},
-        'downloadapp': {f:'html/desktop-onboarding.html', n: 'downloadapp', j:0}
+        'downloadapp': {f:'html/desktop-onboarding.html', n: 'downloadapp', j:0},
+        'codemirror_js': {f:'js/vendor/codemirror.js', n: 'codemirror_js', j:1},
+        'codemirrorscroll_js': {f:'js/vendor/simplescrollbars.js', n: 'codemirrorscroll_js', j:1}
     };
 
     var jsl3 = {
@@ -2688,9 +3018,10 @@ else if (!browserUpdate) {
             'chat_emoji_css':{f:'css/chat-emoji.css', n: 'chat_emoji_css', j:2,'w':2,'c':1,'cache':1,'d':1},
 
             /* chat related js */
+            'search_js': {f:'js/chat/search.js', n: 'search_js', j:1},
+            'pushnotificationsettings_js': {f:'js/pushNotificationSettings.js', n: 'pushnotificationsettings_js', j:1},
             'react_js': {f:'js/vendor/react.js', n: 'react_js', j:1},
             'reactdom_js': {f:'js/vendor/react-dom.js', n: 'reactdom_js', j:1},
-            'appactivityhandler_js': {f:'js/appActivityHandler.js', n: 'appactivityhandler_js', j:1},
             'keepalive_js': {f:'js/keepAlive.js', n: 'keepalive_js', j:1},
             'meganotifications_js': {f:'js/megaNotifications.js', n: 'meganotifications_js', j:1},
             'twemoji_js': {f:'js/vendor/twemoji.noutf.js', n: 'twemoji_js', j:1},
@@ -2724,40 +3055,46 @@ else if (!browserUpdate) {
             'richpreviewsFilt_js': {f:'js/chat/plugins/richpreviewsFilter.js', n: 'richpreviewsFilt_js', j:1, w:1},
             'chatStats_js': {f:'js/chat/plugins/chatStats.js', n: 'chatStats_js', j:1, w:1},
             'crm_js': {f:'js/connectionRetryManager.js', n: 'crm_js', j:1},
+            'chat_reactions_js': {f:'js/chat/reactions.js', n: 'chat_reactions_js', j:1},
             'chat_messages_Js': {f:'js/chat/messages.js', n: 'chat_messages_Js', j:1},
             'presence2_js': {f:'js/chat/presence2.js', n: 'presence2_js', j:1},
+            // leave the bundle at the end.
             'chat_react_minified_js': {f:'js/chat/bundle.js', n: 'chat_react_minified_js', j:1}
         }
     };
 
     var subpages =
     {
-        'about': ['about'],
+        'about': ['about', 'about_js'],
+        'corporate': ['corporate', 'corporate_js'],
         'sourcecode': ['sourcecode'],
         'terms': ['terms'],
-        'credits': ['credits'],
-        'backup': ['backup','backup_js','filesaver'],
-        'recovery': ['recovery','recovery_js'],
-        'reset': ['reset','reset_js'],
+        'credits': ['credits', 'creditscss'],
+        'backup': ['backup', 'backup_js', 'filesaver'],
+        'recovery': ['recovery', 'recovery_js'],
+        'reset': ['reset', 'reset_js'],
         'verify': ['change_email', 'change_email_js'],
         'cancel': ['cancel', 'cancel_js'],
-        'blog': ['blog','blog_js','blogarticle','blogarticle_js'],
-        'register': ['register','register_js', 'zxcvbn_js'],
-        'newsignup': ['register','register_js', 'zxcvbn_js'],
+        'blog': ['blog', 'blog_js', 'blogarticle', 'blogarticle_js'],
+        'register': ['register', 'register_js', 'zxcvbn_js'],
+        'newsignup': ['register', 'register_js', 'zxcvbn_js'],
+        'emailverify': ['zxcvbn_js'],
         'resellers': ['resellers'],
-        '!': ['download','download_js'],
+        '!': ['download', 'download_js'],
+        'file': ['download', 'download_js'],
         'dispute': ['dispute'],
         'disputenotice': ['disputenotice', 'copyright_js'],
         'copyright': ['copyright'],
-        'copyrightnotice': ['copyrightnotice','copyright_js'],
-        'privacy': ['privacy','privacycompany'],
+        'copyrightnotice': ['copyrightnotice', 'copyright_js'],
+        'privacy': ['privacy', 'privacycompany'],
         'gdpr': ['gdpr', 'gdpr_js'],
-        'mega': ['mega'],
         'takedown': ['takedown'],
         'sync': ['sync', 'sync_js'],
         'cmd': ['cmd', 'megacmd_js'],
         'mobile': ['mobileapp'],
+        'nas': ['nas'],
         'ios': ['mobileapp'],
+        'refer': ['affiliate', 'affiliate_js'],
         'android': ['mobileapp'],
         'support': ['support_js', 'support'],
         'contact': ['contact'],
@@ -2773,11 +3110,15 @@ else if (!browserUpdate) {
         'plugin': ['browsers', 'browsers_js'],
         'extensions': ['browsers', 'browsers_js'],
         'bird': ['megabird'],
-        'wp': ['uwp'],
-        'uwp': ['uwp'],
+        'wp': ['mobileapp'],
+        'uwp': ['mobileapp'],
         'unsub': ['unsub', 'unsub_js'],
         'security': ['securitypractice', 'securitypractice_js', 'filesaver'],
-        'developersettings': ['developersettings', 'developersettings_js']
+        'developersettings': ['developersettings', 'developersettings_js'],
+        'megadrop': ['megadrop', 'nomegadrop'],
+        'nzippmember': ['nzipp', 'nzipp_js', 'nzipp_css'],
+        'nziphotographer': ['nzipp', 'nzipp_js', 'nzipp_css'],
+        'business': ['business', 'businessjs']
     };
 
     if (is_mobile) {
@@ -2801,6 +3142,7 @@ else if (!browserUpdate) {
         }
     }
     var lightweight=false;
+    var xhr_slots = d && jj ? 5 : localStorage.testSingleThreadLoad ? 1 : 2;
     var waitingToBeLoaded = 0,jsl_done,jj_done = !jj;
     var fx_startup_cache = is_chrome_firefox && nocontentcheck;
     if (!fx_startup_cache && !nocontentcheck)
@@ -2813,7 +3155,8 @@ else if (!browserUpdate) {
         var hash_url = mObjectURL(hashdata, "text/javascript");
         var hash_workers = [];
         var i =0;
-        while (i < 2)
+        // eslint-disable-next-line block-scoped-var
+        while (i < xhr_slots)
         {
             try
             {
@@ -2829,7 +3172,7 @@ else if (!browserUpdate) {
                     }
                     var file = Object(jsl[e.data.jsi]).f || 'unknown.js';
 
-                    if (!nocontentcheck && !compareHashes(e.data.hash, file)) {
+                    if (nocontentcheck === false && !compareHashes(e.data.hash, file)) {
                         siteLoadError(load_error_types.file_corrupt, bootstaticpath + file);
                         contenterror = 1;
                     }
@@ -2892,16 +3235,12 @@ else if (!browserUpdate) {
 
     function jsl_start()
     {
+        if (xhr_stack) {
+            console.error('jsl_start: invalid procedure, pending requests are running...');
+            return false;
+        }
         jslcomplete = 0;
-        if (d && jj) {
-            xhr_progress = [0, 0, 0, 0, 0];
-        }
-        else if (localStorage.testSingleThreadLoad) {
-            xhr_progress = [0];
-        }
-        else {
-            xhr_progress = [0, 0];
-        }
+        xhr_progress = Array(xhr_slots);
         xhr_stack = Array(xhr_progress.length);
         jsl_fm_current = 0;
         jsl_current = 0;
@@ -3010,7 +3349,7 @@ else if (!browserUpdate) {
     // unlimited (0 ms) and let the lower layers handle it (e.g. use the browser default timeout) which can let the
     // site load slowly over 5 minutes if they are on a really bad connection. For the EU static server (which we
     // assume never fails) we set the timeout to unlimited.
-    var xhr_timeout = (staticpath === defaultStaticPath || is_msie) ? 0 : 15000;
+    var xhr_timeout = (staticpath === defaultStaticPath) ? 0 : 15000;
 
     /**
      * Handles the XHR loading error. It tries reloading the file multiple times and switches the static path to the
@@ -3120,7 +3459,7 @@ else if (!browserUpdate) {
             }
             else
             {
-                if (!nocontentcheck) {
+                if (nocontentcheck === false) {
 
                     // Hash the file content and convert to hex
                     var hashHex = asmCryptoSha256.SHA256.hex(jsl[this.jsi].text);
@@ -3141,17 +3480,12 @@ else if (!browserUpdate) {
                 }
             }
         };
-        xhr_stack[xhri].onreadystatechange = function()
-        {
-            try
-            {
-                if (this.readyState == 1) this.timeout=0;
+        xhr_stack[xhri].onreadystatechange = tryCatch(function() {
+            if (this.readyState === 2) {
+                xhr_timeout = 0;
+                this.timeout = 0;
             }
-            catch(e)
-            {
-
-            }
-        };
+        }, false);
         xhr_stack[xhri].onerror = xhr_error;
         xhr_stack[xhri].ontimeout = xhr_error;
         if (jsl[jsi].text)
@@ -3166,16 +3500,9 @@ else if (!browserUpdate) {
             xhr_stack[xhri].xhri = xhri;
             if (localStorage.dd) url += '?t=' + Date.now();
             xhr_stack[xhri].open("GET", bootstaticpath + url, true);
-            xhr_stack[xhri].timeout = xhr_timeout;
 
-            // If a response is received (after 50ms or the 1st byte), set the timeout to 0 so that we wait as long as
-            // possible to receive the rest of the files. This means even slow connections (< GPRS) can load the site.
-            // excluding IE, since IE doesnt support setting "timeout" after "send"
-            if (!is_msie) {
-                xhr_stack[xhri].onprogress = function() {
-                    this.timeout = 0;
-                    xhr_timeout = 0;
-                };
+            if (xhr_timeout > 0) {
+                xhr_stack[xhri].timeout = xhr_timeout;
             }
 
             if (is_chrome_firefox || is_firefox_web_ext) {
@@ -3199,24 +3526,25 @@ else if (!browserUpdate) {
 
             pageLoadTime = now - pageLoadTime;
 
-            var ph = String(isPublicLink(page)).split('!')[1];
-            if (ph) {
-                localStorage.affid = ph;
-                localStorage.affts = now;
-            }
-
-            Object.defineProperty(mega, 'affid', {
-                get: function() {
-                    return parseInt(localStorage.affts) + 864e5 > Date.now() && localStorage.affid || 0;
-                }
-            });
-
-            mega.ipcc = (String(document.cookie).match(/geoip\s*=\s*([A-Z]{2})/) || [])[1];
+            tryCatch(function() {
+                mega.ipcc = (String(document.cookie).match(/geoip\s*=\s*([A-Z]{2})/) || [])[1];
+            })();
         });
 
-        if (!maintenance && !androidsplash && !is_karma) {
-            jsl_start();
-        }
+        scriptTest(
+            'es6s =' +
+            ' Number.isNaN(Date.UTC()) === true' + // C1 E12 F54 O3 S1
+            ' && /-/[Symbol.split]("0-0").join("") === "00"' + // C50 E79 F49 O37 S10
+            ' && (async()=>{})[Symbol.toStringTag] === "AsyncFunction"' + // C55 E15 F52 O42 S10.1
+            ' && (function *(a=1,){yield a})(2).next().value === 2', // C58 E14 F52 O45 S10
+            function(error) {
+                if (error || !window.es6s) {
+                    document.location = (is_extension ? '' : '/') + 'update.html';
+                    return;
+                }
+                jsl_start();
+                delete window.es6s;
+            });
     };
     function jsl_load(xhri)
     {
@@ -3268,7 +3596,10 @@ else if (!browserUpdate) {
         var jsar = [];
         var cssar = [];
         var nodedec = {};
-        //for(var i in localStorage) if (i.substr(0,6) == 'cache!') delete localStorage[i];
+        var j4re = /url\(["']?images\/([^"')]+)["']?\)/g;
+        var j4tr = "url('" + staticpath + "images/pdfV/$1')";
+
+        xhr_stack = false;
         for (var i in jsl)
         {
             if (!jj || !jsl[i].j || jsl[i].j > 2) {
@@ -3310,41 +3641,14 @@ else if (!browserUpdate) {
             }
             else if (jsl[i].j === 4) { // new type to distinguish files to be used on iframes
                 if (!window[jsl[i].n]) {
-                    var scriptText = jsl[i].text;
                     var blobLink;
                     if ((jsl[i].n || '').indexOf('css') > -1) {
-                        scriptText = scriptText.replace(/\.\.\//g, staticpath).replace(new RegExp("\\/en\\/", "g"), '/' + lang + '/');
-                        blobLink = mObjectURL([scriptText], 'text/css');
+                        blobLink = mObjectURL([jsl[i].text.replace(j4re, j4tr)], 'text/css');
                     }
                     else {
-                        if (jsl[i].n === 'pdforiginalviewerjs') {
-                            if (localStorage.d === '1' && localStorage.dd === '1' && localStorage.jj === '1') {
-                                blobLink = staticpath + 'dont-deploy/pdf.viewer.debug.js';
-                            }
-                            else {
-                                scriptText = modifyPdfViewerScript(scriptText);
-                                blobLink = mObjectURL([scriptText], 'text/javascript');
-                            }
-                        }
-                        else {
-                            blobLink = mObjectURL([scriptText], 'text/javascript');
-                        }
+                        blobLink = mObjectURL([jsl[i].text], 'text/javascript');
                     }
                     window[jsl[i].n] = blobLink;
-                }
-            }
-            else if (jsl[i].j === 5) {
-                // a type of resources that we want to modify before loading.
-                if (jsl[i].n.indexOf('dexie_js') > -1) {
-                    var replaceString =
-                        'return new Function("let F=async ()=>{},p=F();return [p,Object.getPrototypeOf(p),Promise.resolve(),F.constructor];")();';
-
-                    var replaceByString = 'throw new Error();';
-
-                    jsl[i].text = jsl[i].text.replace(replaceString, replaceByString);
-
-                    jsar.push(jsl[i].text + '\n\n');
-
                 }
             }
             else if (jsl[i].j === 0 && jsl[i].f.match(/\.json$/)) {
@@ -3435,13 +3739,23 @@ else if (!browserUpdate) {
             '    </div>'+
             '</div>';
 
-    if (is_iframed) {
+    if (is_iframed || window.top !== window) {
         try {
+            // if this does fail, we're under a mis-configured sandbox, and loading Worker()ers won't work.
+            tmp = 1 + (document.cookie | 0);
+
             document.body.textContent = '';
             document.body.style.background = is_drop ? '#fff' : '#000';
             jsl_progress = function() {};
         }
-        catch (ex) {}
+        catch (ex) {
+            if (ex.code === 18 || ex.name === 'SecurityError') {
+                window.onload = window.onerror = null;
+                tmp = String(ex.message || ex.name || ex);
+                document.body.textContent = tmp.substr(tmp.lastIndexOf(':') + 1);
+                throw ex;
+            }
+        }
     }
 
     var u_storage, loginresponse, u_sid, dl_res, voucher, gmf_res;
@@ -3468,8 +3782,9 @@ else if (!browserUpdate) {
                     }
                 }
 
-                callback(response);
-                boot_done();
+                if (!callback(response)) {
+                    boot_done();
+                }
             };
 
             xhr.open("POST", apipath + 'cs?id=0' + mega.urlParams() + (params || ''), true);
@@ -3521,6 +3836,9 @@ else if (!browserUpdate) {
                     if (parseInt(response) === -15 /* ESID */) {
                         loginresponse = -15;
                     }
+                    else if (parseInt(response) === -16 /* EBLOCKED */) {
+                        loginresponse = -16;
+                    }
                     else if (typeof response[0] === 'object') {
                         loginresponse = response;
                     }
@@ -3533,7 +3851,11 @@ else if (!browserUpdate) {
             }
 
             if (dl_res) {
-                var g = {a: 'g', p: page.split('!')[1], 'ad': showAd(), 'esid': u_sid || ''};
+                var g = {
+                    a: 'g',
+                    esid: u_sid || '',
+                    p: page.substr(0, 5) === 'file/' ? page.substr(5, 8) : page.split('!')[1]
+                };
 
                 xhr(false, g, function(response) {
                     dl_res = Array.isArray(response) && response[0];
@@ -3574,13 +3896,28 @@ else if (!browserUpdate) {
             return;
         }
 
+        if (page[0] === 'F' && page[1] === '!' || page.substr(0, 7) === 'folder/') {
+            var n = page.split(/\W+/);
+
+            if (n && !n[2] && n[1] && n[1].length === 8) {
+                xhr('&v=1&n=' + n[1], null, function(res) {
+                    res |= 0;
+
+                    if (res === -9 || res === -16) {
+                        window['preflight-folder-link-error:' + n[1]] = res;
+                    }
+                    return -1;
+                });
+            }
+        }
+
         if (!(parseInt(localStorage.voucherExpiry) > Date.now())) {
             delete localStorage.voucher;
         }
 
         loginresponse = true;
         voucher = localStorage.voucher !== undefined || page.substr(0, 7) === 'voucher';
-        dl_res = (page[0] === '!' || (page[0] === 'E' && page[1] === '!')) && page.length > 2;
+        dl_res = page[0] === '!' || page[0] === 'E' && page[1] === '!' || page.substr(0, 5) === 'file/';
 
         if (localStorage === u_storage) {
             ack();
@@ -3663,6 +4000,7 @@ else if (!browserUpdate) {
 
         if (d) console.log('boot_done', loginresponse === true, dl_res === true, !jsl_done, !jj_done);
 
+        // eslint-disable-next-line max-len
         if (loginresponse === true || dl_res === true || gmf_res === true || voucher === true || !jsl_done || !jj_done) {
             return;
         }
@@ -3681,6 +4019,10 @@ else if (!browserUpdate) {
         }
         else if (loginresponse === -15) {
             u_logout(true);
+            boot_auth(null, false);
+        }
+        else if (loginresponse === -16) {
+            api_setsid(u_sid);
             boot_auth(null, false);
         }
         else if (loginresponse)
@@ -3724,12 +4066,29 @@ function pushHistoryState(page, state) {
     'use strict';
 
     try {
-        if (typeof page !== 'object') {
-            page = {subpage: page};
+        var method = 'pushState';
+        if (page === true) {
+            method = 'replaceState';
+            page = state;
+            state = undefined;
         }
-        state = Object.assign(page, state);
+
+        if (typeof page !== 'object') {
+            page = page ? {subpage: page} : history.state || {subpage: getCleanSitePath()};
+        }
+        state = Object.assign({}, page, state);
         page = state.subpage || state.fmpage || location.hash;
-        history.pushState(state, '', (hashLogic || isPublicLink(page) ? '#' : '/') + page);
+
+        if (page.substr(0, 9) === 'fm/search') {
+            state.searchString = page.substr(9) || state.searchString;
+            page = state.subpage = 'fm/search';
+        }
+
+        if (d > 1 && method === 'pushState' && JSON.stringify(history.state) === JSON.stringify(state)) {
+            console.warn('duplicate push state attempt.');
+        }
+
+        history[method](state, '', (hashLogic || isPublicLink(page) ? '#' : '/') + page);
     }
     catch (ex) {
         console.warn(ex);
@@ -3760,7 +4119,9 @@ function tryCatch(fn, onerror)
         try {
             return fn.apply(this, arguments);
         } catch (e) {
-            console.error(e);
+            if (onerror !== false) {
+                console.error(e);
+            }
 
             if (typeof onerror === 'function') {
                 onIdle(onerror.bind(null, e));
@@ -3771,20 +4132,16 @@ function tryCatch(fn, onerror)
     return fn.foo;
 }
 
-// setImmediate polyfill for Dexie...
-if (!window.setImmediate && window.requestIdleCallback) {
-    window.setImmediate = function _setImmediate(callback) {
-        'use strict';
+/** fast weak checksum */
+function wchecksum(data, seed) {
+    'use strict';
+    seed = seed || 0x9f00eb1f;
 
-        // XXX: nothing from the code depends on the args
-        return window.requestIdleCallback(callback, {timeout: 20});
-    };
-
-    window.clearImmediate = function _clearImmediate(pid) {
-        'use strict';
-
-        window.cancelIdleCallback(pid);
-    };
+    var l = data.length;
+    while (l--) {
+        seed += data.charCodeAt(l) * l;
+    }
+    return seed >>> 0;
 }
 
 var onIdle = function(handler) {
@@ -3808,15 +4165,6 @@ if (window.requestIdleCallback) {
     };
 }
 
-/** Helper to replace process.nextTick in videostream.js */
-function onIdleA(boundCallBack) {
-    'use strict';
-
-    onIdle(function() {
-        boundCallBack();
-    });
-}
-
 function makeUUID(a) {
     'use strict';
 
@@ -3828,22 +4176,43 @@ function makeUUID(a) {
 function inherits(target, source) {
     'use strict';
 
-    target.prototype = Object.create(source.prototype || source);
+    target.prototype = Object.create(source && source.prototype || source);
     Object.defineProperty(target.prototype, 'constructor', {
         value: target,
         enumerable: false
     });
+
+    Object.defineProperty(target.prototype, 'toString', {
+        value: function() {
+            return '[object ' + this.constructor.name + ']';
+        },
+        writable: true,
+        configurable: true
+    });
+
+    if (!target.prototype.valueOf) {
+        Object.defineProperty(target.prototype, 'valueOf', {
+            value: function() {
+                return this;
+            },
+            configurable: true
+        });
+    }
+
+    if (source) {
+        Object.setPrototypeOf(target, source);
+    }
 }
 
+// eslint-disable-next-line strict
 function lazy(target, property, stub) {
-    'use strict';
     Object.defineProperty(target, property, {
         get: function() {
-            Object.defineProperty(target, property, {
-                value: stub(),
-                enumerable: true
+            Object.defineProperty(this, property, {
+                value: stub.call(this),
+                enumerable: property[0] !== '_'
             });
-            return target[property];
+            return this[property];
         },
         configurable: true
     });
@@ -3852,14 +4221,92 @@ function lazy(target, property, stub) {
 
 function promisify(fc) {
     'use strict';
-    return function() {
+    var a$yncMethod = function() {
         var self = this;
-        var args = toArray.apply(null, arguments);
+        var args = [];
+        if (arguments.length) {
+            var len = arguments.length;
+            args = Array(len);
+            while (len--) {
+                args[len] = arguments[len];
+            }
+        }
         return new Promise(function(resolve, reject) {
-            fc.apply(self, [resolve, reject].concat(args));
+            a$yncMethod.__function__.apply(self, [resolve, reject].concat(args));
         });
     };
+    a$yncMethod.prototype = undefined;
+    Object.defineProperty(fc, '__method__', {value: a$yncMethod});
+    Object.defineProperty(a$yncMethod, '__function__', {value: fc});
+    return a$yncMethod;
 }
+
+function mutex(name, handler) {
+    'use strict';
+    if (typeof name === 'function') {
+        handler = name;
+        name = null;
+    }
+    var mMutexMethod = function() {
+        var self = this;
+        var args = arguments.length ? toArray.apply(null, arguments) : [];
+        name = name || this.__mutex_lock_name_$;
+        if (!name) {
+            name = (this.constructor.name || '$') + makeUUID().slice(-13);
+            Object.defineProperty(this, '__mutex_lock_name_$', {value: name});
+        }
+        return new Promise(function(resolve, reject) {
+            mutex.lock(name).then(function(unlock) {
+                var res = function(a0) {
+                    unlock().always(resolve.bind(null, a0));
+                };
+                var rej = function(a0) {
+                    unlock().always(reject.bind(null, a0));
+                };
+                mMutexMethod.__function__.apply(self, [res, rej].concat(args));
+            }).catch(function(ex) {
+                console.error(ex);
+                mutex.unlock(name).always(reject.bind(null, ex));
+            });
+        });
+    };
+    mMutexMethod.prototype = undefined;
+    Object.defineProperty(handler, '__method__', {value: mMutexMethod});
+    Object.defineProperty(mMutexMethod, '__name__', {value: name});
+    Object.defineProperty(mMutexMethod, '__function__', {value: handler});
+    return Object.freeze(mMutexMethod);
+}
+
+mutex.queue = Object.create(null);
+mutex.lock = promisify(function(resolve, reject, name) {
+    'use strict';
+    resolve = resolve.bind(this, mutex.unlock.bind(mutex, name));
+
+    if (mutex.queue[name]) {
+        mutex.queue[name].push(resolve);
+    }
+    else {
+        mutex.queue[name] = [];
+        resolve();
+    }
+});
+mutex.unlock = promisify(function(resolve, reject, name) {
+    'use strict';
+    var next = (mutex.queue[name] || []).shift();
+    if (next) {
+        onIdle(next);
+    }
+    else {
+        delete mutex.queue[name];
+    }
+    resolve();
+});
+Object.freeze(mutex);
+
+var smbl = typeof Symbol === 'function' ? Symbol : function(s) {
+    'use strict';
+    return '<<<' + s;
+};
 
 mBroadcaster.once('startMega', function() {
     var data = sessionStorage.sitet;
@@ -3868,6 +4315,15 @@ mBroadcaster.once('startMega', function() {
         delete sessionStorage.sitet;
         onIdle(function() {
             M.transferFromMegaCoNz(data);
+        });
+    }
+
+    if (window.uTagMT) {
+        var mt = window.uTagMT;
+        delete window.uTagMT;
+
+        setTimeout(function() {
+            M.req({a: 'mrt', t: mt}).dump('uTagMT');
         });
     }
 });

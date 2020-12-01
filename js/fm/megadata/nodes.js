@@ -1310,11 +1310,11 @@ MegaData.prototype.safeRemoveNodes = function(handles) {
             var delPromise = new MegaPromise();
 
             for (i = toDel.length; i--;) {
-                promises.push(M.req({a: 'd', n: toDel[i], i: idtag}));
+                promises.push(M.req({a: 'd', n: toDel[i], i: i ? idtag.substr(-5) : idtag}));
             }
 
             M.scAckQueue[idtag] = function() {
-                delPromise.resolve.apply(delPromise, arguments);
+                delPromise.resolve();
             };
             promises.push(delPromise);
         }

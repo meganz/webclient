@@ -106,14 +106,14 @@ if (typeof loadingDialog === 'undefined') {
         'use strict';
 
         if (!this.nest++) {
-            this.show();
+            this.show('--dont-mess-with-me');
         }
     };
     loadingDialog.phide = function() {
         'use strict';
 
         if (--this.nest < 1) {
-            this.hide();
+            this.hide('--dont-mess-with-me');
             this.nest = 0;
         }
         return !this.nest;

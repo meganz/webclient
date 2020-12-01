@@ -3074,6 +3074,11 @@ FullScreenManager.prototype.enterFullscreen = function() {
         };
 
         switch (isMediaSourceSupported() && container) {
+            case '3gp4':
+            case '3gp5':
+            case '3gp6':
+            case '3gp7':
+            case '3gp8':
             case 'mp41':
             case 'mp42':
             case 'isom':

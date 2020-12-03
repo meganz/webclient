@@ -1127,7 +1127,11 @@ MegaData.prototype.moveNodes = function moveNodes(n, t, quiet, folderDefaultConf
             mega.megadrop.preMoveCheck(n, t).done(function(n, t) {
                 fileconflict.check(n, t, 'move', null, folderDefaultConflictResolution)
                     .always(function(files) {
-                        if (files.length === 0) { // user refuse to move all file.
+                        if (!files.length) {
+                            // user canceled the operation.
+                            if (!quiet) {
+                                loadingDialog.phide();
+                            }
                             promise.reject(EBLOCKED);
                             return false;
                         }
@@ -1180,7 +1184,7 @@ MegaData.prototype.moveNodes = function moveNodes(n, t, quiet, folderDefaultConf
                         }
                     });
             }).fail(function() {
-                loadingDialog.hide();
+                loadingDialog.hide('force');
                 // The user didn't want to disable MEGAdrop folders
                 promise.reject(EBLOCKED);
             });

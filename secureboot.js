@@ -102,6 +102,16 @@ function isMobile() {
     return false;
 }
 
+function setCookie(key, val) {
+    'use strict';
+    if (!is_iframed && location.host === 'mega.nz' && key) {
+        tryCatch(function() {
+            document.cookie = key + '=' + (val || '') + '; expires=' +
+                (val ? 'Fri, 31 Dec 9999 23:59:59 GMT' : 'Thu, 01 Jan 1970 00:00:00 GMT');
+        })();
+    }
+}
+
 function getSitePath() {
     'use strict';
     var hash = location.hash.replace('#', '');
@@ -871,6 +881,20 @@ if (!browserUpdate && is_extension)
 }
 
 var page;
+window.redirect = ['backup', 'businessinvite', 'businesssignup', 'cancel', 'confirm', 'copyrightnotice', 'debug',
+    'disputenotice', 'emailverify', 'key', 'login', 'megadrop', 'megadrop', 'newsignup', 'pwrevert', 'recover',
+    'redeem', 'register', 'repay', 'reset', 'sms', 'support', 'test', 'twofactor', 'unsub', 'voucher', 'wiretransfer'];
+var shouldRedirectPage = function(page) {
+    'use strict';
+    if (page) {
+        for (var k = redirect.length; k--;) {
+            if (page.substr(0, redirect[k].length) === redirect[k]) {
+                return true;
+            }
+        }
+    }
+    return false;
+};
 
 if (hashLogic) {
     // legacy support:
@@ -909,15 +933,10 @@ else {
     }
 
     page = getCleanSitePath(page);
-    if (is_litesite) {
-        window.redirect = {
-            'login': true, 'register': 1, 'registerb': 1, 'recovery': 1, 'reset': 1, 'cancel': 1, 'newsignup': 1,
-            'recover': 1, 'redeem': true, 'megadrop': true, 'support': 1, 'copyrightnotice': 1
-        };
-        if (redirect[page]) {
-            window.location.replace('https://mega.nz/' + page);
-        }
+    if (is_litesite && shouldRedirectPage(page)) {
+        window.location.replace('https://mega.nz/' + page);
     }
+
 	// put try block around it to allow the page to be rendered in Google cache
 	try
 	{
@@ -3875,6 +3894,13 @@ else if (!browserUpdate) {
         // No session handling needed for
         if (is_drop || is_karma) {
             return;
+        }
+        if (location.host === 'mega.nz' && !u_storage.sid && !is_iframed && !shouldRedirectPage(page)
+            && !isPublickLinkV2(page) && !isPublicLink(page) && !isChatLink(page) && !location.hash) {
+            // there isn't a stored session ID (regardless of its validity), we move.
+            // since without a session-id it's not possible to access any internal page.
+            setCookie('logged');
+            return window.location.replace('https://mega.io/' + page);
         }
 
         if (page[0] === 'F' && page[1] === '!' || page.substr(0, 7) === 'folder/') {

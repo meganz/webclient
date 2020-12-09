@@ -163,6 +163,12 @@ mBroadcaster.once('startMega', function() {
             }
         });
     }
+
+    if (typeof Uint8Array.prototype.copyWithin !== 'function') {
+        Uint8Array.prototype.copyWithin = function(target, start, end) {
+            return Array.prototype.copyWithin.call(this, target, start,  end);
+        };
+    }
 });
 
 mBroadcaster.once('boot_done', function() {

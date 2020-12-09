@@ -119,10 +119,6 @@ input, textarea {
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 	z-index: 10;
-	-webkit-transition: opacity 200ms ease-in-out;
-	-moz-transition: opacity 200ms ease-in-out;
-	-o-transition: opacity 200ms ease-in-out;
-	-ms-transition: opacity 200ms ease-in-out;
 	transition: opacity 200ms ease-in-out;
 }
 .embedplayer.video .viewer-bottom-bl {
@@ -190,15 +186,8 @@ input, textarea {
 	color: rgba(255,255,255,0.7);
 	font-size: 14px;
 	line-height: 18px;
-	-webkit-transition: opacity 500ms ease-in-out, visibility 500ms ease-in-out, bottom 500ms ease-in-out, margin-bottom 500ms ease-in-out;
-	-moz-transition: opacity 500ms ease-in-out, visibility 500ms ease-in-out, bottom 500ms ease-in-out, margin-bottom 500ms ease-in-out;
-	-o-transition: opacity 500ms ease-in-out, visibility 500ms ease-in-out, bottom 500ms ease-in-out, margin-bottom 500ms ease-in-out;
-	-ms-transition: opacity 500ms ease-in-out, visibility 500ms ease-in-out, bottom 500ms ease-in-out, margin-bottom 500ms ease-in-out;
 	transition: opacity 500ms ease-in-out, visibility 500ms ease-in-out, bottom 500ms ease-in-out, margin-bottom 500ms ease-in-out;
 	cursor: default;
-	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
-	-moz-opacity: 0;
-	-khtml-opacity: 0;
 	opacity: 0;
 	visibility: hidden;
 }
@@ -216,9 +205,6 @@ input, textarea {
 }
 .embedplayer.video .toast-notification.visible {
 	margin-bottom: 0;
-	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
-	-moz-opacity: 1;
-	-khtml-toast-notification: 1;
 	opacity: 1;
 	visibility: visible;
 }
@@ -227,32 +213,16 @@ input, textarea {
 	bottom: 0px;
 }
 .viewer-button i, .close-overlay i {
-	-webkit-transition: opacity 200ms ease-in-out;
-	-moz-transition: opacity 200ms ease-in-out;
-	-o-transition: opacity 200ms ease-in-out;
-	-ms-transition: opacity 200ms ease-in-out;
 	transition: opacity 200ms ease-in-out;
-	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=70);
-	-moz-opacity: 0.7;
-	-khtml-opacity: 0.7;
 	opacity: 0.7;
 }
 .viewer-button i.red-heart {
-	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
-	-moz-opacity: 0.8;
-	-khtml-opacity: 0.8;
 	opacity: 0.8;
 }
 .viewer-button:hover i, .close-overlay:hover i {
-	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
-	-moz-opacity: 1;
-	-khtml-opacity: 1;
 	opacity: 1;
 }
 .no-audio .viewer-button:hover i {
-	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=70);
-	-moz-opacity: 0.7;
-	-khtml-opacity: 0.7;
 	opacity: 0.7;
 }
 .no-audio .viewer-button {
@@ -353,29 +323,16 @@ input, textarea {
 	margin: -33px 0 0 0;
 	background-image: url(../images/mega/icons-sprite_v40.png);
 	background-position: -188px -670px;
-	-webkit-transition: opacity 200ms ease-in-out;
-	-moz-transition: opacity 200ms ease-in-out;
-	-o-transition: opacity 200ms ease-in-out;
-	-ms-transition: opacity 200ms ease-in-out;
 	transition: opacity 200ms ease-in-out;
-	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
-	-moz-opacity: 0;
-	-khtml-opacity: 0;
 	opacity: 0;
 	display: none;
 	cursor: pointer;
 }
 .viewer-mid-button.active {
-	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=70);
-	-moz-opacity: 0.7;
-	-khtml-opacity: 0.7;
 	opacity: 0.7;
 	display: block;
 }
 .viewer-mid-button.active:hover {
-	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
-	-moz-opacity: 1;
-	-khtml-opacity: 1;
 	opacity: 1;
 }
 .viewer-mid-button.next {
@@ -496,13 +453,8 @@ input, textarea {
 	padding: 0 5px;
 }
 .mouse-idle .viewer-top-bl, .mouse-idle .viewer-bottom-bl, .mouse-idle .viewer-mid-button {
-	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
-	-moz-opacity: 0;
-	-khtml-opacity: 0;
 	opacity: 0;
 	transition: opacity 1s ease-in-out;
-	-moz-transition: opacity 1s ease-in-out;
-	-webkit-transition: opacity 1s ease-in-out;
 }
 .video-thumb-details {
 	display: none;
@@ -534,14 +486,10 @@ input, textarea {
 	background-color: #F52929;
 	background-position: -14px -179px;
 	transition: background-color .5s ease-in-out;
-	-moz-transition: background-color .5s ease-in-out;
-	-webkit-transition: background-color .5s ease-in-out;
 }
 .video .play-video-button:hover {
 	background-color: #FF3333;
 	transition: background-color .5s ease-in-out;
-	-moz-transition: background-color .5s ease-in-out;
-	-webkit-transition: background-color .5s ease-in-out;
 }
 .video-theatre-mode .viewer-image-bl {
 	width: 100%;
@@ -605,10 +553,6 @@ input, textarea {
 	border-radius: 2px;
 	background-color: rgba(255,255,255,0.2);
 	color: rgba(255,255,255,0.2);
-	-webkit-transition: height 100ms ease-in-out, margin 100ms ease-in-out, border-radius 100ms ease-in-out;
-	-moz-transition: height 100ms ease-in-out, margin 100ms ease-in-out, border-radius 100ms ease-in-out;
-	-o-transition: height 100ms ease-in-out, margin 100ms ease-in-out, border-radius 100ms ease-in-out;
-	-ms-transition: height 100ms ease-in-out, margin 100ms ease-in-out, border-radius 100ms ease-in-out;
 	transition: height 100ms ease-in-out, margin 100ms ease-in-out, border-radius 100ms ease-in-out;
 	cursor: pointer;
 	text-align: left;
@@ -682,10 +626,6 @@ input, textarea {
 	position: absolute;
 	bottom: 43px;
 	left: 15px;
-	-webkit-transition: all 100ms ease-in-out;
-	-moz-transition: all 100ms ease-in-out;
-	-o-transition: all 100ms ease-in-out;
-	-ms-transition: all 100ms ease-in-out;
 	transition: all 100ms ease-in-out;
 	overflow: hidden;
 }
@@ -747,10 +687,6 @@ input, textarea {
 	cursor: pointer;
 	background-color: rgba(255,255,255,1);
 	position: relative;
-	-webkit-transition: all 200ms ease-in-out;
-	-moz-transition: all 200ms ease-in-out;
-	-o-transition: all 200ms ease-in-out;
-	-ms-transition: all 200ms ease-in-out;
 	transition: all 200ms ease-in-out;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
@@ -816,9 +752,6 @@ input, textarea {
 }
 .button.disabled, .default-white-button.disabled, .default-grey-button.disabled, .default-red-button.disabled {
 	cursor: default;
-	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
-	-moz-opacity: 0.3;
-	-khtml-opacity: 0.3;
 	opacity: 0.3;
 }
 .default-white-button.left, .default-grey-button.left, .default-red-button.left, .default-transparent-button.left {
@@ -851,19 +784,12 @@ input, textarea {
 	min-width: 188px;
 }
 .dropdown.body.submenu {
-	-webkit-transition: all 200ms ease-in-out, right 200ms ease-in-out;
-	-moz-transition: all 200ms ease-in-out, right 200ms ease-in-out;
-	-o-transition: all 200ms ease-in-out, right 200ms ease-in-out;
-	-ms-transition: all 200ms ease-in-out, right 200ms ease-in-out;
 	transition: all 200ms ease-in-out, right 200ms ease-in-out;
 	left: 100%;
 	right: auto;
 	width: 160px;
 	margin: -8px -4px 0 -4px;
 	visibility: hidden;
-	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
-	-moz-opacity: 0;
-	-khtml-opacity: 0;
 	opacity: 0;
 }
 .dropdown.body.submenu.left-position {
@@ -872,9 +798,6 @@ input, textarea {
 }
 .dropdown.body.submenu.active {
 	visibility: visible;
-	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
-	-moz-opacity: 1;
-	-khtml-opacity: 1;
 	opacity: 1;
 }
 .dropdown.body.submenu.active {
@@ -1040,16 +963,10 @@ input, textarea {
 	background-image: url(../images/mega/icons-sprite_v40.png);
 	background-repeat: no-repeat;
 	background-position: -106px -254px;
-	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=73);
-	-moz-opacity: 0.73;
-	-khtml-opacity: 0.73;
 	opacity: 0.73;
 }
 .dropdown-item.contains-submenu:hover::before, .dropdown-item.contains-submenu.opened::before {
 	background-position: -146px -254px;
-	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
-	-moz-opacity: 1;
-	-khtml-opacity: 1;
 	opacity: 1;
 }
 .dropdown-item.tick-item {
@@ -1083,16 +1000,10 @@ input, textarea {
 .dropdown-item i {
 	margin: 6px 9px 1px 0;
 	vertical-align: middle;
-	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=73);
-	-moz-opacity: 0.73;
-	-khtml-opacity: 0.73;
 	opacity: 0.73;
 	float: left;
 }
 .dropdown-item:hover > i, .dropdown-item.opened > i, .dropdown-item.red i, .dropdown-item.do-sort i {
-	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
-	-moz-opacity: 1;
-	-khtml-opacity: 1;
 	opacity: 1;
 }
 .dropdown-items-info {
@@ -1152,21 +1063,11 @@ input, textarea {
 .dropdown.body.tooltip {
 	position: fixed;
 	visibility: collapse;
-	-webkit-transition: opacity 200ms ease-in-out, visibility 200ms ease-in-out;
-	-moz-transition: opacity 200ms ease-in-out, visibility 200ms ease-in-out;
-	-o-transition: opacity 200ms ease-in-out, visibility 200ms ease-in-out;
-	-ms-transition: opacity 200ms ease-in-out, visibility 200ms ease-in-out;
 	transition: opacity 200ms ease-in-out, visibility 200ms ease-in-out;
-	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
-	-moz-opacity: 0;
-	-khtml-opacity: 0;
 	opacity: 0;
 }
 .dropdown.body.tooltip.visible {
 	visibility: visible;
-	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
-	-moz-opacity: 1;
-	-khtml-opacity: 1;
 	opacity: 1;
 }
 .dropdown.text-block {
@@ -1725,7 +1626,6 @@ input, textarea {
     white-space: nowrap;
     text-align: center;
     text-transform: capitalize;
-    -webkit-transition: all 200ms ease-in-out;
     transition: all 200ms ease-in-out;
     cursor: default;
 }
@@ -1779,14 +1679,12 @@ input, textarea {
 .viewer-vad-control .label i {
     margin: 14px -3px 0 11px;
     opacity: 0.8;
-    -webkit-transition:  opacity 200ms ease-in-out;
     transition: opacity 200ms ease-in-out;
 }
 .viewer-vad-control.skip:hover .label i {
      opacity: 1;
 }
 .video-progress-bar.vad {
-    -webkit-transition:  opacity 200ms ease-in-out, visibility 200ms ease-in-out;
     transition: opacity 200ms ease-in-out, visibility 200ms ease-in-out;
     opacity: 0;
     visibility: hidden;
@@ -1798,7 +1696,6 @@ input, textarea {
     z-index: 10;
     border-radius: 0;
     background-color: rgba(0,0,0,0.6);
-    border-radius: 0;
     margin: 0;
 }
 .vad.mouse-idle .video-progress-bar.vad,  .mouse-idle .vad .video-progress-bar.vad {
@@ -1888,9 +1785,6 @@ input, textarea {
 }
 .viewer-bottom-bl.no-grad {
 	opacity: 0;
-}
-.video-theatre-mode .no-grad {
-	opacity: 1;
 }
 @media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {
 	.medium-icon.icons-img,

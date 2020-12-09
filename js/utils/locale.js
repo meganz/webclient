@@ -1239,6 +1239,9 @@ mBroadcaster.once('boot_done', function populate_l() {
     l[24141] = escapeHTML(l[24141]).replace('[A]', '<a class="red" href="https://mega.nz/blog_48">')
         .replace('[/A]', '</a>');
     l[24431] = escapeHTML(l[24431]).replace('[A]', '<a href="/repay" class="clickurl">').replace('[/A]', '</a>');
+    l[24440] = l[24440].replace('[B]', '<strong>').replace('[/B]', '</strong>');
+    l[24408] = l[24408].replace('[A]', '<a href="/fm" class="clickurl">').replace('[/A]', '</a>');
+    l[24409] = l[24409].replace('[A]', '<a href="/register" class="clickurl">').replace('[/A]', '</a>');
     l[24547] = escapeHTML(l[24547]).replace('[A1]', '<a target="_blank" href="/sourcecode" class="clickurl">')
         .replace('[/A1]', '</a>')
         .replace('[A2]', '<a target="_blank" href="/security" class="clickurl">')

@@ -2679,7 +2679,7 @@ Chat.prototype.safeForceUpdate = SoonFc(60, function forceAppUpdate() {
 });
 
 Chat.prototype.loginOrRegisterBeforeJoining = function(chatHandle, forceRegister, forceLogin, notJoinReq) {
-    if (!chatHandle && (page === 'chat' || page.indexOf('chat') > -1)) {
+    if (!chatHandle && page !== 'securechat' && (page === 'chat' || page.indexOf('chat') > -1)) {
         chatHandle = getSitePath().split("chat/")[1].split("#")[0];
     }
     assert(chatHandle, 'missing chat handle when calling megaChat.loginOrRegisterBeforeJoining');

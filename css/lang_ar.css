@@ -1,8 +1,8 @@
-/* Unique language styling 
+/* Unique language styling
    Update the standard font family from Source Sans Pro to Noto Naskh non latin/cyrillic text
    */
 
-/* Arabic/Farsi .ar .fa */ 
+/* Arabic/Farsi .ar .fa */
 @font-face {
     font-family: 'noto_nashk_regular';
     src: url('../fonts/international-text/NotoNaskhArabicUI-Regular.ttf') format('truetype');
@@ -79,7 +79,7 @@ body.rtl .inline-block.col-2.cmd-pad .bottom-page.dark-title,
 body.rtl .inline-block.col-2.cmd-pad .bottom-page.dark-txt,
 body.rtl .top-login-warning,
 body.rtl .bottom-menu.body .link,
-body.rtl .bottom-menu.company-info,
+body.rtl .bottom-menu .company-info,
 body.rtl .membership-pad-bl .reg-st3-name-aligner span,
 body.rtl .fm-dialog.payment-address-dialog,
 body.rtl .fm-dialog.loginrequired-dialog,

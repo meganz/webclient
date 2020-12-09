@@ -4755,7 +4755,7 @@ div.radioOn.small, div.radioOff.small {
 .top-submenu.language-items .top-menu-item.beta .beta-text {
     display: inline-block;
 }
-.bottom-menu.copyrights {
+.bottom-menu .copyrights {
     position: static;
     margin: 20px 0 0 0;
 }

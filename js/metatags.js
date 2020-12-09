@@ -351,8 +351,28 @@ mega.metatags = new function() {
             mTags.en_title = 'Resellers - MEGA';
             mTags.en_desc =
                 'You can conveniently purchase your MEGA PRO membership from one of our authorized resellers.';
-            mTags.mega_desc = l[23993] || mTags.en_title;
-            mTags.mega_title = l[23992] || mTags.en_desc;
+            mTags.mega_title = l[23992] || mTags.en_title;
+            mTags.mega_desc = l[23993] || mTags.en_desc;
+        }
+        else if (page === 'securechat') {
+            mTags.en_title = 'Secure Chat - MEGA';
+            mTags.en_desc = 'With MEGA all chat messages, audio and video call are fully encrypted and 100% private';
+            mTags.mega_title = l[24608] || mTags.en_title;
+            mTags.mega_desc = l[24611] || mTags.en_desc;
+        }
+        else if (page === 'storage') {
+            mTags.en_title = 'Secure Cloud Storage - MEGA';
+            mTags.en_desc =
+                'MEGA provides generous user-controlled end-to-end encrypted cloud storage and fast transfer';
+            mTags.mega_title = l[24606] || mTags.en_title;
+            mTags.mega_desc = l[24609] || mTags.en_desc;
+        }
+        else if (page === 'collaboration') {
+            mTags.en_title = 'Collaboration - MEGA';
+            mTags.en_desc =
+                'With MEGA you can work with your stored files, stay connected and communicate all in one easy place';
+            mTags.mega_title = l[24607] || mTags.en_title;
+            mTags.mega_desc = l[24610] || mTags.en_desc;
         }
         else if (page === 'security') {
             mTags.en_title = 'Security - MEGA';

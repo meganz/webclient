@@ -2454,6 +2454,7 @@ else if (!browserUpdate) {
     jsl.push({f:'css/business-register.css', n: 'business-register_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/psa.css', n: 'psa_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
     jsl.push({f:'css/about.css', n: 'about_css', j:2,w:5,c:1,d:1,cache:1});
+    jsl.push({f:'css/features.css', n: 'features_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/corporate.css', n: 'corporate_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'html/start.html', n: 'start', j:0});
     jsl.push({f:'html/js/start.js', n: 'start_js', j:1});
@@ -2835,6 +2836,8 @@ else if (!browserUpdate) {
         jsl.push({f:'css/dialogs-common.css', n: 'dialogs-common_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'js/utils/clipboard.js', n: 'js_utils_clipboard_js', j: 1});
         jsl.push({f:'js/ui/simpletip.js', n: 'simpletip_js', j:1,w:1});
+        jsl.push({f:'css/features.css', n: 'features_css', j:2,w:5,c:1,d:1,cache:1});
+
         if (lang === 'ar' || lang === 'fa') {
             jsl.push({f:'css/lang_ar.css', n: 'lang_arabic_css', j: 2, w: 30, c: 1, d: 1, m: 1 });
         }
@@ -2982,7 +2985,11 @@ else if (!browserUpdate) {
         'downloadapp_js': {f:'html/js/desktop-onboarding.js', n: 'downloadapp_js', j:1},
         'downloadapp': {f:'html/desktop-onboarding.html', n: 'downloadapp', j:0},
         'codemirror_js': {f:'js/vendor/codemirror.js', n: 'codemirror_js', j:1},
-        'codemirrorscroll_js': {f:'js/vendor/simplescrollbars.js', n: 'codemirrorscroll_js', j:1}
+        'codemirrorscroll_js': {f:'js/vendor/simplescrollbars.js', n: 'codemirrorscroll_js', j:1},
+        'features_js': {f:'html/js/features.js', n: 'features_js', j:1},
+        'feature_storage': {f:'html/features-storage.html', n: 'feature_storage', j:0},
+        'feature_chat': {f:'html/features-chat.html', n: 'feature_chat', j:0},
+        'feature_collaboration': {f:'html/features-collaboration.html', n: 'feature_collaboration', j:0},
     };
 
     var jsl3 = {
@@ -3097,6 +3104,9 @@ else if (!browserUpdate) {
         'security': ['securitypractice', 'securitypractice_js', 'filesaver'],
         'developersettings': ['developersettings', 'developersettings_js'],
         'megadrop': ['megadrop', 'nomegadrop'],
+        'storage': ['feature_storage', 'features_js'],
+        'securechat': ['feature_chat', 'features_js'],
+        'collaboration': ['feature_collaboration', 'features_js'],
         'nzippmember': ['nzipp', 'nzipp_js', 'nzipp_css'],
         'nziphotographer': ['nzipp', 'nzipp_js', 'nzipp_css'],
         'business': ['business', 'businessjs']

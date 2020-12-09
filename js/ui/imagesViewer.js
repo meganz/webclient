@@ -1089,6 +1089,9 @@ var slideshowid;
                     preqs[n.h].kill();
                     preqs[n.h] = false;
                 }
+
+                sessionStorage.removeItem('previewNode');
+                sessionStorage.removeItem('previewTime');
             };
 
             // Show loading spinner until video is playing

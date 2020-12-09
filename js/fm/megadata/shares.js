@@ -139,7 +139,7 @@ MegaData.prototype.initShareAddDialog = function(alreadyAddedContacts, $extraFoo
     var $shareAddDialog = $extraFooterElement;
     $('.add-share', $shareAddDialog).addClass('disabled');
 
-    $('.share-add-dialog-cancel-button span', $shareAddDialog).rebind('click', function() {
+    $('.cancel-add-share', $shareAddDialog).rebind('click', function() {
         closeShareAddDialog();
     });
 
@@ -230,6 +230,7 @@ MegaData.prototype.initShareAddDialog = function(alreadyAddedContacts, $extraFoo
         newNoContact: true,
         highlightSearchValue: true,
         closeDlgOnClickOverlay: false,
+        emailTooltips: true,
         extraFooterElement: $extraFooterElement[0],
         onExtraFooterElementDidMount: extraFooterElementDidMount,
         onSelected: function(nodes) {

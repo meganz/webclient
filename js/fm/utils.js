@@ -907,8 +907,15 @@ MegaUtils.prototype.require = function megaUtilsRequire() {
                 // nothing to load
                 onload();
             }
+            else if (jsl.length) {
+                if (logger) {
+                    logger.debug('File(s) externally being loaded, holding up...');
+                }
+                mBroadcaster.once('startMega', _load.bind(this, files, promise));
+            }
             else {
                 Array.prototype.push.apply(jsl, files);
+                console.assert(!silent_loading);
                 silent_loading = onload;
                 jsl_start();
             }

@@ -727,15 +727,11 @@
     background-position: -145px -148px;
 }
 .menus-sprite.rounded.encryption {
-    background-color: #ED5564;
+    background-color: #4A90E2;
     background-position: -195px -148px;
 }
-.menus-sprite.rounded.chat {
-    background-color: #00A8E1;
-    background-position: 6px -197px;
-}
-.menus-sprite.rounded.chat {
-    background-color: #00A8E1;
+.menus-sprite.rounded.securechat {
+    background-color: #ED5564;
     background-position: 6px -197px;
 }
 .menus-sprite.rounded.backup {

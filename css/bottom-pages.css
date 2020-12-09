@@ -5237,7 +5237,7 @@ body:not(.mobile) .bottom-page.dropdown .dropdown-item:hover, .bottom-page.dropd
         margin: 32px auto;
         width: 100%;
     }
-    .bottom-menu.col2-of-6 {
+    .bottom-menu .col2-of-6 {
         width: 32%;
     }
     .bottom-page.mid-header {
@@ -6178,7 +6178,7 @@ body:not(.mobile) .bottom-page.dropdown .dropdown-item:hover, .bottom-page.dropd
         letter-spacing: 0;
         font-size: 21px;
     }
-    
+
     /* Credits */
     .credits-main-pad {
         margin: -3px 0;
@@ -6434,10 +6434,8 @@ body:not(.mobile) .bottom-page.dropdown .dropdown-item:hover, .bottom-page.dropd
 .rtl .startpage.top-info,
 .rtl .startpage.top-header,
 .rtl .pages-nav.content-block .button-label,
-.rtl .bottom-menu.link,
-.rtl .bottom-menu.header,
-.rtl .bottom-menu.company-info,
-.rtl .bottom-menu.copyrights,
+.rtl .bottom-menu .desktop-menu,
+.rtl .bottom-menu .mobile-menu,
 .rtl-supportm,
 .bottom-page.dropdown,
 .rtl .bottom-page.top-title span,

@@ -83,19 +83,19 @@ var bottompage = {
 
         // Show/Hide Affiliate program link in bottom menu
         if (mega.flags.refpr) {
-            $('.bottom-menu.affiliate', $bottomMenu).removeClass('hidden');
+            $('.bottom-menu .affiliate', $bottomMenu).removeClass('hidden');
         }
         else {
-            $('.bottom-menu.affiliate', $bottomMenu).addClass('hidden');
+            $('.bottom-menu .affiliate', $bottomMenu).addClass('hidden');
         }
 
         // Show/Hide Pricing link for Business sub accounts and admin expired
         if (u_attr && u_attr.b && u_attr.b.s !== -1) {
-            $('.bottom-menu.pro', $bottomMenu).addClass('hidden');
+            $('.bottom-menu .pro', $bottomMenu).addClass('hidden');
             $('.pages-menu.link.pro', $pagesMenu).addClass('hidden');
         }
         else {
-            $('.bottom-menu.pro', $bottomMenu).removeClass('hidden');
+            $('.bottom-menu .pro', $bottomMenu).removeClass('hidden');
             $('.pages-menu.link.pro', $pagesMenu).removeClass('hidden');
         }
     },

@@ -1167,6 +1167,24 @@
     padding: 14px;
 }
 
+@media screen and (min-width: 1281px) {
+    .gif-panel .gif-panel-results {
+        column-count: 4;
+    }
+}
+
+@media screen and (min-width: 1921px) {
+    .gif-panel .gif-panel-results {
+        column-count: 5;
+    }
+}
+
+@media screen and (min-width: 2561px) {
+    .gif-panel .gif-panel-results {
+        column-count: 6;
+    }
+}
+
 .gif-panel .gif-panel-results .node-container {
     display: inline-block;
     width: 100%;

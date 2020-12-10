@@ -2891,11 +2891,10 @@ function createFolderDialog(close) {
     }
 
     var doCreateFolder = function(v) {
-
+        var errorMsg = '';
         if (!M.isSafeName(v, true)) {
             $dialog.removeClass('active');
-            $input.addClass('error');
-            return;
+            errorMsg = l[7436];
         }
         else {
             var specifyTarget = null;
@@ -2903,20 +2902,25 @@ function createFolderDialog(close) {
                 specifyTarget = $.cftarget;
             }
             if (duplicated(v, specifyTarget)) {
-                $dialog.addClass('duplicate');
-                $input.addClass('error');
-
-                setTimeout(
-                    function() {
-                        $input.removeClass('error');
-                        $dialog.removeClass('duplicate');
-                        $input.trigger("focus");
-                    },
-                    2000
-                );
-
-                return;
+                errorMsg = l[23219];
             }
+        }
+
+        if (errorMsg !== '') {
+            $('.duplicated-input-warning span', $dialog).text(errorMsg);
+            $dialog.addClass('duplicate');
+            $input.addClass('error');
+
+            setTimeout(
+                function() {
+                    $input.removeClass('error');
+                    $dialog.removeClass('duplicate');
+                    $input.trigger("focus");
+                },
+                2000
+            );
+
+            return;
         }
 
         var target = $.cftarget = $.cftarget || M.currentCustomView.nodeID || M.currentdirid;
@@ -2969,11 +2973,11 @@ function createFolderDialog(close) {
         $dialog.removeClass('focused');
     });
 
-    $input.rebind('keyup', function() {
+    $input.rebind('keyup', function(e) {
         if ($input.val() === '' || $input.val() === l[157]) {
             $dialog.removeClass('active');
         }
-        else {
+        else if (e.which !== 13)  {
             $dialog.addClass('active');
             $input.removeClass('error');
         }

@@ -65,7 +65,7 @@ function render_blogarticle() {
     if (blogposts[i].attaches.bimg) {
         content += '<img alt=""  integrity="ni:///sha-256;'
             + escapeHTML(blogposts[i].attaches.bimg) + '" src="'
-            + escapeHTML(CMS.img2(blogposts[i].attaches.bimg))
+            + CMS.img(blogposts[i].attaches.bimg)
             + '" class="blog-new-full-img" />';
     }
     content += blogposts[i].c;
@@ -76,7 +76,11 @@ function render_blogarticle() {
     var btitle = blogposts[i].h;
     var bdate = acc_time2date(blogposts[i].t);
 
-    content = content.replace(/(?:{|%7B)cmspath(?:%7D|})/g, CMS.getUrl());
+    content = content.replace(
+        /((?:{|%7B)cmspath(?:%7D|}))\/(unsigned\/)?([\dA-Za-z]+)/g,
+        function(matches, cmspath, unsigned, filename) {
+            return CMS.img(filename);
+        });
 
     if (!content) {
         loadSubPage('blog');
@@ -104,7 +108,7 @@ function render_blogarticle() {
         'NewsArticle',
         {
             headline: btitle,
-            image: blogposts[i].attaches.bimg ? CMS.img2(blogposts[i].attaches.bimg) :
+            image: blogposts[i].attaches.bimg ? CMS.img(blogposts[i].attaches.bimg) :
                 'https://cms2.mega.nz/b41537c0eae056cfe5ab05902fca322b.png',
             datePublished: pubDate,
             dateModified: pubDate

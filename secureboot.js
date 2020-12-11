@@ -12,7 +12,9 @@ var lastactive = new Date().getTime();
 var URL = window.URL || window.webkitURL;
 var seqno = Math.ceil(Math.random()*1000000000);
 var staticpath = null;
+var cmsStaticPath = null;
 var defaultStaticPath = 'https://eu.static.mega.co.nz/3/'; // EU should never fail. EU is the mothership.
+var defaultCMSStaticPath = 'https://eu.static.mega.co.nz/cms/';
 var ua = window.navigator.userAgent.toLowerCase();
 var uv = window.navigator.appVersion.toLowerCase();
 var storage_version = '1'; // clear localStorage when version doesn't match
@@ -238,10 +240,11 @@ function mURIDecode(path) {
  * This is detected by the mega.nz server and set as a cookie e.g. "geoip=SG".
  * @returns {String} Returns the nearest static server to be used or the EU one as default
  */
-function geoStaticPath() {
+function geoStaticPath(cms) {
 
     'use strict';
 
+    var finalPath = cms ? 'cms/' : '3/';
     try {
         // If flag is not set to force the default EU static server
         if (!sessionStorage.skipGeoStaticPath) {
@@ -256,19 +259,19 @@ function geoStaticPath() {
 
             // Check the country code to return a closer static server
             if (cookieMatch && cookieMatch[1] && singaporeStaticCountries.indexOf(cookieMatch[1]) > -1) {
-                return 'https://sg.static.mega.co.nz/3/';
+                return 'https://sg.static.mega.co.nz/' + finalPath;
             }
             else if (cookieMatch && cookieMatch[1] && northAmericaStaticCountries.indexOf(cookieMatch[1]) > -1) {
-                return 'https://na.static.mega.co.nz/3/';
+                return 'https://na.static.mega.co.nz/' + finalPath;
             }
             else if (cookieMatch && cookieMatch[1] && newZealandStaticCountries.indexOf(cookieMatch[1]) > -1) {
-                return 'https://nz.static.mega.co.nz/3/';
+                return 'https://nz.static.mega.co.nz/' + finalPath;
             }
         }
     }
     catch (ex) {}
 
-    return defaultStaticPath;
+    return cms ? defaultCMSStaticPath : defaultStaticPath;
 }
 
 if (is_chrome_firefox) {
@@ -499,12 +502,15 @@ if (!browserUpdate) try
             location.host !== 'webcache.googleusercontent.com'))) {
 
         if (location.host === 'smoketest.mega.nz') {
+            cmsStaticPath = 'https://smoketest.static.mega.nz/cms/';
             staticpath = 'https://smoketest.static.mega.nz/3/';
             defaultStaticPath = staticpath;
         }
         else {
             nocontentcheck = sessionStorage.dbgContentCheck ? 0 : true;
             var devhost = window.location.host;
+
+            cmsStaticPath = 'https://smoketest.static.mega.nz/cms/';
 
             // Set the static path and default static path for debug mode to be the same
             staticpath = window.location.protocol + "//" + devhost + "/";
@@ -521,12 +527,20 @@ if (!browserUpdate) try
         staticpath = localStorage.staticpath;
     }
 
+    // Override any set cms static path with the one from localStorage to test standard static server failure
+    if (localStorage.cms) {
+        cmsStaticPath = localStorage.cms;
+    }
+
     // Override the default static path to test recovery after standard static server failure
     if (localStorage.getItem('defaultstaticpath') !== null) {
         defaultStaticPath = localStorage.defaultstaticpath;
     }
 
-    staticpath = staticpath || geoStaticPath();
+    staticpath = staticpath || geoStaticPath(false);
+    // cms static path
+    cmsStaticPath = cmsStaticPath || geoStaticPath(true);
+
     apipath = localStorage.apipath || 'https://g.api.mega.co.nz/';
 
     // If dark mode flag is enabled, change styling

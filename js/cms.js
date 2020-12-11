@@ -68,15 +68,12 @@
     }
 
     function parse_pack(bytes) {
-        var mime;
         var type;
         var nameLen;
         var name;
         var content;
-        var e = 0;
         var binary = new Uint8Array(bytes);
         var hash = {};
-
 
         for (var i = 0; i < bytes.byteLength;) {
             size = readLength(bytes, i);
@@ -93,7 +90,11 @@
             switch (type) {
             case 3:
                 hash[name] = {
-                    html: ab_to_str(content).replace(/(?:{|%7B)cmspath(?:%7D|})/g, CMS.getUrl()),
+                        html: ab_to_str(content).replace(
+                            /((?:{|%7B)cmspath(?:%7D|}))\/(unsigned\/)?([\dA-Za-z]+)/g,
+                            function(matches, cmspath, unsigned, filename) {
+                                return filename;
+                            }),
                     mime: type
                 };
                 break;
@@ -149,6 +150,7 @@
         return false;
     }
 
+
     function parse_cms_content(content) {
         if (content && typeof content !== 'string') {
             content = ab_to_str(content);
@@ -157,7 +159,11 @@
         return String(content)
             .replace(/\s+/g, ' ')
             // eslint-disable-next-line no-use-before-define
-            .replace(/(?:{|%7B)cmspath(?:%7D|})/g, CMS.getUrl())
+            .replace(
+                /((?:{|%7B)cmspath(?:%7D|}))\/(unsigned\/)?([\dA-Za-z]+)/g,
+                function(matches, cmspath, unsigned, filename) {
+                    return CMS.img(filename);
+                })
             .replace(/<a[^>]+>/g, function(m) {
                 if (m.indexOf('href=&quot;') > 0) {
                     m = m.replace(/&quot;/g, '"');
@@ -182,7 +188,6 @@
         }
 
         var signature = bytes.slice(3, 67); // 64 bytes, signature
-        var version = viewer[0];
         var mime = viewer[1];
         var label = ab_to_str(bytes.slice(67, viewer[2] + 67));
         var content = bytes.slice(viewer[2] + 67);
@@ -325,7 +330,7 @@
             delete fetching[id];
             cmsBackoff = 0; /* reset backoff */
         };
-        var url = CMS.getUrl() + '/' + id;
+        var url = cmsStaticPath + CMS.scope + '/' + id;
         q.open("GET", url);
         q.responseType = 'arraybuffer';
         q.send();
@@ -363,6 +368,8 @@
     var reRendered = {};
 
     var CMS = {
+        scope: '',
+
         watch: function(type, callback) {
             curType = type;
             curCallback = callback;
@@ -412,28 +419,16 @@
 
         loaded: loaded,
 
-        /**
-         *  Load unsigned images (HTTP images) instead
-         *  of letting the CMS loading the signed images.
-         *  We assume it's secure enough because the content that references
-         *  the images are signed.
-         *
-         *  @param {String} id  64 digits to represent 256 bits.
-         *  @returns {String} URL
-         */
-        img2: function insecureImageLoading(id) {
-            return this.getUrl() + "/unsigned/" + id;
-        },
-
         img: function(id) {
             if (!assets[id]) {
                 this.get(id, function(err, obj) {
+                    id = escapeHTML(id);
                     $('*[data-img=loading_' + id + ']').attr({'id': '', 'src': obj.url});
                     $('*[src="' + IMAGE_PLACEHOLDER + "#" + id + '"]').attr({'id': '', 'src': obj.url});
                     assets[id] = obj.url;
                 });
             }
-            return assets[id] ? assets[id] : IMAGE_PLACEHOLDER + "#" + id;
+            return assets[id] ? escapeHTML(assets[id]) : escapeHTML(IMAGE_PLACEHOLDER + "#" + id);
         },
 
         index: function(index, callback) {
@@ -485,7 +480,6 @@
                 }
             }
 
-
             if (typeof fetching[id] === "undefined") {
                 isNew = true;
                 fetching[id] = [];
@@ -495,10 +489,6 @@
             if (isNew) {
                 doRequest(id);
             }
-        },
-
-        getUrl: function() {
-            return localStorage.cms || "https://cms2.mega.nz";
         },
 
         on: function(id, callback)
@@ -578,5 +568,4 @@
 
     /* Make it public */
     window.CMS = CMS;
-
 })(this);

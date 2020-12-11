@@ -16,11 +16,15 @@ var corporate = {
     fetchCMS: function($page) {
         "use strict";
         var self = this;
-        M.xhr({ url: (localStorage.cms || "https://cms2.mega.nz/") + "unsigned/corporate", type: 'json' })
-            .then(function(ev, pages) {
-                self.renderCorporatePages(pages);
-                corporate.openSubSection($page);
-            });
+        CMS.scope = 'corporate';
+        CMS.get('corporate', function(err, data) {
+            if (err) {
+                console.error('Error fetching Corporate page data.');
+                return false;
+            }
+            self.renderCorporatePages(data.object);
+            corporate.openSubSection($page);
+        });
     },
 
     renderCorporatePages: function(pages) {
@@ -28,7 +32,11 @@ var corporate = {
         var self = this;
         pages.forEach(function(c) {
             $('.corporate-content', self.$page).safeAppend(
-                c.content.replace(/(?:{|%7B)cmspath(?:%7D|})/g, CMS.getUrl())
+                c.content.replace(
+                    /((?:{|%7B)cmspath(?:%7D|}))\/(unsigned\/)?([\dA-Za-z]+)/g,
+                    function(matches, cmspath, unsigned, filename) {
+                        return CMS.img(filename);
+                    })
             );
         });
     },

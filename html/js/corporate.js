@@ -29,16 +29,10 @@ var corporate = {
 
     renderCorporatePages: function(pages) {
         'use strict';
-        var self = this;
-        pages.forEach(function(c) {
-            $('.corporate-content', self.$page).safeAppend(
-                c.content.replace(
-                    /((?:{|%7B)cmspath(?:%7D|}))\/(unsigned\/)?([\dA-Za-z]+)/g,
-                    function(matches, cmspath, unsigned, filename) {
-                        return CMS.img(filename);
-                    })
-            );
-        });
+        var $target = $('.corporate-content', this.$page);
+        for (var i = 0; i < pages.length; i++) {
+            $target.safeAppend(CMS.parse(pages[i].content));
+        }
     },
 
     /**

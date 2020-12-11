@@ -240,6 +240,7 @@ function mURIDecode(path) {
  * This is detected by the mega.nz server and set as a cookie e.g. "geoip=SG".
  * @returns {String} Returns the nearest static server to be used or the EU one as default
  */
+// eslint-disable-next-line complexity
 function geoStaticPath(cms) {
 
     'use strict';

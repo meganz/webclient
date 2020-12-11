@@ -1,4 +1,6 @@
 (function(window) {
+    'use strict';
+
     /** Our trusted public keys {{{ */
     var signPubKey = {
         "__global": [
@@ -14,6 +16,7 @@
     };
     /** }}} */
 
+    var CMS = {scope: ''};
     var IMAGE_PLACEHOLDER = staticpath + "/images/img_loader@2x.png";
     var isReady = true;
 
@@ -76,12 +79,12 @@
         var hash = {};
 
         for (var i = 0; i < bytes.byteLength;) {
-            size = readLength(bytes, i);
+            var size = readLength(bytes, i);
             i += 4; /* 4 bytes */
 
             type = binary[i++];
             nameLen = binary[i++];
-            name = ab_to_str(bytes.slice(i, nameLen + i));
+            name = CMS.escape(ab_to_str(bytes.slice(i, nameLen + i)));
 
             i += nameLen;
 
@@ -89,14 +92,7 @@
 
             switch (type) {
             case 3:
-                hash[name] = {
-                        html: ab_to_str(content).replace(
-                            /((?:{|%7B)cmspath(?:%7D|}))\/(unsigned\/)?([\dA-Za-z]+)/g,
-                            function(matches, cmspath, unsigned, filename) {
-                                return filename;
-                            }),
-                    mime: type
-                };
+                    hash[name] = {html: CMS.parse(content, false), mime: type};
                 break;
 
             case 2:
@@ -151,18 +147,17 @@
     }
 
 
-    function parse_cms_content(content) {
+    function parse_cms_content(content, imgLoad) {
         if (content && typeof content !== 'string') {
             content = ab_to_str(content);
         }
 
         return String(content)
             .replace(/\s+/g, ' ')
-            // eslint-disable-next-line no-use-before-define
             .replace(
                 /((?:{|%7B)cmspath(?:%7D|}))\/(unsigned\/)?([\dA-Za-z]+)/g,
                 function(matches, cmspath, unsigned, filename) {
-                    return CMS.img(filename);
+                    return imgLoad === false ? filename : CMS.img(filename);
                 })
             .replace(/<a[^>]+>/g, function(m) {
                 if (m.indexOf('href=&quot;') > 0) {
@@ -199,8 +194,7 @@
         if (verify_cms_content(content, signature, id)) {
             switch (mime) {
             case 3: // html
-                    content = parse_cms_content(content);
-                next(false, { html: content, mime: mime});
+                    next(false, {html: CMS.parse(content), mime: mime});
                 return loaded(id);
 
             case 1:
@@ -300,6 +294,7 @@
         if (!id) {
             throw new Error("Calling CMS.doRequest without an ID");
         }
+        id = CMS.escape(id);
 
         if (typeof CMS_Cache === "object" && CMS_Cache[id]) {
             for (var i in fetching[id]) {
@@ -367,9 +362,7 @@
     var curCallback;
     var reRendered = {};
 
-    var CMS = {
-        scope: '',
-
+    Object.assign(CMS, {
         watch: function(type, callback) {
             curType = type;
             curCallback = callback;
@@ -390,8 +383,28 @@
             }
         },
 
-        html: function(html) {
-            return html.replace(/(?:{|%7B)cmspath(?:%7D|})/g, CMS.getUrl());
+        escape: function(content, mode) {
+            mode = mode || 'strict';
+            content = String(content || '');
+
+            if (mode === 'html') {
+                content = escapeHTML(content);
+            }
+            else if (mode === 'strict') {
+                content = content.replace(/[^\w.-]/g, '');
+            }
+            else if (mode === 'regex') {
+                content = content.replace(/\W/g, "\\$&");
+            }
+            else {
+                content = parseFloat(content) || '';
+            }
+            return String(content || "\u26A0");
+        },
+
+        parse: function(content, imgLoad) {
+            // @todo unify both functions once this file is properly refactored
+            return parse_cms_content(content, imgLoad);
         },
 
         isLoading: function() {
@@ -420,15 +433,19 @@
         loaded: loaded,
 
         img: function(id) {
+            id = CMS.escape(id);
+            var imgPlaceHolder = IMAGE_PLACEHOLDER + "#" + id;
             if (!assets[id]) {
                 this.get(id, function(err, obj) {
-                    id = escapeHTML(id);
-                    $('*[data-img=loading_' + id + ']').attr({'id': '', 'src': obj.url});
-                    $('*[src="' + IMAGE_PLACEHOLDER + "#" + id + '"]').attr({'id': '', 'src': obj.url});
-                    assets[id] = obj.url;
+                    var url = CMS.escape(obj.url, 'html');
+                    if (url && !err) {
+                        $('*[data-img=loading_' + id + '], *[src="' + imgPlaceHolder + '"]')
+                            .attr({'id': '', 'src': url});
+                    }
+                    assets[id] = url;
                 });
             }
-            return assets[id] ? escapeHTML(assets[id]) : escapeHTML(IMAGE_PLACEHOLDER + "#" + id);
+            return CMS.escape(assets[id] || imgPlaceHolder, 'html');
         },
 
         index: function(index, callback) {
@@ -461,17 +478,19 @@
         },
 
         get: function(id, next, cache, as) {
-            if (id instanceof Array) {
+            if (d > 1) {
+                console.debug('CMS.get(%s)', id, [id]);
+            }
+            if (Array.isArray(id)) {
                 var step = steps(id.length, next);
-                for (var i in id) {
-                    if (id.hasOwnProperty(i)) {
-                        this.get(id[i], step(i), cache, as);
-                    }
+                for (var i = 0; i < id.length; ++i) {
+                    this.get(id[i], step(i), cache, as);
                 }
                 return;
             }
             var isNew = false;
             next = next || function() {};
+            id = CMS.escape(id);
 
             if (cache) {
                 next = cacheCallback(id, next);
@@ -564,8 +583,8 @@
                 });
             }
         }
-    };
+    });
 
     /* Make it public */
-    window.CMS = CMS;
+    Object.defineProperty(window, 'CMS', {value: CMS});
 })(this);

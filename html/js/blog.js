@@ -394,7 +394,7 @@ var eventHandlers = [
 
 if (typeof mobileblog !== 'undefined') {
     var blogid = getSitePath().substr(1).replace('blog_', '');
-    CMS.scope('blog');
+    CMS.scope = 'blog';
     CMS.get('blog', function(err, data) {
         'use strict';
         blogposts = data.object;
@@ -426,13 +426,7 @@ if (typeof mobileblog !== 'undefined') {
                         '<span>by:</span> ' + escapeHTML(blogposts[i].by || "Admin") +
                     '</div>' +
                     '<div class="clear"></div>' +
-                    '<div id="blogarticle_post">' +
-                    content.replace(
-                        /((?:{|%7B)cmspath(?:%7D|}))\/(unsigned\/)?([\dA-Za-z]+)/g,
-                        function(matches, cmspath, unsigned, filename) {
-                            return CMS.img(filename);
-                        }) +
-                '</div>' +
+                    '<div id="blogarticle_post">' + CMS.parse(content) + '</div>' +
                     '<div class="clear"></div>' +
                 '</div>' +
                 '<div class="bottom-menu full-version">' +

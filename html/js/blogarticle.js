@@ -76,11 +76,7 @@ function render_blogarticle() {
     var btitle = blogposts[i].h;
     var bdate = acc_time2date(blogposts[i].t);
 
-    content = content.replace(
-        /((?:{|%7B)cmspath(?:%7D|}))\/(unsigned\/)?([\dA-Za-z]+)/g,
-        function(matches, cmspath, unsigned, filename) {
-            return CMS.img(filename);
-        });
+    content = CMS.parse(content);
 
     if (!content) {
         loadSubPage('blog');

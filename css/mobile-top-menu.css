@@ -204,7 +204,7 @@
     box-sizing: border-box;
 }
 .submenu-item.expanded + .top-submenu {
-    max-height: 300px;
+    max-height: 340px;
     opacity: 1;
     padding-top: 6px;
 }

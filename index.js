@@ -638,6 +638,10 @@ function init_page() {
         && (page !== 'securechat')
         && (page !== 'downloadapp')
         && (page !== 'unsub')
+        && (page !== 'cookie')
+        && (page !== 'updatedterms')
+        && (page !== 'updatedprivacy')
+        && (page !== 'updatedtakedown')
         && (page.indexOf('file/') === -1)
         && (page.indexOf('folder/') === -1)
         && localStorage.awaitingConfirmationAccount) {
@@ -1562,6 +1566,19 @@ function init_page() {
         parsepage(pages['done']);
         init_done();
     }
+    else if (page === 'cookie') {
+        parsepage(pages.cookie);
+    }
+    // Temporary pages
+    else if (page === 'updatedterms') {
+        parsepage(pages.updatedterms);
+    }
+    else if (page === 'updatedprivacy') {
+        parsepage(pages.updatedprivacy);
+    }
+    else if (page === 'updatedtakedown') {
+        parsepage(pages.updatedtakedown);
+    }
     else if (page.substr(0, 5) === 'unsub') {
         // Non-registered user unsubsribe from emails.
         if (is_mobile) {
@@ -2447,7 +2464,8 @@ function topmenuUI() {
                     'help', 'login', 'mega', 'nzippmember', 'nziphotographer', 'privacy', 'gdpr', 'mobileapp',
                     'mobile', 'privacycompany', 'register', 'resellers', 'sdk', 'sync', 'sitemap', 'sourcecode',
                     'support', 'sync', 'takedown', 'terms', 'start', 'security', 'downloadapp', 'affiliate',
-                    'nas', 'pro', 'securechat', 'collaboration', 'storage'
+                    'nas', 'pro', 'securechat', 'collaboration', 'storage', 'cookie',
+                    'updatedterms', 'updatedprivacy', 'updatedtakedown' // This will be removed on future
                 ];
                 var moveTo = {
                     'account': 'fm/account',

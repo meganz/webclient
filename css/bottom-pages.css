@@ -177,11 +177,17 @@
 .new-bottom-pages ul {
     padding-left: 15px;
 }
-.new-bottom-pages ul li {
+.new-bottom-pages ul li, .new-bottom-pages.takedown-guidance ol li {
     color: #333333;
     font-size: 14px;
     line-height: 26px;
     padding-left: 3px;
+}
+.new-bottom-pages.cookie-policy ul li, .new-bottom-pages.takedown-guidance ul li {
+    list-style: disc;
+}
+.new-bottom-pages.takedown-guidance ol li {
+    list-style: decimal;
 }
 .new-bottom-pages hr, .bottom-pages-dialog .bp-main hr {
     height: 1px;
@@ -6550,4 +6556,8 @@ body:not(.mobile) .bottom-page.unsub .tip-wrapper .underline-btn-txt {
 }
 .dev-new-button.del-icon:hover, .dev-new-button.del-icon.active {
     background-position: 11px -967px;
+}
+.mobile .terms-of-service .index-table td:nth-of-type(2) {
+    white-space: nowrap;
+    text-align: right;
 }

@@ -208,7 +208,7 @@
     margin: 4px 0 -16px 0;
 }
 .submenu-item.expanded + .top-submenu {
-    max-height: 300px;
+    max-height: 340px;
     opacity: 1;
 }
 .top-submenu .top-menu-item {

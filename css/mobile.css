@@ -9645,6 +9645,7 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll, .mob
 
 .new-bottom-pages.terms .index-table td:not(:first-child) {
     text-align: right;
+    white-space: nowrap;
 }
 .business-page .big-red-button.height-48 {
     display: block;

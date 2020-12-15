@@ -3024,6 +3024,12 @@ else if (!browserUpdate) {
         'feature_storage': {f:'html/features-storage.html', n: 'feature_storage', j:0},
         'feature_chat': {f:'html/features-chat.html', n: 'feature_chat', j:0},
         'feature_collaboration': {f:'html/features-collaboration.html', n: 'feature_collaboration', j:0},
+        'cookie': {f:'html/cookie.html', n: 'cookie', j:0},
+
+        // This need to be removed once switch this pages to normal one.
+        'updatedterms': {f:'html/updated-terms.html', n: 'updatedterms', j:0},
+        'updatedprivacy': {f:'html/updated-privacy.html', n: 'updatedprivacy', j:0},
+        'updatedtakedown': {f:'html/updated-takedown.html', n: 'updatedtakedown', j:0},
     };
 
     var jsl3 = {
@@ -3143,7 +3149,13 @@ else if (!browserUpdate) {
         'collaboration': ['feature_collaboration', 'features_js'],
         'nzippmember': ['nzipp', 'nzipp_js', 'nzipp_css'],
         'nziphotographer': ['nzipp', 'nzipp_js', 'nzipp_css'],
-        'business': ['business', 'businessjs']
+        'business': ['business', 'businessjs'],
+        'cookie': ['cookie'],
+
+        // Temporary pages
+        'updatedterms': ['updatedterms'],
+        'updatedprivacy': ['updatedprivacy'],
+        'updatedtakedown': ['updatedtakedown'],
     };
 
     if (is_mobile) {

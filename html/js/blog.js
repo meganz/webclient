@@ -18,19 +18,6 @@ if (!m) {
 var blogposts = null;
 var blogHeaders = Object.create(null);
 
-function unsigned_blogposts(ready) {
-    var xhr = getxhr();
-    xhr.open("GET", (localStorage.cms || "https://cms2.mega.nz/") + "unsigned/blog");
-    xhr.onreadystatechange = function() {
-        if (this.readyState === 4) {
-            blogposts = JSON.parse(xhr.responseText);
-            ready();
-        }
-    };
-    xhr.send(null);
-}
-
-
 var bloglimit = 5;
 var blogpage = 1;
 
@@ -92,6 +79,8 @@ function init_blog() {
         init_blog();
     });
 
+    CMS.scope = 'blog';
+
     CMS.get('blog', function(err, data) {
         if (err) {
             return alert("Error fetching the blog data");
@@ -142,7 +131,7 @@ function blog_load() {
                     blogcontent += '<div class="blog-new-small"><span>By:</span> ' + escapeHTML(by) + '</div>';
                     blogcontent += '<div class="clear"></div><img alt="" data-img="loading_'
                         + escapeHTML(blogposts[i].attaches.simg) + '" src="'
-                        + escapeHTML(CMS.img2(blogposts[i].attaches.simg)) + '" />';
+                        + CMS.img(blogposts[i].attaches.simg) + '" />';
                     blogcontent += '<p><span class="blog-new-description">' + introtxt + '</span>';
                     blogcontent += '<a class="blog-new-read-more">' + l[8512] + '</a>';
                     blogcontent += '<span class="clear"></span></p> </div>';
@@ -405,8 +394,10 @@ var eventHandlers = [
 
 if (typeof mobileblog !== 'undefined') {
     var blogid = getSitePath().substr(1).replace('blog_', '');
-    unsigned_blogposts(function() {
-
+    CMS.scope = 'blog';
+    CMS.get('blog', function(err, data) {
+        'use strict';
+        blogposts = data.object;
         var i = "post_" + blogid;
         var content = '';
         if (!blogposts[i]) {
@@ -415,7 +406,7 @@ if (typeof mobileblog !== 'undefined') {
         }
         if (blogposts[i].attaches.bimg) {
             content += '<img alt="" data-img="loading_' + escapeHTML(blogposts[i].attaches.bimg)
-                + '" src="https://cms2.mega.nz/unsigned/' + escapeHTML(blogposts[i].attaches.bimg)
+                + '" src="' + CMS.img(blogposts[i].attaches.bimg)
                 + '" class="blog-new-full-img" />';
         }
         content += blogposts[i].c;
@@ -435,7 +426,7 @@ if (typeof mobileblog !== 'undefined') {
                         '<span>by:</span> ' + escapeHTML(blogposts[i].by || "Admin") +
                     '</div>' +
                     '<div class="clear"></div>' +
-                    '<div id="blogarticle_post">' + content.replace(/(?:{|%7B)cmspath(?:%7D|})/g, 'https://cms2.mega.nz/') + '</div>' +
+                    '<div id="blogarticle_post">' + CMS.parse(content) + '</div>' +
                     '<div class="clear"></div>' +
                 '</div>' +
                 '<div class="bottom-menu full-version">' +
@@ -449,15 +440,16 @@ if (typeof mobileblog !== 'undefined') {
             .replace(RegExp(' (' + eventHandlers.join("|") + ')', 'g'), ' data-dummy');
 
         // Prevent blog breaking on mobile due to missing jQuery
-        if (!is_mobile) {
-            clickURLs();
-        } else {
+        if (is_mobile) {
             // Record blog post visit.
             onIdle(function() {
                 var xhr = getxhr();
                 xhr.open("POST", apipath + 'cs?id=0' + mega.urlParams(), true);
                 xhr.send(JSON.stringify([{a: 'log', e: 99801, m: blogid}]));
             });
+        }
+        else {
+            clickURLs();
         }
 
         if (window.android) {

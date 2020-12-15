@@ -846,6 +846,7 @@ var megasync = (function() {
             return next(linuxClients);
         }
 
+        CMS.scope = 'sync';
         // Talk to the CMS server and get information
         // about the `sync` (expect a JSON)
         CMS.get('sync', function(err, content) {

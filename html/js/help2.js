@@ -793,8 +793,9 @@ var Help = (function() {
             }
         };
 
-        CMS.index('help_' + lang, function(err, blobs)
-        {
+        CMS.scope = 'help2';
+
+        CMS.index('help_' + lang, function(err, blobs) {
             if (err) {
                 return alert('Invalid response from the server');
             }
@@ -885,6 +886,13 @@ var Help = (function() {
                 e: 99704,
                 m: 'web help viewed'
             });
+        }
+
+        let $images = $('img', $('.main-content-pad'));
+        for (let i = 0; i < $images.length; i++) {
+            let $img = $($images[i]);
+            let source = $img.attr('src');
+            $img.attr('src', CMS.img(source));
         }
 
         $('#help2-main .link').rebind('click', function(e) {

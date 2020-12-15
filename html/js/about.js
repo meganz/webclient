@@ -16,17 +16,20 @@ var aboutus = {
 
     fetchCMS: function() {
         "use strict";
-
+        CMS.scope = 'team';
         if (this.members) {
             this.insMembersInHTML(this.members);
         }
         else {
             var self = this;
-            M.xhr({ url: (localStorage.cms || "https://cms2.mega.nz/") + "unsigned/team_en", type: 'json' })
-                .then(function(ev, members) {
-                    self.members = members;
-                    self.insMembersInHTML(members);
-                });
+            CMS.get('team_en', function(err, data) {
+                if (err) {
+                    console.error('Failed to fetch team data');
+                    return false;
+                }
+                self.members = data.object;
+                self.insMembersInHTML(data.object);
+            });
         }
     },
 
@@ -85,13 +88,10 @@ var aboutus = {
             return 0.5 - Math.random();
         });
         var aboutContent = '';
-        var memPhoto;
-        var cmsUrl = CMS.getUrl();
         for (var i = members.length; i--;) {
-            memPhoto = (members[i].photo || '').replace(/(?:{|%7B)cmspath(?:%7D|})/, cmsUrl);
             aboutContent +=
                 '<div class="bottom-page inline-block col-6 fadein">' +
-                '<img class="shadow" src="' + escapeHTML(memPhoto)
+                '<img class="shadow" src="' + CMS.img(members[i].photo)
                 + '" alt="' + escapeHTML(members[i].name) + '">' +
                 '<span class="bold">' + escapeHTML(members[i].name) + '</span>' +
                 '<span>' + escapeHTML(members[i].role) + '</span>' +

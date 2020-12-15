@@ -16,21 +16,23 @@ var corporate = {
     fetchCMS: function($page) {
         "use strict";
         var self = this;
-        M.xhr({ url: (localStorage.cms || "https://cms2.mega.nz/") + "unsigned/corporate", type: 'json' })
-            .then(function(ev, pages) {
-                self.renderCorporatePages(pages);
-                corporate.openSubSection($page);
-            });
+        CMS.scope = 'corporate';
+        CMS.get('corporate', function(err, data) {
+            if (err) {
+                console.error('Error fetching Corporate page data.');
+                return false;
+            }
+            self.renderCorporatePages(data.object);
+            corporate.openSubSection($page);
+        });
     },
 
     renderCorporatePages: function(pages) {
         'use strict';
-        var self = this;
-        pages.forEach(function(c) {
-            $('.corporate-content', self.$page).safeAppend(
-                c.content.replace(/(?:{|%7B)cmspath(?:%7D|})/g, CMS.getUrl())
-            );
-        });
+        var $target = $('.corporate-content', this.$page);
+        for (var i = 0; i < pages.length; i++) {
+            $target.safeAppend(CMS.parse(pages[i].content));
+        }
     },
 
     /**

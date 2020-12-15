@@ -89,6 +89,11 @@ MegaQueue.prototype.isEmpty = function() {
         && this._queue.length === 0;
 };
 
+MegaQueue.prototype.isFinalising = function(threshold) {
+    'use strict';
+    return this._running <= (threshold || 1) && this._queue.length === 0;
+};
+
 MegaQueue.prototype.pushFirst = function(arg, next, self) {
     if (d) {
         var found;

@@ -341,6 +341,7 @@ i.medium-icon.business-sprite {
     display: table;
     table-layout: fixed;
     width: 100%;
+    position: relative;
 }
 .bottom-page.slider-body {
     padding: 32px 0 5px 0;

@@ -40,7 +40,6 @@
 var uldl_hold = false;
 var ul_queue = false;
 
-/* jshint -W003 */
 var ulmanager = {
     ulFaId: 0,
     ulSize: 0,
@@ -52,6 +51,7 @@ var ulmanager = {
     ulCompletingPhase: Object.create(null),
     ulOverStorageQuota: false,
     ulOverStorageQueue: [],
+    ulFinalizeQueue: [],
     ulBlockSize: 131072,
     ulBlockExtraSize: 1048576,
     ulMaxFastTrackSize: 1048576 * 3,
@@ -314,6 +314,8 @@ var ulmanager = {
     },
 
     abort: function UM_abort(gid) {
+        'use strict';
+
         if (gid === null || Array.isArray(gid)) {
             this._multiAbort = 1;
 
@@ -321,6 +323,8 @@ var ulmanager = {
                 gid.forEach(this.abort.bind(this));
             }
             else {
+                this.ulSetupQueue = false;
+                M.tfsdomqueue = Object.create(null);
                 ul_queue.filter(isQueueActive).forEach(this.abort.bind(this));
             }
 
@@ -341,6 +345,12 @@ var ulmanager = {
                 var ul = ul_queue[l];
 
                 if (gid === this.getGID(ul)) {
+                    if (ulmanager.ulCompletingPhase[gid]) {
+                        if (d) {
+                            ulmanager.logger.debug('Not aborting %s, it is completing...', gid, ul);
+                        }
+                        continue;
+                    }
                     if (d) {
                         ulmanager.logger.info('Aborting ' + gid, ul.name);
                     }
@@ -634,19 +644,31 @@ var ulmanager = {
             req.n[0].fa = file.ddfa;
         }
 
-        if (target) {
-            var sn = M.getShareNodesSync(target);
-            if (sn.length) {
-                req.cr = crypto_makecr([n], sn, false);
-                req.cr[1][0] = file.response;
+        onIdle(function() {
+            for (var k in M.tfsdomqueue) {
+                if (k[0] === 'u') {
+                    addToTransferTable(k, M.tfsdomqueue[k], 1);
+                    delete M.tfsdomqueue[k];
+                    break;
+                }
             }
-        }
+        });
 
         if (d) {
             ulmanager.logger.info("Completing upload for %s, into %s", file.name, target, req);
+            console.assert(file.owner && file.owner.gid, 'No assoc owner..');
         }
 
-        api_req(req, ctx);
+        if (file.owner) {
+            this.ulCompletingPhase[file.owner.gid] = Date.now();
+        }
+
+        if (this.ulFinalizeQueue.push([n, req, ctx]) > 19 || window.ulQueue.isFinalising()) {
+            this.ulCompletePending();
+        }
+        else {
+            delay('ul.finalize:dsp', () => this.ulCompletePending(), 4e3);
+        }
     },
 
     ulGetPostURL: function UM_ul_get_posturl(File) {
@@ -864,6 +886,39 @@ var ulmanager = {
         }
     },
 
+    ulCompletePending: function() {
+        'use strict';
+        const self = this;
+        delay.cancel('ul.finalize:dsp');
+
+        // Ensure no -3s atm..
+        M.req('ping').always(function dsp() {
+            // @todo per target folder rather!
+            if ($.getExportLinkInProgress) {
+                if (d) {
+                    self.logger.debug('Holding upload(s) until link-export completed...');
+                }
+                mBroadcaster.once('export-link:completed', () => onIdle(dsp));
+                return;
+            }
+
+            const q = self.ulFinalizeQueue;
+            self.ulFinalizeQueue = [];
+
+            for (let i = q.length; i--;) {
+                const [n, req, ctx] = q[i];
+
+                let sn = M.getShareNodesSync(req.t);
+                if (sn.length) {
+                    req.cr = crypto_makecr([n], sn, false);
+                    req.cr[1][0] = req.n[0].h;
+                }
+
+                api_req(req, ctx);
+            }
+        });
+    },
+
     ulCompletePending2: function UM_ul_completepending2(res, ctx) {
         'use strict';
 
@@ -938,7 +993,7 @@ var ulmanager = {
         else {
             var ul = ul_queue[ctx.ul_queue_num];
 
-            if (!ul && error === EACCESS) {
+            if (!ul && res === EACCESS) {
                 ulmanager.logger.warn('This upload was already aborted, resorting to context...', ctx.file);
                 ul = ctx.file;
             }
@@ -1339,22 +1394,9 @@ ChunkUpload.prototype.onXHRready = function(xhrEvent) {
                     var u8 = new Uint8Array(response);
 
                     this.file.filekey = filekey;
-                    ulmanager.ulCompletingPhase[this.gid] = Date.now();
                     this.file.response = (u8[35] === 1)
                         ? ab_to_base64(response)
                         : ab_to_str(response);
-
-                    if ($.getExportLinkInProgress) {
-                        this.logger.debug('Holding upload until link-export completed...', [this]);
-                        mBroadcaster.once('export-link:completed', function() {
-                            ulmanager.ulFinalize(self.file);
-                            self.bytes = null;
-                            self.file.retries = 0;
-                            self.done();
-                        });
-                        return;
-                    }
-
                     ulmanager.ulFinalize(this.file);
                     u8 = undefined;
                 }

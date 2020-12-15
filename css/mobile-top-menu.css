@@ -204,7 +204,7 @@
     box-sizing: border-box;
 }
 .submenu-item.expanded + .top-submenu {
-    max-height: 300px;
+    max-height: 340px;
     opacity: 1;
     padding-top: 6px;
 }
@@ -369,7 +369,7 @@
     color: #373737;
     font-family: 'LatoWebSemiBold', Arial;
     padding: 1px 0 0 0;
-    
+
     overflow: hidden;
     -o-text-overflow: ellipsis;
     text-overflow: ellipsis;
@@ -516,11 +516,11 @@
     background-position: -148px -170px;
 }
 .menus-sprite.rounded.encryption {
-    background-color: #ED5564;
+    background-color: #4A90E2;
     background-position: -198px -167px;
 }
-.menus-sprite.rounded.chat {
-    background-color: #00A8E1;
+.menus-sprite.rounded.securechat {
+    background-color: #ED5564;
     background-position: 2px -226px;
 }
 .menus-sprite.rounded.backup {

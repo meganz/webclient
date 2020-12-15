@@ -133,6 +133,8 @@ function linuxMegacmdDropdown() {
     $content.find('.megaapp-linux').removeClass('hidden');
     $content.addClass('linux');
 
+    CMS.scope = 'cmd';
+
     CMS.get('cmd', function(err, content) {
         linuxnameindex = {};
         linuxClients = content.object;

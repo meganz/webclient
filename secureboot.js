@@ -12,7 +12,9 @@ var lastactive = new Date().getTime();
 var URL = window.URL || window.webkitURL;
 var seqno = Math.ceil(Math.random()*1000000000);
 var staticpath = null;
+var cmsStaticPath = null;
 var defaultStaticPath = 'https://eu.static.mega.co.nz/3/'; // EU should never fail. EU is the mothership.
+var defaultCMSStaticPath = 'https://eu.static.mega.co.nz/cms/';
 var ua = window.navigator.userAgent.toLowerCase();
 var uv = window.navigator.appVersion.toLowerCase();
 var storage_version = '1'; // clear localStorage when version doesn't match
@@ -100,6 +102,16 @@ function isMobile() {
     }
 
     return false;
+}
+
+function setCookie(key, val) {
+    'use strict';
+    if (!is_iframed && location.host === 'mega.nz' && key) {
+        tryCatch(function() {
+            document.cookie = key + '=' + (val || '') + '; expires=' +
+                (val ? 'Fri, 31 Dec 9999 23:59:59 GMT' : 'Thu, 01 Jan 1970 00:00:00 GMT');
+        })();
+    }
 }
 
 function getSitePath() {
@@ -238,10 +250,12 @@ function mURIDecode(path) {
  * This is detected by the mega.nz server and set as a cookie e.g. "geoip=SG".
  * @returns {String} Returns the nearest static server to be used or the EU one as default
  */
-function geoStaticPath() {
+// eslint-disable-next-line complexity
+function geoStaticPath(cms) {
 
     'use strict';
 
+    var finalPath = cms ? 'cms/' : '3/';
     try {
         // If flag is not set to force the default EU static server
         if (!sessionStorage.skipGeoStaticPath) {
@@ -256,19 +270,19 @@ function geoStaticPath() {
 
             // Check the country code to return a closer static server
             if (cookieMatch && cookieMatch[1] && singaporeStaticCountries.indexOf(cookieMatch[1]) > -1) {
-                return 'https://sg.static.mega.co.nz/3/';
+                return 'https://sg.static.mega.co.nz/' + finalPath;
             }
             else if (cookieMatch && cookieMatch[1] && northAmericaStaticCountries.indexOf(cookieMatch[1]) > -1) {
-                return 'https://na.static.mega.co.nz/3/';
+                return 'https://na.static.mega.co.nz/' + finalPath;
             }
             else if (cookieMatch && cookieMatch[1] && newZealandStaticCountries.indexOf(cookieMatch[1]) > -1) {
-                return 'https://nz.static.mega.co.nz/3/';
+                return 'https://nz.static.mega.co.nz/' + finalPath;
             }
         }
     }
     catch (ex) {}
 
-    return defaultStaticPath;
+    return cms ? defaultCMSStaticPath : defaultStaticPath;
 }
 
 if (is_chrome_firefox) {
@@ -499,12 +513,15 @@ if (!browserUpdate) try
             location.host !== 'webcache.googleusercontent.com'))) {
 
         if (location.host === 'smoketest.mega.nz') {
+            cmsStaticPath = 'https://smoketest.static.mega.nz/cms/';
             staticpath = 'https://smoketest.static.mega.nz/3/';
             defaultStaticPath = staticpath;
         }
         else {
             nocontentcheck = sessionStorage.dbgContentCheck ? 0 : true;
             var devhost = window.location.host;
+
+            cmsStaticPath = 'https://smoketest.static.mega.nz/cms/';
 
             // Set the static path and default static path for debug mode to be the same
             staticpath = window.location.protocol + "//" + devhost + "/";
@@ -521,12 +538,20 @@ if (!browserUpdate) try
         staticpath = localStorage.staticpath;
     }
 
+    // Override any set cms static path with the one from localStorage to test standard static server failure
+    if (localStorage.cms) {
+        cmsStaticPath = localStorage.cms;
+    }
+
     // Override the default static path to test recovery after standard static server failure
     if (localStorage.getItem('defaultstaticpath') !== null) {
         defaultStaticPath = localStorage.defaultstaticpath;
     }
 
-    staticpath = staticpath || geoStaticPath();
+    staticpath = staticpath || geoStaticPath(false);
+    // cms static path
+    cmsStaticPath = cmsStaticPath || geoStaticPath(true);
+
     apipath = localStorage.apipath || 'https://g.api.mega.co.nz/';
 
     // If dark mode flag is enabled, change styling
@@ -871,6 +896,20 @@ if (!browserUpdate && is_extension)
 }
 
 var page;
+window.redirect = ['backup', 'businessinvite', 'businesssignup', 'cancel', 'confirm', 'copyrightnotice', 'debug',
+    'disputenotice', 'emailverify', 'key', 'login', 'megadrop', 'megadrop', 'newsignup', 'pwrevert', 'recover',
+    'redeem', 'register', 'repay', 'reset', 'sms', 'support', 'test', 'twofactor', 'unsub', 'voucher', 'wiretransfer'];
+var shouldRedirectPage = function(page) {
+    'use strict';
+    if (page) {
+        for (var k = redirect.length; k--;) {
+            if (page.substr(0, redirect[k].length) === redirect[k]) {
+                return true;
+            }
+        }
+    }
+    return false;
+};
 
 if (hashLogic) {
     // legacy support:
@@ -909,15 +948,10 @@ else {
     }
 
     page = getCleanSitePath(page);
-    if (is_litesite) {
-        window.redirect = {
-            'login': true, 'register': 1, 'registerb': 1, 'recovery': 1, 'reset': 1, 'cancel': 1, 'newsignup': 1,
-            'recover': 1, 'redeem': true, 'megadrop': true, 'support': 1, 'copyrightnotice': 1
-        };
-        if (redirect[page]) {
-            window.location.replace('https://mega.nz/' + page);
-        }
+    if (is_litesite && shouldRedirectPage(page)) {
+        window.location.replace('https://mega.nz/' + page);
     }
+
 	// put try block around it to allow the page to be rendered in Google cache
 	try
 	{
@@ -2454,6 +2488,7 @@ else if (!browserUpdate) {
     jsl.push({f:'css/business-register.css', n: 'business-register_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/psa.css', n: 'psa_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
     jsl.push({f:'css/about.css', n: 'about_css', j:2,w:5,c:1,d:1,cache:1});
+    jsl.push({f:'css/features.css', n: 'features_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/corporate.css', n: 'corporate_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'html/start.html', n: 'start', j:0});
     jsl.push({f:'html/js/start.js', n: 'start_js', j:1});
@@ -2835,6 +2870,8 @@ else if (!browserUpdate) {
         jsl.push({f:'css/dialogs-common.css', n: 'dialogs-common_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'js/utils/clipboard.js', n: 'js_utils_clipboard_js', j: 1});
         jsl.push({f:'js/ui/simpletip.js', n: 'simpletip_js', j:1,w:1});
+        jsl.push({f:'css/features.css', n: 'features_css', j:2,w:5,c:1,d:1,cache:1});
+
         if (lang === 'ar' || lang === 'fa') {
             jsl.push({f:'css/lang_ar.css', n: 'lang_arabic_css', j: 2, w: 30, c: 1, d: 1, m: 1 });
         }
@@ -2982,7 +3019,17 @@ else if (!browserUpdate) {
         'downloadapp_js': {f:'html/js/desktop-onboarding.js', n: 'downloadapp_js', j:1},
         'downloadapp': {f:'html/desktop-onboarding.html', n: 'downloadapp', j:0},
         'codemirror_js': {f:'js/vendor/codemirror.js', n: 'codemirror_js', j:1},
-        'codemirrorscroll_js': {f:'js/vendor/simplescrollbars.js', n: 'codemirrorscroll_js', j:1}
+        'codemirrorscroll_js': {f:'js/vendor/simplescrollbars.js', n: 'codemirrorscroll_js', j:1},
+        'features_js': {f:'html/js/features.js', n: 'features_js', j:1},
+        'feature_storage': {f:'html/features-storage.html', n: 'feature_storage', j:0},
+        'feature_chat': {f:'html/features-chat.html', n: 'feature_chat', j:0},
+        'feature_collaboration': {f:'html/features-collaboration.html', n: 'feature_collaboration', j:0},
+        'cookie': {f:'html/cookie.html', n: 'cookie', j:0},
+
+        // This need to be removed once switch this pages to normal one.
+        'updatedterms': {f:'html/updated-terms.html', n: 'updatedterms', j:0},
+        'updatedprivacy': {f:'html/updated-privacy.html', n: 'updatedprivacy', j:0},
+        'updatedtakedown': {f:'html/updated-takedown.html', n: 'updatedtakedown', j:0},
     };
 
     var jsl3 = {
@@ -3097,9 +3144,18 @@ else if (!browserUpdate) {
         'security': ['securitypractice', 'securitypractice_js', 'filesaver'],
         'developersettings': ['developersettings', 'developersettings_js'],
         'megadrop': ['megadrop', 'nomegadrop'],
+        'storage': ['feature_storage', 'features_js'],
+        'securechat': ['feature_chat', 'features_js'],
+        'collaboration': ['feature_collaboration', 'features_js'],
         'nzippmember': ['nzipp', 'nzipp_js', 'nzipp_css'],
         'nziphotographer': ['nzipp', 'nzipp_js', 'nzipp_css'],
-        'business': ['business', 'businessjs']
+        'business': ['business', 'businessjs'],
+        'cookie': ['cookie'],
+
+        // Temporary pages
+        'updatedterms': ['updatedterms'],
+        'updatedprivacy': ['updatedprivacy'],
+        'updatedtakedown': ['updatedtakedown'],
     };
 
     if (is_mobile) {
@@ -3875,6 +3931,13 @@ else if (!browserUpdate) {
         // No session handling needed for
         if (is_drop || is_karma) {
             return;
+        }
+        if (location.host === 'mega.nz' && !u_storage.sid && !is_iframed && !shouldRedirectPage(page)
+            && !isPublickLinkV2(page) && !isPublicLink(page) && !isChatLink(page) && !location.hash) {
+            // there isn't a stored session ID (regardless of its validity), we move.
+            // since without a session-id it's not possible to access any internal page.
+            setCookie('logged');
+            return window.location.replace('https://mega.io/' + page);
         }
 
         if (page[0] === 'F' && page[1] === '!' || page.substr(0, 7) === 'folder/') {

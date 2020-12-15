@@ -2574,7 +2574,7 @@ var exportExpiry = {
 
         if (handles.length) {
             if (!quiet) {
-                loadingDialog.show();
+                loadingDialog.pshow();
             }
             self.logger.debug('removeExportLink');
 

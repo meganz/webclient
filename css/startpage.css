@@ -607,7 +607,7 @@ body.en .download .bottom-page.top-bl {
     height: 44px;
 }
 .startpage-sprite, i.startpage-sprite,
-.bottom-menu.logo
+.bottom-menu .logo
 {
     background-image: url(../images/mega/startpage-sprite_v12.png);
     background-repeat: no-repeat;
@@ -1018,7 +1018,7 @@ div.startpage.software-img.soft-slide[data-slide="2"] {
     -webkit-transition: opacity 200ms ease-in-out;
     transition: opacity 200ms ease-in-out;
     margin: 9px 0;
-}  
+}
 .startpage.software-controls span.active, .startpage.default-controls span.active {
     opacity: 1;
 }
@@ -1131,7 +1131,7 @@ div.startpage.software-img.soft-slide[data-slide="2"] {
     .startpage.os-icons,
     .startpage.scroll-to-top,
     .startpage.quote-icon,
-    .bottom-menu.logo,
+    .bottom-menu .logo,
     .startpage-sprite,
     i.startpage-sprite
     {

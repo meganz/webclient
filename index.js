@@ -633,8 +633,15 @@ function init_page() {
         && (page !== 'takendown')
         && (page !== 'resellers')
         && (page !== 'security')
+        && (page !== 'storage')
+        && (page !== 'collaboration')
+        && (page !== 'securechat')
         && (page !== 'downloadapp')
         && (page !== 'unsub')
+        && (page !== 'cookie')
+        && (page !== 'updatedterms')
+        && (page !== 'updatedprivacy')
+        && (page !== 'updatedtakedown')
         && (page.indexOf('file/') === -1)
         && (page.indexOf('folder/') === -1)
         && localStorage.awaitingConfirmationAccount) {
@@ -1536,6 +1543,18 @@ function init_page() {
     else if (page == 'resellers') {
         parsepage(pages['resellers']);
     }
+    else if (page === 'storage') {
+        parsepage(pages.feature_storage);
+        featurePages('storage');
+    }
+    else if (page === 'securechat') {
+        parsepage(pages.feature_chat);
+        featurePages('securechat');
+    }
+    else if (page === 'collaboration') {
+        parsepage(pages.feature_collaboration);
+        featurePages('collaboration');
+    }
     else if (page === 'downloadapp') {
         parsepage(pages.downloadapp);
         desktopOnboarding();
@@ -1546,6 +1565,19 @@ function init_page() {
     else if (page == 'done') {
         parsepage(pages['done']);
         init_done();
+    }
+    else if (page === 'cookie') {
+        parsepage(pages.cookie);
+    }
+    // Temporary pages
+    else if (page === 'updatedterms') {
+        parsepage(pages.updatedterms);
+    }
+    else if (page === 'updatedprivacy') {
+        parsepage(pages.updatedprivacy);
+    }
+    else if (page === 'updatedtakedown') {
+        parsepage(pages.updatedtakedown);
     }
     else if (page.substr(0, 5) === 'unsub') {
         // Non-registered user unsubsribe from emails.
@@ -2138,12 +2170,13 @@ function topmenuUI() {
             // Show the Pro badge
             $('.plan', $menuLoggedBlock).text(purchasedPlan);
             $headerPlanIcon.attr('class', 'tiny-icon membership-status ' + cssClass);
+            $('body').addClass('pro-user');
         }
         else {
             // Show the free badge
             $('.plan', $menuLoggedBlock).text(l[1150]);
             $('.membership-status', $topHeader).attr('class', 'tiny-icon membership-status free');
-            $('body').removeClass('lite').addClass('free');
+            $('body').removeClass('lite pro-user').addClass('free');
         }
 
         if (is_fm()) {
@@ -2172,6 +2205,10 @@ function topmenuUI() {
                 // Hide Pricing menu item for Business sub accounts and admin expired
                 $menuPricingItem.addClass('hidden');
             }
+            $('body').addClass('business-user');
+        }
+        else {
+            $('body').removeClass('business-user');
         }
 
         // Show PRO plan expired warning popup (if applicable)
@@ -2427,7 +2464,8 @@ function topmenuUI() {
                     'help', 'login', 'mega', 'nzippmember', 'nziphotographer', 'privacy', 'gdpr', 'mobileapp',
                     'mobile', 'privacycompany', 'register', 'resellers', 'sdk', 'sync', 'sitemap', 'sourcecode',
                     'support', 'sync', 'takedown', 'terms', 'start', 'security', 'downloadapp', 'affiliate',
-                    'nas', 'pro'
+                    'nas', 'pro', 'securechat', 'collaboration', 'storage', 'cookie',
+                    'updatedterms', 'updatedprivacy', 'updatedtakedown' // This will be removed on future
                 ];
                 var moveTo = {
                     'account': 'fm/account',
@@ -2862,7 +2900,7 @@ function loadSubPage(tpage, event) {
 
     if (M.chat && megaChatIsReady) {
         // navigating within the chat, skip the bloatware
-        if (tpage.indexOf('chat') > -1) {
+        if (tpage !== 'securechat' && tpage.indexOf('chat') > -1) {
             megaChat.navigate(tpage, event);
             return false;
         }

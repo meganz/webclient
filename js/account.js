@@ -219,8 +219,6 @@ function u_checklogin3a(res, ctx) {
             psa.updateApiWithLastPsaSeen(u_attr['^!lastPsa']);
         }
 
-        setCookie('logged', '1');
-
         if (r > 2 && !is_embed) {
             return mBroadcaster.crossTab.initialize(function() {
                 ctx.checkloginresult(ctx, r);
@@ -304,7 +302,6 @@ function u_logout(logout) {
         u_sharekeys = {};
         u_type = false;
         loggedout = true;
-        setCookie('logged');
         $('#fmholder').text('').attr('class', 'fmholder');
         if (window.MegaData) {
             M = new MegaData();

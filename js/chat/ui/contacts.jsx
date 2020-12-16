@@ -646,7 +646,7 @@ export class ContactCard extends ContactAwareComponent {
         var noContextButton = this.props.noContextButton ? this.props.noContextButton : "";
         var dropdownRemoveButton = self.props.dropdownRemoveButton ? self.props.dropdownRemoveButton : [];
         var highlightSearchValue = self.props.highlightSearchValue ? self.props.highlightSearchValue : false;
-        var emailTooptips = self.props.emailTooltips ? self.props.emailTooltips : false;
+        var emailTooltips = self.props.emailTooltips ? self.props.emailTooltips : false;
         var searchValue = self.props.searchValue ? self.props.searchValue : "";
 
         var usernameBlock;
@@ -679,7 +679,7 @@ export class ContactCard extends ContactAwareComponent {
                     )
                 }}></span>;
             }
-            if (emailTooptips) {
+            if (emailTooltips) {
                 usernameBlock = <div
                     className="user-card-name light simpletip"
                     data-simpletip={contact.m}

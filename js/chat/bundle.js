@@ -2028,7 +2028,7 @@ class ContactCard extends _stores_mixins_js2__["ContactAwareComponent"] {
     var noContextButton = this.props.noContextButton ? this.props.noContextButton : "";
     var dropdownRemoveButton = self.props.dropdownRemoveButton ? self.props.dropdownRemoveButton : [];
     var highlightSearchValue = self.props.highlightSearchValue ? self.props.highlightSearchValue : false;
-    var emailTooptips = self.props.emailTooltips ? self.props.emailTooltips : false;
+    var emailTooltips = self.props.emailTooltips ? self.props.emailTooltips : false;
     var searchValue = self.props.searchValue ? self.props.searchValue : "";
     var usernameBlock;
 
@@ -2063,7 +2063,7 @@ class ContactCard extends _stores_mixins_js2__["ContactAwareComponent"] {
         });
       }
 
-      if (emailTooptips) {
+      if (emailTooltips) {
         usernameBlock = react1.a.createElement("div", {
           className: "user-card-name light simpletip",
           "data-simpletip": contact.m,
@@ -19390,7 +19390,7 @@ Chat.prototype.safeForceUpdate = SoonFc(60, function forceAppUpdate() {
 });
 
 Chat.prototype.loginOrRegisterBeforeJoining = function (chatHandle, forceRegister, forceLogin, notJoinReq) {
-  if (!chatHandle && (page === 'chat' || page.indexOf('chat') > -1)) {
+  if (!chatHandle && page !== 'securechat' && (page === 'chat' || page.indexOf('chat') > -1)) {
     chatHandle = getSitePath().split("chat/")[1].split("#")[0];
   }
 

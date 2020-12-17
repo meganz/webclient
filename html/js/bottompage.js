@@ -53,11 +53,9 @@ var bottompage = {
         }
 
         if (!is_mobile) {
-            $('body').removeClass('mobile');
             bottompage.initNavButtons($content);
         }
         else {
-            $('body').addClass('mobile');
             bottompage.initMobileNavButtons($content);
         }
 

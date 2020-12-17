@@ -1248,6 +1248,7 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[/A2]', '</a>')
         .replace(/\[S]/g, '<span>').replace(/\[\/S]/g, '</span>')
         .replace(/\[BR]/g, '<br/>');
+    l[24642] = escapeHTML(l[24642]).replace('[A]', '<a href="/register" class="green">').replace('[/A]', '</a>');
 
     var common = [
         15536, 16106, 16107, 16119, 16120, 16123, 16124, 16135, 16136, 16137, 16138, 16304, 16313, 16315, 16316,

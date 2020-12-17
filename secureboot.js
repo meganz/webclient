@@ -2495,6 +2495,7 @@ else if (!browserUpdate) {
     jsl.push({f:'js/ui/passwordReminderDialog.js', n: 'prd_js', j:1,w:1});
     jsl.push({f:'html/dialogs-common.html', n: 'dialogs-common', j:0,w:2});
     jsl.push({f:'css/dialogs-common.css', n: 'dialogs-common_css', j:2,w:5,c:1,d:1,cache:1});
+    jsl.push({f:'css/dialogs/cookie-dialog.css', n: 'cookie-dialog_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'js/metatags.js', n: 'metatags_js', j:1 });
 
     if (!is_mobile) {

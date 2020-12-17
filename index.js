@@ -381,13 +381,20 @@ function init_page() {
     }
 
     if (is_mobile && is_android) {
+
         var $html = $('html');
+        var $body = $('body', $html);
 
-        $html.height(window.innerHeight);
+        // Add mobile class for adaptive features
+        $body.addClass('mobile');
 
-        $(window).rebind('resize.htmlheight', function() {
+        if (is_android) {
             $html.height(window.innerHeight);
-        });
+
+            $(window).rebind('resize.htmlheight', function() {
+                $html.height(window.innerHeight);
+            });
+        }
     }
 
     // Redirect url to extensions when it tries to go plugin or chrome or firefox

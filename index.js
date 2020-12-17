@@ -1570,8 +1570,22 @@ function init_page() {
         parsepage(pages.cookie);
     }
     // Temporary pages
-    else if (page === 'updatedterms') {
-        parsepage(pages.updatedterms);
+    else if (page.substr(0, 12) === 'updatedterms') {
+        if (is_mobile) {
+            mobile.initDOM();
+            mobile.terms.show();
+        }
+        else {
+            parsepage(pages.updatedterms);
+        }
+
+        if (page.substr(12, 1) === '/') {
+            delay('waitTermLoad', function() {
+                var anchor = page.split('/')[1];
+                page = 'updatedterms';
+                $('a[data-scrollto="#' + anchor + '"]').click();
+            });
+        }
     }
     else if (page === 'updatedprivacy') {
         parsepage(pages.updatedprivacy);

@@ -13,29 +13,6 @@
     border-top: 1px solid rgba(0, 0, 0, 0.1);
 }
 
-.fm-dialog.share-dialog .share-dialog-green-button,
-.fm-dialog.share-add-dialog .share-dialog-green-button {
-    background: linear-gradient(180deg, #00BFA5 0%, #00A690 100%);
-    border: 1px solid #009985;
-    border-radius: 4px;
-    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.15);
-    box-sizing: border-box;
-    cursor: pointer;
-    height: 38px;
-    width: auto;
-}
-
-.fm-dialog.share-dialog .share-dialog-white-button {
-    background: linear-gradient(180deg, #FFFFFF 0%, #FAFAFA 100%);
-    border: 1px solid rgba(0, 0, 0, 0.05);
-    border-radius: 4px;
-    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.15);
-    box-sizing: border-box;
-    cursor: pointer;
-    height: 38px;
-    width: auto;
-}
-
 .fm-dialog.share-dialog .share-dialog-top-body {
     padding: 44px 44px 15px 44px;
     position: relative;
@@ -72,16 +49,6 @@
     float: right;
     padding-right: 4px;
     vertical-align: middle;
-}
-
-.share-dialog-top-body .copy-link {
-    color: #FFFFFF;
-    display: inline-block;
-    font-family: LatoWeb;
-    font-size: 14px;
-    letter-spacing: 0;
-    line-height: 20px;
-    padding: 8px 13px;
 }
 
 .share-dialog-top-body .share-dialog-copy-link-msg {
@@ -397,24 +364,13 @@
 
 .share-dialog-bottom-body .done-share,
 .share-add-dialog-bottom-body .add-share {
-    color: #FFFFFF;
     display: inline-block;
-    font-family: LatoWeb;
-    font-size: 14px;
-    letter-spacing: 0;
-    line-height: 20px;
-    padding: 8px 17px;
 }
 
-.share-dialog-bottom-body .remove-share {
-    color: #333333;
+.share-dialog-bottom-body .remove-share,
+.share-add-dialog-bottom-body .cancel-add-share {
     display: inline-block;
-    font-family: LatoWeb;
-    font-size: 14px;
-    letter-spacing: 0;
-    line-height: 20px;
-    margin-right: 11px;
-    padding: 8px 17px;
+    margin-right: 12px;
 }
 
 .share-dialog-bottom-body .remove-share.disabled {
@@ -556,27 +512,7 @@
 .share-add-dialog-bottom-body .share-add-dialog-buttons-wrapper {
     height: 38px;
     margin-top: 14px;
-    vertical-align: middle;
-}
-
-.share-add-dialog-bottom-body .share-add-dialog-cancel-button {
-    color: #000000;
-    display: inline-block;
-    font-family: LatoWeb;
-    height: 20px;
-    vertical-align: middle;
-    width: 100px;
-}
-
-.share-add-dialog-bottom-body .share-add-dialog-cancel-button span {
-    cursor: pointer;
-}
-
-.share-add-dialog-bottom-body .share-add-dialog-add-button-wrapper {
-    display: inline-block;
     text-align: right;
-    vertical-align: middle;
-    width: calc(100% - 103px);
 }
 
 /* Overwrite the style of elements in the contact picker rendered by react */
@@ -698,6 +634,10 @@
     color: #666666;
     font-weight: 600;
     max-width: 80%;
+}
+
+.fm-dialog.share-add-dialog .contacts-search-list .user-card-data .user-card-name:hover {
+    color: #333333;
 }
 
 .fm-dialog.share-add-dialog .contacts-search-list .user-card-data .user-card-name strong {

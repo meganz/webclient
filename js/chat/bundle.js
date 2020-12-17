@@ -2028,6 +2028,7 @@ class ContactCard extends _stores_mixins_js2__["ContactAwareComponent"] {
     var noContextButton = this.props.noContextButton ? this.props.noContextButton : "";
     var dropdownRemoveButton = self.props.dropdownRemoveButton ? self.props.dropdownRemoveButton : [];
     var highlightSearchValue = self.props.highlightSearchValue ? self.props.highlightSearchValue : false;
+    var emailTooltips = self.props.emailTooltips ? self.props.emailTooltips : false;
     var searchValue = self.props.searchValue ? self.props.searchValue : "";
     var usernameBlock;
 
@@ -2062,9 +2063,17 @@ class ContactCard extends _stores_mixins_js2__["ContactAwareComponent"] {
         });
       }
 
-      usernameBlock = react1.a.createElement("div", {
-        className: "user-card-name light"
-      }, username);
+      if (emailTooltips) {
+        usernameBlock = react1.a.createElement("div", {
+          className: "user-card-name light simpletip",
+          "data-simpletip": contact.m,
+          "data-simpletipposition": "top"
+        }, username);
+      } else {
+        usernameBlock = react1.a.createElement("div", {
+          className: "user-card-name light"
+        }, username);
+      }
     }
 
     var userCard = null;
@@ -2384,6 +2393,7 @@ class ContactPickerWidget extends _stores_mixins_js2__["MegaRenderMixin"] {
       noContextMenu: true,
       searchValue: self.state.searchValue,
       highlightSearchValue: self.props.highlightSearchValue,
+      emailTooltips: self.props.emailTooltips,
       key: v.u
     }));
     return true;
@@ -2752,7 +2762,8 @@ ContactPickerWidget.defaultProps = {
   autoFocusSearchField: false,
   disableDoubleClick: false,
   newEmptySearchResult: false,
-  newNoContact: false
+  newNoContact: false,
+  emailTooltips: false
 };
 
 /***/ }),
@@ -7043,11 +7054,11 @@ class resultContainer_ResultContainer extends mixins["MegaRenderMixin"] {
             const entry = entries[i];
             const target = entry.target;
 
-            if ((_target$classList = target.classList) == null ? void 0 : _target$classList.contains(NODE_CLASS)) {
+            if ((_target$classList = target.classList) != null && _target$classList.contains(NODE_CLASS)) {
               target.style.backgroundImage = entry.isIntersecting ? "url(" + target.dataset.url + ")" : null;
             }
 
-            if (entry.isIntersecting && ((_target$classList2 = target.classList) == null ? void 0 : _target$classList2.contains(RESULTS_END_CLASS))) {
+            if (entry.isIntersecting && (_target$classList2 = target.classList) != null && _target$classList2.contains(RESULTS_END_CLASS)) {
               this.props.onPaginate();
             }
           }
@@ -19379,7 +19390,7 @@ Chat.prototype.safeForceUpdate = SoonFc(60, function forceAppUpdate() {
 });
 
 Chat.prototype.loginOrRegisterBeforeJoining = function (chatHandle, forceRegister, forceLogin, notJoinReq) {
-  if (!chatHandle && (page === 'chat' || page.indexOf('chat') > -1)) {
+  if (!chatHandle && page !== 'securechat' && (page === 'chat' || page.indexOf('chat') > -1)) {
     chatHandle = getSitePath().split("chat/")[1].split("#")[0];
   }
 
@@ -21626,7 +21637,8 @@ class startGroupChatWizard_StartGroupChatWizard extends mixins["MegaRenderMixin"
       emptySelectionMsg: self.props.emptySelectionMsg,
       newEmptySearchResult: self.props.newEmptySearchResult,
       newNoContact: self.props.newNoContact,
-      highlightSearchValue: self.props.highlightSearchValue
+      highlightSearchValue: self.props.highlightSearchValue,
+      emailTooltips: self.props.emailTooltips
     }), extraFooterElement);
   }
 
@@ -21645,7 +21657,8 @@ startGroupChatWizard_StartGroupChatWizard.defaultProps = {
   'disableDoubleClick': false,
   'newEmptySearchResult': false,
   'newNoContact': false,
-  'closeDlgOnClickOverlay': true
+  'closeDlgOnClickOverlay': true,
+  'emailTooltips': false
 };
 window.StartGroupChatDialogUI = {
   StartGroupChatWizard: startGroupChatWizard_StartGroupChatWizard

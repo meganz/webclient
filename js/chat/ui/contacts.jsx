@@ -646,6 +646,7 @@ export class ContactCard extends ContactAwareComponent {
         var noContextButton = this.props.noContextButton ? this.props.noContextButton : "";
         var dropdownRemoveButton = self.props.dropdownRemoveButton ? self.props.dropdownRemoveButton : [];
         var highlightSearchValue = self.props.highlightSearchValue ? self.props.highlightSearchValue : false;
+        var emailTooltips = self.props.emailTooltips ? self.props.emailTooltips : false;
         var searchValue = self.props.searchValue ? self.props.searchValue : "";
 
         var usernameBlock;
@@ -678,7 +679,15 @@ export class ContactCard extends ContactAwareComponent {
                     )
                 }}></span>;
             }
-            usernameBlock = <div className="user-card-name light">{username}</div>;
+            if (emailTooltips) {
+                usernameBlock = <div
+                    className="user-card-name light simpletip"
+                    data-simpletip={contact.m}
+                    data-simpletipposition="top">{username}</div>;
+            }
+            else {
+                usernameBlock = <div className="user-card-name light">{username}</div>;
+            }
         }
 
         var userCard = null;
@@ -809,7 +818,8 @@ export class ContactPickerWidget extends MegaRenderMixin {
         autoFocusSearchField: false,
         disableDoubleClick: false,
         newEmptySearchResult: false,
-        newNoContact: false
+        newNoContact: false,
+        emailTooltips: false
     }
     constructor(props) {
         super(props);
@@ -1005,6 +1015,7 @@ export class ContactPickerWidget extends MegaRenderMixin {
                 noContextMenu={true}
                 searchValue={self.state.searchValue}
                 highlightSearchValue={self.props.highlightSearchValue}
+                emailTooltips={self.props.emailTooltips}
                 key={v.u}
             />
         );

@@ -25,7 +25,8 @@ export class StartGroupChatWizard extends MegaRenderMixin {
         'disableDoubleClick': false,
         'newEmptySearchResult': false,
         'newNoContact': false,
-        'closeDlgOnClickOverlay': true
+        'closeDlgOnClickOverlay': true,
+        'emailTooltips': false
     };
 
     constructor(props) {
@@ -316,6 +317,7 @@ export class StartGroupChatWizard extends MegaRenderMixin {
                     newEmptySearchResult={self.props.newEmptySearchResult}
                     newNoContact={self.props.newNoContact}
                     highlightSearchValue={self.props.highlightSearchValue}
+                    emailTooltips={self.props.emailTooltips}
                 />
                 {extraFooterElement}
             </ModalDialogsUI.ModalDialog>

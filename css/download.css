@@ -88,7 +88,34 @@
     height: calc(100% - 48px);
     margin-top: 48px;
 }
-.bottom-page.download-content .table-cell {
+
+.video-theatre-mode .bottom-page.download-content .bottom-page.dl-ads,
+.bottom-page.download-content .dl-ads {
+    display: none;
+    vertical-align: top;
+}
+.bottom-page.download-content .dl-ads.table-cell.ads-active {
+    display: table-cell;
+    width: 137px;
+}
+.bottom-page.download-content .dl-left-ads.ads-active {
+    text-align: left;
+    padding-left: 17px;
+}
+.bottom-page.download-content .dl-right-ads.ads-active {
+    text-align: right;
+    padding-right: 17px;
+}
+
+@media only screen and (max-width: 920px), (max-height: 668px) {
+    .bottom-page.download-content .dl-ads.table-row.ads-active {
+        display: table-row;
+    }
+    .bottom-page.download-content .dl-ads.table-cell.ads-active {
+        display: none;
+    }
+}
+.bottom-page.download-content .table-cell:not(.dl-ads) {
     vertical-align: middle;
 }
 .bottom-page.dropdown-table {
@@ -174,6 +201,7 @@ body.en .download.top-bar.expanded::before {
     top: -118px;
     position: fixed;
     background: rgba(255, 255, 255,1);
+    overflow: hidden;
 }
 body:not(.en) .download.top-bar.floating {
     top: -128px;

@@ -3003,6 +3003,8 @@ else if (!browserUpdate) {
         'downloadapp': {f:'html/desktop-onboarding.html', n: 'downloadapp', j:0},
         'codemirror_js': {f:'js/vendor/codemirror.js', n: 'codemirror_js', j:1},
         'codemirrorscroll_js': {f:'js/vendor/simplescrollbars.js', n: 'codemirrorscroll_js', j:1},
+        'gadvs_js': {f:'js/gAdvs.js', n: 'gadvs_js', j:1},
+
         // 'features_js': {f:'html/js/features.js', n: 'features_js', j:1},
         // 'feature_storage': {f:'html/features-storage.html', n: 'feature_storage', j:0},
         // 'feature_chat': {f:'html/features-chat.html', n: 'feature_chat', j:0},
@@ -3091,8 +3093,8 @@ else if (!browserUpdate) {
         'newsignup': ['register', 'register_js', 'zxcvbn_js'],
         'emailverify': ['zxcvbn_js'],
         'resellers': ['resellers'],
-        '!': ['download', 'download_js'],
-        'file': ['download', 'download_js'],
+        '!': ['download', 'download_js', 'gadvs_js'],
+        'file': ['download', 'download_js', 'gadvs_js'],
         'dispute': ['dispute'],
         'disputenotice': ['disputenotice', 'copyright_js'],
         'copyright': ['copyright'],
@@ -3877,6 +3879,12 @@ else if (!browserUpdate) {
                     p: page.substr(0, 5) === 'file/' ? page.substr(5, 8) : page.split('!')[1]
                 };
 
+                // if this is download page, get ads data with g request
+                if (page.substr(0, 5) === 'file/') {
+                    g.au = ["wphl", "wphr", "wpht"];
+                    g.ad = localStorage.adflag || 1;
+                }
+
                 xhr(false, g, function(response) {
                     dl_res = Array.isArray(response) && response[0];
                 });
@@ -4056,27 +4064,6 @@ else if (!browserUpdate) {
 }
 
 /* jshint -W098 */
-/**
- * Determines whether to show an ad or not
- * @returns {number} Returns a 0 for definitely no ads (e.g. I am using an extension). 1 will enable ads dependent on
- *                   country. 2 ignores country limitations (for developers to always see ads regardless). 3 means I
- *                   prefer not to see an ad because I am logged in, but it will send one if it is a trusted ad that we
- *                   have vetted (we fully control the ad and host it ourselves) and ads are turned on in the API.
- */
-function showAd() {
-
-    // We need to tell the API we would like ad urls, but only show generic ads from providers if we are not logged in
-    var showAd = (typeof u_sid === 'undefined') ? 1 : 3;
-
-    // If using a browser extension, do not show ads at all for our security conscious users
-    showAd = (is_extension) ? 0 : showAd;
-
-    // Override for testing
-    showAd = (typeof localStorage.testAds === 'undefined') ? showAd : parseInt(localStorage.testAds);
-
-    return showAd;
-}
-
 /**
  * History API's pushState helper that takes into account whether we're running through an extension or public-link
  * @param {Object|String} page The page to change to, or an history's state object

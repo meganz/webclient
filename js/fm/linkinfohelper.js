@@ -214,7 +214,7 @@ LinkInfoHelper.prototype.retrieve = function() {
             });
     }
     else if (!self.is_dir) {
-        self._promise = asyncApiReq({a: 'g', p: self.node_handle, 'ad': showAd()})
+        self._promise = asyncApiReq({a: 'g', p: self.node_handle})
             .done(function (r) {
                 self.info['size'] = r.s;
                 self.info['at'] = r.at;

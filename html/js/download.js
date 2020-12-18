@@ -9,6 +9,7 @@ var fileSize;
 var dlResumeInfo;
 var mediaCollectFn;
 var maxDownloadSize = Math.pow(2, 53);
+var dl_advs;
 
 function expandDlBar(close) {
     'use strict';
@@ -38,7 +39,9 @@ function expandDlBar(close) {
         // Set height to  top  bar if it doesn't fit min height
         if ($topBar.hasClass('expanded')) {
 
-            var contentHeight = $('.download.main-pad', $topBar).outerHeight(true);
+            $topBar.css('height', 'auto');
+
+            var contentHeight = $('.download-content .dropdown-table', $topBar).outerHeight(true);
 
             if (contentHeight > $('.download-content', $topBar).outerHeight()) {
 
@@ -93,7 +96,7 @@ function dlinfo(ph,key,next)
     }
     else {
         // Fetch the file information and optionally the download URL
-        M.req({a: 'g', p: ph, 'ad': showAd()}).always(dl_g);
+        M.req({a: 'g', p: ph, 'ad': localStorage.adflag || 1, au: ["wphl", "wphr", "wpht"]}).always(dl_g);
     }
 
     if (is_mobile) {
@@ -636,6 +639,9 @@ function dl_g(res, ctx) {
 
             // This file link is valid to affiliate
             M.affiliate.storeAffiliate(dlpage_ph, 2);
+
+            // Adding advertisement
+            dlPageAds($topBar).dump('ads');
         }
         else if (is_mobile) {
             // Load the missing file decryption key dialog for mobile
@@ -856,17 +862,71 @@ function dlPageStartDownload(isDlWithMegaSync) {
     $.dlhash = getSitePath();
 }
 
+async function dlPageAds($topBar) {
+    'use strict';
+
+    if (is_mobile || !('csp' in window)) {
+        return 'unavailing';
+    }
+
+    await csp.init();
+    if (!csp.has('ads') || !csp.has('third')) {
+        return 'unhallowed';
+    }
+
+    dl_advs = new gAdvs(dlpage_ph, res);
+
+    // Only load iframe that require to be rendered,
+    // Once screensize updated to change layout, trying to render others
+    if (window.innerWidth < 920 || window.innerHeight < 668) {
+        $(window).rebind('resize.downloadAdvs', function() {
+
+            if (window.innerWidth >= 920 && window.innerHeight >= 668) {
+
+                dl_advs.render($('.dl-left-ads', $topBar), 'wphl').dump('wphl');
+                dl_advs.render($('.dl-right-ads', $topBar), 'wphr').dump('wphr');
+                $(window).unbind('resize.downloadAdvs');
+            }
+        });
+
+        dl_advs.render($('.dl-top-ads', $topBar), 'wpht').dump('wpht');
+    }
+    else {
+        $(window).rebind('resize.downloadAdvs', function() {
+
+            if (window.innerWidth < 920 || window.innerHeight < 668) {
+
+                dl_advs.render($('.dl-top-ads', $topBar), 'wpht').dump('wpht');
+                $(window).unbind('resize.downloadAdvs');
+            }
+        });
+
+        dl_advs.render($('.dl-left-ads', $topBar), 'wphl').dump('wphl');
+        dl_advs.render($('.dl-right-ads', $topBar), 'wphr').dump('wphr');
+    }
+
+    $topBar.rebind('click.hideAds', function(e) {
+
+        if ($(e.target).is('.download.play-video-button')) {
+            dl_advs.destroy();
+            $(window).unbind('resize.downloadAdvs');
+        }
+    });
+
+    return 'showing';
+}
+
 function getStoreLink() {
     switch (ua.details.os) {
-    case 'iPad':
-    case 'iPhone':
-        return 'https://itunes.apple.com/app/mega/id706857885';
+        case 'iPad':
+        case 'iPhone':
+            return 'https://itunes.apple.com/app/mega/id706857885';
 
-    case 'Windows Phone':
-        return 'zune://navigate/?phoneappID=1b70a4ef-8b9c-4058-adca-3b9ac8cc194a';
+        case 'Windows Phone':
+            return 'zune://navigate/?phoneappID=1b70a4ef-8b9c-4058-adca-3b9ac8cc194a';
 
-    case 'Android':
-        return 'https://play.google.com/store/apps/details?id=mega.privacy.android.app&referrer=meganzindexandroid';
+        case 'Android':
+            return 'https://play.google.com/store/apps/details?id=mega.privacy.android.app&referrer=meganzindexandroid';
     }
 }
 
@@ -1221,5 +1281,11 @@ function dlPageCleanup() {
 
         $(window).trigger('video-destroy');
         dl_node = false;
+    }
+
+    if (dl_advs) {
+        $(window).unbind('resize.downloadAdvs');
+        dl_advs.destroy();
+        dl_advs = false;
     }
 }

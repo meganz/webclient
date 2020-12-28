@@ -1418,6 +1418,7 @@ function init_page() {
     else if (page == 'blog') {
         parsepage(pages['blog']);
         init_blog();
+        api_req({ a: 'log', e: 99740, m: window.u_handle || 'visitor' });
     }
     else if (is_mobile && (page === 'copyright' || page === 'copyrightnotice')) {
 

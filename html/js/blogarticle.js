@@ -110,6 +110,17 @@ function render_blogarticle() {
             dateModified: pubDate
         }
     );
-
-    api_req({ a: 'log', e: 99801, m: blogid});
+    // mousedown event is used because "clickURLs()" function will overwrite "click" event
+    $('.new-bottom-pages.blog-new a', 'body').rebind('mousedown.log', (e) => {
+        api_req({
+            a: 'log', e: 99742,
+            m: {
+                blogid: blogid,
+                u: window.u_handle || 'visitor',
+                btn: e.currentTarget.id || 'n/a',
+                ext: e.currentTarget.href || 'n/a'
+            }
+        });
+    });
+    api_req({ a: 'log', e: 99801, m: { blogid: blogid, u: window.u_handle || 'visitor' } });
 }

@@ -2787,6 +2787,46 @@ body:not(.mobile) .bottom-page.top-dark-button:hover {
 .bottom-page.linux .megaapp-linux {
     display: table;
 }
+
+.bottom-page .megaapp-linux-container .install-guide-trigger {
+    text-align: left;
+    color: #6FD7FF;
+    cursor: pointer;
+}
+
+.bottom-page .megaapp-linux-container .install-guide-trigger span,
+.bottom-page .megaapp-linux-container .install-guide-text span {
+    font-family: 'LatoWeb', 'source_sans_proregular', Arial;
+    float: left;
+    font-size: 14px;
+    margin-top: 16px;
+}
+
+.bottom-page .megaapp-linux-container .install-guide-text {
+    color: #FAFAFA;
+    line-height: 17px;
+    padding-bottom: 10px;
+    white-space: initial;
+}
+
+.bottom-page .megaapp-linux-container .install-guide-text:not(.hidden) {
+    display: inline-block;
+}
+
+.bottom-page .megaapp-linux-container div.radioOff,
+.bottom-page .megaapp-linux-container div.radioOn {
+    margin-left: 24px;
+}
+
+.megaapp-install-guide-arrow {
+    width: 8px;
+    height: 6px;
+    background-image: url(../images/mega/new-pages-sprite_v6.png);
+    background-repeat: no-repeat;
+    margin: 10px 48px 0 11px;
+    float: left;
+}
+
 .megaapp-linux-arrow {
     position: absolute;
     width: 18px;
@@ -2964,7 +3004,7 @@ div.radioOn.green::after {
     opacity: 1;
 }
 .megaapp-linux .radio-txt {
-    min-width: 85px;
+    padding-right: 0 !important;
 }
 .small-green-button {
     display: inline-block;

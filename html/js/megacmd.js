@@ -58,6 +58,25 @@ function initMegacmd() {
         return false;
     });
 
+    $('.install-guide-trigger', $content).rebind('click', function() {
+        var $guideText = $('.install-guide-text', $content);
+        var $this = $(this);
+        if ($guideText.hasClass('hidden')) {
+            $guideText.removeClass('hidden');
+        }
+        else {
+            $guideText.addClass('hidden');
+        }
+        if ($this.hasClass('open')) {
+            $this.removeClass('open');
+            $this.addClass('closed');
+        }
+        else {
+            $this.addClass('open');
+            $this.removeClass('closed');
+        }
+    });
+
     $content.find('.tab-button').rebind('click', function() {
         var $this = $(this);
         var className = $this.attr('data-class');
@@ -117,6 +136,7 @@ function changeLinuxCMD(linuxClients, i) {
         if (link) {
             $page.find('.megacmd-linux-download').addClass('download').removeClass('disabled').attr('data-link', link);
         }
+        $('.install-guide-text span', $page).text(linuxClients[i].help_text);
     }
 }
 

@@ -550,7 +550,6 @@ FileManager.prototype.initFileManagerUI = function() {
     M.treeSortUI();
     M.initTreePanelSorting();
     M.initContextUI();
-    initShareDialog();
     M.addTransferPanelUI();
     M.initUIKeyEvents();
     M.onFileManagerReady(topmenuUI);
@@ -1407,7 +1406,10 @@ FileManager.prototype.initContextUI = function() {
         renameDialog();
     });
 
-    $(c + '.sh4r1ng-item').rebind('click', M.openSharingDialog.bind(M));
+    $(c + '.sh4r1ng-item').rebind('click', function() {
+        initShareDialog();
+        M.openSharingDialog();
+    });
 
     // Move Dialog
     $(c + '.advanced-item, ' + c + '.move-item').rebind('click', openMoveDialog);

@@ -646,7 +646,7 @@ MegaData.prototype.hideEmptyGrids = function hideEmptyGrids() {
     $('.fm-empty-trashbin,.fm-empty-contacts,.fm-empty-search')
         .add('.fm-empty-cloud,.fm-invalid-folder,.fm-empty-filter').addClass('hidden');
     $('.fm-empty-folder,.fm-empty-incoming,.fm-empty-folder-link')
-        .add('.fm-empty-outgoing,.fm-empty-public-link').addClass('hidden');
+        .add('.fm-empty-outgoing,.fm-empty-public-link,.fm-empty-user-management').addClass('hidden');
     $('.fm-empty-pad.fm-empty-sharef').remove();
 };
 

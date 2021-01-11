@@ -3860,6 +3860,7 @@ FileManager.prototype.onSectionUIOpen = function(id) {
         else {
             $('.fm-right-header').addClass('hidden');
             $('.fm-right-header-user-management').removeClass('hidden');
+            M.hideEmptyGrids();
         }
         $('.fm-chat-block').addClass('hidden');
         $('.section.conversations').addClass('hidden');

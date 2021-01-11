@@ -2777,7 +2777,7 @@ body:not(.mobile) .bottom-page.top-dark-button:hover {
     width: 398px;
     border: 1px solid rgba(0, 0, 0, 0.3);
     position: relative;
-    margin: -40px auto 50px auto;
+    margin: -40px auto 0 auto;
     text-align: left;
     white-space: nowrap;
 }
@@ -2794,24 +2794,40 @@ body:not(.mobile) .bottom-page.top-dark-button:hover {
     cursor: pointer;
 }
 
-.bottom-page .megaapp-linux-container .install-guide-trigger span,
-.bottom-page .megaapp-linux-container .install-guide-text span {
+.bottom-page .megaapp-linux-container .install-guide-trigger span {
     font-family: 'LatoWeb', 'source_sans_proregular', Arial;
     float: left;
     font-size: 14px;
     margin-top: 16px;
+    margin-right: 21px;
     line-height: 0;
 }
 
-.bottom-page .megaapp-linux-container .install-guide-text span::selection { /* Code for Firefox */
+.bottom-page .megaapp-linux-container .install-guide-text span {
+    font-family: 'LatoWeb', 'source_sans_proregular', Arial;
+    float: left;
+    font-size: 14px;
+    margin: 8px;
+    line-height: 20px;
+}
+
+.bottom-page .megaapp-linux-box-container {
+    min-height: 480px;
+}
+
+.bottom-page .megaapp-linux-container .install-guide-text span::selection {
     color: white;
-    background: #6FD7FF;
+    background: rgba(129, 207, 179, 0.3);
 }
 
 .bottom-page .megaapp-linux-container .install-guide-text {
+    background-color: #222222;
+    margin-top: 10px;
+    width: 100%;
     color: #FAFAFA;
     line-height: 17px;
     white-space: initial;
+    border-radius: 4px;
 }
 
 .bottom-page .megaapp-linux-container .install-guide-text:not(.hidden) {
@@ -2851,9 +2867,7 @@ body:not(.mobile) .bottom-page.top-dark-button:hover {
     background-repeat: no-repeat;
     background-position: right -385px;
 }
-.very-dark-blue-bg .megaapp-linux {
-    background-color: rgba(0, 0, 0, 0.3);
-}
+
 .very-dark-blue-bg .megaapp-linux-arrow {
     background-position: -347px -349px;
 }

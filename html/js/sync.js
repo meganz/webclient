@@ -127,25 +127,6 @@ function initMegasync() {
         return false;
     });
 
-    $('.install-guide-trigger', $content).rebind('click', function() {
-        var $guideText = $('.install-guide-text', $content);
-        var $this = $(this);
-        if ($guideText.hasClass('hidden')) {
-            $guideText.removeClass('hidden');
-        }
-        else {
-            $guideText.addClass('hidden');
-        }
-        if ($this.hasClass('open')) {
-            $this.removeClass('open');
-            $this.addClass('closed');
-        }
-        else {
-            $this.addClass('open');
-            $this.removeClass('closed');
-        }
-    });
-
     $('.megaapp-windows-info.32bit a', $content).rebind('click.megasyncWin32', function() {
         window.location = megasync.getMegaSyncUrl('windows_x32');
         return false;

@@ -64,7 +64,7 @@ function initMegacmd() {
             $copiedMsg.removeClass('hidden');
             setTimeout(function() {
                 $('.install-guide-copy-msg', $content).addClass('hidden');
-            }, 2000)
+            }, 2000);
         }
     });
 

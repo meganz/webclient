@@ -58,24 +58,16 @@ function initMegacmd() {
         return false;
     });
 
-    $('.install-guide-trigger', $content).rebind('click', function() {
-        var $guideText = $('.install-guide-text', $content);
-        var $this = $(this);
-        if ($guideText.hasClass('hidden')) {
-            $guideText.removeClass('hidden');
-        }
-        else {
-            $guideText.addClass('hidden');
-        }
-        if ($this.hasClass('open')) {
-            $this.removeClass('open');
-            $this.addClass('closed');
-        }
-        else {
-            $this.addClass('open');
-            $this.removeClass('closed');
+    $('.copy-intall-guide-icon', $content).rebind('click', function() {
+        if (copyToClipboard($('span', $(this).closest('.install-guide-text')).text())) {
+            var $copiedMsg = $('.install-guide-copy-msg', $content);
+            $copiedMsg.removeClass('hidden');
+            setTimeout(function() {
+                $('.install-guide-copy-msg', $content).addClass('hidden');
+            }, 2000)
         }
     });
+
 
     $content.find('.tab-button').rebind('click', function() {
         var $this = $(this);

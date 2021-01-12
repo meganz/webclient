@@ -139,8 +139,13 @@ function initMegasync() {
     });
 
     $('.copy-intall-guide-icon', $content).rebind('click', function() {
-        if (copyToClipboard($('span', $(this).closest('.install-guide-text')).text())) {
-
+        var $this = $(this);
+        if (copyToClipboard($('span', $this.closest('.install-guide-text')).text())) {
+            var $copiedMsg = $('.install-guide-copy-msg', $this.closest('.copy-line'))
+            $copiedMsg.removeClass('hidden');
+            setTimeout(function() {
+                $copiedMsg.addClass('hidden');
+            }, 2000)
         }
     });
 

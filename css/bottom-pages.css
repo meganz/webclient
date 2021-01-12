@@ -2790,7 +2790,7 @@ body:not(.mobile) .bottom-page.top-dark-button:hover {
 
 .bottom-page .megaapp-linux-container .install-guide-trigger {
     color: #6fd7ff;
-    cursor: pointer;
+    cursor: none;
     text-align: left;
 }
 
@@ -2808,7 +2808,7 @@ body:not(.mobile) .bottom-page.top-dark-button:hover {
     font-family: 'LatoWeb', 'source_sans_proregular', Arial, sans-serif;
     font-size: 14px;
     line-height: 20px;
-    margin: 8px;
+    margin: 8px 8px 0;
     width: 100%;
 }
 
@@ -2820,7 +2820,7 @@ body:not(.mobile) .bottom-page.top-dark-button:hover {
     font-size: 14px;
     height: 23px;
     line-height: 20px;
-    margin: 26px 0 8px 10px;
+    margin: 24px 0 8px 10px;
     text-align: center;
     width: 240px;
 }
@@ -2830,7 +2830,7 @@ body:not(.mobile) .bottom-page.top-dark-button:hover {
     background-position: -242px -288px;
     float: right;
     height: 23px;
-    margin: 26px 10px 10px 0;
+    margin: 24px 10px 10px 0;
 }
 
 .bottom-page .megaapp-linux-box-container {

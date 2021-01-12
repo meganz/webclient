@@ -127,6 +127,7 @@ function initMegasync() {
         return false;
     });
 
+
     $('.megaapp-windows-info.32bit a', $content).rebind('click.megasyncWin32', function() {
         window.location = megasync.getMegaSyncUrl('windows_x32');
         return false;
@@ -135,6 +136,12 @@ function initMegasync() {
     $('.megaapp-windows-info.64bit a', $content).rebind('click.megasyncWin64', function() {
         window.location = megasync.getMegaSyncUrl('windows');
         return false;
+    });
+
+    $('.copy-intall-guide-icon', $content).rebind('click', function() {
+        if (copyToClipboard($('span', $(this).closest('.install-guide-text')).text())) {
+
+        }
     });
 
     registerLinuxDownloadButton($content.find('.megaapp-linux-download, .megaext-linux-download'));
@@ -201,7 +208,7 @@ function changeLinux(linuxsync, i) {
             .removeClass('disabled')
             .attr('data-link', syncurl);
 
-        $('.install-guide-text span').text(linuxsync[i].help_text);
+        $('.install-guide-text span.install-guide').text(linuxsync[i].help_text);
 
         mBroadcaster.sendMessage('megasync-linux-distro-selected', syncurl);
         syncsel = i;

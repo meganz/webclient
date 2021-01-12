@@ -2799,23 +2799,45 @@ body:not(.mobile) .bottom-page.top-dark-button:hover {
     float: left;
     font-size: 14px;
     margin-top: 16px;
-    margin-right: 21px;
+    margin-right: 66px;
     line-height: 0;
 }
 
-.bottom-page .megaapp-linux-container .install-guide-text span {
+.bottom-page .megaapp-linux-container .install-guide-text span.install-guide {
     font-family: 'LatoWeb', 'source_sans_proregular', Arial;
     float: left;
     font-size: 14px;
     margin: 8px;
     line-height: 20px;
+    width: 100%;
+}
+
+.bottom-page .megaapp-linux-container .install-guide-copy-msg {
+    float: left;
+    margin: 26px 0 10px 10px;
+    font-size: 14px;
+    width: 240px;
+    height: 26px;
+    text-align: center;
+    line-height: 23px;
+    background-color: rgba(29,176,123,0.5);
+    border-radius: 4px;
+    border: solid 1px #1DB07B;
+}
+
+.bottom-page .megaapp-linux-container .copy-line-icon {
+    background-image: url(../images/mega/icons-sprite_v40.png);
+    background-position: -242px -288px;
+    height: 23px;
+    margin: 26px 10px 10px 0;
+    float: right;
 }
 
 .bottom-page .megaapp-linux-box-container {
     min-height: 480px;
 }
 
-.bottom-page .megaapp-linux-container .install-guide-text span::selection {
+.bottom-page .megaapp-linux-container .install-guide-text span.install-guide::selection {
     color: white;
     background: rgba(129, 207, 179, 0.3);
 }

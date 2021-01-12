@@ -63,10 +63,10 @@ function scrollToURLs() {
                 var newOffset = $scrollTo[0].offsetTop;
 
                 if (is_mobile) {
-                    if (page === "privacy" || page === "updatedprivacy") {
+                    if (page === "privacy") {
                         $toScroll = $('html');
                     }
-                    else if (page === "terms" || page === "updatedterms") {
+                    else if (page === "terms") {
                         $toScroll = $('.fm-block.terms-of-service .mobile.fm-scrolling');
                     }
                 }

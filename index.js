@@ -639,9 +639,6 @@ function init_page() {
         && (page !== 'downloadapp')
         && (page !== 'unsub')
         && (page !== 'cookie')
-        && (page !== 'updatedterms')
-        && (page !== 'updatedprivacy')
-        && (page !== 'updatedtakedown')
         && (page.indexOf('file/') === -1)
         && (page.indexOf('folder/') === -1)
         && localStorage.awaitingConfirmationAccount) {
@@ -1569,30 +1566,6 @@ function init_page() {
     else if (page === 'cookie') {
         parsepage(pages.cookie);
     }
-    // Temporary pages
-    else if (page.substr(0, 12) === 'updatedterms') {
-        if (is_mobile) {
-            mobile.initDOM();
-            mobile.terms.show();
-        }
-        else {
-            parsepage(pages.updatedterms);
-        }
-
-        if (page.substr(12, 1) === '/') {
-            delay('waitTermLoad', function() {
-                var anchor = page.split('/')[1];
-                page = 'updatedterms';
-                $('a[data-scrollto="#' + anchor + '"]').click();
-            });
-        }
-    }
-    else if (page === 'updatedprivacy') {
-        parsepage(pages.updatedprivacy);
-    }
-    else if (page === 'updatedtakedown') {
-        parsepage(pages.updatedtakedown);
-    }
     else if (page.substr(0, 5) === 'unsub') {
         // Non-registered user unsubsribe from emails.
         if (is_mobile) {
@@ -2479,7 +2452,6 @@ function topmenuUI() {
                     'mobile', 'privacycompany', 'register', 'resellers', 'sdk', 'sync', 'sitemap', 'sourcecode',
                     'support', 'sync', 'takedown', 'terms', 'start', 'security', 'downloadapp', 'affiliate',
                     'nas', 'pro', 'cookie', //'securechat', 'collaboration', 'storage',
-                    'updatedterms', 'updatedprivacy', 'updatedtakedown' // This will be removed on future
                 ];
                 var moveTo = {
                     'account': 'fm/account',

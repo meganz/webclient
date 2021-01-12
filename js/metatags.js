@@ -301,27 +301,15 @@ mega.metatags = new function() {
         }
         else if (page === 'terms') {
             mTags.en_title = 'Terms of Service - MEGA';
-            mTags.en_desc = 'MEGA LIMITED TERMS OF SERVICE ("TERMS")';
+            mTags.en_desc = 'Want to know what your rights are when using MEGA\'s services?';
             mTags.mega_title = l[23978] || mTags.en_title;
             mTags.mega_desc = l[23979] || mTags.en_desc;
         }
-        else if (page === 'updatedterms') {
-            mTags.en_title = 'Updated Terms of Service - MEGA';
-            mTags.en_desc = 'Want to know what your rights are when using MEGA\'s services?';
-            mTags.mega_title = mTags.en_title;
-            mTags.mega_desc = mTags.en_desc;
-        }
         else if (page === 'privacy') {
             mTags.en_title = 'Privacy Policy - MEGA';
-            mTags.en_desc = 'Mega Limited Privacy and Data Policy';
+            mTags.en_desc = 'Find out how MEGA protects your privacy.';
             mTags.mega_title = l[23980] || mTags.en_title;
             mTags.mega_desc = l[23981] || mTags.en_desc;
-        }
-        else if (page === 'updatedprivacy') {
-            mTags.en_title = 'Updated Privacy Policy - MEGA';
-            mTags.en_desc = 'Find out how MEGA protects your privacy.';
-            mTags.mega_title = mTags.en_title;
-            mTags.mega_desc = mTags.en_desc;
         }
         else if (page === 'gdpr') {
             mTags.en_title = 'GDPR - MEGA';
@@ -349,16 +337,10 @@ mega.metatags = new function() {
         }
         else if (page === 'takedown') {
             mTags.en_title = 'Takedown Guidance - MEGA';
-            mTags.en_desc = 'Guidance on Requesting User Information or "Takedown" of User Data';
-            mTags.mega_title = l[23988] || mTags.en_title;
-            mTags.mega_desc = l[23989] || mTags.en_desc;
-        }
-        else if (page === 'updatedtakedown') {
-            mTags.en_title = 'Updated Takedown Guidance - MEGA';
             mTags.en_desc = 'MEGA has special policies and procedures in place for anyone wanting access to user data' +
                             ' and information.';
-            mTags.mega_title = mTags.en_title;
-            mTags.mega_desc = mTags.en_desc;
+            mTags.mega_title = l[23988] || mTags.en_title;
+            mTags.mega_desc = l[23989] || mTags.en_desc;
         }
         else if (page === 'cookie') {
             mTags.en_title = 'Cookie Policy - MEGA';

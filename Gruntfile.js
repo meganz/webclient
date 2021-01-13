@@ -3,6 +3,8 @@ var fileLimit = 512*1024;
 const useHtmlMin = false;
 const usePostCSS = true;
 
+const basename = p => p.replace(/^.*\//, '');
+
 var Secureboot = function() {
     var content = fs.readFileSync("secureboot.js").toString().split("\n");
     var jsl = getFiles();
@@ -102,7 +104,10 @@ var Secureboot = function() {
                     lines.push(content[i]);
                     continue;
                 }
-                file = (usePostCSS ? 'build/' : '') + file[0].substr(1, file[0].length - 2);
+                file = file[0].substr(1, file[0].length - 2);
+                if (usePostCSS) {
+                    file = 'build/css/' + basename(file);
+                }
                 if (cssGroups[cssKeys[0]] && cssGroups[cssKeys[0]][0] == file) {
                     ns.addHeader(lines, cssGroups[cssKeys[0]]);
                     lines.push("    jsl.push({f:'" + cssKeys[0] + "', n: '" + cssKeys[0].replace(/[^a-z0-9]/ig, "-") + "', j: 2, w: " + getWeight(cssKeys[0]) + "});");
@@ -265,7 +270,7 @@ var Secureboot = function() {
             return f.f.match(/(?:css|jsx)$/);
         }).map(function(f) {
             if (usePostCSS && String(f.f).startsWith('css/')) {
-                f.f = 'build/' + f.f;
+                f.f = 'build/css/' + basename(f.f);
             }
             return f;
         });

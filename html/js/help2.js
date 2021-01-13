@@ -12,6 +12,7 @@ var Help = (function() {
     var structIdx = [];
     var $window = $(window);
     var $currentQuestion = null;
+    var rerouted = false;
 
     function tagUri(tag) {
         return tag.toLowerCase().replace(/[^\da-z]/g, '_');
@@ -675,6 +676,7 @@ var Help = (function() {
             var redirect = article[0] ? article[0].url : 'help';
             loadSubPage(redirect);
             mega.metatags.disableBots();
+            rerouted = true;
         }
     };
 
@@ -869,6 +871,9 @@ var Help = (function() {
         $currentQuestion = null;
 
         doRouting();
+        if (rerouted) {
+            return;
+        }
         topmenuUI();
         sidebars();
         userfeedback();
@@ -906,7 +911,7 @@ var Help = (function() {
                     url = 'login';
                 }
                 // Log that they clicked on the panel
-                api_req({ a: 'log', e: 99621, m: 'Help2 client selection panel used' });
+                api_req({a: 'log', e: 99621, m: 'Help2 client selection panel used'});
                 loadSubPage(url);
             }
         });
@@ -938,7 +943,7 @@ var Help = (function() {
 
         // FAQ items logging
         $('#help2-main .popular-question-items a').rebind('click.help2', function() {
-            api_req({ a: 'log', e: 99622, m: 'Help2 FAQ item selected' });
+            api_req({a: 'log', e: 99622, m: 'Help2 FAQ item selected'});
         });
 
         // Image Gallery Interaction
@@ -947,7 +952,7 @@ var Help = (function() {
 
                 var $this = $(this);
                 var $cnt = $this.parents('.container');
-                var id   = $this.data('photo');
+                var id = $this.data('photo');
 
                 $cnt.find('.active-nav-dot').addClass('nav-dots')
                     .removeClass('active-nav-dot');
@@ -979,7 +984,8 @@ var Help = (function() {
 
             if ($this.hasClass('active-instructions')) {
                 $this.prev().addClass('selected-bullet');
-            } else {
+            }
+            else {
                 $this.prev().removeClass('selected-bullet');
             }
         });
@@ -998,7 +1004,8 @@ var Help = (function() {
 
             if ($this.next().hasClass('active-instructions')) {
                 $this.addClass('selected-bullet');
-            } else {
+            }
+            else {
                 $this.removeClass('selected-bullet');
             }
         });

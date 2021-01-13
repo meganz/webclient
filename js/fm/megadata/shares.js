@@ -278,6 +278,8 @@ MegaData.prototype.initAddByEmailComponent = function(alreadyAddedContacts) {
 
     var $shareAddDialog = $('.fm-dialog.share-add-dialog');
 
+    $('.share-add-dialog-bottom', $shareAddDialog).removeClass('hidden');
+
     // Hide the personal message by default. This gets triggered when a new contact is added
     $('.share-message', $shareAddDialog).addClass('hidden');
 

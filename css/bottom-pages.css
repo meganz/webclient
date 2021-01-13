@@ -2848,28 +2848,31 @@ body:not(.mobile) .bottom-page.top-dark-button:hover {
     -webkit-box-sizing: border-box;
     background-color: black;
     border-radius: 4px;
-    bottom: 189px;
+    bottom: 190px;
     box-sizing: border-box;
     color: white;
-    font-size: 13px;
+    font-size: 14px;
+    height: 0;
     line-height: 18px;
-    padding: 10px;
+    opacity: 0;
+    padding: 7px 10px 10px;
     position: absolute;
     right: -44px;
     text-align: center;
     white-space: normal;
+    width: 0;
     z-index: 10;
 }
 
 body:not(.mobile) .copy-line-icon:hover .dark-help-block {
-    height: 36px;
+    height: unset;
     opacity: 1;
     transition-delay: 0.75s;
     width: 60px;
 }
 
 .bottom-page .copy-line-icon .dark-help-block .dark-notification-arrow {
-    top: auto !important;
+    top: 10px;
 }
 
 .bottom-page .megaapp-linux-container .copy-line-icon.active {

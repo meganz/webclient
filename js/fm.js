@@ -2443,8 +2443,7 @@ function initShareDialog() {
         }
     });
 
-    var $shareAddFooterElement = $('.share-add-dialog-bottom', $dialog);
-    $shareAddFooterElement.detach();
+    var $shareAddFooterElement = $('.share-add-dialog-bottom', $dialog).clone();
 
     // Close the share dialog
     $('.fm-dialog-close', $dialog).rebind('click', function() {

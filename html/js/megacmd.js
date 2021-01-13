@@ -58,15 +58,37 @@ function initMegacmd() {
         return false;
     });
 
-    $('.copy-intall-guide-icon', $content).rebind('click', function() {
-        if (copyToClipboard($('span', $(this).closest('.install-guide-text')).text())) {
-            var $copiedMsg = $('.install-guide-copy-msg', $content);
-            $copiedMsg.removeClass('hidden');
-            setTimeout(function() {
-                $('.install-guide-copy-msg', $content).addClass('hidden');
-            }, 2000);
-        }
-    });
+    $('.copy-install-guide-icon', $content)
+        .rebind('click', function() {
+            var $this = $(this);
+            if (copyToClipboard($('.install-guide', $this.closest('.install-guide-text')).text())) {
+                $this.removeClass('active');
+                var $icon = $('.copy-line-icon', $this);
+                if (!$icon.hasClass('active')) {
+                    $icon.addClass('active');
+                }
+                var $copiedMsg = $('.install-guide-copy-msg', $this.closest('.copy-line'));
+                $copiedMsg.removeClass('hidden');
+                setTimeout(function() {
+                    $icon.removeClass('active');
+                    $copiedMsg.addClass('hidden');
+                }, 2000);
+            }
+        })
+        .rebind('mouseover', function() {
+            var $this = $(this);
+            if (!$this.hasClass('active')) {
+                $this.addClass('active');
+                $('.copy-line-icon', $this).addClass('active');
+            }
+        })
+        .rebind('mouseleave', function() {
+            var $this = $(this);
+            if ($this.hasClass('active')) {
+                $this.removeClass('active');
+                $('.copy-line-icon', $this).removeClass('active');
+            }
+        });
 
 
     $content.find('.tab-button').rebind('click', function() {
@@ -128,7 +150,7 @@ function changeLinuxCMD(linuxClients, i) {
         if (link) {
             $page.find('.megacmd-linux-download').addClass('download').removeClass('disabled').attr('data-link', link);
         }
-        $('.install-guide-text span', $page).text(linuxClients[i].help_text);
+        $('.install-guide-text .install-guide', $page).text(linuxClients[i].help_text);
     }
 }
 

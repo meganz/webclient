@@ -2790,7 +2790,7 @@ body:not(.mobile) .bottom-page.top-dark-button:hover {
 
 .bottom-page .megaapp-linux-container .install-guide-trigger {
     color: #6fd7ff;
-    cursor: none;
+    cursor: default;
     text-align: left;
 }
 
@@ -2820,17 +2820,64 @@ body:not(.mobile) .bottom-page.top-dark-button:hover {
     font-size: 14px;
     height: 23px;
     line-height: 20px;
-    margin: 24px 0 8px 10px;
+    margin: 22px 0 6px 10px;
     text-align: center;
     width: 240px;
+}
+
+.bottom-page .install-guide-text .copy-install-guide-icon {
+    border-radius: 4px;
+    float: right;
+    margin: 22px 6px 6px 0;
+    padding: 2px 4px;
+    text-align: center;
 }
 
 .bottom-page .megaapp-linux-container .copy-line-icon {
     background-image: url(../images/mega/icons-sprite_v40.png);
     background-position: -242px -288px;
-    float: right;
+    cursor: pointer;
     height: 23px;
-    margin: 24px 10px 10px 0;
+    opacity: 0.7;
+    width: 19px;
+}
+
+.bottom-page .megaapp-linux-container .dark-help-block {
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    -webkit-box-sizing: border-box;
+    background-color: black;
+    border-radius: 4px;
+    bottom: 189px;
+    box-sizing: border-box;
+    color: white;
+    font-size: 13px;
+    line-height: 18px;
+    padding: 10px;
+    position: absolute;
+    right: -44px;
+    text-align: center;
+    white-space: normal;
+    z-index: 10;
+}
+
+body:not(.mobile) .copy-line-icon:hover .dark-help-block {
+    height: 36px;
+    opacity: 1;
+    transition-delay: 0.75s;
+    width: 60px;
+}
+
+.bottom-page .copy-line-icon .dark-help-block .dark-notification-arrow {
+    top: auto !important;
+}
+
+.bottom-page .megaapp-linux-container .copy-line-icon.active {
+    opacity: 1;
+}
+
+.bottom-page .install-guide-text .copy-install-guide-icon.active {
+    background-color: rgba(255, 255, 255, 0.1);
 }
 
 .bottom-page .megaapp-linux-box-container {

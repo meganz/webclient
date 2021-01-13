@@ -663,7 +663,7 @@ export class ContactCard extends ContactAwareComponent {
         else {
             if (highlightSearchValue && searchValue.length > 0) {
                 var matches = [];
-                var regex = new RegExp(searchValue, 'gi');
+                var regex = new RegExp(RegExpEscape(searchValue), 'gi');
                 var result;
 
                 // eslint-disable-next-line no-cond-assign

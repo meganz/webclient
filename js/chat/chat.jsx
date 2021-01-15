@@ -47,7 +47,6 @@ function Chat() {
     this.currentlyOpenedChat = null;
     this.lastOpenedChat = null;
     this.archivedChatsCount = 0;
-    this._myPresence = localStorage.megaChatPresence;
 
     this._imageLoadCache = Object.create(null);
     this._imagesToBeLoaded = Object.create(null);

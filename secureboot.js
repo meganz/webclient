@@ -355,9 +355,7 @@ try {
                 }
             },
             get: function() {
-                return status || localStorage.testChatDisabled
-                    || (localStorage.chatDisabled !== undefined
-                        && localStorage.chatDisabled !== "0");
+                return status || localStorage.testChatDisabled || window.mega.flags.mcs === 0;
             }
         };
     })());
@@ -2376,19 +2374,17 @@ else if (!browserUpdate) {
         return enLang;
     };
 
-    var lang = detectLang();
+    var lang = sessionStorage.lang || localStorage.lang;
     var jsl = [];
 
     // If they've already selected a language, use that
-    if (localStorage.lang) {
-        if (languages[localStorage.lang]) {
-            lang = localStorage.lang;
-        }
-        else {
-            console.warn('Language "%s" is no longer available...', localStorage.lang);
-            delete localStorage.lang;
-        }
+    if (lang && !languages[lang]) {
+        console.warn('Language "%s" is no longer available...', lang);
+        delete localStorage.lang;
+        delete sessionStorage.lang;
+        lang = 0;
     }
+    lang = lang || detectLang();
 
     // Get the language file path e.g. lang/en.json or 'lang/en_7a8e15911490...f1878e1eb3.json'
     var langFilepath = getLanguageFilePath(lang);
@@ -2411,6 +2407,7 @@ else if (!browserUpdate) {
     jsl.push({f:'js/utils/clipboard.js', n: 'js_utils_clipboard_js', j: 1});
     jsl.push({f:'js/utils/conv.js', n: 'js_utils_conv_js', j: 1});
     jsl.push({f:'js/utils/crypt.js', n: 'js_utils_crypt_js', j: 1});
+    jsl.push({f:'js/utils/csp.js', n: 'js_utils_csp_js', j: 1});
     jsl.push({f:'js/utils/debug.js', n: 'js_utils_debug_js', j: 1});
     jsl.push({f:'js/utils/dom.js', n: 'js_utils_dom_js', j: 1});
     jsl.push({f:'js/utils/events.js', n: 'js_utils_events_js', j: 1});
@@ -2428,6 +2425,7 @@ else if (!browserUpdate) {
 
     jsl.push({f:'js/vendor/dexie.js', n: 'dexie_js', j:1,w:5});
     jsl.push({f:'js/functions.js', n: 'functions_js', j:1});
+    jsl.push({f:'js/config.js', n: 'config_js', j:1,w:5});
     jsl.push({f:'js/crypto.js', n: 'crypto_js', j:1,w:5});
     jsl.push({f:'js/account.js', n: 'user_js', j:1});
     jsl.push({f:'js/security.js', n: 'security_js', j: 1, w: 5});
@@ -2497,10 +2495,10 @@ else if (!browserUpdate) {
     jsl.push({f:'css/dialogs-common.css', n: 'dialogs-common_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/dialogs/cookie-dialog.css', n: 'cookie-dialog_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'js/metatags.js', n: 'metatags_js', j:1 });
+    jsl.push({f:'js/vendor/verge.js', n: 'verge', j:1, w:5});
 
     if (!is_mobile) {
         jsl.push({f:'js/ui/nicknames.js', n: 'nicknames_js', j:1});
-        jsl.push({f:'js/vendor/verge.js', n: 'verge', j:1, w:5});
         jsl.push({f:'js/jquery.tokeninput.js', n: 'jquerytokeninput_js', j:1});
         jsl.push({f:'js/jquery.checkboxes.js', n: 'checkboxes_js', j:1});
 
@@ -2588,11 +2586,7 @@ else if (!browserUpdate) {
     jsl.push({f:'js/fm/fileconflict.js', n: 'fileconflict_js', j:1});
     jsl.push({f:'js/ui/gdpr-download.js', n: 'gdpr_download', j:1});
     jsl.push({f:'html/js/registerb.js', n: 'registerb_js', j:1});
-
-    // Notification setting controllers (mobile and desktop).
-    jsl.push({f:'js/notifyConfig.js', n: 'notify_config_js', j:1});
     jsl.push({f:'js/emailNotify.js', n: 'email_notify_js', j:1});
-
     jsl.push({f:'js/megadrop.js', n: 'megadrop_js', j:1});
 
     if (!is_mobile) {
@@ -4230,7 +4224,13 @@ function promisify(fc) {
             }
         }
         return new Promise(function(resolve, reject) {
-            a$yncMethod.__function__.apply(self, [resolve, reject].concat(args));
+            var result = a$yncMethod.__function__.apply(self, [resolve, reject].concat(args));
+            if (result instanceof Promise) {
+                if (d > 2) {
+                    console.assert(a$yncMethod.__function__[Symbol.toStringTag] === "AsyncFunction");
+                }
+                result.catch(reject);
+            }
         });
     };
     a$yncMethod.prototype = undefined;
@@ -4261,7 +4261,7 @@ function mutex(name, handler) {
                 var rej = function(a0) {
                     unlock().always(reject.bind(null, a0));
                 };
-                mMutexMethod.__function__.apply(self, [res, rej].concat(args));
+                return mMutexMethod.__function__.apply(self, [res, rej].concat(args));
             }).catch(function(ex) {
                 console.error(ex);
                 mutex.unlock(name).always(reject.bind(null, ex));
@@ -4301,12 +4301,26 @@ mutex.unlock = promisify(function(resolve, reject, name) {
 });
 Object.freeze(mutex);
 
+// Promise.catch helper
+function nop() {
+    'use strict';
+}
+
+// Promise.catch helper
+function echo(a) {
+    'use strict';
+    return a;
+}
+
+var dump = nop;
 var smbl = typeof Symbol === 'function' ? Symbol : function(s) {
     'use strict';
     return '<<<' + s;
 };
 
 mBroadcaster.once('startMega', function() {
+    'use strict';
+
     var data = sessionStorage.sitet;
 
     if (data) {
@@ -4324,4 +4338,6 @@ mBroadcaster.once('startMega', function() {
             M.req({a: 'mrt', t: mt}).dump('uTagMT');
         });
     }
+
+    Object.defineProperty(window, 'dump', {value: console.warn.bind(console, '[dump]')});
 });

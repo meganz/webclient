@@ -192,7 +192,7 @@ function fmremove(selectedNodes) {
                 promise.linkDoneAndFailTo(MegaPromise.allDone(promises));
             }
             else {
-                fmremovesync(selectedNodes);
+                fmremove.sync(selectedNodes);
                 promise.resolve();
             }
         });
@@ -200,7 +200,9 @@ function fmremove(selectedNodes) {
     return promise;
 }
 
-function fmremovesync(selectedNodes) {
+// @todo make eslint happy..
+// eslint-disable-next-line complexity,sonarjs/cognitive-complexity
+fmremove.sync = function(selectedNodes) {
     'use strict';
 
     var i = 0;
@@ -212,9 +214,7 @@ function fmremovesync(selectedNodes) {
     var message = '';
 
     // If on mobile we will bypass the warning dialog prompts
-    if (is_mobile) {
-        localStorage.skipDelWarning = '1';
-    }
+    const skipDelWarning = is_mobile ? 1 : mega.config.get('skipDelWarning');
 
     for (i = 0; i < selectedNodes.length; i++) {
         var n = M.d[selectedNodes[i]];
@@ -350,7 +350,7 @@ function fmremovesync(selectedNodes) {
 
     // Remove contacts
     else if (M.getNodeRoot(selectedNodes[0]) === 'contacts') {
-        if (localStorage.skipDelWarning) {
+        if (skipDelWarning) {
             M.copyNodes(selectedNodes, M.RubbishID, true);
         }
         else {
@@ -375,7 +375,7 @@ function fmremovesync(selectedNodes) {
             });
         };
 
-        if (localStorage.skipDelWarning) {
+        if (skipDelWarning) {
             moveToRubbish();
         }
         else {
@@ -389,7 +389,7 @@ function fmremovesync(selectedNodes) {
             }, true);
         }
     }
-}
+};
 
 /**
  * Generate file manager contains text message

@@ -113,7 +113,7 @@ var dlmanager = {
             promise = MegaPromise.resolve(false);
         }
         else {
-            promise = M.getPersistentData(tag);
+            promise = M.getPersistentData(tag, true);
         }
 
         if (typeof callback === 'function') {
@@ -155,7 +155,7 @@ var dlmanager = {
             this.logger.debug('setResumeInfo', this.getResumeInfoTag(dl), dl.resumeInfo, dl);
         }
 
-        return M.setPersistentData(this.getResumeInfoTag(dl), dl.resumeInfo);
+        return M.setPersistentData(this.getResumeInfoTag(dl), dl.resumeInfo, true);
     },
 
     // @private

@@ -197,14 +197,14 @@
 .top-submenu {
     max-height: 0;
     overflow: hidden;
-    -webkit-transition: max-height 200ms ease-in-out, padding 200ms ease-in-out, opacity 200ms ease-in-out;
-    transition: max-height 200ms ease-in-out, padding 200ms ease-in-out, opacity 200ms ease-in-out;
+    -webkit-transition: max-height 300ms ease-in-out, padding 200ms ease-in-out, opacity 200ms ease-in-out;
+    transition: max-height 300ms ease-in-out, padding 200ms ease-in-out, opacity 200ms ease-in-out;
     opacity: 0;
     margin: 0;
     box-sizing: border-box;
 }
 .submenu-item.expanded + .top-submenu {
-    max-height: 340px;
+    max-height: 520px;
     opacity: 1;
     padding-top: 6px;
 }

@@ -329,16 +329,34 @@ class ConfirmDialog extends MegaRenderMixin {
         self.unbindEvents();
         delete this._wasAutoConfirmed;
     }
+
     onConfirmClicked() {
         this.unbindEvents();
         if (this.props.onConfirmClicked) {
             this.props.onConfirmClicked();
         }
     }
+
+    static saveState(o) {
+        let state = mega.config.get('xccd') >>> 0;
+        mega.config.set('xccd', state | 1 << o.props.pref);
+    }
+
+    static clearState(o) {
+        let state = mega.config.get('xccd') >>> 0;
+        mega.config.set('xccd', state & ~o.props.pref);
+    }
+
+    static autoConfirm(o) {
+        console.assert(o.props.pref > 0);
+        let state = mega.config.get('xccd') >>> 0;
+        return !!(state & o.props.pref);
+    }
+
     render() {
         var self = this;
 
-        if (self.props.dontShowAgainCheckbox && mega.config.get('confirmModal_' + self.props.name) === true)  {
+        if (self.props.dontShowAgainCheckbox && ConfirmDialog.autoConfirm(self)) {
             if (this._wasAutoConfirmed) {
                 return null;
             }
@@ -363,10 +381,10 @@ class ConfirmDialog extends MegaRenderMixin {
                     id="delete-confirm"
                     onLabelClick={(e, state) => {
                         if (state === true) {
-                            mega.config.set('confirmModal_' + self.props.name, true);
+                            ConfirmDialog.saveState(self);
                         }
                         else {
-                            mega.config.set('confirmModal_' + self.props.name, false);
+                            ConfirmDialog.clearState(self);
                         }
                     }}
                 >

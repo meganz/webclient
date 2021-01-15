@@ -337,21 +337,3 @@ if (!String.prototype.padEnd) {
         return String(this) + padString.slice(0, targetLength);
     };
 }
-
-
-
-// XXX: The following are not polyfills obviously, but given this file is included always let's place them here for now
-
-// @private
-var nop = function() {
-    'use strict';
-};
-
-// @private
-var echo = function(a) {
-    'use strict';
-    return a;
-};
-
-// @private
-var dump = console.warn.bind(console, '[dump]');

@@ -253,7 +253,15 @@ lazy(self, 'trk', function() {
         return () => Promise.resolve(EACCESS);
     }
 
+    let allow;
     return async(action, data) => {
+        if (!allow && 'csp' in window) {
+            await csp.init();
+            if (!csp.has('analytics')) {
+                return disable('csp');
+            }
+            allow = true;
+        }
         if (action === 'd1sab1e!') {
             return disable(action);
         }

@@ -115,22 +115,9 @@ mobile.languageMenu = {
             // If not the currently selected language, change to the selected language
             if (selectedLangCode !== lang) {
 
-                // Store the new language in localStorage to be used upon reload
-                localStorage.lang = selectedLangCode;
-
-                // Set a language user attribute on the API (This is a private but unencrypted user
-                // attribute so that the API can read it and send emails in the correct language)
-                if (typeof u_attr !== 'undefined' && u_attr) {
-                    mega.attr.set(
-                        'lang',
-                        selectedLangCode,       // E.g. en, es, pt
-                        -2,                     // Set to private private not encrypted
-                        true                    // Set to non-historic, this won't retain previous values on API server
-                    );
-                }
-
-                // Reload the site
-                document.location.reload();
+                M.uiSaveLang(selectedLangCode)
+                    .then(() => location.reload())
+                    .catch(dump);
             }
 
             return false;

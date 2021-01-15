@@ -11282,29 +11282,18 @@ table {
 }
 .top-login-warning {
     position: absolute;
-    background-color: #333333;
+    background-color: rgb(51, 51, 51);
     width: 100%;
     min-height: 60px;
-    -moz-border-radius: 8px;
-    -webkit-border-radius: 8px;
+    margin: 14px 0 0 0;
+    opacity: 1;
     border-radius: 8px;
-    margin-top: 14px;
-    -webkit-transition: opacity 200ms ease-in-out;
-    -moz-transition: opacity 200ms ease-in-out;
-    -o-transition: opacity 200ms ease-in-out;
-    -ms-transition: opacity 200ms ease-in-out;
-    transition: opacity 200ms ease-in-out;
-    -moz-opacity: 0;
-    -khtml-opacity: 0;
+    transition: opacity 200ms ease-in-out 0s;
+}
+.top-login-warning.hidden {
+    display: block;
     opacity: 0;
     margin-left: 150%;
-}
-.top-login-warning.active {
-    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
-    -moz-opacity: 1;
-    -khtml-opacity: 1;
-    opacity: 1;
-    margin-left: 0;
 }
 .video-theatre-mode .top-login-warning.active {
     margin-top: 28px;

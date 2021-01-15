@@ -803,7 +803,7 @@ accountUI.account = {
                 $addPhoneBanner.addClass('hidden');
 
                 // Save in fmconfig so it is not shown again on reload or login on different machine
-                mega.config.set('skipsmsbanner', true);
+                mega.config.set('skipsmsbanner', 1);
             });
 
             // Set the text for x GB storage and quota
@@ -2865,18 +2865,14 @@ accountUI.fileManagement = {
     dragAndDrop: {
 
         render: function() {
-
             'use strict';
-
-            var initVal = fmconfig.ulddd === undefined ? 1 : 0;
 
             accountUI.inputs.switch.init(
                 '#ulddd',
                 $('#ulddd').parent(),
-                initVal,
+                !mega.config.get('ulddd'),
                 function(val) {
-                    val = val === 1 ? undefined : val;
-                    mega.config.setn('ulddd', val);
+                    mega.config.setn('ulddd', val ? undefined : 1);
                 });
         }
     }
@@ -2928,14 +2924,14 @@ accountUI.transfers = {
                             if (M.currentdirid === 'account/transfers') {
                                 bandwidthLimit = ui.value;
 
-                                if (parseInt(localStorage.bandwidthLimit) !== bandwidthLimit) {
+                                if (parseInt($.bandwidthLimit) !== bandwidthLimit) {
 
                                     var done = delay.bind(null, 'bandwidthLimit', function() {
                                         api_req({"a": "up", "srvratio": Math.round(bandwidthLimit)});
-                                        if (localStorage.bandwidthLimit !== undefined) {
+                                        if ($.bandwidthLimit !== undefined) {
                                             showToast('settings', l[16168]);
                                         }
-                                        localStorage.bandwidthLimit = bandwidthLimit;
+                                        $.bandwidthLimit = bandwidthLimit;
                                     }, 700);
 
                                     if (bandwidthLimit > 99) {
@@ -3032,7 +3028,6 @@ accountUI.transfers = {
                             }
                         }
 
-                        showToast('settings', l[16168]);
                         mega.config.setn('ul_maxSpeed', ul_maxSpeed);
                     }
                 );

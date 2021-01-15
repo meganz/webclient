@@ -221,6 +221,7 @@ class BrowserEntries extends MegaRenderMixin {
 
 
         $(document.body).rebind('keydown.cloudBrowserModalDialog', function(e) {
+            var dir = -1;
             var charTyped = false;
             var keyCode = e.which || e.keyCode;
             var selectionIncludeShift = e.shiftKey;
@@ -238,7 +239,7 @@ class BrowserEntries extends MegaRenderMixin {
                 $typingArea.trigger('blur');
             }
 
-            var viewMode = localStorage.dialogViewMode ? localStorage.dialogViewMode : "0";
+            var viewMode = mega.config.get('cbvm') | 0;
 
             if (keyCode === KEY_A && (e.ctrlKey || e.metaKey)) {
                 // select all
@@ -257,7 +258,7 @@ class BrowserEntries extends MegaRenderMixin {
                 e.stopPropagation();
             }
             else if (e.metaKey && keyCode === KEY_UP || keyCode === KEY_BACKSPACE) {
-                if (viewMode === "0") {
+                if (!viewMode) {
                     // back
                     var currentFolder = M.getNode(self.props.currentlyViewedEntry);
                     if (currentFolder.p) {
@@ -267,12 +268,12 @@ class BrowserEntries extends MegaRenderMixin {
             }
             else if (!e.metaKey &&
                 (
-                    viewMode === "0" && (keyCode === KEY_UP || keyCode === KEY_DOWN) ||
-                    viewMode === "1" && (keyCode === KEY_LEFT || keyCode === KEY_RIGHT)
+                    !viewMode && (keyCode === KEY_UP || keyCode === KEY_DOWN) ||
+                    viewMode && (keyCode === KEY_LEFT || keyCode === KEY_RIGHT)
                 )
             ) {
                 // up/down
-                var dir = keyCode === (viewMode === "1" ? KEY_LEFT : KEY_UP) ? -1 : 1;
+                dir = keyCode === (viewMode ? KEY_LEFT : KEY_UP) ? -1 : 1;
 
                 var lastHighlighted = self.state.cursor || false;
                 if (!self.state.cursor && self.state.highlighted && self.state.highlighted.length > 0) {
@@ -299,14 +300,14 @@ class BrowserEntries extends MegaRenderMixin {
 
                 self._doSelect(selectionIncludeShift, currentIndex, targetIndex);
             }
-            else if (viewMode === "1" && (keyCode === KEY_UP || keyCode === KEY_DOWN)) {
+            else if (viewMode && (keyCode === KEY_UP || keyCode === KEY_DOWN)) {
                 var containerWidth = $('.add-from-cloud .fm-dialog-scroll .content:visible').outerWidth();
                 var itemWidth = $('.add-from-cloud .fm-dialog-scroll .content:visible .data-block-view:first')
                     .outerWidth();
                 var itemsPerRow = Math.floor(containerWidth/itemWidth);
 
 
-                var dir = keyCode === KEY_UP ? -1 : 1;
+                dir = keyCode === KEY_UP ? -1 : 1;
 
                 var lastHighlighted = self.state.cursor || false;
                 if (!self.state.cursor && self.state.highlighted && self.state.highlighted.length > 0) {
@@ -536,7 +537,7 @@ class BrowserEntries extends MegaRenderMixin {
         var self = this;
 
         var items = [];
-        var viewMode = localStorage.dialogViewMode ? localStorage.dialogViewMode : "0";
+        var viewMode = mega.config.get('cbvm') | 0;
 
         var imagesThatRequireLoading = [];
         self.props.entries.forEach(function(node) {
@@ -612,7 +613,7 @@ class BrowserEntries extends MegaRenderMixin {
                 );
             }
 
-            if (viewMode === "0") {
+            if (!viewMode) {
                 items.push(
                     <tr
                         className={
@@ -707,7 +708,7 @@ class BrowserEntries extends MegaRenderMixin {
         }
 
         if (items.length > 0) {
-            if (viewMode === "0") {
+            if (!viewMode) {
                 return (
                     <utils.JScrollPane className="fm-dialog-scroll grid"
                                        selected={this.state.selected}
@@ -882,11 +883,7 @@ class CloudBrowserDialog extends MegaRenderMixin {
             return false;
         }
 
-        if ($this.hasClass("block-view")) {
-            localStorage.dialogViewMode = "1";
-        } else {
-            localStorage.dialogViewMode = "0";
-        }
+        mega.config.set('cbvm', $this.hasClass("block-view") ? 1 : undefined);
 
         self.setState({
             entries: self.getEntries(),
@@ -1139,7 +1136,7 @@ class CloudBrowserDialog extends MegaRenderMixin {
     render() {
         var self = this;
 
-        const viewMode = localStorage.dialogViewMode ? localStorage.dialogViewMode : "0";
+        const viewMode = mega.config.get('cbvm') | 0;
 
         const classes = `add-from-cloud ${self.props.className}`;
 
@@ -1308,7 +1305,7 @@ class CloudBrowserDialog extends MegaRenderMixin {
         });
 
         var gridHeader = [];
-        if (viewMode === "0") {
+        if (!viewMode) {
             gridHeader.push(
                 <table className="grid-table-header fm-dialog-table" key={"grid-table-header"}>
                     <tbody>
@@ -1388,13 +1385,13 @@ class CloudBrowserDialog extends MegaRenderMixin {
                 </div>
                 <div className="fm-picker-header">
                     <div className="fm-header-buttons">
-                        <a className={"fm-files-view-icon block-view" + (viewMode === "1" ? " active" : "")}
+                        <a className={"fm-files-view-icon block-view" + (viewMode ? " active" : "")}
                             title="Thumbnail view"
                             onClick={(e) => {
                                 self.onViewButtonClick(e);
                             }}>
                         </a>
-                        <a className={"fm-files-view-icon listing-view" + (viewMode === "0" ? " active" : "")}
+                        <a className={"fm-files-view-icon listing-view" + (viewMode ? "" : " active")}
                             title="List view"
                             onClick={(e) => {
                                     self.onViewButtonClick(e);
@@ -1439,7 +1436,7 @@ class CloudBrowserDialog extends MegaRenderMixin {
                     onSelected={self.onSelected}
                     onHighlighted={self.onHighlighted}
                     onAttachClicked={self.onAttachClicked}
-                    viewMode={localStorage.dialogViewMode}
+                    viewMode={mega.config.get('cbvm') | 0}
                     initialSelected={self.state.selected}
                     initialHighlighted={self.state.highlighted}
                     ref={

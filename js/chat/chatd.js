@@ -1,7 +1,6 @@
 // chatd interface
-// jshint -W089
 
-var CHATD_TAG = localStorage.chatdTag ? localStorage.chatdTag : '6';
+var CHATD_TAG = localStorage.chatdTag || '6';
 
 var Chatd = function(userId, megaChat, options) {
     var self = this;
@@ -54,7 +53,6 @@ var Chatd = function(userId, megaChat, options) {
     });
 
     // Initialize with a dummy webrtc event handler
-    /* jshint -W098 */
     self.rtcHandler = self.defaultRtcHandler = {
         handleMessage: function(shard, msg, len) {},
         onClientLeftCall: function(chat, userid, clientid) {},
@@ -74,22 +72,15 @@ var Chatd = function(userId, megaChat, options) {
         onShutdown: function() {},
         onChatOnline: function(chat) {}
     };
-    /* jshint +W098 */
 
     // load persistent client id, or generate one if none was stored
-    //    self.identity = localStorage['chatdIdentity'];
-    //    if (!self.identity) {
     self.identity = Chatd.pack32le((Math.random() * 0xffffffff) | 0) +
                     Chatd.pack16le((Math.random() * 0xffff) | 0) +
                     Chatd.pack16le(Date.now() & 0xffff);
 
-    localStorage.setItem('chatdIdentity', base64urlencode(self.identity));
-
-    self.logger.debug("Generated new client identity: " + Chatd.clientIdToString(self.identity));
-    //    } else {
-    //        self.identity = base64urldecode(self.identity);
-    //        assert(self.identity.length === 8);
-    //    }
+    if (d > 1) {
+        self.logger.debug("Generated new client identity: " + Chatd.clientIdToString(self.identity));
+    }
 
     self.options = $.extend({}, Chatd.DEFAULT_OPTIONS, options);
 

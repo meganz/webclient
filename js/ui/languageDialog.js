@@ -201,38 +201,9 @@ var langDialog = {
 
             // If not the currently selected language, change to the selected language
             if (selectedLangCode !== lang) {
-
-                var _reload = function() {
-                    loadingDialog.hide();
-
-                    // Store the new language in localStorage to be used upon reload
-                    localStorage.lang = selectedLangCode;
-
-                    // If there are transfers, ask the user to cancel them to reload...
-                    M.abortTransfers().then(function() {
-                        // Reload the site
-                        location.reload();
-                    }).catch(function(ex) {
-                        console.debug('Not reloading upon language change...', ex);
-                    });
-                };
-                loadingDialog.show();
-
-                // Set a language user attribute on the API (This is a private but unencrypted user
-                // attribute so that the API can read it and send emails in the correct language)
-                if (typeof u_attr !== 'undefined' && u_attr) {
-                    mega.attr.set(
-                        'lang',
-                        selectedLangCode,       // E.g. en, es, pt
-                        -2,                     // Set to private private not encrypted
-                        true                    // Set to non-historic, this won't retain previous values on API server
-                    ).then(function() {
-                        setTimeout(_reload, 3e3);
-                    }).catch(_reload);
-                }
-                else {
-                    _reload();
-                }
+                M.uiSaveLang(selectedLangCode)
+                    .then(() => location.reload())
+                    .catch(dump);
             }
         });
     }

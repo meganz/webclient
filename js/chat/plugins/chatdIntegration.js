@@ -251,26 +251,20 @@ ChatdIntegration.prototype.requiresUpdate = function() {
     // because msgDialog would be closed on location.hash change... we need to do this a bit later....
     Soon(function() {
 
-        if (localStorage.chatUpdateIgnored === String(Chatd.VERSION)) {
+        if (sessionStorage.chatUpdateIgnored === String(Chatd.VERSION)) {
             return;
         }
-        if (!is_extension) {
-            msgDialog('confirmation', l[1900], l[8840], '', function (e) {
-                if (e) {
-                    window.location.reload();
-                }
-                else {
-                    localStorage.chatUpdateIgnored = Chatd.VERSION;
-                }
-            });
+        sessionStorage.chatUpdateIgnored = Chatd.VERSION;
+
+        if (is_extension) {
+            msgDialog('warningb', l[1900], l[8841]);
         }
         else {
-            msgDialog(
-                'warningb',
-                l[1900],
-                l[8841]
-            );
-            localStorage.chatUpdateIgnored = Chatd.VERSION;
+            msgDialog('confirmation', l[1900], l[8840], '', function(e) {
+                if (e) {
+                    location.reload();
+                }
+            });
         }
     });
 };

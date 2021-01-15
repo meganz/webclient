@@ -179,7 +179,7 @@ mega.megadrop = (function() {
             }
         }
     };
-    
+
     /**
      * Public upload folder's (PUF) related methods and properties
      */
@@ -1542,7 +1542,7 @@ mega.megadrop = (function() {
                 if (uiOpts.dlg.create.$.checkboxDiv.hasClass('checkboxOn')
                     || uiOpts.dlg.create.$.checkboxInput.hasClass('checkboxOn')) {
                     uiOpts.dlg.create.skip = true;
-                    localStorage.skipPUFCreationInfo = true;
+                    mega.config.set('sdss', 1);
                 }
                 closeDialog();
 
@@ -1631,7 +1631,15 @@ mega.megadrop = (function() {
             uiOpts.dlg.create.$.createButton = uiOpts.dlg.create.$.find('.widget-create-button');
             uiOpts.dlg.create.$.createMsg = uiOpts.dlg.create.$.find('.fm-widget-introduction');
             uiOpts.dlg.create.$.manageMsg = uiOpts.dlg.create.$.find('.fm-widget-manage');
-            uiOpts.dlg.create.skip = localStorage.skipPUFCreationInfo;
+
+            // @todo remove me in 4 months.
+            if (localStorage.skipPUFCreationInfo) {
+                delete localStorage.skipPUFCreationInfo;
+                mega.config.set('sdss', 1);
+            }
+
+            // Check Skip Drop Splash Screen flag
+            uiOpts.dlg.create.skip = mega.config.get('sdss');
 
             // Widget Dialog
             uiOpts.dlg.widget.$ = $(uiOpts.dlg.widget.class);

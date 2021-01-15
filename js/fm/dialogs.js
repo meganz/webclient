@@ -1294,29 +1294,10 @@
 
                 $menu.find('.dropdown-item').removeClass('active asc desc');
 
-                // Check existance of previous sort options, direction (dir)
-                if (localStorage['sort' + key + 'Dir']) {
-                    $.sortTreePanel[key].dir = localStorage['sort' + key + 'Dir'];
-                    $menu.find('.dropdown-item[data-by="' + localStorage['sort' + key + 'By'] + '"]')
-                        .addClass($.sortTreePanel[key].dir > 0 ? 'asc' : 'desc');
-                }
-                else {
-                    $.sortTreePanel[key].dir = 1;
-                    $menu.find('.dropdown-item[data-by="' + localStorage['sort' + key + 'By'] + '"]')
-                        .addClass('asc');
-                }
+                const by = escapeHTML(M.sortTreePanel[key] && M.sortTreePanel[key].by || 'name');
+                const dir = M.sortTreePanel[key] && M.sortTreePanel[key].dir || 1;
 
-                // Check existance of previous sort option, ascending/descending (By)
-                if (localStorage['sort' + key + 'By']) {
-                    $.sortTreePanel[key].by = localStorage['sort' + key + 'By'];
-                    $menu.find('.dropdown-item[data-by="' + localStorage['sort' + key + 'By'] + '"]')
-                        .addClass('active');
-                }
-                else {
-                    $.sortTreePanel[key].by = 'name';
-                    $menu.find('.dropdown-item[data-by="name"]')
-                        .addClass('active');
-                }
+                $('.dropdown-item[data-by="' + by + '"]', $menu).addClass(dir > 0 ? 'asc' : 'desc').addClass('active');
 
                 $self.addClass('active');
                 $dialog.find('.dialog-sorting-menu').removeClass('hidden');
@@ -1335,15 +1316,14 @@
             var key = $.dialog[0].toUpperCase() + $.dialog.substr(1) + section;
 
             if (data.by) {
-                localStorage['sort' + key + 'By'] = $.sortTreePanel[key].by = data.by;
+                M.sortTreePanel[key].by = data.by;
             }
 
             $self.removeClass('asc desc');
 
             if ($self.hasClass('active')) {
-                $.sortTreePanel[key].dir *= -1;
-                localStorage['sort' + key + 'Dir'] = $.sortTreePanel[key].dir;
-                $self.addClass($.sortTreePanel[key].dir > 0 ? 'asc' : 'desc');
+                M.sortTreePanel[key].dir *= -1;
+                $self.addClass(M.sortTreePanel[key].dir > 0 ? 'asc' : 'desc');
             }
 
             buildDialogTree();
@@ -1653,7 +1633,7 @@
                 }
 
                 if ($('.notagain', $dialog).prop('checked')) {
-                    mega.config.setn('ulddd', 0);
+                    mega.config.setn('ulddd', 1);
                 }
 
                 closeDialog();

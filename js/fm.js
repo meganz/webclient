@@ -1494,11 +1494,11 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
                 var $o = $('#msgDialog .checkbox-block .checkdiv, #msgDialog .checkbox-block input');
                 if ($('#msgDialog .checkbox-block input').hasClass('checkboxOff')) {
                     $o.removeClass('checkboxOff').addClass('checkboxOn');
-                    localStorage.skipDelWarning = 1;
+                    mega.config.set('skipDelWarning', 1);
                 }
                 else {
                     $o.removeClass('checkboxOn').addClass('checkboxOff');
-                    delete localStorage.skipDelWarning;
+                    mega.config.remove('skipDelWarning');
                 }
             });
         }

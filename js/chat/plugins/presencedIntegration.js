@@ -301,9 +301,8 @@ PresencedIntegration.prototype.setPresence = function(presence) {
     var self = this;
     self.logger.debug("setPresence", presence);
 
+    // @todo simplify!
     if (presence === UserPresence.PRESENCE.ONLINE) {
-        localStorage.removeItem("userPresenceIsOffline");
-        localStorage.removeItem("megaChatPresence"); // legacy
         self.userPresence.canceled = false;
 
         self.userPresence.connectionRetryManager.requiresConnection()
@@ -312,8 +311,6 @@ PresencedIntegration.prototype.setPresence = function(presence) {
             });
     }
     else if (presence === UserPresence.PRESENCE.AWAY) {
-        localStorage.removeItem("userPresenceIsOffline");
-        localStorage.removeItem("megaChatPresence"); // legacy
         self.userPresence.canceled = false;
 
         self.userPresence.connectionRetryManager.requiresConnection()
@@ -322,8 +319,6 @@ PresencedIntegration.prototype.setPresence = function(presence) {
             });
     }
     else if (presence === UserPresence.PRESENCE.DND) {
-        localStorage.removeItem("userPresenceIsOffline");
-        localStorage.removeItem("megaChatPresence"); // legacy
         self.userPresence.canceled = false;
 
         self.userPresence.connectionRetryManager.requiresConnection()
@@ -332,12 +327,6 @@ PresencedIntegration.prototype.setPresence = function(presence) {
             });
     }
     else if (presence === UserPresence.PRESENCE.OFFLINE) {
-        localStorage.removeItem("userPresenceIsOffline");
-
-        // localStorage.userPresenceIsOffline = 1;
-
-        localStorage.removeItem("megaChatPresence"); // legacy
-
         self.userPresence.connectionRetryManager.requiresConnection()
             .done(function() {
                 self.userPresence.ui_setstatus(UserPresence.PRESENCE.OFFLINE);

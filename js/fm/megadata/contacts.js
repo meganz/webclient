@@ -449,8 +449,8 @@ MegaData.prototype.contacts = function() {
             return M.d[handle];
         });
 
-    var sortBy = $.sortTreePanel['contacts'].by;
-    var sortDirection = $.sortTreePanel['contacts'].dir;
+    var sortBy = this.sortTreePanel.contacts.by;
+    var sortDirection = this.sortTreePanel.contacts.dir;
     var sortFn;
 
     if (sortBy === 'last-interaction') {
@@ -712,12 +712,11 @@ MegaData.prototype.syncUsersFullname = function(userId, chatHandle, promise) {
                 $('.inbound-share .' + userId).next().find('.shared-folder-info')
                     .text(l[17590].replace('%1', userName));
             }
-            else if (M.getNodeRoot(M.currentdirid) === 'shares') {
+            else if (M.currentrootid === 'shares') {
                 $('.shared-details-info-block .' + userId).next()
                     .find('.fm-chat-user').text(userName + ' <' + user.m + '>');
             }
-            else if (M.getNodeRoot(M.currentdirid) === 'contacts' && $.sortTreePanel) {
-
+            else if (!is_mobile && M.currentrootid === 'contacts') {
                 // Update left panel if it has been initialised
                 M.contacts();
             }

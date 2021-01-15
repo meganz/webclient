@@ -95,8 +95,7 @@
     <!-- end of Set new password dialog !-->
 
     <!--Cookie dialog !-->
-    <!--TODO: Remove "fm-dialog" once new dialogs are merged !-->
-    <div class="fm-dialog mega-dialog cookie-dialog lato">
+    <div class="fm-dialog mega-dialog cookie-dialog hidden lato">
 
         <!-- Common info !-->
         <div class="content-block step1 active">
@@ -110,7 +109,6 @@
                 </div>
             </div>
             <div class="bottom-buttons">
-                <!-- Please bind events to special classnames like "accept-cookies" or "cookie-settings" !-->
                 <div class="common-dialog-button positive right accept-cookies">
                     [$24643]
                 </div>
@@ -139,32 +137,38 @@
             <div class="scrollable-block">
                 <!-- Settings !-->
                 <div class="settings">
-                    <div class="settings-row">
+                    <div class="settings-row" data-type="::all">
                         <div class="settings-cell">
                             <div class="settings-header">[$24643]</div>
                         </div>
                         <div class="settings-cell current">
                             <div class="toggle-header">[$24648]</div>
-                            <div class="dialog-feature-toggle"><div class="dialog-feature-switch"></div></div>
+                            <div class="dialog-feature-toggle all"><div class="dialog-feature-switch"></div></div>
                         </div>
                          <div class="settings-cell saved">
                              <div class="toggle-header">[$24649]</div>
-                            <div class="dialog-feature-toggle disabled"><div class="dialog-feature-switch"></div></div>
+                            <div class="dialog-feature-toggle all disabled toggle-on">
+                                <div class="dialog-feature-switch"></div>
+                            </div>
                         </div>
                     </div>
-                    <div class="settings-row">
+                    <div class="settings-row" data-type="essential">
                         <div class="settings-cell">
                             <div class="settings-header">[$24650]</div>
                             <div class="settings-text">[$24651]</div>
                         </div>
                         <div class="settings-cell current">
-                            <div class="dialog-feature-toggle"><div class="dialog-feature-switch"></div></div>
+                            <div class="dialog-feature-toggle disabled toggle-on">
+                                <div class="dialog-feature-switch"></div>
+                            </div>
                         </div>
-                         <div class="settings-cell saved">
-                            <div class="dialog-feature-toggle disabled"><div class="dialog-feature-switch"></div></div>
+                        <div class="settings-cell saved">
+                            <div class="dialog-feature-toggle disabled toggle-on">
+                                <div class="dialog-feature-switch"></div>
+                            </div>
                         </div>
                     </div>
-                    <div class="settings-row">
+                    <div class="settings-row" data-type="preferences">
                         <div class="settings-cell">
                             <div class="settings-header">[$24652]</div>
                             <div class="settings-text">[$24653]</div>
@@ -176,7 +180,7 @@
                             <div class="dialog-feature-toggle disabled"><div class="dialog-feature-switch"></div></div>
                         </div>
                     </div>
-                    <div class="settings-row">
+                    <div class="settings-row" data-type="analytics">
                         <div class="settings-cell">
                             <div class="settings-header">[$24654]</div>
                             <div class="settings-text">[$24655] </div>
@@ -188,7 +192,7 @@
                             <div class="dialog-feature-toggle disabled"><div class="dialog-feature-switch"></div></div>
                         </div>
                     </div>
-                    <div class="settings-row">
+                    <div class="settings-row" data-type="advetisement">
                         <div class="settings-cell">
                             <div class="settings-header">[$24656]</div>
                             <div class="settings-text">[$24657]</div>
@@ -200,15 +204,17 @@
                             <div class="dialog-feature-toggle disabled"><div class="dialog-feature-switch"></div></div>
                         </div>
                     </div>
-                    <div class="settings-row">
+                    <div class="settings-row" data-type="thirdparty">
                         <div class="settings-cell">
                             <div class="settings-header">[$24658]</div>
                             <div class="settings-text">[$24659]
                             </div>
-                            <a href="/" class="details clickurl">[$24660]</a>
+                            <a class="thirdparty details">[$24660]</a>
                             <div class="clear"></div>
-                            <a href="/" class="settings-links clickurl">[$24629]</a>
-                            <a href="/privacy" class="settings-links clickurl">[$386]</a>
+                            <div  class="settings-links">
+                                <a class="settings-link clickurl" href="/cookie" target="_blank">[$24629]</a>
+                                <a class="settings-link clickurl" href="/privacy" target="_blank">[$386]</a>
+                            </div>
                         </div>
                         <div class="settings-cell current">
                             <div class="dialog-feature-toggle"><div class="dialog-feature-switch"></div></div>
@@ -220,7 +226,6 @@
                 </div>
             </div>
             <div class="bottom-buttons">
-                <!-- Please bind events to special classnames like "accept-cookies" or "cookie-settings" !-->
                 <div class="common-dialog-button positive right save-settings">
                     [$81]
                 </div>
@@ -244,20 +249,23 @@
             <div class="scrollable-block">
                 <div class="info-block">
                     <div class="header small">[$24663]</div>
-                    <div class="category"> [$24664] </div>
-                        [$24665]
-                        <ul>
-                            <li>[$24666]</li>
-                            <li>[$24667]</li>
-                            <li>[$24668]</li>
-                            <li>[$24669]</li>
-                        </ul>
-                        <a class="green">https://policies.google.com/technologies/partner-sites</a>
+                    <div class="category"> [$24664]</div>
+                    [$24665]
+                    <ul>
+                        <li>[$24666]</li>
+                        <li>[$24667]</li>
+                        <li>[$24668]</li>
+                        <li>[$24669]</li>
+                    </ul>
+                    <br/>
+                    <a class="green" rel="noopener noreferrer" target="_blank"
+                        href="https://policies.google.com/technologies/partner-sites">
+                        https://policies.google.com/technologies/partner-sites
+                    </a>
                 </div>
             </div>
             <div class="bottom-buttons pad">
-                <!-- Please bind events to special classnames like "accept-cookies" or "cookie-settings" !-->
-                <div class="common-dialog-button right close-info">
+                <div class="common-dialog-button right cookie-settings">
                     [$822]
                 </div>
             </div>

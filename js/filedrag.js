@@ -7,7 +7,7 @@
     var touchedElement = 0;
 
     function addUpload(files, emptyFolders) {
-        var straight = $.doStraightUpload || Object(window.fmconfig).ulddd === 0 || M.currentrootid === M.RubbishID;
+        var straight = $.doStraightUpload || Object(window.fmconfig).ulddd || M.currentrootid === M.RubbishID;
 
         console.assert(page === 'start' || window.fminitialized, 'check this...');
 

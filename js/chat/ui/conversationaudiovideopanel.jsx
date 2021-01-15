@@ -557,7 +557,7 @@ class ConversationAVPanel extends MegaRenderMixin {
 
         $(self.avResizable).rebind('resize.avp', function(e, e2, ui) {
             self.resizePanes();
-            localStorage.chatAvPaneHeight = ui.size.height;
+            mega.config.set('chatAvPaneHeight', ui.size.height | 0);
         });
 
         self.initialRender = true;
@@ -594,9 +594,9 @@ class ConversationAVPanel extends MegaRenderMixin {
                 !this.state.messagesBlockEnabled
             );
             var $container = $(this.findDOMNode());
-            var predefHeight = localStorage.chatAvPaneHeight || false;
+            var predefHeight = mega.config.get('chatAvPaneHeight') | 0;
             if (predefHeight) {
-                $container.height(parseInt(localStorage.chatAvPaneHeight, 10));
+                $container.height(predefHeight);
             }
             $('.simpletip', $container).trigger('simpletipClose');
         }

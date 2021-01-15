@@ -380,14 +380,21 @@ function init_page() {
         $('body').addClass('rtl');
     }
 
-    if (is_mobile && is_android) {
+    if (is_mobile) {
+
         var $html = $('html');
+        var $body = $('body', $html);
 
-        $html.height(window.innerHeight);
+        // Add mobile class for adaptive features
+        $body.addClass('mobile');
 
-        $(window).rebind('resize.htmlheight', function() {
+        if (is_android) {
             $html.height(window.innerHeight);
-        });
+
+            $(window).rebind('resize.htmlheight', function() {
+                $html.height(window.innerHeight);
+            });
+        }
     }
 
     // Redirect url to extensions when it tries to go plugin or chrome or firefox
@@ -612,7 +619,7 @@ function init_page() {
     blogmonth = false;
     blogsearch = false;
 
-    if (!$.mcImport && typeof closeDialog === 'function') {
+    if (!$.mcImport && $.dialog !== 'cookies-dialog' && typeof closeDialog === 'function') {
         closeDialog();
     }
 
@@ -2435,6 +2442,12 @@ function topmenuUI() {
                 }
                 if (!is_mobile) {
                     setTimeout(topMenuScroll, 200);
+                }
+            }
+            else if (className.indexOf('cookies-settings') > -1) {
+                topMenu(1);
+                if ('csp' in window) {
+                    csp.showCookiesDialog('step2');
                 }
             }
             else {

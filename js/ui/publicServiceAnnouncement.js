@@ -37,12 +37,15 @@ var psa = {
         'use strict';
 
         // Get the last announcement number they have seen from localStorage
-        if (localStorage.getItem('lastSeenPsaId') !== null) {
-            psa.lastSeenPsaId = parseInt(localStorage.getItem('lastSeenPsaId'));
-        }
+        Promise.allSettled([
+            M.getPersistentData('lastSeenPsaId'),
+            window.u_handle && mega.attr.get(u_handle, 'lastPsa', -2, true)
+        ]).then((res) => {
+            psa.lastSeenPsaId = res[1].value || res[0].value;
 
-        // Request current PSA number from API
-        psa.requestCurrentPsaAndShowAnnouncement();
+            // Request current PSA number from API
+            psa.requestCurrentPsaAndShowAnnouncement();
+        }).catch(dump);
     },
 
     /**
@@ -64,10 +67,11 @@ var psa = {
         if (psa.fetchedPsa) {
             return false;
         }
+        psa.fetchedPsa = true;
 
         // Make Get PSA (gpsa) API request
-        api_req({ a: 'gpsa', n: psa.lastSeenPsaId }, {
-            callback: function(result) {
+        M.req({a: 'gpsa', n: psa.lastSeenPsaId})
+            .then(function(result) {
 
                 // If there is no current announcement, set a flag so we don't repeat API requests this session
                 if (result === -9) {
@@ -86,8 +90,12 @@ var psa = {
                     // Show the announcement
                     psa.configureAndShowAnnouncement();
                 }
-            }
-        });
+            })
+            .catch(ex => {
+                if (typeof ex !== 'number') {
+                    console.warn(ex);
+                }
+            });
     },
 
     /**
@@ -247,7 +255,7 @@ var psa = {
 
         // Always store that they have seen it in localStorage. This is useful if they
         // then log out, then the PSA should still stay hidden and not re-show itself
-        localStorage.lastSeenPsaId = String(psa.currentPsa.id);
+        M.setPersistentData('lastSeenPsaId', String(psa.currentPsa.id)).dump('psa');
 
         // If logged in and completed registration
         if (u_type === 3) {
@@ -263,16 +271,19 @@ var psa = {
      * @param {String|undefined} apiLastPsaSeen The last PSA that the user has seen that the API knows about
      */
     updateApiWithLastPsaSeen: function(apiLastPsaSeen) {
-
         'use strict';
 
         // Make sure they have seen a PSA and that the API seen PSA is older than the one in localStorage
-        if (localStorage.getItem('lastSeenPsaId') !== null && apiLastPsaSeen < localStorage.getItem('lastSeenPsaId')) {
+        M.getPersistentData('lastSeenPsaId')
+            .then(res => {
+                if (apiLastPsaSeen < res) {
 
-            // Store that they have seen it on the API side
-            // (should be stored as ^!lastPsa for a private non encrypted, non historic attribute)
-            mega.attr.set('lastPsa', localStorage.lastSeenPsaId, -2, true);
-        }
+                    // Store that they have seen it on the API side
+                    // (should be stored as ^!lastPsa for a private non encrypted, non historic attribute)
+                    mega.attr.set('lastPsa', res, -2, true);
+                }
+            })
+            .catch(nop);
     },
 
     /**

@@ -202,13 +202,13 @@
     min-height: 12px;
     max-height: 12px;
     overflow: hidden;
-    -webkit-transition: max-height 200ms ease-in-out, opacity 200ms ease-in-out;
-    transition: max-height 200ms ease-in-out, opacity 200ms ease-in-out;
+    -webkit-transition: max-height 300ms ease-in-out, opacity 200ms ease-in-out;
+    transition: max-height 300ms ease-in-out, opacity 200ms ease-in-out;
     opacity: 0;
     margin: 4px 0 -16px 0;
 }
 .submenu-item.expanded + .top-submenu {
-    max-height: 340px;
+    max-height: 520px;
     opacity: 1;
 }
 .top-submenu .top-menu-item {
@@ -221,10 +221,6 @@
     border-left: 2px solid transparent;
     -webkit-transition: all 200ms ease-in-out;
     transition: all 200ms ease-in-out;
-    display: none;
-}
-.submenu-item.expanded + .top-submenu .top-menu-item:not(.hidden) {
-    display: block;
 }
  .top-submenu .top-menu-item.active {
     background-color: rgba(102,102,102,0.1);

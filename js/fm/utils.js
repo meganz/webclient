@@ -568,6 +568,56 @@ MegaUtils.prototype.abortTransfers = function megaUtilsAbortTransfers(force) {
 };
 
 /**
+ * Save new UI language.
+ * @param {String} The new lang
+ * @returns {Promise}
+ */
+MegaUtils.prototype.uiSaveLang = promisify(function(resolve, reject, aNewLang) {
+    'use strict';
+    assert(aNewLang !== window.lang);
+
+    const ack = async() => {
+        let storage = localStorage;
+
+        loadingDialog.hide();
+
+        if ('csp' in window) {
+            await csp.init();
+
+            if (!csp.has('pref')) {
+                storage = sessionStorage;
+            }
+        }
+
+        // Store the new language in localStorage to be used upon reload
+        storage.lang = aNewLang;
+
+        // If there are transfers, ask the user to cancel them to reload...
+        M.abortTransfers().then(resolve).catch(function(ex) {
+            console.debug('Not reloading upon language change...', ex);
+            reject(ex);
+        });
+    };
+    loadingDialog.show();
+
+    // Set a language user attribute on the API (This is a private but unencrypted user
+    // attribute so that the API can read it and send emails in the correct language)
+    if (window.u_handle) {
+        mega.attr.set(
+            'lang',
+            aNewLang,      // E.g. en, es, pt
+            -2,            // Set to private private not encrypted
+            true           // Set to non-historic, this won't retain previous values on API server
+        ).then(function() {
+            setTimeout(ack, 2e3);
+        }).catch(ack);
+    }
+    else {
+        ack();
+    }
+});
+
+/**
  *  Reload the site cleaning databases & session/localStorage.
  *
  *  Under non-activated/registered accounts this
@@ -1916,9 +1966,10 @@ MegaUtils.prototype.onDexieDB = promisify(function(resolve, reject, name, schema
  * @param {String} [action] Pre-defined action to perform.
  * @param {String} [key] action key.
  * @param {String} [value] action key value.
+ * @param {*} [essential] as per EU's cookie law, is this an essential 'cookie'?
  * @returns {Promise}
  */
-MegaUtils.prototype.onPersistentDB = promisify(function(resolve, reject, action, key, value) {
+MegaUtils.prototype.onPersistentDB = promisify(function(resolve, reject, action, key, value, essential) {
     'use strict';
 
     this.onDexieDB('$ps', {kv: '&k'}).then(function(db) {
@@ -1936,7 +1987,7 @@ MegaUtils.prototype.onPersistentDB = promisify(function(resolve, reject, action,
             }).catch(reject);
         }
         else {
-            M.onPersistentDB.fallback.call(null, action, key, value).then(resolve, reject);
+            M.onPersistentDB.fallback.call(null, action, key, value, essential).then(resolve, reject);
         }
     }, reject);
 });
@@ -1946,17 +1997,20 @@ MegaUtils.prototype.onPersistentDB = promisify(function(resolve, reject, action,
  * @param {String} action The fallback action being performed
  * @param {String} key The storage key identifier
  * @param {*} [value] The storage key value
+ * @param {*} [essential] as per EU's cookie law, is this an essential 'cookie'?
  * @returns {Promise}
  */
-MegaUtils.prototype.onPersistentDB.fallback = promisify(function(resolve, reject, action, key, value) {
+MegaUtils.prototype.onPersistentDB.fallback = promisify(function(resolve, reject, action, key, value, essential) {
     'use strict';
-    var pfx = '$ps!';
+    const pfx = '$ps!';
+    const parse = tryCatch(JSON.parse.bind(JSON));
+    const storage = essential ? localStorage : sessionStorage;
     key = pfx + (key || '');
 
     var getValue = function(key) {
-        var value = localStorage[key];
+        var value = storage[key];
         if (value) {
-            value = tryCatch(JSON.parse.bind(JSON))(value) || value;
+            value = parse(value) || value;
         }
         return value;
     };
@@ -1966,17 +2020,18 @@ MegaUtils.prototype.onPersistentDB.fallback = promisify(function(resolve, reject
         if (d && String(value).length > 4096) {
             console.warn('Storing more than 4KB...', key, [value]);
         }
-        localStorage[key] = value;
+        storage[key] = value;
     }
     else if (action === 'get') {
         value = getValue(key);
     }
     else if (action === 'rem') {
-        value = localStorage[key];
+        value = storage[key];
         delete localStorage[key];
+        delete sessionStorage[key];
     }
     else if (action === 'enum') {
-        var entries = Object.keys(localStorage)
+        var entries = Object.keys(storage)
             .filter(function(k) {
                 return k.startsWith(key);
             })
@@ -2172,15 +2227,29 @@ MegaUtils.prototype.getFileSystemEntries = promisify(function(resolve, reject, a
 /**
  * Retrieve data saved into persistent storage
  * @param {String} k The key identifying the data
+ * @param {*} [essential] as per EU's cookie law, is this an essential 'cookie'?
  * @returns {Promise}
  */
-MegaUtils.prototype.getPersistentData = promisify(function(resolve, reject, k) {
+MegaUtils.prototype.getPersistentData = promisify(async function(resolve, reject, k, essential) {
     'use strict';
 
     var self = this;
     var fallback = function() {
-        self.onPersistentDB('get', k).then(resolve, reject);
+        self.onPersistentDB('get', k, null, true).then(resolve, reject);
     };
+
+    if (!essential && 'csp' in window) {
+        const value = await this.onPersistentDB.fallback('get', k).catch(nop);
+
+        if (value !== undefined) {
+            await csp.init();
+            if (csp.has('pref')) {
+                await this.onPersistentDB.fallback('rem', k).catch(nop);
+                await this.setPersistentData(k, value, true).catch(dump);
+            }
+            return resolve(value);
+        }
+    }
 
     if (M.requestFileSystem) {
         var tmpPromise = this.getFileSystemEntry(k);
@@ -2206,15 +2275,23 @@ MegaUtils.prototype.getPersistentData = promisify(function(resolve, reject, k) {
  * Save data into persistent storage
  * @param {String} k The key identifying the data to store
  * @param {*} v The value/data to store
+ * @param {*} [essential] as per EU's cookie law, is this an essential 'cookie'?
  * @returns {Promise}
  */
-MegaUtils.prototype.setPersistentData = promisify(function(resolve, reject, k, v) {
+MegaUtils.prototype.setPersistentData = promisify(async function(resolve, reject, k, v, essential) {
     'use strict';
 
     var self = this;
     var fallback = function() {
-        self.onPersistentDB('set', k, v).then(resolve, reject);
+        self.onPersistentDB('set', k, v, true).then(resolve, reject);
     };
+
+    if (!essential && 'csp' in window) {
+        await csp.init();
+        if (!csp.has('pref')) {
+            return this.onPersistentDB.fallback('set', k, v).then(resolve, reject);
+        }
+    }
 
     if (M.requestFileSystem) {
         var tmpPromise = this.getFileSystemEntry(k, true);
@@ -2264,8 +2341,12 @@ MegaUtils.prototype.delPersistentData = promisify(function(resolve, reject, k) {
 
     var self = this;
     var fallback = function() {
-        self.onPersistentDB('rem', k).then(resolve, reject);
+        self.onPersistentDB('rem', k, null, true).then(resolve, reject);
     };
+
+    if ('csp' in window) {
+        this.onPersistentDB.fallback('rem', k).dump();
+    }
 
     if (M.requestFileSystem) {
         var tmpPromise = this.getFileSystemEntry(k);
@@ -2291,12 +2372,38 @@ MegaUtils.prototype.delPersistentData = promisify(function(resolve, reject, k) {
  * @param {Boolean} [aReadContents] Whether the contents must be read as well
  * @returns {MegaPromise}
  */
-MegaUtils.prototype.getPersistentDataEntries = promisify(function(resolve, reject, aPrefix, aReadContents) {
+MegaUtils.prototype.getPersistentDataEntries = promisify(async function(resolve, reject, aPrefix, aReadContents) {
     'use strict';
 
-    var self = this;
-    var fallback = function() {
-        self.onPersistentDB().then(function(db) {
+    let result = null;
+    const append = (data) => {
+        if (Array.isArray(data)) {
+            result = result || [];
+            assert(Array.isArray(result));
+            result = result.concat(data);
+        }
+        else {
+            assert(typeof result === 'object' && !Array.isArray(result));
+            result = Object.assign(Object.create(null), result, data);
+        }
+    };
+    const finish = (data) => {
+        if (data) {
+            append(data);
+        }
+        if (result) {
+            return resolve(result);
+        }
+        reject(ENOENT);
+    };
+    const fail = (ex) => {
+        if (d > 1) {
+            console.warn(ex);
+        }
+        finish();
+    };
+    const fallback = () => {
+        this.onPersistentDB().then((db) => {
             if (db) {
                 var dbc = db.kv;
 
@@ -2312,21 +2419,30 @@ MegaUtils.prototype.getPersistentDataEntries = promisify(function(resolve, rejec
                         onIdle(db.close.bind(db));
 
                         if (!aReadContents) {
-                            return resolve(entries);
+                            return finish(entries);
                         }
 
                         var result = Object.create(null);
                         for (var i = entries.length; i--;) {
                             result[entries[i].k] = entries[i].v;
                         }
-                        resolve(result);
-                    });
+                        finish(result);
+                    })
+                    .catch(fail);
             }
             else {
-                self.onPersistentDB.fallback('enum', aPrefix, aReadContents).then(resolve, reject);
+                this.onPersistentDB.fallback('enum', aPrefix, aReadContents, true).then(finish).catch(fail);
             }
-        }, reject);
+        }, fail);
     };
+
+    if ('csp' in window) {
+        const value = await this.onPersistentDB.fallback('enum', aPrefix, aReadContents).catch(nop);
+
+        if (Object.keys(value || {}).length) {
+            append(value);
+        }
+    }
 
     if (M.requestFileSystem) {
         this.getFileSystemEntries(aPrefix, false)
@@ -2334,7 +2450,7 @@ MegaUtils.prototype.getPersistentDataEntries = promisify(function(resolve, rejec
                 var entries = Object.keys(result);
 
                 if (!aReadContents) {
-                    return resolve(entries);
+                    return finish(entries);
                 }
 
                 var promises = [];
@@ -2355,15 +2471,15 @@ MegaUtils.prototype.getPersistentDataEntries = promisify(function(resolve, rejec
                                 result[entries[i]] = false;
                             }
                         }
-                        resolve(result);
+                        finish(result);
                     })
-                    .catch(reject);
+                    .catch(fail);
             }).catch(function(ex) {
                 if (Object(ex).name === "SecurityError") {
                     // Running on Incognito mode?
                     return fallback();
                 }
-                reject(ex);
+                fail(ex);
             });
     }
     else {

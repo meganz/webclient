@@ -3633,10 +3633,26 @@ class ConfirmDialog extends _stores_mixins_js1__["MegaRenderMixin"] {
     }
   }
 
+  static saveState(o) {
+    let state = mega.config.get('xccd') >>> 0;
+    mega.config.set('xccd', state | 1 << o.props.pref);
+  }
+
+  static clearState(o) {
+    let state = mega.config.get('xccd') >>> 0;
+    mega.config.set('xccd', state & ~o.props.pref);
+  }
+
+  static autoConfirm(o) {
+    console.assert(o.props.pref > 0);
+    let state = mega.config.get('xccd') >>> 0;
+    return !!(state & o.props.pref);
+  }
+
   render() {
     var self = this;
 
-    if (self.props.dontShowAgainCheckbox && mega.config.get('confirmModal_' + self.props.name) === true) {
+    if (self.props.dontShowAgainCheckbox && ConfirmDialog.autoConfirm(self)) {
       if (this._wasAutoConfirmed) {
         return null;
       }
@@ -3663,9 +3679,9 @@ class ConfirmDialog extends _stores_mixins_js1__["MegaRenderMixin"] {
         id: "delete-confirm",
         onLabelClick: (e, state) => {
           if (state === true) {
-            mega.config.set('confirmModal_' + self.props.name, true);
+            ConfirmDialog.saveState(self);
           } else {
-            mega.config.set('confirmModal_' + self.props.name, false);
+            ConfirmDialog.clearState(self);
           }
         }
       }, l[7039]));
@@ -5530,6 +5546,7 @@ class cloudBrowserModalDialog_BrowserEntries extends mixins["MegaRenderMixin"] {
   bindEvents() {
     var self = this;
     $(document.body).rebind('keydown.cloudBrowserModalDialog', function (e) {
+      var dir = -1;
       var charTyped = false;
       var keyCode = e.which || e.keyCode;
       var selectionIncludeShift = e.shiftKey;
@@ -5544,7 +5561,7 @@ class cloudBrowserModalDialog_BrowserEntries extends mixins["MegaRenderMixin"] {
         $typingArea.trigger('blur');
       }
 
-      var viewMode = localStorage.dialogViewMode ? localStorage.dialogViewMode : "0";
+      var viewMode = mega.config.get('cbvm') | 0;
 
       if (keyCode === 65 && (e.ctrlKey || e.metaKey)) {
         var newCursor = false;
@@ -5560,15 +5577,15 @@ class cloudBrowserModalDialog_BrowserEntries extends mixins["MegaRenderMixin"] {
         e.preventDefault();
         e.stopPropagation();
       } else if (e.metaKey && keyCode === 38 || keyCode === 8) {
-        if (viewMode === "0") {
+        if (!viewMode) {
           var currentFolder = M.getNode(self.props.currentlyViewedEntry);
 
           if (currentFolder.p) {
             self.expandFolder(currentFolder.p);
           }
         }
-      } else if (!e.metaKey && (viewMode === "0" && (keyCode === 38 || keyCode === 40) || viewMode === "1" && (keyCode === 37 || keyCode === 39))) {
-        var dir = keyCode === (viewMode === "1" ? 37 : 38) ? -1 : 1;
+      } else if (!e.metaKey && (!viewMode && (keyCode === 38 || keyCode === 40) || viewMode && (keyCode === 37 || keyCode === 39))) {
+        dir = keyCode === (viewMode ? 37 : 38) ? -1 : 1;
         var lastHighlighted = self.state.cursor || false;
 
         if (!self.state.cursor && self.state.highlighted && self.state.highlighted.length > 0) {
@@ -5587,11 +5604,11 @@ class cloudBrowserModalDialog_BrowserEntries extends mixins["MegaRenderMixin"] {
         }
 
         self._doSelect(selectionIncludeShift, currentIndex, targetIndex);
-      } else if (viewMode === "1" && (keyCode === 38 || keyCode === 40)) {
+      } else if (viewMode && (keyCode === 38 || keyCode === 40)) {
         var containerWidth = $('.add-from-cloud .fm-dialog-scroll .content:visible').outerWidth();
         var itemWidth = $('.add-from-cloud .fm-dialog-scroll .content:visible .data-block-view:first').outerWidth();
         var itemsPerRow = Math.floor(containerWidth / itemWidth);
-        var dir = keyCode === 38 ? -1 : 1;
+        dir = keyCode === 38 ? -1 : 1;
         var lastHighlighted = self.state.cursor || false;
 
         if (!self.state.cursor && self.state.highlighted && self.state.highlighted.length > 0) {
@@ -5801,7 +5818,7 @@ class cloudBrowserModalDialog_BrowserEntries extends mixins["MegaRenderMixin"] {
   render() {
     var self = this;
     var items = [];
-    var viewMode = localStorage.dialogViewMode ? localStorage.dialogViewMode : "0";
+    var viewMode = mega.config.get('cbvm') | 0;
     var imagesThatRequireLoading = [];
     self.props.entries.forEach(function (node) {
       if (node.t !== 0 && node.t !== 1) {
@@ -5881,7 +5898,7 @@ class cloudBrowserModalDialog_BrowserEntries extends mixins["MegaRenderMixin"] {
         });
       }
 
-      if (viewMode === "0") {
+      if (!viewMode) {
         items.push(external_React_default.a.createElement("tr", {
           className: "node_" + node.h + (isFolder ? " folder" : "") + (isHighlighted ? " ui-selected" : "") + (share && share.down ? " taken-down" : ""),
           onClick: e => {
@@ -5949,7 +5966,7 @@ class cloudBrowserModalDialog_BrowserEntries extends mixins["MegaRenderMixin"] {
     }
 
     if (items.length > 0) {
-      if (viewMode === "0") {
+      if (!viewMode) {
         return external_React_default.a.createElement(utils["default"].JScrollPane, {
           className: "fm-dialog-scroll grid",
           selected: this.state.selected,
@@ -6115,12 +6132,7 @@ class cloudBrowserModalDialog_CloudBrowserDialog extends mixins["MegaRenderMixin
       return false;
     }
 
-    if ($this.hasClass("block-view")) {
-      localStorage.dialogViewMode = "1";
-    } else {
-      localStorage.dialogViewMode = "0";
-    }
-
+    mega.config.set('cbvm', $this.hasClass("block-view") ? 1 : undefined);
     self.setState({
       entries: self.getEntries(),
       selected: self.state.selected,
@@ -6369,7 +6381,7 @@ class cloudBrowserModalDialog_CloudBrowserDialog extends mixins["MegaRenderMixin
 
   render() {
     var self = this;
-    const viewMode = localStorage.dialogViewMode ? localStorage.dialogViewMode : "0";
+    const viewMode = mega.config.get('cbvm') | 0;
     const classes = "add-from-cloud " + self.props.className;
     let folderIsHighlighted = false;
     let share = false;
@@ -6519,7 +6531,7 @@ class cloudBrowserModalDialog_CloudBrowserDialog extends mixins["MegaRenderMixin
     });
     var gridHeader = [];
 
-    if (viewMode === "0") {
+    if (!viewMode) {
       gridHeader.push(external_React_default.a.createElement("table", {
         className: "grid-table-header fm-dialog-table",
         key: "grid-table-header"
@@ -6582,13 +6594,13 @@ class cloudBrowserModalDialog_CloudBrowserDialog extends mixins["MegaRenderMixin
     }, external_React_default.a.createElement("div", {
       className: "fm-header-buttons"
     }, external_React_default.a.createElement("a", {
-      className: "fm-files-view-icon block-view" + (viewMode === "1" ? " active" : ""),
+      className: "fm-files-view-icon block-view" + (viewMode ? " active" : ""),
       title: "Thumbnail view",
       onClick: e => {
         self.onViewButtonClick(e);
       }
     }), external_React_default.a.createElement("a", {
-      className: "fm-files-view-icon listing-view" + (viewMode === "0" ? " active" : ""),
+      className: "fm-files-view-icon listing-view" + (viewMode ? "" : " active"),
       title: "List view",
       onClick: e => {
         self.onViewButtonClick(e);
@@ -6628,7 +6640,7 @@ class cloudBrowserModalDialog_CloudBrowserDialog extends mixins["MegaRenderMixin
       onSelected: self.onSelected,
       onHighlighted: self.onHighlighted,
       onAttachClicked: self.onAttachClicked,
-      viewMode: localStorage.dialogViewMode,
+      viewMode: mega.config.get('cbvm') | 0,
       initialSelected: self.state.selected,
       initialHighlighted: self.state.highlighted,
       ref: browserEntries => {
@@ -12649,7 +12661,7 @@ class conversationaudiovideopanel_ConversationAVPanel extends mixins["MegaRender
     });
     $(self.avResizable).rebind('resize.avp', function (e, e2, ui) {
       self.resizePanes();
-      localStorage.chatAvPaneHeight = ui.size.height;
+      mega.config.set('chatAvPaneHeight', ui.size.height | 0);
     });
     self.initialRender = true;
   }
@@ -12683,10 +12695,10 @@ class conversationaudiovideopanel_ConversationAVPanel extends mixins["MegaRender
     if (this.props.onMessagesToggle) {
       this.props.onMessagesToggle(!this.state.messagesBlockEnabled);
       var $container = $(this.findDOMNode());
-      var predefHeight = localStorage.chatAvPaneHeight || false;
+      var predefHeight = mega.config.get('chatAvPaneHeight') | 0;
 
       if (predefHeight) {
-        $container.height(parseInt(localStorage.chatAvPaneHeight, 10));
+        $container.height(predefHeight);
       }
 
       $('.simpletip', $container).trigger('simpletipClose');
@@ -14625,6 +14637,7 @@ let conversationpanel_ConversationPanel = (conversationpanel_dec = utils["defaul
         chatRoom: room,
         title: l[8004],
         name: "delete-message",
+        pref: "1",
         onClose: () => {
           self.setState({
             'confirmDeleteDialog': false
@@ -14688,6 +14701,7 @@ let conversationpanel_ConversationPanel = (conversationpanel_dec = utils["defaul
         chatRoom: room,
         title: l[20905],
         name: "paste-image-chat",
+        pref: "2",
         onClose: () => {
           self.setState({
             'pasteImageConfirmDialog': false
@@ -14762,6 +14776,7 @@ let conversationpanel_ConversationPanel = (conversationpanel_dec = utils["defaul
         chatRoom: room,
         title: l[8871],
         name: "truncate-conversation",
+        pref: "3",
         dontShowAgainCheckbox: false,
         onClose: () => {
           self.setState({
@@ -14787,6 +14802,7 @@ let conversationpanel_ConversationPanel = (conversationpanel_dec = utils["defaul
         chatRoom: room,
         title: l[19068],
         name: "archive-conversation",
+        pref: "4",
         onClose: () => {
           self.setState({
             'archiveDialog': false
@@ -14811,6 +14827,7 @@ let conversationpanel_ConversationPanel = (conversationpanel_dec = utils["defaul
         chatRoom: room,
         title: l[19063],
         name: "unarchive-conversation",
+        pref: "5",
         onClose: () => {
           self.setState({
             'unarchiveDialog': false
@@ -16745,6 +16762,7 @@ class conversations_ArchivedConversationsList extends mixins["MegaRenderMixin"] 
           chatRoom: room,
           title: l[19063],
           name: "unarchive-conversation",
+          pref: "5",
           onClose: () => {
             self.setState({
               'confirmUnarchiveDialogShown': false
@@ -17264,7 +17282,6 @@ function Chat() {
   this.currentlyOpenedChat = null;
   this.lastOpenedChat = null;
   this.archivedChatsCount = 0;
-  this._myPresence = localStorage.megaChatPresence;
   this._imageLoadCache = Object.create(null);
   this._imagesToBeLoaded = Object.create(null);
   this._imageAttributeCache = Object.create(null);

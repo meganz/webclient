@@ -1,0 +1,335 @@
+<!doctype html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Group Chat</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <link rel="stylesheet" type="text/css" href="../../css/fonts.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/general.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/style.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/account.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/settings.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/dialogs.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/dialogs-common.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/dialogs/cookie-dialog.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/perfect-scrollbar.css" />
+    <style>
+        .cookie-icon {
+            background: no-repeat center url("../../images/mega/single-icons/cookie.svg");
+        }
+    </style>
+    
+    <script type="text/javascript" src="../../js/vendor/jquery.js"></script>
+    <script type="text/javascript" src="../../js/vendor/perfect-scrollbar.js"></script>
+    <script type="text/javascript">
+
+        $(document).ready(function() {
+
+            var $dialog = $('.mega-dialog.cookie-dialog');
+            var $content = $('.content-block', $dialog);
+            var $activeStep;
+            var $scroll;
+            var $buttons;
+            var is_mobile = false;
+            var is_saved_settings = true;
+            var initDesktopScroll;
+            var initMobileSteetingsTabs;
+
+            // Show settings
+            $content.removeClass('active');
+            $activeStep = $content.filter('.step2').addClass('active'); //Feel free to  rename step1, step2, ...
+            $scroll = $('.scrollable-block', $activeStep);
+            // Buttons for Step2 (Settings)
+            $useCurrentSettingsButton = $('.use-current-settings', $activeStep);
+            $useSavedSettingsButton = $('.use-saved-settings', $activeStep);
+
+            // Desktop scroll
+            initDesktopScroll = function() {
+
+                if ($scroll.is('.ps-container')) {
+                    Ps.update($scroll[0]);
+                }
+                else {
+                    Ps.initialize($scroll[0]);
+                }
+            };
+
+            // Init Mobile Settings Tabs
+            initMobileSteetingsTabs = function() {
+
+                var $tabs = $('.settings-tab', $activeStep);
+
+                $tabs.bind('click', function() {
+
+                    var $this = $(this);
+                    var type = $this.data('type');
+
+                    $tabs.removeClass('active');
+                    $this.addClass('active');
+
+                    if (type === 'saved') {
+
+                        // Show selected toggle buttons
+                        $('.settings-cell.current', $activeStep).addClass('hidden');
+                        $('.settings-cell.saved', $activeStep).removeClass('hidden');
+
+                        // Show necessary button
+                        $useCurrentSettingsButton.addClass('hidden');
+                        $useSavedSettingsButton.removeClass('hidden');
+                    }
+                    else {
+
+                        // Show selected toggle buttons
+                        $('.settings-cell.current', $activeStep).removeClass('hidden')
+                        $('.settings-cell.saved', $activeStep).addClass('hidden');
+
+                        // Show necessary button. Feel free to change these special classnames.
+                        $useCurrentSettingsButton.removeClass('hidden').addClass('positive');
+                        $useSavedSettingsButton.addClass('hidden');
+                    }
+                });
+
+                // Show Current settings as default (for example)
+                $tabs.filter('[data-type="current"]').trigger('click');
+            };
+
+            // Please init scrolling for step (Desktop only)
+            if (!is_mobile) {
+
+                initDesktopScroll();
+                $scroll.scrollTop(0);
+
+                $(window).resize(function () {
+                    initDesktopScroll();
+                });
+            }
+            else {
+
+                // Just for demo (we have it already)
+                $('body').addClass('mobile');
+            }
+
+            // If there are saved settings...
+            if (is_saved_settings) {
+
+                // We need to set special classaname
+                $activeStep.addClass('active-saved-cookies');
+
+                // Hide "OK"(.save-settings) button, Show "Use saved settings" and "Use current settings" buttons
+                $('.save-settings', $activeStep).addClass('hidden');
+                $useCurrentSettingsButton.removeClass('hidden');
+                $useSavedSettingsButton.removeClass('hidden');
+
+                // Init Mobile Settings Tab events as wwe show only one type of Toggle buttons at once on mobile
+                if (is_mobile) {
+                    initMobileSteetingsTabs();
+                }
+            }
+            else {
+                $activeStep.removeClass('active-saved-cookies');
+
+                $('.save-settings', $activeStep).removeClass('hidden');
+                $useCurrentSettingsButton.addClass('hidden');
+                $useSavedSettingsButton.addClass('hidden');
+            }
+
+            // Toggle buttons
+            $('.dialog-feature-toggle', $activeStep).bind('mousedown', function() {
+
+                var $this = $(this);
+
+                if ($this.hasClass('disabled')) {
+                    return false;
+                }
+                else if ($this.hasClass('toggle-on')) {
+                    $this.removeClass('toggle-on')
+                }
+                else {
+                    $this.addClass('toggle-on');
+                }
+            });
+        });
+
+    </script>
+</head>
+<body id="bodyel" class="logged fontsize2 en lite">
+    
+    <div class="fm-dialog-overlay"></div>
+
+    <!--Cookie dialog !-->
+    <!--TODO: Remove "fm-dialog" once new dialogs are merged !-->
+    <div class="fm-dialog mega-dialog cookie-dialog lato" style="display: flex;">
+
+        <!-- Common info !-->
+        <div class="content-block step1 active">
+            <div class="scrollable-block big-pad">
+                <div class="cookie-icon cookie"></div>
+                <div class="header">
+                    Before you continue
+                </div>
+                <div class="common-info">
+                    We use cookies and similar technologies (‘Cookies’) to provide our services to you, enhance your experience with our services and customize the adverts you see, including through third parties. Accept our use of Cookies from the beginning of your visit or customise Cookies in Cookie Settings. Read more in our <a href="/" class="green">Cookie Policy</a>.
+                </div>
+            </div>
+            <div class="bottom-buttons">
+                <!-- Please bind events to special classnames like "accept-cookies" or "cookie-settings" !-->
+                <div class="common-dialog-button positive right accept-cookies">
+                    Accept Cookies
+                </div>
+                <div class="common-dialog-button right m-lnk cookie-settings">
+                    Cookie Settings
+                </div>
+            </div>
+        </div>
+
+        <!-- Cookie settings !-->
+        <div class="content-block step2">
+            <div class="header medium">
+                Cookie Settings
+            </div>
+            <div class="settings-tip">
+                Your current settings and your saved settings are different. Select which settings you want to use.
+            </div>
+            <div class="tabs">
+                <div class="settings-tab current" data-type="current">
+                    Current settings
+                </div>
+                <div class="settings-tab saved" data-type="saved">
+                    Saved settings
+                </div>
+            </div>
+            <div class="scrollable-block">
+                <!-- Settings !-->
+                <div class="settings">
+                    <div class="settings-row">
+                        <div class="settings-cell">
+                            <div class="settings-header">Accept Cookies</div>
+                        </div>
+                        <div class="settings-cell current">
+                            <div class="toggle-header">Current</div>
+                            <div class="dialog-feature-toggle"><div class="dialog-feature-switch"></div></div>
+                        </div>
+                         <div class="settings-cell saved">
+                             <div class="toggle-header">Saved</div>
+                            <div class="dialog-feature-toggle disabled"><div class="dialog-feature-switch"></div></div>
+                        </div>
+                    </div>
+                    <div class="settings-row">
+                        <div class="settings-cell">
+                            <div class="settings-header">Essential Cookies</div>
+                            <div class="settings-text">Essential for providing you important functionality and secure access to our services. For this reason, they do not require consent.</div>
+                        </div>
+                        <div class="settings-cell current">
+                            <div class="dialog-feature-toggle"><div class="dialog-feature-switch"></div></div>
+                        </div>
+                         <div class="settings-cell saved">
+                            <div class="dialog-feature-toggle disabled"><div class="dialog-feature-switch"></div></div>
+                        </div>
+                    </div>
+                    <div class="settings-row">
+                        <div class="settings-cell">
+                            <div class="settings-header">Preference Cookies</div>
+                            <div class="settings-text">Allow us to remember certain display and formatting settings you choose. Not accepting these Cookies will mean we won’t be able to remember some things for you such as your preferred screen layout.</div>
+                        </div>
+                        <div class="settings-cell current">
+                            <div class="dialog-feature-toggle"><div class="dialog-feature-switch"></div></div>
+                        </div>
+                         <div class="settings-cell saved">
+                            <div class="dialog-feature-toggle disabled"><div class="dialog-feature-switch"></div></div>
+                        </div>
+                    </div>
+                    <div class="settings-row">
+                        <div class="settings-cell">
+                            <div class="settings-header">Performance and Analytics Cookies</div>
+                            <div class="settings-text">Help us to understand how you use our services and provide us data that we can use to make improvements. Not accepting these Cookies will mean we will have less data available to us to help design improvements. </div>
+                        </div>
+                        <div class="settings-cell current">
+                            <div class="dialog-feature-toggle"><div class="dialog-feature-switch"></div></div>
+                        </div>
+                         <div class="settings-cell saved">
+                            <div class="dialog-feature-toggle disabled"><div class="dialog-feature-switch"></div></div>
+                        </div>
+                    </div>
+                    <div class="settings-row">
+                        <div class="settings-cell">
+                            <div class="settings-header">Advertising Cookies</div>
+                            <div class="settings-text">Used by us and our approved advertising partners to customise the adverts you see on our services and on other websites based on your browsing history. Not accepting these Cookies means we may show advertisements that are less relevant.</div>
+                        </div>
+                        <div class="settings-cell current">
+                            <div class="dialog-feature-toggle"><div class="dialog-feature-switch"></div></div>
+                        </div>
+                         <div class="settings-cell saved">
+                            <div class="dialog-feature-toggle disabled"><div class="dialog-feature-switch"></div></div>
+                        </div>
+                    </div>
+                    <div class="settings-row">
+                        <div class="settings-cell">
+                            <div class="settings-header">Third Party Cookies</div>
+                            <div class="settings-text">These are Cookies which are controlled by someone other than us; we use these Cookies to provide the types of functionality described above. Not accepting these Cookies will have different implications depending on what type of Cookie each third party Cookie is. Click on ‘More Information' below for details on all the third party Cookies we use. 
+                            </div>
+                            <a href="" class="details">More Information</a>
+                            <div class="clear"></div>
+                            <a href="" class="settings-links">Cookie Policy</a>
+                            <a href="" class="settings-links">Privacy Policy</a>
+                        </div>
+                        <div class="settings-cell current">
+                            <div class="dialog-feature-toggle"><div class="dialog-feature-switch"></div></div>
+                        </div>
+                         <div class="settings-cell saved">
+                            <div class="dialog-feature-toggle disabled"><div class="dialog-feature-switch"></div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="bottom-buttons">
+                <!-- Please bind events to special classnames like "accept-cookies" or "cookie-settings" !-->
+                <div class="common-dialog-button positive right save-settings">
+                    OK
+                </div>
+                <div class="common-dialog-button positive right use-saved-settings hidden">
+                    Use saved settings
+                </div>
+                <div class="common-dialog-button right use-current-settings hidden">
+                    Use current settings
+                </div>
+                <div class="common-dialog-button m-lnk left close-settings">
+                    Back
+                </div>
+            </div>
+        </div>
+
+        <!-- Third Party Cookies !-->
+        <div class="content-block step3">
+            <div class="header medium">
+                Third Party Cookies
+            </div>
+            <div class="scrollable-block">
+                <div class="info-block">
+                    <div class="header small">Google Advertising Cookies</div>
+                    <div class="category">Google Advertising Cookies</div>
+                    Used by Google to:
+<ul>
+<li>customise adverts which are shown by Google on our services and on other websites and services based on such things as your location and your actions on our services and the actions you have taken on other websites and services you have previously visited;</li>
+
+<li>monitor how often you are displayed certain adverts</li>
+
+<li>provide fraud prevention;</li>
+
+<li>determine when you click on a particular advert and then to track the following actions you take in response to that advert;</li>
+    </ul>
+<a class="green">https://policies.google.com/technologies/partner-sites</a>
+
+                </div>
+            </div>
+            <div class="bottom-buttons pad">
+                <!-- Please bind events to special classnames like "accept-cookies" or "cookie-settings" !-->
+                <div class="common-dialog-button right close-info">
+                    Back
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- end of Set new password dialog !-->
+
+</body>
+</html>

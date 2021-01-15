@@ -2278,3 +2278,11 @@ i.account-icon.menu {
 .medium-icon.dialog-sprite.right-arrow {
     background-position: -136px -7008px;
 }
+
+/* Single icons */
+/* TODO: Put it to sprite in revamp branch */
+.cookie-icon {
+    background: no-repeat center url("../images/mega/single-icons/cookie.svg");
+    width: 80px;
+    height: 80px;
+}

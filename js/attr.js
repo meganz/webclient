@@ -196,12 +196,24 @@
         if (typeof userhandle !== 'string' || base64urldecode(userhandle).length !== 8) {
             return MegaPromise.reject(EARGS);
         }
+        attribute = buildAttribute(attribute, pub, nonHistoric, decodeValues);
+
+        // Prevent firing API requests when API already gave the attribute value with 'ug'
+        if (attribute[0] === '^' && Object(window.u_attr).u === userhandle && u_attr[attribute]) {
+            if (d > 1) {
+                logger.info('Attribute retrieval "%s" ug-provided.', attribute);
+            }
+            if (callback) {
+                callback(u_attr[attribute], {u: userhandle, ua: attribute});
+            }
+            return MegaPromise.resolve(u_attr[attribute]);
+        }
+
         var self = this;
         var myCtx = ctx || {};
         var args = toArray.apply(null, arguments);
 
         // Assemble property name on Mega API.
-        attribute = buildAttribute(attribute, pub, nonHistoric, decodeValues);
         var cacheKey = buildCacheKey(userhandle, attribute);
 
         if (_inflight[cacheKey]) {
@@ -325,7 +337,6 @@
             settleFunctionDone(res);
         };
 
-
         // Assemble context for this async API request.
         myCtx.u = userhandle;
         myCtx.ua = attribute;
@@ -436,13 +447,18 @@
      * @return {MegaPromise}
      *     A promise that is resolved when the original asynch code is settled.
      */
-    ns.remove = function _removeUserAttribute(attribute, pub, nonHistoric, encodeValues) {
-        attribute = buildAttribute(attribute, pub, nonHistoric, encodeValues);
+    ns.remove = promisify(function(resolve, reject, attribute, pub, nonHistoric, encodeValues) {
+        if (arguments.length > 3) {
+            attribute = buildAttribute(attribute, pub, nonHistoric, encodeValues);
+        }
         var cacheKey = buildCacheKey(u_handle, attribute);
-        var promise = new MegaPromise();
 
         if (d) {
             console.warn("Removing attribute %s, I really hope you know what you are doing!", attribute);
+        }
+
+        if (attribute[0] === '^') {
+            delete u_attr[attribute];
         }
 
         var self = this;
@@ -450,6 +466,7 @@
         if (self._versions[cacheKey]) {
             // req['av'] = self._versions[cacheKey];
         }
+
         attribCache.removeItem(cacheKey)
             .always(function() {
                 api_req(req, {
@@ -459,21 +476,19 @@
 
                         if (typeof res === 'number' || res < 0) {
                             logger.warn('Error removing user attribute "%s", result: %s!', attribute, res);
-                            promise.reject(res);
+                            reject(res);
                         }
                         else {
                             if (self._versions[cacheKey] && typeof res === 'string') {
                                 self._versions[cacheKey] = res;
                             }
                             logger.info('Removed user attribute "%s", result: ' + res, attribute);
-                            promise.resolve();
+                            resolve();
                         }
                     }
                 });
             });
-
-        return promise;
-    };
+    });
 
     /**
      * Stores a user attribute for oneself.
@@ -1070,6 +1085,10 @@
         // XXX: Even if we're using promises here, this is guaranteed to resolve synchronously atm,
         //      so if this ever changes we'll need to make sure it's properly adapted...
 
+        if (window.u_attr && userHandle === window.u_handle && attrName[0] === '^') {
+            delete u_attr[attrName];
+        }
+
         var removeItemPromise = attribCache.removeItem(cacheKey);
 
         removeItemPromise
@@ -1112,9 +1131,15 @@
             crypt.getPubEd25519(userHandle);
         };
         uaPacketParserHandler['*!fmconfig'] = function() {
-            mega.config.fetch();
-            if (fminitialized && page === 'fm/account/transfers') {
-                accountUI.transfers.transferTools.megasync.render();
+            if (fminitialized) {
+                mega.config.fetch()
+                    .then(() => {
+                        // @todo move this to config->refresh.ui()?
+                        if (page === 'fm/account/transfers') {
+                            accountUI.transfers.transferTools.megasync.render();
+                        }
+                    })
+                    .dump('fmconfig.sync');
             }
         };
         uaPacketParserHandler['*!>alias'] = function() {
@@ -1166,8 +1191,9 @@
             }
         };
         uaPacketParserHandler['^clv'] = function(userHandle) {
-            mega.attr.get(userHandle, 'clv', -2, 0, function(res) {
-                u_attr['^clv'] = res;
+            mega.attr.get(userHandle, 'clv', -2, 0, function(res, ctx) {
+                u_attr[ctx.ua] = res;
+
                 if (fminitialized && $.dialog === 'qr-dialog') {
                     openAccessQRDialog();
                 }
@@ -1178,7 +1204,9 @@
         };
         uaPacketParserHandler['^!rubbishtime'] = function(userHandle) {
             if (u_attr.flags.ssrs > 0) {
-                mega.attr.get(userHandle, 'rubbishtime', -2, 1, function(res) {
+                mega.attr.get(userHandle, 'rubbishtime', -2, 1, function(res, ctx) {
+                    u_attr[ctx.ua] = res;
+
                     if (fminitialized && M.account) {
                         M.account.ssrs = parseInt(res);
                         if (page === 'fm/account/file-management') {
@@ -1202,8 +1230,9 @@
             mega.enotif.handleAttributeUpdate();
         };
         uaPacketParserHandler['^!affid'] = function(userHandle) {
-            mega.attr.get(userHandle, 'affid', -2, 1, function(res) {
-                u_attr['^!affid'] = res;
+            mega.attr.get(userHandle, 'affid', -2, 1, function(res, ctx) {
+                u_attr[ctx.ua] = res;
+
                 if (fminitialized) {
                     M.affiliate.id = res;
                 }
@@ -1214,13 +1243,15 @@
         };
 
         uaPacketParserHandler['^!ps'] = function(userHandle) {
-            mega.attr.get(userHandle, 'ps', -2, 1, function(res) {
+            mega.attr.get(userHandle, 'ps', -2, 1, function(res, ctx) {
+                u_attr[ctx.ua] = res;
+
                 if (fminitialized && typeof pushNotificationSettings !== 'undefined') {
-                    u_attr['^!ps'] = res;
                     pushNotificationSettings.init();
                 }
             });
         };
+        uaPacketParserHandler['^!csp'] = () => 'csp' in window && csp.init();
 
         if (d) {
             global._uaPacketParserHandler = uaPacketParserHandler;

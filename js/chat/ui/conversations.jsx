@@ -739,6 +739,7 @@ class ArchivedConversationsList extends MegaRenderMixin {
                             chatRoom={room}
                             title={l[19063]}
                             name="unarchive-conversation"
+                    pref="5"
                             onClose={() => {
                                 self.setState({'confirmUnarchiveDialogShown': false});
                             }}

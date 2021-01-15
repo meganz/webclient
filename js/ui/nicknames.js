@@ -135,7 +135,7 @@ var nicknames = {
                 });
 
                 // Update left panel if it has been initialised
-                if (M.getNodeRoot(M.currentdirid) === 'contacts' && $.sortTreePanel) {
+                if (!is_mobile && M.currentrootid === 'contacts') {
                     M.contacts();
                 }
             });
@@ -333,7 +333,7 @@ var nicknames = {
                     });
 
                     // Update left panel if it has been initialised
-                    if (M.getNodeRoot(M.currentdirid) === 'contacts' && $.sortTreePanel) {
+                    if (!is_mobile && M.currentrootid === 'contacts') {
                         M.contacts();
                     }
                 }

@@ -94,14 +94,6 @@ function scrollToURLs() {
 }
 
 /**
- *  Check if value is contained in a array. If it is return value
- *  otherwise false
- */
-function anyOf(arr, value) {
-    return $.inArray(value, arr) === -1 ? false : value;
-}
-
-/**
  * excludeIntersected
  *
  * Loop through arrays excluding intersected items form array2
@@ -2038,6 +2030,25 @@ function elementInViewport(el) {
     var rect = verge.rectangle(el);
 
     return !(rect.left < 0 || rect.right < 0 || rect.bottom < 0 || rect.top < 0);
+}
+
+/**
+ * Check if the element is within the viewport, not detached and visible.
+ * @param {HTMLElement|Element} el DOM node/element.
+ * @returns {Boolean} whether it is.
+ */
+function elementIsVisible(el) {
+    'use strict';
+
+    if (!(el && el.parentNode && verge.inViewport(el))) {
+        return false;
+    }
+
+    if (window.getComputedStyle(el).position !== 'fixed' && !el.offsetParent) {
+        return false;
+    }
+
+    return !!(el.offsetWidth || el.offsetHeight || el.getClientRects().length);
 }
 
 // FIXME: This is a "Dirty Hack" (TM) that needs to be removed as soon as

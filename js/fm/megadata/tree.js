@@ -192,10 +192,11 @@ MegaData.prototype.buildtree = function(n, dialog, stype, sDeepIndex) {
             }));
         }
 
-        var sortDirection = is_mobile ? 1 : Object($.sortTreePanel[prefix]).dir;
-        var sortFn = M.getSortByNameFn2(sortDirection);
+        const stp = prefix === 'cloud-drive' && folderlink ? 'folder-link' : prefix;
+        const sortDirection = Object(M.sortTreePanel[stp]).dir || 1;
+        let sortFn = M.getSortByNameFn2(sortDirection);
 
-        switch (Object($.sortTreePanel[prefix]).by) {
+        switch (Object(M.sortTreePanel[stp]).by) {
             case 'fav':
                 sortFn = M.sortByFavFn(sortDirection);
                 break;
@@ -443,39 +444,110 @@ MegaData.prototype.buildtree.FORCE_REBUILD = 34675890009;
 MegaData.prototype.initTreePanelSorting = function() {
     "use strict";
 
-    var sections = [
+    // Sorting sections for tree panels, dialogs, and per field.
+    // XXX: do NOT change the order, add new entries at the tail, and ask before removing anything..
+    const sections = [
         'folder-link', 'contacts', 'conversations', 'inbox',
-        'shared-with-me', 'cloud-drive', 'rubbish-bin', 'out-shares', 'public-links' // Sorting sections for tree parts
+        'shared-with-me', 'cloud-drive', 'rubbish-bin',
+        'out-shares', 'public-links'
     ];
-    var byType = ['name', 'status', 'last-interaction', 'label'];
-    var dialogs = ['Copy', 'Move', 'SelectFolder', 'SaveAs'];
-    var byDefault;
-    var type;
+    const byType = ['name', 'status', 'last-interaction', 'label', 'created', 'fav', 'ts', 'mtime'];
+    const dialogs = ['Copy', 'Move', 'SelectFolder', 'SaveAs'];
 
-    $.sortTreePanel = Object.create(null);
+    const bitmap = Object.create(null);
+    this.sortTreePanel = Object.create(null);
 
-    var setSortTreePanel = function _setSortTreePanel(dialog) {
-        var key = (dialog || '') + type;
-        $.sortTreePanel[key] = {
-            by: anyOf(byType, localStorage['sort' + key + 'By']) || byDefault,
-            dir: parseInt(anyOf(['-1', '1'], localStorage['sort' + key + 'Dir']) || '1')
-        };
+    const store = () => {
+        let res = '';
+        const bitdef = Object.keys(bitmap);
+
+        for (let i = 0; i < bitdef.length; i++) {
+            const k = bitdef[i];
+            const v = bitmap[k];
+            const by = v.by;
+            const dir = v.dir || 1;
+
+            if (!by || by === v.byDefault && dir > 0) {
+                // defaults, do not store.
+                continue;
+            }
+
+            const b1 = String.fromCharCode(i);
+            const b2 = String.fromCharCode(byType.indexOf(by) << 1 | (dir < 0 ? 1 : 0));
+
+            res += b1 + b2;
+        }
+
+        mega.config.set('xtp', res.length ? res : undefined);
     };
 
-    for (var i = sections.length; i--;) {
-        type = sections[i];
-        byDefault = type === 'contacts' ? "status" : "name";
+    const validate = (p, va = ['by', 'dir']) => {
+        assert(va.indexOf(p) !== -1, 'Invalid property, must be one of ' + va);
+    };
 
-        setSortTreePanel();
+    const handler = {
+        get(target, prop) {
+            validate(prop);
 
-        dialogs.forEach(setSortTreePanel);
+            if (Reflect.has(target, prop)) {
+                return Reflect.get(target, prop);
+            }
+            return prop === 'by' ? target.byDefault : 1;
+        },
+        set(target, prop, value) {
+            validate(prop);
+            validate(value, prop === 'by' ? byType : [-1, 1]);
+
+            if (Reflect.set(target, prop, value)) {
+                delay('sortTreePanel:store', store, 1408);
+                return true;
+            }
+        }
+    };
+
+    const setSortTreePanel = (type, byDefault, dialog) => {
+        const key = (dialog || '') + type;
+
+        bitmap[key] = Object.create(null);
+        Object.defineProperty(bitmap[key], 'byDefault', {value: byDefault});
+        Object.defineProperty(this.sortTreePanel, key, {value: new Proxy(bitmap[key], handler)});
+    };
+
+    for (let x = 0; x < sections.length; ++x) {
+        const type = sections[x];
+        const by = type === 'contacts' ? "status" : "name";
+
+        setSortTreePanel(type, by);
+
+        for (let y = 0; y < dialogs.length; ++y) {
+            setSortTreePanel(type, by, dialogs[y]);
+        }
+    }
+    Object.freeze(this.sortTreePanel);
+
+    if (d) {
+        console.info('xtp.bitmap', [bitmap]);
+    }
+
+    const xtp = mega.config.get('xtp');
+    if (xtp) {
+        const bitdef = Object.keys(bitmap);
+
+        for (let i = 0; i < xtp.length; i += 2) {
+            const b1 = xtp.charCodeAt(i);
+            const b2 = xtp.charCodeAt(i + 1);
+            const map = bitmap[bitdef[b1]];
+
+            map.by = byType[b2 >> 1];
+            map.dir = b2 & 1 ? -1 : 1;
+        }
     }
 };
 
 MegaData.prototype.getTreePanelSortingValue = function(column, property) {
     'use strict';
 
-    column = $.sortTreePanel && $.sortTreePanel[column] || false;
+    column = M.sortTreePanel[column] || false;
     return column[property || 'by'];
 };
 
@@ -703,7 +775,7 @@ MegaData.prototype.treeSortUI = function() {
                 'right': '-' + (menu.outerWidth() - 3) + 'px'
             });
 
-            sortTreePanel = $.sortTreePanel[type];
+            sortTreePanel = M.sortTreePanel[type === 'cloud-drive' && folderlink ? 'folder-link' : type];
 
             if (d && !sortTreePanel) {
                 console.error('No sortTreePanel for "%s"', type);
@@ -775,16 +847,20 @@ MegaData.prototype.treeSortUI = function() {
             type = M.lastActiveTab || 'cloud-drive';
         }
 
-        if ($.sortTreePanel[type]) {
+        if (type === 'cloud-drive' && folderlink) {
+            // @todo should we rather fix M.currentTreeType / M.treePanelType() ?!
+            type = 'folder-link';
+        }
+
+        if (M.sortTreePanel[type]) {
             $('.nw-sorting-menu').addClass('hidden');
             $('.nw-tree-panel-arrows').removeClass('active');
 
             if (data.by) {
-                localStorage['sort' + type + 'By'] = $.sortTreePanel[type].by = data.by;
+                M.sortTreePanel[type].by = data.by;
             }
             if ($self.hasClass('active')) {// Change sort direction
-                $.sortTreePanel[type].dir *= -1;
-                localStorage['sort' + type + 'Dir'] = $.sortTreePanel[type].dir;
+                M.sortTreePanel[type].dir *= -1;
             }
 
             var fav = function(el) {

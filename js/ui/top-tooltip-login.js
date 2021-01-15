@@ -168,7 +168,7 @@ var tooltiplogin = {
             if ($('.loginwarning-checkbox', $dialog).hasClass('checkboxOn')) {
                 localStorage.hideloginwarning = 1;
             }
-            $('.top-login-warning', $dialog).removeClass('active');
+            $('.top-login-warning', $dialog).addClass('hidden');
         });
 
         $('.top-login-forgot-pass', $dialog).rebind('click', function() {

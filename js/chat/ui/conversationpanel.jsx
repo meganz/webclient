@@ -1536,6 +1536,7 @@ export class ConversationPanel extends MegaRenderMixin {
                 chatRoom={room}
                 title={l[8004]}
                 name="delete-message"
+                pref="1"
                 onClose={() => {
                     self.setState({'confirmDeleteDialog': false});
                 }}
@@ -1621,6 +1622,7 @@ export class ConversationPanel extends MegaRenderMixin {
                 chatRoom={room}
                 title={l[20905]}
                 name="paste-image-chat"
+                pref="2"
                 onClose={() => {
                     self.setState({'pasteImageConfirmDialog': false});
                 }}
@@ -1709,6 +1711,7 @@ export class ConversationPanel extends MegaRenderMixin {
                 chatRoom={room}
                 title={l[8871]}
                 name="truncate-conversation"
+                pref="3"
                 dontShowAgainCheckbox={false}
                 onClose={() => {
                     self.setState({'truncateDialog': false});
@@ -1737,6 +1740,7 @@ export class ConversationPanel extends MegaRenderMixin {
                 chatRoom={room}
                 title={l[19068]}
                 name="archive-conversation"
+                pref="4"
                 onClose={() => {
                     self.setState({'archiveDialog': false});
                 }}
@@ -1763,6 +1767,7 @@ export class ConversationPanel extends MegaRenderMixin {
                 chatRoom={room}
                 title={l[19063]}
                 name="unarchive-conversation"
+                pref="5"
                 onClose={() => {
                     self.setState({'unarchiveDialog': false});
                 }}

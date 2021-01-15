@@ -171,9 +171,10 @@ FileManager.prototype.initFileManagerUI = function() {
 
     $('.fm-dialog-overlay').rebind('click.fm', function(ev) {
         if ($.dialog === 'pro-login-dialog'
-            || $.dialog === 'affiliate-redeem-dialog'
             || $.dialog === 'share'
             || $.dialog === 'share-add'
+            || $.dialog === 'cookies-dialog'
+            || $.dialog === 'affiliate-redeem-dialog'
             || String($.dialog).startsWith('verify-email')
             || localStorage.awaitingConfirmationAccount) {
 
@@ -3405,12 +3406,10 @@ FileManager.prototype.addGridUI = function(refresh) {
 
         if (M.v.some(fav)) {
             for (var f in M.sortRules) {
-                if (M.sortRules.hasOwnProperty(f)) {
-                    if (c.indexOf(f) !== -1) {
-                        M.doSort(f, d);
-                        M.renderMain();
-                        break;
-                    }
+                if (c.indexOf(f) !== -1) {
+                    M.doSort(f, d);
+                    M.renderMain();
+                    break;
                 }
             }
         }

@@ -641,7 +641,7 @@ function dl_g(res, ctx) {
             M.affiliate.storeAffiliate(dlpage_ph, 2);
 
             // Adding advertisement
-            dlPageAds($topBar).dump('ads');
+            dlPageAds($topBar, res).dump('ads');
         }
         else if (is_mobile) {
             // Load the missing file decryption key dialog for mobile
@@ -862,7 +862,7 @@ function dlPageStartDownload(isDlWithMegaSync) {
     $.dlhash = getSitePath();
 }
 
-async function dlPageAds($topBar) {
+async function dlPageAds($topBar, res) {
     'use strict';
 
     if (is_mobile || !('csp' in window)) {

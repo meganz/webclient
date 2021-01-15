@@ -6,12 +6,6 @@ var folderlink = false;
 var fetcher = null;
 var workerstate;
 
-var fmconfig = Object.create(null);
-
-if (localStorage.fmconfig) {
-    fmconfig = JSON.parse(localStorage.fmconfig);
-}
-
 // Set up the MegaLogger's root logger
 MegaLogger.rootLogger = new MegaLogger(
     "",
@@ -3700,14 +3694,7 @@ function loadfm_done(mDBload) {
         delete localStorage['treefixup$' + u_handle];
 
         // load/initialise the authentication system
-        mega.config.fetch()
-            .always(function() {
-                authring.initAuthenticationSystem();
-            });
-    }
-    else if (pfid && u_type == 3) {
-        // logged in user opening a folder link
-        mega.config.fetch();
+        authring.initAuthenticationSystem();
     }
 
     // This function is invoked once the M.openFolder()'s promise (through renderfm()) is fulfilled.
@@ -3860,25 +3847,20 @@ function loadfm_done(mDBload) {
         promise.always(_completion);
     };
 
-    mega.config.ready(function() {
-        mclp.then(_onConfigReady)
-            .catch(function() {
-                try {
-                    _onConfigReady();
-                }
-                catch (ex) {
-                    onIdle(function() {
-                        // give time for window.onerror to fire 'cd2' before showing the blocking confirm-dialog
-                        setTimeout(function() {
-                            siteLoadError(ex, 'loadfm');
-                        }, 2e3);
+    Promise.allSettled([mclp, u_type > 2 && mega.config.fetch()])
+        .then(_onConfigReady)
+        .catch(function(ex) {
+            console.warn(ex);
+            tryCatch(_onConfigReady, (ex) => {
+                // give time for window.onerror to fire 'cd2' before showing the blocking confirm-dialog
+                setTimeout(function() {
+                    siteLoadError(ex, 'loadfm');
+                }, 2e3);
 
-                        // reach window.onerror
-                        throw ex;
-                    });
-                }
-            });
-    });
+                // reach window.onerror
+                throw ex;
+            })();
+        });
 }
 
 function fmtreenode(id, e)

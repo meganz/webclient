@@ -91,6 +91,7 @@ function MegaData() {
     this.csort = 'name';
     this.tfsdomqueue = Object.create(null);
     this.scAckQueue = Object.create(null);
+    this.sortTreePanel = Object.create(null);
     this.lastColumn = null;
     this.account = false;
 
@@ -119,7 +120,8 @@ function MegaData() {
         return new AffiliateData();
     });
 
-    this.sortRules = {
+    // XXX: do NOT change the order, add new entries at the tail, and ask before removing anything..
+    const sortRules = {
         'name': this.sortByName.bind(this),
         'size': this.sortBySize.bind(this),
         'type': this.sortByType.bind(this),
@@ -138,6 +140,8 @@ function MegaData() {
         'sharedwith': this.sortBySharedWith.bind(this),
         'versions': this.sortByVersion.bind(this)
     };
+    Object.setPrototypeOf(sortRules, null);
+    Object.defineProperty(this, 'sortRules', {value: Object.freeze(sortRules)});
 
     /** EventListener interface. */
     this.handleEvent = function(ev) {

@@ -729,7 +729,7 @@ mobile.cloud = {
         var $fileManagerBlock = $('.mobile.file-manager-block');
 
         // If they have previously set the grid mode to be enabled and just done a refresh/reload then enable it again
-        if (localStorage.getItem('mobileGridViewModeEnabled') === '1') {
+        if (mega.config.get('mgvm')) {
             mobile.cloud.enableGridView($fileManagerBlock, $changeViewButton);
         }
         else {
@@ -774,7 +774,7 @@ mobile.cloud = {
         $changeViewButton.addClass('list-icon');
 
         // Save current grid view state for page refreshes/reloads
-        localStorage.setItem('mobileGridViewModeEnabled', '1');
+        mega.config.set('mgvm', 1);
     },
 
     /**
@@ -789,7 +789,7 @@ mobile.cloud = {
         $changeViewButton.addClass('grid-icon');
 
         // Save current list view state for page refreshes/reloads
-        localStorage.setItem('mobileGridViewModeEnabled', '0');
+        mega.config.set('mgvm');
     },
 
     /**

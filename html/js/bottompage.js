@@ -53,12 +53,24 @@ var bottompage = {
         }
 
         if (!is_mobile) {
-            $('body').removeClass('mobile');
             bottompage.initNavButtons($content);
         }
         else {
-            $('body').addClass('mobile');
             bottompage.initMobileNavButtons($content);
+        }
+
+        const $cs = $('.cookies-settings', $content).off('click.csp').addClass('hidden');
+        if ('csp' in window) {
+            $cs.removeClass('hidden').rebind('click.csp', function() {
+                if (!this.classList.contains('top-menu-item')) {
+                    csp.showCookiesDialog('step2');
+                    return false;
+                }
+            });
+        }
+        else {
+            // cookie-dialog not available, replace links with text nodes.
+            document.querySelectorAll('a.cookies-settings').forEach(e => e.replaceWith(e.textContent));
         }
 
         // Init floating top menu

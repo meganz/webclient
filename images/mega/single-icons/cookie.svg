@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="76px" height="76px" viewBox="0 0 76 76" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>Group</title>
+    <defs>
+        <path d="M34.8,6 C37.8754834,6 40.8577861,6.39895446 43.6979783,7.14793384 C43.1956152,8.40740885 42.92,9.78151773 42.92,11.22 C42.92,13.8119572 43.8148492,16.1949111 45.3124622,18.0767766 C45.2643238,18.4910103 45.24,18.9126646 45.24,19.34 C45.24,25.4261779 50.1738221,30.36 56.26,30.36 L56.4529277,30.3581732 C58.3205511,31.8132448 60.6690548,32.68 63.22,32.68 C65.0616026,32.68 66.7976963,32.2282626 68.3235166,31.4295523 C69.1553923,34.4104728 69.6,37.5533145 69.6,40.8 C69.6,60.0195093 54.0195093,75.6 34.8,75.6 C15.5804907,75.6 0,60.0195093 0,40.8 C0,21.5804907 15.5804907,6 34.8,6 Z" id="path-1"></path>
+        <circle id="path-3" cx="61.2" cy="14.4" r="14.4"></circle>
+        <path d="M59.588867,16.1235439 L57.188844,13.4982475 C56.7340009,13.0007115 55.9966666,13.0007115 55.5418236,13.4982475 C55.0860588,13.9962876 55.0860588,14.8033343 55.5418236,15.3003663 L58.7653568,18.8264699 C58.9925479,19.07549 59.2907075,19.2 59.588867,19.2 C59.8865657,19.2 60.1851861,19.07549 60.4123772,18.8264699 L66.8585221,11.7752708 C67.313826,11.2772307 67.313826,10.4701839 66.8585221,9.973152 C66.4041398,9.475616 65.6658839,9.475616 65.2115016,9.973152 L59.588867,16.1235439 Z" id="path-5"></path>
+    </defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Group">
+            <mask id="mask-2" fill="white">
+                <use xlink:href="#path-1"></use>
+            </mask>
+            <use id="Combined-Shape" fill="#F0AA7D" xlink:href="#path-1"></use>
+            <circle id="Oval" fill="#924A1C" mask="url(#mask-2)" cx="33.6" cy="24" r="3.6"></circle>
+            <circle id="Oval-Copy-4" fill="#924A1C" mask="url(#mask-2)" cx="15.6" cy="40.8" r="6"></circle>
+            <circle id="Oval-Copy-5" fill="#924A1C" mask="url(#mask-2)" cx="28.2" cy="58.2" r="4.2"></circle>
+            <circle id="Oval-Copy-6" fill="#924A1C" mask="url(#mask-2)" cx="51" cy="45" r="4.2"></circle>
+            <circle id="Oval-Copy-7" fill="#924A1C" mask="url(#mask-2)" cx="35.4" cy="40.2" r="3"></circle>
+            <path d="M34.8,0 C34,12 36,18 40.8,18 C37.2,24 42,27.6 46.8,28.8 C50,29.6 53.6,28 57.6,24 L62.0838389,22.3940246 L50.4,0 L34.8,0 Z" id="Path-3" fill-opacity="0.2" fill="#000000" style="mix-blend-mode: soft-light;" mask="url(#mask-2)"></path>
+            <path d="M63.6,32.4 C67.6,52.4 58,66.8 34.8,75.6 C11.6,84.4 24.8,85.6 74.4,79.2 L74.4,28.8 L63.6,32.4 Z" id="Path-5" fill-opacity="0.2" fill="#000000" style="mix-blend-mode: soft-light;" mask="url(#mask-2)"></path>
+            <rect id="Rectangle" fill-opacity="0.2" fill="#FFFFFF" style="mix-blend-mode: soft-light;" mask="url(#mask-2)" transform="translate(14.400000, 39.600000) scale(-1, 1) translate(-14.400000, -39.600000) " x="-4.8" y="-3.6" width="38.4" height="86.4"></rect>
+            <mask id="mask-4" fill="white">
+                <use xlink:href="#path-3"></use>
+            </mask>
+            <use id="Oval" fill="#00C0A6" xlink:href="#path-3"></use>
+            <rect id="Rectangle" fill-opacity="0.2" fill="#000000" style="mix-blend-mode: soft-light;" mask="url(#mask-4)" x="61.2" y="-1.2" width="14.4" height="30"></rect>
+            <mask id="mask-6" fill="white">
+                <use xlink:href="#path-5"></use>
+            </mask>
+            <use id="Fill-102" fill="#FFFFFF" xlink:href="#path-5"></use>
+        </g>
+    </g>
+</svg>

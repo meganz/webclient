@@ -2056,13 +2056,9 @@ else if (!browserUpdate) {
                 return false;
             }
 
-            if (dump.m.indexOf('this.get(...).querySelectorAll') !== -1
-                    || String(errobj && errobj.stack).indexOf('<anonymous>:1:18') !== -1
-                    || dump.m.indexOf('TypeError: this.get is not a function') !== -1) {
-                // ^ this seems a quirk on latest Chrome (~46+) or a bogus extension
-                dump.l = 1;
-                errobj = null;
-                dump.m = 'TypeError: this.get(...).querySelectorAll is not a function';
+            if (dump.m.indexOf("Failed to construct 'Worker'") !== -1) {
+                errobj = {};
+                dump.l = ln = 1; // enforce deduplication..
             }
 
             if (~dump.m.indexOf("\n")) {
@@ -2170,7 +2166,7 @@ else if (!browserUpdate) {
             }
             if (cn) dump.c = cn;
 
-            if (/Access to '.*' from script denied/.test(dump.m)) {
+            if (/Access to (?:the script at )?'.*(?:' from script|is) denied/.test(dump.m)) {
                 console.error(dump.m, dump);
                 return false;
             }
@@ -2180,7 +2176,6 @@ else if (!browserUpdate) {
                 if (dump.m.toLowerCase().indexOf('out of memory') != -1) dump.m = '!Fatal! Out Of Memory.';
                 else dump.m = dump.m.replace(/[^\s\w]/gi,'') || ('[!] ' + msg);
             }
-            if (location.hostname === 'beta.mega.nz' || location.hostname.indexOf("developers.") > -1) dump.m = '[' + location.hostname + '] ' + dump.m;
 
             try
             {

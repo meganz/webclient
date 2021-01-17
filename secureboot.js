@@ -104,6 +104,33 @@ function isMobile() {
     return false;
 }
 
+function setCookie(key, val) {
+    'use strict';
+    if (!is_iframed && !is_extension && is_livesite && key) {
+        tryCatch(function() {
+            document.cookie = key + '=' + (val || '') + '; expires=' +
+                (val ? 'Fri, 31 Dec 9999 23:59:59 GMT' : 'Thu, 01 Jan 1970 00:00:00 GMT')
+                + '; path=/';
+            // now we need to inform the server [of mega.io]
+            if (location.host === 'mega.nz') {
+                var iping = document.getElementById('i-ping');
+                if (iping) {
+                    iping.src = 'https://mega.io/' + (val ? 'loggedin' : 'loggedout');
+                }
+            }
+        })();
+    }
+}
+
+function getCookie() {
+    'use strict';
+    var cookies = '';
+    tryCatch(function() {
+        cookies = document.cookie;
+    })();
+    return cookies;
+}
+
 function getSitePath() {
     'use strict';
     var hash = location.hash.replace('#', '');
@@ -884,6 +911,28 @@ if (!browserUpdate && is_extension)
 }
 
 var page;
+window.redirect = ['about', 'bird', 'blog', 'business', 'cmd', 'contact', 'copyright', 'corporate',
+                   'credits', 'dev', 'developers', 'dispute', 'doc', 'extensions', 'gdpr', 'help', 'mobile', 'nas',
+                   'privacy', 'resellers', 'sdkterms', 'security', 'sourcecode', 'start', 'sync',
+                   'takedown', 'terms'];
+var isStaticPage = function(page) {
+    'use strict';
+    if (page) {
+        const excludedPages = { copyrightnotice: 1, disputenotice: 1, businesssignup: 1, businessinvite: 1 };
+        if (excludedPages[page] || page.indexOf('businesssignup') > -1 || page.indexOf('businessinvite') > -1) {
+            return false;
+        }
+        for (var k = redirect.length; k--;) {
+            if (page.substr(0, redirect[k].length) === redirect[k]) {
+                return true;
+            }
+        }
+    }
+    else {
+        return true;
+    }
+    return false;
+};
 
 if (hashLogic) {
     // legacy support:
@@ -923,14 +972,19 @@ else {
 
     page = getCleanSitePath(page);
     if (is_litesite) {
-        window.redirect = {
-            'login': true, 'register': 1, 'registerb': 1, 'recovery': 1, 'reset': 1, 'cancel': 1, 'newsignup': 1,
-            'recover': 1, 'redeem': true, 'megadrop': true, 'support': 1, 'copyrightnotice': 1
-        };
-        if (redirect[page]) {
-            window.location.replace('https://mega.nz/' + page);
+        const loggedCookie = getCookie().indexOf('logged=1') > -1;
+        const comingFromNZ = locationSearchParams.indexOf('nz=1') > -1;
+        if ((!isStaticPage(page) && page !== 'pro' && page !== 'sdk' && page !== 'refer') ||
+            (loggedCookie && !comingFromNZ)) {
+            var affid = localStorage.affid;
+            window.location.replace('https://mega.nz/' + page + (affid ? '#aff=' + affid : ''));
+        }
+        else if (loggedCookie && comingFromNZ) {
+            // oh, a race probably,
+            setCookie('logged');
         }
     }
+
 	// put try block around it to allow the page to be rendered in Google cache
 	try
 	{
@@ -2283,6 +2337,7 @@ else if (!browserUpdate) {
         // If a search bot, they may set the URL as e.g. mega.nz/pro?es so get the language from that
         if ((is_bot || sessionStorage.botSim ) && locationSearchParams !== '') {
             userLangs = locationSearchParams.replace('?', '');
+            userLangs = userLangs.substr(0, (userLangs + '&').indexOf('&'));
         }
         else {
             // Otherwise get the user's preferred language in their browser settings
@@ -3902,6 +3957,14 @@ else if (!browserUpdate) {
         // No session handling needed for
         if (is_drop || is_karma) {
             return;
+        }
+        if (location.host === 'mega.nz' && !u_storage.sid
+            && !is_iframed && isStaticPage(page) && !location.hash) {
+            // there isn't a stored session ID (regardless of its validity), we move.
+            // since without a session-id it's not possible to access any internal page.
+            setCookie('logged');
+            return window.location.replace('https://mega.io/' + page +
+                (locationSearchParams ? locationSearchParams + '&' : '?') + 'nz=1');
         }
 
         if (page[0] === 'F' && page[1] === '!' || page.substr(0, 7) === 'folder/') {

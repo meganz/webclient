@@ -118,13 +118,10 @@ const checkUserLogin = () => {
     return true;
 };
 MegaData.prototype.abortTransfers = () => { return Promise.resolve() };
-window.redirect = window.redirect || {
-    'login': true, 'register': 1, 'registerb': 1, 'recovery': 1, 'reset': 1, 'cancel': 1, 'newsignup': 1,
-    'recover': 1, 'redeem': true, 'megadrop': true, 'support': 1, 'copyrightnotice':1
-};
 const moveToNZ = (page) => {
     'use strict';
-    if (window.redirect[page]) {
+    const extra = { pro: 1, sdk: 1, refer: 1 };
+    if (!isStaticPage(page) && !extra[page]) {
         window.location.replace('https://mega.nz/' + page);
     }
 };
@@ -163,6 +160,8 @@ mBroadcaster.once('boot_done', () => {
     pages.megadrop = ' ';
     delete subpages.copyrightnotice;
     pages.copyrightnotice = ' ';
+    delete subpages.disputenotice;
+    pages.disputenotice = ' ';
     pages.login = ' ';
     pages.registerb = ' ';
     showSignupPromptDialog = () => { window.location.replace('https://mega.nz/pro') };
@@ -527,3 +526,5 @@ var bottomPageDialog = () => {
 };
 const copyright = Object.create(null);
 copyright.init_cn = dummy;
+copyright.init_cndispute = dummy;
+const u_wasloggedin = dummy;

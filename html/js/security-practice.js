@@ -12,6 +12,9 @@ var securityPractice = {
         if (is_extension) {
             linkToUse = getAppBaseUrl() + String(videos[lang] || videos['en']).replace('#', '#E');
         }
+        else if (is_litesite) {
+            linkToUse = linkToUse.replace('mega.io', 'mega.nz');
+        }
 
         onIdle(function() {
             var iframe = mCreateElement('iframe', {

@@ -33,9 +33,6 @@ var cachepages = [
     "takedown",
     "terms",
 	"cmd"
-	// "storage",
-	// "securechat",
-	// "collaboration"
 ];
 
 var titles = {
@@ -72,9 +69,6 @@ var titles = {
 	'help/client/megasync' : 'MEGAsync Help Center - MEGA',
 	'help/client/webclient' : 'Webclient Help Center - MEGA',
 	'help/client/windowsphone' : 'Windows Phone Help Center - MEGA'
-	// 'securechat' : 'Secure Chat - MEGA',
-	// 'storage' : 'Secure Cloud Storage - MEGA',
-	// 'collaboration': 'Collaboration - MEGA'
 };
 
 

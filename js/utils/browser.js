@@ -217,6 +217,9 @@ function browserdetails(useragent) {
     else if (useragent.indexOf('qqbrowser/') > 0) {
         browser = 'QQBrowser';
     }
+    else if (useragent.indexOf(' whale/') > 0) {
+        browser = 'Whale';
+    }
     else if (useragent.indexOf('coc_coc_browser') > 0) {
         browser = 'Coc';
         icon = 'coc.png';

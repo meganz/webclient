@@ -640,9 +640,9 @@ function init_page() {
         && (page !== 'takendown')
         && (page !== 'resellers')
         && (page !== 'security')
-        // && (page !== 'storage')
-        // && (page !== 'collaboration')
-        // && (page !== 'securechat')
+        && (page !== 'storage')
+        && (page !== 'collaboration')
+        && (page !== 'securechat')
         && (page !== 'downloadapp')
         && (page !== 'unsub')
         && (page !== 'cookie')
@@ -1548,18 +1548,18 @@ function init_page() {
     else if (page == 'resellers') {
         parsepage(pages['resellers']);
     }
-    // else if (page === 'storage') {
-    //     parsepage(pages.feature_storage);
-    //     featurePages('storage');
-    // }
-    // else if (page === 'securechat') {
-    //     parsepage(pages.feature_chat);
-    //     featurePages('securechat');
-    // }
-    // else if (page === 'collaboration') {
-    //     parsepage(pages.feature_collaboration);
-    //     featurePages('collaboration');
-    // }
+    else if (page === 'storage') {
+        parsepage(pages.feature_storage);
+        featurePages('storage');
+    }
+    else if (page === 'securechat') {
+        parsepage(pages.feature_chat);
+        featurePages('securechat');
+    }
+    else if (page === 'collaboration') {
+        parsepage(pages.feature_collaboration);
+        featurePages('collaboration');
+    }
     else if (page === 'downloadapp') {
         parsepage(pages.downloadapp);
         desktopOnboarding();
@@ -2465,7 +2465,7 @@ function topmenuUI() {
                     'help', 'login', 'mega', 'nzippmember', 'nziphotographer', 'privacy', 'gdpr', 'mobileapp',
                     'mobile', 'privacycompany', 'register', 'resellers', 'sdk', 'sync', 'sitemap', 'sourcecode',
                     'support', 'sync', 'takedown', 'terms', 'start', 'security', 'downloadapp', 'affiliate',
-                    'nas', 'pro', 'cookie', //'securechat', 'collaboration', 'storage',
+                    'nas', 'pro', 'cookie', 'securechat', 'collaboration', 'storage'
                 ];
                 var moveTo = {
                     'account': 'fm/account',

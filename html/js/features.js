@@ -139,3 +139,15 @@ const featurePages = (function() {
         }
     };
 })();
+
+featurePages.fixMobileChatLinks = function() {
+    'use strict';
+
+    const chatLinks = document.querySelectorAll('.mobile .chatlink');
+    chatLinks.forEach(function(link) {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            document.querySelector(link.dataset.scrollTo).scrollIntoView(true);
+        });
+    });
+};

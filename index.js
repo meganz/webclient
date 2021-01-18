@@ -1555,6 +1555,7 @@ function init_page() {
     else if (page === 'securechat') {
         parsepage(pages.feature_chat);
         featurePages('securechat');
+        featurePages.fixMobileChatLinks();
     }
     else if (page === 'collaboration') {
         parsepage(pages.feature_collaboration);

@@ -117,6 +117,15 @@ body.rtl .feature-page * {
 
 /* end logged in/out */
 
+/* mobile/desktop only */
+
+    body:not(.mobile) .feature-page .mobile-only,
+    body.mobile .feature-page .desktop-only {
+        display: none;
+    }
+
+/* end mobile/desktop only */
+
 /* is business user */
 
     .feature-page .not-business-user-only {

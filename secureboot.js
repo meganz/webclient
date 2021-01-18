@@ -911,10 +911,10 @@ if (!browserUpdate && is_extension)
 }
 
 var page;
-window.redirect = ['about', 'bird', 'blog', 'business', 'cmd', 'contact', 'copyright', 'corporate',
+window.redirect = ['about', 'bird', 'blog', 'business', 'cmd', 'contact', 'collaboration', 'copyright', 'corporate',
                    'credits', 'dev', 'developers', 'dispute', 'doc', 'extensions', 'gdpr', 'help', 'mobile', 'nas',
-                   'privacy', 'resellers', 'sdkterms', 'security', 'sourcecode', 'start', 'sync',
-                   'takedown', 'terms'];
+                   'privacy', 'resellers', 'sdkterms', 'securechat', 'security', 'sourcecode', 'start', 'storage',
+                   'sync', 'takedown', 'terms'];
 var isStaticPage = function(page) {
     'use strict';
     if (page) {

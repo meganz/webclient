@@ -977,7 +977,8 @@ else {
         if ((!isStaticPage(page) && page !== 'pro' && page !== 'sdk' && page !== 'refer') ||
             (loggedCookie && !comingFromNZ)) {
             var affid = localStorage.affid;
-            window.location.replace('https://mega.nz/' + page + (affid ? '#aff=' + affid : ''));
+            window.location.replace('https://mega.nz' + (page ? '/' + page : '')
+                + (affid ? '/aff=' + affid : ''));
         }
         else if (loggedCookie && comingFromNZ) {
             // oh, a race probably,

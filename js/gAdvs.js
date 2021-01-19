@@ -108,6 +108,8 @@ class gAdvs {
 
         this.rendered[adsunit] = $target;
 
+        mBroadcaster.sendMessage('trk:event', 'advertisement', 'render', 'google', '1');
+
         return true;
     }
 

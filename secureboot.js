@@ -3962,10 +3962,11 @@ else if (!browserUpdate) {
             return;
         }
         if (location.host === 'mega.nz' && !u_storage.sid
-            && !is_iframed && isStaticPage(page) && !location.hash) {
+            && !is_iframed && isStaticPage(page) && !location.hash && !u_storage.wasloggedin
+            && getCookie().indexOf('logged=1') === -1) {
             // there isn't a stored session ID (regardless of its validity), we move.
             // since without a session-id it's not possible to access any internal page.
-            setCookie('logged');
+            window.onload = null;
             return window.location.replace('https://mega.io/' + page +
                 (locationSearchParams ? locationSearchParams + '&' : '?') + 'nz=1');
         }

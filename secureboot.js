@@ -977,6 +977,10 @@ else {
         if ((!isStaticPage(page) && page !== 'pro' && page !== 'sdk' && page !== 'refer') ||
             (loggedCookie && !comingFromNZ)) {
             var affid = localStorage.affid;
+            var affts = localStorage.affts;
+            if (!affts || isNaN(affts) || (Date.now() - affts > 864e5)) {
+                affid = null;
+            }
             window.location.replace('https://mega.nz' + (page ? '/' + page : '')
                 + (affid ? '/aff=' + affid : ''));
         }

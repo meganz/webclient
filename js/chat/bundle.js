@@ -16884,17 +16884,19 @@ let conversations_ConversationsApp = (_dec3 = utils["default"].SoonFcWrap(80), (
         }
       }
     });
-    self.fmConfigLeftPaneListener = mBroadcaster.addListener('fmconfig:leftPaneWidth', function () {
-      megaChat.$leftPane = megaChat.$leftPane || $('.conversationsApp .fm-left-panel');
-      delay('CoApp:fmc:thr', function () {
-        self.setState({
-          'leftPaneWidth': mega.config.get('leftPaneWidth')
-        });
-        $('.jspVerticalBar:visible').addClass('hiden-when-dragging');
-        $('.jScrollPaneContainer:visible').trigger('forceResize');
-      }, 75);
-      megaChat.$leftPane.width(mega.config.get('leftPaneWidth'));
-      $('.fm-tree-panel', megaChat.$leftPane).width(mega.config.get('leftPaneWidth'));
+    self.fmConfigLeftPaneListener = mBroadcaster.addListener('fmconfig:leftPaneWidth', function (value) {
+      if (value > 0) {
+        megaChat.$leftPane = megaChat.$leftPane || $('.conversationsApp .fm-left-panel');
+        delay('CoApp:fmc:thr', function () {
+          self.setState({
+            leftPaneWidth: value
+          });
+          $('.jspVerticalBar:visible').addClass('hiden-when-dragging');
+          $('.jScrollPaneContainer:visible').trigger('forceResize');
+        }, 75);
+        megaChat.$leftPane.width(value);
+        $('.fm-tree-panel', megaChat.$leftPane).width(value);
+      }
     });
 
     var lPaneResizableInit = function () {

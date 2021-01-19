@@ -221,7 +221,7 @@ MegaData.prototype.initShareAddDialog = function(alreadyAddedContacts, $extraFoo
         selected: alreadyAddedContacts,
         showSelectedNum: true,
         disableFrequents: true,
-        notSearchInEmails: true,
+        notSearchInEmails: false,
         autoFocusSearchField: false,
         disableDoubleClick: true,
         selectedWidthSize: 62,

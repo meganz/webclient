@@ -2880,7 +2880,6 @@ else if (!browserUpdate) {
         jsl.push({f:'css/fonts.css', n: 'fonts_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'html/js/megasync.js', n: 'megasync_js', j: 1});
         jsl.push({f:'css/business.css', n: 'business_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'css/retina-images.css', n: 'retina_images_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
         jsl.push({f:'js/cms.js', n: 'cms_js', j:1});
         jsl.push({f:'html/proplan.html', n: 'proplan', j:0});
         jsl.push({f:'html/propay.html', n: 'propay', j:0});
@@ -2931,6 +2930,10 @@ else if (!browserUpdate) {
             jsl.push({f:'css/dropdowns.css', n: 'dropdowns_css', j:2,w:5,c:1,d:1,cache:1});
             jsl.push({f:'css/popups.css', n: 'popups_css', j:2,w:5,c:1,d:1,cache:1});
         }
+
+        // Desktop and mobile Retina icons
+        jsl.push({f:'css/retina-images.css', n: 'retina_images_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
+
         // end of staticPages
 
     }

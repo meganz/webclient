@@ -312,13 +312,13 @@
 }
 
 .share-dialog-access-node .access-node-permission.owner {
-    background-image: url(../images/mega/dialog-sprite_v18.png);
+    background-image: url(../images/mega/dialog-sprite_v19.png);
     background-position: -44px -7074px;
     background-repeat: no-repeat;
 }
 
 .share-dialog-access-node .access-node-remove {
-    background-image: url(../images/mega/dialog-sprite_v18.png);
+    background-image: url(../images/mega/dialog-sprite_v19.png);
     background-position: -15px -7078px;
     background-repeat: no-repeat;
     display: inline-block;
@@ -675,7 +675,7 @@
 }
 
 .fm-dialog.share-add-dialog .chat-contactspicker-no-contacts.searching .fm-empty-contacts-bg {
-    background-image: url(../images/mega/dialog-sprite_v18.png);
+    background-image: url(../images/mega/dialog-sprite_v19.png);
     background-position: 0 -7103px;
     background-repeat: no-repeat;
     background-size: auto;

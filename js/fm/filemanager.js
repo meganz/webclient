@@ -175,6 +175,7 @@ FileManager.prototype.initFileManagerUI = function() {
             || $.dialog === 'share-add'
             || $.dialog === 'cookies-dialog'
             || $.dialog === 'affiliate-redeem-dialog'
+            || $.dialog === 'discount-offer'
             || String($.dialog).startsWith('verify-email')
             || localStorage.awaitingConfirmationAccount) {
 

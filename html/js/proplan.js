@@ -13,6 +13,14 @@ pro.proplan = {
     /** If the user had come from the home page, or wasn't logged in and the got booted back to Pro step 1 */
     previouslySelectedPlan: null,
 
+    /** Discount API error codes. */
+    discountErrors: {
+        expired: -8,
+        notFound: -9,
+        diffUser: -11,
+        isRedeemed:-12
+    },
+
     /**
      * Initialises the page and functionality
      */
@@ -1017,9 +1025,57 @@ pro.proplan = {
             $('.pro-popular-txt', $nextPlan).addClass('hidden');
         }
 
+    },
+    handleDiscount: function(page) {
+        'use strict';
+        mega.discountCode = page.substr(8);
+        if (mega.discountCode.length < 15) {
+            // it should be 22 length. but made 10 because i am not sure if len=22 is guaranteed
+            delete mega.discountInfo;
+            msgDialog('warninga', l[135], l[24676], false, () => {
+                loadSubPage('pro');
+            });
+            return false;
+        }
+        if (!u_type) {
+            login_txt = l[24673];
+            login_next = 'discount' + mega.discountCode;
+            return loadSubPage('login');
+        }
+        loadingDialog.show();
+        delete mega.discountInfo;
+        M.req({ a: 'dci', dc: mega.discountCode }).then((res) => {
+            loadingDialog.hide();
+            if (res && res.al && res.pd) {
+                mega.discountInfo = res;
+                mega.discountInfo.dc = mega.discountCode;
+                return loadSubPage('propay_' + res.al);
+            }
+            msgDialog('warninga', l[135], l[24674], false, () => {
+                loadSubPage('pro');
+            });
+        }).catch((ex) => {
+            loadingDialog.hide();
+            let errMsg = l[24674];
+            if (ex === pro.proplan.discountErrors.expired) {
+                errMsg = l[24675];
+            }
+            else if (ex === pro.proplan.discountErrors.notFound) {
+                errMsg = l[24676];
+            }
+            else if (ex === pro.proplan.discountErrors.diffUser) {
+                errMsg = l[24677];
+            }
+            else if (ex === pro.proplan.discountErrors.isRedeemed) {
+                errMsg = l[24678];
+            }
+            msgDialog('warninga', l[135], errMsg, false, () => {
+                loadSubPage('pro');
+            });
+        });
+        return false;
     }
 };
-
 
 /* jshint -W003 */  // Warning is not relevant
 

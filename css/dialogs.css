@@ -4,7 +4,7 @@
 
 /* Common styles */
 .fm-dialog-close, .btn-close-dialog, .export-links-warning-close {
-    background-image: url(../images/mega/dialog-sprite_v18.png);
+    background-image: url(../images/mega/dialog-sprite_v19.png);
     cursor: pointer;
     height: 30px;
     width: 30px;
@@ -2233,7 +2233,7 @@ li.token-input-token-invite .input-close {
     color: orange;
 }
 .fm-dialog.storage-dialog .odq-warning .odq-warn-icon {
-    background-image: url(../images/mega/dialog-sprite_v18.png);
+    background-image: url(../images/mega/dialog-sprite_v19.png);
     width: 60px;
     height: 60px;
     display: inline-block;
@@ -4399,7 +4399,7 @@ body.ru .voucher-logo.business-v .plan-info span {
     letter-spacing: 1px;
 }
 .verify-ph-icon, .verify-ph-success-icon {
-    background-image: url(../images/mega/dialog-sprite_v18.png);
+    background-image: url(../images/mega/dialog-sprite_v19.png);
     width: 122px;
     height: 154px;
     position: absolute;
@@ -7999,11 +7999,11 @@ a.affiliate-guide.grey-link:hover {
     opacity: 0.8;
 }
 .embed-content-block .tab-icon.url {
-    background-image: url(../images/mega/dialog-sprite_v18.png);
+    background-image: url(../images/mega/dialog-sprite_v19.png);
     background-position: -128px -5818px;
 }
 .embed-content-block .tab-icon.embed {
-    background-image: url(../images/mega/dialog-sprite_v18.png);
+    background-image: url(../images/mega/dialog-sprite_v19.png);
     background-position: -88px -5818px;
 }
 .embed-content-block .fm-subheading {
@@ -8237,4 +8237,119 @@ a.affiliate-guide.grey-link:hover {
     font-size: 14px;
 }
 /* end of Set password dialog*/
+.fm-dialog.pro-discount {
+    height: 438px;
+    width: 560px;
+    border-radius: 24px;
+    box-shadow: 0 4px 16px 0 rgba(0,0,0,0.1);
+}
+.fm-dialog.pro-discount .discount-body {
+    height: 390px;
+    width: 560px;
+}
+.fm-dialog.pro-discount .discount-body .discount-icon {
+    height: 100px;
+    width: 100px;
+    padding-top: 52px;
+    margin-left: 224px;
+    background-image: url(../images/mega/dialog-sprite_v19.png);
+    background-position: 0 -7161px;
+    background-clip: content-box;
+}
+.fm-dialog.pro-discount .discount-body .discount-title {
+    padding-top: 20px;
+    text-align: center;
+    color: #333333;
+    font-family: 'LatoWeb', sans-serif;
+    font-size: 30px;
+    letter-spacing: 0;
+    line-height: 36px;
+}
+.fm-dialog.pro-discount .discount-body .discount-desc {
+    padding-top: 16px;
+    color: #00BFA5;
+    font-family: 'LatoWeb', sans-serif;
+    font-size: 16px;
+    font-weight: bold;
+    letter-spacing: 0;
+    line-height: 24px;
+    text-align: center;
+}
+.fm-dialog.pro-discount .discount-body .discount-btns {
+    padding-top: 48px;
+    height: 48px;
+    text-align: center;
+}
+.fm-dialog.pro-discount .discount-body .discount-tail {
+    padding-top: 24px;
+    opacity: 0.7;
+    color: #333333;
+    font-family: 'LatoWeb', sans-serif;
+    font-size: 12px;
+    letter-spacing: 0;
+    line-height: 18px;
+    text-align: center;
+}
+.fm-dialog.pro-discount .discount-btns .discount-white-button {
+    display: inline-block;
+    box-sizing: border-box;
+    margin-right: 8px;
+    height: 48px;
+    border: 2px solid rgba(0,0,0,0.1);
+    border-radius: 4px;
+    background: linear-gradient(180deg, #FAFAFA 0%, #F2F2F2 100%);
+    cursor: pointer;
+    -webkit-transition: color 200ms ease-in-out, box-shadow 200ms ease-in-out, background-color 200ms ease-in-out;
+    transition: color 200ms ease-in-out, box-shadow 200ms ease-in-out, background-color 200ms ease-in-out;
+}
+.fm-dialog.pro-discount .discount-btns .discount-green-button {
+    display: inline-block;
+    box-sizing: border-box;
+    height: 48px;
+    border: 2px solid rgba(0,0,0,0.05);
+    border-radius: 4px;
+    background: linear-gradient(180deg, #3ED8B2 0%, #1DB07B 100%);
+    cursor: pointer;
+    -webkit-transition: color 200ms ease-in-out, box-shadow 200ms ease-in-out, background-color 200ms ease-in-out;
+    transition: color 200ms ease-in-out, box-shadow 200ms ease-in-out, background-color 200ms ease-in-out;
+}
+.fm-dialog.pro-discount .discount-btns .discount-green-button:hover {
+    box-shadow: 0 0 0 4px rgba(0,0,0,0.15);
+}
+.fm-dialog.pro-discount .discount-btns .discount-white-button:hover {
+    box-shadow: 0 0 0 2px rgba(0,0,0,0.15);
+}
+.fm-dialog.pro-discount .discount-btns .discount-button-txt {
+    padding: 12px 24px 12px 24px;
+    color: #333333;
+    font-family: 'LatoWeb', sans-serif;
+    font-size: 16px;
+    letter-spacing: 0;
+    line-height: 24px;
+}
+.fm-dialog.pro-discount .discount-btns .discount-green-button .discount-button-txt {
+    color: #FFFFFF;
+}
+.fm-dialog.pro-discount .discount-footer {
+    height: 48px;
+    width: 560px;
+    background-color: #333333;
+    border-radius: 0 0 24px 24px;
+}
+.fm-dialog.pro-discount .discount-footer .checkdiv {
+    margin-top: 14px;
+    margin-left: 52px;
+    background: linear-gradient(180deg, #9F9F9F 0%, #666666 100%);
+}
+.fm-dialog.pro-discount .discount-footer .checkdiv.checkboxOn::after {
+    background-position: -28px -1851px;
+}
+.fm-dialog.pro-discount .footer-option label {
+    padding-top: 14px;
+    color: #FFFFFF;
+    font-family: 'LatoWeb', sans-serif;
+    font-size: 12px;
+    letter-spacing: 0;
+    line-height: 18px;
+}
 

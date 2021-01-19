@@ -360,9 +360,10 @@ i.dialog-sprite,
 .fm-dialog.storage-dialog .odq-warning .odq-warn-icon,
 .share-dialog-access-node .access-node-permission.owner,
 .share-dialog-access-node .access-node-remove,
-.fm-dialog.share-add-dialog .chat-contactspicker-no-contacts.searching .fm-empty-contacts-bg
+.fm-dialog.share-add-dialog .chat-contactspicker-no-contacts.searching .fm-empty-contacts-bg,
+.fm-dialog.pro-discount .discount-body .discount-icon
 {
-    background-image: url(../images/mega/dialog-sprite_v18@2x.png);
+    background-image: url(../images/mega/dialog-sprite_v19@2x.png);
     background-size: 160px auto;
 }
 

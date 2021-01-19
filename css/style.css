@@ -1632,7 +1632,7 @@ a.blog-button:hover {
     display: none;
 }
 .notification-loading-icon {
-    background-image: url(../images/mega/dialog-sprite_v18.png);
+    background-image: url(../images/mega/dialog-sprite_v19.png);
     background-position: center -3245px;
     background-repeat: no-repeat;
     height: 225px;
@@ -3177,7 +3177,7 @@ img.blog-new-logos {
     display: inline-block;
 }
 .shared .contact-list-icon {
-    background-image: url(../images/mega/dialog-sprite_v18.png);
+    background-image: url(../images/mega/dialog-sprite_v19.png);
     float: right;
     width: 16px;
     height: 16px;
@@ -3245,7 +3245,7 @@ img.blog-new-logos {
     padding: 8px 0
 }
 .properties-context-arrow {
-    background-image: url(../images/mega/dialog-sprite_v18.png);
+    background-image: url(../images/mega/dialog-sprite_v19.png);
     width: 16px;
     height: 16px;
     position: absolute;
@@ -3288,7 +3288,7 @@ img.blog-new-logos {
     background-color: rgba(255,179,0,1);
 }
 .properties-share-icon {
-    background-image: url(../images/mega/dialog-sprite_v18.png);
+    background-image: url(../images/mega/dialog-sprite_v19.png);
     position: absolute;
     width: 18px;
     height: 18px;
@@ -5803,7 +5803,7 @@ tr:not(.taken-down) .grid-status-icon:not(.read-only):not(.read-and-write) {
     text-decoration: none;
 }
 .fm-notification-close {
-    background-image: url(../images/mega/dialog-sprite_v18.png);
+    background-image: url(../images/mega/dialog-sprite_v19.png);
     width: 24px;
     height: 24px;
     background-position: -55px -4827px;
@@ -8133,7 +8133,7 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
     position: relative;
 }
 .dlkey-dialog .decryption-key .icon {
-    background-image: url(../images/mega/dialog-sprite_v18.png);
+    background-image: url(../images/mega/dialog-sprite_v19.png);
     background-position: -6px -5510px;
     background-repeat: no-repeat;
     height: 22px;
@@ -9156,7 +9156,7 @@ body:not(.en) .warning-dialog-a.wide {
     box-sizing: border-box;
 }
 .fm-notification-icon {
-    background-image: url(../images/mega/dialog-sprite_v18.png);
+    background-image: url(../images/mega/dialog-sprite_v19.png);
     float: left;
     width: 92px;
     height: 75px;
@@ -9271,7 +9271,7 @@ body:not(.en) .warning-dialog-a.wide {
     display: inline;
 }
 .delete-contact.multiple .fm-del-contact-avatar {
-    background-image: url(../images/mega/dialog-sprite_v18.png);
+    background-image: url(../images/mega/dialog-sprite_v19.png);
     background-repeat: no-repeat;
     background-position: -5px -3080px;
     background-color: rgba(0,0,0,0.2);
@@ -9313,7 +9313,7 @@ body:not(.en) .warning-dialog-a.wide {
     padding: 15px 0 0 23px;
 }
 .fm-notification-info p.red::before {
-    background-image: url(../images/mega/dialog-sprite_v18.png);
+    background-image: url(../images/mega/dialog-sprite_v19.png);
     content: '';
     display: block;
     position: absolute;
@@ -9476,7 +9476,7 @@ span.orange {
     display: block;
 }
 .export-links-warning-close {
-    background-image: url(../images/mega/dialog-sprite_v18.png);
+    background-image: url(../images/mega/dialog-sprite_v19.png);
     cursor: pointer;
     height: 30px;
     width: 30px;
@@ -9618,19 +9618,19 @@ span.orange {
 }
 .shared-with-me.read-only .properties-elements-counter span {
     background-color: #61D2FF;
-    background-image: url(../images/mega/dialog-sprite_v18.png);
+    background-image: url(../images/mega/dialog-sprite_v19.png);
     background-position: -81px -238px;
     background-repeat: no-repeat;
 }
 .shared-with-me.read-and-write .properties-elements-counter span {
     background-color: #FFD300;
-    background-image: url(../images/mega/dialog-sprite_v18.png);
+    background-image: url(../images/mega/dialog-sprite_v19.png);
     background-position: -83px -205px;
     background-repeat: no-repeat;
 }
 .shared-with-me.full-access .properties-elements-counter span {
     background-color: #00E22C;
-    background-image: url(../images/mega/dialog-sprite_v18.png);
+    background-image: url(../images/mega/dialog-sprite_v19.png);
     background-position: -81px -174px;
     background-repeat: no-repeat;
 }
@@ -10161,7 +10161,7 @@ table {
     background-position: 5px -3716px;
 }
 .full-access .context-menu-icon, .read-and-write .context-menu-icon, .read-only .context-menu-icon {
-    background-image: url(../images/mega/dialog-sprite_v18.png);
+    background-image: url(../images/mega/dialog-sprite_v19.png);
     background-repeat: no-repeat;
 }
 .full-access .context-menu-icon {
@@ -11845,7 +11845,7 @@ h5.main-italic-header {
     background: linear-gradient(45deg, rgba(0,137,123,1) 0%,rgba(0,189,178,1) 100%);
 }
 .reg-success-icon-green::after {
-    background-image: url(../images/mega/dialog-sprite_v18.png);
+    background-image: url(../images/mega/dialog-sprite_v19.png);
     content: '';
     display: block;
     position: absolute;
@@ -13815,7 +13815,7 @@ code, c {
     position: relative;
 }
 .notification-empty-icon {
-    background-image: url(../images/mega/dialog-sprite_v18.png);
+    background-image: url(../images/mega/dialog-sprite_v19.png);
     height: 225px;
     background-position: center -3245px;
     background-repeat: no-repeat;
@@ -14992,7 +14992,7 @@ span.incoming-call-name {
     width: 208px;
 }
 .start-chat-button {
-    background-image: url(../images/mega/dialog-sprite_v18.png);
+    background-image: url(../images/mega/dialog-sprite_v19.png);
     position: absolute;
     right: 13px;
     top: 4px;
@@ -15035,7 +15035,7 @@ span.incoming-call-name {
     box-shadow: 0 0 0 1px rgba(0,0,0,0.05);
 }
 .start-chat-button span {
-    background-image: url(../images/mega/dialog-sprite_v18.png);
+    background-image: url(../images/mega/dialog-sprite_v19.png);
     display: block;
     width: 32px;
     height: 16px;
@@ -15787,7 +15787,7 @@ li.token-input-token-mega p {
     margin: 0;
 }
 li.token-input-token-mega .input-close, li.token-input-token-invite .input-close {
-    background-image: url(../images/mega/dialog-sprite_v18.png);
+    background-image: url(../images/mega/dialog-sprite_v19.png);
     height: 20px;
     width: 10px;
     background-position: -94px -460px;
@@ -16018,7 +16018,7 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
     box-sizing: border-box;
 }
 .share-pending-arrow {
-    background-image: url(../images/mega/dialog-sprite_v18.png);
+    background-image: url(../images/mega/dialog-sprite_v19.png);
     position: absolute;
     bottom: -10px;
     height: 10px;
@@ -16055,7 +16055,7 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
     background: linear-gradient(45deg, rgba(0,137,123,1) 0%,rgba(0,189,178,1) 100%);
 }
 .email .search-avatar::after, .gmail .search-avatar::after, .gmail .avatar-wrapper::after, .email .avatar-wrapper::after, .pending .search-avatar::after, .pending-indicator::after {
-    background-image: url(../images/mega/dialog-sprite_v18.png);
+    background-image: url(../images/mega/dialog-sprite_v19.png);
     content: '';
     display: block;
     position:absolute;
@@ -16117,19 +16117,19 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
     cursor: pointer;
 }
 .share-search-result.selected {
-    background-image: url(../images/mega/dialog-sprite_v18.png);
+    background-image: url(../images/mega/dialog-sprite_v19.png);
     background-repeat: no-repeat;
     background-position: right -748px;
 }
 .share-dialog-img {
-    background-image: url(../images/mega/dialog-sprite_v18.png);
+    background-image: url(../images/mega/dialog-sprite_v19.png);
     height: 90px;
     background-repeat: no-repeat;
     background-position: center 4px;
     margin: 24px 0;
 }
 .share-dialog-icon, .add-user-icon {
-    background-image: url(../images/mega/dialog-sprite_v18.png);
+    background-image: url(../images/mega/dialog-sprite_v19.png);
     position: absolute;
     width: 30px;
     height: 28px;
@@ -16200,7 +16200,7 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
     left: 0;
 }
 .share-dialog-permissions span, .share-dialog-icon.permissions-icon span, .permissions-menu span, .fm-dialogs-select span, .fm-dialogs-dropdown span {
-    background-image: url(../images/mega/dialog-sprite_v18.png);
+    background-image: url(../images/mega/dialog-sprite_v19.png);
     width: 24px;
     height: 24px;
     position: absolute;
@@ -16220,7 +16220,7 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
     background-position: -87px -396px;
 }
 .share-dialog-remove-button {
-    background-image: url(../images/mega/dialog-sprite_v18.png);
+    background-image: url(../images/mega/dialog-sprite_v19.png);
     width: 20px;
     height: 20px;
     float: right;
@@ -17878,7 +17878,7 @@ body.pro:after {
     opacity: 0.3;
 }
 .nw-fm-dialog-title span, .bandwidth-text-bl .star {
-    background-image: url(../images/mega/dialog-sprite_v18.png);
+    background-image: url(../images/mega/dialog-sprite_v19.png);
     width: 15px;
     background-position: -50px -1551px;
     background-repeat: no-repeat;
@@ -18102,7 +18102,7 @@ div.camera-bottom-txt {
     background-position: center -3405px;
 }
 .copyrights-dialog-icon {
-    background-image: url(../images/mega/dialog-sprite_v18.png);
+    background-image: url(../images/mega/dialog-sprite_v19.png);
     width: 100px;
     height: 100px;
     margin: 8px auto 31px auto;
@@ -19486,7 +19486,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     background-color: #fafafa;
 }
 .widget-dialog .fm-body-text .widget-folder-icon {
-    background-image: url(../images/mega/dialog-sprite_v18.png);
+    background-image: url(../images/mega/dialog-sprite_v19.png);
     width: 36px;
     height: 44px;
     margin-right: 12px;
@@ -19714,11 +19714,11 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     margin-top: 2px;
 }
 .tab-icon.url {
-    background-image: url(../images/mega/dialog-sprite_v18.png);
+    background-image: url(../images/mega/dialog-sprite_v19.png);
         background-position: -128px -5818px;
 }
 .tab-icon.embed {
-    background-image: url(../images/mega/dialog-sprite_v18.png);
+    background-image: url(../images/mega/dialog-sprite_v19.png);
     background-position: -88px -5818px;
 }
 .widget-dialog .close-button{
@@ -19781,7 +19781,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     transition:  opacity, border-bottom, 200ms ease-in-out;
 }
 .widget-card .widget-minimise, .widget-card .widget-maximise {
-    background-image: url(../images/mega/dialog-sprite_v18.png);
+    background-image: url(../images/mega/dialog-sprite_v19.png);
     width: 20px;
     height: 20px;
     right: 0;

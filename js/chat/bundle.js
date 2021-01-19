@@ -2046,7 +2046,7 @@ class ContactCard extends _stores_mixins_js2__["ContactAwareComponent"] {
     } else {
       if (highlightSearchValue && searchValue.length > 0) {
         var matches = [];
-        var regex = new RegExp(searchValue, 'gi');
+        var regex = new RegExp(RegExpEscape(searchValue), 'gi');
         var result;
 
         while (result = regex.exec(username)) {

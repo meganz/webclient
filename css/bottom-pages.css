@@ -2864,6 +2864,14 @@ body:not(.mobile) .bottom-page.top-dark-button:hover {
     z-index: 10;
 }
 
+.bottom-page .megaapp-linux-container .dark-help-block.bottomsync-copy-tip {
+    bottom: 200px;
+}
+
+.bottom-page .megaapp-linux-container .dark-help-block.cmd-copy-tip {
+    bottom: 92px;
+}
+
 body:not(.mobile) .copy-line-icon:hover .dark-help-block {
     height: unset;
     opacity: 1;

@@ -291,6 +291,11 @@ function sharedUInode(nodeHandle) {
 
         // Right panel block view
         $('#' + nodeHandle + '.data-block-view .block-view-file-type').removeClass('folder-shared');
+
+        // Remove the share node selection on incoming and outgoing shares pages
+        if (typeof nodeHandle !== 'undefined' && (M.currentdirid === 'out-shares' || M.currentdirid === 'shares')) {
+            selectionManager.remove_from_selection(nodeHandle);
+        }
     }
 
     // If no export link is available, remove export link from left and right panels (list and block view)

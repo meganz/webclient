@@ -141,7 +141,7 @@ function initMegasync() {
     $('.copy-install-guide-icon', $content)
         .rebind('click', function() {
             var $this = $(this);
-            if (copyToClipboard($('span', $this.closest('.install-guide-text')).text())) {
+            if (copyToClipboard($('.install-guide', $this.closest('.install-guide-text')).text())) {
                 $this.removeClass('active');
                 var $icon = $('.copy-line-icon', $this);
                 if (!$icon.hasClass('active')) {

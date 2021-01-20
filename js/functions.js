@@ -943,7 +943,7 @@ function mKeyDialog(ph, fl, keyr, selector) {
     "use strict";
 
     var promise = new MegaPromise();
-    var $dialog = $(is_mobile ? '#mobile-decryption-key-overlay' : '.fm-dialog.dlkey-dialog').removeClass('hidden');
+    var $dialog = $(is_mobile ? '#mobile-decryption-key-overlay' : '.fm-dialog.dlkey-dialog');
     var $button = $(is_mobile ? '.mobile.decrypt-button' : '.fm-dialog-new-folder-button', $dialog);
     var $input = $(is_mobile ? '.mobile.decryption-key' : 'input', $dialog);
 
@@ -964,7 +964,14 @@ function mKeyDialog(ph, fl, keyr, selector) {
     }));
 
     $button.addClass('disabled').removeClass('active');
-    fm_showoverlay();
+
+    if (is_mobile) {
+        fm_showoverlay();
+        $dialog.removeClass('hidden');
+    }
+    else {
+        M.safeShowDialog('dlkey-dialog', $dialog);
+    }
 
     $input.rebind('input keypress', function(e) {
         var length = String($(this).val() || '').length;

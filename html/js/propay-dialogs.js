@@ -919,6 +919,12 @@ var wireTransferDialog = {
 
             // Update plan price in the dialog
             if (proPrice) {
+                const discountInfo = pro.propay.getDiscount();
+                if (discountInfo &&
+                    ((numOfMonths === 1 && discountInfo.emp) || (numOfMonths === 12 && discountInfo.eyp))) {
+                    proPrice = numOfMonths === 1 ? mega.intl.number.format(discountInfo.emp)
+                        : mega.intl.number.format(discountInfo.eyp);
+                }
                 this.$dialog.find('.amount').text(mega.intl.number.format(proPrice)).closest('tr')
                     .removeClass('hidden');
             }
@@ -1242,6 +1248,12 @@ var addressDialog = {
             proPrice = selectedPackage[pro.UTQA_RES_INDEX_PRICE];
             numOfMonths = selectedPackage[pro.UTQA_RES_INDEX_MONTHS];
             proNum = 'pro' + proNum;
+            const discountInfo = pro.propay.getDiscount();
+            if (discountInfo &&
+                ((numOfMonths === 1 && discountInfo.emp) || (numOfMonths === 12 && discountInfo.eyp))) {
+                proPrice = numOfMonths === 1 ? mega.intl.number.format(discountInfo.emp)
+                    : mega.intl.number.format(discountInfo.eyp);
+            }
         }
         else {
             // here it means we are coming from business account register page
@@ -1927,6 +1939,12 @@ var cardDialog = {
         var numOfMonths = pro.propay.selectedProPackage[4];
         var monthsWording = pro.propay.getNumOfMonthsWording(numOfMonths);
 
+        const discountInfo = pro.propay.getDiscount();
+        if (discountInfo && ((numOfMonths === 1 && discountInfo.emp) || (numOfMonths === 12 && discountInfo.eyp))) {
+            proPrice = numOfMonths === 1 ? mega.intl.number.format(discountInfo.emp)
+                : mega.intl.number.format(discountInfo.eyp);
+        }
+
         // Update the Pro plan details
         this.$dialog.find('.plan-icon').removeClass('pro1 pro2 pro3 pro4').addClass('pro' + proNum);
         this.$dialog.find('.payment-plan-title').text(proPlan);
@@ -2425,6 +2443,12 @@ var bitcoinDialog = {
         var priceEuros = pro.propay.selectedProPackage[5];
         var priceBitcoins = apiResponse.amount;
         var expiryTime = new Date(apiResponse.expiry);
+
+        const discountInfo = pro.propay.getDiscount();
+        if (discountInfo && ((numOfMonths === 1 && discountInfo.emp) || (numOfMonths === 12 && discountInfo.eyp))) {
+            priceEuros = numOfMonths === 1 ? mega.intl.number.format(discountInfo.emp)
+                : mega.intl.number.format(discountInfo.eyp);
+        }
 
         // Cache selectors
         var $dialogBackgroundOverlay = $('.fm-dialog-overlay');

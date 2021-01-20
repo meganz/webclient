@@ -1633,6 +1633,13 @@ function init_page() {
     else if (page.substr(0, 4) === 'test') {
         test(page.substr(4));
     }
+    else if (page.substr(0, 8) === 'discount') {
+        // discount code from URL #discountxR7xVwBkNjcerUKpjqO6bQ
+        if (is_mobile) {
+            parsepage(pages.mobile);
+        }
+        return pro.proplan.handleDiscount(page);
+    }
 
     /**
      * If voucher code from url e.g. #voucherZUSA63A8WEYTPSXU4985

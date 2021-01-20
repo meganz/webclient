@@ -166,6 +166,18 @@ MegaData.prototype.accountData = function(cb, blockui, force) {
                     else {
                         delete u_attr.uspw;
                     }
+                    if (res.mkt) {
+                        u_attr.mkt = res.mkt;
+                        if (Array.isArray(u_attr.mkt.dc) && u_attr.mkt.dc.length) {
+                            delay('ShowDiscountOffer', pro.propay.showDiscountOffer, 7000);
+                        }
+                    }
+                    else {
+                        delete u_attr.mkt;
+                    }
+                    if (res['^!discountoffers']) {
+                        u_attr['^!discountoffers'] = base64urldecode(res['^!discountoffers']);
+                    }
                 }
 
                 if (!ctx.account.downbw_used) {

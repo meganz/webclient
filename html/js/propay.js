@@ -75,6 +75,19 @@ pro.propay = {
 
         // Update header text with plan
         $selectedPlanName.text(pro.propay.planName);
+        let discountInfo = pro.propay.getDiscount();
+        if (discountInfo && discountInfo.pd && !discountInfo.used) {
+            $('.top-header.plan-title', $stepTwo).safeHTML(l[24680]
+                .replace('%1', '<b>' + pro.propay.planName + '</b>'));
+            discountInfo.used = 1;
+        }
+        else if (discountInfo && discountInfo.used) {
+            delete mega.discountInfo;
+            discountInfo = false;
+        }
+        if (login_next && login_next.indexOf('discount') > -1) {
+            login_next = false;
+        }
 
         // Initialise the main purchase button
         $purchaseButton.rebind('click.purchase', function() {
@@ -144,6 +157,14 @@ pro.propay = {
         );
     },
 
+    getDiscount: function() {
+        'use strict';
+        if (mega.discountInfo && mega.discountInfo.pd && mega.discountInfo.al === pro.propay.planNum) {
+            return mega.discountInfo;
+        }
+        return false;
+    },
+
     /**
      * Loads the payment gateway options into Payment options section
      */
@@ -180,6 +201,18 @@ pro.propay = {
                         tempGatewayOptions.push(gatewayOptions[ix]);
                     }
                 }
+                // if this user has a discount, clear gateways that are not supported.
+                const discountInfo = pro.propay.getDiscount();
+                const testGateway = localStorage.testGateway;
+                if (discountInfo) {
+                    tempGatewayOptions = tempGatewayOptions.filter(gate => {
+                        if (gate.supportsDiscountCodes && gate.supportsDiscountCodes === 1) {
+                            return true;
+                        }
+                        return testGateway;
+                    });
+                }
+
                 gatewayOptions = tempGatewayOptions;
 
                 // Make a clone of the array so it can be modified
@@ -201,7 +234,7 @@ pro.propay = {
                 var secondaryGatewayOptions = gatewayOptions;
 
                 // Show payment duration (e.g. month or year) and renewal option radio options
-                pro.propay.renderPlanDurationOptions();
+                pro.propay.renderPlanDurationOptions(discountInfo);
                 pro.propay.initPlanDurationClickHandler();
                 pro.propay.initRenewalOptionClickHandler();
 
@@ -230,7 +263,7 @@ pro.propay = {
                 pro.propay.initShowMoreOptionsButton();
 
                 // Update the pricing and whether is a regular payment or subscription
-                pro.propay.updateMainPrice();
+                pro.propay.updateMainPrice(undefined, discountInfo);
                 pro.propay.updateTextDependingOnRecurring();
 
                 // Show the pricing box on the right (it is hidden while everything loads)
@@ -242,11 +275,13 @@ pro.propay = {
         });
     },
 
+    /* eslint-disable complexity */
     /**
      * Renders the pro plan prices into the Plan Duration dropdown
+     * @param {Object}  discountInfo    Discount info object if any
      */
-    renderPlanDurationOptions: function() {
-
+    renderPlanDurationOptions: function(discountInfo) {
+        'use strict';
         // Sort plan durations by lowest number of months first
         pro.propay.sortMembershipPlans();
 
@@ -264,12 +299,32 @@ pro.propay = {
                 // Get the price and number of months duration
                 var price = currentPlan[pro.UTQA_RES_INDEX_PRICE];
                 var currencySymbol = ' \u20ac';
+                var discountedPriceY = '';
+                var discountedPriceM = '';
+                var discountSaveY = '';
+                var discountSaveM = '';
                 if (currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE]) {
                     price = currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE];
                     currencySymbol = '';
+                    if (discountInfo) {
+                        discountSaveY = discountInfo.lyps || '';
+                        discountSaveM = discountInfo.lmps || '';
+                        discountedPriceY = discountInfo.lyp || '';
+                        discountedPriceM = discountInfo.lmp || '';
+                    }
+                }
+                else if (discountInfo && (discountInfo.emp || discountInfo.eyp)) {
+                    discountedPriceY = discountInfo.eyp || '';
+                    discountedPriceM = discountInfo.emp || '';
+                    discountSaveY = discountedPriceY ? (price - discountedPriceY).toFixed(2) : '';
+                    discountSaveM = discountedPriceM ? (price - discountedPriceM).toFixed(2) : '';
                 }
                 var numOfMonths = currentPlan[pro.UTQA_RES_INDEX_MONTHS];
                 var monthsWording = l[922];     // 1 month
+
+                if (discountInfo && discountInfo.m !== 0 && discountInfo.m !== numOfMonths) {
+                    continue;
+                }
 
                 // Change wording depending on number of months
                 if (numOfMonths === 12) {
@@ -293,7 +348,7 @@ pro.propay = {
                 if (numOfMonths === 12) {
                     var discount;
                     if (currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE]) {
-                        discount = currentPlan[pro.UTQA_RES_INDEX_LOCALPRICECURRENCYSAVE];
+                        discount = discountSaveY || currentPlan[pro.UTQA_RES_INDEX_LOCALPRICECURRENCYSAVE];
                     }
                     else {
                         // Calculate the discount price (the current yearly price is 10 months worth)
@@ -301,10 +356,30 @@ pro.propay = {
                         var priceTenMonths = (priceOneMonth * 10);
                         var priceTwelveMonths = (priceOneMonth * 12);
                         discount = (priceTwelveMonths - priceTenMonths).toFixed(2);
+                        if (discountSaveY) {
+                            discount = discountSaveY;
+                        }
                     }
 
                     $('.save-money', $durationOption).removeClass('hidden');
                     $('.save-money .amount', $durationOption).text(discount + currencySymbol);
+                    if (discountedPriceY) {
+                        $('.oldPrice', $durationOption).text($('.price', $durationOption).text())
+                            .removeClass('hidden');
+                        $('.crossline', $durationOption).removeClass('hidden');
+                        $('.price', $durationOption).text(discountedPriceY + currencySymbol);
+                        $('.membership-radio-label', $durationOption).addClass('discounted');
+                    }
+                }
+                else if (numOfMonths === 1 && discountedPriceM) {
+                    let savedAmount = discountSaveM + currencySymbol;
+                    const $saveContainer = $('.save-money', $durationOption).removeClass('hidden');
+                    $('.amount', $saveContainer).text(savedAmount);
+                    $('.oldPrice', $durationOption).text($('.price', $durationOption).text())
+                        .removeClass('hidden');
+                    $('.crossline', $durationOption).removeClass('hidden');
+                    $('.price', $durationOption).text(discountedPriceM + currencySymbol);
+                    $('.membership-radio-label', $durationOption).addClass('discounted');
                 }
 
                 // Update the list of duration options
@@ -337,7 +412,7 @@ pro.propay = {
             + selectedPeriod + '"]', '.duration-options-list');
 
         // Otherwise pre-select monthly payment
-        if (!$selectedOption) {
+        if (!$selectedOption.length) {
             $selectedOption = $('.payment-duration:not(.template)', '.duration-options-list').first();
         }
 
@@ -345,6 +420,7 @@ pro.propay = {
         $('.membership-radio', $selectedOption).addClass('checked');
         $('.membership-radio-label', $selectedOption).addClass('checked');
     },
+    /* eslint-enable complexity */
 
     /**
      * Sorts plan durations by lowest number of months first
@@ -395,13 +471,14 @@ pro.propay = {
             pro.propay.updateTextDependingOnRecurring();
         });
     },
-
+    /* eslint-disable complexity */
     /**
      * Updates the main price
-     * @param {Number} planIndex The array index of the plan in pro.membershipPlans
+     * @param {Number} planIndex    The array index of the plan in pro.membershipPlans
+     * @param {Object} discountInfo Discount info object if any
      */
-    updateMainPrice: function(planIndex) {
-
+    updateMainPrice: function(planIndex, discountInfo) {
+        'use strict';
         // If not passed in (e.g. inital load), get it from the currently selected duration radio option
         if (typeof planIndex === 'undefined') {
             planIndex = $('.duration-options-list .membership-radio.checked', '.payment-section')
@@ -456,8 +533,6 @@ pro.propay = {
 
         var euroSign = '\u20ac';
         var localPrice;
-        var localD;
-        var localC;
         if (currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE]) {
             $step2.addClass('local-currency');
             $currncyAbbrev.text(currentPlan[pro.UTQA_RES_INDEX_LOCALPRICECURRENCY]);
@@ -487,26 +562,6 @@ pro.propay = {
         // Update the price of the plan and the /month or /year next to the price box
         // work for local currency if present
         if (localPrice) {
-            var localParts = localPrice.split('.');
-            localD = localParts[0];
-            localC = localParts[1] || '00';
-            if (localD.length > 9) {
-                // localD = localD.substr(0, 5);
-                if (localD.length > 11) {
-                    localC = '0';
-                }
-                else {
-                    localC = '00';
-                }
-                localD = Number.parseInt(localD) + 1;
-            }
-            else {
-                if (localC.length > 2) {
-                    localC = localC.substr(0, 2);
-                    localC = Number.parseInt(localC) + 1;
-                    localC = (localC + '0').substr(0, 2);
-                }
-            }
             $priceNum.text(localPrice);
         }
         else {
@@ -530,7 +585,38 @@ pro.propay = {
                 .safeHTML(l[23790].replace('%1', '<span>' + bandwidthValue + '</span>'));
             $bandwidthTip.attr('data-simpletip', bandwidthText.replace('%1', '[U]' + bandwidthValue + '[/U]'));
         }
+
+        discountInfo = discountInfo || pro.propay.getDiscount();
+
+        if (discountInfo && discountInfo.al && discountInfo.pd && discountInfo.al === pro.propay.planNum) {
+            const $discountHeader = $('.payment-page.discount-header', $step2);
+
+            $('.discount-header-text', $discountHeader).text(l[24670].replace('$1', discountInfo.pd + '%'));
+            $discountHeader.removeClass('hidden');
+
+            const oldPriceText = $priceNum.text();
+            let newPriceText = oldPriceText;
+            const oldEuroText = $euroPrice.text();
+            let newEuroText = oldEuroText;
+
+            if (numOfMonths === 1) {
+                const euroFormatted = discountInfo.emp ? (intl.format(discountInfo.emp) + ' ' + euroSign) : '';
+                newPriceText = discountInfo.lmp || euroFormatted || oldPriceText;
+                newEuroText = euroFormatted || oldEuroText;
+            }
+            else {
+                const euroFormatted = discountInfo.eyp ? (intl.format(discountInfo.eyp) + ' ' + euroSign) : '';
+                newPriceText = discountInfo.lyp || euroFormatted || oldPriceText;
+                newEuroText = euroFormatted || oldEuroText;
+            }
+
+            $('.old-plan-price', $pricingBox).text(oldPriceText).removeClass('hidden');
+            $('.cross-line', $pricingBox).removeClass('hidden');
+            $priceNum.text(newPriceText).parent('.pricing-page.plan-price').addClass('discounted');
+            $euroPrice.text(newEuroText);
+        }
     },
+    /* eslint-enable complexity */
 
     /* jshint -W074 */  // Old code, refactor another day
 
@@ -586,13 +672,26 @@ pro.propay = {
 
         // Find the pricing period in the pricing box and the plan duration options
         var $sidePanelPeriod = $('.pricing-page.plan .period', $step2);
+        const discountInfo = pro.propay.getDiscount();
 
         // Change the charge information below the recurring yes/no question
         if ((recurringEnabled) && (numOfMonths === 1)) {
             chargeInfoDuration = l[10640].replace('%1', price);     // You will be charged 0.00 monthly.
+            if (discountInfo && (discountInfo.lmp || discountInfo.emp)) {
+                chargeInfoDuration = l[24699].replace('%1', price);
+            }
         }
         else if ((recurringEnabled) && (numOfMonths === 12)) {
             chargeInfoDuration = l[10641].replace('%1', price);     // You will be charged 0.00 annually.
+            if (discountInfo && (discountInfo.lyp || discountInfo.eyp)) {
+                chargeInfoDuration = l[24698].replace('%1', price);
+            }
+        }
+        else if (discountInfo && (discountInfo.lmp || discountInfo.emp) && !recurringEnabled && numOfMonths === 1) {
+            chargeInfoDuration = l[10642].replace('%1', discountInfo.lmp || discountInfo.emp);
+        }
+        else if (discountInfo && (discountInfo.lyp || discountInfo.eyp) && !recurringEnabled && numOfMonths === 12) {
+            chargeInfoDuration = l[10642].replace('%1', discountInfo.lyp || discountInfo.eyp);
         }
 
         // Set to monthly or annually in the pricing box on the right
@@ -1140,13 +1239,18 @@ pro.propay = {
                 }
 
                 // Complete the transaction
-                api_req({
+                let utcReqObj = {
                     a: 'utc',                       // User Transaction Complete
                     s: [saleId],                    // Sale ID
                     m: pro.lastPaymentProviderId,   // Gateway number
                     bq: fromBandwidthDialog,        // Log for bandwidth quota triggered
                     extra: extra                    // Extra information for the specific gateway
-                }, {
+                };
+                const discountInfo = pro.propay.getDiscount();
+                if (discountInfo && discountInfo.dc) {
+                    utcReqObj.dc = discountInfo.dc;
+                }
+                api_req(utcReqObj, {
                     m: pro.lastPaymentProviderId,
                     callback: tryCatch(function(utcResult, ctx) {
                         pro.propay.processUtcResults(utcResult);
@@ -1311,5 +1415,105 @@ pro.propay = {
         }
 
         return monthsWording;
+    },
+    /* eslint-disable complexity */
+    /** This function to show the discount offer dialog if applies */
+    showDiscountOffer: function() {
+        'use strict';
+        if (window.offerPopupTimer) {
+            clearTimeout(window.offerPopupTimer);
+        }
+        if (is_mobile || page.indexOf('propay') > -1) {
+            return;
+        }
+
+        if (u_attr && u_attr.mkt && Array.isArray(u_attr.mkt.dc) && u_attr.mkt.dc.length) {
+            // if we have multiple offers, we have no preferences we will take the first one.
+            const offer = u_attr.mkt.dc[0];
+
+            // check if we previewed a popup in the past 20 hours
+            let discountOffers = u_attr['^!discountoffers'] ? JSON.parse(u_attr['^!discountoffers']) : null;
+            if (discountOffers && discountOffers[offer.dc]) {
+                const timeDif = new Date().getTime() - discountOffers[offer.dc];
+                if (timeDif < 72e6) {
+                    if (timeDif > 0) {
+                        window.offerPopupTimer = setTimeout(pro.propay.showDiscountOffer, 72e6 - timeDif + 10);
+                    }
+                    return;
+                }
+            }
+            discountOffers = discountOffers || Object.create(null);
+
+            if (offer.al && offer.pd && typeof offer.m !== 'undefined') {
+                const $discountDlg = $('.fm-dialog.pro-discount', 'body');
+                let title = l[24703];
+                if (offer.m === 1) {
+                    title = l[24702];
+                }
+                else if (offer.m === 12) {
+                    title = l[24701];
+                }
+                title = title.replace('%1', offer.pd + '%').replace('%2', pro.getProPlanName(offer.al));
+                $('.discount-title', $discountDlg).text(title);
+                pro.loadMembershipPlans(() => {
+                    const matchedPlan = pro.membershipPlans.find(plan => {
+                        return plan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL] === offer.al
+                            && plan[pro.UTQA_RES_INDEX_MONTHS] === (offer.m || 12);
+                    });
+                    if (matchedPlan) {
+                        const storageFormatted = numOfBytes(matchedPlan[pro.UTQA_RES_INDEX_STORAGE] * 1073741824, 0);
+                        const desc = l[24704]
+                            .replace('%1', Math.round(storageFormatted.size) + ' ' + storageFormatted.unit);
+                        $('.discount-desc', $discountDlg).text(desc);
+
+                        let discountPopupPref = new Date().getTime();
+                        let reTrigger = true;
+
+                        const storeViewTime = () => {
+                            discountOffers[offer.dc] = discountPopupPref;
+                            mega.attr.set('discountoffers', JSON.stringify(discountOffers), -2, true);
+                        };
+
+                        // binding events
+                        $('.fm-dialog-close, .close-btn', $discountDlg).rebind('click.discount', () => {
+                            storeViewTime();
+                            window.closeDialog();
+                            if (reTrigger) {
+                                window.offerPopupTimer = setTimeout(pro.propay.showDiscountOffer, 72e6);
+                            }
+                        });
+
+                        $('.get-btn', $discountDlg).rebind('click.discount', () => {
+                            storeViewTime();
+                            $discountDlg.addClass('hidden');
+                            if (reTrigger) {
+                                window.offerPopupTimer = setTimeout(pro.propay.showDiscountOffer, 72e6);
+                            }
+                            loadSubPage('discount' + offer.dc);
+                        });
+
+                        $('.fm-picker-notagain.checkbox-block', $discountDlg).rebind('click.discount', () => {
+                            const $check = $('.fm-picker-notagain.checkbox-block .checkdiv', $discountDlg);
+                            if ($check.hasClass('checkboxOff')) {
+                                $check.removeClass('checkboxOff').addClass('checkboxOn');
+                                discountPopupPref = new Date(9999, 11, 30).getTime();
+                                reTrigger = false;
+                            }
+                            else {
+                                $check.addClass('checkboxOff').removeClass('checkboxOn');
+                                discountPopupPref = new Date().getTime();
+                                reTrigger = true;
+                            }
+                        });
+                        M.safeShowDialog('discount-offer', $discountDlg, true);
+                    }
+                });
+            }
+        }
     }
+    /* eslint-enable complexity */
 };
+mBroadcaster.once('login2', () => {
+    'use strict';
+    delay('ShowDiscountOffer', pro.propay.showDiscountOffer, 5000);
+});

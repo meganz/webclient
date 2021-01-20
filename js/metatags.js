@@ -304,6 +304,7 @@ mega.metatags = new function() {
             mTags.en_desc = 'Want to know what your rights are when using MEGA\'s services?';
             mTags.mega_title = l[23978] || mTags.en_title;
             mTags.mega_desc = l[23979] || mTags.en_desc;
+            mTags.image = 'https://cms2.mega.nz/4548c0ab90a611b8b7c5a940811e23b5975b4ba8.png';
         }
         else if (page === 'privacy') {
             mTags.en_title = 'Privacy Policy - MEGA';
@@ -341,12 +342,14 @@ mega.metatags = new function() {
                             ' and information.';
             mTags.mega_title = l[23988] || mTags.en_title;
             mTags.mega_desc = l[23989] || mTags.en_desc;
+            mTags.image = 'https://cms2.mega.nz/c449150b27444c9cc8eb3cad8ab02319744dd61d.png';
         }
         else if (page === 'cookie') {
             mTags.en_title = 'Cookie Policy - MEGA';
             mTags.en_desc = 'Understand how MEGA collects data from you using Cookies and similar technologies';
             mTags.mega_title = l[24639] || mTags.en_title;
             mTags.mega_desc = l[24640] || mTags.en_desc;
+            mTags.image = 'https://cms2.mega.nz/e5cebb274552eb5e5408db5e834d5ff3ec8c66ef.png'
         }
         else if (page === 'contact') {
             mTags.en_title = 'Contact Us - MEGA';

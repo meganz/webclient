@@ -571,6 +571,7 @@ export class ConversationPanel extends MegaRenderMixin {
             pushSettingsValue: null,
             messageToBeDeleted: null,
             editing: false,
+            setNonLoggedInJoinChatDlgTrue: null
         };
 
         this.handleKeyDown = SoonFc(120, (ev) => this._handleKeyDown(ev));
@@ -684,7 +685,7 @@ export class ConversationPanel extends MegaRenderMixin {
 
         self.eventuallyInit();
         if (anonymouschat) {
-            setTimeout(function() {
+            self.state.setNonLoggedInJoinChatDlgTrue = setTimeout(function() {
                 self.setState({'nonLoggedInJoinChatDialog': true});
             }, rand_range(5, 10) * 1000);
         }
@@ -2139,6 +2140,7 @@ export class ConversationPanel extends MegaRenderMixin {
                             <div className="join-chat-button"
                                 onClick={(e) => {
                                     if (anonymouschat) {
+                                        clearTimeout(self.state.setNonLoggedInJoinChatDlgTrue);
                                         megaChat.loginOrRegisterBeforeJoining(room.publicChatHandle);
                                     }
                                     else {

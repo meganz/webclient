@@ -13781,7 +13781,8 @@ let conversationpanel_ConversationPanel = (conversationpanel_dec = utils["defaul
       pushSettingsDialog: false,
       pushSettingsValue: null,
       messageToBeDeleted: null,
-      editing: false
+      editing: false,
+      setNonLoggedInJoinChatDlgTrue: null
     };
     this.handleKeyDown = SoonFc(120, ev => this._handleKeyDown(ev));
     this.handleWindowResize = SoonFc(80, ev => this._handleWindowResize(ev));
@@ -13872,7 +13873,7 @@ let conversationpanel_ConversationPanel = (conversationpanel_dec = utils["defaul
     self.eventuallyInit();
 
     if (anonymouschat) {
-      setTimeout(function () {
+      self.state.setNonLoggedInJoinChatDlgTrue = setTimeout(function () {
         self.setState({
           'nonLoggedInJoinChatDialog': true
         });
@@ -15144,6 +15145,7 @@ let conversationpanel_ConversationPanel = (conversationpanel_dec = utils["defaul
       className: "join-chat-button",
       onClick: () => {
         if (anonymouschat) {
+          clearTimeout(self.state.setNonLoggedInJoinChatDlgTrue);
           megaChat.loginOrRegisterBeforeJoining(room.publicChatHandle);
         } else {
           room.joinViaPublicHandle();

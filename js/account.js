@@ -294,7 +294,7 @@ function u_logout(logout) {
         u_sharekeys = {};
         u_type = false;
         loggedout = true;
-        setCookie('logged');
+        // setCookie('logged');
         $('#fmholder').text('').attr('class', 'fmholder');
         if (window.MegaData) {
             M = new MegaData();

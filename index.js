@@ -1441,6 +1441,15 @@ function init_page() {
             loadSubPage('copyrightnotice');
         });
     }
+    else if (is_mobile && page === 'disputenotice') {
+        // Show message that the copyright counter-notification should be submitted in a desktop browser
+        mobile.initDOM();
+        mobile.messageOverlay.show(l[621], l[24738]).always(function() {
+            // On clicking OK in the dialog, go to the file manager if logged in, or start page if not
+            loadSubPage(u_type === 3 ? 'fm' : 'start');
+        });
+        return false;
+    }
     else if (page === 'disputenotice') {
         parsepage(pages['disputenotice']);
         copyright.init_cndispute();

@@ -461,6 +461,10 @@ lazy(self, 'trk', function() {
             log('event', category, action, name, value);
         }
 
+        if (['download', 'upload', 'videostream'].indexOf(category) > -1) {
+            return EINTERNAL;
+        }
+
         if (category === 'download' && action === 'completed' && page === category) {
             return trk({download: getBaseUrl() + '/file/' + dlpage_ph});
         }
@@ -468,6 +472,7 @@ lazy(self, 'trk', function() {
             // @todo decide whether disabling completely.
             return EAGAIN;
         }
+
         trk({
             e_c: filter(category),
             e_a: filter(action),

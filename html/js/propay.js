@@ -1475,12 +1475,24 @@ pro.propay = {
                         };
 
                         // binding events
-                        $('.fm-dialog-close, .close-btn', $discountDlg).rebind('click.discount', () => {
+                        $('.fm-dialog-close, .close-btn', $discountDlg).rebind('click.discount', (ev) => {
                             storeViewTime();
                             window.closeDialog();
                             if (reTrigger) {
                                 window.offerPopupTimer = setTimeout(pro.propay.showDiscountOffer, 72e6);
                             }
+                            mBroadcaster.sendMessage(
+                                'trk:event',
+                                'discountPopup',
+                                'closed',
+                                'btnUsed',
+                                ev.currentTarget.className.indexOf('close-btn') > -1 ? 1 : 0);
+                            mBroadcaster.sendMessage(
+                                'trk:event',
+                                'discountPopup',
+                                'closed',
+                                'notShowAgain',
+                                reTrigger ? 0 : 1);
                         });
 
                         $('.get-btn', $discountDlg).rebind('click.discount', () => {
@@ -1490,6 +1502,12 @@ pro.propay = {
                                 window.offerPopupTimer = setTimeout(pro.propay.showDiscountOffer, 72e6);
                             }
                             loadSubPage('discount' + offer.dc);
+                            mBroadcaster.sendMessage(
+                                'trk:event',
+                                'discountPopup',
+                                'requested',
+                                'notShowAgain',
+                                reTrigger ? 0 : 1);
                         });
 
                         $('.fm-picker-notagain.checkbox-block', $discountDlg).rebind('click.discount', () => {
@@ -1506,6 +1524,7 @@ pro.propay = {
                             }
                         });
                         M.safeShowDialog('discount-offer', $discountDlg, true);
+                        mBroadcaster.sendMessage('trk:event', 'discountPopup', 'shown');
                     }
                 });
             }

@@ -447,7 +447,7 @@ if (typeof mobileblog !== 'undefined') {
                 xhr.open("POST", apipath + 'cs?id=0' + mega.urlParams(), true);
                 xhr.send(JSON.stringify([{
                     a: 'log', e: 99801,
-                    m: { blogid: blogid, u: window.u_handle || 'visitor' }
+                    m: blogid
                 }]));
             });
         }

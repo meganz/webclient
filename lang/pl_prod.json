@@ -3990,7 +3990,7 @@
     "24520": "Anti-ransomware",
     "24521": "Wsparcie priorytetowe",
     "24522": "MEGA zapewnia, \u017ce jedynymi osobami, kt\u00f3re mog\u0105 uzyska\u0107 dost\u0119p do Twoich danych, s\u0105 osoby, kt\u00f3re wybierzesz. MEGA zapewnia kontrolowane przez u\u017cytkownika kompleksowe szyfrowanie danych, czat\u00f3w i po\u0142\u0105cze\u0144 bez po\u015bwi\u0119cania elastyczno\u015bci potrzebnej do wykonania pracy.",
-    "24523": "Z \u0142atwo\u015bci\u0105 tw\u00f3rz \u0142\u0105cza do plik\u00f3w \/ folder\u00f3w, kt\u00f3re mo\u017cna udost\u0119pnia\u0107 cz\u0142onkom zespo\u0142u lub wysy\u0142a\u0107 do klient\u00f3w. W ka\u017cdej chwili mo\u017cesz usun\u0105\u0107 \u0142\u0105cze, a tym samym uniemo\u017cliwi\u0107 dost\u0119p do pliku \/ folderu. Mo\u017cesz r\u00f3wnie\u017c ustawi\u0107 dat\u0119 wyga\u015bni\u0119cia dowolnego \u0142\u0105cza lub doda\u0107 kolejne has\u0142o do \u0142\u0105cza.",
+    "24523": "Z \u0142atwo\u015bci\u0105 tw\u00f3rz \u0142\u0105cza do plik\u00f3w \/ folder\u00f3w, kt\u00f3re mo\u017cna udost\u0119pnia\u0107 cz\u0142onkom zespo\u0142u lub wysy\u0142a\u0107 do klient\u00f3w. W ka\u017cdej chwili mo\u017cesz usun\u0105\u0107 \u0142\u0105cze, a tym samym uniemo\u017cliwi\u0107 dost\u0119p do pliku \/ folderu. Mo\u017cesz r\u00f3wnie\u017c ustawi\u0107 dat\u0119 wyga\u015bni\u0119cia lub doda\u0107 ochron\u0119 has\u0142em do dowolnego \u0142\u0105cza.",
     "24524": "Szybkie i \u0142atwe udost\u0119pnianie oznacza, \u017ce mo\u017cesz po prostu zabra\u0107 si\u0119 do pracy",
     "24525": "Bezpiecznie udost\u0119pniaj swoje pliki",
     "24526": "Dzi\u0119ki nieograniczonemu rozmiarowi plik\u00f3w MEGA \u017caden plik nie jest nigdy zbyt du\u017cy. Bezpieczne udost\u0119pnianie du\u017cego pliku nigdy nie by\u0142o \u0142atwiejsze. Po prostu skonfiguruj \u0142\u0105cze z komputera lub urz\u0105dzenia mobilnego. Mo\u017cesz r\u00f3wnie\u017c zabezpieczy\u0107 go has\u0142em lub udost\u0119pni\u0107 tylko przez ograniczony czas.",
@@ -4064,7 +4064,7 @@
     "24674": "Wyst\u0105pi\u0142 problem podczas pr\u00f3by aktywacji kodu rabatowego. Spr\u00f3buj ponownie p\u00f3\u017aniej. Je\u015bli problem b\u0119dzie si\u0119 powtarza\u0142, mo\u017cesz skontaktowa\u0107 si\u0119 z zespo\u0142em pomocy pod adresem support@mega.nz",
     "24675": "Kod rabatowy wygas\u0142.",
     "24676": "Kod rabatowy jest nieprawid\u0142owy.",
-    "24677": "Kod rabatowy, kt\u00f3rego u\u017cy\u0142e\u015b, jest przeznaczony dla innego konta u\u017cytkownika.",
+    "24677": "Kod rabatowy, kt\u00f3ry pr\u00f3bujesz zrealizowa\u0107, jest przeznaczony dla innego konta u\u017cytkownika.",
     "24678": "Kod rabatowy zosta\u0142 ju\u017c wykorzystany.",
     "24680": "Masz dost\u0119pn\u0105 zni\u017ck\u0119 na plan %1",
     "24698": "Zostaniesz obci\u0105\u017cony normaln\u0105 cen\u0105 planu w wysoko\u015bci %1 po pierwszym roku odnowienia subskrypcji.",
@@ -4076,5 +4076,5 @@
     "24705": "Jeszcze nie",
     "24706": "Chc\u0119 to",
     "24707": "Oferta dost\u0119pna przez ograniczony czas",
-    "24738": "If you wish to submit a takedown counter-notification through our web form, please visit this page in a desktop browser."
+    "24738": "Je\u015bli chcesz przes\u0142a\u0107 roszczenie wzajemne dotycz\u0105ce usuni\u0119cia tre\u015bci za po\u015brednictwem naszego formularza internetowego, odwied\u017a t\u0119 stron\u0119 w przegl\u0105darce na komputerze."
 }

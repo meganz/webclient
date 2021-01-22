@@ -3990,7 +3990,7 @@
     "24520": "Anti-ransomware",
     "24521": "Suporte priorit\u00e1rio",
     "24522": "O MEGA garante que as \u00fanicas pessoas que podem acessar os seus dados s\u00e3o as pessoas com as quais voc\u00ea decidir compartilh\u00e1-los. Usamos criptografia de ponta a ponta para dados, chats e chamadas, mantendo a flexibilidade que voc\u00ea precisa para trabalhar.",
-    "24523": "Crie facilmente links de arquivos e pastas que poder\u00e3o ser compartilhados com os membros da sua equipe ou enviados a clientes. Voc\u00ea poder\u00e1 excluir o link a qualquer momento, e assim remover o acesso ao arquivo ou \u00e0 pasta. Tamb\u00e9m \u00e9 poss\u00edvel definir uma data de validade ou uma senha adicional em qualquer link.",
+    "24523": "Crie facilmente links de arquivos e pastas que poder\u00e3o ser compartilhados com os membros da sua equipe ou enviados a clientes. Voc\u00ea poder\u00e1 remover o link a qualquer momento, e assim revogar o acesso ao arquivo ou \u00e0 pasta. Tamb\u00e9m \u00e9 poss\u00edvel definir uma data de validade ou incluir uma senha adicional a qualquer link.",
     "24524": "Compartilhamento f\u00e1cil e r\u00e1pido significa que voc\u00ea pode focar no seu trabalho",
     "24525": "Compartilhe os seus arquivos com seguran\u00e7a",
     "24526": "No MEGA, n\u00e3o h\u00e1 limita\u00e7\u00f5es de tamanho, e nenhum arquivo \u00e9 grande demais. Compartilhar um arquivo grande com seguran\u00e7a nunca foi t\u00e3o f\u00e1cil: basta configurar um link usando o seu computador ou um dispositivo m\u00f3vel. Voc\u00ea tamb\u00e9m pode proteger o arquivo com uma senha, ou fazer com que esteja dispon\u00edvel por um tempo limitado.",
@@ -4064,7 +4064,7 @@
     "24674": "Houve um problema ao tentar ativar o seu c\u00f3digo de desconto - tente novamente mais tarde. Se o problema persistir, entre em contato com a equipe de suporte em support@mega.nz",
     "24675": "O c\u00f3digo de desconto expirou.",
     "24676": "O c\u00f3digo de desconto n\u00e3o \u00e9 v\u00e1lido.",
-    "24677": "O c\u00f3digo de desconto que voc\u00ea digitou pertence \u00e0 conta de outro usu\u00e1rio.",
+    "24677": "O c\u00f3digo de desconto que voc\u00ea est\u00e1 tentando usar corresponde \u00e0 conta de outro usu\u00e1rio.",
     "24678": "O c\u00f3digo de desconto j\u00e1 foi utilizado.",
     "24680": "Voc\u00ea tem um desconto dispon\u00edvel para o plano %1",
     "24698": "Ap\u00f3s o primeiro ano, ser\u00e1 cobrado o valor normal do plano do plano (%1) quando a assinatura for renovada.",
@@ -4076,5 +4076,5 @@
     "24705": "Ainda n\u00e3o",
     "24706": "Eu quero",
     "24707": "Oferta dispon\u00edvel por tempo limitado",
-    "24738": "If you wish to submit a takedown counter-notification through our web form, please visit this page in a desktop browser."
+    "24738": "Se voc\u00ea quiser enviar uma contranotifica\u00e7\u00e3o de um aviso de remo\u00e7\u00e3o por meio do nosso formul\u00e1rio online, visite esta p\u00e1gina usando um navegador em um computador."
 }

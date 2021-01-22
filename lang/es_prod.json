@@ -4033,7 +4033,7 @@
     "24641": "Antes de continuar",
     "24642": "Utilizamos cookies y tecnolog\u00edas similares (\u201cCookies\u201d) para ofrecerte nuestros servicios, mejorar tu experiencia al usarlos y personalizar los anuncios que ves, incluso a trav\u00e9s de terceros. Acepta el uso de Cookies o personalizalo en los ajustes. Encuentra m\u00e1s informaci\u00f3n al respecto en nuestra [A]Pol\u00edtica de cookies[\/A].",
     "24643": "Aceptar Cookies",
-    "24644": "Ajustes",
+    "24644": "Ajustes de Cookies",
     "24645": "Los ajustes que has seleccionado recientemente y los que has guardado anteriormente son diferentes. Selecciona los que deseas utilizar.",
     "24646": "Nuevos ajustes",
     "24647": "Ajustes guardados",
@@ -4064,7 +4064,7 @@
     "24674": "Tu c\u00f3digo de descuento no se ha activado correctamente, vuelve a intentarlo m\u00e1s tarde. Si el problema persiste, ponte en contacto con el equipo de soporte support@mega.nz",
     "24675": "El c\u00f3digo de descuento ha caducado.",
     "24676": "El c\u00f3digo de descuento no es v\u00e1lido.",
-    "24677": "El c\u00f3digo de descuento que has utilizado es para una cuenta diferente.",
+    "24677": "El c\u00f3digo de descuento que intentas canjear es para una cuenta diferente.",
     "24678": "El c\u00f3digo de descuento ya ha sido canjeado.",
     "24680": "Tienes un descuento disponible para el plan %1",
     "24698": "Despu\u00e9s del primer a\u00f1o, en cuanto se renueve la suscripci\u00f3n, se te cobrar\u00e1 el precio integro de %1.",
@@ -4076,5 +4076,5 @@
     "24705": "Ahora no",
     "24706": "Lo quiero",
     "24707": "Oferta por tiempo limitado",
-    "24738": "If you wish to submit a takedown counter-notification through our web form, please visit this page in a desktop browser."
+    "24738": "Si quieres enviar una contranotificaci\u00f3n de retirada a trav\u00e9s de nuestro formulario web, visita esta p\u00e1gina desde el navegador de tu ordenador."
 }

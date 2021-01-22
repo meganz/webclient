@@ -1019,7 +1019,10 @@ var ulmanager = {
         var n;
         var uq = File.ul;
 
-        fmconfig.ul_skipIdentical = false;
+        // @todo finally deprecate around the codebase?
+        if (fmconfig.ul_skipIdentical !== undefined) {
+            mega.config.remove('ul_skipIdentical');
+        }
 
         if (identical && fmconfig.ul_skipIdentical) {
             n = identical;

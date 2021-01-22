@@ -114,13 +114,11 @@ function render_blogarticle() {
     $('.new-bottom-pages.blog-new a', 'body').rebind('mousedown.log', (e) => {
         api_req({
             a: 'log', e: 99742,
-            m: {
-                blogid: blogid,
-                u: window.u_handle || 'visitor',
+            m: blogid + ' ' + JSON.stringify({
                 btn: e.currentTarget.id || 'n/a',
                 ext: e.currentTarget.href || 'n/a'
-            }
+            })
         });
     });
-    api_req({ a: 'log', e: 99801, m: { blogid: blogid, u: window.u_handle || 'visitor' } });
+    api_req({ a: 'log', e: 99801, m: blogid });
 }

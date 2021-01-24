@@ -3008,7 +3008,7 @@ div.radioOn.small, div.radioOff.small {
 }
 
 /* Hide the dropdown on the MegaSync page */
-.megaapp-linux {
+.megaapp-linux-box-container, .megaapp-linux {
     display: none !important;
 }
 
@@ -11321,7 +11321,7 @@ code, c {
         background-color: #fff;
         border-radius: 8px;
         border: 1px solid rgba(0, 40, 100, 0.12);
-    } 
+    }
     .mobile .main-mid-pad.bus-repay .main-left-block, .mobile .main-mid-pad.bus-repay .main-right-block {
         padding: 20px;
     }

@@ -17,6 +17,7 @@ lazy(self, 'trk', function() {
         'emailverify', 'newsignup', 'payment', 'pwrevert', 'recover',
         'unsub', 'verify', 'voucher'
     ];
+    const idsite = location.host === 'mega.io' ? 2 : 1;
     let disabled = !storage.trk && (!is_livesite || !mega.flags.sra);
 
     const send = async(data) => {
@@ -103,7 +104,7 @@ lazy(self, 'trk', function() {
                 k[x] = (k[x] | 0) + 1;
             }
         }
-        const r = {a: 'ra', q: q, cid: utm.cid, idsite: 1, _idts: utm.fts};
+        const r = {a: 'ra', q: q, cid: utm.cid, idsite, _idts: utm.fts};
 
         if (queue.length > 1) {
             // deduplicate

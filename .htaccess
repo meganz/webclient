@@ -1,7 +1,7 @@
 RewriteEngine On
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_FILENAME} !-f
-RewriteRule ^[\w/-]*$ /
+RewriteRule . /
 
 <IfModule mod_headers.c>
 #Header set Access-Control-Allow-Origin "*"

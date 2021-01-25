@@ -165,6 +165,10 @@ function getCleanSitePath(path) {
     // cleanup and handle affiliate tags.
     path = mURIDecode(path).replace(/^[#/]+|\/+$/g, '').split(/(\/\w+=)/);
 
+    if (/^\w+=/.test(path[0])) {
+        path = [''].concat(path[0].split('=')).concat(path.slice(1));
+    }
+
     if (path.length > 1) {
         for (var s = 1; s < path.length; s += 2) {
             path[String(path[s]).replace(/\W/g, '')] = mURIDecode(path[s + 1]);
@@ -193,19 +197,17 @@ function getCleanSitePath(path) {
                 localStorage.afftype = 1;
             }
         }
+        if (path.csp) {
+            localStorage.csp = path.csp >>> 0 & 0xff;
+        }
+        if (path.sra) {
+            tryCatch(function(utm) {
+                localStorage.utm = atob(utm);
+            })((path.sra + '=='.substr(2 - path.sra.length * 3 & 3)).replace(/-/g, '+').replace(/_/g, '/'));
+        }
         if (path.mt) {
             window.uTagMT = path.mt;
         }
-    }
-    else if (path[0].indexOf('aff=') === 0) {
-        localStorage.affid = String(path[0]).replace('aff=', '');
-        localStorage.affts = Date.now();
-        localStorage.afftype = 1;
-        path = [''];
-    }
-    else if (path[0].indexOf('mt=') === 0) {
-        window.uTagMT = String(path[0]).replace('mt=', '');
-        path = [''];
     }
 
     return path[0];
@@ -712,6 +714,44 @@ var mega = {
         this.state |= window.MEGAFLAG_LOADINGCLOUD;
     },
 
+    redirect: function(to, page, kv, urlQs) {
+        'use strict';
+        var storage = localStorage;
+        var encode = function(v) {
+            return btoa(v).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+        };
+
+        to = (String(to).indexOf('//') < 0 ? 'https://' : '') + to;
+        if (page) {
+            to += '/' + page;
+        }
+
+        var affid = storage.affid;
+        var affts = storage.affts >>> 0;
+        if (affid && affts && Date.now() - affts < 864e5) {
+            to += '/aff=' + affid;
+        }
+
+        if (storage.csp) {
+            to += '/csp=' + storage.csp;
+        }
+
+        if (storage.utm) {
+            to += '/sra=' + encode(storage.utm);
+        }
+
+        if (Array.isArray(kv)) {
+            for (var i = kv.length; i--;) {
+                var k = kv[i][0];
+                var v = kv[i][1];
+                to += '/' + k + '=' + (typeof v === 'string' ? encode(v) : v);
+            }
+        }
+
+        window.onload = window.onerror = null;
+        location.replace(to + (urlQs || ''));
+    },
+
     /** Parameters to append to API requests */
     urlParams: function() {
         if (!this._urlParams) {
@@ -918,7 +958,7 @@ window.redirect = ['about', 'bird', 'blog', 'business', 'cmd', 'contact', 'colla
 var isStaticPage = function(page) {
     'use strict';
     if (page) {
-        const excludedPages = { copyrightnotice: 1, disputenotice: 1, businesssignup: 1, businessinvite: 1 };
+        var excludedPages = {copyrightnotice: 1, disputenotice: 1, businesssignup: 1, businessinvite: 1};
         if (excludedPages[page] || page.indexOf('businesssignup') > -1 || page.indexOf('businessinvite') > -1) {
             return false;
         }
@@ -972,17 +1012,12 @@ else {
 
     page = getCleanSitePath(page);
     if (is_litesite) {
-        const loggedCookie = getCookie().indexOf('logged=1') > -1;
-        const comingFromNZ = locationSearchParams.indexOf('nz=1') > -1;
+        var loggedCookie = getCookie().indexOf('logged=1') > -1;
+        var comingFromNZ = locationSearchParams.indexOf('nz=1') > -1;
         if ((!isStaticPage(page) && page !== 'pro' && page !== 'sdk' && page !== 'refer') ||
             (loggedCookie && !comingFromNZ)) {
-            var affid = localStorage.affid;
-            var affts = localStorage.affts;
-            if (!affts || isNaN(affts) || (Date.now() - affts > 864e5)) {
-                affid = null;
-            }
-            window.location.replace('https://mega.nz' + (page ? '/' + page : '')
-                + (affid ? '/aff=' + affid : ''));
+
+            mega.redirect('mega.nz', page);
         }
         else if (loggedCookie && comingFromNZ) {
             // oh, a race probably,
@@ -2130,9 +2165,12 @@ else if (!browserUpdate) {
             dump.m = (
                 is_mobile ? '[mobile] ' :
                     is_embed ? '[embed] ' :
-                        is_drop ? '[drop] ' :
-                            is_litesite ? '[lite] ' : ''
+                        is_drop ? '[drop] ' : ''
             ) + dump.m.replace(/\s+/g, ' ');
+
+            if (is_litesite) {
+                dump.m = '[lite]' + (dump.m[0] === '[' ? '' : ' ') + dump.m;
+            }
 
             if (!window.jsl_done && !window.u_checked) {
                 // Alert the user if there was an uncaught exception while
@@ -2864,11 +2902,14 @@ else if (!browserUpdate) {
         jsl.push({f:'js/vendor/jquery.jscrollpane.js', n: 'jscrollpane_js', j:1});
         jsl.push({f:'js/jscrollpane.utils.js', n: 'jscrollpane_utils_js', j: 1});
         jsl.push({f:'js/jquery.misc.js', n: 'jquerymisc_js', j:1});
+        jsl.push({f:'js/utils/polyfills.js', n: 'js_utils_polyfills_js', j: 1});
         jsl.push({f:'js/utils/browser.js', n: 'js_utils_browser_js', j: 1});
         jsl.push({f:'js/utils/locale.js', n: 'js_utils_locale_js', j: 1});
         jsl.push({f:'js/utils/dom.js', n: 'js_utils_dom_js', j: 1});
         jsl.push({f:'js/utils/network.js', n: 'js_utils_network_js', j: 1});
         jsl.push({f:'js/utils/timers.js', n: 'js_utils_timers_js', j: 1});
+        jsl.push({f:'js/utils/csp.js', n: 'js_utils_csp_js', j: 1});
+        jsl.push({f:'js/utils/track.js', n: 'js_utils_track_js', j: 1});
         jsl.push({f:'js/megaPromise.js', n: 'megapromise_js', j:1,w:5});
         jsl.push({f:'index.js', n: 'index', j:1,w:4});
         jsl.push({f:'js/staticPages.js', n: 'staticPages_js', j:1});
@@ -2905,6 +2946,9 @@ else if (!browserUpdate) {
         jsl.push({f:'css/toast.css', n: 'toast_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/psa.css', n: 'psa_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
         jsl.push({f:'css/general.css', n: 'general_css', j:2, w:5, c:1, d:1, cache: 1});
+
+        jsl.push({f:'html/dialogs-common.html', n: 'dialogs-common', j:0,w:2});
+        jsl.push({f:'css/dialogs/cookie-dialog.css', n: 'cookie-dialog_css', j:2,w:5,c:1,d:1,cache:1});
 
         if (lang === 'ar' || lang === 'fa') {
             jsl.push({f:'css/lang_ar.css', n: 'lang_arabic_css', j: 2, w: 30, c: 1, d: 1, m: 1 });
@@ -3964,14 +4008,14 @@ else if (!browserUpdate) {
         if (is_drop || is_karma) {
             return;
         }
+
         if (location.host === 'mega.nz' && !u_storage.sid
             && !is_iframed && isStaticPage(page) && !location.hash && !u_storage.wasloggedin
             && getCookie().indexOf('logged=1') === -1) {
             // there isn't a stored session ID (regardless of its validity), we move.
             // since without a session-id it's not possible to access any internal page.
-            window.onload = null;
-            return window.location.replace('https://mega.io/' + page +
-                (locationSearchParams ? locationSearchParams + '&' : '?') + 'nz=1');
+            tmp = (locationSearchParams ? locationSearchParams + '&' : '?') + 'nz=1';
+            return mega.redirect('mega.io', page, false, tmp);
         }
 
         if (page[0] === 'F' && page[1] === '!' || page.substr(0, 7) === 'folder/') {

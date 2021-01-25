@@ -119,6 +119,18 @@ MegaData.prototype.req = promisify(function(resolve, reject, params, ch) {
         }
     });
 });
+MegaData.prototype.uiSaveLang = promisify(async function(resolve, reject, aNewLang) {
+    'use strict';
+    let storage = localStorage;
+    if ('csp' in window) {
+        await csp.init();
+        if (!csp.has('pref')) {
+            storage = sessionStorage;
+        }
+    }
+    storage.lang = aNewLang;
+    resolve();
+});
 MegaData.prototype.xhr = megaUtilsXHR;
 MegaData.prototype.loading = Object.create(null);
 MegaData.prototype.pending = [];

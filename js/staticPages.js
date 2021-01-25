@@ -36,6 +36,19 @@ const dlinfo = dummy;
 const ulmanager = Object.create(null);
 ulmanager.isUploading = false;
 
+var EAGAIN = -3;
+var EFAILED = -5;
+var ENOENT = -9;
+var ECIRCULAR = -10;
+var EACCESS = -11;
+var EEXIST = -12;
+var EINCOMPLETE = -13;
+var EKEY = -14;
+var ESID = -15;
+var EBLOCKED = -16;
+var EOVERQUOTA = -17;
+var ETEMPUNAVAIL = -18;
+
 function ab_to_str(ab) {
     'use strict';
     var b = '';
@@ -49,7 +62,8 @@ function ab_to_str(ab) {
 let seqNo = -Math.floor(Math.random() * 0x100000000);
 function api_req(req, context) {
     'use strict';
-    let uri = apipath + 'cs?id=' + (seqNo++) + mega.urlParams();
+    const sn = ++seqNo;
+    let uri = apipath + 'cs?id=' + sn + mega.urlParams();
     let payload = '';
     if (typeof req === 'string') {
         uri += '&' + req;
@@ -58,27 +72,30 @@ function api_req(req, context) {
         payload = JSON.stringify([req]);
     }
     if (d) {
-        console.log('API request prepared: ' + payload + ' url= ' + uri);
+        console.log('[%s] API request', sn.toString(16).slice(-6), payload, uri);
     }
     let success = dummy;
     let fail = dummy;
     if (context && typeof context.callback === 'function') {
-        success = res => {
+        success = async(res) => {
             if (!res.ok) {
-                return context.callback(0xBAD, context);
+                // @todo retry (?)
+                if (d) {
+                    console.error('[%s] API req failed.', sn.toString(16).slice(-6), res);
+                }
+                return context.callback(EAGAIN, context);
             }
+            const data = await res.json();
             if (d) {
-                console.log('API res: ' + res);
+                console.debug('[%s] API res', sn.toString(16).slice(-6), [res], data);
             }
-            res.json().then(data => {
-                context.callback(data[0], context);
-            });
+            context.callback(data[0], context);
         };
         fail = ex => {
             if (d) {
-                console.error('API req ERROR: ' + ex);
+                console.error('[%s] API req ERROR', sn.toString(16).slice(-6), ex);
             }
-            context.callback(0xBAD, context);
+            context.callback(EFAILED, context);
         };
     }
     fetch(uri, { method: 'POST', body: payload })
@@ -106,15 +123,64 @@ MegaData.prototype.xhr = megaUtilsXHR;
 MegaData.prototype.loading = Object.create(null);
 MegaData.prototype.pending = [];
 MegaData.prototype.require = () => MegaPromise.resolve();
+/* eslint-disable no-useless-concat */
+MegaData.prototype['safeSh' + 'owDialog'] = function(name, dsp) {
+    'use strict';
+    const $dialog = $(typeof dsp === 'function' ? dsp() : dsp);
+
+    $('.fm-dialog:visible, .overlay:visible').addClass('arrange-to-back');
+
+    fm_showoverlay();
+    $dialog.removeClass('hidden arrange-to-back');
+
+    if (!is_mobile) {
+        // Center dialogs
+        $dialog.css({
+            'margin-left': -1 * ($dialog.outerWidth() / 2),
+            'margin-top': -1 * ($dialog.outerHeight() / 2)
+        });
+    }
+
+    console.assert(!$.dialog);
+    // eslint-disable-next-line local-rules/hints
+    $.dialog = name;
+};
+
+function closeDialog() {
+    'use strict';
+    fm_hideoverlay();
+    $('.fm-dialog, .fm-dialog-mobile').trigger('dialog-closed').addClass('hidden');
+    $('.fm-dialog, .overlay.arrange-to-back, .fm-dialog-mobile').removeClass('arrange-to-back');
+
+    delete $.dialog;
+    mBroadcaster.sendMessage('closedialog');
+}
+
+function elementIsVisible(el) {
+    'use strict';
+    if (!(el && el.parentNode)) {
+        return false;
+    }
+    if (window.getComputedStyle(el).position !== 'fixed' && !el.offsetParent) {
+        return false;
+    }
+    return !!(el.offsetWidth || el.offsetHeight || el.getClientRects().length);
+}
+
+/* eslint-disable strict */
+const to8 = data => unescape(encodeURIComponent(data));
+const base64urlencode = data => btoa(data).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+
 var MegaLogger = console;
 MegaLogger.getLogger = () => { return console };
+MegaData.prototype.getStack = dummy;
 MegaData.prototype.hasPendingTransfers = dummy;
 const u_savekey = dummy;
 const fmconfig = Object.create(null);
 fmconfig.uidateformat = false;
 const checkUserLogin = () => {
     'use strict';
-    window.location.replace("https://mega.nz/login");
+    loadSubPage('login');
     return true;
 };
 MegaData.prototype.abortTransfers = () => { return Promise.resolve() };
@@ -122,7 +188,7 @@ const moveToNZ = (page) => {
     'use strict';
     const extra = { pro: 1, sdk: 1, refer: 1 };
     if (!isStaticPage(page) && !extra[page]) {
-        window.location.replace('https://mega.nz/' + page);
+        mega.redirect('mega.nz', page);
     }
 };
 mBroadcaster.once('startMega:desktop', () => {
@@ -136,7 +202,9 @@ mBroadcaster.once('startMega:desktop', () => {
 mBroadcaster.addListener('pagechange', moveToNZ);
 
 const tooltiplogin = Object.create(null);
-tooltiplogin.init = () => { window.location.href = 'https://mega.nz/login' };
+tooltiplogin.init = () => {
+    loadSubPage('login');
+};
 var init_register = dummy;
 const init_login = dummy;
 const accountinputs = Object.create(null);
@@ -164,7 +232,9 @@ mBroadcaster.once('boot_done', () => {
     pages.disputenotice = ' ';
     pages.login = ' ';
     pages.registerb = ' ';
-    showSignupPromptDialog = () => { window.location.replace('https://mega.nz/pro') };
+    showSignupPromptDialog = () => {
+        mega.redirect('mega.nz', 'pro');
+    };
 
     if (is_mobile) {
         mobile.downloadOverlay = Object.create(null);
@@ -498,7 +568,7 @@ MegaAnalytics.prototype.log = function(c, e, data) {
 window.megaAnalytics = new MegaAnalytics(99999);
 mega.ui.showLoginRequiredDialog = () => {
     'use strict';
-    window.location.replace('https://mega.nz/refer');
+    mega.redirect('mega.nz', 'refer');
     return MegaPromise.reject();
 };
 function RegExpEscape(text) {
@@ -519,12 +589,26 @@ function fm_hideoverlay() {
     }
     $(document).trigger('MegaCloseDialog');
 }
+
 var showToast = dummy;
 var bottomPageDialog = () => {
     'use strict';
-    window.location.replace('https://mega.nz/sdk');
+    mega.redirect('mega.nz', 'sdk');
 };
 const copyright = Object.create(null);
 copyright.init_cn = dummy;
 copyright.init_cndispute = dummy;
 const u_wasloggedin = dummy;
+
+const loadSubPageNZ = window.loadSubPage;
+loadSubPageNZ.passth = {
+    'login': 1,
+    'support': 1
+};
+window.loadSubPage = function(page) {
+    if (loadSubPageNZ.passth[page]) {
+        pushHistoryState(page);
+        return mega.redirect('mega.nz', page);
+    }
+    return loadSubPageNZ.apply(this, arguments);
+};

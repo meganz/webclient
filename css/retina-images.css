@@ -191,7 +191,8 @@ i.small-icon.icons-sprite,
 .toast-icon.multi-files-icon,
 #mega-text-editor .txt-editor-download-btn .txt-editor-download-btn-icon,
 .dropdown-dark-arrow,
-.transfer-task-status::before
+.transfer-task-status::before,
+.bottom-page .megaapp-linux-container .copy-line-icon
 {
     background-image: url(../images/mega/icons-sprite_v40@2x.png);
     background-size: 262px auto;

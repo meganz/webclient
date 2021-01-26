@@ -9,7 +9,7 @@ function renderLinuxOptions(linuxsync) {
     syncsel = false;
 
     $content.addClass('linux');
-    $content.find('.megaapp-linux').removeClass('hidden');
+    $('.megaapp-linux-box-container', $content).removeClass('hidden');
     $content.find('.architecture-checkbox input').rebind('click', function() {
         var val = $(this).val();
         $content.find('.architecture-checkbox input').each(function() {
@@ -58,7 +58,7 @@ function resetMegasync() {
 
     $content.removeClass('linux');
     $content.find('.nav-buttons-bl a.linux').removeClass('active');
-    $linuxBlock.addClass('hidden');
+    $linuxBlock.closest('.megaapp-linux-box-container').addClass('hidden');
     $linuxBlock.find('.megaapp-linux-default').text(l[7086]);
     $linuxBlock.find('.radio-buttons label, .architecture-checkbox').removeClass('hidden');
     $linuxBlock.find('.linux-bit-radio').addClass('hidden');
@@ -127,6 +127,7 @@ function initMegasync() {
         return false;
     });
 
+
     $('.megaapp-windows-info.32bit a', $content).rebind('click.megasyncWin32', function() {
         window.location = megasync.getMegaSyncUrl('windows_x32');
         return false;
@@ -136,6 +137,38 @@ function initMegasync() {
         window.location = megasync.getMegaSyncUrl('windows');
         return false;
     });
+
+    $('.copy-install-guide-icon', $content)
+        .rebind('click', function() {
+            var $this = $(this);
+            if (copyToClipboard($('.install-guide', $this.closest('.install-guide-text')).text())) {
+                $this.removeClass('active');
+                var $icon = $('.copy-line-icon', $this);
+                if (!$icon.hasClass('active')) {
+                    $icon.addClass('active');
+                }
+                var $copiedMsg = $('.install-guide-copy-msg', $this.closest('.copy-line'));
+                $copiedMsg.removeClass('hidden');
+                setTimeout(function() {
+                    $icon.removeClass('active');
+                    $copiedMsg.addClass('hidden');
+                }, 2000);
+            }
+        })
+        .rebind('mouseover', function() {
+            var $this = $(this);
+            if (!$this.hasClass('active')) {
+                $this.addClass('active');
+                $('.copy-line-icon', $this).addClass('active');
+            }
+        })
+        .rebind('mouseleave', function() {
+            var $this = $(this);
+            if ($this.hasClass('active')) {
+                $this.removeClass('active');
+                $('.copy-line-icon', $this).removeClass('active');
+            }
+        });
 
     registerLinuxDownloadButton($content.find('.megaapp-linux-download, .megaext-linux-download'));
 
@@ -200,6 +233,8 @@ function changeLinux(linuxsync, i) {
             .addClass('download')
             .removeClass('disabled')
             .attr('data-link', syncurl);
+
+        $('.install-guide-text span.install-guide').text(linuxsync[i].help_text);
 
         mBroadcaster.sendMessage('megasync-linux-distro-selected', syncurl);
         syncsel = i;

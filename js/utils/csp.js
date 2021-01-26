@@ -28,6 +28,7 @@ lazy(self, 'csp', function() {
 
                 const srv = await Promise.resolve(mega.attr.get(u_handle, 'csp', -2, 1)).catch(nop) >>> 0;
                 if (!byUser && srv) {
+                    value = (storage['csp.' + u_handle] || value) >>> 0;
                     if (value !== srv) {
                         // different settings, ask to reconfigure.
                         onIdle(() => csp.init());
@@ -35,6 +36,7 @@ lazy(self, 'csp', function() {
                     return;
                 }
 
+                storage['csp.' + u_handle] = newValue;
                 return srv === newValue ? -srv : mega.attr.set('csp', newValue, -2, 1);
             }
             storage.csp = newValue;
@@ -92,6 +94,10 @@ lazy(self, 'csp', function() {
                 return reject(tag);
             }
 
+            if (step === 'nova') {
+                value = 0;
+                step = null;
+            }
             const first = !csp.has('essential');
             const qsa = (sel, cb) => dialog.querySelectorAll(sel).forEach(cb);
             const hideBlocks = () => qsa('.content-block', e => e.classList.remove('active'));

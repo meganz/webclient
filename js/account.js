@@ -438,6 +438,10 @@ function u_setrsa(rsakey) {
                         // Show newly registered user the download recovery key dialog.
                         M.onFileManagerReady(function() {
                             M.showRecoveryKeyDialog(1);
+
+                            if ('csp' in window) {
+                                csp.showCookiesDialog('nova');
+                            }
                         });
 
                         // No affiliate guide dialog for new users.

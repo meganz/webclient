@@ -686,7 +686,9 @@ export class ConversationPanel extends MegaRenderMixin {
         self.eventuallyInit();
         if (anonymouschat) {
             self.state.setNonLoggedInJoinChatDlgTrue = setTimeout(function() {
-                self.setState({'nonLoggedInJoinChatDialog': true});
+                M.safeShowDialog('chat-links-preview-desktop', () => {
+                    self.setState({'nonLoggedInJoinChatDialog': true});
+                });
             }, rand_range(5, 10) * 1000);
         }
         self.props.chatRoom._uiIsMounted = true;
@@ -1428,13 +1430,19 @@ export class ConversationPanel extends MegaRenderMixin {
         var nonLoggedInJoinChatDialog = null;
         if (self.state.nonLoggedInJoinChatDialog === true) {
             var usersCount = Object.keys(room.members).length;
+            let closeJoinDialog = () => {
+                onIdle(() => {
+                    if ($.dialog === 'chat-links-preview-desktop') {
+                        closeDialog();
+                    }
+                });
+                self.setState({'nonLoggedInJoinChatDialog': false});
+            };
             nonLoggedInJoinChatDialog = <ModalDialogsUI.ModalDialog
                 title={l[20596]}
                 className={"fm-dialog chat-links-preview-desktop"}
                 chatRoom={room}
-                onClose={() => {
-                    self.setState({'nonLoggedInJoinChatDialog': false});
-                }}
+                onClose={closeJoinDialog}
             >
                 <div className="fm-dialog-body">
                     <div className="chatlink-contents">
@@ -1449,14 +1457,11 @@ export class ConversationPanel extends MegaRenderMixin {
                         <p>{l[20595]}</p>
 
                         <a className="join-chat" onClick={function(e) {
-                            self.setState({'nonLoggedInJoinChatDialog': false});
-
+                            closeJoinDialog();
                             megaChat.loginOrRegisterBeforeJoining(room.publicChatHandle);
                         }}>{l[20597]}</a>
 
-                        <a className="not-now" onClick={function(e) {
-                            self.setState({'nonLoggedInJoinChatDialog': false});
-                        }}>{l[18682]}</a>
+                        <a className="not-now" onClick={closeJoinDialog}>{l[18682]}</a>
                     </div>
                 </div>
             </ModalDialogsUI.ModalDialog>;

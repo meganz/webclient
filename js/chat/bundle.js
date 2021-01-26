@@ -13874,8 +13874,10 @@ let conversationpanel_ConversationPanel = (conversationpanel_dec = utils["defaul
 
     if (anonymouschat) {
       self.state.setNonLoggedInJoinChatDlgTrue = setTimeout(function () {
-        self.setState({
-          'nonLoggedInJoinChatDialog': true
+        M.safeShowDialog('chat-links-preview-desktop', () => {
+          self.setState({
+            'nonLoggedInJoinChatDialog': true
+          });
         });
       }, rand_range(5, 10) * 1000);
     }
@@ -14521,15 +14523,23 @@ let conversationpanel_ConversationPanel = (conversationpanel_dec = utils["defaul
 
     if (self.state.nonLoggedInJoinChatDialog === true) {
       var usersCount = Object.keys(room.members).length;
+
+      let closeJoinDialog = () => {
+        onIdle(() => {
+          if ($.dialog === 'chat-links-preview-desktop') {
+            closeDialog();
+          }
+        });
+        self.setState({
+          'nonLoggedInJoinChatDialog': false
+        });
+      };
+
       nonLoggedInJoinChatDialog = external_React_default.a.createElement(modalDialogs["a" ].ModalDialog, {
         title: l[20596],
         className: "fm-dialog chat-links-preview-desktop",
         chatRoom: room,
-        onClose: () => {
-          self.setState({
-            'nonLoggedInJoinChatDialog': false
-          });
-        }
+        onClose: closeJoinDialog
       }, external_React_default.a.createElement("div", {
         className: "fm-dialog-body"
       }, external_React_default.a.createElement("div", {
@@ -14539,18 +14549,12 @@ let conversationpanel_ConversationPanel = (conversationpanel_dec = utils["defaul
       }), external_React_default.a.createElement("h3", null, external_React_default.a.createElement(utils["default"].EmojiFormattedContent, null, room.topic ? room.getRoomTitle() : " ")), external_React_default.a.createElement("h5", null, usersCount ? l[20233].replace("%s", usersCount) : " "), external_React_default.a.createElement("p", null, l[20595]), external_React_default.a.createElement("a", {
         className: "join-chat",
         onClick: function () {
-          self.setState({
-            'nonLoggedInJoinChatDialog': false
-          });
+          closeJoinDialog();
           megaChat.loginOrRegisterBeforeJoining(room.publicChatHandle);
         }
       }, l[20597]), external_React_default.a.createElement("a", {
         className: "not-now",
-        onClick: function () {
-          self.setState({
-            'nonLoggedInJoinChatDialog': false
-          });
-        }
+        onClick: closeJoinDialog
       }, l[18682]))));
     }
 

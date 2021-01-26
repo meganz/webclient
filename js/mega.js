@@ -3359,6 +3359,10 @@ function folderreqerr(c, e) {
     loadfm.loaded = false;
     loadfm.loading = false;
 
+    if ($.dialog) {
+        return mBroadcaster.once('closedialog', SoonFc(90, () => folderreqerr(c, e)));
+    }
+
     if (typeof e === 'object' && e.err < 0) {
         if (e.u === 7) {
             message = l[23242];

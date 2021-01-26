@@ -18,7 +18,8 @@ pro.proplan = {
         expired: -8,
         notFound: -9,
         diffUser: -11,
-        isRedeemed:-12
+        isRedeemed: -12,
+        tempUnavailable: -18
     },
 
     /**
@@ -1068,6 +1069,9 @@ pro.proplan = {
             }
             else if (ex === pro.proplan.discountErrors.isRedeemed) {
                 errMsg = l[24678];
+            }
+            else if (ex === pro.proplan.discountErrors.tempUnavailable) {
+                errMsg = l[24764];
             }
             msgDialog('warninga', l[135], errMsg, false, () => {
                 loadSubPage('pro');

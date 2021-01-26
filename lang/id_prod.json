@@ -708,7 +708,7 @@
     "5895": "Panggilan dengan [X] ditangani pada beberapa perangkat.",
     "5896": "Mulai panggilan suara",
     "5897": "Mulai panggilan video",
-    "5898": "Nama pengguna [X] telah diundang dan akan muncul dalam daftar kontak anda setelah undangan anda diterima.",
+    "5898": "The user has been invited and will appear in your contact list once accepted.",
     "5899": "Pengguna telah diundang dan akan muncul dalam daftar kontak anda setelah undangan anda diterima.",
     "5902": "Percakapan",
     "5903": "Kontak saya",
@@ -4061,12 +4061,13 @@
     "24669": "determine when you click on a particular advert and then to track the following actions you take in response to that advert.",
     "24670": "$1 off",
     "24673": "Please log in to your account to claim the discount offer.",
-    "24674": "There was an issue while trying to activate your discount code. Please try again later, If the issue persists you may contact support team at support@mega.nz",
+    "24674": "There was an issue while trying to activate your discount code. Please try again later. If the issue persists, you may contact our support team at support@mega.nz.",
     "24675": "Discount code has expired.",
     "24676": "Discount code is invalid.",
     "24677": "The discount code you are trying to redeem is for a different user account.",
     "24678": "The discount code has already been redeemed.",
     "24680": "You have a discount available for the %1 plan",
+    "24688": "Installation guide",
     "24698": "You will be charged the normal plan price of %1 after the first year when the subscription renews.",
     "24699": "You will be charged the normal plan price of %1 after the first month when the subscription renews.",
     "24701": "%1 off %2 annual plan",
@@ -4076,5 +4077,7 @@
     "24705": "Not yet",
     "24706": "I want this",
     "24707": "Offer available for a limited time",
-    "24738": "If you wish to submit a takedown counter-notification through our web form, please visit this page in a desktop browser."
+    "24709": "Installation guide copied",
+    "24738": "If you wish to submit a takedown counter-notification through our web form, please visit this page in a desktop browser.",
+    "24764": "It looks like the discount you are trying to use is already associated with a payment in progress. Please be patient. If the existing payment does fail, you will be able to use the discount again."
 }

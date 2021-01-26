@@ -708,7 +708,7 @@
     "5895": "L\u2019appel avec [X] a \u00e9t\u00e9 trait\u00e9 sur un autre appareil.",
     "5896": "Faire un appel vocal",
     "5897": "Faire un appel vid\u00e9o",
-    "5898": "L\u2019utilisateur [X] a \u00e9t\u00e9 invit\u00e9 et appara\u00eetra dans votre liste de contacts si l\u2019invitation est accept\u00e9e.",
+    "5898": "L\u2019utilisateur a \u00e9t\u00e9 invit\u00e9 et appara\u00eetra dans votre liste de contacts si l\u2019invitation est accept\u00e9e.",
     "5899": "Les utilisateurs ont \u00e9t\u00e9 invit\u00e9s et appara\u00eetront dans votre liste de contacts s'ils acceptent.",
     "5902": "Conversations",
     "5903": "Mes contacts",
@@ -4067,6 +4067,7 @@
     "24677": "Le code de rabais que vous tentez d\u2019utiliser est pour un compte utilisateur diff\u00e9rent.",
     "24678": "Le code de rabais a d\u00e9j\u00e0 \u00e9t\u00e9 utilis\u00e9.",
     "24680": "Un rabais vous est propos\u00e9 pour l\u2019abonnement %1",
+    "24688": "Guide d\u2019installation",
     "24698": "Le prix normal d\u2019abonnement de %1 vous sera factur\u00e9 apr\u00e8s la premi\u00e8re ann\u00e9e, lors du renouvellement de l\u2019abonnement.",
     "24699": "Le prix normal d\u2019abonnement de %1 vous sera factur\u00e9 apr\u00e8s le premier mois, lors du renouvellement de l\u2019abonnement.",
     "24701": "%1 de rabais sur l\u2019abonnement annuel %2",
@@ -4076,5 +4077,7 @@
     "24705": "Pas encore",
     "24706": "\u00c7a m\u2019int\u00e9resse",
     "24707": "L\u2019offre est propos\u00e9e pour un temps limit\u00e9",
-    "24738": "Si vous souhaitez envoyer un contre-avis de retrait gr\u00e2ce \u00e0 notre formulaire Web, veuillez acc\u00e9der \u00e0 cette page avec un navigateur pour ordinateur."
+    "24709": "Installation guide copied",
+    "24738": "Si vous souhaitez envoyer un contre-avis de retrait gr\u00e2ce \u00e0 notre formulaire Web, veuillez acc\u00e9der \u00e0 cette page avec un navigateur pour ordinateur.",
+    "24764": "It looks like the discount you are trying to use is already associated with a payment in progress. Please be patient. If the existing payment does fail, you will be able to use the discount again."
 }

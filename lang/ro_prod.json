@@ -708,7 +708,7 @@
     "5895": "Apelul cu [X] a fost manipulat pe un alt dispozitiv.",
     "5896": "Porne\u0219te apelul audio",
     "5897": "Porne\u0219te apelul video",
-    "5898": "Utilizatorul [X] a fost invitat \u0219i va ap\u0103rea \u00een lista de contacte de \u00eendat\u0103 ce a acceptat invita\u021bia.",
+    "5898": "The user has been invited and will appear in your contact list once accepted.",
     "5899": "Utilizatorii au fost invita\u021bi \u0219i vor ap\u0103rea \u00een lista de contacte de \u00eendat\u0103 ce au acceptat invita\u021bia.",
     "5902": "Conversa\u021bii",
     "5903": "Contactele mele",
@@ -4061,12 +4061,13 @@
     "24669": "s\u0103 determine c\u00e2nd dai clic pe un anumit anun\u021b \u0219i apoi s\u0103 urm\u0103reasc\u0103 urm\u0103toarele ac\u021biuni pe care le \u00eentreprinzi ca r\u0103spuns la acel anun\u021b.",
     "24670": "Reducere $1",
     "24673": "Te rug\u0103m s\u0103 te autentifici \u00een cont pentru a revendica oferta de discount.",
-    "24674": "There was an issue while trying to activate your discount code. Please try again later, If the issue persists you may contact support team at support@mega.nz",
+    "24674": "There was an issue while trying to activate your discount code. Please try again later. If the issue persists, you may contact our support team at support@mega.nz.",
     "24675": "Codul de discount a expirat.",
     "24676": "Codul de discount este nevalid.",
     "24677": "Codul de discount pe care \u00eencerci s\u0103 \u00eel valorifici este pentru un cont de utilizator diferit.",
     "24678": "Codul de discount a fost deja valorificat.",
     "24680": "Ai un discount disponibil pentru planul %1",
+    "24688": "Ghid de instalare",
     "24698": "You will be charged the normal plan price of %1 after the first year when the subscription renews.",
     "24699": "You will be charged the normal plan price of %1 after the first month when the subscription renews.",
     "24701": "Reducere %1 la planul anual %2",
@@ -4076,5 +4077,7 @@
     "24705": "Nu \u00eenc\u0103",
     "24706": "Vreau asta",
     "24707": "Ofert\u0103 disponibil\u0103 pentru o perioad\u0103 limitat\u0103 de timp",
-    "24738": "Dac\u0103 dore\u0219ti s\u0103 trimi\u021bi o contranotificare privind eliminarea prin formularul nostru web, te rug\u0103m s\u0103 vizitezi aceast\u0103 pagin\u0103 \u00eentr-un browser desktop."
+    "24709": "Installation guide copied",
+    "24738": "Dac\u0103 dore\u0219ti s\u0103 trimi\u021bi o contranotificare privind eliminarea prin formularul nostru web, te rug\u0103m s\u0103 vizitezi aceast\u0103 pagin\u0103 \u00eentr-un browser desktop.",
+    "24764": "It looks like the discount you are trying to use is already associated with a payment in progress. Please be patient. If the existing payment does fail, you will be able to use the discount again."
 }

@@ -708,7 +708,7 @@
     "5895": "Gesprek met [X] werd behandeld op een ander apparaat.",
     "5896": "Start audio oproep",
     "5897": "Start video-oproep",
-    "5898": "De gebruiker [X] is uitgenodigd en zal, eenmaal geaccepteerd, verschijnen in uw lijst met contactpersonen.",
+    "5898": "The user has been invited and will appear in your contact list once accepted.",
     "5899": "De gebruikers zijn uitgenodigd en zullen, eenmaal geaccepteerd, in uw lijst met contactpersonen verschijnen.",
     "5902": "Gesprekken",
     "5903": "Mijn contacten",
@@ -4067,6 +4067,7 @@
     "24677": "De kortingscode die u heeft gebruikt, is voor een ander gebruikersaccount.",
     "24678": "De kortingscode is al verzilverd.",
     "24680": "U heeft een korting beschikbaar voor het %1-abonnement",
+    "24688": "Installatie gids",
     "24698": "U betaalt de normale abonnementsprijs van %1 na het eerste jaar wanneer het abonnement wordt verlengd.",
     "24699": "De normale abonnementsprijs van %1 wordt in rekening gebracht na de eerste maand waarin het abonnement wordt verlengd.",
     "24701": "%1 korting %2 jaarabonnement",
@@ -4076,5 +4077,7 @@
     "24705": "Nog niet",
     "24706": "ik wil dit",
     "24707": "Aanbieding geldig voor een beperkte tijd",
-    "24738": "If you wish to submit a takedown counter-notification through our web form, please visit this page in a desktop browser."
+    "24709": "Installation guide copied",
+    "24738": "If you wish to submit a takedown counter-notification through our web form, please visit this page in a desktop browser.",
+    "24764": "It looks like the discount you are trying to use is already associated with a payment in progress. Please be patient. If the existing payment does fail, you will be able to use the discount again."
 }

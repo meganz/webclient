@@ -708,7 +708,7 @@
     "5895": "La llamada con [X] ha sido atendida en otro dispositivo.",
     "5896": "Iniciar llamada",
     "5897": "Iniciar videollamada",
-    "5898": "El usuario [X] ha sido invitado y aparecer\u00e1 en tu lista de contactos en cuanto acepte la invitaci\u00f3n.",
+    "5898": "The user has been invited and will appear in your contact list once accepted.",
     "5899": "Los usuarios han sido invitados y aparecer\u00e1n en tu lista de contactos en cuanto acepten la invitaci\u00f3n.",
     "5902": "Chat",
     "5903": "Mis contactos",
@@ -4067,6 +4067,7 @@
     "24677": "El c\u00f3digo de descuento que intentas canjear es para una cuenta diferente.",
     "24678": "El c\u00f3digo de descuento ya ha sido canjeado.",
     "24680": "Tienes un descuento disponible para el plan %1",
+    "24688": "Gu\u00eda de instalaci\u00f3n",
     "24698": "Despu\u00e9s del primer a\u00f1o, en cuanto se renueve la suscripci\u00f3n, se te cobrar\u00e1 el precio integro de %1.",
     "24699": "Despu\u00e9s del primer mes, en cuanto se renueve la suscripci\u00f3n, se te cobrar\u00e1 el precio integro de %1.",
     "24701": "Descuento del %1 para el plan anual %2",
@@ -4076,5 +4077,7 @@
     "24705": "Ahora no",
     "24706": "Lo quiero",
     "24707": "Oferta por tiempo limitado",
-    "24738": "Si quieres enviar una contranotificaci\u00f3n de retirada a trav\u00e9s de nuestro formulario web, visita esta p\u00e1gina desde el navegador de tu ordenador."
+    "24709": "Installation guide copied",
+    "24738": "Si quieres enviar una contranotificaci\u00f3n de derechos de autor a trav\u00e9s de nuestro formulario web, visita esta p\u00e1gina desde el navegador de tu ordenador.",
+    "24764": "It looks like the discount you are trying to use is already associated with a payment in progress. Please be patient. If the existing payment does fail, you will be able to use the discount again."
 }

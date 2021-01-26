@@ -708,7 +708,7 @@
     "5895": "Cu\u1ed9c g\u1ecdi v\u1edbi [X] \u0111\u00e3 \u0111\u01b0\u1ee3c chuy\u1ec3n sang m\u1ed9t thi\u1ebft b\u1ecb kh\u00e1c.",
     "5896": "G\u1ecdi tho\u1ea1i",
     "5897": "G\u1ecdi video",
-    "5898": "Ng\u01b0\u1eddi d\u00f9ng [X] \u0111\u00e3 \u0111\u01b0\u1ee3c m\u1eddi v\u00e0 s\u1ebd xu\u1ea5t hi\u1ec7n trong s\u1ed5 li\u00ean l\u1ea1c khi h\u1ecd ch\u1ea5p nh\u1eadn l\u1eddi m\u1eddi \u0111\u00f3.",
+    "5898": "The user has been invited and will appear in your contact list once accepted.",
     "5899": "T\u00ean c\u1ee7a nh\u1eefng ng\u01b0\u1eddi qu\u00fd kh\u00e1ch v\u1eeba m\u1eddi s\u1ebd xu\u1ea5t hi\u1ec7n trong s\u1ed5 li\u00ean l\u1ea1c sau khi h\u1ecd d\u00f9ng l\u1eddi m\u1eddi c\u1ee7a qu\u00fd kh\u00e1ch \u0111\u1ec3 t\u1ea1o t\u00e0i kho\u1ea3n.",
     "5902": "C\u00e1c cu\u1ed9c tr\u00f2 chuy\u1ec7n",
     "5903": "S\u1ed5 li\u00ean l\u1ea1c",
@@ -4061,12 +4061,13 @@
     "24669": "determine when you click on a particular advert and then to track the following actions you take in response to that advert.",
     "24670": "$1 off",
     "24673": "Please log in to your account to claim the discount offer.",
-    "24674": "There was an issue while trying to activate your discount code. Please try again later, If the issue persists you may contact support team at support@mega.nz",
+    "24674": "There was an issue while trying to activate your discount code. Please try again later. If the issue persists, you may contact our support team at support@mega.nz.",
     "24675": "Discount code has expired.",
     "24676": "Discount code is invalid.",
     "24677": "The discount code you are trying to redeem is for a different user account.",
     "24678": "The discount code has already been redeemed.",
     "24680": "You have a discount available for the %1 plan",
+    "24688": "Installation guide",
     "24698": "You will be charged the normal plan price of %1 after the first year when the subscription renews.",
     "24699": "You will be charged the normal plan price of %1 after the first month when the subscription renews.",
     "24701": "%1 off %2 annual plan",
@@ -4076,5 +4077,7 @@
     "24705": "Not yet",
     "24706": "I want this",
     "24707": "Offer available for a limited time",
-    "24738": "If you wish to submit a takedown counter-notification through our web form, please visit this page in a desktop browser."
+    "24709": "Installation guide copied",
+    "24738": "If you wish to submit a takedown counter-notification through our web form, please visit this page in a desktop browser.",
+    "24764": "It looks like the discount you are trying to use is already associated with a payment in progress. Please be patient. If the existing payment does fail, you will be able to use the discount again."
 }

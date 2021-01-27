@@ -2704,7 +2704,7 @@ FileManager.prototype.addTransferPanelUI = function() {
 
     $.clearTransferPanel = function() {
         var obj = M.getTransferElements();
-        if (!obj.domTable.querySelector('tr')) {
+        if (obj.domTable && !obj.domTable.querySelector('tr')) {
             $('.transfer-clear-all-icon').addClass('disabled');
             $('.transfer-pause-icon').addClass('disabled');
             $('.transfer-clear-completed').addClass('disabled');

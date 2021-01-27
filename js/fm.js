@@ -1086,7 +1086,9 @@ function FMShortcuts() {
                 'op': charTyped == "c" ? 'copy' : 'cut',
                 'src': items
             };
-            mBroadcaster.crossTab.notify('fms!cut/copy', current_operation);
+            delay('crossTab:fms!cut/copy', () => {
+                mBroadcaster.crossTab.notify('fms!cut/copy', current_operation);
+            });
 
             return false; // stop prop.
         }

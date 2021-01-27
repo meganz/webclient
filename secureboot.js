@@ -727,8 +727,8 @@ var mega = {
         }
 
         var affid = storage.affid;
-        var affts = storage.affts >>> 0;
-        if (affid && affts && Date.now() - affts < 864e5) {
+        var affts = storage.affts;
+        if (affid && affts && !(Date.now() - affts > 864e5)) {
             to += '/aff=' + affid;
         }
 

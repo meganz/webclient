@@ -601,6 +601,24 @@
                 return keepBothState[target][name];
             }
 
+            if (!matchSingle && M.c[target]) {
+                if (!keepBothState[target]) {
+                    keepBothState[target] = Object.create(null);
+                }
+                if (!keepBothState[target]['~/.names.db']) {
+                    const store = keepBothState[target]['~/.names.db'] = Object.create(null);
+                    const handles = Object.keys(M.c[target]);
+
+                    for (let i = handles.length; i--;) {
+                        let n = M.d[handles[i]];
+                        if (n && n.name) {
+                            store[n.name] = n;
+                        }
+                    }
+                }
+                return keepBothState[target]['~/.names.db'][name];
+            }
+
             for (var h in M.c[target]) {
                 var n = M.d[h] || false;
 

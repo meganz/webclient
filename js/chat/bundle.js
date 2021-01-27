@@ -2056,11 +2056,13 @@ class ContactCard extends _stores_mixins_js2__["ContactAwareComponent"] {
           });
         }
 
-        username = react1.a.createElement("span", {
-          dangerouslySetInnerHTML: {
-            __html: megaChat.highlight(username, matches, false)
-          }
-        });
+        if (matches.length > 0) {
+          username = react1.a.createElement("span", {
+            dangerouslySetInnerHTML: {
+              __html: megaChat.highlight(username, matches, false)
+            }
+          });
+        }
       }
 
       if (emailTooltips) {
@@ -2316,9 +2318,11 @@ class ContactPickerWidget extends _stores_mixins_js2__["MegaRenderMixin"] {
     if (self.state.searchValue && self.state.searchValue.length > 0) {
       var userName = ChatSearch._normalize_str(avatarMeta.fullName.toLowerCase());
 
+      var userRealName = ChatSearch._normalize_str(v.name.toLowerCase());
+
       var userEmail = ChatSearch._normalize_str(v.m.toLowerCase());
 
-      if (userName.indexOf(self.state.searchValue.toLowerCase()) === -1 && (userEmail.indexOf(self.state.searchValue.toLowerCase()) === -1 || self.props.notSearchInEmails)) {
+      if (userName.indexOf(self.state.searchValue.toLowerCase()) === -1 && userRealName.indexOf(self.state.searchValue.toLowerCase()) === -1 && (userEmail.indexOf(self.state.searchValue.toLowerCase()) === -1 || self.props.notSearchInEmails)) {
         return false;
       }
     }

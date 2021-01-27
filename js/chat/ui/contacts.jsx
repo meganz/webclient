@@ -671,13 +671,15 @@ export class ContactCard extends ContactAwareComponent {
                     matches.push({idx: result.index, str: result[0]});
                 }
 
-                username = <span dangerouslySetInnerHTML={{
-                    __html: megaChat.highlight(
-                        username,
-                        matches,
-                        false
-                    )
-                }}></span>;
+                if (matches.length > 0) {
+                    username = <span dangerouslySetInnerHTML={{
+                        __html: megaChat.highlight(
+                            username,
+                            matches,
+                            false
+                        )
+                    }}></span>;
+                }
             }
             if (emailTooltips) {
                 usernameBlock = <div
@@ -932,11 +934,13 @@ export class ContactPickerWidget extends MegaRenderMixin {
 
         if (self.state.searchValue && self.state.searchValue.length > 0) {
             var userName = ChatSearch._normalize_str(avatarMeta.fullName.toLowerCase());
+            var userRealName = ChatSearch._normalize_str(v.name.toLowerCase());
             var userEmail = ChatSearch._normalize_str(v.m.toLowerCase());
 
             // DON'T add to the contacts list if the contact's name or email does not match the search value
             if (
                 userName.indexOf(self.state.searchValue.toLowerCase()) === -1 &&
+                userRealName.indexOf(self.state.searchValue.toLowerCase()) === -1 &&
                 (userEmail.indexOf(self.state.searchValue.toLowerCase()) === -1 || self.props.notSearchInEmails)
             ) {
                 return false;

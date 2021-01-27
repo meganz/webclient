@@ -789,6 +789,13 @@ Object.defineProperty(mega, 'flags', {
     }
 });
 
+Object.defineProperty(mega, 'user', {
+    get: function() {
+        'use strict';
+        return typeof u_attr === 'object' && u_attr.u === window.u_handle && u_attr.u || false;
+    }
+});
+
 Object.defineProperty(mega, 'paywall', {
     get: function() {
         'use strict';

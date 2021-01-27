@@ -19,11 +19,13 @@ lazy(self, 'csp', function() {
     };
 
     const sgValue = async(newValue, byUser) => {
+        const u_handle = mega.user;
+
         if (newValue !== undefined) {
             newValue >>>= 0;
             console.assert(newValue & CS_ESSENT);
 
-            if (window.u_handle) {
+            if (u_handle) {
                 delete storage.csp;
 
                 const srv = await Promise.resolve(mega.attr.get(u_handle, 'csp', -2, 1)).catch(nop) >>> 0;
@@ -41,7 +43,7 @@ lazy(self, 'csp', function() {
             }
             storage.csp = newValue;
         }
-        return window.u_handle && mega.attr.get(u_handle, 'csp', -2, 1) || storage.csp;
+        return u_handle && mega.attr.get(u_handle, 'csp', -2, 1) || storage.csp;
     };
 
     const canShowDialog = promisify(resolve => {
@@ -61,7 +63,7 @@ lazy(self, 'csp', function() {
     return Object.freeze({
         init: mutex(tag, async(resolve) => {
             const val = await sgValue().catch(nop) >>> 0;
-            const chg = value && window.u_handle && value !== val ? value : false;
+            const chg = value && mega.user && value !== val ? value : false;
 
             value = val;
             if (chg || !csp.has('essential')) {
@@ -75,7 +77,7 @@ lazy(self, 'csp', function() {
         reset: async() => {
             value = null;
             delete storage.csp;
-            if (window.u_handle) {
+            if (mega.user) {
                 await mega.attr.remove('csp', -2, 1).catch(nop);
             }
             return csp.init();

@@ -51,6 +51,9 @@ lazy(self, 'csp', function() {
             if (exclude[page]) {
                 return mBroadcaster.once('pagechange', check);
             }
+            if ($.msgDialog) {
+                return mBroadcaster.once('msgdialog-closed', SoonFc(200, () => check(window.page)));
+            }
             resolve();
         })(window.page);
     });

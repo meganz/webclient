@@ -1585,6 +1585,7 @@ function closeMsg() {
     }
 
     delete $.msgDialog;
+    mBroadcaster.sendMessage('msgdialog-closed');
 }
 
 function dialogPositioning(s) {

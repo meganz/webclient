@@ -83,6 +83,12 @@ var loginFromEphemeral = {
 
         // If successful result
         else if (result !== false && result >= 0) {
+            let reload = async() => {
+                if ('csp' in window) {
+                    await csp.init();
+                }
+                location.reload();
+            };
 
             // If the user got logged-in when trying to register, let's migrate the ephemeral account
             if ($.ephNodes) {
@@ -101,15 +107,13 @@ var loginFromEphemeral = {
                         if (!Array.isArray(e)) {
                             console.error(e);
                         }
-                        location.reload();
+                        queueMicrotask(reload);
                     });
                 });
             }
             else {
                 // Show message that they've been successfully logged in then on OK reload the page
-                msgDialog('info', l[18280], l[8745], null, function() {
-                    location.reload();
-                });
+                msgDialog('info', l[18280], l[8745], null, reload);
             }
         }
         else {

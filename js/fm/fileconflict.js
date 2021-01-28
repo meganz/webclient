@@ -160,7 +160,8 @@
                 var applyCheck = function _prompt(a) {
                     var promptPromise = new MegaPromise();
 
-                    var promptRecursion = function (a) {
+                    let tick = 0;
+                    (function promptRecursion(a) {
                         var file = a.pop();
 
                         if (file) {
@@ -183,7 +184,12 @@
                                         break;
                                 }
                                 if (proceed) {
-                                    promptRecursion(a);
+                                    if (++tick % 200) {
+                                        promptRecursion(a);
+                                    }
+                                    else {
+                                        onIdle(() => promptRecursion(a));
+                                    }
                                 }
                                 else {
                                     promptPromise.resolve();
@@ -220,8 +226,8 @@
                         else {
                             promptPromise.resolve();
                         }
-                    };
-                    promptRecursion(a);
+                    })(a);
+
                     return promptPromise;
                 };
 

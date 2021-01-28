@@ -552,6 +552,7 @@ FileManager.prototype.initFileManagerUI = function() {
     M.treeSortUI();
     M.initTreePanelSorting();
     M.initContextUI();
+    initShareDialog();
     M.addTransferPanelUI();
     M.initUIKeyEvents();
     M.onFileManagerReady(topmenuUI);
@@ -1409,7 +1410,6 @@ FileManager.prototype.initContextUI = function() {
     });
 
     $(c + '.sh4r1ng-item').rebind('click', function() {
-        initShareDialog();
         M.openSharingDialog();
     });
 

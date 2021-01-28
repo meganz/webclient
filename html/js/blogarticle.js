@@ -2,6 +2,8 @@ function init_blogarticle() {
     if (blogposts === null) {
         return init_blog();
     }
+    parsepage(pages.blogarticle);
+
 
     if (!is_mobile) {
         blog_bind_search();

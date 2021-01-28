@@ -97,10 +97,6 @@ function init_blog() {
                 blogposts[b].th = bHeader;
             }
         }
-        if (page.substr(0, 5) === 'blog/') {
-            // we arrived here to load all blogs, with a specific requested blog
-            pagemetadata();
-        }
         loadingDialog.hide();
         init_blog_callback();
     });

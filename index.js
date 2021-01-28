@@ -718,7 +718,6 @@ function init_page() {
     }
     else if (page.substr(0, 5) === 'blog/') {
         // eslint-disable-next-line dot-notation
-        parsepage(pages['blogarticle']);
         init_blogarticle();
     }
     else if (page.substr(0, 5) === 'blog_' && page.length > 4 && page.length < 10) {

@@ -2320,7 +2320,7 @@
     "19124": "Dapatkan penyimpanan gratis dan transfer kuota untuk setiap teman yang menginstal aplikasi MEGA",
     "19125": "Mulai Panggilan...",
     "19126": "Hubungi Reinvite",
-    "19127": "%1 telah diundang kembali dan akan muncul di daftar kontak Anda setelah diterima.",
+    "19127": "The user has been re-invited and will appear in your contact list once accepted.",
     "19128": "Mengaktifkan pengguna yang dipilih telah gagal",
     "19129": "Buat akun pengguna [A]bisnis[\/A] Anda",
     "19134": "Ditransfer",
@@ -4031,7 +4031,7 @@
     "24639": "Kebijakan Cookie - MEGA",
     "24640": "Pahami bagaimana MEGA mengumpulkan data dari anda menggunakan Cookie dan teknologi serupa",
     "24641": "Before you continue",
-    "24642": "We use cookies and similar technologies (\u2018Cookies\u2019) to provide our services to you, enhance your experience with our services and customize the adverts you see, including through third parties. Accept our use of Cookies from the beginning of your visit or customise Cookies in Cookie Settings. Read more in our [A]Cookie Policy[\/A].",
+    "24642": "We use Cookies and similar technologies (\u2018Cookies\u2019) to provide our services to you, enhance your experience with our services and customise the adverts you see, including through third parties. Accept our use of Cookies from the beginning of your visit or customise Cookies in Cookie Settings. Read more in our [A]Cookie Policy[\/A].",
     "24643": "Accept Cookies",
     "24644": "Cookie Settings",
     "24645": "The new settings you have recently selected and the settings previously saved are different. Please select which settings you want to use.",
@@ -4078,6 +4078,7 @@
     "24706": "I want this",
     "24707": "Offer available for a limited time",
     "24709": "Installation guide copied",
-    "24738": "If you wish to submit a takedown counter-notification through our web form, please visit this page in a desktop browser.",
-    "24764": "It looks like the discount you are trying to use is already associated with a payment in progress. Please be patient. If the existing payment does fail, you will be able to use the discount again."
+    "24738": "If you wish to submit a Copyright Counter-Notification through our web form, please visit this page in a desktop browser.",
+    "24764": "It looks like the discount you are trying to use is already associated with a payment in progress. Please be patient. If the existing payment does fail, you will be able to use the discount again.",
+    "24836": "Enter voucher code"
 }

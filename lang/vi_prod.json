@@ -2320,7 +2320,7 @@
     "19124": "Nh\u1eadn th\u00eam kh\u00f4ng gian l\u01b0u tr\u1eef v\u00e0 b\u0103ng th\u00f4ng truy\u1ec1n t\u1ea3i khi m\u1eddi b\u1ea1n b\u00e8 \u0111\u0103ng k\u00fd v\u00e0 c\u00e0i \u0111\u1eb7t MEGA.",
     "19125": "G\u1ecdi \u0110i\u1ec7n...",
     "19126": "G\u1eedi L\u1ea1i L\u1eddi M\u1eddi",
-    "19127": "Th\u01b0 m\u1eddi \u0111\u00e3 \u0111\u01b0\u1ee3c g\u1eedi l\u1ea1i t\u1edbi %1, v\u00e0 s\u1ebd xu\u1ea5t hi\u00ean trong s\u1ed5 li\u00ean l\u1ea1c m\u1ed9t khi l\u1eddi m\u1eddi \u0111\u01b0\u1ee3c ch\u1ea5p nh\u1eadn.",
+    "19127": "The user has been re-invited and will appear in your contact list once accepted.",
     "19128": "Vi\u1ec7c k\u00edch ho\u1ea1t c\u00e1c nh\u00e2n vi\u00ean \u0111\u00e3 ch\u1ecdn b\u1ecb th\u1ea5t b\u1ea1i",
     "19129": "T\u1ea1o t\u00e0i kho\u1ea3n [A]h\u1ea1ng doanh nghi\u1ec7p[\/A]",
     "19134": "\u0110\u00e3 truy\u1ec1n t\u1ea3i",
@@ -4031,7 +4031,7 @@
     "24639": "Cookie Policy - MEGA",
     "24640": "Understand how MEGA collects data from you using Cookies and similar technologies",
     "24641": "Before you continue",
-    "24642": "We use cookies and similar technologies (\u2018Cookies\u2019) to provide our services to you, enhance your experience with our services and customize the adverts you see, including through third parties. Accept our use of Cookies from the beginning of your visit or customise Cookies in Cookie Settings. Read more in our [A]Cookie Policy[\/A].",
+    "24642": "We use Cookies and similar technologies (\u2018Cookies\u2019) to provide our services to you, enhance your experience with our services and customise the adverts you see, including through third parties. Accept our use of Cookies from the beginning of your visit or customise Cookies in Cookie Settings. Read more in our [A]Cookie Policy[\/A].",
     "24643": "Accept Cookies",
     "24644": "Cookie Settings",
     "24645": "The new settings you have recently selected and the settings previously saved are different. Please select which settings you want to use.",
@@ -4078,6 +4078,7 @@
     "24706": "I want this",
     "24707": "Offer available for a limited time",
     "24709": "Installation guide copied",
-    "24738": "If you wish to submit a takedown counter-notification through our web form, please visit this page in a desktop browser.",
-    "24764": "It looks like the discount you are trying to use is already associated with a payment in progress. Please be patient. If the existing payment does fail, you will be able to use the discount again."
+    "24738": "If you wish to submit a Copyright Counter-Notification through our web form, please visit this page in a desktop browser.",
+    "24764": "It looks like the discount you are trying to use is already associated with a payment in progress. Please be patient. If the existing payment does fail, you will be able to use the discount again.",
+    "24836": "Enter voucher code"
 }

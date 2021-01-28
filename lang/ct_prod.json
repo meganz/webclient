@@ -2320,7 +2320,7 @@
     "19124": "\u8b93\u5b89\u88ddMEGA\u7684\u6bcf\u4f4d\u670b\u53cb\u90fd\u7372\u5f97\u514d\u8cbb\u7684\u5132\u5b58\u7a7a\u9593\u8207\u50b3\u8f38\u914d\u984d",
     "19125": "\u958b\u59cb\u901a\u8a71...",
     "19126": "\u91cd\u65b0\u9080\u8acb\u806f\u7d61\u4eba",
-    "19127": "%1\u5df2\u88ab\u91cd\u65b0\u9080\u8acb\uff0c\u4e00\u65e6\u5c0d\u65b9\u63a5\u53d7\u9080\u8acb\uff0c\u5c31\u6703\u986f\u793a\u5728\u60a8\u7684\u806f\u7d61\u4eba\u5217\u8868\u4e2d\u3002",
+    "19127": "The user has been re-invited and will appear in your contact list once accepted.",
     "19128": "\u7121\u6cd5\u555f\u7528\u6240\u9078\u53d6\u7684\u4f7f\u7528\u8005",
     "19129": "\u5efa\u7acb\u60a8\u7684[A]\u5546\u696d[\/A]\u4f7f\u7528\u8005\u5e33\u865f",
     "19134": "\u5df2\u50b3\u8f38",
@@ -4079,5 +4079,6 @@
     "24707": "\u9650\u6642\u512a\u60e0",
     "24709": "Installation guide copied",
     "24738": "\u5982\u679c\u60a8\u60f3\u900f\u904e\u6211\u5011\u7684\u7db2\u9801\u8868\u55ae\u63d0\u4ea4\u79fb\u9664\u6297\u8faf\u56de\u5fa9\u901a\u77e5\uff0c\u8acb\u5728\u96fb\u8166\u7248\u700f\u89bd\u5668\u958b\u555f\u6b64\u9801\u9762\u3002",
-    "24764": "It looks like the discount you are trying to use is already associated with a payment in progress. Please be patient. If the existing payment does fail, you will be able to use the discount again."
+    "24764": "It looks like the discount you are trying to use is already associated with a payment in progress. Please be patient. If the existing payment does fail, you will be able to use the discount again.",
+    "24836": "Enter voucher code"
 }

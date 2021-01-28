@@ -2320,7 +2320,7 @@
     "19124": "Ottieni spazio di archiviazione e banda di trasferimento gratuita per ogni amico che installa un'app di MEGA",
     "19125": "Inizia chiamata...",
     "19126": "Contatto reinvitato",
-    "19127": "%1 \u00e8 stato reinvitato e apparir\u00e0 nella tua lista contatti una volta accettato l'invito.",
+    "19127": "The user has been re-invited and will appear in your contact list once accepted.",
     "19128": "L'attivazione dell'utente selezionato \u00e8 fallita",
     "19129": "Crea il tuo account di utente [A]business [\/A]",
     "19134": "Trasferiti",
@@ -4079,5 +4079,6 @@
     "24707": "Offerta disponibile per un tempo limitato",
     "24709": "Installation guide copied",
     "24738": "Se desideri inviare una contro-notifica di chiusura attraverso il nostro form sul web, per favore visita questa pagina da un browser desktop.",
-    "24764": "It looks like the discount you are trying to use is already associated with a payment in progress. Please be patient. If the existing payment does fail, you will be able to use the discount again."
+    "24764": "It looks like the discount you are trying to use is already associated with a payment in progress. Please be patient. If the existing payment does fail, you will be able to use the discount again.",
+    "24836": "Enter voucher code"
 }

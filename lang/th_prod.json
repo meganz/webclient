@@ -2320,7 +2320,7 @@
     "19124": "\u0e23\u0e31\u0e1a\u0e1e\u0e37\u0e49\u0e19\u0e17\u0e35\u0e48\u0e40\u0e01\u0e47\u0e1a\u0e02\u0e49\u0e2d\u0e21\u0e39\u0e25\u0e1f\u0e23\u0e35\u0e41\u0e25\u0e30\u0e42\u0e04\u0e27\u0e15\u0e49\u0e32\u0e16\u0e48\u0e32\u0e22\u0e42\u0e2d\u0e19\u0e2a\u0e33\u0e2b\u0e23\u0e31\u0e1a\u0e40\u0e1e\u0e37\u0e48\u0e2d\u0e19\u0e41\u0e15\u0e48\u0e25\u0e30\u0e04\u0e19\u0e17\u0e35\u0e48\u0e15\u0e34\u0e14\u0e15\u0e31\u0e49\u0e07\u0e41\u0e2d\u0e1b\u0e1e\u0e25\u0e34\u0e40\u0e04\u0e0a\u0e31\u0e19 MEGA",
     "19125": "\u0e40\u0e23\u0e34\u0e48\u0e21\u0e42\u0e17\u0e23...",
     "19126": "\u0e40\u0e0a\u0e34\u0e0d\u0e1c\u0e39\u0e49\u0e15\u0e34\u0e14\u0e15\u0e48\u0e2d\u0e2d\u0e35\u0e01\u0e04\u0e23\u0e31\u0e49\u0e07",
-    "19127": "%1 \u0e44\u0e14\u0e49\u0e23\u0e31\u0e1a\u0e01\u0e32\u0e23\u0e15\u0e2d\u0e1a\u0e01\u0e25\u0e31\u0e1a\u0e41\u0e25\u0e30\u0e08\u0e30\u0e1b\u0e23\u0e32\u0e01\u0e0f\u0e43\u0e19\u0e23\u0e32\u0e22\u0e0a\u0e37\u0e48\u0e2d\u0e1c\u0e39\u0e49\u0e15\u0e34\u0e14\u0e15\u0e48\u0e2d\u0e02\u0e2d\u0e07\u0e04\u0e38\u0e13\u0e40\u0e21\u0e37\u0e48\u0e2d\u0e44\u0e14\u0e49\u0e23\u0e31\u0e1a\u0e01\u0e32\u0e23\u0e22\u0e2d\u0e21\u0e23\u0e31\u0e1a\u0e41\u0e25\u0e49\u0e27",
+    "19127": "The user has been re-invited and will appear in your contact list once accepted.",
     "19128": "\u0e01\u0e32\u0e23\u0e40\u0e1b\u0e34\u0e14\u0e43\u0e0a\u0e49\u0e07\u0e32\u0e19\u0e1c\u0e39\u0e49\u0e43\u0e0a\u0e49\u0e17\u0e35\u0e48\u0e40\u0e25\u0e37\u0e2d\u0e01\u0e25\u0e49\u0e21\u0e40\u0e2b\u0e25\u0e27",
     "19129": "\u0e2a\u0e23\u0e49\u0e32\u0e07\u0e1a\u0e31\u0e0d\u0e0a\u0e35\u0e1c\u0e39\u0e49\u0e43\u0e0a\u0e49[A]\u0e17\u0e32\u0e07\u0e18\u0e38\u0e23\u0e01\u0e34\u0e08[\/A]\u0e02\u0e2d\u0e07\u0e04\u0e38\u0e13",
     "19134": "\u0e16\u0e48\u0e32\u0e22\u0e42\u0e2d\u0e19\u0e41\u0e25\u0e49\u0e27",
@@ -4031,7 +4031,7 @@
     "24639": "\u0e19\u0e42\u0e22\u0e1a\u0e32\u0e22\u0e04\u0e38\u0e01\u0e01\u0e35\u0e49 - MEGA",
     "24640": "\u0e17\u0e33\u0e04\u0e27\u0e32\u0e21\u0e40\u0e02\u0e49\u0e32\u0e43\u0e08\u0e27\u0e48\u0e32 MEGA \u0e23\u0e27\u0e1a\u0e23\u0e27\u0e21\u0e02\u0e49\u0e2d\u0e21\u0e39\u0e25\u0e08\u0e32\u0e01\u0e04\u0e38\u0e13\u0e42\u0e14\u0e22\u0e43\u0e0a\u0e49\u0e04\u0e38\u0e01\u0e01\u0e35\u0e49\u0e41\u0e25\u0e30\u0e40\u0e17\u0e04\u0e42\u0e19\u0e42\u0e25\u0e22\u0e35\u0e17\u0e35\u0e48\u0e04\u0e25\u0e49\u0e32\u0e22\u0e04\u0e25\u0e36\u0e07\u0e01\u0e31\u0e19\u0e2d\u0e22\u0e48\u0e32\u0e07\u0e44\u0e23",
     "24641": "Before you continue",
-    "24642": "We use cookies and similar technologies (\u2018Cookies\u2019) to provide our services to you, enhance your experience with our services and customize the adverts you see, including through third parties. Accept our use of Cookies from the beginning of your visit or customise Cookies in Cookie Settings. Read more in our [A]Cookie Policy[\/A].",
+    "24642": "We use Cookies and similar technologies (\u2018Cookies\u2019) to provide our services to you, enhance your experience with our services and customise the adverts you see, including through third parties. Accept our use of Cookies from the beginning of your visit or customise Cookies in Cookie Settings. Read more in our [A]Cookie Policy[\/A].",
     "24643": "Accept Cookies",
     "24644": "Cookie Settings",
     "24645": "The new settings you have recently selected and the settings previously saved are different. Please select which settings you want to use.",
@@ -4078,6 +4078,7 @@
     "24706": "I want this",
     "24707": "Offer available for a limited time",
     "24709": "Installation guide copied",
-    "24738": "If you wish to submit a takedown counter-notification through our web form, please visit this page in a desktop browser.",
-    "24764": "It looks like the discount you are trying to use is already associated with a payment in progress. Please be patient. If the existing payment does fail, you will be able to use the discount again."
+    "24738": "If you wish to submit a Copyright Counter-Notification through our web form, please visit this page in a desktop browser.",
+    "24764": "It looks like the discount you are trying to use is already associated with a payment in progress. Please be patient. If the existing payment does fail, you will be able to use the discount again.",
+    "24836": "Enter voucher code"
 }

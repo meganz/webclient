@@ -2320,7 +2320,7 @@
     "19124": "Kostenloses Speicher- und Transfervolumen f\u00fcr die Einladung von Freunden und Bekannten, die eine MEGA-App installieren",
     "19125": "Anrufen...",
     "19126": "Einladung wiederholen",
-    "19127": "%1 wurde erneut eingeladen und nach Annahme der Einladung Ihrer Kontaktliste hinzugef\u00fcgt.",
+    "19127": "The user has been re-invited and will appear in your contact list once accepted.",
     "19128": "Die Aktivierung des gew\u00e4hlten Benutzers ist fehlgeschlagen",
     "19129": "[A]Business[\/A]-Benutzeraccount erstellen",
     "19134": "\u00dcbertragen",
@@ -4078,6 +4078,7 @@
     "24706": "Ja, bitte",
     "24707": "Befristetes Sonderangebot",
     "24709": "Installation guide copied",
-    "24738": "If you wish to submit a takedown counter-notification through our web form, please visit this page in a desktop browser.",
-    "24764": "It looks like the discount you are trying to use is already associated with a payment in progress. Please be patient. If the existing payment does fail, you will be able to use the discount again."
+    "24738": "If you wish to submit a Copyright Counter-Notification through our web form, please visit this page in a desktop browser.",
+    "24764": "It looks like the discount you are trying to use is already associated with a payment in progress. Please be patient. If the existing payment does fail, you will be able to use the discount again.",
+    "24836": "Enter voucher code"
 }

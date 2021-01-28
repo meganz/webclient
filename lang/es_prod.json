@@ -2320,7 +2320,7 @@
     "19124": "Obt\u00e9n m\u00e1s cuota de almacenamiento y de transferencia gratis para cada amigo que instale una aplicaci\u00f3n MEGA",
     "19125": "Iniciar llamada...",
     "19126": "Invitaci\u00f3n reenviada",
-    "19127": "Has vuelto a invitar a %1 que aparecer\u00e1 en tu lista de contactos en cuanto acepte la invitaci\u00f3n.",
+    "19127": "The user has been re-invited and will appear in your contact list once accepted.",
     "19128": "No se ha podido activar el usuario",
     "19129": "Crea tu cuenta de usuario [A]Business[\/A]",
     "19134": "Transferidos",
@@ -4079,5 +4079,6 @@
     "24707": "Oferta por tiempo limitado",
     "24709": "Installation guide copied",
     "24738": "Si quieres enviar una contranotificaci\u00f3n de derechos de autor a trav\u00e9s de nuestro formulario web, visita esta p\u00e1gina desde el navegador de tu ordenador.",
-    "24764": "It looks like the discount you are trying to use is already associated with a payment in progress. Please be patient. If the existing payment does fail, you will be able to use the discount again."
+    "24764": "It looks like the discount you are trying to use is already associated with a payment in progress. Please be patient. If the existing payment does fail, you will be able to use the discount again.",
+    "24836": "Enter voucher code"
 }

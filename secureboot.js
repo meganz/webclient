@@ -1067,7 +1067,7 @@ var languages = {
     'pl': [['pl'], 'Polish', 'Polski'],
     'ro': [['ro', 'ro-'], 'Romanian', 'Română'],
     'ru': [['ru', 'ru-mo'], 'Russian', 'Pусский'],
-    'th': [['||'], 'Thai', 'ไทย'],
+    'th': [['||', 'th'], 'Thai', 'ไทย'],
     'vi': [['vn', 'vi'], 'Vietnamese', 'Tiếng Việt']
 };
 

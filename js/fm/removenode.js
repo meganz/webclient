@@ -108,7 +108,7 @@ function removeUInode(h, parent) {
             }
             break;
         default:
-            if (M.chat || M.currentdirid.indexOf('fm/user-management') >= 0) {
+            if (M.chat || M.currentdirid.indexOf('user-management') >= 0) {
                 break;
             }
             if (i == 0 && n) {

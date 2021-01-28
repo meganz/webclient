@@ -469,8 +469,8 @@
         if (page === 'start') {
             return true;
         }
-        if (is_fm() && // if page is fm,
-            (slideshowid || !$('.feedback-dialog').hasClass('hidden') || // preview and feedback dialog show
+        return !(is_fm() && // if page is fm,
+            (window.slideshowid || !$('.feedback-dialog').hasClass('hidden') || // preview and feedback dialog show
                 M.currentdirid === 'shares' || // Share root page
                 M.currentdirid === 'out-shares' || // Out-share root page
                 M.currentdirid === 'public-links' || // Public-link root page
@@ -479,11 +479,7 @@
                 M.currentrootid === 'opc' || // OPC
                 M.currentrootid === M.RubbishID || // Rubbish bin
                 (M.currentrootid === undefined && M.currentdirid !== 'transfers') // Dashboard and Settings pages
-            )
-        ) {
-            return false;
-        }
-        return true;
+            ));
     }
 
     // initialize

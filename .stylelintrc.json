@@ -47,7 +47,13 @@
         "selector-list-comma-newline-after": [
             "always",
             {
-                "severity": "warning"
+                "severity": "error"
+            }
+        ],
+        "alpha-value-notation": [
+            "number",
+            {
+                "severity": "error"
             }
         ],
         "color-hex-case": [

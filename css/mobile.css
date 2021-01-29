@@ -12675,7 +12675,7 @@ p a.blog-new-read-more {
 .mobile.affiliate-comission .commission-info {
     left: auto;
     right: -40px;
-    opacity: 50%;
+    opacity: 0.5;
 }
 .mobile.affiliate-comission-bl {
     display: table;
@@ -12720,7 +12720,7 @@ p a.blog-new-read-more {
 .mobile.affiliate-comission-bl .cell .price.euro {
     bottom: 20px;
     color: #999999;
-    opacity: 80%;
+    opacity: 0.8;
     padding-top: 8px;
 }
 .mobile.affiliate-comission-bl .cell.active .price {

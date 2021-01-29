@@ -1,7 +1,7 @@
 var fs = require('fs');
 var fileLimit = 512*1024;
 const useHtmlMin = false;
-const usePostCSS = false;
+const usePostCSS = true;
 
 const basename = p => p.replace(/^.*\//, '');
 

@@ -1900,45 +1900,43 @@ FileManager.prototype.createFolderUI = function() {
         var $inputWrapper = $('.create-new-folder.popup .fm-dialog-body');
         var $input = $inputWrapper.find('input');
         var name = $input.val();
+        var errorMsg = '';
 
         if (name === '' || !M.isSafeName(name)) {
-            $inputWrapper.addClass('error');
+            errorMsg = l[24708];
+        }
+        else if (duplicated(name)) { // Check if folder name already exists
+            errorMsg = l[23219];
+        }
+
+        if (errorMsg !== '') {
+            $('.duplicated-input-warning span', $inputWrapper).text(errorMsg);
+            $inputWrapper.addClass('duplicate');
             $input.addClass('error');
 
             setTimeout(function () {
-                $inputWrapper.removeClass('error');
+                $inputWrapper.removeClass('duplicate');
                 $input.removeClass('error');
                 $input.trigger("focus");
             }, 2000);
+
+            return;
         }
-        else {
-            if (duplicated(name)) {// Check if folder name already exists
-                $inputWrapper.addClass('duplicate');
-                $input.addClass('error');
 
-                setTimeout(function () {
-                    $inputWrapper.removeClass('duplicate');
-                    $input.removeClass('error');
-                    $input.trigger("focus");
-                }, 2000);
+        loadingDialog.pshow();
+        var currentdirid = M.currentCustomView.nodeID || M.currentdirid;
 
-                return;
-            }
-            loadingDialog.pshow();
-            var currentdirid = M.currentCustomView.nodeID || M.currentdirid;
-
-            M.createFolder(currentdirid, name)
-                .then(function(h) {
-                    if (d) {
-                        console.log('Created new folder %s->%s.', currentdirid, h);
-                    }
-                    loadingDialog.phide();
-                })
-                .catch(function(ex) {
-                    loadingDialog.phide();
-                    msgDialog('warninga', l[135], l[47], ex < 0 ? api_strerror(ex) : ex);
-                });
-        }
+        M.createFolder(currentdirid, name)
+            .then(function(h) {
+                if (d) {
+                    console.log('Created new folder %s->%s.', currentdirid, h);
+                }
+                loadingDialog.phide();
+            })
+            .catch(function(ex) {
+                loadingDialog.phide();
+                msgDialog('warninga', l[135], l[47], ex < 0 ? api_strerror(ex) : ex);
+            });
 
         return false;
     };

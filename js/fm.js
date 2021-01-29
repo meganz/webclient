@@ -1245,7 +1245,7 @@ function renameDialog() {
                         }
                     }
                     else {
-                        errMsg = l[7436];
+                        errMsg = l[24708];
                     }
 
                     if (errMsg) {
@@ -2899,7 +2899,7 @@ function createFolderDialog(close) {
         var errorMsg = '';
         if (!M.isSafeName(v, true)) {
             $dialog.removeClass('active');
-            errorMsg = l[7436];
+            errorMsg = l[24708];
         }
         else {
             var specifyTarget = null;

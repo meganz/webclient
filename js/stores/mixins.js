@@ -867,7 +867,8 @@ export class ContactAwareComponent extends MegaRenderMixin {
         }
 
         const syncName = !contact.firstName && !contact.lastName;
-        const syncMail = (contact.c === 1 || contact.c === 2) && !contact.m && !anonymouschat;
+        const syncMail = megaChat.FORCE_EMAIL_LOADING ||
+            (contact.c === 1 || contact.c === 2) && !contact.m && !anonymouschat;
         const syncAvtr = !avatars[contactHandle] && !ContactAwareComponent.unavailableAvatars[contactHandle];
 
         const loader = () => {

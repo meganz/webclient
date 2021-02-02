@@ -898,7 +898,7 @@ class ContactAwareComponent extends MegaRenderMixin {
     }
 
     const syncName = !contact.firstName && !contact.lastName;
-    const syncMail = (contact.c === 1 || contact.c === 2) && !contact.m && !anonymouschat;
+    const syncMail = megaChat.FORCE_EMAIL_LOADING || (contact.c === 1 || contact.c === 2) && !contact.m && !anonymouschat;
     const syncAvtr = !avatars[contactHandle] && !ContactAwareComponent.unavailableAvatars[contactHandle];
 
     const loader = () => {
@@ -1499,7 +1499,7 @@ class ContactButton extends _stores_mixins_js2__["ContactAwareComponent"] {
     }, username, react1.a.createElement(ContactPresence, {
       className: "small",
       contact: contact
-    })), contact && (contact.c === 1 || contact.c === 2) && react1.a.createElement("span", {
+    })), contact && (megaChat.FORCE_EMAIL_LOADING || contact.c === 1 || contact.c === 2) && react1.a.createElement("span", {
       className: "email"
     }, contact.m))));
     moreDropdowns.push(react1.a.createElement(ContactFingerprint, {
@@ -9111,7 +9111,12 @@ class contact_Contact extends abstractGenericMessage_AbstractGenericMessage {
 
   _getContactCard(message, contact, contactEmail) {
     const HAS_RELATIONSHIP = M.u[contact.u].c === 1;
-    const name = M.getNameByHandle(contact.u);
+    let name = M.getNameByHandle(contact.u);
+
+    if (megaChat.FORCE_EMAIL_LOADING) {
+      name += "(" + contact.m + ")";
+    }
+
     return external_React_default.a.createElement(ui_buttons["Button"], {
       className: "default-white-button tiny-button",
       icon: "tiny-icon icons-sprite grey-dots"
@@ -17294,6 +17299,7 @@ function Chat() {
   this.currentlyOpenedChat = null;
   this.lastOpenedChat = null;
   this.archivedChatsCount = 0;
+  this.FORCE_EMAIL_LOADING = localStorage.fel;
   this._imageLoadCache = Object.create(null);
   this._imagesToBeLoaded = Object.create(null);
   this._imageAttributeCache = Object.create(null);

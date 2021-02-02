@@ -48,6 +48,8 @@ function Chat() {
     this.lastOpenedChat = null;
     this.archivedChatsCount = 0;
 
+    this.FORCE_EMAIL_LOADING = localStorage.fel;
+
     this._imageLoadCache = Object.create(null);
     this._imagesToBeLoaded = Object.create(null);
     this._imageAttributeCache = Object.create(null);

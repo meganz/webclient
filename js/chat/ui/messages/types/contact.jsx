@@ -66,7 +66,10 @@ export default class Contact extends AbstractGenericMessage {
 
     _getContactCard(message, contact, contactEmail) {
         const HAS_RELATIONSHIP = M.u[contact.u].c === 1;
-        const name = M.getNameByHandle(contact.u);
+        let name = M.getNameByHandle(contact.u);
+        if (megaChat.FORCE_EMAIL_LOADING) {
+            name += "(" + contact.m + ")";
+        }
 
         return (
             <Button

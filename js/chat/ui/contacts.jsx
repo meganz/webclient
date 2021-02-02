@@ -94,7 +94,9 @@ export class ContactButton extends ContactAwareComponent {
                         {username}
                         <ContactPresence className="small" contact={contact} />
                     </div>
-                    {contact && (contact.c === 1 || contact.c === 2) && <span className="email">{contact.m}</span>}
+                    {contact && (
+                        megaChat.FORCE_EMAIL_LOADING || (contact.c === 1 || contact.c === 2)
+                    ) && <span className="email">{contact.m}</span>}
                 </div>
             </div>
         );

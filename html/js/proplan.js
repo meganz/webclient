@@ -110,6 +110,17 @@ pro.proplan = {
                 prevWindowWidth = currentWindowWidth;
             }
         });
+
+        if (window.nextPage === '1' && window.pickedPlan) {
+            const $planDiv = $('.pricing-page.plan.main[data-payment=' + window.pickedPlan + ']', 'body');
+            if ($planDiv.length) {
+                $('.pricing-page.plan.main', 'body').removeClass('selected');
+                $planDiv.addClass('selected');
+                showRegisterDialog();
+                delete window.nextPage;
+                delete window.pickedPlan;
+            }
+        }
     },
 
     /**

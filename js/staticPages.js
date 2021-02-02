@@ -245,7 +245,37 @@ mBroadcaster.once('boot_done', () => {
     pages.login = ' ';
     pages.registerb = ' ';
     showSignupPromptDialog = () => {
-        mega.redirect('mega.nz', 'pro');
+        'use strict';
+        const selectedPlan = $('.pricing-page.plan.selected', 'body').data('payment');
+        const kvLogin = [['next', 'propay_' + selectedPlan]];
+        const uLang = sessionStorage.lang || localStorage.lang;
+        if (uLang) {
+            kvLogin.push(['lang', uLang]);
+        }
+        const kvReg = [['next', '1'], ['plan', selectedPlan]];
+        if (is_mobile) {
+            const $mobileDlg = $('.mobile.loginrequired-dialog', '#startholder');
+            const closeMobileDlg = () => {
+                $mobileDlg.addClass('hidden').removeClass('overlay');
+                $('html').removeClass('overlayed');
+            };
+            $('.fm-dialog-close', $mobileDlg).rebind('tap', closeMobileDlg);
+            $('.register', $mobileDlg).rebind('tap', mega.redirect.bind(mega, 'mega.nz', 'register', kvReg, null));
+            $('.login', $mobileDlg).rebind('tap', mega.redirect.bind(mega, 'mega.nz', 'login', kvLogin, null));
+            $mobileDlg.removeClass('hidden').addClass('overlay');
+            $('html').addClass('overlayed');
+        }
+        else {
+            const $dlg = $('.loginrequired-dialog', '.common-dialogs');
+            $('.fm-dialog-title', $dlg).text(l[5841]);
+            $('.fm-notification-info', $dlg)
+                .safeHTML('<p>@@</p>', l[5842]);
+            $('.icon', $dlg).attr('class', 'icon pricing-sprite plan-icon pro' + selectedPlan);
+            $('.fm-dialog-close').rebind('click', closeDialog);
+            $('.pro-login').rebind('click', mega.redirect.bind(mega, 'mega.nz', 'login', kvLogin, null));
+            $('.pro-register').rebind('click', mega.redirect.bind(mega, 'mega.nz', 'pro', kvReg, null));
+            M.safeShowDialog('loginrequired', $dlg);
+        }
     };
 
     if (is_mobile) {

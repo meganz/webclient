@@ -75,8 +75,11 @@ function init_embed(ph, key, g) {
             link = '/file/' + ph + '#' + key;
         }
 
+        // XXX: as needed for mega.io given we cannot access the parent domain reliably of course..
+        var unfortunateHackpatch = ph === 'RvY01QZB' || ph === '8rI0GIrQ';
+
         // Remove header and logo on embed player when viewing the security video on /security page
-        if (under('security')) {
+        if (unfortunateHackpatch || under('security')) {
             $('.viewer-top-bl, .logo-container').remove();
             $('.viewer-bottom-bl').addClass('no-grad');
             $('.download.video-block').addClass('no-bg-color');

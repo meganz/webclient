@@ -200,13 +200,32 @@ function getCleanSitePath(path) {
         if (path.csp) {
             localStorage.csp = path.csp >>> 0 & 0xff;
         }
+        window.decodeParam = window.decodeParam || function(val) {
+            return atob((val + '=='.substr(2 - val.length * 3 & 3)).replace(/-/g, '+').replace(/_/g, '/'));
+        };
         if (path.sra) {
-            tryCatch(function(utm) {
-                localStorage.utm = atob(utm);
-            })((path.sra + '=='.substr(2 - path.sra.length * 3 & 3)).replace(/-/g, '+').replace(/_/g, '/'));
+            tryCatch(function() {
+                localStorage.utm = window.decodeParam(path.sra);
+            })();
         }
         if (path.mt) {
             window.uTagMT = path.mt;
+        }
+        if (path.next) {
+            tryCatch(function() {
+                window.nextPage = window.decodeParam(path.next);
+                if (path.txt) {
+                    window.nextTxt = window.decodeParam(path.txt);
+                }
+                if (path.plan) {
+                    window.pickedPlan = path.plan;
+                }
+            })();
+        }
+        if (path.lang) {
+            tryCatch(function() {
+                localStorage.lang = window.decodeParam(path.lang);
+            })();
         }
     }
 

@@ -2967,7 +2967,7 @@
     "20433": "Nie ma procedury odzyskiwania utraconych hase\u0142, pami\u0119taj, aby zawsze pami\u0119ta\u0107 has\u0142o",
     "20434": "Bajty",
     "20435": "%1 udost\u0119pni\u0142 Ci nast\u0119puj\u0105ce foldery:",
-    "20454": "Szyfrowana rotacja klucza jest nieco bezpieczniejsza, ale nie pozwala na utworzenie \u0142\u0105cza do czatu, a nowi uczestnicy nie zobacz\u0105 poprzednich wiadomo\u015bci.",
+    "20454": "Limit rozmiaru nie mo\u017ce by\u0107 aObr\u00f3t klucza szyfrowania jest nieco bezpieczniejszy, ale nie pozwala na utworzenie \u0142\u0105cza do czatu, a nowi uczestnicy nie zobacz\u0105 poprzednich wiadomo\u015bci.",
     "20460": "Jest aktywne po\u0142\u0105czenie. [A]Do\u0142\u0105cz[\/A]",
     "20461": "Brak folder\u00f3w w us\u0142udze Cloud Drive",
     "20462": "Twoje konto jest obecnie [B]zawieszone[\/B]. Mo\u017cesz tylko przegl\u0105da\u0107 swoje dane.",
@@ -2979,7 +2979,7 @@
     "20473": "Podzia\u0142 p\u0142atno\u015bci",
     "20474": "Zamierzasz zamkn\u0105\u0107 okno dialogowe. Wszystkie wprowadzone dane zostan\u0105 utracone.",
     "20481": "Uzyskaj link do czatu",
-    "20484": "Szyfrowana rotacja klucza jest nieco bezpieczniejsza, ale nie pozwala na utworzenie \u0142\u0105cza do czatu, a nowi uczestnicy nie zobacz\u0105 poprzednich wiadomo\u015bci.",
+    "20484": "Limit rozmiaru nie mo\u017ce by\u0107 aObr\u00f3t klucza szyfrowania jest nieco bezpieczniejszy, ale nie pozwala na utworzenie \u0142\u0105cza do czatu, a nowi uczestnicy nie zobacz\u0105 poprzednich wiadomo\u015bci.",
     "20487": "Usu\u0144 \u0142\u0105cze do czatu",
     "20552": "Bezpieczne przechowywanie w chmurze i komunikacja. [Br] Prywatno\u015b\u0107 wed\u0142ug projektu.",
     "20553": "Utw\u00f3rz konto MEGA, aby uzyska\u0107 [S]50 GB DARMOWEJ *[\/S] pami\u0119ci masowej",
@@ -4080,5 +4080,6 @@
     "24709": "Skopiowana instrukcja instalacji",
     "24738": "Je\u015bli chcesz przes\u0142a\u0107 kontrzawiadomienie o prawach autorskich za po\u015brednictwem naszego formularza internetowego, odwied\u017a t\u0119 stron\u0119 w przegl\u0105darce internetowej.",
     "24764": "Wygl\u0105da na to, \u017ce rabat, z kt\u00f3rego pr\u00f3bujesz skorzysta\u0107, jest ju\u017c powi\u0105zany z trwaj\u0105c\u0105 p\u0142atno\u015bci\u0105. Prosimy o cierpliwo\u015b\u0107. Je\u015bli istniej\u0105ca p\u0142atno\u015b\u0107 nie powiedzie si\u0119, b\u0119dziesz m\u00f3g\u0142 ponownie skorzysta\u0107 z rabatu.",
-    "24836": "Enter voucher code"
+    "24766": "Prosz\u0119 si\u0119 zalogowa\u0107, aby kontynuowa\u0107 zakup",
+    "24836": "Wpisz kod kuponu"
 }

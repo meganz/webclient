@@ -2680,7 +2680,7 @@
     "20003": "Adresse courriel d\u2019entreprise",
     "20004": "La s\u00e9curit\u00e9 et son importance",
     "20006": "Regardez la vid\u00e9o pour en apprendre davantage.",
-    "20011": "Plus robuste sera votre mot de passe, plus s\u00e9curis\u00e9 sera votre chiffrement. De nombreux gestionnaires de mots de passe offrent une fonction pour g\u00e9n\u00e9rer un mot de passe robuste et unique, par exemple [A]https:\/\/www.lastpass.com\/password-generator[\/A]",
+    "20011": "Plus robuste sera votre mot de passe, plus s\u00fbre sera votre chiffrement. De nombreux gestionnaires de mots de passe offrent une fonction pour g\u00e9n\u00e9rer un mot de passe robuste et unique, par exemple [A]https:\/\/www.lastpass.com\/password-generator[\/A]",
     "20013": "Un mot de passe robuste et unique est plus difficile \u00e0 m\u00e9moriser. Cependant, si vous l\u2019oubliez, vous perdrez l\u2019acc\u00e8s \u00e0 vos donn\u00e9es sur MEGA.[Br]C\u2019est pourquoi MEGA recommande l\u2019utilisation d\u2019un gestionnaire de mots de passe tel que\u00a0:",
     "20015": "Si vous \u00eates connect\u00e9, vous pouvez sauvegarder votre cl\u00e9 de r\u00e9cup\u00e9ration ici\u00a0: [A]https:\/\/mega.nz\/backup[\/A]",
     "20016": "Nous vous recommandons d\u2019activer l\u2019authentification \u00e0 deux facteurs pour ajouter une couche suppl\u00e9mentaire de s\u00e9curit\u00e9. Apprenez-en davantage ici\u00a0: [A]https:\/\/mega.nz\/blog_48[\/A] (page en anglais).[Br]MEGA recommande d\u2019utiliser l\u2019une des applis d\u2019authentification suivantes\u00a0:",
@@ -2967,7 +2967,7 @@
     "20433": "Il n\u2019y a aucune proc\u00e9dure de r\u00e9cup\u00e9ration de mot de passe perdu. Assurez-vous de vous souvenir de votre mot de passe en tout temps.",
     "20434": "octets",
     "20435": "%1 a partag\u00e9 les dossiers suivants avec vous\u00a0:",
-    "20454": "La rotation de la cl\u00e9 de chiffrement est un peu plus s\u00e9curis\u00e9e, mais elle ne vous permet pas de cr\u00e9er un lien de conversation, et les nouveaux participants ne verront pas les anciens messages.",
+    "20454": "La rotation de la cl\u00e9 de chiffrement est un peu plus s\u00fbre, mais elle ne vous permet pas de cr\u00e9er un lien de conversation, et les nouveaux participants ne verront pas les anciens messages.",
     "20460": "Un appel est en cours. [A]Vous y joindre[\/A]",
     "20461": "Il n\u2019y a aucun dossier dans le disque nuagique",
     "20462": "Votre compte est actuellement [B]d\u00e9sactiv\u00e9[\/B]. Vous ne pouvez que parcourir vos donn\u00e9es.",
@@ -2979,7 +2979,7 @@
     "20473": "R\u00e9partition des paiements",
     "20474": "Vous \u00eates sur le point de fermer la fen\u00eatre de dialogue. Toutes les donn\u00e9es saisies seront perdues.",
     "20481": "Obtenir le lien vers la conversation",
-    "20484": "La rotation de la cl\u00e9 de chiffrement est un peu plus s\u00e9curis\u00e9e, mais elle ne vous permet pas de cr\u00e9er un lien de conversation, et les nouveaux participants ne verront pas les anciens messages.",
+    "20484": "La rotation de la cl\u00e9 de chiffrement est un peu plus s\u00fbre, mais elle ne vous permet pas de cr\u00e9er un lien de conversation, et les nouveaux participants ne verront pas les anciens messages.",
     "20487": "Supprimer le lien de conversation",
     "20552": "Service de stockage nuagique et communications s\u00e9curis\u00e9s.[Br]Confidentialit\u00e9 et protection des donn\u00e9es d\u00e8s la conception.",
     "20553": "Cr\u00e9ez un compte MEGA pour obtenir un g\u00e9n\u00e9reux espace de stockage de [S]50\u00a0Go gratuitement*[\/S]",
@@ -3832,7 +3832,7 @@
     "24051": "D\u00e9finissez votre propre vidage automatique de la corbeille selon vos besoins.",
     "24053": "Commencez \u00e0 utiliser d\u00e8s aujourd\u2019hui le stockage nuagique s\u00e9curis\u00e9 et les transferts rapides de MEGA",
     "24054": "Commencer maintenant",
-    "24056": "Gr\u00e2ce \u00e0 notre chiffrement de bout en bout, la fa\u00e7on dont votre \u00e9quipe travaille n\u2019a jamais \u00e9t\u00e9 aussi s\u00e9curis\u00e9e ni vos donn\u00e9es aussi prot\u00e9g\u00e9es.",
+    "24056": "Gr\u00e2ce \u00e0 notre chiffrement de bout en bout, la fa\u00e7on dont votre \u00e9quipe travaille n\u2019a jamais \u00e9t\u00e9 aussi s\u00fbre ni vos donn\u00e9es aussi prot\u00e9g\u00e9es.",
     "24059": "[A]%1 fichiers[\/A] cr\u00e9\u00e9s par %3",
     "24060": "[A]%1 fichiers[\/A] modifi\u00e9s par %3",
     "24061": "une personne inconnue",
@@ -4080,5 +4080,6 @@
     "24709": "Le guide d\u2019installation a \u00e9t\u00e9 copi\u00e9",
     "24738": "Si vous souhaitez envoyer un contre-avis de droit d\u2019auteur gr\u00e2ce \u00e0 notre formulaire Web, veuillez acc\u00e9der \u00e0 cette page avec un navigateur pour ordinateur.",
     "24764": "Il semble que le rabais que vous tentez d\u2019utiliser est d\u00e9j\u00e0 associ\u00e9 \u00e0 un paiement en cours de traitement. Veuillez \u00eatre patient. Si le paiement en cours de traitement \u00e9choue, vous pourrez alors r\u00e9utiliser le rabais.",
-    "24836": "Enter voucher code"
+    "24766": "Veuillez vous connecter pour poursuivre l\u2019achat",
+    "24836": "Saisissez le code du bon"
 }

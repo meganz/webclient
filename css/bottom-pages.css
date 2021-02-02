@@ -3821,6 +3821,8 @@ a.opensource-icon-txt.coming-soon {
 /* Desktop download during onboarding phase */
 .bottom-page.onboarding-suggestions.megasync .megaapp-linux {
     margin-top: 0px;
+    margin-bottom: 32px;
+    z-index: 1000;
 }
 .bottom-page.onboarding-suggestions.megasync .megaapp-linux .default-select.megaapp-dropdown {
     width: 100%;

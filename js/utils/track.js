@@ -14,7 +14,7 @@ lazy(self, 'trk', function() {
     const urx = /^(file|folder|chat|embed|download|megadrop|fm\/(?:contacts|[\w-]{12,}|[\w-]{9,10}|[\w-]{3,7})|fm)\b/;
     const epx = [
         'businessinvite', 'businesssignup', 'cancel', 'confirm',
-        'emailverify', 'newsignup', 'payment', 'pwrevert', 'recover',
+        'discount', 'emailverify', 'newsignup', 'payment', 'pwrevert', 'recover',
         'unsub', 'verify', 'voucher'
     ];
     const idsite = location.host === 'mega.io' ? 2 : 1;
@@ -190,7 +190,7 @@ lazy(self, 'trk', function() {
             if (typeof cid !== 'string' || cid.length !== 16) {
                 return disable(cid);
             }
-            onIdle(dsp);
+            // onIdle(dsp);
             utm.fts = ts;
             utm.cid = cid;
         }
@@ -202,6 +202,10 @@ lazy(self, 'trk', function() {
         else if (action.startsWith('nav')) {
             if (!nav.id) {
                 data = Object.assign({}, data, await pf().catch(nop));
+            }
+
+            if (action.indexOf('^page:') > 0) {
+                action = action.replace(/\^page: \/\s*([^/]+)/, (m,p) => uri(p));
             }
 
             if (nav.pv !== action) {
@@ -239,7 +243,7 @@ lazy(self, 'trk', function() {
         }
 
         queue.push([ts, action, data, utm.lts, uri(page), nav.id]);
-        delay('trk:dsp', dsp, 2e4);
+        delay('trk:dsp', dsp, 2e5);
         return save(ts);
     };
 
@@ -333,7 +337,12 @@ lazy(self, 'trk', function() {
 
         if (path[0] === 'fm') {
             path[0] = 'cloud-drive';
+
+            if (path[1] === 'out-shares' || path[1] === 'public-links') {
+                path.splice(2);
+            }
         }
+
         if (path[1] === 'chat' && path.length > 3) {
             // remove room-id
             path.splice(path.length - 1, 1);
@@ -365,7 +374,7 @@ lazy(self, 'trk', function() {
                 sections = getCleanPath(page);
             }
             else if (/^\w+$/.test(page)) {
-                sections = [page];
+                sections = ['^page:', page];
             }
             else {
                 log('unhandled page', page);

@@ -1014,7 +1014,7 @@
      * @param len {Number}
      * @returns {Promise}
      */
-    ChatdPersist.prototype.retrieveChatHistory = promisify(function(resolve, reject, chatId, len) {
+    ChatdPersist.prototype.retrieveChatHistory = promisify(function(resolve, reject, chatId, len, highNum, lowNum) {
         var self = this;
 
         var waitingPromises = [];
@@ -1028,6 +1028,14 @@
             var lowHigh = chatRoom.messagesBuff.getLowHighIds(true);
             lownum = lowHigh ? lowHigh[0] : false;
             highnum = lowHigh ? lowHigh[1] : false;
+        }
+
+        if (highNum) {
+            highnum = highNum;
+        }
+
+        if (lowNum) {
+            lownum = lowNum;
         }
 
         var lastRetrOrdValue = len === Chatd.MESSAGE_HISTORY_LOAD_COUNT_INITIAL ? 0 : lownum;
@@ -1395,6 +1403,23 @@
             .catch(function(ex) {
                 self.logger.error("Failed to apply message update", chatId, messageInfo.messageId, messageInfo, ex);
             });
+    };
+
+    ChatdPersist.prototype.removeMessagesBefore = function(chatId, msgOrderValue) {
+        var self = this;
+        return new Promise(function(resolve, reject) {
+            self.db.msgs
+                .where('chatId')
+                .equals(ChatdPersist.encrypt(chatId))
+                .filter(function(item) {
+                    return item.orderValue < msgOrderValue;
+                })
+                .delete()
+                .then(function() {
+                    resolve(true);
+                }, console.error.bind(console))
+                .catch(reject);
+        });
     };
 
     /**

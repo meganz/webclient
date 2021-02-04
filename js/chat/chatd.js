@@ -1,6 +1,6 @@
 // chatd interface
 
-var CHATD_TAG = localStorage.chatdTag || '6';
+var CHATD_TAG = localStorage.chatdTag || '8';
 
 var Chatd = function(userId, megaChat, options) {
     var self = this;
@@ -174,6 +174,8 @@ Chatd.Opcode = {
     'NUMBYHANDLE': 46,
     'HANDLELEAVE': 47,
     'REACTIONSN': 48,
+    'MSGIDTIMESTAMP': 49,
+    'NEWMSGIDTIMESTAMP': 50
 };
 
 // privilege levels
@@ -259,6 +261,7 @@ Chatd.prototype._proxyEventsToRooms = function() {
         'onMessagesKeyIdDone',
         'onMessageIncludeKey',
         'onMarkAsJoinRequested',
+        'onRetentionChanged',
         'onAddReaction',
         'onDelReaction',
         'onReactionSn',
@@ -906,8 +909,7 @@ Chatd.cmdToString = function(cmd, tx) {
             result += " policy change on '" +
                 base64urlencode(cmd.substr(1, 8)) + "' by '" +
                 base64urlencode(cmd.substr(9, 8)) + "': " +
-                Chatd.unpack32le(cmd.substr(17, 4)) + " second(s)";
-
+                Chatd.unpack32le(cmd.substr(17, 2)) + " second(s)";
             return [result, 21];
 
         case Chatd.Opcode.NUMBYHANDLE:
@@ -953,6 +955,15 @@ Chatd.cmdToString = function(cmd, tx) {
                 "sn: " + base64urlencode(cmd.substr(9, 8));
 
             return [result, 17];
+
+        case Chatd.Opcode.MSGIDTIMESTAMP:
+        case Chatd.Opcode.NEWMSGIDTIMESTAMP:
+            // <msgxid.8> <msgid.8> <ts.4>
+            var msgxid2 = base64urlencode(cmd.substr(1, 8));
+            var msgId2 = base64urlencode(cmd.substr(9, 8));
+            var ts2 = Chatd.unpack32le(cmd.substr(17, 4));
+            result += " msgxid: " + msgxid2 + " msgId: " + msgId2 + " ts: " + ts2;
+            return [result, 21];
 
         default:
             if (cmd.length > 64) {
@@ -1607,17 +1618,20 @@ Chatd.Shard.prototype.exec = function(a) {
 
             case Chatd.Opcode.RETENTION:
                 self.keepAlive.restart();
+
+                var retentionTime = Chatd.unpack32le(cmd.substr(17, 4));
+                var handle = base64urlencode(cmd.substr(1, 8));
+
                 if (self.loggerIsEnabled) {
                     self.logger.log("Retention policy change on '" +
-                        base64urlencode(cmd.substr(1, 8)) + "' by '" +
+                        handle + "' by '" +
                         base64urlencode(cmd.substr(9, 8)) + "': " +
-                        Chatd.unpack32le(cmd.substr(17, 4)) + " second(s)");
+                        retentionTime + " second(s)");
                 }
 
                 self.chatd.trigger('onRetentionChanged', {
-                    chatId: base64urlencode(cmd.substr(1, 8)),
-                    userId: base64urlencode(cmd.substr(9, 8)),
-                    retention: Chatd.unpack32le(cmd.substr(17, 4))
+                    chatId: handle,
+                    retentionTime: retentionTime,
                 });
 
                 len = 21;
@@ -1826,6 +1840,41 @@ Chatd.Shard.prototype.exec = function(a) {
                 });
 
                 len = 13;
+                break;
+
+            case Chatd.Opcode.MSGIDTIMESTAMP:
+                self.keepAlive.restart();
+
+                if (self.loggerIsEnabled) {
+                    self.logger.log("MSG already exists: " + base64urlencode(cmd.substr(1, 8)) +
+                        " - " + base64urlencode(cmd.substr(9, 8)));
+                }
+                self.chatd.msgreject(
+                    cmd.substr(1, 8),
+                    cmd.substr(9, 8),
+                    Chatd.unpack32le(cmd.substr(17, 4))
+                );
+
+                len = 21;
+
+                break;
+
+            case Chatd.Opcode.NEWMSGIDTIMESTAMP:
+                self.keepAlive.restart();
+
+                if (self.loggerIsEnabled) {
+                    self.logger.log(
+                        "Sent message ID confirmed: '" + base64urlencode(cmd.substr(9, 8)) + "'");
+                }
+
+                self.chatd.msgconfirm(
+                    cmd.substr(1, 8),
+                    cmd.substr(9, 8),
+                    Chatd.unpack32le(cmd.substr(17, 4))
+                );
+
+                len = 21;
+
                 break;
 
             case Chatd.Opcode.ADDREACTION:
@@ -2613,13 +2662,14 @@ Chatd.Messages.prototype.joinrangehist = function() {
 };
 
 // msgid can be false in case of rejections
-Chatd.prototype.msgconfirm = function(msgxid, msgid) {
+Chatd.prototype.msgconfirm = function(msgxid, msgid, ts) {
+    "use strict";
     // CHECK: is it more efficient to keep a separate mapping of msgxid to Chatd.Messages?
     for (var chatId in this.chatIdMessages) {
         if (this.chatIdMessages[chatId]) {
             var messagekey = this.chatIdMessages[chatId].getmessagekey(msgxid, Chatd.MsgType.MESSAGE);
             if (this.chatIdMessages[chatId].sending[messagekey]) {
-                this.chatIdMessages[chatId].confirm(chatId, msgxid, msgid);
+                this.chatIdMessages[chatId].confirm(chatId, msgxid, msgid, ts);
                 break;
             }
         }
@@ -2627,13 +2677,14 @@ Chatd.prototype.msgconfirm = function(msgxid, msgid) {
 };
 
 // msg is rejected as it have already been sent, and the msgid is the confirmed msg id.
-Chatd.prototype.msgreject = function(msgxid, msgid) {
+Chatd.prototype.msgreject = function(msgxid, msgid, ts) {
+    "use strict";
     // CHECK: is it more efficient to keep a separate mapping of msgxid to Chatd.Messages?
     for (var chatId in this.chatIdMessages) {
         if (this.chatIdMessages[chatId]) {
             var messagekey = this.chatIdMessages[chatId].getmessagekey(msgxid, Chatd.MsgType.MESSAGE);
             if (this.chatIdMessages[chatId].sending[messagekey]) {
-                this.chatIdMessages[chatId].reject(msgxid, msgid);
+                this.chatIdMessages[chatId].reject(msgxid, msgid, ts);
                 break;
             }
         }
@@ -2805,6 +2856,7 @@ Chatd.prototype.onJoinRangeHistReject = function(chatIdBin, shardId) {
 
 // msg is rejected and the confirmed msg id is msgid
 Chatd.Messages.prototype.reject = function(msgxid, msgid) {
+    "use strict";
     var self = this;
 
     var messagekey = self.getmessagekey(msgxid, Chatd.MsgType.MESSAGE);
@@ -2851,7 +2903,8 @@ Chatd.Messages.prototype.reject = function(msgxid, msgid) {
 };
 
 // msgid can be false in case of rejections
-Chatd.Messages.prototype.confirm = function(chatId, msgxid, msgid) {
+Chatd.Messages.prototype.confirm = function(chatId, msgxid, msgid, ts) {
+    "use strict";
     var self = this;
 
     var messagekey = self.getmessagekey(msgxid, Chatd.MsgType.MESSAGE);
@@ -2876,6 +2929,9 @@ Chatd.Messages.prototype.confirm = function(chatId, msgxid, msgid) {
         self.buf[id] = self.sendingbuf[num];
         self.buf[id][Chatd.MsgField.MSGID] = msgid;
         var keyid = self.buf[id][Chatd.MsgField.KEYID];
+        if (ts) {
+            self.buf[id][Chatd.MsgField.TIMESTAMP] = ts;
+        }
         self.chatd.trigger('onMessageStore', {
             chatId: base64urlencode(self.chatId),
             id: id,

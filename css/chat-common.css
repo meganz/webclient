@@ -282,6 +282,21 @@
     color: #00BFA5;
     font-family: 'LatoWebSemiBold', Arial;
 }
+.chat-right-area .link-button.history-retention-btn {
+    height: 53px;
+}
+
+.chat-right-area .link-button.history-retention-btn .label--red {
+    line-height: 18px;
+    color: #F0373A;
+}
+
+.chat-right-area .link-button.history-retention-btn::before{
+    content: url('../images/temp/clock_ico.png');
+    left: 5px;
+    position: absolute;
+    top: 5px;
+}
 .chat-right-area .link-button.green {
     color: #00BFA5;
     font-family: 'LatoWebSemiBold', Arial;

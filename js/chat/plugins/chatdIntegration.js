@@ -1451,6 +1451,13 @@ ChatdIntegration.prototype._processDecryptedMessage = function(
                 handleUpdate: (decryptedResult.type === strongvelope.MESSAGE_TYPES.PUBLIC_HANDLE_CREATE) ? 1 : 0
             };
         }
+        else if (decryptedResult.type === strongvelope.MESSAGE_TYPES.MESSAGES_RETENTION) {
+            msgInstance.dialogType = 'messageRetention';
+            msgInstance.meta = {
+                userId: decryptedResult.sender,
+                retentionTime: Chatd.unpack32le(decryptedResult.payload),
+            };
+        }
         else {
             self.logger.error("Could not decrypt: ", decryptedResult);
             return false;
@@ -1566,15 +1573,6 @@ ChatdIntegration.prototype.markMessageAsReceived = function(chatRoom, msgid) {
         // Temporarily disabled, until we get into the state in which we need this again in the UI:
         // self.chatd.cmd(Chatd.Opcode.RECEIVED, base64urldecode(chatRoom.chatId), base64urldecode(msgid));
     }
-};
-
-ChatdIntegration.prototype.setRetention = function(chatRoom, time) {
-    var self = this;
-    self.chatd.cmd(
-        Chatd.Opcode.RETENTION,
-        base64urldecode(chatRoom.chatId),
-        Chatd.Const.UNDEFINED + Chatd.pack32le(time)
-    );
 };
 
 ChatdIntegration.prototype.sendNewKey = function(chatRoom, keyxid, keyBlob) {
@@ -1810,7 +1808,6 @@ ChatdIntegration.prototype.handleLeave = function(room) {
     'retrieveHistory',
     'markMessageAsSeen',
     'markMessageAsReceived',
-    'setRetention',
     'sendMessage',
     'updateMessage'
 ].forEach(function(fnName) {
@@ -1826,7 +1823,6 @@ ChatdIntegration.prototype.handleLeave = function(room) {
     'retrieveHistory',
     'markMessageAsSeen',
     'markMessageAsReceived',
-    'setRetention',
     'sendMessage',
     'updateMessage'
 ].forEach(function(fnName) {

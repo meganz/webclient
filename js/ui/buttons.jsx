@@ -63,6 +63,9 @@ export class Button extends MegaRenderMixin {
 
     renderChildren() {
         var self = this;
+        if (React.Children.count(self.props.children) < 1) {
+            return null;
+        }
 
         return React.Children.map(this.props.children, function (child) {
             return React.cloneElement(child, {

@@ -112,7 +112,7 @@ export default class Text extends AbstractGenericMessage {
                 const editButton = !IS_GEOLOCATION && (
                     <DropdownItem
                         icon="icons-sprite writing-pencil"
-                        label={__(l[1342]) /* `Edit` */}
+                        label={l[1342] /* `Edit` */}
                         onClick={() => this.props.onEditToggle(true)} />
                 );
                 messageActionButtons = (
@@ -131,7 +131,7 @@ export default class Text extends AbstractGenericMessage {
                             {editButton ? <hr/> : null}
                             <DropdownItem
                                 icon="red-cross"
-                                label={__(l[1730]) /* `Delete` */}
+                                label={l[1730] /* `Delete` */}
                                 className="red"
                                 onClick={e => this.props.onDelete(e, message)}
                             />

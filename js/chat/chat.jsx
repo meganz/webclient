@@ -344,6 +344,7 @@ Chat.prototype.init = promisify(function(resolve, reject) {
             self.trigger("onInit");
             mBroadcaster.sendMessage('chat_initialized');
             setInterval(self._syncDnd.bind(self), 60000);
+            setInterval(self.removeMessagesByRetentionTime.bind(self, null), 20000);
 
             return true;
         })
@@ -1200,7 +1201,8 @@ Chat.prototype.openChat = function(userHandles, type, chatId, chatShard, chatdUr
         null,
         chatHandle,
         publicChatKey,
-        ck
+        ck,
+        0
     );
 
     self.chats.set(room.roomId, room);
@@ -2678,6 +2680,31 @@ Chat.prototype.safeForceUpdate = SoonFc(60, function forceAppUpdate() {
         this.$conversationsAppInstance.forceUpdate();
     }
 });
+
+Chat.prototype.removeMessagesByRetentionTime = function(chatId) {
+    if (this.chats.length > 0) {
+        if (chatId) {
+            if (this.logger) {
+                this.logger.debug(`Chat.prototype.removeMessagesByRetentionTime chatId=${chatId}`);
+            }
+            var room = this.getChatById(chatId);
+            if (room) {
+                room.removeMessagesByRetentionTime();
+            }
+            return;
+        }
+        let chatIds = this.chats.keys();
+        for (var i = 0; i < chatIds.length; i++) {
+            let chatRoom = this.chats[chatIds[i]];
+            if (chatRoom.retentionTime > 0 && chatRoom.state === ChatRoom.STATE.READY) {
+                if (this.logger) {
+                    this.logger.debug(`Chat.prototype.removeMessagesByRetentionTime roomId=${chatRoom.roomId}`);
+                }
+                chatRoom.removeMessagesByRetentionTime();
+            }
+        }
+    }
+};
 
 Chat.prototype.loginOrRegisterBeforeJoining = function(chatHandle, forceRegister, forceLogin, notJoinReq) {
     if (!chatHandle && page !== 'securechat' && (page === 'chat' || page.indexOf('chat') > -1)) {

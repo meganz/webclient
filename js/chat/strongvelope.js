@@ -197,7 +197,8 @@ var strongvelope = {};
         CALL_STARTED:       0x07,
         PUBLIC_HANDLE_CREATE:    0x08,
         PUBLIC_HANDLE_DELETE:    0x09,
-        OPEN_MODE_CLOSED:        0x0a
+        OPEN_MODE_CLOSED:        0x0a,
+        MESSAGES_RETENTION: 0x0b
     };
     var MESSAGE_TYPES = strongvelope.MESSAGE_TYPES;
     var _KEYED_MESSAGES = [MESSAGE_TYPES.GROUP_KEYED,
@@ -467,6 +468,7 @@ var strongvelope = {};
                     logger.critical('Could not parse the content, probably a broken binary.');
                     return false;
                 }
+
                 tlvType = part.record[0].charCodeAt(0);
                 tlvVariable = _TLV_MAPPING[tlvType];
                 value = part.record[1];
@@ -478,6 +480,7 @@ var strongvelope = {};
                 }
 
                 // Some records need different treatment. Let's go through cases.
+                // console.log(constStateToText(TLV_TYPES, tlvType));
                 switch (tlvType) {
                     case TLV_TYPES.SIGNATURE:
                         parsedContent[tlvVariable] = value;
@@ -535,6 +538,7 @@ var strongvelope = {};
             logger.critical('Could not parse the content, probably a broken binary.');
             return false;
         }
+
         return parsedContent;
     };
 
@@ -1686,6 +1690,16 @@ var strongvelope = {};
 
                     proxyPromise.resolve(result);
                     return proxyPromise;
+                case MESSAGE_TYPES.MESSAGES_RETENTION:
+                    var proxyPromise2 = new MegaPromise();
+                    result = {
+                        sender: parsedMessage.invitor,
+                        type: parsedMessage.type,
+                        payload: parsedMessage.payload
+                    };
+
+                    proxyPromise2.resolve(result);
+                    return proxyPromise2;
 
                 default:
                     logger.critical('Invalid management message.');

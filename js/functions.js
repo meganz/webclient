@@ -1482,10 +1482,6 @@ function generateAnonymousReport() {
     return $promise;
 }
 
-function __(s) { // TODO: waiting for @crodas to commit the real __ code.
-    return s;
-}
-
 (function(scope) {
     var MegaAnalytics = function(id) {
         this.loggerId = id;

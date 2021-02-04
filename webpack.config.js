@@ -83,7 +83,13 @@ var webpackConfigs = {
                 raw: true,
                 banner: "/** @file automatically generated, do not edit it. */"
             })
-        ]
+        ],
+        devServer: {
+            watchContentBase: true,
+            watchOptions: {
+                ignored: [/\.(jsx)$/, 'js/**/*.jsx']
+            }
+        }
     },
     dist: {
         mode: 'production',

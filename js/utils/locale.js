@@ -551,6 +551,26 @@ function secondsToTimeShort(secs) {
     return val;
 }
 
+function hoursToSeconds(hours) {
+    'use strict';
+    return hours * 60 * 60;
+}
+
+function secondsToHours(seconds) {
+    'use strict';
+    return seconds / (60 * 60);
+}
+
+function daysToSeconds(days) {
+    'use strict';
+    return days * 24 * 60 * 60;
+}
+
+function secondsToDays(seconds) {
+    'use strict';
+    return seconds / (24 * 60 * 60);
+}
+
 /**
  * Calculate the number of days since the given date
  * @param {String} dateStr The date string, in YYYY-MM-DD format

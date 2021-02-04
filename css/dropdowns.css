@@ -125,6 +125,28 @@
 .dropdown.body.wide-dropdown {
     width: 240px;
 }
+
+.dropdown.body.retention-history-menu {
+    width: 162px;
+}
+
+.dropdown.body .retention-history-menu__list {
+    z-index: 300;
+}
+
+.dropdown.body .retention-history-menu__list > .retention-history-menu__list__elem,
+.dropdown.body .retention-history-menu__list > .retention-history-menu__list__elem--checked {
+    padding: 0 0 0 7px;
+    cursor: pointer;
+}
+
+.dropdown.body .retention-history-menu__list > .retention-history-menu__list__elem--checked::after {
+    content: url(../images/temp/check_ico.png);
+    top: 4px;
+    left: 125px;
+    position: absolute;
+}
+
 .dropdown.body .dropdown-item {
     position: relative;
     z-index: 10;

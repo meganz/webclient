@@ -8143,6 +8143,178 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
     top: 5px;
     width: 24px;
 }
+
+.fm-modal-dialog .fm-dialog .msg-retention-dialog {
+    width: 330px;
+    padding: 15px;
+    font-family: LatoWeb, Helvetica, sans-serif;
+}
+
+.text-width-wrapper {
+    height: auto;
+    position: absolute;
+    visibility: hidden;
+    white-space: nowrap;
+    width: auto;
+}
+
+/*
+* History Retention
+* ----------------------------------------------------------------------
+*/
+
+.fm-modal-dialog .fm-dialog .msg-retention-dialog .msg-retention-dialog__header {
+    text-align: center;
+}
+
+.fm-modal-dialog .fm-dialog .msg-retention-dialog .msg-retention-dialog__header .msg-retention-dialog__title {
+    max-width: 80%;
+    margin: 0 auto;
+    line-height: 20px;
+}
+
+.fm-modal-dialog .fm-dialog .msg-retention-dialog .msg-retention-dialog__title {
+    font-size: 15px;
+    font-weight: 600;
+    margin-top: 0;
+    color: #111;
+}
+
+.fm-modal-dialog .fm-dialog .msg-retention-dialog p {
+    color: #666;
+}
+
+.fm-modal-dialog .fm-dialog .msg-retention-dialog .msg-retention-dialog__header__footer {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 10px;
+}
+
+.fm-modal-dialog .fm-dialog .msg-retention-dialog .msg-retention-dialog__header__footer .default-green-button {
+    margin-left: 10px;
+}
+
+.fm-modal-dialog .fm-dialog .msg-retention-dialog .msg-retention-dialog__form {
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: center;
+}
+
+.fm-modal-dialog .fm-dialog .msg-retention-dialog .msg-retention-dialog__form {
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: center;
+    margin-top: 27px;
+}
+
+.fm-modal-dialog .fm-dialog .msg-retention-dialog .msg-retention-dialog__form__section {
+    position: relative;
+    width: 100%;
+}
+
+.fm-modal-dialog .fm-dialog .msg-retention-dialog .msg-retention-dialog__form__section__radio {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    height: 126px;
+    justify-content: space-between;
+    margin-top: 6px;
+    margin-bottom: 51px;
+}
+
+.fm-modal-dialog .fm-dialog .msg-retention-dialog .msg-retention-dialog__form__section__time {
+    width: 125px;
+    height: 32px;
+    padding-right: 40px;
+    padding-left: 10px;
+    margin-left: 15px;
+    border-radius: 4px;
+    border: 1px solid rgba(0,0,0,0.15);
+    box-sizing: border-box;
+    font-size: 13px;
+}
+
+.fm-modal-dialog .fm-dialog .msg-retention-dialog .msg-retention-dialog__form__section__placeholder {
+    position: absolute;
+    left: 44px;
+    top: 9px;
+    font-size: 13px;
+    color: #CCC;
+}
+
+.fm-modal-dialog .fm-dialog .msg-retention-dialog .msg-retention-dialog__form__section__time::placeholder {
+    color: #CCC;
+    font-size: 13px;
+}
+
+/*
+    custom radio buttons
+*/
+.fm-modal-dialog .fm-dialog .msg-retention-dialog .custom-radio {
+    cursor: pointer;
+    display: block;
+    position: relative;
+    padding-left: 30px;
+    padding-top: 4px;
+}
+
+.fm-modal-dialog .fm-dialog .msg-retention-dialog .custom-radio input.radio-btn {
+    opacity: 0;
+    position: absolute;
+    z-index: -1;
+}
+
+.fm-modal-dialog .fm-dialog .msg-retention-dialog .custom-radio-btn {
+    background: linear-gradient(180deg, #FFF 0%, #FCFCFC 100%);
+    border: solid 1px rgba(0, 0, 0, 0.05);
+    border-radius: 50%;
+    box-shadow: 0 1px 2px 0 rgba(0,0,0,0.15);
+    box-sizing: border-box;
+    cursor: pointer;
+    height: 18px;
+    left: 0;
+    opacity: 0.9;
+    position: absolute;
+    top: 2px;
+    width: 18px;
+}
+
+.fm-modal-dialog .fm-dialog .msg-retention-dialog .custom-radio .custom-radio-btn::before {
+    background-color: rgba(0, 0, 0, 0.05);
+    border-radius: 50%;
+    content: '';
+    height: 12px;
+    left: 2px;
+    position: absolute;
+    top: 2px;
+    width: 12px;
+}
+
+.fm-modal-dialog .fm-dialog .msg-retention-dialog .custom-radio .custom-radio-btn::after {
+    content: '';
+    display: none;
+    position: absolute;
+}
+
+.fm-modal-dialog .fm-dialog .msg-retention-dialog .custom-radio input.radio-btn:checked ~ .custom-radio-btn::after {
+    display: block;
+}
+
+.fm-modal-dialog .fm-dialog .msg-retention-dialog .custom-radio .custom-radio-btn::after {
+    background: linear-gradient(to bottom, rgba(0,191,165,1) 0%, rgba(0,148,128,1) 100%);
+    border-radius: 50%;
+    content: '';
+    height: 12px;
+    left: 2px;
+    position: absolute;
+    top: 2px;
+    width: 12px;
+}
+
+/*
+end custom radio button
+*/
+
 .dlkey-dialog .decryption-key input {
     text-indent: 0px;
     margin-left: 36px;

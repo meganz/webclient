@@ -655,6 +655,29 @@ Message.prototype.getManagementMessageSummaryText = function() {
     }
 };
 
+/**
+ * getMessageRetentionSummary
+ * @description Returns text summary for `messageRetention` message type.
+ * @example
+ * message.getMessageRetentionSummary()
+ * => `Disabled the message retention`
+ * message.getMessageRetentionSummary()
+ * => `Changed the message retention to 3 months`
+ * @returns {string}
+ */
+
+Message.prototype.getMessageRetentionSummary = function() {
+    'use strict';
+    var retentionTime = this.meta.retentionTime;
+    var retentionSummary = retentionTime === 0 ?
+        // `Disabled the message clearing`
+        l[23442] :
+        // `Changed the message clearing to [X] day/days`
+        l[23441].replace('[X]', this.chatRoom.getRetentionLabel(retentionTime));
+
+    return escapeHTML(retentionSummary);
+};
+
 Message.prototype.isEditable = function() {
     return this.userId === u_handle && (unixtime() - this.delay) < MESSAGE_NOT_EDITABLE_TIMEOUT;
 };
@@ -877,6 +900,7 @@ function MessagesBuff(chatRoom, chatdInt) {
     self.chatdPersist = self.chatd.chatdPersist;
 
     self.messages = new MessageBuffSortedMap("messageId", MessagesBuff.orderFunc, this);
+    self.messagesToBeRemoved = new Map();
     self.sharedFiles = new MegaDataSortedMap("messageId", MessagesBuff.orderFunc, this);
     self.messagesBatchFromHistory = new MegaDataSortedMap("messageId", MessagesBuff.orderFunc);
     self.sharedFilesBatchFromHistory = new MegaDataSortedMap("messageId", MessagesBuff.orderFunc);
@@ -1002,6 +1026,16 @@ function MessagesBuff(chatRoom, chatdInt) {
                 chatRoom.setState(ChatRoom.STATE.READY);
             }
         }
+    });
+
+    /**
+     * When user either setup a retention time or retention time is provided by chatd
+     * And messages are deleted from local db (if is available) and from memory (UI)
+     * If messages are inside the time frame
+     */
+    self.chatRoom.rebind('onRetentionChanged.messagesBuff' + chatRoomId, function(e, eventData) {
+        self.chatRoom.retentionTime = eventData.retentionTime;
+        self.chatRoom.removeMessagesByRetentionTime();
     });
 
     self.chatRoom.rebind('onMessageConfirm.messagesBuff' + chatRoomId, function(e, eventData) {
@@ -1149,11 +1183,13 @@ function MessagesBuff(chatRoom, chatdInt) {
 
 
         if (!eventData.isNew) {
+            // console.log('!eventData.isNew');
             if (typeof self.expectedMessagesCount !== 'undefined') {
                 self.expectedMessagesCount--;
             }
 
             if (!self.isRetrievingSharedFiles) {
+                // console.log('!self.isRetrievingSharedFiles');
                 if (eventData.userId !== u_handle) {
                     if (self.lastDeliveredMessageRetrieved === true) {
                         // received a message from history, which was NOT marked as received, e.g. was sent during
@@ -1162,6 +1198,7 @@ function MessagesBuff(chatRoom, chatdInt) {
 
                     }
                 }
+                // console.log('self.messagesBatchFromHistory.push(msgObject)');
                 self.messagesBatchFromHistory.push(msgObject);
             }
             else {
@@ -2250,6 +2287,12 @@ MessagesBuff.prototype.detachMessages = SoonFc(70, function() {
         return false;
     }
 
+    // var lengthBefore = self.messages.length;
+
+    // self.logger.info(
+    //     "messages in memory: ", lengthBefore
+    // );
+
     var detachCount = self.chatRoom.isCurrentlyActive ? Chatd.MESSAGE_HISTORY_LOAD_COUNT * 2 : 3;
     if (self.messages.length > detachCount) {
         var deletedItems = self.messages.splice(0,  self.messages.length - detachCount);
@@ -2275,6 +2318,18 @@ MessagesBuff.prototype.detachMessages = SoonFc(70, function() {
             }
         }
 
+        // self.logger.info(
+        //     "messages detached from memory: ", lengthBefore - self.messages.length
+        // );
+        //
+        // self.logger.info(
+        //     "messages in memory now: ", self.messages.length
+        // );
+        //
+        // self.logger.info(
+        //     'removedAnyMessage === true && self.retrievedAllMessages',
+        //     removedAnyMessage === true && self.retrievedAllMessages
+        // );
         if (self.retrievedAllMessages) {
             self.retrievedAllMessages = false;
         }
@@ -2296,6 +2351,10 @@ MessagesBuff.prototype._removeMessagesBefore = function(messageId) {
         return;
     }
     var ts = found.delay + (found.updated ? found.updated : 0);
+    var lengthBefore = self.messages.length;
+    self.logger.info(
+        "messages in memory now: ", lengthBefore
+    );
 
     for (var i = self.messages.length - 1; i >= 0; i--) {
         var currentMessage = self.messages.getItem(i);
@@ -2303,6 +2362,10 @@ MessagesBuff.prototype._removeMessagesBefore = function(messageId) {
             self.messages.removeByKey(currentMessage.messageId);
         }
     }
+
+    self.logger.info(
+        "messages removed from memory: ", lengthBefore - self.messages.length
+    );
 };
 
 
@@ -2367,6 +2430,9 @@ MessagesBuff.prototype.getRenderableSummary = function(lastMessage) {
     else {
         if (lastMessage.isManagement && lastMessage.isManagement()) {
             renderableSummary = lastMessage.getManagementMessageSummaryText();
+        }
+        else if (!lastMessage.textContents && lastMessage.dialogType === "messageRetention") {
+            renderableSummary = lastMessage.getMessageRetentionSummary();
         }
         else if (!lastMessage.textContents && lastMessage.dialogType) {
             renderableSummary = Message._getTextContentsForDialogType(lastMessage);

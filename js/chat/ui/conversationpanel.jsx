@@ -5,6 +5,7 @@ import {MegaRenderMixin, timing, SoonFcWrap} from './../../stores/mixins.js';
 import {Button} from './../../ui/buttons.jsx';
 import ModalDialogsUI from './../../ui/modalDialogs.jsx';
 import CloudBrowserModalDialog from './../../ui/cloudBrowserModalDialog.jsx';
+import { HistoryRetentionDialog } from './../../ui/historyRetentionDialog.jsx';
 import { Dropdown, DropdownItem, DropdownContactsSelector } from './../../ui/dropdowns.jsx';
 import { ContactCard, MembersAmount } from './../ui/contacts.jsx';
 import { TypingArea } from './../ui/typingArea.jsx';
@@ -18,6 +19,7 @@ import { AltPartsConvMessage }  from './messages/alterParticipants.jsx';
 import { TruncatedMessage } from './messages/truncated.jsx';
 import { PrivilegeChange } from './messages/privilegeChange.jsx';
 import { TopicChange } from './messages/topicChange.jsx';
+import { RetentionChange } from './messages/retentionChange.jsx';
 import { SharedFilesAccordionPanel } from './sharedFilesAccordionPanel.jsx';
 import { IncSharesAccordionPanel } from './incomingSharesAccordionPanel.jsx';
 import { CloseOpenModeMessage } from './messages/closeOpenMode.jsx';
@@ -85,6 +87,10 @@ export class ConversationRightArea extends MegaRenderMixin {
             }
         }
         return true;
+    }
+    setRetention(chatRoom, retentionTime) {
+        chatRoom.setRetention(retentionTime);
+        $(document).trigger('closeDropdowns');
     }
     render() {
         const self = this;
@@ -283,6 +289,68 @@ export class ConversationRightArea extends MegaRenderMixin {
             </div>
         );
 
+        //
+        // History Retention
+        // ----------------------------------------------------------------------
+
+        let retentionTime = room.retentionTime ? secondsToDays(room.retentionTime) : 0;
+        const BASE_CLASSNAME = 'dropdown-item link-button light';
+        const ELEM_CLASSNAME = `${BASE_CLASSNAME} retention-history-menu__list__elem`;
+        const ELEM_CLASSNAME_ACTIVE = `${BASE_CLASSNAME} retention-history-menu__list__elem--checked`;
+        const retentionHistoryBtn = <Button
+            className="link-button colorized light history-retention-btn"
+            label={l[23436]}
+            disabled={!room.iAmOperator() || room.isReadOnly()}
+            secondLabel={room.getRetentionLabel()}
+            secondLabelClass="label--red"
+            chatRoom={room}>
+            {room.iAmOperator() ?
+                <Dropdown
+                    className="retention-history-menu light"
+                    noArrow="false"
+                    vertOffset={-53}
+                    horizOffset={-205}>
+                    <div className="retention-history-menu__list">
+                        <div
+                            className={retentionTime === 0 ? ELEM_CLASSNAME_ACTIVE : ELEM_CLASSNAME}
+                            onClick={() => this.setRetention(room, 0)}>
+                            {l[7070]}
+                        </div>
+                        <div
+                            className={retentionTime === 1 ? ELEM_CLASSNAME_ACTIVE : ELEM_CLASSNAME}
+                            onClick={() => this.setRetention(room, daysToSeconds(1))}>
+                            {l[23437]}
+                        </div>
+                        <div
+                            className={retentionTime === 7 ? ELEM_CLASSNAME_ACTIVE : ELEM_CLASSNAME}
+                            onClick={() => this.setRetention(room, daysToSeconds(7))}>
+                            {l[23438]}
+                        </div>
+                        <div
+                            className={
+                                retentionTime === 30 ? ELEM_CLASSNAME_ACTIVE : ELEM_CLASSNAME
+                            }
+                            onClick={() => this.setRetention(room, daysToSeconds(30))}>
+                            {l[23439]}
+                        </div>
+                        <div
+                            className={
+                                [0, 1, 7, 30].indexOf(retentionTime) === -1 ?
+                                    ELEM_CLASSNAME_ACTIVE :
+                                    ELEM_CLASSNAME
+                            }
+                            onClick={() => {
+                                $(document).trigger('closeDropdowns');
+                                self.props.onHistoryRetentionConfig();
+                            }}>
+                            {l[23440]}
+                        </div>
+                    </div>
+                </Dropdown> :
+                null
+            }
+        </Button>;
+
         var expandedPanel = {};
         if (room.type === "group" || room.type === "public") {
             expandedPanel['participants'] = true;
@@ -441,6 +509,8 @@ export class ConversationRightArea extends MegaRenderMixin {
                                 <span>{l[8871]}</span>
                             </div>
 
+                                {retentionHistoryBtn}
+
                             {
                                 (room.iAmOperator() && (room.type === "public")) ?
                                     (
@@ -571,6 +641,7 @@ export class ConversationPanel extends MegaRenderMixin {
             pushSettingsValue: null,
             messageToBeDeleted: null,
             editing: false,
+            showHistoryRetentionDialog: false,
             setNonLoggedInJoinChatDlgTrue: null
         };
 
@@ -1292,7 +1363,14 @@ export class ConversationPanel extends MegaRenderMixin {
                             contact={Message.getContactForMessage(v)}
                             grouped={grouped}
                             chatRoom={room}
-                        />
+                        />;
+                    }
+                    else if (v.dialogType === 'messageRetention') {
+                        messageInstance = <RetentionChange
+                            message={v}
+                            key={v.messageId}
+                            contact={Message.getContactForMessage(v)}
+                        />;
                     }
                     messagesList.push(messageInstance);
                 } else {
@@ -1902,6 +1980,18 @@ export class ConversationPanel extends MegaRenderMixin {
                 showLastGreen={true}
                 key={contact.u} />;
         }
+        let historyRetentionDialog = null;
+        if (self.state.showHistoryRetentionDialog === true) {
+            historyRetentionDialog = <HistoryRetentionDialog
+                chatRoom={room}
+                title={''}
+                name="rename-group"
+                className=""
+                onClose={() => {
+                    self.setState({ showHistoryRetentionDialog: false });
+                }}
+            />;
+        }
 
         var startCallDisabled = isStartCallDisabled(room);
         var startCallButtonClass = startCallDisabled ? " disabled" : "";
@@ -1968,6 +2058,9 @@ export class ConversationPanel extends MegaRenderMixin {
                                 ) :
                                 pushNotificationSettings.setDnd(room.chatId, 0);
                         }}
+                        onHistoryRetentionConfig={function() {
+                            self.setState({showHistoryRetentionDialog: true});
+                        }}
                         onAddParticipantSelected={function(contactHashes) {
                             self.props.chatRoom.scrolledToBottom = true;
 
@@ -2017,6 +2110,7 @@ export class ConversationPanel extends MegaRenderMixin {
                     {attachCloudDialog}
                     {sendContactDialog}
                     {confirmDeleteDialog}
+                    {historyRetentionDialog}
                     {confirmTruncateDialog}
                     {pushSettingsDialog}
 

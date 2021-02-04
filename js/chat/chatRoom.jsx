@@ -1,8 +1,4 @@
-var utils = require("../utils.jsx");
-var React = require("react");
-var ConversationPanelUI = require("./ui/conversationpanel.jsx");
-
-
+export const RETENTION_FORMAT = { HOURS: l[7132], DAYS: l[16290], WEEKS: l[16293], MONTHS: l[6788], DISABLED: l[7070] };
 
 /**
  * Class used to represent a MUC Room in which the current user is present
@@ -18,7 +14,7 @@ var ConversationPanelUI = require("./ui/conversationpanel.jsx");
  */
 var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, chatId, chatShard, chatdUrl, noUI,
                          publicChatHandle, publicChatKey,
-                         ck) {
+                         ck, retentionTime) {
     var self = this;
 
     this.logger = MegaLogger.getLogger("room[" + roomId + "]", {}, megaChat.logger);
@@ -52,7 +48,8 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
             showArchived: false,
             observers: 0,
             dnd: null,
-            alwaysNotify: null
+            alwaysNotify: null,
+            retentionTime: 0
         }
     );
 
@@ -76,6 +73,9 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
 
     this.callRequest = null;
     this.shownMessages = {};
+    this.retentionTime = retentionTime;
+    this.retentionLabel = '';
+
     this.activeSearches = 0;
     self.members = {};
 
@@ -536,6 +536,178 @@ ChatRoom.prototype.getCallParticipants = function() {
 
 ChatRoom.prototype.getChatIdMessages = function() {
     return this.chatd.chatIdMessages[this.chatIdBin];
+};
+
+/**
+ * getRetentionFormat
+ * @description Extrapolate the retention format based on retention time. If no `retentionTime` parameter is passed,
+ * the format extrapolation is based on the `retentionTime` set for the given chat room.
+ * @see RETENTION_FORMAT
+ * @param {number} [retentionTime] The retention time timestamp
+ * @returns {string} The retention time format, e.g. `hours`, `days`, `weeks`, `months` or `disabled`
+ */
+
+ChatRoom.prototype.getRetentionFormat = function(retentionTime) {
+    retentionTime = retentionTime || this.retentionTime;
+    switch (true) {
+        case retentionTime === 0:
+            return RETENTION_FORMAT.DISABLED;
+        case retentionTime % daysToSeconds(30) === 0 || /* 365 days */ retentionTime >= 31536000:
+            return RETENTION_FORMAT.MONTHS;
+        case retentionTime % daysToSeconds(7) === 0:
+            return RETENTION_FORMAT.WEEKS;
+        case retentionTime % daysToSeconds(1) === 0:
+            return RETENTION_FORMAT.DAYS;
+        default:
+            return RETENTION_FORMAT.HOURS;
+    }
+};
+
+/**
+ * getRetentionLabel
+ * @description Returns formatted retention label as a string. The formatting takes into account singular/plural forms
+ * based on the specific retention time. The formatting is based on the `retentionTime` for the given chat room, if no
+ * `retentionTime` is passed as parameter.
+ * @example
+ * room.retentionTime
+ * => 1209600
+ * room.getRetentionLabel()
+ * => `2 weeks`
+ * room.retentionTime
+ * => 0
+ * room.getRetentionLabel()
+ * > `Disabled`
+ * @see RETENTION_FORMAT
+ * @param {number} retentionTime
+ * @returns {string}
+ */
+
+ChatRoom.prototype.getRetentionLabel = function(retentionTime) {
+    retentionTime = retentionTime || this.retentionTime;
+    const days = secondsToDays(retentionTime);
+    const months = Math.floor(days / 30);
+
+    switch (this.getRetentionFormat(retentionTime)) {
+        case RETENTION_FORMAT.DISABLED:
+            // `Disabled`
+            return l[7070];
+        case RETENTION_FORMAT.MONTHS:
+            // `month` || `months`
+            return `${months} ${months === 1 ? l[913] : l[6788]}`;
+        case RETENTION_FORMAT.WEEKS:
+            // `week` || `weeks`
+            return `${days / 7} ${days / 7 === 1 ? l[16292] : l[16293]}`;
+        case RETENTION_FORMAT.DAYS:
+            // `day` || `days`
+            return `${days} ${days === 1 ? l[930] : l[16290]}`;
+        case RETENTION_FORMAT.HOURS:
+            // `hour` || `hours`
+            return `${secondsToHours(retentionTime)} ${secondsToHours(retentionTime) === 1 ? l[7133] : l[7132]}`;
+    }
+};
+
+/**
+ * setRetention
+ * @description Sets the retention time for given chat room.
+ * @param {String} time The retention time
+ * @param {Boolean} [isHours] Optional flag to indicate that the retention time is in hours
+ * @returns {void}
+ */
+
+ChatRoom.prototype.setRetention = function(time) {
+    asyncApiReq({
+        "a": "mcsr", // mega chat set retention
+        "id": this.chatId,
+        "d": time, // duration in seconds, a value <= 0 turns the feature off
+        "ds": 1 // flag to indicate `d` is in seconds, instead of days (optional, for testing purposes ONLY)
+    });
+};
+
+ChatRoom.prototype.removeMessagesByRetentionTime = function() {
+    var self = this;
+    var messages = self.messagesBuff.messages;
+    if (messages.length === 0 || this.retentionTime === 0) {
+        return;
+    }
+
+    var newest = messages.getItem(messages.length - 1);
+    var lowestValue = newest.orderValue;
+    var deleteFrom = null;
+    var lastMessage = null;
+    var deletePreviousTo = (new Date() - self.retentionTime * 1000) / 1000;
+
+    let cp = self.megaChat.plugins.chatdIntegration.chatd.chatdPersist;
+
+    var finished = false;
+    if (typeof cp !== 'undefined') {
+        var done = function(message) {
+            if (message) {
+                if (self.retentionTime > 0 && self.messagesBuff.messages.length > 0) {
+                    self.messagesBuff._removeMessagesBefore(message.messageId);
+                }
+
+                cp.removeMessagesBefore(
+                    self.chatId,
+                    message.orderValue
+                );
+            }
+        };
+
+        if (newest.delay < deletePreviousTo) {
+            // newest message is older then the retention time set, clear all history for this chat
+            cp.clearChatHistoryForChat(
+                self.chatId
+            );
+            return;
+        }
+
+        var removeMsgs = function() {
+            cp._paginateMessages(
+                lowestValue,
+                Chatd.MESSAGE_HISTORY_LOAD_COUNT,
+                self.chatId
+            )
+                .then(function(messages) {
+                    messages = messages[0];
+
+                    if (messages.length) {
+                        for (let i = 0; i < messages.length; i++) {
+                            let message = messages[i];
+                            if (message.msgObject.delay < deletePreviousTo) {
+                                deleteFrom = lastMessage || message;
+                                break;
+                            }
+                            lastMessage = message;
+                            lowestValue = message.orderValue;
+                        }
+                    }
+                    else {
+                        finished = true;
+                    }
+
+                    if (!finished && !deleteFrom) {
+                        onIdle(removeMsgs);
+                    }
+                    else {
+                        done(deleteFrom);
+                    }
+                });
+        };
+        removeMsgs();
+    }
+    if (self.retentionTime > 0 && self.messagesBuff.messages.length > 0) {
+        var message;
+        while ((message = self.messagesBuff.messages.getItem(0))) {
+            if (message.delay < deletePreviousTo) {
+                if (!self.messagesBuff.messages.removeByKey(message.messageId)) {
+                    break;
+                }
+            }
+            else {
+                break;
+            }
+        }
+    }
 };
 
 ChatRoom.prototype.isOnline = function() {

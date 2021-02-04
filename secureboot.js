@@ -57,6 +57,7 @@ var is_android = /android/.test(ua);
 var is_bot = !is_extension && /bot|crawl/i.test(ua);
 var is_old_windows_phone = /Windows Phone 8|IEMobile\/9|IEMobile\/10|IEMobile\/11/i.test(ua);
 var is_uc_browser = /ucbrowser/.test(ua);
+var is_webcache = location.host === 'webcache.googleusercontent.com';
 var is_livesite = location.host === 'mega.nz' || location.host === 'mega.io' || is_extension;
 var is_litesite = !is_embed && location.host === 'mega.io';
 self.fetchStreamSupport = (
@@ -139,7 +140,7 @@ function getSitePath() {
         return '/' + hash;
     }
 
-    if (location.host === 'webcache.googleusercontent.com') {
+    if (is_webcache) {
         var m = String(location.href).match(/mega\.nz\/([\w-]+)/);
         if (m) {
             return '/' + m[1];
@@ -468,10 +469,6 @@ if (!browserUpdate) try
             throw new Error('SecurityError: DOM Exception 18');
         }
 
-        // Enable logging on smoketest.static.mega.co.nz (old smoketest) and smoketest.mega.nz (new smoketest)
-        if (typeof localStorage.d === 'undefined' && location.host.indexOf('smoketest') > -1) {
-            localStorage.d = 1;
-        }
         d = localStorage.d | 0;
         jj = localStorage.jj;
         dd = localStorage.dd;
@@ -530,12 +527,6 @@ if (!browserUpdate) try
         }
         tmp = undefined;
 
-        if (location.host !== 'mega.nz' && !is_karma) {
-            dd = d = 1;
-            if (!is_mobile) {
-                jj = 1;
-            }
-        }
         setTimeout(function() {
             console.warn('Apparently you have Cookies disabled, ' +
                 'please note this session is temporal, ' +
@@ -543,10 +534,14 @@ if (!browserUpdate) try
         }, 4000);
     }
 
-    if (!is_extension && (window.dd ||
-        (location.host !== 'mega.nz' &&
-            location.host !== 'mega.io' &&
-            location.host !== 'webcache.googleusercontent.com'))) {
+    if (!is_livesite && !is_karma) {
+        dd = d = d > 0 ? d : !localStorage.nfd;
+        if (!is_mobile) {
+            jj = !!d;
+        }
+    }
+
+    if (!is_extension && (window.dd || !is_livesite && !is_webcache)) {
 
         if (location.host === 'smoketest.mega.nz') {
             cmsStaticPath = 'https://smoketest.static.mega.nz/cms/';
@@ -556,8 +551,6 @@ if (!browserUpdate) try
         else {
             nocontentcheck = sessionStorage.dbgContentCheck ? 0 : true;
             var devhost = window.location.host;
-
-            cmsStaticPath = 'https://smoketest.static.mega.nz/cms/';
 
             // Set the static path and default static path for debug mode to be the same
             staticpath = window.location.protocol + "//" + devhost + "/";
@@ -569,24 +562,13 @@ if (!browserUpdate) try
         }
     }
 
-    // Override any set static path with the one from localStorage to test standard static server failure
-    if (localStorage.getItem('staticpath') !== null) {
-        staticpath = localStorage.staticpath;
-    }
-
-    // Override any set cms static path with the one from localStorage to test standard static server failure
-    if (localStorage.cms) {
-        cmsStaticPath = localStorage.cms;
-    }
-
     // Override the default static path to test recovery after standard static server failure
     if (localStorage.getItem('defaultstaticpath') !== null) {
         defaultStaticPath = localStorage.defaultstaticpath;
     }
 
-    staticpath = staticpath || geoStaticPath(false);
-    // cms static path
-    cmsStaticPath = cmsStaticPath || geoStaticPath(true);
+    staticpath = localStorage.staticpath || staticpath || geoStaticPath(false);
+    cmsStaticPath = localStorage.cms || cmsStaticPath || geoStaticPath(true);
 
     apipath = localStorage.apipath || 'https://g.api.mega.co.nz/';
 
@@ -621,7 +603,7 @@ catch(e) {
     }
 }
 
-is_litesite = is_litesite || (localStorage.testIO && !is_embed);
+is_litesite = is_litesite || !is_livesite && localStorage.testIO;
 if (location.host === 'mega.io') {
     tmp = document.head.querySelector('meta[property="og:url"]');
     if (tmp) {

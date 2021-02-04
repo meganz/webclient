@@ -259,19 +259,40 @@ var watchdog = Object.freeze({
                 break;
 
             case 'setsid':
-                if (typeof dlmanager === 'object' && dlmanager.isOverQuota) {
+                if (this.Strg.login === strg.origin && strg.data) {
+                    const sid = strg.data;
 
-                    // another tab fired a login/register while this one has an overquota state
-                    var sid = strg.data;
-                    delay('watchdog:setsid', function() {
-                        // the other tab must have sent the new sid
-                        console.assert(sid, 'sid not set');
+                    delay('watchdog:setsid', () => {
                         api_setsid(sid);
-                    }, 2000);
+                        u_storage.sid = sid;
+
+                        u_checklogin({
+                            checkloginresult: (ctx, r) => {
+                                u_type = r;
+                                onIdle(topmenuUI);
+                            }
+                        });
+                    }, 9e2);
+
+                    delete this.Strg.login;
                 }
                 break;
 
-            case 'login':
+            case 'login': {
+                const data = strg.data;
+
+                if (data[0]) {
+                    u_storage = init_storage(sessionStorage);
+                    u_storage.k = JSON.stringify(data[0]);
+                }
+                else {
+                    u_storage = init_storage(localStorage);
+                }
+                this.Strg.login = strg.origin;
+
+                break;
+            }
+
             case 'createuser':
                 if (!M.hasPendingTransfers()) {
                     loadingDialog.show();

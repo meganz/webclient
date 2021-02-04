@@ -643,6 +643,11 @@ mega.metatags = new function() {
             mTags.mega_title = 'Desktop Onboarding - MEGA';
             stopBots(metaRobots);
         }
+        else if (page === 'troy-hunt' || page === 'troy-hunt/pro' || page === 'troy-hunt/business') {
+            mTags.mega_title = 'Troy Hunt - MEGA';
+            mTags.mega_desc = 'MEGA\'s Troy Hunt Page';
+            stopBots(metaRobots);
+        }
         else if (page && (mTags.excluded = isPageExcluded(page))) {
             mTags.mega_title = page.charAt(0).toUpperCase() + page.slice(1) + ' - MEGA';
             stopBots(metaRobots);

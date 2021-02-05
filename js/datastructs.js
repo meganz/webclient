@@ -555,7 +555,7 @@ MegaDataMap.prototype.set = function(k, v, ignoreTrackDataChange) {
     }
 
     if (_cmp(this._data[k], v) === true) {
-        return;
+        return false;
     }
 
     this._data[k] = v;

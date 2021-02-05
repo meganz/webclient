@@ -290,38 +290,82 @@ class ConfirmDialog extends MegaRenderMixin {
         'dontShowAgainCheckbox': true,
         'hideable': true
     };
-    constructor (props) {
+
+    static saveState(o) {
+        let state = mega.config.get('xcod') >>> 0;
+        mega.config.set('xcod', state | 1 << o.props.pref);
+    }
+
+    static clearState(o) {
+        let state = mega.config.get('xcod') >>> 0;
+        mega.config.set('xcod', state & ~(1 << o.props.pref));
+    }
+
+    static autoConfirm(o) {
+        console.assert(o.props.pref > 0);
+        let state = mega.config.get('xcod') >>> 0;
+        return !!(state & 1 << o.props.pref);
+    }
+
+    constructor(props) {
         super(props);
         this._wasAutoConfirmed = undefined;
+        this._keyUpEventName = 'keyup.confirmDialog' + this.getUniqueId();
+
+        if (Date.now() < 1616e9) {
+            mega.config.remove('xccd');
+        }
+        else {
+            console.error('^ REMOVE ME');
+        }
+
+        /** @property this._autoConfirm */
+        lazy(this, '_autoConfirm', () =>
+            this.props.onConfirmClicked
+            && this.props.dontShowAgainCheckbox
+            && ConfirmDialog.autoConfirm(this));
     }
     unbindEvents() {
-        $(document).off('keyup.confirmDialog' + this.getUniqueId());
+        $(document).off(this._keyUpEventName);
     }
     componentDidMount() {
         super.componentDidMount();
-        var self = this;
 
         // since ModalDialogs can be opened in other keyup (on enter) event handlers THIS is required to be delayed a
         // bit...otherwise the dialog would open up and get immediately confirmed
-        setTimeout(function() {
-            if (!self.isMounted()) {
+        queueMicrotask(() => {
+            if (!this.isMounted()) {
                 // can be automatically hidden/unmounted, so this would bind the event AFTER the unbind in
                 // componentWillUnmount executed.
                 return;
             }
-            $(document).rebind('keyup.confirmDialog' + self.getUniqueId(), function(e) {
+
+            if (this._autoConfirm) {
+                if (!this._wasAutoConfirmed) {
+                    this._wasAutoConfirmed = 1;
+
+                    // this would most likely cause a .setState, so it should be done in a separate cycle/call stack.
+                    queueMicrotask(() => {
+                        this.onConfirmClicked();
+                    });
+                }
+
+                return;
+            }
+
+            $(document).rebind(this._keyUpEventName, (e) => {
                 if (e.which === 13 || e.keyCode === 13) {
-                    if (!self.isMounted()) {
-                       // we need to be 10000% sure that the dialog is still shown, otherwise, we may trigger some
-                       // unwanted action.
-                        self.unbindEvents();
+                    if (!this.isMounted()) {
+                        // we need to be 10000% sure that the dialog is still shown, otherwise, we may trigger some
+                        // unwanted action.
+                        this.unbindEvents();
                         return;
                     }
-                    self.onConfirmClicked();
+                    this.onConfirmClicked();
                     return false;
                 }
             });
-        }, 75);
+        });
     }
     componentWillUnmount() {
         super.componentWillUnmount();
@@ -337,37 +381,9 @@ class ConfirmDialog extends MegaRenderMixin {
         }
     }
 
-    static saveState(o) {
-        let state = mega.config.get('xccd') >>> 0;
-        mega.config.set('xccd', state | 1 << o.props.pref);
-    }
-
-    static clearState(o) {
-        let state = mega.config.get('xccd') >>> 0;
-        mega.config.set('xccd', state & ~o.props.pref);
-    }
-
-    static autoConfirm(o) {
-        console.assert(o.props.pref > 0);
-        let state = mega.config.get('xccd') >>> 0;
-        return !!(state & o.props.pref);
-    }
-
     render() {
         var self = this;
-
-        if (self.props.dontShowAgainCheckbox && ConfirmDialog.autoConfirm(self)) {
-            if (this._wasAutoConfirmed) {
-                return null;
-            }
-            if (this.props.onConfirmClicked) {
-                this._wasAutoConfirmed = 1;
-                // this would most likely cause a .setState, so it should be done in a separate cycle/call stack.
-                setTimeout(function() {
-                    self.unbindEvents();
-                    self.props.onConfirmClicked();
-                }, 75);
-            }
+        if (this._autoConfirm) {
             return null;
         }
 
@@ -414,6 +430,7 @@ class ConfirmDialog extends MegaRenderMixin {
                             "label": self.props.cancelLabel,
                             "key": "cancel",
                             "onClick": function(e) {
+                            ConfirmDialog.clearState(self);
                                 self.props.onClose(self);
                                 e.preventDefault();
                                 e.stopPropagation();

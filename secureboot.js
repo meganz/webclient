@@ -993,7 +993,14 @@ else if ((tmp = getSitePath()).substr(0, 6) === '/chat/') {
 else if ((page = isPublicLink(document.location.hash))) {
     // folder or file link: always keep the hash URL to ensure that keys remain client side
     // history.replaceState so that back button works in new URL paradigm
-    history.replaceState({subpage: page}, "", '#' + page);
+    if (is_litesite) {
+        page = '';
+        history.replaceState({ subpage: page }, "", page);
+    }
+    else {
+        history.replaceState({ subpage: page }, "", '#' + page);
+    }
+    
 }
 else if (isPublickLinkV2(document.location.pathname)) {
     page = getCleanSitePath();

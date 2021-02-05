@@ -652,5 +652,9 @@ window.loadSubPage = function(page) {
         pushHistoryState(page);
         return mega.redirect('mega.nz', page);
     }
+    if (is_litesite && isPublicLink(page)) {
+        return false;
+    }
+
     return loadSubPageNZ.apply(this, arguments);
 };

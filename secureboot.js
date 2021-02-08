@@ -215,9 +215,6 @@ function getCleanSitePath(path) {
         if (path.next) {
             tryCatch(function() {
                 window.nextPage = window.decodeParam(path.next);
-                if (path.txt) {
-                    window.nextTxt = window.decodeParam(path.txt);
-                }
                 if (path.plan) {
                     window.pickedPlan = path.plan;
                 }

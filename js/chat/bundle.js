@@ -3596,35 +3596,70 @@ SelectContactDialog.defaultProps = {
 };
 
 class ConfirmDialog extends _stores_mixins_js1__["MegaRenderMixin"] {
+  static saveState(o) {
+    let state = mega.config.get('xcod') >>> 0;
+    mega.config.set('xcod', state | 1 << o.props.pref);
+  }
+
+  static clearState(o) {
+    let state = mega.config.get('xcod') >>> 0;
+    mega.config.set('xcod', state & ~(1 << o.props.pref));
+  }
+
+  static autoConfirm(o) {
+    console.assert(o.props.pref > 0);
+    let state = mega.config.get('xcod') >>> 0;
+    return !!(state & 1 << o.props.pref);
+  }
+
   constructor(props) {
     super(props);
     this._wasAutoConfirmed = undefined;
+    this._keyUpEventName = 'keyup.confirmDialog' + this.getUniqueId();
+
+    if (Date.now() < 1616e9) {
+      mega.config.remove('xccd');
+    } else {
+      console.error('^ REMOVE ME');
+    }
+
+    lazy(this, '_autoConfirm', () => this.props.onConfirmClicked && this.props.dontShowAgainCheckbox && ConfirmDialog.autoConfirm(this));
   }
 
   unbindEvents() {
-    $(document).off('keyup.confirmDialog' + this.getUniqueId());
+    $(document).off(this._keyUpEventName);
   }
 
   componentDidMount() {
     super.componentDidMount();
-    var self = this;
-    setTimeout(function () {
-      if (!self.isMounted()) {
+    queueMicrotask(() => {
+      if (!this.isMounted()) {
         return;
       }
 
-      $(document).rebind('keyup.confirmDialog' + self.getUniqueId(), function (e) {
+      if (this._autoConfirm) {
+        if (!this._wasAutoConfirmed) {
+          this._wasAutoConfirmed = 1;
+          queueMicrotask(() => {
+            this.onConfirmClicked();
+          });
+        }
+
+        return;
+      }
+
+      $(document).rebind(this._keyUpEventName, e => {
         if (e.which === 13 || e.keyCode === 13) {
-          if (!self.isMounted()) {
-            self.unbindEvents();
+          if (!this.isMounted()) {
+            this.unbindEvents();
             return;
           }
 
-          self.onConfirmClicked();
+          this.onConfirmClicked();
           return false;
         }
       });
-    }, 75);
+    });
   }
 
   componentWillUnmount() {
@@ -3642,38 +3677,10 @@ class ConfirmDialog extends _stores_mixins_js1__["MegaRenderMixin"] {
     }
   }
 
-  static saveState(o) {
-    let state = mega.config.get('xccd') >>> 0;
-    mega.config.set('xccd', state | 1 << o.props.pref);
-  }
-
-  static clearState(o) {
-    let state = mega.config.get('xccd') >>> 0;
-    mega.config.set('xccd', state & ~o.props.pref);
-  }
-
-  static autoConfirm(o) {
-    console.assert(o.props.pref > 0);
-    let state = mega.config.get('xccd') >>> 0;
-    return !!(state & o.props.pref);
-  }
-
   render() {
     var self = this;
 
-    if (self.props.dontShowAgainCheckbox && ConfirmDialog.autoConfirm(self)) {
-      if (this._wasAutoConfirmed) {
-        return null;
-      }
-
-      if (this.props.onConfirmClicked) {
-        this._wasAutoConfirmed = 1;
-        setTimeout(function () {
-          self.unbindEvents();
-          self.props.onConfirmClicked();
-        }, 75);
-      }
-
+    if (this._autoConfirm) {
       return null;
     }
 
@@ -3715,6 +3722,7 @@ class ConfirmDialog extends _stores_mixins_js1__["MegaRenderMixin"] {
         "label": self.props.cancelLabel,
         "key": "cancel",
         "onClick": function (e) {
+          ConfirmDialog.clearState(self);
           self.props.onClose(self);
           e.preventDefault();
           e.stopPropagation();
@@ -19658,7 +19666,7 @@ Chat.prototype._syncDnd = function () {
 };
 
 Chat.prototype.loadChatUIFlagsFromConfig = function (val) {
-  var self = this;
+  var hadChanged = false;
   var flags = val || mega.config.get("cUIF");
 
   if (flags) {
@@ -19666,18 +19674,13 @@ Chat.prototype.loadChatUIFlagsFromConfig = function (val) {
       flags = {};
     }
 
-    try {
-      Object.keys(CHATUIFLAGS_MAPPING).forEach(function (k) {
-        var v = flags[CHATUIFLAGS_MAPPING[k]];
-
-        if (v) {
-          self.chatUIFlags.set(k, v);
-        }
-      });
-    } catch (e) {
-      console.warn("Failed to parse persisted chatUIFlags: ", e);
-    }
+    Object.keys(CHATUIFLAGS_MAPPING).forEach(k => {
+      var v = flags[CHATUIFLAGS_MAPPING[k]];
+      hadChanged = v !== undefined && this.chatUIFlags.set(k, v) !== false || hadChanged;
+    });
   }
+
+  return hadChanged;
 };
 
 Chat.prototype.initChatUIFlagsManagement = function () {
@@ -19715,10 +19718,11 @@ Chat.prototype.initChatUIFlagsManagement = function () {
       mega.config.set("cUIF", flags);
     }
   });
-  mBroadcaster.addListener('fmconfig:cUIF', function (v) {
-    self.loadChatUIFlagsFromConfig(v);
-    self.chatUIFlags.trackDataChange(0xDEAD);
-  });
+  mBroadcaster.addListener('fmconfig:cUIF', tryCatch(v => {
+    if (self.loadChatUIFlagsFromConfig(v)) {
+      self.chatUIFlags.trackDataChange(0xDEAD);
+    }
+  }));
 };
 
 Chat.prototype.unregisterUploadListeners = function (destroy) {

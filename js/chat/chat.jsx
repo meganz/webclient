@@ -373,25 +373,21 @@ Chat.prototype._syncDnd = function() {
  * @param [val] {Object} optional settings, if already received.
  */
 Chat.prototype.loadChatUIFlagsFromConfig = function(val) {
-    var self = this;
+    var hadChanged = false;
     var flags = val || mega.config.get("cUIF");
     if (flags) {
         if (typeof flags !== 'object') {
             flags = {};
         }
 
-        try {
-            Object.keys(CHATUIFLAGS_MAPPING).forEach(function(k) {
-                var v = flags[CHATUIFLAGS_MAPPING[k]];
-                if (v) {
-                    self.chatUIFlags.set(k, v);
-                }
-            });
-        }
-        catch (e) {
-            console.warn("Failed to parse persisted chatUIFlags: ", e);
-        }
+        // @todo refactor this to use config.factory()
+        Object.keys(CHATUIFLAGS_MAPPING).forEach((k) => {
+            var v = flags[CHATUIFLAGS_MAPPING[k]];
+            hadChanged = v !== undefined && this.chatUIFlags.set(k, v) !== false || hadChanged;
+        });
     }
+
+    return hadChanged;
 };
 
 /**
@@ -436,10 +432,12 @@ Chat.prototype.initChatUIFlagsManagement = function() {
             mega.config.set("cUIF", flags);
         }
     });
-    mBroadcaster.addListener('fmconfig:cUIF', function(v) {
-        self.loadChatUIFlagsFromConfig(v);
-        self.chatUIFlags.trackDataChange(0xDEAD);
-    });
+
+    mBroadcaster.addListener('fmconfig:cUIF', tryCatch((v) => {
+        if (self.loadChatUIFlagsFromConfig(v)) {
+            self.chatUIFlags.trackDataChange(0xDEAD);
+        }
+    }));
 };
 
 Chat.prototype.unregisterUploadListeners = function(destroy) {

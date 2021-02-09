@@ -77,8 +77,12 @@ pro.propay = {
         $selectedPlanName.text(pro.propay.planName);
         let discountInfo = pro.propay.getDiscount();
         if (discountInfo && discountInfo.pd && !discountInfo.used) {
-            $('.top-header.plan-title', $stepTwo).safeHTML(l[24680]
-                .replace('%1', '<b>' + pro.propay.planName + '</b>'));
+            const discountTitle = discountInfo.m === 12 ? l[24680]
+                : (discountInfo.m === 1 ? l[24849] : l[24850]);
+            $('.top-header.plan-title', $stepTwo).safeHTML(discountTitle
+                .replace('%1', pro.propay.planName)
+                .replace('%2', discountInfo.pd + '%'));
+            $('.stores-desc', $stepTwo).addClass('hidden');
             discountInfo.used = 1;
         }
         else if (discountInfo && discountInfo.used) {
@@ -104,6 +108,9 @@ pro.propay = {
         // Initialise some extra stuff just for mobile
         if (is_mobile) {
             mobile.propay.init();
+            if (discountInfo && discountInfo.pd) {
+                $('.mobile.external-payment-options', '.mobile.fm-content').addClass('hidden');
+            }
         }
 
         // Load payment plans

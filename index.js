@@ -927,13 +927,11 @@ function init_page() {
             loadSubPage('fm');
             return false;
         }
-        login_next = login_next || window.nextPage || false;
-        login_txt = login_txt || window.nextTxt || false;
-        if (!login_txt && login_next && String(login_next).indexOf('propay_') >= 0) {
+        if (window.nextPage) {
+            login_next = window.nextPage;
             login_txt = l[24766];
+            delete window.nextPage;
         }
-        delete window.nextPage;
-        delete window.nextTxt;
         if (is_mobile) {
             mobile.initDOM();
             mobile.signin.show();

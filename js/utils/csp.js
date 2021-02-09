@@ -47,10 +47,10 @@ lazy(self, 'csp', function() {
     };
 
     const canShowDialog = promisify(resolve => {
-        const exclude = {'cookie': 1, 'privacy': 1, 'takedown': 1, 'terms': 1};
+        const exclude = {'cookie': 1, 'megadrop': 1, 'privacy': 1, 'takedown': 1, 'terms': 1};
 
         (function check(page) {
-            if (exclude[page]) {
+            if (exclude[String(page).split('/')[0]]) {
                 return mBroadcaster.once('pagechange', check);
             }
             if ($.msgDialog) {

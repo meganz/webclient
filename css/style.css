@@ -17639,6 +17639,14 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
     line-height: 24px;
     font-family: 'source_sans_proregular', Arial
 }
+.payment-result {
+    background-color: rgba(34, 34, 34, 0.95);
+    height: 100%;
+    position: absolute;
+    top: 0;
+    width: 100%;
+    z-index: 2200;
+}
 .payment-result-pad, .feedback-result-pad {
     position: absolute;
     width: 100%;

@@ -3746,6 +3746,54 @@ MegaData.prototype.getNodeParent = function(node) {
 };
 
 /**
+ * Refresh UI on node removal.
+ * @param {String} handle The ufs-node's handle.
+ * @param {String} [parent] this node's parent.
+ */
+MegaData.prototype.nodeRemovalUIRefresh = function(handle, parent) {
+    'use strict';
+    const n = this.getNodeByHandle(handle);
+    const customView = this.currentCustomView;
+    const currentDir = customView && customView.nodeID || this.currentdirid;
+
+    if (n.t && (currentDir === n.h || this.isCircular(n.h, currentDir))) {
+        // If the node being removed is a folder, get out of it to the nearest available parent
+        const root = this.getNodeRoot(parent || n.h);
+        const path = this.getPath(parent || this.getNodeParent(n) || root);
+
+        // Mark this node as pending to prevent going to the Rubbish meanwhile parsing action-packets..
+        this.nodeRemovalUIRefresh.pending = n.h;
+
+        delay('openfolder', () => {
+            let target = null;
+            let promise = Promise.resolve();
+
+            for (let i = 0; i < path.length; ++i) {
+                const n = this.getNodeByHandle(path[i]);
+                if (n && this.getNodeRoot(n.h) !== this.RubbishID) {
+                    target = path[i];
+                    break;
+                }
+            }
+
+            if (d) {
+                console.debug('nodeRemovalUIRefresh(%s)', handle, target, path);
+            }
+
+            if (target && this.getNodeRoot(handle) !== root) {
+                if (customView) {
+                    target = target === this.RootID ? customView.type : customView.prefixPath + target;
+                }
+                promise = this.openFolder(target);
+            }
+
+            this.nodeRemovalUIRefresh.pending = null;
+            delay('redraw-tree', () => promise.then(() => this.redrawTree()));
+        }, 90);
+    }
+};
+
+/**
  * Retrieve media properties for a file node.
  * @param {MegaNode|String} node An ufs node or handle
  * @return {Object} Media properties.

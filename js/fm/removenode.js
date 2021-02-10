@@ -1,16 +1,18 @@
 function removeUInode(h, parent) {
     'use strict';
 
-    var i = 0;
-    var n = M.getNodeByHandle(h);
+    let hasSubFolders = 0;
+    const n = M.getNodeByHandle(h);
+
+    parent = parent || M.getNodeParent(n || h);
 
     // check subfolders
     if (n && n.t) {
-        var cns = M.c[n.p];
+        const cns = M.c[parent];
         if (cns) {
             for (var cn in cns) {
                 if (M.d[cn] && M.d[cn].t && cn !== h) {
-                    i++;
+                    hasSubFolders++;
                     break;
                 }
             }
@@ -70,8 +72,8 @@ function removeUInode(h, parent) {
             }
             break;
         case M.RubbishID:
-            if (i == 0 && n) {
-                $('#treea_' + n.p).removeClass('contains-folders expanded');
+            if (!hasSubFolders) {
+                $('#treea_' + parent).removeClass('contains-folders expanded');
             }
 
             // Remove item
@@ -86,8 +88,8 @@ function removeUInode(h, parent) {
             }
             break;
         case M.RootID:
-            if (i == 0 && n) {
-                $('#treea_' + n.p).removeClass('contains-folders expanded');
+            if (!hasSubFolders) {
+                $('#treea_' + parent).removeClass('contains-folders expanded');
             }
 
             // Remove item
@@ -111,8 +113,8 @@ function removeUInode(h, parent) {
             if (M.chat || M.currentdirid.indexOf('user-management') >= 0) {
                 break;
             }
-            if (i == 0 && n) {
-                $('#treea_' + n.p).removeClass('contains-folders expanded');
+            if (!hasSubFolders) {
+                $('#treea_' + parent).removeClass('contains-folders expanded');
             }
             $('#' + h).remove();// remove item
             $('#treeli_' + h).remove();// remove folder and subfolders
@@ -142,17 +144,7 @@ function removeUInode(h, parent) {
         }
     }
 
-    if (M.currentCustomView.nodeID === h || M.isCircular(h, M.currentCustomView.nodeID) === true) {
-        parent = parent || M.getNodeParent(n || h) || M.getNodeRoot(h);
-        parent = parent === M.RootID ? M.currentCustomView.type : (M.currentCustomView.prefixPath + parent);
-
-        // if parent is exist on M.su.EXP
-        delay('openfolder', M.openFolder.bind(M, parent));
-    }
-    else if (M.currentdirid === h || M.isCircular(h, M.currentdirid) === true) {
-        parent = parent || M.getNodeParent(n || h) || M.getNodeRoot(h);
-        delay('openfolder', M.openFolder.bind(M, parent), 777);
-    }
+    M.nodeRemovalUIRefresh(h,  parent);
 }
 
 /**

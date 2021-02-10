@@ -1093,7 +1093,7 @@ FileManager.prototype.updFileManagerUI = promisify(function(resolve) {
     var buildtree = function(n) {
         delay('updFileManagerUI:buildtree:' + n.h, function() {
             M.buildtree(n, M.buildtree.FORCE_REBUILD);
-            M.addTreeUI();
+            M.addTreeUIDelayed();
         }, 2600);
     };
 
@@ -1187,7 +1187,9 @@ FileManager.prototype.updFileManagerUI = promisify(function(resolve) {
         }
 
         renderPromise.always(function() {
-            M.onTreeUIOpen(M.currentdirid);
+            if (M.nodeRemovalUIRefresh.pending !== M.currentdirid) {
+                M.onTreeUIOpen(M.currentdirid);
+            }
         });
     }
 

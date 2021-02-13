@@ -642,7 +642,7 @@ mega.metatags = new function() {
         }
         else if (page === 'start') {
             mTags.mega_title = 'MEGA';
-            if (getCleanSitePath() === 'start') {
+            if (getCleanSitePath().substr(0, 5) === 'start') {
                 addCanonical(getBaseUrl());
             }
         }

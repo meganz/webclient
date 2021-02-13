@@ -549,6 +549,7 @@ function pagemetadata() {
     };
 
     append('description', mega.whoami, 'name');
+    append('robots', 'noindex', 'name');
 
     if (ep_node) {
         var url = getBaseUrl() + '/embed#!' + ep_node.link;

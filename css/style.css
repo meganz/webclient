@@ -12989,25 +12989,16 @@ strong, b {
 }
 .resellers-link {
     width: 33.333333%;
-    width: -webkit-calc(33.333333% - 50px);
-    width: -moz-calc(33.333333% - 50px);
     width: calc(33.333333% - 50px);
     min-height: 160px;
     display: inline-block;
     vertical-align: top;
     margin: 25px 25px 25px 25px;
     border: 2px solid #d9d9d9;
-    -moz-border-radius: 5px;
-    -webkit-border-radius: 5px;
     border-radius: 5px;
     text-align: center;
-    -moz-box-sizing: border-box;
-    -webkit-box-sizing: border-box;
     box-sizing: border-box;
     -webkit-transition: all 200ms ease-in-out;
-    -moz-transition: all 200ms ease-in-out;
-    -o-transition: all 200ms ease-in-out;
-    -ms-transition: all 200ms ease-in-out;
     transition: all 200ms ease-in-out;
 }
 .resellers-link:hover {
@@ -13021,13 +13012,13 @@ strong, b {
     margin: 48px auto 29px auto;
     width: 220px;
 }
+.resellers-logo.cb {
+    margin-top: 44px;
+}
 .resellers-payment {
     width: 32px;
     display: inline-block;
     margin: 0 4px 0 4px;
-    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
-    -moz-opacity: 0.5;
-    -khtml-opacity: 0.5;
     opacity: 0.5;
 }
 .resellers-link:hover .resellers-payment {

@@ -159,6 +159,7 @@ MegaData.prototype.accountData = function(cb, blockui, force) {
                     }
                     if (res.b) {
                         u_attr.b = res.b;
+                        topmenuUI();
                     }
                     if (res.uspw) {
                         u_attr.uspw = res.uspw;

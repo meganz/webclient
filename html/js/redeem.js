@@ -61,7 +61,7 @@ var redeem = {
             redeem.voucherData = data;
 
             // Was the user already logged-in?
-            if (!sessionStorage.signinorup && !window.bCreatedVoucher) {
+            if (!sessionStorage.signinorup && !window.bCreatedVoucher && !window.busUpgrade) {
                 // Show confirm dialog asking the user if he wants to redeem the voucher for this account.
                 promise = redeem.showConfirmAccountDialog();
             }
@@ -71,8 +71,17 @@ var redeem = {
             }
 
             var addVoucher = function() {
+                // if Business voucher with individual account, stop and collect needed data.
+                if (!window.busUpgrade && !window.bCreatedVoucher && data.businessmonths && u_attr && !u_attr.b) {
+                    window.businessVoucher = 1;
+                    window.busUpgrade = 1;
+                    loadSubPage('registerb');
+                    return false;
+                }
+
+                delete window.busUpgrade;
+
                 // Make API call to redeem voucher
-                // MegaPromise.resolve()
                 M.req({a: 'promoter' in data ? 'epcr' : 'uavr', v: data.code, p: data.promoter})
                     .then(function() {
                         if (data.promotional) {
@@ -757,12 +766,13 @@ var redeem = {
                         return false;
                     }
                     closeDialog();
-                    if (window.bCreatedVoucher || (mega.voucher.businessmonths && u_type === 3)) {
+                    if (window.bCreatedVoucher || (mega.voucher.businessmonths && u_attr && u_attr.b)) {
                         loadSubPage('redeem');
                         return false;
                     }
                     if (mega.voucher.businessmonths) {
                         window.businessVoucher = 1;
+                        window.busUpgrade = 1;
                         loadSubPage('registerb');
                         return false;
                     }

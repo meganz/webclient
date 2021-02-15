@@ -931,12 +931,12 @@ MegaData.prototype.redrawTree = function(f) {
     else if (M.currentrootid === 'contacts' || M.currentrootid === 'opc' || M.currentrootid === 'ipc') {
         M.contacts();
     }
-    M.addTreeUI();
+
+    M.addTreeUIDelayed(2);
     $('.nw-fm-tree-item').noTransition(function() {
         M.onTreeUIOpen(M.currentdirid, false);
     });
     M.redrawTreeFilterUI();
-
 };
 
 /**
@@ -1271,7 +1271,8 @@ MegaData.prototype.onTreeUIOpen = function(id, event, ignoreScroll) {
     var id_s = id.split('/')[0];
     var e, scrollTo = false, stickToTop = false;
     if (d) {
-        console.log("treeUIopen", id);
+        console.group('onTreeUIOpen', id);
+        console.time('onTreeUIOpen');
     }
 
     if (id_r === 'shares') {
@@ -1321,13 +1322,17 @@ MegaData.prototype.onTreeUIOpen = function(id, event, ignoreScroll) {
     }
 
     if (!fminitialized) {
+        if (d) {
+            console.groupEnd();
+            console.timeEnd('onTreeUIOpen');
+        }
         return false;
     }
 
     if (!event) {
         var ids = this.getPath(id);
-        var i = 1;
-        while (i < ids.length) {
+        let i = ids.length;
+        while (i-- > 1) {
             if (this.d[ids[i]] && ids[i].length === 8) {
                 if (id_r === 'out-shares') {
                     this.onTreeUIExpand('os_' + ids[i], 1);
@@ -1339,7 +1344,6 @@ MegaData.prototype.onTreeUIOpen = function(id, event, ignoreScroll) {
                     this.onTreeUIExpand(ids[i], 1);
                 }
             }
-            i++;
         }
         if (
             (ids[0] === 'contacts')
@@ -1396,5 +1400,11 @@ MegaData.prototype.onTreeUIOpen = function(id, event, ignoreScroll) {
             }, 50);
         }
     }
+
     this.addTreeUIDelayed();
+
+    if (d) {
+        console.timeEnd('onTreeUIOpen');
+        console.groupEnd();
+    }
 };

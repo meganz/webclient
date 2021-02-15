@@ -156,10 +156,7 @@ mobile.cloud = {
         mobile.cloud.renderFoldersAndFilesSubHeader();
 
         // If in the current folder and this got removed, then we need to go back up and open the parent folder
-        if (M.currentdirid === nodeHandle || M.isCircular(nodeHandle, M.currentdirid) === true) {
-            parentHandle = parentHandle || Object(M.getNodeByHandle(nodeHandle)).p || M.getNodeRoot(nodeHandle);
-            M.openFolder(parentHandle);
-        }
+        M.nodeRemovalUIRefresh(nodeHandle,  parentHandle);
     },
 
     /**

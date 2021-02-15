@@ -7,6 +7,7 @@
     max-height: calc(100% - 30px);
     text-align: center;
     margin: 0 !important;
+    z-index: 9999 !important;
 
     /* TODO: Remove once new dialogs are merged */
     -webkit-transform: translate(-50%, -50%);

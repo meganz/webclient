@@ -3089,6 +3089,12 @@ accountUI.transfers = {
                     fmconfig.dlThroughMEGAsync,
                     function(val) {
                         mega.config.setn('dlThroughMEGAsync', val);
+                        if (val) {
+                            megasync.periodicCheck();
+                        }
+                        else {
+                            window.useMegaSync = 4;
+                        }
                     });
 
                 megasync.isInstalled(function(err, is) {

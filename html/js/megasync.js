@@ -904,7 +904,7 @@ var megasync = (function() {
     ns.isInstalled = function (next) {
         if ((!fmconfig.dlThroughMEGAsync && page !== "download")
             || (!is_livesite && !usemsync)) {
-            next(true, false); // next with error=true and isworking=false
+            next(true, false, true); // next with error=true and isworking=false, off=true
         }
         else if (!lastCheckStatus || !lastCheckTime) {
             if (lastCheckTime) {
@@ -975,7 +975,7 @@ var megasync = (function() {
         if (periodicCheckTimeout) {
             clearTimeout(periodicCheckTimeout);
         }
-        ns.isInstalled(function(err, is) {
+        ns.isInstalled(function(err, is, off) {
             if (!err || is) {
                 if (megasync.currUser === u_handle) {
                     window.useMegaSync = 2;
@@ -988,6 +988,9 @@ var megasync = (function() {
             }
             else {
                 window.useMegaSync = 4;
+                if (off) {
+                    return;
+                }
                 periodicCheckTimeout = setTimeout(ns.periodicCheck, statusThresholdWhenDifferentUsr);
             }
         });

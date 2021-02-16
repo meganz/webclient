@@ -10061,6 +10061,78 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll, .mob
     width: 100%;
 }
 
+/*
+Thank You dialog
+ */
+.thankyou-dialog {
+    background-color: rgba(34, 34, 34, 1);
+    display: block;
+    height: 100%;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 2200;
+}
+
+.thankyou-dialog .thankyou-close {
+    position: absolute;
+    right: 0;
+    top: 14px;
+    width: 50px;
+    z-index: 2300;
+}
+
+.thankyou-body {
+    margin: -125px auto;
+    position: relative;
+    text-align: center;
+    top: 50%;
+    width: calc(100% - 48px);
+    z-index: 2200;
+}
+
+.thankyou-dialog .thankyou-body .thankyou-header,
+.thankyou-dialog .thankyou-body .thankyou-txt {
+    color: white;
+    font-size: 17px;
+    line-height: 35px;
+    padding-bottom: 17px;
+}
+
+.thankyou-dialog .thankyou-body .thankyou-txt {
+    font-size: 14px;
+    margin: 0 auto;
+    max-width: 700px;
+    padding-bottom: 35px;
+}
+
+.thankyou-dialog .thankyou-body .thankyou-button {
+    border: 2px solid rgba(19, 224, 60, 0.7);
+    border-radius: 8px;
+    box-sizing: border-box;
+    color: rgba(19, 224, 60, 1);
+    cursor: pointer;
+    display: inline-block;
+    font-size: 16px;
+    height: 48px;
+    line-height: 44px;
+    min-width: 240px;
+    padding: 0 15px;
+    transition: all 200ms ease-in-out;
+    -moz-border-radius: 8px;
+    -webkit-border-radius: 8px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-transition: all 200ms ease-in-out;
+    -moz-transition: all 200ms ease-in-out;
+    -o-transition: all 200ms ease-in-out;
+    -ms-transition: all 200ms ease-in-out;
+}
+
+.thankyou-dialog .thankyou-body .green-link {
+    color: #0bbdaa;
+}
+
 /* Only media queries after here */
 @media only screen and (max-width: 970px) {
     .securitypractice .security-page-video-block {

@@ -1496,6 +1496,21 @@ function init_page() {
         // Process the return URL from the payment provider and show a success/failure dialog if applicable
         pro.proplan.processReturnUrlFromProvider(page);
     }
+    else if (page === 'thanks') {
+        let $dialogOverlay = $('.thankyou-dialog').removeClass('hidden');
+        let $backgroundOverlay = $('.thankyou-dialog-overlay').removeClass('hidden');
+
+        parsepage(pages.placeholder);
+        $('.thankyou-txt', $dialogOverlay).safeAppend(l[24852]);
+        $('.thankyou-button, .thankyou-close', $dialogOverlay)
+            .removeClass('hidden')
+            .rebind('click', function() {
+                $backgroundOverlay.addClass('hidden').removeClass('thankyou-dialog-overlay');
+                $dialogOverlay.addClass('hidden');
+                loadSubPage(loggedout || u_type === false ? 'start' : 'fm', 'override');
+                return false;
+            });
+    }
     else if (page.substr(0, 5) === 'repay') {
         if (u_attr && u_attr.b && u_attr.b.m && (u_attr.b.s === -1 || u_attr.b.s === 2)) {
             getUAOParameter(page, 'repay');

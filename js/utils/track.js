@@ -147,7 +147,7 @@ lazy(self, 'trk', function() {
     const gClickHandler = async(ev) => {
         const t = ev.target || false;
 
-        if (M.chat) {
+        if (M.chat || $.dialog === 'cookies-dialog') {
             return;
         }
         let a = t;

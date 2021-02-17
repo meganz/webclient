@@ -668,8 +668,10 @@ var dlmanager = {
         }
 
         if (d && String(apipath).indexOf('staging') > 0) {
-            var s = sessionStorage;
-            req.f = [s.dltfefq | 0, s.dltflimit | 0];
+            const s = sessionStorage;
+            if (s.dltfefq || s.dltflimit) {
+                req.f = [s.dltfefq | 0, s.dltflimit | 0];
+            }
         }
 
         if (window.fetchStreamSupport) {
@@ -1322,13 +1324,20 @@ var dlmanager = {
         }
     },
 
-    _onOverQuotaAttemptRetry: function() {
+    _onOverQuotaAttemptRetry: function(sid) {
         'use strict';
 
         if (!this.onOverquotaWithAchievements) {
-            if (this.isOverQuota && !this.isOverFreeQuota) {
-                this.uqFastTrack = !Object(u_attr).p;
-                delay('overquota:uqft', this._overquotaInfo.bind(this), 900);
+            if (this.isOverQuota) {
+                delay.cancel('overquota:uqft');
+
+                if (this.isOverFreeQuota) {
+                    this._onQuotaRetry(true, sid);
+                }
+                else {
+                    this.uqFastTrack = !Object(u_attr).p;
+                    delay('overquota:uqft', this._overquotaInfo.bind(this), 900);
+                }
             }
 
             if (typeof this.onLimitedBandwidth === 'function') {
@@ -1338,103 +1347,99 @@ var dlmanager = {
     },
 
     _overquotaInfo: function() {
-        'use strict'; /* jshint -W074 */
+        'use strict';
 
-        var onQuotaInfo = function(res) {
+        const onQuotaInfo = (res) => {
+            let timeLeft = 3600;
+            if (Object(res.tah).length) {
+                let add = 1;
+                // let size = 0;
+
+                timeLeft = 3600 - ((res.bt | 0) % 3600);
+
+                for (let i = 0; i < res.tah.length; i++) {
+                    // size += res.tah[i];
+
+                    if (res.tah[i]) {
+                        add = 0;
+                    }
+                    else if (add) {
+                        timeLeft += 3600;
+                    }
+                }
+            }
+
+            clearInterval(this._overQuotaTimeLeftTick);
+            delay('overquota:retry', () => this._onQuotaRetry(), timeLeft * 1000);
+
+            let $dlPageCountdown = $('.download.transfer-overquota-txt').text(String(l[7100]).replace('%1', ''));
+            if (!$dlPageCountdown.is(':visible')) {
+                $dlPageCountdown = null;
+            }
+
+            const $dialog = $('.limited-bandwidth-dialog');
+            this._overquotaClickListeners($dialog);
+
+            if ($dialog.is(':visible') || $dlPageCountdown) {
+                const $countdown = $('.countdown', $dialog).removeClass('hidden');
+                const tick = () => {
+                    const time = secondsToTime(timeLeft--, 1);
+
+                    if (time) {
+                        $countdown.safeHTML(time);
+
+                        if ($dlPageCountdown) {
+                            const html = '<span class="countdown">' + secondsToTime(timeLeft) + '</span>';
+                            $dlPageCountdown.safeHTML(escapeHTML(l[7100]).replace('%1', html));
+                        }
+                    }
+                    else {
+                        $countdown.text('');
+
+                        if ($dlPageCountdown) {
+                            $dlPageCountdown.text(String(l[7100]).replace('%1', ''));
+                        }
+                        clearInterval(dlmanager._overQuotaTimeLeftTick);
+                    }
+                };
+
+                tick();
+                this._overQuotaTimeLeftTick = setInterval(tick, 1000);
+            }
+        };
+
+        M.req.poll(-10, {a: 'uq', xfer: 1}).then((res) => {
+            delay('overquotainfo:reply.success', () => {
                 if (typeof res === "number") {
                     // Error, just keep retrying
-                    Soon(this._overquotaInfo.bind(this));
+                    onIdle(() => this._overquotaInfo());
                     return;
                 }
 
-                if (this.uqFastTrack || (this.onOverQuotaProClicked && u_type)) {
+                // XXX: replaced uqFastTrack usage by directly checking for pro flag ...
+                if (this.onOverQuotaProClicked && u_type || Object(u_attr).p) {
                     // The user loged/registered in another tab, poll the uq command every
                     // 30 seconds until we find a pro status and then retry with fresh download
 
-                    var proStatus = res.mxfer;
+                    const proStatus = res.mxfer;
                     this.logger.debug('overquota:proStatus', proStatus);
 
                     if (proStatus) {
-                        // Got PRO, resume dl inmediately.
+                        // Got PRO, resume dl immediately.
                         return this._onQuotaRetry(true);
                     }
 
-                    delay('overquota:uqft', this._overquotaInfo.bind(this), 30000);
+                    delay('overquota:uqft', () => this._overquotaInfo(), 30000);
                 }
 
-                var timeLeft = 3600;
-
-                if (Object(res.tah).length) {
-                    var add = 1;
-                    var size = 0;
-
-                    timeLeft = 3600 - ((res.bt | 0) % 3600);
-
-                    for (var i = 0 ; i < res.tah.length; i++) {
-                        size += res.tah[i];
-
-                        if (res.tah[i]) {
-                            add = 0;
-                        }
-                        else if (add) {
-                            timeLeft += 3600;
-                        }
-                    }
-                }
-
-                clearInterval(this._overQuotaTimeLeftTick);
-                delay('overquota:retry', this._onQuotaRetry.bind(this), timeLeft * 1000);
-
-                var $dialog = $('.fm-dialog.limited-bandwidth-dialog');
-                var $dlPageCountdown = $('.download.transfer-overquota-txt').text(String(l[7100]).replace('%1', ''));
-                if (!$dlPageCountdown.is(':visible')) {
-                    $dlPageCountdown = null;
-                }
-                this._overquotaClickListeners($dialog);
-
-                if ($dialog.is(':visible') || $dlPageCountdown) {
-                    var $countdown = $dialog.find('.countdown').removeClass('hidden');
-                    $countdown.safeHTML(secondsToTime(timeLeft, 1));
-
-                    if ($dlPageCountdown) {
-                        var html = '<span class="countdown">' + secondsToTime(timeLeft) + '</span>';
-                        $dlPageCountdown.safeHTML(escapeHTML(l[7100]).replace('%1', html));
-                    }
-
-                    this._overQuotaTimeLeftTick =
-                        setInterval(function() {
-                            var time = secondsToTime(timeLeft--, 1);
-
-                            if (time) {
-                                $countdown.safeHTML(time);
-
-                                if ($dlPageCountdown) {
-                                    var html = '<span class="countdown">' + secondsToTime(timeLeft) + '</span>';
-                                    $dlPageCountdown.safeHTML(escapeHTML(l[7100]).replace('%1', html));
-                                }
-                            }
-                            else {
-                                $countdown.text('');
-
-                                if ($dlPageCountdown) {
-                                    $dlPageCountdown.text(String(l[7100]).replace('%1', ''));
-                                }
-                                clearInterval(dlmanager._overQuotaTimeLeftTick);
-                            }
-                        }, 1000);
-                }
-            }.bind(this)
-
-        M.req.poll(-10, {a: 'uq', xfer: 1}).then(function(res) {
-            delay('overquotainfo:reply.success', function() {
                 onQuotaInfo(res);
             });
-        }).catch(function(ex) {
+        }).catch((ex) => {
             if (d) {
                 dlmanager.logger.warn('_overquotaInfo', ex);
             }
 
-            delay('overquotainfo:reply.error', dlmanager._overquotaInfo.bind(dlmanager));
+            delay('overquotainfo:reply.error', () => this._overquotaInfo(), 2e3);
         });
     },
 

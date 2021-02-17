@@ -345,7 +345,7 @@ function api_setsid(sid) {
 
         if (typeof dlmanager === 'object') {
 
-            dlmanager._onOverQuotaAttemptRetry();
+            delay('overquota:retry', () => dlmanager._onOverQuotaAttemptRetry(sid));
         }
         sid = 'sid=' + sid;
     }

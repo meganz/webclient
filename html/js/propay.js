@@ -657,7 +657,7 @@ pro.propay = {
         var numOfMonths = currentPlan[pro.UTQA_RES_INDEX_MONTHS];
         var price = currentPlan[pro.UTQA_RES_INDEX_PRICE] + ' \u20ac';     // 0.00 EUR symbol
         if (currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE]) {
-            price = currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE];
+            price = currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE] + '*';
         }
 
         // Get the value for whether the user wants the plan to renew automatically
@@ -695,10 +695,12 @@ pro.propay = {
             }
         }
         else if (discountInfo && (discountInfo.lmp || discountInfo.emp) && !recurringEnabled && numOfMonths === 1) {
-            chargeInfoDuration = l[10642].replace('%1', discountInfo.lmp || discountInfo.emp);
+            chargeInfoDuration = l[10642]
+                .replace('%1', (discountInfo.lmp ? discountInfo.lmp + '*' : discountInfo.emp));
         }
         else if (discountInfo && (discountInfo.lyp || discountInfo.eyp) && !recurringEnabled && numOfMonths === 12) {
-            chargeInfoDuration = l[10642].replace('%1', discountInfo.lyp || discountInfo.eyp);
+            chargeInfoDuration = l[10642]
+                .replace('%1', (discountInfo.lyp ? discountInfo.lyp + '*' : discountInfo.eyp));
         }
 
         // Set to monthly or annually in the pricing box on the right

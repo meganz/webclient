@@ -896,7 +896,6 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
         $subAccountContainer.find('.profile-button-container .disable-account').text(l[19094])
             .removeClass('default-red-button-user-management').addClass('default-green-button-user-management')
             .addClass('sub-enable').removeClass('sub-disable');
-        $subAccountContainer.find('.profile-button-container .migrate-data').text(l[19095]).removeClass('hidden');
     }
     $subAccountContainer.find('.user-management-view-status.text').text(this.subUserStatus(subUser.s));
 
@@ -1052,6 +1051,10 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
 
         totalStorage = subUserStats["ts"] || 0;
         totalBandwidth = subUserStats["dl"] || 0;
+
+        if (subUser.s === 11 && totalStorage > 0) {
+            $('.profile-button-container .migrate-data', $subAccountContainer).text(l[19095]).removeClass('hidden');
+        }
 
         var totalStorageFormatted = numOfBytes(totalStorage, 2);
         var totalBandwidthFormatted = numOfBytes(totalBandwidth, 2);

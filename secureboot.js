@@ -162,7 +162,9 @@ function getCleanSitePath(path) {
     if (path === undefined) {
         path = getSitePath();
     }
-
+    if (path.indexOf('lang_') > -1) {
+        path = path.replace('lang_', 'lang=');
+    }
     // cleanup and handle affiliate tags.
     path = mURIDecode(path).replace(/^[#/]+|\/+$/g, '').split(/(\/\w+=)/);
 
@@ -220,10 +222,8 @@ function getCleanSitePath(path) {
                 }
             })();
         }
-        if (path.lang) {
-            tryCatch(function() {
-                localStorage.lang = window.decodeParam(path.lang);
-            })();
+        if (path.lang && path.lang.length < 6) {
+            localStorage.lang = path.lang;
         }
     }
 
@@ -742,7 +742,8 @@ var mega = {
             for (var i = kv.length; i--;) {
                 var k = kv[i][0];
                 var v = kv[i][1];
-                to += '/' + k + '=' + (typeof v === 'string' ? encode(v) : v);
+                var plain = kv[i][2];
+                to += '/' + k + '=' + (typeof v === 'string' && !plain ? encode(v) : v);
             }
         }
 
@@ -2389,15 +2390,8 @@ else if (!browserUpdate) {
         // Get the preferred language in their browser
         var userLangs, userLang, ourLangs, k, v, j, i, u;
 
-        // If a search bot, they may set the URL as e.g. mega.nz/pro?es so get the language from that
-        if ((is_bot || sessionStorage.botSim ) && locationSearchParams !== '') {
-            userLangs = locationSearchParams.replace('?', '');
-            userLangs = userLangs.substr(0, (userLangs + '&').indexOf('&'));
-        }
-        else {
-            // Otherwise get the user's preferred language in their browser settings
-            userLangs = navigator.languages || navigator.language || navigator.userLanguage;
-        }
+        // Otherwise get the user's preferred language in their browser settings
+        userLangs = navigator.languages || navigator.language || navigator.userLanguage;
 
         // If a language can't be detected, default to English
         if (!userLangs) {

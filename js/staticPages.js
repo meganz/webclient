@@ -250,7 +250,7 @@ mBroadcaster.once('boot_done', () => {
         const kvLogin = [['next', 'propay_' + selectedPlan]];
         const uLang = sessionStorage.lang || localStorage.lang;
         if (uLang) {
-            kvLogin.push(['lang', uLang]);
+            kvLogin.push(['lang', uLang, '1']);
         }
         const kvReg = [['next', '1'], ['plan', selectedPlan]];
         if (is_mobile) {

@@ -1551,6 +1551,10 @@ function init_page() {
         parsepage(pages.nzipp);
         nzippCampaign.init();
     }
+    else if (page.substring(0, 9) === 'troy-hunt') {
+        parsepage(pages['troy-hunt']);
+        troyhuntCampaign.init();
+    }
     else if (page === 'refer') {
         parsepage(pages.affiliate);
         affiliateprogram.init();
@@ -2504,7 +2508,7 @@ function topmenuUI() {
                     'help', 'login', 'mega', 'nzippmember', 'nziphotographer', 'privacy', 'gdpr', 'mobileapp',
                     'mobile', 'privacycompany', 'register', 'resellers', 'sdk', 'sync', 'sitemap', 'sourcecode',
                     'support', 'sync', 'takedown', 'terms', 'start', 'security', 'downloadapp', 'affiliate',
-                    'nas', 'pro', 'cookie', 'securechat', 'collaboration', 'storage'
+                    'nas', 'pro', 'cookie', 'securechat', 'collaboration', 'storage', 'troy-hunt'
                 ];
                 var moveTo = {
                     'account': 'fm/account',

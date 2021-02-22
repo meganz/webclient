@@ -21,9 +21,7 @@ lazy(self, 'csp', function() {
     const sgValue = async(newValue, byUser) => {
         const u_handle = mega.user;
 
-        if (newValue !== undefined) {
-            newValue >>>= 0;
-            console.assert(newValue & CS_ESSENT);
+        if ((newValue >>>= 0) & CS_ESSENT) {
 
             if (u_handle) {
                 delete storage.csp;
@@ -41,6 +39,7 @@ lazy(self, 'csp', function() {
                 storage['csp.' + u_handle] = newValue;
                 return srv === newValue ? -srv : mega.attr.set('csp', newValue, -2, 1);
             }
+
             storage.csp = newValue;
         }
         return u_handle && mega.attr.get(u_handle, 'csp', -2, 1) || storage.csp;

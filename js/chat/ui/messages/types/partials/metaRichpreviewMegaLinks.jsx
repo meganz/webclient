@@ -147,7 +147,7 @@ class MetaRichpreviewMegaLinks extends ConversationMessageMixin {
                 }
                 onClick={function(url, megaLinkInfo) {
                     if (megaLinkInfo.hadLoaded()) {
-                        window.open(url, '_blank', 'noopener');
+                        window.open(url, '_blank', 'noopener,noreferrer');
                     }
                 }.bind(this, megaLinkInfo.getLink(), megaLinkInfo)}>
                     {previewContainer}

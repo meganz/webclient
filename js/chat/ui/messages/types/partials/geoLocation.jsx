@@ -6,7 +6,7 @@ function GeoLocation(props) {
     const handleOnclick= (lat, lng) => {
         const openGmaps = () => {
             const gmapsUrl = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
-            window.open(gmapsUrl, '_blank', 'noopener');
+            window.open(gmapsUrl, '_blank', 'noopener,noreferrer');
         }
 
         if (GeoLocationLinks.gmapsConfirmation === -1 || GeoLocationLinks.gmapsConfirmation === false) {

@@ -187,7 +187,7 @@ var psa = {
             psa.saveLastPsaSeen();
 
             // Open a new tab (and hopefully don't trigger popup blocker)
-            window.open(pageLink, '_blank');
+            window.open(pageLink, '_blank', 'noopener,noreferrer');
         });
     },
 

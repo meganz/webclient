@@ -180,6 +180,7 @@
         "local-rules/jquery-replacements": 2,
         "local-rules/jquery-scopes": 1,
         "local-rules/misc-warnings": 1,
+        "local-rules/open": 2,
 
         "optimize-regex/optimize-regex": 2,
         "sonarjs/cognitive-complexity": [1, 48],

@@ -95,7 +95,7 @@ class MetaRichpreview  extends ConversationMessageMixin {
                     }
                     onClick={function(url) {
                         if (!message.meta.isLoading) {
-                            window.open(url, "_blank");
+                            window.open(url, "_blank", 'noopener,noreferrer');
                         }
                     }.bind(this, meta.url)}>
                     {previewContainer}

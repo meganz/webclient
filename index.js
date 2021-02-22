@@ -2568,11 +2568,6 @@ function topmenuUI() {
         loadSubPage('pro');
     });
 
-    $('.top-social-bl a', $topMenu).rebind('click.opensocialnw', function(e) {
-        e.preventDefault();
-        window.open($(this).attr('href'));
-    });
-
     // Initialise the language sub menu for mobile
     if (is_mobile) {
         mobile.languageMenu.init();

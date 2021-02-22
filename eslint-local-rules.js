@@ -44,6 +44,53 @@ function dump(what) {
 }
 
 module.exports = {
+    'open': {
+        meta: {
+            docs: {
+                description: 'Ensure safe window.open() calls.',
+                category: 'possible-errors',
+                recommended: true
+            },
+            schema: []
+        },
+        create(context) {
+            return {
+                Identifier(node) {
+                    if (node.name === 'open') {
+                        const parent = xpath(node, 'parent/type');
+                        const args = 'MemberExpression' === parent ? xpath(node, 'parent/parent/arguments')
+                            : parent === 'CallExpression' && xpath(node, 'parent/arguments');
+
+                        if (args && (args.length < 3
+                            || !String(args[2].value).includes('noopener')
+                            || !String(args[2].value).includes('noreferrer'))) {
+
+                            let a0 = args[0] || false;
+                            if (a0.type === 'BinaryExpression') {
+                                do {
+                                    a0 = a0.left || false;
+                                }
+                                while (a0.type === 'BinaryExpression');
+                            }
+                            if (a0.type === 'CallExpression') {
+                                a0 = a0.callee.name;
+                            }
+                            else if (a0.type === 'Literal') {
+                                a0 = a0.value;
+                            }
+
+                            if (!/^(?:GET|POST|https:\/\/mega\.(?:nz|io)|get(?:App)?BaseUrl)\b/.test(a0)) {
+
+                                context.report(node,
+                                    'If this is a window.open() call, it must be explicitly invoked with noopener|noreferrer.'
+                                );
+                            }
+                        }
+                    }
+                },
+            };
+        }
+    },
     'hints': {
         meta: {
             docs: {

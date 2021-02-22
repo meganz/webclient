@@ -998,7 +998,7 @@ else if ((page = isPublicLink(document.location.hash))) {
     else {
         history.replaceState({ subpage: page }, "", '#' + page);
     }
-    
+
 }
 else if (isPublickLinkV2(document.location.pathname)) {
     page = getCleanSitePath();
@@ -2610,9 +2610,6 @@ else if (!browserUpdate) {
         // Other
         jsl.push({f:'js/vendor/moment.js', n: 'moment_js', j:1,w:1});
         jsl.push({f:'js/vendor/perfect-scrollbar.js', n: 'ps_js', j:1,w:1});
-
-        // Google Import Contacts
-        jsl.push({f:'js/gContacts.js', n: 'gcontacts_js', j:1,w:3});
 
         // UI Elements
         jsl.push({f:'js/ui/megaRender.js', n: 'megarender_js', j:1,w:1});

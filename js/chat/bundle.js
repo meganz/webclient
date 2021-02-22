@@ -11953,7 +11953,7 @@ class MetaRichpreview extends ConversationMessageMixin {
         className: "message richpreview container " + (meta.i ? "have-preview" : "no-preview") + " " + (meta.d ? "have-description" : "no-description") + " " + (isLoading ? "is-loading" : "done-loading"),
         onClick: function (url) {
           if (!message.meta.isLoading) {
-            window.open(url, "_blank");
+            window.open(url, "_blank", 'noopener,noreferrer');
           }
         }.bind(this, meta.url)
       }, previewContainer, metaRichpreview_React.createElement("div", {
@@ -12066,7 +12066,7 @@ function GeoLocation(props) {
 
   const handleOnclick = (lat, lng) => {
     const openGmaps = () => {
-      window.open("https://www.google.com/maps/search/?api=1&query=" + lat + "," + lng, '_blank', 'noopener');
+      window.open("https://www.google.com/maps/search/?api=1&query=" + lat + "," + lng, '_blank', 'noopener,noreferrer');
     };
 
     if (GeoLocationLinks.gmapsConfirmation === -1 || GeoLocationLinks.gmapsConfirmation === false) {
@@ -12247,7 +12247,7 @@ class metaRichpreviewMegaLinks_MetaRichpreviewMegaLinks extends mixin["Conversat
         className: "message richpreview container " + (megaLinkInfo.havePreview() ? "have-preview" : "no-preview") + " " + (megaLinkInfo.d ? "have-description" : "no-description") + " " + (!megaLinkInfo.hadLoaded() ? "is-loading" : "done-loading"),
         onClick: function (url, megaLinkInfo) {
           if (megaLinkInfo.hadLoaded()) {
-            window.open(url, '_blank', 'noopener');
+            window.open(url, '_blank', 'noopener,noreferrer');
           }
         }.bind(this, megaLinkInfo.getLink(), megaLinkInfo)
       }, previewContainer, external_React_default.a.createElement("div", {

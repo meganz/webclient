@@ -245,14 +245,8 @@
             u_checked = true;
 
             if (u_type === 3) {
-                onIdle(topmenuUI);
-                console.assert($.dialog === 'pro-login-dialog', 'Uhm, unexpected dialog... ' + $.dialog);
                 if ($.dialog === 'pro-login-dialog') {
                     closeDialog();
-                }
-                if (window.n_h) {
-                    // set new u_sid under folderlinks
-                    api_setfolder(n_h);
                 }
                 completePromise.resolve();
             }

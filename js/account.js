@@ -22,28 +22,12 @@ function u_login(ctx, email, password, uh, pinCode, permanent) {
 function u_login2(ctx, ks) {
     if (ks !== false) {
         sessionStorage.signinorup = 1;
-        localStorage.wasloggedin = true;
-        u_logout();
-        u_storage = init_storage(ctx.permanent ? localStorage : sessionStorage);
-        u_storage.k = JSON.stringify(ks[0]);
-        u_storage.sid = ks[1];
-        watchdog.notify('login', [!ctx.permanent && ks[0], ks[1]]);
-        if (ks[2]) {
-            u_storage.privk = base64urlencode(crypto_encodeprivkey(ks[2]));
-        }
-        u_checklogin(ctx, false);
-
-        // Logging to see how many people are signing
-        onIdle(function() {
-            if (is_mobile) {
-                api_req({a: 'log', e: 99629, m: 'Completed login on mobile webclient'});
-            }
-            else {
-                api_req({a: 'log', e: 99630, m: 'Completed login on regular webclient'});
-            }
-
-            mBroadcaster.sendMessage('login', ks);
-        });
+        security.login.rememberMe = !!ctx.permanent;
+        security.login.loginCompleteCallback = (res) => {
+            ctx.checkloginresult(ctx, res);
+            ctx = ks = undefined;
+        };
+        security.login.setSessionVariables(ks);
     }
     else {
         ctx.checkloginresult(ctx, false);
@@ -231,6 +215,50 @@ function u_checklogin3a(res, ctx) {
         }
     }
 
+}
+
+// validate user session.
+async function u_checklogin4(sid) {
+    'use strict';
+
+    console.assert(!u_sid || u_type);
+    console.assert(u_storage === localStorage || u_storage === sessionStorage);
+
+    u_storage.sid = u_sid = sid;
+    api_setsid(u_sid || false);
+    delay.cancel('overquota:retry');
+
+    // let's use M.req()'s deduplication capability in case of concurrent callers..
+    const ug = await Promise.resolve(M.req('ug')).catch(echo);
+
+    const res = await promisify(resolve => {
+        u_checklogin3a(ug, {
+            checkloginresult: (ctx, r) => resolve(r)
+        });
+    })();
+
+    if (res >= 0) {
+        if (window.n_h) {
+            // set new sid under folder-links
+            api_setfolder(n_h);
+
+            // hide ephemeral account warning
+            if (typeof alarm !== 'undefined') {
+                alarm.hideAllWarningPopups();
+            }
+        }
+        u_type = res;
+        u_checked = true;
+        onIdle(topmenuUI);
+        if (typeof dlmanager === 'object') {
+            dlmanager.setUserFlags();
+            delay('overquota:retry', () => dlmanager._onOverQuotaAttemptRetry(sid));
+        }
+        return res;
+    }
+
+    u_storage.sid = u_sid = undefined;
+    throw new SecurityError('Invalid Session, ' + res);
 }
 
 // erase all local user/session information

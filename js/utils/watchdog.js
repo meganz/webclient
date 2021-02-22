@@ -232,48 +232,24 @@ var watchdog = Object.freeze({
                     var type = strg.data[0];
 
                     u_storage = init_storage(localStorage);
-                    u_storage.sid = sid;
-
-                    u_checklogin({
-                        checkloginresult: function(ctx, r) {
-                            u_type = r;
+                    u_checklogin4(sid)
+                        .then(r => {
 
                             if (u_type !== type) {
                                 console.error('Unexpected user-type: got %s, expected %s', r, type);
                             }
 
-                            if (window.n_h) {
-                                // set new u_sid under folderlinks
-                                api_setfolder(n_h);
-
-                                // hide ephemeral account warning
-                                if (typeof alarm !== 'undefined') {
-                                    alarm.hideAllWarningPopups();
-                                }
-                            }
-
                             dlmanager._onQuotaRetry(true, sid);
-                        }
-                    });
+                            return r;
+                        })
+                        .dump('watchdog.setrsa');
                 }
                 break;
 
             case 'setsid':
                 if (this.Strg.login === strg.origin && strg.data) {
                     const sid = strg.data;
-
-                    delay('watchdog:setsid', () => {
-                        api_setsid(sid);
-                        u_storage.sid = sid;
-
-                        u_checklogin({
-                            checkloginresult: (ctx, r) => {
-                                u_type = r;
-                                onIdle(topmenuUI);
-                            }
-                        });
-                    }, 9e2);
-
+                    delay('watchdog:setsid', () => u_checklogin4(sid).dump('watchdog.setsid'), 750);
                     delete this.Strg.login;
                 }
                 break;

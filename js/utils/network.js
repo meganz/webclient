@@ -164,7 +164,9 @@ function megaUtilsGFSFetch(aData, aStartOffset, aEndOffset, aProgress) {
 
             if (d && String(apipath).indexOf('staging') > 0) {
                 var s = sessionStorage;
-                req.f = [s.dltfefq | 0, s.dltflimit | 0];
+                if (s.dltfefq || s.dltflimit) {
+                    req.f = [s.dltfefq | 0, s.dltflimit | 0];
+                }
             }
 
             if (!key) {

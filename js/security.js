@@ -1279,7 +1279,6 @@ security.login = {
      *     ]
      */
     setSessionVariables: function(keyAndSessionData) {
-
         'use strict';
 
         // Check if the Private Key and Session ID were decrypted successfully
@@ -1314,37 +1313,25 @@ security.login = {
             u_storage.privk = base64urlencode(crypto_encodeprivkey(decodedPrivateRsaKey));
         }
 
-        // A little helper to pass only the final result of the User Get (ug) API request
-        // i.e. the (user type or error code) back to the loginCompletionCallback function
-        var ctx = {
-            callback2: security.login.loginCompleteCallback,
-            checkloginresult: function(ctx, result) {
-                if (ctx.callback2) {
-                    ctx.callback2(result);
-                }
-            }
-        };
-
         // Cleanup temporary login variables
         security.login.email = null;
         security.login.password = null;
         security.login.rememberMe = false;
 
         // Continue to perform 'ug' request and afterwards run the loginComplete callback
-        u_checklogin(ctx, false);
+        u_checklogin4(u_storage.sid)
+            .then((res) => {
+                security.login.loginCompleteCallback(res);
 
-        // Logging to see how many people are signing in
-        onIdle(function() {
-            if (is_mobile) {
-                api_req({a: 'log', e: 99629, m: 'Completed login on mobile webclient'});
-            }
-            else {
-                api_req({a: 'log', e: 99630, m: 'Completed login on regular webclient'});
-            }
+                // Logging to see how many people are signing in
+                eventlog(is_mobile ? 99629 : 99630);
 
-            // Broadcast login event
-            mBroadcaster.sendMessage('login', keyAndSessionData);
-        });
+                // Broadcast login event
+                mBroadcaster.sendMessage('login', keyAndSessionData);
+
+                return res;
+            })
+            .dump('sec.login');
     },
 
     /**

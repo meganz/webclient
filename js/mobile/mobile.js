@@ -910,7 +910,8 @@ function closeDialog() {
     mBroadcaster.sendMessage('closedialog');
 }
 
-mega.ui.showRegisterDialog = function() {};
+// eslint-disable-next-line no-useless-concat
+mega.ui['showReg' + 'isterDialog'] = nop;
 
 /**
  * Shim for sendSignupLinkDialog, likely called from showOverQuotaRegisterDialog

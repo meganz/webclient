@@ -3088,7 +3088,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
             case 'M4V ':
             case 'avc1': // JVT
             case 'f4v ': // Adobe Flash (MPEG-4 Part 12)
-            case 'qt  ' + (d > 1 ? '' : '$'):
+            case 'qt  ' + (mega.chrome || audiocodec ? '$' : ''):
                 if (videocodec === 'avc1') {
                     mime = 'video/mp4; codecs="avc1.640029';
 
@@ -3115,7 +3115,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
                 }
                 /* falls through */
             case 'WebM':
-                switch (mega.chrome && videocodec) {
+                switch (isMediaSourceSupported.webm && videocodec) {
                     case 'V_AV1':
                         return MediaSource.isTypeSupported('video/webm; codecs="av01.2.23M.12"') ? 1 : 0;
                     case 'V_VP8':
@@ -3574,6 +3574,43 @@ mBroadcaster.once('startMega', function isAudioContextSupported() {
     // Safari AudioContext polyfill for audio streaming support
     if (!window.AudioContext && window.webkitAudioContext) {
         window.AudioContext = window.webkitAudioContext;
+    }
+
+    if (isMediaSourceSupported()) {
+        onIdle(tryCatch(() => {
+            if (!localStorage.vsWebM) {
+                if (mega.chrome) {
+                    Object.defineProperty(isMediaSourceSupported, 'webm', {value: 2});
+                }
+                return;
+            }
+            const ms = new MediaSource();
+            const uri = URL.createObjectURL(ms);
+            const video = document.getElementById('video');
+            const onOpen = tryCatch(() => {
+                ms.removeEventListener('sourceopen', onOpen);
+                URL.revokeObjectURL(uri);
+
+                const sb = ms.addSourceBuffer('video/webm; codecs="vp8, vorbis"');
+
+                if (sb.timestampOffset === 0) {
+                    sb.timestampOffset = true;
+
+                    if (sb.timestampOffset === 1) {
+                        /** @property isMediaSourceSupported.webm */
+                        Object.defineProperty(isMediaSourceSupported, 'webm', {value: true});
+
+                        if (d) {
+                            console.debug('[MSE] WebM support enabled.');
+                        }
+                    }
+                }
+
+            }, false);
+
+            ms.addEventListener('sourceopen', onOpen);
+            video.src = uri;
+        }, false));
     }
 
     if ('AudioContext' in window) {

@@ -2118,7 +2118,6 @@ var exportExpiry = {
 
                 var $selectedLink = $('.item.selected', $linksTab);
                 var handle = $selectedLink.data('node-handle');
-                var media = false;
                 var $items;
                 var itemsLength;
 
@@ -2161,12 +2160,8 @@ var exportExpiry = {
                     dialogPositioning($linksDialog);
                 };
 
-                if (is_video(M.d[handle])) {
-                    media = true;
-                }
-
                 // Show confirmartion dialog if handle is media
-                if (media) {
+                if (is_video(M.d[handle]) === 1) {
                     msgDialog('confirmation', l[882], l[17824], 0, function(e) {
                         if (e) {
                             removeLink();

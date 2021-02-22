@@ -733,8 +733,10 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
                         $menuCMI.filter('.move-item').hide();
                         $menuCMI.filter('.send-to-contact-item').hide();
                     }
-                    else if (items['.getlink-item']) {
-                        onIdle(M.setContextMenuGetLinkText.bind(M));
+                    else {
+                        if (items['.getlink-item']) {
+                            onIdle(() => M.setContextMenuGetLinkText());
+                        }
 
                         if (items['.play-item']) {
                             var $playItem = $menuCMI.filter('.play-item');

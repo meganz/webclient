@@ -1194,8 +1194,8 @@ function init_page() {
         parsepage(pages['privacy']);
     }
     else if (page === 'gdpr') {
-        parsepage(pages['gdpr']);
-        gdpr.init();
+        loadSubPage('privacy', 'override');
+        return false;
     }
     else if (page == 'privacycompany') {
         parsepage(pages['privacycompany']);

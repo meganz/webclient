@@ -743,7 +743,7 @@
     "6126": "PRO III",
     "6159": "MEGA SDK",
     "6170": "SORTUJ",
-    "6172": "subskrybuj",
+    "6172": "Subskrybuj",
     "6181": "Usu\u0144 swoje konto",
     "6182": "Zamknij swoje konto",
     "6183": "Tak, chc\u0119 anulowa\u0107 moje konto",
@@ -1971,7 +1971,6 @@
     "18493": "Pobierz swoje dane osobowe",
     "18495": "Note: This will provide your account and file metadata, not the actual files stored by you.",
     "18496": "This feature does not work on iOS. Please try to download again using the desktop web client.",
-    "18501": "Data Protection Regulation",
     "18506": "Je\u015bli mo\u017cesz poda\u0107 adres e-mail swojego konta, zr\u00f3b to. Je\u015bli nie mo\u017cesz go zapami\u0119ta\u0107, kliknij Uruchom ponownie, aby pomin\u0105\u0107 ten krok.",
     "18508": "Wprowad\u017a adres e-mail konta, kt\u00f3re chcesz odzyska\u0107. Je\u015bli nie mo\u017cesz tego zapami\u0119ta\u0107, zostaw to pole puste.",
     "18509": "Wprowad\u017a nazw\u0119 grupy",
@@ -4058,7 +4057,7 @@
     "24656": "Reklamowe pliki cookie",
     "24657": "U\u017cywane przez nas i naszych zatwierdzonych partner\u00f3w reklamowych do dostosowywania reklam, kt\u00f3re widzisz w naszych us\u0142ugach i na innych stronach internetowych na podstawie historii przegl\u0105dania. Brak akceptacji tych plik\u00f3w cookie oznacza, \u017ce mo\u017cemy wy\u015bwietla\u0107 reklamy, kt\u00f3re s\u0105 mniej istotne.",
     "24658": "Pliki cookie stron trzecich",
-    "24659": "S\u0105 to pliki cookie, kt\u00f3re s\u0105 kontrolowane przez kogo\u015b innego ni\u017c my; u\u017cywamy tych plik\u00f3w cookie w celu zapewnienia typ\u00f3w funkcjonalno\u015bci opisanych powy\u017cej. Brak akceptacji tych plik\u00f3w cookie b\u0119dzie mia\u0142 r\u00f3\u017cne konsekwencje w zale\u017cno\u015bci od typu pliku cookie ka\u017cdego pliku cookie strony trzeciej. Kliknij \u201eWi\u0119cej informacji\u201d poni\u017cej, aby uzyska\u0107 szczeg\u00f3\u0142owe informacje na temat wszystkich u\u017cywanych przez nas plik\u00f3w cookie stron trzecich.",
+    "24659": "S\u0105 to pliki cookie, kt\u00f3re s\u0105 kontrolowane przez kogo\u015b innego ni\u017c my; u\u017cywamy tych plik\u00f3w cookie w celu zapewnienia opisanych powy\u017cej funkcji. Brak akceptacji tych plik\u00f3w cookie b\u0119dzie mia\u0142 r\u00f3\u017cne konsekwencje w zale\u017cno\u015bci od rodzaju pliku cookie, jakim jest plik cookie nale\u017c\u0105cy do osoby trzeciej. Kliknij \u201cWi\u0119cej informacji\u201d poni\u017cej, aby uzyska\u0107 szczeg\u00f3\u0142owe informacje na temat wszystkich u\u017cywanych przez nas plik\u00f3w cookie os\u00f3b trzecich.",
     "24660": "Wi\u0119cej informacji",
     "24661": "U\u017cyj zapisanych ustawie\u0144",
     "24662": "U\u017cyj nowych ustawie\u0144",
@@ -4094,5 +4093,7 @@
     "24766": "Prosz\u0119 si\u0119 zalogowa\u0107, aby kontynuowa\u0107 zakup",
     "24836": "Wpisz kod kuponu",
     "24849": "Zyskaj [B]%2 zni\u017cki[\/B] na sw\u00f3j miesi\u0119czny plan [B]%1[\/B] teraz",
-    "24850": "Skorzystaj z [B]%2 zni\u017cki[\/B] na sw\u00f3j [B]%1[\/B] plan teraz"
+    "24850": "Skorzystaj z [B]%2 zni\u017cki[\/B] na sw\u00f3j [B]%1[\/B] plan teraz",
+    "24851": "Dzi\u0119ki!",
+    "24852": "Twoja opinia jest dla nas wa\u017cna i pomo\u017ce nam poprawi\u0107 nasze us\u0142ugi. Je\u015bli chcieliby\u015bcie Pa\u0144stwo poda\u0107 nam wi\u0119cej szczeg\u00f3\u0142\u00f3w, prosimy o kontakt mailowy z obs\u0142ug\u0105 techniczn\u0105 MEGA na adres support@mega.nz. Je\u015bli chcesz przeczyta\u0107 wi\u0119cej o MEGA, [A]kliknij tutaj[\/A], aby sprawdzi\u0107 nasz blog."
 }

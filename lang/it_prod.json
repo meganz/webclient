@@ -1416,7 +1416,7 @@
     "16112": "Info su MEGA",
     "16113": "La Compagnia della Privacy",
     "16114": "Legale e policy",
-    "16115": "Cancella account",
+    "16115": "Elimina account",
     "16116": "[S]Attenzione:[\/S] Non potrai accedere ai dati del tuo account, ai tuoi contatti o conversazioni MEGA dopo aver confermato quest'azione.",
     "16117": "Obiettivi",
     "16118": "Uso complessivo",
@@ -1971,7 +1971,6 @@
     "18493": "Scarica i tuoi dati personali",
     "18495": "Nota: Questo fornir\u00e0 il tuo account e i relativi metadata del file, non i file che sono realmente archiviati da te.",
     "18496": "This feature does not work on iOS. Please try to download again using the desktop web client.",
-    "18501": "Data Protection Regulation",
     "18506": "Se puoi, fornisci l'indirizzo email dell'account che vuoi recuperare. Se non riesci a ricordarlo, per favore clicca di nuovo su Inizia per saltare questo step.",
     "18508": "Per favore, inserisci l'indirizzo email dell'account che desideri recuperare. Se non riesci a ricordarla, per favore lascia vuoto il campo.",
     "18509": "Inserisci nome gruppo",
@@ -2293,7 +2292,7 @@
     "19086": "Disabilita utenti",
     "19087": "Numero di utenti",
     "19088": "Spazio totale utilizzato",
-    "19091": "Banda utilizzata",
+    "19091": "Utilizzo della banda",
     "19092": "Disabilita utente",
     "19093": "Vedi utente",
     "19094": "Riattiva utente",
@@ -2442,7 +2441,7 @@
     "19512": "Hai effettuato l'upgrade con successo del tuo account [B]%2[\/B] a %1.",
     "19513": "Grazie! Il tuo account [B]%2[\/B] subir\u00e0 un upgrade appena riceviamo conferma del tuo pagamento dal nostro provider di pagamento. Se hai pagato con carta di debito o carta di credito e non hai ricevuto il tuo account MEGA Pro nel giro di qualche ora, per favore contattaci a [A]support@mega.nz[\/A]. Se hai pagato con un trasferimento bancario per favore permetti 4-5 giorni di tempo al pagamento per essere eseguito.",
     "19514": "Grazie! Il tuo account [B]%2[\/B] subir\u00e0 un upgrade appena riceviamo conferma dell\u2019avvenuto pagamento dal nostro provider di pagamento. Se non ricevi il tuo account MEGA Pro nel giro di %1 ore, per favore contattaci a [A]support@mega.nz[\/A].",
-    "19516": "Crea account business",
+    "19516": "Crea account Business",
     "19517": "Crea account Business",
     "19521": "Modifica impostazioni dell'account",
     "19522": "Gestisci account",
@@ -4094,5 +4093,7 @@
     "24766": "Per favore, effettua il login per procedere con l\u2019acquisto",
     "24836": "Inserisci il codice sconto",
     "24849": "Get [B]%2 off[\/B] your monthly [B]%1[\/B] plan now",
-    "24850": "Get [B]%2 off[\/B] your [B]%1[\/B] plan now"
+    "24850": "Get [B]%2 off[\/B] your [B]%1[\/B] plan now",
+    "24851": "Thanks!",
+    "24852": "Your feedback is important to us and will help us improve our service. If you would like to give us more detail, please email MEGA support at support@mega.nz. If you would like to read more about MEGA, [A]click here[\/A] to check out our blog."
 }

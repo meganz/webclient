@@ -1971,7 +1971,6 @@
     "18493": "Download Personal Data Anda",
     "18495": "Catatan: Ini akan memberikan metadata akun dan file Anda, bukan file sebenarnya yang disimpan oleh Anda.",
     "18496": "This feature does not work on iOS. Please try to download again using the desktop web client.",
-    "18501": "Data Protection Regulation",
     "18506": "Jika Anda dapat memberikan alamat email akun Anda, silakan lakukan. Jika Anda tidak dapat mengingatnya, klik Mulai lagi untuk melewati langkah ini.",
     "18508": "Harap masukkan alamat email dari akun yang ingin Anda pulihkan. Jika Anda tidak dapat mengingatnya, kosongkan bidang ini.",
     "18509": "Masukan nama grup",
@@ -4094,5 +4093,7 @@
     "24766": "Harap masuk untuk melanjutkan pembelian",
     "24836": "Masukkan kode voucher",
     "24849": "Get [B]%2 off[\/B] your monthly [B]%1[\/B] plan now",
-    "24850": "Get [B]%2 off[\/B] your [B]%1[\/B] plan now"
+    "24850": "Get [B]%2 off[\/B] your [B]%1[\/B] plan now",
+    "24851": "Thanks!",
+    "24852": "Your feedback is important to us and will help us improve our service. If you would like to give us more detail, please email MEGA support at support@mega.nz. If you would like to read more about MEGA, [A]click here[\/A] to check out our blog."
 }

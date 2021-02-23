@@ -1971,7 +1971,6 @@
     "18493": "T\u1ea3i v\u1ec1 d\u1eef li\u1ec7u li\u00ean quan \u0111\u1ebfn c\u00e1 nh\u00e2n",
     "18495": "Ghi ch\u00fa: Ti\u1ebfn tr\u00ecnh n\u00e0y s\u1ebd tr\u00ecnh b\u00e0y si\u00eau d\u1eef li\u1ec7u v\u1ec1 t\u00e0i kho\u1ea3n, ch\u1ee9 kh\u00f4ng ph\u1ea3i t\u1ea3i v\u1ec1 to\u00e0n b\u1ed9 c\u00e1c t\u1ec7p tin c\u00f3 trong \u1ed5 m\u00e2y.",
     "18496": "This feature does not work on iOS. Please try to download again using the desktop web client.",
-    "18501": "Quy \u0110\u1ecbnh B\u1ea3o V\u1ec7 D\u1eef Li\u1ec7u",
     "18506": "N\u1ebfu bi\u1ebft \u0111\u1ecba ch\u1ec9 email c\u1ee7a t\u00e0i kho\u1ea3n, xin vui l\u00f2ng \u0111i\u1ec1n v\u00e0o. N\u1ebfu kh\u00f4ng nh\u1edb, c\u1ee9 \u0111\u1ec3 tr\u1ed1ng v\u00e0 click v\u00e0o B\u1eaft \u0110\u1ea7u \u0111\u1ec3 b\u1ecf qua b\u01b0\u1edbc n\u00e0y.",
     "18508": "Xin nh\u1eadp \u0111\u1ecba ch\u1ec9 email c\u1ee7a t\u00e0i kho\u1ea3n mu\u1ed1n ph\u1ee5c h\u1ed3i. N\u1ebfu kh\u00f4ng nh\u1edb, c\u1ee9 \u0111\u1ec3 tr\u1ed1ng.",
     "18509": "\u0110i\u00ea\u0300n t\u00ean nho\u0301m",
@@ -4094,5 +4093,7 @@
     "24766": "Xin \u0111\u0103ng nh\u1eadp \u0111\u1ec3 ti\u1ebfn h\u00e0nh thanh to\u00e1n",
     "24836": "Nh\u1eadp m\u00e3 voucher",
     "24849": "Get [B]%2 off[\/B] your monthly [B]%1[\/B] plan now",
-    "24850": "Get [B]%2 off[\/B] your [B]%1[\/B] plan now"
+    "24850": "Get [B]%2 off[\/B] your [B]%1[\/B] plan now",
+    "24851": "Thanks!",
+    "24852": "Your feedback is important to us and will help us improve our service. If you would like to give us more detail, please email MEGA support at support@mega.nz. If you would like to read more about MEGA, [A]click here[\/A] to check out our blog."
 }

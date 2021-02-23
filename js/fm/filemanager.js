@@ -1368,7 +1368,7 @@ FileManager.prototype.initContextUI = function() {
             };
 
             for (var i = handles.length; i--;) {
-                if (is_video(M.d[handles[i]])) {
+                if (is_video(M.d[handles[i]]) === 1) {
                     media = true;
                     break;
                 }

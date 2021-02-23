@@ -161,10 +161,18 @@ function getCleanSitePath(path) {
 
     if (path === undefined) {
         path = getSitePath();
+
+        if (location.search && path.indexOf('#') < 0) {
+            location.search.replace(/\w+=[^&]+/g, function(m) {
+                path += '/' + m;
+            });
+        }
     }
+
     if (path.indexOf('lang_') > -1) {
         path = path.replace('lang_', 'lang=');
     }
+
     // cleanup and handle affiliate tags.
     path = mURIDecode(path).replace(/^[#/]+|\/+$/g, '').split(/(\/\w+=)/);
 
@@ -174,7 +182,19 @@ function getCleanSitePath(path) {
 
     if (path.length > 1) {
         for (var s = 1; s < path.length; s += 2) {
-            path[String(path[s]).replace(/\W/g, '')] = mURIDecode(path[s + 1]);
+            var v = mURIDecode(path[s + 1]);
+            var k = String(path[s]).replace(/\W/g, '');
+
+            path[k] = v;
+
+            v = k.substr(0, 3);
+            if (v === 'utm' || v === 'mtm') {
+                /** @property window.uTagUTM */
+                /** @property window.uTagMTM */
+                v = 'uTag' + v.toUpperCase();
+                window[v] = window[v] || {};
+                window[v][k] = path[k];
+            }
         }
 
         if (path.uao) {
@@ -203,24 +223,17 @@ function getCleanSitePath(path) {
         if (path.csp) {
             localStorage.csp = path.csp >>> 0 & 0xff;
         }
-        window.decodeParam = window.decodeParam || function(val) {
-            return atob((val + '=='.substr(2 - val.length * 3 & 3)).replace(/-/g, '+').replace(/_/g, '/'));
-        };
         if (path.sra) {
-            tryCatch(function() {
-                localStorage.utm = window.decodeParam(path.sra);
-            })();
+            localStorage.utm = b64decode(path.sra);
         }
         if (path.mt) {
             window.uTagMT = path.mt;
         }
         if (path.next) {
-            tryCatch(function() {
-                window.nextPage = window.decodeParam(path.next);
-                if (path.plan) {
-                    window.pickedPlan = path.plan;
-                }
-            })();
+            window.nextPage = b64decode(path.next);
+            if (path.plan) {
+                window.pickedPlan = path.plan;
+            }
         }
         if (path.lang && path.lang.length < 6) {
             localStorage.lang = path.lang;
@@ -715,9 +728,6 @@ var mega = {
     redirect: function(to, page, kv, urlQs) {
         'use strict';
         var storage = localStorage;
-        var encode = function(v) {
-            return btoa(v).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
-        };
 
         to = (String(to).indexOf('//') < 0 ? 'https://' : '') + to;
         if (page) {
@@ -735,15 +745,17 @@ var mega = {
         }
 
         if (storage.utm) {
-            to += '/sra=' + encode(storage.utm);
+            to += '/sra=' + b64encode(storage.utm);
         }
 
         if (Array.isArray(kv)) {
             for (var i = kv.length; i--;) {
                 var k = kv[i][0];
                 var v = kv[i][1];
-                var plain = kv[i][2];
-                to += '/' + k + '=' + (typeof v === 'string' && !plain ? encode(v) : v);
+                v = !kv[i][2] && typeof v === 'string' ? b64encode(v) : v;
+                if (v || v === 0) {
+                    to += '/' + k + '=' + v;
+                }
             }
         }
 
@@ -4414,6 +4426,23 @@ mutex.unlock = promisify(function(resolve, reject, name) {
     resolve();
 });
 Object.freeze(mutex);
+
+function b64encode(str) {
+    'use strict';
+    // eslint-disable-next-line local-rules/hints
+    try {
+        return btoa(str).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+    }
+    catch (ex) {}
+}
+function b64decode(str) {
+    'use strict';
+    // eslint-disable-next-line local-rules/hints
+    try {
+        return atob((str + '=='.substr(2 - str.length * 3 & 3)).replace(/-/g, '+').replace(/_/g, '/'));
+    }
+    catch (ex) {}
+}
 
 // Promise.catch helper
 function nop() {

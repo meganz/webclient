@@ -643,9 +643,17 @@ mega.metatags = new function() {
             mTags.mega_title = 'Desktop Onboarding - MEGA';
             stopBots(metaRobots);
         }
-        else if (page === 'troy-hunt' || page === 'troy-hunt/pro' || page === 'troy-hunt/business') {
+        else if (page.startsWith('troy-hunt')) {
             mTags.mega_title = 'Troy Hunt - MEGA';
             mTags.mega_desc = 'MEGA\'s Troy Hunt Page';
+
+            if (page.endsWith('/pro')) {
+                mTags.mega_title = 'Troy Hunt - PRO - MEGA';
+            }
+            else if (page.endsWith('/business')) {
+                mTags.mega_title = 'Troy Hunt - Business - MEGA';
+            }
+
             stopBots(metaRobots);
         }
         else if (page && (mTags.excluded = isPageExcluded(page))) {

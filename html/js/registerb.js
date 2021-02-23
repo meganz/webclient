@@ -533,6 +533,7 @@ BusinessRegister.prototype.goToPayment = function(userInfo) {
         if (!userInfo.isUpgrade) {
             window.bCreatedVoucher = true;
         }
+        window.busUpgrade = this.isLoggedIn;
         loadSubPage('redeem');
     }
     else {

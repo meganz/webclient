@@ -766,7 +766,8 @@ var redeem = {
                         return false;
                     }
                     closeDialog();
-                    if (window.bCreatedVoucher || (mega.voucher.businessmonths && u_attr && u_attr.b)) {
+                    if (window.busUpgrade || window.bCreatedVoucher ||
+                        (mega.voucher.businessmonths && u_attr && u_attr.b)) {
                         loadSubPage('redeem');
                         return false;
                     }

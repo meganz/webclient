@@ -201,7 +201,7 @@ lazy(self, 'trk', function() {
         }
         else if (action.startsWith('nav')) {
             if (!nav.id) {
-                data = Object.assign({}, data, await pf().catch(nop));
+                data = Object.assign({}, window.uTagUTM, window.uTagMTM, data, await pf().catch(nop));
             }
 
             if (action.indexOf('^page:') > 0) {

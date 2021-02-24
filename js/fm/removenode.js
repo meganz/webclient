@@ -150,9 +150,10 @@ function removeUInode(h, parent) {
 /**
  * Remove nodes
  * @param {Array|String} selectedNodes An array of node handles.
+ * @param {Boolean} [skipDelWarning] skip..del..warning..
  * @returns {MegaPromise}
  */
-function fmremove(selectedNodes) {
+function fmremove(selectedNodes, skipDelWarning) {
     'use strict';
 
     var promise = new MegaPromise();
@@ -184,7 +185,7 @@ function fmremove(selectedNodes) {
                 promise.linkDoneAndFailTo(MegaPromise.allDone(promises));
             }
             else {
-                fmremove.sync(selectedNodes);
+                fmremove.sync(selectedNodes, skipDelWarning);
                 promise.resolve();
             }
         });
@@ -194,7 +195,7 @@ function fmremove(selectedNodes) {
 
 // @todo make eslint happy..
 // eslint-disable-next-line complexity,sonarjs/cognitive-complexity
-fmremove.sync = function(selectedNodes) {
+fmremove.sync = function(selectedNodes, skipDelWarning) {
     'use strict';
 
     var i = 0;
@@ -206,7 +207,7 @@ fmremove.sync = function(selectedNodes) {
     var message = '';
 
     // If on mobile we will bypass the warning dialog prompts
-    const skipDelWarning = is_mobile ? 1 : mega.config.get('skipDelWarning');
+    skipDelWarning = skipDelWarning || is_mobile ? 1 : mega.config.get('skipDelWarning');
 
     for (i = 0; i < selectedNodes.length; i++) {
         var n = M.d[selectedNodes[i]];

@@ -1084,6 +1084,7 @@ function FMShortcuts() {
 
             current_operation = {
                 'op': charTyped == "c" ? 'copy' : 'cut',
+                'dir': M.currentdirid,
                 'src': items
             };
             delay('crossTab:fms!cut/copy', () => {
@@ -1102,12 +1103,13 @@ function FMShortcuts() {
                 return false; // stop prop.
             }
 
-            var handles = current_operation.src;
+            let {src: handles, op, dir} = current_operation;
+            op = op === 'cut' && dir === M.currentdirid ? 'copy' : op;
 
-            if (current_operation.op === "copy") {
+            if (op === "copy") {
                 M.copyNodes(handles, M.currentdirid);
             }
-            else if (current_operation.op === "cut") {
+            else if (op === "cut") {
                 M.moveNodes(handles, M.currentdirid);
                 current_operation = null;
             }
@@ -1123,16 +1125,10 @@ function FMShortcuts() {
                 return; // dont do anything.
             }
 
-            fmremove(remItems);
-
-            // force remove, no confirmation
-            if (e.ctrlKey || e.metaKey) {
-                $('#msgDialog:visible .fm-dialog-button.confirm').trigger('click');
-            }
+            fmremove(remItems, e.ctrlKey || e.metaKey);
 
             return false;
         }
-
     });
 }
 

@@ -191,6 +191,10 @@ Landing page
 /*
 General individual page
  */
+.thunt-header-block {
+    display: block;
+}
+
 .thunt-content.top-bl {
     display: table;
     padding: 55px 0;

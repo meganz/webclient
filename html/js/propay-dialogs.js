@@ -1062,7 +1062,7 @@ var directReseller = {
             '',
             'https://mega.6media.tw/', // 6media
             'https://mega.bwm-mediasoft.com/mega.php5?', // BWM Mediasoft
-            'https://my.hosting.co.uk/' // Hosting.co.uk
+            'https://my.cloudbasedbackup.com/'
         ];
 
         if (provider >= 1 && provider <= 3)

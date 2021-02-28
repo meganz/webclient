@@ -594,22 +594,14 @@ FileManager.prototype.initFileManagerUI = function() {
         return false;
     });
 
-    var thElm;
-    var startOffset;
     var $fmholder = $('#fmholder');
     $('.grid-table-header .grid-view-resize').rebind('mousedown.colresize', function(col) {
         var $me = $(this);
         var th = $me.closest('th');
-        thElm = th;
-        startOffset = th.outerWidth() - col.pageX;
-    });
+        var thElm = th;
+        var startOffset = th.outerWidth() - col.pageX;
 
-    $fmholder.rebind('mousemove.colresize', function(col) {
-        if (M.chat) {
-            return;
-        }
-        if (thElm && thElm.length) {
-
+        $fmholder.rebind('mousemove.colresize', function(col) {
             var newWidth = startOffset + col.pageX;
 
             var colType = thElm.attr('megatype');
@@ -626,11 +618,11 @@ FileManager.prototype.initFileManagerUI = function() {
                     outerWidth(M.columnsWidth.cloud[colType].curr);
 
                 if (M.megaRender && M.megaRender.megaList) {
-                    if (!M.megaRender.megaList._scrollIsInitialized) {
-                        M.megaRender.megaList.resized();
+                    if (M.megaRender.megaList._scrollIsInitialized) {
+                        M.megaRender.megaList.scrollUpdate();
                     }
                     else {
-                        M.megaRender.megaList.scrollUpdate();
+                        M.megaRender.megaList.resized();
                     }
                 }
             }
@@ -639,22 +631,17 @@ FileManager.prototype.initFileManagerUI = function() {
             }
 
             $('#fmholder').css('cursor', 'col-resize');
-        }
-    });
+        });
 
-    $fmholder.rebind('mouseup.colresize', function() {
-        if (M.chat) {
-            return;
-        }
-
-        if (thElm) {
+        $fmholder.rebind('mouseup.colresize', function() {
             M.columnsWidth.makeNameColumnStatic();
-
             initGridScrolling();
-        }
-        thElm = undefined;
-        $('#fmholder').css('cursor', '');
+            $('#fmholder').css('cursor', '');
+            $fmholder.off('mouseup.colresize');
+            $fmholder.off('mousemove.colresize');
+        });
     });
+
 
     $fmholder
         .rebind('ps-scroll-left.fm-x-scroll ps-scroll-right.fm-x-scroll', function(e) {

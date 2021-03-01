@@ -3741,12 +3741,12 @@ else if (!browserUpdate) {
                 if (document.getElementById('bootbottom')) document.getElementById('bootbottom').style.display='none';
                 if (!is_chrome_firefox && window.URL)
                 {
-                    cssar.push(jsl[i].text.replace(/\.\.\//g,staticpath).replace(new RegExp( "\\/en\\/", "g"),'/' + lang + '/'));
+                    cssar.push(jsl[i].text.replace(/(?:\.\.\/)+/g,staticpath).replace(new RegExp("\\/en\\/", "g"),'/' + lang + '/'));
                 }
                 else
                 {
                     mCreateElement('style', {type: 'text/css', rel: 'stylesheet'}, 'head')
-                        .textContent = jsl[i].text.replace(/\.\.\//g,staticpath).replace(new RegExp( "\\/en\\/", "g"),'/' + lang + '/');
+                        .textContent = jsl[i].text.replace(/(?:\.\.\/)+/g,staticpath).replace(new RegExp("\\/en\\/", "g"),'/' + lang + '/');
                 }
             }
             else if (jsl[i].j == 3) {

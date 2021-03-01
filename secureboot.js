@@ -545,10 +545,8 @@ if (!browserUpdate) try
     }
 
     if (!is_livesite && !is_karma) {
+        jj = !sessionStorage.dbgContentCheck;
         dd = d = d > 0 ? d : !localStorage.nfd;
-        if (!is_mobile) {
-            jj = !!d;
-        }
     }
 
     if (!is_extension && (window.dd || !is_livesite && !is_webcache)) {
@@ -3720,11 +3718,18 @@ else if (!browserUpdate) {
         var jsar = [];
         var cssar = [];
         var nodedec = {};
+        var j2re1 = /(?:\.\.\/)+/g;
+        var j2re2 = /\/en\//g;
+        var j2tr2 = '/' + lang + '/';
         var j4re = /url\(["']?images\/([^"')]+)["']?\)/g;
         var j4tr = "url('" + staticpath + "images/pdfV/$1')";
 
+        if (lang === 'en') {
+            j2tr2 = 0;
+        }
+
         xhr_stack = false;
-        for (var i in jsl)
+        for (var i = 0; i < jsl.length; ++i)
         {
             if (!jj || !jsl[i].j || jsl[i].j > 2) {
                 jsl_loaded[jsl[i].n] = 1;
@@ -3738,16 +3743,17 @@ else if (!browserUpdate) {
             }
             else if ((jsl[i].j == 2) && (!jj))
             {
-                if (document.getElementById('bootbottom')) document.getElementById('bootbottom').style.display='none';
-                if (!is_chrome_firefox && window.URL)
-                {
-                    cssar.push(jsl[i].text.replace(/(?:\.\.\/)+/g,staticpath).replace(new RegExp("\\/en\\/", "g"),'/' + lang + '/'));
+                if (tmp !== -23 && (tmp = document.getElementById('bootbottom'))) {
+                    tmp.style.display = 'none';
+                    tmp = -23;
                 }
-                else
-                {
-                    mCreateElement('style', {type: 'text/css', rel: 'stylesheet'}, 'head')
-                        .textContent = jsl[i].text.replace(/(?:\.\.\/)+/g,staticpath).replace(new RegExp("\\/en\\/", "g"),'/' + lang + '/');
+
+                var text = jsl[i].text.replace(j2re1, staticpath);
+                if (j2tr2) {
+                    text = text.replace(j2re2, j2tr2);
                 }
+
+                cssar.push(text);
             }
             else if (jsl[i].j == 3) {
                 try {
@@ -3797,7 +3803,7 @@ else if (!browserUpdate) {
             nodedec = !jj && !is_extension && !("ActiveXObject" in window) && nodedec;
 
             if (nodedec && Object.keys(nodedec).length === 3) {
-                var tmp = String(nodedec.nodedec_js).split(/importScripts\([^)]+\)/);
+                tmp = String(nodedec.nodedec_js).split(/importScripts\([^)]+\)/);
 
                 nodedec = [tmp.shift(), nodedec.sjcl_js, nodedec.asmcrypto_js, tmp.join(';')];
                 mega.nodedecBlobURI = mObjectURL(nodedec, 'text/javascript');

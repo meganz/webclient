@@ -1722,7 +1722,8 @@ function init_page() {
 
     // Load the direct voucher redeem page
     else if (page.substr(0, 6) === 'redeem') {
-        if (localStorage.voucher && (u_type > 2 || window.bCreatedVoucher)) {
+        const storageVoucher = localStorage.voucher;
+        if (storageVoucher && (u_type > 2 || window.bCreatedVoucher)) {
             // To complete the redeem voucher process after user logs in if the voucher code exists
             parsepage(pages[is_mobile ? 'mobile' : 'redeem']);
             redeem.init();
@@ -1731,7 +1732,8 @@ function init_page() {
             // No voucher found, ask to enter it.
             // Or back to the voucher redeem page without completion of login or register if entered code before
             parsepage(pages.redeem);
-            redeem.setupVoucherInputbox(localStorage.voucher);
+            const vCode = page.substr(6);
+            redeem.setupVoucherInputbox((vCode.length > 10 && vCode.length < 25) ? vCode : storageVoucher);
         }
     }
 

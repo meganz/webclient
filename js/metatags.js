@@ -306,6 +306,13 @@ mega.metatags = new function() {
             mTags.mega_desc = l[23979] || mTags.en_desc;
             mTags.image = 'https://cms2.mega.nz/4548c0ab90a611b8b7c5a940811e23b5975b4ba8.png';
         }
+        else if (page === 'dispute') {
+            mTags.en_title = 'Copyright Dispute - MEGA';
+            mTags.en_desc = 'Counter-notification process of copyright dispute';
+            mTags.mega_title = l[24967] || mTags.en_title;
+            mTags.mega_desc = l[24968] || mTags.en_desc;
+            mTags.image = 'https://cms2.mega.nz/4548c0ab90a611b8b7c5a940811e23b5975b4ba8.png';
+        }
         else if (page === 'privacy') {
             mTags.en_title = 'Privacy Policy - MEGA';
             mTags.en_desc = 'Find out how MEGA protects your privacy.';

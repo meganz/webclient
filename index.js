@@ -398,7 +398,7 @@ function init_page() {
     }
 
     // Redirect url to extensions when it tries to go plugin or chrome or firefox
-    if (page === 'plugin' || page === 'chrome' || page === 'firefox') {
+    if (page === 'plugin' || page === 'chrome' || page === 'firefox' || page === 'edge') {
         loadSubPage('extensions');
         return false;
     }

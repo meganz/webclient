@@ -876,6 +876,8 @@ async function dlPageAds($topBar, res) {
 
     dl_advs = new gAdvs(dlpage_ph, res);
 
+    let isRendered = false;
+
     // Only load iframe that require to be rendered,
     // Once screensize updated to change layout, trying to render others
     if (window.innerWidth < 920 || window.innerHeight < 668) {
@@ -889,7 +891,7 @@ async function dlPageAds($topBar, res) {
             }
         });
 
-        dl_advs.render($('.dl-top-ads', $topBar), 'wpht').dump('wpht');
+        isRendered |= await dl_advs.render($('.dl-top-ads', $topBar), 'wpht');
     }
     else {
         $(window).rebind('resize.downloadAdvs', function() {
@@ -901,8 +903,13 @@ async function dlPageAds($topBar, res) {
             }
         });
 
-        dl_advs.render($('.dl-left-ads', $topBar), 'wphl').dump('wphl');
-        dl_advs.render($('.dl-right-ads', $topBar), 'wphr').dump('wphr');
+        isRendered |= await dl_advs.render($('.dl-left-ads', $topBar), 'wphl');
+        isRendered |= await dl_advs.render($('.dl-right-ads', $topBar), 'wphr');
+    }
+
+    // If any one of ads are rendered send stats it is served.
+    if (isRendered) {
+        eventlog(99808);
     }
 
     $topBar.rebind('click.hideAds', function(e) {

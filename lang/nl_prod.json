@@ -743,7 +743,7 @@
     "6126": "Pro III",
     "6159": "MEGA SDK",
     "6170": "Sorteer op",
-    "6172": "inschrijven",
+    "6172": "Inschrijven",
     "6181": "Annuleer uw account",
     "6182": "Be\u00ebindig uw account",
     "6183": "Ja, ik wil mijn account annuleren.",
@@ -2292,7 +2292,7 @@
     "19086": "Uitgeschakelde Gebruikers",
     "19087": "Aantal gebruikers",
     "19088": "Totaal Opslag Verbruik",
-    "19091": "Overdracht Verbruik",
+    "19091": "Gebruikte Overdracht Tegoed",
     "19092": "Gebruiker uitschakelen",
     "19093": "Gebruiker Weergeven",
     "19094": "Activeer gebruiker opnieuw",
@@ -4095,5 +4095,7 @@
     "24849": "Ontvang nu [B]%2 korting [\/B] op uw maandelijkse [B]%1[\/B] abonnement",
     "24850": "Ontvang nu [B]%2 korting [\/B] op uw [B]%1[\/B] abonnement",
     "24851": "Bedankt!",
-    "24852": "Uw feedback is belangrijk voor ons en helpt ons onze service te verbeteren. Als u ons meer details wilt geven, stuur dan een e-mail naar MEGA-ondersteuning op support@mega.nz. Als u meer wilt lezen over MEGA, [A]klik dan hier[\/A] om onze blog te bekijken."
+    "24852": "Uw feedback is belangrijk voor ons en helpt ons onze service te verbeteren. Als u ons meer details wilt geven, stuur dan een e-mail naar MEGA-ondersteuning op support@mega.nz. Als u meer wilt lezen over MEGA, [A]klik dan hier[\/A] om onze blog te bekijken.",
+    "24967": "Copyright Dispute - MEGA",
+    "24968": "Counter-notification process of copyright dispute"
 }

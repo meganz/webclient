@@ -58,7 +58,8 @@ var is_bot = !is_extension && /bot|crawl/i.test(ua);
 var is_old_windows_phone = /Windows Phone 8|IEMobile\/9|IEMobile\/10|IEMobile\/11/i.test(ua);
 var is_uc_browser = /ucbrowser/.test(ua);
 var is_webcache = location.host === 'webcache.googleusercontent.com';
-var is_livesite = location.host === 'mega.nz' || location.host === 'mega.io' || is_extension;
+var is_livesite = location.host === 'mega.nz' || location.host === 'mega.io'
+    || location.host === 'smoketest.mega.nz' || is_extension;
 var is_litesite = !is_embed && location.host === 'mega.io';
 self.fetchStreamSupport = (
     window.fetch && !window.MSBlobBuilder
@@ -544,30 +545,31 @@ if (!browserUpdate) try
         }, 4000);
     }
 
-    if (!is_livesite && !is_karma) {
-        jj = !sessionStorage.dbgContentCheck;
+    if (!is_livesite && !is_karma && !is_webcache) {
         dd = d = d > 0 ? d : !localStorage.nfd;
+        jj = d > 0 && !sessionStorage.dbgContentCheck;
     }
 
-    if (!is_extension && (window.dd || !is_livesite && !is_webcache)) {
+    if (!is_extension && window.dd) {
+        nocontentcheck = sessionStorage.dbgContentCheck ? 0 : true;
 
-        if (location.host === 'smoketest.mega.nz') {
-            cmsStaticPath = 'https://smoketest.static.mega.nz/cms/';
-            staticpath = 'https://smoketest.static.mega.nz/3/';
-            defaultStaticPath = staticpath;
+        staticpath = location.origin + '/';
+        defaultStaticPath = staticpath;
+
+        if (window.d) {
+            console.debug('StaticPath set to "' + staticpath + '"');
         }
-        else {
-            nocontentcheck = sessionStorage.dbgContentCheck ? 0 : true;
-            var devhost = window.location.host;
+    }
 
-            // Set the static path and default static path for debug mode to be the same
-            staticpath = window.location.protocol + "//" + devhost + "/";
-            defaultStaticPath = staticpath;
+    if (location.host === 'smoketest.mega.nz') {
+        staticpath = 'https://smoketest.static.mega.nz/3/';
+        cmsStaticPath = 'https://smoketest.static.mega.nz/cms/';
+        defaultStaticPath = staticpath;
+        d = 1;
+    }
 
-            if (window.d) {
-                console.debug('StaticPath set to "' + staticpath + '"');
-            }
-        }
+    if (d > 0) {
+        localStorage.minLogLevel |= 0;
     }
 
     // Override the default static path to test recovery after standard static server failure

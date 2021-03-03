@@ -101,7 +101,13 @@ function dcTracer(ctr) {
 }
 
 
-mBroadcaster.once('startMega', function() {
+mBroadcaster.once('startMega', async() => {
+    'use strict';
+
+    console.group('[DEBUG] ' + new Date().toISOString());
+    console.table({apipath, staticpath, bootstaticpath, cmsStaticPath, defaultStaticPath, defaultCMSStaticPath});
+    console.table(staticServerLoading);
+
     if (d && window.chrome) {
         var usages = Object.create(null);
         var createObjectURL = URL.createObjectURL;
@@ -170,4 +176,6 @@ mBroadcaster.once('startMega', function() {
 
         window.createObjectURLUsages = usages;
     }
+
+    console.groupEnd();
 });

@@ -2560,7 +2560,7 @@ var exportExpiry = {
         "use strict";
 
         if (M.isInvalidUserStatus()) {
-            return;
+            return MegaPromise.reject(EINTERNAL);
         }
 
         var self = this;

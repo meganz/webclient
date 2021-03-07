@@ -208,7 +208,16 @@ BusinessRegister.prototype.initPage = function(preSetNb, preSetName, preSetTel, 
             .text(intl.format(mySelf.planPrice * (users - mySelf.minUsers)) + ' \u20ac');
         $('.business-plan-total span.right', $gadget).text(intl.format(mySelf.planPrice * users) + ' \u20ac');
 
-        $('.business-users-plan .left', $gadget).text(l[19504].replace('{0}', users - mySelf.minUsers));
+        const extraUsers = users - mySelf.minUsers;
+        let extraText = l[19504].replace('{0}', extraUsers);
+        if (extraUsers === 0) {
+            extraText = l[24977];
+        }
+        else if (extraUsers === 1) {
+            extraText = l[24978];
+        }
+
+        $('.business-users-plan .left', $gadget).text(extraText);
     };
 
     // event handler for clicking on terms anchor

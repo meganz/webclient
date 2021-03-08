@@ -442,7 +442,7 @@
     "1174": "Cette extension vous permettra d\u2019installer MEGA dans votre navigateur. Elle r\u00e9duira les temps de chargement, am\u00e9liorera les performances en t\u00e9l\u00e9chargement et renforcera la s\u00e9curit\u00e9.",
     "1175": "Toute URL MEGA sera intercept\u00e9e par cette extension et restera locale (aucun JavaScript ne sera charg\u00e9 de nos serveurs). Les mises \u00e0 jour (automatiques) s\u00e9curis\u00e9es sont fournies gr\u00e2ce \u00e0 une signature cryptographique par cl\u00e9 priv\u00e9e.",
     "1176": "Et si vous \u00eates vraiment parano\u00efaque :",
-    "1177": "D\u00e9sactivez les mises \u00e0 jour automatiques et examinez notre code source pour chaque mise \u00e0 jour.",
+    "1177": "d\u00e9sactiver les mises \u00e0 jour automatiques et examinez manuellement notre code source pour chaque mise \u00e0 jour.",
     "1181": "Ouvrir la page des extensions dans Chrome",
     "1182": "Menu > Plus d\u2019outils > Extensions",
     "1183": "ou saisir",
@@ -2292,7 +2292,7 @@
     "19086": "Utilisateurs d\u00e9sactiv\u00e9s",
     "19087": "Nombre d\u2019utilisateurs\u00a0",
     "19088": "Espace de stockage total utilis\u00e9\u00a0",
-    "19091": "Quantit\u00e9 de transfert utilis\u00e9e",
+    "19091": "Quota de transfert utilis\u00e9e",
     "19092": "D\u00e9sactiver l\u2019utilisateur",
     "19093": "Visualiser l\u2019utilisateur",
     "19094": "R\u00e9activer l\u2019utilisateur",
@@ -4095,5 +4095,7 @@
     "24849": "Obtenez maintenant [B]%2 de rabais[\/B] sur votre abonnement mensuel [B]%1[\/B]",
     "24850": "Obtenez maintenant [B]%2 de rabais[\/B] sur votre abonnement [B]%1[\/B]",
     "24851": "Merci!",
-    "24852": "Vos commentaires nous int\u00e9ressent et nous aiderons \u00e0 am\u00e9liorer notre service. Si vous souhaitez nous communiquer plus de d\u00e9tails, veuillez nous les envoyer par courriel \u00e0 support@mega.nz. Pour plus de pr\u00e9cisions sur MEGA, [A]cliquez ici[\/A] pour consulter notre blogue."
+    "24852": "Vos commentaires nous int\u00e9ressent et nous aiderons \u00e0 am\u00e9liorer notre service. Si vous souhaitez nous communiquer plus de d\u00e9tails, veuillez nous les envoyer par courriel \u00e0 support@mega.nz. Pour plus de pr\u00e9cisions sur MEGA, [A]cliquez ici[\/A] pour consulter notre blogue.",
+    "24967": "Copyright Dispute - MEGA",
+    "24968": "Counter-notification process of copyright dispute"
 }

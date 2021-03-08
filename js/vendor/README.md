@@ -252,7 +252,7 @@ characters were removed from the files
 [filesaver.js]: <https://github.com/eligrey/FileSaver.js/tree/d8388a1a3c781821caae9110ee3d7c28aa7d6e0b>
 [int64.js]: <https://github.com/meganz/node-int64>
 [ion.sound.js]: <https://github.com/meganz/ion.sound>
-[jquery.js]: <https://github.com/jquery/jquery/blob/3.3.1/dist/jquery.js>
+[jquery.js]: <https://github.com/jquery/jquery/blob/3.6.0/dist/jquery.js>
 [jquery-ui.js]: <https://code.jquery.com/ui/1.12.1/jquery-ui.js>
 [jquery.fullscreen.js]: <https://github.com/meganz/jquery-fullscreen-plugin>
 [jquery.jscrollpane.js]: <https://github.com/meganz/jScrollPane>

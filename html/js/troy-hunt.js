@@ -5,17 +5,18 @@ var troyhuntCampaign = {
     /**
      * Initialise Troy Hunt Landing page
      */
-    init: function(page) {
+    init: function() {
         "use strict";
 
         this.$campaignPage = $('.scroll-block.thunt', 'body');
         this.$landingPage = $('.thunt-page.landing', this.$campaignPage);
-        this.initTroyHuntPage(page);
+        this.initTroyHuntPage();
     },
 
-    initTroyHuntPage: function(page) {
+    initTroyHuntPage: function() {
         "use strict";
-        var subpage = (page[0] === '/' && page.substr(1) || 'landing').replace(/\W+$/, '');
+        var subpage = page.substring(10);
+        subpage = subpage === '' ? 'landing' : subpage;
         $('.thunt-page:not(.' + subpage + ')').addClass('hidden').removeClass('active');
         $('.thunt-page.' + subpage).removeClass('hidden').addClass('active');
         if (subpage === 'business') {

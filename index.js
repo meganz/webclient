@@ -1552,7 +1552,7 @@ function init_page() {
     }
     else if (page.substring(0, 9) === 'troy-hunt') {
         parsepage(pages['troy-hunt']);
-        troyhuntCampaign.init(page.substr(9));
+        troyhuntCampaign.init();
     }
     else if (page === 'refer') {
         parsepage(pages.affiliate);

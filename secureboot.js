@@ -3116,9 +3116,6 @@ else if (!browserUpdate) {
         'feature_collaboration': {f:'html/features-collaboration.html', n: 'feature_collaboration', j:0},
         'gadvs_js': {f:'js/gAdvs.js', n: 'gadvs_js', j:1},
         'cookie': {f:'html/cookie.html', n: 'cookie', j:0},
-        'troy-hunt': {f:'html/troy-hunt.html', n:'troy-hunt', j:0},
-        'troy-hunt_js': {f:'html/js/troy-hunt.js', n:'troy-hunt_js', j:1},
-        'troy-hunt_css': {f:'css/troy-hunt.css', n:'troy-hunt_css', j:2},
     };
 
     var jsl3 = {
@@ -3218,7 +3215,9 @@ else if (!browserUpdate) {
         'sdk': ['dev','dev_js','sdkterms'],
         'doc': ['dev','dev_js','sdkterms'],
         'downloadapp': ['downloadapp_js', 'downloadapp', 'sync_js'],
-        'help': ['lunr_js', 'help_js'],
+        'help': [
+            'lunr_js', 'help_js'
+        ],
         'recover': ['reset', 'reset_js'],
         'redeem': ['redeem', 'redeem_js'],
         'plugin': ['browsers', 'browsers_js'],
@@ -3237,7 +3236,6 @@ else if (!browserUpdate) {
         'nziphotographer': ['nzipp', 'nzipp_js', 'nzipp_css'],
         'business': ['business', 'businessjs'],
         'cookie': ['cookie'],
-        'troy-hunt': ['troy-hunt', 'troy-hunt_js', 'troy-hunt_css']
     };
 
     if (is_mobile) {

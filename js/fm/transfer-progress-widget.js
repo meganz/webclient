@@ -79,15 +79,17 @@ mega.tpw = new function TransferProgressWidget() {
     };
 
     var updateJSP = function() {
-        if (!$bodyContianer.data('jsp')) {
-            $bodyContianer.jScrollPane({
-                enableKeyboardNavigation: true, showArrows: true,
-                arrowSize: 8, animateScroll: true
-            });
-        }
-        else {
-            $bodyContianer.data('jsp').reinitialise();
-        }
+        delay('tpw:updatejsp', function() {
+            const jsp = $bodyContianer.data('jsp');
+            if (jsp) {
+                jsp.reinitialise();
+            }
+            else {
+                $bodyContianer.jScrollPane({
+                    enableKeyboardNavigation: true, showArrows: true, arrowSize: 8, animateScroll: true
+                });
+            }
+        }, 250);
     };
 
     var removeRow = function($row) {
@@ -108,8 +110,11 @@ mega.tpw = new function TransferProgressWidget() {
         }
 
         $row.remove();
-        updateJSP();
-        updateHeaderAndContent();
+        delay('tpw:remove', () => {
+            updateJSP();
+            // eslint-disable-next-line no-use-before-define
+            updateHeaderAndContent();
+        }, 1500);
     };
 
 
@@ -711,6 +716,15 @@ mega.tpw = new function TransferProgressWidget() {
         updateJSP();
     };
 
+    var finalizeUpdates = function() {
+        cleanOverLimitRows();
+        updateHeaderAndContent();
+        if (!mega.tpw.isWidgetVisibile() && page.indexOf('download') === -1) {
+            mega.tpw.showWidget();
+        }
+        updateJSP();
+    };
+
     /**
      * Adding a download/upload entry to transfer progress widget
      * @param {Number} type             Entry type: 1 download, 2 upload
@@ -840,20 +854,10 @@ mega.tpw = new function TransferProgressWidget() {
             }
         }
 
-        cleanOverLimitRows();
+        // for a concurrent batch of adding, we will postpone final calculations to the end.
+        delay('tpw:addTimer', finalizeUpdates, 1500);
 
         $rowsContainer.prepend($tempRows);
-
-        updateHeaderAndContent();
-
-        if (!this.isWidgetVisibile() && page.indexOf('download') === -1) {
-            mega.tpw.showWidget();
-        }
-
-        updateJSP();
-
-
-
         $tempRows = null;
     };
 
@@ -951,9 +955,6 @@ mega.tpw = new function TransferProgressWidget() {
         setProgressCircle($header, all_bytes, done_bytes);
     };
 
-
-
-
     this.finishDownloadUpload = function(type, entry, handle) {
         'use strict';
         if (!$rowsContainer || typeof type === 'undefined' || !entry) {
@@ -1016,15 +1017,18 @@ mega.tpw = new function TransferProgressWidget() {
         $finishedAction.find('.tooltips').text(l[6992]);
         $actionsRow.append($finishedAction);
 
-        updateHeaderAndContent();
-
         if (unHide) {
             $targetedRow.removeClass('hidden');
         }
         else {
             $targetedRow.addClass('hidden');
         }
-        postPorcessComplete();
+
+        // for a concurrent batch of finishes, we will postpone final calculations to the end.
+        delay('tpw:finishTimer', () => {
+            updateHeaderAndContent();
+            postPorcessComplete();
+        }, 1500);
 
         var timerHandle = setTimeout(function() {
             $targetedRow.fadeOut(400, function() {
@@ -1122,7 +1126,6 @@ mega.tpw = new function TransferProgressWidget() {
             prefix = uploadRowPrefix;
             toolTipText = l[1617];
         }
-
         var $targetedRow = $rowsContainer.find('#' + prefix + dId);
 
         if (!$targetedRow || !$targetedRow.length) {
@@ -1131,7 +1134,6 @@ mega.tpw = new function TransferProgressWidget() {
         if (!$targetedRow.hasClass('paused')) {
             return;
         }
-
         if (monitors[dId]) {
             clearTimeout(monitors[dId]);
             delete monitors[dId];
@@ -1141,21 +1143,11 @@ mega.tpw = new function TransferProgressWidget() {
         var $enqueueAction = $transferActionTemplate.clone().addClass('cancel');
         $enqueueAction.find('.tooltips').text(toolTipText);
         $targetedRow.find('.transfer-task-actions').empty().append($enqueueAction);
-
         $targetedRow.removeClass('complete error progress paused').addClass('inqueue');
-
         setStatus($targetedRow, this.INITIALIZING);
 
-        cleanOverLimitRows();
-
-        updateHeaderAndContent();
-
-        if (!this.isWidgetVisibile() && page.indexOf('download') === -1) {
-            mega.tpw.showWidget();
-        }
-
-        updateJSP();
-
+        // for a concurrent batch of resumes, we will postpone final calculations to the end.
+        delay('tpw:resumeTimer', finalizeUpdates, 1500);
     };
 
 
@@ -1275,6 +1267,9 @@ mega.tpw = new function TransferProgressWidget() {
     };
 
     this.clearRows = function(type) {
+        if (d) {
+            console.time('tpw:clearRows');
+        }
         var $tasks;
         if (!type) { // all
             $tasks = $rowsContainer.find('.transfer-task-row');
@@ -1287,6 +1282,9 @@ mega.tpw = new function TransferProgressWidget() {
             for (var r = 0; r < $tasks.length; r++) {
                 removeRow($($tasks[r]));
             }
+        }
+        if (d) {
+            console.timeEnd('tpw:clearRows');
         }
     };
 };

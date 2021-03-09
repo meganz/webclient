@@ -2735,10 +2735,21 @@ FileManager.prototype.addTransferPanelUI = function() {
                     return;
                 }
 
-                dlmanager.abort(null);
-                ulmanager.abort(null);
+                const time = (tag, cb) => {
+                    if (d) {
+                        console.time(tag);
+                    }
+                    cb();
 
-                $.removeTransferItems($('.transfer-table tr'));
+                    if (d) {
+                        console.timeEnd(tag);
+                    }
+                };
+
+                uldl_hold = true;
+                time('dlm:abort', () => dlmanager.abort(null));
+                time('ulm:abort', () => ulmanager.abort(null));
+                time('tfs:abort', () => $.removeTransferItems($('.transfer-table tr')));
 
                 later(function() {
                     if (uldl_hold) {

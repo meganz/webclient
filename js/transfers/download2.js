@@ -530,6 +530,76 @@ var dlmanager = {
         return dl.zipid ? 'zip_' + dl.zipid : 'dl_' + (dl.dl_id || dl.ph);
     },
 
+    _clearGp: function() {
+        'use strict';
+        for (const k in GlobalProgress) {
+            if (k[0] !== 'u') {
+                let chunk;
+                const w = GlobalProgress[k].working;
+                while ((chunk = w.pop())) {
+                    let result = chunk.isCancelled();
+                    if (!result) {
+                        this.logger.error('Download chunk %s(%s) should have been cancelled itself.', k, chunk);
+                    }
+                }
+            }
+        }
+    },
+
+    abortAll: function DM_abort_all() {
+        'use strict';
+        const dlQueue = window.dlQueue;
+        const abort = tryCatch(dl => {
+            if (typeof dl.io.abort === "function") {
+                if (d) {
+                    dlmanager.logger.info('IO.abort', dl);
+                }
+                dl.io.abort("User cancelled");
+            }
+        }, ex => {
+            dlmanager.logger.error(ex);
+        });
+
+        const destroy = function(task) {
+            task = task[0];
+            if (task instanceof ClassChunk && !task.isCancelled() && task.destroy) {
+                task.destroy();
+            }
+        };
+
+        for (let k = dl_queue.length; k--;) {
+            const dl = dl_queue[k];
+            if (dl.id) {
+                if (!dl.cancelled) {
+                    if (dl.hasResumeSupport) {
+                        dlmanager.remResumeInfo(dl).dump();
+                    }
+                    abort(dl);
+                }
+                dl.cancelled = true;
+                if (dl.zipid && Zips[dl.zipid]) {
+                    Zips[dl.zipid].cancelled = true;
+                }
+                if (dl.io && typeof dl.io.begin === 'function') {
+                    /* Canceled while Initializing? Let's free up stuff
+                     * and notify the scheduler for the running task
+                     */
+                    dl.io.begin();
+                }
+                if (dl.io instanceof MemoryIO) {
+                    dl.io.abort();
+                }
+                dl_queue[k] = Object.freeze({});
+            }
+        }
+
+        dlQueue._queue.forEach(destroy);
+        Object.values(dlQueue._qpaused).forEach(destroy);
+
+        this._clearGp();
+        dlQueue._qpaused = {};
+    },
+
     abort: function DM_abort(gid, keepUI) {
         /* jshint -W074 */
         if (gid === null || Array.isArray(gid)) {
@@ -541,10 +611,7 @@ var dlmanager = {
                 });
             }
             else {
-                dl_queue.filter(isQueueActive)
-                    .forEach(function(dl) {
-                        dlmanager.abort(dl, keepUI);
-                    });
+                dlmanager.abortAll();
             }
 
             delete this._multiAbort;

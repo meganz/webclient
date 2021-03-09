@@ -899,7 +899,7 @@ mBroadcaster.once('boot_done', function populate_l() {
     l[10634] = l[10634].replace('[A]', '<a href="https://mega.nz/support" target="_blank" rel="noopener noreferrer">')
                        .replace('[/A]', '</a>');
 
-    l[10635] = l[10635].replace('[B]', '"<b>').replace('[/B]', '</b>"');
+    l[10635] = l[10635].replace('[B]', '<b>').replace('[/B]', '</b>');
     l[10644] = l[10644].replace('[A]', '<a href="mailto:support@mega.nz">').replace('[/A]', '</a>');
     l[10646] = l[10646].replace('[A]', '<a href="/account" class="clickurl">').replace('[/A]', '</a>');
     l[10650] = l[10650].replace('[A]', '<a href="/account" class="clickurl">').replace('[/A]', '</a>');

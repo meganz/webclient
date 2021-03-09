@@ -118,7 +118,7 @@ RepayPage.prototype.initPage = function() {
                 msg = l[20672];
                 title = l[1578];
             }
-            msgDialog('warninga', l[6859], l[20671], '', function() {
+            msgDialog('warninga', title, msg, '', function() {
                 loadingDialog.hide();
                 loadSubPage('');
             });
@@ -151,23 +151,23 @@ RepayPage.prototype.initPage = function() {
             var rowTemplate = $overduePaymentRow.clone();
 
             // adding due invoice row
-            $overduePaymentRow.find('.content-desc').text(res.inv[0].d);
-            $overduePaymentRow.find('.content-date').text(time2date(res.inv[0].ts, 1));
-            $overduePaymentRow.find('.content-amou').text(res.inv[0].tot.toFixed(2) + ' \u20ac');
             nbOfUsers = res.inv[0].nb;
+            $('.content-desc', $overduePaymentRow).text(l[24975].replace('%1', nbOfUsers));
+            $('.content-date', $overduePaymentRow).text(time2date(res.inv[0].ts, 1));
+            $('.content-amou', $overduePaymentRow).text(mega.intl.number.format(res.inv[0].tot) + ' \u20ac');
 
             if (res.nb && res.et) {
                 var futurePaymentRow = rowTemplate.clone();
                 nbOfUsers = res.nb;
 
-                futurePaymentRow.find('.content-desc').text('Mega Business ' + res.nb + ' users');
-                futurePaymentRow.find('.content-date').text(time2date(new Date().getTime() / 1000, 1));
-                futurePaymentRow.find('.content-amou').text(res.et.toFixed(2) + ' \u20ac');
+                $('.content-desc', futurePaymentRow).text(l[24975].replace('%1', res.nb));
+                $('.content-date', futurePaymentRow).text(time2date(new Date().getTime() / 1000, 1));
+                $('.content-amou', futurePaymentRow).text(mega.intl.number.format(res.et) + ' \u20ac');
 
                 futurePaymentRow.insertAfter($overduePaymentHeader);
             }
 
-            $rightBlock.find('.repay-td-total').text(res.t.toFixed(2) + ' \u20ac');
+            $('.repay-td-total', $rightBlock).text(mega.intl.number.format(res.t) + ' \u20ac');
 
             if (u_attr['%name']) {
                 $leftSection.find('#repay-business-cname').text(u_attr['%name']);

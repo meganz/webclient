@@ -290,6 +290,7 @@ mega.tpw = new function TransferProgressWidget() {
             }
 
             if (node.p) {
+                $.autoSelectNode = node.h;
                 M.openFolder(node.p);
             }
         }

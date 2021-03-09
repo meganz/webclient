@@ -5284,7 +5284,6 @@ div.radioOn.small, div.radioOff.small {
     vertical-align: top;
 }
 .mobile.my-account-page .account-page-contents {
-    height: calc(100vh - 68px);
     margin-top: 68px;
     overflow: scroll;
 }

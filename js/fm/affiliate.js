@@ -1288,6 +1288,22 @@ affiliateUI.redemptionDialog = {
 
         var $currentStep = $('.cells.step4', this.$dialog);
         var firstRequest = affiliateRedemption.requests.first;
+        var req1res = affiliateRedemption.req1res[0];
+
+        if (firstRequest.m === 2 && (req1res.lf / req1res.la) > 0.1) {
+
+            $('.fm-dialog-overlay').off('click.redemptionClose');
+
+            msgDialog('confirmation', '', l[24964], l[24965], confirm => {
+
+                if (confirm) {
+                    $('.fm-dialog-overlay').rebind('click.redemptionClose', this.hide.bind(this, false));
+                }
+                else {
+                    this.hide(true);
+                }
+            });
+        }
 
         affiliateRedemption.redemptionAccountDetails($currentStep, firstRequest.m);
 

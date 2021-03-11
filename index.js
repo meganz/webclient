@@ -1190,12 +1190,11 @@ function init_page() {
     else if (page.substr(0, 4) == 'help') {
         return Help.render();
     }
-    else if (page == 'privacy') {
+    else if (page === 'privacy') {
         parsepage(pages['privacy']);
     }
     else if (page === 'gdpr') {
-        loadSubPage('privacy', 'override');
-        return false;
+        return loadSubPage('privacy', 'override');
     }
     else if (page == 'privacycompany') {
         parsepage(pages['privacycompany']);
@@ -1550,10 +1549,6 @@ function init_page() {
     else if (page === 'nzippmember' || page === 'nziphotographer') {
         parsepage(pages.nzipp);
         nzippCampaign.init();
-    }
-    else if (page.substring(0, 9) === 'troy-hunt') {
-        parsepage(pages['troy-hunt']);
-        troyhuntCampaign.init(page.substr(9));
     }
     else if (page === 'refer') {
         parsepage(pages.affiliate);
@@ -2507,10 +2502,10 @@ function topmenuUI() {
                 var subPages = [
                     'about', 'account', 'backup', 'blog', 'cmd', 'contact',
                     'copyright', 'corporate', 'credits', 'doc', 'extensions',
-                    'help', 'login', 'mega', 'nzippmember', 'nziphotographer', 'privacy', 'gdpr', 'mobileapp',
+                    'help', 'login', 'mega', 'nzippmember', 'nziphotographer', 'privacy', 'mobileapp',
                     'mobile', 'privacycompany', 'register', 'resellers', 'sdk', 'sync', 'sitemap', 'sourcecode',
                     'support', 'sync', 'takedown', 'terms', 'start', 'security', 'downloadapp', 'affiliate',
-                    'nas', 'pro', 'cookie', 'securechat', 'collaboration', 'storage', 'troy-hunt'
+                    'nas', 'pro', 'cookie', 'securechat', 'collaboration', 'storage'
                 ];
                 var moveTo = {
                     'account': 'fm/account',

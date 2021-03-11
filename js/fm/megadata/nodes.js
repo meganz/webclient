@@ -3961,18 +3961,18 @@ MegaData.prototype.disableCircularTargets = function disableCircularTargets(pref
             if (node.p) {
                 // Disable parent dir
                 $(pref + node.p).addClass('disabled');
+
+                // Disable moving to rubbish from rubbish
+                if (M.getNodeRoot(handle) === M.RubbishID) {
+                    $(pref + M.RubbishID).addClass('disabled');
+                }
             }
             else if (d && node.t < 2 && (node.h !== M.RootID /*folderlink*/)) {
                 console.error('M.disableCircularTargets: parent-less node!', handle, pref);
             }
         }
-        else if (d) {
-            console.error('M.disableCircularTargets: Invalid node', handle, pref);
-        }
-
-        // Disable moving to rubbish from rubbish
-        if (M.getNodeRoot(handle) === M.RubbishID) {
-            $(pref + M.RubbishID).addClass('disabled');
+        else if (d > 1 || this.currentdirid !== 'recents') {
+            console.warn('[disableCircularTargets] Node %s%s not found.', pref, handle);
         }
 
         // Disable all children folders

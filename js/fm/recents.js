@@ -710,7 +710,6 @@ RecentsRender.prototype._renderMedia = function($newRow, action, actionId) {
 
     // Create & append new image container, fire async method to collect thumbnail.
     var renderThumb = function(i) {
-        return new Promise(function (resolve) {
             var $newThumb = $thumbTemplate.clone().removeClass("template");
             var node = action[i];
             $newThumb
@@ -781,8 +780,6 @@ RecentsRender.prototype._renderMedia = function($newRow, action, actionId) {
 
             $previewBody.append($newThumb);
             renderedThumbs[i] = $newThumb;
-            resolve($newThumb);
-        });
     };
 
     var $toggleExpandedButton = $newRow.find(".toggle-expanded-state");
@@ -916,37 +913,22 @@ RecentsRender.prototype._renderMedia = function($newRow, action, actionId) {
         }
     });
 
-    $newRow.rebind("contextmenu", function(e) {
+    const triggerContextMenu = (ev) => {
         self.markSelected($newRow);
-        selectionManager.clear_selection();
-        for (var i = 0; i < action.length; i++) {
-            selectionManager.add_to_selection(action[i].h);
-        }
+        const sm = selectionManager;
+        sm.clear_selection();
+        sm.selected_list = action.map(n => n.h);
+        sm.add_to_selection(sm.selected_list.pop(), false, true);
         $.hideTopMenu();
-        return M.contextMenuUI(e, 3) ? true : false;
-    });
+        return !!M.contextMenuUI(ev, 3);
+    };
+
+    $newRow.rebind("contextmenu", triggerContextMenu);
 
     var $contextMenuButton = $newRow.find(".context-menu-button");
     $contextMenuButton
-        .rebind("click", function (e) {
-            $contextMenuButton.trigger({
-                type: 'contextmenu',
-                originalEvent: e.originalEvent
-            });
-            return false;
-        })
-        .rebind("dblclick", function() {
-            return false;
-        })
-        .rebind("contextmenu", function(e) {
-            self.markSelected($newRow);
-            selectionManager.clear_selection();
-            for (var i = 0; i < action.length; i++) {
-                selectionManager.add_to_selection(action[i].h);
-            }
-            $.hideTopMenu();
-            return M.contextMenuUI(e, 3) ? true : false;
-        });
+        .rebind("dblclick", () => false)
+        .rebind("click contextmenu", triggerContextMenu);
 
     // Remove the template that we no longer need.
     $thumbTemplate.remove();

@@ -961,11 +961,11 @@ MegaUtils.prototype.require = function megaUtilsRequire() {
                 if (logger) {
                     logger.debug('File(s) externally being loaded, holding up...');
                 }
-                mBroadcaster.once('startMega', _load.bind(this, files, promise));
+                mBroadcaster.once('startMega', SoonFc(90, _load.bind(this, files, promise)));
             }
             else {
                 Array.prototype.push.apply(jsl, files);
-                console.assert(!silent_loading);
+                console.assert(!silent_loading, 'There is another silent loader... ' + silent_loading);
                 silent_loading = onload;
                 jsl_start();
             }

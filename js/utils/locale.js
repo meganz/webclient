@@ -792,6 +792,8 @@ mBroadcaster.once('boot_done', function populate_l() {
     l['208s'] = l[208].replace('[A]', '<span class="red txt-bold">');
     l['208s'] = l['208s'].replace('[/A]', '</span>');
     l['208.g'] = l[208].replace('[A]', '<a class="green txt-bold">').replace('[/A]', '</a>');
+    l['208.g2'] = l[208].replace('[A]', '<a href="/terms" class="green txt-bold clickurl" target="_blank">')
+        .replace('[/A]', '</a>');
     l[208] = l[208].replace('[A]', '<a href="/terms" class="clickurl" tabindex="-1">');
     l[208] = l[208].replace('[/A]', '</a>');
     l[517] = l[517].replace('[A]', '<a href="/help" class="help-center-link clickurl">').replace('[/A]', '</a>');

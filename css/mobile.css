@@ -9092,7 +9092,8 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll, .mob
 }
 .mobile.payment-result .payment-result-button {
     position: relative;
-    width: 100%;
+    width: 200px;
+    margin-left: calc(50% - 100px);
 }
 .mobile.voucher-redeem-dialog .buttons {
     align-items: stretch;
@@ -9666,7 +9667,8 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll, .mob
     margin-left: 50%;
     transform: translateX(-50%);
 }
-.mobile.payment-result.pending.alternate {
+.mobile.payment-result.pending.alternate,
+.mobile.payment-result.failed {
     position: fixed;
     z-index: 99999;
     background-color: rgba(255, 255, 255, 1);

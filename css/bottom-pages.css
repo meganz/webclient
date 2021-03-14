@@ -277,7 +277,7 @@ body.bottom-pages .fmholder {
     position: relative;
 }
 body.bottom-pages.mobile .fmholder {
-    overflow: visible;
+    overflow: auto;
 }
 html.gbot {
     overflow-y: scroll;

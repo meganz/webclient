@@ -20,16 +20,19 @@ function init_blogarticle() {
     else {
         console.error('unknown blog ' + page);
     }
+
     if (!post) {
         handleInvalidBlogID();
     }
-    for (var e in post.attaches) {
-        if (post.attaches.hasOwnProperty(e)) {
-            post.c = CMS.imgLoader(post.c, post.attaches[e]);
+    else {
+        for (var e in post.attaches) {
+            if (post.attaches.hasOwnProperty(e)) {
+                post.c = CMS.imgLoader(post.c, post.attaches[e]);
+            }
         }
-    }
 
-    return render_blogarticle();
+        return render_blogarticle();
+    }
 }
 
 function render_blogarticle() {

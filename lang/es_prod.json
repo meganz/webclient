@@ -908,7 +908,7 @@
     "7150": "Aviso: tienes una solicitud de contacto",
     "7151": "Ha cancelado su solicitud de contacto",
     "7152": "Pesado",
-    "7153": "Ligero",
+    "7153": "Claro",
     "7154": "Puedes cerrar esta pesta\u00f1a, tu descarga se gestiona desde otra pesta\u00f1a donde tienes abierto el Gestor de Descargas",
     "7156": "Tambi\u00e9n puedes pagar a trav\u00e9s de Google Play Store, Apple App Store, Microsoft Store o a trav\u00e9s de tu operador m\u00f3vil si utilizas nuestra app [A]MEGA[\/A] para Android.",
     "7157": "Por favor, cierra todas las dem\u00e1s ventanas\/pesta\u00f1as del navegador donde se est\u00e1 ejecutando MEGA antes de proceder.",
@@ -4099,8 +4099,8 @@
     "24965": "En este momento la comisi\u00f3n requerida por Bitcoin para que la transacci\u00f3n tenga \u00e9xito representa una parte considerable de la cantidad que intentas cobrar. \u00bfEst\u00e1s seguro de que quieres continuar?",
     "24967": "Disputa de derechos de autor - MEGA",
     "24968": "Procedimiento de contranotificaci\u00f3n de una disputa de derechos de autor",
-    "24975": "MEGA Business %1 users",
+    "24975": "MEGA Business %1 usuarios",
     "24976": "Total:",
-    "24977": "No additional users",
-    "24978": "1 additional user"
+    "24977": "Ning\u00fan usuario adicional",
+    "24978": "1 usuario adicional"
 }

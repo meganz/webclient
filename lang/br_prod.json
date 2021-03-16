@@ -871,7 +871,7 @@
     "7004": "Obrigado pelo seu feedback.",
     "7005": "Por favor, digite o motivo abaixo:",
     "7006": "Carregando...",
-    "7014": "Voc\u00ea excedeu a sua cota de armazenamento. [A]Fa\u00e7a o upgrade da sua conta[\/A] para continuar aproveitando o armazenamento seguro criptografado de ponta a ponta.",
+    "7014": "Voc\u00ea excedeu o limite de armazenamento da sua conta. [A]Fa\u00e7a o upgrade da sua conta[\/A] para continuar aproveitando o armazenamento seguro criptografado de ponta a ponta.",
     "7022": "Iniciando",
     "7026": "Prefer\u00eancias",
     "7039": "N\u00e3o me pergunte novamente",
@@ -908,7 +908,7 @@
     "7150": "Lembrete: voc\u00ea tem uma solicita\u00e7\u00e3o de contato",
     "7151": "Cancelou a solicita\u00e7\u00e3o de contato",
     "7152": "Pesado",
-    "7153": "Leve",
+    "7153": "Claro",
     "7154": "Voc\u00ea pode fechar esta aba, seu download ser\u00e1 gerenciado pela outra aba onde voc\u00ea tem o seu gerenciador aberto.",
     "7156": "Voc\u00ea tamb\u00e9m pode efetuar o pagamento atrav\u00e9s da Google Play Store, da Apple App Store ou da conta da sua operadora de celular, se estiver usando um [A]aplicativo do MEGA[\/A]",
     "7157": "Antes de continuar, feche todas as janelas\/abas nas quais o MEGA estiver aberto.",
@@ -1435,7 +1435,7 @@
     "16131": "Todos os arquivos",
     "16132": "Todas as pastas",
     "16135": "Voc\u00ea est\u00e1 ficando sem espa\u00e7o na nuvem.[BR] Por favor, considere fazer um upgrade da sua conta.",
-    "16136": "Voc\u00ea excedeu a sua cota de armazenamento. [A]Fa\u00e7a o upgrade da sua conta[\/A] para continuar aproveitando o armazenamento seguro criptografado de ponta a ponta.",
+    "16136": "Voc\u00ea excedeu o limite de armazenamento da sua conta. [A]Fa\u00e7a o upgrade da sua conta[\/A] para continuar aproveitando o armazenamento seguro criptografado de ponta a ponta.",
     "16137": "Voc\u00ea excedeu a cota de transfer\u00eancia permitida. Voc\u00ea pode esperar at\u00e9 ter suficiente cota de transfer\u00eancia dispon\u00edvel ou [A]fazer um upgrade[\/A] para continuar desfrutando de um armazenamento seguro e criptografado de ponta a ponta.",
     "16138": "Voc\u00ea excedeu as cotas de transfer\u00eancia e de armazenamento. Voc\u00ea pode liberar espa\u00e7o na sua Nuvem de arquivos e esperar at\u00e9 ter suficiente cota de transfer\u00eancia dispon\u00edvel ou [A]fazer um upgrade[\/A] para continuar desfrutando de um armazenamento seguro e criptografado de ponta a ponta.",
     "16141": "Ativar",
@@ -4099,8 +4099,8 @@
     "24965": "Neste momento, as taxas exigidas pela rede Bitcoin para fazer uma transa\u00e7\u00e3o representam uma grande parte do valor que voc\u00ea est\u00e1 tentando resgatar. Voc\u00ea tem certeza de que quer prosseguir?",
     "24967": "Disputa de direitos autorais - MEGA",
     "24968": "Processo de contranotifica\u00e7\u00e3o de uma disputa de direitos autorais",
-    "24975": "MEGA Business %1 users",
+    "24975": "MEGA Business - %1 usu\u00e1rios",
     "24976": "Total:",
-    "24977": "No additional users",
-    "24978": "1 additional user"
+    "24977": "Nenhum usu\u00e1rio adicional",
+    "24978": "1 usu\u00e1rio adicional"
 }

@@ -55,7 +55,7 @@ affiliateRedemption.getRedemptionStatus = function(code) {
         case 3:
             return {c: 'orange', s: l[22833], class: 'processing', m: l[23371], bm: l[23370]};
         case 4:
-            return {c: '', s: l[23277], class: 'complete', m: l[23372], bm: l[23373]};
+            return {c: '', s: l[25002], class: 'complete', m: l[23372], bm: l[23373]};
         case 5:
         case 6:
             return {c: 'red', s: l[22819], class: 'failed', m: l[23369]};

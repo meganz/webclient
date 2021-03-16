@@ -14,8 +14,11 @@ function init_blogarticle() {
         post = blogposts['post_' + blogid];
     }
     else if (page.substr(0, 5) === 'blog/') {
-        blogid = blogHeaders[page.substr(5)].replace('post_', '');
-        post = blogposts['post_' + blogid];
+        var postId = blogHeaders[page.substr(5)];
+        if (postId) {
+            blogid = postId.replace('post_', '');
+            post = blogposts['post_' + blogid];
+        }
     }
     else {
         console.error('unknown blog ' + page);

@@ -320,8 +320,9 @@ MegaData.prototype.isCustomView = function(pathOrID) {
 MegaData.prototype.clearRubbish = function(all) {
     "use strict";
 
+    var promise = new MegaPromise();
     if (M.isInvalidUserStatus()) {
-        return;
+        return promise.reject(EINTERNAL);
     }
 
     if (M.account) {
@@ -339,7 +340,6 @@ MegaData.prototype.clearRubbish = function(all) {
     var fail = 0;
     var success = 0;
     var idtag = mRandomToken('cr');
-    var promise = new MegaPromise();
 
     var apiReq = function apiReq(handle, i) {
         api_req({a: 'd', n: handle, i: i}, {
@@ -456,7 +456,7 @@ MegaData.prototype.copyNodes = function copynodes(cn, t, del, promise, tree) {
     }
 
     if (M.isInvalidUserStatus()) {
-        return;
+        return promise.reject(EINTERNAL);
     }
 
     loadingDialog.pshow();
@@ -793,7 +793,7 @@ MegaData.prototype.moveNodes = function moveNodes(n, t, quiet, folderDefaultConf
     var promise = new MegaPromise();
 
     if (M.isInvalidUserStatus()) {
-        return;
+        return promise.reject(EINTERNAL);
     }
     if (!quiet) {
         loadingDialog.pshow();
@@ -1208,7 +1208,7 @@ MegaData.prototype.safeMoveNodes = function safeMoveNodes(target, nodes) {
     var promise = new MegaPromise();
 
     if (M.isInvalidUserStatus()) {
-        return;
+        return promise.reject(EINTERNAL);
     }
 
     nodes = nodes || $.selected || [];
@@ -1274,10 +1274,10 @@ MegaData.prototype.safeMoveNodes = function safeMoveNodes(target, nodes) {
 MegaData.prototype.safeRemoveNodes = function(handles) {
     'use strict';
 
-    if (M.isInvalidUserStatus()) {
-        return;
-    }
     var masterPromise = new MegaPromise();
+    if (M.isInvalidUserStatus()) {
+        return masterPromise.reject(EINTERNAL);
+    }
 
     handles = handles || [];
 
@@ -1339,7 +1339,7 @@ MegaData.prototype.revertRubbishNodes = function(handles) {
     var masterPromise = new MegaPromise();
 
     if (M.isInvalidUserStatus()) {
-        return;
+        return masterPromise.reject(EINTERNAL);
     }
 
     handles = handles || [];
@@ -1523,7 +1523,7 @@ MegaData.prototype.revokeShares = function(handles) {
     var promise = new MegaPromise();
 
     if (M.isInvalidUserStatus()) {
-        return;
+        return promise.reject(EINTERNAL);
     }
 
     if (!Array.isArray(handles)) {
@@ -1635,7 +1635,7 @@ MegaData.prototype.revokeFolderShare = function(h, usr, isps) {
     var promise = new MegaPromise();
 
     if (M.isInvalidUserStatus()) {
-        return;
+        return promise.reject(EINTERNAL);
     }
 
     if (String(h).length !== 8 || String(usr).length !== 11) {

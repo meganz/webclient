@@ -3060,6 +3060,8 @@ else if (!browserUpdate) {
         'dev_js': {f:'html/js/dev.js', n: 'dev_js', j:1},
         'sdkterms': {f:'html/sdkterms.html', n: 'sdkterms', j:0},
         'lunr_js': {f:'js/vendor/elasticlunr.js', n: 'lunr_js', j:1},
+        'help2_welcome': {f:'html/help2_welcome.html', n: 'help2_welcome', j: 0},
+        'help2_page': {f:'html/help2_page.html', n: 'help2_page', j: 0},
         'help_js': {f:'html/js/help2.js', n: 'help_js', j:1},
         'sync': {f:'html/sync.html', n: 'sync', j:0},
         'sync_js': {f:'html/js/sync.js', n: 'sync_js', j:1},
@@ -3213,9 +3215,7 @@ else if (!browserUpdate) {
         'sdk': ['dev','dev_js','sdkterms'],
         'doc': ['dev','dev_js','sdkterms'],
         'downloadapp': ['downloadapp_js', 'downloadapp', 'sync_js'],
-        'help': [
-            'lunr_js', 'help_js'
-        ],
+        'help': ['lunr_js', 'help2_welcome', 'help2_page', 'help_js'],
         'recover': ['reset', 'reset_js'],
         'redeem': ['redeem', 'redeem_js'],
         'plugin': ['browsers', 'browsers_js'],

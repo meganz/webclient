@@ -532,6 +532,7 @@ var Help = (function() {
             });
         },
         'client': function(args) {
+            var is_section = false;
             if (args[1] === 'mobile') {
                 args[1] = 'android';
                 loadSubPage(url.apply(null, args));
@@ -560,16 +561,18 @@ var Help = (function() {
                     }
                 }
             }
-            else if (args.length === 2 && location.hash) {
-                var sec = args.pop();
-                sec = sec.substring(0, sec.indexOf('#'));
-                args.push(sec);
-                question = clearQuestion(location.hash);
-            }
-            else if (args.length === 2 && !location.hash && args[1].length === 24 &&
-                args[1].indexOf('-') === -1) {
-                // old buggos short urls
-                return loadSubPage('help/s/' + args.pop());
+            else if (args.length === 2) {
+                is_section = true;
+                if (location.hash) {
+                    var sec = args.pop();
+                    sec = sec.substring(0, sec.indexOf('#'));
+                    args.push(sec);
+                    question = clearQuestion(location.hash);
+                }
+                else if (!location.hash && args[1].length === 24 && args[1].indexOf('-') === -1) {
+                    // old buggos short urls
+                    return loadSubPage('help/s/' + args.pop());
+                }
             }
             else if (args.length < 1) {
                 loadSubPage('help');
@@ -595,7 +598,7 @@ var Help = (function() {
                 return;
             }
 
-            parsepage(data.html);
+            parseHelpPage(data.object, is_section);
 
             var getArticleURL = function(articleURL) {
                 if (articleURL) {
@@ -660,7 +663,45 @@ var Help = (function() {
             }
         },
         'welcome': function welcome() {
-            parsepage(Data.help_index.html);
+            var $page = $(pages.help2_welcome);
+            var $welcomeData = Data.welcome.object;
+            var $clientBlockContainer = $('.client-container-wrapper #container', $page);
+
+            var $faqBlock = $('.popular-question-block', $page);
+            var $faqOdd = $('.popular-question-items.odd', $faqBlock);
+            var $faqEven = $('.popular-question-items.even', $faqBlock);
+
+            for (var c = 0; c < $welcomeData.clients.length; c++) {
+                var $client = $welcomeData.clients[c];
+                var $clientBlock = $('.block.template', $clientBlockContainer)
+                    .clone()
+                    .removeClass('template')
+                    .removeClass('hidden');
+                $clientBlock.addClass($client.iconClass).attr('data-href', $client.href);
+                $('.client-image', $clientBlock).addClass('block-' + $client.iconClass);
+                $('.client-image-name', $clientBlock).text($client.name);
+                $clientBlockContainer.safeAppend($clientBlock.prop('outerHTML'));
+            }
+
+            for (var i = 0; i < $welcomeData.faq.length; i++) {
+                var $faq = $welcomeData.faq[i];
+                var $faqItem = $('.popular-question-item.template', $faqBlock)
+                    .clone()
+                    .removeClass('template')
+                    .removeClass('hidden');
+                $('.popular-question-redirect', $faqItem).attr('href', $faq.url);
+                $('.client-name', $faqItem).text($faq.client + ' ');
+                $('.article-title', $faqItem).text($faq.title);
+
+                if ((i + 1) % 2 === 1) {
+                    // Odd index
+                    $faqOdd.safeAppend($faqItem.prop('outerHTML'));
+                }
+                else {
+                    $faqEven.safeAppend($faqItem.prop('outerHTML'));
+                }
+            }
+            parsepage($page.prop('outerHTML'));
         },
         // Routing for short url help
         's': function shorturl(args) {
@@ -692,6 +733,133 @@ var Help = (function() {
     }
 
     /**
+     * Function that will parse the Client or Section subpage.
+     *
+     * @param {object} object           JSON from CMS
+     * @param {boolean} is_section      Whether it's a client or a section page.
+     *
+     * @returns {void}
+     */
+    function parseHelpPage(object, is_section) {
+        var $page = $(pages.help2_page);
+        var $goBack = $('.support-go-back', $page);
+        var $titleBlock = $('.main-title-section', $page);
+        var $sideBar = $('.sidebar-menu-container', $page);
+        var $contentBlock = $('.main-content-pad', $page);
+        var $clientSelect = $('.sidebar-device-container', $sideBar);
+        var $subpageList  = $('.sidebar-menu-slider', $sideBar);
+        var $subpageListItem  = $('.sidebar-menu-link', $subpageList)
+            .clone()
+            .removeClass('template')
+            .removeClass('hidden');
+        var $subpagelistHeading = $('.helpsection-grayheading', $subpageList);
+        var $content;
+        var i;
+
+        // Modify the title
+        $('.section-title', $titleBlock).text(object.title);
+        $('.howto-section-subtitle', $titleBlock).text(object.subtitle);
+
+        if (is_section) {
+            // Modify the goback
+            $('.support-go-back-client', $goBack).text(object.title);
+            $('.nav-breadcrumb-client', $goBack).attr('data-href', object.client.url);
+            $('.support-go-back-client', $goBack).text(object.client.name);
+            $('.support-go-back-section', $goBack).text(object.title);
+            $('.support-go-back-icon', $goBack).attr('data-href', object.client.url);
+
+            // Modify the sidebar and content
+            $clientSelect.remove();
+            $subpagelistHeading.text(l[9097]);
+            for (i = 0; i < object.questions.length; i++) {
+                var $q = object.questions[i];
+
+                // Sidebar
+                $subpageListItem
+                    .attr('data-to', '#' + $q.reference)
+                    .attr('id', 'section-' + $q.url)
+                    .attr('data-state', '#' + $q.full_url);
+                $('div', $subpageListItem).text($q.question);
+
+                // Content
+                $content = $('.support-article.template', $contentBlock)
+                    .clone()
+                    .removeClass('template')
+                    .removeClass('hidden')
+                    .attr('data-update', '#section-' + $q.url)
+                    .attr('id', $q.reference)
+                    .attr('data-tags', JSON.stringify($q.tags));
+                $('.support-article-heading', $content).text($q.question);
+                $('.support-updatedate-result', $content).text($q.modified);
+                $('.support-article-info', $content).safeAppend($q.response);
+                if ($q.related_articles) {
+                    $('.related-and-tags-container', $content).safeAppend($q.related_articles);
+                }
+                $('.feedback-yes, .feedback-no', $content).attr('data-hash', $q.id);
+
+                $subpageList.safeAppend($subpageListItem.prop('outerHTML'));
+                $contentBlock.safeAppend($content.prop('outerHTML'));
+            }
+
+            $('.d-section-container', $contentBlock).remove();
+        }
+        else {
+            // Modify the goback
+            $('.nav-breadcrumb-section', $goBack).remove();
+            $('.support-go-back-client', $goBack).text(object.title);
+
+            // Modify the title
+            $('.section-title', $titleBlock).text(object.title);
+            $('.howto-section-subtitle', $titleBlock).text(object.subtitle);
+
+            // Modify the sidebar and content
+            $subpagelistHeading.text(l[24966]);
+            $('.device-selector span', $clientSelect).text(object.title);
+            $('.device-selector .device-icon', $clientSelect).addClass(object.iconClass + '-icon');
+
+            for (i = 0; i < object.clients.length; i++) {
+                var $c = object.clients[i];
+                var $clientSelectItem = $('.device-select.template', $clientSelect)
+                    .clone()
+                    .removeClass('template')
+                    .removeClass('hidden');
+
+                $clientSelectItem.addClass('device-' + $c.c_iconclass).attr('data-href', $c.c_fullurl);
+                $('.device-icon', $clientSelectItem).addClass($c.c_iconclass + '-icon');
+                $('span', $clientSelectItem).text($c.c_name);
+
+                $('.device-selector-top', $clientSelect).safeAppend($clientSelectItem.prop('outerHTML'));
+            }
+
+            for (i = 0; i < object.sections.length; i++) {
+                var $s = object.sections[i];
+
+                // Sidebar
+                $subpageListItem.attr('data-to', '#' + $s.name_slug).attr('id', 'section-' + $s.id);
+                $('div', $subpageListItem).text($s.name);
+
+                // Content
+                $content = $('.d-section-container.template', $page)
+                    .clone()
+                    .removeClass('template')
+                    .removeClass('hidden')
+                    .attr('id', $s.name_slug)
+                    .attr('data-update', '#' + $s.id);
+                $('.d-section-title a', $content).attr('href', $s.url_from_client).text($s.name);
+                $('.d-section-items', $content).safeAppend($s.content);
+
+                // Append
+                $subpageList.safeAppend($subpageListItem.prop('outerHTML'));
+                $contentBlock.safeAppend($content.prop('outerHTML'));
+            }
+
+            $('.support-article', $contentBlock).remove();
+        }
+
+        parsepage($page.prop('outerHTML'));
+    }
+
+    /**
      * Create short version of url for current article's share.
      * @param {String} section section id of current article.
      * @return {Array} newParts Array that contains all parts of shorturl
@@ -718,9 +886,8 @@ var Help = (function() {
         if (urls[parts[1]]) {
             return urls[parts[1]](parts.slice(1));
         }
-        else {
-            return urls.welcome();
-        }
+
+        return urls.welcome();
 
         // init page here instead with page set as 'help' ?!
         // document.location.href = '#help';
@@ -785,8 +952,7 @@ var Help = (function() {
         }, 200);
     }
 
-    ns.loadfromCMS = function(callback)
-    {
+    ns.loadfromCMS = function(callback) {
         var addToStructIndex = function(client, section, question, body) {
             structIdx[client] = structIdx[client] || Object.create(null);
             structIdx[client][section] = structIdx[client][section] || Object.create(null);
@@ -893,7 +1059,7 @@ var Help = (function() {
             });
         }
 
-        let $images = $('img', $('.main-content-pad'));
+        let $images = $('img', '.main-content-pad');
         for (let i = 0; i < $images.length; i++) {
             let $img = $($images[i]);
             let source = $img.attr('src');

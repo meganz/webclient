@@ -7,7 +7,7 @@
 }
 .main-mid-pad#help2-main {
     width: 100%;
-    min-width: 1024px;
+    min-width: 700px;
     max-width: 100%;
     padding-top: 46px;
 }
@@ -2900,14 +2900,15 @@
         font-size: 21px;
     }
 }
-@media (min-width: 801px) and (max-width: 1060px) {
+
+@media (min-width: 701px) and (max-width: 1060px) {
     #help2-main .main-directory-pad {
         margin: 0 auto;
         width: 700px;
     }
     #help2-main .main-content-pad {
         margin: 0 auto;
-        width: 700px;
+        width: 715px;
     }
     #help2-main .sidebar-menu-container {
         display: none;
@@ -2951,7 +2952,8 @@
         font-size: 44px;
     }
 }
-@media (min-width: 601px) and (max-width: 800px) {
+
+@media (min-width: 601px) and (max-width: 700px) {
      #help2-main .search-section-header .popular-question-list, #help2-main .popular-question-list {
         width: 100%;
     }#help2-main .support-search-container {

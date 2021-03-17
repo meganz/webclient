@@ -3981,10 +3981,8 @@ else if (!browserUpdate) {
                 };
 
                 // if this is download page, get ads data with g request
-                if (page.substr(0, 5) === 'file/') {
-                    g.au = ["wphl", "wphr", "wpht"];
-                    g.ad = localStorage.adflag || 1;
-                }
+                g.au = ["wphl", "wphr", "wpht"];
+                g.ad = localStorage.adflag || 1;
 
                 xhr(false, g, function(response) {
                     dl_res = Array.isArray(response) && response[0];

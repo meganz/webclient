@@ -304,7 +304,6 @@ var Help = (function() {
         var $headFeedBack = $('.feedback-heading', $container);
         var $feedbackContainer = $('.article-feedback-container', $container);
         var $noIconThumb = $('.no-icon', $container);
-        var $radioButtons = $('.adv-search-selected', $container);
 
         function sent($parent) {
             $('.feedback-buttons,.feedback-suggestions-list', $parent).delay(500).fadeOut(500);
@@ -321,17 +320,39 @@ var Help = (function() {
 
             $this.parent().parent().children($headFeedBack).delay(200).fadeOut(300);
 
-            $this.parent().siblings('.feedback-suggestions-list').delay(500).fadeIn(500);
+            var $feedbackSuggestions = $this.parent().siblings('.feedback-suggestions-list');
+            $("ul", $feedbackSuggestions).safeHTML(Data.help_article_feedbacks.html);
+            $('input', $feedbackSuggestions).attr('name', 'feedback-radio-' + $this.data('hash'));
 
-            $('.feedback-send').rebind('click', function() {
+            $feedbackSuggestions.delay(500).fadeIn(500);
+
+            $('.feedback-send', $feedbackSuggestions).rebind('click', function() {
                 var data = {hash: $this.data('hash')};
-                $(this).parents('.feedback-suggestions-list').find('input,textarea')
-                    .serializeArray().map(function(val) {
+                var optionData = $('input,textarea', $feedbackSuggestions).serializeArray();
+                for (let i = 0; i < optionData.length; i++) {
+                    var val = optionData[i];
+                    if (val.name.includes('feedback-radio')) {
+                        data['feedback-radio'] = val.value;
+                    }
+                    else {
                         data[val.name] = val.value;
-                    });
+                    }
+                }
 
                 M.xhr('https://cms2.mega.nz/feedback', JSON.stringify(data));
                 sent($this.parents('.article-feedback-container'));
+            });
+
+            // When a radio button is clicked
+            var $radioButtons = $('.adv-search-selected', $feedbackSuggestions);
+            $radioButtons.rebind('click', function() {
+                var $this = $(this);
+                // Remove existing checked styles from the other radio buttons
+                $radioButtons.removeClass('checked');
+
+                // Check just the selected radio button
+                $this.addClass('checked');
+                $('input', $this).prop('checked', true);
             });
         });
 
@@ -342,16 +363,6 @@ var Help = (function() {
 
             M.xhr('https://cms2.mega.nz/feedback', JSON.stringify({hash: $this.data('hash')}));
             sent($this.parents('.article-feedback-container'));
-        });
-
-        // When a radio button is clicked
-        $radioButtons.rebind('click', function() {
-            // Remove existing checked styles from the other radio buttons
-            $radioButtons.removeClass('checked');
-
-            // Check just the selected radio button
-            $(this).addClass('checked');
-            $(this).find('input').prop('checked', true);
         });
     }
 

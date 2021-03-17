@@ -1802,7 +1802,12 @@ function init_page() {
         if (page.substr(0, 4) === "chat") {
             id = page;
             page = "chat";
-            if (u_type === false) {
+            if (u_type === false || is_mobile && u_type) {
+                // for the sake of simplicity and fast loading...we are "faking" a logged out user for the case,
+                // where a user tries to open a chatlink
+                if (u_type) {
+                    u_type = false;
+                }
                 anonymouschat = true;
                 u_handle = "AAAAAAAAAAA";
                 pchandle = id.substr(5, 8);

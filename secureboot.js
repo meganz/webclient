@@ -3976,7 +3976,6 @@ else if (!browserUpdate) {
             if (dl_res) {
                 var g = {
                     a: 'g',
-                    esid: u_sid || '',
                     p: page.substr(0, 5) === 'file/' ? page.substr(5, 8) : page.split('!')[1]
                 };
 
@@ -3984,7 +3983,7 @@ else if (!browserUpdate) {
                 g.au = ["wphl", "wphr", "wpht"];
                 g.ad = localStorage.adflag || 1;
 
-                xhr(false, g, function(response) {
+                xhr(u_sid ? '&sid=' + u_sid : false, g, function(response) {
                     dl_res = Array.isArray(response) && response[0];
                 });
             }

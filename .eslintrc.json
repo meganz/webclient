@@ -51,7 +51,7 @@
         "block-scoped-var": 2,
         "brace-style": [2, "stroustrup"],
         "comma-style": [2, "last"],
-        "complexity": [2, 12],
+        "complexity": [2, 15],
         "consistent-this": [2, "self"],
         "consistent-return": 0,
         "curly": [2, "all"],

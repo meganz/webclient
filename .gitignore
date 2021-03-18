@@ -264,3 +264,8 @@ jsconfig.json #vscode js config
 /koko.html
 /webclient.sln
 /vwd.webinfo
+
+#############
+## PHPstorm project metadata
+#############
+.idea/

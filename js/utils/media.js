@@ -839,6 +839,22 @@ FullScreenManager.prototype.enterFullscreen = function() {
         }
     };
 
+    /** Animation for hiding the mobile video controls*/
+    var hideMobileVideoControls = null;
+
+    /**
+     * Init & reset hide the mobile video controls animation function
+     * @param $wrapper
+     * @private
+     */
+    var _initHideMobileVideoControls = function($wrapper) {
+        clearTimeout(hideMobileVideoControls);
+        hideMobileVideoControls = setTimeout(function() {
+            $('.video-controls', $wrapper).addClass('invisible');
+            $('.viewer-vad-control', $wrapper).addClass('bottom');
+        }, 3000);
+    };
+
     // @private Init custom video controls
     var _initVideoControls = function(wrapper, streamer, node, options) {
         var $wrapper = $(wrapper);
@@ -1215,38 +1231,6 @@ FullScreenManager.prototype.enterFullscreen = function() {
 
         /* Drag status */
         var timeDrag = false;
-        $progress.rebind('mousedown.videoprogress', function(e) {
-            timeDrag = true;
-
-            if (streamer.currentTime) {
-                videoElement.pause();
-                onIdle(updatebar.bind(0, e.pageX));
-            }
-        });
-
-        $document.rebind('mouseup.videoprogress', function(e) {
-            if (timeDrag) {
-                timeDrag = false;
-
-                if (streamer.currentTime) {
-                    updatebar(e.pageX);
-
-                    if (!streamer.WILL_AUTOPLAY_ONSEEK) {
-                        streamer.play();
-                    }
-                }
-            }
-        });
-
-        $document.rebind('mousemove.videoprogress', function(e) {
-            if (timeDrag && streamer.currentTime) {
-                updatebar(e.pageX);
-            }
-        });
-
-        $progress.rebind('mousemove.videoprogress', function(e) {
-            this.setAttribute('title', secondsToTimeShort(getTimeOffset(e.pageX).time, 1));
-        });
 
         // Update Progress Bar control
         var updatebar = function(x) {
@@ -1262,6 +1246,67 @@ FullScreenManager.prototype.enterFullscreen = function() {
                 }
             }
         };
+
+        // Get page X based on event
+        var getX = function(e) {
+            if (e.type.includes("mouse")) {
+                return e.pageX;
+            }
+            else if (e.type.includes("touch")) {
+                return (e.changedTouches || e.touches)[0].pageX;
+            }
+        };
+
+        $progress.rebind('mousedown.videoprogress touchstart.videoprogress', function(e) {
+            timeDrag = true;
+
+            if (streamer && streamer.currentTime) {
+                videoElement.pause();
+                onIdle(updatebar.bind(0, getX(e)));
+            }
+
+            if (is_mobile) {
+                var $videoControl = $(this).parents('.video-controls');
+                clearTimeout(hideMobileVideoControls);
+                $videoControl.addClass('timeDrag');
+            }
+        });
+
+        $document.rebind('mouseup.videoprogress touchend.videoprogress', function(e) {
+            if (timeDrag) {
+                timeDrag = false;
+
+                if (streamer && streamer.currentTime) {
+                    updatebar(getX(e));
+
+                    if (!streamer.WILL_AUTOPLAY_ONSEEK) {
+                        streamer.play();
+                    }
+                }
+            }
+
+            if (is_mobile) {
+                var $videoControl = $(this).parents('.video-controls');
+                $videoControl.removeClass('timeDrag');
+                _initHideMobileVideoControls($wrapper);
+            }
+        });
+
+        $document.rebind('mousemove.videoprogress', function(e) {
+            if (timeDrag && streamer && streamer.currentTime) {
+                updatebar(getX(e));
+            }
+        });
+
+        $progress.rebind('mousemove.videoprogress', function(e) {
+            this.setAttribute('title', secondsToTimeShort(getTimeOffset(getX(e)).time, 1));
+        });
+
+        $progress.rebind('touchmove.videoprogress', function(e) {
+            updatebar(getX(e));
+            this.setAttribute('title', secondsToTimeShort(getTimeOffset(getX(e)).time, 1));
+            return false;
+        });
 
         // Set the video container's fullscreen state
         var setFullscreenData = function(state) {
@@ -1864,22 +1909,6 @@ FullScreenManager.prototype.enterFullscreen = function() {
         return s;
     };
 
-    /** Animation for hiding the mobile video controls*/
-    var hideMobileVideoControlsAnimation = null;
-
-    /**
-     * Init & reset hide the mobile video controls animation function
-     * @param $wrapper
-     * @private
-     */
-    var _initHideMobileVideoControlsAnimation = function($wrapper) {
-        clearTimeout(hideMobileVideoControlsAnimation);
-        hideMobileVideoControlsAnimation = setTimeout(function () {
-            $('.video-controls', $wrapper).addClass('invisible');
-            $('.viewer-vad-control', $wrapper).addClass('bottom');
-        }, 3000);
-    };
-
     /**
      * Toggle hiding and showing the mobile video controls
      * @param $wrapper
@@ -1890,19 +1919,23 @@ FullScreenManager.prototype.enterFullscreen = function() {
         var $videoControl = $wrapper.find('.video-controls');
         var $adControl = $('.viewer-vad-control', $wrapper);
 
-        $video.off().on('tap', function (ev) {
+        $video.rebind('touchstart', function(ev) {
             if ($(ev.target).is('.mobile-gallery, #video')) {
                 if ($videoControl.hasClass('invisible')) {
                     $adControl.removeClass('bottom');
                     $videoControl.removeClass('invisible');
-                    _initHideMobileVideoControlsAnimation($wrapper);
-                } else {
+                    _initHideMobileVideoControls($wrapper);
+                }
+                else {
                     $videoControl.addClass('invisible');
                     $adControl.addClass('bottom');
                 }
             }
-            else if ($(ev.target).closest('.video-controls').length) {
-                _initHideMobileVideoControlsAnimation($wrapper);
+            else {
+                var $videoControls = $(ev.target).closest('.video-controls');
+                if ($videoControls.length && !$videoControls.hasClass('timeDrag')) {
+                    _initHideMobileVideoControls($wrapper);
+                }
             }
         });
     };
@@ -2016,7 +2049,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
 
                     $wrapper.addClass('video-theatre-mode');
                     if (is_mobile) {
-                        _initHideMobileVideoControlsAnimation($wrapper);
+                        _initHideMobileVideoControls($wrapper);
                         _initMobileVideoControlsToggle($wrapper);
                     }
                 });

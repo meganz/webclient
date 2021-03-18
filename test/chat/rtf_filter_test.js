@@ -15,48 +15,12 @@ describe("chat.rtf_filter unit test", function() {
         megaChat = function() {};
         makeObservable(megaChat);
         megaChat = new megaChat();
-        Object.assign(megaChat, {
-            'getEmojiDataSet': function(name) {
-                var self = this;
-                assert(name === "categories" || name === "emojis", "Invalid emoji dataset name passed.");
-
-                if (!self._emojiDataLoading) {
-                    self._emojiDataLoading = {};
-                }
-                if (!self._emojiData) {
-                    self._emojiData = {};
-                }
-
-                if (self._emojiData[name]) {
-                    return MegaPromise.resolve(
-                        self._emojiData[name]
-                    );
-                }
-                else if (self._emojiDataLoading[name]) {
-                    return self._emojiDataLoading[name];
-                }
-                else {
-                    self._emojiDataLoading[name] = MegaPromise.asMegaPromiseProxy(
-                        $.getJSON(staticpath + "js/chat/emojidata/" + name + "_v" + EMOJI_DATASET_VERSION + ".json")
-                    );
-                    self._emojiDataLoading[name].done(function(data) {
-                        self._emojiData[name] = data;
-                        delete self._emojiDataLoading[name];
-                    }).fail(function() {
-                        delete self._emojiDataLoading[name];
-                    });
-
-                    return self._emojiDataLoading[name];
-                }
-            }
-        });
         megaChat.plugins = {
             // 'chatStats': ChatStats,
             // 'chatdIntegration': ChatdIntegration,
             // 'callManager': CallManager,
             'urlFilter': UrlFilter,
             'emoticonShortcutsFilter': EmoticonShortcutsFilter,
-            'emoticonsFilter': EmoticonsFilter,
             // 'callFeedback': CallFeedback,
             // 'presencedIntegration': PresencedIntegration,
             // 'persistedTypeArea': PersistedTypeArea,

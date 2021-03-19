@@ -43,6 +43,8 @@ function dump(what) {
     process.stderr.write(what + '\n');
 }
 
+const jQueryEVh = {'on': 1, 'off': 1, 'bind': 1, 'unbind': 1, 'one': 1, 'trigger': 1, 'rebind': 1};
+
 module.exports = {
     'open': {
         meta: {
@@ -190,8 +192,15 @@ module.exports = {
 
                             context.report(node, msg);
                         }
-                        else if (prop === 'on' && isjQuery(node)) {
-                            context.report(node, 'Prefer $.rebind to $.on and $.off + $.on');
+                        else if (jQueryEVh[prop] && isjQuery(node)) {
+                            if (prop === 'on') {
+                                context.report(node, 'Prefer $.rebind to $.on and $.off + $.on');
+                            }
+
+                            const arg0 = node.arguments[0] || false;
+                            if (arg0.type === 'Literal' && String(arg0.value).indexOf(',') !== -1) {
+                                context.report(node, 'Unexpected comma, that is not a valid separator.');
+                            }
                         }
                         else if ((prop === 'show' || prop === 'hide') && isjQuery(node)) {
                             let rep = prop === 'show' ? 'removeClass' : 'addClass';

@@ -195,7 +195,7 @@ mobile.account = {
         var $usedStorage = $accountUsageBlock.find('.used');
         var $totalStorage = $accountUsageBlock.find('.total');
         var $percentageUsed = $accountUsageBlock.find('.percentage');
-        var $message = $('.over-quota-message', $accountUsageBlock).text(l[16136]).removeClass('odq-red-alert');
+        var $message = $('.over-quota-message', $accountUsageBlock).safeHTML(l[16136]).removeClass('odq-red-alert');
 
         // Format percentage used to X.XX%, used space to 'X.X GB' and total space to 'X GB' format
         var spaceUsed = M.account.cstrg;

@@ -563,6 +563,7 @@ var Help = (function() {
                 if (args.length === 2) {// if this a question.
                     if (question.lastIndexOf('-') !== -1) {
                         question = question.substring(question.lastIndexOf('-') + 1);
+                        is_section = true;
                     }
                     else {
                         // Reload the short url of the help article when title is missing in original url

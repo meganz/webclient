@@ -61,6 +61,8 @@ function init_blog_callback() {
 
 function init_blog() {
 
+    CMS.scope = 'blog';
+
     // Remove early.
     if (is_mobile) {
         $('.blog-new-right').addClass('hidden');
@@ -78,8 +80,6 @@ function init_blog() {
         }
         init_blog();
     });
-
-    CMS.scope = 'blog';
 
     CMS.get('blog', function(err, data) {
         if (err) {

@@ -1037,8 +1037,9 @@ var Help = (function() {
 
     var helpAlreadyLogged;
     ns.render = function() {
-        // reset all tags
+        CMS.scope = 'help2';
 
+        // reset all tags
         if (!ready) {
             doRender = true;
             loadingDialog.show();

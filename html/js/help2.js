@@ -477,7 +477,7 @@ var Help = (function() {
 
             var articles = idx.all.filter(function(doc) {
                 return words.filter(function(target) {
-                    return !!doc.indexedTitle.match(target) || !!doc.body.match(target);
+                    return !!doc.title.match(target) || !!doc.body.match(target);
                 }).length === words.length;
             });
 

@@ -2440,7 +2440,7 @@ accountUI.security = {
                                 /* clear account cache */
                                 $activeSessionsRows.find('.settings-logout').remove();
                                 $activeSessionsRows.find('.active-session-txt')
-                                    .removeClass('active-session-txt').addClass('expired-session-txt').text(l[1664]);
+                                    .removeClass('active-session-txt').addClass('expired-session-txt').text(l[25016]);
                                 $('.fm-close-all-sessions').hide();
                                 loadingDialog.hide();
                             }
@@ -2469,7 +2469,7 @@ accountUI.security = {
                             /* clear account cache */
                             $this.find('.settings-logout').remove();
                             $this.find('.active-session-txt').removeClass('active-session-txt')
-                                .addClass('expired-session-txt').text(l[1664]);
+                                .addClass('expired-session-txt').text(l[25016]);
                             loadingDialog.hide();
                         }
                     });
@@ -2539,7 +2539,7 @@ accountUI.security = {
                     status = '<span class="active-session-txt">' + l[23754] + '</span>';     // Logged-in
                 }
                 else {
-                    status = '<span class="expired-session-txt">' + l[1664] + '</span>';    // Expired
+                    status = '<span class="expired-session-txt">' + l[25016] + '</span>';    // Expired
                 }
             }
 

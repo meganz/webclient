@@ -1197,6 +1197,11 @@ function waitsc() {
         }
     };
 
+    waitxhr.onprogress = function() {
+        clearTimeout(waittimeout);
+        waittimeout = setTimeout(waitsc, MAX_WAIT);
+    };
+
     waitbegin = Date.now();
     waitxhr.open('POST', waiturl, true);
     waitxhr.send();

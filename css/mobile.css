@@ -213,11 +213,10 @@ ul, li {
     z-index: 1010;
 }
 .mobile.main-block.error-overlay {
-    bottom: 0;
-    left: 0;
-    position: absolute;
+    position: fixed;
     top: 0;
     z-index: 1300;
+    overflow: hidden;
 }
 .mobile.content-row {
     display: table-row;
@@ -8278,7 +8277,9 @@ textarea.mobile.support-text-field {
     height: 100%;
     width: 100%;
     top: 0;
-    position: absolute;
+    position: fixed;
+    z-index: 1200;
+    overflow: scroll;
 }
 .mobile.fm-dialog-aligner {
     display: table-cell;

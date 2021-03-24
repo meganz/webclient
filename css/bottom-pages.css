@@ -4458,7 +4458,6 @@ a.opensource-icon-txt.coming-soon {
     transition: box-shadow 200ms ease-in-out;
     cursor: pointer;
     margin-top: 15px;
-    text-transform: capitalize;
 }
 body:not(.mobile) .bottom-page.white-button:hover {
     -webkit-box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.4);

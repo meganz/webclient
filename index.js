@@ -169,7 +169,7 @@ function topMenuDataUpdate(data) {
     if (perc >= 100) {
         $storageBlock.addClass('exceeded');
     }
-    else if (perc > 80) {
+    else if (perc >= data.uslw / 100) {
         $storageBlock.addClass('going-out');
     }
 

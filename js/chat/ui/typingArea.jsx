@@ -845,7 +845,13 @@ export class TypingArea extends MegaRenderMixin {
             />;
         }
         var placeholder = l[18669];
-        placeholder = placeholder.replace("%s", room.getRoomTitle(false, true));
+        var roomTitle = room.getRoomTitle(false, true);
+        // If room title contains quote, use translation with translated quote
+        if (roomTitle[0] === '"' && roomTitle[roomTitle.length - 1] === '"') {
+            placeholder = l[18763];
+            roomTitle = roomTitle.slice(1, -1);
+        }
+        placeholder = placeholder.replace("%s", roomTitle);
 
         var disabledTextarea = room.pubCu25519KeyIsMissing === true || this.props.disabled ? true : false;
 

@@ -57,7 +57,7 @@
     width: 100%;
 }
 i.medium-icon.business-sprite {
-    background-image: url(../images/mega/business_v2.png);
+    background-image: url(../images/mega/business_v3.png);
 }
 .nav-button .nav-icon.business {
     background-position: -50px -193px;
@@ -92,9 +92,9 @@ i.medium-icon.business-sprite {
 .bottom-page.angle-bg.low-top {
     margin-top: -134px;
 }
-.business .bottom-page.top-bl .bottom-page.angle-bg,
-.bottom-page.top-bl > .vertical-centered-cell .bottom-page.angle-bg {
-    bottom: -100px;
+.bottom-page.top-bl > .vertical-centered-cell .bottom-page.angle-bg,
+.business .bottom-page.top-bl .bottom-page.angle-bg {
+	bottom: -100px;
 }
 .business-page .bottom-page.info-block {
     position: relative;
@@ -217,7 +217,7 @@ i.medium-icon.business-sprite {
     width: 34px;
     height: 34px;
     float: left;
-    background-image: url(../images/mega/business_v2.png);
+    background-image: url(../images/mega/business_v3.png);
     background-position: -486px -28px;
     margin: 11px 20px 0 0;
     position: relative;
@@ -276,18 +276,6 @@ i.medium-icon.business-sprite {
 .business-icon.transfer {
     background-position: -542px -28px;
 }
-.business-icon.android {
-    background-position: -136px -156px;
-}
-.business-icon.ios {
-    background-position: -88px -156px;
-}
-.business-icon.win {
-    background-position: -184px -156px;
-}
-.business-icon.linux {
-    background-position: -232px -155px;
-}
 .business-storageZ-info {
     font-size: 16px;
     line-height: 19px;
@@ -329,7 +317,7 @@ i.medium-icon.business-sprite {
     position: absolute;
     left: 0;
     top: 0;
-    background-image: url(../images/mega/business_v2.png);
+    background-image: url(../images/mega/business_v3.png);
     background-position: -7px -115px;
     margin: 10px 0 0 0;
 }
@@ -516,7 +504,7 @@ div.bottom-page.slider-controls {
     vertical-align: top;
     margin: 0 10px;
     box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.15);
-    background-image: url(../images/mega/business_v2.png);
+    background-image: url(../images/mega/business_v3.png);
     background-position: 2px -151px;
     cursor: pointer;
 }
@@ -597,7 +585,16 @@ div.bottom-page.slider-controls {
     text-align: left;
 }
 .bottom-page.business-icons {
-    padding: 0 0 0 0;
+    font-size: 0;
+    padding: 0;
+    white-space: nowrap;
+}
+.bottom-page.business-icons i {
+    display: inline-block;
+    margin: 22px 0 0 25px;
+}
+.bottom-page.business-icons i:first-child {
+    margin: 0;
 }
 .bottom-page.arrange-to-top {
     position: relative;
@@ -692,7 +689,7 @@ div.bottom-page.slider-controls {
     display: block;
     width: 20px;
     height: 20px;
-    background-image: url(../images/mega/business_v2.png);
+    background-image: url(../images/mega/business_v3.png);
     background-position: -152px -115px;
 }
 .business-cell.cell-icon.cross i {
@@ -1182,7 +1179,7 @@ div.bottom-page.slider-controls {
     .business-tick-txt::before,
     .bottom-page .slider-ctrl-button,
     .business-cell.cell-icon i {
-        background-image: url(../images/mega/business_v2@2x.png) !important;
+        background-image: url(../images/mega/business_v3@2x.png) !important;
         background-size: 367px auto;
     }
 }

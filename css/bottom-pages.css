@@ -477,7 +477,7 @@ body:not(.mobile) .bottom-page.scroll-button:hover {
     height: 20px;
     display: inline-block;
     margin: 10px 6px 0 0;
-    background-image: url(../images/mega/pages-sprite_v7.png);
+    background-image: url(../images/mega/pages-sprite_v8.png);
     background-position: 2px -3330px;
     background-repeat: no-repeat;
     vertical-align: top;
@@ -673,10 +673,10 @@ body:not(.mobile) .bottom-page.scroll-button:hover {
     color: #2EA9D3;
 }
 .bottom-page.small-txt {
-    font-size: 14px;
-    line-height: 24px;
     color: #666666;
-    padding-bottom: 10px;
+    font-family: LatoWeb, Arial, sans-serif;
+    font-size: 16px;
+    line-height: 30px;
 }
 .bottom-page.big-icon-info {
     font-size: 30px;
@@ -1019,7 +1019,7 @@ body:not(.mobile) .bottom-page.scroll-button:hover {
     vertical-align: top;
     width: 8px;
     height: 13px;
-    background-image: url(../images/mega/startpage-sprite_v12.png);
+    background-image: url(../images/mega/startpage-sprite_v13.png);
     background-position: -165px -7px;
     background-repeat: no-repeat;
 }
@@ -1055,7 +1055,7 @@ body:not(.mobile) .bottom-page.scroll-button:hover {
     width: 102px;
     height: 102px;
     margin: 10px auto 26px auto;
-    background-image: url(../images/mega/startpage-sprite_v12.png);
+    background-image: url(../images/mega/startpage-sprite_v13.png);
     background-position: 0 -533px;
     background-repeat: no-repeat;
     padding: 0;
@@ -1125,15 +1125,15 @@ body:not(.mobile) .bottom-page.scroll-button:hover {
 }
 .bottom-page.big-icon.folders {
     background-position: -119px -1270px;
-    background-image: url(../images/mega/pages-sprite_v7.png);
+    background-image: url(../images/mega/pages-sprite_v8.png);
 }
 .bottom-page.big-icon.arrows {
     background-position: -119px -1400px;
-    background-image: url(../images/mega/pages-sprite_v7.png);
+    background-image: url(../images/mega/pages-sprite_v8.png);
 }
 .bottom-page.big-icon.up-down {
     background-position: -119px -1530px;
-    background-image: url(../images/mega/pages-sprite_v7.png);
+    background-image: url(../images/mega/pages-sprite_v8.png);
 }
 .bottom-page.big-icon.safe {
     background-position: -160px -383px;
@@ -1237,7 +1237,7 @@ body:not(.mobile) .bottom-page.scroll-button:hover {
 .bottom-page.tab-icon {
     width: 34px;
     height: 32px;
-    background-image: url(../images/mega/pages-sprite_v7.png);
+    background-image: url(../images/mega/pages-sprite_v8.png);
     background-position: 1px -1941px;
     opacity: 0.3;
     display: block;
@@ -1316,8 +1316,10 @@ body:not(.mobile) .bottom-btn-container .bus-plan.button-48-height.red:hover {
 }
 .bottom-page.horizontal-centered-bl.ultra-wide {
     max-width: 1440px;
-    padding: 0 40px;
     overflow: visible;
+    padding: 0 40px;
+    position: relative;
+    z-index: 1;
 }
 .bottom-page.horizontal-centered-bl.mid-wide {
     max-width: 1194px;
@@ -1385,7 +1387,7 @@ iframe.security-video-container {
     margin: 12px auto 5px auto;
     width: 22px;
     height: 24px;
-    background-image: url(../images/mega/startpage-sprite_v12.png);
+    background-image: url(../images/mega/startpage-sprite_v13.png);
     background-position: -0px -73px;
     opacity: 0.5;
     -webkit-transition: opacity 200ms ease-in-out;
@@ -1401,7 +1403,7 @@ iframe.security-video-container {
     opacity: 0.3;
 }
 .nav-buttons-bl .pages-nav.nav-icon.bott-sprite {
-    background-image: url(../images/mega/pages-sprite_v7.png);
+    background-image: url(../images/mega/pages-sprite_v8.png);
     width: 26px;
     height: 26px;
     margin: 8px auto 3px auto;
@@ -1565,7 +1567,7 @@ iframe.security-video-container {
     width: 8px;
     height: 5px;
     margin: 5px 0 0 4px;
-    background-image: url(../images/mega/pages-sprite_v7.png);
+    background-image: url(../images/mega/pages-sprite_v8.png);
     background-position: -215px -203px;
     opacity: 0.67;
 }
@@ -1701,7 +1703,7 @@ iframe.security-video-container {
     height: 26px;
     display: inline-block;
     vertical-align: top;
-    background-image: url(../images/mega/pages-sprite_v7.png);
+    background-image: url(../images/mega/pages-sprite_v8.png);
     background-position: -12px -3039px;
     margin: 15px 12px 0 0;
 }
@@ -1979,7 +1981,7 @@ body:not(.mobile) .bottom-page.top-dark-button:hover {
     background-repeat: no-repeat;
 }
 .bottom-page.icon.pages-sprite, .pages-sprite, i.pages-sprite {
-    background-image: url(../images/mega/pages-sprite_v7.png);
+    background-image: url(../images/mega/pages-sprite_v8.png);
 }
 .bottom-page.icon.new-pages-sprite {
     background-image: url(../images/mega/new-pages-sprite_v6.png);
@@ -2211,7 +2213,7 @@ body:not(.mobile) .bottom-page.top-dark-button:hover {
     padding: 0 40px;
 }
 .bottom-page.mid-icon {
-    background-image: url(../images/mega/pages-sprite_v7.png);
+    background-image: url(../images/mega/pages-sprite_v8.png);
     width: 80px;
     height: 80px;
     float: left;
@@ -2278,44 +2280,44 @@ body:not(.mobile) .bottom-page.top-dark-button:hover {
     color: #333333;
 }
 .bottom-page.big-icon.target {
-    background-image: url(../images/mega/pages-sprite_v7.png);
+    background-image: url(../images/mega/pages-sprite_v8.png);
     background-position: 1px -310px;
 }
 .bottom-page.big-icon.charts {
-    background-image: url(../images/mega/pages-sprite_v7.png);
+    background-image: url(../images/mega/pages-sprite_v8.png);
     background-position: 1px -190px;
 }
 .bottom-page.big-icon.mobile-cloud {
-    background-image: url(../images/mega/pages-sprite_v7.png);
+    background-image: url(../images/mega/pages-sprite_v8.png);
     background-position: 1px -1400px;
 }
 .bottom-page.big-icon.chat {
-    background-image: url(../images/mega/pages-sprite_v7.png);
+    background-image: url(../images/mega/pages-sprite_v8.png);
     background-position: 1px -1270px;
 }
 .bottom-page.big-icon.photos {
-    background-image: url(../images/mega/pages-sprite_v7.png);
+    background-image: url(../images/mega/pages-sprite_v8.png);
     background-position: 1px -1530px;
 }
 .bottom-page.big-icon.cloud {
-    background-image: url(../images/mega/pages-sprite_v7.png);
+    background-image: url(../images/mega/pages-sprite_v8.png);
     background-position: 1px -1660px;
 }
 .bottom-page.big-icon.camera {
-    background-image: url(../images/mega/pages-sprite_v7.png);
+    background-image: url(../images/mega/pages-sprite_v8.png);
     background-position: -119px -1660px;
 }
 .bottom-page.big-icon.player {
-    background-image: url(../images/mega/pages-sprite_v7.png);
+    background-image: url(../images/mega/pages-sprite_v8.png);
     background-position: -119px -1790px;
 }
 .bottom-page.big-icon.mobile-arrow {
-    background-image: url(../images/mega/pages-sprite_v7.png);
+    background-image: url(../images/mega/pages-sprite_v8.png);
     background-position: -119px -1920px;
 }
 .cmd-top-img {
     height: 180px;
-    background-image: url(../images/mega/pages-sprite_v7.png);
+    background-image: url(../images/mega/pages-sprite_v8.png);
     background-position: center -3114px;
     background-repeat: no-repeat;
     display: none;
@@ -2331,6 +2333,7 @@ body:not(.mobile) .bottom-page.top-dark-button:hover {
 .bottom-align.float-hero-image {
     width: 100%;
 }
+
 /* New product page icons*/
 .bottom-page.large-icon {
     width: 188px;
@@ -2342,7 +2345,7 @@ body:not(.mobile) .bottom-page.top-dark-button:hover {
     padding: 0;
 }
 .bottom-page.large-icon.pages-sprite, .bottom-page.big-icon.pages-sprite {
-    background-image: url(../images/mega/pages-sprite_v7.png);
+    background-image: url(../images/mega/pages-sprite_v8.png);
     background-size: 360px auto;
     background-repeat: no-repeat;
 }
@@ -3142,7 +3145,7 @@ body:not(.mobile) .small-green-button:not(.disabled):hover {
     -moz-border-radius: 4px;
     -webkit-border-radius: 4px;
     border-radius: 4px;
-    background-image: url(../images/mega/pages-sprite_v7.png);
+    background-image: url(../images/mega/pages-sprite_v8.png);
     background-repeat: no-repeat;
     background-position: 0 -887px;
     margin: 38px 0 77px 0;
@@ -3244,34 +3247,91 @@ body:not(.mobile) .mobile-apps-button:hover {
 .megasync .right-cell .business-info-block {
     padding-left: 40px;
 }
+
 /* Mobile-app */
+.mobileapp .top-bl .horizontal-centered-bl {
+    min-height: 695px;
+}
+.mobileapp .bottom-page.big-icon {
+    margin: 0 auto 16px;
+}
+.mobileapp .bottom-page.top-bl > .vertical-centered-cell .bottom-page.angle-bg {
+    bottom: -240px;
+}
+.mobileapp .business-info-block {
+    padding: 15px 0;
+}
+.mobileapp .bottom-page.business-header {
+    padding-top: 0;
+}
+.mobileapp .left-cell .bottom-page.img {
+     -webkit-margin-end: 35px;
+    margin-inline-end: 35px;
+    width: calc(100% - 35px);
+}
+.mobileapp .right-cell .bottom-page.img {
+    margin: 0;
+    -webkit-margin-start: 35px;
+    margin-inline-start: 35px;
+    width: calc(100% - 35px);
+}
+.bottom-page.img.mobile01 {
+    max-width: 458px;
+}
+.bottom-page.img.mobile02 {
+    max-width: 523px;
+}
+.bottom-page.img.mobile03 {
+    max-width: 328px;
+}
+.bottom-page.img.mobile04 {
+    max-width: 538px;
+}
+.rtl .mobileapp .img-wrap {
+    text-align: right;
+}
+
+/* Small OS/Platform icons */
 .bottom-page.apps-buttons {
-    padding: 53px 0 0 0;
+    padding: 24px 0 78px 0;
     font-size: 0;
     line-height: 0;
 }
 .bottom-page.apps-buttons.bott-block {
-    padding: 32px 0;
+    padding-bottom: 8px;
 }
 .bottom-page.dark-button {
-    display: inline-block;
-    background-image: url(../images/mega/pages-sprite_v7.png);
-    width: 169px;
-    height: 57px;
     background-position: -2px -3512px;
+    background-image: url(../images/mega/pages-sprite_v8.png);
+    display: inline-block;
+    height: 57px;
+    margin: 30px 15px 0;
+    width: 169px;
 }
 .bottom-page.dark-button.android {
     background-position: -2px -3603px;
     width: 191px;
 }
-.bottom-page.dark-button.hover {
-    opacity: 0.85;
+.bottom-page.dark-button.huawei {
+    background-position: -172px -3512px;
+    width: 187px;
 }
-body:not(.mobile) .bottom-page.dark-button.hover:hover {
-    opacity: 1;
+.bottom-page.dark-button.small {
+    background-position: -2px -2731px;
+    background-size: 280px auto;
+    height: 45px;
+    width: 131px;
 }
-.bottom-page.dark-button:first-child {
-    margin-right: 36px;
+.bottom-page.dark-button.small.android {
+    background-position: -2px -2802px;
+    width: 148px;
+}
+.bottom-page.dark-button.small.huawei {
+    background-position: -134px -2731px;
+    width: 146px;
+}
+.dark-blue-bg .bottom-page.dark-button:first-child {
+    margin-right: 30px;
 }
 .bottom-page.top-description {
     font-size: 14px;
@@ -3301,7 +3361,7 @@ body:not(.mobile) .bottom-page.dark-button.hover:hover {
     margin: 4px 0 0 12px;
     width: 25px;
     height: 18px;
-    background-image: url(../images/mega/pages-sprite_v7.png);
+    background-image: url(../images/mega/pages-sprite_v8.png);
     background-position: -162px -3401px;
     background-size: 360px auto;
 }
@@ -3319,9 +3379,11 @@ body:not(.mobile) .bottom-page.dark-button.hover:hover {
      margin: 72px 0;
 }
 .bottom-page.img.mobile-top {
-    max-width: 655px;
+    max-width: 526px;
     width: 118%;
-    margin: 56px 0 50px 38px;
+    margin: 78px 0;
+     -webkit-margin-start: 38px;
+    margin-inline-start: 38px;
 }
 .bottom-page.mid-txt {
     line-height: 36px;
@@ -3345,27 +3407,6 @@ body:not(.mobile) .bottom-page.dark-button.hover:hover {
     font-family: 'LatoWeb', 'source_sans_proregular', Arial;
     max-width: 840px;
     margin: 0 auto;
-}
-.bottom-page.img.mobile01 {
-    width: 100%;
-    max-width: 515px;
-}
-.bottom-page.img.mobile02 {
-    width: 100%;
-    max-width: 573px;
-    margin-left: 35px;
-}
-.bottom-page.img.mobile03 {
-    width: 100%;
-    max-width: 479px;
-}
-.bottom-page.img.mobile04 {
-    width: 100%;
-    max-width: 613px;
-}
-.bottom-page.img.mobile05 {
-    width: 188%;
-    max-width: 1092px;
 }
 .bottom-page.big-icon.green-mobile {
     background-position: -70px -3394px;
@@ -3456,25 +3497,7 @@ body:not(.mobile) .bottom-page.dark-button.hover:hover {
     font-family: 'LatoWeb', 'source_sans_proregular', Arial;
     padding: 24px 0 0 0;
 }
-.bottom-page.dark-button.win10 {
-    width: 217px;
-    height: 66px;
-    background-position: -2px -3699px;
-}
-.bottom-page.dark-button.win8 {
-    width: 248px;
-    height: 66px;
-    background-position: -2px -3805px;
-}
-.dark-blue-bg .bottom-page.dark-button:first-child {
-    margin-right: 30px;
-}
-.mobileapp .bottom-page.big-icon {
-    margin: 0 auto 16px;
-}
-.mobileapp .top-bl .horizontal-centered-bl {
-    min-height: 779px;
-}
+
 .securitypractice .business-info-block {
     max-width: 620px;
     text-align: left;
@@ -5095,11 +5118,8 @@ body:not(.mobile) .bottom-page.dropdown .dropdown-item:hover, .bottom-page.dropd
 }
 
 @media only screen and (max-width: 970px) {
-    .bottom-page.apps-buttons {
-        padding: 40px 0 0 0;
-    }
-    .bottom-page.dark-button, .bottom-page.dark-button:first-child {
-        margin: 16px 8px 0 8px;
+    .bottom-page.dark-button {
+        margin: 16px 8px 0;
     }
     .dark-blue-bg .bottom-page.dark-button {
         margin: 0;
@@ -5161,6 +5181,9 @@ body:not(.mobile) .bottom-page.dropdown .dropdown-item:hover, .bottom-page.dropd
     .bottom-page.top-dark-info.medium, .bottom-page.big-header, .bottom-page.dark-big-header, .bottom-page.large-header, .bottom-page.large-header.big, .bottom-page.business-header, .bottom-page.container-title, .bottom-page.bold-title {
         font-size: 30px;
     }
+    .mobileapp .top-bl .horizontal-centered-bl {
+        min-height: auto;
+    }
 }
 
 @media only screen and (max-width: 870px) {
@@ -5195,9 +5218,12 @@ body:not(.mobile) .bottom-page.dropdown .dropdown-item:hover, .bottom-page.dropd
 }
 
 @media only screen and (max-width: 783px) {
+    .bottom-page.small-txt {
+        font-size: 14px;
+        line-height: 24px;
+    }
     .bottom-page.img.mobile-top {
-        width: 100%;
-        margin: 0 0 70px 0;
+        margin: 0 0 50px;
     }
     .top-bl .bottom-page.table.changed-order .order1 {
         display: none;
@@ -5320,31 +5346,20 @@ body:not(.mobile) .bottom-page.dropdown .dropdown-item:hover, .bottom-page.dropd
     .bottom-page.angle-bg.blue {
         margin: -300px 0 0 0;
     }
-    .bottom-page.img.mobile01 {
-        margin: -10px 0 10px -30px;
-    }
-    .bottom-page.img.mobile02 {
-        margin-bottom: 48px;
-    }
-    .bottom-page.img.mobile03 {
-        margin: -20px 0 16px 0;
-    }
-    .bottom-page.img.mobile04 {
-        margin: -20px 0 19px -20px;
-    }
-    .bottom-page.img.mobile05 {
+    .mobileapp .full-block .bottom-page.img {
         margin: 0;
         width: 100%;
     }
     .bottom-page.img.tm {
         padding: 161px 0 0 0;
     }
-
-    .megasync .bottom-page.table.changed-order .order2,
-    .mobileapp .bottom-page.table.changed-order .order2 {
+    .megasync .bottom-page.table.changed-order .order2 {
         display: block;
         height: auto;
         margin: 0 auto 48px auto;
+    }
+    .mobileapp .bottom-page.table.changed-order .order2 {
+        display: block;
     }
     .megasync .bottom-page.table.changed-order .order1,
     .mobileapp .bottom-page.table.changed-order .order1 {
@@ -5694,6 +5709,14 @@ body:not(.mobile) .bottom-page.dropdown .dropdown-item:hover, .bottom-page.dropd
     }
 }
 
+@media only screen and (max-width: 675px) {
+    .bottom-page.apps-buttons .dark-button,
+    .feature-page .app-links a.bottom-page.dark-button {
+        display: block;
+        margin: 16px auto 0;
+    }
+}
+
 @media only screen and (max-width: 660px) {
     .bottom-page.img.ios2 {
         margin-top: 0;
@@ -5801,19 +5824,12 @@ body:not(.mobile) .bottom-page.dropdown .dropdown-item:hover, .bottom-page.dropd
     .bottom-page.top-dark-info.medium {
         padding-bottom: 10px;
     }
-    .bottom-page.dark-button:first-child {
-        margin-right: 16px;
-    }
     .bottom-page.top-description {
         padding: 40px 0 25px 0;
     }
     .onboarding-suggestions .bottom-page.top-description {
         font-size: 14px;
         line-height: 22px;
-    }
-    .bottom-page.img.mobile-top {
-        width: 100%;
-        margin: 0 0 0 0;
     }
     .securitypractice .bottom-page.large-subheader {
         font-size: 16px;
@@ -5855,15 +5871,22 @@ body:not(.mobile) .bottom-page.dropdown .dropdown-item:hover, .bottom-page.dropd
     .bottom-page.img.bird-img2 {
         margin: 0 auto 40px auto;
     }
-    .bottom-page.top-dark-info.medium, .bottom-page.big-header, .bottom-page.dark-big-header, .bottom-page.large-header, .bottom-page.large-header.big, .bottom-page.business-header, .bottom-page.container-title, .bottom-page.bold-title {
+    .bottom-page.top-dark-info.medium,
+    .bottom-page.big-header,
+    .bottom-page.dark-big-header,
+    .bottom-page.large-header,
+    .bottom-page.large-header.big,
+    .bottom-page.business-header,
+    .bottom-page.container-title,
+    .bottom-page.bold-title {
         font-size: 26px;
         line-height: 38px;
     }
     .bottom-page.apps-buttons {
-        padding: 40px 0 0 0;
+        padding: 24px 0 60px 0;
     }
-    .bottom-page.dark-button, .bottom-page.dark-button:first-child, .dark-blue-bg .bottom-page.dark-button, .dark-blue-bg .bottom-page.dark-button:first-child {
-        margin: 0 8px 16px 8px;
+    .bottom-page.apps-buttons.bott-block {
+        padding: 20px 0 0;
     }
     .bottom-page.big-header {
         padding: 5px 0 34px 0;
@@ -6010,10 +6033,6 @@ body:not(.mobile) .bottom-page.dropdown .dropdown-item:hover, .bottom-page.dropd
     .top-bl .bottom-page.half-sized-cell {
         padding-left: 0;
         padding-right: 0;
-    }
-    .bottom-page.img.mobile-top {
-        width: 100%;
-        margin: 0 0 0 0;
     }
     .onboarding-suggestions .bottom-page.vertical-centered-bl.top-bl {
         max-height: initial;
@@ -6368,7 +6387,7 @@ body:not(.mobile) .bottom-page.dropdown .dropdown-item:hover, .bottom-page.dropd
     /* end of MEGAcmd */
     /* MEGAsync */
     .small-megasync-logo {
-        background-image: url(../images/mega/pages-sprite_v7.png);
+        background-image: url(../images/mega/pages-sprite_v8.png);
         background-repeat: no-repeat;
         background-position: 0 0;
         width: 185px;
@@ -6547,7 +6566,7 @@ body:not(.mobile) .bottom-page.dropdown .dropdown-item:hover, .bottom-page.dropd
 
 @media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {
     .medium-icon.down-arrow, .bottom-page.big-icon.interactive, .bottom-page.big-icon.scriptable, .bottom-page.big-icon.target, .bottom-page.big-icon.charts, .small-megasync-logo, .mobile-apps-button, .bottom-page.big-icon.mobile-cloud, .bottom-page.big-icon.chat, .bottom-page.big-icon.photos, .bottom-page.big-icon.cloud, .bottom-page.tab-icon, .bottom-page.big-icon.folders, .bottom-page.big-icon.arrows, .bottom-page.big-icon.up-down, .bottom-page.big-icon.camera, .bottom-page.big-icon.player, .bottom-page.big-icon.mobile-arrow, .pages-nav.nav-icon.bott-sprite, .bottom-page.mid-icon, .bottom-page.tab-lnk-icon, .cmd-top-img, .bottom-page.scroll-icon, .bottom-page.dark-button, .bottom-page.big-link i, .bottom-page.large-icon.pages-sprite, .bottom-page.big-icon.pages-sprite, .bottom-page.icon.pages-sprite, .pages-sprite, i.pages-sprite {
-        background-image: url(../images/mega/pages-sprite_v7@2x.png) !important;
+        background-image: url(../images/mega/pages-sprite_v8@2x.png) !important;
         background-size: 360px auto;
     }
     .bottom-page .security-illustration, .bottom-page.password-manager-app-select .app-link-icon {

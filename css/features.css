@@ -182,22 +182,12 @@ body.rtl .feature-page * {
         margin-top: 15px;
     }
 
-    .feature-page .app-links img {
-        height: 100%;
-    }
-
     .feature-page .app-links a {
         display: inline-block;
-        height: 65px;
-        vertical-align: middle;
-    }
-
-    .feature-page .app-links .ios {
-        padding: 10px 0;
-    }
-
-    .feature-page .app-links .android {
-        margin: 0;
+        margin: 16px 0 0 0;
+        -webkit-margin-end: 16px;
+        margin-inline-end: 16px;
+        vertical-align: top;
     }
 
 /* end app store links */
@@ -367,6 +357,15 @@ body.rtl .feature-page * {
             float: none;
             max-width: 100%;
         }
+
+        /* app store links */
+
+            .feature-page .app-links a,
+            .feature-page .app-links a:first-child {
+                margin: 16px 8px 0;
+            }
+
+        /* end app store links */
     }
 
     @media only screen and (max-width: 460px) {

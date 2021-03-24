@@ -161,7 +161,7 @@ body.en .download .bottom-page.top-bl {
     right: 90px;
 }
 .startpage.small-icon, .startpage.mid-icon {
-    background-image: url(../images/mega/startpage-sprite_v12.png);
+    background-image: url(../images/mega/startpage-sprite_v13.png);
     background-position: -243px 14px;
     background-repeat: no-repeat;
     width: 20px;
@@ -245,7 +245,7 @@ body.en .download .bottom-page.top-bl {
     word-break: break-word;
 }
 .startpage.rating-block span {
-    background-image: url(../images/mega/startpage-sprite_v12.png);
+    background-image: url(../images/mega/startpage-sprite_v13.png);
     background-position: -161px -618px;
     background-repeat: no-repeat;
     width: 14px;
@@ -265,7 +265,7 @@ body.en .download .bottom-page.top-bl {
     margin: -16px 0 0 0;
     background-color: white;
     border-radius: 100%;
-    background-image: url(../images/mega/startpage-sprite_v12.png);
+    background-image: url(../images/mega/startpage-sprite_v13.png);
     background-position: -220px -650px;
     -webkit-transition: opacity 200ms ease-in-out;
     transition: opacity 200ms ease-in-out;
@@ -377,7 +377,7 @@ body.en .download .bottom-page.top-bl {
     box-sizing: border-box;
     padding: 0 4px;
     vertical-align: top;
-    background-image: url(../images/mega/startpage-sprite_v12.png);
+    background-image: url(../images/mega/startpage-sprite_v13.png);
     background-position: -243px 14px;
     background-repeat: no-repeat;
 }
@@ -404,7 +404,7 @@ body.en .download .bottom-page.top-bl {
     -webkit-border-radius: 100%;
     border-radius: 100%;
     background-color: #CECECE;
-    background-image: url(../images/mega/startpage-sprite_v12.png);
+    background-image: url(../images/mega/startpage-sprite_v13.png);
     background-position: -214px -688px;
     cursor: pointer;
     -webkit-transition: background-color 200ms ease-in-out, opacity 200ms ease-in-out;
@@ -501,14 +501,6 @@ body.en .download .bottom-page.top-bl {
 .logged .startpage.button-48-height.account {
     display: inline-block;
 }
-.startpage.os-icons {
-    display: block;
-    width: 106px;
-    height: 20px;
-    margin: 20px auto 0 auto;
-    background-image: url(../images/mega/startpage-sprite_v12.png);
-    background-position: -108px -1447px;
-}
 .startpage.italic-text {
     font-style: italic;
     font-size: 18px;
@@ -531,7 +523,7 @@ body.en .download .bottom-page.top-bl {
     height: 26px;
     left: 14px;
     top: -25px;
-    background-image: url(../images/mega/startpage-sprite_v12.png);
+    background-image: url(../images/mega/startpage-sprite_v13.png);
     background-position: -115px -2739px;
 }
 .startpage.quote-icon.close {
@@ -557,7 +549,7 @@ body.en .download .bottom-page.top-bl {
     width: 66px;
     height: 66px;
     margin: 20px auto 12px auto;
-    background-image: url(../images/mega/startpage-sprite_v12.png);
+    background-image: url(../images/mega/startpage-sprite_v13.png);
     background-position: 1px -2723px;
     background-repeat: no-repeat;
 }
@@ -596,24 +588,29 @@ body.en .download .bottom-page.top-bl {
     -moz-box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.05);
     box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.05);
 }
-.page-icon.x48 {
+.page-icon {
     display: block;
+}
+.page-icon.x48 {
     width: 48px;
     height: 48px;
 }
 .page-icon.x44 {
-    display: block;
     width: 44px;
     height: 44px;
+}
+.page-icon.x24 {
+    width: 24px;
+    height: 24px;
 }
 .startpage-sprite, i.startpage-sprite,
 .bottom-menu .logo
 {
-    background-image: url(../images/mega/startpage-sprite_v12.png);
+    background-image: url(../images/mega/startpage-sprite_v13.png);
     background-repeat: no-repeat;
 }
 
-/* Social newtock icons */
+/* Social netwock icons */
 .startpage-sprite.social-i {
     width: 36px;
     height: 36px;
@@ -650,6 +647,22 @@ body.en .download .bottom-page.top-bl {
 }
 .expanded .page-icon.x44.arrow-icon {
     background-position: -184px -646px;
+}
+
+.page-icon.x24.android {
+    background-position: -76px -1453px;
+}
+.page-icon.x24.huawei {
+    background-position: -128px -1453px;
+}
+.page-icon.x24.apple {
+    background-position: -27px -1453px;
+}
+.page-icon.x24.linux {
+    background-position: -228px -1453px;
+}
+.page-icon.x24.win {
+    background-position: -180px -1453px;
 }
 
 .bottom-page.compare-block .page-icon {
@@ -859,17 +872,21 @@ body.en .download .bottom-page.top-bl {
 .startpage.software-txt a:hover {
     text-decoration: none;
 }
+
 .startpage.software-txt a.icons {
+    display: inline-block;
+    font-size: 0;
+    margin-left: 36px;
     text-decoration: none;
-    width: 110px;
-    height: 20px;
-    margin-left: 30px;
-    background-position: -106px -1484px;
+    white-space: nowrap;
 }
-.startpage.software-txt a.icons.mobile {
-    width: 68px;
-    background-position: -105px -195px;
-    height: 21px;
+.startpage.software-txt a.icons i {
+    display: inline-block;
+    margin: 0 0 0 25px;
+    padding: 0;
+}
+.startpage.software-txt a.icons i:first-child {
+    margin: 0;
 }
 .startpage.software-cell img {
     width: 100%;
@@ -1135,7 +1152,7 @@ div.startpage.software-img.soft-slide[data-slide="2"] {
     .startpage-sprite,
     i.startpage-sprite
     {
-        background-image: url(../images/mega/startpage-sprite_v12@2x.png) !important;
+        background-image: url(../images/mega/startpage-sprite_v13@2x.png) !important;
         background-size: 267px auto;
     }
     .bottom-page.large-icon, .cropped-page .bottom-page.big-icon {

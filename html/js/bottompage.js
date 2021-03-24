@@ -120,7 +120,7 @@ var bottompage = {
     initAnimations: function($content) {
         "use strict";
 
-        var $scrollableBlock = is_mobile ? $('html') : $('.fmholder', 'body');
+        var $scrollableBlock = is_mobile ? $('body.mobile .fmholder') : $('.fmholder', 'body');
 
         // Init top-block animations
         setTimeout(function() {

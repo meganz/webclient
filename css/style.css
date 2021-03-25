@@ -14023,8 +14023,8 @@ p.copyrights-red {
 .register-st2-button.active.back.copyrights-form .register-st2-button-arrow {
     background-color: #4c4c4c;
 }
-.main-mid-pad.new-bottom-pages.copyrights-bottom {
-    padding: 73px 15px 73px 15px;
+.copyrights-bottom {
+    padding: 24px 0 16px 0;
 }
 .copyrights-bottom .new-registration-checkbox .checkboxOn, .copyrights-bottom .new-registration-checkbox .checkboxOff {
     margin: 4px 1px 0 0;

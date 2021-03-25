@@ -82,11 +82,15 @@ function setDateTimeFormat(locales, format) {
         options.year = 'numeric';
         options.month = format >= 2 ? 'long' : 'numeric';
         options.day = format === 3 ? undefined : 'numeric';
-        options.weekday = format === 4 ? 'long' : undefined;
+        options.weekday = format === 4 || format === 5 ? 'long' : undefined;
 
-        if (format === 0) {
+        if (format === 0 || format === 5) {
             options.minute = 'numeric';
             options.hour = 'numeric';
+            if (format === 5) {
+                options.second = 'numeric';
+                options.timeZoneName = 'short';
+            }
         }
 
     }
@@ -141,6 +145,8 @@ function setDateTimeFormat(locales, format) {
  *       2: yyyy fmn dd (fmn: Full month name, based on the locale) (Long Date format)
  *       3: yyyy fmn (fmn: Full month name, based on the locale) (Long Date format without day)
  *       4: Monday, yyyy fmn dd (fmn: Full month name, based on the locale) (Long Date format with weekday)
+ *       5: Monday, yyyy fmn dd hh:mm:ss TZ (fmn: Full month name, based on the locale)
+ *                                                                  (Long Date format with weekday, time, and timezone)
  *
  * Non full date formats:
  *       10: Mon (Only day of the week long version)
@@ -616,6 +622,11 @@ function formatCurrency(value, currency, display) {
     // If this is number only, remove currency code
     if (displayNumber) {
         result = result.replace(currency, '').trim();
+    }
+
+    // Romanian with Euro Symbol currency display is currently buggy on all browsers, so doing this to polyfill it
+    if (locales.startsWith('ro') && currency === 'EUR' && display === 'symbol') {
+        result = result.replace('EUR', '\u20ac');
     }
 
     return result;

@@ -7294,6 +7294,7 @@ table {
     white-space: nowrap;
 }
 .fm-breadcrumbs-wrapper {
+    position: relative;
     overflow: hidden;
 }
 .fm-breadcrumbs-block:not(.hidden) {

@@ -2769,6 +2769,9 @@ body:not(.mobile) .bottom-page.top-dark-button:hover {
     text-align: center;
     white-space: nowrap;
 }
+.megacmd .bottom-page .megaapp-windows {
+    top: -147px;
+}
 .bottom-page .megaapp-linux {
     background-color: #333333;
     -moz-box-sizing: border-box;

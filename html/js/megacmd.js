@@ -3,7 +3,10 @@ var cmdsel = false;
 var platformsel = '64';
 var linuxnameindex = {};
 var linuxurl = 'https://mega.nz/linux/MEGAsync/';
-var windowsurl = 'https://mega.nz/MEGAcmdSetup.exe';
+var windowsurl = {
+    window_x64: 'https://mega.nz/MEGAcmdSetup64.exe',
+    window_x32: 'https://mega.nz/MEGAcmdSetup32.exe'
+};
 var osxurl = 'https://mega.nz/MEGAcmdSetup.dmg';
 
 /**
@@ -31,6 +34,9 @@ function initMegacmd() {
 
     resetMegacmd();
 
+    // Hide windows options as default
+    $('.megaapp-windows', $content).addClass('hidden');
+
     if (pf.indexOf('LINUX') >= 0) {
         $('.nav-buttons-bl a.linux').addClass('active');
         linuxMegacmdDropdown();
@@ -40,8 +46,22 @@ function initMegacmd() {
         var $tab = $(this);
         var osData = $tab.attr('data-os');
 
+        // Hide windows options as default
+        $('.megaapp-windows', $content).addClass('hidden');
+
         if (osData === 'windows') {
-            window.location = windowsurl;
+            if (ua.details.is64bit && !ua.details.isARM) {
+                // Download app for Windows 64bit
+                window.location = windowsurl.window_x64;
+                $('.megaapp-windows-info.64bit', $content).addClass('hidden');
+            }
+            else {
+                // Download app for Windows 32bit
+                window.location = windowsurl.window_x32;
+                $('.megaapp-windows-info.32bit', $content).addClass('hidden');
+            }
+
+            $('.megaapp-windows', $content).removeClass('hidden');
             resetMegacmd();
         }
         else if (osData === 'mac') {
@@ -55,6 +75,16 @@ function initMegacmd() {
             $tab.addClass('active');
             linuxMegacmdDropdown();
         }
+        return false;
+    });
+
+    $('.megaapp-windows-info.32bit a', $content).rebind('click.megacmdWin32', function() {
+        window.location = windowsurl.window_x32;
+        return false;
+    });
+
+    $('.megaapp-windows-info.64bit a', $content).rebind('click.megacmdWin64', function() {
+        window.location = windowsurl.window_x64;
         return false;
     });
 

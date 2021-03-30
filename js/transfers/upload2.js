@@ -313,6 +313,76 @@ var ulmanager = {
         return promise;
     },
 
+    abortAll: function() {
+        'use strict';
+        const ulQueue = window.ulQueue;
+        const fileUploadInstances = [];
+
+        const destroy = function(task) {
+            if ((task = task && task[0] || task || !1).destroy) {
+                task.destroy(-0xbeef);
+            }
+        };
+
+        const abort = (ul, gid, idx) => {
+            if (d) {
+                ulmanager.logger.info('Aborting ' + gid, ul.name);
+            }
+            ul.abort = true;
+            fileUploadInstances.push([ul.owner, idx]);
+
+            const gp = GlobalProgress[gid];
+            if (gp && !gp.paused) {
+                gp.paused = true;
+
+                let chunk;
+                while ((chunk = gp.working.pop())) {
+                    chunk.abort();
+                    if (array.remove(ulQueue._pending, chunk, 1)) {
+                        console.assert(--ulQueue._running > -1, 'Queue inconsistency on pause[abort]');
+                    }
+                }
+            }
+        };
+
+        ulQueue.pause();
+
+        for (let i = ul_queue.length; i--;) {
+            const ul = ul_queue[i];
+            if (ul.id) {
+                const gid = 'ul_' + ul.id;
+
+                if (ulmanager.ulCompletingPhase[gid]) {
+                    if (d) {
+                        ulmanager.logger.debug('Not aborting %s, it is completing...', gid, ul);
+                    }
+                }
+                else {
+                    abort(ul, gid, i);
+                }
+            }
+        }
+
+        ulQueue._queue.forEach(destroy);
+        Object.values(ulQueue._qpaused).forEach(destroy);
+
+        for (let i = fileUploadInstances.length; i--;) {
+            const [ul, idx] = fileUploadInstances[i];
+
+            if (ul) {
+                if (ul.file) {
+                    mBroadcaster.sendMessage('upload:abort', ul.file.id, -0xDEADBEEF);
+                }
+                ul.destroy(-0xbeef);
+            }
+            ul_queue[idx] = Object.freeze({});
+        }
+
+        ulQueue._queue = [];
+        ulQueue._qpaused = {};
+        ulQueue.resume();
+    },
+
     abort: function UM_abort(gid) {
         'use strict';
 
@@ -325,7 +395,7 @@ var ulmanager = {
             else {
                 this.ulSetupQueue = false;
                 M.tfsdomqueue = Object.create(null);
-                ul_queue.filter(isQueueActive).forEach(this.abort.bind(this));
+                this.abortAll();
             }
 
             delete this._multiAbort;
@@ -1606,7 +1676,8 @@ FileUpload.prototype.toString = function() {
     return "[FileUpload " + this.gid + "]";
 };
 
-FileUpload.prototype.destroy = function() {
+FileUpload.prototype.destroy = function(mul) {
+    'use strict';
     if (d) {
         ulmanager.logger.info('Destroying ' + this);
     }
@@ -1625,7 +1696,7 @@ FileUpload.prototype.destroy = function() {
         this.file._close();
     }
     ASSERT(this.file.owner === this, 'Invalid FileUpload Owner...');
-    ulQueue.poke(this.file, 0xdead);
+    window.ulQueue.poke(this.file, mul === -0xbeef ? mul : 0xdead);
     if (this.file.done_starting) {
         this.file.done_starting();
     }
@@ -1752,6 +1823,12 @@ var ulQueue = new TransferQueue(function _workerUploader(task, done) {
 }, 4, 'uploader');
 
 ulQueue.poke = function(file, meth) {
+    'use strict';
+    let quick = false;
+    if (meth === -0xbeef) {
+        quick = true;
+        meth = 0xdead;
+    }
     if (file.owner) {
         var gid = ulmanager.getGID(file);
 
@@ -1762,8 +1839,10 @@ ulQueue.poke = function(file, meth) {
         file.uReqFired = null;
         file.abort = true;
 
-        ulQueue.pause(gid);
-        ulQueue.filter(gid);
+        if (!quick) {
+            ulQueue.pause(gid);
+            ulQueue.filter(gid);
+        }
 
         if (file.__umRetryTimer) {
             var t = file.__umRetryTimer;
@@ -1772,7 +1851,10 @@ ulQueue.poke = function(file, meth) {
                     clearTimeout(t[i]);
                 }
             }
-            ulQueue.resume();
+
+            if (!quick) {
+                ulQueue.resume();
+            }
         }
         if (file.ul_reader) {
             file.ul_reader.destroy();

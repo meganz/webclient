@@ -1341,6 +1341,11 @@ lazy(mega, 'intl', function _() {
         return this.get('NumberFormat', {minimumFractionDigits: 2});
     });
 
+    /** @property mega.intl.bitcoin */
+    lazy(ns, 'bitcoin', function() {
+        return this.get('NumberFormat', {minimumFractionDigits: 8});
+    });
+
     /** @property mega.intl.collator */
     lazy(ns, 'collator', function() {
         return this.get('Collator');

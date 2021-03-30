@@ -2005,6 +2005,7 @@
     "18739": "Copia negli appunti",
     "18759": "Nuovo contatto",
     "18760": "Archiviazione usata",
+    "18763": "Scrivi messaggio a \u201c%s\u201d\u2026",
     "18770": "Il prezzo viene stimato nella tua valuta locale. Ti verr\u00e0 addebitato il costo mostrato in euro per tutte le transazioni.",
     "18771": "Password link d'invito",
     "18772": "Per favore, inserisci la password del tuo link di invito per procedere con l'attivazione del tuo account.",
@@ -3176,7 +3177,7 @@
     "20983": "Per favore, ricorda che le email contenenti promemoria critici non possono essere disabilitate.",
     "21956": "Promemoria di quasi superamento della quota",
     "21957": "Per favore, spunta il box per dichiarare che capisci il pericolo di perdere la password del tuo account MEGA.",
-    "22001": "Hai effettuato il login con un account differente rispetto a quello che stai provando ad eliminare. Per favore, effettua il logout e fai nuovamente il login con l\u2019account che desideri eliminare, e poi prova a cliccare di nuovo sullo stesso link di cancellazione dell\u2019account.",
+    "22001": "Hai effettuato il login con un account differente rispetto a quello che stai provando ad eliminare. Dovresti effettuare il logout e poi fare nuovamente il login con l\u2019account che desideri eliminare, e poi cliccare di nuovo sullo stesso link di cancellazione dell\u2019account.",
     "22011": "Finch\u00e9 non lo riattivo",
     "22012": "30 minuti",
     "22013": "6 ore",
@@ -3950,6 +3951,8 @@
     "24418": "Una cartella di selfie e una finestra che mostra il progresso dei trasferimenti",
     "24419": "Gestione completa dei file e dei trasferimenti, anche sui dispositivi mobili",
     "24420": "Le app per mobile di MEGA mettono la potenza di MEGA a portata di mano, cos\u00ec hai accesso a tutti i tuoi dati in ogni momento. Le app per mobile di MEGA semplificano l\u2019accesso, la visualizzazione e la condivisione dei file anche se non erano stati originariamente caricati dal tuo dispositivo mobile.",
+    "24421": "Scarica dall\u2019Apple App Store",
+    "24422": "Ottieni su Google Play",
     "24423": "Installa l\u2019app per desktop di MEGA e divertiti con la sincronizzazione veloce tra il tuo computer e il cloud di MEGA",
     "24424": "Hai pieno controllo sui trasferimenti attivi e completati. Il tuo luogo dove hai tutto sotto controllo per dare priorit\u00e0, mettere in pausa, riprendere upload o download e generare collegamenti in un modo che gestisca facilmente file di grandi dimensioni che altrimenti mandrebbero in crash il tuo browser.",
     "24431": "Il tuo account Business \u00e8 scaduto. [A]Riattiva il tuo account adesso[\/A] per continuare ad utilizzare MEGA.",
@@ -4112,5 +4115,8 @@
     "25002": "Processato",
     "25004": "Ci dispiace che non trovi questo d\u2019aiuto. Cosa possiamo fare per migliorarlo?",
     "25005": "Inserisci la tua ricerca qui...",
-    "25006": "Se non trovi quello che stai cercando, per favore contatta il nostro team di supporto per un\u2019assistenza diretta."
+    "25006": "Se non trovi quello che stai cercando, per favore contatta il nostro team di supporto per un\u2019assistenza diretta.",
+    "25016": "Scaduta",
+    "25040": "22-character recovery key",
+    "25042": "Audio"
 }

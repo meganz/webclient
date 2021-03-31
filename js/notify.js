@@ -1324,7 +1324,16 @@ var notify = {
             // PRO membership plan expiring soon
             // Your PRO membership plan will expire in 1 day/x days.
             var header = l[8598];
-            var title = (days === 1) ? l[8596] : l[8597].replace('%1', days);
+            var title;
+            if (days === 0) {
+                title = l[25041];
+            }
+            else if (days === 1) {
+                title = l[8596];
+            }
+            else {
+                title = l[8597].replace('%1', days);
+            }
 
             // Populate other template information
             $notificationHtml.addClass('nt-payment-reminder-notification clickable');

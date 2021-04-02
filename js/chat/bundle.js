@@ -6434,7 +6434,7 @@ class DropdownEmojiSelector extends _stores_mixins_js1__["MegaRenderMixin"] {
     this.data_emojis = null;
     this.data_emojiByCategory = null;
     this.customCategoriesOrder = ["frequently_used", "people", "nature", "food", "activity", "travel", "objects", "symbols", "flags"];
-    this.frequentlyUsedEmojis = ['slight_smile', 'grinning', 'smile', 'rofl', 'wink', 'yum', 'rolling_eyes', 'stuck_out_tongue', 'smiling_face_with_3_hearts', 'kissing_heart', 'sob', 'mask', 'eyes', 'thumbsup', 'pray', 'white_check_mark', 'sparkles', 'fire'];
+    this.frequentlyUsedEmojis = ['slight_smile', 'grinning', 'smile', 'rofl', 'wink', 'yum', 'rolling_eyes', 'stuck_out_tongue', 'smiling_face_with_3_hearts', 'kissing_heart', 'sob', 'mask', 'eyes', 'thumbsup', 'pray', 'wave', 'white_check_mark', 'sparkles'];
     this.heightDefs = {
       'categoryTitleHeight': 55,
       'emojiRowHeight': 35,
@@ -15384,7 +15384,7 @@ pushSettingsDialog_PushSettingsDialog.default = pushSettingsDialog_PushSettingsD
 
 
 
-var conversationpanel_dec, conversationpanel_dec2, _dec3, _dec4, conversationpanel_class;
+var conversationpanel_dec, conversationpanel_dec2, _dec3, _dec4, conversationpanel_class, conversationpanel_temp;
 
 
 
@@ -15873,7 +15873,7 @@ class conversationpanel_ConversationRightArea extends mixins["MegaRenderMixin"] 
 conversationpanel_ConversationRightArea.defaultProps = {
   'requiresUpdateOnResize': true
 };
-let conversationpanel_ConversationPanel = (conversationpanel_dec = utils["default"].SoonFcWrap(360), conversationpanel_dec2 = utils["default"].SoonFcWrap(50), _dec3 = Object(mixins["SoonFcWrap"])(450, true), _dec4 = Object(mixins["timing"])(0.7, 9), (conversationpanel_class = class ConversationPanel extends mixins["MegaRenderMixin"] {
+let conversationpanel_ConversationPanel = (conversationpanel_dec = utils["default"].SoonFcWrap(360), conversationpanel_dec2 = utils["default"].SoonFcWrap(50), _dec3 = Object(mixins["SoonFcWrap"])(450, true), _dec4 = Object(mixins["timing"])(0.7, 9), (conversationpanel_class = (conversationpanel_temp = class ConversationPanel extends mixins["MegaRenderMixin"] {
   constructor(props) {
     super(props);
 
@@ -17422,7 +17422,7 @@ let conversationpanel_ConversationPanel = (conversationpanel_dec = utils["defaul
     }))))))));
   }
 
-}, (applyDecoratedDescriptor_default()(conversationpanel_class.prototype, "onMouseMove", [conversationpanel_dec], Object.getOwnPropertyDescriptor(conversationpanel_class.prototype, "onMouseMove"), conversationpanel_class.prototype), applyDecoratedDescriptor_default()(conversationpanel_class.prototype, "onMessagesScrollReinitialise", [conversationpanel_dec2], Object.getOwnPropertyDescriptor(conversationpanel_class.prototype, "onMessagesScrollReinitialise"), conversationpanel_class.prototype), applyDecoratedDescriptor_default()(conversationpanel_class.prototype, "enableScrollbar", [_dec3], Object.getOwnPropertyDescriptor(conversationpanel_class.prototype, "enableScrollbar"), conversationpanel_class.prototype), applyDecoratedDescriptor_default()(conversationpanel_class.prototype, "render", [_dec4], Object.getOwnPropertyDescriptor(conversationpanel_class.prototype, "render"), conversationpanel_class.prototype)), conversationpanel_class));
+}, conversationpanel_temp), (applyDecoratedDescriptor_default()(conversationpanel_class.prototype, "onMouseMove", [conversationpanel_dec], Object.getOwnPropertyDescriptor(conversationpanel_class.prototype, "onMouseMove"), conversationpanel_class.prototype), applyDecoratedDescriptor_default()(conversationpanel_class.prototype, "onMessagesScrollReinitialise", [conversationpanel_dec2], Object.getOwnPropertyDescriptor(conversationpanel_class.prototype, "onMessagesScrollReinitialise"), conversationpanel_class.prototype), applyDecoratedDescriptor_default()(conversationpanel_class.prototype, "enableScrollbar", [_dec3], Object.getOwnPropertyDescriptor(conversationpanel_class.prototype, "enableScrollbar"), conversationpanel_class.prototype), applyDecoratedDescriptor_default()(conversationpanel_class.prototype, "render", [_dec4], Object.getOwnPropertyDescriptor(conversationpanel_class.prototype, "render"), conversationpanel_class.prototype)), conversationpanel_class));
 class conversationpanel_ConversationPanels extends mixins["MegaRenderMixin"] {
   render() {
     var self = this;

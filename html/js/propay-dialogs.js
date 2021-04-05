@@ -2476,7 +2476,7 @@ var bitcoinDialog = {
         $bitcoinDialog.find('.plan-name').text(planName);
         $bitcoinDialog.find('.plan-duration').text(planMonths);
         $('.plan-price-euros .value', $bitcoinDialog).text(mega.intl.number.format(priceEuros));
-        $bitcoinDialog.find('.plan-price-bitcoins').text(priceBitcoins);
+        $('.plan-price-bitcoins', $bitcoinDialog).text(mega.intl.bitcoin.format(priceBitcoins));
 
         // Set countdown to price expiry
         bitcoinDialog.setCoundownTimer($bitcoinDialog, expiryTime);

@@ -3648,7 +3648,7 @@ else if (!browserUpdate) {
 
         scriptTest(
             'es6s =' +
-            ' Number.isNaN(Date.UTC()) === true' + // C1 E12 F54 O3 S1
+            ' ({...{a:23}}).a === 23' + // C60 E79 F55 O47 S11
             ' && /-/[Symbol.split]("0-0").join("") === "00"' + // C50 E79 F49 O37 S10
             ' && (async()=>{})[Symbol.toStringTag] === "AsyncFunction"' + // C55 E15 F52 O42 S10.1
             ' && (function *(a=1,){yield a})(2).next().value === 2', // C58 E14 F52 O45 S10

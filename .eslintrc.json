@@ -7,7 +7,7 @@
         "worker": true
     },
     "parserOptions": {
-        "ecmaVersion": 2017,
+        "ecmaVersion": 2018,
         "ecmaFeatures": {
             "jsx": true
         }
@@ -26,7 +26,7 @@
     ],
     "extends": [
         "eslint:recommended",
-        "plugin:es/restrict-to-es2017",
+        "plugin:es/restrict-to-es2018",
         "plugin:no-unsanitized/DOM",
         "plugin:react/recommended",
         "plugin:sonarjs/recommended"
@@ -154,7 +154,6 @@
         "compat/compat": 1,
         "dollar-sign/dollar-sign": 2,
 
-        // es2017
         "es/no-atomics": 2,
         "es/no-exponential-operators": 2,
         "es/no-generators": 2,

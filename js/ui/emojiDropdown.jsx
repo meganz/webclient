@@ -45,9 +45,9 @@ export class DropdownEmojiSelector extends MegaRenderMixin {
             'eyes',
             'thumbsup',
             'pray',
+            'wave',
             'white_check_mark',
             'sparkles',
-            'fire',
         ];
         this.heightDefs = {
             'categoryTitleHeight': 55,

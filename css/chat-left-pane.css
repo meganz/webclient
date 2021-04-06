@@ -644,7 +644,7 @@ li.active .call-duration i {
 }
 
 .result-table .result-table-row.message .user-card-presence {
-    margin-bottom: -2px;
+    margin-bottom: -8px;
 }
 
 .result-table .result-table-row.message .summary {

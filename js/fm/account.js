@@ -232,7 +232,7 @@ accountUI.general = {
 
             this.bandwidthChart(account);
             this.usedStorageChart(account);
-            this.chartWarningNoti(onDashboard);
+            this.chartWarningNoti(account, onDashboard);
         },
 
         bandwidthChart: function(account) {
@@ -317,7 +317,7 @@ accountUI.general = {
             if (this.perc_c_s === 100) {
                 $storageChart.addClass('exceeded');
             }
-            else if (this.perc_c_s > 80) {
+            else if (this.perc_c_s >= account.uslw / 100) {
                 $storageChart.addClass('going-out');
             }
 
@@ -325,12 +325,12 @@ accountUI.general = {
 
             // Used space chart
             if (deg <= 180) {
-                $storageChart.find('.left-chart span').css('transform', 'rotate(' + deg + 'deg)');
-                $storageChart.find('.right-chart span').removeAttr('style');
+                $('.left-chart span', $storageChart).css('transform', 'rotate(' + deg + 'deg)');
+                $('.right-chart span', $storageChart).removeAttr('style');
             }
             else {
-                $storageChart.find('.left-chart span').css('transform', 'rotate(180deg)');
-                $storageChart.find('.right-chart span').css('transform', 'rotate(' + (deg - 180) + 'deg)');
+                $('.left-chart span', $storageChart).css('transform', 'rotate(180deg)');
+                $('.right-chart span', $storageChart).css('transform', 'rotate(' + (deg - 180) + 'deg)');
             }
 
             // Maximum disk space
@@ -351,10 +351,10 @@ accountUI.general = {
                     150 + (Math.floor(Math.log(usedPercentage) * Math.LOG10E) - 2) * 15 + 'px'
                     : ''
             );
-            /** End New Used Storage chart */
+        /** End New Used Storage chart */
         },
 
-        chartWarningNoti: function(onDashboard) {
+        chartWarningNoti: function(account, onDashboard) {
 
             'use strict';
 
@@ -376,11 +376,11 @@ accountUI.general = {
                 // Bandwidth quota exceeded
                 $chartsBlock.find('.chart-warning.bandwidth').removeClass('hidden');
             }
-            else if (this.perc_c_s > 80) {
+            else if (this.perc_c_s >= account.uslw / 100) {
                 // Running out of cloud space
                 $chartsBlock.find('.chart-warning.out-of-space').removeClass('hidden');
             }
-            if (b_exceeded || s_exceeded || this.perc_c_s > 80) {
+            if (b_exceeded || s_exceeded || this.perc_c_s >= account.uslw / 100) {
                 $chartsBlock.find('.chart-warning').rebind('click', function() {
                     loadSubPage('pro');
                 });

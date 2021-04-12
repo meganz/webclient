@@ -31,13 +31,6 @@
             }
         ],
 
-
-        "order/properties-alphabetical-order": [
-            true,
-            {
-                "severity": "warning"
-            }
-        ],
         "plugin/no-unsupported-browser-features": [
             true,
             {

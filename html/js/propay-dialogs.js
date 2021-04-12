@@ -1178,6 +1178,7 @@ var addressDialog = {
 
     /** The gateway ID for Ecomprocessing */
     gatewayId: 16,
+    gatewayId_stripe: 19,
 
     /** Extra details for the API 'utc' call */
     extraDetails: {},
@@ -1247,6 +1248,8 @@ var addressDialog = {
             proPlan = pro.getProPlanName(proNum);
             proPrice = selectedPackage[pro.UTQA_RES_INDEX_PRICE];
             numOfMonths = selectedPackage[pro.UTQA_RES_INDEX_MONTHS];
+            this.proNum = proNum;
+            this.numOfMonths = numOfMonths;
             proNum = 'pro' + proNum;
             const discountInfo = pro.propay.getDiscount();
             if (discountInfo &&
@@ -1258,6 +1261,7 @@ var addressDialog = {
         else {
             // here it means we are coming from business account register page
             proNum = 'business'; // business account Plan icon
+            this.proNum = 100;
             proPlan = l[19510];
             proPrice = (this.userInfo.nbOfUsers * this.businessPlan.p).toFixed(2);
             if (this.businessPlan.pastInvoice && this.businessPlan.currInvoice) {
@@ -1269,6 +1273,7 @@ var addressDialog = {
             this.businessPlan.totalPrice = proPrice;
             this.businessPlan.totalUsers = this.userInfo.nbOfUsers;
             numOfMonths = this.businessPlan.m;
+            this.numOfMonths = numOfMonths;
 
             // auto renew is mandatory in business
             this.$dialog.find('.payment-buy-now').text(l[6172]);
@@ -1280,7 +1285,8 @@ var addressDialog = {
             .addClass(proNum);
         this.$dialog.find('.payment-plan-title').text(proPlan);
         this.$dialog.find('.payment-plan-txt .duration').text(monthsWording);
-        this.$dialog.find('.payment-plan-price .price').text(mega.intl.number.format(proPrice));
+        this.proPrice = mega.intl.number.format(proPrice);
+        this.$dialog.find('.payment-plan-price .price').text(this.proPrice);
 
         // Show the black background overlay and the dialog
         this.$backgroundOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
@@ -1808,15 +1814,197 @@ var addressDialog = {
         window.location = url + '?lang=' + lang;
     },
 
+    stripePaymentChecker: function(saleId) {
+        'use strict';
+        addressDialog.stripeCheckerCounter++;
+        if (addressDialog.stripeCheckerCounter > 20) {
+            return;
+        }
+        // let shift = 500 * ((addressDialog.stripeCheckerCounter / 10) | 0) + 500; // 500ms
+        let shift = 500;
+        const base = 3000; // 3sec
+        const nextTick = addressDialog.stripeCheckerCounter * shift + base;
+        api_req({ a: 'utd', s: [saleId] }, {
+            callback: (res) => {
+
+                if (typeof res === 'string') {
+                    // success
+                    const $stripWidget = $('.payment-stripe-dialog');
+                    const $stripeIframe = $('iframe#stripe-widget', $stripWidget);
+                    const $success = $('.payment-success', $stripWidget);
+
+                    if (addressDialog.userInfo && !addressDialog.userInfo.isUpgrade) {
+                        // If this is newly created business account, it's then requires verification
+                        $('.success-desc', $success).safeHTML(l[25081]);
+                        $('.btn-close-dialog', $success).addClass('hidden');
+                    }
+                    else {
+                        $('.btn-close-dialog', $success).removeClass('hidden').rebind('click.stripDlg', closeDialog);
+                        delay('reload:stripe', pro.redirectToSite, 4000);
+                    }
+
+                    $stripeIframe.remove();
+                    $success.removeClass('hidden');
+                }
+                else {
+                    pro.propay.paymentStatusChecker =
+                        setTimeout(addressDialog.stripePaymentChecker.bind(addressDialog, saleId), nextTick);
+                }
+            }
+        });
+    },
+
+    stripeFrameHandler: function(event) {
+        'use strict';
+        if (d) {
+            console.log(event);
+        }
+
+        clearTimeout(pro.propay.paymentStatusChecker);
+        clearTimeout(pro.propay.listenRemover);
+
+        if (event && event.origin === addressDialog.gatewayOrigin && event.data) {
+
+            if (event.data === 'closeme') {
+                return closeDialog();
+            }
+
+            if (event.data.startsWith('payfail^')) {
+                const $stripWidget = $('.payment-stripe-dialog');
+                const $stripeIframe = $('iframe#stripe-widget', $stripWidget);
+                const extraError = event.data.split('^')[1];
+                const $fail = $('.payment-fail', $stripWidget);
+
+                $('.btn-close-dialog', $fail).rebind('click.stripDlg', closeDialog);
+
+                const extraTxt = extraError || '';
+                $('.stripe-error', $fail).text(extraTxt);
+
+                $stripeIframe.remove();
+                $fail.removeClass('hidden');
+            }
+            else if (event.data === 'paysuccess') {
+
+                addressDialog.stripeCheckerCounter = 0;
+
+                pro.propay.paymentStatusChecker =
+                    setTimeout(addressDialog.stripePaymentChecker
+                        .bind(addressDialog, addressDialog.stripeSaleId), 500);
+            }
+        }
+        else {
+            window.addEventListener("message", addressDialog.stripeFrameHandler, { once: true });
+            pro.propay.listenRemover = setTimeout(() => {
+                window.removeEventListener("message", addressDialog.stripeFrameHandler, { once: true });
+            }, 7e5);
+        }
+    },
+
+    stripeLocal: function() {
+        'use strict';
+        switch (lang) {
+            case 'br': return 'pt';
+            case 'cn': return 'zh';
+            case 'ct': return 'zh-HK';
+            case 'jp': return 'ja';
+            case 'kr':
+            case 'vi': return 'en'; // no support for Korean and Vietnamese
+            default: return lang;
+        }
+    },
+
+    stripeCheckerCounter: 0,
+    stripeSaleId: null,
+
     /**
      * Process the result from the API User Transaction Complete call
      * @param {Object} utcResult The results from the UTC call
+     * @param {Boolean} isStripe A flag if 'Stripe' gateway is used
+     * @param {String}  saleId   Saleid to check
      */
-    processUtcResult: function(utcResult) {
-        if (utcResult.EUR.url) {
-            this.redirectToSite(utcResult);
+    processUtcResult: function(utcResult, isStripe, saleId) {
+        'use strict';
+        this.gatewayOrigin = null;
+        if (isStripe) {
+            this.stripeSaleId = null;
+            if (utcResult.EUR) {
+                const $stripWidget = $('.payment-stripe-dialog');
+                let $stripeIframe = $('iframe#stripe-widget', $stripWidget);
+                $stripeIframe.remove();
+
+                $('.payment-success, .payment-fail', $stripWidget).addClass('hidden');
+
+                $stripeIframe = mCreateElement(
+                    'iframe',
+                    {
+                        width: '100%',
+                        height: '100%',
+                        sandbox: 'allow-scripts allow-same-origin allow-forms',
+                        frameBorder: '0'
+                    },
+                    $stripWidget[0]
+                );
+                let iframeSrc = utcResult.EUR;
+
+                const payInfo = tryCatch(() => {
+                    return new URL(utcResult.EUR);
+                })();
+                this.gatewayOrigin = payInfo.origin;
+
+                // if a testing gateway is set.
+                if (localStorage.megaPay) {
+                    const testSrc = tryCatch(() => {
+                        return new URL(localStorage.megaPay);
+                    })();
+
+                    if (testSrc && payInfo) {
+                        this.gatewayOrigin = testSrc.origin;
+                        const secret = payInfo.searchParams.get('s');
+                        const env = payInfo.searchParams.get('e');
+                        if (secret) {
+                            testSrc.searchParams.append('s', secret);
+                        }
+                        if (env) {
+                            testSrc.searchParams.append('e', env);
+                        }
+                        iframeSrc = testSrc.toString();
+                    }
+                }
+
+                iframeSrc += '&p=' + this.proNum;
+                iframeSrc += '&pp=' + b64encode(this.proPrice);
+
+                const locale = addressDialog.stripeLocal();
+                if (locale) {
+                    iframeSrc += '&l=' + locale;
+                }
+                if (this.extraDetails.recurring) {
+                    iframeSrc += '&r=1';
+                }
+                iframeSrc += '&m=' + this.numOfMonths;
+
+                $stripeIframe.src = iframeSrc;
+                $stripeIframe.id = 'stripe-widget';
+
+                pro.propay.hideLoadingOverlay();
+                loadingDialog.hide();
+                this.stripeSaleId = saleId;
+
+                M.safeShowDialog('stripe-pay', $stripWidget);
+
+                window.addEventListener("message", addressDialog.stripeFrameHandler, { once: true });
+                pro.propay.listenRemover = setTimeout(() => {
+                    window.removeEventListener("message", addressDialog.stripeFrameHandler, { once: true });
+                }, 6e5); // 10 minutes
+            }
+            else {
+                this.showError(utcResult);
+            }
         }
         else {
+            if (utcResult.EUR.url) {
+                return this.redirectToSite(utcResult);
+            }
             // Hide the loading animation and show the error
             pro.propay.hideLoadingOverlay();
             this.showError(utcResult);

@@ -31,6 +31,8 @@ pro.propay = {
     /** Overlays for loading/processing/redirecting */
     $loadingOverlay: null,
 
+    paymentStatusChecker: null,
+
     /**
      * Initialises the page and functionality
      */
@@ -1100,7 +1102,8 @@ pro.propay = {
             if (pro.propay.proPaymentMethod === 'perfunctio') {
                 cardDialog.init();
             }
-            else if (pro.propay.proPaymentMethod.indexOf('ecp') === 0) {
+            else if (pro.propay.proPaymentMethod.indexOf('ecp') === 0
+                || pro.propay.proPaymentMethod.toLowerCase().indexOf('stripe') === 0) {
                 addressDialog.init();
             }
             else if (pro.propay.proPaymentMethod === 'voucher') {
@@ -1246,6 +1249,10 @@ pro.propay = {
                         extra.recurring = true;
                     }
                 }
+                else if (pro.propay.proPaymentMethod.toLowerCase().indexOf('stripe') === 0) {
+                    extra = addressDialog.extraDetails;
+                    pro.lastPaymentProviderId = addressDialog.gatewayId_stripe;
+                }
 
                 // Complete the transaction
                 let utcReqObj = {
@@ -1262,7 +1269,7 @@ pro.propay = {
                 api_req(utcReqObj, {
                     m: pro.lastPaymentProviderId,
                     callback: tryCatch(function(utcResult, ctx) {
-                        pro.propay.processUtcResults(utcResult);
+                        pro.propay.processUtcResults(utcResult, saleId);
 
                         if (typeof utcResult === 'number' && utcResult < 0) {
                             mBroadcaster.sendMessage('trk:event', 'account', 'upg', 'error', utcResult);
@@ -1283,12 +1290,12 @@ pro.propay = {
     /**
      * Process results from the API User Transaction Complete call
      * @param {Object|Number} utcResult The results from the UTC call or a negative number on failure
+     * @param {String}        saleId    The saleIds of the purchase.
      */
-    processUtcResults: function(utcResult) {
-
+    processUtcResults: function(utcResult, saleId) {
+        'use strict';
         // Check for insufficient balance error, other errors will fall through
-        if ((typeof utcResult === 'number') && (utcResult === EOVERQUOTA) &&
-                (pro.lastPaymentProviderId === voucherDialog.gatewayId)) {
+        if (utcResult === EOVERQUOTA && pro.lastPaymentProviderId === voucherDialog.gatewayId) {
 
             // Hide the loading animation and show an error
             pro.propay.hideLoadingOverlay();
@@ -1297,7 +1304,7 @@ pro.propay = {
         }
 
         // If other negative number response from the API
-        else if ((typeof utcResult === 'number') && (utcResult < 0)) {
+        else if (utcResult < 0) {
 
             // Hide the loading animation and show an error
             pro.propay.hideLoadingOverlay();
@@ -1357,6 +1364,10 @@ pro.propay = {
             case sabadell.gatewayId:
                 sabadell.redirectToSite(utcResult);
                 break;
+
+            case addressDialog.gatewayId_stripe:
+                addressDialog.processUtcResult(utcResult, true, saleId);
+                break;
         }
     },
     /* jshint +W074 */
@@ -1399,10 +1410,11 @@ pro.propay = {
      * Hides the payment processing/transferring/loading overlay
      */
     hideLoadingOverlay: function() {
-
-        pro.propay.$backgroundOverlay.addClass('hidden')
-            .removeClass('payment-dialog-overlay');
-        pro.propay.$loadingOverlay.addClass('hidden');
+        if (pro.propay.$backgroundOverlay && pro.propay.$loadingOverlay) {
+            pro.propay.$backgroundOverlay.addClass('hidden')
+                .removeClass('payment-dialog-overlay');
+            pro.propay.$loadingOverlay.addClass('hidden');
+        }
     },
 
     /**

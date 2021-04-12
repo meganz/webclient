@@ -949,6 +949,12 @@ mBroadcaster.once('boot_done', function populate_l() {
     l[16494] = escapeHTML(l[16494]).replace('[S]2[/S]', '%1');
     l[22670] = escapeHTML(l[22670])
         .replace('[A]', '<a class="red" href="mailto:support@mega.nz">').replace('[/A]', '</a>');
+    l[25048] = escapeHTML(l[25048])
+        .replace('[A]', '<a href="mailto:support@mega.nz">').replace('[/A]', '</a>');
+    l[25050] = escapeHTML(l[25050])
+        .replace('[A]', '<a href="mailto:support@mega.nz">').replace('[/A]', '</a>');
+    l[25081] = escapeHTML(l[25081])
+        .replace('[A]', '<a href="mailto:support@mega.nz">').replace('[/A]', '</a>');
 
     l[16649] = l[16649].replace('%1', '<span class="amount">10.00</span>');
     l[16501] = l[16501].replace('[A1]', '<a class="red" href="mailto:support@mega.nz">').replace('[/A1]', '</a>')

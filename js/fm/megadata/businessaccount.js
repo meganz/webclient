@@ -1429,7 +1429,7 @@ BusinessAccount.prototype.doPaymentWithAPI = function (payDetails,businessPlan) 
             var utcRequest = {
                 a: 'utc',                   // User Transaction Complete
                 s: salesIDs,                // Sale ID
-                m: addressDialog.gatewayId, // Gateway number
+                m: businessPlan.usedGatewayId || addressDialog.gatewayId, // Gateway number
                 bq: 0,                      // Log for bandwidth quota triggered
                 extra: payDetails           // Extra information for the specific gateway
             };
@@ -1439,11 +1439,14 @@ BusinessAccount.prototype.doPaymentWithAPI = function (payDetails,businessPlan) 
                     if ($.isNumeric(res) && res < 0) {
                         operationPromise.reject(0, res, 'API returned error');
                     }
-                    else if (!res.EUR || !res.EUR.url) {
+                    else if (!res.EUR) {
+                        operationPromise.reject(0, res, 'API returned error');
+                    }
+                    else if (typeof res.EUR === 'object' && !res.EUR.url) {
                         operationPromise.reject(0, res, 'API returned error');
                     }
                     else {
-                        operationPromise.resolve(1, res); // ready of redirection
+                        operationPromise.resolve(1, res, salesIDs[0]); // ready of redirection
                     }
                 }
 

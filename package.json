@@ -47,7 +47,7 @@
     "@babel/preset-env": "7.13.15",
     "@babel/preset-react": "7.13.13",
     "@babel/runtime": "7.13.10",
-    "@lodder/grunt-postcss": "3.0.0",
+    "@lodder/grunt-postcss": "3.0.1",
     "babel-loader": "8.2.2",
     "babel-plugin-minify-constant-folding": "0.5.0",
     "babel-plugin-minify-dead-code-elimination": "0.5.1",
@@ -94,7 +94,6 @@
     "stylelint": "13.12.0",
     "stylelint-config-standard": "21.0.0",
     "stylelint-no-unsupported-browser-features": "4.1.4",
-    "stylelint-order": "4.1.0",
     "webpack-dev-server": "3.11.2"
   }
 }

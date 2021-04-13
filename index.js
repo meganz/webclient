@@ -300,23 +300,6 @@ function init_page() {
 
     dlkey = false;
 
-    var fileLinkReloading = function() {
-        if (M.hasPendingTransfers() && $.lastSeenFilelink !== getSitePath()) {
-            page = 'download';
-
-            M.abortTransfers()
-                .done(function() {
-                    location.reload();
-                })
-                .fail(function() {
-                    loadSubPage($.lastSeenFilelink);
-                });
-
-            return;
-        }
-        $.lastSeenFilelink = getSitePath();
-    };
-
     var pageBeginLetters = page.substr(0, 2);
 
     if (page.length > 2 && (page[0] === '!' || pageBeginLetters === 'F!')) {
@@ -330,19 +313,16 @@ function init_page() {
     }
 
     if (page.substr(0, 5) === 'file/') {
-        var phLen = page.indexOf('#');
+        dlid = page.substr(5, 8).replace(/[^\w-]+/g, '');
+        dlkey = page.substr(14).replace(/[^\w-].+$/, '');
 
-        if (phLen < 0) {
-            phLen = page.length;
+        if (M.hasPendingTransfers() && $.lastSeenFilelink !== getSitePath()) {
+            page = 'download';
+
+            M.abortTransfers().then(() => location.reload()).catch(() => loadSubPage($.lastSeenFilelink));
+            return;
         }
-        dlid = page.substr(5, phLen - 5).replace(/[^\w-]+/g, "");
-
-        // check if we have key
-        if (page.length - phLen > 2) {
-            dlkey = page.substr(phLen + 1, page.length - phLen - 1);
-        }
-
-        fileLinkReloading();
+        $.lastSeenFilelink = getSitePath();
     }
 
     // Set class if gbot

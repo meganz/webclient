@@ -9,7 +9,6 @@ var silent_loading = false;
 var cookiesDisabled = false;
 var storageQuotaError = false;
 var lastactive = new Date().getTime();
-var URL = window.URL || window.webkitURL;
 var seqno = Math.ceil(Math.random()*1000000000);
 var staticpath = null;
 var cmsStaticPath = null;
@@ -37,36 +36,60 @@ if (typeof process !== 'undefined') {
     }
 }
 
+var is_mobile = (function isMobile() {
+    'use strict';
+    var mobileStrings = [
+        'iphone', 'ipad', 'android', 'blackberry', 'nokia', 'opera mini', 'ucbrowser',
+        'windows mobile', 'windows phone', 'iemobile', 'mobile safari', 'bb10; touch'
+    ];
+    for (var i = mobileStrings.length; i--;) {
+        if (ua.indexOf(mobileStrings[i]) > 0) {
+            return true;
+        }
+    }
+})();
+
+var is_android = is_mobile && ua.indexOf('android') > 0;
+var is_uc_browser = is_mobile && ua.indexOf('ucbrowser') > 0;
+var is_ios = is_mobile && (ua.indexOf('iphone') > -1 || ua.indexOf('ipad') > -1 || ua.indexOf('ipod') > -1);
+var is_old_windows_phone = is_mobile && /windows phone 8|iemobile\/9|iemobile\/10|iemobile\/11/i.test(ua);
+var is_windowsphone = is_old_windows_phone || is_mobile && ua.indexOf('windows phone') > 0;
+var is_huawei = is_mobile && ua.indexOf('huawei') > 0;
+
+if (is_android && !is_huawei) {
+    // @todo detect huawei devices by model (?)
+}
+
+// @todo get rid of 'm' around the codebase!
+m = !!is_mobile;
+
 var tmp = getCleanSitePath();
 var is_selenium = !ua.indexOf('mozilla/5.0 (selenium; ');
 var is_embed = String(location.pathname).substr(0, 6) === '/embed' || tmp.substr(0, 2) === 'E!';
 var is_drop = location.pathname === '/drop' || tmp.substr(0, 2) === 'D!';
 var is_iframed = is_embed || is_drop;
 var is_karma = !is_iframed && /^localhost:987[6-9]/.test(window.top.location.host);
+
 var is_chrome_firefox = document.location.protocol === 'chrome:' &&       // Only true for Palemoon/Legacy FF extension
     document.location.host === 'mega' || document.location.protocol === 'mega:';
-var is_msie = ua.indexOf('msie') !== -1 || uv.indexOf('trident') > -1;
 var location_sub = document.location.href.substr(0, 16);
 var is_chrome_web_ext = location_sub === 'chrome-extension' || location_sub === 'ms-browser-exten';
 var is_firefox_web_ext = location_sub === 'moz-extension://';
 var is_extension = is_chrome_firefox || is_electron || is_chrome_web_ext || is_firefox_web_ext;
-var is_mobile = m = isMobile();
-var is_ios = is_mobile && (ua.indexOf('iphone') > -1 || ua.indexOf('ipad') > -1 || ua.indexOf('ipod') > -1);
 var is_microsoft = /msie|edge|trident/i.test(ua);
-var is_android = /android/.test(ua);
 var is_bot = !is_extension && /bot|crawl/i.test(ua);
-var is_old_windows_phone = /Windows Phone 8|IEMobile\/9|IEMobile\/10|IEMobile\/11/i.test(ua);
-var is_uc_browser = /ucbrowser/.test(ua);
 var is_webcache = location.host === 'webcache.googleusercontent.com';
 var is_livesite = location.host === 'mega.nz' || location.host === 'mega.io'
     || location.host === 'smoketest.mega.nz' || is_extension;
 var is_litesite = !is_embed && location.host === 'mega.io';
+
 self.fetchStreamSupport = (
     window.fetch && !window.MSBlobBuilder
     && typeof ReadableStream === 'function'
     && typeof AbortController === 'function'
     && typeof Object(AbortController.prototype).abort === 'function'
 );
+
 var staticServerLoading = {
     loadFailuresOriginal: 0,        // Count of failures on the original static server (from any thread)
     loadFailuresDefault: {},        // Count of failures on the EU static server per file
@@ -78,32 +101,56 @@ var staticServerLoading = {
     flippedToDefault: false         // Flag to indicate if the static server was flipped
 };
 var load_error_types = {
-
     /** The file is corrupt i.e. mismatch on SHA-2 hash check */
     file_corrupt: 1,
-
     /** A file loading issue, network issue or the static server is down */
     file_load_error: 2
 };
 
-/**
- * Check if the user is coming from a mobile device
- * @returns {Boolean}
- */
-function isMobile() {
+function getMobileStoreLink() {
+    'use strict';
 
-    var mobileStrings = [
-        'iphone', 'ipad', 'android', 'blackberry', 'nokia', 'opera mini', 'ucbrowser',
-        'windows mobile', 'windows phone', 'iemobile', 'mobile safari', 'bb10; touch'
-    ];
-
-    for (var i = mobileStrings.length; i--;) {
-        if (ua.indexOf(mobileStrings[i]) > 0) {
-            return true;
-        }
+    if (is_ios) {
+        return 'https://itunes.apple.com/app/mega/id706857885';
     }
+    if (is_windowsphone) {
+        return 'zune://navigate/?phoneappID=1b70a4ef-8b9c-4058-adca-3b9ac8cc194a';
+    }
+    if (is_huawei) {
+        return 'https://appgallery.huawei.com/#/app/C102009895';
+    }
+    return 'https://play.google.com/store/apps/details?id=mega.privacy.android.app&referrer=meganzindexandroid';
+}
 
-    return false;
+function goToMobileApp(aBaseLink) {
+    'use strict';
+    var testbed = tryCatch(function() {
+        return localStorage.testOpenInApp;
+    }, false)();
+
+    if (is_ios || testbed === 'ios') {
+        tryCatch(function() {
+            sessionStorage.setItem('__mobile_app_tap', 1);
+        }, false)();
+
+        tmp = 'https://' + location.host + '/' + aBaseLink;
+        // clip(tmp);
+        top.location = tmp + '?mobileapptap';
+    }
+    else if (is_windowsphone || testbed === 'winphone') {
+        top.location = 'mega://' + aBaseLink;
+    }
+    else if (is_android || testbed === 'android') {
+        tmp = 'intent://' + aBaseLink + '/#Intent;scheme=mega;package=mega.privacy.android.app;end';
+        if (is_huawei) {
+            tmp = tmp.replace('.app;', '.app.huawei;');
+        }
+        top.location = tmp;
+    }
+    else {
+        // eslint-disable-next-line no-alert
+        alert('This device is unsupported.');
+    }
 }
 
 function setCookie(key, val) {
@@ -268,9 +315,7 @@ function isHelpLink(page) {
 
 // Check whether the provided `page` points to a chat link
 function isChatLink(page) {
-
     'use strict';
-
     page = mURIDecode(page).replace(/^[#/]+/, '');
     return page.indexOf('chat/') === 0 ? page : false;
 }
@@ -543,6 +588,24 @@ if (!browserUpdate) try
                 'please note this session is temporal, ' +
                 'it will die once you close/reload the browser/tab.');
         }, 4000);
+    }
+
+    if (is_mobile && String(location.href).indexOf("mobileapptap") > 0) {
+        tmp = true;
+        tryCatch(function() {
+            'use strict';
+            tmp = sessionStorage.getItem('__mobile_app_tap');
+            sessionStorage.removeItem('__mobile_app_tap');
+        })();
+        tryCatch(function() {
+            'use strict';
+            if (tmp) {
+                setTimeout(function() {
+                    top.location = 'https://' + location.host + '/#' + getCleanSitePath();
+                });
+                top.location = getMobileStoreLink();
+            }
+        })();
     }
 
     if (!is_livesite && !is_karma && !is_webcache) {
@@ -1982,7 +2045,6 @@ if (showLegacyMobilePage) {
     var mobileblog;
     var android;
     var intent;
-    var ios9;
     var link = document.createElement('link');
 
     link.setAttribute('rel', 'stylesheet');
@@ -2021,12 +2083,15 @@ if (showLegacyMobilePage) {
     if (page.substr(0, 4) === 'blog') {
         mobileblog = 1;
     }
-    if (ua.indexOf('windows phone') > -1) {
+    if (is_windowsphone) {
         app = 'zune://navigate/?phoneappID=1b70a4ef-8b9c-4058-adca-3b9ac8cc194a';
         document.body.className = 'wp full-mode supported';
     }
-    else if (ua.indexOf('android') > -1) {
+    else if (is_android) {
         app = 'https://play.google.com/store/apps/details?id=mega.privacy.android.app&referrer=meganzsb';
+        if (is_huawei) {
+            app = 'https://appgallery.huawei.com/#/app/C102009895';
+        }
         document.body.className = 'android full-mode supported';
         android = 1;
         var ver = ua.match(/android (\d+)\.(\d+)/);
@@ -2039,6 +2104,9 @@ if (showLegacyMobilePage) {
             }
         }
         if (intent && !mobileblog) {
+            if (is_huawei) {
+                intent = intent.replace('.app;', '.app.huawei;');
+            }
             document.location = intent;
         }
     }
@@ -4438,6 +4506,22 @@ function b64decode(str) {
         return atob((str + '=='.substr(2 - str.length * 3 & 3)).replace(/-/g, '+').replace(/_/g, '/'));
     }
     catch (ex) {}
+}
+
+function clip(str) {
+    'use strict';
+    var elm = document.getElementById('chromeclipboard');
+    if (elm) {
+        elm.textContent = str;
+        var res = tryCatch(function() {
+            elm.focus();
+            elm.setSelectionRange(0, str.length);
+            return document.execCommand('copy');
+        })();
+
+        elm.textContent = '';
+        return res;
+    }
 }
 
 // Promise.catch helper

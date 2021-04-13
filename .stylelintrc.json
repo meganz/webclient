@@ -1,17 +1,16 @@
 {
     "extends": "stylelint-config-standard",
     "plugins": [
-        "stylelint-no-unsupported-browser-features",
-        "stylelint-order"
+        "stylelint-no-unsupported-browser-features"
     ],
     "rules": {
         "indentation": null,
         "declaration-no-important": null,
         "rule-empty-line-before": null,
         "no-descending-specificity": null,
+        "color-hex-length": null,
         "custom-property-empty-line-before": null,
         "declaration-empty-line-before": null,
-
 
         "no-missing-end-of-source-newline": true,
         "max-empty-lines": 2,

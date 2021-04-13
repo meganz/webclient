@@ -1642,13 +1642,6 @@ FileManager.prototype.initContextUI = function() {
         var newFavState = Number(!M.isFavourite($.selected));
 
         M.favourite($.selected, newFavState);
-
-        if (M.viewmode) {
-            $('.fm-blocks-view .data-block-view').removeClass('ui-selected');
-        }
-        else {
-            $('.grid-table.fm tr').removeClass('ui-selected');
-        }
     });
 
     $(c + '.send-to-contact-item').rebind('click', function () {

@@ -34,6 +34,11 @@
         "plugin/no-unsupported-browser-features": [
             true,
             {
+                "ignore": [
+                    "css-appearance",
+                    "css-gradients",
+                    "css-masks"
+                ],
                 "severity": "warning"
             }
         ],

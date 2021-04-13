@@ -54,18 +54,6 @@
                 "severity": "error"
             }
         ],
-        "color-hex-case": [
-            "lower",
-            {
-                "severity": "warning"
-            }
-        ],
-        "color-hex-length": [
-            "short",
-            {
-                "severity": "warning"
-            }
-        ],
         "comment-empty-line-before": [
             "always",
             {

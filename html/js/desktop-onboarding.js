@@ -112,13 +112,13 @@
             }, 950);
             return false;
         });
-        
+
         if (is_mobile || ua.indexOf('linux') < 0) {
             $('.download-app', $wrapper).removeClass('hidden');
             $('.bottom-page.horizontal-centered-bl', $wrapper).addClass('resize');
 
             if (is_mobile) {
-                syncurl = mobile.downloadOverlay.getStoreLink();
+                syncurl = getMobileStoreLink();
                 $('.bottom-page.onboard-image-wrapper', $wrapper).addClass('hidden');
             }
         }

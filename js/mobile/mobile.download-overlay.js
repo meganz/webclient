@@ -135,76 +135,7 @@ mobile.downloadOverlay = {
         'use strict';
 
         var redirectLink = this.getAppLink(nodeHandle);
-
-        // If iOS (iPhone, iPad, iPod), use method based off https://github.com/prabeengiri/DeepLinkingToNativeApp/
-        if (is_ios || localStorage.testOpenInApp === 'ios') {
-
-            var ns = '.ios ';
-            var appLink = 'mega://' + redirectLink;
-            var events = ['pagehide', 'blur', 'beforeunload'];
-            var timeout = null;
-
-            var preventDialog = function() {
-                clearTimeout(timeout);
-                timeout = null;
-                $(window).off(events.join(ns) + ns);
-            };
-
-            var redirectToStore = function() {
-                window.top.location = mobile.downloadOverlay.getStoreLink();
-            };
-
-            var redirect = function() {
-                var ms = 500;
-
-                preventDialog();
-                $(window).rebind(events.join(ns) + ns, preventDialog);
-
-                window.location = appLink;
-
-                // Starting with iOS 9.x, there will be a confirmation dialog asking whether we want to
-                // open the app, which turns the setTimeout trick useless because no page unloading is
-                // notified and users redirected to the app-store regardless if the app is installed.
-                // Hence, as a mean to not remove the redirection we'll increase the timeout value, so
-                // that users with the app installed will have a higher chance of confirming the dialog.
-                // If past that time they didn't, we'll redirect them anyhow which isn't ideal but
-                // otherwise users will the app NOT installed might don't know where the app is,
-                // at least if they disabled the smart-app-banner...
-                // NB: Chrome (CriOS) is not affected.
-                if (is_ios > 8 && ua.details.brand !== 'CriOS') {
-                    ms = 4100;
-                }
-
-                timeout = setTimeout(redirectToStore, ms);
-            };
-
-            Soon(function() {
-                // If user navigates back to browser and clicks the button,
-                // try redirecting again.
-                $selector.rebind('click', function(e) {
-                    e.preventDefault();
-                    redirect();
-                    return false;
-                });
-            });
-            redirect();
-        }
-
-        // Otherwise if Windows Phone
-        else if (ua.details.os === 'Windows Phone' || localStorage.testOpenInApp === 'winphone') {
-            window.location = 'mega://' + redirectLink;
-        }
-
-        // Otherwise if Android
-        else if (ua.indexOf('android') > -1 || localStorage.testOpenInApp === 'android') {
-            var intent = 'intent://' + redirectLink + '/#Intent;scheme=mega;package=mega.privacy.android.app;end';
-            document.location = intent;
-        }
-        else {
-            // Otherwise show an error saying the device is unsupported
-            alert('This device is unsupported.');
-        }
-
+        goToMobileApp(redirectLink);
         return false;
     },
 
@@ -733,41 +664,17 @@ mobile.downloadOverlay = {
     },
 
     /**
-     * Gets the app store link based on the user agent
-     * @returns {String} Returns the link to the relevant app store for the user's platform
-     */
-    getStoreLink: function() {
-
-        'use strict';
-
-        switch (ua.details.os) {
-            case 'iPad':
-            case 'iPhone':
-                return 'https://itunes.apple.com/app/mega/id706857885';
-
-            case 'Windows Phone':
-                return 'zune://navigate/?phoneappID=1b70a4ef-8b9c-4058-adca-3b9ac8cc194a';
-
-            default:
-                // Android and others
-                return 'https://play.google.com/store/apps/details?id=mega.privacy.android.app' +
-                       '&referrer=meganzindexandroid';
-        }
-    },
-
-    /**
      * Changes the footer image and text depending on what platform they are on
      */
     setMobileAppInfo: function() {
 
         'use strict';
 
-        var $downloadOnAppStoreButton = $('.mobile.download-app');
         var $appInfoBlock = $('.app-info-block');
         var $openInBrowserButton = $('.mobile.dl-browser');
 
         // Change the link
-        $downloadOnAppStoreButton.attr('href', mobile.downloadOverlay.getStoreLink());
+        mobile.initMobileAppButton();
 
         switch (ua.details.os) {
             case 'iPad':

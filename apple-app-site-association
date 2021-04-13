@@ -1,0 +1,13 @@
+{
+    "applinks": {
+        "apps": [],
+        "details": [
+            {
+                "appID": "T9RH74Y7L9.mega.ios",
+                "paths": [
+                    "NOT /emailverify/*", "NOT /#emailverify/*","NOT /dont-deploy/*", "*"
+                ]
+            }
+        ]
+    }
+}

@@ -923,22 +923,8 @@ async function dlPageAds($topBar, res) {
     return 'showing';
 }
 
-function getStoreLink() {
-    switch (ua.details.os) {
-        case 'iPad':
-        case 'iPhone':
-            return 'https://itunes.apple.com/app/mega/id706857885';
-
-        case 'Windows Phone':
-            return 'zune://navigate/?phoneappID=1b70a4ef-8b9c-4058-adca-3b9ac8cc194a';
-
-        case 'Android':
-            return 'https://play.google.com/store/apps/details?id=mega.privacy.android.app&referrer=meganzindexandroid';
-    }
-}
-
 function setMobileAppInfo() {
-    $('.mobile.download-app').attr('href', getStoreLink());
+    $('.mobile.download-app').attr('href', getMobileStoreLink());
     switch (ua.details.os) {
         case 'iPad':
         case 'iPhone':

@@ -391,7 +391,7 @@ var mobile = {
         var $appStoreButton = $('.download-app, .startpage .mobile-apps-button');
 
         // Set the link
-        $appStoreButton.attr('href', mobile.downloadOverlay.getStoreLink());
+        $appStoreButton.attr('href', getMobileStoreLink());
 
         // If iOS, Windows or Android show the relevant app store badge
         switch (ua.details.os) {
@@ -685,11 +685,6 @@ var mobile = {
 
 mBroadcaster.once('fm:initialized', function () {
     'use strict';
-
-    if (!isMobile) {
-        // not neccessary check, but to make sure.
-        return;
-    }
 
     var $banner;
     if (u_attr && u_attr.b) {

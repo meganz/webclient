@@ -280,19 +280,6 @@ mBroadcaster.once('boot_done', () => {
 
     if (is_mobile) {
         mobile.downloadOverlay = Object.create(null);
-        mobile.downloadOverlay.getStoreLink = () => {
-            switch (ua.details.os) {
-                case 'iPad':
-                case 'iPhone':
-                    return 'https://itunes.apple.com/app/mega/id706857885';
-                case 'Windows Phone':
-                    return 'zune://navigate/?phoneappID=1b70a4ef-8b9c-4058-adca-3b9ac8cc194a';
-                default:
-                    // Android and others
-                    return 'https://play.google.com/store/apps/details?id=mega.privacy.android.app' +
-                        '&referrer=meganzindexandroid';
-            }
-        };
         mobile.signin = Object.create(null);
         mobile.signin.show = dummy;
         mobile.register = Object.create(null);

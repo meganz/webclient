@@ -284,7 +284,7 @@
     "838": "[X] telah ditambahkan",
     "862": "Pemberitahuan",
     "864": "Unduh sebagai ZIP",
-    "865": "Bukan",
+    "865": "Buka",
     "870": "Konfirm",
     "871": "[B]Peringatan:[\/B] kuota penyimpanan telah terlewati. Harap hapus berkas atau [A] upgrade akun anda [\/A].",
     "873": "[X] detik yang lalu",
@@ -548,7 +548,7 @@
     "1686": "Batal",
     "1687": "Cloud Drive",
     "1694": "Serahkan",
-    "1710": "Bukan",
+    "1710": "Buka",
     "1712": "Umum",
     "1718": "Batal",
     "1724": "Detil",
@@ -4118,5 +4118,6 @@
     "25006": "Jika anda tidak dapat menemukan apa yang anda cari, silakan hubungi tim dukungan kami untuk bantuan langsung.",
     "25016": "Kedaluwarsa",
     "25040": "22-character recovery key",
+    "25041": "Your Pro membership plan will expire today.",
     "25042": "Audio"
 }

@@ -29,9 +29,9 @@
     "encryption"
   ],
   "browserslist": [
-    "Chrome > 57",
-    "Firefox > 53",
-    "Safari > 10.1",
+    "Chrome > 59",
+    "Firefox > 54",
+    "Safari > 11.2",
     "Opera > 54",
     "Edge > 78"
   ],

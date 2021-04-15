@@ -4112,11 +4112,13 @@
     "24976": "Gesamt:",
     "24977": "Keine weiteren Benutzer",
     "24978": "1 weiterer Benutzer",
-    "25002": "Processed",
-    "25004": "We\u2019re sorry you didn\u2019t find this helpful. What can we do to improve it?",
-    "25005": "Enter your search here\u2026",
-    "25006": "If you can\u2019t find what you are looking for, please contact our support team for direct assistance.",
-    "25016": "Expired",
-    "25040": "22-character recovery key",
-    "25042": "Audio"
+    "25002": "Bearbeitet",
+    "25004": "Was k\u00f6nnen wir tun, um diese Antwort zu verbessern?",
+    "25005": "Suchbegriff...",
+    "25006": "Sollten Sie keine L\u00f6sung f\u00fcr Ihr Problem finden, setzen Sie sich bitte mit unserem Kundendienst in Verbindung.",
+    "25016": "Beendet",
+    "25040": "Rettungsschl\u00fcssel (L\u00e4nge: 22)",
+    "25041": "Ihre Pro-Mitgliedschaft l\u00e4uft heute ab.",
+    "25042": "Audio",
+    "25073": "This payment method has minimum amount restrictions"
 }

@@ -1447,6 +1447,13 @@ body:not(.mobile) .pricing-page.slider-dot:hover {
 .payment-duration .save-money.hidden {
     display: none;
 }
+.payment-duration .opt-note {
+    display: none;
+}
+.payment-duration.disabled .opt-note {
+    display: block;
+    font-size: 9px;
+}
 .payment-section .bottom-page.horizontal-centered-bl.mid-wide {
     max-width: 1300px;
 }

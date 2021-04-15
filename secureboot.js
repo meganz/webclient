@@ -133,9 +133,11 @@ function goToMobileApp(aBaseLink) {
             sessionStorage.setItem('__mobile_app_tap', 1);
         }, false)();
 
-        tmp = 'https://' + location.host + '/' + aBaseLink;
-        // clip(tmp);
-        top.location = tmp + '?mobileapptap';
+        var link = 'https://' + location.host + '/' + aBaseLink;
+        setTimeout(function() {
+            top.location = link + '?mobileapptap';
+        }, 4e3);
+        top.location = 'mega://' + aBaseLink;
     }
     else if (is_windowsphone || testbed === 'winphone') {
         top.location = 'mega://' + aBaseLink;
@@ -602,6 +604,12 @@ if (!browserUpdate) try
             if (tmp) {
                 setTimeout(function() {
                     top.location = 'https://' + location.host + '/#' + getCleanSitePath();
+                });
+                var idx = 1;
+                document.addEventListener('visibilitychange', function _() {
+                    if (++idx > 2) {
+                        location.reload();
+                    }
                 });
                 top.location = getMobileStoreLink();
             }

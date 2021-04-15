@@ -461,6 +461,9 @@ pro.propay = {
         $durationOptions.rebind('click', function() {
 
             var $this = $(this);
+            if ($this.hasClass('disabled')) {
+                return;
+            }
             var planIndex = $this.attr('data-plan-index');
 
             // Remove checked state on the other buttons
@@ -997,20 +1000,27 @@ pro.propay = {
         // Loop through renewal period options (1 month, 1 year)
         $.each($durationOptions, function(key, durationOption) {
 
+            var $durOpt = $(durationOption);
             // Get the plan's number of months
-            var planIndex = $(durationOption).attr('data-plan-index');
+            var planIndex = $durOpt.attr('data-plan-index');
             var currentPlan = pro.membershipPlans[planIndex];
             var numOfMonths = currentPlan[pro.UTQA_RES_INDEX_MONTHS];
+
+            $durOpt.removeClass('disabled');
 
             // If the currently selected payment option e.g. Wire transfer
             // doesn't support a 1 month payment hide the option
             if (((!selectedProvider.supportsMonthlyPayment) && (numOfMonths === 1)) ||
-                    ((!selectedProvider.supportsAnnualPayment) && (numOfMonths === 12))) {
-                $(durationOption).addClass('hidden');
+                ((!selectedProvider.supportsAnnualPayment) && (numOfMonths === 12))) {
+                $durOpt.addClass('hidden');
             }
             else {
                 // Show the option otherwise
-                $(durationOption).removeClass('hidden');
+                $durOpt.removeClass('hidden');
+                if (selectedProvider.minimumEURAmountSupported &&
+                    selectedProvider.minimumEURAmountSupported > currentPlan[pro.UTQA_RES_INDEX_PRICE]) {
+                    $durOpt.addClass('disabled');
+                }
             }
         });
 
@@ -1018,11 +1028,13 @@ pro.propay = {
         var $newDurationOption;
         var newPlanIndex;
         $newDurationOption = $('[data-plan-index=' + selectedPlanIndex + ']', $durationOptionsList);
-        if ($newDurationOption.length && !$newDurationOption.hasClass('hidden')) {
+        if ($newDurationOption.length && !$newDurationOption.hasClass('hidden') &&
+            !$newDurationOption.hasClass('disabled')) {
             newPlanIndex = selectedPlanIndex;
         }
         else {
-            $newDurationOption = $('.payment-duration:not(.template, .hidden)', $durationOptionsList).first();
+            $newDurationOption = $('.payment-duration:not(.template, .hidden, .disabled)', $durationOptionsList)
+                .first();
             newPlanIndex = $newDurationOption.attr('data-plan-index');
         }
         $('.membership-radio', $newDurationOption).addClass('checked');

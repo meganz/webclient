@@ -28,7 +28,6 @@
         "eslint:recommended",
         "plugin:es/restrict-to-es2018",
         "plugin:no-unsanitized/DOM",
-        "plugin:react/recommended",
         "plugin:sonarjs/recommended"
     ],
     "settings": {
@@ -73,6 +72,7 @@
         "no-alert": 2,
         "no-caller": 2,
         "no-console": 0,
+        "no-constant-condition": [2, { "checkLoops": false }],
         "no-constructor-return": 2,
         "no-dupe-else-if": 2,
         "no-else-return": 2,
@@ -156,7 +156,6 @@
 
         "es/no-atomics": 2,
         "es/no-exponential-operators": 2,
-        "es/no-generators": 2,
         "es/no-promise-all-settled": "off",
         "es/no-trailing-function-commas": 2,
 
@@ -183,7 +182,7 @@
 
         "optimize-regex/optimize-regex": 2,
         "sonarjs/cognitive-complexity": [1, 48],
-        "sonarjs/no-duplicate-string": 1,
+        "sonarjs/no-duplicate-string": [1, 5],
 
         "unicorn/catch-error-name": [2, {"name": "ex"}],
         "unicorn/consistent-function-scoping": 1,
@@ -209,12 +208,20 @@
             "excludedFiles": "*.js",
             "parser": "babel-eslint",
             "parserOptions": {
-                "ecmaVersion": 6,
+                "ecmaVersion": 2019,
                 "sourceType": "module"
             },
+            "extends": [
+                "eslint:recommended",
+                "plugin:es/restrict-to-es2019",
+                "plugin:react/recommended",
+                "plugin:sonarjs/recommended"
+            ],
             "rules": {
                 "complexity": [2, 28],
-                "no-negated-condition": "off"
+                "es/no-optional-chaining": "off",
+                "no-negated-condition": "off",
+                "sonarjs/cognitive-complexity": [2, 60]
             }
         }
     ]

@@ -200,7 +200,7 @@
         "unicorn/prefer-modern-dom-apis": 1,
         "unicorn/prefer-negative-index": 2,
         "unicorn/prefer-set-has": 1,
-        "unicorn/prefer-spread": 2,
+        "unicorn/prefer-spread": 1,
         "unicorn/prefer-starts-ends-with": 2,
         "unicorn/prefer-ternary": 1,
         "unicorn/regex-shorthand": 2,

@@ -378,7 +378,7 @@ function init_page() {
     }
 
     // Redirect url to extensions when it tries to go plugin or chrome or firefox
-    if (page === 'plugin' || page === 'chrome' || page === 'firefox' || page === 'edge') {
+    if (page === 'plugin') {
         loadSubPage('extensions');
         return false;
     }
@@ -612,6 +612,9 @@ function init_page() {
         && (page !== 'mobileapp')
         && (page !== 'nas')
         && (page !== 'extensions')
+        && (page !== 'chrome')
+        && (page !== 'firefox')
+        && (page !== 'edge')
         && (page !== 'sync')
         && (page !== 'cmd')
         && (page !== 'terms')
@@ -1534,7 +1537,7 @@ function init_page() {
         parsepage(pages.affiliate);
         affiliateprogram.init();
     }
-    else if (page === 'extensions') {
+    else if (page === 'extensions' || page === 'chrome' || page === 'firefox' || page === 'edge') {
         parsepage(pages['browsers']);
         browserspage.init();
     }

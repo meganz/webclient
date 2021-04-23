@@ -203,12 +203,7 @@
         "unicorn/prefer-spread": 1,
         "unicorn/prefer-starts-ends-with": 2,
         "unicorn/prefer-ternary": 1,
-        "unicorn/regex-shorthand": 2,
-
-        "react/no-find-dom-node": "off",
-        "react/prop-types": "off",
-        "react/no-is-mounted": "off",
-        "react/jsx-indent": ["error", 4]
+        "unicorn/regex-shorthand": 2
     },
 
     "overrides": [
@@ -221,15 +216,16 @@
                 "sourceType": "module"
             },
             "extends": [
-                "eslint:recommended",
                 "plugin:es/restrict-to-es2019",
-                "plugin:react/recommended",
-                "plugin:sonarjs/recommended"
+                "plugin:react/recommended"
             ],
             "rules": {
                 "complexity": [2, 28],
                 "es/no-optional-chaining": "off",
                 "no-negated-condition": "off",
+                "react/no-find-dom-node": "off",
+                "react/no-is-mounted": "off",
+                "react/jsx-indent": ["error", 4],
                 "sonarjs/cognitive-complexity": [2, 60]
             }
         }

@@ -1026,7 +1026,7 @@ function stopsc() {
     }
 
     if (waittimeout) {
-        clearTimeout(waittimeout);
+        delay.cancel(waittimeout);
         waittimeout = false;
     }
 }
@@ -1072,7 +1072,7 @@ function sc_residue(sc) {
             console.error("Strange error, we dont know WSC url and we didnt get it");
             return getsc(true);
         }
-        waittimeout = setTimeout(waitsc, waitbackoff);
+        waittimeout = delay('reinit:wsc', waitsc, waitbackoff);
 
         if ((mega.state & window.MEGAFLAG_LOADINGCLOUD) && !mega.loadReport.recvAPs) {
             mega.loadReport.recvAPs = Date.now() - mega.loadReport.stepTimeStamp;
@@ -1140,7 +1140,7 @@ function waitsc() {
     }
     waitxhr.waitid = newid;
 
-    waittimeout = setTimeout(waitsc, MAX_WAIT);
+    waittimeout = delay('reinit:wsc', waitsc, MAX_WAIT);
 
     waitxhr.onloadend = function(ev) {
         if (this.waitid === waitid) {
@@ -1149,9 +1149,8 @@ function waitsc() {
                     console.info('waitsc(%s:%s)', this.status, ev.type, ev);
                 }
 
-                clearTimeout(waittimeout);
                 waitbackoff = Math.min(MAX_WAIT, waitbackoff << 1);
-                waittimeout = setTimeout(waitsc, waitbackoff);
+                waittimeout = delay('reinit:wsc', waitsc, waitbackoff);
             }
             else {
                 // Increase backoff if we do keep receiving packets is rapid succession, so that we maintain
@@ -1168,7 +1167,7 @@ function waitsc() {
                 if (delieveredResponse === '0') {
                     // clearTimeout(waittimeout); mo need for clearing, we stopped
                     // immediately re-connect.
-                    waittimeout = setTimeout(waitsc, 0);
+                    waittimeout = delay('reinit:wsc', waitsc, 1);
                 }
                 else if ($.isNumeric(delieveredResponse)) {
                     if (delieveredResponse == ETOOMANY) {
@@ -1177,7 +1176,7 @@ function waitsc() {
                     }
                     else if (delieveredResponse == EAGAIN || delieveredResponse == ERATELIMIT) {
                         // WSC is stopped at the beginning.
-                        waittimeout = setTimeout(waitsc, waitbackoff);
+                        waittimeout = delay('reinit:wsc', waitsc, waitbackoff);
                     }
                     else if (delieveredResponse == EBLOCKED) {
                         // == because API response will be in a string
@@ -1198,8 +1197,7 @@ function waitsc() {
     };
 
     waitxhr.onprogress = function() {
-        clearTimeout(waittimeout);
-        waittimeout = setTimeout(waitsc, MAX_WAIT);
+        waittimeout = delay('reinit:wsc', waitsc, MAX_WAIT);
     };
 
     waitbegin = Date.now();

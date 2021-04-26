@@ -218,6 +218,23 @@
 
     "overrides": [
         {
+            "files": ["secureboot.js"],
+            "parserOptions": {
+                "ecmaVersion": 5
+            },
+            "extends": [
+                "plugin:es/restrict-to-es5"
+            ],
+            "rules": {
+                "prefer-arrow-callback": 0,
+                "prefer-const": 0,
+                "prefer-destructuring": 0,
+                "prefer-rest-params": 0,
+                "prefer-spread": 0,
+                "prefer-template": 0
+            }
+        },
+        {
             "files": ["*.jsx"],
             "excludedFiles": "*.js",
             "parser": "babel-eslint",

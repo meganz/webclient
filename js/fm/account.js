@@ -355,7 +355,7 @@ accountUI.general = {
             var b2 = bytesToSize(account.space, 0).split(' ');
             $('.chart.data .pecents-txt', $storageChart).text(b2[0]);
             $('.chart.data .gb-txt', $storageChart).text(b2[1]);
-            $('.chart .perc-txt', $storageChart).text(usedPercentage + '%');
+            $('.chart .perc-txt', $storageChart).text(formatPercentage(usedPercentage / 100));
             $('.chart.data .size-txt', $storageChart).text(bytesToSize(account.space_used));
             /** End New Used Storage chart */
         },

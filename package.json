@@ -95,8 +95,8 @@
     "mocha": "8.3.2",
     "react-hot-loader": "4.13.0",
     "sinon": "10.0.0",
-    "stylelint": "13.12.0",
-    "stylelint-config-standard": "21.0.0",
+    "stylelint": "13.13.0",
+    "stylelint-config-standard": "22.0.0",
     "stylelint-no-unsupported-browser-features": "4.1.4",
     "webpack-dev-server": "3.11.2"
   }

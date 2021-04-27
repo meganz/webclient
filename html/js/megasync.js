@@ -44,11 +44,6 @@ var megasync = (function() {
     ns.UILinuxDropdown = function(selected) {
         linuxDropdown(selected);
     };
-    mBroadcaster.once('fm:initialized', function () {
-        if (typeof fmconfig.dlThroughMEGAsync === 'undefined') {
-            mega.config.set('dlThroughMEGAsync', 1);
-        }
-    });
 
     ns.UIExtensionsDropdown = function(distroIndex, platform, onSelect) {
         extensionsDropdown(distroIndex, platform, onSelect);

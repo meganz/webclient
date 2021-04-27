@@ -347,7 +347,7 @@ mega.metatags = new function() {
             mTags.mega_desc = l[8789] || mTags.en_desc;
         }
         else if (page === 'takedown') {
-            mTags.en_title = 'Takedown Guidance - MEGA';
+            mTags.en_title = 'Takedown Guidance Policy - MEGA';
             mTags.en_desc = 'MEGA has special policies and procedures in place for anyone wanting access to user data' +
                             ' and information.';
             mTags.mega_title = l[23988] || mTags.en_title;

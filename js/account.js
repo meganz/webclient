@@ -470,6 +470,7 @@ function u_setrsa(rsakey) {
                             if ('csp' in window) {
                                 csp.showCookiesDialog('nova');
                             }
+                            mega.config.set('dlThroughMEGAsync', 1);
                         });
 
                         // No affiliate guide dialog for new users.

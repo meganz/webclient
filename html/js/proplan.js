@@ -844,7 +844,6 @@ pro.proplan = {
         var $businessPrice = $('.plan-price', $businessBoxes);
         var $businessStorageInfo = $('.plan-feature.storage-b span', $businessBoxes);
         var businessStorageAmount = '15 ' + l[20160];
-        var euroSign = '\u20ac';
 
         var updateResults = pro.proplan.updateEachPriceBlock("P", $pricingBoxes, undefined, 1);
         var oneLocalPriceFound = updateResults[0];
@@ -856,9 +855,8 @@ pro.proplan = {
             $stepOne.removeClass('local-currency');
         }
 
-        $businessPrice.text(
-            $businessPrice.text().replace('.', mega.intl.decimalSeparator)
-        );
+        var businessPlanIdx = pro.membershipPlans.length - 1;
+        $businessPrice.text(formatCurrency(pro.membershipPlans[businessPlanIdx][pro.UTQA_RES_INDEX_MONTHLYBASEPRICE]));
 
         $businessStorageInfo.safeHTML(
             l[23789].replace('%1', '<span>' + businessStorageAmount + '</span>')

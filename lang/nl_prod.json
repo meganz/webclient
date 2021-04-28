@@ -4119,5 +4119,11 @@
     "25016": "Verlopen",
     "25040": "Herstelsleutel van 22 tekens",
     "25041": "Uw Pro-lidmaatschapsplan verloopt vandaag.",
-    "25042": "Audio"
+    "25042": "Audio",
+    "25047": "Betaling was succesvol",
+    "25048": "Bedankt voor uw betaling, uw account moet nu opgewaardeerd worden. Voor vragen kunt u ons contacteren bij [A]support@mega.n[\/A]",
+    "25049": "Betaling mislukt",
+    "25050": "Helaas, de betaling is niet doorgegaan. Als u gelooft dat dit vanuit een fout is binnen MEGA, neem dan contact op met [A]support@mega.nz[\/A]",
+    "25073": "Deze betaaloptie methode heeft een minimale aantal restricties",
+    "25081": "Thanks! Your account should now be upgraded. Please check your email to verify your account and login. For enquiries you can contact us at [A]support@mega.nz[\/A]"
 }

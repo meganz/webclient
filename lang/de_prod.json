@@ -4119,5 +4119,11 @@
     "25016": "Beendet",
     "25040": "Rettungsschl\u00fcssel (L\u00e4nge: 22)",
     "25041": "Ihre Pro-Mitgliedschaft l\u00e4uft heute ab.",
-    "25042": "Audio"
+    "25042": "Audio",
+    "25047": "Payment has succeeded",
+    "25048": "Thank you for your payment, your account should be upgraded by now. For enquiries you can contact us at [A]support@mega.nz[\/A]",
+    "25049": "Payment failed",
+    "25050": "Unfortunately, the payment did not go through. If you believe that this is an error from MEGA side, please contact support at [A]support@mega.nz[\/A]",
+    "25073": "This payment method has minimum amount restrictions",
+    "25081": "Thanks! Your account should now be upgraded. Please check your email to verify your account and login. For enquiries you can contact us at [A]support@mega.nz[\/A]"
 }

@@ -4119,5 +4119,11 @@
     "25016": "Kedaluwarsa",
     "25040": "Kunci pemulihan 22-karakter",
     "25041": "Paket keanggotaan Pro Anda akan kedaluwarsa hari ini.",
-    "25042": "Audio"
+    "25042": "Audio",
+    "25047": "Payment has succeeded",
+    "25048": "Thank you for your payment, your account should be upgraded by now. For enquiries you can contact us at [A]support@mega.nz[\/A]",
+    "25049": "Payment failed",
+    "25050": "Unfortunately, the payment did not go through. If you believe that this is an error from MEGA side, please contact support at [A]support@mega.nz[\/A]",
+    "25073": "Metode pembayaran ini memiliki batasan jumlah minimum",
+    "25081": "Thanks! Your account should now be upgraded. Please check your email to verify your account and login. For enquiries you can contact us at [A]support@mega.nz[\/A]"
 }

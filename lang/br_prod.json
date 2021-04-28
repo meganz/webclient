@@ -4119,5 +4119,11 @@
     "25016": "Expirada",
     "25040": "Chave de recupera\u00e7\u00e3o de 22 caracteres",
     "25041": "O seu plano Pro expirar\u00e1 hoje.",
-    "25042": "\u00c1udio"
+    "25042": "\u00c1udio",
+    "25047": "O pagamento foi realizado",
+    "25048": "Obrigado pelo seu pagamento, o status da sua conta j\u00e1 deve ter sido atualizado. Se voc\u00ea tiver alguma d\u00favida, entre em contato conosco em [A]support@mega.nz[\/A]",
+    "25049": "O pagamento n\u00e3o foi realizado",
+    "25050": "Infelizmente,  n\u00e3o foi poss\u00edvel fazer este pagamento. Se voc\u00ea acredita que isso \u00e9 um erro por parte do MEGA, entre em contato conosco em [A]support@mega.nz[\/A]",
+    "25073": "Este m\u00e9todo de pagamento tem restri\u00e7\u00f5es de valor m\u00ednimo",
+    "25081": "Obrigado! O upgrade da sua conta foi realizado. Por favor, acesse o seu email para confirmar a sua conta e fazer login. Se tiver d\u00favidas, voc\u00ea pode entrar em contato conosco em [A]support@mega.nz[\/A]"
 }

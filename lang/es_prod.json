@@ -4119,5 +4119,11 @@
     "25016": "Caducada",
     "25040": "Clave de recuperaci\u00f3n de 22 caracteres",
     "25041": "Tu plan Pro caduca hoy.",
-    "25042": "Audio"
+    "25042": "Audio",
+    "25047": "El pago se ha realizado correctamente",
+    "25048": "Muchas gracias, tu cuenta ya deber\u00eda de estar ampliada. Para consultas, puedes contactarnos en [A]support@mega.nz[\/A]",
+    "25049": "Pago fallido",
+    "25050": "Lo sentimos, el pago no se ha realizado correctamente. Si crees que se trata de un error de MEGA, contactarnos en [A]support@mega.nz[\/A]",
+    "25073": "Este m\u00e9todo de pago tiene restricciones de cuota m\u00ednima",
+    "25081": "\u00a1Gracias! Tu cuenta deber\u00eda de haberse ampliado ya. Por favor revisa tu correo electr\u00f3nico para verificar tu cuenta e iniciar sesi\u00f3n. Para consultas, puedes contactarnos en [A]support@mega.nz[\/A]"
 }

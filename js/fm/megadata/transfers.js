@@ -198,7 +198,7 @@ MegaData.prototype.addDownloadSync = function(n, z, preview) {
     }
     // if in folder link and logged-in and download using mSync is set to 0
     if (folderlink && u_type) {
-        if (fmconfig.dlThroughMEGAsync === 0) {
+        if (!fmconfig.dlThroughMEGAsync) {
             return webdl();
         }
     }

@@ -205,13 +205,16 @@
 .provider-icon.voucher {
     background-position: 0 -3900px;
 }
-.provider-icon.ecp {
+.provider-icon.ecp,
+.provider-icon.Stripe {
     background-position: 0 -3540px;
 }
-.provider-icon.ecpVI {
+.provider-icon.ecpVI,
+.provider-icon.stripeVI {
     background-position: 0 -3360px;
 }
-.provider-icon.ecpMC {
+.provider-icon.ecpMC,
+.provider-icon.stripeMC {
     background-position: 0 -1980px;
 }
 .provider-icon.wiretransfer {
@@ -1446,6 +1449,13 @@ body:not(.mobile) .pricing-page.slider-dot:hover {
 }
 .payment-duration .save-money.hidden {
     display: none;
+}
+.payment-duration .opt-note {
+    display: none;
+}
+.payment-duration.disabled .opt-note {
+    display: block;
+    font-size: 9px;
 }
 .payment-section .bottom-page.horizontal-centered-bl.mid-wide {
     max-width: 1300px;

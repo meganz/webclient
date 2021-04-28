@@ -1646,12 +1646,12 @@ accountUI.plan = {
                     });
                 }
 
-                // Otherwise if ECP or Sabadell
-                else if ((gatewayId === 16) || (gatewayId === 17)) {
+                // Otherwise if ECP, Sabadell, or Stripe
+                else if (gatewayId === 16 || gatewayId === 17 || gatewayId === 19) {
 
                     // Check if there are any active subscriptions
                     // ccqns = Credit Card Query Number of Subscriptions
-                    api_req({a: 'ccqns'}, {
+                    api_req({ a: 'ccqns' }, {
                         callback: function(numOfSubscriptions) {
 
                             // If there is an active subscription

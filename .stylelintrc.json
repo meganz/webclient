@@ -8,10 +8,12 @@
         "declaration-no-important": null,
         "rule-empty-line-before": null,
         "no-descending-specificity": null,
+        "color-hex-case": null,
         "color-hex-length": null,
         "custom-property-empty-line-before": null,
         "declaration-empty-line-before": null,
 
+        "no-irregular-whitespace": true,
         "no-missing-end-of-source-newline": true,
         "max-empty-lines": 2,
         "property-disallowed-list": [ "text-transform" ],

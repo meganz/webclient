@@ -7,7 +7,7 @@
         "worker": true
     },
     "parserOptions": {
-        "ecmaVersion": 2017,
+        "ecmaVersion": 2018,
         "ecmaFeatures": {
             "jsx": true
         }
@@ -26,9 +26,8 @@
     ],
     "extends": [
         "eslint:recommended",
-        "plugin:es/restrict-to-es2017",
+        "plugin:es/restrict-to-es2018",
         "plugin:no-unsanitized/DOM",
-        "plugin:react/recommended",
         "plugin:sonarjs/recommended"
     ],
     "settings": {
@@ -61,7 +60,6 @@
         "eqeqeq": [2, "smart"],
         "for-direction": 2,
         "func-call-spacing": [2, "never"],
-        "function-call-argument-newline": [2, "consistent"],
         "guard-for-in": 1,
         "id-length": [2, {"min": 1, "max": 29}],
         "keyword-spacing": [2, {}],
@@ -73,10 +71,10 @@
         "no-alert": 2,
         "no-caller": 2,
         "no-console": 0,
+        "no-constant-condition": [2, { "checkLoops": false }],
         "no-constructor-return": 2,
         "no-dupe-else-if": 2,
         "no-else-return": 2,
-        "no-empty": 0,
         "no-empty-function": [2, { "allow": ["constructors"] }],
         "no-eq-null": 2,
         "no-eval": 2,
@@ -93,6 +91,7 @@
         "no-lone-blocks": 2,
         "no-lonely-if": 2,
         "no-loop-func": 2,
+        "no-loss-of-precision": 1,
         "no-mixed-spaces-and-tabs": 2,
         "no-multi-str": 2,
         "no-negated-condition": 2,
@@ -102,6 +101,7 @@
         "no-prototype-builtins": 0,
         "no-restricted-properties": [2, {"property": "innerHTML"}, {"property": "outerHTML"}],
         "no-return-assign": 2,
+        "no-return-await": 2,
         "no-script-url": 2,
         "no-self-compare": 2,
         "no-sequences": 2,
@@ -116,7 +116,9 @@
         "no-unused-expressions": 2,
         "no-unused-vars": [2, {"vars": "local", "args": "after-used"}],
         "no-useless-call": 2,
+        "no-useless-computed-key": [2, { "enforceForClassMembers": true }],
         "no-useless-concat": 2,
+        "no-useless-constructor": 2,
         "no-useless-return": 2,
         "no-use-before-define": [2, {"functions": false}],
         "no-void": 2,
@@ -124,7 +126,15 @@
         "no-whitespace-before-property": 2,
         "one-var": [2, {"initialized": "never"}],
         "operator-assignment": 2,
+        "prefer-arrow-callback": [2, { "allowNamedFunctions": true }],
+        "prefer-const": [2, {"destructuring": "all"}],
+        "prefer-destructuring": [1, {"object": true, "array": false}],
+        "prefer-numeric-literals": 2,
         "prefer-regex-literals": 1,
+        "prefer-rest-params": 1,
+        "prefer-spread": 1,
+        "prefer-template": 1,
+        "rest-spread-spacing": 2,
         "semi": [2, "always"],
         "space-before-function-paren": [2, "never"],
         "space-in-parens": [2, "never"],
@@ -154,10 +164,8 @@
         "compat/compat": 1,
         "dollar-sign/dollar-sign": 2,
 
-        // es2017
         "es/no-atomics": 2,
         "es/no-exponential-operators": 2,
-        "es/no-generators": 2,
         "es/no-promise-all-settled": "off",
         "es/no-trailing-function-commas": 2,
 
@@ -184,38 +192,68 @@
 
         "optimize-regex/optimize-regex": 2,
         "sonarjs/cognitive-complexity": [1, 48],
-        "sonarjs/no-duplicate-string": 1,
+        "sonarjs/no-duplicate-string": [1, 5],
 
         "unicorn/catch-error-name": [2, {"name": "ex"}],
+        "unicorn/consistent-destructuring": 1,
         "unicorn/consistent-function-scoping": 1,
         "unicorn/error-message": 2,
         "unicorn/no-abusive-eslint-disable": 2,
-        "unicorn/no-array-instanceof": 2,
+        "unicorn/no-instanceof-array": 2,
+        "unicorn/no-this-assignment": 2,
         "unicorn/no-unsafe-regex": 2,
-        "unicorn/prefer-dataset": 2,
-        "unicorn/prefer-event-key": 1,
+        "unicorn/prefer-date-now": 2,
+        "unicorn/prefer-default-parameters": 1,
+        "unicorn/prefer-dom-node-dataset": 2,
+        "unicorn/prefer-includes": 1,
+        "unicorn/prefer-keyboard-event-key": 1,
+        "unicorn/prefer-modern-dom-apis": 1,
+        "unicorn/prefer-negative-index": 2,
+        "unicorn/prefer-set-has": 1,
+        "unicorn/prefer-spread": 1,
         "unicorn/prefer-starts-ends-with": 2,
-        "unicorn/prefer-text-content": 2,
-        "unicorn/regex-shorthand": 2,
-
-        "react/no-find-dom-node": "off",
-        "react/prop-types": "off",
-        "react/no-is-mounted": "off",
-        "react/jsx-indent": ["error", 4]
+        "unicorn/prefer-ternary": 1,
+        "unicorn/regex-shorthand": 2
     },
 
     "overrides": [
+        {
+            "files": ["secureboot.js"],
+            "parserOptions": {
+                "ecmaVersion": 5
+            },
+            "extends": [
+                "plugin:es/restrict-to-es5"
+            ],
+            "rules": {
+                "prefer-arrow-callback": 0,
+                "prefer-const": 0,
+                "prefer-destructuring": 0,
+                "prefer-rest-params": 0,
+                "prefer-spread": 0,
+                "prefer-template": 0
+            }
+        },
         {
             "files": ["*.jsx"],
             "excludedFiles": "*.js",
             "parser": "babel-eslint",
             "parserOptions": {
-                "ecmaVersion": 6,
+                "ecmaVersion": 2019,
                 "sourceType": "module"
             },
+            "extends": [
+                "plugin:es/restrict-to-es2019",
+                "plugin:react/recommended"
+            ],
             "rules": {
                 "complexity": [2, 28],
-                "no-negated-condition": "off"
+                "es/no-optional-chaining": "off",
+                "no-negated-condition": "off",
+                "react/no-find-dom-node": "off",
+                "react/no-is-mounted": "off",
+                "react/jsx-indent": ["error", 4],
+                "sonarjs/cognitive-complexity": [2, 60]
             }
         }
     ]

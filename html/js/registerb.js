@@ -149,7 +149,8 @@ BusinessRegister.prototype.initPage = function(preSetNb, preSetName, preSetTel, 
         // clear the payment block
         var $paymentBlock = $('.bus-reg-radio-block', $pageContainer).empty();
 
-        var radioHtml = '<div class="bus-reg-radio-option"> <div class="bus-reg-radio payment-[x] checkOff"></div>';
+        var radioHtml = '<div class="bus-reg-radio-option">' +
+            ' <div class="bus-reg-radio payment-[x] checkOff" prov-id="[Y]"></div>';
         var textHtml = '<div class="provider">[x]</div>';
         var iconHtml = '<div class="provider-icon [x]"></div> </div>';
 
@@ -160,7 +161,7 @@ BusinessRegister.prototype.initPage = function(preSetNb, preSetName, preSetTel, 
         if (!window.businessVoucher) {
             var paymentGatewayToAdd = '';
             for (var k = 0; k < list.length; k++) {
-                var payRadio = radioHtml.replace('[x]', list[k].gatewayName);
+                var payRadio = radioHtml.replace('[x]', list[k].gatewayName).replace('[Y]', list[k].gatewayId);
                 var payText = textHtml.replace('[x]', list[k].displayName);
                 var payIcon = iconHtml.replace('[x]', list[k].gatewayName);
                 paymentGatewayToAdd += payRadio + payText + payIcon;
@@ -517,6 +518,9 @@ BusinessRegister.prototype.doRegister = function(nbusers, cname, fname, lname, t
                 pMethod: pMethod,
                 isUpgrade: isUpgrade
             };
+            if (pMethod !== 'voucher') {
+                mySelf.planInfo.usedGatewayId = $paymentMethod.attr('prov-id');
+            }
             mySelf.goToPayment(userInfo);
         });
     };
@@ -562,7 +566,7 @@ BusinessRegister.prototype.processPayment = function(payDetails, businessPlan) {
 
     var mySelf = this;
 
-    var finalizePayment = function(st, res) {
+    var finalizePayment = function(st, res, saleIds) {
         if (st === 0) {
             msgDialog('warninga', '', l[19511], '', function() {
                 loadingDialog.hide();
@@ -607,7 +611,10 @@ BusinessRegister.prototype.processPayment = function(payDetails, businessPlan) {
             msgDialog('warninga', l[6859], l[20429].replace('{0}', payMethod), '', redirectToPaymentGateway);
         }
         else {
-            redirectToPaymentGateway();
+            // redirectToPaymentGateway();
+            const isStrip = businessPlan.usedGatewayId ?
+                (businessPlan.usedGatewayId | 1) === addressDialog.gatewayId_stripe : false;
+            addressDialog.processUtcResult(res, isStrip, saleIds);
         }
 
 

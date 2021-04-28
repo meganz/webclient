@@ -76,6 +76,9 @@ mega.metatags = new function() {
     };
 
     var addCanonical = function(link) {
+        if (lang && lang !== 'en') {
+            link += `/lang_${lang}`;
+        }
         var canonical = document.createElement('link');
         canonical.setAttribute('rel', 'canonical');
         canonical.setAttribute('href', link);
@@ -253,12 +256,15 @@ mega.metatags = new function() {
             mTags.mega_desc = l[16580] || mTags.en_desc;
             mTags.image = 'https://cms2.mega.nz/0723d3ca8f856c90f39480c66b4f2646.png';
         }
-        else if (page === 'extensions') {
+        else if (page === 'extensions' || page === 'chrome' || page === 'firefox' || page === 'edge') {
             mTags.en_title = 'Browser Extensions - MEGA';
             mTags.en_desc = 'Reduce loading times, improve download performance, strengthen security';
             mTags.mega_title = l[23968] || mTags.en_title;
             mTags.mega_desc = l[20921] || mTags.en_desc;
             mTags.image = 'https://cms2.mega.nz/b9a5ee1bd8935e2eb8659b1b7b87f0ae.png';
+            if (page !== 'extensions') {
+                addCanonical(getBaseUrl() + '/extensions');
+            }
         }
         else if (page === 'bird') {
             mTags.en_title = 'MEGAbird - MEGA';

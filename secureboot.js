@@ -133,9 +133,11 @@ function goToMobileApp(aBaseLink) {
             sessionStorage.setItem('__mobile_app_tap', 1);
         }, false)();
 
-        tmp = 'https://' + location.host + '/' + aBaseLink;
-        // clip(tmp);
-        top.location = tmp + '?mobileapptap';
+        var link = 'https://' + location.host + '/' + aBaseLink;
+        setTimeout(function() {
+            top.location = link + '?mobileapptap';
+        }, 4e3);
+        top.location = 'mega://' + aBaseLink;
     }
     else if (is_windowsphone || testbed === 'winphone') {
         top.location = 'mega://' + aBaseLink;
@@ -602,6 +604,12 @@ if (!browserUpdate) try
             if (tmp) {
                 setTimeout(function() {
                     top.location = 'https://' + location.host + '/#' + getCleanSitePath();
+                });
+                var idx = 1;
+                document.addEventListener('visibilitychange', function _() {
+                    if (++idx > 2) {
+                        location.reload();
+                    }
                 });
                 top.location = getMobileStoreLink();
             }
@@ -3288,6 +3296,9 @@ else if (!browserUpdate) {
         'redeem': ['redeem', 'redeem_js'],
         'plugin': ['browsers', 'browsers_js'],
         'extensions': ['browsers', 'browsers_js'],
+        'chrome': ['browsers', 'browsers_js'],
+        'firefox': ['browsers', 'browsers_js'],
+        'edge': ['browsers', 'browsers_js'],
         'bird': ['megabird'],
         'wp': ['mobileapp'],
         'uwp': ['mobileapp'],
@@ -3716,7 +3727,7 @@ else if (!browserUpdate) {
 
         scriptTest(
             'es6s =' +
-            ' Number.isNaN(Date.UTC()) === true' + // C1 E12 F54 O3 S1
+            ' ({...{a:23}}).a === 23' + // C60 E79 F55 O47 S11
             ' && /-/[Symbol.split]("0-0").join("") === "00"' + // C50 E79 F49 O37 S10
             ' && (async()=>{})[Symbol.toStringTag] === "AsyncFunction"' + // C55 E15 F52 O42 S10.1
             ' && (function *(a=1,){yield a})(2).next().value === 2', // C58 E14 F52 O45 S10

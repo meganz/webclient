@@ -39,7 +39,8 @@ var bottompage = {
         }
 
         // Insert variables with replaced browser names
-        if (page === 'extensions' || page === 'bird') {
+        if (page === 'extensions' || page === 'bird' || page === 'edge'
+            || page === 'chrome' || page === 'firefox') {
             bottompage.replaceSpecialVariables($content);
         }
 

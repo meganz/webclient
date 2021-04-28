@@ -27,6 +27,11 @@ function AccountRecoveryControl() {
     this.twoFactor = false;
     var self = this;
 
+    const emailParam = locationSearchParams.match(/email=([^\s&=]+)/);
+    if (emailParam){
+        $.prefillEmail = b64decode(emailParam[1]);
+    }
+
     // if mobile we view the related header for top-mobile.html and hide navigation div of desktop
     if (is_mobile) {
         $('.mobile.forgot-password-page').removeClass('hidden');

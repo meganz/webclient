@@ -73,7 +73,7 @@
     "195": "Ihre E-Mail",
     "198": "Bitte geben Sie eine g\u00fcltige E-Mail-Adresse an.",
     "200": "Ups, da ist wohl etwas schiefgelaufen.",
-    "201": "Falsche E-Mail-Adresse und\/oder Passwort. Bitte versuchen Sie es noch einmal.",
+    "201": "Falsche E-Mail-Adresse und\/oder Passwort. Bitte versuchen Sie es noch einmal",
     "208": "Ich bin mit den [A]AGBs[\/A] von MEGA einverstanden.",
     "209": "Registrieren",
     "214": "Sie m\u00fcssen unsere AGB akzeptieren.",
@@ -4120,5 +4120,10 @@
     "25040": "Rettungsschl\u00fcssel (L\u00e4nge: 22)",
     "25041": "Ihre Pro-Mitgliedschaft l\u00e4uft heute ab.",
     "25042": "Audio",
-    "25073": "This payment method has minimum amount restrictions"
+    "25047": "Payment has succeeded",
+    "25048": "Thank you for your payment, your account should be upgraded by now. For enquiries you can contact us at [A]support@mega.nz[\/A]",
+    "25049": "Payment failed",
+    "25050": "Unfortunately, the payment did not go through. If you believe that this is an error from MEGA side, please contact support at [A]support@mega.nz[\/A]",
+    "25073": "This payment method has minimum amount restrictions",
+    "25081": "Thanks! Your account should now be upgraded. Please check your email to verify your account and login. For enquiries you can contact us at [A]support@mega.nz[\/A]"
 }

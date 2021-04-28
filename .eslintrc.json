@@ -167,6 +167,10 @@
         "es/no-atomics": 2,
         "es/no-exponential-operators": 2,
         "es/no-promise-all-settled": "off",
+        "es/no-regexp-lookbehind-assertions": 2,
+        "es/no-regexp-named-capture-groups": 2,
+        "es/no-regexp-s-flag": 2,
+        "es/no-regexp-unicode-property-escapes": 2,
         "es/no-trailing-function-commas": 2,
 
         "jquery/no-ajax": 2,

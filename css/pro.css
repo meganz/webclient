@@ -205,13 +205,16 @@
 .provider-icon.voucher {
     background-position: 0 -3900px;
 }
-.provider-icon.ecp {
+.provider-icon.ecp,
+.provider-icon.Stripe {
     background-position: 0 -3540px;
 }
-.provider-icon.ecpVI {
+.provider-icon.ecpVI,
+.provider-icon.stripeVI {
     background-position: 0 -3360px;
 }
-.provider-icon.ecpMC {
+.provider-icon.ecpMC,
+.provider-icon.stripeMC {
     background-position: 0 -1980px;
 }
 .provider-icon.wiretransfer {

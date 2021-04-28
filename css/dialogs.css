@@ -8237,6 +8237,43 @@ a.affiliate-guide.grey-link:hover {
     font-size: 14px;
 }
 /* end of Set password dialog*/
+.fm-dialog.payment-stripe-dialog,
+.fm-dialog.payment-stripe-dialog iframe {
+    border-radius: 24px;
+    box-shadow: 0 4px 16px 0 rgb(0 0 0 / 0.1);
+    height: 550px;
+    width: 640px;
+}
+.payment-stripe-dialog .payment-success,
+.payment-stripe-dialog .payment-fail {
+    width: 640px;
+    height: 550px;
+    border-radius: 24px;
+    box-shadow: 0 4px 16px 0 rgb(0 0 0 / 0.1);
+    position: fixed;
+}
+.payment-stripe-dialog .success-head,
+.payment-stripe-dialog .fail-head {
+    margin-top: 10px;
+    font-family: 'LatoWeb', sans-serif;
+    text-align: center;
+    font-size: 20px;
+}
+
+.payment-stripe-dialog .success-desc,
+.payment-stripe-dialog .fail-desc {
+    margin-top: 20px;
+    font-family: 'LatoWeb', sans-serif;
+    margin-left: 40px;
+    margin-right: 40px;
+    font-size: 15px;
+    text-align: center;
+    line-height: 20px;
+}
+.payment-stripe-dialog .success-logo,
+.payment-stripe-dialog .fail-logo {
+    margin-top: 170px;
+}
 .fm-dialog.pro-discount {
     height: 438px;
     width: 560px;

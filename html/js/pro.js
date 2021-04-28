@@ -312,6 +312,10 @@ var pro = {
                 name: 'sabadell',
                 displayName: 'Sabadell'
             },
+            19: {
+                name: 'Stripe2',
+                displayName: ''
+            },
             999: {
                 name: 'wiretransfer',
                 displayName: l[6198]    // Wire transfer

@@ -626,6 +626,55 @@ ul, li {
     overflow: hidden;
     box-sizing:border-box;
 }
+.fm-dialog.mobile.payment-stripe-dialog {
+    width: 100%;
+    height: 100%;
+    max-width: 640px;
+    max-height: 640px;
+    margin: 0 auto;
+    right: 0;
+    bottom: 0;
+    top: 7%;
+    left: 0;
+    position: absolute;
+    border: none;
+}
+.mobile.payment-stripe-dialog .success-logo,
+.mobile.payment-stripe-dialog .fail-logo {
+    display: block;
+    margin-top: 30%;
+}
+.mobile.payment-stripe-dialog .success-head,
+.mobile.payment-stripe-dialog .fail-head {
+    margin-top: 10px;
+    font-family: 'LatoWeb', sans-serif;
+    text-align: center;
+    font-size: 20px;
+}
+.mobile.payment-stripe-dialog .success-desc,
+.mobile.payment-stripe-dialog .fail-desc {
+    margin-top: 20px;
+    font-family: 'LatoWeb', sans-serif;
+    margin-left: 40px;
+    margin-right: 40px;
+    font-size: 15px;
+    text-align: center;
+    line-height: 20px;
+}
+.mobile.payment-stripe-dialog .btn-close-dialog {
+    cursor: pointer;
+    height: 30px;
+    width: 30px;
+    background-position: -53px -4825px;
+    background-repeat: no-repeat;
+    position: absolute;
+    right: 10px;
+    top: 11px;
+    -webkit-transition: opacity 200ms ease-in-out;
+    transition: opacity 200ms ease-in-out;
+    opacity: 0.3;
+    z-index: 10;
+}
 .mobile.green-button, .mobile.default-green-button {
     background-image: linear-gradient(-180deg, #07BEB1 0%, #00BFA5 100%);
     border: 1px solid #00A58F;

@@ -2795,6 +2795,9 @@ div.checkboxOn {
     color: #666;
     cursor: pointer;
 }
+.checkbox-label.text {
+    padding-top: 2.3px;
+}
 .checkbox-label.small {
     font-size: 14px;
     line-height: 18px;
@@ -11414,6 +11417,10 @@ code, c {
 
 .mobile.password-reminder-overlay .dont-show-again-container .checkbox-container {
     display: inline-block;
+}
+
+.mobile.password-reminder-overlay .dont-show-again-container .checkboxOff {
+    margin-right: 0;
 }
 
 .mobile.password-reminder-overlay .try-password-container .signin-input {

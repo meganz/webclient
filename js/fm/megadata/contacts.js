@@ -800,7 +800,7 @@ MegaData.prototype.syncContactEmail = function(userHash, promise, forced) {
     'use strict';
     var user = userHash in this.u && this.u[userHash] || false;
 
-    if (megaChat.FORCE_EMAIL_LOADING) {
+    if (megaChatIsReady && megaChat.FORCE_EMAIL_LOADING) {
         forced = true;
     }
 

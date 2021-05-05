@@ -247,8 +247,12 @@ contrib/local_config.py
 
 # Temp language files from Babel
 lang/*
+!lang/strings.json
 !lang/*_prod.json
 lang/strings_prod.json
+
+# Transifex
+scripts/transifex.json
 
 #############
 ## Netbeans project metadata

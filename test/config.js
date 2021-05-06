@@ -53,6 +53,10 @@ function _stubMegaPromise(sinon, sandbox) {
 
 function mStub(obj, prop, value) {
     mStub.values.push([obj, prop, obj[prop]]);
+    if (obj[prop] === undefined) {
+        // Prevent e.g. TypeError: Cannot stub non-existent property ion ...
+        obj[prop] = {};
+    }
     var result = sinon.stub(obj, prop);
     mStub.inflight.push(result);
     obj[prop] = result;

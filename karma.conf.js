@@ -9,7 +9,7 @@ module.exports = function(config) {
     basePath: '',
 
     // Frameworks to use.
-    frameworks: ['mocha', 'chai', 'sinon-chai'],
+    frameworks: ['mocha', 'chai', 'sinon'],
 
     // List of files/patterns to load in the browser.
     // {included: false} files are loaded by requirejs

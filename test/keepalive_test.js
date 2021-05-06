@@ -1,7 +1,7 @@
 describe("KeepAlive test", function() {
     var clock;
     beforeEach(function () {
-        clock = sinon.useFakeTimers("Date", "setTimeout", "clearTimeout");
+        clock = sinon.useFakeTimers();
     });
 
     afterEach(function () {

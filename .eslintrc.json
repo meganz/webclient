@@ -241,7 +241,7 @@
         {
             "files": ["*.jsx"],
             "excludedFiles": "*.js",
-            "parser": "babel-eslint",
+            "parser": "@babel/eslint-parser",
             "parserOptions": {
                 "ecmaVersion": 2019,
                 "sourceType": "module"

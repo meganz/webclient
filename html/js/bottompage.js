@@ -39,9 +39,9 @@ var bottompage = {
         }
 
         // Insert variables with replaced browser names
-        if (page === 'extensions' || page === 'bird' || page === 'edge'
-            || page === 'chrome' || page === 'firefox') {
-            bottompage.replaceSpecialVariables($content);
+        if (page === 'bird') {
+            $('.top-bl .bottom-page.top-dark-button.rounded span.label', $content)
+                .safeHTML(l[20923].replace('%1', 'Thunderbird'));
         }
 
         // Init Video resizing on security page
@@ -188,28 +188,6 @@ var bottompage = {
                 }, 1600);
             }
         });
-    },
-
-    /**
-    * replaceSpecialVariable
-    * Replaces custom locale variables in HTML
-    * @param {Object} $content The jQuery selector for the current page
-    * @returns {void}
-    */
-    replaceSpecialVariables: function($content) {
-        "use strict";
-
-        var $topBlock = $('.top-bl', $content);
-        var $elems = $('.top-dark-button span, .top-copyrights em', $topBlock);
-
-        for (var i = 0; i < $elems.length; i++) {
-            var $this = $($elems[i]);
-            var labelNum = $this.text().match(/\$([^)]+)]/);
-
-            if (labelNum[1] && l[labelNum[1]]) {
-                $this.safeHTML(l[labelNum[1]]);
-            }
-        }
     },
 
     initBackToScroll: function() {

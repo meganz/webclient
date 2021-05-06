@@ -1125,16 +1125,7 @@ mBroadcaster.once('boot_done', function populate_l() {
     l[20757] = escapeHTML(l[20757]).replace('[S]', '<span>').replace('[/S]', '</span>');
     l[20759] = escapeHTML(l[20759]).replace('[B]%1[/B]', '<b>%1</b>');
     l[20923] = escapeHTML(l[20923]).replace('[S]', '<span>').replace('[/S]', '</span>');
-    l['20923c'] = l[20923].replace('%1', 'Chrome');
-    l['20923f'] = l[20923].replace('%1', 'Firefox');
-    l['20923o'] = l[20923].replace('%1', 'Opera');
-    l['20923t'] = l[20923].replace('%1', 'Thunderbird');
-    l['20923e'] = l[20923].replace('%1', 'Edge');
     l[20924] = escapeHTML(l[20924]);
-    l['20924c'] = l[20924].replace('%1', 'Chrome<sup>&reg;</sup>');
-    l['20924f'] = l[20924].replace('%1', 'Firefox<sup>&reg;</sup>');
-    l['20924o'] = l[20924].replace('%1', 'Opera<sup>&reg;</sup>');
-    l['20924e'] = l[20924].replace('%1', 'Edge<sup>&reg;</sup>');
     l[20932] = l[20932].replace('[R/]', '<sup>&reg;</sup>');
     l[20959] = l[20959].replace('[A]', '<a class="red" href="https://mega.nz/SecurityWhitepaper.pdf" '
         + 'target="_blank" rel="noopener noreferrer">')

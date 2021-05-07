@@ -16,11 +16,10 @@ Requirements:
     - Create a Transifex token and assign it to a system environment variable as `TRANSIFEX_TOKEN`
         - Note: As a fallback, we can also add a property `TOKEN` in `transifex.json`
 
-
 This script will work with both Python 2.7 as well as 3.x.
 """
 
-import copy, json, os, requests, sys, re, subprocess, time
+import copy, json, os, requests, sys, re, subprocess, time, io, random
 from threading import Thread
 from collections import OrderedDict
 from natsort import natsorted # Use version 6.2.1
@@ -108,9 +107,8 @@ def create_file(language, content, is_prod = False):
     sorted_dict = OrderedDict(sorted(content.items(), key=lambda pair:index_map[pair[0]]))
 
     filename = language + "_prod" if is_prod else language
-    file = open(os.path.dirname(os.path.abspath(__file__)) + "/../lang/" + filename + ".json", "w+")
-    file.write(json.dumps(sorted_dict, indent=4, separators=(',',": ")).replace('\r\n', '\n'))
-    file.close()
+    with io.open(os.path.dirname(os.path.abspath(__file__)) + "/../lang/" + filename + ".json", 'w+', newline='\n') as file:
+        file.write(u"{}".format(json.dumps(sorted_dict, indent=4, separators=(',',": ")) + "\n"))
 
 def prepare_english_string(resource):
     url = BASE_URL + "/resource_strings_async_downloads"
@@ -194,14 +192,16 @@ def download_languages(resource, english_only = False):
             else:
                 download_link = content['data']['links']['self']
                 for i in range(50):
-                    time.sleep(3) # This is to give Transifex some time to pre-process the data before trying to re-fetch
-                    download_response = requests.get(download_link, headers=HEADER, allow_redirects=True)
-                    download_content = download_response.json()
-                    if 'data' not in download_content:
+                    # This is to give Transifex some time to pre-process the data before trying to re-fetch
+                    time.sleep(min(4, max(1, i / 10)) + (random.randint(0, 1000) / 1000.0))
+                    download_response = requests.get(download_link, headers=HEADER, allow_redirects=False)
+                    if download_response.status_code == 303:
+                        download_content = requests.get(download_response.url, headers=HEADER).json()
                         languages[language] = download_content
                         print(language + " => Completed")
                         return
                     elif download_response.status_code != 200:
+                        download_content = download_response.json()
                         print_error(download_content['errors'])
                         return
                 print(language + " => Error: Maximum file fetch limit reached.")

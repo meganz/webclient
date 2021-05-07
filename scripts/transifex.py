@@ -16,11 +16,10 @@ Requirements:
     - Create a Transifex token and assign it to a system environment variable as `TRANSIFEX_TOKEN`
         - Note: As a fallback, we can also add a property `TOKEN` in `transifex.json`
 
-
 This script will work with both Python 2.7 as well as 3.x.
 """
 
-import copy, json, os, requests, sys, re, subprocess, time, io
+import copy, json, os, requests, sys, re, subprocess, time, io, random
 from threading import Thread
 from collections import OrderedDict
 from natsort import natsorted # Use version 6.2.1
@@ -193,7 +192,8 @@ def download_languages(resource, english_only = False):
             else:
                 download_link = content['data']['links']['self']
                 for i in range(50):
-                    time.sleep(3) # This is to give Transifex some time to pre-process the data before trying to re-fetch
+                    # This is to give Transifex some time to pre-process the data before trying to re-fetch
+                    time.sleep(min(4, max(1, i / 10)) + (random.randint(0, 1000) / 1000.0))
                     download_response = requests.get(download_link, headers=HEADER, allow_redirects=False)
                     if download_response.status_code == 303:
                         download_content = requests.get(download_response.url, headers=HEADER).json()

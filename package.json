@@ -68,7 +68,7 @@
   "devDependencies": {
     "@babel/eslint-parser": "7.13.14",
     "chai": "4.3.4",
-    "eslint": "7.25.0",
+    "eslint": "7.26.0",
     "eslint-plugin-compat": "3.9.0",
     "eslint-plugin-dollar-sign": "1.0.2",
     "eslint-plugin-es": "4.1.0",
@@ -78,7 +78,7 @@
     "eslint-plugin-optimize-regex": "1.2.0",
     "eslint-plugin-react": "7.23.2",
     "eslint-plugin-sonarjs": "0.7.0",
-    "eslint-plugin-unicorn": "31.0.0",
+    "eslint-plugin-unicorn": "32.0.0",
     "htmlhint": "0.14.2",
     "istanbul": "0.4.5",
     "jscpd": "3.3.25",

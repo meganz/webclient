@@ -243,11 +243,10 @@
             "excludedFiles": "*.js",
             "parser": "@babel/eslint-parser",
             "parserOptions": {
-                "ecmaVersion": 2019,
+                "ecmaVersion": 2021,
                 "sourceType": "module"
             },
             "extends": [
-                "plugin:es/restrict-to-es2019",
                 "plugin:react/recommended"
             ],
             "rules": {

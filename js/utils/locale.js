@@ -67,7 +67,14 @@ function translate(html) {
             console.warn('locale string %s does contain raw entity tags', localeNum, [l[localeNum]]);
         }
 
-        return String(l[localeNum]);
+        if (typeof l[localeNum] === 'string') {
+            return String(l[localeNum]);
+        }
+
+        // if the type is an object (not simple), then it's not allowed on HTML
+        console.error(`locale l[${localeNum}] is used in HTML, not a string, val= ${JSON.stringify(l[localeNum])}`);
+
+        return `not supported l[${localeNum}]`;
     };
 
     return String(html).replace(/\[\$(\d+)(?:\.(\w+))?\]/g, replacer);

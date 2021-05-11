@@ -80,7 +80,6 @@
     "eslint-plugin-sonarjs": "0.7.0",
     "eslint-plugin-unicorn": "32.0.1",
     "htmlhint": "0.14.2",
-    "istanbul": "0.4.5",
     "jscpd": "3.3.25",
     "karma": "6.3.2",
     "karma-chai": "0.1.0",

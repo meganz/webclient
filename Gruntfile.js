@@ -1,7 +1,8 @@
 var fs = require('fs');
 var fileLimit = 512*1024;
-const useHtmlMin = false;
 const usePostCSS = true;
+const usePostHTML = false;
+const rebaseURLs = false;
 
 const basename = p => p.replace(/^.*\//, '');
 
@@ -280,7 +281,7 @@ var Secureboot = function() {
         return jsl.filter(function(f) {
             return f.f.match(/html?$/);
         }).map(function(f) {
-            return useHtmlMin ? 'build/' + f.f : f.f;
+            return usePostHTML ? 'build/html/' + basename(f.f) : f.f;
         });
     };
 
@@ -386,6 +387,162 @@ console.log = function(s) {
     }
 };
 
+const [postHtmlTreeWalker, postHtmlURLRebase, postCssURLRebase] = (() => {
+    'use strict';
+    const mime = require('mime');
+    const seen = Object.create(null);
+    const xxmcache = Object.create(null);
+    const xxhash64 = require('xxhashjs').h64;
+    const cwd = process.cwd() + require('path').sep;
+    const debug = process.env.DEBUG;
+
+    const read = (path, length, offset) => {
+        const buf = Buffer.alloc(length);
+        const fd = fs.openSync(path, 'r');
+        fs.readSync(fd, buf, 0, length, offset || 0);
+        fs.closeSync(fd);
+        return buf;
+    };
+
+    const stat = path => {
+        try {
+            return fs.statSync(path);
+        }
+        catch (ex) {}
+
+        return false;
+    };
+
+    const checksum = (path, size = -0x9eef) => {
+        const file = path.replace(cwd, '').replace(/^[\\\/]+/, '').replace(/[\\\/]+/g, '/');
+
+        if (!xxmcache[file]) {
+            const xxh = xxhash64(0x9fee);
+
+            if (size === -0x9eef) {
+                xxh.update(path);
+            }
+            else if (size < 8192) {
+                xxh.update(fs.readFileSync(path));
+            }
+            else {
+                for (let len = size / 16, offset = 0, i = 4; i--;) {
+                    xxh.update(read(path, len, offset));
+                    offset += len * 5;
+                }
+            }
+
+            xxmcache[file] = xxh.digest().toString(16);
+        }
+
+        return xxmcache[file];
+    };
+
+    const report = !debug ? () => {} : (path, size, hash) => {
+        if (!seen[path]) {
+            seen[path] = 1;
+            console.info('url-rewrite: %s%s %s', (hash || 'Embedded.').padStart(20), String(size).padStart(9), path);
+        }
+    };
+
+    const rewrite = (asset, limit = 444) => {
+        const path = asset.absolutePath;
+        const size = asset.pathname && stat(path).size;
+
+        if (size) {
+
+            if (size < limit) {
+                report(path, size);
+                return 'data:' + mime.getType(path) + ';base64,' + read(path, size).toString('base64');
+            }
+
+            const v = checksum(path, size);
+
+            report(path, size, v);
+            return asset.pathname + (asset.search ? asset.search + '&' : '?') + 'v=' + v + (asset.hash || '');
+        }
+        else if (asset.pathname) {
+            report(path, '-', 'Not found.');
+        }
+
+        return asset.url;
+    };
+
+    const urlToAsset = (url) => {
+        const asset = {url, pathname: url};
+
+        if (url.includes('?') || url.includes('#')) {
+            const uri = new URL(url.replace('{staticpath}', 'https://mega.nz/'));
+            asset.hash = uri.hash;
+            asset.search = uri.search;
+            [asset.pathname] = url.split(/[?#]/);
+        }
+        asset.absolutePath = asset.pathname.replace('{staticpath}', cwd);
+
+        return asset;
+    };
+
+    const getPictureCs1 = (folder, name, extension) => {
+        const cs = [];
+        const types = ['desktop', 'mobile'];
+
+        for (let i = types.length; i--;) {
+            const type = types[i];
+
+            cs.push(rewrite(urlToAsset(`{staticpath}${folder}/${name}_${type}.${extension}`)));
+            for (let i = 2; i < 4; i++) {
+                cs.push(rewrite(urlToAsset(`{staticpath}${folder}/${name}_${type}@${i}x.${extension}`)));
+            }
+        }
+
+        return checksum(cs.join('$'));
+    };
+
+    return [
+
+        (tree) => {
+            tree.walk((node) => {
+                if (node.attrs) {
+                    if (node.tag === 'picture') {
+                        const {attrs} = node;
+
+                        if (String(attrs['data-folder']).startsWith('images/')) {
+                            const cs = getPictureCs1(attrs['data-folder'], attrs['data-name'], attrs['data-extension']);
+                            attrs['data-extension'] += '?pv=' + cs;
+                        }
+                    }
+                }
+                return node;
+            });
+        },
+
+        usePostHTML && require('posthtml-urls')({
+            filter: {
+                img: {src: true, srcset: true},
+                source: {src: true, srcset: true}
+            },
+            eachURL(url) {
+                if (!url.startsWith('{staticpath}')) {
+                    if (!url.startsWith('data:')) {
+                        console.warn(`WARNING: Unexpected Resource URL ${url}`);
+                    }
+                    return url;
+                }
+
+                return rewrite(urlToAsset(url));
+            }
+        }),
+
+        usePostCSS && require('postcss-url')({
+            url(asset) {
+                return rewrite(asset);
+            }
+        })
+    ];
+})();
+
+const ensureCallablePlugIn = array => array.filter(Boolean);
+
 module.exports = function(grunt) {
     // Project configuration.
     grunt.initConfig({
@@ -395,7 +552,7 @@ module.exports = function(grunt) {
                 safe: true,
                 failOnError: true,
                 sequential: true,
-                processors: [
+                processors: ensureCallablePlugIn([
                     require('cssnano')({
                         preset: [
                             'default', {
@@ -405,6 +562,7 @@ module.exports = function(grunt) {
                             }
                         ]
                     }),
+                    rebaseURLs && postCssURLRebase,
                     (css) => {
                         css.walk((node) => {
                             const {type} = node;
@@ -430,9 +588,19 @@ module.exports = function(grunt) {
                             }
                         });
                     }
-                ]
+                ])
             },
             dist: {expand: true, flatten: true, src: ['css/*.css', 'css/**/*.css'], dest: 'build/css/'}
+        },
+        posthtml: {
+            options: {
+                use: ensureCallablePlugIn([
+                    rebaseURLs && postHtmlURLRebase,
+                    rebaseURLs && postHtmlTreeWalker,
+                    require('htmlnano')()
+                ])
+            },
+            dist: {expand: true, flatten: true, src: ['html/*.html', 'html/**/*.html'], dest: 'build/html/'}
         },
         concat: {
             prod: {
@@ -450,18 +618,6 @@ module.exports = function(grunt) {
                     return Secureboot.getGroups(true);
                 },
             }
-        },
-        htmlmin: {
-            default_options: {
-                options: {
-                    removeComments: true,
-                    keepClosingSlash: true,
-                    collapseWhitespace: true,
-                },
-                files:[
-                     {expand: true, src: ['html/*.html', 'html/**/*.html'], dest: 'build/'},
-                ],
-            },
         },
         htmljson: {
             required: {
@@ -483,13 +639,13 @@ module.exports = function(grunt) {
 
     // Default task(s).
     var tasks = ['concat', 'htmljson', 'secureboot'];
-    if (useHtmlMin) {
-        grunt.loadNpmTasks('grunt-contrib-htmlmin');
-        tasks.unshift('htmlmin');
-    }
     if (usePostCSS) {
         grunt.loadNpmTasks('@lodder/grunt-postcss');
         tasks.unshift('postcss');
+    }
+    if (usePostHTML) {
+        grunt.loadNpmTasks('grunt-posthtml');
+        tasks.unshift('posthtml');
     }
     grunt.registerTask('secureboot', function() {
         console.log("Write secureboot.prod.js");

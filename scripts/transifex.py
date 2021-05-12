@@ -32,11 +32,16 @@ transifex_config = json.loads(content)
 BASE_URL = transifex_config['BASE_URL']
 PROJECT_ID = "o:" + transifex_config['ORGANISATION'] + ":p:" + transifex_config['PROJECT']
 RESOURCE = transifex_config['RESOURCE']
-token = os.getenv('TRANSIFEX_TOKEN')
-if not token:
-    token = transifex_config['TOKEN']
+GITLAB_DEVELOP_STRINGS_URL = transifex_config['GITLAB_DEVELOP_STRINGS_URL']
+gitlab_token = os.getenv('GITLAB_TOKEN')
+if not gitlab_token:
+    gitlab_token = transifex_config['GITLAB_TOKEN']
+GITLAB_TOKEN = gitlab_token
+transifex_token = os.getenv('TRANSIFEX_TOKEN')
+if not transifex_token:
+    transifex_token = transifex_config['TRANSIFEX_TOKEN']
 HEADER = {
-    "Authorization": "Bearer " + token,
+    "Authorization": "Bearer " + transifex_token,
     "Content-Type": "application/vnd.api+json"
 }
 
@@ -131,7 +136,7 @@ def prepare_english_string(resource):
     }
     return {'strings': {'url': url, 'payload': payload}}
 
-def prepare_translation_string(resource):
+def prepare_translation_string(resource, lang):
     language_strings = {}
     url = BASE_URL + "/projects/" + PROJECT_ID + "/languages"
     response = requests.get(url, headers=HEADER)
@@ -142,45 +147,58 @@ def prepare_translation_string(resource):
     else:
         languages = content['data']
         for language in languages:
-            url = BASE_URL + "/resource_translations_async_downloads"
-            payload = {
-                "data": {
-                    "attributes": {
-                        "content_encoding": "text",
-                        "file_type": "default",
-                        "mode": "default",
-                        "pseudo": False,
-                    },
-                    "relationships": {
-                        "language": {
-                            "data": {
-                                "id": language['id'],
-                                "type": "languages",
+            if lang == "all" or language['id'] in lang:
+                url = BASE_URL + "/resource_translations_async_downloads"
+                payload = {
+                    "data": {
+                        "attributes": {
+                            "content_encoding": "text",
+                            "file_type": "default",
+                            "mode": "default",
+                            "pseudo": False,
+                        },
+                        "relationships": {
+                            "language": {
+                                "data": {
+                                    "id": language['id'],
+                                    "type": "languages",
+                                }
+                            },
+                            "resource": {
+                                "data": {
+                                    "id": PROJECT_ID + ":r:" + resource,
+                                    "type": "resources"
+                                }
                             }
                         },
-                        "resource": {
-                            "data": {
-                                "id": PROJECT_ID + ":r:" + resource,
-                                "type": "resources"
-                            }
-                        }
-                    },
-                    "type": "resource_translations_async_downloads"
+                        "type": "resource_translations_async_downloads"
+                    }
                 }
-            }
-            language_code = language['attributes']['code']
-            language_code = REMAPPED_CODE[language_code] if language_code in REMAPPED_CODE else language_code
-            language_strings[language_code] = {'url': url, 'payload': payload}
+                language_code = language['attributes']['code']
+                language_code = REMAPPED_CODE[language_code] if language_code in REMAPPED_CODE else language_code
+                language_strings[language_code] = {'url': url, 'payload': payload}
     return language_strings
 
-def download_languages(resource, english_only = False):
+def download_languages(resource, lang = []):
     languages = {}
-    all_requests = prepare_english_string(resource)
-    if not english_only:
-        lang = prepare_translation_string(resource)
-        if not all_requests or not lang:
-            return False
-        all_requests.update(lang)
+    all_requests = {}
+    if lang:
+        lang = list(set(lang))
+        if "en" in lang:
+            all_requests.update(prepare_english_string(resource))
+            lang.remove("en")
+        for code_from, code_to in REMAPPED_CODE.items():
+            if code_to in lang:
+                index = lang.index(code_to)
+                lang[index] = code_from
+        lang = list(map(lambda code: "l:" + code, lang))
+        lang_requests = prepare_translation_string(resource, lang)
+    else:
+        all_requests = prepare_english_string(resource)
+        lang_requests = prepare_translation_string(resource, "all")
+
+    if lang_requests:
+        all_requests.update(lang_requests)
 
     def transifex_download_requests(language, request):
         response = requests.post(request['url'], headers=HEADER, data=json.dumps(request['payload']))
@@ -316,67 +334,83 @@ def string_validation(new_strings):
             print("Accepted: String with key " + key + " is valid.")
     return valid_strings
 
+def get_differences():
+    new_strings_found = {}
+    try:
+        new_file = open(os.path.dirname(os.path.abspath(__file__)) + "/../lang/strings.json", "r")
+        new_strings = json.loads(new_file.read())
+        new_file.close()
+    except IOError:
+        sys.exit("Error: File not found.")
+
+    gitlab_header = {'Private-Token': GITLAB_TOKEN}
+    current_strings = requests.get(GITLAB_DEVELOP_STRINGS_URL, headers=gitlab_header).json()
+
+    for new_key in new_strings:
+        if new_key not in current_strings or new_strings[new_key]['string'] != current_strings[new_key]['string'] or new_strings[new_key]['developer_comment'] != current_strings[new_key]['developer_comment']:
+            new_strings_found[new_key] = new_strings[new_key]
+
+    if new_strings_found:
+        print("New string(s) file found! Checking validity...")
+        if not string_validation(new_strings_found):
+            sys.exit("Error: Invalid new string(s).")
+        else:
+            print("New strings are valid! :)")
+            return new_strings_found
+    else:
+        print("No changes found in strings.json")
+        return False
+
 def main():
     print("Export Started")
     is_prod = False
-    english_only = False
+    lang = []
     branch_resource_name = None
 
     if len(sys.argv) > 1:
         arg = sys.argv[1]
         if arg == 'production':
             is_prod = True
-        elif arg == 'english_only':
-            english_only = True
-        else:
-            print("New string(s) file found! Checking validity...")
+        elif arg == 'lang':
             try:
-                if os.path.splitext(arg)[-1].lower() != '.json':
-                    raise Exception()
-                new_string_file = open(arg, "r")
-                content = new_string_file.read()
-                new_string_file.close()
-                new_strings = json.loads(content)
-                if not string_validation(new_strings):
-                    raise Exception()
-            except IOError:
-                sys.exit("Error: File not found.")
+                lang = sys.argv[2].split(",")
             except:
-                sys.exit("Error: Invalid new string(s).")
-            print("New strings are valid! :)")
+                sys.exit("Invalid language arguments")
+        elif arg == 'update':
+            new_strings = get_differences()
+            if new_strings:
+                branch_resource_name = get_branch_resource_name(True)
+                if not branch_resource_name:
+                    sys.exit()
 
-            branch_resource_name = get_branch_resource_name(True)
-            if not branch_resource_name:
-                sys.exit()
-
-            # Push new string to the branch resource file
-            print("Pushing new strings to branch resource file... ")
-            sys.stdout.flush()
-            url = BASE_URL + "/resource_strings_async_uploads"
-            payload = {
-                "data": {
-                    "attributes": {
-                        "content": json.dumps(new_strings),
-                        "content_encoding": "text",
-                    },
-                    "relationships": {
-                        "resource": {
-                            "data": {
-                                "id": PROJECT_ID + ":r:" + branch_resource_name,
-                                "type": "resources",
+                # Push new string to the branch resource file
+                print("Pushing new strings to branch resource file... ")
+                sys.stdout.flush()
+                url = BASE_URL + "/resource_strings_async_uploads"
+                payload = {
+                    "data": {
+                        "attributes": {
+                            "content": json.dumps(new_strings),
+                            "content_encoding": "text",
+                        },
+                        "relationships": {
+                            "resource": {
+                                "data": {
+                                    "id": PROJECT_ID + ":r:" + branch_resource_name,
+                                    "type": "resources",
+                                },
                             },
                         },
+                        "type": "resource_strings_async_uploads",
                     },
-                    "type": "resource_strings_async_uploads",
-                },
-            }
-            success = send_upload_request(url, payload)
-            if success:
-                print("Completed")
-            print("")
+                }
+                success = send_upload_request(url, payload)
+                if success:
+                    print("Completed")
+                print("")
 
     print("Fetching Main Language Files...")
-    lang = download_languages(RESOURCE, english_only)
+    lang = download_languages(RESOURCE, lang)
     if not lang:
         sys.exit("Failed to fetch main language files.")
 
@@ -385,15 +419,16 @@ def main():
         branch_resource_name = get_branch_resource_name()
     if not is_prod and branch_resource_name:
         print("Fetching Branch Language Files...")
-        lang_branch = download_languages(branch_resource_name, english_only)
+        lang_branch = download_languages(branch_resource_name, lang)
         if lang_branch:
             merge_language(lang, lang_branch)
         else:
             print("Failed to fetch branch language files.")
         print("")
 
-    # Copy strings to en
-    lang["en"] = copy.deepcopy(lang["strings"])
+    # Copy strings to en if lang["strings"] exists
+    if "strings" in lang:
+        lang["en"] = copy.deepcopy(lang["strings"])
 
     print("Creating Translation Files... ")
     sys.stdout.flush()

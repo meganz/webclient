@@ -52,7 +52,7 @@ _What's happening when running the script?_
 
 ##### Importing String(s)
 1. Branch-off from develop or master branch
-2. Create a JSON file (ex. newString.json) and type your new strings in this following format:
+2. Update `strings.json` with your new strings (or edit strings) in this following format:
 ```json
 {
     "string_key": {
@@ -62,7 +62,7 @@ _What's happening when running the script?_
     // to do multiple, make multiple of JSON object as above in the same file
 }
 ```
-3. Run `./scripts/lang.sh /PATH/TO/FILE/newstring.json`. When completed, it will continue to export all string including the newly imported (merging both main resource file and branch resource file)
+3. Run `./scripts/lang.sh update`. When completed, it will continue to export all string including the newly imported (merging both main resource file and branch resource file)
 4. Add screenshots for the string through Transifex's under Webclient > Context and map the string on the branch resource file
 
 What's happening when running the script?

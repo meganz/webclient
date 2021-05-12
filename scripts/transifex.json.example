@@ -1,7 +1,9 @@
 {
-    "TOKEN": "fallback if system environment variable is not set",
+    "TRANSIFEX_TOKEN": "fallback if system environment variable is not set",
+    "GITLAB_TOKEN": "fallback if system environment variable is not set",
     "BASE_URL": "https://rest.api.transifex.com",
     "ORGANISATION": "meganz-1",
     "PROJECT": "webclient-1",
-    "RESOURCE": "prod"
+    "RESOURCE": "prod",
+    "GITLAB_DEVELOP_STRINGS_URL": "https://code.developers.mega.co.nz/api/v4/projects/55/repository/files/lang%2Fstrings.json/raw?ref=develop"
 }

@@ -1489,24 +1489,26 @@ ChatdIntegration.prototype._processDecryptedMessage = function(
 };
 
 ChatdIntegration.prototype.decryptTopic = function(chatRoom) {
-    var self = this;
-    return new MegaPromise(function(resolve, reject) {
+    return new MegaPromise((resolve, reject) => {
         if (!chatRoom.protocolHandler) {
+            ChatdIntegration._waitForProtocolHandler(chatRoom, () => {
+                this.decryptTopic(chatRoom);
+            });
             return reject(false);
         }
         var parsedMessage = strongvelope._parseMessageContent(base64urldecode(chatRoom.ct));
 
         ChatdIntegration._ensureKeysAreLoaded(undefined, [parsedMessage.invitor], chatRoom.publicChatHandle)
-            .then(function() {
+            .then(() => {
                 return chatRoom.protocolHandler.decryptFrom(base64urldecode(chatRoom.ct));
             })
-            .then(function(decryptedCT) {
+            .then((decryptedCT) => {
                 chatRoom.topic = decryptedCT.payload;
                 resolve();
             })
-            .catch(function(ex) {
+            .catch((ex) => {
                 if (d) {
-                    self.logger.warn("Could not decrypt topic in root %s",
+                    this.logger.warn("Could not decrypt topic in root %s",
                         chatRoom.chatId, ex, localStorage.debugSignatureInvalid && parsedMessage);
                 }
                 reject(ex);

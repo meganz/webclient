@@ -37,27 +37,7 @@ function translate(html) {
      * @param {String} namespace The operation, if any
      * @returns {String} The localized string
      */
-    var replacer = function(match, localeNum, namespace) {
-        if (namespace) {
-            match = localeNum + '.' + namespace;
-
-            if (namespace === 'dq') {
-                // Replace double quotes to their html entities
-                l[match] = String(l[localeNum]).replace(/"/g, '&quot;');
-            }
-            else if (namespace === 'q') {
-                // Escape single quotes
-                l[match] = String(l[localeNum]).replace(/'/g, "\\'");
-            }
-            else if (namespace === 'dqq') {
-                // Both of the above
-                l[match] = String(l[localeNum]).replace(/"/g, '&quot;');
-                l[match] = String(l[match]).replace(/'/g, "\\'");
-            }
-
-            localeNum = match;
-        }
-
+    var replacer = function(match, localeNum) {
         // XXX: Seeing this warning could simply mean we forgot to replace entity tags
         //      within populate_l(), or it may indicate a worse issue where html pages
         //      are used before startMega() have finished. Also, injecting them in the
@@ -77,7 +57,7 @@ function translate(html) {
         return `not supported l[${localeNum}]`;
     };
 
-    return String(html).replace(/\[\$(\d+)(?:\.(\w+))?\]/g, replacer);
+    return String(html).replace(/\[\$(\w+)]/g, replacer);
 }
 
 /**

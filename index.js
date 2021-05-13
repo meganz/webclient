@@ -1284,6 +1284,11 @@ function init_page() {
                     loadSubPage('fm');
                 });
         }
+        else if (is_mobile) {
+            login_next = 'wiretransfer';
+            loadSubPage('login');
+
+        }
         else {
             mega.ui.showLoginRequiredDialog({
                 minUserType: 3,

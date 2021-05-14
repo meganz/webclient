@@ -155,7 +155,7 @@ def get_current_branch():
     return CURRENT_BRANCH
 
 def get_commits_in_branch(current_branch=None):
-    protected_branches = ['master', 'develop', 'old-design']
+    protected_branches = ['master', 'develop', 'webclient-v2', 'webclient-v3']
 
     if current_branch is None:
         current_branch = get_current_branch()

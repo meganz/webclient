@@ -1,7 +1,6 @@
 *.xpi
 *.crx
 
-
 #################
 ## Eclipse
 #################
@@ -224,9 +223,14 @@ jscpd-report.xml
 .eslintcache
 .coverage
 .tox
-js/tests/coverage
-test/phantomjs-storage
-#test/selenium
+js/mega-[0-9]*.js
+css/mega-[0-9]*.css
+js/chat-group[0-9]*.js
+css/chat-group[0-9]*.css
+secureboot.prod.js
+html/templates.json
+css/*-postbuild.css
+html/*-postbuild.html
 
 #############
 ## Miscellaneous

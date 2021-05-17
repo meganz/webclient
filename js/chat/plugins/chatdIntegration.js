@@ -1492,9 +1492,9 @@ ChatdIntegration.prototype.decryptTopic = function(chatRoom) {
     return new MegaPromise((resolve, reject) => {
         if (!chatRoom.protocolHandler) {
             ChatdIntegration._waitForProtocolHandler(chatRoom, () => {
-                this.decryptTopic(chatRoom);
+                this.decryptTopic(chatRoom).then(resolve).catch(reject);
             });
-            return reject(false);
+            return;
         }
         var parsedMessage = strongvelope._parseMessageContent(base64urldecode(chatRoom.ct));
 

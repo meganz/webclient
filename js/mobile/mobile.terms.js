@@ -12,6 +12,10 @@ mobile.terms = {
 
         var $termsScreen = $('.mobile.terms-of-service');
 
+        // variables which declare specific classes needed to init scroll button
+        var topBlock = '.index-table';
+        var blockEndScroll = '.mobile .content';
+
         // Show the TOS page
         $termsScreen.removeClass('hidden');
 
@@ -20,5 +24,6 @@ mobile.terms = {
 
         // Init Mega (M) icon
         mobile.initHeaderMegaIcon();
+        mobile.initButtonScroll($termsScreen, topBlock, blockEndScroll);
     }
 };

@@ -1078,6 +1078,9 @@ ul, li {
     max-height: calc(100vh - 126px);
     -webkit-overflow-scrolling: touch;
 }
+.terms-of-service .fm-scrolling {
+    overflow: visible;
+}
 .bottom-pages .fm-scrolling {
     max-height: none;
 }
@@ -5180,18 +5183,10 @@ div.checkboxOn {
 }
 .mobile.context-menu-container.hidden {
     display: block !important;
-    bottom: -100%;
     overflow: hidden;
-    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
-    -moz-opacity: 0;
-    -khtml-opacity: 0;
     opacity: 0;
-    -webkit-transition: opacity 200ms ease-in-out, bottom 200ms ease-in-out;
-    -moz-transition: opacity 200ms ease-in-out, bottom 200ms ease-in-out;
-    -o-transition: opacity 200ms ease-in-out, bottom 200ms ease-in-out;
-    -ms-transition: opacity 200ms ease-in-out, bottom 200ms ease-in-out;
-    transition: opacity 200ms ease-in-out, bottom 200ms ease-in-out;
-    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
+    transition: opacity 200ms ease-in-out, transform 200ms ease-in-out;
+    transform: translateY(calc(100% + 8px));
 }
 .mobile.context-menu-container {
     background: #fff;
@@ -13736,7 +13731,41 @@ body.landscape .upload-overlay .mobile.filetype-img {
         background-size: 280px auto;
     }
 }
-
+.mobile-scroll-button.scroll-to-top {
+    width: 52px;
+    height: 52px;
+    right: 50px;
+    margin: 0;
+    position: fixed;
+    bottom: 60px;
+    z-index: 10;
+    -moz-border-radius: 100%;
+    -webkit-border-radius: 100%;
+    border-radius: 100%;
+    background-color: #CECECE;
+    background-image: url(../images/mega/startpage-sprite.png);
+    background-position: -214px -688px;
+    cursor: pointer;
+    -webkit-transition: background-color 200ms ease-in-out, opacity 200ms ease-in-out;
+    transition: background-color 200ms ease-in-out, opacity 200ms ease-in-out;
+    opacity: 0;
+}
+.start-animation .mobile-scroll-button.scroll-to-top {
+    opacity: 1;
+}
+.mobile-scroll-button.scroll-to-top.up {
+    background-position: -214px -601px;
+}
+.mobile .mobile-scroll-button.scroll-to-top {
+    bottom: 30px;
+    right: 30px;
+}
+.mobile-scroll-button.scroll-to-top:hover {
+    background-color: #A1A1A1;
+}
+.last-updated-date {
+    margin-bottom: 40px;
+}
 /*
  * Retina Sprite for mobile Ends
  * Please no more new styling after this.

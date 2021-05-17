@@ -77,7 +77,7 @@ pkg-upgrade:
 
 clean:
 	rm -rf doc/api/ coverage/ build/ test-results.xml jscpd-report.xml test/phantomjs-storage dont-deploy/ui/out/
-	rm -f css/*-group*.css js/*-group*.js js/mega-*.js css/mega-*.css node_modules/banner-*.js html/templates.json secureboot.prod.js
+	rm -f css/*-group*.css css/*-postbuild.*  html/*-postbuild.* js/*-group*.js js/mega-*.js css/mega-*.css node_modules/banner-*.js html/templates.json secureboot.prod.js
 
 clean-all: clean
 	rm -f $(BUILD_DEP_ALL)

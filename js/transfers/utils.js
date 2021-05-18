@@ -10,10 +10,6 @@ function setTransferStatus(dl, status, ethrow, lock, fatalError) {
     var id = dl && dlmanager.getGID(dl);
     var text = '' + status;
 
-    if (text.length > 56) {
-        text = text.substr(0, 56) + "\u2026";
-    }
-
     if (ethrow) {
         fatalError = true;
     }
@@ -41,7 +37,7 @@ function setTransferStatus(dl, status, ethrow, lock, fatalError) {
 
         if (fatalError) {
             $('.mid-pause', $dlTopBar).addClass('hidden');
-            $('.default-white-button', $dlMainTNfo).addClass('hidden');
+            $('.mega-button', $dlMainTNfo).addClass('hidden');
             dlmanager.setBrowserWarningClasses('.download.warning-block', 0, status);
         }
     }

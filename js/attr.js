@@ -1194,9 +1194,6 @@
             mega.attr.get(userHandle, 'clv', -2, 0, function(res, ctx) {
                 u_attr[ctx.ua] = res;
 
-                if (fminitialized && $.dialog === 'qr-dialog') {
-                    openAccessQRDialog();
-                }
                 if (fminitialized && page === 'fm/account') {
                     accountUI.account.qrcode.render(M.account, res);
                 }
@@ -1240,6 +1237,17 @@
         };
         uaPacketParserHandler['^!afficon'] = function() {
             u_attr['^!afficon'] = 1;
+        };
+        uaPacketParserHandler['^!webtheme'] = function(userHandle) {
+
+            mega.attr.get(userHandle, 'webtheme', -2, 1, function(res, ctx) {
+
+                u_attr[ctx.ua] = res;
+
+                if (!is_mobile && is_fm()) {
+                    mega.ui.theme.set(res | 0);
+                }
+            });
         };
 
         uaPacketParserHandler['^!ps'] = function(userHandle) {
@@ -1314,16 +1322,14 @@
         };
         cacheValue.last = false;
 
-        var notify = function() {
-            for (var i = notify.queue.length; i--;) {
-                notify.queue[i](cacheValue.last);
-            }
-        };
-        notify.queue = [];
-
         var factory = {
+            notify: function() {
+                for (var i = this.notify.queue.length; i--;) {
+                    this.notify.queue[i](cacheValue.last);
+                }
+            },
             change: function(callback) {
-                notify.queue.push(tryCatch(callback));
+                this.notify.queue.push(tryCatch(callback));
                 return this;
             },
             remove: function() {
@@ -1371,6 +1377,8 @@
             })
         };
 
+        factory.notify.queue = [];
+
         if (uaPacketParserHandler[key]) {
             return log.warn('exists');
         }
@@ -1381,7 +1389,7 @@
                 if (typeof u_attr === 'object') {
                     delete u_attr[key];
                 }
-                factory.get(true).always(notify);
+                factory.get(true).always(factory.notify);
             }
         };
 
@@ -1436,7 +1444,7 @@
 
         // Initialization logic, invoke just once when needed.
         ns.init = function() {
-            factory.get().then(onchange).catch(function() {
+            factory.get().then(factory.notify.bind(factory)).catch(function() {
                 // attribute not set, lookup for a legacy folder node
                 var keys = Object.keys(M.c[M.RootID] || {});
 
@@ -1486,6 +1494,12 @@
         // Store folder handle.
         ns.set = function(handle) {
             return handle === Object(M[attribute]).h ? Promise.resolve(EEXIST) : factory.set(handle);
+        };
+
+        // Get notified about changes.
+        ns.change = function(cb) {
+            factory.change(cb);
+            return this;
         };
 
         Object.defineProperty(ns, 'name', {

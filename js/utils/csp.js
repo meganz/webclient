@@ -107,7 +107,7 @@ lazy(self, 'csp', function() {
             const hideBlocks = () => qsa('.content-block', e => e.classList.remove('active'));
 
             const forEachCell = (cb, p = '') => qsa('.settings-cell' + p, cell => {
-                const toggle = cell.querySelector('.dialog-feature-toggle');
+                const toggle = cell.querySelector('.mega-switch');
 
                 if (toggle) {
                     const row = cell.parentNode;
@@ -120,14 +120,15 @@ lazy(self, 'csp', function() {
             const showBlock = (step) => {
                 const qsa = (sel, cb) => step.querySelectorAll(sel).forEach(cb);
                 const all = (sel = '.current') => {
-                    sel += ' .dialog-feature-toggle:not(.all)';
+                    sel += ' .mega-switch:not(.all)';
                     const total = step.querySelectorAll(sel).length;
 
                     if (total) {
                         const active = step.querySelectorAll(sel + '.toggle-on').length;
 
-                        step.querySelector(sel.split(':')[0] + '.all')
-                            .classList[total === active ? 'add' : 'remove']('toggle-on');
+                        const toggleSwitch = step.querySelector(sel.split(':')[0] + '.all');
+                        toggleSwitch.classList[total === active ? 'add' : 'remove']('toggle-on');
+                        toggleSwitch.setAttribute('aria-checked', total === active ? 'true' : 'false');
                     }
                 };
 
@@ -201,17 +202,18 @@ lazy(self, 'csp', function() {
                     }
                 }
 
-                $('.dialog-feature-toggle', step).rebind('mousedown.toggle', function() {
+                $('.mega-switch', step).rebind('mousedown.toggle', function() {
                     if (!this.classList.contains('disabled')) {
 
                         if (this.classList.contains('all')) {
-                            const op = this.classList.contains('toggle-on') ? 'remove' : 'add';
+                            const setOn = !this.classList.contains('toggle-on');
 
                             qsa('.settings-cell.current', cell => {
-                                const toggle = cell.querySelector('.dialog-feature-toggle');
+                                const toggle = cell.querySelector('.mega-switch');
 
                                 if (!toggle.classList.contains('disabled')) {
-                                    toggle.classList[op]('toggle-on');
+                                    toggle.classList[setOn ? 'add' : 'remove']('toggle-on');
+                                    toggle.setAttribute('aria-checked', setOn ? 'true' : 'false');
                                 }
                             });
                         }

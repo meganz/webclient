@@ -50,37 +50,6 @@ function deleteScrollPanel(from, data) {
     }
 }
 
-function initAccountScroll(scroll) {
-
-    "use strict";
-
-    $('.fm-account-main:visible').jScrollPane({
-        enableKeyboardNavigation: false, showArrows: true, arrowSize: 5, animateScroll: true
-    });
-    jScrollFade('.fm-account-main:visible');
-    if (scroll) {
-        var jsp = $('.fm-account-main:visible').data('jsp');
-        if (jsp) {
-            jsp.scrollToBottom();
-        }
-    }
-}
-
-function initAffiliateScroll(scroll) {
-
-    "use strict";
-
-    $('.fm-affiliate.body:visible').jScrollPane({
-        enableKeyboardNavigation: false, showArrows: true, arrowSize: 5, animateScroll: true
-    });
-    jScrollFade('.fm-affiliate.body:visible');
-    if (scroll) {
-        var jsp = $('.fm-affiliate.body:visible').data('jsp');
-        if (jsp) {
-            jsp.scrollToBottom();
-        }
-    }
-}
 
 function initGridScrolling() {
     $('.grid-scrolling-table:visible')
@@ -197,25 +166,6 @@ function initTransferScroll() {
         verticalDragMinHeight: 20
     });
     jScrollFade('.transfer-scrolling-table');
-}
-
-function initTreeScroll() {
-    if (d) {
-        console.time('treeScroll');
-    }
-
-    $('.fm-tree-panel:not(.manual-tree-panel-scroll-management)').jScrollPane({
-        enableKeyboardNavigation: false,
-        showArrows: true,
-        arrowSize: 5,
-        animateScroll: true
-    });
-
-    jScrollFade('.fm-tree-panel:not(.manual-tree-panel-scroll-management)');
-
-    if (d) {
-        console.timeEnd('treeScroll');
-    }
 }
 
 function dialogScroll(s) {

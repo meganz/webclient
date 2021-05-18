@@ -74,7 +74,7 @@
         $('.video-call', self.$dialog).rebind('mouseup.IncomingCallDialog', function() {
             answerVideoFn();
         });
-        $('.fm-dialog-close', self.$dialog).rebind('mouseup.IncomingCallDialog', function() {
+        $('button.js-close', self.$dialog).rebind('mouseup.IncomingCallDialog', function() {
             self.hide();
         });
 
@@ -92,14 +92,14 @@
 
         if (isGroupCall) {
             $('.video-call', self.$dialog).hide();
-            $('.incoming-call-txt, .icoming-call-header', self.$dialog).text(
+            $('.incoming-call-txt, .incoming-call-header', self.$dialog).text(
                 l[19995] || 'Incoming group call...'
             );
             self.$dialog.addClass('group-call');
         }
         else {
             $('.video-call', self.$dialog).show();
-            $('.incoming-call-txt, .icoming-call-header', self.$dialog).text(
+            $('.incoming-call-txt, .incoming-call-header', self.$dialog).text(
                 (l[17878] || "Incoming call") + '...'
             );
             self.$dialog.removeClass('group-call');
@@ -151,7 +151,7 @@
         var self = this;
         self.$dialog = $(IncomingCallDialog.DIALOG_TEMPLATE);
 
-        $(document.body).append(self.$dialog);
+        $('.mega-dialog-container', document.body).append(self.$dialog);
     };
 
 
@@ -172,25 +172,37 @@
      *
      * @type {string}
      */
-    IncomingCallDialog.DIALOG_TEMPLATE = '<div class="fm-dialog incoming-call-dialog hidden">\n' +
-        '<div class="fm-dialog-close"></div>\n' +
-        '<div class="icoming-call-header"></div>\n' +
-        '<div class="incoming-call-avatar">\n' +
-        '       <div class="incoming-call-shadow-bl"></div>\n' +
-        '       <div class="incoming-call-avatar-bl"></div>\n' +
-        '</div>\n' +
-        '<div class="incoming-call-username">\n' +
-		  '<span class="incoming-contact-info">\n' +
-            '<span class="incoming-call-name"></span>\n' +
-            '<span class="incoming-call-txt"></span>\n' +
-          '</span>\n' +
-        '</div>\n' +
-        '<div class="incoming-call-buttons">\n' +
-        '  <div class="icoming-call-button cancel-call"></div>\n' +
-		'  <div class="icoming-call-button video-call"></div>\n' +
-        '  <div class="icoming-call-button audio-call"></div>\n' +
-        '</div>\n' +
-    '</div>';
+    IncomingCallDialog.DIALOG_TEMPLATE =
+        `<div class="mega-dialog dialog-template-main incoming-call-dialog hidden"
+              aria-labelledby="incoming-call-dialog-title"
+              role="dialog"
+              aria-modal="true">
+            <button class="close js-close" aria-label="[$148]">
+                <i class="sprite-fm-mono icon-dialog-close"></i>
+            </button>
+            <header>
+                <h2 class="incoming-call-header" id="incoming-call-dialog-title"></h2>
+            </header>
+            <section class="content">
+                <div class="content-block dialog-bottom">
+                    <div class="incoming-call-avatar">
+                        <div class="incoming-call-shadow-bl"></div>
+                        <div class="incoming-call-avatar-bl"></div>
+                    </div>
+                    <div class="incoming-call-username">
+                    <span class="incoming-contact-info">
+                        <span class="incoming-call-name"></span>
+                        <span class="incoming-call-txt"></span>
+                    </span>
+                    </div>
+                        <div class="incoming-call-buttons">
+                        <div class="incoming-call-button cancel-call"></div>
+                        <div class="incoming-call-button video-call"></div>
+                        <div class="incoming-call-button audio-call"></div>
+                    </div>
+                </div>
+            </section>
+        </div>`;
 
     // export
     scope.mega = scope.mega || {};

@@ -422,10 +422,8 @@
     position: relative;
 }
 .pages-menu.link span {
-    font-family: 'LatoWebBold', Arial;
-    font-size: 14px;
-    line-height: 24px;
-    color: #373737;
+    font: var(--text-body1-bold);
+    color: var(--text-color-high);
     display: block;
     padding: 11px 40px 11px 20px;
 }
@@ -434,15 +432,13 @@
     position: absolute;
     top: 12px;
     right: 17px;
-    opacity: 0.4;
-    -webkit-transition: transform 200ms ease-in-out;
     transition: transform 200ms ease-in-out;
+    transform: rotate(-90deg);
+    --icon-size: 22px;
+    --mask-color: var(--icon-active);
 }
 .pages-menu.link.active i {
-    -moz-transform: rotate(90deg);
-    -o-transform: rotate(90deg);
-    -ms-transform: rotate(90deg);
-    transform: rotate(90deg);
+    transform: rotate(0deg);
 }
 .pages-menu.submenu {
     overflow: hidden;
@@ -480,11 +476,9 @@
 }
 .pages-menu.submenu-link span {
     display: block;
-    padding: 3px 0 3px 45px;
-    font-family: 'LatoWeb', Arial;
-    font-size: 14px;
-    line-height: 24px;
-    color: #373737;
+    padding: 5px 0 3px 45px;
+    font: var(--text-body1);
+    color: var(--text-color-high);
     text-align: left;
 }
 .menus-sprite.rounded.sync {
@@ -553,11 +547,9 @@
     display: inline-block;
     vertical-align: top;
     margin-top: 23px;
-    -webkit-transform: rotate(90deg);
-    -moz-transform: rotate(90deg);
-    -o-transform: rotate(90deg);
-    -ms-transform: rotate(90deg);
     transform: rotate(90deg);
+    --icon-size: 24px;
+    --mask-color: var(--icon-active);
 }
 .mobile.pages-menu-dropdown.active i {
     background-position: -195px -285px;
@@ -600,7 +592,7 @@
 
 /*menus-sprite */
 .menus-sprite, i.menus-sprite {
-    background-image: url(../images/mobile/mobile-menus-sprite_v1.png);
+    background-image: url(../images/mobile/mobile-menus-sprite.png);
     background-repeat: no-repeat;
 }
 
@@ -609,7 +601,7 @@
     .menus-sprite,
     i.menus-sprite
     {
-        background-image: url(../images/mobile/mobile-menus-sprite_v1@2x.png);
+        background-image: url(../images/mobile/mobile-menus-sprite@2x.png);
         background-size: 221px auto;
     }
 }

@@ -247,84 +247,6 @@ mega.achievem.enabled = function achievementsEnabled() {
 mega.achievem.achStatus = Object.create(null);
 
 /**
- * Show achievement dialog
- * @param {String} title achievement title
- * @param {String} close dialog parameter
- */
-mega.achievem.achievementDialog = function achievementDialog(title, close) {
-    var headerTxt, descriptionTxt, storageSpace, transferQuota, monthNumber;
-    var $dialog = $('.fm-dialog.achievement-dialog')
-    if (close) {
-        closeDialog();
-        return true;
-    }
-    M.safeShowDialog('achievement', $dialog);
-
-    $('.achievement-dialog .button.continue,.achievement-dialog .fm-dialog-close').rebind('click', function() {
-        mega.achievem.achievementDialog(title, 1);
-    });
-    switch (title) {
-        case 'create-account':
-            headerTxt = 'Create an account in MEGA';
-            storageSpace = '10 GB';
-            monthNumber = 1;
-            break;
-        case 'install-megasync':
-            headerTxt = 'Install MEGAsync';
-            storageSpace = '20 GB';
-            transferQuota = '20 GB';
-            monthNumber = 2;
-            break;
-        case 'install-mobile-app':
-            headerTxt = 'Install a mobile app';
-            storageSpace = '20 GB';
-            transferQuota = '20 GB';
-            monthNumber = 2;
-            break;
-        case 'read-intro':
-            headerTxt = 'Read our introduction';
-            storageSpace = '20 GB';
-            transferQuota = '20 GB';
-            monthNumber = 2;
-            break;
-        case 'invite-friend':
-            headerTxt = 'Invite a friend to MEGA';
-            storageSpace = '20 GB';
-            transferQuota = '20 GB';
-            monthNumber = 2;
-            break;
-        case 'verify-number':
-            headerTxt = 'Verify your mobile number';
-            storageSpace = '20 GB';
-            transferQuota = '20 GB';
-            monthNumber = 2;
-            break;
-        case 'start-chat':
-            headerTxt = 'Start a group chat';
-            storageSpace = '20 GB';
-            transferQuota = '20 GB';
-            monthNumber = 2;
-            break;
-        case 'share-folder':
-            headerTxt = 'Share a folder';
-            storageSpace = '20 GB';
-            transferQuota = '20 GB';
-            monthNumber = 2;
-            break;
-    }
-    $dialog.find('.fm-dialog-title').text(headerTxt);
-    $dialog.find('.storage .reward-txt span').text(storageSpace);
-    if (transferQuota) {
-        $dialog.find('.bandwidth .reward-txt span').removeClass('hidden').text(transferQuota);
-    }
-    else {
-        $dialog.find('.bandwidth .reward-txt span').addClass('hidden');
-    }
-    $dialog.find('.achievement-dialog.expires-txt span').text(monthNumber);
-    $dialog.attr('class', 'fm-dialog achievement-dialog ' + title);
-};
-
-/**
  * Show achievements list dialog
  * @param {Function} [onDialogClosed] function to invoke when the [x] is clicked
  */
@@ -344,9 +266,9 @@ mega.achievem.achievementsListDialog = function achievementsListDialog(onDialogC
         });
         return true;
     }
-    var $dialog = $('.fm-dialog.achievements-list-dialog');
+    var $dialog = $('.mega-dialog.achievements-list-dialog');
 
-    $dialog.find('.fm-dialog-close')
+    $('button.js-close', $dialog)
         .rebind('click', function() {
             if (onDialogClosed) {
                 onIdle(onDialogClosed);
@@ -387,16 +309,21 @@ mega.achievem.achievementsListDialog = function achievementsListDialog(onDialogC
                 if (!$cell.hasClass('localized')) {
                     $cell.addClass('localized');
 
-                    var $desc = $cell.find('.achi-content-txt');
-                    var text = String($desc.text()).trim().replace('[%3]', '%3');
-
-                    if (!data[1]) {
-                        // one-reward
-                        $desc.safeHTML('%n', text, bytesToSize(data[0], 0), data.expiry.value);
-                    }
-                    else {
-                        $desc.safeHTML('%n', text, bytesToSize(data[0], 0),
-                            bytesToSize(data[1], 0), data.expiry.value);
+                    const $desc = $('.achi-content-txt', $cell);
+                    if ($desc.length) {
+                        const text = String($desc.text()).trim().replace('[%3]', '%3');
+                        if (data[1]){
+                            $desc.safeHTML(
+                                '%n',
+                                text,
+                                bytesToSize(data[0], 0),
+                                bytesToSize(data[1], 0),
+                                data.expiry.value);
+                        }
+                        else {
+                            // one-reward
+                            $desc.safeHTML('%n', text, bytesToSize(data[0], 0), data.expiry.value);
+                        }
                     }
                 }
 
@@ -408,7 +335,7 @@ mega.achievem.achievementsListDialog = function achievementsListDialog(onDialogC
                     }
                 }
                 else if (data.rwd) {
-                    locFmt = l[16336].replace('[S]', '<span>').replace('[/S]', '</span>');
+                    locFmt = l[16336].replace(/[()]/g, '').replace('[S]', '<span>').replace('[/S]', '</span>');
 
                     totalStorage += data[0];
                     totalTransfer += data[1];
@@ -422,12 +349,17 @@ mega.achievem.achievementsListDialog = function achievementsListDialog(onDialogC
                         locFmt = l[1664];
                         totalStorage -= data[0];
                         totalTransfer -= data[1];
+                        $('.expires-txt', $cell).addClass('error');
+                        $cell.addClass('expired');
                     }
 
                     if (idx !== ach.ACH_INVITE) {
                         $cell.addClass('achieved');
 
-                        $('.expires-txt', $cell).addClass('red').safeHTML('%n', locFmt, data.rwd.left, l[16290]);
+                        $('.expires-txt', $cell).safeHTML('%n', locFmt, data.rwd.left, l[16290]);
+                        if (!$('.expires-txt', $cell).hasClass('error')) {
+                            $('.expires-txt', $cell).addClass('info');
+                        }
 
                         locFmt = '';
                         switch (idx) {
@@ -444,13 +376,14 @@ mega.achievem.achievementsListDialog = function achievementsListDialog(onDialogC
                         );
                 }
                 else {
-                    locFmt = l[16291].replace('[S]', '<span>').replace('[/S]', '</span>');
+                    locFmt = l[16291].replace(/[()]/g, '').replace('[S]', '<span>').replace('[/S]', '</span>');
                     $('.expires-txt', $cell)
-                        .removeClass('red')
+                        .removeClass('error')
                         .safeHTML('%n', locFmt, data.expiry.value, data.expiry.utxt);
+                    $cell.removeClass('expired');
                 }
 
-                ach.bind.call($('.default-green-button', $cell), ach.mapToAction[idx]);
+                ach.bind.call($('.mega-button.positive', $cell), ach.mapToAction[idx]);
                 $cell.removeClass('hidden');
 
                 // If this is the SMS achievement, and SMS achievements are not enabled yet, hide the container
@@ -491,9 +424,11 @@ mega.achievem.achievementsListDialog = function achievementsListDialog(onDialogC
         if ($dialog.outerHeight() > bodyHeight) {
             $scrollBlock.css('max-height', bodyHeight - 60);
             $scrollBlock.jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5});
+            $scrollBlock.data('jsp').scrollTo(0, 0);
         }
         else if ($contentBlock.outerHeight() > 666) {
             $scrollBlock.jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5});
+            $scrollBlock.data('jsp').scrollTo(0, 0);
         }
         else {
             deleteScrollPanel($scrollBlock, 'jsp');
@@ -514,14 +449,17 @@ mega.achievem.achievementsListDialog = function achievementsListDialog(onDialogC
  * @param {String} close dialog parameter
  */
 mega.achievem.inviteFriendDialog = function inviteFriendDialog(close) {
-    var $dialog = $('.fm-dialog.invite-dialog');
+    var $dialog = $('.mega-dialog.invite-dialog');
 
     if (close) {
         showLoseChangesWarning().done(closeDialog);
         return true;
     }
 
-    $dialog.find('.fm-dialog-close').rebind('click', mega.achievem.inviteFriendDialog);
+    $('button.js-close', $dialog).rebind('click', mega.achievem.inviteFriendDialog);
+    $('button.how-it-works', $dialog).rebind('click', () => {
+        $('.how-it-works, .how-it-works-body', $dialog).toggleClass('closed');
+    });
 
     var ach = mega.achievem;
     var maf = M.maf;
@@ -533,15 +471,15 @@ mega.achievem.inviteFriendDialog = function inviteFriendDialog(close) {
     $('.info-body p:first', $dialog).safeHTML(l[16317].replace('[S]', '<strong>').replace('[/S]', '</strong>'));
 
     // Remove all previously added emails
-    $('.fm-dialog.invite-dialog .share-added-contact.token-input-token-invite').remove();
+    $('.share-added-contact.token-input-token-invite', $dialog).remove();
 
     // Remove success dialog look
-    $('.fm-dialog.invite-dialog').removeClass('success');
+    $dialog.removeClass('success');
 
     // Default buttons states
-    $('.button.back', $dialog).addClass('hidden');
-    $('.button.send', $dialog).removeClass('hidden').addClass('disabled');
-    $('.button.status', $dialog).addClass('hidden');
+    $('button.back', $dialog).addClass('hidden');
+    $('button.send', $dialog).removeClass('hidden').addClass('disabled');
+    $('button.status', $dialog).addClass('hidden');
 
     // Show dialog
     M.safeShowDialog('invite-friend', function() {
@@ -571,7 +509,7 @@ mega.achievem.inviteFriendDialog = function inviteFriendDialog(close) {
 
     // Show "Invitation Status" button if invitations were sent before
     if (maf && maf.rwd && 0) {
-        $('.default-white-button.inline.status', $dialog)
+        $('button.status', $dialog)
             .removeClass('hidden')
             .rebind('click', function() {
                 closeDialog();
@@ -579,7 +517,7 @@ mega.achievem.inviteFriendDialog = function inviteFriendDialog(close) {
             });
     }
     else {
-        $('.default-white-button.inline.status', $dialog).addClass('hidden');
+        $('button.status', $dialog).addClass('hidden');
     }
 };
 
@@ -596,18 +534,10 @@ mega.achievem.smsVerifyDialog = function () {
 mega.achievem.initInviteDialogMultiInputPlugin = function initInviteDialogMultiInputPlugin() {
 
     // Init textarea logic
-    var $dialog = $('.fm-dialog.invite-dialog');
+    var $dialog = $('.mega-dialog.invite-dialog');
     var $this = $('.achievement-dialog.multiple-input.emails input');
-    var $inputWrapper = $('.achievement-dialog.multiple-input');
-    var $sendButton = $dialog.find('.default-grey-button.send');
     var contacts = M.getContactsEMails();
     var errorTimer = null;
-
-    // $dialog.position({
-    //     'my': 'center center',
-    //     'at': 'center center',
-    //     'of': $(window)
-    // });
 
     $this.tokenInput(contacts, {
         theme: "invite",
@@ -665,13 +595,13 @@ mega.achievem.initInviteDialogMultiInputPlugin = function initInviteDialogMultiI
 
                 if (isValidEmail(value)) {
                     resetInfoText(0);
-                    $('.default-grey-button.send', $dialog).removeClass('disabled');
+                    $('button.send', $dialog).removeClass('disabled');
                 }
                 else if ($wrapper.find('.share-added-contact').length > 0 || emailList.length > 1) {
-                    $('.default-grey-button.send', $dialog).removeClass('disabled');
+                    $('button.send', $dialog).removeClass('disabled');
                 }
                 else {
-                    $('.default-grey-button.send', $dialog).addClass('disabled');
+                    $('button.send', $dialog).addClass('disabled');
                 }
             });
             resetInfoText(0);
@@ -680,13 +610,7 @@ mega.achievem.initInviteDialogMultiInputPlugin = function initInviteDialogMultiI
             }, 0);
         },
         onAdd: function() {
-            $('.invite-dialog .default-grey-button.send', $dialog).removeClass('disabled');
-
-            $dialog.position({
-                'my': 'center center',
-                'at': 'center center',
-                'of': $(window)
-            });
+            $('.invite-dialog button.send', $dialog).removeClass('disabled');
 
             resetInfoText(0);
         },
@@ -701,17 +625,11 @@ mega.achievem.initInviteDialogMultiInputPlugin = function initInviteDialogMultiI
 
             // Get number of emails
             if (itemNum === 0) {
-                $('.default-grey-button.send', $inviteDialog).addClass('disabled');
+                $('button.send', $inviteDialog).addClass('disabled');
             }
             else {
-                $('.default-grey-button.send', $inviteDialog).removeClass('disabled');
+                $('button.send', $inviteDialog).removeClass('disabled');
             }
-
-            $dialog.position({
-                'my': 'center center',
-                'at': 'center center',
-                'of': $(window)
-            });
         }
     });
 
@@ -738,14 +656,14 @@ mega.achievem.initInviteDialogMultiInputPlugin = function initInviteDialogMultiI
     }
 
     // Invite dialog back button click event handler
-    $('.fm-dialog.invite-dialog .button.back').rebind('click', function() {
-        var $dialog = $('.fm-dialog.invite-dialog');
+    $('.mega-dialog.invite-dialog button.back').rebind('click', function() {
+        var $dialog = $('.mega-dialog.invite-dialog');
 
         // Remove all previously added emails
         $('.share-added-contact.token-input-token-invite', $dialog).remove();
 
         // Disable Send button
-        $('.button.send', $dialog).addClass('disabled');
+        $('button.send', $dialog).addClass('disabled');
 
         initTokenInputsScroll($('.multiple-input', $dialog));
         Soon(function() {
@@ -753,16 +671,10 @@ mega.achievem.initInviteDialogMultiInputPlugin = function initInviteDialogMultiI
         });
 
         $dialog.removeClass('success');
-
-        $dialog.position({
-            'my': 'center center',
-            'at': 'center center',
-            'of': $(window)
-        });
     });
 
     // Invite dialog send button click event handler
-    $('.fm-dialog.invite-dialog .button.send').rebind('click', function() {
+    $('.mega-dialog.invite-dialog button.send').rebind('click', function() {
         'use strict';
 
         // Text message
@@ -794,9 +706,9 @@ mega.achievem.initInviteDialogMultiInputPlugin = function initInviteDialogMultiI
             });
 
             if (!error) {
-                $('.fm-dialog.invite-dialog').addClass('success');
-                $('.fm-dialog.invite-dialog button.back').removeClass('hidden');
-                $('.fm-dialog.invite-dialog .share-added-contact.token-input-token-invite').remove();
+                $('.mega-dialog.invite-dialog').addClass('success');
+                $('.mega-dialog.invite-dialog button.back').removeClass('hidden');
+                $('.mega-dialog.invite-dialog .share-added-contact.token-input-token-invite').remove();
             }
             else {
                 console.warn('Unable to send invitation(s), no account access.');
@@ -813,7 +725,8 @@ mega.achievem.initInviteDialogMultiInputPlugin = function initInviteDialogMultiI
  * @param {String} close dialog parameter
  */
 mega.achievem.invitationStatusDialog = function invitationStatusDialog(close) {
-    var $dialog = $('.fm-dialog.invitation-dialog');
+    'use strict';
+    var $dialog = $('.mega-dialog.invitation-dialog');
     var $scrollBlock = $dialog.find('.table-scroll');
 
     if (close) {
@@ -841,7 +754,7 @@ mega.achievem.invitationStatusDialog = function invitationStatusDialog(close) {
     }
     $table.empty();
 
-    $dialog.find('.fm-dialog-close').rebind('click', invitationStatusDialog);
+    $('button.js-close', $dialog).rebind('click', invitationStatusDialog);
 
     var ach = mega.achievem;
     var maf = M.maf;
@@ -858,9 +771,7 @@ mega.achievem.invitationStatusDialog = function invitationStatusDialog(close) {
             if (typeof a.m[0] == 'string' && typeof b.m[0] == 'string') {
                 return a.m[0].localeCompare(b.m[0]) * d;
             }
-            else {
-                return -1;
-            }
+            return -1;
         };
 
         return sortfn;
@@ -958,28 +869,28 @@ mega.achievem.invitationStatusDialog = function invitationStatusDialog(close) {
                 $('.status .light-grey', $tmpl)
                     .safeHTML('%n', locFmt, expiry.value, expiry.utxt);
 
-                $('.icon i', $tmpl).addClass('tick');
+                $('.icon i', $tmpl).addClass('sprite-fm-mono icon-active granted-icon');
             }
             else {// Pending APP Install
 
                 $('.status', $tmpl)
                     .safeHTML('<strong class="orange">@@</span>', l[16104]);// Pending App Install
 
-                $('.icon i', $tmpl).addClass('exclamation-point');
+                $('.icon i', $tmpl).addClass('sprite-fm-mono icon-exclamation-filled pending-install-icon');
             }
 
             // Remove reinvite button
-            $('.date div', $tmpl).remove();
+            $('.date button.resend', $tmpl).remove();
         }
         else {// Pending
 
             $('.status', $tmpl)
                 .safeHTML('<strong >@@</span>', l[7379]);// Pending
 
-            $('.icon i', $tmpl).addClass('dots');
+            $('.icon i', $tmpl).addClass('sprite-fm-mono icon-options pending-icon');
 
             // In case that time-limit is not
-            $('.date div', $tmpl).rebind('click', function() {
+            $('.date button', $tmpl).rebind('click', function() {
                 var $row = $(this).closest('.table-row');
 
                 reinvite($('.email strong', $row).text(), $row);
@@ -1003,13 +914,13 @@ mega.achievem.invitationStatusDialog = function invitationStatusDialog(close) {
         deleteScrollPanel($scrollBlock, 'jsp');
     }
 
-    $('.button.invite-more', $dialog).rebind('click', function() {
+    $('button.invite-more', $dialog).rebind('click', function() {
         closeDialog();
         mega.achievem.inviteFriendDialog();
         return false;
     });
 
-    $('.button.reinvite-all', $dialog).rebind('click', function() {
+    $('button.reinvite-all', $dialog).rebind('click', function() {
         $('.table-row', $table).each(function(idx, $row) {
             $row = $($row);
 
@@ -1024,9 +935,8 @@ mega.achievem.invitationStatusDialog = function invitationStatusDialog(close) {
     // Click on sort column Email, Status or Date Sent
     $('.header .table-cell', $dialog).rebind('click', function() {
 
-        $this = $(this);
         var config = getConfig();
-        var $elem = $this.find('span');
+        var $elem = $('span', $(this));
         var sortBy = $elem.text();
         var sortClass = 'asc';
 
@@ -1047,15 +957,15 @@ mega.achievem.invitationStatusDialog = function invitationStatusDialog(close) {
             sortClass = 'desc';
         }
 
-        $('.invitation-dialog.table-cell span', $dialog).removeClass('asc desc');
+        $('.table-cell span', $dialog).removeClass('asc desc');
         $($elem).addClass(sortClass);
 
         // Repaint dialog
         mega.achievem.invitationStatusDialog();
     });
 
-    var reinvite = function(email, $row) {
-        var email = String(email).trim();
+    function reinvite(rawEmail, $row) {
+        const email = String(rawEmail).trim();
         var opc = M.findOutgoingPendingContactIdByEmail(email);
 
         if (opc) {
@@ -1065,7 +975,7 @@ mega.achievem.invitationStatusDialog = function invitationStatusDialog(close) {
             console.warn('No outgoing pending contact request for %s', email);
         }
 
-        $('.date div', $row).fadeOut(700);
+        $('.date button.resend', $row).fadeOut(700);
     };
 };
 
@@ -1131,21 +1041,24 @@ mega.achievem.parseAccountAchievements = function parseAccountAchievements() {
     var transferProportion = transferCurrentValue / (transferBaseQuota + transferCurrentValue) * 100;
     var storageAchieveValue = storageCurrentValue;
     var transferAchieveValue = transferCurrentValue;
+    var $planContent = $('.data-block.account-type', '.fm-account-main');
+    var $storageContent = $('.acc-storage-space', $planContent);
+    var $bandwidthContent = $('.acc-bandwidth-vol', $planContent);
     storageCurrentValue += storageBaseQuota;
     transferCurrentValue += transferBaseQuota;
 
-    $('.account.plan-info.bandwidth > span').text(bytesToSize(transferCurrentValue, 0));
-    $('.account.plan-info.bandwidth .settings-sub-bar').css('width', transferProportion + '%');
-    $('.account.plan-info.bandwidth .base-quota-note').text(l[19992]
+    $('.plan-info > span', $bandwidthContent).text(bytesToSize(transferCurrentValue, 0));
+    $('.settings-sub-bar', $bandwidthContent).css('width', transferProportion + '%');
+    $('.base-quota-note span', $bandwidthContent).text(l[19992]
         .replace('%1', bytesToSize(transferBaseQuota, 0)));
-    $('.account.plan-info.bandwidth .achieve-quota-note').text(l[19993]
+    $('.achieve-quota-note span', $bandwidthContent).text(l[19993]
         .replace('%1', bytesToSize(transferAchieveValue, 0)));
 
-    $('.account.plan-info.storage > span').text(bytesToSize(storageCurrentValue, 0));
-    $('.account.plan-info.storage .settings-sub-bar').css('width', storageProportion + '%');
-    $('.account.plan-info.storage .base-quota-note').text(l[19992]
+    $('.plan-info > span', $storageContent).text(bytesToSize(storageCurrentValue, 0));
+    $('.settings-sub-bar', $storageContent).css('width', storageProportion + '%');
+    $('.base-quota-note span', $storageContent).text(l[19992]
         .replace('%1', bytesToSize(storageBaseQuota, 0)));
-    $('.account.plan-info.storage .achieve-quota-note').text(l[19993]
+    $('.achieve-quota-note span', $storageContent).text(l[19993]
         .replace('%1', bytesToSize(storageAchieveValue, 0)));
 };
 

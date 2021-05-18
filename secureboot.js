@@ -2594,6 +2594,7 @@ else if (!browserUpdate) {
     jsl.push({f:'js/utils/debug.js', n: 'js_utils_debug_js', j: 1});
     jsl.push({f:'js/utils/dom.js', n: 'js_utils_dom_js', j: 1});
     jsl.push({f:'js/utils/events.js', n: 'js_utils_events_js', j: 1});
+    jsl.push({f:'js/utils/icu.js', n: 'js_utils_icu_js', j: 1});
     jsl.push({f:'js/utils/locale.js', n: 'js_utils_locale_js', j: 1});
     jsl.push({f:'js/utils/media.js', n: 'js_utils_pictools_js', j: 1});
     jsl.push({f:'js/utils/network.js', n: 'js_utils_network_js', j: 1});
@@ -2667,7 +2668,7 @@ else if (!browserUpdate) {
     jsl.push({f:'js/ui/password-revert.js', n: 'password-revert', j:1});
     jsl.push({f:'js/ui/publicServiceAnnouncement.js', n: 'psa_js', j:1,w:1});
     jsl.push({f:'js/ui/megaInputs.js', n: 'megainputs_js', j:1,w:1});
-    jsl.push({f:'js/ui/megaInputs-titleTop.js', n: 'megainputs_titletop_js', j:1,w:1});
+    jsl.push({f:'js/ui/megaInputs-underlinedText.js', n: 'megainputs_underlinedtext_js', j:1,w:1});
     jsl.push({f:'html/registerb.html', n: 'registerb',j:0});
     jsl.push({f:'html/developersettings.html', n: 'developersettings', j:0});
     jsl.push({f:'html/js/developersettings.js', n: 'developersettings_js', j:1 });
@@ -2707,6 +2708,7 @@ else if (!browserUpdate) {
         jsl.push({f:'js/ui/alarm.js', n: 'alarm_js', j:1,w:1});
         jsl.push({f:'js/ui/toast.js', n: 'toast_js', j:1,w:1});
         jsl.push({f:'js/ui/top-tooltip-login.js', n: 'top-tooltip-login', j:1});
+        jsl.push({f:'js/ui/searchbar.js', n: 'searchbar_js', j:1});
         jsl.push({f:'html/megadrop.html', n: 'megadrop', j:0});
         jsl.push({f:'html/nomegadrop.html', n: 'nomegadrop', j:0});
         jsl.push({f:'js/fm/transfer-progress-widget.js', n: 'tpw_js', j:1});
@@ -2769,13 +2771,44 @@ else if (!browserUpdate) {
     jsl.push({f:'js/emailNotify.js', n: 'email_notify_js', j:1});
     jsl.push({f:'js/megadrop.js', n: 'megadrop_js', j:1});
 
+    // Variables which can be used across all stylesheets
+    jsl.push({f:'css/vars/theme.css', n: 'vars_theme_css', j:2, w:30, c:1, d:1, cache:1});
+    jsl.push({f:'css/switches.css', n: 'switches_css', j:2,w:5,c:1,d:1,cache:1});
+
+    // Sprites
+    jsl.push({f:'css/sprites/fm-uni@uni.css', n: 'fm_uni_css', j:2, w:30, c:1, d:1, cache:1});
+    jsl.push({f:'css/sprites/fm-mono@mono.css', n: 'fm_mono_css', j:2, w:30, c:1, d:1, cache:1});
+    jsl.push({f:'css/theme-sprite.css', n: 'theme_sprite_css', j:2, w:30, c:1, d:1, cache:1});
+    jsl.push({f:'css/sprites/fm-theme@dark.css', n: 'fm_dark_css', j:2, w:30, c:1, d:1, cache:1});
+    jsl.push({f:'css/sprites/fm-theme@light.css', n: 'fm_light_css', j:2, w:30, c:1, d:1, cache:1});
+    jsl.push({f:'css/sprites/fm-illustrations.css', n: 'fm_illustration_css', j:2, w:30, c:1, d:1, cache:1});
+
+    // Dialog templates
+    jsl.push({f:'css/mega-dialog.css', n: 'mega_dialog_css', j:2,w:5,c:1,d:1,cache:1});
+    jsl.push({f:'css/vars/dialog.css', n: 'vars_dialog_css', j:2, w:30, c:1, d:1, cache:1});
+
+    // Inputs
+    jsl.push({f:'css/vars/button.css', n: 'vars_button_css', j:2, w:30, c:1, d:1, cache:1});
+    jsl.push({f:'css/radios.css', n: 'radios_css', j:2,w:5,c:1,d:1,cache:1});
+    jsl.push({f:'css/mega-button.css', n: 'mega_button_css', j:2,w:5,c:1,d:1,cache:1});
+
     if (!is_mobile) {
+        jsl.push({f:'js/ui/theme.js', n: 'theme_js', j: 1, w: 1});
+
+        jsl.push({f:'css/buttons.css', n: 'buttons_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/checkboxes.css', n: 'checkboxes_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/vars/text-input.css', n: 'vars_text_input_css', j:2, w:30, c:1, d:1, cache:1});
+        jsl.push({f:'css/components.css', n: 'components_css', j:2, w:30, c:1, d:1, cache:1});
+
         jsl.push({f:'html/top.html', n: 'top', j:0});
         jsl.push({f:'css/style.css', n: 'style_css', j:2, w:30, c:1, d:1, cache:1});
+        jsl.push({f:'css/important.css', n: 'important_css', j:2, w:30, c:1, d:1, cache:1});
+        jsl.push({f:'css/fm-lists.css', n: 'fm_lists_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/grid-table.css', n: 'grid_table_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'js/vendor/megalist.js', n: 'megalist_js', j:1, w:5});
         jsl.push({f:'js/vendor/megaDynamicList.js', n: 'mega_dynamic_list_js', j:1, w:5});
         jsl.push({f:'js/fm/quickfinder.js', n: 'fm_quickfinder_js', j:1, w:1});
-        jsl.push({f:'js/fm/selectionmanager.js', n: 'fm_selectionmanager_js', j:1, w:1});
+        jsl.push({f:'js/fm/selectionManager2.js', n: 'fm_selectionmanager2_js', j:1, w:1});
         jsl.push({f:'js/fm.js', n: 'fm_js', j:1, w:12});
         jsl.push({f:'js/fm/dashboard.js', n: 'fmdashboard_js', j:1, w:5});
         jsl.push({f:'js/fm/recents.js', n: 'fmrecents_js', j:1, w:5});
@@ -2788,6 +2821,7 @@ else if (!browserUpdate) {
         jsl.push({f:'js/notify.js', n: 'notify_js', j:1});
         jsl.push({f:'js/vendor/avatar.js', n: 'avatar_js', j:1, w:3});
         jsl.push({f:'js/fm/affiliate.js', n: 'fm_affiliate_js', j: 1});
+        jsl.push({f:'js/ui/contextMenu.js', n: 'context_menu_js', j: 1});
 
         jsl.push({f:'js/ui/onboarding.js', n: 'onboarding_js', j:1,w:1});
         jsl.push({f:'js/ui/sms.js', n: 'sms_js', j: 1, w: 1});
@@ -2796,17 +2830,20 @@ else if (!browserUpdate) {
 
         jsl.push({f:'css/download.css', n: 'download_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/user-card.css', n: 'user_card_css', j:2, w:5, c:1, d:1, cache:1});
-        jsl.push({f:'css/fm-lists.css', n: 'fm_lists_css', j:2,w:5,c:1,d:1,cache:1});
+
         jsl.push({f:'css/account.css', n: 'account_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'css/buttons.css', n: 'buttons_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/banners.css', n: 'banners_css', j:2,w:5,c:1,d:1,cache:1});
+
         jsl.push({f:'css/dropdowns.css', n: 'dropdowns_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/jq-ui-custom.css', n: 'jq_ui_custom_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/labels-and-filters.css', n: 'labels-and-filters_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/dialogs.css', n: 'dialogs_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/share-dialog.css', n: 'share_dialog_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/media-viewer.css', n: 'media_viewer_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/megadrop.css', n: 'megadrop_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/popups.css', n: 'popups_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/data-blocks-view.css', n: 'data_blocks_view_css', j:2,w:5,c:1,d:1,cache:1});
+
         jsl.push({f:'css/help2.css', n: 'help_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/perfect-scrollbar.css', n: 'vendor_ps_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/recovery.css', n: 'recovery_css', j:2,w:5,c:1,d:1,cache:1});
@@ -2815,16 +2852,28 @@ else if (!browserUpdate) {
         jsl.push({f:'css/animations.css', n: 'animations_css', j:2, w:30, c:1, d:1, cache:1});
         jsl.push({f:'css/affiliate-program.css', n: 'animations_css', j:2, w:30, c:1, d:1, cache:1});
         jsl.push({f:'css/top-menu.css', n: 'top_menu_css', j:2, w:30, c:1, d:1, cache:1});
+        jsl.push({f:'css/context-menu.css', n: 'context_menu_css', j:2, w:5, c:1, d:1, cache:1});
+        jsl.push({f:'css/tables.css', n: 'tables_css', j:2, w:30, c:1, d:1, cache:1});
+        jsl.push({f:'css/recents.css', n: 'recents_css', j:2, w:30, c:1, d:1, cache:1});
+        jsl.push({f:'css/transfer-widget.css', n: 'transfer_widget_css', j:2, w:30, c:1, d:1, cache:1});
+
+        // CSS Revamp changes
+        jsl.push({f:'css/components/fm-left-pane.css', n: 'components_fm_left_pane_css', j:2, w:30, c:1, d:1, cache:1});
 
         jsl.push({f:'html/key.html', n: 'key', j:0});
         jsl.push({f:'html/login.html', n: 'login', j:0});
         jsl.push({f:'html/fm.html', n: 'fm', j:0, w:3});
         jsl.push({f:'html/top-login.html', n: 'top-login', j:0});
         jsl.push({f:'html/dialogs.html', n: 'dialogs', j:0,w:2});
+
+
+        jsl.push({f:'css/topbar.css', n: 'topbar_css', j:2,w:5,c:1,d:1,cache:1});
+
     } // !is_mobile
 
     // do not change the order...
     jsl.push({f:'js/fm/filemanager.js', n: 'filemanager_js', j: 1, w: 5});
+
     jsl.push({f:'js/fm/utils.js', n: 'fm_utils_js', j: 1});
     jsl.push({f:'js/fm/megadata.js', n: 'fm_megadata_js', j: 1});
     jsl.push({f:'js/fm/megadata/account.js', n: 'fm_megadata_account_js', j: 1});
@@ -2836,6 +2885,7 @@ else if (!browserUpdate) {
     jsl.push({f:'js/fm/megadata/nodes.js', n: 'fm_megadata_nodes_js', j: 1});
     jsl.push({f:'js/fm/megadata/openfolder.js', n: 'fm_megadata_openfolder_js', j: 1});
     jsl.push({f:'js/fm/megadata/render.js', n: 'fm_megadata_render_js', j: 1});
+    jsl.push({f:'js/fm/megadata/render-breadcrumbs.js', n: 'fm_megadata_render_breadcrumbs_js', j: 1});
     jsl.push({f:'js/fm/megadata/reset.js', n: 'fm_megadata_reset_js', j: 1});
     jsl.push({f:'js/fm/megadata/shares.js', n: 'fm_megadata_shares_js', j: 1});
     jsl.push({f:'js/fm/megadata/sort.js', n: 'fm_megadata_sort_js', j: 1});
@@ -2869,6 +2919,7 @@ else if (!browserUpdate) {
         jsl.push({f:'css/mobile-help.css', n: 'mobile_css', j: 2, w: 30, c: 1, d: 1, m: 1});
         jsl.push({f:'css/mobile-top-menu.css', n: 'mobile_top_menu_css',  j: 2, w: 30, c: 1, d: 1, m: 1});
         jsl.push({f:'css/mobile-megadrop.css', n: 'mobile_megadrop_css', j:2, w:30, c:1, d:1, cache:1});
+        jsl.push({f:'css/mobile-toast.css', n: 'mobile_toast_css', j:2, w:30, c:1, d:1, cache:1});
         jsl.push({f:'html/mobile.html', n: 'mobile', j: 0, w: 1});
         jsl.push({f:'html/mobile-megadrop.html', n: 'mobile-megadrop', j: 0, w: 1});
         jsl.push({f:'html/mobile-nomegadrop.html', n: 'mobile-nomegadrop', j: 0, w: 1});
@@ -2937,6 +2988,7 @@ else if (!browserUpdate) {
 
     jsl.push({f:'css/toast.css', n: 'toast_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/general.css', n: 'general_css', j:2, w:5, c:1, d:1, cache: 1});
+    jsl.push({f:'css/megainput.css', n: 'megainput_css', j:2, w:5, c:1, d:1, cache: 1});
     jsl.push({f:'css/retina-images.css', n: 'retina_images_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
 
     // We need to keep a consistent order in loaded resources, so that if users
@@ -3029,6 +3081,11 @@ else if (!browserUpdate) {
         jsl.push({f:'css/dialogs-common.css', n: 'dialogs-common_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'js/utils/clipboard.js', n: 'js_utils_clipboard_js', j: 1});
         jsl.push({f:'js/ui/simpletip.js', n: 'simpletip_js', j:1,w:1});
+        jsl.push({f:'css/mega-button.css', n: 'mega_button_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/mega-dialog.css', n: 'mega_dialog_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/vars/theme.css', n: 'theme_variables_css', j:2, w:30, c:1, d:1, cache:1});
+        jsl.push({f:'css/vars/button.css', n: 'button_variables_css', j:2, w:30, c:1, d:1, cache:1});
+        jsl.push({f:'css/vars/dialog.css', n: 'vars_dialog_css', j:2, w:30, c:1, d:1, cache:1});
         jsl.push({f:'css/features.css', n: 'features_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/toast.css', n: 'toast_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/psa.css', n: 'psa_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
@@ -3206,6 +3263,7 @@ else if (!browserUpdate) {
             'chat_calls_css':{f:'css/chat-calls.css', n: 'chat_calls_css', j:2,'w':5,'c':1,'cache':1,'d':1},
             'chat_common_css':{f:'css/chat-common.css', n: 'chat_common_css', j:2,'w':5,'c':1,'cache':1,'d':1},
             'chat_emoji_css':{f:'css/chat-emoji.css', n: 'chat_emoji_css', j:2,'w':2,'c':1,'cache':1,'d':1},
+            'chat_history_retention_css':{f:'css/chat-history-retention.css', n: 'chat_history_retention_css', j:2,'w':2,'c':1,'cache':1,'d':1},
 
             /* chat related js */
             'search_js': {f:'js/chat/search.js', n: 'search_js', j:1},
@@ -3728,7 +3786,7 @@ else if (!browserUpdate) {
         scriptTest(
             'es6s =' +
             ' ({...{a:23}}).a === 23' + // C60 E79 F55 O47 S11
-            ' && /-/[Symbol.split]("0-0").join("") === "00"' + // C50 E79 F49 O37 S10
+            ' && Promise.prototype.finally' + // C63 E18 F58 O50 S11
             ' && (async()=>{})[Symbol.toStringTag] === "AsyncFunction"' + // C55 E15 F52 O42 S10.1
             ' && (function *(a=1,){yield a})(2).next().value === 2', // C58 E14 F52 O45 S10
             function(error) {
@@ -3921,7 +3979,7 @@ else if (!browserUpdate) {
         istaticpath = 'chrome://mega/content/images/mega/';
     }
 
-    mCreateElement('style', {type: 'text/css'}, 'body').textContent = '.div, span, input {outline: none;}.hidden {display: none;}.clear {clear: both;margin: 0px;padding: 0px;display: block;}.loading-main-block {width: 100%;height: 100%;position: fixed;z-index: 10000;font-family:Arial, Helvetica, sans-serif;}.toast-notification{visibility:hidden}.main-blur-block,.bottom-page.scroll-block{display:none}.loading-mid-white-block {height: 100%;width:100%;}.loading-cloud {width: 222px;position: fixed;height: 158px;background-image: url(' + istaticpath + 'loading-sprite_v4.png);background-repeat: no-repeat;background-position: 0 0;left:50%;top:50%;margin:-79px 0 0 -111px;}.loading-m-block{width:60px;height:60px;position:absolute; left:81px;top:65px;background-color:white;background-image: url(' + istaticpath + 'loading-sprite_v4.png);background-repeat: no-repeat;background-position: -81px -65px;border-radius: 100%;-webkit-border-radius: 100%;border-radius: 100%;z-index:10;}.loading-percentage { width: 80px;height: 80px; background-color: #e1e1e1;position: absolute;-moz-border-radius: 100%;-webkit-border-radius: 100%;border-radius: 100%;overflow: hidden;background-image: url(' + istaticpath + 'loading-sprite_v4.png);background-repeat: no-repeat;background-position: -70px -185px;left:71px;top:55px;}.loading-percentage ul {list-style-type: none;-moz-border-radius: 100%;-webkit-border-radius: 100%;border-radius: 100%;overflow: hidden;}.loading-percentage li {position: absolute;top: 0px;}.loading-percentage p, .loading-percentage li, .loading-percentage ul{width: 80px;height: 80px;padding: 0;margin: 0;}.loading-percentage span {display: block;width: 40px;height: 80px;}.loading-percentage ul :nth-child(odd) {clip: rect(0px, 80px, 80px, 40px);}.loading-percentage ul :nth-child(even) {clip: rect(0px, 40px, 80px, 0px);}.loading-percentage .right-c span {-moz-border-radius-topleft: 40px;-moz-border-radius-bottomleft: 40px;-webkit-border-top-left-radius: 40px;-webkit-border-bottom-left-radius: 40px;border-top-left-radius: 40px;border-bottom-left-radius: 40px;background-color:#dc0000;}.loading-percentage .left-c span {margin-left: 40px;-moz-border-radius-topright: 40px;-moz-border-radius-bottomright: 40px;-webkit-border-top-right-radius: 40px;-webkit-border-bottom-right-radius: 40px;border-top-right-radius: 40px;border-bottom-right-radius: 40px;background-color:#dc0000;}.loading-main-bottom {max-width: 940px;width: 100%;position: absolute;bottom: 20px;left: 50%;margin: 0 0 0 -470px;text-align: center;}.loading-bottom-button {height: 29px;width: 29px;float: left;background-image: url(' + istaticpath + 'loading-sprite_v4.png);background-repeat: no-repeat;cursor: pointer;}.st-social-block-load {position: fixed;bottom: 20px;left: 0;width: 100%;height: 43px;text-align: center;}.st-bottom-button {height: 24px;width: 24px;margin: 0 8px;display: inline-block;background-image: url(' + istaticpath + 'loading-sprite_v4.png);background-repeat: no-repeat;background-position:11px -405px;cursor: pointer;-moz-border-radius: 100%;-webkit-border-radius: 100%;border-radius: 100%;-webkit-transition: all 200ms ease-in-out;-moz-transition: background-color 200ms ease-in-out;-o-transition: background-color 200ms ease-in-out;-ms-transition: background-color 200ms ease-in-out;transition: background-color 200ms ease-in-out;background-color:#999999;}.st-bottom-button.st-google-button {background-position: 11px -405px;}.st-bottom-button.st-google-button {background-position: -69px -405px;}.st-bottom-button.st-twitter-button{background-position: -29px -405px;}.st-bottom-button:hover {background-color:#334f8d;}.st-bottom-button.st-twitter-button:hover {background-color:#1a96f0;}.st-bottom-button.st-google-button:hover {background-color:#d0402a;}@media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {.maintance-block, .loading-percentage, .loading-m-block, .loading-cloud, .loading-bottom-button,.st-bottom-button, .st-bottom-scroll-button {background-image: url(' + istaticpath + 'loading-sprite_v4@2x.png);    background-size: 222px auto;}}';
+    mCreateElement('style', {type: 'text/css'}, 'body').textContent = '.div, span, input {outline: none;}.hidden {display: none;}.clear {clear: both;margin: 0px;padding: 0px;display: block;}.loading-main-block {width: 100%;height: 100%;position: fixed;z-index: 10000;font-family:Arial, Helvetica, sans-serif;}.main-blur-block,.bottom-page.scroll-block{display:none}.loading-mid-white-block {height: 100%;width:100%;}.loading-cloud {width: 222px;position: fixed;height: 158px;background-image: url(' + istaticpath + 'loading-sprite_v4.png);background-repeat: no-repeat;background-position: 0 0;left:50%;top:50%;margin:-79px 0 0 -111px;}.loading-m-block{width:60px;height:60px;position:absolute; left:81px;top:65px;background-color:white;background-image: url(' + istaticpath + 'loading-sprite_v4.png);background-repeat: no-repeat;background-position: -81px -65px;border-radius: 100%;-webkit-border-radius: 100%;border-radius: 100%;z-index:10;}.loading-percentage { width: 80px;height: 80px; background-color: #e1e1e1;position: absolute;-moz-border-radius: 100%;-webkit-border-radius: 100%;border-radius: 100%;overflow: hidden;background-image: url(' + istaticpath + 'loading-sprite_v4.png);background-repeat: no-repeat;background-position: -70px -185px;left:71px;top:55px;}.loading-percentage ul {list-style-type: none;-moz-border-radius: 100%;-webkit-border-radius: 100%;border-radius: 100%;overflow: hidden;}.loading-percentage li {position: absolute;top: 0px;}.loading-percentage p, .loading-percentage li, .loading-percentage ul{width: 80px;height: 80px;padding: 0;margin: 0;}.loading-percentage span {display: block;width: 40px;height: 80px;}.loading-percentage ul :nth-child(odd) {clip: rect(0px, 80px, 80px, 40px);}.loading-percentage ul :nth-child(even) {clip: rect(0px, 40px, 80px, 0px);}.loading-percentage .right-c span {-moz-border-radius-topleft: 40px;-moz-border-radius-bottomleft: 40px;-webkit-border-top-left-radius: 40px;-webkit-border-bottom-left-radius: 40px;border-top-left-radius: 40px;border-bottom-left-radius: 40px;background-color:#dc0000;}.loading-percentage .left-c span {margin-left: 40px;-moz-border-radius-topright: 40px;-moz-border-radius-bottomright: 40px;-webkit-border-top-right-radius: 40px;-webkit-border-bottom-right-radius: 40px;border-top-right-radius: 40px;border-bottom-right-radius: 40px;background-color:#dc0000;}.loading-main-bottom {max-width: 940px;width: 100%;position: absolute;bottom: 20px;left: 50%;margin: 0 0 0 -470px;text-align: center;}.loading-bottom-button {height: 29px;width: 29px;float: left;background-image: url(' + istaticpath + 'loading-sprite_v4.png);background-repeat: no-repeat;cursor: pointer;}.st-social-block-load {position: fixed;bottom: 20px;left: 0;width: 100%;height: 43px;text-align: center;}.st-bottom-button {height: 24px;width: 24px;margin: 0 8px;display: inline-block;background-image: url(' + istaticpath + 'loading-sprite_v4.png);background-repeat: no-repeat;background-position:11px -405px;cursor: pointer;-moz-border-radius: 100%;-webkit-border-radius: 100%;border-radius: 100%;-webkit-transition: all 200ms ease-in-out;-moz-transition: background-color 200ms ease-in-out;-o-transition: background-color 200ms ease-in-out;-ms-transition: background-color 200ms ease-in-out;transition: background-color 200ms ease-in-out;background-color:#999999;}.st-bottom-button.st-google-button {background-position: 11px -405px;}.st-bottom-button.st-google-button {background-position: -69px -405px;}.st-bottom-button.st-twitter-button{background-position: -29px -405px;}.st-bottom-button:hover {background-color:#334f8d;}.st-bottom-button.st-twitter-button:hover {background-color:#1a96f0;}.st-bottom-button.st-google-button:hover {background-color:#d0402a;}@media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {.maintance-block, .loading-percentage, .loading-m-block, .loading-cloud, .loading-bottom-button,.st-bottom-button, .st-bottom-scroll-button {background-image: url(' + istaticpath + 'loading-sprite_v4@2x.png);    background-size: 222px auto;}}';
 
     mCreateElement('div', { "class": "loading-main-block", id: "loading"}, 'body')
         .innerHTML =

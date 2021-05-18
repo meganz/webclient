@@ -50,7 +50,7 @@ pro.propay = {
 
         var $stepTwo = $('.payment-section', '.fmholder');
         var $selectedPlanName = $('.top-header.plan-title .plan-name', $stepTwo);
-        var $purchaseButton = $('.big-green-button.purchase', $stepTwo);
+        var $purchaseButton = $((is_mobile ? '.' : '')  + 'button.purchase', $stepTwo);
 
         // Preload loading/transferring/processing animation
         pro.propay.preloadAnimation();
@@ -760,12 +760,12 @@ pro.propay = {
         }
 
         // Update depending on recurring or one off payment
-        $('.big-green-button.purchase', $step2).text(subscribeOrPurchase);
+        $('button.purchase span', $step2).text(subscribeOrPurchase);
         $('.payment-instructions', $step2).safeHTML(subscribeOrPurchaseInstruction);
         $('.choose-renewal .duration-text', $step2).text(autoRenewMonthOrYearQuestion);
         $('.charge-information', $step2).text(chargeInfoDuration);
-        $('.payment-buy-now', $paymentDialog).text(subscribeOrPurchase);
-        $('.payment-buy-now', $paymentAddressDialog).text(subscribeOrPurchase);
+        $('.payment-buy-now span', $paymentDialog).text(subscribeOrPurchase);
+        $('.payment-buy-now span', $paymentAddressDialog).text(subscribeOrPurchase);
         $('.payment-note-first.recurring .duration', $paymentAddressDialog)
             .text(recurringMonthlyOrAnnuallyMessage);
         $('.payment-plan-txt .recurring', $paymentAddressDialog).text(recurringOrNonRecurring);
@@ -1478,7 +1478,7 @@ pro.propay = {
             discountOffers = discountOffers || Object.create(null);
 
             if (offer.al && offer.pd && typeof offer.m !== 'undefined') {
-                const $discountDlg = $('.fm-dialog.pro-discount', 'body');
+                const $discountDlg = $('.mega-dialog.pro-discount', 'body');
                 let title = l[24703];
                 if (offer.m === 1) {
                     title = l[24702];
@@ -1508,7 +1508,7 @@ pro.propay = {
                         };
 
                         // binding events
-                        $('.fm-dialog-close, .close-btn', $discountDlg).rebind('click.discount', (ev) => {
+                        $('button.js-close, .close-btn', $discountDlg).rebind('click.discount', (ev) => {
                             storeViewTime();
                             window.closeDialog();
                             if (reTrigger) {

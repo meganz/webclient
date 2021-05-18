@@ -93,7 +93,7 @@ var astroPayDialog = {
         }
 
         // Change the tax labels
-        this.$dialog.find('.astropay-label.tax').text(taxLabel);
+        this.$dialog.find('.astropay-label.tax').text(taxLabel + ':');
         this.$dialog.find('.astropay-tax-field').attr('placeholder', taxPlaceholder);
     },
 
@@ -142,7 +142,7 @@ var astroPayDialog = {
     initCloseButton: function () {
         "use strict";
         // Initialise the close and cancel buttons
-        this.$dialog.find('.fm-dialog-close, .cancel').rebind('click', function () {
+        this.$dialog.find('button.js-close, .cancel').rebind('click', function() {
 
             // Hide the overlay and dialog
             astroPayDialog.hideDialog();
@@ -560,7 +560,7 @@ var voucherDialog = {
         this.$dialog.find('.voucher-plan-txt .duration').text(monthsWording);
         this.$dialog.find('.voucher-plan-price .price').text(intl.format(proPrice));
         this.$dialog.find('#voucher-code-input input').val('');
-        this.changeColourIfSufficientBalance();
+        const hasSufficientBalance = this.changeColourIfSufficientBalance();
 
         var $voucherAccountBalance = this.$dialog.find('.voucher-account-balance');
         var $balanceAmount = $voucherAccountBalance.find('.balance-amount');
@@ -596,9 +596,15 @@ var voucherDialog = {
         clickURLs();
 
         // Reset state to hide voucher input
-        voucherDialog.$dialog.find('.voucher-input-container').fadeOut('fast', function() {
-            voucherDialog.$dialog.find('.voucher-redeem-container, .purchase-now-container').fadeIn('fast');
-        });
+        $('.voucher-input-container', voucherDialog.$dialog).addClass('hidden');
+
+        if (hasSufficientBalance) {
+            $('.voucher-buy-now', voucherDialog.$dialog).removeClass('hidden');
+            $('.voucher-redeem', voucherDialog.$dialog).addClass('hidden');
+        }
+        else {
+            $('.voucher-redeem, .voucher-buy-now', voucherDialog.$dialog).removeClass('hidden');
+        }
     },
 
     /**
@@ -606,22 +612,23 @@ var voucherDialog = {
      */
     changeColourIfSufficientBalance: function() {
 
-        var price = pro.propay.selectedProPackage[5];
+        const price = pro.propay.selectedProPackage[5];
+        const hasSufficientBalance = parseFloat(pro.propay.proBalance) >= parseFloat(price);
 
         // If they have enough balance to purchase the plan, make it green
-        if (parseFloat(pro.propay.proBalance) >= parseFloat(price)) {
-            this.$dialog.find('.voucher-account-balance').addClass('sufficient-funds');
-            this.$dialog.find('.voucher-buy-now').addClass('sufficient-funds');
-            this.$dialog.find('.voucher-information-help').hide();
-            this.$dialog.find('.voucher-redeem').hide();
+        if (hasSufficientBalance) {
+            $('.voucher-account-balance', this.$dialog).addClass('sufficient-funds');
+            $('.voucher-buy-now', this.$dialog).addClass('sufficient-funds');
+            $('.voucher-information-help', this.$dialog).addClass('hidden');
         }
         else {
             // Otherwise leave it as red
-            this.$dialog.find('.voucher-account-balance').removeClass('sufficient-funds');
-            this.$dialog.find('.voucher-buy-now').removeClass('sufficient-funds');
-            this.$dialog.find('.voucher-information-help').show();
-            this.$dialog.find('.voucher-redeem').show();
+            $('.voucher-account-balance', this.$dialog).removeClass('sufficient-funds');
+            $('.voucher-buy-now', this.$dialog).removeClass('sufficient-funds');
+            $('.voucher-information-help', this.$dialog).removeClass('hidden');
         }
+
+        return hasSufficientBalance;
     },
 
     /**
@@ -630,7 +637,7 @@ var voucherDialog = {
     initCloseButton: function() {
 
         // Initialise the close button
-        this.$dialog.find('.btn-close-dialog').rebind('click', function() {
+        this.$dialog.find('button.js-close, .btn-close-dialog').rebind('click', function() {
 
             // Hide the overlay and dialog
             voucherDialog.hideDialog();
@@ -672,9 +679,8 @@ var voucherDialog = {
         $this.$dialog.find('.voucher-redeem').rebind('click', function() {
 
             // Show voucher input
-            $this.$dialog.find('.voucher-redeem-container, .purchase-now-container').fadeOut('fast', function() {
-                $this.$dialog.find('.voucher-input-container').fadeIn();
-            });
+            $('.voucher-redeem, .voucher-buy-now', $this.$dialog).addClass('hidden');
+            $('.voucher-input-container', $this.$dialog).removeClass('hidden');
         });
     },
 
@@ -746,12 +752,14 @@ var voucherDialog = {
                     // Update dialog details
                     voucherDialog.$dialog.find('.voucher-account-balance .balance-amount').text(balance);
                     voucherDialog.$dialog.find('.voucher-account-balance .new-balance-amount').text(newBalance);
-                    voucherDialog.changeColourIfSufficientBalance();
+                    const sufficientBalance = voucherDialog.changeColourIfSufficientBalance();
 
+                    if (!sufficientBalance) {
+                        voucherDialog.$dialog.find('.voucher-redeem').removeClass('hidden');
+                    }
+                    voucherDialog.$dialog.find('.voucher-buy-now').removeClass('hidden');
                     // Hide voucher input
-                    voucherDialog.$dialog.find('.voucher-redeem-container').show();
-                    voucherDialog.$dialog.find('.purchase-now-container').show();
-                    voucherDialog.$dialog.find('.voucher-input-container').hide();
+                    $('.voucher-input-container', voucherDialog.$dialog).addClass('hidden');
                 });
             })
             .catch(function(ex) {
@@ -878,21 +886,17 @@ var wireTransferDialog = {
         $('.pro-register-dialog').removeClass('active').addClass('hidden');
 
         // Cache DOM reference for faster lookup
-        this.$dialog = $('.fm-dialog.wire-transfer-dialog');
+        this.$dialog = $('.mega-dialog.wire-transfer-dialog');
         this.$backgroundOverlay = $('.fm-dialog-overlay');
 
         // Add the styling for the overlay
         this.$backgroundOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
 
-        // Position the dialog and open it
-        this.$dialog.css({
-            'margin-left': -1 * (this.$dialog.outerWidth() / 2),
-            'margin-top': -1 * (this.$dialog.outerHeight() / 2)
-        });
+        // Open the dialog
         this.$dialog.addClass('active').removeClass('hidden');
 
         // Initialise the close button
-        this.$dialog.find('.btn-close-dialog').rebind('click', function() {
+        this.$dialog.find('button.js-close').rebind('click', function() {
             wireTransferDialog.$backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
             wireTransferDialog.$dialog.removeClass('active').addClass('hidden');
 
@@ -1276,7 +1280,7 @@ var addressDialog = {
             this.numOfMonths = numOfMonths;
 
             // auto renew is mandatory in business
-            this.$dialog.find('.payment-buy-now').text(l[6172]);
+            this.$dialog.find('.payment-buy-now span').text(l[6172]);
         }
         monthsWording = pro.propay.getNumOfMonthsWording(numOfMonths);
 
@@ -1298,43 +1302,40 @@ var addressDialog = {
      */
     initStateDropDown: function(preselected, country) {
 
-        var stateOptions = '';
-        var $statesSelect = this.$dialog.find('.states');
+        var $statesSelect = $('.states', this.$dialog);
+        var $selectScroll = $('.dropdown-scroll', $statesSelect);
 
         // Remove all states (leave the first option because its actually placeholder).
-        $statesSelect.children(':not(:first-child)').remove();
+        $selectScroll.empty();
 
         // Build options
         $.each(M.getStates(), function(isoCode, stateName) {
 
             var countryCode = isoCode.substr(0, 2);
+            var itemNode;
 
             // Create the option and set the ISO code and state name
-            var $stateOption = $('<option>').val(isoCode).text(stateName).prop('disabled', countryCode !== country);
+            itemNode = mCreateElement('div', {
+                'class': 'option' + (countryCode !== country ? ' hidden' : ''),
+                'data-value': isoCode,
+                'data-state': preselected && isoCode === preselected ? 'active' : ''
+            }, $selectScroll[0]);
+            mCreateElement('span', undefined, itemNode).textContent = stateName;
 
             if (preselected && isoCode === preselected) {
-                $stateOption.attr('selected', true);
-            }
-
-            // Append the HTML to the list of options
-            stateOptions += $stateOption.prop('outerHTML');
-        });
-
-        // Render the states and update the text when a state is selected
-        $statesSelect.append(stateOptions);
-
-        // Initialise the jQueryUI selectmenu
-        $statesSelect.selectmenu({
-            position: {
-                my: "left top-18",
-                at: "left bottom-18",
-                collision: "flip"  // default is ""
+                $('> span', $statesSelect).text(stateName);
             }
         });
 
-        $statesSelect.selectmenu('refresh');
-        $statesSelect.selectmenu(preselected || country === 'US' || country === 'CA' ? 'enable' : 'disable');
+        // Initialise the selectmenu
+        bindDropdownEvents($statesSelect);
 
+        if (preselected || country === 'US' || country === 'CA') {
+            $statesSelect.removeClass('disabled');
+        }
+        else {
+            $statesSelect.addClass('disabled');
+        }
     },
 
     /**
@@ -1342,40 +1343,34 @@ var addressDialog = {
      */
     initCountryDropDown: function(preselected) {
 
-        var countryOptions = '';
-        var $countriesSelect = this.$dialog.find('.countries');
+        var $countriesSelect = $('.countries', this.$dialog);
+        var $selectScroll = $('.dropdown-scroll', $countriesSelect);
 
         // Remove all countries (leave the first option because its actually placeholder).
-        $countriesSelect.children(':not(:first-child)').remove();
+        $selectScroll.empty();
 
         // Build options
         $.each(M.getCountries(), function(isoCode, countryName) {
 
+            var itemNode;
+
             // Create the option and set the ISO code and country name
-            var $countryOption = $('<option>').val(isoCode).text(countryName);
+            itemNode = mCreateElement('div', {
+                'class': 'option',
+                'data-value': isoCode,
+                'data-state': preselected && isoCode === preselected ? 'active' : ''
+            }, $selectScroll[0]);
+            mCreateElement('span', undefined, itemNode).textContent = countryName;
 
             if (preselected && isoCode === preselected) {
-                $countryOption.attr('selected', true);
+                $('> span', $countriesSelect).text(countryName);
             }
-
-            // Append the HTML to the list of options
-            countryOptions += $countryOption.prop('outerHTML');
         });
-
-        // Render the countries and update the text when a country is selected
-        $countriesSelect.append(countryOptions);
 
         // Initialise the jQueryUI selectmenu
-        $countriesSelect.selectmenu({
-            position: {
-                my: "left top-18",
-                at: "left bottom-18",
-                collision: "flip"  // default is ""
-            }
-        });
+        bindDropdownEvents($countriesSelect);
 
-        $countriesSelect.selectmenu('refresh');
-        $countriesSelect.selectmenu('enable');
+        $countriesSelect.removeClass('disabled');
     },
 
     /**
@@ -1385,78 +1380,79 @@ var addressDialog = {
      */
     initCountryDropdownChangeHandler: function() {
 
-        var $countriesSelect = this.$dialog.find('.countries');
-        var $statesSelect = this.$dialog.find('.states');
-        var $stateSelectmenuButton = this.$dialog.find('#address-dialog-states-button');
-        var $postcodeInput = this.$dialog.find(".postcode");
+        var $countriesSelect = $('.countries', this.$dialog);
+        var $statesSelect = $('.states', this.$dialog);
+        var $postcodeInput = $('.postcode', this.$dialog);
         var $taxcode = $('input.taxcode', this.$dialog).attr('placeholder', 'VAT ' + l[7347]);
 
         // On dropdown option change
-        $countriesSelect.selectmenu({
-            change: function(event, ui) {
+        $('.option', $countriesSelect).rebind('click.selectCountry', function() {
 
-                // Get the selected country ISO code e.g. CA
-                var selectedCountryCode = ui.item.value;
+            // Get the selected country ISO code e.g. CA
+            var selectedCountryCode = $(this).attr('data-value');
 
-                // If postcode translations not set, then decalre them.
-                if (addressDialog.localePostalCodeName === undefined || addressDialog.localePostalCodeName === null) {
-                    addressDialog.localePostalCodeName = {
-                        "US": "ZIP Code",
-                        "CA": "Postal Code",
-                        "PH": "ZIP Code",
-                        "DE": "PLZ",
-                        "AT": "PLZ",
-                        "IN": "Pincode",
-                        "IE": "Eircode",
-                        "BR": "CEP",
-                        "IT": "CAP"
-                    };
-                }
+            // If postcode translations not set, then decalre them.
+            if (addressDialog.localePostalCodeName === undefined
+                || addressDialog.localePostalCodeName === null) {
 
-                // If selecting a country whereby the postcode is named differently, update the placeholder value.
-                if (addressDialog.localePostalCodeName.hasOwnProperty(selectedCountryCode)) {
-                    $postcodeInput.attr("placeholder", addressDialog.localePostalCodeName[selectedCountryCode]);
-                } else {
-                    $postcodeInput.attr("placeholder", l[10659]);
-                }
-
-                // Reset states dropdown to default and select first option
-                $statesSelect.find('option:first-child').prop('disabled', false).prop('selected', true);
-
-                // If Canada or United States is selected
-                if ((selectedCountryCode === 'CA') || (selectedCountryCode === 'US')) {
-
-                    // Loop through all the states
-                    $statesSelect.find('option').each(function() {
-
-                        // Get just the country code from the state code e.g. CA-QC
-                        var $stateOption = $(this);
-                        var stateCode = $stateOption.val();
-                        var countryCode = stateCode.substr(0, 2);
-
-                        // If it's a match, show it
-                        if (countryCode === selectedCountryCode) {
-                            $stateOption.prop('disabled', false);
-                        }
-                        else {
-                            // Otherwise hide it
-                            $stateOption.prop('disabled', true);
-                        }
-                    });
-
-                    $statesSelect.selectmenu('enable');
-                } else {
-                    $statesSelect.selectmenu('disable');
-                }
-                var taxName = getTaxName(selectedCountryCode);
-                $taxcode.attr('placeholder', taxName + ' ' + l[7347]);
-
-                // Refresh the selectmenu to show/hide disabled options
-                $statesSelect.selectmenu('refresh');
-
-                // Remove any previous validation error
-                $stateSelectmenuButton.removeClass('error');
+                addressDialog.localePostalCodeName = {
+                    "US": "ZIP Code",
+                    "CA": "Postal Code",
+                    "PH": "ZIP Code",
+                    "DE": "PLZ",
+                    "AT": "PLZ",
+                    "IN": "Pincode",
+                    "IE": "Eircode",
+                    "BR": "CEP",
+                    "IT": "CAP"
+                };
             }
+
+            // If selecting a country whereby the postcode is named differently, update the placeholder value.
+            if (addressDialog.localePostalCodeName.hasOwnProperty(selectedCountryCode)) {
+                $postcodeInput
+                    .attr('placeholder', addressDialog.localePostalCodeName[selectedCountryCode]);
+            }
+            else {
+                $postcodeInput.attr('placeholder', l[10659]);
+            }
+
+            // If Canada or United States is selected
+            if (selectedCountryCode === 'CA' || selectedCountryCode === 'US') {
+
+                var $options = $('.option', $statesSelect);
+
+                // Loop through all the states
+                for (var i = 0; i < $options.length; i++) {
+                    var $stateOption = $($options[i]);
+                    var stateCode = $stateOption.attr('data-value');
+                    var countryCode = stateCode.substr(0, 2);
+
+                    // If it's a match, show it
+                    if (countryCode === selectedCountryCode) {
+                        $stateOption.removeClass('hidden');
+                    }
+                    else {
+                        // Otherwise hide it
+                        $stateOption.addClass('hidden');
+                    }
+                }
+
+                $statesSelect.removeClass('disabled');
+                $statesSelect.attr('tabindex', '7');
+            }
+            else {
+                $statesSelect.addClass('disabled');
+                $statesSelect.attr('tabindex', '-1');
+                $('span', $statesSelect).first().text(l[7192]);
+                $('.option', $statesSelect).removeAttr('data-state').removeClass('active');
+            }
+
+            var taxName = getTaxName(selectedCountryCode);
+            $taxcode.attr('placeholder', taxName + ' ' + l[7347]);
+
+            // Remove any previous validation error
+            $statesSelect.removeClass('error');
         });
     },
 
@@ -1630,12 +1626,12 @@ var addressDialog = {
         'use strict';
 
         // Change the class depending on mobile/desktop
-        var closeButtonClass = (is_mobile) ? 'close-payment-dialog' : 'btn-close-dialog';
+        var closeButtonClass = (is_mobile) ? '.close-payment-dialog' : 'button.js-close';
 
         var mySelf = this;
 
         // Add the click handler to hide the dialog and the black overlay
-        this.$dialog.find('.' + closeButtonClass).rebind('click', function() {
+        this.$dialog.find(closeButtonClass).rebind('click', function() {
 
             addressDialog.closeDialog();
             // if we are coming from business plan, we need to reset registration
@@ -1675,24 +1671,22 @@ var addressDialog = {
 
             // Get the form field value
             var fieldName = fields[i];
-            var fieldValue = this.$dialog.find('.' + fieldName).val();
+            var fieldValue = $('.' + fieldName, this.$dialog).val();
 
             // Trim the text
             fieldValues[fieldName] = $.trim(fieldValue);
         }
 
         // Get the values from the dropdowns
-        var $stateSelect = this.$dialog.find('.states');
-        var $countrySelect = this.$dialog.find('.countries');
-        var $stateSelectmenuButton = this.$dialog.find('#address-dialog-states-button');
-        var $countrySelectmenuButton = this.$dialog.find('#address-dialog-countries-button');
-        var state = $stateSelect.val();
-        var country = $countrySelect.val();
+        var $stateSelect = $('.states', this.$dialog);
+        var $countrySelect = $('.countries', this.$dialog);
+        var state = $('.option[data-state="active"]', $stateSelect).attr('data-value');
+        var country = $('.option[data-state="active"]', $countrySelect).attr('data-value');
         var taxCode = $('input.taxcode', this.$dialog).val();
 
         // Selectors for error handling
-        var $errorMessage = this.$dialog.find('.error-message');
-        var $allInputs = this.$dialog.find('.fm-account-input, .ui-selectmenu-button');
+        var $errorMessage = this.$dialog.find('.error-message', this.$dialog);
+        var $allInputs = $('.mega-input', this.$dialog);
 
         // Reset state of past error messages
         var stateNotSet = false;
@@ -1710,12 +1704,12 @@ var addressDialog = {
 
         // Add red border around the missing country selectmenu
         if (!country) {
-            $countrySelectmenuButton.addClass('error');
+            $countrySelect.addClass('error');
         }
 
         // If the country is US or Canada then the State is also required field
         if (((country === 'US') || (country === 'CA')) && !state) {
-            $stateSelectmenuButton.addClass('error');
+            $stateSelect.addClass('error');
             stateNotSet = true;
         }
 
@@ -1821,7 +1815,7 @@ var addressDialog = {
             return;
         }
         // let shift = 500 * ((addressDialog.stripeCheckerCounter / 10) | 0) + 500; // 500ms
-        let shift = 500;
+        const shift = 500;
         const base = 3000; // 3sec
         const nextTick = addressDialog.stripeCheckerCounter * shift + base;
         api_req({ a: 'utd', s: [saleId] }, {
@@ -1829,22 +1823,25 @@ var addressDialog = {
 
                 if (typeof res === 'string') {
                     // success
-                    const $stripWidget = $('.payment-stripe-dialog');
-                    const $stripeIframe = $('iframe#stripe-widget', $stripWidget);
-                    const $success = $('.payment-success', $stripWidget);
+                    const $stripeDialog = $('.payment-stripe-dialog');
+                    const $stripeSuccessDialog = $('.payment-stripe-success-dialog');
+                    const $stripeIframe = $('iframe#stripe-widget', $stripeDialog);
 
                     if (addressDialog.userInfo && !addressDialog.userInfo.isUpgrade) {
                         // If this is newly created business account, it's then requires verification
-                        $('.success-desc', $success).safeHTML(l[25081]);
-                        $('.btn-close-dialog', $success).addClass('hidden');
+                        $('.success-desc', $stripeSuccessDialog).safeHTML(l[25081]);
+                        $('button.js-close, .btn-close-dialog', $stripeSuccessDialog).addClass('hidden');
                     }
                     else {
-                        $('.btn-close-dialog', $success).removeClass('hidden').rebind('click.stripDlg', closeDialog);
+                        $('button.js-close, .btn-close-dialog', $stripeSuccessDialog)
+                            .removeClass('hidden')
+                            .rebind('click.stripeDlg', closeDialog);
                         delay('reload:stripe', pro.redirectToSite, 4000);
                     }
 
                     $stripeIframe.remove();
-                    $success.removeClass('hidden');
+                    $stripeDialog.addClass('hidden');
+                    M.safeShowDialog('stripe-pay-success', $stripeSuccessDialog);
                 }
                 else {
                     pro.propay.paymentStatusChecker =
@@ -1870,18 +1867,19 @@ var addressDialog = {
             }
 
             if (event.data.startsWith('payfail^')) {
-                const $stripWidget = $('.payment-stripe-dialog');
-                const $stripeIframe = $('iframe#stripe-widget', $stripWidget);
+                const $stripeDialog = $('.payment-stripe-dialog');
+                const $stripeFailureDialog = $('.payment-stripe-failure-dialog');
+                const $stripeIframe = $('iframe#stripe-widget', $stripeDialog);
                 const extraError = event.data.split('^')[1];
-                const $fail = $('.payment-fail', $stripWidget);
 
-                $('.btn-close-dialog', $fail).rebind('click.stripDlg', closeDialog);
+                $('button.js-close, .btn-close-dialog', $stripeFailureDialog).rebind('click.stripeDlg', closeDialog);
 
                 const extraTxt = extraError || '';
-                $('.stripe-error', $fail).text(extraTxt);
+                $('.stripe-error', $stripeFailureDialog).text(extraTxt);
 
                 $stripeIframe.remove();
-                $fail.removeClass('hidden');
+                $stripeDialog.addClass('hidden');
+                M.safeShowDialog('stripe-pay-failure', $stripeFailureDialog);
             }
             else if (event.data === 'paysuccess') {
 
@@ -1893,9 +1891,9 @@ var addressDialog = {
             }
         }
         else {
-            window.addEventListener("message", addressDialog.stripeFrameHandler, { once: true });
+            window.addEventListener('message', addressDialog.stripeFrameHandler, { once: true });
             pro.propay.listenRemover = setTimeout(() => {
-                window.removeEventListener("message", addressDialog.stripeFrameHandler, { once: true });
+                window.removeEventListener('message', addressDialog.stripeFrameHandler, { once: true });
             }, 7e5);
         }
     },
@@ -1918,9 +1916,10 @@ var addressDialog = {
 
     /**
      * Process the result from the API User Transaction Complete call
+     *
      * @param {Object} utcResult The results from the UTC call
      * @param {Boolean} isStripe A flag if 'Stripe' gateway is used
-     * @param {String}  saleId   Saleid to check
+     * @param {String} saleId Saleid to check
      */
     processUtcResult: function(utcResult, isStripe, saleId) {
         'use strict';
@@ -1928,11 +1927,11 @@ var addressDialog = {
         if (isStripe) {
             this.stripeSaleId = null;
             if (utcResult.EUR) {
-                const $stripWidget = $('.payment-stripe-dialog');
-                let $stripeIframe = $('iframe#stripe-widget', $stripWidget);
+                const $stripeDialog = $('.payment-stripe-dialog');
+                const $iframeContainer =
+                    $('.fm-dialog.mobile.payment-stripe-dialog, .mega-dialog.payment-stripe-dialog .iframe-container');
+                let $stripeIframe = $('iframe#stripe-widget', $stripeDialog);
                 $stripeIframe.remove();
-
-                $('.payment-success, .payment-fail', $stripWidget).addClass('hidden');
 
                 $stripeIframe = mCreateElement(
                     'iframe',
@@ -1942,7 +1941,7 @@ var addressDialog = {
                         sandbox: 'allow-scripts allow-same-origin allow-forms',
                         frameBorder: '0'
                     },
-                    $stripWidget[0]
+                    $iframeContainer[0]
                 );
                 let iframeSrc = utcResult.EUR;
 
@@ -1971,8 +1970,8 @@ var addressDialog = {
                     }
                 }
 
-                iframeSrc += '&p=' + this.proNum;
-                iframeSrc += '&pp=' + b64encode(this.proPrice);
+                iframeSrc += `&p=${this.proNum}`;
+                iframeSrc += `&pp=${b64encode(this.proPrice)}`;
 
                 const locale = addressDialog.stripeLocal();
                 if (locale) {
@@ -1981,7 +1980,7 @@ var addressDialog = {
                 if (this.extraDetails.recurring) {
                     iframeSrc += '&r=1';
                 }
-                iframeSrc += '&m=' + this.numOfMonths;
+                iframeSrc += `&m=${this.numOfMonths}`;
 
                 $stripeIframe.src = iframeSrc;
                 $stripeIframe.id = 'stripe-widget';
@@ -1990,11 +1989,11 @@ var addressDialog = {
                 loadingDialog.hide();
                 this.stripeSaleId = saleId;
 
-                M.safeShowDialog('stripe-pay', $stripWidget);
+                M.safeShowDialog('stripe-pay', $stripeDialog);
 
-                window.addEventListener("message", addressDialog.stripeFrameHandler, { once: true });
+                window.addEventListener('message', addressDialog.stripeFrameHandler, { once: true });
                 pro.propay.listenRemover = setTimeout(() => {
-                    window.removeEventListener("message", addressDialog.stripeFrameHandler, { once: true });
+                    window.removeEventListener('message', addressDialog.stripeFrameHandler, { once: true });
                 }, 6e5); // 10 minutes
             }
             else {
@@ -2091,7 +2090,6 @@ var cardDialog = {
         this.initCountryDropDown();
         this.initExpiryMonthDropDown();
         this.initExpiryYearDropDown();
-        this.initInputsFocus();
         this.initPurchaseButton();
     },
 
@@ -2104,7 +2102,7 @@ var cardDialog = {
         $('.pro-register-dialog').removeClass('active').addClass('hidden');
 
         // Cache DOM reference for lookup in other functions
-        this.$dialog = $('.fm-dialog.payment-dialog');
+        this.$dialog = $('.mega-dialog.payment-dialog');
         this.$backgroundOverlay = $('.fm-dialog-overlay');
         this.$successOverlay = $('.payment-result.success');
         this.$failureOverlay = $('.payment-result.failed');
@@ -2114,10 +2112,6 @@ var cardDialog = {
         this.$backgroundOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
 
         // Position the dialog and open it
-        this.$dialog.css({
-            'margin-left': -1 * (this.$dialog.outerWidth() / 2),
-            'margin-top': -1 * (this.$dialog.outerHeight() / 2)
-        });
         this.$dialog.addClass('active').removeClass('hidden');
 
         // Get the selected Pro plan details
@@ -2147,7 +2141,7 @@ var cardDialog = {
         this.clearPreviouslyEnteredCardData();
 
         // Initialise the close button
-        this.$dialog.find('.btn-close-dialog').rebind('click', function() {
+        this.$dialog.find('button.js-close').rebind('click', function() {
             cardDialog.$backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
             cardDialog.$dialog.removeClass('active').addClass('hidden');
 
@@ -2165,18 +2159,18 @@ var cardDialog = {
      */
     clearPreviouslyEnteredCardData: function() {
 
-        this.$dialog.find('.first-name').val('');
-        this.$dialog.find('.last-name').val('');
-        this.$dialog.find('.credit-card-number').val('');
-        this.$dialog.find('.cvv-code').val('');
-        this.$dialog.find('.address1').val('');
-        this.$dialog.find('.address2').val('');
-        this.$dialog.find('.city').val('');
-        this.$dialog.find('.state-province').val('');
-        this.$dialog.find('.post-code').val('');
-        this.$dialog.find('.expiry-date-month span').text(l[913]);
-        this.$dialog.find('.expiry-date-year span').text(l[932]);
-        this.$dialog.find('.countries span').text(l[481]);
+        $('.first-name', this.$dialog).val('');
+        $('.last-name', this.$dialog).val('');
+        $('.credit-card-number', this.$dialog).val('');
+        $('.cvv-code', this.$dialog).val('');
+        $('.address1', this.$dialog).val('');
+        $('.address2', this.$dialog).val('');
+        $('.city', this.$dialog).val('');
+        $('.state-province', this.$dialog).val('');
+        $('.post-code', this.$dialog).val('');
+        $('.expiry-date-month > span', this.$dialog).text(l[913]);
+        $('.expiry-date-year > span', this.$dialog).text(l[932]);
+        $('.countries > span', this.$dialog).text(l[481]);
     },
 
     /**
@@ -2212,19 +2206,21 @@ var cardDialog = {
      */
     initCountryDropDown: function() {
 
-        var countryOptions = '';
-        var $countriesSelect = this.$dialog.find('.default-select.countries');
-        var $countriesDropDown = $countriesSelect.find('.default-select-scroll');
+        var $countriesSelect = $('.dropdown-input.countries', this.$dialog);
+        var $selectScroll = $('.dropdown-scroll', $countriesSelect);
 
         // Build options
         $.each(M.getCountries(), function(isoCode, countryName) {
-            countryOptions += '<div class="default-dropdown-item " data-value="' + isoCode + '">'
-                            +     countryName
-                            + '</div>';
-        });
 
-        // Render the countries and update the text when a country is selected
-        $countriesDropDown.html(countryOptions);
+            var itemNode;
+
+            // Create the option and set the ISO code and country name
+            itemNode = mCreateElement('div', {
+                'class': 'option',
+                'data-value': isoCode,
+            }, $selectScroll[0]);
+            mCreateElement('span', undefined, itemNode).textContent = countryName;
+        });
 
         // Bind custom dropdowns events
         bindDropdownEvents($countriesSelect);
@@ -2235,21 +2231,24 @@ var cardDialog = {
      */
     initExpiryMonthDropDown: function() {
 
-        var twoDigitMonth = '';
-        var monthOptions = '';
-        var $expiryMonthSelect = this.$dialog.find('.default-select.expiry-date-month');
-        var $expiryMonthDropDown = $expiryMonthSelect.find('.default-select-scroll');
+        var $expiryMonthSelect = $('.dropdown-input.expiry-date-month',  this.$dialog);
+        var $selectScroll = $('.dropdown-scroll', $expiryMonthSelect);
 
         // Build options
         for (var month = 1; month <= 12; month++) {
-            twoDigitMonth = (month < 10) ? '0' + month : month;
-            monthOptions += '<div class="default-dropdown-item " data-value="' + twoDigitMonth + '">'
-                          +     twoDigitMonth
-                          + '</div>';
-        }
 
-        // Render the months and update the text when a country is selected
-        $expiryMonthDropDown.html(monthOptions);
+            var itemNode;
+            var twoDigitMonth;
+
+            twoDigitMonth = (month < 10) ? '0' + month : month;
+
+            // Create the option and set month values
+            itemNode = mCreateElement('div', {
+                'class': 'option',
+                'data-value': twoDigitMonth,
+            }, $selectScroll[0]);
+            mCreateElement('span', undefined, itemNode).textContent = twoDigitMonth;
+        }
 
         // Bind custom dropdowns events
         bindDropdownEvents($expiryMonthSelect);
@@ -2260,37 +2259,26 @@ var cardDialog = {
      */
     initExpiryYearDropDown: function() {
 
-        var yearOptions = '';
         var currentYear = new Date().getFullYear();
         var endYear = currentYear + 20;                                     // http://stackoverflow.com/q/2500588
-        var $expiryYearSelect = this.$dialog.find('.default-select.expiry-date-year');
-        var $expiryYearDropDown = $expiryYearSelect.find('.default-select-scroll');
+        var $expiryYearSelect = $('.dropdown-input.expiry-date-year', this.$dialog);
+        var $selectScroll = $('.dropdown-scroll', $expiryYearSelect);
 
         // Build options
         for (var year = currentYear; year <= endYear; year++) {
-            yearOptions += '<div class="default-dropdown-item " data-value="' + year + '">' + year + '</div>';
-        }
 
-        // Render the months and update the text when a country is selected
-        $expiryYearDropDown.html(yearOptions);
+            var itemNode;
+
+            // Create the option and set year values
+            itemNode = mCreateElement('div', {
+                'class': 'option',
+                'data-value': year,
+            }, $selectScroll[0]);
+            mCreateElement('span', undefined, itemNode).textContent = year;
+        }
 
         // Bind custom dropdowns events
         bindDropdownEvents($expiryYearSelect);
-    },
-
-    /**
-     * Inputs focused states
-     */
-    initInputsFocus: function() {
-        'use strict';
-
-        this.$dialog.find('.fm-account-input input').rebind('focus', function() {
-            $(this).parent().addClass('focused');
-        });
-
-        this.$dialog.find('.fm-account-input input').rebind('blur', function() {
-            $(this).parent().removeClass('focused');
-        });
     },
 
     /* jshint -W074 */  // Old code, refactor another day
@@ -2304,18 +2292,18 @@ var cardDialog = {
 
         // All payment data
         var billingData =    {
-            first_name: this.$dialog.find('.first-name').val(),
-            last_name: this.$dialog.find('.last-name').val(),
-            card_number: this.$dialog.find('.credit-card-number').val(),
-            expiry_date_month: this.$dialog.find('.expiry-date-month .active').attr('data-value'),
-            expiry_date_year: this.$dialog.find('.expiry-date-year .active').attr('data-value'),
-            cv2: this.$dialog.find('.cvv-code').val(),
-            address1: this.$dialog.find('.address1').val(),
-            address2: this.$dialog.find('.address2').val(),
-            city: this.$dialog.find('.city').val(),
-            province: this.$dialog.find('.state-province').val(),
-            postal_code: this.$dialog.find('.post-code').val(),
-            country_code: this.$dialog.find('.countries .active').attr('data-value'),
+            first_name: $('.first-name', this.$dialog).val(),
+            last_name: $('.last-name', this.$dialog).val(),
+            card_number: $('.credit-card-number', this.$dialog).val(),
+            expiry_date_month: $('.expiry-date-month .option[data-state="active"]', this.$dialog).attr('data-value'),
+            expiry_date_year: $('.expiry-date-year .option[data-state="active"]', this.$dialog).attr('data-value'),
+            cv2: $('.cvv-code', this.$dialog).val(),
+            address1: $('.address1', this.$dialog).val(),
+            address2: $('.address2', this.$dialog).val(),
+            city: $('.city', this.$dialog).val(),
+            province: $('.state-province', this.$dialog).val(),
+            postal_code: $('.post-code', this.$dialog).val(),
+            country_code: $('.countries .option[data-state="active"]', this.$dialog).attr('data-value'),
             email_address: u_attr.email
         };
 
@@ -2670,7 +2658,7 @@ var bitcoinDialog = {
         bitcoinDialog.setCoundownTimer($bitcoinDialog, expiryTime);
 
         // Close dialog and reset to original dialog
-        $bitcoinDialog.find('.btn-close-dialog').rebind('click.bitcoin-dialog-close', function() {
+        $('button.js-close', $bitcoinDialog).rebind('click.bitcoin-dialog-close', function() {
 
             $dialogBackgroundOverlay.removeClass('bitcoin-invoice-dialog-overlay').addClass('hidden');
             $bitcoinDialog.addClass('hidden');
@@ -2697,8 +2685,8 @@ var bitcoinDialog = {
             width: 256,
             height: 256,
             correctLevel: QRErrorCorrectLevel.H,    // High
-            background: '#ffffff',
-            foreground: '#000',
+            background: '#f2f2f2',
+            foreground: '#151412',
             text: 'bitcoin:' + bitcoinAddress + '?amount=' + priceInBitcoins
         };
 
@@ -2798,7 +2786,7 @@ var bitcoinDialog = {
         clearInterval(bitcoinDialog.countdownIntervalId);
 
         // Close dialog and reset to original dialog
-        $bitcoinFailureDialog.find('.btn-close-dialog').rebind('click', function() {
+        $('button.js-close', $bitcoinFailureDialog).rebind('click', function() {
             $dialogBackgroundOverlay.removeClass('bitcoin-invoice-dialog-overlay').addClass('hidden');
             $bitcoinFailureDialog.addClass('hidden');
         });

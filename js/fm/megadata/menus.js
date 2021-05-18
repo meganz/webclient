@@ -20,7 +20,7 @@ MegaData.prototype.buildSubMenu = function(id) {
     csb = document.getElementById('sm_move');
     if (!csb || parseInt(csb.dataset.folders) !== rootTreeLen) {
         if (rootTree) {
-            cs = ' contains-submenu';
+            cs = ' contains-submenu sprite-fm-mono-after icon-arrow-right-after';
             sm = '<span class="dropdown body submenu" id="sm_' + rootID + '">'
                 + '<span id="csb_' + rootID + '"></span>' + arrow + '</span>';
         }
@@ -33,14 +33,17 @@ MegaData.prototype.buildSubMenu = function(id) {
             '<span class="dropdown body submenu" id="sm_move">' +
             '  <span id="csb_move">' +
             '    <span class="dropdown-item cloud-item' + cs + '" id="fi_' + rootID + '">' +
-            '      <i class="small-icon context cloud"></i>' + escapeHTML(l[164]) +
+            '      <i class="sprite-fm-mono icon-cloud"></i>' +
+            '      <span>' + escapeHTML(l[164]) + '</span>' +
             '    </span>' + sm +
             '    <span class="dropdown-item remove-item" id="fi_' + escapeHTML(this.RubbishID) + '">' +
-            '      <i class="small-icon context remove-to-bin"></i>' + escapeHTML(l[168]) +
+            '      <i class="sprite-fm-mono icon-bin"></i>' +
+            '      <span>' + escapeHTML(l[168]) + '</span>' +
             '    </span>' +
             '    <hr />' +
             '    <span class="dropdown-item advanced-item">' +
-            '      <i class="small-icon context aim"></i>' + escapeHTML(l[9108]) +
+            '      <i class="sprite-fm-mono icon-target"></i>' +
+            '      <span>' + escapeHTML(l[9108]) + '</span>' +
             '    </span>' + arrow +
             '  </span>' +
             '</span>'
@@ -63,24 +66,28 @@ MegaData.prototype.buildSubMenu = function(id) {
             cs = '';
             sm = '';
             if (this.tree[fid]) {
-                cs = ' contains-submenu';
+                cs = ' contains-submenu sprite-fm-mono-after icon-arrow-right-after';
                 sm = '<span class="dropdown body submenu" id="sm_' + fid + '">'
                     + '<span id="csb_' + fid + '"></span>' + arrow + '</span>';
             }
 
             var classes = 'folder-item';
+            var iconClass = 'icon-folder';
             if (folders[i].t & M.IS_SHARED) {
                 classes += ' shared-folder-item';
+                iconClass = 'icon-folder-outgoing-share';
             }
             else if (mega.megadrop.pufs[fid] && mega.megadrop.pufs[fid].s !== 1) {
                 classes += ' puf-folder';
+                iconClass = 'icon-folder-upload';
             }
 
             var nodeName = missingkeys[fid] ? l[8686] : folders[i].name;
 
             $csb.append(
                 '<span class="dropdown-item ' + classes + cs + '" id="fi_' + fid + '">' +
-                '  <i class="small-icon context ' + classes + '"></i>' + escapeHTML(nodeName) +
+                '  <i class="sprite-fm-mono ' + iconClass + '"></i>' +
+                '  <span>' + escapeHTML(nodeName) + '</span>' +
                 '</span>' + sm
             );
         }
@@ -115,11 +122,13 @@ MegaData.prototype.menuItems = function menuItems() {
     nodes = nodes.concat(rrnodes);
 
     var checkMegaSync = function _checkMegaSync(preparedItems) {
-        $('.dropdown-item.download-item').addClass('contains-submenu');
+        $('.dropdown-item.download-item')
+            .addClass('contains-submenu sprite-fm-mono-after icon-arrow-right-after');
         $('.dropdown-item.download-item').removeClass('msync-found');
 
         if (window.useMegaSync === 2 || window.useMegaSync === 3) {
-            $('.dropdown-item.download-item').removeClass('contains-submenu');
+            $('.dropdown-item.download-item')
+                .removeClass('contains-submenu sprite-fm-mono-after icon-arrow-right-after');
             $('.dropdown-item.download-item').addClass('msync-found');
             if (window.useMegaSync === 2 && $.selected.length === 1 && M.d[$.selected[0]].t === 1) {
                 var addItemAndResolvePromise = function _addItemAndResolvePromise(error, response) {
@@ -153,6 +162,40 @@ MegaData.prototype.menuItems = function menuItems() {
     return promise;
 };
 
+MegaData.prototype.getSelectedSourceRoot = function(isSearch) {
+
+    'use strict';
+
+    let sourceRoot = isSearch || M.currentdirid === 'recents' ? M.getNodeRoot($.selected[0]) : M.currentrootid;
+
+    if (sourceRoot === 'public-links' || sourceRoot === 'out-shares') {
+        sourceRoot = M.RootID;
+    }
+
+    return sourceRoot;
+};
+
+MegaData.prototype.checkSendToChat = function(isSearch, sourceRoot) {
+
+    'use strict';
+
+    // view send to chat if all selected items are files
+    if (!folderlink && window.megaChatIsReady && $.selected.length) {
+
+        for (let i = $.selected.length; i--;) {
+
+            let n = M.d[$.selected[i]];
+            let nRoot = isSearch ? (n.u === u_handle && M.getNodeRoot($.selected[i])) : sourceRoot;
+
+            if (!n || (n.t && nRoot !== M.RootID)) {
+                return false;
+            }
+        }
+        return true;
+    }
+    return false;
+};
+
 /**
  * Build an array of context-menu items to show for the selected node
  * @returns {Object}
@@ -163,7 +206,8 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
     var n;
     var items = Object.create(null);
     var selNode = M.d[$.selected[0]] || false;
-    var sourceRoot = M.getNodeRoot($.selected[0]);
+    const isSearch = page.startsWith('fm/search');
+    const sourceRoot = M.getSelectedSourceRoot(isSearch);
 
     if (selNode && selNode.su && !M.d[selNode.p]) {
         items['.removeshare-item'] = 1;
@@ -245,10 +289,10 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
             items['.colour-label-items'] = 1;
 
             if (M.isFavourite(selNode.h)) {
-                $('.add-star-item').safeHTML('<i class="small-icon context broken-heart"></i>@@', l[5872]);
+                $('.add-star-item').safeHTML('<i class="sprite-fm-mono icon-favourite-removed"></i>@@', l[5872]);
             }
             else {
-                $('.add-star-item').safeHTML('<i class="small-icon context heart"></i>@@', l[5871]);
+                $('.add-star-item').safeHTML('<i class="sprite-fm-mono icon-favourite"></i>@@', l[5871]);
             }
 
             M.colourLabelcmUpdate(selNode);
@@ -262,19 +306,8 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
         }
     }
 
-    // view send to chat if all selected items are files
-    if (!folderlink && window.megaChatIsReady && $.selected.length) {
-        var viewChat = true;
-        for (var i = $.selected.length; i--;) {
-            var n = M.d[$.selected[i]];
-            if (!n || (n.t && sourceRoot !== M.RootID)) {
-                viewChat = false;
-                break;
-            }
-        }
-        if (viewChat) {
-            items['.send-to-contact-item'] = 1;
-        }
+    if (M.checkSendToChat(isSearch, sourceRoot)) {
+        items['.send-to-contact-item'] = 1;
     }
 
     if (selNode) {
@@ -530,10 +563,6 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
                 onIdle(showContextMenu);
             });
     }
-    else if (ll === 6) { // sort menu
-        $('.files-menu.context .dropdown-item').hide();
-        $('.files-menu.context .dropdown-item.do-sort').show();
-    }
     else if (ll === 7) { // Columns selection menu
         if (M && M.columnsWidth && M.columnsWidth.cloud) {
             var $currMenuItems = $('.files-menu.context .dropdown-item').hide().filter('.visible-col-select');
@@ -544,11 +573,11 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
                 else {
                     if (M.columnsWidth.cloud[col] && M.columnsWidth.cloud[col].viewed) {
                         $currMenuItems.filter('[megatype="' + col + '"]').attr('isviewed', 'y')
-                            .show().find('i').addClass('icons-sprite tiny-grey-tick');
+                            .show().find('i').removeClass('icon-add').addClass('icon-check');
                     }
                     else {
                         $currMenuItems.filter('[megatype="' + col + '"]').removeAttr('isviewed')
-                            .show().find('i').removeClass('icons-sprite tiny-grey-tick');
+                            .show().find('i').removeClass('icon-check').addClass('icon-add');
                     }
                 }
             }
@@ -559,8 +588,20 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
         // Hide all menu-items
         $(menuCMI).hide();
 
-        var id = $(e.currentTarget).attr('id');
-        var currNodeClass = $(e.currentTarget).attr('class');
+        var id;
+        var currNodeClass;
+        var $currentTarget = $(e.currentTarget);
+
+        // This event is context on selection bar
+        if ($currentTarget.hasClass('js-statusbarbtn')) {
+            id = $.selected[0];
+            currNodeClass = $.gridLastSelected.className;
+        }
+        // This event is context on node itself
+        else {
+            id = $currentTarget.attr('id');
+            currNodeClass = $currentTarget.attr('class');
+        }
 
         if (id) {
 
@@ -630,7 +671,7 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
 
             // Open contact details page
             $contactDetails.rebind('click.opencontact', function() {
-                M.openFolder(id);
+                loadSubPage('fm/chat/contacts/' + id);
             });
 
             var verificationState = u_authring.Ed25519[id] || {};
@@ -742,12 +783,12 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
                             var $playItem = $menuCMI.filter('.play-item');
 
                             if (is_audio(M.d[id])) {
-                                $playItem.find('i').removeClass('videocam').addClass('play')
-                                    .end().find('span').text(l[17828]);
+                                $('i', $playItem).removeClass('icon-video-call-filled').addClass('icon-play-small');
+                                $('span', $playItem).text(l[17828]);
                             }
                             else {
-                                $playItem.find('i').removeClass('play').addClass('videocam')
-                                    .end().find('span').text(l[16275]);
+                                $('i', $playItem).removeClass('icon-play-small').addClass('icon-video-call-filled');
+                                $('span', $playItem).text(l[16275]);
                             }
                         }
                     }
@@ -755,6 +796,12 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
                     // Hide Info item if properties dialog is opened
                     if ($.dialog === 'properties') {
                         $menuCMI.filter('.properties-item').hide();
+                    }
+
+                    // Hide items for selection Bar Options button
+                    if (!$currentTarget.attr('id')) {
+                        $menuCMI.filter('.download-item, .sh4r1ng-item, .send-to-contact-item,' +
+                            '.getlink-item, .remove-item').hide();
                     }
 
                     onIdle(showContextMenu);
@@ -862,7 +909,7 @@ MegaData.prototype.reCalcMenuPosition = function(m, x, y, ico) {
     var maxY = wH - TOP_MARGIN;// max vertical coordinate, bottom side of window
 
     // min horizontal coordinate, left side of right panel
-    var minX = SIDE_MARGIN + $('div.nw-fm-left-icons-panel').outerWidth();
+    var minX = SIDE_MARGIN + $('nav.nw-fm-left-icons-panel').outerWidth();
     var minY = TOP_MARGIN;// min vertical coordinate, top side of window
     var wMax = x + cmW;// coordinate of context menu right edge
     var hMax = y + cmH;// coordinate of context menu bottom edge
@@ -1046,7 +1093,7 @@ MegaData.prototype.reCalcMenuPosition = function(m, x, y, ico) {
 MegaData.prototype.setBordersRadius = function(m, c) {
     "use strict";
 
-    var DEF = 8;// default corner radius
+    var DEF = 12;// default corner radius
     var SMALL = 4;// small carner radius
     var TOP_LEFT = 1, TOP_RIGHT = 3, BOT_LEFT = 2, BOT_RIGHT = 4;
     var tl = DEF, tr = DEF, bl = DEF, br = DEF;
@@ -1122,11 +1169,12 @@ MegaData.prototype.labelSortMenuUI = function(event, rightClick) {
     var $menuItems = $('.colour-sorting-menu .dropdown-colour-item');
     var x = 0;
     var y = 0;
-    var $sortMenuItems = $('.dropdown-item', $menu).removeClass('active asc desc');
+    var $sortMenuItems = $('.dropdown-item', $menu).removeClass('active');
+    var $selectedItem;
     var type = this.currentLabelType;
     var sorting = M.sortmode || {n: 'name', d: 1};
 
-    var dir = sorting.d > 0 ? 'asc' : 'desc';
+    var dirClass = sorting.d > 0 ? 'icon-up' : 'icon-down';
 
     // Close label filtering sorting menu on second Name column click
     if ($menu.is(':visible') && !rightClick) {
@@ -1143,10 +1191,12 @@ MegaData.prototype.labelSortMenuUI = function(event, rightClick) {
         }
     }
 
-    $sortMenuItems
+    $('.sort-arrow', $sortMenuItems).removeClass('icon-up icon-down');
+
+    $selectedItem = $sortMenuItems
         .filter('*[data-by=' + sorting.n + ']')
-        .addClass('active')
-        .addClass(dir);
+        .addClass('active');
+    $('.sort-arrow', $selectedItem).addClass(dirClass);
 
     var tmpFn = function() {
         x = event.clientX;
@@ -1163,7 +1213,7 @@ MegaData.prototype.labelSortMenuUI = function(event, rightClick) {
         tmpFn();
     }
 
-    M.searchPath();
+    delay('render:search_breadcrumbs', () => M.renderSearchBreadcrumbs());
     $.hideTopMenu();
     $.hideContextMenu();
     $menu.removeClass('hidden');

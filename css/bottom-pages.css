@@ -9,7 +9,7 @@
     float: left;
     width: 171px;
     height: 120px;
-    background-image: url(../images/mega/privacy-sprite_v2.png);
+    background-image: url(../images/mega/privacy-sprite.png);
     background-position: left top;
     background-repeat: no-repeat;
 }
@@ -40,7 +40,7 @@
     padding: 7px 0 9px 0;
 }
 .privacy-company-bott .st-quote-left, .privacy-company-bott .st-quote-right {
-    background-image: url(../images/mega/privacy-sprite_v2.png);
+    background-image: url(../images/mega/privacy-sprite.png);
     background-position: -10px -650px;
     background-repeat: no-repeat;
 }
@@ -48,7 +48,7 @@
     background-position: -70px -748px;
 }
 .copyrights-dispute-bottom {
-    background-color: #FAFAFA;
+    background: var(--surface-grey-1);
     margin-top: 24px;
     padding: 20px;
 }
@@ -78,48 +78,57 @@
     padding: 0 20px 10px 20px;
 }
 .new-bottom-pages h1, .bp-main h1 {
-    font-size: 21px;
-    line-height: 31px;
-    font-family: 'LatoWebBold', 'source_sans_prosemibold', Arial;
+    color: var(--text-color-high);
+    font: var(--text-h1);
     margin: 0;
-    padding: 25px 0 0 0;
+    -webkit-padding-end: 25px;
+    padding-inline-end: 25px;
     font-weight: normal;
-    color: #333333;
 }
 .new-bottom-pages h2, .bp-main h2 {
-    color: #666666;
-    font-size: 16px;
-    line-height: 24px;
-    letter-spacing: -0.1px;
-    font-family: 'Open Sans Semibold Italic', Arial;
+    color: var(--text-color-high);
+    font: var(--text-h2);
     padding: 21px 0 0 0;
     margin: 0;
-    font-weight: normal;
+}
+.new-bottom-pages.terms h2,
+.new-bottom-pages.privacy-policy h2,
+.new-bottom-pages.takedown-guidance h2,
+.new-bottom-pages.copyrights-page h2 {
+    color: var(--text-color-medium);
+    font-style: italic;
 }
 .new-bottom-pages p, .new-bottom-pages p span.text, .bp-main p {
-    color: #333333;
-    font-size: 14px;
-    line-height: 26px;
+    color: var(--text-color-medium);
+    font: var(--text-body1);
     margin: 0;
-    padding: 25px 0 0 0;
+    padding-top: 25px;
 }
 .new-bottom-pages p span.text {
     display: block;
-    padding: 0 0 0 34px;
-    color: #666666;
+    padding-top: 0;
+    -webkit-padding-start: 34px;
+    padding-inline-start: 34px;
+}
+.new-bottom-pages:not(.terms):not(.privacy-policy):not(.copyrights-page) p span.text {
+    color: var(--text-color-low);
 }
 .new-bottom-pages h2 span.text {
     display: block;
-    padding: 0 0 0 34px;
+    -webkit-padding-start: 34px;
+    padding-inline-start: 34px;
 }
 .bottom-page-txt-pad {
-    padding: 0 0 0 34px;
+    -webkit-padding-start: 34px;
+    padding-inline-start: 34px;
 }
 .new-bottom-pages p.list span.text, .new-bottom-pages h2.list span.text {
-    padding: 0 0 0 75px;
+    -webkit-padding-start: 75px;
+    padding-inline-start: 75px;
 }
 .new-bottom-pages p.sub-list span.text, .new-bottom-pages h2.sub-list span.text {
-    padding: 0 0 0 125px;
+    -webkit-padding-start: 125px;
+    padding-inline-start: 125px;
 }
 .new-bottom-pages p span.number, .new-bottom-pages h2 span.number {
     padding: 0;
@@ -154,7 +163,7 @@
     margin: 2px 0 0 70px;
 }
 .new-bottom-page p span.red, .new-bottom-page h2 span.red, .new-bottom-page p a, .new-bottom-page h2 a, .new-bottom-pages p a, .new-bottom-pages .investors-pdf-block a, .new-bottom-page li a, .new-bottom-pages li a, .download.error-text a, .bottom-pages-dialog a {
-    color: #F0373B;
+    color: var(--text-color-error);
     overflow-wrap: break-word;
 }
 .mobile .investors-pdf-block {
@@ -318,9 +327,10 @@ html.gbot {
 }
 .bottom-page .top-head.floating {
     background-color: white;
-    box-shadow: 0 1px 0 0 rgba(0, 0, 0, 0.1);
+    height: 60px;
     position: fixed;
-    top: -38px;
+    padding-bottom: 14px;
+    top: -62px;
 }
 .bottom-page .top-head.floating.activated {
     top: 0;
@@ -328,17 +338,16 @@ html.gbot {
 .bottom-page .logo:not(.bottom-menu) {
     background-position: -6px -773px;
 }
-.bottom-page.light-blue-top .top-head, .bottom-page.light-blue-top .top-head.floating {
-    background-color: #F0F2F5;
-    box-shadow: 0 1px 0 0 rgba(0, 0, 0, 0.1);
+.bottom-page.light-blue-top .top-head,
+.bottom-page.light-blue-top .top-head.floating,
+.bottom-page.light-grey-top .top-head,
+.bottom-page.light-grey-top .top-head.floating {
+    background-color: var(--surface-main);
 }
-.bottom-page.light-grey-top .top-head, .bottom-page.light-grey-top .top-head.floating {
-    background-color: #FAFAFA;
-    box-shadow: 0 1px 0 0 rgba(0, 0, 0, 0.1);
-}
+
 .bottom-page.top-bl {
     table-layout: fixed;
-    padding-top: 106px;
+    padding-top: 128px;
     box-sizing: border-box;
 }
 .onboarding-suggestions.megasync .bottom-page.top-bl {
@@ -387,6 +396,14 @@ html.gbot {
     display: block;
     height: 100%;
 }
+.fmholder .bottom-page.scroll-block.placeholder {
+    background: var(--surface-main);
+}
+.fmholder .bottom-page.sign .top-head.floating,
+.fmholder .bottom-page.about .top-head.floating {
+    box-shadow: 0 1px 0 0 var(--surface-grey-2);
+}
+
 .bottom-page.vertical-centered-bl {
     display: table;
     width: 100%;
@@ -477,7 +494,7 @@ body:not(.mobile) .bottom-page.scroll-button:hover {
     height: 20px;
     display: inline-block;
     margin: 10px 6px 0 0;
-    background-image: url(../images/mega/pages-sprite_v8.png);
+    background-image: url(../images/mega/pages-sprite.png);
     background-position: 2px -3330px;
     background-repeat: no-repeat;
     vertical-align: top;
@@ -1019,7 +1036,7 @@ body:not(.mobile) .bottom-page.scroll-button:hover {
     vertical-align: top;
     width: 8px;
     height: 13px;
-    background-image: url(../images/mega/startpage-sprite_v13.png);
+    background-image: url(../images/mega/startpage-sprite.png);
     background-position: -165px -7px;
     background-repeat: no-repeat;
 }
@@ -1055,7 +1072,7 @@ body:not(.mobile) .bottom-page.scroll-button:hover {
     width: 102px;
     height: 102px;
     margin: 10px auto 26px auto;
-    background-image: url(../images/mega/startpage-sprite_v13.png);
+    background-image: url(../images/mega/startpage-sprite.png);
     background-position: 0 -533px;
     background-repeat: no-repeat;
     padding: 0;
@@ -1125,15 +1142,15 @@ body:not(.mobile) .bottom-page.scroll-button:hover {
 }
 .bottom-page.big-icon.folders {
     background-position: -119px -1270px;
-    background-image: url(../images/mega/pages-sprite_v8.png);
+    background-image: url(../images/mega/pages-sprite.png);
 }
 .bottom-page.big-icon.arrows {
     background-position: -119px -1400px;
-    background-image: url(../images/mega/pages-sprite_v8.png);
+    background-image: url(../images/mega/pages-sprite.png);
 }
 .bottom-page.big-icon.up-down {
     background-position: -119px -1530px;
-    background-image: url(../images/mega/pages-sprite_v8.png);
+    background-image: url(../images/mega/pages-sprite.png);
 }
 .bottom-page.big-icon.safe {
     background-position: -160px -383px;
@@ -1237,7 +1254,7 @@ body:not(.mobile) .bottom-page.scroll-button:hover {
 .bottom-page.tab-icon {
     width: 34px;
     height: 32px;
-    background-image: url(../images/mega/pages-sprite_v8.png);
+    background-image: url(../images/mega/pages-sprite.png);
     background-position: 1px -1941px;
     opacity: 0.3;
     display: block;
@@ -1373,6 +1390,45 @@ iframe.security-video-container {
 .icon-blocks-wrap .bottom-page.icon {
     margin: 40px 0 0 0;
 }
+.bottom-page .transparent-button {
+    border-radius: 4px;
+    box-sizing: border-box;
+    color: #fafafa;
+    display: inline-block;
+    font-family: 'LatoWeb', Arial, sans-serif;
+    font-size: 16px;
+    height: 34px;
+    line-height: 34px;
+    min-width: 102px;
+    padding: 0 25px;
+    position: relative;
+    text-align: center;
+    transition: color 0.2s ease-in-out, box-shadow 0.2s ease-in-out, background-color 0.2s ease-in-out;
+    white-space: nowrap;
+}
+.bottom-page .transparent-button.light {
+    color: #666;
+}
+.bottom-page .transparent-button::after {
+    border-radius: inherit;
+    box-shadow: 0 0 0 1px #fff;
+    content: "";
+    display: block;
+    height: 100%;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 100%;
+}
+.bottom-page .transparent-button.light::after {
+    box-shadow: 0 0 0 1px #666;
+}
+.bottom-page .transparent-button:hover {
+    box-shadow: 0 0 0 4px hsla(0, 0%, 100%, 0.2);
+}
+.bottom-page .transparent-button.light:hover {
+    box-shadow: 0 0 0 4px rgba(0, 0, 0, .15);
+}
 /* end of Bottom pages common styles*/
 .pages-nav.nav-button {
     width: 14.2%;
@@ -1387,7 +1443,7 @@ iframe.security-video-container {
     margin: 12px auto 5px auto;
     width: 22px;
     height: 24px;
-    background-image: url(../images/mega/startpage-sprite_v13.png);
+    background-image: url(../images/mega/startpage-sprite.png);
     background-position: -0px -73px;
     opacity: 0.5;
     -webkit-transition: opacity 200ms ease-in-out;
@@ -1403,7 +1459,7 @@ iframe.security-video-container {
     opacity: 0.3;
 }
 .nav-buttons-bl .pages-nav.nav-icon.bott-sprite {
-    background-image: url(../images/mega/pages-sprite_v8.png);
+    background-image: url(../images/mega/pages-sprite.png);
     width: 26px;
     height: 26px;
     margin: 8px auto 3px auto;
@@ -1567,7 +1623,7 @@ iframe.security-video-container {
     width: 8px;
     height: 5px;
     margin: 5px 0 0 4px;
-    background-image: url(../images/mega/pages-sprite_v8.png);
+    background-image: url(../images/mega/pages-sprite.png);
     background-position: -215px -203px;
     opacity: 0.67;
 }
@@ -1603,6 +1659,12 @@ iframe.security-video-container {
 .megacmd .bottom-page.horizontal-centered-bl.wide {
     max-width: 1246px;
     padding: 0 40px;
+}
+.megacmd .cmd-pad .transparent-button {
+    margin-top: 16px;
+}
+.megacmd .cmd-pad .transparent-button::after {
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.12);
 }
 .bottom-page.green-block {
     background-color: #00BFA5;
@@ -1680,7 +1742,7 @@ iframe.security-video-container {
     text-align: left;
     cursor: pointer;
 }
-.bottom-page.tab-body .button {
+.bottom-page.tab-body button {
     margin-top: 12%;
 }
 .bottom-page.tab-button.active {
@@ -1703,7 +1765,7 @@ iframe.security-video-container {
     height: 26px;
     display: inline-block;
     vertical-align: top;
-    background-image: url(../images/mega/pages-sprite_v8.png);
+    background-image: url(../images/mega/pages-sprite.png);
     background-position: -12px -3039px;
     margin: 15px 12px 0 0;
 }
@@ -1981,10 +2043,10 @@ body:not(.mobile) .bottom-page.top-dark-button:hover {
     background-repeat: no-repeat;
 }
 .bottom-page.icon.pages-sprite, .pages-sprite, i.pages-sprite {
-    background-image: url(../images/mega/pages-sprite_v8.png);
+    background-image: url(../images/mega/pages-sprite.png);
 }
 .bottom-page.icon.new-pages-sprite {
-    background-image: url(../images/mega/new-pages-sprite_v6.png);
+    background-image: url(../images/mega/new-pages-sprite.png);
 }
 .bottom-page.icon.x96 {
     width: 96px;
@@ -2213,7 +2275,7 @@ body:not(.mobile) .bottom-page.top-dark-button:hover {
     padding: 0 40px;
 }
 .bottom-page.mid-icon {
-    background-image: url(../images/mega/pages-sprite_v8.png);
+    background-image: url(../images/mega/pages-sprite.png);
     width: 80px;
     height: 80px;
     float: left;
@@ -2241,7 +2303,7 @@ body:not(.mobile) .bottom-page.top-dark-button:hover {
     margin: 0 0 0 120px;
     text-align: left;
 }
-.bottom-page.icon-info .button {
+.bottom-page.icon-info .mega-button {
     margin-top: 16px;
 }
 .bottom-page.icon-info hr {
@@ -2269,55 +2331,48 @@ body:not(.mobile) .bottom-page.top-dark-button:hover {
     color: #666666;
     text-decoration: underline;
 }
-.bottom-page .button.default-huge-button {
-    margin-top: 65px;
-    font-family: 'montserrat', 'open_sans', sans-serif;
-}
-.bottom-page .megaapp-linux:not(.hidden) + .button.default-huge-button {
-    margin-top: 18px;
-}
 .cmd-bg .top-header {
     color: #333333;
 }
 .bottom-page.big-icon.target {
-    background-image: url(../images/mega/pages-sprite_v8.png);
+    background-image: url(../images/mega/pages-sprite.png);
     background-position: 1px -310px;
 }
 .bottom-page.big-icon.charts {
-    background-image: url(../images/mega/pages-sprite_v8.png);
+    background-image: url(../images/mega/pages-sprite.png);
     background-position: 1px -190px;
 }
 .bottom-page.big-icon.mobile-cloud {
-    background-image: url(../images/mega/pages-sprite_v8.png);
+    background-image: url(../images/mega/pages-sprite.png);
     background-position: 1px -1400px;
 }
 .bottom-page.big-icon.chat {
-    background-image: url(../images/mega/pages-sprite_v8.png);
+    background-image: url(../images/mega/pages-sprite.png);
     background-position: 1px -1270px;
 }
 .bottom-page.big-icon.photos {
-    background-image: url(../images/mega/pages-sprite_v8.png);
+    background-image: url(../images/mega/pages-sprite.png);
     background-position: 1px -1530px;
 }
 .bottom-page.big-icon.cloud {
-    background-image: url(../images/mega/pages-sprite_v8.png);
+    background-image: url(../images/mega/pages-sprite.png);
     background-position: 1px -1660px;
 }
 .bottom-page.big-icon.camera {
-    background-image: url(../images/mega/pages-sprite_v8.png);
+    background-image: url(../images/mega/pages-sprite.png);
     background-position: -119px -1660px;
 }
 .bottom-page.big-icon.player {
-    background-image: url(../images/mega/pages-sprite_v8.png);
+    background-image: url(../images/mega/pages-sprite.png);
     background-position: -119px -1790px;
 }
 .bottom-page.big-icon.mobile-arrow {
-    background-image: url(../images/mega/pages-sprite_v8.png);
+    background-image: url(../images/mega/pages-sprite.png);
     background-position: -119px -1920px;
 }
 .cmd-top-img {
     height: 180px;
-    background-image: url(../images/mega/pages-sprite_v8.png);
+    background-image: url(../images/mega/pages-sprite.png);
     background-position: center -3114px;
     background-repeat: no-repeat;
     display: none;
@@ -2339,18 +2394,18 @@ body:not(.mobile) .bottom-page.top-dark-button:hover {
     width: 188px;
     height: 188px;
     margin: 0 auto;
-    background-image: url(../images/mega/new-pages-sprite_v6.png);
+    background-image: url(../images/mega/new-pages-sprite.png);
     background-size: 376px auto;
     background-repeat: no-repeat;
     padding: 0;
 }
 .bottom-page.large-icon.pages-sprite, .bottom-page.big-icon.pages-sprite {
-    background-image: url(../images/mega/pages-sprite_v8.png);
+    background-image: url(../images/mega/pages-sprite.png);
     background-size: 360px auto;
     background-repeat: no-repeat;
 }
 .bottom-page.about-sprite, i.bottom-page.about-sprite {
-    background-image: url(../images/mega/about-sprite_v2.png);
+    background-image: url(../images/mega/about-sprite.png);
     background-repeat: no-repeat;
 }
 .bottom-page.large-icon.camera {
@@ -2563,7 +2618,7 @@ body:not(.mobile) .bottom-page.top-dark-button:hover {
     width: 96px;
     height: 96px;
     margin: 0 auto 16px;
-    background-image: url(../images/mega/new-pages-sprite_v6.png);
+    background-image: url(../images/mega/new-pages-sprite.png);
     background-size: 376px auto;
     background-repeat: no-repeat;
     padding: 0;
@@ -2633,7 +2688,7 @@ body:not(.mobile) .bottom-page.top-dark-button:hover {
 }
 
 .megasync .bottom-page.angle-bg {
-    background-image: url(../images/mega/bottom-page/gray-blue-angle_v1@2x.png);
+    background-image: url(../images/mega/bottom-page/gray-blue-angle@2x.png);
     background-position: center top;
     margin-top: 4px;
     bottom: 0 !important;
@@ -2645,7 +2700,7 @@ body:not(.mobile) .bottom-page.top-dark-button:hover {
     position: absolute;
     width: 100%;
     left: 0;
-    background-image: url(../images/mega/bottom-page/grey-angle_v1.png);
+    background-image: url(../images/mega/bottom-page/grey-angle.png);
     background-size: 100% 100%;
     background-position: center top;
     background-color: white;
@@ -2707,57 +2762,69 @@ body:not(.mobile) .bottom-page.top-dark-button:hover {
     content: unset;
 }
 .bottom-page.radio-buttons {
-    padding: 5px 0 0px 0;
+    padding: 5px 0 0;
 }
 .megaapp-linux .bottom-page.radio-buttons {
-    width: auto;
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
     margin: 0;
-    padding: 6px 0 0 0;
+    padding: 12px 0 0;
+    width: 100%;
 }
-.default-dropdown-item.icon {
-    padding: 0 30px 0 34px;
-    background-image: url(../images/mega/download-sprite_v10.png);
-    background-position: 0 64px;
+.megaapp-linux .bottom-page.radio-buttons.hidden {
+    display: none;
+}
+
+.download-sprite {
+    background-image: url(../images/mega/download-sprite.png);
     background-repeat: no-repeat;
 }
-.default-dropdown-item.centos {
-    background-position: 10px -1921px;
+.icon.linux.download-sprite {
+    height: 18px;
+    width: 18px;
 }
-.default-dropdown-item.debian, .default-dropdown-item.raspbian {
-    background-position: 10px -1982px;
+.icon.linux.download-sprite.centos {
+    background-position: 1px -1928px;
 }
-.default-dropdown-item.elementary, .default-dropdown-item.elementaryosfreya {
-    background-position: 10px -1952px;
+.icon.linux.download-sprite.debian,
+.icon.linux.download-sprite.raspbian {
+    background-position: 1px -1988px;
 }
-.default-dropdown-item.fedora {
-    background-position: 10px -2132px;
+.icon.linux.download-sprite.elementary,
+.icon.linux.download-sprite.elementaryosfreya {
+    background-position: 1px -1958px;
 }
-.default-dropdown-item.mint {
-    background-position: 10px -2102px;
+.icon.linux.download-sprite.fedora {
+    background-position: 1px -2138px;
 }
-.default-dropdown-item.opensuse {
-    background-position: 10px -2072px;
+.icon.linux.download-sprite.mint {
+    background-position: 1px -2108px;
 }
-.default-dropdown-item.redhat {
-    background-position: 10px -2042px;
+.icon.linux.download-sprite.opensuse {
+    background-position: 1px -2078px;
 }
-.default-dropdown-item.ubuntu {
-    background-position: 10px -2012px;
+.icon.linux.download-sprite.redhat {
+    background-position: 1px -2049px;
 }
-.default-dropdown-item.arch {
-    background-position: 12px -3633px;
+.icon.linux.download-sprite.ubuntu {
+    background-position: 1px -2018px;
 }
-.default-dropdown-item.nautilus {
-    background-position: 11px -3503px;
+.icon.linux.download-sprite.arch {
+    background-position: 2px -3638px;
 }
-.default-dropdown-item.dolphin {
-    background-position: 11px -3535px;
+.icon.linux.download-sprite.nautilus {
+    background-position: 3px -3510px;
 }
-.default-dropdown-item.nemo {
-    background-position: 11px -3601px;
+.icon.linux.download-sprite.dolphin {
+    background-position: 2px -3542px;
 }
-.default-dropdown-item.thunar {
-    background-position: 11px -3567px;
+.icon.linux.download-sprite.nemo {
+    background-position: 2px -3607px;
+}
+.icon.linux.download-sprite.thunar {
+    background-position: 3px -3574px;
 }
 .mobile .bottom-page.nav-buttons-bl.contrast, .mobile .bottom-page.top-dark-info.small {
     display: none;
@@ -2797,16 +2864,9 @@ body:not(.mobile) .bottom-page.top-dark-button:hover {
 .bottom-page .megaapp-linux-container .install-guide-trigger {
     color: #6fd7ff;
     cursor: default;
-    text-align: left;
-}
-
-.bottom-page .megaapp-linux-container .install-guide-trigger span {
-    float: left;
-    font-family: 'LatoWeb', 'source_sans_proregular', Arial, sans-serif;
+    font-family: 'LatoWeb', sans-serif;
     font-size: 14px;
-    line-height: 0;
-    margin-right: 66px;
-    margin-top: 16px;
+    line-height: 21px;
 }
 
 .bottom-page .megaapp-linux-container .install-guide-text span.install-guide {
@@ -2824,13 +2884,23 @@ body:not(.mobile) .bottom-page.top-dark-button:hover {
     border-radius: 4px;
     float: left;
     font-size: 14px;
-    height: 23px;
-    line-height: 20px;
-    margin: 22px 0 6px 10px;
+    line-height: 24px;
+    margin: 20px 0 6px 10px;
     text-align: center;
     width: 240px;
 }
-
+.dark-direct-tooltip.simpletip-tooltip.megasync-tip {
+    background-color: #000;
+    box-sizing: border-box;
+    color: #fff;
+    font-size: 13px;
+    line-height: 18px;
+    max-width: 228px;
+    text-align: center;
+}
+.dark-direct-tooltip.simpletip-tooltip.megasync-tip i {
+    --mask-color: #000;
+}
 .bottom-page .install-guide-text .copy-install-guide-icon {
     border-radius: 4px;
     float: right;
@@ -2839,8 +2909,7 @@ body:not(.mobile) .bottom-page.top-dark-button:hover {
     text-align: center;
 }
 
-.bottom-page .megaapp-linux-container .copy-line-icon {
-    background-image: url(../images/mega/icons-sprite_v40.png);
+.small-icon.icons-sprite.copy-line-icon {
     background-position: -242px -288px;
     cursor: pointer;
     height: 23px;
@@ -2929,7 +2998,7 @@ body:not(.mobile) .copy-line-icon:hover .dark-help-block {
     position: absolute;
     width: 18px;
     height: 9px;
-    background-image: url(../images/mega/new-pages-sprite_v6.png);
+    background-image: url(../images/mega/new-pages-sprite.png);
     background-repeat: no-repeat;
     background-position: -347px -329px;
     top: -9px;
@@ -2939,10 +3008,7 @@ body:not(.mobile) .copy-line-icon:hover .dark-help-block {
 }
 .megaapp-linux .default-select {
     color: #333333;
-    font-family: 'source_sans_proregular', Arial;
-    background-image: url(../images/mega/new-pages-sprite_v6.png);
-    background-repeat: no-repeat;
-    background-position: right -385px;
+    font-family: var(--text-font-family);
 }
 
 .very-dark-blue-bg .megaapp-linux-arrow {
@@ -2964,11 +3030,21 @@ body:not(.mobile) .copy-line-icon:hover .dark-help-block {
     text-decoration: underline;
 }
 .megaapp-linux-info {
+    font-family: 'LatoWebSemibold', sans-serif;
     font-size: 16px;
     line-height: 24px;
     color: #333333;
     padding: 32px 0 0 0;
-    font-family: 'LatoWebBold', 'source_sans_prosemibold';
+}
+.megaapp-inputs-wrap {
+    align-content: center;
+    display: flex;
+    margin: 12px 0 0;
+}
+.megaapp-inputs-wrap .mega-input {
+    flex: 1;
+    -webkit-margin-end: 12px;
+    margin-inline-end: 12px;
 }
 .megaapp-footer {
     box-sizing: border-box;
@@ -3005,12 +3081,12 @@ body:not(.mobile) .copy-line-icon:hover .dark-help-block {
     vertical-align: top;
 }
 .megaapp-linux-info .bottom-page-icon.white-info {
-    margin: 5px 0 0 5px;
+    margin: 4px 0 0 4px;
 }
 .bottom-page-icon.white-info {
     width: 18px;
     height: 18px;
-    background-image: url(../images/mega/new-pages-sprite_v6.png);
+    background-image: url(../images/mega/new-pages-sprite.png);
     background-repeat: no-repeat;
     background-position: -355px -433px;
     position: relative;
@@ -3048,7 +3124,7 @@ body:not(.mobile) .bottom-page-icon.white-info:not(.disabled):hover .dark-notifi
     top: 21px;
     width: 8px;
     height: 15px;
-    background-image: url(../images/mega/new-pages-sprite_v6.png);
+    background-image: url(../images/mega/new-pages-sprite.png);
     background-repeat: no-repeat;
     background-position: -328px -436px;
 }
@@ -3148,7 +3224,7 @@ body:not(.mobile) .small-green-button:not(.disabled):hover {
     -moz-border-radius: 4px;
     -webkit-border-radius: 4px;
     border-radius: 4px;
-    background-image: url(../images/mega/pages-sprite_v8.png);
+    background-image: url(../images/mega/pages-sprite.png);
     background-repeat: no-repeat;
     background-position: 0 -887px;
     margin: 38px 0 77px 0;
@@ -3305,7 +3381,7 @@ body:not(.mobile) .mobile-apps-button:hover {
 }
 .bottom-page.dark-button {
     background-position: -2px -3512px;
-    background-image: url(../images/mega/pages-sprite_v8.png);
+    background-image: url(../images/mega/pages-sprite.png);
     display: inline-block;
     height: 57px;
     margin: 30px 15px 0;
@@ -3364,7 +3440,7 @@ body:not(.mobile) .mobile-apps-button:hover {
     margin: 4px 0 0 12px;
     width: 25px;
     height: 18px;
-    background-image: url(../images/mega/pages-sprite_v8.png);
+    background-image: url(../images/mega/pages-sprite.png);
     background-position: -162px -3401px;
     background-size: 360px auto;
 }
@@ -3501,6 +3577,28 @@ body:not(.mobile) .mobile-apps-button:hover {
     padding: 24px 0 0 0;
 }
 
+/* Security page */
+.security-page-video-block .download.video-block {
+    border-radius: 4px;
+    display: block;
+    height: 360px;
+    margin: 0 auto;
+    overflow: hidden;
+    position: relative;
+}
+.security-page-video-block {
+    background-color: #fff;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.15);
+    box-sizing: border-box;
+    display: block;
+    max-width: 640px;
+    position: relative;
+    margin: 48px auto 32px;
+    border-radius: 8px;
+    padding: 0 0;
+    height: 367px;
+    border: 8px solid #fff;
+}
 .securitypractice .business-info-block {
     max-width: 620px;
     text-align: left;
@@ -3508,7 +3606,7 @@ body:not(.mobile) .mobile-apps-button:hover {
     display: inline-block;
 }
 .bottom-page .security-illustration {
-    background-image: url(../images/mega/security-page_v2.png);
+    background-image: url(../images/mega/security-page.png);
     width: 375px;
     height: 249px;
     background-size: 750px auto;
@@ -3582,8 +3680,52 @@ body:not(.mobile) .mobile-apps-button:hover {
 .bottom-page.auth-app-select-tooltip .app-link:nth-of-type(odd) {
     margin-right: 8px;
 }
+.bottom-page.auth-app-select-tooltip .app-link-text {
+    color: #4c5251;
+    display: block;
+    font-size: 14px;
+    line-height: 56px;
+    margin-left: 64px;
+    font-family: LatoWeb;
+    font-weight: 500;
+    letter-spacing: .2px;
+}
+.bottom-page .auth-app-select-tooltip .app-link-icon {
+    background: url(../images/mega/2fa-auth-apps.png);
+    background-repeat: no-repeat;
+    display: inline-block;
+    height: 32px;
+    position: absolute;
+    left: 14px;
+    top: 12px;
+    width: 32px;
+}
+.bottom-page .auth-app-select-tooltip .authy .app-link-icon {
+    background-position: -2px -2px;
+}
+.bottom-page .auth-app-select-tooltip .duomobile .app-link-icon {
+    background-position: -38px -2px;
+}
+.bottom-page .auth-app-select-tooltip .googleauthenticator .app-link-icon {
+    background-position: -2px -38px;
+}
+.bottom-page .auth-app-select-tooltip .microsoftauthenticator .app-link-icon {
+    background-position: -38px -38px;
+}
+.bottom-page.auth-app-select-tooltip .app-link-arrow {
+    background-image: url(../images/mega/2fa-auth-apps.png);
+    background-position: -14px -77px;
+    background-repeat: no-repeat;
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    -webkit-tap-highlight-color: transparent;
+    height: 14px;
+    right: 25px;
+    position: absolute;
+    top: 19px;
+    width: 8px;
+}
 .bottom-page.password-manager-app-select .app-link-icon {
-    background: url(../images/mega/security-page_v2.png);
+    background: url(../images/mega/security-page.png);
     background-repeat: no-repeat;
     display: inline-block;
     height: 32px;
@@ -3646,9 +3788,6 @@ body:not(.mobile) .securitypractice .business-text a.red:hover {
 }
 .securitypractice .improved-recovery-steps .recover-paste-block .right-section {
     width: 49.5%;
-}
-.securitypractice .default-green-button {
-    font-weight: 600;
 }
 /* Browser extensions page */
 .extension.img-wrap {
@@ -3749,7 +3888,7 @@ body:not(.mobile) .securitypractice .business-text a.red:hover {
     display: block;
 }
 .opensource-top-icon {
-    background-image: url("../images/mega/opensource-v3.png");
+    background-image: url("../images/mega/opensource.png");
     background-position: -30px 1px;
     background-repeat: no-repeat;
     float: left;
@@ -3795,7 +3934,7 @@ body:not(.mobile) .securitypractice .business-text a.red:hover {
     display: block;
     width: 102px;
     height: 102px;
-    background-image: url(../images/mega/opensource-v3.png);
+    background-image: url(../images/mega/opensource.png);
     background-repeat: no-repeat;
     background-position: center -109px;
     margin: 0 auto;
@@ -3888,13 +4027,13 @@ a.opensource-icon-txt.coming-soon {
     text-decoration: underline;
     cursor: pointer;
 }
-.default-green-button.height-48.redirect-clouddrive, .default-green-button.height-48.download-app {
+.mega-button.positive.height-48.redirect-clouddrive, .mega-button.positive.height-48.download-app {
     font-size: 16px;
     padding: 0 24px;
     z-index: 999;
     margin-top: 10px;
 }
-.default-green-button.redirect-clouddrive.hidden, .default-green-button.download-app.hidden {
+.mega-button.positive.redirect-clouddrive.hidden, .mega-button.positive.download-app.hidden {
     display: none;
 }
 .onboard-container-size .bottom-page.horizontal-centered-bl {
@@ -3923,10 +4062,10 @@ a.opensource-icon-txt.coming-soon {
     z-index: 0;
     text-align: center;
 }
-.onboarding-suggestions .onboard-image, .onboarding-suggestions .default-green-button.redirect-clouddrive::after {
+.onboarding-suggestions .onboard-image {
     width: 102px;
     height: 102px;
-    background-image: url(../images/mega/onboarding_download_v2.png);
+    background-image: url(../images/mega/onboarding_download.png);
     background-repeat: no-repeat;
     background-position: 0 0;
     background-size: 600px auto;
@@ -4040,15 +4179,6 @@ a.opensource-icon-txt.coming-soon {
 }
 .onboarding-suggestions .badge {
     font-family: 'LatoWebBold', 'source_sans_probold', Arial;
-}
-.onboarding-suggestions .default-green-button.redirect-clouddrive::after {
-    width: 26px;
-    height: 24px;
-    background-position: -571px -170px;
-    content: '';
-    margin: 0 0 -10px 9px;
-    display: inline-block;
-    position: relative;
 }
 .onboarding-suggestions .text-button.redirect-clouddrive-link {
     display: inline-block;
@@ -4360,13 +4490,17 @@ a.opensource-icon-txt.coming-soon {
     background-color: #eee;
     margin: 0 auto 24px;
 }
-/*.onboarding-suggestions.promo-vouchers .bottom-page.top-dark-info.medium, .onboarding-suggestions.promo-vouchers .bottom-page.top-description {
+/*.onboarding-suggestions.promo-vouchers .bottom-page.top-dark-info.medium,
+.onboarding-suggestions.promo-vouchers .bottom-page.top-description {
     text-align: left;
 }
-.onboarding-suggestions.promo-vouchers .promo-voucher-card, .onboarding-suggestions.promo-vouchers .default-green-button.height-48.redirect-clouddrive, .onboarding-suggestions.promo-vouchers .default-green-button.height-48.download-app {
+.onboarding-suggestions.promo-vouchers .promo-voucher-card,
+.onboarding-suggestions.promo-vouchers .mega-button.positive.height-48.redirect-clouddrive,
+.onboarding-suggestions.promo-vouchers .mega-button.positive.height-48.download-app {
     margin: 0 0;
 }
-.onboarding-suggestions.promo-vouchers .default-green-button.height-48.redirect-clouddrive, .onboarding-suggestions.promo-vouchers .default-green-button.height-48.download-app {
+.onboarding-suggestions.promo-vouchers .mega-button.positive.height-48.redirect-clouddrive,
+.onboarding-suggestions.promo-vouchers .mega-button.positive.height-48.download-app {
     float: left;
 }*/
 .onboarding-suggestions.promo-vouchers .text-button.redirect-clouddrive-link {
@@ -4398,7 +4532,7 @@ a.opensource-icon-txt.coming-soon {
     min-height: 455px;
     table-layout: fixed;
 }
-.mobile .default-huge-button.inline, .mobile .megaapp-button-info {
+.mobile button.inline, .mobile .megaapp-button-info {
     display: none;
 }
 .mobile .megasync .top-bl .medium-txt.small-lineheight, .mobile .megacmd .top-bl .top-header, .mobile .megacmd .top-header {
@@ -4924,7 +5058,6 @@ body:not(.mobile) .bottom-page.dropdown .dropdown-item:hover, .bottom-page.dropd
 }
 /* end of NAS page */
 
-
 /* Adaptive layout */
 @media only screen and (min-width: 1200px) {
     .bottom-page.icon-blocks-wrap .inline-block.mid-pad {
@@ -4941,7 +5074,7 @@ body:not(.mobile) .bottom-page.dropdown .dropdown-item:hover, .bottom-page.dropd
     }
     .bottom-page.grey-angle-bg {
         background-size: cover !important;
-        background-image: linear-gradient(transparent, transparent), url(../images/mega/bottom-page/grey-angle_v1.svg) !important;
+        background-image: linear-gradient(transparent, transparent), url(../images/mega/bottom-page/grey-angle.svg) !important;
     }
     .bottom-page.angle-bg.light {
         background-size: auto 1343px !important;
@@ -5023,7 +5156,7 @@ body:not(.mobile) .bottom-page.dropdown .dropdown-item:hover, .bottom-page.dropd
         font-size: 16px;
         line-height: 24px;
     }
-    .default-green-button.height-48.redirect-clouddrive, .default-green-button.height-48.download-app {
+    .mega-button.positive.height-48.redirect-clouddrive, .mega-button.positive.height-48.download-app {
         font-size: 15px;
     }
     .onboarding-suggestions .onboard-image-wrapper .onboard-image.transfer-progress, .onboarding-suggestions .onboard-image-wrapper .onboard-image.transfer-speed, .onboarding-suggestions .onboard-image-wrapper .onboard-image.folder-select {
@@ -5564,14 +5697,6 @@ body:not(.mobile) .bottom-page.dropdown .dropdown-item:hover, .bottom-page.dropd
     .cols-container .col3.mid * {
         color: #333333;
     }
-    .cols-container .col3.mid .default-white-button.light.white-border::after {
-        -webkit-box-shadow: 0px 0px 0px 1px rgba(102,102,102,1);
-        -moz-box-shadow: 0px 0px 0px 1px rgba(102,102,102,1);
-        box-shadow: 0px 0px 0px 1px rgba(102,102,102,1);
-    }
-    .cols-container .col3.mid .default-white-button.light.white-border {
-        color: #373737;
-    }
     .bottom-page.cols-container.borders .col3::before {
         display: none;
     }
@@ -5669,7 +5794,7 @@ body:not(.mobile) .bottom-page.dropdown .dropdown-item:hover, .bottom-page.dropd
     .tab-body.dark .bottom-page.dark-tab-img {
         display: block;
     }
-    .bottom-page.tab-body .button {
+    .bottom-page.tab-body button {
         margin-top: 18px;
     }
     .bottom-page.big-bott-pad.cmd {
@@ -5700,13 +5825,13 @@ body:not(.mobile) .bottom-page.dropdown .dropdown-item:hover, .bottom-page.dropd
     .linux .megaapp-button-info {
         padding-bottom: 60px;
     }
-    .linux .button.download-megacmd {
+    .linux button.download-megacmd {
         margin-top: 35px;
     }
     .megacmd .top-bl .bottom-page.top-header {
         padding-top: 13px;
     }
-    .megacmd .bottom-page .button.default-huge-button {
+    .megacmd .bottom-page button {
         margin-top: 28px;
     }
 }
@@ -5753,9 +5878,6 @@ body:not(.mobile) .bottom-page.dropdown .dropdown-item:hover, .bottom-page.dropd
     .securitypractice .improved-recovery-steps .recover-paste-block .right-section {
         width: 100%;
         display: block;
-    }
-    .recover-paste-block .default-white-button, .recover-paste-block .default-green-button {
-        margin-top: 20px;
     }
     .improved-recovery-steps .recovery-key.account.input-wrapper.input-key {
         width: 100%;
@@ -6389,7 +6511,7 @@ body:not(.mobile) .bottom-page.dropdown .dropdown-item:hover, .bottom-page.dropd
     /* end of MEGAcmd */
     /* MEGAsync */
     .small-megasync-logo {
-        background-image: url(../images/mega/pages-sprite_v8.png);
+        background-image: url(../images/mega/pages-sprite.png);
         background-repeat: no-repeat;
         background-position: 0 0;
         width: 185px;
@@ -6407,7 +6529,7 @@ body:not(.mobile) .bottom-page.dropdown .dropdown-item:hover, .bottom-page.dropd
         position: absolute;
         display: block;
     }
-    .megasync .button.download-megasync {
+    .megasync button.download-megasync {
         margin: 18px 0 0 0;
     }
     .megasync .megaapp-button-info {
@@ -6505,7 +6627,7 @@ body:not(.mobile) .bottom-page.dropdown .dropdown-item:hover, .bottom-page.dropd
 }
 
 @media only screen and (max-height: 685px) {
-    .linux.megasync .button.download-megasync {
+    .linux.megasync button.download-megasync {
         margin-top: 18px;
     }
     .linux .bottom-page.img.sync-top {
@@ -6543,7 +6665,6 @@ body:not(.mobile) .bottom-page.dropdown .dropdown-item:hover, .bottom-page.dropd
 .old .top-head {
     background-color: transparent;
     position: absolute;
-    width: 100%;
     z-index: 200;
     -webkit-transition: background-color 200ms ease-in-out, top 600ms ease-in-out;
     -moz-transition: background-color 200ms ease-in-out, top 600ms ease-in-out;
@@ -6568,15 +6689,16 @@ body:not(.mobile) .bottom-page.dropdown .dropdown-item:hover, .bottom-page.dropd
 
 @media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {
     .medium-icon.down-arrow, .bottom-page.big-icon.interactive, .bottom-page.big-icon.scriptable, .bottom-page.big-icon.target, .bottom-page.big-icon.charts, .small-megasync-logo, .mobile-apps-button, .bottom-page.big-icon.mobile-cloud, .bottom-page.big-icon.chat, .bottom-page.big-icon.photos, .bottom-page.big-icon.cloud, .bottom-page.tab-icon, .bottom-page.big-icon.folders, .bottom-page.big-icon.arrows, .bottom-page.big-icon.up-down, .bottom-page.big-icon.camera, .bottom-page.big-icon.player, .bottom-page.big-icon.mobile-arrow, .pages-nav.nav-icon.bott-sprite, .bottom-page.mid-icon, .bottom-page.tab-lnk-icon, .cmd-top-img, .bottom-page.scroll-icon, .bottom-page.dark-button, .bottom-page.big-link i, .bottom-page.large-icon.pages-sprite, .bottom-page.big-icon.pages-sprite, .bottom-page.icon.pages-sprite, .pages-sprite, i.pages-sprite {
-        background-image: url(../images/mega/pages-sprite_v8@2x.png) !important;
+        background-image: url(../images/mega/pages-sprite@2x.png) !important;
         background-size: 360px auto;
     }
     .bottom-page .security-illustration, .bottom-page.password-manager-app-select .app-link-icon {
-        background-image: url(../images/mega/security-page_v2@2x.png);
+        background-image: url(../images/mega/security-page@2x.png);
         background-size: 750px auto;
     }
-    .onboarding-suggestions .onboard-image, .onboarding-suggestions .default-green-button.redirect-clouddrive::after, .redeem-promo-page .onboard-image {
-        background-image: url(../images/mega/onboarding_download_v2@2x.png);
+    .onboarding-suggestions .onboard-image,
+    .redeem-promo-page .onboard-image {
+        background-image: url(../images/mega/onboarding_download@2x.png);
         background-size: 600px auto;
     }
 }
@@ -6714,3 +6836,64 @@ body:not(.mobile) .bottom-page.unsub .tip-wrapper .underline-btn-txt {
     white-space: nowrap;
     text-align: right;
 }
+
+/* Buttons */
+
+    /* dev button */
+
+        .dev-new-button {
+            height: 34px;
+            border: 2px solid #d9d9d9;
+            background-color: white;
+            cursor: pointer;
+            float: left;
+            -moz-border-radius: 5px;
+            font-size: 14px;
+            line-height: 28px;
+            -webkit-border-radius: 5px;
+            border-radius: 5px;
+            padding: 0 30px 0 13px;
+            background-image: url(../images/mega/sdk-sprite.png);
+            background-position: right -760px;
+            background-repeat: no-repeat;
+            color: #333333;
+            -webkit-box-sizing: border-box;
+            -moz-box-sizing: border-box;
+            box-sizing: border-box;
+            font-family: 'source_sans_prosemibold', Arial, sans-serif;
+        }
+        .dev-new-button:hover, .dev-new-button.active {
+            background-color: #D92E00;
+            border-color: #D92E00;
+            color: white;
+            background-position: right -830px;
+        }
+        .dev-new-button.down-arrow {
+            padding: 0 13px 0 38px;
+            background-position: -865px -899px;
+        }
+        .dev-new-button.down-arrow:hover, .dev-new-button.down-arrow.active {
+            background-position: -865px -969px;
+        }
+        .dev-new-button.plus-icon {
+            padding: 0 13px 0 38px;
+            background-position: 10px -286px;
+        }
+        .dev-new-button.plus-icon:hover, .dev-new-button.plus-icon.active {
+            background-position: 10px -366px;
+        }
+        .dev-new-button.del-icon {
+            padding: 0 13px 0 38px;
+            float: right;
+            margin: 49px 0 0 0;
+            background-position: 11px -907px;
+        }
+        .dev-new-button.del-icon:hover, .dev-new-button.del-icon.active {
+            background-position: 11px -967px;
+        }
+
+        .default-white-button.small.red-bg::after {
+            box-shadow: 0 0 0 1px rgba(218, 49, 53, 1);
+        }
+
+/* end buttons */

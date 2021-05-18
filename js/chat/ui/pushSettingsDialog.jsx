@@ -58,27 +58,32 @@ export default class PushSettingsDialog extends MegaRenderMixin {
                 {...this.state}
                 name="push-settings"
                 title={l[16214] /* `Mute` */}
+                subtitle={l[22015] /* `Mute chat notifications for` */}
                 className="push-settings-dialog"
+                dialogName="push-settings-chat-dialog"
+                dialogType="tool"
                 onClose={this.props.onClose}>
-                <div className="fm-dialog-content">
-                    <div className="dialog secondary-header">
-                        {l[22015] /* `Mute chat notifications for` */}
+
+                <section className="content">
+                    <div className="content-block">
+                        <div>
+                            {this.renderOptions()}
+                        </div>
                     </div>
-                    <div className="fm-dialog-body">
-                        {this.renderOptions()}
-                    </div>
-                    <div className="buttons-block">
-                        <div
-                            className="default-green-button gradient right"
+                </section>
+
+                <footer>
+                    <div className="footer-container">
+                        <button className="mega-button" onClick={this.props.onClose}>
+                            <span>{l[82] /* `Cancel` */}</span>
+                        </button>
+                        <button
+                            className="mega-button positive"
                             onClick={() => this.props.onConfirm(this.state.pushSettingsValue)}>
-                            {l[726] /* `Done` */}
-                        </div>
-                        <div className="default-white-button right" onClick={this.props.onClose}>
-                            {l[82] /* `Cancel` */}
-                        </div>
-                        <div className="clear" />
+                            <span>{l[726] /* `Done` */}</span>
+                        </button>
                     </div>
-                </div>
+                </footer>
             </ModalDialogsUI.ModalDialog>
         );
     }

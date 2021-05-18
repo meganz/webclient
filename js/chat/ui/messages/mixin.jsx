@@ -336,15 +336,14 @@ class ConversationMessageMixin extends ContactAwareComponent {
             const reactionBtn = !chatRoom.isReadOnly() ?
                 <Button
                     className="popup-button reactions-button hover-colorized simpletip"
-                    icon="tiny-icon laughing-face-with-plus"
+                    icon="sprite-fm-theme icon-emoji-reactions reactions-icon"
                     disabled={false}
                     key="add-reaction-button"
                     attrs={{
                         'data-simpletip': l[24070] || "Add reaction...",
                         'data-simpletipoffset': "3",
                         'data-simpletipposition': "top"
-                    }}
-                >
+                    }}>
                     <DropdownEmojiSelector
                         onActiveChange={this._emojiOnActiveStateChange}
                         className="popup emoji reactions-dropdown"
@@ -363,13 +362,13 @@ class ConversationMessageMixin extends ContactAwareComponent {
     getMessageActionButtons() {
         // reaction button
         const { chatRoom, message } = this.props;
+        const icon = 'sprite-fm-theme reactions-icon';
 
         return message instanceof Message && message.isSentOrReceived() && !chatRoom.isReadOnly() ?
             <Button
-                className={"popup-button reactions-button button default-white-button tiny-button" +
-                " hover-colorized " +
-                "simpletip"}
-                icon="tiny-icon laughing-face-with-plus"
+                className="popup-button reactions-button tiny-button simpletip"
+                icon={`${icon} icon-emoji-reactions`}
+                iconHovered={`${icon} icon-emoji-reactions-active`}
                 disabled={false}
                 key="add-reaction-button"
                 attrs={{

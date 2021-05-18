@@ -100,13 +100,13 @@ var support = (function() {
                 if (first) {
                     $subject.find('span').text(supportSubjects[i]);
                 }
-                html += '<div class="default-dropdown-item ' + ((first) ? 'active' : '')
+                html += '<div class="option ' + ((first) ? 'active' : '')
                     + ' " data-value="' + i + '">' + supportSubjects[i] + '</div>';
                 first = false;
             }
         }
 
-        $subject.find('.default-select-scroll').safeHTML(html);
+        $subject.find('.mega-input-dropdown').safeHTML(html);
         bindDropdownEvents($subject, 0, '.bottom-page.scroll-block');
         $window.rebind('resize.support-textarea', resizeHandler);
         $button = $('.support a').rebind('click', submit);

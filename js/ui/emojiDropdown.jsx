@@ -444,15 +444,15 @@ export class DropdownEmojiSelector extends MegaRenderMixin {
         }
 
         var categoryIcons = {
-            "frequently_used": "clock-icon",
-            "people": "smile-icon",
-            "nature": "leaf-icon",
-            "food": "cutlery-icon",
-            "activity": "ball-icon",
-            "travel": "car-icon",
-            "objects": "bulb-icon",
-            "symbols": "heart-icon",
-            "flags": "flag-icon",
+            "frequently_used": "icon-emoji-type-frequent",
+            "people": "icon-emoji-type-people",
+            "nature": "icon-emoji-type-nature",
+            "food": "icon-emoji-type-food",
+            "activity": "icon-emoji-type-activity",
+            "travel": "icon-emoji-type-travel",
+            "objects": "icon-emoji-type-objects",
+            "symbols": "icon-emoji-type-symbol",
+            "flags": "icon-emoji-type-flag",
         };
 
         var categoryButtons = [];
@@ -488,7 +488,7 @@ export class DropdownEmojiSelector extends MegaRenderMixin {
 
                         this.emojiSearchField?.current.focus();
                     }}>
-                    <i className={`small-icon ${categoryIcons[categoryName]}`} />
+                    <i className={`sprite-fm-mono ${categoryIcons[categoryName]}`} />
                 </div>
             );
         });
@@ -498,7 +498,7 @@ export class DropdownEmojiSelector extends MegaRenderMixin {
                 <div className="popup-header emoji">
                     {preview || (
                         <div className="search-block emoji">
-                            <i className="small-icon search-icon" />
+                            <i className="sprite-fm-mono icon-preview-reveal" />
                             <input
                                 ref={this.emojiSearchField}
                                 type="search"

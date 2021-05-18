@@ -1,4 +1,5 @@
 (function($, scope) {
+    'use strict';
     var dialogIdx = 0;
     var startingZIndex = 1300;
 
@@ -40,7 +41,7 @@
              * css class names
              */
             'expandableButtonClass': '.fm-mega-dialog-size-icon',
-            'buttonContainerClassName': 'fm-mega-dialog-bottom',
+            'buttonContainerClassName': '',
             'buttonPlaceholderClassName': 'fm-mega-dialog-pad',
 
             /**
@@ -55,7 +56,7 @@
 
         assert(self.options.className && self.options.className.length > 0, 'missing required option .className');
 
-        self.$dialog = $('.fm-dialog.' + self.options.className);
+        self.$dialog = $('.mega-dialog.' + self.options.className);
 
         self.visible = false;
         self.expanded = false;
@@ -88,7 +89,7 @@
             });
         }
         if (self.options.closable) {
-            $('.fm-dialog-close', self.$dialog).rebind('click.dialog' + self._getEventSuffix(), function() {
+            $('button.js-close', self.$dialog).rebind('click.dialog' + self._getEventSuffix(), function() {
                 self.hide();
             });
         }
@@ -98,7 +99,7 @@
             });
         }
         if (self.options.title) {
-            $('.nw-fm-dialog-title', self.$dialog).text(self.options.title);
+            $('header h2, header h3', self.$dialog).first().text(self.options.title);
         }
 
         // link dialog size with the textareas when/if resized by the user using the native resize func
@@ -112,9 +113,9 @@
                     this.oldheight = this.style.height;
                 }
             })
-            .rebind('resize', function() {
-                self.reposition();
-            });
+            // .rebind('resize', function() {
+            //     self.reposition();
+            // });
     };
 
 
@@ -123,37 +124,48 @@
      */
     Dialog.prototype._renderButtons = function() {
         var self = this;
-        var $container = self.options.notAgainTag || self.options.buttons.length
-            ? $('<div class="' + self.options.buttonContainerClassName + '"/>')
-            : null;
 
+        let $container = null;
+        let $footer = null;
+        if (self.options.buttons.length) {
+            $footer = $('<footer />');
+            $container = $('<div class="footer-container ' + self.options.buttonContainerClassName + '"/>');
+        }
+        else if (self.options.notAgainTag) {
+            $footer = $('<footer />');
+        }
+
+        let $aside;
         if (self.options.notAgainTag) {
-            $container.append('<div class="left checkbox-block fm-chat-inline-dialog-button-sendFeedback">'+
-                '<div class="checkdiv checkboxOff">'+
-                    '<input type="checkbox" name="confirmation-checkbox" class="checkboxOff">'+
-                '</div>'+
-                '<label for="confirmation-checkbox" class="radio-txt">' + l[229] + '</label>'+
-            '</div>');
+            $aside = $('<aside class="align-start" />');
+            $aside.safeAppend(`<div class="not-again checkbox-block fm-chat-inline-dialog-button-sendFeedback">
+                <div class="checkdiv checkboxOff">
+                    <input type="checkbox" name="confirmation-checkbox" class="checkboxOff">
+                </div>
+                <label for="confirmation-checkbox" class="radio-txt">${l[229]}</label>
+            </div>`);
 
-            $('.left.checkbox-block', $container).rebind('click.dialog', function(e) {
-                var c = $('.left.checkbox-block .checkdiv', $container);
-                if (c.hasClass('checkboxOff')) {
-                    c.removeClass('checkboxOff').addClass('checkboxOn');
+            $('.not-again.checkbox-block', $aside).rebind('click.dialog', function() {
+                var $c = $('.not-again.checkbox-block .checkdiv', $aside);
+                if ($c.hasClass('checkboxOff')) {
+                    $c.removeClass('checkboxOff').addClass('checkboxOn');
                     localStorage[self.options.notAgainTag] = 1;
                 }
                 else {
-                    c.removeClass('checkboxOn').addClass('checkboxOff');
+                    $c.removeClass('checkboxOn').addClass('checkboxOff');
                     delete localStorage[self.options.notAgainTag];
                 }
             });
+
         }
 
         if (self.options.buttons.length > 0) {
             self.options.buttons.forEach(function(buttonMeta, k) {
+                let $button;
                 if (self.options.defaultButtonStyle) {
-                    var $button = $('<div class="fm-dialog-button"><span></span></div>');
+                    $button = $('<button class="mega-button"><span></span></button>');
                 } else {
-                    var $button = $('<div><span></span></div>');
+                    $button = $('<button><span></span></button>');
                 }
                 $button
                     .addClass(
@@ -170,60 +182,15 @@
             });
         }
 
-        if ($container) {
-            $container.append('<div class="clear"></div>');
-            $('.' + self.options.buttonPlaceholderClassName, self.$dialog).append($container);
-        }
-    };
+        if ($footer) {
+            $footer.append($container);
+            self.$dialog.append($footer);
 
-
-    /**
-     * Reposition the element (exposed as pub method, so that when we need to change the content of the dialog on the fly
-     * we can call .reposition)
-     */
-    Dialog.prototype.reposition = function() {
-        var self = this;
-
-        if (!self.visible) {
-            return;
-        }
-
-        if (self.options.expandable) {
-            if (!self.expanded && self.$toggleButton) {
-                self.$dialog.position({
-                    'my': 'center bottom',
-                    'at': 'center top-10', /* the only hardcoded value, the arrow height */
-                    'of': self.$toggleButton,
-                    'collision': 'flipfit flipfit',
-                    'using': function (obj, info) {
-                        if (info.vertical == "top") {
-                            $(this).addClass("flipped"); // the arrow is re-positioned if this .flipped css class name is added to the popup container, to be on top, instead of bottom
-                        } else {
-                            $(this).removeClass("flipped");
-                        }
-
-                        $(this).css({
-                            left: obj.left + 'px',
-                            top: obj.top + 'px'
-                        });
-                    }
-                });
-            } else {
-                self.$dialog.position({
-                    'my': 'center center',
-                    'at': 'center center',
-                    'of': $(window)
-                });
+            if ($aside) {
+                $footer.append($aside);
             }
-        } else {
-            self.$dialog.position({
-                'my': 'center center',
-                'at': 'center center',
-                'of': $(window)
-            });
         }
     };
-
 
     /**
      * Show the picker (and if $toggleButton is passed, position it top/bottom)
@@ -268,10 +235,10 @@
             self._showOverlay();
         }
 
-        $(window).rebind('resize.dialogReposition' + self.dialogIdx, function(e) {
-            self.reposition();
-        });
-        self.reposition();
+        // $(window).rebind('resize.dialogReposition' + self.dialogIdx, function(e) {
+        //     self.reposition();
+        // });
+        // self.reposition();
 
         self.trigger('onShow');
     };
@@ -353,7 +320,7 @@
             self.$toggleButton.addClass('active');
         }
 
-        self.reposition();
+        // self.reposition();
 
         self.trigger('onCollapse');
     };
@@ -379,7 +346,7 @@
 
         self.trigger('onExpand');
 
-        self.reposition();
+        // self.reposition();
 
     };
 
@@ -400,7 +367,7 @@
 
     Dialog.prototype._hideOverlay = function() {
         var self = this;
-        if (!$('.fm-dialog.arrange-to-back').length) {
+        if (!$('.mega-dialog.arrange-to-back').length) {
             $('.fm-dialog-overlay').addClass('hidden');
             $('body').removeClass('overlayed');
         }

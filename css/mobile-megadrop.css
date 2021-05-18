@@ -46,16 +46,13 @@
     margin-top: 3px;
 }
 .wu-logo {
-    margin-top: 0px;
     width: 24px;
     height: 24px;
-    -moz-border-radius: 100%;
-    -webkit-border-radius: 100%;
     border-radius: 100%;
     float: left;
-    margin: 6px 0 0 12px;
+    margin: 4px 0 0 12px;
     background-position: -6px -383px;
-    background-image: url(../images/mega/top-sprite_v8.png);
+    background-image: url(../images/mega/top-sprite.png);
     background-repeat: no-repeat;
     cursor: pointer;
 }
@@ -129,7 +126,7 @@
     width: 270px;
     height: 175px;
     margin: 0 auto;
-    background-image: url(../images/mega/wu_empty_upload_v2@2x.png);
+    background-image: url(../images/mega/wu_empty_upload@2x.png);
     background-position: 0 0;
     background-repeat: no-repeat;
     background-size: 100% auto;
@@ -349,6 +346,7 @@
 }
 
 /* Mobile Megadrop link copy overlay */
+
 #mobile-ui-copy-link.mobile.main-block.megadrop .filesize {
     white-space: normal;
 }
@@ -359,4 +357,14 @@
     float: none;
     width: 100%;
 }
+
 /* End of Mobile Megadrop link copy overlay */
+
+@media only screen and (-webkit-min-device-pixel-ratio: 1.5),
+    only screen and (min-resolution: 1.5dppx) {
+
+    .wu-logo {
+        background-image: url(../images/mega/top-sprite@2x.png);
+        background-size: 38px auto;
+    }
+}

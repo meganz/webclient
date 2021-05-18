@@ -29,8 +29,8 @@
              * css class names
              */
             'expandableButtonClass': '.fm-mega-dialog-size-icon',
-            'buttonContainerClassName': 'fm-mega-dialog-bottom',
-            'buttonPlaceholderClassName': 'fm-mega-dialog-pad',
+            'buttonContainerClassName': '',
+            'buttonPlaceholderClassName': '',
 
             /**
              * optional:
@@ -39,7 +39,7 @@
             'buttons': [
                 {
                     'label': l[148],
-                    'className': 'default-white-button right red',
+                    'className': 'mega-button',
                     'callback': function() {
                         this.hide();
                         this._hideOverlay();
@@ -87,18 +87,18 @@
         var description = l[8436];
         description = description.replace('%1', '<span class="emailAddress">'
                       + contactEmail + '</span>');
-        description = description.replace('[A]', '<a class="red" href="mailto:support@mega.nz">');
+        description = description.replace('[A]', '<a href="mailto:support@mega.nz">');
         description = description.replace('[/A]', '</a>');
         $dialog.find('.information .description').html(description);
 
         // If the avatar exists, show it
         if (typeof avatars[KeySignatureWarningDialog.contactHandle] !== 'undefined') {
-            $dialog.find('.userAvatar img').attr('src', avatars[KeySignatureWarningDialog.contactHandle].url);
+            $('.userAvatar img', $dialog).attr('src', avatars[KeySignatureWarningDialog.contactHandle].url);
+            $('.userAvatar', $dialog).show();
         }
         else {
             // Otherwise hide the avatar
             $dialog.find('.userAvatar').hide();
-            $dialog.find('.information').addClass('noAvatar');
         }
     };
 

@@ -95,34 +95,36 @@ class ChatlinkDialog extends MegaRenderMixin {
         const self = this;
 
         const closeButton = (
-            <div
+            <button
                 key="close"
-                className={"default-red-button right links-button"}
+                className={"mega-button negative links-button"}
                 onClick={function(e) {
                     self.onClose();
                 }}
             >
                 <span>{l[148]}</span>
-            </div>
+            </button>
         );
 
         return <ModalDialogsUI.ModalDialog
             {...this.state}
             title={self.props.chatRoom.iAmOperator() && !self.props.chatRoom.topic ? l[9080] : ""}
             className={
-                "fm-dialog chat-rename-dialog export-chat-links-dialog group-chat-link" + (
+                "chat-rename-dialog export-chat-links-dialog group-chat-link" + (
                     !self.props.chatRoom.topic ? " requires-topic" : ""
                 )}
             onClose={() => {
                 self.onClose(self);
             }}
+            dialogName="chat-link-dialog"
+            dialogType={self.props.chatRoom.iAmOperator() && !self.props.chatRoom.topic ? 'main' : 'graphic'}
             chatRoom={self.props.chatRoom}
             popupDidMount={self.onPopupDidMount}>
 
-            <div className="export-content-block">
-                {
-                    self.props.chatRoom.iAmOperator() && !self.props.chatRoom.topic ?
-                        <div>
+            {
+                self.props.chatRoom.iAmOperator() && !self.props.chatRoom.topic ?
+                    <section className="content">
+                        <div className="content-block">
                             <div className="export-chat-ink-warning">
                                 {l[20617]}
                             </div>
@@ -131,85 +133,92 @@ class ChatlinkDialog extends MegaRenderMixin {
                                 margin: '10px auto 20px auto'
                             }}>
                                 <input type="text" name="newTopic" value={self.state.newTopic}
-                                       ref={function (field) {
-                                           self.topicInput = field;
-                                       }}
-                                       style={{
+                                    ref={function(field) {
+                                        self.topicInput = field;
+                                    }}
+                                    style={{
                                         'paddingLeft': 8,
-                                       }}
-                                       onChange={self.onTopicFieldChanged.bind(self)}
-                                       onKeyPress={self.onTopicFieldKeyPress.bind(self)}
-                                       placeholder={l[20616]} maxLength="30"/>
+                                    }}
+                                    onChange={self.onTopicFieldChanged.bind(self)}
+                                    onKeyPress={self.onTopicFieldKeyPress.bind(self)}
+                                    placeholder={l[20616]} maxLength="30"/>
                             </div>
                         </div>
-                        :
-
-                        <div className="fm-dialog-body">
-                            <i className="big-icon group-chat"></i>
-                            <div className="chat-title">
+                    </section>
+                    :
+                    <>
+                        <header>
+                            <h2 id="chat-link-dialog-title">
                                 <utils.EmojiFormattedContent>
                                     {self.props.chatRoom.topic}
                                 </utils.EmojiFormattedContent>
-                            </div>
-                            <div className="chat-link-input">
-                                <i className="small-icon blue-chain colorized"></i>
-                                <input type="text" readOnly={true} value={
-                                    !self.props.chatRoom.topic ?
-                                        l[20660] :
-                                    self.state.link
-                                }/>
-                            </div>
-                            <div className="info">
-                                {self.props.chatRoom.publicLink ? l[20644] : null}
-                            </div>
-                        </div>
-                }
-            </div>
+                            </h2>
+                        </header>
+                        <section className="content">
+                            <div className="content-block">
 
-            <div className="fm-notifications-bottom">
-                {
-                    self.props.chatRoom.iAmOperator() && self.props.chatRoom.publicLink ?
-                        <div key="deleteLink" className={"default-white-button left links-button" + (
+                                <div className="chat-link-input">
+                                    <i className="sprite-fm-mono icon-link-filled" />
+                                    <input type="text" readOnly={true} value={
+                                        !self.props.chatRoom.topic ?
+                                            l[20660] :
+                                            self.state.link
+                                    }/>
+                                </div>
+                                <div className="info">
+                                    {self.props.chatRoom.publicLink ? l[20644] : null}
+                                </div>
+                            </div>
+                        </section>
+                    </>
+            }
+
+            <footer>
+                <div className="footer-container">
+                    {
+                        self.props.chatRoom.iAmOperator() && self.props.chatRoom.publicLink ?
+                            <button key="deleteLink" className={"mega-button links-button" + (
+                                (
+                                    self.loading && self.loading.state() === 'pending'
+                                ) ? " disabled" : ""
+                            )} onClick={function() {
+                                self.props.chatRoom.updatePublicHandle(1);
+                                self.onClose();
+                            }}>
+                                <span>{l[20487]}</span>
+                            </button>
+                            :
+                            null
+                    }
+                    {
+                        self.props.chatRoom.topic ?
                             (
-                                self.loading && self.loading.state() === 'pending'
-                            ) ? " disabled" : ""
-                        )} onClick={function(e) {
-                            self.props.chatRoom.updatePublicHandle(1);
-                            self.onClose();
-                        }}>
-                            <span>{l[20487]}</span>
-                        </div>
-                        :
-                        null
-                }
-                {
-                    self.props.chatRoom.topic ?
-                        (
-                            self.props.chatRoom.publicLink ?
-                                <div className={"default-green-button button right copy-to-clipboard" +
-                                (self.loading && self.loading.state() === 'pending' ? " disabled" : "")}>
-                                    <span>{l[63]}</span>
-                                </div>
-                                :
-                                closeButton
-                        )
-                        :
-                        (
-                            self.props.chatRoom.iAmOperator() ?
-                                <div key="setTopic" className={"default-red-button right links-button" + (
-                                  self.state.newTopic && $.trim(self.state.newTopic) ? "" : " disabled"
-                                )} onClick={function(e) {
-                                    if (self.props.chatRoom.iAmOperator()) {
-                                        self.props.chatRoom.setRoomTitle(self.state.newTopic);
-                                    }
-                                }}>
-                                    <span>{l[20615]}</span>
-                                </div>
-                                : closeButton
-                        )
-                }
-                <div className="clear"></div>
-            </div>
+                                self.props.chatRoom.publicLink ?
+                                    <button className={"mega-button positive copy-to-clipboard" +
+                                    (self.loading && self.loading.state() === 'pending' ? " disabled" : "")}>
+                                        <span>{l[63]}</span>
+                                    </button>
+                                    :
+                                    closeButton
+                            )
+                            :
+                            (
+                                self.props.chatRoom.iAmOperator() ?
+                                    <button key="setTopic" className={"mega-button positive links-button" + (
+                                        self.state.newTopic && $.trim(self.state.newTopic) ? "" : " disabled"
+                                    )} onClick={function() {
+                                        if (self.props.chatRoom.iAmOperator()) {
+                                            self.props.chatRoom.setRoomTitle(self.state.newTopic);
+                                        }
+                                    }}>
+                                        <span>{l[20615]}</span>
+                                    </button>
+                                    :
+                                    closeButton
+                            )
+                    }
+                </div>
+            </footer>
         </ModalDialogsUI.ModalDialog>;
     }
 };

@@ -1125,7 +1125,7 @@ mega.megadrop = (function() {
         var settingsOpts = {
             initialized: false,
             card: {
-                wrapperClass: '.grid-table.megadrop tbody',
+                wrapperClass: '.js-data-table-megadrop tbody',
                 code: '',
                 url: '',
                 expanded: []// Handle of expanded card
@@ -1141,17 +1141,23 @@ mega.megadrop = (function() {
         };
 
         var _getPath = function _settingsGetPath(nodeHandle) {
-            var path = M.getPath(nodeHandle).map(function(h, k) {
+            var path = M.getPath(nodeHandle).map(function(h, k, arr) {
                 var title = h === M.RootID ? l[1687] : M.d[h].name;
+                var arrowHtml = '';
 
-                var html = title ? '<a class="fm-breadcrumbs folder ' + (k !== 0 ? 'has-next-button' : '') +
-                    '" data-node="' + escapeHTML(h) + '">' +
-                    '<span class="right-arrow-bg simpletip" data-simpletip="' +  escapeHTML(title) + '" ><span>' +
-                    escapeHTML(title) + '</span></span></a>' : '';
+                if (k !== 0) {
+                    arrowHtml = '<i class="sprite-fm-mono icon-arrow-right"></i>';
+                }
+
+                var html = title ? '<div class="item">'
+                + '<a class="simpletip" data-simpletipposition="top" data-node="'
+                + escapeHTML(h) + '" + data-simpletip="' +  escapeHTML(title) + '">'
+                + escapeHTML(title)
+                + '</a>' + arrowHtml + '</div>' : '';
 
                 return html;
 
-            }).reverse().join('') + '<div class="clear"></div>';
+            }).reverse().join('');
 
             return path;
         };
@@ -1175,10 +1181,10 @@ mega.megadrop = (function() {
 
             $domElem.attr('id', 'pup_' + handle);
             $domElem.removeClass('hidden');
-            $domElem.find('.fm-picker-breadcrumbs').safeHTML(pupPath);
-            $domElem.find('.megafolder-name').text(name);
-            $domElem.find('.widget-code-wrapper.widget-url').text(url);
-            $domElem.find('.embed-link .widget-code-wrapper').text(code);
+            $('.settings-breadcrumbs', $domElem).safeHTML(pupPath);
+            $('.megafolder-name', $domElem).text(name);
+            $('.widget-code-wrapper.widget-url', $domElem).text(url);
+            $('.embed-link .widget-code-wrapper', $domElem).text(code);
 
             $(settingsOpts.card.wrapperClass).append($domElem);
         };
@@ -1191,53 +1197,48 @@ mega.megadrop = (function() {
             var $wrapper = $(settingsOpts.card.wrapperClass);
 
             // Click on PUP basic info, show full PUP informations
-            $('.megadrop-row', $wrapper).rebind('click', function() {
+            $('.megadrop-row', $wrapper).rebind('click', function(e) {
 
                 var $this = $(this);
 
-                $this.removeClass('closed');
-                $this.find('.close-icon > .tooltips').text(l[148]);
-
-                // Waiting for css animation to be finished
-                setTimeout(function() {
-                    initAccountScroll();
-                }, 301);
+                if ($this.is('.closed') && !$(e.target).is('.toggle')) {
+                    $('.toggle', $this).trigger('click.toggle');
+                }
             });
 
-            // Click on minimise of PUP expanded informations, replace it  with basic info .widget-card
-            $('.close-icon', $wrapper).rebind('click', function(e) {
+            // Click on minimise of PUP expanded informations, replace it  with basic info .widget-dialog
+            $('.megadrop-icon.toggle', $wrapper).rebind('click.toggle', function(e) {
 
                 e.stopPropagation();
 
-                var $this = $(this).parents('.megadrop-row');
+                var $this = $(this);
+                var $row = $this.closest('.megadrop-row');
+                var $accountSection = $('.fm-right-account-block:visible', 'body');
 
-                if (!$this.hasClass('closed')) {
-                    $this.addClass('closed');
-                    $(this).find('.tooltips').text(l[20172]);
-                    var $jspPane = $this.parents('.jspPane');
+                $this.removeClass('icon-arrow-down icon-arrow-up');
 
-                    // Waiting for css animation to be finished
-                    $jspPane.removeClass('shrink');
-                    setTimeout(function() {
-                        initAccountScroll();
-                        setTimeout(function() {
-                            $jspPane.removeClass('shrink');
-                        }, 301);
-                    }, 301);
+                if ($row.hasClass('closed')) {
+                    $row.removeClass('closed').addClass('expanded');
+                    $this.attr('data-simpletip', l[148]).trigger('simpletipUpdated')
+                        .addClass('icon-arrow-up');
                 }
                 else {
-                    $this.removeClass('closed');
-                    $(this).find('.tooltips').text(l[148]);
+                    $row.addClass('closed').removeClass('expanded');
+                    $this.attr('data-simpletip', l[20172]).trigger('simpletipUpdated')
+                        .addClass('icon-arrow-down');
                 }
 
-                // Waiting for css animation to be finished
-                setTimeout(function() {
-                    initAccountScroll(1);
-                }, 301);
+                if ($accountSection.length && $accountSection.is('.ps-container')) {
+                    Ps.update($accountSection[0]);
+                    $accountSection.scrollTop(
+                        $accountSection.scrollTop() + $row.offset().top
+                        - $row.outerHeight() - $accountSection.offset().top
+                    );
+                }
             });
 
             // Remove PUP
-            $('.delete-megadrop', $wrapper).rebind('click', function(e) {
+            $('.megadrop-icon.delete', $wrapper).rebind('click', function(e) {
 
                 e.stopPropagation();
 
@@ -1249,7 +1250,7 @@ mega.megadrop = (function() {
             });
 
             // Widget expanded go to folder
-            $('.fm-breadcrumbs', $wrapper).rebind('click', function () {
+            $('.settings-breadcrumbs .item a', $wrapper).rebind('click.openFolder', function() {
                 var nodeId = $(this).data('node');
 
                 M.openFolder(nodeId, true);
@@ -1261,24 +1262,26 @@ mega.megadrop = (function() {
             $('.tab-embed-link', $wrapper).rebind('click', function () {
 
                 // Find first parent with id attrbute starting with ew_
-                var $parent = $(this).parents('.megadrop-row');
+                var $this = $(this);
+                var $parent = $this.parents('.megadrop-row');
 
-                $parent.find('.fm-tab').removeClass('active');
-                $(this).addClass('active');
-                $parent.find('.embed-link').removeClass('hidden');
-                $parent.find('.url-link').addClass('hidden');
+                $('.tab', $parent).removeClass('active');
+                $this.addClass('active');
+                $('.embed-link', $parent).removeClass('hidden');
+                $('.url-link', $parent).addClass('hidden');
             });
 
             // Widget expanded url tab
             $('.tab-url-link', $wrapper).rebind('click', function () {
 
                 // Find first parent with id attrbute starting with ew_
-                var $parent = $(this).parents('.megadrop-row');
+                var $this = $(this);
+                var $parent = $this.parents('.megadrop-row');
 
-                $parent.find('.fm-tab').removeClass('active');
-                $(this).addClass('active');
-                $parent.find('.embed-link').addClass('hidden');
-                $parent.find('.url-link').removeClass('hidden');
+                $('.tab', $parent).removeClass('active');
+                $this.addClass('active');
+                $('.embed-link', $parent).addClass('hidden');
+                $('.url-link', $parent).removeClass('hidden');
             });
 
             // Widget expanded copy link
@@ -1300,7 +1303,7 @@ mega.megadrop = (function() {
             // Widget expanded  Preview upload page
             $('.preview-widget', $wrapper).rebind('click', function () {
 
-                var url = $('.url-link .widget-url', $(this).parents('.widget-card.expanded-widget')).text();
+                var url = $('.url-link .widget-url', $(this).parents('.widget-dialog.expanded-widget')).text();
 
                 window.open(url, '_blank', wopts.widgetParams[0].slice(1, -1), true);
             });
@@ -1327,7 +1330,7 @@ mega.megadrop = (function() {
                 $(settingsOpts.card.wrapperClass).append($headElem);
                 if (Object.keys(list).length === 0) {
                     $(settingsOpts.card.wrapperClass)
-                        .append('<tr><td colspan="3" class="grid-table-empty">' + l[20139] + '</td></tr>');
+                        .append('<tr><td colspan="3" class="data-table-empty">' + l[20139] + '</td></tr>');
                 }
             }
 
@@ -1364,7 +1367,6 @@ mega.megadrop = (function() {
             loadingDialog.show();
 
             drawPups().always(_eventListeners.bind(null));
-            initAccountScroll();
             setInitialized(true);
 
             loadingDialog.hide();
@@ -1381,12 +1383,12 @@ mega.megadrop = (function() {
             }
 
             if (M.currentdirid === "account/transfers") {
-                $('#pup_' + pupHandle).remove();// Remove widget-card
+                $('#pup_' + pupHandle).remove();// Remove widget-dialog
 
                 // Display "No MEGAdrop folders" if the list is empty
                 if ($.isEmptyObject(pup.items)) {
                     $(settingsOpts.card.wrapperClass)
-                        .append('<tr><td colspan="3" class="grid-table-empty">' + l[20139] + '</td></tr>');
+                        .append('<tr><td colspan="3" class="data-table-empty">' + l[20139] + '</td></tr>');
                 }
             }
             ui.nodeIcon(nodeHandle);
@@ -1407,7 +1409,7 @@ mega.megadrop = (function() {
                 drawPupCard(pupHandle);
                 _eventListeners();
 
-                var $emptyGrid = $('.grid-table-empty', settingsOpts.card.wrapperClass);
+                var $emptyGrid = $('.data-table-empty', settingsOpts.card.wrapperClass);
 
                 if ($emptyGrid.length) {
                     $emptyGrid.parent('tr').remove();
@@ -1453,19 +1455,14 @@ mega.megadrop = (function() {
                     $: {},
                     skip: false,
                     visible: false,
-                    class: '.fm-dialog.create-widget-info-dialog'
+                    class: '.mega-dialog.create-widget-info-dialog'
                 },
                 widget: {
                     $: {},
                     url: '',
                     code: '',
                     visible: false,
-                    class: '.fm-dialog.widget-dialog'
-                },
-                manage: {
-                    $: {},
-                    visible: false,
-                    class: '.fm-dialog.manage-widget'
+                    class: '.mega-dialog.widget-dialog'
                 }
             },
             widgetLink: '',
@@ -1519,7 +1516,7 @@ mega.megadrop = (function() {
         var _dlgEventListeners = function _uiDlgEventListeners() {
 
             // Create info widget dialog 'x'
-            $(uiOpts.dlg.create.class + ' .fm-dialog-close').rebind('click.CWD_close', function () {
+            $(uiOpts.dlg.create.class + ' button.js-close').rebind('click.CWD_close', function() {
                 closeDialog();
             });
 
@@ -1553,7 +1550,7 @@ mega.megadrop = (function() {
             /*** '.widget-dialog' */
             // Widget dialog close
             $([
-                uiOpts.dlg.widget.class + ' .fm-dialog-close',
+                uiOpts.dlg.widget.class + ' button.js-close',
                 uiOpts.dlg.widget.class + ' .close-button'
             ]).rebind('click.WD_close', function () {
                 closeDialog();
@@ -1569,7 +1566,6 @@ mega.megadrop = (function() {
                     .find('span').safeHTML(l[17408]);
                 uiOpts.dlg.widget.$.embedForm.removeClass('hidden');
                 uiOpts.dlg.widget.$.urlForm.addClass('hidden');
-                dialogPositioning('.widget-dialog');
             });
 
             // Widget dialog url tab
@@ -1582,7 +1578,6 @@ mega.megadrop = (function() {
                     .find('span').safeHTML(l[17835]);
                 uiOpts.dlg.widget.$.embedForm.addClass('hidden');
                 uiOpts.dlg.widget.$.urlForm.removeClass('hidden');
-                dialogPositioning('.widget-dialog');
             });
 
             // Widget dialog light theme
@@ -1616,7 +1611,7 @@ mega.megadrop = (function() {
 
             // Dialog Preview upload page
             $(uiOpts.dlg.widget.class + ' .preview-widget').rebind('click.WD_preview', function () {
-                window.open(uiOpts.dlg.widget.url, '_blank', wopts.widgetParams[0].slice(1, -1), true);
+                window.open(uiOpts.dlg.widget.url, '_blank', wopts.widgetParams[0].slice(1, -1));
             });
             /*** END '.widget-dialog' ***/
         };
@@ -1625,7 +1620,7 @@ mega.megadrop = (function() {
 
             // Widget Info Dialog
             uiOpts.dlg.create.$ = $(uiOpts.dlg.create.class);
-            uiOpts.dlg.create.$.title = uiOpts.dlg.create.$.find('.fm-dialog-title');
+            uiOpts.dlg.create.$.title = uiOpts.dlg.create.$.find('header h2');
             uiOpts.dlg.create.$.checkboxDiv = uiOpts.dlg.create.$.find('.CWD_cb');
             uiOpts.dlg.create.$.checkboxInput = uiOpts.dlg.create.$.find('.CWD_cb input');
             uiOpts.dlg.create.$.createButton = uiOpts.dlg.create.$.find('.widget-create-button');
@@ -1643,7 +1638,7 @@ mega.megadrop = (function() {
 
             // Widget Dialog
             uiOpts.dlg.widget.$ = $(uiOpts.dlg.widget.class);
-            uiOpts.dlg.widget.$.title = uiOpts.dlg.widget.$.find('.fm-dialog-title');
+            uiOpts.dlg.widget.$.title = uiOpts.dlg.widget.$.find('header h2');
             uiOpts.dlg.widget.$.closeButton = uiOpts.dlg.widget.$.find('.close-button');
             uiOpts.dlg.widget.$.url = uiOpts.dlg.widget.$.find('.widget-url');
             uiOpts.dlg.widget.$.code = uiOpts.dlg.widget.$.find('.embed-link .widget-code-wrapper');
@@ -1688,11 +1683,11 @@ mega.megadrop = (function() {
 
             if (creation) {
                 $('.wu-title-text', $overlay).text(l[17412]);
-                $('.default-green-button.wu-btn span', $overlay).text(l[158]);
+                $('button.wu-btn span', $overlay).text(l[158]);
             }
             else {
                 $('.wu-title-text', $overlay).text(l[17399]);
-                $('.default-green-button.wu-btn span', $overlay).text(l[17490]);
+                $('button.wu-btn span', $overlay).text(l[17490]);
             }
 
             $overlay.removeClass('hidden');
@@ -1784,12 +1779,12 @@ mega.megadrop = (function() {
 
                     $overlay.removeClass('megadrop');
                     $linkField.val('');
-                    $('.fm-dialog-close', $overlay).off('tap.removeMDClass');
+                    $('button.js-close', $overlay).off('tap.removeMDClass');
                     $('.text-button', $overlay).off('tap.removeMDClass');
                 };
 
                 // Some extra binding for Megadrop
-                $('.fm-dialog-close', $overlay).rebind('tap.removeMDClass', removeMDClass);
+                $('button.js-close', $overlay).rebind('tap.removeMDClass', removeMDClass);
                 $('.text-button', $overlay).rebind('tap.removeMDClass', removeMDClass);
 
                 // Disable scrolling of the file manager in the background to fix a bug on iOS Safari
@@ -1830,27 +1825,46 @@ mega.megadrop = (function() {
             }
 
             var icon = 'puf-folder';
+            var target;
 
             if (render) {
 
-                // Update right panel selected node with appropriate icon for list view
-                $('.grid-table.fm #' + nodeHandle + ' .transfer-filetype-icon').addClass(icon);
+                target = document.getElementById(nodeHandle);
 
-                // Update right panel selected node with appropriate icon for block view
-                $('#' + nodeHandle + ' .block-view-file-type').addClass(icon);
+                if (target) {
+                    // Update right panel selected node with appropriate icon
+                    target = target.querySelector(M.viewmode ? '.block-view-file-type' : '.transfer-filetype-icon');
+
+                    if (target) {
+                        target.classList.add(icon);
+                    }
+                }
 
                 // Left panel
-                $('#treea_' + nodeHandle + ' .nw-fm-tree-folder').addClass(icon);
+                target = document.querySelector('#treea_' + nodeHandle + ' .nw-fm-tree-folder');
+
+                if (target) {
+                    target.classList.add(icon);
+                }
             }
             else {
-                // Update right panel selected node with appropriate icon for list view
-                $('.grid-table.fm #' + nodeHandle + ' .transfer-filetype-icon').removeClass(icon);
+                target = document.getElementById(nodeHandle);
 
-                // Update right panel selected node with appropriate icon for block view
-                $('#' + nodeHandle + ' .block-view-file-type').removeClass(icon);
+                if (target) {
+                    // Update right panel selected node with appropriate icon
+                    target = target.querySelector(M.viewmode ? '.block-view-file-type' : '.transfer-filetype-icon');
+
+                    if (target) {
+                        target.classList.remove(icon);
+                    }
+                }
 
                 // Left panel
-                $('#treea_' + nodeHandle + ' .nw-fm-tree-folder').removeClass(icon);
+                target = document.querySelector('#treea_' + nodeHandle + ' .nw-fm-tree-folder');
+
+                if (target) {
+                    target.classList.remove(icon);
+                }
             }
         };
 
@@ -2390,12 +2404,12 @@ mega.megadrop = (function() {
         this.showMEGAdropOverQuotaPromise = promise;
 
         $('.fm-main').addClass('full');
-        var $strgdlg = $('.fm-dialog.storage-dialog').removeClass('almost-full');
+        var $strgdlg = $('.mega-dialog.storage-dialog').removeClass('almost-full');
 
         $strgdlg.addClass('full')
-            .find('.default-red-button').addClass('hidden')
+            .find('.choose-plan').addClass('hidden')
             .end()
-            .find('.fm-dialog-body.full .fm-dialog-title').text(l[16302])
+            .find('.fm-dialog-body.full header h2').text(l[16302])
             .end()
             .find('.body-header').text(l[17535])
             .end()
@@ -2406,12 +2420,12 @@ mega.megadrop = (function() {
             .end()
             .find('.storage-dialog.no-achievements-bl').addClass('hidden');
 
-        $('.fm-dialog-close, .button.skip', $strgdlg).rebind('click', closeDialog);
+        $('button.js-close, button.skip', $strgdlg).rebind('click', closeDialog);
 
         // if another dialog wasn't opened previously
         if (!prevState) {
             M.safeShowDialog('megadrop-over-quota', $strgdlg);
-            $('.fm-dialog:visible, .overlay:visible').addClass('arrange-to-back');
+            $('.mega-dialog:visible, .overlay:visible').addClass('arrange-to-back');
         }
         else {
             promise.reject();

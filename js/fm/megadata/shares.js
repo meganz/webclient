@@ -24,12 +24,11 @@ MegaData.prototype.openSharingDialog = function() {
     if (u_type === 0) {
         return ephemeralDialog(l[1006]);
     }
-
-    var $dialog = $('.fm-dialog.share-dialog');
+    var $dialog = $('.mega-dialog.share-dialog');
 
     $('.fm-dialog-overlay').rebind('click.closeShareDLG', function() {
         // When click the overlay, only close the share dialog if the lost changes warning dialog isn't there.
-        if ($.dialog === 'share' && $('.confirmation-dialog:not(.hidden)').length === 0) {
+        if ($.dialog === 'share' && $('.confirmation:not(.hidden)').length === 0) {
             showLoseChangesWarning().done(closeDialog);
             return false;
         }
@@ -37,7 +36,7 @@ MegaData.prototype.openSharingDialog = function() {
 
     $(window).rebind('keydown.closeShareDLG', function(e) {
         // When press the Esc key, only close the share dialog if the lost changes warning dialog isn't there.
-        if (e.keyCode === 27 && $.dialog === 'share' && $('.confirmation-dialog:not(.hidden)').length === 0) {
+        if (e.keyCode === 27 && $.dialog === 'share' && $('.confirmation:not(.hidden)').length === 0) {
             showLoseChangesWarning().done(closeDialog);
             return false;
         }
@@ -56,11 +55,11 @@ MegaData.prototype.openSharingDialog = function() {
         $dialog.removeClass('hidden');
 
         if (M.d[selectedNode].shares || M.ps[selectedNode]) {
-            $('.share-dialog-folder-icon', $dialog).addClass('shared');
+            $('.share-dialog-folder-icon', $dialog).removeClass('icon-folder-24').addClass('icon-folder-outgoing-24');
             $('.remove-share', $dialog).removeClass('disabled');
         }
         else {
-            $('.share-dialog-folder-icon', $dialog).removeClass('shared');
+            $('.share-dialog-folder-icon', $dialog).removeClass('icon-folder-outgoing-24').addClass('icon-folder-24');
             $('.remove-share', $dialog).addClass('disabled');
         }
 
@@ -95,7 +94,7 @@ MegaData.prototype.openSharingDialog = function() {
  *
  * @param {array} alreadyAddedContacts  exclude contacts array
  */
-MegaData.prototype.initShareAddDialog = function(alreadyAddedContacts, $extraFooterElement) {
+MegaData.prototype.initShareAddDialog = function(alreadyAddedContacts, $extraContent) {
     "use strict";
 
     // If chat is not ready.
@@ -107,7 +106,7 @@ MegaData.prototype.initShareAddDialog = function(alreadyAddedContacts, $extraFoo
             // Waiting for chat_initialized broadcaster.
             loadingDialog.show();
             mBroadcaster.once('chat_initialized',
-                              this.initShareAddDialog.bind(this, alreadyAddedContacts, $extraFooterElement));
+                              this.initShareAddDialog.bind(this, alreadyAddedContacts, $extraContent));
         }
         return false;
     }
@@ -136,7 +135,7 @@ MegaData.prototype.initShareAddDialog = function(alreadyAddedContacts, $extraFoo
         return true;
     };
 
-    var $shareAddDialog = $extraFooterElement;
+    var $shareAddDialog = $extraContent;
     $('.add-share', $shareAddDialog).addClass('disabled');
 
     $('.cancel-add-share', $shareAddDialog).rebind('click', function() {
@@ -209,13 +208,13 @@ MegaData.prototype.initShareAddDialog = function(alreadyAddedContacts, $extraFoo
         return false;
     });
 
-    var extraFooterElementDidMount = function() {
+    var extraContentDidMount = function() {
         // Initializes the component of adding new contacts to share
         M.initAddByEmailComponent(alreadyAddedContacts);
     };
 
     var prop = {
-        className: 'share-add-dialog',
+        className: 'mega-dialog share-add-dialog',
         pickerClassName: 'share-add-dialog-top',
         customDialogTitle: l[23710],
         selected: alreadyAddedContacts,
@@ -224,19 +223,19 @@ MegaData.prototype.initShareAddDialog = function(alreadyAddedContacts, $extraFoo
         notSearchInEmails: false,
         autoFocusSearchField: false,
         disableDoubleClick: true,
-        selectedWidthSize: 62,
+        selectedWidthSize: 72,
         emptySelectionMsg: l[23751],
         newEmptySearchResult: true,
         newNoContact: true,
         highlightSearchValue: true,
         closeDlgOnClickOverlay: false,
         emailTooltips: true,
-        extraFooterElement: $extraFooterElement[0],
-        onExtraFooterElementDidMount: extraFooterElementDidMount,
+        extraContent: $extraContent[0],
+        onExtraContentDidMount: extraContentDidMount,
         onSelected: function(nodes) {
             $.contactPickerSelected = nodes;
 
-            var $shareAddDialog = $('.fm-dialog.share-add-dialog');
+            var $shareAddDialog = $('.mega-dialog.share-add-dialog');
 
             // Control the add button enable / disable
             if (JSON.stringify(clone($.contactPickerSelected).sort()) === JSON.stringify(alreadyAddedContacts.sort())
@@ -265,7 +264,7 @@ MegaData.prototype.initShareAddDialog = function(alreadyAddedContacts, $extraFoo
     var dialog = React.createElement(StartGroupChatDialogUI.StartGroupChatWizard, prop);
     ReactDOM.render(dialog, dialogPlacer);
 
-    M.safeShowDialog('share-add', $('.fm-dialog.share-add-dialog'));
+    M.safeShowDialog('share-add', $('.mega-dialog.share-add-dialog'));
 };
 
 /**
@@ -276,9 +275,7 @@ MegaData.prototype.initShareAddDialog = function(alreadyAddedContacts, $extraFoo
 MegaData.prototype.initAddByEmailComponent = function(alreadyAddedContacts) {
     'use strict';
 
-    var $shareAddDialog = $('.fm-dialog.share-add-dialog');
-
-    $('.share-add-dialog-bottom', $shareAddDialog).removeClass('hidden');
+    var $shareAddDialog = $('.mega-dialog.share-add-dialog');
 
     // Hide the personal message by default. This gets triggered when a new contact is added
     $('.share-message', $shareAddDialog).addClass('hidden');
@@ -291,8 +288,6 @@ MegaData.prototype.initAddByEmailComponent = function(alreadyAddedContacts) {
 
     $('.multiple-input .token-input-token-mega', $shareAddDialog).remove();
     initTokenInputsScroll($('.multiple-input', $shareAddDialog));
-
-    dialogPositioning($shareAddDialog);
 
     // Personal message
     $('.share-message textarea', $shareAddDialog).rebind('focus', function() {

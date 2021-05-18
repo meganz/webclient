@@ -314,7 +314,7 @@ var pro = {
             },
             19: {
                 name: 'Stripe2',
-                displayName: ''
+                displayName: l[6952] + ' (Stripe)' // Credit card (Stripe)
             },
             999: {
                 name: 'wiretransfer',

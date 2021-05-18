@@ -865,7 +865,7 @@
 
             // The 'delete token' button
             if (!readonly) {
-                $("<span class='input-close'></span>")
+                $('<i class="remove-item sprite-fm-mono icon-close-component"></i>')
                     .addClass($(input).data("settings").classes.tokenDelete)
                     .appendTo($this_token)
                     .on('click', function() {

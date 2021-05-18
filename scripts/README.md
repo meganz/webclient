@@ -23,6 +23,59 @@ strings for the webclient. For further information, see here:
 
 [https://wiki.developers.mega.co.nz/SoftwareEngineering/WebTranslationGuide]
 
+### transifex.py
+This is a Python script to import and export translation from Transifex. For further information, see here: https://confluence.developers.mega.co.nz/display/DEV/Webclient
+
+#### Glossary
+- __Main resource file:__ the `prod` resource file in Transifex which contains the strings attained from the import of `strings.json` on the latest `develop` branch
+- __Branch resource file:__ the `prod-branch_name` resource file in Transifex which contains the strings which are imported from a branch during development
+- __Developer comment:__ an attribute in a string object, similar to "Description" in Babel
+
+#### Setting Up
+1. Copy `transifex.json.example` and rename it to `transifex.json`
+2. Copy your Transifex API token at https://www.transifex.com/user/settings/api/ and set as a system environment variable `TRANSIFEX_TOKEN`
+
+_Notes:_
+- Token is also supported in `transifex.json` as TOKEN, but it is more ideal to store it as a system environment variable
+- `transifex.json` is git ignored. Please NEVER commit your Transifex API token
+
+#### Workflow
+##### Exporting Language Files
+1. Run `./scripts/lang.sh`.
+
+_What's happening when running the script?_
+1. Pulls all languages from main resource files
+2. If the branch has a corresponding resource file, the script also pulls all languages from branch resource file
+   1. When completed, the script merges the main resource file and the branch resource file
+3. Sanitise the strings from unwanted characters (ex.: < > ...)
+4. Create new `strings.json` and `<language>.json` files
+
+##### Importing String(s)
+1. Branch-off from develop or master branch
+2. Update `strings.json` with your new strings (or edit strings) in this following format:
+```json
+{
+    "string_key": {
+        "string": "your new string",
+        "developer_comment": "description of your string"
+    }
+    // to do multiple, make multiple of JSON object as above in the same file
+}
+```
+3. Run `./scripts/lang.sh --update`. When completed, it will continue to export all string including the newly imported (merging both main resource file and branch resource file)
+4. Add screenshots for the string through Transifex's under Webclient > Context and map the string on the branch resource file
+
+What's happening when running the script?
+1. Validate the JSON file content. A valid file content is:
+   - No duplicated key in the same JSON file
+   - Each string object has a string
+   - Each string object has a developer comment
+2. If file is valid, then the strings' straight quotes are sanitised to typographical quotes
+3. Check if the branch has an existing branch resource file. If not, create a new branch resource file
+4. Push the new strings to the branch resource file
+5. Pull both main resource file and branch resource file, then merge them
+6. Sanitise the strings from unwanted characters (ex.: `< > ...`)
+7. Create new `strings.json` and `<language>.json` files
 
 Deployment
 ----------

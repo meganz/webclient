@@ -41,6 +41,20 @@ function affiliateUI() {
     });
 
     affiliateUI.$body = $('.fm-affiliate.body');
+
+    $('.breadcrumbs .item.active', affiliateUI.$body).rebind('click.breadcrumbs', function() {
+        loadSubPage('/fm/dashboard');
+    });
+
+    // Init Referral content scrolling
+    var $scrollBlock = $('.scroll-block', affiliateUI.$body);
+
+    if ($scrollBlock.is('.ps-container')) {
+        Ps.update($scrollBlock[0]);
+    }
+    else {
+        Ps.initialize($scrollBlock[0]);
+    }
 }
 
 /*
@@ -59,7 +73,7 @@ affiliateUI.guideDialog = {
 
         var self = this;
 
-        $('.fm-affiliate.guide-dialog', affiliateUI.$body).rebind('click.guide-dialog', function() {
+        $('.guide-dialog', affiliateUI.$body).rebind('click.guide-dialog', function() {
             affiliateUI.guideDialog.show();
 
             if (this.classList.contains('to-rules')) {
@@ -79,10 +93,10 @@ affiliateUI.guideDialog = {
 
         var self = this;
 
-        this.$dialog = $('.fm-dialog.affiliate-guide');
-        this.$firstStepBlock = $('.affiliate-guide.step1', this.$dialog);
-        this.$secondStepBlock = $('.affiliate-guide.step2', this.$dialog);
-        this.slidesLength = $('.content', this.$secondStepBlock).length;
+        this.$dialog = $('.mega-dialog.affiliate-guide');
+        this.$firstStepBlock = $('.step1', this.$dialog);
+        this.$secondStepBlock = $('.step2', this.$dialog);
+        this.slidesLength = $('.affiliate-guide-content', this.$secondStepBlock).length;
 
         this.bindDialogEvents();
 
@@ -102,16 +116,13 @@ affiliateUI.guideDialog = {
         var self = this;
 
         // Step1. Welcome dialog, How it works button click - > show step 2.
-        $('.default-green-button.how-it-works', this.$dialog).rebind('click.guide-dialog-hiw-btn', function() {
+        $('button.how-it-works', this.$dialog).rebind('click.guide-dialog-hiw-btn', function() {
             self.$firstStepBlock.removeClass('active');
             self.$secondStepBlock.addClass('active');
-
-            // We should reposition Step2 dialog
-            self.$dialog.css('margin-top', '-' + self.$dialog.outerHeight() / 2 + 'px');
         });
 
         // Step 2. Back/Next buttons
-        $('.affiliate-guide.bottom-button', this.$dialog).rebind('click.btns', function() {
+        $('.bottom-button', this.$dialog).rebind('click.btns', function() {
             var currentSlide = $('.nav-button.active', self.$dialog).data('slide');
 
             if ($(this).hasClass('next') && currentSlide + 1 <= self.slidesLength) {
@@ -122,17 +133,17 @@ affiliateUI.guideDialog = {
             }
         });
 
-        $('.default-green-button.dashboard', this.$secondStepBlock).rebind('click.to-aff-page', function() {
+        $('button.dashboard', this.$secondStepBlock).rebind('click.to-aff-page', function() {
             loadSubPage('fm/refer');
         });
 
         // Step 2.Top nav buttons
-        $('.affiliate-guide.nav-button', this.$dialog).rebind('click.top-nav', function() {
+        $('.nav-button', this.$dialog).rebind('click.top-nav', function() {
             self.showAffiliateSlide($(this).attr('data-slide'));
         });
 
         // Closing dialog related
-        $('.fm-dialog-close', this.$dialog).rebind('click.close-dialog', function() {
+        $('button.js-close', this.$dialog).rebind('click.close-dialog', function() {
             closeDialog();
             affiliateUI.animateIcon();
             $('.fm-dialog-overlay').off('click.affGuideDialog');
@@ -151,8 +162,8 @@ affiliateUI.guideDialog = {
 
         num = num | 0 || 1;
 
-        $('.content.active', this.$secondStepBlock).removeClass('active');
-        $('.content.slide' + num, this.$secondStepBlock).addClass('active');
+        $('.affiliate-guide-content.active', this.$secondStepBlock).removeClass('active');
+        $('.affiliate-guide-content.slide' + num, this.$secondStepBlock).addClass('active');
 
         // Show/hide Back button
         if (num === 1) {
@@ -164,8 +175,19 @@ affiliateUI.guideDialog = {
 
         // Slide 3 requires scrollpane
         if (num === 3) {
-            $('.affiliate-guide.content.slide3', this.$secondStepBlock)
-                .jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5, animateScroll: true});
+            var $scrollBlock = $('.affiliate-guide-content.slide3', this.$secondStepBlock);
+
+            if ($scrollBlock.is('.ps-container')) {
+                Ps.update($scrollBlock[0]);
+            }
+            else {
+                Ps.initialize($scrollBlock[0]);
+            }
+
+            $('footer', this.$dialog).addClass('has-divider');
+        }
+        else {
+            $('footer', this.$dialog).removeClass('has-divider');
         }
 
         // Show/hide Affiliate Dashboard button/Next button
@@ -173,14 +195,14 @@ affiliateUI.guideDialog = {
             $('.bottom-button.next', this.$secondStepBlock).addClass('hidden');
 
             if (page === 'fm/refer') {
-                $('.default-green-button.dashboard', this.$secondStepBlock).addClass('hidden');
+                $('button.dashboard', this.$secondStepBlock).addClass('hidden');
             }
             else {
-                $('.default-green-button.dashboard', this.$secondStepBlock).removeClass('hidden');
+                $('button.dashboard', this.$secondStepBlock).removeClass('hidden');
             }
         }
         else {
-            $('.default-green-button', this.$secondStepBlock).addClass('hidden');
+            $('.mega-button.positive', this.$secondStepBlock).addClass('hidden');
             $('.bottom-button.next', this.$secondStepBlock).removeClass('hidden');
         }
 
@@ -201,7 +223,7 @@ affiliateUI.referralUrlDialog = {
         'use strict';
 
         var self = this;
-        this.$dialog = $('.fm-dialog.generate-url');
+        this.$dialog = $('.mega-dialog.generate-url');
 
         this.bindDialogEvents();
         $('.page-names span[data-page="start"]', this.$dialog).click();
@@ -273,14 +295,6 @@ affiliateUI.referralUrlDialog = {
                 self.updateURL();
                 $('.custom-block', self.$dialog).addClass('hidden');
             }
-
-            // Center dialogs
-            if (!is_mobile) {
-                self.$dialog.css({
-                    'margin-left': -1 * (self.$dialog.outerWidth() / 2),
-                    'margin-top': -1 * (self.$dialog.outerHeight() / 2)
-                });
-            }
         });
 
         $('.url-input', this.$dialog).rebind('keyup.enter-custom-url', function(e) {
@@ -293,7 +307,7 @@ affiliateUI.referralUrlDialog = {
             self.checkAndSetCustomURL();
         });
 
-        $('.fm-dialog-close', this.$dialog).rebind('click.close-dialog', function() {
+        $('button.js-close', this.$dialog).rebind('click.close-dialog', function() {
             closeDialog();
         });
     },
@@ -380,7 +394,7 @@ affiliateUI.registeredDialog = {
         if (u_type > 2 && mega.flags.refpr && !pfid) {
 
             var self = this;
-            this.$dialog = $('.fm-dialog.joined-to-affiliate');
+            this.$dialog = $('.mega-dialog.joined-to-affiliate');
 
             var _showRegisteredDialog = function() {
                 self.bindDialogEvents();
@@ -388,7 +402,7 @@ affiliateUI.registeredDialog = {
             };
 
             if (M.currentdirid === 'refer') {
-                $('.default-green-button span', this.$dialog).text(l[81]);
+                $('.how-it-works span', this.$dialog).text(l[81]);
                 $('.cancel-button', this.$dialog).addClass('hidden');
             }
 
@@ -410,12 +424,12 @@ affiliateUI.registeredDialog = {
 
         'use strict';
 
-        $('.default-green-button', this.$dialog).rebind('click.to-aff-page', function() {
+        $('.how-it-works', this.$dialog).rebind('click.to-aff-page', function() {
             closeDialog();
             affiliateUI.guideDialog.show();
         });
 
-        $('.fm-dialog-close, .cancel-button', this.$dialog).rebind('click.close-dialog', function() {
+        $('button.js-close, .cancel-button', this.$dialog).rebind('click.close-dialog', function() {
             closeDialog();
         });
     }
@@ -450,9 +464,6 @@ affiliateUI.startRender = function() {
         affiliateUI.purchaseIndex.init();
         loadingDialog.hide('affiliateUI');
     });
-
-    // Make sure init scrolling for the dashboard
-    initAffiliateScroll();
 };
 
 /*
@@ -476,7 +487,7 @@ affiliateUI.referUsers = {
         });
 
         $('.refer-users', affiliateUI.$body).rebind('click.affRefClick', function() {
-            affiliateUI.$body.data('jsp').scrollTo(0, 0, 1);
+            $('.scroll-block', affiliateUI.$body).animate({scrollTop: 0}, 500);
         });
     },
 
@@ -580,10 +591,10 @@ affiliateUI.commissionIndex = {
 
         // Redeem requires at least one payment history and available balance more than 50 euro
         if (M.affiliate.redeemable && balance.available >= 50 && M.affiliate.utpCount) {
-            $('.redeem.default-green-button', this.$block).removeClass('disabled');
+            $('button.redeem', this.$block).removeClass('disabled');
         }
         else {
-            $('.redeem.default-green-button', this.$block).addClass('disabled');
+            $('button.redeem', this.$block).addClass('disabled');
         }
     },
 
@@ -591,7 +602,7 @@ affiliateUI.commissionIndex = {
 
         'use strict';
 
-        $('.redeem.default-green-button' ,this.$block).rebind('click.openRedemptionDialog', function() {
+        $('button.redeem' ,this.$block).rebind('click.openRedemptionDialog', function() {
 
             if ($(this).hasClass('disabled')) {
                 return false;
@@ -611,7 +622,7 @@ affiliateUI.redemptionDialog = {
         var self = this;
         var balance = M.affiliate.balance;
         this.rdm = M.affiliate.redemption;
-        this.$dialog = $('.fm-dialog.affiliate-redeem');
+        this.$dialog = $('.mega-dialog.affiliate-redeem');
 
         // Reset dialog and info
         this.reset();
@@ -639,7 +650,7 @@ affiliateUI.redemptionDialog = {
 
         'use strict';
 
-        var $dialog = $('.fm-dialog.affiliate-request');
+        var $dialog = $('.mega-dialog.affiliate-request');
         var message = affiliateRedemption.requests.first.m === 2 ? l[23364] : l[23365];
 
         $('.status-message', $dialog).text(message);
@@ -666,7 +677,8 @@ affiliateUI.redemptionDialog = {
             });
         };
 
-        $('.button', $dialog).rebind('click', __closeSubmitted);
+        // Bind OK and close buttons
+        $('button', $dialog).rebind('click', __closeSubmitted);
         $('.fm-dialog-overlay').rebind('click.redemptionSubmittedClose', __closeSubmitted);
 
         M.safeShowDialog('affiliate-redeem-submitted', $dialog);
@@ -709,16 +721,6 @@ affiliateUI.redemptionDialog = {
         $('#affi-bitcoin-address', this.$dialog).val('');
 
         affiliateRedemption.reset();
-    },
-
-    repositionDialog: function() {
-
-        'use strict';
-
-        this.$dialog.css({
-            'margin-left': -1 * (this.$dialog.outerWidth() / 2),
-            'margin-top': -1 * (this.$dialog.outerHeight() / 2)
-        });
     },
 
     bindDialogEvents: function() {
@@ -796,7 +798,7 @@ affiliateUI.redemptionDialog = {
             }
         });
 
-        $('.fm-dialog-close', this.$dialog).rebind('click', this.hide.bind(this, false));
+        $('button.js-close', this.$dialog).rebind('click', this.hide.bind(this, false));
         $('.fm-dialog-overlay').rebind('click.redemptionClose', this.hide.bind(this, false));
 
         // Step 1
@@ -884,14 +886,14 @@ affiliateUI.redemptionDialog = {
 
                     // Account type
                     $('span', $type).text(l[23366]);
-                    $('.default-dropdown-item.active', $type).removeClass('active');
+                    $('.option.active', $type).removeClass('active');
                     $('.affi-dynamic-acc-info', $step3).empty();
 
                     return;
                 }
 
                 savedValue = M.affiliate.redeemAccDefaultInfo.type;
-                $activeOption = $('.default-dropdown-item.' + savedValue, $type);
+                $activeOption = $('.option.' + savedValue, $type);
                 $type.trigger('click');
                 $activeOption.trigger('click');
             }
@@ -914,13 +916,13 @@ affiliateUI.redemptionDialog = {
 
                 savedValue = empty ? '' : M.affiliate.redeemAccDefaultInfo[key];
 
-                if ($target.is('.megaInputs.titleTop')) {
+                if ($target.is('.megaInputs.underlinedText')) {
                     $target.data('MegaInputs').setValue(savedValue, true);
                 }
-                else if ($target.hasClass('default-select')) {
+                else if ($target.hasClass('dropdown-input')) {
 
-                    $activeOption = empty ? $('.default-dropdown-item:first', $target) :
-                        $('.default-dropdown-item[data-type="' + savedValue + '"]', $target);
+                    $activeOption = empty ? $('.option:first', $target) :
+                        $('.option[data-type="' + savedValue + '"]', $target);
 
                     $target.trigger('click');
                     $activeOption.trigger('click');
@@ -930,16 +932,12 @@ affiliateUI.redemptionDialog = {
 
         uiCheckboxes($autofillCheckbox, function(value) {
 
+            const scrollContainer = $step3[0].querySelector('.cell-content');
             __fillupForm(!value);
             $saveDataTip.addClass('hidden');
-            $step3.jScrollPane({
-                enableKeyboardNavigation: false,
-                showArrows: true,
-                arrowSize: 5,
-                animateScroll: true
-            });
+            Ps.update(scrollContainer);
+            scrollContainer.scrollTop = 0;
             $('input', $step3).off('focus.jsp');
-            self.repositionDialog();
         });
 
         uiCheckboxes($('.save-data-checkbox', $step3));
@@ -950,14 +948,10 @@ affiliateUI.redemptionDialog = {
             var __hideSaveDataTip = function() {
 
                 $saveDataTip.addClass('hidden');
-                $step3.jScrollPane({
-                    enableKeyboardNavigation: false,
-                    showArrows: true,
-                    arrowSize: 5,
-                    animateScroll: true
-                });
+                const scrollContainer = $step3[0].querySelector('.cell-content');
+                Ps.update(scrollContainer);
+                scrollContainer.scrollTop = 0;
                 $('input', $step3).off('focus.jsp');
-                self.repositionDialog();
             };
 
             if ($target.hasClass('accept') && affiliateRedemption.validateDynamicAccInputs()) {
@@ -1003,17 +997,16 @@ affiliateUI.redemptionDialog = {
         this['displayStep' + affiliateRedemption.currentStep]();
         $('span', $nextBtn).text(buttonText[affiliateRedemption.currentStep]);
 
-        if ($currentStep.is('.scrollable')) {
-            $currentStep.jScrollPane({
-                enableKeyboardNavigation: false,
-                showArrows: true,
-                arrowSize: 5,
-                animateScroll: true
-            });
+        var $cellContent = $('.cell-content', $currentStep);
+
+        if ($currentStep.is('.scrollable') && !$cellContent.hasClass('ps-container')) {
+            Ps.initialize($cellContent[0]);
             $('input', $currentStep).off('focus.jsp');
         }
-
-        this.repositionDialog();
+        else {
+            $cellContent.scrollTop(0);
+            Ps.update($cellContent[0]);
+        }
     },
 
     displayStep1: function() {
@@ -1059,7 +1052,7 @@ affiliateUI.redemptionDialog = {
         'use strict';
 
         var $currentStep = $('.cells.step2', this.$dialog);
-        var selectItemTemplate = '<div class="default-dropdown-item %3" data-type="%1">%2</div>';
+        var selectItemTemplate = '<div class="option %3" data-state="%4" data-type="%1">%2</div>';
 
         // Method text
         $('.withdraw-txt .method-chosen', $currentStep)
@@ -1088,25 +1081,19 @@ affiliateUI.redemptionDialog = {
             var $dropdown = $('#affi-' + type, $currentStep);
             var contentHtml = '';
 
-            $('.default-select-dropdown', $currentStep).addClass('hidden');
+            $('.mega-input-dropdown', $currentStep).addClass('hidden');
 
             for (var i = 0; i < list.length; i++) {
 
                 var item = escapeHTML(list[i]);
                 var displayName = type === 'country' ? M.getCountryName(item) : item;
+                var state = item === activeItem ? 'active' : '';
 
                 contentHtml += selectItemTemplate.replace('%1', item).replace('%2', displayName)
-                    .replace('%3', item === activeItem ? 'active' : '');
+                    .replace('%3', state).replace('%4', state);
             }
 
-            // Avoiding jsp reinitializing bug, destroy jsp manually
-            var jsp = $('.default-select-scroll', $dropdown).data('jsp');
-
-            if (jsp) {
-                jsp.destroy();
-            }
-
-            $('.default-select-scroll', $dropdown).safeHTML(contentHtml);
+            $('.dropdown-scroll', $dropdown).safeHTML(contentHtml);
 
             bindDropdownEvents($('#affi-' + type, $currentStep));
 
@@ -1139,7 +1126,7 @@ affiliateUI.redemptionDialog = {
 
         var self = this;
         var $currentStep = $('.cells.step3', this.$dialog);
-        var selectItemTemplate = '<div class="default-dropdown-item @@" data-type="@@">@@</div>';
+        var selectItemTemplate = '<div class="option @@" data-state="@@" data-type="@@">@@</div>';
         var ccc = affiliateRedemption.requests.first.cc + affiliateRedemption.requests.first.c;
         var req1 = affiliateRedemption.requests.first;
         var req1res = affiliateRedemption.req1res[0];
@@ -1149,11 +1136,11 @@ affiliateUI.redemptionDialog = {
         // Summary table update
         if (req1.c !== 'EUR') {
             $('.requested.price .euro', this.$dialog).removeClass('hidden')
-                .text(formatCurrency(req1.p));
+                .text(`(${formatCurrency(req1.p)})`);
             $('.fee.price .euro', this.$dialog).removeClass('hidden')
-                .text(formatCurrency(req1res.f));
+                .text(`(${formatCurrency(req1res.f)})`);
             $('.received.price .euro', this.$dialog).removeClass('hidden')
-                .text(formatCurrency(affiliateRedemption.requests.first.p - req1res.f));
+                .text(`(${formatCurrency(affiliateRedemption.requests.first.p - req1res.f)})`);
             $('.local-info', this.$dialog).removeClass('hidden');
         }
 
@@ -1232,7 +1219,7 @@ affiliateUI.redemptionDialog = {
                 var $accountSelector = $selectTemplate.clone().removeClass('template');
 
                 $('.mega-input-title', $accountSelector).text(l[23394]);
-                $('.dialog-input.default-select', $accountSelector).attr('id', 'account-type');
+                $accountSelector.attr('id', 'account-type');
                 $('span', $accountSelector).text(l[23366]);
 
                 var html = '';
@@ -1240,12 +1227,12 @@ affiliateUI.redemptionDialog = {
 
                 for (var i = 0; i < accTypes.length; i++) {
                     html += selectItemTemplate;
-                    safeArgs.push(accTypes[i][0], i, accTypes[i][1]);
+                    safeArgs.push(accTypes[i][0], accTypes[i][0], i, accTypes[i][1]);
                 }
 
                 safeArgs.unshift(html);
 
-                var $optionWrapper = $('.default-select-scroll', $accountSelector);
+                var $optionWrapper = $('.dropdown-scroll', $accountSelector);
 
                 $optionWrapper.safeHTML.apply($optionWrapper, safeArgs);
 
@@ -1253,7 +1240,7 @@ affiliateUI.redemptionDialog = {
 
                 bindDropdownEvents($('#account-type', $accountType));
 
-                $('#account-type .default-dropdown-item' , $accountType).rebind('click.accountTypeSelect', function() {
+                $('#account-type .option' , $accountType).rebind('click.accountTypeSelect', function() {
 
                     $accountType.parent().removeClass('error');
 
@@ -1265,15 +1252,8 @@ affiliateUI.redemptionDialog = {
                         $saveCheckbox.removeClass('hidden');
                     }
 
-                    $currentStep.jScrollPane({
-                        enableKeyboardNavigation: false,
-                        showArrows: true,
-                        arrowSize: 5,
-                        animateScroll: true
-                    });
+                    Ps.update($currentStep[0]);
                     $('input', $currentStep).off('focus.jsp');
-
-                    self.repositionDialog();
                 });
             }
             else {
@@ -1294,13 +1274,13 @@ affiliateUI.redemptionDialog = {
 
             $('.fm-dialog-overlay').off('click.redemptionClose');
 
-            msgDialog('confirmation', '', l[24964], l[24965], confirm => {
+            msgDialog('warningb:!^' + l[78] + '!' + l[79], '', l[24964], l[24965], reject => {
 
-                if (confirm) {
-                    $('.fm-dialog-overlay').rebind('click.redemptionClose', this.hide.bind(this, false));
+                if (reject) {
+                    this.hide(true);
                 }
                 else {
-                    this.hide(true);
+                    $('.fm-dialog-overlay').rebind('click.redemptionClose', this.hide.bind(this, false));
                 }
             });
         }
@@ -1322,15 +1302,8 @@ affiliateUI.redemptionDialog = {
         if (M.affiliate.redeemAccDefaultInfo && M.affiliate.redeemAccDefaultInfo.ccc === ccc) {
 
             $('.save-data-tip', $step3).removeClass('hidden');
-            $step3.jScrollPane({
-                enableKeyboardNavigation: false,
-                showArrows: true,
-                arrowSize: 5,
-                animateScroll: true
-            });
+            Ps.update($step3[0].querySelector('.cell-content'));
             $('input', $step3).off('focus.jsp');
-
-            this.repositionDialog();
         }
     },
 
@@ -1376,7 +1349,7 @@ affiliateUI.redemptionDialog = {
 
         var self = this;
         var $selectTemplate = $('.affi-dynamic-acc-select.template', this.$dialog);
-        var selectItemTemplate = '<div class="default-dropdown-item %c" data-type="@@">@@</div>';
+        var selectItemTemplate = '<div class="option %c" data-type="@@" data-state="%s">@@</div>';
         var $currentStep = $('.cells.step3', this.$dialog);
         var defaultCountry;
         var hashedKey = 'm' + MurmurHash3(selectItem.key);
@@ -1390,7 +1363,7 @@ affiliateUI.redemptionDialog = {
         var $select = $selectTemplate.clone().removeClass('template');
 
         $('.mega-input-title', $select).text(selectItem.name);
-        $('.dialog-input.default-select', $select).attr({id: hashedKey, title: escapeHTML(selectItem.name)});
+        $select.attr({id: hashedKey, title: escapeHTML(selectItem.name)});
 
         var selectHtml = '';
         var safeArgs = [];
@@ -1404,12 +1377,12 @@ affiliateUI.redemptionDialog = {
             safeArgs.push(option.key, option.name);
 
             if ((!defaultCountry && j === 0) || (defaultCountry && defaultCountry === option.key)) {
-                selectItemHtml = selectItemHtml.replace('%c', 'active');
+                selectItemHtml = selectItemHtml.replace('%c', 'active').replace('%s', 'active');
                 $('span', $select).text(option.name);
                 hasActive = true;
             }
             else {
-                selectItemHtml = selectItemHtml.replace('%c', '');
+                selectItemHtml = selectItemHtml.replace('%c', '').replace('%s', '');
             }
 
             selectHtml += selectItemHtml;
@@ -1417,25 +1390,25 @@ affiliateUI.redemptionDialog = {
 
         safeArgs.unshift(selectHtml);
 
-        var $optionWrapper = $('.default-select-scroll', $select);
+        var $optionWrapper = $('.dropdown-scroll', $select);
 
         $optionWrapper.safeHTML.apply($optionWrapper, safeArgs);
 
         // If non of option is active with above looping, select first one
         if (!hasActive) {
-            $('.default-dropdown-item', $optionWrapper).first().addClass('active');
+            $('.option', $optionWrapper).first().addClass('active');
         }
 
         $wrapper.safeAppend($select.prop('outerHTML'));
 
         $select = $('#' + hashedKey, $wrapper);
-        bindDropdownEvents($select, 0, '.step3 .cell-content');
+        bindDropdownEvents($select, 0, '.mega-dialog.affiliate-redeem');
         affiliateRedemption.dynamicInputs[hashedKey] = ['s', $select, selectItem.key];
 
-        $('.default-select-dropdown', $select).rebind('click.removeError', function(e) {
+        $('.mega-input-dropdown', $select).rebind('click.removeError', function(e) {
 
             if ($(e.target).data('type') !== '') {
-                $(this).parents('.underline-dropdown-input').removeClass('error');
+                $(this).parents('.mega-input.dropdown-input').removeClass('error');
             }
         });
 
@@ -1444,7 +1417,7 @@ affiliateUI.redemptionDialog = {
 
             $wrapper.safeAppend('<div class="extraWrapper" data-parent="@@"></div>', hashedKey);
 
-            $('.default-dropdown-item', $select).rebind('click.showAdditionalInput', function() {
+            $('.option', $select).rebind('click.showAdditionalInput', function() {
 
                 var $extraWrapper = $('.extraWrapper[data-parent="' + hashedKey + '"]', $wrapper).empty();
                 affiliateRedemption.clearDynamicInputs();
@@ -1490,8 +1463,15 @@ affiliateUI.redemptionDialog = {
                             $('.active', parentDynamicInput[1]).data('type') === defaultInfo[parentDynamicInput[2]]) {
 
                             if (additions[j].va) {
-                                $('[data-type="' + defaultInfo[additions[j].key] + '"]', $newElem)
-                                    .trigger('click.settingsGeneral');
+                                // TODO: replace this with a proper function to set the value of a MegaInput/Dropdown
+                                const $option = $('[data-type="' + defaultInfo[additions[j].key] + '"]', $newElem)
+                                const $dropdown = $option.closest('.dropdown-input');
+
+                                // Select dropdown item
+                                $('.option', $dropdown).removeClass('active').removeAttr('data-state');
+                                $option.addClass('active').attr('data-state', 'active');
+                                $('span', $dropdown).text($option.text());
+                                $('.hidden-input', $dropdown).trigger('focus');
                             }
                             else {
                                 $newElem.val(defaultInfo[additions[j].key]);
@@ -1499,7 +1479,7 @@ affiliateUI.redemptionDialog = {
                         }
                     }
 
-                    $('.default-dropdown-item', $extraWrapper)
+                    $('.option', $extraWrapper)
                         .rebind('click.showSaveTooltip', self.__showSaveDataTip.bind(self));
 
                     affiliateRedemption.clearDynamicInputs();
@@ -1507,12 +1487,7 @@ affiliateUI.redemptionDialog = {
                     // Lets remove temporary added data for afftrc.
                     affiliateRedemption.requests.second = {};
 
-                    $currentStep.jScrollPane({
-                        enableKeyboardNavigation: false,
-                        showArrows: true,
-                        arrowSize: 5,
-                        animateScroll: true
-                    });
+                    Ps.update($currentStep[0]);
 
                     $('input', $currentStep).off('focus.jsp');
 
@@ -1529,7 +1504,7 @@ affiliateUI.redemptionDialog = {
             });
 
             onIdle(function() {
-                $('.default-dropdown-item.active', $select).trigger('click.showAdditionalInput');
+                $('.option.active', $select).trigger('click.showAdditionalInput');
             });
         }
     },
@@ -1564,11 +1539,9 @@ affiliateUI.redemptionDialog = {
             }
         }
 
-        this.repositionDialog();
-
         // After rendering, make bind for any input on this stage will show save tooltip when condition met
         $('input[type="text"]', $currentStep).rebind('input.showSaveTooltip', this.__showSaveDataTip.bind(this));
-        $('.default-dropdown-item', $currentStep).rebind('click.showSaveTooltip', this.__showSaveDataTip.bind(this));
+        $('.option', $currentStep).rebind('click.showSaveTooltip', this.__showSaveDataTip.bind(this));
     },
 };
 
@@ -1582,7 +1555,7 @@ affiliateUI.redemptionHistory = {
         'use strict';
 
         this.$block = $('.mega-data-box.redemption', affiliateUI.$body);
-        this.$dropdownBlock = $('.dropdown-wrap.redemption', affiliateUI.$body);
+        this.$dropdown = $('.dropdown-input.affiliate-redemption', this.$block);
 
         // Initial table view for redemption history, no filter, default sort
         this.list = M.affiliate.redemptionHistory.r;
@@ -1600,20 +1573,27 @@ affiliateUI.redemptionHistory = {
 
         var self = this;
 
-        $('th.sortable', this.$block).rebind('click', function() {
+        $('th.sortable', self.$block).rebind('click', function() {
 
             var $this = $(this);
+            var $icon = $('i', $this);
 
             self.sort = $this.data('type');
 
-            if ($this.hasClass('asc')) {
+            if ($icon.hasClass('desc')) {
 
-                $this.removeClass('asc').addClass('desc');
+                $('.mega-data-box th.sortable i', this.$block)
+                    .removeClass('desc asc sprite-fm-mono icon-dropdown');
+
+                $icon.addClass('sprite-fm-mono icon-dropdown asc');
                 self.sortd = -1;
             }
             else {
-                $('.mega-data-box th.sortable').removeClass('asc desc');
-                $this.addClass('asc');
+
+                $('.mega-data-box th.sortable i', this.$block)
+                    .removeClass('desc asc sprite-fm-mono icon-dropdown');
+
+                $icon.addClass('sprite-fm-mono icon-dropdown desc');
                 self.sortd = 1;
             }
 
@@ -1625,7 +1605,7 @@ affiliateUI.redemptionHistory = {
         $(window).rebind('resize.affiliate', self.initRedeemResizeNScroll);
 
         // Init redeem detail View/Close link click
-        $('.fm-affiliate.redeem-table .link', this.$block).rebind('click.redemptionItemExpand', function() {
+        $('.redeem-table .link', self.$block).rebind('click.redemptionItemExpand', function() {
 
             var $this = $(this);
             var $table = $this.closest('.redeem-scroll');
@@ -1634,7 +1614,7 @@ affiliateUI.redemptionHistory = {
             if ($this.hasClass('open')) {
 
                 // This scroll animation is using CSS animation not jscrollpane animation because it is too heavy.
-                var $scrollBlock = $this.parents('.fm-affiliate.redeem-scroll').addClass('animateScroll');
+                var $scrollBlock = $this.parents('.redeem-scroll').addClass('animateScroll');
                 $('.expanded', $table).removeClass('expanded');
 
                 var rid = $this.data('rid');
@@ -1650,7 +1630,7 @@ affiliateUI.redemptionHistory = {
 
                     self.initRedeemResizeNScroll();
 
-                    $scrollBlock.data('jsp').scrollToElement($this.parent(), true, false);
+                    $scrollBlock.scrollTop($this.parents('tr').position().top);
 
                     // Just waiting animation to be finihsed
                     setTimeout(function() {
@@ -1672,10 +1652,10 @@ affiliateUI.redemptionHistory = {
             }
         });
 
-        bindDropdownEvents($('.default-select.affiliate-redemption', this.$dropdownBlock));
+        bindDropdownEvents(self.$dropdown, false, affiliateUI.$body);
 
         // Click event for item on filter dropdown
-        $('.default-dropdown-item', this.$dropdownBlock).rebind('click.showList', function() {
+        $('.option', self.$dropdown).rebind('click.showList', function() {
 
             var $this = $(this);
 
@@ -1784,24 +1764,24 @@ affiliateUI.redemptionHistory = {
             return false;
         }
 
-        var $scrollElement = $('.fm-affiliate.redeem-scroll').jScrollPane({
-            enableKeyboardNavigation: false,
-            showArrows: true,
-            arrowSize: 5,
-            animateScroll: true
-        });
+        var $scrollElement = $('.redeem-scroll', this.$block);
 
-        var $header = $('.fm-affiliate.redeem-table.main th');
+        if ($scrollElement.hasClass('ps-container')) {
+            Ps.update($scrollElement[0]);
+        }
+        else {
+            Ps.initialize($scrollElement[0]);
+        }
+
+        var $header = $('.redeem-table.main th', this.$block);
 
         for (var i = 0; i < $header.length; i++) {
-            var $clonedHeader = $('.fm-affiliate.redeem-table.clone th');
+            var $clonedHeader = $('.redeem-table.clone th', this.$block);
 
             if ($clonedHeader.eq(i).length) {
                 $clonedHeader.eq(i).outerWidth($header.eq(i).outerWidth());
             }
         }
-
-        initAffiliateScroll();
 
         // Remove default focus scrolling from jsp
         $('a', $scrollElement).off('focus.jsp');
@@ -1884,7 +1864,7 @@ affiliateUI.registrationIndex = {
             }
         });
 
-        $('.charts-head-cell .compare span', this.$registerChartBlock).text('+' + thisMonthCount);
+        $('.charts-head .compare span', this.$registerChartBlock).text(thisMonthCount);
     },
 
     /**
@@ -2002,9 +1982,15 @@ affiliateUI.registrationIndex = {
             }
         });
 
-        var ctx = document.getElementById('register-chart');
+        var $chartWrapper = $('.mega-data-box.registration', affiliateUI.$body);
+        var $ctx = $('#register-chart', $chartWrapper);
+        var chartColor1 = $ctx.css('--label-blue');
+        var chartColor2 = $ctx.css('--label-blue-hover');
+        var dividerColor = $ctx.css('--surface-grey-2');
+        var textColor = $ctx.css('--text-color-low');
         var ticksLimit = 6;
-        ctx.height = 186;
+
+        $ctx.outerHeight(186);
 
         //  TODO: set ticksLimit=4 for all months after library update
         if (this.type === 'm') {
@@ -2013,15 +1999,16 @@ affiliateUI.registrationIndex = {
             ticksLimit = daysInMonth === 28 ? 5 : 4;
         }
 
-        this.chart = new Chart(ctx, {
-            type: 'roundedBar',
+        this.chart = new Chart($ctx[0], {
+            type: 'bar',
             data: {
                 labels: labels,
                 datasets: [{
                     data: data,
-                    backgroundColor: 'rgba(101,187,226,0.5)',
-                    hoverBackgroundColor: 'rgb(64, 142, 201)',
-                    borderWidth: 0
+                    backgroundColor: chartColor1,
+                    hoverBackgroundColor: chartColor2,
+                    borderWidth: 1,
+                    borderColor: chartColor1.replace(/^\s/ , '')
                 }]
             },
             options: {
@@ -2039,7 +2026,7 @@ affiliateUI.registrationIndex = {
                             display : false
                         },
                         ticks: {
-                            fontColor: '#B7B7B7',
+                            fontColor: textColor,
                             fontSize: 12,
                             autoSkip: true,
                             maxTicksLimit: ticksLimit,
@@ -2049,15 +2036,15 @@ affiliateUI.registrationIndex = {
                     yAxes: [{
                         display: true,
                         ticks: {
-                            fontColor: '#999999',
+                            fontColor: textColor,
                             fontSize: 12,
                             beginAtZero: true,
                             precision: 0,
                             suggestedMax: 4
                         },
                         gridLines: {
-                            color: "#F0F0F0",
-                            zeroLineColor: '#F0F0F0',
+                            color: dividerColor,
+                            zeroLineColor: dividerColor,
                             drawBorder: false,
                         }
                     }]
@@ -2131,7 +2118,7 @@ affiliateUI.purchaseIndex = {
         });
 
         $('.affiliate-total-pur', this.$purchaseChartBlock).text(this.totalCount);
-        $('.charts-head-cell .compare span', this.$purchaseChartBlock).text('+' + this.monthCount);
+        $('.charts-head .compare span', this.$purchaseChartBlock).text(this.monthCount);
 
         $('.list-item.prol .label', this.$purchaseChartBlock)
             .text(formatPercentage(this.countedData[4] / this.totalCount || 0));
@@ -2162,9 +2149,10 @@ affiliateUI.purchaseIndex = {
             this.chart.destroy();
         }
 
-        var ctx = document.getElementById('purchase-chart');
+        var $chartWrapper = $('.mega-data-box.purchase', affiliateUI.$body);
+        var $ctx = $('#purchase-chart', $chartWrapper);
 
-        this.chart = new Chart(ctx, {
+        this.chart = new Chart($ctx[0], {
             type: 'doughnut',
             data: {
                 datasets: [{
@@ -2177,12 +2165,12 @@ affiliateUI.purchaseIndex = {
                         $.isEmptyObject(this.countedData) ? 1  : 0
                     ],
                     backgroundColor: [
-                        '#FFC240',
-                        '#FF6F00',
-                        '#FF0003',
-                        '#CC0049',
-                        '#408EC9',
-                        '#F6F6F6'
+                        $ctx.css('--label-yellow'),
+                        $ctx.css('--label-orange'),
+                        $ctx.css('--label-red'),
+                        $ctx.css('--label-purple'),
+                        $ctx.css('--label-blue'),
+                        $ctx.css('--surface-grey-2')
                     ],
                     borderWidth: 0
                 }]
@@ -2268,7 +2256,7 @@ affiliateUI.geographicDistribution = {
         var template =
             '<div class="fm-affiliate list-item">' +
                 '<div class="img-wrap"><img src="$countryImg" alt=""></div>' +
-                '$countryName <span class="num">$count</span>' +
+                '<span class="name">$countryName</span><span class="num">$count</span>' +
             '</div>';
 
         var _sortFunc = function(a, b) {

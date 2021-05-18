@@ -137,15 +137,21 @@ MegaData.prototype.drawReceivedContactRequests = function(ipc, clearGrid) {
                     '</td>' +
                     '<td>' + ts + '</td>' +
                     '<td class="right-textalign">' +
-                    '<div class="contact-request-button default-white-button green-txt inline accept">' +
-                    '<i class="small-icon icons-sprite tiny-green-tick"></i>' +
-                    '<span>' + l[5856] + '</span></div>' +
-                    '<div class="contact-request-button default-white-button grey-txt inline ignore">' +
-                    '<i class="small-icon icons-sprite stop dark"></i>' +
-                    '<span>' + l[20980] + '</span></div>' +
-                    '<div class="contact-request-button default-white-button red-txt inline delete">' +
-                    '<i class="small-icon icons-sprite tiny-red-cross"></i>' +
-                    '<span>' + l[20981] + '</span></div>' +
+                    '<button class="mega-button positive contact-request-button accept">' +
+                        '<span>' +
+                            l[5856] +
+                        '</span>' +
+                    '</button>' +
+                    '<button class="mega-button contact-request-button ignore">' +
+                        '<span>' +
+                            l[20980] +
+                        '</span>' +
+                    '</button>' +
+                    '<button class="mega-button negative contact-request-button delete">' +
+                        '<span>' +
+                            l[20981] +
+                        '</span>' +
+                    '</button>' +
                     '<div class="contact-request-ignored"><span>' + l[5864] + '</span></div>' +
                     '<div class="clear"></div>' +
                     '</td>' +
@@ -160,7 +166,7 @@ MegaData.prototype.drawReceivedContactRequests = function(ipc, clearGrid) {
         // If at least one new item is added then ajust grid
         if (drawn) {
             $('.fm-empty-contacts').addClass('hidden');
-            $('.button.link-button.accept-all').removeClass('hidden');
+            $('button.link-button.accept-all').removeClass('hidden');
 
             // Update IPC indicator
             delay('updateIpcRequests', updateIpcRequests);
@@ -209,7 +215,7 @@ MegaData.prototype.drawReceivedContactRequests = function(ipc, clearGrid) {
                 return false; // stop propagation!
             });
 
-            $('.button.link-button.accept-all').rebind('click', function() {
+            $('button.link-button.accept-all').rebind('click', function() {
                 var $requestsList= $('.grid-table.contact-requests tr');
                 var ipcId = '';
 
@@ -302,25 +308,26 @@ MegaData.prototype.drawSentContactRequests = function(opc, clearGrid) {
                 hideOPC = (hideOPC !== '') ? ' class="' + hideOPC + '"' : '';
                 html = '<tr id="opc_' + htmlentities(opc[i].p) + '"' + hideOPC + '>' +
                     '<td>' +
-                    '<div class="left email">' +
-                    '<div class="avatar-wrapper small-rounded-avatar"></div>' +
-                    '<div class="fm-chat-user-info">' +
-                    '<div class="contact-email">' + htmlentities(opc[i].m) + '</div>' +
-                    '</div>' +
-                    '</div>' +
+                        '<div class="left email">' +
+                            '<div class="avatar-wrapper small-rounded-avatar"></div>' +
+                            '<div class="fm-chat-user-info">' +
+                                '<div class="contact-email">' + htmlentities(opc[i].m) + '</div>' +
+                            '</div>' +
+                        '</div>' +
                     '</td>' +
                     '<td>' + rts + '</td>' +
                     '<td class="right-textalign">' +
-                    '<div class="default-white-button grey-txt ' +
-                    'contact-request-button inline reinvite ' + hideReinvite + '">' +
-                    '<i class="small-icon icons-sprite reverted dark"></i>' +
-                    '<span>' + escapeHTML(l[5861]) + '</span>' +
-                    '</div>' +
-                    '<div class="default-white-button red-txt ' +
-                    'contact-request-button inline cancel ' + hideCancel + '">' +
-                    '<i class="small-icon icons-sprite tiny-red-cross"></i>' +
-                    '<span>' + escapeHTML(l[82]) + '</span>' +
-                    '</div>' +
+                        '<button class="mega-button ' +
+                            'contact-request-button reinvite ' + hideReinvite + '">' +
+                            '<div>' +
+                                '<i class="small-icon icons-sprite reverted dark"></i>' +
+                            '</div>' +
+                            '<span>' + escapeHTML(l[5861]) + '</span>' +
+                        '</button>' +
+                        '<button class="mega-button negative ' +
+                            'contact-request-button cancel ' + hideCancel + '"><span>' +
+                            escapeHTML(l[82]) +
+                        '</span></button>' +
                     '</td></tr>';
 
                 $(t).append(html);
@@ -362,6 +369,10 @@ MegaData.prototype.drawSentContactRequests = function(opc, clearGrid) {
                 }
             });
         }
+    }
+
+    if (M.chat && megaChat.routingSection === "contacts" && megaChat.routingSubSection === "sent") {
+        mBroadcaster.sendMessage('fmViewUpdate:opc');
     }
 };
 
@@ -800,7 +811,7 @@ MegaData.prototype.syncContactEmail = function(userHash, promise, forced) {
     'use strict';
     var user = userHash in this.u && this.u[userHash] || false;
 
-    if (megaChat.FORCE_EMAIL_LOADING) {
+    if (megaChatIsReady && megaChat.FORCE_EMAIL_LOADING) {
         forced = true;
     }
 
@@ -1387,8 +1398,8 @@ MegaData.prototype.contactsUI = function() {
     "use strict";
 
     var $container = $('.contacts-view');
-    var $contactBlocks = $container.find('.data-block-view, .contacts tr');
-    var $buttons = $contactBlocks.find('.default-white-button');
+    var $contactBlocks = $('.data-block-view, .contacts tr', $container);
+    var $buttons = $('.mega-button', $contactBlocks);
 
     setContactLink();
 

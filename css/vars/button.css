@@ -1,0 +1,147 @@
+/* Please read wiki article 'CSS Variables and Themes' before editing this file. */
+
+/* Button: theme-based variables */
+
+/* Some <a> elements need to look like buttons but are semantically links */
+
+.theme-light .mega-button,
+html .theme-light-forced .mega-button,
+.mega-button.theme-light,
+html .mega-button.theme-light-forced {
+
+    /* negative/branded red button */
+
+        --red: var(--surface-error);
+        --red-hover: var(--surface-error-hover);
+        --red-active: var(--surface-error-active);
+        --text-red: var(--text-color-white-high);
+        --red-border: rgb(1, 1, 1, 0.05);
+
+    /* positive/branded green button */
+
+        --green: var(--button-fill-positive);
+        --green-hover: var(--button-fill-positive-hover);
+        --green-active: var(--button-fill-positive-active);
+        --text-green: var(--text-color-white-high);
+        --green-border: rgb(1, 1, 1, 0.05);
+
+    /* neutral button - white */
+
+        --neutral: linear-gradient(rgba(255, 255, 255, 1) 0%, rgba(242, 242, 242, 1) 100%);
+        --neutral-hover: linear-gradient(rgba(242, 242, 242, 1) 0%, rgba(237, 237, 237, 1) 100%);
+        --neutral-active: #fff;
+        --text-neutral: rgb(51, 51, 51);
+        --neutral-border: rgba(0, 0, 0, 0.1);
+
+    /* action button */
+
+        --action: transparent;
+        --action-hover: rgba(0, 0, 0, 0.05);
+        --action-active: transparent;
+        --text-action: var(--text-color-black-high);
+}
+
+.theme-dark .mega-button,
+html .theme-dark-forced .mega-button,
+.mega-button.theme-dark,
+html .mega-button.theme-dark-forced {
+
+    /* negative/branded red button */
+
+        --red: var(--surface-error);
+        --red-hover: var(--surface-error-hover);
+        --red-active: var(--surface-error-active);
+        --text-red: var(--text-color-white-high);
+        --red-border: rgb(255, 255, 255, 0.2);
+
+    /* positive/branded green button */
+
+        --green: var(--button-fill-positive);
+        --green-hover: var(--button-fill-positive-hover);
+        --green-active: var(--button-fill-positive-active);
+        --text-green: var(--text-color-white-high);
+        --green-border: rgb(255, 255, 255, 0.2);
+
+    /* neutral button - grey */
+
+        --neutral: linear-gradient(180deg, rgba(159, 159, 159, 1) 0%, rgba(102, 102, 102, 1) 100%);
+        --neutral-hover: linear-gradient(180deg, rgba(175, 175, 175, 1) 0%, rgba(120, 120, 120, 1) 100%);
+        --neutral-active: linear-gradient(180deg, rgba(140, 140, 140, 1) 0%, rgba(83, 83, 83, 1) 100%);
+        --text-neutral: var(--text-color-white-high);
+        --neutral-border: rgb(255, 255, 255, 0.1);
+
+    /* action button */
+
+        --action: transparent;
+        --action-hover: rgba(255, 255, 255, 0.1);
+        --action-active: transparent;
+        --text-action: var(--text-color-white-high);
+}
+
+.mega-button {
+    --horizontal-padding: 8px;
+    --outer-padding: 6px;
+    --border-width: 2px;
+    --height: 36px;
+    --mask-color: var(--icon-active);
+}
+
+.mega-button.small {
+    --horizontal-padding: 4px;
+    --outer-padding: 4px;
+    --height: 24px;
+}
+
+.mega-button.large {
+    --horizontal-padding: 16px;
+    --outer-padding: 8px;
+    --height: 48px;
+}
+
+.mega-button.round {
+    --outer-padding: 6px;
+}
+
+.mega-button.small.round {
+    --outer-padding: var(--border-width);
+}
+
+.mega-button.large.round {
+    --outer-padding: 8px;
+}
+
+.mega-button.icon {
+    --horizontal-padding: 0;
+    --outer-padding: 0;
+    --height: 24px;
+}
+
+.mega-button.small.icon {
+    --horizontal-padding: 0;
+    --outer-padding: 0;
+    --height: 16px;
+}
+
+.mega-button.large.icon {
+    --horizontal-padding: 0;
+    --outer-padding: 0;
+    --height: 32px;
+}
+
+.mega-button.negative,
+.mega-button.branded-red {
+    --mask-color: var(--text-red);
+}
+
+.mega-button.positive,
+.mega-button.branded-green {
+    --mask-color: var(--text-green);
+}
+
+.mega-button.round {
+    --outer-padding: 6px;
+}
+
+.mega-button.round.small {
+    --outer-padding: 2px;
+}

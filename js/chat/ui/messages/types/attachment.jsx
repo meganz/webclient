@@ -4,9 +4,6 @@ import { Dropdown, DropdownItem } from '../../../../ui/dropdowns.jsx';
 import { Button } from '../../../../ui/buttons.jsx';
 
 export default class Attachment extends AbstractGenericMessage {
-    constructor(props) {
-        super(props);
-    }
 
     _isRevoked = node => !M.chd[node.ch] || node.revoked;
 
@@ -46,20 +43,20 @@ export default class Attachment extends AbstractGenericMessage {
                 }
                 // `Play Audio` || `Play Video` || `Preview`
                 var previewLabel = isAudio ? l[17828] : isVideo ? l[16275] : l[1899];
-                var previewIcon = isAudio ? 'context play' : isVideo ? 'context videocam' : 'search-icon';
+                var previewIcon = isAudio ? 'icon-play' : isVideo ? 'icon-video-call-filled' : 'icon-preview-reveal';
                 // eslint-disable-next-line max-depth
                 if (isText) {
                     // `View`
                     previewLabel = l[16797];
                     // TODO: Replace with "preview-file" icon?
                     //  will keep this one for now for consistency with FM.
-                    previewIcon = "context-sprite edit-file";
+                    previewIcon = "icon-file-edit";
                 }
                 previewButton =
                     <span key="previewButton">
                         <DropdownItem
                             label={previewLabel}
-                            icon={previewIcon}
+                            icon={`sprite-fm-mono ${previewIcon}`}
                             onClick={e => this.props.onPreviewStart(v, e)}
                         />
                     </span>;
@@ -67,7 +64,7 @@ export default class Attachment extends AbstractGenericMessage {
 
             if (contact.u === u_handle) {
                 dropdown = <Button
-                    className="default-white-button tiny-button"
+                    className="tiny-button"
                     icon="tiny-icon icons-sprite grey-dots">
                     <Dropdown
                         ref={(refObj) => {
@@ -93,9 +90,8 @@ export default class Attachment extends AbstractGenericMessage {
                             if (message.isEditable && message.isEditable()) {
                                 revokeButton = (
                                     <DropdownItem
-                                        icon="red-cross"
+                                        icon="sprite-fm-mono icon-dialog-close"
                                         label={l[83] /* `Remove` */}
-                                        className="red"
                                         onClick={() => {
                                             chatRoom.megaChat.plugins.chatdIntegration.updateMessage(
                                                 chatRoom, message.internalId || message.orderValue, ""
@@ -120,7 +116,7 @@ export default class Attachment extends AbstractGenericMessage {
                             }
                             else if (!NODE_DOESNT_EXISTS_ANYMORE[v.h]) {
                                 downloadButton = <DropdownItem
-                                    icon="rounded-grey-down-arrow"
+                                    icon="sprite-fm-mono icon-download-small"
                                     label={l[1187] /* `Download` */}
                                     onClick={() => this.props.onDownloadStart(v)} />;
 
@@ -130,7 +126,7 @@ export default class Attachment extends AbstractGenericMessage {
 
                                 firstGroupOfButtons.push(
                                     <DropdownItem
-                                        icon="context info"
+                                        icon="sprite-fm-mono icon-info"
                                         label={l[6859] /* `Info` */}
                                         key="infoDialog"
                                         onClick={() => {
@@ -144,7 +140,7 @@ export default class Attachment extends AbstractGenericMessage {
 
                                 linkButtons.push(
                                     <DropdownItem
-                                        icon="small-icon conversations"
+                                        icon="sprite-fm-mono icon-send-to-chat"
                                         label={l[17764] /* `Send to chat` */}
                                         key="sendToChat"
                                         onClick={() => {
@@ -192,7 +188,7 @@ export default class Attachment extends AbstractGenericMessage {
             }
             else {
                 dropdown = <Button
-                    className="default-white-button tiny-button"
+                    className="tiny-button"
                     icon="tiny-icon icons-sprite grey-dots">
                     <Dropdown
                         className="white-context-menu attachments-dropdown"
@@ -205,19 +201,19 @@ export default class Attachment extends AbstractGenericMessage {
                         {previewButton}
                         {previewButton && <hr/>}
                         <DropdownItem
-                            icon="rounded-grey-down-arrow"
+                            icon="sprite-fm-mono icon-download-small"
                             label={l[1187] /* `Download` */}
                             onClick={() => this.props.onDownloadStart(v)}
                         />
                         {this._isUserRegistered() &&
                             <>
                                 <DropdownItem
-                                    icon="grey-cloud"
+                                    icon="sprite-fm-mono icon-cloud"
                                     label={l[1988] /* `Save file` */}
                                     onClick={() => this.props.onAddToCloudDrive(v, false)}
                                 />
                                 <DropdownItem
-                                    icon="conversations"
+                                    icon="sprite-fm-mono icon-send-to-chat"
                                     label={l[17764] /* `Send to chat` */}
                                     onClick={() => this.props.onAddToCloudDrive(v, true)}
                                 />
@@ -260,9 +256,15 @@ export default class Attachment extends AbstractGenericMessage {
                         <div
                             className="thumb-overlay"
                             onClick={() => isPreviewable && this.props.onPreviewStart(v)}>
-                            {isPreviewable && <div className="play-video-button"/>}
+                            {isPreviewable && (
+                                <div className="thumb-overlay-play">
+                                    <div className="thumb-overlay-circle">
+                                        <i className="sprite-fm-mono icon-play" />
+                                    </div>
+                                </div>
+                            )}
                             <div className="video-thumb-details">
-                                {v.playtime && <i className="small-icon small-play-icon"/>}
+                                {v.playtime && <i className="sprite-fm-mono icon-play"/>}
                                 <span>{secondsToTimeShort(v.playtime || -1)}</span>
                             </div>
                         </div>;

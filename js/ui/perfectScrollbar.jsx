@@ -192,7 +192,7 @@ export class PerfectScrollbar extends MegaRenderMixin {
     }
 
     reinitialise(skipReinitialised, bottom) {
-        var $elem = this.get$Node()[0];
+        var $elem = this.findDOMNode();
         this.isUserScroll = false;
         if (bottom) {
             $elem.scrollTop = this.getScrollHeight();
@@ -206,11 +206,11 @@ export class PerfectScrollbar extends MegaRenderMixin {
     }
 
     getDOMRect(node) {
-        return (node || this.get$Node()[0]).getBoundingClientRect();
+        return (node || this.findDOMNode()).getBoundingClientRect();
     }
 
     getScrollOffset(value) {
-        var $elem = this.get$Node()[0];
+        var $elem = this.findDOMNode();
         return this.getDOMRect($elem.children[0])[value] - this.getDOMRect($elem)[value] || 0;
     }
 
@@ -238,12 +238,16 @@ export class PerfectScrollbar extends MegaRenderMixin {
         var $elem = this.get$Node();
         return $elem[0].scrollHeight;
     }
+    getContentWidth() {
+        var $elem = this.get$Node();
+        return $elem[0].scrollWidth;
+    }
     setCssContentHeight(h) {
         var $elem = this.get$Node();
         return $elem.css('height', h);
     }
     isAtTop() {
-        return this.get$Node()[0].scrollTop === 0;
+        return this.findDOMNode().scrollTop === 0;
     }
     isAtBottom() {
         return Math.round(this.getScrollPositionY()) === Math.round(this.getScrollHeight());
@@ -255,11 +259,20 @@ export class PerfectScrollbar extends MegaRenderMixin {
         return 100 / this.getScrollHeight() * this.getScrollPositionY();
     }
     getScrollPositionY() {
-        return this.get$Node()[0].scrollTop;
+        return this.findDOMNode().scrollTop;
+    }
+    getScrollPositionX() {
+        return this.findDOMNode().scrollLeft;
+    }
+    getClientWidth() {
+        return this.findDOMNode().clientWidth;
+    }
+    getClientHeight() {
+        return this.findDOMNode().clientHeight;
     }
     scrollToPercentY(posPerc, skipReinitialised) {
         var $elem = this.get$Node();
-        var targetPx = this.getScrollHeight()/100 * posPerc;
+        var targetPx = this.getScrollHeight() / 100 * posPerc;
         if ($elem[0].scrollTop !== targetPx) {
             this.doProgramaticScroll(targetPx, 0, 0, skipReinitialised);
         }
@@ -320,7 +333,7 @@ export class PerfectScrollbar extends MegaRenderMixin {
         return verge.inViewport(domNode);
     }
     componentDidUpdate() {
-        if (this.props.requiresUpdateOnResize) {
+        if (this.props.requiresUpdateOnResize || this.requiresUpdateOnResize) {
             this.onResize(true);
         }
         this.attachAnimationEvents();

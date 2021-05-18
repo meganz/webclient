@@ -206,11 +206,9 @@
     PasswordReminderDialog.prototype.bindEvents = function() {
         var self = this;
 
-        $(window).rebind('resize.prd', self.repositionDialog.bind(self));
-
         $(this.dialog.querySelectorAll(is_mobile
             ? '.button-prd-confirm, .button-prd-skip, .change-password-button, .button-prd-backup'
-            : '.default-white-button, .default-big-button'
+            : 'button.mega-button'
         )).rebind('click.prd', function(e) {
             self.onButtonClicked(this, e);
         });
@@ -226,7 +224,7 @@
             }
         });
 
-        $(self.dialog.querySelector('.fm-dialog-close')).rebind('click.prd', function() {
+        $(self.dialog.querySelector('button.js-close')).rebind('click.prd', function() {
             self.dismiss();
             return false;
         });
@@ -238,7 +236,7 @@
         });
 
         uiCheckboxes(
-            $(this.dialog.querySelector(is_mobile ? '.content-cell' : '.content-block')),
+            $(this.dialog.querySelector(is_mobile ? '.content-cell' : 'aside')),
             undefined,
             function(newState) {
                 if (newState === true) {
@@ -439,7 +437,6 @@
             this.correctLabel = null;
         }
         this.prepare();
-        this.repositionDialog();
     };
 
     /**
@@ -513,7 +510,7 @@
             // - there is a visible/active dialog
             var skipShowingDialog = !self.showIcon()
                 || $(
-                    'textarea:focus, input:focus, select:focus, .dropdown:visible:first, .fm-dialog:visible:first'
+                    'textarea:focus, input:focus, select:focus, .dropdown:visible:first, .mega-dialog:visible:first'
                 ).length > 0;
 
             if (
@@ -546,13 +543,13 @@
     };
 
     PasswordReminderDialog.prototype.topIconClicked = function() {
-        this[this.isShown ? 'hide' : 'show']();
+        this[this.isShown ? 'hideDialog' : 'showDialog']();
     };
 
     PasswordReminderDialog.prototype.showIcon = function() {
         if (!this.topIcon || this.topIcon.classList.contains('hidden') || !document.body.contains(this.topIcon)) {
             // because, we have plenty of top menus, that may not be visible/active
-            this.topIcon = $('.top-head:visible .top-icon.pass-reminder')[0];
+            this.topIcon = $('.js-pass-reminder', '.top-head')[0];
             if (this.topIcon) {
                 this.topIcon.classList.remove('hidden');
                 $(this.topIcon).rebind('click.prd', this.topIconClicked.bind(this));
@@ -564,7 +561,7 @@
     PasswordReminderDialog.prototype._initInternals = function() {
         this.dialog = document.querySelector(is_mobile
             ? '.mobile.password-reminder-overlay'
-            : '.dropdown.body.pass-reminder'
+            : '.mega-dialog.pass-reminder'
         );
         assert(this.dialog, 'this.dialog not found');
         this.passwordField = this.dialog.querySelector('input#test-pass');
@@ -617,7 +614,6 @@
         }
         else {
             assert(this.topIcon, 'topIcon not defined.');
-            this.repositionDialog();
             $(document.body).rebind(MouseDownEvent, this.onGenericClick.bind(this));
         }
 
@@ -639,18 +635,6 @@
         if (this.exportButton) {
             this.exportButton.classList.remove('red-button');
             this.exportButton.classList.add('green-button');
-        }
-    };
-
-
-    PasswordReminderDialog.prototype.repositionDialog = function() {
-        if (this.isShown) {
-            topPopupAlign('.top-icon.pass-reminder', '.dropdown.pass-reminder', 40);
-        }
-        if (this.dialogShown) {
-            // center position
-            this.dialog.style.left = (document.body.clientWidth - this.dialog.clientWidth) / 2 + "px";
-            this.dialog.style.top = (document.body.clientHeight - this.dialog.clientHeight) / 2 + "px";
         }
     };
 
@@ -713,16 +697,12 @@
         }
         else {
             fm_showoverlay();
-            this.dialog.classList.add('fm-dialog');
         }
 
         this.dialog.classList.remove('hidden');
 
         if (promise) {
             this._dialogActionPromise = promise;
-        }
-        if (!is_mobile) {
-            this.repositionDialog();
         }
     };
 
@@ -732,7 +712,6 @@
         fm_hideoverlay();
 
         this.dialog.classList.add('hidden');
-        this.dialog.classList.remove('fm-dialog');
         if (is_mobile) {
             this.dialog.classList.remove('overlay');
         }

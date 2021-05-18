@@ -11,7 +11,7 @@ class AccordionPanel extends MegaRenderMixin {
                 self.props.onToggle(e);
             }}>
                 <span>{this.props.title}</span>
-                <i className="tiny-icon right-arrow"></i>
+                <i className="sprite-fm-mono icon-arrow-down" />
             </div>
             {this.props.expanded ? <div
                 className={"chat-dropdown content have-animation " + contentClass}>{this.props.children}</div> : null}

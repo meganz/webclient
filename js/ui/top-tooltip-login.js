@@ -18,7 +18,7 @@ var accountinputs = {
         var $loginForm = $formWrapper.find('form');
         var $inputs = $('input',  $formWrapper);
         var $checkbox = $('.account.checkbox-block input, .pw-remind.checkbox-block input', $loginForm);
-        var $button = $('.button', $loginForm);
+        var $button = $('button.mega-button', $formWrapper);
         var $tooltip  = $loginForm.find('.account.input-tooltip');
 
         var megaInputs = new mega.ui.MegaInputs($inputs);
@@ -146,18 +146,16 @@ var tooltiplogin = {
         }
 
         var $inputs = $('input',  $dialog);
-        var $button = $dialog.find('.big-red-button');
+        var $button = $('.top-dialog-login-button', $dialog);
 
         $inputs.add($button).rebind('keydown.loginpopup', function(e) {
             if (e.keyCode === 13) {
-                tooltiplogin.startLogin();
+                tooltiplogin.startLogin.call(this);
                 return false;
             }
         });
 
-        $button.rebind('click.loginpopup', function() {
-            tooltiplogin.startLogin();
-        });
+        $button.rebind('click.loginpopup', tooltiplogin.startLogin);
 
         $('.top-login-full', $dialog).rebind('click', function() {
             tooltiplogin.init(1);
@@ -185,14 +183,14 @@ var tooltiplogin = {
         $dialog.removeClass('hidden');
 
         if ($('body').hasClass('logged')) {
-            topPopupAlign('.top-head .user-name', '.dropdown.top-login-popup', 40);
+            topPopupAlign('.top-head .user-name', '.dropdown.top-login-popup', 60);
         }
         else {
             if ($('body').hasClass('business')) {
-                topPopupAlign('.top-buttons.business .top-login-button', '.dropdown.top-login-popup', 40);
+                topPopupAlign('.top-buttons.business .top-login-button', '.dropdown.top-login-popup', 60);
             }
             else {
-                topPopupAlign('.top-login-button:visible', '.dropdown.top-login-popup', 40);
+                topPopupAlign('.top-login-button:visible', '.dropdown.top-login-popup', 60);
             }
         }
         if (is_chrome_firefox) {
@@ -210,7 +208,7 @@ var tooltiplogin = {
 
         'use strict';
 
-        var $topLoginPopup = $('.top-login-popup');
+        var $topLoginPopup =  $(this.closest('.top-login-popup'));
         var $loginForm = $topLoginPopup.find('.account.top-login-form');
         var $emailField = $topLoginPopup.find('#login-name');
         var $passwordField = $topLoginPopup.find('#login-password');
@@ -341,6 +339,7 @@ var tooltiplogin = {
             else if (page !== 'login') {
                 page = getSitePath().substr(1);
                 init_page();
+                tooltiplogin.init(1);
             }
             else {
                 loadSubPage('fm');

@@ -126,6 +126,9 @@ class ParticipantsList extends MegaRenderMixin {
                     self.safeForceUpdate();
                 }}
                 isVisible={self.props.chatRoom.isCurrentlyActive}
+                options={{
+                    suppressScrollX: true
+                }}
             >
                 <ParticipantsListInner
                     chatRoom={room}
@@ -201,11 +204,12 @@ class ParticipantsListInner extends MegaRenderMixin {
 
         for (var i = 0; i < contacts.length; i++) {
             var contactHash = contacts[i];
-            var contact = M.u[contactHash];
-
-            if (!contact) {
+            if (!(contactHash in M.u)) {
                 continue;
             }
+
+            var contact = M.u[contactHash];
+
             if (i < firstVisibleUserNum || i > lastVisibleUserNum) {
                 continue;
             }
@@ -219,7 +223,7 @@ class ParticipantsListInner extends MegaRenderMixin {
                 if (room.iAmOperator() && contactHash !== u_handle) {
                     dropdownRemoveButton.push(
                         <DropdownsUI.DropdownItem className="red"
-                            key="remove" icon="rounded-stop" label={l[8867]}
+                            key="remove" icon="sprite-fm-mono icon-disabled-filled" label={l[8867]}
                             onClick={onRemoveClicked.bind(this, contactHash)}/>
                     );
                 }
@@ -234,7 +238,7 @@ class ParticipantsListInner extends MegaRenderMixin {
 
                     dropdowns.push(
                         <DropdownsUI.DropdownItem
-                            key="privOperator" icon="gentleman"
+                            key="privOperator" icon="sprite-fm-mono icon-admin"
                             label={l[8875]}
                             className={"tick-item " + (room.members[contactHash] === FULL ? "active" : "")}
                             disabled={contactHash === u_handle}
@@ -243,7 +247,7 @@ class ParticipantsListInner extends MegaRenderMixin {
 
                     dropdowns.push(
                         <DropdownsUI.DropdownItem
-                            key="privFullAcc" icon="conversation-icon"
+                            key="privFullAcc" icon="sprite-fm-mono icon-chat"
                             className={"tick-item " + (room.members[contactHash] === OPERATOR ? "active" : "")}
                             disabled={contactHash === u_handle}
                             label={l[8874]} onClick={onSetPrivClicked.bind(this, contactHash, OPERATOR)} />
@@ -251,24 +255,24 @@ class ParticipantsListInner extends MegaRenderMixin {
 
                     dropdowns.push(
                         <DropdownsUI.DropdownItem
-                            key="privReadOnly" icon="eye-icon"
+                            key="privReadOnly" icon="sprite-fm-mono icon-read-only"
                             className={"tick-item " + (room.members[contactHash] === READONLY ? "active" : "")}
                             disabled={contactHash === u_handle}
                             label={l[8873]} onClick={onSetPrivClicked.bind(this, contactHash, READONLY)}/>
                     );
-
                 }
 
+                const baseClassName = 'sprite-fm-mono';
                 // other user privilege
                 switch (room.members[contactHash]) {
                     case FULL:
-                        dropdownIconClasses = "small-icon gentleman";
+                        dropdownIconClasses = `${baseClassName} icon-admin`;
                         break;
                     case OPERATOR:
-                        dropdownIconClasses = "small-icon conversation-icon";
+                        dropdownIconClasses = `${baseClassName} icon-chat-filled`;
                         break;
                     case READONLY:
-                        dropdownIconClasses = "small-icon eye-icon";
+                        dropdownIconClasses = `${baseClassName} icon-read-only`;
                         break;
                     default:
                         break;
@@ -284,7 +288,7 @@ class ParticipantsListInner extends MegaRenderMixin {
                         dropdownPositionAt="left top"
                         dropdowns={dropdowns}
                         dropdownDisabled={contactHash === u_handle || anonymouschat}
-                        dropdownButtonClasses="button icon-dropdown"
+                        dropdownButtonClasses="contacts-icon"
                         dropdownRemoveButton={dropdownRemoveButton}
                         dropdownIconClasses={dropdownIconClasses}
                         noLoading={true}

@@ -1,0 +1,282 @@
+/* Regular size illustrations */
+
+.sprite-fm-illustration,
+.sprite-fm-illustration-before::before,
+.sprite-fm-illustration-after::after {
+    background: url(../../images/sprites/fm-illustration-sprite.svg) no-repeat;
+    background-size: calc(100% * var(--num-of-illustration)) auto;
+    display: block;
+    content: '';
+
+    /* Default size. need to be overrided by each implementation */
+    width: 200px;
+    height: 200px;
+
+    --num-of-illustration: 41;
+}
+.sprite-fm-illustration.img-topbar-email-registration,
+.sprite-fm-illustration.img-topbar-email-registration-before::before,
+.sprite-fm-illustration.img-topbar-email-registration-after::after {
+    background-position: 0 0;
+}
+.sprite-fm-illustration.img-transferpage-empty-transfer,
+.sprite-fm-illustration.img-transferpage-empty-transfer-before::before,
+.sprite-fm-illustration.img-transferpage-empty-transfer-after::after {
+    background-position: calc(100% / (var(--num-of-illustration) - 1)) 0;
+}
+.sprite-fm-illustration.img-dialog-business-contacts,
+.sprite-fm-illustration.img-dialog-business-contacts-before::before,
+.sprite-fm-illustration.img-dialog-business-contacts-after::after {
+    background-position: calc(200% / (var(--num-of-illustration) - 1)) 0;
+}
+.sprite-fm-illustration.img-dialog-contacts,
+.sprite-fm-illustration.img-dialog-contacts-before::before,
+.sprite-fm-illustration.img-dialog-contacts-after::after {
+    background-position: calc(300% / (var(--num-of-illustration) - 1)) 0;
+}
+.sprite-fm-illustration.img-dialog-decryption-key,
+.sprite-fm-illustration.img-dialog-decryption-key-before::before,
+.sprite-fm-illustration.img-dialog-decryption-key-after::after {
+    background-position: calc(400% / (var(--num-of-illustration) - 1)) 0;
+}
+.sprite-fm-illustration.img-meetings-e2ee,
+.sprite-fm-illustration.img-meetings-e2ee-before::before,
+.sprite-fm-illustration.img-meetings-e2ee-after::after {
+    background-position: calc(500% / (var(--num-of-illustration) - 1)) 0;
+}
+.sprite-fm-illustration.img-transferpage-transfer,
+.sprite-fm-illustration.img-transferpage-transfer-before::before,
+.sprite-fm-illustration.img-transferpage-transfer-after::after {
+    background-position: calc(600% / (var(--num-of-illustration) - 1)) 0;
+}
+.sprite-fm-illustration.img-dialogs-achievements,
+.sprite-fm-illustration.img-dialogs-achievements-before::before,
+.sprite-fm-illustration.img-dialogs-achievements-after::after {
+    background-position: calc(700% / (var(--num-of-illustration) - 1)) 0;
+}
+.sprite-fm-illustration.img-achievements-bonus,
+.sprite-fm-illustration.img-achievements-bonus-before::before,
+.sprite-fm-illustration.img-achievements-bonus-after::after {
+    background-position: calc(800% / (var(--num-of-illustration) - 1)) 0;
+}
+.sprite-fm-illustration.img-achievements-desktop-app,
+.sprite-fm-illustration.img-achievements-desktop-app-before::before,
+.sprite-fm-illustration.img-achievements-desktop-app-after::after {
+    background-position: calc(900% / (var(--num-of-illustration) - 1)) 0;
+}
+.sprite-fm-illustration.img-dialog-email,
+.sprite-fm-illustration.img-dialog-email-before::before,
+.sprite-fm-illustration.img-dialog-email-after::after {
+    background-position: calc(1000% / (var(--num-of-illustration) - 1)) 0;
+}
+.sprite-fm-illustration.img-dialog-groupchat,
+.sprite-fm-illustration.img-dialog-groupchat-before::before,
+.sprite-fm-illustration.img-dialog-groupchat-after::after {
+    background-position: calc(1100% / (var(--num-of-illustration) - 1)) 0;
+}
+.sprite-fm-illustration.img-achievements-invite-users,
+.sprite-fm-illustration.img-achievements-invite-users-before::before,
+.sprite-fm-illustration.img-achievements-invite-users-after::after {
+    background-position: calc(1200% / (var(--num-of-illustration) - 1)) 0;
+}
+.sprite-fm-illustration.img-achievements-mobile-app,
+.sprite-fm-illustration.img-achievements-mobile-app-before::before,
+.sprite-fm-illustration.img-achievements-mobile-app-after::after {
+    background-position: calc(1300% / (var(--num-of-illustration) - 1)) 0;
+}
+.sprite-fm-illustration.img-achievements-sms-verification,
+.sprite-fm-illustration.img-achievements-sms-verification-before::before,
+.sprite-fm-illustration.img-achievements-sms-verification-after::after {
+    background-position: calc(1400% / (var(--num-of-illustration) - 1)) 0;
+}
+.sprite-fm-illustration.img-dialog-backup-phone,
+.sprite-fm-illustration.img-dialog-backup-phone-before::before,
+.sprite-fm-illustration.img-dialog-backup-phone-after::after {
+    background-position: calc(1500% / (var(--num-of-illustration) - 1)) 0;
+}
+.sprite-fm-illustration.img-dialog-upgrade,
+.sprite-fm-illustration.img-dialog-upgrade-before::before,
+.sprite-fm-illustration.img-dialog-upgrade-after::after {
+    background-position: calc(1600% / (var(--num-of-illustration) - 1)) 0;
+}
+.sprite-fm-illustration.img-dialog-overquota-storage,
+.sprite-fm-illustration.img-dialog-overquota-storage-before::before,
+.sprite-fm-illustration.img-dialog-overquota-storage-after::after {
+    background-position: calc(1700% / (var(--num-of-illustration) - 1)) 0;
+}
+.sprite-fm-illustration.img-dialog-transfer-full,
+.sprite-fm-illustration.img-dialog-transfer-full-before::before,
+.sprite-fm-illustration.img-dialog-transfer-full-after::after {
+    background-position: calc(1800% / (var(--num-of-illustration) - 1)) 0;
+}
+.sprite-fm-illustration.img-dialog-account-lock,
+.sprite-fm-illustration.img-dialog-account-lock-before::before,
+.sprite-fm-illustration.img-dialog-account-lock-after::after {
+    background-position: calc(1900% / (var(--num-of-illustration) - 1)) 0;
+}
+.sprite-fm-illustration.img-dialog-account-recovery,
+.sprite-fm-illustration.img-dialog-account-recovery-before::before,
+.sprite-fm-illustration.img-dialog-account-recovery-after::after {
+    background-position: calc(2000% / (var(--num-of-illustration) - 1)) 0;
+}
+.sprite-fm-illustration.img-dialog-mobile-success,
+.sprite-fm-illustration.img-dialog-mobile-success-before::before,
+.sprite-fm-illustration.img-dialog-mobile-success-after::after {
+    background-position: calc(2100% / (var(--num-of-illustration) - 1)) 0;
+}
+.sprite-fm-illustration.img-dialog-sms-verification,
+.sprite-fm-illustration.img-dialog-sms-verification-before::before,
+.sprite-fm-illustration.img-dialog-sms-verification-after::after {
+    background-position: calc(2200% / (var(--num-of-illustration) - 1)) 0;
+}
+.sprite-fm-illustration.img-dialog-business-expiry,
+.sprite-fm-illustration.img-dialog-business-expiry-before::before,
+.sprite-fm-illustration.img-dialog-business-expiry-after::after {
+    background-position: calc(2300% / (var(--num-of-illustration) - 1)) 0;
+}
+.sprite-fm-illustration.img-dialog-coin,
+.sprite-fm-illustration.img-dialog-coin-before::before,
+.sprite-fm-illustration.img-dialog-coin-after::after {
+    background-position: calc(2400% / (var(--num-of-illustration) - 1)) 0;
+}
+.sprite-fm-illustration.img-dialog-cookie,
+.sprite-fm-illustration.img-dialog-cookie-before::before,
+.sprite-fm-illustration.img-dialog-cookie-after::after {
+    background-position: calc(2500% / (var(--num-of-illustration) - 1)) 0;
+}
+.sprite-fm-illustration.img-dialog-copyright,
+.sprite-fm-illustration.img-dialog-copyright-before::before,
+.sprite-fm-illustration.img-dialog-copyright-after::after {
+    background-position: calc(2600% / (var(--num-of-illustration) - 1)) 0;
+}
+.sprite-fm-illustration.img-dialog-login,
+.sprite-fm-illustration.img-dialog-login-before::before,
+.sprite-fm-illustration.img-dialog-login-after::after {
+    background-position: calc(2700% / (var(--num-of-illustration) - 1)) 0;
+}
+.sprite-fm-illustration.img-dialog-safe,
+.sprite-fm-illustration.img-dialog-safe-before::before,
+.sprite-fm-illustration.img-dialog-safe-after::after {
+    background-position: calc(2800% / (var(--num-of-illustration) - 1)) 0;
+}
+.sprite-fm-illustration.img-dialog-printer,
+.sprite-fm-illustration.img-dialog-printer-before::before,
+.sprite-fm-illustration.img-dialog-printer-after::after {
+    background-position: calc(2900% / (var(--num-of-illustration) - 1)) 0;
+}
+.sprite-fm-illustration.img-dialog-pw-manager,
+.sprite-fm-illustration.img-dialog-pw-manager-before::before,
+.sprite-fm-illustration.img-dialog-pw-manager-after::after {
+    background-position: calc(3000% / (var(--num-of-illustration) - 1)) 0;
+}
+.sprite-fm-illustration.img-dialog-usb,
+.sprite-fm-illustration.img-dialog-usb-before::before,
+.sprite-fm-illustration.img-dialog-usb-after::after {
+    background-position: calc(3100% / (var(--num-of-illustration) - 1)) 0;
+}
+.sprite-fm-illustration.img-dialog-payment,
+.sprite-fm-illustration.img-dialog-payment-before::before,
+.sprite-fm-illustration.img-dialog-payment-after::after {
+    background-position: calc(3200% / (var(--num-of-illustration) - 1)) 0;
+}
+.sprite-fm-illustration.img-dialog-voucher,
+.sprite-fm-illustration.img-dialog-voucher-before::before,
+.sprite-fm-illustration.img-dialog-voucher-after::after {
+    background-position: calc(3300% / (var(--num-of-illustration) - 1)) 0;
+}
+.sprite-fm-illustration.img-chat-url-preview,
+.sprite-fm-illustration.img-chat-url-preview-before::before,
+.sprite-fm-illustration.img-chat-url-preview-after::after {
+    background-position: calc(3400% / (var(--num-of-illustration) - 1)) 0;
+}
+.sprite-fm-illustration.img-dialog-account-setting,
+.sprite-fm-illustration.img-dialog-account-setting-before::before,
+.sprite-fm-illustration.img-dialog-account-setting-after::after {
+    background-position: calc(3500% / (var(--num-of-illustration) - 1)) 0;
+}
+.sprite-fm-illustration.img-passowrd-reset-unlock-account,
+.sprite-fm-illustration.img-passowrd-reset-unlock-account-before::before,
+.sprite-fm-illustration.img-passowrd-reset-unlock-account-after::after {
+    background-position: calc(3600% / (var(--num-of-illustration) - 1)) 0;
+}
+.sprite-fm-illustration.img-password-reset-recovery-key,
+.sprite-fm-illustration.img-password-reset-recovery-key-before::before,
+.sprite-fm-illustration.img-password-reset-recovery-key-after::after {
+    background-position: calc(3700% / (var(--num-of-illustration) - 1)) 0;
+}
+.sprite-fm-illustration.img-password-recovery-device1,
+.sprite-fm-illustration.img-password-recovery-device1-before::before,
+.sprite-fm-illustration.img-password-recovery-device1-after::after {
+    background-position: calc(3800% / (var(--num-of-illustration) - 1)) 0;
+}
+.sprite-fm-illustration.img-password-recovery-device2,
+.sprite-fm-illustration.img-password-recovery-device2-before::before,
+.sprite-fm-illustration.img-password-recovery-device2-after::after {
+    background-position: calc(3900% / (var(--num-of-illustration) - 1)) 0;
+}
+.sprite-fm-illustration.img-password-recovery-device3,
+.sprite-fm-illustration.img-password-recovery-device3-before::before,
+.sprite-fm-illustration.img-password-recovery-device3-after::after {
+    background-position: calc(4000% / (var(--num-of-illustration) - 1)) 0;
+}
+
+/* Wide illustrations */
+.sprite-fm-illustration-wide,
+.sprite-fm-illustration-wide-before::before,
+.sprite-fm-illustration-wide-after::after {
+    background: url(../../images/sprites/fm-illustration-sprite-wide.svg) no-repeat;
+    background-size: calc(100% * var(--num-of-illustration)) auto;
+    display: block;
+    content: '';
+
+    /* Default size. need to be overrided by each implementation */
+    width: 400px;
+    height: 200px;
+
+    --num-of-illustration: 9;
+}
+.sprite-fm-illustration-wide.img-dialog-referral-program,
+.sprite-fm-illustration-wide.img-dialog-referral-program-before::before,
+.sprite-fm-illustration-wide.img-dialog-referral-program-after::after {
+    background-position: 0 0;
+}
+.sprite-fm-illustration-wide.img-backup-computer,
+.sprite-fm-illustration-wide.img-backup-computer-before::before,
+.sprite-fm-illustration-wide.img-backup-computer-after::after {
+    background-position: calc(100% / (var(--num-of-illustration) - 1)) 0;
+}
+.sprite-fm-illustration-wide.img-dialog-expiry-link,
+.sprite-fm-illustration-wide.img-dialog-expiry-link-before::before,
+.sprite-fm-illustration-wide.img-dialog-expiry-link-after::after {
+    background-position: calc(200% / (var(--num-of-illustration) - 1)) 0;
+}
+.sprite-fm-illustration-wide.img-meetings-create-account,
+.sprite-fm-illustration-wide.img-meetings-create-account-before::before,
+.sprite-fm-illustration-wide.img-meetings-create-account-after::after {
+    background-position: calc(300% / (var(--num-of-illustration) - 1)) 0;
+}
+.sprite-fm-illustration-wide.img-backup-rewind,
+.sprite-fm-illustration-wide.img-backup-rewind-before::before,
+.sprite-fm-illustration-wide.img-backup-rewind-after::after {
+    background-position: calc(400% / (var(--num-of-illustration) - 1)) 0;
+}
+.sprite-fm-illustration-wide.registration,
+.sprite-fm-illustration-wide.registration-before::before,
+.sprite-fm-illustration-wide.registration-after::after {
+    background-position: calc(500% / (var(--num-of-illustration) - 1)) 0;
+}
+.sprite-fm-illustration-wide.img-dialog-megadrop,
+.sprite-fm-illustration-wide.img-dialog-megadrop-before::before,
+.sprite-fm-illustration-wide.img-dialog-megadrop-after::after {
+    background-position: calc(600% / (var(--num-of-illustration) - 1)) 0;
+}
+.sprite-fm-illustration-wide.img-dialog-darkmode,
+.sprite-fm-illustration-wide.img-dialog-darkmode-before::before,
+.sprite-fm-illustration-wide.img-dialog-darkmode-after::after {
+    background-position: calc(700% / (var(--num-of-illustration) - 1)) 0;
+}
+.sprite-fm-illustration-wide.img-password-recovery-devices,
+.sprite-fm-illustration-wide.img-password-recovery-devices-before::before,
+.sprite-fm-illustration-wide.img-password-recovery-devices-after::after {
+    background-position: calc(800% / (var(--num-of-illustration) - 1)) 0;
+}

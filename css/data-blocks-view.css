@@ -1,25 +1,85 @@
-.data-block-view {
-    width: 160px;
+.search .file-block-scrolling,
+.search .fm-contacts-blocks-view,
+.select .file-block-scrolling,
+.select .shared-blocks-scrolling,
+.select .out-shared-blocks-scrolling {
+    height: 100%;
+}
+
+.fm-blocks-view,
+.fm-contacts-blocks-view,
+.fm-blocks-view.shared-view,
+.shared-details-block,
+.shared-blocks-view,
+.out-shared-blocks-view,
+.fm-blocks-view.out-shares-view,
+.fm-blocks-view.public-links-view,
+.contacts-details-block,
+.contacts-blocks-view {
+    box-sizing: border-box;
+    height: 100%;
+    position: relative;
+    min-height: 280px;
+    padding: 0;
+    overflow: hidden;
+    border-top: 1px solid var(--surface-grey-2);
+}
+
+.fm-right-files-block.emptied .fm-blocks-view:not(.shared-folder-content),
+.fm-right-files-block.emptied .fm-contacts-blocks-view,
+.fm-right-files-block.emptied .fm-blocks-view.shared-view,
+.fm-right-files-block.emptied .shared-blocks-view,
+.fm-right-files-block.emptied .out-shared-blocks-view,
+.fm-right-files-block.emptied .fm-blocks-view.out-shares-view,
+.fm-right-files-block.emptied .fm-blocks-view.public-links-view,
+.fm-right-files-block.emptied .contacts-details-block,
+.fm-right-files-block.emptied .contacts-blocks-view {
+    display: none;
+}
+.file-block-scrolling,
+.contacts-blocks-scrolling,
+.shared-blocks-scrolling,
+.out-shared-blocks-scrolling {
+    height: 100%;
+    padding-right: 14px;
+    box-sizing: border-box;
+}
+.file-block-scrolling .jspPane::after,
+.contacts-blocks-scrolling .jspPane::after,
+.shared-blocks-scrolling .jspPane::after,
+.out-shared-blocks-scrolling .jspPane::after {
+    clear: both;
     display: block;
+    content: '';
+    height: 12px;
+}
+.file-block-scrolling .megaList-content {
+    margin-bottom: 24px;
+}
+.rtl .file-block-scrolling .megaList-content {
+    direction: rtl;
+}
+.fm-blocks-view.shared-view .file-icon-area,
+.shared-blocks-view .file-icon-area,
+.fm-blocks-view.contacts-view .file-icon-area,
+.contacts-blocks-view .file-icon-area {
+    width: 160px;
+    height: 160px;
+}
+
+.data-block-view {
+    width: 192px;
+    display: inline-block;
     font-size: 0;
     line-height: 0;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
     box-sizing: border-box;
-    -moz-border-radius: 4px;
-    -webkit-border-radius: 4px;
-    border-radius: 4px;
-    float: left;
+    border-radius: 10px;
     position: relative;
     cursor: default;
     text-align: center;
-    background-color: white;
-    -webkit-transition: background-color 100ms ease-in-out, box-shadow 100ms ease-in-out;
-    -moz-transition: background-color 100ms ease-in-out, box-shadow 100ms ease-in-out;
-    -o-transition: background-color 100ms ease-in-out, box-shadow 100ms ease-in-out;
-    -ms-transition: background-color 100ms ease-in-out, box-shadow 100ms ease-in-out;
     transition: background-color 100ms ease-in-out, box-shadow 100ms ease-in-out;
-    padding: 2px;
+    padding: 0;
+    overflow: hidden;
 }
 .data-block-view.semi-big {
     width: 170px;
@@ -34,66 +94,45 @@
 .data-block-view.medium {
     width: 128px;
 }
-.fm-blocks-view .data-block-view, .shared-blocks-view .data-block-view, .out-shared-blocks-view .data-block-view {
-    margin: 12px 0 0 12px;
+.fm-blocks-view .data-block-view,
+.shared-blocks-view .data-block-view,
+.out-shared-blocks-view .data-block-view {
+    margin: 24px 0 0 24px;
 }
-.data-block-view::before, .data-block-view::after {
-    content: '';
-    position: absolute;
-    width: 100%;
+
+.fm-blocks-view.contact-details-view {
     height: 100%;
-    top: 0;
-    left: 0;
-    -moz-border-radius: 4px;
-    -webkit-border-radius: 4px;
-    border-radius: 4px;
-    -webkit-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.1);
-    -moz-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.1);
-    box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.1);
-    background-color: white;
+    height: calc(100% - 207px);
 }
-.data-block-view::after {
-    -webkit-box-shadow: 0 0 0 1px rgba(0,0,0,0.05);
-    -moz-box-shadow: 0 0 0 1px rgba(0,0,0,0.05);
-    box-shadow: 0 0 0 1px rgba(0,0,0,0.05);
-    background-color: transparent;
+.data-block-view:hover {
+    box-shadow: 0 0 0 4px var(--surface-grey-2);
 }
-.data-block-view.ui-selected, .data-block-view.ui-selecting, .data-block-view.dragover {
-    -webkit-box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.1);
-    -moz-box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.1);
-    box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.1);
-    background-color: rgba(0,0,0,0.1);
+.data-block-view.ui-selected,
+.data-block-view.ui-selecting,
+.data-block-view.dragover {
+    box-shadow: 0 0 0 4px var(--secondary-blue);
 }
 .data-block-bg {
-    height: 156px;
-    width: 156px;
+    height: 192px;
+    width: 192px;
     display: block;
     font-size: 0;
-    overflow: hidden;
-    -moz-border-radius: 2px;
-    -webkit-border-radius: 2px;
-    border-radius: 2px;
-    position: relative;
-    -webkit-transition: background-color 100ms ease-in-out, box-shadow 100ms ease-in-out;
-    -moz-transition: background-color 100ms ease-in-out, box-shadow 100ms ease-in-out;
-    -o-transition: background-color 100ms ease-in-out, box-shadow 100ms ease-in-out;
-    -ms-transition: background-color 100ms ease-in-out, box-shadow 100ms ease-in-out;
     transition: background-color 100ms ease-in-out, box-shadow 100ms ease-in-out;
-    overflow: hidden;
     text-align: center;
-    vertical-align: middle;
-    position: relative;
+    position: static;
+    background: var(--surface-grey-1);
+    border: 1px solid var(--surface-grey-4);
+    border-radius: 10px;
+    box-sizing: border-box;
+    overflow: hidden;
 }
 .data-block-view.medium .data-block-bg {
     height: 124px;
     width: 124px;
 }
 .data-block-view .data-block-bg img {
-    width: 156px;
-    height: 156px;
-    -moz-border-radius: 2px;
-    -webkit-border-radius: 2px;
-    border-radius: 2px;
+    width: 192px;
+    height: 192px;
     vertical-align: middle;
     position: relative;
 }
@@ -106,21 +145,23 @@
     height: auto;
 }
 
-.data-block-view.active .data-block-bg, .data-block-view:hover .data-block-bg, .data-block-view.ui-selected .data-block-bg, .data-block-view.ui-selecting .data-block-bg, .data-block-view.dragover .data-block-bg {
-    background-color: rgba(0,0,0,0.05);
+.data-block-view.active .data-block-bg,
+.data-block-view:hover .data-block-bg,
+.data-block-view.ui-selected .data-block-bg,
+.data-block-view.ui-selecting .data-block-bg,
+.data-block-view.dragover .data-block-bg {
+    background-color: var(--surface-grey-1);
+    border: 1px solid var(--surface-main);
 }
+
 .data-block-view.active .thumb .indicator {
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
     -moz-opacity: 1;
     -khtml-opacity: 1;
     opacity: 1;
-    -webkit-transition: background-color 100ms ease-in-out, box-shadow 100ms ease-in-out;
-    -moz-transition: background-color 100ms ease-in-out, box-shadow 100ms ease-in-out;
-    -o-transition: background-color 100ms ease-in-out, box-shadow 100ms ease-in-out;
-    -ms-transition: background-color 100ms ease-in-out, box-shadow 100ms ease-in-out;
     transition: background-color 100ms ease-in-out, box-shadow 100ms ease-in-out;
 }
-.data-block-view .default-white-button.tiny-button {
+.data-block-view .tiny-button {
     float: none;
     position: absolute;
     z-index: 100;
@@ -133,21 +174,74 @@
     top: 10px;
     margin: 0;
 }
-.shared-blocks-view .shared-folder-info-block, .out-shared-blocks-view .shared-folder-info-block {
+
+.data-block-view .file-status-icon.icon-favourite-filled,
+.data-block-view .file-status-icon.icon-versions-previous,
+.data-block-view .file-status-icon.icon-takedown,
+.data-block-view .file-status-icon.icon-info,
+.data-block-view.linked .icon-link {
+    --icon-size: 16px;
+    margin-right: 4px;
+    margin-top: 4px;
+    margin-bottom: 4px;
+    background-image: none;
+}
+.data-block-view .file-status-icon.icon-favourite-filled {
+    --mask-color: var(--icon-rest);
+}
+.data-block-view .file-status-icon.icon-versions-previous {
+    --mask-color: var(--icon-rest);
+}
+.data-block-view .file-status-icon.icon-takedown {
+    --mask-color: var(--secondary-red);
+}
+.data-block-view .file-status-icon.icon-info {
+    --mask-color: var(--secondary-orange);
+}
+.data-block-view:not(.linked) .icon-link {
+    display: none;
+}
+.data-block-view.linked .icon-link {
+    --mask-color: var(--icon-rest);
+}
+.data-block-view .file-status-icon.sprite-fm-mono:not(.icon-favourite-filled),
+.data-block-view .file-status-icon.sprite-fm-mono:not(.icon-versions-previous),
+.data-block-view .file-status-icon.sprite-fm-mono:not(.icon-takedown),
+.data-block-view .file-status-icon.sprite-fm-mono:not(.icon-info),
+.data-block-view.linked .sprite-fm-mono:not(.icon-link) {
+    height: 0;
+}
+.data-block-view .file-status-icon.sprite-fm-mono.icon-favourite-filled,
+.data-block-view .file-status-icon.sprite-fm-mono.icon-versions-previous,
+.data-block-view .file-status-icon.sprite-fm-mono.icon-takedown,
+.data-block-view .file-status-icon.sprite-fm-mono.icon-info,
+.data-block-view.linked .sprite-fm-mono.icon-link {
+    height: 16px;
+}
+
+.shared-folder-info-block {
+    padding: 0 0 0 51px;
+    font: var(--text-body1);
+    display: block;
+    box-sizing: border-box;
+    position: relative;
+    text-align: left;
+}
+
+.shared-blocks-view .shared-folder-info-block,
+.out-shared-blocks-view .shared-folder-info-block {
     padding: 8px 6px 6px 50px;
+    background: var(--surface-grey-2);
 }
 .data-block-view .shared-folder-access {
-    width: 28px;
-    height: 24px;
+    width: 16px;
+    height: 16px;
     float: left;
     padding: 0;
-    background-position: -11px -4289px;
-}
-.data-block-view .shared-folder-access.read-and-write {
-    background-position: -9px -4327px;
-}
-.data-block-view .shared-folder-access.full-access {
-    background-position: -11px -4251px;
+    --mask-color: var(--icon-rest);
+    margin-top: 4px;
+    margin-right: 4px;
+    background-image: none;
 }
 .contacts-blocks-scrolling .nw-contact-status {
     float: none;
@@ -161,49 +255,99 @@
     margin: 6px 0 0 0;
     top: 0;
 }
-.data-block-view:hover .file-settings-icon, .data-block-view.ui-selected .file-settings-icon, tr:hover .grid-url-arrow, tr.ui-selected .grid-url-arrow, .properties-name-block:hover .file-settings-icon, tr:hover .clear-transfer-icon, tr.ui-selected .clear-transfer-icon {
- filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
-    -moz-opacity: 1;
-    -khtml-opacity: 1;
+.data-block-view:hover .file-settings-icon,
+.data-block-view.ui-selected .file-settings-icon,
+.properties-name-block:hover .file-settings-icon {
+    opacity: 1;
+    background: var(--surface-highlight-2);
+    height: 26px;
+    width: 26px;
+    border-radius: 50%;
+}
+
+.data-block-view:hover .file-settings-icon i,
+.data-block-view.ui-selected .file-settings-icon i {
+    --icon-size: 24px;
+    --mask-color: var(--icon-rest);
+    height: 24px;
+    position: relative;
+    top: 1px;
     opacity: 1;
 }
-.data-block-indicators {
-    display: block;
-    position: absolute;
-    right: 0;
-    top: 0;
-    height: 24px;
-    z-index: 10;
-    -webkit-border-bottom-left-radius: 2px;
-    -moz-border-radius-bottomleft: 2px;
-    border-bottom-left-radius: 2px;
+.data-block-view .file-settings-icon i::before {
+    line-height: 24px;
+    transition: color 100ms ease-in-out;
 }
-.thumb .data-block-indicators {
-    background-color: rgba(255,255,255,0.4);
+.data-block-view .file-settings-icon:hover i,
+.data-block-view.ui-selected .file-settings-icon.active i {
+    --mask-color: var(--icon-active);
+}
+
+.data-block-indicators {
+    display: inline-flex;
+    justify-content: flex-end;
+    position: absolute;
+    right: 1px;
+    top: 1px;
+    left: 1px;
+    height: auto;
+    z-index: 2;
+    background: var(--surface-highlight-2);
+    border-radius: 10px 10px 0 0;
+    float: right;
+}
+
+.data-block-bg.thumb .data-block-indicators {
+    border-radius: 8px 8px 0 0;
+}
+.data-block-bg.video .data-block-indicators {
+    height: 24px;
 }
 
 .video-thumb-details {
-    font-size: 12px;
-    line-height: 20px;
-    color: #666666;
-    width: 100%;
-    bottom: 0;
-    padding: 2px 0;
+    font: var(--text-body2);
+    color: var(--surface-main-inverted);
+    top: 4px;
     position: absolute;
     text-align: left;
     display: none;
-    background-color: rgba(255,255,255,0.4);
+    left: 4px;
+    z-index: 2;
 }
+
 .data-block-bg.video .video-thumb-details {
     display: block;
 }
-.video-thumb-details i {
-    margin: 0 0 0 2px;
+.data-block-bg.video .video-thumb-details i {
+    width: 16px;
+    float: left;
+    margin-top: 1px;
+    --mask-color: var(--icon-rest);
 }
-.video.thumb .data-block-indicators, .video.thumb .video-thumb-details {
-    background-color: rgba(0,0,0,0.4);
-    color: white;
+.data-block-view .contact-chat-buttons {
+    position: absolute;
+    left: 0;
+    top: 0;
+    padding: 11px 0 0 2px;
+    opacity: 0;
+    z-index: 10;
 }
-.video.thumb .data-block-indicators i {
-    opacity: 0.8;
+
+.data-block-view:hover .contact-chat-buttons,
+.data-block-view.ui-selected .contact-chat-buttons {
+    opacity: 1;
+}
+
+.contacts-view .data-block-view:hover .overlayed,
+.contacts-view .data-block-view.ui-selected .overlayed {
+    opacity: 0;
+}
+.shared-blocks-view .data-block-view .data-block-bg,
+.out-shared-blocks-view .data-block-view .data-block-bg {
+    border-radius: 10px 10px 0 0;
+}
+.shared-blocks-view .data-block-view .file-settings-icon,
+.out-shared-blocks-view .data-block-view .file-settings-icon {
+    right: 8px;
+    bottom: 64px;
 }

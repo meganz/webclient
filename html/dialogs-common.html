@@ -2,102 +2,150 @@
  * Dialogs for mobile and desktop devices.
 !-->
 
-<div class="common-dialogs">
+<section class="mega-dialog-container common-container">
 
     <!-- Email verfifcation required dialog !-->
-    <div class="fm-dialog verify-email big-radius hidden">
-        <div class="verify-email header">
-            <div class="verify-email header-txt">[$19906]</div>
-            <div class="dialog-top-icon dialog-sprite yellow-triangle"></div>
-        </div>
-        <div class="verify-email body lato">
-            <div class="text">
-                [$22247]
-            </div>
-            <div class="text red">
-                <div class="dropdown body dropdown-arrow down-arrow">
-                    <i class="dropdown-white-arrow"></i>
-                    <div class="popup-body">
-                        <div class="dialog-top-icon dialog-sprite locked-account"></div>
-                        <div class="verify-email header-txt grey">
-                            [$22249]
-                        </div>
-                        <div class="text small">
-                            [$22250]
-                        </div>
-                        <div class="text small">
-                            [$22251]
+    <div class="mega-dialog dialog-template-action verify-email hidden"
+        role="dialog"
+        aria-labelledby="verify-email-title"
+        aria-modal="true">
+
+        <header class="verify-email header">
+            <i class="graphic sprite-fm-uni icon-hazard"></i>
+            <h2 id="verify-email-title" class="verify-email header-txt">[$19906]</h2>
+        </header>
+
+        <section class="content">
+            <div class="verify-email content-block">
+                <div class="text">
+                    [$22247]
+                </div>
+                <div class="text red">
+                    <div class="dropdown body dropdown-arrow down-arrow">
+                        <i class="dropdown-white-arrow"></i>
+                        <div class="popup-body">
+                            <div class="locked-account sprite-fm-illustration img-dialog-login"></div>
+                            <h3  class="verify-email header-txt">
+                                [$22249]
+                            </h3>
+                            <div class="text small">
+                                [$22250]
+                            </div>
+                            <div class="text small">
+                                [$22251]
+                            </div>
                         </div>
                     </div>
+                    <span>[$22248]</span>
                 </div>
-                <span>[$22248]</span>
+                <div class="clear"></div>
             </div>
-            <div class="clear"></div>
-            <div class="button default-green-button height-48 gradient send-email">
-                <span>[$22252]</span>
+        </section>
+
+        <footer>
+            <div class="footer-container">
+                <button class="mega-button positive large send-email">
+                    <span>[$22252]</span>
+                </button>
             </div>
+
             <!-- Remove "hidden" class if Email is sent !-->
-            <div class="verify-email status-txt hidden">
-                [$16827]
-            </div>
-        </div>
+            <aside class="status hidden">
+                <div class="verify-email status-txt">
+                    [$16827]
+                </div>
+            </aside>
+        </footer>
     </div>
     <!-- end of Email verfifcation required dialog !-->
+
     <!-- Login to your MEGA account dialog !-->
-    <div class="fm-dialog verify-email-login-to-account type-480px227 big-radius hidden">
-        <div class="fm-dialog-close"></div>
-        <div class="fm-dialog-header">
-            <div class="fm-dialog-title medium">[$1768]</div>
-        </div>
-        <div class="login-set-pass body">
-            <div class="dialog-top-icon dialog-sprite locked-account"></div>
-            <div class="text">
-                [$22253]
+    <div class="mega-dialog dialog-template-graphic verify-email-login-to-account type-480px227 hidden"
+        role="dialog"
+        aria-labelledby="verify-email-login-to-account-title"
+        aria-modal="true">
+
+        <button class="close js-close" aria-label="[$148]">
+            <i class="sprite-fm-mono icon-dialog-close"></i>
+        </button>
+
+        <header>
+            <div class="graphic sprite-fm-illustration img-dialog-login"></div>
+            <h2 id="verify-email-login-to-account-title">[$1768]</h2>
+        </header>
+
+        <section class="content">
+            <div class="login-set-pass content-block">
+                <div class="text">
+                    [$22253]
+                </div>
+                <form class="account dialog-login-form">
+                    <input class="underlinedText mail" data-icon="sprite-fm-mono icon-email" data-wrapper-class="small-txt disabled"
+                        disabled name="susp-login-name" placeholder="[$195]" type="text" value="[$5533]"/>
+                    <input class="underlinedText pass" data-icon="sprite-fm-mono icon-lock" data-wrapper-class="small-txt"
+                        name="susp-login-password" placeholder="[$909]" type="password"/>
+                </form>
             </div>
-            <form class="account dialog-login-form">
-                <input class="titleTop mail" data-icon="bus-reg-icon email" data-wrapper-class="small-txt disabled"
-                       disabled name="susp-login-name" placeholder="[$195]" type="text" value="[$5533]" />
-                <input class="titleTop pass" data-icon="bus-reg-icon pw" data-wrapper-class="small-txt"
-                       name="susp-login-password" placeholder="[$909]" type="password" />
-                <div class="button default-green-button gradient right" tabindex="0">[$556]</div>
-                <div class="button default-white-button gradient right cancel-email-verify hidden">[$82]</div>
-                <div class="clear"></div>
-            </form>
-        </div>
+        </section>
+
+        <footer>
+            <div class="login-set-pass footer-container">
+                <button class="mega-button positive next" tabindex="0" type="button">
+                    <span>[$556]</span>
+                </button>
+                <button class="mega-button cancel-email-verify hidden" type="button">
+                    <span>[$82]</span>
+                </button>
+            </div>
+        </footer>
     </div>
     <!-- end of Login to your MEGA account dialog !-->
+
     <!--Set new password dialog !-->
-    <div class="fm-dialog verify-email-set-new-pass type-480px227 big-radius hidden">
-        <div class="fm-dialog-header">
-            <div class="fm-dialog-title medium">[$22254]</div>
-        </div>
-        <div class="login-set-pass body">
-            <div class="text">
-                [$22250]
-            </div>
-            <div class="text">
-                [$22251]
-            </div>
-            <form class="account dialog-login-form-low-pad">
-                <input class="titleTop strengthChecker pw1" data-icon="bus-reg-icon pw1" data-wrapper-class="small-txt"
-                       name="verify-email-set-new-pass1" placeholder="[$9074]" type="password" />
-                <input class="titleTop pw2" data-icon="bus-reg-icon pw2" data-wrapper-class="small-txt"
-                       name="verify-email-set-new-pass2" placeholder="[$9075]" type="password" />
-                <div class="button default-green-button gradient right" tabindex="0">
-                    Finish
+    <div class="mega-dialog dialog-template-tool verify-email-set-new-pass type-480px227 hidden"
+        role="dialog"
+        aria-labelledby="verify-email-set-new-pass-title"
+        aria-modal="true">
+
+        <header>
+            <h2 id="verify-email-set-new-pass-title">[$22254]</h2>
+        </header>
+
+        <section class="content">
+            <div class="login-set-pass content-block">
+                <div class="text">
+                    [$22250]
                 </div>
-                <div class="clear"></div>
-            </form>
-        </div>
+                <div class="text">
+                    [$22251]
+                </div>
+                <form class="account dialog-login-form-low-pad">
+                    <input class="underlinedText strengthChecker pw1" data-icon="sprite-fm-mono icon-lock" data-wrapper-class="small-txt"
+                        name="verify-email-set-new-pass1" placeholder="[$9074]" type="password"/>
+                    <input class="underlinedText pw2" data-icon="sprite-fm-mono icon-lock-2" data-wrapper-class="small-txt"
+                        name="verify-email-set-new-pass2" placeholder="[$9075]" type="password"/>
+                </form>
+            </div>
+        </section>
+
+        <footer>
+            <div class="login-set-pass footer-container">
+                <button class="mega-button positive finish" tabindex="0" type="button">
+                    <span>Finish</span>
+                </button>
+            </div>
+        </footer>
     </div>
     <!-- end of Set new password dialog !-->
+
     <!--Cookie dialog !-->
-    <div class="fm-dialog mega-dialog cookie-dialog hidden lato">
+    <!-- TODO: add a new template -->
+    <div class="mega-dialog cookie-dialog hidden">
 
         <!-- Common info !-->
         <div class="content-block step1 active">
             <div class="scrollable-block big-pad">
-                <div class="cookie-icon cookie"></div>
+                <div class="cookie-icon sprite-fm-illustration img-dialog-cookie"></div>
                 <div class="header">
                     [$24641]
                 </div>
@@ -106,12 +154,12 @@
                 </div>
             </div>
             <div class="bottom-buttons">
-                <div class="common-dialog-button positive right accept-cookies">
-                    [$24643]
-                </div>
-                <div class="common-dialog-button right m-lnk cookie-settings">
-                    [$24644]
-                </div>
+                <button class="mega-button positive right accept-cookies">
+                    <span>[$24643]</span>
+                </button>
+                <button class="mega-button right m-lnk cookie-settings">
+                    <span>[$24644]</span>
+                </button>
             </div>
         </div>
 
@@ -140,12 +188,14 @@
                         </div>
                         <div class="settings-cell current">
                             <div class="toggle-header">[$24648]</div>
-                            <div class="dialog-feature-toggle all"><div class="dialog-feature-switch"></div></div>
+                            <div class="mega-switch all" role="switch" aria-checked="false" tabindex="0">
+                                <div class="mega-feature-switch"></div>
+                            </div>
                         </div>
-                        <div class="settings-cell saved">
-                            <div class="toggle-header">[$24649]</div>
-                            <div class="dialog-feature-toggle all disabled toggle-on">
-                                <div class="dialog-feature-switch"></div>
+                         <div class="settings-cell saved">
+                             <div class="toggle-header">[$24649]</div>
+                            <div class="mega-switch all disabled toggle-on" role="switch" aria-checked="true" tabindex="0">
+                                <div class="mega-feature-switch"></div>
                             </div>
                         </div>
                     </div>
@@ -155,13 +205,13 @@
                             <div class="settings-text">[$24651]</div>
                         </div>
                         <div class="settings-cell current">
-                            <div class="dialog-feature-toggle disabled toggle-on">
-                                <div class="dialog-feature-switch"></div>
+                            <div class="mega-switch disabled toggle-on" role="switch" aria-checked="true" tabindex="0">
+                                <div class="mega-feature-switch"></div>
                             </div>
                         </div>
                         <div class="settings-cell saved">
-                            <div class="dialog-feature-toggle disabled toggle-on">
-                                <div class="dialog-feature-switch"></div>
+                            <div class="mega-switch disabled toggle-on" role="switch" aria-checked="true" tabindex="0">
+                                <div class="mega-feature-switch"></div>
                             </div>
                         </div>
                     </div>
@@ -171,10 +221,14 @@
                             <div class="settings-text">[$24653]</div>
                         </div>
                         <div class="settings-cell current">
-                            <div class="dialog-feature-toggle"><div class="dialog-feature-switch"></div></div>
+                            <div class="mega-switch" role="switch" aria-checked="false" tabindex="0">
+                                <div class="mega-feature-switch"></div>
+                            </div>
                         </div>
-                        <div class="settings-cell saved">
-                            <div class="dialog-feature-toggle disabled"><div class="dialog-feature-switch"></div></div>
+                         <div class="settings-cell saved">
+                            <div class="mega-switch disabled" role="switch" aria-checked="false" tabindex="0">
+                                <div class="mega-feature-switch"></div>
+                            </div>
                         </div>
                     </div>
                     <div class="settings-row" data-type="analytics">
@@ -183,10 +237,14 @@
                             <div class="settings-text">[$24655] </div>
                         </div>
                         <div class="settings-cell current">
-                            <div class="dialog-feature-toggle"><div class="dialog-feature-switch"></div></div>
+                            <div class="mega-switch" role="switch" aria-checked="false" tabindex="0">
+                                <div class="mega-feature-switch"></div>
+                            </div>
                         </div>
-                        <div class="settings-cell saved">
-                            <div class="dialog-feature-toggle disabled"><div class="dialog-feature-switch"></div></div>
+                         <div class="settings-cell saved">
+                            <div class="mega-switch disabled" role="switch" aria-checked="false" tabindex="0">
+                                <div class="mega-feature-switch"></div>
+                            </div>
                         </div>
                     </div>
                     <div class="settings-row" data-type="advetisement">
@@ -195,47 +253,54 @@
                             <div class="settings-text">[$24657]</div>
                         </div>
                         <div class="settings-cell current">
-                            <div class="dialog-feature-toggle"><div class="dialog-feature-switch"></div></div>
+                            <div class="mega-switch" role="switch" aria-checked="false" tabindex="0">
+                                <div class="mega-feature-switch"></div>
+                            </div>
                         </div>
-                        <div class="settings-cell saved">
-                            <div class="dialog-feature-toggle disabled"><div class="dialog-feature-switch"></div></div>
+                         <div class="settings-cell saved">
+                            <div class="mega-switch disabled" role="switch" aria-checked="false" tabindex="0">
+                                <div class="mega-feature-switch"></div>
+                            </div>
                         </div>
                     </div>
                     <div class="settings-row" data-type="thirdparty">
                         <div class="settings-cell">
                             <div class="settings-header">[$24658]</div>
-                            <div class="settings-text">
-                                [$24659]
+                            <div class="settings-text">[$24659]
                             </div>
                             <a class="thirdparty details">[$24660]</a>
                             <div class="clear"></div>
-                            <div class="settings-links">
+                            <div  class="settings-links">
                                 <a class="settings-link clickurl" href="/cookie" target="_blank">[$24629]</a>
                                 <a class="settings-link clickurl" href="/privacy" target="_blank">[$386]</a>
                             </div>
                         </div>
                         <div class="settings-cell current">
-                            <div class="dialog-feature-toggle"><div class="dialog-feature-switch"></div></div>
+                            <div class="mega-switch" role="switch" aria-checked="false" tabindex="0">
+                                <div class="mega-feature-switch"></div>
+                            </div>
                         </div>
-                        <div class="settings-cell saved">
-                            <div class="dialog-feature-toggle disabled"><div class="dialog-feature-switch"></div></div>
+                         <div class="settings-cell saved">
+                            <div class="mega-switch disabled" role="switch" aria-checked="false" tabindex="0">
+                                <div class="mega-feature-switch"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="bottom-buttons">
-                <div class="common-dialog-button positive right save-settings">
-                    [$81]
-                </div>
-                <div class="common-dialog-button positive right use-saved-settings hidden">
-                    [$24661]
-                </div>
-                <div class="common-dialog-button right use-current-settings hidden">
-                    [$24662]
-                </div>
-                <div class="common-dialog-button m-lnk left close-settings">
-                    [$822]
-                </div>
+                <button class="mega-button positive right save-settings">
+                    <span>[$81]</span>
+                </button>
+                <button class="mega-button positive right use-saved-settings hidden">
+                    <span>[$24661]</span>
+                </button>
+                <button class="mega-button right use-current-settings hidden">
+                    <span>[$24662]</span>
+                </button>
+                <button class="mega-button m-lnk left close-settings">
+                    <span>[$822]</span>
+                </button>
             </div>
         </div>
 
@@ -255,53 +320,70 @@
                         <li>[$24668]</li>
                         <li>[$24669]</li>
                     </ul>
-                    <br />
+                    <br/>
                     <a class="green" rel="noopener noreferrer" target="_blank"
-                       href="https://policies.google.com/technologies/partner-sites">
+                        href="https://policies.google.com/technologies/partner-sites">
                         https://policies.google.com/technologies/partner-sites
                     </a>
                 </div>
             </div>
             <div class="bottom-buttons pad">
-                <div class="common-dialog-button right cookie-settings">
-                    [$822]
-                </div>
+                <button class="mega-button right cookie-settings">
+                    <span>[$822]</span>
+                </button>
             </div>
         </div>
     </div>
     <!-- end of Cookie dialog !-->
 
+    <!-- Dialog: loginrequired-dialog -->
     <!-- Register/Login required dialog for desktop !-->
-    <div class="fm-dialog loginrequired-dialog hidden">
-        <div class="fm-dialog-header">
-            <div class="fm-dialog-title"><span>[$14]</span></div>
-            <div class="fm-dialog-close"></div>
-            <div class="clear"></div>
-        </div>
-        <div class="fm-notification-body">
-            <div class="icon pricing-sprite plan-icon"></div>
-            <div class="fm-notification-info">
-                [$15]
+    <div class="mega-dialog dialog-template-message loginrequired-dialog hidden"
+        role="dialog"
+        aria-labelledby="loginrequired-dialog-title"
+        aria-modal="true">
+
+        <button class="close js-close" aria-label="[$148]">
+            <i class="sprite-fm-mono icon-dialog-close"></i>
+        </button>
+
+        <header>
+            <i class="graphic sprite-fm-uni icon-warning"></i>
+            <div>
+                <h3 id="loginrequired-dialog-title"></h3>
+                <p></p>
             </div>
-            <div class="clear"></div>
+        </header>
+
+        <footer>
+            <div class="footer-container">
+                <button class="mega-button pro-register">
+                    <span>[$1076]</span>
+                </button>
+                <button class="mega-button positive pro-login">
+                    <span>[$171]</span>
+                </button>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Thank You overlay dialog -->
+    <div class="thankyou-dialog theme-dark-forced hidden"
+        role="dialog"
+        aria-labelledby="thankyou-title"
+        aria-modal="true">
+
+        <div class="thankyou-close">
+            <i class="sprite-fm-mono icon-dialog-close"></i>
         </div>
-        <div class="fm-notifications-bottom">
-            <div class="default-white-button right pro-login"><span>[$171]</span></div>
-            <div class="default-white-button right pro-register"><span>[$1076]</span></div>
-            <div class="clear"></div>
+        <div class="thankyou-body">
+            <h1 id="thankyou-title" class="thankyou-header">[$24851]</h1>
+            <div class="thankyou-txt"></div>
+            <i class="thankyou-icon sprite-fm-uni icon-success"></i>
+            <button class="mega-button positive large thankyou-button">
+                <span>[$726]</span>
+            </button>
         </div>
     </div>
 
-    <!-- Thank You dialog -->
-    <div class="thankyou-dialog hidden">
-        <div class="thankyou-close">
-            <div class="overlay-close-icon"></div>
-        </div>
-        <div class="thankyou-body">
-            <div class="thankyou-header">[$24851]</div>
-            <div class="thankyou-txt"></div>
-            <div class="thankyou-icon"></div>
-            <div class="thankyou-button">[$726]</div>
-        </div>
-    </div>
-</div>
+</section>

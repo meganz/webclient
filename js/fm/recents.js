@@ -88,6 +88,7 @@ function RecentsRender() {
 
     // Default click handlers
     this.$container.rebind("click contextmenu", function(e) {
+        $.hideTopMenu(e);
         $.hideContextMenu(e);
         self.markSelected();
         selectionManager.clear_selection();
@@ -111,7 +112,7 @@ RecentsRender.prototype.render = function(limit, until, forceInit) {
     // Switch to recents panel.
     M.onSectionUIOpen('recents');
     $('.fmholder').removeClass("transfer-panel-opened");
-    $('.fm-right-files-block, .fm-left-panel, .fm-transfers-block').addClass('hidden');
+    $('.fm-right-files-block, .fm-transfers-block').addClass('hidden');
     $('.top-head').find(".recents-tab-link").removeClass("hidden").addClass('active');
     this.$container.removeClass('hidden');
     M.viewmode = 1;
@@ -330,18 +331,52 @@ RecentsRender.prototype.populateBreadCrumb = function($container, action) {
         return $breadCrumb;
     };
 
+    var getActionUserString = function(isOtherUser, isCreated) {
+        var actionUserString = '<span>';
+        if (isOtherUser) {
+            actionUserString += isCreated ? l[19937] : l[19940];
+            actionUserString = actionUserString
+                .replace("%3", '<span class="link action-user-name"></span>');
+        }
+        else {
+            actionUserString += isCreated ? l[24769] : l[24770];
+        }
+        actionUserString = actionUserString.replace("%1", '<span class="dot-separator">&#183;</span>');
+
+        return actionUserString + '</span>';
+    };
+
     if (!action || !Array.isArray(action.path) || !action.path.length) {
         // FIXME: check out where this does originates...
         console.warn('Invalid parameters, cannot render breadcrumb...', action);
         return;
     }
 
-    for (var k = action.path.length - 1; k >= 1; k--) {
-        $container.append(newBreadCrumb(action.path[k]));
-        $container.append('<i class=" tiny-icon icons-sprite grey-arrow"></i>');
+    var iconFolderType = 'icon-folder';
+    if (action.inshare) {
+        iconFolderType = "icon-folder-incoming-share";
     }
-    $container.append(newBreadCrumb(action.path[0]));
+    else if (action.outshare) {
+        iconFolderType = "icon-folder-outgoing-share";
+    }
+    $container.append('<i class="sprite-fm-mono ' + iconFolderType + '"></i>');
 
+    var pathTooltip = '';
+    for (var k = action.path.length; k--;) {
+        pathTooltip += action.path[k].name;
+        if (k >= 1) {
+            pathTooltip += '[I class="sprite-fm-mono icon-arrow-right"][/I]';
+        }
+    }
+
+    $container.append(newBreadCrumb(action.path[0]));
+    $('span', $container).addClass('link parent-folder-name simpletip').attr({
+        "data-simpletip": pathTooltip,
+        "data-simpletip-class": "recents-file-path",
+        "data-simpletipposition": "top"
+    });
+
+    $container.safeAppend(getActionUserString(action.user !== u_handle, action.action === "added"));
 };
 
 /**
@@ -353,7 +388,7 @@ RecentsRender.prototype.handleByUserHandle = function($newRow, action) {
     'use strict';
     var self = this;
     var user = M.getUserByHandle(action.user);
-    var $userNameContainer = $newRow.find(".file-name .action-user-name");
+    var $userNameContainer = $(".breadcrumbs .action-user-name", $newRow);
 
     $userNameContainer
         .removeClass("hidden")
@@ -410,7 +445,7 @@ RecentsRender.prototype.handleInOutShareState = function($newRow, action) {
 RecentsRender.prototype.getMaxFitOnScreen = function(force) {
     'use strict';
     if (!this._maxFitOnScreen || force) {
-        this._maxFitOnScreen = Math.ceil(this.$container.width() / 170) || 2;
+        this._maxFitOnScreen = Math.floor((this.$container.width() - 120) / 128) || 2;
     }
     return this._maxFitOnScreen;
 };
@@ -442,14 +477,15 @@ RecentsRender.prototype.generateRow = function (action, actionId) {
     // Populate breadcrumb path
     this.populateBreadCrumb($newRow.find(".breadcrumbs"), action);
 
+    // The following commented out code may require to back later.
     // Render the date/time views.
-    var date = new Date(action.ts * 1000 || 0);
-    $newRow.find(".file-data .time").text(this._shortTimeFormatter.format(date));
-    $newRow.find(".file-data .uploaded-on-message.dark-direct-tooltip span").text(
-        (action.action !== "added" ? l[19942] : l[19941])
-            .replace('%1', acc_time2date(action.ts, true))
-            .replace('%2', this._fullTimeFormatter.format(date))
-    );
+    // var date = new Date(action.ts * 1000 || 0);
+    // $newRow.find(".file-data .time").text(this._shortTimeFormatter.format(date));
+    // $newRow.find(".file-data .uploaded-on-message.dark-direct-tooltip span").text(
+    //     (action.action !== "added" ? l[19942] : l[19941])
+    //         .replace('%1', acc_time2date(action.ts, true))
+    //         .replace('%2', this._fullTimeFormatter.format(date))
+    // );
 
     // Render in/out share icons.
     if (action.outshare || action.inshare) {
@@ -505,8 +541,8 @@ RecentsRender.prototype._renderFiles = function($newRow, action, actionId) {
 
         if (iconClass === 'video') {
             $icon.safeAppend(
-                '<div class="video-thumb-details">' +
-                    '<i class="small-icon small-play-icon"></i>' +
+                '<div class="video-thumb-details theme-dark-forced">' +
+                    '<i class="sprite-fm-mono icon-play"></i>' +
                 '</div>');
         }
     }
@@ -515,34 +551,19 @@ RecentsRender.prototype._renderFiles = function($newRow, action, actionId) {
     var $fileName = $newRow.find(".file-name");
     var titleString;
     var isMore = action.length > 1;
-    if (isOtherUser) {
-        if (isCreated) {
-            if (isMore) {
-                titleString = l[19936];
-            } else {
-                titleString = l[19937];
-            }
-        } else {
-            if (isMore) {
-                titleString = l[19939];
-            } else {
-                titleString = l[19940];
-            }
-        }
+    if (isMore) {
+        titleString = l[24835];
     } else {
-        if (isMore) {
-            titleString = l[19938];
-        } else {
-            titleString = '%1';
-        }
+        titleString = '%1';
     }
 
     titleString = titleString
         .replace("%1", '<span class="link title first-node-name"></span>')
         .replace("%2", action.length - 1)
-        .replace("%3", '<span class="link action-user-name"></span>')
         .replace("[A]", '<span class="link more-less-toggle">')
-        .replace("[/A]", '<i class="small-icon icons-sprite gray-arrow"></i></span>');
+        .replace("[/A]", '</span>')
+        .replace("[A1]", '<span class="rest-nodes-counter">')
+        .replace("[/A1]", '</span>');
 
     $fileName.safeHTML(titleString);
 
@@ -586,7 +607,6 @@ RecentsRender.prototype._renderFiles = function($newRow, action, actionId) {
             return clone;
         };
 
-        var $moreLessToggle = $fileName.find(".more-less-toggle");
         var expandedIds = [];
 
         // Use a render function to delay the rendering of a child node till it is in view.
@@ -599,9 +619,7 @@ RecentsRender.prototype._renderFiles = function($newRow, action, actionId) {
                     nodeAction.push(node);
                     var $newChildAction = self.generateRow(nodeAction);
                     $newChildAction.addClass("action-" + actionId + "-child");
-                    if (i === action.length - 1) {
-                        $newChildAction.addClass('last-child');
-                    }
+                    $newChildAction.addClass(i === action.length - 1 ? 'last-child' : 'child-note');
                     self._renderCache[id] = $newChildAction[0];
                 }
                 return self._renderCache[id];
@@ -611,10 +629,9 @@ RecentsRender.prototype._renderFiles = function($newRow, action, actionId) {
         var expandCollapseHelper = function() {
             self.markSelected();
             $.hideContextMenu();
-            if ($moreLessToggle.hasClass('less')) {
+            if ($newRow.hasClass('expanded')) {
                 self._expandedStates[actionId] = false;
                 $newRow.removeClass('expanded').addClass("collapsed");
-                $moreLessToggle.removeClass("less").addClass("more");
                 self._dynamicList.remove(expandedIds, false);
                 self._dynamicList.itemRenderChanged(actionId);
                 delete self._actionChildren[actionId];
@@ -631,14 +648,13 @@ RecentsRender.prototype._renderFiles = function($newRow, action, actionId) {
                     self._childIds[id] = true;
                     expandedIds.push(id);
                 }
-                $moreLessToggle.removeClass("more").addClass("less");
                 self._dynamicList.insert(actionId, expandedIds, false);
                 self._dynamicList.itemRenderChanged(actionId);
                 self._actionChildren[actionId] = expandedIds;
             }
         };
 
-        $moreLessToggle.rebind('click', function() {
+        $('.expand-collapse-toggle, .more-less-toggle', $newRow).rebind('click', function() {
                 expandCollapseHelper();
                 return false;
             })
@@ -708,6 +724,8 @@ RecentsRender.prototype._renderMedia = function($newRow, action, actionId) {
     var images = mediaCounts.images;
     var pdfs = mediaCounts.pdfs;
 
+    $newRow.addClass('media expanded');
+
     // Create & append new image container, fire async method to collect thumbnail.
     var renderThumb = function(i) {
             var $newThumb = $thumbTemplate.clone().removeClass("template");
@@ -761,7 +779,15 @@ RecentsRender.prototype._renderMedia = function($newRow, action, actionId) {
                 $(".block-view-file-type", $newThumb).removeClass("image").addClass("pdf");
             }
 
-            var $contextMenuHandle = $newThumb.find(".file-settings-icon");
+        if (node.fav) {
+            $('.file-status-icon', $newThumb).addClass('sprite-fm-mono icon-favourite-filled');
+        }
+
+        if (M.getNodeShare(node.h).down) {
+            $('.file-status-icon', $newThumb).removeClass('icon-favourite-filled').addClass('icon-takedown');
+        }
+
+        var $contextMenuHandle = $(".file-settings-icon", $newThumb);
             $contextMenuHandle
                 .attr('id', node.h)
                 .rebind("contextmenu", function(e) {
@@ -789,7 +815,7 @@ RecentsRender.prototype._renderMedia = function($newRow, action, actionId) {
     var $previewsScroll = $newRow.find(".previews-scroll");
 
     // If there are more images than we can fit onto the initial screen size.
-    if (action.length >= maxFitOnScreen) {
+    if (action.length > maxFitOnScreen) {
         imagesToRender = maxFitOnScreen;
         $toggleExpandedButton.removeClass('hidden');
     }
@@ -813,7 +839,7 @@ RecentsRender.prototype._renderMedia = function($newRow, action, actionId) {
                 $previewsScroll.addClass('expanded');
                 $toggleExpandedButtonText.text(l[19963]);
                 $toggleExpandedButtonIcon.removeClass("bold-eye").addClass("bold-crossed-eye");
-                $previewsScroll.children().removeClass('hidden');
+                $('.data-block-view', $previewsScroll).removeClass('hidden');
                 // Inject the rest of the images that were not loaded initially.
                 for (;renderedIndex < action.length; renderedIndex++) {
                     renderThumb(renderedIndex);
@@ -842,22 +868,9 @@ RecentsRender.prototype._renderMedia = function($newRow, action, actionId) {
     var makeTitle = function() {
 
         var numOfFiles = images + videos + pdfs;
-        var currentStringSet = [l[7470].replace('%d', '%1'), l[24059], l[24060]];
+        var titleString = numOfFiles === 1 ? l[835] : l[7470].replace('%d', numOfFiles);
 
-        if (isOtherUser) {
-            if (isCreated) {
-                $titleString = currentStringSet[1];
-            } else {
-                $titleString = currentStringSet[2];
-            }
-            $titleString = $titleString
-                .replace("%3", '<span class="link action-user-name"></span>')
-                .replace("[A]", '<span class="link title">')
-                .replace("[/A]", '</span>');
-        } else {
-            $titleString = '<span class="link title">' + currentStringSet[0] + '</span>';
-        }
-        return $titleString.replace("%1", numOfFiles);
+        return '<span class="title number-of-files">' + titleString + '</span>';
     };
 
     $titleString = makeTitle();
@@ -911,6 +924,18 @@ RecentsRender.prototype._renderMedia = function($newRow, action, actionId) {
         } else if (newMax > action.length) {
             $toggleExpandedButton.addClass("hidden");
         }
+    });
+
+    $('.expand-collapse-toggle', $newRow).rebind('click', function() {
+        if ($newRow.hasClass('expanded')) {
+            $newRow.removeClass('expanded').addClass('collapsed');
+        }
+        else {
+            $newRow.removeClass('collapsed').addClass('expanded');
+        }
+        return false;
+    }).rebind("dblclick", function() {
+        return false;
     });
 
     const triggerContextMenu = (ev) => {

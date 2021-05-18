@@ -256,7 +256,7 @@ var nicknames = {
             'use strict';
 
             var $cancelButton = this.$dialog.find('.cancel-button');
-            var $closeIconButton = this.$dialog.find('.fm-dialog-close');
+            var $closeIconButton = this.$dialog.find('button.js-close');
             var $input = this.$dialog.find('.nickname-input');
             var self = this;
 

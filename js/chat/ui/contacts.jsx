@@ -8,7 +8,7 @@ import { Dropdown, DropdownItem } from '../../ui/dropdowns.jsx';
 
 const EMPTY_ARR = [];
 
-var _attchRerenderCbContacts = function(others) {
+let _attchRerenderCbContacts = function(others) {
     this.addDataStructListenerForProperties(this.props.contact, [
         'name',
         'firstName',
@@ -19,6 +19,9 @@ var _attchRerenderCbContacts = function(others) {
     ].concat(others ? others : EMPTY_ARR));
 };
 
+const closeDropdowns = () => {
+    document.dispatchEvent(new Event('closeDropdowns'));
+};
 
 export class ContactsListItem extends ContactAwareComponent {
     static defaultProps = {
@@ -80,7 +83,7 @@ export class ContactButton extends ContactAwareComponent {
                 loadSubPage('fm/account');
             }
             if (contact.c === 1) {
-                loadSubPage('fm/' + contact.u);
+                loadSubPage('fm/chat/contacts/' + contact.u);
             }
         };
 
@@ -116,7 +119,7 @@ export class ContactButton extends ContactAwareComponent {
             if (contact.c === 2 && contact.u === u_handle) {
                 moreDropdowns.push(
                     <DropdownItem
-                        key="view0" icon="human-profile" label={l[187]} onClick={() => {
+                        key="view0" icon="sprite-fm-mono icon-user-filled" label={l[187]} onClick={() => {
                             loadSubPage('fm/account');
                         }} />
                 );
@@ -134,8 +137,13 @@ export class ContactButton extends ContactAwareComponent {
             if (megaChat.currentlyOpenedChat && megaChat.currentlyOpenedChat === contact.u) {
                 moreDropdowns.push(
                     <DropdownItem
-                        key="startCall" className="contains-submenu" icon="context handset" label={l[19125]}
-                        onClick={startAudioCall} />
+                        key="startCall"
+                        className="sprite-fm-mono-before icon-arrow-right-before"
+                        icon="sprite-fm-mono icon-phone"
+                        submenu={true}
+                        label={l[19125]}
+                        onClick={startAudioCall}
+                    />
                 );
 
 
@@ -144,18 +152,24 @@ export class ContactButton extends ContactAwareComponent {
                     <div className="dropdown body submenu" key="dropdownGroup">
                         <div>
                             <DropdownItem
-                                key="startAudio" icon="context handset" label={l[1565]}
-                                onClick={startAudioCall} />
+                                key="startAudio"
+                                icon="sprite-fm-mono icon-phone"
+                                label={l[1565]}
+                                onClick={startAudioCall}
+                            />
                         </div>
                         <div>
                             <DropdownItem
-                                key="startVideo" icon="context videocam" label={l[1566]} onClick={() => {
+                                key="startVideo"
+                                icon="sprite-fm-mono icon-video-call-filled"
+                                label={l[1566]}
+                                onClick={() => {
                                     megaChat.createAndShowPrivateRoom(contact.u)
                                         .then(function(room) {
                                             room.setActive();
                                             room.startVideoCall();
                                         });
-                                }} />
+                                }}/>
                         </div>
                     </div>
                 );
@@ -163,7 +177,7 @@ export class ContactButton extends ContactAwareComponent {
             else {
                 moreDropdowns.push(
                     <DropdownItem
-                        key="startChat" icon="context conversation" label={l[5885]} onClick={() => {
+                        key="startChat" icon="sprite-fm-mono icon-chat" label={l[5885]} onClick={() => {
                             loadSubPage('fm/chat/p/' + contact.u);
                         }} />
                 );
@@ -175,13 +189,13 @@ export class ContactButton extends ContactAwareComponent {
 
             moreDropdowns.push(
                 <DropdownItem
-                    key="send-files-item" icon="context arrow-in-circle" label={l[6834]} onClick={() => {
+                    key="send-files-item" icon="sprite-fm-mono icon-send-files" label={l[6834]} onClick={() => {
                         megaChat.openChatAndSendFilesDialog(contact.u);
                     }} />
             );
             moreDropdowns.push(
                 <DropdownItem
-                    key="share-item" icon="context share-folder" label={l[6775]} onClick={() => {
+                    key="share-item" icon="sprite-fm-mono icon-folder-outgoing-share" label={l[6775]} onClick={() => {
                         openCopyShareDialog(contact.u);
                     }} />
                 );
@@ -190,7 +204,7 @@ export class ContactButton extends ContactAwareComponent {
                 moreDropdowns.push(
                     <DropdownItem
                         key="view2"
-                        icon="small-icon icons-sprite grey-plus"
+                        icon="sprite-fm-mono icon-add-filled"
                         label={l[101]}
                         onClick={() => {
                             loadingDialog.show();
@@ -254,7 +268,7 @@ export class ContactButton extends ContactAwareComponent {
             }
             moreDropdowns.push(
                 <DropdownItem
-                    key="set-nickname" icon="small-icon context writing-pen" label={l[20828]} onClick={() => {
+                    key="set-nickname" icon="sprite-fm-mono icon-rename" label={l[20828]} onClick={() => {
                         nicknames.setNicknameDialog.init(contact.u);
                     }} />
             );
@@ -307,7 +321,7 @@ export class ContactButton extends ContactAwareComponent {
                     disabled={self.props.dropdownDisabled}
                     label={label}>
                     <Dropdown
-                        className="contact-card-dropdown"
+                        className="context contact-card-dropdown"
                         positionMy={dropdownPosition}
                         positionAt={dropdownPosition}
                         vertOffset={vertOffset}
@@ -341,7 +355,15 @@ export class ContactVerified extends MegaRenderMixin {
         if (u_authring && u_authring.Ed25519) {
             var verifyState = u_authring.Ed25519[contact.u] || {};
             if (verifyState.method >= authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON) {
-                return <div className={"user-card-verified " + this.props.className}/>;
+                return (
+                    <div
+                        className={`
+                            user-card-verified
+                            ${this.props.className || ''}
+                        `}>
+                        <i className="sprite-fm-mono icon-check" />
+                    </div>
+                );
             }
         }
         else if (!pubEd25519[contact.u]) {
@@ -469,9 +491,9 @@ export class ContactFingerprint extends MegaRenderMixin {
                 verifyButton = <Button
                     className="dropdown-verify active"
                     label={l[7692]}
-                    icon="grey-key"
+                    icon="sprite-fm-mono icon-key"
                     onClick={() => {
-                        $(document).trigger('closeDropdowns');
+                        closeDropdowns();
                         fingerprintDialog(contact.u);
                     }} />
             }
@@ -479,7 +501,7 @@ export class ContactFingerprint extends MegaRenderMixin {
 
         var fingerprintCode = null;
         if (infoBlocks.length > 0) {
-            fingerprintCode = <div className="dropdown-fingerprint">
+            fingerprintCode = <div className={`dropdown-fingerprint ${this.props.className || ''}`}>
                 <div className="contact-fingerprint-title">
                     <span>{l[6872]}</span>
                     <ContactVerified contact={contact} />
@@ -546,13 +568,16 @@ export class Avatar extends ContactAwareComponent {
             if (this.props.simpletipPosition) {
                 extraProps['data-simpletipposition'] = this.props.simpletipPosition;
             }
+            if (this.props.simpletipClass) {
+                extraProps['data-simpletip-class'] = this.props.simpletipClass;
+            }
         }
 
         if (avatarMeta.type === "image") {
             displayedAvatar = <div className={classes} style={this.props.style}
                     {...extraProps}
                     onClick={self.props.onClick ? (e) => {
-                        $(document).trigger('closeDropdowns');
+                        closeDropdowns();
                         self.props.onClick(e);
                     } : self.onClick}>
                         {verifiedElement}
@@ -569,7 +594,7 @@ export class Avatar extends ContactAwareComponent {
             displayedAvatar = <div className={classes} style={this.props.style}
                 {...extraProps}
                 onClick={self.props.onClick ? (e) => {
-                    $(document).trigger('closeDropdowns');
+                    closeDropdowns();
                     self.props.onClick(e);
                 } : self.onClick}>
                 {verifiedElement}
@@ -586,7 +611,7 @@ export class Avatar extends ContactAwareComponent {
 
 export class ContactCard extends ContactAwareComponent {
     static defaultProps = {
-        'dropdownButtonClasses': "default-white-button tiny-button",
+        'dropdownButtonClasses': "tiny-button",
         'dropdownIconClasses': "tiny-icon icons-sprite grey-dots",
         'presenceClassName': '',
         'manualDataChangeTracking': true,
@@ -725,9 +750,10 @@ export class ContactCard extends ContactAwareComponent {
 
         var selectionTick = null;
         if (this.props.selectable) {
-            selectionTick = <div className="user-card-tick-wrap">
-                <i className="small-icon mid-green-tick"></i>
-            </div>
+            selectionTick =
+                <div className="user-card-tick-wrap">
+                    <i className="sprite-fm-mono icon-check" />
+                </div>;
         }
 
         return <div
@@ -832,10 +858,9 @@ export class ContactPickerWidget extends MegaRenderMixin {
             'selected': this.props.selected || false,
         };
     }
-    onSearchChange(e) {
-        var self = this;
-        self.setState({searchValue: e.target.value});
-    }
+    onSearchChange = ev => {
+        this.setState({ searchValue: ev.target.value });
+    };
     componentDidMount() {
         super.componentDidMount();
         setContactLink();
@@ -868,7 +893,7 @@ export class ContactPickerWidget extends MegaRenderMixin {
                         e.preventDefault();
                         e.stopPropagation();
 
-                        $(document).trigger('closeDropdowns');
+                        closeDropdowns();
 
                         if (self.props.onSelectDone) {
                             self.props.onSelectDone(self.state.selected);
@@ -984,7 +1009,7 @@ export class ContactPickerWidget extends MegaRenderMixin {
                             self.props.onSelected([contactHash]);
                         }
                         self.props.onSelectDone([contactHash]);
-                        $(document).trigger('closeDropdowns');
+                        closeDropdowns();
                         return;
                     }
                     else {
@@ -1012,7 +1037,7 @@ export class ContactPickerWidget extends MegaRenderMixin {
                         self.setState({'selected': selected});
                         self.setState({'searchValue': ''});
                         if (self.props.autoFocusSearchField) {
-                            self.refs.contactSearchField.focus();
+                            self.contactSearchField.focus();
                         }
                     }
                     self.clickTime = new Date();
@@ -1067,7 +1092,7 @@ export class ContactPickerWidget extends MegaRenderMixin {
                 e.preventDefault();
                 e.stopPropagation();
 
-                $(document).trigger('closeDropdowns');
+                closeDropdowns();
 
                 if (self.props.onSelectDone) {
                     self.props.onSelectDone(self.state.selected);
@@ -1111,7 +1136,7 @@ export class ContactPickerWidget extends MegaRenderMixin {
                     self.setState({'selected': selected});
                     self.setState({'searchValue': ''});
                     if (self.props.autoFocusSearchField) {
-                        self.refs.contactSearchField.focus();
+                        self.contactSearchField.focus();
                     }
                 }
                 self.clickTime = new Date();
@@ -1124,13 +1149,16 @@ export class ContactPickerWidget extends MegaRenderMixin {
                 selectedContacts = false;
                 var emptySelectionMsg = self.props.emptySelectionMsg || l[8889];
 
-                multipleContacts = <div className="horizontal-contacts-list">
-                    <div className="contacts-list-empty-txt">{
-                        self.props.nothingSelectedButtonLabel ?
-                            self.props.nothingSelectedButtonLabel
-                            : emptySelectionMsg
-                    }</div>
-                </div>;
+                multipleContacts =
+                    <div className="horizontal-contacts-list">
+                        <div className="contacts-list-empty-txt">
+                            {
+                                self.props.nothingSelectedButtonLabel ?
+                                    self.props.nothingSelectedButtonLabel
+                                    : emptySelectionMsg
+                            }
+                        </div>
+                    </div>;
             }
             else {
                 selectedContacts = true;
@@ -1165,12 +1193,12 @@ export class ContactPickerWidget extends MegaRenderMixin {
 
             if (self.props.selectFooter) {
 
-                selectFooter = <div className="fm-dialog-footer">
-                    <a className="default-white-button left" onClick={onAddContact.bind(self)}>
-                        {l[71]}
-                    </a>
+                selectFooter = <footer>
+                    <button className="mega-button left" onClick={onAddContact.bind(self)}>
+                        <span>{l[71]}</span>
+                    </button>
 
-                    <a className={"default-grey-button right " + (!selectedContacts ? "disabled" : "")}
+                    <button className={"mega-button right " + (!selectedContacts ? "disabled" : "")}
                         onClick = {function(e) {
                             if (self.state.selected.length > 0) {
                                 onSelectDoneCb(e);
@@ -1181,33 +1209,31 @@ export class ContactPickerWidget extends MegaRenderMixin {
                                 this.props.multipleSelectedButtonLabel
                                 : l[8890]
                         }
-                    </a>
-                </div>;
+                    </button>
+                </footer>;
             }
         }
 
-        if (self.props.showTopButtons) {
-            var _topButtons = [];
-
-            self.props.showTopButtons.forEach(function(button) {
-                _topButtons.push(
-                    <div className={"link-button light"} key={button.key} onClick = {function(e) {
-                        e.preventDefault();
-                        e.stopPropagation();
-
-                        // trigger dropdown close.
-                        $(document).trigger('closeDropdowns');
-
-                        button.onClick(e);
-                    }}>
-                        <i className={"small-icon " + button.icon}></i>
-                        <span>{button.title}</span>
-                    </div>
-                )
-            });
-            topButtons = <div className="contacts-search-buttons">
-                {_topButtons}
-            </div>;
+        const { showTopButtons } = this.props;
+        if (showTopButtons) {
+            topButtons =
+                <div className="contacts-search-buttons">
+                    {showTopButtons.map(button =>
+                        <div
+                            key={button.key}
+                            className="button-wrapper">
+                            <Button
+                                className="mega-button round"
+                                icon={button.icon}
+                                onClick={e => {
+                                    closeDropdowns();
+                                    button.onClick(e);
+                                }}
+                            />
+                            <span className="button-title">{button.title}</span>
+                        </div>
+                    )}
+                </div>;
         }
 
         var alreadyAdded = {};
@@ -1221,7 +1247,7 @@ export class ContactPickerWidget extends MegaRenderMixin {
         } else if (!self.props.readOnly && self._foundFrequents) {
             var totalFound = 0;
             self._foundFrequents.forEach(function(v) {
-                if (totalFound < 5 && M.u[v.userId]) {
+                if (totalFound < 5 && v.userId in M.u) {
                     if (self._eventuallyAddContact(M.u[v.userId], frequentContacts, selectableContacts)) {
                         alreadyAdded[v.userId] = 1;
                         totalFound++;
@@ -1345,11 +1371,11 @@ export class ContactPickerWidget extends MegaRenderMixin {
                 <div className="fm-empty-contacts-bg"></div>
                 <div className="fm-empty-cloud-txt small">{l[784]}</div>
                 <div className="fm-empty-description small">{l[19115]}</div>
-                <div className=" big-red-button fm-empty-button" onClick={function(e) {
+                <button className="mega-button positive large fm-empty-button" onClick={function() {
                     contactAddDialog();
                 }}>
-                    {l[101]}
-                </div>
+                    <span>{l[101]}</span>
+                </button>
                 <div className="empty-share-public">
                     <i className="small-icon icons-sprite grey-chain"></i>
                     <span dangerouslySetInnerHTML={{__html: l[19111]}}></span>
@@ -1359,35 +1385,63 @@ export class ContactPickerWidget extends MegaRenderMixin {
             extraClasses += " no-contacts";
         }
 
-        var displayStyle = (self.state.searchValue && self.state.searchValue.length > 0) ? "" : "none";
-        var totalContactsNum = contacts.length + frequentContacts.length;
-        var searchPlaceholderMsg = totalContactsNum === 1 ? l[23749] : l[23750].replace("[X]", totalContactsNum);
-        return <div className={this.props.className + " " + extraClasses}>
-            {multipleContacts}
-            {!self.props.readOnly && haveContacts ?
-                <div className={"contacts-search-header " + this.props.headerClasses}>
-                    <i className="small-icon thin-search-icon"></i>
-                    <input
-                        autoFocus
-                        type="search"
-                        placeholder={searchPlaceholderMsg}
-                        ref="contactSearchField"
-                        onChange={this.onSearchChange.bind(this)}
-                        value={this.state.searchValue}
-                    />
+        const totalContactsNum = contacts.length + frequentContacts.length;
+        const searchPlaceholderMsg = totalContactsNum === 1 ? l[23749] : l[23750].replace('[X]', totalContactsNum);
+        return (
+            <div
+                className={`
+                    ${this.props.className || ''}
+                    ${extraClasses}
+                `}>
+                {topButtons}
+                {multipleContacts}
+                {!this.props.readOnly && haveContacts && (
                     <div
-                        onClick={function(e) {
-                            self.setState({searchValue: ''});
-                            self.refs.contactSearchField.focus();
-                        }}
-                        className="search-result-clear"
-                        style={{display : displayStyle}}
-                    ></div>
-                </div> : null}
-
-            {topButtons}
-            {contactsList}
-            {selectFooter}
-        </div>;
+                        className={`
+                            contacts-search-header
+                            ${this.props.headerClasses}
+                        `}>
+                        <i className="sprite-fm-mono icon-preview-reveal"/>
+                        <input
+                            autoFocus
+                            type="search"
+                            placeholder={searchPlaceholderMsg}
+                            ref={nodeRef => {
+                                this.contactSearchField = nodeRef;
+                            }}
+                            onChange={this.onSearchChange}
+                            value={this.state.searchValue}
+                        />
+                        <div
+                            className={`
+                                search-result-clear
+                                ${this.state.searchValue && this.state.searchValue.length > 0 ? '' : 'hidden'}
+                            `}
+                            onClick={() => {
+                                this.setState({ searchValue: '' }, () =>
+                                    this.contactSearchField.focus()
+                                );
+                            }}>
+                            <i className="sprite-fm-mono icon-close-component"/>
+                        </div>
+                    </div>
+                )}
+                {contactsList}
+                {selectFooter}
+                {this.props.showAddContact && (
+                    <div className="contacts-search-bottom">
+                        <Button
+                            className="mega-button action positive"
+                            icon="sprite-fm-mono icon-add-circle"
+                            label={l[18759]}
+                            onClick={() => {
+                                contactAddDialog();
+                                closeDropdowns();
+                            }}
+                        />
+                    </div>
+                )}
+            </div>
+        );
     }
-};
+}

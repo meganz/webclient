@@ -14,7 +14,7 @@ describe("MegaNotifications Unit Test", function() {
     var megaNotifications = null;
 
     beforeEach(function(done) {
-        sandbox = sinon.sandbox.create();
+        sandbox = sinon.createSandbox();
         mStub(window, 'ion', {
             'sound': function() {
                 ion.sound.play = function() {
@@ -69,6 +69,7 @@ describe("MegaNotifications Unit Test", function() {
 
 
     afterEach(function(done) {
+        sandbox.restore();
         mStub.restore();
         done();
     });

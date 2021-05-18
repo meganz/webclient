@@ -31,7 +31,7 @@ export const LABEL = {
 
     DECRYPTING_RESULTS: l[23543],
     PAUSE_SEARCH: l[23544],
-    RESUME_SEARCH: l[23545],
+    SEARCH_PAUSED: 'Search paused',
     SEARCH_COMPLETE: l[23546]
 };
 
@@ -119,11 +119,11 @@ export default class ResultContainer extends MegaRenderMixin {
 
                 if (status === STATUS.COMPLETED && key === 'MESSAGES') {
                     const SEARCH_MESSAGES =
-                        <div
-                            className="search-messages default-white-button"
+                        <button
+                            className="search-messages mega-button"
                             onClick={onSearchMessages}>
-                            {LABEL.SEARCH_MESSAGES_CTA}
-                        </div>;
+                            <span>{LABEL.SEARCH_MESSAGES_CTA}</span>
+                        </button>;
                     const NO_RESULTS =
                         <ResultRow
                             type={TYPE.NIL}

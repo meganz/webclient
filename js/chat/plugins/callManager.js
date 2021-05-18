@@ -156,7 +156,7 @@ CallManager.prototype.startCall = function (chatRoom, mediaOptions) {
                 buttons: {
                     'reject': {
                         'type': 'secondary',
-                        'classes': 'default-white-button small-text left red',
+                        'classes': 'mega-button',
                         'text': l[1686],
                         'callback': function () {
                             if (callManagerCall) {
@@ -780,18 +780,18 @@ CallManagerCall.prototype.onWaitingResponseIncoming = function (e, eventData) {
         delay: unixtime(),
         persist: false,
         buttons: {
+            'reject': {
+                'type': 'secondary',
+                'classes': 'mega-button',
+                'text': l[1686],
+                'callback': doCancel
+            },
             'answer': {
                 'type': 'primary',
-                'classes': 'default-white-button small-text left',
+                'classes': 'mega-button positive',
                 'text': l[7205],
                 'callback': doAnswer
             },
-            'reject': {
-                'type': 'secondary',
-                'classes': 'default-white-button small-text left red',
-                'text': l[1686],
-                'callback': doCancel
-            }
         }
     });
 

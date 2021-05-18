@@ -44,6 +44,9 @@ var webpackConfigs = {
             publicPath: "/",
             filename: "js/chat/bundle.js"
         },
+        resolve: {
+            extensions: ['.js', '.jsx'],
+        },
         devtool: "source-map",
         externals: {
             "jquery": "jQuery",
@@ -98,6 +101,9 @@ var webpackConfigs = {
             path: __dirname + "/",
             publicPath: "/",
             filename: "js/chat/bundle.js"
+        },
+        resolve: {
+            extensions: ['.js', '.jsx'],
         },
         module: {
             rules: [

@@ -1,0 +1,355 @@
+/**
+ * Structure:
+ *
+ * <button class="mega-button
+ *                {positive?|negative?|branded-red?|branded-green?|action?|transparent?}
+ *                {small?|large?}
+ *                {round?|full-width?}
+ *                {icon?}
+ *                {align-flex-start?|align-flex-end?}
+ *                {hidden?}
+ *                {disabled?}
+ *                {...other specific classes}">
+ *     <div>
+ *         <i class="{icon-name}"></i>
+ *     </div>
+ *     <span>
+ *         {button text}
+ *     </span>
+ *     <div>
+ *         <i class="{icon-name}"></i>
+ *     </div>
+ * </button>
+ *
+ * All ? classes are optional:
+ *     - positive: the button performs a positive action
+ *     - negative: the button performs a negative action
+ *     - neither positive or negative: the button performs a neutral action
+ *     - branded-*: applies the brand colour, regardless of action type, e.g. Login is MEGA red
+ *     - action: the button is an action button
+ *     - transparent: the button is transparent, regardless of action type
+ *     - small: the small variant
+ *     - large: the large variant
+ *     - round: the button will have equal width and height, suitable for icons, may also be small/large
+ *     - icon: used for single icon buttons with no padding, best used in conjunction with `action` and/or `round`
+ *     - full-width: the button will be 100% wide to fill its container, may also be small/large
+ *     - align-flex-*: the text within the button will align left or right, and react to LTR/RTL language options
+ *     - hidden: the button is not visible
+ *     - disabled: the button is disabled
+ *     - {other classes}: you may add any other classes you wish
+ *
+ * Icons are optional, can be any size, and may be before, after, or before and after the span(s).
+ * They must be within a <div> so they are centred properly.
+ *
+ * Any non-span and non-div elements can be added to the button, e.g. an <input>.
+ * If they are absolutely positioned they will not affect the layout.
+ *
+ * Minimal structure:
+ * <button class="mega-button">
+ *     <span>{button text}</span>
+ * </button>
+ *
+ * TODO: Make this a component.
+ */
+
+/* base case */
+
+    .mega-button {
+        align-items: center;
+        border: none;
+        border-radius: 4px;
+        box-sizing: border-box;
+        cursor: pointer;
+        display: inline-flex;
+        font: var(--text-body1);
+        justify-content: space-between;
+        line-height: 24px;
+        min-height: var(--height);
+        min-width: 64px;
+        outline: none;
+        padding: var(--outer-padding);
+        position: relative;
+        text-align: center;
+        transition: var(--transition-color), var(--transition-bg-color), var(--transition-shadow);
+        vertical-align: middle;
+        white-space: nowrap;
+    }
+
+/* end: base case */
+
+/* size modifiers */
+
+    .mega-button.small {
+        min-width: auto;
+        line-height: 16px;
+    }
+
+    .mega-button.large {
+        font: var(--text-h3);
+        line-height: 32px;
+        min-width: 96px;
+    }
+
+/* end: size modifiers */
+
+/* shape modifiers */
+
+    /* round */
+    .mega-button.round {
+        border-radius: 50%;
+        height: var(--height);
+        min-width: var(--height);
+        width: var(--height);
+    }
+
+    /* square */
+    .mega-button.square {
+        height: var(--height);
+        min-width: var(--height);
+        width: var(--height);
+    }
+
+    /* full (100%) width */
+    .mega-button.full-width {
+        width: 100%;
+    }
+
+    .mega-button.action {
+        padding: 4px var(--outer-padding);
+    }
+
+    .mega-button.icon {
+        height: var(--height);
+        min-width: var(--height);
+        padding: 0 !important;
+        width: var(--height);
+    }
+
+/* end: shape modifiers */
+
+/* content */
+
+    /* text */
+    /* spans within spans should not be formatted to allow concatenation of translations */
+
+        .mega-button > span {
+            display: inline-flex;
+            flex-grow: 1;
+            justify-content: center;
+            margin: 0 auto;
+            white-space: normal;
+        }
+
+        /* align the text to the start if there's an icon, so multi line buttons look right */
+        /* allow for wrapping of spans within the text span, so multiple lines can be controlled */
+        .mega-button.large > div ~ span {
+            text-align: start;
+        }
+
+        /* aligns the text with the flex start (left on ltr, right on rtl) */
+        .mega-button.align-flex-start span {
+            justify-content: flex-start;
+        }
+
+        /* aligns the text with the flex end (right on ltr, left on rtl) */
+        .mega-button.align-flex-end span {
+            justify-content: flex-end;
+        }
+
+    /* end: text */
+
+    /* icons */
+    /* icons: [ icon ], [ icon | text ], [ icon | text | icon ] */
+
+        /* the icons can be all different sizes, so we have to centre them */
+        .mega-button > div {
+            align-items: center;
+            display: flex;
+            flex-grow: 0;
+            height: 0;
+            justify-content: center;
+            overflow: visible;
+        }
+
+        .mega-button > div i {
+            --icon-size: 24px;
+        }
+
+        .mega-button.small > div {
+            width: 16px;
+        }
+
+        .mega-button.small > div i {
+            --icon-size: 16px;
+        }
+
+        .mega-button.large > div {
+            width: 32px;
+        }
+
+        .mega-button.large > div i {
+            --icon-size: 32px;
+        }
+
+        .mega-button i {
+            /* clipping for smaller icons close to others */
+            background-clip: content-box;
+            box-sizing: border-box;
+            display: block;
+            flex-shrink: 0;
+        }
+
+        .mega-button i.hidden {
+            display: none;
+        }
+
+        /* spacing */
+
+            .mega-button > div {
+                margin: 0 auto;
+            }
+
+            .mega-button > span {
+                margin: 0 var(--horizontal-padding);
+            }
+
+            .mega-button.large > div ~ span {
+                -webkit-margin-start: 12px;
+                margin-inline-start: 12px;
+            }
+
+            .mega-button.large > span ~ div {
+                -webkit-margin-start: -4px;
+                margin-inline-start: -4px;
+            }
+
+        /* end: spacing */
+
+    /* end: icons */
+
+/* end: content */
+
+/* appearance modifiers */
+
+    .mega-button.hidden {
+        display: none;
+    }
+
+    /* TODO: remove this and use 'disabled' attribute on buttons */
+    .mega-button.disabled {
+        cursor: default;
+        opacity: 0.3;
+    }
+
+/* end: appearance modifiers */
+
+/* basic colours */
+
+    .mega-button {
+        background: var(--neutral);
+        box-shadow: inset 0 0 0 var(--border-width) var(--neutral-border);
+        color: var(--text-neutral);
+    }
+
+    .mega-button.negative {
+        background: var(--red);
+        box-shadow: inset 0 0 0 var(--border-width) var(--red-border);
+        color: var(--text-red);
+    }
+
+    .mega-button.positive {
+        background: var(--green);
+        box-shadow: inset 0 0 0 var(--border-width) var(--green-border);
+        color: var(--text-green);
+    }
+
+    .mega-button.action {
+        background: var(--action);
+        box-shadow: none;
+        color: var(--text-action);
+    }
+
+    /* branded colours */
+
+        .mega-button.branded-red {
+            background: var(--red);
+            box-shadow: inset 0 0 0 var(--border-width) var(--red-border);
+            color: var(--text-red);
+        }
+
+        .mega-button.branded-green {
+            background: var(--green);
+            box-shadow: inset 0 0 0 var(--border-width) var(--green-border);
+            color: var(--text-green);
+        }
+
+    /* end: branded colours */
+
+/* end: basic colours */
+
+/* hover colours */
+
+    .mega-button:hover:not(.disabled) {
+        background: var(--neutral-hover);
+    }
+
+    .mega-button.negative:hover:not(.disabled) {
+        background: var(--red-hover);
+    }
+
+    .mega-button.positive:hover:not(.disabled) {
+        background: var(--green-hover);
+    }
+
+    .mega-button.action:hover:not(.disabled) {
+        background: var(--action-hover);
+    }
+
+    .mega-button.no-hover:hover {
+        background: none !important;
+    }
+
+    /* branded-colours */
+
+        .mega-button.branded-red:hover:not(.disabled) {
+            background: var(--red-hover);
+        }
+
+        .mega-button.branded-green:hover:not(.disabled) {
+            background: var(--green-hover);
+        }
+
+    /* end: branded-colours */
+
+/* end: hover colours */
+
+/* active colours */
+
+    .mega-button:active:not(.disabled) {
+        background: var(--neutral-active);
+    }
+
+    .mega-button.negative:active:not(.disabled) {
+        background: var(--red-active);
+    }
+
+    .mega-button.positive:active:not(.disabled) {
+        background: var(--green-active);
+    }
+
+    .mega-button.action:active:not(.disabled) {
+        background: var(--action-active);
+    }
+
+    /* branded colours */
+
+        .mega-button.branded-red:active:not(.disabled) {
+            background: var(--red-active);
+        }
+
+        .mega-button.branded-green:active:not(.disabled) {
+            background: var(--green-active);
+        }
+    /* end: branded colours */
+
+/* end: active colours */

@@ -68,7 +68,7 @@ twofactor.loginDialog = {
         'use strict';
 
         // Show the dialog
-        var $dialog = $('.fm-dialog.verify-two-factor-login');
+        var $dialog = $('.mega-dialog.verify-two-factor-login');
         var $overlay = $('.dark-overlay');
 
         // Show the modal dialog
@@ -90,7 +90,7 @@ twofactor.loginDialog = {
         'use strict';
 
         // Cache selectors
-        var $dialog = $('.fm-dialog.verify-two-factor-login');
+        var $dialog = $('.mega-dialog.verify-two-factor-login');
         var $pinCodeInput = $dialog.find('.pin-input');
         var $submitButton = $dialog.find('.submit-button');
         var $warningText = $dialog.find('.warning-text-field');
@@ -134,7 +134,7 @@ twofactor.loginDialog = {
         'use strict';
 
         // Cache selectors
-        var $dialog = $('.fm-dialog.verify-two-factor-login');
+        var $dialog = $('.mega-dialog.verify-two-factor-login');
         var $pinCodeInput = $dialog.find('.pin-input');
         var $submitButton = $dialog.find('.submit-button');
 
@@ -167,7 +167,7 @@ twofactor.loginDialog = {
         'use strict';
 
         // Cache selectors
-        var $dialog = $('.fm-dialog.verify-two-factor-login');
+        var $dialog = $('.mega-dialog.verify-two-factor-login');
         var $lostDeviceButton = $dialog.find('.lost-authenticator-button');
 
         // On button click
@@ -186,8 +186,8 @@ twofactor.loginDialog = {
         'use strict';
 
         // Show the dialog
-        var $dialog = $('.fm-dialog.verify-two-factor-login');
-        var $closeButton = $dialog.find('.fm-dialog-close');
+        var $dialog = $('.mega-dialog.verify-two-factor-login');
+        var $closeButton = $('button.js-close', $dialog);
 
         // On click of the close and back buttons
         $closeButton.rebind('click', function() {
@@ -204,7 +204,7 @@ twofactor.loginDialog = {
 
         'use strict';
 
-        var $dialog = $('.fm-dialog.verify-two-factor-login');
+        var $dialog = $('.mega-dialog.verify-two-factor-login');
         var $overlay = $('.dark-overlay');
         var $warningText = $dialog.find('.warning-text-field');
         var $pinCodeInput = $dialog.find('.pin-input');
@@ -229,7 +229,7 @@ twofactor.loginDialog = {
 
         'use strict';
 
-        var $dialog = $('.fm-dialog.verify-two-factor-login');
+        var $dialog = $('.mega-dialog.verify-two-factor-login');
         var $warningText = $dialog.find('.warning-text-field');
         var $pinCodeInput = $dialog.find('.pin-input');
         var $submitButton = $dialog.find('.submit-button');
@@ -247,7 +247,7 @@ twofactor.loginDialog = {
 
         'use strict';
 
-        var $dialog = $('.fm-dialog.verify-two-factor-login');
+        var $dialog = $('.mega-dialog.verify-two-factor-login');
         var $overlay = $('.dark-overlay');
 
         // Close the modal dialog
@@ -407,8 +407,6 @@ twofactor.setupDialog = {
         // Show the dialog
         this.$dialog.removeClass('hidden');
         this.$overlay.removeClass('hidden');
-
-        dialogPositioning('.two-factor-dialog.setup-two-factor');
     },
 
     /**
@@ -428,7 +426,11 @@ twofactor.setupDialog = {
 
                 // If the Two-Factor has already been setup, show a warning dialog
                 if (response === EEXIST) {
-                    msgDialog('warninga', l[19219], l[19220],
+                    msgDialog(
+                        'warninga',
+                        l[19219],
+                        l[19220],
+                        '',
                         function() {
                             // Close the dialog on click of OK button
                             twofactor.setupDialog.closeDialog();
@@ -447,8 +449,8 @@ twofactor.setupDialog = {
                     width: 224,
                     height: 224,
                     correctLevel: QRErrorCorrectLevel.H,    // High
-                    background: '#ffffff',
-                    foreground: '#000',
+                    background: '#f2f2f2',
+                    foreground: '#151412',
                     text: 'otpauth://totp/MEGA:' + u_attr.email + '?secret=' + response + '&issuer=MEGA'
                 };
 
@@ -482,7 +484,7 @@ twofactor.setupDialog = {
         'use strict';
 
         // On button click, close the dialog
-        this.$dialog.find('.fm-dialog-close').rebind('click', function() {
+        this.$dialog.find('button.js-close').rebind('click', function() {
 
             twofactor.setupDialog.closeDialog();
         });
@@ -618,7 +620,7 @@ twofactor.verifySetupDialog = {
         var $pinCode = this.$dialog.find('.pin-input');
         var $warningText = this.$dialog.find('.information-highlight.warning');
         var $successText = this.$dialog.find('.information-highlight.success');
-        var $closeButton = this.$dialog.find('.fm-dialog-close');
+        var $closeButton = this.$dialog.find('button.js-close');
 
         // Clear the text input, remove the warning/success boxes, unhide the close button
         $pinCode.val('');
@@ -635,7 +637,7 @@ twofactor.verifySetupDialog = {
         'use strict';
 
         // On button click, close the dialog
-        this.$dialog.find('.fm-dialog-close').rebind('click', function() {
+        this.$dialog.find('button.js-close').rebind('click', function() {
 
             twofactor.verifySetupDialog.closeDialog();
         });
@@ -710,7 +712,7 @@ twofactor.verifySetupDialog = {
         // Cache selectors
         var $pinCodeInput = this.$dialog.find('.pin-input');
         var $backButton = this.$dialog.find('.back-button');
-        var $closeButton = this.$dialog.find('.fm-dialog-close');
+        var $closeButton = this.$dialog.find('button.js-close');
         var $verifyButton = this.$dialog.find('.next-button');
         var $warningText = this.$dialog.find('.information-highlight.warning');
         var $successText = this.$dialog.find('.information-highlight.success');
@@ -816,7 +818,7 @@ twofactor.backupKeyDialog = {
         'use strict';
 
         // On button click, close the dialog
-        this.$dialog.find('.fm-dialog-close, .finish-button').rebind('click', function() {
+        this.$dialog.find('button.js-close').rebind('click', function() {
 
             // Close the dialog and refresh the status of 2FA in the background
             twofactor.backupKeyDialog.closeDialog();
@@ -859,7 +861,7 @@ twofactor.verifyActionDialog = {
         'use strict';
 
         // Cache selectors
-        this.$dialog = $('.fm-dialog.two-factor-verify-action');
+        this.$dialog = $('.mega-dialog.two-factor-verify-action');
         this.$overlay = $('.dark-overlay');
 
         // Initialise functionality
@@ -960,7 +962,7 @@ twofactor.verifyActionDialog = {
 
         'use strict';
 
-        var $closeButton = this.$dialog.find('.fm-dialog-close');
+        var $closeButton = this.$dialog.find('button.js-close');
 
         // On click of the close and back buttons
         $closeButton.rebind('click', function() {

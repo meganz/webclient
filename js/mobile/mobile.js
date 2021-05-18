@@ -732,11 +732,15 @@ mBroadcaster.once('startMega:mobile', function() {
     };
 
     var setBodyClass = function() {
+
+        // Add mobile class for adaptive features
+        document.body.classList.add('mobile');
+
         if (mobile.orientation === 'landscape') {
-            $('body').addClass('landscape');
+            document.body.classList.add('landscape');
         }
         else {
-            $('body').removeClass('landscape');
+            document.body.classList.remove('landscape');
         }
     };
 
@@ -750,7 +754,7 @@ mBroadcaster.once('startMega:mobile', function() {
 
         if (dlmanager.isOverQuota) {
             onIdle(function() {
-                var $dialog = $('.fm-dialog.limited-bandwidth-dialog');
+                var $dialog = $('.limited-bandwidth-dialog');
 
                 if (mobile.orientation === 'landscape') {
                     $('.speedometer.full', $dialog).removeClass('big-104px-icon');
@@ -769,6 +773,15 @@ mBroadcaster.once('startMega:mobile', function() {
         console.debug('Device orientation is "%s"', mobile.orientation);
     }
     onIdle(setBodyClass);
+
+    if (is_android) {
+
+        document.documentElement.style.height = window.innerHeight + 'px';
+
+        $(window).rebind('resize.htmlheight', function() {
+            document.documentElement.style.height = window.innerHeight + 'px';
+        });
+    }
 });
 
 /**
@@ -898,8 +911,8 @@ function closeDialog() {
     }
 
     fm_hideoverlay();
-    $('.fm-dialog, .fm-dialog-mobile').trigger('dialog-closed').addClass('hidden');
-    $('.fm-dialog, .overlay.arrange-to-back, .fm-dialog-mobile').removeClass('arrange-to-back');
+    $('.mega-dialog, .fm-dialog-mobile, .fm-dialog').trigger('dialog-closed').addClass('hidden');
+    $('.mega-dialog, .overlay.arrange-to-back, .fm-dialog-mobile, .fm-dialog').removeClass('arrange-to-back');
 
     delete $.dialog;
     mBroadcaster.sendMessage('closedialog');

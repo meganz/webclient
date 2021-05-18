@@ -1,0 +1,1451 @@
+.fm-right-files-block.emptied .contact-requests-grid,
+.fm-right-files-block.emptied .sent-requests-grid,
+.fm-right-files-block.emptied .shared-grid-view,
+.fm-right-files-block.emptied .files-grid-view:not(.shared-folder-content),
+.fm-right-files-block.emptied .out-shared-grid-view {
+    display: none;
+}
+
+/* ============================ *\
+    files-grid-view - Wrapper
+\* ============================ */
+.files-grid-view,
+.files-grid-view.shared-view,
+.files-grid-view.out-shares-view,
+.files-grid-view.public-links-view,
+.files-grid-view.contacts-view {
+    box-sizing: border-box;
+    height: 100%;
+    overflow: hidden;
+    position: relative;
+}
+.files-grid-view.archived-chat-view {
+    top: 0;
+}
+
+.files-grid-view.contact-details-view {
+    height: 100%;
+}
+
+.fm-empty-incoming.contact-details-view {
+    height: 100%;
+    height: calc(100% - 211px);
+}
+
+.contact-requests-grid,
+.sent-requests-grid {
+    box-sizing: border-box;
+    height: 100%;
+    height: calc(100% - 72px);
+    margin-top: -1px;
+    position: relative;
+    white-space: nowrap;
+}
+
+.grid-url-header-nw {
+    width: 53px;
+}
+
+/* ============================ *\
+    contacts-grid-view - Wrapper
+\* ============================ */
+.contacts-grid-view {
+    box-sizing: border-box;
+    height: 100%;
+    height: calc(100% - 36px);
+    overflow: hidden;
+    position: relative;
+    top: -1px;
+}
+
+/* ============================ *\
+    shared-grid-view - Wrapper
+\* ============================ */
+.shared-grid-view {
+    box-sizing: border-box;
+    height: 100%;
+    overflow: hidden;
+    position: relative;
+}
+
+.shared-grid-view .grid-table {
+    table-layout: fixed;
+}
+
+
+/* ============================ *\
+    out-shared-grid-view - Wrapper
+\* ============================ */
+
+.out-shared-grid-view {
+    box-sizing: border-box;
+    height: 100%;
+    overflow: hidden;
+    position: relative;
+}
+.out-shared-grid-view .grid-table {
+    table-layout: fixed;
+}
+
+/* ============================ *\
+    transfer-table - Wrapper
+\* ============================ */
+
+.transfer-table-wrapper {
+    box-sizing: border-box;
+    height: 100%;
+    height: calc(100% - 36px);
+    overflow: hidden;
+    position: relative;
+    top: -1px;
+}
+
+.transfer-table-wrapper th:hover::before {
+    content: '';
+    position: absolute;
+    right: 7px;
+    bottom: 1px;
+    height: 20px;
+    width: 1px;
+    background: var(--surface-grey-2);
+    cursor: col-resize;
+}
+
+.transfer-table-wrapper th:last-child::before,
+.transfer-table-wrapper th:first-child::before,
+.transfer-table-wrapper th:nth-child(7)::before {
+    display: none;
+}
+
+/* ======================================== *\
+   contacts-details-view - Wrapper
+\* ======================================== */
+
+.contact-details-view .grid-table {
+    table-layout: fixed;
+}
+
+/* ======================================== *\
+   grid-scrolling-table
+\* ======================================== */
+.grid-wrapper {
+    box-sizing: content-box;
+    display: inline-block;
+    margin: 0 16px;
+    min-height: calc(100% - 5px);
+    min-width: calc(100% - 32px);
+    outline: 10px;
+    outline-color: var(--surface-main);
+    outline-offset: -10px;
+    outline-style: solid;
+    position: relative;
+}
+
+.grid-scrolling-table .jspPane {
+    min-height: 100%;
+}
+
+.grid-scrolling-table,
+.contacts-grid-scrolling-table,
+.grid-scrolling-table .jspContainer,
+.contacts-grid-scrolling-table .jspContainer,
+.grid-scrolling-table .jspPane,
+.contacts-grid-scrolling-table .jspPane {
+    max-width: 100%;
+    min-width: 100%;
+}
+
+.grid-scrolling-table,
+.contacts-grid-scrolling-table,
+.transfer-scrolling-table {
+    height: 100%;
+    height: calc(100% - 34px);
+}
+
+.archived-chats .grid-scrolling-table {
+    height: 100%;
+    height: calc(100% - 36px);
+}
+
+.transfer-scrolling-table {
+    /* do not remove, needed for perfect-scrollbar */
+    position: relative !important;
+}
+
+/* ======================================== *\
+   table
+\* ======================================== */
+table {
+    display: table;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+table tr td:first-child::after {
+    width: calc(100% - 8px);
+    left: auto;
+    right: -2px;
+}
+
+table tr td:last-child::after {
+    width: calc(100% - 8px);
+}
+
+/* ======================================== *\
+   table-hover
+\* ======================================== */
+.table-hover tr td {
+    z-index: 0;
+}
+
+.table-hover tr:hover td::before,
+.table-hover tr.ui-selected td::before {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 0;
+    right: 0;
+    bottom: 2px;
+    z-index: -1;
+}
+
+.table-hover tr:hover td::before {
+    background: var(--surface-grey-3);
+    border-bottom: 1px solid var(--grid-hover-border);
+    border-top: 1px solid var(--grid-hover-border);
+}
+
+.table-hover tr.ui-selected td::before {
+    background: var(--surface-grey-4);
+    border-bottom: 1px solid var(--surface-grey-4);
+    border-top: 1px solid var(--surface-grey-4);
+}
+
+.table-hover tr.ui-selected td:first-child::before {
+    background-image: linear-gradient(var(--secondary-blue), var(--secondary-blue));
+    background-size: 2px calc(100% - 8px);
+    background-repeat: no-repeat;
+    background-position: 4px;
+}
+.rtl .table-hover tr.ui-selected td:first-child::before {
+    background-position: calc(100% - 4px);
+}
+
+.table-hover tr:hover td:first-child::before,
+.table-hover tr.ui-selected td:first-child::before {
+    right: -2px;
+    left: 0;
+    border-radius: 4px 0 0 4px;
+}
+
+.rtl .table-hover tr:hover td:first-child::before,
+.rtl .table-hover tr.ui-selected td:first-child::before {
+    left: -2px;
+    right: 0;
+    border-radius: 0 4px 4px 0;
+}
+
+.table-hover tr:hover td:first-child::before {
+    border-left: 1px solid var(--grid-hover-border);
+}
+
+.rtl .table-hover tr:hover td:first-child::before {
+    border-left: none;
+    border-right: 1px solid var(--grid-hover-border);
+}
+
+.table-hover tr.ui-selected td:first-child::before {
+    border-left: 1px solid var(--surface-grey-4);
+}
+
+.rtl .table-hover tr.ui-selected td:first-child::before {
+    border-left: none;
+    border-right: 1px solid var(--surface-grey-4);
+}
+
+.table-hover tr:hover td:last-child::before,
+.table-hover tr.ui-selected td:last-child::before {
+    border-radius: 0 4px 4px 0;
+    right: 0;
+}
+.rtl .table-hover tr:hover td:last-child::before,
+.rtl .table-hover tr.ui-selected td:last-child::before {
+    border-radius: 4px 0 0 4px;
+    right: 0;
+    left: 0;
+}
+
+.table-hover tr:hover td:last-child::before {
+    border-right: 1px solid var(--grid-hover-border);
+}
+
+.rtl .table-hover tr:hover td:last-child::before {
+    border-left: 1px solid var(--grid-hover-border);
+    border-right: none;
+}
+
+.table-hover tr.ui-selected td:last-child::before {
+    border-right: 1px solid var(--surface-grey-4);
+}
+table tr:hover .grid-url-arrow,
+table tr.ui-selected .grid-url-arrow,
+table tr:hover .clear-transfer-icon,
+table tr.ui-selected .clear-transfer-icon,
+table tr:hover .link-transfer-status,
+table tr.ui-selected .link-transfer-status {
+     opacity: 1;
+}
+
+.rtl .table-hover tr.ui-selected td:last-child::before {
+    border-left: 1px solid var(--surface-grey-4);
+    border-right: none;
+}
+
+/* ======================================== *\
+   .grid-table-header - Wrapper & table
+\* ======================================== */
+
+.grid-table-header-container-sc {
+    position: relative;
+    background-color: var(--surface-main);
+}
+
+.grid-table-header-container-sc::after {
+    content: '';
+    width: calc(100% - 48px);
+    height: 1px;
+    bottom: 0;
+    left: 24px;
+    background-color: var(--surface-grey-2);
+    position: absolute;
+}
+
+.grid-table-header {
+    width: 100%;
+    background-color: var(--surface-main);
+    position: relative;
+    font-size: 0;
+    white-space: nowrap;
+    margin: 10px 16px 0;
+}
+
+.rtl .grid-table-header {
+    direction: rtl;
+}
+
+.grid-table-header::after {
+    content: '';
+    width: calc(100% - 34px);
+    height: 1px;
+    bottom: 0;
+    left: 0;
+    position: absolute;
+    background:
+        linear-gradient(
+            90deg,
+            var(--surface-main) 0%,
+            var(--surface-main) 8px,
+            var(--surface-grey-2) 8px,
+            var(--surface-grey-2) calc(100% - 8px),
+            var(--surface-main) calc(100% - 8px),
+            var(--surface-main) 100%
+        );
+}
+
+.grid-table-header .filter-block.body {
+    margin: 3px 0 0 0;
+    -webkit-margin-end: 18px;
+    margin-inline-end: 18px;
+}
+
+.grid-table-header th {
+    display: inline-block;
+    float: none;
+    box-sizing: border-box;
+    height: 24px;
+    font: var(--text-body2);
+    color: var(--surface-main-inverted);
+    text-align: start;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    position: relative;
+    -webkit-padding-start: 5px;
+    padding-inline-start: 5px;
+    -webkit-padding-end: 13px;
+    padding-inline-end: 13px;
+}
+
+.grid-table-header .grid-view-resize {
+    cursor: col-resize;
+    width: 16px;
+    position: absolute;
+    right: 0;
+}
+.rtl .grid-table-header .grid-view-resize {
+    right: auto;
+    left: 0;
+}
+
+.grid-table-header:not(.fm-fmview-table) th:not(.grid-url-header):hover::before {
+    content: '';
+    position: absolute;
+    right: 7px;
+    bottom: 1px;
+    height: 20px;
+    width: 1px;
+    background-color: var(--surface-grey-2);
+    cursor: col-resize;
+}
+.rtl .grid-table-header th:not(.grid-url-header):hover::before {
+    right: auto;
+    left: 7px;
+}
+
+.grid-table-header th.grid-first-th {
+    width: 75px;
+    padding: 0;
+    -webkit-padding-start: 12px;
+    padding-inline-start: 12px;
+    -webkit-padding-end: 14px;
+    padding-inline-end: 14px;
+}
+
+.grid-table-header.fm th.grid-first-th {
+    -webkit-padding-start: 5px;
+    padding-inline-start: 5px;
+    -webkit-padding-end: 0;
+    padding-inline-end: 0;
+}
+.grid-table-header.fm th:first-child {
+    padding: 0 6px;
+}
+.grid-table-header th:last-child::after {
+    display: none;
+}
+.grid-table-header th span.grid-header-star i,
+.grid-table-header th.grid-first-th i {
+    --icon-size: 16px;
+    --mask-color: var(--icon-rest);
+    -webkit-margin-start: 7px;
+    margin-inline-start: 7px;
+    display: inline-block;
+}
+
+.files-grid-view.fm .column-settings {
+    content: "";
+    display: inline-block;
+    position: absolute;
+    width: 40px;
+    height: 24px;
+    background-color: var(--surface-main);
+    right: 0;
+    top: 0;
+    z-index: 9;
+    cursor: pointer;
+}
+.rtl .files-grid-view.fm .column-settings {
+    right: auto;
+    left: 0;
+}
+
+.files-grid-view.fm .column-settings i {
+    --icon-size: 24px;
+    -webkit-margin-start: 8px;
+    margin-inline-start: 8px;
+    --mask-color: var(--icon-inactive);
+}
+
+.files-grid-view.fm .column-settings:hover i {
+    --mask-color: var(--icon-active);
+}
+
+.files-grid-view.fm .column-settings.c-opened i {
+    --mask-color: var(--icon-active);
+}
+
+.files-grid-view.fm .column-settings.overlap {
+    border-left: 1px solid var(--surface-grey-2);
+}
+
+.rtl .files-grid-view.fm .column-settings.overlap {
+    border-left: unset;
+    border-right: 1px solid var(--surface-grey-2);
+}
+
+.out-shared-grid-view > .grid-table-header::after {
+    width: calc(100% - 32px);
+}
+
+/* ======================================== *\
+   Table : grid-table
+\* ======================================== */
+
+table.grid-table {
+    width: 100%;
+    margin: 0 auto;
+    border-collapse: collapse;
+}
+
+table.grid-table tr {
+    border-bottom: 1px solid var(--surface-grey-2);
+}
+
+table.grid-table td:first-child {
+    padding-top: 3px;
+    -webkit-padding-start: 12px;
+    padding-inline-start: 12px;
+}
+
+table.grid-table td {
+    padding: 0;
+    -webkit-padding-start: 5px;
+    padding-inline-start: 5px;
+    -webkit-padding-end: 13px;
+    padding-inline-end: 13px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    position: relative;
+}
+
+table.grid-table .tranfer-filetype-txt {
+    left: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
+    -webkit-padding-start: 38px;
+    padding-inline-start: 38px;
+    padding-top: 7px;
+    box-sizing: border-box;
+    display: block;
+}
+
+table.grid-table .taken-down td,
+.taken-down .file-block-title,
+.taken-down .nw-fm-tree-folder,
+.taken-down .tranfer-filetype-txt,
+.taken-down .propreties-dark-txt {
+    color: var(--secondary-red);
+}
+table.grid-table .undecryptable td {
+    color: var(--surface-mid-grey);
+}
+table.grid-table .undecryptable .tranfer-filetype-txt,
+.undecryptable .file-block-title,
+.undecryptable .nw-fm-tree-folder,
+.undecryptable .shared-folder-name,
+.undecryptable .shared-folder-info,
+.undecryptable .propreties-dark-txt {
+    color: var(--secondary-orange);
+}
+
+table.grid-table .ver-col-container .ver-nb {
+    height: 18px;
+    color: var(--grid-text);
+    font: var(--text-body2);
+    display: inline-block;
+    width: 19px;
+    text-align: center;
+}
+table.grid-table .ver-col-container .ver-icon.versioning {
+    display: inline-block;
+}
+table.grid-table .ver-col-container .ver-icon.versioning .versioning-indicator {
+    position: relative;
+    display: inline-block;
+    line-height: 24px;
+}
+table.grid-table .ver-col-container .ver-size {
+    -webkit-margin-start: 8px;
+    margin-inline-start: 8px;
+    height: 16px;
+    border-radius: 8px;
+    background-color: var(--surface-mid-grey);
+    margin-top: 4px;
+    display: inline-block;
+}
+table.grid-table .ver-col-container .ver-size .ver-size-nb {
+    height: 15px;
+    color: var(--text-color-white-high);
+    font: var(--text-body2);
+    line-height: 15px;
+    text-align: center;
+    padding-left: 7px;
+    padding-right: 7px;
+}
+
+table.grid-table .grid-url-arrow {
+    height: 24px;
+    width: 24px;
+    display: block;
+    cursor: pointer;
+    transition: all 50ms ease-in-out;
+    position: absolute;
+    background-color: transparent;
+    top: 0;
+    left: 35px;
+    border-radius: 4px;
+    opacity: 0;
+    padding: 0 2px;
+}
+.rtl table.grid-table .grid-url-arrow {
+    left: auto;
+    right: 35px;
+}
+
+table.grid-table .grid-url-arrow i {
+    --icon-size: 24px;
+    --mask-color: var(--icon-inactive);
+}
+
+table.grid-table .grid-url-arrow:hover i,
+table.grid-table .grid-url-arrow.active i {
+    --mask-color: var(--icon-active);
+}
+
+table.grid-table .grid-url-header-nw .grid-url-arrow {
+    top: 17px;
+    left: auto;
+    right: 14px;
+}
+.rtl table.grid-table .grid-url-header-nw .grid-url-arrow {
+    left: 14px;
+    right: auto;
+}
+
+table.grid-table tr:not(.taken-down) .grid-status-icon:not(.read-only):not(.read-and-write) {
+    cursor: pointer;
+}
+
+table.grid-table .grid-status-icon {
+    --icon-size: 16px;
+    --mask-color: var(--icon-rest);
+    -webkit-margin-start: 7px;
+    margin-inline-start: 7px;
+    margin-top: 5px;
+    display: inline-block;
+}
+
+table.grid-table .grid-status-icon.icon-info {
+    background-color: var(--secondary-orange);
+}
+
+table.grid-table .grid-status-icon.icon-takedown {
+    --mask-color: var(--secondary-red);
+}
+
+table.grid-table i {
+    --mask-color: var(--icon-rest);
+    --icon-size: 24px;
+    display: inline-block;
+}
+
+table.grid-table tr:not(.linked) .icon-link {
+    display: none;
+}
+
+table.grid-table tr.linked .icon-link,
+table.grid-table td.linked .icon-link {
+    display: inline-block;
+    margin-top: 4px;
+}
+
+/* ======================================== *\
+   Table : grid-table fm
+\* ======================================== */
+
+.rtl table.fm {
+    direction: rtl;
+}
+
+table.fm td {
+    display: inline-block;
+    float: none;
+    z-index: 0;
+    box-sizing: border-box;
+    height: 31px;
+    font: var(--text-body2);
+    line-height: 31px;
+    padding: 0;
+    -webkit-padding-start: 5px;
+    padding-inline-start: 5px;
+    -webkit-padding-end: 13px;
+    padding-inline-end: 13px;
+    color: var(--text-color-medium);
+    text-align: start;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    position: relative;
+}
+
+table.fm td[megatype="fname"] {
+    min-width: 180px;
+}
+
+table.fm td:first-child {
+    -webkit-padding-start: 0;
+    padding-inline-start: 0;
+}
+
+table.fm tr {
+    white-space: nowrap;
+    width: 100%;
+}
+
+table.fm .transfer-filetype-icon,
+table.fm .grid-url-arrow,
+table.fm .data-item-icon,
+table.fm .versioning-indicator
+{
+    margin-top: 4px;
+    line-height: 32px;
+}
+table.fm .grid-status-icon {
+    margin-top: 8px;
+}
+
+/* ======================================== *\
+   index-table & wrapper
+\* ======================================== */
+.terms-page-content.terms .index-table {
+    margin: 24px auto;
+    width: 100%;
+}
+
+.terms-page-content.terms .index-table td {
+    font-family: var(--text-font-family);
+    padding: 8px 0;
+    -webkit-padding-end: 8px;
+    padding-inline-end: 8px;
+}
+
+.terms-page-content.terms .index-table td:not(:first-child) {
+    text-align: end;
+}
+
+/* ======================================== *\
+   developer-settings-table
+\* ======================================== */
+.bottom-page.developer-settings .developer-settings-table {
+    margin: auto;
+    text-align: start;
+}
+
+/* ======================================== *\
+   megasync-table
+\* ======================================== */
+.megasync-table {
+    background-color: white;
+    border-radius: 6px;
+    display: inline-block;
+    overflow: hidden;
+}
+.megasync-table table {
+    width: 640px;
+}
+.megasync-table table th,
+.megasync-table table td {
+    height: 80px;
+    box-sizing: border-box;
+    padding: 0 23px;
+    vertical-align: middle;
+    text-align: start;
+    white-space: nowrap;
+    border-left: 1px solid rgba(0,0,0,0.1);
+    font-weight: normal;
+}
+.megasync-table table td {
+    height: 63px;
+    border-top: 1px solid rgba(0,0,0,0.1);
+}
+.megasync-table table th:nth-child(1),
+.megasync-table table td:nth-child(1) {
+    background-color: #f2f2f2;
+    text-align: right;
+    width: 209px;
+    border-left: 0;
+}
+.megasync-table table th:nth-child(2),
+.megasync-table table td:nth-child(2) {
+    width: 216px;
+    padding: 0 26px;
+}
+.megasync-table table th:nth-child(3),
+.megasync-table table td:nth-child(3) {
+    width: 215px;
+    padding: 0 28px;
+}
+.megasync-table table th span,
+.megasync-table table td span {
+    font-size: 16px;
+    line-height: 40px;
+    color: rgba(51,51,51,1);
+    padding: 0;
+    background-image: url(../images/mega/download-sprite.png);
+    background-position: left 1000px;
+    background-repeat: no-repeat;
+    display: inline-block;
+}
+.megasync-table table span.tick {
+    background-position: -4px -1768px;
+}
+.megasync-table table span.dots {
+    background-position: -3px -1648px;
+}
+.megasync-table table span.globe {
+    background-position: -2px -1577px;
+    margin-left: -3px;
+    padding: 0 0 0 48px !important;
+}
+.megasync-table table span.sync {
+    background-position: 0 -1696px;
+    margin-left: -4px;
+    padding: 0 0 0 45px !important;
+}
+.megasync-table table th:nth-child(1) span,
+.megasync-table table td:nth-child(1) span {
+    color: rgba(51,51,51,0.7);
+    background-image: none;
+}
+.megasync-table table th:nth-child(2) span,
+.megasync-table table td:nth-child(2) span {
+    padding: 0 0 0 45px;
+}
+.megasync-table table th:nth-child(3) span,
+.megasync-table table td:nth-child(3) span {
+    padding: 0 0 0 41px;
+}
+
+/* ======================================== *\
+   contacts-view grid-table-header
+\* ======================================== */
+.contacts-view .grid-table-header th:first-child {
+    padding: 0 10px 0 16px;
+}
+
+/* ======================================== *\
+   contacts grid-table
+\* ======================================== */
+.contacts-view .grid-table {
+    table-layout: fixed;
+}
+
+table.contacts td {
+    z-index: 0;
+    height: 64px;
+    vertical-align: middle;
+}
+
+table.contacts td:first-child {
+    padding: 0 10px 0 16px;
+}
+
+table.contacts td .avatar-wrapper {
+    position: absolute;
+    top: 13px;
+    margin: 0;
+}
+
+table.contacts td .fm-chat-user-info {
+    float: none;
+    margin: 0 0 0 44px;
+    display: block;
+}
+
+table.contacts td .fm-chat-user {
+    font-size: 14px;
+    line-height: 18px;
+    color: #333;
+    margin-right: 20px;
+    font-family: 'source_sans_prosemibold', sans-serif;
+    display: block;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+table.contacts td .contact-email {
+    color: #777;
+    font-size: 13px;
+    line-height: 18px;
+    display: block;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+table.contacts td .nw-contact-status {
+    margin: 6px 6px 0 0;
+    border: 0;
+}
+
+table.contacts td {
+    vertical-align: middle;
+    height: 48px;
+}
+
+table.contacts tr:hover .ustatus {
+    transition: opacity 100ms ease-in-out;
+}
+
+table.contacts .contact-chat-buttons {
+    position: absolute;
+    left: 0;
+    top: 0;
+    padding: 15px 0 0 2px;
+    -moz-opacity: 0;
+    -khtml-opacity: 0;
+    opacity: 0;
+    z-index: 10;
+}
+
+table.contacts tr:hover .ustatus {
+    transition: opacity 100ms ease-in-out;
+}
+
+table.contacts tr:hover .contact-chat-buttons,
+table.contacts tr.ui-selected .contact-chat-buttons {
+    opacity: 1;
+}
+
+table.contacts tr:hover .ustatus,
+table.contacts tr.ui-selected .ustatus {
+    opacity: 0;
+}
+
+/* ======================================== *\
+   grid-table-user-management
+\* ======================================== */
+/* TODO: need to move from style.css */
+
+/* ======================================== *\
+   grid-table-header contact-requests
+\* ======================================== */
+.contact-requests-grid .grid-table tr td:first-child,
+.contact-requests-grid tr th:first-child {
+    padding: 0 12px 0 16px;
+}
+
+/* ======================================== *\
+   grid-table contact-requests
+\* ======================================== */
+.contact-requests-grid .grid-table tr td:first-child,
+.contact-requests-grid tr th:first-child {
+    padding: 0 12px 0 16px;
+}
+
+.grid-table.contact-requests td,
+.grid-table.sent-requests td {
+    height: 64px;
+}
+
+.grid-table.contact-requests td:last-child {
+    padding-right: 14px;
+}
+
+.contact-requests td:nth-child(2) {
+    width: 240px;
+}
+
+.contact-requests td:nth-child(3) {
+    width: 340px;
+}
+.contact-requests th:last-child::after {
+    display: none;
+}
+
+.contact-requests-grid .grid-table tr:hover .contact-request-button,
+.contact-requests-grid .grid-table tr.ui-selected .contact-request-button
+{
+    -moz-opacity: 1;
+    -khtml-opacity: 1;
+    opacity: 1;
+}
+
+/* ======================================== *\
+   grid-table sent-requests
+\* ======================================== */
+
+.sent-requests-grid .grid-table tr td:first-child,
+.sent-requests-grid tr th:first-child {
+    padding: 0 12px 0 16px;
+}
+
+.grid-table.sent-requests td:last-child {
+    padding-right: 14px;
+}
+
+.sent-requests td:nth-child(2) {
+    width: 240px;
+}
+
+.sent-requests td:nth-child(3) {
+    width: 340px;
+}
+.sent-requests th:last-child::after {
+    display: none;
+}
+
+.sent-requests-grid .grid-table tr:hover .contact-request-button,
+.sent-requests-grid .grid-table tr.ui-selected .contact-request-button {
+    -moz-opacity: 1;
+    -khtml-opacity: 1;
+    opacity: 1;
+}
+
+/* ======================================== *\
+   grid-table shared-with-me
+\* ======================================== */
+
+@media only screen and (max-width: 1368px) and (min-width: 320px)  {
+    table.shared-with-me td:nth-child(2) {
+        width: 150px !important;
+    }
+}
+
+table.shared-with-me td {
+    z-index: 0;
+}
+
+table.shared-with-me td {
+    vertical-align: middle;
+    height: 56px;
+}
+
+table.shared-with-me .avatar-wrapper {
+    position: absolute;
+    top: 11px;
+    margin: 0;
+}
+
+table.shared-with-me .shared-folder-icon {
+    background-image: url(../images/mega/files-icons.png);
+    background-position: -217px -4799px;
+    background-repeat: no-repeat;
+    width: 40px;
+    height: 37px;
+    position: absolute;
+    margin: -1px 0 0 0;
+}
+
+table.shared-with-me .shared-folder-info-block {
+    padding: 0 0 0 51px;
+    font: var(--text-body2);
+    display: block;
+    box-sizing: border-box;
+    position: relative;
+    text-align: left;
+}
+
+table.shared-with-me .shared-folder-info-block .shared-folder-name {
+    color: var(--text-color-high);
+    font: var(--text-body1);
+    display: block;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+table.shared-with-me .shared-folder-info-block .shared-folder-info {
+    color: var(--text-color-low);
+    font: var(--text-body2);
+    display: block;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+table.shared-with-me .fm-chat-user-info {
+    float: none;
+    margin: 0 0 0 44px;
+    display: block;
+}
+
+table.shared-with-me .fm-chat-user-info .fm-chat-user {
+    color: var(--text-color-high);
+    margin-right: 20px;
+    font: var(--text-body1);
+    display: block;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+table.shared-with-me .fm-chat-user-info .nw-contact-status {
+    margin: 6px 6px 0 0;
+}
+
+table.shared-with-me .fm-chat-user-info .fm-chat-user-status {
+    font: var(--text-body2);
+    color: var(--text-color-low);
+}
+table.shared-with-me .shared-folder-size {
+    font: var(--text-body2);
+}
+table.shared-with-me .shared-folder-access {
+    color: var(--text-color-medium);
+    display: block;
+}
+table.shared-with-me .shared-folder-access i {
+    display: inline-block;
+    margin-right: 5px;
+    --icon-size: 22px;
+}
+table.shared-with-me .shared-folder-access span {
+    display: inline-block;
+    vertical-align: middle;
+    font: var(--text-body2);
+}
+
+
+/* ======================================== *\
+   grid-table out-shares
+\* ======================================== */
+
+@media only screen and (max-width: 1368px) and (min-width: 320px)  {
+    table.out-shares td:nth-child(2) {
+        width: 150px !important;
+    }
+}
+
+table.out-shares td {
+    z-index: 0;
+    height: 56px;
+}
+
+table.out-shares .shared-folder-icon {
+    background-image: url(../images/mega/files-icons.png);
+    background-position: -217px -4799px;
+    background-repeat: no-repeat;
+    width: 40px;
+    height: 37px;
+    position: absolute;
+    margin: -1px 0 0 0;
+}
+table.out-shares .medium-file-icon {
+    width: 38px;
+    height: 38px;
+    background-position: -216px -3239px;
+    background-image: url(../images/mega/files-icons.png);
+    background-repeat: no-repeat;
+}
+
+table.out-shares .medium-file-icon.folder-shared {
+    background-position: -216px -5039px;
+}
+
+table.out-shares .shared-folder-info-block {
+    padding: 0 0 0 51px;
+    font: var(--text-body2);
+    display: block;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    position: relative;
+    text-align: left;
+}
+
+table.out-shares .shared-folder-info-block .shared-folder-name {
+    color: var(--text-color-high);
+    font: var(--text-body1);
+    display: block;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+table.out-shares .shared-folder-info-block .shared-folder-info {
+    color: var(--text-color-low);
+    font: var(--text-body2);
+    display: block;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+table.out-shares .fm-chat-users-wrapper.simpletip {
+    display: inline-block;
+    max-width: 100%;
+    vertical-align: top;
+}
+table.out-shares .fm-chat-users-wrapper.simpletip:hover {
+    text-decoration: underline;
+}
+table.out-shares .shared-folder-size,
+table.out-shares .last-shared-time,
+table.out-shares .fm-chat-users,
+table.out-shares .fm-chat-users-other {
+    color: var(--text-color-medium);
+    font: var(--text-body2);
+}
+table.out-shares .fm-chat-users {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* ======================================== *\
+   transfer-table-header
+\* ======================================== */
+
+.transfer-table-header {
+    width: calc(100% - 32px);
+    position: relative;
+    font-size: 0;
+    white-space: nowrap;
+    background-color: var(--surface-main);
+    margin: 0 16px;
+    min-width: 1152px;
+}
+.transfer-table-header th {
+    box-sizing: border-box;
+    height: 24px;
+    font: var(--text-body2);
+    padding: 0 13px 0 5px;
+    color: var(--surface-main-inverted);
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    position: relative;
+    display: table-cell;
+    float: none;
+}
+.transfer-table-header th:first-child span {
+    display: block;
+    background-image: url(../images/mega/fm-main-sprite.png);
+    background-repeat: no-repeat;
+    background-position: -6px -4019px;
+    height: 24px;
+}
+
+/* ======================================== *\
+   transfer-table
+\* ======================================== */
+
+.transfer-table-header::after {
+    content: '';
+    width: calc(100% - 16px);
+    height: 1px;
+    bottom: 0;
+    left: 8px;
+    background-color: var(--surface-grey-2);
+    position: absolute;
+}
+.fm-transfers-block td
+ {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    height: 32px;
+    line-height: 32px;
+    font-size: 13px;
+    padding: 0 13px 0 5px;
+    color: #707070;
+    font-weight: normal;
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    -o-text-overflow: ellipsis;
+    text-overflow: ellipsis;
+    position: relative;
+}
+.transfer-table {
+    border-collapse: collapse;
+    min-width: 1152px;
+}
+.transfer-table,
+.transfer-table tbody {
+    height: auto;
+    table-layout: fixed;
+    white-space: nowrap;
+}
+.transfer-table .tranfer-filetype-txt {
+    position: absolute;
+    left: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
+    padding-left: 30px;
+    padding-top: 7px;
+    box-sizing: border-box;
+    display: block;
+}
+.transfer-table .transfer-filetype-icon {
+    margin: 4px 0 0 -1px;
+}
+.transfer-table .transfer-type {
+    margin: 0 0 0 24px;
+}
+.transfer-table .transfer-type::before {
+    background-image: none;
+}
+.transfer-table tr {
+    border-bottom: 1px solid var(--surface-grey-2);
+}
+.transfer-table td {
+    color: var(--text-color-high);
+    padding-left: 5px;
+    height: 32px;
+    font: var(--text-body1);
+    cursor: default;
+    box-sizing: border-box;
+    position: relative;
+}
+.transfer-table td object {
+    position: absolute;
+    z-index: 10;
+    width: 100%;
+    height: 26px;
+    top: 0;
+    left: 0;
+    opacity: 0;
+}
+.transfer-table td:nth-child(1),
+.transfer-table-header th:nth-child(1) {
+    width: 60px;
+    background-image: none;
+    padding: 0;
+}
+.transfer-table td:nth-child(2),
+.transfer-table-header th:nth-child(2) {
+    width: 100%;
+    width: calc(100% - 972px);
+    padding-left: 0;
+}
+.transfer-table td:nth-child(2) {
+    vertical-align: top;
+}
+.transfer-table td:nth-child(3),
+.transfer-table-header th:nth-child(3) {
+    width: 288px;
+}
+.transfer-table td:nth-child(4),
+.transfer-table-header th:nth-child(4) {
+    width: 96px;
+}
+.transfer-table td:nth-child(5),
+.transfer-table-header th:nth-child(5) {
+    width: 96px;
+}
+.transfer-table td:nth-child(6),
+.transfer-table-header th:nth-child(6) {
+    width: 192px;
+}
+.transfer-table td:nth-child(7),
+.transfer-table-header th:nth-child(7) {
+    width: 192px;
+    background-image: none;
+}
+.transfer-table td:nth-child(8),
+.transfer-table-header th:nth-child(8) {
+    width: 69px;
+}
+.transfer-table td:nth-child(8)::before {
+    border-radius: 0 4px 4px 0;
+}
+.transfer-table td:nth-child(9),
+.transfer-table-header th:nth-child(9) {
+    width: 0;
+}
+.transfer-table-header th:nth-child(9),
+.transfer-table td:nth-child(9),
+.dndc-sort .transfer-table td:nth-child(9) {
+    display: none;
+}
+.transfer-table .link-transfer-status i,
+.transfer-table .grid-url-arrow i,
+.transfer-table .clear-transfer-icon i {
+    --icon-size: 24px;
+    display: inline-block;
+    --mask-color: var(--icon-rest);
+    vertical-align: middle;
+}
+.transfer-table .link-transfer-status:hover i,
+.transfer-table .grid-url-arrow i,
+.transfer-table .clear-transfer-icon:hover i {
+    --mask-color: var(--icon-active);
+}
+
+@media only screen and (max-width: 1260px) {
+    .transfer-table td:nth-child(2),
+    .transfer-table-header th:nth-child(2) {
+        width: 100%;
+        width: calc(100% - 876px);
+    }
+}
+
+@media only screen and (max-width: 1100px) {
+    .transfer-table td:nth-child(2),
+    .transfer-table-header th:nth-child(2) {
+        width: 100%;
+        width: calc(100% - 846px);
+    }
+}
+
+/* ======================================== *\
+   grid-table vouchers
+\* ======================================== */
+
+.fm-account-reseller .grid-table.vouchers {
+    table-layout: auto;
+}
+
+.grid-table.vouchers td:first-child {
+    padding-left: 12px;
+}
+
+/* ======================================== *\
+   grid-table arc-chat-messages-block
+\* ======================================== */
+
+table.arc-chat-messages-block td {
+    color: #333;
+    padding-left: 5px;
+    height: 24px;
+    line-height: 24px;
+    vertical-align: top;
+    font-size: 14px;
+    cursor: default;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    position: relative;
+}
+
+/* ======================================== *\
+   dev-new-appplications-table > grid-table
+\* ======================================== */
+
+.dev-new-appplications-table .grid-table th {
+    line-height: 27px !important;
+}
+.dev-new-appplications-table .grid-table th {
+    height: 30px;
+}
+.dev-new-appplications-table .grid-table td {
+    height: 31px;
+    color: #666666;
+}
+
+.dev-new-appplications-table .grid-table tr td:first-child {
+    padding-left: 10px;
+}
+.dev-new-appplications-table .grid-table td {
+    color: #666666;
+}
+.dev-new-appplications-table table.grid-table th:nth-child(4),
+.dev-new-appplications-table table.grid-table td:nth-child(4) {
+    width: 35px;
+    padding: 0;
+}
+
+
+/* =============== OLD implementation ================= */
+.shared-details-block .shared-folder-content .grid-table-header-container-sc {
+    z-index: 2;
+    position: relative;
+}

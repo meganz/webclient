@@ -1102,12 +1102,12 @@ pro.proplan = {
 function showLoginDialog(email, password) {
     'use strict';
     var $dialog = $('.pro-login-dialog');
-    var $inputs = $dialog.find('input');
-    var $button = $dialog.find('.big-red-button');
+    var $inputs = $('input', $dialog);
+    var $button = $('.top-dialog-login-button', $dialog);
 
     var closeLoginDialog = function() {
         $('.fm-dialog-overlay').unbind('click.proDialog');
-        $('.fm-dialog-close', $dialog).unbind('click.proDialog');
+        $('button.js-close', $dialog).unbind('click.proDialog');
         closeDialog();
         return false;
     };
@@ -1118,7 +1118,7 @@ function showLoginDialog(email, password) {
         accountinputs.init($dialog);
 
         // controls
-        $('.fm-dialog-close', $dialog).rebind('click.proDialog', closeLoginDialog);
+        $('button.js-close', $dialog).rebind('click.proDialog', closeLoginDialog);
         $('.fm-dialog-overlay').rebind('click.proDialog', closeLoginDialog);
 
         $('.input-email', $dialog).val(email || '');
@@ -1136,17 +1136,18 @@ function showLoginDialog(email, password) {
         });
 
 
-        $inputs.rebind('keydown.initdialog', function(e) {
+        $inputs.rebind('keydown.loginreq', function(e) {
             if (e.keyCode === 13) {
                 doProLogin($dialog);
             }
         });
 
-        $button.rebind('click.initdialog', function() {
+        $button.rebind('click.loginreq', function() {
             doProLogin($dialog);
         });
 
-        $button.rebind('keydown.initdialog', function(e) {
+        // eslint-disable-next-line sonarjs/no-identical-functions
+        $button.rebind('keydown.loginreq', function(e) {
             if (e.keyCode === 13) {
                 doProLogin($dialog);
             }
@@ -1324,7 +1325,7 @@ function showRegisterDialog() {
                 loadSubPage('propay_' + proNum);
             }
             else {
-                $('.fm-dialog.registration-page-success').removeClass('hidden');
+                $('.mega-dialog.registration-page-success').removeClass('hidden');
                 fm_showoverlay();
             }
         }
@@ -1351,11 +1352,10 @@ var showSignupPromptDialog = function() {
             'buttons': []
         });
         signupPromptDialog.rebind('onBeforeShow', function() {
-            $('.fm-dialog-title', this.$dialog).text(this.options.title);
 
             // custom buttons, because of the styling
-            $('.fm-notification-info', this.$dialog)
-                .safeHTML('<p>@@</p>', l[5842]);
+            $('header p', this.$dialog)
+                .safeHTML('@@', l[5842]);
 
             $('.pro-login', this.$dialog)
                 .rebind('click.loginrequired', function() {
@@ -1384,20 +1384,18 @@ var showSignupPromptDialog = function() {
                     }
                     return false;
                 }).find('span').text(l[1076]);
+
+            var $selectedPlan = $('.pricing-page.plan.selected', 'body');
+
+            $(this.$dialog).addClass('pro' + $selectedPlan.data('payment'));
         });
 
         signupPromptDialog.rebind('onHide', function() {
 
             // Set default icon
-            $('.icon', this.$dialog).attr('class', 'icon fm-notification-icon');
+            $(this.$dialog).removeClass('pro1 pro2 pro3 pro4');
         });
     }
 
     signupPromptDialog.show();
-
-    var $selectedPlan = $('.pricing-page.plan.selected', 'body');
-
-    $('.fm-dialog.loginrequired-dialog .icon')
-        .attr('class', 'icon pricing-sprite plan-icon pro' + $selectedPlan.data('payment'));
 };
-/* jshint +W003 */

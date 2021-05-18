@@ -31,8 +31,8 @@ export default class Giphy extends AbstractGenericMessage {
             message.isEditable() && (
                 <Button
                     key="delete-GIPHY-button"
-                    className="default-white-button tiny-button"
-                    icon="tiny-icon icons-sprite grey-dots">
+                    className="tiny-button"
+                    icon="sprite-fm-mono icon-options">
                     <Dropdown
                         className="white-context-menu attachments-dropdown"
                         noArrow={true}
@@ -40,9 +40,8 @@ export default class Giphy extends AbstractGenericMessage {
                         positionAt="right bottom"
                         horizOffset={4}>
                         <DropdownItem
-                            icon="red-cross"
+                            icon="sprite-fm-mono icon-dialog-close"
                             label={l[1730]}
-                            className="red"
                             onClick={e => onDelete(e, message)}/>
                     </Dropdown>
                 </Button>

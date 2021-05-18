@@ -1,34 +1,36 @@
-var React = require("react");
-var ReactDOM = require("react-dom");
-import {MegaRenderMixin} from "./../stores/mixins.js";
+import React from 'react';
+import { MegaRenderMixin } from '../stores/mixins';
 
 class ToggleCheckbox extends MegaRenderMixin {
-    constructor (props) {
+    constructor(props) {
         super(props);
         this.state = {
             value: this.props.value
         };
     }
-    onToggle() {
-        var newState = !this.state.value;
-        this.setState({'value': newState});
+
+    onToggle = () => {
+        const newState = !this.state.value;
+        this.setState({ value: newState });
         if (this.props.onToggle) {
             this.props.onToggle(newState);
         }
-    }
-    render() {
-        var self = this;
+    };
 
-        return  <div className={"toggle-checkbox " + (self.state.value ? " checked " : "") + self.props.className}
-                     onClick={function(e) {
-                         self.onToggle();
-                     }}>
-            <div className="toggle-checkbox-wrap">
-                <div className="toggle-checkbox-button"></div>
+    render() {
+        return (
+            <div
+                className={`
+                    mega-switch
+                    ${this.props.className}
+                    ${this.state.value ? 'toggle-on' : ''}
+                `}
+                onClick={this.onToggle}>
+                <div className="mega-feature-switch" />
             </div>
-        </div>;
+        );
     }
-};
+}
 
 class Checkbox extends MegaRenderMixin {
     constructor (props) {

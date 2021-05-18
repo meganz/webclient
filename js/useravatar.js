@@ -243,7 +243,7 @@ var useravatar = (function() {
         if (user === u_handle) {
             var myavatar = ns.mine();
 
-            $('.fm-avatar img,.fm-account-avatar img, .top-menu-popup .avatar-block', 'body')
+            $('.fm-avatar img,.fm-account-avatar img, .top-menu-popup .avatar-block img', 'body')
                 .attr('src', myavatar);
             $('.fm-account-avatar .avatar-bg span').css('background-image', 'url(' + myavatar + ')');
             $('.fm-avatar').show();

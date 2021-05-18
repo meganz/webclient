@@ -1,5 +1,5 @@
 .typing-block {
-	position: absolute;
+    position: absolute;
     padding: 0 0 0 72px;
     bottom: 1px;
     width: 100%;
@@ -8,19 +8,14 @@
     box-sizing: border-box;
 }
 .typing-text {
-	ont-size: 12px;
-    line-height: 15px;
-    color: #777777;
+    font: var(--text-body2);
+    line-height: 13px;
+    color: var(--text-color-low);
     display: inline-block;
-    max-width: 100%;
     white-space: nowrap;
-    -o-text-overflow: ellipsis;
     text-overflow: ellipsis;
     overflow: hidden;
-    max-width: -webkit-calc(100% - 66px);
-    max-width: -moz-calc(100% - 66px);
     max-width: calc(100% - 66px);
-    vertical-align: top;
 }
 .typing-bounce {
 	width: 34px;

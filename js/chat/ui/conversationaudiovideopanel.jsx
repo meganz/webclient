@@ -23,14 +23,14 @@ var VIEW_MODES = {
 function muteOrHoldIconStyle(opts, contact) {
     var props = {};
     if (opts.onHold) {
-        props.className = "small-icon icon-audio-muted on-hold simpletip";
+        props.className = "sprite-fm-mono icon-pause on-hold simpletip";
         props["data-simpletip"] = l[23542].replace("%s", M.getNameByHandle(contact.u));
     }
     else if (!opts.audio) {
-        props.className = "small-icon icon-audio-muted";
+        props.className = "sprite-fm-mono icon-audio-off";
     }
     else {
-        props.className = "small-icon hidden";
+        props.className = "hidden";
     }
     return props;
 }
@@ -63,11 +63,12 @@ class RemoteVideoPlayer extends MegaRenderMixin {
                     sess.peerNetworkQuality() === 0 ?
                         <div className="icon-connection-issues"></div> : null
                 }
-                <div className="center-avatar-wrapper" style={{left: "auto"}}>
+                <div className="center-avatar-wrapper theme-light-forced" style={{left: "auto"}}>
                     <div {...muteOrHoldIconStyle(peerMedia, contact)}></div>
                     <Avatar contact={contact}  className="avatar-wrapper" simpletip={contact.name}
                         simpletipWrapper="#call-block"
                         simpletipOffset={8}
+                        simpletipClass="in-call"
                         simpletipPosition="top"
                         hideVerifiedBadge={true}
                     />
@@ -730,19 +731,18 @@ class ConversationAVPanel extends MegaRenderMixin {
                         megaChat.rtc.ownNetworkQuality() === 0 ?
                             <div className="icon-connection-issues"></div> : null
                     }
-                    <div className="default-white-button tiny-button call"
+                    <button className="tiny-button call"
                         onClick={this.toggleLocalVideoDisplay.bind(this)}>
-                        <i className="tiny-icon grey-minus-icon"/>
-                    </div>
+                        <div>
+                            <i className="sprite-fm-mono icon-minimise"/>
+                        </div>
+                    </button>
                     <div className="center-avatar-wrapper">
                         <div {...muteOrHoldIconStyle(localMedia, M.u[u_handle])}></div>
                         <Avatar
                             contact={M.u[u_handle]}
                             chatRoom={this.props.chatRoom}
-                            className={
-                                "call avatar-wrapper is-avatar " +
-                                (this.state.localMediaDisplay ? "" : "hidden")
-                            }
+                            className="call avatar-wrapper is-avatar"
                             hideVerifiedBadge={true}
                         />
                     </div>
@@ -761,10 +761,12 @@ class ConversationAVPanel extends MegaRenderMixin {
                         megaChat.rtc.ownNetworkQuality() === 0 ?
                             <div className="icon-connection-issues"></div> : null
                     }
-                    <div className="default-white-button tiny-button call"
+                    <button className="tiny-button call"
                         onClick={this.toggleLocalVideoDisplay.bind(this)}>
-                        <i className="tiny-icon grey-minus-icon"/>
-                    </div>
+                        <div>
+                            <i className="tiny-icon grey-minus-icon"/>
+                        </div>
+                    </button>
                     <div {...muteOrHoldIconStyle(localMedia, M.u[u_handle])}></div>
                     <video
                         className="localViewport"
@@ -901,47 +903,50 @@ class ConversationAVPanel extends MegaRenderMixin {
         var notifBar = null;
 
         if (chatRoom.type === "group" || chatRoom.type === "public") {
+            const IS_GRID = self.getViewMode() === VIEW_MODES.GRID;
+            const EXCEEDS_MAX_PARTICIPANTS = participantsCount > MAX_PARTICIPANTS_FOR_GRID_MODE;
             header = (
                 <div className="call-header">
-                    <div className="call-topic">
-                        <utils.EmojiFormattedContent>
-                            {ellipsis(chatRoom.getRoomTitle(), 'end', 70)}
-                        </utils.EmojiFormattedContent>
-                    </div>
-                    <div className="call-participants-count">
-                        {chatRoom.getCallParticipants().length}
+                    <div className="call-header-column">
+                        <div className="call-topic">
+                            <utils.EmojiFormattedContent>
+                                {ellipsis(chatRoom.getRoomTitle(), 'end', 70)}
+                            </utils.EmojiFormattedContent>
+                        </div>
+                        <div className="call-participants-count">
+                            {chatRoom.getCallParticipants().length}
+                        </div>
                     </div>
 
-                    <a className={
-                        "call-switch-view " + (self.getViewMode() === VIEW_MODES.GRID ? " grid" : " carousel") +
-                        (participantsCount > MAX_PARTICIPANTS_FOR_GRID_MODE ||
-                            this.haveScreenSharingPeer() ? " disabled" : "")
-                    } onClick={function(e) {
-                        if (participantsCount > MAX_PARTICIPANTS_FOR_GRID_MODE) {
-                            return;
-                        }
+                    <div className="call-header-column">
+                        <i
+                            className={`
+                                call-switch-view
+                                sprite-fm-mono
+                                ${IS_GRID ? 'icon-speaker-view' : 'icon-thumbnail-view'}
+                                ${EXCEEDS_MAX_PARTICIPANTS || this.haveScreenSharingPeer() ? 'disabled' : ''}
+                            `}
+                            onClick={() =>
+                                EXCEEDS_MAX_PARTICIPANTS || self.setState({
+                                    selectedStreamSid: false,
+                                    viewMode: IS_GRID ? VIEW_MODES.CAROUSEL : VIEW_MODES.GRID
+                                })
+                            }
+                        />
+                        <div className={`call-av-counter ${videoSendersMaxed ? 'limit-reached' : ''}`}>
+                            {videoSessionCount} / {RtcModule.kMaxCallVideoSenders}
+                        </div>
 
-                        self.setState({
-                            'selectedStreamSid': false,
-                            'viewMode':
-                                self.getViewMode() === VIEW_MODES.GRID ?
-                                    VIEW_MODES.CAROUSEL :
-                                    VIEW_MODES.GRID
-                        });
-                    }}></a>
-                    <div className={"call-av-counter" + (
-                        videoSendersMaxed ? " limit-reached" : ""
-                    )}>{videoSessionCount} / {RtcModule.kMaxCallVideoSenders}</div>
-
-                    <div
-                        className={
-                            "call-video-icon" + (
-                                videoSendersMaxed.video ? " call-video-icon-warn" : ""
-                        )}>
-                    </div>
-                    <div className="call-header-duration"
-                        data-room-id={chatRoom.chatId}>
-                        {secondsToTimeShort(chatRoom._currentCallCounter)}
+                        <i
+                            className={`
+                                sprite-fm-mono
+                                icon-video-call-filled
+                                ${videoSendersMaxed.video ? 'warn' : ''}
+                            `}
+                        />
+                        <div className="call-header-duration" data-room-id={chatRoom.chatId}>
+                            {secondsToTimeShort(chatRoom._currentCallCounter)}
+                        </div>
                     </div>
                 </div>
             );
@@ -999,10 +1004,16 @@ class ConversationAVPanel extends MegaRenderMixin {
 
         var players = null;
         if (self.getViewMode() === VIEW_MODES.GRID) {
-            players = <div className="participantsWrapper" key="container">
-                <div className="participantsContainer" key="partsContainer">{remotePlayerElements}</div>
-                {localPlayerElement}
-            </div>;
+            players =
+                <div className="participantsWrapper" key="container">
+                    <div className="participantsContainer" key="partsContainer">
+                        <div className="call-counter" data-room-id={chatRoom.chatId}>
+                            {secondsToTimeShort(chatRoom._currentCallTimer)}
+                        </div>
+                        {remotePlayerElements}
+                    </div>
+                    {localPlayerElement}
+                </div>;
         }
         else { // carousel
             players = <div className="activeStreamWrap" key="container">
@@ -1055,13 +1066,13 @@ class ConversationAVPanel extends MegaRenderMixin {
         }
         else if (rtcCall.isOnHold() || otherPartyIsOnHold) {
             hugeOverlayDiv = <div className="callReconnecting dark">
-                <div className="call-on-hold body">
+                <div className={"call-on-hold body " + (otherPartyIsOnHold ? 'other-party' : 'me')}>
                     <div
-                        className={"call-on-hold icon " + (otherPartyIsOnHold ? "" : "white-bg")}
+                        className="call-on-hold icon"
                         onClick={otherPartyIsOnHold ? undefined : function() {
                             rtcCall.releaseOnHold();
                         }}>
-                            <i className={"big-icon " + (otherPartyIsOnHold ? "white-pause" : "grey-play")}></i>
+                            <i className={"sprite-fm-mono " + (otherPartyIsOnHold ? "icon-pause" : "icon-play")}></i>
                     </div>
                     <div className="call-on-hold txt">
                         {otherPartyIsOnHold ? l[23458] : l[23459]}
@@ -1089,13 +1100,14 @@ class ConversationAVPanel extends MegaRenderMixin {
 
             {topPanel}
 
-            <div className="call bottom-panel">
+            <div className="call bottom-panel theme-light-forced">
                 <div className={"button call left" + (unreadDiv ? " unread" : "")}
                     onClick={this.toggleMessages.bind(this)}>
                     {unreadDiv}
                     <i
-                        className="big-icon conversations simpletip"
+                        className="sprite-fm-mono icon-chat-filled simpletip"
                         data-simpletip={this.state.messagesBlockEnabled ? l[22892] : l[22891]}
+                        data-simpletip-class="in-call theme-light-forced"
                         data-simpletipoffset="5"
                     >
                     </i>
@@ -1110,13 +1122,13 @@ class ConversationAVPanel extends MegaRenderMixin {
                     }}>
                     <i
                         className={
-                            "big-icon simpletip " +
-                            (localMedia.audio ? "microphone" : "crossed-microphone")
+                            "sprite-fm-mono simpletip " +
+                            (localMedia.audio ? "icon-audio-filled" : "icon-audio-off")
                         }
                         data-simpletip={localMedia.audio ? l[16214] : l[16708]}
+                        data-simpletip-class="in-call theme-light-forced"
                         data-simpletipoffset="5"
-                    >
-                    </i>
+                    />
                 </div>
 
                 <div className={
@@ -1135,10 +1147,11 @@ class ConversationAVPanel extends MegaRenderMixin {
                     }}>
                     <i
                         className={
-                            "big-icon simpletip " +
-                            (callManagerCall.videoMode() === Av.Video ? "videocam" : "crossed-videocam")
+                            "sprite-fm-mono simpletip " +
+                            (callManagerCall.videoMode() === Av.Video ? "icon-video-call-filled" : "icon-video-off")
                         }
                         data-simpletip={callManagerCall.videoMode() === Av.Video ? l[22894] : l[22893]}
+                        data-simpletip-class="in-call theme-light-forced"
                         data-simpletipoffset="5"
                     >
                     </i>
@@ -1158,12 +1171,13 @@ class ConversationAVPanel extends MegaRenderMixin {
                     }}>
                     <i
                         className={
-                            "big-icon simpletip " +
-                            (rtcCall.isScreenCaptureEnabled() ? "screenshare" : "crossed-screenshare")
+                            "sprite-fm-mono simpletip " +
+                            (rtcCall.isScreenCaptureEnabled() ? "icon-end-screenshare" : "icon-screen-share")
                         }
                         data-simpletip={
                             rtcCall.isScreenCaptureEnabled() ? l[22890] : l[22889]
                         }
+                        data-simpletip-class="in-call theme-light-forced"
                         data-simpletipoffset="5"
                     >
                     </i>
@@ -1172,7 +1186,7 @@ class ConversationAVPanel extends MegaRenderMixin {
                 <Button
                     className="call"
                     disabled={rtcCall.isRecovery && rtcCall.isOnHold()}
-                    icon="big-icon white-dots">
+                    icon="sprite-fm-mono icon-options">
                     <Dropdown
                         className="dark black call-actions"
                         noArrow={true}
@@ -1183,14 +1197,14 @@ class ConversationAVPanel extends MegaRenderMixin {
 
                         {rtcCall.isOnHold() ?
                             <DropdownItem
-                                icon="white-play"
+                                icon="sprite-fm-mono icon-play"
                                 label={l[23459]}
                                 onClick={function() {
                                     rtcCall.releaseOnHold();
                                 }}
                             /> :
                             <DropdownItem
-                                icon="white-pause"
+                                icon="sprite-fm-mono icon-pause"
                                 label={l[23460]}
                                 onClick={function() {
                                     rtcCall.putOnHold();
@@ -1204,8 +1218,9 @@ class ConversationAVPanel extends MegaRenderMixin {
                     callManagerCall.endCall();
                 }}>
                     <i
-                        className="big-icon horizontal-red-handset simpletip"
+                        className="sprite-fm-mono icon-end-call simpletip"
                         data-simpletip={l[5884]}
+                        data-simpletip-class="in-call theme-light-forced"
                         data-simpletipoffset="5"
                     >
                     </i>
@@ -1213,7 +1228,12 @@ class ConversationAVPanel extends MegaRenderMixin {
 
                 <div className="button call right" onClick={this.fullScreenModeToggle.bind(this)}>
                     <i
-                        className="big-icon nwse-resize simpletip"
+                        className={`
+                            sprite-fm-mono
+                            ${this.state.fullScreenModeEnabled ? 'icon-fullscreen-leave' : 'icon-fullscreen-enter'}
+                            simpletip
+                        `}
+                        data-simpletip-class="in-call theme-light-forced"
                         data-simpletip={this.state.fullScreenModeEnabled ? l[22895] : l[17803]}>
                     </i>
                 </div>

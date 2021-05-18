@@ -9,8 +9,9 @@
     /* To use this animation, please set max-height to element that has slideItem class */
 }
 .slide-in-out.closed .slide-item {
-    max-height: 0;
-    padding: 0;
+    max-height: 0 !important;
+    padding-top: 0;
+    padding-bottom: 0;
 }
 /* End of slide In / Out animation */
 

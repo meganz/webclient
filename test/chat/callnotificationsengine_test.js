@@ -10,7 +10,7 @@ describe("CallNotificationsEngine tests", function () {
     var now = 1;
 
     beforeEach(function () {
-        clock = sinon.useFakeTimers("Date", "setTimeout", "clearTimeout");
+        clock = sinon.useFakeTimers();
         mStub(window, 'ChatRoom', {});
         mStub(Date, 'now').callsFake(function() {
             return now * 1000;

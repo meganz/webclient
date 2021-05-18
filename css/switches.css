@@ -1,0 +1,42 @@
+/* Default toggle checkbox. */
+/*
+ * <div class="mega-switch">
+ *     <div class="mega-feature-switch"></div>
+ * </div>
+* 'toggle-on' is addition class if checkbox is active
+* 'red' is addition class if active state is red
+*/
+.mega-switch {
+    box-shadow: inset 0 0 0 1px var(--switch-border-inactive);
+    background: var(--switch-fill-inactive);
+    border-radius: 40px;
+    cursor: pointer;
+    display: inline-block;
+    float: right;
+    height: 24px;
+    width: 48px;
+    box-sizing: border-box;
+}
+.rtl .mega-switch {
+    float: left;
+}
+.mega-switch.toggle-on {
+    background: var(--switch-fill-active);
+    box-shadow: inset 0 0 0 1px var(--switch-border-active);
+}
+.mega-switch .mega-feature-switch {
+    background: var(--switch-handle-fill);
+    border: 1px solid var(--switch-handle-border);
+    border-radius: 50%;
+    height: 16px;
+    width: 16px;
+    margin: 3px;
+    box-sizing: content-box;
+    background-clip: padding-box;
+    transition: margin-inline-start 100ms ease-in-out;
+    cursor: pointer;
+}
+.mega-switch.toggle-on .mega-feature-switch {
+    -webkit-margin-start: 27px;
+    margin-inline-start: 27px;
+}

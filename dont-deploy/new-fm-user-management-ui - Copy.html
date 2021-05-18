@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <style>
 @import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600');
-</style> 
+</style>
 <title>MEGA 2.0</title>
 <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
 <link rel="stylesheet" type="text/css" href="../css/style.css" />
@@ -13,7 +13,7 @@
 <script type="text/javascript" src="../js/jquery.mousewheel.js"></script>
 <script type="text/javascript" src="../js/jquery.mousewheel.js"></script>
 <script type="text/javascript">
-$(document).ready(function() {  
+$(document).ready(function() {
   function initTreePanelScroll()
   {
 	  $('.fm-tree-panel').jScrollPane({enableKeyboardNavigation:false,showArrows:true, arrowSize:5,animateScroll: true});
@@ -30,23 +30,23 @@ $(document).ready(function() {
   {
 	  $('.shared-blocks-scrolling').jScrollPane({enableKeyboardNavigation:false,showArrows:true, arrowSize:5,animateScroll: true});
   }
-  
-  
-  $.gridHeader = function()  
-  {	
+
+
+  $.gridHeader = function()
+  {
 		$('.grid-table tbody tr:first-child td').each(function(i,e) {
 		  var headerColumn = $('.grid-table-header th').get(i);
 		  $(headerColumn).width($(e).width());
 	    });
-   }	
-	
+   }
+
   initTreePanelScroll();
   initTransferPanelScroll();
   initSharedGridScroll();
   initSharedBlocksScroll();
   $.gridHeader();
-  
-  $(window).bind('resize', function () 
+
+  $(window).bind('resize', function ()
   {
 	  initTreePanelScroll();
       initTransferPanelScroll();
@@ -100,7 +100,7 @@ $(document).ready(function() {
   $('.nw-fm-left-icon').bind('mouseover', function () {
 	  var  tooltip = $(this).find('.nw-fm-left-tooltip');
 	  clearTimeout( initial );
-	  initial = window.setTimeout( 
+	  initial = window.setTimeout(
       function() {
         $(tooltip).addClass('hovered');
       }, 1000);
@@ -109,12 +109,12 @@ $(document).ready(function() {
 	    $(this).find('.nw-fm-left-tooltip').removeClass('hovered');
 		clearTimeout( initial );
   });
-  
+
   $('.fm-files-view-icon').bind('click', function () {
 	  if ($(this).attr('class').indexOf('active') == -1) {
 		  if ($(this).attr('class').indexOf('block-view') > -1) {
 			  $('.files-grid-view ').addClass('hidden');
-			  $('.fm-blocks-view').removeClass('hidden'); 
+			  $('.fm-blocks-view').removeClass('hidden');
               initSharedBlocksScroll();
 		  } else {
 			  $('.files-grid-view ').removeClass('hidden');
@@ -124,7 +124,7 @@ $(document).ready(function() {
 		  $('.fm-files-view-icon').removeClass('active');
 		  $(this).addClass('active');
 	  }
-  }); 
+  });
 });
 </script>
 </head>
@@ -136,6 +136,7 @@ $(document).ready(function() {
 		<div class="fm-main default">
 		 	<div class="nw-fm-left-icons-panel">
 		 	 	<div class="nw-fm-left-icon dashboard ui-droppable">
+
 	                <div class="nw-fm-left-border"></div>
 	                <div class="dark-tooltip">Dashboard</div>
 	            </div>
@@ -144,7 +145,7 @@ $(document).ready(function() {
 	                <div class="nw-fm-left-border"></div>
 	                <div class="dark-tooltip">Cloud Drive</div>
 	            </div>
-	            
+
 				<div class="nw-fm-left-icon inbox ui-droppable hidden">
 	                <div class="nw-fm-left-border"></div>
 	                <div class="dark-tooltip">Inbox</div>
@@ -172,7 +173,7 @@ $(document).ready(function() {
 	                <div class="nw-fm-left-border"></div>
 	                <div class="dark-tooltip">User Management</div>
 	                <div class="beta-text"></div>
-	            </div> 
+	            </div>
 
 				<div class="nw-fm-left-icon rubbish-bin ui-droppable">
 	                <div class="nw-fm-left-border"></div>
@@ -208,8 +209,8 @@ $(document).ready(function() {
 		 	<div class="fm-left-panel ui-resizable user-management-panel" style="width:256px">
 
             	<div class="left-pane-drag-handle ui-resizable-handle ui-resizable-e"></div>
-           
-            	<div class="user-management-sorting-menu hidden"> 
+
+            	<div class="user-management-sorting-menu hidden">
                     <div class="sorting-menu-arrow"></div>
                     <p> SORT </p>
 
@@ -223,7 +224,7 @@ $(document).ready(function() {
                     	<span>Status</span>
                     </div>
             	</div>
-            
+
             	<div class="fm-left-menu user-management">
 	                <div class="nw-fm-tree-header user-management">
 	                    <input value="" placeholder="User Management" type="text">
@@ -236,8 +237,8 @@ $(document).ready(function() {
 	                	<span>Enabled Accounts</span>
 	                <div class="user-management-tree-panel-arrows"></div>
             	</div>
-        
-	            <div class="fm-tree-panel" style="overflow: hidden; padding: 0px;">    
+
+	            <div class="fm-tree-panel" style="overflow: hidden; padding: 0px;">
 	            	<div class="jspContainer" style=" ">
 	                	<div class="jspPane" style="padding: 0px; top: 0px; left: 0px; width: 272px;">
 
@@ -265,7 +266,7 @@ $(document).ready(function() {
                 	<div class="user-management-tree-panel-arrows"></div>
             	</div>
 
-            	<div class="fm-tree-panel hidden" style="overflow: hidden; padding: 0px;">    
+            	<div class="fm-tree-panel hidden" style="overflow: hidden; padding: 0px;">
 	            	<div class="jspContainer" style=" ">
 	                	<div class="jspPane" style="padding: 0px; top: 0px; left: 0px; width: 272px;">
 
@@ -302,7 +303,7 @@ $(document).ready(function() {
 
 						<div class="default-white-button">
 							<div class="account-img"></div>
-							<span>Account</span> 
+							<span>Account</span>
 						</div>
 
 						<div class="default-green-button">
@@ -312,7 +313,7 @@ $(document).ready(function() {
                     </div>
 				</div>
 
-				<div class="files-grid-view user-management-view">  
+				<div class="files-grid-view user-management-view">
 					<div class="user-management-overview-bar">
 						<div class="user-management-overview-bar-data">
 								<div class="info-block">
@@ -335,14 +336,14 @@ $(document).ready(function() {
 								</div>
 								<div class="user-management-overview-bar-button">
 									<div class="view-plan-icon"></div>
-									<span>View Plans</span>  
+									<span>View Plans</span>
 								</div>
 						</div>
 					</div>
 
                     <table class="grid-table-user-management" width="100%" cellspacing="0" cellpadding="0" border="0">
 	                      	<tr class="grid-table-header-user-management">
-			                    <th>  
+			                    <th>
 		                    		<div class="checkdiv left checkboxOn small-user-management">
                                 	</div>
 			                    </th>
@@ -356,17 +357,17 @@ $(document).ready(function() {
 	                        </tr>
 
 	                        <tr>
-			                    <td>  
+			                    <td>
 		                    		<div class="checkdiv left checkboxOff small-user-management">
                                 	</div>
 			                    </td>
-			                    <td>			                    	
+			                    <td>
 	                                <div class="fm-user-management-user">
 	                                	<div class="admin-icon"></div>
-	                                	<div class="tooltip">Sub – administrators</div>	
+	                                	<div class="tooltip">Sub – administrators</div>
 	                                    <span>Jay Pierce</span>
 	                                </div>
-	                                <div class="user-management-email">alvah_powlowski@yahoo.com</div> 
+	                                <div class="user-management-email">alvah_powlowski@yahoo.com</div>
 			                    </td>
 			                    <td>
 			                    	<div class="user-management-status enabled"></div>
@@ -377,21 +378,21 @@ $(document).ready(function() {
 			                    <td>
 			                    	<div class="disable-icon icon"></div>
 			                    	<div class="edit-icon icon"></div>
-			                    	<div class="view-icon icon"></div>  	
+			                    	<div class="view-icon icon"></div>
 			                    </td>
                        		</tr>
 
 	                        <tr>
-			                    <td>  
+			                    <td>
 		                    		<div class="checkdiv left checkboxOn small-user-management">
                                 	</div>
 			                    </td>
-			                    <td>			                    	
+			                    <td>
 	                                <div class="fm-user-management-user">
-	                                	<div class="admin-icon" style="visibility: hidden;"></div>	
+	                                	<div class="admin-icon" style="visibility: hidden;"></div>
 	                                    <span>Jay Pierce</span>
 	                                </div>
-	                                <div class="user-management-email">alvah_powlowski@yahoo.com</div> 
+	                                <div class="user-management-email">alvah_powlowski@yahoo.com</div>
 			                    </td>
 			                    <td>
 			                    	<div class="user-management-status pending"></div>
@@ -402,11 +403,11 @@ $(document).ready(function() {
 			                    <td>
 			                    	<div class="disable-icon icon"></div>
 			                    	<div class="edit-icon icon"></div>
-			                    	<div class="view-icon icon"></div>  	
+			                    	<div class="view-icon icon"></div>
 			                    </td>
                        		</tr>
                     </table>
-                    
+
                     </div>
            		</div>
 			</div>

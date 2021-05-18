@@ -1,0 +1,513 @@
+/**
+  * Please read wiki article 'CSS Variables and Themes' before editing this file.
+  *
+  * All variable names are based on the design system and serve the purpose of bridging between the design and
+  * development teams. Other variables should be put elsewhere.
+  *
+  * Variable format: --type-purpose-color-importance-state, e.g. --text-body1-black-high-hover. Not all parts need
+  * to be added for all variables, and some parts may have multiple words (e.g. `line-height`).
+  *
+  * When styling, always use the most specific variable, e.g. if you are styling an element which should have
+  * body (1) text, use `--text-color-high` rather than `--text-color-white-high` so that it changes with
+  * the theme.
+  *
+  * The variables at the bottom will update their value when switching theme, and the attributes can be assigned
+  * to the body, or any element within it to give that element and its children a different theme, e.g. to demo
+  * themes, or for sections which are inverted compared to the rest of the theme (accents, etc.).
+  *
+  * Themes can be forced so that they are always on using the `-forced` suffix, for example the nav bar is always
+  * dark mode.
+  */
+
+
+/*** Section 1: constants that will not vary by theme, but may only be used by one theme at the moment ***/
+
+body {
+
+    /* colors */
+
+        /* left main navbar */
+            --navbar-background: #333333;
+
+        /* icons */
+
+            --icon-agnostic: #000;
+
+        /* labels */
+
+            --label-red: #ff625c;
+            --label-orange: #f9a646;
+            --label-yellow: #f4ce4a;
+            --label-green: #6dcc50;
+            --label-blue: #4bb8f3;
+            --label-purple: #d088e1;
+            --label-grey: #a4a4a7;
+
+            --label-red-hover: rgba(255, 98, 92, 0.6);
+            --label-orange-hover: rgba(249, 166, 70, 0.6);
+            --label-yellow-hover: rgba(244, 206, 74, 0.6);
+            --label-green-hover: rgba(109, 204, 80, 0.6);
+            --label-blue-hover: rgba(75, 184, 243, 0.6);
+            --label-purple-hover: rgba(208, 136, 225, 0.6);
+            --label-grey-hover: rgba(164, 164, 167, 0.6);
+
+        /* avatars */
+
+            --avatar-blue: linear-gradient(225deg, rgba(85, 210, 240, 1) 0%, rgba(43, 166, 222, 1) 100%);
+            --avatar-eggplant: linear-gradient(225deg, rgba(188, 32, 134, 1) 0%, rgba(136, 14, 79, 1) 100%);
+            --avatar-gold: linear-gradient(225deg, rgba(255, 210, 0, 1) 0%, rgba(255, 165, 0, 1) 100%);
+            --avatar-green: linear-gradient(225deg, rgba(95, 219, 0, 1) 0%, rgba(49, 181, 0, 1) 100%);
+            --avatar-jade: linear-gradient(225deg, rgba(0, 189, 178, 1) 0%, rgba(0, 137, 123, 1) 100%);
+            --avatar-orange: linear-gradient(225deg, rgba(255, 167, 0, 1) 0%, rgba(255, 111, 0, 1) 100%);
+            --avatar-purple: linear-gradient(225deg, rgba(228, 38, 155, 1) 0%, rgba(197, 17, 98, 1) 100%);
+            --avatar-red: linear-gradient(225deg, rgba(255, 98, 108, 1) 0%, rgba(255, 51, 58, 1) 100%);
+            --avatar-salmon: linear-gradient(225deg, rgba(255, 137, 137, 1) 0%, rgba(255, 82, 82, 1) 100%);
+            --avatar-sky: linear-gradient(225deg, rgba(154, 234, 255, 1) 0%, rgba(97, 210, 255, 1) 100%);
+            --avatar-teal: linear-gradient(225deg, rgba(0, 213, 226, 1) 0%, rgba(0, 172, 193, 1) 100%);
+            --avatar-yellow: linear-gradient(225deg, rgba(255, 235, 0, 1) 0%, rgba(255, 211, 0, 1) 100%);
+
+    /* text */
+
+        /* base colors */
+
+            /* black */
+
+                --text-color-black-higher: #333;
+                --text-color-black-high: #333;
+                --text-color-black-medium: rgba(51, 51, 51, 0.7);
+                --text-color-black-low: rgba(51, 51, 51, 0.4);
+
+            /* white */
+
+                --text-color-white-higher: #fff;
+                --text-color-white-high: #fff;
+                --text-color-white-medium: rgba(255, 255, 255, 0.7);
+                --text-color-white-low: rgba(255, 255, 255, 0.4);
+
+        /* font family */
+
+            --text-font-family: 'LatoWeb', sans-serif;
+            --text-font-family-bold: 'LatoWebBold', sans-serif;
+            --text-font-family-semibold: 'LatoWebSemibold', sans-serif;
+            --text-font-family-black: 'LatoWebBlack', sans-serif;
+            --text-font-family-light: 'LatoWebLight', sans-serif;
+            --text-font-family-code: 'source_code_proregular', monospace;
+
+        /* font */
+
+            --text-h1: 24px/36px var(--text-font-family);
+            --text-h2: 20px/30px var(--text-font-family);
+            --text-h3: 16px/24px var(--text-font-family);
+            --text-body1: 14px/20px var(--text-font-family);
+            --text-body2: 12px/18px var(--text-font-family);
+            --text-caption: 10px/16px var(--text-font-family);
+            --text-data: 40px/60px var(--text-font-family);
+
+            --text-h1-bold: bold 24px/36px var(--text-font-family-semibold);
+            --text-h2-bold: bold 20px/30px var(--text-font-family-semibold);
+            --text-h3-bold: bold 16px/24px var(--text-font-family-semibold);
+            --text-body1-bold: bold 14px/20px var(--text-font-family-semibold);
+
+            /* body2, caption and data are currently never bold */
+
+            --text-code1: 12px/24px var(--text-font-family-code);
+
+    /* transitions */
+
+        --transition-all: all 800ms ease-in-out;
+        --transition-border: border 200ms ease-in-out;
+        --transition-color: color 200ms ease-in-out;
+        --transition-bg-color: background-color 200ms ease-in-out;
+        --transition-opacity: opacity 200ms ease-in-out;
+        --transition-padding: padding 200ms ease-in-out;
+        --transition-shadow: box-shadow 200ms ease-in-out;
+}
+
+
+/*** Section 2: shorthand variables that will automatically update on changing theme ***/
+
+/* light theme */
+.theme-light,
+html .theme-light-forced {
+
+    /* secondary colors */
+
+        --secondary-blue: #2ba6de;
+        --secondary-green: #1db07b;
+        --secondary-orange: #ffa500;
+        --secondary-red: #fd3e38;
+        --secondary-white: #fff;
+        --secondary-grey: #ccc;
+
+    /* surfaces */
+
+        --surface-main: #ffffff;
+        --surface-grey-1: #fafafa;
+        --surface-grey-2: #eee;
+        --surface-grey-3: var(--surface-grey-1);
+        --surface-grey-4: var(--surface-grey-2);
+        --surface-grey-5: var(--surface-main);
+        --surface-grey-6: var(--surface-grey-2);
+        --surface-light-grey: /* not present in this theme */;
+        --surface-mid-grey: #ccc;
+        --surface-dark-grey: linear-gradient(180deg, rgba(85, 85, 85, 1) 0%, rgba(68, 68, 68, 1) 100%);
+        --surface-black: #000;
+        --surface-black-bar: rgba(0, 0, 0, 0.7);
+        --surface-scrim: rgba(255, 255, 255, 0.32);
+        --surface-warning: linear-gradient(180deg, rgba(255, 210, 0, 1) 0%, rgba(255, 165, 0, 1) 100%);
+        --surface-error: linear-gradient(180deg, rgba(255, 113, 105, 1) 0%, rgba(253, 62, 56, 1) 100%);
+        --surface-error-hover: linear-gradient(180deg, rgba(255, 95, 85, 1) 0%, rgba(252, 48, 42, 1) 100%);
+        --surface-error-active: linear-gradient(180deg, rgba(255, 132, 123, 1) 0%, rgba(253, 76, 69, 1) 100%);
+        --surface-progress-background: linear-gradient(180deg, rgba(85, 85, 85, 0.3) 0%, rgba(68, 68, 68, 0.3) 100%);
+        --surface-overlay: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.1) 0%, rgba(20, 20, 20, 0.3) 100%);
+        --surface-highlight-1: rgba(250, 250, 250, 0.8);
+        --surface-highlight-2: rgba(250, 250, 250, 0.4);
+
+    /* strokes */
+
+        --stroke-main: #fff;
+        --stroke-grey-1: #fafafa;
+        --stroke-grey-2: #eee;
+        --stroke-info: #2ba6de;
+        --stroke-success: #00bfa5;
+        --stroke-warning: #ff9924;
+        --stroke-error: #fd3e38;
+
+    /* icons */
+
+        --icon-rest: rgba(51, 51, 51, 0.7);
+        --icon-inactive: rgba(51, 51, 51, 0.3);
+        --icon-active: #333;
+
+    /* table */
+
+        --table-border: #f1f1f1;
+
+    /* text */
+
+        --text-color-higher: var(--text-color-black-higher);
+        --text-color-high: var(--text-color-black-high);
+        --text-color-medium: var(--text-color-black-medium);
+        --text-color-low: var(--text-color-black-low);
+        --text-color-info: #2ba6de;
+        --text-color-success: #00bfa5;
+        --text-color-warning: #ff9924;
+        --text-color-error: #fd3e38;
+
+    /* button */
+
+        --button-fill-positive: linear-gradient(180deg, rgba(62, 216, 178, 1) 0%, rgba(29, 176, 123, 1) 100%);
+        --button-fill-positive-hover: linear-gradient(180deg, rgba(47, 206, 161, 1) 0%, rgba(21, 159, 103, 1) 100%);
+        --button-fill-positive-active: linear-gradient(180deg, rgba(76, 255, 194, 1) 0%, rgba(36, 192, 141, 1) 100%);
+
+    /* banner */
+
+        --banner-text-error: #e33832;
+        --banner-text-info: #299cd1;
+        --banner-text-success: #06b17a;
+        --banner-text-warning: #e59400;
+
+        --banner-border-error: rgba(253, 62, 56, 0.5);
+        --banner-border-info: rgba(43, 166, 222, 0.5);
+        --banner-border-success: rgba(29, 176, 123, 0.5);
+        --banner-border-warning: rgba(255, 165, 0, 0.5);
+
+        --banner-background-error: rgba(253, 62, 56, 0.1);
+        --banner-background-info: rgba(43, 166, 222, 0.1);
+        --banner-background-success: rgba(29, 176, 123, 0.1);
+        --banner-background-warning: rgba(255, 165, 0, 0.1);
+
+    /* input border */
+
+        --input-text-underline-active: #2ba6de;
+        --input-text-underline-hover: #2ba6de;
+        --input-text-underline-error: #ff333a;
+
+    /* checkbox */
+
+        --checkbox-fill-active: linear-gradient(180deg, #0ed9b1 0%, #06b17a 100%);
+        --checkbox-fill-inactive: linear-gradient(180deg, #f2f2f2 0%, #ededed 100%);
+
+        --checkbox-border-inactive: rgba(0, 0, 0, 0.05);
+
+    /* radio */
+
+        --radio-fill-active: linear-gradient(180deg, #3ed8b2 0%, #1db07b 100%);
+        --radio-fill-inactive: rgba(182, 188, 191, 0.1);
+
+        --radio-border-active: #3ed8b2;
+        --radio-border-inactive: #b6bcbf;
+
+        --radio-oval-fill: rgba(34, 34, 34, 0.1);
+
+    /* switch */
+
+        --switch-fill-active: linear-gradient(180deg, #0ed9b1 0%, #06b17a 100%);
+        --switch-fill-inactive: rgba(182, 191, 189, 0.3);
+
+        --switch-border-active: rgba(0, 0, 0, 0.05);
+        --switch-border-inactive: rgba(182, 191, 189, 0.5);
+
+        --switch-handle-fill: linear-gradient(180deg, #fff 0%, #fcfcfc 100%);
+        --switch-handle-border: rgba(0, 0, 0, 0.05);
+
+    /* dialog */
+
+        --dialog-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.1);
+
+    /* dropdown */
+
+        --dropdown-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.1);
+        --dropdown-border: 1px solid #eee;
+
+    /* toast */
+
+        --toast-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.1);
+
+    /* dropdowns */
+
+        --dropdown-arrow-color: #fff;
+
+    /* context/dropdown menus */
+
+        --context-menu-border: 1px solid #eee;
+        --context-menu-background: #ffffff;
+        --context-menu-shadow: rgba(0,0,0,0.3);
+
+    /* divider */
+
+        --divider-color: #eee;
+
+    /* progress bars */
+
+        --progress-bar-fill1: #d90007;
+        --progress-bar-fill2: #ff333a;
+        --progress-bar-fill3: #ffa500;
+        --progress-bar-background: rgba(0, 0, 0, 0.2);
+
+    /* scroll bar */
+        --scroll-bar-background: rgba(0, 0, 0, 0.1);
+        --scroll-bar-handle: rgb(0, 0, 0);
+
+    /* Initial loading screen bars fill */
+        --progress-bar-fill4: #1d1d1d;
+
+    /* inverted */
+
+    /* TODO: remove this once the library is updated */
+        --surface-overlay-background: rgba(204, 204, 204, 0.9);
+        --surface-main-inverted: #333;
+        --surface-link-inverted: #676767;
+        --surface-grey-1-inverted: #222;
+        --stroke-grey-2-inverted: #444;
+        --text-color-high-inverted: var(--text-color-white-high);
+        --text-color-medium-inverted: var(--text-color-white-medium);
+        --text-color-low-inverted: var(--text-color-white-low);
+        --text-color-success-inverted: #5afee8;
+        --text-color-error-inverted: #ff7e79;
+        --icon-rest-inverted: #ccc;
+        --icon-active-inverted: #fff;
+
+        --secondary-blue-inverted: #6fd7ff;
+        --secondary-green-inverted: #81cfb3;
+        --secondary-orange-inverted: #ffbe00;
+        --secondary-red-inverted: #ff6560;
+
+    /* TEMP: variables */
+        --button-hover: rgba(0, 0, 0, 0.05);
+        --text-selection: rgba(0, 0, 0, 0.1);
+}
+
+/* dark theme */
+.theme-dark,
+html .theme-dark-forced {
+
+    /* secondary colors */
+
+        --secondary-blue: #6fd7ff;
+        --secondary-green: #81cfb3;
+        --secondary-orange: #ffbe00;
+        --secondary-white: #fff;
+        --secondary-red: #ff6560;
+        --secondary-grey: #ccc;
+
+    /* surfaces */
+
+        --surface-main: #333;
+        --surface-grey-1: #222;
+        --surface-grey-2: #444;
+        --surface-grey-3: var(--surface-grey-2);
+        --surface-grey-4: var(--surface-grey-1);
+        --surface-grey-5: var(--surface-grey-2);
+        --surface-grey-6: var(--surface-black);
+        --surface-light-grey: linear-gradient(180deg, rgba(230, 230, 230, 1) 0%, rgba(204, 204, 204, 1) 100%);
+        --surface-mid-grey: #666;
+        --surface-dark-grey: linear-gradient(180deg, #e6e6e6 0%, #ccc 100%);
+        --surface-black: #000;
+        --surface-black-bar: rgba(0, 0, 0, 0.7);
+        --surface-scrim: rgba(0, 0, 0, 0.32);
+        --surface-warning: linear-gradient(180deg, rgba(255, 235, 0, 1) 0%, rgba(255, 211, 0, 1) 100%);
+        --surface-error: linear-gradient(180deg, rgba(255, 158, 154, 1) 0%, rgba(255, 101, 96, 1) 100%);
+        --surface-error-hover: linear-gradient(180deg, rgba(255, 174, 171, 1) 0%, rgba(255, 119, 113, 1) 100%);
+        --surface-error-active: linear-gradient(180deg, rgba(255, 139, 134, 1) 0%, rgba(255, 83, 79, 1) 100%);
+        --surface-progress-background: linear-gradient(180deg, rgba(230, 230, 230, 0.3) 0%, rgba(204, 204, 204, 0.3) 100%);
+        --surface-overlay: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0.7) 100%);
+        --surface-highlight-1: rgba(34, 34, 34, 0.8);
+        --surface-highlight-2: rgba(34, 34, 34, 0.4);
+
+    /* strokes */
+
+        --stroke-main: #333;
+        --stroke-grey-1: #222;
+        --stroke-grey-2: #444;
+        --stroke-info: #6fd7ff;
+        --stroke-success: #5afee8;
+        --stroke-warning: #fec35a;
+        --stroke-error: #ff7e79;
+
+    /* icons */
+
+        --icon-rest: #ccc;
+        --icon-inactive: rgba(255, 255, 255, 0.3);
+        --icon-active: #fff;
+
+    /* table */
+
+        --table-border: #444;
+
+    /* text */
+
+        --text-color-higher: var(--text-color-white-higher);
+        --text-color-high: var(--text-color-white-high);
+        --text-color-medium: var(--text-color-white-medium);
+        --text-color-low: var(--text-color-white-low);
+        --text-color-info: #6fd7ff;
+        --text-color-success: #5afee8;
+        --text-color-warning: #fec35a;
+        --text-color-error: #ff7e79;
+
+    /* button */
+
+        --button-fill-positive: linear-gradient(180deg, rgba(14, 217, 177, 1) 0%, rgba(6, 177, 122, 1) 100%);
+        --button-fill-positive-hover: linear-gradient(180deg, rgba(17, 226, 193, 1) 0%, rgba(7, 193, 140, 1) 100%);
+        --button-fill-positive-active: linear-gradient(180deg, rgba(10, 206, 160, 1) 0%, rgba(4, 160, 103, 1) 100%);
+
+    /* banner */
+
+        --banner-text-error: #fff;
+        --banner-text-info: #fff;
+        --banner-text-success: #fff;
+        --banner-text-warning: #fff;
+        --banner-border-error: #fd3e38;
+        --banner-border-info: #2ba6de;
+        --banner-border-success: #1db07b;
+        --banner-border-warning: #ffa500;
+        --banner-background-error: rgba(253, 62, 56, 0.5);
+        --banner-background-info: rgba(43, 166, 222, 0.5);
+        --banner-background-success: rgba(29, 176, 123, 0.5);
+        --banner-background-warning: rgba(255, 165, 0, 0.5);
+
+
+    /* input border */
+
+        --input-text-underline-active: #6fd7ff;
+        --input-text-underline-hover: #6fd7ff;
+        --input-text-underline-error: #ff333a;
+
+
+    /* checkbox */
+
+        --checkbox-fill-active: linear-gradient(180deg, #08e7c0 0%, #03ca8b 100%);
+        --checkbox-fill-inactive: linear-gradient(180deg, #9f9f9f 0%, #666 100%);
+        --checkbox-border-inactive: rgba(255, 255, 255, 0.1);
+
+
+    /* radio */
+
+        --radio-fill-active: linear-gradient(180deg, #0ed9b1 0%, #06b17a 100%);
+        --radio-fill-inactive: linear-gradient(180deg, #9f9f9f 0%, #666 100%);
+        --radio-border-active: #0ed9b1;
+        --radio-border-inactive: rgba(255, 255, 255, 0.1);
+        --radio-oval-fill: rgba(255, 255, 255, 0.3);
+
+
+    /* switch */
+
+        --switch-fill-active: linear-gradient(180deg, #08e7c0 0%, #03ca8b 100%);
+        --switch-fill-inactive: linear-gradient(180deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.2) 100%);
+        --switch-border-active: rgba(255, 255, 255, 0.1);
+        --switch-border-inactive: rgba(255, 255, 255, 0.1);
+        --switch-handle-fill: linear-gradient(180deg, #fff 0%, #fcfcfc 100%);
+        --switch-handle-border: rgba(0, 0, 0, 0.05);
+
+
+    /* dialog */
+
+        --dialog-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.7);
+
+
+    /* dropdown/tooltip */
+
+        --dropdown-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.7);
+        --dropdown-border: 1px solid #444;
+
+    /* toast */
+
+        --toast-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.7);
+
+    /* dropdowns */
+
+        --dropdown-arrow-color: #333;
+
+    /* context/dropdown menus */
+
+        --context-menu-border: 1px solid #444;
+        --context-menu-background: #444444;
+        --context-menu-shadow: rgba(0,0,0,0.3);
+
+    /* divider */
+
+        --divider-color: rgba(255, 255, 255, 0.1);
+
+    /* progress bars */
+
+        --progress-bar-fill1: #d90007;
+        --progress-bar-fill2: #ff333a;
+        --progress-bar-fill3: #ffa500;
+        --progress-bar-background: rgba(255, 255, 255, 0.2);
+
+    /* scroll bar */
+        --scroll-bar-background: rgba(0, 0, 0, 0.2);
+        --scroll-bar-handle: rgb(255, 255, 255);
+
+    /* Initial loading screen bars fill */
+
+        --progress-bar-fill4: #1d1d1d;
+
+    /* inverted */
+
+    /* TODO: remove this once the library is updated */
+
+        --surface-overlay-background: rgba(0, 0, 0, 0.8);
+        --surface-main-inverted: #fff;
+        --surface-link-inverted: #C7C7C7;
+        --surface-grey-1-inverted: #fafafa;
+        --stroke-grey-2-inverted: #eee;
+        --text-color-high-inverted: var(--text-color-black-high);
+        --text-color-medium-inverted: var(--text-color-black-medium);
+        --text-color-low-inverted: var(--text-color-black-low);
+        --text-color-success-inverted: #00bfa5;
+        --text-color-error-inverted: #fd3e38;
+        --icon-rest-inverted: rgba(51, 51, 51, 70);
+        --icon-active-inverted: #333;
+
+        --secondary-blue-inverted: #2ba6de;
+        --secondary-green-inverted: #1db07b;
+        --secondary-orange-inverted: #ffa500;
+        --secondary-red-inverted: #fd3e38;
+
+    /* TEMP: variables */
+
+        --button-hover: rgba(255, 255, 255, 0.1);
+        --text-selection: rgba(255, 255, 255, 0.1);
+}

@@ -81,7 +81,7 @@
     line-height: 18px;
     margin: 5px 0 0 0;
 }
-.bottom-info.button {
+button.bottom-info {
     box-sizing: border-box;
     border: 1px solid rgba(0,0,0,0.05);
     border-radius: 3px;
@@ -96,11 +96,11 @@
     padding: 8px 25px;
     margin: 15px 0 0 0;
 }
-.bottom-info.button:hover {
+button.bottom-info:hover {
     background-color: #686565;
 }
 .bottom-info.fm-dialog-close {
-    background-image: url(../images/mega/dialog-sprite_v19.png);
+    background-image: url(../images/mega/dialog-sprite.png);
     cursor: pointer;
     height: 30px;
     width: 30px;

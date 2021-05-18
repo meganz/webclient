@@ -69,7 +69,7 @@ def traverse_directories(dirs, result_files, entries_function):
     """
     Traverses a directory tree to find all fine entries relevant for
     checking compliance for hashing (for `secureboot.js`)
-    
+
     :param  dirs: List of directories to search in.
     :param result_files: List to collect all result file paths in.
     :param entries_function: Function to collect entries from a path.
@@ -77,7 +77,7 @@ def traverse_directories(dirs, result_files, entries_function):
     for item in dirs:
         sub_dirs = entries_function(item, result_files)
         traverse_directories(sub_dirs, result_files, entries_function)
-    
+
 
 def analyse_files_for_special_chars(filename):
     """
@@ -105,7 +105,7 @@ def analyse_files_for_special_chars(filename):
                         test_fail = True
 
     return test_fail
-                        
+
 
 ## Check for translation strings.
 
@@ -118,11 +118,15 @@ def check_translation_strings():
     test_fail = False
 
     # Get language strings and add copyright year placeholder.
-    lang_strings = json.load(open('lang/en.json'))
+    try:
+        lang_strings = json.load(open('lang/en.json'))
+    except:
+        logging.warn('lang/en.json file not found, run scripts/lang.sh')
+        return test_fail
     lang_strings['0'] = ''
 
     # Check all HTML files.
-    lang_placeholder = re.compile(r'\[\$([0-9]+)\]', re.MULTILINE)
+    lang_placeholder = re.compile(r'\[\$(\w+)\]', re.MULTILINE)
     html_files = glob.glob('html/*.html')
     for html_file in html_files:
         content = open(html_file).read()
@@ -146,7 +150,7 @@ def main():
     logging.info('Checking for non-ASCII characters ...')
     result_files = []
     traverse_directories(['.'], result_files, _get_hashable_entries)
-    
+
     # Analyse for the special characters.
     for item in result_files:
         test_fail |= analyse_files_for_special_chars(item)
@@ -161,7 +165,7 @@ def main():
     if test_fail:
         sys.exit(1)
 
-    
+
 if __name__ == '__main__':
     # Set up logging.
     logging.basicConfig(level=logging.INFO,

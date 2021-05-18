@@ -68,7 +68,7 @@ class ModalDialog extends MegaRenderMixin {
         var $element = $(this.findDOMNode());
 
         if (
-            (!e || !$(e.target).closest(".fm-dialog").is($element))
+            (!e || !$(e.target).closest('.mega-dialog').is($element))
         ) {
             var convApp = document.querySelector('.conversationsApp');
             if (convApp) {
@@ -109,7 +109,7 @@ class ModalDialog extends MegaRenderMixin {
     render() {
         var self = this;
 
-        var classes = "fm-dialog " + self.props.className;
+        var classes = 'mega-dialog';
 
         var selectedNumEle = null;
         var footer = null;
@@ -140,19 +140,33 @@ class ModalDialog extends MegaRenderMixin {
             }
         }.bind(this));
 
+        if (self.props.className) {
+            classes += ` ${self.props.className}`;
+        }
+
+        if (self.props.dialogType) {
+            classes += ` dialog-template-${self.props.dialogType}`;
+        }
+
+        if (self.props.dialogName) {
+            classes += ` ${self.props.dialogName}`;
+        }
+
         if (self.props.showSelectedNum && self.props.selectedNum) {
             selectedNumEle = <div className="selected-num"><span>{self.props.selectedNum}</span></div>;
         }
 
+        var buttons;
         if (self.props.buttons) {
-            var buttons = [];
+            buttons = [];
             self.props.buttons.forEach(function(v, i) {
                 if (v) {
                     buttons.push(
-                        <a
+                        <button
                             className={
-                                (v.defaultClassname ? v.defaultClassname : "default-white-button right") +
-                                (v.className ? " " + v.className : "")
+                                (v.defaultClassname ? v.defaultClassname : "mega-button") +
+                                (v.className ? " " + v.className : "") +
+                                (self.props.dialogType === "action" ? "large" : "")
                             }
                             onClick={(e) => {
                                 if ($(e.target).is(".disabled")) {
@@ -162,37 +176,87 @@ class ModalDialog extends MegaRenderMixin {
                                     v.onClick(e, self);
                                 }
                             }} key={v.key + i}>
-                            {v.iconBefore ? <i className={v.iconBefore} /> : null}
-                            {v.label}
-                            {v.iconAfter ? <i className={v.iconAfter} /> : null}
-                        </a>
+                            {v.iconBefore ?
+                                <div>
+                                    <i className={v.iconBefore} />
+                                </div> : null
+                            }
+                            <span>{v.label}</span>
+                            {v.iconAfter ?
+                                <div>
+                                    <i className={v.iconAfter} />
+                                </div> : null
+                            }
+                        </button>
                     );
                 }
             });
 
-            footer = <div className="fm-dialog-footer white">
-                {extraFooterElements}
-                <div className="footer-buttons">
-                    {buttons}
-                </div>
-                <div className="clear"></div>
-            </div>;
+            if ((buttons && buttons.length > 0) || (extraFooterElements && extraFooterElements.length > 0)) {
+                footer = <footer>
+                    {buttons && buttons.length > 0 ?
+                        <div className="footer-container">
+                            {buttons}
+                        </div>
+                        : null
+                    }
+                    {extraFooterElements && extraFooterElements.length > 0 ?
+                        <aside>
+                            {extraFooterElements}
+                        </aside>
+                        : null
+                    }
+                </footer>;
+            }
         }
 
         return (
             <utils.RenderTo element={document.body} className="fm-modal-dialog" popupDidMount={this.onPopupDidMount}>
-                <div className={classes}>
-                    <div className="fm-dialog-close" onClick={self.onCloseClicked}></div>
+                <div className={classes}
+                    aria-labelledby={self.props.dialogName ? self.props.dialogName + "-title" : null}
+                    role="dialog"
+                    aria-modal="true"
+                    onClick={self.props.onClick}>
+                    <button className="close" onClick={self.onCloseClicked}>
+                        <i className="sprite-fm-mono icon-dialog-close"></i>
+                    </button>
                     {
                         self.props.title ?
-                            <div className="fm-dialog-title">{self.props.title}{selectedNumEle}</div> : null
+                            self.props.dialogType === "message" ?
+                                <header>
+                                    {
+                                        self.props.icon ?
+                                            <i className={`graphic ${self.props.icon}`} />
+                                            : null
+                                    }
+                                    <div>
+                                        <h3 id={self.props.dialogName ? self.props.dialogName + "-title" : null}>
+                                            {self.props.title}{selectedNumEle}
+                                        </h3>
+                                        {self.props.subtitle ? <p>{self.props.subtitle}</p> : null}
+                                        {otherElements}
+                                    </div>
+                                </header>
+                                :
+                                <header>
+                                    {
+                                        self.props.icon ?
+                                            <i className={`graphic ${self.props.icon}`} />
+                                            : null
+                                    }
+                                    <h2 id={self.props.dialogName ? self.props.dialogName + "-title" : null}>
+                                        {self.props.title}{selectedNumEle}
+                                    </h2>
+                                    {self.props.subtitle ? <p>{self.props.subtitle}</p> : null}
+                                </header>
+                            : null
                     }
 
-                    <div className="fm-dialog-content">
-                        {otherElements}
-                    </div>
+                    {
+                        self.props.dialogType !== "message" ? otherElements : null
+                    }
 
-                    {footer}
+                    {buttons || extraFooterElements ? footer : null}
                 </div>
             </utils.RenderTo>
         );
@@ -229,7 +293,7 @@ class SelectContactDialog extends MegaRenderMixin {
     render() {
         var self = this;
 
-        var classes = "send-contact contrast small-footer " + self.props.className;
+        var classes = "send-contact contrast small-footer dialog-template-tool " + self.props.className;
 
         return (
             <ModalDialog
@@ -240,44 +304,46 @@ class SelectContactDialog extends MegaRenderMixin {
                     self.props.onClose(self);
                 }}
                 buttons={[
-                        {
-                            "label": self.props.selectLabel,
-                            "key": "select",
-                            "defaultClassname": "default-grey-button lato right",
-                            "className": self.state.selected.length === 0 ? "disabled" : null,
-                            "onClick": function(e) {
-                                if (self.state.selected.length > 0) {
-                                    if (self.props.onSelected) {
-                                        self.props.onSelected(self.state.selected);
-                                    }
-                                    self.props.onSelectClicked(self.state.selected);
+                    {
+                        "label": self.props.cancelLabel,
+                        "key": "cancel",
+                        "onClick": function(e) {
+                            self.props.onClose(self);
+                            e.preventDefault();
+                            e.stopPropagation();
+                        }
+                    },
+                    {
+                        "label": self.props.selectLabel,
+                        "key": "select",
+                        "className": self.state.selected.length === 0 ? "positive disabled" : "positive",
+                        "onClick": function(e) {
+                            if (self.state.selected.length > 0) {
+                                if (self.props.onSelected) {
+                                    self.props.onSelected(self.state.selected);
                                 }
-                                e.preventDefault();
-                                e.stopPropagation();
+                                self.props.onSelectClicked(self.state.selected);
                             }
-                        },
-                        {
-                            "label": self.props.cancelLabel,
-                            "key": "cancel",
-                            "defaultClassname": "link-button lato left",
-                            "onClick": function(e) {
-                                self.props.onClose(self);
-                                e.preventDefault();
-                                e.stopPropagation();
-                            }
-                        },
-            ]}>
-            <ContactsUI.ContactPickerWidget
-                megaChat={self.props.megaChat}
-                exclude={self.props.exclude}
-                selectableContacts="true"
-                onSelectDone={self.props.onSelectClicked}
-                onSelected={self.onSelected}
-                selected={self.state.selected}
-                contacts={M.u}
-                headerClasses="left-aligned"
-                multiple={true}
-                />
+                            e.preventDefault();
+                            e.stopPropagation();
+                        }
+                    },
+                ]}>
+                <section className="content">
+                    <div className="content-block">
+                        <ContactsUI.ContactPickerWidget
+                            megaChat={self.props.megaChat}
+                            exclude={self.props.exclude}
+                            selectableContacts="true"
+                            onSelectDone={self.props.onSelectClicked}
+                            onSelected={self.onSelected}
+                            selected={self.state.selected}
+                            contacts={M.u}
+                            headerClasses="left-aligned"
+                            multiple={true}
+                        />
+                    </div>
+                </section>
             </ModalDialog>
         );
     }
@@ -288,7 +354,8 @@ class ConfirmDialog extends MegaRenderMixin {
         'confirmLabel': l[6826],
         'cancelLabel': l[82],
         'dontShowAgainCheckbox': true,
-        'hideable': true
+        'hideable': true,
+        'dialogType': 'message'
     };
 
     static saveState(o) {
@@ -311,13 +378,6 @@ class ConfirmDialog extends MegaRenderMixin {
         super(props);
         this._wasAutoConfirmed = undefined;
         this._keyUpEventName = 'keyup.confirmDialog' + this.getUniqueId();
-
-        if (Date.now() < 1616e9) {
-            mega.config.remove('xccd');
-        }
-        else {
-            console.error('^ REMOVE ME');
-        }
 
         /** @property this._autoConfirm */
         lazy(this, '_autoConfirm', () =>
@@ -387,7 +447,8 @@ class ConfirmDialog extends MegaRenderMixin {
             return null;
         }
 
-        var classes = "delete-message " + self.props.name + " " + self.props.className;
+        var classes = "delete-message" + (self.props.name ? ` ${self.props.name}` : "") +
+            (self.props.className ? ` ${self.props.className}` : "");
 
         var dontShowCheckbox = null;
         if (self.props.dontShowAgainCheckbox) {
@@ -411,38 +472,46 @@ class ConfirmDialog extends MegaRenderMixin {
         return (
             <ModalDialog
                 title={this.props.title}
+                subtitle={this.props.subtitle}
                 className={classes}
+                dialogId={this.props.name}
+                dialogType={this.props.dialogType}
+                icon={this.props.icon}
                 onClose={() => {
                     self.props.onClose(self);
                 }}
                 buttons={[
-                        {
-                            "label": self.props.confirmLabel,
-                            "key": "select",
-                            "className": null,
-                            "onClick": function(e) {
-                                self.onConfirmClicked();
-                                e.preventDefault();
-                                e.stopPropagation();
-                            }
-                        },
-                        {
-                            "label": self.props.cancelLabel,
-                            "key": "cancel",
-                            "onClick": function(e) {
+                    {
+                        "label": self.props.cancelLabel,
+                        "key": "cancel",
+                        /* eslint-disable-next-line sonarjs/no-identical-functions */
+                        "onClick": function(e) {
+                            self.props.onClose(self);
+                            e.preventDefault();
+                            e.stopPropagation();
+                        }
+                    },
+                    {
+                        "label": self.props.confirmLabel,
+                        "key": "select",
+                        "className": "positive",
+                        "onClick": function(e) {
                             ConfirmDialog.clearState(self);
-                                self.props.onClose(self);
-                                e.preventDefault();
-                                e.stopPropagation();
-                            }
-                        },
+                            self.onConfirmClicked();
+                            e.preventDefault();
+                            e.stopPropagation();
+                        }
+                    },
             ]}>
-                <div className="fm-dialog-content">
-                    {self.props.children}
-                </div>
-                <ExtraFooterElement>
-                    {dontShowCheckbox}
-                </ExtraFooterElement>
+
+                {self.props.children}
+
+                { dontShowCheckbox ?
+                    <ExtraFooterElement>
+                        {dontShowCheckbox}
+                    </ExtraFooterElement>
+                    : null
+                }
             </ModalDialog>
         );
     }

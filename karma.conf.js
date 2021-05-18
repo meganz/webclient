@@ -9,7 +9,7 @@ module.exports = function(config) {
     basePath: '',
 
     // Frameworks to use.
-    frameworks: ['mocha', 'chai', 'sinon-chai'],
+    frameworks: ['mocha', 'chai', 'sinon'],
 
     // List of files/patterns to load in the browser.
     // {included: false} files are loaded by requirejs
@@ -90,6 +90,7 @@ module.exports = function(config) {
         'js/fm/megadata/nodes.js',
         'js/fm/megadata/openfolder.js',
         'js/fm/megadata/render.js',
+        'js/fm/megadata/render-breadcrumbs.js',
         'js/fm/megadata/reset.js',
         'js/fm/megadata/sort.js',
         'js/fm/megadata/transfers.js',
@@ -114,6 +115,7 @@ module.exports = function(config) {
         'js/ui/miniui.js',
         'js/ui/export.js',
         'js/ui/dialog.js',
+        'js/ui/toast.js',
         'js/ui/feedbackDialog.js',
         'js/ui/credentialsWarningDialog.js',
         'js/ui/loginRequiredDialog.js',

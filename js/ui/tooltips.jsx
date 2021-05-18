@@ -61,6 +61,9 @@ class Tooltip extends MegaRenderMixin {
             chatGlobalEventManager.addEventListener('resize', 'tooltip' + this.getUniqueId(), function() {
                 self.repositionTooltip();
             });
+            if (this.props.onShown) {
+                this.props.onShown();
+            }
         }
     }
     repositionTooltip() {
@@ -135,8 +138,6 @@ class Tooltip extends MegaRenderMixin {
     render() {
         var self = this;
 
-        var classes = "" + this.props.className;
-
         var others = [];
         var handler = null;
         var contents = null;
@@ -169,7 +170,7 @@ class Tooltip extends MegaRenderMixin {
         });
 
         return (
-            <span className={classes}>
+            <span className={this.props.className || ''}>
                 {handler}
                 {contents}
                 {others}

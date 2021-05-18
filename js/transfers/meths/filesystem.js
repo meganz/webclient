@@ -734,7 +734,8 @@
             }
 
             if ($.msgDialog
-                    && $('#msgDialog:visible .fm-dialog-title').text() == WRITERR_DIAGTITLE) {
+                    // eslint-disable-next-line eqeqeq
+                    && $('#msgDialog:visible header h2').text() == WRITERR_DIAGTITLE) {
                 closeDialog();
             }
 

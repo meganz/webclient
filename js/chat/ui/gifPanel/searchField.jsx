@@ -24,8 +24,8 @@ export default class SearchField extends MegaRenderMixin {
             <div className="gif-panel-search">
                 <div className="gif-search-field">
                     {searching ?
-                        <i className="small-icon thin-back-icon" onClick={onBack} /> :
-                        <i className="small-icon thin-search-icon" />}
+                        <i className="sprite-fm-mono icon-left" onClick={onBack} /> :
+                        <i className="sprite-fm-mono icon-preview-reveal" />}
 
                     <input
                         ref={SearchField.inputRef}
@@ -35,7 +35,7 @@ export default class SearchField extends MegaRenderMixin {
                         value={value}
                         onChange={onChange} />
 
-                    {searching && <i className="small-icon tiny-reset" onClick={onReset} />}
+                    {searching && <i className="sprite-fm-mono icon-close-component" onClick={onReset} />}
                 </div>
 
                 <div className="giphy-logo">

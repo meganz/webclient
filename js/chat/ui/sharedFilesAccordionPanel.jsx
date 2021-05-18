@@ -231,7 +231,7 @@ class SharedFilesAccordionPanel extends MegaRenderMixin {
                 self.props.onToggle(e);
             }}>
                 <span>{this.props.title}</span>
-                <i className="tiny-icon right-arrow"></i>
+                <i className="sprite-fm-mono icon-arrow-down" />
             </div>
             <div className={"chat-shared-files-container" + (self.isLoadingMore ? "is-loading" : "")}>
                 {contents}

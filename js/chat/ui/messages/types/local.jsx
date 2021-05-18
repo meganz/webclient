@@ -75,34 +75,33 @@ export default class Local extends AbstractGenericMessage {
         let cssClass;
         switch (this.props.message.type) {
             case MESSAGE_TYPE.REJECTED:
-                cssClass = 'handset-with-stop';
+                cssClass = 'icon-handset-rejected';
                 break;
             case MESSAGE_TYPE.MISSED:
-                cssClass = 'handset-with-yellow-arrow';
+                cssClass = 'icon-handset-missed';
                 break;
-            case MESSAGE_TYPE.OUTGOING || MESSAGE_TYPE.HANDLED_ELSEWHERE:
-                cssClass = 'handset-with-up-arrow';
+            case MESSAGE_TYPE.OUTGOING:
+            case MESSAGE_TYPE.HANDLED_ELSEWHERE:
+                cssClass = 'icon-handset-outgoing';
                 break;
             case MESSAGE_TYPE.FAILED:
-                cssClass = 'handset-with-cross';
-                break;
-            case MESSAGE_TYPE.TIMEOUT:
-                cssClass = 'horizontal-handset';
-                break;
             case MESSAGE_TYPE.FAILED_MEDIA:
-                cssClass = 'handset-with-yellow-cross';
-                break;
-            case MESSAGE_TYPE.CANCELLED:
-                cssClass = 'crossed-handset';
+                cssClass = 'icon-handset-failed';
                 break;
             case MESSAGE_TYPE.ENDED:
-                cssClass = 'horizontal-handset';
+            case MESSAGE_TYPE.TIMEOUT:
+                cssClass = 'icon-handset-ended';
                 break;
-            case MESSAGE_TYPE.FEEDBACK || MESSAGE_TYPE.STARTING || MESSAGE_TYPE.STARTED:
-                cssClass = 'diagonal-handset';
+            case MESSAGE_TYPE.CANCELLED:
+                cssClass = 'icon-handset-cancelled';
+                break;
+            case MESSAGE_TYPE.FEEDBACK:
+            case MESSAGE_TYPE.STARTING:
+            case MESSAGE_TYPE.STARTED:
+                cssClass = 'icon-phone';
                 break;
             case MESSAGE_TYPE.INCOMING:
-                cssClass = 'handset-with-down-arrow';
+                cssClass = 'icon-handset-incoming';
                 break;
             default:
                 cssClass = this.props.message.type;
@@ -112,10 +111,11 @@ export default class Local extends AbstractGenericMessage {
     }
 
     _getIcon(message) {
+        const BASE_CLASS = 'call-info-icon sprite-fm-mono';
         const MESSAGE_ICONS = {
-            [MESSAGE_TYPE.STARTED]: '<i class="call-icon diagonal-handset green">&nbsp;</i>',
-            [MESSAGE_TYPE.ENDED]: '<i class="call-icon big horizontal-handset grey">&nbsp;</i>',
-            DEFAULT: `<i class="call-icon ${message.cssClass}">&nbsp;</i>`,
+            [MESSAGE_TYPE.STARTED]: `<i class="${BASE_CLASS} icon-phone">&nbsp;</i>`,
+            [MESSAGE_TYPE.ENDED]: `<i class="${BASE_CLASS} icon-handset-ended">&nbsp;</i>`,
+            DEFAULT: `<i class="${BASE_CLASS} ${message.cssClass}">&nbsp;</i>`,
         };
         return MESSAGE_ICONS[message.type] || MESSAGE_ICONS.DEFAULT;
     }
@@ -140,20 +140,21 @@ export default class Local extends AbstractGenericMessage {
             .replace("]]", "</span>");
 
         if (IS_GROUP) {
-            // `Group call started` -> `<i class="call-icon diagonal-handset green">&nbsp;</i>Group call started`
-            messageText = this._getIcon(message) + messageText;
-
-            // <div class="bold mainMessage">
-            //     <i class="call-icon big horizontal-handset grey" />
-            //     Group call ended
+            // <div class="call-info-container">
+            //     <i class="call-info-icon sprite-fm-mono icon-handset-ended" />
+            //     <div class="call-info-content">
+            //         <span class="call-info-message bold">Group call ended</span>
+            //         With <span class="bold">Edward Snowden</span>.
+            //         Call duration: <span class="bold">45 seconds</span>
+            //     </div>
             // </div>
-            // <div class="extraCallInfo">
-            //     With <span class="bold">Edward Snowden</span>.
-            //     Call duration: <span class="bold">45 seconds</span>
-            // </div>
-            messageText =
-                '<div class="bold mainMessage">' + messageText + '</div>' +
-                '<div class="extraCallInfo">' + this._getExtraInfo(message) + '</div>';
+            messageText = `
+                ${this._getIcon(message)}
+                <div class="call-info-content">
+                    <span class="call-info-message bold">${messageText}</span>
+                    ${this._getExtraInfo(message)}
+                </div>
+            `;
         }
 
         return messageText;
@@ -172,7 +173,7 @@ export default class Local extends AbstractGenericMessage {
                 <Avatar
                     key={handle}
                     contact={M.u[handle]}
-                    simpletip={M.u[handle] && M.u[handle].name}
+                    simpletip={handle in M.u && M.u[handle].name}
                     className="message avatar-wrapper small-rounded-avatar"
                 />
             );
@@ -190,15 +191,19 @@ export default class Local extends AbstractGenericMessage {
                     {Object.keys(message.buttons).map(key => {
                         const button = message.buttons[key];
                         return (
-                            <div
+                            <button
                                 key={key}
                                 className={button.classes}
                                 onClick={e =>
                                     button.callback(e.target)
                                 }>
-                                {button.icon && <i className={`small-icon ${button.icon}`} />}
-                                {button.text}
-                            </div>
+                                {button.icon && (
+                                    <div>
+                                        <i className={`small-icon ${button.icon}`} />
+                                    </div>
+                                )}
+                                <span>{button.text}</span>
+                            </button>
                         );
                     })}
                     <div className="clear" />
@@ -217,7 +222,7 @@ export default class Local extends AbstractGenericMessage {
             />;
         const $$ICON =
             <div className="feedback call-status-block">
-                <i className={"call-icon " + message.cssClass} />
+                <i className={`sprite-fm-mono ${message.cssClass}`} />
             </div>;
 
         return (
@@ -252,7 +257,7 @@ export default class Local extends AbstractGenericMessage {
 
     getClassNames() {
         const { message: { showInitiatorAvatar, type }, grouped } = this.props;
-        let classNames = [
+        const classNames = [
             showInitiatorAvatar && grouped && 'grouped',
             this._roomIsGroup() && type !== MESSAGE_TYPE.OUTGOING && type !== MESSAGE_TYPE.INCOMING && 'with-border'
         ];
@@ -269,7 +274,7 @@ export default class Local extends AbstractGenericMessage {
                 <ContactButton
                     contact={contact}
                     className="message"
-                    label={M.getNameByHandle(message.authorContact.u)}
+                    label={message.authorContact ? M.getNameByHandle(message.authorContact.u) : ''}
                     chatRoom={message.chatRoom}
                 /> :
                 M.getNameByHandle(contact.u)
@@ -283,7 +288,7 @@ export default class Local extends AbstractGenericMessage {
                 <div className="message text-block">
                     <div className="message call-inner-block">
                         {this._getAvatarsListing()}
-                        <div dangerouslySetInnerHTML={{ __html: this._getText() }} />
+                        <div className="call-info-container" dangerouslySetInnerHTML={{ __html: this._getText() }} />
                     </div>
                 </div>
                 {getState && getState() === Message.STATE.NOT_SENT ? null : this._getButtons()}

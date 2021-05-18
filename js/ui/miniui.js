@@ -49,6 +49,7 @@ var uiPlaceholders = function($scope) {
  * @returns {jQuery}
  */
 var uiCheckboxes = function($scope, saveState, stateChangeCb, initialState) {
+
     if (typeof saveState === 'function') {
         initialState = stateChangeCb;
         stateChangeCb = saveState;

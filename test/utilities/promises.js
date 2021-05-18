@@ -103,5 +103,18 @@ PromiseHelpers.prototype.expectPromiseToFail = function(promise, promiseFailedVa
 
 
 PromiseHelpers.prototype.promiseQueue = function() {
-    return MegaPromise.QueuedPromiseCallbacks();
+    let callback;
+    let count = 0;
+    const queue = mutex.bind(null, 'karma:test:' + Date.now() + '/' + Math.random());
+    const dispatch = () => !--count && callback();
+    return {
+        tick: () => {},
+        whenFinished: (cb) => {
+            callback = cb;
+        },
+        queue: (fc) => {
+            ++count;
+            queue((resolve, reject) => fc().then(resolve).catch(reject))().then(dispatch).catch(dump)
+        }
+    };
 };

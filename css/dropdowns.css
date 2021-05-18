@@ -111,8 +111,9 @@
 
 .dropdown.body .retention-history-menu__list > .retention-history-menu__list__elem i {
     --icon-size: 24px;
-    margin-inline-end: 0;
     --mask-color: var(--secondary-green);
+    -webkit-margin-end: 0;
+    margin-inline-end: 0;
 }
 
 .dropdown.body .dropdown-item {
@@ -284,7 +285,7 @@
 }
 /*  Item with tick */
 .dropdown-item.tick-item.active .status-text {
-    -webkit-padding-end: 8px;
+    -webkit-margin-end: 8px;
     margin-inline-end: 8px;
 }
 .dropdown-item.tick-item.active::after {

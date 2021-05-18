@@ -19,7 +19,7 @@ Requirements:
 This script will work with both Python 2.7 as well as 3.x.
 """
 
-import copy, json, os, requests, sys, re, subprocess, time, io, random
+import copy, json, os, requests, sys, re, subprocess, time, io, random, argparse
 from threading import Thread
 from collections import OrderedDict
 from natsort import natsorted # Use version 6.2.1
@@ -237,22 +237,33 @@ def download_languages(resource, lang = []):
 
     return languages
 
-def get_branch_resource_name(is_upload = False):
+def get_branch_resource_name(is_upload = False, is_force = False):
     branch_name = subprocess.check_output(['git', 'branch', '--show-current'], universal_newlines=True).strip()
     if branch_name in ["master", "develop"]:
-        print("Error: Updating string is not allowed in this branch.")
+        if is_upload:
+            print("Error: Updating string is not allowed in this branch.")
         return False
     branch_resource_name =  RESOURCE + "-" + re.sub('[^A-Za-z0-9]+', '', branch_name)
     url = BASE_URL + "/resources/" + PROJECT_ID + ":r:" + branch_resource_name
     response = requests.get(url, headers=HEADER)
     content = response.json()
     if response.status_code == 200:
+        print("Resource file is found for this branch. ")
         return branch_resource_name
     elif response.status_code == 404:
         print("Resource file does not exist for this branch. ")
         if not is_upload:
             print("")
             return False
+        if is_force:
+            version = sys.version_info.major
+            input_note = "WARNING: Only create an empty branch resource if sub-branches will be made for this branch in future. Type \"YES\" to proceed: "
+            if version == 2:
+                user_input = raw_input(input_note)
+            else:
+                user_input = input(input_note)
+            if user_input != "YES":
+                return True
         print("Creating new resource... ")
         sys.stdout.flush()
         url = BASE_URL + "/resources"
@@ -341,7 +352,8 @@ def get_differences():
         new_strings = json.loads(new_file.read())
         new_file.close()
     except IOError:
-        sys.exit("Error: File not found.")
+        print("Error: File not found.")
+        sys.exit(1)
 
     gitlab_header = {'Private-Token': GITLAB_TOKEN}
     current_strings = requests.get(GITLAB_DEVELOP_STRINGS_URL, headers=gitlab_header).json()
@@ -353,7 +365,8 @@ def get_differences():
     if new_strings_found:
         print("New string(s) file found! Checking validity...")
         if not string_validation(new_strings_found):
-            sys.exit("Error: Invalid new string(s).")
+            print("Error: Invalid new string(s).")
+            sys.exit(1)
         else:
             print("New strings are valid! :)")
             return new_strings_found
@@ -363,63 +376,71 @@ def get_differences():
 
 def main():
     print("Export Started")
+    languages = ""
     is_prod = False
-    lang = []
     branch_resource_name = None
 
-    if len(sys.argv) > 1:
-        arg = sys.argv[1]
-        if arg == 'production':
-            is_prod = True
-        elif arg == 'lang':
-            try:
-                lang = sys.argv[2].split(",")
-            except:
-                sys.exit("Invalid language arguments")
-        elif arg == 'update':
-            new_strings = get_differences()
-            if new_strings:
-                branch_resource_name = get_branch_resource_name(True)
-                if not branch_resource_name:
-                    sys.exit()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-p", "--production", nargs="?", help="Create production language files", const=True, default=False)
+    parser.add_argument("-l", "--language", nargs="+", help="Select several languages to fetch in comma separated value. (Use Webclient's language code)")
+    parser.add_argument("-u", "--update", nargs="*", help="Parse strings.json and update branch resource file", type=str)
+    args = parser.parse_args()
+    if args.production:
+        is_prod = args.production
+    elif args.language != None and len(args.language) > 0:
+        try:
+            languages = args.language[0].split(",")
+        except:
+            print("Invalid language arguments")
+            sys.exit(1)
+    elif args.update != None:
+        new_strings = get_differences()
+        is_force = not new_strings and len(args.update) > 0 and args.update[0] == "force"
+        if new_strings or is_force:
+            branch_resource_name = get_branch_resource_name(True, is_force)
+            if not branch_resource_name:
+                print("Failed to get branch resource name")
+                sys.exit(1)
 
-                # Push new string to the branch resource file
-                print("Pushing new strings to branch resource file... ")
-                sys.stdout.flush()
-                url = BASE_URL + "/resource_strings_async_uploads"
-                payload = {
-                    "data": {
-                        "attributes": {
-                            "content": json.dumps(new_strings),
-                            "content_encoding": "text",
-                        },
-                        "relationships": {
-                            "resource": {
-                                "data": {
-                                    "id": PROJECT_ID + ":r:" + branch_resource_name,
-                                    "type": "resources",
-                                },
+        if new_strings:
+            # Push new string to the branch resource file
+            print("Pushing new strings to branch resource file... ")
+            sys.stdout.flush()
+            url = BASE_URL + "/resource_strings_async_uploads"
+            payload = {
+                "data": {
+                    "attributes": {
+                        "content": json.dumps(new_strings),
+                        "content_encoding": "text",
+                    },
+                    "relationships": {
+                        "resource": {
+                            "data": {
+                                "id": PROJECT_ID + ":r:" + branch_resource_name,
+                                "type": "resources",
                             },
                         },
-                        "type": "resource_strings_async_uploads",
                     },
-                }
-                success = send_upload_request(url, payload)
-                if success:
-                    print("Completed")
-                print("")
+                    "type": "resource_strings_async_uploads",
+                },
+            }
+            success = send_upload_request(url, payload)
+            if success:
+                print("Completed")
+            print("")
 
     print("Fetching Main Language Files...")
-    lang = download_languages(RESOURCE, lang)
+    lang = download_languages(RESOURCE, languages)
     if not lang:
-        sys.exit("Failed to fetch main language files.")
+        print("Failed to fetch main language files.")
+        sys.exit(1)
 
     print("")
     if not branch_resource_name:
         branch_resource_name = get_branch_resource_name()
     if not is_prod and branch_resource_name:
         print("Fetching Branch Language Files...")
-        lang_branch = download_languages(branch_resource_name, lang)
+        lang_branch = download_languages(branch_resource_name, languages)
         if lang_branch:
             merge_language(lang, lang_branch)
         else:

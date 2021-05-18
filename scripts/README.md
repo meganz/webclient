@@ -62,7 +62,7 @@ _What's happening when running the script?_
     // to do multiple, make multiple of JSON object as above in the same file
 }
 ```
-3. Run `./scripts/lang.sh update`. When completed, it will continue to export all string including the newly imported (merging both main resource file and branch resource file)
+3. Run `./scripts/lang.sh --update`. When completed, it will continue to export all string including the newly imported (merging both main resource file and branch resource file)
 4. Add screenshots for the string through Transifex's under Webclient > Context and map the string on the branch resource file
 
 What's happening when running the script?

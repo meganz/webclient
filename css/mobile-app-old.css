@@ -374,11 +374,6 @@ span.select-txt {
 	-moz-box-sizing: border-box;
 	-webkit-box-sizing: border-box;
 }
-.blackberry .main-button, .blackberry.ios .main-button {
-	background-image: url(https://eu.static.mega.co.nz/images/mobile/main-bg-blackberry_v2.png);
-	width: 175px;
-	background-position: 13px -272px;
-}
 .wp .main-button, .wp.ios .main-button {
 	background-image: url(https://eu.static.mega.co.nz/images/mobile/main-bg-wp.png);
 	width: 232px;

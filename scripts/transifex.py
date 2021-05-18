@@ -238,7 +238,7 @@ def download_languages(resource, lang = []):
     return languages
 
 def get_branch_resource_name(is_upload = False, is_force = False):
-    branch_name = subprocess.check_output(['git', 'branch', '--show-current'], universal_newlines=True).strip()
+    branch_name = subprocess.check_output(['git', 'symbolic-ref', '--short','-q','HEAD'], universal_newlines=True).strip()
     if branch_name in ["master", "develop"]:
         if is_upload:
             print("Error: Updating string is not allowed in this branch.")

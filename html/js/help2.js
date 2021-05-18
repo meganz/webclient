@@ -116,13 +116,13 @@ var Help = (function() {
         if ($target.length) {
             selectMenuItem($target, null, true);
             $('.bottom-pages .fmholder').stop().animate({
-                scrollTop: $target.position().top - 20
+                scrollTop: $target.position().top - 120
             }, 1000);
         }
         else if ($dataTarget.length) {
             selectMenuItem($dataTarget, null, true);
             $('.bottom-pages .fmholder').stop().animate({
-                scrollTop: $('*[data-update="' + selector + '"]').position().top - 20
+                scrollTop: $('*[data-update="' + selector + '"]').position().top - 120
             }, 1000);
         }
     }
@@ -645,15 +645,16 @@ var Help = (function() {
                 var articleURL = $(this).parents('.support-article').data('update');
                 if (articleURL) {
                     var link = getArticleURL(articleURL);
+                    const $shareHelp = $('.share-help', '.mega-dialog-container');
                     if (!link) {
                         return;
                     }
-                    var $input = $('.share-help').removeClass('hidden');
+                    var $input = $shareHelp.removeClass('hidden');
 
                     $('input', $input).val(link).trigger("focus").trigger('select');
 
-                    $('.fm-dialog-close').rebind('click', function() {
-                        $('.share-help').addClass('hidden');
+                    $('button.js-close', $shareHelp).rebind('click', function() {
+                        $shareHelp.addClass('hidden');
                         fm_hideoverlay();
                     });
                     $('.copy-to-clipboard').rebind('click', function() {

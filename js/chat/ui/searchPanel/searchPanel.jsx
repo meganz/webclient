@@ -10,6 +10,16 @@ export const STATUS = {
     COMPLETED: 3
 };
 
+export const EVENTS = {
+    RESULT_OPEN: 'chatSearchResultOpen',
+    KEYDOWN: 'keydown'
+};
+
+const ACTIONS = {
+    PAUSE: 'pause',
+    RESUME: 'resume'
+};
+
 const SEARCH_PANEL_CLASS = `search-panel`;
 
 export default class SearchPanel extends MegaRenderMixin {
@@ -33,21 +43,6 @@ export default class SearchPanel extends MegaRenderMixin {
         this.bindEvents();
     }
 
-    componentWillReceiveProps(nextProps, nextContext) {
-        super.componentWillReceiveProps(nextProps, nextContext);
-
-        if (nextProps.minimized !== this.props.minimized) {
-            this.safeForceUpdate();
-            // Focus and mark the text as selected on re-opening from minimize
-            if (!nextProps.minimized) {
-                Soon(() => {
-                    SearchField.focus();
-                    SearchField.select();
-                });
-            }
-        }
-    }
-
     componentWillUnmount() {
         super.componentWillUnmount();
         this.unbindEvents();
@@ -57,57 +52,21 @@ export default class SearchPanel extends MegaRenderMixin {
         if (this.pageChangeListener) {
             mBroadcaster.removeListener(this.pageChangeListener);
         }
-        $(document).unbind('.searchPanel');
+        document.removeEventListener(EVENTS.RESULT_OPEN, this.toggleMinimize);
+        document.removeEventListener(EVENTS.KEYDOWN, this.handleKeyDown);
     }
 
     bindEvents = () => {
         // Pause on page change
-        this.pageChangeListener = mBroadcaster.addListener('pagechange', () => this.doToggle('pause'));
-        $(document)
-            // Clicked on search result
-            .rebind('chatSearchResultOpen.searchPanel', () => this.toggleMinimize())
-            // Clicked outside the search panel component
-            .rebind('mousedown.searchPanel', ev => {
-                if (this.clickedOutsideComponent(ev) && !this.props.minimized) {
-                    this.toggleMinimize();
-                }
-            })
-            // `ESC` keypress
-            .rebind('keydown.searchPanel', ({ keyCode }) => {
-                if (keyCode && keyCode === 27 /* ESC */ && !this.props.minimized) {
-                    // Clear the text on the first `ESC` press; minimize on the second
-                    return SearchField.hasValue() ? this.handleReset() : this.toggleMinimize();
-                }
-            });
-    }
+        this.pageChangeListener = mBroadcaster.addListener('pagechange', () => this.doToggle(ACTIONS.PAUSE));
 
-    clickedOutsideComponent = ev => {
-        const $target = ev && $(ev.target);
-        const outsideElements = [
-            'div.conversationsApp',
-            'div.fm-main',
-            'div.fm-left-panel',
-            'i.tiny-reset',
-            'div.small-icon.thin-search-icon',
-            'div.search-messages, div.search-messages a'
-        ];
-
-        return (
-            $target &&
-            // current parents !== root component
-            $target.parents(`.${SEARCH_PANEL_CLASS}`).length === 0 &&
-            // current element !== left sidebar container
-            $target.parents('div.fm-left-menu.conversations').length === 0 &&
-            // current element !== left sidebar icon controls
-            $target.parents('div.nw-fm-left-icons-panel').length === 0 &&
-            // current element !== generic outside element
-            outsideElements.every(outsideElement => !$target.is(outsideElement))
-        );
+        // Clicked on search result
+        document.addEventListener(EVENTS.RESULT_OPEN, this.toggleMinimize);
+        document.addEventListener(EVENTS.KEYDOWN, this.handleKeyDown);
     }
 
     toggleMinimize = () => {
-        this.doToggle('pause');
-        this.props.onToggle();
+        this.doToggle(ACTIONS.PAUSE);
     };
 
     doSearch = (s, searchMessages) => {
@@ -132,7 +91,7 @@ export default class SearchPanel extends MegaRenderMixin {
             }
 
             this.setState({
-                status: action === 'pause' ? PAUSED : action === 'resume' ? IN_PROGRESS : COMPLETED
+                status: action === ACTIONS.PAUSE ? PAUSED : action === ACTIONS.RESUME ? IN_PROGRESS : COMPLETED
             }, () =>
                 chatSearch[action]()
             );
@@ -140,6 +99,14 @@ export default class SearchPanel extends MegaRenderMixin {
     };
 
     doDestroy = () => ChatSearch && ChatSearch.doSearch && ChatSearch.doSearch.cs && ChatSearch.doSearch.cs.destroy();
+
+    handleKeyDown = ev => {
+        const { keyCode } = ev;
+        if (keyCode && keyCode === 27 /* ESC */) {
+            // Clear the text on the first `ESC` press; minimize on the second
+            return SearchField.hasValue() ? this.handleReset() : this.toggleMinimize();
+        }
+    }
 
     handleChange = ev => {
         const value = ev.target.value;
@@ -170,23 +137,18 @@ export default class SearchPanel extends MegaRenderMixin {
         this.setState({
             status: inProgress ? STATUS.PAUSED : STATUS.IN_PROGRESS
         }, () => {
-            Soon(() => SearchField.focus());
-            return this.doToggle(inProgress ? 'pause' : 'resume');
+            delay('chat-toggled', () => SearchField.focus());
+            return this.doToggle(inProgress ? ACTIONS.PAUSE : ACTIONS.RESUME);
         });
+
     };
 
-    handleReset = () => {
-        return (
-            // Clear the text on the first reset; minimize on the second
-            SearchField.hasValue() ?
-                this.setState({ value: '', searching: false, status: undefined, results: [] }, () => {
-                    this.wrapperRef.scrollToY(0);
-                    onIdle(() => SearchField.focus());
-                    this.doDestroy();
-                }) :
-                this.toggleMinimize()
-        );
-    };
+    handleReset = () =>
+        this.setState({ value: '', searching: false, status: undefined, results: [] }, () => {
+            this.wrapperRef.scrollToY(0);
+            onIdle(() => SearchField.focus());
+            this.doDestroy();
+        });
 
     handleSearchMessages = () =>
         SearchField.hasValue() && (
@@ -211,18 +173,19 @@ export default class SearchPanel extends MegaRenderMixin {
         // -------------------------------------------------------------------------
 
         return (
-            <div className={`
-                ${SEARCH_PANEL_CLASS}
-                ${searching ? 'expanded' : ''}
-                ${this.props.minimized ? 'hidden' : ''}
-            `}>
+            <div
+                className={`
+                    ${SEARCH_PANEL_CLASS}
+                    ${searching ? 'expanded' : ''}
+                `}>
                 <SearchField
                     value={value}
                     searching={searching}
                     status={status}
                     onChange={this.handleChange}
                     onToggle={this.handleToggle}
-                    onReset={this.handleReset} />
+                    onReset={this.handleReset}
+                />
 
                 <div className="search-results-wrapper">
                     <PerfectScrollbar
@@ -239,7 +202,8 @@ export default class SearchPanel extends MegaRenderMixin {
                                 status={status}
                                 results={results}
                                 isFirstQuery={isFirstQuery}
-                                onSearchMessages={this.handleSearchMessages} />
+                                onSearchMessages={this.handleSearchMessages}
+                            />
                         )}
                     </PerfectScrollbar>
                 </div>

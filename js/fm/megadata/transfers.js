@@ -138,7 +138,7 @@ MegaData.prototype.putToTransferTable = function(node, ttl) {
 
     this.addToTransferTable(gid, ttl,
         '<tr id="dl_' + htmlentities(handle) + '" class="transfer-queued transfer-download ' + state + '">'
-        + '<td><div class="transfer-type download">'
+        + '<td><div class="transfer-type download sprite-fm-mono-after icon-down-after">'
         + '<ul><li class="right-c"><p ' + rightRotate + '>'
         + '<span></span></p></li><li class="left-c"><p ' + leftRotate + '><span></span></p></li></ul>'
         + '</div>' + flashhtml + '</td>'
@@ -149,8 +149,9 @@ MegaData.prototype.putToTransferTable = function(node, ttl) {
         + '<td><span class="downloaded-size">' + bytesToSize(dowloadedSize) + '</span></td>'
         + '<td><span class="eta"></span><span class="speed">' + pauseTxt + '</span></td>'
         + '<td><span class="transfer-status">' + l[7227] + '</span></td>'
-        + '<td class="grid-url-field"><a class="grid-url-arrow"></a>'
-        + '<a class="clear-transfer-icon"></a></td>'
+        + '<td class="grid-url-field">'
+        + '<a class="link-transfer-status transfer-pause"><i class="sprite-fm-mono icon-pause"></i></a>'
+        + '<a class="clear-transfer-icon"><i class="sprite-fm-mono icon-close-component"></i></a></td>'
         + '<td><span class="row-number"></span></td>'
         + '</tr>');
 
@@ -379,6 +380,7 @@ MegaData.prototype.addWebDownload = function(n, z, preview, zipname) {
     }
 
     var ttl = this.getTransferTableLengths();
+    let errorStatus = null;
     for (var k in nodes) {
         /* jshint -W089 */
         if (!nodes.hasOwnProperty(k) || !this.isFileNode((n = this.d[nodes[k]]))) {
@@ -399,8 +401,7 @@ MegaData.prototype.addWebDownload = function(n, z, preview, zipname) {
         if ($tr.length) {
             if (!$tr.hasClass('transfer-completed')) {
                 if ($tr.hasClass('transfer-error') && !entries.length) {
-                    var errorStatus = $('.transfer-status', $tr).text();
-                    showToast('download', errorStatus);
+                    errorStatus = $('.transfer-status', $tr).text();
                 }
                 continue;
             }
@@ -424,6 +425,10 @@ MegaData.prototype.addWebDownload = function(n, z, preview, zipname) {
             onDownloadStart: this.dlstart.bind(this)
         };
         entries.push({node: n, entry: entry});
+    }
+
+    if (errorStatus) {
+        showToast('download', errorStatus);
     }
 
     if (!entries.length) {
@@ -493,7 +498,7 @@ MegaData.prototype.addWebDownload = function(n, z, preview, zipname) {
     if (z && zipsize) {
         this.addToTransferTable('zip_' + z, ttl,
             '<tr id="zip_' + z + '" class="transfer-queued transfer-download ' + p + '">'
-            + '<td><div class="transfer-type download">'
+            + '<td><div class="transfer-type download sprite-fm-mono-after icon-down-after">'
             + '<ul><li class="right-c"><p><span></span></p></li><li class="left-c"><p><span></span></p></li></ul>'
             + '</div>' + flashhtml + '</td>'
             + '<td><span class="transfer-filetype-icon ' + fileIcon({name: 'archive.zip'}) + '"></span>'
@@ -503,8 +508,9 @@ MegaData.prototype.addWebDownload = function(n, z, preview, zipname) {
             + '<td><span class="downloaded-size">' + bytesToSize(0) + '</span></td>'
             + '<td><span class="eta"></span><span class="speed">' + pauseTxt + '</span></td>'
             + '<td><span class="transfer-status">' + l[7227] + '</span></td>'
-            + '<td class="grid-url-field"><a class="grid-url-arrow"></a>'
-            + '<a class="clear-transfer-icon"></a></td>'
+            + '<td class="grid-url-field">'
+            + '<a class="link-transfer-status transfer-pause"><i class="sprite-fm-mono icon-pause"></i></a>'
+            + '<a class="clear-transfer-icon"><i class="sprite-fm-mono icon-close-component"></i></a></td>'
             + '<td><span class="row-number"></span></td>'
             + '</tr>');
 
@@ -610,7 +616,7 @@ MegaData.prototype.dlprogress = function(id, perc, bl, bt, kbps, dl_queue_num, f
         if (!uldl_hold) {
             var slideshowid = window.slideshowid && slideshow_handle();
             if (slideshowid === dl_queue[dl_queue_num].id && !previews[slideshowid]) {
-                var $overlay = $('.viewer-overlay');
+                var $overlay = $('.media-viewer-container');
                 var $chart = $overlay.find('.viewer-progress');
 
                 $overlay.find('.viewer-error').addClass('hidden');
@@ -676,7 +682,7 @@ MegaData.prototype.dlcomplete = function(dl) {
 
     var slideshowid = slideshow_handle();
     if (slideshowid == id && !previews[slideshowid]) {
-        var $overlay = $('.viewer-overlay');
+        var $overlay = $('.media-viewer-container');
         $overlay.find('.viewer-pending').addClass('hidden');
         $overlay.find('.viewer-error').addClass('hidden');
         $overlay.find('.viewer-progress p').css('transform', 'rotate(180deg)');
@@ -694,6 +700,7 @@ MegaData.prototype.dlcomplete = function(dl) {
 
     var $tr = $('.transfer-table #' + id);
     $tr.removeClass('transfer-started').addClass('transfer-completed');
+    $('.link-transfer-status', $tr).addClass('hidden');
     $tr.find('.left-c p, .right-c p').css('transform', 'rotate(180deg)');
     $tr.find('.transfer-status').text(l[1418]);
     $tr.find('.eta, .speed').text('').removeClass('unknown');
@@ -730,7 +737,7 @@ MegaData.prototype.dlerror = function(dl, error) {
     var x;
     var errorstr;
     var gid = dlmanager.getGID(dl);
-    var $overlay = $('.viewer-overlay');
+    var $overlay = $('.media-viewer-container');
 
     if (d) {
         dlmanager.logger.error('dlerror', gid, error);
@@ -780,11 +787,11 @@ MegaData.prototype.dlerror = function(dl, error) {
 
     var slideshowid = slideshow_handle();
     if (slideshowid === dl.id && !previews[slideshowid]) {
-        $overlay.find('.viewer-image-bl').addClass('hidden');
-        $overlay.find('.viewer-pending').addClass('hidden');
-        $overlay.find('.viewer-progress').addClass('hidden');
-        $overlay.find('.viewer-error').removeClass('hidden');
-        $overlay.find('.viewer-error-txt').text(errorstr);
+        $('.img-wrap', $overlay).addClass('hidden');
+        $('.viewer-pending', $overlay).addClass('hidden');
+        $('.viewer-progress', $overlay).addClass('hidden');
+        $('.viewer-error', $overlay).removeClass('hidden');
+        $('.viewer-error-txt', $overlay).text(errorstr);
     }
 
     if (errorstr) {
@@ -885,7 +892,7 @@ MegaData.prototype.getTransferTableLengths = function() {
         return false;
     }
     var used = te.domTable.querySelectorAll('tr').length;
-    var size = (Math.ceil(parseInt(te.domScrollingTable.style.height) / 24) | 0) + 1;
+    var size = (Math.ceil(parseInt(te.domScrollingTable.style.height) / 32) | 0) + 1;
 
     return { size: size, used: used, left: size - used };
 };
@@ -900,7 +907,9 @@ MegaData.prototype.getTransferElements = function() {
     obj.domTransferHeader = obj.domTransfersBlock.querySelector('.fm-transfers-header');
     obj.domPanelTitle = obj.domTransferHeader.querySelector('.transfer-panel-title');
     obj.domUploadBlock = obj.domPanelTitle.querySelector('.upload');
+    obj.domUploadProgressText = obj.domUploadBlock.querySelector('.transfer-progress-txt');
     obj.domDownloadBlock = obj.domPanelTitle.querySelector('.download');
+    obj.domDownloadProgressText = obj.domDownloadBlock.querySelector('.transfer-progress-txt');
     obj.domTableEmptyTxt = obj.domTableWrapper.querySelector('.transfer-panel-empty-txt');
     obj.domTableHeader = obj.domTableWrapper.querySelector('.transfer-table-header');
     obj.domScrollingTable = obj.domTableWrapper.querySelector('.transfer-scrolling-table');
@@ -1116,7 +1125,7 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders, target) 
             var gid = 'ul_' + ul_id;
             var template = (
                 '<tr id="' + gid + '" class="transfer-queued transfer-upload ' + pause + '">'
-                + '<td><div class="transfer-type upload">'
+                + '<td><div class="transfer-type upload sprite-fm-mono-after icon-up-after">'
                 + '<ul><li class="right-c"><p><span></span></p></li>'
                 + '<li class="left-c"><p><span></span></p></li></ul>'
                 + '</div></td>'
@@ -1127,8 +1136,9 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders, target) 
                 + '<td><span class="uploaded-size">' + bytesToSize(0) + '</span></td>'
                 + '<td><span class="eta"></span><span class="speed">' + pauseTxt + '</span></td>'
                 + '<td><span class="transfer-status">' + l[7227] + '</span></td>'
-                + '<td class="grid-url-field"><a class="grid-url-arrow"></a>'
-                + '<a class="clear-transfer-icon"></a></td>'
+                + '<td class="grid-url-field">'
+                + '<a class="link-transfer-status transfer-pause"><i class="sprite-fm-mono icon-pause"></i></a>'
+                + '<a class="clear-transfer-icon"><i class="sprite-fm-mono icon-close-component"></i></a></td>'
                 + '<td><span class="row-number"></span></td>'
                 + '</tr>');
             this.addToTransferTable(gid, ttl || f, template);
@@ -1662,6 +1672,7 @@ MegaData.prototype.ulfinalize = function(ul, status, h) {
     var $tr = $('#ul_' + id);
 
     $tr.removeClass('transfer-started').addClass('transfer-completed');
+    $('.link-transfer-status', $tr).addClass('hidden');
     $tr.find('.left-c p, .right-c p').css('transform', 'rotate(180deg)');
     $tr.find('.transfer-status').text(status);
     $tr.find('.eta, .speed').text('').removeClass('unknown');
@@ -1883,83 +1894,67 @@ MegaData.prototype.openTransfersPanel = function openTransfersPanel() {
 MegaData.prototype.showTransferToast = function showTransferToast(t_type, t_length, isPaused) {
     'use strict';
 
+    t_type = t_type ? t_type : 'd';
+
+    // If the user is viewing a slideshow
     if (window.slideshowid) {
-        var $toast;
-        var $second_toast;
-        var timer = 0;
-        var nt_txt;
 
-        if (t_type !== 'u') {
-            $toast = $('.toast-notification.download');
-            $second_toast = $('.toast-notification.upload');
+        let icons = ['upload'];
+        const text = document.createElement('span');
+        text.className = 'message';
+        let buttons = [];
+
+        // Upload message
+        if (t_type === 'u') {
+            // Plural message
             if (t_length > 1) {
-                nt_txt = l[12481].replace('%1', t_length);
+                text.textContent = l[12480].replace('%1', t_length);
             }
+            // Singular message
             else {
-                nt_txt = l[7222];
+                text.textContent = l[7223];
             }
         }
+        // Download message
         else {
-            $toast = $('.toast-notification.upload');
-            $second_toast = $('.toast-notification.download');
+            icons = ['download'];
+            // Plural message
             if (t_length > 1) {
-                nt_txt = l[12480].replace('%1', t_length);
+                text.textContent = l[12481].replace('%1', t_length);
             }
+            // Singular message
             else {
-                nt_txt = l[7223];
+                text.textContent = l[7222];
             }
         }
+
+        // Add (paused) to the message
         if (uldl_hold || isPaused) {
-            nt_txt += '<b> (' + l[1651] + ') </b>';
+            const b = document.createElement('b');
+            b.textContent = ` (${l[1651]}) `;
+            text.appendChild(b);
         }
 
-        $toast.find('.toast-col:first-child span').safeHTML(nt_txt);
-
-        if (!u_type) {
-            // If not logged in, do not display the "Show me" button in the toast information
-            $('.toast-button', $toast).addClass('hidden');
+        // Only display the "Show me" button in the toast if the user is logged in
+        if (u_type) {
+            buttons.push({
+                text: l[7224],
+                onClick: () => {
+                    // Hide the toast and overlay, open the transfers page
+                    window.toaster.main.hideAll();
+                    document.querySelector('.viewer-overlay').classList.add('hidden');
+                    document.querySelector('.nw-fm-left-icon.transfers').click();
+                }
+            });
         }
 
-        if ($second_toast.hasClass('visible')) {
-            $second_toast.addClass('second');
-        }
-
-        clearTimeout(timer);
-        $toast.removeClass('second hidden').addClass('visible');
-        timer = setTimeout(function() {
-            M.hideTransferToast($toast);
-        }, 4000);
-
-        $('.transfer .toast-button').rebind('click', function() {
-            $('.toast-notification').removeClass('visible second');
-            if (!$('.viewer-overlay').hasClass('hidden')) {
-                $('.viewer-overlay').addClass('hidden');
-            }
-            // M.openFolder('transfers', true);
-            $('.nw-fm-left-icon.transfers').click();
-        });
-
-        $('.toast-close-button', $toast).rebind('click', function() {
-            $(this).closest('.toast-notification').removeClass('visible');
-            $('.toast-notification').removeClass('second');
-        });
-
-        $toast.rebind('mouseover', function() {
-            clearTimeout(timer);
-        });
-        $toast.rebind('mouseout', function() {
-            timer = setTimeout(function() {
-                M.hideTransferToast($toast);
-            }, 4000);
+        // Show the toast
+        window.toaster.main.show({
+            content: text,
+            buttons,
+            icons
         });
     }
-};
-
-MegaData.prototype.hideTransferToast = function hideTransferToast($toast) {
-    'use strict';
-
-    $toast.removeClass('visible');
-    $('.toast-notification').removeClass('second');
 };
 
 // report a transient upload error
@@ -2049,6 +2044,10 @@ function fm_tfspause(gid, overquota) {
             $tr.addClass('transfer-paused');
             $tr.removeClass('transfer-started');
 
+            let $transLink = $('.link-transfer-status', $tr);
+            $transLink.removeClass('transfer-pause').addClass('transfer-play');
+            $('i', $transLink).removeClass('icon-pause').addClass('icon-play-small');
+
             if (overquota === true) {
                 $tr.addClass('transfer-error');
                 $tr.find('.transfer-status').addClass('overquota').text(l[1673]);
@@ -2072,15 +2071,22 @@ function fm_tfspause(gid, overquota) {
 function fm_tfsresume(gid) {
     'use strict';
     if (ASSERT(typeof gid === 'string' && "zdu".indexOf(gid[0]) !== -1, 'Invalid GID to resume')) {
+
+        var $tr = $('#' + gid);
+
         if (gid[0] === 'u') {
             mega.tpw.resumeDownloadUpload(mega.tpw.UPLOAD, { id: gid.split('_').pop() });
 
             ulQueue.resume(gid);
+
+            $tr.removeClass('transfer-paused');
+
+            let $transLink = $('.link-transfer-status', $tr);
+            $transLink.removeClass('transfer-play').addClass('transfer-pause');
+            $('i', $transLink).removeClass('icon-play-small').addClass('icon-pause');
         }
         else {
             mega.tpw.resumeDownloadUpload(mega.tpw.DOWNLOAD, { id: gid.split('_').pop() });
-
-            var $tr = $('#' + gid);
 
             if (page === 'download'
                 && $('.download.top-bar').hasClass('overquota')
@@ -2106,6 +2112,10 @@ function fm_tfsresume(gid) {
             }
             else {
                 $tr.removeClass('transfer-paused');
+
+                let $transLink = $('.link-transfer-status', $tr);
+                $transLink.removeClass('transfer-play').addClass('transfer-pause');
+                $('i', $transLink).removeClass('icon-play-small').addClass('icon-pause');
 
                 if ($('tr.transfer-started, tr.transfer-initiliazing', $tr.closest('table')).length) {
                     $('.speed, .eta', $tr).removeClass('unknown').text('');
@@ -2314,7 +2324,20 @@ function fm_tfsupdate() {
     }
 
     M.pendingTransfers = i + u;
-    tfse.domUploadBlock.textContent = u || '';
-    tfse.domDownloadBlock.textContent = i || '';
 
+    if (u) {
+        tfse.domUploadProgressText.textContent = l[20808].replace('{0}', ((u > 999) ? '999+' : u));
+        tfse.domUploadBlock.classList.remove('hidden');
+    }
+    else {
+        tfse.domUploadProgressText.textContent = l[1418];
+    }
+
+    if (i) {
+        tfse.domDownloadProgressText.textContent = l[20808].replace('{0}', ((i > 999) ? '999+' : i));
+        tfse.domDownloadBlock.classList.remove('hidden');
+    }
+    else {
+        tfse.domDownloadProgressText.textContent = l[1418];
+    }
 }

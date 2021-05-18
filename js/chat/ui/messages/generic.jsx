@@ -96,7 +96,7 @@ export default class GenericConversationMessage extends ConversationMessageMixin
                 Soon(function() {
                     // a delay is needed, otherwise React would receive the same click event and close the dropdown
                     // even before displaying it in the UI.
-                    $('.button.default-white-button.tiny-button', $block).trigger('click');
+                    $('.tiny-button', $block).trigger('click');
                 });
             });
     }
@@ -187,7 +187,11 @@ export default class GenericConversationMessage extends ConversationMessageMixin
 
             arr.push(
                 <DropdownItem
-                    icon={"context " + (isFav ? "broken-heart" : "heart")}
+                    icon={`
+                        sprite-fm-mono
+                        context
+                        ${isFav ? 'icon-favourite-removed' : 'icon-favourite'}
+                    `}
                     label={isFav ? l[5872] : l[5871]}
                     isFav={isFav}
                     key="fav"
@@ -217,7 +221,7 @@ export default class GenericConversationMessage extends ConversationMessageMixin
 
         arr.push(
             <DropdownItem
-                icon="icons-sprite chain"
+                icon="sprite-fm-mono icon-link"
                 key="getLinkButton"
                 label={getManageLinkText}
                 onClick={self._getLink.bind(self, h)}
@@ -226,7 +230,7 @@ export default class GenericConversationMessage extends ConversationMessageMixin
         if (haveLink) {
             arr.push(
                 <DropdownItem
-                    icon="context remove-link"
+                    icon="sprite-fm-mono context icon-link-remove"
                     key="removeLinkButton"
                     label={l[6821]}
                     onClick={self._removeLink.bind(self, h)}

@@ -41,7 +41,6 @@ var avatars = {};
 var mega_title = 'MEGA';
 var pchandle = false;
 
-
 var pro_json = '[[["N02zLAiWqRU",1,500,1024,1,"9.99","EUR"],["zqdkqTtOtGc",1,500,1024,12,"99.99","EUR"],["j-r9sea9qW4",2,2048,4096,1,"19.99","EUR"],["990PKO93JQU",2,2048,4096,12,"199.99","EUR"],["bG-i_SoVUd0",3,4096,8182,1,"29.99","EUR"],["e4dkakbTRWQ",3,4096,8182,12,"299.99","EUR"]]]';
 
 pages['placeholder'] = '<div class="bottom-page scroll-block placeholder">' +
@@ -61,6 +60,21 @@ mBroadcaster.once('startMega', function() {
         $('body').safeAppend(translate(pages['dialogs-common'].replace(/{staticpath}/g, staticpath)));
         delete pages['dialogs-common'];
     }
+
+    // Set class if gbot
+    if (is_bot) {
+        document.documentElement.classList.add('gbot');
+    }
+    else {
+        document.documentElement.classList.remove('gbot');
+    }
+
+    // Add language class to body for CSS fixes for specific language strings
+    document.body.classList.add(lang);
+
+    if (({'fa': 1,'ar': 1,'he': 1})[lang]) {
+        document.body.classList.add('rtl');
+    }
 });
 
 mBroadcaster.once('startMega:desktop', function() {
@@ -76,7 +90,7 @@ mBroadcaster.once('startMega:desktop', function() {
         }
     }
 
-    if ((p = document.querySelector('.viewer-image-bl'))) {
+    if ((p = document.querySelector('.media-viewer .content'))) {
         mCreateElement('iframe', {type: 'content', 'class': 'hidden', src: 'about:blank', id: 'pdfpreviewdiv1'}, p);
     }
 });
@@ -108,13 +122,26 @@ function startMega() {
 function topMenu(close) {
     'use strict';
 
-    var $topMenuIcon =  $('.top-icon.menu', 'body');
-    var $topMenu = $('.top-menu-popup', 'body');
+    let $currentContainer;
+    const fmholder = document.getElementById('fmholder');
+
+    // If #startholder is visible, #fmholder is not
+    if (fmholder.classList.contains('hidden') || fmholder.style.display === 'none') {
+        $currentContainer = $('#startholder');
+    }
+    else {
+        $currentContainer = $(fmholder);
+    }
+
+    var $topMenuBtn = $('.js-more-menu', $currentContainer);
+    var $topMenu = $('.top-menu-popup', $currentContainer);
+    var $scrollBlock = $('.top-menu-scroll', $topMenu);
     var $mobileOverlay = $('.mobile.dark-overlay', 'body');
 
     if (close) {
         $.topMenu = '';
-        $topMenuIcon.removeClass('active');
+        $topMenuBtn.removeClass('menu-open');
+
         $topMenu.addClass('hidden');
 
         // If on mobile, hide the menu and also remove the close click/tap handler on the dark background overlay
@@ -126,21 +153,38 @@ function topMenu(close) {
     }
     else {
         $.topMenu = 'topmenu';
-        $topMenuIcon.addClass('active');
+        $topMenuBtn.addClass('menu-open');
         $topMenu.removeClass('hidden');
 
         if (u_type) {
+            const $menuAvatar = $('.avatar-block', $topMenu);
+            if (!$menuAvatar.hasClass('rendered')) {
+                $menuAvatar.addClass('rendered');
+                $('.wrapper', $menuAvatar).safeHTML(useravatar.contact(u_handle));
+            }
+
             $('.top-menu-logged .loader', $topMenu).addClass('loading');
-            M.getStorageQuota().then(topMenuDataUpdate).catch(dump);
+
+            // M.storageQuotaCache is exist, fm is inited but not folder link,
+            // pulled storage data already and the data is not updated.
+            if (M.storageQuotaCache && !folderlink) {
+                topMenuDataUpdate(M.storageQuotaCache);
+            }
+            // M.storageQuotaCache is not exist, it is either not on fm or data was revoked by action packet.
+            else {
+                M.getStorageQuota().then(data => {
+
+                    topMenuDataUpdate(data);
+
+                    if (fminitialized && !folderlink && M.currentTreeType === 'cloud-drive') {
+                        M.checkLeftStorageBlock(data);
+                    }
+                }).catch(dump);
+            }
         }
 
         if (!is_mobile) {
-            topMenuScroll();
-            $(window).rebind('resize.topmenu', function () {
-                if ($topMenuIcon.hasClass('active')) {
-                    topMenuScroll();
-                }
-            });
+            topMenuScroll($scrollBlock);
         }
         else {
             // Mobile
@@ -160,10 +204,11 @@ function topMenu(close) {
 /* Update used storage info*/
 function topMenuDataUpdate(data) {
     'use strict';
+
     var storageHtml;
     var $storageBlock = $('.top-menu-logged', '.top-menu-popup').removeClass('going-out exceeded');
     var space_used = bytesToSize(data.used);
-    var space = bytesToSize(data.max);
+    var space = bytesToSize(data.max, 0);
     var perc = data.percent;
 
     if (perc >= 100) {
@@ -187,14 +232,19 @@ function topMenuDataUpdate(data) {
     $('.storage span', $storageBlock).outerWidth(perc + '%');
 }
 
+function topMenuScroll($scrollBlock) {
+    "use strict";
 
-function topMenuScroll() {
-    $('.top-menu-scroll').jScrollPane({
-        enableKeyboardNavigation: false,
-        showArrows: true,
-        arrowSize: 5,
-        animateScroll: true
-    });
+    if (!$scrollBlock.length) {
+        return false;
+    }
+
+    if ($scrollBlock.is('.ps-container')) {
+        Ps.update($scrollBlock[0]);
+    }
+    else {
+        Ps.initialize($scrollBlock[0]);
+    }
 }
 
 function scrollMenu() {
@@ -225,8 +275,8 @@ function topPopupAlign(button, popup, topPos) {
             $popup = $(popup),
             $popupArrow = $popup.children('.dropdown-white-arrow'),
             pageWidth,
-            popupRightPos,
-            arrowRightPos,
+            popupLeftPos,
+            arrowLeftPos,
             buttonTopPos,
             headerWidth;
 
@@ -235,9 +285,8 @@ function topPopupAlign(button, popup, topPos) {
             headerWidth = $('.top-head').outerWidth();
             $popup.removeAttr('style');
             $popupArrow.removeAttr('style');
-            popupRightPos = headerWidth
-                - $button.offset().left
-                - $button.outerWidth() / 2
+            popupLeftPos = $button.offset().left
+                + $button.outerWidth() / 2
                 - $popup.outerWidth() / 2;
             if (topPos) {
                 $popup.css('top', topPos + 'px');
@@ -247,17 +296,26 @@ function topPopupAlign(button, popup, topPos) {
                 $popup.css('top', buttonTopPos + 13 + 'px');
             }
 
-            if (popupRightPos > 10) {
-                $popup.css('right', popupRightPos + 'px');
+            if (popupLeftPos > 10) {
+                if (popupLeftPos + $popup.outerWidth() + 10 > pageWidth) {
+                    $popup.css({
+                        left: 'auto',
+                        right: '10px'
+                    });
+                    $popupArrow.css(
+                        'left', $button.offset().left - $button.outerWidth() / 2
+                    );
+                }
+                else {
+                    $popup.css('left', popupLeftPos + 'px');
+                }
             }
             else {
-                $popup.css('right', '10px');
-                arrowRightPos = pageWidth
-                    - $button.offset().left
+                $popup.css('left', '10px');
+                arrowLeftPos = $button.offset().left
                     - $button.outerWidth() / 2;
                 $popupArrow.css({
-                    left: 'auto',
-                    right: arrowRightPos - 22
+                    left: arrowLeftPos + 22
                 })
             }
         }
@@ -325,57 +383,10 @@ function init_page() {
         $.lastSeenFilelink = getSitePath();
     }
 
-    // Set class if gbot
-    if (is_bot) {
-        $('html').addClass('gbot');
-    }
-    else {
-        $('html').removeClass('gbot');
-    }
-
-    if (!u_type) {
-        $('body').attr('class', 'not-logged');
-    }
-    else {
-        $('body').attr('class', 'logged');
-
-        // Recovery key has been saved
-        if (localStorage.recoverykey && !$('body').hasClass('rk-saved')) {
-            $('body').addClass('rk-saved');
-        }
-
-        // Add FM fonsize class to body
-        if (fmconfig.font_size) {
-            $('body').removeClass('fontsize1 fontsize2')
-                .addClass('fontsize' + fmconfig.font_size);
-        }
-    }
-
-    // Add language class to body for CSS fixes for specific language strings
-    $('body').addClass(lang);
-    // add business class to affect the top header
-    $('body').removeClass('business');
-
-    if ('-fa-ar-he-'.indexOf('-' + lang + '-') > -1) {
-        $('body').addClass('rtl');
-    }
-
-    if (is_mobile) {
-
-        var $html = $('html');
-        var $body = $('body', $html);
-
-        // Add mobile class for adaptive features
-        $body.addClass('mobile');
-
-        if (is_android) {
-            $html.height(window.innerHeight);
-
-            $(window).rebind('resize.htmlheight', function() {
-                $html.height(window.innerHeight);
-            });
-        }
-    }
+    // Rmove business class to affect the top header
+    // Remove bottom-page class and old class
+    // Remove pro class when user come back from pro page
+    document.body.classList.remove('business', 'bottom-pages', 'old', 'pro');
 
     // Redirect url to extensions when it tries to go plugin or chrome or firefox
     if (page === 'plugin') {
@@ -383,9 +394,12 @@ function init_page() {
         return false;
     }
 
-    if (!page.match(/^(blog|help|corporate|fm\/recents|page_)/)) {
-        $('.top-head').remove();
+    if (page === "fm/contacts") {
+        // force replace of page history, so that back won't cause the user to go back to an empty fm/contacts
+        loadSubPage("/fm/chat/contacts");
+        return false;
     }
+
     $('#loading').hide();
     if (window.loadingDialog) {
         loadingDialog.hide();
@@ -401,7 +415,7 @@ function init_page() {
                 openContactInfoLink(ctLink);
             }
             else {
-                page = 'fm/contacts';
+                page = 'fm/chat/contacts';
                 mBroadcaster.once('fm:initialized', function() {
                     openContactInfoLink(ctLink);
                 });
@@ -533,6 +547,9 @@ function init_page() {
                 else {
                     // Insert placeholder background page while waiting for user input
                     parsepage(pages.placeholder);
+
+                    // Lets apply theme for this dialog
+                    mega.ui.theme.setWithUA();
 
                     // Show the decryption key dialog on top
                     mKeyDialog(pfid, true, pfkey, newLinkSelector)
@@ -680,6 +697,9 @@ function init_page() {
         }
         else {
             exportPassword.decrypt.init(page);
+
+            // lets set them for the dialog.
+            mega.ui.theme.setWithUA();
         }
     }
     else if (page.substr(0, 10) == 'blogsearch') {
@@ -800,16 +820,6 @@ function init_page() {
             else {
                 parsepage(pages['login']);
                 login_txt = l[378];
-
-                // I need this event handler to be triggered only in case of coming from confirmation
-                mBroadcaster.once('fm:initialized', function () {
-                    if (u_attr && u_attr.b && u_attr.b.m) {
-                        M.require('businessAcc_js', 'businessAccUI_js').done(function () {
-                            var business = new BusinessAccountUI();
-                            business.showWelcomeDialog();
-                        });
-                    }
-                });
 
                 init_login();
                 if (email) {
@@ -1107,7 +1117,7 @@ function init_page() {
         getUAOParameter(page, 'registerb');
 
         parsepage(pages['registerb']);
-        $('body').addClass('business');
+        document.body.classList.add('business');
         var regBusiness = new BusinessRegister();
         regBusiness.initPage();
     }
@@ -1472,7 +1482,7 @@ function init_page() {
         }
         else {
             parsepage(pages['business']);
-            $('body').addClass('business');
+            document.body.classList.add('business');
         }
 
         // Process the return URL from the payment provider and show a success/failure dialog if applicable
@@ -1543,7 +1553,7 @@ function init_page() {
     }
     else if (page === 'business') {
         parsepage(pages['business']);
-        $('body').addClass('business');
+        document.body.classList.add('business');
         var businessP = new BusinessProductPage();
         businessP.init();
     }
@@ -1762,10 +1772,15 @@ function init_page() {
             console.log('Setting up fm...', id, pfid, fminitialized, M.currentdirid);
         }
 
+        // Set System default theme or any previously selected
+        if (!is_mobile) {
+            var theme = u_attr && u_attr['^!webtheme'] !== undefined ? u_attr['^!webtheme'] : 0;
+            mega.ui.theme.set(theme);
+        }
+
         if (!id && fminitialized) {
             id = M.RootID;
         }
-
 
         // FIXME
         // all global state must be encapsulated in a single object -
@@ -1820,6 +1835,9 @@ function init_page() {
                     .always(function() {
                         M.chat = true;
                         megaChat.renderListing(id)
+                            .catch((ex) => {
+                                console.error("Chat link init failed:", ex);
+                            })
                             .always(function() {
                                 // @todo is this needed?..
                                 megaChat.renderMyStatus();
@@ -1866,7 +1884,8 @@ function init_page() {
                     u_attr.terms = 1;
                     api_req({ a: 'up', terms: 'Mq' });
                     // queued work is continued when user accept terms of service
-                    $('.transfer-pause-icon').removeClass('active');
+                    let $icon = $('.transfer-pause-icon').removeClass('active');
+                    $('i', $icon).removeClass('icon-play-small').addClass('icon-pause');
                     $('.nw-fm-left-icon.transfers').removeClass('paused');
                     dlQueue.resume();
                     ulQueue.resume();
@@ -1894,7 +1913,6 @@ function init_page() {
                 }
             }
         }
-        $('#topmenu').safeHTML(parsetopmenu());
 
         $('#pageholder, #startholder').addClass('hidden');
 
@@ -1906,12 +1924,15 @@ function init_page() {
         }
 
         $('.nw-fm-left-icons-panel').removeClass('hidden');
-        if ($('#fmholder:visible').length == 0) {
+        let fmholder = document.getElementById('fmholder');
+        // try to determinate visibility, without needing to use :visible
+        if (fmholder.classList.contains("hidden") || fmholder.style.display === "none") {
             if (anonymouschat) {
                 $('.nw-fm-left-icons-panel').addClass('hidden');
                 $('.top-head .logo').css("display", "block");
             }
-            $('#fmholder').removeAttr('style').removeClass('hidden');
+            fmholder.removeAttribute("style");
+            fmholder.classList.remove('hidden');
             if (fminitialized && !is_mobile) {
                 M.addViewUI();
 
@@ -1939,9 +1960,7 @@ function init_page() {
                 }
             }
         }
-        if (megaChatIsDisabled) {
-            $(document.body).addClass("megaChatDisabled");
-        }
+
         pagemetadata();
     }
     else if (page.substr(0, 2) == 'fm' && !u_type) {
@@ -1991,14 +2010,148 @@ function init_page() {
     onIdle(blockChromePasswordManager);
 }
 
-function topmenuUI() {
+function topbarUITogglePresence(topbar) {
+
     'use strict';
 
+    let element = topbar.querySelector('.js-activity-status');
+
+    if (element) {
+        element.classList.add('hidden');
+
+        // ActivityStatus Code
+        // If the chat is disabled don't show the green status icon in the header
+        if (!pfid && !megaChatIsDisabled) {
+
+            element.classList.remove('hidden');
+
+            if (megaChatIsReady) {
+                megaChat._renderMyStatus();
+            }
+        }
+    }
+}
+
+function topbarUI(holderId) {
+    'use strict';
+
+    let element;
+    const topbar = document.getElementById(holderId).querySelector('.js-topbar');
+
+    if (!topbar) {
+        return;
+    }
+
+    topbarUITogglePresence(topbar);
+
+    element = topbar.querySelector('.js-dropdown-account');
+
+    if (element) {
+        element.classList[u_type ? 'remove' : 'add']('hidden');
+    }
+
+    element = topbar.querySelector('.js-topbar-searcher');
+
+    if (element) {
+        element.classList[fminitialized ? 'remove' : 'add']('hidden');
+    }
+
+    element = topbar.querySelector('.js-dropdown-notification');
+
+    if (element) {
+        element.classList[fminitialized && !folderlink && u_type === 3 ? 'remove' : 'add']('hidden');
+    }
+
+    if (u_type === 3 && u_attr.fullname && (element = topbar.querySelector('.name'))) {
+        element.textContent = u_attr.fullname;
+    }
+
+    if (u_type && u_attr.email && (element = topbar.querySelector('.email'))) {
+        element.textContent = u_attr.email;
+    }
+
+    if (holderId === 'fmholder') {
+        window.mega.ui.searchbar.refresh();
+    }
+    else {
+        window.mega.ui.searchbar.init();
+    }
+
+    $('.js-topbaravatar', topbar).rebind('click', function() {
+        let container = this.parentNode;
+        if (container.classList.contains("show")) {
+            container.classList.remove("show");
+        }
+        else {
+            var $accountAvatar = $('.js-account-avatar', topbar);
+            if (!$accountAvatar.hasClass('rendered')) {
+                $accountAvatar.addClass('rendered').safeHTML(useravatar.contact(u_handle));
+            }
+            container.classList.add("show");
+        }
+    });
+
+    $('.js-activity-status', topbar).rebind('click', function() {
+        $(this).parent().toggleClass('show');
+    });
+
+    $('.js-accountbtn', topbar).rebind('click.topAccBtn', function(){
+
+        if (this.classList.contains('settings')) {
+            loadSubPage('fm/account');
+        }
+        else if (this.classList.contains('achievements')) {
+            mega.achievem.achievementsListDialog();
+        }
+        else if (this.classList.contains('logout')) {
+            mLogout();
+        }
+
+        var dropdown = document.getElementsByClassName('js-dropdown-account');
+
+        for (i = dropdown.length; i--;) {
+            dropdown[i].classList.remove('show');
+        }
+    });
+
+    $('.js-accountsubmenu', topbar).rebind('mouseover.topSubmenu', function() {
+        $('.js-statuslist', this).removeClass('hidden');
+        $(this).on('mouseout.topSubmenu', () => {
+            $('.js-statuslist', this).addClass('hidden');
+            $(this).off('mouseout.topSubmenu');
+        });
+    });
+}
+
+function topmenuUI() {
+
+    'use strict';
+
+    var topMenuElm = document.getElementById('topmenu');
+
+    if (topMenuElm) {
+        var topHeader = topMenuElm.querySelector('.top-head');
+
+        if (!topHeader) {
+            $(topMenuElm).safeHTML(parsetopmenu());
+
+            if (!is_fm()) {
+                $('.top-head .logo', topMenuElm).css("display", "block");
+            }
+        }
+
+        $.tresizer();
+    }
+
+    const holderId = is_fm() && page !== 'start' ? 'fmholder' : 'startholder';
+
+    topbarUI(holderId);
+
     var $topMenu = $('.top-menu-popup', 'body');
-    var $topHeader = is_mobile ? $('.fm-header', 'body') : $('.top-head', 'body');
-    var $loginButton = $('.top-login-button', $topHeader);
+    var $topHeader = is_mobile ? $('.fm-header', 'body') : $('.top-head', '#' + holderId);
+    var $topBar = is_mobile ? $('.fm-header', 'body') : $('.js-topbar', '#' + holderId);
     var $menuFmItem = $('.top-menu-item.fm', $topMenu);
-    var $menuLogoutButton = $('.top-white-button.logout', $topMenu);
+    var $menuLogoutButton = $('.logout', $topMenu);
     var $menuAuthButtons = $('.top-menu-item.register,.top-menu-item.login', $topMenu);
     var $menuLoggedBlock = $('.top-menu-logged', $topMenu);
     var $menuRefreshItem = $('.top-menu-item.refresh-item', $topMenu);
@@ -2007,23 +2160,24 @@ function topmenuUI() {
     var $menuBackupItem = $('.top-menu-item.backup', $topMenu);
     var $menuAffiliateItem = $('.top-menu-item.affiliate', $topMenu);
     var $menuFeedbackItem = $('.top-menu-item.feedback', $topMenu);
-    var $menuUserinfo = $('.user-info', $menuLoggedBlock);
+    var $menuUserinfo = $('.top-menu-account-info', $menuLoggedBlock);
     var $menuUsername = $('.name', $menuUserinfo);
-    var $menuAvatar = $('.avatar-block', $menuLoggedBlock);
+    var $menuAvatar = $('.avatar-block', $menuUserinfo);
     var $menuUpgradeAccount = $('.upgrade-your-account', $topMenu);
-    var $headerWarningIcon = $('.top-icon.warning', $topHeader);
     var $headerActivityBlock = $('.activity-status-block .activity-status,.activity-status-block', $topHeader);
-    var $headerActivityStatus = $('.activity-status-block', $headerActivityBlock);
-    var $headerPlanIcon = $('.membership-status-block i', $topHeader);
-    var $headerIndividual = $('.left.individual', $topHeader);
-    var $headerSearch = $('.top-search-bl', $topHeader);
-    var $headerNotificationIcon = $('.top-icon.notification', $topHeader);
-    var $headerAvatar = $('.fm-avatar', $topHeader);
-    var $headerRegisterBotton = $('.create-account-button', $topHeader);
-    var $headerAchievements = $('.top-icon.achievements', $topHeader);
+    var $headerIndividual = $('.individual', $topHeader);
+    var $headerIndividualSpan = $('.individual span', $topHeader);
+    var $headerSearch = $('.mini-search', $topHeader);
+    var $headerButtons = $('.top-buttons', $topHeader);
+    var $loginButton = $('.top-login-button', $headerButtons);
+    var $headerRegisterBotton = $('.create-account-button', $headerButtons);
+    var $headerSetStatus = $('.js-accountbtn.setstatus', $topHeader).parent();
+    var $headerAchievements = $('.js-accountbtn.achievements', $topHeader);
+    var $headerDownloadMega = $('.js-accountbtn.downloadmega', $topHeader);
+    const $topBarAvatar = $('.js-topbaravatar', $topBar);
 
     if (u_type === 0) {
-        $loginButton.text(l[967]);
+        $('span', $loginButton).text(l[967]);
     }
 
     $menuLoggedBlock.addClass('hidden').removeClass('business-acc');
@@ -2039,37 +2193,30 @@ function topmenuUI() {
     $menuUpgradeAccount.removeClass('hidden');
     $menuAvatar.removeClass('presence');
 
-    $headerWarningIcon.addClass('hidden');
     $headerActivityBlock.addClass('hidden');
-    $headerActivityStatus.addClass('hidden');
-    $headerPlanIcon.attr('class', 'tiny-icon membership-status free');
-    $headerIndividual.text(l[19702]).removeClass('hidden'); // try Mega Business
+    $headerIndividual.removeClass('hidden'); // try Mega Business
+    $headerIndividualSpan.text(l[19702]); // try Mega Business
+    $headerSetStatus.addClass('hidden');
     $headerAchievements.addClass('hidden');
     $('.membership-status, .top-head .user-name', $topHeader).addClass('hidden');
 
-    if (fminitialized) {
-        $headerSearch.removeClass('hidden');
-        $headerNotificationIcon.removeClass('hidden');
-    }
-    else {
+    if (!fminitialized) {
         $headerSearch.addClass('hidden');
-        $headerNotificationIcon.addClass('hidden');
     }
 
-    if (folderlink) {
-        $headerNotificationIcon.addClass('hidden');
-    }
     if (page === 'download') {
         $menuRefreshItem.removeClass('hidden');
     }
     if (page === 'business' || page ==='registerb') {
-        $headerIndividual.text(l[19529]); // try Mega MEGA Indivisual
+        $headerIndividualSpan.text(l[19529]); // try Mega MEGA Indivisual
     }
 
     var avatar = window.useravatar && useravatar.mine();
     if (!avatar) {
-        $headerAvatar.addClass('hidden');
         $menuAvatar.addClass('hidden');
+    }
+    else {
+        $menuAvatar.removeClass('hidden');
     }
 
     // Show active item in main menu
@@ -2109,6 +2256,7 @@ function topmenuUI() {
         $menuItem = undefined;
     }
 
+
     if (u_type === 3 && u_attr.fullname) {
         $('.user-name', $topHeader).text(u_attr.fullname).removeClass('hidden');
         $menuUsername.text(u_attr.fullname).removeClass('hidden');
@@ -2136,7 +2284,6 @@ function topmenuUI() {
     });
 
     if (u_type > 0) {
-        $('body').removeClass('not-logged').addClass('logged');
 
         $menuHomeItem.addClass('hidden');
         $menuFmItem.removeClass('hidden');
@@ -2146,12 +2293,16 @@ function topmenuUI() {
         $menuFeedbackItem.removeClass('hidden');
 
         // for top menu, load avatar and show for logged in user
-        useravatar.loadAvatar(u_handle).always(function(){
-            $headerAvatar.safeHTML(useravatar.contact(u_handle));
-            $menuAvatar.safeHTML(useravatar.contact(u_handle));
-        });
+        if (!$topBarAvatar.hasClass('rendered')) {
+            useravatar.loadAvatar(u_handle).always(function(){
+                $topBarAvatar.addClass('rendered');
+                $('.avatar',$topBarAvatar).safeHTML(useravatar.contact(u_handle));
+            });
+        }
 
+        $headerButtons.addClass('hidden');
         $loginButton.addClass('hidden');
+        $('.dropdown.top-login-popup', $topHeader).addClass('hidden');
         $('.membership-status', $topHeader).removeClass('hidden');
         $('.top-change-language', $topHeader).addClass('hidden');
         $headerRegisterBotton.addClass('hidden');
@@ -2161,10 +2312,10 @@ function topmenuUI() {
         // Show the rocket icon if achievements are enabled
         mega.achievem.enabled()
             .done(function () {
-                $headerAchievements.removeClass('hidden');
+                $headerAchievements.parent().removeClass('hidden');
             })
             .fail(function () {
-                $headerAchievements.addClass('hidden');
+                $headerAchievements.parent().addClass('hidden');
             });
 
         if (u_attr.email) {
@@ -2180,26 +2331,28 @@ function topmenuUI() {
 
             // Set colour of plan and body class
             var cssClass;
-            $('body').removeClass('free lite');
+
+            document.body.classList.remove('free');
 
             if (proNum === 4) {
                 cssClass = 'lite';
-                $('body').addClass('lite');
+                document.body.classList.add('lite');
             }
             else {
                 cssClass = 'pro' + proNum;
+                document.body.classList.remove('lite');
             }
 
             // Show the Pro badge
             $('.plan', $menuLoggedBlock).text(purchasedPlan);
-            $headerPlanIcon.attr('class', 'tiny-icon membership-status ' + cssClass);
-            $('body').addClass('pro-user');
+            document.body.classList.add('pro-user');
         }
         else {
             // Show the free badge
             $('.plan', $menuLoggedBlock).text(l[1150]);
             $('.membership-status', $topHeader).attr('class', 'tiny-icon membership-status free');
-            $('body').removeClass('lite pro-user').addClass('free');
+            document.body.classList.remove('lite', 'pro-user');
+            document.body.classList.add('free');
         }
 
         if (is_fm()) {
@@ -2209,7 +2362,7 @@ function topmenuUI() {
         // If the chat is disabled don't show the green status icon in the header
         if (!pfid && !megaChatIsDisabled) {
             $headerActivityBlock.removeClass('hidden');
-            $headerActivityStatus.removeClass('hidden');
+            $headerSetStatus.removeClass('hidden');
             $menuAvatar.addClass('presence');
             if (megaChatIsReady) {
                 megaChat._renderMyStatus();
@@ -2228,20 +2381,17 @@ function topmenuUI() {
                 // Hide Pricing menu item for Business sub accounts and admin expired
                 $menuPricingItem.addClass('hidden');
             }
-            $('body').addClass('business-user');
+            document.body.classList.add('business-user');
         }
         else {
-            $('body').removeClass('business-user');
+            document.body.classList.remove('business-user');
         }
 
         // Show PRO plan expired warning popup (if applicable)
         alarm.planExpired.render();
     }
     else {
-        if (u_type !== 0) {
-            $('body').removeClass('logged').addClass('not-logged');
-        }
-        else if (!confirmok && page !== 'key') {
+        if (u_type === 0 && !confirmok && page !== 'key') {
 
             $('.top-menu-item.register span', $topMenu).text(l[968]);
 
@@ -2260,8 +2410,8 @@ function topmenuUI() {
 
         $menuLoggedBlock.addClass('hidden');
         $('.membership-status-block', $topHeader).addClass('hidden');
-        $headerNotificationIcon.addClass('hidden');
         $headerAchievements.addClass('hidden');
+        $headerButtons.removeClass('hidden');
         $headerRegisterBotton.removeClass('hidden');
 
         if (u_type === 0 && is_fm()) {
@@ -2333,54 +2483,116 @@ function topmenuUI() {
     $.hideTopMenu = function (e) {
 
         var c;
+        let $target;
+        let element;
+        let elements;
+        let parent;
+        let i;
 
         if (e) {
-            c = $(e.target).attr('class');
+
+            parent = e.target.parentNode;
+            // if event is triggered by inner element of mega-button, try pull classname of the button.
+            if (parent.classList.contains('mega-button')) {
+                c = parent.className;
+            }
+            else {
+                c = e.target.className;
+            }
         }
-        if (!e || ($(e.target).parents('.top-menu-popup').length === 0
-            && !$(e.target).hasClass('top-menu-popup')
-            && !$('.top-menu-popup', 'body').hasClass('hidden')
-            && ((c && c.indexOf('top-icon menu') == -1) || !c))) {
+        elements = document.getElementsByClassName('js-more-menu menu-open');
+
+        if (!e || !e.target.closest('.top-menu-popup, .js-more-menu') && elements.length &&
+            (!c || !c.includes('top-icon menu') && !c.includes('top-menu-popup'))) {
             topMenu(1);
         }
-        if (!e || ($(e.target).parents('.top-warning-popup').length === 0
-            && !$(e.target).hasClass('top-menu-popup')
-            && ((c && c.indexOf('top-icon warning') == -1) || !c))) {
-            $topHeader.find('.top-warning-popup').addClass('hidden');
-            $headerWarningIcon.removeClass('active');
-        }
-        if (!e || ($(e.target).parents('.top-user-status-popup').length === 0
-            && ((c && c.indexOf('activity-status') === -1 && c.indexOf('loading') === -1) || !c))) {
-            $topHeader.find('.top-user-status-popup').addClass('hidden');
+
+        if (!e || e.target.closest('.top-menu-popup') &&
+            (!c || !c.includes('activity-status') && !c.includes('loading'))) {
             $headerActivityBlock.removeClass('active');
         }
-        if (!e || ($(e.target).parents('.notification-popup').length == 0
-            && ((c && c.indexOf('top-icon notification') === -1) || !c))) {
 
-            if (typeof notify === 'object') {
-                notify.closePopup();
-            }
-        }
-        if (!e || ($(e.target).parents('.dropdown.top-login-popup').length === 0
-            && ((c && c.indexOf('top-login-popup') === -1 && c.indexOf('top-login-button') === -1) || !c))) {
+        if (!e || !e.target.closest('.top-login-popup') &&
+            (!c || !c.includes('top-login-popup') && !c.includes('top-login-button'))) {
             $topHeader.find('.dropdown.top-login-popup').addClass('hidden');
         }
-        if ((!e || $(e.target).parents('.create-new-folder').length == 0)
-            && (!c || c.indexOf('fm-new-folder') == -1)) {
+
+        if (!e || !e.target.closest('.create-new-folder') &&
+            (!c || !c.includes('fm-new-folder'))) {
+
             var c3;
+
             if (e && e.target) {
-                c3 = $(e.target).parent().attr('class');
+                c3 = e.target.parentNode.className;
             }
-            if (!c3 || c3.indexOf('fm-new-folder') == -1) {
-                $('.fm-new-folder').removeClass('active filled-input');
-                $('.create-new-folder').addClass('hidden');
+
+            if (!c3 || c3.indexOf('fm-new-folder') === -1) {
+
+                element = document.getElementsByClassName('fm-new-folder').item(0);
+
+                if (element) {
+                    element.classList.remove('active', 'filled-input');
+                }
+
+                element = document.getElementsByClassName('create-new-folder').item(0);
+
+                if (element) {
+                    element.classList.add('hidden');
+                }
             }
         }
-        if ((!e || $(e.target).parents('.fm-add-user,.add-user-popup').length == 0)
-            && (!c || c.indexOf('fm-add-user') == -1)) {
-            $('.fm-add-user').removeClass('active');
-            $('.add-user-popup').addClass('hidden');
-            $('.add-user-popup').removeAttr('style');
+
+        if ((!e || !e.target.closest('.fm-add-user, .add-user-popup')) &&
+            (!c || c.indexOf('fm-add-user') === -1)) {
+
+            element = document.getElementsByClassName('fm-add-user').item(0);
+
+            if (element) {
+                element.classList.remove('active');
+            }
+
+            element = document.getElementsByClassName('add-user-popup').item(0);
+
+            if (element) {
+                element.classList.add('hidden');
+                element.removeAttribute('style');
+            }
+        }
+
+        if (!e || (!e.target.closest('.js-dropdown-notification') &&
+            ((c && c.indexOf('js-topbarnotification') === -1) || !c))) {
+            elements = document.getElementsByClassName('js-dropdown-notification');
+            for (i = elements.length; i--;) {
+                elements[i].classList.remove('show');
+            }
+        }
+
+        if (!e || (!e.target.closest('.js-dropdown-warning') &&
+            ((c && c.indexOf('js-dropdown-warning') === -1) || !c))) {
+            elements = document.getElementsByClassName('js-dropdown-warning');
+            for (i = elements.length; i--;) {
+                elements[i].classList.remove('show');
+            }
+        }
+
+        if (!e ||
+            (
+                !e.target.closest('.js-dropdown-account') &&
+                (
+                    c && c.indexOf('js-topbaravatar') === -1 ||
+                    !c
+                )
+            )) {
+
+            elements = document.getElementsByClassName('js-dropdown-account');
+
+            for (i = elements.length; i--;) {
+                elements[i].classList.remove('show');
+            }
+        }
+
+        if (!e || !(parent && parent.classList.contains('js-dropdown-account'))) {
+            $('.fm-breadcrumbs-block .dropdown').removeClass('active');
         }
     };
 
@@ -2392,6 +2604,10 @@ function topmenuUI() {
 
     $headerAchievements.rebind('click.achievements', function() {
         mega.achievem.achievementsListDialog();
+    });
+
+    $headerDownloadMega.rebind('click.downloadmega', function() {
+        loadSubPage('sync');
     });
 
     // try individual button in business mode
@@ -2411,28 +2627,14 @@ function topmenuUI() {
         }
     });
 
-    $('.top-icon.menu', 'body').rebind('click.openmenu', function() {
+    $('.js-more-menu, .top-icon.menu', '.fmholder').rebind('click.openmenu', function() {
         topMenu();
     });
 
-    $('.top-menu-icon.close', $topMenu).rebind('click.closemenu', function() {
+    $('.close', $topMenu).rebind('click.closemenu', function() {
         topMenu(1);
     });
 
-    $headerActivityBlock.rebind('click.topui', function() {
-        var $this = $(this);
-        if ($this.attr('class').indexOf('active') == -1) {
-            $this.addClass('active');
-            $topHeader.find('.top-user-status-popup')
-                .removeClass('hidden')
-                .find('.dropdown-item').show();
-            topPopupAlign('.activity-status-block', '.top-user-status-popup', 40);
-        }
-        else {
-            $this.removeClass('active');
-            $topHeader.find('.top-user-status-popup').addClass('hidden');
-        }
-    });
     $('.top-user-status-popup .dropdown-item', $topHeader)
         .rebind('click.topui', function (e) {
             var $this = $(this);
@@ -2440,11 +2642,7 @@ function topmenuUI() {
             if ($this.attr('class').indexOf('active') === -1) {
                 $topHeader.find('.top-user-status-popup .dropdown-item')
                     .removeClass('active');
-                $(this).addClass('active');
-                $headerActivityStatus.attr('class', 'top ' + $('.activity-status', $this).attr('class'));
                 $headerActivityBlock.removeClass('active');
-
-                $('.top-user-status-popup', $topHeader).addClass('hidden');
 
                 if (!megaChatIsReady && !megaChatIsDisabled) {
                     var presence = $(this).data("presence");
@@ -2457,20 +2655,25 @@ function topmenuUI() {
             }
         });
 
-    $('.top-menu-item', $topMenu)
+    $('.top-menu-item, .logout', $topMenu)
         .rebind('click.menuitem tap.menuitem', function() {
             var $this = $(this);
+            var $scrollBlock = $('.top-menu-scroll', $topMenu);
             var className = $this.attr('class') || '';
 
             if (className.indexOf('submenu-item') > -1) {
                 if (className.indexOf('expanded') > -1) {
+
                     $(this).removeClass('expanded');
                 }
                 else {
                     $(this).addClass('expanded');
                 }
                 if (!is_mobile) {
-                    setTimeout(topMenuScroll, 200);
+
+                    delay('sideMenuScroll', function() {
+                        topMenuScroll($scrollBlock);
+                    }, 200);
                 }
             }
             else if (className.indexOf('cookies-settings') > -1) {
@@ -2483,6 +2686,7 @@ function topmenuUI() {
                 if ($('.light-overlay', 'body').is(':visible')) {
                     loadingInitDialog.hide();
                 }
+
                 topMenu(1);
 
                 var subpage;
@@ -2503,7 +2707,7 @@ function topmenuUI() {
                 };
 
                 for (var i = subPages.length; i--;) {
-                    if (className.indexOf(subPages[i]) > -1) {
+                    if (this.classList.contains(subPages[i])) {
                         subpage = subPages[i];
                         break;
                     }
@@ -2541,11 +2745,8 @@ function topmenuUI() {
             return false;
         });
 
-    $menuAvatar.rebind('click.openaccount', function() {
-        loadSubPage('fm/account');
-    });
-
     $menuUserinfo.rebind('click.openaccount', function() {
+        topMenu(1);
         loadSubPage('fm/account');
     });
 
@@ -2558,85 +2759,8 @@ function topmenuUI() {
         mobile.languageMenu.init();
     }
 
-    $headerSearch.rebind('click.resetval', function() {
-        if ($.trim($('.top-search-input').val()) === "") {
-            $(this).addClass('active');
-            $('.top-search-input').trigger("focus");
-        }
-    });
-
-    $('.top-search-input', $headerSearch).rebind('blur.searchblur', function() {
-        $headerSearch.removeClass('active');
-        if ($(this).val() == '') {
-            $headerSearch.removeClass('contains-value');
-            $('.top-search-button', $headerSearch).addClass('hidden');
-            $('.top-clear-button', $headerSearch).addClass('hidden');
-        }
-        else {
-            $headerSearch.addClass('contains-value');
-            $('.top-search-button', $headerSearch).addClass('hidden');
-            $('.top-clear-button', $headerSearch).removeClass('hidden');
-        }
-    });
-
-    $('.top-clear-button', $headerSearch).rebind('click.searchclear', function(e) {
-
-        // stop propaation to not calling .top-search-bl click
-        e.stopPropagation();
-
-        // if this is folderlink, open folderlink root;
-        if (folderlink) {
-            M.nn = false;
-            M.openFolder();
-        }
-        $headerSearch.removeClass('contains-value active');
-        $('.top-clear-button', $headerSearch).removeClass('hidden');
-        $('.top-search-input', $headerSearch).val('').trigger('blur');
-        // if current page is search result reset it.
-        if (page.indexOf('/search/') !== -1) {
-            loadSubPage(page.slice(0, page.indexOf('/search/')));
-        }
-    });
-
-    $('.top-search-input', $headerSearch).rebind('focus.searchfocus', function() {
-        if ($(this).closest('.top-search-bl').hasClass('active')) {
-            $('.top-search-button', $headerSearch).removeClass('hidden');
-            $('.top-clear-button', $headerSearch).addClass('hidden');
-        }
-    });
-
-    $('#search-fake-form', $headerSearch).rebind('submit.searchsumbit', function() {
-        return false;
-    })
-
-    $('.top-search-button', $headerSearch)
-        .rebind('click.search mousedown.search', function _topSearchHandler() {
-
-            var val = $.trim($('.top-search-input', $headerSearch).val());
-
-            // if current page is search and value is empty result move to root.
-            if (!val && page.indexOf('/search/') !== -1) {
-                $('.top-clear-button', $headerSearch).addClass('hidden');
-                loadSubPage(page.slice(0, page.indexOf('/search/')));
-            }
-            else if (val.length >= 2 || !asciionly(val)) {
-                var $this = $(this);
-
-                M.fmSearchNodes(val).then(function() {
-                    $this.trigger('blur');
-                });
-            }
-        });
-
-    // Press enter to start searching
-    $('.top-search-input', $headerSearch).rebind('keyup.search', function(e) {
-        if (e.keyCode === 13) {
-            $('.top-search-button', $headerSearch).click();
-        }
-    });
-
     // Hover tooltip for top-menu elements and sidebar icons
-    $('.nw-fm-left-icon, .top-icon').rebind('mouseover.nw-fm-left-icon', function () {
+    $('.nw-fm-left-icon, .js-top-buttons').rebind('mouseover.nw-fm-left-icon', function() {
         var $this = $(this);
         var $tooltip = $this.find('.dark-tooltip');
         var tooltipPos;
@@ -2673,18 +2797,6 @@ function topmenuUI() {
             clearTimeout($.liTooltipTimer);
         });
 
-    $headerAvatar.rebind('click.headeravatar', function() {
-
-        // If the user has an avatar already set, take them to the profile page where they can change or remove it
-        if ($(this).find('img').length > 0) {
-            loadSubPage('fm/account');
-        }
-        else {
-            // Otherwise if they don't have an avatar, open the change avatar dialog;
-            avatarDialog();
-        }
-    });
-
     // If the user name in the header is clicked, take them to the account overview page
     $('.user-name', $topHeader).rebind('click.showaccount', function() {
         loadSubPage('fm/account');
@@ -2699,10 +2811,10 @@ function topmenuUI() {
 
     /**
      * this is closing the EFQ email confirm dialog, if needed for something else ask before re-enabling [dc]
-    if (!$('.fm-dialog.registration-page-success').hasClass('hidden')) {
-        $('.fm-dialog.registration-page-success').addClass('hidden');
+    if (!$('.mega-dialog.registration-page-success').hasClass('hidden')) {
+        $('.mega-dialog.registration-page-success').addClass('hidden');
         $('.fm-dialog-overlay').addClass('hidden');
-        $('body').removeClass('overlayed');
+        document.body.classList.remove('overlayed');
     }*/
 
     /**
@@ -2729,16 +2841,6 @@ function topmenuUI() {
             loadSubPage('fm');
         }
     });
-
-    if (String(M.currentdirid).substr(0, 7) === 'search/' && M.currentdirid[7] !== '~') {
-        $headerSearch.addClass('contains-value');
-        $('.top-clear-button', $headerSearch).removeClass("hidden");
-        var searchVal = M.currentdirid.substr(7);
-        if (hashLogic) {
-            searchVal = decodeURIComponent(searchVal);
-        }
-        $('input', $headerSearch).val(searchVal);
-    }
 
     // Initialise the header icon for mobile
     if (is_mobile) {
@@ -2817,7 +2919,6 @@ pagemetadata.last = null;
 function parsepage(pagehtml) {
     'use strict';
 
-    var $body = $('body').removeClass('ads');
     $('#fmholder, #pageholder, #startholder').addClass('hidden');
     pagemetadata();
 
@@ -2844,9 +2945,12 @@ function parsepage(pagehtml) {
     }
     pagehtml = (($.mTransferWidgetPage || '') + pagehtml).replace(/{staticpath}/g, staticpath);
 
-    $('#startholder', $body).safeHTML(pagehtml).removeClass('hidden');
+    $('#startholder').safeHTML(pagehtml).removeClass('hidden');
 
-    $body.addClass('bottom-pages');
+    // if this is bottom page we have to enforce light mode for now.
+    document.body.classList.remove('theme-dark');
+    document.body.classList.add('theme-light', 'bottom-pages');
+
     $('body, html, .bottom-pages .fmholder').stop(true, true).scrollTop(0);
     bottompage.init();
 
@@ -2999,6 +3103,7 @@ function loadSubPage(tpage, event) {
         return false;
     }
 
+    mBroadcaster.sendMessage('beforepagechange', tpage);
     if (jsl.length > 0) {
         loadingDialog.show();
         jsl_start();

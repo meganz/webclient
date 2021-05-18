@@ -1,5 +1,5 @@
 .provider-icon {
-    background-image: url(../images/mega/payment-provider-icons-v3.png);
+    background-image: url(../images/mega/payment-provider-icons.png);
     background-position: 0 0;
     background-repeat: no-repeat;
     display: inline-block;
@@ -240,10 +240,10 @@
 .pricing-sprite,
 i.pricing-sprite,
 .pricing-page.slider .ui-slider-handle {
-    background-image: url(../images/mega/pricing-sprite_v1.png);
+    background-image: url(../images/mega/pricing-sprite.png);
     background-repeat: no-repeat;
 }
-.pricing-sprite.powered-by-astropay {
+.mobile .pricing-sprite.powered-by-astropay {
     height: 25px;
     width: 100px;
     background-position: -14px -815px;
@@ -441,10 +441,8 @@ i.pricing-sprite,
     position: relative;
 }
 .pricing-page label.radio-txt {
-    font-size: 14px;
-    color: #373737;
-    font-family: 'LatoWebBold', Arial;
-    padding-top: 7px;
+    font: var(--text-body1);
+    color: var(--text-color-high);
     cursor: pointer;
 }
  .pricing-page.radio-buttons label.radio-txt:last-child {
@@ -499,9 +497,9 @@ i.pricing-sprite,
 .pricing-page.plan {
     text-align: center;
     box-sizing: border-box;
-    border: 1px solid #D5D5D5;
+    border: 1px solid var(--stroke-grey-2);
     position: relative;
-    background-color: #FFF;
+    background: var(--surface-main);
 }
 .pricing-page.plan.details {
     text-align: left;
@@ -573,13 +571,13 @@ i.pricing-sprite,
 .pricing-page.plan-title {
     font-size: 28px;
     line-height: 34px;
-    color: #373737;
+    color: var(--text-color-high);
     font-family: montserrat_light, montserrat, Arial, sans-serif;
 }
 .pricing-page.plan-info {
     font-size: 16px;
     line-height: 24px;
-    color: #666;
+    color: var(--text-color-medium);
     padding: 8px 10px 20px 10px;
     white-space: normal;
     box-sizing: border-box;
@@ -590,12 +588,12 @@ i.pricing-sprite,
     font-size: 37px;
     line-height: 45px;
     padding: 0 15px;
-    color: #373737;
+    color: var(--text-color-high);
     font-family: 'montserrat_light', 'montserrat', Arial;
 }
 .pricing-page.plan-price .asterisk {
     font-size: 20px;
-    color: #373737;
+    color: var(--text-color-high);
     vertical-align: top;
     display: none;
     margin-top: -5px;
@@ -604,15 +602,15 @@ i.pricing-sprite,
     display: inline-block;
 }
 .pricing-page.plan-currency, .pricing-page.plan-period, .pricing-page.plan-data {
+    color: var(--text-color-high);
     font-size: 16px;
     line-height: 19px;
-    color: #373737;
-    font-family: 'montserrat_light', 'montserrat', Arial;
+    font-family: 'montserrat_light', 'montserrat', Arial, sans-serif;
 }
 .pricing-page.plan-data {
     font-size: 15px;
     margin-top: 10px;
-    color: #777;
+    color: var(--text-color-medium);
 }
 .pricing-page.plan-price + .pricing-page.plan-period {
     padding-top: 6px;
@@ -671,14 +669,12 @@ body:not(.mobile) .current .pricing-page.plan-button:hover {
     color: white;
     padding: 0 15px 0 15px;
     font-size: 14px;
-    line-height: 38px;
-    -moz-border-radius: 5px;
-    -webkit-border-radius: 5px;
-    border-radius: 5px;
+    line-height: 40px;
+    border-radius: 4px;
     display: inline-block;
 }
 .reg-st5-complete-button.active {
-    background-color: #D82C00;
+    background: var(--surface-error);
     cursor: pointer;
 }
 
@@ -809,7 +805,7 @@ body:not(.mobile) .plan.pro3:not(.current) .pricing-page.plan-button:hover {
 .pricing-page.plan-feature {
     font-size: 15px;
     line-height: 20px;
-    color: #666;
+    color: var(--text-color-medium);
     padding: 7px 39px 7px 16px;
     position: relative;
     white-space: normal;
@@ -820,9 +816,10 @@ body:not(.mobile) .plan.pro3:not(.current) .pricing-page.plan-button:hover {
 .pricing-page.plan-feature span {
     display: inline-block;
 }
-.pricing-page.plan-feature.strong {
+.pricing-page.plan-feature.strong,
+.pricing-page.plan-feature.strong * {
     font-family: 'LatoWebBold', Arial;
-    color: #373737;
+    color: var(--text-color-high);
 }
 .pricing-page.plan .i-icon:hover {
     background-color: #BCB9B9;
@@ -830,7 +827,7 @@ body:not(.mobile) .plan.pro3:not(.current) .pricing-page.plan-button:hover {
 .pricing-page.local-currency-tip {
     font-size: 14px;
     line-height: 20px;
-    color: #666;
+    color: var(--text-color-low);
     padding: 20px 0 0 0;
     text-align: center;
     display: none;
@@ -902,18 +899,6 @@ body:not(.mobile) .plan.pro3:not(.current) .pricing-page.plan-button:hover {
     bottom: -3px;
     background: none;
 }
-.dark-direct-tooltip.pricing-tip i:before {
-    content: '';
-    display: block;
-    width: 10px;
-    height: 11px;
-    transform: rotate(-45deg);
-    -moz-transform: rotate(-45deg);
-    -ms-transform: rotate(-45deg);
-    -o-transform: rotate(-45deg);
-    -webkit-transform: rotate(-45deg);
-    background: #333333;
-}
 
 /* jQ Slider */
 .pricing-page.slider-wrap {
@@ -925,13 +910,13 @@ body:not(.mobile) .plan.pro3:not(.current) .pricing-page.plan-button:hover {
     width: auto;
     max-width: 973px;
     height: 24px;
-    background-color: #E8E8E8;
+    background: #E8E8E8;
     border-radius: 10px;
     margin: 0;
     position: static;
 }
 .pricing-page.slider .ui-slider-range {
-    background-color: #00C0A6;
+    background: #00C0A6;
     height: 24px;
     border-radius: 10px;
     -webkit-transition: width 200ms ease-in-out;
@@ -960,7 +945,7 @@ body:not(.mobile) .plan.pro3:not(.current) .pricing-page.plan-button:hover {
     width: 40px;
     height: 40px;
     border-radius: 100%;
-    background-color: #D3D3D3;
+    background: #D3D3D3;
     position: absolute;
     left: 0;
     top: 0;
@@ -971,11 +956,11 @@ body:not(.mobile) .plan.pro3:not(.current) .pricing-page.plan-button:hover {
     transition: background-color 200ms ease-in-out, box-shadow 200ms ease-in-out;
 }
 body:not(.mobile) .pricing-page.slider-dot:hover {
-    background-color: #00BFA5;
+    background: #00BFA5;
 }
 .pricing-page.slider-dot.active {
     box-shadow: 0 0 0 4px #FFF;
-    background-color: #00BFA5;
+    background: #00BFA5;
 }
 .pricing-page.slider-dot.d2 {
     left: 33.333333%;
@@ -1286,6 +1271,40 @@ body:not(.mobile) .pricing-page.slider-dot:hover {
 }
 
 /* Playment page */
+
+/* Argentina notification */
+.orange-notification.body {
+    display: table;
+    background-color: rgba(191, 74, 0, 0.05);
+    box-shadow: 0 0 0 1px rgba(191, 104, 0, 0.2);
+    border-radius: 3px;
+    padding: 0 16px 0 12px;
+    margin-left: 1px;
+    margin-top: 20px;
+    box-sizing: border-box;
+    max-width: calc(100% - 2px);
+}
+.orange-notification.body.hidden {
+    display: none;
+}
+.orange-notification.cell {
+    display: table-cell;
+    vertical-align: middle;
+    color: #ff6f00;
+    font-size: 13px;
+    line-height: 18px;
+}
+.argentina-only .orange-notification.cell {
+    padding: 6px;
+}
+.orange-notification.cell.text {
+    padding: 5px 0;
+}
+.orange-notification .icons-sprite.fvnotice {
+    background-position: -3px -1727px;
+}
+
+/* Content */
 .payment-section .top-header.plan-title {
     padding-bottom: 20px;
 }
@@ -1346,6 +1365,7 @@ body:not(.mobile) .pricing-page.slider-dot:hover {
     float: left;
 }
 .payment-page.info-block .provider-details {
+    color: var(--text-color-high);
     display: inline-block;
     font-size: 14px;
     line-height: 26px;
@@ -1366,7 +1386,7 @@ body:not(.mobile) .pricing-page.slider-dot:hover {
     vertical-align: top;
     width: 16px;
     background-color: #fff;
-    margin: 4px 10px 0 0;
+    margin: 5px 10px 0 0;
     box-shadow: 0 0 0 1px rgba(0,0,0,0.1);
 }
 .membership-radio::before, .membership-radio:after {
@@ -1537,7 +1557,7 @@ body:not(.mobile) .pricing-page.slider-dot:hover {
 .reg-st5-info-icon {
     width: 32px;
     height: 32px;
-    background-image: url(../images/mega/register-big-sprite-v15.png);
+    background-image: url(../images/mega/register-big-sprite.png);
     margin: 30px auto 20px;
     background-position: 1px -1631px;
     background-repeat: no-repeat;
@@ -1565,17 +1585,17 @@ body:not(.mobile) .pricing-page.slider-dot:hover {
 }
 
 /* Promotion Voucher code, I will remove once I have more time */
-.redeem-promo-page .mega-input-title-ontop input {
+.redeem-promo-page .mega-input.title-ontop input {
     text-transform: uppercase;
 }
-.redeem-promo-page .mega-input-title-ontop {
+.redeem-promo-page .mega-input.title-ontop {
     width: 320px;
 }
-body.mobile .redeem-promo-page .mega-input-title-ontop {
+body.mobile .redeem-promo-page .mega-input.title-ontop {
     width: 100%;
 }
 .redeem-promo-page .onboard-image {
-    background-image: url(../images/mega/onboarding_download_v2.png);
+    background-image: url(../images/mega/onboarding_download.png);
 }
 .redeem-promo-page .onboard-image.voucher {
     background-position: 0 -635px;
@@ -1611,7 +1631,7 @@ body.mobile .redeem-promo-page .mega-input-title-ontop {
 .redeem-promo-page .voucher-input-container {
     margin-bottom: 36px;
 }
-.redeem-promo-page .button-block .default-green-button {
+.redeem-promo-page .button-block .mega-button.positive {
     min-width: 180px;
 }
 .redeem-promo-page .button-block {
@@ -1639,11 +1659,11 @@ body.mobile .redeem-promo-page .mega-input-title-ontop {
     .pricing-sprite,
     i.pricing-sprite,
     .pricing-page.slider .ui-slider-handle {
-        background-image: url(../images/mega/pricing-sprite_v1@2x.png);
+        background-image: url(../images/mega/pricing-sprite@2x.png);
         background-size: 373px auto;
     }
     .redeem-promo-page .onboard-image {
-        background-image: url(../images/mega/onboarding_download_v2@2x.png);
+        background-image: url(../images/mega/onboarding_download@2x.png);
         background-size: 600px auto;
     }
 }
@@ -1704,7 +1724,7 @@ body.mobile .redeem-promo-page .mega-input-title-ontop {
         line-height: 24px;
         color: #666;
     }
-    
+
     /*Plans block */
     .pricing-page.local-currency-tip {
         font-size: 12px;
@@ -1740,7 +1760,7 @@ body.mobile .redeem-promo-page .mega-input-title-ontop {
     .pricing-page.plan .i-icon {
         right: 14px;
     }
-    
+
     /* jQ slider */
     .pricing-page.slider-wrap {
         margin: 70px 70px 143px 70px;
@@ -1770,7 +1790,7 @@ body.mobile .redeem-promo-page .mega-input-title-ontop {
     .pricing-page.slider-dot span {
         font-size: 18px;
     }
-    
+
     /* Compare blocks */
     .pricing-section .page-icon.x48 {
         width: 36px;
@@ -1847,7 +1867,7 @@ body.mobile .redeem-promo-page .mega-input-title-ontop {
     .slide1 .pricing-page.compare-info {
         padding-top: 40px;
     }
-    
+
     /*  MEGA Solutions */
     .pricing-page.solution-name {
         font-size: 22px;
@@ -1863,7 +1883,7 @@ body.mobile .redeem-promo-page .mega-input-title-ontop {
         margin: 64px 22px -18px 22px;
         border-spacing: 18px;
     }
-    
+
     /*  MEGA roles */
     .pricing-page.roles-wrap {
         padding: 0 0 48px 0;
@@ -1876,7 +1896,7 @@ body.mobile .redeem-promo-page .mega-input-title-ontop {
         line-height: 24px;
         padding: 22px 0 0 0;
     }
-    
+
     /* Payment page */
     .payment-section .button.purchase {
         float: none;
@@ -1914,7 +1934,7 @@ body.mobile .redeem-promo-page .mega-input-title-ontop {
         line-height: 48px;
         padding-top: 70px;
     }
-    
+
     /* Plan cards */
     .plans-bottom-pad {
         padding-bottom: 88px;
@@ -1963,12 +1983,12 @@ body.mobile .redeem-promo-page .mega-input-title-ontop {
     .br .pricing-page.slider-dot .label, .es .pricing-page.slider-dot .label {
         font-size: 12px;
     }
-    
+
     /* Roles */
     .pricing-page.roles-wrap .col-4 {
         padding: 54px 0 0 0;
     }
-    
+
     /* Business bottom block */
     .pricing-button.green-button {
         margin: 40px 0 0 0;
@@ -1984,7 +2004,7 @@ body.mobile .redeem-promo-page .mega-input-title-ontop {
         line-height: 38px;
         padding-top: 60px;
     }
-    
+
     /* Plans */
     .pricing-section .pricing-page.plans-block {
         padding: 0 14px;
@@ -2025,7 +2045,7 @@ body.mobile .redeem-promo-page .mega-input-title-ontop {
     .pricing-page.plans-wrap {
         padding: 40px 0 0 0;
     }
-    
+
     /* Compare */
     .pricing-page.slider-wrap {
         margin: 45px 35px 95px 35px;
@@ -2057,13 +2077,13 @@ body.mobile .redeem-promo-page .mega-input-title-ontop {
         background-size: 128px auto;
         background-position: -29px -248px;
     }
-    
+
     /* Solutions */
     .pricing-page.solutions-wrap {
         display: block;
         margin: 20px 0 0 0;
     }
-    
+
     /* Payment page */
     .payment-page.info-block .payment-method,
     .payment-page.info-block .payment-duration {
@@ -2086,7 +2106,7 @@ body.mobile .redeem-promo-page .mega-input-title-ontop {
         font-size: 14px;
         line-height: 24px;
     }
-    
+
     .bottom-page.horizontal-centered-bl.pricing-pad {
         padding: 0 24px;
     }
@@ -2094,7 +2114,7 @@ body.mobile .redeem-promo-page .mega-input-title-ontop {
         font-size: 14px;
         line-height: 24px;
     }
-    
+
     /* Compare */
     .pricing-page label.radio-txt {
         font-size: 13px;
@@ -2115,7 +2135,7 @@ body.mobile .redeem-promo-page .mega-input-title-ontop {
         font-size: 10px;
         padding-right: 10px;
     }
-    
+
     /* Solutions */
     .pricing-page.solutions-wrap {
         display: block;

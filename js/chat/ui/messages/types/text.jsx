@@ -50,7 +50,7 @@ export default class Text extends AbstractGenericMessage {
                         extraPreButtons = [
                             ...extraPreButtons,
                             <DropdownItem
-                                icon="icons-sprite bold-crossed-eye"
+                                icon="sprite-fm-mono icon-eye-hidden"
                                 key="stop-link-preview"
                                 label={l[18684] /* `Remove preview` */}
                                 className=""
@@ -67,7 +67,7 @@ export default class Text extends AbstractGenericMessage {
                             ...extraPreButtons,
                             <DropdownItem
                                 key="remove-link-preview"
-                                icon="icons-sprite bold-crossed-eye"
+                                icon="sprite-fm-mono icon-eye-hidden"
                                 label={l[18684] /* `Remove preview` */}
                                 className=""
                                 onClick={(e) => {
@@ -111,15 +111,15 @@ export default class Text extends AbstractGenericMessage {
             ) {
                 const editButton = !IS_GEOLOCATION && (
                     <DropdownItem
-                        icon="icons-sprite writing-pencil"
+                        icon="sprite-fm-mono icon-rename"
                         label={l[1342] /* `Edit` */}
                         onClick={() => this.props.onEditToggle(true)} />
                 );
                 messageActionButtons = (
                     <Button
                         key="delete-msg"
-                        className="default-white-button tiny-button"
-                        icon="tiny-icon icons-sprite grey-dots">
+                        className="tiny-button"
+                        icon="sprite-fm-mono icon-options">
                         <Dropdown
                             className="white-context-menu attachments-dropdown"
                             noArrow={true}
@@ -130,9 +130,8 @@ export default class Text extends AbstractGenericMessage {
                             {editButton}
                             {editButton ? <hr/> : null}
                             <DropdownItem
-                                icon="red-cross"
+                                icon="sprite-fm-mono icon-dialog-close"
                                 label={l[1730] /* `Delete` */}
-                                className="red"
                                 onClick={e => this.props.onDelete(e, message)}
                             />
                         </Dropdown>
@@ -220,7 +219,7 @@ export default class Text extends AbstractGenericMessage {
                                     key="cancel"
                                     data-tooltip="not-sent-notification-cancel"
                                     onClick={e => this.props.onCancelRetry(e, message)}>
-                                    <i className="small-icon red-cross"/>
+                                    <i className="sprite-fm-mono icon-dialog-close" />
                                 </span>
                             </div>
                         );

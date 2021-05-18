@@ -795,7 +795,7 @@ BusinessAccount.prototype.copySubUserTreeToMasterRoot = function (treeObj, folde
 
 
 
-                M.copyNodes(treeToCopy, n.h, false, copyPromise, treeToCopy);
+                M.copyNodes(treeToCopy, n.h, false, copyPromise, treeToCopy, true);
                 // treeObj.shift();
                 // M.copyNodes(treeObj, n.h, false, copyPromise, treeObj);
 

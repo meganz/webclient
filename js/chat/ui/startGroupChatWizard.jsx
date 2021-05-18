@@ -10,7 +10,9 @@ import ModalDialogsUI from './../../ui/modalDialogs.jsx';
 
 
 export class StartGroupChatWizard extends MegaRenderMixin {
+    inputContainerRef = React.createRef();
     inputRef = React.createRef();
+
     static clickTime = 0;
     static defaultProps = {
         'selectLabel': l[1940],
@@ -94,37 +96,33 @@ export class StartGroupChatWizard extends MegaRenderMixin {
             failedToEnableChatlink = false;
         }
 
-        var extraFooterElement;
-        if (this.props.extraFooterElement) {
+        var extraContent;
+        if (this.props.extraContent) {
             self.state.step = 0;
-            extraFooterElement = <div className="extraFooterElement"></div>;
+            extraContent = <div className="content-block imported"></div>;
         }
         else if (self.state.step === 0 && haveContacts) {
             // always allow Next even if .selected is empty.
             allowNext = true;
 
             buttons.push({
-                    "label": l[556],
-                    "key": "next",
-                    // "defaultClassname": "default-grey-button lato right",
-                    "defaultClassname": "link-button lato right",
-                    "className": !allowNext ? "disabled" : null,
-                    "iconAfter": "small-icon grey-right-arrow",
-                    "onClick": function(e) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        self.setState({'step': 1});
-                    }
-                });
-
-            buttons.push({
                 "label": self.props.cancelLabel,
                 "key": "cancel",
-                "defaultClassname": "link-button lato left",
                 "onClick": function(e) {
                     self.props.onClose(self);
                     e.preventDefault();
                     e.stopPropagation();
+                }
+            });
+
+            buttons.push({
+                "label": l[556],
+                "key": "next",
+                "className": !allowNext ? "disabled positive" : "positive",
+                "onClick": function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    self.setState({'step': 1});
                 }
             });
         }
@@ -133,29 +131,15 @@ export class StartGroupChatWizard extends MegaRenderMixin {
 
             contacts = [];
             self.state.selected.forEach(function(h) {
-                M.u[h] && contacts.push(M.u[h]);
+                if (h in M.u) {
+                    contacts.push(M.u[h]);
+                }
             });
-
-            buttons.push({
-                    "label": l[726],
-                    "key": "done",
-                    "defaultClassname": "default-grey-button lato right",
-                    "className": !allowNext ? "disabled" : null,
-                    "onClick": function(e) {
-                        if (self.state.createChatLink === true && !self.state.groupName) {
-                            self.setState({'failedToEnableChatlink': true});
-                        }
-                        else {
-                            self.onFinalizeClick(e);
-                        }
-                    }
-                });
 
             if (!haveContacts || this.props.flowType === 2) {
                 buttons.push({
                     "label": self.props.cancelLabel,
                     "key": "cancel",
-                    "defaultClassname": "link-button lato left",
                     "onClick": function(e) {
                         self.props.onClose(self);
                         e.preventDefault();
@@ -167,8 +151,6 @@ export class StartGroupChatWizard extends MegaRenderMixin {
                 buttons.push({
                     "label": l[822],
                     "key": "back",
-                    "defaultClassname": "button link-button lato left",
-                    "iconBefore": "small-icon grey-left-arrow",
                     "onClick": function (e) {
                         e.preventDefault();
                         e.stopPropagation();
@@ -177,6 +159,19 @@ export class StartGroupChatWizard extends MegaRenderMixin {
                 });
             }
 
+            buttons.push({
+                "label": l[726],
+                "key": "done",
+                "className": !allowNext ? "positive disabled" : "positive",
+                "onClick": function(e) {
+                    if (self.state.createChatLink === true && !self.state.groupName) {
+                        self.setState({'failedToEnableChatlink': true});
+                    }
+                    else {
+                        self.onFinalizeClick(e);
+                    }
+                }
+            });
         }
 
         var chatInfoElements;
@@ -197,29 +192,43 @@ export class StartGroupChatWizard extends MegaRenderMixin {
                             contacts-search-header left-aligned top-pad
                             ${failedToEnableChatlink ? 'failed' : ''}
                         `}>
-                        <i className="small-icon conversations" />
-                        <input
-                            autoFocus
-                            type="search"
-                            ref={this.inputRef}
-                            placeholder={l[18509]}
-                            value={this.state.groupName}
-                            maxLength={30}
-                            onKeyDown={e => {
-                                const code = e.which || e.keyCode;
-                                if (allowNext && code === 13 && self.state.step === 1) {
-                                    this.onFinalizeClick();
-                                }
-                            }}
-                            onChange={e =>
-                                this.setState({ groupName: e.target.value, failedToEnableChatlink: false })
-                            }
-                        />
+                        <div
+                            className={`
+                                mega-input
+                                with-icon
+                                box-style
+                                ${this.state.groupName?.length > 0 ? 'valued' : ''}
+                                ${failedToEnableChatlink ? 'error msg' : ''}
+                            `}
+                            ref={this.inputContainerRef}>
+                            <i className="sprite-fm-mono icon-channel-new" />
+                            <input
+                                autoFocus
+                                className="megaInputs"
+                                type="text"
+                                ref={this.inputRef}
+                                placeholder={l[18509] /* `Enter group name` */}
+                                value={this.state.groupName}
+                                maxLength={30}
+                                onKeyDown={e => {
+                                    const code = e.which || e.keyCode;
+                                    if (allowNext && code === 13 && self.state.step === 1) {
+                                        this.onFinalizeClick();
+                                    }
+                                }}
+                                onChange={e => {
+                                    const containerRef = this.inputContainerRef.current;
+                                    const { value } = e.target;
+                                    containerRef.classList[value.length > 0 ? 'add' : 'remove']('valued');
+                                    this.setState({ groupName: value, failedToEnableChatlink: false });
+                                }}
+                            />
+                        </div>
                     </div>
                     {this.props.flowType === 2 ? null : (
                         <div className="group-chat-dialog content">
                             <MiniUI.ToggleCheckbox
-                                className="right"
+                                className="rotation-toggle"
                                 checked={this.state.keyRotation}
                                 onToggle={keyRotation =>
                                     this.setState({ keyRotation }, () =>
@@ -277,6 +286,8 @@ export class StartGroupChatWizard extends MegaRenderMixin {
                 title={this.props.flowType === 2 && self.state.createChatLink
                     ? l[20638] : this.props.customDialogTitle || l[19483]}
                 className={classes}
+                dialogType="tool"
+                dialogName="group-chat-dialog"
                 showSelectedNum={self.props.showSelectedNum}
                 selectedNum={self.state.selected.length}
                 closeDlgOnClickOverlay={self.props.closeDlgOnClickOverlay}
@@ -284,42 +295,45 @@ export class StartGroupChatWizard extends MegaRenderMixin {
                     self.props.onClose(self);
                 }}
                 popupDidMount={(elem) => {
-                    if (this.props.extraFooterElement) {
-                        elem.querySelector('.extraFooterElement')?.appendChild(this.props.extraFooterElement);
+                    if (this.props.extraContent) {
+                        elem.querySelector('.content-block.imported')?.appendChild(this.props.extraContent);
                     }
-                    if (this.props.onExtraFooterElementDidMount) {
-                        this.props.onExtraFooterElementDidMount(elem);
+                    if (this.props.onExtraContentDidMount) {
+                        this.props.onExtraContentDidMount(elem);
                     }
                 }}
                 triggerResizeOnUpdate={true}
                 buttons={buttons}>
-                {chatInfoElements}
-                <ContactPickerWidget
-                    changedHashProp={self.state.step}
-                    exclude={self.props.exclude}
-                    contacts={contacts}
-                    selectableContacts="true"
-                    onSelectDone={self.onSelectClicked}
-                    onSelected={self.onSelected}
-                    selected={self.state.selected}
-                    headerClasses="left-aligned"
-                    multiple={true}
-                    readOnly={self.state.step !== 0}
-                    allowEmpty={true}
-                    showMeAsSelected={self.state.step === 1}
-                    className={self.props.pickerClassName}
-                    disableFrequents={self.props.disableFrequents}
-                    notSearchInEmails={self.props.notSearchInEmails}
-                    autoFocusSearchField={self.props.autoFocusSearchField}
-                    disableDoubleClick={self.props.disableDoubleClick}
-                    selectedWidthSize={self.props.selectedWidthSize}
-                    emptySelectionMsg={self.props.emptySelectionMsg}
-                    newEmptySearchResult={self.props.newEmptySearchResult}
-                    newNoContact={self.props.newNoContact}
-                    highlightSearchValue={self.props.highlightSearchValue}
-                    emailTooltips={self.props.emailTooltips}
-                />
-                {extraFooterElement}
+
+				<div className="content-block">
+                	{chatInfoElements}
+                	<ContactPickerWidget
+                    	changedHashProp={self.state.step}
+                    	exclude={self.props.exclude}
+                    	contacts={contacts}
+                    	selectableContacts="true"
+                    	onSelectDone={self.onSelectClicked}
+                    	onSelected={self.onSelected}
+                    	selected={self.state.selected}
+                    	headerClasses="left-aligned"
+                    	multiple={true}
+                    	readOnly={self.state.step !== 0}
+                    	allowEmpty={true}
+                    	showMeAsSelected={self.state.step === 1}
+                    	className={self.props.pickerClassName}
+                    	disableFrequents={self.props.disableFrequents}
+                    	notSearchInEmails={self.props.notSearchInEmails}
+                    	autoFocusSearchField={self.props.autoFocusSearchField}
+                    	disableDoubleClick={self.props.disableDoubleClick}
+                    	selectedWidthSize={self.props.selectedWidthSize}
+                    	emptySelectionMsg={self.props.emptySelectionMsg}
+                    	newEmptySearchResult={self.props.newEmptySearchResult}
+                    	newNoContact={self.props.newNoContact}
+                    	highlightSearchValue={self.props.highlightSearchValue}
+                    	emailTooltips={self.props.emailTooltips}
+                	/>
+				</div>
+                {extraContent}
             </ModalDialogsUI.ModalDialog>
         );
     }

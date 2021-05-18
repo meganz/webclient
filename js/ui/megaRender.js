@@ -10,8 +10,9 @@
             // List view mode
             '<table>' +
                 '<tr>' +
-                    '<td megatype="fav" >' +
-                        '<span class="grid-status-icon"></span>' +
+                    '<td></td>' +
+                    '<td megatype="fav">' +
+                        '<span class="grid-status-icon sprite-fm-mono icon-dot"></span>' +
                     '</td>' +
                     '<td megatype="fname">' +
                         '<span class="transfer-filetype-icon"><img/></span>' +
@@ -24,11 +25,11 @@
                     '<td megatype="timeMd" class="time md"></td>' +
                     '<td megatype="versions" class="hd-versions"></td>' +
                     '<td megatype="extras" class="grid-url-field own-data">' +
-                        '<a class="grid-url-arrow"></a>' +
+                        '<a class="grid-url-arrow"><i class="sprite-fm-mono icon-options"></i></a>' +
                         '<span class="versioning-indicator">' +
-                            '<i class="small-icon icons-sprite grey-clock"></i>' +
+                            '<i class="sprite-fm-mono icon-versions-previous"></i>' +
                         '</span>' +
-                        '<span class="data-item-icon"></span>' +
+                        '<i class="sprite-fm-mono icon-link"></i>' +
                     '</td>' +
                 '</tr>' +
             '</table>',
@@ -37,16 +38,16 @@
             '<a class="data-block-view">' +
                 '<span class="data-block-bg ">' +
                     '<span class="data-block-indicators">' +
-                        '<span class="file-status-icon indicator"></span>' +
+                        '<span class="file-status-icon indicator sprite-fm-mono"></span>' +
                         '<span class="versioning-indicator">' +
-                            '<i class="small-icon icons-sprite grey-clock"></i>' +
+                            '<i class="sprite-fm-mono icon-versions-previous"></i>' +
                         '</span>' +
-                        '<span class="data-item-icon indicator"></span>' +
+                        '<i class="sprite-fm-mono icon-link"></i>' +
                     '</span>' +
                     '<span class="block-view-file-type"><img/></span>' +
-                    '<span class="file-settings-icon"></span>' +
+                    '<span class="file-settings-icon"><i class="sprite-fm-mono icon-options"></i></span>' +
                     '<div class="video-thumb-details">' +
-                        '<i class="small-icon small-play-icon"></i>' +
+                        '<i class="sprite-fm-mono icon-play"></i>' +
                         '<span>00:00</span>' +
                     ' </div>' +
                 '</span>' +
@@ -58,8 +59,8 @@
             // List view mode
             '<table>' +
                 '<tr>' +
-                    '<td width="50">' +
-                        '<span class="grid-status-icon"></span>' +
+                    '<td width="30">' +
+                        '<span class="grid-status-icon sprite-fm-mono icon-dot"></span>' +
                     '</td>' +
                     '<td>' +
                         '<div class="shared-folder-icon"></div>' +
@@ -81,10 +82,10 @@
                         '<div class="shared-folder-size"></div>' +
                     '</td>' +
                     '<td width="200">' +
-                        '<div class="shared-folder-access"></div>' +
+                        '<div class="shared-folder-access"><i class="sprite-fm-mono"></i><span></span></div>' +
                     '</td>' +
                     '<td class="grid-url-header-nw">' +
-                        '<a class="grid-url-arrow"></a>' +
+                        '<a class="grid-url-arrow"><i class="sprite-fm-mono icon-options"></i></a>' +
                     '</td>' +
                 '</tr>' +
             '</table>',
@@ -93,13 +94,13 @@
             '<a class="data-block-view folder">' +
                 '<span class="data-block-bg">' +
                     '<span class="data-block-indicators">' +
-                       '<span class="file-status-icon indicator"></span>' +
-                       '<span class="shared-folder-access indicator"></span>' +
+                       '<span class="file-status-icon indicator sprite-fm-mono"></span>' +
+                       '<span class="shared-folder-access indicator sprite-fm-mono"></span>' +
                     '</span>' +
                     '<span class="block-view-file-type"></span>' +
-                    '<span class="file-settings-icon"></span>' +
+                    '<span class="file-settings-icon"><i class="sprite-fm-mono icon-options"></i></span>' +
                     '<div class="video-thumb-details">' +
-                        '<i class="small-icon small-play-icon"></i>' +
+                        '<i class="sprite-fm-mono icon-play"></i>' +
                         '<span>00:00</span>' +
                     '</div>' +
                 '</span>' +
@@ -114,8 +115,8 @@
             // List view mode
             '<table>' +
                 '<tr>' +
-                    '<td width="50">' +
-                        '<span class="grid-status-icon"></span>' +
+                    '<td width="30">' +
+                        '<span class="grid-status-icon sprite-fm-mono icon-dot"></span>' +
                     '</td>' +
                     '<td>' +
                         '<div class="shared-folder-icon medium-file-icon folder-shared"></div>' +
@@ -137,7 +138,7 @@
                         '<div class="last-shared-time"></div>' +
                     '</td>' +
                     '<td class="grid-url-header-nw">' +
-                        '<a class="grid-url-arrow"></a>' +
+                        '<a class="grid-url-arrow"><i class="sprite-fm-mono icon-options"></i></a>' +
                     '</td>' +
                 '</tr>' +
             '</table>',
@@ -146,12 +147,12 @@
             '<a class="data-block-view folder">' +
                 '<span class="data-block-bg">' +
                     '<span class="data-block-indicators">' +
-                       '<span class="file-status-icon indicator"></span>' +
+                       '<span class="file-status-icon indicator sprite-fm-mono"></span>' +
                     '</span>' +
                     '<span class="block-view-file-type"></span>' +
-                    '<span class="file-settings-icon"></span>' +
+                    '<span class="file-settings-icon"><i class="sprite-fm-mono icon-options"></i></span>' +
                     '<div class="video-thumb-details">' +
-                        '<i class="small-icon small-play-icon"></i>' +
+                        '<i class="sprite-fm-mono icon-play"></i>' +
                         '<span>00:00</span>' +
                     ' </div>' +
                 '</span>' +
@@ -179,16 +180,22 @@
                             '<div class="clear"></div>' +
                         '</div>' +
                         '<div class="contact-chat-buttons">' +
-                            '<div class="default-white-button inline start-conversation">' +
-                                '<i class="small-icon conversations dark"></i>' +
+                            '<button class="mega-button start-conversation">' +
+                                '<div>' +
+                                    '<i class="small-icon conversations"></i>' +
+                                '</div>' +
                                 '<span></span>' +
-                            '</div>' +
-                            '<div class="default-white-button inline short start-audio-call">' +
-                                '<i class="small-icon audio-call dark"></i>' +
-                            '</div>' +
-                            '<div class="default-white-button inline short start-video-call">' +
-                                '<i class="small-icon video-call dark"></i>' +
-                            '</div>' +
+                            '</button>' +
+                            '<button class="mega-button start-audio-call">' +
+                                '<div>' +
+                                    '<i class="small-icon audio-call"></i>' +
+                                '</div>' +
+                            '</button>' +
+                            '<button class="mega-button start-video-call">' +
+                                '<div>' +
+                                    '<i class="small-icon video-call"></i>' +
+                                '</div>' +
+                            '</button>' +
                         '</div>' +
                     '</td>' +
                     '<td width="270">' +
@@ -202,7 +209,7 @@
 
             // Icon view mode
             '<a class="data-block-view semi-big ustatus">' +
-                '<span class="file-settings-icon"></span>' +
+                '<span class="file-settings-icon sprite-fm-mono"></span>' +
                 '<span class="shared-folder-info-block">' +
                     '<span class="u-card-data overlayed">' +
                         '<span class="shared-folder-name"></span>' +
@@ -210,16 +217,22 @@
                     '</span>' +
                     '<span class="shared-folder-info overlayed""></span>' +
                     '<span class="contact-chat-buttons">' +
-                        '<span class="default-white-button inline start-conversation">' +
-                            '<i class="small-icon conversations dark"></i>' +
+                        '<button class="mega-button start-conversation">' +
+                            '<div>' +
+                                '<i class="small-icon conversations"></i>' +
+                            '</div>' +
                             '<span></span>' +
-                        '</span>' +
-                        '<span class="default-white-button inline short start-audio-call">' +
-                            '<i class="small-icon audio-call dark"></i>' +
-                        '</span>' +
-                        '<span class="default-white-button inline short start-video-call">' +
-                            '<i class="small-icon video-call dark"></i>' +
-                        '</span>' +
+                        '</button>' +
+                        '<button class="mega-button start-audio-call">' +
+                            '<div>' +
+                                '<i class="small-icon audio-call"></i>' +
+                            '</div>' +
+                        '</button>' +
+                        '<button class="mega-button start-video-call">' +
+                            '<div>' +
+                                '<i class="small-icon video-call"></i>' +
+                            '</div>' +
+                        '</button>' +
                     '</span>' +
                 '</span>' +
             '</a>'
@@ -230,7 +243,7 @@
             '<table>' +
                 '<tr>' +
                     '<td width="50">' +
-                        '<span class="grid-status-icon"></span>' +
+                        '<span class="grid-status-icon sprite-fm-mono icon-dot"></span>' +
                     '</td>' +
                     '<td>' +
                         '<div class="shared-folder-icon"></div>' +
@@ -252,13 +265,13 @@
             '<a class="data-block-view folder">' +
                 '<span class="data-block-bg">' +
                     '<span class="data-block-indicators">' +
-                       '<span class="file-status-icon indicator"></span>' +
+                       '<span class="file-status-icon indicator sprite-fm-mono"></span>' +
                        '<span class="shared-folder-access indicator"></span>' +
                     '</span>' +
                     '<span class="block-view-file-type folder-shared"><img/></span>' +
                     '<span class="file-settings-icon"></span>' +
                     '<div class="video-thumb-details">' +
-                        '<i class="small-icon small-play-icon"></i>' +
+                        '<i class="sprite-fm-mono icon-play"></i>' +
                         '<span>00:00</span>' +
                     ' </div>' +
                 '</span>' +
@@ -294,7 +307,7 @@
         var versionsTemplate = '<div class="ver-col-container">' +
             '<div class="ver-nb">' + versionsNb + '</div>' +
             '<div class="ver-icon versioning">' +
-            '<span class="versioning-indicator"><i class="small-icon icons-sprite grey-clock"></i></span>' +
+            '<span class="versioning-indicator"><i class="sprite-fm-mono icon-versions-previous"></i></span>' +
             '</div>' +
             '<div class="ver-size">' +
             '<div class="ver-size-nb">' + bytesToSize(VersionsSize) + '</div>' +
@@ -480,7 +493,20 @@
 
             // Draw empty grid if no contents.
             var nodeListLength = aNodeList.length;
-            if (!nodeListLength) {
+            let fmRightFileBlock = document.querySelector('.fm-right-files-block:not(.in-chat)');
+
+            if (nodeListLength || (M.currentdirid && M.currentdirid.includes('user-management'))) {
+
+                if (fmRightFileBlock) {
+                    fmRightFileBlock.classList.remove('emptied');
+                }
+            }
+            else {
+
+                if (fmRightFileBlock) {
+                    fmRightFileBlock.classList.add('emptied');
+                }
+
                 if (M.RubbishID && M.currentdirid === M.RubbishID) {
                     $('.fm-empty-trashbin').removeClass('hidden');
                     $('.fm-clearbin-button').addClass('hidden');
@@ -492,7 +518,7 @@
                 else if (M.currentdirid === 'opc' || M.currentdirid === 'ipc') {
                     $('.contacts-tab-lnk.ipc[data-folder=' + M.currentdirid+ ']')
                         .removeClass('filled').find('span').text('');
-                    $('.button.link-button.accept-all').addClass('hidden');
+                    $('button.link-button.accept-all').addClass('hidden');
                     $('.fm-empty-contacts .fm-empty-cloud-txt').text(l[6196]);
                     $('.fm-empty-contacts').removeClass('hidden');
                 }
@@ -958,14 +984,17 @@
                 if (aNode.r === 1) {
                     props.accessRightsText = l[56];
                     props.accessRightsClass = 'read-and-write';
+                    props.accessRightsIcon = 'icon-permissions-write';
                 }
                 else if (aNode.r === 2) {
                     props.accessRightsText = l[57];
                     props.accessRightsClass = 'full-access';
+                    props.accessRightsIcon = 'icon-star';
                 }
                 else {
                     props.accessRightsText = l[55];
                     props.accessRightsClass = 'read-only';
+                    props.accessRightsIcon = 'icon-read-only';
                 }
 
                 if (this.viewmode) {
@@ -1102,10 +1131,12 @@
             'cloud-drive': function(aNode, aProperties, aTemplate) {
                 var tmp;
                 var title = [];
+                let elm;
 
                 if (aNode.fav && !folderlink) {
-                    var selector = this.viewmode ? '.file-status-icon' : '.grid-status-icon';
-                    aTemplate.querySelector(selector).classList.add('star');
+                    elm = aTemplate.querySelector(this.viewmode ? '.file-status-icon' : '.grid-status-icon');
+                    elm.classList.add('icon-favourite-filled');
+                    elm.classList.remove('icon-dot');
                 }
 
                 if (!aNode.t && aNode.tvf) {
@@ -1174,24 +1205,55 @@
                 }
                 this.addClasses(tmp, aProperties.classNames);
 
+                if (aProperties.undecryptable) {
+
+                    if (this.viewmode) {
+                        elm = aTemplate.querySelector('.file-status-icon');
+                        elm.classList.remove('icon-favourite-filled');
+                        elm.classList.add('icon-info');
+                    }
+                    else {
+                        elm = aTemplate.querySelector('.grid-status-icon');
+                        elm.classList.remove('icon-dot', 'icon-favourite-filled');
+                        elm.classList.add('icon-info');
+                    }
+                }
+
+                if (aProperties.takenDown) {
+
+                    if (this.viewmode) {
+                        elm = aTemplate.querySelector('.file-status-icon');
+                        elm.classList.remove('icon-favourite-filled');
+                        elm.classList.add('icon-takedown');
+                    }
+                    else {
+                        elm = aTemplate.querySelector('.grid-status-icon');
+                        elm.classList.remove('icon-dot', 'icon-favourite-filled');
+                        elm.classList.add('icon-takedown');
+                    }
+                }
+
+
                 return aTemplate;
             },
             'shares': function(aNode, aProperties, aTemplate) {
 
-                var selector = this.viewmode ? '.file-status-icon' : '.grid-status-icon';
+                let elm;
 
                 if (!this.viewmode) {
-                    aTemplate.querySelector(selector).classList.add(aProperties.accessRightsClass);
+                    elm = aTemplate.querySelector(this.viewmode ? '.file-status-icon' : '.grid-status-icon');
+                    elm.classList.add(aProperties.accessRightsClass);
                 }
 
                 if (aNode.fav && !folderlink) {
-                    aTemplate.querySelector(selector).classList.add('star');
+                    elm = elm || aTemplate.querySelector(this.viewmode ? '.file-status-icon' : '.grid-status-icon');
+                    elm.classList.add('icon-favourite-filled');
+                    elm.classList.remove('icon-dot');
                 }
 
                 aTemplate.querySelector('.shared-folder-name').textContent = aProperties.name;
 
                 var tmp = aTemplate.querySelector('.shared-folder-access');
-                tmp.classList.add(aProperties.accessRightsClass);
 
                 if (aProperties.avatar) {
                     var avatar = this.viewmode ? '.shared-folder-info-block' : '.fm-chat-user-info';
@@ -1205,12 +1267,15 @@
                     if (aProperties.icon) {
                         aTemplate.querySelector('.block-view-file-type').classList.add(aProperties.icon);
                     }
+                    tmp.classList.add(aProperties.accessRightsIcon);
 
                     aTemplate.querySelector('.shared-folder-info')
                         .textContent = l[17590].replace('%1', aProperties.userName);
                 }
                 else {
-                    tmp.textContent = aProperties.accessRightsText;
+
+                    tmp.querySelector('span').textContent = aProperties.accessRightsText;
+                    tmp.querySelector('i').classList.add(aProperties.accessRightsIcon);
 
                     tmp = aTemplate.querySelector('.fm-chat-user-info');
                     tmp.classList.add(aProperties.userHandle);
@@ -1234,8 +1299,9 @@
             'out-shares': function(aNode, aProperties, aTemplate) {
 
                 if (aNode.fav && !folderlink) {
-                    var selector = this.viewmode ? '.file-status-icon' : '.grid-status-icon';
-                    aTemplate.querySelector(selector).classList.add('star');
+                    let elm = aTemplate.querySelector(this.viewmode ? '.file-status-icon' : '.grid-status-icon');
+                    elm.classList.add('icon-favourite-filled');
+                    elm.classList.remove('icon-dot');
                 }
 
                 aTemplate.querySelector('.shared-folder-name').textContent = aProperties.name;
@@ -1424,16 +1490,16 @@
                         var megaListContainer;
 
                         if (this.viewmode) {
-                            megaListOptions['itemWidth'] = 156 + 2 + 2 + 12 /* 12 = margin-left */;
-                            megaListOptions['itemHeight'] = 184 + 2 + 2 + 12 /* 12 = margin-top */;
+                            megaListOptions.itemWidth = 192 + 4 + 4 + 12 /* 12 = margin-left */;
+                            megaListOptions.itemHeight = 192 + 4 + 4 + 12 /* 12 = margin-top */;
                             megaListContainer = this.container;
                         }
                         else {
-                            megaListOptions['itemWidth'] = false;
-                            megaListOptions['itemHeight'] = 24;
-                            megaListOptions['appendTo'] = 'tbody';
-                            megaListOptions['renderAdapter'] = new MegaList.RENDER_ADAPTERS.Table();
-                            megaListContainer = this.container.parentNode.parentNode;
+                            megaListOptions.itemWidth = false;
+                            megaListOptions.itemHeight = 32;
+                            megaListOptions.appendTo = 'tbody';
+                            megaListOptions.renderAdapter = new MegaList.RENDER_ADAPTERS.Table();
+                            megaListContainer = this.container.parentNode.parentNode.parentNode;
                         }
 
                         define(this, 'megaList', new MegaList(megaListContainer, megaListOptions));

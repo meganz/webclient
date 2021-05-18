@@ -55,7 +55,9 @@
     border-radius: 6px;
 }
 
-
+.emoji-preview {
+    padding-left: 10px;
+}
 .emoji-preview img {
     float: left;
     display: inline-block;
@@ -70,7 +72,7 @@
     color: rgba(0,0,0, 0.3)
 }
 .popup-footer.emoji .button i {
-    margin-top: 6px;
+    margin: 6px auto 0;
 }
 
 img.emoji,
@@ -121,45 +123,40 @@ img.emoji.big {
 
 
 /** new hover/active styles for the emoji dropdown **/
+.button.square-button {
+    width: 32px;
+    height: 32px;
+    float: left;
+    box-sizing: border-box;
+    border-radius: 4px;
+    -webkit-transition: all 100ms ease-in-out;
+    transition: all 100ms ease-in-out;
+    text-align: center;
+}
+.button.square-button:last-child {
+    margin-right: 0;
+}
 .button.square-button i {
-    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
-    -moz-opacity: 0.3;
-    -khtml-opacity: 0.3;
-    opacity: 0.3;
-    -webkit-transition: all 200ms ease-in-out;
-    -moz-transition: all 200ms ease-in-out;
-    -o-transition: all 200ms ease-in-out;
-    -ms-transition: all 200ms ease-in-out;
     transition: all 200ms ease-in-out;
+    --icon-size: 24px;
+    --mask-color: var(--icon-rest);
 }
-.button.square-button:hover {
-    background-color: transparent;
-}
-.button.square-button:hover i, .button.square-button.active i {
-    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
-    -moz-opacity: 0.5;
-    -khtml-opacity: 0.5;
-    opacity: 0.5;
-}
-.button.square-button.active {
-    background-color: transparent;
+.button.square-button:hover i,
+.button.square-button.active i {
+    --mask-color: var(--icon-active);
 }
 .button.square-button:after {
-    content: " ";
+    content: '';
     display: block;
     position: relative;
-    bottom: -4px;
+    bottom: -6px;
     left: -2px;
     width: 36px;
     height: 2px;
-    -webkit-transition: all 200ms ease-in-out;
-    -moz-transition: all 200ms ease-in-out;
-    -o-transition: all 200ms ease-in-out;
-    -ms-transition: all 100ms ease-in-out;
     transition: all 200ms ease-in-out;
 }
 .button.square-button.active:after {
-    background-color: rgb(255, 051, 058);
+    background-color: var(--stroke-info);
 }
 .button.square-button.emoji {
     cursor: pointer;

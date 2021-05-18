@@ -47,6 +47,8 @@ MegaData.prototype.accountData = function(cb, blockui, force) {
                     ctx.account.servbw_used = Math.round(res.csxfer);
                     ctx.account.downbw_used = Math.round(res.caxfer);
                     ctx.account.servbw_limit = Math.round(res.srvratio);
+                    ctx.account.isFull = res.cstrg / res.mstrg >= 1;
+                    ctx.account.isAlmostFull = res.cstrg / res.mstrg >= res.uslw / 10000;
 
                     if (res.nextplan) {
                         ctx.account.nextplan = res.nextplan;
@@ -384,8 +386,8 @@ MegaData.prototype.refreshSessionList = function(callback) {
 MegaData.prototype.showRecoveryKeyDialog = function(version) {
     'use strict';
 
-    var $dialog = $('.fm-dialog.recovery-key-dialog').removeClass('post-register');
-    $('.recover-image.icon', $dialog).addClass('device-key').removeClass('shiny-key');
+    var $dialog = $('.mega-dialog.recovery-key-dialog').removeClass('post-register');
+    $('i.js-key', $dialog).removeClass('shiny');
 
     // TODO: Implement this on mobile
     if (!$dialog.length) {
@@ -397,18 +399,21 @@ MegaData.prototype.showRecoveryKeyDialog = function(version) {
 
     M.safeShowDialog('recovery-key-dialog', function() {
 
-        $('.skip-button, .fm-dialog-close', $dialog).removeClass('hidden').rebind('click', closeDialog);
+        $('.skip-button, button.js-close', $dialog).removeClass('hidden').rebind('click', closeDialog);
         $('.copy-recovery-key-button', $dialog).removeClass('hidden').rebind('click', function() {
             // Export key showing a toast message
             u_exportkey(l[6040]);
         });
+        $('footer', $dialog).removeClass('hidden');
+        $('.content-block', $dialog).removeClass('dialog-bottom');
+        $('header.graphic', $dialog).removeClass('hidden');
 
         switch (version) {
             case 1:
                 $('.skip-button', $dialog).removeClass('hidden');
-                $('.fm-dialog-close', $dialog).addClass('hidden');
+                $('button.js-close', $dialog).addClass('hidden');
                 $('.copy-recovery-key-button', $dialog).addClass('hidden');
-                $('.recover-image.icon', $dialog).removeClass('device-key').addClass('shiny-key');
+                $('i.js-key', $dialog).addClass('shiny');
                 $dialog.addClass('post-register').rebind('dialog-closed', function() {
                     eventlog(localStorage.recoverykey ? 99718 : 99719);
                     $dialog.unbind('dialog-closed');
@@ -416,9 +421,12 @@ MegaData.prototype.showRecoveryKeyDialog = function(version) {
                 break;
             case 2:
                 $('.skip-button', $dialog).addClass('hidden');
-                $('.fm-dialog-close', $dialog).removeClass('hidden');
+                $('button.js-close', $dialog).removeClass('hidden');
                 $('.copy-recovery-key-button', $dialog).addClass('hidden');
-                $('.recover-image.icon', $dialog).removeClass('device-key').addClass('shiny-key');
+                $('footer', $dialog).addClass('hidden');
+                $('.content-block', $dialog).addClass('dialog-bottom');
+                $('i.js-key', $dialog).addClass('shiny');
+                $('header.graphic', $dialog).addClass('hidden');
                 $dialog.addClass('post-register');
                 break;
         }
@@ -428,10 +436,10 @@ MegaData.prototype.showRecoveryKeyDialog = function(version) {
                 M.safeShowDialog('recovery-key-info', function() {
                     // Show user recovery key info warning
                     $dialog.addClass('hidden').removeClass('post-register');
-                    $dialog = $('.fm-dialog.recovery-key-info');
+                    $dialog = $('.mega-dialog.recovery-key-info');
 
                     // On button click close dialog
-                    $('.close-dialog', $dialog).rebind('click', closeDialog);
+                    $('.close-dialog, button.js-close', $dialog).rebind('click', closeDialog);
 
                     return $dialog;
                 });
@@ -479,7 +487,7 @@ MegaData.prototype.showRecoveryKeyDialog = function(version) {
                 }
                 else if (res === 0) {
                     if (!is_mobile) {
-                        $('.fm-dialog.account-reset-confirmation').removeClass('hidden');
+                        $('.mega-dialog.account-reset-confirmation').removeClass('hidden');
                     }
                     else {
                         msgDialog('info', '', l[735]);
@@ -518,6 +526,9 @@ MegaData.prototype.hideClickHint = function() {
 
 MegaData.prototype.showClickHint = function(force) {
     'use strict';
+
+    // Temporarily disabled. This will be added back in future with new design changes.
+    return false;
 
     this.hideClickHint();
 
@@ -583,7 +594,7 @@ MegaData.prototype.showOverStorageQuota = function(quota, options) {
         quota = EPAYWALL;
     }
 
-    var $strgdlg = $('.fm-dialog.storage-dialog').removeClass('full almost-full');
+    var $strgdlg = $('.mega-dialog.storage-dialog').removeClass('full almost-full');
     var $strgdlgBodyFull = $('.fm-dialog-body.storage-dialog.full', $strgdlg).removeClass('odq');
     var $strgdlgBodyAFull = $('.fm-dialog-body.storage-dialog.almost-full', $strgdlg);
 
@@ -591,7 +602,8 @@ MegaData.prototype.showOverStorageQuota = function(quota, options) {
     $('.fm-main').removeClass('fm-notification almost-full full');
     var $odqWarn = $('.odq-warning', $strgdlgBodyFull).addClass('hidden');
     var $fullExtras = $('.full-extras', $strgdlgBodyFull).removeClass('hidden');
-    var $upgradeBtn = $('.choose-plan', $strgdlg).text(l[8696]);
+    var $upgradeBtn = $('.choose-plan span', $strgdlg).text(l[8696]);
+
 
     if (quota === EPAYWALL) { // ODQ paywall
 
@@ -615,7 +627,9 @@ MegaData.prototype.showOverStorageQuota = function(quota, options) {
         $upgradeBtn.text(l[5549]);
         $('.storage-dialog.body-p', $odqWarn).safeHTML(dlgTexts.dlgFooterText);
 
-        $('.fm-notification-block.full').safeHTML(dlgTexts.fmBannerText);
+        $('.fm-notification-block.full').safeHTML(
+            `<i class="notification-block-icon sprite-fm-mono icon-offline"></i>
+            <span>${dlgTexts.fmBannerText}</span>`);
     }
     else {
         if (quota === -1) {
@@ -650,7 +664,7 @@ MegaData.prototype.showOverStorageQuota = function(quota, options) {
         if (quota.isFull) {
             $strgdlg.addClass('full');
             $('.fm-main').addClass('fm-notification full');
-            $('.fm-dialog-title', $strgdlgBodyFull).text(myOptions.title || l[16302]);
+            $('header h2', $strgdlgBodyFull).text(myOptions.title || l[16302]);
             $('.body-header', $strgdlgBodyFull).safeHTML(myOptions.body || l[16360]);
         }
         else if (quota.isAlmostFull || myOptions.custom) {
@@ -658,29 +672,32 @@ MegaData.prototype.showOverStorageQuota = function(quota, options) {
                 $('.fm-main').addClass('fm-notification almost-full');
             }
             $strgdlg.addClass('almost-full');
-            $('.fm-dialog-title', $strgdlgBodyAFull).text(myOptions.title || l[16311]);
+            $('header h2', $strgdlgBodyAFull).text(myOptions.title || l[16311]);
             $('.body-header', $strgdlgBodyAFull).safeHTML(myOptions.body || l[16312]);
 
             // Storage chart and info
             var strQuotaLimit = bytesToSize(quota.mstrg, 0).split(' ');
             var strQuotaUsed = bytesToSize(quota.cstrg);
-            var deg = 230 * quota.percent / 100;
             var $storageChart = $('.fm-account-blocks.storage', $strgdlg);
 
-            // Storage space chart
+            var fullDeg = 360;
+            var direction = -1;
+            var deg = fullDeg * quota.percent / 100;
+
+            // Used space chart
             if (deg <= 180) {
-                $('.left-chart span', $storageChart).css('transform', 'rotate(' + deg + 'deg)');
+                $('.left-chart span', $storageChart).css('transform', 'rotate(' + deg * direction + 'deg)');
                 $('.right-chart span', $storageChart).removeAttr('style');
             }
             else {
                 $('.left-chart span', $storageChart).css('transform', 'rotate(180deg)');
-                $('.right-chart span', $storageChart).css('transform', 'rotate(' + (deg - 180) + 'deg)');
+                $('.right-chart span', $storageChart).css('transform', 'rotate(' + (deg - 180) * direction + 'deg)');
             }
 
             $('.chart.data .size-txt', $strgdlg).text(strQuotaUsed);
             $('.chart.data .pecents-txt', $strgdlg).text(strQuotaLimit[0]);
             $('.chart.data .gb-txt', $strgdlg).text(strQuotaLimit[1]);
-            $('.chart.data .perc-txt', $strgdlg).text(quota.percent + '%');
+            $('.chart.body .perc-txt', $strgdlg).text(quota.percent + '%');
 
         }
         else {
@@ -690,10 +707,16 @@ MegaData.prototype.showOverStorageQuota = function(quota, options) {
             $('.fm-main').removeClass('fm-notification almost-full full');
             return promise.reject();
         }
-        $('.fm-notification-block.full').safeHTML(l[22667].replace('%1', maxStorage));
+        $('.fm-notification-block.full')
+            .safeHTML(
+                `<i class="notification-block-icon sprite-fm-mono icon-offline"></i>
+                <span>${l[22667].replace('%1', maxStorage)}</span>`);
 
         $('.fm-notification-block.almost-full')
-            .safeHTML('<div class="fm-notification-close"></div>' + l[22668].replace('%1', maxStorage));
+            .safeHTML(
+                `<i class="notification-block-icon sprite-fm-mono icon-offline"></i>
+                <span>${l[22668].replace('%1', maxStorage)}</span>
+                <i class="fm-notification-close sprite-fm-mono icon-close-component"></i>`);
 
     }
 
@@ -706,7 +729,7 @@ MegaData.prototype.showOverStorageQuota = function(quota, options) {
 
     $strgdlg.rebind('dialog-closed', closeDialog);
 
-    $('.button', $strgdlg).rebind('click', function() {
+    $('button', $strgdlg).rebind('click', function() {
         var $this = $(this);
 
         closeDialog();
@@ -720,7 +743,7 @@ MegaData.prototype.showOverStorageQuota = function(quota, options) {
 
         return false;
     });
-    $('.fm-dialog-close, .button.skip', $strgdlg).rebind('click', closeDialog);
+    $('button.js-close, button.skip', $strgdlg).rebind('click', closeDialog);
 
     $('.fm-notification-block .fm-notification-close')
         .rebind('click', function() {
@@ -731,17 +754,17 @@ MegaData.prototype.showOverStorageQuota = function(quota, options) {
     mega.achievem.enabled()
         .done(function() {
             $strgdlg.addClass('achievements');
-            $('.semi-small-icon.rocket', $strgdlg).rebind(
-                'click',
-                function() {
-                    closeDialog();
-                    mega.achievem.achievementsListDialog();
-                    return false;
-                }
-            );
         });
 
     clickURLs();
+
+    if (quota && quota.isFull && page === 'fm/dashboard') {
+        $('a.dashboard-link', $strgdlg).rebind('click.dashboard', e => {
+            e.preventDefault();
+            closeDialog();
+        });
+    }
+
     $('a.gotorub').attr('href', '/fm/' + M.RubbishID)
         .rebind('click', function() {
             closeDialog();

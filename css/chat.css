@@ -4,7 +4,7 @@
     -khtml-opacity: 0.5;
     opacity: 0.5;
 }
-.nw-fm-tree-header.conversations .button {
+.nw-fm-tree-header.conversations button {
 	position: absolute;
 	right: 14px;
 	top: 14px;
@@ -39,7 +39,7 @@
     box-sizing: border-box;
 }
 .contacts-info .tiny-button {
-	margin-top: 10px;
+    margin-top: 10px;
 }
 .chat-right-area .buttons-block {
 	padding: 13px 0;

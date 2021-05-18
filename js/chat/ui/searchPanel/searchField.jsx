@@ -39,34 +39,23 @@ export default class SearchField extends MegaRenderMixin {
         SearchField.focus();
     }
 
-    renderStatus = (status, isClickable, onToggle) => {
-        const className = `${SEARCH_STATUS_CLASS} ${isClickable ? 'clickable' : ''}`;
-        const handleClick = () => isClickable && onToggle();
-        const handleHover = () => this.setState(state => ({ hovered: !state.hovered }));
-
-        switch (status) {
+    renderStatusBanner = () => {
+        switch (this.props.status) {
             case STATUS.IN_PROGRESS:
                 return (
-                    <div
-                        className={`${className} searching`}
-                        onClick={handleClick}
-                        onMouseOver={handleHover}
-                        onMouseOut={handleHover}>
-                        <i className="small-icon tiny-searching" />
-                        {this.state.hovered ? LABEL.PAUSE_SEARCH : LABEL.DECRYPTING_RESULTS}
+                    <div className={`${SEARCH_STATUS_CLASS} searching info`}>
+                        {LABEL.DECRYPTING_RESULTS}
                     </div>
                 );
             case STATUS.PAUSED:
                 return (
-                    <div className={`${className} paused`} onClick={handleClick}>
-                        <i className="small-icon tiny-play" />
-                        {LABEL.RESUME_SEARCH}
+                    <div className={`${SEARCH_STATUS_CLASS} paused info`}>
+                        {LABEL.SEARCH_PAUSED}
                     </div>
                 );
             case STATUS.COMPLETED:
                 return (
-                    <div className={`${className} complete`} onClick={handleClick}>
-                        <i className="small-icon tiny-complete" />
+                    <div className={`${SEARCH_STATUS_CLASS} complete success`}>
                         {LABEL.SEARCH_COMPLETE}
                     </div>
                 );
@@ -75,13 +64,43 @@ export default class SearchField extends MegaRenderMixin {
         }
     };
 
-    render() {
-        const { value, searching, status, onFocus, onChange, onToggle, onReset } = this.props;
-        const isClickable = status === STATUS.IN_PROGRESS || status === STATUS.PAUSED;
+    renderStatusControls = () => {
+        const { status, onToggle } = this.props;
+        const handleHover = () => this.setState(state => ({ hovered: !state.hovered }));
 
+        switch (status) {
+            case STATUS.IN_PROGRESS:
+                return (
+                    <div
+                        // Additional `div` element wrapping the controls, re: increased clickable area
+                        className="progress-controls"
+                        onMouseOver={handleHover}
+                        onMouseOut={handleHover}
+                        onClick={onToggle}>
+                        <i className={this.state.hovered ? 'sprite-fm-mono icon-pause' : 'small-icon tiny-searching'} />
+                    </div>
+                );
+            case STATUS.PAUSED:
+                return (
+                    <i
+                        className="sprite-fm-mono icon-play"
+                        onClick={onToggle}
+                        onMouseOver={handleHover}
+                        onMouseOut={handleHover}
+                    />
+                );
+            case STATUS.COMPLETED:
+                return null;
+            default:
+                return null;
+        }
+    };
+
+    render() {
+        const { value, searching, status, onChange, onReset } = this.props;
         return (
             <div className="search-field">
-                <i className="small-icon thin-search-icon" />
+                <i className="sprite-fm-mono icon-preview-reveal search-icon-find"/>
 
                 <input
                     type="text"
@@ -89,7 +108,6 @@ export default class SearchField extends MegaRenderMixin {
                     placeholder="Search"
                     ref={SearchField.inputRef}
                     value={value}
-                    onFocus={onFocus}
                     onChange={ev => {
                         // Reset the `pause search` state
                         if (this.state.hovered) {
@@ -97,13 +115,16 @@ export default class SearchField extends MegaRenderMixin {
                         }
                         onChange(ev);
                     }}
-                    className={searching ? 'searching' : ''} />
+                />
+
+                {searching && <i className="sprite-fm-mono icon-close-component search-icon-reset" onClick={onReset} />}
 
                 {searching && status && (
-                    this.renderStatus(status, isClickable, onToggle)
+                    <>
+                        {this.renderStatusControls()}
+                        {this.renderStatusBanner()}
+                    </>
                 )}
-
-                <i className="small-icon tiny-reset" onClick={onReset} />
             </div>
         );
     }

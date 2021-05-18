@@ -351,9 +351,6 @@ AccountRecoveryControl.prototype.showStep = function _showStep(step, branch) {
         }
         else {
             this.$navigationControl.addClass('hidden');
-            this.$btnYes.noTransition(function() {
-                $(this).addClass('default-grey-button');
-            });
             $('.button-aligner', this.$recoveryContents).removeClass('no-float');
         }
     }
@@ -361,11 +358,6 @@ AccountRecoveryControl.prototype.showStep = function _showStep(step, branch) {
         if (is_mobile) {
             this.$navigationControl.find('.fm-icon.left').addClass('back').removeClass('mega')
                 .addClass('non-responsive');
-        }
-        else {
-            this.$btnYes.noTransition(function() {
-                $(this).removeClass('default-grey-button');
-            });
         }
     }
 
@@ -438,17 +430,9 @@ AccountRecoveryControl.prototype.showStep = function _showStep(step, branch) {
         this.$recoveryContents.removeClass('hasButton');
     }
 
-    // If it is only one btn using red button. otherwise using default style
-    if (yesAnswer && noAnswer) {
-        this.$btnYes.removeClass('red-button');
-    }
-    else {
-        this.$btnYes.addClass('red-button');
-    }
-
     // Update button text
-    this.$btnYes.text(yesAnswer);
-    this.$btnNo.text(noAnswer);
+    this.$btnYes.safeHTML(`<span>${yesAnswer}</span>`);
+    this.$btnNo.safeHTML(`<span>${noAnswer}</span>`);
 
     // this page has link to Reset
     if (toReset) {
@@ -653,7 +637,7 @@ AccountRecoveryControl.prototype.startRecovery = function _startRecovery(email, 
 
 AccountRecoveryControl.prototype.showParkWarning = function _showParkWarning(easyPark) {
 
-    var $dialog = $('.fm-dialog.park-account-dialog');
+    var $dialog = $('.mega-dialog.park-account-dialog');
     var self = this;
     self.checks2 = 0;
     $('.checkbox-block.park-account-checkbox .settings-row .checkdiv', $dialog)
@@ -731,7 +715,7 @@ AccountRecoveryControl.prototype.showParkWarning = function _showParkWarning(eas
         self.startRecovery(email, true);
     });
 
-    $('.closebtn, .fm-dialog-close', $dialog).rebind('click', closeDialogLocal);
+    $('.closebtn, button.js-close', $dialog).rebind('click', closeDialogLocal);
 
     if (!is_mobile) {
         $(document).rebind('keydown.parkwarn', function (e) {

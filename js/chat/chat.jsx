@@ -6,6 +6,8 @@ require("./chatGlobalEventManager.jsx");
 // load chatRoom.jsx, so that its included in bundle.js, despite that ChatRoom is legacy ES ""class""
 require("./chatRoom.jsx");
 
+import ChatRouting from "./chatRouting.jsx";
+
 const EMOJI_DATASET_VERSION = 3;
 const CHAT_ONHISTDECR_RECNT = "onHistoryDecrypted.recent";
 
@@ -175,9 +177,13 @@ function Chat() {
         this,
         {
             "currentlyOpenedChat": null,
-            "displayArchivedChats": false,
+            'routingSection': null,
+            'routingSubSection': null,
+            'routingParams': null,
         }
     );
+
+    this.routing = new ChatRouting(this);
 
     return this;
 };
@@ -216,11 +222,9 @@ Chat.prototype.init = promisify(function(resolve, reject) {
 
     // UI events
     var $body = $(document.body);
-    $body.rebind('mousedown.megachat', '.top-user-status-popup .tick-item', function() {
+    $body.rebind('mousedown.megachat', '.top-user-status-popup .dropdown-item', function() {
         var presence = $(this).data("presence");
         self._myPresence = presence;
-
-        $('.top-user-status-popup').removeClass("active").addClass("hidden");
 
         // presenced integration
         var targetPresence = PresencedIntegration.cssClassToPresence(presence);
@@ -325,7 +329,12 @@ Chat.prototype.init = promisify(function(resolve, reject) {
 
             // eslint-disable-next-line react/no-render-return-value
             self.$conversationsAppInstance = ReactDOM.render(
-                self.$conversationsApp = <ConversationsUI.ConversationsApp megaChat={self}/>,
+                self.$conversationsApp = <ConversationsUI.ConversationsApp
+                    megaChat={self}
+                    routingSection={self.routingSection}
+                    routingSubSection={self.routingSubSection}
+                    routingParams={self.routingParams}
+                />,
                 self.domSectionNode = document.querySelector('.section.conversations')
             );
 
@@ -350,6 +359,26 @@ Chat.prototype.init = promisify(function(resolve, reject) {
         })
         .then(resolve)
         .catch(reject);
+
+    mBroadcaster.addListener("beforepagechange", (page) => {
+        // Reduce flickering when coming back to chat + ensure the ContactsPanel's components are properly destroyed
+
+        if (page.indexOf("chat") === -1) {
+            // target page is not chat
+            if (megaChat.routingSection) {
+                if (String(M.currentdirid).substr(0, 4) === "chat") {
+                    // We always want to hide the chat, when the user is not really in chat, so
+                    // we need to reset M.currentdirid, so that on next M.openFolder, it would go and
+                    // reinitialize/reroute the chat. This would solve potential issues with bugs in the type of
+                    // Chat -> Static page -> Chat
+                    delete M.currentdirid;
+                }
+                megaChat.routingParams = megaChat.routingSection = megaChat.routingSubSection = null;
+                // update immediately, otherwise the ConversationsApp may become invisible and no unmounts would be done
+                this.$conversationsAppInstance?.forceUpdate();
+            }
+        }
+    });
 });
 
 Chat.prototype._syncDnd = function() {
@@ -925,9 +954,9 @@ Chat.prototype._renderMyStatus = function() {
     }
 
     // reset
-    var $status = $('.activity-status-block .activity-status, .top-menu-popup .avatar-block', 'body');
+    var $status = $('.activity-status-block .activity-status', 'body');
 
-    $('.top-user-status-popup .tick-item').removeClass("active");
+    $('.top-user-status-popup .dropdown-item').removeClass("active");
 
 
     $status
@@ -959,19 +988,19 @@ Chat.prototype._renderMyStatus = function() {
     // use the actual presence for ticking the dropdown's items, since the user can be auto away/reconnecting,
     // but his actual presence's settings to be set to online/away/busy/etc
     if (actualPresence === UserPresence.PRESENCE.ONLINE) {
-        $('.top-user-status-popup .tick-item[data-presence="chat"]').addClass("active");
+        $('.top-user-status-popup .dropdown-item[data-presence="chat"]').addClass("active");
     }
     else if (actualPresence === UserPresence.PRESENCE.AWAY) {
-        $('.top-user-status-popup .tick-item[data-presence="away"]').addClass("active");
+        $('.top-user-status-popup .dropdown-item[data-presence="away"]').addClass("active");
     }
     else if (actualPresence === UserPresence.PRESENCE.DND) {
-        $('.top-user-status-popup .tick-item[data-presence="dnd"]').addClass("active");
+        $('.top-user-status-popup .dropdown-item[data-presence="dnd"]').addClass("active");
     }
     else if (actualPresence === UserPresence.PRESENCE.OFFLINE) {
-        $('.top-user-status-popup .tick-item[data-presence="unavailable"]').addClass("active");
+        $('.top-user-status-popup .dropdown-item[data-presence="unavailable"]').addClass("active");
     }
     else {
-        $('.top-user-status-popup .tick-item[data-presence="unavailable"]').addClass("active");
+        $('.top-user-status-popup .dropdown-item[data-presence="unavailable"]').addClass("active");
     }
 
     $status.addClass(
@@ -1066,8 +1095,7 @@ Chat.prototype.openChat = function(userHandles, type, chatId, chatShard, chatdUr
         // validate that ALL jids are contacts
         var allValid = true;
         userHandles.forEach(function(user_handle) {
-            var contact = M.u[user_handle];
-            if (!contact) {
+            if (!(user_handle in M.u)) {
                 M.u.set(user_handle, new MegaDataObject(MEGA_USER_STRUCT, {
                     'h': user_handle,
                     'u': user_handle,
@@ -1485,103 +1513,7 @@ Chat.prototype.getChatNum = function(idx) {
 };
 
 Chat.prototype.navigate = promisify(function megaChatNavigate(resolve, reject, location, event) {
-    if (!M.chat) {
-        console.error('This function is meant to navigate within the chat...');
-        return;
-    }
-
-    var target = String(location || '').split('/').map(String.trim).filter(String);
-
-    if (target[0] === 'fm') {
-        target.shift();
-    }
-    if (target[0] === 'chat') {
-        target.shift();
-    }
-
-    if (d) {
-        this.logger.warn('navigate(%s)', location, target);
-    }
-
-    var type = target[0];
-    if (!type) {
-        // show last seen/active chat.
-        let self = this;
-        this.onChatsHistoryReady(15e3)
-            .then(() => {
-                return page === location ? self.renderListing() : EACCESS;
-            })
-            .then(resolve)
-            .catch(reject);
-        resolve = null;
-    }
-    else if ((this.displayArchivedChats = type === 'archived')) {
-        this.hideAllChats();
-        delete this.lastOpenedChat;
-    }
-    else {
-        var roomId = target[(type === 'c' || type === 'g' || type === 'p') | 0];
-        if (roomId.indexOf('#') > 0) {
-            var key = roomId.split('#');
-            roomId = key[0];
-            key = key[1];
-
-            this.publicChatKeys[roomId] = key;
-            roomId = this.handleToId[roomId] || roomId;
-        }
-
-        var room = this.getChatById(roomId);
-        if (room) {
-            room.show();
-            location = room.getRoomUrl();
-        }
-        else if (type === 'p') {
-            megaChat.smartOpenChat([u_handle, roomId], 'private', undefined, undefined, undefined, true)
-                .then(resolve)
-                .catch(reject);
-            resolve = null;
-        }
-        else {
-            let done = resolve;
-            megaChat.plugins.chatdIntegration.openChat(roomId)
-                .then(chatId => {
-                    this.getChatById(chatId).show();
-                    done(chatId);
-                })
-                .catch(ex => {
-                    if (d && ex !== ENOENT) {
-                        console.warn('If "%s" is a chat, something went wrong..', roomId, ex);
-                    }
-
-                    if (ex === ENOENT && this.publicChatKeys[roomId]) {
-                        msgDialog('warninga', l[20641], l[20642], 0, function() {
-                            loadSubPage(anonymouschat ? 'start' : 'fm/chat', event);
-                        });
-                    }
-                    else {
-                        if (String(location).startsWith('chat')) {
-                            location = location === 'chat' ? 'fm' : 'chat';
-                        }
-                        M.currentdirid = M.chat = page = false;
-                        loadSubPage(location, event);
-                    }
-                    done(EACCESS);
-                });
-            resolve = null;
-        }
-    }
-
-    if (resolve) {
-        onIdle(resolve);
-    }
-    this.safeForceUpdate();
-
-    const method = page === 'chat' || page === 'fm/chat' || page === location
-                || event && event.type === 'popstate' ? 'replaceState' : 'pushState';
-
-    M.currentdirid = String(page = location).replace('fm/', '');
-    history[method]({subpage: location}, "", (hashLogic ? '#' : '/') + location);
-    mBroadcaster.sendMessage('pagechange', page);
+    this.routing.route(resolve, reject, location, event);
 });
 
 if (is_mobile) {
@@ -2409,8 +2341,15 @@ Chat.prototype.openChatAndSendFilesDialog = function(user_handle) {
 
     this.smartOpenChat(user_handle)
         .then(function(room) {
+            if (room.$rConversationPanel && room.$rConversationPanel.isMounted()) {
+                room.trigger('openSendFilesDialog');
+            }
+            else {
+                room.one('onComponentDidMount.sendFilesDialog', () => {
+                    room.trigger('openSendFilesDialog');
+                });
+            }
             room.setActive();
-            room.trigger('openSendFilesDialog');
         })
         .catch(this.logger.error.bind(this.logger));
 };
@@ -2584,8 +2523,8 @@ Chat.prototype.getFrequentContacts = function() {
             }
 
             if (
-                contactHandle !== "gTxFhlOd_LQ" &&
-                M.u[contactHandle] && M.u[contactHandle].c === 1 &&
+                contactHandle !== strongvelope.COMMANDER &&
+                contactHandle in M.u && M.u[contactHandle].c === 1 &&
                 contactHandle !== u_handle
             ) {
                 if (!recentContacts[contactHandle] || recentContacts[contactHandle].ts < msg.delay) {

@@ -42,7 +42,7 @@
     function _propertiesDialog(action) {
         var update = action === 3;
         var close = !update && action;
-        var $dialog = $('.fm-dialog.properties-dialog');
+        var $dialog = $('.mega-dialog.properties-dialog');
 
         $(document).off('MegaCloseDialog.Properties');
 
@@ -151,7 +151,7 @@
             }
             var star = '';
             if (n.fav && !folderlink) {
-                star = ' star';
+                star = ' sprite-fm-mono icon-favourite-filled';
             }
             $dialog.find('.file-status-icon').attr('class', 'file-status-icon ' + star);
 
@@ -273,7 +273,7 @@
                 }
             }
             if (filecnt && versioningFlag) {
-                p.t14 = '<a id = "previousversions" class="red" >' + p.t14 + '</a>';
+                p.t14 = '<a id = "previousversions" >' + p.t14 + '</a>';
             }
         }
         else {
@@ -322,16 +322,17 @@
 
         var html = '<div class="properties-small-gray">' + p.t1 + '</div>'
             + '<div class="properties-name-block"><div class="propreties-dark-txt">' + p.t2 + '</div>'
-            + ' <span class="file-settings-icon"><span></span></span></div>'
-            + '<div><div class="properties-float-bl"><span class="properties-small-gray">' + p.t3 + '</span>'
+            + ' <span class="file-settings-icon"><i class="sprite-fm-mono icon-options"></i></span></div>'
+            + '<div class="properties-items"><div class="properties-float-bl"><span class="properties-small-gray">'
+            + p.t3 + '</span>'
             + '<span class="propreties-dark-txt">' + p.t4 + '</span></div>'
             + vhtml
             + singlenodeinfohtml
             + '<div class="properties-float-bl">'
             + '<div class="properties-small-gray">' + p.t8
             + '</div><div class="propreties-dark-txt contact-list">'
-            + '<div class="contact-list-icon"></div>'
-            + p.t9
+            + '<span>' + p.t9 + '</span>'
+            + '<div class="contact-list-icon sprite-fm-mono icon-info-filled"></div>'
             + '</div></div>'
             + shareinfohtml;
 
@@ -353,16 +354,17 @@
         if ((filecnt === 1) && (foldercnt === 0)) {
             $('#previousversions').rebind('click', function(ev) {
                 fileversioning.fileVersioningDialog(n.h);
+                closeDialog();
             });
         }
 
-        $('.fm-dialog-close', $dialog).rebind('click', _propertiesDialog);
+        $('button.js-close', $dialog).rebind('click', _propertiesDialog);
 
         var __fsi_close = function() {
             $dialog.find('.file-settings-icon').removeClass('active');
             $('.dropdown.body').removeClass('arrange-to-front');
             $('.properties-dialog').removeClass('arrange-to-back');
-            $('.fm-dialog').removeClass('arrange-to-front');
+            $('.mega-dialog').removeClass('arrange-to-front');
             $.hideContextMenu();
         };
 
@@ -371,7 +373,7 @@
                 e.preventDefault();
                 e.stopPropagation();
                 $(this).addClass('active');
-                // $('.fm-dialog').addClass('arrange-to-front');
+                // $('.mega-dialog').addClass('arrange-to-front');
                 // $('.properties-dialog').addClass('arrange-to-back');
                 $('.dropdown.body').addClass('arrange-to-front');
                 e.currentTarget = $('#' + n.h);
@@ -401,7 +403,7 @@
                     $(this).addClass('active');
                     var $pcm = $('.properties-context-menu');
                     $pcm.css({
-                        'left': $(this).position().left + 8 + 'px',
+                        'left': $(this).position().left + 12 + 'px',
                         'top': $(this).position().top - $pcm.outerHeight() - 8 + 'px',
                         'margin-left': '-' + $pcm.width() / 2 + 'px'
                     });

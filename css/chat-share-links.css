@@ -138,32 +138,63 @@ a.shared-link.show-more {
     display: inline-block;
 }
 .shared-link.thumb .thumb-overlay {
-	position: absolute;
-	width: 100%;
-	height: 100%;
-	left: 0;
-	top: 0;
-	display: block;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+    display: block;
     cursor: zoom-in;
+    z-index: 1;
 }
 .video.thumb .thumb-overlay {
     cursor: pointer;
+}
+.video.thumb .thumb-overlay .thumb-overlay-play {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+}
+.video.thumb .thumb-overlay .thumb-overlay-play i {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    --mask-color: var(--icon-rest);
+    --icon-size: 54px;
+}
+.video.thumb .thumb-overlay .thumb-overlay-circle {
+    position: relative;
+    width: 72px;
+    height: 72px;
+    border-radius: 200px;
+    background: var(--surface-grey-2);
 }
 .video.thumb.non-previewable .thumb-overlay {
 	cursor: default;
 }
 .thumb-overlay .video-thumb-details {
-    display: block;
+    display: flex;
+    align-items: center;
+    padding: 1px 4px 1px 1px;
+    border-radius: 2px;
+    color: var(--text-color-high);
+    background: var(--surface-grey-2);
 }
-.shared-link.thumb .default-white-button.tiny-button {
-	float: none;
-	position: absolute;
-	z-index: 100;
-	bottom: 4px;
-	right: 4px;
-	margin: 0;
+.thumb-overlay .video-thumb-details i {
+    --icon-size: 16px;
+    --mask-color: var(--icon-rest);
 }
-
+.shared-link.thumb .tiny-button {
+    float: none;
+    position: absolute;
+    z-index: 100;
+    bottom: 4px;
+    right: 4px;
+    margin: 0;
+}
 .message.shared-block .data-title,
 .message.shared-block .file-size,
 .message.shared-block .data-block-view.medium {

@@ -72,10 +72,9 @@
             this.lastSeenCloudFolder = this.currentdirid;
         }
 
-        $('.nw-fm-tree-item').removeClass('opened');
-        $('.files-grid-view.fm').removeClass('duplication-found');
-        $('.fm-blocks-view.fm').removeClass('duplication-found');
-        $('.duplicated-items-found').addClass('hidden');
+        $('.nw-fm-tree-item.opened').removeClass('opened');
+        $('.fm-notification-block.duplicated-items-found').removeClass('visible');
+        $('.fm-right-header .fm-breadcrumbs-wrapper').removeClass('hidden');
 
         if (this.chat) {
             this.v = [];
@@ -89,8 +88,7 @@
         else if (id && (id.substr(0, 7) !== 'account')
             && (id.substr(0, 9) !== 'dashboard')
             && (id.substr(0, 15) !== 'user-management')
-            && (id.substr(0, 13) !== 'notifications')
-            && (id.substring(0, 7) !== 'recents')) {
+            && (id.substr(0, 13) !== 'notifications')) {
 
             $('.fm-right-files-block').removeClass('hidden');
 
@@ -132,6 +130,7 @@
             }
             else if (id.substr(0, 6) === 'search') {
                 this.filterBySearch(this.currentdirid);
+                $('.fm-right-header .fm-breadcrumbs-wrapper').addClass('hidden');
             }
             else if (this.currentCustomView){
                 this.filterByParent(this.currentCustomView.nodeID);
@@ -233,7 +232,6 @@
                 }
 
                 M.onTreeUIOpen(currentdirid, currentdirid === 'contacts');
-
                 $('#treea_' + treeid).addClass('opened');
             }
             if (d) {
@@ -241,7 +239,7 @@
             }
 
             Soon(function() {
-                M.renderPath(fid);
+                M.renderPathBreadcrumbs(fid);
             });
         }
 
@@ -276,9 +274,7 @@
             loadSubPage(newHashLocation);
         }
 
-        this.currentTreeType = this.currentCustomView.type || M.treePanelType();
-
-        M.searchPath();
+        delay('render:search_breadcrumbs', () => M.renderSearchBreadcrumbs());
         M.treeSearchUI();
         M.treeSortUI();
         M.treeFilterUI();
@@ -457,11 +453,13 @@
         }
         else if (String(id).length === 11) {
             if (M.u[id] && id !== u_handle) {
-                fetchshares = !M.c[id];
+                loadSubPage('fm/chat/contacts/' + id);
             }
             else {
-                id = 'contacts';
+                loadSubPage('fm/chat/contacts');
             }
+            return MegaPromise.reject(ENOENT);
+
         }
         else if (id !== 'transfers') {
             if (id && id.substr(0, 9) === 'versions/') {
@@ -518,10 +516,6 @@
                         finish();
                     });
                 return;
-            }
-
-            if (cv) {
-                M.buildtree({h: cv.type}, M.buildtree.FORCE_REBUILD, cv.type);
             }
 
             finish();

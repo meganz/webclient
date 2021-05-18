@@ -64,8 +64,8 @@ function dlinfo(ph,key,next)
         init_start();
     }
     if (dlMethod === FlashIO) {
-        $('.fm-dialog.download-dialog').removeClass('hidden');
-        $('.fm-dialog.download-dialog').css('left','-1000px');
+        $('.mega-dialog.download-dialog').removeClass('hidden');
+        $('.mega-dialog.download-dialog').css('left','-1000px');
         $('.download-save-your-file').safeHTML('<object data="'
             + document.location.origin
             + '/downloader.swf" id="dlswf_' + htmlentities(ph)
@@ -448,7 +448,7 @@ function dl_g(res, ctx) {
                 return false;
             });
 
-            $('.mid-button.download-file, .big-button.download-file, .mobile.dl-browser')
+            $('.mid-button.download-file, button.download-file, .mobile.dl-browser')
                 .rebind('click', function() {
                     $('.download.progress-bar').width('0%');
                     $('.open-in-folder').addClass('hidden');
@@ -512,7 +512,7 @@ function dl_g(res, ctx) {
                     return false;
                 });
 
-            $('.mid-button.to-clouddrive, .big-button.to-clouddrive').rebind('click', start_import);
+            $('.mid-button.to-clouddrive, button.to-clouddrive').rebind('click', start_import);
 
             $('.share-content-button').rebind('click', function() {
                 copyToClipboard(getBaseUrl() + '#!' + dlpage_ph + '!' + dlpage_key, l[1642]);
@@ -704,7 +704,7 @@ function dl_g(res, ctx) {
                 var $target = $(e.target);
 
                 if ($(this).find('.download-content').height() < 15
-                    && $target.not('.button') && !$target.closest('.button').length
+                    && $target.not('button') && !$target.closest('button').length
                     && !$target.closest('.top-menu-popup').length
                     && !$target.closest('.pages-menu').length
                     && !$topBar.hasClass('download-complete')) {
@@ -1155,15 +1155,16 @@ function dlcomplete(dl) {
     {
         $('.fm-dialog-overlay').removeClass('hidden');
         $('body').addClass('overlayed');
-        $('.fm-dialog.download-dialog').css('left','50%');
-        $('.fm-dialog.download-dialog .fm-dialog-close').rebind('click', function() {
-            $('.fm-dialog.download-dialog').css('left','-1000px');
+        $('.mega-dialog.download-dialog').css('left','50%');
+        $('.mega-dialog.download-dialog button.js-close').rebind('click', function() {
+            $('.mega-dialog.download-dialog').css('left','-1000px');
             msgDialog('confirmation', l[1196], l[1197], l[1198], function(e)
             {
-                if (e) $('.fm-dialog.download-dialog').addClass('hidden');
-                else
-                {
-                    $('.fm-dialog.download-dialog').css('left','50%');
+                if (e) {
+                    $('.mega-dialog.download-dialog').addClass('hidden');
+                }
+                else {
+                    $('.mega-dialog.download-dialog').css('left','50%');
                     $('.fm-dialog-overlay').removeClass('hidden');
                     $('body').addClass('overlayed');
                 }

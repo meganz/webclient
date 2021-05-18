@@ -195,6 +195,16 @@ function u_checklogin3a(res, ctx) {
 
         setCookie('logged', '1');
 
+        if (r === 3) {
+            document.body.classList.add('logged');
+            document.body.classList.remove('not-logged');
+        }
+
+        // Recovery key has been saved
+        if (localStorage.recoverykey) {
+            document.body.classList.add('rk-saved');
+        }
+
         if (r > 2 && !is_embed) {
             return mBroadcaster.crossTab.initialize(function() {
                 ctx.checkloginresult(ctx, r);
@@ -214,7 +224,6 @@ function u_checklogin3a(res, ctx) {
             ctx.checkloginresult(ctx, r);
         }
     }
-
 }
 
 // validate user session.
@@ -470,6 +479,7 @@ function u_setrsa(rsakey) {
                             if ('csp' in window) {
                                 csp.showCookiesDialog('nova');
                             }
+
                             mega.config.set('dlThroughMEGAsync', 1);
                         });
 
@@ -903,7 +913,7 @@ function setLandingPage(page) {
      * @param triggeredBySet {boolean}
      * @returns {MegaPromise}
      */
-    var getLastInteractionWith = function (u_h, triggeredBySet) {
+    var getLastInteractionWith = function (u_h, triggeredBySet, noRender) {
         console.assert(u_handle, "missing u_handle, can't proceed");
         console.assert(u_h, "missing argument u_h, can't proceed");
 
@@ -911,7 +921,7 @@ function setLandingPage(page) {
             return MegaPromise.reject(EARGS);
         }
 
-        var _renderLastInteractionDone = function (r) {
+        var _renderLastInteractionDone = noRender ? nop : function (r) {
             r = r.split(":");
 
             var ts = parseInt(r[1], 10);
@@ -968,7 +978,7 @@ function setLandingPage(page) {
             }
         };
 
-        var _renderLastInteractionFail = function (r) {
+        var _renderLastInteractionFail = noRender ? nop : function (r) {
             var $elem = $('.li_' + u_h);
 
             $elem

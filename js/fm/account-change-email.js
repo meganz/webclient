@@ -46,13 +46,15 @@ var accountChangeEmail = {
             if ($newEmail.val()) {
                 // Show information message
                 $emailInfoMessage.slideDown();
-                $changeEmailButton.parent().removeClass('closed');
+                $changeEmailButton.closest('.save-container').removeClass('closed');
             }
             else {
                 // Show information message
                 $emailInfoMessage.slideUp();
-                $changeEmailButton.parent().addClass('closed');
+                $changeEmailButton.closest('.save-container').addClass('closed');
             }
+
+            $.tresizer();
         });
     },
 
@@ -162,7 +164,6 @@ var accountChangeEmail = {
                 else {
                     // Success
                     fm_showoverlay();
-                    dialogPositioning('.awaiting-confirmation');
 
                     $('.awaiting-confirmation').removeClass('hidden');
 

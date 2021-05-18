@@ -84,9 +84,9 @@ video.localViewport {
     max-height: 184px;
 }
 .call.local-video.minimized, .call.local-audio.minimized {
-    width: 34px;
-    height: 24px;
-    min-height: 24px;
+    width: 32px;
+    height: 32px;
+    min-height: 32px;
     box-shadow: none;
 }
 .call.local-video .center-avatar-wrapper, .call.local-audio .center-avatar-wrapper {
@@ -157,9 +157,13 @@ video.localViewport {
 .call.button.hidden {
     display: none;
 }
+.call.button i {
+    --icon-size: 38px;
+    --mask-color: var(--surface-grey-2);
+    background: transparent;
+}
 .small-block .call.button {
-    width: 32px;
-    height: 32px;
+    --icon-size: 32px;
     margin: 9px 18px 0 18px;
 }
 .call.button.left {
@@ -181,39 +185,30 @@ video.localViewport {
 .full-sized-block  .call.button.left {
     display: none;
 }
-.call.button i {
-    webkit-transition: opacity 200ms ease-in-out;
-    -moz-transition: opacity 200ms ease-in-out;
-    -o-transition: opacity 200ms ease-in-out;
-    -ms-transition: opacity 200ms ease-in-out;
+button.call i {
     transition: opacity 200ms ease-in-out;
- filter: progid:DXImageTransform.Microsoft.Alpha(opacity=70);
-    -moz-opacity: 0.7;
-    -khtml-opacity: 0.7;
     opacity: 0.7;
 }
-.call.button:hover i {
- filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
-    -moz-opacity: 1;
-    -khtml-opacity: 1;
+button.call:hover i {
     opacity: 1;
 }
-.default-white-button.tiny-button.call {
- filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
-    -moz-opacity: 1;
-    -khtml-opacity: 1;
+.tiny-button.call {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     opacity: 1;
     position: absolute;
     z-index: 10;
     right: 4px;
     top: 4px;
+    border: 0 none;
 }
 .private-chat .call.user-audio {
     width: 60%;
     height: 100%;
     left: 50%;
     top: 50%;
-    z-index: 9;
+    z-index: 10;
     transform: translate(-50%, -50%);
 }
 .call.top-panel .call-duration {
@@ -229,8 +224,10 @@ video.localViewport {
     margin:0 0 0 10px;
 }
 .call.button .unread-messages {
-    left: 32px;
+    top: 14px;
+    left: 25px;
     margin: -3px 0 0 0;
+    border-radius: 200px;
 }
 .call-block.visible-panel .call.bottom-aligned {
     margin-bottom: 72px;
@@ -261,6 +258,18 @@ video.localViewport {
     height: -moz-calc(100% - 36px);
     height: calc(100% - 36px);
     display: table;
+}
+.participantsWrapper .call-counter {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100%;
+    padding: 6px 28px;
+    font: var(--text-h3);
+    text-align: right;
+    color: var(--secondary-white);
+    background: #06151C;
+    z-index: 10;
 }
 .group-chat .call-block .participantsContainer {
     -webkit-transition: margin-top 400ms ease-in-out;
@@ -293,7 +302,7 @@ video.localViewport {
     height: 20px;
     width: 20px;
     border-radius: 2px;
-    background-color: #FFA500;
+    background-color: var(--secondary-orange);
     position: absolute;
     bottom: 3px;
     left: 3px;
@@ -309,30 +318,37 @@ video.localViewport {
     content: "!";
     border-radius: 12px;
     display: block;
-    color: #FFA500;
+    color: var(--secondary-orange);
     margin-left: 4px;
     margin-top: 4px;
     font-size: 11px;
     font-weight: bold;
     line-height: 12px;
 }
-.call-block .icon-audio-muted {
+.call-block .icon-audio-off,
+.call-block .icon-pause {
     position: absolute;
-    background-color: #06151C;
-    background-position: -43px -462px;
     border-radius: 2px;
     top: 3px;
     right: 3px;
     z-index: 2;
+    --icon-size: 24px;
+    --mask-color: var(--secondary-white);
+    background: var(--surface-black-bar);
 }
-.call-block .icon-audio-muted.on-hold {
-    background-position: -44px -428px;
+.call-block .local-audio .icon-audio-off,
+.call-block .local-audio .icon-pause,
+.call-block .center-avatar-wrapper .icon-pause {
+    --mask-color: var(--secondary-white);
+    background: var(--surface-black-bar);
 }
+
 .call-header {
     height: 36px;
     background-color: #06151C;
-    color: #FFFFFF;
-    text-align: left;
+    font: var(--text-body1);
+    color: var(--secondary-white);
+    text-align: start;
     position: absolute;
     z-index: 11;
     width: 100%;
@@ -341,44 +357,52 @@ video.localViewport {
     display: inline-block;
 }
 .call-header .call-topic {
+    display: inline-flex;
+    align-items: center;
     margin-left: 24px;
-    font-size: 15px;
-    line-height: 35px;
-    font-family: 'source_sans_prosemibold';
-    height: 36px;
+    height: 100%;
+    font: var(--text-h3);
 }
 
 .call-header .call-participants-count {
-    height: 16px;
+    height: 17px;
     width: 18px;
     border-radius: 4px;
-    background-color: #2BA6DE;
-    color: white;
+    background-color: var(--secondary-blue);
+    color: var(--secondary-white);
     margin-left: 12px;
     text-align: center;
+    line-height: 17px;
 }
 .call-header .call-header-duration,
 .call-header .call-av-counter,
 .call-header .call-video-icon,
 .call-header .call-switch-view {
     float: right;
-    margin-top: 10px;
+}
+
+.call-header .call-header-column {
+    display: flex;
+    align-items: center;
+    float: left;
+    width: 50%;
+    height: 100%;
+}
+.call-header .call-header-column:last-child {
+    flex-direction: row-reverse;
 }
 
 .call-header .call-header-duration {
-    font-size: 16px;
+    font: var(--text-h3);
     margin-right: 24px;
 }
-.call-header .call-video-icon, .call-header .call-video-icon-warn {
+.call-header .icon-video-call-filled {
     margin-right: 8px;
-    background-image: url(../images/mega/new-chat-sprite_v19.png);
-    background-position: -84px -466px;
-    height: 12px;
-    width: 20px;
-    margin-top: 12px;
+    --icon-size: 24px;
+    --mask-color: var(--surface-grey-2);
 }
-.call-header .call-video-icon-warn {
-    background-position: -124px -466px;
+.call-header .icon-video-call-filled.warn {
+    --mask-color: var(--secondary-orange);
 }
 .call-header .call-av-counter {
     height: 16px;
@@ -388,84 +412,84 @@ video.localViewport {
     font-size: 11px;
     text-align: center;
     margin-right: 16px;
+    line-height: 15px;
 }
 .call-header .call-switch-view {
     margin-right: 16px;
-    background-image: url(../images/mega/new-chat-sprite_v19.png);
-    background-position: -160px -464px;
-    width: 16px;
-    height: 16px;
+    --icon-size: 24px;
+    --mask-color: var(--surface-grey-2);
+    cursor: pointer;
 }
 
 .call-header .call-switch-view.carousel {
     background-position: -190px -464px;
 }
 .in-call-notif {
-    color: rgba(255, 255, 255, 1);
+    color: var(--text-color-white-high);
     height: 24px;
     position: absolute;
     top: 36px;
     z-index: 12;
-    line-height: 24px;
     -webkit-animation: fadein 2s; /* Safari, Chrome and Opera > 12.1 */
     -moz-animation: fadein 2s; /* Firefox < 16 */
     -ms-animation: fadein 2s; /* Internet Explorer */
     -o-animation: fadein 2s; /* Opera < 12.1 */
     animation: fadein 2s;
     width: 100%;
+    font: var(--text-body1);
+    padding: 5px 0 0 0;
+}
+.in-call-notif span {
+    display: block;
+    float: left;
+    margin: 3px 0 0 0;
+}
+.in-call-notif i {
+    display: block;
+    float: left;
+    --icon-size: 24px;
+    margin: 1px 7px 0 7px;
+    --mask-color: var(--icon-rest);
 }
 .private-chat .in-call-notif {
     top: 0;
 }
 .in-call-notif.green {
-    background-color: rgba(0, 191, 165, 0.9);
+    background-color: var(--secondary-green)
 }
 .in-call-notif.gray {
-    background-color: #666666;
-    color: white;
-    opacity: 0.8;
+    background-color: var(--surface-grey-1);
+    color: var(--text-color-high);
 }
 
 .in-call-notif.neutral {
     box-sizing: border-box;
     height: 36px;
-    border: 1px solid rgba(0,0,0,0.05);
-    box-shadow: 0 1px 2px 0 rgba(0,0,0,0.15);
+    border: var(--stroke-grey-2);
     left: 50%;
     -webkit-transform: translateX(-50%);
     transform: translateX(-50%);
     top: 12px;
-    color: #2BA6DE;
+    color: var(--text-color-high);
     border-radius: 18px;
     text-align: center;
-    font-size: 14px;
-    background-color: white;
-    line-height: 33px;
+    background-color: var(--surface-grey-1);
     width: auto;
+    box-shadow: var(--dialog-shadow);
 }
 
-.in-call-notif.neutral.join a:hover {
-    background-color: white;
-    color: #2BA6DE;
-    border-color: #2BA6DE;
-}
-.in-call-notif.neutral.join a {
+.in-call-notif.neutral.join button {
     border-radius: 12px;
-    background-color: #2BA6DE;
-    border: 1px solid white;
-    color: white;
-    padding: 0px 12px;
+    padding: 0 12px;
     -webkit-transition: color 200ms ease-in-out, background-color 200ms ease-in-out, border-color 200ms ease-in-out;
     -moz-transition: color 200ms ease-in-out, background-color 200ms ease-in-out, border-color 200ms ease-in-out;
     -o-transition: color 200ms ease-in-out, background-color 200ms ease-in-out, border-color 200ms ease-in-out;
     -ms-transition: color 200ms ease-in-out, background-color 200ms ease-in-out, border-color 200ms ease-in-out;
     transition: color 200ms ease-in-out, background-color 200ms ease-in-out, border-color 200ms ease-in-out;
-
     display: inline;
     float: right;
     height: 24px;
-    line-height: 22px;
-    margin: 4px 4px auto 24px;
+    margin: -2px 7px 0 24px;
 }
 .in-call-notif.neutral .small-icon {
     margin-top: 7px;
@@ -531,14 +555,16 @@ video.localViewport {
     width: 100%;
     height: 100%;
 }
-.call-block.carousel .activeStream .icon-audio-muted, .private-chat .call.user-audio .icon-audio-muted, .call-block.grid .participantsContainer .icon-audio-muted {
-    width: 38px;
-    height: 38px;
-    background-position: -92px -3310px;
+.call-block.carousel .activeStream .icon-audio-off,
+.private-chat .call.user-audio .icon-audio-off,
+.call-block.grid .participantsContainer .icon-audio-off,
+.call-block.grid .participantsContainer .icon-pause {
     margin: 10px;
+    --icon-size: 38px;
+    --mask-color: var(--surface-grey-2);
 }
-.call-block.grid .participantsContainer .icon-audio-muted.on-hold,
-.call-block.carousel .activeStream .icon-audio-muted.on-hold {
+.call-block.grid .participantsContainer .icon-audio-off.on-hold,
+.call-block.carousel .activeStream .icon-audio-off.on-hold {
     background-position: -154px -2922px;
 }
 
@@ -616,14 +642,15 @@ video.localViewport {
     transform: translate(-50%, -50%);
 }
 
-.call-block .local-audio .icon-audio-muted,
-.call-block .local-video .icon-audio-muted {
-    right: auto;
-    left: 6px;
+.call-block .local-audio .icon-audio-off,
+.call-block .local-video .icon-audio-off {
     top: 6px;
+    left: 6px;
+    right: auto;
+    --icon-size: 24px;
 }
-.call-block .local-video.minimized .icon-audio-muted,
-.call-block .local-audio.minimized .icon-audio-muted {
+.call-block .local-video.minimized .icon-audio-off,
+.call-block .local-audio.minimized .icon-audio-off {
     display: none;
 }
 
@@ -791,9 +818,7 @@ video.localViewport {
 
 .message.call-inner-block .avatar-wrapper {
     float: right;
-    margin-top: -8px;
-    margin-right: 4px;
-    margin-left: -12px;
+    margin: 0 0 0 -12px;
 }
 
 .callReconnecting {
@@ -813,6 +838,7 @@ video.localViewport {
     top: 50%;
     left: 50%;
     margin: -35px 0 0 -35px;
+    --mask-color: var(--secondary-white);
 }
 .call-on-hold.body {
     position: absolute;
@@ -824,8 +850,8 @@ video.localViewport {
     z-index: 10;
 }
 .call-on-hold.icon {
-    width: 64px;
-    height: 64px;
+    width: 100px;
+    height: 100px;
     margin: 0 auto;
     position: relative;
 }
@@ -838,13 +864,15 @@ video.localViewport {
     -webkit-transition: opacity 200ms ease-in-out;
     transition: opacity 200ms ease-in-out;
     opacity: 0.7;
-    cursor: pointer;
 }
 .call-on-hold.icon.white-bg:hover {
     opacity: 1;
 }
+
 .call-on-hold.body i {
     margin: -32px 0 0 -32px;
+    --icon-size: 64px;
+    background: transparent;
 }
 .call-on-hold.txt {
     font-size: 20px;
@@ -855,6 +883,9 @@ video.localViewport {
 }
 .dropdown.call-actions {
     margin-bottom: 8px;
+}
+.dropdown.call-actions i {
+    --mask-color: var(--surface-grey-2);
 }
 .rtc-stats {
     position: absolute; /* Sit on top of the page content */
@@ -875,6 +906,16 @@ video.localViewport {
     z-index: 9;
     top: 10px;
     left: 0;
+}
+
+.call-on-hold.body.me {
+    cursor: pointer;
+}
+.call-on-hold.body.me:hover .call-on-hold.icon {
+    border-radius: 100%;
+    background-color: var(--surface-scrim);
+    width: 100px;
+    height: 100px;
 }
 
 .call.local-video .small-icon.icon-audio-muted.on-hold,

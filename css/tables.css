@@ -1,0 +1,448 @@
+/**
+ * Table Structure:
+ *
+ * <div class="mega-data-header>
+ *     <span>{Title}</span>
+ *     <div class="mega-input dropdown-input text-style"></div>
+ * </div>
+ * <table class="data-table">
+ *     <tr>
+ *          <th class="{sortable?}">
+ *              <span></span>
+ *              <i class="sprite-fm-mono {icon-dropdown?} {asc?|desc?}"></i>
+ *          </th>
+ *     </tr>
+ *     <tr>
+ *         <td><span></span></td>
+ *    </tr>
+ * </table>
+ *
+ * Minimal Table Structure:
+ *
+ * <div class="mega-data-header>
+ *     <span>{Title}</span>
+ * </div>
+ * <table class="data-table">
+ *     <tr><th></th></tr>
+ *     <tr><td></td></tr>
+ * </table>
+ *
+ *
+ * Data Box Table Structure:
+ *
+ * Data box '.mega-data-box' is used mostly for account data. Its a block with border, shadow.
+ * Data box may contain table with data. Usage:
+ *
+ * <div class="mega-data-box">
+ *     <div class="mega-data-header>
+ *         <span></span>
+ *         <div class="mega-input dropdown-input text-style"></div>
+ *    </div>
+ *     <table class="data-table clone">
+ *         <tr><th></th></tr>
+ *         <tr><td></td></tr>
+ *     </table>
+ *     <div class="data-table-scroll>
+ *         <table class="data-table main">
+ *             <tr><th></th></tr>
+ *             <tr><td></td></tr>
+ *         </table>
+ *     </div>
+ * </div>
+ *
+ * Minimal Data Box Table Structure:
+ *
+ * <div class="mega-data-box">
+ *     <div class="mega-data-header>
+ *         <span></span>
+ *    </div>
+ *     <table class="data-table">
+ *         <tr><th></th></tr>
+ *         <tr><td></td></tr>
+ *     </table>
+ * </div>
+ *
+ * There are two addition components:
+ * 1. '.link' for default link with underline
+ * 2.  '.colored-label' for any statuses. Can be '.green', '.orange' and '.red'
+ */
+
+/* Tables */
+
+/* Table header */
+.mega-data-header {
+    align-items: center;
+    color: var(--text-color-high);
+    display: flex;
+    font: var(--text-h2);
+    justify-content: space-between;
+}
+.mega-data-header > span {
+    display: inline-flex;
+    margin: 22px 0 16px;
+}
+.mega-data-header .mega-input.text-style {
+    margin-top: 12px;
+}
+
+/* Data table */
+.data-table {
+    background: var(--surface-main);
+    border: 2px solid var(--table-border);
+    border-collapse: separate;
+    border-radius: 12px;
+    box-sizing: border-box;
+    font-family: var(--text-font-family);
+    margin: 0 auto;
+    padding: 0 0 8px;
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+}
+.rtl .data-table {
+    direction: rtl;
+}
+.data-table th {
+    color: var(--text-color-high);
+    box-sizing: border-box;
+    font: var(--text-body2);
+    padding: 12px 8px 4px;
+    position: relative;
+    text-align: start;
+}
+.data-table tr th:first-child {
+    border: 0;
+    -webkit-padding-start: 22px;
+    padding-inline-start: 22px;
+}
+.data-table tr th:last-child {
+    -webkit-padding-end: 22px;
+    padding-inline-end: 22px;
+}
+.data-table td {
+    color: var(--text-color-medium);
+    border-top: 1px solid transparent;
+    box-sizing: border-box;
+    font: var(--text-body2);
+    padding: 7px 8px;
+    position: relative;
+    text-align: start;
+    text-overflow: ellipsis;
+    vertical-align: middle;
+    z-index: 1;
+}
+.data-table td.data-table-empty {
+    padding: 12px 0 5px;
+    text-align: center;
+}
+.data-table td.data-table-empty:last-child::before {
+    display: none;
+}
+.data-table tr td:first-child {
+    -webkit-padding-start: 22px;
+    padding-inline-start: 22px;
+}
+.data-table tr td:last-child {
+    -webkit-padding-end: 22px;
+    padding-inline-end: 22px;
+}
+.data-table-scroll {
+    border-bottom-left-radius: inherit;
+    border-bottom-right-radius: inherit;
+    max-height: 409px;
+    overflow: hidden;
+}
+
+/* highlight */
+.data-table tr td::before,
+.data-table tr td::before {
+    content: '';
+    bottom: 3px;
+    border-bottom: 1px solid transparent;
+    border-top: 1px solid transparent;
+    left: 0;
+    position: absolute;
+    right: 0;
+    top: 3px;
+    transition: var(--transition-border), var(--transition-bg-color);
+    z-index: -1;
+}
+.data-table tr td:first-child::before {
+    right: 0;
+    left: 10px;
+    border-radius: 4px 0 0 4px;
+    border-left: 1px solid transparent;
+}
+.rtl .data-table tr td:first-child::before {
+    right: 10px;
+    left: 0;
+    border-left: initial;
+    border-radius: 0 4px 4px 0;
+    border-right: 1px solid transparent;
+}
+.data-table tr td:last-child::before,
+.data-table tr td:last-child::before {
+    border-radius: 0 4px 4px 0;
+    right: 12px;
+    border-right: 1px solid transparent;
+}
+.rtl .data-table tr td:last-child::before {
+    border-left: 1px solid transparent;
+    border-radius: 4px 0 0 4px;
+    border-right: initial;
+    left: 12px;
+    right: 0;
+}
+.data-table tr:hover td::before,
+.data-table tr.active td::before {
+    background: var(--surface-grey-3);
+    border-color: var(--surface-grey-2);
+}
+.data-table tr.active td::before,
+.data-table tr.active td:last-child::before,
+.data-table tr.active td:first-child::before {
+    background: var(--surface-grey-4);
+    border-color: var(--surface-grey-4);
+}
+.data-table tr.active td:first-child::before {
+    background-image: linear-gradient(var(--secondary-blue), var(--secondary-blue));
+    background-size: 2px calc(100% - 8px);
+    background-repeat: no-repeat;
+    background-position: 3px;
+}
+.rtl .data-table tr.active td:first-child::before {
+    background-position: calc(100% - 3px);
+}
+
+/* Expanded highlight */
+.data-table tr.expanded,
+.fm-affiliate.redeem-details {
+    background: var(--surface-grey-1);
+    border-color: var(--surface-grey-1);
+}
+.data-table tr.expanded td::before {
+    display: none;
+}
+
+/* Bottom border */
+.data-table tr + tr td::after,
+.data-table tr th::after {
+    content: '';
+    top: -1px;
+    position: absolute;
+    width: 100%;
+    height: 1px;
+    background: var(--surface-grey-2);
+    left: 0;
+    pointer-events: none;
+}
+.data-table tr.template + tr td,
+.data-table tr:nth-child(1) td,
+.data-table tr:nth-child(2) td {
+    border: 0;
+}
+.data-table tr.template + tr td::after,
+.data-table tr:first-of-type td::after {
+    display: none;
+}
+.data-table tr th::after {
+    bottom: 0;
+    top: auto;
+}
+.rtl .data-table tr td::after,
+.rtl .data-table tr th::after {
+    left: auto;
+    right: 0;
+}
+.data-table tr td:first-child::after {
+    right: 0;
+    left: auto;
+    width: calc(100% - 22px);
+}
+.rtl .data-table tr td:first-child::after {
+    right: auto;
+    left: 0;
+}
+.data-table tr td:last-child::after {
+    width: calc(100% - 22px);
+}
+
+/* Data boxes */
+
+/* Data box table */
+.mega-data-box {
+    background: var(--surface-main);
+    border-radius: 12px;
+    box-shadow: var(--table-border) 0 0 0 2px;
+    position: relative;
+}
+.mega-data-box table th {
+    border: 1px solid var(--surface-grey-2);
+    border-width: 0 0 0 1px;
+    font: var(--text-body1);
+    padding: 2px 16px 3px;
+}
+.rtl .mega-data-box table th {
+    border-width: 0 1px  0 0;
+}
+.mega-data-box table th span {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.mega-data-box table td {
+    padding: 8px 16px;
+}
+
+/* Data box table header */
+.mega-data-box .mega-data-header {
+    border-bottom: 1px solid var(--surface-grey-2);
+    padding: 0 22px;
+}
+
+/* Data box table */
+.mega-data-box table {
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+}
+
+/* Main and cloned Data box tables. Required for table content scrolling */
+.mega-data-box table.main th {
+    height: 0;
+    overflow: hidden;
+    line-height: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    border: 0;
+}
+.mega-data-box table.clone,
+.mega-data-box table.clone tr,
+.mega-data-box table.clone tbody {
+    display: flex;
+    overflow: hidden;
+    padding: 0;
+    white-space: nowrap;
+    width: 100%;
+}
+.mega-data-box table.clone th {
+    display: inline-flex;
+    flex: none;
+    width: 17.5%;
+}
+
+/* Sortable table cells */
+.mega-data-box table th.sortable {
+    --mask-color: var(--text-color-high);
+    cursor: pointer;
+    -webkit-padding-end: 24px;
+    padding-inline-end: 24px;
+}
+.mega-data-box table th.sortable i.icon-dropdown {
+    border-radius: 0;
+    display: inline-block;
+    float: none;
+    margin: auto;
+    -webkit-margin-end: -8px;
+    margin-inline-end: -8px;
+    padding: 0;
+}
+.mega-data-box table th.sortable i.asc {
+    transform: rotate(180deg);
+}
+
+/* Table labels */
+.mega-data-box .colored-label {
+    background-color: var(--label-green);
+    border-radius: 9px;
+    color: var(--text-color-white-high);
+    display: inline-block;
+    padding: 0 10px;
+}
+.mega-data-box .colored-label.orange {
+    background-color: var(--label-orange);
+}
+.mega-data-box .colored-label.red {
+    background-color: var(--label-red);
+}
+
+/* Table links */
+.mega-data-box .link {
+    color: var(--text-color-medium);
+    display: inline-block;
+    font: var(--text-body2);
+    text-decoration: underline;
+    cursor: pointer;
+}
+.mega-data-box .link:hover {
+    text-decoration: none;
+}
+
+/* medium list */
+
+.data-table.medium-list {
+    border: none;
+    border-radius: 0;
+    padding: 0;
+}
+
+.data-table.medium-list tr td:first-child::after {
+    width: calc(100% - 8px);
+}
+.data-table.medium-list tr th:first-child::after {
+    right: 0;
+    left: auto;
+    width: calc(100% - 8px);
+}
+.rtl .data-table.medium-list tr th:first-child::after {
+    left: 0;
+    right: auto;
+}
+
+.data-table.medium-list tr td:last-child::after {
+    width: calc(100% - 8px);
+}
+.data-table.medium-list tr th:last-child::after {
+    left: 0;
+    right: auto;
+    width: calc(100% - 8px);
+}
+.rtl .data-table.medium-list tr th:last-child::after {
+    right: 0;
+    left: auto;
+}
+
+.data-table.medium-list tr th:last-child::after {
+    left: 0;
+    right: auto;
+    width: calc(100% - 8px);
+}
+.rtl .data-table.medium-list tr th:last-child::after {
+    right: 0;
+    left: auto;
+}
+
+.data-table tr td:first-child,
+.data-table tr th:first-child {
+    -webkit-padding-start: 16px;
+    padding-inline-start: 16px;
+}
+.data-table tr td:last-child,
+.data-table tr th:last-child {
+    -webkit-padding-end: 16px;
+    padding-inline-end: 16px;
+}
+
+.data-table.medium-list tr td:first-child::before {
+    left: 0;
+}
+.rtl .data-table.medium-list tr td:first-child::before {
+    right: 0;
+}
+
+.data-table.medium-list tr td:last-child::before {
+    right: 0;
+}
+.rtl .data-table.medium-list tr td:last-child::before {
+    left: 0;
+}

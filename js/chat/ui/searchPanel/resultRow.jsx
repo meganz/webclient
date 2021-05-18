@@ -4,6 +4,7 @@ import { Avatar, ContactPresence, LastActivity, MembersAmount } from '../contact
 import { MegaRenderMixin } from '../../../stores/mixins';
 import { EmojiFormattedContent } from '../../../ui/utils.jsx';
 import { ContactAwareName } from '../contacts.jsx';
+import { EVENTS } from './searchPanel.jsx';
 
 const SEARCH_ROW_CLASS = `result-table-row`;
 const USER_CARD_CLASS = `user-card`;
@@ -28,7 +29,7 @@ const roomIsGroup = room => room && room.type === 'group' || room.type === 'publ
  */
 
 const openResult = (room, messageId, index) => {
-    $(document).trigger('chatSearchResultOpen');
+    document.dispatchEvent(new Event(EVENTS.RESULT_OPEN));
 
     if (isString(room)) {
         loadSubPage('fm/chat/p/' + room);
@@ -63,6 +64,7 @@ class MessageRow extends MegaRenderMixin {
 
     render() {
         const { data, matches, room, index } = this.props;
+        const isGroup = room && roomIsGroup(room);
         const contact = room.getParticipantsExceptMe();
         const summary = data.renderableSummary || room.messagesBuff.getRenderableSummary(data);
 
@@ -70,25 +72,42 @@ class MessageRow extends MegaRenderMixin {
             <div
                 className={`${SEARCH_ROW_CLASS} message`}
                 onClick={() => openResult(room, data.messageId, index)}>
-                <span className="title">
-                    <ContactAwareName contact={M.u[contact]}>
-                        <EmojiFormattedContent>
-                            {room.getRoomTitle()}
-                        </EmojiFormattedContent>
-                    </ContactAwareName>
-                </span>
-                {!roomIsGroup(room) && <ContactPresence contact={M.u[contact]} />}
-                <div
-                    className="summary"
-                    dangerouslySetInnerHTML={{ __html: megaChat.highlight(
-                        summary,
-                        matches,
-                        true /* already escaped by `getRenderableSummary` */
-                    ) }}>
+                <div className="message-result-avatar">
+                    {isGroup ?
+                        <div className="chat-topic-icon">
+                            <i className="sprite-fm-uni icon-chat-group" />
+                        </div> :
+                        <Avatar contact={M.u[contact]}/>}
                 </div>
-                <span className="date">
-                    {time2date(data.delay)}
-                </span>
+                <div className="user-card">
+                    <span className="title">
+                        <ContactAwareName contact={M.u[contact]}>
+                            <EmojiFormattedContent>
+                                {room.getRoomTitle()}
+                            </EmojiFormattedContent>
+                        </ContactAwareName>
+                    </span>
+                    {isGroup ? null : <ContactPresence contact={M.u[contact]}/>}
+                    <div className="clear"/>
+                    <div className="message-result-info">
+                        <div
+                            className="summary"
+                            dangerouslySetInnerHTML={{
+                                __html: megaChat.highlight(
+                                    summary,
+                                    matches,
+                                    true /* already escaped by `getRenderableSummary` */
+                                )
+                            }}
+                        />
+                        <div className="result-separator">
+                            <i className="sprite-fm-mono icon-dot"/>
+                        </div>
+                        <span className="date">
+                            {getTimeMarker(data.delay, true)}
+                        </span>
+                    </div>
+                </div>
             </div>
         );
     }
@@ -110,14 +129,18 @@ class ChatRow extends MegaRenderMixin {
             <div
                 className={SEARCH_ROW_CLASS}
                 onClick={() => openResult(room)}>
-                <div className="chat-topic-icon" />
+                <div className="chat-topic-icon">
+                    <i className="sprite-fm-uni icon-chat-group" />
+                </div>
                 <div className={USER_CARD_CLASS}>
                     <div className="graphic">
-                        <span dangerouslySetInnerHTML={{ __html: megaChat.highlight(
-                            megaChat.plugins.emoticonsFilter.processHtmlMessage(htmlentities(room.topic)),
-                            matches,
-                            true
-                        ) }} />
+                        <span dangerouslySetInnerHTML={{
+                            __html: megaChat.highlight(
+                                megaChat.plugins.emoticonsFilter.processHtmlMessage(htmlentities(room.topic)),
+                                matches,
+                                true
+                            )
+                        }}/>
                     </div>
                 </div>
                 <div className="clear" />
@@ -193,7 +216,11 @@ class MemberRow extends MegaRenderMixin {
             <div
                 className={SEARCH_ROW_CLASS}
                 onClick={() => openResult(room ? room : contact.h)}>
-                {isGroup ? <div className="chat-topic-icon" /> : <Avatar contact={contact}/>}
+                {isGroup ?
+                    <div className="chat-topic-icon">
+                        <i className="sprite-fm-uni icon-chat-group" />
+                    </div> :
+                    <Avatar contact={contact}/>}
                 <div className={USER_CARD_CLASS}>
                     {userCard[hasHighlight ? 'graphic' : 'textual']}
                 </div>
@@ -204,9 +231,9 @@ class MemberRow extends MegaRenderMixin {
 }
 
 const NilRow = ({ onSearchMessages, isFirstQuery }) => (
-    <div className={SEARCH_ROW_CLASS}>
+    <div className={`${SEARCH_ROW_CLASS} nil`}>
         <div className="nil-container">
-            <img src={`${staticpath}images/temp/search-icon.png`} alt={LABEL.NO_RESULTS} />
+            <i className="sprite-fm-mono icon-preview-reveal" />
             <span>{LABEL.NO_RESULTS}</span>
             {isFirstQuery && (
                 <div

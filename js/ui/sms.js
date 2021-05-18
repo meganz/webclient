@@ -13,7 +13,7 @@ var sms = {
 
         'use strict';
 
-        var $closeButton = $dialog.find('.js-dialog-close, .js-not-now-button');
+        var $closeButton = $('button.js-close, .js-not-now-button', $dialog);
 
         // If they are suspended, don't show the close icon/button so they can't do anything else
         if (this.isSuspended) {
@@ -106,7 +106,7 @@ sms.phoneInput = {
         'use strict';
 
         // Cache the page
-        this.$dialog = $('.fm-dialog.verify-phone');
+        this.$dialog = $('.mega-dialog.verify-phone');
         this.$background = $('.fm-dialog-overlay');
         this.$page = $('.js-phone-input-page');
 
@@ -139,12 +139,14 @@ sms.phoneInput = {
         'use strict';
 
         var $dialog = this.$dialog;
-        var $headerText = $dialog.find('.js-header-text');
-        var $allPages = $dialog.find('form');
-        var $verifyIcon = $dialog.find('.verify-ph-icon');
-        var $verifySuccessIcon = $dialog.find('.verify-ph-success-icon');
-        var $bodyText = this.$page.find('.js-body-text');
-        var $warningMessage = this.$page.find('.js-warning-message');
+        var $headerText = $('.js-header-text', $dialog);
+        var $allPages = $('form', $dialog);
+        var $allFooters = $('.footer-container', $dialog);
+        var $verifyIcon = $('.verify-ph-icon', $dialog);
+        var $verifySuccessIcon = $('.verify-ph-success-icon', $dialog);
+        var $bodyText = $('.js-body-text', this.$page);
+        var $warningMessage = $('.js-warning-message', this.$page);
+        var megaInput = new mega.ui.MegaInputs($('.js-phone-input', $dialog));
 
         // If coming from the login process where their account was suspended
         if (sms.isSuspended) {
@@ -164,6 +166,7 @@ sms.phoneInput = {
 
         // Hide any previous pages and warnings if returning
         $allPages.addClass('hidden');
+        $allFooters.addClass('hidden');
         $warningMessage.removeClass('visible');
         $verifyIcon.removeClass('hidden');
         $verifySuccessIcon.addClass('hidden');
@@ -177,7 +180,7 @@ sms.phoneInput = {
         'use strict';
 
         var $countryList = $('.js-country-list');
-        var $countryItemTemplate = $countryList.find('.js-country-list-item.template');
+        var $countryItemTemplate = $('.option.template', $countryList);
 
         var countryOptions = '';
 
@@ -210,7 +213,7 @@ sms.phoneInput = {
         });
 
         // Render the countries
-        $countryList.append(countryOptions);
+        $('.dropdown-scroll', $countryList).safeAppend(countryOptions);
     },
 
     /**
@@ -220,51 +223,32 @@ sms.phoneInput = {
 
         'use strict';
 
-        var $countrySelect = this.$page.find('.js-country-list');
+        var $countrySelect = $('.verify-ph-country', this.$page);
+        var $countryDropdown = $('.js-country-list', $countrySelect);
 
         // Initialise with jQueryUI selectmenu
-        $countrySelect.selectmenu({
-            position: {
-                my: 'left-5 top+2',
-                at: 'left-5 bottom+2',
-                collision: 'flip'
-            }
-        });
+        bindDropdownEvents($countrySelect);
 
         // On select of the country in the picker
-        $countrySelect.on('selectmenuselect', function() {
+        $('.option', $countryDropdown).rebind('click.countryselect', function() {
 
             // Get the country call code and name
-            var countryIsoCode = $(this).find(':selected').val();
+            var $this = $(this);
+            var countryIsoCode = $this.attr('data-country-iso-code');
             var countryCallCode = M.getCountryCallCode(countryIsoCode);
             var countryName = M.getCountryName(countryIsoCode);
-            var $selectMenuText = sms.phoneInput.$page.find('.ui-selectmenu-text');
-            var $selectMenuTextParent = $(this).parent();
+            var $selectMenuText = $('> span', $countrySelect);
 
             // Check that they didn't pick the blank option at the top
             if (typeof countryCallCode !== 'undefined') {
 
                 // Put the call code first because of long country names
                 $selectMenuText.text('(+' + countryCallCode + ') ' + countryName);
-                $selectMenuTextParent.addClass('selected');
             }
             else {
                 // Reset back to default state if blank option clicked
                 $selectMenuText.text(l[481]);
-                $selectMenuTextParent.removeClass('selected');
             }
-        });
-
-        // On window resize, make sure the open dropdown list moves to the correct position after resize
-        $(window).off('resize.countrylist').on('resize.countrylist', function() {
-            $('.js-country-list').each(function() {
-
-                // If open, close and re-open
-                if ($(this).next().attr('aria-expanded') === 'true') {
-                    $(this).selectmenu('close');
-                    $(this).selectmenu('open');
-                }
-            });
         });
     },
 
@@ -275,18 +259,18 @@ sms.phoneInput = {
 
         'use strict';
 
-        var $countrySelector = this.$page.find('.js-country-list');
-        var $phoneInput = this.$page.find('.js-phone-input');
-        var $sendButton = this.$page.find('.js-send-sms-button');
-        var $warningMessage = this.$page.find('.js-warning-message');
+        var $countrySelector = $('.js-country-list', this.$page);
+        var $phoneInput = $('.js-phone-input', this.$page);
+        var $sendButton = $('.js-send-sms-button', this.$page);
+        var $warningMessage = $('.js-warning-message', this.$page);
 
-        // Add handlers
-        $countrySelector.add($phoneInput).rebind('keyup.common selectmenuchange.common', function() {
-
-            var $countryCode = $countrySelector.val();
+        var toggleButtonState = function() {
+            var $countrySelect = $('.option[data-state="active"]', $countrySelector);
 
             // If the fields are completed enable the button
-            if ($countryCode && $countryCode.length > 1 && $phoneInput.val().length > 1) {
+            if ($countrySelect.length && $countrySelect.attr('data-country-iso-code').length > 1
+                && $phoneInput.val().length > 1) {
+
                 $sendButton.removeClass('disabled');
             }
             else {
@@ -296,12 +280,23 @@ sms.phoneInput = {
 
             // Hide old error message
             $warningMessage.removeClass('visible');
+        };
+
+        // Add handlers to enable/disable button
+        $('.option', $countrySelector).rebind('click.toggleVerifyButton', function() {
+            toggleButtonState();
+        });
+
+        $phoneInput.rebind('keyup.toggleVerifyButton', function() {
+            toggleButtonState();
         });
 
         // Prevent input of invalid chars
         $phoneInput.rebind('keypress.filterkeys', function(event) {
 
             var inputChar = String.fromCharCode(event.which);
+
+            toggleButtonState();
 
             // If not an integer, prevent input from being entered
             if (!/[0-9]/.test(inputChar)) {
@@ -317,13 +312,13 @@ sms.phoneInput = {
 
         'use strict';
 
-        var $countrySelector = this.$page.find('.js-country-list');
-        var $phoneInput = this.$page.find('.js-phone-input');
-        var $sendButton = this.$page.find('.js-send-sms-button');
-        var $warningMessage = this.$page.find('.js-warning-message');
+        var $countrySelector = $('.js-country-list', this.$page);
+        var $phoneInput = $('.js-phone-input', this.$page);
+        var $sendButton = $('.js-send-sms-button', this.$page);
+        var $warningMessage = $('.js-warning-message', this.$page);
 
         // On Send button click
-        $sendButton.off('click').on('click', function() {
+        $sendButton.rebind('click', function() {
 
             // Do not proceed the country code/phone is not selected/entered and the button is not active
             if ($sendButton.hasClass('disabled')) {
@@ -331,7 +326,7 @@ sms.phoneInput = {
             }
 
             // Get the phone number details
-            var $selectedOption = $countrySelector.find('option:selected');
+            var $selectedOption = $('.option[data-state="active"]', $countrySelector);
             var countryName = $selectedOption.attr('data-country-name');
             var countryCode = $selectedOption.attr('data-country-iso-code');
             var countryCallingCode = $selectedOption.attr('data-country-call-code');
@@ -410,7 +405,7 @@ sms.verifyCode = {
         'use strict';
 
         // Cache the page
-        this.$dialog = $('.fm-dialog.verify-phone');
+        this.$dialog = $('.mega-dialog.verify-phone');
         this.$background = $('.fm-dialog-overlay');
         this.$page = $('.js-verify-code-page');
 
@@ -625,7 +620,7 @@ sms.verifySuccess = {
         'use strict';
 
         // Cache the page
-        this.$dialog = $('.fm-dialog.verify-phone');
+        this.$dialog = $('.mega-dialog.verify-phone');
         this.$background = $('.fm-dialog-overlay');
         this.$page = $('.js-verify-success-page');
 
@@ -710,7 +705,7 @@ sms.verifySuccess = {
 
         'use strict';
 
-        var $dialogCloseButton = this.$dialog.find('.js-dialog-close');
+        var $dialogCloseButton = this.$dialog.find('button.js-close');
         var $pageCloseButton = this.$dialog.find('.js-close-button');
 
         // On Close button tap

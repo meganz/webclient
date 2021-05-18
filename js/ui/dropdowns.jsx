@@ -100,13 +100,17 @@ export class Dropdown extends MegaRenderMixin {
             left: obj.left + (offsetLeft ? offsetLeft / 2 : 0) + horizOffset + 'px',
             top: obj.top + vertOffset + 'px'
         });
+
+        if (this.props.positionLeft) {
+            $(element).css({ left: this.props.positionLeft });
+        }
     }
     onResized() {
         var self = this;
         if (this.props.active === true && this.popupElement) {
             var $element = $(this.popupElement);
             // eslint-disable-next-line local-rules/jquery-scopes
-            var $positionToElement = $('.button.active:visible');
+            var $positionToElement = $('.button.active-dropdown:visible');
             if ($positionToElement.length === 0) {
                 return;
             }
@@ -315,6 +319,7 @@ export class DropdownContactsSelector extends MegaRenderMixin {
                 allowEmpty={this.props.allowEmpty}
                 multiple={this.props.multiple}
                 showTopButtons={this.props.showTopButtons}
+                showAddContact={this.props.showAddContact}
                 onSelectDone={this.props.onSelectDone}
                 multipleSelectedButtonLabel={this.props.multipleSelectedButtonLabel}
                 singleSelectedButtonLabel={this.props.singleSelectedButtonLabel}
@@ -346,18 +351,21 @@ export class DropdownItem extends MegaRenderMixin {
             return React.cloneElement(child, props);
         });
     }
-    onClick(e) {
-        var self = this;
+    onClick(ev) {
+        const { children, onClick } = this.props;
 
-        if (this.props.children) {
-            self.setState({'isClicked': !self.state.isClicked});
-
-            e.stopPropagation();
-            e.preventDefault();
+        if (children) {
+            ev.stopPropagation();
+            ev.preventDefault();
+            this.setState({ isClicked: !this.state.isClicked });
         }
+
+        $(document).trigger('closeDropdowns');
+
+        return onClick && onClick(ev);
     }
     onMouseOver(e) {
-        if (this.props.className === "contains-submenu") {
+        if (this.props.submenu) {
             var $contextItem = $(e.target).closest(".contains-submenu");
             var $subMenu = $contextItem.next('.submenu');
             var contextTopPos = $contextItem.position().top;
@@ -384,36 +392,22 @@ export class DropdownItem extends MegaRenderMixin {
         }
     }
     render() {
-        const self = this;
-
-        let icon;
-        if (self.props.icon) {
-            icon = <i className={"small-icon " + self.props.icon}></i>
-        }
-        let label;
-        if (self.props.label) {
-            label = self.props.label;
-        }
-
-        let child = null;
-
-        child = <div>
-            {self.renderChildren()}
-        </div>;
-
-        return <div
-            className={`dropdown-item ${self.props.className ? self.props.className : ''}`}
-            onClick={self.props.onClick ? (e) => {
-                $(document).trigger('closeDropdowns');
-                if (!self.props.disabled) {
-                    self.props.onClick(e);
-                }
-            } : self.onClick}
-            onMouseOver={self.onMouseOver}
-        >
-            {icon}
-            <span>{label}</span>
-            {child}
-        </div>;
+        const { className, disabled, label, icon, submenu } = this.props;
+        return (
+            <div
+                className={`
+                    dropdown-item
+                    ${className ? className : ''}
+                    ${submenu ? 'contains-submenu' : ''}
+                    ${disabled ? 'disabled' : ''}
+                `}
+                onClick={disabled ? undefined : ev => this.onClick(ev)}
+                onMouseOver={this.onMouseOver}>
+                {icon && <i className={icon} />}
+                {label && <span>{label}</span>}
+                {submenu ? <i className="sprite-fm-mono icon-arrow-right submenu-icon" /> : ''}
+                <div>{this.renderChildren()}</div>
+            </div>
+        );
     }
 };

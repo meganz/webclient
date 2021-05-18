@@ -24,7 +24,7 @@ export default class VoiceClip extends AbstractGenericMessage {
         if (iAmSender && stillEditable && !isBeingEdited && !chatIsReadOnly && !this.props.dialog) {
             return (
                 <Button
-                    className="default-white-button tiny-button"
+                    className="tiny-button"
                     icon="tiny-icon icons-sprite grey-dots">
                     <Dropdown
                         className="white-context-menu attachments-dropdown"
@@ -34,9 +34,8 @@ export default class VoiceClip extends AbstractGenericMessage {
                         horizOffset={4}
                     >
                         <DropdownItem
-                            icon="red-cross"
+                            icon="sprite-fm-mono icon-dialog-close"
                             label={l[1730] /* `Delete` */}
-                            className="red"
                             onClick={(e) => this.props.onDelete(e, message)}
                         />
                     </Dropdown>

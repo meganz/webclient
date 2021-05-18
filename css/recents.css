@@ -1,0 +1,426 @@
+.fm-recents.container {
+    background-color: var(--surface-main);
+    display: flex;
+    flex-direction: column;
+    height: calc(100% - 48px);
+    overflow: hidden;
+    position: relative;
+}
+.fm-recents.container.hidden {
+    display: none;
+}
+.fm-recents.header {
+    font: var(--text-h3-bold);
+    color: var(--text-color-higher);
+    border-bottom: 1px solid var(--surface-grey-2);
+    padding: 12px 0 10px 32px;
+}
+.fm-recents.content {
+    padding-bottom: 100px;
+}
+.rtl .fm-recents.content {
+    direction: rtl;
+}
+.fm-recents.scroll {
+    height: 100%;
+    overflow: hidden;
+}
+.fm-recents.scroll:empty {
+    height: auto;
+}
+.fm-recents .scroll .jspDrag {
+    min-height: 15px;
+}
+.fm-recents.content-row {
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    min-height: 48px;
+    position: relative;
+    width: 100%;
+    padding: 5px 0;
+}
+.fm-recents.content-row.group {
+    margin-top: -1px;
+}
+.fm-recents.content-row .content {
+    margin-left: 48px;
+    margin-right: 48px;
+    min-height: 48px;
+    -webkit-padding-start: 20px;
+    padding-inline-start: 20px;
+    border: 1px solid transparent;
+    position: relative;
+}
+.fm-recents.content-row.template {
+    display: none;
+}
+.fm-recents.date {
+    color: var(--secondary-blue);
+    font: var(--text-body1-bold);
+    padding: 23px 0 13px;
+    -webkit-padding-start: 24px;
+    padding-inline-start: 24px;
+}
+.fm-recents.date.template {
+    display: none;
+}
+.fm-recents.date:first-child {
+    padding-top: 21px;
+}
+.fm-recents .medium-file-icon {
+    margin: 0 0 0 0;
+    position: absolute;
+    left: 14px;
+    top: 8px;
+}
+.rtl .fm-recents .medium-file-icon {
+    right: 14px;
+    left: auto;
+}
+.fm-recents .medium-file-icon.thumb {
+    background-image: none;
+}
+.fm-recents .medium-file-icon.thumb img {
+    width: 100%;
+    height: 100%;
+}
+.fm-recents .medium-file-icon.thumb.video .video-thumb-details {
+    align-items: center;
+    display: flex;
+    height: 100%;
+    justify-content: center;
+    left: 0;
+    padding: 0;
+    top: 0;
+    width: 100%;
+}
+.fm-recents .data-block-bg.video .video-thumb-details i {
+    margin-top: -1px;
+}
+.fm-recents .medium-file-icon.double {
+    left: 14px;
+    top: 10px;
+}
+.rtl .fm-recents .medium-file-icon.double {
+    right: 14px;
+    left: auto;
+}
+.fm-recents.content-row.group .medium-file-icon {
+    top: 9px;
+}
+.fm-recents .medium-file-icon .medium-file-icon {
+    left: 6px;
+    top: -6px;
+}
+.fm-recents .medium-file-icon .medium-file-icon {
+    right: 6px;
+    left: auto;
+}
+.fm-recents.file-info {
+    margin: 0;
+    -webkit-margin-end: 130px;
+    margin-inline-end: 130px;
+    -webkit-margin-start: 48px;
+    margin-inline-start: 48px;
+    padding: 5px 0 0 0;
+}
+.fm-recents.file-name {
+    white-space: nowrap;
+    overflow: hidden;
+    -o-text-overflow: ellipsis;
+    text-overflow: ellipsis;
+    color: var(--text-color-high);
+    font: var(--text-body2);
+}
+.fm-recents.file-name span.first-node-name,
+.fm-recents.file-name span.number-of-files {
+    font: var(--text-body1);
+}
+.fm-recents.file-name span.rest-nodes-counter {
+    color: var(--text-color-medium);
+}
+.fm-recents.file-name .link {
+    cursor: pointer;
+}
+.fm-recents.file-name .link:hover {
+    text-decoration: underline;
+}
+.fm-recents.breadcrumbs {
+    font-size: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    -o-text-overflow: ellipsis;
+    text-overflow: ellipsis;
+    margin-bottom: 6px;
+}
+.fm-recents.breadcrumbs span {
+    color: var(--text-color-low);
+    font: var(--text-body2);
+    display: inline-block;
+    vertical-align: middle;
+    margin-top: 3px;
+}
+.fm-recents.breadcrumbs span.dot-separator {
+    margin: 0 4px;
+    color: var(--text-color-high);
+}
+.fm-recents.breadcrumbs span.action-user-name {
+    margin-top: 0;
+    color: var(--text-color-high);
+}
+.fm-recents.breadcrumbs span.link:hover {
+    cursor: pointer;
+    text-decoration: underline;
+}
+.fm-recents.breadcrumbs i {
+    display: inline-block;
+    vertical-align: middle;
+    margin: 0;
+    -webkit-margin-end: 5px;
+    margin-inline-end: 5px;
+    -webkit-margin-start: -2px;
+    margin-inline-start: -2px;
+}
+.fm-recents.file-action {
+    position: absolute;
+    right: 0;
+    top: 16px;
+}
+.rtl .fm-recents.file-action {
+    right: auto;
+    left: 0;
+}
+.fm-recents.iteration {
+    font-size: 0;
+    white-space: nowrap;
+    float: left;
+    margin: 4px 0 0 0;
+    -webkit-margin-start: 21px;
+    margin-inline-start: 21px;
+}
+.rtl .fm-recents.iteration {
+    float: right;
+}
+.fm-recents.iteration:hover + .dark-direct-tooltip {
+    display: block;
+}
+.fm-recents i.iteration {
+    display: inline-block;
+    vertical-align: top;
+    margin: 1px 0 0 0;
+}
+.fm-recents .sprite-fm-mono.icon-options,
+.fm-recents .sprite-fm-mono.icon-link,
+.fm-recents .sprite-fm-mono.icon-download-filled {
+    float: left;
+    position: relative;
+    left: 0;
+    top: 0;
+    opacity: 0;
+}
+.fm-recents .sprite-fm-mono.icon-options {
+    margin-right: 20px;
+}
+.fm-recents .data-block-view .file-settings-icon {
+    right: 6px;
+    bottom: 6px;
+}
+.fm-recents .data-block-view .file-settings-icon i {
+    left: 2px;
+    --icon-size: 22px;
+}
+.fm-recents .data-block-view.linked .icon-link {
+    opacity: 1;
+}
+.fm-recents .data-block-indicators .sprite-fm-mono.icon-link {
+    margin-right: 1px;
+}
+.fm-recents .sprite-fm-mono.icon-link,
+.fm-recents .sprite-fm-mono.icon-download-filled {
+    margin-right: 16px;
+}
+.fm-recents.content-row:hover .sprite-fm-mono.icon-options,
+.fm-recents.content-row.active .sprite-fm-mono.icon-options {
+    opacity: 1;
+}
+.fm-recents .transfer-filetype-icon {
+    float: left;
+    position: static;
+}
+.fm-recents .transfer-filetype-icon.inbound-share {
+    background-position: -336px -877px;
+}
+.fm-recents.previews-wrapper {
+    margin: 3px 0 0 -22px;
+}
+.fm-recents.previews-scroll {
+    overflow: hidden;
+    font-size: 0;
+    line-height: 0;
+    white-space: nowrap;
+}
+.fm-recents.previews-scroll.expanded {
+    white-space: normal;
+}
+.fm-recents.media.collapsed .previews-wrapper,
+.fm-recents.media.collapsed .toggle-expanded-state {
+    display: none;
+}
+.fm-recents .link-button.toggle-expanded-state i {
+    --icon-size: 24px;
+    --mask-color: var(--text-color-medium);
+    display: inline-block;
+    vertical-align: middle;
+    margin-bottom: 1px;
+}
+.fm-recents .link-button.toggle-expanded-state span {
+    font: var(--text-body1);
+    color: var(--text-color-medium);
+    vertical-align: middle;
+}
+.fm-recents .link-button.toggle-expanded-state:hover i {
+    --mask-color: var(--text-color-high);
+}
+.fm-recents .link-button.toggle-expanded-state:hover span {
+    color: var(--text-color-high);
+}
+.fm-recents.previews-body {
+    display: inline-block;
+    -webkit-padding-start: 18px;
+    padding-inline-start: 18px;
+    vertical-align: top;
+}
+.fm-recents .data-block-view:not(.hidden) {
+    display: inline-block;
+    vertical-align: top;
+    margin: 8px 4px;
+    padding: 0;
+}
+.fm-recents .data-block-view,
+.fm-recents .data-block-bg,
+.fm-recents .block-view-file-type,
+.fm-recents .data-block-view .data-block-bg img {
+    width: 120px;
+    height: 120px;
+}
+.fm-recents .link-button {
+    float: left;
+    margin: 5px 0 9px;
+}
+.fm-recents .link-button:not(.hidden) {
+    display: inline-flex;
+}
+.fm-recents .dark-direct-tooltip {
+    right: 8px;
+    bottom: 28px;
+}
+.fm-recents .dark-direct-tooltip i {
+    left: auto;
+    right: 58px;
+}
+.fm-recents .dark-direct-tooltip.in-out-tooltip i {
+    left: 20px;
+}
+.fm-recents .in-out-share-icon:hover + .in-out-tooltip,
+.fm-recents .in-out-tooltip:hover {
+    display: block;
+}
+.fm-recents .dark-direct-tooltip.in-out-tooltip {
+    left: -12px;
+    right: unset;
+}
+.fm-recents.content-row.link-row {
+    min-height: 0;
+}
+.fm-recents.link-row .link-button {
+    margin: 10px 0 9px 0;
+}
+.fm-recents.group.expanded .rest-nodes-counter {
+    display: none;
+}
+.fm-recents .more-less-toggle {
+    border-radius: 12px;
+    background-color: var(--surface-grey-2);
+    padding: 2px 6px 2px 6px;
+    color: var(--text-color-high);
+}
+.fm-recents.content-row.ui-selected .more-less-toggle {
+    background-color: var(--surface-main);
+}
+.simpletip-tooltip.recents-file-path span i {
+    display: inline-block;
+    --icon-size: 16px;
+    --mask-color: var(--surface-main);
+    position: static;
+    margin: 0 4px 2px;
+    vertical-align: middle;
+    height: 16px;
+    width: 16px;
+}
+.fm-recents .expand-collapse-toggle {
+    position: absolute;
+    top: 22px;
+    left: 20px;
+    cursor: pointer;
+    display: none;
+}
+.rtl .fm-recents .expand-collapse-toggle {
+    transform: rotate(180deg);
+    left: auto;
+    right: 20px;
+}
+.fm-recents.group .expand-collapse-toggle,
+.fm-recents.media .expand-collapse-toggle {
+    display: inline;
+}
+.fm-recents .expand-collapse-toggle .icon-arrow-right,
+.fm-recents.breadcrumbs .sprite-fm-mono,
+.fm-recents.file-action .sprite-fm-mono {
+    --icon-size: 24px;
+    --mask-color: var(--text-color-medium);
+}
+.fm-recents.expanded .expand-collapse-toggle {
+    transform: rotate(90deg);
+}
+.fm-recents.content-row.group.collapsed .content::after,
+.fm-recents.content-row.single .content::after {
+    content: '';
+    position: absolute;
+    height: 1px;
+    left: 8px;
+    right: 8px;
+    bottom: -6px;
+    background: var(--surface-grey-2);
+}
+.fm-recents.content-row.single.child-note .content::after {
+    display: none;
+}
+.fm-recents.content-row:hover .content,
+.fm-recents.content-row.ui-selected .content {
+    border-radius: 6px;
+    border: 1px solid var(--surface-grey-2);
+    position: relative;
+}
+.fm-recents.content-row.ui-selected .content {
+    border-color: var(--surface-grey-4);
+}
+.fm-recents.content-row:hover .content {
+    background-color: var(--surface-grey-3);
+}
+.fm-recents.content-row.ui-selected .content {
+    background-color: var(--surface-grey-4);
+}
+.fm-recents.content-row.ui-selected .content::before {
+    content: '';
+    background-color: var(--banner-border-info);
+    width: 2px;
+    position: absolute;
+    left: 4px;
+    top: 2px;
+    bottom: 2px;
+}
+.rtl .fm-recents.content-row.ui-selected .content::before {
+    left: auto;
+    right: 4px;
+}

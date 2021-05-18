@@ -156,11 +156,11 @@
     Onboarding.prototype._initGenericEvents = function(screenId, $screen, $dialog, screenInfo) {
         var self = this;
 
-        $('.default-grey-button', $dialog).text(
+        $('.accept span', $dialog).text(
             !screenInfo.dontShow && self._queuedForShowing.length > 1 ? l[556] /* next */ : l[5700] /* Got it */
         );
 
-        $('.dropdown.close-button, .default-grey-button', $dialog)
+        $('.dropdown.close-button, .accept', $dialog)
             .rebind('click.onboarding', function() {
                 self.hideDialog(screenId);
             });
@@ -775,24 +775,16 @@
 
     mBroadcaster.addListener('fm:initialized', function _delayedInitOnboarding() {
         if (!folderlink) {
-            assert(typeof mega.ui.onboarding === 'undefined', 'unexpected onboarding initialization');
+            // Disable onboarding until further design update happens
 
-            if (typeof u_handle === 'undefined') {
-                console.error('onboarding expects a valid user...');
-                return;
-            }
-            mega.ui.onboarding = new mega.ui.Onboarding({});
+            // assert(typeof mega.ui.onboarding === 'undefined', 'unexpected onboarding initialization');
 
-            if (u_attr && u_attr.b) {
-                M.require('businessAcc_js', 'businessAccUI_js').done(function() {
-                    var business_ui = new BusinessAccountUI();
-                    if (u_attr.b.m) {
-                        business_ui.showWelcomeDialog();
-                    }
-                    // the function will check if the account is expired
-                    business_ui.showExp_GraceUIElements();
-                });
-            }
+            // if (typeof u_handle === 'undefined') {
+            //     console.error('onboarding expects a valid user...');
+            //     return;
+            // }
+
+            // mega.ui.onboarding = new mega.ui.Onboarding({});
 
             // we reached our goal, stop listening for fminitialized
             return 0xDEAD;

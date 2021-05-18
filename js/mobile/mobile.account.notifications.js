@@ -65,8 +65,8 @@
             }
 
             // Select switches.
-            var $NAll = this.$page.find('.account-notifications .dialog-feature-toggle#notif-all');
-            var $NEach = this.$page.find('.account-notifications .dialog-feature-toggle:not(#notif-all)');
+            var $NAll = this.$page.find('.account-notifications .mega-switch#notif-all');
+            var $NEach = this.$page.find('.account-notifications .mega-switch:not(#notif-all)');
 
             // Init each individual notification switchs.
             $NEach.each(function() {
@@ -100,8 +100,8 @@
             loadingDialog.show('mobile:account/notifications:enotify');
 
             // Select switches.
-            var $EAll = this.$page.find('.email-notifications .dialog-feature-toggle#enotif-all');
-            var $EEach = this.$page.find('.email-notifications .dialog-feature-toggle:not(#enotif-all)');
+            var $EAll = this.$page.find('.email-notifications .mega-switch#enotif-all');
+            var $EEach = this.$page.find('.email-notifications .mega-switch:not(#enotif-all)');
 
             // Hide achievements toggle if achievements not an option for this user.
             (M.account.maf ? $.fn.removeClass : $.fn.addClass).apply(
@@ -137,7 +137,7 @@
          */
         initRowTapEvent: function() {
             this.$page.find('.notification-setting-row').off('tap').on('tap', function() {
-                $(this).find('.dialog-feature-toggle').tap();
+                $('.mega-switch', this).tap();
             });
         },
     };

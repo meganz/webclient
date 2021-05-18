@@ -115,24 +115,28 @@ MegaData.prototype.sortByName = function(d) {
     this.sort();
 };
 
-MegaData.prototype.sortByEmail = function(d) {
+MegaData.prototype.getSortByEmail = function() {
     "use strict";
 
     if (typeof Intl !== 'undefined' && Intl.Collator) {
         var intl = new Intl.Collator('co', {numeric: true});
 
-        this.sortfn = function(a, b, d) {
+        return function(a, b, d) {
             return intl.compare(a.m, b.m) * d;
         };
     }
-    else {
-        this.sortfn = function(a, b, d) {
-            if (typeof a.m === 'string' && typeof b.m === 'string') {
-                return a.m.localeCompare(b.m) * d;
-            }
-            return -1;
-        };
-    }
+
+    return function(a, b, d) {
+        if (typeof a.m === 'string' && typeof b.m === 'string') {
+            return a.m.localeCompare(b.m) * d;
+        }
+        return -1;
+    };
+}
+MegaData.prototype.sortByEmail = function(d) {
+    "use strict";
+
+    this.sortfn = this.getSortByEmail();
     this.sortd = d;
     this.sort();
 };

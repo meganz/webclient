@@ -3,15 +3,13 @@
 /* TODO: adapt it to new dialogs styles once it merged */
 .cookie-dialog {
     display: flex;
-    max-width: 596px;
     max-height: calc(100% - 30px);
+    max-width: 596px;
     text-align: center;
     margin: 0 !important;
     z-index: 9999 !important;
 
     /* TODO: Remove once new dialogs are merged */
-    -webkit-transform: translate(-50%, -50%);
-    transform: translate(-50%, -50%);
     width: calc(100% - 30px);
 }
 .mobile .mega-dialog.cookie-dialog {
@@ -19,7 +17,7 @@
     max-width: 596px;
 }
 .cookie-dialog .content-block {
-    border-radius: inherit;
+    border-radius: var(--border-radius);
     display: none;
     flex-direction: column;
     font-size: 0;
@@ -30,7 +28,6 @@
     display: flex;
 }
 .cookie-dialog .scrollable-block {
-    box-sizing: border-box;
     padding: 0 24px;
     overflow: auto;
     position: relative;
@@ -39,54 +36,22 @@
 
 /* Bottom buttons bar */
 .cookie-dialog .bottom-buttons {
-    background-color: #fafafa;
-    border-bottom-right-radius: inherit;
-    border-bottom-left-radius: inherit;
-    box-shadow: 0 -1px 0 0 rgba(0, 0, 0, 0.1);
-    box-sizing: border-box;
+    background: var(--surface-grey-1);
+    border-bottom-right-radius: var(--border-radius);
+    border-bottom-left-radius: var(--border-radius);
     height: 60px;
     padding: 12px 18px;
     position: relative;
 }
-
-/* TODO: Replace button styles once new buttons are merged */
-.common-dialog-button {
-    background-color: white;
-    border-radius: 4px;
-    box-sizing: border-box;
-    box-shadow: 0.5px 0.5px 2px 0 rgba(0, 0, 0, 0.05);
-    color: #666;
-    cursor: pointer;
-    display: block;
-    font-family: LatoWeb, Arial, sans-serif;
-    font-size: 14px;
-    line-height: 36px;
-    height: 36px;
-    padding: 0 15px;
-    position: relative;
-    margin: 0 6px;
-    min-width: 62px;
-    text-align: center;
-    transition: box-shadow 200ms ease-in-out 0s;
+.rtl .cookie-dialog .bottom-buttons .right {
+    float: left;
 }
-.common-dialog-button.positive {
-    background: rgb(0,191,165);
-    background: linear-gradient(rgba(0,191,165,1) 0%, rgba(0,166,144,1) 100%);
-    color: white;
-    min-width: 82px;
+.rtl .cookie-dialog .bottom-buttons .left {
+    float: right;
 }
-.common-dialog-button::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0;
-    border-radius: inherit;
-    width: 100%;
-    height: 100%;
-    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.05);
-}
-.common-dialog-button.positive::before {
-    box-shadow: 0 0 0 1px #009985;
+.cookie-dialog .bottom-buttons button {
+    -webkit-margin-start: 8px;
+    margin-inline-start: 8px;
 }
 
 /* Step 1. Common info */
@@ -94,34 +59,33 @@
     padding: 62px 50px;
 }
 .cookie-dialog .cookie-icon {
-    margin: 0 auto 0 auto;
+    margin: 0 auto;
+    width: 120px;
+    height: 120px;
 }
 .cookie-dialog .header {
-    font-size: 20px;
-    line-height: 24px;
-    color: #333;
+    font: var(--text-h2);
+    color: var(--text-color-high);
     padding: 24px 0 0 0;
 }
 .cookie-dialog .common-info {
-    font-size: 13px;
-    line-height: 21px;
-    color: #666;
+    font: var(--text-body1);
+    color: var(--text-color-medium);
     padding: 30px 0 0 0;
 }
 .cookie-dialog a.green,
 .cookie-dialog a.green:visited {
-    color: #00C0A6;
+    color: var(--text-color-success);
     overflow-wrap: break-word;
 }
 
 /* Step 2. Cookie Settings */
 .cookie-dialog .header.medium {
-    font-size: 18px;
+    font: var(--text-h3);
     padding: 28px 0;
 }
 .cookie-dialog .settings-tip {
-    box-sizing: border-box;
-    color: #888;
+    color: var(--text-color-low);
     display: none;
     font-size: 13px;
     line-height: 20px;
@@ -136,39 +100,38 @@
 }
 .cookie-dialog .settings-row {
     display: table-row;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    border-bottom: 1px solid var(--stroke-grey-2);
 }
 .cookie-dialog .settings-row:last-child {
     border: 0;
 }
 .cookie-dialog .settings-cell {
-    box-sizing: border-box;
     display: table-cell;
     line-height: 0;
     padding: 12px 0;
 }
 .cookie-dialog .settings-cell:first-child {
-    text-align: left;
+    text-align: start;
     vertical-align: bottom;
 }
 .cookie-dialog .settings-cell.saved {
-    background-color: #fafafa;
+    background: var(--surface-grey-1);
     display: none;
 }
 .cookie-dialog .settings-header {
-    color: #333;
-    font-family: LatoWebBold, Arial, sans-serif;
+    color: var(--text-color-high);
+    font-family: var(--text-font-family-semibold);
     font-size: 15px;
     line-height: 22px;
 }
 .cookie-dialog .settings-text {
-    color: #999;
+    color: var(--text-color-low);
     font-size: 14px;
     line-height: 22px;
     padding: 10px 0 0 0;
 }
 .cookie-dialog .settings-cell a {
-    color: #999;
+    color: var(--text-color-low);
     display: inline-block;
     font-size: 14px;
     line-height: 22px;
@@ -176,22 +139,22 @@
     text-decoration: underline;
 }
 .cookie-dialog .settings-cell a:visited {
-    color: #999;
+    color: var(--text-color-low);
 }
 .cookie-dialog .toggle-header {
-    box-sizing: border-box;
-    color: #373737;
+    color: var(--text-color-high);
     display: none;
     font-size: 14px;
-    font-family: LatoWebBold, Arial, sans-serif;
+    font-family: var(--text-font-family-semibold);
     line-height: 17px;
     min-width: 82px;
     padding: 2px 10px 10px;
 }
-.cookie-dialog .dialog-feature-toggle {
+.rtl .cookie-dialog .mega-switch,
+.cookie-dialog .mega-switch {
     float: none;
 }
-.cookie-dialog .dialog-feature-toggle.disabled {
+.cookie-dialog .mega-switch.disabled {
     opacity: 0.5;
     cursor: default;
 }
@@ -199,15 +162,18 @@
     margin: 10px 0 48px 0;
 }
 .cookie-dialog a.settings-link {
-    color: #666;
-    margin: 10px 25px 0 0;
-    font-family: LatoWebBold, Arial, sans-serif;
+    color: var(--text-color-medium);
+    margin-top: 10px;
+    -webkit-margin-end: 25px;
+    margin-inline-end: 25px;
+    font-family: var(--text-font-family-semibold);
 }
 .cookie-dialog a.settings-link:visited {
-    color: #666;
+    color: var(--text-color-medium);
 }
 .cookie-dialog a.settings-link:last-child {
-    margin-right: 0;
+    -webkit-margin-end: 0;
+    margin-inline-end: 0;
 }
 .cookie-dialog .tabs {
     display: none;
@@ -215,9 +181,8 @@
     white-space: nowrap;
 }
 .cookie-dialog .settings-tab {
-    color: #666;
-    background-color: #F7F7F7;
-    box-sizing: border-box;
+    color: var(--text-color-medium);
+    background: var(--surface-grey-1);
     display: inline-block;
     font-size: 14px;
     height: 44px;
@@ -226,9 +191,9 @@
     width: 50%;
 }
 .cookie-dialog .settings-tab.active {
-    color: #00BFA5;
-    font-family: LatoWebBold, Arial, sans-serif;
-    border-bottom: 2px solid #00BFA5;
+    border-bottom: 2px solid var(--stroke-success);
+    color: var(--text-color-success);
+    font-family: var(--text-font-family-semibold);
 }
 
 /* Visible Saved settings */
@@ -246,20 +211,18 @@
 
 /* Step 3. Third Party Cookies */
 .cookie-dialog .info-block {
-    color: #999;
+    color: var(--text-color-low);
     font-size: 14px;
     line-height: 22px;
     padding: 0 0 52px 0;
-    text-align: left;
+    text-align: start;
 }
 .cookie-dialog .header.small {
     font-size: 15px;
-    font-family: LatoWebBold, Arial, sans-serif;
     padding: 0 0 4px 0;
 }
 .cookie-dialog .info-block .category {
-    color: #666;
-    font-family: LatoWebBold, Arial, sans-serif;
+    color: var(--text-color-medium);
     padding: 0 0 7px 0;
 }
 .cookie-dialog .info-block ul {
@@ -270,8 +233,9 @@
 .cookie-dialog .info-block li::before {
     content: '\2022';
     display: inline-block;
-    vertical-align:  top;
-    padding-right: 4px;
+    vertical-align: top;
+    -webkit-margin-end: 4px;
+    margin-inline-end: 4px;
 }
 
 /* Mobile devices */
@@ -313,32 +277,22 @@
     height: auto;
     padding: 26px 16px 12px 16px;
 }
-.mobile .common-dialog-button {
-    background: linear-gradient(to bottom, rgba(255,255,255,1) 1%,rgba(248,248,248,1) 100%);
-    float: none;
-    margin: 0;
-    line-height: 44px;
-    height: 44px;
+.mobile .cookie-dialog .bottom-buttons .mega-button {
+    margin-bottom: 8px;
+    width: 100%;
 }
-.mobile .common-dialog-button::before {
-    box-shadow: 0 0 0 1px #e2e2e2;
+.mobile .cookie-dialog .bottom-buttons .mega-button.positive {
+    background: linear-gradient(180deg, #07beb1 0,#00bfa5);
+    box-shadow: 0 1px 1px 0 rgba(0, 0, 0, .11),inset 0 2px 1px 0 hsla(0, 0%, 100%, .2);
 }
-.mobile .common-dialog-button.positive::before {
-    box-shadow: 0 0 0 1px #009985;
-}
-.mobile .common-dialog-button.positive {
-    background: linear-gradient(to bottom, rgba(7, 190, 177, 1) 0%,rgba(0, 191, 165, 1) 100%);
-    box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.11), inset 0 2px 1px 0 rgba(255, 255, 255, 0.2);
-}
-.mobile .common-dialog-button.m-lnk {
+.mobile .cookie-dialog .bottom-buttons .mega-button.m-lnk {
     color: #818993;
     background: none;
     box-shadow: none;
     font-size: 12px;
-    margin: 10px 0 0 0;
     text-decoration: underline;
 }
-.mobile .common-dialog-button.m-lnk::before {
+.mobile .cookie-dialog .bottom-buttons .mega-button.m-lnk::before {
     display: none;
 }
 
@@ -348,8 +302,8 @@
     /* Cookie dialog. Step 1. */
     .cookie-dialog .header,
     .cookie-dialog .header.medium {
+        font-family: var(--text-font-family-semibold);
         font-size: 17px;
-        font-family: LatoWebBold, Arial, sans-serif;
     }
     .cookie-dialog .common-info {
         font-size: 14px;
@@ -364,15 +318,14 @@
         margin-top: -14px;
     }
     .cookie-dialog .settings-header {
-        color: #000;
-        font-family: LatoWeb, Arial, sans-serif;
+        color: var(--text-color-high);
         font-size: 14px;
     }
     .cookie-dialog .settings-row:first-child .settings-cell {
         padding: 12px 0;
     }
     .cookie-dialog .settings-text {
-        color: #777E82;
+        color: var(--text-color-medium);
         font-size: 13px;
         line-height: 16px;
         padding: 7px 0 0 0;
@@ -394,31 +347,15 @@
         padding: 0 0 5px 0;
     }
     .cookie-dialog .info-block .category {
-        color: #373737;
+        color: var(--text-color-high);
         font-size: 13px;
-        font-family: LatoWeb, Arial, sans-serif;
         padding: 0 0 16px 0;
     }
 }
 
 /* Hover states */
 @media (hover: hover) {
-    .common-dialog-button:hover {
-        box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.15);
-    }
-    .common-dialog-button.positive:hover {
-        box-shadow: 0 0 0 4px rgba(0,191,165,0.3);
-    }
     .cookie-dialog a:hover {
         text-decoration: none;
     }
-}
-
-
-/* Single icons */
-/* TODO: Put it to sprite in revamp branch */
-.cookie-icon {
-    background: no-repeat center url("../../images/mega/single-icons/cookie.svg");
-    width: 80px;
-    height: 80px;
 }

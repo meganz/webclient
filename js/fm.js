@@ -110,7 +110,7 @@ function addNewContact($addButton, cd) {
     var email;
     var emailText;
     var $mails;
-    var $textarea = $addButton.parents('.fm-dialog').find('textarea');
+    var $textarea = $('textarea', $addButton.parents('.mega-dialog'));
     var promise = new MegaPromise();
     cd = cd === undefined ? true : cd;
 
@@ -228,6 +228,7 @@ function sharedUInode(nodeHandle) {
     var bAvailShares = false;
     var UiExportLink = new mega.UI.Share.ExportLink();
     var share = new mega.Share();
+    var target;
 
     if (!fminitialized) {
         if (d) {
@@ -263,7 +264,11 @@ function sharedUInode(nodeHandle) {
         if (share.isShareExist([nodeHandle], true, true, false)) {
 
             // Left panel
-            $('#treea_' + nodeHandle + ' .nw-fm-tree-folder').addClass('shared-folder');
+            target = document.querySelector('#treea_' + nodeHandle + ' .nw-fm-tree-folder');
+
+            if (target) {
+                target.classList.add('shared-folder');
+            }
 
             bAvailShares = true;
         }
@@ -273,24 +278,40 @@ function sharedUInode(nodeHandle) {
     if (M.d[nodeHandle] && M.d[nodeHandle].t) {
         var icon = fileIcon(M.d[nodeHandle]);
 
-        // Update right panel selected node with appropriate icon for list view
-        $('.grid-table.fm #' + nodeHandle + ' .transfer-filetype-icon').addClass(icon);
+        target = document.getElementById(nodeHandle);
 
-        // Update right panel selected node with appropriate icon for block view
-        $('#' + nodeHandle + '.data-block-view .block-view-file-type').addClass(icon);
+        if (target) {
+
+            // Update right panel selected node with appropriate icon
+            target = target.querySelector(M.viewmode ? '.block-view-file-type' : '.transfer-filetype-icon');
+
+            if (target) {
+                target.classList.add(icon);
+            }
+        }
     }
 
     // If no shares are available, remove share icon from left panel, right panel (list and block view)
     if (!bAvailShares) {
 
         // Left panel
-        $('#treea_' + nodeHandle + ' .nw-fm-tree-folder').removeClass('shared-folder');
+        target = document.querySelector('#treea_' + nodeHandle + ' .nw-fm-tree-folder');
 
-        // Right panel list view
-        $('.grid-table.fm #' + nodeHandle + ' .transfer-filetype-icon').removeClass('folder-shared');
+        if (target) {
+            target.classList.remove('shared-folder');
+        }
 
-        // Right panel block view
-        $('#' + nodeHandle + '.data-block-view .block-view-file-type').removeClass('folder-shared');
+        target = document.getElementById(nodeHandle);
+
+        if (target) {
+
+            // Right panel
+            target = target.querySelector(M.viewmode ? '.block-view-file-type' : '.transfer-filetype-icon');
+
+            if (target) {
+                target.classList.remove('folder-shared');
+            }
+        }
 
         // Remove the share node selection on incoming and outgoing shares pages
         if (typeof nodeHandle !== 'undefined' && (M.currentdirid === 'out-shares' || M.currentdirid === 'shares')) {
@@ -313,7 +334,8 @@ function initAddDialogMultiInputPlugin() {
     var contacts = M.getContactsEMails();
     var $this  = $('.add-contact-multiple-input');
     var $scope = $this.closest('.add-user-popup');
-    var $addButton = $scope.find('.add-user-popup-button');
+    var $addButton = $('.add-user-popup-button', $scope);
+    var $addButtonSpan = $('span', $addButton);
 
     $this.tokenInput(contacts, {
         theme: 'mega',
@@ -365,13 +387,16 @@ function initAddDialogMultiInputPlugin() {
                 }
 
                 if (itemNum > 1) {
-                    $addButton.text(l[19113].replace('%1', itemNum)).removeClass('disabled');
+                    $addButtonSpan.text(l[19113].replace('%1', itemNum));
+                    $addButton.removeClass('disabled');
                 }
                 else if (itemNum === 1) {
-                    $addButton.text(l[19112]).removeClass('disabled');
+                    $addButtonSpan.text(l[19112]);
+                    $addButton.removeClass('disabled');
                 }
                 else {
-                    $addButton.text(l[19112]).addClass('disabled');
+                    $addButtonSpan.text(l[19112]);
+                    $addButton.addClass('disabled');
                 }
 
             });
@@ -381,15 +406,18 @@ function initAddDialogMultiInputPlugin() {
             var itemNum = $inputTokens.length;
 
             if (itemNum === 0) {
-                $addButton.text(l[19112]).addClass('disabled');
+                $addButtonSpan.text(l[19112]);
+                $addButton.addClass('disabled');
             }
             else if (itemNum === 1) {
-                $addButton.text(l[19112]).removeClass('disabled');
+                $addButtonSpan.text(l[19112]);
+                $addButton.removeClass('disabled');
             }
             else {
                 var $multiInput = $scope.find('.multiple-input');
 
-                $addButton.text(l[19113].replace('%1', itemNum)).removeClass('disabled');
+                $addButtonSpan.text(l[19113].replace('%1', itemNum))
+                $addButton.removeClass('disabled');
             }
         },
         onDelete: function() {
@@ -404,13 +432,16 @@ function initAddDialogMultiInputPlugin() {
             itemNum = $inputTokens.length;
 
             if (itemNum === 0) {
-                $addButton.text(l[148]).addClass('disabled');
+                $addButtonSpan.text(l[148]);
+                $addButton.addClass('disabled');
             }
             else if (itemNum === 1) {
-                $addButton.text(l[19112]).removeClass('disabled');
+                $addButtonSpan.text(l[19112]);
+                $addButton.removeClass('disabled');
             }
             else {
-                $addButton.text(l[19113].replace('%1', itemNum)).removeClass('disabled');
+                $addButtonSpan.text(l[19113].replace('%1', itemNum));
+                $addButton.removeClass('disabled');
             }
         }
     });
@@ -443,7 +474,7 @@ function initAddDialogMultiInputPlugin() {
  * @param {Boolean} close dialog parameter
  */
 function newContactDialog(ipcId, close) {
-    var $d = $('.fm-dialog.new-contact');
+    var $d = $('.mega-dialog.new-contact');
     var $msg = $d.find('.new-user-message');
     var ipc = M.ipc[ipcId];
     var username = ipc.m;
@@ -459,16 +490,16 @@ function newContactDialog(ipcId, close) {
     // Set default
     $msg.addClass('hidden').find('span').text('');
 
-    $d.find('.new-contact-info span').text(username);
+    $('.new-contact-info span', $d).text(username);
 
-    $d.find('.new-contact-avatar')
+    $('.new-contact-avatar', $d)
         .safeHTML(useravatar.contact(username, 'semi-mid-avatar'));
 
     if (ipc.msg) {
         $msg.removeClass('hidden').find('span').text(ipc.msg);
     }
 
-    $d.find('.contact-request-button').rebind('click', function() {
+    $('.contact-request-button', $d).rebind('click', function() {
         var $self = $(this);
         var $reqRow = $('tr#ipc_' + ipcId);
 
@@ -491,7 +522,7 @@ function newContactDialog(ipcId, close) {
         newContactDialog(ipcId, 1);
     });
 
-    $d.find('.fm-dialog-close').rebind('click', function() {
+    $('button.js-close', $d).rebind('click', function() {
         newContactDialog(ipcId, 1);
     });
 }
@@ -505,8 +536,10 @@ function newContactDialog(ipcId, close) {
  * @param {Boolean} close Dialog parameter
  */
 function contactsInfoDialog(title, username, msg, close) {
-    var $d = $('.fm-dialog.contact-info');
-    var $msg = $d.find('.new-contact-info');
+    'use strict';
+
+    var $d = $('.mega-dialog.contact-info');
+    var $msg = $('.new-contact-info', $d);
 
     // Hide
     if (close) {
@@ -515,10 +548,10 @@ function contactsInfoDialog(title, username, msg, close) {
     }
 
     if (title) {
-        $d.find('.nw-fm-dialog-title').text(title);
+        $('#contact-info-title', $d).text(title);
     }
     else {
-        $d.find('.nw-fm-dialog-title').text('');
+        $('#contact-info-title', $d).text('');
     }
 
     if (username && msg) {
@@ -530,7 +563,7 @@ function contactsInfoDialog(title, username, msg, close) {
 
     M.safeShowDialog('contact-info', $d);
 
-    $d.find('.fm-dialog-close, .default-white-button.ok').rebind('click', function() {
+    $('button.js-close, button.ok', $d).rebind('click', function() {
         contactsInfoDialog(undefined, undefined, undefined, 1);
     });
 }
@@ -573,21 +606,6 @@ function setContactLink($container) {
         });
     }
 
-    $publicLink.rebind('mouseover.publiclnk', function() {
-        var $this = $(this);
-        var $tooltip = $('.dropdown.tooltip.small');
-        var leftPos = $this.offset().left + $this.width() / 2 - $tooltip.outerWidth() / 2;
-        var topPos = $this.offset().top - $tooltip.outerHeight() - 10;
-
-        $tooltip
-            .addClass('visible')
-            .removeClass('hidden')
-            .css({
-                'left': leftPos,
-                'top': topPos
-            });
-    });
-
     $publicLink.rebind('mouseout.publiclnk', function() {
         $('.dropdown.tooltip.small')
             .removeClass('visible')
@@ -598,7 +616,7 @@ function setContactLink($container) {
         var linkData = $(this).attr('data-lnk') || '';
 
         if (linkData.length) {
-            copyToClipboard(linkData, l[371] + '<span>' + linkData + '</span>', 'short');
+            copyToClipboard(linkData, l[371] + '<br/>' + linkData);
         }
     });
 }
@@ -608,12 +626,12 @@ function contactVsUserDialog() {
     "use strict";
     var $dialog = $('.add-reassign-dialog.user-management-dialog');
 
-    $dialog.find('.dif-dlg-contact-add-btn').rebind('click.dlg', function addContactClickHandler() {
+    $('.dif-dlg-contact-add-btn', $dialog).rebind('click.dlg', function addContactClickHandler() {
         closeDialog();
         return contactAddDialog(null, true);
     });
 
-    $dialog.find('.dif-dlg-close').rebind('click.dlg', function closeClickHandler() {
+    $('button.js-close', $dialog).rebind('click.dlg', function closeClickHandler() {
         return closeDialog();
     });
 
@@ -680,7 +698,15 @@ function contactAddDialog(close, dontWarnBusiness) {
         $('.token-input-input-token-mega input', $d).trigger("focus");
     });
 
-    $d.find('.add-user-popup-button').text(l[19112]).addClass('disabled');
+    $('.add-user-popup-button span', $d).text(l[19112])
+    $('.add-user-popup-button', $d).addClass('disabled');
+
+    if (u_attr && u_attr.b) {
+        $('.hidden-achievement-info', $d).addClass('hidden');
+    }
+    else {
+        $('.hidden-achievement-info', $d).removeClass('hidden');
+    }
 
     initTextareaScrolling($textarea, 72);
     $d.find('.token-input-input-token-mega input').trigger("focus");
@@ -712,7 +738,7 @@ function contactAddDialog(close, dontWarnBusiness) {
         addNewContact($(this));
     });
 
-    $('.add-user-popup .fm-dialog-close').rebind('click', function() {
+    $('.add-user-popup button.js-close').rebind('click', function() {
         showLoseChangesWarning().done(closeDialog);
     });
 }
@@ -736,17 +762,18 @@ function fmtopUI() {
     $contactsTabBlock.find('.contacts-tab-lnk.active').removeClass('active');
     $sharesTabBlock.find('.shares-tab-lnk.active').removeClass('active');
 
-    $('.fm-clearbin-button,.fm-add-user,.fm-new-folder,.fm-file-upload,.fm-folder-upload')
+    $('.fm-clearbin-button,.fm-add-user,.fm-new-folder,.fm-file-upload,.fm-folder-upload,.fm-uploads')
         .add('.fm-new-shared-folder,.fm-new-link').addClass('hidden');
     $('.fm-new-folder').removeClass('filled-input');
     $('.fm-right-files-block').removeClass('visible-notification rubbish-bin');
     $('.fm-right-header').removeClass('requests-panel');
     $('.fm-breadcrumbs-block').removeClass('hidden');
-    $('.button.link-button.accept-all').addClass('hidden');
+    $('button.link-button.accept-all').addClass('hidden');
 
     var showUploadBlock = function _showUploadBlock() {
         $('.fm-new-folder').removeClass('hidden');
         $('.fm-file-upload').removeClass('hidden');
+        $('.fm-uploads').removeClass('hidden');
         if ((is_chrome_firefox & 2) || 'webkitdirectory' in document.createElement('input')) {
             $('.fm-folder-upload').removeClass('hidden');
         }
@@ -770,6 +797,10 @@ function fmtopUI() {
                 console.log('Inbox');
             }
         }
+        else if (String(M.currentdirid).substr(0, 4) === "chat") {
+            // Update IPC indicator
+            delay('updateIpcRequests', updateIpcRequests);
+        }
         else if (M.currentdirid === 'contacts'
                 || M.currentdirid === 'ipc'
                 || M.currentdirid === 'opc'
@@ -786,7 +817,7 @@ function fmtopUI() {
 
             // Show Accept All button
             if (M.currentdirid === 'ipc' && Object.keys(M.ipc).length > 0) {
-                $('.button.link-button.accept-all').removeClass('hidden');
+                $('button.link-button.accept-all').removeClass('hidden');
             }
 
             // Show set active tab, Hide grid/blocks/view buttons
@@ -818,21 +849,31 @@ function fmtopUI() {
                 showUploadBlock();
             }
         }
-        else if (M.currentrootid === 'out-shares' || M.currentrootid === 'public-links') {
+        else if (M.currentrootid === 'out-shares') {
 
             M.sharesUI();
             $sharesTabBlock.removeClass('hidden');
-            $sharesTabBlock.find('.' + M.currentrootid).addClass('active');
+            $('.out-shares', $sharesTabBlock).addClass('active');
             $('.fm-right-files-block').addClass('visible-notification');
 
             if (M.currentdirid !== M.currentrootid) {
                 showUploadBlock();
             }
-            else if (M.currentrootid === 'out-shares') {
+            else {
                 $('.fm-new-shared-folder').removeClass('hidden');
+                $sharesTabBlock.removeClass('hidden');
+            }
+        }
+        else if (M.currentrootid === 'public-links') {
+
+            M.sharesUI();
+            $('.fm-right-files-block').addClass('visible-notification');
+
+            if (M.currentdirid === M.currentrootid) {
+                $('.fm-new-link').removeClass('hidden');
             }
             else {
-                $('.fm-new-link').removeClass('hidden');
+                showUploadBlock();
             }
         }
         else if (String(M.currentdirid).length === 8
@@ -847,6 +888,34 @@ function fmtopUI() {
     });
 }
 
+/**
+ * Function to init Left Pane scrolling in FM/Settings/Dashboard
+ */
+function initTreeScroll() {
+
+    "use strict";
+
+    var treeClass = 'js-myfiles-panel';
+    var scrollBlock;
+
+    if (folderlink || M.currentTreeType !== 'cloud-drive') {
+        treeClass = 'js-other-tree-panel';
+    }
+
+    scrollBlock = document.getElementsByClassName(treeClass).item(0);
+
+    if (!scrollBlock || scrollBlock.classList.contains('hidden')) {
+        return false;
+    }
+
+    if (scrollBlock.classList.contains('ps-container')) {
+        Ps.update(scrollBlock);
+    }
+    else {
+        Ps.initialize(scrollBlock);
+    }
+}
+
 function fmLeftMenuUI() {
 
     "use strict";
@@ -856,8 +925,7 @@ function fmLeftMenuUI() {
         $('.nw-fm-left-icon.inbox').removeClass('hidden');
     }
     else {
-        $('.nw-fm-left-icon.inbox').addClass('hidden');
-
+        $('.js-inbox-btn').addClass('hidden');
         if (M.InboxID && M.currentrootid === M.InboxID) {
             M.openFolder(M.RootID);
         }
@@ -882,13 +950,6 @@ function fmLeftMenuUI() {
     else {
         $icon.removeClass('filled glow');
     }
-
-    if (mega.flags.refpr) {
-        $('.nw-fm-left-icon.affiliate').removeClass('hidden');
-    }
-    else {
-        $('.nw-fm-left-icon.affiliate').addClass('hidden');
-    }
 }
 
 function doClearbin(all) {
@@ -903,18 +964,18 @@ function doClearbin(all) {
 
 function handleResetSuccessDialogs(dialog, txt, dlgString) {
 
-    $('.fm-dialog' + dialog + ' .reg-success-txt').text(txt);
+    $('.mega-dialog' + dialog + ' .reg-success-txt').text(txt);
 
-    $('.fm-dialog' + dialog + ' .default-white-button').rebind('click', function() {
+    $('.mega-dialog' + dialog + ' button.cancel').rebind('click', function() {
         $('.fm-dialog-overlay').addClass('hidden');
         $('body').removeClass('overlayed');
-        $('.fm-dialog' + dialog).addClass('hidden');
+        $('.mega-dialog' + dialog).addClass('hidden');
         delete $.dialog;
     });
 
     $('.fm-dialog-overlay').removeClass('hidden');
     $('body').addClass('overlayed');
-    $('.fm-dialog' + dialog).removeClass('hidden');
+    $('.mega-dialog' + dialog).removeClass('hidden');
 
     $.dialog = dlgString;
 }
@@ -922,7 +983,7 @@ function handleResetSuccessDialogs(dialog, txt, dlgString) {
 function avatarDialog(close) {
     'use strict';
 
-    var $dialog = $('.fm-dialog.avatar-dialog');
+    var $dialog = $('.mega-dialog.avatar-dialog');
 
     if (close) {
         closeDialog();
@@ -932,42 +993,49 @@ function avatarDialog(close) {
     M.safeShowDialog('avatar', $dialog);
 
     $('.avatar-body').safeHTML(
-        '<div id="avatarcrop">' +
-            '<div class="image-upload-and-crop-container">' +
-                '<div class="image-explorer-container empty">' +
-                    '<div class="image-explorer-image-view">' +
-                        '<img class="image-explorer-source" />' +
-                        '<div class="avatar-white-bg"></div>' +
-                        '<div class="image-explorer-mask circle-mask"></div>' +
-                        '<div class="image-explorer-drag-delegate"></div>' +
-                    '</div>' +
-                    '<div class="image-explorer-scale-slider-wrapper">' +
-                        '<div class="image-explorer-scale-slider-minus"></div>' +
-                        '<input class="image-explorer-scale-slider disabled" type="range" ' +
-                            'min="0" max="100" step="1" value="0" disabled="" />' +
-                        '<div class="image-explorer-scale-slider-plus"></div>' +
-                    '</div>' +
-                '</div>' +
-                '<div class="fm-notifications-bottom">' +
-                    '<input type="file" id="image-upload-and-crop-upload-field" class="image-upload-field" ' +
-                        'accept="image/jpeg, image/gif, image/png" />' +
-                    '<label for="image-upload-and-crop-upload-field" ' +
-                        'class="image-upload-field-replacement default-white-button right">' +
-                        '<span>@@</span>' +
-                    '</label>' +
-                    '<div class="default-white-button right" id="fm-change-avatar">' +
-                        '<span>@@</span>' +
-                    '</div>' +
-                    '<div  class="default-white-button right" id="fm-cancel-avatar">' +
-                        '<span>@@</span>' +
-                    '</div>' +
-                    '<div  class="default-white-button right" id="fm-remove-avatar">' +
-                    '<span>@@</span>' +
-                    '</div>' +
-                    '<div class="clear"></div>' +
-                '</div>' +
-            '</div>' +
-        '</div>', l[1016], l[1017], l[82], l[6974]);
+        `<div id="avatarcrop">
+            <div class="image-upload-and-crop-container">
+                <div class="image-explorer-container empty">
+                    <div class="image-explorer-image-view">
+                        <img class="image-explorer-source" />
+                        <div class="image-explorer-mask circle-mask"></div>
+                        <div class="image-explorer-drag-delegate"></div>
+                    </div>
+                    <div class="image-explorer-scale-slider-wrapper">
+                        <i class="zoom-out sprite-fm-theme icon-image-zoom-out simpletip" data-simpletip="${l[24927]}">
+                        </i>
+                        <input class="image-explorer-scale-slider disabled" type="range"
+                            min="0" max="100" step="1" value="0" disabled="" />
+                        <i class="zoom-in sprite-fm-theme icon-image-zoom-in simpletip" data-simpletip="${l[24928]}">
+                        </i>
+                    </div>
+                    <input type="file" id="image-upload-and-crop-upload-field" class="image-upload-field"
+                        accept="image/jpeg, image/gif, image/png" />
+                </div>
+            </div>
+        </div>`);
+    $('.avatar-footer').safeHTML(
+        `<button class="mega-button cancel-avatar" id="fm-cancel-avatar">
+            <span>@@</span>
+        </button>
+        <div>
+            <label for="image-upload-and-crop-upload-field">
+                <button class="mega-button image-upload-field-replacement select-avatar">
+                    <span>@@</span>
+                </button>
+            </label>
+            <button class="mega-button positive change-avatar" id="fm-change-avatar">
+                <span>@@</span>
+            </button>
+            <button class="mega-button negative remove-avatar" id="fm-remove-avatar">
+                <span>@@</span>
+            </button>
+        </div>`,
+        l[82],
+        l[1016],
+        l[1017],
+        l[6974]
+    );
     $('#fm-change-avatar').hide();
     $('#fm-cancel-avatar').hide();
     $('#fm-remove-avatar').hide();
@@ -1010,19 +1078,21 @@ function avatarDialog(close) {
 
             }
         });
-    $('#fm-cancel-avatar,.fm-dialog.avatar-dialog .fm-dialog-close').rebind('click', function(e)
-    {
+    $('#fm-cancel-avatar,.mega-dialog.avatar-dialog button.js-close').rebind('click', function() {
         avatarDialog(1);
     });
 
-    $("#fm-remove-avatar").rebind('click', function()
-    {
-        msgDialog('confirmation', "confirm-remove-avatar", l[18699], l[6973], function(response) {
+    $('#fm-remove-avatar').rebind('click', function() {
+        msgDialog('confirmation', 'confirm-remove-avatar', l[18699], l[6973], function(response) {
             if (response){
                 mega.attr.set('a', "none", true, false);
                 avatarDialog(1);
             }
         });
+    });
+
+    $('.select-avatar', $dialog).rebind('click', function() {
+        $(this).parent('label').trigger('click');
     });
 }
 
@@ -1212,7 +1282,7 @@ function renameDialog() {
         var n = M.d[$.selected[0]] || false;
         var nodeType = n.t;// file: 0, folder: 1
         var ext = fileext(n.name);
-        var $dialog = $('.fm-dialog.rename-dialog');
+        var $dialog = $('.mega-dialog.rename-dialog');
         var $input = $('input', $dialog);
         var errMsg = '';
 
@@ -1222,7 +1292,7 @@ function renameDialog() {
             return $dialog;
         });
 
-        $('.fm-dialog-close, .rename-dialog-button.cancel', $dialog).rebind('click', closeDialog);
+        $('button.js-close, .rename-dialog-button.cancel', $dialog).rebind('click', closeDialog);
 
         $('.rename-dialog-button.rename').rebind('click', function() {
             if ($dialog.hasClass('active')) {
@@ -1266,7 +1336,7 @@ function renameDialog() {
             }
         });
 
-        $('.fm-dialog-title', $dialog).text(n.t ? l[425] : l[426]);
+        $('header h2', $dialog).text(n.t ? l[425] : l[426]);
         $input.val(n.name);
 
         $('.transfer-filetype-icon', $dialog)
@@ -1313,6 +1383,7 @@ function renameDialog() {
 }
 
 function msgDialog(type, title, msg, submsg, callback, checkbox) {
+    'use strict';
     var doneButton  = l[81];
     var extraButton = String(type).split(':');
     if (extraButton.length === 1) {
@@ -1337,30 +1408,31 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
     $.msgDialog = type;
     $.warningCallback = callback;
 
-    $('#msgDialog').removeClass('clear-bin-dialog confirmation-dialog warning-dialog-b warning-dialog-a ' +
-        'notification-dialog remove-dialog delete-contact loginrequired-dialog multiple wide with-close-btn');
-    $('#msgDialog .icon').removeClass('fm-bin-clear-icon .fm-notification-icon');
-    $('#msgDialog .confirmation-checkbox').addClass('hidden');
+    $('#msgDialog').removeClass('confirmation warning info error question ' +
+        'delete-contact loginrequired-dialog multiple with-close-btn');
+    $('#msgDialog aside').addClass('hidden');
 
     if (type === 'clear-bin') {
-        $('#msgDialog').addClass('clear-bin-dialog');
-        $('#msgDialog .icon').addClass('fm-bin-clear-icon');
-        $('#msgDialog .fm-notifications-bottom')
+        $('#msgDialog').addClass('warning');
+        $('#msgDialog footer .footer-container')
             .safeHTML(
-                '<div class="button default-green-button semi-big right confirm">' +
-                    '<span>@@</span>' +
-                '</div>' +
-                '<div class="button default-white-button semi-big right cancel"><span>@@</span></div>' +
-                '<div class="clear"></div>', extraButton || l[1018], l[82]);
+                `<button class="mega-button cancel">
+                    <span>@@</span>
+                </button>
+                <button class="mega-button positive confirm">
+                    <span>@@</span>
+                </button>`,
+                l[82],
+                extraButton || l[1018]);
 
-        $('#msgDialog .default-green-button').rebind('click', function() {
+        $('#msgDialog .mega-button.confirm').rebind('click', function() {
             closeMsg();
             if ($.warningCallback) {
                 $.warningCallback(true);
                 $.warningCallback = null;
             }
         });
-        $('#msgDialog .default-white-button').rebind('click', function() {
+        $('#msgDialog .mega-button.cancel').rebind('click', function() {
             closeMsg();
             if ($.warningCallback) {
                 $.warningCallback(false);
@@ -1370,21 +1442,28 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
     }
     else if (type === 'delete-contact') {
         $('#msgDialog').addClass('delete-contact');
-        $('#msgDialog .fm-notifications-bottom')
-            .safeHTML('<div class="button default-green-button semi-big right confirm">' +
-                '<span>@@</span></div>' +
-                '<div class="button default-white-button semi-big right cancel"><span>@@</span></div>' +
-                '<div class="clear"></div>', l[78], l[79]);
+        $('#msgDialog footer .footer-container')
+            .safeHTML(
+                `<button class="mega-button cancel">
+                    <span>@@</span>
+                </button>
+                <button class="mega-button positive confirm">
+                    <span>@@</span>
+                </button>`,
+                l[79],
+                l[78]);
 
-        $('#msgDialog .default-green-button').rebind('click', function() {
+        // eslint-disable-next-line sonarjs/no-identical-functions
+        $('#msgDialog .mega-button.confirm').rebind('click', function() {
             closeMsg();
             if ($.warningCallback) {
                 $.warningCallback(true);
                 $.warningCallback = null;
             }
         });
-        /*!1*/
-        $('#msgDialog .default-white-button').rebind('click', function() {
+
+        // eslint-disable-next-line sonarjs/no-identical-functions
+        $('#msgDialog .mega-button.cancel').rebind('click', function() {
             closeMsg();
             if ($.warningCallback) {
                 $.warningCallback(false);
@@ -1392,28 +1471,31 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
             }
         });
     }
-    else if (type === 'warninga' || type === 'warningb' || type === 'info') {
+    else if (type === 'warninga' || type === 'warningb' || type === 'info' || type === 'error') {
         if (extraButton) {
-            $('#msgDialog .fm-notifications-bottom')
+            $('#msgDialog footer .footer-container')
                 .safeHTML(
-                    '<div class="button default-green-button semi-big right confirm">' +
-                        '<span>@@</span>' +
-                    '</div>' +
-                    '<div class="button default-white-button semi-big right cancel">' +
-                        '<span>@@</span>' +
-                    '</div>' +
-                    '<div class="clear"></div>', doneButton, extraButton
+                    `<button class="mega-button cancel">
+                        <span>@@</span>
+                    </button>
+                    <button class="mega-button positive confirm">
+                        <span>@@</span>
+                    </button>`,
+                    extraButton,
+                    doneButton
                 );
 
-            $('#msgDialog .default-green-button').rebind('click', function() {
+            // eslint-disable-next-line sonarjs/no-identical-functions
+            $('#msgDialog .mega-button.confirm').rebind('click', function() {
                 closeMsg();
                 if ($.warningCallback) {
                     $.warningCallback(false);
                     $.warningCallback = null;
                 }
             });
-            /*!2*/
-            $('#msgDialog .default-white-button').rebind('click', function() {
+
+            // eslint-disable-next-line sonarjs/no-identical-functions
+            $('#msgDialog .mega-button.cancel').rebind('click', function() {
                 closeMsg();
                 if ($.warningCallback) {
                     $.warningCallback(true);
@@ -1422,13 +1504,15 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
             });
         }
         else {
-            $('#msgDialog .fm-notifications-bottom')
+            $('#msgDialog footer .footer-container')
                 .safeHTML(
-                    '<div class="button default-white-button semi-big right"><span>@@</span></div>' +
-                    '<div class="clear"></div>', l[81]
+                    `<button class="mega-button confirm">
+                        <span>@@</span>
+                    </button>`, l[81]
                 );
 
-            $('#msgDialog .default-white-button').rebind('click', function() {
+            // eslint-disable-next-line sonarjs/no-identical-functions
+            $('#msgDialog .mega-button.confirm').rebind('click', function() {
                 closeMsg();
                 if ($.warningCallback) {
                     $.warningCallback(true);
@@ -1436,54 +1520,67 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
                 }
             });
         }
-
-        $('#msgDialog .icon').addClass('fm-notification-icon');
         if (type === 'warninga') {
-            $('#msgDialog').addClass('warning-dialog-a');
+            $('#msgDialog').addClass('info');
         }
         else if (type === 'warningb') {
-            $('#msgDialog').addClass('warning-dialog-b');
+            $('#msgDialog').addClass('warning');
         }
         else if (type === 'info') {
-            $('#msgDialog').addClass('notification-dialog');
+            $('#msgDialog').addClass('info');
+        }
+        else if (type === 'error') {
+            $('#msgDialog').addClass('error');
         }
     }
     else if (type === 'confirmation' || type === 'remove') {
         if (doneButton === l[81]) {
             doneButton = false;
         }
-        $('#msgDialog .fm-notifications-bottom')
-            .safeHTML('<div class="checkbox-block top-pad hidden">' +
-                '<div class="checkdiv checkboxOff">' +
-                    '<input type="checkbox" name="confirmation-checkbox" ' +
-                        'id="confirmation-checkbox" class="checkboxOff">' +
-                '</div>' +
-                '<label for="export-checkbox" class="radio-txt">@@</label></div>' +
-                '<div class="button default-green-button semi-big right confirm">' +
-                    '<span>@@</span>' +
-                '</div>' +
-                '<div class="button default-white-button semi-big right cancel"><span>@@</span></div>' +
-                '<div class="clear"></div>', l[229], doneButton || l[78], extraButton || l[79]);
+        $('#msgDialog footer .footer-container')
+            .safeHTML(
+                `<div class="space-between">
+                    <button class="mega-button cancel">
+                        <span>@@</span>
+                    </button>
+                    <button class="mega-button positive confirm">
+                        <span>@@</span>
+                    </button>
+                </div>`,
+                extraButton || l[79],
+                doneButton || l[78]);
 
-        $('#msgDialog .default-green-button').rebind('click', function() {
+        $('#msgDialog aside')
+            .safeHTML(`<div class="checkbox-block top-pad">
+                    <div class="checkdiv checkboxOff">
+                        <input type="checkbox" name="confirmation-checkbox"
+                            id="confirmation-checkbox" class="checkboxOff">
+                    </div>
+                    <label for="confirmation-checkbox" class="radio-txt">@@</label>
+                </div>`, l[229]);
+        $('#msgDialog aside').removeClass('hidden');
+
+        // eslint-disable-next-line sonarjs/no-identical-functions
+        $('#msgDialog .mega-button.confirm').rebind('click', function() {
             closeMsg();
             if ($.warningCallback) {
                 $.warningCallback(true);
                 $.warningCallback = null;
             }
         });
-        /*!3*/
-        $('#msgDialog .default-white-button').rebind('click', function() {
+        // eslint-disable-next-line sonarjs/no-identical-functions
+        $('#msgDialog .mega-button.cancel').rebind('click', function() {
             closeMsg();
             if ($.warningCallback) {
                 $.warningCallback(false);
                 $.warningCallback = null;
             }
         });
-        $('#msgDialog .icon').addClass('fm-notification-icon');
-        $('#msgDialog').addClass('confirmation-dialog');
         if (type === 'remove') {
-            $('#msgDialog').addClass('remove-dialog');
+            $('#msgDialog').addClass('warning');
+        }
+        else {
+            $('#msgDialog').addClass('confirmation');
         }
 
         if (checkbox) {
@@ -1492,7 +1589,7 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
                     .removeClass('checkboxOn').addClass('checkboxOff');
 
             $.warningCheckbox = false;
-            $('#msgDialog .checkbox-block').removeClass('hidden');
+            $('#msgDialog aside').removeClass('hidden');
             $('#msgDialog .checkbox-block').rebind('click', function() {
                 var $o = $('#msgDialog .checkbox-block .checkdiv, #msgDialog .checkbox-block input');
                 if ($('#msgDialog .checkbox-block input').hasClass('checkboxOff')) {
@@ -1505,22 +1602,28 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
                 }
             });
         }
+        else {
+            $('#msgDialog aside').addClass('hidden');
+        }
     }
     else if (type === 'import_login_or_register') {
         // Show import confirmation dialog if a user isn't logged in
-        $('#msgDialog').addClass('warning-dialog-a wide with-close-btn');
-        $('#msgDialog .fm-notifications-bottom')
-            .safeHTML('<div class="bottom-bar-link">@@</div>' +
-                '<div class="button default-green-button semi-big right confirm">' +
-                    '<span>@@</span>' +
-                '</div>' +
-                '<div class="button default-white-button semi-big right cancel">' +
-                    '<span>@@</span>' +
-                '</div>' +
-                '<div class="clear"></div></div>', l[20754], l[170], l[171]);
+        $('#msgDialog').addClass('question with-close-btn');
+        $('#msgDialog footer .footer-container')
+            .safeHTML(
+                `<a class="bottom-bar-link">@@</a>
+                <button class="mega-button cancel">
+                    <span>@@</span>
+                </button>
+                <button class="mega-button positive confirm">
+                    <span>@@</span>
+                </button>`,
+                l[20754],
+                l[171],
+                l[170]);
 
         // Register a new account to complete the import
-        $('#msgDialog .default-green-button').rebind('click', function() {
+        $('#msgDialog .mega-button.confirm').rebind('click', function() {
             closeMsg();
             if ($.warningCallback) {
                 $.warningCallback('register');
@@ -1528,7 +1631,7 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
             }
         });
         // Login to complete the import
-        $('#msgDialog .default-white-button').rebind('click', function() {
+        $('#msgDialog .mega-button.cancel').rebind('click', function() {
             closeMsg();
             if ($.warningCallback) {
                 $.warningCallback('login');
@@ -1545,19 +1648,20 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
         });
     }
 
-    $('#msgDialog .fm-dialog-title span').text(title);
+    $('#msgDialog header p.subtitle').text(title);
 
-    $('#msgDialog .fm-notification-info h1').safeHTML(msg);
+    $('#msgDialog header h3').safeHTML(msg);
     clickURLs();
     if (submsg) {
-        $('#msgDialog .fm-notification-info p').safeHTML(submsg);
-        $('#msgDialog .fm-notification-info p').removeClass('hidden');
+        $('#msgDialog header p.text').safeHTML(submsg);
+        $('#msgDialog header p.text').removeClass('hidden');
     }
     else {
-        $('#msgDialog .fm-notification-info p').addClass('hidden');
+        $('#msgDialog header p.text').addClass('hidden');
     }
 
-    $('#msgDialog .fm-dialog-close').rebind('click', function() {
+    // eslint-disable-next-line sonarjs/no-identical-functions
+    $('#msgDialog button.js-close').rebind('click', function() {
         closeMsg();
         if ($.warningCallback) {
             $.warningCallback(false);
@@ -1568,7 +1672,7 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
     fm_showoverlay();
 
     if ($.dialog) {
-        $('.fm-dialog:not(#msgDialog)').addClass('arrange-to-back');
+        $('.mega-dialog:not(#msgDialog)').addClass('arrange-to-back');
     }
 }
 
@@ -1576,7 +1680,7 @@ function closeMsg() {
     $('#msgDialog').addClass('hidden');
 
     if ($.dialog) {
-        $('.fm-dialog').removeClass('arrange-to-back');
+        $('.mega-dialog').removeClass('arrange-to-back');
     }
     else {
         fm_hideoverlay();
@@ -1586,11 +1690,6 @@ function closeMsg() {
     mBroadcaster.sendMessage('msgdialog-closed');
 }
 
-function dialogPositioning(s) {
-    $(s).css('margin-left', '-' + $(s).outerWidth() / 2 + 'px');
-    $(s).css('margin-top', '-' + $(s).outerHeight() / 2 + 'px');
-}
-
 /**
  * opens a contact link dialog, after getting all needed info from API
  *
@@ -1598,12 +1697,12 @@ function dialogPositioning(s) {
  * @returns {null} no return value
  */
 function openContactInfoLink(contactLink) {
-    var $dialog = $('.fm-dialog.qr-contact');
+    var $dialog = $('.mega-dialog.qr-contact');
     var QRContactDialogPrepare = function QRContactDialogPrepare(em, fullname, ctHandle) {
         $('.qr-contact-name', $dialog).text(fullname);
         $('.qr-contact-email', $dialog).text(em);
 
-        var curAvatar = useravatar.contact(em);
+        var curAvatar = useravatar.contact(em, 'small-rounded-avatar square');
         $('.avatar-container-qr-contact', $dialog).html(curAvatar);
 
         var contactStatus = 1;
@@ -1612,17 +1711,20 @@ function openContactInfoLink(contactLink) {
                 $('#qr-ctn-add', $dialog).addClass('disabled');
                 $('#qr-ctn-add', $dialog).off('click');
                 $('.qr-ct-exist', $dialog).text(l[18514]).removeClass('hidden');
+                $('aside', $dialog).removeClass('hidden');
             }
             else if (M.u[ctHandle] && M.u[ctHandle]._data.c) {
                 contactStatus = 2;
                 $('#qr-ctn-add', $dialog).addClass('disabled');
                 $('.qr-ct-exist', $dialog).text(l[17886]).removeClass('hidden');
+                $('aside', $dialog).removeClass('hidden');
                 $('#qr-ctn-add', $dialog).off('click');
             }
             else {
                 $('.big-btn-txt', $dialog).text(l[101]);
                 $('#qr-ctn-add', $dialog).removeClass('disabled');
                 $('.qr-ct-exist', $dialog).addClass('hidden');
+                $('aside', $dialog).addClass('hidden');
                 $('#qr-ctn-add', $dialog).rebind('click', function () {
                     if (contactStatus === 1) {
                         M.inviteContact(u_attr.email, em, null, contactLink);
@@ -1641,9 +1743,10 @@ function openContactInfoLink(contactLink) {
             $('.big-btn-txt', $dialog).text(l[101]);
             $('#qr-ctn-add', $dialog).removeClass('disabled');
             $('.qr-ct-exist', $dialog).addClass('hidden');
+            $('aside', $dialog).addClass('hidden');
             $('#qr-ctn-add', $dialog).rebind('click', function () {
                 closeDialog();
-                var page = 'fm/contacts';
+                var page = 'fm/chat/contacts';
                 mBroadcaster.once('fm:initialized', function () {
                     openContactInfoLink(contactLink);
                 });
@@ -1659,7 +1762,7 @@ function openContactInfoLink(contactLink) {
         }
         $dialog.removeClass('hidden');
     };
-    $dialog.find('.fm-dialog-close')
+    $('button.js-close', $dialog)
         .rebind('click', function () {
             closeDialog();
             return false;
@@ -1682,171 +1785,6 @@ function openContactInfoLink(contactLink) {
 }
 
 /**
- * IFunction to open QR customization dialog.
- * Access QR Code Dialog, can be accessed from dashboard -> QR widget, and from settings -> security
- *
- * @returns {null} no returned value
- */
-function openAccessQRDialog() {
-    "use strict";
-
-    var $dialog = $('.fm-dialog.qr-dialog');
-
-    var QRdialogPrepare = function _QRdialogPrepare() {
-
-        var curAvatar;
-
-        $dialog.removeClass('hidden');
-        $dialog.removeClass('disabled');
-
-        if (M.account.contactLink && M.account.contactLink.length) {
-
-            var myHost = getBaseUrl() + '/' + M.account.contactLink;
-            var QRoptions = {
-                width: 222,
-                height: 222,
-                correctLevel: QRErrorCorrectLevel.H,    // high
-                foreground: '#D90007',
-                text: myHost
-            };
-
-            $('.qr-icon-big', $dialog).text('').qrcode(QRoptions);
-            $('.qr-http-link', $dialog).text(myHost);
-
-            curAvatar = useravatar.contact(u_handle);
-            $('.avatar-container-qr', $dialog).html(curAvatar);
-
-            var handleAutoAccept = function _handleAutoAccept(autoAcc) {
-
-                if (autoAcc === '0') {
-
-                    $('.qr-dialog-label .dialog-feature-toggle', $dialog).removeClass('toggle-on');
-                }
-                else {
-
-                    // if  it's 1 or not set
-                    $('.qr-dialog-label .dialog-feature-toggle', $dialog).addClass('toggle-on');
-                }
-            };
-
-            mega.attr.get(u_handle, 'clv', -2, 0).always(handleAutoAccept);
-        }
-    };
-
-    $('.fm-dialog-close, #qr-dlg-close', $dialog).rebind('click', function() {
-
-        closeDialog();
-        return false;
-    });
-
-    $('.qr-dialog-label .dialog-feature-toggle', $dialog).rebind('click', function() {
-
-        var $this = $(this);
-
-        if ($this.hasClass('toggle-on')) {
-
-            $this.removeClass('toggle-on');
-            mega.attr.set('clv', 0, -2, 0);
-        }
-        else {
-
-            $this.addClass('toggle-on');
-            mega.attr.set('clv', 1, -2, 0);
-        }
-    });
-
-    $('.reset-qr-label', $dialog).rebind('click', function() {
-
-        // QR Code Regenerate
-        var msgTitle = l[18227];
-        // You are about to generate a new QR code.
-        // Your <b>existing</b> QR code and invitation link will no longer work.
-        var msgMsg = l[18228] + ' ';
-        // Do you want to proceed?
-        var msgQuestion = l[18229];
-
-        msgDialog('confirmation', msgTitle, msgMsg, msgQuestion, function(regenQR) {
-
-            if (regenQR) {
-                $dialog.addClass('disabled');
-                var delQR = {
-                    a: 'cld',
-                    cl: M.account.contactLink.substring(2, M.account.contactLink.length)
-                };
-                var reGenQR = { a: 'clc' };
-
-                api_req(delQR, {
-                    callback: function(res) {
-                        // success
-                        if (res === 0) {
-
-                            api_req(reGenQR, {
-                                callback: function(res2) {
-
-                                    if (typeof res2 === 'string') {
-                                        res2 = 'C!' + res2;
-                                    }
-                                    else {
-                                        res2 = '';
-                                    }
-
-                                    M.account.contactLink = res2;
-                                    QRdialogPrepare();
-                                }
-                            });
-                        }
-                        else {
-                            $dialog.removeClass('disabled');
-                        }
-                    }
-                });
-            }
-        });
-    });
-
-    if (is_extension || M.execCommandUsable()) {
-
-        $('#qr-dlg-cpy-lnk').removeClass('hidden').rebind('click', function() {
-            var links = $.trim($('.qr-http-link', $dialog).text());
-            var toastTxt = l[7654];
-
-            copyToClipboard(links, toastTxt);
-        });
-    }
-    else {
-        $('#qr-dlg-cpy-lnk').addClass('hidden');
-    }
-
-    if (ua.details.browser === "Chrome") {
-
-        $('#qr-dlg-sv-img', $dialog).removeClass('hidden').rebind('click', function() {
-            var canvasQR = $('.qr-icon-big canvas', $dialog)[0];
-            var genImageURL = canvasQR.toDataURL();
-            var link = document.createElement("a");
-
-            link.setAttribute("href", genImageURL);
-            link.setAttribute("download", M.account.contactLink);
-            //link.addClass('hidden');
-            link.click();
-        });
-    }
-    else {
-
-        $('#qr-dlg-sv-img', $dialog).addClass('hidden');
-    }
-
-    M.safeShowDialog('qr-dialog', function() {
-
-        QRdialogPrepare();
-        return $dialog;
-    });
-
-}
-
-
-
-
-/**
  * shareDialogContentCheck
  *
  * Taking care about share dialog buttons enabled/disabled and scroll
@@ -1854,13 +1792,10 @@ function openAccessQRDialog() {
  */
 function shareDialogContentCheck() {
 
-    var dc = '.fm-dialog.share-dialog';
+    var dc = '.mega-dialog.share-dialog';
     var itemsNum = $('.share-dialog-access-list .share-dialog-access-node', dc).length;
     var $doneBtn = $('.done-share', dc);
     var $removeBtn = $('.remove-share', dc);
-
-    // Hide the share dialog bottom hint message as default
-    $('.share-dialog-bottom-msg', dc).css('opacity', 0);
 
     // Taking care about the sharing access list scrolling
     handleDialogScroll(itemsNum, dc);
@@ -1908,18 +1843,30 @@ function renderContactRowContent(userEmail, type, id, av, userName, permClass) {
     permClass = type === '1' ? 'owner' : permClass;
     var ownerClass = type === '1' ? ' owner' : '';
 
-    html = '<div class="share-dialog-access-node' + ownerClass + '" id=' + id + '>'
-        + '<div class="access-node-info-block">'
-        + av
-        + '<div class="access-node-username">' + htmlentities(userName) + '</div>'
-        + '<div class="access-node-status ustatus ' + id + " " + presence + '">'
-        + '<div class="nw-contact-status"></div></div>'
-        + '</div>'
-        + '<div class="access-node-remove"></div>'
-        + '<div class="access-node-permission-wrapper">'
-        + '<div class="access-node-permission ' + permClass + '"></div></div>'
-        + '<div class="clear"></div>'
-        + '</div>';
+    html =  `<div class="share-dialog-access-node${ownerClass}" id="${id}">
+                <div class="access-node-info-block">
+                    ${av}
+                    <div class="access-node-username">
+                        ${htmlentities(userName)}
+                    </div>
+                    <div class="access-node-status ustatus ${id} ${presence}">
+                        <div class="nw-contact-status"></div>
+                    </div>
+                </div>
+                <div class="access-node-permission-wrapper">
+                    <button
+                        class="mega-button action icon round access-node-permission ${permClass}
+                        ${permClass === 'full-access' ? ' simpletip' : ''}"
+                        data-simpletip="${l[23709]}" data-simpletipposition="start"
+                        data-simpletip-class="medium-width center-align">
+                        <i class="owner sprite-fm-uni icon-owner"></i>
+                        <i class="full-access sprite-fm-mono icon-star"></i>
+                        <i class="read-and-write sprite-fm-mono icon-permissions-write"></i>
+                        <i class="read-only sprite-fm-mono icon-read-only"></i>
+                    </button>
+                </div>
+                <i class="access-node-remove sprite-fm-mono icon-remove"></i>
+            </div>`;
 
     return html;
 }
@@ -2036,11 +1983,11 @@ function generateShareDialogRow(displayNameOrEmail, email, shareRights, userHand
  */
 function hideShareDialogPermMenu() {
     "use strict";
-    var $shareDialog = $('.fm-dialog.share-dialog');
+    var $shareDialog = $('.mega-dialog.share-dialog');
     var $permissionMenu = $('.share-dialog-permissions-menu', $shareDialog);
 
     $permissionMenu.fadeOut(200);
-    $('.permission-item', $permissionMenu).removeClass('active');
+    $('.option', $permissionMenu).removeClass('active');
     $('.share-dialog-access-node', $shareDialog).removeClass('active');
 }
 
@@ -2053,12 +2000,12 @@ function hideShareDialogPermMenu() {
  */
 function showShareDialogPermMenu($this, x, y) {
     "use strict";
-    var $shareDialog = $('.fm-dialog.share-dialog');
+    var $shareDialog = $('.mega-dialog.share-dialog');
     var $permissionMenu = $('.share-dialog-permissions-menu', $shareDialog);
     var permissionLevel = checkMultiInputPermission($this);
 
-    $('.permission-item', $permissionMenu).removeClass('active');
-    $('.permission-item.' + permissionLevel[0], $permissionMenu).addClass('active');
+    $('.option', $permissionMenu).removeClass('active');
+    $('.option.' + permissionLevel[0], $permissionMenu).addClass('active');
     $permissionMenu.css('right', x + 'px');
     $permissionMenu.css('top', y + 'px');
     $permissionMenu.fadeIn(200);
@@ -2069,7 +2016,7 @@ function showShareDialogPermMenu($this, x, y) {
  */
 function shareDialogAccessListBinds() {
     "use strict";
-    var $shareDialog = $('.fm-dialog.share-dialog');
+    var $shareDialog = $('.mega-dialog.share-dialog');
 
     // Open the permissions menu
     $('.access-node-permission-wrapper', $shareDialog).rebind('click', function(e) {
@@ -2097,7 +2044,7 @@ function shareDialogAccessListBinds() {
         else {
             $('.share-dialog-access-node', $shareDialog).removeClass('active');
             x = 45;
-            y = $this.position().top + 74 + scrollPos;
+            y = $this.position().top + 84 + scrollPos;
 
             showShareDialogPermMenu($('.access-node-permission', $(this)), x, y);
             $selectedContact.addClass('active');
@@ -2153,18 +2100,6 @@ function shareDialogAccessListBinds() {
     // Hide the permission menu once scrolling
     $('.share-dialog-access-list', $shareDialog).rebind('jsp-scroll-y.closeMenu', function() {
         hideShareDialogPermMenu();
-    });
-
-    // Show the full access message once hover contacts with the full-access permission
-    $('.share-dialog-access-node', $shareDialog).rebind('mouseover', function() {
-        if ($('.access-node-permission', $(this)).is('.full-access')) {
-            $('.share-dialog-bottom-msg', $shareDialog).safeHTML(l[23709]).css('opacity', 1);
-        }
-    });
-
-    // Hide the full access message once mouse leave contacts
-    $('.share-dialog-access-node', $shareDialog).rebind('mouseout', function() {
-        $('.share-dialog-bottom-msg', $shareDialog).css('opacity', 0);
     });
 }
 
@@ -2319,7 +2254,6 @@ function initShareDialogMultiInput(alreadyAddedContacts) {
             errorMsg(l[2465]); // Please enter a valid email address
         },
         onReady: function() {
-            dialogPositioning($scope);
         },
         onDoublet: function() {
             errorMsg(l[23714]); // This folder has already been shared with this email address
@@ -2355,8 +2289,6 @@ function initShareDialogMultiInput(alreadyAddedContacts) {
 
                 $('.add-share', $scope).removeClass('disabled');
             }
-
-            dialogPositioning($scope);
         },
         onDelete: function() {
             var $scope = $('.share-add-dialog');
@@ -2388,7 +2320,6 @@ function initShareDialogMultiInput(alreadyAddedContacts) {
                 $('.add-share', $scope).addClass('disabled');
             }
 
-            dialogPositioning($scope);
         }
     });
 }
@@ -2399,7 +2330,7 @@ function initShareDialogMultiInput(alreadyAddedContacts) {
 function renderShareDialogAccessList() {
     "use strict";
 
-    var $shareDialog = $('.fm-dialog.share-dialog');
+    var $shareDialog = $('.mega-dialog.share-dialog');
 
     // Remove all contacts from the access list
     $('.share-dialog-access-node').remove();
@@ -2415,8 +2346,6 @@ function renderShareDialogAccessList() {
 
     // Bind events to components in the access list after rendering
     shareDialogAccessListBinds();
-
-    dialogPositioning($shareDialog);
 }
 
 /**
@@ -2428,35 +2357,26 @@ function initShareDialog() {
     var $dialog = $('.share-dialog');
 
     $dialog.rebind('click', function(e) {
-        var $this = $(this);
+        var $target = $(e.target);
 
         // Hide the permission menu once click outside range of it
-        if (typeof e.originalEvent.path !== 'undefined') {
-            var trg0 = e.originalEvent.path[0];
-            var trg1 = e.originalEvent.path[1];
-            var trg2 = e.originalEvent.path[2];
+        if (!$target.is('.share-dialog-permissions-menu')
+           &&  !$target.closest('.share-dialog-permissions-menu').length) {
 
-            if (!$(trg0).is('.permission-item-text,.permission-item,.share-dialog-permissions-menu')
-                && !$(trg1).is('.permission-item-text,.permission-item,.share-dialog-permissions-menu')
-                && !$(trg2).is('.permission-item-text,.permission-item,.share-dialog-permissions-menu')) {
-                hideShareDialogPermMenu();
-            }
-        }
-        else if ($this.get(0) === e.currentTarget) {
             hideShareDialogPermMenu();
         }
     });
 
-    var $shareAddFooterElement = $('.share-add-dialog-bottom', $dialog).clone();
+    var $shareAddFooterElement = null;
 
     // Close the share dialog
-    $('.fm-dialog-close', $dialog).rebind('click', function() {
+    $('button.js-close', $dialog).rebind('click', function() {
         showLoseChangesWarning().done(closeDialog);
     });
 
     // Change the permission for the specific contact or group
     // eslint-disable-next-line complexity
-    $('.share-dialog-permissions-menu .permission-item', $dialog).rebind('click', function(e) {
+    $('.share-dialog-permissions-menu .option', $dialog).rebind('click', function(e) {
         var $this = $(this);
         var shares = M.d[$.selected[0]].shares;
         var newPermLevel = checkMultiInputPermission($this);
@@ -2490,9 +2410,13 @@ function initShareDialog() {
                 }
             });
 
-            $('.share-dialog-access-node:not(.owner) .access-node-permission', $dialog)
-                .removeClass('full-access read-and-write read-only')
+            const $nodes = $('.share-dialog-access-node:not(.owner) .access-node-permission', $dialog);
+            $nodes.removeClass('full-access read-and-write read-only simpletip')
                 .addClass(newPermLevel[0]);
+
+            if (newPermLevel[0] === 'full-access') {
+                $nodes.addClass('simpletip');
+            }
         }
         else {
             // Change the permission for the specific contact
@@ -2514,9 +2438,13 @@ function initShareDialog() {
                 }
             }
 
-            $('.access-node-permission', $selectedContact)
-                .removeClass('full-access read-and-write read-only')
+            const $node = $('.access-node-permission', $selectedContact);
+            $node.removeClass('full-access read-and-write read-only simpletip')
                 .addClass(newPermLevel[0]);
+
+            if (newPermLevel[0] === 'full-access') {
+                $node.addClass('simpletip');
+            }
         }
 
         // Share button enable/disable control
@@ -2542,6 +2470,10 @@ function initShareDialog() {
             }
         });
 
+        if(!$shareAddFooterElement) {
+            $shareAddFooterElement = $(document.querySelector('.share-add-dialog-bottom-template')
+                .content.firstElementChild.cloneNode(true));
+        }
         M.initShareAddDialog(alreadyAddedContacts, $shareAddFooterElement);
     });
 
@@ -2587,16 +2519,6 @@ function initShareDialog() {
         }
         return false;
     });
-
-    // Show the group change permission message once hover permission items in the menu
-    $('.share-dialog-permissions-menu .permission-item', $dialog).rebind('mouseover', function() {
-        $('.share-dialog-bottom-msg', $dialog).safeHTML(l[23708]).css('opacity', 1);
-    });
-
-    // Hide the group change permission message once mouse leave permission items
-    $('.share-dialog-permissions-menu .permission-item', $dialog).rebind('mouseout', function() {
-        $('.share-dialog-bottom-msg', $dialog).css('opacity', 0);
-    });
 }
 
 function addImportedDataToSharedDialog(data) {
@@ -2640,7 +2562,7 @@ function closeImportContactNotification(c) {
 function showLoseChangesWarning() {
     "use strict";
 
-    var $dialog = $('.fm-dialog:visible');
+    var $dialog = $('.mega-dialog:visible');
     if ($dialog.length !== 1) {
         console.warn('Unexpected number of dialogs...', [$dialog]);
         return MegaPromise.resolve();
@@ -2698,12 +2620,12 @@ function closeDialog(ev) {
         MegaLogger.getLogger('closeDialog').debug($.dialog);
     }
 
-    if (!$('.fm-dialog.registration-page-success').hasClass('hidden')) {
+    if (!$('.mega-dialog.registration-page-success').hasClass('hidden')) {
         fm_hideoverlay();
-        $('.fm-dialog.registration-page-success').addClass('hidden').removeClass('special');
+        $('.mega-dialog.registration-page-success').addClass('hidden').removeClass('special');
     }
 
-    if ($('.fm-dialog.incoming-call-dialog').is(':visible') === true || $.dialog === 'download-pre-warning') {
+    if ($('.mega-dialog.incoming-call-dialog').is(':visible') === true || $.dialog === 'download-pre-warning') {
         // managing dialogs should be done properly in the future, so that we won't need ^^ bad stuff like this one
         return false;
     }
@@ -2713,12 +2635,12 @@ function closeDialog(ev) {
             // do nothing while on the password-link page
             return false;
         }
-        $('.fm-dialog.password-dialog').addClass('hidden');
+        $('.mega-dialog.password-dialog').addClass('hidden');
     }
 
     // business account, add sub-user dialog. we wont allow closing before copying password
     if ($.dialog === 'sub-user-adding-dlg') {
-        if ($('.user-management-add-user-dialog.user-management-dialog .dialog-button-container .add-sub-user')
+        if ($('.user-management-add-user-dialog.user-management-dialog footer .add-sub-user')
             .hasClass('disabled')) {
             return false;
         }
@@ -2730,11 +2652,11 @@ function closeDialog(ev) {
     }
 
     if ($.dialog === 'terms' && $.registerDialog) {
-        $('.fm-dialog.bottom-pages-dialog').addClass('hidden');
+        $('.mega-dialog.bottom-pages-dialog').addClass('hidden');
     }
     else if ($.dialog === 'createfolder' && ($.copyDialog || $.moveDialog || $.selectFolderDialog || $.saveAsDialog)) {
-        $('.fm-dialog.create-folder-dialog').addClass('hidden');
-        $('.fm-dialog.create-folder-dialog .create-folder-size-icon').removeClass('hidden');
+        $('.mega-dialog.create-folder-dialog').addClass('hidden');
+        $('.mega-dialog.create-folder-dialog .create-folder-size-icon').removeClass('hidden');
     }
     else if (($.dialog === 'slideshow') && $.copyrightsDialog) {
         $('.copyrights-dialog').addClass('hidden');
@@ -2742,7 +2664,7 @@ function closeDialog(ev) {
         delete $.copyrightsDialog;
     }
     else if ($.dialog === 'share-add') {
-        $('.fm-dialog.share-add-dialog').addClass('hidden');
+        $('.mega-dialog.share-add-dialog').addClass('hidden');
     }
     else {
         if ($.dialog === 'properties') {
@@ -2751,7 +2673,7 @@ function closeDialog(ev) {
         else {
             fm_hideoverlay();
         }
-        $('.fm-dialog' + ($.propertiesDialog ? ':not(.properties-dialog)' : ''))
+        $('.mega-dialog' + ($.propertiesDialog ? ':not(.properties-dialog)' : ''))
             .trigger('dialog-closed')
             .addClass('hidden');
         $('.dialog-content-block').empty();
@@ -2815,8 +2737,8 @@ function closeDialog(ev) {
             delete $.msgDialog;
         }
     }
-    $('.fm-dialog, .overlay.arrange-to-back').removeClass('arrange-to-back');
-    // $('.fm-dialog .dialog-sorting-menu').remove();
+    $('.mega-dialog, .overlay.arrange-to-back').removeClass('arrange-to-back');
+    // $('.mega-dialog .dialog-sorting-menu').remove();
 
     $('.export-links-warning').addClass('hidden');
     if ($.dialog === 'terms' && $.termsAgree) {
@@ -2859,8 +2781,8 @@ function closeDialog(ev) {
         // eslint-disable-next-line local-rules/hints
         $.dialog = $.copyDialog || $.moveDialog || $.selectFolderDialog || $.saveAsDialog;
 
-        $('.fm-dialog').addClass('arrange-to-back');
-        $('.fm-dialog.fm-picker-dialog').removeClass('arrange-to-back');
+        $('.mega-dialog').addClass('arrange-to-back');
+        $('.mega-dialog.fm-picker-dialog').removeClass('arrange-to-back');
     }
 
     if ($.shareDialog) {
@@ -2879,7 +2801,7 @@ function createFolderDialog(close) {
         return;
     }
 
-    var $dialog = $('.fm-dialog.create-folder-dialog');
+    var $dialog = $('.mega-dialog.create-folder-dialog');
     var $input = $('input', $dialog);
     $input.val('');
 
@@ -2993,7 +2915,7 @@ function createFolderDialog(close) {
         }
     });
 
-    $('.fm-dialog-close, .create-folder-button-cancel', $dialog).rebind('click', createFolderDialog);
+    $('button.js-close, .create-folder-button-cancel', $dialog).rebind('click', createFolderDialog);
 
     $('.fm-dialog-input-clear').rebind('click', function() {
         $input.val('');
@@ -3091,7 +3013,7 @@ function createFileDialog(close, action, params) {
 
     // there's no jquery parent for this container.
     // eslint-disable-next-line local-rules/jquery-scopes
-    var $dialog = $('.fm-dialog.create-file-dialog');
+    var $dialog = $('.mega-dialog.create-file-dialog');
     var $input = $('input', $dialog);
     $input.val('.txt')[0].setSelectionRange(0, 0);
 
@@ -3149,7 +3071,7 @@ function createFileDialog(close, action, params) {
     });
 
     // eslint-disable-next-line sonarjs/no-duplicate-string
-    $('.fm-dialog-close, .cancel-create-file', $dialog).rebind('click.fileDialog', closeFunction);
+    $('.js-close, .cancel-create-file', $dialog).rebind('click.fileDialog', closeFunction);
 
     $('.fm-dialog-input-clear', $dialog).rebind('click.fileDialog', function() {
         $input.val('');
@@ -3169,107 +3091,11 @@ function createFileDialog(close, action, params) {
 
     M.safeShowDialog('createfile', function() {
         $dialog.removeClass('hidden');
-        $('.fm-dialog-body.mid-pad input', $dialog).focus();
+        $('.create-folder-input-bl input', $dialog).focus();
         $dialog.removeClass('active');
         return $dialog;
     });
 }
-
-function browserDialog(close) {
-    'use strict';
-
-    var $dialog = $('.fm-dialog.browsers-dialog');
-
-    if (close) {
-        closeDialog();
-        return true;
-    }
-
-    M.safeShowDialog('browser', function() {
-        $.browserDialog = 1;
-        return $dialog;
-    });
-
-    $('.browsers-dialog .browsers-button,.browsers-dialog .fm-dialog-close').rebind('click', function() {
-        browserDialog(1);
-    });
-
-    $('#browsers-checkbox').rebind('click', function() {
-        if (!$(this).hasClass('checkboxOn')) {
-            localStorage.browserDialog = 1;
-            $(this).attr('class', 'checkboxOn');
-            $(this).parent().attr('class', 'checkboxOn');
-            $(this).prop('checked', true);
-        }
-        else {
-            delete localStorage.chromeDialog;
-            $(this).attr('class', 'checkboxOff');
-            $(this).parent().attr('class', 'checkboxOff');
-            $(this).prop('checked', false);
-        }
-    });
-
-    $('.browsers-top-icon').removeClass('ie9 ie10 safari');
-    var bc, bh, bt;
-    var type = browserDialog.isWeak();
-    if (type && type.ie11)
-    {
-        if (page !== 'download' && ('' + page).split('/').shift() !== 'fm')
-        {
-            browserDialog(1);
-            return false;
-        }
-        // IE11
-        bc = 'ie10';
-        bh = l[884].replace('[X]', type.edge ? 'Edge' : 'IE 11');
-        // if (page == 'download') bt = l[1933];
-        // else bt = l[886];
-        bt = l[1933];
-    }
-    else if (type && type.ie10)
-    {
-        bc = 'ie10';
-        bh = l[884].replace('[X]', 'Internet Explorer 10');
-        if (page === 'download')
-            bt = l[1933];
-        else
-            bt = l[886];
-    }
-    else if (type && type.safari)
-    {
-        bc = 'safari';
-        bh = l[884].replace('[X]', 'Safari');
-        if (page === 'download')
-            bt = l[1933];
-        else
-            bt = l[887].replace('[X]', 'Safari');
-    }
-    else
-    {
-        bc = 'safari';
-        bh = l[884].replace('[X]', l[885]);
-        bt = l[887].replace('[X]', 'Your browser');
-    }
-    $('.browsers-top-icon').addClass(bc);
-    $('.browsers-info-block p').text(bt);
-    $('.browsers-info-header').text(bh);
-    $('.browsers-info-header p').text(bt);
-}
-
-browserDialog.isWeak = function() {
-    var result = {};
-    var ua = String(navigator.userAgent);
-    var style = document.documentElement.style;
-
-    result.ie10 = (ua.indexOf('MSIE 10') > -1);
-    result.ie11 = ('-ms-scroll-limit' in style) && ('-ms-ime-align' in style);
-    result.edge = /\sEdg(?:e|A|iOS)?\/\d/.test(ua);
-    result.safari = (ua.indexOf('Safari') > -1) && (ua.indexOf('Chrome') === -1);
-
-    result.weak = result.edge || result.ie11 || result.ie10 || result.safari;
-
-    return result.weak && result;
-};
 
 /**
  * Show bottom pages dialog
@@ -3281,7 +3107,7 @@ browserDialog.isWeak = function() {
 function bottomPageDialog(close, pp, hh, tickbox) {
     "use strict";
 
-    var $dialog = $('.fm-dialog.bottom-pages-dialog');
+    var $dialog = $('.mega-dialog.bottom-pages-dialog');
     var closeDialog = function() {
         $dialog.off('dialog-closed');
         // reset scroll position to top for re-open
@@ -3308,15 +3134,7 @@ function bottomPageDialog(close, pp, hh, tickbox) {
     if ((pp === 'terms' && !tickbox) || pp === 'sdkterms') {
         $('.fm-bp-cancel, .fm-bp-agree', $dialog).removeClass('hidden');
         $('.fm-bp-close', $dialog).addClass('hidden');
-        $('.fm-dialog-title', $dialog).text(l[385]);
-
-        $('.fm-bp-cancel', $dialog).rebind('click', function()
-        {
-            if ($.termsDeny) {
-                $.termsDeny();
-            }
-            bottomPageDialog(1);
-        });
+        $('header h2', $dialog).text(l[385]);
 
         $('.fm-bp-agree', $dialog).rebind('click', function()
         {
@@ -3326,7 +3144,7 @@ function bottomPageDialog(close, pp, hh, tickbox) {
             bottomPageDialog(1);
         });
 
-        $('.fm-dialog-close', $dialog).rebind('click', function()
+        $('button.js-close, .fm-bp-cancel', $dialog).rebind('click', function()
         {
             if ($.termsDeny) {
                 $.termsDeny();
@@ -3338,10 +3156,10 @@ function bottomPageDialog(close, pp, hh, tickbox) {
         $('.fm-bp-cancel, .fm-bp-agree', $dialog).addClass('hidden');
         $('.fm-bp-close', $dialog).removeClass('hidden');
         if (hh) {
-            $('.fm-dialog-title', $dialog).text(hh)
+            $('header h2', $dialog).text(hh);
         }
 
-        $('.fm-dialog-close, .fm-bp-close', $dialog).rebind('click', function()
+        $('button.js-close, .fm-bp-close', $dialog).rebind('click', function()
         {
             bottomPageDialog(1);
         });
@@ -3405,7 +3223,7 @@ function saveprogress(id, bytesloaded, bytestotal)
 
 function savecomplete(id)
 {
-    $('.fm-dialog.download-dialog').addClass('hidden');
+    $('.mega-dialog.download-dialog').addClass('hidden');
     fm_hideoverlay();
     if (!$.dialog)
         $('#dlswf_' + id).remove();
@@ -3523,37 +3341,28 @@ function fm_resize_handler(force) {
         fm_tfsupdate(); // this will call $.transferHeader();
     }
     else if (M.currentdirid && M.currentdirid.substr(0, 7) === 'account') {
-        var $mainBlock = $('.fm-account-main');
+        var $accountContent = $('.fm-account-main', '.fm-main');
 
-        $mainBlock.removeClass('low-width hi-width');
+        $accountContent.removeClass('low-width');
 
-        if ($mainBlock.width() > 1675) {
-            $mainBlock.addClass('hi-width');
+        if ($accountContent.width() < 780) {
+            $accountContent.addClass('low-width');
         }
-        else if ($mainBlock.width() < 920) {
-            $mainBlock.addClass('low-width');
-        }
-        initAccountScroll();
     }
     else if (M.currentdirid && M.currentdirid.substr(0, 9) === 'dashboard') {
-        var $mainBlock = $('.fm-right-block.dashboard');
+        var $dashboardContent = $('.fm-right-block.dashboard', '.fm-main');
 
-        $mainBlock.removeClass('hidden ultra low-width hi-width');
-        if ($mainBlock.width() > 1675) {
-            $mainBlock.addClass('hi-width');
+        $dashboardContent.removeClass('low-width');
+
+        if ($dashboardContent.width() < 780) {
+            $dashboardContent.addClass('low-width');
         }
-        else if ($mainBlock.width() < 880 && $mainBlock.width() > 850) {
-            $mainBlock.addClass('low-width');
-        }
-        else if ($mainBlock.width() < 850) {
-            $mainBlock.addClass('ultra low-width');
-        }
-        initDashboardScroll();
-    }
-    else if (M.currentdirid === 'refer') {
-        initAffiliateScroll();
     }
     else if (!M.chat) {
+        // Resize the search breadcrumbs
+        if (M.currentdirid && M.currentdirid.includes('search/')) {
+            delay('render:search_breadcrumbs', () => M.renderSearchBreadcrumbs());
+        }
         if (M.viewmode) {
             initFileblocksScrolling();
         }
@@ -3564,18 +3373,22 @@ function fm_resize_handler(force) {
                 $.detailsGridHeader();
             }
         }
+        // Resize the cloud drive breadcrumbs
+        delay('render:path_breadcrumbs', () => M.renderPathBreadcrumbs());
     }
 
     if (M.currentdirid !== 'transfers') {
         var treePaneWidth = Math.round($('.fm-left-panel:visible').outerWidth());
         var leftPaneWidth = Math.round($('.nw-fm-left-icons-panel:visible').outerWidth());
+        const margin = (treePaneWidth + leftPaneWidth) + "px";
 
         if (megaChatIsReady && megaChat.resized) {
             megaChat.resized();
         }
 
         $('.fm-right-files-block, .fm-right-account-block, .fm-right-block.dashboard').css({
-            'margin-left': (treePaneWidth + leftPaneWidth) + "px"
+            'margin-inline-start': margin,
+            '-webkit-margin-start': margin
         });
 
         $('.popup.transfer-widget').outerWidth(treePaneWidth - 9);
@@ -3599,34 +3412,6 @@ function fm_resize_handler(force) {
         }
     }
 
-    if (M.currentdirid && M.currentdirid.indexOf('user-management') > -1) {
-        var $businessAccountContainer = $('.files-grid-view.user-management-view');
-        var $subAccountContainer = $('.user-management-subaccount-view-container', $businessAccountContainer);
-        // sub-user info pgae
-        if (!$subAccountContainer.hasClass('hidden')) {
-            $subAccountContainer.jScrollPane({
-                enableKeyboardNavigation: false, showArrows: true,
-                arrowSize: 8, animateScroll: true
-            });
-        }
-        // overview page
-        else if (!$('.user-management-overview-container', $businessAccountContainer).hasClass('hidden')) {
-            $('.user-management-overview-container', $businessAccountContainer).jScrollPane(
-                { enableKeyboardNavigation: false, showArrows: true, arrowSize: 8, animateScroll: true }
-            );
-        }
-        else if (!$('.user-management-account-settings .invoice-detail', $businessAccountContainer)
-            .hasClass('hidden')) {
-            $('.user-management-account-settings .invoice-detail', $businessAccountContainer)
-                .jScrollPane({ enableKeyboardNavigation: false, showArrows: true, arrowSize: 8, animateScroll: true });
-        }
-        else if (!$('.user-management-account-settings .invoice', $businessAccountContainer)
-            .hasClass('hidden')) {
-            $('.user-management-account-settings .invoice .invoice-table-list-container', $businessAccountContainer)
-                .jScrollPane({ enableKeyboardNavigation: false, showArrows: true, arrowSize: 8, animateScroll: true });
-        }
-    }
-
     if (d) {
         console.timeEnd('fm_resize_handler');
     }
@@ -3644,6 +3429,7 @@ function sharedFolderUI() {
 
         $('.shared-details-block .files-grid-view, .shared-details-block .fm-blocks-view').removeAttr('style');
         $('.shared-details-block .shared-folder-content').unwrap();
+        $('.grid-table-header-container-sc', '.shared-folder-content').removeClass('hidden');
         $('.shared-folder-content').removeClass('shared-folder-content');
         $('.shared-top-details').remove();
         browsingSharedContent = true;
@@ -3657,27 +3443,25 @@ function sharedFolderUI() {
     if (nodeData) {
 
         var rights = l[55];
-        var rightsclass = ' read-only';
         var rightPanelView = '.files-grid-view.fm';
 
         // Handle of initial share owner
         var ownersHandle = nodeData.su;
         var folderName = (M.d[M.currentdirid] || nodeData).name;
-        var displayName = htmlentities(M.getNameByHandle(ownersHandle));
+        var displayName = escapeHTML(M.getNameByHandle(ownersHandle));
         var avatar = useravatar.contact(M.d[ownersHandle]);
+        $('.shared-blocks-view', '.fm-right-files-block').addClass('hidden');
 
         if (Object(M.u[ownersHandle]).m) {
-            displayName += ' &nbsp;&lt;' + htmlentities(M.u[ownersHandle].m) + '&gt;';
+            displayName += '<span>' + escapeHTML(M.u[ownersHandle].m) + '</span>';
         }
 
         // Access rights
         if (nodeData.r === 1) {
             rights = l[56];
-            rightsclass = ' read-and-write';
         }
         else if (nodeData.r === 2) {
             rights = l[57];
-            rightsclass = ' full-access';
         }
 
         if (M.viewmode === 1) {
@@ -3691,9 +3475,12 @@ function sharedFolderUI() {
                 + '<div class="shared-details-icon"></div>'
                 + '<div class="shared-details-info-block">'
                     + '<div class="shared-details-pad">'
-                        + '<div class="shared-details-folder-name">' + htmlentities(folderName) + '</div>'
-                        + '<a href="javascript:;" class="grid-url-arrow"></a>'
-                        + '<div class="shared-folder-access' + rightsclass + '">' + rights + '</div>'
+                        + '<div class="shared-details-folder-name">' + escapeHTML(folderName) + '</div>'
+                        + '<div class="shared-folder-access">'
+                            + '<span>' + escapeHTML(rights) + '</span>'
+                        + '</div>'
+                        + '<a href="javascript:;" class="grid-url-arrow">'
+                        + '<i class="sprite-fm-mono icon-options"></i></a>'
                         + '<div class="clear"></div>'
                         + avatar
                         + '<div class="fm-chat-user-info">'
@@ -3701,10 +3488,19 @@ function sharedFolderUI() {
                         + '</div>'
                     + '</div>'
                     + '<div class="shared-details-buttons">'
-                        + '<div class="fm-leave-share default-white-button right small grey-txt"><span>' + l[5866] + '</span></div>'
-                        + '<div class="fm-share-copy default-white-button right small grey-txt"><span>' + l[63] + '</span></div>'
-                        + '<div class="fm-share-download default-white-button right small grey-txt"><span class="fm-chatbutton-arrow">' + l[58] + '</span></div>'
-                        + '<div class="clear"></div>'
+                        + '<button class="mega-button fm-share-download">'
+                            + '<span class="fm-chatbutton-arrow">' + escapeHTML(l[58]) + '</span>'
+                        + '</button>'
+                        + '<button class="mega-button fm-share-copy">'
+                            + '<span>'
+                                + escapeHTML(l[63])
+                            + '</span>'
+                        + '</button>'
+                        + '<button class="mega-button negative fm-leave-share">'
+                            + '<span>'
+                                + escapeHTML(l[5866])
+                            + '</span>'
+                        + '</button>'
                     + '</div>'
                     + '<div class="clear"></div>'
                 + '</div>'
@@ -3794,7 +3590,7 @@ function fingerprintDialog(userid) {
     var $dialog = $('.fingerprint-dialog');
     var closeFngrPrntDialog = function() {
         closeDialog();
-        $('.fm-dialog-close', $dialog).off('click');
+        $('button.js-close', $dialog).off('click');
         $('.dialog-approve-button').off('click');
         $('.dialog-skip-button').off('click');
         mega.ui.CredentialsWarningDialog.rendernext();
@@ -3828,7 +3624,7 @@ function fingerprintDialog(userid) {
         });
     });
 
-    $('.fm-dialog-close', $dialog).rebind('click', function() {
+    $('button.js-close', $dialog).rebind('click', function() {
         closeFngrPrntDialog();
     });
 
@@ -4023,49 +3819,85 @@ function FMResizablePane(element, opts) {
 function bindDropdownEvents($select, saveOption, contentBlock) {
     'use strict';
 
-    var $dropdownsItem = $('.default-dropdown-item', $select);
+    var $dropdownItem = $('.option', $select);
     var $contentBlock = contentBlock ? $(contentBlock) : $('body');
-    var $hiddenInput = $('.dropdown-hidden-input', $select);
+    var $scrollBlock = $('.dropdown-scroll', $select);
+    var $hiddenInput = $('.hidden-input', $select);
 
     // hidden input for keyboard search
     if (!$hiddenInput.length) {
 
         // Skip tab action for hidden input by tabindex="-1"
-        $select.safePrepend('<input class="dropdown-hidden-input" tabindex="-1" autocomplete="disabled">');
-        $hiddenInput = $('input.dropdown-hidden-input', $select);
+        $select.safeAppend('<input class="hidden-input" tabindex="-1" autocomplete="disabled">');
+        $hiddenInput = $('input.hidden-input', $select);
     }
 
-    $select.rebind('click.defaultselect', function(e) {
+    $select.rebind('click.inputDropdown', function(e) {
 
         var $this = $(this);
-        var $dropdown = $('.default-select-dropdown', $this);
-        var $outsideArea = $('.fmholder, .fm-dialog:not(.hidden)', 'body');
+        var $dropdown = $('.mega-input-dropdown', $this);
+        var $hiddenInput = $('.hidden-input', $this);
+        var $target = $(e.target);
 
-        if (!$this.hasClass('active')) {
-            var jsp;
-            var scrollBlock = ('#' + $this.attr('id')).replace(/\./g, '\\.') + ' .default-select-scroll';
-            var $activeDropdownItem = $('.default-dropdown-item.active', $this);
-            var dropdownOffset;
+        var closeDropdown = function() {
+            $this.removeClass('active');
+            $dropdown.addClass('hidden').removeAttr('style');
+            $contentBlock.unbind('mousedown.closeInputDropdown');
+            $hiddenInput.trigger('blur');
+        };
+
+        if ($this.hasClass('disabled')) {
+            return false;
+        }
+        else if (!$this.hasClass('active')) {
+
+            var horizontalOffset;
+            var verticalOffset;
+            var dropdownLeftPos;
             var dropdownBottPos;
             var dropdownHeight;
+            var dropdownWidth;
             var contentBlockHeight;
+            var contentBlockWidth;
+            var $activeDropdownItem = $('.option[data-state="active"]', $dropdown);
 
             //Show select dropdown
-            $('.default-select.active', 'body').removeClass('active');
-            $('.active .default-select-dropdown', 'body').addClass('hidden');
+            $('.mega-input.dropdown-input.active', 'body').removeClass('active');
+            $('.active .mega-input-dropdown', 'body').addClass('hidden');
             $this.addClass('active');
-            $dropdown.removeAttr('style');
+            $('.option.active', $this).removeClass('active');
+            $activeDropdownItem.addClass('active');
             $dropdown.removeClass('hidden');
 
+            // Dropdown scrolling initialization
+            if ($scrollBlock.length) {
+                if ($scrollBlock.is('.ps-container')) {
+                    $scrollBlock.scrollTop(0);
+                    Ps.destroy($scrollBlock[0]);
+                }
+
+                Ps.initialize($scrollBlock[0]);
+
+                if ($activeDropdownItem.length) {
+                    $scrollBlock.scrollTop($activeDropdownItem.position().top);
+                }
+            }
+
+            $hiddenInput.trigger('focus');
+
             //Dropdown position relative to the window
-            dropdownOffset = $dropdown.offset().top - $contentBlock.offset().top;
-            contentBlockHeight = $contentBlock.height();
+            horizontalOffset = $dropdown.offset().left - $contentBlock.offset().left;
+            verticalOffset = $dropdown.offset().top - $contentBlock.offset().top;
+            contentBlockHeight = $contentBlock.outerHeight();
+            contentBlockWidth = $contentBlock.outerWidth();
             dropdownHeight = $dropdown.outerHeight();
-            dropdownBottPos = contentBlockHeight - (dropdownOffset + dropdownHeight);
+            dropdownWidth = $dropdown.outerWidth();
+            dropdownBottPos = contentBlockHeight - (verticalOffset + dropdownHeight);
+            dropdownLeftPos = contentBlockWidth - (horizontalOffset + dropdownWidth);
 
             if (contentBlockHeight < (dropdownHeight + 20)) {
                 $dropdown.css({
-                    'margin-top': '-' + (dropdownOffset - 10) + 'px',
+                    'margin-top': '-' + (verticalOffset - 10) + 'px',
                     'height': (contentBlockHeight - 20) + 'px'
                 });
             }
@@ -4075,44 +3907,36 @@ function bindDropdownEvents($select, saveOption, contentBlock) {
                 });
             }
 
-            //Dropdown scrolling initialization
-            if ($(scrollBlock).length) {
-                initSelectScrolling(scrollBlock);
-                jsp = $(scrollBlock).data('jsp');
-
-                if (jsp && $activeDropdownItem.length) {
-                    jsp.scrollToElement($activeDropdownItem);
-                }
+            if (dropdownLeftPos < 20) {
+                $dropdown.css({
+                    'margin-left': '-' + (10 - dropdownLeftPos) + 'px'
+                });
             }
 
-            $hiddenInput.trigger('focus');
+            $contentBlock.rebind('mousedown.closeInputDropdown', function(e) {
+                var $target = $(e.target);
 
-            $outsideArea.rebind('mousedown.defaultselect', function(e) {
+                if (!$this.has($target).length && !$this.is($target)) {
 
-                if (!$this.has($(e.target)).length && !$this.is(e.target)) {
-                    $this.removeClass('active');
-                    $dropdown.addClass('hidden');
-                    $outsideArea.unbind('mousedown.defaultselect');
+                    closeDropdown();
                 }
             });
+
+            $hiddenInput.trigger('focus');
         }
-        else if (!$(e.target).closest('.jspVerticalBar').length) {
-            $this.removeClass('active');
-            $dropdown.addClass('hidden');
-            $outsideArea.unbind('mousedown.defaultselect');
+        else if ($target.closest('.option').length || $target.is('.option')) {
+            closeDropdown();
         }
     });
 
-    $dropdownsItem.rebind('click.settingsGeneral', function() {
+    $dropdownItem.rebind('click.inputDropdown', function() {
+
         var $this = $(this);
 
-        var $select = $(this).closest('.default-select');
-
         // Select dropdown item
-        $('.default-dropdown-item', $select).removeClass('active');
-        $this.addClass('active');
-        $('span', $select).text($this.text());
-        $hiddenInput.trigger('focus');
+        $('.option', $select).removeClass('active').removeAttr('data-state');
+        $this.addClass('active').attr('data-state', 'active');
+        $('> span', $select).text($this.text());
 
         if (saveOption) {
             var nameLen = String($('#account-firstname').val() || '').trim().length;
@@ -4124,7 +3948,7 @@ function bindDropdownEvents($select, saveOption, contentBlock) {
         }
     });
 
-    $dropdownsItem.rebind('mouseenter.settingsGeneral', function() {
+    $dropdownItem.rebind('mouseenter.inputDropdown', function() {
 
         var $this = $(this);
 
@@ -4135,43 +3959,53 @@ function bindDropdownEvents($select, saveOption, contentBlock) {
     });
 
     // Typing search and arrow key up and down features for dropdowns
-    $hiddenInput.rebind('keyup.defaultselect', function(e) {
+    $hiddenInput.rebind('keyup.inputDropdown', function(e) {
         var charCode = e.which || e.keyCode; // ff
+        var $filteredItem = {};
+        var $current = $('.option.active', $select).length ? $('.option.active', $select) :
+            $('.option:not(.template)', $select).first();
+
         if ((charCode > 64 && charCode < 91) || (charCode > 96 && charCode < 123)) {
             var inputValue = $hiddenInput.val();
-            var $filteredItem = $dropdownsItem.filter(function() {
-                return $(this).text().slice(0, inputValue.length).toLowerCase() === inputValue.toLowerCase();
-            });
 
-            if ($filteredItem[0]) {
-                var jsp = $('.default-select-scroll', $select).data('jsp');
-                $('.default-dropdown-item.active', $select).removeClass('active');
-                jsp.scrollToElement($($filteredItem[0]), 1);
-                $($filteredItem[0]).addClass('active');
-            }
+            $filteredItem = $dropdownItem.filter(function() {
+                return $(this).text().slice(0, inputValue.length).toLowerCase() === inputValue.toLowerCase();
+            }).first();
         }
         else {
             e.preventDefault();
             e.stopPropagation();
 
-            var $current = $('.default-dropdown-item.active',  $select);
+            var $prev = $current.prev('.option:not(.template)');
+            var $next = $current.next('.option:not(.template)');
 
-            if (charCode === 38) { // Up key
-                $current.removeClass('active').prev().addClass('active');
+            if (charCode === 38 && $prev.length) { // Up key
+                $filteredItem = $prev;
             }
-            else if (charCode === 40) { // Down key
-                $current.removeClass('active').next().addClass('active');
+            else if (charCode === 40 && $next.length) { // Down key
+                $filteredItem = $next;
             }
             else if (charCode === 13) {// Enter
                 $current.trigger('click');
             }
         }
+
+        if ($filteredItem.length) {
+            $('.option.active', $select).removeClass('active');
+            $filteredItem.addClass('active');
+
+            if ($scrollBlock.length) {
+                $scrollBlock.scrollTop($scrollBlock.scrollTop() + $filteredItem.position().top);
+            }
+        }
     });
 
-    $hiddenInput.rebind('keydown.defaultselect', function() {
+    $hiddenInput.rebind('keydown.inputDropdown', function() {
+        var $this = $(this);
+
         delay('dropbox:clearHidden', function() {
             // Combination language bug fixs for MacOS.
-            $hiddenInput.val('').trigger('blur').trigger('focus');
+            $this.val('').trigger('blur').trigger('focus');
         }, 750);
     });
     // End of typing search for dropdowns

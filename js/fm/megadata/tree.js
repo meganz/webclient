@@ -71,14 +71,18 @@ MegaData.prototype.buildtree = function(n, dialog, stype, sDeepIndex) {
         }
     }
 
+    /* eslint-disable local-rules/jquery-replacements */
     if (n.h === M.RootID && !sDeepIndex) {
+        var wrapperClass = '.js-myfile-tree-panel';
+
         if (folderlink) {
             n = {h: ''};
+            wrapperClass = '.js-other-tree-panel';
         }
         i = escapeHTML(n.h);
         if (typeof dialog === 'undefined') {
             if (rebuild || $('.content-panel.cloud-drive ul').length === 0) {
-                $('.content-panel.cloud-drive').html('<ul id="treesub_' + i + '"></ul>');
+                $(`${wrapperClass} .content-panel.cloud-drive`).html('<ul id="treesub_' + i + '"></ul>');
             }
         }
         else {
@@ -106,22 +110,25 @@ MegaData.prototype.buildtree = function(n, dialog, stype, sDeepIndex) {
     }
     else if (n.h === M.InboxID) {
         if (typeof dialog === 'undefined') {
-            $('.content-panel.inbox').html('<ul id="treesub_' + htmlentities(M.InboxID) + '"></ul>');
+            $('.content-panel.inbox').html('<ul id="treesub_' + escapeHTML(M.InboxID) + '"></ul>');
         }
         else {
-            $('.' + dialog + ' .inbox .dialog-content-block').html('<ul id="mctreesub_' + htmlentities(M.InboxID) + '"></ul>');
+            $('.' + dialog + ' .inbox .dialog-content-block')
+                .html('<ul id="mctreesub_' + escapeHTML(M.InboxID) + '"></ul>');
         }
         stype = "inbox";
     }
     else if (n.h === M.RubbishID) {
         if (typeof dialog === 'undefined') {
-            $('.content-panel.rubbish-bin').html('<ul id="treesub_' + htmlentities(M.RubbishID) + '"></ul>');
+            $('.content-panel.rubbish-bin').html('<ul id="treesub_' + escapeHTML(M.RubbishID) + '"></ul>');
         }
         else {
-            $('.' + dialog + ' .rubbish-bin .dialog-content-block').html('<ul id="mctreesub_' + htmlentities(M.RubbishID) + '"></ul>');
+            $('.' + dialog + ' .rubbish-bin .dialog-content-block')
+                .html('<ul id="mctreesub_' + escapeHTML(M.RubbishID) + '"></ul>');
         }
         stype = "rubbish-bin";
     }
+    /* eslint-enable local-rules/jquery-replacements */
 
     prefix = stype;
     // Detect copy and move dialogs, make sure that right DOMtree will be sorted.
@@ -245,7 +252,6 @@ MegaData.prototype.buildtree = function(n, dialog, stype, sDeepIndex) {
             // render > if new folders found on an empty folder
             if (!node.classList.contains('contains-folders')) {
                 node.classList.add('contains-folders');
-                node.firstElementChild.classList.add('nw-fm-arrow-icon');
             }
         }
 
@@ -275,15 +281,6 @@ MegaData.prototype.buildtree = function(n, dialog, stype, sDeepIndex) {
                     else {
                         node.classList.remove('contains-folders');
                     }
-
-                    if ((node = node.querySelector('span'))) {
-                        if (containsc) {
-                            node.classList.add('nw-fm-arrow-icon');
-                        }
-                        else {
-                            node.classList.remove('nw-fm-arrow-icon');
-                        }
-                    }
                 }
             }
             else {
@@ -309,7 +306,6 @@ MegaData.prototype.buildtree = function(n, dialog, stype, sDeepIndex) {
                 }
                 if (containsc) {
                     node.classList.add('contains-folders');
-                    node.firstElementChild.classList.add('nw-fm-arrow-icon');
                 }
                 if (M.currentdirid === curItemHandle) {
                     node.classList.add('opened');
@@ -719,7 +715,7 @@ MegaData.prototype.treeSortUI = function() {
         var type;
         var sortTreePanel;
         var $sortMenuItems;
-        var dir;
+        var dirClass;
         var sortMenuPos;
 
         // Show sort menu
@@ -781,14 +777,15 @@ MegaData.prototype.treeSortUI = function() {
                 console.error('No sortTreePanel for "%s"', type);
             }
 
-            $sortMenuItems = $('.dropdown-item', menu).removeClass('active asc desc');
+            $sortMenuItems = $('.dropdown-item', menu).removeClass('active');
+            $('.sort-arrow', $sortMenuItems).removeClass('icon-up icon-down');
 
             if (sortTreePanel) {
-                dir = sortTreePanel.dir === 1 ? 'asc' : 'desc';
-                $sortMenuItems
-                    .filter('*[data-by=' + sortTreePanel.by + ']')
-                    .addClass('active')
-                    .addClass(dir);
+                var $selectedItem = $sortMenuItems.filter('*[data-by="' + sortTreePanel.by + '"]');
+
+                dirClass = sortTreePanel.dir === 1 ? 'icon-up' : 'icon-down';
+                $selectedItem.addClass('active');
+                $('.sort-arrow', $selectedItem).removeClass('icon-up icon-down').addClass(dirClass);
             }
 
             // reset and restore filter UI from previous actions.
@@ -887,8 +884,9 @@ MegaData.prototype.treeSortUI = function() {
 MegaData.prototype.treePanelType = function() {
     'use strict';
 
-    var remove = /active|nw-fm-left-icon|ui-droppable|filled|glow|asc|desc/g;
-    return $.trim(String($('.nw-fm-left-icon.active').attr('class') || 'unknown').replace(remove, ''));
+    let active = document.querySelector('.nw-fm-left-icon.active');
+
+    return active ? active.attributes.name.value : 'unknown';
 };
 
 /**
@@ -1085,10 +1083,11 @@ MegaData.prototype.addTreeUI = function() {
                     id = id.replace(/treea_+|(os_|pl_)/g, '');
                 }
                 if (id && M.d[id]) {
-                    html = (
-                        '<div class="transfer-filetype-icon ' + fileIcon(M.d[id]) + '"></div>' +
-                        '<div class="tranfer-filetype-txt dragger-entry">' +
-                        str_mtrunc(htmlentities(M.d[id].name)) + '</div>'
+                    html = ('<div class="tree-item-dragger nw-fm-tree-item">' +
+                            '<span class="nw-fm-tree-folder ' + fileIcon(M.d[id]) + '"></span>' +
+                            '<span class="item-name">' +
+                                escapeHTML(M.d[id].name) + '</span>' +
+                            '</div>'
                     );
                 }
                 $('#draghelper .dragger-icon').remove();
@@ -1166,7 +1165,7 @@ MegaData.prototype.addTreeUI = function() {
         }
 
         var $target = $(e.target);
-        if ($target.hasClass('nw-fm-arrow-icon')) {
+        if ($target.hasClass('nw-fm-tree-arrow')) {
             M.onTreeUIExpand(tmpId);
         }
         else if (e.shiftKey) {
@@ -1201,7 +1200,7 @@ MegaData.prototype.addTreeUI = function() {
         }
 
         $.selected = [$self.attr('id').replace('contact_', '')];
-        M.searchPath();
+        delay('render:search_breadcrumbs', () => M.renderSearchBreadcrumbs());
         $.hideTopMenu();
 
         return Boolean(M.contextMenuUI(e, 1));
@@ -1269,7 +1268,9 @@ MegaData.prototype.onTreeUIOpen = function(id, event, ignoreScroll) {
     id = String(id);
     var id_r = this.getNodeRoot(id);
     var id_s = id.split('/')[0];
-    var e, scrollTo = false, stickToTop = false;
+    var $e;
+    var scrollTo = false;
+    var stickToTop = false;
     if (d) {
         console.group('onTreeUIOpen', id);
         console.time('onTreeUIOpen');
@@ -1371,29 +1372,34 @@ MegaData.prototype.onTreeUIOpen = function(id, event, ignoreScroll) {
     }
 
     if (id_r === 'out-shares') {
-        e = $('#treea_os_' + id.split('/')[1]);
+        $e = $('#treea_os_' + id.split('/')[1]);
     }
     else if (id_r === 'public-links') {
-        e = $('#treea_pl_' + id.split('/')[1]);
+        $e = $('#treea_pl_' + id.split('/')[1]);
     }
     else {
-        e = $('#treea_' + id_s);
+        $e = $('#treea_' + id_s);
     }
 
     $('.fm-tree-panel .nw-fm-tree-item').removeClass('selected');
-    e.addClass('selected');
+    $e.addClass('selected');
 
     if (!ignoreScroll) {
-        if (id === this.RootID || id === 'shares' || id === 'contacts' || id === 'chat' || id === 'opc' || id === 'ipc') {
+
+        if ((!folderlink && id === this.RootID) || id === 'shares' || id === 'contacts' ||
+            id === 'chat' || id === 'opc' || id === 'ipc') {
             stickToTop = true;
-            scrollTo = $('.nw-tree-panel-header');
+            scrollTo = '.nw-tree-panel-header';
+            if (id === this.RootID) {
+                scrollTo = '.js-clouddrive-btn';
+            }
         }
-        else if (e.length && !e.visible()) {
-            scrollTo = e;
+        else if ($e.length) {
+            scrollTo = $e;
         }
         // if (d) console.log('scroll to element?',ignoreScroll,scrollTo,stickToTop);
 
-        var jsp = scrollTo && $('.fm-tree-panel').data('jsp');
+        var jsp = scrollTo && $(scrollTo).closest('.jspScrollable').data('jsp');
         if (jsp) {
             setTimeout(function() {
                 jsp.scrollToElement(scrollTo, stickToTop);

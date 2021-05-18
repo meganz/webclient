@@ -1,208 +1,205 @@
-<div class="bottom-page scroll-block download embedplayer video">
-    <div class="download main-pad">
-        <div class="download transfer-wrapper">
-            <!-- Video block !-->
-            <div class="download video-block">
-                <!-- Sharing options -->
-                <div class="sharefile-block hidden">
-                    <div class="sharefile-container">
-                        <div class="close-overlay right">
-                            <i class="medium-icon icons-img close-icon"></i>
-                        </div>
-                        <div class="sharefile-aligner">
-                            <div class="sharefile-option-wrapper">
-                                <div class="sharefile-tabs">
-                                    <div class="tab-link share-link active">[$5622]</div>
-                                    <div class="tab-link share-embed-code">[$17407]</div>
-                                </div>
-                                <div class="sharefile-sections">
-                                    <div class="tab-content" id="embed-code-field"></div>
-                                </div>
-                                <div class="sharefile-settings">
-                                    <div class="settings-row">
-                                        <div class="checkbox-item">
-                                            <div class="checkdiv checkboxOff">
-                                                <input type="checkbox" name="" id="timecheckbox" class="checkboxOff"/>
-                                            </div>
-                                            <label for="timecheckbox" class="radio-txt">[$17822]</label>
-                                            <div class="start-at-time">
-                                                <input type="text" value="00:00" id="timeoffset"/>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="sharefile-buttons">
-                                    <div class="button default-red-button right copy">[$63]</div>
-                                    <div class="button default-transparent-button right cancel">[$82]</div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="toast-notification">
-                            <div class="toast-message">[$16763]</div>
-                        </div>
-                    </div>
+<div class="media-viewer-container embedplayer video">
+    <!-- Video block !-->
+    <div class="media-viewer">
+        <!-- Sharing options -->
+        <div class="sharefile-block hidden">
+            <div class="dialog-container sharefile-container">
+                <div class="close-overlay right">
+                    <i class="medium-icon icons-img close-icon"></i>
                 </div>
-                <!-- Transfer limitation overlay -->
-                <div class="transfer-limitation-block hidden">
-                    <div class="transfer-limitation-container">
-                        <div class="close-overlay right">
-                            <i class="medium-icon icons-img close-icon"></i>
+                <div class="dialog-aligner sharefile-aligner">
+                    <div class="dialog-wrapper sharefile-option-wrapper">
+                        <div class="sharefile-tabs">
+                            <div class="tab-link share-link active">[$5622]</div>
+                            <div class="tab-link share-embed-code">[$17407]</div>
                         </div>
-                        <div class="transfer-limitation-aligner">
-                            <div class="transfer-limitation-wrapper">
-                                <div class="transfer-heading">[$17]</div>
-                                <div class="transfer-body">[$120]</div>
-                                <div class="transfer-buttons">
-                                    <div class="upgrade-option hidden">
-                                        <div class="button default-red-button">[$16386]</div>
+                        <div class="sharefile-sections">
+                            <div class="tab-content" id="embed-code-field"></div>
+                        </div>
+                        <div class="sharefile-settings">
+                            <div class="settings-row">
+                                <div class="checkbox-item">
+                                    <div class="checkdiv checkboxOff">
+                                        <input type="checkbox" name="" id="timecheckbox" class="checkboxOff"/>
                                     </div>
-                                    <div class="signin-register-option">
-                                        <div class="button default-transparent-button inline login">[$16345]</div>
-                                        <div class="button default-red-button inline signup">[$209]</div>
+                                    <label for="timecheckbox" class="radio-txt">[$17822]</label>
+                                    <div class="start-at-time">
+                                        <input type="text" value="00:00" id="timeoffset"/>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </div>
-                <!-- File Removed -->
-                <div class="file-removed-block hidden">
-                    <div class="file-removed-container">
-                        <div class="file-removed-aligner">
-                            <div class="file-removed-wrapper">
-                                <div class="file-removed-heading">[$23]</div>
-                                <div class="file-removed-body"></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="logo-container">
-                        <div class="logo-icon"></div>
-                    </div>
-                </div>
-                <!-- Dropdown/context menu
-                Add class "mobile-mode" to the dropdown when viewing the iframe video on mobile devices -->
-                <div class="dropdown body files-menu context hidden" style="height: auto; border-radius: 8px;">
-                    <div class="close-overlay right">
-                        <i class="medium-icon icons-img close-icon"></i>
-                    </div>
-                    <div class="dropdown-aligner">
-                        <div class="dropdown-wrapper">
-                            <div class="dropdown-section">
-                                <a class="dropdown-item login-item" style="display: block;">
-                                    <i class="small-icon context login"></i>
-                                    <div class="contextmenu useravatar hidden">
-                                        <div class="avatar-wrapper avatar"><span></span></div>
-                                    </div>
-                                    <span class="login-text">[$16345]</span>
-                                </a>
-                                <hr>
-                            </div>
-                            <div class="dropdown-section">
-                                <a class="dropdown-item getlink-item" style="display: block;">
-                                    <i class="small-icon context get-link"></i><span>[$59]</span>
-                                </a>
-                            </div>
-                            <div class="dropdown-section">
-                                <a class="dropdown-item embedcode-item" style="display: block;">
-                                    <i class="small-icon context embed-code"></i><span>[$17407]</span>
-                                </a>
-                                <hr>
-                            </div>
-                            <div class="dropdown-section">
-                                <a class="dropdown-item viewonmega-item" style="display: block;">
-                                    <i class="small-icon context mega"></i><span>[$16518]</span>
-                                </a>
-                            </div>
+                        <div class="sharefile-buttons">
+                            <div class="button default-red-button right copy">[$63]</div>
+                            <div class="button default-transparent-button left cancel">[$82]</div>
                         </div>
                     </div>
                 </div>
-                <!-- Add main-blur-block to video-wrapper when any overlay is visible.
-                Pause the video as well when an overlay is visible -->
-                <div class="video-wrapper">
-                    <!-- Video Header -->
-                    <div class="viewer-top-bl">
-                        <div class="viewer-filename">
-                            <div class="download file-info">
-                                <div class="download info-txt big-txt filename">
-                                    <span class="filename"></span>
-                                    <span class="extension"></span>
-                                </div>
+                <div class="toast-notification">
+                    <div class="toast-message">[$16763]</div>
+                </div>
+            </div>
+        </div>
+        <!-- Transfer limitation overlay -->
+        <div class="transfer-limitation-block hidden">
+            <div class="dialog-container transfer-limitation-container">
+                <div class="close-overlay right">
+                    <i class="medium-icon icons-img close-icon"></i>
+                </div>
+                <div class="dialog-aligner transfer-limitation-aligner">
+                    <div class="dialog-wrapper transfer-limitation-wrapper">
+                        <div class="transfer-heading">[$17]</div>
+                        <div class="transfer-body">[$120]</div>
+                        <div class="transfer-buttons">
+                            <div class="upgrade-option hidden">
+                                <div class="button default-red-button">[$16386]</div>
                             </div>
-                        </div>
-                        <div class="viewer-button right moreoptions">
-                            <i class="medium-icon icons-img three-dots"></i>
-                        </div>
-                        <div class="viewer-button right useravatar hidden">
-                            <div data-color="color4" class="avatar-wrapper avatar"><span>C</span></div>
-                        </div>
-                        <!-- Will Replace with a more appropriate share icon -->
-                        <div class="viewer-button right share">
-                            <i class="medium-icon icons-img share-generic"></i>
-                        </div>
-                        <div class="clear"></div>
-                    </div>
-                    <video id="video" data-autoplayvideo="false" data-playvideoonclick="false"></video>
-
-                    <div class="download play-video-button"></div>
-                    <div class="viewer-pending hidden">
-                        <div class="bounce1"></div>
-                        <div class="bounce2"></div>
-                        <div class="bounce3"></div>
-                    </div>
-                    <!-- Will add soon. This button should direct you to the dl page for the file -->
-                    <div class="logo-container">
-                        <div class="logo-icon"></div>
-                    </div>
-
-                    <div class="viewer-vad-control lato hidden">
-                        <div  class="thumb">
-                            <img alt="" />
-                        </div>
-                        <div class="counter">
-                            0
-                        </div>
-                        <div class="label">
-                            <span>[$22879]</span><i class="small-icon icons-sprite skip"></i>
-                        </div>
-                    </div>
-
-                    <div class="video-progress-bar vad" title="">
-                        <div class="video-time-bar"></div>
-                    </div>
-
-                    <!-- Video Footer -->
-                    <div class="viewer-bottom-bl">
-                        <div id="video-controls" class="video-controls" data-state="hidden">
-                            <div data-state="play" class="viewer-button left playpause">
-                                <i class="medium-icon icons-img pause"></i>
-                            </div>
-                            <div class="volume-control left">
-                                <div data-state="mute" class="viewer-button mute">
-                                    <i class="medium-icon icons-img volume"></i>
-                                </div>
-                                <div class="video-vol-range">
-                                    <div class="volume-bar"><span></span></div>
-                                </div>
-                            </div>
-                            <div class="video-timing current left">
-                                00:00
-                            </div>
-                            <div data-state="go-fullscreen" class="viewer-button right fs">
-                                <i class="medium-icon icons-img fullscreen"></i>
-                            </div>
-                            <div class="video-timing duration right">
-                                00:00
-                            </div>
-                            <div class="video-progress-block">
-                                <div class="video-progress-bar">
-                                    <div class="video-time-bar"></div>
-                                </div>
+                            <div class="signin-register-option">
+                                <div class="button default-transparent-button inline login">[$16345]</div>
+                                <div class="button default-red-button inline signup">[$209]</div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+
+        <!-- File Removed -->
+        <div class="file-removed-block hidden">
+            <div class="dialog-container file-removed-container">
+                <div class="dialog-aligner file-removed-aligner">
+                    <div class="dialog-wrapper file-removed-wrapper">
+                        <div class="file-removed-heading">[$23]</div>
+                        <div class="file-removed-body"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="logo-container">
+                <div class="logo-icon"></div>
+            </div>
+        </div>
+
+        <!-- Dropdown/context menu
+        Add class "mobile-mode" to the dropdown when viewing the iframe video on mobile devices -->
+        <div class="dropdown body files-menu context hidden" style="height: auto; border-radius: 8px;">
+            <div class="close-overlay right">
+                <i class="medium-icon icons-img close-icon"></i>
+            </div>
+            <div class="dropdown-aligner">
+                <div class="dropdown-wrapper">
+                    <div class="dropdown-section">
+                        <a class="dropdown-item login-item" style="display: block;">
+                            <i class="small-icon context login"></i>
+                            <div class="contextmenu useravatar hidden">
+                                <div class="avatar-wrapper avatar"><span></span></div>
+                            </div>
+                            <span class="login-text">[$16345]</span>
+                        </a>
+                        <hr>
+                    </div>
+                    <div class="dropdown-section">
+                        <a class="dropdown-item getlink-item" style="display: block;">
+                            <i class="small-icon context get-link"></i><span>[$59]</span>
+                        </a>
+                    </div>
+                    <div class="dropdown-section">
+                        <a class="dropdown-item embedcode-item" style="display: block;">
+                            <i class="small-icon context embed-code"></i><span>[$17407]</span>
+                        </a>
+                        <hr>
+                    </div>
+                    <div class="dropdown-section">
+                        <a class="dropdown-item viewonmega-item" style="display: block;">
+                            <i class="small-icon context mega"></i><span>[$16518]</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Add main-blur-block to video-wrapper when any overlay is visible.
+        Pause the video as well when an overlay is visible -->
+        <div class="video-wrapper">
+            <!-- Video Header -->
+            <div class="viewer-top-bl">
+                <div class="viewer-filename">
+                    <div class="download file-info">
+                        <div class="download info-txt big-txt filename">
+                            <span class="filename"></span>
+                            <span class="extension"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="v-btn right moreoptions">
+                    <i class="medium-icon icons-img three-dots"></i>
+                </div>
+                <div class="v-btn right useravatar hidden">
+                    <div data-color="color4" class="avatar-wrapper avatar"><span>C</span></div>
+                </div>
+                <!-- Will Replace with a more appropriate share icon -->
+                <div class="v-btn right share">
+                    <i class="medium-icon icons-img share-generic"></i>
+                </div>
+                <div class="clear"></div>
+            </div>
+            <video id="video" data-autoplayvideo="false" data-playvideoonclick="false"></video>
+
+            <div class="play-video-button"></div>
+            <div class="viewer-pending hidden">
+                <div class="bounce1"></div>
+                <div class="bounce2"></div>
+                <div class="bounce3"></div>
+            </div>
+            <!-- Will add soon. This button should direct you to the dl page for the file -->
+            <div class="logo-container">
+                <div class="logo-icon"></div>
+            </div>
+
+            <div class="viewer-vad-control lato hidden">
+                <div  class="thumb">
+                    <img alt="" />
+                </div>
+                <div class="counter">
+                    0
+                </div>
+                <div class="label">
+                    <span>[$22879]</span><i class="small-icon icons-sprite skip"></i>
+                </div>
+            </div>
+
+            <div class="video-progress-bar vad" title="">
+                <div class="video-time-bar"></div>
+            </div>
+
+            <!-- Video Footer -->
+            <div class="viewer-bottom-bl video-controls" data-state="hidden">
+                <div data-state="play" class="v-btn left playpause">
+                    <i class="medium-icon icons-img icon-pause"></i>
+                </div>
+                <div class="volume-control vol-wrapper left">
+                    <div data-state="mute" class="v-btn mute">
+                        <i class="medium-icon icons-img icon-volume"></i>
+                    </div>
+                    <div class="video-vol-range">
+                        <div class="volume-bar"><span></span></div>
+                    </div>
+                </div>
+                <div class="video-timing current left">
+                    00:00
+                </div>
+                <div data-state="go-fullscreen" class="v-btn right fs">
+                    <i class="medium-icon icons-img icon-fullscreen-enter"></i>
+                </div>
+                <div class="video-timing duration right">
+                    00:00
+                </div>
+                <div class="video-progress-block">
+                    <div class="video-progress-bar">
+                        <div class="video-time-bar"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
+
 <textarea id="chromeclipboard" title="copy" style="position:absolute;top:-100%;left:-100%;opacity:0" readonly></textarea>

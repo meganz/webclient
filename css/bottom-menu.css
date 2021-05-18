@@ -94,6 +94,7 @@
 }
 .bottom-social-button {
     cursor: pointer;
+    -webkit-margin-end: 15px;
     margin-inline-end: 15px;
     margin-bottom: 15px;
     padding: 0;
@@ -159,6 +160,9 @@
     }
     .bottom-pages a.logo {
         display: none;
+    }
+    .bottom-pages .download a.logo {
+        display: block;
     }
     .bottom-menu .desktop-menu .col1-of-6 {
         width: 25%;

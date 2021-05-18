@@ -195,7 +195,7 @@ function continueOldRegistration(result) {
 
         passwordManager($('#register_form'));
 
-        $('.fm-dialog.registration-page-success').off('click');
+        $('.mega-dialog.registration-page-success').off('click');
 
         mega.ui.sendSignupLinkDialog(rv);
 
@@ -236,7 +236,7 @@ function continueNewRegistration(result) {
         // Setup the password manager
         passwordManager($('#register_form'));
 
-        $('.fm-dialog.registration-page-success').off('click');
+        $('.mega-dialog.registration-page-success').off('click');
 
         mega.ui.sendSignupLinkDialog(rv);
 
@@ -375,7 +375,7 @@ function init_register() {
 
     var $formWrapper = $('.main-mid-pad.register1');
     var $inputs = $formWrapper.find('input');
-    var $button = $formWrapper.find('.big-red-button');
+    var $button = $('.register-button', $formWrapper);
     var $email = $formWrapper.find('#register-email-registerpage2');
     var $firstName = $formWrapper.find('#register-firstname-registerpage2');
     var $lastName = $formWrapper.find('#register-lastname-registerpage2');
@@ -432,7 +432,7 @@ function init_register() {
     });
 
     var $regInfoContainer = $('.main-mid-pad.big-pad.register1 .main-left-block').removeClass('businessSubAc');
-    $('.mega-input-title-ontop', $regInfoContainer).removeClass('hidden');
+    $('.mega-input.title-ontop', $regInfoContainer).removeClass('hidden');
     $('.account.top-header', $regInfoContainer).safeHTML(l[1095]);
 
     // business sub-account registration

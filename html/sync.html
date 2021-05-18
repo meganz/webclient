@@ -1,4 +1,4 @@
-<div class="bottom-page scroll-block megasync cropped-page light-blue-top white-pages-menu">
+<div class="bottom-page scroll-block megasync cropped-page light-blue-top">
     <div class="pages-menu-wrap">
         ((TOP))
         ((PAGESMENU))
@@ -47,45 +47,40 @@
                                         <div class="megaapp-linux-info linux-txt">
                                             [$18777]
                                         </div>
-                                        <div class="default-select megaapp-dropdown"> <span class="megaapp-linux-default">[$7086]</span>
-                                            <div class="megaapp-dropdown-list default-select-dropdown hidden">
-                                                <div class="mega-list-arrow up hidden inactive"></div>
-                                                <div class="megaapp-dropdown-scroll">
-                                                    <div class="megaapp-scr-pad"> </div>
+                                        <div class="megaapp-inputs-wrap">
+                                            <div class="mega-input dropdown-input box-style inline megasync-dropdown">
+                                                <span>[$7086]</span>
+                                                <i class="sprite-fm-mono icon-dropdown"></i>
+                                                <div class="mega-input-dropdown hidden">
+                                                    <div class="dropdown-scroll"></div>
                                                 </div>
-                                                <div class="mega-list-arrow down hidden"></div>
                                             </div>
-                                        </div>
-                                        <div class="small-green-button transition megaapp-linux-download disabled">
-                                            [$58]
+                                            <button class="mega-button positive transition megaapp-linux-download disabled">
+                                                [$58]
+                                            </button>
                                         </div>
                                         <div class="bottom-page radio-buttons linux-bit-radio linux-download-details hidden">
                                             <div class="install-guide-trigger open">
-                                                <span>[$24688]</span>
+                                                [$24688]
                                             </div>
-                                            <div class="architecture-checkbox radioOff green transition">
-                                                <input type="radio" name="architecture" id="rad1" class="linux32 radioOff" value="32">
+                                            <div>
+                                                <div class="architecture-checkbox radioOff">
+                                                    <input type="radio" name="architecture" id="sync-rad1" class="linux32 radioOff" value="32">
+                                                </div>
+                                                <label for="sync-rad1" class="radio-txt megaapp-radio-txt 32">[$20663]</label>
+                                                <div class="architecture-checkbox radioOn">
+                                                    <input type="radio" name="architecture" id="sync-rad2" class="linux64 radioOn" checked="checked" value="64">
+                                                </div>
+                                                <label for="sync-rad2" class="radio-txt megaapp-radio-txt 64">[$20662]</label>
                                             </div>
-                                            <label for="rad1" class="radio-txt megaapp-radio-txt 32">[$20663]</label>
-
-                                            <div class="architecture-checkbox radioOn green transition">
-                                                <input type="radio" name="architecture" id="rad2" class="linux64 radioOn" checked="checked" value="64">
-                                            </div>
-                                            <label for="rad2" class="radio-txt megaapp-radio-txt 64">[$20662]</label>
-                                            <div class="clear"></div>
                                             <div class="install-guide-text">
                                                 <span class="install-guide"></span>
                                                 <div class="copy-line">
                                                     <div class="install-guide-copy-msg hidden">
                                                         [$24709]
                                                     </div>
-                                                    <div class="copy-install-guide-icon transition">
-                                                        <div class="small-icon copy-line-icon transition">
-                                                            <div class="dark-help-block">
-                                                                <div class="dark-notification-arrow"></div>
-                                                                <span>[$63]</span>
-                                                            </div>
-                                                        </div>
+                                                    <div class="copy-install-guide-icon transition simpletip" data-simpletip="[$63]" data-simpletipposition="top" data-simpletip-class="megasync-tip">
+                                                        <i class="small-icon icons-sprite copy-line-icon transition"></i>
                                                     </div>
                                                 </div>
                                             </div>
@@ -94,24 +89,19 @@
                                         <!-- Extension -->
                                         <div class="megaapp-linux-info linux-txt megaext-header transition">
                                             <span>[$20654]</span>
-                                            <div class="bottom-page-icon white-info megaext-info-hover disabled transition">
-                                                <div class="dark-notification-block transition">
-                                                    <div class="dark-notification-arrow"></div>
-                                                    <span>[$20655]</span>
+                                            <div class="bottom-page-icon white-info disabled transition simpletip" data-simpletip="[$20655]" data-simpletipposition="top" data-simpletip-class="megasync-tip"></div>
+                                        </div>
+                                        <div class="megaapp-inputs-wrap">
+                                            <div class="mega-input dropdown-input box-style inline megaext-dropdown disabled">
+                                                <span></span>
+                                                <i class="sprite-fm-mono icon-dropdown"></i>
+                                                <div class="mega-input-dropdown hidden">
+                                                    <div class="dropdown-scroll"></div>
                                                 </div>
                                             </div>
-                                        </div>
-                                        <div class="default-select megaext-dropdown disabled transition"> <span class="megaext-linux-default"></span>
-                                            <div class="megaext-dropdown-list default-select-dropdown hidden">
-                                                <div class="mega-list-arrow up hidden inactive"></div>
-                                                <div class="megaext-dropdown-scroll">
-                                                    <div class="megaext-scr-pad"> </div>
-                                                </div>
-                                                <div class="mega-list-arrow down hidden"></div>
-                                            </div>
-                                        </div>
-                                        <div class="small-green-button transition megaext-linux-download disabled">
-                                            [$58]
+                                            <button class="mega-button positive transition megaext-linux-download disabled">
+                                                [$58]
+                                            </button>
                                         </div>
                                         <div class="megaext-linux-arrow"></div>
                                     </div>
@@ -122,7 +112,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="bottom-align float-hero-image"> <img alt="" class="bottom-page img sync1" src="{staticpath}/images/mega/bottom-page/sp_sync_1_v3@2x.png"><img alt="" class="bottom-page img mobile-view" src="{staticpath}/images/mega/bottom-page/sp_sync_3_v2@2x.png"> </div>
+                    <div class="bottom-align float-hero-image"> <img alt="" class="bottom-page img sync1" src="{staticpath}/images/mega/bottom-page/sp_sync_1@2x.png"><img alt="" class="bottom-page img mobile-view" src="{staticpath}/images/mega/bottom-page/sp_sync_3@2x.png"> </div>
                 </div>
             </div>
         </div>
@@ -154,7 +144,7 @@
             <div class="bottom-page horizontal-centered-bl wide">
                 <div class="bottom-page table changed-order">
                     <div class="bottom-page vertical-centered-cell right-cell order2">
-                        <img alt="" class="bottom-page img " src="{staticpath}/images/mega/bottom-page/sp_sync_2_v2@2x.png">
+                        <img alt="" class="bottom-page img " src="{staticpath}/images/mega/bottom-page/sp_sync_2@2x.png">
                     </div>
                     <div class="bottom-page vertical-centered-cell left-cell">
                         <div class="business-info-block">
@@ -179,7 +169,7 @@
                         </div>
                     </div>
                     <div class="bottom-page vertical-centered-cell right-cell order1">
-                        <img alt="" class="bottom-page img " src="{staticpath}/images/mega/bottom-page/sp_sync_2_v2@2x.png">
+                        <img alt="" class="bottom-page img " src="{staticpath}/images/mega/bottom-page/sp_sync_2@2x.png">
                     </div>
                 </div>
             </div>
@@ -188,10 +178,10 @@
             <div class="bottom-page horizontal-centered-bl wide">
                 <div class="bottom-page table changed-order">
                     <div class="bottom-page vertical-centered-cell left-cell order1">
-                        <img alt="" class="bottom-page desktop-img" src="{staticpath}/images/mega/bottom-page/sp_sync_3_v2@2x.png">
+                        <img alt="" class="bottom-page desktop-img" src="{staticpath}/images/mega/bottom-page/sp_sync_3@2x.png">
                     </div>
                     <div class="bottom-page table-cell left-cell img-wrap order2">
-                        <img alt="" class="bottom-page desktop-img" src="{staticpath}/images/mega/bottom-page/sp_sync_3_v2@2x.png">
+                        <img alt="" class="bottom-page desktop-img" src="{staticpath}/images/mega/bottom-page/sp_sync_3@2x.png">
                     </div>
                     <div class="bottom-page vertical-centered-cell right-cell">
                         <div class="business-info-block">
@@ -293,8 +283,8 @@
                             [$19779]
                         </div>
                         <div class="bottom-page buttons">
-                            <a href="https://github.com/meganz/MEGAsync/blob/master/README.md" target="_blank" rel="noopener noreferrer" class="button default-white-button light inline white-border">
-                                [$8742]
+                            <a href="https://github.com/meganz/MEGAsync/blob/master/README.md" target="_blank" rel="noopener noreferrer" class="transparent-button">
+                                <span>[$8742]</span>
                             </a>
                         </div>
                     </div>
@@ -306,9 +296,9 @@
                             [$19780]
                         </div>
                         <div class="bottom-page buttons">
-                            <a class="button default-white-button light inline grey-border clickurl" href="/help/client/megasync/" rel="noopener noreferrer"
-                               target="_blank">
-                                [$8742]
+                            <a href="/help/client/megasync/" rel="noopener noreferrer"
+                               target="_blank" class="transparent-button light">
+                               <span>[$8742]</span>
                             </a>
                         </div>
                     </div>
@@ -320,8 +310,8 @@
                             [$18794]
                         </div>
                         <div class="bottom-page buttons">
-                            <a href="https://github.com/meganz/MEGAsync/" target="_blank" rel="noopener noreferrer" class="button default-white-button light inline white-border">
-                                [$8742]
+                            <a href="https://github.com/meganz/MEGAsync/" target="_blank" rel="noopener noreferrer" class="transparent-button">
+                                <span>[$8742]</span>
                             </a>
                         </div>
                     </div>
@@ -357,87 +347,82 @@
                         </div>
                     </div>
 
-                    <div class="megaapp-linux hidden">
-                        <div class="megaapp-linux-container">
-                            <div class="megaapp-linux-info linux-txt">
-                                [$18777]
-                            </div>
-                            <div class="default-select megaapp-dropdown"> <span class="megaapp-linux-default">[$7086]</span>
-                                <div class="megaapp-dropdown-list default-select-dropdown hidden">
-                                    <div class="mega-list-arrow up hidden inactive"></div>
-                                    <div class="megaapp-dropdown-scroll">
-                                        <div class="megaapp-scr-pad"> </div>
-                                    </div>
-                                    <div class="mega-list-arrow down hidden"></div>
-                                </div>
-                            </div>
-                            <div class="small-green-button transition megaapp-linux-download disabled">
-                                [$58]
-                            </div>
-                            <div class="bottom-page radio-buttons linux-bit-radio hidden">
-                                <div class="install-guide-trigger open">
-                                    <span>[$24688]</span>
-                                </div>
-                                <div class="architecture-checkbox radioOff green transition">
-                                    <input type="radio" name="architecture" id="rad3" class="linux32 radioOff" value="32">
-                                </div>
-                                <label for="rad3" class="radio-txt 32">[$20663]</label>
-
-                                <div class="architecture-checkbox radioOn green transition">
-                                    <input type="radio" name="architecture" id="rad4" class="linux64 radioOn" checked="checked" value="64">
-                                </div>
-                                <label for="rad4" class="radio-txt 64">[$20662]</label>
-                                <div class="clear"></div>
-                                <div class="install-guide-text">
-                                    <span class="install-guide"></span>
-                                    <div class="copy-line">
-                                        <div class="install-guide-copy-msg hidden">
-                                            [$24709]
+                    <div class="megaapp-linux-box-container hidden">
+                        <div class="megaapp-linux">
+                                    <div class="megaapp-linux-container">
+                                        <div class="megaapp-linux-info linux-txt">
+                                            [$18777]
                                         </div>
-                                        <div class="copy-install-guide-icon transition">
-                                            <div class="small-icon copy-line-icon transition">
-                                                <div class="dark-help-block bottomsync-copy-tip">
-                                                    <div class="dark-notification-arrow"></div>
-                                                    <span>[$63]</span>
+                                        <div class="megaapp-inputs-wrap">
+                                            <div class="mega-input dropdown-input box-style inline megasync-dropdown">
+                                                <span>[$7086]</span>
+                                                <i class="sprite-fm-mono icon-dropdown"></i>
+                                                <div class="mega-input-dropdown hidden">
+                                                    <div class="dropdown-scroll"></div>
+                                                </div>
+                                            </div>
+                                            <button class="mega-button positive transition megaapp-linux-download disabled">
+                                                [$58]
+                                            </button>
+                                        </div>
+                                        <div class="bottom-page radio-buttons linux-bit-radio linux-download-details hidden">
+                                            <div class="install-guide-trigger open">
+                                                [$24688]
+                                            </div>
+                                            <div>
+                                                <div class="architecture-checkbox radioOff">
+                                                    <input type="radio" name="architecture" id="rad1" class="linux32 radioOff" value="32">
+                                                </div>
+                                                <label for="rad1" class="radio-txt megaapp-radio-txt 32">[$20663]</label>
+                                                <div class="architecture-checkbox radioOn">
+                                                    <input type="radio" name="architecture" id="rad2" class="linux64 radioOn" checked="checked" value="64">
+                                                </div>
+                                                <label for="rad2" class="radio-txt megaapp-radio-txt 64">[$20662]</label>
+                                            </div>
+                                            <div class="install-guide-text">
+                                                <span class="install-guide"></span>
+                                                <div class="copy-line">
+                                                    <div class="install-guide-copy-msg hidden">
+                                                        [$24709]
+                                                    </div>
+                                                    <div class="copy-install-guide-icon transition simpletip" data-simpletip="[$63]" data-simpletipposition="top" data-simpletip-class="megasync-tip">
+                                                        <i class="small-icon icons-sprite copy-line-icon transition"></i>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                </div>
-                            </div>
 
-                            <!-- Extension -->
-                            <div class="megaapp-linux-info linux-txt megaext-header transition">
-                                <span>[$20654]</span>
-                                <div class="bottom-page-icon white-info megaext-info-hover disabled transition">
-                                    <div class="dark-notification-block transition">
-                                        <div class="dark-notification-arrow"></div>
-                                        <span>[$20655]</span>
+                                        <!-- Extension -->
+                                        <div class="megaapp-linux-info linux-txt megaext-header transition">
+                                            <span>[$20654]</span>
+                                            <div class="bottom-page-icon white-info disabled transition simpletip" data-simpletip="[$20655]" data-simpletipposition="top" data-simpletip-class="megasync-tip"></div>
+                                        </div>
+                                        <div class="megaapp-inputs-wrap">
+                                            <div class="mega-input dropdown-input box-style inline megaext-dropdown disabled">
+                                                <span></span>
+                                                <i class="sprite-fm-mono icon-dropdown"></i>
+                                                <div class="mega-input-dropdown hidden">
+                                                    <div class="dropdown-scroll"></div>
+                                                </div>
+                                            </div>
+                                            <button class="mega-button positive transition megaext-linux-download disabled">
+                                                [$58]
+                                            </button>
+                                        </div>
+                                        <div class="megaext-linux-arrow"></div>
+                                    </div>
+                                    <div class="megaapp-footer">
+                                        [$20846]
                                     </div>
                                 </div>
-                            </div>
-                            <div class="default-select megaext-dropdown disabled transition"> <span class="megaext-linux-default"></span>
-                                <div class="megaext-dropdown-list default-select-dropdown hidden">
-                                    <div class="mega-list-arrow up hidden inactive"></div>
-                                    <div class="megaext-dropdown-scroll">
-                                        <div class="megaext-scr-pad"> </div>
-                                    </div>
-                                    <div class="mega-list-arrow down hidden"></div>
-                                </div>
-                            </div>
-                            <div class="small-green-button transition megaext-linux-download disabled">
-                                [$58]
-                            </div>
-                            <div class="megaext-linux-arrow"></div>
-                        </div>
-                        <div class="megaapp-footer">
-                            [$20846]
-                        </div>
                     </div>
 
-                    <div class="button default-huge-button download-megacmd inline hidden" data-link="/" style="display: none;">
-                        <i class="medium-icon down-arrow"></i> [$58]
-                     </div>
+                    <button class="mega-button large download-megacmd inline hidden" data-link="/" style="display: none;">
+                        <div>
+                            <i class="medium-icon down-arrow"></i>
+                        </div>
+                        <span>[$58]</span>
+                     </button>
                  </div>
         </div>
      </div>

@@ -1,6 +1,7 @@
 /** This class will function as a UI controller.
  */
 mega.tpw = new function TransferProgressWidget() {
+    'use strict';
     var downloadRowPrefix = 'tpw_dl_';
     var uploadRowPrefix = 'tpw_ul_';
     var totalUploads = 0;
@@ -16,6 +17,7 @@ mega.tpw = new function TransferProgressWidget() {
     var $widget;
     var $widgetWarnings;
     var $rowsHeader;
+    var $transferPageHeader;
     var $widgetHeadAndBody;
     var $rowsContainer;
     var $bodyContianer;
@@ -67,11 +69,16 @@ mega.tpw = new function TransferProgressWidget() {
                     stText = 'Frozen';
                     break;
                 case mySelf.PAUSED:
-                    stText = l[1651];
+                    stText = '<i class="sprite-fm-mono icon-pause"></i><span>' + l[1651] + '</span>';
                     break;
             }
 
-            row.find('.transfer-task-status').text(stText);
+            if (stText) {
+                row.find('.transfer-task-status').safeHTML(stText);
+            }
+            else {
+                row.find('.transfer-task-status').text('');
+            }
         }
         else {
             return;
@@ -195,9 +202,10 @@ mega.tpw = new function TransferProgressWidget() {
 
                 $overQuotaBanner.find('.quota-info-pct-txt').text('100%');
                 $overQuotaBanner.find('.quota-info-pr-txt').text(bytesToSize(acc.tfsq.used) + ' ' + l[5775]);
-                $overQuotaBanner.find('.action').removeClass('default-orange-button').addClass('default-red-button');
+                const $action = $('.action', $overQuotaBanner);
+                $action.addClass('negative');
 
-                $overQuotaBanner.find('.quota-info-pct-circle li.left-c p').rotate(180, 0);
+                $('.quota-info-pct-circle li.right-c p', $overQuotaBanner).rotate(-180, 0);
             }
             else {
                 $overQuotaBanner.find('.head-title').text(l[5932]);
@@ -206,16 +214,20 @@ mega.tpw = new function TransferProgressWidget() {
                 var perc = Math.round(acc.space_used * 100 / acc.space);
                 $overQuotaBanner.find('.quota-info-pct-txt').text(perc + '%');
 
-                var spaceInfo = bytesToSize(acc.space_used) + '/' + bytesToSize(acc.space, 0);
-                if (spaceInfo.length >= 15) {
+                var usedSpace = bytesToSize(acc.space_used);
+                var totalSpace = bytesToSize(acc.space, 0);
+                if ((usedSpace + totalSpace).length >= 12) {
                     $('.quota-info-pr-txt', $overQuotaBanner).addClass('small-font');
                 }
-                $('.quota-info-pr-txt', $overQuotaBanner).text(spaceInfo);
+                var spaceInfo = l[16301].replace('%1', usedSpace).replace('%2', totalSpace);
+                $('.quota-info-pr-txt', $overQuotaBanner).safeHTML(spaceInfo);
 
-                $overQuotaBanner.find('.action').removeClass('default-red-button').addClass('default-orange-button');
+                const $action = $('.action', $overQuotaBanner);
+                $action.removeClass('negative');
 
-                var rotateAngle = 18 * perc / 10 >= 180 ? 180 : 18 * perc / 10;
-                $('.quota-info-pct-circle li.left-c p', $overQuotaBanner).rotate(rotateAngle);
+                var direction = -1;
+                var rotateAngle = 360 * perc / 100 <= 180 ? 0 : 360 * perc / 100 - 180;
+                $('.quota-info-pct-circle li.right-c p', $overQuotaBanner).rotate(rotateAngle * direction);
             }
 
             $overQuotaBanner.removeClass('hidden');
@@ -241,6 +253,7 @@ mega.tpw = new function TransferProgressWidget() {
         }
 
         $rowsHeader.find('.transfer-progress-type.' + $sectionType).removeClass('error overquota');
+        $('.transfer-progress-type.' + $sectionType, $transferPageHeader).removeClass('error overquota');
     };
 
 
@@ -326,7 +339,7 @@ mega.tpw = new function TransferProgressWidget() {
 
 
     var clearAndReturnWidget = function() {
-        var $currWidget = $('.transfer-prorgess.tpw');
+        var $currWidget = $('.transfer-progress.tpw');
         if (!$currWidget || !$currWidget.length) {
             return null;
         }
@@ -359,19 +372,22 @@ mega.tpw = new function TransferProgressWidget() {
 
         $widgetWarnings = $('.banner.transfer', $widget);
         $rowsHeader = $('.transfer-progress-head', $widget);
+        $transferPageHeader = $('.fm-transfers-header');
         $widgetHeadAndBody = $('.transfer-progress-widget', $widget);
         $bodyContianer = $('.widget-body-container', $widget);
         $rowsContainer = $('.transfer-progress-widget-body', $bodyContianer);
         $overQuotaBanner = $('.banner.transfer', $widget);
         $rowTemplate = $($('.transfer-task-row', $rowsContainer)[0]).clone();
         rowProgressWidth = $($rowsContainer[0]).find('.transfer-progress-bar').width();
-        $downloadRowTemplate = $rowTemplate.clone().removeClass('upload').addClass('download');
-        $uploadRowTemplate = $rowTemplate.clone().removeClass('download').addClass('upload');
+        $downloadRowTemplate = $rowTemplate.clone().removeClass('upload').addClass('download icon-down');
+        $uploadRowTemplate = $rowTemplate.clone().removeClass('download').addClass('upload icon-up');
 
-        $transferActionTemplate = $($downloadRowTemplate.find('i.transfer-progress-icon')[0]).clone();
-        $transferActionTemplate.removeClass('pause cancel link cloud-folder restart');
-        $transferActionTemplate.off('click').on('click',
-            actionsOnRowEventHandler);
+        $transferActionTemplate = $($('button.btn-icon.transfer-progress-btn', $downloadRowTemplate)[0]).clone()
+            .removeClass('pause cancel link cloud-folder restart');
+        var $transferActionTemplateIcon = $('i.transfer-progress-icon', $transferActionTemplate);
+        $transferActionTemplateIcon.removeClass('pause cancel link cloud-folder restart' +
+            'icon-pause icon-close-component icon-link icon-search-cloud icon-play-small');
+        $transferActionTemplateIcon.bind('click', actionsOnRowEventHandler);
 
         $rowsContainer.empty();
 
@@ -493,6 +509,9 @@ mega.tpw = new function TransferProgressWidget() {
         perc = isNaN(perc) ? 0 : Math.round(perc * 100);
 
         $headerSection.find('.transfer-progress-pct').text(perc + '%');
+
+        let block = $headerSection.hasClass('download') ? 'download' : 'upload';
+        $('.transfer-progress-type.' + block + ' .transfer-progress-pct', $transferPageHeader).text(perc + '%');
     };
 
 
@@ -571,6 +590,7 @@ mega.tpw = new function TransferProgressWidget() {
             $downloadHeader.removeClass('hidden');
             if (!dRows.filter('.error').length) {
                 $downloadHeader.removeClass('error overquota');
+                $('.transfer-progress-type.download', $transferPageHeader).removeClass('error overquota');
             }
 
         }
@@ -611,6 +631,7 @@ mega.tpw = new function TransferProgressWidget() {
             $uploadHeader.removeClass('hidden');
             if (!uRows.filter('.error').length) {
                 $uploadHeader.removeClass('error overquota');
+                $('.transfer-progress-type.upload', $transferPageHeader).removeClass('error overquota');
             }
         }
 
@@ -818,7 +839,8 @@ mega.tpw = new function TransferProgressWidget() {
             $row.find('.transfer-filetype-txt').text(fName);
 
             var $enqueueAction = $transferActionTemplate.clone().addClass('cancel');
-            $enqueueAction.find('.tooltips').text(toolTipText);
+            $('i.transfer-progress-icon', $enqueueAction).addClass('cancel icon-close-component')
+                .attr('data-simpletip', toolTipText);
             $row.find('.transfer-task-actions').empty().append($enqueueAction);
 
             if (!specifiedSize) {
@@ -940,10 +962,12 @@ mega.tpw = new function TransferProgressWidget() {
         if (!$targetedRow.attr('prepared')) {
             var $actionsRow = $targetedRow.find('.transfer-task-actions').empty();
             var $progressAction = $transferActionTemplate.clone(true).addClass('pause');
-            $progressAction.find('.tooltips').text(pauseText);
+            $('i.transfer-progress-icon', $progressAction).addClass('pause icon-pause')
+                .attr('data-simpletip', pauseText);
             $actionsRow.append($progressAction);
             $progressAction = $transferActionTemplate.clone(true).addClass('cancel');
-            $progressAction.find('.tooltips').text(cancelText);
+            $('i.transfer-progress-icon', $progressAction).addClass('cancel icon-close-component')
+                .attr('data-simpletip', cancelText);
             $actionsRow.append($progressAction);
             $targetedRow.attr('prepared', 'yes');
         }
@@ -1005,16 +1029,19 @@ mega.tpw = new function TransferProgressWidget() {
             $targetedRow.find('.transfer-complete-actions').remove();
             $finishedActionsRow.removeClass('transfer-task-actions').addClass('transfer-complete-actions');
             if (M.getNodeRoot(handle || dId) !== 'shares') {
-                $finishedAction.find('.tooltips').text(l[59]);
+                $('i.transfer-progress-icon', $finishedAction).removeClass('sprite-fm-mono')
+                    .addClass('sprite-fm-mono link icon-link').attr('data-simpletip', l[59]);
                 $finishedActionsRow.append($finishedAction);
             }
             $finishedAction = $transferActionTemplate.clone(true).addClass('cloud-folder');
-            $finishedAction.find('.tooltips').text(l[20695]);
+            $('i.transfer-progress-icon', $finishedAction).addClass('cloud-folder icon-search-cloud')
+                .attr('data-simpletip', l[20695]);
             $finishedActionsRow.append($finishedAction);
             $finishedActionsRow.insertAfter($targetedRow.find('.transfer-file-size'));
         }
         $finishedAction = $transferActionTemplate.clone(true).addClass('cancel');
-        $finishedAction.find('.tooltips').text(l[6992]);
+        $('i.transfer-progress-icon', $finishedAction).addClass('cancel icon-close-component')
+            .attr('data-simpletip', l[6992]);
         $actionsRow.append($finishedAction);
 
         if (unHide) {
@@ -1081,15 +1108,18 @@ mega.tpw = new function TransferProgressWidget() {
         setStatus($targetedRow, this.FAILED, errorStr);
 
         var $errorCancelAction = $transferActionTemplate.clone(true).addClass('cancel');
-        $errorCancelAction.find('.tooltips').text(cancelText);
+        $('i.transfer-progress-icon', $errorCancelAction).addClass('cancel icon-close-component')
+            .attr('data-simpletip', cancelText);
         $targetedRow.find('.transfer-task-actions').empty().append($errorCancelAction);
 
         $targetedRow.removeAttr('prepared');
 
         $rowsHeader.find('.transfer-progress-type.' + subHeaderClass).addClass('error');
+        $('.transfer-progress-type.' + subHeaderClass, $transferPageHeader).addClass('error');
 
         if (isOverQuota) {
             $rowsHeader.find('.transfer-progress-type.' + subHeaderClass).addClass('overquota');
+            $('.transfer-progress-type.' + subHeaderClass, $transferPageHeader).addClass('overquota');
             viewOverQuotaBanner(type);
         }
 
@@ -1141,7 +1171,8 @@ mega.tpw = new function TransferProgressWidget() {
         monitors[dId] = setTimeout(updateToFrozen, frozenTimeout, dId);
 
         var $enqueueAction = $transferActionTemplate.clone().addClass('cancel');
-        $enqueueAction.find('.tooltips').text(toolTipText);
+        $('i.transfer-progress-icon', $enqueueAction).addClass('cancel icon-close-component')
+            .attr('data-simpletip', toolTipText);
         $targetedRow.find('.transfer-task-actions').empty().append($enqueueAction);
         $targetedRow.removeClass('complete error progress paused').addClass('inqueue');
         setStatus($targetedRow, this.INITIALIZING);
@@ -1193,10 +1224,12 @@ mega.tpw = new function TransferProgressWidget() {
 
         var $actionsRow = $targetedRow.find('.transfer-task-actions').empty();
         var $pausedAction = $transferActionTemplate.clone(true).addClass('restart');
-        $pausedAction.find('.tooltips').text(resumeText);
+        $('i.transfer-progress-icon', $pausedAction).addClass('restart icon-play-small')
+            .attr('data-simpletip', resumeText);
         $actionsRow.append($pausedAction);
         $pausedAction = $transferActionTemplate.clone(true).addClass('cancel');
-        $pausedAction.find('.tooltips').text(cancelText);
+        $('i.transfer-progress-icon', $pausedAction).addClass('cancel icon-close-component')
+            .attr('data-simpletip', cancelText);
         $actionsRow.append($pausedAction);
         $targetedRow.removeAttr('prepared');
     };

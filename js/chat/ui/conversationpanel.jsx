@@ -37,7 +37,7 @@ export class JoinCallNotification extends MegaRenderMixin {
     componentDidUpdate() {
         var $node = $(this.findDOMNode());
         var room = this.props.chatRoom;
-        $('a.joinActiveCall', $node)
+        $('button.joinActiveCall', $node)
             .rebind('click.joinCall', function(e) {
                 room.joinCall();
                 e.preventDefault();
@@ -48,18 +48,18 @@ export class JoinCallNotification extends MegaRenderMixin {
         var room = this.props.chatRoom;
         if (room.getCallParticipants().length >= RtcModule.kMaxCallReceivers) {
             return <div className="in-call-notif yellow join">
-                <i className="small-icon audio-call colorized"/>
+                <i className="sprite-fm-mono icon-phone"/>
                 {l[20200]}
             </div>;
         }
         else {
             var translatedCode = escapeHTML(l[20460] || "There is an active group call. [A]Join[/A]");
             translatedCode = translatedCode
-                .replace("[A]", '<a class="joinActiveCall">')
-                .replace('[/A]', '</a>');
+                .replace("[A]", '<button class="mega-button positive joinActiveCall small">')
+                .replace('[/A]', '</button>');
 
             return <div className="in-call-notif neutral join">
-                <i className="small-icon audio-call colorized"/>
+                <i className="sprite-fm-mono icon-phone"/>
                 <span dangerouslySetInnerHTML={{__html: translatedCode}}></span>
             </div>;
         }
@@ -136,8 +136,8 @@ export class ConversationRightArea extends MegaRenderMixin {
                         room.startAudioCall();
                     }
                 }}>
-                <i className="small-icon colorized audio-call"></i>
-                <span>{l[5896]}</span>
+                    <i className="sprite-fm-mono icon-phone" />
+                    <span>{l[5896]}</span>
             </div>;
         }
         if (startVideoCallButton !== null) {
@@ -147,11 +147,11 @@ export class ConversationRightArea extends MegaRenderMixin {
                         room.startVideoCall();
                     }
                 }}>
-                <i className="small-icon colorized video-call"></i>
-                <span>{l[5897]}</span>
+                    <i className="sprite-fm-mono icon-video-call-filled" />
+                    <span>{l[5897]}</span>
             </div>;
         }
-        var AVseperator = <div className="chat-button-seperator"></div>;
+        var AVseperator = <div className="chat-button-separator" />;
         if (endCallButton !== null) {
             endCallButton =
                 <div className={"link-button light red"} onClick={() => {
@@ -214,37 +214,37 @@ export class ConversationRightArea extends MegaRenderMixin {
         }
 
         const addParticipantBtn = (
-                <Button
-                    className="link-button green light"
-                    icon="rounded-plus colorized"
-                    label={l[8007]}
-                    disabled={
-                        /* Disable in case I don't have any more contacts to add ... */
-                        !(
-                            !room.isReadOnly() &&
-                            room.iAmOperator() &&
-                            !self.allContactsInChat(excludedParticipants)
-                        )
+            <Button
+                className="link-button light"
+                icon="sprite-fm-mono icon-add-small"
+                label={l[8007]}
+                disabled={
+                    /* Disable in case I don't have any more contacts to add ... */
+                    !(
+                        !room.isReadOnly() &&
+                        room.iAmOperator() &&
+                        !self.allContactsInChat(excludedParticipants)
+                    )
+                }
+            >
+                <DropdownContactsSelector
+                    contacts={this.props.contacts}
+                    chatRoom={room}
+                    exclude={
+                        excludedParticipants
                     }
-                >
-                    <DropdownContactsSelector
-                        contacts={this.props.contacts}
-                        chatRoom={room}
-                        exclude={
-                            excludedParticipants
-                        }
-                        multiple={true}
-                        className="popup add-participant-selector"
-                        singleSelectedButtonLabel={l[8869]}
-                        multipleSelectedButtonLabel={l[8869]}
-                        nothingSelectedButtonLabel={l[8870]}
-                        onSelectDone={this.props.onAddParticipantSelected.bind(this)}
-                        positionMy="center top"
-                        positionAt="left bottom"
-                        arrowHeight={-32}
-                        selectFooter={true}
-                    />
-                </Button>
+                    multiple={true}
+                    className="popup add-participant-selector"
+                    singleSelectedButtonLabel={l[8869]}
+                    multipleSelectedButtonLabel={l[8869]}
+                    nothingSelectedButtonLabel={l[8870]}
+                    onSelectDone={this.props.onAddParticipantSelected.bind(this)}
+                    positionMy="center top"
+                    positionAt="left bottom"
+                    arrowHeight={-32}
+                    selectFooter={true}
+                />
+            </Button>
         );
 
         //
@@ -254,12 +254,13 @@ export class ConversationRightArea extends MegaRenderMixin {
         const { pushSettingsValue, onPushSettingsToggled, onPushSettingsClicked } = this.props;
         const pushSettingsBtn = room.membersSetFromApi.members.hasOwnProperty(u_handle) && !anonymouschat && (
             <div className="push-settings">
+                {AVseperator}
                 <Button
                     className="link-button light push-settings-button"
-                    icon={"small-icon colorized " + (
+                    icon={"sprite-fm-mono " + (
                         pushSettingsValue || pushSettingsValue === 0 ?
-                            "muted" :
-                            "mute"
+                            "icon-notification-off-filled" :
+                            "icon-notification-filled"
                     )}
                     label={l[16709] /* `Mute chat` */}
                     secondLabel={(() => {
@@ -286,6 +287,7 @@ export class ConversationRightArea extends MegaRenderMixin {
                     }}
                     onClick={() => onPushSettingsClicked()}>
                 </Button>
+                {AVseperator}
             </div>
         );
 
@@ -294,11 +296,12 @@ export class ConversationRightArea extends MegaRenderMixin {
         // ----------------------------------------------------------------------
 
         let retentionTime = room.retentionTime ? secondsToDays(room.retentionTime) : 0;
-        const BASE_CLASSNAME = 'dropdown-item link-button light';
+        const BASE_CLASSNAME = 'dropdown-item link-button';
         const ELEM_CLASSNAME = `${BASE_CLASSNAME} retention-history-menu__list__elem`;
-        const ELEM_CLASSNAME_ACTIVE = `${BASE_CLASSNAME} retention-history-menu__list__elem--checked`;
+        const ICON_ACTIVE = <i className="sprite-fm-mono icon-check" />;
         const retentionHistoryBtn = <Button
-            className="link-button colorized light history-retention-btn"
+            className="link-button light history-retention-btn"
+            icon="sprite-fm-mono icon-recents-filled"
             label={l[23436]}
             disabled={!room.iAmOperator() || room.isReadOnly()}
             secondLabel={room.getRetentionLabel()}
@@ -312,38 +315,37 @@ export class ConversationRightArea extends MegaRenderMixin {
                     horizOffset={-205}>
                     <div className="retention-history-menu__list">
                         <div
-                            className={retentionTime === 0 ? ELEM_CLASSNAME_ACTIVE : ELEM_CLASSNAME}
+                            className={ELEM_CLASSNAME}
                             onClick={() => this.setRetention(room, 0)}>
-                            {l[7070]}
+                            <span>{l[7070]}</span>
+                            {retentionTime === 0 && ICON_ACTIVE}
                         </div>
                         <div
-                            className={retentionTime === 1 ? ELEM_CLASSNAME_ACTIVE : ELEM_CLASSNAME}
+                            className={ELEM_CLASSNAME}
                             onClick={() => this.setRetention(room, daysToSeconds(1))}>
-                            {l[23437]}
+                            <span>{l[23437]}</span>
+                            {retentionTime === 1 && ICON_ACTIVE}
                         </div>
                         <div
-                            className={retentionTime === 7 ? ELEM_CLASSNAME_ACTIVE : ELEM_CLASSNAME}
+                            className={ELEM_CLASSNAME}
                             onClick={() => this.setRetention(room, daysToSeconds(7))}>
-                            {l[23438]}
+                            <span>{l[23438]}</span>
+                            {retentionTime === 7 && ICON_ACTIVE}
                         </div>
                         <div
-                            className={
-                                retentionTime === 30 ? ELEM_CLASSNAME_ACTIVE : ELEM_CLASSNAME
-                            }
+                            className={ELEM_CLASSNAME}
                             onClick={() => this.setRetention(room, daysToSeconds(30))}>
-                            {l[23439]}
+                            <span>{l[23439]}</span>
+                            {retentionTime === 30 && ICON_ACTIVE}
                         </div>
                         <div
-                            className={
-                                [0, 1, 7, 30].indexOf(retentionTime) === -1 ?
-                                    ELEM_CLASSNAME_ACTIVE :
-                                    ELEM_CLASSNAME
-                            }
+                            className={ELEM_CLASSNAME}
                             onClick={() => {
                                 $(document).trigger('closeDropdowns');
                                 self.props.onHistoryRetentionConfig();
                             }}>
-                            {l[23440]}
+                            <span>{l[23440]}</span>
+                            {[0, 1, 7, 30].indexOf(retentionTime) === -1 && ICON_ACTIVE}
                         </div>
                     </div>
                 </Dropdown> :
@@ -392,7 +394,7 @@ export class ConversationRightArea extends MegaRenderMixin {
                         {room.type === "public" && room.observers > 0 ? <div className="accordion-text observers">
                             {l[20466]}
                             <span className="observers-count">
-                                <i className="tiny-icon eye"></i>
+                                <i className="sprite-fm-mono icon-eye-reveal" />
                                 {room.observers}
                             </span>
                         </div> : <div></div>}
@@ -403,7 +405,6 @@ export class ConversationRightArea extends MegaRenderMixin {
                             {addParticipantBtn}
                             {startAudioCallButton}
                             {startVideoCallButton}
-                            {AVseperator}
                             {
                                 room.type == "group" || room.type == "public" ?
                                 (
@@ -416,7 +417,7 @@ export class ConversationRightArea extends MegaRenderMixin {
                                                 self.props.onRenameClicked();
                                              }
                                     }}>
-                                        <i className="small-icon colorized writing-pen"></i>
+                                        <i className="sprite-fm-mono icon-rename"></i>
                                         <span>{l[9080]}</span>
                                     </div>
                                 ) : null
@@ -432,7 +433,7 @@ export class ConversationRightArea extends MegaRenderMixin {
 
                                                  self.props.onGetManageChatLinkClicked();
                                              }}>
-                                            <i className="small-icon blue-chain colorized"></i>
+                                            <i className="sprite-fm-mono icon-link-filled"></i>
                                             <span>{l[20481]}</span>
                                         </div>
                                     ) : null
@@ -450,15 +451,16 @@ export class ConversationRightArea extends MegaRenderMixin {
 
                                                  self.props.onJoinViaPublicLinkClicked();
                                              }}>
-                                            <i className="small-icon writing-pen"></i>
+                                            <i className="sprite-fm-mono icon-rename"></i>
                                             <span>{l[20597]}</span>
                                         </div>
                                     ) : null
                             }
 
+                            {AVseperator}
                             <Button
                                 className="link-button light dropdown-element"
-                                icon="rounded-grey-up-arrow colorized"
+                                icon="sprite-fm-mono icon-upload-filled"
                                 label={l[23753]}
                                 disabled={room.isReadOnly()}
                                 >
@@ -472,15 +474,15 @@ export class ConversationRightArea extends MegaRenderMixin {
                                         {l[23753] ? l[23753] : "Send..."}
                                     </div>
                                     <DropdownItem
-                                        className="link-button light"
-                                        icon="grey-cloud colorized"
+                                        className="link-button"
+                                        icon="sprite-fm-mono icon-cloud-drive"
                                         label={l[19794] ? l[19794] : "My Cloud Drive"}
                                         onClick={() => {
                                             self.props.onAttachFromCloudClicked();
                                         }} />
                                     <DropdownItem
-                                        className="link-button light"
-                                        icon="grey-computer colorized"
+                                        className="link-button"
+                                        icon="sprite-fm-mono icon-pc"
                                         label={l[19795] ? l[19795] : "My computer"}
                                         onClick={() => {
                                             self.props.onAttachFromComputerClicked();
@@ -488,10 +490,7 @@ export class ConversationRightArea extends MegaRenderMixin {
                                 </Dropdown>
                             </Button>
 
-                            {AVseperator}
                             {pushSettingsBtn}
-                            {pushSettingsBtn && AVseperator}
-
                             {endCallButton}
 
                             <div className={"link-button light " + (
@@ -505,7 +504,7 @@ export class ConversationRightArea extends MegaRenderMixin {
                                          self.props.onTruncateClicked();
                                      }
                                  }}>
-                                <i className="small-icon colorized clear-arrow"></i>
+                                <i className="sprite-fm-mono icon-remove" />
                                 <span>{l[8871]}</span>
                             </div>
 
@@ -515,7 +514,7 @@ export class ConversationRightArea extends MegaRenderMixin {
                                 (room.iAmOperator() && (room.type === "public")) ?
                                     (
                                         <div className="chat-enable-key-rotation-paragraph">
-                                            <div className="chat-button-seperator"></div>
+                                            {AVseperator}
                                             <div className={
                                                 "link-button light " +
                                                 (Object.keys(room.members).length > MAX_USERS_CHAT_PRIVATE ?
@@ -531,7 +530,7 @@ export class ConversationRightArea extends MegaRenderMixin {
                                                 }
                                                 self.props.onMakePrivateClicked();
                                             }}>
-                                                <i className="small-icon yellow-key colorized"></i>
+                                                <i className="sprite-fm-mono icon-key" />
                                                 <span>{l[20623]}</span>
                                             </div>
                                             <p>
@@ -541,7 +540,7 @@ export class ConversationRightArea extends MegaRenderMixin {
                                     ) : null
                             }
 
-                            <div className="chat-button-seperator"></div>
+                            {AVseperator}
                             {
                                 <div className={"link-button light" + (
                                     !(
@@ -566,8 +565,12 @@ export class ConversationRightArea extends MegaRenderMixin {
                                              }
                                          }
                                      }}>
-                                    <i className={"small-icon colorized " +  ((room.isArchived()) ?
-                                        "unarchive" : "archive")}></i>
+                                    <i
+                                        className={`
+                                            sprite-fm-mono
+                                            ${room.isArchived() ? 'icon-unarchive' : 'icon-archive'}`
+                                        }
+                                    />
                                     <span>{room.isArchived() ? l[19065] : l[16689]}</span>
                                 </div>
                             }
@@ -588,7 +591,7 @@ export class ConversationRightArea extends MegaRenderMixin {
                                              self.props.onLeaveClicked();
                                          }
                                      }}>
-                                    <i className="small-icon rounded-stop colorized"></i>
+                                    <i className="sprite-fm-mono icon-disabled-filled" />
                                     <span>{l[8633]}</span>
                                 </div>) : null
                             }
@@ -603,7 +606,7 @@ export class ConversationRightArea extends MegaRenderMixin {
                                             self.props.onCloseClicked();
                                         }
                                     }}>
-                                        <i className="small-icon rounded-stop colorized"></i>
+                                        <i className="sprite-fm-mono icon-dialog-close" />
                                         <span>{l[148]}</span>
                                     </div>
                                 ) : null
@@ -743,7 +746,7 @@ export class ConversationPanel extends MegaRenderMixin {
 
         if (self.props.chatRoom.type === "private") {
             var otherContactHash = self.props.chatRoom.getParticipantsExceptMe()[0];
-            if (M.u[otherContactHash]) {
+            if (otherContactHash in M.u) {
                 self._privateChangeListener = M.u[otherContactHash].addChangeListener(function() {
                     if (!self.isMounted()) {
                         // theoretical chance of leaking - M.u[...] removed before the listener is removed
@@ -862,7 +865,7 @@ export class ConversationPanel extends MegaRenderMixin {
         }
         if (this._privateChangeListener) {
             var otherContactHash = self.props.chatRoom.getParticipantsExceptMe()[0];
-            if (M.u[otherContactHash]) {
+            if (otherContactHash in M.u) {
                 M.u[otherContactHash].removeChangeListener(this._privateChangeListener);
                 delete this._privateChangeListener;
             }
@@ -988,8 +991,10 @@ export class ConversationPanel extends MegaRenderMixin {
                 $('.chat-textarea-block', $container).outerHeight()
             )
         );
+        var scrollBlockHeightOffset = 8;
 
-        if (scrollBlockHeight != self.$messages.outerHeight()) {
+        if (scrollBlockHeight !== self.$messages.outerHeight()) {
+            scrollBlockHeight -= scrollBlockHeightOffset;
             self.$messages.css('height', scrollBlockHeight);
             $('.messages.main-pad', self.$messages).css('min-height', scrollBlockHeight);
             self.refreshUI(true);
@@ -1209,7 +1214,7 @@ export class ConversationPanel extends MegaRenderMixin {
                         <div className="info">
                             {l[8080]}
                             <p>
-                                <i className="semi-big-icon grey-lock" />
+                                <i className="sprite-fm-mono icon-lock" />
                                 <span dangerouslySetInnerHTML={{
                                     __html: l[8540]
                                         .replace("[S]", "<strong>")
@@ -1217,7 +1222,7 @@ export class ConversationPanel extends MegaRenderMixin {
                                 }} />
                             </p>
                             <p>
-                                <i className="semi-big-icon grey-tick" />
+                                <i className="sprite-fm-mono icon-accept" />
                                 <span dangerouslySetInnerHTML={{
                                     __html: l[8539]
                                         .replace("[S]", "<strong>")
@@ -1516,33 +1521,38 @@ export class ConversationPanel extends MegaRenderMixin {
                 });
                 self.setState({'nonLoggedInJoinChatDialog': false});
             };
-            nonLoggedInJoinChatDialog = <ModalDialogsUI.ModalDialog
-                title={l[20596]}
-                className={"fm-dialog chat-links-preview-desktop"}
-                chatRoom={room}
-                onClose={closeJoinDialog}
-            >
-                <div className="fm-dialog-body">
-                    <div className="chatlink-contents">
-                        <div className="huge-icon group-chat"></div>
-                        <h3>
-                            <utils.EmojiFormattedContent>
-                                {room.topic ? room.getRoomTitle() : " "}
-                            </utils.EmojiFormattedContent>
-                        </h3>
-                        <h5>{usersCount? l[20233].replace("%s", usersCount) : " "}</h5>
-
-                        <p>{l[20595]}</p>
-
-                        <a className="join-chat" onClick={function(e) {
-                            closeJoinDialog();
-                            megaChat.loginOrRegisterBeforeJoining(room.publicChatHandle);
-                        }}>{l[20597]}</a>
-
-                        <a className="not-now" onClick={closeJoinDialog}>{l[18682]}</a>
-                    </div>
-                </div>
-            </ModalDialogsUI.ModalDialog>;
+            nonLoggedInJoinChatDialog =
+                <ModalDialogsUI.ModalDialog
+                    title={l[20596]}
+                    className={"mega-dialog chat-links-preview-desktop dialog-template-graphic"}
+                    chatRoom={room}
+                    onClose={closeJoinDialog}>
+                    <section className="content">
+                        <div className="chatlink-contents">
+                            <div className="huge-icon group-chat" />
+                            <h3>
+                                <utils.EmojiFormattedContent>
+                                    {room.topic ? room.getRoomTitle() : " "}
+                                </utils.EmojiFormattedContent>
+                            </h3>
+                            <h5>{usersCount ? l[20233].replace("%s", usersCount) : " "}</h5>
+                            <p>{l[20595]}</p>
+                        </div>
+                    </section>
+                    <footer>
+                        <div className="bottom-buttons">
+                            <button
+                                className="mega-button positive right"
+                                onClick={() => {
+                                    closeJoinDialog();
+                                    megaChat.loginOrRegisterBeforeJoining(room.publicChatHandle);
+                                }}>
+                                {l[20597]}
+                            </button>
+                            <button className="mega-button right" onClick={closeJoinDialog}>{l[18682]}</button>
+                        </div>
+                    </footer>
+                </ModalDialogsUI.ModalDialog>;
         }
 
         var chatLinkDialog;
@@ -1561,26 +1571,35 @@ export class ConversationPanel extends MegaRenderMixin {
             privateChatDialog = (
                 <ModalDialogsUI.ModalDialog
                     title={l[20594]}
-                    className="fm-dialog create-private-chat"
+                    className="mega-dialog create-private-chat"
                     chatRoom={room}
-                    onClose={onClose}>
-                    <div className="create-private-chat-content-block fm-dialog-body">
-                        <i className="huge-icon lock" />
-                        <div className="dialog-body-text">
-                            <strong>{l[20590]}</strong>
-                            <br />
-                            <span>{l[20591]}</span>
+                    onClose={onClose}
+                    dialogType="action"
+                    dialogName="create-private-chat-dialog">
+
+                    <section className="content">
+                        <div className="content-block">
+                            <i className="huge-icon lock" />
+                            <div className="dialog-body-text">
+                                <strong>{l[20590]}</strong>
+                                <br />
+                                <span>{l[20591]}</span>
+                            </div>
                         </div>
-                        <div className="clear" />
-                        <div
-                            className="big-red-button"
-                            onClick={() => {
-                                this.props.chatRoom.switchOffPublicMode();
-                                onClose();
-                            }}>
-                            <div className="big-btn-txt">{l[20593]}</div>
+                    </section>
+
+                    <footer>
+                        <div className="footer-container">
+                            <button
+                                className="mega-button positive large"
+                                onClick={() => {
+                                    this.props.chatRoom.switchOffPublicMode();
+                                    onClose();
+                                }}>
+                                <span>{l[20593]}</span>
+                            </button>
                         </div>
-                    </div>
+                    </footer>
                 </ModalDialogsUI.ModalDialog>
             );
         }
@@ -1590,10 +1609,9 @@ export class ConversationPanel extends MegaRenderMixin {
             var excludedContacts = [];
             if (room.type == "private") {
                 room.getParticipantsExceptMe().forEach(function(userHandle) {
-                    var contact = M.u[userHandle];
-                    if (contact) {
+                    if (userHandle in M.u) {
                         excludedContacts.push(
-                            contact.u
+                            M.u[userHandle].u
                         );
                     }
                 });
@@ -1618,7 +1636,9 @@ export class ConversationPanel extends MegaRenderMixin {
         if (self.state.confirmDeleteDialog === true) {
             confirmDeleteDialog = <ModalDialogsUI.ConfirmDialog
                 chatRoom={room}
+                dialogType="main"
                 title={l[8004]}
+                subtitle={l[8879]}
                 name="delete-message"
                 pref="1"
                 onClose={() => {
@@ -1682,21 +1702,19 @@ export class ConversationPanel extends MegaRenderMixin {
 
                 }}
             >
-                <div className="fm-dialog-content">
 
-                    <div className="dialog secondary-header">
-                        {l[8879]}
+                <section className="content">
+                    <div className="content-block">
+                        <GenericConversationMessage
+                            className=" dialog-wrapper"
+                            message={self.state.messageToBeDeleted}
+                            hideActionButtons={true}
+                            initTextScrolling={true}
+                            dialog={true}
+                            chatRoom={self.props.chatRoom}
+                        />
                     </div>
-
-                    <GenericConversationMessage
-                        className=" dialog-wrapper"
-                        message={self.state.messageToBeDeleted}
-                        hideActionButtons={true}
-                        initTextScrolling={true}
-                        dialog={true}
-                        chatRoom={self.props.chatRoom}
-                    />
-                </div>
+                </section>
             </ModalDialogsUI.ConfirmDialog>
         }
 
@@ -1705,6 +1723,8 @@ export class ConversationPanel extends MegaRenderMixin {
             confirmDeleteDialog = <ModalDialogsUI.ConfirmDialog
                 chatRoom={room}
                 title={l[20905]}
+                subtitle={l[20906]}
+                icon="sprite-fm-uni icon-question"
                 name="paste-image-chat"
                 pref="2"
                 onClose={() => {
@@ -1736,30 +1756,23 @@ export class ConversationPanel extends MegaRenderMixin {
                     URL.revokeObjectURL(meta[2]);
                 }}
             >
-                <div className="fm-dialog-content">
-
-                    <div className="dialog secondary-header">
-                        {l[20906]}
-                    </div>
-
-                    <img
-                        src={self.state.pasteImageConfirmDialog[2]}
-                        style={{
-                            maxWidth: "90%",
-                            height: "auto",
-                            maxHeight: $(document).outerHeight() * 0.3,
-                            margin: '10px auto',
-                            display: 'block',
-                            border: '1px solid #ccc',
-                            borderRadius: '4px'
-                        }}
-                        onLoad={function(e) {
-                            $(e.target).parents('.paste-image-chat').position({
-                                of: $(document.body)
-                            });
-                        }}
-                    />
-                </div>
+                <img
+                    src={self.state.pasteImageConfirmDialog[2]}
+                    style={{
+                        maxWidth: "90%",
+                        height: "auto",
+                        maxHeight: $(document).outerHeight() * 0.3,
+                        margin: '10px auto',
+                        display: 'block',
+                        border: '1px solid #ccc',
+                        borderRadius: '4px'
+                    }}
+                    onLoad={function(e) {
+                        $(e.target).parents('.paste-image-chat').position({
+                            of: $(document.body)
+                        });
+                    }}
+                />
             </ModalDialogsUI.ConfirmDialog>
         }
 
@@ -1794,6 +1807,8 @@ export class ConversationPanel extends MegaRenderMixin {
             confirmDeleteDialog = <ModalDialogsUI.ConfirmDialog
                 chatRoom={room}
                 title={l[8871]}
+                subtitle={l[8881]}
+                icon="sprite-fm-uni icon-question"
                 name="truncate-conversation"
                 pref="3"
                 dontShowAgainCheckbox={false}
@@ -1809,20 +1824,15 @@ export class ConversationPanel extends MegaRenderMixin {
                         'truncateDialog': false
                     });
                 }}
-            >
-                <div className="fm-dialog-content">
-
-                    <div className="dialog secondary-header">
-                        {l[8881]}
-                    </div>
-                </div>
-            </ModalDialogsUI.ConfirmDialog>
+            />;
         }
 
         if (self.state.archiveDialog === true) {
             confirmDeleteDialog = <ModalDialogsUI.ConfirmDialog
                 chatRoom={room}
                 title={l[19068]}
+                subtitle={l[19069]}
+                icon="sprite-fm-uni icon-question"
                 name="archive-conversation"
                 pref="4"
                 onClose={() => {
@@ -1837,19 +1847,14 @@ export class ConversationPanel extends MegaRenderMixin {
                         'archiveDialog': false
                     });
                 }}
-            >
-                <div className="fm-dialog-content">
-
-                    <div className="dialog secondary-header">
-                        {l[19069]}
-                    </div>
-                </div>
-            </ModalDialogsUI.ConfirmDialog>
+            />;
         }
         if (self.state.unarchiveDialog === true) {
             confirmDeleteDialog = <ModalDialogsUI.ConfirmDialog
                 chatRoom={room}
                 title={l[19063]}
+                subtitle={l[19064]}
+                icon="sprite-fm-uni icon-question"
                 name="unarchive-conversation"
                 pref="5"
                 onClose={() => {
@@ -1864,14 +1869,7 @@ export class ConversationPanel extends MegaRenderMixin {
                         'unarchiveDialog': false
                     });
                 }}
-            >
-                <div className="fm-dialog-content">
-
-                    <div className="dialog secondary-header">
-                        {l[19064]}
-                    </div>
-                </div>
-            </ModalDialogsUI.ConfirmDialog>
+            />;
         }
         if (self.state.renameDialog === true) {
             var onEditSubmit = function(e) {
@@ -1889,23 +1887,11 @@ export class ConversationPanel extends MegaRenderMixin {
                 chatRoom={room}
                 title={l[9080]}
                 name="rename-group"
-                className="chat-rename-dialog"
+                className="chat-rename-dialog dialog-template-main"
                 onClose={() => {
                     self.setState({'renameDialog': false, 'renameDialogValue': undefined});
                 }}
                 buttons={[
-                    {
-                        "label": l[61],
-                        "key": "rename",
-                        "className": (
-                            $.trim(self.state.renameDialogValue).length === 0 ||
-                            self.state.renameDialogValue === self.props.chatRoom.getRoomTitle() ?
-                                "disabled" : ""
-                        ),
-                        "onClick": function(e) {
-                            onEditSubmit(e);
-                        }
-                    },
                     {
                         "label": l[1686],
                         "key": "cancel",
@@ -1915,30 +1901,44 @@ export class ConversationPanel extends MegaRenderMixin {
                             e.stopPropagation();
                         }
                     },
+                    {
+                        "label": l[61],
+                        "key": "rename",
+                        "className": (
+                            $.trim(self.state.renameDialogValue).length === 0 ||
+                            self.state.renameDialogValue === self.props.chatRoom.getRoomTitle() ?
+                                "positive disabled" : "positive"
+                        ),
+                        "onClick": function(e) {
+                            onEditSubmit(e);
+                        }
+                    },
                 ]}>
-                <div className="fm-dialog-content">
-                    <div className="dialog secondary-header">
-                        <div className="rename-input-bl">
-                            <input
-                                type="text"
-                                className="chat-rename-group-dialog"
-                                name="newTopic"
-                                value={renameDialogValue}
-                                maxLength="30"
-                                onChange={(e) => {
-                                    self.setState({
-                                        'renameDialogValue': e.target.value.substr(0, 30)
-                                    });
-                                }}
-                                onKeyUp={(e) => {
-                                    if (e.which === 13) {
-                                        onEditSubmit(e);
-                                    }
-                                }}
-                            />
+                <section className="content">
+                    <div className="content-block">
+                        <div className="dialog secondary-header">
+                            <div className="rename-input-bl">
+                                <input
+                                    type="text"
+                                    className="chat-rename-group-dialog"
+                                    name="newTopic"
+                                    value={renameDialogValue}
+                                    maxLength="30"
+                                    onChange={(e) => {
+                                        self.setState({
+                                            'renameDialogValue': e.target.value.substr(0, 30)
+                                        });
+                                    }}
+                                    onKeyUp={(e) => {
+                                        if (e.which === 13) {
+                                            onEditSubmit(e);
+                                        }
+                                    }}
+                                />
+                            </div>
                         </div>
                     </div>
-                </div>
+                </section>
             </ModalDialogsUI.ModalDialog>
         }
 
@@ -1955,7 +1955,9 @@ export class ConversationPanel extends MegaRenderMixin {
         var topicInfo = null;
         if (self.props.chatRoom.type === "group" || self.props.chatRoom.type === "public") {
             topicInfo = <div className="chat-topic-info">
-                <div className="chat-topic-icon"></div>
+                <div className="chat-topic-icon">
+                    <i className="sprite-fm-uni icon-chat-group" />
+                </div>
                 <div className="chat-topic-text">
                     <span className="txt">
                         <utils.EmojiFormattedContent>{
@@ -1992,6 +1994,7 @@ export class ConversationPanel extends MegaRenderMixin {
                 }}
             />;
         }
+
 
         var startCallDisabled = isStartCallDisabled(room);
         var startCallButtonClass = startCallDisabled ? " disabled" : "";
@@ -2151,19 +2154,23 @@ export class ConversationPanel extends MegaRenderMixin {
                             <Button
                                 className="right"
                                 disableCheckingVisibility={true}
-                                icon={"small-icon " + (
-                                    !room.megaChat.chatUIFlags.convPanelCollapse ?
-                                        "arrow-in-square" :
-                                        "arrow-in-square active"
-                                )}
+                                icon="sprite-fm-mono icon-info"
                                 onClick={() => room.megaChat.toggleUIFlag('convPanelCollapse')} />
                             <Button
-                                className="button right"
-                                icon={`small-icon small-icon video-call colorized ${startCallButtonClass}`}
+                                className={`
+                                    button
+                                    right
+                                    ${startCallDisabled ? 'disabled' : ''}
+                                `}
+                                icon="sprite-fm-mono icon-video-call-filled"
                                 onClick={() => !startCallDisabled && room.startVideoCall()} />
                             <Button
-                                className="button right"
-                                icon={`small-icon small-icon audio-call colorized ${startCallButtonClass}`}
+                                className={`
+                                    button
+                                    right
+                                    ${startCallDisabled ? 'disabled' : ''}
+                                `}
+                                icon="sprite-fm-mono icon-phone"
                                 onClick={() => !startCallDisabled && room.startAudioCall()} />
                         </div>
                         {topicInfo}
@@ -2236,7 +2243,7 @@ export class ConversationPanel extends MegaRenderMixin {
                             ) ?
                         (
                         <div className="join-chat-block">
-                            <div className="join-chat-button"
+                            <div className="mega-button large positive"
                                 onClick={(e) => {
                                     if (anonymouschat) {
                                         clearTimeout(self.state.setNonLoggedInJoinChatDlgTrue);
@@ -2323,7 +2330,7 @@ export class ConversationPanel extends MegaRenderMixin {
                             >
                                     <Button
                                         className="popup-button left"
-                                        icon="small-icon grey-small-plus"
+                                        icon="sprite-fm-mono icon-add"
                                         disabled={room.isReadOnly()}
                                         >
                                         <Dropdown
@@ -2337,23 +2344,23 @@ export class ConversationPanel extends MegaRenderMixin {
                                                 {l[23753] ? l[23753] : "Send..."}
                                             </div>
                                             <DropdownItem
-                                                className="link-button light"
-                                                icon="grey-cloud colorized"
+                                                className="link-button"
+                                                icon="sprite-fm-mono icon-cloud-drive"
                                                 label={l[19794] ? l[19794] : "My Cloud Drive"}
                                                 onClick={(e) => {
                                                     self.setState({'attachCloudDialog': true});
                                             }} />
                                             <DropdownItem
-                                                className="link-button light"
-                                                icon="grey-computer colorized"
+                                                className="link-button"
+                                                icon="sprite-fm-mono icon-pc"
                                                 label={l[19795] ? l[19795] : "My computer"}
                                                 onClick={(e) => {
                                                     self.uploadFromComputer();
                                             }} />
-                                            <div className="chat-button-seperator"></div>
+                                            <hr />
                                             <DropdownItem
-                                                className="link-button light"
-                                                icon="square-profile colorized"
+                                                className="link-button"
+                                                icon="sprite-fm-mono icon-add-user"
                                                 label={l[8628]}
                                                 onClick={(e) => {
                                                     self.setState({'sendContactDialog': true});
@@ -2400,6 +2407,9 @@ export class ConversationPanels extends MegaRenderMixin {
         }
 
         if (megaChat.chats.length === 0) {
+            if (megaChat.routingSection !== "chat") {
+                return null;
+            }
             self._MuChangeListener = M.u.addChangeListener(() => self.safeForceUpdate());
             var contactsList = [];
             var contactsListOffline = [];
@@ -2417,8 +2427,8 @@ export class ConversationPanels extends MegaRenderMixin {
                 }
             }
             let emptyMessage = escapeHTML(l[8008]).replace("[P]", "<span>").replace("[/P]", "</span>");
-            let button = <div className="big-red-button new-chat-link"
-                onClick={() => $(document.body).trigger('startNewChatLink')}>{l[20638]}</div>;
+            let button = <button className="mega-button positive large new-chat-link"
+                onClick={() => $(document.body).trigger('startNewChatLink')}><span>{l[20638]}</span></button>;
 
             if (anonymouschat) {
                 button = null;

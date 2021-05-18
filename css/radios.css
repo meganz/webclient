@@ -1,0 +1,105 @@
+/* Radio */
+
+div.radioOn, div.radioOff {
+    border-radius: 100%;
+    box-shadow: inset 0 0 0 1px var(--radio-border-inactive);
+    cursor: pointer;
+    display: inline-block;
+    height: 18px;
+    margin: 1px 0;
+    -webkit-margin-end: 12px;
+    margin-inline-end: 12px;
+    position: relative;
+    vertical-align: top;
+    width: 18px;
+}
+div.radioOn.hidden,
+div.radioOff.hidden {
+    display: none;
+}
+div.radioOn {
+    box-shadow: none;
+}
+div.radioOff {
+    background: var(--radio-fill-inactive);
+}
+div.radioOn::before {
+    background: var(--radio-fill-active);
+    border-radius: 100%;
+    content: "";
+    height: 12px;
+    margin: 3px;
+    position: absolute;
+    width: 12px;
+}
+div.radioOn::after {
+    border-radius: 100%;
+    box-sizing: border-box;
+    box-shadow: inset 0 0 0 1px var(--radio-border-active);
+    content: "";
+    display: inline-block;
+    height: 100%;
+    width: 100%;
+}
+div.radioOff::after {
+    background: var(--radio-oval-fill);
+    border-radius: 100%;
+    content: "";
+    display: inline-block;
+    height: 4px;
+    margin: calc(50% - 2px);
+    width: 4px;
+}
+div.radioOn.small,
+div.radioOff.small {
+    width: 16px;
+    height: 16px;
+}
+div.radioOn.small::before,
+div.radioOff.small::before {
+    width: 10px;
+    height: 10px;
+}
+.radioOn input,
+.radioOff input {
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+    margin: 0;
+    position: absolute;
+    opacity: 0;
+    z-index: 1;
+    cursor: pointer;
+}
+.rtl .radioOn input,
+.rtl .radioOff input {
+    left: auto;
+    right: 0;
+}
+.radio-txt {
+    font: var(--text-body1);
+    color: var(--text-color-medium);
+    -webkit-padding-end: 28px;
+    padding-inline-end: 28px;
+    max-width: calc(100% - 31px);
+    box-sizing: border-box;
+    display: inline-block;
+    transition: 0.3s;
+    vertical-align: middle;
+}
+.radio-txt.small {
+    font: var(--text-body1);
+}
+.radio-txt.big {
+    font: var(--text-h3);
+}
+.radioOff input, .radioOn input {
+    opacity: 0;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    z-index: 1;
+    cursor: pointer;
+    margin: 0;
+}

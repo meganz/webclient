@@ -97,8 +97,8 @@ var exportPassword = {
             "use strict";
 
             // Cache dialog selector
-            this.$dialog = $('.fm-dialog.export-links-dialog', 'body');
-            this.$passwordDialog = $('.fm-dialog.set-password-dialog', 'body');
+            this.$dialog = $('.mega-dialog.export-links-dialog', 'body');
+            this.$passwordDialog = $('.mega-dialog.set-password-dialog', 'body');
 
             this.updatePasswordComponentsUI();
             this.updateLinkInputValues();
@@ -118,24 +118,13 @@ var exportPassword = {
 
             "use strict";
 
-            var $items = $('.export-links-dialog.item', this.$dialog);
+            var $items = $('.item', this.$dialog);
             var $protectedItems = $items.filter('.password-protect-link');
-            var $bottomBar = $('.export-links-dialog.bottom', this.$dialog);
-            var $setPasswordBtn = $('.default-white-button.password', this.$dialog);
-            var $removePasswordBtn = $('.default-white-button.remove', this.$dialog);
+            var $setPasswordBtn = $('button.password', this.$dialog);
+            var $setPasswordBtnSpan = $('span', $setPasswordBtn);
+            var $removePasswordBtn = $('button.remove', this.$dialog);
             var $checkboxWrap = $('.options .checkdiv', this.$dialog);
             var $checkbox = $('input', $checkboxWrap);
-
-            if ($items.length > 1) {
-
-                // Show bottom bar with Copy buttons if more than one link
-                $bottomBar.removeClass('hidden');
-            }
-            else {
-
-                // Hide bottom bar with Copy buttons if more than one link
-                $bottomBar.addClass('hidden');
-            }
 
             // Enable separate key option
             $checkbox.prop('disabled', false);
@@ -148,7 +137,8 @@ var exportPassword = {
                 $('.lock', $protectedItems).removeClass('hidden');
 
                 // Change Set password button state
-                $setPasswordBtn.addClass('encrypted').text(l[737]);
+                $setPasswordBtn.addClass('encrypted');
+                $setPasswordBtnSpan.text(l[737]);
 
                 // Hide Remove password button
                 $removePasswordBtn.removeClass('hidden');
@@ -164,7 +154,8 @@ var exportPassword = {
             else {
 
                 // Set paassword button initial state
-                $setPasswordBtn.removeClass('encrypted').text(l[17454]);
+                $setPasswordBtn.removeClass('encrypted');
+                $setPasswordBtnSpan.text(l[17454]);
 
                 // Hide Remove password button
                 $removePasswordBtn.addClass('hidden');
@@ -182,7 +173,7 @@ var exportPassword = {
             "use strict";
 
             var isSeparateKeys = $('.options .checkdiv input', this.$dialog).prop('checked');
-            var $items = $('.export-links-dialog.item:not(.password-protect-link)', this.$dialog);
+            var $items = $('.item:not(.password-protect-link)', this.$dialog);
 
             // Update not password protected Link input values
             $items.get().forEach(function(e) {
@@ -213,7 +204,7 @@ var exportPassword = {
 
             "use strict";
 
-            var $setPasswordBtn = $('.default-white-button.password', this.$dialog);
+            var $setPasswordBtn = $('button.password', this.$dialog);
 
             // On Set paassword click
             $setPasswordBtn.rebind('click.setPass', function() {
@@ -233,12 +224,12 @@ var exportPassword = {
 
             "use strict";
 
-            var $removePasswordBtn = $('.default-white-button.remove', this.$dialog);
+            var $removePasswordBtn = $('button.remove', this.$dialog);
 
             // On Remove password click
             $removePasswordBtn.rebind('click.removePass', function() {
 
-                var $items = $('.export-links-dialog.item', this.$dialog);
+                var $items = $('.item', this.$dialog);
 
                 // Set links and keys into text boxes
                 $items.removeClass('password-protect-link');
@@ -258,7 +249,7 @@ var exportPassword = {
 
             "use strict";
 
-            var $passwordIcon = $('.links-scroll .small-icon.lock', this.$dialog);
+            var $passwordIcon = $('.links-scroll .lock', this.$dialog);
             var $tip =  $('.dark-direct-tooltip.custom-html', this.$dialog);
             var $scrollBlock = $('.links-scroll', this.$dialog);
 
@@ -276,13 +267,13 @@ var exportPassword = {
                 $('.content i', $tip).rebind('click.showPass', function() {
                     var $this = $(this);
 
-                    if ($this.is('.white-eye')) {
-                        $this.removeClass('white-eye').addClass('white-crossed-eye');
+                    if ($this.hasClass('icon-eye-reveal')) {
+                        $this.removeClass('icon-eye-reveal').addClass('icon-eye-hidden');
                         $this.prev('input').attr('type', 'text');
                         $lockIcon.data('type', 'text');
                     }
                     else {
-                        $this.removeClass('white-crossed-eye').addClass('white-eye');
+                        $this.removeClass('icon-eye-hidden').addClass('icon-eye-reveal');
                         $this.prev('input').attr('type', 'password');
                         $lockIcon.removeData('type');
                     }
@@ -309,7 +300,7 @@ var exportPassword = {
                 var $tipContentBlock = $('.content', $tip);
                 var $input;
                 var passwordHtml = '<input type="password" value="" readonly>'
-                    + '<i class="small-icon dialog-sprite white-eye"></i>';
+                    + '<i class="sprite-fm-mono icon-eye-reveal"></i>';
 
                 // Fill tip content
                 $tipContentBlock.safeHTML(passwordHtml);
@@ -321,7 +312,7 @@ var exportPassword = {
                 // Show password if it has been showed before
                 if ($this.data('type') === 'text') {
                     $input.attr('type', 'text');
-                    $('i', $tipContentBlock).removeClass('white-eye').addClass('white-crossed-eye');
+                    $('i', $tipContentBlock).removeClass('icon-eye-reveal').addClass('icon-eye-hidden');
                 }
 
                 // Init Show password icon
@@ -346,9 +337,7 @@ var exportPassword = {
 
             // Hide tooltip on mouseout from lock icon
             $passwordIcon.rebind('mouseout.hidePassTip', function(e) {
-
-                if (!$(e.relatedTarget).is('.tooltip-arrow')) {
-
+                if (!$(e.relatedTarget).hasClass('icon-tooltip-arrow')) {
                     hidePasswordTip();
                 }
             });
@@ -369,7 +358,7 @@ var exportPassword = {
 
             var $dialog = this.$dialog;
             var $setPasswordDialog = this.$passwordDialog;
-            var $setPasswordBtn = $('.default-white-button.password', $dialog);
+            var $setPasswordBtn = $('button.password', $dialog);
             var $inputs = $('.pass-wrapper input', $setPasswordDialog);
             var $existingPassword = $('.existing-pass', $setPasswordDialog);
             var $existingPasswordInput = $('.existing-pass input', $setPasswordDialog);
@@ -422,7 +411,7 @@ var exportPassword = {
             }
 
             // Copy old (existing) password button
-            $('.button.copy', $existingPassword).rebind('click.copyTcClipboard', function() {
+            $('button.copy', $existingPassword).rebind('click.copyToClipboard', function() {
                 var existingPassword = $existingPasswordInput.val();
 
                 if (existingPassword) {
@@ -431,26 +420,26 @@ var exportPassword = {
             });
 
             // Add click handler to show old (existing) password icon
-            $('.small-icon', $existingPassword).rebind('click.showPass', function() {
+            $('i', $existingPassword).rebind('click.showPass', function() {
                 var $this = $(this);
 
-                if ($this.is('.grey-eye')) {
-                    $this.removeClass('grey-eye').addClass('grey-crossed-eye');
+                if ($this.hasClass('icon-eye-reveal')) {
+                    $this.removeClass('icon-eye-reveal').addClass('icon-eye-hidden');
                     $existingPasswordInput[0].type = 'text';
                 }
                 else {
-                    $this.removeClass('grey-crossed-eye').addClass('grey-eye');
+                    $this.removeClass('icon-eye-hidden').addClass('icon-eye-reveal');
                     $existingPasswordInput[0].type = 'password';
                 }
             });
 
             // Add click handler to the confirm button
-            $('.button.confirm', $setPasswordDialog).rebind('click.setPass', function() {
+            $('button.confirm', $setPasswordDialog).rebind('click.setPass', function() {
                 exportPassword.encrypt.startEncryption();
             });
 
             // Add click handler to the cancel button
-            $('.button.cancel',$setPasswordDialog).rebind('click.closePassDialog', function() {
+            $('button.cancel',$setPasswordDialog).rebind('click.closePassDialog', function() {
                 exportPassword.encrypt.hideSetPasswordDialog();
             });
 
@@ -459,10 +448,11 @@ var exportPassword = {
 
                 var $target = $(e.target);
 
-                if (!$target.is('.button.password')
-                    && !$target.is('.small-icon.lock')
-                    && !$target.parent().is('.button.password')
-                    && !$target.parent().parent().is('.dropdown.export ')) {
+                if (!$target.is('button.password')
+                    && !$target.is('i.lock')
+                    && !$target.parent().is('button.password')
+                    && !$target.parent().is('.dropdown.export')
+                    && !$target.parent().parent().is('.dropdown.export')) {
 
                     exportPassword.encrypt.hideSetPasswordDialog();
                 }
@@ -519,7 +509,7 @@ var exportPassword = {
             var $passwordStrengthField = $('.strength', this.$passwordDialog);
             var $passwordInput = $('input.enter-pass', this.$passwordDialog);
             var $confirmPasswordInput = $('input.confirm-pass', this.$passwordDialog);
-            var $encryptButton = $('.button.confirm', this.$passwordDialog);
+            var $encryptButton = $('button.confirm', this.$passwordDialog);
             var $inputWrapper = $passwordInput.parent();
 
             // Add keyup event to the password text field
@@ -726,13 +716,13 @@ var exportPassword = {
             var protectedUrl = getBaseUrl() + '/#P!' + dataBase64UrlEncoded;
 
             // Get the HTML block for this link by using the node handle
-            var $item = $('.export-links-dialog.item[data-node-handle="' + linkInfo.handle + '"]', this.$dialog);
+            var $item = $('.item[data-node-handle="' + linkInfo.handle + '"]', this.$dialog);
             var password =  $('.enter-pass', this.$passwordDialog).val();
 
             // Set the password into the text box and add a class for styling this block
             $('.item-link.link input', $item).val(protectedUrl);
             $('.item-link.key input', $item).val('');
-            $('.small-icon.lock', $item).data('pw', password);
+            $('i.lock', $item).data('pw', password);
             $item.addClass('password-protect-link');
 
             // Update Password buttons and links UI
@@ -828,7 +818,7 @@ var exportPassword = {
             "use strict";
 
             // Cache dialog selector
-            this.$dialog = $('.fm-dialog.password-dialog', 'body');
+            this.$dialog = $('.mega-dialog.password-dialog', 'body');
 
             // Show the dialog
             this.showDialog(page);
@@ -842,7 +832,7 @@ var exportPassword = {
 
             "use strict";
 
-            var $closeButton = $('.fm-dialog-close', this.$dialog);
+            var $closeButton = $('button.js-close', this.$dialog);
             var $decryptButton = $('.decrypt-link-button', this.$dialog);
             var $decryptButtonText = $('.decrypt-text', $decryptButton);
             var $decryptInput = $('.password-decrypt-input', this.$dialog);
@@ -1226,8 +1216,8 @@ var exportExpiry = {
 
         "use strict";
 
-        this.$dialog = $('.fm-dialog.export-links-dialog');
-        this.$datepickerBtn = $('.default-white-button.expiry', this.$dialog);
+        this.$dialog = $('.mega-dialog.export-links-dialog');
+        this.$datepickerBtn = $('button.expiry', this.$dialog);
 
         // If they are a pro user, enable expiry date
         if (u_attr.p) {
@@ -1248,7 +1238,7 @@ var exportExpiry = {
 
         var self = this;
         var $setDateInput = $('.set-date', self.$dialog);
-        var $removeDateBtn = $('.sub-button', self.$datepickerBtn);
+        var $removeDateBtn = $('.remove-date', self.$dialog);
         var $scroll = $('.links-scroll', this.$dialog);
         var minDate = new Date();
         var maxDate = new Date(2060, 11, 31);
@@ -1269,9 +1259,9 @@ var exportExpiry = {
             // Start date that should be displayed when datepiccker is shown
             startDate: minDate,
             // Content of Previous button
-            prevHtml: '<i class="medium-icon dialog-sprite right-arrow"></i>',
+            prevHtml: '<i class="sprite-fm-mono icon-arrow-right"></i>',
             // Content of Next button
-            nextHtml: '<i class="medium-icon dialog-sprite right-arrow"></i>',
+            nextHtml: '<i class="sprite-fm-mono icon-arrow-right"></i>',
             // First day in the week. 0 - Sun
             firstDay: 0,
             // Auto close daticker is date is selected
@@ -1409,7 +1399,7 @@ var exportExpiry = {
         var $setDateInput = $('.set-date', $setDateBtn);
         var datepicker = $setDateInput.datepicker().data('datepicker');
         var $btnLabel = $('.label', $setDateBtn);
-        var $removeDateBtn = $('.sub-button', $setDateBtn);
+        var $removeDateBtn = $('.remove-date', this.$dialog);
         var buttonLabel;
 
         // Clear active dates
@@ -1420,6 +1410,7 @@ var exportExpiry = {
 
             // Show Remove Expiry Date button
             $removeDateBtn.removeClass('hidden');
+            $setDateBtn.addClass('remove-button-visible');
 
             // Get button label
             $expiryLinks.get().forEach(function(e) {
@@ -1457,6 +1448,7 @@ var exportExpiry = {
             // Clear the date of any old entries and set "Set  expiry date" button label
             $btnLabel.text(l[8953]);
             $removeDateBtn.addClass('hidden');
+            $setDateBtn.removeClass('remove-button-visible');
         }
     },
 
@@ -1565,11 +1557,10 @@ var exportExpiry = {
         "use strict";
 
         // Find the right row
-        var $linkItem = $('.export-links-dialog.item[data-node-handle="' + nodeHandle + '"]', this.$dialog);
-        var $expiryIcon = $('.small-icon.calendar', $linkItem);
+        var $linkItem = $('.item[data-node-handle="' + nodeHandle + '"]', this.$dialog);
+        var $expiryIcon = $('i.calendar', $linkItem);
         var $setDateInput = $('input', $expiryIcon);
         var datepicker = $setDateInput.datepicker().data('datepicker');
-        var expiryString = '';
 
         // Clear active dates
         datepicker.selectedDates = [];
@@ -1615,8 +1606,8 @@ var exportExpiry = {
 
         "use strict";
 
-        var $linkItem = $('.export-links-dialog.item', this.$dialog);
-        var $expiryIcon = $('.small-icon.calendar', $linkItem);
+        var $linkItem = $('.item', this.$dialog);
+        var $expiryIcon = $('i.calendar', $linkItem);
         var $tip =  $('.dark-direct-tooltip.custom-html', this.$dialog);
         var $scrollBlock = $('.links-scroll', this.$dialog);
 
@@ -1713,26 +1704,28 @@ var exportExpiry = {
 
         /* jshint -W074 */
         var self = this;
-        var $linksDialog = $('.fm-dialog.export-links-dialog');
-        var $linksTab = $('.export-links-dialog.body', $linksDialog);
-        var $linksHeader = $('.export-links-dialog.header.get-link', $linksDialog);
-        var $linkContent = $('.export-links-dialog.links', $linksTab);
+        var $linksDialog = $('.mega-dialog.export-links-dialog');
+        var $linksTab = $('section .content-block.links-content', $linksDialog);
+        var $linksHeader = $('header .get-link', $linksDialog);
+        var $linkContent = $('.links-content.links', $linksDialog);
         var $keysCheckbox = $('.checkdiv input', $linksTab);
-        var $embedHeader  = $('.export-links-dialog.header.embed', $linksDialog);
-        var $embedTab = $('.embed-content-block', $linksDialog);
-        var $options = $('.export-links-dialog.options', $linksTab);
-        var $proOptions = $('.export-links-dialog.pro', $options);
+        var $embedHeader  = $('header .embed-header', $linksDialog);
+        var $embedTab = $('.embed-content', $linksDialog);
+        var $embedFooter = $('footer .embed-footer', $linksDialog);
+        var $options = $('.options', $linksTab);
+        var $proOptions = $('.pro', $options);
         var $setPasswordtem = $('.link-button.set-password', $linksTab);
         var $setExpiryItem = $('.link-button.set-exp-date', $linksTab);
         var $removeItem = $('.link-button.remove-item', $linksTab);
-        var $bottomBar = $('.export-links-dialog.bottom', $linksTab);
-        var $copyKeysButton = $('.button.copy.keys', $bottomBar);
+        var $bottomBar = $('.links-footer', $linksDialog);
+        var $copyKeysButton = $('button.copy.keys', $bottomBar);
+        var $footer = $('footer', $linksDialog);
         var $calendarIcons;
         var $lockIcons;
         var $cogIcons;
         var $datepickerInputs = $('.set-date', $linksDialog);
         var html = '';
-        var $scroll = $('.export-links-dialog.links-scroll', $linksTab);
+        var $scroll = $('.links-scroll', $linksTab);
         var links;
         var toastTxt;
         var linksNum;
@@ -1780,10 +1773,11 @@ var exportExpiry = {
         $scroll.safeHTML(html);
 
         // Hide embed tab
-        $('.export-links-dialog.header', $linksDialog).removeClass('active');
+        $('header h2', $linksDialog).removeClass('active');
         $('.preview-embed', $linksDialog).addClass('hidden');
         $embedHeader.addClass('hidden');
         $embedTab.addClass('hidden');
+        $embedFooter.addClass('hidden');
 
         // Show Export links tab
         $linksTab.removeClass('hidden');
@@ -1806,6 +1800,7 @@ var exportExpiry = {
         $proOptions.addClass('hidden disabled').unbind('click.openpro');
         $copyKeysButton.removeClass('disabled');
         $bottomBar.addClass('hidden');
+        $footer.addClass('empty');
 
         // Embed code handling
         var n = Object($.itemExport).length === 1 && M.d[$.itemExport[0]];
@@ -1905,20 +1900,31 @@ var exportExpiry = {
 
             (function _() {
 
-                $('.export-links-dialog.header', $linksDialog).removeClass('active').rebind('click.switchTab', _);
+                $('header .embed-header, header .get-link', $linksDialog)
+                    .removeClass('active').rebind('click.switchTab', _);
 
-                if (this === window || $(this).is('.header.embed')) {
+                if (this === window || $(this).is('.embed-header')) {
                     $embedHeader.addClass('active');
                     $embedTab.removeClass('hidden');
+                    $embedFooter.removeClass('hidden');
                     $linksTab.addClass('hidden');
+                    $bottomBar.addClass('hidden');
+                    $footer.removeClass('empty');
                 }
                 else {
                     $linksHeader.addClass('active');
                     $embedTab.addClass('hidden');
+                    $embedFooter.addClass('hidden');
                     $linksTab.removeClass('hidden');
-                }
+                    $bottomBar.removeClass('hidden');
 
-                dialogPositioning($linksDialog);
+                    if ($('.item', $linksTab).length >= 1) {
+                        $footer.addClass('empty');
+                    }
+                    else {
+                        $footer.removeClass('empty');
+                    }
+                }
 
             }).call($.itemExportEmbed ? window : {});
 
@@ -1953,8 +1959,6 @@ var exportExpiry = {
                     $('.video-thumbnail-container', $embedTab).removeClass('hidden');
                     $('.video-player-container', $embedTab).addClass('hidden').text('');
                 }
-
-                $linksDialog.css('margin-top', $embedTab.outerHeight() / 2 * -1);
             });
 
             // Let's hide it for now...
@@ -1965,6 +1969,19 @@ var exportExpiry = {
         else {
             // Remove special Embed class
             $linksDialog.removeClass('embed');
+
+            if ($('.item', $linksDialog).length > 1) {
+
+                // Show bottom bar with Copy buttons if more than one link
+                $bottomBar.removeClass('hidden');
+                $footer.removeClass('empty');
+            }
+            else {
+
+                // Hide bottom bar with Copy buttons if only one link
+                $bottomBar.addClass('hidden');
+                $footer.addClass('empty');
+            }
         }
 
         // Show export dialog
@@ -1978,16 +1995,11 @@ var exportExpiry = {
             Ps.initialize($scroll[0]);
             $scroll.scrollTop(0);
 
-            // Dialog repositioning
-            onIdle(function() {
-                dialogPositioning($linksDialog);
-            });
-
             return $linksDialog;
         });
 
         // Close dialog button
-        $('.fm-dialog-close', $linksDialog).rebind('click.closeDialog', function() {
+        $('button.js-close', $linksDialog).rebind('click.closeDialog', function() {
             self.linksDialog(1);
         });
 
@@ -1996,20 +2008,20 @@ var exportExpiry = {
 
             var isChecked = this.checked;
             var $checkboxWrap = $(this).parent();
-            var $bottomBar = $('.export-links-dialog.bottom', $linksTab);
+            var $bottomBar = $('.links-footer', $linksDialog);
 
             // Change chekcbox state and adapt CopyToClipboard buttons
             if (isChecked) {
                 $checkboxWrap.removeClass('checkboxOff').addClass('checkboxOn');
                 $linkContent.addClass('separately');
-                $('.copy.button.links', $bottomBar).text(l[23625]);
-                $('.copy.button.keys', $bottomBar).removeClass('hidden');
+                $('button.copy.links span', $bottomBar).text(l[23625]);
+                $('button.copy.keys', $bottomBar).removeClass('hidden');
             }
             else {
                 $checkboxWrap.removeClass('checkboxOn').addClass('checkboxOff');
                 $linkContent.removeClass('separately');
-                $('.copy.button.links', $bottomBar).text(l[20840]);
-                $('.copy.button.keys', $bottomBar).addClass('hidden');
+                $('button.copy.links span', $bottomBar).text(l[20840]);
+                $('button.copy.keys', $bottomBar).addClass('hidden');
             }
 
             // Update Link input values
@@ -2037,10 +2049,10 @@ var exportExpiry = {
         });
 
         // Copy all links/keys to clipboard
-        $('.copy.button', $linksDialog).rebind('click.copyToClipboard', function() {
+        $('button.copy', $linksDialog).rebind('click.copyToClipboard', function() {
 
             var $this = $(this);
-            var $links = $('.item', this.$dialog);
+            var $links = $('.item', $linksDialog);
             var $item = $this.hasClass('current') ? $this.closest('.item') : undefined;
             var pwProtectedNum = $links.filter('.password-protect-link').length;
             var mode = $this.hasClass('keys') ? 'keys' : undefined;
@@ -2051,7 +2063,7 @@ var exportExpiry = {
             }
 
             // If Copy  button locates in Embed tab
-            if ($('.export-links-dialog.embed', $linksDialog).hasClass('active')) {
+            if ($('.embed-header', $linksDialog).hasClass('active')) {
                 toastTxt = l[371];
                 data =  $('.code-field .code', $linksDialog).text();
             }
@@ -2084,7 +2096,7 @@ var exportExpiry = {
 
                 var $this = $(this);
                 var $dropdown = $('.dropdown.export', $linksTab);
-                var itemsLength = $('.export-links-dialog.item', $linksTab).length;
+                var itemsLength = $('.item', $linksTab).length;
                 var $currentItem = $this.closest('.item');
                 var expiryLabel = $('.calendar.hidden', $currentItem).length ? l[8953] : l[23665];
                 var passwordLabel = $('.lock.hidden', $currentItem).length ? l[17454] : l[23666];
@@ -2155,9 +2167,6 @@ var exportExpiry = {
 
                     // Update common Set Expiry Date button
                     exportExpiry.updateExpiryButtons();
-
-                    // Change dialog position
-                    dialogPositioning($linksDialog);
                 };
 
                 // Show confirmartion dialog if handle is media
@@ -2230,6 +2239,7 @@ var exportExpiry = {
             if (Object($.itemExport).length > 1) {
 
                 $bottomBar.removeClass('hidden');
+                $footer.removeClass('empty');
             }
         }
         // Init FREE options
@@ -2287,10 +2297,10 @@ var exportExpiry = {
         "use strict";
 
         var links = [];
-        var $dialog = $('.fm-dialog.export-links-dialog', 'body');
+        var $dialog = $('.mega-dialog.export-links-dialog', 'body');
 
         if (!$items) {
-            $items = $('.export-links-dialog.item', $dialog);
+            $items = $('.item', $dialog);
         }
 
         // Otherwise add all regular links
@@ -2388,38 +2398,42 @@ var exportExpiry = {
             }
         }
 
-        html = '<div class="export-links-dialog item" data-node-handle="' + nodeHandle + '">'
-             +      '<div class="export-links-dialog icons">'
-             +          '<i class="small-icon dialog-sprite cog"></i>'
-             +          '<i class="small-icon context-sprite lock hidden"></i>'
-             +          '<i class="small-icon context-sprite calendar hidden">'
+        html = '<div class="item" data-node-handle="' + nodeHandle + '">'
+             +      '<div class="icons">'
+             +          '<i class="sprite-fm-theme icon-settings cog"></i>'
+             +          '<i class="sprite-fm-uni icon-lock lock hidden"></i>'
+             +          '<i class="sprite-fm-uni icon-calendar calendar hidden">'
              +              '<input type="text" class="set-date" data-node-handle="' + nodeHandle + '">'
              +          '</i>'
              +      '</div>'
              +      '<div class="transfer-filetype-icon ' + fileIcon(item) + '" ></div>'
-             +      '<div class="export-links-dialog item-title">' + htmlentities(item.name) + '</div>'
-             +      '<div class="export-links-dialog item-size">' + fileSize + '</div>'
+             +      '<div class="item-title">' + htmlentities(item.name) + '</div>'
+             +      '<div class="item-size">' + fileSize + '</div>'
              +      '<div class="clear"></div>'
-             +      '<div class="export-links-dialog item-link link">'
-             +          '<div class="export-links-dialog input-wrap">'
-             +              '<i class="small-icon dialog-sprite chain"></i>'
+             +      '<div class="item-link link">'
+             +          '<div class="input-wrap">'
+             +              '<i class="sprite-fm-mono icon-link chain"></i>'
              +              '<input type="text" data-link="' + fileUrlWithoutKey + '" data-key="'
              +                  fileUrlKey + fileUrlNodeHandle + '" '
              +                  'value="' + fileUrlWithoutKey + fileUrlKey + fileUrlNodeHandle + '" readonly>'
              +          '</div>'
-             +          '<div class="button default-green-button semi-big gradient copy current">'
-             +              l[63]
-             +          '</div>'
+             +          '<button class="mega-button positive copy current">'
+             +              '<span>'
+             +                  l[63]
+             +              '</span>'
+             +          '</button>'
              +      '</div>'
-             +      '<div class="export-links-dialog item-link key">'
-             +          '<div class="export-links-dialog input-wrap">'
-             +              '<i class="small-icon dialog-sprite key"></i>'
+             +      '<div class="item-link key">'
+             +          '<div class="input-wrap">'
+             +              '<i class="sprite-fm-mono icon-key key"></i>'
              +              '<input type="text" data-key="' + fileUrlKey.substring(1) + fileUrlNodeHandle + '" value="'
              +              fileUrlKey.substring(1) + fileUrlNodeHandle + '" readonly>'
              +          '</div>'
-             +          '<div class="button default-green-button semi-big gradient copy current keys">'
-             +              l[63]
-             +          '</div>'
+             +          '<button class="mega-button positive copy current keys">'
+             +              '<span>'
+             +                  l[63]
+             +              '</span>'
+             +          '</button>'
              +      '</div>'
              +      '<div class="clear"></div>'
              +  '</div>';
@@ -2477,9 +2491,9 @@ var exportExpiry = {
      *
      * @constructor
      */
-    var ExportLink = function(opts) {
 
-        "use strict";
+    'use strict';
+    var ExportLink = function(opts) {
 
         var self = this;
 
@@ -2500,8 +2514,6 @@ var exportExpiry = {
      * Get public link for file or folder.
      */
     ExportLink.prototype.getExportLink = function() {
-
-        "use strict";
 
         var nodes = this.options.nodesToProcess || false;
 
@@ -2557,8 +2569,6 @@ var exportExpiry = {
      */
     ExportLink.prototype.removeExportLink = function(quiet, handle) {
 
-        "use strict";
-
         if (M.isInvalidUserStatus()) {
             return MegaPromise.reject(EINTERNAL);
         }
@@ -2602,8 +2612,6 @@ var exportExpiry = {
      * @param {String} nodeId The node ID.
      */
     ExportLink.prototype._getFolderExportLinkRequest = function(nodeId) {
-
-        "use strict";
 
         var self = this;
         var share = M.getNodeShare(nodeId);
@@ -2651,8 +2659,6 @@ var exportExpiry = {
      * @param {String} nodeId The node ID.
      */
     ExportLink.prototype._getExportLinkRequest = function(nodeId) {
-
-        "use strict";
 
         var self = this;
         var done = function(handle) {
@@ -2726,8 +2732,6 @@ var exportExpiry = {
      */
     ExportLink.prototype._removeFolderExportLinkRequest = function(nodeId, quiet) {
 
-        "use strict";
-
         var self = this;
         var masterPromise = new MegaPromise();
 
@@ -2771,8 +2775,6 @@ var exportExpiry = {
      * @returns {MegaPromise}
      */
     ExportLink.prototype._removeFileExportLinkRequest = function(nodeId, quiet) {
-
-        "use strict";
 
         var self = this;
         var promise = new MegaPromise();
@@ -2818,8 +2820,6 @@ var exportExpiry = {
      */
     ExportLink.prototype.isTakenDown = function(nodes) {
 
-        "use strict";
-
         if (nodes) {
             if (!Array.isArray(nodes)) {
                 nodes = [nodes];
@@ -2851,8 +2851,6 @@ var exportExpiry = {
      * @param {*} [isEmbed] Whether we're opening the dialog with the embed-code tab focused.
      */
     var initCopyrightsDialog = function(nodesToProcess, isEmbed) {
-
-        "use strict";
 
         if (M.isInvalidUserStatus()) {
             return;
@@ -2890,23 +2888,22 @@ var exportExpiry = {
             return $copyrightDialog;
         });
 
-        // Init click handler for 'I agree' / 'I disagree' buttons
-        $('.default-white-button', $copyrightDialog).rebind('click.acceptAction', function() {
+        // Init click handler for 'I disagree' button: User disagrees with copyright warning
+        $('button.cancel', $copyrightDialog).rebind('click.disagreeAction', closeDialog);
 
+        // Init click handler for 'I agree'
+        $('button.accept', $copyrightDialog).rebind('click.agreeAction', function() {
             closeDialog();
 
-            // User disagrees with copyright warning
-            if (!$(this).hasClass('cancel')) {
-                // User agrees, store flag so they don't see it again
-                mega.config.set('cws', 1);
+            // User agrees, store flag so they don't see it again
+            mega.config.set('cws', 1);
 
-                // Go straight to Get Link dialog
-                openGetLinkDialog();
-            }
+            // Go straight to Get Link dialog
+            openGetLinkDialog();
         });
 
         // Init click handler for 'Close' button
-        $('.fm-dialog-close', $copyrightDialog).rebind('click.closeDialog', closeDialog);
+        $('button.js-close', $copyrightDialog).rebind('click.closeDialog', closeDialog);
     };
 
     // export
@@ -3040,18 +3037,22 @@ var exportExpiry = {
         "use strict";
 
         var titleTooltip = '';
+        var $element;
 
         // Add taken-down to list view
-        $('.grid-table.fm #' + nodeId).addClass('taken-down');
+        $element = $('.grid-table.fm #' + nodeId).addClass('taken-down');
+        $('.grid-status-icon', $element).removeClass('icon-dot icon-favourite-filled').addClass('icon-takedown');
 
         // Add taken-down to block view
-        $('#' + nodeId + '.data-block-view').addClass('taken-down');
+        $element = $('#' + nodeId + '.data-block-view').addClass('taken-down');
+        $('.file-status-icon', $element).removeClass('icon-favourite-filled').addClass('icon-takedown');
 
         if (M.megaRender && M.megaRender.nodeMap && M.megaRender.nodeMap[nodeId]) {
             $(M.megaRender.nodeMap[nodeId]).addClass('take-down');
         }
         // Add taken-down to left panel
-        $('#treea_' + nodeId).addClass('taken-down');
+        $element = $('#treea_' + nodeId).addClass('taken-down');
+        $('.file-status-ico', $element).removeClass('icon-link-small').addClass('icon-takedown');
 
         // Add title, mouse popup
         if (M.d[nodeId].t === 1) {// Item is folder
@@ -3092,14 +3093,19 @@ var exportExpiry = {
             $(M.megaRender.getDOMNode(nodeId)).removeClass('take-down');
         }
 
+        var $element;
+
         // Add taken-down to list view
-        $('.grid-table.fm #' + nodeId).removeClass('taken-down');
+        $element = $('.grid-table.fm #' + nodeId).removeClass('taken-down');
+        $('.grid-status-icon', $element).removeClass('icon-takedown');
 
         // Add taken-down to block view
-        $('#' + nodeId + '.data-block-view').removeClass('taken-down');
+        $element = $('#' + nodeId + '.data-block-view').removeClass('taken-down');
+        $('.file-status-icon', $element).removeClass('icon-takedown');
 
         // Add taken-down to left panel
-        $('#treea_' + nodeId).removeClass('taken-down');
+        $element = $('#treea_' + nodeId).removeClass('taken-down');
+        $('.file-status-ico', $element).removeClass('icon-takedown');
 
         // Remove title, mouse popup
         $('.grid-table.fm #' + nodeId).attr('title', '');

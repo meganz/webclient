@@ -1,0 +1,519 @@
+/**
+ * Text Input Structure:
+ *
+* <div class="mega-input {inline?} {title-ontop?} {with-icon?} {box-style?|text-style?} {strengthChecker?}">
+ *     <div class="mega-input-title">[$995]</div>
+ *     <i class="{some-icon}"></i>
+*      <input class="titleTop strengthChecker" type="text" placeholder="{XX}">
+ *     <div class="message-container mega-banner"></div>
+ *     <div class="account password-status hidden"></div>
+ *     <div class="account-pass-lines"><div class="register-pass-status-line"></div></div>
+ * </div>
+ *
+ * Minimal Text Input Structure:
+ *
+ * <div class="mega-input">
+*      <input type="text" placeholder="{XX}">
+ * </div>
+ *
+ * Dropdown Input Structure:
+ *
+ * <div class="mega-input dropdown-input {inline?} {title-ontop?} {with-icon?} {box-style?|text-style?}">
+ *     <input class="hidden-input" tabindex="-1" autocomplete="disabled">
+ *     <div class="mega-input-title">[$995]</div>
+ *      <i class="{some-icon-class}"></i>
+ *      <span>{Selected option label}</span>
+ *      <i class="sprite-fm-mono icon-dropdown"></i>
+ *      <div class="mega-input-dropdown hidden">
+ *          <div class="dropdown-scroll">
+ *              <div class="option"></div>
+ *          </div>
+ *     </div>
+ * </div>
+ *
+ * Minimal Dropdown Input Structure:
+ *
+ * <div class="mega-input dropdown-input">
+ *      <span>{Selected option label}</span>
+ *      <i class="sprite-fm-mono icon-dropdown"></i>
+ *      <div class="mega-input-dropdown hidden">
+ *          <div class="option"></div>
+ *     </div>
+ * </div>
+ *
+ * (Tiny tip: `bindDropdownEvents($select, saveOption, wrapperBlock` inits default dropdown events)
+ *
+ * All ? classes are optional:
+ *     - inline: Makes the input an inline element, the width of which depends on the value set in it. ".text-style" has auto width by default
+ *     - title-ontop: Animate title/placeholder to top of input when it is focused/has value
+ *     - with-icon: Input type with icon before label
+ *     - text-style: Changes input appearance. ".text-style" removes all borders and backgrounds, mostly used with ".dropdown-input". Default input is underlined (i.e. has bottom border)
+ *     - box-style: Changes input appearance. ".box-style" will add border and background. Default input is underlined (i.e. has bottom border)
+ *     - strengthChecker: Shows password strength checker for text inputs
+ */
+
+/* INPUTS */
+
+/* Base input styles */
+.mega-input {
+    align-items: center;
+    box-sizing: border-box;
+    display: inline-flex;
+    height: 36px;
+    max-width: 100%;
+    padding: 2px 0;
+    position: relative;
+    text-align: start;
+    vertical-align: top;
+    white-space: nowrap;
+    width: 100%;
+}
+.mega-input.hidden {
+    display: none;
+}
+.mega-input input:-webkit-autofill {
+    box-shadow: 0 0 0 50px var(--surface-main) inset;
+    -webkit-text-fill-color: var(--text-color-high);
+}
+.mega-input input::placeholder {
+    font: var(--text-body1);
+}
+.mega-input.halfSize-l {
+    width: 48%;
+    float: left;
+}
+.mega-input.halfSize-r {
+    width: 48%;
+    float: right;
+}
+
+/* Inline input */
+.mega-input.inline {
+    width: auto;
+}
+
+/* Input and dropdown label styling */
+.mega-input input,
+.mega-input.dropdown-input > span {
+    background-color: transparent;
+    border: none;
+    box-sizing: border-box;
+    flex: 1;
+    font: var(--text-body1);
+    color: var(--text-color-high);
+    cursor: text;
+    overflow: hidden;
+    padding: 2px 8px;
+    position: relative;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: 100%;
+    z-index: 11;
+}
+
+/* Input icons */
+.mega-input > i {
+    --icon-size: 24px;
+    --mask-color: var(--icon-rest);
+    border-radius: 0;
+    display: block;
+    flex-shrink: 0;
+    float: none;
+    padding: 0;
+    position: relative;
+    -webkit-margin-start: 3px;
+    margin-inline-start: 3px;
+    transition: var(--transition-color);
+}
+.mega-input:hover > i,
+.mega-input.active > i {
+    --mask-color: var(--icon-active);
+}
+
+/* Icons after span or input (Usually dropdown its dropdown arrow or three dots) */
+.mega-input > input + i,
+.mega-input > span + i {
+    --mask-color: var(--icon-inactive);
+    margin: 0;
+    -webkit-margin-end: 3px;
+    margin-inline-end: 3px;
+}
+.mega-input:hover > input + i,
+.mega-input:hover > span + i,
+.mega-input.active > input + i,
+.mega-input.active > span + i {
+    --mask-color: var(--icon-rest);
+}
+
+/* Input styles */
+
+/* Default underlined input style */
+.mega-input::before {
+    border: 1px solid var(--surface-mid-grey);
+    border-width: 0 0 1px;
+    box-sizing: border-box;
+    content: "";
+    height: 100%;
+    left: 0;
+    position: absolute;
+    top: 0;
+    transition: var(--transition-border);
+    width: 100%;
+}
+
+/* Box input style */
+.mega-input.box-style {
+    height: 38px;
+    min-width: 150px;
+}
+.mega-input.box-style input::placeholder {
+    opacity: 0.9;
+}
+.mega-input.box-style::before {
+    background: var(--surface-grey-1);
+    border-color: var(--surface-grey-2);
+    border-radius: 4px;
+    border-width: 1px;
+}
+.mega-input.box-style > i {
+    -webkit-margin-start: 8px;
+    margin-inline-start: 8px;
+}
+.mega-input.box-style .mega-input-dropdown {
+    top: -6px;
+}
+
+/* Text input style (transparent without borders) */
+.mega-input.dropdown-input.text-style {
+    border-radius: 4px;
+    min-width: auto;
+    transition: var(--transition-bg-color);
+    width: auto;
+}
+.mega-input.text-style::before {
+    display: none;
+}
+.mega-input.text-style > input + i,
+.mega-input.text-style > span + i {
+    --mask-color: var(--icon-active);
+    -webkit-margin-end: 0;
+    margin-inline-end: 0;
+}
+.mega-input.dropdown-input.text-style:hover {
+    background: var(--button-hover);
+}
+
+/* Three extra status for the inputs: hover error, active, valued */
+.mega-input:hover::before {
+    border-color: var(--input-text-underline-hover);
+}
+.mega-input.active::before {
+    border-color: var(--input-text-underline-active);
+}
+.mega-input.error::before {
+    border-color: var(--input-text-underline-error);
+}
+.mega-input.error .title {
+    visibility: visible;
+    opacity: 1;
+}
+
+/* Disabled class. Hides underline */
+.mega-input.disabled {
+    cursor: default;
+    opacity: 1;
+}
+.mega-input.disabled::before {
+    display: none;
+}
+.mega-input.box-style.disabled,
+.mega-input.text-style.disabled {
+    opacity: 0.5;
+}
+.mega-input.box-style.disabled::before {
+    border-color: var(--surface-mid-grey);
+    display: block;
+}
+.mega-input.dropdown-input.disabled > span {
+    cursor: default;
+}
+
+/* .title-ontop and "titleTop" style */
+.mega-input.title-ontop {
+    margin: 20px 0;
+}
+.mega-input.title-ontop input::placeholder {
+    opacity: 0;
+}
+.mega-input.title-ontop .mega-input-title {
+    font: var(--text-body1);
+    color: var(--text-color-medium);
+    display: inline-block;
+    -webkit-padding-start: 8px;
+    padding-inline-start: 8px;
+    position: absolute;
+    left: 0;
+    top: 8px;
+    transition: font-size 0.2s ease-in, color 0.2s ease-in, top 0.2s cubic-bezier(0.4, 0, 1, 1);
+    z-index: 10;
+}
+.mega-input.title-ontop.with-icon .mega-input-title {
+    -webkit-padding-start: 35px;
+    padding-inline-start: 35px;
+}
+
+/* Move "titleTop" placeholder  to the top for Active inputs/Box type inputs/Dropdowns */
+.mega-input.title-ontop.active .mega-input-title,
+.mega-input.title-ontop.valued .mega-input-title,
+.mega-input.title-ontop.birth .mega-input-title,
+.mega-input.title-ontop.dropdown-input .mega-input-title,
+.mega-input.title-ontop.box-type .mega-input-title {
+    top: -20px;
+    color: var(--text-color-low);
+    font: var(--text-body2);
+}
+
+/* Smaller font size input */
+.mega-input.small-txt input {
+    font: var(--text-body1);
+}
+.mega-input.title-ontop.small-txt .mega-input-title,
+.mega-input.title-ontop.active.small-txt .mega-input-title,
+.mega-input.title-ontop.valued.small-txt .mega-input-title {
+    font: var(--text-body2);
+}
+.mega-input.small-txt input::placeholder {
+    font: var(--text-body2);
+}
+
+/* Input types */
+
+/* Dropdown input type */
+.mega-input.dropdown-input {
+    cursor: pointer;
+    min-width: 150px;
+}
+.mega-input.dropdown-input input {
+    height: 0;
+    padding: 0;
+    position: absolute;
+    margin: 0;
+    min-width: auto;
+    width: 0;
+}
+.mega-input.dropdown-input > span {
+    cursor: pointer;
+    z-index: auto;
+}
+
+/* Dropdown styling */
+.mega-input-dropdown {
+    background: var(--surface-main);
+    border: var(--context-menu-border);
+    border-radius: 12px;
+    box-shadow: 0 5px 10px 0 rgba(0, 0, 0, 0.3);
+    box-sizing: border-box;
+    font-size: 0;
+    min-width: 200px;
+    padding: 8px 0;
+    position: absolute;
+    transition: var(--transition-opacity);
+    z-index: 150;
+}
+.mega-input .mega-input-dropdown {
+    left: -9px;
+    min-width: calc(100% + 16px);
+    top: -7px;
+}
+.mega-input-dropdown .dropdown-scroll {
+    max-height: 288px;
+    max-width: 100%;
+    position: relative;
+    z-index: 1;
+}
+.mega-input-dropdown .ps-container .ps-scrollbar-y {
+    right: 1px;
+    width: 6px;
+}
+.mega-input-dropdown .option {
+    --mask-color: var(--icon-rest);
+    align-items: center;
+    background: var(--surface-main);
+    border-radius: 4px;
+    color: var(--text-color-medium);
+    cursor: pointer;
+    display: flex;
+    font: var(--text-body1);
+    margin: 0 8px;
+    min-height: 32px;
+    outline: none;
+    padding: 0 8px;
+    text-align: start;
+    transition: var(--transition-bg-color), var(--transition-color);
+}
+.mega-input-dropdown .option.template,
+.mega-input-dropdown .option.hidden {
+    display: none;
+}
+.mega-input-dropdown .option span {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.mega-input-dropdown .option:hover,
+.mega-input-dropdown .option.active {
+    --mask-color: var(--icon-active);
+    background: var(--button-hover);
+    color: var(--text-color-high);
+}
+.mega-input-dropdown .option i {
+    --icon-size: 24px;
+    margin: 0;
+    -webkit-margin-end: 8px;
+    margin-inline-end: 8px;
+    transition: var(--transition-color);
+}
+.mega-input-dropdown .option span + i {
+    margin: 0;
+    -webkit-margin-start: 8px;
+    margin-inline-start: 8px;
+}
+.mega-input-dropdown .option i.icon-check {
+    --icon-size: 16px;
+    display: none;
+}
+.mega-input-dropdown .option.active i.icon-check {
+    display: block;
+}
+
+/* Error/warning message containers */
+.mega-input .message-container {
+    font: var(--text-body1);
+    padding: 8px;
+    white-space: normal;
+    text-overflow: ellipsis;
+    position: absolute;
+    top: 40px;
+    left: 0;
+    width: 100%;
+    display: none;
+    text-align: center;
+    box-sizing: border-box;
+    border-radius: 4px;
+    color: var(--banner-text-info);
+    border: 1px solid var(--banner-border-info);
+    background: var(--banner-background-info);
+}
+.mega-input.halfSize-l .message-container {
+    width: 208%;
+}
+.mega-input.error .message-container {
+    color: var(--banner-text-error);
+    border-color: var(--banner-border-error);
+    background: var(--banner-background-error);
+}
+.mega-input.success .message-container {
+    color: var(--banner-text-success);
+    border-color: var(--banner-border-success);
+    background: var(--banner-background-success);
+}
+.mega-input.warning .message-container {
+    color: var(--banner-text-warning);
+    border-color: var(--banner-border-warning);
+    background: var(--banner-background-warning);
+}
+.mega-input.msg .message-container,
+.mega-input.fix-msg .message-container {
+    display: inline-block;
+}
+.mega-input.fix-msg .message-container {
+    padding: 0;
+    text-align: left;
+    color: var(--text-color-medium);
+    border: none;
+    background: none;
+}
+.mega-input.fix-msg.error .message-container {
+    color: var(--banner-text-error);
+}
+/* Password strength Checker - Bar */
+.mega-input .account-pass-lines {
+    background: var(--surface-mid-grey);
+    border-radius: 2px;
+    -webkit-margin-end: 4px;
+    margin-inline-end: 4px;
+}
+.mega-input .register-pass-status-line {
+    border-radius: 2px;
+    height: 20px;
+}
+.mega-input .good1 .register-pass-status-line {
+    background-color: var(--password-status-veryweak);
+    height: 4px;
+    margin-top: 16px;
+    width: 4px;
+}
+.mega-input .good2 .register-pass-status-line {
+    background-color: var(--password-status-weak);
+    height: 8px;
+    margin-top: 12px;
+    width: 4px;
+}
+.mega-input .good3 .register-pass-status-line {
+    background-color: var(--password-status-medium);
+    height: 12px;
+    margin-top: 8px;
+    width: 4px;
+}
+.mega-input .good4 .register-pass-status-line {
+    background-color: var(--password-status-good);
+    height: 16px;
+    margin-top: 4px;
+    width: 4px;
+}
+.mega-input .good5 .register-pass-status-line {
+    background-color: var(--password-status-strong);
+    height: 20px;
+    margin-top: 0;
+    width: 4px;
+}
+
+/* Password strength Checker - Text */
+.mega-input .account.password-status {
+    color: var(--password-status-veryweak);
+    display: none;
+    font-size: 14px;
+    font-family: var(--text-font-family-black);
+    line-height: 24px;
+    margin: 0 4px;
+}
+.mega-input .account.password-status.good2 {
+    color: var(--password-status-weak);
+}
+.mega-input .account.password-status.good3 {
+    color: var(--password-status-medium);
+}
+.mega-input .account.password-status.good4 {
+    color: var(--password-status-good);
+}
+.mega-input .account.password-status.good5 {
+    color: var(--password-status-strong);
+}
+.mega-input .account.password-status.checked {
+    display: block;
+}
+
+/* Input loading */
+.mega-input .register-loading-icon {
+    display: none;
+    background: rgba(0, 0, 0, 0) url("../images/mega/ajax-loader-gray.gif") no-repeat scroll 0 0 / 16px 16px;
+    height: 16px;
+    width: 16px;
+}
+.mega-input .loading .register-loading-icon {
+    display: block;
+}
+.mega-input .register-loading-icon img {
+    width: 16px;
+}

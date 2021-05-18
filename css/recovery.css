@@ -10,17 +10,11 @@
     margin: 0 0;
 }
 .improved-recovery-steps h3.main-italic-header, .improved-recovery-steps h2  {
-    font-family:'LatoWeb', 'source_sans_proregular', Arial;
-    color: #aaa;
     text-align: center;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
     box-sizing: border-box;
     overflow: hidden;
     -o-text-overflow: ellipsis;
     text-overflow: ellipsis;
-    line-height: 24px;
-    margin: 0;
 }
 .park-account-dialog .improved-recovery-steps h3.main-italic-header {
     margin: 0 0 24px;
@@ -29,6 +23,7 @@
     font-family: 'LatoWeb', 'source_sans_proregular', Arial;
     font-size: 13px;
     line-height: 21px;
+    text-align: left;
 }
 .improved-recovery-steps .container-information ul, .improved-recovery-steps.backup-recover.withkey ul {
     margin: 12px 24px 0;
@@ -40,24 +35,12 @@
     margin-bottom: 8px;
 }
 .improved-recovery-steps li a.red {
-    color: #eb4444;
+    color: var(--text-color-error);
 }
 .improved-recovery-steps a.red:hover {
     text-decoration: underline;
 }
-.improved-recovery-steps h2 {
-    color: #51585D;
-    font-size: 20px;
-    display: inline-block;
-    font-family: 'LatoWebSemibold', 'source_sans_proregular', Arial;
-}
 .improved-recovery-steps h1 {
-    font-family:'LatoWebSemibold', 'source_sans_proregular', Arial;
-    font-size: 20px;
-    color: #495057;
-    line-height: 30px;
-    margin: 0;
-    padding: 20px 0 0 0;
     text-align: center;
 }
 .improved-recovery-steps .recover-image-block {
@@ -65,11 +48,8 @@
     display: block;
     margin: 0 auto;
 }
-.fm-dialog.improved-recovery-steps .recover-image-block {
-    margin: 30px auto 10px auto;
-}
-.fm-dialog.improved-recovery-steps .default-green-button.height-48:last-child {
-    margin: 20px 0 10px 0;
+.improved-recovery-steps h3 {
+    text-align: center;
 }
 .improved-recovery-steps .register-st2-txt-block, .backup-recover.withkey .register-st2-txt-block {
     display: table;
@@ -95,20 +75,24 @@
     position: relative;
     margin: 0;
     padding: 0 30px 30px 30px;
+    text-align: left;
+}
+.improved-recovery-steps .content-wrapper .reset-input-container {
+    display: block;
+    text-align: center;
 }
 .improved-recovery-steps .content-wrapper p span {
     font-family: 'source_sans_probold';
     color: #F57223;
 }
-.improved-recovery-steps p, .improved-recovery-steps h3.main-italic-header:not(.main-header) {
-    font-family: 'LatoWeb', 'source_sans_proregular', Arial;
-    font-size: 14px;
-    color: #676D75;
+.improved-recovery-steps p {
     letter-spacing: 0;
-    line-height: 23px;
-    padding: 20px 0 0 0;
+    padding: 8px 0 0 0;
     text-align: center;
     margin: 0;
+}
+.improved-recovery-steps p:first-child {
+    padding: 0;
 }
 .improved-recovery-steps p.top-pad {
     padding-top: 30px;
@@ -137,93 +121,29 @@
     width: 100%;
     height: 100px;
 }
-.improved-recovery-steps .recover-button {
-    font-size: 13px;
-    letter-spacing: 0;
-    text-align: right;
-    line-height: 44px;
-    width: auto;
-    height: auto;
-    background-color: #fff;
-    text-align: right;
-    text-transform: none;
-    float: right;
-    margin: 0;
-    display: block;
-    border-radius: 0px;
-    padding: 0px 16px;
-    border: 0px solid rgba(0,0,0,0);
-    -webkit-box-shadow: 0 0 0 0 #6BB219;
-    -moz-box-shadow: 0 0 0 0 #6BB219;
-    box-shadow: 0 0 0 0 #6BB219;
-    border-radius: 4px;
-    font-family: 'LatoWeb', 'source_sans_proregular', Arial;
-}
-.improved-recovery-steps .backup-input-button.default-grey-button.left {
+.improved-recovery-steps .backup-input-button.mega-button.left {
     right: 0px;
     font-size: 14px;
     text-decoration: none;
     line-height: 36px;
     text-align: center;
 }
-.improved-recovery-steps .recover-button.yes {
-    color: #2AAF5F;
-}
-.improved-recovery-steps .recover-button.yes.default-grey-button, .improved-recovery-steps .recover-button.yes.red-button, .improved-recovery-steps .restore-verify-button {
-    color: #fff;
-    text-align: center;
-    text-decoration: none;
-    background: #F0373B;
-    webkit-box-shadow: 0px 1px 2px 0px rgba(217,0,7,0.3);
-    -moz-box-shadow: 0px 1px 2px 0px rgba(217,0,7,0.3);
-    box-shadow: 0px 1px 2px 0px rgba(217,0,7,0.3);
-    border-radius: 4px;
-    margin: 0 auto 0;
-    float: initial;
-    width: 160px;
-    line-height: 48px;
-}
-.improved-recovery-steps .recover-button.yes.default-grey-button::after, .improved-recovery-steps .recover-button.yes.red-button::after {
-    webkit-box-shadow: 0px 1px 2px 0px rgba(217,0,7,0.3);
-    -moz-box-shadow: 0px 1px 2px 0px rgba(217,0,7,0.3);
-    box-shadow: 0px 1px 2px 0px rgba(217,0,7,0.3);
-}
-.improved-recovery-steps .recover-button.yes.default-grey-button::before, .improved-recovery-steps .recover-button.yes.red-button::before {
-    -webkit-box-shadow: 0px 0px 0px 1px rgba(218,49,53,1);
-    -moz-box-shadow: 0px 0px 0px 1px rgba(218,49,53,1);
-    box-shadow: 0px 0px 0px 1px rgba(218,49,53,1);
-}
-.improved-recovery-steps .recover-button.yes.default-grey-button:hover, .improved-recovery-steps .recover-button.yes.red-button:hover {
-    background: #E12124;
-    -webkit-box-shadow: inset 0px 1px 1px 0px rgba(255,255,255,0.2);
-    -moz-box-shadow: inset 0px 1px 1px 0px rgba(255,255,255,0.2);
-    box-shadow: inset 0px 1px 1px 0px rgba(255,255,255,0.2);
-}
-.improved-recovery-steps .big-red-button.height-48 {
+.improved-recovery-steps .recover-button.yes.mega-button,
+.improved-recovery-steps .restore-verify-button {
     margin: 0 auto;
-    display: table;
-}
-.improved-recovery-steps .recover-button.yes:hover, .recover-button.yes.active {
-    background: rgba(42,175,95,0.1);
-    -webkit-box-shadow: 0 0 0 0 #6BB219;
-    -moz-box-shadow: 0 0 0 0 #6BB219;
-    box-shadow: 0 0 0 0 #6BB219;
-}
-.improved-recovery-steps .recover-button.no {
-    color: #eb4444;
-}
-.improved-recovery-steps .recover-button.no:hover, .recover-button.no.active {
-    background: rgba(235,68,68,0.10);
-    -webkit-box-shadow: 0 0 0 0 #FDECEC;
-    -moz-box-shadow: 0 0 0 0 #FDECEC;
-    box-shadow: 0 0 0 0 #FDECEC;
+    float: initial;
 }
 .improved-recovery-steps .button-container {
-    padding-top: 30px;
+    margin-top: 8px;
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
 }
 .improved-recovery-steps .button-aligner {
     float: right;
     width: 100%;
+    text-align: center;
+    margin-top: 24px;
 }
 .improved-recovery-steps .progress-meter {
     margin: 0 auto;
@@ -241,39 +161,11 @@
     user-select: none; /* Non-prefixed version, currently
                        supported by Chrome and Opera */
 }
-.improved-recovery-steps .recover-button.yes.default-grey-button::after, .improved-recovery-steps .recover-button.yes.red-button::after {
-    content: none;
-}
-.improved-recovery-steps .recover-button.yes::after, .improved-recovery-steps .recover-button.no::after {
-    content:'';
-    background-image: url(../images/mega/recover-account-sprite_v1.png);
-    background-repeat: no-repeat;
-    background-size: 344px auto;
-    display: inline-block;
-    width: 20px;
-    height: 11px;
-    margin-left: 8px;
-}
-.improved-recovery-steps .recover-button.yes::after {
-    background-position:-133px -720px;
-}
-.improved-recovery-steps .recover-button.no::after {
-    background-position:-133px -740px;
-}
 .improved-recovery-steps .restore-verify-button {
-    height: 48px;
-    font-size: 16px;
     margin-top: 64px;
-    background-color: #00BFA5;
-}
-.improved-recovery-steps .restore-verify-button.active {
-    background-color: #00BFA5;
+    display: flex;
 }
 .improved-recovery-steps .login-register-input {
-    background-color: #F8F9FA;
-    border: 1px solid #EBEEF0;
-    border-radius: 2px;
-    max-width: 400px;
     margin-bottom: 0;
 }
 .improved-recovery-steps .login-register-input:hover {
@@ -392,7 +284,7 @@
     background-position: -6px -773px;
     width: 24px;
     height: 24px;
-    background-image: url(../images/mega/top-sprite_v8.png);
+    background-image: url(../images/mega/top-sprite.png);
     background-repeat: no-repeat;
     padding-left: 66px;
     margin: 0 -39px 0 0;
@@ -441,11 +333,11 @@
 }
 
 .improved-recovery-steps strong {
-    font-family: 'source_sans_probold';
-    color: #333;
+    font-family: var(--text-font-family-semibold);
+    color: var(--text-color-high);
 }
-.improved-recovery-steps  strong.warning-text {
-    color: #eb4444;
+.improved-recovery-steps strong.warning-text {
+    color: var(--text-color-error);
 }
 .improved-recovery-steps .instruction-block {
     margin-top: 24px;
@@ -459,14 +351,14 @@
     color: #00A58F;
     letter-spacing: 0;
     text-align: center;
-    text-transform: capitalize;
 }
 .improved-recovery-steps .recover-state.warning {
-    color: #FD8116;
+    color: var(--text-color-error);
 }
 .improved-recovery-steps .container-information .warning-text {
-    color: #eb4444;
-    font-family: 'source_sans_prosemibold';
+    color: var(--text-color-error);
+    font-family: var(--text-font-family-semibold);
+
 }
 .improved-recovery-steps .container-information li {
     margin-bottom: 16px;
@@ -510,7 +402,7 @@
 .improved-recovery-steps .nav-back-icon {
     width: 18px;
     height: 16px;
-    background-image: url(../images/mega/icons-sprite_v40.png);
+    background-image: url(../images/mega/icons-sprite.png);
     background-repeat: no-repeat;
     background-position: -204px -196px;
     background-size: 262px auto;
@@ -534,9 +426,10 @@
     line-height: 24px;
 }
 .improved-recovery-steps .nav-header-block h2 {
+    display: inline-block;
     font-size: 13px;
     color: #9a9fa2;
-    line-height: 24px;
+    line-height: 27px;
     white-space: nowrap;
     font-family: 'LatoWeb';
     letter-spacing: 0;
@@ -559,10 +452,12 @@
     position: relative;
 }
 .park-account-dialog .recover-account-email-block {
-    margin: 24px auto 56px;
+    margin: 40px auto 24px;
 }
-.improved-recovery-steps .recover-image, .improved-recovery-steps .session-image-block, .backup-recover .recover-image {
-    background-image: url(../images/mega/recover-account-sprite_v1.png);
+.improved-recovery-steps .recover-image,
+.improved-recovery-steps .session-image-block,
+.backup-recover .recover-image {
+    background-image: url(../images/mega/recover-account-sprite.png);
     background-repeat: no-repeat;
     background-size: 344px auto;
     display: block;
@@ -583,9 +478,6 @@
 }
 .improved-recovery-steps .recover-image.device-password {
     background-position: -172px -138px;
-}
-.improved-recovery-steps .recover-image.device-key {
-    background-position: -5px -258px;
 }
 .improved-recovery-steps .recover-image.locked-key {
     background-position: -186px -251px;
@@ -610,8 +502,12 @@
     margin: 0 auto 12px;
     width: 120px;
 }
-.improved-recovery-steps .check-sessions, .improved-recovery-steps .backup-key-info {
+.improved-recovery-steps .check-sessions {
     margin: 30px auto 0;
+    display: table;
+}
+.improved-recovery-steps .backup-key-info {
+    margin: 40px auto 0;
     display: table;
 }
 .improved-recovery-steps .check-sessions-text, .improved-recovery-steps .backup-key-info-text {
@@ -626,6 +522,7 @@
 }
 .recovery-key-info.improved-recovery-steps .col-3 {
     cursor: auto;
+    padding-bottom: 0;
 }
 .improved-recovery-steps .check-sessions .col-3 {
     display: table-cell;
@@ -650,20 +547,14 @@
 .improved-recovery-steps .session-image-block.mobile {
     background-position: -123px -611px;
 }
-.improved-recovery-steps .session-image-block.printer {
-    background-position: -2px -926px;
-}
-.improved-recovery-steps .session-image-block.password-manager {
-    background-position: -118px -926px;
-}
-.improved-recovery-steps .session-image-block.usb-stick {
-    background-position: -232px -926px;
-}
-.improved-recovery-steps .check-sessions .session-text, .improved-recovery-steps .backup-key-info .backup-key-info-text {
+.improved-recovery-steps .check-sessions .session-text {
     text-align: center;
-    font-size: 13px;
-    font-family: 'LatoWeb', 'source_sans_proregular', Arial;
-    line-height: 18px;
+    font: var(--text-body2);
+}
+.improved-recovery-steps .backup-key-info .backup-key-info-text {
+    text-align: center;
+    font: var(--text-body1);
+    color: var(--text-color-high);
 }
 .improved-recovery-steps .check-sessions .checkboxOn, .improved-recovery-steps .check-sessions .checkboxOff {
     position: absolute;
@@ -679,7 +570,14 @@
 }
 .improved-recovery-steps .check-sessions .checkdiv::after {
     background-position: -25.5px -1850px;
+    content: "";
+    background-image: url(../images/mega/top-login-sprite.png);
+    background-repeat: no-repeat;
+    width: 100%;
+    height: 100%;
     display: block;
+    position: absolute;
+    top: 0;
 }
 .improved-recovery-steps .check-sessions .checkboxOn {
     background-color: #2AAF5F;
@@ -691,13 +589,15 @@
     background-color: rgba(42,175,95,0.55);
 }
 .improved-recovery-steps h5.main-italic-header {
-    font-size: 14px;
-    font-family: 'LatoWeb', 'source_sans_proregular', Arial;
-    line-height: 24px;
-    color: #495057;
-    font-weight: 800;
+    color: var(--text-color-high);
     display: inline-block;
     padding: 0 0;
+}
+.improved-recovery-steps .recover-divider h5.main-italic-header {
+    background: #fff;
+    margin: auto;
+    display: block;
+    position: relative;
 }
 .improved-recovery-steps .recover-paste-block .left-section, .improved-recovery-steps .recover-paste-block .right-section {
     margin: 0 0;
@@ -707,46 +607,54 @@
 }
 .improved-recovery-steps .recover-paste-block .left-section {
     width: 50%;
-    text-align: left;
+    text-align: start;
 }
 .improved-recovery-steps .recover-paste-block .right-section {
     width: 49%;
-    text-align: right;
+    text-align: end;
 }
-.improved-recovery-steps .recover-paste-block .right-section > div:not(.hidden) {
-    display: inline-block;
+.improved-recovery-steps .recover-paste-block .right-section > button:not(.hidden) {
     min-width: 95px;
-    margin: 5px 5px 5px 0;
+    margin: 8px 4px;
 }
-.improved-recovery-steps .recover-paste-block .right-section > div.no-hover:hover{
+.securitypractice .improved-recovery-steps .recover-paste-block .right-section > button {
+    margin-left: 8px;
+}
+.improved-recovery-steps .recover-paste-block .right-section > button.no-hover:hover {
     background-color: initial;
 }
-.improved-recovery-steps .recover-paste-block .recovery-key.account.input-wrapper .icon{
+.improved-recovery-steps .recover-paste-block .recovery-key.account.input-wrapper .icon {
     width: 24px;
     height: 22px;
     background-position: -172px -715px;
     display: inline-block;
     vertical-align: bottom;
     opacity: 0.7;
-    margin-right: 6px;
+    -webkit-margin-end: 6px;
+    margin-inline-end: 6px;
 }
 .improved-recovery-steps.withkey .recover-paste-block .recovery-key.account.input-wrapper .icon {
     margin-bottom: 4px;
 }
-.improved-recovery-steps .upload-key.default-green-button, .improved-recovery-steps .paste-key.default-green-button {
+.improved-recovery-steps .upload-key.mega-button.positive, .improved-recovery-steps .paste-key.mega-button.positive {
     position: absolute;
     right: 24px;
     top: 50%;
     transform: translateY(-50%);
 }
-.improved-recovery-steps .account.input-wrapper, .improved-recovery-steps .mega-input-title-ontop {
+.improved-recovery-steps .account.input-wrapper {
     margin: 0;
     display: block;
 }
-.improved-recovery-steps.withkey .mega-input-title-ontop, .improved-recovery-steps.withoutkey .mega-input-title-ontop {
+
+.improved-recovery-steps .mega-input.title-ontop {
+    margin: 0;
+    display: inline-flex;
+}
+.improved-recovery-steps.withkey .mega-input.title-ontop, .improved-recovery-steps.withoutkey .mega-input.title-ontop {
     width: 418px;
 }
-.improved-recovery-steps .recover-block.success .mega-input-title-ontop {
+.improved-recovery-steps .recover-block.success .mega-input.title-ontop {
     margin: 20px auto 0;
 }
 .improved-recovery-steps .recovery-key.account.input-wrapper {
@@ -766,23 +674,24 @@
     border-bottom: 1px solid #ccc;
     line-height: 22px;
 }
-.improved-recovery-steps strong, .improved-recovery-steps b {
-    font-family: 'LatoWebBold', 'source_sans_probold', Arial;
+.improved-recovery-steps strong,
+.improved-recovery-steps b {
+    font-family: var(--text-font-family-semibold);
 }
 .improved-recovery-steps .info-container, .improved-recovery-steps .checkbox-container {
     overflow: auto;
-    margin-top: 8px;
-    background-color: #fff;
-    border: 1px solid #eee;
-    border-radius: 3px;
     min-height: 44px;
 }
-.improved-recovery-steps .info-container, .improved-recovery-steps .checkbox-container, .improved-recovery-steps .app-instruction-block, .improved-recovery-steps .recover-upload-block, .improved-recovery-steps .recover-paste-block {
-    background: #fafafa;
-    border: 1px solid rgba(38,47,59,0.10);
+.improved-recovery-steps .info-container,
+.improved-recovery-steps .checkbox-container,
+.improved-recovery-steps .app-instruction-block,
+.improved-recovery-steps .recover-upload-block,
+.improved-recovery-steps .recover-paste-block {
+    background: var(--surface-grey-1);
+    border: 1px solid var(--stroke-grey-2);
     border-radius: 6px;
-    padding: 20px 20px;
-    margin: 30px auto 0;
+    padding: 16px;
+    margin: 24px auto 0;
     height: auto;
     position: relative;
 }
@@ -811,6 +720,17 @@
     -o-transition: all 200ms ease-in-out;
     -ms-transition: all 200ms ease-in-out;
     transition: all 200ms ease-in-out;
+    background: var(--surface-main);
+    border-radius: 4px;
+    border: var(--dropdown-border);
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+.improved-recovery-steps .app-button-block i.icon-dropdown {
+    --icon-size: 24px;
+    position: absolute;
+    right: 0;
 }
 .improved-recovery-steps .app-button-block:hover {
     box-shadow: 0 0 0 4px rgba(0,0,0,0.1);
@@ -824,9 +744,9 @@
     height: 38px;
     position: relative;
 }
-.improved-recovery-steps .recover-divider hr{
+.improved-recovery-steps .recover-divider hr {
     display: inline-block;
-    width: 90%;
+    width: 100%;
     float: right;
     border-color: rgba(38,47,59,0.15);
     border-bottom-width: 0;
@@ -854,13 +774,14 @@
 }
 
 /* Post register recovery key dialog */
-.step-main-question.post-register, .first-paragraph.post-register, .second-paragraph.post-register, .post-register .step-main-question, .post-register .first-paragraph, .post-register .second-paragraph {
-    display: none;
+.improved-recovery-steps .post-register,
+.improved-recovery-steps.post-register .pre-register {
+    display: none !important;
 }
-.post-register .step-main-question.post-register, .post-register .first-paragraph.post-register, .post-register .second-paragraph.post-register {
-    display: block;
+.improved-recovery-steps.post-register .post-register {
+    display: block !important;
 }
-.step-main-question.post-register, .first-paragraph.post-register, .second-paragraph.post-register, .recovery-key-dialog.post-register .reset-account {
+.improved-recovery-steps.post-register .reset-account {
     display: none;
 }
 .improved-recovery-steps.recovery-key-dialog .skip-button {
@@ -868,7 +789,6 @@
 }
 .improved-recovery-steps.recovery-key-dialog.post-register .skip-button {
     display: block;
-    color: #aaa;
     cursor: pointer;
 }
 .improved-recovery-steps.recovery-key-dialog.post-register .skip-button.hidden {
@@ -877,19 +797,21 @@
 .improved-recovery-steps.post-register .skip-button:hover {
     text-decoration: underline;
 }
-.fm-dialog.recovery-key-dialog.post-register {
+.mega-dialog.recovery-key-dialog.post-register {
     height: auto;
-    margin: -280px 0 0 -320px;
+}
+.mega-dialog.recovery-key-dialog.post-register a.info {
+    color: var(--text-color-info);
 }
 
 @media only screen and (max-width: 1250px) {
-.improved-recovery-steps .password-tooltip.tooltip-block {
-    right: -200px;
-    top: 45px;
-}
-.improved-recovery-steps .password-tooltip.tooltip-block .triangle-pointer {
-    transform: rotate(135deg);
-    left: 170px;
-    top: -8px;
-}
+    .improved-recovery-steps .password-tooltip.tooltip-block {
+        right: -200px;
+        top: 45px;
+    }
+    .improved-recovery-steps .password-tooltip.tooltip-block .triangle-pointer {
+        transform: rotate(135deg);
+        left: 170px;
+        top: -8px;
+    }
 }

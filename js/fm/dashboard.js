@@ -32,12 +32,6 @@ function dashboardUI() {
     if (u_attr && u_attr.b) {
         $('.fm-right-block.dashboard .non-business-dashboard').addClass('hidden');
         $('.fm-right-block.dashboard .business-dashboard').removeClass('hidden');
-        if (u_attr.b.s !== -1 || !u_attr.b.m) {
-            $('.dashboard .button.upgrade-account').addClass('hidden');
-        }
-        else {
-            $('.dashboard .button.upgrade-account').removeClass('hidden');
-        }
         if (u_attr.b.m && u_attr.b.s !== -1) {
             $('.business-dashboard .go-to-usermanagement-btn').removeClass('hidden');
 
@@ -59,7 +53,6 @@ function dashboardUI() {
     else {
         $('.fm-right-block.dashboard .non-business-dashboard').removeClass('hidden');
         $('.fm-right-block.dashboard .business-dashboard').addClass('hidden');
-        $('.dashboard .button.upgrade-account').removeClass('hidden');
     }
 
     // Add-contact plus
@@ -73,9 +66,8 @@ function dashboardUI() {
         avatarDialog();
     });
 
-
     // Data plus, upload file
-    $('.data-float-bl .icon-button').rebind('click', function() {
+    $('.non-business-dashboard button.upload-file, .business-dashboard button.upload-file').rebind('click', function() {
         $('.fm-file-upload input').trigger('click');
         return false;
     });
@@ -108,59 +100,16 @@ function dashboardUI() {
         });
 
     // Account data
+    /* eslint-disable-next-line complexity */
     M.accountData(function(account) {
-        var perc;
 
-        // QR Code
-        var drawQRCanvas = function _drawQRCanvas() {
+        // Display welcome message
+        if (u_attr.firstname) {
+            const $welcome = $('.dashboard .welcome-message-banner').removeClass('hidden');
+            $('.message', $welcome).text(l[24930].replace('$1', u_attr.firstname));
+        }
 
-            if (account.contactLink && account.contactLink.length) {
-                var QRoptions = {
-                    width: 106,
-                    height: 106,
-                    correctLevel: QRErrorCorrectLevel.H,    // high
-                    foreground: '#D90007',
-                    text: getBaseUrl() + '/' + account.contactLink
-                };
-                // Render the QR code
-                $('.account.qr-icon').text('').qrcode(QRoptions);
-            }
-            else {
-                $('.account.qr-icon').text('');
-
-            }
-        };
-        drawQRCanvas();
-
-        $('.qr-widget-w .access-qr').rebind('click', function () {
-            if (account.contactLink && account.contactLink.length) {
-                openAccessQRDialog();
-            }
-            else {
-                var msgTitle = l[18230]; // 'QR Code Reactivate';
-                var msgMsg = l[18231]; // 'Your QR Code is deactivated.';
-                var msgQuestion = l[18232]; // 'Do you want to reactivate your QR Code?';
-                msgDialog('confirmation', msgTitle, msgMsg,
-                    msgQuestion,
-                    function (reActivate) {
-                        if (reActivate) {
-                            var reGenQR = { a: 'clc' };
-                            api_req(reGenQR, {
-                                callback: function (res2, ctx2) {
-                                    if (typeof res2 !== 'string') {
-                                        return;
-                                    }
-                                    M.account.contactLink = 'C!' + res2;
-                                    drawQRCanvas();
-                                    openAccessQRDialog();
-                                }
-                            });
-                        }
-                    });
-            }
-        });
-
-        // Show ballance
+        // Show balance
         $('.account.left-pane.balance-info').text(l[7108]);
         $('.account.left-pane.balance-txt').safeHTML('@@ &euro; ', account.balance[0][0]);
 
@@ -179,24 +128,6 @@ function dashboardUI() {
             $storage.text(bytesToSize(storageCurrentValue, 0));
             $transfer.text(bytesToSize(transferCurrentValue, 0));
 
-            if (maf.storage.current > 0) {
-                $storage.removeClass('light-grey');
-            }
-            else {
-                $storage.addClass('light-grey');
-            }
-            if (maf.transfer.current > 0) {
-                $transfer.removeClass('light-grey');
-            }
-            else {
-                $transfer.addClass('light-grey');
-            }
-
-            $('.progress-bar.storage', $achWidget)
-                .css('width', Math.round(maf.storage.current * 100 / maf.storage.max) + '%');
-            $('.progress-bar.transfers', $achWidget)
-                .css('width', Math.round(maf.transfer.current * 100 / maf.transfer.max) + '%');
-
             $('.more-bonuses', $achWidget).rebind('click', function() {
                 mega.achievem.achievementsListDialog();
             });
@@ -205,7 +136,61 @@ function dashboardUI() {
             $('.fm-right-block.dashboard').removeClass('active-achievements');
         }
 
-        // Elements for free/pro accounts. Expites date / Registration date
+        // Referrals Widget
+        if (mega.flags.refpr) {
+
+            M.affiliate.getBalance().then(() => {
+                let prefix = '.non-business-dashboard ';
+                if (u_attr.b) {
+                    prefix = '.business-dashboard ';
+                }
+
+                const $referralWidget = $(prefix + '.account.widget.referrals');
+                const balance = M.affiliate.balance;
+                var localCurrency;
+                var localTotal;
+                var localAvailable;
+
+                if (balance) {
+                    localCurrency = balance.localCurrency;
+
+                    $referralWidget.removeClass('hidden');
+
+                    if (localCurrency === 'EUR') {
+                        localTotal = formatCurrency(balance.localTotal);
+                        localAvailable = formatCurrency(balance.localAvailable);
+
+                        $('.euro', $referralWidget).addClass('hidden');
+                    }
+                    else {
+                        localTotal = formatCurrency(balance.localTotal, localCurrency, 'number');
+                        localAvailable = formatCurrency(balance.localAvailable, localCurrency, 'number');
+
+                        $('.euro', $referralWidget).removeClass('hidden');
+                        $('.referral-value.local .currency', $referralWidget).text(localCurrency);
+                        $('.referral-value.total.euro', $referralWidget)
+                            .text(formatCurrency(balance.pending + balance.available));
+                        $('.referral-value.available.euro', $referralWidget).text(formatCurrency(balance.available));
+                    }
+
+                    $('.referral-value.total.local .value', $referralWidget)
+                        .text(localTotal);
+                    $('.referral-value.available.local .value', $referralWidget)
+                        .text(localAvailable);
+
+                    // Referral widget button
+                    $('button.referral-program', $referralWidget).rebind('click.refer', () => {
+                        loadSubPage('/fm/refer');
+                    });
+                }
+            }).catch(ex => {
+                if (d) {
+                    console.error('Update affiliate data failed: ', ex);
+                }
+            });
+        }
+
+        // Elements for free/pro accounts. Expires date / Registration date
         if (u_attr.p || (u_attr.b && u_attr.b.s === -1)) {
 
             var timestamp;
@@ -233,7 +218,7 @@ function dashboardUI() {
                 if (account.nextplan) {
                     $('.account.left-pane.plan-date-info').safeHTML(escapeHTML(l[20153]) +
                         '<div class="small-icon info-icon simpletip" ' +
-                        'data-simpletip-style=\'{"max-width":"220px", "text-align":"center"}\' data-simpletip="' +
+                        'data-simpletip-class="center-align medium-width" data-simpletip="' +
                         escapeHTML(l[20965]) + '"></div>');
                 }
                 else if (u_attr.b && u_attr.b.m) {
@@ -299,8 +284,7 @@ function dashboardUI() {
         }
 
         /* Registration date, bandwidth notification link */
-        $('.default-green-button.upgrade-account, .bandwidth-info a, .pay-bill-btn','.dashboard')
-            .rebind('click.dboard', function() {
+        $('.upgrade-to-pro, .pay-bill-btn', '.dashboard').rebind('click.dboard', function() {
             if (u_attr && u_attr.b && u_attr.b.m && (u_attr.b.s === -1 || u_attr.b.s === 2)) {
                 loadSubPage('repay');
             }
@@ -308,6 +292,7 @@ function dashboardUI() {
                 loadSubPage('pro');
             }
         });
+
         $('.account.left-pane.reg-date-info').text(l[16128]);
         $('.account.left-pane.reg-date-val').text(time2date(u_attr.since, 2));
 
@@ -322,59 +307,72 @@ function dashboardUI() {
 
         $($.leftPaneResizable).trigger('resize');
         if (!u_attr.b) {
-            accountUI.general.charts.init(account, true);
+            accountUI.general.charts.init(account);
 
-
-            /* Used Storage progressbar */
+            /* Used Storage */
             var percents = [
                 100 * account.stats[M.RootID].bytes / account.space,
                 100 * account.stats[M.RubbishID].bytes / account.space,
-                100 * account.stats.inshares.bytes / account.space,
                 100 * account.stats[M.InboxID].bytes / account.space,
-                100 * (account.space - account.space_used) / account.space,
+                100 * account.stats[M.RootID].vbytes / account.space,
+                Math.max(100 * (account.space - account.space_used) / account.space, 0),
             ];
-            for (i = 0; i < 5; i++) {
-                if (i === 2) {
-                    // escaping showing incoming share percentage
-                    continue;
-                }
-                var $percBlock = $('.storage .account.progress-perc.pr' + i);
-                if (percents[i] > 0) {
-                    $percBlock.text(Math.round(percents[i]) + ' %');
-                    $percBlock.parent().removeClass('empty hidden');
-                }
-                else {
-                    $percBlock.text('');
-                    $percBlock.parent().addClass('empty hidden');
-                }
+            for (let i = 0; i < percents.length; i++) {
+                const $percBlock = $('.storage .account.progress-perc.pr' + i);
+                $percBlock.safeHTML(`<span class="value">${Math.round(percents[i])}</span><span class="unit">%</span>`);
+                const $percBar = $('.storage .account.progress-bar-section.pr' + i);
+                $percBar.css('width', percents[i] + '%');
             }
 
             // Cloud drive
             $('.account.progress-size.cloud-drive').text(
-                account.stats[M.RootID].bytes > 0 ? bytesToSize(account.stats[M.RootID].bytes) : '-'
+                `(${bytesToSize(account.stats[M.RootID].bytes)})`
             );
             // Rubbish bin
             $('.account.progress-size.rubbish-bin').text(
-                account.stats[M.RubbishID].bytes > 0 ? bytesToSize(account.stats[M.RubbishID].bytes) : '-'
+                `(${bytesToSize(account.stats[M.RubbishID].bytes)})`
             );
-            // Incoming shares
-            // $('.account.progress-size.incoming-shares').text(
-            //    account.stats.inshares.bytes ? bytesToSize(account.stats.inshares.bytes) : '-'
-            // );
-            // Inbox
-            $('.account.progress-size.inbox').text(
-                account.stats[M.InboxID].bytes > 0 ? bytesToSize(account.stats[M.InboxID].bytes) : '-'
-            );
+
+            // Hide the inbox if it is empty
+            const inboxSize = account.stats[M.InboxID].bytes;
+            if (inboxSize > 0) {
+                // Inbox
+                $('.account.progress-size.inbox').text(
+                    `(${bytesToSize(inboxSize)})`
+                );
+                $('.pr-item.inbox').removeClass('hidden');
+            }
+            else {
+                $('.pr-item.inbox').addClass('hidden');
+            }
+
             // Available
             $('.account.progress-size.available').text(
-                account.space - account.space_used > 0 ? bytesToSize(account.space - account.space_used) : '-'
+                `(${bytesToSize(Math.max(account.space - account.space_used, 0))})`
             );
-            /* End of Used Storage progressbar */
+            // Versions
+            $('.account.progress-size.versions').text(
+                `(${bytesToSize(account.stats[M.RootID].vbytes)})`
+            );
+            /* End of Used Storage */
 
-
-            /* Used Bandwidth progressbar */
-            $('.bandwidth .account.progress-bar.green').css('width', account.tfsq.perc + '%');
-            $('.bandwidth .account.progress-size.available-quota').text(bytesToSize(account.tfsq.left, 0));
+            /* hide/show quota warning banner */
+            const quotaBanner = document.querySelector('.non-business-dashboard .account.quota-alert-banner');
+            if (quotaBanner) {
+                if (account.isFull) {
+                    quotaBanner.textContent = l[24973];
+                    quotaBanner.classList.remove('hidden', 'warning');
+                    quotaBanner.classList.add('error');
+                }
+                else if (account.isAlmostFull) {
+                    quotaBanner.textContent = l[24974];
+                    quotaBanner.classList.remove('hidden', 'error');
+                    quotaBanner.classList.add('warning');
+                }
+                else {
+                    quotaBanner.classList.add('hidden');
+                }
+            }
 
             if (u_attr.p) {
                 $('.account.widget.bandwidth').addClass('enabled-pr-bar');
@@ -400,11 +398,6 @@ function dashboardUI() {
                         $dropDownItem.addClass('hidden');
                     }
                 });
-                $('.fm-right-block.dashboard').rebind('click', function(e) {
-                    if (!$(e.target).hasClass('learn-more') && !$('.dropdown.body.bandwidth-inf').hasClass('hidden')) {
-                        $('.dropdown.body.bandwidth-info').addClass('hidden');
-                    }
-                });
 
                 // Get more transfer quota button
                 $('.account.widget.bandwidth .free .more-quota').rebind('click', function() {
@@ -424,15 +417,10 @@ function dashboardUI() {
             }
 
             /* End of Used Bandwidth progressbar */
-            // $('.dashboard .button.upgrade-account').removeClass('hidden');
             // Fill rest of widgets
             dashboardUI.updateWidgets();
         }
         else {
-            // someone modified CSS, hidden class is overwitten --> .hide()
-            if (u_attr.b.s !== -1 || !u_attr.b.m) {
-                $('.dashboard .upgrade-account').addClass('hidden').hide();
-            }
             $('.business-dashboard .user-management-storage .storage-transfer-data')
                 .text(bytesToSize(account.space_used, 2));
             $('.business-dashboard .user-management-transfer .storage-transfer-data')
@@ -457,6 +445,8 @@ function dashboardUI() {
                 return numTextOutput;
             };
 
+            const rubbishSize = account.stats[M.RubbishID].bytes;
+
             var folderNumText = ffNumText(account.stats[M.RootID].folders, 'folder');
             var fileNumText = ffNumText(account.stats[M.RootID].files, 'file');
             $('.ba-root .ff-occupy', $dataStats).text(bytesToSize(account.stats[M.RootID].bytes, 2));
@@ -477,7 +467,7 @@ function dashboardUI() {
 
             folderNumText = ffNumText(account.stats[M.RubbishID].folders, 'folder');
             fileNumText = ffNumText(account.stats[M.RubbishID].files, 'file');
-            $('.ba-rubbish .ff-occupy', $dataStats).text(bytesToSize(account.stats[M.RubbishID].bytes, 2));
+            $('.ba-rubbish .ff-occupy', $dataStats).text(bytesToSize(rubbishSize, 2));
             $('.ba-rubbish .folder-number', $dataStats).text(folderNumText);
             $('.ba-rubbish .file-number', $dataStats).text(fileNumText);
 
@@ -486,6 +476,13 @@ function dashboardUI() {
             $('.ba-pub-links .ff-occupy', $dataStats).text(bytesToSize(account.stats.links.bytes, 2));
             $('.ba-pub-links .folder-number', $dataStats).text(folderNumText);
             $('.ba-pub-links .file-number', $dataStats).text(fileNumText);
+
+            if (rubbishSize > 0) {
+                $('.ba-rubbish', $dataStats).removeClass('empty');
+            }
+            else {
+                $('.ba-rubbish', $dataStats).addClass('empty');
+            }
 
             var verFiles = 0;
             var verBytes = 0;
@@ -500,7 +497,7 @@ function dashboardUI() {
             //    }
             // }
 
-            $('.ba-version .tiny-icon.cog.versioning-settings').rebind('click', function () {
+            $('.ba-version .versioning-settings').rebind('click', function() {
                 loadSubPage('fm/account/file-management');
             });
 
@@ -515,7 +512,6 @@ function dashboardUI() {
 
         // if this is a business account user (sub or master)
         // if (u_attr.b) {
-        //    $('.dashboard .button.upgrade-account').addClass('hidden');
         //    $('.account.widget.bandwidth').addClass('hidden');
         //    $('.account.widget.body.achievements').addClass('hidden');
         // }
@@ -528,6 +524,9 @@ function dashboardUI() {
             M.showRecoveryKeyDialog(2);
         });
     });
+
+    // Init dashboard content scrolling
+    initDashboardScroll();
 }
 dashboardUI.updateWidgets = function(widget) {
     /* Contacts block */
@@ -637,11 +636,11 @@ dashboardUI.updateCloudDataWidget = function() {
         return false;
     });
 
-    $('.account.data-item .tiny-icon.cog').rebind('click', function() {
+    $('.account.data-item .versioning-settings').rebind('click', function() {
         loadSubPage('fm/account/file-management');
     });
 
-    $('.data-float-bl').find('.data-item')
+    $('.data-item:not(.used-storage-info)', '.account.data-table.data')
         .each(function(idx, elm) {
             var props = data[map[idx]];
             var str = l[locale[idx]];
@@ -664,27 +663,35 @@ dashboardUI.updateCloudDataWidget = function() {
             if (props.cnt > 0) {
                 elm.children[2].textContent = bytesToSize(props.size);
                 $(elm).removeClass('empty');
-                $('.account.data-item .tiny-icon.cog').show();
+                $('.account.data-item .versioning-settings').show();
             }
             else {
                 elm.children[2].textContent = '-';
                 $(elm).addClass('empty');
-                $('.account.data-item .tiny-icon.cog').hide();
+                $('.account.data-item .versioning-settings').hide();
             }
         });
 };
 dashboardUI.prototype = undefined;
 Object.freeze(dashboardUI);
 
-function initDashboardScroll(scroll) {
-    $('.fm-right-block.dashboard').jScrollPane({
-        enableKeyboardNavigation: false, showArrows: true, arrowSize: 5, animateScroll: true
-    });
-    jScrollFade('.fm-right-block.dashboard');
-    if (scroll) {
-        var jsp = $('.fm-right-block.dashboard').data('jsp');
-        if (jsp) {
-            jsp.scrollToBottom();
-        }
+/**
+ * Function to init custom block scrolling
+ * @param {Object} $scrollBlock optional custom block selector.
+ */
+function initDashboardScroll() {
+    "use strict";
+
+    var $scrollBlock = $('.fm-right-block.dashboard', '.fm-main');
+
+    if (!$scrollBlock.length) {
+        return false;
+    }
+
+    if ($scrollBlock.is('.ps-container')) {
+        Ps.update($scrollBlock[0]);
+    }
+    else {
+        Ps.initialize($scrollBlock[0]);
     }
 }

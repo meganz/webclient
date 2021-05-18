@@ -27,17 +27,17 @@
  *
  *   1. Create an input on html, adding classname for the custom styles as you required
  *
- *      e.g. `<input class="titleTop" type="text" name="register-name" id="register-name" placeholder="[$195]"
+ *      e.g. `<input class="underlinedText" type="text" name="register-name" id="register-name" placeholder="[$195]"
  *            class="input-email " maxlength="190" />`
  *
  *   1.1 You can use extension for custom style by adding classname of the extension
  *
- *      e.g. `<input class="titleTop strengthChecker" type="password" name="register-password"
+ *      e.g. `<input class="underlinedText strengthChecker" type="password" name="register-password"
  *            id="register-password" class="input-password" placeholder="[$909]" />`
  *
  *      For Devs, when code extension, please leave a comment about what is class name for it,
  *      and an example html to help other people to get info for your extension.
- *      To see an example for the comment please refer megaInputs-titletop.js.
+ *      To see an example for the comment please refer megaInputs-underlinedText.js.
  *
  *   2. Select eletment with jquery and call as following:
  *
@@ -80,7 +80,7 @@
  *                  }
  *              });`
  *
- *          2. Setup on extension code and override original (Please refer titleTop as example)
+ *          2. Setup on extension code and override original (Please refer underlinedText as example)
  *
  *   - Similar way as above, you can setup event binding on the input.
  *
@@ -92,13 +92,13 @@
  *                  }
  *              });`
  *
- *          2. Setup on extension code and override original (Please refer titleTop as example)
+ *          2. Setup on extension code and override original (Please refer underlinedText as example)
  *
  *  - Mark input as required
  *      You can add `requried` class on input to mark it as required. Extension will handle required on it's own way.
  *
  * MegaInputs extensions:
- *  - TEXT: Titletop - megaInputs-titleTop.js
+ *  - TEXT: text input - megaInputs-underlinedText.js
  */
 
 (function($, scope) {

@@ -55,34 +55,25 @@
     padding: 0 0 0 50px;
 }
 .user-card-name {
-    font-size: 14px;
-    line-height: 18px;
-    color: #222;
-    font-family: 'source_sans_prosemibold';
-    white-space: nowrap;
-    -o-text-overflow: ellipsis;
-    text-overflow: ellipsis;
     overflow: hidden;
-    max-width: 100%;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
     position: relative;
-    overflow: hidden;
+    max-width: 100%;
+    box-sizing: border-box;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    font: var(--text-body1);
+    color: var(--text-color-high);
 }
-.user-card-name.button:hover {
+button.user-card-name:hover {
     text-decoration: underline;
 }
 .user-card-name.light {
-    color: #333;
-    font-family: 'LatoWebSemibold', 'source_sans_prosemibold';
-    max-width: -webkit-calc(100% - 40px);
-    max-width: -moz-calc(100% - 40px);
+    color: var(--text-color-high);
     max-width: calc(100% - 40px);
     display: inline-block;
 }
 .user-card-name .grey {
-    color: #999999;
+    color: var(--text-color-medium);
     padding-left: 6px;
 }
 .user-card-name.white {
@@ -109,22 +100,17 @@
     font-size: 12px;
     line-height: 14px;
 }
+.user-card-verified i {
+    --icon-size: 14px;
+    --mask-color: var(--secondary-blue);
+}
 .user-card-verified, .verified .verified_icon {
     width: 15px;
     height: 15px;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
     box-sizing: border-box;
     background-color: white;
-    -moz-border-radius: 100%;
-    -webkit-border-radius: 100%;
     border-radius: 100%;
     float: left;
-    background-image: url(../images/mega/new-chat-sprite_v19.png);
-    background-repeat: no-repeat;
-    background-position: -36px -1351px;
-    -webkit-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.1);
-    -moz-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.1);
     box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.1);
     position: relative;
 }
@@ -193,18 +179,19 @@
     top: 8px;
 }
 .user-card-tick-wrap {
-    width:  24px;
-    height:  24px;
-    border: 2px solid #EEEEEE;
-    -moz-border-radius: 100%;
-    -webkit-border-radius: 100%;
-    border-radius: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    background: var(--checkbox-fill-inactive);
+    border: 1px solid var(--checkbox-border-inactive);
+    border-radius: 3px;
     position: absolute;
     z-index: 1;
     right: 12px;
-    top: 12px;
-     -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
+    top: 50%;
+    transform: translateY(-50%);
     box-sizing: border-box;
 }
 .user-card-tick-wrap i {
@@ -215,9 +202,11 @@
     padding-right: 40px;
 }
 .selected .user-card-tick-wrap {
-    background-color: rgba(0,191,165,0.1);
-    border-color: #00BFA5;
+    background: var(--checkbox-fill-active);
+    border: 1px solid var(--checkbox-fill-active);
 }
 .selected .user-card-tick-wrap i {
     display: block;
+    --icon-size: 14px;
+    --mask-color: var(--secondary-white);
 }

@@ -129,7 +129,8 @@
 }
 
 .corporate-content .media-asset-card .media-asset-card-content p {
-    font-size: 23px !important;
+    font: var(--text-h1) !important;
+    color: var(--text-color-high);
     text-align: center;
     margin-bottom: 20px;
 }
@@ -314,7 +315,7 @@ body:not(.mobile) .corporate.main-menu.item:hover span {
     }
 
     .corporate-content .media-asset-card .media-asset-card-content p {
-        font-size: 20px !important;
+        font: var(--text-h2) !important;
     }
 
     .corporate-content .contact-us {
@@ -404,7 +405,7 @@ body:not(.mobile) .corporate.main-menu.item:hover span {
     }
 
     .corporate-content .media-asset-card .media-asset-card-content p {
-        font-size: 18px !important;
+        font: var(--text-h3) !important;
     }
 
     .corporate-content .media-page-key-features .key-feature-part p.key-feature-text {

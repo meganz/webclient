@@ -16,8 +16,10 @@
                                     <p id="step-p1">[$19842]</p>
                                     <p id="step-p2">[$19843]</p>
 
-                                    <input class="titleTop strengthChecker first" type="password" name="login-password" id="withoutkey-password" placeholder="[$909]" data-icon="account-icon lock">
-                                    <input class="titleTop confirm" type="password" name="login-password2" id="withoutkey-password2" placeholder="[$1114]" data-icon="account-icon lock">
+                                    <div class="reset-input-container">
+                                        <input class="underlinedText strengthChecker first" type="password" name="login-password" id="withoutkey-password" placeholder="[$909]" data-icon="account-icon lock">
+                                        <input class="underlinedText confirm" type="password" name="login-password2" id="withoutkey-password2" placeholder="[$1114]" data-icon="account-icon lock">
+                                    </div>
                                     <div class="new-registration-checkbox reset-pass">
                                         <div class="register-check checkboxOff">
                                             <input class="checkbox checkboxOff" type="checkbox" name="reset-pass" id="reset-pass" checked="">
@@ -25,7 +27,9 @@
                                         <label id="lbl-reset-confirm-txt" class="radio-txt" for="reset-pass">[$1950]</label>
                                         <div class="clear"></div>
                                     </div>
-                                    <div class="restore-verify-button reset-account disabled">[$1951]</div>
+                                    <button class="mega-button positive restore-verify-button reset-account disabled">
+                                        <span>[$1951]</span>
+                                    </button>
                                     <div class="clear"></div>
                                 </div>
                             </div>
@@ -60,16 +64,23 @@
                                         <h5 class="main-italic-header">[$1958]</h5>
                                         <div class="backup-file-info hidden"><span class="restore-uploading-status-icon success"></span><span class="tranfer-filetype-txt">file.txt</span></div>
                                         <input type="file" id="key-upload-field" style="display:none;">
-                                        <label for="key-upload-field" class="upload-key default-green-button">[$1959]</label>
+                                        <label for="key-upload-field" class="mega-button positive upload-key">
+                                            <span>[$1959]</span>
+                                        </label>
                                     </div>
-                                    <div class="recover-divider"><h5 class="main-italic-header">[$174]</h5><hr></div>
+                                    <div class="recover-divider">
+                                        <hr>
+                                        <h5 class="main-italic-header">[$174]</h5>
+                                    </div>
                                     <div class="recover-paste-block">
                                         <h5 class="main-italic-header">[$17042]</h5>
                                         <div class="account input-wrapper recovery-key">
                                             <span class="recover-image icon"></span>
                                             <input type="text" name="key-input2" id="key-input2" placeholder="[$25040]" maxlength="22">
                                         </div>
-                                         <div class="paste-key default-green-button backup-input-button">[$1960]</div>
+                                         <button class="mega-button positive paste-key backup-input-button">
+                                             <span>[$1960]</span>
+                                        </button>
                                     </div>
                                     <p>[$19849]</p>
                                 </div>
@@ -88,10 +99,14 @@
                                     </div>
                                     <h1 class="step-main-question">[$19850]</h1>
                                     <p>[$1961]</p>
-                                    <input class="titleTop strengthChecker first" type="password" name="login-password" id="withkey-password" placeholder="[$909]" autocomplete="new-password" data-icon="account-icon lock">
-                                    <div class="clear"></div>
-                                    <input class="titleTop confirm" type="password" name="login-password2" id="withkey-password2" placeholder="[$1114]" autocomplete="new-password" data-icon="account-icon lock">
-                                    <div class="restore-verify-button disabled">[$1962]</div>
+                                    <div class="reset-input-container">
+                                        <input class="underlinedText strengthChecker first" type="password" name="login-password" id="withkey-password" placeholder="[$909]" autocomplete="new-password" data-icon="account-icon lock">
+                                        <div class="clear"></div>
+                                        <input class="underlinedText confirm" type="password" name="login-password2" id="withkey-password2" placeholder="[$1114]" autocomplete="new-password" data-icon="account-icon lock">
+                                    </div>
+                                    <button class="mega-button positive restore-verify-button disabled">
+                                        <span>[$1962]</span>
+                                    </button>
                                     <div class="clear"></div>
                                 </div>
                             </div>

@@ -1,4 +1,5 @@
 (function(scope) {
+    'use strict';
     var options = {};
 
     /*jshint -W074*/
@@ -16,7 +17,7 @@
 
             $(window).off('resize.proregdialog');
             $('.fm-dialog-overlay').off('click.registerDialog');
-            $('.fm-dialog-close', $dialog).off('click.registerDialog');
+            $('button.js-close', $dialog).off('click.registerDialog');
             $('input', $dialog).val('');
 
             if (isUserTriggered && options.onDialogClosed) {
@@ -53,7 +54,7 @@
 
             hideOverlay();
             closeRegisterDialog($dialog);
-            $('.fm-dialog.registration-page-success').off('click');
+            $('.mega-dialog.registration-page-success').off('click');
 
             if (login) {
                 Soon(function() {
@@ -67,7 +68,7 @@
                 onAccountCreated(login, rv);
             }
             else {
-                // $('.fm-dialog.registration-page-success').removeClass('hidden');
+                // $('.mega-dialog.registration-page-success').removeClass('hidden');
                 // fm_showoverlay();
                 // ^ legacy confirmation dialog, with no email change option
                 sendSignupLinkDialog(rv);
@@ -103,7 +104,7 @@
                 u_logout();
                 hideOverlay();
                 // closeRegisterDialog($dialog, true);
-                $('.fm-dialog:visible').addClass('arrange-to-back');
+                $('.mega-dialog:visible').addClass('arrange-to-back');
                 if (result === EEXIST) {
                     fm_hideoverlay();
                     msgDialog('warninga', l[1578], l[7869]);
@@ -111,7 +112,7 @@
                 }
                 else {
                     msgDialog('warninga', l[1578], l[200], api_strerror(result), function() {
-                        if ($('.fm-dialog:visible').removeClass('arrange-to-back').length) {
+                        if ($('.mega-dialog:visible').removeClass('arrange-to-back').length) {
                             fm_showoverlay();
                         }
                     });
@@ -271,10 +272,10 @@
             closeRegisterDialog(options.$dialog, true);
         }
         options = Object(opts);
-        var $dialog = options.$wrapper || $('.fm-dialog.pro-register-dialog');
-        var $inputs = $dialog.find('input');
-        var $button = $dialog.find('.button');
-        var $password = $dialog.find('input[type="password"]');
+        var $dialog = options.$wrapper || $('.mega-dialog.pro-register-dialog');
+        var $inputs = $('input', $dialog);
+        var $button = $('button', $dialog);
+        var $password = $('input[type="password"]', $dialog);
 
         // Controls events, close button etc
         if (options.controls) {
@@ -282,7 +283,7 @@
         }
         else {
             // controls
-            $('.fm-dialog-close', $dialog).rebind('click.registerDialog', function() {
+            $('button.js-close', $dialog).rebind('click.registerDialog', function() {
                 closeRegisterDialog($dialog, true);
                 return false;
             });
@@ -316,14 +317,16 @@
         accountinputs.init($dialog);
 
         if (M.chat) {
-            $('.dialog-dark-bottom.login', $dialog).removeClass('hidden').find('a')
+            $('aside .login-text', $dialog).removeClass('hidden');
+            $('aside .login-text a, .register-side-pane.header a', $dialog)
                 .rebind('click.doSignup', function() {
                     closeRegisterDialog($dialog, true);
                     megaChat.loginOrRegisterBeforeJoining(undefined, false, true);
                 });
         }
         else if (options.showLogin) {
-            $('.dialog-dark-bottom.login, .register-side-pane.header', $dialog).removeClass('hidden').find('a')
+            $('aside .login-text', $dialog).removeClass('hidden');
+            $('aside .login-text a, .register-side-pane.header a', $dialog)
                 .rebind('click.doSignup', function() {
                     var onAccountCreated = options.onAccountCreated && options.onAccountCreated.bind(options);
 
@@ -340,19 +343,20 @@
                 });
         }
         else {
-            $('.dialog-dark-bottom.login', $dialog).addClass('hidden');
+            $('aside .login-text', $dialog).addClass('hidden');
+            $('aside', $dialog).addClass('no-padding');
         }
 
         $inputs.val('');
         $password.parent().find('.password-status').removeClass('checked');
 
-        $('.register-side-pane.header span', $dialog).text(options.title || l[20755]);
+        $('header h2', $dialog).text(options.title || l[20755]);
         if (options.body) {
-            $('.register-side-pane.header-info', $dialog)
+            $('header p', $dialog)
                 .safeHTML(options.body);
         }
         else {
-            $('.register-side-pane.header-info', $dialog).safeHTML(l[20757]);
+            $('header p', $dialog).safeHTML(l[20757]);
         }
 
         $inputs.rebind('keydown.proRegister', function(e) {
@@ -395,26 +399,27 @@
      * @param {Function} onCloseCallback Optional callback to invoke on close
      */
     function sendSignupLinkDialog(accountData, onCloseCallback) {
-        var $dialog = $('.fm-dialog.registration-page-success').removeClass('hidden');
+        var $dialog = $('.mega-dialog.registration-page-success').removeClass('hidden');
         var $changeEmailLink = $('.reg-success-change-email-btn', $dialog);
         var $resendEmailButton = $('.resend-email-button', $dialog);
 
         if (page && page.indexOf("chat/") > -1  || page === "chat") {
             $dialog.addClass('chatlink');
-            $('.reg-success-icon-container-chat', $dialog).removeClass('hidden');
-            $('.reg-success-icon-container', $dialog).addClass('hidden');
+            $('.reg-success-icon-chat', $dialog).removeClass('hidden');
+            $('.reg-success-icon', $dialog).addClass('hidden');
         }
         else {
             $dialog.removeClass('chatlink');
-            $('.reg-success-icon-container-chat', $dialog).addClass('hidden');
-            $('.reg-success-icon-container', $dialog).removeClass('hidden');
+            $('.reg-success-icon-chat', $dialog).addClass('hidden');
+            $('.reg-success-icon', $dialog).removeClass('hidden');
         }
         $('.reg-resend-email-txt', $dialog).text(accountData.email);
 
         $changeEmailLink.rebind('click', function(event) {
             event.preventDefault();
             $('.reg-resend-email-txt', $dialog).addClass('hidden');
-            $('.reg-success-txtb', $dialog).css('display', 'none');
+            $('footer', $dialog).addClass('hidden');
+            $('.content-block', $dialog).addClass('dialog-bottom');
             if ($dialog.hasClass('chatlink')) {
                 $('.reg-success-special .chat-header', $dialog).text(l[22901]);
             }
@@ -486,9 +491,9 @@
 
         if (typeof onCloseCallback === 'function') {
             // Show dialog close button
-            $('.fm-dialog-header', $dialog).removeClass('hidden');
+            $('button.js-close', $dialog).removeClass('hidden');
 
-            $('.fm-dialog-close', $dialog).rebind('click', function _click() {
+            $('button.js-close', $dialog).rebind('click', function _click() {
 
                 msgDialog('confirmation', l[1334], l[5710], false, function(ev) {
 
@@ -508,13 +513,13 @@
         }
         else {
             // Hide dialog close button
-            $('.fm-dialog-header', $dialog).addClass('hidden');
+            $('button.js-close', $dialog).addClass('hidden');
         }
 
         if (onCloseCallback === true) {
             // we just want the close button to be show and to not trigger anything closing it.
-            $('.fm-dialog-header', $dialog).removeClass('hidden');
-            $('.fm-dialog-close', $dialog).rebind('click', function() {
+            $('button.js-close', $dialog).removeClass('hidden');
+            $('button.js-close', $dialog).rebind('click', function() {
                 // TODO: Move this to safeShowDialog();
                 $dialog.addClass('hidden');
                 fm_hideoverlay();
@@ -523,6 +528,8 @@
         }
 
         fm_showoverlay();
+        $('.content-block', $dialog).removeClass('dialog-bottom');
+        $('footer', $dialog).removeClass('hidden');
         $dialog.addClass('special').show();
     }
 

@@ -28,12 +28,20 @@ var CallFeedback = function(megaChat, options) {
                                 authorContact: eventData.getPeer(),
                                 delay: unixtime(),
                                 buttons: {
+                                    'noThanks': {
+                                        'type': 'secondary',
+                                        'classes': 'mega-button',
+                                        'text': l[8898],
+                                        'callback': function() {
+                                            megaRoom.messagesBuff.removeMessageById(msgId);
+                                            megaRoom.trigger('resize');
+                                        }
+                                    },
                                     'sendFeedback': {
                                         'type': 'primary',
-                                        'classes': 'default-white-button small-text left',
-                                        'icon': 'refresh-circle',
+                                        'classes': 'mega-button positive',
                                         'text': l[1403],
-                                        'callback': function () {
+                                        'callback': function() {
                                             var feedbackDialog = mega.ui.FeedbackDialog.singleton(
                                                 undefined,
                                                 undefined,
@@ -49,15 +57,6 @@ var CallFeedback = function(megaChat, options) {
                                             });
                                         }
                                     },
-                                    'noThanks': {
-                                        'type': 'secondary',
-                                        'classes': 'default-white-button small-text left red',
-                                        'text': l[8898],
-                                        'callback': function () {
-                                            megaRoom.messagesBuff.removeMessageById(msgId);
-                                            megaRoom.trigger('resize');
-                                        }
-                                    }
                                 }
                             })
                         );

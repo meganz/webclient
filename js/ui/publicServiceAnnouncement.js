@@ -176,8 +176,7 @@ var psa = {
         'use strict';
 
         // Use delegated event in case the HTML elements are not loaded yet
-        $('body').off('click', '.public-service-anouncement .button.view-more-info');
-        $('body').on('click', '.public-service-anouncement .button.view-more-info', function() {
+        $('body').rebind('click', '.public-service-anouncement button.view-more-info', function() {
 
             // Get the page link for this announcement
             var pageLink = $(this).attr('data-continue-link');

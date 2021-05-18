@@ -12,7 +12,7 @@ var lastactive = new Date().getTime();
 var seqno = Math.ceil(Math.random()*1000000000);
 var staticpath = null;
 var cmsStaticPath = null;
-var defaultStaticPath = 'https://eu.static.mega.co.nz/3/'; // EU should never fail. EU is the mothership.
+var defaultStaticPath = 'https://eu.static.mega.co.nz/4/'; // EU should never fail. EU is the mothership.
 var defaultCMSStaticPath = 'https://eu.static.mega.co.nz/cms/';
 var ua = window.navigator.userAgent.toLowerCase();
 var uv = window.navigator.appVersion.toLowerCase();
@@ -352,7 +352,7 @@ function geoStaticPath(cms) {
 
     'use strict';
 
-    var finalPath = cms ? 'cms/' : '3/';
+    var finalPath = cms ? 'cms/' : '4/';
     try {
         // If flag is not set to force the default EU static server
         if (!sessionStorage.skipGeoStaticPath) {
@@ -633,7 +633,7 @@ if (!browserUpdate) try
     }
 
     if (location.host === 'smoketest.mega.nz') {
-        staticpath = 'https://smoketest.static.mega.nz/3/';
+        staticpath = 'https://smoketest.static.mega.nz/4/';
         cmsStaticPath = 'https://smoketest.static.mega.nz/cms/';
         defaultStaticPath = staticpath;
         d = 1;

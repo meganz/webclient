@@ -140,7 +140,7 @@ MegaData.prototype['safeSh' + 'owDialog'] = function(name, dsp) {
     'use strict';
     const $dialog = $(typeof dsp === 'function' ? dsp() : dsp);
 
-    $('.fm-dialog:visible, .overlay:visible').addClass('arrange-to-back');
+    $('.fm-dialog:visible, .mega-dialog:visible, .overlay:visible').addClass('arrange-to-back');
 
     fm_showoverlay();
     $dialog.removeClass('hidden arrange-to-back');
@@ -161,8 +161,8 @@ MegaData.prototype['safeSh' + 'owDialog'] = function(name, dsp) {
 function closeDialog() {
     'use strict';
     fm_hideoverlay();
-    $('.fm-dialog, .fm-dialog-mobile').trigger('dialog-closed').addClass('hidden');
-    $('.fm-dialog, .overlay.arrange-to-back, .fm-dialog-mobile').removeClass('arrange-to-back');
+    $('.fm-dialog, .mega-dialog, .fm-dialog-mobile').trigger('dialog-closed').addClass('hidden');
+    $('.fm-dialog, .mega-dialog, .overlay.arrange-to-back, .fm-dialog-mobile').removeClass('arrange-to-back');
 
     delete $.dialog;
     mBroadcaster.sendMessage('closedialog');
@@ -266,12 +266,14 @@ mBroadcaster.once('boot_done', () => {
             $('html').addClass('overlayed');
         }
         else {
-            const $dlg = $('.loginrequired-dialog', '.common-dialogs');
-            $('.fm-dialog-title', $dlg).text(l[5841]);
-            $('.fm-notification-info', $dlg)
-                .safeHTML('<p>@@</p>', l[5842]);
-            $('.icon', $dlg).attr('class', 'icon pricing-sprite plan-icon pro' + selectedPlan);
-            $('.fm-dialog-close').rebind('click', closeDialog);
+            const $dlg = $('.loginrequired-dialog', '.common-container');
+            $('header h2', $dlg).text(l[5841]);
+            $('header p', $dlg).text(l[5842]);
+            $($dlg).addClass('pro' + selectedPlan);
+            $('.js-close', $dlg).rebind('click', () => {
+                $($dlg).removeClass('pro1 pro2 pro3 pro4');
+                closeDialog();
+            });
             $('.pro-login').rebind('click', mega.redirect.bind(mega, 'mega.nz', 'login', kvLogin, null));
             $('.pro-register').rebind('click', mega.redirect.bind(mega, 'mega.nz', 'pro', kvReg, null));
             M.safeShowDialog('loginrequired', $dlg);
@@ -620,6 +622,7 @@ function fm_hideoverlay() {
 }
 
 var showToast = dummy;
+window.toastRack = dummy;
 var bottomPageDialog = () => {
     'use strict';
     mega.redirect('mega.nz', 'sdk');

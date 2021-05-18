@@ -1,5 +1,6 @@
 var versiondialogid;
 (function _fileversioning(global) {
+    'use strict';
 
     var current_sel_version = false;
     var ns = {
@@ -310,10 +311,12 @@ var versiondialogid;
                     }
                 });
             };
+
             var fillVersionList = function(versionList) {
 
                 var html = '';
                 var lastDate = false;
+                let firstHeader = true;
                 for (var i = 0; i < versionList.length; i++) {
 
                     var v = versionList[i];
@@ -330,84 +333,109 @@ var versiondialogid;
                     }
                     //            <!-- Modification Date !-->
                     if (curTimeMarker !== lastDate) {
-                        html += '<div class="fm-versioning data"><span>' + curTimeMarker + '</span></div>';
+                        if (firstHeader) {
+                            firstHeader = false;
+                        }
+                        else {
+                            html += '</table>';
+                        }
+                        html += '<div class="fm-versioning data">' + curTimeMarker + '</div><table class="data-table">';
                     }
                     var actionHtml = (v.u === u_handle) ? l[16480]
                         : l[16476].replace('%1', M.u[v.u] && M.u[v.u].m || l[7381]);
                     if (i < versionList.length - 1) {
                         if (v.name !== versionList[i + 1].name) {
-                            actionHtml = l[17156].replace('%1',
-                            '<span class="light-grey italic">' + htmlentities(versionList[i + 1].name) + '</span>');
+                            actionHtml = l[17156].replace(
+                                '%1',
+                                '<span>' + htmlentities(versionList[i + 1].name) + '</span>');
                         }
                     }
 
-                    var mostRecentHtml = (i === 0) ? '<span class="red">(' + l[17149] + ')</span>' : '';
-                    var radioClass  = (current_sel_version === v.h) ? 'radioOn' : 'radioOff';
-                    var downBtnHtml = '<div class="button download-file" title="' + l[58] +
-                            '" id=' + 'vdl_' + v.h + '>' +
-                            '<i class="small-icon icons-sprite down-arrow"></i>' +
-                            '</div>';
-                    var revertBtnHtml = '<div class="button revert-file" title="' + l[16475] +
-                            '" id=' + 'vrv_' + v.h + '>' +
-                            '<i class="small-icon icons-sprite revert-small-arrow"></i>' +
-                            '</div>';
+                    var mostRecentHtml = (i === 0) ? '<span class="current">(' + l[17149] + ')</span>' : '';
+                    var activeClass  = (current_sel_version === v.h) ? 'active' : '';
+                    var downBtnHtml =
+                        `<div class="download-file simpletip"
+                            data-simpletip="${l[58]}"
+                            aria-label="${l[58]}"
+                            id="vdl_${v.h}">
+                            <i class="sprite-fm-mono icon-download-filled"></i>
+                        </div>`;
+                    var revertBtnHtml =
+                        `<div class="revert-file simpletip"
+                            data-simpletip="${l[16475]}"
+                            aria-label="${l[16475]}"
+                            id="vrv_${v.h}">
+                            <i class="sprite-fm-mono icon-versions-previous"></i>
+                        </div>`;
                     // if the user does not have full access of the shared folder.
                     if ((nodeData && (nodeData.r < 2)) || (fileversioning.dvState === 1) ||
                     ((i === 0) && (fileversioning.getTopNodeSync(current_sel_version) === v.h))) {
-                        revertBtnHtml = '<div class="button revert-file disabled nonclickable" title="' +
-                            l[16475] + '" id=' + 'vrv_' + v.h + '>' +
-                            '<i class="small-icon icons-sprite revert-small-arrow disabled nonclickable"></i>' +
-                            '</div>';
+                        revertBtnHtml =
+                            `<div class="revert-file disabled nonclickable simpletip"
+                                data-simpletip="${l[16475]}"
+                                aria-label="${l[16475]}"
+                                id="vrv_${v.h}">
+                                <i class="sprite-fm-mono icon-versions-previous disabled nonclickable"></i>
+                            </div>`;
                     }
-                    var deleteBtnHtml = '<div class="button delete-file" title="' +
-                            l[1730] + '" id=' + 'vde_' + v.h + '>' +
-                            '<i class="small-icon icons-sprite filled-rubbish-bin"></i>' +
-                            '</div>';
+                    var deleteBtnHtml =
+                        `<div class="delete-file simpletip"
+                            data-simpletip="${l[1730]}"
+                            aria-label="${l[1730]}"
+                            id="vde_${v.h}">
+                            <i class="sprite-fm-mono icon-bin-filled"></i>
+                        </div>`;
                     if (nodeData && (nodeData.r < 2)) {// if the user does not have full access of the shared folder.
-                        deleteBtnHtml = '<div class="button delete-file disabled nonclickable" title="' +
-                            l[1730] + '" id=' + 'vde_' + v.h + '>' +
-                            '<i class="small-icon icons-sprite filled-rubbish-bin disabled nonclickable"></i>' +
-                            '</div>';
+                        deleteBtnHtml =
+                            `<div class="delete-file disabled nonclickable"
+                                data-simpletip="${l[1730]}"
+                                aria-label="${l[1730]}"
+                                id="vde_${v.h}">
+                                <i class="sprite-fm-mono icon-bin-filled disabled nonclickable"></i>
+                            </div>`;
                     }
                     html += // <!-- File Data Row !-->
-                            '<div class="fm-versioning file-info-row" id=' + 'v_' + v.h + '>' +
-                            '<div class="radio-input ' + radioClass + '">' +
-                            '<input type="radio" name="versioning" class="' +
-                            radioClass + '" value="1" id=' + 'r_' + v.h + '></div>' +
-                            '<div class="medium-file-icon ' + fileIcon({'name' : v.name}) + '"></div>' +
-                            '<div class="fm-versioning file-data table-cell">' +
-                            '<div class="fm-versioning file-name">' +
-                            '<span class="grey">' + htmlentities(v.name) + '</span>' +
-                            '</div>' +
-                            '<div class="fm-versioning file-info">' +
-                            '<span class="size">' + bytesToSize(v.s) + '</span>' +
-                            mostRecentHtml +
-                            '</div>' +
-                            '</div>' +
-                            // <!-- Modification time !-->
-                            '<div class="fm-versioning modified-time table-cell">' +
-                            '<i class="small-icon icons-sprite clock"></i>' +
-                            '<span>' +  msgDate.getHours() + ":" + addZeroIfLenLessThen(msgDate.getMinutes(), 2)
-                            + '</span>' +
-                            '</div>' +
-                            // <!-- Modification info !-->
-                            '<div class="fm-versioning modified-info table-cell">' +
-                            // <!-- Classnames: "earth", "refresh-arrows", "mobile-device", "reverted-light-clock" !-->
-                            '<span class="modified-info-txt">' +
-                            actionHtml +
-                            '</span>' +
-                            // <!-- Buttons !-->
-                            '<div class="fm-versioning buttons">' +
-                            downBtnHtml +
-                            revertBtnHtml +
-                            deleteBtnHtml +
-                            '</div>' +
-                            // <!-- End of Buttons !-->
-                            '</div>' +
-                            '<div class="clear"></div>' +
-                            '</div>';
+                            `<tr class="fm-versioning file-info-row ${activeClass}" id=v_${v.h}>
+                                <td class="fm-versioning file-icon">
+                                    <div class="medium-file-icon ${fileIcon({name : v.name})}"></div>
+                                </td>
+                                <td class="fm-versioning file-data">
+                                    <div class="fm-versioning file-name">
+                                        <span>${htmlentities(v.name)}</span>
+                                    </div>
+                                    <div class="fm-versioning file-info">
+                                        <span class="size">${bytesToSize(v.s)}</span>
+                                        <span>${mostRecentHtml}</span>
+                                    </div>
+                                </td>
+                                ${/* Modification time */''}
+                                <td class="fm-versioning modified-time">
+                                    <i class="sprite-fm-uni icon-history"></i>
+                                    <span>
+                                        ${msgDate.getHours()}:${addZeroIfLenLessThen(msgDate.getMinutes(), 2)}
+                                    </span>
+                                </td>
+                                ${/* Modification info */''}
+                                <td class="fm-versioning modified-info">
+                                    ${/* Classnames: "earth", "refresh-arrows",
+                                    "mobile-device", "reverted-light-clock" */''}
+                                    <span class="modified-info-txt">
+                                        ${actionHtml}
+                                    </span>
+                                </td>
+                                <td class="fm-versioning button-container">
+                                    ${/* Buttons */''}
+                                    <div class="fm-versioning buttons">
+                                        ${downBtnHtml}
+                                        ${revertBtnHtml}
+                                        ${deleteBtnHtml}
+                                    </div>
+                                    ${/* End of Buttons */''}
+                                </td>
+                            </tr>`;
                     lastDate = curTimeMarker;
                 }
+                html += '</table>';
                 return html;
             };
 
@@ -415,6 +443,7 @@ var versiondialogid;
             var name;
             var pathHtml = '';
             for (var i in a2) {
+                let hasArrow = false;
                 name = '';
                 if (a2[i] === M.RootID) {
                     if (M.d[M.RootID]) {
@@ -443,53 +472,51 @@ var versiondialogid;
                     var n = M.d[a2[i]];
                     if (n && n.name) {
                         name = n.name;
+                        hasArrow = true;
                     }
                 }
-                pathHtml = '<span>' + htmlentities(name) + '</span>' + pathHtml;
+                name = htmlentities(name);
+                pathHtml =
+                    `<span>
+                        ${hasArrow ? '<i class="sprite-fm-mono icon-arrow-right"></i>' : ''}
+                        <span class="simpletip" data-simpletip="${name}">${name}</span>
+                    </span>` + pathHtml;
             }
 
             var refreshHeader = function(fileHandle) {
                 if (((fileHandle === fh)
                         && (fileversioning.getTopNodeSync(fileHandle) === current_sel_version))
                         || (nodeData && (nodeData.r < 2)) || (fileversioning.dvState === 1)) {
-                    $('.fm-versioning .pad .top-column .default-white-button .reverted-clock')
-                        .parent()
+                    $('.fm-versioning .pad .top-column button.js-revert')
                         .addClass("disabled nonclickable");
                 }
                 else {
-                    $('.fm-versioning .pad .top-column .default-white-button .reverted-clock')
-                        .parent()
+                    $('.fm-versioning .pad .top-column button.js-revert')
                         .removeClass("disabled nonclickable");
                 }
                 if (nodeData && (nodeData.r < 2)) {
-                    $('.fm-versioning .pad .top-column .default-white-button .rubbish-bin-icon')
-                        .parent()
+                    $('.fm-versioning .pad .top-column button.js-delete')
                         .addClass("disabled nonclickable");
-                    $('.fm-versioning .pad .top-column .default-white-button .clock-with-cross')
-                        .parent()
+                    $('.fm-versioning .pad .top-column button.js-clear-previous')
                         .addClass("disabled nonclickable");
                 }
                 else {
-                    $('.fm-versioning .pad .top-column .default-white-button .rubbish-bin-icon')
-                        .parent()
+                    $('.fm-versioning .pad .top-column button.js-delete')
                         .removeClass("disabled nonclickable");
-                    $('.fm-versioning .pad .top-column .default-white-button .clock-with-cross')
-                        .parent()
+                    $('.fm-versioning .pad .top-column button.js-clear-previous')
                         .removeClass("disabled nonclickable");
                     if (M.d[fh].tvf) {
-                        $('.fm-versioning .pad .top-column .default-white-button .clock-with-cross')
-                            .parent()
+                        $('.fm-versioning .pad .top-column button.js-clear-previous')
                             .removeClass("disabled nonclickable");
                     }
                     else {
-                        $('.fm-versioning .pad .top-column .default-white-button .clock-with-cross')
-                            .parent()
+                        $('.fm-versioning .pad .top-column button.js-clear-previous')
                             .addClass("disabled nonclickable");
                     }
                 }
 
                 var f = M.d[fileHandle];
-                var fnamehtml = '<span class="grey">' + htmlentities(f.name);
+                var fnamehtml = '<span>' + htmlentities(f.name);
 
                 $('.fm-versioning .header .pad .top-column .file-data .file-name').html(fnamehtml);
 
@@ -498,18 +525,18 @@ var versiondialogid;
                     .addClass(fileIcon({'name':f.name}));
 
             };
-            var fnamehtml = '<span class="grey">' + htmlentities(f.name);
+            var fnamehtml = '<span>' + htmlentities(f.name);
 
             $('.fm-versioning .header .pad .top-column .file-data .file-name').html(fnamehtml);
             $('.fm-versioning .header .pad .top-column .file-data .file-path').html(pathHtml);
             $('.fm-versioning .header .pad .top-column .medium-file-icon').addClass(fileIcon({'name':f.name}));
 
-            $('.fm-versioning .pad .top-column .default-white-button .down-arrow').parent()
+            $('.fm-versioning .pad .top-column button.js-download')
                     .rebind('click', function() {
                 M.addDownload([current_sel_version]);
             });
 
-            $('.fm-versioning .pad .top-column .default-white-button .rubbish-bin-icon').parent()
+            $('.fm-versioning .pad .top-column button.js-delete')
                 .rebind('click', function() {
                     $('.fm-versioning.overlay').addClass('arrange-to-back');
                     var apiReq = function(handle) {
@@ -530,14 +557,14 @@ var versiondialogid;
                     }
             });
 
-            $('.fm-versioning .pad .top-column .default-white-button .reverted-clock').parent()
+            $('.fm-versioning .pad .top-column button.js-revert')
                     .rebind('click', function() {
                 if (!$(this).hasClass('disabled')) {
                     revertVersion(current_sel_version, fh);
                 }
             });
 
-            $('.fm-versioning .header .button.close').rebind('click', function() {
+            $('.fm-versioning .button.close').rebind('click', function() {
                 fileversioning.closeFileVersioningDialog(window.versiondialogid);
             });
 
@@ -546,46 +573,31 @@ var versiondialogid;
                     var vh = fillVersionList(versions);
                     $('.fm-versioning .body .scroll-bl .content').html(vh);
                     $('.fm-versioning .body .file-info-row').rebind('click', function() {
-                        $('.radio-input').removeClass('radioOn');
-                        $('.radio-input').addClass('radioOff');
-                        $('.radio-input', $(this)).removeClass('radioOff');
-                        $('.radio-input', $(this)).addClass('radioOn');
+                        $('.fm-versioning .body .file-info-row').removeClass('active');
+                        $(this).addClass('active');
                         current_sel_version = this.id.substring(2);
                         refreshHeader(this.id.substring(2));
                     });
 
                     $('.fm-versioning .body .file-info-row').rebind('dblclick.fileInfoRow', function() {
-                        $('.radio-input').removeClass('radioOn');
-                        $('.radio-input', $(this)).addClass('radioOn');
+                        $('.fm-versioning .body .file-info-row').removeClass('active');
+                        $(this).addClass('active');
                         M.addDownload([this.id.substring(2)]);
                         current_sel_version = this.id.substring(2);
                         refreshHeader(this.id.substring(2));
                     });
 
-                    $('input[type=radio]').change(function() {
-                        $('.radio-input').removeClass('radioOn');
-                        $(this).parent().addClass('radioOn');
-                        current_sel_version = this.id.substring(2);
-                        refreshHeader(this.id.substring(2));
-                        if (current_sel_version === fileversioning.getTopNodeSync(current_sel_version)) {
-                            $('#vrv_' + current_sel_version).addClass('disabled nonclickable');
-                        }
-                        else {
-                            $('#vrv_' + current_sel_version).removeClass('disabled nonclickable');
-                        }
-                    });
-
-                    $('.fm-versioning .buttons .button.download-file').rebind('click', function() {
+                    $('.fm-versioning .buttons .download-file').rebind('click', function() {
                         M.addDownload([this.id.substring(4)]);
                         current_sel_version = this.id.substring(4);
                     });
-                    $('.fm-versioning .buttons .button.revert-file').rebind('click', function() {
+                    $('.fm-versioning .buttons .revert-file').rebind('click', function() {
                         if (!$(this).hasClass('disabled')) {
                             revertVersion(this.id.substring(4), fh);
                             current_sel_version = this.id.substring(4);
                         }
                     });
-                    $('.fm-versioning .buttons .button.delete-file').rebind('click', function() {
+                    $('.fm-versioning .buttons .delete-file').rebind('click', function() {
                         var apiReq = function(handle) {
                             api_req({a: 'd',
                                      n: handle,
@@ -605,7 +617,7 @@ var versiondialogid;
                         }
                     });
 
-                    $('.fm-versioning .pad .top-column .default-white-button .clock-with-cross').parent()
+                    $('.fm-versioning .pad .top-column button.js-clear-previous')
                     .rebind('click', function() {
 
                         if (!$(this).hasClass('disabled')) {

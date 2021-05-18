@@ -1,0 +1,618 @@
+.top-head {
+    background-color: var(--surface-grey-2);
+    position: relative;
+}
+.topbar {
+    align-items: flex-end;
+    box-sizing: border-box;
+    display: flex;
+    font-size: 0;
+    padding: 0 16px;
+    background-color: var(--surface-main);
+    height: 48px;
+}
+
+.topbar .logo-wrapper {
+    align-items: flex-end;
+    display: flex;
+}
+
+.topbar .logo-wrapper button {
+    margin: 0 4px;
+}
+
+.bottom-page .topbar .logo-wrapper button {
+    margin: 0;
+    -webkit-margin-start: 20px;
+    margin-inline-start: 20px;
+}
+
+.topbar .logo {
+    --icon-size: 24px;
+    background: none;
+    height: auto;
+    padding: 4px;
+    margin: 0;
+    width: auto;
+}
+.topbar .searcher-wrapper {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    -webkit-margin-start: 62px;
+    margin-inline-start: 62px;
+}
+.topbar-searcher {
+    max-width: 480px;
+    width: 100%;
+    min-height: 32px;
+    background: var(--surface-grey-6);
+    border-radius: 50px;
+    position: relative;
+}
+.topbar-searcher form {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.topbar-searcher i {
+    --icon-size: 24px;
+    --mask-color: var(--icon-inactive);
+}
+
+.topbar-searcher i.search-icon {
+    -webkit-margin-start: 8px;
+    margin-inline-start: 8px;
+}
+.topbar-searcher input {
+    border: 0;
+    background-color: transparent;
+    padding: 6px 0;
+    margin: 0 16px;
+    box-sizing: border-box;
+    width: 100%;
+    color: var(--surface-main-inverted);
+    font: var(--text-body1);
+}
+.topbar-searcher button {
+    cursor: pointer;
+    -webkit-margin-end: 4px;
+    margin-inline-end: 4px;
+    border: none;
+    outline: transparent;
+    background-color: transparent;
+}
+.topbar-searcher input::placeholder {
+    color: var(--surface-main-inverted);
+    opacity: 0.3;
+}
+.topbar-searcher button i {
+    --icon-size: 16px;
+    --mask-color: var(--surface-main-inverted);
+}
+/* mini search */
+
+.topbar .mini-search {
+    -webkit-margin-end: 16px;
+    margin-inline-end: 16px;
+    overflow: hidden;
+    position: relative;
+}
+
+.topbar .mini-search button {
+    cursor: pointer;
+    flex-shrink: 0;
+    height: 32px;
+    margin: 0;
+    padding: 4px;
+    width: 32px;
+}
+
+.topbar .mini-search .topbar-mini-search {
+    padding: 4px;
+}
+
+.topbar .mini-search .topbar-mini-search-close {
+    height: 32px;
+    position: relative;
+    width: 32px;
+}
+
+.topbar .mini-search.hidden {
+    display: none;
+}
+
+.topbar .mini-search .topbar-searcher {
+    background: transparent;
+    display: flex;
+    transition: background-color 350ms, width 350ms;
+    width: 32px;
+}
+
+.topbar .mini-search button i::before {
+    transition: color 350ms;
+    --mask-color: var(--icon-rest);
+}
+
+.topbar .mini-search button:hover i::before {
+    --mask-color: var(--icon-active);
+}
+
+.topbar .mini-search .topbar-searcher form {
+    flex-shrink: 0;
+    overflow: hidden;
+    width: 168px;
+}
+
+.topbar .mini-search .topbar-searcher input {
+    margin: 0 12px;
+}
+
+/* highlighted state */
+
+.topbar .mini-search.highlighted .topbar-searcher {
+    background: var(--surface-grey-6);
+}
+
+.topbar .mini-search.highlighted .topbar-mini-search i::before {
+    --mask-color: var(--icon-inactive);
+}
+
+/* active state */
+
+.topbar .mini-search.active .topbar-mini-search {
+    pointer-events: none;
+}
+
+.topbar .mini-search.active .topbar-searcher {
+    width: 200px;
+}
+
+/* has a valid input state */
+
+.topbar .mini-search form .valid,
+.topbar .mini-search form .invalid {
+    backface-visibility: hidden;
+    display: block;
+    position: absolute;
+    right: 8px;
+    top: 8px;
+    transition: transform 350ms, opacity 350ms;
+}
+
+.topbar .mini-search form.valid .valid,
+.topbar .mini-search form .invalid {
+    transform: rotateZ(0);
+    opacity: 1;
+}
+
+.topbar .mini-search form .valid {
+    transform: rotateZ(-180deg);
+    opacity: 0;
+}
+
+.topbar .mini-search form.valid .invalid {
+    transform: rotateZ(180deg);
+    opacity: 0;
+}
+
+/* end mini search */
+
+.topbar .fmdb-loader {
+    display: inline-block;
+    margin: 4px 24px;
+    width: 24px;
+    height: 24px;
+    opacity: 0;
+    transition: opacity 100ms;
+}
+.fmdb-working .topbar .fmdb-loader {
+    animation: rotate 1.5s linear infinite;
+    animation-timing-function: steps(12, end);
+    opacity: 1;
+}
+.fmdb-working .topbar .fmdb-loader::after {
+    content: '';
+    top: -1px;
+    background: transparent;
+    display: block;
+    position: absolute;
+    left: -1px;
+    bottom: -1px;
+    right: -1px;
+    border: 2px solid var(--stroke-main);
+}
+.topbar-links {
+    align-items: center;
+    display: flex;
+    height: 32px;
+    position: relative;
+}
+
+.topbar-links > .dropdown {
+    align-items: center;
+    display: flex;
+    height: 100%;
+}
+
+.topbar-links > .dropdown.hidden {
+    display: none;
+}
+
+/* Icon Button */
+
+.topbar .btn-icon {
+    cursor: pointer;
+    background-color: transparent;
+    border: none;
+    outline: transparent;
+    margin: 0;
+    -webkit-margin-end: 20px;
+    margin-inline-end: 20px;
+    padding: 4px;
+    transition: margin 0.2s ease-in-out;
+}
+
+.topbar .btn-icon:last-child {
+    -webkit-margin-end: 0;
+    margin-inline-end: 0;
+}
+
+.topbar .btn-icon.menu-open {
+    -webkit-margin-start: 220px;
+    margin-inline-start: 220px;
+}
+.topbar-links .btn-icon i,
+.topbar .btn-icon i {
+    --icon-size: 24px;
+    vertical-align: middle;
+}
+.topbar .btn-icon i.sprite-fm-mono,
+.topbar-links .btn-icon i.sprite-fm-mono {
+    --mask-color: var(--icon-active);
+}
+
+/*
+ * Icon Buttons separator.
+ * Hidden by default, but visible is aany previous element if shown.
+ * Should have common wrappper with element, whicch are separated
+*/
+
+.topbar hr {
+    background-color: var(--divider-color);
+    border: 0;
+    content: '';
+    display: none;
+    height: calc(100% - 8px);
+    margin: 0;
+    -webkit-margin-end: 20px;
+    margin-inline-end: 20px;
+    width: 1px;
+}
+.topbar *:not(.hidden) ~ hr {
+    display: block;
+}
+
+/* Top  bar Avatar and presence status */
+
+.topbar-links .btn-icon .avatar-wrapper {
+    float: none;
+    font-size: 12px;
+    height: 24px;
+    line-height: 24px;
+    width: 24px;
+}
+
+.topbar-links .btn-icon .small-rounded-avatar img {
+  width: 24px;
+  height: 24px;
+}
+
+.topbar .btn-icon .activity-status-block {
+    margin: 0;
+    -webkit-margin-start: 15px;
+    margin-inline-start: 15px;
+    position: absolute;
+    top: 1px;
+    z-index: 1;
+}
+
+/* Icon badge. Used in notification button */
+
+.icon-badge {
+    background-color: var(--secondary-red);
+    font-size: 12px;
+    color: var(--text-color-white-higher);
+    text-align: center;
+    width: auto;
+    border-radius: 4px;
+    position: absolute;
+    top: 0;
+    left: 17px;
+    display: inline;
+    line-height: 14px;
+    padding: 0 4px;
+}
+.topbar .activity-status.top::after {
+    content: '';
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    display: block;
+    z-index: 10;
+    left: -3px;
+    top: -3px;
+}
+.topbar .dropdown {
+    line-height: 0;
+    position: relative;
+}
+
+.topbar .dropdown-content {
+    display: none;
+    position: absolute;
+}
+.topbar .dropdown.show .dropdown-content {
+    display: block;
+    right: -10px;
+}
+.topbar .dropdown-arrow {
+    right: -30px;
+    top: 40px;
+    width: auto;
+}
+.topbar .dropdown-arrow::before {
+    content: '';
+    width: 12px;
+    height: 12px;
+    position: absolute;
+    background: var(--arrow-color, var(--surface-main));
+    border-bottom: 1px solid var(--stroke-grey-2);
+    border-right: 1px solid var(--stroke-grey-2);
+    z-index: 123;
+    transform: rotateZ(-135deg);
+    top: -7px;
+    right: 38px;
+}
+.topbar .top-login-popup.dropdown-arrow::before {
+    right: 80px;
+}
+.topbar .account-dialog {
+    width: auto;
+}
+.topbar .dropdown.account .dropdown.popup {
+    width: 312px;
+    padding: 0;
+}
+.topbar .account-dialog .header {
+    display: flex;
+    padding: 16px;
+    border-bottom: 1px solid var(--divider-color);
+    margin-bottom: 8px;
+}
+.topbar .account-dialog .body {
+    top: 10px;
+}
+.account-avatar .small-rounded-avatar {
+    height: 64px;
+    width: 64px;
+    border-radius: 8px;
+}
+.topbar .account-dialog .account-info {
+    flex-grow: 1;
+    -webkit-margin-start: 16px;
+    margin-inline-start: 16px;
+    display: flex;
+    flex-direction: column;
+}
+.topbar .activity-status-wrapper {
+    display: flex;
+    align-items: center;
+    margin-top: 5px;
+}
+.topbar .account-dialog .account-info .activity-status-block{
+    position: relative;
+    left: 0;
+    margin: 0;
+    width: min-content;
+}
+.topbar .account-dialog .account-info .name {
+    color: var(--text-color-higher);
+    font: var(--text-h3);
+    letter-spacing: 0;
+    line-height: 24px;
+ }
+.topbar .account-dialog .account-info .email {
+    opacity: 0.7;
+    color: var(--text-color-higher);
+    font: var(--text-body1);
+    letter-spacing: 0;
+    line-height: 20px;
+ }
+.topbar .account-dialog .account-info .activity-text {
+    opacity: 0.7;
+    color: var(--text-color-higher);
+    font: var(--text-body1);
+    letter-spacing: 0;
+    line-height: 20px;
+    margin-left: 5px;
+ }
+.topbar .account-dialog ul.links {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 16px;
+    width: 100%;
+}
+.topbar .account-dialog ul.links li {
+    font: var(--text-body1);
+    margin: 0 8px;
+}
+.topbar .account-dialog ul.links li button {
+    --mask-color: var(--icon-rest);
+    align-items: center;
+    display: flex;
+    padding: 8px;
+    width: 100%;
+    text-align: left;
+    color: var(--text-color-medium);
+    border-radius: 4px;
+    font: var(--text-body1);
+    background-color: transparent;
+    border: none;
+    outline: transparent;
+    cursor: pointer;
+    transition: var(--transition-color), var(--transition-bg-color);
+    margin: 0;
+    float: none;
+}
+.topbar .account-dialog ul.links li button:hover,
+.topbar .account-dialog ul.links li button.active {
+    --mask-color: var(--icon-active);
+    background: var(--surface-grey-2);
+    color: var(--text-color-high);
+    opacity: 1;
+}
+.topbar .account-dialog ul.links li button span {
+    flex: 1;
+}
+.topbar .account-dialog ul.links li button > i {
+    --icon-size: 16px;
+     -webkit-margin-end: 8px;
+    margin-inline-end: 8px;
+    transition: var(--transition-color);
+}
+.topbar .account-dialog ul.links li button > span + i {
+    --icon-size: 16px;
+    margin: 0;
+     -webkit-margin-start: 8px;
+    margin-inline-start: 8px;
+}
+.topbar .account-dialog ul.links li .status-dropdown {
+    position: relative;
+    display: block;
+}
+.topbar .account-dialog ul.links li .status-dropdown .dropdown-content {
+    display: none;
+    position: absolute;
+    left: -242px;
+    top: -24px;
+    width: 242px;
+    z-index: 1;
+    padding: 19px;
+    background: var(--surface-main);
+    border-radius: 24px;
+    border: var(--dropdown-border);
+    min-width: 160px;
+    min-height: 32px;
+    box-sizing: border-box;
+    box-shadow: var(--dropdown-shadow);
+  }
+.topbar .account-dialog ul.links li .status-dropdown:hover .dropbtn {
+    background-color: var(--surface-grey-2);
+    color: var(--text-color-high);
+}
+.topbar .account-dialog ul.links li .status-dropdown:hover .dropdown-content {
+    display: block;
+}
+.topbar .account-dialog ul.links li.separator {
+    height: 1px;
+    margin: 8px 0;
+    background-color: var(--divider-color);
+}
+.topbar .notification-popup .fm-notifications-bottom {
+    padding: 12px 20px 16px;
+    justify-content: flex-end;
+    border-top: 1px solid var(--divider-color);
+}
+.topbar .top-warning-popup .fm-notifications-bottom {
+    border-top: none;
+    padding: 24px 0 0;
+    justify-content: flex-end;
+}
+.topbar .notification-popup .notification-txt {
+    background: none;
+}
+.topbar .dropdown.top-login-popup {
+    position: absolute;
+    top: 62px;
+    right: 10px;
+    min-width: 160px;
+    min-height: 32px;
+}
+.topbar .dropdown.top-login-popup .dropdown-white-arrow{
+    left: auto;
+    right: 79px;
+    top: -11px;
+}
+.topbar .top-icon.pass-reminder {
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    -webkit-margin-end: 14px;
+    margin-inline-end: 14px;
+    -webkit-margin-start: 6px;
+    margin-inline-start: 6px;
+    position: relative;
+    top: -6px;
+}
+.topbar .top-icon.pass-reminder i {
+    width: 100%;
+    height: 100%;
+}
+.topbar .top-icon.pass-reminder::before {
+    content: none;
+}
+/* Change top language button */
+
+.topbar .top-change-language {
+    padding: 4px 0;
+}
+
+.top-change-language-name {
+    color: var(--text-color-high);
+    font: var(--text-body1-bold);
+    -webkit-padding-start: 4px;
+    padding-inline-start: 4px;
+
+    /* stylelint-disable-next-line property-disallowed-list */
+    text-transform: uppercase;
+    vertical-align: middle;
+}
+
+/* mega-buttons in top bar */
+
+.top-buttons button {
+    margin: 0;
+    min-width: 68px;
+    display: inline-block;
+}
+
+.top-buttons button:not(.hidden) + button {
+    -webkit-margin-start: 12px;
+    margin-inline-start: 12px;
+}
+
+.top-head .top-buttons {
+    display: flex;
+    -webkit-margin-end: 16px;
+    margin-inline-end: 16px;
+}
+
+.top-head .top-buttons.hidden {
+    display: none;
+}
+
+.top-head .top-buttons.business {
+    display: none;
+    position: relative;
+}
+
+.business .top-head .top-buttons {
+    display: none;
+}
+
+.business .top-head .top-buttons.business {
+    display: block;
+}

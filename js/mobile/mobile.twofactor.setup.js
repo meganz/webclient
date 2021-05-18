@@ -75,8 +75,8 @@ mobile.twofactor.setup = {
                     width: 160,
                     height: 160,
                     correctLevel: QRErrorCorrectLevel.H,    // High
-                    background: '#ffffff',
-                    foreground: '#000',
+                    background: '#f2f2f2',
+                    foreground: '#151412',
                     text: 'otpauth://totp/MEGA:' + u_attr.email + '?secret=' + response + '&issuer=MEGA'
                 };
 

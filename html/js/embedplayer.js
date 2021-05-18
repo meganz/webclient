@@ -82,7 +82,7 @@ function init_embed(ph, key, g) {
         if (unfortunateHackpatch || under('security')) {
             $('.viewer-top-bl, .logo-container').remove();
             $('.viewer-bottom-bl').addClass('no-grad');
-            $('.download.video-block').addClass('no-bg-color');
+            $('.media-viewer').addClass('no-bg-color');
         }
         else {
             localStorage.affid = ph;
@@ -247,7 +247,7 @@ function add_layout() {
 
 function topmenuUI() {
     'use strict';
-    var $useravatar = $('.viewer-button.useravatar');
+    var $useravatar = $('.v-btn.useravatar');
     var $avatarwrapper = $('.avatar-wrapper');
     var _colors = [
         "#69F0AE", "#13E03C", "#31B500", "#00897B", "#00ACC1",

@@ -829,7 +829,7 @@ var dlmanager = {
 
         dlmanager.isOverQuota = false;
         dlmanager.isOverFreeQuota = false;
-        $('.limited-bandwidth-dialog .fm-dialog-close').trigger('click');
+        $('.limited-bandwidth-dialog button.js-close, .limited-bandwidth-dialog .fm-dialog-close').trigger('click');
     },
 
     dlQueuePushBack: function DM_dlQueuePushBack(aTask) {
@@ -887,8 +887,9 @@ var dlmanager = {
                 dlmanager.abort(dl, eekey);
             });
             if (M.chat) {
-                $('.toast-notification').removeClass('visible');
-                showToast('download', eekey ? l[24] : l[20228]);
+                window.toaster.main.hideAll().then(() => {
+                    showToast('download', eekey ? l[24] : l[20228]);
+                });
             }
             else if (code === ETOOMANY) {
 
@@ -1274,7 +1275,7 @@ var dlmanager = {
         this.setUserFlags();
 
         var ids = dlmanager.getCurrentDownloads();
-        // $('.limited-bandwidth-dialog .fm-dialog-close').trigger('click');
+        // $('.limited-bandwidth-dialog button.js-close').trigger('click');
 
         if (d) {
             this.logger.debug('_onQuotaRetry', getNewUrl, ids, this._dlQuotaListener.length, this._dlQuotaListener);
@@ -1592,7 +1593,7 @@ var dlmanager = {
 
             $('.video-theatre-mode:visible').addClass('paused');
 
-            $('.fm-dialog-close', $dialog).add($('.fm-dialog-overlay'))
+            $('button.js-close, .fm-dialog-close', $dialog).add($('.fm-dialog-overlay'))
                 .rebind('click.closeOverQuotaDialog', function() {
 
                     unbindEvents();
@@ -1646,10 +1647,10 @@ var dlmanager = {
 
             if (preWarning && !u_wasloggedin()) {
                 api_req({a: 'log', e: 99646, m: 'on pre-warning not-logged-in'});
-                $('.default-big-button.login', $oqbbl).addClass('hidden');
+                $('button.login', $oqbbl).addClass('hidden');
             }
             else {
-                $('.default-big-button.login', $oqbbl).removeClass('hidden').rebind('click', function() {
+                $('button.login', $oqbbl).removeClass('hidden').rebind('click', function() {
                     api_req({a: 'log', e: 99644, m: 'on overquota login clicked'});
                     closeDialog();
 
@@ -1665,7 +1666,7 @@ var dlmanager = {
                 });
             }
 
-            $('.default-big-button.create-account', $oqbbl).rebind('click', showOverQuotaRegisterDialog);
+            $('button.create-account', $oqbbl).rebind('click', showOverQuotaRegisterDialog);
         }
 
         $dialog.addClass('hidden-bottom');
@@ -1781,7 +1782,7 @@ var dlmanager = {
                 if ($dialog) {
                     fm_showoverlay();
                     $dialog.removeClass('hidden')
-                        .find('.fm-dialog-close')
+                        .find('button.js-close, .fm-dialog-close')
                         .rebind('click.quota', closeDialog);
                 }
                 delete dlmanager.onOverquotaWithAchievements;
@@ -1817,44 +1818,15 @@ var dlmanager = {
                     return 'ontouchstart' in window || 'onmsgesturechange' in window;
                 };
 
-                // Change dialog height to fit browser height
-                var updateDialogHeight = function() {
-
-                    var dialogHeight;
-                    var contentHeight;
-
-                    $dialog.css('height', '');
-                    dialogHeight = $dialog.outerHeight();
-                    contentHeight = $('.fm-dialog-body', $dialog).outerHeight();
-
-                    if (dialogHeight < contentHeight) {
-                        $dialog.outerHeight(contentHeight);
+                // Initialise scrolling
+                if (!is_touch()) {
+                    if ($scrollBlock.is('.ps-container')) {
+                        Ps.update($scrollBlock[0]);
                     }
-
-                    if (!is_touch()) {
-
-                        // Update previous scrolling
-                        if ($scrollBlock.is('.ps-container')) {
-                            Ps.update($scrollBlock[0]);
-                        }
-                        else {
-                            // Initialize scrolling
-                            Ps.initialize($scrollBlock[0]);
-                        }
+                    else {
+                        Ps.initialize($scrollBlock[0]);
                     }
-                };
-
-                // Change dialog height to fit browser height
-                Soon(updateDialogHeight);
-
-                $(window).rebind('resize.overQuotaDialog', function() {
-
-                    // Change dialog height to fit browser height
-                    updateDialogHeight();
-
-                    // Change dialog position
-                    dialogPositioning($dialog);
-                });
+                }
             }
         });
     },
@@ -1869,7 +1841,7 @@ var dlmanager = {
             if (callback) {
                 $dialog.removeClass('registered achievements exceeded pro slider uploads');
                 $('.bottom-tips a', $dialog).off('click');
-                $('.continue, .continue-download, .fm-dialog-close', $dialog).off('click');
+                $('.continue, .continue-download, button.js-close, .fm-dialog-close', $dialog).off('click');
                 $('.upgrade, .pricing-page.plan, .mobile.upgrade-to-pro', $dialog).off('click');
                 $('.get-more-bonuses', $dialog).off('click');
                 if ($.dialog === 'download-pre-warning') {
@@ -1931,7 +1903,7 @@ var dlmanager = {
         loadingDialog.hide();
 
         var asyncTaskID = false;
-        var $dialog = $('.fm-dialog.limited-bandwidth-dialog');
+        var $dialog = $('.limited-bandwidth-dialog');
 
         $(document).fullScreen(false);
         this._setOverQuotaState(dlTask);
@@ -1941,7 +1913,7 @@ var dlmanager = {
             return;
         }
 
-        if ($('.fm-dialog.achievements-list-dialog').is(':visible')) {
+        if ($('.achievements-list-dialog').is(':visible')) {
             this.logger.info('showOverQuotaDialog', 'Achievements dialog visible.');
             return;
         }
@@ -1987,13 +1959,13 @@ var dlmanager = {
                     $('.chart.data .pecents-txt', $dialog).text(tfsQuotaLimit[0]);
                     $('.chart.data .gb-txt', $dialog).text(tfsQuotaLimit[1]);
                     $('.fm-account-blocks.bandwidth', $dialog).removeClass('no-percs');
-                    $('.chart.data .perc-txt', $dialog).text(perc + '%');
+                    $('.chart .perc-txt', $dialog).text(perc + '%');
 
                     // if they granted quota to other users
                     if (account.servbw_limit > 0) {
                         $dialog.addClass('slider');
 
-                        $('.bandwidth-slider', $dialog).slider({
+                        var $slider = $('.bandwidth-slider', $dialog).slider({
                             min: 0, max: 100, range: 'min', value: account.servbw_limit,
                             change: function(e, ui) {
                                 if (ui.value < account.servbw_limit) {
@@ -2007,6 +1979,8 @@ var dlmanager = {
                                 }
                             }
                         });
+                        $('.ui-slider-handle', $slider).addClass('sprite-fm-mono icon-arrow-left ' +
+                            'sprite-fm-mono-after icon-arrow-right-after');
                     }
 
                     mBroadcaster.sendMessage(asyncTaskID);
@@ -2019,7 +1993,8 @@ var dlmanager = {
                     clearInterval(dlmanager._overQuotaTimeLeftTick);
                 }
                 $('.fm-dialog-overlay').off('click.dloverq');
-                $dialog.off('dialog-closed').find('.fm-dialog-close').off('click.quota');
+                $dialog.off('dialog-closed');
+                $('button.js-close, .fm-dialog-close', $dialog).off('click.quota');
                 closeDialog();
                 return false;
             };
@@ -2036,7 +2011,7 @@ var dlmanager = {
                 .addClass('exceeded')
                 .removeClass('hidden')
                 .rebind('dialog-closed', doCloseModal)
-                .find('.fm-dialog-close')
+                .find('button.js-close, .fm-dialog-close')
                 .rebind('click.quota', doCloseModal);
 
             // Load the membership plans
@@ -2244,7 +2219,7 @@ var dlmanager = {
                     onIdle(function() {
                         $('.freeupdiskspace').rebind('click', function() {
                             var $dialog = $('.megasync-overlay');
-                            $('.megasync-close, .fm-dialog-close', $dialog).click();
+                            $('.megasync-close, button.js-close, .fm-dialog-close', $dialog).click();
 
                             msgDialog('warningb', l[882], l[7157], 0, function(yes) {
                                 if (yes) {
@@ -2280,7 +2255,7 @@ var dlmanager = {
             $elm.find('span.txt').safeHTML(text);
         };
 
-        $elm.find('.default-white-button').rebind('click', function() {
+        $('.mega-button', $elm).rebind('click', function() {
             if (typeof megasync === 'undefined') {
                 console.error('Failed to load megasync.js');
             }
@@ -2297,7 +2272,7 @@ var dlmanager = {
             }
         });
 
-        $elm.find('.fm-dialog-close').rebind('click', function() {
+        $('button.js-close, .fm-dialog-close', $elm).rebind('click', function() {
             $elm.removeClass('visible');
         });
 
@@ -2333,7 +2308,7 @@ var dlmanager = {
 
         var $slides = $overlay.find('.megasync-slide');
         var $currentSlide = $slides.filter('.megasync-slide:not(.hidden)').first();
-        var $sliderControl = $overlay.find('.megasync-slider.button');
+        var $sliderControl = $('button.megasync-slider', $overlay);
         var $sliderPrevButton = $sliderControl.filter('.prev');
         var $sliderNextButton = $sliderControl.filter('.next');
 
@@ -2388,7 +2363,7 @@ var dlmanager = {
             dlmanager.setBrowserWarningClasses('.megasync-bottom-warning', $overlay, dlStateError);
         }
 
-        $('.big-button.download-megasync', $overlay).rebind('click', function() {
+        $('button.download-megasync', $overlay).rebind('click', function() {
             if (typeof megasync === 'undefined') {
                 console.error('Failed to load megasync.js');
             }
@@ -2409,7 +2384,7 @@ var dlmanager = {
             loadSubPage('pro');
         });
 
-        $('.megasync-close, .fm-dialog-close', $overlay).rebind('click', hideOverlay);
+        $('.megasync-close, button.js-close, .fm-dialog-close', $overlay).rebind('click', hideOverlay);
 
         $body.rebind('keyup.msd', function(e) {
             if (e.keyCode === 27) {

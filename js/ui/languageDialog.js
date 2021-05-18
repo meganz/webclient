@@ -12,7 +12,7 @@ var langDialog = {
     show: function() {
 
         // Cache some selectors for performance
-        langDialog.$dialog = $('.fm-dialog.languages-dialog');
+        langDialog.$dialog = $('.mega-dialog.languages-dialog');
         langDialog.$overlay = $('.fm-dialog-overlay');
 
         var $tierOneLanguages = langDialog.$dialog.find('.tier-one-languages');
@@ -87,7 +87,7 @@ var langDialog = {
         $.dialog = 'languages';
 
         // Initialise the close button
-        langDialog.$dialog.find('.fm-dialog-close').rebind('click', function() {
+        langDialog.$dialog.find('button.js-close').rebind('click', function() {
             langDialog.hide();
         });
 

@@ -1,260 +1,159 @@
 
 .business-register .disabled {
-	opacity: 0.3;
+    opacity: 0.3;
 }
 
 .business-register .main-pad-block {
-	position: relative;
-	margin:0;
+    position: relative;
+    margin:0;
 }
 
 .bus-reg-body {
-	min-width: 790px;
-	max-width: 940px;
-	margin:0 auto;
-	padding-top: 124px;
-	position: relative;
+    min-width: 790px;
+    max-width: 940px;
+    margin:0 auto;
+    padding-top: 124px;
+    position: relative;
 }
-.bus-reg-body *, .card-container.bus-repay * {
-	font-family: 'LatoWeb', 'source_sans_proregular', Arial;
+.bus-reg-body *,
+.card-container.bus-repay * {
+    font-family: var(--text-font-family);
 }
 
 .bus-reg-header {
-	font-size: 40px;
-	line-height: 48px;
-	text-align: left;
+    font-size: 40px;
+    line-height: 48px;
+    text-align: start;
+	color: var(--text-color-high);
 }
 
 .bus-reg-info-block {
-	width: 400px;
+    width: 400px;
 }
 
 .bus-reg-subheader {
-	font-size: 24px;
-	margin:64px 0 24px 0;
-	color: #333;
-	line-height: 30px;
+    font: var(--text-h1);
+    margin-top: 64px;
+    color: var(--text-color-high);
 }
 
 .bus-reg-icon {
-    background-image: url(../images/mega/top-sprite_v8.png);
+    background-image: url(../images/mega/top-sprite.png);
     width: 24px;
     height: 24px;
 }
 
 .bus-reg-body .password-stutus-txt {
-	margin-top: 8px;
+    margin-top: 8px;
 }
 
 .bus-reg-radio-block {
-    margin-top: 32px 0;
+    margin-top: 32px;
     width: 100%;
     height: 100%;
     position: relative;
     padding-bottom: 12px;
 }
+.card-container.bus-repay .dialog-subtitle {
+   font: var(--text-body1);
+}
 .card-container.bus-repay .bus-reg-radio-block {
-	margin: 0;
-}
-.bus-reg-body .bus-reg-radio, .card-container.bus-repay .bus-reg-radio {
-	width: 18px;
-    height: 18px;
-    cursor: pointer;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
-    border: 1px solid rgba(0, 0, 0, 0.1);
-    -moz-background-clip: padding-box;
-    -webkit-background-clip: padding-box;
-    background-clip: padding-box;
-    -moz-border-radius: 100%;
-    -webkit-border-radius: 100%;
-    border-radius: 100%;
-    position: relative;
-    display: inline-block;
-    margin:3px 0;
-}
-.bus-reg-body .bus-reg-radio.checkOn, .card-container.bus-repay .bus-reg-radio.checkOn {
-	-webkit-box-shadow: 0 0 0 1px rgba(0,191,165, 0.5);
-	-moz-box-shadow: 0 0 0 rgba(0,191,165, 0.5);
-	box-shadow: 0 0 0 1px rgba(0,191,165, 0.5);
-	border: 1px solid rgba(0,191,165, 1);
-}
-.bus-reg-body .bus-reg-radio::before, .card-container.bus-repay .bus-reg-radio::before {
-	width:12px;
-	height: 12px;
-	background-color: rgba(0,0,0,0.1);
-	position: absolute;
-	-moz-border-radius: 100%;
-    -webkit-border-radius: 100%;
-    border-radius: 100%;
-	left: 2px;
-	top: 2px;
-	content: " ";
+    margin: 0;
 }
 .bus-reg-body .bus-reg-radio-option,
 .bus-repay-block .bus-reg-radio-option {
-    display: inline-block;
+    align-items: center;
     cursor: pointer;
+    display: inline-flex;
+    margin-bottom: 8px;
 }
-.bus-reg-body .bus-reg-radio.checkOn::before, .card-container.bus-repay .bus-reg-radio.checkOn::before {
-	background: rgb(0,191,165);
-
-background: -moz-linear-gradient(top, rgba(0,191,165,1) 0%, rgba(0,148,128,1) 100%);
-
-background: -webkit-linear-gradient(top, rgba(0,191,165,1) 0%, rgba(0,148,128,1) 100%);
-
-background: linear-gradient(to bottom, rgba(0,191,165,1) 0%, rgba(0,148,128,1) 100%);
+.bus-reg-body .bus-reg-radio.not-first-child,
+.card-container.bus-repay .bus-reg-radio.not-first-child {
+    -webkit-margin-start: 32px;
+    margin-inline-start: 32px;
 }
-.bus-reg-body .bus-reg-radio.not-first-child, .card-container.bus-repay .bus-reg-radio.not-first-child{
-	margin-left: 32px;
-}
-.bus-reg-radio-block .provider, .card-container.bus-repay .provider {
-	margin-left: 12px;
-	font-size: 16px;
-	color: #333;
-	line-height: 24px;
-	height: 24px;
-	display: inline-block;
-	vertical-align: top;
-}
-.bus-reg-body .provider-icon, .card-container.bus-repay .provider-icon {
-    vertical-align: top;
+.bus-reg-body .provider,
+.card-container.bus-repay .provider {
+	font: var(--text-body1);
     display: inline-block;
-    margin-left: 4px;
-    margin-right: 32px;
-    margin-top: 4px;
+    vertical-align: middle;
+}
+.card-container.bus-repay .payment-icon,
+.bus-reg-body .payment-icon {
+    vertical-align: middle;
+    display: inline-block;
+    -webkit-margin-start: 4px;
+    margin-inline-start: 4px;
+    -webkit-margin-end: 32px;
+    margin-inline-end: 32px;
+}
+.card-container.bus-repay .payment-icon i,
+.bus-reg-body .payment-icon i {
+    --icon-size: 24px;
 }
 .bus-reg-agreement {
-    width: 100%;
-    margin-top: 16px;
+    align-items: flex-start;
     cursor: pointer;
+    display: flex;
+    font: var(--text-body1);
+    margin-top: 16px;
+}
+.bus-reg-agreement .checkdiv {
+    margin: 2px 0;
+    -webkit-margin-end: 14px;
+    margin-inline-end: 14px;
+    vertical-align: top;
 }
 .bus-reg-agreement.mega-terms .red {
-	margin-left: 4px;
-}
-.bus-reg-checkbox {
-	width: 12px;
-	height: 12px;
-	border:1px solid rgba(0,0,0,0.2);
-    -moz-border-radius: 3px;
-    -webkit-border-radius: 3px;
-    border-radius: 3px;
-    -webkit-box-shadow: 0 0 0 1px rgba(0,0,0,0.2);
-    -moz-box-shadow: 0 0 0 1px rgba(0,0,0,0.2);
-    box-shadow: 0 0 0 1px rgba(0,0,0,0.2); 
-    cursor: pointer;
-    display: inline-block;
-    content: " ";
-    margin-right: 12px;
-    vertical-align: top;
-    margin-top: 2px;
-}
-.bus-reg-checkbox.focused {
-    box-shadow: 0 0 0 1px rgba(240, 55, 58, 0.5);
-}
-
-.bus-reg-checkbox.checkOn::before {
-	background-position: 0px -2381px;
-    background-image: url(../images/mega/top-login-sprite_v11.png);
-    background-repeat: no-repeat;
-    background-size: 48px auto;
-    position: absolute;
-    width: 12px;
-    height: 12px;
-    -webkit-box-shadow: 0 0 0 1px rgba(0,0,0,0.2);
-    -moz-box-shadow: 0 0 0 1px rgba(0,0,0,0.2);
-    box-shadow: 0 0 0 1px rgba(0,0,0,0.2);
-    display: block;
-    content: " ";
+    margin-left: 4px;
 }
 
 .bus-reg-agreement .bus-reg-txt {
-	width: 90%;
-	font-size: 13px;
-	color:#999;
-	line-height: 20px;
-	display: inline-block;
+    width: 90%;
+    font-size: 13px;
+    color:#999;
+    line-height: 20px;
+    display: inline-block;
 }
 
 .bus-reg-agreement .terms {
-	color: rgba(217,0,7,1); 
-	display: inline-block;
-	cursor: pointer;
-}
-
-.bus-reg-btn, .bus-reg-btn-2 {
-	background-color: rgba(255,51,58,1);
-	height: 48px;
-	padding: 0 24px;
-	cursor: pointer;
-	border-radius: 4px;
-	margin-top: 64px;
-	margin-bottom: 88px;
-	float: right;
-	transition: 0.2s;
-}
-
-.bus-reg-btn-2.disabled {
-    opacity: 0.5;
-}
-
-.bus-reg-btn:hover, .bus-reg-btn-2:hover {
-	background-color: rgba(223,29,32,1);
-}
-
-.bus-reg-btn:focus, .bus-reg-btn-2:focus {
-	box-shadow: 0 0 0 3px rgba(240, 55, 58, 0.5);
-}
-
-.bus-reg-btn-2 {
-	display: none;
-}
-
-.bus-reg-btn span, .bus-reg-btn-2 span {
-	line-height: 48px;
-	display: inline;
-	font-size: 18px;
-	color: #fff;
-	vertical-align: top;
-}
-
-.bus-reg-btn .next-arrow, .bus-reg-btn-2 .next-arrow {
-	width: 24px;
-	height: 24px;
-	background-position: -93px -414px;
-    background-image: url(../images/mega/big-icons_v5.png);
+    color: rgba(217,0,7,1);
     display: inline-block;
-    margin-left: 12px;
-    margin-top: 12px;
+    cursor: pointer;
+}
+.bus-reg-btn-2,
+.bus-reg-btn {
+    margin-top: 64px;
+    margin-bottom: 88px;
+    float: right;
+}
+
+.mega-button.bus-reg-btn-2 {
+    display: none;
 }
 
 .bus-reg-plan {
-	width: 380px;
-	display: inline-block;
-	-moz-border-radius: 8px;
-    -webkit-border-radius: 8px;
-    border-radius: 8px;
-    border:1px solid rgba(0,0,0,0.1);
-    -webkit-box-shadow: 0 0 10px 1px rgba(0,0,0,0.04);
-    -moz-box-shadow: 0 0 10px 1px rgba(0,0,0,0.04);
-    box-shadow: 0 0 10px 1px rgba(0,0,0,0.04);
+    width: 380px;
+    display: inline-block;
+    border-radius: 24px;
+    border: 1px solid var(--divider-color);
     position: absolute;
     right: 0;
     top: 240px;
-    background-color: #fff;
+    background-color: var(--surface-main);
 }
 
 .bus-reg-plan .plan-icon {
-	margin: 40px auto 0;
+    margin: 40px auto 0;
 }
-.bus-reg-plan.repay .plan-icon {
-	margin: 16px auto 0;
+.bus-reg-plan .plan-icon {
+    margin: 16px auto 0;
+    width: 64px;
+    height: 64px;
 }
 .bus-reg-plan .business-plan-title {
-    font-size: 20px;
-    color: #333;
-    line-height: 24px;
+    font: var(--text-h2);
+    color: var(--text-color-high);
     margin: 4px auto 32px;
     width: 100%;
     text-align: center;
@@ -263,126 +162,123 @@ background: linear-gradient(to bottom, rgba(0,191,165,1) 0%, rgba(0,148,128,1) 1
     width: 90%;
     min-height: 72px;
     margin: 16px auto;
-    background-color: #00BFA5;
+    background-color: var(--secondary-green);
     border-radius: 4px;
-    color: #fff;
-    font-size: 16px;
+    color: var(--text-color-white-high);
+    font: var(--text-h3);
     text-align: center;
-    line-height: 40px;
-    padding: 16px 0 6px 0;
+    padding: 16px 0 6px;
     box-sizing: border-box;
 }
-.ru .bus-reg-plan .business-plan-price {
-    font-size: 14px;
-}
-.mobile.ru .bus-reg-plan .business-plan-price  .sub-unit {
+.mobile.ru .bus-reg-plan .business-plan-price .sub-unit {
     display: block;
 }
 .bus-reg-plan .business-plan-price .big {
-	font-size: 40px;
-	font-weight: 600;
-	margin-right: 8px;
+    font: var(--text-data);
+    font-family: var(--text-font-family-semibold);
+    margin-right: 8px;
 }
 
 .bus-reg-plan .business-plan-note {
-	line-height: 22px;
-	width: 90%;
-	margin: 4px auto 20px auto;
-	text-align: center;
-	font-size: 14px;
-	color: #999;
+    width: 90%;
+    margin: 4px auto 20px;
+    text-align: center;
+    font: var(--text-body1);
+    color: var(--text-color-low);
 }
 
 .bus-reg-plan .business-plan-info {
-	width: 94%;
-	height: 54px;
-	margin:0 auto;
-	background-color: #fff;
+    width: 94%;
+    height: 54px;
+    margin:0 auto;
+    background-color: #fff;
 }
 
 .bus-reg-plan .business-plan-info.grey {
-	width: 94%;
-	height: 54px;
-	margin:0 auto;
-	background-color: rgba(0,0,0,0.03);
+    width: 94%;
+    height: 54px;
+    margin:0 auto;
+    background-color: rgba(0,0,0,0.03);
 }
 
-.bus-reg-plan .business-plan-info .left, .bus-reg-plan .business-plan-info .right {
-	font-size: 15px;
-	color: #333;
-	line-height: 54px;
-	padding: 0 13px;
+.bus-reg-plan .business-plan-info .left,
+.bus-reg-plan .business-plan-info .right {
+    font: var(--text-body1);
+    color: var(--text-color-high);
+    line-height: 54px;
+    padding: 0 13px;
 }
 
 .bus-reg-plan .business-plan-total {
-	height: 64px;
-	position: relative;
+    height: 64px;
+    position: relative;
 }
 
 .bus-reg-plan .business-plan-total::before {
-	content: " ";
+    content: "";
     width: 100%;
     height: 1px;
     top: 0;
     left: 0;
-    background-color: rgba(0,0,0,0.2);
+    background-color: var(--divider-color);
     position: absolute;
 }
 
-.bus-reg-plan .business-plan-total .left, .bus-reg-plan .business-plan-total .right {
-	font-size: 24px;
-	color:#000;
-	line-height: 64px;
-	padding: 0 13px;
-	margin: 0 4%;
+.bus-reg-plan .business-plan-total .left,
+.bus-reg-plan .business-plan-total .right {
+    font: var(--text-font-h1);
+    color: var(--text-color-high);
+    line-height: 64px;
+    padding: 0 13px;
+    margin: 0 3%;
 }
 
 .bus-reg-bottom-page {
-	width: 100%;
-	position: relative;
+    width: 100%;
+    position: relative;
 }
 
 .bus-reg-bottom-page::before {
-	width:100%;
-	height: 1px;
-	background-color: rgba(0,0,0,0.1);
-	position: absolute;
-	content: " ";
+    width:100%;
+    height: 1px;
+    background-color: rgba(0,0,0,0.1);
+    position: absolute;
+    content: " ";
 }
 
 .bus-reg-bottom-page .page-header {
     padding: 64px 20px 0 20px;
-	font-size: 36px;
-	font-family: montserrat, open_sans, sans-serif;
-	font-weight: 300;
-	text-align: center;
-	margin-bottom: 64px;
-	color: #333;
-	line-height: 54px;
+    font-size: 36px;
+    font-family: montserrat, open_sans, sans-serif;
+    font-weight: 300;
+    text-align: center;
+    margin-bottom: 64px;
+    color: #333;
+    line-height: 54px;
 }
 
 .bus-reg-featureBlock {
-	width:32%;
-	display: inline-block;
-	margin-top: 48px;
-	vertical-align: top;
+    width:32%;
+    display: inline-block;
+    margin-top: 48px;
+    vertical-align: top;
 }
 
 .bus-reg-featureImg100 {
-	width: 100px;
-	height: 100px;
-	margin: auto;
-	background-image: url(../images/mega/big-icons_v5.png);
+    width: 100px;
+    height: 100px;
+    margin: auto;
+    background-image: url(../images/mega/big-icons.png);
     background-repeat: no-repeat;
 }
 
 .bus-reg-featureTxt {
-	width: 80%;
-	margin:48px auto 64px auto;
-	color: #666;
-	font-size: 16px;
-	line-height: 28px;
-	text-align: center;
+    width: 80%;
+    margin:48px auto 64px auto;
+    color: #666;
+    font-size: 16px;
+    line-height: 28px;
+    text-align: center;
 }
 
 .bus-reg-featureTxt a {
@@ -394,293 +290,328 @@ background: linear-gradient(to bottom, rgba(0,191,165,1) 0%, rgba(0,148,128,1) 1
 }
 
 .ky-icon {
-	background-position: -16px -464px;
+    background-position: -16px -464px;
 }
 
 .forbit-icon {
-	background-position: -16px -572px;
+    background-position: -16px -572px;
 }
 
 .extension-icon {
-	background-position: -16px -691px;
+    background-position: -16px -691px;
 }
 
 
 .bus-confirm-body {
-	width: 90%;
-	max-width:400px;
-	margin:88px auto 128px auto;
+    width: 90%;
+    max-width:400px;
+    margin:88px auto 128px auto;
 }
 
 .bus-confirm-body.verfication {
-	width: 100%;
-	max-width: 600px;
+    width: 100%;
+    max-width: 600px;
 }
 
 .bus-confirm-body .bus-reg-header {
-	width: 100%;
-	text-align: center;
+    width: 100%;
+    text-align: center;
 }
 
 .bus-confirm-body .bus-confirmImg {
-	width:160px;
-	height: 120px;
-	background-image: url(../images/mega/big-icons_v5.png);
+    width:160px;
+    height: 120px;
+    background-image: url(../images/mega/big-icons.png);
     background-repeat: no-repeat;
     background-position: -16px -809px;
-	margin:0 auto 48px auto;
+    margin:0 auto 48px auto;
 }
 
 @media only screen and (max-width: 790px) {
     .bus-reg-body {
-	width:90%;
-	min-width: 0;
-	}
+        width: 90%;
+        min-width: 0;
+    }
 
-	.bus-reg-info-block {
-		width:100%;
-	}
+    .bus-reg-info-block {
+        width:100%;
+    }
 
-	.bus-reg-plan {
-		width:100%;
-		top: 48px;
-		position: relative;
-	}
+    .bus-reg-plan {
+        width:100%;
+        top: 48px;
+        position: relative;
+    }
 
-	.bus-reg-header {
-		font-size: 30px;
-	}
-	.bus-reg-btn {
-		display: none;
-	}
+    .bus-reg-header {
+        font-size: 30px;
+    }
+    .bus-reg-btn {
+        display: none !important;
+    }
 
-	.bus-confirm-body .bus-reg-btn {
-		display: inline-block;
-	}
+    .bus-confirm-body .bus-reg-btn {
+        display: inline-flex;
+    }
 
-	.bus-reg-btn-2 {
-		display: inline-block;
-		margin-top: 80px;
-	}
+    .mega-button.bus-reg-btn-2 {
+        display: inline-flex;
+        margin-top: 80px;
+    }
 
-	.bus-reg-featureBlock {
-		width:100%;
-	}
+    .bus-reg-featureBlock {
+        width:100%;
+    }
 }
-/*For business over due payment page*/
+/* For business over due payment page */
 .card-container.bus-repay {
-	width: 850px;
-	height: auto;
-	padding: 16px 32px 32px;
-	margin: 0 auto 80px;
-	box-sizing: border-box;
-	background-color: #fff;
-	border-radius: 8px;
-	border: 1px solid rgba(0, 40, 100, 0.12);
+    width: 850px;
+    height: auto;
+    padding: 16px 32px 32px;
+    margin: 0 auto 80px;
+    box-sizing: border-box;
+    background: var(--surface-main);
+    border-radius: 24px;
+    border: 1px solid var(--divider-color);
+}
+.rtl .card-container.bus-repay {
+    direction: rtl;
 }
 .bus-repay-block {
-	height: 100%;
-	width: 100%;
-	padding-top: 80px;
-	padding-bottom: 8px;
+    height: 100%;
+    width: 100%;
+    padding-top: 80px;
+    padding-bottom: 8px;
+}
+.bus-repay-block .payment-reminder-logo {
+    width: 96px;
+    height: 96px;
+    display: block;
+    margin: 48px auto 24px;
+}
+.bus-repay-block .dialog-title {
+    font: var(--text-h2);
+    color: var(--text-color-high);
+    margin-bottom: 12px;
+}
+.bus-repay-block .radio-txt a {
+    color: var(--text-color-success);
 }
 .card-header {
-	text-align: center;
+    text-align: center;
 }
 .main-mid-pad.bus-repay .card-body {
-	display: block;
+    display: block;
 }
 .main-mid-pad.bus-repay .main-left-block, .main-mid-pad.bus-repay .main-right-block {
-	width: 362px;
-	height: auto;
-	display: inline-block;
-	position: relative;
-	margin: 0;
-	float: none;
-	vertical-align: top;
-	padding: 56px 0 0;
+    width: 362px;
+    height: auto;
+    display: inline-block;
+    position: relative;
+    margin: 0;
+    float: none;
+    vertical-align: top;
+    padding: 56px 0 0;
 }
 .main-mid-pad.bus-repay .main-left-block {
-	padding-right: 48px;
+    -webkit-padding-end: 48px;
+    padding-inline-end: 48px;
 }
 .main-mid-pad.bus-repay .section-wrapper:not(:first-child) {
-	margin-top: 32px;
+    margin-top: 32px;
 }
 .main-mid-pad.bus-repay .section-wrapper:last-child {
-	margin-top: 44px;
+    margin-top: 44px;
+	text-align: start;
 }
 .main-mid-pad.bus-repay .section-title {
-	font-size: 16px;
-	line-height: 24px;
-	color: #333;
-	font-family: 'LatoWebBold', 'source_sans_proregular', Arial;
-	padding-bottom: 16px;
+    font: var(--text-h3-bold);
+    color: var(--text-color-high);
+    padding-bottom: 16px;
 }
 .repay-btn.small-view-btn {
-	display: none;
+    display: none;
 }
 .main-mid-pad.bus-repay .row-wrapper {
-	padding-bottom: 16px;
-	display: block;
+    padding-bottom: 16px;
+    display: flex;
+    align-items: center;
+}
+.card-container.bus-repay .account-info-icon {
+    --icon-size: 24px;
+    --mask-color: var(--icon-active);
+    flex-shrink: 0;
+    flex-grow: 0;
+}
+.main-mid-pad.bus-repay .row-wrapper i {
+    flex-shrink: 0;
 }
 .main-mid-pad.bus-repay .row-wrapper .info-txt {
-	font-size: 14px;
-	line-height: 25px;
-	color: #999;
-	padding-left: 12px;
-	display: inline-block;
-	vertical-align: top;
+    font: var(--text-body1);
+    color: var(--text-color-medium);
+    -webkit-margin-start: 12px;
+    margin-inline-start: 12px;
+    display: inline-block;
+    vertical-align: middle;
 }
 .main-mid-pad.bus-repay .bus-reg-plan.repay {
-	width: 364px;
-	position: relative;
-	right: 0;
-	top:0;
-	padding: 16px;
-	box-sizing: border-box;
-	text-align: center;
-	-webkit-box-shadow: 0 0 1px 0.5px rgba(0,0,0,0.05);
-    -moz-box-shadow: 0 0 1px 0.5px rgba(0,0,0,0.05);
-    box-shadow: 0 0 1px 0.5px rgba(0,0,0,0.05);
-    background-color: #fafafa;
+    width: 364px;
+    position: relative;
+    right: 0;
+    top:0;
+    padding: 16px;
+    box-sizing: border-box;
+    text-align: center;
+    border: 1px solid var(--divider-color);
+    background: var(--surface-grey-1);
 }
 .repay-breakdown-container {
-	width: 100%;
-	border-radius: 4px;
-	background-color: #fff;
-	border:1px solid rgba(0,0,0,0.1);
-	position: relative;
-	display: block;
-	overflow: hidden;
+    width: 100%;
+    border-radius: 24px;
+    background: var(--surface-main);
+    border: 1px solid var(--divider-color);
+    position: relative;
+    display: block;
+    overflow: hidden;
 }
 .main-mid-pad.bus-repay .card-body .card-sub-title {
-	font-size: 16px;
-	color: #333;
-	line-height: 22px;
-	padding: 22px 0;
-	display: block;
-	position: relative;
+    font: var(--text-h3);
+    color: var(--text-color-high);
+    padding: 22px 0;
+    display: block;
+    position: relative;
 }
 .main-mid-pad.bus-repay .card-body .card-sub-title::before{
-	content: "";
-	position: absolute;
-	display: block;
-	width: 100%;
-	height: 1px;
-	background-color:rgba(0,0,0,0.1);
-	left: 0;
-	bottom: 0;
+    content: "";
+    position: absolute;
+    display: block;
+    width: 100%;
+    height: 1px;
+    background-color:rgba(0,0,0,0.1);
+    left: 0;
+    bottom: 0;
 }
 .bus-reg-plan.repay .repay-breakdown-tb {
-	width: 100%;
+    width: 100%;
 }
 .bus-reg-plan.repay .repay-breakdown-tb tr {
-	position: relative;
-	display: block;
+    position: relative;
+    display: block;
 }
 .bus-reg-plan.repay .repay-breakdown-tb tr:not(:last-child)::before {
-	content: "";
-	position: absolute;
-	display: block;
-	width: 308px;
-	height: 1px;
-	background-color:rgba(0,0,0,0.1);
-	left: 12px;
-	bottom: 0;
+    content: "";
+    position: absolute;
+    display: block;
+    width: 308px;
+    height: 1px;
+    background-color:rgba(0,0,0,0.1);
+    left: 12px;
+    bottom: 0;
 }
-.bus-reg-plan.repay .repay-breakdown-tb tr th:first-child, .bus-reg-plan.repay .repay-breakdown-tb tr td:first-child {
-	width: 94px;
-	padding: 12px 8px 8px 12px;
-	box-sizing: border-box;
-	display: inline-block;
+.bus-reg-plan.repay .repay-breakdown-tb tr th:first-child,
+.bus-reg-plan.repay .repay-breakdown-tb tr td:first-child {
+    width: 94px;
+    padding: 12px 0 8px;
+    -webkit-padding-end: 8px;
+    padding-inline-end: 8px;
+    -webkit-padding-start: 12px;
+    padding-inline-start: 12px;
+    box-sizing: border-box;
+    display: inline-block;
 }
-.bus-reg-plan.repay .repay-breakdown-tb tr th:nth-child(2), .bus-reg-plan.repay .repay-breakdown-tb tr td:nth-child(2) {
-	width: 141px;
-	padding-right: 4px;
-	box-sizing: border-box;
-	display: inline-block;
+.bus-reg-plan.repay .repay-breakdown-tb tr th:nth-child(2),
+.bus-reg-plan.repay .repay-breakdown-tb tr td:nth-child(2) {
+    width: 141px;
+    -webkit-padding-end: 4px;
+    padding-inline-end: 4px;
+    box-sizing: border-box;
+    display: inline-block;
 }
-.bus-reg-plan.repay .repay-breakdown-tb tr th:nth-child(3), .bus-reg-plan.repay .repay-breakdown-tb tr td:nth-child(3) {
-	width: calc(100% - 244px);
-	padding-right: 12px;
-	box-sizing: border-box;
-	text-align: right;
-	display: inline-block;
+.bus-reg-plan.repay .repay-breakdown-tb tr th:nth-child(3),
+.bus-reg-plan.repay .repay-breakdown-tb tr td:nth-child(3) {
+    width: calc(100% - 244px);
+    -webkit-padding-end: 12px;
+    padding-inline-end: 12px;
+    box-sizing: border-box;
+    text-align: end;
+    display: inline-block;
 }
 .bus-reg-plan.repay .repay-breakdown-tb th {
-	font-size: 13px;
-	line-height: 18px;
-	padding:12px 0 8px;
-	color: #666;
-	text-align: left;
+    font: var(--text-body2);
+    padding: 12px 0 8px;
+    color: var(--text-color-medium);
+    text-align: start;
 }
 .bus-reg-plan.repay .repay-breakdown-tb td {
-	font-size: 12px;
-	line-height: 18px;
-	color: #999;
-	padding: 15px 0 15px;
-	text-align: left;
+    font: var(--text-body2);
+    color: var(--text-color-low);
+    padding: 15px 0;
+    text-align: start;
 }
 .bus-reg-plan.repay .repay-breakdown-tb tr:last-child td {
-	color: #333;
-	font-size: 20px;
-	line-height: 34px;
-	font-family: 'LatoWebBold', 'source_sans_proregular', Arial;
-	text-align: left;
-	width: 110px;
+    color: var(--text-color-high);
+    font: var(--text-h1);
+    font-family: var(--text-font-family-semibold);
+    text-align: start;
+    width: 110px;
 }
 .bus-reg-plan.repay .repay-breakdown-tb tr:last-child td:last-child {
-	padding-right: 12px;
-	width: 210px;
-	text-align: right;
+    -webkit-padding-end: 12px;
+    padding-inline-end: 12px;
+    width: 210px;
+    text-align: end;
 }
 @media only screen and (max-width: 800px) {
-	.card-container.bus-repay {
-		width: 96%;
-		min-width: 406px;
-		padding: 2%;
-	}
-	.main-mid-pad.bus-repay .main-left-block, .main-mid-pad.bus-repay .main-right-block {
-		width: auto;
-		display: block;
-	}
-	.main-mid-pad.bus-repay .main-left-block {
-		padding-right: 0px;
-	}
-	.main-mid-pad.bus-repay .bus-reg-plan.repay {
-		width: 100%;
-	}
-	.main-mid-pad.bus-repay .row-wrapper {
-		padding-bottom: 8px;
-	}
-	.bus-reg-plan.repay .repay-breakdown-tb tr:not(:last-child)::before {
-		width: calc(100% - 24px);
-	}
-	.bus-reg-plan.repay .repay-breakdown-tb tr th:nth-child(1), .bus-reg-plan.repay .repay-breakdown-tb tr td:nth-child(1) {
-		width: 25%;
-		min-width: 90px;
-	}
-	.bus-reg-plan.repay .repay-breakdown-tb tr th:nth-child(2), .bus-reg-plan.repay .repay-breakdown-tb tr td:nth-child(2) {
-		width: 40%;
-		min-width: 136px;
-		white-space: normal;
-	}
-	.bus-reg-plan.repay .repay-breakdown-tb tr th:nth-child(3), .bus-reg-plan.repay .repay-breakdown-tb tr td:nth-child(3) {
-		width: 30%;
-		min-width: 82px;
-	}
-	.bus-reg-plan.repay .repay-breakdown-tb tr:last-child td:last-child {
-		width: 70%;
-		min-width: 210px;
-	}
-	.main-mid-pad.bus-repay .btn-container {
-		text-align: center;
-	}
-	.main-mid-pad.bus-repay .section-wrapper:last-child {
-		display: none;
-	}
-	.repay-btn.small-view-btn {
-		margin: 32px auto;
-		display: inline-block;
-	}
+    .card-container.bus-repay {
+        width: 96%;
+        min-width: 406px;
+        padding: 2%;
+    }
+    .main-mid-pad.bus-repay .main-left-block,
+	.main-mid-pad.bus-repay .main-right-block {
+        width: auto;
+        display: block;
+    }
+    .main-mid-pad.bus-repay .main-left-block {
+        padding-right: 0;
+    }
+    .main-mid-pad.bus-repay .bus-reg-plan.repay {
+        width: 100%;
+    }
+    .main-mid-pad.bus-repay .row-wrapper {
+        padding-bottom: 8px;
+    }
+    .bus-reg-plan.repay .repay-breakdown-tb tr:not(:last-child)::before {
+        width: calc(100% - 24px);
+    }
+    .bus-reg-plan.repay .repay-breakdown-tb tr th:nth-child(1),
+	.bus-reg-plan.repay .repay-breakdown-tb tr td:nth-child(1) {
+        width: 25%;
+        min-width: 90px;
+    }
+    .bus-reg-plan.repay .repay-breakdown-tb tr th:nth-child(2),
+	.bus-reg-plan.repay .repay-breakdown-tb tr td:nth-child(2) {
+        width: 40%;
+        min-width: 136px;
+        white-space: normal;
+    }
+    .bus-reg-plan.repay .repay-breakdown-tb tr th:nth-child(3),
+	.bus-reg-plan.repay .repay-breakdown-tb tr td:nth-child(3) {
+        width: 30%;
+        min-width: 82px;
+    }
+    .bus-reg-plan.repay .repay-breakdown-tb tr:last-child td:last-child {
+        width: 70%;
+        min-width: 210px;
+    }
+    .main-mid-pad.bus-repay .btn-container {
+        text-align: center;
+    }
+    .main-mid-pad.bus-repay .section-wrapper:last-child {
+        display: none;
+    }
+    .repay-btn.small-view-btn {
+        margin: 32px auto;
+        display: inline-block;
+    }
 }

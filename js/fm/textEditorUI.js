@@ -15,7 +15,8 @@ mega.textEditorUI = new function TextEditorUI() {
     var initialized = false;
 
     var $containerDialog;
-    var $editorContianer;
+    var $editorContainer;
+    var $menuBar;
     var $saveButton;
 
 
@@ -118,14 +119,29 @@ mega.textEditorUI = new function TextEditorUI() {
 
         // there's no jquery parent for this container.
         // eslint-disable-next-line local-rules/jquery-scopes
-        $containerDialog = $('.txt-editor-frame');
-        $editorContianer = $('#mega-text-editor', $containerDialog);
-        $saveButton = $('.buttons-holder .save-btn', $editorContianer);
+        $containerDialog = $('.text-editor-container', 'body');
+        $editorContainer = $('.text-editor', $containerDialog);
+        $menuBar = $('.text-editor-bars', $editorContainer);
+        $saveButton = $('.save-btn', $editorContainer);
 
-        $('.editor-textarea-container', $editorContianer).resizable({
+        const fileMenu = contextMenu.create({
+            template: $('#text-editor-file-menu', $containerDialog)[0],
+            sibling: $('.file-btn', $containerDialog)[0],
+            animationDuration: 150,
+            boundingElement: $containerDialog[0]
+        });
+
+        const formatMenu = contextMenu.create({
+            template: $('#text-editor-format-menu', $containerDialog)[0],
+            sibling: $('.format-btn', $containerDialog)[0],
+            animationDuration: 150,
+            boundingElement: $containerDialog[0]
+        });
+
+        $editorContainer.resizable({
             handles: 'e',
             resize: function() {
-                var cm = $('.editor-textarea-container .CodeMirror', $editorContianer)[0];
+                var cm = $('.CodeMirror', $editorContainer)[0];
                 if (cm) {
                     cm = cm.CodeMirror;
                     if (cm) {
@@ -136,28 +152,38 @@ mega.textEditorUI = new function TextEditorUI() {
         });
 
         /* eslint-disable sonarjs/no-duplicate-string */
-        $('.txt-editor-menu', $editorContianer).rebind(
+        $('.file-btn', $menuBar).rebind(
             'click.txt-editor',
             function textEditorMenuOpen() {
                 if ($(this).hasClass('disabled')) {
                     return false;
                 }
-                // eslint-disable-next-line local-rules/jquery-replacements
-                $('.top-menu-popup-editor', $editorContianer).removeClass('hidden').show();
+                contextMenu.toggle(fileMenu);
                 return false;
             }
         );
 
-        $editorContianer.rebind(
+        $('.format-btn', $menuBar).rebind(
             'click.txt-editor',
-            function textEditorGlobalClick() {
-                // eslint-disable-next-line local-rules/jquery-replacements
-                $('.top-menu-popup-editor', $editorContianer).addClass('hidden').hide();
+            function textEditorMenuOpen() {
+                if ($(this).hasClass('disabled')) {
+                    return false;
+                }
+                contextMenu.toggle(formatMenu);
                 return false;
             }
         );
 
-        $('.buttons-holder .close-btn, .editor-btn-container .close-f', $editorContianer).rebind(
+        $editorContainer.rebind(
+            'mouseup.txt-editor',
+            function textEditorGlobalClick() {
+                contextMenu.close(fileMenu);
+                contextMenu.close(formatMenu);
+                return false;
+            }
+        );
+
+        $('header .close-btn, .file-menu .close-f', $editorContainer).rebind(
             'click.txt-editor',
             function textEditorCloseBtnClick() {
 
@@ -210,21 +236,21 @@ mega.textEditorUI = new function TextEditorUI() {
             }
         );
 
-        $('.editor-btn-container .open-f', $editorContianer).rebind(
+        $('.file-menu .open-f', $menuBar).rebind(
             'click.txt-editor',
             function openFileClick() {
                 M.initFileAndFolderSelectDialog('openFile', selectedItemOpen);
             }
         );
 
-        $('.editor-btn-container .save-f', $editorContianer).rebind(
+        $('.file-menu .save-f', $menuBar).rebind(
             'click.txt-editor',
             function saveFileMenuClick() {
                 $saveButton.trigger('click');
             }
         );
 
-        $('.editor-btn-container .new-f', $editorContianer).rebind(
+        $('.file-menu .new-f', $menuBar).rebind(
             'click.txt-editor',
             function newFileMenuClick() {
                 validateAction(
@@ -245,7 +271,7 @@ mega.textEditorUI = new function TextEditorUI() {
             }
         );
 
-        $('.editor-btn-container .save-as-f', $editorContianer).rebind(
+        $('.file-menu .save-as-f', $menuBar).rebind(
             'click.txt-editor',
             function saveAsMenuClick() {
                 // loadingDialog.show();
@@ -264,7 +290,7 @@ mega.textEditorUI = new function TextEditorUI() {
             }
         );
 
-        $('.editor-btn-container .get-link-f', $editorContianer).rebind(
+        $('.file-menu .get-link-f', $menuBar).rebind(
             'click.txt-editor',
             function getLinkFileMenuClick() {
                 selectionManager.clear_selection();
@@ -276,7 +302,7 @@ mega.textEditorUI = new function TextEditorUI() {
             }
         );
 
-        $('.editor-btn-container .send-contact-f', $editorContianer).rebind(
+        $('.file-menu .send-contact-f', $menuBar).rebind(
             'click.txt-editor',
             function sendToContactMenuClick() {
                 selectionManager.clear_selection();
@@ -288,28 +314,28 @@ mega.textEditorUI = new function TextEditorUI() {
             }
         );
 
-        $('.editor-btn-container .print-f', $editorContianer).rebind('click.txt-editor', printText);
+        $('.file-menu .print-f', $menuBar).rebind('click.txt-editor', printText);
 
-        $('.editor-btn-container .wrap-text', $editorContianer).rebind(
+        $('.format-menu .wrap-text', $editorContainer).rebind(
             'click.txt-editor',
             function wrapTextMenuClick() {
-                const $tick = $('span.menu-item-shortcut', $(this));
-                if ($tick.hasClass('green-tick')) {
-                    $tick.removeClass('green-tick tiny-icon');
+                const $tick = $('.icon-check', $(this));
+                if ($tick.hasClass('hidden')) {
+                    $tick.removeClass('hidden');
                     if (editor) {
-                        editor.setOption('lineWrapping', false);
+                        editor.setOption('lineWrapping', true);
                     }
                 }
                 else {
-                    $tick.addClass('green-tick tiny-icon');
+                    $tick.addClass('hidden');
                     if (editor) {
-                        editor.setOption('lineWrapping', true);
+                        editor.setOption('lineWrapping', false);
                     }
                 }
             }
         );
 
-        $('.editor-btn-container .txt-editor-download-btn', $editorContianer).rebind(
+        $('footer .download-btn', $editorContainer).rebind(
             'click.txt-editor',
             function downloadBtnClicked() {
                 validateAction(
@@ -324,22 +350,22 @@ mega.textEditorUI = new function TextEditorUI() {
 
         var hotkey = 'ctrlKey';
         if (ua.details.os === 'Apple') {
-            $('.open-f .menu-item-shortcut', $editorContianer).text(' ');
-            $('.close-f .menu-item-shortcut', $editorContianer).text(' ');
-            $('.save-f .menu-item-shortcut', $editorContianer).text('\u2318 S');
-            $('.save-as-f .menu-item-shortcut', $editorContianer).text('\u21E7\u2318 S');
-            $('.print-f .menu-item-shortcut', $editorContianer).text('\u2318 P');
+            $('button.open-f .shortcut', $editorContainer).text(' ');
+            $('button.close-f .shortcut', $editorContainer).text(' ');
+            $('button.save-f .shortcut', $editorContainer).text('\u2318 S');
+            $('button.save-as-f .shortcut', $editorContainer).text('\u21E7\u2318 S');
+            $('button.print-f .shortcut', $editorContainer).text('\u2318 P');
             hotkey = 'metaKey';
         }
 
-        $editorContianer.rebind(
+        $editorContainer.rebind(
             'keydown.txt-editor',
             function keydownHandler(event) {
                 if (event[hotkey]) {
                     switch (event.code) {
                         case 'KeyS':
                             if (event.shiftKey) {
-                                $('.editor-btn-container .save-as-f', $editorContianer).trigger('click');
+                                $('.context-menu .save-as-f', $editorContainer).trigger('click');
                             }
                             else {
                                 $saveButton.trigger('click');
@@ -349,19 +375,19 @@ mega.textEditorUI = new function TextEditorUI() {
                             if (event.shiftKey) {
                                 return true;
                             }
-                            $('.editor-btn-container .open-f', $editorContianer).trigger('click');
+                            $('.context-menu .open-f', $editorContainer).trigger('click');
                             return false;
                         case 'KeyQ':
                             if (event.shiftKey) {
                                 return true;
                             }
-                            $('.editor-btn-container .close-f', $editorContianer).trigger('click');
+                            $('.context-menu .close-f', $editorContainer).trigger('click');
                             return false;
                         case 'KeyP':
                             if (event.shiftKey) {
                                 return true;
                             }
-                            $('.editor-btn-container .print-f', $editorContianer).trigger('click');
+                            $('.context-menu .print-f', $editorContainer).trigger('click');
                             return false;
                     }
                 }
@@ -396,7 +422,7 @@ mega.textEditorUI = new function TextEditorUI() {
             pushHistoryState();
             $containerDialog.removeClass('hidden');
             window.textEditorVisible = true;
-            $myTextarea = $('#txtar', $editorContianer);
+            $myTextarea = $('.content .txtar', $editorContainer);
             if (!editor) {
                 editor = CodeMirror.fromTextArea($myTextarea[0], {
                     lineNumbers: true,
@@ -410,13 +436,13 @@ mega.textEditorUI = new function TextEditorUI() {
             // eslint-disable-next-line no-extra-parens
             if (isReadonly || folderlink || (M.currentrootid === 'shares' && M.getNodeRights(handle) < 1)) {
                 editor.options.readOnly = true;
-                $('.txt-editor-menu', $editorContianer).addClass('disabled');
-                $('.txt-editor-btn.save-btn', $editorContianer).addClass('hidden');
+                $('header .file-btn', $editorContainer).addClass('disabled');
+                $('.save-btn', $editorContainer).addClass('hidden');
             }
             else {
                 editor.options.readOnly = false;
-                $('.txt-editor-menu', $editorContianer).removeClass('disabled');
-                $('.txt-editor-btn.save-btn', $editorContianer).removeClass('hidden');
+                $('header .file-btn', $editorContainer).removeClass('disabled');
+                $('footer .save-btn', $editorContainer).removeClass('hidden');
             }
 
             if (editor) {
@@ -426,9 +452,7 @@ mega.textEditorUI = new function TextEditorUI() {
             }
             $saveButton.addClass('disabled');
 
-            $('.txt-editor-opened-f-name', $editorContianer).text(fName);
-            // eslint-disable-next-line local-rules/jquery-replacements
-            $('.top-menu-popup-editor', $editorContianer).addClass('hidden').hide();
+            $('.text-editor-file-name span', $editorContainer).text(fName);
 
             if (Array.isArray(handle)) {
                 handle = handle[0];

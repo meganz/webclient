@@ -1003,6 +1003,10 @@ scparser.$add('t', function(a, scnodes) {
             fileversioning.updateFileVersioningDialog(i);
         }
     }
+
+    if (fminitialized) {
+        M.storageQuotaCache = null;
+    }
 });
 
 scparser.$add('opc', {
@@ -1010,9 +1014,14 @@ scparser.$add('opc', {
         // outgoing pending contact
         processOPC([a]);
 
+        // TODO: deprecate
         if (fminitialized) {
             M.syncPendingContacts(a);
             M.drawSentContactRequests([a]);
+        }
+
+        if (fminitialized && M.chat && megaChatIsReady) {
+            mBroadcaster.sendMessage('fmViewUpdate:opc');
         }
     }
 });
@@ -1022,9 +1031,14 @@ scparser.$add('ipc', {
         // incoming pending contact
         processIPC([a]);
 
+        // TODO: deprecate
         if (fminitialized) {
             M.syncPendingContacts(a);
             M.drawReceivedContactRequests([a]);
+        }
+
+        if (fminitialized && megaChatIsReady) {
+            mBroadcaster.sendMessage('fmViewUpdate:ipc');
         }
 
         notify.notifyFromActionPacket(a);
@@ -1340,6 +1354,10 @@ scparser.$add('d', function(a) {
     if (fminitialized && ul_queue.length > 0) {
         ulmanager.ulClearTargetDeleted(a.n);
     }
+
+    if (fminitialized) {
+        M.storageQuotaCache = null;
+    }
 });
 
 scparser.$add('la', function() {
@@ -1388,6 +1406,8 @@ scparser.$add('psts', function(a) {
                 M.accountData();
             }
         });
+
+        M.storageQuotaCache = null;
     }
 });
 
@@ -1558,6 +1578,10 @@ scparser.$finalize = function() {
                     if (M.currentrootid === 'shares' || M.currentrootid === 'out-shares') {
                         M.openFolder(M.currentdirid, true);
                     }
+                    else if (megaChatIsReady && M.chat && megaChat.routingSection === "contacts") {
+                        let id = String(M.currentdirid).substr(14);
+                        mBroadcaster.sendMessage("fmViewUpdate:" + id);
+                    }
 
                     if ($.dialog === 'share') {
                         // Re-render the content of access list in share dialog
@@ -1580,10 +1604,10 @@ scparser.$finalize = function() {
                 scpubliclinksuiupd = false;
             }
 
-            if (scContactsSharesUIUpdate === M.currentdirid) {
-                onIdle(function() {
-                    M.openFolder(M.currentdirid, true);
-                });
+            if ("chat/contacts/" + scContactsSharesUIUpdate === M.currentdirid) {
+                onIdle(function(handle) {
+                    mBroadcaster.sendMessage('fmViewUpdate:' + handle);
+                }.bind(this, scContactsSharesUIUpdate));
 
                 scContactsSharesUIUpdate = false;
             }
@@ -2657,7 +2681,7 @@ function doShare(nodeId, targets, dontShowShareDialog) {
                 }
             }
             if (dontShowShareDialog !== true) {
-                $('.fm-dialog.share-dialog').removeClass('hidden');
+                $('.mega-dialog.share-dialog').removeClass('hidden');
             }
             loadingDialog.hide();
             M.renderShare(nodeId);
@@ -2665,7 +2689,7 @@ function doShare(nodeId, targets, dontShowShareDialog) {
             masterPromise.resolve();
         }
         else {
-            $('.fm-dialog.share-dialog').removeClass('hidden');
+            $('.mega-dialog.share-dialog').removeClass('hidden');
             loadingDialog.hide();
             masterPromise.reject(result);
         }
@@ -2843,7 +2867,7 @@ function processIPC(ipc, ignoreDB) {
                     $('.contact-requests-grid').addClass('hidden');
                     $('.fm-empty-contacts .fm-empty-cloud-txt').text(l[6196]);
                     $('.fm-empty-contacts').removeClass('hidden');
-                    $('.button.link-button.accept-all').addClass('hidden');
+                    $('button.link-button.accept-all').addClass('hidden');
                 }
                 else if (Object.keys(M.ipc).length) {
                     updateIpcRequests();
@@ -3079,22 +3103,7 @@ function processUPCI(ap) {
         if (ap[i].s) {
             delete M.ipc[ap[i].p];
             M.delIPC(ap[i].p);// Remove from localStorage
-            $('#ipc_' + ap[i].p).remove();
-            if ((Object.keys(M.ipc).length === 0) && (M.currentdirid === 'ipc')) {
-                updateIpcRequests();
-                $('.contact-requests-grid').addClass('hidden');
-                $('.fm-empty-contacts .fm-empty-cloud-txt').text(l[6196]);
-                $('.button.link-button.accept-all').addClass('hidden');
-                $('.fm-empty-contacts').removeClass('hidden');
-                $('.contacts-tab-lnk.ipc').removeClass('filled').find('span').text('');
-            }
-            else if (M.currentdirid === 'ipc') {
-                $('.contacts-tab-lnk.ipc').addClass('filled').find('span').text(Object.keys(M.ipc).length);
-                $('.button.link-button.accept-all').removeClass('hidden');
-            }
-            else if (M.currentdirid === 'ipc') {
-                updateIpcRequests();
-            }
+            mBroadcaster.sendMessage('fmViewUpdate:ipc');
         }
     }
 }
@@ -3133,6 +3142,7 @@ function processUPCO(ap) {
                 removeFromMultiInputDDL('.share-multiple-input', {id: ap[i].m, name: ap[i].m});
                 removeFromMultiInputDDL('.add-contact-multiple-input', {id: ap[i].m, name: ap[i].m});
                 $('#opc_' + psid).remove();
+                mBroadcaster.sendMessage('fmViewUpdate:opc');
 
                 // Update sent contact request tab, set empty message with Add contact... button
                 if ((Object.keys(M.opc).length === 0) && (M.currentdirid === 'opc')) {
@@ -3736,6 +3746,21 @@ function loadfm_done(mDBload) {
                     hideLoadingDialog = false;
                 }*/
             }
+        }
+
+        // Check business account is expired on initial phase.
+        if (u_attr && u_attr.b) {
+            M.require('businessAcc_js', 'businessAccUI_js').done(() => {
+
+                var business_ui = new BusinessAccountUI();
+
+                if (u_attr.b.m) {
+                    business_ui.showWelcomeDialog();
+                }
+
+                // the function will check if the account is expired
+                business_ui.showExp_GraceUIElements();
+            });
         }
 
         if (hideLoadingDialog) {

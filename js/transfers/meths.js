@@ -116,9 +116,9 @@ mBroadcaster.once('startMega', function() {
                             if (is_mobile) {
                                 mobile.resumeTransfersOverlay.show(continueTransfers, cancelTransfers);
                             } else {
-                                var $dialog = $('.fm-dialog.resume-transfer');
+                                var $dialog = $('.mega-dialog.resume-transfer');
 
-                                $('.fm-dialog-close, .cancel', $dialog).rebind('click', function() {
+                                $('button.js-close, .cancel', $dialog).rebind('click', function() {
                                     closeDialog();
                                     cancelTransfers();
                                 });

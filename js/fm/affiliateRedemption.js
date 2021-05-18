@@ -135,6 +135,8 @@ affiliateRedemption.processSteps = function() {
                 mainMessage += ' ' + l[253];
             }
 
+            loadingDialog.hide('redeemRequest');
+
             // Oops something went wrong for api side errors
             msgDialog('warninga', '', mainMessage, subMessage, function() {
 
@@ -243,8 +245,8 @@ affiliateRedemption.__processBlock3 = function() {
         this.requests.first.c = $('#affi-currency', this.$step).val();
     }
     else {
-        this.requests.first.cc = $('#affi-country .default-dropdown-item.active', this.$step).data('type');
-        this.requests.first.c = $('#affi-currency .default-dropdown-item.active', this.$step).data('type');
+        this.requests.first.cc = $('#affi-country .option.active', this.$step).data('type');
+        this.requests.first.c = $('#affi-currency .option.active', this.$step).data('type');
     }
 
     return Promise.all([
@@ -302,8 +304,8 @@ affiliateRedemption.recordSecondReqValues = function() {
     if (this.req1res[0].data.length > 1) {
 
         var $accountType = $('#account-type', this.$rdmUI);
-        var activeTypeValue = $accountType.hasClass('default-select') ?
-            $('.default-dropdown-item.active', $accountType).data('type') : $accountType.val();
+        var activeTypeValue = $accountType.hasClass('dropdown-input') ?
+            $('.option.active', $accountType).data('type') : $accountType.val();
 
         this.requests.second.extra.type = this.req1res[0].data[activeTypeValue][0];
         this.requests.second.extra.title = this.req1res[0].data[activeTypeValue][1];
@@ -316,7 +318,7 @@ affiliateRedemption.recordSecondReqValues = function() {
     // Lets use UI input to order it as UI shows.
     var $dynamicInputsWrapper = $('.affi-dynamic-acc-info', this.$rdmUI);
     var uiSelectString = is_mobile ? '.affi-dynamic-acc-select select, .affi-dynamic-acc-input input' :
-        '.affi-dynamic-acc-select .default-select, .affi-dynamic-acc-input';
+        '.affi-dynamic-acc-select, .affi-dynamic-acc-input';
     var $dynamicInputListFromUI = $(uiSelectString, $dynamicInputsWrapper);
 
     // Dynamic input recording
@@ -339,9 +341,9 @@ affiliateRedemption.recordSecondReqValues = function() {
             var $activeItem;
             var activeValue;
 
-            if ($input.hasClass('default-select')) {
+            if ($input.hasClass('dropdown-input')) {
 
-                $activeItem = $('.default-dropdown-item.active', $input);
+                $activeItem = $('.option.active', $input);
                 activeValue = $activeItem.data('type');
             }
             else {
@@ -430,7 +432,7 @@ affiliateRedemption.validateDynamicAccInputs = function() {
         else if (item[0] === 's') {
 
             // If active item has value '', it is default value like "Please select". Warn user to enter value.
-            if ($input.hasClass('default-select')) {
+            if ($input.hasClass('dropdown-input')) {
 
                 var $activeItem = $('.active', $input);
 
@@ -459,10 +461,10 @@ affiliateRedemption.validateDynamicAccInputs = function() {
     // Reason for not using MegaInputs show error for message is due to when there is verification,
     // MegaInputs's message block alreayd taken by the example.
     if (!fillupCheck) {
-        msgDialog('warninga', '', l[23323]);
+        msgDialog('error', '', l[23323]);
     }
     else if (!formatCheck) {
-        msgDialog('warninga', '', l[23324]);
+        msgDialog('error', '', l[23324]);
     }
 
     return fillupCheck && formatCheck;

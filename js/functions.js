@@ -264,7 +264,7 @@ function megatitle(nperc) {
 
 // Set Recieved Contacts indicator
 function updateIpcRequests() {
-    var $indicator = $('.contacts-indicator');
+    var $indicator = $('.contacts-indicator, .ipc-count');
     var $contactTab = $('.contacts-tab-lnk.ipc');
     var ipcLength = Object.keys(M.ipc).length;
 
@@ -943,17 +943,17 @@ function mKeyDialog(ph, fl, keyr, selector) {
     "use strict";
 
     var promise = new MegaPromise();
-    var $dialog = $(is_mobile ? '#mobile-decryption-key-overlay' : '.fm-dialog.dlkey-dialog');
+    var $dialog = $(is_mobile ? '#mobile-decryption-key-overlay' : '.mega-dialog.dlkey-dialog');
     var $button = $(is_mobile ? '.mobile.decrypt-button' : '.fm-dialog-new-folder-button', $dialog);
     var $input = $(is_mobile ? '.mobile.decryption-key' : 'input', $dialog);
 
     if (keyr) {
-        $('.fm-dialog.dlkey-dialog .instruction-message')
+        $('.mega-dialog.dlkey-dialog .instruction-message')
             .text(l[9048]);
     }
     else {
-        $('.fm-dialog.dlkey-dialog input').val('');
-        $('.fm-dialog.dlkey-dialog .instruction-message')
+        $('.mega-dialog.dlkey-dialog input').val('');
+        $('.mega-dialog.dlkey-dialog .instruction-message')
             .safeHTML(l[7945] + '<br/>' + l[7972]);
     }
 
@@ -1021,13 +1021,6 @@ function mKeyDialog(ph, fl, keyr, selector) {
             }
         }
     });
-
-    // Close button is removed in eff07477006e49667edad81a1deae7d79a03a3f1
-    // $('.fm-dialog.dlkey-dialog .fm-dialog-close').rebind('click', function() {
-    //     $('.fm-dialog.dlkey-dialog').addClass('hidden');
-    //     fm_hideoverlay();
-    //     promise.reject();
-    // });
 
     return promise;
 }

@@ -1,0 +1,456 @@
+/**
+ * Dialogs CSS for desktop devices.
+ */
+
+/* Common styles */
+
+    /* container -  handles centering the dialogs */
+
+        /* TODO: make this the blur overlay? */
+
+        .mega-dialog-container,
+        .fm-modal-dialog {
+            align-items: center;
+            display: flex;
+            height: 100%;
+            justify-content: center;
+            left: 0;
+            pointer-events: none;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1111;
+        }
+
+        .fm-modal-dialog {
+            z-index: 1115;
+        }
+
+        .mega-dialog-container > *,
+        .fm-modal-dialog > * {
+            pointer-events: initial;
+        }
+
+    .mega-dialog {
+        background: var(--surface-main);
+        background-clip: padding-box;
+        border-radius: var(--border-radius);
+        box-shadow: var(--dialog-shadow);
+        box-sizing: border-box;
+        color: var(--text-color-medium);
+        display: flex;
+        flex-direction: column;
+        font: var(--text-body1);
+        position: absolute;
+        width: 640px;
+        z-index: 1200;
+    }
+
+    .rtl .mega-dialog {
+        direction: rtl;
+    }
+
+    .mega-dialog > header,
+    .mega-dialog > footer,
+    .mega-dialog > footer aside {
+        flex-grow: 0;
+        flex-shrink: 0;
+    }
+
+    .mega-dialog > section,
+    .mega-dialog > .content-block {
+        min-height: 0;
+    }
+
+    .mega-dialog * {
+        box-sizing: border-box;
+        font-family: var(--text-font-family);
+    }
+
+    .mega-dialog > header h2,
+    .mega-dialog > header h3 {
+        font-weight: 400;
+        margin: 0;
+        overflow: hidden;
+        padding: 0;
+        text-align: center;
+        text-overflow: ellipsis;
+        width: 100%;
+    }
+
+    .mega-dialog h2 {
+        color: var(--text-color-high);
+        font: var(--text-h2);
+    }
+
+    .mega-dialog h3 {
+        color: var(--text-color-high);
+        font: var(--text-h3);
+    }
+
+    .mega-dialog > header p {
+        color: var(--text-color-medium);
+        font: var(--text-body1);
+        margin-top: 16px;
+    }
+
+    .mega-dialog .content-block {
+        background: var(--surface-main);
+        color: var(--text-color-medium);
+        font: var(--text-body1);
+    }
+
+    .mega-dialog p,
+    .mega-dialog a,
+    .mega-dialog a:visited,
+    .mega-dialog a:active {
+        margin: 0;
+    }
+
+    .mega-dialog a,
+    .mega-dialog a:visited,
+    .mega-dialog a:active {
+        color: var(--text-color-success);
+        text-decoration: underline;
+    }
+
+    .mega-dialog a:hover {
+        text-decoration: none;
+    }
+
+    .mega-dialog > header,
+    .mega-dialog > footer {
+        background: transparent;
+    }
+
+    .mega-dialog > footer button ~ button {
+        -webkit-margin-start: 8px;
+        margin-inline-start: 8px;
+    }
+
+    .mega-dialog > footer button ~ button.large {
+        -webkit-margin-start: 12px;
+        margin-inline-start: 12px;
+    }
+
+    /* curved corners */
+
+        .mega-dialog > header,
+        .mega-dialog .dialog-top {
+            border-radius: var(--border-radius) var(--border-radius) 0 0;
+        }
+
+        .mega-dialog > footer,
+        .mega-dialog > footer aside,
+        .mega-dialog .dialog-bottom {
+            border-radius: 0 0 var(--border-radius) var(--border-radius);
+        }
+
+
+    /* text-direction aware text alignment */
+
+        .mega-dialog .align-start {
+            text-align: start !important;
+        }
+
+        .mega-dialog .align-end {
+            text-align: end !important;
+        }
+
+    /* sections with backgrounds */
+
+        .mega-dialog .alt-background {
+            background: var(--surface-grey-1);
+        }
+
+    /* dividers */
+
+        .mega-dialog hr {
+            background: var(--surface-grey-2);
+            border: none;
+            height: 1px;
+            margin: 0;
+            width: 100%;
+        }
+
+    /* close button */
+
+        .mega-dialog button.close {
+            align-items: center;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            padding: 0;
+            position: absolute;
+            right: 16px;
+            top: 16px;
+            z-index: 2010;
+            --icon-size: 24px;
+        }
+
+        .mega-dialog button.close:focus {
+            outline: none;
+        }
+
+        .mega-dialog button.close i {
+            --icon-size: 24px;
+            margin: 0;
+            opacity: 0.6;
+            transition: opacity 200ms ease-in-out;
+        }
+
+        .mega-dialog button.close i:hover {
+            opacity: 0.8;
+        }
+
+        .rtl .mega-dialog button.close {
+            left: 16px;
+            right: initial;
+        }
+
+    /* header layout */
+
+        .mega-dialog > header {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .mega-dialog:not(.dialog-template-message) > header .graphic {
+            display: block;
+            height: 120px;
+            margin: 0 auto 24px;
+            width: 120px;
+        }
+
+        .mega-dialog:not(.dialog-template-message) > header .graphic.wide {
+            width: initial;
+        }
+
+    /* main content layout */
+
+        .mega-dialog > section {
+            display: flex;
+            flex-direction: column;
+        }
+
+    /* footer layout */
+
+        .mega-dialog > footer {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+        }
+
+        .mega-dialog > footer .footer-container {
+            align-items: center;
+            display: flex;
+            justify-content: flex-end;
+            width: 100%;
+        }
+
+        /* footer container variations - overrides type variants using higher specificity */
+
+            .mega-dialog > footer .footer-container.space-between {
+                justify-content: space-between;
+            }
+
+        .mega-dialog > footer .condition {
+            color: var(--text-color-low);
+            font: var(--text-body2);
+            left: 0;
+            position: absolute;
+            top: -26px; /* single line with 8px below */
+            text-align: center;
+            width: 100%;
+        }
+
+    /* aside layout */
+
+        .mega-dialog > footer aside {
+            --mask-color: var(--text-color-medium);
+            background: var(--surface-grey-4);
+            font: var(--text-body2);
+            position: relative;
+            text-align: center;
+        }
+
+        .mega-dialog > footer aside *,
+        .mega-dialog > footer aside *:active,
+        .mega-dialog > footer aside *:hover {
+            font: var(--text-body2);
+        }
+
+    /* type variants - padding and margins */
+
+        /* main */
+
+            .mega-dialog.dialog-template-main > header {
+                padding: 48px 48px 16px 48px;
+            }
+
+            .mega-dialog.dialog-template-main > header h2 {
+                text-align: start;
+            }
+
+            .mega-dialog.dialog-template-main > header p {
+                text-align: start;
+            }
+
+            .mega-dialog.dialog-template-main .content-block {
+                padding: 0 48px;
+            }
+
+            .mega-dialog.dialog-template-main > footer .footer-container {
+                padding: 16px 48px 48px 48px;
+            }
+
+            .mega-dialog.dialog-template-main > footer aside {
+                padding: 12px 48px;
+            }
+
+            .mega-dialog.dialog-template-main > footer aside:not(.with-condition) {
+                margin-top: -24px;
+            }
+
+        /* tool */
+
+            .mega-dialog.dialog-template-tool > header {
+                padding: 12px 48px 12px 48px;
+            }
+
+            .mega-dialog.dialog-template-tool > header .graphic {
+                margin-top: 36px;
+            }
+
+            .mega-dialog.dialog-template-tool > header p {
+                margin-top: 4px;
+                text-align: center;
+            }
+
+            .mega-dialog.dialog-template-tool .content-block {
+                padding: 0 48px;
+            }
+
+            .mega-dialog.dialog-template-tool > footer .footer-container {
+                padding: 40px 48px 24px 48px;
+            }
+
+            .mega-dialog.dialog-template-tool > footer aside {
+                padding: 12px 48px;
+            }
+
+            .mega-dialog.dialog-template-tool > footer aside.with-condition {
+                margin-top: 24px;
+            }
+
+        /* action */
+
+            .mega-dialog.dialog-template-action > header {
+                padding: 16px 48px 16px 48px;
+            }
+
+            .mega-dialog.dialog-template-action > header .graphic {
+                margin-top: 32px;
+            }
+
+            .mega-dialog.dialog-template-action > header p {
+                text-align: start;
+            }
+
+            .mega-dialog.dialog-template-action .content-block {
+                padding: 0 48px;
+            }
+
+            .mega-dialog.dialog-template-action > footer .footer-container {
+                justify-content: center;
+                padding: 16px 48px 48px 48px;
+            }
+
+            .mega-dialog.dialog-template-action > footer button {
+                -webkit-margin-end: 4px;
+                margin-inline-end: 4px;
+                -webkit-margin-start: 4px;
+                margin-inline-start: 4px;
+            }
+
+            .mega-dialog.dialog-template-action > footer button.large {
+                -webkit-margin-end: 6px;
+                margin-inline-end: 6px;
+                -webkit-margin-start: 6px;
+                margin-inline-start: 6px;
+            }
+
+            .mega-dialog.dialog-template-action > footer aside {
+                padding: 12px 48px;
+            }
+
+            .mega-dialog.dialog-template-action > footer aside:not(.with-condition) {
+                margin-top: -24px;
+            }
+
+        /* message */
+
+            .mega-dialog.dialog-template-message > header {
+                flex-direction: row;
+                padding-top: 24px;
+                -webkit-padding-end: 72px;
+                padding-inline-end: 72px;
+                -webkit-padding-start: 24px;
+                padding-inline-start: 24px;
+            }
+
+            .mega-dialog.dialog-template-message > header .graphic {
+                flex-grow: 0;
+                flex-shrink: 0;
+                height: 64px;
+                -webkit-margin-end: 24px;
+                margin-inline-end: 24px;
+                width: 64px;
+            }
+
+            .mega-dialog.dialog-template-message > header h3 {
+                text-align: start;
+            }
+
+            .mega-dialog.dialog-template-message > header p {
+                margin-top: 12px;
+            }
+
+            .mega-dialog.dialog-template-message > footer .footer-container {
+                padding: 24px;
+            }
+
+            .mega-dialog.dialog-template-message > footer aside {
+                padding: 12px 24px;
+            }
+
+            .mega-dialog.dialog-template-message > footer aside.with-condition {
+                margin-top: 24px;
+            }
+
+        /* graphic */
+
+            .mega-dialog.dialog-template-graphic > header {
+                padding: 48px 48px 16px 48px;
+            }
+
+            .mega-dialog.dialog-template-graphic .content-block {
+                padding: 0 48px;
+                text-align: center;
+            }
+
+            .mega-dialog.dialog-template-graphic > footer .footer-container {
+                padding: 16px 48px 48px 48px;
+            }
+
+            .mega-dialog.dialog-template-graphic > footer aside {
+                padding: 12px 48px;
+            }
+
+            .mega-dialog.dialog-template-graphic > footer .footer-container + aside:not(.with-condition) {
+                margin-top: -24px;
+            }
+
+        /* some complex dialogs are untemplated so have no dialog-* class */

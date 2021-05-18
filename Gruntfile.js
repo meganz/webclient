@@ -1,8 +1,8 @@
 var fs = require('fs');
 var fileLimit = 512*1024;
+const rebaseURLs = true;
 const usePostCSS = true;
-const usePostHTML = false;
-const rebaseURLs = false;
+const usePostHTML = true;
 
 const basename = p => p.replace(/^.*\//, '');
 
@@ -224,6 +224,49 @@ var Secureboot = function() {
 
             return m + '    var subpages';
         });
+
+        if (usePostCSS || usePostHTML) {
+            const cwd = process.cwd();
+            const path = require("path");
+            const debug = process.env.DEBUG;
+            const read = file => fs.readFileSync(file).toString('utf8');
+            const diff = (file1, file2) => read(file1) !== read(file2);
+            const copy = (src, dst) => {
+                try {
+                    fs.copyFileSync(src, dst);
+
+                    if (debug) {
+                        console.log('INFO: Created "%s"', dst);
+                    }
+                }
+                catch (ex) {
+                    die('Something went wrong copying', {src, dst}, ex);
+                }
+            };
+
+            lines = lines.replace(/{f:'((?:html|css)[^']+)[^}]+}/g, (match, file) => {
+                const base = basename(file);
+
+                if (base.endsWith('.html') || base.endsWith('.css')) {
+                    const type = file.replace(/\/.*$/, '');
+                    const buildFile = path.join(cwd, 'build', type, base);
+
+                    if (fs.existsSync(buildFile)) {
+                        const origFile = path.join(cwd, file);
+
+                        if (diff(origFile, buildFile)) {
+                            const jslFile = file + '-postbuild.' + type;
+                            const newFile = path.join(cwd, jslFile);
+
+                            copy(buildFile, newFile);
+                            match = match.replace(file, jslFile);
+                        }
+                    }
+                }
+
+                return match;
+            });
+        }
 
         fs.writeFileSync(name, lines);
 

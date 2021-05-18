@@ -7,11 +7,14 @@ export class Button extends MegaRenderMixin {
     buttonClass = `.button`;
 
     state = {
-        focused: false
+        focused: false,
+        hovered: false,
+        iconHovered: ''
     };
 
     constructor(props) {
         super(props);
+        this.state.iconHovered = this.props.iconHovered || '';
     }
 
     componentWillUpdate(nextProps, nextState) {
@@ -68,6 +71,14 @@ export class Button extends MegaRenderMixin {
         }
 
         return React.Children.map(this.props.children, function (child) {
+            if (!child) {
+                return;
+            }
+            if (typeof child.type === 'string' || typeof child.type === 'undefined') {
+                // DOM element or Raw text
+                return child;
+            }
+
             return React.cloneElement(child, {
                 active: self.state.focused,
                 closeDropdown: function() {
@@ -114,6 +125,8 @@ export class Button extends MegaRenderMixin {
         }
     }
 
+    toggleHovered = () => this.setState({ hovered: !this.state.hovered });
+
     unbindEvents() {
         $(document).off('keyup.button' + this.getUniqueId());
         $(document).off('closeDropdowns.' + this.getUniqueId());
@@ -146,7 +159,7 @@ export class Button extends MegaRenderMixin {
 
         if (this.state.focused === false) {
             if (this.props.onClick) {
-                this.props.onClick(this);
+                this.props.onClick(this, e);
             }
             else if (React.Children.count(this.props.children) > 0) { // does it contain some kind of a popup/container?
                 this.setState({ focused: true });
@@ -159,21 +172,44 @@ export class Button extends MegaRenderMixin {
     }
 
     render() {
-        const { className, disabled, style, icon, label, toggle, secondLabel, secondLabelClass } = this.props;
+        const {
+            className,
+            disabled,
+            style,
+            icon,
+            iconHovered,
+            label,
+            attrs,
+            toggle,
+            secondLabel,
+            secondLabelClass
+        } = this.props;
+        const isMegaButton = className && className.indexOf('mega-button') > -1;
+        const TagName = isMegaButton ? 'button' : 'div';
 
-        var extraAttrs = this.props.attrs;
         return (
-            <div
+            <TagName
                 className={`
                     button
                     ${className ? className : ''}
                     ${disabled ? 'disabled' : ''}
-                    ${this.state.focused ? 'active' : ''}
+                    ${this.state.focused ? 'active active-dropdown' : ''}
                 `}
                 style={style}
                 onClick={this.onClick}
-                {...extraAttrs}>
-                {icon && <i className={`small-icon ${icon}`} />}
+                onMouseEnter={iconHovered ? this.toggleHovered : undefined}
+                onMouseLeave={iconHovered ? this.toggleHovered : undefined}
+                {...attrs}>
+                {icon && !isMegaButton && (
+                    <div>
+                        <i className={this.state.hovered ? this.state.iconHovered : icon} />
+                    </div>
+                )}
+                {icon && isMegaButton && (
+                    <div>
+                        <i className={this.state.hovered ? this.state.iconHovered : icon} />
+                    </div>
+                )}
                 {label && <span>{label}</span>}
                 {secondLabel && (
                     <span
@@ -183,7 +219,7 @@ export class Button extends MegaRenderMixin {
                 {toggle && (
                     <div
                         className={`
-                            dialog-feature-toggle
+                            mega-switch
                             ${toggle.className ? toggle.className : ''}
                             ${toggle.enabled ? 'toggle-on' : ''}
                         `}
@@ -193,11 +229,11 @@ export class Button extends MegaRenderMixin {
                                 this.props.toggle.onClick();
                             }
                         }}>
-                        <div className="dialog-feature-switch" />
+                        <div className="mega-feature-switch" />
                     </div>
                 )}
                 {this.renderChildren()}
-            </div>
+            </TagName>
         );
     }
 }

@@ -336,7 +336,7 @@
          */
         prompt: function(op, file, node, remaining, target, dupsNB) {
             var promise = new MegaPromise();
-            var $dialog = $('.fm-dialog.duplicate-conflict');
+            var $dialog = $('.mega-dialog.duplicate-conflict');
             var name = M.getSafeName(file.name);
             var $a1 = $('.action-block.a1', $dialog).removeClass('hidden');
             var $a2 = $('.action-block.a2', $dialog).removeClass('hidden');
@@ -344,6 +344,9 @@
             var icons = $('.export-icon', $dialog);
             var classes = icons.attr('class').split(' ');
             icons.removeClass(classes[classes.length - 1]); // remove last class
+
+            // Hide the loading spinner, it will be shown again when the conflict is being resolved
+            loadingDialog.phide();
 
             if (file.t) {
                 $a3.addClass('hidden');
@@ -520,10 +523,10 @@
                 window.open(this.href, '_blank');
                 return false;
             });
-            $('.skip-button', $dialog).rebind('click', function() {
-                done(null, 0, ns.DONTCOPY);
-            });
-            $('.cancel-button, .fm-dialog-close', $dialog).rebind('click', function() {
+            // $('.skip-button', $dialog).rebind('click', function() {
+            //     done(null, 0, ns.DONTCOPY);
+            // });
+            $('button.js-close, button.cancel-button', $dialog).rebind('click', function() {
                 done(-0xBADF);
             });
 
@@ -532,14 +535,14 @@
                 .parent()
                 .switchClass('checkboxOn', 'checkboxOff');
 
-            var $chk = $('.bottom-checkbox', $dialog).addClass('hidden');
+            var $aside = $('aside', $dialog).addClass('hidden');
 
             if (remaining) {
                 var remainingConflictText = remaining > 1 ?
                     escapeHTML(l[16494]).replace('%1', '<span>' + remaining + '</span>') :
                     l[23294];
-                $chk.removeClass('hidden');
-                $('.radio-txt', $chk).safeHTML(remainingConflictText);
+                $aside.removeClass('hidden');
+                $('.radio-txt', $aside).safeHTML(remainingConflictText);
             }
 
             uiCheckboxes($dialog);
@@ -744,9 +747,7 @@
                                     M.moveToRubbish(nodeToRemove);
                                 }
                                 // hide bar
-                                $('.files-grid-view.fm').removeClass('duplication-found');
-                                $('.fm-blocks-view.fm').removeClass('duplication-found');
-                                $('.duplicated-items-found').addClass('hidden');
+                                $('.fm-notification-block.duplicated-items-found').removeClass('visible');
                             }
                             else {
                                 // merge
@@ -774,9 +775,8 @@
                                                     function() {
                                                         // no need to updateUI,
                                                         // for optimization we will only hide the bar
-                                                        $('.files-grid-view.fm').removeClass('duplication-found');
-                                                        $('.fm-blocks-view.fm').removeClass('duplication-found');
-                                                        $('.duplicated-items-found').addClass('hidden');
+                                                        $('.fm-notification-block.duplicated-items-found')
+                                                            .removeClass('visible');
                                                         resolveDup(duplicateEntries, keys, ++kIndex, type,
                                                             (checked) ? action : null);
                                                     }

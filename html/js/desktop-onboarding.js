@@ -92,7 +92,7 @@
             $('.onboard-image.transfer-speed', $oiw).addClass('hidden');
 
             // Hide the download buttons and MEGAcmd dropdown
-            $('.default-green-button.download-app', $wrapper).addClass('hidden');
+            $('button.download-app', $wrapper).addClass('hidden');
             $('.megaapp-linux.cmd', $wrapper).addClass('hidden');
 
             // Swap between pre/post download body text
@@ -101,7 +101,7 @@
 
             // Swap between text button and green button for cloud drive redirection
             $('.text-button.redirect-clouddrive-link', $wrapper).addClass('hidden');
-            $('.default-green-button.redirect-clouddrive', $wrapper).removeClass('hidden');
+            $('button.redirect-clouddrive', $wrapper).removeClass('hidden');
 
             // Resize the height of the container to align items
             $('.bottom-page.horizontal-centered-bl', $wrapper).addClass('resize');

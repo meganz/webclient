@@ -51,22 +51,20 @@ RepayPage.prototype.initPage = function() {
 
     // event handler for radio buttons
     $('.bus-reg-radio-option', $paymentBlock)
-        .off('click.suba').on('click.suba', function businessRepayCheckboxClick() {
+        .rebind('click.suba', function businessRepayCheckboxClick() {
             var $me = $(this);
             $me = $('.bus-reg-radio', $me);
-            if ($me.hasClass('checkOn')) {
+            if ($me.hasClass('radioOn')) {
                 return;
             }
-            else {
-                $('.bus-reg-radio', $paymentBlock).removeClass('checkOn').addClass('checkOff');
-                $me.removeClass('checkOff').addClass('checkOn');
-            }
+            $('.bus-reg-radio', $paymentBlock).removeClass('radioOn').addClass('radioOff');
+            $me.removeClass('radioOff').addClass('radioOn');
         });
 
 
     // event handler for clicking on terms anchor
-    $leftSection.find('.bus-reg-agreement.mega-terms .bus-reg-txt span').off('click')
-        .on('click', function termsClickHandler() {
+    $('.bus-reg-agreement.mega-terms .radio-txt a', $leftSection)
+        .rebind('click', function termsClickHandler() {
             if (!is_mobile) {
                 bottomPageDialog(false, 'terms', false, true);
             }
@@ -85,20 +83,21 @@ RepayPage.prototype.initPage = function() {
             return false;
         });
 
-    $('.bus-reg-agreement.mega-terms .bus-reg-checkbox', $leftSection)
-        .removeClass('checkOn').addClass('checkOff');
+    $('.bus-reg-agreement.mega-terms .checkdiv', $leftSection)
+        .removeClass('checkboxOn').addClass('checkboxOff');
 
     // event handler for check box
-    $('.bus-reg-agreement', $leftSection).off('click.suba').on('click.suba',
+    $('.bus-reg-agreement', $leftSection).rebind(
+        'click.suba',
         function businessRepayCheckboxClick() {
-            var $me = $(this).find('.bus-reg-checkbox');
-            if ($me.hasClass('checkOn')) {
-                $me.removeClass('checkOn').addClass('checkOff');
+            var $me = $('.checkdiv', $(this));
+            if ($me.hasClass('checkboxOn')) {
+                $me.removeClass('checkboxOn').addClass('checkboxOff');
                 $repayBtn.addClass('disabled');
             }
             else {
-                $me.removeClass('checkOff').addClass('checkOn');
-                if ($('.bus-reg-agreement .bus-reg-checkbox.checkOn', $leftSection).length === 2) {
+                $me.removeClass('checkboxOff').addClass('checkboxOn');
+                if ($('.bus-reg-agreement .checkdiv.checkboxOn', $leftSection).length === 2) {
                     $repayBtn.removeClass('disabled');
                 }
                 else {

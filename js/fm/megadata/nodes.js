@@ -443,11 +443,16 @@ MegaData.prototype.injectNodes = function(nodes, target, callback) {
  * @param {Boolean}     [del]         Should we delete the node after copying? (Like a move operation)
  * @param {MegaPromise} [promise]     promise to notify completion on (Optional)
  * @param {Array}       [tree]        optional tree from M.getCopyNodes
+ * @param {Boolean}     [quiet]       whether to show the loading spinner or not
  * @returns {MegaPromise} The promise provided to this function, if any.
  */
-MegaData.prototype.copyNodes = function copynodes(cn, t, del, promise, tree) {
+MegaData.prototype.copyNodes = function copynodes(cn, t, del, promise, tree, quiet) {
     'use strict';
     var todel = [];
+
+    if (typeof quiet === 'undefined') {
+        quiet = false;
+    }
 
     if (typeof promise === 'function') {
         var tmp = promise;
@@ -459,15 +464,19 @@ MegaData.prototype.copyNodes = function copynodes(cn, t, del, promise, tree) {
         return promise.reject(EINTERNAL);
     }
 
-    loadingDialog.pshow();
+    if (!quiet) {
+        loadingDialog.pshow();
+    }
 
     if (t.length === 11 && !u_pubkeys[t]) {
         var keyCachePromise = api_cachepubkeys([t]);
         keyCachePromise.always(function _cachepubkeyscomplete() {
-            loadingDialog.phide();
+            if (!quiet) {
+                loadingDialog.phide();
+            }
 
             if (u_pubkeys[t]) {
-                M.copyNodes(cn, t, del, promise, tree);
+                M.copyNodes(cn, t, del, promise, tree, quiet);
             }
             else {
                 alert(l[200]);
@@ -539,7 +548,7 @@ MegaData.prototype.copyNodes = function copynodes(cn, t, del, promise, tree) {
                     tree.todel = todel.length && todel;
 
                     // 5. Provide the final tree back to copyNodes() and continue
-                    M.copyNodes(cn, t, del, promise, tree);
+                    M.copyNodes(cn, t, del, promise, tree, quiet);
                 });
 
             return promise;
@@ -548,7 +557,10 @@ MegaData.prototype.copyNodes = function copynodes(cn, t, del, promise, tree) {
 
     if (!Object(tree).length) {
         // we may receive an empty array, for example if the user cancelled the fileconflict dialog
-        loadingDialog.phide();
+
+        if (!quiet) {
+            loadingDialog.phide();
+        }
 
         if (promise) {
             promise.reject(EINCOMPLETE);
@@ -571,7 +583,9 @@ MegaData.prototype.copyNodes = function copynodes(cn, t, del, promise, tree) {
         }
 
         if (shared.length) {
-            loadingDialog.phide();
+            if (!quiet) {
+                loadingDialog.phide();
+            }
 
             // Confirm with the user the operation will revoke shares and he wants to
             msgDialog('confirmation', l[870], l[34] + ' ' + l[7410], l[6994], function(yes) {
@@ -587,7 +601,9 @@ MegaData.prototype.copyNodes = function copynodes(cn, t, del, promise, tree) {
     }
 
     if (tree.opSize) {
-        loadingDialog.phide();
+        if (!quiet) {
+            loadingDialog.phide();
+        }
 
         M.checkGoingOverStorageQuota(tree.opSize)
             .fail(function() {
@@ -597,7 +613,7 @@ MegaData.prototype.copyNodes = function copynodes(cn, t, del, promise, tree) {
             })
             .done(function() {
                 // Not going overquota, provide the final tree back to copyNodes() and continue
-                M.copyNodes(cn, t, del, promise, tree);
+                M.copyNodes(cn, t, del, promise, tree, quiet);
             });
 
         delete tree.opSize;
@@ -636,14 +652,21 @@ MegaData.prototype.copyNodes = function copynodes(cn, t, del, promise, tree) {
 
     var onCopyNodesDone = function() {
         M.safeRemoveNodes(todel).always(function() {
-            loadingDialog.phide();
+            if (!quiet) {
+                loadingDialog.phide();
+            }
 
             if (importNodes && nodesCount < importNodes) {
-                msgDialog('warninga', l[882],
-                    (nodesCount ? l[8683] : l[2507])
-                        .replace('%1', nodesCount)
-                        .replace('%2', importNodes)
-                );
+                if (nodesCount) {
+                    msgDialog(
+                        'warninga',
+                        l[882],
+                        l[8683].replace('%1', nodesCount).replace('%2', importNodes)
+                    );
+                }
+                else {
+                    msgDialog('error', l[882], l[2507]);
+                }
             }
 
             if (promise) {
@@ -747,7 +770,10 @@ MegaData.prototype.copyNodes = function copynodes(cn, t, del, promise, tree) {
         callback: function(res, ctx) {
 
             if (typeof res === 'number' && res < 0) {
-                loadingDialog.phide();
+                if (!quiet) {
+                    loadingDialog.phide();
+                }
+
                 if (promise) {
                     promise.reject(res);
                 }
@@ -1761,6 +1787,8 @@ MegaData.prototype.nodeUpdated = function(n, ignoreDB) {
                 parentNode = M.d[parentNode] ? M.d[parentNode].p : null;
             }
         }
+
+        mBroadcaster.sendMessage("nodeUpdated:" + n.h);
     }
 };
 
@@ -1827,7 +1855,7 @@ MegaData.prototype.onRenameUIUpdate = function(itemHandle, newItemName) {
                 clearTimeout(this.onRenameUIUpdate.tick);
             }
             this.onRenameUIUpdate.tick = setTimeout(function() {
-                M.renderPath();
+                delay('render:path_breadcrumbs', () => M.renderPathBreadcrumbs());
             }, 90);
         }
 
@@ -2296,12 +2324,12 @@ MegaData.prototype.favouriteDomUpdate = function(node, favState) {
     var $blockView = $('#' + node.h + '.data-block-view .file-status-icon');
 
     if (favState) {// Add favourite
-        $gridView.addClass('star');
-        $blockView.addClass('star');
+        $gridView.removeClass('icon-dot').addClass('icon-favourite-filled');
+        $blockView.addClass('icon-favourite-filled');
     }
     else {// Remove from favourites
-        $gridView.removeClass('star');
-        $blockView.removeClass('star');
+        $gridView.removeClass('icon-favourite-filled').addClass('icon-dot');
+        $blockView.removeClass('icon-favourite-filled');
     }
 };
 
@@ -3934,7 +3962,7 @@ MegaData.prototype.emptySharefolderUI = function(lSel) {
     $(lSel).before($('.fm-empty-folder .fm-empty-pad:first').clone().removeClass('hidden').addClass('fm-empty-sharef'));
     $(lSel).hide().parent().children('table').hide();
 
-    $('.files-grid-view.fm.shared-folder-content').addClass('hidden');
+    $('.files-grid-view.fm.shared-folder-content').removeClass('hidden');
 
     $.tresizer();
 };
@@ -4229,7 +4257,25 @@ MegaData.prototype.importFolderLinkNodes = function importFolderLinkNodes(nodes)
  * @type {Object}
  */
 lazy(MegaData.prototype, 'myChatFilesFolder', function() {
+
     'use strict';
-    return mega.attr.getFolderFactory("cf", false, true, 'h',
-        [l[20157], 'My chat files'], base64urlencode, base64urldecode);
+
+    return mega.attr.getFolderFactory(
+        "cf",
+        false,
+        true,
+        'h',
+        [l[20157], 'My chat files'],
+        base64urlencode,
+        base64urldecode
+    ).change(function(handle) {
+
+        if (handle) {
+            let target = document.querySelector('#treea_' + handle + ' .nw-fm-tree-folder');
+
+            if (target) {
+                target.classList.add('chat-folder');
+            }
+        }
+    });
 });

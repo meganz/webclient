@@ -42,32 +42,35 @@ class MetaRichprevConfirmation extends ConversationMessageMixin {
         var notNowButton = null;
         var neverButton = null;
 
-
         if (RichpreviewsFilter.confirmationCount >= 2) {
-            neverButton = <div className="default-white-button small-text small right red"
+            neverButton = <button className="mega-button right negative"
                 onClick={function() {
                     self.doNever();
                 }}>
                 <span>{l[1051]}</span>
-            </div>;
+            </button>;
         }
 
-        notNowButton = <div className="default-white-button small-text small grey-txt right"
+        notNowButton = <button className="mega-button right"
             onClick={function() {
                 self.doNotNow();
             }}>
             <span>{l[18682]}</span>
-        </div>;
-
-
-
-
+        </button>;
 
         return <div className="message richpreview previews-container">
             <div className="message richpreview container confirmation">
                 <div className="message richpreview body">
                     <div className="message richpreview img-wrapper">
-                        <div className="message richpreview preview confirmation-icon"></div>
+                        <div
+                            className="
+                                message
+                                richpreview
+                                preview-confirmation
+                                sprite-fm-illustration
+                                img-chat-url-preview
+                            "
+                        />
                     </div>
                     <div className="message richpreview inner-wrapper">
                         <div className="message richpreview data-title">
@@ -77,11 +80,11 @@ class MetaRichprevConfirmation extends ConversationMessageMixin {
                             {l[18680]}
                         </div>
                         <div className="buttons-block">
-                            <div className="default-grey-button small-text small right" onClick={function() {
+                            <button className="mega-button right positive" onClick={function() {
                                 self.doAllow();
                             }}>
                                 <span>{l[18681]}</span>
-                            </div>
+                            </button>
                             {notNowButton}
                             {neverButton}
                         </div>

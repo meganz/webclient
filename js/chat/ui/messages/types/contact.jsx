@@ -54,9 +54,8 @@ export default class Contact extends AbstractGenericMessage {
                 <>
                     <hr/>
                     <DropdownItem
-                        icon="red-cross"
+                        icon="sprite-fm-mono icon-dialog-close"
                         label={l[83] /* `Remove` */}
-                        className="red"
                         onClick={e => this.props.onDelete(e, message)}
                     />
                 </>
@@ -73,7 +72,7 @@ export default class Contact extends AbstractGenericMessage {
 
         return (
             <Button
-                className="default-white-button tiny-button"
+                className="tiny-button"
                 icon="tiny-icon icons-sprite grey-dots">
                 <Dropdown
                     className="white-context-menu shared-contact-dropdown"
@@ -104,15 +103,15 @@ export default class Contact extends AbstractGenericMessage {
                     {HAS_RELATIONSHIP && (
                         <>
                             <DropdownItem
-                                icon="human-profile"
+                                icon="sprite-fm-mono icon-user-filled"
                                 label={l[5868] /* `View profile` */}
                                 onClick={() => {
-                                    loadSubPage("fm/" + contact.u);
+                                    loadSubPage("fm/chat/contacts/" + contact.u);
                                 }}
                             />
                             <hr/>
                             <DropdownItem
-                                icon="conversations"
+                                icon="sprite-fm-mono icon-chat-filled"
                                 label={l[8632] /* `Start new chat` */}
                                 onClick={() => {
                                     loadSubPage("fm/chat/p/" + contact.u);
@@ -123,7 +122,7 @@ export default class Contact extends AbstractGenericMessage {
 
                     {!HAS_RELATIONSHIP && (
                         <DropdownItem
-                            icon="rounded-grey-plus"
+                            icon="sprite-fm-mono icon-add-filled"
                             label={l[71] /* `Add contact` */}
                             onClick={() => this._handleAddContact(contactEmail)}
                         />
@@ -147,7 +146,7 @@ export default class Contact extends AbstractGenericMessage {
         let contacts = [];
 
         attachmentMeta.forEach((v) => {
-            const contact = M.u && M.u[v.u] ? M.u[v.u] : v;
+            const contact = M.u && v.u in M.u ? M.u[v.u] : v;
             const contactEmail = contact.email ? contact.email : contact.m;
 
             if (!M.u[contact.u]) {

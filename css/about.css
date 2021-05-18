@@ -361,7 +361,7 @@ body:not(.mobile) .about.white-button:hover {
 
 .about.carousel {
     height: 700px;
-    background-image: url(../images/mega/about/about-carousel_v1.jpg);
+    background-image: url(../images/mega/about/about-carousel.jpg);
     background-repeat: repeat;
     background-position: 0 0;
     background-size: auto 100%;

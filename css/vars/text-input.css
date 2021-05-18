@@ -1,0 +1,10 @@
+.mega-input {
+
+	/* Password strength */
+
+	    --password-status-strong: #4BB8F3;
+	    --password-status-good: #6DCC50;
+	    --password-status-medium: #F9A646;
+	    --password-status-weak: #F4CE4A;
+	    --password-status-veryweak: #FF333A;
+}

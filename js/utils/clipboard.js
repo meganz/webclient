@@ -60,7 +60,7 @@ function copyToClipboard(content, toastText, classname) {
     }
 
     if (success && toastText) {
-        showToast(classname ? 'clipboard ' + classname : 'clipboard', toastText);
+        showToast(classname ? classname : 'clipboard', toastText);
     }
 
     return success;

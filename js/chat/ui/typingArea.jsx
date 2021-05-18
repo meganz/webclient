@@ -728,17 +728,18 @@ export class TypingArea extends MegaRenderMixin {
         var buttons = null;
 
         if (self.props.showButtons === true) {
+            const className = 'mega-button right';
             buttons = [
                 <Button
+                    className={className}
                     key="save"
-                    className="default-white-button right"
                     icon=""
                     onClick={self.onSaveClicked.bind(self)}
                     label={l[776]} />,
 
                 <Button
+                    className={className}
                     key="cancel"
-                    className="default-white-button right"
                     icon=""
                     onClick={self.onCancelClicked.bind(self)}
                     label={l[1718]} />
@@ -855,7 +856,7 @@ export class TypingArea extends MegaRenderMixin {
 
         var disabledTextarea = room.pubCu25519KeyIsMissing === true || this.props.disabled ? true : false;
 
-        return <div className={"typingarea-component" + self.props.className + (disabledTextarea ? " disabled" : "")}>
+        return <div className={"typingarea-component " + self.props.className}>
             {this.state.gifPanelActive &&
                 <GifPanel
                     chatRoom={this.props.chatRoom}
@@ -883,7 +884,7 @@ export class TypingArea extends MegaRenderMixin {
                 )}
                 <Button
                     className="popup-button emoji-button"
-                    icon="smiling-face"
+                    icon="sprite-fm-theme icon-emoji"
                     disabled={this.props.disabled}>
                     <DropdownEmojiSelector
                         className="popup emoji"
@@ -891,10 +892,14 @@ export class TypingArea extends MegaRenderMixin {
                         onClick={self.onEmojiClicked.bind(self)} />
                 </Button>
                 <hr />
-                <div className="chat-textarea-scroll textarea-scroll jScrollPaneContainer"
-                     style={textareaScrollBlockStyles}>
+                <div
+                    className="chat-textarea-scroll textarea-scroll jScrollPaneContainer"
+                    style={textareaScrollBlockStyles}>
                     <textarea
-                        className={messageTextAreaClasses}
+                        className={`
+                            ${messageTextAreaClasses}
+                            ${disabledTextarea ? 'disabled' : ''}
+                        `}
                         placeholder={placeholder}
                         onKeyUp={self.onTypeAreaKeyUp.bind(self)}
                         onKeyDown={self.onTypeAreaKeyDown.bind(self)}
@@ -902,15 +907,14 @@ export class TypingArea extends MegaRenderMixin {
                         onChange={self.onTypeAreaChange.bind(self)}
                         onSelect={self.onTypeAreaSelect.bind(self)}
                         value={self.state.typedMessage}
-                        ref="typearea"
                         style={textareaStyles}
-                        disabled={disabledTextarea ? true : false}
-                        readOnly={disabledTextarea ? true : false}
+                        disabled={disabledTextarea}
+                        readOnly={disabledTextarea}
                         onCopyCapture={self.onCopyCapture.bind(self)}
                         onPasteCapture={self.onPasteCapture.bind(self)}
                         onCutCapture={self.onCutCapture.bind(self)}
-                    ></textarea>
-                    <div className="message-preview"></div>
+                    />
+                    <div className="message-preview" />
                 </div>
             </div>
             {buttons}

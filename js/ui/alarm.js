@@ -22,22 +22,18 @@ var alarm = {
 
         // If permanently hidden, make sure it stays hidden
         if (alarm.hidden === 2) {
-            $button.addClass('hidden').removeClass('active');
-            $dialog.addClass('hidden');
+            $button.addClass('hidden').removeClass('show');
         }
 
         // If they have seen it already, we still want to let them open the dialog
         // So just show the warning icon and they can click to re-show the dialog if they want
         else if (alarm.hidden === 1) {
-            $button.removeClass('hidden active');
-            $dialog.addClass('hidden');
+            $button.removeClass('hidden show');
         }
 
         // Otherwise auto show the dialog and warning icon
         else {
-            $button.removeClass('hidden').addClass('active');
-            $dialog.removeClass('hidden');
-            topPopupAlign($button, $dialog, 40);
+            $button.removeClass('hidden').addClass('show');
         }
     },
 
@@ -49,12 +45,10 @@ var alarm = {
         'use strict';
 
         if (!leaveButton) {
-            var $buttons = $('.top-icon.warning');
-            $buttons.addClass('hidden').removeClass('active');
+            var $buttons = $('.js-dropdown-warning');
+            $buttons.addClass('hidden').removeClass('show');
         }
 
-        var $dialogs = $('.top-warning-popup');
-        $dialogs.addClass('hidden');
     },
 
     /**
@@ -65,23 +59,20 @@ var alarm = {
     initWarningIconButton: function($button, $dialog) {
 
         // On warning icon click
-        $button.rebind('click', function() {
+        $button.rebind('click', '.js-top-buttons', function() {
 
             // If the popup is currently visible
-            if (!$dialog.hasClass('hidden')) {
+            if ($button.hasClass('show')) {
 
                 // Hide the popup
-                $dialog.addClass('hidden');
-                $button.removeClass('active');
+                $button.removeClass('show');
 
                 // Set flag so it doesn't auto show each time
                 alarm.hidden = 1;
             }
             else {
                 // Otherwise show the popup
-                $dialog.removeClass('hidden');
-                $button.addClass('active');
-                topPopupAlign($button, $dialog, 40);
+                $button.addClass('show');
             }
         });
     },
@@ -98,7 +89,7 @@ var alarm = {
         render: function() {
 
             // Cache lookups
-            var $button = $('.top-icon.warning.over-quota');
+            var $button = $('.js-dropdown-overquota');
             var $dialog = $('.top-warning-popup.over-quota');
 
             // Add button click handler
@@ -140,7 +131,8 @@ var alarm = {
         render: function() {
 
             // Cache lookups
-            var $button = $('.top-icon.warning.ephemeral-session');
+
+            var $button = $('.js-dropdown-ephemeral');
             var $dialog = $('.top-warning-popup.ephemeral-session');
 
             // Add button click handler
@@ -170,8 +162,7 @@ var alarm = {
                 alarm.hidden = 1;
 
                 // Hide the dialog and go to register page
-                $dialog.addClass('hidden');
-                $button.removeClass('active');
+                $button.removeClass('show');
                 loadSubPage('register');
             });
         }
@@ -192,7 +183,7 @@ var alarm = {
         render: function(recentPurchase) {
 
             // Cache lookups
-            var $button = $('.top-icon.warning.non-activated-account');
+            var $button = $('.js-dropdown-accountlink');
             var $dialog = $('.top-warning-popup.non-activated-account');
 
             // If they just purchased it, log specific event
@@ -227,7 +218,7 @@ var alarm = {
         render: function() {
 
             // Cache lookups
-            var $button = $('.top-icon.warning.astropay-payment-reminder');
+            var $button = $('.js-dropdown-astropay');
             var $dialog = $('.top-warning-popup.astropay-payment-reminder');
 
             // If their last payment info is not set by the API, then their plan is not currently expired.
@@ -284,6 +275,7 @@ var alarm = {
             $dialog.find('.plan-duration').text(planMonths + ' ' + planMonthsPluralisation);
             $dialog.find('.provider-icon').addClass(gatewayName);
             $dialog.find('.gateway-name').text(gatewayDisplayName);
+            $('.plan-icon', $dialog).removeClass('pro1 pro2 pro3 pro4').addClass('pro' + proNum);
 
             // Add button click handlers
             this.initChooseButton($button, $dialog);
@@ -305,8 +297,7 @@ var alarm = {
          */
         hideRepayWarn: function($button, $dialog) {
             'use strict';
-            $button.addClass('hidden').removeClass('active');
-            $dialog.addClass('hidden');
+            $button.addClass('hidden').removeClass('show');
         },
 
         /**
@@ -319,8 +310,7 @@ var alarm = {
             $dialog.find('.warning-button.choose').rebind('click', function() {
 
                 // Hide the dialog and go to pro page
-                $dialog.addClass('hidden');
-                $button.removeClass('active');
+                $button.removeClass('show');
 
                 // Set a flag so it doesn't show each time
                 alarm.hidden = 1;
@@ -344,8 +334,7 @@ var alarm = {
             $dialog.find('.warning-button.renew').rebind('click', function() {
 
                 // Hide the dialog
-                $dialog.addClass('hidden');
-                $button.removeClass('active');
+                $button.removeClass('show');
 
                 // Set a flag so it doesn't show each time
                 alarm.hidden = 1;
@@ -452,8 +441,7 @@ var alarm = {
                 );
 
                 // Hide the warning icon and the dialog
-                $button.addClass('hidden');
-                $dialog.addClass('hidden');
+                $button.addClass('hidden').removeClass('show');
             });
         },
 
@@ -583,7 +571,7 @@ var alarm = {
         render: function(serverBuildVersion, reRender) {
 
             // Cache lookups
-            var $button = $('.top-icon.warning.site-update-available');
+            var $button = $('.js-dropdown-siteupdate');
             var $dialog = $('.top-warning-popup.site-update-available');
 
             // Convert versions to integers for easier comparison
@@ -646,8 +634,7 @@ var alarm = {
                 api_req({ a: 'log', e: 99611, m: 'User chose not to update from site update dialog' });
 
                 // Hide the warning icon and the dialog
-                $button.addClass('hidden');
-                $dialog.addClass('hidden');
+                $button.addClass('hidden').removeClass('show');
             });
         },
 
@@ -663,8 +650,7 @@ var alarm = {
                 alarm.hidden = 1;
 
                 // Hide the warning dialog
-                $dialog.addClass('hidden');
-                $button.removeClass('active');
+                $button.removeClass('show');
 
                 // Check for pending transfers and if there are, prompt user to see if they want to continue
                 M.abortTransfers().then(function() {

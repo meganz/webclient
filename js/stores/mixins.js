@@ -324,7 +324,11 @@ export class MegaRenderMixin extends React.Component {
         this.__isMounted = true;
         this._wasRendered = true;
 
-        if (this.props.requiresUpdateOnResize || !this.props.skipQueuedUpdatesOnResize) {
+        if (
+            this.props.requiresUpdateOnResize ||
+            this.requiresUpdateOnResize ||
+            !this.props.skipQueuedUpdatesOnResize
+        ) {
             chatGlobalEventManager.addEventListener('resize',
                 'megaRenderMixing' + this.getUniqueId(), () => this.onResizeDoUpdate());
         }
@@ -389,7 +393,8 @@ export class MegaRenderMixin extends React.Component {
             return false;
         }
         if (this.customIsEventuallyVisible) {
-            var result = this.customIsEventuallyVisible();
+            let ciev = this.customIsEventuallyVisible;
+            var result = typeof ciev === "function" ? ciev.call(this) : ciev;
             if (result !== -1) {
                 return result;
             }
@@ -423,7 +428,8 @@ export class MegaRenderMixin extends React.Component {
         }
 
         if (this.customIsEventuallyVisible) {
-            return this.customIsEventuallyVisible();
+            let ciev = this.customIsEventuallyVisible;
+            return typeof ciev === "function" ? ciev.call(this) : !!ciev;
         }
 
         if (typeof this.props.isVisible !== 'undefined') {
@@ -644,8 +650,10 @@ export class MegaRenderMixin extends React.Component {
             return false;
         }
         if (this.customIsEventuallyVisible) {
+            let ciev = this.customIsEventuallyVisible;
+            ciev = typeof ciev === "function" ? ciev.call(this) : !!ciev;
             // we asume `customIsEventuallyVisible` is super quick/does have low CPU usage
-            if (!this._queueUpdateWhenVisible && !this.customIsEventuallyVisible()) {
+            if (!this._queueUpdateWhenVisible && !ciev) {
                 this._queueUpdateWhenVisible = true;
                 if (window.RENDER_DEBUG) {
                     console.error(
@@ -654,7 +662,7 @@ export class MegaRenderMixin extends React.Component {
                     );
                 }
             }
-            else if (this._queueUpdateWhenVisible && this.customIsEventuallyVisible()) {
+            else if (this._queueUpdateWhenVisible && ciev) {
                 delete this._queueUpdateWhenVisible;
                 return true;
             }

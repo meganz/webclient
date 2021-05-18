@@ -35,14 +35,20 @@
      * Example:
      * ```<a href="#" class="simpletip" data-simpletip="Hey! Show on top, if I fit"
      *      data-simpletipposition="top">Mouse over me</a>```
+     * The tooltip can also be placed to the "left", "right", or can detect the direction using "start" and "end".
      *
      * C) Manually add extra top/bottom offset by passing `data-simpletipoffset="10"`
      * Example:
      * ```<a href="#" data-simpletip="Hey! +/-20px offset for this tip." data-simpletipoffset="20">Mouse over me</a>```
      *
-     * D) Add any custom styling to tooltip by `data-simpletip-style='{"max-width":"200px"}'`
+     * D) Add any custom styling to tooltip by adding style class e.g. .medium-width for max-width: 220px;,
+     * .center-align for text-align: center;
      * Example:
-     * ```<a href="#" data-simpletip="Hey! custom style." data-simpletip-style='{"width":"200px"}'>Mouse over me</a>```
+     * ```
+     *    <a href="#" data-simpletip="Hey! custom style." data-simpletip-class="medium-width center-align">
+     *        Mouse over me
+     *    </a>
+     * ```
      *
      * E) Add any custom class to tooltip by `data-simpletip-class='custom-class'`
      * Example:
@@ -61,7 +67,7 @@
 
     var $template = $(
         '<div class="dark-direct-tooltip simpletip-tooltip">' +
-        '<i class="small-icon icons-sprite tooltip-arrow"></i>' +
+        '<i class="sprite-fm-mono icon-tooltip-arrow tooltip-arrow"></i>' +
         '<span></span>' +
         '</div>'
     );
@@ -73,7 +79,8 @@
 
     var sanitize = function(contents) {
         return escapeHTML(contents).replace(/\[BR\]/g, '<br>')
-            .replace(/\[I\]/g, '<i>').replace(/\[\/I\]/g, '</i>')
+            .replace(/\[I class=&quot;([\w- ]*)&quot;]/g, `<i class="$1">`)
+            .replace(/\[I]/g, '<i>').replace(/\[\/I]/g, '</i>')
             .replace(/\[B\]/g, '<b>').replace(/\[\/B\]/g, '</b>')
             .replace(/\[U]/g, '<u>').replace(/\[\/U]/g, '</u>')
             .replace(/\[G]/g, '<span class="gray-text">')
@@ -90,7 +97,57 @@
         }
     };
 
-    $(document.body).rebind('mouseenter.simpletip', '.simpletip', function () {
+    const calculateOffset = (info, $this) => {
+        let topOffset = 0;
+        let leftOffset = 0;
+        let offset = 7;      // 7px === height of arrow glyph
+        if ($this.attr('data-simpletipoffset')) {
+            offset = parseInt($this.attr('data-simpletipoffset'), 10) + 7;
+        }
+
+        if (info.vertical === 'top') {
+            topOffset = offset;
+        }
+        else if (info.vertical === 'bottom') {
+            topOffset = -offset;
+        }
+        else if (info.horizontal === 'left') {
+            leftOffset = offset;
+        }
+        else if (info.horizontal === 'right') {
+            leftOffset = -offset;
+        }
+
+        return { leftOffset, topOffset };
+    };
+
+
+    /**
+     * Converts relative start/end positioning to absolute left/right positioning
+     *
+     * @param {string} tipPosition the specified position of the tooltip
+     * @returns {string} the absolute direction of the tooltip
+     */
+    const getTipLRPosition = tipPosition => {
+        if ($('body').hasClass('rtl')) {
+            if (tipPosition === 'start') {
+                tipPosition = 'right';
+            }
+            else if (tipPosition === 'end') {
+                tipPosition = 'left';
+            }
+        }
+        else if (tipPosition === 'start') {
+            tipPosition = 'left';
+        }
+        else if (tipPosition === 'end') {
+            tipPosition = 'right';
+        }
+
+        return tipPosition;
+    };
+
+    $(document.body).rebind('mouseenter.simpletip', '.simpletip', function() {
         var $this = $(this);
         if ($currentNode) {
             unmount();
@@ -102,96 +159,132 @@
 
         var contents = $this.attr('data-simpletip');
         if (contents) {
-            var $node = $template.clone();
-            var $textContainer = $('span', $node);
+            const $node = $template.clone();
+            const $textContainer = $('span', $node);
             $textContainer.safeHTML(sanitize(contents));
             // Handle the tooltip's text content updates based on the current control state,
             // e.g. "Mute" -> "Unmute"
-            $this.rebind(SIMPLETIP_UPDATED_EVENT, function() {
+            $this.rebind(SIMPLETIP_UPDATED_EVENT, () => {
                 $textContainer.safeHTML(
                     sanitize($this.attr('data-simpletip'))
                 );
             });
-            $this.rebind(SIMPLETIP_CLOSE_EVENT, function() {
+            $this.rebind(SIMPLETIP_CLOSE_EVENT, () => {
                 unmount();
             });
             $('body').append($node);
 
             $currentNode = $node;
             $currentTriggerer = $this;
-            var wrapper = $this.attr('data-simpletipwrapper') || "";
+            let wrapper = $this.attr('data-simpletipwrapper') || '';
             if (wrapper) {
                 wrapper += ",";
             }
 
-            var customStyle = $this.attr('data-simpletip-style');
-            if (customStyle) {
-                $currentNode.css(customStyle);
-            }
-
-            var customClass = $this.attr('data-simpletip-class');
+            const customClass = $this.attr('data-simpletip-class');
             if (customClass) {
                 $currentNode.addClass(customClass);
             }
 
-            var my = "center top";
-            var at = "center bottom";
-            if ($this.attr('data-simpletipposition') === "top") {
-                my = "center bottom";
-                at = "center top";
+            let my = 'center top';
+            let at = 'center bottom';
+            let arrowRotation = 180;
+            const tipPosition = getTipLRPosition($this.attr('data-simpletipposition'));
+
+            switch (tipPosition) {
+                case 'top':
+                    my = 'center bottom';
+                    at = 'center top';
+                    arrowRotation = 0;
+                    break;
+                case 'left':
+                    my = 'right center';
+                    at = 'left center';
+                    arrowRotation = -90;
+                    break;
+                case 'right':
+                    my = 'left center';
+                    at = 'right center';
+                    arrowRotation = 90;
+                    break;
             }
+
             $node.position({
                 of: $this,
                 my: my,
                 at: at,
-                collision: "flipfit",
-                within: $this.parents('.ps-container,' + wrapper + 'body').first(),
+                collision: 'flipfit',
+                within: $this.parents(wrapper ? `${wrapper} body` : '.ps-container, body').first(),
                 using: function(obj, info) {
-                    var vertClass = info.vertical === "top" ? "b" : "t";
-                    var horizClass = info.horizontal === "left" ? "r" : "l";
-                    this.classList.remove(
-                        "simpletip-v-t", "simpletip-v-b", "simpletip-h-l", "simpletip-h-r"
-                    );
-                    this.classList.add("simpletip-h-" + horizClass, "simpletip-v-" + vertClass, "visible");
+                    let positionClass = '';
 
-                    var topOffset = 0;
-                    if (vertClass === "t") {
-                        topOffset = -6;
+                    if (info.vertical === 'top') {
+                        positionClass = 'simpletip-v-t';
                     }
-                    if ($this.attr('data-simpletipoffset')) {
-                        var offset = parseInt($this.attr('data-simpletipoffset'), 10);
-                        if (vertClass === "t") {
-                            topOffset += offset * -1;
-                        }
-                        else {
-                            topOffset += offset;
-                        }
+                    else if (info.vertical === 'bottom') {
+                        positionClass = 'simpletip-v-b';
                     }
+
+                    if (info.horizontal === 'left') {
+                        positionClass = 'simpletip-h-l';
+                    }
+                    else if (info.horizontal === 'right') {
+                        positionClass = 'simpletip-h-r';
+                    }
+
+                    this.classList.remove(
+                        'simpletip-v-t', 'simpletip-v-b', 'simpletip-h-l', 'simpletip-h-r'
+                    );
+
+                    this.classList.add(positionClass, 'visible');
+
+                    const { leftOffset, topOffset} = calculateOffset(info, $this);
 
                     $(this).css({
-                        left: obj.left + 'px',
-                        top: obj.top + topOffset + 'px'
+                        left: `${obj.left + leftOffset}px`,
+                        top: `${obj.top + topOffset}px`
                     });
                 }
             });
 
             // Calculate Arrow position
-            var $tooltipArrow = $node.find('.tooltip-arrow');
+            var $tooltipArrow = $('.tooltip-arrow', $node);
 
             $tooltipArrow.position({
                 of: $this,
                 my: my,
                 at: at,
-                collision: "none",
-                using: function(obj) {
-                        $(this).css({
-                            left: obj.left + 'px'
-                        });
+                collision: 'none',
+                using: function(obj, info) {
+                    let { top, left } = obj;
+
+                    if (info.vertical === 'bottom') {
+                        top += 8;
                     }
+                    else if (info.vertical === 'top') {
+                        top -= 8;
+                    }
+
+                    if (info.horizontal === 'left') {
+                        left -= 12;
+                    }
+                    else if (info.horizontal === 'right') {
+                        left += 12;
+                    }
+
+                    const { leftOffset, topOffset} = calculateOffset(info, $this);
+
+                    $(this).css({
+                        left: `${left + leftOffset}px`,
+                        top: `${top + topOffset}px`,
+                        transform: `rotate(${arrowRotation}deg)`
+                    });
+                }
             });
         }
     });
-    $(document.body).rebind('mouseover.simpletip, touchmove.simpletip', function(e) {
+
+    $(document.body).rebind('mouseover.simpletip touchmove.simpletip', function(e) {
         if ($currentNode && !e.target.classList.contains('simpletip') && !$(e.target).parents('.simpletip').length > 0
             && !e.target.classList.contains('tooltip-arrow')) {
             unmount();

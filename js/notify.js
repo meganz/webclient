@@ -35,9 +35,9 @@ var notify = {
     init: function() {
 
         // Cache lookups
-        notify.$popup = $('.dropdown.popup.notification-popup');
+        notify.$popup = $('.js-notification-popup');
         notify.$popupIcon = $('.top-head .top-icon.notification');
-        notify.$popupNum = $('.top-head .notification-num');
+        notify.$popupNum = $('.js-notification-num');
 
         // Init event handler to open popup
         notify.initNotifyIconClickHandler();
@@ -443,24 +443,21 @@ var notify = {
             }
             else {
                 // Otherwise open the popup
-                notify.openPopup();
+                notify.renderNotifications();
             }
         });
-    },
 
-    /**
-     * Opens the notification popup with notifications
-     */
-    openPopup: function() {
 
-        // Show the popup
-        notify.$popup.removeClass('hidden');
-        notify.$popupIcon.addClass('active');
-
-        topPopupAlign('.top-icon.notification', notify.$popup, 40);
-
-        // Render and show notifications currently in list
-        notify.renderNotifications();
+        $('.js-topbarnotification').rebind('click', function() {
+            let $elem = $(this).parent();
+            $elem.toggleClass('show');
+            if ($elem.hasClass('show')) {
+                notify.renderNotifications();
+            }
+            else {
+                notify.closePopup();
+            }
+        });
     },
 
     /**
@@ -470,20 +467,10 @@ var notify = {
      * notifications as seen/read, we want the number of new notifications to remain in the red tooltip.
      */
     closePopup: function() {
-
-        // Make sure it is actually visible (otherwise any call to $.hideTopMenu in index.js could trigger this
-        if ((notify.$popup !== null) && (!notify.$popup.hasClass('hidden'))) {
-
-            // Hide the popup
-            notify.$popup.addClass('hidden');
-            notify.$popupIcon.removeClass('active');
-
-            // Mark all notifications as seen seeing the popup has been opened and they have been viewed
+        'use strict';
+        if (notify.$popup !== null) {
+            this.$popup.closest('.js-dropdown-notification').removeClass('show');
             notify.markAllNotificationsAsSeen();
-        }
-        else {
-            // Otherwise this call probably came from $.hideTopMenu in index.js so just hide the popup
-            notify.$popup.addClass('hidden');
         }
     },
 
@@ -541,6 +528,7 @@ var notify = {
      * To do: render the notifications in the popup
      */
     renderNotifications: function() {
+        'use strict';
 
         // Get the number of notifications
         var numOfNotifications = notify.notifications.length;
@@ -609,6 +597,7 @@ var notify = {
         notify.initPaymentClickHandler();
         notify.initPaymentReminderClickHandler();
         notify.initAcceptContactClickHandler();
+        notify.initSettingsClickHander();
     },
 
     /**
@@ -661,7 +650,7 @@ var notify = {
         this.$popup.find('.nt-contact-accepted').rebind('click', function() {
             // Redirect to the contact's page only if it's still a contact
             if (M.c.contacts && $(this).attr('data-contact-handle') in M.c.contacts) {
-                loadSubPage('fm/' + $(this).attr('data-contact-handle'));
+                loadSubPage('fm/chat/contacts/' + $(this).attr('data-contact-handle'));
                 notify.closePopup();
             } else {
                 msgDialog('info', '', l[20427]);
@@ -680,8 +669,9 @@ var notify = {
             // Get the folder ID from the HTML5 data attribute
             var folderId = $(this).attr('data-folder-id');
 
-            // Mark all notifications as seen (because they clicked on a notification within the popup)
-            notify.markAllNotificationsAsSeen();
+            // Mark all notifications as seen and close the popup
+            // (because they clicked on a notification within the popup)
+            notify.closePopup();
 
             // Open the folder
             M.openFolder(folderId)
@@ -703,8 +693,9 @@ var notify = {
             var folderOrFileId = $(this).attr('data-folder-or-file-id');
             var parentFolderId = M.getNodeByHandle(folderOrFileId).p;
 
-            // Mark all notifications as seen (because they clicked on a notification within the popup)
-            notify.markAllNotificationsAsSeen();
+            // Mark all notifications as seen and close the popup
+            // (because they clicked on a notification within the popup)
+            notify.closePopup();
 
             if (parentFolderId) {
                 // Open the folder
@@ -725,7 +716,7 @@ var notify = {
         this.$popup.find('.notification-item.nt-payment-notification').rebind('click', function() {
 
             // Mark all notifications as seen (because they clicked on a notification within the popup)
-            notify.markAllNotificationsAsSeen();
+            notify.closePopup();
             var $target = $('.data-block.account-balance');
 
             // Redirect to payment history
@@ -744,8 +735,9 @@ var notify = {
         // On payment reminder notification click
         this.$popup.find('.notification-item.nt-payment-reminder-notification').rebind('click', function() {
 
-            // Mark all notifications as seen (because they clicked on a notification within the popup)
-            notify.markAllNotificationsAsSeen();
+            // Mark all notifications as seen and close the popup
+            // (because they clicked on a notification within the popup)
+            notify.closePopup();
 
             // Redirect to pro page
             loadSubPage('pro');
@@ -769,11 +761,24 @@ var notify = {
             // Show the Accepted icon and text
             $this.closest('.notification-item').addClass('accepted');
 
-            // Mark all notifications as seen (because they clicked on a notification within the popup)
-            notify.markAllNotificationsAsSeen();
+            // Mark all notifications as seen and close the popup
+            // (because they clicked on a notification within the popup)
+            notify.closePopup();
 
             // Update IPC indicator
             delay('updateIpcRequests', updateIpcRequests, 1000);
+        });
+    },
+
+    /**
+     * Load the notification settings page
+     * @return {undefined}
+     */
+    initSettingsClickHander: function() {
+        'use strict';
+        $('button.settings', this.$popup).rebind('click.notifications', () => {
+            notify.closePopup();
+            loadSubPage('fm/account/notifications');
         });
     },
 

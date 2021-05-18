@@ -44,7 +44,7 @@
     position: absolute;
     left: 0;
     top: 0;
-    z-index: 1201;
+    z-index: 2201;
 }
 @media print {
     .datepickers-container {
@@ -53,16 +53,15 @@
 }
 .datepicker {
     min-width: 252px;
-    background: #FFF;
-    color: #111;
-    font-family: 'LatoWeb', Arial;
+    background: var(--surface-main);
+    color: var(--text-color-high);
+    font-family: var(--text-font-family);
     border-radius: 24px;
-    box-shadow: 0 4px 16px 0 rgba(0,0,0,0.1);
+    border: 1px solid var(--stroke-grey-2);
     margin: 0;
     position: absolute;
     left: -100000px;
     opacity: 0;
-    -webkit-transition: opacity 200ms ease-in-out 0s;
     transition: opacity 200ms ease-in-out 0s;
     z-index: 100;
 }
@@ -91,11 +90,10 @@
     width: 32px;
     height: 32px;
     line-height: 32px;
-    color: rgb(51, 51, 51);
+    color: var(--text-color-medium);
     font-size: 14px;
     margin: 1px;
     border-radius: 100%;
-    -webkit-transition: background-color 200ms ease-in-out 0s, color 200ms ease-in-out 0s;
     transition: background-color 200ms ease-in-out 0s, color 200ms ease-in-out 0s;
     z-index: 1;
     -o-text-overflow: ellipsis;
@@ -115,20 +113,20 @@
     width: 300px;
 }
 .datepicker--cell.-focus- {
-    background: #F2F2F2;
+    background: var(--surface-grey-2);
 }
 .datepicker--cell.-current- {
-    color: #FF5C5E;
+    color: var(--text-solor-red);
     background: transparent;
 }
 .datepicker--cell.-disabled- {
     cursor: default;
-    color: #999;
+    color: var(--text-color-low);
     background: transparent;
 }
 .datepicker--cell.-selected- {
-    color: #fff;
-    background: #FF5C5E;
+    color: var(--text-color-high);
+    background: var(--surface-error);
 }
 .datepicker--cell:empty {
     cursor: default;
@@ -141,11 +139,11 @@
     text-align: center;
     text-transform: uppercase;
     font-size: 10px;
-    font-family: 'LatoWebSemiBold', Arial;
+    font-family: var(--text-font-family);
     width: 32px;
     height: 32px;
     line-height: 32px;
-    color: rgb(51, 51, 51);
+    color: var(--text-color-medium);
     margin: 1px;
 }
 
@@ -162,18 +160,17 @@
     padding: 0 12px;
     position: relative;
     display: inline-block;
-    font-family: 'LatoWebSemiBold', Arial;
+    font-family: var(--text-font-family);
     font-size: 15px;
     line-height: 32px;
     cursor: pointer;
-    -webkit-transition: background-color 200ms ease-in-out 0s, color 200ms ease-in-out 0s;
     transition: background-color 200ms ease-in-out 0s, color 200ms ease-in-out 0s;
 }
 .datepicker--nav-title i {
     font-style: normal;
 }
 .datepicker--nav-title:hover {
-    background: #F2F2F2;
+    background: var(--surface-grey-2);
 }
 .datepicker--nav-title.-disabled- {
     cursor: default;
@@ -187,8 +184,14 @@
     height: 28px;
     font-size: 0px;
     z-index: 1;
-    background-position: -138px -7010px;
     cursor: pointer;
+}
+.datepicker--nav-action i {
+    --icon-size: 28px;
+    color: var(--icon-rest);
+}
+.datepicker--nav-action:hover i {
+    color: var(--icon-active);
 }
 .datepicker--nav-action:first-child {
     left: 10px;

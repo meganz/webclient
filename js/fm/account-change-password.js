@@ -35,7 +35,7 @@ var accountChangePassword = {
         'use strict';
 
         var $newPasswordField = $('#account-new-password');
-        var $changePasswordButton = $('.account.change-password .button-container');
+        var $changePasswordButton = $('.account.change-password .save-container');
 
         var bindStrengthChecker = function() {
             $newPasswordField.rebind('keyup.pwdchg input.pwdchg change.pwdchg', function() {
@@ -44,11 +44,11 @@ var accountChangePassword = {
                 var password = $.trim($(this).val());
                 var passwordLength = password.length;
 
-                $changePasswordButton.removeClass('closed');
-
                 if (passwordLength === 0) {
                     $changePasswordButton.addClass('closed');
-                    return false;
+                }
+                else {
+                    $changePasswordButton.removeClass('closed');
                 }
             });
 

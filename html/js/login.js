@@ -92,7 +92,7 @@ var signin = {
         'use strict';
 
         // Remove loading spinner from 2FA dialog
-        $('.fm-dialog.verify-two-factor-login.submit-button').removeClass('loading');
+        $('.mega-dialog.verify-two-factor-login.submit-button').removeClass('loading');
 
         // Check and handle the common login errors
         if (security.login.checkForCommonErrors(result, signin.old.startLogin, signin.new.startLogin)) {
@@ -272,8 +272,8 @@ function init_login() {
     'use strict';
 
     var $formWrapper = $('.main-mid-pad.login');
-    var $inputs = $formWrapper.find('input');
-    var $button = $formWrapper.find('.big-red-button');
+    var $inputs = $('input', $formWrapper);
+    var $button = $('button.login-button', $formWrapper);
     var $forgotPassLink = $('.top-login-forgot-pass', $formWrapper);
 
     if (is_extension) {
@@ -294,7 +294,7 @@ function init_login() {
         $('.account.small-header-txt').addClass('hidden');
         $forgotPassLink.addClass('hidden');
         $('.main-top-info-block').removeClass('hidden');
-        $('.big-red-button.login-button').text(l[1131]);
+        $('span', $button).text(l[1131]);
         $('.account.top-header.login').text(l[1131]);
         $('.main-top-info-text').text(l[378]);
         $('.login-check').addClass('hidden').next().addClass('hidden');

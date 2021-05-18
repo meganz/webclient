@@ -858,25 +858,27 @@ FullScreenManager.prototype.enterFullscreen = function() {
     // @private Init custom video controls
     var _initVideoControls = function(wrapper, streamer, node, options) {
         var $wrapper = $(wrapper);
-        var $video = $wrapper.find('video');
+        var $video = $('video', $wrapper);
         var videoElement = $video.get(0);
         var $videoContainer = $video.parent();
-        var $videoControls = $wrapper.find('.video-controls');
+        var $videoControls = $('.video-controls', $wrapper);
+        var $playVideoButton = $('.play-video-button', $wrapper);
         var $document = $(document);
         var duration;
         var timer;
         var filters = Object.create(null);
 
-        // Show the volume icon until we found the video has no audio track
-        $('.volume-control', $wrapper).removeClass('no-audio');
+        // Set volume icon default state
+        $('.vol-wrapper', $wrapper).removeClass('audio');
 
         // Obtain handles to buttons and other elements
-        var $playpause = $videoControls.find('.playpause');
-        var $mute = $videoControls.find('.mute');
-        var $progress = $videoControls.find('.video-progress-bar');
-        var $progressBar = $videoControls.find('.video-time-bar');
-        var $fullscreen = $videoControls.find('.fs');
-        var $volumeBar = $videoControls.find('.volume-bar');
+        var $playpause = $('.playpause', $videoControls);
+        var $mute = $('.mute', $videoControls);
+        var $progress = $('.video-progress-bar', $videoControls);
+        var $progressBar = $('.video-time-bar', $videoControls);
+        var $fullscreen = $('.fs', $videoControls);
+        var $volumeBar = $('.volume-bar', $videoControls);
+        var $pendingBlock = $('.viewer-pending', $wrapper);
 
         // time-update elements and helpers.
         var onTimeUpdate;
@@ -932,21 +934,21 @@ FullScreenManager.prototype.enterFullscreen = function() {
             // Play/Pause button
             if (type === 'playpause') {
                 if (videoElement.paused || videoElement.ended) {
-                    $playpause.find('i').removeClass('pause').addClass('play');
-                    // $wrapper.addClass('paused');
+                    $('i', $playpause).removeClass('icon-pause').addClass('icon-play');
+                    $playVideoButton.removeClass('hidden');
                 }
                 else {
-                    $playpause.find('i').removeClass('play').addClass('pause');
-                    // $wrapper.removeClass('paused');
+                    $('i', $playpause).removeClass('icon-play').addClass('icon-pause');
+                    $playVideoButton.addClass('hidden');
                 }
             }
             // Mute button
             else if (type === 'mute') {
                 if (videoElement.muted) {
-                    $mute.find('i').removeClass('volume').addClass('volume-muted');
+                    $('i', $mute).removeClass('icon-volume').addClass('icon-volume-muted');
                 }
                 else {
-                    $mute.find('i').removeClass('volume-muted').addClass('volume');
+                    $('i', $mute).removeClass('icon-volume-muted').addClass('icon-volume');
                 }
             }
         };
@@ -1038,9 +1040,10 @@ FullScreenManager.prototype.enterFullscreen = function() {
         // Set Init Values
         changeButtonState('playpause');
         changeButtonState('mute');
-        $wrapper.removeClass('paused').find('.video-timing').text('00:00');
+        $('.video-timing', $wrapper).text('00:00');
         $progressBar.removeAttr('style');
         $volumeBar.find('style').removeAttr('style');
+        $playVideoButton.removeClass('hidden');
         setDuration(0);
         onTimeUpdate(0, 1);
 
@@ -1050,9 +1053,11 @@ FullScreenManager.prototype.enterFullscreen = function() {
         });
 
         var playevent;
+        var $vc;
+
         $video.rebind('playing', function() {
             if (streamer.duration) {
-                $wrapper.removeClass('paused').find('.viewer-pending').addClass('hidden');
+                $pendingBlock.addClass('hidden');
 
                 if (!playevent) {
                     playevent = true;
@@ -1070,12 +1075,16 @@ FullScreenManager.prototype.enterFullscreen = function() {
                         $fullscreen.trigger('click');
                     });
 
-                    $('.play-video-button', $wrapper).rebind('click', function() {
+                    $playVideoButton.rebind('click', function() {
                         $playpause.trigger('click');
                     });
 
-                    if (!streamer.hasAudio) {
-                        var $vc = $('.volume-control', $wrapper).addClass('no-audio');
+                    $vc = $('.vol-wrapper', $wrapper);
+
+                    if (streamer.hasAudio) {
+                        $vc.addClass('audio').removeAttr('title');
+                    }
+                    else {
                         var title = l[19061];
 
                         if (streamer.hasUnsupportedAudio) {
@@ -1083,6 +1092,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
                             title = escapeHTML(l[19060]).replace('%1', streamer.hasUnsupportedAudio);
                         }
                         $vc.attr('title', title);
+                        $('i', $vc).removeClass('icon-volume').addClass('icon-volume-muted');
                     }
 
                     streamer._megaNode = node;
@@ -1165,7 +1175,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
             }
         });
 
-        $('.volume-control', $wrapper).rebind('mousewheel.volumecontrol', function(e) {
+        $('.vol-wrapper', $wrapper).rebind('mousewheel.volumecontrol', function(e) {
             var delta = Math.max(-1, Math.min(1, (e.wheelDelta || e.deltaY || -e.detail)));
             setVideoVolume(0.1 * delta);
             return false;
@@ -1209,7 +1219,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
 
         // Bind Mute button
         $mute.rebind('click', function() {
-            if (!$(this).parent('.volume-control').hasClass('no-audio')) {
+            if ($(this).parent('.vol-wrapper').hasClass('audio')) {
                 streamer.muted = -1; // swap state
                 changeButtonState('mute');
                 updateVolumeBar();
@@ -1316,10 +1326,10 @@ FullScreenManager.prototype.enterFullscreen = function() {
             $fullscreen.attr('data-state', state ? 'cancel-fullscreen' : 'go-fullscreen');
 
             if (state) {
-                $fullscreen.find('i').removeClass('fullscreen').addClass('lowscreen');
+                $('i', $fullscreen).removeClass('icon-fullscreen-enter').addClass('icon-fullscreen-leave');
             }
             else {
-                $fullscreen.find('i').removeClass('lowscreen').addClass('fullscreen');
+                $('i', $fullscreen).removeClass('icon-fullscreen-leave').addClass('icon-fullscreen-enter');
             }
         };
 
@@ -1439,8 +1449,8 @@ FullScreenManager.prototype.enterFullscreen = function() {
                 return false;
             }
             window.removeEventListener('keydown', videoKeyboardHandler, true);
-            $wrapper.removeClass('mouse-idle video-theatre-mode video')
-                .off('is-over-quota').find('.viewer-pending').addClass('hidden');
+            $wrapper.removeClass('mouse-idle video-theatre-mode video').off('is-over-quota');
+            $pendingBlock.addClass('hidden');
             $document.off('mousemove.videoprogress');
             $document.off('mouseup.videoprogress');
             $document.off('mousemove.volumecontrol');
@@ -1465,6 +1475,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
         var vad = videoElement.cloneNode();
         var $control = $('.viewer-vad-control', $wrapper).removeClass('skip');
         var $thumb = $('.thumb', $control).removeClass('active');
+        var $pendingBlock = $('.viewer-pending', $wrapper);
         var nop = function(ev) {
             ev.preventDefault();
             ev.stopPropagation();
@@ -1608,7 +1619,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
                     vad.removeEventListener('click', nop, true);
                     vad.addEventListener('click', onclick, true);
                 }
-                $('.viewer-pending', $wrapper).addClass('hidden');
+                $pendingBlock.addClass('hidden');
 
                 eventlog(99730);
             });
@@ -1758,9 +1769,9 @@ FullScreenManager.prototype.enterFullscreen = function() {
                 console.debug(ev.type, ev);
             }
 
-            var $pinner = $wrapper.find('.viewer-pending');
+            var $pinner = $('.viewer-pending', $wrapper);
             $pinner.removeClass('hidden');
-            $pinner.find('span').text(navigator.onLine === false ? 'No internet access.' : '');
+            $('span', $pinner).text(navigator.onLine === false ? 'No internet access.' : '');
 
             if (this.isOverQuota) {
                 var self = this;
@@ -1773,7 +1784,6 @@ FullScreenManager.prototype.enterFullscreen = function() {
                     file.flushRetryQueue();
 
                     if (video.paused) {
-                        $wrapper.removeClass('paused');
                         $pinner.removeClass('hidden');
                         onIdle(self.play.bind(self));
                     }
@@ -1990,7 +2000,10 @@ FullScreenManager.prototype.enterFullscreen = function() {
                     $fn.attr('title', node.name + ' (' + c + ')');
                 }
 
-                var $video = $wrapper.find('video');
+                var $video = $('video',  $wrapper);
+                var $videoControls = $('.video-controls', $wrapper);
+                var $playVideoButton = $('.play-video-button', $wrapper);
+
                 if (!$video.length) {
                     return reject(new Error('No video element found...'));
                 }
@@ -2013,7 +2026,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
 
                 var vsp = options.preBuffer && initVideoStream(node, $wrapper, options);
 
-                $('.play-video-button', $wrapper).rebind('click', function() {
+                $playVideoButton.rebind('click', function() {
                     if (dlmanager.isOverQuota) {
                         $wrapper.trigger('is-over-quota');
                         return dlmanager.showOverQuotaDialog();
@@ -2025,7 +2038,8 @@ FullScreenManager.prototype.enterFullscreen = function() {
                     }
 
                     // Show Loader until video is playing
-                    $wrapper.find('.viewer-pending').removeClass('hidden');
+                    $('.viewer-pending', $wrapper).removeClass('hidden');
+                    $(this).addClass('hidden');
 
                     if (!vsp) {
                         vsp = initVideoStream(node, $wrapper, options);
@@ -2048,6 +2062,8 @@ FullScreenManager.prototype.enterFullscreen = function() {
                     }).fail(console.warn.bind(console));
 
                     $wrapper.addClass('video-theatre-mode');
+                    $videoControls.removeClass('hidden');
+
                     if (is_mobile) {
                         _initHideMobileVideoControls($wrapper);
                         _initMobileVideoControlsToggle($wrapper);

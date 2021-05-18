@@ -34,8 +34,8 @@
              * css class names
              */
             'expandableButtonClass': '.fm-mega-dialog-size-icon',
-            'buttonContainerClassName': 'fm-mega-dialog-bottom',
-            'buttonPlaceholderClassName': 'fm-mega-dialog-pad',
+            'buttonContainerClassName': '',
+            'buttonPlaceholderClassName': '',
 
             /**
              * optional:
@@ -44,7 +44,7 @@
             'buttons': [
                 {
                     'label': l[148],
-                    'className': 'default-white-button right red',
+                    'className': 'mega-button',
                     'callback': function() {
                         this.hide();
                         this._hideOverlay();
@@ -144,9 +144,6 @@
             // Hide the current Reset button and show the Verify contact one
             $(this).addClass('hidden');
             $dialog.find('.verify-contact-button').removeClass('hidden');
-
-            // Reposition dialog
-            CredentialsWarningDialog._instance.reposition();
         });
 
         // Button to view the verification dialog

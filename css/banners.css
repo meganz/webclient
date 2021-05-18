@@ -1,0 +1,111 @@
+.mega-banner.body {
+    display: table;
+    background-color: var(--banner-background-info);
+    box-shadow: 0 0 0 1px var(--banner-border-info);
+    border-radius: 3px;
+    padding: 0 8px;
+}
+.mega-banner.with-btn {
+    text-align: left;
+    margin-top: 20px;
+}
+.mega-banner.with-btn .text-cell {
+    padding: 6px 0;
+}
+.mega-banner.with-btn .btn-cell button {
+    position: static;
+}
+.mega-banner.body .versioning-body-text {
+    max-width: 370px;
+    -webkit-padding-start: 8px;
+    padding-inline-start: 8px;
+}
+.mega-banner.body.with-btn .versioning-body-text {
+     max-width: none;
+}
+.free .mega-banner.body:not(.hidden) {
+    position: relative;
+}
+.mega-banner .cell {
+    display: table-cell;
+    vertical-align: middle;
+    color: var(--banner-text-info);
+    font: var(--text-body1);
+}
+.account .mega-banner button {
+    margin: 8px 0;
+    -webkit-margin-start: 24px;
+    margin-inline-start: 24px;
+}
+.mega-banner i {
+    --icon-size: 24px;
+    margin: 4px 0;
+}
+.mega-banner i.x30 {
+    --icon-size: 30px;
+}
+.mega-banner i.sprite-fm-mono {
+    --mask-color: var(--banner-text-info);
+}
+.mega-banner.cell i.sprite-fm-mono {
+    margin-top: 0;
+}
+.mega-banner.cell .button {
+    position: relative;
+    transform: none;
+}
+.mega-banner.cell:nth-child(2) {
+    width: auto;
+}
+.mega-banner .semi-big-icon {
+    margin: 0 11px 0 3px;
+}
+.mega-banner .button {
+    margin: 12px 0 12px 24px;
+}
+.mega-banner .fvnotice,
+.orange-notification .fvnotice {
+    background-position: -233px -1666px;
+    width: 24px;
+    height: 24px;
+    display: inline-block;
+    margin-top: 4px;
+}
+
+/* Settings/dashboard page banner */
+.settings-banner {
+    align-items: center;
+    background: var(--surface-grey-3);
+    border: 2px solid var(--stroke-grey-2);
+    border-radius: 12px;
+    box-sizing: border-box;
+    display: flex;
+    font-size: 0;
+    margin: 16px auto 0;
+    max-width: 1034px;
+    width: calc(100% - 48px);
+}
+.settings-banner .settings-banner-cell {
+    box-sizing: border-box;
+    padding: 24px;
+}
+.settings-banner .settings-banner-cell .title-txt {
+    display: block;
+    padding-bottom: 10px;
+}
+.settings-banner .settings-banner-cell:nth-child(2) {
+    flex: 1;
+    padding: 24px 0;
+}
+
+/* Low width */
+.low-width .settings-banner {
+    flex-wrap: wrap;
+}
+.low-width .settings-banner .settings-banner-cell {
+    text-align: center;
+    width: 100%;
+}
+.low-width .settings-banner .settings-banner-cell:nth-child(2) {
+    padding: 0 24px;
+}

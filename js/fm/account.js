@@ -16,36 +16,43 @@ function accountUI() {
         return false;
     }
 
-    $('.fm-account-notifications').removeClass('hidden');
-    $('.fm-account-button').removeClass('active');
-    $('.fm-account-sections').addClass('hidden');
-    $('.fm-right-files-block, .section.conversations, .fm-right-block.dashboard').addClass('hidden');
-    $('.fm-right-account-block').removeClass('hidden');
-    $('.nw-fm-left-icon').removeClass('active');
-    $('.nw-fm-left-icon.settings').addClass('active');
-    $('.account.data-block.storage-data').removeClass('exceeded');
-    $('.fm-account-save-block').addClass('hidden');
-    $('.fm-account-save').removeClass('disabled');
+    var $fmContainer = $('.fm-main', '.fmholder');
+    var $settingsMenu = $('.content-panel.account', $fmContainer);
 
-    if ($('.fmholder').hasClass('transfer-panel-opened')) {
+    accountUI.$contentBlock = $('.fm-right-account-block', $fmContainer);
+
+    $('.fm-account-notifications', accountUI.$contentBlock).removeClass('hidden');
+    $('.settings-button', $settingsMenu).removeClass('active');
+    $('.fm-account-sections', accountUI.$contentBlock).addClass('hidden');
+    $('.fm-right-files-block, .section.conversations, .fm-right-block.dashboard',  $fmContainer)
+        .addClass('hidden');
+    $('.nw-fm-left-icon', $fmContainer).removeClass('active');
+    $('.nw-fm-left-icon.settings', $fmContainer).addClass('active');
+    $('.account.data-block.storage-data', accountUI.$contentBlock).removeClass('exceeded');
+    $('.fm-account-save', accountUI.$contentBlock).removeClass('disabled');
+    accountUI.$contentBlock.removeClass('hidden');
+
+    if ($('.fmholder', 'body').hasClass('transfer-panel-opened')) {
         $.transferClose();
     }
-
-    // Destroy jScrollings in select dropdowns
-    $('.fm-account-main .default-select-scroll').each(function(i, e) {
-        $(e).parent().fadeOut(200).parent().removeClass('active');
-        deleteScrollPanel(e, 'jsp');
-    });
 
     M.onSectionUIOpen('account');
 
     if (u_attr && u_attr.b && !u_attr.b.m) {
-        $('.content-panel.account .fm-account-button.slide-in-out.plan').addClass('hidden');
+        $('.settings-button.slide-in-out.plan', $settingsMenu).addClass('hidden');
     }
     else {
-        $('.content-panel.account .fm-account-button.slide-in-out.plan').removeClass('hidden');
+        $('.settings-button.slide-in-out.plan', $settingsMenu).removeClass('hidden');
     }
     M.accountData(accountUI.renderAccountPage, 1);
+
+    // Init account content scrolling
+    if (accountUI.$contentBlock.is('.ps-container')) {
+        Ps.update(accountUI.$contentBlock[0]);
+    }
+    else {
+        Ps.initialize(accountUI.$contentBlock[0]);
+    }
 }
 
 accountUI.renderAccountPage = function(account) {
@@ -66,23 +73,26 @@ accountUI.renderAccountPage = function(account) {
     accountUI.inputs.text.init();
 
     var showOrHideBanner = function(sectionName) {
+
+        var $banner = $('.quota-banner', accountUI.$contentBlock);
+
         if (u_attr && u_attr.b) {
-            $('.settings-banner').addClass('hidden');
+            $banner.addClass('hidden');
             return;
         }
         if (sectionName === '/fm/account' || sectionName === '/fm/account/plan'
             || sectionName === '/fm/account/transfers') {
-            $('.settings-banner').removeClass('hidden');
+            $banner.removeClass('hidden');
         }
         else {
-            $('.settings-banner').addClass('hidden');
+            $banner.addClass('hidden');
         }
     };
 
     showOrHideBanner(id);
 
     // Always hide the add-phone banner if it was shown by the account profile sub page
-    $('.add-phone-num-banner').addClass('hidden');
+    $('.add-phone-num-banner', accountUI.$contentBlock).addClass('hidden');
 
     switch (id) {
 
@@ -96,36 +106,36 @@ accountUI.renderAccountPage = function(account) {
             if ($.openAchievemetsDialog) {
                 delete $.openAchievemetsDialog;
                 onIdle(function() {
-                    $('.fm-account-plan.fm-account-sections .btn-achievements:visible').trigger('click');
+                    $('.fm-account-plan .btn-achievements:visible', accountUI.$contentBlock).trigger('click');
                 });
             }
-            $('.fm-account-plan').removeClass('hidden');
+            $('.fm-account-plan', accountUI.$contentBlock).removeClass('hidden');
             sectionClass = 'plan';
             accountUI.plan.init(account);
             break;
 
         case '/fm/account/security':
-            $('.fm-account-security').removeClass('hidden');
+            $('.fm-account-security', accountUI.$contentBlock).removeClass('hidden');
             sectionClass = 'security';
             accountUI.security.init();
             break;
 
         case '/fm/account/file-management':
-            $('.fm-account-file-management').removeClass('hidden');
+            $('.fm-account-file-management', accountUI.$contentBlock).removeClass('hidden');
             sectionClass = 'file-management';
 
             accountUI.fileManagement.init(account);
             break;
 
         case '/fm/account/transfers':
-            $('.fm-account-transfers').removeClass('hidden');
+            $('.fm-account-transfers', accountUI.$contentBlock).removeClass('hidden');
             sectionClass = 'transfers';
 
             accountUI.transfers.init(account);
             break;
 
         case '/fm/account/contact-chats':
-            $('.fm-account-contact-chats').removeClass('hidden');
+            $('.fm-account-contact-chats', accountUI.$contentBlock).removeClass('hidden');
             sectionClass = 'contact-chats';
 
             accountUI.contactAndChat.init();
@@ -136,7 +146,7 @@ accountUI.renderAccountPage = function(account) {
                 loadSubPage('fm/account');
                 return false;
             }
-            $('.fm-account-reseller').removeClass('hidden');
+            $('.fm-account-reseller', accountUI.$contentBlock).removeClass('hidden');
             sectionClass = 'reseller';
 
             accountUI.reseller.init(account);
@@ -144,7 +154,7 @@ accountUI.renderAccountPage = function(account) {
 
         case '/fm/account/notifications':
             $('.fm-account-notifications').removeClass('hidden');
-            $('.settings-banner').addClass('hidden');
+            $('.quota-banner', '.fm-account-main', accountUI.$contentBlock).addClass('hidden');
             sectionClass = 'notifications';
 
             accountUI.notifications.init(account);
@@ -165,8 +175,6 @@ accountUI.renderAccountPage = function(account) {
 
     accountUI.leftPane.init(sectionClass);
 
-    // Reinitialize Scroll bar
-    initAccountScroll();
     mBroadcaster.sendMessage('settingPageReady');
     fmLeftMenuUI();
 
@@ -179,7 +187,6 @@ accountUI.general = {
 
         'use strict';
 
-        $.tresizer();
         clickURLs();
 
         this.charts.init(account);
@@ -192,7 +199,7 @@ accountUI.general = {
         'use strict';
 
         // Upgrade Account Button
-        $('.upgrade-to-pro').rebind('click', function() {
+        $('.upgrade-to-pro', accountUI.$contentBlock).rebind('click', function() {
             if (u_attr && u_attr.b && u_attr.b.m && (u_attr.b.s === -1 || u_attr.b.s === 2)) {
                 loadSubPage('repay');
             }
@@ -201,7 +208,7 @@ accountUI.general = {
             }
         });
 
-        $('.download-sync').rebind('click', function() {
+        $('.download-sync', accountUI.$contentBlock).rebind('click', function() {
 
             var pf = navigator.platform.toUpperCase();
 
@@ -219,20 +226,22 @@ accountUI.general = {
     /**
      * Helper function to fill common charts into the dashboard and account sections
      * @param {Object}  account       User account data (I.e. same as M.account)
-     * @param {Boolean} [onDashboard] Whether invoked from the dashboard
      */
     charts: {
 
         perc_c_s : 0,
         perc_c_b : 0,
 
-        init: function(account, onDashboard) {
+        init: function(account) {
 
             'use strict';
 
+            /* Settings and Dasboard ccontent blocks */
+            this.$contentBlock = $('.fm-right-block.dashboard, .fm-right-account-block', '.fm-main');
+
             this.bandwidthChart(account);
             this.usedStorageChart(account);
-            this.chartWarningNoti(account, onDashboard);
+            this.chartWarningNoti(account);
         },
 
         bandwidthChart: function(account) {
@@ -242,42 +251,49 @@ accountUI.general = {
             /* New Used Bandwidth chart */
             this.perc_c_b = account.tfsq.perc > 100 ? 100 : account.tfsq.perc;
 
-            var $bandwidthChart = $('.fm-account-blocks.bandwidth');
-            var deg = 230 * this.perc_c_b / 100;
+            var $bandwidthChart = $('.fm-account-blocks.bandwidth', this.$contentBlock);
+            var fullDeg = 360;
+            var direction = -1;
+            var deg = fullDeg * this.perc_c_b / 100;
 
             // Used Bandwidth chart
             if (deg <= 180) {
-                $bandwidthChart.find('.left-chart span').css('transform', 'rotate(' + deg + 'deg)');
-                $bandwidthChart.find('.right-chart span').removeAttr('style');
+                $('.left-chart span', $bandwidthChart).css('transform', 'rotate(' + deg * direction + 'deg)');
+                $('.right-chart span', $bandwidthChart).removeAttr('style');
             }
             else {
-                $bandwidthChart.find('.left-chart span').css('transform', 'rotate(180deg)');
-                $bandwidthChart.find('.right-chart span').css('transform', 'rotate(' + (deg - 180) + 'deg)');
+                $('.left-chart span', $bandwidthChart).css('transform', 'rotate(180deg)');
+                $('.right-chart span', $bandwidthChart).css('transform', 'rotate(' + (deg - 180) * direction + 'deg)');
             }
 
             if (this.perc_c_b > 99 || dlmanager.isOverQuota) {
                 $bandwidthChart.addClass('exceeded');
             }
+            else if (this.perc_c_b > 80) {
+                $bandwidthChart.addClass('going-out');
+            }
 
             // Maximum bandwidth
             var b2 = bytesToSize(account.tfsq.max, 0).split(' ');
             var usedB = bytesToSize(account.tfsq.used);
-            $bandwidthChart.find('.chart.data .size-txt').text(usedB);
+            $('.chart.data .size-txt', $bandwidthChart).text(usedB);
             $('.chart.data .pecents-txt', $bandwidthChart).text(b2[0]);
             $('.chart.data .gb-txt', $bandwidthChart).text(b2[1]);
-            $bandwidthChart.find('.chart.data .content-txt').text('/');
+            $('.chart.data .of-txt', $bandwidthChart).text('/');
             if ((u_attr.p || account.tfsq.ach) && b2[0] > 0) {
                 if (this.perc_c_b > 0) {
                     $bandwidthChart.removeClass('no-percs');
-                    $bandwidthChart.find('.chart.data .perc-txt').text(this.perc_c_b + '%');
+                    $('.chart .perc-txt', $bandwidthChart).text(this.perc_c_b + '%');
                 }
                 else {
                     $bandwidthChart.addClass('no-percs');
+                    $('.chart .perc-txt', $bandwidthChart).text('---');
                 }
             }
             else {
                 $bandwidthChart.addClass('no-percs');
-                $bandwidthChart.find('.chart.data > span:not(.size-txt)').text('');
+                $('.chart .perc-txt', $bandwidthChart).text('---');
+                $('.chart.data > span:not(.size-txt)', $bandwidthChart).text('');
                 var usedW;
                 if (usedB[0] === '1') {
                     usedW = l[17524].toLowerCase().replace('%tq1', '').trim();
@@ -288,14 +304,14 @@ accountUI.general = {
                 else {
                     usedW = l[17517].toLowerCase().replace('%tq', '').trim();
                 }
-                $bandwidthChart.find('.chart.data .pecents-txt').text(usedW);
+                $('.chart.data .pecents-txt', $bandwidthChart).text(usedW);
             }
 
             if (!account.maf) {
-                $('.fm-right-account-block').removeClass('active-achievements');
+                this.$contentBlock.removeClass('active-achievements');
             }
             else {
-                $('.fm-right-account-block').addClass('active-achievements');
+                this.$contentBlock.addClass('active-achievements');
             }
 
             /* End of New Used Bandwidth chart */
@@ -306,7 +322,7 @@ accountUI.general = {
             'use strict';
 
             /* New Used Storage chart */
-            var $storageChart = $('.fm-account-blocks.storage');
+            var $storageChart = $('.fm-account-blocks.storage', this.$contentBlock);
             var usedPercentage = Math.round(account.space_used / account.space * 100);
             this.perc_c_s = usedPercentage;
             if (this.perc_c_s > 100) {
@@ -321,67 +337,60 @@ accountUI.general = {
                 $storageChart.addClass('going-out');
             }
 
-            var deg = 230 * this.perc_c_s / 100;
+            var fullDeg = 360;
+            var direction = -1;
+            var deg = fullDeg * this.perc_c_s / 100;
 
             // Used space chart
             if (deg <= 180) {
-                $('.left-chart span', $storageChart).css('transform', 'rotate(' + deg + 'deg)');
+                $('.left-chart span', $storageChart).css('transform', 'rotate(' + deg * direction + 'deg)');
                 $('.right-chart span', $storageChart).removeAttr('style');
             }
             else {
                 $('.left-chart span', $storageChart).css('transform', 'rotate(180deg)');
-                $('.right-chart span', $storageChart).css('transform', 'rotate(' + (deg - 180) + 'deg)');
+                $('.right-chart span', $storageChart).css('transform', 'rotate(' + (deg - 180) * direction + 'deg)');
             }
 
             // Maximum disk space
             var b2 = bytesToSize(account.space, 0).split(' ');
             $('.chart.data .pecents-txt', $storageChart).text(b2[0]);
             $('.chart.data .gb-txt', $storageChart).text(b2[1]);
-            $('.chart.data .perc-txt', $storageChart).text(usedPercentage + '%');
+            $('.chart .perc-txt', $storageChart).text(usedPercentage + '%');
             $('.chart.data .size-txt', $storageChart).text(bytesToSize(account.space_used));
-            $('.fm-right-block.dashboard .fm-account-blocks.storage .chart-indicator').css(
-                'left',
-                usedPercentage > 100 ?
-                    180 + (Math.floor(Math.log(usedPercentage) * Math.LOG10E) - 2) * 15 + 'px'
-                    : ''
-            );
-            $('.dashboard-container .fm-account-blocks.storage .chart-indicator').css(
-                'left',
-                usedPercentage > 100 ?
-                    150 + (Math.floor(Math.log(usedPercentage) * Math.LOG10E) - 2) * 15 + 'px'
-                    : ''
-            );
-        /** End New Used Storage chart */
+            /** End New Used Storage chart */
         },
 
-        chartWarningNoti: function(account, onDashboard) {
+        // TODO: this need to be modified to using on dashboard
+        chartWarningNoti: function(account) {
 
             'use strict';
 
-            var b_exceeded = (this.perc_c_t > 99 || dlmanager.isOverQuota) ? true : false;
-            var s_exceeded = this.perc_c_s === 100 ? true : false;
+            var b_exceeded = this.perc_c_t > 99 || dlmanager.isOverQuota;
+            var s_exceeded = this.perc_c_s === 100;
 
             // Charts warning notifications
-            var $chartsBlock = $('.account' + (onDashboard ? '.widget.content' : '.data-block.charts'));
-            $chartsBlock.find('.chart-warning:not(.hidden)').addClass('hidden');
+            var $chartsBlock = $('.account.quota-banner', this.$contentBlock);
+
+            $('.chart-warning:not(.hidden)', $chartsBlock).addClass('hidden');
+
             if (b_exceeded && s_exceeded) {
                 // Bandwidth and Storage quota exceeded
-                $chartsBlock.find('.chart-warning.storage-and-bandwidth').removeClass('hidden');
+                $('.chart-warning.storage-and-bandwidth', $chartsBlock).removeClass('hidden');
             }
             else if (s_exceeded) {
                 // Storage quota exceeded
-                $chartsBlock.find('.chart-warning.storage').removeClass('hidden');
+                $('.chart-warning.storage', $chartsBlock).removeClass('hidden');
             }
             else if (b_exceeded) {
                 // Bandwidth quota exceeded
-                $chartsBlock.find('.chart-warning.bandwidth').removeClass('hidden');
+                $('.chart-warning.bandwidth', $chartsBlock).removeClass('hidden');
             }
             else if (this.perc_c_s >= account.uslw / 100) {
                 // Running out of cloud space
-                $chartsBlock.find('.chart-warning.out-of-space').removeClass('hidden');
+                $('.chart-warning.out-of-space', $chartsBlock).removeClass('hidden');
             }
             if (b_exceeded || s_exceeded || this.perc_c_s >= account.uslw / 100) {
-                $chartsBlock.find('.chart-warning').rebind('click', function() {
+                $('.chart-warning', $chartsBlock).rebind('click', function() {
                     loadSubPage('pro');
                 });
             }
@@ -395,8 +404,11 @@ accountUI.general = {
     userUIUpdate: function() {
         'use strict';
 
+        var $fmContent = $('.fm-main', '.fmholder');
+        var $dashboardPane = $('.content-panel.dashboard', $fmContent);
+
         // Show Membership plan
-        $('.small-icon.membership').removeClass('pro1 pro2 pro3 pro4');
+        $('.account .plan-icon', $dashboardPane).removeClass('pro1 pro2 pro3 pro4 pro100 free');
 
         if (u_attr.p) {
 
@@ -404,27 +416,28 @@ accountUI.general = {
             var planNum = u_attr.p;
             var planText = pro.getProPlanName(planNum);
 
-            $('.account.membership-plan').text(planText);
-            $('.small-icon.membership').addClass('pro' + planNum);
+            $('.account.membership-plan', $dashboardPane).text(planText);
+            $('.account .plan-icon', $dashboardPane).addClass('pro' + planNum);
         }
         else {
-            $('.account.membership-plan').text(l[1150]);
+            $('.account .plan-icon', $dashboardPane).addClass('free');
+            $('.account.membership-plan', $dashboardPane).text(l[1150]);
         }
 
         // update avatar
-        $('.fm-account-avatar').safeHTML(useravatar.contact(u_handle, '', 'div', false));
-        $('.fm-avatar').safeHTML(useravatar.contact(u_handle));
-        $('.avatar-block', '.top-menu-popup').safeHTML(useravatar.contact(u_handle));
+        $('.fm-account-avatar', $fmContent).safeHTML(useravatar.contact(u_handle, '', 'div', false));
+        $('.fm-avatar', $fmContent).safeHTML(useravatar.contact(u_handle));
+        $('.top-menu-popup .avatar-block .wrapper', $fmContent).safeHTML(useravatar.contact(u_handle));
 
         // Show first name or last name
-        $('.membership-big-txt.name').text(u_attr.fullname);
+        $('.membership-big-txt.name', $dashboardPane).text(u_attr.fullname);
 
         // Show email address
         if (u_attr.email) {
-            $('.membership-big-txt.email').text(u_attr.email);
+            $('.membership-big-txt.email', $dashboardPane).text(u_attr.email);
         }
         else {
-            $('.membership-big-txt.email').hide();
+            $('.membership-big-txt.email', $dashboardPane).addClass('hidden');
         }
     },
 };
@@ -454,7 +467,7 @@ accountUI.inputs = {
 
             'use strict';
 
-            var $inputs = $('.fm-account-main input').add('.fm-voucher-popup input');
+            var $inputs = $('.underlinedText', '.fm-account-main, .fm-voucher-popup');
             var megaInputs = new mega.ui.MegaInputs($inputs);
         }
     },
@@ -588,41 +601,34 @@ accountUI.leftPane = {
 
         'use strict';
 
-        $.each($('.fm-account-button'), function() {
-
-            var $this = $(this);
-
-            if ($this.hasClass(sectionClass)) {
-                $this.addClass('active');
-                setTimeout(function() {
-                    $this.removeClass('closed');
-                }, 600);
-            }
-            else {
-                $this.addClass('closed');
-            }
-
-            if (!$this.is(':has(.sub-title)')) {
-                $this.find('.settings-menu-arrow').remove();
-            }
-
-            initTreeScroll();
-        });
+        var $settingsPane = $('.content-panel.account', '.fm-main');
+        var $menuItems = $('.settings-button', $settingsPane);
+        var $currentMenuItem = $menuItems.filter('.' + sectionClass);
 
         if (M.account.reseller) {
             // Show reseller button on naviation
-            $('.fm-account-button.reseller').removeClass('hidden');
+            $menuItems.filter('.reseller').removeClass('hidden');
         }
+
+        $menuItems.filter(':not(.' + sectionClass + ')').addClass('closed').removeClass('active');
+        $currentMenuItem.addClass('active');
+
+        setTimeout(function() {
+            $currentMenuItem.removeClass('closed');
+            initTreeScroll();
+        }, 600);
     },
 
     bindEvents: function() {
 
         'use strict';
 
-        $('.fm-account-button').rebind('click', function() {
+        var $settingsPane = $('.content-panel.account', '.fm-main');
+
+        $('.settings-button', $settingsPane).rebind('click', function() {
 
             if ($(this).attr('class').indexOf('active') === -1) {
-                $('.fm-account-main').data('jsp').scrollToY(0, false);
+                accountUI.$contentBlock.scrollTop(0);
 
                 switch (true) {
                     case $(this).hasClass('account-s'):
@@ -653,31 +659,28 @@ accountUI.leftPane = {
             }
         });
 
-        $('.fm-account-button .settings-menu-arrow').rebind('click', function(e) {
+        $('.settings-button i.expand', $settingsPane).rebind('click', function(e) {
 
-            var $button = $(this).parents('.fm-account-button');
-
-            if ($button.hasClass('active')) {
-                return false;
-            }
+            var $button = $(this).closest('.settings-button');
 
             e.stopPropagation();
             $button.toggleClass('closed');
-            setTimeout(initTreeScroll, 600);
         });
 
-        $('.fm-account-button .sub-title').rebind('click', function() {
+        $('.settings-button .sub-title', $settingsPane).rebind('click', function() {
 
-            var $parentBtn = $(this).parents('.fm-account-button');
-            var $target = $('.data-block.' + $(this).data('scrollto'));
+            var $this = $(this);
+            var $parentBtn = $this.closest('.settings-button');
+            var $target = $('.data-block.' + $this.attr('data-scrollto'));
+            var targetPosition = $target.position().top;
 
             if ($parentBtn.hasClass('active')) {
-                $('.fm-account-main').data('jsp').scrollToElement($target, true);
+                accountUI.$contentBlock.animate({scrollTop: targetPosition}, 500);
             }
             else {
                 $parentBtn.trigger('click');
                 mBroadcaster.once('settingPageReady', function () {
-                    $('.fm-account-main').data('jsp').scrollToElement($target, true, false);
+                    accountUI.$contentBlock.animate({scrollTop: targetPosition}, 500);
                 });
             }
         });
@@ -689,6 +692,9 @@ accountUI.account = {
     init: function(account) {
 
         'use strict';
+
+        var $settingsPane = $('.content-panel.account', '.fm-main');
+        var $profileContent = $('.settings-sub-section.profile', accountUI.$contentBlock);
 
         // Profile
         this.profiles.resetProfileForm();
@@ -702,21 +708,21 @@ accountUI.account = {
         var hideOrViewCancelSection = function(setToHidden) {
 
             if (setToHidden) {
-                $('.fm-account-main .fm-account-sections .cancel-account-block').addClass('hidden');
-                $('.content-panel.account .acc-setting-menu-cancel-acc').addClass('hidden');
-                $('.settings-sub-section.profile #account-firstname').prop('disabled', true);
-                $('.settings-sub-section.profile #account-lastname').prop('disabled', true);
+                $('.cancel-account-block', accountUI.$contentBlock).addClass('hidden');
+                $('.acc-setting-menu-cancel-acc', $settingsPane).addClass('hidden');
+                $('#account-firstname', $profileContent).prop('disabled', true);
+                $('#account-lastname', $profileContent).prop('disabled', true);
             }
             else {
-                $('.fm-account-main .fm-account-sections .cancel-account-block').removeClass('hidden');
-                $('.content-panel.account .acc-setting-menu-cancel-acc').removeClass('hidden');
-                $('.settings-sub-section.profile #account-firstname').prop('disabled', false);
-                $('.settings-sub-section.profile #account-lastname').prop('disabled', false);
+                $('.cancel-account-block', accountUI.$contentBlock).removeClass('hidden');
+                $('.acc-setting-menu-cancel-acc', $settingsPane).removeClass('hidden');
+                $('#account-firstname', $profileContent).prop('disabled', false);
+                $('#account-lastname', $profileContent).prop('disabled', false);
             }
         };
 
         if (u_attr && u_attr.b) {
-            $('.fm-account-main .settings-sub-section.profile .acc-setting-country-sec').addClass('hidden');
+            $('.acc-setting-country-sec', $profileContent).addClass('hidden');
             if (!u_attr.b.m) {
                 hideOrViewCancelSection(true);
 
@@ -728,7 +734,7 @@ accountUI.account = {
         else {
 
             // user can set country only in non-business accounts
-            $('.fm-account-main .settings-sub-section.profile .acc-setting-country-sec').removeClass('hidden');
+            $('.acc-setting-country-sec', $profileContent).removeClass('hidden');
 
             this.profiles.renderCountry();
 
@@ -760,11 +766,11 @@ accountUI.account = {
             'use strict';
 
             // Cache selectors
-            var $addPhoneBanner = $('.add-phone-num-banner');
-            var $usageBanner = $('.settings-banner');
-            var $text = $addPhoneBanner.find('.add-phone-text');
-            var $addPhoneButton = $addPhoneBanner.find('.js-add-phone-button');
-            var $skipButton = $addPhoneBanner.find('.skip-button');
+            var $addPhoneBanner = $('.add-phone-num-banner', accountUI.$contentBlock);
+            var $usageBanner = $('.quota-banner', accountUI.$contentBlock);
+            var $text = $('.add-phone-text', $addPhoneBanner);
+            var $addPhoneButton = $('.js-add-phone-button', $addPhoneBanner);
+            var $skipButton = $('.skip-button', $addPhoneBanner);
             // M.maf is cached in its getter, however, repeated gets will cause unnecessary checks.
             var ach = M.maf;
 
@@ -818,14 +824,14 @@ accountUI.account = {
 
             'use strict';
 
-            $('#account-firstname').val(u_attr.firstname).trigger('blur');
+            $('#account-firstname', accountUI.$contentBlock).val(u_attr.firstname).trigger('blur');
         },
 
         renderLastName: function() {
 
             'use strict';
 
-            $('#account-lastname').val(u_attr.lastname).trigger('blur');
+            $('#account-lastname', accountUI.$contentBlock).val(u_attr.lastname).trigger('blur');
         },
 
         renderBirth: function () {
@@ -833,13 +839,14 @@ accountUI.account = {
             'use strict';
 
             // If $.dateTimeFormat['stucture'] is not set, prepare it for birthday
-            if (!$.dateTimeFormat['structure']) {
-                $.dateTimeFormat['structure'] = getDateStructure() || 'ymd';
+            if (!$.dateTimeFormat.structure) {
+                $.dateTimeFormat.structure = getDateStructure() || 'ymd';
             }
 
             // Display only date format that is correct with current locale.
-            $('.mega-input-title-ontop.birth').addClass('hidden');
-            $('.mega-input-title-ontop.birth.' + $.dateTimeFormat['structure']).removeClass('hidden');
+            $('.mega-input.birth', accountUI.$contentBlock).addClass('hidden');
+            $('.mega-input.birth.' + $.dateTimeFormat.structure, accountUI.$contentBlock)
+                .removeClass('hidden');
 
             this.renderBirthYear();
             this.renderBirthMonth();
@@ -851,7 +858,8 @@ accountUI.account = {
             'use strict';
 
             var i = new Date().getFullYear() - 16;
-            var $input = $('.mega-input-title-ontop.birth.' + $.dateTimeFormat['structure'] + ' .byear')
+            var formatClass = '.' + $.dateTimeFormat.structure + ' .byear';
+            var $input = $('.mega-input.birth' + formatClass, accountUI.$contentBlock)
                 .attr('max', i);
 
             if (u_attr.birthyear) {
@@ -864,7 +872,8 @@ accountUI.account = {
             'use strict';
 
             if (u_attr.birthmonth) {
-                var $input = $('.mega-input-title-ontop.birth.' + $.dateTimeFormat['structure'] + ' .bmonth');
+                var formatClass = '.' + $.dateTimeFormat.structure + ' .bmonth';
+                var $input = $('.mega-input.title-ontop.birth' + formatClass, accountUI.$contentBlock);
                 $input.val(u_attr.birthmonth).trigger('input');
                 this.zerofill($input[0]);
             }
@@ -875,7 +884,8 @@ accountUI.account = {
             'use strict';
 
             if (u_attr.birthday) {
-                var $input = $('.mega-input-title-ontop.birth.' + $.dateTimeFormat['structure'] + ' .bdate');
+                var formatClass = '.' + $.dateTimeFormat.structure + ' .bdate';
+                var $input = $('.mega-input.title-ontop.birth' + formatClass, accountUI.$contentBlock);
                 $input.val(u_attr.birthday).trigger('input');
                 this.zerofill($input[0]);
             }
@@ -887,7 +897,7 @@ accountUI.account = {
 
             var html = '';
             var sel = '';
-            var $country = $('.fm-account-main .default-select.country');
+            var $country = $('#account-country', accountUI.$contentBlock);
             $('span', $country).text(l[996]);
             var countries = M.getCountries();
             for (var country in countries) {
@@ -901,17 +911,14 @@ accountUI.account = {
                 else {
                     sel = '';
                 }
-                html += '<div class="default-dropdown-item ' + sel + '" data-value="' + country + '">'
+                html += '<div class="option ' + sel + '" data-value="' + country + '">'
                      +      countries[country]
                      +  '</div>';
             }
-            $('.default-select-scroll', $country).safeHTML(html);
-
-            // Initialize scrolling. This is to prevent scroll losing bug with action packet.
-            initSelectScrolling('#account-country .default-select-scroll');
+            $('.dropdown-scroll', $country).safeHTML(html);
 
             // Bind Dropdowns events
-            bindDropdownEvents($country, 1, '.fm-account-main');
+            bindDropdownEvents($country, 1);
         },
 
         /**
@@ -927,17 +934,21 @@ accountUI.account = {
             if ((u_attr.flags.smsve === 1 && typeof u_attr.smsv !== 'undefined') || u_attr.flags.smsve === 2) {
 
                 // Cache selectors
-                var $phoneSettings = $('.fm-account-main .phone-number-settings');
-                var $text = $phoneSettings.find('.add-phone-text');
-                var $phoneNumber = $phoneSettings.find('.phone-number');
-                var $addNumberButton = $phoneSettings.find('.add-number-button');
-                var $removeNumberButton = $('.rem-gsm', $phoneSettings);
-                var $modifyNumberButton = $('.modify-gsm', $phoneSettings);
+                var $content = $('.fm-account-main', accountUI.$contentBlock);
+                var $phoneSettings = $('.phone-number-settings', $content);
+                var $text = $('.add-phone-text', $phoneSettings);
+                var $phoneNumber = $('.phone-number', $phoneSettings);
+                var $addNumberButton = $('.add-number-button', $phoneSettings);
+                var $buttonsContainer = $('.gsm-mod-rem-btns', $content);
+                var $removeNumberButton = $('.rem-gsm', $buttonsContainer);
+                var $modifyNumberButton = $('.modify-gsm', $buttonsContainer);
 
                 // If the phone is already added, show that
                 if (typeof u_attr.smsv !== 'undefined') {
-                    $phoneSettings.addClass('verified');
-                    $phoneNumber.text(u_attr.smsv);
+                    $addNumberButton.addClass('hidden');
+                    $text.addClass('hidden');
+                    $buttonsContainer.removeClass('hidden');
+                    $phoneNumber.removeClass('hidden').text(u_attr.smsv);
 
                     /**
                      * Send remove command to API, and update UI if needed
@@ -991,7 +1002,11 @@ accountUI.account = {
                     $modifyNumberButton.rebind('click.gsmmodify', removeNumber.bind(null, l[23429], l[23430], false));
                 }
                 else {
-                    $phoneSettings.removeClass('verified');
+                    $addNumberButton.removeClass('hidden');
+                    $text.removeClass('hidden');
+                    $buttonsContainer.addClass('hidden');
+                    $phoneNumber.addClass('hidden').text('');
+
                     // Otherwise set the text for x GB storage and quota
                     sms.renderAddPhoneText($text);
 
@@ -1020,8 +1035,8 @@ accountUI.account = {
 
             'use strict';
 
-            var $personalInfoBlock = $('.profile-form');
-            var $saveBlock = $('.fm-account-sections .save-block');
+            var $personalInfoBlock = $('.profile-form', accountUI.$contentBlock);
+            var $saveBlock = $('.fm-account-sections .save-block', accountUI.$contentBlock);
 
             $('input', $personalInfoBlock).val('');
             $('.error, .errored', $personalInfoBlock).removeClass('error errored');
@@ -1034,17 +1049,18 @@ accountUI.account = {
 
             // Cache selectors
             var self = this;
-            var $personalInfoBlock = $('.profile-form');
-            var $birthdayBlock = $('.mega-input-title-ontop.birth.' + $.dateTimeFormat['structure'],
+            var $personalInfoBlock = $('.profile-form', accountUI.$contentBlock);
+            var $birthdayBlock = $('.mega-input.title-ontop.birth.' + $.dateTimeFormat.structure,
                 $personalInfoBlock);
             var $firstNameField = $('#account-firstname', $personalInfoBlock);
             var $lastNameField = $('#account-lastname', $personalInfoBlock);
-            var $saveBlock = $('.fm-account-sections .save-block');
+            var $countryDropdown = $('#account-country', $personalInfoBlock);
+            var $saveBlock = $('.fm-account-sections .save-block', accountUI.$contentBlock);
             var $saveButton = $('.fm-account-save', $saveBlock);
 
             // Avatar
-            $('.fm-account-avatar, .settings-sub-section.avatar .avatar', $personalInfoBlock)
-                .rebind('click', function() {
+            $('.avatar-wrapper, .settings-sub-section.avatar .avatar', $personalInfoBlock)
+                .rebind('click.showDialog', function() {
                     avatarDialog();
                 });
 
@@ -1059,16 +1075,13 @@ accountUI.account = {
                     var min = parseInt($this.attr('min'));
 
                     if ($this.is('.byear, .bmonth, .bdate')) {
-                        if (this.value > max) {
+                        if (this.value > max || this.value < min) {
                             $this.addClass('errored');
-                            $parent.addClass('error msg').find('.message-container').text(errorMsg);
+                            $parent.addClass('error msg');
+                            var $msg = $('.message-container', $parent).text(errorMsg);
+                            $parent.css('margin-bottom', $msg.outerHeight() + 20 + 'px');
                             $saveBlock.addClass('closed');
-                            return false;
-                        }
-                        else if (this.value < min) {
-                            $this.addClass('errored');
-                            $parent.addClass('error msg').find('.message-container').text(errorMsg);
-                            $saveBlock.addClass('closed');
+
                             return false;
                         }
                         else {
@@ -1080,6 +1093,8 @@ accountUI.account = {
                             else {
                                 $parent.removeClass('error msg');
                             }
+
+                            $parent.css('margin-bottom', '');
                         }
                     }
 
@@ -1158,7 +1173,7 @@ accountUI.account = {
                 $target.trigger(e);
             });
 
-            $('#account-country .default-dropdown-item', $personalInfoBlock).rebind('click.showSave', function() {
+            $('.mega-input-dropdown .option', $countryDropdown).rebind('click.showSave', function() {
 
                 if ($firstNameField.val() && $firstNameField.val().trim().length > 0
                     && !$personalInfoBlock.find('.errored').length) {
@@ -1179,12 +1194,14 @@ accountUI.account = {
                 $('.fm-avatar').safeHTML(useravatar.contact(u_handle));
 
                 var checklist = {
-                    firstname: String($('#account-firstname').val() || '').trim(),
-                    lastname: String($('#account-lastname').val() || '').trim(),
+                    firstname: String($('#account-firstname', $personalInfoBlock).val() || '').trim(),
+                    lastname: String($('#account-lastname', $personalInfoBlock).val() || '').trim(),
                     birthday: String($('.bdate', $birthdayBlock).val() || ''),
                     birthmonth: String($('.bmonth', $birthdayBlock).val() || ''),
                     birthyear: String($('.byear', $birthdayBlock).val() || ''),
-                    country: String($('#account-country .default-dropdown-item.active').attr('data-value') || '')
+                    country: String(
+                        $('#account-country .option[data-state="active"]', $personalInfoBlock).attr('data-value') || ''
+                    )
                 };
                 var userAttrRequest = { a: 'up' };
 
@@ -1236,13 +1253,15 @@ accountUI.account = {
 
             'use strict';
 
-            this.$QRSettings =  $('.qr-settings');
+            this.$QRSettings =  $('.qr-settings', accountUI.$contentBlock);
 
             var QRoptions = {
                 width: 106,
                 height: 106,
-                correctLevel: QRErrorCorrectLevel.H,    // high
-                foreground: '#dc0000',
+                // high
+                correctLevel: QRErrorCorrectLevel.H,
+                background: '#f2f2f2',
+                foreground: '#151412',
                 text: getBaseUrl() + '/' + account.contactLink
             };
 
@@ -1250,22 +1269,22 @@ accountUI.account = {
 
             $('.qr-http-link', this.$QRSettings).text(QRoptions.text);
 
-            var $container = $('.enable-qr-container');
+            var $container = $('.enable-qr-container', this.$QRSettings);
 
             if (defaultValue) {
                 // Render the QR code
-                $('.account.qr-icon').text('').qrcode(QRoptions);
-                $('.dialog-feature-toggle.enable-qr', this.$QRSettings).addClass('toggle-on');
-                $('.access-qr-container').parent().removeClass('closed');
+                $('.account.qr-icon', this.$QRSettings).text('').qrcode(QRoptions);
+                $('.mega-switch.enable-qr', this.$QRSettings).addClass('toggle-on');
+                $('.access-qr-container', this.$QRSettings).parent().removeClass('closed');
                 $('.qr-block', this.$QRSettings).removeClass('hidden');
-                $('.settings-sub-section.enable-qr-container').addClass('border');
+                $container.addClass('border');
             }
             else {
                 $('.account.qr-icon').text('');
-                $('.dialog-feature-toggle.enable-qr', this.$QRSettings).removeClass('toggle-on');
-                $('.access-qr-container').parent().addClass('closed');
+                $('.mega-switch.enable-qr', this.$QRSettings).removeClass('toggle-on');
+                $('.access-qr-container', this.$QRSettings).parent().addClass('closed');
                 $('.qr-block', this.$QRSettings).addClass('hidden');
-                $('.settings-sub-section.enable-qr-container').removeClass('border');
+                $container.removeClass('border');
             }
 
             // Enable QR code
@@ -1276,9 +1295,9 @@ accountUI.account = {
                 function(val) {
 
                     if (val) {
-                        $('.access-qr-container').add('.qr-block', self.$QRSettings).parent().removeClass('closed');
-                        $container.addClass('border');
-                        setTimeout(initAccountScroll, 301);
+                        $('.access-qr-container', accountUI.account.qrcode.$QRSettings)
+                            .add('.qr-block', accountUI.account.qrcode.$QRSettings)
+                            .parent().removeClass('closed');
 
                         api_req({ a: 'clc' }, {
                             myAccount: account,
@@ -1289,8 +1308,9 @@ accountUI.account = {
                         });
                     }
                     else {
-                        $('.access-qr-container').add('.qr-settings .qr-block').parent().addClass('closed');
-                        $container.removeClass('border');
+                        $('.access-qr-container', accountUI.account.qrcode.$QRSettings)
+                            .add('.qr-settings .qr-block').parent().addClass('closed');
+
                         api_req({
                             a: 'cld',
                             cl: account.contactLink.substring(2, account.contactLink.length)
@@ -1332,7 +1352,7 @@ accountUI.account = {
 
                 accountUI.inputs.switch.init(
                     '.auto-qr',
-                    $('.access-qr-container'),
+                    $('.access-qr-container', accountUI.account.qrcode.$QRSettings),
                     parseInt(res),
                     function(val) {
                         mega.attr.set('clv', val, -2, 0);
@@ -1350,8 +1370,8 @@ accountUI.account = {
             // Copy link Section
             if (is_extension || M.execCommandUsable()) {
                 $('.copy-qr-link', this.$QRSettings).removeClass('hidden');
-                $('.qr-dlg-cpy-lnk', this.$QRSettings).rebind('click', function () {
-                    var links = $.trim($(this).prev('.qr-http-link').text());
+                $('.qr-dlg-cpy-lnk', this.$QRSettings).rebind('click', function() {
+                    var links = $.trim($(this).next('.qr-http-link').text());
                     var toastTxt = l[7654];
                     copyToClipboard(links, toastTxt);
                 });
@@ -1413,23 +1433,32 @@ accountUI.account = {
             // Date/time format setting
             accountUI.inputs.radio.init(
                 '.uidateformat',
-                $('.uidateformat').parent(),
+                $('.uidateformat', accountUI.$contentBlock).parent(),
                 fmconfig.uidateformat || 0,
                 function (val) {
-                    showToast('settings', l[16168]);
-                    mega.config.setn('uidateformat', parseInt(val));
+                    mega.config.setn('uidateformat', parseInt(val), l[16168]);
                 }
             );
 
             // Font size
             accountUI.inputs.radio.init(
                 '.uifontsize',
-                $('.uifontsize').parent(),
+                $('.uifontsize', accountUI.$contentBlock).parent(),
                 fmconfig.font_size || 2,
                 function (val) {
-                    showToast('settings', l[16168]);
                     $('body').removeClass('fontsize1 fontsize2').addClass('fontsize' + val);
-                    mega.config.setn('font_size', parseInt(val));
+                    mega.config.setn('font_size', parseInt(val), l[16168]);
+                }
+            );
+
+            // Theme
+            accountUI.inputs.radio.init(
+                '.uiTheme',
+                $('.uiTheme', accountUI.$contentBlock).parent(),
+                u_attr['^!webtheme'] || 0,
+                function(val) {
+                    mega.attr.set('webtheme', val, -2, 1);
+                    mega.ui.theme.set(val);
                 }
             );
 
@@ -1445,22 +1474,19 @@ accountUI.account = {
 
             'use strict';
 
-            var $hPageSelect = $('.fm-account-main .default-select.settings-choose-homepage-dropdown');
+            var $hPageSelect = $('.settings-choose-homepage-dropdown', accountUI.$contentBlock);
             var $textField = $('span', $hPageSelect);
 
             // Mark active item.
-            var $activeItem = $('.default-dropdown-item[data-value="' + getLandingPage() + '"]', $hPageSelect);
+            var $activeItem = $('.option[data-value="' + getLandingPage() + '"]', $hPageSelect);
             $activeItem.addClass('active');
             $textField.text($activeItem.text());
 
-            // Initialize scrolling. This is to prevent scroll losing bug with action packet.
-            initSelectScrolling('#account-hpage .default-select-scroll');
-
             // Bind Dropdowns events
-            bindDropdownEvents($hPageSelect, 1, '.fm-account-main');
+            bindDropdownEvents($hPageSelect, 1);
 
-            $('.default-dropdown-item', $hPageSelect).rebind('click.saveChanges', function() {
-                var $selectedOption = $('.default-dropdown-item.active', $hPageSelect);
+            $('.option', $hPageSelect).rebind('click.saveChanges', function() {
+                var $selectedOption = $('.option[data-state="active"]', $hPageSelect);
                 var newValue = $selectedOption.attr('data-value') || 'fm';
                 showToast('settings', l[16168]);
                 setLandingPage(newValue);
@@ -1570,6 +1596,8 @@ accountUI.plan = {
 
         "use strict";
 
+        var $planContent = $('.fm-account-plan.fm-account-sections', accountUI.$contentBlock);
+
         // Plan - Account type
         this.accountType.render(account);
         this.accountType.bindEvents();
@@ -1585,13 +1613,13 @@ accountUI.plan = {
 
         // check if business account
         if (u_attr && u_attr.b) {
-            $('.fm-account-plan.fm-account-sections .acc-storage-space').addClass('hidden');
-            $('.fm-account-plan.fm-account-sections .acc-bandwidth-vol').addClass('hidden');
-            $('.fm-account-plan.fm-account-sections .btn-achievements').addClass('hidden');
-            $('.fm-account-plan.fm-account-sections .data-block.account-balance').addClass('hidden');
-            $('.content-panel.account .acc-setting-menu-balance-acc').addClass('hidden');
+            $('.acc-storage-space', $planContent).addClass('hidden');
+            $('.acc-bandwidth-vol', $planContent).addClass('hidden');
+            $('.btn-achievements', $planContent).addClass('hidden');
+            $('.data-block.account-balance', $planContent).addClass('hidden');
+            $('.acc-setting-menu-balance-acc', '.content-panel.account').addClass('hidden');
             if (!u_attr.b.m || u_attr.b.s !== -1) {
-                $('.fm-account-plan.fm-account-sections .upgrade-to-pro').addClass('hidden');
+                $('.upgrade-to-pro', $planContent).addClass('hidden');
             }
         }
     },
@@ -1601,6 +1629,8 @@ accountUI.plan = {
         render: function(account) {
 
             'use strict';
+
+            var $planContent = $('.data-block.account-type', accountUI.$contentBlock);
 
             var renderSubscription = function _renderSubscription() {
                 // Get the date their subscription will renew
@@ -1620,18 +1650,18 @@ accountUI.plan = {
                     paymentType = dateString + ' - ' + paymentType;
 
                     // Change placeholder 'Expires on' to 'Renews'
-                    $('.account.plan-info.expiry-txt').text(l[6971]);
-                    $('.account.plan-info.expiry').text(paymentType);
+                    $('.subtitle-txt.expiry-txt', $planContent).text(l[6971]);
+                    $('.account.plan-info.expiry', $planContent).text(paymentType);
                 }
                 else {
                     // Otherwise show nothing
-                    $('.account.plan-info.expiry').text('');
-                    $('.account.plan-info.expiry-txt').text('');
+                    $('.account.plan-info.expiry', $planContent).text('');
+                    $('.subtitle-txt.expiry-txt', $planContent).text('');
                 }
 
-                var $buttons = $('.account.account-type');
-                var $cancelSubscriptionButton = $buttons.find('.btn-cancel-sub');
-                var $achievementsButton = $buttons.find('.btn-achievements');
+                var $subscriptionBlock = $('.sub-container.subscription', $planContent);
+                var $cancelSubscriptionButton = $('.btn-cancel-sub', $subscriptionBlock);
+                var $achievementsButton = $('.btn-achievements', $planContent);
 
                 if (!M.maf){
                     $achievementsButton.addClass('hidden');
@@ -1641,7 +1671,8 @@ accountUI.plan = {
                 if ((gatewayId === 2) || (gatewayId === 3)) {
 
                     // Tell them they need to cancel their plan off-site and don't show the feedback dialog
-                    $cancelSubscriptionButton.removeClass('hidden').rebind('click', function() {
+                    $subscriptionBlock.removeClass('hidden');
+                    $cancelSubscriptionButton.rebind('click', function() {
                         msgDialog('warninga', l[7179], l[16501]);
                     });
                 }
@@ -1658,10 +1689,10 @@ accountUI.plan = {
                             if (numOfSubscriptions > 0) {
 
                                 // Show cancel button and show cancellation dialog
-                                $cancelSubscriptionButton.removeClass('hidden')
-                                    .rebind('click', function() {
-                                        accountUI.plan.accountType.cancelSubscriptionDialog.init();
-                                    });
+                                $subscriptionBlock.removeClass('hidden');
+                                $cancelSubscriptionButton.rebind('click', function() {
+                                    accountUI.plan.accountType.cancelSubscriptionDialog.init();
+                                });
                             }
                         }
                     });
@@ -1676,17 +1707,17 @@ accountUI.plan = {
 
                 // if this is p=100 business
                 if (planNum === 100) {
-                    $('.account.plan-info.accounttype').addClass('business');
-                    $('.fm-account-plan .acc-renew-date-info').removeClass('border');
+                    $('.account.plan-info.accounttype', $planContent).addClass('business');
+                    $('.fm-account-plan .acc-renew-date-info', $planContent).removeClass('border');
                 }
                 else {
-                    $('.account.plan-info.accounttype').removeClass('business');
-                    $('.fm-account-plan .acc-renew-date-info').addClass('border');
+                    $('.account.plan-info.accounttype', $planContent).removeClass('business');
+                    $('.fm-account-plan .acc-renew-date-info', $planContent).addClass('border');
                 }
 
                 // Account type
-                $('.account.plan-info.accounttype span').text(planText);
-                $('.small-icon.membership').addClass('pro' + planNum);
+                $('.account.plan-info.accounttype span', $planContent).text(planText);
+                $('.account .plan-icon', $planContent).addClass('pro' + planNum);
 
                 // Subscription
                 if (account.stype === 'S') {
@@ -1697,32 +1728,33 @@ accountUI.plan = {
                     var expiryTimestamp = account.nextplan ? account.nextplan.t : account.expiry;
 
                     // one-time or cancelled subscription
-                    $('.account.plan-info.expiry-txt').text(l[987]);
-                    $('.account.plan-info.expiry span').text(time2date(expiryTimestamp, 2));
-                    $('.account.data-block .btn-cancel-sub').addClass('hidden');
+                    $('.subtitle-txt.expiry-txt', $planContent).text(l[987]);
+                    $('.account.plan-info.expiry span', $planContent).text(time2date(expiryTimestamp, 2));
+                    $('.sub-container.subscription', $planContent).addClass('hidden');
                 }
 
-                $('.account.plan-info.bandwidth').parent().removeClass('hidden');
+                $('.account.plan-info.bandwidth', $planContent).parent().removeClass('hidden');
             }
             else {
                 // free account:
-                $('.account.plan-info.accounttype span').text(l[1150]);
-                $('.account.plan-info.expiry').text(l[436]);
-                $('.btn-cancel-sub').addClass('hidden');
+                $('.account.plan-info.accounttype span', $planContent).text(l[1150]);
+                $('.account .plan-icon', $planContent).addClass('free');
+                $('.account.plan-info.expiry', $planContent).text(l[436]);
+                $('.sub-container.subscription', $planContent).addClass('hidden');
                 if (account.mxfer) {
-                    $('.account.plan-info.bandwidth').parent().removeClass('hidden');
+                    $('.account.plan-info.bandwidth', $planContent).parent().removeClass('hidden');
                 }
                 else {
-                    $('.account.plan-info.bandwidth').parent().addClass('hidden');
+                    $('.account.plan-info.bandwidth', $planContent).parent().addClass('hidden');
                 }
             }
 
             /* achievements */
             if (!account.maf) {
-                $('.account.plan-info.storage > span').text(bytesToSize(M.account.space, 0));
-                $('.account.plan-info.bandwidth > span').text(bytesToSize(M.account.tfsq.max, 0));
-                $('.account.plan-info .quota-note-container, .account.plan-info .settings-bar, .btn-achievements')
-                    .addClass('hidden');
+
+                $('.plan-info.storage > span', $planContent).text(bytesToSize(M.account.space, 0));
+                $('.plan-info.bandwidth > span', $planContent).text(bytesToSize(M.account.tfsq.max, 0));
+                $('.bars-container, .btn-achievements', $planContent).addClass('hidden');
             }
             else {
                 mega.achievem.parseAccountAchievements();
@@ -1733,7 +1765,7 @@ accountUI.plan = {
 
             "use strict";
 
-            $('.btn-achievements').rebind('click', function() {
+            $('.btn-achievements', accountUI.$contentBlock).rebind('click', function() {
                 mega.achievem.achievementsListDialog();
             });
         },
@@ -1792,7 +1824,7 @@ accountUI.plan = {
                 var self = this;
 
                 // Close main dialog
-                this.$dialog.find('.default-white-button.cancel, .fm-dialog-close').rebind('click', function() {
+                this.$dialog.find('button.cancel, button.js-close').rebind('click', function() {
                     self.$dialog.addClass('hidden');
                     self.$backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
                 });
@@ -1812,7 +1844,7 @@ accountUI.plan = {
 
                 var self = this;
 
-                this.$dialogSuccess.find('.fm-dialog-close').rebind('click', function() {
+                this.$dialogSuccess.find('button.js-close').rebind('click', function() {
                     self.$dialogSuccess.addClass('hidden');
                     self.$backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
                 });
@@ -1898,7 +1930,7 @@ accountUI.plan = {
 
             "use strict";
 
-            $('.account.plan-info.balance span').safeHTML(
+            $('.account.plan-info.balance span', accountUI.$contentBlock).safeHTML(
                 '&euro; @@',
                 mega.intl.number.format(account.balance[0][0])
             );
@@ -1910,19 +1942,15 @@ accountUI.plan = {
 
             var self = this;
 
-            $('.redeem-voucher').rebind('click', function() {
+            $('.redeem-voucher', accountUI.$contentBlock).rebind('click', function() {
                 var $this = $(this);
                 if ($this.attr('class').indexOf('active') === -1) {
                     $('.fm-account-overlay').fadeIn(100);
                     $this.addClass('active');
                     $('.fm-voucher-popup').removeClass('hidden');
-                    self.voucherCentering($this);
-                    $(window).rebind('resize.voucher', function() {
-                        self.voucherCentering($this);
-                    });
 
                     $('.fm-account-overlay, .fm-purchase-voucher, .fm-voucher-button')
-                        .add('.fm-voucher-popup .fm-dialog-close')
+                        .add('.fm-voucher-popup button.js-close')
                         .rebind('click.closeDialog', function() {
                             $('.fm-account-overlay').fadeOut(100);
                             $('.redeem-voucher').removeClass('active');
@@ -1933,7 +1961,6 @@ accountUI.plan = {
                     $('.fm-account-overlay').fadeOut(200);
                     $this.removeClass('active');
                     $('.fm-voucher-popup').addClass('hidden');
-                    $(window).off('resize.voucher');
                 }
             });
 
@@ -1950,7 +1977,6 @@ accountUI.plan = {
                         return redeem.redeemVoucher(code);
                     })
                     .then(function() {
-                        loadingDialog.hide();
                         Object(M.account).lastupdate = 0;
                         onIdle(accountUI);
                     })
@@ -1962,28 +1988,9 @@ accountUI.plan = {
                     });
             });
 
-            $('.fm-purchase-voucher,.default-white-button.topup').rebind('click', function() {
+            $('.fm-purchase-voucher, button.topup').rebind('click', function() {
                 loadSubPage('resellers');
             });
-        },
-
-        voucherCentering: function voucherCentering($button) {
-            'use strict';
-
-            var $popupBlock = $('.fm-voucher-popup');
-            var popupHeight = $popupBlock.outerHeight();
-
-            $popupBlock.css({
-                'top': $button.offset().top - popupHeight - 10,
-                'right': $('body').outerWidth() - $button.outerWidth() - $button.offset().left
-            });
-
-            if ($button.offset().top + 10 > popupHeight) {
-                $popupBlock.css('top', $button.offset().top - popupHeight - 10);
-            }
-            else {
-                $popupBlock.css('top', $button.offset().top + $button.outerHeight() + 10);
-            }
         }
     },
 
@@ -1993,14 +2000,16 @@ accountUI.plan = {
 
             'use strict';
 
+            var $purchaseSelect = $('.dropdown-input.purchases', accountUI.$contentBlock);
+
             if (!$.purchaselimit) {
                 $.purchaselimit = 10;
             }
 
-            $('.account-history-dropdown-button.purchases').text(l[469].replace('[X]', $.purchaselimit));
-            $('.account-history-drop-items.purchase10-').text(l[469].replace('[X]', 10));
-            $('.account-history-drop-items.purchase100-').text(l[469].replace('[X]', 100));
-            $('.account-history-drop-items.purchase250-').text(l[469].replace('[X]', 250));
+            $('span', $purchaseSelect).text(l[469].replace('[X]', $.purchaselimit));
+            $('.purchase10-', $purchaseSelect).text(l[469].replace('[X]', 10));
+            $('.purchase100-', $purchaseSelect).text(l[469].replace('[X]', 100));
+            $('.purchase250-', $purchaseSelect).text(l[469].replace('[X]', 250));
 
             M.account.purchases.sort(function(a, b) {
                 if (a[1] < b[1]) {
@@ -2011,8 +2020,8 @@ accountUI.plan = {
                 }
             });
 
-            $('.grid-table.purchases tr').remove();
-            var html = '<tr><th>' + l[475] + '</th><th>' + l[476] +
+            $('.data-table.purchases tr', accountUI.$contentBlock).remove();
+            var html = '<tr><th>' + l[476] + '</th><th>' + l[475] +
                 '</th><th>' + l[477] + '</th><th>' + l[478] + '</th></tr>';
             if (account.purchases.length) {
                 var intl = mega.intl.number;
@@ -2031,43 +2040,54 @@ accountUI.plan = {
                     var dateTime = time2date(purchaseTransaction[1]);
                     var price = purchaseTransaction[2];
                     var proNum = purchaseTransaction[5];
+                    var planIcon;
                     var numOfMonths = purchaseTransaction[6];
                     var monthWording = (numOfMonths === 1) ? l[931] : 'months';  // Todo: l[6788] when generated
                     var item = pro.getProPlanName(proNum) + ' (' + numOfMonths + ' ' + monthWording + ')';
 
+                    if (proNum === 4) {
+                        planIcon = 'lite';
+                    }
+                    else if (proNum === 100) {
+                        planIcon = 'business';
+                    }
+                    else {
+                        planIcon = 'pro-' + proNum;
+                    }
+
                     // Render table row
                     html += '<tr>'
-                        + '<td>' + dateTime + '</td>'
-                        + '<td>'
-                        + '<span class="fm-member-icon">'
-                        + '<i class="small-icon membership pro' + proNum + '"></i>'
-                        + '</span>'
-                        + '<span class="fm-member-icon-txt"> ' + item + '</span>'
-                        + '</td>'
-                        + '<td>&euro;' + escapeHTML(intl.format(price)) + '</td>'
-                        + '<td>' + paymentMethod + '</td>'
+                        + '<td><div class="label-with-icon">'
+                        + '<i class="sprite-fm-uni icon-crest-' + planIcon + '"></i>'
+                        + '<span> ' + item + '</span>'
+                        + '</div></td>'
+                        + '<td><span>' + dateTime + '</span></td>'
+                        + '<td><span>&euro;' + escapeHTML(intl.format(price)) + '</span></td>'
+                        + '<td><span>' + paymentMethod + '</span></td>'
                         + '</tr>';
                 });
             }
             else {
-                html += '<tr><td colspan="4" class="grid-table-empty">' + l[20140] + '</td></tr>';
+                html += '<tr><td colspan="4" class="data-table-empty"><span>' + l[20140] + '</span></td></tr>';
             }
 
-            $('.grid-table.purchases').safeHTML(html);
+            $('.data-table.purchases', accountUI.$contentBlock).safeHTML(html);
         },
 
         renderTransaction: function(account) {
 
             'use strict';
 
+            var $transactionSelect = $('.dropdown-input.transactions', accountUI.$contentBlock);
+
             if (!$.transactionlimit) {
                 $.transactionlimit = 10;
             }
 
-            $('.account-history-dropdown-button.transactions').text(l[471].replace('[X]', $.transactionlimit));
-            $('.account-history-drop-items.transaction10-').text(l[471].replace('[X]', 10));
-            $('.account-history-drop-items.transaction100-').text(l[471].replace('[X]', 100));
-            $('.account-history-drop-items.transaction250-').text(l[471].replace('[X]', 250));
+            $('span', $transactionSelect).text(l[471].replace('[X]', $.transactionlimit));
+            $('.transaction10-', $transactionSelect).text(l[471].replace('[X]', 10));
+            $('.transaction100-', $transactionSelect).text(l[471].replace('[X]', 100));
+            $('.transaction250-', $transactionSelect).text(l[471].replace('[X]', 250));
 
             M.account.transactions.sort(function(a, b) {
                 if (a[1] < b[1]) {
@@ -2078,7 +2098,7 @@ accountUI.plan = {
                 }
             });
 
-            $('.grid-table.transactions tr').remove();
+            $('.data-table.transactions tr', accountUI.$contentBlock).remove();
             var html = '<tr><th>' + l[475] + '</th><th>' + l[484] +
                 '</th><th>' + l[485] + '</th><th>' + l[486] + '</th></tr>';
             if (account.transactions.length) {
@@ -2093,38 +2113,33 @@ accountUI.plan = {
                     var debit = '';
 
                     if (el[2] > 0) {
-                        credit = '<span class="green">&euro;' + escapeHTML(intl.format(el[2])) + '</span>';
+                        credit = '<span class="green-label">&euro;' + escapeHTML(intl.format(el[2])) + '</span>';
                     }
                     else {
-                        debit = '<span class="red">&euro;' + escapeHTML(intl.format(el[2])) + '</span>';
+                        debit = '<span class="red-label">&euro;' + escapeHTML(intl.format(el[2])) + '</span>';
                     }
                     html += '<tr><td>' + time2date(el[1]) + '</td><td>' + htmlentities(el[0]) + '</td><td>'
                         + credit + '</td><td>' + debit + '</td></tr>';
                 });
             }
             else {
-                html += '<tr><td colspan="4" class="grid-table-empty">' + l[20140] + '</td></tr>';
+                html += '<tr><td colspan="4" class="data-table-empty">' + l[20140] + '</td></tr>';
             }
 
-            $('.grid-table.transactions').safeHTML(html);
+            $('.data-table.transactions', accountUI.$contentBlock).safeHTML(html);
         },
 
         bindEvents: function() {
 
             'use strict';
 
-            $('.fm-account-plan .account-history-dropdown-button').rebind('click', function() {
+            var $planSection = $('.fm-account-plan', accountUI.$contentBlock);
+            var $planSelects = $('.dropdown-input', $planSection);
 
-                $(this).addClass('active');
-                $('.account-history-dropdown').addClass('hidden');
-                $(this).next().removeClass('hidden');
-            });
+            // Bind Dropdowns events
+            bindDropdownEvents($planSelects);
 
-            $('.fm-account-plan .account-history-drop-items').rebind('click', function() {
-
-                var $parent = $(this).parent();
-                $parent.find('.account-history-drop-items').removeClass('active');
-                $parent.prev('.account-history-dropdown-button').text($(this).text()).removeClass('active');
+            $('.mega-input-dropdown .option', $planSection).rebind('click.accountSection', function() {
 
                 var c = $(this).attr('class') ? $(this).attr('class') : '';
 
@@ -2148,8 +2163,6 @@ accountUI.plan = {
                     $.transactionlimit = 250;
                 }
 
-                $(this).addClass('active');
-                $(this).closest('.account-history-dropdown').addClass('hidden');
                 accountUI();
             });
         }
@@ -2182,13 +2195,14 @@ accountUI.notifications = {
         }
 
         // Handle account notification switches
-        var $NToggleAll = $('.fm-account-notifications .account-notification .dialog-feature-toggle.toggle-all');
-        var $NToggle = $('.fm-account-notifications .account-notification .switch-container .dialog-feature-toggle');
+        var $notifictionContent = $('.fm-account-notifications', accountUI.$contentBlock);
+        var $NToggleAll = $('.account-notification .mega-switch.toggle-all', $notifictionContent);
+        var $NToggle = $('.account-notification .switch-container .mega-switch', $notifictionContent);
 
         // Toggle Individual Notifications
         $NToggle.each(function() {
             var $this = $(this);
-            var $section = $this.parents('.switch-container');
+            var $section = $this.closest('.switch-container');
             var sectionName = accountUI.notifications.getSectionName($section);
 
             accountUI.inputs.switch.init(
@@ -2217,7 +2231,7 @@ accountUI.notifications = {
             function(val) {
                 $NToggle.each(function() {
                     var $this = $(this);
-                    var $section = $this.parents('.switch-container');
+                    var $section = $this.closest('.switch-container');
                     var sectionName = accountUI.notifications.getSectionName($section);
                     var notifChange = val ? mega.notif.set : mega.notif.unset;
                     notifChange($this.attr('name'), sectionName);
@@ -2233,14 +2247,14 @@ accountUI.notifications = {
         }
 
         // Handle email notification switches.
-        var $EToggleAll = $('.fm-account-notifications .email-notification .dialog-feature-toggle.toggle-all');
-        var $EToggle = $('.fm-account-notifications .email-notification .switch-container .dialog-feature-toggle');
+        var $EToggleAll = $('.email-notification .mega-switch.toggle-all', $notifictionContent);
+        var $EToggle = $('.email-notification .switch-container .mega-switch', $notifictionContent);
 
         mega.enotif.all().then(function(enotifStates) {
             // Toggle Individual Emails
             $EToggle.each(function() {
                 var $this = $(this);
-                var $section = $this.parents('.switch-container');
+                var $section = $this.closest('.switch-container');
                 var emailId = $this.attr('name');
 
                 accountUI.inputs.switch.init(
@@ -2258,7 +2272,7 @@ accountUI.notifications = {
             // All Email Notifications Switch
             accountUI.inputs.switch.init(
                 '#' + $EToggleAll[0].id,
-                $EToggleAll.parents('.settings-sub-section'),
+                $EToggleAll.closest('.settings-sub-section'),
                 $EToggle.hasClass('toggle-on'),
                 function(val) {
                     mega.enotif.setAllState(!val);
@@ -2364,6 +2378,9 @@ accountUI.security = {
 
             "use strict";
 
+            var $securitySection = $('.fm-account-security', accountUI.$contentBlock);
+            var $sessionSelect = $('.dropdown-input.sessions', $securitySection);
+
             if (d) {
                 console.log('Render session history');
             }
@@ -2372,10 +2389,10 @@ accountUI.security = {
                 $.sessionlimit = 10;
             }
 
-            $('.account-history-dropdown-button.sessions').text(l[472].replace('[X]', $.sessionlimit));
-            $('.account-history-drop-items.session10-').text(l[472].replace('[X]', 10));
-            $('.account-history-drop-items.session100-').text(l[472].replace('[X]', 100));
-            $('.account-history-drop-items.session250-').text(l[472].replace('[X]', 250));
+            $('span', $sessionSelect).text(l[472].replace('[X]', $.sessionlimit));
+            $('.session10-', $sessionSelect).text(l[472].replace('[X]', 10));
+            $('.session100-', $sessionSelect).text(l[472].replace('[X]', 100));
+            $('.session250-', $sessionSelect).text(l[472].replace('[X]', 250));
 
             M.account.sessions.sort(function(a, b) {
                 if (a[7] !== b[7]) {
@@ -2387,9 +2404,9 @@ accountUI.security = {
                 return a[0] < b[0] ? 1 : -1;
             });
 
-            $('#sessions-table-container').empty();
+            $('#sessions-table-container', $securitySection).empty();
             var html =
-                '<table width="100%" border="0" cellspacing="0" cellpadding="0" class="grid-table sessions">' +
+                '<table width="100%" border="0" cellspacing="0" cellpadding="0" class="data-table sessions">' +
                 '<tr><th>' + l[19303] + '</th><th>' + l[480] + '</th><th>' + l[481] + '</th><th>' + l[482] + '</th>' +
                 '<th class="no-border session-status">' + l[7664] + '</th>' +
                 '<th class="no-border logout-column">&nbsp;</th></tr>';
@@ -2413,14 +2430,14 @@ accountUI.security = {
                 html += this.getHtml(session);
             }
 
-            $('#sessions-table-container').safeHTML(html + '</table>');
+            $('#sessions-table-container', $securitySection).safeHTML(html + '</table>');
 
             // Don't show button to close other sessions if there's only the current session
             if (numActiveSessions === 1) {
-                $('.fm-close-all-sessions').hide();
+                $('.fm-close-all-sessions', $securitySection).addClass('hidden');
             }
             else {
-                $('.fm-close-all-sessions').show();
+                $('.fm-close-all-sessions', $securitySection).removeClass('hidden');
             }
         },
 
@@ -2428,20 +2445,26 @@ accountUI.security = {
 
             'use strict';
 
-            $('.fm-close-all-sessions').rebind('click', function() {
+            var $securitySection = $('.fm-account-security', accountUI.$contentBlock);
+            var $sessionSelect = $('.dropdown-input.sessions', $securitySection);
+
+            // Bind Dropdowns events
+            bindDropdownEvents($sessionSelect);
+
+            $('.fm-close-all-sessions', $securitySection).rebind('click.accountSection', function() {
                 msgDialog('confirmation', '', l[18513], false, function(e) {
                     if (e) {
                         loadingDialog.show();
-                        var $activeSessionsRows = $('.active-session-txt').parents('tr');
+                        var $activeSessionsRows = $('.active-session-txt', $securitySection).parents('tr');
                         // Expire all sessions but not the current one
                         api_req({a: 'usr', ko: 1}, {
                             callback: function() {
                                 M.account = null;
                                 /* clear account cache */
-                                $activeSessionsRows.find('.settings-logout').remove();
-                                $activeSessionsRows.find('.active-session-txt')
+                                $('.settings-logout', $activeSessionsRows).remove();
+                                $('.active-session-txt', $activeSessionsRows)
                                     .removeClass('active-session-txt').addClass('expired-session-txt').text(l[25016]);
-                                $('.fm-close-all-sessions').hide();
+                                $('.fm-close-all-sessions', $securitySection).addClass('hidden');
                                 loadingDialog.hide();
                             }
                         });
@@ -2449,7 +2472,7 @@ accountUI.security = {
                 });
             });
 
-            $('.settings-logout').rebind('click', function() {
+            $('.settings-logout', $securitySection).rebind('click.accountSection', function() {
 
                 var $this = $(this).parents('tr');
                 var sessionId = $this.attr('class');
@@ -2476,18 +2499,7 @@ accountUI.security = {
                 }
             });
 
-            $('.fm-account-security .account-history-dropdown-button').rebind('click', function() {
-
-                $(this).addClass('active');
-                $('.account-history-dropdown').addClass('hidden');
-                $(this).next().removeClass('hidden');
-            });
-
-            $('.fm-account-security .account-history-drop-items').rebind('click', function() {
-
-                $(this).parent().prev().removeClass('active');
-                $(this).parent().find('.account-history-drop-items').removeClass('active');
-                $(this).parent().parent().find('.account-history-dropdown-button').text($(this).text());
+            $('.mega-input-dropdown .option', $securitySection).rebind('click.accountSection', function() {
 
                 var c = $(this).attr('class') ? $(this).attr('class') : '';
 
@@ -2501,8 +2513,6 @@ accountUI.security = {
                     $.sessionlimit = 250;
                 }
 
-                $(this).addClass('active');
-                $(this).closest('.account-history-dropdown').addClass('hidden');
                 accountUI();
             });
         },
@@ -2526,7 +2536,7 @@ accountUI.security = {
             var ipAddress = htmlentities(el[3]);
             var country = countrydetails(el[4]);
             var sessionId = el[6];
-            var status = '<span class="current-session-txt">' + l[7665] + '</span>';    // Current
+            var status = '<span class="status-label green">' + l[7665] + '</span>';    // Current
 
             // Show if using an extension e.g. "Firefox on Linux (+Extension)"
             if (browser.isExtension) {
@@ -2536,10 +2546,10 @@ accountUI.security = {
             // If not the current session
             if (!currentSession) {
                 if (activeSession) {
-                    status = '<span class="active-session-txt">' + l[23754] + '</span>';     // Logged-in
+                    status = '<span class="status-label blue">' + l[23754] + '</span>';     // Logged-in
                 }
                 else {
-                    status = '<span class="expired-session-txt">' + l[25016] + '</span>';    // Expired
+                    status = '<span class="status-label">' + l[25016] + '</span>';    // Expired
                 }
             }
 
@@ -2550,21 +2560,24 @@ accountUI.security = {
 
             // Generate row html
             var html = '<tr class="' + (currentSession ? "current" : sessionId) + '">'
-                + '<td class="browser-os"><span class="fm-browsers-icon"><img title="'
+                + '<td><div class="label-with-icon"><img title="'
                 + escapeHTML(userAgent.replace(/\s*megext/i, ''))
                 + '" src="' + staticpath + 'images/browser-icons/' + browser.icon
-                + '" /></span><span class="fm-browsers-txt">' + htmlentities(browserName)
-                + '</span></td>'
-                + '<td class="ip-addr">' + ipAddress + '</td>'
-                + '<td><span class="fm-flags-icon"><img alt="" src="' + staticpath + 'images/flags/'
-                + country.icon + '" style="margin-left: 0px;" /></span><span class="fm-flags-txt">'
-                + htmlentities(country.name) + '</span></td>'
-                + '<td class="date-time">' + dateTime + '</td>'
+                + '" /><span title="' + htmlentities(browserName) + '">' + htmlentities(browserName)
+                + '</span></div></td>'
+                + '<td><span class="break-word" title="' + ipAddress + '">' + ipAddress + '</span></td>'
+                + '<td><div class="label-with-icon"><img alt="" src="' + staticpath + 'images/flags/'
+                + country.icon + '" title="' + htmlentities(country.name) + '" /><span>'
+                + htmlentities(country.name) + '</span></div></td>'
+                + '<td><span>' + dateTime + '</span></td>'
                 + '<td>' + status + '</td>';
 
             // If the session is active show logout button
             if (activeSession) {
-                html += '<td>' + '<span class="settings-logout">' + l[967] + '</span>' + '</td></tr>';
+                html += '<td>'
+                    + '<button class="mega-button small top-login-button settings-logout">'
+                    + '<div><i class="sprite-fm-mono icon-logout"></i></div><span>' + l[967] + '</span>'
+                    + '</button></td></tr>';
             }
             else {
                 html += '<td>&nbsp;</td></tr>';
@@ -2590,10 +2603,11 @@ accountUI.security = {
 
                 M.refreshSessionList(function() {
                     var fSession = M.account.sessions[0];
-                    var DomList =  $('.grid-table.sessions').find('tr');
+                    var domList =  document.querySelectorAll('.data-table.sessions tr');
+
                     // update table when it has new active session or forced
-                    if (fSession && (($(DomList[1]).hasClass('current') && !fSession[5])
-                        || !$(DomList[1]).hasClass(fSession[6])) || force) {
+                    if (fSession && (($(domList[1]).hasClass('current') && !fSession[5])
+                        || !$(domList[1]).hasClass(fSession[6])) || force) {
                         if (d) {
                             console.log('Update session history table');
                         }
@@ -2646,7 +2660,7 @@ accountUI.fileManagement = {
 
             accountUI.inputs.switch.init(
                 '#versioning-status',
-                $('#versioning-status').parent(),
+                $('#versioning-status', accountUI.$contentBlock).parent(),
                 !fileversioning.dvState,
                 setVersioningAttr,
                 function(val) {
@@ -2675,7 +2689,7 @@ accountUI.fileManagement = {
 
             'use strict';
 
-            $('#delete-all-versions').rebind('click', function() {
+            $('#delete-all-versions', accountUI.$contentBlock).rebind('click', function() {
 
                 if (!$(this).hasClass('disabled')) {
                     msgDialog('remove', l[1003], l[17581], l[1007], function(e) {
@@ -2709,31 +2723,30 @@ accountUI.fileManagement = {
                 console.log('Render rubbish bin schedule');
             }
 
-            var $rubschedParent = $('#rubsched').parent();
-            var $rubschedGreenNoti = $('.rub-grn-noti');
-            var $rubschedOptions = $('.rubsched-options');
+            var $rubschedParent = $('#rubsched', accountUI.$contentBlock).parent();
+            var $rubschedGreenNoti = $('.rub-grn-noti', accountUI.$contentBlock);
+            var $rubschedOptions = $('.rubsched-options', accountUI.$contentBlock);
 
             var initRubschedSwitch = function(defaultValue) {
                 accountUI.inputs.switch.init(
                     '#rubsched',
-                    $('#rubsched').parent(),
+                    $('#rubsched', accountUI.$contentBlock).parent(),
                     defaultValue,
                     function(val) {
                         if (val) {
-                            $('#rubsched').parents('.slide-in-out').removeClass('closed');
+                            $('#rubsched', accountUI.$contentBlock).closest('.slide-in-out').removeClass('closed');
                             $rubschedParent.addClass('border');
-                            setTimeout(initAccountScroll, 301);
 
                             if (!fmconfig.rubsched) {
                                 var defValue = u_attr.p ? 90 : 30;
                                 var defOption = 14;
                                 mega.config.setn('rubsched', defOption + ":" + defValue);
-                                $('#rad' + defOption + '_opt').val(defValue);
+                                $('#rad' + defOption + '_opt', accountUI.$contentBlock).val(defValue);
                             }
                         }
                         else {
                             mega.config.setn('rubsched', 0);
-                            $('#rubsched').parents('.slide-in-out').addClass('closed');
+                            $('#rubsched', accountUI.$contentBlock).closest('.slide-in-out').addClass('closed');
                             $rubschedParent.removeClass('border');
                         }
                     });
@@ -2741,12 +2754,12 @@ accountUI.fileManagement = {
 
             if (u_attr.flags.ssrs > 0) { // Server side scheduler - new
                 $rubschedOptions.removeClass('hidden');
-                $('.rubschedopt').addClass('hidden');
-                $('.rubschedopt-none').addClass('hidden');
+                $('.rubschedopt', accountUI.$contentBlock).addClass('hidden');
+                $('.rubschedopt-none', accountUI.$contentBlock).addClass('hidden');
 
                 var value = account.ssrs ? account.ssrs : (u_attr.p ? 90 : 30);
 
-                $('#rad14_opt').val(value);
+                $('#rad14_opt', accountUI.$contentBlock).val(value);
 
                 if (!value) {
                     $rubschedOptions.addClass('hidden');
@@ -2756,8 +2769,9 @@ accountUI.fileManagement = {
                 if (u_attr.p) {
                     $rubschedParent.removeClass('hidden');
                     $rubschedGreenNoti.addClass('hidden');
-                    $('.rubbish-desc').text(l[18685]).removeClass('hidden');
-                    $('.account.rubbish-cleaning .settings-right-block').addClass('slide-in-out');
+                    $('.rubbish-desc', accountUI.$contentBlock).text(l[18685]).removeClass('hidden');
+                    $('.account.rubbish-cleaning .settings-right-block', accountUI.$contentBlock)
+                        .addClass('slide-in-out');
 
                     if (account.ssrs) {
                         $rubschedParent.addClass('border').parent().removeClass('closed');
@@ -2771,8 +2785,9 @@ accountUI.fileManagement = {
                 else {
                     $rubschedParent.addClass('hidden');
                     $rubschedGreenNoti.removeClass('hidden');
-                    $('.rubbish-desc').text(l[18686]).removeClass('hidden');
-                    $('.account.rubbish-cleaning .settings-right-block').removeClass('slide-in-out');
+                    $('.rubbish-desc', accountUI.$contentBlock).text(l[18686]).removeClass('hidden');
+                    $('.account.rubbish-cleaning .settings-right-block', accountUI.$contentBlock)
+                        .removeClass('slide-in-out');
                 }
             }
             else { // Client side scheduler - old
@@ -2788,14 +2803,14 @@ accountUI.fileManagement = {
                 if (fmconfig.rubsched) {
                     $rubschedParent.addClass('border').parent().removeClass('closed');
                     $rubschedOptions.removeClass('hidden');
-                    $('.rubschedopt').removeClass('hidden');
+                    $('.rubschedopt', accountUI.$contentBlock).removeClass('hidden');
 
                     var opt = String(fmconfig.rubsched).split(':');
-                    $('#rad' + opt[0] + '_opt').val(opt[1]);
+                    $('#rad' + opt[0] + '_opt', accountUI.$contentBlock).val(opt[1]);
 
                     accountUI.inputs.radio.init(
                         '.rubschedopt',
-                        $('.rubschedopt').parent(),
+                        $('.rubschedopt', accountUI.$contentBlock).parent(),
                         opt[0],
                         function (val) {
                             mega.config.setn('rubsched', val + ":" + $('#rad' + val + '_opt').val());
@@ -2811,7 +2826,7 @@ accountUI.fileManagement = {
 
             'use strict';
 
-            $('.rubsched_textopt').rebind('click.rs blur.rs keypress.rs', function(e) {
+            $('.rubsched_textopt', accountUI.$contentBlock).rebind('click.rs blur.rs keypress.rs', function(e) {
 
                 // Do not save value until user leave input or click Enter button
                 if (e.which && e.which !== 13) {
@@ -2869,7 +2884,7 @@ accountUI.fileManagement = {
 
             accountUI.inputs.switch.init(
                 '#ulddd',
-                $('#ulddd').parent(),
+                $('#ulddd', accountUI.$contentBlock).parent(),
                 !mega.config.get('ulddd'),
                 function(val) {
                     mega.config.setn('ulddd', val ? undefined : 1);
@@ -2884,7 +2899,7 @@ accountUI.transfers = {
 
         'use strict';
 
-        this.$page = $('.fm-account-sections.fm-account-transfers');
+        this.$page = $('.fm-account-sections.fm-account-transfers', accountUI.$contentBlock);
 
         // Upload and Download - Bandwidth
         this.uploadAndDownload.bandwidth.render(account);
@@ -2918,7 +2933,7 @@ accountUI.transfers = {
                 if (u_attr.p && !u_attr.b) {
                     var bandwidthLimit = Math.round(account.servbw_limit | 0);
 
-                    $('#bandwidth-slider').slider({
+                    var $slider = $('#bandwidth-slider').slider({
                         min: 0, max: 100, range: 'min', value: bandwidthLimit,
                         change: function(e, ui) {
                             if (M.currentdirid === 'account/transfers') {
@@ -2952,26 +2967,30 @@ accountUI.transfers = {
                             }
                         },
                         slide: function(e, ui) {
-                            $('.slider-percentage span').text(ui.value + ' %');
+                            $('.slider-percentage span', accountUI.$contentBlock).text(ui.value + ' %');
 
                             if (ui.value > 90) {
-                                $('.slider-percentage span').addClass('warn bold');
+                                $('.slider-percentage span', accountUI.$contentBlock).addClass('warn bold');
                             }
                             else {
-                                $('.slider-percentage span').removeClass('bold warn');
+                                $('.slider-percentage span', accountUI.$contentBlock).removeClass('bold warn');
                             }
                         }
                     });
-                    $('.slider-percentage span').text(bandwidthLimit + ' %');
-                    $('.bandwith-settings').removeClass('disabled').addClass('border');
-                    $('.slider-percentage-bl').removeClass('hidden');
-                    $('.band-grn-noti').addClass('hidden');
+
+                    $('.ui-slider-handle', $slider).addClass('sprite-fm-mono icon-arrow-left ' +
+                        'sprite-fm-mono-after icon-arrow-right-after');
+
+                    $('.slider-percentage span', accountUI.$contentBlock).text(bandwidthLimit + ' %');
+                    $('.bandwith-settings', accountUI.$contentBlock).removeClass('disabled').addClass('border');
+                    $('.slider-percentage-bl', accountUI.$contentBlock).removeClass('hidden');
+                    $('.band-grn-noti', accountUI.$contentBlock).addClass('hidden');
                 }
                 // Business account
                 else if (u_attr.b) {
-                    $('.bandwith-settings').addClass('hidden');
-                    $('.slider-percentage-bl').addClass('hidden');
-                    $('.band-grn-noti').addClass('hidden');
+                    $('.bandwith-settings', accountUI.$contentBlock).addClass('hidden');
+                    $('.slider-percentage-bl', accountUI.$contentBlock).addClass('hidden');
+                    $('.band-grn-noti', accountUI.$contentBlock).addClass('hidden');
                 }
             }
         },
@@ -2982,8 +3001,10 @@ accountUI.transfers = {
 
                 'use strict';
 
+                var $uploadSettings = $('.upload-settings', accountUI.$contentBlock);
+
                 // Parallel upload slider
-                $('#slider-range-max').slider({
+                var $slider = $('#slider-range-max', $uploadSettings).slider({
                     min: 1, max: 6, range: "min", value: fmconfig.ul_maxSlots || 4,
                     change: function(e, ui) {
                         if (M.currentdirid === 'account/transfers' && ui.value !== fmconfig.ul_maxSlots) {
@@ -2992,36 +3013,41 @@ accountUI.transfers = {
                         }
                     },
                     slide: function(e, ui) {
-                        $('.download-settings .numbers.active').removeClass('active');
-                        $('.download-settings .numbers.val' + ui.value).addClass('active');
+                        $('.numbers.active', $uploadSettings).removeClass('active');
+                        $('.numbers:nth-child(' + ui.value + ')', $uploadSettings)
+                            .addClass('active');
                     }
                 });
 
-                $('.upload-settings .numbers.active').removeClass('active');
-                $('.upload-settings .numbers.val' + $('#slider-range-max').slider('value')).addClass('active');
+                $('.ui-slider-handle', $slider).addClass('sprite-fm-mono icon-arrow-left ' +
+                    'sprite-fm-mono-after icon-arrow-right-after');
+
+                $('.numbers.active', $uploadSettings).removeClass('active');
+                $(' .numbers:nth-child(' + $slider.slider('value') + ')', $uploadSettings)
+                    .addClass('active');
 
                 // Speed limit
                 fmconfig.ul_maxSpeed = fmconfig.ul_maxSpeed || 0;
                 var currentVal = parseInt(fmconfig.ul_maxSpeed) < 1 ? fmconfig.ul_maxSpeed : 1;
 
                 if (currentVal === 1) {
-                    $('#ulspeedvalue').val(fmconfig.ul_maxSpeed / 1024);
+                    $('#ulspeedvalue', accountUI.$contentBlock).val(fmconfig.ul_maxSpeed / 1024);
                 }
-                else if (!$('#ulspeedvalue').val()){
-                    $('#ulspeedvalue').val(100);
+                else if (!$('#ulspeedvalue', accountUI.$contentBlock).val()){
+                    $('#ulspeedvalue', accountUI.$contentBlock).val(100);
                 }
 
                 accountUI.inputs.radio.init(
                     '.ulspeedradio',
-                    $('.ulspeedradio').parent(),
+                    $('.ulspeedradio', accountUI.$contentBlock).parent(),
                     currentVal,
                     function (val) {
                         val = parseInt(val);
                         var ul_maxSpeed = val;
 
                         if (val === 1) {
-                            if (parseInt($('#ulspeedvalue').val()) > 0) {
-                                ul_maxSpeed = parseInt($('#ulspeedvalue').val()) * 1024;
+                            if (parseInt($('#ulspeedvalue', accountUI.$contentBlock).val()) > 0) {
+                                ul_maxSpeed = parseInt($('#ulspeedvalue', accountUI.$contentBlock).val()) * 1024;
                             }
                             else {
                                 ul_maxSpeed = 100 * 1024;
@@ -3037,12 +3063,13 @@ accountUI.transfers = {
 
                 'use strict';
 
-                $('#ulspeedvalue').rebind('click.speedValueClick keyup.speedValueKeyup', function() {
+                $('#ulspeedvalue', accountUI.$contentBlock)
+                    .rebind('click.speedValueClick keyup.speedValueKeyup', function() {
 
-                    $('.ulspeedradio').removeClass('radioOn').addClass('radioOff');
-                    $('#rad3,#rad3_div').addClass('radioOn').removeClass('radioOff');
-                    $('#rad3').trigger('click');
-                });
+                        $('.ulspeedradio', accountUI.$contentBlock).removeClass('radioOn').addClass('radioOff');
+                        $('#rad3,#rad3_div', accountUI.$contentBlock).addClass('radioOn').removeClass('radioOff');
+                        $('#rad3', accountUI.$contentBlock).trigger('click');
+                    });
             }
         },
 
@@ -3052,8 +3079,10 @@ accountUI.transfers = {
 
                 'use strict';
 
+                var $downloadSettings = $('.download-settings', accountUI.$contentBlock);
+
                 // Parallel download slider
-                $('#slider-range-max2').slider({
+                var $slider = $('#slider-range-max2', $downloadSettings).slider({
                     min: 1, max: 6, range: "min", value: fmconfig.dl_maxSlots || 4,
                     change: function(e, ui) {
                         if (M.currentdirid === 'account/transfers' && ui.value !== fmconfig.dl_maxSlots) {
@@ -3062,13 +3091,18 @@ accountUI.transfers = {
                         }
                     },
                     slide: function(e, ui) {
-                        $('.upload-settings .numbers.active').removeClass('active');
-                        $('.upload-settings .numbers.val' + ui.value).addClass('active');
+                        $('.numbers.active', $downloadSettings).removeClass('active');
+                        $('.numbers:nth-child(' + ui.value + ')', $downloadSettings)
+                            .addClass('active');
                     }
                 });
 
-                $('.download-settings .numbers.active').removeClass('active');
-                $('.download-settings .numbers.val' + $('#slider-range-max2').slider('value')).addClass('active');
+                $('.ui-slider-handle', $slider).addClass('sprite-fm-mono icon-arrow-left ' +
+                    'sprite-fm-mono-after icon-arrow-right-after');
+
+                $('.numbers.active', $downloadSettings).removeClass('active');
+                $('.numbers:nth-child(' + $slider.slider('value') + ')', $downloadSettings)
+                    .addClass('active');
             }
         }
     },
@@ -3085,7 +3119,7 @@ accountUI.transfers = {
 
                 accountUI.inputs.switch.init(
                     '#dlThroughMEGAsync',
-                    $('#dlThroughMEGAsync').parent(),
+                    $('#dlThroughMEGAsync', accountUI.$contentBlock).parent(),
                     fmconfig.dlThroughMEGAsync,
                     function(val) {
                         mega.config.setn('dlThroughMEGAsync', val);
@@ -3100,10 +3134,10 @@ accountUI.transfers = {
                 megasync.isInstalled(function(err, is) {
 
                     if (!err && is) {
-                        $('.green-notification', $section).addClass('hidden');
+                        $('.mega-banner', $section).addClass('hidden');
                     }
                     else {
-                        $('.green-notification', $section).removeClass('hidden');
+                        $('.mega-banner', $section).removeClass('hidden');
                     }
                 });
             }
@@ -3114,7 +3148,7 @@ accountUI.transfers = {
 
         'use strict';
 
-        if (is_chrome_firefox && !$('#acc_dls_folder').length) {
+        if (is_chrome_firefox && !$('#acc_dls_folder', accountUI.$contentBlock).length) {
             $('.fm-account-transfers').safeAppend(
                 '<div class="account data-block">' +
                 '<div class="settings-left-block">' +
@@ -3125,8 +3159,8 @@ accountUI.transfers = {
                 'button;margin-right:12px;cursor:pointer" />' +
                 '</div></div></div>');
             var fld = mozGetDownloadsFolder();
-            $('#acc_dls_folder').append($('<span/>').text(fld && fld.path));
-            $('#acc_dls_folder input').click(function() {
+            $('#acc_dls_folder', accountUI.$contentBlock).safeAppend($('<span/>').text(fld && fld.path));
+            $('#acc_dls_folder input', accountUI.$contentBlock).click(function() {
 
                 var fs = mozFilePicker(0, 2);
                 if (fs) {
@@ -3159,7 +3193,6 @@ accountUI.contactAndChat = {
             return true;
         }
         loadingDialog.hide();
-        $.tresizer();
 
         var presenceInt = megaChat.plugins.presencedIntegration;
 
@@ -3193,7 +3226,7 @@ accountUI.contactAndChat = {
             'use strict';
 
             // Chat
-            var $sectionContainerChat = $('.fm-account-contact-chats');
+            var $sectionContainerChat = $('.fm-account-contact-chats', accountUI.$contentBlock);
             // Status appearance radio buttons
             accountUI.inputs.radio.init(
                 '.chatstatus',
@@ -3224,14 +3257,16 @@ accountUI.contactAndChat = {
 
                 // Prevent changes to autoaway if autoawaylock is set
                 if (autoawaylock === true) {
-                    $('#auto-away-switch').addClass('diabled').parent().addClass('hidden');
+                    $('#auto-away-switch', $sectionContainerChat).addClass('diabled')
+                        .parent().addClass('hidden');
                 }
                 else {
-                    $('#auto-away-switch').removeClass('diabled').parent().removeClass('hidden');
+                    $('#auto-away-switch', $sectionContainerChat).removeClass('diabled')
+                        .parent().removeClass('hidden');
                 }
 
                 // Auto-away input box
-                $('input#autoaway').val(autoawaytimeout / 60);
+                $('input#autoaway', $sectionContainerChat).val(autoawaytimeout / 60);
 
                 // Always editable for user comfort -
                 accountUI.controls.enableElement($('input#autoaway', $sectionContainerChat));
@@ -3262,7 +3297,7 @@ accountUI.contactAndChat = {
             'use strict';
 
             if (autoawaytimeout !== false) {
-                var $sectionContainerChat = $('.fm-account-contact-chats');
+                var $sectionContainerChat = $('.fm-account-contact-chats', accountUI.$contentBlock);
                 var lastValidNumber = Math.floor(autoawaytimeout / 60);
 
                 // when value is changed, set checkmark
@@ -3322,7 +3357,6 @@ accountUI.contactAndChat = {
         DOM: {
             container: '.fm-account-main',
             toggle: '#push-settings-toggle',
-            button: '#push-settings-button',
             dialog: '.push-settings-dialog',
             status: '.push-settings-status',
         },
@@ -3494,8 +3528,7 @@ accountUI.contactAndChat = {
         bindEvents: function() {
             'use strict';
             $(this.DOM.toggle, this.DOM.container).rebind('click.dndToggleSwitch', this.handleToggle.bind(this));
-            $(this.DOM.button, this.DOM.container).rebind('click.dndDialogOpen', this.handleDialogOpen.bind(this));
-            $('.fm-dialog-close, .push-settings-close', this.DOM.dialog).rebind('click.dndDialogClose', closeDialog);
+            $('button.js-close, .push-settings-close', this.DOM.dialog).rebind('click.dndDialogClose', closeDialog);
         },
 
         /**
@@ -3590,6 +3623,9 @@ accountUI.reseller = {
 
             'use strict';
 
+            var $resellerSection = $('.fm-account-reseller', accountUI.$contentBlock);
+            var $vouchersSelect = $('.dropdown-input.vouchers',  $resellerSection);
+
             if (!$.voucherlimit) {
                 $.voucherlimit = 10;
             }
@@ -3602,11 +3638,11 @@ accountUI.reseller = {
             // Use 'All' or 'Last 10/100/250' for the dropdown text
             var buttonText = ($.voucherlimit === 'all') ? l[7557] : l['466a'].replace('[X]', $.voucherlimit);
 
-            $('.account-history-dropdown-button.vouchers').text(buttonText);
-            $('.fm-account-reseller .balance span').safeHTML('@@ &euro; ', account.balance[0][0]);
-            $('.account-history-drop-items.voucher10-').text(l['466a'].replace('[X]', 10));
-            $('.account-history-drop-items.voucher100-').text(l['466a'].replace('[X]', 100));
-            $('.account-history-drop-items.voucher250-').text(l['466a'].replace('[X]', 250));
+            $('span', $vouchersSelect).text(buttonText);
+            $('.balance span', $resellerSection).safeHTML('@@ &euro; ', account.balance[0][0]);
+            $('.voucher10-', $vouchersSelect).text(l['466a'].replace('[X]', 10));
+            $('.voucher100-', $vouchersSelect).text(l['466a'].replace('[X]', 100));
+            $('.voucher250-', $vouchersSelect).text(l['466a'].replace('[X]', 250));
 
             // Sort vouchers by most recently created at the top
             M.account.vouchers.sort(function(a, b) {
@@ -3619,7 +3655,7 @@ accountUI.reseller = {
                 }
             });
 
-            $('.grid-table.vouchers tr').remove();
+            $('.data-table.vouchers tr', $resellerSection).remove();
 
             var html = '<tr><th>' + l[475] + '</th><th>' + l[7714] + '</th><th>' + l[477]
                 + '</th><th>' + l[488] + '</th></tr>';
@@ -3644,13 +3680,15 @@ accountUI.reseller = {
 
                 var voucherLink = 'https://mega.nz/#voucher' + htmlentities(el.code);
 
-                html += '<tr><td>' + time2date(el.date) + '</td><td class="selectable">' + voucherLink
-                    + '</td><td>&euro; ' + htmlentities(el.amount) + '</td><td>' + status + '</td></tr>';
+                html += '<tr><td><span>' + time2date(el.date) + '</span></td>'
+                    + '<td class="selectable"><span class="break-word">' + voucherLink + '</span></td>'
+                    + '<td><span>&euro; ' + htmlentities(el.amount) + '</span></td>'
+                    + '<td><span>' + status + '</span></td></tr>';
             });
 
-            $('.grid-table.vouchers').safeHTML(html);
-            $('.default-select.vouchertype .default-select-scroll').text('');
-            $('.default-select.vouchertype span').text(l[6875]);
+            $('.data-table.vouchers', $resellerSection).safeHTML(html);
+            $('.vouchertype .dropdown-scroll', $resellerSection).text('');
+            $('.vouchertype > span', $resellerSection).text(l[6875]);
 
             var prices = [];
             for (var i = 0; i < M.account.prices.length; i++) {
@@ -3663,21 +3701,33 @@ accountUI.reseller = {
             });
 
             var voucheroptions = '';
-            for (i = 0; i < prices.length; i++) {
-                voucheroptions += '<div class="default-dropdown-item" data-value="' + htmlentities(prices[i])
-                    + '">&euro;' + htmlentities(prices[i]) + ' voucher</div>';
+            for (var j = 0; j < prices.length; j++) {
+                voucheroptions += '<div class="option" data-value="'
+                    + htmlentities(prices[j])
+                    + '">&euro;' + htmlentities(prices[j]) + ' voucher</div>';
             }
-            $('.default-select.vouchertype .default-select-scroll').safeHTML(voucheroptions);
+            $('.vouchertype .dropdown-scroll', $resellerSection)
+                .safeHTML(voucheroptions);
         },
 
         bindEvents: function() {
 
             'use strict';
 
-            $('.vouchercreate').rebind('click..voucherCreateClick', function() {
-                var vouchertype = $('.default-select.vouchertype .default-dropdown-item.active').attr('data-value');
-                var voucheramount = parseInt($('#account-voucheramount').val());
+            var $resellerSection = $('.fm-account-reseller', accountUI.$contentBlock);
+            var $voucherSelect = $('.vouchers.dropdown-input', $resellerSection);
+            var $voucherTypeSelect = $('.vouchertype.dropdown-input', $resellerSection);
+
+            // Bind Dropdowns events
+            bindDropdownEvents($voucherSelect);
+            bindDropdownEvents($voucherTypeSelect);
+
+            $('.vouchercreate', $resellerSection).rebind('click.voucherCreateClick', function() {
+                var vouchertype = $('.option[data-state="active"]', $voucherTypeSelect)
+                    .attr('data-value');
+                var voucheramount = parseInt($('#account-voucheramount', $resellerSection).val());
                 var proceed = false;
+
                 for (var i in M.account.prices) {
                     if (M.account.prices[i][0] === vouchertype) {
                         proceed = true;
@@ -3704,20 +3754,10 @@ accountUI.reseller = {
                     });
             });
 
-            $('.fm-account-reseller .account-history-dropdown-button').rebind('click', function() {
+            $('.option', $voucherSelect).rebind('click.accountSection', function() {
+                var $this = $(this);
 
-                $(this).addClass('active');
-                $('.account-history-dropdown').addClass('hidden');
-                $(this).next().removeClass('hidden');
-            });
-
-            $('.fm-account-reseller .account-history-drop-items').rebind('click', function() {
-
-                var $parent = $(this).parent();
-                $parent.find('.account-history-drop-items').removeClass('active');
-                $parent.prev('.default-select.vouchers').text($(this).text()).removeClass('active');
-
-                var c = $(this).attr('class') ? $(this).attr('class') : '';
+                var c = $this.attr('class') ? $this.attr('class') : '';
 
                 if (c.indexOf('voucher10-') > -1) {
                     $.voucherlimit = 10;
@@ -3732,12 +3772,8 @@ accountUI.reseller = {
                     $.voucherlimit = 'all';
                 }
 
-                $(this).addClass('active');
-                $(this).closest('.account-history-dropdown').addClass('hidden');
                 accountUI();
             });
-
-            bindDropdownEvents($('.default-select.vouchertype'), 0, '.fm-account-reseller');
         }
     }
 };

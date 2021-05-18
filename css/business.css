@@ -10,27 +10,23 @@
     display: block;
 }
 .business .bottom-page .top-business-title {
+    color: var(--text-color-medium);
     display: block;
-    font-size: 16px;
-    line-height: 24px;
-    font-family: LatoWeb, Arial, sans-serif;
-    float: left;
-    color: #666;
+    font: var(--text-h3);
+    margin: 4px 0;
+    -webkit-margin-start: 6px;
+    margin-inline-start: 6px;
     position: relative;
-    padding: 6px 3px 0 8px;
 }
 .business .bottom-page .top-business-title::after {
-    content: '';
-    width: 4px;
-    height: 4px;
-    position: absolute;
-    right: -5px;
-    bottom: 7px;
     background-color: #f0373a;
     border-radius: 100%;
-}
-.top-head .default-white-button.individual {
-    margin: 4px 0 0 30px;
+    content: '';
+    display: inline-block;
+    height: 4px;
+    margin: 2px 4px;
+    vertical-align: middle;
+    width: 4px;
 }
 .business-info-block {
     text-align: center;
@@ -42,8 +38,7 @@
 }
 .business-page.bottom-page .top-head,
 .business-page.bottom-page .top-head.floating {
-    background-color: #F0F2F5;
-    box-shadow: 0 1px 0 0 rgba(0, 0, 0, 0.15);
+    background-color: var(--surface-main);
 }
 .business-page .pages-menu.body {
     background-color: #fff;
@@ -57,7 +52,7 @@
     width: 100%;
 }
 i.medium-icon.business-sprite {
-    background-image: url(../images/mega/business_v3.png);
+    background-image: url(../images/mega/business.png);
 }
 .nav-button .nav-icon.business {
     background-position: -50px -193px;
@@ -217,7 +212,7 @@ i.medium-icon.business-sprite {
     width: 34px;
     height: 34px;
     float: left;
-    background-image: url(../images/mega/business_v3.png);
+    background-image: url(../images/mega/business.png);
     background-position: -486px -28px;
     margin: 11px 20px 0 0;
     position: relative;
@@ -317,7 +312,7 @@ i.medium-icon.business-sprite {
     position: absolute;
     left: 0;
     top: 0;
-    background-image: url(../images/mega/business_v3.png);
+    background-image: url(../images/mega/business.png);
     background-position: -7px -115px;
     margin: 10px 0 0 0;
 }
@@ -504,7 +499,7 @@ div.bottom-page.slider-controls {
     vertical-align: top;
     margin: 0 10px;
     box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.15);
-    background-image: url(../images/mega/business_v3.png);
+    background-image: url(../images/mega/business.png);
     background-position: 2px -151px;
     cursor: pointer;
 }
@@ -689,7 +684,7 @@ div.bottom-page.slider-controls {
     display: block;
     width: 20px;
     height: 20px;
-    background-image: url(../images/mega/business_v3.png);
+    background-image: url(../images/mega/business.png);
     background-position: -152px -115px;
 }
 .business-cell.cell-icon.cross i {
@@ -751,9 +746,6 @@ div.bottom-page.slider-controls {
     max-width: 1230px;
     padding-left: 30px;
     padding-right: 30px;
-}
-.top-buttons.business .default-white-button.small i.white-mega {
-    margin: 3px 3px 1px -0px;
 }
 
 @media only screen and (max-width: 1120px) {
@@ -1113,7 +1105,6 @@ div.bottom-page.slider-controls {
     .bottom-page .slide5 .slider-top-wrap {
         left: -400%;
     }
-    .business .bottom-page .default-white-button.individual,
     .bottom-page .top-change-language,
     .bottom-page .top-buttons,
     .bottom-page .activity-status-block,
@@ -1179,7 +1170,7 @@ div.bottom-page.slider-controls {
     .business-tick-txt::before,
     .bottom-page .slider-ctrl-button,
     .business-cell.cell-icon i {
-        background-image: url(../images/mega/business_v3@2x.png) !important;
+        background-image: url(../images/mega/business@2x.png) !important;
         background-size: 367px auto;
     }
 }

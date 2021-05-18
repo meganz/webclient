@@ -1456,17 +1456,13 @@ mBroadcaster.addListener('mega:openfolder', SoonFc(300, function(id) {
 
     var dups = M.checkForDuplication(id);
     if (dups && (dups.files || dups.folders)) {
-        var $bar = $('.duplicated-items-found').removeClass('hidden');
+        var $bar = $('.fm-notification-block.duplicated-items-found').addClass('visible');
 
-        $('.files-grid-view.fm').addClass('duplication-found');
-        $('.fm-blocks-view.fm').addClass('duplication-found');
         $('.fix-me-btn', $bar).rebind('click.df', function() {
             fileconflict.resolveExistedDuplication(dups, id);
         });
         $('.fix-me-close', $bar).rebind('click.df', function() {
-            $('.files-grid-view.fm').removeClass('duplication-found');
-            $('.fm-blocks-view.fm').removeClass('duplication-found');
-            $('.duplicated-items-found').addClass('hidden');
+            $bar.removeClass('visible');
         });
     }
 }));

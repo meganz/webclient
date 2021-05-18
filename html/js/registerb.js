@@ -16,6 +16,7 @@ function BusinessRegister() {
 
 
 /** a function to rest business registration page to its initial state*/
+/* eslint-disable-next-line complexity */
 BusinessRegister.prototype.initPage = function(preSetNb, preSetName, preSetTel, preSetFname, preSetLname, preSetEmail) {
     "use strict";
 
@@ -34,21 +35,16 @@ BusinessRegister.prototype.initPage = function(preSetNb, preSetName, preSetTel, 
     var $rPassInput = $('#business-rpass', $pageContainer).val('');
     var $storageInfo = $('.business-plan-note span', $pageContainer);
 
-    $('.bus-reg-radio-block .bus-reg-radio', $pageContainer).removeClass('checkOn').addClass('checkOff');
-    $('.mega-terms.bus-reg-agreement .bus-reg-checkbox', $pageContainer).removeClass('checkOn');
-    $('.ok-to-auto.bus-reg-agreement .bus-reg-checkbox', $pageContainer).addClass('checkOn');
-    $('.bus-reg-agreement.mega-terms .bus-reg-txt', $pageContainer).safeHTML(l['208s']);
+    $('.bus-reg-radio-block .bus-reg-radio', $pageContainer).removeClass('radioOn').addClass('radioOff');
+    $('.mega-terms.bus-reg-agreement .checkdiv', $pageContainer).removeClass('checkboxOn');
+    $('.ok-to-auto.bus-reg-agreement .checkdiv', $pageContainer).addClass('checkboxOn');
+    $('.bus-reg-agreement.mega-terms .radio-txt', $pageContainer).safeHTML(l['208s']);
     $('.bus-reg-plan .business-base-plan .left', $pageContainer)
         .text(l[19503].replace('[0]', this.minUsers));
     $storageInfo.text(l[23789].replace('%1', '15 ' + l[20160]));
 
-    var nbUsersMegaInput = new mega.ui.MegaInputs($nbUsersInput, {
-        onHideError: function() {
-            $nbUsersInput.removeClass('errored');
-            $nbUsersInput.parent().removeClass('error');
-        }
-    });
-    nbUsersMegaInput.showMessage('*' + l[19501]);
+    var nbUsersMegaInput = new mega.ui.MegaInputs($nbUsersInput);
+    nbUsersMegaInput.showMessage('*' + l[19501], true);
 
     $nbUsersInput.rebind('wheel.registerb', function(e) {
         e.preventDefault();
@@ -149,10 +145,19 @@ BusinessRegister.prototype.initPage = function(preSetNb, preSetName, preSetTel, 
         // clear the payment block
         var $paymentBlock = $('.bus-reg-radio-block', $pageContainer).empty();
 
-        var radioHtml = '<div class="bus-reg-radio-option">' +
-            ' <div class="bus-reg-radio payment-[x] checkOff" prov-id="[Y]"></div>';
+        const icons = {
+            ecpVI: 'sprite-fm-uni icon-visa-border',
+            ecpMC: 'sprite-fm-uni icon-mastercard-border',
+            Stripe2: 'sprite-fm-theme icon-stripe',
+            stripeVI: 'sprite-fm-uni icon-visa-border',
+            stripeMC: 'sprite-fm-uni icon-mastercard-border'
+        };
+
+        var radioHtml = '<div class="bus-reg-radio-option"> <div class="bus-reg-radio payment-[x] radioOff" prov-id="[Y]"></div>';
         var textHtml = '<div class="provider">[x]</div>';
-        var iconHtml = '<div class="provider-icon [x]"></div> </div>';
+        var iconHtml = `<div class="payment-icon">
+                            <i class="[x]"></i>
+                        </div></div>`;
 
         if (!list.length) {
             return failureExit(l[20431]);
@@ -163,7 +168,7 @@ BusinessRegister.prototype.initPage = function(preSetNb, preSetName, preSetTel, 
             for (var k = 0; k < list.length; k++) {
                 var payRadio = radioHtml.replace('[x]', list[k].gatewayName).replace('[Y]', list[k].gatewayId);
                 var payText = textHtml.replace('[x]', list[k].displayName);
-                var payIcon = iconHtml.replace('[x]', list[k].gatewayName);
+                var payIcon = iconHtml.replace('[x]', icons[list[k].gatewayName]);
                 paymentGatewayToAdd += payRadio + payText + payIcon;
             }
             if (paymentGatewayToAdd) {
@@ -175,21 +180,18 @@ BusinessRegister.prototype.initPage = function(preSetNb, preSetName, preSetTel, 
         );
 
         // setting the first payment provider as chosen
-        $($pageContainer.find('.bus-reg-radio-block .bus-reg-radio')[0]).removeClass('checkOff')
-            .addClass('checkOn');
+        $('.bus-reg-radio-block .bus-reg-radio', $pageContainer).first().removeClass('radioOff')
+            .addClass('radioOn');
 
         // event handler for radio buttons
         $('.bus-reg-radio-option', $paymentBlock)
-            .off('click.suba').on('click.suba', function businessRegisterationCheckboxClick() {
-                var $me = $(this);
-                $me = $me.find('.bus-reg-radio');
-                if ($me.hasClass('checkOn')) {
+            .rebind('click.suba', function businessRegisterationCheckboxClick() {
+                const $me = $('.bus-reg-radio', $(this));
+                if ($me.hasClass('radioOn')) {
                     return;
                 }
-                else {
-                    $('.bus-reg-radio', $paymentBlock).removeClass('checkOn').addClass('checkOff');
-                    $me.removeClass('checkOff').addClass('checkOn');
-                }
+                $('.bus-reg-radio', $paymentBlock).removeClass('radioOn').addClass('radioOff');
+                $me.removeClass('radioOff').addClass('radioOn');
             });
 
         // view the page
@@ -222,8 +224,8 @@ BusinessRegister.prototype.initPage = function(preSetNb, preSetName, preSetTel, 
     };
 
     // event handler for clicking on terms anchor
-    $pageContainer.find('.bus-reg-agreement.mega-terms .bus-reg-txt span').off('click')
-        .on('click', function termsClickHandler() {
+    $('.bus-reg-agreement.mega-terms .radio-txt span', $pageContainer)
+        .rebind('click', function termsClickHandler() {
             if (!is_mobile) {
                 bottomPageDialog(false, 'terms', false, true);
             }
@@ -243,16 +245,17 @@ BusinessRegister.prototype.initPage = function(preSetNb, preSetName, preSetTel, 
         });
 
     // event handler for check box
-    $('.bus-reg-agreement', $pageContainer).off('click.suba').on('click.suba',
+    $('.bus-reg-agreement', $pageContainer).rebind(
+        'click.suba',
         function businessRegisterationCheckboxClick() {
-            var $me = $(this).find('.bus-reg-checkbox');
-            if ($me.hasClass('checkOn')) {
-                $me.removeClass('checkOn').addClass('checkOff');
+            var $me = $('.checkdiv', $(this));
+            if ($me.hasClass('checkboxOn')) {
+                $me.removeClass('checkboxOn').addClass('checkboxOff');
                 $('.bus-reg-btn, .bus-reg-btn-2', $pageContainer).addClass('disabled');
             }
             else {
-                $me.removeClass('checkOff').addClass('checkOn');
-                if ($('.bus-reg-agreement .bus-reg-checkbox.checkOn', $pageContainer).length === 2) {
+                $me.removeClass('checkboxOff').addClass('checkboxOn');
+                if ($('.bus-reg-agreement .checkdiv.checkboxOn', $pageContainer).length === 2) {
                     $('.bus-reg-btn, .bus-reg-btn-2', $pageContainer).removeClass('disabled');
                 }
                 else {
@@ -262,7 +265,7 @@ BusinessRegister.prototype.initPage = function(preSetNb, preSetName, preSetTel, 
         });
 
     // event handlers for focus and blur on checkBoxes
-    var $regChk = $('.bus-reg-checkbox input', $pageContainer);
+    var $regChk = $('.checkdiv input', $pageContainer);
     $regChk.rebind(
         'focus.chkRegisterb',
         function regsiterbInputFocus() {
@@ -464,7 +467,7 @@ BusinessRegister.prototype.initPage = function(preSetNb, preSetName, preSetTel, 
  */
 BusinessRegister.prototype.doRegister = function(nbusers, cname, fname, lname, tel, email, pass) {
     "use strict";
-    var $paymentMethod = $('.bus-reg-radio-option .bus-reg-radio.checkOn', '.bus-reg-body');
+    var $paymentMethod = $('.bus-reg-radio-option .bus-reg-radio.radioOn', '.bus-reg-body');
     var pMethod;
     if ($paymentMethod.hasClass('payment-Voucher')) {
         pMethod = 'voucher';
@@ -508,6 +511,7 @@ BusinessRegister.prototype.doRegister = function(nbusers, cname, fname, lname, t
                         mySelf.initPage(nbusers, cname, tel, fname, lname, email);
                     });
                 }
+                loadingDialog.hide();
                 return;
             }
             loadingDialog.hide();

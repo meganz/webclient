@@ -1,337 +1,472 @@
-<div class="top-head">
-    <div class="top-centered-margin">
-        <a class="logo"></a>
-        <div class="top-business-title">[$19530]</div>
-        <div class="default-white-button rtl-block-if-rtl semi-small left individual">
-            [$19529]
+<section class="topbar top-head js-topbar">
+    <div class="logo-wrapper">
+        <a class="logo">
+            <i class="sprite-fm-uni icon-mega-logo"></i>
+        </a>
+        <div class="top-business-title">
+            <span class="rtl-block-if-rtl">[$19530]</span>
         </div>
-
-        <div class="default-white-button small-square-button rounded no-hover show-hints hidden">
-            <i class="small-icon fm-s blue-question"></i>
-        </div>
-
-        <div class="top-tab-lnk hidden recents-tab-link">[$20141]</div>
-
-        <a class="top-icon menu"><div class="dark-tooltip top">[$169]</div></a>
-
-        <div class="top-icon warning ephemeral-session hidden"><div class="dark-tooltip top">[$8643]</div></div>
-        <div class="top-icon warning over-quota hidden"><div class="dark-tooltip top">[$1010]</div></div>
-        <div class="top-icon warning non-activated-account hidden"><div class="dark-tooltip top">[$1585]</div></div>
-        <div class="top-icon warning astropay-payment-reminder hidden"><div class="dark-tooltip top">[$8651]</div></div>
-        <div class="top-icon warning site-update-available hidden"><div class="dark-tooltip top">[$707]</div></div>
-
-        <div class="top-icon notification hidden">
-            <div class="notification-num hidden">0</div>
-            <div class="new-notification-info">
-                1 [$2041] [$2042]
+        <button class="mega-button individual">
+            <span class="rtl-block-if-rtl">[$19529]</span>
+        </button>
+        <button class="btn-icon show-hints hidden">
+            <div>
+                <i class="sprite-fm-uni icon-question"></i>
             </div>
-            <div class="dark-tooltip top">[$862]</div>
+        </button>
+    </div>
+
+    <div class="searcher-wrapper">
+        <div class="topbar-searcher js-topbar-searcher">
+            <form autocomplete="disabled" id="main-search-fake-form">
+                <i class="search-icon sprite-fm-mono icon-preview-reveal"></i>
+                <input type="text" placeholder="[$102]" autocomplete="disabled" class="js-filesearcher" spellcheck="false" />
+                <button class="js-btnclearSearch hidden" type="button"><i class="sprite-fm-mono icon-dialog-close"></i></button>
+            </form>
+        </div>
+    </div>
+
+    <i class="fmdb-loader sprite-fm-uni icon-loading icon24"></i>
+
+    <div class="topbar-links">
+        <div class="btn-icon top-change-language js-top-buttons hidden">
+            <i class="sprite-fm-mono icon-languages icon24"></i>
+            <div class="dark-tooltip top">[$670]</div>
+            <span class="top-change-language-name">[$1436]</span>
+        </div>
+        <hr>
+    </div>
+
+    <div class="top-buttons">
+        <button class="mega-button branded-red create-account-button hidden">
+            <span>
+                [$968]
+            </span>
+        </button>
+        <button class="mega-button top-login-button hidden">
+            <span>[$171]</span>
+        </button>
+    </div>
+
+    <div class="top-buttons business">
+        <button class="mega-button branded-red create-account-button business-reg hidden">
+            <span class="rtl-block-if-rtl">
+                [$19517]
+            </span>
+        </button>
+        <button class="mega-button top-login-button hidden">
+            <span class="rtl-block-if-rtl">[$171]</span>
+        </button>
+    </div>
+
+    <div class="topbar-links">
+        <button class="btn-icon js-pass-reminder js-top-buttons hidden">
+            <i class="sprite-fm-uni icon-ekr"></i>
+            <div class="dark-tooltip top">[$16901]</div>
+        </button>
+        <div class="dropdown js-dropdown-ephemeral js-dropdown-warning hidden">
+            <button class="btn-icon js-top-buttons">
+                <i class="sprite-fm-uni icon-history"></i>
+                <div class="dark-tooltip top">[$8643]</div>
+            </button>
+            <div class="dropdown body popup ephemeral-session dropdown-content dropdown-arrow">
+
+                <div class="top-warning-popup ephemeral-session">
+                    <div class="warning-popup-body">
+                        <div class="warning-header">[$8643]</div>
+                        <div class="description">[$8644]</div>
+                        <div class="description footnote-text">&ast;[$16362]</div>
+                    </div>
+                    <div class="fm-notifications-bottom">
+                        <button class="mega-button positive warning-button">
+                            <span>[$779]</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <div class="top-icon achievements"><div class="dark-tooltip top">[$16117]</div></div>
+        <div class="dropdown js-dropdown-overquota js-dropdown-warning hidden">
+            <button class="btn-icon js-top-buttons">
+                <i class="sprite-fm-uni icon-transfer-full-meter"></i>
+                <div class="dark-tooltip top">[$1010]</div>
+            </button>
+            <div class="dropdown body popup over-quota dropdown-content dropdown-arrow">
+                <div class="top-warning-popup over-quota">
+                    <div class="warning-popup-body">
+                        <div class="warning-header">[$1010]</div>
+                        [$5929]
+                        <p class="description">[$5931]</p>
+                    </div>
+                    <div class="fm-notifications-bottom">
+                        <button class="mega-button positive warning-button">
+                            <span>[$5549]</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-        <div class="top-search-bl hidden">
-            <div class="top-icon search"><div class="dark-tooltip top">[$102]</div></div>
-            <div class="top-search-clear">
-                <div class="top-search-button hidden"></div>
-                <div class="top-clear-button hidden"></div>
-                <!-- Cover with form to prevent autofilling -->
-                <form autocomplete="disabled" id="search-fake-form">
-                    <input type="text" placeholder="[$102]" autocomplete="disabled" class="top-search-input" />
+        <div class="dropdown js-dropdown-accountlink js-dropdown-warning hidden">
+            <button class="btn-icon js-top-buttons">
+                <i class="sprite-fm-uni icon-email"></i>
+                <div class="dark-tooltip top">[$1585]</div>
+            </button>
+            <div class="dropdown body popup non-activated-account dropdown-content dropdown-arrow">
+                <div class="top-warning-popup non-activated-account">
+                    <div class="warning-popup-body">
+                        <div class="mailbox-icon sprite-fm-illustration img-topbar-email-registration"></div>
+                        [$5847]
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="dropdown js-dropdown-astropay js-dropdown-warning hidden">
+            <button class="btn-icon js-top-buttons">
+                <i class="sprite-fm-uni icon-plan-expiry"></i>
+                <div class="dark-tooltip top">[$8651]</div>
+            </button>
+            <div class="dropdown body popup astropay-payment-reminder top-warning-popup dropdown-content dropdown-arrow">
+                <div class="top-warning-popup astropay-payment-reminder">
+                    <div class="warning-popup-body">
+                        <div class="left-block">
+                            <div class="plan-icon">
+                                <i class="pro1 sprite-fm-uni icon-crests-pro-1-details"></i>
+                                <i class="pro2 sprite-fm-uni icon-crests-pro-2-details"></i>
+                                <i class="pro3 sprite-fm-uni icon-crests-pro-3-details"></i>
+                                <i class="pro4 sprite-fm-uni icon-crests-lite-details"></i>
+                            </div>
+                        </div>
+                        <div class="right-block">
+                            <div class="warning-header">[$8651]</div>
+                            <div class="last-payment-info">
+                                <span class="purchased-label">[$8652]</span>
+                                <span class="purchased-date">yyyy-mm-dd</span>
+                                <span class="expired-label">[$8657]</span>
+                                <span class="expired-date">yyyy-mm-dd</span>
+                            </div>
+                            <div class="first-message">[$8653]</div>
+                            <div class="second-message">[$8654]</div>
+                            <div class="confirm-reason hidden">
+                                <label>[$8685]</label>
+                                <textarea class="confirm-reason-message" placeholder="[$8525]"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="fm-notifications-bottom">
+                        <div class="plan-expired-checkbox-wrapper">
+                            <div class="plan-expired-checkbox checkboxOff"></div>
+                            <label class="plan-expired-checkbox-label radio-txt">[$229]</label>
+                        </div>
+                        <button class="mega-button warning-button close disabled hidden">
+                            <span>[$8684]</span>
+                        </button>
+                        <button class="mega-button warning-button choose">
+                            <span>[$8656]</span>
+                        </button>
+                        <button class="mega-button positive warning-button renew">
+                            <span>[$8655]</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="dropdown js-dropdown-siteupdate js-dropdown-warning hidden">
+            <button class="btn-icon js-top-buttons">
+                <i class="sprite-fm-uni icon-takedown"></i>
+                <div class="dark-tooltip top">[$707]</div>
+            </button>
+            <div class="dropdown body popup site-update-available dropdown-content dropdown-arrow">
+                <div class="top-warning-popup site-update-available">
+                    <div class="warning-popup-body">
+
+                            <div class="warning-header">
+                                <div class="warning-icon sprite-fm-uni icon-mega-logo"></div>
+                                <div>[$8850]</div>
+                            </div>
+                            <div class="release-info">
+                                [$8851]
+                            </div>
+                            <p class="description">
+                                [$8852]<br>
+                                <br>
+                                [$15536]
+                            </p>
+                            <p class="description-legacy-extension hidden">[$17549]</p>
+
+                    </div>
+                    <div class="fm-notifications-bottom">
+                        <button class="mega-button warning-button dont-update">
+                            <span>[$148]</span>
+                        </button>
+                        <button class="mega-button positive warning-button update">
+                            <span>[$707]</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mini-search">
+            <div class="topbar-searcher js-topbar-searcher">
+                <button class="btn-icon topbar-mini-search js-top-buttons">
+                    <i class="sprite-fm-mono icon-preview-reveal"></i>
+                </button>
+                <form autocomplete="disabled" id="mini-search-fake-form">
+                    <input type="text" placeholder="[$102]" autocomplete="disabled" class="js-filesearcher" spellcheck="false" />
+                    <button class="topbar-mini-search-close" type="button">
+                        <i class="invalid sprite-fm-mono icon-right"></i>
+                        <i class="valid sprite-fm-mono icon-dialog-close"></i>
+                    </button>
                 </form>
             </div>
         </div>
 
-        <div class="membership-status-block"><i class="tiny-icon membership-status free"></i></div>
-
-        <a class="user-name"></a>
-
-        <div class="activity-status-block hidden">
-            <div class="loading-animation"></div>
-            <div class="activity-status top offline"></div>
-        </div>
-
-        <a class="fm-avatar"></a>
-
-        <div class="top-icon pass-reminder hidden"><div class="dark-tooltip top">[$16901]</div></div>
-
-        <div class="top-chat-notification hidden"><span class="notification-num" style="display: none;">0</span></div>
-
-        <div class="top-buttons">
-            <a class="default-white-button small red-bg create-account-button hidden">
-                <i class="semi-small-icon white-mega"></i>
-                [$968]
-            </a>
-            <a class="default-white-button small dark-border top-login-button hidden">
-                [$171]
-            </a>
-        </div>
-        <div class="top-buttons business rtl-block-if-rtl">
-            <a class="default-white-button small red-bg create-account-button business-reg hidden">
-                <i class="semi-small-icon white-mega"></i>
-                [$19517]
-            </a>
-            <div class="default-white-button small top-login-button hidden">
-                [$171]
-            </div>
-        </div>
-        <div class="top-change-language hidden">
-            <span class="top-icon language"><div class="dark-tooltip top">[$670]</div></span>
-            <span class="top-change-language-name">[$1436]</span>
-        </div>
-
-        <div class="dropdown body popup dropdown-arrow top-warning-popup ephemeral-session hidden">
-            <i class="dropdown-white-arrow"></i>
-            <div class="warning-popup-body">
-                <div class="warning-header">[$8643]</div>
-                <div class="description">[$8644]</div>
-                <div class="description footnote-text">&ast;[$16362]</div>
-            </div>
-            <div class="fm-notifications-bottom">
-                <div class="default-white-button right warning-button"><span>[$779]</span></div>
-            </div>
-        </div>
-
-        <div class="dropdown body popup dropdown-arrow top-warning-popup over-quota hidden">
-            <i class="dropdown-white-arrow"></i>
-            <div class="warning-popup-body">
-                <div class="warning-header">[$1010]</div>
-                [$5929]
-                <p class="description">[$5931]</p>
-            </div>
-            <div class="fm-notifications-bottom">
-                <div class="default-white-button right warning-button"><span>[$5549]</span></div>
-            </div>
-        </div>
-
-        <div class="dropdown body popup dropdown-arrow top-warning-popup non-activated-account hidden">
-            <i class="dropdown-white-arrow"></i>
-            <div class="warning-popup-body">
-                <div class="warning-gray-icon mailbox-icon"></div>
-                [$5847]
-            </div>
-        </div>
-
-        <div class="dropdown body popup dropdown-arrow top-warning-popup astropay-payment-reminder hidden">
-            <i class="dropdown-white-arrow"></i>
-            <div class="warning-popup-body">
-                <div class="left-block">
-                    <div class="mega-payment-icon"></div>
-                </div>
-                <div class="right-block">
-                    <div class="warning-header">[$8651]</div>
-                    <div class="last-payment-info">
-                        <span class="purchased-label">[$8652]</span>
-                        <span class="purchased-date">yyyy-mm-dd</span>
-                        <span class="expired-label">[$8657]</span>
-                        <span class="expired-date">yyyy-mm-dd</span>
+        <div class="dropdown js-dropdown-notification hidden">
+            <button class="btn-icon notification js-topbarnotification js-top-buttons">
+                <i class="sprite-fm-theme icon-notifications"></i><span class="js-notification-num icon-badge">99+</span>
+                <div class="dark-tooltip top">[$862]</div>
+            </button>
+            <div class="dropdown body popup notification-popup dropdown-content dropdown-arrow">
+                <div class="js-notification-popup notification-popup loading">
+                    <div class="notification-header">
+                        <div class="notification-txt">[$862]</div>
                     </div>
-                    <div class="first-message">[$8653]</div>
-                    <div class="second-message">[$8654]</div>
-                    <div class="confirm-reason hidden">
-                        <label>[$8685]</label>
-                        <textarea class="confirm-reason-message" placeholder="[$8525]"></textarea>
-                    </div>
-                </div>
-            </div>
-            <div class="fm-notifications-bottom">
-                <div class="plan-expired-checkbox checkboxOff"></div>
-                <label class="plan-expired-checkbox-label radio-txt">[$229]</label>
-
-                <div class="default-white-button right warning-button renew"><span>[$8655]</span></div>
-                <div class="default-white-button right warning-button choose"><span>[$8656]</span></div>
-                <div class="default-white-button right warning-button close disabled hidden"><span>[$8684]</span></div>
-            </div>
-        </div>
-
-        <div class="dropdown body popup dropdown-arrow top-warning-popup site-update-available hidden">
-            <i class="dropdown-white-arrow"></i>
-            <div class="warning-popup-body">
-                <div class="left-block">
-                    <div class="mega-icon"></div>
-                </div>
-                <div class="right-block">
-                    <div class="warning-header">
-                        [$8850]
-                    </div>
-                    <div class="release-info">
-                        [$8851]
-                    </div>
-                    <p class="description">
-                        [$8852]<br>
-                        <br>
-                        [$15536]
-                    </p>
-                    <p class="description-legacy-extension hidden">[$17549]</p>
-                </div>
-            </div>
-            <div class="fm-notifications-bottom">
-                <div class="default-white-button right warning-button update">
-                    <span>[$707]</span>
-                </div>
-                <div class="default-white-button right warning-button dont-update">
-                    <span>[$148]</span>
-                </div>
-            </div>
-        </div>
-
-        <div class="dropdown body popup dropdown-arrow notification-popup loading hidden">
-            <i class="dropdown-white-arrow"></i>
-            <div class="notification-header">
-                <div class="notification-txt">[$862]</div>
-            </div>
-            <div class="notification-scroll">
-                <div class="notification-scr-list">
-                    <a class="notification-item template">
-                        <span class="notification-status-icon">
-                            <span class="notification-status"></span>
-                            <span class="notification-avatar hidden">
-                                <span class="notification-avatar-icon"></span>
-                            </span>
-                            <span class="notification-icon hidden"></span>
-                            <span class="notification-type">
-                                <span class="notification-content">
-                                    <span class="notification-username"></span>
-                                    <span class="notification-info"></span>
-                                    <span class="notification-date"></span>
-                                </span>
-                                <span class="notification-request-buttons hidden">
-                                    <span class="default-white-button right notifications-button accept">
-                                        <span>[$5856]</span>
+                    <div class="notification-scroll">
+                        <div class="notification-scr-list">
+                            <a class="notification-item template">
+                                <span class="notification-status-icon">
+                                    <span class="notification-status"></span>
+                                    <span class="notification-avatar hidden">
+                                        <span class="notification-avatar-icon">
+                                            <i class="plus sprite-fm-mono icon-add-small"></i>
+                                            <i class="minus sprite-fm-mono icon-disabled-filled"></i>
+                                            <i class="cross sprite-fm-mono icon-remove"></i>
+                                            <i class="exclamation sprite-fm-mono icon-exclamation-filled"></i>
+                                            <i class="contact sprite-fm-mono icon-user-circle-filled"></i>
+                                        </span>
+                                    </span>
+                                    <span class="notification-icon hidden">
+                                        <i class="sprite-fm-uni icon-payment payment-icon"></i>
+                                        <i class="sprite-fm-uni icon-check-circle reinstated-icon"></i>
+                                        <i class="sprite-fm-uni icon-takedown takedown-icon"></i>
+                                    </span>
+                                    <span class="notification-type">
+                                        <span class="notification-content">
+                                            <span class="notification-username"></span>
+                                            <span class="notification-info"></span>
+                                            <span class="notification-date"></span>
+                                        </span>
+                                        <span class="notification-request-buttons hidden">
+                                            <button class="mega-button right notifications-button accept">
+                                                <span>[$5856]</span>
+                                            </button>
+                                        </span>
+                                        <span class="notification-accepted-bl">
+                                            <span class="notification-accepted">[$7375]</span>
+                                        </span>
                                     </span>
                                 </span>
-                                <span class="notification-accepted-bl">
-                                    <span class="notification-accepted">[$7375]</span>
-                                </span>
-                            </span>
-                        </span>
-                    </a>
-                </div>
-            </div>
-            <div class="notification-popup-loading">
-                <div class="notification-loading-icon"></div>
-                <div class="notification-popup-loading-txt">[$1456]<span class="notification-loading-spinner"></span></div>
-            </div>
-            <div class="notification-popup-empty">
-                <div class="notification-empty-icon"></div>
-                <div class="notification-popup-empty-txt">[$8589]</div>
-            </div>
-            <div class="fm-notifications-bottom">
-                <div class="default-white-button right notifications-button red hidden"><span>See all notifications</span></div>
-                <div class="default-white-button right notifications-button clear-button hidden"><span>Clear</span></div>
-            </div>
-        </div>
-
-        <div class="dropdown body popup dropdown-arrow top-login-popup sign hidden">
-            <i class="dropdown-white-arrow"></i>
-            <div class="fm-dialog-header">
-                <div class="top-login-full"></div>
-                <div class="clear"></div>
-            </div>
-            <div class="top-login-pad login">
-                <form id="form_login_header"></form>
-            </div>
-            <div class="top-login-warning active">
-                <div class="top-login-warning-arrow"></div>
-                <div class="top-login-warning-close"></div>
-                <div class="top-login-warning-pad">
-                    <div class="top-login-warning-icon"></div>
-                    <div class="top-login-warning-txt">
-                        [$1093]<br>
+                            </a>
+                        </div>
                     </div>
-                    <div class="clear"></div>
-                    <div class="extension-advise"> [$1094] </div>
-                    <div class="top-login-warning-bott">
-                        <div class="loginwarning-checkbox checkboxOff checkbox"></div>
-                        <label class="radio-txt">[$229]</label>
-                        <div class="clear"></div>
+                    <div class="fm-notifications-bottom">
+                        <button class="mega-button action settings">
+                            <span>[$823]</span>
+                    </button>
+                    </div>
+                    <div class="notification-popup-loading">
+                        <div class="notification-loading-icon sprite-fm-mono icon-notification-filled"></div>
+                        <div class="notification-popup-loading-txt">
+                            <span>[$1456]</span>
+                            <i class="notification-loading-spinner sprite-fm-theme icon-loading-spinner"></i>
+                        </div>
+                    </div>
+                    <div class="notification-popup-empty">
+                        <div class="notification-empty-icon sprite-fm-mono icon-notification-off-filled"></div>
+                        <div class="notification-popup-empty-txt">[$8589]</div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="dropdown body dropdown-arrow top-user-status-popup hidden">
-            <i class="dropdown-white-arrow"></i>
-            <div class="dropdown-item mid-txt tick-item" data-presence="chat">
-                <span class="activity-status online"></span>
-                <span>[$5923]</span>
-            </div>
-            <div class="dropdown-item mid-txt tick-item" data-presence="away">
-                <span class="activity-status away"></span>
-                <span>[$5924]</span>
-            </div>
-            <div class="dropdown-item mid-txt tick-item" data-presence="dnd">
-                <span class="activity-status busy"></span>
-                <span>[$5925]</span>
-                <div class="activity-status-info">
-                    [$19786]
+        <div class="dropdown account js-dropdown-account">
+            <button class="btn-icon js-topbaravatar">
+                <div class="avatar"></div>
+                 <div class="activity-status-block js-activity-status hidden">
+                    <div class="loading-animation"></div>
+                    <div class="activity-status top offline"></div>
                 </div>
-            </div>
-            <div class="dropdown-item mid-txt tick-item active" data-presence="offline">
-                <span class="activity-status offline"></span>
-                <span>[$5926]</span>
-                <div class="activity-status-info">
-                    [$19787]
+            </button>
+            <div class="dropdown body popup dropdown-content dropdown-arrow">
+
+                <div class="account-dialog">
+                    <div class="header">
+                        <div class="account-avatar js-account-avatar"></div>
+                        <div class="account-info">
+                            <span class="name"></span>
+                            <span class="email"></span>
+                            <div class="activity-status-wrapper">
+                                <div class="activity-status-block hidden js-activity-status">
+                                    <div class="loading-animation"></div>
+                                    <div class="activity-status top offline"></div>
+                                </div>
+                                <span class="activity-text">Status</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="body">
+                        <ul class="links">
+                            <li class="no-red-dot">
+                                <div class="status-dropdown">
+                                    <button class="dropbtn">
+                                        <span>[$24845]</span>
+                                        <i class="sprite-fm-mono icon-arrow-right x1"></i>
+                                    </button>
+                                    <div class="dropdown-content">
+                                        <div class="top-user-status-popup">
+                                            <div class="dropdown-item mid-txt tick-item" data-presence="chat">
+                                                <span class="activity-status online"></span>
+                                                <span class="status-text">[$5923]</span>
+                                            </div>
+                                            <div class="dropdown-item mid-txt tick-item" data-presence="away">
+                                                <span class="activity-status away"></span>
+                                                <span class="status-text">[$5924]</span>
+                                            </div>
+                                            <div class="dropdown-item mid-txt tick-item" data-presence="dnd">
+                                                <span class="activity-status busy"></span>
+                                                <span class="status-text">[$5925]</span>
+                                                <div class="activity-status-info">
+                                                    [$19786]
+                                                </div>
+                                            </div>
+                                            <div class="dropdown-item mid-txt tick-item active" data-presence="offline">
+                                                <span class="activity-status offline"></span>
+                                                <span class="status-text">[$5926]</span>
+                                                <div class="activity-status-info">
+                                                    [$19787]
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+
+                            <li class="no-red-dot"><button class="js-accountbtn js-fm-tab settings">[$823]</button></li>
+                            <li class="no-red-dot"><button class="js-accountbtn achievements">[$16117]</button></li>
+                            <li class="no-red-dot"><button class="js-accountbtn downloadmega">[$1913]</button></li>
+                            <li class="separator no-red-dot"></li>
+                            <li class="no-red-dot"><button class="js-accountbtn logout">[$967]</button></li>
+                        </ul>
+                    </div>
                 </div>
+
             </div>
         </div>
 
+        <button class="btn-icon js-more-menu js-top-buttons">
+            <i class="top-icon menu sprite-fm-mono icon-side-menu"></i> <div class="dark-tooltip top">[$169]</div>
+        </button>
     </div>
-</div>
+
+    <!-- dropdown body popup dropdown-arrow top-login-popup sign hidden -->
+    <div class="dropdown body popup dropdown-arrow top-login-popup sign hidden">
+        <header>
+            <div class="top-login-full"></div>
+            <div class="clear"></div>
+            <i class="top-login-full sprite-fm-mono icon-new-window"></i>
+        </header>
+        <div class="login">
+            <form id="form_login_header"></form>
+        </div>
+        <div class="top-login-warning active">
+            <div class="top-login-warning-arrow"></div>
+            <div class="top-login-warning-close"></div>
+            <div class="dropdown-inverted-arrow"></div>
+            <div class="top-login-warning-close sprite-fm-mono icon-dialog-close"></div>
+            <div class="top-login-warning-pad">
+                <i class="top-login-warning-icon sprite-fm-uni icon-warning"></i>
+                <div class="top-login-warning-txt">
+                    [$1093]<br>
+                </div>
+                <div class="clear"></div>
+                <div class="extension-advise"> [$1094] </div>
+                <div class="top-login-warning-bott">
+                    <div class="loginwarning-checkbox checkboxOff checkbox"></div>
+                    <label class="radio-txt">[$229]</label>
+                    <div class="clear"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
 
 <div class="top-menu-popup hidden">
-    <i class="top-menu-icon menus-sprite close"></i>
+    <i class="sprite-fm-mono icon-dialog-close close"></i>
     <div class="top-menu-scroll">
+
         <div class="top-menu-content">
-
             <div class="top-menu-logged">
-                <div class="avatar-block">
-                    <img alt="" />
+                <div class="top-menu-account-info">
+                    <div class="avatar-block">
+                        <div class="wrapper"></div>
+                        <div class="activity-status-block js-activity-status">
+                            <div class="loading-animation"></div>
+                            <div class="activity-status top offline"></div>
+                        </div>
+                    </div>
+                    <div class="user-info">
+                        <div class="name"></div>
+                        <div class="email"></div>
+                    </div>
+                    <div class="clear"></div>
                 </div>
-                <div class="user-info">
-                    <div class="name"></div>
-                    <div class="email"></div>
-                </div>
-                <div class="clear"></div>
-
                 <div class="plan"></div>
                 <div class="storage">
                     <span></span>
                 </div>
-                <div class="loader menus-sprite"></div>
+                <div class="loader sprite-fm-uni icon-loading"></div>
                 <div class="storage-txt">
                 </div>
-                <div class="top-green-button upgrade-your-account">
-                    [$433]
-                </div>
-                <div class="top-menu-item small refresh-item">
-                    <i class="top-menu-icon menus-sprite refresh"></i>
+                <button class="mega-button positive upgrade-your-account">
+                    <span>[$433]</span>
+                </button>
+                <div class="top-menu-item underlined refresh-item">
+                    <i class="sprite-fm-mono icon-clear-transfer refresh"></i>
                     <span>[$23433]</span>
+                </div>
+                <div class="top-menu-item account">
+                    <i class="sprite-fm-mono icon-settings"></i>
+                    <span>[$823]</span>
                 </div>
             </div>
 
             <div class="top-menu-item login">
-                <i class="top-menu-icon menus-sprite login"></i>
+                <i class="sprite-fm-mono icon-login login"></i>
                 <span>[$171]</span>
             </div>
             <div class="top-menu-item register">
-                <i class="top-menu-icon menus-sprite register"></i>
+                <i class="sprite-fm-mono icon-my-account register"></i>
                 <span>[$968]</span>
             </div>
+
             <div class="top-menu-divider"></div>
 
-             <div class="top-menu-item backup small-pad">
-                 <i class="top-menu-icon menus-sprite export"></i>
-                 <span>[$8921]</span>
+            <div class="top-menu-item backup single small-font">
+                <i class="sprite-fm-uni icon-recovery-key x32"></i>
+                <span>[$8859]</span>
             </div>
-            <div class="top-menu-divider small-pad hidden"></div>
+
+            <div class="top-menu-divider hidden"></div>
 
             <div class="top-menu-item submenu-item">
-                <i class="top-menu-icon menus-sprite platforms"></i>
+                <i class="sprite-fm-mono icon-platforms"></i>
                 <span>[$23327]</span>
-                <i class="top-menu-icon menus-sprite right-arrow"></i>
+                <i class="sprite-fm-mono icon-arrow-right right-arrow"></i>
             </div>
-             <div class="top-submenu">
+            <div class="top-submenu">
                 <div class="top-menu-item sync">[$19639]</div>
                 <div class="top-menu-item mobile">[$19682]</div>
                 <div class="top-menu-item extensions">[$16603]</div>
@@ -339,59 +474,54 @@
                 <div class="top-menu-item bird hidden">MEGAbird</div>
                 <div class="top-menu-item nas">[$24478]</div>
             </div>
-
             <div class="top-menu-item submenu-item">
-                <i class="top-menu-icon menus-sprite features"></i>
+                <i class="sprite-fm-mono icon-features"></i>
                 <span>[$23377]</span>
-                <i class="top-menu-icon menus-sprite right-arrow"></i>
+                <i class="sprite-fm-mono icon-arrow-right right-arrow"></i>
             </div>
-             <div class="top-submenu">
+            <div class="top-submenu">
                 <div class="top-menu-item storage">[$24401]</div>
                 <div class="top-menu-item security">[$7337]</div>
                 <div class="top-menu-item collaboration">[$24367]</div>
                 <div class="top-menu-item securechat">[$24432]</div>
             </div>
-
             <div class="top-menu-item submenu-item">
-                <i class="top-menu-icon menus-sprite company"></i>
+                <i class="sprite-fm-mono icon-company"></i>
                 <span>[$23328]</span>
-                <i class="top-menu-icon menus-sprite right-arrow"></i>
+                <i class="sprite-fm-mono icon-arrow-right right-arrow"></i>
             </div>
-             <div class="top-submenu">
+            <div class="top-submenu">
                 <div class="top-menu-item about">[$16112]</div>
                 <div class="top-menu-item pro">[$1361]</div>
                 <div class="top-menu-item affiliate">[$22682]</div>
                 <div class="top-menu-item blog blogarticle">[$389]</div>
                 <div class="top-menu-item corporate">[$24093]</div>
             </div>
-
             <div class="top-menu-item submenu-item">
-                <i class="top-menu-icon menus-sprite support"></i>
+                <i class="sprite-fm-mono icon-support"></i>
                 <span>[$383]</span>
-                <i class="top-menu-icon menus-sprite right-arrow"></i>
+                <i class="sprite-fm-mono icon-arrow-right right-arrow"></i>
             </div>
-             <div class="top-submenu">
+            <div class="top-submenu">
                 <div class="top-menu-item help">[$384]</div>
                 <div class="top-menu-item contact">[$399]</div>
                 <div class="top-menu-item support">[$24616]</div>
                 <div class="top-menu-item feedback hidden">[$1356]</div>
             </div>
-
             <div class="top-menu-item submenu-item">
-                <i class="top-menu-icon menus-sprite develop"></i>
+                <i class="sprite-fm-mono icon-developers"></i>
                 <span>[$392]</span>
-                <i class="top-menu-icon menus-sprite right-arrow"></i>
+                <i class="sprite-fm-mono icon-arrow-right right-arrow"></i>
             </div>
-             <div class="top-submenu">
+            <div class="top-submenu">
                 <div class="top-menu-item sourcecode">[$7411]</div>
                 <div class="top-menu-item sdk">[$962]</div>
                 <div class="top-menu-item doc">[$963]</div>
             </div>
-
             <div class="top-menu-item submenu-item">
-                <i class="top-menu-icon menus-sprite legal"></i>
+                <i class="sprite-fm-mono icon-legal-policies"></i>
                 <span>[$16114]</span>
-                <i class="top-menu-icon menus-sprite right-arrow"></i>
+                <i class="sprite-fm-mono icon-arrow-right right-arrow"></i>
             </div>
             <div class="top-submenu">
                 <div class="top-menu-item terms">[$385]</div>
@@ -399,144 +529,43 @@
                 <div class="top-menu-item copyright">[$387]</div>
                 <div class="top-menu-item takedown">[$966]</div>
                 <div class="top-menu-item transparency">[$22681]</div>
-                <div class="top-menu-item cookies">[$24629]</div>
+                <div class="top-menu-item cookie">[$24629]</div>
                 <div class="top-menu-item cookies-settings">[$24644]</div>
             </div>
 
             <div class="top-menu-divider"></div>
 
-             <div class="top-menu-item languages lato small-pad">
-                 <i class="top-menu-icon menus-sprite globe"></i>
-                 <span>English</span>
-                 <i class="top-menu-icon menus-sprite right-arrow inline down"></i>
+            <div class="top-menu-item languages single">
+                <i class="sprite-fm-mono icon-languages"></i>
+                <span>English</span>
+                <i class="sprite-fm-mono icon-arrow-right right-arrow down"></i>
             </div>
-
-            <div class="top-menu-divider small-pad"></div>
+            <div class="top-menu-divider"></div>
 
             <div class="top-social-bl">
-                <div class="top-social-txt">
-                    [$23329]
-                </div>
+                <div class="top-social-txt"> [$23329] </div>
                 <a href="https://www.facebook.com/MEGAprivacy" target="_blank" rel="noopener noreferrer" class="top-social-button">
-                     <i class="top-menu-icon menus-sprite fb"></i>
+                    <i class="sprite-fm-uni icon-facebook"></i>
                 </a>
                 <a href="https://www.instagram.com/MEGA_privacy/" target="_blank" rel="noopener noreferrer" class="top-social-button">
-                    <i class="top-menu-icon menus-sprite instagram"></i>
+                    <i class="sprite-fm-uni icon-instagram"></i>
                 </a>
                 <a href="https://twitter.com/MEGAprivacy" target="_blank" rel="noopener noreferrer" class="top-social-button">
-                    <i class="top-menu-icon menus-sprite twitter"></i>
+                    <i class="sprite-fm-uni icon-twitter"></i>
                 </a>
                 <a href="https://www.linkedin.com/company/mega-the-privacy-company" target="_blank" rel="noopener noreferrer" class="top-social-button">
-                    <i class="top-menu-icon menus-sprite linkedin"></i>
+                    <i class="sprite-fm-uni icon-linkedin"></i>
                 </a>
                 <a href="https://www.youtube.com/channel/UCL0n8SACU_eghsvHxbizKCA" target="_blank" rel="noopener noreferrer" class="top-social-button">
-                    <i class="top-menu-icon menus-sprite youtube"></i>
+                    <i class="sprite-fm-uni icon-youtube"></i>
                 </a>
-                <div class="clear"></div>
             </div>
-
-            <div class="top-mega-version">
-                v. dev
+            <div class="top-menu-footer">
+                <div class="top-mega-version"> v. dev </div>
+                <button class="mega-button branded-red logout">
+                    <span>[$967]</span>
+                </button>
             </div>
-            <div class="top-menu-item top-white-button logout">
-                [$967]
-            </div>
-            <div class="clear"></div>
         </div>
     </div>
 </div>
-<div class="float-widget transfer-prorgess tpw hidden">
-    <!-- add almost-overquota/overquota to banner -->
-    <div class="banner transfer almost-overquota hidden">
-        <div class="delete-img close-over icon"></div>
-        <div class="background-cloud-img"></div>
-        <div class="left-section circle-dashboard">
-            <div class="quota-info-pct-txt">97%</div>
-            <div class="quota-info-pr-txt">48 GB/50 GB</div>
-            <div class="quota-info-pct-circle">
-                <div class="overlay"></div>
-                <ul>
-                    <li class="nw-fm-chart0 right-c">
-                        <p>
-                            <span></span>
-                        </p>
-                    </li>
-                    <li class="nw-fm-chart0 left-c">
-                        <p>
-                            <span></span>
-                        </p>
-                    </li>
-                </ul>
-            </div>
-        </div>
-        <div class="right-section upgrade-block">
-            <div class="head-title">[$20666]</div>
-            <div class="content-txt">[$18085]</div>
-            <!-- change button color to default-red-button when it is overquota -->
-            <div class="default-red-button button up-action">[$5549]</div>
-            <!--<div class="default-orange-button button hidden">Upgrade account</div>-->
-        </div>
-    </div>
-    <div class="transfer-progress-widget expand">
-        <div class="transfer-progress-head">
-            <!-- add download/upload/error/complete/overquota/almost-overquota to transfer-progress-widget -->
-            <div class="transfer-progress-type download">
-                <div class="status-indicator">
-                    <div class="transfer-progress-icon overquota"></div>
-                    <div class="transfer-progress-pct">90%</div>
-                </div>
-                <div class="transfer-progress-txt">3 items left</div>
-                <div class="transfer-progress-icon transfer-error-1"></div>
-            </div>
-            <div class="transfer-progress-type upload"> <!--error almost-overquota-->
-                <div class="status-indicator">
-                    <div class="transfer-progress-icon almost-overquota"></div>
-                    <div class="transfer-progress-pct">83%</div>
-                </div>
-                <div class="transfer-progress-txt">Over transfer quota</div>
-                <div class="transfer-progress-icon transfer-error-1"></div>
-            </div>
-            <div class="transfer-progress-type initial hidden">
-                <div class="transfer-progress-initial"></div>
-                <div class="transfer-progress-txt"> </div>
-            </div>
-            <div class="transfer-control-panel">
-                <div class="transfer-progress-icon tpw-c-e expand"></div>
-                <div class="transfer-progress-icon tpw-c-e collapse"></div>
-                <div class="transfer-progress-icon tpw-close close"></div>
-            </div>
-        </div>
-        <div class="transfer-section-button process-list hidden">[$22158]</div>
-        <div class="widget-body-container">
-            <div class="transfer-progress-widget-body">
-
-                <!-- add progress/complete/error/inqueue/pause and upload/download to transfer-task-row -->
-                <div class="transfer-task-row upload progress">
-                    <span class="transfer-filetype-icon image"></span>
-                    <div class="transfer-filetype-txt">example image name loooo oooo.png</div>
-                    <div class="transfer-file-size">200 MB</div>
-                    <div class="transfer-task-status">1.3 MB/s</div>
-                    <div class="transfer-task-actions">
-                        <i class="transfer-progress-icon pause">
-                            <div class="tooltips"> </div>
-                        </i>
-                        <i class="transfer-progress-icon cancel">
-                            <div class="tooltips"> </div>
-                        </i>
-                    </div>
-                    <div class="transfer-progress-bar">
-                        <div class="transfer-progress-bar-pct"></div>
-                    </div>
-                </div>
-                <div class="transfer-task-row download complete">
-                    <span class="transfer-filetype-icon image"></span>
-                    <div class="transfer-filetype-txt">example image name loooo oooo.png</div>
-                    <div class="transfer-file-size">200 MB</div>
-                    <div class="transfer-task-status">1.3 MB/s</div>
-                </div>
-            </div>
-        </div>
-        <div class="transfer-section-button complete-list hidden">[$22159]</div>
-    </div>
-</div>
-

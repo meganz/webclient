@@ -37,8 +37,18 @@
         <div class="top-menu-content">
 
             <div class="top-menu-logged">
-                <div class="avatar-block">
-                    <img alt="" />
+                <div class="top-menu-account-info">
+                    <div class="avatar-block">
+                        <div class="wrapper"></div>
+                        <div class="activity-status-block js-activity-status">
+                            <div class="loading-animation"></div>
+                            <div class="activity-status top offline"></div>
+                        </div>
+                    </div>
+                    <div class="user-info">
+                        <div class="name"></div>
+                        <div class="email"></div>
+                    </div>
                 </div>
                 <div class="user-info">
                     <div class="name"></div>
@@ -119,9 +129,8 @@
                 <div class="top-menu-item pro">[$1361]</div>
                 <div class="top-menu-item affiliate">[$22682]</div>
                 <div class="top-menu-item blog blogarticle">[$389]</div>
-                 <div class="top-menu-item corporate">[$24093]</div>
+                <div class="top-menu-item corporate">[$24093]</div>
              </div>
-
             <div class="top-menu-item submenu-item">
                 <i class="top-menu-icon menus-sprite support"></i>
                 <span>[$383]</span>
@@ -156,7 +165,7 @@
                 <div class="top-menu-item copyright">[$387]</div>
                 <div class="top-menu-item takedown">[$966]</div>
                 <div class="top-menu-item transparency">[$22681]</div>
-                <div class="top-menu-item cookies">[$24629]</div>
+                <div class="top-menu-item cookie">[$24629]</div>
                 <div class="top-menu-item cookies-settings">[$24644]</div>
             </div>
 
@@ -250,12 +259,12 @@
 <div class="mobile fm-dialog-container hidden">
     <div class="mobile fm-dialog-aligner">
         <div class="mobile fm-dialog-viewport">
-            <div class="mobile fm-dialog park-account-dialog hidden">
-                <div class="fm-dialog-header">
+            <div class="fm-dialog mobile park-account-dialog hidden">
+                <header>
                     <div class="fm-dialog-title">[$18307]</div>
                     <div class="fm-dialog-close"></div>
                     <div class="clear"></div>
-                </div>
+                </header>
                 <div class="fm-dialog-body improved-recovery-steps">
                     <div class="checkbox-block park-account-checkbox">
                         <div class="info-container">
@@ -291,7 +300,7 @@
                             </div>
                         </div>
                     </div>
-                    <input class="titleTop withIcon" type="text" name="recover-input1" id="recover-input1-di" value="" placeholder="[$195]" maxlength="190" data-icon="account-icon email">
+                    <input class="underlinedText withIcon" type="text" name="recover-input1" id="recover-input1-di" value="" placeholder="[$195]" maxlength="190" data-icon="account-icon email">
                     <!-- Only show this div when all the checkboxes have been ticked and the email field has been filled in. -->
                     <div class="content-highlight warning">
                         <div class="highlight-wrapper">
@@ -313,7 +322,7 @@
 <!-- Add Contact Card
      Display when users scans someones QR code or when a contact URL is entered -->
 <!-- important token to get the below dialog to memory, DONT REMOVE LINE-->
-<div class="mobile fm-dialog main-block hidden" id="mobile-ui-contact-card">
+<div class="fm-dialog mobile main-block hidden" id="mobile-ui-contact-card">
     <div class="mobile content-row first">
         <div class="mobile content-cell">
             <a class="mobile logo" href="https://mega.nz"></a>

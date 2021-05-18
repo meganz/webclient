@@ -172,14 +172,14 @@
      * @private
      */
     var setDialogBreadcrumb = function(aTarget) {
-        var path = false;
-        var names = Object.create(null);
-        var titles = Object.create(null);
-        var $dbc = $('.fm-picker-breadcrumbs', $dialog).empty();
+        let path = false;
+        let names = Object.create(null);
+        const titles = Object.create(null);
+        const dialog = $dialog[0];
         var autoSelect = $.copyToUpload && !$.copyToUpload[2];
 
         if (section === 'conversations') {
-            var chats = getSelectedChats();
+            const chats = getSelectedChats();
             if (chats.length > 1) {
                 path = [u_handle, 'contacts'];
                 names[u_handle] = l[23755];
@@ -198,7 +198,8 @@
 
         titles[M.RootID] = l[164];
         titles[M.RubbishID] = l[167];
-        titles['shares'] = l[5542];
+        titles.shares = l[5542];
+        titles.contacts = l[17765];
 
         if (path.length === 1) {
             names = titles;
@@ -216,7 +217,7 @@
                     var h = String(elm.id).split('_')[1];
                     path.push(h);
 
-                    elm = $dialog[0].querySelector('#mctreea_' + h + ' .nw-fm-tree-folder');
+                    elm = dialog.querySelector('#mctreea_' + h + ' .nw-fm-tree-folder');
                     if (elm) {
                         names[h] = elm.textContent;
                     }
@@ -224,70 +225,80 @@
             }
         }
 
-        for (var i = path.length; i--;) {
-            var h = path[i];
-            var type = 'folder';
-            var name = names[h] || M.getNameByHandle(h);
+        const scope = dialog.querySelector('.fm-picker-breadcrumbs');
+        const dictionary = handle => {
+            let name = names[handle] || M.getNameByHandle(handle) || '';
+            let id = handle;
+            let typeClass = 'folder';
 
-            if (h === M.RootID) {
+            if (handle === M.RootID) {
                 if (!folderlink) {
-                    type = 'cloud-drive';
+                    typeClass = 'cloud-drive';
                 }
             }
-            else if (h === M.RubbishID) {
-                type = 'rubbish-bin';
+            else if (handle === M.RubbishID) {
+                typeClass = 'rubbish-bin';
             }
-            else if (h === 'contacts') {
-                type = 'contacts';
+            else if (handle === 'contacts') {
+                typeClass = 'contacts';
             }
-            else if (h === 'shares') {
-                type = 'shared-with-me';
+            else if (handle === 'shares') {
+                typeClass = 'shared-with-me';
             }
-            else if (h.length === 11) {
-                type = 'contact';
+            else if (handle.length === 11) {
+                typeClass = 'contact';
             }
 
             if (name === 'undefined') {
                 name = '';
             }
 
-            var nameFmt = '@@';
-            if (section === 'conversations') {
-                nameFmt = name && megaChat.plugins.emoticonsFilter.processHtmlMessage(escapeHTML(name)) || nameFmt;
+            if (titles[handle]) {
+                name = titles[handle];
             }
 
-            $dbc.safeAppend(
-                '<a class="fm-breadcrumbs @@ @@" title="@@" data-node="@@">' +
-                '    <span class="right-arrow-bg"><span>' + nameFmt + '</span></span>' +
-                '</a>', type, i > 0 ? 'has-next-button' : '', titles[h] || name, h, name
-            );
+            if (section === 'conversations') {
+                name = name && megaChat.plugins.emoticonsFilter.processHtmlMessage(escapeHTML(name)) || name;
+            }
+            else if (typeClass === 'contact') {
+                name = '';
+            }
 
             if (autoSelect) {
-                selectTreeItem(h);
+                selectTreeItem(handle);
             }
-        }
 
-        if (path.length) {
-            $dbc.parent().addClass('correct-input').removeClass('high-light');
-        }
-        else {
-            $dbc.parent().addClass('high-light').removeClass('correct-input')
-                .find('.transfer-filetype-icon').removeClass('chat folder')
-                .addClass(section === 'conversations' ? 'chat' : 'folder');
-        }
+            return {
+                name,
+                id,
+                typeClass
+            };
+        };
 
-        $dbc.safeAppend('<div class="clear"></div>');
-
-        $('a.fm-breadcrumbs', $dialog).rebind('click', function() {
-            var $elm = $('#mctreea_' + $(this).attr('data-node'), $dialog);
+        M.renderBreadcrumbs(path, scope, dictionary, id => {
+            var $elm = $('#mctreea_' + id, $dialog);
             if ($elm.length) {
                 $elm.trigger('click');
             }
             else {
                 $('.fm-picker-dialog-button.active', $dialog).trigger('click');
             }
+            $('.breadcrumb-dropdown.active', $dialog).removeClass('active');
             return false;
         });
+
+        const placeholder = dialog.querySelector('.summary-input.placeholder');
+        if (path.length) {
+            placeholder.classList.add('correct-input');
+            placeholder.classList.remove('high-light');
+        }
+        else {
+            placeholder.classList.add('high-light');
+            placeholder.classList.remove('correct-input');
+            const filetypeIcon = placeholder.querySelector('.transfer-filetype-icon');
+            filetypeIcon.classList.remove('chat', 'folder');
+            filetypeIcon.classList.add(section === 'conversations' ? 'chat' : 'folder');
+        }
 
         if ($.copyToUpload) {
             // auto-select entries once
@@ -301,7 +312,8 @@
      * @private
      */
     var setSelectedItems = function(single) {
-        var $icon = $('.summary-items-drop-icon', $dialog).removeClass('drop-up-icon drop-down-icon hidden');
+        var $icon = $('.summary-items-drop-icon', $dialog)
+            .removeClass('icon-arrow-up drop-up icon-arrow-down drop-down hidden');
         var $div = $('.summary-items', $dialog).removeClass('unfold multi').empty();
         var names = Object.create(null);
         var items = $.selected || [];
@@ -325,7 +337,7 @@
         };
 
         var setTitle = function() {
-            $('.fm-picker-dialog-title', $dialog)
+            $('header h2', $dialog)
                 .text(
                     items.length < 2
                         ? l[19338]
@@ -400,7 +412,7 @@
                 var h = items[i];
                 var n = M.getNodeByHandle(h) || Object(h);
                 var name = names[h] || M.getNameByHandle(h) || n.name;
-                var tail = '<div class="delete-img icon"></div>';
+                var tail = '<i class="delete-item sprite-fm-mono icon-close-component "></i>';
                 var icon = fileIcon(n);
                 var data = n.uuid || h;
 
@@ -437,7 +449,7 @@
                     $icon.trigger('click');
                     return false;
                 });
-                $icon.addClass('drop-down-icon');
+                $icon.addClass('icon-arrow-down drop-down');
             }
             else {
                 $icon.addClass('hidden');
@@ -445,9 +457,9 @@
         }
         else {
             jScrollPane();
-            $icon.addClass('drop-up-icon');
+            $icon.addClass('icon-arrow-up drop-up');
 
-            $('.delete-img.icon', $div).rebind('click', function() {
+            $('.delete-item', $div).rebind('click', function() {
                 var $row = $(this).parent();
                 var data = $row.attr('data-node');
 
@@ -474,9 +486,6 @@
                 return false;
             });
         }
-
-        // reposition dialog in case we did hide selected-items (Ie. importing)
-        dialogPositioning($dialog);
     };
 
     /**
@@ -588,11 +597,10 @@
                     contactStatus = M.onlineStatusClass(M.d[handle].presence)[1];
                 }
                 contactElem += contactStatus + '">';
-                contactElem += '<i class="tiny-icon green-key"></i>';
+                contactElem += '<i class="encrypted-icon sprite-fm-uni icon-ekr"></i>';
                 contactElem += '<span class="nw-contact-status"></span>';
                 contactElem += '<span class="nw-contact-name">' + escapeHTML(name) + '</span>';
                 contactElem += '<span class="nw-contact-email">' + escapeHTML(email) + '</span>';
-                contactElem += '<span class="nw-contact-checkbox" /></span>';
                 contactElem = '<li id="cpy-dlg-chat-itm-' + handle + '">' + contactElem + '</li>';
                 return contactElem;
             }
@@ -605,10 +613,13 @@
                     + '" class="nw-contact-item multi-contact">';
 
                 if (chatRoom && (chatRoom.type === "group" || chatRoom.type === "private")) {
-                    groupElem += '<i class="tiny-icon green-key"></i>';
+                    groupElem += '<i class="encrypted-icon sprite-fm-uni icon-ekr"></i>';
+                }
+                else {
+                    groupElem += '<span class="encrypted-spacer"></span>';
                 }
 
-                groupElem += '<span class="nw-contact-group-icon"></span>';
+                groupElem += '<i class="group-chat-icon sprite-fm-mono icon-contacts"></i>';
 
                 var namesCombine = names[0];
                 var k = 1;
@@ -624,7 +635,6 @@
                     megaChat.plugins.emoticonsFilter.processHtmlMessage(escapeHTML(namesCombine)) +
                     '</span>';
                 groupElem += '<span class="nw-contact-group">' + l[24157].replace('%1', nb) + '</span>';
-                groupElem += '<span class="nw-contact-checkbox" /></span>';
                 groupElem = '<li id="cpy-dlg-chat-itm-' + handle + '">' + groupElem + '</li>';
                 return groupElem;
             }
@@ -852,9 +862,12 @@
 
         // inherited dialog content...
         var html = section !== 'conversations' && $('.content-panel.' + section).html();
+        var $permissionSelect = $('.permissions.dropdown-input', $dialog);
+        var $permissionIcon = $('i.permission', $permissionSelect);
+        var $permissionOptions = $('.option', $permissionSelect);
 
         // Action button label
-        $('.dialog-picker-button', $dialog).text(buttonLabel);
+        $('.dialog-picker-button span', $dialog).text(buttonLabel);
 
         // if the site is initialized on the chat, $.selected may be `undefined`,
         // which may cause issues doing .length on it in dialogs.js, so lets define it as empty array
@@ -903,9 +916,11 @@
 
         if ($.copyToUpload) {
             $('.fm-picker-notagain', $dialog).removeClass('hidden');
+            $('footer', $dialog).removeClass('dialog-bottom');
         }
         else {
             $('.fm-picker-notagain', $dialog).addClass('hidden');
+            $('footer', $dialog).addClass('dialog-bottom');
         }
 
         handleDialogTabContent(section, section === 'conversations' ? 'div' : 'ul', html);
@@ -921,63 +936,40 @@
         }
 
         // Reset the value of permission and permissions list
-        if ($('.share-dialog-permissions', $dialog).length > 0) {
-            $('.share-dialog-permissions', $dialog).removeClass("read-and-write full-access").addClass("read-only")
-                .safeHTML('<span></span>' + l[7534]);
-            $('.permissions-menu-item', $dialog).removeClass('active');
-            $('.permissions-menu-item.read-only', $dialog).addClass('active');
-        }
+        if ($permissionSelect.length > 0) {
 
-        // Unbind the click event of hiding the permissions menu from the dialog
-        $dialog.off('click.hidePermissionsMenu');
+            $permissionSelect.attr('data-access', 'read-only');
+            $permissionIcon.attr('class', 'permission sprite-fm-mono icon-read-only');
+            $('> span', $permissionSelect).text(l[7534]);
+            $permissionOptions.removeClass('active');
+            $('.permissions .option[data-access="read-only"]', $dialog).addClass('active');
+            $('.permissions .option[data-state="active"]', $dialog).removeAttr('data-state');
+        }
 
         // If copying from contacts tab (Ie, sharing)
         if (!$.saveToDialog && section === 'cloud-drive'
-            && (M.currentrootid === 'contacts' || M.currentrootid === 'chat')) {
-            $('.fm-picker-dialog-title', $dialog).text(l[1344]);
+            && (M.currentrootid === 'contacts' || M.currentrootid === 'chat' || $.copyToShare)) {
+
+            $('header h2', $dialog).text(l[1344]);
             $('.dialog-newfolder-button', $dialog).addClass('hidden');
-            $('.share-dialog-permissions', $dialog).removeClass('hidden')
-                .rebind('click', function() {
-                    var $btn = $(this);
-                    var $menu = $('.permissions-menu', this.parentNode);
-                    var $items = $('.permissions-menu-item', $menu);
+            $permissionSelect.removeClass('hidden');
+            bindDropdownEvents($permissionSelect);
 
-                    $menu.removeAttr('style');
+            $permissionOptions.rebind('click.selectpermission', function() {
+                var $this = $(this);
 
-                    $items
-                        .rebind('click', function() {
-                            $items.off('click');
-
-                            $items.removeClass('active');
-                            $(this).addClass('active');
-                            $btn.attr('class', 'share-dialog-permissions ' + this.classList[1])
-                                .safeHTML('<span></span>' + $(this).text());
-                            $menu.fadeOut(200);
-                        });
-                    $menu.fadeIn(200);
-                });
-            // Hide the permissions menu once click out the menu
-            $dialog.rebind('click.hidePermissionsMenu', function(e) {
-                var $this = $(e.target);
-                if (!$this.hasClass('permissions-menu')
-                    && $this.parents('.permissions-menu').length === 0
-                    && !$this.hasClass('share-dialog-permissions')
-                    && $this.parents('.share-dialog-permissions').length === 0
-                ) {
-                    $('.permissions-menu', $dialog).fadeOut(200);
-                }
+                $permissionIcon.attr('class', 'permission sprite-fm-mono ' + $this.attr('data-icon'));
+                $permissionSelect.attr('data-access', $this.attr('data-access'));
             });
         }
         else if ($.selectFolderDialog) {
-            $('.share-dialog-permissions', $dialog).addClass('hidden');
-            $('.fm-picker-dialog-title', $dialog).text(l[16533]);
+            $permissionSelect.addClass('hidden');
+            $('header h2', $dialog).text(l[16533]);
         }
         else {
-            $('.share-dialog-permissions', $dialog).addClass('hidden');
-            $('.fm-picker-dialog-title', $dialog).text(getDialogTitle());
+            $permissionSelect.addClass('hidden');
+            $('header h2', $dialog).text(getDialogTitle());
         }
-
-        dialogPositioning($dialog);
 
         // 'New contact' button
         if (section === 'conversations') {
@@ -1024,7 +1016,6 @@
         });
 
         $.hideContextMenu();
-        dialogPositioning($dialog);
         $dialog.removeClass('duplicate');
 
         console.assert($dialog, 'The dialogs subsystem is not yet initialized!...');
@@ -1205,7 +1196,7 @@
             return false;
         }
 
-        $dialog = $('.fm-dialog.fm-picker-dialog');
+        $dialog = $('.mega-dialog.fm-picker-dialog');
         var $btn = $('.dialog-picker-button', $dialog);
         var $swm = $('.shared-with-me', $dialog);
         var dialogTooltipTimer;
@@ -1221,7 +1212,15 @@
 
         $('.fm-picker-dialog-tree-panel.conversations .fm-picker-dialog-panel-header span:first').text(l[17765]);
 
-        $('.fm-dialog-close, .dialog-cancel-button', $dialog).rebind('click', closeDialog);
+        // close breadcrumb overflow menu
+        $dialog.rebind('click.dialog', e => {
+            if (!e.target.closest('.breadcrumb-dropdown, .breadcrumb-dropdown-link') &&
+                $('.breadcrumb-dropdown', $dialog).hasClass('active')) {
+                $('.breadcrumb-dropdown', $dialog).removeClass('active');
+            }
+        });
+
+        $('button.js-close, .dialog-cancel-button', $dialog).rebind('click', closeDialog);
 
         $('.fm-picker-dialog-button', $dialog).rebind('click', function _(ev) {
             section = $(this).attr('class').split(" ")[1];
@@ -1397,7 +1396,7 @@
 
             createFolderDialog();
 
-            $('.fm-dialog.create-folder-dialog .create-folder-size-icon').addClass('hidden');
+            $('.mega-dialog.create-folder-dialog .create-folder-size-icon').addClass('hidden');
 
             // Auto-select the created folder.
             $.cfpromise.done(function(h) {
@@ -1451,7 +1450,7 @@
             var c = $(e.target).attr('class');
 
             // Sub-folder exist?
-            if (c && c.indexOf('nw-fm-arrow-icon') > -1) {
+            if (c && c.indexOf('nw-fm-tree-arrow') > -1) {
 
                 c = $(this).attr('class');
 
@@ -1511,8 +1510,10 @@
                 jsp.scrollToElement($(this), true);
             }
 
-            // If not copying from contacts tab (Ie, sharing)
-            if (!(section === 'cloud-drive' && (M.currentrootid === 'contacts' || M.currentrootid === 'chat'))) {
+            // // If not copying from contacts tab (Ie, sharing)
+            if (!(section === 'cloud-drive' &&
+                (M.currentrootid === 'contacts' || M.currentrootid === 'chat' || $.copyToShare))
+            ) {
                 if ($.mcselected && M.getNodeRights($.mcselected) > 0) {
                     $('.dialog-newfolder-button', $dialog).removeClass('hidden');
                 }
@@ -1563,7 +1564,7 @@
             dialogTooltipTimer = setTimeout(function() {
                 $tooltip.css({
                     'left': itemLeftPos + $item.outerWidth() / 2 - $tooltip.outerWidth() / 2 + 'px',
-                    'top': (itemTopPos - (note ? 99 : 63)) + 'px'
+                    'top': (itemTopPos - (note ? 99 : 68)) + 'px'
                 });
                 $tooltip.fadeIn(200);
             }, 200);
@@ -1732,11 +1733,11 @@
                     var user = {
                         u: shareToContactId ? shareToContactId : M.currentdirid
                     };
-                    var $sp = $('.share-dialog-permissions', $dialog);
-                    if ($sp.hasClass('read-and-write')) {
+                    var spValue = $('.permissions.dropdown-input', $dialog).attr('data-access');
+                    if (spValue === 'read-and-write') {
                         user.r = 1;
                     }
-                    else if ($sp.hasClass('full-access')) {
+                    else if (spValue === 'full-access') {
                         user.r = 2;
                     }
                     else {

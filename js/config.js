@@ -494,8 +494,9 @@
             dlQueue.setSize(dlSlots);
         }
 
-        if (fmconfig.font_size) {
-            $('body').removeClass('fontsize1 fontsize2').addClass('fontsize' + fmconfig.font_size);
+        if (fmconfig.font_size && !document.body.classList.contains('fontsize' + fmconfig.font_size)) {
+            document.body.classList.remove('fontsize1', 'fontsize2');
+            document.body.classList.add('fontsize' + fmconfig.font_size);
         }
 
         if (fmconfig.fmColPrefs) {

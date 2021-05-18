@@ -676,9 +676,15 @@ var redeem = {
             var greenBtnText = l[968];
             var whiteBtnText = l[171];
             var titleText = l[22120];
-            var $greenBtn = $('.voucher-info-create', $dlg).removeClass('disabled');
-            var $whiteBtn = $('.voucher-info-login', $dlg).removeAttr('bFail');
-            var $dlgTitle = $('.dialog-title', $dlg).removeClass('red');
+            var $greenBtn = $('.voucher-info-create', $dlg);
+            var $greenBtnSpan = $('span', $greenBtn);
+            var $whiteBtn = $('.voucher-info-login', $dlg);
+            var $whiteBtnSpan = $('span', $whiteBtn);
+            var $dlgTitle = $('h2', $dlg);
+
+            $greenBtn.removeClass('disabled');
+            $whiteBtn.removeAttr('bFail');
+            $dlgTitle.removeClass('red');
 
             if (mega.voucher.businessmonths) {
                 $('.v-storage', $dlg).safeHTML(l[23789].replace('%1', '<span>15 ' + l[20160] + '</span>'));
@@ -743,8 +749,8 @@ var redeem = {
             }
             $dlgTitle.text(titleText);
 
-            $greenBtn.text(greenBtnText);
-            $whiteBtn.text(whiteBtnText);
+            $greenBtnSpan.text(greenBtnText);
+            $whiteBtnSpan.text(whiteBtnText);
 
             $whiteBtn.rebind(
                 'click',
@@ -782,7 +788,7 @@ var redeem = {
                     return false;
                 });
 
-            $('.close-voucher-redeem', $dlg).rebind(
+            $('button.js-close', $dlg).rebind(
                 'click',
                 function() {
                     if (is_mobile) {
@@ -804,7 +810,7 @@ var redeem = {
 
         if (!is_mobile) {
             M.safeShowDialog('voucher-info-dlg', function() {
-                var $dlg = $('.fm-dialog.voucher-info-redeem');
+                var $dlg = $('.mega-dialog.voucher-info-redeem');
 
                 return infoFilling($dlg);
             });
@@ -995,12 +1001,12 @@ var redeem = {
                     else {
                         redeem();
                     }
+                    loadingDialog.hide();
                 })
                 .catch(function(ex) {
                     if (ex) {
                         console.warn('redeemVoucher', ex);
                     }
-
                     // Oops, that does not seem to be a valid voucher code.
                     msgDialog('warninga', l[135], l[473], '', function() {
                         if ($.dialog) {
@@ -1008,6 +1014,7 @@ var redeem = {
                         }
                         reject(null);
                     });
+                    loadingDialog.hide();
                 });
         });
     },

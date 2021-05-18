@@ -5,23 +5,23 @@ var syncsel = false;
 function renderLinuxOptions(linuxsync) {
     var ostxt;
     var $content = $('.bottom-page.megasync');
+    var $linuxContainer = $('.megaapp-linux-box-container', $content);
     syncurl = undefined;
     syncsel = false;
 
     $content.addClass('linux');
-    $('.megaapp-linux-box-container', $content).removeClass('hidden');
-    $content.find('.architecture-checkbox input').rebind('click', function() {
-        var val = $(this).val();
-        $content.find('.architecture-checkbox input').each(function() {
-            var $other = $(this);
-            if ($other.val() !== val) {
-                $other.parent().removeClass('radioOn').addClass('radioOff');
-                $other.prop('checked', false);
-            } else {
-                $other.parent().removeClass('radioOff').addClass('radioOn');
-                $other.prop('checked', true);
-            }
-        });
+    $linuxContainer.removeClass('hidden');
+
+    $('.architecture-checkbox input', $content).rebind('click', function() {
+        var $this = $(this);
+        var $radioWrappers = $('.architecture-checkbox', $content);
+
+        $radioWrappers.removeClass('radioOn').addClass('radioOff');
+        $('input', $radioWrappers).removeClass('radioOn').addClass('radioOff')
+            .prop('checked', false);
+
+        $this.parent().removeClass('radioOff').addClass('radioOn');
+        $this.removeClass('radioOff').addClass('radioOn').prop('checked', true);
 
         if (syncsel) {
             setTimeout(function() {
@@ -31,9 +31,11 @@ function renderLinuxOptions(linuxsync) {
 
         return false;
     });
-    $content.find('.nav-buttons-bl a.linux').addClass('active');
-    $content.find('.megasync .megaapp-linux-default').text(l[7086]);
+    $('.nav-buttons-bl a.linux', $content).addClass('active');
+    $('.megasync .megaapp-linux-default', $content).text(l[7086]);
+
     var ua = navigator.userAgent.toLowerCase();
+
     if (ua.indexOf('i686') > -1 || ua.indexOf('i386') > -1 || ua.indexOf('i586') > -1) {
         $content.find('.megaapp-linux .linux32').click();
     }
@@ -54,19 +56,19 @@ function resetMegasync() {
     'use strict';
 
     var $content = $('.bottom-page.megasync');
-    var $linuxBlock = $content.find('.megaapp-linux');
+    var $linuxBlock = $('.megaapp-linux', $content);
 
     $content.removeClass('linux');
-    $content.find('.nav-buttons-bl a.linux').removeClass('active');
-    $linuxBlock.closest('.megaapp-linux-box-container').addClass('hidden');
-    $linuxBlock.find('.megaapp-linux-default').text(l[7086]);
-    $linuxBlock.find('.radio-buttons label, .architecture-checkbox').removeClass('hidden');
-    $linuxBlock.find('.linux-bit-radio').addClass('hidden');
-    $linuxBlock.find('.megaext-dropdown').addClass('disabled');
-    $linuxBlock.find('.megaext-header').addClass('disabled');
-    $linuxBlock.find('.megaext-info-hover').addClass('disabled');
-    $linuxBlock.find('.megaapp-linux-download, .megaext-linux-download').addClass('disabled');
-    $linuxBlock.find('.megaext-linux-default').text(l[7086]);
+    $('.megaapp-linux-box-container', $content).addClass('hidden');
+    $('.nav-buttons-bl a.linux', $content).removeClass('active');
+    $('.radio-buttons label, .architecture-checkbox', $linuxBlock).removeClass('hidden');
+    $('.linux-bit-radio', $linuxBlock).addClass('hidden');
+    $('.megaext-dropdown', $linuxBlock).addClass('disabled');
+    $('.megaext-header', $linuxBlock).addClass('disabled');
+    $('.megaext-info-hover', $linuxBlock).addClass('disabled');
+    $('.megaapp-linux-download, .megaext-linux-download', $linuxBlock)
+        .addClass('disabled');
+    $('.dropdown-input > span', $linuxBlock).text(l[7086]);
 }
 
 /**
@@ -90,7 +92,7 @@ function initMegasync() {
         megasync.getLinuxReleases(renderLinuxOptions);
     }
 
-    $content.find('.nav-buttons-bl a').rebind('click', function() {
+    $('.nav-buttons-bl a', $content).rebind('click', function() {
         var $this = $(this);
         var osData = $this.attr('data-os');
 
@@ -127,7 +129,6 @@ function initMegasync() {
         return false;
     });
 
-
     $('.megaapp-windows-info.32bit a', $content).rebind('click.megasyncWin32', function() {
         window.location = megasync.getMegaSyncUrl('windows_x32');
         return false;
@@ -154,42 +155,29 @@ function initMegasync() {
                     $copiedMsg.addClass('hidden');
                 }, 2000);
             }
-        })
-        .rebind('mouseover', function() {
-            var $this = $(this);
-            if (!$this.hasClass('active')) {
-                $this.addClass('active');
-                $('.copy-line-icon', $this).addClass('active');
-            }
-        })
-        .rebind('mouseleave', function() {
-            var $this = $(this);
-            if ($this.hasClass('active')) {
-                $this.removeClass('active');
-                $('.copy-line-icon', $this).removeClass('active');
-            }
         });
 
-    registerLinuxDownloadButton($content.find('.megaapp-linux-download, .megaext-linux-download'));
+    registerLinuxDownloadButton($('.megaapp-linux-download, .megaext-linux-download', $content));
 
-    $content.find('.tab-button').rebind('click', function() {
+    $('.tab-button', $content).rebind('click', function() {
         var $this = $(this);
         var className = $this.attr('data-class');
 
         if (!$this.hasClass('active')) {
-            $content.find('.tab-button, .tab-body, .dark-tab-img').removeClass('active');
+            $('.tab-button, .tab-body, .dark-tab-img', $content).removeClass('active');
             $this.addClass('active');
-            $content.find('.' + className).addClass('active');
+            $('.' + className, $content).addClass('active');
         }
         return false;
     });
 
-    $content.rebind('click.resetMegaSync', function(e) {
+    $content.rebind('mousedown.resetMegaSync', function(e) {
         var $target = $(e.target);
-        if (!(megasync.UICloseLinuxDropdown() || megasync.UICloseExtensionsDropdown())) {
-            if (pf.indexOf('LINUX') < 0 && $target.closest('.megaapp-linux').length < 1) {
-                resetMegasync();
-            }
+
+        if (pf.indexOf('LINUX') < 0 && !$target.closest('.megaapp-linux').length
+            && !$('.dropdown-input.active', $content).length) {
+
+            resetMegasync();
         }
     });
 

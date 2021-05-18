@@ -11,7 +11,6 @@ const LIMIT = {
 };
 
 export class HistoryRetentionDialog extends Component {
-    textWidth = React.createRef();
     inputRef = React.createRef();
 
     state = {
@@ -222,27 +221,29 @@ export class HistoryRetentionDialog extends Component {
             <ModalDialogsUI.ModalDialog
                 {...this.state}
                 chatRoom={chatRoom}
-                onClose={onClose}>
-                <div
-                    className="msg-retention-dialog"
-                    onClick={() => this.inputRef.current.focus()}>
-                    <div className="text-width-wrapper" ref={this.textWidth}>
-                        {hasInput ? this.state.timeRange : ''}
-                    </div>
-                    <div className="msg-retention-dialog__header">
-                        <p className="msg-retention-dialog__title">{HistoryRetentionDialog.labels.copy.title}</p>
+                onClose={onClose}
+                dialogName="msg-retention-dialog"
+                dialogType="tool"
+                onClick={() => this.inputRef.current.focus()}>
+
+                <header>
+                    <h2 id="msg-retention-dialog-title">{HistoryRetentionDialog.labels.copy.title}</h2>
+                </header>
+
+                <section className="content">
+                    <div className="content-block">
                         <p>{HistoryRetentionDialog.labels.copy.subtitle}</p>
                     </div>
-                    <div className="msg-retention-dialog__form">
-                        <div className="msg-retention-dialog__form__section">
-                            <span className="msg-retention-dialog__form__section__placeholder">
+                    <div className="content-block form">
+                        <div className="form-section">
+                            <span className="form-section-placeholder">
                                 {this.getParsedLabel(selectedTimeFormat, this.state.timeRange)}
                             </span>
                             <input
                                 type="number"
                                 min="0"
                                 step="1"
-                                className="msg-retention-dialog__form__section__time"
+                                className="form-section-time"
                                 placeholder={this.getDefaultValue(selectedTimeFormat)}
                                 ref={this.inputRef}
                                 autoFocus={true}
@@ -250,28 +251,31 @@ export class HistoryRetentionDialog extends Component {
                                 onKeyDown={e => (e.key === '-' || e.key === '+' || e.key === 'e') && e.preventDefault()}
                             />
                         </div>
-                        <div className="msg-retention-dialog__form__section">
-                            <div className="msg-retention-dialog__form__section__radio">
+                        <div className="form-section">
+                            <div className="form-section-radio">
                                 {this.renderCustomRadioButton()}
                             </div>
                         </div>
                     </div>
-                    <div className="msg-retention-dialog__header__footer">
-                        <div
-                            className="default-white-button"
+                </section>
+
+                <footer>
+                    <div className="footer-container">
+                        <button
+                            className="mega-button"
                             onClick={this.props.onClose}>
-                            {HistoryRetentionDialog.labels.copy.cancel}
-                        </div>
-                        <div
+                            <span>{HistoryRetentionDialog.labels.copy.cancel}</span>
+                        </button>
+                        <button
                             className={`
-                                default-green-button gradient
+                                mega-button positive
                                 ${hasInput ? '' : 'disabled'}
                             `}
                             onClick={e => hasInput ? this.handleOnClick(e) : false}>
-                            {HistoryRetentionDialog.labels.copy.done}
-                        </div>
+                            <span>{HistoryRetentionDialog.labels.copy.done}</span>
+                        </button>
                     </div>
-                </div>
+                </footer>
             </ModalDialogsUI.ModalDialog>
         );
     }
@@ -279,17 +283,23 @@ export class HistoryRetentionDialog extends Component {
 
 function CustomRadioButton({ checked = false, label, name, value, onChange }) {
     return (
-        <label className="custom-radio">
+        <label
+            key={value}
+            className="radio-txt">
             {label}
-            <input
-                type="radio"
-                name={name}
-                value={value}
-                className="radio-btn"
-                checked={checked}
-                onChange={onChange}
-            />
-            <div className="custom-radio-btn" />
+
+            <div className={
+                "custom-radio small green-active " +
+                (checked ? "radioOn" : "radioOff")
+            }>
+                <input
+                    type="radio"
+                    name={name}
+                    value={value}
+                    checked={checked}
+                    onChange={onChange}
+                />
+            </div>
         </label>
     );
 }

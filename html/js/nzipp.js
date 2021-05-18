@@ -71,7 +71,7 @@ var nzippCampaign = {
 
         var $selects = $('select', this.$interviewPage);
 
-        mega.ui.MegaInputs($('.titleTop', this.$interviewPage));
+        mega.ui.MegaInputs($('.underlinedText', this.$interviewPage));
 
         if (!is_mobile) {
             $selects.selectmenu({

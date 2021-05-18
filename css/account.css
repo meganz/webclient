@@ -11,12 +11,13 @@
 .account.register-form, .account.login-form {
     width: 100%;
     border: 1px solid rgba(0,0,0,0.05);
-    border-radius: 8px;
+    border-radius: 24px;
     padding: 4px 48px 0;
     box-sizing: border-box;
     background-color: #fff;
     box-shadow: 0 1px 2px 0 rgba(0,0,0,0.1);
     text-align: center;
+    overflow: hidden;
 }
 .account.register-form .pw-strength-wrap {
     margin-top: -15px;
@@ -24,43 +25,62 @@
     text-align: left;
 }
 .account.register-form .checkbox-block {
-    margin-top: 4px;
+    align-items: flex-start;
+    display: flex;
+    padding: 24px 0 0 0;
+    text-align: initial;
 }
-.account.register-form .checkbox-block.pw-remind {
-    margin-top: 24px;
+.account.register-form .checkbox-block + .checkbox-block {
+    padding-top: 8px;
 }
-.account.register-form .checkbox-block.register {
-    padding:0 0 48px 0;
+.account.register-form .checkbox {
+    margin: 2px 0;
+    -webkit-margin-end: 14px;
+    margin-inline-end: 14px;
 }
 .account.register-form .radio-txt {
-    color: #666;
+    color: var(--text-color-medium);
+    font: var(--text-body1);
     font-size: 13px;
-    text-align: left;
-    padding-right: 0;
-    padding-top: 4px;
 }
 .account.register-form .content-txt.pw-strength-note {
     margin-top: 8px;
     margin-left: 4px;
     color: #aaa;
 }
-.account.register-form .dialog-dark-bottom.login, .account.login-form .dialog-dark-bottom.register {
-    width: calc(100% + 96px);
-    margin-left: -48px;
-    padding: 0 48px;
-    color: #ddd;
-    line-height: 48px;
+.account.register-form .dialog-dark-bottom.login,
+.account.login-form .dialog-dark-bottom.register {
+    align-items: center;
+    color: var(--text-color-medium-inverted);
+    background: var(--surface-main-inverted);
+    box-sizing: border-box;
+    display: flex;
+    font: var(--text-body1);
+    justify-content: center;
+    margin: 0 -48px;
+    min-height: 48px;
+    padding: 12px 48px;
 }
 .main-left-block.confirm .account.login-form .dialog-dark-bottom.register,
 .main-left-block.businessSubAc .account.register-form .dialog-dark-bottom.login  {
     display: none;
 }
-.account.register-form .dialog-dark-bottom.login a, .account.login-form .dialog-dark-bottom.register a {
+.account.register-form .dialog-dark-bottom.login a,
+.account.login-form .dialog-dark-bottom.register a {
     font-size: 15px;
-    color: #fff;
-    font-family: 'LatoWebBold', 'source_sans_prosemibold', Arial;
+    color: var(--text-color-high-inverted);
+    font-family: var(--text-font-family-semibold);
     margin-left: 4px;
+    text-decoration: underline;
 }
+
+@media (hover: hover) {
+    .account.register-form .dialog-dark-bottom.login a:hover,
+    .account.login-form .dialog-dark-bottom.register a:hover {
+        text-decoration: none;
+    }
+}
+
 .account.top-header {
     font-family: 'montserrat', 'LatoWeb', 'source_sans_proregular', Arial;
     font-size: 28px;
@@ -68,11 +88,11 @@
     color: #333;
     padding: 48px 0 40px 0;
 }
-.fm-dialog-header .account.top-header {
+.mega-dialog header .account.top-header {
     padding: 40px 0px 10px 40px;
     color: #333;
 }
-.fm-dialog-header .account.top-header.small {
+.mega-dialog header .account.top-header.small {
     padding: 40px 0px 0px 40px;
     font-size: 26px;
 }
@@ -105,111 +125,93 @@
 }
 .account.half-sized-block.full-sized-error .message-container {
     width: calc(200% + 24px);
-    width: -webkit-calc(200% + 24px);
-    width: -moz-calc(200% + 24px);
 }
 .account.input-wrapper {
-    border-bottom: 1px solid rgba(0,0,0,0.2);
-    padding: 9px 0 9px 38px;
+    border-bottom: 1px solid var(--stroke-grey-2);
+    padding: 14px 0 5px 0;
+    -webkit-padding-end: 8px;
+    padding-inline-end: 8px;
+    -webkit-padding-start: 38px;
+    padding-inline-start: 38px;
     margin: 0 0 24px 0;
     position: relative;
     font-size: 0;
     line-height: 0;
     white-space: nowrap;
-    -webkit-transition: border-color 200ms ease-in-out;
-    -moz-transition: border-color 200ms ease-in-out;
-    -o-transition: border-color 200ms ease-in-out;
-    -ms-transition: border-color 200ms ease-in-out;
     transition: border-color 200ms ease-in-out;
 }
 .account.input-wrapper.small {
-    margin: 0 0 8px 0;
+    margin: 0;
+    -webkit-margin-start: 8px;
+    margin-inline-start: 8px;
 }
 .account.input-wrapper.top-placeholder {
-    margin: 0 0 20px 0;
+    margin: 0 0 24px 0;
 }
 .account.input-wrapper.top-placeholder label {
     display: none;
     position: absolute;
     top: -12px;
-    font-family: 'LatoWeb', 'source_sans_proregular', Arial;
-    color: #999999;
-    font-size: 12px;
-    line-height: 20px;
-    letter-spacing: 0.86px;
+    color: var(--text-color-low);
+    font: var(--text-body2);
 }
-.account.input-wrapper.top-placeholder input:not(:placeholder-shown) + label, .account.input-wrapper.top-placeholder.selected label {
+.account.input-wrapper.top-placeholder input:not(:placeholder-shown) + label,
+.account.input-wrapper.top-placeholder.selected label {
     display: block;
 }
 .account.input-wrapper.focused {
-    border-color: rgba(0,0,0,0.4);
+    border-color: rgba(0, 0, 0, 0.4);
 }
 .account.input-wrapper.incorrect, .both-incorrect-inputs .account.input-wrapper {
-    border-color: rgba(218,49,53,0.5);
+    border-color: var(--stroke-error);
 }
 .account.input-wrapper i {
+    --mask-color: var(--text-color-medium);
     position: absolute;
-    width: 26px;
-    height: 26px;
+    --icon-size: 24px;
     left: 4px;
-    top: 9px;
-    opacity: 0.6;
+    top: 14px;
 }
-.account.input-wrapper input, .account.input-wrapper .ui-selectmenu-button, .account.input-wrapper select {
+.rtl .account.input-wrapper i {
+    left: auto;
+    right: 4px;
+}
+.account.input-wrapper input,
+.account.input-wrapper .ui-selectmenu-button,
+.account.input-wrapper select {
     background-color: transparent;
-    font-family: 'LatoWeb', 'source_sans_proregular', Arial;
     border: 0;
     margin: 0;
     padding: 0;
-    font-size: 14px;
-    line-height: 25px;
-    height: 25px;
-    letter-spacing: 1px;
-    color: #000000;
+    font: var(--text-body1);
+    height: 24px;
+    color: var(--text-color-medium);
     width: 100%;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
     box-sizing: border-box;
-    -webkit-transition: color 200ms ease-in-out;
-    -moz-transition: color 200ms ease-in-out;
-    -o-transition: color 200ms ease-in-out;
-    -ms-transition: color 200ms ease-in-out;
     transition: color 200ms ease-in-out;
 }
 .account.input-wrapper select {
-    height: 25px;
+    height: 24px;
     opacity: 0;
 }
 .account.input-wrapper .select-arrow {
     z-index: -1;
     left: auto;
     right: 5px;
-    -webkit-transition: transform 200ms ease-in-out;
-    -moz-transition: transform 200ms ease-in-out;
-    -o-transition: transform 200ms ease-in-out;
-    -ms-transition: transform 200ms ease-in-out;
     transition: transform 200ms ease-in-out;
 }
 .ui-selectmenu-button-open + label + .select-arrow {
-    -ms-transform: rotate(90deg);
-    -webkit-transform: rotate(90deg);
     transform: rotate(90deg);
 }
 .account.input-wrapper .ui-selectmenu-button {
-    float: none;
-    min-width: 0;
-    height:25px;
-    color: #999999;
-    font-size: 12px;
-    letter-spacing: 0.86px;
-    -webkit-box-shadow: none;
-    -moz-box-shadow: none;
+    height: 24px;
+    color: var(--text-color-medium);
+    font: var(--text-body2);
     box-shadow: none;
 }
 .account.input-wrapper.selected .ui-selectmenu-button {
-    font-size: 14px;
-    letter-spacing: 1px;
-    color: #000000;
+    font: var(--text-body1);
+    color: var(--text-color-medium);
 }
 .account.input-wrapper .ui-selectmenu-button::before {
     display: none;
@@ -220,37 +222,11 @@
 .account.input-wrapper.incorrect input, .both-incorrect-inputs .account.input-wrapper input {
     color: #DA3135;
 }
-.account.input-wrapper input::-webkit-input-placeholder {
-    color: #999999;
-    font-size: 12px;
-    letter-spacing: 0.86px;
+.account.input-wrapper input::placeholder {
+    color: var(--text-color-medium);
+    font: var(--text-body2);
 }
-.account.input-wrapper input:-moz-placeholder {
-    color: #999999;
-    font-size: 12px;
-    letter-spacing: 0.86px;
-    opacity: 1;
-}
-.account.input-wrapper input::-moz-placeholder {
-    color: #999999;
-    letter-spacing: 0.86px;
-    opacity: 1;
-}
-.account.input-wrapper input:-ms-input-placeholder {
-    color: #999999;
-    font-size: 12px;
-    letter-spacing: 0.86px;
-}
-.account.input-wrapper.focused input::-webkit-input-placeholder {
-    color: #CCC;
-}
-.account.input-wrapper.focused input:-moz-placeholder {
-    color: #CCC;
-}
-.account.input-wrapper.focused input::-moz-placeholder {
-    color: #CCC;
-}
-.account.input-wrapper.focused input:-ms-input-placeholder {
+.account.input-wrapper.focused input::placeholder {
     color: #CCC;
 }
 .account.input-wrapper input:-webkit-autofill, input:-webkit-autofill:focus {
@@ -303,33 +279,24 @@
     z-index: 2;
 }
 body.ar .sms-verification-number-input {
-    font-family: 'source_sans_proregular', Arial, sans-serif;
+    font-family: 'source_sans_proregular', Arial, sans-serif !important;
 }
 .account.input-tooltip, .both-input-tooltip {
-    background-color: #f8e6e6;
-    -moz-border-radius: 2px;
-    -webkit-border-radius: 2px;
-    border-radius: 2px;
-    font-size: 12px;
-    line-height: 18px;
+    background: var(--banner-background-warning);
+    border: 1px solid var(--banner-border-warning);
+    border-radius: 4px;
+    font: var(--text-body2);
     min-height: 24px;
-    padding: 4px 0;
-    text-transform: uppercase;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
     box-sizing: border-box;
-    padding: 3px 10px;
-    color: #DA3135;
+    padding: 4px 8px;
+    color: var(--banner-text-warning);
     position: absolute;
-    -webkit-box-shadow: 0px 0px 0px 1px rgba(218,49,53,0.5);
-    -moz-box-shadow: 0px 0px 0px 1px rgba(218,49,53,0.5);
-    box-shadow: 0px 0px 0px 1px rgba(218,49,53,0.5);
     left: 100%;
     bottom: 0;
-    margin: 0 0 0 20px;
+    -webkit-margin-start: 20px;
+    margin-inline-start: 20px;
     display: none;
     z-index: 10;
-    font-family: 'LatoWeb', 'source_sans_proregular', Arial;
 }
 .both-input-tooltip {
     bottom: -22px;
@@ -373,12 +340,6 @@ body.ar .sms-verification-number-input {
     display: block;
     margin: -12px 0 0 0;
 }
-.account.checkbox-block {
-    padding: 10px 0 64px 1px;
-}
-.pro-login-dialog .account.checkbox-block{
-    padding: 16px 0 16px 1px;
-}
 .account.checkbox-block.focused .checkboxOn::before,
 .account.checkbox-block.focused .checkboxOff::before,
 .pw-remind.checkbox-block.focused .checkboxOn::before,
@@ -388,12 +349,16 @@ body.ar .sms-verification-number-input {
     box-shadow: 0 0 0 1px rgba(240, 55, 58, 0.5);
 }
 .account.checkbox-block.left {
+    align-items: center;
+    display: inline-flex;
+    height: 48px;
+    margin: 48px 0;
     white-space: nowrap;
 }
-.big-red-button.login-button {
+button.login-button {
     margin-top: 2px;
 }
-.business .big-red-button.register-button {
+.business button.register-button {
     margin-top: 30px;
 }
 .account.input-wrapper.password {
@@ -402,29 +367,22 @@ body.ar .sms-verification-number-input {
 .login .account.input-wrapper.password {
     padding-right: 0;
 }
-.sign .main-pad-block .big-red-button {
-    display: block;
-    margin: 0 0 48px 0;
+.sign .main-pad-block button {
+    display: flex;
+    margin: 48px 0;
 }
-.sign .big-red-button {
-    min-width: 0;
-    text-align: left;
-}
-.sign .big-red-button i {
-    float: right;
-}
-.big-red-button span {
+button span {
     display: inline-block;
     vertical-align: top;
 }
-.big-red-button .loader {
-    width: 16px;
+button .loader {
     display: none;
-    vertical-align: top;
-    margin: 8px -8px 0 4px;
 }
-.big-red-button.loading .loader {
-    display: inline-block;
+button .loader img {
+    width: 16px;
+}
+button.loading .loader {
+    display: flex;
 }
 .business-block, .business .personal-block {
     display: none;
@@ -464,13 +422,9 @@ body.ar .sms-verification-number-input {
 .account.checkbox-block.terms {
     padding-bottom: 3px;
 }
-.account.checkbox-block .radio-txt {
-    color: #666666;
-    line-height: 18px;
-    padding-top: 7px;
-}
 .account.checkbox-block.small {
     padding: 0 0 14px 1px;
+    display: flex;
 }
 .register-side-pane .account.checkbox-block.small {
     padding: 0 0 16px 8px;
@@ -483,20 +437,6 @@ body.ar .sms-verification-number-input {
 }
 .account.checkbox-block.small .radio-txt  {
         padding: 4px 0 0 0
-}
-.account.achievements-tip  {
-    font-size: 12px;
-    line-height: 15px;
-    color: #999999;
-    padding: 40px 0 0 0;
-    margin: 0 -10px 0 -10px;
-    text-align: center;
-}
-.top-login-popup .account.checkbox-block .radio-txt {
-    padding-top: 0;
-    font-size: 13px;
-    line-height: 19px;
-    font-family: 'LatoWeb', 'source_sans_proregular', Arial;
 }
 .account.business-plan {
     width: 360px;
@@ -618,11 +558,25 @@ body.ar .sms-verification-number-input {
     margin: 36px auto 0 auto;
     text-align: center;
 }
-.top-login-popup .account.checkbox-block {
-    padding: 7px 0 16px 0;
-}
 .dropdown.body.popup.top-login-popup {
     width: 400px;
+    border-radius: 24px;
+}
+.dropdown.body.popup.top-login-popup .mega-button {
+    float: right;
+}
+.rtl .dropdown.body.popup.top-login-popup .mega-button {
+    float: left;
+}
+.dropdown.body.popup.top-login-popup .checkbox-block {
+    float: left;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    height: 36px;
+}
+.rtl .dropdown.body.popup.top-login-popup .checkbox-block {
+    float: right;
 }
 
 /* New register page */
@@ -630,7 +584,7 @@ body.ar .sms-verification-number-input {
     width: 400px;
     height: 142px;
     display: inline-block;
-    background-image: url(../images/mega/register-sprite_v3.png);
+    background-image: url(../images/mega/register-sprite.png);
     background-repeat: no-repeat;
 }
 .big-illustration.register.shield {

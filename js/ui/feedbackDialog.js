@@ -40,14 +40,14 @@
             'buttons': [
                 {
                     'label': l[1686],
-                    'className': "feedback-button-cancel disabled",
+                    'className': "mega-button large feedback-button-cancel disabled",
                     'callback': function() {
                         this.hide();
                     }
                 },
                 {
                     'label': l[7237],
-                    'className': "feedback-button-send disabled",
+                    'className': "mega-button large positive feedback-button-send disabled",
                     'callback': function() {
                         self._report.message = self.$textarea.val();
                         if ($('input[name="contact_me"]', self.$dialog).prop('checked')) {
@@ -76,9 +76,10 @@
                         });
 
                         $('.feedback-dialog-body').addClass('hidden');
+                        $('.mega-dialog.feedback-dialog footer').addClass('hidden');
                         $('.feedback-result-pad').removeClass('hidden');
 
-                        $('.feedback-result-button', self.$dialog).rebind('click.feedbackDialog', function() {
+                        $('.result-button', self.$dialog).rebind('click.feedbackDialog', function() {
                             self.hide();
                         });
 
@@ -196,7 +197,7 @@
                     'buttons': [
                         {
                             'label': l[148],
-                            'className': "default-white-button right green collected-data-review-button-cancel",
+                            'className': "mega-button positive collected-data-review-button-cancel",
                             'callback': function () {
                                 this.hide();
                             }
@@ -212,8 +213,14 @@
 
             // Content render fix for correct scrolling
             var renderTimer = setInterval(function(){
-                    $('.collected-data-textarea').jScrollPane({enableKeyboardNavigation:false,showArrows:true, arrowSize:5,animateScroll: true});
-                    clearInterval(renderTimer);
+                $('.collected-data-textarea').jScrollPane({
+                    enableKeyboardNavigation: false,
+                    showArrows: true,
+                    arrowSize: 5,
+                    animateScroll: true,
+                    verticalDragMinHeight: 40
+                });
+                clearInterval(renderTimer);
             }, 200);
 
         });

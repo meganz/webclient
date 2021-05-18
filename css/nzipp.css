@@ -40,7 +40,7 @@ body:not(.mobile) .nzipp.campaign-button:hover {
 
 /* Campaign-sprite */
 .campaign-sprite, i.campaign-sprite {
-    background-image: url(../images/mega/bottom-page/nzipp/campaign-sprite_v1.png);
+    background-image: url(../images/mega/bottom-page/nzipp/campaign-sprite.png);
     background-repeat: no-repeat;
 }
 .campaign-sprite.triangle {
@@ -282,11 +282,11 @@ body:not(.mobile) .nzipp.campaign-button.landing:hover {
     color: #000;
     padding: 0 0 30px 0;
 }
-.nzipp .mega-input-title-ontop {
+.nzipp .mega-input.title-ontop {
     margin-bottom: 40px;
 }
-.nzipp .mega-input-title-ontop.halfSize-l,
-.nzipp .mega-input-title-ontop.halfSize-r {
+.nzipp .mega-input.title-ontop.halfSize-l,
+.nzipp .mega-input.title-ontop.halfSize-r {
     width: 47%;
 }
 .nzipp-interview.progress {
@@ -581,7 +581,7 @@ Adaptive
     .nzipp-interview.header {
         font-size: 14px;
     }
-    .nzipp .mega-input-title-ontop.halfSize-l, .nzipp .mega-input-title-ontop.halfSize-r {
+    .nzipp .mega-input.title-ontop.halfSize-l, .nzipp .mega-input.title-ontop.halfSize-r {
         float: none;
         width: 100%;
         margin-bottom: 20px;
@@ -607,7 +607,7 @@ Retina
     Campaign-sprite
     */
     .campaign-sprite, i.campaign-sprite {
-        background-image: url(../images/mega/bottom-page/nzipp/campaign-sprite_v1@2x.png);
+        background-image: url(../images/mega/bottom-page/nzipp/campaign-sprite@2x.png);
         background-size: 75px auto;
     }
 }

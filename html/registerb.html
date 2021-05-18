@@ -1,4 +1,4 @@
-<div class="bottom-page scroll-block">
+<div class="bottom-page scroll-block sign">
 
     ((TOP))
 
@@ -6,58 +6,69 @@
         <div class="bus-reg-header rtl-block-if-rtl">[$19517]</div>
         <div class="bus-reg-info-block rtl-block-if-rtl">
             <div class="bus-reg-subheader">[$19789]</div>
-            <input class="titleTop withIcon" type="number" id="business-nbusrs" placeholder="[$19087]" autofocus data-icon="bus-reg-icon number-of-user">
+            <input class="underlinedText withIcon" type="number" id="business-nbusrs" placeholder="[$19087]" autofocus data-icon="sprite-fm-mono icon-user">
             <div class="bus-reg-subheader">[$19790]</div>
-            <input class="titleTop withIcon" type="text" id="business-cname" placeholder="[$19603]" data-icon="bus-reg-icon company-name">
-            <input class="titleTop withIcon" type="tel" id="business-tel" placeholder="[$19152]" data-icon="bus-reg-icon phone">
-            <input class="titleTop withIcon halfSize-l fir-name" type="text" id="business-fname" placeholder="[$7342]" data-icon="bus-reg-icon number-of-user">
-            <input class="titleTop halfSize-r las-name" type="text" id="business-lname" placeholder="[$7345]">
-            <input class="titleTop withIcon" autocomplete="disabled" type="email" id="business-email" placeholder="[$7434]" data-icon="bus-reg-icon email">
-            <input class="titleTop withIcon strengthChecker" autocomplete="disabled" type="password" id="business-pass" placeholder="[$909]" data-icon="bus-reg-icon pw">
-            <input class="titleTop withIcon" autocomplete="disabled" type="password" id="business-rpass" placeholder="[$1114]" data-icon="bus-reg-icon pw">
+            <input class="underlinedText withIcon" type="text" id="business-cname" placeholder="[$19603]" data-icon="sprite-fm-mono icon-building">
+            <input class="underlinedText withIcon" type="tel" id="business-tel" placeholder="[$19152]" data-icon="sprite-fm-mono icon-phone">
+            <input class="underlinedText withIcon halfSize-l fir-name" type="text" id="business-fname" placeholder="[$7342]" data-icon="sprite-fm-mono icon-user">
+            <input class="underlinedText halfSize-r las-name" type="text" id="business-lname" placeholder="[$7345]">
+            <input class="underlinedText withIcon" autocomplete="disabled" type="email" id="business-email" placeholder="[$7434]" data-icon="sprite-fm-mono icon-email">
+            <input class="underlinedText withIcon strengthChecker" autocomplete="disabled" type="password" id="business-pass" placeholder="[$909]" data-icon="sprite-fm-mono icon-lock">
+            <input class="underlinedText withIcon" autocomplete="disabled" type="password" id="business-rpass" placeholder="[$1114]" data-icon="sprite-fm-mono icon-lock-2">
             <div class="bus-reg-subheader">[$478]</div>
             <div class="bus-reg-radio-block">
                 <div class="bus-reg-radio-option">
-                    <div class="bus-reg-radio payment-typ1 checkOn"></div>
-                    <div class="provider">[$7111]</div>
-                    <div class="provider-icon ecpVI"></div>
+                    <div class="bus-reg-radio payment-typ1 payment-ecpVI radioOn"></div>
+                    <div class="radio-txt">
+                        <div class="provider">[$7111]</div>
+                        <div class="payment-icon">
+                            <i class="sprite-fm-uni icon-visa-border"></i>
+                        </div>
+                    </div>
                 </div>
                 <div class="bus-reg-radio-option">
-                    <div class="bus-reg-radio payment-typ2 checkOff"></div>
-                    <div class="provider"> </div>
-                    <div class="provider-icon ecpMC"></div>
+                    <div class="bus-reg-radio payment-typ2 payment-ecpMC radioOff"></div>
+                    <div class="radio-txt">
+                        <div class="provider"> </div>
+                        <div class="payment-icon">
+                            <i class="sprite-fm-uni icon-mastercard-border"></i>
+                        </div>
+                    </div>
                 </div>
                 <div class="bus-reg-radio-option">
-                    <div class="bus-reg-radio payment-typ3 checkOff"></div>
-                    <div class="provider">[$23494]</div>
-                    <div class="provider-icon b-voucher"></div>
+                    <div class="bus-reg-radio payment-typ3 payment-Voucher radioOff"></div>
+                    <div class="radio-txt">
+                        <div class="provider">[$23494]</div>
+                    </div>
                 </div>
             </div>
             <div class="bus-reg-agreement ok-to-auto">
-                <div class="bus-reg-checkbox">
-                    <input class="checkboxOff" type="checkbox">
+                <div class="checkdiv checkboxOn">
+                    <input type="checkbox">
                 </div>
-                <div class="bus-reg-txt">[$19509]</div>
+                <div class="radio-txt">[$19509]</div>
             </div>
 
             <div class="bus-reg-agreement mega-terms">
-                <div class="bus-reg-checkbox">
-                    <input class="checkboxOff" type="checkbox">
+                <div class="checkdiv checkboxOff">
+                    <input type="checkbox">
                 </div>
-                <div class="bus-reg-txt">
+                <div class="radio-txt">
                     [$208]
                     <!--<a href="/terms" class="terms">Terms of Service &#8827;</a>-->
                 </div>
             </div>
-            <div id="business-reg-btn" class="bus-reg-btn disabled" tabindex="0">
+            <button id="business-reg-btn" class="mega-button positive large bus-reg-btn disabled" tabindex="0">
                 <span>[$170]</span>
-                <div class="next-arrow"></div>
-            </div>
+                <div>
+                    <i class="sprite-fm-mono icon-next-arrow"></i>
+                </div>
+            </button>
             <div class="clear"></div>
         </div>
 
         <div class="bus-reg-plan rtl-block-if-rtl">
-            <div class="pricing-sprite plan-icon business"></div>
+            <i class="plan-icon sprite-fm-uni icon-crests-business-details"></i>
             <div class="business-plan-title">
                 Business
             </div>
@@ -87,10 +98,12 @@
             </div>
         </div>
 
-        <div id="business-reg-btn-mob" class="bus-reg-btn-2">
-            <span>[$170] </span>
-            <div class="next-arrow"></div>
-        </div>
+        <button id="business-reg-btn-mob" class="mega-button positive large bus-reg-btn-2 disabled" tabindex="0">
+            <span>[$170]</span>
+            <div>
+                <i class="sprite-fm-mono icon-next-arrow"></i>
+            </div>
+        </button>
         <div class="clear"></div>
     </div>
 

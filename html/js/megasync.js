@@ -35,12 +35,6 @@ var megasync = (function() {
     var listeners = [];
     var pending;
 
-    // Functions to close the linux dropdown / extensions dropdowns.
-    // done like this so that the function can execute multiple lines without exposing all the internal selects
-    // while still working with either sync page or sync dialog.
-    var closeLinuxDropdown = null;
-    var closeExtensionsDropdown = null;
-
     ns.UILinuxDropdown = function(selected) {
         linuxDropdown(selected);
     };
@@ -48,15 +42,6 @@ var megasync = (function() {
     ns.UIExtensionsDropdown = function(distroIndex, platform, onSelect) {
         extensionsDropdown(distroIndex, platform, onSelect);
     };
-
-    ns.UICloseLinuxDropdown = function() {
-        return (typeof closeLinuxDropdown === 'function') ? closeLinuxDropdown() : false;
-    };
-
-    ns.UICloseExtensionsDropdown = function() {
-        return (typeof closeExtensionsDropdown === 'function') ? closeExtensionsDropdown() : false;
-    };
-
 
     /** a function to switch the url to communicate with MEGASync */
     function switchMegasyncUrlToHttpWhenPossible() {
@@ -113,21 +98,21 @@ var megasync = (function() {
      */
     function linuxDropdown(selected, forMsyncDialog) {
 
-        var is64    = browserdetails().is64bit;
+        var is64 = browserdetails().is64bit;
         var $background = $('.bottom-page.scroll-block.megasync');
-
-        var $dropdown = $('.megasync .megaapp-dropdown');
-        var $select = $dropdown.find('.megaapp-scr-pad').empty();
-        var $list = $dropdown.find('.megaapp-dropdown-list');
+        var $dropdown;
+        var $list;
 
         if (forMsyncDialog) {
-            $dropdown = $('.megasync-overlay .megasync-dropdown');
-            $select = $dropdown.find('.megasync-scr-pad').empty();
-            $list = $dropdown.find('.megasync-dropdown-list');
-            $background = $('.megasync-overlay');
+            $background = $('.megasync-overlay', 'body');
         }
 
-        $('.megasync-overlay').addClass('linux');
+        $dropdown = $('.megasync-dropdown', $background);
+        $list = $('.dropdown-scroll', $dropdown);
+
+        $background.addClass('linux');
+        $('> span', $dropdown).text(l[7086]);
+        $dropdown.removeClass('hidden');
 
         if (typeof selected !== "function") {
             /**
@@ -135,74 +120,37 @@ var megasync = (function() {
              * @param {jquery} $element     Element that has been clicked.
              */
             selected = function followLink($element) {
-                window.location = $element.attr('link');
+                window.location = $element.attr('data-link');
             }
         }
 
         linuxClients.forEach(function(client, id) {
 
             var icon = client.name.toLowerCase().match(/([a-z]+)/i)[1];
+            var itemNode;
+
             icon = (icon === 'red') ? 'redhat' : icon;
 
-            $('<div/>').addClass('default-dropdown-item icon ' + icon)
-                .text(client.name)
-                .data('client', client.name)
-                .data('client-id', id)
-                .attr('link', ns.getMegaSyncUrl(client.name + " " + (is64 ? "64" : "32")))
-                .appendTo($select);
+            itemNode = mCreateElement('div', {
+                'class': 'option',
+                'data-client': client.name,
+                'data-client-id': id,
+                'data-link': ns.getMegaSyncUrl(client.name + " " + (is64 ? "64" : "32"))
+            }, $list[0]);
+            mCreateElement('i', {'class': 'icon linux download-sprite ' + icon}, itemNode);
+            mCreateElement('span', undefined, itemNode).textContent = client.name;
         });
 
-        $('.default-dropdown-item', $dropdown).rebind('click', function() {
-            $dropdown.find('span').text($(this).text());
+        $('.option', $dropdown).rebind('click.selectapp', function() {
             selected($(this));
         });
 
-        $background.rebind('click.closesyncdropdown', function(e) {
-            if ($dropdown.hasClass('active')) {
-                if ($(e.target).parent('.megaapp-dropdown, .megasync-dropdown').length === 0 &&
-                    !$(e.target).hasClass('megaapp-dropdown, .megasync-dropdown')) {
-                    $dropdown.removeClass('active');
-                    $list.addClass('hidden');
-                }
-            }
-        });
-
-        // Set the close function.
-        closeLinuxDropdown = function() {
-            if ($dropdown.hasClass('active')) {
-                $dropdown.removeClass('active');
-                $list.addClass('hidden');
-                return true;
-            }
-            return false;
-        };
-
-        $dropdown.rebind('click', function() {
-            var $this = $(this);
-            if (typeof closeExtensionsDropdown === 'function') {
-                closeExtensionsDropdown();
-            }
-
-            if (!$this.hasClass('disabled')) {
-                if (!closeLinuxDropdown()) {
-                    $this.addClass('active');
-                    if (forMsyncDialog) {
-                        $list.removeClass('hidden');
-                    } else {
-                        $this.find('.megaapp-dropdown-list').removeClass('hidden');
-                    }
-
-                    linuxDropdownResizeHandler(forMsyncDialog);
-                }
-            }
-
-            return false;
-        });
-
-        $(window).rebind('resize.linuxDropdown', function() {
-            linuxDropdownResizeHandler(forMsyncDialog);
-            return false;
-        });
+        if (forMsyncDialog) {
+            bindDropdownEvents($dropdown);
+        }
+        else {
+            bindDropdownEvents($dropdown, false, '.fmholder');
+        }
     }
 
     function extensionsDropdown(distroIndex, platform, onSelected, forMsyncDialog) {
@@ -228,30 +176,31 @@ var megasync = (function() {
         });
 
         var $background = $('.bottom-page.scroll-block.megasync');
-        var $dropdown = $('.megasync .megaext-dropdown');
-        var $select = $dropdown.find('.megaext-scr-pad').empty();
-        var $list = $dropdown.find('.megaext-dropdown-list');
+        var $dropdown;
+        var $dropdownLabel;
+        var $list;
         var $header = $('.megaext-header');
         var $infoButton = $('.megaext-info-hover');
 
         if (forMsyncDialog) {
-            $dropdown = $('.megasync-overlay .megasync-dropdown');
-            $select = $dropdown.find('.megasync-scr-pad').empty();
-            $list = $dropdown.find('.megasync-dropdown-list');
-            $background = $('.megasync-overlay');
+            $background = $('.megasync-overlay', 'body');
         }
+
+        $dropdown = $('.megaext-dropdown', $background);
+        $dropdownLabel = $('> span', $dropdown);
+        $list = $('.dropdown-scroll', $dropdown);
 
         if (!extensions.length) {
             $dropdown.addClass('disabled');
             $header.addClass('disabled');
-            $dropdown.find('.megaext-linux-default').text(l[20656]);
+            $dropdownLabel.text(l[20656]);
             $infoButton.addClass('disabled');
             return false;
-        } else {
-            $dropdown.removeClass('disabled');
-            $header.removeClass('disabled');
-            $infoButton.removeClass('disabled');
         }
+
+        $dropdown.removeClass('disabled');
+        $header.removeClass('disabled');
+        $infoButton.removeClass('disabled');
 
         if (typeof onSelected !== "function") {
             /**
@@ -259,148 +208,45 @@ var megasync = (function() {
              * @param {jquery} $element     Element that has been clicked.
              */
             onSelected = function followLink($element) {
-                window.location = $element.attr('link');
+                window.location = $element.attr('data-link');
             };
         }
 
         var preselected = null;
-        extensions.forEach(function(extension, id) {
-            var icon = extension.name.toLowerCase().match(/([a-z]+)/i)[1] || 'nautilus';
 
-            $('<div/>').addClass('default-dropdown-item icon ' + icon)
-                .text(extension.name)
-                .data('extension', extension.name)
-                .data('extension-id', id)
-                .attr('link', extension.url)
-                .prop('selected', id === 0)
-                .appendTo($select);
+        extensions.forEach(function(extension, id) {
+
+            var icon = extension.name.toLowerCase().match(/([a-z]+)/i)[1] || 'nautilus';
+            var itemNode;
+
+            itemNode = mCreateElement('div', {
+                'class': 'option' + (id === 0 ? ' active' : ''),
+                'data-extension': extension.name,
+                'data-extension-id': id,
+                'data-link': extension.url
+            }, $list[0]);
+            mCreateElement('i', {'class': 'icon linux download-sprite ' + icon}, itemNode);
+            mCreateElement('span', undefined, itemNode).textContent = extension.name;
 
             if (id === 0) {
                 preselected = extension;
             }
         });
 
-        $('.default-dropdown-item', $dropdown).rebind('click', function() {
+        $('.option', $dropdown).rebind('click.selectextension', function() {
             var $this = $(this);
-            $dropdown.find('span').text($this.text());
+
             onSelected({
                 name: $this.data('extension'),
-                url: $this.attr('link')
+                url: $this.attr('data-link')
             });
         });
 
-        $background.rebind('click.closesyncextensiondropdown', function(e) {
-            if ($dropdown.hasClass('active')) {
-                if ($(e.target).parent('.megaext-dropdown, .megaext-dropdown').length === 0 &&
-                    !$(e.target).hasClass('megaext-dropdown, .megaext-dropdown')) {
-                    $dropdown.removeClass('active');
-                    $list.addClass('hidden');
-                }
-            }
-        });
-
-        // Set the close function.
-        closeExtensionsDropdown = function() {
-            if ($dropdown.hasClass('active')) {
-                $dropdown.removeClass('active');
-                $list.addClass('hidden');
-                return true;
-            }
-            return false;
-        };
-
-        $dropdown.rebind('click', function() {
-            var $this = $(this);
-            if (typeof closeLinuxDropdown === 'function') {
-                closeLinuxDropdown();
-            }
-
-            if (!$this.hasClass('disabled')) {
-                if (!closeExtensionsDropdown()) {
-                    $this.addClass('active');
-                    $list.removeClass('hidden');
-                    linuxDropdownResizeHandler(forMsyncDialog, true);
-                }
-            }
-            return false;
-        });
-
-        $(window).rebind('resize.linuxExtensionDropdown', function() {
-            linuxDropdownResizeHandler(forMsyncDialog, true);
-        });
+        bindDropdownEvents($dropdown, false, '.fmholder');
 
         if (preselected) {
-            $dropdown.find('.megaext-linux-default').text(preselected.name);
+            $dropdownLabel.text(preselected.name);
             onSelected(preselected);
-        }
-    }
-
-    /**
-     * Handle window-resize events on the Linux Dropdown
-     */
-    function linuxDropdownResizeHandler(forMsyncDialog, forExtensionsDropdown) {
-
-        // Only select the list elements that are active.
-        var $list = $('.default-select.active .megaapp-dropdown-list:visible');
-
-        var $pane = $list.find('.megaapp-dropdown-scroll');
-        var overlayHeight = $('body').outerHeight();
-        var listHeight = $list.find('.megaapp-scr-pad').outerHeight() + 72;
-        var listPosition;
-
-        if (forExtensionsDropdown) {
-            $list = $('.megaext-dropdown-list:visible');
-            $pane = $list.find('.megaext-dropdown-scroll');
-            overlayHeight = $('body').outerHeight();
-            listHeight = $list.find('.megaext-scr-pad').outerHeight() + 72;
-        } else if (forMsyncDialog) {
-            $list = $('.megasync-dropdown-list:visible');
-            $pane = $list.find('.megasync-dropdown-scroll');
-            listHeight = $list.find('.megasync-scr-pad').outerHeight() + 72;
-        }
-
-        var jsp = $pane.data('jsp');
-        var $arrow = $list.find('.mega-list-arrow');
-        var $upArrow = $list.find('.mega-list-arrow.up');
-        var $downArrow = $list.find('.mega-list-arrow.down');
-
-        if ($list.length) {
-            listPosition = $list.offset().top;
-        }
-        if (overlayHeight < (listHeight + listPosition)) {
-            $arrow.removeClass('hidden');
-            $downArrow.removeClass('inactive');
-            var paneHeight = overlayHeight - listPosition - 72;
-            paneHeight = paneHeight < 120 ? 120 : paneHeight;
-            $pane.height(paneHeight);
-            $pane.jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 8, animateScroll: true});
-
-            var jspAPI = $pane.data('jsp');
-            $arrow.rebind('click', function() {
-                jspAPI.scrollByY($(this).hasClass('up') ? -200 : 200, true);
-                return false;
-            });
-
-            $pane.rebind('jsp-arrow-change', function(event, isAtTop, isAtBottom) {
-                if (isAtBottom) {
-                    $downArrow.addClass('inactive');
-                }
-                else if (isAtTop) {
-                    $upArrow.addClass('inactive');
-                }
-                else {
-                    $arrow.removeClass('inactive');
-                }
-            });
-        }
-        else {
-            if (jsp) {
-                jsp.destroy();
-            }
-            $pane.off('jsp-arrow-change');
-            $arrow.removeAttr('style');
-            $arrow.addClass('hidden');
-            $arrow.off('click');
         }
     }
 
@@ -464,7 +310,7 @@ var megasync = (function() {
             loadingDialog.show();
             ns.getLinuxReleases(function() {
                 loadingDialog.hide();
-                $modal.show();
+                $modal.removeClass('hidden');
                 linuxDropdown(null, true);
             });
         } else {

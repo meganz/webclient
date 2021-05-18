@@ -33,18 +33,14 @@
                 });
             });
             loginRequiredDialog.bind('onBeforeShow', function() {
-                $('.fm-dialog-title', this.$dialog)
+                $('header h2', this.$dialog)
                     .text(this.options.title);
 
-
                 // custom buttons, because of the styling
-                $('.fm-notification-info', this.$dialog)
-                    .safeHTML('<p>@@</p>', options.textContent || l[7679]);
+                $('header p', this.$dialog)
+                    .text(options.textContent || l[7679]);
 
-                icon = $(this.$dialog)
-                    .addClass('warning-dialog-a login').removeClass('loginrequired-dialog');
-
-                $('.default-white-button.pro-login', this.$dialog)
+                $('button.pro-login', this.$dialog)
                     .rebind('click.loginrequired', function() {
                         loginRequiredDialog.hide();
                         showLoginDialog(promise, options);
@@ -52,11 +48,12 @@
                         return false;
                     });
 
-                $('.default-white-button.pro-register', this.$dialog)
+                $('button.pro-register', this.$dialog)
                     .rebind('click.loginrequired', function() {
                         promise.reject();
                         return false;
-                    }).find('span').text(l[82]);
+                    });
+                $('button.pro-register span', this.$dialog).text(l[82]);
             });
 
             loginRequiredDialog.show();
@@ -64,10 +61,6 @@
             promise.always(function __lrdAlways() {
                 loginRequiredDialog.hide();
                 loginRequiredDialog = undefined;
-                if (icon) {
-                    icon.removeClass('warning-dialog-a login').addClass('loginrequired-dialog');
-                    icon = undefined;
-                }
                 closeDialog();
                 promise = undefined;
             });
@@ -77,20 +70,20 @@
     }
 
     function showLoginDialog(aPromise, options) {
-        var $dialog = $('.fm-dialog.pro-login-dialog');
-        var $inputs = $dialog.find('input');
-        var $button = $dialog.find('.big-red-button');
+        var $dialog = $('.mega-dialog.pro-login-dialog');
+        var $inputs = $('input', $dialog);
+        var $button = $('.top-dialog-login-button', $dialog);
 
         if (M.chat) {
-            $('.fm-dialog-subheading', $dialog).removeClass('hidden');
-            $('.fm-dialog-subheading > a', $dialog).rebind('click.doSignup', function() {
+            $('header > p', $dialog).removeClass('hidden');
+            $('header > p > a', $dialog).rebind('click.doSignup', function() {
                 closeDialog();
                 megaChat.loginOrRegisterBeforeJoining(undefined, true, false);
             });
         }
         else if (options.showRegister) {
-            $('.fm-dialog-subheading', $dialog).removeClass('hidden');
-            $('.fm-dialog-subheading > a', $dialog).rebind('click.doSignup', function() {
+            $('header > p', $dialog).removeClass('hidden');
+            $('header > p > a', $dialog).rebind('click.doSignup', function() {
                 closeDialog();
                 mega.ui.showRegisterDialog({
                     showLogin: true,
@@ -111,7 +104,7 @@
             });
         }
         else {
-            $('.fm-dialog-subheading', $dialog).addClass('hidden');
+            $('header > p', $dialog).addClass('hidden');
         }
 
         M.safeShowDialog('pro-login-dialog', function() {
@@ -123,7 +116,7 @@
         });
 
         // controls
-        $('.fm-dialog-close', $dialog).rebind('click.proDialog', function() {
+        $('button.js-close', $dialog).rebind('click.proDialog', function() {
             closeDialog();
             aPromise.reject();
         });

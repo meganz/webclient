@@ -87,7 +87,7 @@ var ulmanager = {
     ulShowOverStorageQuotaDialog: function(aFileUpload) {
         'use strict';
 
-        var $dialog = $('.fm-dialog.limited-bandwidth-dialog');
+        var $dialog = $('.limited-bandwidth-dialog');
 
         ulQueue.pause();
         this.ulOverStorageQuota = true;
@@ -119,7 +119,7 @@ var ulmanager = {
                 return false;
             });
 
-            $('.fm-dialog-close', $dialog).add($('.fm-dialog-overlay'))
+            $('button.js-close, .fm-dialog-close', $dialog).add($('.fm-dialog-overlay'))
                 .rebind('click.closeOverQuotaDialog', function() {
 
                     ulmanager.ulHideOverStorageQuotaDialog();
@@ -142,7 +142,7 @@ var ulmanager = {
     ulResumeOverStorageQuotaState: function() {
         'use strict';
 
-        if ($('.fm-dialog.limited-bandwidth-dialog').is(':visible')) {
+        if ($('.mega-dialog.limited-bandwidth-dialog').is(':visible')) {
 
             ulmanager.ulHideOverStorageQuotaDialog();
         }

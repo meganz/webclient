@@ -36,10 +36,21 @@ function removeUInode(h, parent) {
     }
 
     var hasItems = !!M.v.length;
+    const __markEmptied = () => {
+
+        let fmRightFileBlock = document.querySelector('.fm-right-files-block:not(.in-chat)');
+
+        if (fmRightFileBlock) {
+            fmRightFileBlock.classList.add('emptied');
+        }
+    };
+
     switch (M.currentdirid) {
         case "shares":
             $('#treeli_' + h).remove();// remove folder and subfolders
             if (!hasItems) {
+
+                __markEmptied();
                 $('.files-grid-view .grid-table-header tr').remove();
                 $('.fm-empty-cloud').removeClass('hidden');
             }
@@ -60,6 +71,8 @@ function removeUInode(h, parent) {
             // clear the contacts grid:
             $('.contacts-grid-view #' + h).remove();
             if (!hasItems) {
+
+                __markEmptied();
                 $('.contacts-grid-view .contacts-grid-header tr').remove();
                 $('.fm-empty-contacts .fm-empty-cloud-txt').text(l[784]);
                 $('.fm-empty-contacts').removeClass('hidden');
@@ -67,6 +80,8 @@ function removeUInode(h, parent) {
             break;
         case "chat":
             if (!hasItems) {
+
+                __markEmptied();
                 $('.contacts-grid-view .contacts-grid-header tr').remove();
                 $('.fm-empty-chat').removeClass('hidden');
             }
@@ -82,6 +97,8 @@ function removeUInode(h, parent) {
             // Remove folder and subfolders
             $('#treeli_' + h).remove();
             if (!hasItems) {
+
+                __markEmptied();
                 $('.contacts-grid-view .contacts-grid-header tr').remove();
                 $('.fm-empty-trashbin').removeClass('hidden');
                 $('.fm-clearbin-button').addClass('hidden');
@@ -98,6 +115,8 @@ function removeUInode(h, parent) {
             // Remove folder and subfolders
             $('#treeli_' + h).remove();
             if (!hasItems) {
+
+                __markEmptied();
                 $('.files-grid-view').addClass('hidden');
                 $('.grid-table.fm tr').remove();
 
@@ -119,6 +138,8 @@ function removeUInode(h, parent) {
             $('#' + h).remove();// remove item
             $('#treeli_' + h).remove();// remove folder and subfolders
             if (!hasItems) {
+
+                __markEmptied();
                 if (sharedFolderUI()) {
                     M.emptySharefolderUI();
                 }
@@ -270,6 +291,10 @@ fmremove.sync = function(selectedNodes, skipDelWarning) {
             });
         if (c > 1) {
             $('#msgDialog').addClass('multiple');
+            $('#msgDialog .fm-del-contact-avatar')
+                .safeHTML(`<i class="multiple sprite-fm-uni icon-users"></i>
+                    <span></span>
+                    <div class="fm-del-contacts-number"></div>`);
             $('.fm-del-contacts-number').text(selectedNodes.length);
             $('#msgDialog .fm-del-contact-avatar').attr('class', 'fm-del-contact-avatar');
             $('#msgDialog .fm-del-contact-avatar span').empty();
@@ -278,7 +303,7 @@ fmremove.sync = function(selectedNodes, skipDelWarning) {
             var user = M.u[selectedNodes[0]];
             var avatar = useravatar.contact(user, 'avatar-remove-dialog');
 
-            $('#msgDialog .fm-del-contact-avatar').html(avatar);
+            $('#msgDialog .fm-del-contact-avatar').safeHTML(avatar);
         }
     }
 

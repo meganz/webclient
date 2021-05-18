@@ -121,24 +121,24 @@ export default class AudioPlayer extends React.Component {
 
         if (isBeingPlayed) {
             playtimeStyles = {
-                color: '#EB4444'
+                color: 'var(--secondary-red)'
             };
         }
 
-        let btnClass = 'audio-player__pause-btn';
+        let btnClass = 'icon-pause';
         if (!isBeingPlayed || isPaused) {
-            btnClass = 'audio-player__play-btn';
+            btnClass = 'icon-play';
         }
 
         let controls = (
             <span
-                className={btnClass}
                 onClick={() => {
                     this.play();
                     if (this.props.source === null) {
                         this.props.getAudioFile();
                     }
                 }}>
+                <i className={`sprite-fm-mono ${btnClass}`} />
             </span>
         );
 

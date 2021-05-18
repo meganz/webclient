@@ -28,9 +28,9 @@
 
     AccountClosure.prototype._initAccountClosure = function() {
 
-        $('body').removeClass('overlayed');
-        $('.fm-dialog').removeClass('error active');
-        $('.fm-dialog' + this.opt.fbDlgClass)
+        const $body = $('body').removeClass('overlayed');
+        $('.mega-dialog', $body).removeClass('error active');
+        $('.mega-dialog' + this.opt.fbDlgClass)
             .addClass('hidden')
             .removeClass('active');
 
@@ -166,7 +166,7 @@
         $(self.opt.fbDlgClass + ' #res5_div')
             .attr('class', 'radioOn')
             .next().addClass('active');
-        $('.fm-dialog' + self.opt.fbDlgClass).removeClass('hidden');
+        $('.mega-dialog' + self.opt.fbDlgClass).removeClass('hidden');
 
         $.dialog = self.opt.fbDlgName;
 

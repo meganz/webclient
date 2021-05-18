@@ -191,7 +191,7 @@ var affiliateprogram = {
 
         for (var i = 1; i <= limit; i++) {
 
-            var template = '<div class="dropdown-item $active" data-value="$val">$val</div>';
+            var template = '<div class="dropdown-item $active" data-value="$val"><span>$val</span></div>';
 
             template = template.replace(/\$val/g, i).replace('$active', i === 10 ? 'active' : '');
 

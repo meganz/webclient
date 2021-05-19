@@ -2787,6 +2787,10 @@
         "developer_comment": "create a link of a file and send it using an app from the device",
         "string": "Share link"
     },
+    "5631": {
+        "developer_comment": "Menu item under contact's ellipsis button",
+        "string": "Share folder"
+    },
     "5638": {
         "developer_comment": "",
         "string": "Delete"

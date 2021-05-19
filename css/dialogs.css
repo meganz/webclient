@@ -1088,6 +1088,9 @@ body.de .mega-dialog.new-group-chat {
     justify-content: space-between;
     height: 100%;
 }
+.fm-versioning .data-table {
+    padding: 0;
+}
 .fm-versioning.top-column {
     display: flex;
     align-items: center;
@@ -1245,6 +1248,18 @@ body.de .mega-dialog.new-group-chat {
 .fm-versioning.buttons .revert-file,
 .fm-versioning.buttons .download-file {
     cursor: pointer;
+    border-radius: 4px;
+    padding: 4px;
+}
+.file-info-row .fm-versioning.buttons .delete-file:hover,
+.file-info-row .fm-versioning.buttons .revert-file:hover,
+.file-info-row .fm-versioning.buttons .download-file:hover {
+    background: var(--surface-grey-2);
+}
+.file-info-row.active .fm-versioning.buttons .delete-file:hover,
+.file-info-row.active .fm-versioning.buttons .revert-file:hover,
+.file-info-row.active .fm-versioning.buttons .download-file:hover {
+    background: var(--surface-mid-grey);
 }
 .fm-versioning.buttons .download-file,
 .fm-versioning.buttons .revert-file {
@@ -1262,8 +1277,6 @@ body.de .mega-dialog.new-group-chat {
 }
 .fm-versioning.buttons div:not(.disabled):hover i {
     --mask-color: var(--icon-active);
-    --icon-size: 24px;
-    margin: 0;
 }
 .fm-versioning.buttons i.disabled {
     opacity: 1;

@@ -53,18 +53,15 @@
                     </div>
 
                     <!-- Remove hidden class if user is operating Linux -->
-                    <div class="megaapp-linux hidden">
-                        <div class="default-select megaapp-dropdown sprite-fm-mono icon-arrow-down">
-                            <span class="megaapp-linux-default">[$7086]</span>
-                            <div class="megaapp-dropdown-list default-select-dropdown hidden">
-                                <div class="mega-list-arrow up hidden inactive"></div>
-                                <div class="megaapp-dropdown-scroll">
-                                    <div class="megaapp-scr-pad"> </div>
-                                </div>
-                                <div class="mega-list-arrow down hidden"></div>
+                    <div class="megaapp-linux linux-onboarding hidden">
+                        <div class="mega-input dropdown-input box-style inline  megasync-dropdown">
+                            <span>[$7086]</span>
+                            <i class="sprite-fm-mono icon-dropdown"></i>
+                            <div class="mega-input-dropdown hidden">
+                                <div class="dropdown-scroll"></div>
                             </div>
                         </div>
-                        <div class="bottom-page radio-buttons linux-bit-radio hidden">
+                        <div class="bottom-page radio-buttons linux-bit-radio linux-onboarding hidden">
                             <div class="architecture-checkbox radioOff green transition">
                                 <input type="radio" name="architecture" id="rad1" class="linux32 radioOff" value="32">
                             </div>
@@ -77,12 +74,13 @@
                             <div class="clear"></div>
                         </div>
                     </div>
+
                     <!-- Add hidden class if user has linux and has not chosen a distro to download -->
                     <button class="mega-button large positive download-app">
                         <span>[$20129]</span>
                     </button>
                     <div class="clear"></div>
-                    <div class="button-wrappers">
+                    <div class="button-wrappers linux-onboarding">
                         <!-- Both the buttons here should take a user to their cloud drive -->
                         <!-- Add hidden class when a users download begins -->
                         <div class="text-button redirect-clouddrive-link">[$20130]</div>

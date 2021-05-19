@@ -2854,6 +2854,26 @@ body:not(.mobile) .bottom-page.top-dark-button:hover {
     text-align: left;
     white-space: nowrap;
 }
+.megaapp-linux.linux-onboarding .hidden-input {
+    display: none;
+}
+.megaapp-linux.linux-onboarding .megasync-dropdown {
+    width: 100%;
+}
+.linux-bit-radio.linux-onboarding:not(.hidden) {
+    display: block !important;
+}
+.linux-bit-radio.linux-onboarding .architecture-checkbox {
+    -webkit-margin-end: 4px;
+    margin-inline-end: 4px;
+}
+.linux-bit-radio.linux-onboarding label {
+    margin-right: 15px;
+}
+.linux-onboarding.button-wrappers .mega-button.redirect-clouddrive {
+    margin-top: 30px;
+}
+
 .bottom-page .megaapp-linux-container {
     padding: 24px 24px 0 24px;
 }

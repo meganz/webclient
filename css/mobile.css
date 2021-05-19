@@ -3730,7 +3730,16 @@ div.checkboxOn {
     margin: 0 20px 20px 20px;
 }
 .mobile.cancel-account .radio-button-form .radio-txt {
-    padding-top: 5px;
+    margin: 0;
+}
+.mobile.cancel-account .radio-option {
+    margin: 24px 0 24px;
+    display: flex !important;
+    align-items: center;
+}
+.mobile.cancel-account .radio-option .radioOn,
+.mobile.cancel-account .radio-option .radioOff {
+    display: flex !important;
 }
 .mobile.header-icon {
     width: 36px;
@@ -5900,7 +5909,9 @@ textarea.mobile.support-text-field {
 }
 .mobile.my-account-change-password-page .signin-input {
     margin: 0 24px 4px;
-    padding: 9px 16px 0 52px;
+    padding-top: 0;
+    display: flex;
+    align-items: center;
 }
 .mobile.my-account-change-password-page .update-password-button {
     margin: 8px 24px;

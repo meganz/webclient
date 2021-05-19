@@ -37,7 +37,13 @@ function translate(html) {
      * @param {String} namespace The operation, if any
      * @returns {String} The localized string
      */
-    var replacer = function(match, localeNum) {
+    var replacer = function(match, localeNum, namespace) {
+
+        if (namespace) {
+            match = localeNum + '.' + namespace;
+            localeNum = match;
+        }
+
         // XXX: Seeing this warning could simply mean we forgot to replace entity tags
         //      within populate_l(), or it may indicate a worse issue where html pages
         //      are used before startMega() have finished. Also, injecting them in the
@@ -57,7 +63,7 @@ function translate(html) {
         return `not supported l[${localeNum}]`;
     };
 
-    return String(html).replace(/\[\$(\w+)]/g, replacer);
+    return String(html).replace(/\[\$(\w+)(?:\.(\w+))?\]/g, replacer);
 }
 
 /**

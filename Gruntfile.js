@@ -640,7 +640,11 @@ module.exports = function(grunt) {
                 use: ensureCallablePlugIn([
                     rebaseURLs && postHtmlURLRebase,
                     rebaseURLs && postHtmlTreeWalker,
-                    require('htmlnano')()
+                    require('htmlnano')({
+                        removeEmptyAttributes: false,
+                        sortAttributesWithLists: false,
+                        collapseWhitespace: process.env.DEBUG ? false : 'conservative'
+                    })
                 ])
             },
             dist: {expand: true, flatten: true, src: ['html/*.html', 'html/**/*.html'], dest: 'build/html/'}

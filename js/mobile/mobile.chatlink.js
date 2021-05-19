@@ -32,12 +32,10 @@ mobile.chatlink = {
 
         // On click/tap
         $('.chatlink-contents a', $overlay).rebind('tap', function() {
+            $(this).off().addClass('disabled');
 
             // Start the download
-            goToMobileApp('chat/' + publicHandle + '#' + chatKey);
-
-            // Prevent default anchor link behaviour
-            return false;
+            return goToMobileApp(`chat/${publicHandle}#${chatKey}`);
         });
 
 

@@ -145,10 +145,7 @@ function goToMobileApp(aBaseLink) {
         }, false)();
 
         var link = 'https://' + location.host + '/' + aBaseLink;
-        setTimeout(function() {
-            top.location = link + '?mobileapptap';
-        }, 4e3);
-        top.location = 'mega://' + aBaseLink;
+        openExternalLink('mega://' + aBaseLink, link + '?mobileapptap');
     }
     else if (is_windowsphone || testbed === 'winphone') {
         top.location = 'mega://' + aBaseLink;
@@ -165,6 +162,39 @@ function goToMobileApp(aBaseLink) {
         // eslint-disable-next-line no-alert
         alert('This device is unsupported.');
     }
+    return false;
+}
+
+function openExternalLink(aExternalLink, aFallbackLink, aTimeout) {
+    'use strict';
+    var vis = 0;
+    var dsp = function() {
+        // failed to go to the external link if visibility hasn't changed
+        if (vis !== 1) {
+            if (aFallbackLink) {
+                if (top.location.href === aFallbackLink) {
+                    vis = 3;
+                }
+                top.location = aFallbackLink;
+            }
+            // we came back from the external link if visibility changed twice.
+            if (vis > 1) {
+                location.reload();
+            }
+        }
+    };
+    if (aFallbackLink === 'self') {
+        aFallbackLink = 'https://' + location.host + '/#' + getCleanSitePath().replace('?mobileapptap', '');
+    }
+    setTimeout(dsp, parseInt(aTimeout) || 3e3);
+    document.addEventListener('visibilitychange', function() {
+        if (++vis > 1) {
+            dsp();
+        }
+    });
+    tryCatch(function() {
+        top.location = aExternalLink;
+    }, dsp)();
 }
 
 function setCookie(key, val) {
@@ -614,16 +644,7 @@ if (!browserUpdate) try
         tryCatch(function() {
             'use strict';
             if (tmp) {
-                setTimeout(function() {
-                    top.location = 'https://' + location.host + '/#' + getCleanSitePath();
-                });
-                var idx = 1;
-                document.addEventListener('visibilitychange', function _() {
-                    if (++idx > 2) {
-                        location.reload();
-                    }
-                });
-                top.location = getMobileStoreLink();
+                openExternalLink(getMobileStoreLink(), 'self');
             }
         })();
     }

@@ -332,6 +332,7 @@ var slideshowid;
             if (fullScreenManager) {
                 fullScreenManager.enterFullscreen();
             }
+            slideshow_imgPosition($overlay);
             return false;
         });
 
@@ -544,7 +545,7 @@ var slideshowid;
         var $imgWrap = $('.img-wrap', $overlay);
         var $img = $('img.active', $overlay);
         var $percLabel = $('.zoom-slider-wrap', $overlay);
-        var id = $('.img-wrap').attr('data-image', $overlay);
+        var id = $imgWrap.attr('data-image');
         var viewerWidth = $imgWrap.width();
         var viewerHeight = $imgWrap.height();
         var imgWidth = 0;
@@ -892,7 +893,7 @@ var slideshowid;
             }
 
             if (!previews[n.h]) {
-                $('img', $imgWrap).attr('src', '').removeClass('active');
+                $('img', $imgWrap).attr('src', '');
                 $('.viewer-pending', $content).removeClass('hidden');
             }
         }
@@ -1365,7 +1366,6 @@ var slideshowid;
         $overlay.removeClass('pdf video video-theatre-mode');
         $('embed', $content).addClass('hidden');
         $('video', $content).addClass('hidden');
-        $('img', $imgWrap).removeClass('active');
         $imgWrap.removeClass('hidden');
         $('#pdfpreviewdiv1', $content).addClass('hidden');
         $bottomBar.removeClass('hidden');

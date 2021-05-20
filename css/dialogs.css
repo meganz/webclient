@@ -1073,10 +1073,9 @@ body.de .mega-dialog.new-group-chat {
 }
 .fm-versioning.body {
     height: calc(100% - 64px);
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 50px;
     box-sizing: border-box;
+    display: inline-block;
+    width: 100%;
 }
 .fm-versioning.pad {
     max-width: 1200px;
@@ -1199,6 +1198,11 @@ body.de .mega-dialog.new-group-chat {
     width: 100%;
     height: 100%;
     overflow: hidden;
+}
+.fm-versioning.scroll-bl .content {
+    max-width: 1200px;
+    padding: 0 50px;
+    margin: 0 auto;
 }
 .fm-versioning.data {
     font: var(--text-h2);

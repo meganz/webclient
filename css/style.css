@@ -4160,6 +4160,9 @@ tr:not(.taken-down) .grid-status-icon:not(.read-only):not(.read-and-write) {
     width: calc(50% - 56px);
     color: inherit;
 }
+.mega-dialog .nw-contact-name img.emoji {
+    margin-top: 0;
+}
 .mega-dialog .nw-contact-status {
     width: 8px;
     height: 8px;

@@ -490,7 +490,8 @@
         background-image: url(../images/mega/fm-main-sprite@2x.png);
         background-size: 48px auto;
     }
-    .user-management-view .icon, .fm-right-header-user-management .icon, .user-management-dialog .icon,
+    .fm-right-header-user-management .icon,
+    .user-management-dialog .icon,
     .user-management-overview-bar .icon {
         background-image: url(../images/mega/fm-main-sprite@2x.png);
         background-size: 48px auto;

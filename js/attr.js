@@ -1235,9 +1235,6 @@
                 }
             });
         };
-        uaPacketParserHandler['^!afficon'] = function() {
-            u_attr['^!afficon'] = 1;
-        };
         uaPacketParserHandler['^!webtheme'] = function(userHandle) {
 
             mega.attr.get(userHandle, 'webtheme', -2, 1, function(res, ctx) {

@@ -102,6 +102,7 @@
     };
 
     shrink.bitdef = Object.assign(Object.create(null), {
+        v04: ['rvonbrddl', 'rvonbrdfd', 'rvonbrdas'],
         xb1: [
             // do NOT change the order, add new entries at the tail UP TO 31, and 8 per row.
             'cws', 'ctt', 'viewmode', 'dbDropOnLogout', 'dlThroughMEGAsync', 'sdss', 'tpp', 'ulddd',

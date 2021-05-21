@@ -1271,6 +1271,9 @@ mBroadcaster.once('boot_done', function populate_l() {
     l[24852] = escapeHTML(l[24852])
         .replace('[A]', '<a target="_blank" class="green-link clickurl" href="/blog">')
         .replace('[/A]', '</a>');
+    l.v4onboard_dialogtext = escapeHTML(l.v4onboard_dialogtext)
+        .replace('[S]', '<span class="highlight-blue">')
+        .replace('[/S]', '</span>');
 
     var common = [
         15536, 16106, 16107, 16119, 16120, 16123, 16124, 16135, 16136, 16137, 16138, 16304, 16313, 16315, 16316,

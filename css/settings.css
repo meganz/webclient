@@ -1088,3 +1088,10 @@
     background: var(--surface-main);
 }
 
+.account .revamp-onboarding.revamp-note.theme-indicator.active {
+    left: -165px;
+}
+.account .revamp-onboarding.revamp-note.theme-indicator {
+    left: -180px;
+    top: 53px;
+}

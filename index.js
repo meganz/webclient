@@ -1926,13 +1926,15 @@ function init_page() {
         $('.nw-fm-left-icons-panel').removeClass('hidden');
         let fmholder = document.getElementById('fmholder');
         // try to determinate visibility, without needing to use :visible
-        if (fmholder.classList.contains("hidden") || fmholder.style.display === "none") {
+        if (!fmholder || fmholder.classList.contains("hidden") || fmholder.style.display === "none") {
             if (anonymouschat) {
                 $('.nw-fm-left-icons-panel').addClass('hidden');
                 $('.top-head .logo').css("display", "block");
             }
-            fmholder.removeAttribute("style");
-            fmholder.classList.remove('hidden');
+            if (fmholder) {
+                fmholder.removeAttribute("style");
+                fmholder.classList.remove('hidden');
+            }
             if (fminitialized && !is_mobile) {
                 M.addViewUI();
 
@@ -2036,7 +2038,8 @@ function topbarUI(holderId) {
     'use strict';
 
     let element;
-    const topbar = document.getElementById(holderId).querySelector('.js-topbar');
+    const holder = document.getElementById(holderId);
+    const topbar = holder && holder.querySelector('.js-topbar');
 
     if (!topbar) {
         return;

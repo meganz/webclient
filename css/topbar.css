@@ -631,6 +631,7 @@
     display: flex;
     align-items: center;
     font: var(--text-h3);
+    box-shadow: var(--dropdown-shadow);
 }
 .revamp-onboarding.popup .sprite-fm-illustration {
     min-width: 100px;

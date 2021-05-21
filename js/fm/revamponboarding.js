@@ -37,6 +37,11 @@ var RevampOnboarding = {
         var $popup = $('.revamp-onboarding.popup');
         $('.popup-content', $popup).text(l.v4onboard_popupmessage);
         $popup.removeClass('hidden');
+
+        setTimeout(() => {
+            $popup.addClass('hidden');
+        }, 10000);
+
     },
 
     showFeedbackTip: function() {
@@ -48,6 +53,10 @@ var RevampOnboarding = {
 
         $('.js-accountbtn.feedback', '.account-dialog').addClass('highlight');
         this.setDone(1);
+
+        setTimeout(() => {
+            $('.revamp-onboarding.feedback-request').removeClass('active');
+        }, 10000);
     },
 
     removeFeedbackTip: function() {

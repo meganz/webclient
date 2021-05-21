@@ -4536,5 +4536,11 @@
     "25063": "Verloopdatum",
     "25064": "Kaart informatie",
     "25073": "Deze betaaloptie methode heeft een minimale aantal restricties",
-    "25081": "Bedankt! Uw account zou nu moeten worden ge\u00fcpgraded. Controleer uw e-mail om uw account te verifi\u00ebren en in te loggen. Voor vragen kunt u contact met ons opnemen via [A]support@mega.nz [/A]"
+    "25081": "Bedankt! Uw account zou nu moeten worden ge\u00fcpgraded. Controleer uw e-mail om uw account te verifi\u00ebren en in te loggen. Voor vragen kunt u contact met ons opnemen via [A]support@mega.nz [/A]",
+    "v4onboard_dialogtext": "Onze nieuwe donkere modus is nu beschikbaar als een vroege release. Vertel ons wat u denkt.",
+    "v4onboard_dialogtitle": "Bekijk onze nieuwe MEGA donkere modus!",
+    "v4onboard_feeddropdown": "Feedback op deze release ",
+    "v4onboard_feedtextbox": "Vertel ons wat u vind",
+    "v4onboard_popupmessage": "Switch tussen de lichte en donkere modus in uw instellingen en geef ons feedback",
+    "v4onboard_switchmodes": "Switch modus hier"
 }

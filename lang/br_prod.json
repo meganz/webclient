@@ -4536,5 +4536,11 @@
     "25063": "V\u00e1lido at\u00e9",
     "25064": "N\u00famero do cart\u00e3o",
     "25073": "Este m\u00e9todo de pagamento tem restri\u00e7\u00f5es de valor m\u00ednimo",
-    "25081": "Obrigado! O upgrade da sua conta foi realizado. Por favor, acesse o seu email para confirmar a sua conta e fazer login. Se tiver d\u00favidas, voc\u00ea pode entrar em contato conosco em [A]support@mega.nz[/A]"
+    "25081": "Obrigado! O upgrade da sua conta foi realizado. Por favor, acesse o seu email para confirmar a sua conta e fazer login. Se tiver d\u00favidas, voc\u00ea pode entrar em contato conosco em [A]support@mega.nz[/A]",
+    "v4onboard_dialogtext": "O nosso novo modo escuro j\u00e1 est\u00e1 dispon\u00edvel. Conte-nos o que voc\u00ea pensa.",
+    "v4onboard_dialogtitle": "Confira o novo modo escuro do MEGA!",
+    "v4onboard_feeddropdown": "Coment\u00e1rios sobre esta vers\u00e3o",
+    "v4onboard_feedtextbox": "Conte-nos o que voc\u00ea pensa",
+    "v4onboard_popupmessage": "Escolha entre os modos claro e escuro nas suas configura\u00e7\u00f5es e envie-nos os seus coment\u00e1rios",
+    "v4onboard_switchmodes": "Troque o modo aqui"
 }

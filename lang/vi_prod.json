@@ -4536,5 +4536,11 @@
     "25063": "Ng\u00e0y h\u1ebft h\u1ea1n",
     "25064": "Th\u00f4ng tin th\u1ebb",
     "25073": "Ph\u01b0\u01a1ng th\u1ee9c thanh to\u00e1n \u0111\u00e3 ch\u1ecdn c\u00f3 y\u00eau c\u1ea7u m\u1ee9c chi ti\u00eau t\u1ed1i thi\u1ec3u",
-    "25081": "Xin c\u1ea3m \u01a1n! T\u00e0i kho\u1ea3n c\u1ee7a qu\u00fd kh\u00e1ch s\u1ebd \u0111\u01b0\u1ee3c n\u00e2ng c\u1ea5p ngay. Xin ki\u1ec3m tra email n\u1ebfu \u0111\u00fang r\u1ed3i \u0111\u0103ng nh\u1eadp v\u00e0o t\u00e0i kho\u1ea3n. Qu\u00fd kh\u00e1ch c\u00f3 th\u1eafc m\u1eafc g\u00ec kh\u00e1c xin li\u00ean h\u1ec7 [A]support@mega.nz[/A]"
+    "25081": "Xin c\u1ea3m \u01a1n! T\u00e0i kho\u1ea3n c\u1ee7a qu\u00fd kh\u00e1ch s\u1ebd \u0111\u01b0\u1ee3c n\u00e2ng c\u1ea5p ngay. Xin ki\u1ec3m tra email n\u1ebfu \u0111\u00fang r\u1ed3i \u0111\u0103ng nh\u1eadp v\u00e0o t\u00e0i kho\u1ea3n. Qu\u00fd kh\u00e1ch c\u00f3 th\u1eafc m\u1eafc g\u00ec kh\u00e1c xin li\u00ean h\u1ec7 [A]support@mega.nz[/A]",
+    "v4onboard_dialogtext": "Giao di\u1ec7n n\u1ec1n t\u1ed1i hi\u1ec7n \u0111\u00e3 c\u00f3 m\u1eb7t cho phi\u00ean b\u1ea3n c\u00f4ng b\u1ed1 s\u1edbm. Xin g\u1eedi c\u1ea3m nh\u1eadn c\u1ee7a b\u1ea1n cho ch\u00fang t\u00f4i.",
+    "v4onboard_dialogtitle": "Xem qua giao di\u1ec7n n\u1ec1n t\u1ed1i m\u1edbi c\u1ee7a MEGA!",
+    "v4onboard_feeddropdown": "G\u1eedi ph\u1ea3n h\u1ed3i v\u1ec1 phi\u00ean b\u1ea3n m\u1edbi n\u00e0y",
+    "v4onboard_feedtextbox": "G\u1eedi c\u1ea3m nh\u1eadn c\u1ee7a b\u1ea1n cho ch\u00fang t\u00f4i",
+    "v4onboard_popupmessage": "Thay \u0111\u1ed5i gi\u1eefa giao di\u1ec7n s\u00e1ng v\u00e0 t\u1ed1i trong ph\u1ea7n thi\u1ebft \u0111\u1eb7t v\u00e0 g\u1eedi ph\u1ea3n h\u1ed3i c\u1ee7a b\u1ea1n cho ch\u00fang t\u00f4i",
+    "v4onboard_switchmodes": "Thay \u0111\u1ed5i ch\u1ebf d\u1ed9 giao di\u1ec7n \u1edf \u0111\u00e2y"
 }

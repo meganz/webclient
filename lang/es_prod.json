@@ -4536,5 +4536,11 @@
     "25063": "Fecha de caducidad",
     "25064": "N\u00famero de la tarjeta",
     "25073": "Este m\u00e9todo de pago tiene restricciones de cuota m\u00ednima",
-    "25081": "\u00a1Gracias! Tu cuenta deber\u00eda de haberse ampliado ya. Por favor revisa tu correo electr\u00f3nico para verificar tu cuenta e iniciar sesi\u00f3n. Para consultas, puedes contactarnos en [A]support@mega.nz[/A]"
+    "25081": "\u00a1Gracias! Tu cuenta deber\u00eda de haberse ampliado ya. Por favor revisa tu correo electr\u00f3nico para verificar tu cuenta e iniciar sesi\u00f3n. Para consultas, puedes contactarnos en [A]support@mega.nz[/A]",
+    "v4onboard_dialogtext": "Nuestro nuevo modo oscuro est\u00e1 disponible para que lo pruebes. Danos tu opini\u00f3n.",
+    "v4onboard_dialogtitle": "\u00c9chale un vistazo a nuestro nuevo modo oscuro",
+    "v4onboard_feeddropdown": "Comentarios sobre esta versi\u00f3n",
+    "v4onboard_feedtextbox": "Danos tu opini\u00f3n",
+    "v4onboard_popupmessage": "Prueba el modo claro y oscuro seleccion\u00e1ndolos desde los ajustes y env\u00edanos tus comentarios",
+    "v4onboard_switchmodes": "Cambiar de modo aqu\u00ed"
 }

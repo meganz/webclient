@@ -614,6 +614,11 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
             else if (id.indexOf('treea_') !== -1) {
                 id = id.replace(/treea_+|(os_|pl_)/g, '');
             }
+
+            // File manager breadcrumb path click
+            else if (id.startsWith('pathbc-')) {
+                id = id.replace('pathbc-', '');
+            }
         }
 
         /*if (id && !M.d[id]) {

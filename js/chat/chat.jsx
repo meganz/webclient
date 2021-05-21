@@ -987,20 +987,27 @@ Chat.prototype._renderMyStatus = function() {
 
     // use the actual presence for ticking the dropdown's items, since the user can be auto away/reconnecting,
     // but his actual presence's settings to be set to online/away/busy/etc
+    const $activityStatus = $('.activity-text', '.js-topbar');
+
     if (actualPresence === UserPresence.PRESENCE.ONLINE) {
         $('.top-user-status-popup .dropdown-item[data-presence="chat"]').addClass("active");
+        $activityStatus.text(l[5923]);
     }
     else if (actualPresence === UserPresence.PRESENCE.AWAY) {
         $('.top-user-status-popup .dropdown-item[data-presence="away"]').addClass("active");
+        $activityStatus.text(l[5924]);
     }
     else if (actualPresence === UserPresence.PRESENCE.DND) {
         $('.top-user-status-popup .dropdown-item[data-presence="dnd"]').addClass("active");
+        $activityStatus.text(l[5925]);
     }
     else if (actualPresence === UserPresence.PRESENCE.OFFLINE) {
         $('.top-user-status-popup .dropdown-item[data-presence="unavailable"]').addClass("active");
+        $activityStatus.text(l[5926]);
     }
     else {
         $('.top-user-status-popup .dropdown-item[data-presence="unavailable"]').addClass("active");
+        $activityStatus.text(l[5926]);
     }
 
     $status.addClass(

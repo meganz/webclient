@@ -272,7 +272,8 @@
 
 .top-menu-logged .activity-status-block {
     position: absolute;
-    right: 0;
+    right: -2px;
+    top: -2px;
     margin: 0;
 }
 

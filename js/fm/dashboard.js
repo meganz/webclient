@@ -88,8 +88,11 @@ function dashboardUI() {
             else if (section.indexOf('inbox') !== -1) {
                 section = M.InboxID;
             }
-            else {
+            else if (section.indexOf('versions') === -1) {
                 section = null;
+            }
+            else {
+                section = 'account/file-management';
             }
 
             if (section) {

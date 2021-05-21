@@ -559,7 +559,7 @@ table.grid-table .ver-col-container .ver-icon.versioning .versioning-indicator {
 table.grid-table .ver-col-container .ver-size {
     -webkit-margin-start: 8px;
     margin-inline-start: 8px;
-    height: 16px;
+    height: 15px;
     border-radius: 8px;
     background-color: var(--surface-mid-grey);
     margin-top: 4px;
@@ -635,7 +635,7 @@ table.grid-table .grid-status-icon.icon-takedown {
     --mask-color: var(--secondary-red);
 }
 
-table.grid-table i {
+table.grid-table i:not(.verified-user-icon) {
     --mask-color: var(--icon-rest);
     --icon-size: 24px;
     display: inline-block;

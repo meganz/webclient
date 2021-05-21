@@ -671,7 +671,7 @@ AccountRecoveryControl.prototype.showParkWarning = function _showParkWarning(eas
 
     var closeDialogLocal = function _closeDialog() {
         if (is_mobile) {
-            $('.mobile.fm-dialog-container').addClass('hidden');
+            $('.mobile.mega-dialog-container').addClass('hidden');
             fm_hideoverlay();
             $('.mobile #startholder.fmholder').removeClass('no-scroll');
         }
@@ -738,7 +738,7 @@ AccountRecoveryControl.prototype.showParkWarning = function _showParkWarning(eas
         $dialog.removeClass('hidden');
         $dialog.trigger("focus");
         if (is_mobile) {
-            $('.mobile.fm-dialog-container').removeClass('hidden');
+            $('.mobile.mega-dialog-container').removeClass('hidden');
         }
 
         return $dialog;

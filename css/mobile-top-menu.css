@@ -572,6 +572,9 @@
     left: 115px;
     background-position: -98px -400px;
 }
+.top-menu-logged .verified_icon {
+    display: none;
+}
 
 /* Business account */
 .top-menu-logged.business-acc .storage {

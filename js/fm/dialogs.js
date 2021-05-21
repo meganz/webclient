@@ -295,9 +295,14 @@
         else {
             placeholder.classList.add('high-light');
             placeholder.classList.remove('correct-input');
-            const filetypeIcon = placeholder.querySelector('.transfer-filetype-icon');
-            filetypeIcon.classList.remove('chat', 'folder');
-            filetypeIcon.classList.add(section === 'conversations' ? 'chat' : 'folder');
+            const filetypeIcon = placeholder.querySelector('.target-icon');
+            filetypeIcon.classList.remove('icon-chat-filled', 'icon-folder-24', 'sprite-fm-uni', 'sprite-fm-mono');
+            filetypeIcon.classList.add(
+                section === 'conversations' ? 'sprite-fm-mono' : 'sprite-fm-uni'
+            );
+            filetypeIcon.classList.add(
+                section === 'conversations' ? 'icon-chat-filled' : 'icon-folder-24'
+            );
         }
 
         if ($.copyToUpload) {
@@ -854,9 +859,9 @@
         section = dialogTabClass || 'cloud-drive';
         buttonLabel = buttonLabel || getActionButtonLabel();
 
+        var $pickerButtons = $('.fm-picker-dialog-button', $dialog).removeClass('active');
         $('.dialog-sorting-menu', $dialog).addClass('hidden');
         $('.dialog-empty-block', $dialog).removeClass('active');
-        $('.fm-picker-dialog-button', $dialog).removeClass('active');
         $('.fm-picker-dialog-tree-panel', $dialog).removeClass('active');
         $('.fm-picker-dialog-panel-arrows', $dialog).removeClass('active');
 
@@ -865,6 +870,13 @@
         var $permissionSelect = $('.permissions.dropdown-input', $dialog);
         var $permissionIcon = $('i.permission', $permissionSelect);
         var $permissionOptions = $('.option', $permissionSelect);
+
+        // all the different buttons
+        // var $cloudDrive = $pickerButtons.filter('[data-section="cloud-drive"]');
+        var $sharedMe = $pickerButtons.filter('[data-section="shared-with-me"]');
+        var $conversations = $pickerButtons.filter('[data-section="conversations"]');
+        var $rubbishBin = $pickerButtons.filter('[data-section="rubbish-bin"]');
+
 
         // Action button label
         $('.dialog-picker-button span', $dialog).text(buttonLabel);
@@ -890,28 +902,28 @@
         }
 
         if (allowConversationTab || $.copyToUpload || $.saveToDialogNode) {
-            $('.fm-picker-dialog-button.rubbish-bin', $dialog).addClass('hidden');
-            $('.fm-picker-dialog-button.conversations', $dialog).removeClass('hidden');
+            $rubbishBin.addClass('hidden');
+            $conversations.removeClass('hidden');
         }
         else {
-            $('.fm-picker-dialog-button.conversations', $dialog).addClass('hidden');
-            $('.fm-picker-dialog-button.rubbish-bin', $dialog).removeClass('hidden');
+            $conversations.addClass('hidden');
+            $rubbishBin.removeClass('hidden');
         }
 
         if (!u_type || $.saveToDialog || $.copyToShare || $.mcImport || $.selectFolderDialog
             || $.saveAsDialog) {
-            $('.fm-picker-dialog-button.rubbish-bin', $dialog).addClass('hidden');
-            $('.fm-picker-dialog-button.conversations', $dialog).addClass('hidden');
+            $rubbishBin.addClass('hidden');
+            $conversations.addClass('hidden');
         }
         if (M.getNodeRoot($.selected[0]) === M.RubbishID) {
-            $('.fm-picker-dialog-button.rubbish-bin', $dialog).addClass('hidden');
+            $rubbishBin.addClass('hidden');
         }
 
         if ($.copyToShare || $.selectFolderDialog) {
-            $('.fm-picker-dialog-button.shared-with-me', $dialog).addClass('hidden');
+            $sharedMe.addClass('hidden');
         }
         else {
-            $('.fm-picker-dialog-button.shared-with-me', $dialog).removeClass('hidden');
+            $sharedMe.removeClass('hidden');
         }
 
         if ($.copyToUpload) {
@@ -980,7 +992,7 @@
         }
 
         // Activate tab
-        $('.fm-picker-dialog-button.' + section, $dialog).addClass('active');
+        $('.fm-picker-dialog-button[data-section="' + section + '"]', $dialog).addClass('active');
     };
 
     /**
@@ -1223,7 +1235,7 @@
         $('button.js-close, .dialog-cancel-button', $dialog).rebind('click', closeDialog);
 
         $('.fm-picker-dialog-button', $dialog).rebind('click', function _(ev) {
-            section = $(this).attr('class').split(" ")[1];
+            section = $(this).attr('data-section');
 
             if (section === 'shared-with-me' && ev !== -0x3f) {
                 $('.dialog-content-block', $dialog).empty();
@@ -1296,7 +1308,10 @@
                 const by = escapeHTML(M.sortTreePanel[key] && M.sortTreePanel[key].by || 'name');
                 const dir = M.sortTreePanel[key] && M.sortTreePanel[key].dir || 1;
 
-                $('.dropdown-item[data-by="' + by + '"]', $menu).addClass(dir > 0 ? 'asc' : 'desc').addClass('active');
+                var $sortbutton = $('.dropdown-item[data-by="' + by + '"]', $menu);
+
+                $sortbutton.addClass(dir > 0 ? 'asc' : 'desc').addClass('active');
+                $('.sort-arrow', $sortbutton).addClass(dir > 0 ? 'icon-up' : 'icon-down');
 
                 $self.addClass('active');
                 $dialog.find('.dialog-sorting-menu').removeClass('hidden');
@@ -1313,6 +1328,8 @@
             // Arbitrary element data
             var data = $self.data();
             var key = $.dialog[0].toUpperCase() + $.dialog.substr(1) + section;
+            var $arrowIcon = $('.sort-arrow', $self).removeClass('icon-down icon-up');
+            var sortDir;
 
             if (data.by) {
                 M.sortTreePanel[key].by = data.by;
@@ -1320,16 +1337,23 @@
 
             $self.removeClass('asc desc');
 
+
+
             if ($self.hasClass('active')) {
                 M.sortTreePanel[key].dir *= -1;
-                $self.addClass(M.sortTreePanel[key].dir > 0 ? 'asc' : 'desc');
+                sortDir = M.sortTreePanel[key].dir > 0 ? 'asc' : 'desc';
+                $self.addClass(sortDir);
             }
 
             buildDialogTree();
 
             // Disable previously selected
-            $self.parent().find('.sorting-menu-item').removeClass('active');
+            $('.sorting-menu-item', $self.parent()).removeClass('active');
+            $('.sort-arrow', $self.parent()).removeClass('icon-down icon-up');
             $self.addClass('active');
+
+            // Change icon
+            $arrowIcon.addClass(sortDir === 'asc' ? 'icon-up' : 'icon-down');
 
             // Hide menu
             $('.dialog-sorting-menu', $dialog).addClass('hidden');
@@ -1564,7 +1588,7 @@
             dialogTooltipTimer = setTimeout(function() {
                 $tooltip.css({
                     'left': itemLeftPos + $item.outerWidth() / 2 - $tooltip.outerWidth() / 2 + 'px',
-                    'top': (itemTopPos - (note ? 99 : 68)) + 'px'
+                    'top': (itemTopPos - (note ? 120 : 75)) + 'px'
                 });
                 $tooltip.fadeIn(200);
             }, 200);

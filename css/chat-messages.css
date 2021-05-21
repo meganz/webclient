@@ -856,7 +856,7 @@ body.theme-dark .message .audio-player {
     left: 20px;
 }
 .reactions-bar {
-    display: inline-flex;
+    display: flex;
     line-height: 20px;
     clear: both;
     margin: 2px 0 4px 0;

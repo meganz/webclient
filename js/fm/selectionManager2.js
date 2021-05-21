@@ -476,6 +476,7 @@ class SelectionManager2_DOM extends SelectionManager2Base {
     constructor($selectable, eventHandlers) {
         super(eventHandlers);
         this.currentdirid = M.currentdirid;
+        this._boundEvents = [];
         this.init();
         this.$selectable = $selectable;
     }
@@ -499,20 +500,21 @@ class SelectionManager2_DOM extends SelectionManager2Base {
             this.bindJqSelectable($uiSelectable);
         }
 
-        $('.fm-right-files-block')
-            .rebind('selectablecreate.sm', '.ui-selectable', (e) => {
-                this.bindJqSelectable(e.target);
-            });
+        const $fmRightFilesBlock = $('.fm-right-files-block');
+
+        $fmRightFilesBlock.rebind('selectablereinitialized.sm', (e) => {
+            this.bindJqSelectable(e.target);
+        });
+
+        this._boundEvents.push([$fmRightFilesBlock, 'selectablereinitialized.sm']);
 
         this.reinitialize();
     }
 
     destroy() {
-        if (this._$jqSelectable) {
-            this._$jqSelectable.off('selectableunselecting.sm selectableunselected.sm');
-            this._$jqSelectable.off('selectableselecting.sm selectableselected.sm');
+        for (const [$obj, eventName] of this._boundEvents) {
+            $obj.off(eventName);
         }
-        $('.fm-right-files-block').off('selectablecreate.sm');
 
         super.destroy();
     }
@@ -539,6 +541,7 @@ class SelectionManager2_DOM extends SelectionManager2Base {
                 this.add_to_selection(id);
             }
         });
+        this._boundEvents.push([$jqSelectable, 'selectableselecting.sm selectableselected.sm']);
 
         /**
          * Remove any unselected element from the selected_list array.
@@ -554,12 +557,15 @@ class SelectionManager2_DOM extends SelectionManager2Base {
                 }
             });
 
-        this._$jqSelectable = $jqSelectable;
+        this._boundEvents.push([$jqSelectable, 'selectableunselecting.sm selectableunselected.sm']);
 
         if ($(target).is(".file-block-scrolling:not(.hidden)")) {
             // jQuery UI won't do trigger unselecting, in case of the ui-selected item is NOT in the DOM, so
             // we need to reset it on our own (on drag on the background OR click)
-            $(target).rebind('mousedown.sm', (e) => {
+            const $target = $(target);
+            this._boundEvents.push([$target, 'mousedown.sm']);
+
+            $target.rebind('mousedown.sm', (e) => {
                 var $target = $(e.target);
 
                 if ($target.parent().is('.file-block-scrolling:not(.hidden)') &&

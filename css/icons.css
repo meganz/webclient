@@ -913,10 +913,12 @@ button.active .semi-big-icon.nwse-resize,
 .medium-icon.icons-img.volume-muted {
     background-position: -222px -741px;
 }
-.medium-icon.icons-img.play {
+.medium-icon.icons-img.play,
+.medium-icon.icons-img.icon-play {
     background-position: -42px -537px;
 }
-.medium-icon.icons-img.pause {
+.medium-icon.icons-img.pause,
+.medium-icon.icons-img.icon-pause {
     background-position: -93px -630px;
 }
 .semi-big-icon.icons-img.pause {

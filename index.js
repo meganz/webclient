@@ -2078,6 +2078,17 @@ function topbarUI(holderId) {
     }
 
     $('.js-topbaravatar', topbar).rebind('click', function() {
+        const $wrap = $(this).closest('.js-dropdown-account');
+        const $btn = $('.downloadmega', $wrap).parent();
+        if (!$btn.hasClass('sync-checked')) {
+            megasync.isInstalled((err, is) => {
+                if (!err || is) {
+                    $btn.addClass('hidden');
+                }
+                $btn.addClass('sync-checked');
+            });
+        }
+
         let container = this.parentNode;
         if (container.classList.contains("show")) {
             container.classList.remove("show");

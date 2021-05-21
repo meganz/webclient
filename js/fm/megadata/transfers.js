@@ -1028,15 +1028,14 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders, target) 
 
     if (u.length > 999 && !ignoreWarning && !localStorage[flag]) {
         var showMEGAsyncDialog = function(button, syncData) {
-            $('.download-button.light-red.download').safeHTML(button);
-            $('.download-button.light-white.continue').safeHTML(l[8846]);
+            $('.download-button.download').safeHTML(button);
             $('.megasync-upload-overlay').show();
             var $chk = $('.megasync-upload-overlay .checkdiv');
             var hideMEGAsyncDialog = function() {
                 $('.megasync-upload-overlay').hide();
                 $(document).off('keyup.megasync-upload');
-                $('.download-button.light-white.continue, .fm-dialog-close').off('click');
-                $('.download-button.light-red.download').off('click');
+                $('.download-button.continue, .fm-dialog-close').off('click');
+                $('.download-button.download').off('click');
                 $chk.off('click.dialog');
                 $chk = undefined;
             };
@@ -1045,8 +1044,8 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders, target) 
                 M.addUpload(u, true, emptyFolders, target);
             };
             $(document).rebind('keyup.megasync-upload', onclick);
-            $('.download-button.light-white.continue, .fm-dialog-close').rebind('click', onclick);
-            $('.download-button.light-red.download').rebind('click', function() {
+            $('.download-button.continue, .fm-dialog-close').rebind('click', onclick);
+            $('.download-button.download').rebind('click', () => {
                 hideMEGAsyncDialog();
 
                 if (!syncData) {

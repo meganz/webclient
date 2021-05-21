@@ -217,7 +217,7 @@
 .dropdown-item {
     --mask-color: var(--icon-rest);
     align-items: center;
-    border-radius: 2px;
+    border-radius: 4px;
     box-sizing: border-box;
     color: var(--text-color-medium);
     cursor: pointer;
@@ -519,7 +519,8 @@
     float: left;
 }
 .dropdown.submenu.labels {
-    width: 216px;
+    white-space: nowrap;
+    max-width: unset;
 }
 .dropdown-color-txt {
     font: var(--text-body1);
@@ -535,8 +536,10 @@
     width: 16px;
     height: 16px;
     margin: 6px 0 8px;
-    -webkit-margin-end: 12px;
-    margin-inline-end: 12px;
+    -webkit-margin-end: 6px;
+    margin-inline-end: 6px;
+    -webkit-margin-start: 6px;
+    margin-inline-start: 6px;
     display: inline-block;
     border-radius: 100%;
     background-color: #777;

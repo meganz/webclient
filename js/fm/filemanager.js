@@ -685,6 +685,16 @@ FileManager.prototype.initFileManagerUI = function() {
         return false;
     });
 
+    $('.fm-folder-upload, .fm-file-upload').rebind('click', (element) => {
+        $.hideContextMenu();
+        if (element.currentTarget.classList.contains('fm-folder-upload')) {
+            $('#fileselect2').click();
+        }
+        else {
+            $('#fileselect1').click();
+        }
+    });
+
     $.hideContextMenu = function(event) {
 
         var a, b, currentNodeClass;
@@ -934,7 +944,8 @@ FileManager.prototype.initFileManagerUI = function() {
                     targetFolder = tab.root;
 
                     // special case handling for the chat, re-render current conversation
-                    if (tab.root === 'chat' && String(M.currentdirid).substr(0, 5) === 'chat/') {
+                    if (tab.root === 'chat' && String(M.currentdirid).substr(0, 5) === 'chat/' &&
+                        !M.currentdirid.startsWith('chat/contacts')) {
                         targetFolder = M.currentdirid;
                     }
                 }
@@ -3692,6 +3703,9 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
                 delay('render:search_breadcrumbs', () => M.renderSearchBreadcrumbs());
             }
         });
+        // Since selectablecreate is triggered only on first creation of the selectable widget, we need to find a way
+        // to notify any code (selectionManager) that it can now hook selectable events after the widget is created
+        $ddUIgrid.trigger('selectablereinitialized');
     }
 
     $ddUIitem.rebind('contextmenu', function(e) {
@@ -4225,81 +4239,6 @@ FileManager.prototype.initStatusBarLinks = function() {
         }
         return !!M.contextMenuUI(e, 1);
     }
-};
-
-FileManager.prototype.checkLeftStorageBlock = async function(data) {
-
-    'use strict';
-
-    if (!u_type || !fminitialized || this.storageQuotaCache) {
-        return false;
-    }
-
-    const storageBlock = document.querySelector('.js-lp-storage-usage-block');
-    const oldUsedElement = document.getElementById('lp-sq-used');
-    const oldMaxElement = document.getElementById('lp-sq-max');
-    const loaderSpinner = storageBlock.querySelector('.loader');
-
-    // minimize DOM ops when not needed by only triggering the loader if really needed
-    if (loaderSpinner) {
-        loaderSpinner.classList.add('loading');
-    }
-
-    this.storageQuotaCache = data || await M.getStorageQuota();
-
-    var space_used = bytesToSize(this.storageQuotaCache.used);
-    var space = bytesToSize(this.storageQuotaCache.max, 0);
-
-    // Only update DOM when there is update of contents
-    if ((oldUsedElement && oldUsedElement.textContent === space_used) &&
-        (!oldMaxElement || (oldMaxElement && oldMaxElement.textContent === space))) {
-        return;
-    }
-
-    this.updateLeftStorageBlock(storageBlock, space_used, space);
-
-    if (loaderSpinner) {
-        loaderSpinner.remove();
-    }
-};
-
-FileManager.prototype.updateLeftStorageBlock = function(storageBlock, space_used, space) {
-
-    'use strict';
-
-    var storageHtml;
-    var perc = this.storageQuotaCache.percent;
-
-    if (perc >= 100 && !storageBlock.classList.contains("over")) {
-        storageBlock.classList.add('over');
-    }
-    else if (perc > 80 && !storageBlock.classList.contains("warning")) {
-        storageBlock.classList.add('warning');
-    }
-
-    if (u_attr.p) {
-        storageBlock.querySelector('.plan').textContent = pro.getProPlanName(u_attr.p);
-    }
-    else {
-        storageBlock.querySelector('.plan').textContent = l[1150];
-    }
-
-    // Show only space_used  for business accounts
-    if (u_attr && u_attr.b) {
-        storageHtml = '<span id="lp-sq-used">' +  space_used + '</span>';
-        storageBlock.querySelector('.js-storagegraph').classList.add('hidden');
-        storageBlock.querySelector('.js-lpbtn[data-link="upgrade"]').classList.add('hidden');
-    }
-    else {
-        storageHtml = l[1607].replace('%1', '<span id="lp-sq-used">' +  space_used + '</span>')
-            .replace('%2', '<span id="lp-sq-max">' + space + '</span>');
-    }
-
-    let $storageTxt = $('.storage-txt', storageBlock);
-
-    $storageTxt.safeHTML(storageHtml);
-
-    $('.js-storagegraph span', storageBlock).outerWidth(perc + '%');
 };
 
 FileManager.prototype.initLeftPanel = function() {

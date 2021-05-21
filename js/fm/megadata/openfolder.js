@@ -233,14 +233,14 @@
 
                 M.onTreeUIOpen(currentdirid, currentdirid === 'contacts');
                 $('#treea_' + treeid).addClass('opened');
+
+                onIdle(() => {
+                    M.renderPathBreadcrumbs(fid);
+                });
             }
             if (d) {
                 console.timeEnd('time for rendering');
             }
-
-            Soon(function() {
-                M.renderPathBreadcrumbs(fid);
-            });
         }
 
         var newHashLocation = 'fm/' + this.currentdirid;

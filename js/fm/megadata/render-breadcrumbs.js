@@ -103,6 +103,11 @@
                 }
                 if (handle.length === 11) {
                     typeClass = 'contact';
+
+                    // Contact should not appears on other than chat/contact pages
+                    if (M.currentrootid !== 'chat') {
+                        name = '';
+                    }
                 }
                 else if (folderlink) {
                     typeClass = 'folder-link';
@@ -284,6 +289,12 @@
                 clickAction(id);
             }
         });
+
+        $('.fm-breadcrumbs', scope).rebind('contextmenu.breadcrumb', (e) => {
+            $.hideTopMenu();
+            M.hideClickHint();
+            return !!M.contextMenuUI(e, 1);
+        });
     }
 
     /**
@@ -310,6 +321,7 @@
 
                 const isLastItem = i === 0;
                 const isRoot = i === items.length - 1;
+                let item;
                 // if we won't have space, add it to the dropdown, but always render the current folder,
                 // and root if there are no extraItems
                 if ((!isLastItem && !isRoot || isRoot && extraItems.length > 0) && currentPathLength > maxPathLength) {
@@ -322,9 +334,10 @@
                 // otherwise, add it to the main breadcrumb
                 else {
                     name = escapeHTML(name);
+                    item = escapeHTML(items[i]);
                     html =
                         `<a class="fm-breadcrumbs ${escapeHTML(typeClass)} ${isRoot ? 'root' : ''} ui-droppable"
-                            data-id="${escapeHTML(items[i])}">
+                            data-id="${item}" id="pathbc-${item}">
                             <span
                                 class="right-arrow-bg simpletip"
                                 data-simpletip="${name}">

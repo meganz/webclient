@@ -1227,6 +1227,11 @@ var exportExpiry = {
                 exportExpiry.prepopulateExpiryDates();
             });
         }
+
+        this.$datepickerBtn.rebind('click', () => {
+            $('input.set-date', this.$dialog).trigger('focus');
+        });
+
     },
 
     /**
@@ -1396,7 +1401,7 @@ var exportExpiry = {
 
         var $expiryLinks = $('.links-scroll .item.dateSet', this.$dialog);
         var $setDateBtn = this.$datepickerBtn;
-        var $setDateInput = $('.set-date', $setDateBtn);
+        var $setDateInput = $('input.set-date', this.$dialog);
         var datepicker = $setDateInput.datepicker().data('datepicker');
         var $btnLabel = $('.label', $setDateBtn);
         var $removeDateBtn = $('.remove-date', this.$dialog);

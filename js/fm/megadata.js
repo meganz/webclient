@@ -89,6 +89,7 @@ function MegaData() {
 
     this.csortd = -1;
     this.csort = 'name';
+    this.storageQuotaCache = null;
     this.tfsdomqueue = Object.create(null);
     this.scAckQueue = Object.create(null);
     this.sortTreePanel = Object.create(null);

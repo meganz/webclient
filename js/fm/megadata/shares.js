@@ -28,7 +28,7 @@ MegaData.prototype.openSharingDialog = function() {
 
     $('.fm-dialog-overlay').rebind('click.closeShareDLG', function() {
         // When click the overlay, only close the share dialog if the lost changes warning dialog isn't there.
-        if ($.dialog === 'share' && $('.confirmation:not(.hidden)').length === 0) {
+        if ($.dialog === 'share' && $('.mega-dialog.confirmation:not(.hidden)').length === 0) {
             showLoseChangesWarning().done(closeDialog);
             return false;
         }
@@ -36,7 +36,7 @@ MegaData.prototype.openSharingDialog = function() {
 
     $(window).rebind('keydown.closeShareDLG', function(e) {
         // When press the Esc key, only close the share dialog if the lost changes warning dialog isn't there.
-        if (e.keyCode === 27 && $.dialog === 'share' && $('.confirmation:not(.hidden)').length === 0) {
+        if (e.keyCode === 27 && $.dialog === 'share' && $('.mega-dialog.confirmation:not(.hidden)').length === 0) {
             showLoseChangesWarning().done(closeDialog);
             return false;
         }

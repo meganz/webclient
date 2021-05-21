@@ -570,6 +570,9 @@ ul, li {
     overflow: hidden;
     font-family: 'latoWeb';
 }
+.mobile.mega-dialog.park-account-dialog .mobile.inline-buttons {
+    overflow: initial;
+}
 .mobile.inline-buttons .mobile.red-button, .mobile.inline-buttons .mobile.green-button, .mobile .unsub .btn {
     width: 50%;
     width: -webkit-calc(50% - 4px);
@@ -2550,6 +2553,12 @@ input[type='checkbox'] {
     position: relative;
     width: 18px;
 }
+.checkboxOn.square input.remember-billing-info,
+.checkboxOff.square input.remember-billing-info {
+    display: block;
+    z-index: 2;
+    position: absolute;
+}
 .mobile.remember-me .text {
     color: #eb4444;
     cursor: pointer;
@@ -2742,6 +2751,11 @@ div.checkboxOn {
 	border-radius: 100%;
 	float: left;
 	position: relative;
+}
+.bus-reg-agreement div.checkboxOff,
+.bus-reg-agreement div.checkboxOn {
+    border: none;
+    border-radius: 3px;
 }
 .checkboxOff span,
 .checkboxOn span {
@@ -7552,7 +7566,6 @@ textarea.mobile.support-text-field {
     width: 100%;
 }
 .mobile .improved-recovery-steps .recover-button.yes {
-    color: #00BFA5;
     margin-bottom: 12px;
 }
 .mobile .improved-recovery-steps .recover-button.yes:hover,.mobile  .recover-button.yes.active {
@@ -7560,9 +7573,6 @@ textarea.mobile.support-text-field {
     -webkit-box-shadow: 0 0 0 0 #6BB219;
     -moz-box-shadow: 0 0 0 0 #6BB219;
     box-shadow: 0 0 0 0 #6BB219;
-}
-.mobile .improved-recovery-steps .recover-button.no {
-    color: #eb4444;
 }
 .mobile .improved-recovery-steps .recover-button.no:hover, .mobile .improved-recovery-steps .recover-button.no.active {
     background-color: rgba(235,68,68,0.0);
@@ -7945,6 +7955,9 @@ textarea.mobile.support-text-field {
     margin-top: 32px;
     font-size: 14px;
 }
+.mobile .improved-recovery-steps .checkbox-block .checkboxOn {
+    background: none;
+}
 .mobile .improved-recovery-steps .checkbox-block {
     padding: 0 0;
     margin-top: 26px;
@@ -8121,6 +8134,8 @@ textarea.mobile.support-text-field {
     -webkit-border-radius: 2px;
     border-radius: 2px;
     color: #eb4444;
+    padding: 12px;
+    margin-bottom: 14px;
 }
 .mobile .improved-recovery-steps .content-text {
     padding: 8px 12px 8px 0;
@@ -8201,7 +8216,7 @@ textarea.mobile.support-text-field {
     padding-left: 28px;
     margin: 0 2px 0 3px;
 }
-.mobile.fm-dialog.park-account-dialog {
+.mobile.mega-dialog.park-account-dialog {
     width: 100%;
     width: -webkit-calc(100% - 24px);
     width: -moz-calc(100% - 24px);
@@ -10078,6 +10093,10 @@ Thank You dialog
 
 .thankyou-dialog .thankyou-body .green-link {
     color: #0bbdaa;
+}
+
+.mobile.main-avatar .verified_icon {
+    display: none;
 }
 
 /* Only media queries after here */

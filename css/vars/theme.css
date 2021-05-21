@@ -316,6 +316,7 @@ html .theme-light-forced {
     /* TEMP: variables */
         --button-hover: rgba(0, 0, 0, 0.05);
         --text-selection: rgba(0, 0, 0, 0.1);
+        --text-selection-inverted: rgba(255, 255, 255, 0.1);
 }
 
 /* dark theme */
@@ -510,4 +511,5 @@ html .theme-dark-forced {
 
         --button-hover: rgba(255, 255, 255, 0.1);
         --text-selection: rgba(255, 255, 255, 0.1);
+        --text-selection-inverted: rgba(0, 0, 0, 0.1);
 }

@@ -127,18 +127,17 @@ var megasync = (function() {
         linuxClients.forEach(function(client, id) {
 
             var icon = client.name.toLowerCase().match(/([a-z]+)/i)[1];
-            var itemNode;
 
             icon = (icon === 'red') ? 'redhat' : icon;
 
-            itemNode = mCreateElement('div', {
+            var data = {
                 'class': 'option',
                 'data-client': client.name,
                 'data-client-id': id,
                 'data-link': ns.getMegaSyncUrl(client.name + " " + (is64 ? "64" : "32"))
-            }, $list[0]);
-            mCreateElement('i', {'class': 'icon linux download-sprite ' + icon}, itemNode);
-            mCreateElement('span', undefined, itemNode).textContent = client.name;
+            };
+            createAndAddToList($list, data, 0, client.name, icon);
+            createAndAddToList($list, data, 1, client.name, icon);
         });
 
         $('.option', $dropdown).rebind('click.selectapp', function() {
@@ -218,15 +217,15 @@ var megasync = (function() {
 
             var icon = extension.name.toLowerCase().match(/([a-z]+)/i)[1] || 'nautilus';
             var itemNode;
-
-            itemNode = mCreateElement('div', {
+            var data = {
                 'class': 'option' + (id === 0 ? ' active' : ''),
                 'data-extension': extension.name,
                 'data-extension-id': id,
                 'data-link': extension.url
-            }, $list[0]);
-            mCreateElement('i', {'class': 'icon linux download-sprite ' + icon}, itemNode);
-            mCreateElement('span', undefined, itemNode).textContent = extension.name;
+            };
+
+            createAndAddToList($list, data, 0, extension.name, icon);
+            createAndAddToList($list, data, 1, extension.name, icon);
 
             if (id === 0) {
                 preselected = extension;
@@ -248,6 +247,12 @@ var megasync = (function() {
             $dropdownLabel.text(preselected.name);
             onSelected(preselected);
         }
+    }
+
+    function createAndAddToList($list, data, index, itemName, icon) {
+        var itemNode = mCreateElement('div', data, $list[index]);
+        mCreateElement('i', {'class': 'icon linux download-sprite ' + icon}, itemNode);
+        mCreateElement('span', undefined, itemNode).textContent = itemName;
     }
 
     /**

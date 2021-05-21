@@ -29,11 +29,15 @@ mega.megadrop = (function() {
         },
         ulId: 8000,
         ignoreDb: false,
-        initialized: false,
-        widgetParams: [
-            '"width=750, height=770, resizable=no, status=no, location=no, titlebar=no, toolbar=no", ',
-            'true'
-        ]
+        initialized: false
+    };
+
+    const winOpen = (url) => {
+        window.open(
+            url,
+            '_blank',
+            'noopener,noreferrer, width=750, height=770, resizable=no, status=no, location=no, titlebar=no, toolbar=no'
+        );
     };
 
     /**
@@ -1305,7 +1309,7 @@ mega.megadrop = (function() {
 
                 var url = $('.url-link .widget-url', $(this).parents('.widget-dialog.expanded-widget')).text();
 
-                window.open(url, '_blank', wopts.widgetParams[0].slice(1, -1), true);
+                winOpen(url);
             });
         };
 
@@ -1611,7 +1615,7 @@ mega.megadrop = (function() {
 
             // Dialog Preview upload page
             $(uiOpts.dlg.widget.class + ' .preview-widget').rebind('click.WD_preview', function () {
-                window.open(uiOpts.dlg.widget.url, '_blank', wopts.widgetParams[0].slice(1, -1));
+                winOpen(uiOpts.dlg.widget.url);
             });
             /*** END '.widget-dialog' ***/
         };

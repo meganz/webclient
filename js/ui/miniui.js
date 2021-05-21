@@ -99,7 +99,7 @@ var uiCheckboxes = function($scope, saveState, stateChangeCb, initialState) {
 
         $label.off('click.uiCheckboxes');
         $cbxElement.off('click.uiCheckboxes');
-        $input.off('change.uiCheckboxes').addClass('hidden');
+        $input.off('change.uiCheckboxes');
 
         if (initialState === true) {
             $input.prop('checked', true);
@@ -111,7 +111,6 @@ var uiCheckboxes = function($scope, saveState, stateChangeCb, initialState) {
         }
 
         $label.rebind('click.uiCheckboxes', _onToggle);
-        $cbxElement.rebind('click.uiCheckboxes', _onToggle);
 
         $input.rebind('change.uiCheckboxes', function() {
             doToggle($(this).prop('checked'));

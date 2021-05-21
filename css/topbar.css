@@ -448,6 +448,7 @@
 .topbar .account-dialog ul.links li {
     font: var(--text-body1);
     margin: 0 8px;
+    position: relative;
 }
 .topbar .account-dialog ul.links li button {
     --mask-color: var(--icon-rest);
@@ -641,10 +642,10 @@
     color: var(--secondary-blue);
 }
 .revamp-onboarding.feedback-request {
-    left: -450px;
-    top: 308px;
+    left: -200px;
+    top: -5px;
     z-index: 1120;
 }
 .revamp-onboarding.feedback-request.active {
-    left: -420px;
+    left: -180px;
 }

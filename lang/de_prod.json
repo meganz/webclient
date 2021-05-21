@@ -4536,5 +4536,11 @@
     "25063": "G\u00fcltig bis",
     "25064": "Kartendetails",
     "25073": "Diese Zahlungsmethode steht nur ab einem bestimmten Mindestbetrag zur Verf\u00fcgung.",
-    "25081": "Vielen Dank f\u00fcr Ihre Zahlung! Ihr Accountstatus wurde aktualisiert. Wir haben Ihnen eine Best\u00e4tigung per email zugestellt. Bei R\u00fcckfragen kontaktieren Sie bitte [A]support@mega.nz[/A]"
+    "25081": "Vielen Dank f\u00fcr Ihre Zahlung! Ihr Accountstatus wurde aktualisiert. Wir haben Ihnen eine Best\u00e4tigung per email zugestellt. Bei R\u00fcckfragen kontaktieren Sie bitte [A]support@mega.nz[/A]",
+    "v4onboard_dialogtext": "Our new dark mode is now available as an early release. Tell us what you think.",
+    "v4onboard_dialogtitle": "Check out our new MEGA dark mode!",
+    "v4onboard_feeddropdown": "Feedback on this release",
+    "v4onboard_feedtextbox": "Tell us what you think",
+    "v4onboard_popupmessage": "Switch between the light and dark mode in your settings and send us your feedback",
+    "v4onboard_switchmodes": "Switch modes here"
 }

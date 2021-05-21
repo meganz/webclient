@@ -4536,5 +4536,11 @@
     "25063": "Expiration date",
     "25064": "Card information",
     "25073": "Metode pembayaran ini memiliki batasan jumlah minimum",
-    "25081": "Thanks! Your account should now be upgraded. Please check your email to verify your account and login. For enquiries you can contact us at [A]support@mega.nz[/A]"
+    "25081": "Thanks! Your account should now be upgraded. Please check your email to verify your account and login. For enquiries you can contact us at [A]support@mega.nz[/A]",
+    "v4onboard_dialogtext": "Our new dark mode is now available as an early release. Tell us what you think.",
+    "v4onboard_dialogtitle": "Check out our new MEGA dark mode!",
+    "v4onboard_feeddropdown": "Feedback on this release",
+    "v4onboard_feedtextbox": "Tell us what you think",
+    "v4onboard_popupmessage": "Switch between the light and dark mode in your settings and send us your feedback",
+    "v4onboard_switchmodes": "Switch modes here"
 }

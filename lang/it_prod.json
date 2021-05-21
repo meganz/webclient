@@ -4536,5 +4536,11 @@
     "25063": "Data di scadenza",
     "25064": "Informazioni della carta",
     "25073": "Questo metodo di pagamento ha delle restrizioni sulla quantit\u00e0 minima di addebito",
-    "25081": "Grazie! Il tuo account adesso dovrebbe essere aggiornato. Per favore, controlla la tua email per verificare l'account ed effettuare il login. Per problemi puoi contattarci a [A]support@mega.nz[/A]"
+    "25081": "Grazie! Il tuo account adesso dovrebbe essere aggiornato. Per favore, controlla la tua email per verificare l'account ed effettuare il login. Per problemi puoi contattarci a [A]support@mega.nz[/A]",
+    "v4onboard_dialogtext": "La nostra nuova modalit\u00e0 scura \u00e8 disponibile in anteprima. Dicci cosa ne pensi.",
+    "v4onboard_dialogtitle": "Vedi la nuova modalit\u00e0 scura di MEGA!",
+    "v4onboard_feeddropdown": "Feedback su questa release",
+    "v4onboard_feedtextbox": "Dicci cosa pensi",
+    "v4onboard_popupmessage": "Cambia tra la modalit\u00e0 chiara e la modalit\u00e0 scura nelle tue Impostazioni e inviaci un feedback",
+    "v4onboard_switchmodes": "Cambia modalit\u00e0 qui"
 }

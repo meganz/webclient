@@ -1955,7 +1955,8 @@ body.de .mega-dialog.new-group-chat {
     .mega-dialog.export-links-dialog .sub-header ~ button {
         margin: 0 0 0;
     }
-    .mega-dialog.export-links-dialog .sub-header + button {
+    .mega-dialog.export-links-dialog .sub-header + button,
+    .mega-dialog.export-links-dialog .sub-header ~ button.remove {
         margin-top: 15px;
     }
     .mega-dialog.export-links-dialog button.expiry {

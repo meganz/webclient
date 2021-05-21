@@ -753,6 +753,13 @@ accountUI.account = {
 
         // Cancel Account
         this.cancelAccount.bindEvents();
+
+        if (RevampOnboarding.isDone(2)) {
+            $('.revamp-onboarding.theme-indicator.active', accountUI.$contentBlock).removeClass('active');
+        }
+        else {
+            RevampOnboarding.initAccountPage();
+        }
     },
 
     profiles: {

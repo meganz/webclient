@@ -2077,7 +2077,7 @@ function topbarUI(holderId) {
         window.mega.ui.searchbar.init();
     }
 
-    $('.js-topbaravatar', topbar).rebind('click', function() {
+    $('.js-topbaravatar, .js-activity-status', topbar).rebind('click', function() {
         const $wrap = $(this).closest('.js-dropdown-account');
         const $btn = $('.downloadmega', $wrap).parent();
         if (!$btn.hasClass('sync-checked')) {
@@ -2092,6 +2092,7 @@ function topbarUI(holderId) {
         let container = this.parentNode;
         if (container.classList.contains("show")) {
             container.classList.remove("show");
+            RevampOnboarding.removeFeedbackTip();
         }
         else {
             var $accountAvatar = $('.js-account-avatar', topbar);
@@ -2099,12 +2100,17 @@ function topbarUI(holderId) {
                 $accountAvatar.addClass('rendered').safeHTML(useravatar.contact(u_handle));
             }
             container.classList.add("show");
+            if (!RevampOnboarding.isDone(1)) {
+                RevampOnboarding.showFeedbackTip();
+            }
+        }
+        if (RevampOnboarding.isDone(0)) {
+            $('.revamp-onboarding.popup', topbar).addClass('hidden');
         }
     });
 
-    $('.js-activity-status', topbar).rebind('click', function() {
-        $(this).parent().toggleClass('show');
-    });
+    // TO-DO: Remove this, and put locale string in HTML instead of here.
+    $('.js-accountbtn.feedback', topbar).text(l.v4onboard_feeddropdown);
 
     $('.js-accountbtn', topbar).rebind('click.topAccBtn', function(){
 
@@ -2117,11 +2123,23 @@ function topbarUI(holderId) {
         else if (this.classList.contains('logout')) {
             mLogout();
         }
+        else if (this.classList.contains('feedback')) {
+            var $this = $(this);
+            var feedbackDialog = mega.ui.FeedbackDialog.singleton($this);
+            feedbackDialog._type = 'top-button';
+        }
 
         var dropdown = document.getElementsByClassName('js-dropdown-account');
 
+        if (dropdown.length) {
+            RevampOnboarding.removeFeedbackTip();
+        }
+
         for (i = dropdown.length; i--;) {
             dropdown[i].classList.remove('show');
+        }
+        if (!$('.fm-dialog-overlay').hasClass('hidden')) {
+            $('.fm-dialog-overlay').addClass('hidden');
         }
     });
 
@@ -2600,6 +2618,7 @@ function topmenuUI() {
             for (i = elements.length; i--;) {
                 elements[i].classList.remove('show');
             }
+            RevampOnboarding.removeFeedbackTip();
         }
 
         if (!e || !(parent && parent.classList.contains('js-dropdown-account'))) {

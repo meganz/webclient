@@ -485,6 +485,7 @@ function u_setrsa(rsakey) {
 
                         // No affiliate guide dialog for new users.
                         $.noAffGuide = 1;
+                        $.noRevampOnboarding = 1;
 
                         // free up memory since it's not useful any longer
                         delete window.businessSubAc;

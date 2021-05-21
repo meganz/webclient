@@ -616,3 +616,35 @@
 .business .top-head .top-buttons.business {
     display: block;
 }
+
+.revamp-onboarding.popup:not(.hidden) {
+    position: absolute;
+    width: 420px;
+    height: 123px;
+    right: -10px;
+    z-index: 100;
+    padding: 0 24px;
+    border-radius: 24px;
+    border: var(--dropdown-border);
+    background-color: var(--surface-main);
+    display: flex;
+    align-items: center;
+    font: var(--text-h3);
+}
+.revamp-onboarding.popup .sprite-fm-illustration {
+    min-width: 100px;
+    max-width: 123px;
+    height: 110px;
+    margin-right: 22px;
+}
+.topbar .account-dialog ul.links li button.highlight {
+    color: var(--secondary-blue);
+}
+.revamp-onboarding.feedback-request {
+    left: -450px;
+    top: 308px;
+    z-index: 1120;
+}
+.revamp-onboarding.feedback-request.active {
+    left: -420px;
+}

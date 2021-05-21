@@ -2,14 +2,12 @@
     display: block;
     background-color: var(--surface-main);
     position: relative;
-    margin-right: 256px;
     line-height: 20px;
     height: 49px;
     padding: 8px 24px 0 12px;
     z-index: 3;
     box-sizing: border-box;
     overflow: hidden;
-    border-top: 1px solid var(--divider-color);
     border-bottom: 1px solid var(--divider-color);
 }
 .chat-topic-icon {

@@ -94,8 +94,8 @@ var affiliateprogram = {
                 return false;
             }
 
-            $('.dropdown:visible', this.$contentBlock).addClass('hidden');
-            $('.dropdown-lnk.active', this.$contentBlock).removeClass('active');
+            $('.bottom-page.startpage .dropdown:visible', this.$contentBlock).addClass('hidden');
+            $('.bottom-page.startpage .dropdown-lnk.active', this.$contentBlock).removeClass('active');
             $this.addClass('active');
             $dropdown.removeClass('hidden fullscreen').removeAttr('style');
 
@@ -176,8 +176,8 @@ var affiliateprogram = {
                 !$target.is('.notification') && !$target.is('.activity-status') &&
                 !$target.closest('.dropdown').length) {
 
-                $('.dropdown:visible', self.$contentBlock).addClass('hidden');
-                $('.dropdown-lnk.active', self.$contentBlock).removeClass('active');
+                $('.bottom-page.startpage .dropdown:visible', self.$contentBlock).addClass('hidden');
+                $('.bottom-page.startpage .dropdown-lnk.active', self.$contentBlock).removeClass('active');
                 $(window).off('orientationchange.dropdownreposition');
             }
         });

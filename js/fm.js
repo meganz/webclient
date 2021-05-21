@@ -388,15 +388,15 @@ function initAddDialogMultiInputPlugin() {
 
                 if (itemNum > 1) {
                     $addButtonSpan.text(l[19113].replace('%1', itemNum));
-                    $addButton.removeClass('disabled');
+                    $addButton.removeClass('hidden');
                 }
                 else if (itemNum === 1) {
                     $addButtonSpan.text(l[19112]);
-                    $addButton.removeClass('disabled');
+                    $addButton.removeClass('hidden');
                 }
                 else {
                     $addButtonSpan.text(l[19112]);
-                    $addButton.addClass('disabled');
+                    $addButton.addClass('hidden');
                 }
 
             });
@@ -407,17 +407,17 @@ function initAddDialogMultiInputPlugin() {
 
             if (itemNum === 0) {
                 $addButtonSpan.text(l[19112]);
-                $addButton.addClass('disabled');
+                $addButton.addClass('hidden');
             }
             else if (itemNum === 1) {
                 $addButtonSpan.text(l[19112]);
-                $addButton.removeClass('disabled');
+                $addButton.removeClass('hidden');
             }
             else {
                 var $multiInput = $scope.find('.multiple-input');
 
                 $addButtonSpan.text(l[19113].replace('%1', itemNum))
-                $addButton.removeClass('disabled');
+                $addButton.removeClass('hidden');
             }
         },
         onDelete: function() {
@@ -433,15 +433,15 @@ function initAddDialogMultiInputPlugin() {
 
             if (itemNum === 0) {
                 $addButtonSpan.text(l[148]);
-                $addButton.addClass('disabled');
+                $addButton.addClass('hidden');
             }
             else if (itemNum === 1) {
                 $addButtonSpan.text(l[19112]);
-                $addButton.removeClass('disabled');
+                $addButton.removeClass('hidden');
             }
             else {
                 $addButtonSpan.text(l[19113].replace('%1', itemNum));
-                $addButton.removeClass('disabled');
+                $addButton.removeClass('hidden');
             }
         }
     });
@@ -699,7 +699,7 @@ function contactAddDialog(close, dontWarnBusiness) {
     });
 
     $('.add-user-popup-button span', $d).text(l[19112])
-    $('.add-user-popup-button', $d).addClass('disabled');
+    $('.add-user-popup-button', $d).addClass('hidden');
 
     if (u_attr && u_attr.b) {
         $('.hidden-achievement-info', $d).addClass('hidden');
@@ -3821,7 +3821,6 @@ function bindDropdownEvents($select, saveOption, contentBlock) {
 
     var $dropdownItem = $('.option', $select);
     var $contentBlock = contentBlock ? $(contentBlock) : $('body');
-    var $scrollBlock = $('.dropdown-scroll', $select);
     var $hiddenInput = $('.hidden-input', $select);
 
     // hidden input for keyboard search
@@ -3838,6 +3837,7 @@ function bindDropdownEvents($select, saveOption, contentBlock) {
         var $dropdown = $('.mega-input-dropdown', $this);
         var $hiddenInput = $('.hidden-input', $this);
         var $target = $(e.target);
+        var $scrollBlock = $('.dropdown-scroll', $this);
 
         var closeDropdown = function() {
             $this.removeClass('active');
@@ -3960,6 +3960,7 @@ function bindDropdownEvents($select, saveOption, contentBlock) {
 
     // Typing search and arrow key up and down features for dropdowns
     $hiddenInput.rebind('keyup.inputDropdown', function(e) {
+        var $scrollBlock = $('.dropdown-scroll', this);
         var charCode = e.which || e.keyCode; // ff
         var $filteredItem = {};
         var $current = $('.option.active', $select).length ? $('.option.active', $select) :

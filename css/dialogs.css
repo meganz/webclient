@@ -1088,6 +1088,9 @@ body.de .mega-dialog.new-group-chat {
     justify-content: space-between;
     height: 100%;
 }
+.fm-versioning .data-table {
+    padding: 0;
+}
 .fm-versioning.top-column {
     display: flex;
     align-items: center;
@@ -1245,6 +1248,18 @@ body.de .mega-dialog.new-group-chat {
 .fm-versioning.buttons .revert-file,
 .fm-versioning.buttons .download-file {
     cursor: pointer;
+    border-radius: 4px;
+    padding: 4px;
+}
+.file-info-row .fm-versioning.buttons .delete-file:hover,
+.file-info-row .fm-versioning.buttons .revert-file:hover,
+.file-info-row .fm-versioning.buttons .download-file:hover {
+    background: var(--surface-grey-2);
+}
+.file-info-row.active .fm-versioning.buttons .delete-file:hover,
+.file-info-row.active .fm-versioning.buttons .revert-file:hover,
+.file-info-row.active .fm-versioning.buttons .download-file:hover {
+    background: var(--surface-mid-grey);
 }
 .fm-versioning.buttons .download-file,
 .fm-versioning.buttons .revert-file {
@@ -1262,8 +1277,6 @@ body.de .mega-dialog.new-group-chat {
 }
 .fm-versioning.buttons div:not(.disabled):hover i {
     --mask-color: var(--icon-active);
-    --icon-size: 24px;
-    margin: 0;
 }
 .fm-versioning.buttons i.disabled {
     opacity: 1;
@@ -1924,8 +1937,23 @@ body.de .mega-dialog.new-group-chat {
     .mega-dialog.export-links-dialog .disabled .pro-only-feature {
         display: inline;
     }
+    .mega-dialog.export-links-dialog .pro .expiry-container {
+        position: relative;
+        display: inline-block;
+        margin-top: 15px;
+    }
+    .mega-dialog.export-links-dialog .pro input.set-date {
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        position: absolute;
+        z-index: 9;
+        opacity: 0;
+        cursor: pointer;
+    }
     .mega-dialog.export-links-dialog .sub-header ~ button {
-        margin: 15px 0 0;
+        margin: 0 0 0;
     }
     .mega-dialog.export-links-dialog .sub-header + button {
         margin-top: 15px;
@@ -2270,12 +2298,12 @@ body.de .mega-dialog.new-group-chat {
         color: var(--text-color-medium);
         margin: 12px 0 0 0;
     }
-    .mega-dialog.export-links-dialog .embed-content .checkboxOff,
-    .mega-dialog .embed-content .checkboxOn {
+    .mega-dialog.export-links-dialog .embed-content .checkboxOff:not(input),
+    .mega-dialog .embed-content .checkboxOn:not(input) {
         margin:  16px 14px;
     }
-    .mega-dialog.export-links-dialog .embed-content input.checkboxOn,
-    .mega-dialog .embed-content input.checkboxOff {
+    .mega-dialog.export-links-dialog .embed-content input.checkboxOn:not(input),
+    .mega-dialog .embed-content input.checkboxOff:not(input) {
         margin: 0;
     }
     .mega-dialog.export-links-dialog .embed-content .radio-txt {
@@ -2510,18 +2538,25 @@ body.de .mega-dialog.new-group-chat {
     }
     .mega-dialog.fm-picker-dialog .user-card-email.small.note {
         color: var(--text-color-high);
-        height: 24px;
-        font-size: 13px;
-        line-height: 24px;
-        padding: 4px 16px;
+        font: var(--text-body2);
+        padding: 8px 16px;
         text-align: center;
         border-radius: 4px;
         background: var(--surface-grey-1);
-        margin: 12px 0 -8px 0;
+        margin: 12px 0 0;
         -webkit-margin-end: -8px;
         margin-inline-end: -8px;
         -webkit-margin-start: -58px;
         margin-inline-start: -58px;
+    }
+    .mega-dialog.fm-picker-dialog .dropdown.contact-preview {
+        padding: 12px 20px;
+    }
+    .mega-dialog.fm-picker-dialog .dropdown.contact-preview .user-card-data {
+        padding-right: 0;
+    }
+    .mega-dialog.fm-picker-dialog .dropdown.contact-preview .contacts-info.body {
+        padding: 0 8px;
     }
     .mega-dialog.fm-picker-dialog .summary-items.multi {
         cursor: pointer;
@@ -3047,15 +3082,13 @@ body.de .mega-dialog.new-group-chat {
         left: auto;
         right: 50%;
     }
-    .mega-dialog.fm-picker-dialog .summary-container .transfer-filetype-icon {
+    .mega-dialog.fm-picker-dialog .summary-container .transfer-filetype-icon,
+    .mega-dialog.fm-picker-dialog .summary-container .target-icon {
         margin: 4px 0 0 0;
         -webkit-margin-start: 8px;
         margin-inline-start: 8px;
-    }
-    .mega-dialog.fm-picker-dialog .summary-container .transfer-filetype-icon.folder {
-        margin: 4px 0 0 0;
-        -webkit-margin-start: 9px;
-        margin-inline-start: 9px;
+        --icon-size: 24px;
+        position: absolute;
     }
     .mega-dialog.fm-picker-dialog .dialog-button-container {
         height: 56px;
@@ -3078,7 +3111,7 @@ body.de .mega-dialog.new-group-chat {
         padding: 0 24px;
     }
     .mega-dialog.fm-picker-dialog .summary-input.placeholder {
-        background: var(--surface-grey-1);
+        background: var(--surface-grey-4);
         color: var(--text-color-low);
         display: flex;
         align-items: center;
@@ -5824,7 +5857,7 @@ body.de .mega-dialog.new-group-chat {
     }
     .mega-dialog.limited-bandwidth-dialog .pricing-page.radio-buttons {
         margin: 0 12px 14px 0;
-        display: block;
+        display: flex;
         height: 28px;
         float: right;
     }
@@ -10008,3 +10041,32 @@ body.de .mega-dialog.new-group-chat {
     }
 
 /* payment-stripe-success/failure-dialog */
+
+/* Revamp onboarding dialog */
+.revamp-onboarding .revamp-onboarding-header {
+    align-items: center;
+    background-color: var(--surface-main);
+}
+.revamp-onboarding .revamp-onboarding-header .illustration {
+    width: 100%;
+    margin-top: 35px;
+    margin-bottom: -20px;
+}
+.revamp-onboarding .revamp-onboarding-header .icon-dialog-close {
+    --mask-color: var(--icon-rest);
+}
+.revamp-onboarding .content-block {
+    text-align: center;
+}
+.revamp-onboarding .content-block .big-header {
+    font: var(--text-h1);
+    text-align: center;
+    color: var(--text-color-high);
+    padding: 46px 0 16px 0;
+}
+.revamp-onboarding .content-block .highlight-blue {
+    font: var(--text-body1-bold);
+    color: var(--text-color-info);
+}
+
+/* End Revamp onboarding dialog */

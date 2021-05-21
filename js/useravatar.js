@@ -120,8 +120,8 @@ var useravatar = (function() {
         return  bgBlock +
             '<' + element + ' data-color="color' + s.colorIndex + '" class="' +
                 id + ' color' + s.colorIndex + ' ' + className + '">' +
-                '<i class="verified_icon"></i>' + s.letters +
-            '</' + element + '>';
+                '<div class="verified_icon"><i class="sprite-fm-uni icon-check verified-user-icon"></i></div>' +
+            s.letters + '</' + element + '>';
     }
 
     /**
@@ -156,7 +156,7 @@ var useravatar = (function() {
 
         return bgBlock +
             '<' + type + ' data-color="" class="' + id + ' ' + className + '">' +
-                '<i class="verified_icon"></i>' +
+                '<div class="verified_icon"><i class="sprite-fm-uni icon-check verified-user-icon"></i></div>' +
                 '<img src="' + url + '">' +
             '</' + type + '>';
     }

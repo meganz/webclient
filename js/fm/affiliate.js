@@ -145,12 +145,10 @@ affiliateUI.guideDialog = {
         // Closing dialog related
         $('button.js-close', this.$dialog).rebind('click.close-dialog', function() {
             closeDialog();
-            affiliateUI.animateIcon();
             $('.fm-dialog-overlay').off('click.affGuideDialog');
         });
 
         $('.fm-dialog-overlay').rebind('click.affGuideDialog', function() {
-            affiliateUI.animateIcon();
             $('.fm-dialog-overlay').off('click.affGuideDialog');
         });
     },
@@ -2299,58 +2297,3 @@ affiliateUI.geographicDistribution = {
 /*
  * Dashboard End
  */
-
-/*
- * Extras
- */
-
-/**
- * Animate Icon to let user awares of affiliate dashboard icon.
- * @returns {Void} void function
- */
-affiliateUI.animateIcon = function() {
-
-    'use strict';
-
-    if (!M.affiliate.icon) {
-
-        var $icon = $('.nw-fm-left-icon.affiliate');
-
-        M.affiliate.setUA('icon', 1).then(function() {
-            $icon.addClass('animate');
-        });
-    }
-};
-
-mBroadcaster.addListener('fm:initialized', function() {
-
-    'use strict';
-
-    // If user is not fully registered or this is public link without login do not load affiliate data yet
-    if (!folderlink && u_type > 2 && u_attr.flags.refpr) {
-
-        // If user is newly registered user,
-        if ($.noAffGuide) {
-
-            // Just mark him as he already saw the guide dialog and icon animation so it never happens to the user
-            delete $.noAffGuide;
-            M.affiliate.setUA('icon', 1);
-        }
-        // else if user is existing user who did not see dialog show it.
-        else if (!M.affiliate.icon) {
-
-            // If this is import redirection from download page, lets delay show guide dialog until finished.
-            if (typeof dl_import !== 'undefined' && dl_import) {
-                mBroadcaster.once('fm:importFileLinkDone', function() {
-                    affiliateUI.guideDialog.show();
-                });
-            }
-            else {
-                affiliateUI.guideDialog.show();
-            }
-        }
-
-        // we reached our goal, stop listening for fminitialized
-        return 0xDEAD;
-    }
-});

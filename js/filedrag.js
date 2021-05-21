@@ -434,12 +434,14 @@
             if (!window.InitFileDrag) {
                 return;
             }
-            $('.fm-file-upload input').remove();
-            $('.fm-file-upload').append('<input type="file" id="fileselect1" title="' + l[99] + '" multiple="">');
-            $('.fm-folder-upload input').remove();
-            $('.fm-folder-upload').append('<input type="file" id="fileselect2" webkitdirectory="" title="' +
-                l[98]
-                + '" multiple="">');
+
+            var $fileAndFolderUploadWrap = $('.fm-file-upload').parent();
+
+            $('input', $fileAndFolderUploadWrap).remove();
+            $fileAndFolderUploadWrap.safeAppend('<input type="file" class="hidden" id="fileselect1" title="' +
+                l[99] + '" multiple="">' + // File input
+                '<input type="file" class="hidden" id="fileselect2" webkitdirectory="" title="' +
+                l[98] + '" multiple="">'); // Folder input
             $('input#fileselect3').remove();
             $('.files-menu .fileupload-item')
                 .after('<input type="file" id="fileselect3" class="hidden" name="fileselect3" multiple="">');

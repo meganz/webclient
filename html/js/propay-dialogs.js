@@ -1298,12 +1298,36 @@ var addressDialog = {
     },
 
     /**
+     * Binds Select events for mobile, Dropdown component events for desktop
+     * @param {Object} $select jQuery object of the Select menu or dropdown
+     */
+    bindPaymentSelectEvents: function($select) {
+        "use strict";
+
+        if (is_mobile) {
+            $select.rebind('change.defaultSelectChange', function() {
+                var $this = $(this);
+
+                $('option', $this).attr('data-state', '');
+                $(':selected', $this).attr('data-state', 'active');
+            });
+        }
+        else {
+            bindDropdownEvents($select);
+        }
+    },
+
+    /**
      * Creates a list of state names with the ISO 3166-1-alpha-2 code as the option value
+     * @param {String} preselected ISO code of preselected country
+     * @param {String} country ISO code of country
      */
     initStateDropDown: function(preselected, country) {
 
         var $statesSelect = $('.states', this.$dialog);
         var $selectScroll = $('.dropdown-scroll', $statesSelect);
+        var $optionsContainer = is_mobile ? $statesSelect : $selectScroll;
+        var option = is_mobile ? 'option' : 'div';
 
         // Remove all states (leave the first option because its actually placeholder).
         $selectScroll.empty();
@@ -1315,26 +1339,31 @@ var addressDialog = {
             var itemNode;
 
             // Create the option and set the ISO code and state name
-            itemNode = mCreateElement('div', {
+            itemNode = mCreateElement(option, {
                 'class': 'option' + (countryCode !== country ? ' hidden' : ''),
                 'data-value': isoCode,
                 'data-state': preselected && isoCode === preselected ? 'active' : ''
-            }, $selectScroll[0]);
+            }, $optionsContainer[0]);
             mCreateElement('span', undefined, itemNode).textContent = stateName;
 
             if (preselected && isoCode === preselected) {
                 $('> span', $statesSelect).text(stateName);
+
+                // Set value to default Select menu for mobile
+                if (is_mobile) {
+                    $statesSelect.val(stateName);
+                }
             }
         });
 
         // Initialise the selectmenu
-        bindDropdownEvents($statesSelect);
+        this.bindPaymentSelectEvents($statesSelect);
 
         if (preselected || country === 'US' || country === 'CA') {
-            $statesSelect.removeClass('disabled');
+            $statesSelect.removeClass('disabled').removeAttr('disabled');
         }
         else {
-            $statesSelect.addClass('disabled');
+            $statesSelect.addClass('disabled').attr('disabled', 'disabled');
         }
     },
 
@@ -1345,6 +1374,8 @@ var addressDialog = {
 
         var $countriesSelect = $('.countries', this.$dialog);
         var $selectScroll = $('.dropdown-scroll', $countriesSelect);
+        var $optionsContainer = is_mobile ? $countriesSelect : $selectScroll;
+        var option = is_mobile ? 'option' : 'div';
 
         // Remove all countries (leave the first option because its actually placeholder).
         $selectScroll.empty();
@@ -1355,22 +1386,27 @@ var addressDialog = {
             var itemNode;
 
             // Create the option and set the ISO code and country name
-            itemNode = mCreateElement('div', {
+            itemNode = mCreateElement(option, {
                 'class': 'option',
                 'data-value': isoCode,
                 'data-state': preselected && isoCode === preselected ? 'active' : ''
-            }, $selectScroll[0]);
+            }, $optionsContainer[0]);
             mCreateElement('span', undefined, itemNode).textContent = countryName;
 
             if (preselected && isoCode === preselected) {
                 $('> span', $countriesSelect).text(countryName);
+
+                // Set value to default Select menu for mobile
+                if (is_mobile) {
+                    $countriesSelect.val(countryName);
+                }
             }
         });
 
-        // Initialise the jQueryUI selectmenu
-        bindDropdownEvents($countriesSelect);
+        // Initialise the selectmenu
+        this.bindPaymentSelectEvents($countriesSelect);
 
-        $countriesSelect.removeClass('disabled');
+        $countriesSelect.removeClass('disabled').removeAttr('disabled');
     },
 
     /**
@@ -1385,11 +1421,8 @@ var addressDialog = {
         var $postcodeInput = $('.postcode', this.$dialog);
         var $taxcode = $('input.taxcode', this.$dialog).attr('placeholder', 'VAT ' + l[7347]);
 
-        // On dropdown option change
-        $('.option', $countriesSelect).rebind('click.selectCountry', function() {
-
-            // Get the selected country ISO code e.g. CA
-            var selectedCountryCode = $(this).attr('data-value');
+        // Change the States depending on the selected country
+        var changeStates = function(selectedCountryCode) {
 
             // If postcode translations not set, then decalre them.
             if (addressDialog.localePostalCodeName === undefined
@@ -1438,11 +1471,11 @@ var addressDialog = {
                     }
                 }
 
-                $statesSelect.removeClass('disabled');
+                $statesSelect.removeClass('disabled').removeAttr('disabled');
                 $statesSelect.attr('tabindex', '7');
             }
             else {
-                $statesSelect.addClass('disabled');
+                $statesSelect.addClass('disabled').attr('disabled', 'disabled');
                 $statesSelect.attr('tabindex', '-1');
                 $('span', $statesSelect).first().text(l[7192]);
                 $('.option', $statesSelect).removeAttr('data-state').removeClass('active');
@@ -1453,7 +1486,21 @@ var addressDialog = {
 
             // Remove any previous validation error
             $statesSelect.removeClass('error');
-        });
+        };
+
+        // Get the selected country ISO code e.g. CA and change States
+        if (is_mobile) {
+
+            $countriesSelect.rebind('change.selectCountry', function() {
+                changeStates($(':selected', $(this)).attr('data-value'));
+            });
+        }
+        else {
+
+            $('.option', $countriesSelect).rebind('click.selectCountry', function() {
+                changeStates($(this).attr('data-value'));
+            });
+        }
     },
 
     /**

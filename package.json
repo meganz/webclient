@@ -40,10 +40,10 @@
   "private": true,
   "readmeFilename": "README.md",
   "dependencies": {
-    "@babel/core": "7.14.2",
+    "@babel/core": "7.14.3",
     "@babel/plugin-proposal-class-properties": "7.13.0",
     "@babel/plugin-proposal-decorators": "7.14.2",
-    "@babel/plugin-transform-runtime": "7.14.2",
+    "@babel/plugin-transform-runtime": "7.14.3",
     "@babel/preset-env": "7.14.2",
     "@babel/preset-react": "7.13.13",
     "@babel/runtime": "7.14.0",
@@ -66,7 +66,7 @@
     "webpack-cli": "3.3.12"
   },
   "devDependencies": {
-    "@babel/eslint-parser": "7.14.2",
+    "@babel/eslint-parser": "7.14.3",
     "chai": "4.3.4",
     "eslint": "7.26.0",
     "eslint-plugin-compat": "3.9.0",

@@ -44,7 +44,12 @@
     const setTheme = function(rawVal) {
         const val = rawVal | 0;
         if (query) {
-            query.removeEventListener('change', listener);
+            if (query.removeEventListener) {
+                query.removeEventListener('change', listener);
+            }
+            else if (query.removeListener) { // old Safari
+                query.removeListener(listener);
+            }
         }
         if (val === 1) {
             setBodyClass('light');
@@ -54,7 +59,12 @@
         }
         else if (val === 0 && window.matchMedia) {
             query = window.matchMedia('(prefers-color-scheme: dark)');
-            query.addEventListener('change', listener);
+            if (query.addEventListener) {
+                query.addEventListener('change', listener);
+            }
+            else if (query.addListener) { // old Safari
+                query.addListener(listener);
+            }
 
             if (query.matches) {
                 setBodyClass('dark');

@@ -216,7 +216,7 @@
                 collision: 'flipfit',
                 within: $this.parents(wrapper ? `${wrapper} body` : '.ps-container, body').first(),
                 using: function(obj, info) {
-                    let positionClass = '';
+                    let positionClass = 'simpletip-v-b';
 
                     if (info.vertical === 'top') {
                         positionClass = 'simpletip-v-t';
@@ -249,6 +249,7 @@
 
             // Calculate Arrow position
             var $tooltipArrow = $('.tooltip-arrow', $node);
+            const isArrowAtBottom = $node[0].className.indexOf('simpletip-v-b') > 0;
 
             $tooltipArrow.position({
                 of: $this,
@@ -270,6 +271,11 @@
                     }
                     else if (info.horizontal === 'right') {
                         left += 12;
+                    }
+
+                    if (isArrowAtBottom && info.vertical === 'top') {
+                        top = $node[0].offsetHeight - 17;
+                        arrowRotation = 0;
                     }
 
                     const { leftOffset, topOffset} = calculateOffset(info, $this);

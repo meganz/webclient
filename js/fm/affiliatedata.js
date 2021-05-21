@@ -7,7 +7,6 @@
     var AffiliateData = function() {
 
         // Two of one-off actions for affiliate program
-        this.icon = u_attr && u_attr['^!afficon'] || 0; // Affiliate icon has been animated.
         this.id = u_attr && u_attr['^!affid'] || ''; // User never register aff will have '' as affid
 
         this.lastupdate = 0;
@@ -82,7 +81,7 @@
         var self = this;
 
         // Allowed user attribute updatable on affiliate
-        var allowed = ['id', 'icon'];
+        var allowed = ['id'];
 
         if (allowed.indexOf(type) < 0) {
             if (d) {

@@ -171,6 +171,10 @@
 .cookie-dialog a.settings-link:visited {
     color: var(--text-color-medium);
 }
+.cookie-dialog a.settings-link:active,
+.cookie-dialog a.settings-link:visited {
+    margin-right: 25px;
+}
 .cookie-dialog a.settings-link:last-child {
     -webkit-margin-end: 0;
     margin-inline-end: 0;

@@ -37,7 +37,13 @@ function translate(html) {
      * @param {String} namespace The operation, if any
      * @returns {String} The localized string
      */
-    var replacer = function(match, localeNum) {
+    var replacer = function(match, localeNum, namespace) {
+
+        if (namespace) {
+            match = localeNum + '.' + namespace;
+            localeNum = match;
+        }
+
         // XXX: Seeing this warning could simply mean we forgot to replace entity tags
         //      within populate_l(), or it may indicate a worse issue where html pages
         //      are used before startMega() have finished. Also, injecting them in the
@@ -57,7 +63,7 @@ function translate(html) {
         return `not supported l[${localeNum}]`;
     };
 
-    return String(html).replace(/\[\$(\w+)]/g, replacer);
+    return String(html).replace(/\[\$(\w+)(?:\.(\w+))?\]/g, replacer);
 }
 
 /**
@@ -875,8 +881,8 @@ mBroadcaster.once('boot_done', function populate_l() {
     l[8848] = l[8848].replace('[S]', '<span>').replace('[/S]', '</span>');
     l[8849] = l[8849].replace('[S]', '<span>').replace('[/S]', '</span>');
     l[8912] = l[8912].replace('[B]', '<span>').replace('[/B]', '</span>');
-    l[8846] = l[8846].replace('[S]', '<span>').replace('[/S]', '</span>');
-    l[8847] = l[8847].replace('[S]', '<span>').replace('[/S]', '</span>');
+    l[8846] = l[8846].replace('[S]', '').replace('[/S]', '');
+    l[8847] = l[8847].replace('[S]', '').replace('[/S]', '');
     l[8950] = l[8950].replace('[S]', '<span>').replace('[/S]', '</span>');
     l[8951] = l[8951].replace('[S]', '<span>').replace('[/S]', '</span>');
     l[8952] = l[8952].replace('[S]', '<span>').replace('[/S]', '</span>');
@@ -1265,6 +1271,9 @@ mBroadcaster.once('boot_done', function populate_l() {
     l[24852] = escapeHTML(l[24852])
         .replace('[A]', '<a target="_blank" class="green-link clickurl" href="/blog">')
         .replace('[/A]', '</a>');
+    l.v4onboard_dialogtext = escapeHTML(l.v4onboard_dialogtext)
+        .replace('[S]', '<span class="highlight-blue">')
+        .replace('[/S]', '</span>');
 
     var common = [
         15536, 16106, 16107, 16119, 16120, 16123, 16124, 16135, 16136, 16137, 16138, 16304, 16313, 16315, 16316,

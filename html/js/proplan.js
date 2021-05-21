@@ -1126,7 +1126,7 @@ function showLoginDialog(email, password) {
 
         $('.top-login-forgot-pass', $dialog).rebind('click.forgetPass', function() {
 
-            var email = document.getElementById('login-name').value;
+            var email = document.getElementById('login-name3').value;
 
             if (isValidEmail(email)) {
                 $.prefillEmail = email;

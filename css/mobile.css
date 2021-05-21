@@ -570,6 +570,9 @@ ul, li {
     overflow: hidden;
     font-family: 'latoWeb';
 }
+.mobile.mega-dialog.park-account-dialog .mobile.inline-buttons {
+    overflow: initial;
+}
 .mobile.inline-buttons .mobile.red-button, .mobile.inline-buttons .mobile.green-button, .mobile .unsub .btn {
     width: 50%;
     width: -webkit-calc(50% - 4px);
@@ -629,17 +632,17 @@ ul, li {
 .fm-dialog.mobile.payment-stripe-dialog,
 .fm-dialog.mobile.payment-stripe-success-dialog,
 .fm-dialog.mobile.payment-stripe-failure-dialog {
-    width: 100%;
-    height: 100%;
+    height: initial;
     max-width: 640px;
     max-height: 640px;
-    margin: 0 auto;
-    right: 0;
-    bottom: 0;
-    top: 7%;
-    left: 0;
-    position: absolute;
+    margin: auto;
+    right: 8px;
+    bottom: 8px;
+    top: 8px;
+    left: 8px;
+    position: fixed;
     border: none;
+    width: initial;
 }
 .mobile.payment-stripe-success-dialog .success-logo,
 .mobile.payment-stripe-failure-dialog .fail-logo {
@@ -2550,6 +2553,12 @@ input[type='checkbox'] {
     position: relative;
     width: 18px;
 }
+.checkboxOn.square input.remember-billing-info,
+.checkboxOff.square input.remember-billing-info {
+    display: block;
+    z-index: 2;
+    position: absolute;
+}
 .mobile.remember-me .text {
     color: #eb4444;
     cursor: pointer;
@@ -2742,6 +2751,11 @@ div.checkboxOn {
 	border-radius: 100%;
 	float: left;
 	position: relative;
+}
+.bus-reg-agreement div.checkboxOff,
+.bus-reg-agreement div.checkboxOn {
+    border: none;
+    border-radius: 3px;
 }
 .checkboxOff span,
 .checkboxOn span {
@@ -3730,7 +3744,16 @@ div.checkboxOn {
     margin: 0 20px 20px 20px;
 }
 .mobile.cancel-account .radio-button-form .radio-txt {
-    padding-top: 5px;
+    margin: 0;
+}
+.mobile.cancel-account .radio-option {
+    margin: 24px 0 24px;
+    display: flex !important;
+    align-items: center;
+}
+.mobile.cancel-account .radio-option .radioOn,
+.mobile.cancel-account .radio-option .radioOff {
+    display: flex !important;
 }
 .mobile.header-icon {
     width: 36px;
@@ -4030,7 +4053,7 @@ div.checkboxOn {
     padding: 24px 20px;
 }
 .payment-address-dialog .container-box-title {
-    margin: 12px 20px 24px 16px;
+    margin: 12px 20px 24px;
 }
 .payment-address-dialog .payment-note-first {
     color: #495057;
@@ -4051,7 +4074,7 @@ div.checkboxOn {
     background-color: #F8F8F8;
     box-sizing: border-box;
     height: 48px;
-    margin-bottom: 8px;
+    margin: 0 20px 8px;
     overflow: hidden;
     padding: 9px 55px 0 12px;
     position: relative;
@@ -4063,34 +4086,24 @@ div.checkboxOn {
 }
 .payment-address-dialog .default-select {
     float: none;
-    margin: 0 24px 12px;
+    margin: 0 20px 12px;
     min-width: 0;
-    width: calc(100% - 48px);
-}
-.payment-address-dialog .default-select:before {
-    content: "";
-    box-sizing: border-box;
-    border-radius: 4px;
-    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.05);
-    height: 48px;
-    left: 0;
-    position: absolute;
-    width: 100%;
+    width: calc(100% - 40px);
 }
 /* This is to undo all the styling caused by other classnames. I will go through and tidy up the classes after. */
 .mobile.main-block.payment-address-dialog {
-    top: 32px;
+    top: 8px;
     left: 8px;
     right: 8px;
     bottom: 8px;
     width: initial;
     height: initial;
-    position: absolute;
+    position: fixed;
     -moz-border-radius: 16px;
     -webkit-border-radius: 16px;
     border-radius: 16px;
     max-width: 540px;
-    margin: 0 auto;
+    margin: auto;
 }
 /* Styling for jQueryUI selectmenu in use with address dialog */
 .ui-selectmenu-button {
@@ -4191,17 +4204,16 @@ div.checkboxOn {
     color: gray;
     cursor: pointer;
     margin: 0 16px 12px;
-    border: 0;
     height: 48px;
     font-size: 14px;
     line-height: 49px;
     min-width: 150px;
     background-color: rgba(255, 255, 255, 1);
-    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.1);
     border-radius: 4px;
+    border: 1px solid #eee;
     background-image: url(../images/mobile/mobile-sprite.png);
     background-repeat: no-repeat;
-    background-position: right -2351px;
+    background-position: right -2350px;
     box-sizing: border-box;
     position: relative;
     text-align: left;
@@ -4285,7 +4297,7 @@ div.checkboxOn {
     box-sizing: border-box;
     text-align: center;
     text-transform: lowercase;
-    margin: 0 16px 8px;
+    margin: 0 20px 8px;
     position: relative;
     overflow: visible;
 }
@@ -4314,7 +4326,7 @@ div.checkboxOn {
 }
 .payment-address-dialog .redirect-information-container {
     position: relative;
-    margin: 12px 16px;
+    margin: 12px 20px;
 }
 .payment-address-dialog .redirect-information {
     background-color: #f7f8fa;
@@ -5911,7 +5923,9 @@ textarea.mobile.support-text-field {
 }
 .mobile.my-account-change-password-page .signin-input {
     margin: 0 24px 4px;
-    padding: 9px 16px 0 52px;
+    padding-top: 0;
+    display: flex;
+    align-items: center;
 }
 .mobile.my-account-change-password-page .update-password-button {
     margin: 8px 24px;
@@ -7552,7 +7566,6 @@ textarea.mobile.support-text-field {
     width: 100%;
 }
 .mobile .improved-recovery-steps .recover-button.yes {
-    color: #00BFA5;
     margin-bottom: 12px;
 }
 .mobile .improved-recovery-steps .recover-button.yes:hover,.mobile  .recover-button.yes.active {
@@ -7560,9 +7573,6 @@ textarea.mobile.support-text-field {
     -webkit-box-shadow: 0 0 0 0 #6BB219;
     -moz-box-shadow: 0 0 0 0 #6BB219;
     box-shadow: 0 0 0 0 #6BB219;
-}
-.mobile .improved-recovery-steps .recover-button.no {
-    color: #eb4444;
 }
 .mobile .improved-recovery-steps .recover-button.no:hover, .mobile .improved-recovery-steps .recover-button.no.active {
     background-color: rgba(235,68,68,0.0);
@@ -7945,6 +7955,9 @@ textarea.mobile.support-text-field {
     margin-top: 32px;
     font-size: 14px;
 }
+.mobile .improved-recovery-steps .checkbox-block .checkboxOn {
+    background: none;
+}
 .mobile .improved-recovery-steps .checkbox-block {
     padding: 0 0;
     margin-top: 26px;
@@ -8121,6 +8134,8 @@ textarea.mobile.support-text-field {
     -webkit-border-radius: 2px;
     border-radius: 2px;
     color: #eb4444;
+    padding: 12px;
+    margin-bottom: 14px;
 }
 .mobile .improved-recovery-steps .content-text {
     padding: 8px 12px 8px 0;
@@ -8201,7 +8216,7 @@ textarea.mobile.support-text-field {
     padding-left: 28px;
     margin: 0 2px 0 3px;
 }
-.mobile.fm-dialog.park-account-dialog {
+.mobile.mega-dialog.park-account-dialog {
     width: 100%;
     width: -webkit-calc(100% - 24px);
     width: -moz-calc(100% - 24px);
@@ -9057,6 +9072,7 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll, .mob
     border-radius: 4px;
 }
 .mobile.payment-result .payment-result-button {
+    margin: 0 auto;
     position: relative;
 }
 .mobile.voucher-redeem-dialog .buttons {
@@ -9385,7 +9401,7 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll, .mob
     left: 0;
     right: 0;
     bottom: initial;
-    top: 32px;
+    top: 8px;
     height: 22px;
     z-index: 1200;
     margin: 0 auto;
@@ -10079,6 +10095,10 @@ Thank You dialog
     color: #0bbdaa;
 }
 
+.mobile.main-avatar .verified_icon {
+    display: none;
+}
+
 /* Only media queries after here */
 @media only screen and (max-width: 970px) {
     .securitypractice .security-page-video-block {
@@ -10332,12 +10352,6 @@ Thank You dialog
     .mobile.verify-login-page .two-factor-qr-block {
         margin: 0 auto;
         padding: 36px 38px;
-    }
-    .mobile.pro-card-container {
-        margin-left: -48px;
-        width: -webkit-calc(100% + 60px);
-        width: -moz-calc(100% + 60px);
-        width: calc(100% + 60px);
     }
     .mobile.country-selector-dialog {
         max-width: 420px;
@@ -10833,7 +10847,6 @@ Thank You dialog
     }
     .mobile.remember-me,
     .mobile.confirm-terms,
-    .payment-address-dialog .ui-selectmenu-button,
     .mobile.signin-input {
         margin-left: 24px;
         margin-right: 24px;
@@ -10845,9 +10858,6 @@ Thank You dialog
         padding: 17px 0;
         margin-left: 24px;
         margin-right: 24px;
-    }
-    .payment-address-dialog .container-box-title {
-        margin: 12px 24px 24px 24px;
     }
 }
 

@@ -10,8 +10,7 @@
     display: none;
 }
 .fm-recents.header {
-    font: var(--text-h3-bold);
-    color: var(--text-color-higher);
+    font: var(--text-body1);
     border-bottom: 1px solid var(--surface-grey-2);
     padding: 12px 0 10px 32px;
 }

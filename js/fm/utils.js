@@ -1783,6 +1783,66 @@ MegaUtils.prototype.checkGoingOverStorageQuota = function(opSize) {
 };
 
 /**
+ * Fill left-pane element with storage quota footprint.
+ * @param {Object} [data] already-retrieved storage-quota
+ * @returns {Promise} fulfilled on completion.
+ */
+MegaUtils.prototype.checkLeftStorageBlock = async function(data) {
+    'use strict';
+
+    if (!u_type || !fminitialized || this.storageQuotaCache) {
+        return false;
+    }
+
+    const storageBlock = document.querySelector('.js-lp-storage-usage-block');
+    const loaderSpinner = storageBlock.querySelector('.loader');
+
+    // minimize DOM ops when not needed by only triggering the loader if really needed
+    if (loaderSpinner) {
+        loaderSpinner.classList.add('loading');
+    }
+
+    this.storageQuotaCache = data || await this.getStorageQuota();
+
+    let storageHtml;
+    const {percent, max, used} = this.storageQuotaCache;
+    const space = bytesToSize(max, 0);
+    const space_used = bytesToSize(used);
+
+    if (percent >= 100 && !storageBlock.classList.contains("over")) {
+        storageBlock.classList.add('over');
+    }
+    else if (percent > 80 && !storageBlock.classList.contains("warning")) {
+        storageBlock.classList.add('warning');
+    }
+
+    if (u_attr.p) {
+        storageBlock.querySelector('.plan').textContent = pro.getProPlanName(u_attr.p);
+    }
+    else {
+        storageBlock.querySelector('.plan').textContent = l[1150];
+    }
+
+    // Show only space_used  for business accounts
+    if (u_attr && u_attr.b) {
+        storageHtml = `<span id="lp-sq-used">${space_used}</span>`;
+        storageBlock.querySelector('.js-storagegraph').classList.add('hidden');
+        storageBlock.querySelector('.js-lpbtn[data-link="upgrade"]').classList.add('hidden');
+    }
+    else {
+        storageHtml = l[1607].replace('%1', `<span id="lp-sq-used">${space_used}</span>`)
+            .replace('%2', `<span id="lp-sq-max">${space}</span>`);
+    }
+
+    $('.storage-txt', storageBlock).safeHTML(storageHtml);
+    $('.js-storagegraph span', storageBlock).outerWidth(`${percent}%`);
+
+    if (loaderSpinner) {
+        loaderSpinner.remove();
+    }
+};
+
+/**
  * Check whether the provided object is a TypedArray
  * @param {Object} obj The object to check
  * @returns {Boolean}

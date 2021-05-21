@@ -354,14 +354,14 @@ var versiondialogid;
                     var mostRecentHtml = (i === 0) ? '<span class="current">(' + l[17149] + ')</span>' : '';
                     var activeClass  = (current_sel_version === v.h) ? 'active' : '';
                     var downBtnHtml =
-                        `<div class="download-file simpletip"
+                        `<div class="mega-button small action download-file simpletip"
                             data-simpletip="${l[58]}"
                             aria-label="${l[58]}"
                             id="vdl_${v.h}">
-                            <i class="sprite-fm-mono icon-download-filled"></i>
+                            <i class="sprite-fm-mono icon-download-small"></i>
                         </div>`;
                     var revertBtnHtml =
-                        `<div class="revert-file simpletip"
+                        `<div class="mega-button small action revert-file simpletip"
                             data-simpletip="${l[16475]}"
                             aria-label="${l[16475]}"
                             id="vrv_${v.h}">
@@ -371,7 +371,7 @@ var versiondialogid;
                     if ((nodeData && (nodeData.r < 2)) || (fileversioning.dvState === 1) ||
                     ((i === 0) && (fileversioning.getTopNodeSync(current_sel_version) === v.h))) {
                         revertBtnHtml =
-                            `<div class="revert-file disabled nonclickable simpletip"
+                            `<div class="mega-button small action revert-file disabled nonclickable simpletip"
                                 data-simpletip="${l[16475]}"
                                 aria-label="${l[16475]}"
                                 id="vrv_${v.h}">
@@ -379,19 +379,19 @@ var versiondialogid;
                             </div>`;
                     }
                     var deleteBtnHtml =
-                        `<div class="delete-file simpletip"
+                        `<div class="mega-button small action delete-file simpletip"
                             data-simpletip="${l[1730]}"
                             aria-label="${l[1730]}"
                             id="vde_${v.h}">
-                            <i class="sprite-fm-mono icon-bin-filled"></i>
+                            <i class="sprite-fm-mono icon-bin"></i>
                         </div>`;
                     if (nodeData && (nodeData.r < 2)) {// if the user does not have full access of the shared folder.
                         deleteBtnHtml =
-                            `<div class="delete-file disabled nonclickable"
+                            `<div class="mega-button small action delete-file disabled nonclickable"
                                 data-simpletip="${l[1730]}"
                                 aria-label="${l[1730]}"
                                 id="vde_${v.h}">
-                                <i class="sprite-fm-mono icon-bin-filled disabled nonclickable"></i>
+                                <i class="sprite-fm-mono icon-bin disabled nonclickable"></i>
                             </div>`;
                     }
                     html += // <!-- File Data Row !-->

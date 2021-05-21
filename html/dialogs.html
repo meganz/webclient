@@ -249,7 +249,7 @@
     </div>
 </div>
 
-<div class="nw-dark-overlay megasync-upload-overlay hidden">
+<div class="nw-dark-overlay megasync-upload-overlay hidden theme-dark-forced">
     <div class="overlay-close">
         <i class="fm-dialog-close overlay-close-icon sprite-fm-mono icon-dialog-close"></i>
         <span>[$6951]</span>
@@ -271,14 +271,12 @@
             <div class="megasync-bottom">
                 <button class="mega-button download-button download">
                     <span>
-                        [$58]
-                        <span>MEGAsync</span>
+                        [$8847]
                     </span>
                 </button><!--
                 --><button class="mega-button download-button continue">
                     <span>
-                        Continue
-                        <span>anyway</span>
+                        [$8846]
                     </span>
                 </button>
                 <div class="clear"></div>
@@ -672,23 +670,23 @@
                         </button>
                     </li>
                     <li>
-                        <button class="v-btn slideshow simpletip" aria-label="[$17802]" data-simpletipoffset="2" data-simpletip="[$17802]">
+                        <button class="v-btn slideshow simpletip" aria-label="[$17802]" data-simpletipoffset="2" data-simpletip="[$17802]" data-simpletipposition="top">
                             <i class="sprite-fm-mono icon-play"></i>
                         </button>
                     </li>
                 </ul>
                 <div class="zoom-slider-wrap">
-                    <button class="v-btn simpletip zoom-out" aria-label="[$24927]" data-simpletipoffset="2" data-simpletip="[$24927]">
+                    <button class="v-btn simpletip zoom-out" aria-label="[$24927]" data-simpletipoffset="2" data-simpletip="[$24927]" data-simpletipposition="top">
                         <i class="sprite-fm-theme icon-image-zoom-out"></i>
                     </button>
                     <div class="zoom-slider"></div>
-                    <button class="v-btn simpletip zoom-in" aria-label="[$24928]" data-simpletipoffset="2" data-simpletip="[$24928]">
+                    <button class="v-btn simpletip zoom-in" aria-label="[$24928]" data-simpletipoffset="2" data-simpletip="[$24928]" data-simpletipposition="top">
                         <i class="sprite-fm-theme icon-image-zoom-in"></i>
                     </button>
                 </div>
                 <ul class="bar control">
                      <li>
-                        <button class="v-btn simpletip fullscreen" aria-label="[$17803]" data-simpletipoffset="2" data-simpletip="[$17803]">
+                        <button class="v-btn simpletip fullscreen" aria-label="[$17803]" data-simpletipoffset="2" data-simpletip="[$17803]" data-simpletipposition="top">
                             <!-- Active state: .icon-fullscreen-leave !-->
                             <i class="sprite-fm-mono icon-fullscreen-enter"></i>
                         </button>
@@ -849,22 +847,27 @@
         <a data-by="name" class="dropdown-item asc active">
             <i class="small-icon context az"></i>
             <span>[$86]</span>
+            <i class="sprite-fm-mono sort-arrow"></i>
         </a>
         <a data-by="label" class="dropdown-item">
             <i class="small-icon context labels"></i>
             <span>[$17398]</span>
+            <i class="sprite-fm-mono sort-arrow"></i>
         </a>
         <a data-by="status" class="dropdown-item">
             <i class="small-icon context status"></i>
             <span>[$89]</span>
+            <i class="sprite-fm-mono sort-arrow"></i>
         </a>
         <a data-by="last-interaction" class="dropdown-item">
             <i class="small-icon context conversation"></i>
             <span>[$5904]</span>
+            <i class="sprite-fm-mono sort-arrow"></i>
         </a>
         <a data-by="fav" class="dropdown-item">
             <i class="small-icon context heart"></i>
             <span>[$5871]</span>
+            <i class="sprite-fm-mono sort-arrow"></i>
         </a>
     </div>
 </div>
@@ -1527,7 +1530,7 @@
                     <div class="summary-title summary-target-title">[$19181]</div>
                     <div class="summary-input placeholder">
                         <div class="choose-target">
-                            <div class="transfer-filetype-icon folder"></div>
+                            <i class="target-icon"></i>
                             <div class="summary-ff-name">[$19182]</div>
                         </div>
                         <div class="fm-picker-breadcrumbs link-row">
@@ -1552,22 +1555,22 @@
                 </div>
                 <div class="side-pane">
                     <!-- Please add "active" classname to necessary "fm-picker-dialog-button" block !-->
-                    <div class="fm-picker-dialog-button cloud-drive">
+                    <div class="fm-picker-dialog-button cloud-drive" data-section="cloud-drive">
                         <div class="left-border"></div>
                         <div class="tooltip">[$1687]</div>
                         <i class="sprite-fm-mono icon-cloud-drive"></i>
                     </div>
-                    <div class="fm-picker-dialog-button shared-with-me">
+                    <div class="fm-picker-dialog-button shared-with-me" data-section="shared-with-me">
                         <div class="left-border"></div>
                         <div class="tooltip">[$5589]</div>
                         <i class="sprite-fm-mono icon-folder-incoming-share-filled"></i>
                     </div>
-                    <div class="fm-picker-dialog-button conversations">
+                    <div class="fm-picker-dialog-button conversations" data-section="conversations">
                         <div class="left-border"></div>
                         <div class="tooltip">[$17764]</div>
                         <i class="sprite-fm-mono icon-chat-filled"></i>
                     </div>
-                    <div class="fm-picker-dialog-button rubbish-bin">
+                    <div class="fm-picker-dialog-button rubbish-bin" data-section="rubbish-bin">
                         <div class="left-border"></div>
                         <div class="tooltip">[$167]</div>
                         <i class="sprite-fm-mono icon-bin-filled"></i>
@@ -1794,13 +1797,15 @@
                             <div class="sub-header expiry">
                                 <span class="info">[$23622]</span> <span class="pro-only-feature">[$8695]</span>
                             </div>
+                            <div class="expiry-container">
                             <button class="mega-button expiry">
                                 <span class="label">[$8953]</span>
-                                <input type="text" class="set-date common" value="" />
-                            </button><!--
+
+                            </button>
+                            <input type="text" class="set-date common" value="" /></div><!--
                             --><button class="mega-button square remove-date hidden">
                                 <div>
-                                    <i class="small-icon dialog-sprite small-cross"></i>
+                                    <i class="sprite-fm-mono icon-close-component"></i>
                                 </div>
                             </button>
                             <div class="clear"></div>
@@ -6266,6 +6271,32 @@
             </div>
         </footer>
     </div>
+
+    <!-- Dialog: v4 revamp onboarding -->
+    <!-- Revamp onboarding -->
+    <div class="mega-dialog dialog-template-tool revamp-onboarding hidden" role="dialog" aria-labelledby="revamp-onboarding-title" aria-modal="true">
+        <header class="revamp-onboarding-header theme-dark-forced">
+            <button class="close js-close close-rev-onboarding" aria-label="[$148]">
+                <i class="sprite-fm-mono icon-dialog-close"></i>
+            </button>
+            <div class="illustration sprite-fm-illustration-wide img-dialog-darkmode"></div>
+        </header>
+        <section class="content">
+            <div class="content-block">
+                <div class="big-header"></div>
+                <div class="revamp-onboarding-content"></div>
+            </div>
+        </section>
+
+        <footer>
+            <div class="footer-container">
+                <button class="mega-button close-rev-onboarding positive">
+                    <span>OK</span>
+                </button>
+            </div>
+        </footer>
+    </div>
+
 
     <!-- Dialog: generate-url -->
     <!-- Generate referral URL dialog !-->

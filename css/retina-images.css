@@ -448,7 +448,6 @@
     .fm-right-account-block .dialog-input-title-ontop .birth-arrow-container .up-control,
     .fm-right-account-block .dialog-input-title-ontop .birth-arrow-container .down-control,
     .fm-right-account-block .tooltip-icon .medium-icon.info-icon,
-    .fm-picker-dialog .summary-container .transfer-filetype-icon.chat,
     .fm-picker-dialog .contact-row.selected .contact-checkboxOn.small12::before,
     .fm-picker-dialog .contact-row:hover .small12::before,
     .content-panel.dashboard .small-icon.info-icon,
@@ -490,7 +489,8 @@
         background-image: url(../images/mega/fm-main-sprite@2x.png);
         background-size: 48px auto;
     }
-    .user-management-view .icon, .fm-right-header-user-management .icon, .user-management-dialog .icon,
+    .fm-right-header-user-management .icon,
+    .user-management-dialog .icon,
     .user-management-overview-bar .icon {
         background-image: url(../images/mega/fm-main-sprite@2x.png);
         background-size: 48px auto;

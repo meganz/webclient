@@ -678,13 +678,11 @@ class ConversationsList extends MegaRenderMixin {
 
 
         return (
-            <PerfectScrollbar options={{ 'suppressScrollX': true }}>
-                <div className="conversationsList">
-                    <ul className="conversations-pane">
-                        {currConvsList}
-                    </ul>
-                </div>
-            </PerfectScrollbar>
+            <div className="conversationsList">
+                <ul className="conversations-pane">
+                    {currConvsList}
+                </ul>
+            </div>
         );
     }
 };

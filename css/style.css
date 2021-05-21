@@ -914,6 +914,7 @@ a.blog-button:hover {
     text-overflow: ellipsis;
     white-space: nowrap;
     color: var(--text-color-high);
+    width: 320px;
 }
 .notification-content {
     box-sizing: border-box;
@@ -930,6 +931,7 @@ a.blog-button:hover {
     font: var(--text-body2);
     padding: 1px 0;
     word-wrap: break-word;
+    width: 320px;
 }
 .notification-date {
     display: block;
@@ -3154,7 +3156,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     width: 10px;
     height: 10px;
     margin: -2px 0 0 -2px;
-    border: 2px solid #fafafa;
+    border: 2px solid var(--surface-main);
     box-sizing: border-box;
     border-radius: 100%;
     background-color: inherit;
@@ -3271,6 +3273,9 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     display: flex;
     font: var(--text-h2);
     margin-bottom: 16px;
+}
+.astropay-payment-reminder .warning-header {
+    display: block;
 }
 .warning-icon.sprite-fm-illustration.img-topbar-email-registration {
     float: left;
@@ -4160,6 +4165,9 @@ tr:not(.taken-down) .grid-status-icon:not(.read-only):not(.read-and-write) {
     width: calc(50% - 56px);
     color: inherit;
 }
+.mega-dialog .nw-contact-name img.emoji {
+    margin-top: 0;
+}
 .mega-dialog .nw-contact-status {
     width: 8px;
     height: 8px;
@@ -4167,6 +4175,7 @@ tr:not(.taken-down) .grid-status-icon:not(.read-only):not(.read-and-write) {
     margin: 0;
     -webkit-margin-start: 12px;
     margin-inline-start: 12px;
+    flex-shrink: 0;
 }
 .mega-dialog .fm-picker-dialog-tree-panel .nw-contact-item {
     padding: 0 14px 0 14px;
@@ -5545,7 +5554,6 @@ tr:not(.taken-down) .grid-status-icon:not(.read-only):not(.read-and-write) {
     flex-direction: column;
     height: 100%;
     justify-content: center;
-    position: relative;
     text-align: center;
 }
 .fm-empty-section .mega-button.large {
@@ -5645,7 +5653,7 @@ tr:not(.taken-down) .grid-status-icon:not(.read-only):not(.read-and-write) {
 .ui-selectable-helper {
     position: absolute;
     z-index: 100;
-    border: 1px dotted black;
+    border: 1px dotted var(--surface-mid-grey);
 }
 .context-menu, .dialog-sorting-menu, .fm-sorting-menu {
     min-width: 160px;
@@ -7319,7 +7327,7 @@ table {
 .account.responsive-widget-block .widget.body {
     width: 100%;
 }
-.account.responsive-widget-block .widget.body:nth-child(2n) {
+.fm-right-block.dashboard.active-achievements .account.responsive-widget-block .widget.body:nth-child(2n) {
     -webkit-margin-start: 12px;
     margin-inline-start: 12px;
 }
@@ -8507,7 +8515,7 @@ button.loading span i {
     background-color: white;
 }
 strong, b {
-    font-family: 'source_sans_prosemibold', Arial, sans-serif;
+    font-family: var(--text-font-family-bold);
     font-weight: normal;
 }
 .share-folder-block {
@@ -9538,6 +9546,7 @@ code, c {
 span.roman-number {
     color: var(--text-color-error);
     font: var(--text-body1);
+    font-style: italic;
     float: left;
     display: block;
     -webkit-margin-end: 8px;
@@ -9578,6 +9587,11 @@ p.copyrights-red {
 }
 .copyrights-bottom .new-registration-checkbox .checkboxOn, .copyrights-bottom .new-registration-checkbox .checkboxOff {
     margin: 4px 1px 0 0;
+    position: absolute;
+}
+.copyrights-bottom .new-registration-checkbox {
+    position: relative;
+    margin-bottom: 69px;
 }
 .copyrights-bottom .new-registration-checkbox .radio-txt {
     margin: -1px 0 0 35px;
@@ -9586,6 +9600,7 @@ p.copyrights-red {
     text-indent: 0;
     display: block;
     line-height: 24px;
+    position: absolute;
 }
 .copyrights-h2-pad {
     padding: 28px 0 6px 0;
@@ -12917,7 +12932,8 @@ div.camera-bottom-txt {
 .ui-selectable-helper {
     position: absolute;
     z-index: 100;
-    border: 1px dotted black;
+    border: 1px solid var(--surface-mid-grey);
+    background: var(--surface-highlight-2);
 }
 /**
  * Transfer Panel - Resize Handle styling
@@ -15823,7 +15839,7 @@ body.megaChatDisabled .nw-contact-name button.start-chat-button {
     padding-top: 5px;
 }
 
-.privacy-policy h3 {
+.privacy-policy h2 {
     margin-top: 25px;
 }
 
@@ -15918,3 +15934,31 @@ body.megaChatDisabled .nw-contact-name button.start-chat-button {
     bottom: 66px;
 }
 /* end corner toasts and transfer popup */
+
+.revamp-onboarding.revamp-note.right-arrow {
+    position: absolute;
+    color: var(--text-color-high-inverted);
+    background-color: var(--surface-main-inverted);
+    padding: 12px;
+    border-radius: 12px;
+    justify-content: center;
+    display: flex;
+    align-items: center;
+    opacity: 0;
+    transition: var(--transition-all);
+    font: var(--text-body1);
+}
+.revamp-onboarding.revamp-note.right-arrow.active {
+    opacity: 1;
+}
+.revamp-onboarding.revamp-note.right-arrow.active::before {
+    content: '';
+    width: 12px;
+    height: 12px;
+    position: absolute;
+    background: var(--arrow-color, var(--surface-main-inverted));
+    z-index: 123;
+    border: none;
+    transform: rotateZ(-45deg);
+    right: -6px;
+}

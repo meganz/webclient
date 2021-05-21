@@ -1123,6 +1123,7 @@ button.megasync-slider.prev {
     display: block;
 }
 .downloading .download.buttons-block,
+.download-complete .download.buttons-block,
 .download-complete .pause-transfer,
 .downloading .download.checkbox-bl,
 .video.downloading .download.checkbox-bl,

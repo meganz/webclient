@@ -53,6 +53,10 @@ var RevampOnboarding = {
 
         $('.js-accountbtn.feedback', '.account-dialog').addClass('highlight');
         this.setDone(1);
+
+        setTimeout(() => {
+            $('.revamp-onboarding.feedback-request').removeClass('active');
+        }, 10000);
     },
 
     removeFeedbackTip: function() {

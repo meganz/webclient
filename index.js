@@ -1926,7 +1926,7 @@ function init_page() {
         $('.nw-fm-left-icons-panel').removeClass('hidden');
         let fmholder = document.getElementById('fmholder');
         // try to determinate visibility, without needing to use :visible
-        if (!fmnholder || fmholder.classList.contains("hidden") || fmholder.style.display === "none") {
+        if (!fmholder || fmholder.classList.contains("hidden") || fmholder.style.display === "none") {
             if (anonymouschat) {
                 $('.nw-fm-left-icons-panel').addClass('hidden');
                 $('.top-head .logo').css("display", "block");

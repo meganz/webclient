@@ -37,6 +37,11 @@ var RevampOnboarding = {
         var $popup = $('.revamp-onboarding.popup');
         $('.popup-content', $popup).text(l.v4onboard_popupmessage);
         $popup.removeClass('hidden');
+
+        setTimeout(() => {
+            $popup.addClass('hidden');
+        }, 10000);
+
     },
 
     showFeedbackTip: function() {

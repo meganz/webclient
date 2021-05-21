@@ -42,12 +42,11 @@ var RevampOnboarding = {
     showFeedbackTip: function() {
         'use strict';
 
-        var $feedbackLi = $('.js-accountbtn.feedback', '.account-dialog').addClass('highlight');
         $('.revamp-onboarding.feedback-request')
             .text(l.v4onboard_feedtextbox)
-            .addClass('active')
-            .css('top', $feedbackLi.offset().top - 20);
+            .addClass('active');
 
+        $('.js-accountbtn.feedback', '.account-dialog').addClass('highlight');
         this.setDone(1);
     },
 

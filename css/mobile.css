@@ -5992,6 +5992,11 @@ textarea.mobile.support-text-field {
     margin-left: 24px;
     margin-right: 24px;
 }
+.mobile.signin-input.input-recovery-key {
+    display: flex;
+    align-items: center;
+    padding-top: 0;
+}
 .mobile.signin-input.recover-account input, .mobile.signin-input.input-recovery-key input {
     background-color: #F8F8F8;
     border: 0;

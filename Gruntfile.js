@@ -1,10 +1,56 @@
-var fs = require('fs');
 var fileLimit = 512*1024;
+
+const fs = require('fs');
+const path = require("path");
+
+const cwd = process.cwd();
+const debug = process.env.DEBUG;
+const basename = p => p.replace(/^.*\//, '');
+
 const rebaseURLs = true;
 const usePostCSS = true;
 const usePostHTML = true;
 
-const basename = p => p.replace(/^.*\//, '');
+class FS {
+    static ls(dir, regex = false, result = []) {
+        const files = fs.readdirSync(dir);
+
+        for (let i = files.length; i--;) {
+            const file = path.join(dir, files[i]);
+
+            if (this.isDir(file)) {
+                result = this.ls(file, regex, result);
+            }
+            else if (!regex || regex.test(file)) {
+                result.push(file);
+            }
+        }
+        return result;
+    }
+
+    static rm(path) {
+        if (!path.includes(cwd) || path.replace(cwd, '').length < 5) {
+            throw new Error(`Potentially unexpected removal... ${path}`);
+        }
+        if (debug) {
+            console.log(`INFO: Removing ${path}`);
+        }
+        return fs.rmSync(path, {recursive: true, force: true});
+    }
+
+    static stat(path) {
+        try {
+            return fs.statSync(path);
+        }
+        catch (ex) {}
+        return false;
+    }
+
+    static isDir(path) {
+        const s = this.stat(path);
+        return s && s.isDirectory();
+    }
+}
 
 var Secureboot = function() {
     var content = fs.readFileSync("secureboot.js").toString().split("\n");
@@ -226,9 +272,6 @@ var Secureboot = function() {
         });
 
         if (usePostCSS || usePostHTML) {
-            const cwd = process.cwd();
-            const path = require("path");
-            const debug = process.env.DEBUG;
             const read = file => fs.readFileSync(file).toString('utf8');
             const diff = (file1, file2) => read(file1) !== read(file2);
             const copy = (src, dst) => {
@@ -369,7 +412,7 @@ var Secureboot = function() {
             for (var e in groups) {
                 if (groups.hasOwnProperty(e)) {
                     lines = [];
-                    file = "node_modules/banner-" + (++i) + ".js";
+                    file = `build/banner-${++i}.js`;
                     this.addHeader(lines, groups[e]);
                     fs.writeFileSync(file, lines.join("\n").replace(/\n +/g, '\n '));
                     groups[e].unshift(file);
@@ -680,7 +723,21 @@ module.exports = function(grunt) {
         },
     });
 
-    // Load the plugin that provides the "uglify" task.
+    grunt.registerTask('cleanup', () => {
+        const build = path.join(cwd, 'build');
+
+        if (FS.isDir(build)) {
+            console.log('Cleaning up old build files...');
+
+            FS.rm(build);
+            FS.rm(path.join(cwd, 'html', 'templates.json'));
+
+            FS.ls(path.join(cwd, 'html'), /-postbuild\.html$/,
+                FS.ls(path.join(cwd, 'js'), /(?:-group\d+|mega-\d+)\.js$/,
+                    FS.ls(path.join(cwd, 'css'), /(?:-group\d+|mega-\d+|-postbuild)\.css$/))).forEach(FS.rm);
+        }
+    });
+
     grunt.loadNpmTasks('grunt-htmljson');
     grunt.loadNpmTasks('grunt-contrib-concat');
 
@@ -698,6 +755,8 @@ module.exports = function(grunt) {
         console.log("Write secureboot.prod.js");
         Secureboot.rewrite("secureboot.prod.js");
     });
+
+    tasks.unshift('cleanup');
     grunt.registerTask('default', tasks);
     grunt.registerTask('prod', tasks); // <- remove me if unused
 };

@@ -2708,7 +2708,6 @@ else if (!browserUpdate) {
         jsl.push({f:'js/ui/alarm.js', n: 'alarm_js', j:1,w:1});
         jsl.push({f:'js/ui/toast.js', n: 'toast_js', j:1,w:1});
         jsl.push({f:'js/ui/top-tooltip-login.js', n: 'top-tooltip-login', j:1});
-        jsl.push({f:'js/ui/searchbar.js', n: 'searchbar_js', j:1});
         jsl.push({f:'html/megadrop.html', n: 'megadrop', j:0});
         jsl.push({f:'html/nomegadrop.html', n: 'nomegadrop', j:0});
         jsl.push({f:'js/fm/transfer-progress-widget.js', n: 'tpw_js', j:1});
@@ -2822,6 +2821,7 @@ else if (!browserUpdate) {
         jsl.push({f:'js/vendor/avatar.js', n: 'avatar_js', j:1, w:3});
         jsl.push({f:'js/fm/affiliate.js', n: 'fm_affiliate_js', j: 1});
         jsl.push({f:'js/ui/contextMenu.js', n: 'context_menu_js', j: 1});
+        jsl.push({f:'js/ui/searchbar.js', n: 'searchbar_js', j:1});
 
         jsl.push({f:'js/ui/onboarding.js', n: 'onboarding_js', j:1,w:1});
         jsl.push({f:'js/ui/sms.js', n: 'sms_js', j: 1, w: 1});
@@ -2873,7 +2873,6 @@ else if (!browserUpdate) {
 
     // do not change the order...
     jsl.push({f:'js/fm/filemanager.js', n: 'filemanager_js', j: 1, w: 5});
-
     jsl.push({f:'js/fm/utils.js', n: 'fm_utils_js', j: 1});
     jsl.push({f:'js/fm/megadata.js', n: 'fm_megadata_js', j: 1});
     jsl.push({f:'js/fm/megadata/account.js', n: 'fm_megadata_account_js', j: 1});

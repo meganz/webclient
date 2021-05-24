@@ -127,7 +127,7 @@ sms.phoneInput = {
 
         // Show the page
         this.$dialog.removeClass('hidden');
-        this.$background.removeClass('hidden');
+        this.$background.removeClass('hidden').off('click');
         this.$page.removeClass('hidden');
     },
 
@@ -170,6 +170,8 @@ sms.phoneInput = {
         $warningMessage.removeClass('visible');
         $verifyIcon.removeClass('hidden');
         $verifySuccessIcon.addClass('hidden');
+        loadingInitDialog.hide();
+        loadingDialog.hide('force');
     },
 
     /**

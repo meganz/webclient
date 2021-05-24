@@ -6,6 +6,11 @@
     z-index: 1300;
 }
 
+/* for message dialog, but also potentiall other dialogs over common-dialogs as well */
+.mega-dialog-container.common-container.arrange-to-back {
+    z-index: 1000;
+}
+
 .dialog-sprite, i.dialog-sprite,
 .ui-datepicker-prev, .ui-datepicker-next
 {

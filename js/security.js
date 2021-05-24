@@ -663,7 +663,7 @@ var security = {
                         }
 
                         $('.mail', $dialog).val(u_attr.email);
-                        $('button.login', $dialog).rebind('click.ve', function() {
+                        $('button.next', $dialog).rebind('click.ve', function() {
                             var $input = $('.pass', $dialog);
                             var pwd = $input.val();
 

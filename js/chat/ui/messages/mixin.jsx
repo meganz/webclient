@@ -289,18 +289,18 @@ class ConversationMessageMixin extends ContactAwareComponent {
                 var notFoundEmoji = slug && slug[0] !== ":";
                 return (
                     <div
-                        onClick={emojiSelectedWrapper(null, slug, emojiData)}
-                        className={
-                            'reactions-bar__reaction simpletip' + (currentUserReacted ? " user-reacted" : "") +
-                            (notFoundEmoji ? ' emoji-loading-error' : '') +
-                            isReadOnlyClass
-                        }
-                        data-simpletip={tipText}
-                        data-simpletipwrapper="#reactions-bar"
-                        data-simpletipoffset="40"
-                        data-simpletipposition="top"
                         key={slug}
-                    >
+                        onClick={emojiSelectedWrapper(null, slug, emojiData)}
+                        className={`
+                            reactions-bar__reaction
+                            simpletip
+                            ${currentUserReacted ? 'user-reacted' : ''}
+                            ${notFoundEmoji ? 'emoji-loading-error' : ''}
+                            ${isReadOnlyClass}
+                        `}
+                        data-simpletip={tipText}
+                        data-simpletipoffset="3"
+                        data-simpletipposition="top">
                         <img
                             width="10"
                             height="10"

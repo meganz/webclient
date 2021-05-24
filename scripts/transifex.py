@@ -24,22 +24,42 @@ from threading import Thread
 from collections import OrderedDict
 from natsort import natsorted # Use version 6.2.1
 
+base_url = None
+organisation_id = None
+project_id = None
+resource_slug = None
+gitlab_develop_url = None
+transifex_token = None
+gitlab_token = None
+
 dir_path = os.path.dirname(os.path.realpath(__file__))
-transifex_config_file = open(dir_path + "/transifex.json", "r")
-content = transifex_config_file.read()
-transifex_config_file.close()
-transifex_config = json.loads(content)
-BASE_URL = transifex_config['BASE_URL']
-PROJECT_ID = "o:" + transifex_config['ORGANISATION'] + ":p:" + transifex_config['PROJECT']
-RESOURCE = transifex_config['RESOURCE']
-GITLAB_DEVELOP_STRINGS_URL = transifex_config['GITLAB_DEVELOP_STRINGS_URL']
-gitlab_token = os.getenv('GITLAB_TOKEN')
-if not gitlab_token:
-    gitlab_token = transifex_config['GITLAB_TOKEN']
-GITLAB_TOKEN = gitlab_token
-transifex_token = os.getenv('TRANSIFEX_TOKEN')
-if not transifex_token:
-    transifex_token = transifex_config['TRANSIFEX_TOKEN']
+if os.path.exists(dir_path):
+    transifex_config_file = open(dir_path + "/transifex.json", "r")
+    content = transifex_config_file.read()
+    transifex_config_file.close()
+    transifex_config = json.loads(content)
+
+    base_url = transifex_config.get('BASE_URL')
+    organisation_id = transifex_config.get('ORGANISATION')
+    project_id = transifex_config.get('PROJECT')
+    resource_slug = transifex_config.get('RESOURCE')
+    gitlab_develop_url = transifex_config.get('GITLAB_DEVELOP_STRINGS_URL')
+    gitlab_token = transifex_config.get('GITLAB_TOKEN')
+    transifex_token = transifex_config.get('TRANSIFEX_TOKEN')
+
+BASE_URL = base_url if base_url else os.getenv('TRANSIFEX_BASE_URL')
+organisation_id = organisation_id if organisation_id else os.getenv('TRANSIFEX_ORGANISATION')
+project_id = project_id if project_id else os.getenv('TRANSIFEX_PROJECT')
+RESOURCE = resource_slug if resource_slug else os.getenv('TRANSIFEX_RESOURCE')
+GITLAB_DEVELOP_STRINGS_URL = gitlab_develop_url if gitlab_develop_url else os.getenv('GITLAB_DEVELOP_STRINGS_URL')
+GITLAB_TOKEN = gitlab_token if gitlab_token else os.getenv('GITLAB_TOKEN')
+transifex_token = transifex_token if transifex_token else os.getenv('TRANSIFEX_TOKEN')
+
+if not BASE_URL or not organisation_id or not project_id or not RESOURCE or not GITLAB_DEVELOP_STRINGS_URL or not GITLAB_TOKEN or not transifex_token:
+     print("Error: Incomplete Transifex settings.")
+     sys.exit(1)
+
+PROJECT_ID = "o:" + organisation_id + ":p:" + project_id
 HEADER = {
     "Authorization": "Bearer " + transifex_token,
     "Content-Type": "application/vnd.api+json"

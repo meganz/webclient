@@ -1673,6 +1673,7 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
 
     if ($.dialog) {
         $('.mega-dialog:not(#msgDialog)').addClass('arrange-to-back');
+        $('.mega-dialog-container.common-container').addClass('arrange-to-back');
     }
 }
 
@@ -1681,6 +1682,7 @@ function closeMsg() {
 
     if ($.dialog) {
         $('.mega-dialog').removeClass('arrange-to-back');
+        $('.mega-dialog-container.common-container').removeClass('arrange-to-back');
     }
     else {
         fm_hideoverlay();
@@ -2737,7 +2739,7 @@ function closeDialog(ev) {
             delete $.msgDialog;
         }
     }
-    $('.mega-dialog, .overlay.arrange-to-back').removeClass('arrange-to-back');
+    $('.mega-dialog, .overlay.arrange-to-back, .mega-dialog-container.common-container').removeClass('arrange-to-back');
     // $('.mega-dialog .dialog-sorting-menu').remove();
 
     $('.export-links-warning').addClass('hidden');

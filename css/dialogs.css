@@ -3653,6 +3653,12 @@ body.de .mega-dialog.new-group-chat {
         width: 64px;
         height: 64px;
     }
+    .mega-dialog.fingerprint-dialog .fingerprint-avatar .avatar-wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font: var(--text-h1);
+    }
     .mega-dialog.fingerprint-dialog .fingerprint-code {
         width: 270px;
         margin-left: auto;

@@ -77,7 +77,7 @@
     float: none;
 }
 .chat-right-pad {
-    padding: 0;
+    padding: 48px 0 0 0;
     height: 100%;
     border-left: 1px solid var(--divider-color);
     box-sizing: border-box;
@@ -223,11 +223,11 @@
 .chat-topic-buttons {
     position:absolute;
     top: 14px;
-    right: 14px;
+    right: 20px;
     z-index: 1;
 }
 .chat-topic-buttons .button {
-    margin: 0 0 0 24px;
+    margin: 0 0 0 26px;
     cursor: pointer;
 }
 .chat-topic-buttons i {

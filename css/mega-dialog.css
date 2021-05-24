@@ -8,6 +8,17 @@
 
         /* TODO: make this the blur overlay? */
 
+        /* z-index of dialog relate elements
+         *
+         * overlay - 1100
+         * normal dialog - 1115
+         * modal dialog - 1200
+         * arranged back dialog - 900
+         * normal dialog container - 1111
+         * common dialog container - 1300
+         * common dialog container in arrage back status - 1000
+         */
+
         .mega-dialog-container,
         .fm-modal-dialog {
             align-items: center;

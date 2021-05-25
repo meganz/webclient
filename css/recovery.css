@@ -636,7 +636,7 @@
 .improved-recovery-steps.withkey .recover-paste-block .recovery-key.account.input-wrapper .icon {
     margin-bottom: 4px;
 }
-.improved-recovery-steps .upload-key.mega-button.positive, .improved-recovery-steps .paste-key.mega-button.positive {
+.improved-recovery-steps .paste-key.mega-button.positive {
     position: absolute;
     right: 24px;
     top: 50%;
@@ -697,6 +697,18 @@
 }
 .improved-recovery-steps .recover-upload-block {
     margin-bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.improved-recovery-steps .recover-upload-block .upload-key {
+    position: relative;
+    right: 8px;
+    transform: unset;
+    margin-left: 12px;
+}
+.improved-recovery-steps .recover-upload-block .upload-key span {
+    white-space: nowrap;
 }
 .improved-recovery-steps .recover-paste-block {
     margin-top: 0px;

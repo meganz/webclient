@@ -12,9 +12,7 @@
 .lp-myfiles {
     background: var(--surface-grey-2);
     display: flex;
-    flex-basis: 0;
     flex-direction: column;
-    flex-grow: 1;
     height: 100%;
 }
 .lp-myfiles .content-area {

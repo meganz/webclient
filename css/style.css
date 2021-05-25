@@ -766,7 +766,7 @@ a.blog-button:hover {
 .notification-type {
     display: table;
     table-layout: fixed;
-    width: 100%;
+    width: calc(100% - 52px);
     box-sizing: border-box;
 }
 .notification-avatar {

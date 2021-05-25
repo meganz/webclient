@@ -15775,9 +15775,9 @@ body.megaChatDisabled .nw-contact-name button.start-chat-button {
 .information-highlight.warning  {
     box-sizing: border-box;
     width: 302px;
-    border: 1px solid var(--banner-border-warning);
-    background-color: var(--banner-background-warning);
-    color: var(--banner-text-warning);
+    border: 1px solid var(--banner-border-error);
+    background-color: var(--banner-background-error);
+    color: var(--banner-text-error);
     opacity: 1;
 }
 /* new drag and drop dialog */

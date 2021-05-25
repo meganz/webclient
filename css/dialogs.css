@@ -7405,11 +7405,11 @@ body.de .mega-dialog.new-group-chat {
             font: var(--text-h3);
         }
         .mega-dialog.verify-two-factor-login .warning-text-field {
-            background: var(--banner-background-warning);
-            border: 1px solid var(--banner-border-warning);
+            background: var(--banner-background-error);
+            border: 1px solid var(--banner-border-error);
             border-radius: 2px;
             box-sizing: border-box;
-            color: var(--banner-text-warning);
+            color: var(--banner-text-error);
             font: var(--text-body1);
             margin: 0 auto;
             padding: 4px 0;

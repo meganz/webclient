@@ -964,8 +964,9 @@ FileManager.prototype.initFileManagerUI = function() {
         }
     });
 
-    if (dlMethod.warn && !localStorage.browserDialog && !$.browserDialog) {
-        setTimeout(browserDialog, 2000);
+    if (dlMethod.warn) {
+        window.onerror = null;
+        console.error('This browser is using an outdated download method, good luck...', '' + window.ua);
     }
 
     // chat can handle the left-panel resizing on its own

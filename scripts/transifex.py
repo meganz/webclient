@@ -35,6 +35,14 @@ gitlab_develop_url = None
 transifex_token = None
 gitlab_token = None
 
+base_url = os.getenv('TRANSIFEX_BASE_URL')
+organisation_id = os.getenv('TRANSIFEX_ORGANISATION')
+project_id = os.getenv('TRANSIFEX_PROJECT')
+resource_slug = os.getenv('TRANSIFEX_RESOURCE')
+gitlab_develop_url = os.getenv('GITLAB_DEVELOP_STRINGS_URL')
+gitlab_token = os.getenv('GITLAB_TOKEN')
+transifex_token = os.getenv('TRANSIFEX_TOKEN')
+
 dir_path = os.path.dirname(os.path.realpath(__file__))
 if os.path.exists(dir_path):
     transifex_config_file = open(dir_path + "/transifex.json", "r")
@@ -42,26 +50,22 @@ if os.path.exists(dir_path):
     transifex_config_file.close()
     transifex_config = json.loads(content)
 
-    base_url = transifex_config.get('BASE_URL')
-    organisation_id = transifex_config.get('ORGANISATION')
-    project_id = transifex_config.get('PROJECT')
-    resource_slug = transifex_config.get('RESOURCE')
-    gitlab_develop_url = transifex_config.get('GITLAB_DEVELOP_STRINGS_URL')
-    gitlab_token = transifex_config.get('GITLAB_TOKEN')
-    transifex_token = transifex_config.get('TRANSIFEX_TOKEN')
+    base_url = transifex_config.get('BASE_URL') or base_url
+    organisation_id = transifex_config.get('ORGANISATION') or organisation_id
+    project_id = transifex_config.get('PROJECT') or project_id
+    resource_slug = transifex_config.get('RESOURCE') or resource_slug
+    gitlab_develop_url = transifex_config.get('GITLAB_DEVELOP_STRINGS_URL') or gitlab_develop_url
+    gitlab_token = transifex_config.get('GITLAB_TOKEN') or gitlab_token
+    transifex_token = transifex_config.get('TRANSIFEX_TOKEN') or transifex_token
 
-BASE_URL = base_url if base_url else os.getenv('TRANSIFEX_BASE_URL')
-organisation_id = organisation_id if organisation_id else os.getenv('TRANSIFEX_ORGANISATION')
-project_id = project_id if project_id else os.getenv('TRANSIFEX_PROJECT')
-RESOURCE = resource_slug if resource_slug else os.getenv('TRANSIFEX_RESOURCE')
-GITLAB_DEVELOP_STRINGS_URL = gitlab_develop_url if gitlab_develop_url else os.getenv('GITLAB_DEVELOP_STRINGS_URL')
-GITLAB_TOKEN = gitlab_token if gitlab_token else os.getenv('GITLAB_TOKEN')
-transifex_token = transifex_token if transifex_token else os.getenv('TRANSIFEX_TOKEN')
-
-if not BASE_URL or not organisation_id or not project_id or not RESOURCE or not GITLAB_DEVELOP_STRINGS_URL or not GITLAB_TOKEN or not transifex_token:
+if not base_url or not organisation_id or not project_id or not resource_slug or not gitlab_develop_url or not gitlab_token or not transifex_token:
      print("Error: Incomplete Transifex settings.")
      sys.exit(1)
 
+BASE_URL = base_url
+RESOURCE = resource_slug
+GITLAB_DEVELOP_STRINGS_URL = gitlab_develop_url
+GITLAB_TOKEN = gitlab_token
 PROJECT_ID = "o:" + organisation_id + ":p:" + project_id
 HEADER = {
     "Authorization": "Bearer " + transifex_token,

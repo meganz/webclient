@@ -234,14 +234,10 @@
     -khtml-opacity: 0.3;
     opacity: 0.3;
 }
-.message.text-block em {
-    font-family: 'Open Sans Italic';
-    font-size: 12px;
-    color: rgba(43,166,222,0.7);
-    display: inline-block;
-    position: relative;
-    font-style: normal;
-    cursor: default;
+.message.text-block em.edited {
+    font: var(--text-body2);
+    font-style: italic;
+    color: var(--text-color-info);
 }
 .message.text-block a {
     color: var(--secondary-blue);

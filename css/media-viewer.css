@@ -119,7 +119,6 @@
     /* Content */
 
         .media-viewer .content {
-            align-items: center;
             display: flex;
             flex: 1 1 auto;
             justify-content: center;
@@ -152,7 +151,6 @@
         /*Images viewer  content */
 
             .media-viewer .img-wrap {
-                height: 100%;
                 overflow: hidden;
                 position: relative;
                 width: 100%;

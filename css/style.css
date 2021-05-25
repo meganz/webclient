@@ -15018,7 +15018,7 @@ body.megaChatDisabled .nw-contact-name button.start-chat-button {
 .user-management-account-settings .profile {
     height: calc(100% - 52px);
     overflow: hidden;
-    text-align: end;
+    text-align: center;
 }
 .user-management-account-settings .option-containers {
     font-size: 0;

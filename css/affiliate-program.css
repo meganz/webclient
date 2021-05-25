@@ -5,6 +5,9 @@
 .affiliate-program .fm-left-panel {
     display: none;
 }
+.affiliate-program .nw-fm-left-icons-panel {
+    border-right: 2px solid var(--surface-grey-1);
+}
 .fm-affiliate .breadcrumbs {
     --mask-color: var(--text-color-medium);
     align-items: center;

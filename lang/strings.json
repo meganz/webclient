@@ -6565,7 +6565,7 @@
     },
     "16402": {
         "developer_comment": "Header of block with achievements bonuses.",
-        "string": "Unlocked bonuses:"
+        "string": "Unlocked bonuses"
     },
     "16448": {
         "developer_comment": "Label in the main dialog that allows the user to resume paused transfers",

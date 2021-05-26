@@ -9,7 +9,6 @@ This script is used to:
     - Prepare production language files from exported strings from Transifex
 
 Requirements:
-    - `requests` Python Library (only for Python 2.7): sudo apt-get install python-requests
     - Copy `transifex.json.example` and rename them to `transifex.json`
     - Create a Transifex token and assign it to a system environment variable as `TRANSIFEX_TOKEN`
         - Note: As a fallback, we can also add a property `TOKEN` in `transifex.json`
@@ -17,10 +16,16 @@ Requirements:
 This script will work with both Python 2.7 as well as 3.x.
 """
 
-import copy, json, os, requests, sys, re, subprocess, time, io, random, argparse
+import copy, json, os, sys, re, subprocess, time, io, random, argparse
 from threading import Thread
 from collections import OrderedDict
 from functools import cmp_to_key
+version = sys.version_info.major
+if version == 2:
+    from urllib2 import Request, urlopen, install_opener, build_opener, HTTPRedirectHandler, HTTPError
+else:
+    from urllib.request import Request, urlopen, install_opener, build_opener, HTTPRedirectHandler
+    from urllib.error import HTTPError
 
 base_url = None
 organisation_id = None
@@ -168,9 +173,10 @@ def prepare_english_string(resource):
 def prepare_translation_string(resource, lang):
     language_strings = {}
     url = BASE_URL + "/projects/" + PROJECT_ID + "/languages"
-    response = requests.get(url, headers=HEADER)
-    content = response.json()
-    if response.status_code != 200:
+    request = Request(url, headers=HEADER)
+    response = urlopen(request)
+    content = json.loads(response.read().decode('utf8'))
+    if response.code != 200:
         print_error(content['errors'])
         return False
     else:
@@ -230,27 +236,38 @@ def download_languages(resource, lang = []):
         all_requests.update(lang_requests)
 
     def transifex_download_requests(language, request):
-        response = requests.post(request['url'], headers=HEADER, data=json.dumps(request['payload']))
-        content = response.json()
-        if response.status_code == 202:
+        class NoRedirect(HTTPRedirectHandler):
+            def redirect_request(self, req, fp, code, msg, headers, newurl):
+                return None
+
+        request = Request(request['url'], headers=HEADER, data=json.dumps(request['payload']).encode('utf8'))
+        response = urlopen(request)
+        content = json.loads(response.read().decode('utf8'))
+        if response.code == 202:
             if content['data']['attributes']['status'] == 'failed':
                 print_error(content['data']['attributes']['errors'])
                 return
             else:
                 download_link = content['data']['links']['self']
+                opener = build_opener(NoRedirect)
+                install_opener(opener)
                 for i in range(50):
                     # This is to give Transifex some time to pre-process the data before trying to re-fetch
                     time.sleep(min(4, max(1, i / 10)) + (random.randint(0, 1000) / 1000.0))
-                    download_response = requests.get(download_link, headers=HEADER, allow_redirects=False)
-                    if download_response.status_code == 303:
-                        download_content = requests.get(download_response.url, headers=HEADER).json()
-                        languages[language] = download_content
-                        print(language + " => Completed")
-                        return
-                    elif download_response.status_code != 200:
-                        download_content = download_response.json()
-                        print_error(download_content['errors'])
-                        return
+                    try:
+                        status_request = Request(download_link, headers=HEADER)
+                        status_response = urlopen(status_request)
+                    except HTTPError as e:
+                        if e.code == 303:
+                            download_response = urlopen(e.headers['Location'])
+                            download_content = json.loads(download_response.read().decode('utf8'))
+                            languages[language] = download_content
+                            print(language + " => Completed")
+                            return
+                        elif e.code != 200:
+                            download_content = json.loads(status_response.read().decode('utf8'))
+                            print_error(download_content['errors'])
+                            return
                 print(language + " => Error: Maximum file fetch limit reached.")
         else:
             print_error(content['errors'])
@@ -274,67 +291,72 @@ def get_branch_resource_name(is_upload = False, is_force = False):
         return False
     branch_resource_name =  RESOURCE + "-" + re.sub('[^A-Za-z0-9]+', '', branch_name)
     url = BASE_URL + "/resources/" + PROJECT_ID + ":r:" + branch_resource_name
-    response = requests.get(url, headers=HEADER)
-    content = response.json()
-    if response.status_code == 200:
-        print("Resource file is found for this branch. ")
-        return branch_resource_name
-    elif response.status_code == 404:
-        print("Resource file does not exist for this branch. ")
-        if not is_upload:
-            print("")
-            return False
-        if is_force:
-            version = sys.version_info.major
-            input_note = "WARNING: Only create an empty branch resource if sub-branches will be made for this branch in future. Type \"YES\" to proceed: "
-            if version == 2:
-                user_input = raw_input(input_note)
-            else:
-                user_input = input(input_note)
-            if user_input != "YES":
-                return True
-        print("Creating new resource... ")
-        sys.stdout.flush()
-        url = BASE_URL + "/resources"
-        payload = {
-            "data": {
-                "attributes": {
-                    "name": branch_resource_name,
-                    "slug": branch_resource_name,
-                },
-                "relationships": {
-                    "i18n_format": {
-                        "data": {
-                            "id": "STRUCTURED_JSON",
-                            "type": "i18n_formats",
+    request = Request(url, headers=HEADER)
+    try:
+        response = urlopen(request)
+        content = json.loads(response.read().decode('utf8'))
+        if response.code == 200:
+            print("Resource file is found for this branch. ")
+            return branch_resource_name
+    except HTTPError as e:
+        if e.code == 404:
+            print("Resource file does not exist for this branch. ")
+            if not is_upload:
+                print("")
+                return False
+            if is_force:
+                version = sys.version_info.major
+                input_note = "WARNING: Only create an empty branch resource if sub-branches will be made for this branch in future. Type \"YES\" to proceed: "
+                if version == 2:
+                    user_input = raw_input(input_note)
+                else:
+                    user_input = input(input_note)
+                if user_input != "YES":
+                    return True
+            print("Creating new resource... ")
+            sys.stdout.flush()
+            url = BASE_URL + "/resources"
+            payload = {
+                "data": {
+                    "attributes": {
+                        "name": branch_resource_name,
+                        "slug": branch_resource_name,
+                    },
+                    "relationships": {
+                        "i18n_format": {
+                            "data": {
+                                "id": "STRUCTURED_JSON",
+                                "type": "i18n_formats",
+                            }
+                        },
+                        "project": {
+                            "data": {
+                                "id": PROJECT_ID,
+                                "type": "projects"
+                            }
                         }
                     },
-                    "project": {
-                        "data": {
-                            "id": PROJECT_ID,
-                            "type": "projects"
-                        }
-                    }
-                },
-                "type": "resources"
+                    "type": "resources"
+                }
             }
-        }
-        response = requests.post(url, headers=HEADER, data=json.dumps(payload))
-        content = response.json()
-        if response.status_code != 201:
+            request = Request(url, headers=HEADER, data=json.dumps(payload).encode('utf8'))
+            response = urlopen(request)
+            content = json.loads(response.read().decode('utf8'))
+            if response.code != 201:
+                print_error(content['errors'])
+                return False
+            print("")
+            print("New Resource " + branch_resource_name + " has been created.")
+            return branch_resource_name
+        else:
             print_error(content['errors'])
             return False
-        print("")
-        print("New Resource " + branch_resource_name + " has been created.")
-        return branch_resource_name
-    else:
-        print_error(content['errors'])
-        return False
 
 def send_upload_request(url, payload):
-    response = requests.post(url, headers=HEADER, data=json.dumps(payload))
-    content = response.json()
-    if response.status_code != 202:
+    request = Request(url, headers=HEADER, data=json.dumps(payload).encode('utf8'))
+    response = urlopen(request)
+    content = json.loads(response.read().decode('utf8'))
+    if response.code != 202:
         print_error(content['errors'])
         return False
 
@@ -342,7 +364,8 @@ def send_upload_request(url, payload):
     download_link = content['data']['links']['self']
     for i in range(10):
         time.sleep(3)
-        download_content = requests.get(download_link, headers=HEADER, allow_redirects=True).json()
+        request = Request(download_link, headers=HEADER)
+        download_content = json.loads(urlopen(request).read())
         if 'errors' in download_content:
             print_error(content['errors'])
             return False
@@ -385,7 +408,8 @@ def get_differences():
         sys.exit(1)
 
     gitlab_header = {'Private-Token': GITLAB_TOKEN}
-    current_strings = requests.get(GITLAB_DEVELOP_STRINGS_URL, headers=gitlab_header).json()
+    request = Request(GITLAB_DEVELOP_STRINGS_URL, headers=gitlab_header)
+    current_strings = json.loads(urlopen(request).read())
 
     for new_key in new_strings:
         if new_key not in current_strings or new_strings[new_key]['string'] != current_strings[new_key]['string'] or new_strings[new_key]['developer_comment'] != current_strings[new_key]['developer_comment']:

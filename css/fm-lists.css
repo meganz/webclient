@@ -28,6 +28,7 @@
 
 
 .megalist-pusher {
+    display: block !important; /* display *flex breaks everything.... */
     padding: 0 !important;
     margin: 0 !important;
     border: 0 !important;

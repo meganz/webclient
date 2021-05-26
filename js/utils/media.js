@@ -1995,22 +1995,19 @@ FullScreenManager.prototype.enterFullscreen = function() {
 
         return new MegaPromise(function(resolve, reject) {
             MediaAttribute.canPlayMedia(node).then(function(yup) {
+                var $video = $('video',  $wrapper);
                 var c = MediaAttribute.getCodecStrings(node);
                 if (c) {
                     $fn.attr('title', node.name + ' (' + c + ')');
+                    getImage(node, 1).then(uri => $video.attr('poster', uri)).catch(dump);
                 }
 
-                var $video = $('video',  $wrapper);
                 var $videoControls = $('.video-controls', $wrapper);
                 var $playVideoButton = $('.play-video-button', $wrapper);
 
                 if (!$video.length) {
                     return reject(new Error('No video element found...'));
                 }
-
-                getImage(node, 1).then(function(uri) {
-                    $video.attr('poster', uri);
-                }).catch(console.debug.bind(console));
 
                 if (!yup) {
                     if (String(node.fa).indexOf(':8*') > 0 && isMediaSourceSupported()) {

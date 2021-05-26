@@ -592,25 +592,25 @@ function dl_g(res, ctx) {
             };
 
             if (res.fa) {
-                var promise = Promise.resolve();
+                let promise = Promise.resolve(null);
 
                 if (isStreamingEnabled() && String(res.fa).indexOf(':8*') > 0) {
                     promise = iniVideoStreamLayout(dl_node, $pageScrollBlock);
                     prevBut = false;
                 }
-                else {
-
-                    // load thumbnail
-                    getImage(dl_node).then(function(uri) {
-                        var $infoBlock = $('.download.info-block');
-                        $infoBlock.addClass('thumb').find('img').attr('src', uri);
-                        showPreviewButton($infoBlock);
-                    });
-                }
 
                 promise.then(function(ok) {
                     if (!ok) {
-                        // not streamable
+                        // not streamable, load thumbnail and quit.
+                        if (String(res.fa).indexOf(':0*') > 0) {
+                            getImage(dl_node).then((uri) => {
+                                const $infoBlock = $('.download.info-block');
+                                $('img', $infoBlock.addClass('thumb')).attr('src', uri);
+                                if (ok === null) {
+                                    showPreviewButton($infoBlock);
+                                }
+                            });
+                        }
                         return false;
                     }
 

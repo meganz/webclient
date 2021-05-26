@@ -1805,14 +1805,17 @@ MegaUtils.prototype.checkLeftStorageBlock = async function(data) {
     this.storageQuotaCache = data || await this.getStorageQuota();
 
     let storageHtml;
-    const {percent, max, used} = this.storageQuotaCache;
+    const {percent, max, used, isAlmostFull, isFull} = this.storageQuotaCache;
     const space = bytesToSize(max, 0);
     const space_used = bytesToSize(used);
 
-    if (percent >= 100 && !storageBlock.classList.contains("over")) {
+    storageBlock.classList.remove('over');
+    storageBlock.classList.remove('warning');
+
+    if (isFull && !storageBlock.classList.contains("over")) {
         storageBlock.classList.add('over');
     }
-    else if (percent > 80 && !storageBlock.classList.contains("warning")) {
+    else if (isAlmostFull && !storageBlock.classList.contains("warning")) {
         storageBlock.classList.add('warning');
     }
 
@@ -1825,13 +1828,13 @@ MegaUtils.prototype.checkLeftStorageBlock = async function(data) {
 
     // Show only space_used  for business accounts
     if (u_attr && u_attr.b) {
-        storageHtml = `<span id="lp-sq-used">${space_used}</span>`;
+        storageHtml = `<span class="lp-sq-used">${space_used}</span>`;
         storageBlock.querySelector('.js-storagegraph').classList.add('hidden');
         storageBlock.querySelector('.js-lpbtn[data-link="upgrade"]').classList.add('hidden');
     }
     else {
-        storageHtml = l[1607].replace('%1', `<span id="lp-sq-used">${space_used}</span>`)
-            .replace('%2', `<span id="lp-sq-max">${space}</span>`);
+        storageHtml = l[1607].replace('%1', `<span class="lp-sq-used">${space_used}</span>`)
+            .replace('%2', `<span class="lp-sq-max">${space}</span>`);
     }
 
     $('.storage-txt', storageBlock).safeHTML(storageHtml);

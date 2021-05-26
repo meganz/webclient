@@ -1590,6 +1590,7 @@ body:not(.mobile) .pricing-page.slider-dot:hover {
 }
 .redeem-promo-page .mega-input.title-ontop {
     width: 320px;
+    margin-bottom: 24px;
 }
 body.mobile .redeem-promo-page .mega-input.title-ontop {
     width: 100%;
@@ -1597,11 +1598,10 @@ body.mobile .redeem-promo-page .mega-input.title-ontop {
 .redeem-promo-page .onboard-image {
     background-image: url(../images/mega/onboarding_download.png);
 }
-.redeem-promo-page .onboard-image.voucher {
-    background-position: 0 -635px;
-    width: 224px;
-    height: 150px;
+.redeem-promo-page .sprite-fm-illustration.img-dialog-voucher {
     margin: 0 auto 10px;
+    height: 140px;
+    width: 140px;
 }
 .redeem-promo-page .bottom-page.top-description {
     padding: 24px 0 40px 0;
@@ -1620,16 +1620,12 @@ body.mobile .redeem-promo-page .mega-input.title-ontop {
     max-width: 620px;
     margin: 0 auto;
     border-radius: 12px;
-    padding: 24px 24px;
+    padding: 48px 24px;
     box-sizing: border-box;
-    min-height: 540px;
 }
 .redeem-promo-page .bottom-page.top-dark-info.medium {
     font-size: 28px;
     line-height: 40px;
-}
-.redeem-promo-page .voucher-input-container {
-    margin-bottom: 36px;
 }
 .redeem-promo-page .button-block .mega-button.positive {
     min-width: 180px;

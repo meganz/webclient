@@ -2817,6 +2817,7 @@ else if (!browserUpdate) {
         jsl.push({f:'js/fm/dialogs.js', n: 'fm_dialogs_js', j:1});
         jsl.push({f:'js/fm/properties.js', n: 'fm_properties_js', j:1});
         jsl.push({f:'js/ui/imagesViewer.js', n: 'imagesViewer_js', j:1});
+        jsl.push({f:'js/ui/dropdowns.js', n: 'dropdowns_js', j:1});
         jsl.push({f:'js/notify.js', n: 'notify_js', j:1});
         jsl.push({f:'js/vendor/avatar.js', n: 'avatar_js', j:1, w:3});
         jsl.push({f:'js/fm/affiliate.js', n: 'fm_affiliate_js', j: 1});
@@ -3072,6 +3073,7 @@ else if (!browserUpdate) {
         jsl.push({f:'html/js/proplan.js', n: 'proplan_js', j:1});
         jsl.push({f:'html/js/propay.js', n: 'propay_js', j:1});
         jsl.push({f:'html/js/propay-dialogs.js', n: 'propay_js', j:1});
+        jsl.push({f:'js/ui/dropdowns.js', n: 'dropdowns_js', j:1});
         jsl.push({f:'css/pro.css', n: 'pro_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/about.css', n: 'about_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/media-viewer.css', n: 'media_viewer_css', j:2,w:5,c:1,d:1,cache:1});
@@ -3090,6 +3092,26 @@ else if (!browserUpdate) {
         jsl.push({f:'css/toast.css', n: 'toast_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/psa.css', n: 'psa_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
         jsl.push({f:'css/general.css', n: 'general_css', j:2, w:5, c:1, d:1, cache: 1});
+        jsl.push({f:'css/vars/theme.css', n: 'vars_theme_css', j:2, w:30, c:1, d:1, cache:1});
+        jsl.push({f:'css/grid-table.css', n: 'grid_table_css', j:2,w:5,c:1,d:1,cache:1});
+
+        // Sprites
+        jsl.push({f:'css/sprites/fm-uni@uni.css', n: 'fm_uni_css', j:2, w:30, c:1, d:1, cache:1});
+        jsl.push({f:'css/sprites/fm-mono@mono.css', n: 'fm_mono_css', j:2, w:30, c:1, d:1, cache:1});
+        jsl.push({f:'css/theme-sprite.css', n: 'theme_sprite_css', j:2, w:30, c:1, d:1, cache:1});
+        jsl.push({f:'css/sprites/fm-theme@light.css', n: 'fm_light_css', j:2, w:30, c:1, d:1, cache:1});
+        jsl.push({f:'css/sprites/fm-illustrations.css', n: 'fm_illustration_css', j:2, w:30, c:1, d:1, cache:1});
+
+        // Dialog templates
+        jsl.push({f:'css/mega-dialog.css', n: 'mega_dialog_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/vars/dialog.css', n: 'vars_dialog_css', j:2, w:30, c:1, d:1, cache:1});
+
+        // Inputs
+        jsl.push({f:'css/megainput.css', n: 'megainput_css', j:2, w:5, c:1, d:1, cache: 1});
+        jsl.push({f:'css/vars/button.css', n: 'vars_button_css', j:2, w:30, c:1, d:1, cache:1});
+        jsl.push({f:'css/radios.css', n: 'radios_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/mega-button.css', n: 'mega_button_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/switches.css', n: 'switches_css', j:2,w:5,c:1,d:1,cache:1});
 
         jsl.push({f:'html/dialogs-common.html', n: 'dialogs-common', j:0,w:2});
         jsl.push({f:'css/dialogs/cookie-dialog.css', n: 'cookie-dialog_css', j:2,w:5,c:1,d:1,cache:1});
@@ -3115,6 +3137,8 @@ else if (!browserUpdate) {
             jsl.push({f:'css/retina-images.css', n: 'retina_images_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
         }
         else {
+            jsl.push({f:'js/vendor/perfect-scrollbar.js', n: 'ps_js', j:1,w:1});
+            jsl.push({f:'css/perfect-scrollbar.css', n: 'vendor_ps_css', j:2,w:5,c:1,d:1,cache:1});
             jsl.push({f:'css/style.css', n: 'style_css', j:2, w:30, c:1, d:1, cache:1});
             jsl.push({f:'css/dialogs.css', n: 'dialogs_css', j:2,w:5,c:1,d:1,cache:1});
             jsl.push({f:'html/top.html', n: 'top', j:0});
@@ -3124,6 +3148,10 @@ else if (!browserUpdate) {
             jsl.push({f:'css/dropdowns.css', n: 'dropdowns_css', j:2,w:5,c:1,d:1,cache:1});
             jsl.push({f:'css/popups.css', n: 'popups_css', j:2,w:5,c:1,d:1,cache:1});
             jsl.push({f:'css/retina-images.css', n: 'retina_images_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
+            jsl.push({f:'css/topbar.css', n: 'topbar_css', j:2,w:5,c:1,d:1,cache:1});
+            jsl.push({f:'css/vars/theme.css', n: 'theme_variables_css', j:2, w:30, c:1, d:1, cache:1});
+            jsl.push({f:'css/icons.css', n: 'icons_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
+            jsl.push({f:'css/important.css', n: 'important_css', j:2, w:30, c:1, d:1, cache:1});
         }
 
         // end of staticPages

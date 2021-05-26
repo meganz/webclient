@@ -1038,7 +1038,7 @@ li.active .call-duration i {
 }
 
 .contact-item-controls .mega-button.action.contact-block i {
-    --mask-color: var(--surface-mid-grey);
+    --mask-color: var(--icon-rest);
 }
 
 .contact-item-controls .mega-button.action.contact-accept i {

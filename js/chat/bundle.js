@@ -13757,7 +13757,7 @@ class text_Text extends abstractGenericMessage_AbstractGenericMessage {
       });
     } else {
       if (message.updated > 0 && !message.metaType) {
-        textMessage = textMessage + " <em>" + l[8887] + "</em>";
+        textMessage = textMessage + " <em class=\"edited\">" + l[8887] + "</em>";
       }
 
       if (this.props.initTextScrolling) {

@@ -13818,6 +13818,10 @@ body.megaChatDisabled .nw-contact-name button.start-chat-button {
     padding-top: 24px;
 }
 .used-storage-wrap {
+    color: var(--text-color-medium);
+    font: var(--text-body2);
+    text-align: start;
+    text-overflow: ellipsis;
     display: table;
     width: 100%;
     box-sizing: border-box;
@@ -13827,12 +13831,21 @@ body.megaChatDisabled .nw-contact-name button.start-chat-button {
 .data-container .used-storage-wrap {
     padding: 0 24px 0 24px;
 }
-.used-storage-icon-cell {
+.used-storage-wrap .used-storage-info {
+    position: relative;
+    text-align: start;
+    text-overflow: ellipsis;
+    z-index: 1;
+}
+.used-storage-wrap .used-storage-info div {
+    vertical-align: middle;
     display: table-cell;
-    vertical-align: top;
+}
+.used-storage-icon-cell {
     width: 16px;
 }
 .used-storage-icon-cell i {
+    padding-right: 8px;
     --icon-size: 16px;
     --mask-color: var(--text-color-medium);
 }
@@ -13842,26 +13855,13 @@ body.megaChatDisabled .nw-contact-name button.start-chat-button {
     padding-bottom: 16px;
     display: table-row;
 }
-.used-storage-info .ff-name {
-    font: var(--text-body1);
-    color: var(--text-color-high);
-    position: relative;
-    -webkit-padding-start: 12px;
-    padding-inline-start: 12px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: table-cell;
-    vertical-align: top;
-}
 .used-storage-info .versioning-settings {
     --icon-size: 16px;
     --mask-color: var(--text-color-medium);
     cursor: pointer;
 }
 .used-storage-info .ff-number {
-    color: var(--text-color-medium);
     position: relative;
-    display: table-cell;
     vertical-align: top;
 }
 .used-storage-info .folder-number,
@@ -13869,34 +13869,28 @@ body.megaChatDisabled .nw-contact-name button.start-chat-button {
     display: inline-block;
 }
 
-.used-storage-wrap .used-storage-info .file-number,
 .used-storage-wrap .used-storage-info .folder-number {
-    font: var(--text-body1);
-    color: var(--text-color-medium);
-    position: relative;
-    display: inline-block;
-    padding: 0 12px;
-    vertical-align: top;
-    width: 120px;
-}
-
-.used-storage-wrap .used-storage-info .folder-number {
-    border-right: 1px solid var(--stroke-grey-2);
     text-align: end;
 }
-.rtl .used-storage-wrap .used-storage-info .folder-number {
-    border-right: none;
-    border-left: 1px solid var(--stroke-grey-2);
+.used-storage-wrap .file-number {
+    padding: 7px 4px;
 }
 
 .used-storage-wrap .used-storage-info .ff-occupy {
-    font: var(--text-body1);
-    color: var(--text-color-medium);
-    position: relative;
+    text-align: end;
     display: table-cell;
-    vertical-align: top;
-    white-space: nowrap;
-    text-align: right;
+}
+.used-storage-wrap .empty {
+    color: var(--text-color-low);
+}
+.used-storage-wrap .empty i {
+    --mask-color: var(--icon-inactive);
+}
+.used-storage-wrap .folder-number {
+    width: 120px;
+}
+.used-storage-wrap .ba-version .folder-number {
+    width: 123px;
 }
 
 .user-management-overview-buttons {

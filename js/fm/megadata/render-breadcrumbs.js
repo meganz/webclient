@@ -310,19 +310,6 @@
         let currentPathLength = 0;
         const maxPathLength = getMaxPathLength(14, container);
         let extraItems = [];
-        let simpleTipEx = [
-            'shares',
-            'out-shares'
-        ];
-        let noSimpleTip;
-        let i;
-
-        for (i = 0; i < simpleTipEx.length; i++) {
-            if (items.indexOf(simpleTipEx[i]) >= 0) {
-                noSimpleTip = true;
-                break;
-            }
-        }
 
         for (let i = 0; i < items.length; i++) {
 
@@ -352,8 +339,8 @@
                         `<a class="fm-breadcrumbs ${escapeHTML(typeClass)} ${isRoot ? 'root' : ''} ui-droppable"
                             data-id="${item}" id="pathbc-${item}">
                             <span
-                                class="right-arrow-bg ${noSimpleTip ? '' : 'simpletip'}"
-                                ${noSimpleTip ? ' ' : `data-simpletip="{$name}" `}>
+                                class="right-arrow-bg simpletip"
+                                data-simpletip="${name}">
                                 ${isRoot ?
                                     `<span class="not-loading">
                                         ${name}

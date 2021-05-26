@@ -82,6 +82,8 @@
     color: var(--surface-main-inverted);
     font: var(--text-body2);
     line-height: 18px;
+    margin-right: 16px;
+    white-space: nowrap;
 }
 .lp-myfiles .storage-usage-panel .storage-graph {
     height: 6px;

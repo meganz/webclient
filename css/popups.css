@@ -408,6 +408,10 @@ body.tl .dropdown.body.popup.contacts-search {
 .rtl .dark-direct-tooltip.simpletip-tooltip {
     direction: rtl;
 }
+.dark-direct-tooltip.simpletip-tooltip span {
+    position: relative;
+    z-index: 1;
+}
 .dark-direct-tooltip.simpletip-tooltip.delay {
     transition-delay: 1ms;
 }

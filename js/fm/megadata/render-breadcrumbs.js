@@ -13,14 +13,16 @@
      */
     MegaData.prototype.renderBreadcrumbs = function(items, scope, dictionary, clickAction) {
         const block = scope.querySelector('.fm-breadcrumbs-block');
+        const $block = $(block);
         const dropdown = scope.querySelector('.breadcrumb-dropdown');
 
         let { html, extraItems } = getPathHTML(items, dictionary, block);
 
         if (html && html !== '') {
-            $(block).safeHTML(html);
+            $block.safeHTML(html);
         }
 
+        removeSimpleTip($('.fm-breadcrumbs', $block));
         showHideBreadcrumbDropdown(extraItems, scope, dropdown);
         applyBreadcrumbEventHandlers(scope, dropdown, clickAction);
     };
@@ -358,6 +360,16 @@
         }
 
         return { html, extraItems };
+    }
+
+    function removeSimpleTip($breadCrumbs) {
+        let $currentBreadcrumb;
+        for (let i = 0; i < $breadCrumbs.length; i++) {
+            $currentBreadcrumb = $($breadCrumbs[i]);
+            if ($('span', $currentBreadcrumb).get(0).offsetWidth >= $('span', $currentBreadcrumb).get(0).scrollWidth) {
+                $('.right-arrow-bg', $currentBreadcrumb).removeClass('simpletip');
+            }
+        }
     }
 
     /**

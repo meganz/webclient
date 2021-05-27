@@ -3323,6 +3323,7 @@ FileManager.prototype.addGridUI = function(refresh) {
             // Handling favourites is allowed for full permissions shares only
             if (M.getNodeRights(id) > 1) {
                 M.favourite(id, newFavState);
+                return false;
             }
         });
 

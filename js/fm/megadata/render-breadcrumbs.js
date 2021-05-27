@@ -290,10 +290,8 @@
             }
         });
 
-        $('.fm-breadcrumbs', scope).rebind('contextmenu.breadcrumb', (e) => {
-            $.hideTopMenu();
-            M.hideClickHint();
-            return !!M.contextMenuUI(e, 1);
+        $('.fm-breadcrumbs', scope).rebind('contextmenu.breadcrumb', () => {
+            return false;
         });
     }
 

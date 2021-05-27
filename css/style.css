@@ -3134,7 +3134,6 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 .activity-status-block {
     float: right;
     margin: 12px 10px 0 0;
-    cursor: pointer;
 }
 .activity-status, .contact-status {
     height: 6px;

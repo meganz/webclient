@@ -766,7 +766,7 @@ a.blog-button:hover {
 .notification-type {
     display: table;
     table-layout: fixed;
-    width: 100%;
+    width: calc(100% - 52px);
     box-sizing: border-box;
 }
 .notification-avatar {
@@ -2111,6 +2111,9 @@ img.blog-new-logos {
     top: -1px;
     bottom: auto;
     z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 .multiple .properties-name-block .file-settings-icon, .hidden-context .properties-name-block .file-settings-icon {
     display: none;
@@ -5247,6 +5250,9 @@ tr:not(.taken-down) .grid-status-icon:not(.read-only):not(.read-and-write) {
 }
 .fm-breadcrumbs.root {
     flex-shrink: 0;
+}
+.fm-breadcrumbs.root:first-child:nth-last-child(-n+3) {
+    flex-shrink: 1;
 }
 .fm-breadcrumbs:last-of-type {
     flex-shrink: 0;
@@ -15018,7 +15024,7 @@ body.megaChatDisabled .nw-contact-name button.start-chat-button {
 .user-management-account-settings .profile {
     height: calc(100% - 52px);
     overflow: hidden;
-    text-align: end;
+    text-align: center;
 }
 .user-management-account-settings .option-containers {
     font-size: 0;
@@ -15775,9 +15781,9 @@ body.megaChatDisabled .nw-contact-name button.start-chat-button {
 .information-highlight.warning  {
     box-sizing: border-box;
     width: 302px;
-    border: 1px solid var(--banner-border-warning);
-    background-color: var(--banner-background-warning);
-    color: var(--banner-text-warning);
+    border: 1px solid var(--banner-border-error);
+    background-color: var(--banner-background-error);
+    color: var(--banner-text-error);
     opacity: 1;
 }
 /* new drag and drop dialog */

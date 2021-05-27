@@ -164,6 +164,9 @@
     height: 100%;
     margin: -52px 0 0 0;
 }
+.section.conversations .fm-left-panel.hidden {
+    display: none;
+}
 .content-panel.conversations, .archived-chats .archive-chat-list {
     display: block;
     background-color: var(--surface-grey-2);
@@ -1038,7 +1041,7 @@ li.active .call-duration i {
 }
 
 .contact-item-controls .mega-button.action.contact-block i {
-    --mask-color: var(--surface-mid-grey);
+    --mask-color: var(--icon-rest);
 }
 
 .contact-item-controls .mega-button.action.contact-accept i {

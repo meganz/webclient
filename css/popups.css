@@ -302,11 +302,6 @@ body.tl .dropdown.body.popup.contacts-search {
     width: 100%;
     padding: 20px 0;
 }
-.contacts-search-subsection:last-child .contacts-info.body.contacts-search:last-child {
-    height: 48px;
-    border-bottom: 0;
-    margin-bottom: 0;
-}
 .contacts-list-header {
     margin: 0 12px 0 0;
     padding: 0 8px;
@@ -407,6 +402,10 @@ body.tl .dropdown.body.popup.contacts-search {
 }
 .rtl .dark-direct-tooltip.simpletip-tooltip {
     direction: rtl;
+}
+.dark-direct-tooltip.simpletip-tooltip span {
+    position: relative;
+    z-index: 1;
 }
 .dark-direct-tooltip.simpletip-tooltip.delay {
     transition-delay: 1ms;

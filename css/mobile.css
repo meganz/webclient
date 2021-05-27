@@ -5020,12 +5020,12 @@ div.checkboxOn {
     left: 10px;
     margin-right: 50px;
     text-align: left;
-    vertical-align: middle;
     height: 50px;
     float: left;
     font-size: small;
     color: white;
-    display: table-cell;
+    display: flex;
+    align-items: center;
     line-height: 50px;
     padding: 5px;
 }

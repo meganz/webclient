@@ -82,6 +82,9 @@ function browserdetails(useragent) {
     else if (useragent.indexOf('webos') > 0) {
         os = 'WebOS';
     }
+    else if (useragent.indexOf('playstation') > 0) {
+        os = 'PlayStation';
+    }
 
     if (mega.browserBrand[brand]) {
         browser = mega.browserBrand[brand];
@@ -213,6 +216,9 @@ function browserdetails(useragent) {
     }
     else if (useragent.indexOf(' vivobrowser/') > 0) {
         browser = 'VivoBrowser';
+    }
+    else if (useragent.indexOf(' alohabrowser/') > 0) {
+        browser = 'AlohaBrowser';
     }
     else if (useragent.indexOf('qqbrowser/') > 0) {
         browser = 'QQBrowser';

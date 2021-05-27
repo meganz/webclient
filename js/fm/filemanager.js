@@ -9,7 +9,7 @@ function FileManager() {
     };
 
     this.columnsWidth.cloud.fav = { max: 50, min: 50, curr: 50, viewed: true };
-    this.columnsWidth.cloud.fname = { max: 500, min: 180, curr: 'calc(100% - 560px)', viewed: true };
+    this.columnsWidth.cloud.fname = { max: 5000, min: 180, curr: 'calc(100% - 560px)', viewed: true };
     this.columnsWidth.cloud.label = { max: 130, min: 80, curr: 80, viewed: false };
     this.columnsWidth.cloud.size = { max: 160, min: 100, curr: 100, viewed: true };
     this.columnsWidth.cloud.type = { max: 180, min: 130, curr: 130, viewed: true };
@@ -964,8 +964,9 @@ FileManager.prototype.initFileManagerUI = function() {
         }
     });
 
-    if (dlMethod.warn && !localStorage.browserDialog && !$.browserDialog) {
-        setTimeout(browserDialog, 2000);
+    if (dlMethod.warn) {
+        window.onerror = null;
+        console.error('This browser is using an outdated download method, good luck...', '' + window.ua);
     }
 
     // chat can handle the left-panel resizing on its own
@@ -3122,7 +3123,7 @@ FileManager.prototype.addGridUI = function(refresh) {
             // check if it's still dynamic
             var colStyle = $fnameCol.attr('style');
             if (colStyle && colStyle.indexOf('calc(100% -') !== -1) {
-                M.columnsWidth.cloud['fname'].max = Math.max($fnameCol.outerWidth(), 400);
+                M.columnsWidth.cloud['fname'].max = Math.max($fnameCol.outerWidth(), 5000);
             }
 
             for (var col in M.columnsWidth.cloud) {

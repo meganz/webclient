@@ -9,9 +9,7 @@ This script is used to:
     - Prepare production language files from exported strings from Transifex
 
 Requirements:
-    - `requests` Python Library: pip install requests
-    - `natsort` Python Library: pip install 'natsort<7.0.0'
-        - Note: Lower version is used to keep support for Python 2.7
+    - `requests` Python Library (only for Python 2.7): sudo apt-get install python-requests
     - Copy `transifex.json.example` and rename them to `transifex.json`
     - Create a Transifex token and assign it to a system environment variable as `TRANSIFEX_TOKEN`
         - Note: As a fallback, we can also add a property `TOKEN` in `transifex.json`
@@ -22,7 +20,7 @@ This script will work with both Python 2.7 as well as 3.x.
 import copy, json, os, requests, sys, re, subprocess, time, io, random, argparse
 from threading import Thread
 from collections import OrderedDict
-from natsort import natsorted # Use version 6.2.1
+from functools import cmp_to_key
 
 base_url = None
 organisation_id = None
@@ -115,6 +113,19 @@ def sanitise_string(string, convert_quotes, escape_tag):
 
     return string
 
+def natural_sort(a,b):
+    key1 = a[0]
+    key2 = b[0]
+    if key1.isnumeric() and key2.isnumeric():
+        key1 = int(key1)
+        key2 = int(key2)
+    if key1 > key2:
+        return 1
+    elif key1 < key2:
+        return -1
+    else:
+        return 0
+
 def create_file(language, content, is_prod = False):
     if language == "strings" and is_prod:
         return
@@ -127,9 +138,7 @@ def create_file(language, content, is_prod = False):
             content[key] =  sanitise_string(data['string'], False, True)
 
     # Natural sort
-    sorted_order = natsorted(content)
-    index_map = {v: i for i, v in enumerate(sorted_order)}
-    sorted_dict = OrderedDict(sorted(content.items(), key=lambda pair:index_map[pair[0]]))
+    sorted_dict = OrderedDict(sorted(content.items(), key=cmp_to_key(natural_sort)))
 
     filename = language + "_prod" if is_prod else language
     with io.open(os.path.dirname(os.path.abspath(__file__)) + "/../lang/" + filename + ".json", 'w+', newline='\n') as file:

@@ -285,6 +285,44 @@ var slideshowid;
         }
     }
 
+    function slideshow_zoomSlider(value = 100) {
+        const container = document.querySelector('.media-viewer-container');
+        const wrapper = container && container.querySelector('.zoom-slider-wrap');
+        const $elm = $('.zoom-slider', wrapper);
+        const setValue = tryCatch(() => {
+            wrapper.dataset.perc = value;
+            $elm.slider('value', value);
+        });
+
+        if (!wrapper) {
+            if (d) {
+                console.error('zoom-slider-wrap not found.');
+            }
+            return;
+        }
+
+        if (wrapper.dataset.perc) {
+            // Update existing slider.
+            return setValue();
+        }
+
+        // Init zoom slider
+        $elm.slider({
+            min: 1,
+            max: 1000,
+            range: 'min',
+            step: 1,
+            change: function(e, ui) {
+                $(this).attr('title', `${ui.value}%`);
+            },
+            slide: function(e, ui) {
+                $(this).attr('title', `${ui.value}%`);
+                slideshow_zoom(container, false, ui.value);
+            },
+            create: setValue
+        });
+    }
+
     // Inits Image viewer bottom control bar
     function slideshow_imgControls(slideshow_stop) {
         var $overlay = $('.media-viewer-container', 'body');
@@ -392,21 +430,6 @@ var slideshowid;
                 $zoomOutButton.trigger('click.mediaviewer');
             }
             return false;
-        });
-
-        // Init zoom slider
-        $('.zoom-slider', $imageControls).slider({
-            min: 1,
-            max: 1000,
-            range: 'min',
-            step: 1,
-            change: function(e, ui) {
-                $(this).attr('title', ui.value + '%');
-            },
-            slide: function(e, ui) {
-                $(this).attr('title', ui.value + '%');
-                slideshow_zoom($overlay, false, ui.value);
-            }
         });
 
         // Bind Slideshow Close button
@@ -544,7 +567,6 @@ var slideshowid;
     function slideshow_imgPosition($overlay) {
         var $imgWrap = $('.img-wrap', $overlay);
         var $img = $('img.active', $overlay);
-        var $percLabel = $('.zoom-slider-wrap', $overlay);
         var id = $imgWrap.attr('data-image');
         var viewerWidth = $imgWrap.width();
         var viewerHeight = $imgWrap.height();
@@ -622,9 +644,7 @@ var slideshowid;
             'left': (viewerWidth - imgWidth) / 2,
             'top': (viewerHeight - imgHeight) / 2,
         });
-        w_perc = (imgWidth / origImgWidth * 100 * devicePixelRatio);
-        $percLabel.attr('data-perc', w_perc);
-        $('.zoom-slider', $percLabel).slider('value', w_perc);
+        slideshow_zoomSlider(imgWidth / origImgWidth * 100 * devicePixelRatio);
     }
 
     // Viewer Init
@@ -1350,7 +1370,6 @@ var slideshowid;
         var $content = $('.content', $overlay);
         var $imgWrap = $('.img-wrap', $content);
         var $bottomBar = $('footer', $overlay);
-        var $zoomSlider = $('.zoom-slider-wrap', $overlay);
         var $pendingBlock = $('.viewer-pending', $content);
         var $progressBlock = $('.viewer-progress', $content);
 
@@ -1481,8 +1500,6 @@ var slideshowid;
 
                 // Set position, zoom values
                 zoom_mode = false;
-                $zoomSlider.attr('data-perc', 100);
-                $('.zoom-slider', $zoomSlider).slider('value', 100);
                 slideshow_imgPosition($overlay);
                 $(window).rebind('resize.imgResize', function() {
                     zoom_mode = false;
@@ -1493,9 +1510,7 @@ var slideshowid;
                 $img.attr('src', src1).addClass('active');
 
                 // adjust zoom percent label
-                var perc = ($img.width() / origImgWidth * 100 * devicePixelRatio);
-                $zoomSlider.attr('data-perc', perc);
-                $('.zoom-slider', $zoomSlider).slider('value', perc);
+                slideshow_zoomSlider($img.width() / origImgWidth * 100 * devicePixelRatio);
             }
 
             // Apply exit orientation

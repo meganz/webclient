@@ -620,6 +620,13 @@ function fm_hideoverlay() {
     }
     $(document).trigger('MegaCloseDialog');
 }
+window.mega.ui.searchbar = dummy;
+window.mega.ui.searchbar.refresh = dummy;
+window.mega.ui.searchbar.init = dummy;
+
+RevampOnboarding = dummy;
+RevampOnboarding.removeFeedbackTip = dummy;
+RevampOnboarding.isDone = dummy;
 
 var showToast = dummy;
 window.toastRack = dummy;

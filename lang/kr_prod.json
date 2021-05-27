@@ -1640,7 +1640,7 @@
     "16396": "MEGAsync\ub97c \uc124\uce58\ud558\uc5ec %1\uc758 \uc800\uc7a5 \uacf5\uac04\uacfc %2\uc758 \uc804\uc1a1 \ud55c\ub3c4\ub97c \ubc1b\uc558\uc2b5\ub2c8\ub2e4.",
     "16397": "\ubaa8\ubc14\uc77c \uc571\uc744 \uc124\uce58\ud558\uc5ec %1\uc758 \uc800\uc7a5 \uacf5\uac04\uacfc %2\uc758 \uc804\uc1a1 \ud55c\ub3c4\ub97c \ubc1b\uc558\uc2b5\ub2c8\ub2e4.",
     "16401": "\uacc4\uc815 \ub4f1\ub85d \ubcf4\ub108\uc2a4",
-    "16402": "\ud574\uc81c\ub41c \ubcf4\ub108\uc2a4:",
+    "16402": "Unlocked bonuses",
     "16448": "\uc804\uc1a1 \uc7ac\uac1c",
     "16462": "\uc124\uba85",
     "16463": "\uac00\uaca9",
@@ -4537,10 +4537,10 @@
     "25064": "\uce74\ub4dc \uc815\ubcf4",
     "25073": "\uc774 \uacb0\uc81c \uc218\ub2e8\uc740 \ucd5c\uc18c \uae08\uc561 \uc81c\ud55c\uc774 \uc788\uc2b5\ub2c8\ub2e4",
     "25081": "\uace0\ub9d9\uc2b5\ub2c8\ub2e4! \ub2f9\uc2e0\uc758 \uacc4\uc815\uc740 \uc9c0\uae08 \uc5c5\uadf8\ub808\uc774\ub4dc\ub420 \uac83\uc785\ub2c8\ub2e4. \uacc4\uc815\uc744 \ud655\uc778\ud558\uace0 \ub85c\uadf8\uc778\ud558\ub824\uba74 \uc774\uba54\uc77c\uc744 \ud655\uc778\ud558\uc138\uc694. \ubb38\uc758\uc0ac\ud56d\uc740 [A]support@mega.nz[/A]\ub85c \uc5f0\ub77d\uc8fc\uc2e4 \uc218 \uc788\uc2b5\ub2c8\ub2e4",
-    "v4onboard_dialogtext": "Our new dark mode is now available as an early release. Tell us what you think.",
-    "v4onboard_dialogtitle": "Check out our new MEGA dark mode!",
-    "v4onboard_feeddropdown": "Feedback on this release",
-    "v4onboard_feedtextbox": "Tell us what you think",
-    "v4onboard_popupmessage": "Switch between the light and dark mode in your settings and send us your feedback",
-    "v4onboard_switchmodes": "Switch modes here"
+    "v4onboard_dialogtext": "\uc120\ud589 \ub9b4\ub9ac\uc988\uc5d0\uc11c \uc0c8\ub85c\uc6b4 \ub2e4\ud06c \ubaa8\ub4dc\ub97c \uc774\uc6a9\ud560 \uc218 \uc788\uc2b5\ub2c8\ub2e4. \uc5b4\ub5bb\uac8c \uc0dd\uac01\ud558\ub294\uc9c0 \uc54c\ub824\uc8fc\uc138\uc694.",
+    "v4onboard_dialogtitle": "MEGA\uc758 \uc0c8\ub85c\uc6b4 \ub2e4\ud06c \ubaa8\ub4dc\ub97c \ud655\uc778\ud574\ubcf4\uc138\uc694!",
+    "v4onboard_feeddropdown": "\uc774 \ub9b4\ub9ac\uc988\uc5d0 \ub300\ud55c \ud53c\ub4dc\ubc31",
+    "v4onboard_feedtextbox": "\uc5b4\ub5bb\uac8c \uc0dd\uac01\ud558\ub294\uc9c0 \uc54c\ub824\uc8fc\uc138\uc694",
+    "v4onboard_popupmessage": "\uc124\uc815\uc5d0\uc11c \ub77c\uc774\ud2b8\uc640 \ub2e4\ud06c \ubaa8\ub4dc\ub97c \uc804\ud658\ud574\ubcf4\uace0 \uc6b0\ub9ac\uc5d0\uac8c \ud53c\ub4dc\ubc31\uc744 \ubcf4\ub0b4\uc8fc\uc138\uc694",
+    "v4onboard_switchmodes": "\uc5ec\uae30\uc11c \ubaa8\ub4dc \uc804\ud658"
 }

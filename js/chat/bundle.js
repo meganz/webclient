@@ -1607,7 +1607,6 @@ class ContactButton extends _stores_mixins_js2__["ContactAwareComponent"] {
         icon: "sprite-fm-mono icon-add-filled",
         label: l[101],
         onClick: () => {
-          loadingDialog.show();
           const isAnonymousUser = !u_handle || u_type !== 3;
           const ADD_CONTACT = 'addContact';
 
@@ -1621,6 +1620,7 @@ class ContactButton extends _stores_mixins_js2__["ContactAwareComponent"] {
               }));
             }
           } else {
+            loadingDialog.show();
             M.syncContactEmail(contact.u, new MegaPromise(), true).done(function (email) {
               var exists = false;
               var opcKeys = Object.keys(M.opc);
@@ -13757,7 +13757,7 @@ class text_Text extends abstractGenericMessage_AbstractGenericMessage {
       });
     } else {
       if (message.updated > 0 && !message.metaType) {
-        textMessage = textMessage + " <em>" + l[8887] + "</em>";
+        textMessage = textMessage + " <em class=\"edited\">" + l[8887] + "</em>";
       }
 
       if (this.props.initTextScrolling) {

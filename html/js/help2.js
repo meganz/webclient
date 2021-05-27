@@ -513,7 +513,7 @@ var Help = (function() {
                     .appendTo($article);
 
                 $('<div>').addClass('search-result-content')
-                    .text(article.body)
+                    .text(article.body.replace(/<br\/?>/gi, " "))
                     .appendTo($article);
 
                 var $footer = $('<div>').addClass('search-result-footer')

@@ -2111,6 +2111,9 @@ img.blog-new-logos {
     top: -1px;
     bottom: auto;
     z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 .multiple .properties-name-block .file-settings-icon, .hidden-context .properties-name-block .file-settings-icon {
     display: none;

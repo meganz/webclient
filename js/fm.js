@@ -1600,6 +1600,8 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
                     $o.removeClass('checkboxOn').addClass('checkboxOff');
                     mega.config.remove('skipDelWarning');
                 }
+
+                return false;
             });
         }
         else {

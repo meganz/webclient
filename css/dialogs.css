@@ -131,7 +131,6 @@
     position: relative;
 }
 .rounded-tip-button > i {
-    opacity: 0.6;
     position: absolute;
     display: block;
     --icon-size: 24px;

@@ -186,26 +186,43 @@
                 $currentNode.addClass(customClass);
             }
 
+            /*
+             * There are four main positions of the tooltip:
+             * A) The default position is below the hovered el and horizontally centered.
+             *      The tooltip may be flipped vertically or moved along the horizontal axis
+             *      if there is not enough space in container
+             * B) "top" data-simpletipposition value places the tooltip above the hovered el.
+             *      The tooltip may be flipped vertically back or moved along the horizontal axis
+             *      if there is not enough space in container
+             * C) "left" data-simpletipposition value places the tooltip to the left of the target.
+             *      The tooltip is centered  vertically and may be flipped horizontally
+             *      if there is not enough space in container
+             * D) "right" data-simpletipposition value places the tooltip to the right of the target.
+             *      The tooltip is centered  vertically and may be flipped horizontally
+             *      if there is not enough space in container
+            */
+
+            /* Default bottom position (case A) */
             let my = 'center top';
             let at = 'center bottom';
             let arrowRotation = 180;
             const tipPosition = getTipLRPosition($this.attr('data-simpletipposition'));
 
             switch (tipPosition) {
+                /* Top position (case B) */
                 case 'top':
                     my = 'center bottom';
                     at = 'center top';
-                    arrowRotation = 0;
                     break;
+                /* Top position (case C) */
                 case 'left':
                     my = 'right center';
                     at = 'left center';
-                    arrowRotation = -90;
                     break;
+                /* Top position (case D) */
                 case 'right':
                     my = 'left center';
                     at = 'right center';
-                    arrowRotation = 90;
                     break;
             }
 
@@ -216,27 +233,60 @@
                 collision: 'flipfit',
                 within: $this.parents(wrapper ? `${wrapper} body` : '.ps-container, body').first(),
                 using: function(obj, info) {
-                    let positionClass = 'simpletip-v-b';
 
+                    /*
+                     * Defines the positions on the tooltip Arrow and target.
+                     * Delault position on the tooltip Arrow is left top.
+                     * Delault position on the target is right bottom.
+                     * We don't use centering to avoid special conditions after flipping.
+                    */
+                    let myH = 'left';
+                    let myV = 'top';
+                    let atH = 'right';
+                    let atV = 'bottom';
+
+                    /*
+                     * The condition when tooltip is placed to the left of the target (case C),
+                     * For condition C to be met, the tooltip must be vertically centered.
+                     * Otherwise, it will mean that we have case A or B, and the tooltip
+                     * just moves along the horizontal ("arrowRotation" val will be changed then).
+                     * The position on the arrow is right and the position on target is left.
+                    */
+                    if (info.horizontal === 'right') {
+                        myH = 'right';
+                        atH = 'left';
+                        arrowRotation = 270;
+                    }
+                    // Case D, or case A or B, and the tooltip  just moves along the horizontal.
+                    else if (info.horizontal === 'left') {
+                        myH = 'left';
+                        atH = 'right';
+                        arrowRotation = 90;
+                    }
+
+                    // Case A, tooltip is placed below the target. "arrowRotation" value is replaced.
                     if (info.vertical === 'top') {
-                        positionClass = 'simpletip-v-t';
+                        myV = 'top';
+                        atV = 'bottom';
+                        arrowRotation = 180;
                     }
+                    // Case B, tooltip is placed above the target. "arrowRotation" value is replaced.
                     else if (info.vertical === 'bottom') {
-                        positionClass = 'simpletip-v-b';
+                        myV = 'bottom';
+                        atV = 'top';
+                        arrowRotation = 0;
+                    }
+                    // Case C or D, tooltip is placed to the left/right and vertically centered.
+                    else {
+                        myV = 'center';
+                        atV = 'center';
                     }
 
-                    if (info.horizontal === 'left') {
-                        positionClass = 'simpletip-h-l';
-                    }
-                    else if (info.horizontal === 'right') {
-                        positionClass = 'simpletip-h-r';
-                    }
+                    // Set new positions on the tooltip Arrow and target.
+                    my = myH + ' ' + myV;
+                    at = atH + ' ' + atV;
 
-                    this.classList.remove(
-                        'simpletip-v-t', 'simpletip-v-b', 'simpletip-h-l', 'simpletip-h-r'
-                    );
-
-                    this.classList.add(positionClass, 'visible');
+                    this.classList.add('visible');
 
                     const { leftOffset, topOffset} = calculateOffset(info, $this);
 
@@ -249,7 +299,6 @@
 
             // Calculate Arrow position
             var $tooltipArrow = $('.tooltip-arrow', $node);
-            const isArrowAtBottom = $node[0].className.indexOf('simpletip-v-b') > 0;
 
             $tooltipArrow.position({
                 of: $this,
@@ -259,25 +308,30 @@
                 using: function(obj, info) {
                     let { top, left } = obj;
 
-                    if (info.vertical === 'bottom') {
-                        top += 8;
-                    }
-                    else if (info.vertical === 'top') {
-                        top -= 8;
-                    }
+                    /*
+                     * If Case A or B (ie tooltip is placed to the top/bottom), then
+                     * we need to take into account the horizontal centering of the arrow
+                     * in relation to the target, depending on the width of the arrow
+                    */
+                    const horizontalOffset = info.vertical === 'middle' ? 0 : $this[0].offsetWidth / 2;
 
+                    // Horizontal positioning of the arrow in relation to the target
                     if (info.horizontal === 'left') {
-                        left -= 12;
+                        left -= $tooltipArrow[0].offsetWidth / 2 + horizontalOffset;
                     }
                     else if (info.horizontal === 'right') {
-                        left += 12;
+                        left += $tooltipArrow[0].offsetWidth / 2 + horizontalOffset;
                     }
 
-                    if (isArrowAtBottom && info.vertical === 'top') {
-                        top = $node[0].offsetHeight - 17;
-                        arrowRotation = 0;
+                    // Vertical positioning of the arrow in relation to the target
+                    if (info.vertical === 'bottom') {
+                        top += $tooltipArrow[0].offsetHeight / 2;
+                    }
+                    else if (info.vertical === 'top') {
+                        top -= $tooltipArrow[0].offsetHeight / 2;
                     }
 
+                    // Add special offset if set in options
                     const { leftOffset, topOffset} = calculateOffset(info, $this);
 
                     $(this).css({
@@ -291,8 +345,10 @@
     });
 
     $(document.body).rebind('mouseover.simpletip touchmove.simpletip', function(e) {
-        if ($currentNode && !e.target.classList.contains('simpletip') && !$(e.target).parents('.simpletip').length > 0
-            && !e.target.classList.contains('tooltip-arrow')) {
+        if ($currentNode && !e.target.classList.contains('simpletip')
+            && !$(e.target).closest('.simpletip, .simpletip-tooltip').length > 0
+            && !e.target.classList.contains('tooltip-arrow')
+            && !e.target.classList.contains('simpletip-tooltip')) {
             unmount();
         }
     });

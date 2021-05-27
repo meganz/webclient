@@ -262,6 +262,10 @@
     background: var(--surface-grey-2);
     border-radius: 6px;
 }
+.message.dialog-wrapper .giphy-block {
+    max-width: 100%;
+    height: 100%;
+}
 .message.date-time {
     display: inline-block;
     position: relative;

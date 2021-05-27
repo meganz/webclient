@@ -164,6 +164,9 @@
     height: 100%;
     margin: -52px 0 0 0;
 }
+.section.conversations .fm-left-panel.hidden {
+    display: none;
+}
 .content-panel.conversations, .archived-chats .archive-chat-list {
     display: block;
     background-color: var(--surface-grey-2);

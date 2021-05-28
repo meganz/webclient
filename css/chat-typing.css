@@ -1,7 +1,7 @@
 .typing-block {
     position: absolute;
     padding: 0 0 0 72px;
-    bottom: 1px;
+    bottom: 0;
     width: 100%;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
@@ -16,12 +16,13 @@
     text-overflow: ellipsis;
     overflow: hidden;
     max-width: calc(100% - 66px);
+    vertical-align: middle;
 }
 .typing-bounce {
 	width: 34px;
     text-align: center;
     display: inline-block;
-    vertical-align: top;
+    vertical-align: middle;
     margin-left: 4px;
 }
 .typing-bounce div {

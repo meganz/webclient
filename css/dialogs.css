@@ -9702,7 +9702,7 @@ body.de .mega-dialog.new-group-chat {
         min-height: 320px;
         background-image: url(../images/mega/incoming-animation.svg);
         background-repeat: no-repeat;
-        background-position: 14px -8px;
+        background-position: center -15px;
     }
     .mega-dialog.incoming-call-dialog .incoming-call-header {
         text-align: center;
@@ -9712,6 +9712,76 @@ body.de .mega-dialog.new-group-chat {
     .mega-dialog.incoming-call-dialog .content-block {
         padding: 0 24px 24px 24px;
         background: transparent;
+    }
+    .incoming-contact-info {
+        color: var(--text-color-high);
+        display: inline-block;
+        font: var(--text-body1);
+    }
+    .incoming-contact-info span.incoming-call-txt {
+        display: block;
+        font: var(--text-body2);
+        color: var(--text-color-low);
+    }
+    .incoming-call-avatar {
+        width: 140px;
+        height: 140px;
+        margin: 0 auto;
+        border: 4px solid var(--text-color-white-high);
+        overflow: hidden;
+        border-radius: 100%;
+        box-sizing: border-box;
+        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.15);
+        position: relative;
+    }
+    .incoming-call-avatar .avatar-wrapper {
+        width: 132px;
+        height: 132px;
+        border: 0;
+        margin: 0;
+        box-shadow: none;
+        font-size: 42px;
+        line-height: 130px;
+    }
+    .incoming-call-avatar .avatar-wrapper span {
+        color: var(--text-color-white-high);
+    }
+    .incoming-call-avatar img {
+        width: 132px;
+        height: 132px;
+        border-radius: 100%;
+    }
+    .incoming-call-shadow-bl {
+        width: 132px;
+        height: 132px;
+        border-radius: 100%;
+        box-shadow: inset 0 2px 1px 0 rgba(0, 0, 0, 0.06);
+        position: absolute;
+        z-index: 10;
+        top: 0;
+    }
+    .incoming-call-username {
+        overflow: hidden;
+        text-align: center;
+        margin: 0 20px;
+        padding: 17px 0;
+        height: 65px;
+        box-sizing: border-box;
+        font: var(--text-body1);
+        color: var(--text-color-high);
+    }
+    .incoming-call-buttons {
+        display: flex;
+        text-align: center;
+        padding: 0 8px 8px 8px;
+    }
+    .incoming-call-buttons button.incoming-call-button {
+        flex: 0 0 64px;
+        margin: 0 4px;
+        min-width: auto;
+    }
+    .incoming-call-buttons button.audio-call {
+        flex: 1 1 auto;
     }
 
 /* end incoming-call-dialog */

@@ -80,9 +80,9 @@
 
 
         if (isVideoCall) {
-            $('.incoming-call-buttons', self.$dialog).addClass("video-enabled");
+            $('.video-call', self.$dialog).removeClass('hidden');
         } else {
-            $('.incoming-call-buttons', self.$dialog).removeClass("video-enabled");
+            $('.video-call', self.$dialog).addClass('hidden');
         }
         self.visible = true;
 
@@ -91,14 +91,14 @@
 
 
         if (isGroupCall) {
-            $('.video-call', self.$dialog).hide();
+            $('.video-call', self.$dialog).addClass('hidden');
             $('.incoming-call-txt, .incoming-call-header', self.$dialog).text(
                 l[19995] || 'Incoming group call...'
             );
             self.$dialog.addClass('group-call');
         }
         else {
-            $('.video-call', self.$dialog).show();
+            $('.video-call', self.$dialog).removeClass('hidden');
             $('.incoming-call-txt, .incoming-call-header', self.$dialog).text(
                 (l[17878] || "Incoming call") + '...'
             );
@@ -195,10 +195,16 @@
                         <span class="incoming-call-txt"></span>
                     </span>
                     </div>
-                        <div class="incoming-call-buttons">
-                        <div class="incoming-call-button cancel-call"></div>
-                        <div class="incoming-call-button video-call"></div>
-                        <div class="incoming-call-button audio-call"></div>
+                    <div class="incoming-call-buttons">
+                        <button class="mega-button negative large incoming-call-button cancel-call">
+                            <div><i class="sprite-fm-mono icon-handset-ended"></i></div>
+                        </button>
+                        <button class="mega-button positive large incoming-call-button audio-call">
+                            <div><i class="sprite-fm-mono icon-phone"></i></div>
+                        </button>
+                        <button class="mega-button branded-blue large incoming-call-button video-call">
+                            <div><i class="sprite-fm-mono icon-video-call-filled"></i></div>
+                        </button>
                     </div>
                 </div>
             </section>

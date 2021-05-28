@@ -167,6 +167,10 @@
     height: calc(100% - 36px);
 }
 
+.archived-chats .grid-table-header {
+    margin: 10px 0 0;
+}
+
 .transfer-scrolling-table {
     /* do not remove, needed for perfect-scrollbar */
     position: relative !important;
@@ -320,6 +324,7 @@ table tr.ui-selected .link-transfer-status {
     position: absolute;
 }
 
+/* TODO: fix the margin after release */
 .grid-table-header {
     width: 100%;
     background-color: var(--surface-main);
@@ -491,6 +496,7 @@ table.grid-table tr {
     border-bottom: 1px solid var(--surface-grey-2);
 }
 
+table.grid-table th:first-child,
 table.grid-table td:first-child {
     padding-top: 3px;
     -webkit-padding-start: 12px;
@@ -1402,18 +1408,20 @@ table.out-shares .fm-chat-users {
    grid-table arc-chat-messages-block
 \* ======================================== */
 
+.archived-chat-view table th,
 table.arc-chat-messages-block td {
-    color: #333;
     padding-left: 5px;
     height: 24px;
     line-height: 24px;
     vertical-align: top;
     font-size: 14px;
     cursor: default;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
     box-sizing: border-box;
     position: relative;
+}
+.archived-chat-view table th:first-child {
+    -webkit-padding-start: 20px;
+    padding-inline-start: 20px;
 }
 
 /* ======================================== *\

@@ -283,6 +283,12 @@
             color: var(--text-green);
         }
 
+        .mega-button.branded-blue {
+            background: var(--blue);
+            box-shadow: inset 0 0 0 var(--border-width) var(--blue-border);
+            color: var(--text-blue);
+        }
+
     /* end: branded colours */
 
 /* end: basic colours */
@@ -319,6 +325,9 @@
             background: var(--green-hover);
         }
 
+        .mega-button.branded-blue:hover:not(.disabled) {
+            background: var(--blue-hover);
+        }
     /* end: branded-colours */
 
 /* end: hover colours */
@@ -349,6 +358,10 @@
 
         .mega-button.branded-green:active:not(.disabled) {
             background: var(--green-active);
+        }
+
+        .mega-button.branded-blue:active:not(.disabled) {
+            background: var(--blue-active);
         }
     /* end: branded colours */
 

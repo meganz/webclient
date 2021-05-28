@@ -1,36 +1,51 @@
 .chat-topic-block {
-    display: block;
+    align-items: center;
     background-color: var(--surface-main);
+    box-sizing: content-box;
+    display: flex;
+    padding: 0 20px 0 12px;
     position: relative;
     line-height: 20px;
-    height: 49px;
-    padding: 8px 24px 0 12px;
+    height: 48px;
     z-index: 3;
-    box-sizing: border-box;
     overflow: hidden;
     border-bottom: 1px solid var(--divider-color);
 }
-.chat-topic-icon {
-    display: flex;
+.chat-topic-buttons {
+    flex: 0 0 auto;
+    order: 1;
+}
+.chat-topic-info {
     align-items: center;
-    justify-content: center;
+    display: flex;
+    flex: 1 1 auto;
     overflow: hidden;
-    width: 32px;
-    height: 32px;
+}
+.chat-topic-info .chat-topic-icon {
+    margin: 8px 0;
+}
+.chat-topic-icon {
+    align-items: center;
     background: #2ba6de;
     background: linear-gradient(45deg, #2ba6de 0%,#55d2f0 100%);
     border-radius: 4px;
-    float: left;
+    display: flex;
+    justify-content: center;
+    height: 32px;
+    flex: 0 0 auto;
+    overflow: hidden;
     position: relative;
+    width: 32px;
 }
 .chat-topic-icon i {
     --icon-size: 24px;
 }
 .chat-topic-text {
-    margin: 0 150px 0 44px;
+    color: var(--text-color-high);
     font: var(--text-body1);
     line-height: 16px;
-    color: var(--text-color-high);
+    margin: 0 0 0 12px;
+    overflow: hidden;
 }
 .chat-topic-text .txt {
     display: block;
@@ -46,9 +61,16 @@
 .chat-topic-text span.small span {
     margin-right: 4px;
 }
+
+/* Empty messages block */
+.fm-empty-section.empty-messages {
+    position: absolute;
+    width: calc(100% - 256px);
+}
+
 .messages-block {
     overflow: hidden;
-    height: calc(100% - 57px);
+    height: calc(100% - 49px);
     position: relative;
     background-color: var(--surface-main);
     margin-right: 256px;
@@ -59,7 +81,7 @@
 }
 .messages.scroll-area {
     position: relative;
-    height: calc(100% - 70px);
+    height: calc(100% - 68px);
     overflow: hidden;
     z-index: 1;
 }
@@ -115,7 +137,7 @@
     position: absolute;
     left: 0;
     --icon-size: 36px;
-    margin: 4px 0 0 0;
+    margin: 2px 0 0 0;
     --mask-color: var(--icon-rest);
 }
 .messages.notification .info p strong {

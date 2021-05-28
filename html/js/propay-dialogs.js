@@ -5,6 +5,8 @@
  * URLS from the payment provider.
  */
 
+var closeButtonJS = 'button.js-close';
+
 /**
  * Code for the AstroPay dialog on the second step of the Pro page
  */
@@ -886,7 +888,8 @@ var wireTransferDialog = {
         $('.pro-register-dialog').removeClass('active').addClass('hidden');
 
         // Cache DOM reference for faster lookup
-        this.$dialog = $('.mega-dialog.wire-transfer-dialog');
+        var dialogClass = is_mobile ? '.mobile.wire-transfer-dialog' : '.mega-dialog.wire-transfer-dialog';
+        this.$dialog = $(dialogClass);
         this.$backgroundOverlay = $('.fm-dialog-overlay');
 
         // Add the styling for the overlay
@@ -895,8 +898,11 @@ var wireTransferDialog = {
         // Open the dialog
         this.$dialog.addClass('active').removeClass('hidden');
 
+        // Change the class depending on mobile/desktop
+        var closeButtonClass = is_mobile ? '.fm-dialog-close' : closeButtonJS;
+
         // Initialise the close button
-        this.$dialog.find('button.js-close').rebind('click', function() {
+        this.$dialog.find(closeButtonClass).rebind('click', () => {
             wireTransferDialog.$backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
             wireTransferDialog.$dialog.removeClass('active').addClass('hidden');
 
@@ -1673,7 +1679,7 @@ var addressDialog = {
         'use strict';
 
         // Change the class depending on mobile/desktop
-        var closeButtonClass = (is_mobile) ? '.close-payment-dialog' : 'button.js-close';
+        var closeButtonClass = is_mobile ? '.close-payment-dialog' : closeButtonJS;
 
         var mySelf = this;
 
@@ -2188,7 +2194,7 @@ var cardDialog = {
         this.clearPreviouslyEnteredCardData();
 
         // Initialise the close button
-        this.$dialog.find('button.js-close').rebind('click', function() {
+        this.$dialog.find(closeButtonJS).rebind('click', () => {
             cardDialog.$backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
             cardDialog.$dialog.removeClass('active').addClass('hidden');
 

@@ -1596,6 +1596,21 @@ ul, li {
     width: 42px;
     z-index: 10;
 }
+.mobile.fm-wiret-close {
+    background: url(../images/mobile/mobile-sprite.png);
+    background-position: -76px -1138px;
+    background-repeat: no-repeat;
+    cursor: pointer;
+    height: 40px;
+    margin: 13px 6px 0 7px;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+    -webkit-tap-highlight-color: transparent;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 42px;
+    z-index: 10;
+}
 .mobile.fm-header-txt {
     font-size: 20px;
     line-height: 24px;
@@ -3354,6 +3369,13 @@ div.checkboxOn {
 .payment-address-dialog .main-title {
     font-size: 17px;
 }
+.wire-transfer-dialog .main-title {
+    color: #222222;
+    font-size: 17px;
+    font-family: "LatoWebBold", serif;
+    margin: 20px 0 0 0;
+    text-align: center;
+}
 .mobile.membership-step2 .membership-st2-head {
     margin: 30px 0 20px 0;
     color: #495057;
@@ -4040,28 +4062,37 @@ div.checkboxOn {
     opacity: 0;
 }
 /* Credit card billing address dialog */
-.payment-address-dialog {
+.payment-address-dialog,
+.wire-transfer-dialog {
     left: 0;
     position: absolute;
     top: 0;
     z-index: 1200;
 }
-.payment-address-dialog .mobile.content-cell {
+.payment-address-dialog .mobile.content-cell,
+.wire-transfer-dialog .mobile.content-cell {
     width: 50%;
-}
-.payment-address-dialog .mobile.content-cell {
     text-align: initial;
 }
 .payment-address-dialog-body {
     padding: 24px 20px;
 }
-.payment-address-dialog .container-box-title {
+.payment-address-dialog .container-box-title,
+.wire-transfer-dialog .container-box-title {
     margin: 12px 20px 24px;
 }
-.payment-address-dialog .payment-note-first {
+.payment-address-dialog .payment-note-first,
+.wire-transfer-dialog .payment-note-first {
     color: #495057;
     font-size: 14px;
     line-height: 22px;
+    white-space: normal;
+}
+.wire-transfer-dialog .wiretransfer-note-first {
+    color: #676D75;
+    font-size: 13px;
+    line-height: 21px;
+    text-align: center;
     white-space: normal;
 }
 .payment-address-dialog .payment-note-first a {
@@ -4092,6 +4123,37 @@ div.checkboxOn {
     margin: 0 20px 12px;
     min-width: 0;
     width: calc(100% - 40px);
+}
+.wire-transfer-dialog .grey-container-box {
+    background-color: rgba(0, 191, 165, 0.02);
+    border-color: rgba(0, 191, 165, 0.2);
+    border-top-style: solid;
+    border-top-width: 1px;
+    border-bottom-style: solid;
+    border-bottom-width: 1px;
+}
+.wire-transfer-dialog .grey-container-box.second {
+    margin-top: 16px;
+}
+.mobile.wire-transfer-dialog .wire-transfer-details {
+    font-family: LatoWeb, serif;
+    font-size: 13px;
+    color: #262F3B;
+    margin: 14px 15px 16px 18px;
+    line-height: 24px;
+}
+.mobile.wire-transfer-dialog .wire-transfer-details td {
+    padding: 0;
+}
+.wire-transfer-bold {
+    font-family: LatoWebBold, serif;
+}
+.mobile.wire-transfer-dialog .wire-transfer-options {
+    font-family: LatoWeb, serif;
+    font-size: 13px;
+    color: #262F3B;
+    margin: 12px 16px 40px 17px;
+    line-height: 21px;
 }
 /* This is to undo all the styling caused by other classnames. I will go through and tidy up the classes after. */
 .mobile.main-block.payment-address-dialog {

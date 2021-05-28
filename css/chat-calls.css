@@ -146,13 +146,15 @@ video.localViewport {
     bottom: auto;
 }
 .call.button {
-    width: 48px;
-    height: 48px;
+    box-sizing: border-box;
     display: inline-block;
-    margin: 13px 24px 0 24px;
+    height: 48px;
+    margin: 12px 24px 0 24px;
+    padding: 5px;
+    position: relative;
     text-align: center;
     vertical-align: top;
-    position:relative;
+    width: 48px;
 }
 .call.button.hidden {
     display: none;
@@ -161,10 +163,14 @@ video.localViewport {
     --icon-size: 38px;
     --mask-color: var(--surface-grey-2);
     background: transparent;
+    position: static;
 }
 .small-block .call.button {
+    margin: 0 18px;
+    padding: 8px;
+}
+.small-block .call.button i {
     --icon-size: 32px;
-    margin: 9px 18px 0 18px;
 }
 .call.button.left {
     position:absolute;

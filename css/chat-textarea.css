@@ -6,16 +6,12 @@
     z-index: 1;
 }
 .chat-textarea {
-    margin: 0 18px 20px 18px;
+    margin: 0 18px 18px;
     padding: 14px 78px 14px 54px;
     min-height: 48px;
     background-color: var(--surface-main);
-    -moz-border-radius: 4px;
-    -webkit-border-radius: 4px;
     border-radius: 4px;
     border: 1px solid var(--surface-mid-grey);
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
     box-sizing: border-box;
     position: relative;
 }

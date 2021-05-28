@@ -4,10 +4,12 @@
     display: flex;
 }
 .lp-header span {
-    font: var(--text-h2);
     color: var(--text-color-higher);
-    flex-grow: 1;
+    flex: 1 1 auto;
+    font: var(--text-h2);
+    overflow: hidden;
     padding: 3px 0;
+    text-overflow: ellipsis;
 }
 .lp-myfiles {
     background: var(--surface-grey-2);

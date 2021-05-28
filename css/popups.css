@@ -28,7 +28,7 @@ body.tl .dropdown.body.popup.contacts-search {
     box-sizing: border-box;
     border-radius: 19px;
     overflow: hidden;
-    padding: 0 13px 0 0;
+    margin: 0 12px 0 0;
 }
 .new-group-chat .contacts-search-header {
     padding: 0;
@@ -50,13 +50,13 @@ body.tl .dropdown.body.popup.contacts-search {
     transition: all 200ms ease-in-out;
 }
 .contacts-search-header input {
-    height: 32px;
     margin: 0;
-    padding: 0 30px 0 38px;
+    padding: 4px 30px 4px 38px;
     width: 100%;
     border: 0 none;
     border-radius: 18px;
     font: var(--text-body1);
+    line-height: 24px;
     color: var(--text-color-medium);
     background: var(--surface-grey-1);
     box-sizing: border-box;
@@ -92,7 +92,7 @@ body.tl .dropdown.body.popup.contacts-search {
 .contacts-search-header > i {
     position: absolute;
     top: 50%;
-    left: 10px;
+    left: 8px;
     transform: translateY(-50%);
     --icon-size: 24px;
     --mask-color: var(--icon-rest);
@@ -100,7 +100,7 @@ body.tl .dropdown.body.popup.contacts-search {
 .search-block.emoji > i {
     position: absolute;
     --icon-size: 24px;
-    margin: 12px 3px 1px 6px;
+    margin: 11px 3px 1px 8px;
     vertical-align: top;
     --mask-color: var(--icon-inactive);
 }
@@ -161,10 +161,6 @@ body.tl .dropdown.body.popup.contacts-search {
 }
 .dropdown.body.popup.contacts-search footer {
     padding-right: 12px;
-}
-
-.main-start-chat-dropdown .popup.contacts-search.no-contacts {
-    margin-top: 8px;
 }
 .horizontal-contacts-list {
     height: 78px;
@@ -253,7 +249,7 @@ body.tl .dropdown.body.popup.contacts-search {
 .contacts-search-header input ~ .search-result-clear {
     position: absolute;
     top: 50%;
-    right: 20px;
+    right: 8px;
     transform: translateY(-50%);
     cursor: pointer;
 }
@@ -355,7 +351,7 @@ body.tl .dropdown.body.popup.contacts-search {
     display:  inline-block;
     width: 100%;
     margin: 6px 0 0 0;
-    padding: 7px 7px 7px 35px;
+    padding: 7px 7px 7px 40px;
     border: 0 none;
     border-radius: 18px;
     font: var(--text-body1);

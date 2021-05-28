@@ -15,11 +15,11 @@ export default class Nil extends MegaRenderMixin {
     render() {
         const { title } = this.props;
         return (
-            <div className="fm-empty-contacts">
+            <div className="fm-empty-section fm-empty-contacts">
                 <div className="fm-empty-pad">
-                    <div className="fm-empty-contacts-bg" />
-                    <div className="fm-empty-cloud-txt small">{title}</div>
-                    <div className="fm-empty-description small">
+                    <i className="section-icon sprite-fm-mono icon-contacts" />
+                    <div className="fm-empty-cloud-txt">{title}</div>
+                    <div className="fm-empty-description">
                         {l[19114]}
                     </div>
                     <Button
@@ -27,8 +27,8 @@ export default class Nil extends MegaRenderMixin {
                         onClick={() => contactAddDialog()}>
                         <span>{l[71]}</span>
                     </Button>
-                    <div className="public-contact-share">
-                        <i className="sprite-fm-mono icon-link" />
+                    <div className="empty-share-public">
+                        <i className="sprite-fm-mono icon-link-circle" />
                         <span dangerouslySetInnerHTML={{ __html: l[19111] }} />
                     </div>
                 </div>

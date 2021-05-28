@@ -343,9 +343,10 @@ var exportPassword = {
             });
 
             // Hide tooltip on mouseout from itseft
-            $tip.rebind('mouseleave.hidePassTip', function() {
-
-                hidePasswordTip();
+            $tip.rebind('mouseleave.hidePassTip', function(e) {
+                if (!$(e.relatedTarget).hasClass('icon-tooltip-arrow')) {
+                    hidePasswordTip();
+                }
             });
         },
 
@@ -1661,9 +1662,10 @@ var exportExpiry = {
         });
 
         // Hide tooltip
-        $expiryIcon.rebind('mouseout.hideExpiryTip', function() {
-
-            hideExpiryTip();
+        $expiryIcon.rebind('mouseout.hideExpiryTip', function(e) {
+            if (!$(e.relatedTarget).hasClass('icon-tooltip-arrow')) {
+                hideExpiryTip();
+            }
         });
     }
 };

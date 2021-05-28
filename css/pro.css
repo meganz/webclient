@@ -572,7 +572,7 @@ i.pricing-sprite,
     font-size: 28px;
     line-height: 34px;
     color: var(--text-color-high);
-    font-family: montserrat_light, montserrat, Arial, sans-serif;
+    font-family: var(--text-font-family);
 }
 .pricing-page.plan-info {
     font-size: 16px;
@@ -589,7 +589,7 @@ i.pricing-sprite,
     line-height: 45px;
     padding: 0 15px;
     color: var(--text-color-high);
-    font-family: 'montserrat_light', 'montserrat', Arial;
+    font-family: var(--text-font-family);
 }
 .pricing-page.plan-price .asterisk {
     font-size: 20px;
@@ -605,7 +605,7 @@ i.pricing-sprite,
     color: var(--text-color-high);
     font-size: 16px;
     line-height: 19px;
-    font-family: 'montserrat_light', 'montserrat', Arial, sans-serif;
+    font-family: var(--text-font-family);
 }
 .pricing-page.plan-data {
     font-size: 15px;

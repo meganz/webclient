@@ -93,6 +93,10 @@ body {
             --text-font-family-light: 'LatoWebLight', sans-serif;
             --text-font-family-code: 'source_code_proregular', monospace;
 
+        /* font family : ONLY FOR PRODUCT PAGES */
+            --text-font-family-montserrat-bold: 'montserrat_bold', 'montserrat', arial, sans-serif;
+            --text-font-family-montserrat-light: 'montserrat_light', arial, sans-serif;
+
         /* font */
 
             --text-h1: 24px/36px var(--text-font-family);

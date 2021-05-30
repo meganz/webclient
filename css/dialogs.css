@@ -8428,7 +8428,7 @@ body.de .mega-dialog.new-group-chat {
     }
     .mega-dialog.affiliate-request .status-message {
         font: var(--text-body2);
-        padding: 30px 0 20px;
+        padding: 4px 0 40px;
         text-align: center;
     }
     .mega-dialog.affiliate-request .status-message:empty {

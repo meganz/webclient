@@ -11721,6 +11721,9 @@ code, c {
     margin-top: 10px;
     margin-left: 20px;
 }
+.mobile.account-notifications-page .content-txt {
+    color: var(--text-color-medium);
+}
 .notification-setting-row {
     line-height: 30px;
     padding: 10px 20px;

@@ -3008,6 +3008,13 @@ FullScreenManager.prototype.enterFullscreen = function() {
 (function _MediaAttribute(global) {
     'use strict';
 
+    const mp4brands = new Set([
+        'mp41', 'mp42',
+        'isom', 'iso2', 'iso4', 'iso5',
+        '3gp4', '3gp5', '3gp6', '3gp7', '3gp8',
+        'avc1', 'f4v ', 'M4V '
+    ]);
+
     function xxkey(k) {
         var key = new Uint32Array(4);
 
@@ -3119,21 +3126,9 @@ FullScreenManager.prototype.enterFullscreen = function() {
             return 0;
         };
 
-        switch (isMediaSourceSupported() && container) {
-            case '3gp4':
-            case '3gp5':
-            case '3gp6':
-            case '3gp7':
-            case '3gp8':
-            case 'mp41':
-            case 'mp42':
-            case 'isom':
-            case 'iso2':
-            case 'iso4':
-            case 'iso5':
-            case 'M4V ':
-            case 'avc1': // JVT
-            case 'f4v ': // Adobe Flash (MPEG-4 Part 12)
+        const format = isMediaSourceSupported() ? mp4brands.has(container) ? '--mp4-brand--$' : container : 0;
+        switch (format) {
+            case '--mp4-brand--$':
             case 'qt  ' + (mega.chrome || audiocodec ? '$' : ''):
                 if (videocodec === 'avc1') {
                     mime = 'video/mp4; codecs="avc1.640029';
@@ -3526,6 +3521,10 @@ FullScreenManager.prototype.enterFullscreen = function() {
             };
 
             M.req(req).tryCatch(success, reject);
+
+            if (Object(res.General).InternetMediaType === 'video/mp4' && !mp4brands.has(res.container)) {
+                eventlog(99729, JSON.stringify([1, res.containerid, res.container, res.vcodec]));
+            }
 
             if (!res.vcodec && req.n) {
                 if (Object(res.General).Cover_Data) {

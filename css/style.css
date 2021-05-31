@@ -12379,6 +12379,17 @@ div.camera-bottom-txt {
 .chart.progressbars .left-chart span::before {
     margin-left: 50%;
 }
+.chart.progressbars span::after {
+    content: '';
+    background: var(--stroke-dark-grey);
+    width: 6px;
+    height: 6px;
+    position: absolute;
+    z-index: 12;
+    bottom: 0;
+    left: calc(50% - 3px);
+    border-radius: 5px;
+}
 .account.chart.data {
     position: relative;
     margin: 9px 0 0 0;

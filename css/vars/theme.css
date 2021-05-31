@@ -173,6 +173,7 @@ html .theme-light-forced {
         --stroke-grey-1: #fafafa;
         --stroke-grey-2: #eee;
         --stroke-grey-6: #eee;
+        --stroke-dark-grey: #555555;
         --stroke-info: #2ba6de;
         --stroke-success: #00bfa5;
         --stroke-warning: #ff9924;
@@ -358,7 +359,7 @@ html .theme-dark-forced {
         --surface-black: #000;
         --surface-black-bar: rgba(0, 0, 0, 0.7);
         --surface-scrim: rgba(0, 0, 0, 0.32);
-        --surface-warning: linear-gradient(180deg, rgba(255, 235, 0, 1) 0%, rgba(255, 211, 0, 1) 100%);
+        --surface-warning: linear-gradient(0deg, rgba(255, 235, 0, 1) 0%, rgba(255, 211, 0, 1) 100%);
         --surface-error: linear-gradient(180deg, rgba(255, 158, 154, 1) 0%, rgba(255, 101, 96, 1) 100%);
         --surface-error-hover: linear-gradient(180deg, rgba(255, 174, 171, 1) 0%, rgba(255, 119, 113, 1) 100%);
         --surface-error-active: linear-gradient(180deg, rgba(255, 139, 134, 1) 0%, rgba(255, 83, 79, 1) 100%);
@@ -373,6 +374,7 @@ html .theme-dark-forced {
         --stroke-grey-1: #222;
         --stroke-grey-2: #444;
         --stroke-grey-6: #000;
+        --stroke-dark-grey: #e6e6e6;
         --stroke-info: #6fd7ff;
         --stroke-success: #5afee8;
         --stroke-warning: #fec35a;

@@ -253,17 +253,18 @@ accountUI.general = {
 
             var $bandwidthChart = $('.fm-account-blocks.bandwidth', this.$contentBlock);
             var fullDeg = 360;
-            var direction = -1;
             var deg = fullDeg * this.perc_c_b / 100;
 
             // Used Bandwidth chart
-            if (deg <= 180) {
-                $('.left-chart span', $bandwidthChart).css('transform', 'rotate(' + deg * direction + 'deg)');
-                $('.right-chart span', $bandwidthChart).removeAttr('style');
+            if (this.perc_c_b < 50) {
+                $('.left-chart span', $bandwidthChart).css('transform', 'rotate(180deg)');
+                $('.right-chart span', $bandwidthChart).css('transform', `rotate(${180 - deg}deg)`);
+                $('.right-chart', $bandwidthChart).addClass('low-percent-clip');
+                $('.left-chart', $bandwidthChart).addClass('low-percent-clip');
             }
             else {
                 $('.left-chart span', $bandwidthChart).css('transform', 'rotate(180deg)');
-                $('.right-chart span', $bandwidthChart).css('transform', 'rotate(' + (deg - 180) * direction + 'deg)');
+                $('.right-chart span', $bandwidthChart).css('transform', `rotate(${(deg - 180) * -1}deg)`);
             }
 
             if (this.perc_c_b > 99 || dlmanager.isOverQuota) {
@@ -338,17 +339,18 @@ accountUI.general = {
             }
 
             var fullDeg = 360;
-            var direction = -1;
             var deg = fullDeg * this.perc_c_s / 100;
 
             // Used space chart
-            if (deg <= 180) {
-                $('.left-chart span', $storageChart).css('transform', 'rotate(' + deg * direction + 'deg)');
-                $('.right-chart span', $storageChart).removeAttr('style');
+            if (this.perc_c_s < 50) {
+                $('.left-chart span', $storageChart).css('transform', 'rotate(180deg)');
+                $('.right-chart span', $storageChart).css('transform', `rotate(${180 - deg}deg)`);
+                $('.right-chart', $storageChart).addClass('low-percent-clip');
+                $('.left-chart', $storageChart).addClass('low-percent-clip');
             }
             else {
                 $('.left-chart span', $storageChart).css('transform', 'rotate(180deg)');
-                $('.right-chart span', $storageChart).css('transform', 'rotate(' + (deg - 180) * direction + 'deg)');
+                $('.right-chart span', $storageChart).css('transform', `rotate(${(deg - 180) * -1}deg)`);
             }
 
             // Maximum disk space

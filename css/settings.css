@@ -924,26 +924,31 @@
     color: var(--text-color-error);
 }
 .quota-banner .chart.progressbars span::before {
-    background: var(--surface-dark-grey);
+    background: var(--stroke-dark-grey);
 }
 .quota-banner .fm-account-blocks:not(.no-percs) .chart.progressbars span::after {
     content: '';
-    background: var(--surface-dark-grey);
+    background: var(--stroke-dark-grey);
     width: 6px;
     height: 6px;
     position: absolute;
     z-index: 12;
-    top: 0;
+    bottom: 0;
     left: calc(50% - 3px);
     border-radius: 5px;
 }
-.quota-banner .going-out .chart.progressbars span::before,
+.quota-banner .going-out .chart.progressbars span::before {
+    background: var(--stroke-warning);
+}
 .quota-banner .fm-account-blocks:not(.no-percs).going-out .chart.progressbars span::after {
-    background: var(--surface-warning);
+    background: var(--stroke-warning);
 }
 .quota-banner .exceeded .chart.progressbars span::before,
 .quota-banner .fm-account-blocks:not(.no-percs).exceeded .chart.progressbars span::after {
-    background: var(--surface-error);
+    background: var(--stroke-error);
+}
+.quota-banner .fm-account-blocks:not(.no-percs).exceeded .chart.progressbars span::after {
+    display: none;
 }
 
 /* Small rounded chart */
@@ -975,8 +980,11 @@
 .tiny-chart .chart.progressbars .right-chart {
     clip: rect(0, 64px, 64px, 32px);
 }
-.tiny-chart .chart.progressbars .left-chart {
+.tiny-chart .chart.progressbars .right-chart.low-percent-clip {
     clip: rect(0, 32px, 64px, 0);
+}
+.tiny-chart .chart.progressbars .left-chart.low-percent-clip {
+    clip: rect(0, 64px, 64px, 32px);
 }
 .tiny-chart .account.chart.body::after {
     width: 52px;

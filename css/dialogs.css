@@ -411,7 +411,7 @@ body.de .mega-dialog.new-group-chat {
 }
 .fm-dialog-table.grid-table {
     width: calc(100% - 16px);
-    margin: -20px auto 0;
+    margin: 0 auto 0;
 }
 .fm-dialog-table.grid-table td {
     display: flex;
@@ -433,6 +433,9 @@ body.de .mega-dialog.new-group-chat {
 }
 .fm-dialog-table.grid-table .grid-status-icon {
     margin: 0 auto;
+}
+.mega-dialog.add-from-cloud .tranfer-filetype-txt {
+    max-width: 900px;
 }
 .fm-dialog-table.grid-table td .tooltip-handler-container {
     height: 24px;
@@ -585,6 +588,9 @@ body.de .mega-dialog.new-group-chat {
     .mega-dialog.add-from-cloud {
         width: 1219px;
     }
+    .mega-dialog.add-from-cloud .tranfer-filetype-txt {
+        max-width: 770px;
+    }
 }
 @media only screen and (max-height: 850px) {
     .fm-dialog-scroll, .add-from-cloud .dialog-empty-block {
@@ -604,10 +610,16 @@ body.de .mega-dialog.new-group-chat {
     .mega-dialog.add-from-cloud {
         width: 1047px;
     }
+    .mega-dialog.add-from-cloud .tranfer-filetype-txt {
+        max-width: 600px;
+    }
 }
 @media only screen and (max-width: 1024px) {
     .mega-dialog.add-from-cloud {
         width: 700px;
+    }
+    .mega-dialog.add-from-cloud .tranfer-filetype-txt {
+        max-width: 250px;
     }
 }
 

@@ -7005,6 +7005,7 @@ table {
 .shares-tab-lnk.active,
 .contacts-tab-lnk.active,
 .account.tab-lnk.active {
+    font: var(--text-h3-bold);
     border-color: var(--secondary-blue);
     color: var(--text-color-high);
     opacity: 1;

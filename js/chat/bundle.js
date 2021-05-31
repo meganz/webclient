@@ -3335,6 +3335,7 @@ function _applyDecoratedDescriptor(target, property, decorators, descriptor, con
 }
 
 module.exports = _applyDecoratedDescriptor;
+module.exports["default"] = module.exports, module.exports.__esModule = true;
 
 /***/ }),
 
@@ -3355,10 +3356,12 @@ function _extends() {
     return target;
   };
 
+  module.exports["default"] = module.exports, module.exports.__esModule = true;
   return _extends.apply(this, arguments);
 }
 
 module.exports = _extends;
+module.exports["default"] = module.exports, module.exports.__esModule = true;
 
 /***/ }),
 
@@ -7490,12 +7493,12 @@ var perfectScrollbar = __webpack_require__(11);
 
 
 
-var _dec, _class, _temp;
+var _dec, _class;
 
 
 
 
-let megaList2_MegaList2 = (_dec = Object(mixins["SoonFcWrap"])(30, true), (_class = (_temp = class MegaList2 extends mixins["MegaRenderMixin"] {
+let megaList2_MegaList2 = (_dec = Object(mixins["SoonFcWrap"])(30, true), (_class = class MegaList2 extends mixins["MegaRenderMixin"] {
   constructor(props) {
     super(props);
     this._calculated = false;
@@ -7835,7 +7838,7 @@ let megaList2_MegaList2 = (_dec = Object(mixins["SoonFcWrap"])(30, true), (_clas
     }, listAdapterOpts), nodes)));
   }
 
-}, _temp), (applyDecoratedDescriptor_default()(_class.prototype, "onPsUserScroll", [_dec], Object.getOwnPropertyDescriptor(_class.prototype, "onPsUserScroll"), _class.prototype)), _class));
+}, (applyDecoratedDescriptor_default()(_class.prototype, "onPsUserScroll", [_dec], Object.getOwnPropertyDescriptor(_class.prototype, "onPsUserScroll"), _class.prototype)), _class));
 // CONCATENATED MODULE: ./js/ui/jsx/fm/nodes/nodeProperties.jsx
 class NodeProperties {
   static get(node, changeListener) {
@@ -8935,7 +8938,7 @@ class fmView_FMView extends mixins["MegaRenderMixin"] {
       const sortId = props.fmConfigSortId;
       assert(sortId, 'missing fmConfigSortId');
 
-      if ((_fmconfig$sortmodes = fmconfig.sortmodes) == null ? void 0 : (_fmconfig$sortmodes$s = _fmconfig$sortmodes[sortId]) == null ? void 0 : _fmconfig$sortmodes$s.n) {
+      if ((_fmconfig$sortmodes = fmconfig.sortmodes) != null && (_fmconfig$sortmodes$s = _fmconfig$sortmodes[sortId]) != null && _fmconfig$sortmodes$s.n) {
         var _fmconfig$sortmodes2;
 
         initialSortBy = this._translateFmConfigSortMode((_fmconfig$sortmodes2 = fmconfig.sortmodes) == null ? void 0 : _fmconfig$sortmodes2[sortId]);
@@ -8959,7 +8962,7 @@ class fmView_FMView extends mixins["MegaRenderMixin"] {
     this.onAttachClicked = this.onAttachClicked.bind(this);
     this.onContextMenu = this.onContextMenu.bind(this);
 
-    if ((_this$dataSource = this.dataSource) == null ? void 0 : _this$dataSource.addChangeListener) {
+    if ((_this$dataSource = this.dataSource) != null && _this$dataSource.addChangeListener) {
       this._listener = this.dataSource.addChangeListener(() => {
         if (!this.isMounted()) {
           return;
@@ -8979,7 +8982,7 @@ class fmView_FMView extends mixins["MegaRenderMixin"] {
     assert(sortId, 'missing fmConfigSortId');
     const sortByArr = [];
 
-    if (currentSortModes == null ? void 0 : currentSortModes.n) {
+    if (currentSortModes != null && currentSortModes.n) {
       sortByArr[0] = currentSortModes.n;
       const sortMap = this.props.fmConfigSortMap;
       const aliasKeys = sortMap && Object.keys(sortMap) || [];
@@ -9141,7 +9144,7 @@ class fmView_FMView extends mixins["MegaRenderMixin"] {
 
     super.componentDidMount();
 
-    if (!((_this$dataSource2 = this.dataSource) == null ? void 0 : _this$dataSource2.addChangeListener)) {
+    if (!((_this$dataSource2 = this.dataSource) != null && _this$dataSource2.addChangeListener)) {
       this.addOrUpdRawListener();
     }
 
@@ -9161,7 +9164,7 @@ class fmView_FMView extends mixins["MegaRenderMixin"] {
         'highlighted': []
       };
 
-      if (!((_this$dataSource3 = this.dataSource) == null ? void 0 : _this$dataSource3.addChangeListener)) {
+      if (!((_this$dataSource3 = this.dataSource) != null && _this$dataSource3.addChangeListener)) {
         this.addOrUpdRawListener();
       }
 
@@ -10344,11 +10347,11 @@ class resultContainer_ResultContainer extends mixins["MegaRenderMixin"] {
             const entry = entries[i];
             const target = entry.target;
 
-            if ((_target$classList = target.classList) == null ? void 0 : _target$classList.contains(NODE_CLASS)) {
+            if ((_target$classList = target.classList) != null && _target$classList.contains(NODE_CLASS)) {
               target.style.backgroundImage = entry.isIntersecting ? "url(" + target.dataset.url + ")" : null;
             }
 
-            if (entry.isIntersecting && ((_target$classList2 = target.classList) == null ? void 0 : _target$classList2.contains(RESULTS_END_CLASS))) {
+            if (entry.isIntersecting && (_target$classList2 = target.classList) != null && _target$classList2.contains(RESULTS_END_CLASS)) {
               this.props.onPaginate();
             }
           }
@@ -10691,7 +10694,7 @@ class gifPanel_GifPanel extends mixins["MegaRenderMixin"] {
 // CONCATENATED MODULE: ./js/chat/ui/typingArea.jsx
 
 
-var typingArea_dec, _dec2, typingArea_class, _class2, typingArea_temp;
+var typingArea_dec, _dec2, typingArea_class, _class2, _temp;
 
 var typingArea_React = __webpack_require__(0);
 
@@ -10702,7 +10705,7 @@ var typingArea_ReactDOM = __webpack_require__(6);
 
 
 
-let typingArea_TypingArea = (typingArea_dec = Object(mixins["SoonFcWrap"])(60), _dec2 = Object(mixins["SoonFcWrap"])(54, true), (typingArea_class = (typingArea_temp = _class2 = class TypingArea extends mixins["MegaRenderMixin"] {
+let typingArea_TypingArea = (typingArea_dec = Object(mixins["SoonFcWrap"])(60), _dec2 = Object(mixins["SoonFcWrap"])(54, true), (typingArea_class = (_temp = _class2 = class TypingArea extends mixins["MegaRenderMixin"] {
   constructor(props) {
     super(props);
     var initialText = this.props.initialText;
@@ -11497,7 +11500,7 @@ let typingArea_TypingArea = (typingArea_dec = Object(mixins["SoonFcWrap"])(60), 
 
 }, _class2.defaultProps = {
   'textareaMaxHeight': "40%"
-}, typingArea_temp), (applyDecoratedDescriptor_default()(typingArea_class.prototype, "updateScroll", [typingArea_dec], Object.getOwnPropertyDescriptor(typingArea_class.prototype, "updateScroll"), typingArea_class.prototype), applyDecoratedDescriptor_default()(typingArea_class.prototype, "handleWindowResize", [_dec2], Object.getOwnPropertyDescriptor(typingArea_class.prototype, "handleWindowResize"), typingArea_class.prototype)), typingArea_class));
+}, _temp), (applyDecoratedDescriptor_default()(typingArea_class.prototype, "updateScroll", [typingArea_dec], Object.getOwnPropertyDescriptor(typingArea_class.prototype, "updateScroll"), typingArea_class.prototype), applyDecoratedDescriptor_default()(typingArea_class.prototype, "handleWindowResize", [_dec2], Object.getOwnPropertyDescriptor(typingArea_class.prototype, "handleWindowResize"), typingArea_class.prototype)), typingArea_class));
 // CONCATENATED MODULE: ./js/chat/ui/whosTyping.jsx
 var whosTyping_React = __webpack_require__(0);
 
@@ -16618,7 +16621,7 @@ pushSettingsDialog_PushSettingsDialog.default = pushSettingsDialog_PushSettingsD
 // CONCATENATED MODULE: ./js/chat/ui/conversationpanel.jsx
 
 
-var conversationpanel_dec, conversationpanel_dec2, _dec3, _dec4, conversationpanel_class, conversationpanel_temp;
+var conversationpanel_dec, conversationpanel_dec2, _dec3, _dec4, conversationpanel_class;
 
 
 
@@ -16934,7 +16937,7 @@ class conversationpanel_ConversationRightArea extends mixins["MegaRenderMixin"] 
       isVisible: self.props.chatRoom.isCurrentlyActive,
       chatRoom: self.props.chatRoom
     }, external_React_default.a.createElement("div", {
-      className: "chat-right-pad"
+      className: "\n                        chat-right-pad\n                        " + (room.haveActiveCall() ? 'in-call' : '') + "\n                    "
     }, external_React_default.a.createElement(accordion_Accordion, {
       chatRoom: room,
       onToggle: SoonFc(20, function () {
@@ -17107,7 +17110,7 @@ class conversationpanel_ConversationRightArea extends mixins["MegaRenderMixin"] 
 conversationpanel_ConversationRightArea.defaultProps = {
   'requiresUpdateOnResize': true
 };
-let conversationpanel_ConversationPanel = (conversationpanel_dec = utils["default"].SoonFcWrap(360), conversationpanel_dec2 = utils["default"].SoonFcWrap(50), _dec3 = Object(mixins["SoonFcWrap"])(450, true), _dec4 = Object(mixins["timing"])(0.7, 9), (conversationpanel_class = (conversationpanel_temp = class ConversationPanel extends mixins["MegaRenderMixin"] {
+let conversationpanel_ConversationPanel = (conversationpanel_dec = utils["default"].SoonFcWrap(360), conversationpanel_dec2 = utils["default"].SoonFcWrap(50), _dec3 = Object(mixins["SoonFcWrap"])(450, true), _dec4 = Object(mixins["timing"])(0.7, 9), (conversationpanel_class = class ConversationPanel extends mixins["MegaRenderMixin"] {
   constructor(props) {
     super(props);
 
@@ -18484,7 +18487,7 @@ let conversationpanel_ConversationPanel = (conversationpanel_dec = utils["defaul
     }, external_React_default.a.createElement("i", {
       className: "small-icon conversations"
     }), l[8884])), external_React_default.a.createElement("div", {
-      className: "\n                            chat-topic-block\n                            " + topicBlockClass + "\n                            " + (room.havePendingCall() || room.haveActiveCall() ? 'have-pending-group-call' : '') + "\n                        "
+      className: "\n                            chat-topic-block\n                            " + topicBlockClass + "\n                            " + (room.haveActiveCall() ? 'in-call' : '') + "\n                        "
     }, external_React_default.a.createElement("div", {
       className: "chat-topic-buttons"
     }, external_React_default.a.createElement(ui_buttons["Button"], {
@@ -18655,7 +18658,7 @@ let conversationpanel_ConversationPanel = (conversationpanel_dec = utils["defaul
     }))))))));
   }
 
-}, conversationpanel_temp), (applyDecoratedDescriptor_default()(conversationpanel_class.prototype, "onMouseMove", [conversationpanel_dec], Object.getOwnPropertyDescriptor(conversationpanel_class.prototype, "onMouseMove"), conversationpanel_class.prototype), applyDecoratedDescriptor_default()(conversationpanel_class.prototype, "onMessagesScrollReinitialise", [conversationpanel_dec2], Object.getOwnPropertyDescriptor(conversationpanel_class.prototype, "onMessagesScrollReinitialise"), conversationpanel_class.prototype), applyDecoratedDescriptor_default()(conversationpanel_class.prototype, "enableScrollbar", [_dec3], Object.getOwnPropertyDescriptor(conversationpanel_class.prototype, "enableScrollbar"), conversationpanel_class.prototype), applyDecoratedDescriptor_default()(conversationpanel_class.prototype, "render", [_dec4], Object.getOwnPropertyDescriptor(conversationpanel_class.prototype, "render"), conversationpanel_class.prototype)), conversationpanel_class));
+}, (applyDecoratedDescriptor_default()(conversationpanel_class.prototype, "onMouseMove", [conversationpanel_dec], Object.getOwnPropertyDescriptor(conversationpanel_class.prototype, "onMouseMove"), conversationpanel_class.prototype), applyDecoratedDescriptor_default()(conversationpanel_class.prototype, "onMessagesScrollReinitialise", [conversationpanel_dec2], Object.getOwnPropertyDescriptor(conversationpanel_class.prototype, "onMessagesScrollReinitialise"), conversationpanel_class.prototype), applyDecoratedDescriptor_default()(conversationpanel_class.prototype, "enableScrollbar", [_dec3], Object.getOwnPropertyDescriptor(conversationpanel_class.prototype, "enableScrollbar"), conversationpanel_class.prototype), applyDecoratedDescriptor_default()(conversationpanel_class.prototype, "render", [_dec4], Object.getOwnPropertyDescriptor(conversationpanel_class.prototype, "render"), conversationpanel_class.prototype)), conversationpanel_class));
 class conversationpanel_ConversationPanels extends mixins["MegaRenderMixin"] {
   render() {
     var self = this;
@@ -20855,7 +20858,7 @@ contactsPanel_ContactsPanel.getUserFingerprint = handle => {
 
 
 
-var conversations_dec, conversations_dec2, conversations_class, conversations_dec3, conversations_class2, conversations_temp;
+var conversations_dec, conversations_dec2, conversations_class, conversations_dec3, conversations_class2;
 
 
 
@@ -21689,7 +21692,7 @@ class conversations_ArchivedConversationsList extends mixins["MegaRenderMixin"] 
 
 }
 
-let conversations_ConversationsApp = (conversations_dec3 = utils["default"].SoonFcWrap(80), (conversations_class2 = (conversations_temp = class ConversationsApp extends mixins["MegaRenderMixin"] {
+let conversations_ConversationsApp = (conversations_dec3 = utils["default"].SoonFcWrap(80), (conversations_class2 = class ConversationsApp extends mixins["MegaRenderMixin"] {
   constructor(props) {
     super(props);
 
@@ -22080,7 +22083,7 @@ let conversations_ConversationsApp = (conversations_dec3 = utils["default"].Soon
     }, archivedChatsCount))), rightPane);
   }
 
-}, conversations_temp), (applyDecoratedDescriptor_default()(conversations_class2.prototype, "handleWindowResize", [conversations_dec3], Object.getOwnPropertyDescriptor(conversations_class2.prototype, "handleWindowResize"), conversations_class2.prototype)), conversations_class2));
+}, (applyDecoratedDescriptor_default()(conversations_class2.prototype, "handleWindowResize", [conversations_dec3], Object.getOwnPropertyDescriptor(conversations_class2.prototype, "handleWindowResize"), conversations_class2.prototype)), conversations_class2));
 
 if (false) {}
 

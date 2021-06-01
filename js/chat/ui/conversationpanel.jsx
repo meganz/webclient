@@ -373,7 +373,11 @@ export class ConversationRightArea extends MegaRenderMixin {
                 triggerGlobalResize={true}
                 isVisible={self.props.chatRoom.isCurrentlyActive}
                 chatRoom={self.props.chatRoom}>
-                <div className="chat-right-pad">
+                <div
+                    className={`
+                        chat-right-pad
+                        ${room.haveActiveCall() ? 'in-call' : ''}
+                    `}>
                     <Accordion
                         chatRoom={room}
                         onToggle={SoonFc(20, function() {
@@ -2148,7 +2152,7 @@ export class ConversationPanel extends MegaRenderMixin {
                         className={`
                             chat-topic-block
                             ${topicBlockClass}
-                            ${room.havePendingCall() || room.haveActiveCall() ? 'have-pending-group-call' : ''}
+                            ${room.haveActiveCall() ? 'in-call' : ''}
                         `}>
                         <div className="chat-topic-buttons">
                             <Button

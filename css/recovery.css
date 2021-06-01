@@ -740,6 +740,7 @@
     position: relative;
 }
 .improved-recovery-steps .app-button-block i.icon-dropdown {
+    pointer-events: none;
     --icon-size: 24px;
     position: absolute;
     right: 0;

@@ -18155,6 +18155,14 @@
         "developer_comment": "A text for more options tooltip in Selection Manager",
         "string": "More"
     },
+    "gotoacc": {
+        "developer_comment": "Button's text in payment succeeded layout",
+        "string": "Go to my account"
+    },
+    "returntoacc": {
+        "developer_comment": "Button's text in payment failed layout",
+        "string": "Return to my account"
+    },
     "v4onboard_dialogtext": {
         "developer_comment": "Main text of the dialog for Revamp lite onboarding",
         "string": "Our new dark mode is now available as an early release. Tell us what you think."

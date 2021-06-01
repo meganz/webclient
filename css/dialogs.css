@@ -1862,7 +1862,7 @@ body.de .mega-dialog.new-group-chat {
         float: right;
     }
     .mega-dialog.export-links-dialog header h2.active {
-        border-color: var(--stroke-error);
+        border-color: var(--stroke-info);
     }
     .mega-dialog.export-links-dialog.embed .options {
         padding-top: 10px;

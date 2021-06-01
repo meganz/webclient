@@ -1913,6 +1913,20 @@ var addressDialog = {
         clearTimeout(pro.propay.paymentStatusChecker);
         clearTimeout(pro.propay.listenRemover);
 
+        const failHandle = (error) => {
+            const $stripeDialog = $('.payment-stripe-dialog');
+            const $stripeFailureDialog = $('.payment-stripe-failure-dialog');
+            const $stripeIframe = $('iframe#stripe-widget', $stripeDialog);
+
+            $('button.js-close, .btn-close-dialog', $stripeFailureDialog).rebind('click.stripeDlg', closeDialog);
+
+            $('.stripe-error', $stripeFailureDialog).text(error || '');
+
+            $stripeIframe.remove();
+            $stripeDialog.addClass('hidden');
+            M.safeShowDialog('stripe-pay-failure', $stripeFailureDialog);
+        };
+
         if (event && event.origin === addressDialog.gatewayOrigin && event.data) {
 
             if (event.data === 'closeme') {
@@ -1920,19 +1934,7 @@ var addressDialog = {
             }
 
             if (event.data.startsWith('payfail^')) {
-                const $stripeDialog = $('.payment-stripe-dialog');
-                const $stripeFailureDialog = $('.payment-stripe-failure-dialog');
-                const $stripeIframe = $('iframe#stripe-widget', $stripeDialog);
-                const extraError = event.data.split('^')[1];
-
-                $('button.js-close, .btn-close-dialog', $stripeFailureDialog).rebind('click.stripeDlg', closeDialog);
-
-                const extraTxt = extraError || '';
-                $('.stripe-error', $stripeFailureDialog).text(extraTxt);
-
-                $stripeIframe.remove();
-                $stripeDialog.addClass('hidden');
-                M.safeShowDialog('stripe-pay-failure', $stripeFailureDialog);
+                failHandle(event.data.split('^')[1]);
             }
             else if (event.data === 'paysuccess') {
 
@@ -1941,6 +1943,15 @@ var addressDialog = {
                 pro.propay.paymentStatusChecker =
                     setTimeout(addressDialog.stripePaymentChecker
                         .bind(addressDialog, addressDialog.stripeSaleId), 500);
+            }
+            else if (event.data.startsWith('action^')) {
+                const destURL = event.data.split('^')[1] || '';
+                if (!destURL) {
+                    failHandle();
+                }
+                else {
+                    window.location = destURL;
+                }
             }
         }
         else {

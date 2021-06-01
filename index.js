@@ -950,6 +950,9 @@ function init_page() {
         mobile.achieve.howItWorks.init();
         return false;
     }
+    else if (is_mobile && u_type && page === 'fm/account/plan') {
+        return loadSubPage('fm/account');
+    }
     else if (is_mobile && u_type && page === 'fm/account/invites') {
         parsepage(pages['mobile']);
         mobile.achieve.invites.init();

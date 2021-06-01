@@ -932,7 +932,7 @@ function fmLeftMenuUI() {
     }
 
     // handle the RubbishBin icon changes
-    var $icon = $('.nw-fm-left-icon.rubbish-bin');
+    var $icon = $('.fm-left-panel .rubbish-bin');
     var rubNodes = Object.keys(M.c[M.RubbishID] || {});
 
     if (rubNodes.length) {

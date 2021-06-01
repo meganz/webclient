@@ -743,6 +743,7 @@
     --icon-size: 24px;
     position: absolute;
     right: 0;
+    cursor: default;
 }
 .improved-recovery-steps .app-button-block:hover {
     box-shadow: 0 0 0 4px rgba(0,0,0,0.1);

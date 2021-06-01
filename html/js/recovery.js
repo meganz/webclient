@@ -347,7 +347,7 @@ AccountRecoveryControl.prototype.showStep = function _showStep(step, branch) {
     this.$emailBlock.addClass('hidden');
     this.$navigationControl.removeClass('hidden');
 
-    window.scrollTo(0, 0);
+    $('#startholder.fmholder').animate({scrollTop: 0}, 0);
     if (step === 0) {
         if (is_mobile) {
             this.$navigationControl.find('.fm-icon.left').addClass('mega').removeClass('back')

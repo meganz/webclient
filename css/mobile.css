@@ -8067,6 +8067,14 @@ textarea.mobile.support-text-field {
     float: initial;
     width: 260px;
     max-width: 100%;
+    background: none !important;
+    display: flex;
+    align-items: center;
+}
+.mobile .improved-recovery-steps .app-instruction-block .app-button-block .icon-dropdown {
+    position: absolute;
+    --icon-size: 24px;
+    right: 12px;
 }
 .mobile .improved-recovery-steps .default-select::before, .mobile .improved-recovery-steps .ui-selectmenu-button::before {
     content: none !important;

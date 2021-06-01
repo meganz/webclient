@@ -46,7 +46,7 @@ var megasync = (function() {
     /** a function to switch the url to communicate with MEGASync */
     function switchMegasyncUrlToHttpWhenPossible() {
 
-        if (!ua || !ua.details || !ua.details.browser || !ua.details.version || is_extension) {
+        if (!ua || !ua.details || !ua.details.browser || !ua.details.version) {
             return ShttpMegasyncUrl;
         }
 
@@ -83,7 +83,7 @@ var megasync = (function() {
             return httpMegasyncUrl;
         }
         else {
-            return ShttpMegasyncUrl;
+            return httpMegasyncUrl;
         }
 
     }
@@ -395,6 +395,14 @@ var megasync = (function() {
 
         if (!megasyncUrl) {
             megasyncUrl = switchMegasyncUrlToHttpWhenPossible();
+            if (megasyncUrl === ShttpMegasyncUrl) {
+                // not supported any more.
+                const errMsg = 'Browser doesn\'t support Mega Desktop integration';
+                if (typeof reject === 'function') {
+                    reject(errMsg);
+                }
+                return MegaPromise.reject(errMsg);
+            }
         }
 
         var promise = M.xhr({

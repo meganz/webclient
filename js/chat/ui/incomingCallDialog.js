@@ -197,7 +197,7 @@
                     </div>
                     <div class="incoming-call-buttons">
                         <button class="mega-button negative large incoming-call-button cancel-call">
-                            <div><i class="sprite-fm-mono icon-handset-ended"></i></div>
+                            <div><i class="sprite-fm-mono icon-end-call"></i></div>
                         </button>
                         <button class="mega-button positive large incoming-call-button audio-call">
                             <div><i class="sprite-fm-mono icon-phone"></i></div>

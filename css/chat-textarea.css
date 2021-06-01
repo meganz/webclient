@@ -51,9 +51,6 @@
 .chat-textarea .popup-button.emoji-button i {
     --icon-size: 24px;
 }
-.chat-textarea .popup-button.emoji-button i:hover {
-    background-position: 33% 0;
-}
 .chat-textarea .popup-button.gif-button {
     right: 48px;
     width: 22px;

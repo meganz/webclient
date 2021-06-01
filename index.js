@@ -2792,6 +2792,7 @@ function topmenuUI() {
     });
 
     $menuUpgradeAccount.rebind('click.openpricing', function() {
+        topMenu(1);
         loadSubPage('pro');
     });
 

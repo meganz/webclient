@@ -2286,13 +2286,8 @@ MegaUtils.prototype.getFileSystemEntries = promisify(function(resolve, reject, a
  * @param {*} [essential] as per EU's cookie law, is this an essential 'cookie'?
  * @returns {Promise}
  */
-MegaUtils.prototype.getPersistentData = promisify(async function(resolve, reject, k, essential) {
+MegaUtils.prototype.getPersistentData = async function(k, essential) {
     'use strict';
-
-    var self = this;
-    var fallback = function() {
-        self.onPersistentDB('get', k, null, true).then(resolve, reject);
-    };
 
     if (!essential && 'csp' in window) {
         const value = await this.onPersistentDB.fallback('get', k).catch(nop);
@@ -2301,31 +2296,31 @@ MegaUtils.prototype.getPersistentData = promisify(async function(resolve, reject
             await csp.init();
             if (csp.has('pref')) {
                 await this.onPersistentDB.fallback('rem', k).catch(nop);
-                await this.setPersistentData(k, value, true).catch(dump);
+                await this.setPersistentData(k, value).catch(dump);
             }
-            return resolve(value);
+            return value;
         }
     }
 
     if (M.requestFileSystem) {
-        var tmpPromise = this.getFileSystemEntry(k);
+        const entry = await this.getFileSystemEntry(k).catch(nop);
 
-        tmpPromise.then(function(entry) {
-            return self.readFileEntry(entry, 'readAsText');
-        }).then(function(data) {
-            resolve(JSON.parse(data));
-        }).catch(function(ex) {
-            if (ex && ex.name === 'SecurityError') {
-                // Running on Incognito mode?
-                return fallback();
+        if (entry) {
+            const data = tryCatch(e => JSON.parse(e), false)(await this.readFileEntry(entry, 'readAsText').catch(nop));
+
+            if (data !== undefined) {
+                if (!essential) {
+                    // @todo remove in ~4 months..
+                    await this.delPersistentData(k).catch(nop);
+                    await this.setPersistentData(k, data).catch(dump);
+                }
+                return data;
             }
-            reject(ex);
-        });
+        }
     }
-    else {
-        fallback();
-    }
-});
+
+    return this.onPersistentDB('get', k, null, true);
+};
 
 /**
  * Save data into persistent storage
@@ -2349,7 +2344,8 @@ MegaUtils.prototype.setPersistentData = promisify(async function(resolve, reject
         }
     }
 
-    if (M.requestFileSystem) {
+    // @todo deprecate...
+    if (essential && M.requestFileSystem) {
         var tmpPromise = this.getFileSystemEntry(k, true);
 
         tmpPromise.then(function(entry) {
@@ -2392,35 +2388,17 @@ MegaUtils.prototype.setPersistentData = promisify(async function(resolve, reject
  * @param {String} k The key identifying the data
  * @returns {Promise}
  */
-MegaUtils.prototype.delPersistentData = promisify(function(resolve, reject, k) {
+MegaUtils.prototype.delPersistentData = function(k) {
     'use strict';
 
-    var self = this;
-    var fallback = function() {
-        self.onPersistentDB('rem', k, null, true).then(resolve, reject);
-    };
-
-    if ('csp' in window) {
-        this.onPersistentDB.fallback('rem', k).dump();
-    }
-
-    if (M.requestFileSystem) {
-        var tmpPromise = this.getFileSystemEntry(k);
-
-        tmpPromise.then(function(entry) {
-            entry.remove(resolve, reject);
-        }).catch(function(ex) {
-            if (ex && ex.name === "SecurityError") {
-                // Running on Incognito mode?
-                return fallback();
-            }
-            reject(ex);
-        });
-    }
-    else {
-        fallback();
-    }
-});
+    return Promise.allSettled([
+        this.onPersistentDB.fallback('rem', k),
+        this.onPersistentDB('rem', k, null, true),
+        M.requestFileSystem && promisify((resolve, reject) => {
+            this.getFileSystemEntry(k).then(entry => entry.remove(resolve, reject)).catch(reject);
+        })()
+    ]);
+};
 
 /**
  * Enumerates all persistent data entries
@@ -2506,7 +2484,7 @@ MegaUtils.prototype.getPersistentDataEntries = promisify(async function(resolve,
                 var entries = Object.keys(result);
 
                 if (!aReadContents) {
-                    return finish(entries);
+                    return entries;
                 }
 
                 var promises = [];
@@ -2514,7 +2492,7 @@ MegaUtils.prototype.getPersistentDataEntries = promisify(async function(resolve,
                     promises.push(M.readFileEntry(result[entries[i]], 'readAsText'));
                 }
 
-                Promise.allSettled(promises)
+                return Promise.allSettled(promises)
                     .then(function(r) {
                         var parse = tryCatch(JSON.parse.bind(JSON), false);
 
@@ -2527,16 +2505,11 @@ MegaUtils.prototype.getPersistentDataEntries = promisify(async function(resolve,
                                 result[entries[i]] = false;
                             }
                         }
-                        finish(result);
-                    })
-                    .catch(fail);
-            }).catch(function(ex) {
-                if (Object(ex).name === "SecurityError") {
-                    // Running on Incognito mode?
-                    return fallback();
-                }
-                fail(ex);
-            });
+                        return result;
+                    });
+            })
+            .then(append)
+            .finally(fallback);
     }
     else {
         fallback();

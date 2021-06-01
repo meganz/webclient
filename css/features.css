@@ -57,9 +57,12 @@ body.rtl .feature-page * {
 
 .feature-page h2 {
     color: #373737;
-    font-family: 'montserrat_light', arial, sans-serif;
-    font-size: 36px;
-    line-height: 54px;
+    font-family: var(--text-font-family-montserrat-bold);
+    font-size: 32px;
+    line-height: 48px;
+}
+.feature-page h2.light {
+    font-family: var(--text-font-family-montserrat-light);
 }
 
 .feature-page h3 {
@@ -218,8 +221,8 @@ body.rtl .feature-page * {
     }
 
     .feature-page .header-block h2 {
-        font-size: 46px;
-        line-height: 63px;
+        font-size: 40px;
+        line-height: 60px;
         margin-bottom: 12px;
     }
 
@@ -373,6 +376,11 @@ body.rtl .feature-page * {
         .feature-page .header-block {
             padding-bottom: 45px;
             padding-top: 40px;
+        }
+
+        .feature-page .header-block h1 {
+            font-size: 16px;
+            line-height: 24px;
         }
 
         .feature-page .header-block h2 {
@@ -844,6 +852,7 @@ body.rtl .feature-page * {
     }
 
     .feature-page .business-footer h2 {
+        font-family: var(--text-font-family-montserrat-light);
         line-height: 50px;
         margin-bottom: 30px;
     }

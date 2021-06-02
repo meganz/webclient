@@ -2804,14 +2804,11 @@ div.checkboxOn {
 .checkbox-label,
 .checkbox-label.radio-txt {
     float: left;
-    font-size: 15px;
-    line-height: 16px;
+    font-size: 14px;
+    line-height: 20px;
     padding: 0 0 0 9px;
     color: #666;
     cursor: pointer;
-}
-.checkbox-label.text {
-    padding-top: 2.3px;
 }
 .checkbox-label.small {
     font-size: 14px;

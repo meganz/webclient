@@ -27,6 +27,11 @@ function AccountRecoveryControl() {
     this.twoFactor = false;
     var self = this;
 
+    const emailParam = locationSearchParams.match(/email=([^\s&=]+)/);
+    if (emailParam){
+        $.prefillEmail = b64decode(emailParam[1]);
+    }
+
     // if mobile we view the related header for top-mobile.html and hide navigation div of desktop
     if (is_mobile) {
         $('.mobile.forgot-password-page').removeClass('hidden');
@@ -342,7 +347,7 @@ AccountRecoveryControl.prototype.showStep = function _showStep(step, branch) {
     this.$emailBlock.addClass('hidden');
     this.$navigationControl.removeClass('hidden');
 
-    window.scrollTo(0, 0);
+    $('#startholder.fmholder').animate({scrollTop: 0}, 0);
     if (step === 0) {
         if (is_mobile) {
             this.$navigationControl.find('.fm-icon.left').addClass('mega').removeClass('back')

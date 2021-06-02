@@ -5737,7 +5737,7 @@
     },
     "10635": {
         "developer_comment": "An informational message below the billing address dialog. Please do not delete or modify the [B] tags as they will be used to bolden the text. The content between the tags is the literal description to appear on their bank statement and should not be translated either.",
-        "string": "Note: This credit card payment will be listed as [B]MEGA PRO GLOBAL[/B] on your bank statement."
+        "string": "Note: This credit card payment will be listed as [B]MEGA Limited[/B] on your bank statement."
     },
     "10637": {
         "developer_comment": "The text of a button which is shown on the payment page when the recurring payment option is selected. This button will redirect them to a page with more information.",
@@ -18150,6 +18150,18 @@
     "25081": {
         "developer_comment": "Payment success message shown to users who signup for business account.",
         "string": "Thanks! Your account should now be upgraded. Please check your email to verify your account and login. For enquiries you can contact us at [A]support@mega.nz[/A]"
+    },
+    "tooltip_more": {
+        "developer_comment": "A text for more options tooltip in Selection Manager",
+        "string": "More"
+    },
+    "gotoacc": {
+        "developer_comment": "Button's text in payment succeeded layout",
+        "string": "Go to my account"
+    },
+    "returntoacc": {
+        "developer_comment": "Button's text in payment failed layout",
+        "string": "Return to my account"
     },
     "v4onboard_dialogtext": {
         "developer_comment": "Main text of the dialog for Revamp lite onboarding",

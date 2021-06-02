@@ -1300,7 +1300,7 @@ export class ContactPickerWidget extends MegaRenderMixin {
             if (frequentContacts.length === 0 && noOtherContacts) {
                 if (self.props.newEmptySearchResult) {
                     contactsList = <div className="chat-contactspicker-no-contacts searching">
-                        <div className="fm-empty-contacts-bg"></div>
+                        <div className="section-icon sprite-fm-mono icon-contacts"></div>
                         <div className="fm-empty-cloud-txt small">{l[8674]}</div>
                     </div>;
                 }
@@ -1309,7 +1309,7 @@ export class ContactPickerWidget extends MegaRenderMixin {
                         <div className="contacts-list-header">
                             {l[165]}
                         </div>
-                        <div className="fm-empty-contacts-bg"></div>
+                        <div className="section-icon sprite-fm-mono icon-contacts"></div>
                         <div className="fm-empty-cloud-txt small">{l[784]}</div>
                         <div className="fm-empty-description small">{l[19115]}</div>
                     </div>;
@@ -1356,7 +1356,7 @@ export class ContactPickerWidget extends MegaRenderMixin {
         else if (self.props.newNoContact) {
             multipleContacts = "";
             contactsList = <div className="chat-contactspicker-no-contacts">
-                <div className="fm-empty-contacts-bg"></div>
+                <div className="section-icon sprite-fm-mono icon-contacts"></div>
                 <div className="fm-empty-cloud-txt small">{l[784]}</div>
                 <div className="fm-empty-description small">{l[19115]}</div>
             </div>;
@@ -1368,7 +1368,7 @@ export class ContactPickerWidget extends MegaRenderMixin {
                 <div className="contacts-list-header">
                     {l[165]}
                 </div>
-                <div className="fm-empty-contacts-bg"></div>
+                <div className="section-icon sprite-fm-mono icon-contacts"></div>
                 <div className="fm-empty-cloud-txt small">{l[784]}</div>
                 <div className="fm-empty-description small">{l[19115]}</div>
                 <button className="mega-button positive large fm-empty-button" onClick={function() {
@@ -1377,7 +1377,7 @@ export class ContactPickerWidget extends MegaRenderMixin {
                     <span>{l[101]}</span>
                 </button>
                 <div className="empty-share-public">
-                    <i className="small-icon icons-sprite grey-chain"></i>
+                    <i className="sprite-fm-mono icon-link-circle"></i>
                     <span dangerouslySetInnerHTML={{__html: l[19111]}}></span>
                 </div>
             </div>;

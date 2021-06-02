@@ -1332,7 +1332,7 @@ mega.megadrop = (function() {
             if (!$(settingsOpts.card.wrapperClass).find('.megadrop-header').length) {
                 var $headElem = $('#megadrop-header-template').clone().removeAttr('id');
                 $(settingsOpts.card.wrapperClass).append($headElem);
-                if (Object.keys(list).length === 0) {
+                if (isEmptyActivePUP()) {
                     $(settingsOpts.card.wrapperClass)
                         .append('<tr><td colspan="3" class="data-table-empty">' + l[20139] + '</td></tr>');
                 }
@@ -1390,7 +1390,7 @@ mega.megadrop = (function() {
                 $('#pup_' + pupHandle).remove();// Remove widget-dialog
 
                 // Display "No MEGAdrop folders" if the list is empty
-                if ($.isEmptyObject(pup.items)) {
+                if (isEmptyActivePUP()) {
                     $(settingsOpts.card.wrapperClass)
                         .append('<tr><td colspan="3" class="data-table-empty">' + l[20139] + '</td></tr>');
                 }
@@ -2438,6 +2438,20 @@ mega.megadrop = (function() {
         return promise;
     };
 
+    var isEmptyActivePUP = function isEmptyActivePUP() {
+        var $items = pup.items;
+
+        if ($.isEmptyObject($items)) {
+            return true;                    // No item in pup.items, return true;
+        }
+        for (var f in $items) {
+            if ($items[f].s === 2) {
+                return false;           // There is an active one, return false
+            }
+        }
+        return true;
+    };
+
     return {
         init: init,
         upload: put,
@@ -2453,6 +2467,7 @@ mega.megadrop = (function() {
         disableDragDrop: disableDragDrop,
         overQuota: showMEGAdropOverQuota,
         updatePUPUserName: updatePUPUserName,
+        isEmptyActivePUP: isEmptyActivePUP,
 
         // PUF
         pufs: puf.items,

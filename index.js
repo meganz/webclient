@@ -950,6 +950,9 @@ function init_page() {
         mobile.achieve.howItWorks.init();
         return false;
     }
+    else if (is_mobile && u_type && page === 'fm/account/plan') {
+        return loadSubPage('fm/account');
+    }
     else if (is_mobile && u_type && page === 'fm/account/invites') {
         parsepage(pages['mobile']);
         mobile.achieve.invites.init();
@@ -1283,6 +1286,11 @@ function init_page() {
                 .init(function onClose() {
                     loadSubPage('fm');
                 });
+        }
+        else if (is_mobile) {
+            login_next = 'wiretransfer';
+            loadSubPage('login');
+
         }
         else {
             mega.ui.showLoginRequiredDialog({
@@ -2784,6 +2792,7 @@ function topmenuUI() {
     });
 
     $menuUpgradeAccount.rebind('click.openpricing', function() {
+        topMenu(1);
         loadSubPage('pro');
     });
 

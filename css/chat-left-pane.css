@@ -92,82 +92,83 @@
 }
 .conversations .conversations-head-buttons {
     display: flex;
-    margin: 0 8px 0 0;
 }
 .conversations .conversations-head-buttons .contacts-toggle {
     position: relative;
-    float: left;
 }
 .conversations .conversations-head-buttons button {
-    position: relative;
-    width: 36px;
-    height: 36px;
-    border-radius: 200px;
-    margin: 0 12px 0 0;
+    margin: 0 0 0 12px;
 }
-/* TODO: add variables, see: `button.css` */
-.conversations .conversations-head-buttons button.contacts-toggle-button {
-    background: linear-gradient(180deg, rgba(86, 210, 241, 1) 0%, rgba(43, 166, 222, 1) 100%);
-}
-.conversations .conversations-head-buttons button.contacts-toggle-button.active {
+.conversations button.contacts-toggle-button.active {
+    --outer-padding: 4px;
     border: 2px solid var(--surface-grey-2);
 }
-.conversations .conversations-head-buttons button.contacts-toggle-button.active:before {
+.conversations button.contacts-toggle-button::before {
+    border-radius: 100%;
+    box-shadow: 0 0 0 2px var(--secondary-blue);
     content: '';
     display: block;
+    height: inherit;
+    left: 50%;
+    margin: auto;
+    opacity: 0;
     position: absolute;
-    top: -4px;
-    left: -4px;
-    width: 36px;
-    height: 36px;
-    border-radius: 200px;
-    border: 2px solid #32A1D4;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    transition: var(--transition-opacity);
+    width: inherit;
+}
+.conversations button.contacts-toggle-button.active::before {
+    opacity: 1;
 }
 .ipc-count.hidden {
     display: none;
 }
-.conversations .conversations-head-buttons .contacts-toggle div.notifications-count {
-    position: absolute;
-    top: -5px;
-    left: 23px;
-    width: 18px;
-    height: 18px;
-    margin: 0;
-    border-radius: 200px;
-    font: var(--text-body1);
-    color: var(--text-color-white-high);
+.conversations button.contacts-toggle-button .notifications-count {
     background: var(--secondary-red);
-}
-.conversations .conversations-head-buttons .contacts-toggle div.notifications-count span {
+    border-radius: 9px;
+    box-sizing: border-box;
+    color: var(--text-color-white-high);
+    font: var(--text-body1);
+    height: 18px;
+    line-height: 18px;
+    margin: 0;
+    min-width: 18px;
+    padding: 0 3px;
     position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    right: -3px;
+    text-align: center;
+    top: -3px;
 }
-.conversations .conversations-head-buttons button i {
-    position: absolute;
-    left: 50%;
-    --icon-size: 24px;
-    transform: translateX(-50%);
-    --mask-color: var(--secondary-white);
+.conversations .conversations-head-buttons .notifications-count span {
+    color: inherit;
+    font: inherit;
+    line-height: inherit;
+    padding: 0;
+}
+.conversations button.contacts-toggle-button.active .notifications-count {
+    right: -5px;
+    top: -5px;
 }
 .conversations-pane {
     margin: 0;
     padding: 0;
     list-style-type: none;
 }
-.section.conversations .fm-left-panel {
+.chat-lp-body {
 
-    /* Temporary fix to avoid breaking the chat left pane */
-    /* TODO: Make the left chat pane flexible; fix alignments; add RTL  */
-    display: block;
-    height: 100%;
-    margin: -52px 0 0 0;
+    /* Temporary fix - l-pane full height over topbar */
+    height: calc(100% + 48px);
+    margin: -48px 0 0 0;
 }
-.section.conversations .fm-left-panel.hidden {
-    display: none;
+.chat-lp-scroll-area {
+    flex: 1;
+    overflow: hidden;
+    position: relative;
+    white-space: nowrap;
 }
-.content-panel.conversations, .archived-chats .archive-chat-list {
+.content-panel.conversations,
+.archived-chats .archive-chat-list {
     display: block;
     background-color: var(--surface-grey-2);
 }
@@ -363,16 +364,18 @@ li.active .call-duration i {
 }
 
 .left-pane-button {
-    display: flex;
     align-items: center;
-    justify-content: space-between;
-    position: relative;
-    padding: 0 14px;
-    height: 47px;
-    border-top: 2px solid var(--surface-grey-1);
-    transition: all 300ms ease;
     background: var(--surface-grey-2);
+    border-top: 2px solid var(--surface-grey-1);
+    box-sizing: border-box;
     cursor: pointer;
+    display: flex;
+    flex: 0 0 auto;
+    height: 50px;
+    justify-content: space-between;
+    padding: 0 14px;
+    position: relative;
+    transition: all 300ms ease;
 }
 .left-pane-button.archived:hover {
     background: var(--surface-grey-1);
@@ -472,9 +475,9 @@ li.active .call-duration i {
 /* Private Chat Styles */
 .privateChat + .icon-ekr-key {
     display: inline-block;
-    margin-top: 2px;
-    width: 12px;
     height: 10px;
+    vertical-align: middle;
+    width: 12px;
 }
 
 /*
@@ -482,19 +485,24 @@ li.active .call-duration i {
  * ------------------------------------------------------------------------------------------------------------------ */
 
 .search-panel {
-    position: relative;
-    width: 100%;
-    height: 36px;
-    margin: 4px 0 5px 0;
-    padding: 2px 0 0 0;
     background: var(--surface-grey-2);
-    z-index: 130;
     box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    height: 36px;
+    position: relative;
+    z-index: 130;
+    width: 100%;
 }
 
 .search-panel.expanded {
-    position: absolute;
+    flex: 1 1 auto;
     height: 100%;
+    overflow: hidden;
+}
+
+.search-panel.expanded ~ * {
+    display: none;
 }
 
 .search-heading {
@@ -505,8 +513,9 @@ li.active .call-duration i {
 }
 
 .search-results-wrapper {
+    flex: 1 1 auto;
     overflow: hidden;
-    height: calc(100% - 100px);
+    position: relative;
 }
 
 /*
@@ -514,11 +523,13 @@ li.active .call-duration i {
  * ------------------------------------------------------------------------------------------------------------------ */
 
 .search-field {
-    top: 0;
+    flex: 0 0 auto;
     left: 0;
-    width: calc(100% - 16px);
     margin: 0 auto 3px;
     padding: 0 0 5px 0;
+    position: relative;
+    top: 0;
+    width: calc(100% - 16px);
     z-index: 10;
 }
 
@@ -534,30 +545,30 @@ li.active .call-duration i {
 }
 
 .search-field i.search-icon-find {
-    top: 7px;
-    left: 16px;
+    top: 4px;
+    left: 8px;
 }
 
 .search-field i.search-icon-reset {
-    top: 7px;
-    right: 16px;
+    top: 4px;
+    right: 8px;
     cursor: pointer;
 }
 
 .search-field i.tiny-searching {
-    top: 9px;
+    top: 4px;
     animation: rotate 0.8s infinite linear;
 }
 
 .search-field i.icon-check,
 .search-field i.icon-pause {
-    top: 9px;
+    top: 6px;
     right: 36px;
     --icon-size: 20px;
 }
 
 .search-field i.icon-play {
-    top: 11px;
+    top: 8px;
     right: 39px;
     --icon-size: 17px;
     cursor: pointer;
@@ -581,15 +592,15 @@ li.active .call-duration i {
 }
 
 .search-field input {
-    width: 100%;
-    height: 32px;
-    padding: 2px 30px 3px 40px;
-    border: 0 none;
-    border-radius: 18px;
-    font: var(--text-body1);
     color: var(--text-color-medium);
     background: var(--surface-grey-1);
+    border: 0 none;
+    border-radius: 18px;
     box-sizing: border-box;
+    font: var(--text-body1);
+    line-height: 24px;
+    padding: 4px 30px 4px 40px;
+    width: 100%;
 }
 .search-field input::-webkit-input-placeholder { color: var(--text-color-low); }
 .search-field input::-moz-placeholder { color: var(--text-color-low); }
@@ -854,9 +865,10 @@ li.active .call-duration i {
 }
 
 .result-table.nil .result-table-row .search-messages {
-    margin: 15px;
+    color: var(--text-color-low);
     font: var(--text-body1);
-    color: var(--text-color-low)
+    margin: 15px;
+    width: auto;
 }
 
 .result-table.nil .result-table-row .search-messages a {
@@ -869,15 +881,17 @@ li.active .call-duration i {
  * ------------------------------------------------------------------------------------------------------------------ */
 
 .contacts-panel {
+    background: var(--surface-main);
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    font: var(--text-body1);
+    height: calc(100% - 16px);
+    left: 0;
     position: absolute;
     top: 16px;
-    left: 0;
     width: 100%;
-    height: 100%;
-    background: var(--surface-main);
     z-index: 130;
-    box-sizing: border-box;
-    font: var(--text-body1)
 }
 
 .contacts-navigation {
@@ -1140,26 +1154,38 @@ li.active .call-duration i {
 }
 
 .contacts-content {
-    height: 100%;
-    padding: 0 1px 0 24px;
+    flex-grow: 1;
+    overflow: hidden;
 }
 
 .contacts-content .mega-button.action i {
     --icon-size: 24px;
 }
 
-.contacts-list {
-    height: calc(100% - 135px);
+.contacts-content .content-container {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 0 24px;
 }
 
-.contacts-list table {
-    padding: 0 24px 0 0;
+.contacts-list {
+    height: 100%;
+}
+
+.contacts-profile {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
 }
 
 .profile-breadcrumb {
-    display: flex;
     align-items: center;
+    display: flex;
+    flex-shrink: 0;
     height: 48px;
+    padding: 0 32px;
 }
 
 .profile-breadcrumb ul {
@@ -1181,17 +1207,24 @@ li.active .call-duration i {
 .profile-breadcrumb ul li i {
     display: inline-block;
     --icon-size: 18px;
-    margin: 0 6px 0 6px;
+    margin: 0 8px;
     vertical-align: middle;
     --mask-color: var(--icon-rest);
 }
 
-.profile-head {
-    position: relative;
+.profile-content {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
     overflow: hidden;
-    margin: 0 -24px;
-    padding: 24px 32px;
+}
+
+.profile-head {
     background: var(--surface-grey-1);
+    flex: 0 0 auto;
+    overflow: hidden;
+    padding: 24px 32px;
+    position: relative;
 }
 
 .profile-head .user-card-presence {
@@ -1280,7 +1313,8 @@ li.active .call-duration i {
 }
 
 .profile-shared-folders {
-    height: calc(100vh - 360px);
+    flex: 1 1 auto;
+    overflow: hidden;
 }
 
 .profile-shared-folders .colour-label .shared-folder-info-block::after {
@@ -1288,8 +1322,8 @@ li.active .call-duration i {
     top: 15px;
 }
 
-.profile-shared-folders > div {
-    height: calc(100% - 8px) !important;
+.profile-shared-folders .content-container {
+    padding: 0 16px 6px;
 }
 
 .profile-shared-folders .dialog-empty-block {
@@ -1297,11 +1331,16 @@ li.active .call-duration i {
     background: transparent;
 }
 
+.profile-shared-folders .dialog-empty-pad {
+    margin: auto;
+}
+
 .profile-shared-folders .megaListContainer {
-    width: calc(100% - 15px);
-    min-width: 0;
-    margin: 0 auto;
     box-sizing: border-box;
+    flex: 1 1 auto;
+    margin: 0 auto;
+    min-width: 0;
+    width: calc(100% - 15px);
 }
 
 .profile-shared-folders .contact-details-view td {

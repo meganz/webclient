@@ -435,7 +435,7 @@ pro.proplan = {
 
             // Set text to "save" block
             $savePercs.safeHTML(l[16649]);
-            $('span', $savePercs).text('16%');
+            $('span', $savePercs).text(formatPercentage(0.16));
 
             savePercsReposition = function() {
                 $savePercs.position({

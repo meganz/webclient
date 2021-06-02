@@ -604,28 +604,28 @@ a.blog-button:hover {
 .change-pass-block .notice-input-block.last {
     margin: 4px 0 0 0;
 }
-.notification-num, .new-messages-indicator, .contacts-indicator {
-    display: block;
-    position: relative;
-    margin: -6px 0 0 16px;
-    padding: 0 2px 0 2px;
-    width: 18px;
-    height: 18px;
-    min-width: 14px;
-    border-radius: 200px;
+.notification-num,
+.new-messages-indicator,
+.contacts-indicator {
+    border-radius: 9px;
     box-sizing: border-box;
-    font: var(--text-body2);
-    text-align: center;
     color: var(--secondary-white);
+    display: block;
+    font: var(--text-body2);
+    height: 18px;
+    margin: -6px 0 0;
+    max-width: 100%;
+    min-width: 18px;
+    overflow: hidden;
+    padding: 0 3px;
+    position: relative;
+    text-align: center;
+    text-overflow: ellipsis;
 }
 .nw-fm-left-icon.conversations .new-messages-indicator {
     background-color: #2BA6DE;
 }
 
-.new-messages-indicator {
-    padding-left: 4px;
-    padding-right: 5px;
-}
 .new-messages-indicator .chat-pending-call {
     margin-top: -1px;
     display: block;
@@ -5435,53 +5435,6 @@ tr:not(.taken-down) .grid-status-icon:not(.read-only):not(.read-and-write) {
     display: block;
 }
 
-.empty-requests-pad {
-    position: absolute;
-    width: 100%;
-    text-align: center;
-    top: 50%;
-    margin-top: -70px;
-}
-.public-contact-share {
-    position: absolute;
-    left: 50%;
-    bottom: -50px;
-    transform: translateX(-50%);
-}
-.public-contact-share i {
-    display: block;
-    float: left;
-    --icon-size: 24px;
-    --mask-color: var(--icon-rest);
-}
-.public-contact-share span {
-    display: block;
-    float: left;
-    margin: 2px 0 0 8px;
-}
-.public-contact-share span a {
-    text-decoration: underline;
-}
-.empty-share-public {
-    padding: 18px 0 0 0;
-    font: var(--text-body1);
-    color: var(--text-color-low);
-}
-.empty-share-public a {
-    text-decoration: underline;
-}
-.empty-share-public span {
-    color: var(--text-color-high);
-    font: var(--text-body1-bold);
-    vertical-align: middle;
-}
-.empty-share-public i {
-    --icon-size: 24px;
-    --mask-color: var(--secondary-blue);
-    display: inline-block;
-    margin-right: 8px;
-    vertical-align: middle;
-}
 .fm-breadcrumbs.contacts .right-arrow-bg span {
     display: none;
 }
@@ -5559,11 +5512,13 @@ tr:not(.taken-down) .grid-status-icon:not(.read-only):not(.read-and-write) {
     display: flex;
     flex-direction: column;
     height: 100%;
-    justify-content: center;
     text-align: center;
 }
+.fm-empty-pad {
+    margin: auto;
+}
 .fm-empty-section .mega-button.large {
-    margin-top: 40px;
+    margin-top: 30px;
 }
 .fm-empty-section i.section-icon,
 .fm-empty-sharef i.section-icon {
@@ -5582,27 +5537,8 @@ tr:not(.taken-down) .grid-status-icon:not(.read-only):not(.read-and-write) {
 .not-logged .fm-empty-contacts .fm-empty-button {
     display: none;
 }
-.fm-empty-contacts {
-    height: -webkit-calc(100% - 73px);
-    height: -moz-calc(100% - 73px);
-    height: calc(100% - 73px);
-    position: relative;
-    min-height: 426px !important;
-}
 .fm-empty-contacts button {
     margin: 0;
-}
-.fm-empty-pad {
-    position: absolute;
-    text-align: center;
-    width: 100%;
-    top: 50%;
-    margin-top: -131px;
-}
-.fm-empty-contacts-bg {
-    height: 82px;
-    background-position: center -1407px;
-    background-repeat: no-repeat;
 }
 .fm-empty-cloud-txt {
     color: var(--text-color-high);
@@ -5654,6 +5590,29 @@ tr:not(.taken-down) .grid-status-icon:not(.read-only):not(.read-and-write) {
 }
 .not-logged .fm-not-logged-text {
     display: block;
+}
+
+/* Share public link in Empty Contacts block */
+.empty-share-public {
+    padding: 18px 0 0 0;
+    font: var(--text-body1);
+    color: var(--text-color-low);
+}
+.empty-share-public a {
+    text-decoration: underline;
+}
+.empty-share-public span {
+    color: var(--text-color-high);
+    font: var(--text-body1-bold);
+    vertical-align: middle;
+}
+.empty-share-public i {
+    --icon-size: 24px;
+    --mask-color: var(--secondary-blue);
+    display: inline-block;
+    -webkit-margin-end: 8px;
+    margin-inline-end: 8px;
+    vertical-align: middle;
 }
 
 .ui-selectable-helper {
@@ -10389,149 +10348,6 @@ a.blog-article-button {
     height: 66px;
     width: 240px;
 }
-.incoming-contact-info {
-    display: inline-block;
-    text-align: left;
-    line-height: 16px;
-    font-size: 13px;
-}
-span.incoming-call-name {
-    display: inline-block;
-}
-.star .incoming-contact-info span.incoming-call-name {
-    background-image: url(../images/mega/fm-main-sprite.png);
-    background-position: right -6265px;
-    background-repeat: no-repeat;
-    padding-right: 25px;
-}
-.incoming-contact-info span.incoming-call-txt {
-    display: block;
-    font: var(--text-body2);
-    color: var(--text-color-low);
-}
-.incoming-call-avatar {
-    width: 140px;
-    height: 140px;
-    margin: 0 auto;
-    border: 4px solid white;
-    overflow: hidden;
-    -moz-border-radius: 100%;
-    -webkit-border-radius: 100%;
-    border-radius: 100%;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
-    -webkit-box-shadow: 0 1px 2px 0 rgba(0,0,0,0.15);
-    -moz-box-shadow: 0 1px 2px 0 rgba(0,0,0,0.15);
-    box-shadow: 0 1px 2px 0 rgba(0,0,0,0.15);
-    position: relative;
-    background-color: #f2f2f2;
-}
-.incoming-call-avatar .avatar-wrapper {
-    width: 132px;
-    height: 132px;
-    border: 0;
-    margin: 0;
-    -webkit-box-shadow: none;
-    -moz-box-shadow: none;
-    box-shadow: none;
-    font-size: 42px;
-    line-height: 130px;
-    font-family: 'source_sans_proregular', Arial, sans-serif;
-}
-.incoming-call-avatar .avatar-wrapper span {
-    color: white;
-}
-.incoming-call-avatar img {
-    width: 132px;
-    height: 132px;
-    -moz-border-radius: 100%;
-    -webkit-border-radius: 100%;
-    border-radius: 100%;
-}
-.incoming-call-shadow-bl {
-    width: 132px;
-    height: 132px;
-    -moz-border-radius: 100%;
-    -webkit-border-radius: 100%;
-    border-radius: 100%;
-    -webkit-box-shadow: inset 0 2px 1px 0 rgba(0,0,0,0.06);
-    -moz-box-shadow: inset 0 2px 1px 0 rgba(0,0,0,0.06);
-    box-shadow: inset 0 2px 1px 0 rgba(0,0,0,0.06);
-    position: absolute;
-    z-index: 10;
-    top: 0;
-}
-.incoming-call-username {
-    overflow: hidden;
-    text-align: center;
-    margin: 0 20px;
-    padding: 17px 0;
-    height: 65px;
-    box-sizing: border-box;
-    font: var(--text-body1);
-    color: var(--text-color-high);
-}
-.incoming-call-buttons {
-    text-align: center;
-    padding: 0 8px 8px 8px;
-}
-.incoming-call-buttons .incoming-call-button {
-    cursor: pointer;
-}
-.incoming-call-dialog.group-call .audio-call {
-    width: 208px;
-}
-.incoming-call-button {
-    width: 64px;
-    height: 48px;
-    background-image: url(../images/mega/chat-sprite.png?v=2);
-    background-position: center -1457px;
-    background-repeat: no-repeat;
-    margin: 0 4px;
-    -moz-border-radius: 6px;
-    -webkit-border-radius: 6px;
-    border-radius: 6px;
-    cursor: pointer;
-    float: left;
-    -webkit-transition: background-color 200ms ease-in-out;
-    -moz-transition: background-color 200ms ease-in-out;
-    -o-transition: background-color 200ms ease-in-out;
-    -ms-transition: background-color 200ms ease-in-out;
-    transition: background-color 200ms ease-in-out;
-    background-color: rgba(219,6,5,0.7);
-}
-.incoming-call-button.audio-call {
-    background-color: rgba(109,176,63,0.8);
-    background-position: center -1547px;
-    float: none;
-    margin-left: 76px;
-    width: auto;
-}
-.incoming-call-button.video-call {
-    background-position: center -1637px;
-    background-color: rgba(6,160,236,0.7);
-    float: right;
-    margin-left: 76px;
-    width: auto;
-    display: none;
-}
-.video-enabled .incoming-call-button.video-call {
-    display: block;
-    width: 64px;
-}
-.video-enabled .incoming-call-button.audio-call {
-    margin-right: 76px;
-}
-.incoming-call-button:hover {
-    background-color: rgba(219,6,5,1);
-}
-.incoming-call-button.audio-call:hover {
-    background-color: rgba(109,176,63,1);
-}
-.incoming-call-button.video-call:hover {
-    background-color: rgba(6,160,236,1);
-}
 .contacts-view td .avatar-wrapper,
 .contact-requests-grid td .avatar-wrapper,
 .sent-requests-grid td .avatar-wrapper,
@@ -12565,59 +12381,20 @@ div.camera-bottom-txt {
     vertical-align: middle;
     width: 50px;
 }
+
 /* New Common components */
+
 .disabled {
     cursor: default !important;
 }
 .visible {
-    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100) !important;
-    -moz-opacity: 1 !important;
-    -khtml-opacity: 1 !important;
     opacity: 1 !important;
 }
-.empty-block {
-    height: 100%;
-    position: absolute;
-    min-height: 380px;
-    width: 100%;
-    width: -webkit-calc(100% - 256px);
-    width: -moz-calc(100% - 256px);
-    width: calc(100% - 256px);
-    overflow: hidden;
-}
-.empty-pad {
-    position: absolute;
-    text-align: center;
-    width: 100%;
-    top: 50%;
-}
-.empty-icon {
-    background-image: url(../images/mega/empty-sprite.png);
-    background-repeat: no-repeat;
-    height: 185px;
-}
-.empty-title {
-    font-size: 35px;
-    line-height: 52px;
-    color: #CCCCCC;
-    text-align: center;
-    margin-top: 18px;
-    font-family: 'source_sans_prolight', sans-serif;
-}
-.empty-title span {
-    color: #777777;
-}
-.empty-pad.conversations {
-    margin-top: -125px;
-}
-.empty-icon.conversations {
-    background-position: center 0;
-    height: 208px;
-}
+
 /* End of common components */
 
-
 /* New Contact Us Page styles */
+
 .contact-us-revamp .main-mid-pad {
     max-width: 1280px;
     width: auto;
@@ -15121,6 +14898,7 @@ body.megaChatDisabled .nw-contact-name button.start-chat-button {
     height: 100%;
     position: relative;
     overflow: hidden;
+    border-top: 1px solid var(--surface-grey-2);
 }
 
 .user-management-view .icon-wrapper i {

@@ -355,7 +355,7 @@ accountUI.general = {
             var b2 = bytesToSize(account.space, 0).split(' ');
             $('.chart.data .pecents-txt', $storageChart).text(b2[0]);
             $('.chart.data .gb-txt', $storageChart).text(b2[1]);
-            $('.chart .perc-txt', $storageChart).text(usedPercentage + '%');
+            $('.chart .perc-txt', $storageChart).text(formatPercentage(usedPercentage / 100));
             $('.chart.data .size-txt', $storageChart).text(bytesToSize(account.space_used));
             /** End New Used Storage chart */
         },
@@ -1218,7 +1218,7 @@ accountUI.account = {
                         if (u_attr[i] === null || u_attr[i] !== checklist[i]) {
                             // we want also to catch the 'undefined' or null
                             // and replace with the empty string (or given string)
-                            u_attr[i] = i === 'firstName' ? checklist[i] || 'Nobody' : checklist[i];
+                            u_attr[i] = i === 'firstname' ? checklist[i] || 'Nobody' : checklist[i];
                             userAttrRequest[i] = base64urlencode(to8(u_attr[i]));
                             result = true;
                         }
@@ -1231,6 +1231,7 @@ accountUI.account = {
                         callback: function (res) {
                             if (res === u_handle) {
                                 $('.user-name').text(u_attr.name);
+                                $('.name', '.account-dialog').text(u_attr.fullname);
                                 $('.top-menu-logged .name', '.top-menu-popup').text(u_attr.name);
                                 showToast('settings', l[7698]);
                                 accountUI.account.profiles.bindEvents();

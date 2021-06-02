@@ -2655,7 +2655,7 @@ class ContactPickerWidget extends _stores_mixins_js2__["MegaRenderMixin"] {
           contactsList = react1.a.createElement("div", {
             className: "chat-contactspicker-no-contacts searching"
           }, react1.a.createElement("div", {
-            className: "fm-empty-contacts-bg"
+            className: "section-icon sprite-fm-mono icon-contacts"
           }), react1.a.createElement("div", {
             className: "fm-empty-cloud-txt small"
           }, l[8674]));
@@ -2665,7 +2665,7 @@ class ContactPickerWidget extends _stores_mixins_js2__["MegaRenderMixin"] {
           }, react1.a.createElement("div", {
             className: "contacts-list-header"
           }, l[165]), react1.a.createElement("div", {
-            className: "fm-empty-contacts-bg"
+            className: "section-icon sprite-fm-mono icon-contacts"
           }), react1.a.createElement("div", {
             className: "fm-empty-cloud-txt small"
           }, l[784]), react1.a.createElement("div", {
@@ -2706,7 +2706,7 @@ class ContactPickerWidget extends _stores_mixins_js2__["MegaRenderMixin"] {
       contactsList = react1.a.createElement("div", {
         className: "chat-contactspicker-no-contacts"
       }, react1.a.createElement("div", {
-        className: "fm-empty-contacts-bg"
+        className: "section-icon sprite-fm-mono icon-contacts"
       }), react1.a.createElement("div", {
         className: "fm-empty-cloud-txt small"
       }, l[784]), react1.a.createElement("div", {
@@ -2719,7 +2719,7 @@ class ContactPickerWidget extends _stores_mixins_js2__["MegaRenderMixin"] {
       }, react1.a.createElement("div", {
         className: "contacts-list-header"
       }, l[165]), react1.a.createElement("div", {
-        className: "fm-empty-contacts-bg"
+        className: "section-icon sprite-fm-mono icon-contacts"
       }), react1.a.createElement("div", {
         className: "fm-empty-cloud-txt small"
       }, l[784]), react1.a.createElement("div", {
@@ -2732,7 +2732,7 @@ class ContactPickerWidget extends _stores_mixins_js2__["MegaRenderMixin"] {
       }, react1.a.createElement("span", null, l[101])), react1.a.createElement("div", {
         className: "empty-share-public"
       }, react1.a.createElement("i", {
-        className: "small-icon icons-sprite grey-chain"
+        className: "sprite-fm-mono icon-link-circle"
       }), react1.a.createElement("span", {
         dangerouslySetInnerHTML: {
           __html: l[19111]
@@ -9280,9 +9280,7 @@ class fmView_FMView extends mixins["MegaRenderMixin"] {
 
   render() {
     return external_React_default.a.createElement("div", {
-      style: {
-        "height": "100%"
-      },
+      className: "content-container",
       onClick: ev => {
         $.hideContextMenu(ev);
       }
@@ -16939,7 +16937,7 @@ class conversationpanel_ConversationRightArea extends mixins["MegaRenderMixin"] 
       isVisible: self.props.chatRoom.isCurrentlyActive,
       chatRoom: self.props.chatRoom
     }, external_React_default.a.createElement("div", {
-      className: "chat-right-pad"
+      className: "\n                        chat-right-pad\n                        " + (room.haveActiveCall() ? 'in-call' : '') + "\n                    "
     }, external_React_default.a.createElement(accordion_Accordion, {
       chatRoom: room,
       onToggle: SoonFc(20, function () {
@@ -18489,7 +18487,7 @@ let conversationpanel_ConversationPanel = (conversationpanel_dec = utils["defaul
     }, external_React_default.a.createElement("i", {
       className: "small-icon conversations"
     }), l[8884])), external_React_default.a.createElement("div", {
-      className: "\n                            chat-topic-block\n                            " + topicBlockClass + "\n                            " + (room.havePendingCall() || room.haveActiveCall() ? 'have-pending-group-call' : '') + "\n                        "
+      className: "\n                            chat-topic-block\n                            " + topicBlockClass + "\n                            " + (room.haveActiveCall() ? 'in-call' : '') + "\n                        "
     }, external_React_default.a.createElement("div", {
       className: "chat-topic-buttons"
     }, external_React_default.a.createElement(ui_buttons["Button"], {
@@ -18727,11 +18725,11 @@ class conversationpanel_ConversationPanels extends mixins["MegaRenderMixin"] {
       }, external_React_default.a.createElement("div", {
         className: "chat-right-pad"
       }, contactsList, contactsListOffline))), external_React_default.a.createElement("div", {
-        className: "empty-block"
+        className: "fm-empty-section empty-messages"
       }, external_React_default.a.createElement("div", {
-        className: "empty-pad conversations"
-      }, external_React_default.a.createElement("div", {
-        className: "fm-empty-conversations-bg"
+        className: "fm-empty-pad"
+      }, external_React_default.a.createElement("i", {
+        className: "section-icon sprite-fm-mono icon-chat-filled"
       }), external_React_default.a.createElement("div", {
         className: "fm-empty-cloud-txt small",
         dangerouslySetInnerHTML: {
@@ -19429,9 +19427,8 @@ class searchPanel_SearchPanel extends mixins["MegaRenderMixin"] {
       onChange: this.handleChange,
       onToggle: this.handleToggle,
       onReset: this.handleReset
-    }), external_React_default.a.createElement("div", {
-      className: "search-results-wrapper"
-    }, external_React_default.a.createElement(perfectScrollbar["PerfectScrollbar"], {
+    }), external_React_default.a.createElement(perfectScrollbar["PerfectScrollbar"], {
+      className: "search-results-wrapper",
       ref: wrapper => {
         this.wrapperRef = wrapper;
       },
@@ -19445,7 +19442,7 @@ class searchPanel_SearchPanel extends mixins["MegaRenderMixin"] {
       results: results,
       isFirstQuery: isFirstQuery,
       onSearchMessages: this.handleSearchMessages
-    }))));
+    })));
   }
 
 }
@@ -19514,22 +19511,22 @@ class nil_Nil extends mixins["MegaRenderMixin"] {
       title
     } = this.props;
     return external_React_default.a.createElement("div", {
-      className: "fm-empty-contacts"
+      className: "fm-empty-section fm-empty-contacts"
     }, external_React_default.a.createElement("div", {
       className: "fm-empty-pad"
-    }, external_React_default.a.createElement("div", {
-      className: "fm-empty-contacts-bg"
+    }, external_React_default.a.createElement("i", {
+      className: "section-icon sprite-fm-mono icon-contacts"
     }), external_React_default.a.createElement("div", {
-      className: "fm-empty-cloud-txt small"
+      className: "fm-empty-cloud-txt"
     }, title), external_React_default.a.createElement("div", {
-      className: "fm-empty-description small"
+      className: "fm-empty-description"
     }, l[19114]), external_React_default.a.createElement(ui_buttons["Button"], {
       className: "mega-button positive large fm-empty-button",
       onClick: () => contactAddDialog()
     }, external_React_default.a.createElement("span", null, l[71])), external_React_default.a.createElement("div", {
-      className: "public-contact-share"
+      className: "empty-share-public"
     }, external_React_default.a.createElement("i", {
-      className: "sprite-fm-mono icon-link"
+      className: "sprite-fm-mono icon-link-circle"
     }), external_React_default.a.createElement("span", {
       dangerouslySetInnerHTML: {
         __html: l[19111]
@@ -21312,13 +21309,13 @@ class conversations_ConversationsHead extends mixins["MegaRenderMixin"] {
     };
     const CONTACTS_ACTIVE = window.location.pathname.indexOf(ROUTES.CONTACTS) !== -1;
     return conversations_React.createElement("div", {
-      className: "conversations-head"
-    }, conversations_React.createElement("h2", null, l[5902]), conversations_React.createElement("div", {
+      className: "lp-header"
+    }, conversations_React.createElement("span", null, l[5902]), conversations_React.createElement("div", {
       className: "conversations-head-buttons"
     }, conversations_React.createElement("div", {
       className: "contacts-toggle"
     }, conversations_React.createElement(ui_buttons["Button"], {
-      className: "\n                                mega-button\n                                round\n                                contacts-toggle-button\n                                " + (contactsActive ? 'active' : '') + "\n                                " + (RECEIVED_REQUESTS_COUNT > 0 ? 'requests' : '') + "\n                            ",
+      className: "\n                                mega-button\n                                round\n                                branded-blue\n                                contacts-toggle-button\n                                " + (contactsActive ? 'active' : '') + "\n                                " + (RECEIVED_REQUESTS_COUNT > 0 ? 'requests' : '') + "\n                            ",
       icon: "\n                                sprite-fm-mono\n                                icon-contacts\n                                " + (CONTACTS_ACTIVE ? '' : 'active') + "\n                            ",
       onClick: () => loadSubPage(CONTACTS_ACTIVE ? ROUTES.CHAT : ROUTES.CONTACTS)
     }, RECEIVED_REQUESTS_COUNT ? conversations_React.createElement("div", {
@@ -22054,30 +22051,24 @@ let conversations_ConversationsApp = (conversations_dec3 = utils["default"].Soon
       className: "conversationsApp",
       key: "conversationsApp"
     }, startGroupChatDialog, conversations_React.createElement("div", {
-      className: "fm-left-panel chat-left-panel",
+      className: "fm-left-panel chat-lp-body",
       style: leftPanelStyles
     }, conversations_React.createElement("div", {
       className: "left-pane-drag-handle"
-    }), conversations_React.createElement("div", {
-      className: "fm-left-menu conversations"
-    }, conversations_React.createElement(conversations_ConversationsHead, {
+    }), conversations_React.createElement(conversations_ConversationsHead, {
       megaChat: megaChat,
       contactsActive: megaChat.routingSection === "contacts",
       onSelectDone: this.startChatClicked.bind(this),
       showTopButtons: self.getContactsPickerButtons(),
       showAddContact: true
-    })), conversations_React.createElement(searchPanel_SearchPanel, null), conversations_React.createElement("div", {
-      className: "fm-tree-panel manual-tree-panel-scroll-management",
-      style: leftPanelStyles
-    }, conversations_React.createElement(conversations_PerfectScrollbar, {
-      style: leftPanelStyles,
-      className: "conversation-reduce-height",
+    }), conversations_React.createElement(searchPanel_SearchPanel, null), conversations_React.createElement(conversations_PerfectScrollbar, {
+      className: "chat-lp-scroll-area",
       chats: megaChat.chats,
       ref: ref => {
         megaChat.$chatTreePanePs = ref;
       }
     }, megaChat.chats.length > 0 && conversations_React.createElement("div", {
-      className: "\n                                        content-panel\n                                        conversations\n                                        active\n                                    "
+      className: "\n                                    content-panel\n                                    conversations\n                                    active\n                                "
     }, conversations_React.createElement("span", {
       className: "heading"
     }, "Contacts and Groups"), conversations_React.createElement(conversations_ConversationsList, {
@@ -22089,7 +22080,7 @@ let conversations_ConversationsApp = (conversations_dec3 = utils["default"].Soon
       className: "heading"
     }, l[19066]), conversations_React.createElement("div", {
       className: "indicator"
-    }, archivedChatsCount)))), rightPane);
+    }, archivedChatsCount))), rightPane);
   }
 
 }, (applyDecoratedDescriptor_default()(conversations_class2.prototype, "handleWindowResize", [conversations_dec3], Object.getOwnPropertyDescriptor(conversations_class2.prototype, "handleWindowResize"), conversations_class2.prototype)), conversations_class2));

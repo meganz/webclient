@@ -52,7 +52,7 @@ function removeUInode(h, parent) {
 
                 __markEmptied();
                 $('.files-grid-view .grid-table-header tr').remove();
-                $('.fm-empty-cloud').removeClass('hidden');
+                $('.fm-empty-incoming').removeClass('hidden');
             }
             break;
         case "contacts":

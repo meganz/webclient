@@ -3959,7 +3959,8 @@ MegaData.prototype.emptySharefolderUI = function(lSel) {
         lSel = this.fsViewSel;
     }
 
-    $(lSel).before($('.fm-empty-folder .fm-empty-pad:first').clone().removeClass('hidden').addClass('fm-empty-sharef'));
+    $(lSel).before($('.fm-empty-folder').clone()
+        .removeClass('hidden').addClass('fm-empty-sharef'));
     $(lSel).hide().parent().children('table').hide();
 
     $('.files-grid-view.fm.shared-folder-content').removeClass('hidden');

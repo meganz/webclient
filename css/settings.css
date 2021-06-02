@@ -673,7 +673,7 @@
     font: var(--text-h3);
 }
 .slider-percentage span.warn {
-    color: var(--text-color-warning);
+    color: var(--secondary-orange-inverted);
 }
 .slider-tip {
     font: var(--text-body2);

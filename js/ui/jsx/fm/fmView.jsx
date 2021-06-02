@@ -402,7 +402,7 @@ export default class FMView extends MegaRenderMixin {
     }
     render() {
         return <div
-            style={{"height": "100%"}}
+            className="content-container"
             onClick={(ev) => {
                 $.hideContextMenu(ev);
             }}>

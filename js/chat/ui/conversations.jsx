@@ -492,14 +492,15 @@ class ConversationsHead extends MegaRenderMixin {
         const CONTACTS_ACTIVE = window.location.pathname.indexOf(ROUTES.CONTACTS) !== -1;
 
         return (
-            <div className="conversations-head">
-                <h2>{l[5902]}</h2>
+            <div className="lp-header">
+                <span>{l[5902]}</span>
                 <div className="conversations-head-buttons">
                     <div className="contacts-toggle">
                         <Button
                             className={`
                                 mega-button
                                 round
+                                branded-blue
                                 contacts-toggle-button
                                 ${contactsActive ? 'active' : ''}
                                 ${RECEIVED_REQUESTS_COUNT > 0 ? 'requests' : ''}
@@ -1271,44 +1272,43 @@ class ConversationsApp extends MegaRenderMixin {
         return (
             <div className="conversationsApp" key="conversationsApp">
                 {startGroupChatDialog}
-                <div className="fm-left-panel chat-left-panel" style={leftPanelStyles}>
+                <div className="fm-left-panel chat-lp-body" style={leftPanelStyles}>
                     <div className="left-pane-drag-handle" />
-                    <div className="fm-left-menu conversations">
-                        <ConversationsHead
-                            megaChat={megaChat}
-                            contactsActive={megaChat.routingSection === "contacts"}
-                            onSelectDone={this.startChatClicked.bind(this)}
-                            showTopButtons={self.getContactsPickerButtons()}
-                            showAddContact={true}
-                        />
-                    </div>
+
+                    <ConversationsHead
+                        megaChat={megaChat}
+                        contactsActive={megaChat.routingSection === "contacts"}
+                        onSelectDone={this.startChatClicked.bind(this)}
+                        showTopButtons={self.getContactsPickerButtons()}
+                        showAddContact={true}
+                    />
+
                     <SearchPanel />
-                    <div className="fm-tree-panel manual-tree-panel-scroll-management" style={leftPanelStyles}>
-                        <PerfectScrollbar
-                            style={leftPanelStyles}
-                            className="conversation-reduce-height"
-                            chats={megaChat.chats}
-                            ref={ref => {
-                                megaChat.$chatTreePanePs = ref;
-                            }}>
-                            {megaChat.chats.length > 0 &&
-                                <div
-                                    className={`
-                                        content-panel
-                                        conversations
-                                        active
-                                    `}>
-                                    <span className="heading">Contacts and Groups</span>
-                                    <ConversationsList quickSearchText={this.state.quickSearchText} />
-                                </div>
-                            }
-                        </PerfectScrollbar>
-                        <div
-                            className={arcBtnClass}
-                            onClick={this.archiveChatsClicked}>
-                            <div className="heading">{l[19066]}</div>
-                            <div className="indicator">{archivedChatsCount}</div>
-                        </div>
+
+                    <PerfectScrollbar
+                        className="chat-lp-scroll-area"
+                        chats={megaChat.chats}
+                        ref={ref => {
+                            megaChat.$chatTreePanePs = ref;
+                        }}>
+                        {megaChat.chats.length > 0 &&
+                            <div
+                                className={`
+                                    content-panel
+                                    conversations
+                                    active
+                                `}>
+                                <span className="heading">Contacts and Groups</span>
+                                <ConversationsList quickSearchText={this.state.quickSearchText} />
+                            </div>
+                        }
+                    </PerfectScrollbar>
+
+                    <div
+                        className={arcBtnClass}
+                        onClick={this.archiveChatsClicked}>
+                        <div className="heading">{l[19066]}</div>
+                        <div className="indicator">{archivedChatsCount}</div>
                     </div>
                 </div>
                 {rightPane}

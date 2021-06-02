@@ -93,6 +93,10 @@ body {
             --text-font-family-light: 'LatoWebLight', sans-serif;
             --text-font-family-code: 'source_code_proregular', monospace;
 
+        /* font family : ONLY FOR PRODUCT PAGES */
+            --text-font-family-montserrat-bold: 'montserrat_bold', 'montserrat', arial, sans-serif;
+            --text-font-family-montserrat-light: 'montserrat_light', arial, sans-serif;
+
         /* font */
 
             --text-h1: 24px/36px var(--text-font-family);
@@ -199,6 +203,12 @@ html .theme-light-forced {
         --button-fill-positive: linear-gradient(180deg, rgba(62, 216, 178, 1) 0%, rgba(29, 176, 123, 1) 100%);
         --button-fill-positive-hover: linear-gradient(180deg, rgba(47, 206, 161, 1) 0%, rgba(21, 159, 103, 1) 100%);
         --button-fill-positive-active: linear-gradient(180deg, rgba(76, 255, 194, 1) 0%, rgba(36, 192, 141, 1) 100%);
+
+        --button-fill-blue: linear-gradient(180deg, rgba(86, 210, 241, 1) 0%, rgba(43, 166, 222, 1) 100%);
+
+        /* Temporary seccondary blue values, colors values are missing in the library */
+        --button-fill-blue-hover: linear-gradient(180deg, rgba(75, 200, 230, 1) 0%, rgba(33, 156, 212, 1) 100%);
+        --button-fill-blue-active: linear-gradient(180deg, rgba(151, 232, 250, 1) 0%, rgba(94, 205, 242, 1) 100%);
 
     /* banner */
 
@@ -392,6 +402,10 @@ html .theme-dark-forced {
         --button-fill-positive: linear-gradient(180deg, rgba(14, 217, 177, 1) 0%, rgba(6, 177, 122, 1) 100%);
         --button-fill-positive-hover: linear-gradient(180deg, rgba(17, 226, 193, 1) 0%, rgba(7, 193, 140, 1) 100%);
         --button-fill-positive-active: linear-gradient(180deg, rgba(10, 206, 160, 1) 0%, rgba(4, 160, 103, 1) 100%);
+
+        --button-fill-blue: linear-gradient(180deg, rgba(132, 224, 248, 1) 0%, rgba(77, 190, 238, 1) 100%);
+        --button-fill-blue-hover: linear-gradient(180deg, rgba(151, 232, 250, 1) 0%, rgba(94, 205, 242, 1) 100%);
+        --button-fill-blue-active: linear-gradient(180deg, rgba(112, 215, 244, 1) 0%, rgba(61, 176, 233, 1) 100%);
 
     /* banner */
 

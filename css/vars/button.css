@@ -25,6 +25,14 @@ html .mega-button.theme-light-forced {
         --text-green: var(--text-color-white-high);
         --green-border: rgb(1, 1, 1, 0.05);
 
+    /* positive/branded blue button */
+
+        --blue: var(--button-fill-blue);
+        --blue-hover: var(--button-fill-blue-hover);
+        --blue-active: var(--button-fill-blue-active);
+        --text-blue: var(--text-color-white-high);
+        --blue-border: rgb(1, 1, 1, 0.05);
+
     /* neutral button - white */
 
         --neutral: linear-gradient(rgba(255, 255, 255, 1) 0%, rgba(242, 242, 242, 1) 100%);
@@ -61,6 +69,14 @@ html .mega-button.theme-dark-forced {
         --green-active: var(--button-fill-positive-active);
         --text-green: var(--text-color-white-high);
         --green-border: rgb(255, 255, 255, 0.2);
+
+    /* positive/branded blue button */
+
+        --blue: var(--button-fill-blue);
+        --blue-hover: var(--button-fill-blue-hover);
+        --blue-active: var(--button-fill-blue-active);
+        --text-blue: var(--text-color-white-high);
+        --blue-border: rgb(255, 255, 255, 0.2);
 
     /* neutral button - grey */
 
@@ -136,6 +152,10 @@ html .mega-button.theme-dark-forced {
 .mega-button.positive,
 .mega-button.branded-green {
     --mask-color: var(--text-green);
+}
+
+.mega-button.branded-blue {
+    --mask-color: var(--text-blue);
 }
 
 .mega-button.round {

@@ -20,22 +20,14 @@ var nicknames = {
      *                  or FirstName if the last name is not set
      */
     getNickname: function(userId) {
-
         'use strict';
-
-        var userName = '';
-
-        if (M.u && typeof M.u[userId] !== 'undefined') {
+        const user = userId in M.u && M.u[userId] || userId === window.u_handle && window.u_attr;
+        if (user) {
             // Set format to FirstName LastName (or just FirstName if the last name is not set)
-            userName = (M.u[userId].name || M.u[userId].m).trim();
-
-            // Check if a nickname for this contact exists
-            if (M.u[userId].nickname !== '') {
-                userName = M.u[userId].nickname;
-            }
+            return String(user.nickname || user.fullname || user.name || user.m).trim();
         }
 
-        return userName;
+        return '';
     },
 
     /**

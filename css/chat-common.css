@@ -3,10 +3,7 @@
     height: 100%;
 }
 .section.conversations {
-    height: 100%;
-    height: -webkit-calc(100% - 36px);
-    height: -moz-calc(100% - 36px);
-    height: calc(100% - 36px);
+    height: calc(100% - 48px);
 }
 .section.conversations .fm-right-files-block {
     height: 100%;
@@ -82,6 +79,9 @@
     border-left: 1px solid var(--divider-color);
     box-sizing: border-box;
 }
+.chat-right-pad.in-call {
+    padding-top: 0;
+}
 .chat-right-head {
     clear: both;
     padding: 4px 16px 24px 16px;
@@ -151,28 +151,20 @@
 .short .user-card-data {
     padding: 0 30px 0 44px;
 }
-.short .user-card-status span {
-    display: inline-block;
-    vertical-align: top;
-    font-size: 13px;
-    line-height: 15px;
-    color: rgb(102, 102, 102);
-    font-family: LatoWeb;
-}
-.short .user-card-presence {
-    margin: 5px 6px 0px 2px;
-    vertical-align: top;
-}
 .chat-topic-block .contacts-info.body.short {
-    padding-right: 150px;
+    align-items: center;
+    display: flex;
+    flex: 1 1 auto;
     font-size: 0;
     line-height: 0;
+    overflow: hidden;
 }
-.chat-topic-buttons {
-    position:absolute;
-    top: 14px;
-    right: 14px;
-    z-index: 1;
+.chat-topic-block .small-rounded-avatar {
+    margin: 8px 0;
+}
+.chat-topic-block .contacts-info .user-card-data {
+    overflow: hidden;
+    padding: 0 0 0 12px;
 }
 .contacts-info.body.short {
     padding: 0;
@@ -202,9 +194,6 @@
     vertical-align: top;
     max-width: 100%;
 }
-.short .user-card-data {
-    padding: 0 30px 0 44px;
-}
 .short .user-card-status span {
     display: inline-block;
     font: var(--text-body2);
@@ -212,19 +201,8 @@
     vertical-align: top;
 }
 .short .user-card-presence {
-    margin: 6px 4px 0 2px;
+    margin: 6px 4px 6px 2px;
     vertical-align: top;
-}
-.chat-topic-block .contacts-info.body.short {
-    padding-right: 150px;
-    font-size: 0;
-    line-height: 0;
-}
-.chat-topic-buttons {
-    position:absolute;
-    top: 14px;
-    right: 20px;
-    z-index: 1;
 }
 .chat-topic-buttons .button {
     margin: 0 0 0 26px;
@@ -240,6 +218,7 @@
     right: 4px;
 }
 .contacts-info .user-card-data {
+    line-height: 0;
     padding-right: 15px;
 }
 .chat-right-area .buttons-block {
@@ -460,7 +439,9 @@
 }
 
 .arc-chat-messages-block .fm-chat-user-info {
-    margin: 7px 0 0 9px;
+    margin: 7px 0 0;
+    -webkit-padding-start: 8px;
+    padding-inline-start: 8px;
     width: calc(100% - 160px);
 }
 .arc-chat-messages-block .fm-chat-user-info .user-card-name {
@@ -540,10 +521,6 @@ table.arc-chat-messages-block {
 }
 .chat-shared-files-container {
     opacity: 1;
-    -webkit-transition: opacity 150ms ease-in-out;
-    -moz-transition: opacity 150ms ease-in-out;
-    -o-transition: opacity 150ms ease-in-out;
-    -ms-transition: opacity 150ms ease-in-out;
     transition: opacity 150ms ease-in-out;
 }
 .chat-shared-files-container.is-loading {
@@ -551,16 +528,19 @@ table.arc-chat-messages-block {
 }
 
 .chat-dropdown.header {
-    display: flex;
     align-items: center;
+    box-sizing: content-box;
+    color: var(--text-color-high);
+    cursor: pointer;
+    display: flex;
+    font: var(--text-h3-bold);
+    height: 48px;
     justify-content: space-between;
     padding-inline-start: 10px;
     padding-inline-end: 10px;
-    height: 47px;
-    color: var(--text-color-high);
-    font: var(--text-h3-bold);
+}
+.chat-dropdown ~ .chat-dropdown .chat-dropdown.header {
     border-top: 1px solid var(--divider-color);
-    cursor: pointer;
 }
 .chat-dropdown.content {
     padding: 0 14px 4px 14px;
@@ -894,7 +874,10 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
 .chat-contactspicker-no-contacts .fm-empty-cloud-txt {
     padding: 0 32px 0 20px;
 }
-.chat-contactspicker-no-contacts .fm-empty-contacts-bg {
+.chat-contactspicker-no-contacts .section-icon {
+    --icon-size: 120px;
+    --mask-color: var(--secondary-grey);
+    display: inline-block;
     margin: 43px 12px 0 0;
 }
 .chat-contactspicker-no-contacts .fm-empty-description {
@@ -1066,6 +1049,7 @@ button.fm-empty-button {
     margin: 0;
 }
 .chat-contactspicker-no-contacts {
+    margin-top: 8px;
     text-align: center;
 }
 .chat-contactspicker-no-contacts .empty-share-public {

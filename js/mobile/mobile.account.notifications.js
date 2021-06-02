@@ -48,6 +48,7 @@
             // Show the page.
             this.$page.removeClass('hidden');
             loadingDialog.hide('mobile:account/notifications:fetch');
+            loadingInitDialog.hide();
         },
 
         /**

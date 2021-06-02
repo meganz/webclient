@@ -1243,14 +1243,22 @@ mega.megadrop = (function() {
 
             // Remove PUP
             $('.megadrop-icon.delete', $wrapper).rebind('click', function(e) {
-
                 e.stopPropagation();
 
-                var id = $(this).parents('.megadrop-row').attr('id');
-                var pupHandle = id.replace('pup_', '');
-                var nodeHandle = pup.items[pupHandle].h;
-
-                puf.remove([nodeHandle]);
+                msgDialog(
+                    'confirmation',
+                    '',
+                    l.megadrop_delete_confirm_title,
+                    l.megadrop_delete_confirm_text,
+                    (e) => {
+                        if (e) {
+                            var id = $(this).parents('.megadrop-row').attr('id');
+                            var pupHandle = id.replace('pup_', '');
+                            var nodeHandle = pup.items[pupHandle].h;
+                            puf.remove([nodeHandle]);
+                        }
+                    }
+                );
             });
 
             // Widget expanded go to folder

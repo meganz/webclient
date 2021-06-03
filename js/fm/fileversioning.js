@@ -222,6 +222,11 @@ var versiondialogid;
             });
 
             var data = M.getDashboardData();
+
+            var $deleteButton = $('button#delete-all-versions').removeClass('disabled');
+            if (data.versions.cnt === 0) {
+                $deleteButton.addClass('disabled');
+            }
             var verionInfo = l[17582]
                     .replace('[X1]',
                     '<span class="versioning-text total-file-versions">' + data.versions.cnt + '</span>')

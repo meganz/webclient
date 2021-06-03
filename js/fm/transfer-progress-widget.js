@@ -225,6 +225,7 @@ mega.tpw = new function TransferProgressWidget() {
                 const $action = $('.action', $overQuotaBanner);
                 $action.removeClass('negative');
 
+                perc = perc >= 100 ? 100 : perc;
                 var direction = -1;
                 var rotateAngle = 360 * perc / 100 <= 180 ? 0 : 360 * perc / 100 - 180;
                 $('.quota-info-pct-circle li.right-c p', $overQuotaBanner).rotate(rotateAngle * direction);

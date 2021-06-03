@@ -233,7 +233,7 @@
     width: 400px;
     height: 200px;
 
-    --num-of-illustration: 9;
+    --num-of-illustration: 11;
 }
 .sprite-fm-illustration-wide.img-dialog-referral-program,
 .sprite-fm-illustration-wide.img-dialog-referral-program-before::before,
@@ -279,4 +279,14 @@
 .sprite-fm-illustration-wide.img-password-recovery-devices-before::before,
 .sprite-fm-illustration-wide.img-password-recovery-devices-after::after {
     background-position: calc(800% / (var(--num-of-illustration) - 1)) 0;
+}
+.sprite-fm-illustration-wide.img-mega-logo-light,
+.sprite-fm-illustration-wide.img-mega-logo-light-before::before,
+.sprite-fm-illustration-wide.img-mega-logo-light-after::after {
+    background-position: calc(900% / (var(--num-of-illustration) - 1)) 0;
+}
+.sprite-fm-illustration-wide.mega-logo-dark,
+.sprite-fm-illustration-wide.mega-logo-dark-before::before,
+.sprite-fm-illustration-wide.mega-logo-dark-after::after {
+    background-position: calc(1000% / (var(--num-of-illustration) - 1)) 0;
 }

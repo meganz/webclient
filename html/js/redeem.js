@@ -757,6 +757,7 @@ var redeem = {
                 function() {
                     closeDialog();
                     if ($(this).attr('bFail')) {
+                        delete localStorage.voucher;
                         loadSubPage('registerb');
                         return false;
                     }

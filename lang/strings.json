@@ -14057,7 +14057,7 @@
     },
     "22672": {
         "developer_comment": "Mobile text shown to user over storage quota\r\n\r\n%1 will be replaced with the maximum plan storage\r\n%2 will be replaced with the maximum plan bandwidth",
-        "string": "Cloud Drive is almost full. Upgrade to Pro and get up to %1 of storage and %2 of transfer quota."
+        "string": "[S]Cloud Drive is almost full.[/S] [A]Upgrade[/A] to Pro and get up to %1 of storage and %2 of transfer quota."
     },
     "22673": {
         "developer_comment": "Text of the dialog shown when the storage of a FREE account is full",

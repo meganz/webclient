@@ -2149,7 +2149,7 @@ function topbarUI(holderId) {
         for (i = dropdown.length; i--;) {
             dropdown[i].classList.remove('show');
         }
-        if (!$('.fm-dialog-overlay').hasClass('hidden')) {
+        if (!this.classList.contains('logout') && !$('.fm-dialog-overlay').hasClass('hidden')) {
             $('.fm-dialog-overlay').addClass('hidden');
         }
     });

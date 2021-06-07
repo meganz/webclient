@@ -2073,6 +2073,7 @@ body.de .mega-dialog.new-group-chat {
         position: relative;
     }
     .mega-dialog.export-links-dialog .input-wrap {
+        flex: 1;
         vertical-align: top;
         width: 100%;
     }
@@ -2091,6 +2092,7 @@ body.de .mega-dialog.new-group-chat {
         height: 38px;
         box-sizing: border-box;
         width: 100%;
+        padding: 0 10px;
         -webkit-padding-start: 36px;
         padding-inline-start: 36px;
         margin: 0;

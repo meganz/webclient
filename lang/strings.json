@@ -18151,9 +18151,9 @@
         "developer_comment": "Payment success message shown to users who signup for business account.",
         "string": "Thanks! Your account should now be upgraded. Please check your email to verify your account and login. For enquiries you can contact us at [A]support@mega.nz[/A]"
     },
-    "tooltip_more": {
-        "developer_comment": "A text for more options tooltip in Selection Manager",
-        "string": "More"
+    "busProfileUpdatePhone": {
+        "developer_comment": "The success message when a business account is updated with only the phone number changed",
+        "string": "Your Business profile has been updated."
     },
     "gotoacc": {
         "developer_comment": "Button's text in payment succeeded layout",
@@ -18162,6 +18162,10 @@
     "returntoacc": {
         "developer_comment": "Button's text in payment failed layout",
         "string": "Return to my account"
+    },
+    "tooltip_more": {
+        "developer_comment": "A text for more options tooltip in Selection Manager",
+        "string": "More"
     },
     "v4onboard_dialogtext": {
         "developer_comment": "Main text of the dialog for Revamp lite onboarding",

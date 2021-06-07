@@ -1630,6 +1630,11 @@ FileManager.prototype.initContextUI = function() {
             return;
         }
 
+        // Close properties dialog if context menu was triggered there
+        if ($.dialog === 'properties') {
+            propertiesDialog(true);
+        }
+
         loadingDialog.show('common', l[23130]);
 
         mega.fileTextEditor.getFile(nodeHandle).done(

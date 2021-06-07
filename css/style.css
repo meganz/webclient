@@ -4983,6 +4983,7 @@ tr:not(.taken-down) .grid-status-icon:not(.read-only):not(.read-and-write) {
 }
 
 .thumb .transfer-filetype-icon img {
+    background-color: var(--surface-mid-grey);
     display: inline-block;
     height: 18px;
     margin: 3px 2px;

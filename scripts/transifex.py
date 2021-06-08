@@ -43,22 +43,32 @@ gitlab_develop_url = os.getenv('GITLAB_DEVELOP_STRINGS_URL')
 gitlab_token = os.getenv('GITLAB_TOKEN')
 transifex_token = os.getenv('TRANSIFEX_TOKEN')
 
-dir_path = os.path.dirname(os.path.realpath(__file__))
-if os.path.exists(dir_path):
-    transifex_config_file = open(dir_path + "/transifex.json", "r")
+config_file = os.path.join(os.path.dirname(os.path.realpath(__file__)), "transifex.json")
+if not os.path.exists(config_file):
+    config_file += ".example"
+
+if os.path.exists(config_file):
+    transifex_config_file = open(config_file, "r")
     content = transifex_config_file.read()
     transifex_config_file.close()
     transifex_config = json.loads(content)
 
-    base_url = transifex_config.get('BASE_URL') or base_url
-    organisation_id = transifex_config.get('ORGANISATION') or organisation_id
-    project_id = transifex_config.get('PROJECT') or project_id
-    resource_slug = transifex_config.get('RESOURCE') or resource_slug
-    gitlab_develop_url = transifex_config.get('GITLAB_DEVELOP_STRINGS_URL') or gitlab_develop_url
-    gitlab_token = transifex_config.get('GITLAB_TOKEN') or gitlab_token
-    transifex_token = transifex_config.get('TRANSIFEX_TOKEN') or transifex_token
+    if not base_url:
+        base_url = transifex_config.get('BASE_URL')
+    if not organisation_id:
+        organisation_id = transifex_config.get('ORGANISATION')
+    if not project_id:
+        project_id = transifex_config.get('PROJECT')
+    if not resource_slug:
+        resource_slug = transifex_config.get('RESOURCE')
+    if not gitlab_develop_url:
+        gitlab_develop_url = transifex_config.get('GITLAB_DEVELOP_STRINGS_URL')
+    if not gitlab_token:
+        gitlab_token = transifex_config.get('GITLAB_TOKEN')
+    if not transifex_token:
+        transifex_token = transifex_config.get('TRANSIFEX_TOKEN')
 
-if not base_url or not organisation_id or not project_id or not resource_slug or not gitlab_develop_url or not gitlab_token or not transifex_token:
+if not base_url or not organisation_id or not project_id or not resource_slug or not gitlab_develop_url or not gitlab_token or not transifex_token or transifex_token.find("not set") != -1:
      print("Error: Incomplete Transifex settings.")
      sys.exit(1)
 

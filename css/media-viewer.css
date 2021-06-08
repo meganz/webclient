@@ -278,12 +278,9 @@
                 z-index: 10;
             }
             .media-viewer .play-video-button i {
-                margin: 14px 13px 12px;
                 --icon-size: 48px;
-                display: inline-block;
-            }
-            .media-viewer .play-video-button i::before {
-                --icon-size: 48px;
+                margin: 12px;
+                display: block;
             }
         /* Video controls */
 

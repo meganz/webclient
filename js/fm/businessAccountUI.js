@@ -2066,6 +2066,9 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = function () {
                             $('.user-management-able-user-dialog.mig-success.user-management-dialog');
                         $('.yes-answer', $dialog).off('click.suba').on('click.suba', closeDialog);
                         var msg = l[20954];
+                        if (attrsToChange.length === 1 && attrsToChange[0].key === '%phone') {
+                            msg = l.busProfileUpdatePhone;
+                        }
 
                         if (isTaxChanged) {
                             var myNow = new Date();

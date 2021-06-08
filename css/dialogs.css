@@ -4159,6 +4159,10 @@ body.de .mega-dialog.new-group-chat {
         left: auto;
         right: 0;
     }
+    .mega-dialog.add-user-popup .img-dialogs-achievements {
+        height: 56px;
+        width: 56px;
+    }
     .mega-dialog.add-user-popup .hidden-achievement-cell {
         display: table-cell;
         vertical-align: middle;

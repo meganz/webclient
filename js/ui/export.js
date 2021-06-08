@@ -2133,10 +2133,11 @@ var exportExpiry = {
             // Add click event to Remove link dropdown item
             $removeItem.rebind('click.removeLink', function() {
 
-                var $selectedLink = $('.item.selected', $linksTab);
-                var handle = $selectedLink.data('node-handle');
-                var $items;
-                var itemsLength;
+                const $bottomBar = $('footer', this.$dialog);
+                const $selectedLink = $('.item.selected', $linksTab);
+                const handle = $selectedLink.data('node-handle');
+                let $items;
+                let itemsLength;
 
                 // Create Remove link function
                 var removeLink = function() {
@@ -2159,9 +2160,19 @@ var exportExpiry = {
                     $items = $('.item', $linksTab);
                     itemsLength = $items.length;
 
-                    // Close the dialog If there is no link items
-                    if (!itemsLength) {
+                    if (itemsLength > 1) {
 
+                        // Show bottom bar with Copy buttons if more than one link
+                        $bottomBar.removeClass('empty');
+                    }
+                    else if (itemsLength === 1) {
+
+                        // Hide bottom bar with Copy buttons if more than one link
+                        $bottomBar.addClass('empty');
+                    }
+                    else {
+
+                        // Close the dialog If there is no link items
                         self.linksDialog(1);
 
                         return false;

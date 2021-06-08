@@ -149,11 +149,8 @@ function bindDropdownEvents($select, saveOption, contentBlock) {
 
     // Typing search and arrow key up and down features for dropdowns
     $hiddenInput.rebind('keyup.inputDropdown', function(e) {
-        var $scrollBlock = $('.dropdown-scroll', this);
         var charCode = e.which || e.keyCode; // ff
         var $filteredItem = {};
-        var $current = $('.option.active', $select).length ? $('.option.active', $select) :
-            $('.option:not(.template)', $select).first();
 
         if ((charCode > 64 && charCode < 91) || (charCode > 96 && charCode < 123)) {
             var inputValue = $hiddenInput.val();
@@ -165,6 +162,10 @@ function bindDropdownEvents($select, saveOption, contentBlock) {
         else {
             e.preventDefault();
             e.stopPropagation();
+
+            const $activeOption = $('.option.active', $select);
+            const $current = $activeOption.length ? $activeOption :
+                $('.option:not(.template)', $select).first();
 
             var $prev = $current.prev('.option:not(.template)');
             var $next = $current.next('.option:not(.template)');
@@ -181,6 +182,10 @@ function bindDropdownEvents($select, saveOption, contentBlock) {
         }
 
         if ($filteredItem.length) {
+            const $dropdownScroll = $('.dropdown-scroll', this);
+            const $scrollBlock = $dropdownScroll.length ? $dropdownScroll :
+                $('.dropdown-scroll', $(this).closest('.dropdown-input'));
+
             $('.option.active', $select).removeClass('active');
             $filteredItem.addClass('active');
 

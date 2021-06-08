@@ -3523,8 +3523,12 @@ FullScreenManager.prototype.enterFullscreen = function() {
 
             M.req(req).tryCatch(success, reject);
 
-            if (Object(res.General).InternetMediaType === 'video/mp4' && !mp4brands.has(res.container)) {
-                eventlog(99729, JSON.stringify([1, res.containerid, res.container, res.vcodec]));
+            if (Object(res.General).InternetMediaType === 'video/mp4') {
+                const known = new Set(['qt  ', ...mp4brands]);
+
+                if (!known.has(res.container)) {
+                    eventlog(99729, JSON.stringify([2, res.containerid, res.container, res.vcodec, res.height]));
+                }
             }
 
             if (!res.vcodec && req.n) {

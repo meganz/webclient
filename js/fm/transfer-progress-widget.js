@@ -1056,7 +1056,7 @@ mega.tpw = new function TransferProgressWidget() {
         delay('tpw:finishTimer', () => {
             updateHeaderAndContent();
             postPorcessComplete();
-        }, 1500);
+        }, 400);
 
         var timerHandle = setTimeout(function() {
             $targetedRow.fadeOut(400, function() {

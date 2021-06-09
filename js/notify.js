@@ -450,12 +450,12 @@ var notify = {
 
         $('.js-topbarnotification').rebind('click', function() {
             let $elem = $(this).parent();
-            $elem.toggleClass('show');
             if ($elem.hasClass('show')) {
-                notify.renderNotifications();
+                notify.closePopup();
             }
             else {
-                notify.closePopup();
+                $elem.addClass('show');
+                notify.renderNotifications();
             }
         });
     },
@@ -468,7 +468,7 @@ var notify = {
      */
     closePopup: function() {
         'use strict';
-        if (notify.$popup !== null) {
+        if (notify.$popup !== null && this.$popup.closest('.js-dropdown-notification').hasClass('show')) {
             this.$popup.closest('.js-dropdown-notification').removeClass('show');
             notify.markAllNotificationsAsSeen();
         }

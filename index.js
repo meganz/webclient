@@ -2601,10 +2601,7 @@ function topmenuUI() {
 
         if (!e || (!e.target.closest('.js-dropdown-notification') &&
             ((c && c.indexOf('js-topbarnotification') === -1) || !c))) {
-            elements = document.getElementsByClassName('js-dropdown-notification');
-            for (i = elements.length; i--;) {
-                elements[i].classList.remove('show');
-            }
+            notify.closePopup();
         }
 
         if (!e || (!e.target.closest('.js-dropdown-warning') &&

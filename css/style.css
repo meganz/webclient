@@ -10374,9 +10374,6 @@ a.blog-article-button {
 .grid-table.sent-requests td:last-child, .grid-table.contact-requests td:last-child {
     padding-right: 14px;
 }
-button.link-button.accept-all {
-    text-transform: capitalize;
-}
 .fm-share-user-info {
     display: table;
     vertical-align: middle;

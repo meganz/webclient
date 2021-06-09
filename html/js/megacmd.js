@@ -118,15 +118,6 @@ function initMegacmd() {
     });
 
     registerLinuxDownloadButton($('.megacmd-linux-download', $content));
-
-    $content.rebind('click.closeMegaCmdLinux', function(e) {
-        var $target = $(e.target);
-
-        if (pf.indexOf('LINUX') < 0 && $target.closest('.megaapp-linux').length < 1
-            && !$('.dropdown-input.active', $content).length) {
-            resetMegacmd();
-        }
-    });
 }
 
 /**

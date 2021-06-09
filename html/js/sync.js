@@ -171,16 +171,6 @@ function initMegasync() {
         return false;
     });
 
-    $content.rebind('mousedown.resetMegaSync', function(e) {
-        var $target = $(e.target);
-
-        if (pf.indexOf('LINUX') < 0 && !$target.closest('.megaapp-linux').length
-            && !$('.dropdown-input.active', $content).length) {
-
-            resetMegasync();
-        }
-    });
-
     $('.pages-nav.nav-button').removeClass('active');
     $('.pages-nav.nav-button.sync').addClass('active');
 }

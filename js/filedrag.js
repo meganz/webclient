@@ -260,6 +260,12 @@
             e.preventDefault();
         }
 
+        // Clear drag element
+        touchedElement = 0;
+
+        $('.drag-n-drop.overlay').addClass('hidden');
+        $('body').removeClass('overlayed');
+
         if (M.isInvalidUserStatus()) {
             return false;
         }
@@ -278,12 +284,6 @@
         useMegaSync = -1;
 
         var currentDir = M.currentCustomView ? M.currentCustomView.nodeID : M.currentdirid;
-
-        // Clear drag element
-        touchedElement = 0;
-
-        $('.drag-n-drop.overlay').addClass('hidden');
-        $('body').removeClass('overlayed');
 
         if ($.awaitingLoginToUpload) {
             return tooltiplogin.init();

@@ -3085,7 +3085,6 @@ else if (!browserUpdate) {
         jsl.push({f:'js/ui/simpletip.js', n: 'simpletip_js', j:1,w:1});
         jsl.push({f:'css/mega-button.css', n: 'mega_button_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/mega-dialog.css', n: 'mega_dialog_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'css/vars/theme.css', n: 'theme_variables_css', j:2, w:30, c:1, d:1, cache:1});
         jsl.push({f:'css/vars/button.css', n: 'button_variables_css', j:2, w:30, c:1, d:1, cache:1});
         jsl.push({f:'css/vars/dialog.css', n: 'vars_dialog_css', j:2, w:30, c:1, d:1, cache:1});
         jsl.push({f:'css/features.css', n: 'features_css', j:2,w:5,c:1,d:1,cache:1});
@@ -3149,7 +3148,6 @@ else if (!browserUpdate) {
             jsl.push({f:'css/popups.css', n: 'popups_css', j:2,w:5,c:1,d:1,cache:1});
             jsl.push({f:'css/retina-images.css', n: 'retina_images_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
             jsl.push({f:'css/topbar.css', n: 'topbar_css', j:2,w:5,c:1,d:1,cache:1});
-            jsl.push({f:'css/vars/theme.css', n: 'theme_variables_css', j:2, w:30, c:1, d:1, cache:1});
             jsl.push({f:'css/icons.css', n: 'icons_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
             jsl.push({f:'css/important.css', n: 'important_css', j:2, w:30, c:1, d:1, cache:1});
         }

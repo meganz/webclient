@@ -42,7 +42,7 @@ var pro = {
         }
         else {
             // Get the membership plans.
-            api_req({ a: 'utqa', nf: 1 }, {
+            api_req({ a: 'utqa', nf: 1, b: 1 }, {
                 callback: function(results) {
 
                     // The rest of the webclient expects this data in an array format

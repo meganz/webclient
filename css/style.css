@@ -13041,19 +13041,20 @@ body.megaChatDisabled .nw-contact-name button.start-chat-button {
 
 /* Dashboard left pane */
 
-.content-panel.dashboard .small-icon.info-icon {
-    background-image: url(../images/mega/fm-main-sprite.png);
+.content-panel.dashboard .sprite-fm-mono.icon-info-filled.simpletip {
     background-repeat: no-repeat;
-    background-position: -26px -12378px;
-    background-size: 48px auto;
     display: inline-block;
-    opacity: 0.4;
     cursor: pointer;
-    transition: 0.3s;
     margin-left: 4px;
+    --mask-color: var(--icon-rest);
+    --icon-size: 24px;
+    vertical-align: middle;
+    width: 24px;
+    height: 24px;
 }
-.content-panel.dashboard .small-icon.info-icon:hover {
-    opacity: 0.8;
+
+.content-panel.dashboard .sprite-fm-mono.icon-info-filled.simpletip:hover {
+    --mask-color: var(--icon-active);
 }
 
 /* Business account */

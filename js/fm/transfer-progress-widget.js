@@ -354,9 +354,11 @@ mega.tpw = new function TransferProgressWidget() {
                 return $($currWidget[1]);
             }
         }
-        else {
+        else if ($('#fmholder').is(':visible') && $currWidget.parents('#fmholder').length === 0) {
+            $currWidget.appendTo($('.corner-messages', '#fmholder'));
             return $currWidget;
         }
+        return $currWidget;
     };
 
     /** Initialize the properties and class members */

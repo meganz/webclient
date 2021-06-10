@@ -1046,6 +1046,14 @@ function dlprogress(fileid, perc, bytesloaded, bytestotal,kbps, dl_queue_num)
         $('.download.eta-block .dark-numbers', $dowloadWrapper).safeHTML(secondsToTime(retime, 1));
         $('.download.eta-block .light-txt', $dowloadWrapper).text('');
 
+        if (!$.transferprogress) {
+            $.transferprogress = Object.create(null);
+        }
+
+        if (bytestotal) {
+            $.transferprogress["dl_" + fileid] = [bytesloaded, bytestotal, kbps * 1000];
+        }
+
         if (mega.tpw) {
             mega.tpw.updateDownloadUpload(
                 mega.tpw.DOWNLOAD,

@@ -61,7 +61,7 @@ if os.path.exists(config_file):
     gitlab_token = transifex_config.get('GITLAB_TOKEN') or gitlab_token
     transifex_token = transifex_config.get('TRANSIFEX_TOKEN') or transifex_token
 
-if not base_url or not organisation_id or not project_id or not resource_slug or not gitlab_develop_url or not gitlab_token or not transifex_token:
+if not base_url or not organisation_id or not project_id or not resource_slug or not gitlab_develop_url or not transifex_token:
      print("Error: Incomplete Transifex settings.")
      sys.exit(1)
 
@@ -406,6 +406,9 @@ def string_validation(new_strings):
 
 def get_differences():
     new_strings_found = {}
+    if not GITLAB_TOKEN:
+        print("GITLAB_TOKEN is not set.")
+        sys.exit(1)
     try:
         new_file = open(os.path.dirname(os.path.abspath(__file__)) + "/../lang/strings.json", "r")
         new_strings = json.loads(new_file.read())

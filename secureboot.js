@@ -54,10 +54,21 @@ var is_uc_browser = is_mobile && ua.indexOf('ucbrowser') > 0;
 var is_ios = is_mobile && (ua.indexOf('iphone') > -1 || ua.indexOf('ipad') > -1 || ua.indexOf('ipod') > -1);
 var is_old_windows_phone = is_mobile && /windows phone 8|iemobile\/9|iemobile\/10|iemobile\/11/i.test(ua);
 var is_windowsphone = is_old_windows_phone || is_mobile && ua.indexOf('windows phone') > 0;
-var is_huawei = is_mobile && ua.indexOf('huawei') > 0;
+var is_huawei = is_mobile && (ua.indexOf('huawei') > 0 || ua.indexOf('hmscore') > 0);
 
 if (is_android && !is_huawei) {
-    // @todo detect huawei devices by model (?)
+    // detect huawei devices by model
+    var tmp = [
+        'ana-al00', 'ana-nx9', 'ang-an00', 'art-l28', 'brq-an00', 'cdy-nx9b', 'dra-lx9', 'els-n39', 'els-nx9',
+        'jef-nx9', 'jny-lx2', 'lio-an00m', 'lio-l29', 'lio-n29', 'med-lx9', 'noh-an00', 'noh-lg', 'noh-nx9',
+        'nop-an00', 'oce-an10', 'oce-an50', 'tas-l29', 'tet-an00'
+    ];
+    for (m = tmp.length; m--;) {
+        if (ua.indexOf(tmp[m]) > 0) {
+            is_huawei = tmp[m];
+            break;
+        }
+    }
 }
 
 // @todo get rid of 'm' around the codebase!

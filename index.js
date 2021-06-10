@@ -2311,17 +2311,20 @@ function topmenuUI() {
 
     // Show version in top menu
     var $versionButton = $('.top-mega-version', $topMenu).text('v. ' + M.getSiteVersion());
-    var versionClickCounter = 0;
-    var versionClickTimeout = null;
-    $versionButton.rebind('click.versionupdate', function() {
-        clearTimeout(versionClickTimeout);
-        if (++versionClickCounter >= 3) {
-            mega.developerSettings.show();
-        }
-        versionClickTimeout = setTimeout(function() {
-            versionClickCounter = 0;
-        }, 1000);
-    });
+
+    if (!is_litesite) {
+        var versionClickCounter = 0;
+        var versionClickTimeout = null;
+        $versionButton.rebind('click.versionupdate', function() {
+            clearTimeout(versionClickTimeout);
+            if (++versionClickCounter >= 3) {
+                mega.developerSettings.show();
+            }
+            versionClickTimeout = setTimeout(function() {
+                versionClickCounter = 0;
+            }, 1000);
+        });
+    }
 
     if (u_type > 0) {
 

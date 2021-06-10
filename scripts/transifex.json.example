@@ -1,6 +1,6 @@
 {
-    "TRANSIFEX_TOKEN": "fallback if system environment variable is not set",
-    "GITLAB_TOKEN": "fallback if system environment variable is not set",
+    "TRANSIFEX_TOKEN": "",
+    "GITLAB_TOKEN": "",
     "BASE_URL": "https://rest.api.transifex.com",
     "ORGANISATION": "meganz-1",
     "PROJECT": "webclient-1",

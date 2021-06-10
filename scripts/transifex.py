@@ -53,22 +53,15 @@ if os.path.exists(config_file):
     transifex_config_file.close()
     transifex_config = json.loads(content)
 
-    if not base_url:
-        base_url = transifex_config.get('BASE_URL')
-    if not organisation_id:
-        organisation_id = transifex_config.get('ORGANISATION')
-    if not project_id:
-        project_id = transifex_config.get('PROJECT')
-    if not resource_slug:
-        resource_slug = transifex_config.get('RESOURCE')
-    if not gitlab_develop_url:
-        gitlab_develop_url = transifex_config.get('GITLAB_DEVELOP_STRINGS_URL')
-    if not gitlab_token:
-        gitlab_token = transifex_config.get('GITLAB_TOKEN')
-    if not transifex_token:
-        transifex_token = transifex_config.get('TRANSIFEX_TOKEN')
+    base_url = transifex_config.get('BASE_URL') or base_url
+    organisation_id = transifex_config.get('ORGANISATION') or organisation_id
+    project_id = transifex_config.get('PROJECT') or project_id
+    resource_slug = transifex_config.get('RESOURCE') or resource_slug
+    gitlab_develop_url = transifex_config.get('GITLAB_DEVELOP_STRINGS_URL') or gitlab_develop_url
+    gitlab_token = transifex_config.get('GITLAB_TOKEN') or gitlab_token
+    transifex_token = transifex_config.get('TRANSIFEX_TOKEN') or transifex_token
 
-if not base_url or not organisation_id or not project_id or not resource_slug or not gitlab_develop_url or not gitlab_token or not transifex_token or transifex_token.find("not set") != -1:
+if not base_url or not organisation_id or not project_id or not resource_slug or not gitlab_develop_url or not gitlab_token or not transifex_token:
      print("Error: Incomplete Transifex settings.")
      sys.exit(1)
 

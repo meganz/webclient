@@ -2914,7 +2914,6 @@ accountUI.transfers = {
 
         // Upload and Download - Upload
         this.uploadAndDownload.upload.render();
-        this.uploadAndDownload.upload.bindEvents();
 
         // Upload and Download - Download
         this.uploadAndDownload.download.render();
@@ -3033,52 +3032,7 @@ accountUI.transfers = {
                 $('.numbers.active', $uploadSettings).removeClass('active');
                 $(' .numbers:nth-child(' + $slider.slider('value') + ')', $uploadSettings)
                     .addClass('active');
-
-                // Speed limit
-                fmconfig.ul_maxSpeed = fmconfig.ul_maxSpeed || 0;
-                var currentVal = parseInt(fmconfig.ul_maxSpeed) < 1 ? fmconfig.ul_maxSpeed : 1;
-
-                if (currentVal === 1) {
-                    $('#ulspeedvalue', accountUI.$contentBlock).val(fmconfig.ul_maxSpeed / 1024);
-                }
-                else if (!$('#ulspeedvalue', accountUI.$contentBlock).val()){
-                    $('#ulspeedvalue', accountUI.$contentBlock).val(100);
-                }
-
-                accountUI.inputs.radio.init(
-                    '.ulspeedradio',
-                    $('.ulspeedradio', accountUI.$contentBlock).parent(),
-                    currentVal,
-                    function (val) {
-                        val = parseInt(val);
-                        var ul_maxSpeed = val;
-
-                        if (val === 1) {
-                            if (parseInt($('#ulspeedvalue', accountUI.$contentBlock).val()) > 0) {
-                                ul_maxSpeed = parseInt($('#ulspeedvalue', accountUI.$contentBlock).val()) * 1024;
-                            }
-                            else {
-                                ul_maxSpeed = 100 * 1024;
-                            }
-                        }
-
-                        mega.config.setn('ul_maxSpeed', ul_maxSpeed);
-                    }
-                );
             },
-
-            bindEvents: function() {
-
-                'use strict';
-
-                $('#ulspeedvalue', accountUI.$contentBlock)
-                    .rebind('click.speedValueClick keyup.speedValueKeyup', function() {
-
-                        $('.ulspeedradio', accountUI.$contentBlock).removeClass('radioOn').addClass('radioOff');
-                        $('#rad3,#rad3_div', accountUI.$contentBlock).addClass('radioOn').removeClass('radioOff');
-                        $('#rad3', accountUI.$contentBlock).trigger('click');
-                    });
-            }
         },
 
         download: {

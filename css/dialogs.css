@@ -2057,12 +2057,14 @@ body.de .mega-dialog.new-group-chat {
         position: relative;
         height: 29px;
         color: var(--text-color-high);
+        padding-top: 3px;
     }
     .mega-dialog.export-links-dialog .item-size {
         display: inline-block;
         -webkit-margin-start: 8px;
         margin-inline-start: 8px;
         vertical-align: top;
+        padding-top: 3px;
     }
     .mega-dialog.export-links-dialog .item-link {
         display: flex;

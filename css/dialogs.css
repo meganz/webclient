@@ -2099,7 +2099,7 @@ body.de .mega-dialog.new-group-chat {
         border: 0;
         background-color: transparent;
         caret-color: transparent;
-        color: var(--text-color-medium);
+        color: var(--text-color-high);
     }
     .mega-dialog.export-links-dialog .item-link button {
         border-radius: 0 4px 4px 0;
@@ -2391,6 +2391,7 @@ body.de .mega-dialog.new-group-chat {
     }
     .mega-dialog.export-links-dialog .radio-txt {
         padding-inline-end: 4px;
+        color: var(--text-color-high);
     }
     .mega-dialog.export-links-dialog .key .checkdiv {
         -webkit-margin-end: 4px;

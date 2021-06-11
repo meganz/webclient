@@ -1014,13 +1014,12 @@ scparser.$add('opc', {
         // outgoing pending contact
         processOPC([a]);
 
-        // TODO: deprecate
-        if (fminitialized) {
-            M.syncPendingContacts(a);
-            M.drawSentContactRequests([a]);
-        }
-
-        if (fminitialized && M.chat && megaChatIsReady) {
+        if (
+            fminitialized && M.chat && (
+                megaChatIsReady ||
+                megaChat.routingSection === "contacts" && megaChat.routingSubSection === "sent"
+            )
+        ) {
             mBroadcaster.sendMessage('fmViewUpdate:opc');
         }
     }
@@ -1030,12 +1029,6 @@ scparser.$add('ipc', {
     b: function(a) {
         // incoming pending contact
         processIPC([a]);
-
-        // TODO: deprecate
-        if (fminitialized) {
-            M.syncPendingContacts(a);
-            M.drawReceivedContactRequests([a]);
-        }
 
         if (fminitialized && megaChatIsReady) {
             mBroadcaster.sendMessage('fmViewUpdate:ipc');
@@ -2862,14 +2855,7 @@ function processIPC(ipc, ignoreDB) {
                 M.delIPC(ipc[i].p);
                 $('#ipc_' + ipc[i].p).remove();
                 delete M.ipc[ipc[i].p];
-                if ((Object.keys(M.ipc).length === 0) && (M.currentdirid === 'ipc')) {
-                    updateIpcRequests();
-                    $('.contact-requests-grid').addClass('hidden');
-                    $('.fm-empty-contacts .fm-empty-cloud-txt').text(l[6196]);
-                    $('.fm-empty-contacts').removeClass('hidden');
-                    $('button.link-button.accept-all').addClass('hidden');
-                }
-                else if (Object.keys(M.ipc).length) {
+                if (Object.keys(M.ipc).length) {
                     updateIpcRequests();
                 }
 
@@ -2915,11 +2901,6 @@ function processOPC(opc, ignoreDB) {
                 if (M.opc[k].dts && (M.opc[k].m === opc[i].m)) {
                     $('#opc_' + k).remove();
                     delete M.opc[k];
-                    if ((Object.keys(M.opc).length === 0) && (M.currentdirid === 'opc')) {
-                        $('.sent-requests-grid').addClass('hidden');
-                        $('.fm-empty-contacts .fm-empty-cloud-txt').text(l[6196]);
-                        $('.fm-empty-contacts').removeClass('hidden');
-                    }
                     break;
                 }
             }

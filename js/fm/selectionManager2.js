@@ -31,22 +31,6 @@ class SelectionManager2Base {
         this.CLS_UI_SELECTED = "ui-selected";
     }
 
-    /**
-     * Should be called by implementation classes after the constructor finishes
-     */
-    init() {
-        if (this.currentdirid === "ipc" || this.currentdirid === "opc") {
-            this.idMapper = (n) => {
-                return n.p ? this.currentdirid + "_" + n.p : n.h;
-            };
-        }
-        else if (this.currentdirid === "contacts") {
-            this.idMapper = (u) => {
-                return u.u;
-            };
-        }
-    }
-
 
     /**
      * Should be implemented by classes. Would be called when scrolling is required to specific
@@ -492,8 +476,6 @@ class SelectionManager2_DOM extends SelectionManager2Base {
     }
 
     init() {
-        super.init();
-
         var $uiSelectable = $('.fm-right-files-block .ui-selectable:visible:not(.hidden)');
 
         if ($uiSelectable.length === 1) {
@@ -907,8 +889,6 @@ class SelectionManager2_React extends SelectionManager2Base {
         this.currentdirid = currentdirid;
         this.itemsPerRowGetter = itemsPerRowGetter;
         this.scrollToElementProxyMethod = scrollToNode;
-
-        this.init();
     }
 
     get items_per_row() {

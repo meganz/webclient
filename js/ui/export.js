@@ -820,6 +820,8 @@ var exportPassword = {
             // Cache dialog selector
             this.$dialog = $('.mega-dialog.password-dialog', 'body');
 
+            this.$megaInput = new mega.ui.MegaInputs($('#password-decrypt-input',this.$dialog));
+
             // Show the dialog
             this.showDialog(page);
         },
@@ -831,7 +833,6 @@ var exportPassword = {
         showDialog: function(page) {
 
             "use strict";
-
             var $closeButton = $('button.js-close', this.$dialog);
             var $decryptButton = $('.decrypt-link-button', this.$dialog);
             var $decryptButtonText = $('.decrypt-text', $decryptButton);
@@ -873,12 +874,12 @@ var exportPassword = {
         decryptLink: function(page) {
 
             "use strict";
-
+            var $megaInput = this.$megaInput;
             var $decryptButton = $('.decrypt-link-button', this.$dialog);
             var $decryptButtonText = $('.decrypt-text', $decryptButton);
             var $decryptButtonProgress = $('.decryption-in-progress', $decryptButton);
-            var $password = $('.password-decrypt-input', this.$dialog);
-            var $errorLabel = $('.password-link-decrypt-error', this.$dialog);
+            var $password = $megaInput.$input;
+
 
             // Get the password and the encoded information in the URL
             var password = $password.val();
@@ -887,12 +888,9 @@ var exportPassword = {
 
             // If no password given...
             if (!password) {
-                $errorLabel.text(l[970]);  // Please enter a valid password...
+                $megaInput.showError(l[970]); // Please enter a valid password...
                 return false;
             }
-
-            // Hide previous errors
-            $errorLabel.text('');
 
             // Decode the request
             try {
@@ -901,7 +899,7 @@ var exportPassword = {
             catch (exception) {
 
                 // Show error and abort
-                $errorLabel.text(l[9068]);  // The link could not be decoded...
+                $megaInput.showError(l[9068]);  // The link could not be decoded...
                 return false;
             }
 
@@ -912,7 +910,7 @@ var exportPassword = {
             if (typeof exportPassword.algorithms[algorithm] === 'undefined') {
 
                 // Show error and abort
-                $errorLabel.text(l[9069]);  // The algorithm this link was encrypted with is not supported
+                $megaInput.showError(l[9069]);  // The algorithm this link was encrypted with is not supported
                 return false;
             }
 
@@ -965,7 +963,7 @@ var exportPassword = {
                 if (macString !== macToVerifyString) {
 
                     // Show error and abort
-                    $errorLabel.text(l[9076]);  // The link could not be decrypted...
+                    $megaInput.showError(l[9076]);  // The link could not be decrypted...
                     $decryptButtonProgress.addClass('hidden');
                     $decryptButtonText.text(l[1027]);
                     return false;

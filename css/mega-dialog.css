@@ -111,6 +111,11 @@
         font: var(--text-body1);
     }
 
+    .mega-dialog .content-block .sub-header {
+        color: var(--text-color-higher);
+        font: var(--text-body1-bold);
+    }
+
     .mega-dialog p,
     .mega-dialog a,
     .mega-dialog a:visited,
@@ -307,6 +312,10 @@
 
             .mega-dialog.dialog-template-main > header p {
                 text-align: start;
+            }
+
+            .mega-dialog.dialog-template-main > header p span {
+                color: var(--text-color-success);
             }
 
             .mega-dialog.dialog-template-main .content-block {

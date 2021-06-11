@@ -2057,12 +2057,14 @@ body.de .mega-dialog.new-group-chat {
         position: relative;
         height: 29px;
         color: var(--text-color-high);
+        padding-top: 3px;
     }
     .mega-dialog.export-links-dialog .item-size {
         display: inline-block;
         -webkit-margin-start: 8px;
         margin-inline-start: 8px;
         vertical-align: top;
+        padding-top: 3px;
     }
     .mega-dialog.export-links-dialog .item-link {
         display: flex;
@@ -2073,6 +2075,7 @@ body.de .mega-dialog.new-group-chat {
         position: relative;
     }
     .mega-dialog.export-links-dialog .input-wrap {
+        flex: 1;
         vertical-align: top;
         width: 100%;
     }
@@ -2091,13 +2094,14 @@ body.de .mega-dialog.new-group-chat {
         height: 38px;
         box-sizing: border-box;
         width: 100%;
+        padding: 0 10px;
         -webkit-padding-start: 36px;
         padding-inline-start: 36px;
         margin: 0;
         border: 0;
         background-color: transparent;
         caret-color: transparent;
-        color: var(--text-color-medium);
+        color: var(--text-color-high);
     }
     .mega-dialog.export-links-dialog .item-link button {
         border-radius: 0 4px 4px 0;
@@ -2389,6 +2393,7 @@ body.de .mega-dialog.new-group-chat {
     }
     .mega-dialog.export-links-dialog .radio-txt {
         padding-inline-end: 4px;
+        color: var(--text-color-high);
     }
     .mega-dialog.export-links-dialog .key .checkdiv {
         -webkit-margin-end: 4px;
@@ -4156,6 +4161,10 @@ body.de .mega-dialog.new-group-chat {
     .rtl .mega-dialog.add-user-popup .multiple-input i:not(.remove-item) {
         left: auto;
         right: 0;
+    }
+    .mega-dialog.add-user-popup .img-dialogs-achievements {
+        height: 56px;
+        width: 56px;
     }
     .mega-dialog.add-user-popup .hidden-achievement-cell {
         display: table-cell;
@@ -6750,14 +6759,13 @@ body.de .mega-dialog.new-group-chat {
         position: relative;
         display: flex;
         align-items: center;
-        border-right: 2px solid var(--divider-color);
     }
-    body:not(.rtl) .mega-dialog.achievements-list-dialog .achieved-block:last-of-type {
+    .mega-dialog.achievements-list-dialog .achieved-block:last-of-type {
+        justify-content: flex-end;
+    }
+    /* .rtl .mega-dialog.achievements-list-dialog .achieved-block:first-of-type {
         border-right: none;
-    }
-    .rtl .mega-dialog.achievements-list-dialog .achieved-block:first-of-type {
-        border-right: none;
-    }
+    } */
     .mega-dialog.achievements-list-dialog .achieved-block .achievements-header-icon {
         margin: 0 24px;
         width: 48px;
@@ -6823,9 +6831,10 @@ body.de .mega-dialog.new-group-chat {
     .mega-dialog.achievements-list-dialog .achievements-cell .image-container {
         width: 128px;
         height: 128px;
-        margin: 24px auto 12px;
+        margin: 12px auto 12px;
         display: flex;
         align-items: center;
+        justify-content: center;
         flex-grow: 0;
         flex-shrink: 0;
     }
@@ -6836,6 +6845,7 @@ body.de .mega-dialog.new-group-chat {
     .mega-dialog.achievements-list-dialog .achievements-cell .image-container .achievement-icon {
         width: 100%;
     }
+
     .mega-dialog.achievements-list-dialog .ach-install-megasync .achievement-icon {
         height: 70px;
     }
@@ -6852,7 +6862,7 @@ body.de .mega-dialog.new-group-chat {
         height: 88px;
     }
     .mega-dialog.achievements-list-dialog .achievement-full.info {
-        padding: 12px 24px 0;
+        padding: 0 24px;
         position: relative;
         text-align: center;
         display: flex;
@@ -6870,7 +6880,7 @@ body.de .mega-dialog.new-group-chat {
         text-align: center;
         display: block;
         padding-top: 8px;
-        font: var(--text-body1);
+        font: var(--text-body2);
         color: var(--text-color-medium);
         vertical-align: top;
     }
@@ -6962,6 +6972,20 @@ body.de .mega-dialog.new-group-chat {
     .mega-dialog.achievements-list-dialog .achievements-cell.achieved .mega-button.positive,
     .mega-dialog.achievements-list-dialog .achievements-cell.one-reward .mega-button.positive {
         display: none;
+    }
+
+    .mega-dialog.achievements-list-dialog footer .footer-container {
+        height: 60px;
+        padding: 10px;
+        justify-content: center;
+        align-content: space-around;
+        font: var(--text-h3);
+    }
+    .mega-dialog.achievements-list-dialog footer a {
+        text-decoration: underline;
+    }
+    .mega-dialog.achievements-list-dialog footer .footer-container p span {
+        color: var(--text-color-success);
     }
 
     @media only screen and (max-height: 740px) {

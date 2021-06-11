@@ -515,13 +515,6 @@
                     $('.fm-empty-contacts .fm-empty-cloud-txt').text(l[784]);
                     $('.fm-empty-contacts').removeClass('hidden');
                 }
-                else if (M.currentdirid === 'opc' || M.currentdirid === 'ipc') {
-                    $('.contacts-tab-lnk.ipc[data-folder=' + M.currentdirid+ ']')
-                        .removeClass('filled').find('span').text('');
-                    $('button.link-button.accept-all').addClass('hidden');
-                    $('.fm-empty-contacts .fm-empty-cloud-txt').text(l[6196]);
-                    $('.fm-empty-contacts').removeClass('hidden');
-                }
                 else if (String(M.currentdirid).substr(0, 7) === 'search/') {
                     $('.fm-empty-search').removeClass('hidden');
                 }

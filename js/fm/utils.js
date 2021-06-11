@@ -2509,6 +2509,7 @@ MegaUtils.prototype.getPersistentDataEntries = promisify(async function(resolve,
                     });
             })
             .then(append)
+            .catch(nop)
             .finally(fallback);
     }
     else {

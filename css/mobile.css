@@ -6232,7 +6232,7 @@ textarea.mobile.support-text-field {
 .mobile.achievements-page .transfer-quota-block {
     display: inline-block;
     text-align: center;
-    width: 49%;
+    width: 100%;
 }
 .mobile.achievements-page .transfer-quota-block {
     border-left: 1px solid #d8d8d8;
@@ -6285,7 +6285,11 @@ textarea.mobile.support-text-field {
     padding: 2px 11px 8px 11px;
     position: relative;
 }
-.mobile.achievements-page .bonus-information-block .left-block,
+.mobile.achievements-page .bonus-information-block .left-block {
+    display: inline-block;
+    position: relative;
+    top: -10px;
+}
 .mobile.achievements-page .bonus-information-block .right-block {
     display: inline-block;
 }
@@ -6376,7 +6380,7 @@ textarea.mobile.support-text-field {
 .mobile.achievements-referral-bonuses-page .transfer-quota-block {
     display: inline-block;
     text-align: center;
-    width: 49%;
+    width: 100%;
 }
 .mobile.achievements-referral-bonuses-page .transfer-quota-block {
     border-left: 1px solid #d8d8d8;
@@ -8072,6 +8076,7 @@ textarea.mobile.support-text-field {
     align-items: center;
 }
 .mobile .improved-recovery-steps .app-instruction-block .app-button-block .icon-dropdown {
+    pointer-events: none;
     position: absolute;
     --icon-size: 24px;
     right: 12px;

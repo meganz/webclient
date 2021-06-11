@@ -885,6 +885,7 @@ export class TypingArea extends MegaRenderMixin {
                 <Button
                     className="popup-button emoji-button"
                     icon="sprite-fm-theme icon-emoji"
+                    iconHovered="sprite-fm-theme icon-emoji-active"
                     disabled={this.props.disabled}>
                     <DropdownEmojiSelector
                         className="popup emoji"

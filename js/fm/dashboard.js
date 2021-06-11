@@ -220,7 +220,7 @@ function dashboardUI() {
                 // If user has nextplan, show infomative tooltip
                 if (account.nextplan) {
                     $('.account.left-pane.plan-date-info').safeHTML(escapeHTML(l[20153]) +
-                        '<div class="small-icon info-icon simpletip" ' +
+                        '<div class="sprite-fm-mono icon-info-filled simpletip" ' +
                         'data-simpletip-class="center-align medium-width" data-simpletip="' +
                         escapeHTML(l[20965]) + '"></div>');
                 }

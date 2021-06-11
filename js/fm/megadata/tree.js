@@ -926,9 +926,6 @@ MegaData.prototype.redrawTree = function(f) {
     else if (M.currentrootid === 'public-links') {
         M.buildtree({h: 'public-links'}, force);
     }
-    else if (M.currentrootid === 'contacts' || M.currentrootid === 'opc' || M.currentrootid === 'ipc') {
-        M.contacts();
-    }
 
     M.addTreeUIDelayed(2);
     $('.nw-fm-tree-item').noTransition(function() {
@@ -1294,15 +1291,6 @@ MegaData.prototype.onTreeUIOpen = function(id, event, ignoreScroll) {
     else if (id_s === 'chat') {
         this.onSectionUIOpen('conversations');
     }
-    else if (id_r === 'contacts') {
-        this.onSectionUIOpen('contacts');
-    }
-    else if (id_r === 'ipc') {
-        this.onSectionUIOpen('ipc');
-    }
-    else if (id_r === 'opc') {
-        this.onSectionUIOpen('opc');
-    }
     else if (id_s === 'user-management') {
         this.onSectionUIOpen('user-management');
     }
@@ -1386,8 +1374,7 @@ MegaData.prototype.onTreeUIOpen = function(id, event, ignoreScroll) {
 
     if (!ignoreScroll) {
 
-        if ((!folderlink && id === this.RootID) || id === 'shares' || id === 'contacts' ||
-            id === 'chat' || id === 'opc' || id === 'ipc') {
+        if (!folderlink && id === this.RootID || id === 'shares' || id === 'chat') {
             stickToTop = true;
             scrollTo = '.nw-tree-panel-header';
             if (id === this.RootID) {

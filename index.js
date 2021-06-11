@@ -399,6 +399,12 @@ function init_page() {
         loadSubPage("/fm/chat/contacts");
         return false;
     }
+    if (page === "fm/ipc") {
+        return loadSubPage("/fm/chat/contacts/received");
+    }
+    if (page === "fm/opc") {
+        return loadSubPage("/fm/chat/contacts/sent");
+    }
 
     $('#loading').hide();
     if (window.loadingDialog) {
@@ -984,7 +990,8 @@ function init_page() {
         return false;
     }
     else if (page === 'achievements') {
-        loadSubPage('fm/account/achievements');
+        parsepage(pages.achievements);
+        achievementPage();
         return false;
     }
     else if (page === 'fm/account/achievements') {
@@ -1771,7 +1778,7 @@ function init_page() {
         var id = false;
         if (page.substr(0, 2) === 'fm') {
             id = page.replace('fm/', '');
-            if (id.length < 5 && (id !== 'chat' && id !== 'opc' && id !== 'ipc')) {
+            if (id.length < 5 && id !== 'chat') {
                 id = false;
             }
         }
@@ -2149,7 +2156,7 @@ function topbarUI(holderId) {
         for (i = dropdown.length; i--;) {
             dropdown[i].classList.remove('show');
         }
-        if (!$('.fm-dialog-overlay').hasClass('hidden')) {
+        if (!this.classList.contains('logout') && !$('.fm-dialog-overlay').hasClass('hidden')) {
             $('.fm-dialog-overlay').addClass('hidden');
         }
     });
@@ -2311,17 +2318,20 @@ function topmenuUI() {
 
     // Show version in top menu
     var $versionButton = $('.top-mega-version', $topMenu).text('v. ' + M.getSiteVersion());
-    var versionClickCounter = 0;
-    var versionClickTimeout = null;
-    $versionButton.rebind('click.versionupdate', function() {
-        clearTimeout(versionClickTimeout);
-        if (++versionClickCounter >= 3) {
-            mega.developerSettings.show();
-        }
-        versionClickTimeout = setTimeout(function() {
-            versionClickCounter = 0;
-        }, 1000);
-    });
+
+    if (!is_litesite) {
+        var versionClickCounter = 0;
+        var versionClickTimeout = null;
+        $versionButton.rebind('click.versionupdate', function() {
+            clearTimeout(versionClickTimeout);
+            if (++versionClickCounter >= 3) {
+                mega.developerSettings.show();
+            }
+            versionClickTimeout = setTimeout(function() {
+                versionClickCounter = 0;
+            }, 1000);
+        });
+    }
 
     if (u_type > 0) {
 
@@ -2601,10 +2611,7 @@ function topmenuUI() {
 
         if (!e || (!e.target.closest('.js-dropdown-notification') &&
             ((c && c.indexOf('js-topbarnotification') === -1) || !c))) {
-            elements = document.getElementsByClassName('js-dropdown-notification');
-            for (i = elements.length; i--;) {
-                elements[i].classList.remove('show');
-            }
+            notify.closePopup();
         }
 
         if (!e || (!e.target.closest('.js-dropdown-warning') &&
@@ -2738,7 +2745,8 @@ function topmenuUI() {
                     'help', 'login', 'mega', 'nzippmember', 'nziphotographer', 'privacy', 'mobileapp',
                     'mobile', 'privacycompany', 'register', 'resellers', 'sdk', 'sync', 'sitemap', 'sourcecode',
                     'support', 'sync', 'takedown', 'terms', 'start', 'security', 'downloadapp', 'affiliate',
-                    'nas', 'pro', 'cookie', 'securechat', 'collaboration', 'storage'
+                    'nas', 'pro', 'cookie', 'securechat', 'collaboration', 'storage',
+                    'achievements'
                 ];
                 var moveTo = {
                     'account': 'fm/account',

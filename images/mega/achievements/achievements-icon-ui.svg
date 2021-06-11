@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="88px" height="88px" viewBox="0 0 88 88" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>Icon / UI</title>
+    <defs>
+        <path d="M21,20 L67,20 C69.209139,20 71,21.790861 71,24 L71,64 C71,66.209139 69.209139,68 67,68 L21,68 C18.790861,68 17,66.209139 17,64 L17,24 C17,21.790861 18.790861,20 21,20 Z" id="path-1"></path>
+    </defs>
+    <g id="Icon-/-UI" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <circle id="Oval" fill-opacity="0.2" fill="#00C08F" cx="44" cy="44" r="44"></circle>
+        <mask id="mask-2" fill="white">
+            <use xlink:href="#path-1"></use>
+        </mask>
+        <use id="Rectangle" fill="#00C08F" xlink:href="#path-1"></use>
+        <rect id="Rectangle" fill="#00CEA1" mask="url(#mask-2)" x="17" y="20" width="54" height="48" rx="4"></rect>
+        <circle id="Oval" fill="#00C08F" mask="url(#mask-2)" cx="44" cy="69" r="29"></circle>
+        <path d="M20,64 L67,64 L67,16 C71.2157041,16 74.8600444,19.5647987 74.9960659,23.7574411 L75,24 L75,64 C75,68.2157041 71.4352013,71.8600444 67.2425589,71.9960659 L67,72 L20,72 L20,64 Z" id="Path" fill="#00C08F" fill-rule="nonzero" mask="url(#mask-2)"></path>
+        <circle id="Oval" fill="#FFFFFF" mask="url(#mask-2)" cx="22" cy="25" r="1"></circle>
+        <circle id="Oval-Copy" fill="#FFFFFF" mask="url(#mask-2)" cx="26" cy="25" r="1"></circle>
+        <circle id="Oval-Copy-2" fill="#FFFFFF" mask="url(#mask-2)" cx="30" cy="25" r="1"></circle>
+        <circle id="Oval" fill="#FFFFFF" mask="url(#mask-2)" cx="44" cy="45" r="14"></circle>
+        <path d="M41.8518227,47.1544298 L38.651792,43.8728094 C38.0453345,43.2508894 37.0622222,43.2508894 36.4557647,43.8728094 C35.8480784,44.4953595 35.8480784,45.5041679 36.4557647,46.1254578 L40.7538091,50.5330874 C41.0567306,50.8443625 41.4542766,51 41.8518227,51 C42.2487543,51 42.6469148,50.8443625 42.9498363,50.5330874 L51.5446961,41.7190884 C52.151768,41.0965383 52.151768,40.0877299 51.5446961,39.46644 C50.9388531,38.84452 49.9545119,38.84452 49.3486689,39.46644 L41.8518227,47.1544298 Z" id="Fill-102" fill="#00C08F"></path>
+    </g>
+</svg>

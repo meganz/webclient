@@ -75,46 +75,46 @@ export default class Local extends AbstractGenericMessage {
         let cssClass;
         switch (this.props.message.type) {
             case MESSAGE_TYPE.REJECTED:
-                cssClass = 'icon-handset-rejected';
+                cssClass = 'sprite-fm-theme icon-handset-rejected';
                 break;
             case MESSAGE_TYPE.MISSED:
-                cssClass = 'icon-handset-missed';
+                cssClass = 'sprite-fm-theme icon-handset-missed';
                 break;
             case MESSAGE_TYPE.OUTGOING:
             case MESSAGE_TYPE.HANDLED_ELSEWHERE:
-                cssClass = 'icon-handset-outgoing';
+                cssClass = 'sprite-fm-theme icon-handset-outgoing';
                 break;
             case MESSAGE_TYPE.FAILED:
             case MESSAGE_TYPE.FAILED_MEDIA:
-                cssClass = 'icon-handset-failed';
+                cssClass = 'sprite-fm-theme icon-handset-failed';
                 break;
             case MESSAGE_TYPE.ENDED:
             case MESSAGE_TYPE.TIMEOUT:
-                cssClass = 'icon-handset-ended';
+                cssClass = 'sprite-fm-theme icon-handset-ended';
                 break;
             case MESSAGE_TYPE.CANCELLED:
-                cssClass = 'icon-handset-cancelled';
+                cssClass = 'sprite-fm-theme icon-handset-cancelled';
                 break;
             case MESSAGE_TYPE.FEEDBACK:
             case MESSAGE_TYPE.STARTING:
             case MESSAGE_TYPE.STARTED:
-                cssClass = 'icon-phone';
+                cssClass = 'sprite-fm-mono icon-phone';
                 break;
             case MESSAGE_TYPE.INCOMING:
-                cssClass = 'icon-handset-incoming';
+                cssClass = 'sprite-fm-theme icon-handset-incoming';
                 break;
             default:
-                cssClass = this.props.message.type;
+                cssClass = 'sprite-fm-mono ' + this.props.message.type;
                 break;
         }
         this.props.message.cssClass = cssClass;
     }
 
     _getIcon(message) {
-        const BASE_CLASS = 'call-info-icon sprite-fm-mono';
+        const BASE_CLASS = 'call-info-icon';
         const MESSAGE_ICONS = {
-            [MESSAGE_TYPE.STARTED]: `<i class="${BASE_CLASS} icon-phone">&nbsp;</i>`,
-            [MESSAGE_TYPE.ENDED]: `<i class="${BASE_CLASS} icon-handset-ended">&nbsp;</i>`,
+            [MESSAGE_TYPE.STARTED]: `<i class="${BASE_CLASS} sprite-fm-mono icon-phone">&nbsp;</i>`,
+            [MESSAGE_TYPE.ENDED]: `<i class="${BASE_CLASS} sprite-fm-theme icon-handset-ended">&nbsp;</i>`,
             DEFAULT: `<i class="${BASE_CLASS} ${message.cssClass}">&nbsp;</i>`,
         };
         return MESSAGE_ICONS[message.type] || MESSAGE_ICONS.DEFAULT;

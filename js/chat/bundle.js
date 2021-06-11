@@ -11470,6 +11470,7 @@ let typingArea_TypingArea = (typingArea_dec = Object(mixins["SoonFcWrap"])(60), 
     }), typingArea_React.createElement(ui_buttons["Button"], {
       className: "popup-button emoji-button",
       icon: "sprite-fm-theme icon-emoji",
+      iconHovered: "sprite-fm-theme icon-emoji-active",
       disabled: this.props.disabled
     }, typingArea_React.createElement(emojiDropdown["a" ], {
       className: "popup emoji",
@@ -12160,44 +12161,44 @@ class local_Local extends abstractGenericMessage_AbstractGenericMessage {
 
     switch (this.props.message.type) {
       case MESSAGE_TYPE.REJECTED:
-        cssClass = 'icon-handset-rejected';
+        cssClass = 'sprite-fm-theme icon-handset-rejected';
         break;
 
       case MESSAGE_TYPE.MISSED:
-        cssClass = 'icon-handset-missed';
+        cssClass = 'sprite-fm-theme icon-handset-missed';
         break;
 
       case MESSAGE_TYPE.OUTGOING:
       case MESSAGE_TYPE.HANDLED_ELSEWHERE:
-        cssClass = 'icon-handset-outgoing';
+        cssClass = 'sprite-fm-theme icon-handset-outgoing';
         break;
 
       case MESSAGE_TYPE.FAILED:
       case MESSAGE_TYPE.FAILED_MEDIA:
-        cssClass = 'icon-handset-failed';
+        cssClass = 'sprite-fm-theme icon-handset-failed';
         break;
 
       case MESSAGE_TYPE.ENDED:
       case MESSAGE_TYPE.TIMEOUT:
-        cssClass = 'icon-handset-ended';
+        cssClass = 'sprite-fm-theme icon-handset-ended';
         break;
 
       case MESSAGE_TYPE.CANCELLED:
-        cssClass = 'icon-handset-cancelled';
+        cssClass = 'sprite-fm-theme icon-handset-cancelled';
         break;
 
       case MESSAGE_TYPE.FEEDBACK:
       case MESSAGE_TYPE.STARTING:
       case MESSAGE_TYPE.STARTED:
-        cssClass = 'icon-phone';
+        cssClass = 'sprite-fm-mono icon-phone';
         break;
 
       case MESSAGE_TYPE.INCOMING:
-        cssClass = 'icon-handset-incoming';
+        cssClass = 'sprite-fm-theme icon-handset-incoming';
         break;
 
       default:
-        cssClass = this.props.message.type;
+        cssClass = 'sprite-fm-mono ' + this.props.message.type;
         break;
     }
 
@@ -12207,8 +12208,8 @@ class local_Local extends abstractGenericMessage_AbstractGenericMessage {
   _getIcon(message) {
     const MESSAGE_ICONS = {
       [MESSAGE_TYPE.STARTED]: "<i class=\"call-info-icon sprite-fm-mono icon-phone\">&nbsp;</i>",
-      [MESSAGE_TYPE.ENDED]: "<i class=\"call-info-icon sprite-fm-mono icon-handset-ended\">&nbsp;</i>",
-      DEFAULT: "<i class=\"call-info-icon sprite-fm-mono " + message.cssClass + "\">&nbsp;</i>"
+      [MESSAGE_TYPE.ENDED]: "<i class=\"call-info-icon sprite-fm-theme icon-handset-ended\">&nbsp;</i>",
+      DEFAULT: "<i class=\"call-info-icon " + message.cssClass + "\">&nbsp;</i>"
     };
     return MESSAGE_ICONS[message.type] || MESSAGE_ICONS.DEFAULT;
   }

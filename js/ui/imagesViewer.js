@@ -311,9 +311,10 @@ var slideshowid;
             min: 1,
             max: 1000,
             range: 'min',
-            step: 1,
+            step: 0.01,
             change: function(e, ui) {
                 $(this).attr('title', `${ui.value}%`);
+                wrapper.dataset.perc = ui.value;
             },
             slide: function(e, ui) {
                 $(this).attr('title', `${ui.value}%`);
@@ -370,6 +371,8 @@ var slideshowid;
             if (fullScreenManager) {
                 fullScreenManager.enterFullscreen();
             }
+
+            zoom_mode = false;
             slideshow_imgPosition($overlay);
             return false;
         });
@@ -420,7 +423,7 @@ var slideshowid;
         });
 
         // Allow mouse wheel to zoom in/out
-        $overlay.rebind('mousewheel.imgzoom', function(e) {
+        $('.media-viewer', $overlay).rebind('mousewheel.imgzoom', function(e) {
             var delta = Math.max(-1, Math.min(1, (e.wheelDelta || e.deltaY || -e.detail)));
 
             if (delta > 0) {
@@ -524,56 +527,50 @@ var slideshowid;
 
     // Zoom In/Out function
     function slideshow_zoom($overlay, zoomout, value) {
-        var $img = $('.img-wrap img.active', $overlay);
-        var $percLabel = $('.zoom-slider-wrap', $overlay);
-        var perc = parseFloat($percLabel.attr('data-perc'));
-        var newPerc = perc / 100 || 1;
-        var newImgWidth;
-        var newImgHeight;
+        const $img = $('.img-wrap img.active', $overlay);
+        const $percLabel = $('.zoom-slider-wrap', $overlay);
+        let newPerc = parseFloat($percLabel.attr('data-perc')) || 1;
+        let newImgWidth;
+        let zoomStep;
 
         if (value) {
-            newPerc = parseFloat(value) / 100;
+            newPerc = parseFloat(value);
         }
-        if (zoomout && (newPerc * 0.9 >= 0.01)) {
-
-                newPerc *= 0.9;
-
+        else if (zoomout) {
+            zoomStep = (newPerc * 0.9).toFixed(2);
+            newPerc = zoomStep >= 1 ? zoomStep : 1;
         }
-        else if (!zoomout && (newPerc * 1.1 <= 11)) {
-
-                newPerc *= 1.1;
-
+        else if (!zoomout) {
+            zoomStep = (newPerc * 1.2).toFixed(2);
+            newPerc = zoomStep <= 1000 ? zoomStep : 1000;
+            console.log(newPerc);
         }
 
-        newPerc /= devicePixelRatio;
+        newPerc /= devicePixelRatio * 100;
         newImgWidth = origImgWidth * newPerc;
-        newImgHeight = origImgHeight * newPerc;
 
-        if (newImgHeight * newImgWidth > 240) {
+        $img.css({
+            'width': switchedSides ? newImgHeight : newImgWidth
+        });
 
-            $img.css({
-                'width': switchedSides ? newImgHeight : newImgWidth,
-                'height': switchedSides ? newImgWidth : newImgHeight
-            });
+        zoom_mode = true;
 
-            zoom_mode = true;
-
-            // Set zoom, position values and init pick and pan
-            slideshow_imgPosition($overlay);
-        }
+        // Set zoom, position values and init pick and pan
+        slideshow_imgPosition($overlay);
     }
 
     // Sets zoom percents and image position
     function slideshow_imgPosition($overlay) {
-        var $imgWrap = $('.img-wrap', $overlay);
-        var $img = $('img.active', $overlay);
-        var id = $imgWrap.attr('data-image');
-        var viewerWidth = $imgWrap.width();
-        var viewerHeight = $imgWrap.height();
-        var imgWidth = 0;
-        var imgHeight = 0;
-        var w_perc = 0;
-        var h_perc = 0;
+        const $imgWrap = $('.img-wrap', $overlay);
+        const $img = $('img.active', $overlay);
+        const id = $imgWrap.attr('data-image');
+        const viewerWidth = $imgWrap.width();
+        const viewerHeight = $imgWrap.height();
+        let imgWidth = 0;
+        let imgHeight = 0;
+        let w_perc = 0;
+        let h_perc = 0;
+        let newImgWidth = 0;
 
         if (zoom_mode) {
             imgWidth = switchedSides ? $img.height() : $img.width();
@@ -599,9 +596,7 @@ var slideshowid;
             if (origImgWidth > viewerWidth && origImgHeight * w_perc <= viewerHeight) {
                 imgWidth = viewerWidth;
                 imgHeight = origImgHeight * w_perc;
-                $img.css({
-                    'width': switchedSides ? imgHeight : imgWidth
-                });
+                newImgWidth = switchedSides ? imgHeight : imgWidth;
             }
             // Check if width fits browser window after reducing height
             else if ((origImgWidth > viewerWidth && origImgHeight * w_perc > viewerHeight)
@@ -609,9 +604,7 @@ var slideshowid;
 
                 imgWidth = origImgWidth * h_perc;
                 imgHeight = viewerHeight;
-                $img.css({
-                    'height': switchedSides ? imgWidth : imgHeight
-                });
+                newImgWidth = switchedSides ? imgHeight : imgWidth;
             }
             // Check if preview and original imgs are loading and height fits browser window after increasing width
             else if (fitToWindow[id] && origImgHeight < viewerHeight
@@ -619,9 +612,7 @@ var slideshowid;
 
                 imgWidth = viewerWidth;
                 imgHeight = origImgHeight * w_perc;
-                $img.css({
-                    'width': switchedSides ? viewerHeight : viewerWidth
-                });
+                newImgWidth = switchedSides ? viewerHeight : viewerWidth;
             }
             // Check if preview and original imgs are loading and width fits browser window after increasing height
             else if (fitToWindow[id] && imgHeight < viewerHeight
@@ -629,15 +620,15 @@ var slideshowid;
 
                 imgWidth = origImgWidth * h_perc;
                 imgHeight = viewerHeight;
-                $img.css({
-                    'height': switchedSides ? viewerWidth : viewerHeight
-                });
+                newImgWidth = switchedSides ? viewerHeight : viewerWidth;
             }
             else {
-                $img.css({
-                    'height': switchedSides ? origImgWidth : origImgHeight
-                });
+                newImgWidth = switchedSides ? origImgHeight : origImgWidth;
             }
+
+            $img.css({
+                'width': newImgWidth
+            });
         }
 
         $img.css({
@@ -1502,7 +1493,6 @@ var slideshowid;
                 zoom_mode = false;
                 slideshow_imgPosition($overlay);
                 $(window).rebind('resize.imgResize', function() {
-                    zoom_mode = false;
                     slideshow_imgPosition($overlay);
                 });
             }

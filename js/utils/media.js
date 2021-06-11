@@ -868,6 +868,9 @@ FullScreenManager.prototype.enterFullscreen = function() {
         var timer;
         var filters = Object.create(null);
 
+        /* Drag status */
+        let timeDrag = false;
+
         // Set volume icon default state
         $('.vol-wrapper', $wrapper).removeClass('audio');
 
@@ -932,7 +935,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
         // Changes the button state of certain button's so the correct visuals can be displayed with CSS
         var changeButtonState = function(type) {
             // Play/Pause button
-            if (type === 'playpause') {
+            if (type === 'playpause' && !timeDrag) {
                 if (videoElement.paused || videoElement.ended) {
                     $('i', $playpause).removeClass('icon-pause').addClass('icon-play');
                     $playVideoButton.removeClass('hidden');
@@ -1239,9 +1242,6 @@ FullScreenManager.prototype.enterFullscreen = function() {
             applyVideoFilter.apply(this, options.filter.map(function(v) { return v / 10; }));
         }
 
-        /* Drag status */
-        var timeDrag = false;
-
         // Update Progress Bar control
         var updatebar = function(x) {
             if (streamer) {
@@ -1430,6 +1430,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
 
         $wrapper.rebind('is-over-quota', function() {
             fullScreenManager.exitFullscreen();
+            $pendingBlock.addClass('hidden');
             videoElement.pause();
             return false;
         });
@@ -3522,8 +3523,12 @@ FullScreenManager.prototype.enterFullscreen = function() {
 
             M.req(req).tryCatch(success, reject);
 
-            if (Object(res.General).InternetMediaType === 'video/mp4' && !mp4brands.has(res.container)) {
-                eventlog(99729, JSON.stringify([1, res.containerid, res.container, res.vcodec]));
+            if (Object(res.General).InternetMediaType === 'video/mp4') {
+                const known = new Set(['qt  ', ...mp4brands]);
+
+                if (!known.has(res.container)) {
+                    eventlog(99729, JSON.stringify([2, res.containerid, res.container, res.vcodec, res.height]));
+                }
             }
 
             if (!res.vcodec && req.n) {

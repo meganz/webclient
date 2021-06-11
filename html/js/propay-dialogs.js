@@ -2676,7 +2676,8 @@ var bitcoinDialog = {
         // Set details
         var bitcoinAddress = apiResponse.address;
         var bitcoinUrl = 'bitcoin:' + apiResponse.address + '?amount=' + apiResponse.amount;
-        var invoiceDateTime = new Date(apiResponse.created * 1000);
+        var invoiceDateTime = time2date(apiResponse.created, 5);
+        invoiceDateTime = invoiceDateTime[0].toUpperCase() + invoiceDateTime.substring(1);
         var proPlanNum = pro.propay.selectedProPackage[1];
         var planName = pro.getProPlanName(proPlanNum);
         var planMonths = l[6806].replace('%1', pro.propay.selectedProPackage[4]);  // x month purchase
@@ -2715,7 +2716,7 @@ var bitcoinDialog = {
         $bitcoinDialog.find('.plan-icon').addClass('pro' + proPlanNum);
         $bitcoinDialog.find('.plan-name').text(planName);
         $bitcoinDialog.find('.plan-duration').text(planMonths);
-        $('.plan-price-euros .value', $bitcoinDialog).text(mega.intl.number.format(priceEuros));
+        $('.plan-price-euros .value', $bitcoinDialog).text(formatCurrency(priceEuros));
         $('.plan-price-bitcoins', $bitcoinDialog).text(mega.intl.bitcoin.format(priceBitcoins));
 
         // Set countdown to price expiry

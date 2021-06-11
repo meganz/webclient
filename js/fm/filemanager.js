@@ -1630,6 +1630,11 @@ FileManager.prototype.initContextUI = function() {
             return;
         }
 
+        // Close properties dialog if context menu was triggered there
+        if ($.dialog === 'properties') {
+            propertiesDialog(true);
+        }
+
         loadingDialog.show('common', l[23130]);
 
         mega.fileTextEditor.getFile(nodeHandle).done(
@@ -2410,7 +2415,7 @@ FileManager.prototype.initUIKeyEvents = function() {
             e.ctrlKey &&
             !$.dialog
         ) {
-            if (is_transfers_or_accounts || M.currentdirid === 'ipc' || M.currentdirid === 'opc') {
+            if (is_transfers_or_accounts) {
                 return;
             }
             // ctrl+a/cmd+a - select all
@@ -3226,22 +3231,7 @@ FileManager.prototype.addGridUI = function(refresh) {
     $('.fm-blocks-view.contact-details-view').addClass('hidden');
     $('.files-grid-view.user-management-view').addClass('hidden');
 
-    if (this.currentdirid === 'contacts') {
-        $('.files-grid-view.contacts-view').removeClass('hidden');
-        $.contactGridHeader();
-        initContactsGridScrolling();
-    }
-    else if (this.currentdirid === 'opc') {
-        $('.grid-table.sent-requests').removeClass('hidden');
-        $.opcGridHeader();
-        initOpcGridScrolling();
-    }
-    else if (this.currentdirid === 'ipc') {
-        $('.grid-table.contact-requests').removeClass('hidden');
-        $.ipcGridHeader();
-        initIpcGridScrolling();
-    }
-    else if (this.currentdirid === 'shares') {
+    if (this.currentdirid === 'shares') {
         $('.shared-grid-view').removeClass('hidden');
         $.sharedGridHeader();
         initGridScrolling();
@@ -3377,7 +3367,7 @@ FileManager.prototype.addGridUI = function(refresh) {
     });
 
     var showColumnsContextMenu = function(e) {
-        var notAllowedTabs = ['shares', 'out-shares', 'contacts', 'ipc', 'opc'];
+        var notAllowedTabs = ['shares', 'out-shares'];
         if (notAllowedTabs.indexOf(M.currentdirid) !== -1) {
             return false;
         }
@@ -3487,15 +3477,6 @@ FileManager.prototype.addGridUI = function(refresh) {
     }
     else if (this.currentdirid === 'out-shares') {
         $.selectddUIgrid = '.out-shared-grid-view .grid-scrolling-table';
-    }
-    else if (this.currentdirid === 'contacts') {
-        $.selectddUIgrid = '.grid-scrolling-table.contacts';
-    }
-    else if (this.currentdirid === 'ipc') {
-        $.selectddUIgrid = '.contact-requests-grid .grid-scrolling-table';
-    }
-    else if (this.currentdirid === 'opc') {
-        $.selectddUIgrid = '.sent-requests-grid .grid-scrolling-table';
     }
     else if (String(this.currentdirid).length === 11 && this.currentrootid === 'contacts') {
         $.selectddUIgrid = '.files-grid-view.contact-details-view .grid-scrolling-table';
@@ -3612,12 +3593,6 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
     var $ddUIgrid = $($.selectddUIgrid);
     $ddUIitem.draggable({
         start: function(e, u) {
-            // Make the content under contacts, opc, ipc be non draggable
-            if (M.currentrootid === "contacts"
-            || M.currentrootid === "opc"
-            || M.currentrootid === "ipc") {
-                return false;
-            }
             if (d) {
                 console.log('draggable.start');
             }
@@ -4027,17 +4002,6 @@ FileManager.prototype.onSectionUIOpen = function(id) {
         $('.user-management-overview-bar').addClass('hidden');
     }
 
-    if (id !== 'opc') {
-        $('.sent-requests-grid').addClass('hidden');
-
-        // this's button in left panel of contacts tab
-        $('.fm-recived-requests').removeClass('active');
-    }
-
-    if (id !== 'ipc') {
-        $('.contact-requests-grid').addClass('hidden');
-    }
-
     if (id !== 'shared-with-me' && M.currentdirid !== 'shares') {
         $('.shared-blocks-view').addClass('hidden');
         $('.shared-grid-view').addClass('hidden');
@@ -4052,7 +4016,7 @@ FileManager.prototype.onSectionUIOpen = function(id) {
         $('.shares-tabs-bl').addClass('hidden');
     }
 
-    if (id !== 'contacts' && id !== 'opc' && id !== 'ipc') {
+    if (id !== 'contacts') {
         $('.contacts-tabs-bl').addClass('hidden');
     }
 
@@ -4102,12 +4066,6 @@ FileManager.prototype.onSectionUIOpen = function(id) {
         else {
             sections[i].classList.add('hidden');
         }
-    }
-
-    if (id === 'contacts' || id === 'opc' || id === "opc") {
-        // ensure contacts sections are updated ON section change, instead of always updating in the background
-        // (and wasting CPU)
-        M.contacts();
     }
 
     // Revamp Implementation Begin

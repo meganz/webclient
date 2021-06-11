@@ -532,9 +532,9 @@ pro.proplan = {
         // Set compare MEGA/GoogleDrive/Dropbox data for FREE/2TB/8TB/16TB plans.
         compareDetails = [
             [
-                ['50 ' + l[17696], '50 ' + l[17696], '', l[16362]],
-                ['50 ' + l[17696], '2 ' + l[17696], '' , l[24075]],
-                ['50 ' + l[17696], '15 ' + l[17696], '', l[24076]]
+                ['20 ' + l[17696], '20 ' + l[17696], '', l[16362]],
+                ['20 ' + l[17696], '2 ' + l[17696], '' , l[24075]],
+                ['20 ' + l[17696], '15 ' + l[17696], '', l[24076]]
             ],
             [
                 ['2 ' + l[20160], '9' + separator + '99', '&euro;', l[23818].replace('%1', l[5819])],
@@ -563,6 +563,15 @@ pro.proplan = {
 
                 // Set  selected slide data
                 $resultWarpper.attr('class', 'pricing-page compare-block slide' + value);
+
+                const $freeBlock = $($resultBlocks[0]);
+
+                if (value === 1) {
+                    $freeBlock.addClass('free');
+                }
+                else {
+                    $freeBlock.removeClass('free');
+                }
 
                 // Change compare MEGA/GoogleDrive/Dropbox blocks data
                 for (var i = 0, length = $resultBlocks.length; i < length; i++) {
@@ -844,7 +853,6 @@ pro.proplan = {
         var $businessPrice = $('.plan-price', $businessBoxes);
         var $businessStorageInfo = $('.plan-feature.storage-b span', $businessBoxes);
         var businessStorageAmount = '15 ' + l[20160];
-        var euroSign = '\u20ac';
 
         var updateResults = pro.proplan.updateEachPriceBlock("P", $pricingBoxes, undefined, 1);
         var oneLocalPriceFound = updateResults[0];
@@ -856,9 +864,8 @@ pro.proplan = {
             $stepOne.removeClass('local-currency');
         }
 
-        $businessPrice.text(
-            $businessPrice.text().replace('.', mega.intl.decimalSeparator)
-        );
+        var businessPlanIdx = pro.membershipPlans.length - 1;
+        $businessPrice.text(formatCurrency(pro.membershipPlans[businessPlanIdx][pro.UTQA_RES_INDEX_MONTHLYBASEPRICE]));
 
         $businessStorageInfo.safeHTML(
             l[23789].replace('%1', '<span>' + businessStorageAmount + '</span>')

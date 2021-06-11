@@ -54,10 +54,21 @@ var is_uc_browser = is_mobile && ua.indexOf('ucbrowser') > 0;
 var is_ios = is_mobile && (ua.indexOf('iphone') > -1 || ua.indexOf('ipad') > -1 || ua.indexOf('ipod') > -1);
 var is_old_windows_phone = is_mobile && /windows phone 8|iemobile\/9|iemobile\/10|iemobile\/11/i.test(ua);
 var is_windowsphone = is_old_windows_phone || is_mobile && ua.indexOf('windows phone') > 0;
-var is_huawei = is_mobile && ua.indexOf('huawei') > 0;
+var is_huawei = is_mobile && (ua.indexOf('huawei') > 0 || ua.indexOf('hmscore') > 0);
 
 if (is_android && !is_huawei) {
-    // @todo detect huawei devices by model (?)
+    // detect huawei devices by model
+    var tmp = [
+        'ana-al00', 'ana-nx9', 'ang-an00', 'art-l28', 'brq-an00', 'cdy-nx9b', 'dra-lx9', 'els-n39', 'els-nx9',
+        'jef-nx9', 'jny-lx2', 'lio-an00m', 'lio-l29', 'lio-n29', 'med-lx9', 'noh-an00', 'noh-lg', 'noh-nx9',
+        'nop-an00', 'oce-an10', 'oce-an50', 'tas-l29', 'tet-an00'
+    ];
+    for (m = tmp.length; m--;) {
+        if (ua.indexOf(tmp[m]) > 0) {
+            is_huawei = tmp[m];
+            break;
+        }
+    }
 }
 
 // @todo get rid of 'm' around the codebase!
@@ -2038,9 +2049,12 @@ if (is_ios) {
 }
 
 // Determine whether to show the legacy mobile page for these links so that they redirect back to the app
-var showLegacyMobilePage = (m && (page.substr(0, 6) === 'verify' || page.substr(0, 6) === 'fm/ipc' ||
-    page.substr(0, 9) === 'newsignup' || page.substr(0, 7) === 'account' ||
-    (is_old_windows_phone && page.substr(0, 7) === 'confirm')));
+var showLegacyMobilePage = m && (
+    page.substr(0, 6) === 'verify'
+    || page.substr(0, 9) === 'newsignup'
+    || page.substr(0, 7) === 'account'
+    || is_old_windows_phone && page.substr(0, 7) === 'confirm'
+);
 
 /**
  * Some legacy secureboot mobile code that has been refactored to keep just the blog working and also redirect to the
@@ -2634,6 +2648,7 @@ else if (!browserUpdate) {
     jsl.push({f:'js/ui/export.js', n: 'export_js', j:1,w:1});
     jsl.push({f:'html/js/key.js', n: 'key_js', j:1});
 
+
     jsl.push({f:'js/ui/simpletip.js', n: 'simpletip_js', j:1,w:1});
     jsl.push({f:'js/useravatar.js', n: 'contact_avatar_js', j:1,w:3});
     jsl.push({f:'css/avatars.css', n: 'avatars_css', j:2,w:5,c:1,d:1,cache:1});
@@ -2652,6 +2667,7 @@ else if (!browserUpdate) {
     jsl.push({f:'css/psa.css', n: 'psa_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
     jsl.push({f:'css/about.css', n: 'about_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/features.css', n: 'features_css', j:2,w:5,c:1,d:1,cache:1});
+    jsl.push({f:'css/achievements.css', n: 'achievements_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/corporate.css', n: 'corporate_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'html/start.html', n: 'start', j:0});
     jsl.push({f:'html/js/start.js', n: 'start_js', j:1});
@@ -3083,11 +3099,6 @@ else if (!browserUpdate) {
         jsl.push({f:'css/dialogs-common.css', n: 'dialogs-common_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'js/utils/clipboard.js', n: 'js_utils_clipboard_js', j: 1});
         jsl.push({f:'js/ui/simpletip.js', n: 'simpletip_js', j:1,w:1});
-        jsl.push({f:'css/mega-button.css', n: 'mega_button_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'css/mega-dialog.css', n: 'mega_dialog_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'css/vars/theme.css', n: 'theme_variables_css', j:2, w:30, c:1, d:1, cache:1});
-        jsl.push({f:'css/vars/button.css', n: 'button_variables_css', j:2, w:30, c:1, d:1, cache:1});
-        jsl.push({f:'css/vars/dialog.css', n: 'vars_dialog_css', j:2, w:30, c:1, d:1, cache:1});
         jsl.push({f:'css/features.css', n: 'features_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/toast.css', n: 'toast_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/psa.css', n: 'psa_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
@@ -3149,7 +3160,6 @@ else if (!browserUpdate) {
             jsl.push({f:'css/popups.css', n: 'popups_css', j:2,w:5,c:1,d:1,cache:1});
             jsl.push({f:'css/retina-images.css', n: 'retina_images_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
             jsl.push({f:'css/topbar.css', n: 'topbar_css', j:2,w:5,c:1,d:1,cache:1});
-            jsl.push({f:'css/vars/theme.css', n: 'theme_variables_css', j:2, w:30, c:1, d:1, cache:1});
             jsl.push({f:'css/icons.css', n: 'icons_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
             jsl.push({f:'css/important.css', n: 'important_css', j:2, w:30, c:1, d:1, cache:1});
         }
@@ -3277,6 +3287,8 @@ else if (!browserUpdate) {
         'feature_collaboration': {f:'html/features-collaboration.html', n: 'feature_collaboration', j:0},
         'gadvs_js': {f:'js/gAdvs.js', n: 'gadvs_js', j:1},
         'cookie': {f:'html/cookie.html', n: 'cookie', j:0},
+        'achievements': {f:'html/achievements.html', n: 'achievements', j:0},
+        'achievementsPage_js': {f:'html/js/achievements.js', n: 'achievementsPage_js', j:1},
     };
 
     var jsl3 = {
@@ -3395,6 +3407,7 @@ else if (!browserUpdate) {
         'storage': ['feature_storage', 'features_js'],
         'securechat': ['feature_chat', 'features_js'],
         'collaboration': ['feature_collaboration', 'features_js'],
+        'achievements': ['achievements', 'achievementsPage_js'],
         'nzippmember': ['nzipp', 'nzipp_js', 'nzipp_css'],
         'nziphotographer': ['nzipp', 'nzipp_js', 'nzipp_css'],
         'business': ['business', 'businessjs'],

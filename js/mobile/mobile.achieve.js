@@ -164,7 +164,7 @@ mobile.achieve = {
         }
 
         // Display per bonus storage and transfer
-        mobile.achieve.displayStorageAndTransfer($containerElement, classNumber);
+        // mobile.achieve.displayStorageAndTransfer($containerElement, classNumber);
     },
 
     /**
@@ -224,15 +224,17 @@ mobile.achieve = {
 
         'use strict';
 
-        // Get the list of awarded bonuses
-        var awardedBonuses = M.account.maf.a;
+        if (M.account.maf.a) {
+            // Get the list of awarded bonuses
+            var awardedBonuses = M.account.maf.a;
 
-        // Search through the array looking for the bonus class number
-        for (var i = 0; i < awardedBonuses.length; i++) {
+            // Search through the array looking for the bonus class number
+            for (var i = 0; i < awardedBonuses.length; i++) {
 
-            // If the award id is the same return it
-            if (awardedBonuses[i].a === classNum) {
-                return awardedBonuses[i];
+                // If the award id is the same return it
+                if (awardedBonuses[i].a === classNum) {
+                    return awardedBonuses[i];
+                }
             }
         }
 
@@ -247,44 +249,44 @@ mobile.achieve = {
 
         'use strict';
 
-        // Get bonus information
-        var rewardedBonuses = M.account.maf.a;
-        var bonusesReceivedInfo = M.account.maf.r;
 
         // Set variables to accumulate totals
         var totalStorage = 0;
-        var totalTransfer = 0;
 
-        // Loop through all awarded bonuses
-        for (var i = 0; i < rewardedBonuses.length; i++) {
+        if (M.account.maf.r) {
 
-            // Calculate if award is expired
-            var rewardedBonus = rewardedBonuses[i];
-            var awardId = rewardedBonus.r;
-            var expiryTimestamp = rewardedBonus.e;
-            var currentTimestamp = unixtime();
-            var difference = expiryTimestamp - currentTimestamp;
+            // Get bonus information
+            var rewardedBonuses = M.account.maf.a;
+            var bonusesReceivedInfo = M.account.maf.r;
 
-            // If expired don't add
-            if (difference <= 0) {
-                continue;
+            // Loop through all awarded bonuses
+            for (var i = 0; i < rewardedBonuses.length; i++) {
+
+                // Calculate if award is expired
+                var rewardedBonus = rewardedBonuses[i];
+                var awardId = rewardedBonus.r;
+                var expiryTimestamp = rewardedBonus.e;
+                var currentTimestamp = unixtime();
+                var difference = expiryTimestamp - currentTimestamp;
+
+                // If expired don't add
+                if (difference <= 0) {
+                    continue;
+                }
+
+                // Accumulate storage and transfer bytes to overall total
+                totalStorage += bonusesReceivedInfo[awardId][mobile.achieve.AWARD_INDEX_STORAGE];
             }
-
-            // Accumulate storage and transfer bytes to overall total
-            totalStorage += bonusesReceivedInfo[awardId][mobile.achieve.AWARD_INDEX_STORAGE];
-            totalTransfer += bonusesReceivedInfo[awardId][mobile.achieve.AWARD_INDEX_TRANSFER];
         }
+
 
         // Format storage and transfer bytes to 'x GB'
         var totalStorageFormatted = numOfBytes(totalStorage, 0);
-        var totalTransferFormatted = numOfBytes(totalTransfer, 0);
 
         // Display the total storage and transfer
         var $unlockedRewards = mobile.achieve.$page.find('.unlocked-rewards-block');
         $unlockedRewards.find('.storage-amount').text(totalStorageFormatted.size);
         $unlockedRewards.find('.storage-unit').text(totalStorageFormatted.unit);
-        $unlockedRewards.find('.transfer-amount').text(totalTransferFormatted.size);
-        $unlockedRewards.find('.transfer-unit').text(totalTransferFormatted.unit);
     },
 
     /**
@@ -409,5 +411,38 @@ mobile.achieve = {
             // Prevent double taps
             return false;
         });
+    },
+
+    /**
+     * Initialise and bind click events to trigger the respective link
+     */
+    bindEvents: function(selector) {
+        'use strict';
+
+        this.rebind('click', () => {
+
+            switch (selector) {
+                case 'ach-install-megasync':
+                    $('.install-mega-sync', mobile.achieve.$page).tap();
+                    break;
+
+                case 'ach-install-mobile-app':
+                    $('.install-mobile-app', mobile.achieve.$page).tap();
+                    break;
+
+                case 'ach-invite-friend':
+                    $('.invite-friends-block', mobile.achieve.$page).tap();
+                    break;
+
+                case 'ach-sms-verification':
+                    $('.verify-phone-number', mobile.achieve.$page).tap();
+                    break;
+            }
+
+            return false;
+
+        });
+
     }
+
 };

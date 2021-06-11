@@ -3134,7 +3134,6 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 .activity-status-block {
     float: right;
     margin: 12px 10px 0 0;
-    cursor: pointer;
 }
 .activity-status, .contact-status {
     height: 6px;
@@ -4983,6 +4982,7 @@ tr:not(.taken-down) .grid-status-icon:not(.read-only):not(.read-and-write) {
 }
 
 .thumb .transfer-filetype-icon img {
+    background-color: var(--surface-mid-grey);
     display: inline-block;
     height: 18px;
     margin: 3px 2px;
@@ -10374,9 +10374,6 @@ a.blog-article-button {
 .grid-table.sent-requests td:last-child, .grid-table.contact-requests td:last-child {
     padding-right: 14px;
 }
-button.link-button.accept-all {
-    text-transform: capitalize;
-}
 .fm-share-user-info {
     display: table;
     vertical-align: middle;
@@ -13044,19 +13041,20 @@ body.megaChatDisabled .nw-contact-name button.start-chat-button {
 
 /* Dashboard left pane */
 
-.content-panel.dashboard .small-icon.info-icon {
-    background-image: url(../images/mega/fm-main-sprite.png);
+.content-panel.dashboard .sprite-fm-mono.icon-info-filled.simpletip {
     background-repeat: no-repeat;
-    background-position: -26px -12378px;
-    background-size: 48px auto;
     display: inline-block;
-    opacity: 0.4;
     cursor: pointer;
-    transition: 0.3s;
     margin-left: 4px;
+    --mask-color: var(--icon-rest);
+    --icon-size: 24px;
+    vertical-align: middle;
+    width: 24px;
+    height: 24px;
 }
-.content-panel.dashboard .small-icon.info-icon:hover {
-    opacity: 0.8;
+
+.content-panel.dashboard .sprite-fm-mono.icon-info-filled.simpletip:hover {
+    --mask-color: var(--icon-active);
 }
 
 /* Business account */
@@ -14153,16 +14151,13 @@ body.megaChatDisabled .nw-contact-name button.start-chat-button {
 
 .storage-division-container .storage-division-per {
     position: relative;
-    width: 48px;
     height: 18px;
-    left: 0;
     border-radius: 9px;
     color: #fff;
     font-size: 13px;
-    line-height: 18px;
-    text-align: center;
+    line-height: 20px;
     display: inline-block;
-    vertical-align: top;
+    padding: 0 10px;
 }
 
 .storage-division-name {
@@ -15694,9 +15689,6 @@ body.megaChatDisabled .nw-contact-name button.start-chat-button {
 }
 .top-login-popup.sign header {
     padding-bottom: 24px;
-}
-.top-login-popup.sign .fields {
-    padding: 0 48px;
 }
 .top-login-popup.sign .login-page-forgot-bl {
     padding: 0 0 34px;

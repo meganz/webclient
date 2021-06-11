@@ -20,6 +20,9 @@ NODE_ENV="production" ./node_modules/.bin/webpack  --config webpack.config.js
 if [[ "$OSTYPE" == "darwin"* ]]; then
     if which gsed >/dev/null; then
         SED_BINARY="gsed"
+    # as we forbidden to use brew, gsed is unable to install but normal sed
+    elif which sed >/dev/null; then
+        SED_BINARY="sed"
     else
         echo "Found platform to be OSX, but gsed is missing. Please do install 'gsed'."
         exit 1;

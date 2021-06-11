@@ -9,7 +9,7 @@ mobile.sms.achievement = {
      * Initialise the page
      */
     init: function() {
-        
+
         'use strict';
 
         // Cache the page
@@ -18,9 +18,6 @@ mobile.sms.achievement = {
         // Init functionality
         this.initAddPhoneButton();
         this.initCloseButtons();
-
-        // Set achievement text with API values
-        mobile.sms.renderAddPhoneText(this.$page.find('.js-achievement-text'));
 
         // Init header
         mobile.initHeaderMegaIcon();
@@ -36,7 +33,7 @@ mobile.sms.achievement = {
      * Initialise the Add Phone button to take them back to their phone number entry page
      */
     initAddPhoneButton: function() {
-        
+
         'use strict';
 
         // On Add Phone button tap
@@ -54,7 +51,7 @@ mobile.sms.achievement = {
      * Initialise the Close button and Close icon to take them back to the My Account page
      */
     initCloseButtons: function() {
-        
+
         'use strict';
 
         // On Add Phone button tap

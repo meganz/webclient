@@ -260,6 +260,12 @@
             e.preventDefault();
         }
 
+        // Clear drag element
+        touchedElement = 0;
+
+        $('.drag-n-drop.overlay').addClass('hidden');
+        $('body').removeClass('overlayed');
+
         if (M.isInvalidUserStatus()) {
             return false;
         }
@@ -278,12 +284,6 @@
         useMegaSync = -1;
 
         var currentDir = M.currentCustomView ? M.currentCustomView.nodeID : M.currentdirid;
-
-        // Clear drag element
-        touchedElement = 0;
-
-        $('.drag-n-drop.overlay').addClass('hidden');
-        $('body').removeClass('overlayed');
 
         if ($.awaitingLoginToUpload) {
             return tooltiplogin.init();
@@ -477,8 +477,6 @@
                 M.currentdirid === 'out-shares' || // Out-share root page
                 M.currentdirid === 'public-links' || // Public-link root page
                 M.currentrootid === 'contacts' || // Contacts pages
-                M.currentrootid === 'ipc' || // IPC
-                M.currentrootid === 'opc' || // OPC
                 M.currentrootid === M.RubbishID || // Rubbish bin
                 (M.currentrootid === undefined && M.currentdirid !== 'transfers') // Dashboard and Settings pages
             ));

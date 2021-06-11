@@ -82,11 +82,15 @@ function setDateTimeFormat(locales, format) {
         options.year = 'numeric';
         options.month = format >= 2 ? 'long' : 'numeric';
         options.day = format === 3 ? undefined : 'numeric';
-        options.weekday = format === 4 ? 'long' : undefined;
+        options.weekday = format === 4 || format === 5 ? 'long' : undefined;
 
-        if (format === 0) {
+        if (format === 0 || format === 5) {
             options.minute = 'numeric';
             options.hour = 'numeric';
+            if (format === 5) {
+                options.second = 'numeric';
+                options.timeZoneName = 'short';
+            }
         }
 
     }
@@ -141,6 +145,8 @@ function setDateTimeFormat(locales, format) {
  *       2: yyyy fmn dd (fmn: Full month name, based on the locale) (Long Date format)
  *       3: yyyy fmn (fmn: Full month name, based on the locale) (Long Date format without day)
  *       4: Monday, yyyy fmn dd (fmn: Full month name, based on the locale) (Long Date format with weekday)
+ *       5: Monday, yyyy fmn dd hh:mm:ss TZ (fmn: Full month name, based on the locale)
+ *                                                                  (Long Date format with weekday, time, and timezone)
  *
  * Non full date formats:
  *       10: Mon (Only day of the week long version)
@@ -618,6 +624,11 @@ function formatCurrency(value, currency, display) {
         result = result.replace(currency, '').trim();
     }
 
+    // Romanian with Euro Symbol currency display is currently buggy on all browsers, so doing this to polyfill it
+    if (locales.startsWith('ro') && currency === 'EUR' && display === 'symbol') {
+        result = result.replace('EUR', '\u20ac');
+    }
+
     return result;
 }
 
@@ -922,8 +933,7 @@ mBroadcaster.once('boot_done', function populate_l() {
     l[16306] = escapeHTML(l[16306])
         .replace('[A]', '<a href="/fm/rubbish" class="clickurl gotorub">').replace('[/A]', '</a>');
     l[16310] = escapeHTML(l[16310])
-        .replace('[A]', '<a href="/fm/dashboard" class="clickurl dashboard-link">').replace('[/A]', '</a>')
-        .replace('[I]', '<i class="sprite-fm-uni icon-achievements"></i>');
+        .replace('[A]', '<a href="/fm/dashboard" class="clickurl dashboard-link">').replace('[/A]', '</a>');
     l[16317] = escapeHTML(l[16317]).replace('[S]', '<strong>').replace('[/S]', '</strong>');
     l[16389] = escapeHTML(l[16389]).replace(
         '%1',
@@ -1274,6 +1284,15 @@ mBroadcaster.once('boot_done', function populate_l() {
     l.v4onboard_dialogtext = escapeHTML(l.v4onboard_dialogtext)
         .replace('[S]', '<span class="highlight-blue">')
         .replace('[/S]', '</span>');
+    l.achievem_dialogfootertext = escapeHTML(l.achievem_dialogfootertext)
+        .replace('[A]', '<a href="/pro" class="clickurl">')
+        .replace('[/A]', '</a>');
+    l.achievem_pagedesc = escapeHTML(l.achievem_pagedesc)
+        .replace('[S]', '<span>')
+        .replace('[/S]', '</span>');
+    l.achievem_storagetitle = escapeHTML(l.achievem_storagetitle)
+        .replace('[S]', '<span>')
+        .replace('[/S]', '</span>');
 
     var common = [
         15536, 16106, 16107, 16119, 16120, 16123, 16124, 16135, 16136, 16137, 16138, 16304, 16313, 16315, 16316,
@@ -1281,9 +1300,9 @@ mBroadcaster.once('boot_done', function populate_l() {
         18282, 18283, 18284, 18285, 18286, 18287, 18289, 18290, 18291, 18292, 18293, 18294, 18295, 18296, 18297,
         18298, 18302, 18303, 18304, 18305, 18314, 18315, 18316, 18419, 19807, 19808, 19810, 19811, 19812, 19813,
         19814, 19854, 19821, 19930, 20402, 20462, 20966, 20967, 20969, 20970, 20971, 20973, 22117, 22667, 22668,
-        22674, 22669, 22671, 22784, 22789, 22881, 22883, 23098, 23351, 23521, 23522, 23523, 23524, 23532, 23533,
-        23534, 23296, 23299, 23304, 23819, 24077, 24097, 24098, 24099, 24139, 24540, 24542, 24543, 24544, 24546,
-        24680, 24849, 24850
+        22674, 22669, 22671, 22672, 22784, 22789, 22881, 22883, 23098, 23351, 23521, 23522, 23523, 23524, 23532,
+        23533, 23534, 23296, 23299, 23304, 23819, 24077, 24097, 24098, 24099, 24139, 24540, 24542, 24543, 24544,
+        24546, 24680, 24849, 24850
     ];
     for (i = common.length; i--;) {
         var num = common[i];

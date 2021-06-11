@@ -351,6 +351,10 @@
     text-align: start;
     transition: var(--transition-bg-color), var(--transition-color);
 }
+.mega-input-dropdown .ps-active-y .option {
+    margin-right: 14px;
+}
+
 .mega-input-dropdown .option.template,
 .mega-input-dropdown .option.hidden {
     display: none;

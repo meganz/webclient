@@ -7301,7 +7301,7 @@ table {
 .low-width .account.responsive-widget-block {
     flex-direction: column;
 }
-.low-width .account.responsive-widget-block .widget.body {
+.fm-right-block.dashboard.active-achievements.low-width .account.responsive-widget-block .widget.body {
     margin-top: 12px;
     -webkit-margin-start: 0;
     margin-inline-start: 0;

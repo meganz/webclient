@@ -184,14 +184,11 @@ MegaData.prototype.getPath = function(id) {
 
         if (
             this.d[id]
-            || (id === 'contacts')
             || (id === 'messages')
             || (id === 'shares')
             || (id === 'out-shares')
             || (id === 'public-links')
             || (id === this.InboxID)
-            || (id === 'opc')
-            || (id === 'ipc')
         ) {
             result.push(id);
         }
@@ -204,13 +201,10 @@ MegaData.prototype.getPath = function(id) {
 
         if (
             (id === this.RootID)
-            || (id === 'contacts')
             || (id === 'shares')
             || (id === 'messages')
             || (id === this.RubbishID)
             || (id === this.InboxID)
-            || (id === 'opc')
-            || (id === 'ipc')
         ) {
             loop = false;
         }

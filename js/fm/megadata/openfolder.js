@@ -122,12 +122,6 @@
                     }, []).map(fltn).filter(String).map(hton).concat(p.length ? _(p) : []);
                 })([id]);
             }
-            else if (id === 'opc') {
-                this.v = Object.values(this.opc || {});
-            }
-            else if (id === 'ipc') {
-                this.v = Object.values(this.ipc || {});
-            }
             else if (id.substr(0, 6) === 'search') {
                 this.filterBySearch(this.currentdirid);
                 $('.fm-right-header .fm-breadcrumbs-wrapper').addClass('hidden');
@@ -189,9 +183,6 @@
             }
             else if (this.currentdirid === 'contacts') {
                 this.doSort('status', 1);
-            }
-            else if (this.currentdirid === 'opc' || this.currentdirid === 'ipc') {
-                M.doSort('email', 1);
             }
             else {
                 this.doSort('name', 1);
@@ -332,15 +323,6 @@
         }
         else if (id === 'cloudroot') {
             id = this.RootID;
-        }
-        else if (id === 'contacts') {
-            id = 'contacts';
-        }
-        else if (id === 'opc') {
-            id = 'opc';
-        }
-        else if (id === 'ipc') {
-            id = 'ipc';
         }
         else if (id && id.substr(0, 4) === 'chat') {
             if (is_mobile) {

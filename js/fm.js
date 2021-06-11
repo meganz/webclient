@@ -802,8 +802,6 @@ function fmtopUI() {
             delay('updateIpcRequests', updateIpcRequests);
         }
         else if (M.currentdirid === 'contacts'
-                || M.currentdirid === 'ipc'
-                || M.currentdirid === 'opc'
                 || (String(M.currentdirid).length === 11
                     && M.currentdirid.substr(0, 6) !== 'search')) {
 
@@ -815,27 +813,8 @@ function fmtopUI() {
             $('.fm-add-user').removeClass('hidden');
             $contactsTabBlock.removeClass('hidden');
 
-            // Show Accept All button
-            if (M.currentdirid === 'ipc' && Object.keys(M.ipc).length > 0) {
-                $('button.link-button.accept-all').removeClass('hidden');
-            }
-
-            // Show set active tab, Hide grid/blocks/view buttons
-            if (M.currentdirid === 'ipc') {
-                $('.fm-right-header').addClass('requests-panel');
-                $contactsTabBlock.find('.ipc').addClass('active');
-            }
-            else if (M.currentdirid === 'opc') {
-                $('.fm-right-header').addClass('requests-panel');
-                $contactsTabBlock.find('.opc').addClass('active');
-            }
-            else if (M.currentdirid === 'contacts') {
-                $contactsTabBlock.find('.contacts').addClass('active');
-            }
-            else {
-                $('.fm-breadcrumbs-block').addClass('hidden');
-                $contactsTabBlock.find('.contacts').addClass('active');
-            }
+            $('.fm-breadcrumbs-block').addClass('hidden');
+            $('.contacts', $contactsTabBlock).addClass('active');
 
         }
         else if (M.currentrootid === 'shares') {
@@ -1135,9 +1114,6 @@ function FMShortcuts() {
 
         if (charTyped === "a" && (e.ctrlKey || e.metaKey)) {
             if (typeof selectionManager != 'undefined' && selectionManager) {
-                if (M.currentdirid === 'ipc' || M.currentdirid === 'opc') {
-                    return;
-                }
                 selectionManager.select_all();
             }
             return false; // stop prop.
@@ -1148,7 +1124,7 @@ function FMShortcuts() {
             !isContactRootOrShareRoot
         ) {
             var items = clone(selectionManager.get_selected());
-            if (items.length === 0 || M.currentdirid === 'ipc' || M.currentdirid === 'opc') {
+            if (items.length === 0) {
                 return; // dont do anything.
             }
 
@@ -1168,8 +1144,7 @@ function FMShortcuts() {
             (e.ctrlKey || e.metaKey) &&
             !isContactRootOrShareRoot
         ) {
-            if (!current_operation || (M.getNodeRights(M.currentdirid || '') | 0) < 1
-                || M.currentdirid === 'ipc' || M.currentdirid === 'opc') {
+            if (!current_operation || (M.getNodeRights(M.currentdirid || '') | 0) < 1) {
                 return false; // stop prop.
             }
 
@@ -3303,20 +3278,6 @@ function fm_resize_handler(force) {
                 $.contactGridHeader();
             }
             initContactsGridScrolling();
-        }
-    }
-    else if (M.currentdirid === 'ipc') {
-        initIpcGridScrolling();
-        M.addGridUIDelayed(true);
-        if ($.ipcGridHeader) {
-            $.ipcGridHeader();
-        }
-    }
-    else if (M.currentdirid === 'opc') {
-        initOpcGridScrolling();
-        M.addGridUIDelayed(true);
-        if ($.opcGridHeader) {
-            $.opcGridHeader();
         }
     }
     else if (M.currentdirid === 'shares') {

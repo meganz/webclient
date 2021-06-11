@@ -399,6 +399,12 @@ function init_page() {
         loadSubPage("/fm/chat/contacts");
         return false;
     }
+    if (page === "fm/ipc") {
+        return loadSubPage("/fm/chat/contacts/received");
+    }
+    if (page === "fm/opc") {
+        return loadSubPage("/fm/chat/contacts/sent");
+    }
 
     $('#loading').hide();
     if (window.loadingDialog) {
@@ -1771,7 +1777,7 @@ function init_page() {
         var id = false;
         if (page.substr(0, 2) === 'fm') {
             id = page.replace('fm/', '');
-            if (id.length < 5 && (id !== 'chat' && id !== 'opc' && id !== 'ipc')) {
+            if (id.length < 5 && id !== 'chat') {
                 id = false;
             }
         }

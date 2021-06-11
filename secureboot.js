@@ -2049,9 +2049,12 @@ if (is_ios) {
 }
 
 // Determine whether to show the legacy mobile page for these links so that they redirect back to the app
-var showLegacyMobilePage = (m && (page.substr(0, 6) === 'verify' || page.substr(0, 6) === 'fm/ipc' ||
-    page.substr(0, 9) === 'newsignup' || page.substr(0, 7) === 'account' ||
-    (is_old_windows_phone && page.substr(0, 7) === 'confirm')));
+var showLegacyMobilePage = m && (
+    page.substr(0, 6) === 'verify'
+    || page.substr(0, 9) === 'newsignup'
+    || page.substr(0, 7) === 'account'
+    || is_old_windows_phone && page.substr(0, 7) === 'confirm'
+);
 
 /**
  * Some legacy secureboot mobile code that has been refactored to keep just the blog working and also redirect to the

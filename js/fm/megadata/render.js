@@ -26,19 +26,8 @@ MegaData.prototype.renderMain = function(aUpdate) {
     // are no nodes in the current list (Ie, M.v), if so no need
     // to call renderLayout therefore.
     if (this.megaRender.cleanupLayout(aUpdate, this.v, this.fsViewSel)) {
-
-        if (this.currentdirid === 'opc') {
-            this.drawSentContactRequests(this.v, 'clearGrid');
-            container = '.grid-scrolling-table.opc';
-        }
-        else if (this.currentdirid === 'ipc') {
-            this.drawReceivedContactRequests(this.v, 'clearGrid');
-            container = '.grid-scrolling-table.ipc';
-        }
-        else {
-            numRenderedNodes = this.megaRender.renderLayout(aUpdate, this.v);
-            container = this.megaRender.container;
-        }
+        numRenderedNodes = this.megaRender.renderLayout(aUpdate, this.v);
+        container = this.megaRender.container;
     }
 
     // No need to bind mouse events etc (gridUI/iconUI/selecddUI)

@@ -819,9 +819,6 @@ accountUI.account = {
                 mega.config.set('skipsmsbanner', 1);
             });
 
-            // Set the text for x GB storage and quota
-            sms.renderAddPhoneText($text);
-
             // Show the phone banner, hide the storage/bandwidth usage banner
             $usageBanner.addClass('hidden');
             $addPhoneBanner.removeClass('hidden');

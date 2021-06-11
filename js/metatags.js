@@ -579,6 +579,11 @@ mega.metatags = new function() {
             mTags.mega_desc = 'Blog article from MEGA';
             stopBots(metaRobots, true);
         }
+        else if (page === 'achievements') {
+            mTags.mega_title = 'Achievements - MEGA';
+            mTags.mega_desc = 'Increase your cloud storage';
+            stopBots(metaRobots, true);
+        }
         else if (page.substr(0, 5) === 'blog/') {
             var notSet = true;
             if (blogHeaders && blogposts) {

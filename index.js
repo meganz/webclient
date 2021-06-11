@@ -984,7 +984,8 @@ function init_page() {
         return false;
     }
     else if (page === 'achievements') {
-        loadSubPage('fm/account/achievements');
+        parsepage(pages.achievements);
+        achievementPage();
         return false;
     }
     else if (page === 'fm/account/achievements') {
@@ -2738,7 +2739,8 @@ function topmenuUI() {
                     'help', 'login', 'mega', 'nzippmember', 'nziphotographer', 'privacy', 'mobileapp',
                     'mobile', 'privacycompany', 'register', 'resellers', 'sdk', 'sync', 'sitemap', 'sourcecode',
                     'support', 'sync', 'takedown', 'terms', 'start', 'security', 'downloadapp', 'affiliate',
-                    'nas', 'pro', 'cookie', 'securechat', 'collaboration', 'storage'
+                    'nas', 'pro', 'cookie', 'securechat', 'collaboration', 'storage',
+                    'achievements'
                 ];
                 var moveTo = {
                     'account': 'fm/account',

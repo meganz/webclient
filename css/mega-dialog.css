@@ -309,6 +309,10 @@
                 text-align: start;
             }
 
+            .mega-dialog.dialog-template-main > header p span {
+                color: var(--text-color-success);
+            }
+
             .mega-dialog.dialog-template-main .content-block {
                 padding: 0 48px;
             }

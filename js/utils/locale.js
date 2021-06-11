@@ -933,8 +933,7 @@ mBroadcaster.once('boot_done', function populate_l() {
     l[16306] = escapeHTML(l[16306])
         .replace('[A]', '<a href="/fm/rubbish" class="clickurl gotorub">').replace('[/A]', '</a>');
     l[16310] = escapeHTML(l[16310])
-        .replace('[A]', '<a href="/fm/dashboard" class="clickurl dashboard-link">').replace('[/A]', '</a>')
-        .replace('[I]', '<i class="sprite-fm-uni icon-achievements"></i>');
+        .replace('[A]', '<a href="/fm/dashboard" class="clickurl dashboard-link">').replace('[/A]', '</a>');
     l[16317] = escapeHTML(l[16317]).replace('[S]', '<strong>').replace('[/S]', '</strong>');
     l[16389] = escapeHTML(l[16389]).replace(
         '%1',
@@ -1284,6 +1283,15 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[/A]', '</a>');
     l.v4onboard_dialogtext = escapeHTML(l.v4onboard_dialogtext)
         .replace('[S]', '<span class="highlight-blue">')
+        .replace('[/S]', '</span>');
+    l.achievem_dialogfootertext = escapeHTML(l.achievem_dialogfootertext)
+        .replace('[A]', '<a href="/pro" class="clickurl">')
+        .replace('[/A]', '</a>');
+    l.achievem_pagedesc = escapeHTML(l.achievem_pagedesc)
+        .replace('[S]', '<span>')
+        .replace('[/S]', '</span>');
+    l.achievem_storagetitle = escapeHTML(l.achievem_storagetitle)
+        .replace('[S]', '<span>')
         .replace('[/S]', '</span>');
 
     var common = [

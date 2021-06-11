@@ -144,9 +144,9 @@ Object.defineProperty(mega, 'achievem', {
                             if (rwd && rwd.left > 0) {
                                 base++;
                                 if (ach[1]) {
-                                    quota.transfer.current += ach[1];
+                                    quota.transfer.current += mafr[rwd.r][1];
                                 }
-                                quota.storage.current += ach[0];
+                                quota.storage.current += mafr[rwd.r][0];
                             }
                         }
 
@@ -197,7 +197,6 @@ Object.defineProperty(mega, 'achievem', {
         mapToAction[idx + 1] = tmp[1];
         mapToElement[idx + 1] = tmp[0];
     });
-
     Object.defineProperty(o, 'mapToAction', {
         value: Object.freeze(mapToAction)
     });
@@ -280,145 +279,15 @@ mega.achievem.achievementsListDialog = function achievementsListDialog(onDialogC
     // hide everything until seen on the api reply (maf)
     $('.achievements-cell', $dialog).addClass('hidden');
 
-    var ach = mega.achievem;
-    var maf = M.maf;
-    var totalStorage = 0;
-    var totalTransfer = 0;
-    var totalInviteeCount = 0;
-    for (var idx in maf) {
-        if (maf.hasOwnProperty(idx)) {
-            idx |= 0;
-            var data = maf[idx];
-            var selector = ach.mapToElement[idx];
-            if (selector) {
-                var $cell = $('.achievements-cell.' + selector, $dialog).removeClass('hidden');
-
-                $('.reward.storage .reward-txt', $cell).next()
-                    .safeHTML(bytesToSize(data[0], 0));
-
-                if (!data[1]) {
-                    $cell.addClass('one-reward');
-                }
-                else {
-                    $('.reward.bandwidth .reward-txt', $cell).next()
-                        .safeHTML(bytesToSize(data[1], 0));
-                }
-                $('.reward.valid-period .reward-txt', $cell).next()
-                    .safeHTML(l[19775].replace('%d', data['expiry']['value']));
-
-                if (!$cell.hasClass('localized')) {
-                    $cell.addClass('localized');
-
-                    const $desc = $('.achi-content-txt', $cell);
-                    if ($desc.length) {
-                        const text = String($desc.text()).trim().replace('[%3]', '%3');
-                        if (data[1]){
-                            $desc.safeHTML(
-                                '%n',
-                                text,
-                                bytesToSize(data[0], 0),
-                                bytesToSize(data[1], 0),
-                                data.expiry.value);
-                        }
-                        else {
-                            // one-reward
-                            $desc.safeHTML('%n', text, bytesToSize(data[0], 0), data.expiry.value);
-                        }
-                    }
-                }
-
-                if (data.rwds) {
-                    for (var i = data.rwds.length - 1; i >= 0; i--) {
-                        totalStorage += data.rwds[i].left > 0 ? data[0] : 0;
-                        totalTransfer += data.rwds[i].left > 0 ? data[1] : 0;
-                        totalInviteeCount += data.rwds[i].left > 0 ? 1 : 0;
-                    }
-                }
-                else if (data.rwd) {
-                    locFmt = l[16336].replace(/[()]/g, '').replace('[S]', '<span>').replace('[/S]', '</span>');
-
-                    totalStorage += data[0];
-                    totalTransfer += data[1];
-
-                    if (!data.rwd.e) {
-                        // this reward do not expires
-                        locFmt = '&nbsp;';
-                    }
-                    else if (data.rwd.left < 1) {
-                        // show "Expired"
-                        locFmt = l[1664];
-                        totalStorage -= data[0];
-                        totalTransfer -= data[1];
-                        $('.expires-txt', $cell).addClass('error');
-                        $cell.addClass('expired');
-                    }
-
-                    if (idx !== ach.ACH_INVITE) {
-                        $cell.addClass('achieved');
-
-                        $('.expires-txt', $cell).safeHTML('%n', locFmt, data.rwd.left, l[16290]);
-                        if (!$('.expires-txt', $cell).hasClass('error')) {
-                            $('.expires-txt', $cell).addClass('info');
-                        }
-
-                        locFmt = '';
-                        switch (idx) {
-                            case ach.ACH_WELCOME:     locFmt = l[16395]; break;
-                            case ach.ACH_SYNCINSTALL: locFmt = l[16396]; break;
-                            case ach.ACH_APPINSTALL:  locFmt = l[16397]; break;
-                        }
-                    }
-
-                    $('.content-txt:not(.tooltip-content)', $cell)
-                        .text(locFmt
-                            .replace('%1', bytesToSize(data[0], 0))
-                            .replace('%2', bytesToSize(data[1], 0))
-                        );
-                }
-                else {
-                    locFmt = l[16291].replace(/[()]/g, '').replace('[S]', '<span>').replace('[/S]', '</span>');
-                    $('.expires-txt', $cell)
-                        .removeClass('error')
-                        .safeHTML('%n', locFmt, data.expiry.value, data.expiry.utxt);
-                    $cell.removeClass('expired');
-                }
-
-                ach.bind.call($('.mega-button.positive', $cell), ach.mapToAction[idx]);
-                $cell.removeClass('hidden');
-
-                // If this is the SMS achievement, and SMS achievements are not enabled yet, hide the container
-                if (selector === 'ach-sms-verification' && u_attr.flags.smsve !== 2) {
-                    $cell.addClass('hidden');
-                }
-            }
-        }
-    }
-
-    $('.storage-quota .quota-txt', $dialog).text(bytesToSize(totalStorage, 0));
-    $('.transfer-quota .quota-txt', $dialog).text(bytesToSize(totalTransfer, 0));
-
-    if (maf[3].rwds) {
-        $('.invitees .quota-txt', $dialog).text(totalInviteeCount);
-        $('.invitees .new-dialog-icon', $dialog).removeClass('hidden');
-    }
-    else if (maf[3].rwd && maf[3].rwd.left > 0) {
-        $('.invitees .quota-txt', $dialog).text(1);
-        $('.invitees .new-dialog-icon', $dialog).addClass('hidden');
-    }
-    else {
-        $('.invitees .quota-txt', $dialog).text(0);
-        $('.invitees .new-dialog-icon', $dialog).addClass('hidden');
-    }
-
-    maf = ach = undefined;
+    mega.achievem.bindStorageDataToView($dialog, true);
 
     // Show dialog
-    M.safeShowDialog('achievements', function() {
+    M.safeShowDialog('achievements', () => {
         $dialog.removeClass('hidden');
 
         // Init scroll
-        var $contentBlock = $dialog.find('.achievements-list');
-        var $scrollBlock = $dialog.find('.achievements-scroll');
+        var $contentBlock = $('.achievements-list', $dialog);
+        var $scrollBlock = $('.achievements-scroll', $dialog);
         var bodyHeight = $('body').height();
 
         if ($dialog.outerHeight() > bodyHeight) {
@@ -437,11 +306,145 @@ mega.achievem.achievementsListDialog = function achievementsListDialog(onDialogC
         return $dialog;
     });
 
-    $('.invitees .new-dialog-icon', $dialog).rebind('click', function() {
+    $('.invitees .new-dialog-icon', $dialog).rebind('click', () => {
         closeDialog();
         fm_showoverlay();
         mega.achievem.invitationStatusDialog();
     });
+    $('.js-dashboard-btn', $dialog).rebind('click', () => {
+        closeDialog();
+        loadSubPage('fm/dashboard');
+    });
+};
+
+/**
+ * Show achievements list dialog
+ * @param {Element} [$viewContext] element to bind the data dynamicaly
+ * @param {boolean} [isDialog] boolean value for conditinal bindings
+ */
+mega.achievem.bindStorageDataToView = function bindStorageDataToView($viewContext, isDialog) {
+    'use strict';
+    var ach = mega.achievem;
+    var maf = M.maf;
+    var totalStorage = 0;
+    var totalTransfer = 0;
+    var totalInviteeCount = 0;
+    var $cell;
+    var locFmt = l[16325].replace(/\[S]/g, '<span>').replace(/\[\/S]/g, '</span>');
+
+    const calculateAndBindRewardData = function calculateAndBindRewardData(data, idx) {
+
+        if (data.rwds) {
+            for (var i = data.rwds.length - 1; i >= 0; i--) {
+                // totalStorage += data.rwds[i].left > 0 ? data[0] : 0;
+                // totalTransfer += data.rwds[i].left > 0 ? data[1] : 0;
+                totalInviteeCount += data.rwds[i].left > 0 ? 1 : 0;
+            }
+        }
+        else if (data.rwd) {
+            locFmt = l[16336].replace(/[()]/g, '').replace('[S]', '<span>').replace('[/S]', '</span>');
+
+            // totalStorage += data[0];
+            // totalTransfer += data[1];
+
+            if (!data.rwd.e) {
+                // this reward do not expires
+                locFmt = '&nbsp;';
+            }
+            else if (data.rwd.left < 1) {
+                // show "Expired"
+                locFmt = l[1664];
+                // totalStorage -= data[0];
+                // totalTransfer -= data[1];
+                $('.expires-txt', $cell).addClass('error');
+                $cell.addClass('expired');
+            }
+
+            if (idx !== ach.ACH_INVITE) {
+                $cell.addClass('achieved');
+
+                $('.expires-txt', $cell).safeHTML('%n', locFmt, data.rwd.left, l[16290]);
+                if (!$('.expires-txt', $cell).hasClass('error')) {
+                    $('.expires-txt', $cell).addClass('info');
+                }
+
+                locFmt = '';
+                switch (idx) {
+                    case ach.ACH_WELCOME:     locFmt = l[16395]; break;
+                    case ach.ACH_SYNCINSTALL: locFmt = l[16396]; break;
+                    case ach.ACH_APPINSTALL:  locFmt = l[16397]; break;
+                }
+            }
+        }
+        else {
+            locFmt = l[16291].replace(/[()]/g, '').replace('[S]', '<span>').replace('[/S]', '</span>');
+            $('.expires-txt', $cell)
+                .removeClass('error')
+                .safeHTML('%n', locFmt, data.expiry.value, data.expiry.utxt);
+            $cell.removeClass('expired');
+        }
+
+    };
+
+    for (var idx in maf) {
+        if (maf.hasOwnProperty(idx)) {
+            idx |= 0;
+            var data = maf[idx];
+            var selector = ach.mapToElement[idx];
+            if (selector) {
+                $cell = $('.achievements-cell.' + selector, $viewContext).removeClass('hidden');
+
+                if (idx !== 3 && (data.rwd || data.rwds)) {
+                    $cell.addClass('one-reward');
+                }
+
+                if (!$cell.hasClass('localized')) {
+                    $cell.addClass('localized');
+                }
+
+                calculateAndBindRewardData(data, idx);
+
+                if (is_mobile) {
+                    mobile.achieve.bindEvents.call($('.mega-button.positive', $cell), selector);
+                }
+                else {
+                    ach.bind.call($('.mega-button.positive', $cell), ach.mapToAction[idx]);
+                }
+                $cell.removeClass('hidden');
+
+                // If this is the SMS achievement, and SMS achievements are not enabled yet, hide the container
+                if (selector === 'ach-sms-verification' && u_attr.flags.smsve !== 2) {
+                    $cell.addClass('hidden');
+                }
+            }
+        }
+    }
+
+    const loadDialogMoreData = function loadDialogMoreData() {
+
+        $('.storage-quota .quota-txt', $viewContext).text(bytesToSize(M.maf.storage.current, 0));
+        // $('.transfer-quota .quota-txt', $viewContext).text(bytesToSize(totalTransfer, 0));
+
+        if (maf[3].rwds) {
+            $('.invitees .quota-txt', $viewContext).text(totalInviteeCount);
+            $('.invitees .new-dialog-icon', $viewContext).removeClass('hidden');
+        }
+        else if (maf[3].rwd && maf[3].rwd.left > 0) {
+            $('.invitees .quota-txt', $viewContext).text(1);
+            $('.invitees .new-dialog-icon', $viewContext).removeClass('hidden');
+        }
+        else {
+            $('.invitees .quota-txt', $viewContext).text(0);
+            $('.invitees .new-dialog-icon', $viewContext).addClass('hidden');
+        }
+
+    };
+
+    if (isDialog) {
+        loadDialogMoreData();
+    }
+
+    maf = ach = undefined;
 };
 
 /**
@@ -464,9 +467,6 @@ mega.achievem.inviteFriendDialog = function inviteFriendDialog(close) {
     var ach = mega.achievem;
     var maf = M.maf;
     maf = maf[ach.ACH_INVITE];
-
-    var locFmt = l[16325].replace(/\[S\]/g, '<span>').replace(/\[\/S\]/g, '</span>');
-    $('.header.default', $dialog).safeHTML('%n', locFmt, bytesToSize(maf[0], 0), bytesToSize(maf[1], 0));
 
     $('.info-body p:first', $dialog).safeHTML(l[16317].replace('[S]', '<strong>').replace('[/S]', '</strong>'));
 
@@ -760,8 +760,8 @@ mega.achievem.invitationStatusDialog = function invitationStatusDialog(close) {
     var maf = M.maf;
     maf = maf[ach.ACH_INVITE];
 
-    var locFmt = l[16283].replace(/\[S\]/g, '<span class="red">').replace(/\[\/S\]/g, '</span>');
-    $('.hint', $dialog).safeHTML('%n', locFmt, bytesToSize(maf[0], 0), bytesToSize(maf[1], 0), maf.expiry.value);
+    var locFmt;
+
 
     // Due specific M.maf.rwds structure sorting must be done respecting it
     var getSortByMafEmailFn = function() {

@@ -1075,6 +1075,10 @@ body:not(.mobile) .pricing-page.slider-dot:hover {
 .slide2 .pricing-page.compare-price .star.green {
     display: inline-block;
 }
+.pricing-page.mega.free .star,
+.pricing-page.mega.free .compare-info {
+    display: none;
+}
 .pricing-page.compare-period {
     font-size: 20px;
     line-height: 24px;

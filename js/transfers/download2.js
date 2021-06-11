@@ -1303,8 +1303,6 @@ var dlmanager = {
             var $dtb = $('.download.top-bar');
             $dtb.removeClass('stream-overquota overquota');
             $('.see-our-plans', $dtb).addClass('hidden').off('click');
-            $('.create-account-button', $dtb).addClass('hidden').off('click');
-            $('.get-more-bonuses', $dtb).addClass('hidden').off('click');
             $('.download.over-transfer-quota', $dtb).addClass('hidden');
             $(window).trigger('resize');
         }
@@ -1602,22 +1600,6 @@ var dlmanager = {
             if (page === 'download') {
                 var $dtb = $('.download.top-bar');
 
-                $('.create-account-button', $dtb).addClass('hidden').off('click');
-                $('.get-more-bonuses', $dtb).addClass('hidden').off('click');
-
-                if (flags & this.LMT_HASACHIEVEMENTS) {
-                    if (flags & this.LMT_ISREGISTERED) {
-                        $('.get-more-bonuses', $dtb)
-                            .removeClass('hidden')
-                            .rebind('click', getMoreBonusesListener);
-                    }
-                    else {
-                        $('.create-account-button', $dtb)
-                            .removeClass('hidden')
-                            .rebind('click', getMoreBonusesListener);
-                    }
-                }
-
                 $('.see-our-plans', $dtb).removeClass('hidden').rebind('click', onclick);
 
                 $('.download.over-transfer-quota', $dtb).removeClass('hidden');
@@ -1691,7 +1673,6 @@ var dlmanager = {
         if (flags & this.LMT_HASACHIEVEMENTS) {
             $dialog.addClass('achievements');
             localStorage.gotOverquotaWithAchievements = 1;
-            $('.get-more-bonuses', $dialog).rebind('click', getMoreBonusesListener);
         }
     },
 
@@ -1843,7 +1824,7 @@ var dlmanager = {
                 $('.bottom-tips a', $dialog).off('click');
                 $('.continue, .continue-download, button.js-close, .fm-dialog-close', $dialog).off('click');
                 $('.upgrade, .pricing-page.plan, .mobile.upgrade-to-pro', $dialog).off('click');
-                $('.get-more-bonuses', $dialog).off('click');
+
                 if ($.dialog === 'download-pre-warning') {
                     $.dialog = false;
                 }

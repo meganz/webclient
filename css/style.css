@@ -15690,9 +15690,6 @@ body.megaChatDisabled .nw-contact-name button.start-chat-button {
 .top-login-popup.sign header {
     padding-bottom: 24px;
 }
-.top-login-popup.sign .fields {
-    padding: 0 48px;
-}
 .top-login-popup.sign .login-page-forgot-bl {
     padding: 0 0 34px;
 }

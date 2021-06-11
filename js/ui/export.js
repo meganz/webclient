@@ -1440,7 +1440,7 @@ var exportExpiry = {
                 datepicker.selectedDates = [new Date(buttonLabel * 1000)];
 
                 // Change "Set  expiry date" button label
-                buttonLabel = time2date(buttonLabel, 5);
+                buttonLabel = time2date(buttonLabel, 2);
             }
 
             // Set expiry date button label
@@ -1631,7 +1631,7 @@ var exportExpiry = {
             if (Number(date)) {
 
                 // Change date format and use "Expires %1" string
-                date = time2date(date, 5);
+                date = time2date(date, 2);
                 tipContent = l[8698].replace('%1', '<span class="green">' + date + '</span');
             }
             else {

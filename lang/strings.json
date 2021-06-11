@@ -313,7 +313,7 @@
     },
     "208": {
         "developer_comment": "",
-        "string": "I agree with the MEGA [A]Terms of Service[/A]"
+        "string": "I have read and understand MEGA\u2019s [A]terms of service[/A]"
     },
     "209": {
         "developer_comment": "Register button",
@@ -2973,7 +2973,7 @@
     },
     "5878": {
         "developer_comment": "This string is shown inside the Add Contact dialog and sent to a user in an email.",
-        "string": "Hello, join me on MEGA and get access to encrypted storage and communication. Get 50 GB free!"
+        "string": "Hello, join me on MEGA and get access to encrypted storage and communication. Get 20 GB free!"
     },
     "5884": {
         "developer_comment": "end a phonecall",
@@ -4601,7 +4601,7 @@
     },
     "8428": {
         "developer_comment": "MEGAsync application advantages. As short as possible please. Please leave [A] and [/A] as it is.",
-        "string": "Take advantage of 50 GB cloud storage with secure user-controlled end-to-end encryption and sign up for a Free account or one of our [A]Pro plans[/A]."
+        "string": "Take advantage of 20 GB cloud storage with secure user-controlled end-to-end encryption and sign up for a Free account or one of our [A]Pro plans[/A]."
     },
     "8435": {
         "developer_comment": "An error message which is shown when we want to share a file with somebody who has used all the storage space in their MEGA account.",
@@ -4765,7 +4765,7 @@
     },
     "8634": {
         "developer_comment": "Some information for users that are not logged in. Please leave the [S] and [/S] placeholder tags as they will be replaced at runtime.\r\n\r\nAdded an asterisk * to 50GB for a footnote",
-        "string": "Log in or create an account to [S]get 50 GB* FREE[/S] cloud storage and to receive messages from your friends and coworkers."
+        "string": "Log in or create an account to [S]get 20 GB FREE[/S] cloud storage and to receive messages from your friends and coworkers."
     },
     "8635": {
         "developer_comment": "A notification when a file is downloading through the MEGAsync application. Please leave the brand \u201cMEGAsync\u201d as it is.",
@@ -4801,7 +4801,7 @@
     },
     "8644": {
         "developer_comment": "A message in the ephemeral warning dialog. Please keep the [S] and [/S] placeholder tags in the translation which will be used to stylise the content at runtime.\r\n\r\nAdded an asterisk to 50GB for a footnote",
-        "string": "You are using an ephemeral session. The data you are storing will be lost when it expires. To preserve your files, please upgrade to a real account at your earliest convenience and claim your [S]free 50 GB* of secure storage space in the cloud![/S]"
+        "string": "You are using an ephemeral session. The data you are storing will be lost when it expires. To preserve your files, please upgrade to a real account at your earliest convenience and claim your [S]free 20 GB of secure storage space in the cloud![/S]"
     },
     "8645": {
         "developer_comment": "An error dialog title for when a user tried to upload an avatar image which was too large.",
@@ -4969,7 +4969,7 @@
     },
     "8762": {
         "developer_comment": "A message on the cloud drive screen when they are on an ephemeral session and they have no files or folders in their account. This prompts them to register an account for extra features. Please keep the [S] and [/S] tags which will be used to style that text red at runtime.\r\n\r\nAdded an asterisk * to 50GB for a footnote",
-        "string": "Create an account to [S]get 50 GB* FREE[/S] cloud storage and to receive messages from your friends and coworkers."
+        "string": "Create an account to [S]get 20 GB FREE[/S] cloud storage and to receive messages from your friends and coworkers."
     },
     "8763": {
         "developer_comment": "A three letter abbreviation for the word Sunday. This abbreviation will be used inside a datepicker on the Get Link dialog.",
@@ -5189,7 +5189,7 @@
     },
     "8833": {
         "developer_comment": "A message displayed to encourage the user to register an account for extra bandwidth and free storage. Please keep the [B] and [/B] tags as they will be used to stylise the text at runtime.",
-        "string": "To enhance this limit, you can register an account. This will not only give you ample extra transfer quota but also 50 GB of secure storage space in the cloud - [B]for free[/B]."
+        "string": "To enhance this limit, you can register an account. This will not only give you ample extra transfer quota but also 20 GB of secure storage space in the cloud - [B]for free[/B]."
     },
     "8834": {
         "developer_comment": "A warning message which is displayed to warn the user about the reason why their download can not proceed because they would be over the bandwidth quota.",
@@ -5461,15 +5461,15 @@
     },
     "8950": {
         "developer_comment": "Mobile-webclient, downloads page.\n\nWhile downloading through the mobile browser, this message is shown to users to encourage installing our app.\n\n[S] is replaced with <span> and the text within turns red.",
-        "string": "Install our mobile app to get [S]free 50 GB encrypted cloud storage![/S]"
+        "string": "Install a MEGA Mobile App and earn another [S]free 5 GB encrypted cloud storage[/S]"
     },
     "8951": {
         "developer_comment": "This is used on the downloads page on the mobile webclient when viewing a download link through the mobile browser and the filesize exceeds an stated limit. Leave the [S] and [/S] tags which will be used to turn the text red. Please leave the asterisk since it requires a conditional term.",
-        "string": "This file is too large to open in your mobile browser. Please use our mobile app for [S]unlimited file size support and free 50 GB* cloud storage[/S]."
+        "string": "This file is too large to open in your mobile browser. Please use a MEGA Mobile App for [S]unlimited file size support and to earn another free 5 GB of cloud storage[/S]."
     },
     "8952": {
         "developer_comment": "This is used on the downloads page in the mobile webclient when viewing a download link through the mobile browser and the file-type cannot be handled through the mobile browser itself. The message is shown BEFORE trying to download the file. Leave the [S] and [/S] tags which will turn the text red. Please leave the asterisk since it requires a conditional term.",
-        "string": "This file could not be opened in your mobile browser. Please use our mobile app for [S]unlimited file size, unlimited file types and free 50 GB* cloud storage[/S]."
+        "string": "This file is too large to open in your mobile browser. Please use a MEGA Mobile App for [S]unlimited file size support and earn another free 5 GB of cloud storage[/S]."
     },
     "8953": {
         "developer_comment": "A label for the Get Link dialog when there is no expiry time currently set for the link. This lets them set an expiry date for the link so it will no longer be available after this date.",
@@ -6252,20 +6252,20 @@
         "string": "Play Video"
     },
     "16278": {
-        "developer_comment": "",
-        "string": "Install MEGAsync"
+        "developer_comment": "Content Update, MEGAsync to Desktop App",
+        "string": "Install the MEGA Desktop App"
     },
     "16280": {
-        "developer_comment": "",
-        "string": "Install our mobile app"
+        "developer_comment": "Content Update",
+        "string": "Install MEGA mobile app"
     },
     "16282": {
-        "developer_comment": "",
-        "string": "Invite a friend to MEGA"
+        "developer_comment": "Content update",
+        "string": "Invite your friends"
     },
     "16283": {
-        "developer_comment": "%1 and %2 would be replaced with amounts, for example \u201c50 GB\u201d and %3 would be replaced with a numeric value which represents the number of days.",
-        "string": "Invite as many friends or coworkers as you want. For every signup under the invited email address, you will receive %1 of complimentary storage plus %2 of transfer quota, both valid for %3 days, provided that the new user installs either MEGAsync or a mobile app and starts using MEGA."
+        "developer_comment": "%1 and %2 would be replaced with amounts, for example \u201c20 GB\u201d and %3 would be replaced with a numeric value which represents the number of days.",
+        "string": "Invite as many friends or coworkers as you want. For every signup under the invited email address, you will receive %1 of complimentary storage plus %2 of transfer quota, both valid for %3 days, provided that the new user installs either MEGA desktop app or a mobile app and starts using MEGA."
     },
     "16284": {
         "developer_comment": "",
@@ -6321,7 +6321,7 @@
     },
     "16308": {
         "developer_comment": "A dialog message informing the user that they can get more cloud drive space by completing achievements.",
-        "string": "You can unlock more free storage and transfer quota by using our products. Simple. Easy."
+        "string": "You can unlock more free storage by using our products. Simple. Easy."
     },
     "16309": {
         "developer_comment": "Button label. Allows user to get more storage/transfer quotas by executing achievements.",
@@ -6329,7 +6329,7 @@
     },
     "16310": {
         "developer_comment": "A dialog message that informs the user that they may have outstanding achievements, which may increase storage quota. Please leave the [I] placeholder as it is because it will be replaced by an icon.",
-        "string": "Tip: Check all your available bonuses in the [A]Dashboard[/A] or click [I]"
+        "string": "Tip: Check all your available bonuses in the [A]Dashboard[/A]"
     },
     "16311": {
         "developer_comment": "Dialog header. Informs user that he\u2019ve almost reached the full capacity of Cloud Drive for Free accounts.",
@@ -6345,7 +6345,7 @@
     },
     "16314": {
         "developer_comment": "A dialog message that informs the user that he can get more storage/transfer quota by completing achievements.",
-        "string": "You can unlock more free storage and transfer quota by completing more achievements."
+        "string": "You can unlock more free storage by completing more achievements."
     },
     "16316": {
         "developer_comment": "Informs the user that they\u2019ve almost reached the full capacity of their Cloud Drive for a Free account. Please leave the [S], [/S], [A], [/A] placeholders as they are.",
@@ -6381,7 +6381,7 @@
     },
     "16331": {
         "developer_comment": "A message which is shown once someone has invited a friend as part of the achievements program.",
-        "string": "You will not receive credit for inviting someone who has used MEGA previously and you will not be notified about such a rejection."
+        "string": "Inviting existing MEGA users does not count toward your achievements. Newly invited contacts must install the MEGA Mobile App or the MEGA Desktop App."
     },
     "16332": {
         "developer_comment": "A message shown on the invite friend dialog for the achievements program. The user may only receive the referral bonus if they meet the requirements listed below.",
@@ -6476,7 +6476,7 @@
         "string": "[A]Upgrade now[/A] and don\u2019t worry about running out of storage."
     },
     "16362": {
-        "developer_comment": "A message shown at registration time when users have to select their plan. The FREE 50 GB plan is subject to the achievements program.",
+        "developer_comment": "A message shown at registration time when users have to select their plan. The FREE 20 GB plan is subject to the achievements program.",
         "string": "Subject to your participation in our achievements program."
     },
     "16364": {
@@ -6565,7 +6565,7 @@
     },
     "16402": {
         "developer_comment": "Header of block with achievements bonuses.",
-        "string": "Unlocked bonuses"
+        "string": "Unlock rewards"
     },
     "16448": {
         "developer_comment": "Label in the main dialog that allows the user to resume paused transfers",
@@ -7369,15 +7369,15 @@
     },
     "17466": {
         "developer_comment": "title of the introduction for the achievements screen",
-        "string": "Get %1$s of storage and %2$s of transfers for each referral"
+        "string": "5 GB of storage for each referral. Valid for 365 days."
     },
     "17476": {
         "developer_comment": "first paragraph of screen to invite friends and get an achievement",
-        "string": "Invite your friends to create a free MEGA account and install our mobile app. For every successful signup and app install you will receive bonus storage and transfer quota."
+        "string": "Invite your friends to create a free MEGA account and install our mobile app. For every successful signup and app install you receive a bonus storage, valid for 365 days."
     },
     "17477": {
         "developer_comment": "second paragraph of screen to invite friends and get an achievement",
-        "string": "You will not receive credit for inviting someone who has used MEGA previously and you will not be notified about such a rejection. Invited contacts must install the MEGA mobile app or the MEGA desktop app on their devices."
+        "string": "Inviting existing MEGA users does not count toward your achievements. Newly invited contacts must install the MEGA Mobile App or the MEGA Desktop App."
     },
     "17489": {
         "developer_comment": "Button for the downloads page to let users preview PDF documents.",
@@ -7732,7 +7732,7 @@
         "string": "Your login is taking longer than expected. Do you want to wait or force a reload?"
     },
     "17716": {
-        "developer_comment": "A message shown at registration time when users have to select their plan. The FREE 50 GB plan is subject to the achievements program.",
+        "developer_comment": "A message shown at registration time when users have to select their plan. The FREE 20 GB plan is subject to the achievements program.",
         "string": "Subject to your participation in our achievements program."
     },
     "17732": {
@@ -11877,11 +11877,11 @@
     },
     "20176": {
         "developer_comment": "New achievement dialog - introduction for installing mobile app",
-        "string": "Securely access/manage your files and enjoy secure communication with MEGAchat on your mobile device."
+        "string": "5 GB of free storage when you install a MEGA Mobile App. Achievement valid for 365 days."
     },
     "20177": {
         "developer_comment": "Achievement dialog - first step to get invitation bonus",
-        "string": "Invite a new user."
+        "string": "5 GB of free storage for each friend who installs a MEGA app. Valid for 365 days."
     },
     "20178": {
         "developer_comment": "Achievement dialog - second step to get invitation bonus : after inviting a new user, new user has to install the desktop or mobile app to finish the bonus process.",
@@ -11905,7 +11905,7 @@
     },
     "20183": {
         "developer_comment": "new achievement dialog - storage quota summary in the banner",
-        "string": "Achieved storage quota"
+        "string": "Current Storage Quota"
     },
     "20184": {
         "developer_comment": "new achievement dialog - transfer quota summary in the banner",
@@ -11997,7 +11997,7 @@
     },
     "20210": {
         "developer_comment": "A description on the Add Phone page/dialog for a regular account. Please leave the %1 and %2 placeholders in the translation which will be replaced with the amounts at run time.",
-        "string": "Get %1 GB storage and %2 GB transfer quota for free when you add your phone number. This makes it easier for your contacts to find you on MEGA."
+        "string": "Get 5 GB storage valid for 365 days when you add your phone number. This makes it easier for your contacts to find you on MEGA."
     },
     "20211": {
         "developer_comment": "A title for the Add Phone page/dialog.",
@@ -12089,7 +12089,7 @@
     },
     "20235": {
         "developer_comment": "New Achievement Dialog - Dulplicate string as 16580, but with full stop. Need Mega desktop app description with full stop.",
-        "string": "Easy automated synchronisation between your computer and your MEGA cloud."
+        "string": "5 GB of free storage when you install our MEGA app on your desktop. Valid for 365 days."
     },
     "20237": {
         "developer_comment": "Text for a checkbox giving the user the option to have us remember their billing address encrypted for next time.",
@@ -12928,8 +12928,8 @@
         "string": "Secure Cloud Storage and Communication [Br] Privacy by Design"
     },
     "20553": {
-        "developer_comment": "Startpage sub header, explains that MEGA provides 50 GB storage for free. Please leave [S] and [/S] as it is.",
-        "string": "Create a MEGA account to get [S]50 GB FREE*[/S] storage"
+        "developer_comment": "Startpage sub header, explains that MEGA provides 20 GB storage for free. Please leave [S] and [/S] as it is.",
+        "string": "Create a MEGA account to get [S]20 GB FREE[/S] storage"
     },
     "20554": {
         "developer_comment": "Startpage header, explains the Advantages of using MEGA.",
@@ -13289,19 +13289,19 @@
     },
     "20707": {
         "developer_comment": "A registration promotion on the download page.",
-        "string": "[B]50 GB*[/B] Free storage"
+        "string": "[B]20 GB[/B] Free storage"
     },
     "20708": {
         "developer_comment": "Registration information on the Download page.",
-        "string": "Create an account and get [S]50 GB*[/S] of free storage on the MEGA cloud collaboration platform while you are waiting. It will not affect your download process."
+        "string": "Create an account and get [S]20 GB[/S] of free storage on the MEGA cloud collaboration platform while you are waiting. It will not affect your download process."
     },
     "20709": {
         "developer_comment": "Default information text in the Register dialog.",
-        "string": "Create an account today and get [S]50 GB*[/S] of free storage on MEGA\u2019s end-to-end encrypted cloud collaboration platform!"
+        "string": "Create an account today and get [S]20 GB[/S] of free storage on MEGA\u2019s end-to-end encrypted cloud collaboration platform!"
     },
     "20710": {
         "developer_comment": "Information text in the Register dialog if the user isn&#039;t logged in, but selected to import files to a MEGA account.",
-        "string": "Create an account and get [S]50 GB*[/S] of free storage on the MEGA cloud collaboration platform to complete your import. Otherwise it will be imported to an ephemeral session for temporary storage."
+        "string": "Create an account and get [S]20 GB[/S] of free storage on the MEGA cloud collaboration platform to complete your import. Otherwise it will be imported to an ephemeral session for temporary storage."
     },
     "20711": {
         "developer_comment": "A label which shows the user&#039;s current PRO plan.",
@@ -13333,7 +13333,7 @@
     },
     "20750": {
         "developer_comment": "Description text in the Registration dialog&#039;s right panel on the download page. Please leave the [S] and [/S] tags.",
-        "string": "Create your account and get [S]50 GB*[/S] of free storage on MEGA. Your download will not get interrupted while you create an account."
+        "string": "Create your account and get [S]20 GB[/S] of free storage on MEGA. Your download will not get interrupted while you create an account."
     },
     "20751": {
         "developer_comment": "The title text in the Import File confirmation dialog.",
@@ -13353,11 +13353,11 @@
     },
     "20756": {
         "developer_comment": "Description text in Register dialog, triggered during file import. Please leave the [S] and [/S] tags.",
-        "string": "Create an account and get [S]50 GB*[/S] of free storage on MEGA, which you can use for importing or uploading your files."
+        "string": "Register a new MEGA account and receive [S]20 GB[/S] of free lifetime storage."
     },
     "20757": {
         "developer_comment": "Default description text in the Register dialog.",
-        "string": "Create an account and get [S]50 GB*[/S] of free storage on MEGA."
+        "string": "Create an account and get [S]20 GB[/S] of free storage on MEGA."
     },
     "20758": {
         "developer_comment": "Header of the Install MEGAsync dialog",
@@ -16265,7 +16265,7 @@
     },
     "23974": {
         "developer_comment": "Description shown in google search for \u201cRegister\u201d page.",
-        "string": "Create your MEGA account and get up to 50 GB free!"
+        "string": "Create your MEGA account with 20 GB of free, secure cloud storage."
     },
     "23975": {
         "developer_comment": "Login page title.\r\nPlease keep the format and dont translate \u201d - MEGA\u201d",
@@ -16461,7 +16461,7 @@
     },
     "24023": {
         "developer_comment": "Mega home page description shown in google search results",
-        "string": "We make secure cloud storage simple. Create an account and get up to 50 GB free on MEGA\u2019s end-to-end encrypted cloud collaboration platform today!"
+        "string": "We make secure cloud storage simple. Create an account with 20 GB free storage on MEGA\u2019s end-to-end encrypted cloud collaboration platform today."
     },
     "24025": {
         "developer_comment": "This is the placeholder text for GIPHY search",
@@ -18151,6 +18151,50 @@
         "developer_comment": "Payment success message shown to users who signup for business account.",
         "string": "Thanks! Your account should now be upgraded. Please check your email to verify your account and login. For enquiries you can contact us at [A]support@mega.nz[/A]"
     },
+    "achievem_dialogdesc": {
+        "developer_comment": "Achievement page Key Info One",
+        "string": "Complete one of the following actions and earn [S]more storage[/S] on MEGA"
+    },
+    "achievem_dialogfootertext": {
+        "developer_comment": "Achievement page Key Info One",
+        "string": "Get up to 16 TB of storage with [A]MEGA\u2019s Pro plans[/A]"
+    },
+    "achievem_keyinfo_one": {
+        "developer_comment": "Achievement page Key Info One",
+        "string": "It can take two to three days for your achievements to be activated."
+    },
+    "achievem_keyinfo_three": {
+        "developer_comment": "Achievement page Key Info One",
+        "string": "Invite as many friends as you want. They will have to install our app and not have used MEGA before."
+    },
+    "achievem_keyinfo_two": {
+        "developer_comment": "Achievement page Key Info One",
+        "string": "MEGA makes it super easy for you to see the status of your achievements via a personalised dashboard."
+    },
+    "achievem_keyinfotitle": {
+        "developer_comment": "Achievement page Key Info Block title",
+        "string": "Further information"
+    },
+    "achievem_pagedesc": {
+        "developer_comment": "Achievement page title description",
+        "string": "Increase your cloud storage by [S]5 GB per achievement valid for 365 days[/S] Start now and get more from your MEGA cloud."
+    },
+    "achievem_smsveridesc": {
+        "developer_comment": "SMS verification desc",
+        "string": "5 GB of free storage when you verify your mobile number in your MEGA account. Valid for 365 days."
+    },
+    "achievem_storagetitle": {
+        "developer_comment": "Achievement page Storage Block title",
+        "string": "Complete one of the following actions and earn [S]more storage[/S] on MEGA"
+    },
+    "achievem_trymegalink": {
+        "developer_comment": "Achievement page Try Mega Link",
+        "string": "Try MEGA for free"
+    },
+    "achievm_invitefrddesc": {
+        "developer_comment": "Invite a friend storage description",
+        "string": "Invite as many friends or coworkers as you want. For every signup under the invited email address, you will receive 5 GB of complimentary storage, valid for 365 days. Provided that the new user installs either MEGA Desktop App or a Mobile App and starts using MEGA."
+    },
     "busProfileUpdatePhone": {
         "developer_comment": "The success message when a business account is updated with only the phone number changed",
         "string": "Your Business profile has been updated."
@@ -18158,6 +18202,10 @@
     "gotoacc": {
         "developer_comment": "Button's text in payment succeeded layout",
         "string": "Go to my account"
+    },
+    "learnmore_text": {
+        "developer_comment": "Learn More link",
+        "string": "Learn More"
     },
     "returntoacc": {
         "developer_comment": "Button's text in payment failed layout",

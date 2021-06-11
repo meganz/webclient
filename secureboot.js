@@ -2645,6 +2645,7 @@ else if (!browserUpdate) {
     jsl.push({f:'js/ui/export.js', n: 'export_js', j:1,w:1});
     jsl.push({f:'html/js/key.js', n: 'key_js', j:1});
 
+
     jsl.push({f:'js/ui/simpletip.js', n: 'simpletip_js', j:1,w:1});
     jsl.push({f:'js/useravatar.js', n: 'contact_avatar_js', j:1,w:3});
     jsl.push({f:'css/avatars.css', n: 'avatars_css', j:2,w:5,c:1,d:1,cache:1});
@@ -2663,6 +2664,7 @@ else if (!browserUpdate) {
     jsl.push({f:'css/psa.css', n: 'psa_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
     jsl.push({f:'css/about.css', n: 'about_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/features.css', n: 'features_css', j:2,w:5,c:1,d:1,cache:1});
+    jsl.push({f:'css/achievements.css', n: 'achievements_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/corporate.css', n: 'corporate_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'html/start.html', n: 'start', j:0});
     jsl.push({f:'html/js/start.js', n: 'start_js', j:1});
@@ -3282,6 +3284,8 @@ else if (!browserUpdate) {
         'feature_collaboration': {f:'html/features-collaboration.html', n: 'feature_collaboration', j:0},
         'gadvs_js': {f:'js/gAdvs.js', n: 'gadvs_js', j:1},
         'cookie': {f:'html/cookie.html', n: 'cookie', j:0},
+        'achievements': {f:'html/achievements.html', n: 'achievements', j:0},
+        'achievementsPage_js': {f:'html/js/achievements.js', n: 'achievementsPage_js', j:1},
     };
 
     var jsl3 = {
@@ -3400,6 +3404,7 @@ else if (!browserUpdate) {
         'storage': ['feature_storage', 'features_js'],
         'securechat': ['feature_chat', 'features_js'],
         'collaboration': ['feature_collaboration', 'features_js'],
+        'achievements': ['achievements', 'achievementsPage_js'],
         'nzippmember': ['nzipp', 'nzipp_js', 'nzipp_css'],
         'nziphotographer': ['nzipp', 'nzipp_js', 'nzipp_css'],
         'business': ['business', 'businessjs'],

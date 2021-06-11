@@ -2736,8 +2736,8 @@
         "string": "folder"
     },
     "5568": {
-        "developer_comment": "user (singular) label indicating is receiving some info, for example shared folders",
-        "string": "user"
+        "developer_comment": "business account type",
+        "string": "User"
     },
     "5569": {
         "developer_comment": "used for example when a folder is shared with 2 or more users",

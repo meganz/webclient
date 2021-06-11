@@ -9821,7 +9821,7 @@
     },
     "19124": {
         "developer_comment": "Achievements block description. Informs user that he can get bonuses for every new contact.",
-        "string": "Get free storage and transfer quota for each friend that installs a MEGA app"
+        "string": "Get free storage for each friend that installs a MEGA app"
     },
     "19125": {
         "developer_comment": "Dropdown label. Allows to choose Audio or Video Call",

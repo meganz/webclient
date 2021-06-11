@@ -111,6 +111,11 @@
         font: var(--text-body1);
     }
 
+    .mega-dialog .content-block .sub-header {
+        color: var(--text-color-higher);
+        font: var(--text-body1-bold);
+    }
+
     .mega-dialog p,
     .mega-dialog a,
     .mega-dialog a:visited,

@@ -224,7 +224,7 @@
             }
         });
 
-        $(self.dialog.querySelector('button.js-close')).rebind('click.prd', function() {
+        $(self.dialog.querySelectorAll('.fm-dialog-close, button.js-close')).rebind('click.prd', () => {
             self.dismiss();
             return false;
         });

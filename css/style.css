@@ -4315,7 +4315,7 @@ tr:not(.taken-down) .grid-status-icon:not(.read-only):not(.read-and-write) {
     display: block;
     cursor: pointer;
     position: absolute;
-    top: 4px;
+    top: 0;
     left: 9px;
     opacity: 0;
 }
@@ -5008,8 +5008,8 @@ tr:not(.taken-down) .grid-status-icon:not(.read-only):not(.read-and-write) {
 }
 
 .transfer-status {
-    height: 24px;
-    line-height: 23px;
+    height: 32px;
+    line-height: 31px;
     padding: 0;
     white-space: nowrap;
     position: relative;

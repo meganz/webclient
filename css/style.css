@@ -2133,7 +2133,7 @@ img.blog-new-logos {
     border-radius: 8px;
     position: absolute;
     z-index: 100;
-    padding: 8px 0
+    padding: 8px 0;
 }
 .properties-context-arrow {
     background-image: url(../images/mega/dialog-sprite.png);
@@ -2142,8 +2142,9 @@ img.blog-new-logos {
     position: absolute;
     bottom: -16px;
     left: 50%;
-    margin: 0 0 0 -8px;
-    background-position: -5px -2117px;
+    margin: 0 0 0 -9px;
+    border: 9px solid #000;
+    border-color: var(--surface-main-inverted) transparent transparent transparent;
     background-repeat: no-repeat;
 }
 .properties-context-item {
@@ -2154,12 +2155,14 @@ img.blog-new-logos {
     color: var(--text-color-medium-inverted);
     transition: all 200ms ease-in-out;
     cursor: pointer;
+    display: flex;
+    align-items: center;
 }
 .properties-context-item span{
     white-space: nowrap;
 }
 .properties-context-item.show-more {
-    color: white;
+    color: var(--text-color-low-inverted);
 }
 .properties-context-item:hover {
     background: var(--surface-grey-1-inverted);

@@ -1526,7 +1526,7 @@ body.de .mega-dialog.new-group-chat {
     margin-top: 8px;
 }
 .dialog-empty-pad i {
-    --icon-size: 120px;
+    --icon-size: 96px;
     --mask-color: var(--secondary-grey);
     text-align: center;
 }

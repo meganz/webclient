@@ -1005,9 +1005,6 @@ body.theme-dark .message .audio-player {
     justify-content: center;
     background: var(--surface-grey-3);
 }
-.message.content-area > .right-aligned-msg-buttons .reactions-button:hover i.icon-emoji-reactions {
-    background-position: 33% 50%;
-}
 .message.content-area > .right-aligned-msg-buttons.total-2 > .reactions-button {
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;

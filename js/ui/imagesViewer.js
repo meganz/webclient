@@ -612,7 +612,7 @@ var slideshowid;
 
                 imgWidth = viewerWidth;
                 imgHeight = origImgHeight * w_perc;
-                newImgWidth = switchedSides ? viewerHeight : viewerWidth;
+                newImgWidth = switchedSides ? imgHeight : imgWidth;
             }
             // Check if preview and original imgs are loading and width fits browser window after increasing height
             else if (fitToWindow[id] && imgHeight < viewerHeight
@@ -620,7 +620,7 @@ var slideshowid;
 
                 imgWidth = origImgWidth * h_perc;
                 imgHeight = viewerHeight;
-                newImgWidth = switchedSides ? viewerHeight : viewerWidth;
+                newImgWidth = switchedSides ? imgHeight : imgWidth;
             }
             else {
                 newImgWidth = switchedSides ? origImgHeight : origImgWidth;
@@ -1489,8 +1489,6 @@ var slideshowid;
                 $imgWrap.attr('data-image', id);
                 $img.attr('src', src1).addClass('active');
 
-                // Set position, zoom values
-                zoom_mode = false;
                 slideshow_imgPosition($overlay);
                 $(window).rebind('resize.imgResize', function() {
                     slideshow_imgPosition($overlay);

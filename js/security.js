@@ -591,6 +591,10 @@ var security = {
         'use strict';
         var name = 'verify-email' + (aStep ? '-' + aStep : '');
 
+        if ($.hideTopMenu) {
+            $.hideTopMenu();
+        }
+
         // abort any ongoing dialog operation that may would get stuck by receiving an whyamiblocked=700
         M.safeShowDialog.abort();
 

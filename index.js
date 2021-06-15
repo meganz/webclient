@@ -1195,6 +1195,9 @@ function init_page() {
     }
     else if (page === 'privacy') {
         parsepage(pages['privacy']);
+        if (is_mobile) {
+            mobile.privacy.show();
+        }
     }
     else if (page === 'gdpr') {
         return loadSubPage('privacy', 'override');
@@ -1428,6 +1431,9 @@ function init_page() {
     }
     else if (page == 'takedown') {
         parsepage(pages['takedown']);
+        if (is_mobile) {
+            mobile.takedown.show();
+        }
     }
     else if (page == 'blog') {
         parsepage(pages['blog']);
@@ -1603,15 +1609,15 @@ function init_page() {
         parsepage(pages.downloadapp);
         desktopOnboarding();
     }
-    else if (page == 'takedown') {
-        parsepage(pages['takedown']);
-    }
     else if (page == 'done') {
         parsepage(pages['done']);
         init_done();
     }
     else if (page === 'cookie') {
         parsepage(pages.cookie);
+        if (is_mobile) {
+            mobile.cookie.show();
+        }
     }
     else if (page.substr(0, 5) === 'unsub') {
         // Non-registered user unsubsribe from emails.

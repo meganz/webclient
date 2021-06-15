@@ -680,6 +680,83 @@ var mobile = {
 
         newnodes = [];
         return masterPromise;
+    },
+
+    /**
+     * Init Button Scroll
+     * @param {Object} $content The jQuery selector for the current page
+     * @param {String} topBlock The class declaring top block, where button will change from up to down way
+     * @param {String} blockEndScroll The class for block which height will be used to decide the end of page
+     * @returns {void}
+     */
+    initButtonScroll: function($content, topBlock, blockEndScroll) {
+        'use strict';
+
+        var scrollableBlock = 'body.mobile .fmholder';
+        var startAnimation = 'start-animation';
+        // Init top-block animations
+        setTimeout(() => {
+            $content.addClass(startAnimation);
+        }, 700);
+
+        var isVisibleBlock = function($row) {
+            if ($row.length === 0) {
+                return false;
+            }
+
+            var $window = $(window);
+            var elementTop = $row.offset().top;
+            var elementBottom = elementTop + $row.outerHeight();
+            var viewportTop = $window.scrollTop();
+            var viewportBottom = viewportTop + $window.outerHeight();
+
+            return elementBottom - 100 > viewportTop && elementTop < viewportBottom;
+        };
+
+        var showAnimated = function($content) {
+            var $blocks = $('.animated, .fadein', $content);
+
+            for (var i = $blocks.length - 1; i >= 0; i--) {
+
+                var $block = $($blocks[i]);
+
+                if (isVisibleBlock($block)) {
+                    if (!$block.hasClass(startAnimation)) {
+                        $block.addClass(startAnimation);
+                    }
+                }
+                else if ($block.hasClass(startAnimation)) {
+                    $block.removeClass(startAnimation);
+                }
+            }
+        };
+
+        $(scrollableBlock).add(window).rebind('scroll.mobile-scroll', () => {
+            var $scrollTop = $('.scroll-to-top', $content);
+            showAnimated();
+
+            if (isVisibleBlock($(topBlock, $content))) {
+                $scrollTop.removeClass('up');
+            }
+            else {
+                $scrollTop.addClass('up');
+            }
+        });
+
+        // Init Scroll to Top button event
+        $('.scroll-to-top:visible', $content).rebind('click.scroll', function() {
+
+            if ($(this).hasClass('up')) {
+                $(scrollableBlock).animate({
+                    scrollTop: 0
+                }, 1600);
+            }
+            else {
+                $(scrollableBlock).animate({
+                    scrollTop: $(blockEndScroll, $content).outerHeight()
+                }, 1600);
+            }
+        });
     }
 };
 
@@ -731,10 +808,10 @@ mBroadcaster.once('startMega:mobile', function() {
         return !window.orientation || window.orientation === 180 ? 'portrait' : 'landscape';
     };
 
-    var setBodyClass = function() {
+    // Add mobile class for adaptive features
+    document.body.classList.add('mobile');
 
-        // Add mobile class for adaptive features
-        document.body.classList.add('mobile');
+    var setBodyClass = function() {
 
         if (mobile.orientation === 'landscape') {
             document.body.classList.add('landscape');

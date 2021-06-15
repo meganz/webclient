@@ -38,6 +38,11 @@ var RevampOnboarding = {
         $('.popup-content', $popup).text(l.v4onboard_popupmessage);
         $popup.removeClass('hidden');
 
+        $popup.rebind('click.closeme', () => {
+            $popup.addClass('hidden');
+        });
+
+
         setTimeout(() => {
             $popup.addClass('hidden');
         }, 10000);

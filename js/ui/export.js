@@ -834,10 +834,10 @@ var exportPassword = {
         showDialog: function(page) {
 
             "use strict";
+            var $megaInput = this.$megaInput;
             var $closeButton = $('button.js-close', this.$dialog);
             var $decryptButton = $('.decrypt-link-button', this.$dialog);
             var $decryptButtonText = $('.decrypt-text', $decryptButton);
-            var $decryptInput = $('.password-decrypt-input', this.$dialog);
 
             // Show a background overlay
             fm_showoverlay();
@@ -861,7 +861,7 @@ var exportPassword = {
             });
 
             // Listen for Enter key to fire decryption
-            $decryptInput.rebind('keyup', function(ev) {
+            $megaInput.$input.rebind('keyup', (ev) => {
                 if (ev.keyCode === 13) {
                     exportPassword.decrypt.decryptLink(page);
                 }

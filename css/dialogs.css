@@ -1752,7 +1752,7 @@ body.de .mega-dialog.new-group-chat {
         border-radius: 12px;
         font-size: 14px;
         line-height: 24px;
-        z-index: 1;
+        z-index: 12;
     }
     .mega-dialog.set-password-dialog div.mega-input-title {
         font-size: 12px;

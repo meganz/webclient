@@ -343,10 +343,10 @@ function dashboardUI() {
                 $('.account.progress-size.inbox').text(
                     `(${bytesToSize(inboxSize)})`
                 );
-                $('.pr-item.inbox').removeClass('hidden');
+                $('.pr-item.inbox').parent().removeClass('hidden');
             }
             else {
-                $('.pr-item.inbox').addClass('hidden');
+                $('.pr-item.inbox').parent().addClass('hidden');
             }
 
             // Available

@@ -7400,10 +7400,13 @@ table {
 .account.widget .medium.account.progress-list {
     margin-top: 12px;
     display: flex;
-    justify-content: space-around;
+    justify-content: space-between;
 }
-.account.widget .medium.account.progress-list .pr-item {
-    width: 25%;
+.account.widget .medium.account.progress-list .item-wrapper {
+    width: 20%;
+}
+.account.widget .medium.account.progress-list .item-wrapper .pr-item {
+    width: max-content;
 }
 .small.account.progress-list.colorized {
     padding: 12px 0 2px 0;

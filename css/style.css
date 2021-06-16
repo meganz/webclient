@@ -11131,8 +11131,8 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
     position: absolute;
     left: 0;
     top: 0;
+    font: var(--text-caption);
     line-height: 16px;
-    font-size: 10px;
     text-align: center;
     -moz-border-radius: 100%;
     -webkit-border-radius: 100%;

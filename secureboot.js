@@ -154,7 +154,8 @@ function goToMobileApp(aBaseLink) {
         top.location = 'mega://' + aBaseLink;
     }
     else if (is_android || testbed === 'android') {
-        tmp = 'intent://' + aBaseLink + '/#Intent;scheme=mega;package=mega.privacy.android.app;end';
+        var tmp = 'intent://' + aBaseLink + '/#Intent;scheme=mega;package=mega.privacy.android.app;end';
+        tmp = tmp.replace('id.app', 'id.app;S.browser_fallback_url=' + encodeURIComponent(getMobileStoreLink()));
         if (is_huawei) {
             tmp = tmp.replace('.app;', '.app.huawei;');
         }

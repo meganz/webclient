@@ -2765,7 +2765,10 @@ body:not(.mobile) .bottom-page.top-dark-button:hover {
     margin: 32px 0 32px -30px;
     display: block;
 }
-.bottom-page.very-dark-blue-bg .white-text, .bottom-page .megaapp-linux .radio-txt, .bottom-page .megaapp-linux .megaapp-linux-info, .bottom-page .megaapp-linux .megaapp-button-info, .bottom-page .megaapp-linux .megaext-container .radio-txt, .bottom-page .megaapp-linux .megaext-container .megaapp-linux-info, .bottom-page .megaapp-linux .megaext-container .megaapp-button-info {
+.bottom-page.very-dark-blue-bg .white-text,
+.bottom-page .megaapp-linux.dark .radio-txt,
+.bottom-page .megaapp-linux.dark .megaapp-linux-info,
+.bottom-page .megaapp-linux.dark .megaapp-button-info {
     color: #fff;
 }
 .very-dark-blue-bg .megaapp-button-info.disabled {
@@ -2784,11 +2787,15 @@ body:not(.mobile) .bottom-page.top-dark-button:hover {
     flex-wrap: wrap;
     justify-content: space-between;
     margin: 0;
-    padding: 12px 0 0;
+    padding: 12px 5px 0;
     width: 100%;
 }
 .megaapp-linux .bottom-page.radio-buttons.hidden {
     display: none;
+}
+.megaapp-linux .bottom-page.radio-buttons label:last-child {
+    -webkit-padding-end: 0;
+    padding-inline-end: 0;
 }
 
 .download-sprite {
@@ -2846,7 +2853,7 @@ body:not(.mobile) .bottom-page.top-dark-button:hover {
 .bottom-page .megaapp-windows {
     width: 398px;
     position: relative;
-    margin: -30px auto 50px auto;
+    margin: -30px auto 50px;
     text-align: center;
     white-space: nowrap;
 }
@@ -2854,45 +2861,24 @@ body:not(.mobile) .bottom-page.top-dark-button:hover {
     top: -147px;
 }
 .bottom-page .megaapp-linux {
-    background-color: #333333;
-    -moz-box-sizing: border-box;
-    -webkit-box-sizing: border-box;
     box-sizing: border-box;
-    -moz-border-radius: 4px;
-    -webkit-border-radius: 4px;
-    border-radius: 4px;
-    width: 398px;
-    border: 1px solid rgba(0, 0, 0, 0.3);
-    margin: -40px auto 0 auto;
+    display: table;
+    margin: -40px auto 0;
+    min-width: 398px;
     position: relative;
     text-align: left;
     white-space: nowrap;
 }
-.megaapp-linux.linux-onboarding .hidden-input {
+.bottom-page .megaapp-linux.hidden {
     display: none;
 }
-.megaapp-linux.linux-onboarding .megasync-dropdown {
-    width: 100%;
+.bottom-page .megaapp-linux.dark {
+    background-color: #333;
+    border-radius: 4px;
+    border: 1px solid rgba(0, 0, 0, 0.3);
 }
-.linux-bit-radio.linux-onboarding:not(.hidden) {
-    display: block !important;
-}
-.linux-bit-radio.linux-onboarding .architecture-checkbox {
-    -webkit-margin-end: 4px;
-    margin-inline-end: 4px;
-}
-.linux-bit-radio.linux-onboarding label {
-    margin-right: 15px;
-}
-.linux-onboarding.button-wrappers .mega-button.redirect-clouddrive {
-    margin-top: 30px;
-}
-
 .bottom-page .megaapp-linux-container {
-    padding: 24px 24px 0 24px;
-}
-.bottom-page.linux .megaapp-linux {
-    display: table;
+    padding: 24px;
 }
 
 .bottom-page .megaapp-linux-container .install-guide-trigger {
@@ -3086,7 +3072,7 @@ body:not(.mobile) .copy-line-icon:hover .dark-help-block {
     background-color: #222;
     padding: 12px 24px;
     line-height: 24px;
-    margin-top: 40px;
+    margin-top: 16px;
     color: #fafafa;
     font-size: 14px;
     vertical-align: middle;
@@ -3110,9 +3096,11 @@ body:not(.mobile) .copy-line-icon:hover .dark-help-block {
     margin-left: 12px;
     cursor: pointer;
 }
-.megaapp-linux-info span, .megaapp-linux-info .bottom-page-icon {
+.megaapp-linux-info span,
+.megaapp-linux-info .bottom-page-icon {
     display: inline-block;
     vertical-align: top;
+    white-space: normal;
 }
 .megaapp-linux-info .bottom-page-icon.white-info {
     margin: 4px 0 0 4px;
@@ -3208,9 +3196,6 @@ div.radioOn::before.green, div.radioOff::before.green {
 div.radioOn.green::after {
     background: #00BFA5;
     opacity: 1;
-}
-.megaapp-linux .radio-txt {
-    padding-right: 0 !important;
 }
 .small-green-button {
     display: inline-block;
@@ -4018,15 +4003,17 @@ a.opensource-icon-txt.coming-soon {
 }
 /*  end of Open source */
 /* Desktop download during onboarding phase */
-.bottom-page.onboarding-suggestions.megasync .megaapp-linux {
-    margin-top: 0px;
-    margin-bottom: 32px;
-    z-index: 1000;
+.onboarding-suggestions .megaapp-linux {
+    margin: 0 auto 32px;
 }
-.bottom-page.onboarding-suggestions.megasync .megaapp-linux .default-select.megaapp-dropdown {
-    width: 100%;
+.onboarding-suggestions .megaapp-linux .bottom-page.radio-buttons {
+    justify-content: flex-start;
 }
-.onboarding-suggestions .top-buttons, .onboarding-suggestions .top-icon.menu, .onboarding-suggestions .top-icon.notification, .onboarding-suggestions .top-icon.achievements, .onboarding-suggestions .membership-status-block {
+.onboarding-suggestions .top-buttons,
+.onboarding-suggestions .btn-icon.js-more-menu,
+.onboarding-suggestions .top-icon.notification,
+.onboarding-suggestions .top-icon.achievements,
+.onboarding-suggestions .membership-status-block {
     display: none;
 }
 .onboarding-suggestions .bottom-page.top-description {
@@ -5981,6 +5968,9 @@ body:not(.mobile) .bottom-page.dropdown .dropdown-item:hover, .bottom-page.dropd
     }
     .bottom-page.top-dark-info.medium {
         padding-bottom: 10px;
+    }
+    .bottom-page .megaapp-linux {
+        margin-top: 30px;
     }
     .bottom-page.top-description {
         padding: 40px 0 25px 0;

@@ -9989,7 +9989,7 @@ body.de .mega-dialog.new-group-chat {
         color: #2e2e2e;
     }
     .voucher-redeem-dialog .plan-icon i {
-        --icon-size: 96px;
+        --icon-size: 80px;
         display: none;
         margin: auto;
     }

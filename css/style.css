@@ -4120,6 +4120,10 @@ tr:not(.taken-down) .grid-status-icon:not(.read-only):not(.read-and-write) {
 .fm-notification-block.grace-business {
     background-color: var(--label-orange);
 }
+.fm-notification-block.grace-business.visible span span,
+.fm-notification-block.grace-business.visible span a {
+    font-family: var(--text-font-family-bold);
+}
 .fm-notification-block .notification-block-icon {
     --icon-size: 24px;
     --mask-color: var(--text-color-white-high);

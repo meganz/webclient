@@ -230,6 +230,7 @@ css/chat-group[0-9]*.css
 secureboot.prod.js
 html/templates.json
 css/*-postbuild.css
+css/*/*-postbuild.css
 html/*-postbuild.html
 
 #############

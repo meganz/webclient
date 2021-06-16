@@ -10,6 +10,12 @@ const basename = p => p.replace(/^.*\//, '');
 const rebaseURLs = true;
 const usePostCSS = true;
 const usePostHTML = true;
+const useEmbedMode = !!process.env.EMBEDMODE;
+const useImageryMode = !useEmbedMode && !process.env.NOIMAGERY && process.env.USER !== 'jenkins' || process.env.IMAGERY;
+
+const TARGET = 'build';
+const getBuildFile = (file) => path.join(TARGET, file);
+const getCleanFile = (file) => file.replace(cwd, '').replace(/[\\\/]+/g, '/').replace(TARGET, '').replace(/^\W+/, '');
 
 class FS {
     static ls(dir, regex = false, result = []) {
@@ -36,6 +42,10 @@ class FS {
             console.log(`INFO: Removing ${path}`);
         }
         return fs.rmSync(path, {recursive: true, force: true});
+    }
+
+    static mkdir(...paths) {
+        return fs.mkdirSync(path.join(...paths), {recursive: true});
     }
 
     static stat(path) {
@@ -105,7 +115,7 @@ var Secureboot = function() {
     ns.addHeader = function(lines, files) {
         lines.push("    /* Bundle Includes:");
         files.forEach(function(file) {
-            lines.push("     *   " + file.replace('build/', ''));
+            lines.push(`     *   ${getCleanFile(file)}`);
         });
         lines.push("     */");
     }
@@ -113,9 +123,11 @@ var Secureboot = function() {
     ns.rewrite = function(name) {
         var addedHtml = false;
         var lines = [];
+        var errors = [];
         var jsgroup = [];
         var cssgroup = [];
         var seenFiles = {};
+        var section = false;
         var bundleFiles = [];
         var outOfBundle = [];
         var watchSeenFiles = true;
@@ -124,7 +136,16 @@ var Secureboot = function() {
         var cssGroups = this.getCSSGroups();
         var cssKeys   = Object.keys(cssGroups);
         var allowExtraHTML = false;
-        for (var i in content) {
+        for (var i = 0, l = content.length; i < l; ++i) {
+            if (!section) {
+                if (content[i].indexOf('var jsl = []') > 0) {
+                    section = 'main';
+                }
+                else {
+                    lines.push(content[i]);
+                    continue;
+                }
+            }
             var file = null;
             if (content[i].match(/jsl\.push.+(js)/)) {
                 file = content[i].match(/'.+\.(js)'/);
@@ -153,7 +174,7 @@ var Secureboot = function() {
                 }
                 file = file[0].substr(1, file[0].length - 2);
                 if (usePostCSS) {
-                    file = 'build/css/' + basename(file);
+                    file = getBuildFile(file);
                 }
                 if (cssGroups[cssKeys[0]] && cssGroups[cssKeys[0]][0] == file) {
                     ns.addHeader(lines, cssGroups[cssKeys[0]]);
@@ -175,14 +196,34 @@ var Secureboot = function() {
             } else {
                 lines.push(content[i]);
 
-                if (content[i].indexOf('if (is_embed') > 0) {
-                    // no longer need to check for seen-files
-                    watchSeenFiles = false;
+                var currentSection =
+                    content[i].indexOf('if (is_drop') > 0 ? 'drop' :
+                        content[i].indexOf('if (is_embed') > 0 ? 'embed' :
+                            content[i].indexOf('if (is_litesite') > 0 ? 'lite' :
+                                section;
+
+                if (currentSection !== section) {
+                    // console.log('Section move, %s->%s', section, currentSection);
+                    section = currentSection;
+
+                    for (const k in seenFiles) {
+                        if (seenFiles[k] > 1) {
+                            errors.push(['ERROR: The file "%s" was included %d times!', k, seenFiles[k]]);
+                        }
+                    }
+                    seenFiles = {};
+
+                    if (section === 'drop') {
+                        // no longer need to check for seen-files
+                        watchSeenFiles = false;
+                    }
                 }
             }
 
             if (watchSeenFiles && file) {
-                seenFiles[file] = (seenFiles[file] | 0) + 1;
+                if (section !== 'lite' || file.indexOf('retina-images') < 0) {
+                    seenFiles[file] = (seenFiles[file] | 0) + 1;
+                }
             }
         }
         lines = lines.join("\n");
@@ -273,10 +314,18 @@ var Secureboot = function() {
 
         if (usePostCSS || usePostHTML) {
             const read = file => fs.readFileSync(file).toString('utf8');
-            const diff = (file1, file2) => read(file1) !== read(file2);
-            const copy = (src, dst) => {
+            const diff = (file1, file2) => {
+                file2 = read(file2);
+                return read(file1) !== file2 ? file2 : false;
+            };
+            const copy = (src, dst, writeThisData) => {
                 try {
-                    fs.copyFileSync(src, dst);
+                    if (writeThisData) {
+                        fs.writeFileSync(dst, writeThisData);
+                    }
+                    else {
+                        fs.copyFileSync(src, dst);
+                    }
 
                     if (debug) {
                         console.log('INFO: Created "%s"', dst);
@@ -288,20 +337,23 @@ var Secureboot = function() {
             };
 
             lines = lines.replace(/{f:'((?:html|css)[^']+)[^}]+}/g, (match, file) => {
-                const base = basename(file);
 
-                if (base.endsWith('.html') || base.endsWith('.css')) {
+                if (file.endsWith('.html') || file.endsWith('.css')) {
                     const type = file.replace(/\/.*$/, '');
-                    const buildFile = path.join(cwd, 'build', type, base);
+                    const buildFile = path.join(cwd, getBuildFile(file));
 
                     if (fs.existsSync(buildFile)) {
                         const origFile = path.join(cwd, file);
+                        const changed = diff(origFile, buildFile);
 
-                        if (diff(origFile, buildFile)) {
+                        if (changed) {
                             const jslFile = file + '-postbuild.' + type;
                             const newFile = path.join(cwd, jslFile);
 
-                            copy(buildFile, newFile);
+                            copy(buildFile, newFile,
+                                useEmbedMode && changed.includes('url(--url-')
+                                && changed.replace(/url\(--url-/g, 'var(--url-'));
+
                             match = match.replace(file, jslFile);
                         }
                     }
@@ -319,7 +371,8 @@ var Secureboot = function() {
             if (!f.startsWith('//')) {
                 f = f.match(/f:'([^']+)'/)[1];
                 if (!/^(js\/(beta|vendor))|makecache|dont-deploy/.test(f)) {
-                    return f + ' (' + fs.statSync(f).size + ' bytes)';
+                    const type = ({'.css': 'css', 'html': 'html'})[f.substr(-4)];
+                    return f + ' (' + (type && FS.stat(`${f}-postbuild.${type}`) || FS.stat(f)).size + ' bytes)';
                 }
             }
             return '';
@@ -339,10 +392,8 @@ var Secureboot = function() {
         });
 
         // check for files included more than once.
-        for (var k in seenFiles) {
-            if (seenFiles[k] > 1) {
-                console.error('ERROR The file "%s" was included %d times!', k, seenFiles[k]);
-            }
+        for (let idx = errors.length; idx--;) {
+            console.error(...errors[idx]);
         }
     };
 
@@ -357,7 +408,7 @@ var Secureboot = function() {
             return f.f.match(/(?:css|jsx)$/);
         }).map(function(f) {
             if (usePostCSS && String(f.f).startsWith('css/')) {
-                f.f = 'build/css/' + basename(f.f);
+                f.f = getBuildFile(f.f);
             }
             return f;
         });
@@ -367,7 +418,7 @@ var Secureboot = function() {
         return jsl.filter(function(f) {
             return f.f.match(/html?$/);
         }).map(function(f) {
-            return usePostHTML ? 'build/html/' + basename(f.f) : f.f;
+            return usePostHTML ? getBuildFile(f.f) : f.f;
         });
     };
 
@@ -412,8 +463,8 @@ var Secureboot = function() {
             for (var e in groups) {
                 if (groups.hasOwnProperty(e)) {
                     lines = [];
-                    file = `build/banner-${++i}.js`;
                     this.addHeader(lines, groups[e]);
+                    file = getBuildFile(`banner-${++i}.js`);
                     fs.writeFileSync(file, lines.join("\n").replace(/\n +/g, '\n '));
                     groups[e].unshift(file);
                 }
@@ -473,14 +524,19 @@ console.log = function(s) {
     }
 };
 
-const [postHtmlTreeWalker, postHtmlURLRebase, postCssURLRebase] = (() => {
+const [postTaskFinalizer, postHtmlTreeWalker, postHtmlURLRebase, postCssURLRebase] = (() => {
     'use strict';
+    const now = Date.now();
+    const ONE_YEAR = 365 * 864e5;
     const mime = require('mime');
     const seen = Object.create(null);
+    const embed = Object.create(null);
     const xxmcache = Object.create(null);
     const xxhash64 = require('xxhashjs').h64;
-    const cwd = process.cwd() + require('path').sep;
-    const debug = process.env.DEBUG;
+
+    const getDataURI = (path) => 'data:' + mime.getType(path) + ';base64,' + fs.readFileSync(path).toString('base64');
+    const getUniquePathID = (path, sep = '-') => path.replace(cwd, '').replace(/^\W+/, '').replace(/\W+/g, sep);
+    const isNewerThanOneYear = (mtime) => (now - mtime < ONE_YEAR);
 
     const read = (path, length, offset) => {
         const buf = Buffer.alloc(length);
@@ -500,7 +556,7 @@ const [postHtmlTreeWalker, postHtmlURLRebase, postCssURLRebase] = (() => {
     };
 
     const checksum = (path, size = -0x9eef) => {
-        const file = path.replace(cwd, '').replace(/^[\\\/]+/, '').replace(/[\\\/]+/g, '/');
+        const file = getUniquePathID(path);
 
         if (!xxmcache[file]) {
             const xxh = xxhash64(0x9fee);
@@ -531,18 +587,66 @@ const [postHtmlTreeWalker, postHtmlURLRebase, postCssURLRebase] = (() => {
         }
     };
 
-    const rewrite = (asset, limit = 444) => {
+    const doImagery = (asset, size, hash, source, mtime) => {
+        const ok = !asset.pathname.includes('fonts/') && isNewerThanOneYear(mtime);
+
+        if (ok) {
+            const src = asset.absolutePath;
+            const dst = getUniquePathID(src).replace(/-(\w+)$/, `.${hash}.$1`);
+
+            const resource = `imagery/${dst.replace('images-', '')}`;
+            const target = path.join(cwd, TARGET, resource);
+
+            fs.copyFileSync(src, target);
+            report(target, size, hash);
+
+            const root = String(source).endsWith('.css') ? '../' : '{staticpath}';
+            return `${root}${resource}${asset.search || ''}${asset.hash || ''}`;
+        }
+    };
+
+    const shallEmbed = (resource, mtime, file = '') => {
+        return !file.includes('embedplayer')
+            && !resource.includes('embed-sprite')
+            && !resource.includes('fonts/')
+            && isNewerThanOneYear(mtime);
+    };
+
+    const rewrite = (asset, source = '', limit = 640) => {
         const path = asset.absolutePath;
-        const size = asset.pathname && stat(path).size;
+        const {size, mtime} = asset.pathname && stat(path) || {};
 
         if (size) {
 
+            if (useEmbedMode && shallEmbed(path, mtime, source)) {
+                report(path, size);
+
+                if (String(source).endsWith('.css')) {
+                    const urlvar = '--url-' + getUniquePathID(asset.pathname);
+
+                    if (!embed[urlvar]) {
+                        embed[urlvar] = getDataURI(path);
+                    }
+
+                    return urlvar;
+                }
+
+                return getDataURI(path);
+            }
+
             if (size < limit) {
                 report(path, size);
-                return 'data:' + mime.getType(path) + ';base64,' + read(path, size).toString('base64');
+                return getDataURI(path);
             }
 
             const v = checksum(path, size);
+
+            if (useImageryMode) {
+                const image = doImagery(asset, size, v, source, mtime);
+                if (image) {
+                    return image;
+                }
+            }
 
             report(path, size, v);
             return asset.pathname + (asset.search ? asset.search + '&' : '?') + 'v=' + v + (asset.hash || '');
@@ -563,7 +667,7 @@ const [postHtmlTreeWalker, postHtmlURLRebase, postCssURLRebase] = (() => {
             asset.search = uri.search;
             [asset.pathname] = url.split(/[?#]/);
         }
-        asset.absolutePath = asset.pathname.replace('{staticpath}', cwd);
+        asset.absolutePath = asset.pathname.replace('{staticpath}', cwd + path.sep);
 
         return asset;
     };
@@ -584,7 +688,63 @@ const [postHtmlTreeWalker, postHtmlURLRebase, postCssURLRebase] = (() => {
         return checksum(cs.join('$'));
     };
 
+    const getPictureCs2 = (folder, name, extension) => {
+        if (!useImageryMode) {
+            throw new Error('uhm');
+        }
+        const imagery = (tuple) => {
+            if (Array.isArray(tuple)) {
+                const hash = checksum('' + tuple.map(v => v[1]));
+                const result = getUniquePathID(`${folder}/${name}.${hash}`).replace('images-mega-', 'picture-');
+
+                for (let i = tuple.length; i--;) {
+                    const [src] = tuple[i];
+                    const target = path.join(cwd, TARGET, 'imagery', basename(src).replace(name, result));
+
+                    if (debug) {
+                        report(target, FS.stat(src).size, hash);
+                    }
+                    fs.copyFileSync(src, target);
+                }
+
+                return result;
+            }
+            const asset = urlToAsset(tuple);
+            const hash = checksum(asset.absolutePath, -1);
+            return [asset.absolutePath, hash];
+        };
+
+        const cs = [];
+        const types = ['desktop', 'mobile'];
+        for (let i = types.length; i--;) {
+            const type = types[i];
+
+            cs.push(imagery(`{staticpath}${folder}/${name}_${type}.${extension}`));
+            for (let i = 2; i < 4; i++) {
+                cs.push(imagery(`{staticpath}${folder}/${name}_${type}@${i}x.${extension}`));
+            }
+        }
+
+        return imagery(cs);
+    };
+
     return [
+
+        () => {
+            if (useEmbedMode && Object.keys(embed).length) {
+                const themeCss = path.join(cwd, TARGET, 'css', 'theme.css');
+                const content = fs.readFileSync(themeCss);
+                const vars = [];
+
+                for (const urlvar in embed) {
+                    const dataUri = embed[urlvar];
+
+                    vars.push(`${urlvar}:url(${dataUri})`);
+                }
+
+                fs.writeFileSync(themeCss, content + '\n:root{\n' + vars.join(';\n') + '\n}');
+            }
+        },
 
         (tree) => {
             tree.walk((node) => {
@@ -593,8 +753,16 @@ const [postHtmlTreeWalker, postHtmlURLRebase, postCssURLRebase] = (() => {
                         const {attrs} = node;
 
                         if (String(attrs['data-folder']).startsWith('images/')) {
-                            const cs = getPictureCs1(attrs['data-folder'], attrs['data-name'], attrs['data-extension']);
-                            attrs['data-extension'] += '?pv=' + cs;
+                            const {'data-folder': folder, 'data-name': name, 'data-extension': extension} = attrs;
+
+                            if (useImageryMode) {
+                                attrs['data-folder'] = 'imagery';
+                                attrs['data-name'] = getPictureCs2(folder, name, extension);
+                            }
+                            else {
+                                const pv = getPictureCs1(folder, name, extension);
+                                attrs['data-extension'] += '?pv=' + pv;
+                            }
                         }
                     }
                 }
@@ -620,13 +788,14 @@ const [postHtmlTreeWalker, postHtmlURLRebase, postCssURLRebase] = (() => {
         }),
 
         usePostCSS && require('postcss-url')({
-            url(asset) {
-                return rewrite(asset);
+            url(asset, dir, opts, decl, w, res) {
+                return rewrite(asset, res.opts.from);
             }
         })
     ];
 })();
 
+let concatGroups = null;
 const ensureCallablePlugIn = array => array.filter(Boolean);
 
 module.exports = function(grunt) {
@@ -676,7 +845,7 @@ module.exports = function(grunt) {
                     }
                 ])
             },
-            dist: {expand: true, flatten: true, src: ['css/*.css', 'css/**/*.css'], dest: 'build/css/'}
+            dist: {expand: true, flatten: false, src: ['css/*.css', 'css/**/*.css'], dest: TARGET}
         },
         posthtml: {
             options: {
@@ -690,7 +859,7 @@ module.exports = function(grunt) {
                     })
                 ])
             },
-            dist: {expand: true, flatten: true, src: ['html/*.html', 'html/**/*.html'], dest: 'build/html/'}
+            dist: {expand: true, flatten: false, src: ['html/*.html', 'html/**/*.html'], dest: TARGET}
         },
         concat: {
             prod: {
@@ -699,13 +868,21 @@ module.exports = function(grunt) {
                     process: function(content, filename) {
                         if (String(filename).endsWith('.css')) {
                             content = content.replace(/(?:\.\.\/)+/g, '../');
+
+                            if (useEmbedMode) {
+                                content = content.replace(/url\(--url-/g, 'var(--url-');
+                            }
                         }
                         return content.trim() + "\n";
                     }
                 },
                 get files() {
-                    console.log = log;
-                    return Secureboot.getGroups(true);
+                    if (!concatGroups) {
+                        console.log = log;
+                        postTaskFinalizer();
+                        concatGroups = Secureboot.getGroups(true);
+                    }
+                    return concatGroups;
                 },
             }
         },
@@ -724,7 +901,7 @@ module.exports = function(grunt) {
     });
 
     grunt.registerTask('cleanup', () => {
-        const build = path.join(cwd, 'build');
+        const build = path.join(cwd, TARGET);
 
         if (FS.isDir(build)) {
             console.log('Cleaning up old build files...');
@@ -735,6 +912,10 @@ module.exports = function(grunt) {
             FS.ls(path.join(cwd, 'html'), /-postbuild\.html$/,
                 FS.ls(path.join(cwd, 'js'), /(?:-group\d+|mega-\d+)\.js$/,
                     FS.ls(path.join(cwd, 'css'), /(?:-group\d+|mega-\d+|-postbuild)\.css$/))).forEach(FS.rm);
+        }
+
+        if (useImageryMode) {
+            FS.mkdir(cwd, TARGET, 'imagery');
         }
     });
 

@@ -474,6 +474,12 @@ def inspecthtml(file, ln, line, result):
     if match and not re.search(r'=["\']fm-dialog', line):
         result.append('{}:{}: {}\n{}^ for consistency, fm-dialog shall be placed as the first class.'.format(file, ln, line, indent))
 
+    # check for relative URLs without 'clickurl' class
+    match = re.search(r'href\s*=\s*["\']?/', line)
+    if match and not re.search('clickurl', line):
+        fatal += 1
+        result.append('{}:{}: {}\n{}^ Missing clickurl class.'.format(file, ln, line, indent))
+
     return fatal
 
 def validate_strings(key_value_pairs):

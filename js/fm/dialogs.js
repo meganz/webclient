@@ -1280,7 +1280,8 @@
             var $self = $(this);
 
             if (!$self.hasClass('active')) {
-                var $menu = $('.dialog-sorting-menu', $dialog).removeClass('hidden');
+                // There are four menus for each tab: get menu for active tab
+                var $menu = $self.siblings('.dialog-sorting-menu');
 
                 var p = $self.position();
 
@@ -1303,7 +1304,8 @@
                 // Copy dialog key only
                 var key = $.dialog[0].toUpperCase() + $.dialog.substr(1) + section;
 
-                $menu.find('.dropdown-item').removeClass('active asc desc');
+                $('.dropdown-item', $menu).removeClass('active asc desc');
+                $('.sort-arrow', $menu).removeClass('icon-up icon-down');
 
                 const by = escapeHTML(M.sortTreePanel[key] && M.sortTreePanel[key].by || 'name');
                 const dir = M.sortTreePanel[key] && M.sortTreePanel[key].dir || 1;

@@ -38,6 +38,11 @@ var RevampOnboarding = {
         $('.popup-content', $popup).text(l.v4onboard_popupmessage);
         $popup.removeClass('hidden');
 
+        $popup.rebind('click.closeme', () => {
+            $popup.addClass('hidden');
+        });
+
+
         setTimeout(() => {
             $popup.addClass('hidden');
         }, 10000);
@@ -111,16 +116,19 @@ var RevampOnboarding = {
 
     isDone: function(index) {
         'use strict';
-        switch (index) {
-            case 0:
-                return fmconfig.rvonbrddl === 1;
-            case 1:
-                return fmconfig.rvonbrdfd === 1;
-            case 2:
-                return fmconfig.rvonbrdas === 1;
-            default:
-                return false;
+        if (is_fm()) {
+            switch (index) {
+                case 0:
+                    return fmconfig.rvonbrddl === 1;
+                case 1:
+                    return fmconfig.rvonbrdfd === 1;
+                case 2:
+                    return fmconfig.rvonbrdas === 1;
+                default:
+                    return false;
+            }
         }
+        return true;
     }
 };
 

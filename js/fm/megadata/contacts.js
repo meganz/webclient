@@ -433,6 +433,8 @@ MegaData.prototype.syncUsersFullname = function(userId, chatHandle, promise) {
         lastName = lastName.value;
         firstName = firstName.value;
 
+        const oldNameHash = user.name + user.firstName + user.lastName;
+
         user.name = "";
         user.lastName = lastName;
         user.firstName = firstName;
@@ -468,7 +470,8 @@ MegaData.prototype.syncUsersFullname = function(userId, chatHandle, promise) {
             user.nickname = nicknames.cache[userId];
         }
 
-        if (user.avatar && user.avatar.type !== "image") {
+        // only clear old avatar if the old one was a text one and was different then the new names
+        if (user.avatar && user.avatar.type !== "image" && oldNameHash !== user.name + user.firstName + user.lastName) {
             user.avatar = false;
             useravatar.loaded(userId);
         }

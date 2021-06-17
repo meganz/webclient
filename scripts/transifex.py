@@ -62,7 +62,7 @@ if os.path.exists(config_file):
     transifex_token = transifex_config.get('TRANSIFEX_TOKEN') or transifex_token
 
 if not base_url or not organisation_id or not project_id or not resource_slug or not gitlab_develop_url or not transifex_token:
-     print("Error: Incomplete Transifex settings.")
+     print("ERROR: Incomplete Transifex settings.")
      sys.exit(1)
 
 BASE_URL = base_url
@@ -85,7 +85,7 @@ REMAPPED_CODE = {
 
 def print_error(errors):
     for error in errors:
-        print("Error " + error['status'] + ": " + error['detail'] + ".")
+        print('ERROR {}: {}.'.format(error['status'], error['detail']))
 
 def sanitise_string(string, convert_quotes, escape_tag):
     # We do not want to convert the quotes that are in between tags
@@ -269,13 +269,13 @@ def download_languages(resource, lang = []):
                             download_response = urlopen(e.headers['Location'])
                             download_content = json.loads(download_response.read().decode('utf8'))
                             languages[language] = download_content
-                            print(language + " => Completed")
+                            print('{} => Completed'.format(language))
                             return
                         elif e.code != 200:
                             download_content = json.loads(status_response.read().decode('utf8'))
                             print_error(download_content['errors'])
                             return
-                print(language + " => Error: Maximum file fetch limit reached.")
+                print('{} => ERROR: Maximum file fetch limit reached.'.format(language))
         else:
             print_error(content['errors'])
 
@@ -294,7 +294,7 @@ def get_branch_resource_name(is_upload = False, is_force = False):
     branch_name = subprocess.check_output(['git', 'symbolic-ref', '--short','-q','HEAD'], universal_newlines=True).strip()
     if branch_name in ["master", "develop"]:
         if is_upload:
-            print("Error: Updating string is not allowed in this branch.")
+            print("ERROR: Updating string is not allowed in this branch.")
         return False
     branch_resource_name =  RESOURCE + "-" + re.sub('[^A-Za-z0-9]+', '', branch_name)
     url = BASE_URL + "/resources/" + PROJECT_ID + ":r:" + branch_resource_name
@@ -353,7 +353,7 @@ def get_branch_resource_name(is_upload = False, is_force = False):
                 print_error(content['errors'])
                 return False
             print("")
-            print("New Resource " + branch_resource_name + " has been created.")
+            print("New Resource {} has been created.".format(branch_resource_name))
             return branch_resource_name
         else:
             print_error(content['errors'])
@@ -379,7 +379,7 @@ def send_upload_request(url, payload):
         elif 'data' in download_content and 'attributes' in download_content['data'] and 'status' in download_content['data']['attributes'] and \
                 download_content['data']['attributes']['status'] not in ['processing', 'pending']:
             return response
-    print("Error: Maximum file fetch limit reached.")
+    print("ERROR: Maximum file fetch limit reached.")
     return False
 
 def merge_language(main, branch):
@@ -394,15 +394,28 @@ def string_validation(new_strings):
     valid_strings = True
     for key, data in new_strings.items():
         if 'string' not in data:
-            print("Error: String with key " +  key + " has no string.")
+            print('ERROR: String with key {} has no string.'.format(key))
             valid_strings = False
         elif 'developer_comment' not in data:
-            print("Error: String with key " + key + " has no developer comment.")
+            print('ERROR: String with key {} has no developer comment.'.format(key))
             valid_strings = False
         else:
             new_strings[key]['string'] = sanitise_string(data['string'], True, False)
-            print("Accepted: String with key " + key + " is valid.")
+            print('Accepted: String with key {} is valid.'.format(key))
     return valid_strings
+
+def validate_strings(key_value_pairs):
+    strings = {}
+    duplicated_keys = []
+    for key, value in key_value_pairs:
+        if key in strings:
+           duplicated_keys.append(key)
+        else:
+           strings[key] = value
+    if len(duplicated_keys) > 0:
+        print('ERROR: Duplicated key: {}'.format(", ".join(duplicated_keys)))
+        sys.exit(1)
+    return strings
 
 def get_differences():
     new_strings_found = {}
@@ -411,15 +424,23 @@ def get_differences():
         sys.exit(1)
     try:
         new_file = open(os.path.dirname(os.path.abspath(__file__)) + "/../lang/strings.json", "r")
-        new_strings = json.loads(new_file.read())
+        new_strings = json.loads(new_file.read(), object_pairs_hook=validate_strings)
         new_file.close()
     except IOError:
-        print("Error: File not found.")
+        print("ERROR: File not found.")
         sys.exit(1)
 
     gitlab_header = {'Private-Token': GITLAB_TOKEN}
     request = Request(GITLAB_DEVELOP_STRINGS_URL, headers=gitlab_header)
-    current_strings = json.loads(urlopen(request).read())
+    try:
+        response = urlopen(request)
+        current_strings = json.loads(response.read())
+    except HTTPError as e:
+        if e.code == 401:
+            print("ERROR: Invalid GitLab Token credentials.")
+        else:
+            print("ERROR: Cannot fetch strings.json from GitLab.")
+        sys.exit(1)
 
     for new_key in new_strings:
         if new_key not in current_strings or new_strings[new_key]['string'] != current_strings[new_key]['string'] or new_strings[new_key]['developer_comment'] != current_strings[new_key]['developer_comment']:
@@ -428,7 +449,7 @@ def get_differences():
     if new_strings_found:
         print("New string(s) file found! Checking validity...")
         if not string_validation(new_strings_found):
-            print("Error: Invalid new string(s).")
+            print("ERROR: Invalid new string(s).")
             sys.exit(1)
         else:
             print("New strings are valid! :)")
@@ -438,7 +459,7 @@ def get_differences():
         return False
 
 def main():
-    print("Export Started")
+    print("--- Transifex Language Management ---")
     languages = ""
     is_prod = False
     branch_resource_name = None
@@ -457,6 +478,7 @@ def main():
             print("Invalid language arguments")
             sys.exit(1)
     elif args.update != None:
+        print("~ Import started ~")
         new_strings = get_differences()
         is_force = not new_strings and len(args.update) > 0 and args.update[0] == "force"
         if new_strings or is_force:
@@ -490,8 +512,10 @@ def main():
             success = send_upload_request(url, payload)
             if success:
                 print("Completed")
-            print("")
+        print("~ Import completed ~")
+        print("")
 
+    print("~ Export started ~")
     print("Fetching Main Language Files...")
     lang = download_languages(RESOURCE, languages)
     if not lang:
@@ -519,7 +543,7 @@ def main():
     for code, data in lang.items():
         create_file(code, data, is_prod)
     print("Completed")
-    print("Export Completed")
+    print("~ Export completed ~")
 
 try:
     main()

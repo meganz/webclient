@@ -402,10 +402,11 @@
                 if (!$(this).hasClass('active')) {
                     $(this).addClass('active');
                     var $pcm = $('.properties-context-menu');
+                    var position = $(this).position();
                     $pcm.css({
-                        'left': $(this).position().left + 12 + 'px',
-                        'top': $(this).position().top - $pcm.outerHeight() - 8 + 'px',
-                        'margin-left': '-' + $pcm.width() / 2 + 'px'
+                        'left': position.left + 16 + 'px',
+                        'top': position.top - $pcm.outerHeight() - 8 + 'px',
+                        'transform': 'translateX(-50%)',
                     });
                     $pcm.fadeIn(200);
                 }
@@ -442,10 +443,11 @@
                     .removeClass('hidden');// un-hide rest of contacts
 
                 var $cli = $('.contact-list-icon');
+                var position = $cli.position();
                 $('.properties-context-menu').css({
-                    'left': $cli.position().left + 8 + 'px',
-                    'top': $cli.position().top - $('.properties-context-menu').outerHeight() - 8 + 'px',
-                    'margin-left': '-' + $('.properties-context-menu').width() / 2 + 'px'
+                    'left': position.left + 16 + 'px',
+                    'top': position.top - $('.properties-context-menu').outerHeight() - 8 + 'px',
+                    'transform': 'translateX(-50%)',
                 });
                 // $('.properties-context-menu').fadeIn(200);
 

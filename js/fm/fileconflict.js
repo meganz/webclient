@@ -545,6 +545,7 @@
                 $('.radio-txt', $aside).safeHTML(remainingConflictText);
             }
 
+            loadingDialog.phide();
             uiCheckboxes($dialog);
             M.safeShowDialog('fileconflict-dialog', $dialog);
 

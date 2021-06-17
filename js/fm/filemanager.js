@@ -571,7 +571,7 @@ FileManager.prototype.initFileManagerUI = function() {
         ];
         var ALLOWED_PARENTS =
             '#startholder, .fm-account-main, .export-link-item, .contact-fingerprint-txt, .fm-breadcrumbs, ' +
-            '.fm-affiliate';
+            '.fm-affiliate, .text-editor-container';
         var ALLOWED_CLOSEST =
             '.multiple-input, .create-folder-input-bl, .content-panel.conversations, ' +
             '.messages.content-area, .chat-right-pad .user-card-data';

@@ -825,7 +825,7 @@ var voucherDialog = {
             if ((parseFloat(pro.propay.proBalance) < parseFloat(selectedPlanPrice))) {
 
                 // Show warning and re-apply the background because the msgDialog function removes it on close
-                msgDialog('warninga', l[6804], l[6805], '', function() {
+                msgDialog('warningb', l[6804], l[6805], '', () => {
                     voucherDialog.showBackgroundOverlay();
                 });
             }

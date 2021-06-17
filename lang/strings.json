@@ -18207,6 +18207,14 @@
         "developer_comment": "Learn More link",
         "string": "Learn More"
     },
+    "megadrop_delete_confirm_text": {
+        "developer_comment": "The confirmation text for the delete MEGAdrop folder dialog in the account settings page",
+        "string": "Contacts with a link to the folder will no longer be able to access it."
+    },
+    "megadrop_delete_confirm_title": {
+        "developer_comment": "The title for the delete MEGAdrop folder confirmation dialog in the account settings page",
+        "string": "Are you sure you want to remove this folder from MEGAdrop?"
+    },
     "returntoacc": {
         "developer_comment": "Button's text in payment failed layout",
         "string": "Return to my account"

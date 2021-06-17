@@ -63,11 +63,9 @@ function scrollToURLs() {
                 var newOffset = $scrollTo[0].offsetTop;
 
                 if (is_mobile) {
-                    if (page === "privacy") {
-                        $toScroll = $('html');
-                    }
-                    else if (page === "terms") {
-                        $toScroll = $('.fm-block.terms-of-service .mobile.fm-scrolling');
+                    var mobileClass = 'body.mobile .fmholder';
+                    if (page === "privacy" || page === "terms") {
+                        $toScroll = $(mobileClass);
                     }
                 }
                 else {

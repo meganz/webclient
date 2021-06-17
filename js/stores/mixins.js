@@ -860,6 +860,7 @@ export class MegaRenderMixin extends React.Component {
 
 export class ContactAwareComponent extends MegaRenderMixin {
     static unavailableAvatars = Object.create(null);
+    static unavailableNames = Object.create(null);
 
     constructor(props) {
         super(props);
@@ -874,10 +875,12 @@ export class ContactAwareComponent extends MegaRenderMixin {
             return;
         }
 
-        const syncName = !contact.firstName && !contact.lastName;
+        const syncName = !ContactAwareComponent.unavailableNames[contactHandle] && !contact.firstName &&
+            !contact.lastName;
         const syncMail = megaChat.FORCE_EMAIL_LOADING ||
             (contact.c === 1 || contact.c === 2) && !contact.m && !anonymouschat;
-        const syncAvtr = !avatars[contactHandle] && !ContactAwareComponent.unavailableAvatars[contactHandle];
+        const syncAvtr = !contact.avatar && !avatars[contactHandle] &&
+            !ContactAwareComponent.unavailableAvatars[contactHandle];
 
         const loader = () => {
             if (!this.isComponentEventuallyVisible()) {
@@ -914,6 +917,9 @@ export class ContactAwareComponent extends MegaRenderMixin {
                 .always(() => {
                     this.eventuallyUpdate();
                     this.__isLoadingContactInfo = false;
+                    if (!contact.firstName && !contact.lastName) {
+                        ContactAwareComponent.unavailableNames[contactHandle] = true;
+                    }
                 });
         };
 

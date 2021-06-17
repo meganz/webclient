@@ -4551,6 +4551,8 @@
     "busProfileUpdatePhone": "Your Business profile has been updated.",
     "gotoacc": "Go to my account",
     "learnmore_text": "Learn More",
+    "megadrop_delete_confirm_text": "Contacts with a link to the folder will no longer be able to access it.",
+    "megadrop_delete_confirm_title": "Are you sure you want to remove this folder from MEGAdrop?",
     "returntoacc": "Return to my account",
     "tooltip_more": "More",
     "v4onboard_dialogtext": "Our new dark mode is now available as an early release. Tell us what you think.",

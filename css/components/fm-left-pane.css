@@ -128,8 +128,14 @@
 .storage-usage-panel .loader.loading + .storage-txt {
     visibility: hidden;
 }
-.storage-usage-panel .storage-txt span#lp-sq-used {
+.storage-usage-panel .storage-txt .lp-sq-used {
     color: var(--text-color-success);
+}
+.storage-usage-panel.warning .storage-txt .lp-sq-used {
+    color: var(--text-color-warning);
+}
+.storage-usage-panel.over .storage-txt .lp-sq-used {
+    color: var(--text-color-error);
 }
 .fm-tree-panel li {
     margin: 1px 0;

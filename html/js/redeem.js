@@ -675,7 +675,7 @@ var redeem = {
         var infoFilling = function($dlg) {
             var greenBtnText = l[968];
             var whiteBtnText = l[171];
-            var titleText = l[22120];
+            var descText = l[22120];
             var $greenBtn = $('.voucher-info-create', $dlg);
             var $greenBtnSpan = $('span', $greenBtn);
             var $whiteBtn = $('.voucher-info-login', $dlg);
@@ -687,29 +687,29 @@ var redeem = {
             $dlgTitle.removeClass('red');
 
             if (mega.voucher.businessmonths) {
-                $('.v-storage', $dlg).safeHTML(l[23789].replace('%1', '<span>15 ' + l[20160] + '</span>'));
-                $('.v-transfer', $dlg).safeHTML(l[24098]);
+                $('.v-storage', $dlg).safeHTML(l[23789].replace('%1', '15 ' + l[20160]));
+                $('.v-transfer', $dlg).safeHTML(l[23813]);
 
                 $('.voucher-logo', $dlg).addClass('business-v');
                 $('.plan-icon', $dlg).removeClass('pro1 pro2 pro3 pro4').addClass('business');
 
-                var headerText;
+                var titleText;
                 if (mega.voucher.businessmonths === 1) {
-                    headerText = l[23492];
+                    titleText = l[23492];
                 }
                 else if (mega.voucher.businessmonths === 12) {
-                    headerText = l[23491];
+                    titleText = l[23491];
                 }
                 else {
-                    headerText = l[23493].replace('%n', mega.voucher.businessmonths);
+                    titleText = l[23493].replace('%n', mega.voucher.businessmonths);
                 }
-                $('.voucher-head .v-header-text', $dlg).text(headerText);
+                $dlgTitle.text(titleText);
 
                 greenBtnText = l[19516];
                 if (window.bCreatedVoucher || u_type === 3) {
                     greenBtnText = l[458];
                     whiteBtnText = l[82];
-                    titleText = l[23496];
+                    descText = l[23496];
                 }
             }
             else {
@@ -717,7 +717,7 @@ var redeem = {
                 var storageFormatted = numOfBytes(storageBytes, 0);
                 var storageValue = Math.round(storageFormatted.size) + ' ' + storageFormatted.unit;
 
-                $('.v-storage', $dlg).safeHTML(l[23789].replace('%1', '<span>' + storageValue + '</span>'));
+                $('.v-storage', $dlg).safeHTML(l[23789].replace('%1', storageValue));
 
                 $('.plan-icon', $dlg).removeClass('pro1 pro2 pro3 pro4 business')
                     .addClass('pro' + mega.voucher.proNum);
@@ -727,7 +727,7 @@ var redeem = {
                 var bandwidthFormatted = numOfBytes(bandwidthBytes, 0);
                 var bandwidthValue = Math.round(bandwidthFormatted.size) + ' ' + bandwidthFormatted.unit;
 
-                $('.v-transfer', $dlg).safeHTML(l[23790].replace('%1', '<span>' + bandwidthValue + '</span>'));
+                $('.v-transfer', $dlg).safeHTML(l[23790].replace('%1', bandwidthValue));
 
                 if (mega.voucher.proNum === 4) {
                     $('.voucher-logo', $dlg).addClass('pro-l');
@@ -735,19 +735,19 @@ var redeem = {
                 else {
                     $('.voucher-logo', $dlg).removeClass('pro-l');
                 }
-                $('.voucher-head .v-header-text', $dlg).text(l[22114]);
+                $dlgTitle.text(l[22114]);
 
                 // Is this PRO voucher being used for a business registration?
                 if (window.bCreatedVoucher) {
                     $greenBtn.addClass('disabled');
-                    titleText = l[23541];
+                    descText = l[23541];
                     $dlgTitle.addClass('red');
                     whiteBtnText = l[82];
                     $whiteBtn.attr('bFail', 1);
                 }
 
             }
-            $dlgTitle.text(titleText);
+            $('.v-description', $dlg).text(descText);
 
             $greenBtnSpan.text(greenBtnText);
             $whiteBtnSpan.text(whiteBtnText);

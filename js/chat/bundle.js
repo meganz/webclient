@@ -902,9 +902,9 @@ class ContactAwareComponent extends MegaRenderMixin {
       return;
     }
 
-    const syncName = !contact.firstName && !contact.lastName;
+    const syncName = !ContactAwareComponent.unavailableNames[contactHandle] && !contact.firstName && !contact.lastName;
     const syncMail = megaChat.FORCE_EMAIL_LOADING || (contact.c === 1 || contact.c === 2) && !contact.m && !anonymouschat;
-    const syncAvtr = !avatars[contactHandle] && !ContactAwareComponent.unavailableAvatars[contactHandle];
+    const syncAvtr = !contact.avatar && !avatars[contactHandle] && !ContactAwareComponent.unavailableAvatars[contactHandle];
 
     const loader = () => {
       if (!this.isComponentEventuallyVisible()) {
@@ -933,6 +933,10 @@ class ContactAwareComponent extends MegaRenderMixin {
       MegaPromise.allDone(promises).always(() => {
         this.eventuallyUpdate();
         this.__isLoadingContactInfo = false;
+
+        if (!contact.firstName && !contact.lastName) {
+          ContactAwareComponent.unavailableNames[contactHandle] = true;
+        }
       });
     };
 
@@ -963,6 +967,7 @@ class ContactAwareComponent extends MegaRenderMixin {
 
 }
 ContactAwareComponent.unavailableAvatars = Object.create(null);
+ContactAwareComponent.unavailableNames = Object.create(null);
 
 /***/ }),
 

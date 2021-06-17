@@ -89,10 +89,7 @@ function init_blog() {
         blogposts = data.object;
         for (var b in blogposts) {
             if (blogposts.hasOwnProperty(b)) {
-                var bHeader = blogposts[b].h.substr(0, 50).trim().toLowerCase()
-                    .replace(/( )+/g, '-')
-                    .replace(/[^\dA-Za-z-]/g, '')
-                    .replace(/(-)+/g, '-');
+                var bHeader = urlFromTitle(blogposts[b].h);
                 blogHeaders[bHeader] = b;
                 blogposts[b].th = bHeader;
             }
@@ -285,6 +282,15 @@ function blog_archive() {
     }
     $('#blog_archive').safeHTML(blogarchive);
     clickURLs();
+}
+
+function urlFromTitle(title) {
+    'use strict';
+
+    return title.substr(0, 50).trim().toLowerCase()
+        .replace(/( )+/g, '-')
+        .replace(/[^\dA-Za-z-]/g, '')
+        .replace(/(-)+/g, '-');
 }
 
 

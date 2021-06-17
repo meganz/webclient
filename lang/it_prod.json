@@ -4551,6 +4551,8 @@
     "busProfileUpdatePhone": "Your Business profile has been updated.",
     "gotoacc": "Vai al mio account",
     "learnmore_text": "Learn More",
+    "megadrop_delete_confirm_text": "Contacts with a link to the folder will no longer be able to access it.",
+    "megadrop_delete_confirm_title": "Are you sure you want to remove this folder from MEGAdrop?",
     "returntoacc": "Torna al mio account",
     "tooltip_more": "Altro",
     "v4onboard_dialogtext": "La nostra nuova modalit\u00e0 scura \u00e8 disponibile in anteprima. Dicci cosa ne pensi.",

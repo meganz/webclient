@@ -3176,9 +3176,9 @@ body.de .mega-dialog.new-group-chat {
         color: var(--text-color-high);
     }
     .mega-dialog.fm-picker-dialog .summary-input.high-light {
-        background: var(--banner-background-info);
-        box-shadow: 0 0 0 1px var(--banner-border-info);
-        color: var(--banner-text-info);
+        background: var(--surface-grey-6);
+        box-shadow: 0 0 0 1px var(--stroke-grey-6);
+        color: var(--text-color-low);
     }
     .mega-dialog.fm-picker-dialog .summary-input #f-name-input {
         border: none;

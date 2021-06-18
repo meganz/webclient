@@ -4,7 +4,7 @@
 #
 # Use -h for help.
 #
-# $Id: squash.sh,v 2.2.0 2021/06/18 15:10:00 dc Exp $
+# $Id: squash.sh,v 2.2.1 2021/06/18 15:24:26 dc Exp $
 
 ask() {
     read -r -n 1 -p "$1 [Yn]: "
@@ -19,6 +19,11 @@ fatal() {
 get_firstcommit() {
     sha=$(git log --no-merges --oneline --format=%H $1 | tail -1)
     git show $sha --pretty=%B --no-patch | $SED_BINARY 's/^WEB-/#/; s/:\s\w\+:/:/'
+}
+
+get_targetbranch() {
+    git show-branch -a 2>/dev/null | $GREP_BINARY '\*' | $GREP_BINARY -v "$1" | \
+        head -n1 | $SED_BINARY 's/.*\[\(.*\)\].*/\1/' | $SED_BINARY 's/[\^~].*//'
 }
 
 get_binary() {
@@ -112,7 +117,7 @@ current_branch=$(git symbolic-ref --short -q HEAD)
 
 [[ -z "$source_branch" ]] && source_branch=$1
 [[ -z "$source_branch" ]] && source_branch=$current_branch
-[[ -z "$target_branch" ]] && target_branch=$(git name-rev --name-only $(git rev-parse HEAD^))
+[[ -z "$target_branch" ]] && target_branch=$(get_targetbranch "$source_branch")
 
 [[ -z $(git rev-parse --quiet --verify "$source_branch") ]] && fatal "Invalid source branch: $source_branch"
 [[ -z $(git rev-parse --quiet --verify "$target_branch") ]] && fatal "Invalid target branch: $target_branch"

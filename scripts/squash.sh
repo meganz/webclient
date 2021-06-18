@@ -4,7 +4,7 @@
 #
 # Use -h for help.
 #
-# $Id: squash.sh,v 2.1.0 2020/11/06 18:42:16 dc Exp $
+# $Id: squash.sh,v 2.2.0 2021/06/18 15:10:00 dc Exp $
 
 ask() {
     read -r -n 1 -p "$1 [Yn]: "
@@ -111,8 +111,8 @@ GREP_BINARY=$(get_binary "grep") || exit 1
 current_branch=$(git symbolic-ref --short -q HEAD)
 
 [[ -z "$source_branch" ]] && source_branch=$1
-[[ -z "$target_branch" ]] && target_branch=develop
 [[ -z "$source_branch" ]] && source_branch=$current_branch
+[[ -z "$target_branch" ]] && target_branch=$(git name-rev --name-only $(git rev-parse HEAD^))
 
 [[ -z $(git rev-parse --quiet --verify "$source_branch") ]] && fatal "Invalid source branch: $source_branch"
 [[ -z $(git rev-parse --quiet --verify "$target_branch") ]] && fatal "Invalid target branch: $target_branch"

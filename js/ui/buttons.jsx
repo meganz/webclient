@@ -125,8 +125,6 @@ export class Button extends MegaRenderMixin {
         }
     }
 
-    toggleHovered = () => this.setState({ hovered: !this.state.hovered });
-
     unbindEvents() {
         $(document).off('keyup.button' + this.getUniqueId());
         $(document).off('closeDropdowns.' + this.getUniqueId());
@@ -197,8 +195,8 @@ export class Button extends MegaRenderMixin {
                 `}
                 style={style}
                 onClick={this.onClick}
-                onMouseEnter={iconHovered ? this.toggleHovered : undefined}
-                onMouseLeave={iconHovered ? this.toggleHovered : undefined}
+                onMouseEnter={() => iconHovered && this.setState({ hovered: true })}
+                onMouseLeave={() => iconHovered && this.setState({ hovered: false })}
                 {...attrs}>
                 {icon && !isMegaButton && (
                     <div>

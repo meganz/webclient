@@ -180,13 +180,10 @@ def prepare_english_string(resource):
 def prepare_translation_string(resource, lang):
     language_strings = {}
     url = BASE_URL + "/projects/" + PROJECT_ID + "/languages"
-    request = Request(url, headers=HEADER)
-    response = urlopen(request)
-    content = json.loads(response.read().decode('utf8'))
-    if response.code != 200:
-        print_error(content['errors'])
-        return False
-    else:
+    try:
+        request = Request(url, headers=HEADER)
+        response = urlopen(request)
+        content = json.loads(response.read().decode('utf8'))
         languages = content['data']
         for language in languages:
             if lang == "all" or language['id'] in lang:
@@ -219,7 +216,11 @@ def prepare_translation_string(resource, lang):
                 language_code = language['attributes']['code']
                 language_code = REMAPPED_CODE[language_code] if language_code in REMAPPED_CODE else language_code
                 language_strings[language_code] = {'url': url, 'payload': payload}
-    return language_strings
+        return language_strings
+    except HTTPError as e:
+        content = json.loads(e.read().decode('utf8'))
+        print_error(content['errors'])
+        return False
 
 def download_languages(resource, lang = []):
     languages = {}
@@ -247,10 +248,10 @@ def download_languages(resource, lang = []):
             def redirect_request(self, req, fp, code, msg, headers, newurl):
                 return None
 
-        request = Request(request['url'], headers=HEADER, data=json.dumps(request['payload']).encode('utf8'))
-        response = urlopen(request)
-        content = json.loads(response.read().decode('utf8'))
-        if response.code == 202:
+        try:
+            request = Request(request['url'], headers=HEADER, data=json.dumps(request['payload']).encode('utf8'))
+            response = urlopen(request)
+            content = json.loads(response.read().decode('utf8'))
             if content['data']['attributes']['status'] == 'failed':
                 print_error(content['data']['attributes']['errors'])
                 return
@@ -272,12 +273,14 @@ def download_languages(resource, lang = []):
                             print('{} => Completed'.format(language))
                             return
                         elif e.code != 200:
-                            download_content = json.loads(status_response.read().decode('utf8'))
+                            download_content = json.loads(e.read().decode('utf8'))
                             print_error(download_content['errors'])
                             return
                 print('{} => ERROR: Maximum file fetch limit reached.'.format(language))
-        else:
+        except HTTPError as e:
+            content = json.loads(e.read().decode('utf8'))
             print_error(content['errors'])
+            return False
 
     threads = []
     for language, request in all_requests.items():
@@ -346,24 +349,29 @@ def get_branch_resource_name(is_upload = False, is_force = False):
                     "type": "resources"
                 }
             }
-            request = Request(url, headers=HEADER, data=json.dumps(payload).encode('utf8'))
-            response = urlopen(request)
-            content = json.loads(response.read().decode('utf8'))
-            if response.code != 201:
+            try:
+                request = Request(url, headers=HEADER, data=json.dumps(payload).encode('utf8'))
+                response = urlopen(request)
+                content = json.loads(response.read().decode('utf8'))
+                print("")
+                print("New Resource {} has been created.".format(branch_resource_name))
+                return branch_resource_name
+            except HTTPError as e:
+                content = json.loads(e.read().decode('utf8'))
                 print_error(content['errors'])
                 return False
-            print("")
-            print("New Resource {} has been created.".format(branch_resource_name))
-            return branch_resource_name
         else:
+            content = json.loads(e.read().decode('utf8'))
             print_error(content['errors'])
             return False
 
 def send_upload_request(url, payload):
-    request = Request(url, headers=HEADER, data=json.dumps(payload).encode('utf8'))
-    response = urlopen(request)
-    content = json.loads(response.read().decode('utf8'))
-    if response.code != 202:
+    try:
+        request = Request(url, headers=HEADER, data=json.dumps(payload).encode('utf8'))
+        response = urlopen(request)
+        content = json.loads(response.read().decode('utf8'))
+    except HTTPError as e:
+        content = json.loads(e.read().decode('utf8'))
         print_error(content['errors'])
         return False
 
@@ -371,14 +379,17 @@ def send_upload_request(url, payload):
     download_link = content['data']['links']['self']
     for i in range(10):
         time.sleep(3)
-        request = Request(download_link, headers=HEADER)
-        download_content = json.loads(urlopen(request).read())
-        if 'errors' in download_content:
+        try:
+            request = Request(download_link, headers=HEADER)
+            response = urlopen(request)
+            download_content = json.loads(response.read())
+            if 'data' in download_content and 'attributes' in download_content['data'] and 'status' in download_content['data']['attributes'] and \
+                    download_content['data']['attributes']['status'] not in ['processing', 'pending']:
+                return response
+        except HTTPError as e:
+            content = json.loads(e.read().decode('utf8'))
             print_error(content['errors'])
             return False
-        elif 'data' in download_content and 'attributes' in download_content['data'] and 'status' in download_content['data']['attributes'] and \
-                download_content['data']['attributes']['status'] not in ['processing', 'pending']:
-            return response
     print("ERROR: Maximum file fetch limit reached.")
     return False
 

@@ -298,10 +298,8 @@
             const filetypeIcon = placeholder.querySelector('.target-icon');
             filetypeIcon.classList.remove('icon-chat-filled', 'icon-folder-24', 'sprite-fm-uni', 'sprite-fm-mono');
             filetypeIcon.classList.add(
-                section === 'conversations' ? 'sprite-fm-mono' : 'sprite-fm-uni'
-            );
-            filetypeIcon.classList.add(
-                section === 'conversations' ? 'icon-chat-filled' : 'icon-folder-24'
+                'sprite-fm-mono', 
+                section === 'conversations' ? 'icon-chat-filled' : 'icon-folder-filled'
             );
         }
 

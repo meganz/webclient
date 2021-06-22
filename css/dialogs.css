@@ -3110,6 +3110,7 @@ body.de .mega-dialog.new-group-chat {
         margin-inline-start: 8px;
         --icon-size: 24px;
         position: absolute;
+        --mask-color: var(--icon-rest);
     }
     .mega-dialog.fm-picker-dialog .dialog-button-container {
         height: 56px;

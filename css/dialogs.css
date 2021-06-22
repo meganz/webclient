@@ -7936,10 +7936,15 @@ body.de .mega-dialog.new-group-chat {
         border: 1px solid var(--stroke-grey-2);
         border-radius: 12px;
         overflow: hidden;
+        background: var(--surface-grey-2);
     }
     .mega-dialog.affiliate-redeem .header {
         font: var(--text-h3-bold);
         color: var(--text-color-high);
+        background: var(--surface-main);
+    }
+    .mega-dialog.affiliate-redeem .summary {
+        background: var(--surface-main);
     }
     .mega-dialog.affiliate-redeem .header + .mega-input {
         margin: 8px  0;
@@ -7984,7 +7989,6 @@ body.de .mega-dialog.new-group-chat {
         clear: both;
     }
     .mega-dialog.affiliate-redeem .amount {
-        background: var(--surface-grey-2);
         padding: 12px 24px 24px;
         display: flex;
         align-items: baseline;

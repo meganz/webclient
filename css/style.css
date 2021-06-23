@@ -1758,6 +1758,10 @@ a.blog-new-archive-lnk {
     background-image: url(../images/mega/dev-point.png);
     background-repeat: no-repeat;
 }
+.blog-new-full ul li {
+    line-height: 24px;
+    margin-bottom: 8px;
+}
 .pro li:not(.no-red-dot) {
     padding: 0 0 12px 20px;
 }

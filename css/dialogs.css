@@ -7822,32 +7822,6 @@ body.de .mega-dialog.new-group-chat {
         left: auto;
         right: 7px;
     }
-    .mega-dialog.contact-nickname-dialog .nickname-input-title {
-        color: var(--text-color-low);
-        font-size: 12px;
-        letter-spacing: 0.86px;
-        line-height: 15px;
-        -webkit-margin-start: 34px;
-        margin-inline-start: 34px;
-        visibility: hidden;
-    }
-    .mega-dialog.contact-nickname-dialog .nickname-input-title.visible {
-        visibility: visible;
-    }
-    .mega-dialog.contact-nickname-dialog .nickname-input {
-        border: 0;
-        background: transparent;
-        color: var(--text-color-high);
-        font: var(--text-body1);
-        -webkit-margin-start: 34px;
-        margin-inline-start: 34px;
-        padding: 8px 0 8px 0;
-        width: 420px;
-    }
-    .mega-dialog.contact-nickname-dialog .horizontal-bar {
-        background-color: var(--secondary-green);
-        height: 1px;
-    }
 
 /* end contact-nickname-dialog */
 

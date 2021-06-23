@@ -158,13 +158,14 @@ var nicknames = {
             // Init global selectors
             this.$dialog = $('.contact-nickname-dialog');
             this.$backgroundOverlay = $('.dark-overlay');
+            this.$megaInput = new mega.ui.MegaInputs($('#nickname-input',this.$dialog)).$input;
 
             // Set user handle for use later
             this.contactUserHandle = contactUserHandle;
 
             // Init functionality
             this.prefillUserNickname();
-            this.initTextInputTitle();
+            this.initTextSave();
             this.initCancelAndCloseButtons();
             this.initSaveButton();
             this.showDialog();
@@ -178,7 +179,7 @@ var nicknames = {
 
             'use strict';
 
-            var $input = this.$dialog.find('.nickname-input');
+            var $input = this.$megaInput;
             var inputValue = '';
 
             // If the contact exists
@@ -202,42 +203,23 @@ var nicknames = {
         },
 
         /**
-         * Initialise the code to hide/show the text input's title/tooltip if there is text entered
+         * Initialise the code to bind the save button to enter key
          */
-        initTextInputTitle: function() {
+        initTextSave: function() {
 
             'use strict';
 
-            var $input = this.$dialog.find('.nickname-input');
-            var $inputTitle = this.$dialog.find('.nickname-input-title');
+            var $input = this.$megaInput;
             var $saveButton = this.$dialog.find('.save-button');
-
-            // Small function to hide/show
-            var setTitleVisibility = function() {
-
-                // If there is text entered, show the text field title
-                if ($input.val().length > 0) {
-                    $inputTitle.addClass('visible');
-                }
-                else {
-                    // Placeholder text is shown so no title needed
-                    $inputTitle.removeClass('visible');
-                }
-            };
 
             // Set the keyup handler
             $input.rebind('keyup.inputchange', function(event) {
-
-                setTitleVisibility();
 
                 // If Enter key is pressed, trigger Save action
                 if (event.which === 13) {
                     $saveButton.trigger('click');
                 }
             });
-
-            // Check on initial load whether it should be shown
-            setTitleVisibility();
         },
 
         /**
@@ -249,7 +231,7 @@ var nicknames = {
 
             var $cancelButton = this.$dialog.find('.cancel-button');
             var $closeIconButton = this.$dialog.find('button.js-close');
-            var $input = this.$dialog.find('.nickname-input');
+            var $input = this.$megaInput;
             var self = this;
 
             // On click of the Cancel or Close icon
@@ -271,7 +253,7 @@ var nicknames = {
             'use strict';
 
             var $saveButton = this.$dialog.find('.save-button');
-            var $nicknameInput = this.$dialog.find('.nickname-input');
+            var $nicknameInput = this.$megaInput;
             var contactUserHandle = this.contactUserHandle;
             var self = this;
 
@@ -420,7 +402,7 @@ var nicknames = {
 
             'use strict';
 
-            this.$dialog.find('.nickname-input').trigger('focus');
+            this.$megaInput.trigger('focus');
         },
 
         /**

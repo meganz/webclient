@@ -394,7 +394,7 @@
 /* Error/warning message containers */
 .mega-input .message-container {
     font: var(--text-body1);
-    padding: 8px;
+    padding: 2px;
     white-space: normal;
     text-overflow: ellipsis;
     position: absolute;

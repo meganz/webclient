@@ -399,7 +399,7 @@ table tr.ui-selected .link-transfer-status {
     bottom: 1px;
     height: 20px;
     width: 1px;
-    background-color: var(--surface-grey-2);
+    background-color: var(--surface-mid-grey);
     cursor: col-resize;
 }
 .rtl .grid-table-header th:not(.grid-url-header):hover::before {

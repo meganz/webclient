@@ -15,7 +15,8 @@
 .fm-blocks-view.out-shares-view,
 .fm-blocks-view.public-links-view,
 .contacts-details-block,
-.contacts-blocks-view {
+.contacts-blocks-view,
+.files-grid-view {
     box-sizing: border-box;
     height: 100%;
     position: relative;

@@ -822,36 +822,46 @@ inherits(MessageBuffSortedMap, MegaDataSortedMap);
 tmp = function(method) {
     'use strict';
     return function msgBufSMWrap(msg, ignoreDB) {
+        const persist = () => {
+            var parent = this._parent;
+            var chatdPersist = parent.chatdPersist;
+
+            if (ignoreDB !== true && chatdPersist) {
+                var chatRoom = parent.chatRoom;
+                var members = chatRoom.members;
+
+                if (
+                    !(chatRoom.type === "public" &&
+                        parent.joined === true &&
+                        (
+                            members[u_handle] === undefined ||
+                            members[u_handle] === -1
+                        ))
+                ) {
+                    chatdPersist.persistMessageBatched(
+                        method === "removeByKey" ? "remove" : method,
+                        chatRoom.chatId,
+                        toArray.apply(null, arguments)
+                    );
+                }
+            }
+        };
+
+        // Same message instance already exists.
+        if (method === "push" && msg && !ignoreDB && msg instanceof Message && this[msg.messageId] === msg) {
+            persist();
+            return this.indexOfKey(msg.messageId);
+        }
         // signal about this message action *before* actually performing it.
         msg = msg in this && this[msg];
         if (msg instanceof Message) {
             msg._onMessageAction(ignoreDB ? method : 'revoke');
         }
+
         // proceed to the actual action.
         var res = MegaDataSortedMap.prototype[method].apply(this, arguments);
 
-        var parent = this._parent;
-        var chatdPersist = parent.chatdPersist;
-
-        if (ignoreDB !== true && chatdPersist) {
-            var chatRoom = parent.chatRoom;
-            var members = chatRoom.members;
-
-            if (
-                !(chatRoom.type === "public" &&
-                    parent.joined === true &&
-                    (
-                        members[u_handle] === undefined ||
-                        members[u_handle] === -1
-                    ))
-            ) {
-                chatdPersist.persistMessageBatched(
-                    method === "removeByKey" ? "remove" : method,
-                    chatRoom.chatId,
-                    toArray.apply(null, arguments)
-                );
-            }
-        }
+        persist();
 
         return res;
     };

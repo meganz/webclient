@@ -54,7 +54,11 @@ MegaData.prototype.openSharingDialog = function() {
         // Show the share dialog
         $dialog.removeClass('hidden');
 
-        if (M.d[selectedNode].shares || M.ps[selectedNode]) {
+        var shares = M.d[selectedNode].shares;
+        var shareKeys = Object.keys(shares || {});
+
+        // This is shared folder, not just folder link
+        if (shares && !(shares.EXP && shareKeys.length === 1) || M.ps[selectedNode]) {
             $('.share-dialog-folder-icon', $dialog).removeClass('icon-folder-24').addClass('icon-folder-outgoing-24');
             $('.remove-share', $dialog).removeClass('disabled');
         }

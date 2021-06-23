@@ -3394,7 +3394,6 @@ function sharedFolderUI() {
 
         $('.shared-details-block .files-grid-view, .shared-details-block .fm-blocks-view').removeAttr('style');
         $('.shared-details-block .shared-folder-content').unwrap();
-        $('.grid-table-header-container-sc', '.shared-folder-content').removeClass('hidden');
         $('.shared-folder-content').removeClass('shared-folder-content');
         $('.shared-top-details').remove();
         browsingSharedContent = true;

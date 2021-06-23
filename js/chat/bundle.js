@@ -2841,10 +2841,6 @@ class Button extends _stores_mixins_js2__["MegaRenderMixin"] {
       }
     };
 
-    this.toggleHovered = () => this.setState({
-      hovered: !this.state.hovered
-    });
-
     this.onClick = e => {
       if (this.props.disabled === true) {
         e.preventDefault();
@@ -3007,8 +3003,12 @@ class Button extends _stores_mixins_js2__["MegaRenderMixin"] {
       className: "\n                    button\n                    " + (className ? className : '') + "\n                    " + (disabled ? 'disabled' : '') + "\n                    " + (this.state.focused ? 'active active-dropdown' : '') + "\n                ",
       style: style,
       onClick: this.onClick,
-      onMouseEnter: iconHovered ? this.toggleHovered : undefined,
-      onMouseLeave: iconHovered ? this.toggleHovered : undefined
+      onMouseEnter: () => iconHovered && this.setState({
+        hovered: true
+      }),
+      onMouseLeave: () => iconHovered && this.setState({
+        hovered: false
+      })
     }, attrs), icon && !isMegaButton && react1.a.createElement("div", null, react1.a.createElement("i", {
       className: this.state.hovered ? this.state.iconHovered : icon
     })), icon && isMegaButton && react1.a.createElement("div", null, react1.a.createElement("i", {

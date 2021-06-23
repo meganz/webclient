@@ -313,12 +313,17 @@ body.de .mega-dialog.new-group-chat {
     padding: 5px;
     border-radius: 4px;
     font: var(--text-body1);
-    color: var(--text-color-medium);
+    color: var(--surface-main-inverted);
     background: transparent;
+}
+.mega-dialog.add-from-cloud .fm-header-buttons input::placeholder {
+    color: var(--surface-main-inverted);
+    opacity: 0.3;
 }
 .mega-dialog.add-from-cloud .fm-header-buttons.active-search input {
     border: 1px solid var(--stroke-grey-2);
-    background: var(--surface-grey-1);
+    background: var(--surface-grey-6);
+    border-radius: 50px;
 }
 .mega-dialog.add-from-cloud .fm-header-buttons i {
     display: block;
@@ -327,6 +332,9 @@ body.de .mega-dialog.new-group-chat {
     --icon-size: 24px;
     --mask-color: var(--icon-rest);
     cursor: pointer;
+}
+.mega-dialog.add-from-cloud .fm-header-buttons.active-search i {
+    --mask-color: var(--icon-inactive);
 }
 .mega-dialog.add-from-cloud .fm-header-buttons i.icon-preview-reveal {
     display: block;
@@ -528,9 +536,10 @@ body.de .mega-dialog.new-group-chat {
 .fm-picker-header {
     position: relative;
     height: 48px;
+    display: flex;
+    align-items: center;
 }
 .fm-picker-header .fm-header-buttons {
-    top: 5px;
     right: 5px;
     position: absolute;
 }

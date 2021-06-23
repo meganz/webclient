@@ -13666,6 +13666,151 @@ body.landscape .upload-overlay .mobile.filetype-img {
     transform: rotate(180deg) !important;
 }
 
+.cn .header .fm-header {
+    display: block !important;
+    width: 100%;
+}
+
+.dn .header .fm-header {
+    display: block !important;
+    width: 100%;
+}
+
+.copyrights-page .new-affiliate-label {
+    color: #858585;
+    float: left;
+    font-size: 14px;
+    line-height: 25px;
+    padding: 20px 18px 4px 0;
+    position: relative;
+}
+
+.copyrights-page .new-affiliate-star {
+    background-image: url(../images/mega/new-affiliate-sprite.png);
+    background-position: -1478px -1541px;
+    background-repeat: no-repeat;
+    height: 15px;
+    position: absolute;
+    right: 0;
+    width: 14px;
+}
+
+.copyrights-page .affiliate-select-txt {
+    color: #666;
+    font-size: 14px;
+    line-height: 26px;
+    padding-right: 23px;
+}
+
+.copyrights-page .affiliate-input-block {
+    background-color: white;
+    background-image: none;
+    background-position: 6px -73px;
+    background-repeat: no-repeat;
+    border: 1px solid #d9d9d9;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    margin-bottom: 0;
+    padding: 0 10px 0 10px;
+    position: relative;
+}
+.copyrights-page .affiliate-input-block.select {
+    background-image: url(../images/mega/new-affiliate-sprite.png);
+    background-position: right -1310px;
+    background-repeat: no-repeat;
+    overflow: hidden;
+    position: relative;
+    min-height: 30px;
+}
+
+.copyrights-page .affiliate-input-block.select select {
+    border: 0;
+    filter: progid:dximagetransform.microsoft.alpha(opacity=0);
+    height: 26px;
+    margin: 0;
+    -moz-opacity: 0;
+    -khtml-opacity: 0;
+    opacity: 0;
+    padding: 0;
+    position: absolute;
+    top: 0;
+    width: 100%;
+    z-index: 10;
+}
+
+.copyrights-page .affiliate-input-block textarea,
+.copyrights-page .affiliate-input-block input {
+    border: 0;
+    color: #666;
+    font-size: 13px;
+    line-height: 22px;
+    margin: 0;
+    padding: 0;
+    resize: none;
+    width: 100%;
+}
+
+.copyrights-page .active.copyrights-form.step2btn {
+    background-image: none;
+    margin-top: 24px;
+    width: 195px;
+}
+
+.copyrights-page .active:not(.backbtn) .register-st2-button-arrow {
+    background-color: #f0373b;
+}
+
+.copyrights-page .register-st2-button-arrow {
+    background-color: rgba(0, 0, 0, 0.05);
+    background-image: url(../images/mega/top-login-sprite.png);
+    background-position: right -662px;
+    background-repeat: no-repeat;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+    color: white;
+    font-size: 14px;
+    height: 40px;
+    line-height: 38px;
+    padding: 0 30px 0 15px;
+}
+
+.copyrights-page .reg-st5-complete-button.active.copyrights-form,
+.copyrights-page .copyrights-form.backbtn .register-st2-button-arrow {
+    background-color: #4c4c4c;
+    margin-top: 24px;
+}
+
+.copyrights-page .copyrights-form.backbtn .register-st2-button-arrow {
+    background-position: -28px -1197px;
+    padding: 0 15px 0 30px;
+}
+
+.copyrights-page .copyrights-form.backbtn {
+    background-image: none;
+    float: left;
+}
+
+.copyrights-page .copyrights-form.signbtn {
+    float: right;
+    margin-top: 24px;
+}
+
+.copyrights-gray .new-registration-checkbox {
+    margin-bottom: 24px;
+}
+.copyrights-gray .new-registration-checkbox .radio-txt {
+    padding: 0;
+}
+.copyrights-dispute-bottom {
+    background-color: unset;
+}
+
+
 /*
  * Retina Sprite for mobile
  * Please leave it on the bottom to make sure it override on Retina.

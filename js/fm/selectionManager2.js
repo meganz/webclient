@@ -741,6 +741,13 @@ class SelectionManager2_DOM extends SelectionManager2Base {
                     .replace('%3', itemsTotalSize);
             }
             this.showSelectionBar(notificationText);
+            if (M.currentdirid === 'shared') {
+                fm_resize_handler(); // Run custom resizing
+            }
+            else if (M.megaRender && M.megaRender.megaList) {
+                M.megaRender.megaList.resized();
+            }
+            this.scrollToElementProxyMethod(this.last_selected);
         }
     }
 

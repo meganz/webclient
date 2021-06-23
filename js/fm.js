@@ -3360,20 +3360,11 @@ function fm_resize_handler(force) {
 
     if (M.currentrootid === 'shares') {
         var $sharedDetailsBlock = $('.shared-details-block', '.fm-main');
-        var sharedDetailsHeight = Math.round($sharedDetailsBlock.outerHeight());
-        var sharedHeaderHeight = Math.round($('.shared-top-details').outerHeight());
-        var sharedBlockHeight = sharedDetailsHeight - sharedHeaderHeight;
+        var sharedHeaderHeight = Math.round($('.shared-top-details', $sharedDetailsBlock).outerHeight());
 
-        if ($sharedDetailsBlock.closest('.fm-main').hasClass('fm-notification')) {
-            sharedBlockHeight -= 24;
-        }
-
-        if (sharedBlockHeight > 0) {
-            $('.files-grid-view, .fm-blocks-view', $sharedDetailsBlock).css({
-                'height': sharedBlockHeight + "px",
-                'min-height': sharedBlockHeight + "px"
-            });
-        }
+        $('.files-grid-view, .fm-blocks-view', $sharedDetailsBlock).css({
+            'height': `calc(100% - ${sharedHeaderHeight}px)`,
+        });
     }
 
     if (d) {

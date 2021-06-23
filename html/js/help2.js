@@ -719,8 +719,10 @@ var Help = (function() {
         // Routing for short url help
         's': function shorturl(args) {
             if (args[1].length !== 24) {
-                loadSubPage('help');
-                return;
+                if (is_extension) {
+                    return loadSubPage('help');
+                }
+                location.replace('/help');
             }
 
             var article = idx.all.filter(function(doc) {
@@ -728,9 +730,14 @@ var Help = (function() {
             });
 
             var redirect = article[0] ? article[0].url : 'help';
-            loadSubPage(redirect);
-            mega.metatags.disableBots();
-            rerouted = true;
+            if (is_extension) {
+                loadSubPage(redirect);
+                mega.metatags.disableBots();
+                rerouted = true;
+            }
+            else {
+                location.replace('/' + redirect);
+            }
         }
     };
 

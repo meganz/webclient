@@ -5511,6 +5511,10 @@ tr:not(.taken-down) .grid-status-icon:not(.read-only):not(.read-and-write) {
     cursor: default;
 }
 
+.fm-files-search input::-webkit-input-placeholder {
+    opacity: 0.3;
+}
+
 /* Empty data blocks */
 .fm-empty-section,
 .fm-empty-sharef {

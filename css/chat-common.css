@@ -966,13 +966,13 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
 
 .chat-links-preview-desktop .chatlink-contents span {
     display: block;
-    color: rgba(102,102,102,1);
+    color: var(--text-color-medium);
     font-size: 16px;
     margin-top: 32px;
     margin-bottom: 24px;
 }
 .chat-links-preview-desktop .chatlink-contents h3 {
-    color: rgba(51,51,51,1);
+    color: var(--text-color-medium);
     font-size: 20px;
     font-weight: 500;
     letter-spacing: -0.52px;
@@ -982,7 +982,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
     margin-bottom: 6px;
 }
 .chat-links-preview-desktop .chatlink-contents h5 {
-    color: rgba(102,102,102,1);
+    color: var(--text-color-medium);
     font-size: 16px;
     font-weight: normal;
     letter-spacing: -0.18px;

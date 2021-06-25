@@ -925,7 +925,9 @@
 
             if (this._lastContentHeight !== this._calculated['contentHeight']) {
                 this._lastContentHeight = this._calculated['contentHeight'];
-                this.content.style.height = this._calculated['contentHeight'] + "px";
+                if (this.content.nodeName !== 'TBODY') {
+                    this.content.style.height = this._calculated['contentHeight'] + "px";
+                }
             }
 
             // scrolled out of the viewport if the last item in the list was removed? scroll back a little bit...
@@ -1335,7 +1337,7 @@
 
     MegaList.RENDER_ADAPTERS.Table.prototype._rendered = function() {
         var megaList = this.megaList;
-        megaList.content.style.height = megaList._calculated['contentHeight'] + "px";
+        // megaList.content.style.height = megaList._calculated['contentHeight'] + "px";
         Ps.update(megaList.listContainer);
     };
 

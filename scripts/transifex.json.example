@@ -5,5 +5,4 @@
     "ORGANISATION": "meganz-1",
     "PROJECT": "webclient-1",
     "RESOURCE": "prod",
-    "GITLAB_DEVELOP_STRINGS_URL": "https://code.developers.mega.co.nz/api/v4/projects/55/repository/files/lang%2Fstrings.json/raw?ref=develop"
 }

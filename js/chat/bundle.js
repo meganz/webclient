@@ -17021,14 +17021,14 @@ class conversationpanel_ConversationRightArea extends mixins["MegaRenderMixin"] 
       className: "dropdown info-txt"
     }, l[23753] ? l[23753] : "Send..."), external_React_default.a.createElement(ui_dropdowns["DropdownItem"], {
       className: "link-button",
-      icon: "sprite-fm-mono icon-cloud-drive",
+      icon: "sprite-fm-mono icon-cloud",
       label: l[19794] ? l[19794] : "My Cloud Drive",
       onClick: () => {
         self.props.onAttachFromCloudClicked();
       }
     }), external_React_default.a.createElement(ui_dropdowns["DropdownItem"], {
       className: "link-button",
-      icon: "sprite-fm-mono icon-pc",
+      icon: "sprite-fm-mono icon-session-history",
       label: l[19795] ? l[19795] : "My computer",
       onClick: () => {
         self.props.onAttachFromComputerClicked();
@@ -18638,7 +18638,7 @@ let conversationpanel_ConversationPanel = (conversationpanel_dec = utils["defaul
       className: "dropdown info-txt"
     }, l[23753] ? l[23753] : "Send..."), external_React_default.a.createElement(ui_dropdowns["DropdownItem"], {
       className: "link-button",
-      icon: "sprite-fm-mono icon-cloud-drive",
+      icon: "sprite-fm-mono icon-cloud",
       label: l[19794] ? l[19794] : "My Cloud Drive",
       onClick: () => {
         self.setState({
@@ -18647,14 +18647,14 @@ let conversationpanel_ConversationPanel = (conversationpanel_dec = utils["defaul
       }
     }), external_React_default.a.createElement(ui_dropdowns["DropdownItem"], {
       className: "link-button",
-      icon: "sprite-fm-mono icon-pc",
+      icon: "sprite-fm-mono icon-session-history",
       label: l[19795] ? l[19795] : "My computer",
       onClick: () => {
         self.uploadFromComputer();
       }
     }), external_React_default.a.createElement("hr", null), external_React_default.a.createElement(ui_dropdowns["DropdownItem"], {
       className: "link-button",
-      icon: "sprite-fm-mono icon-add-user",
+      icon: "sprite-fm-mono icon-send-contact",
       label: l[8628],
       onClick: () => {
         self.setState({

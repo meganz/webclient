@@ -18499,7 +18499,7 @@ let conversationpanel_ConversationPanel = (conversationpanel_dec = utils["defaul
     }, external_React_default.a.createElement(ui_buttons["Button"], {
       className: "right",
       disableCheckingVisibility: true,
-      icon: "sprite-fm-mono icon-info",
+      icon: "sprite-fm-mono icon-info-filled",
       onClick: () => room.megaChat.toggleUIFlag('convPanelCollapse')
     }), external_React_default.a.createElement(ui_buttons["Button"], {
       className: "\n                                    button\n                                    right\n                                    " + (startCallDisabled ? 'disabled' : '') + "\n                                ",

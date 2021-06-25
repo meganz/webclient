@@ -479,14 +479,14 @@ export class ConversationRightArea extends MegaRenderMixin {
                                     </div>
                                     <DropdownItem
                                         className="link-button"
-                                        icon="sprite-fm-mono icon-cloud-drive"
+                                        icon="sprite-fm-mono icon-cloud"
                                         label={l[19794] ? l[19794] : "My Cloud Drive"}
                                         onClick={() => {
                                             self.props.onAttachFromCloudClicked();
                                         }} />
                                     <DropdownItem
                                         className="link-button"
-                                        icon="sprite-fm-mono icon-pc"
+                                        icon="sprite-fm-mono icon-session-history"
                                         label={l[19795] ? l[19795] : "My computer"}
                                         onClick={() => {
                                             self.props.onAttachFromComputerClicked();
@@ -2349,14 +2349,14 @@ export class ConversationPanel extends MegaRenderMixin {
                                             </div>
                                             <DropdownItem
                                                 className="link-button"
-                                                icon="sprite-fm-mono icon-cloud-drive"
+                                                icon="sprite-fm-mono icon-cloud"
                                                 label={l[19794] ? l[19794] : "My Cloud Drive"}
                                                 onClick={(e) => {
                                                     self.setState({'attachCloudDialog': true});
                                             }} />
                                             <DropdownItem
                                                 className="link-button"
-                                                icon="sprite-fm-mono icon-pc"
+                                                icon="sprite-fm-mono icon-session-history"
                                                 label={l[19795] ? l[19795] : "My computer"}
                                                 onClick={(e) => {
                                                     self.uploadFromComputer();
@@ -2364,7 +2364,7 @@ export class ConversationPanel extends MegaRenderMixin {
                                             <hr />
                                             <DropdownItem
                                                 className="link-button"
-                                                icon="sprite-fm-mono icon-add-user"
+                                                icon="sprite-fm-mono icon-send-contact"
                                                 label={l[8628]}
                                                 onClick={(e) => {
                                                     self.setState({'sendContactDialog': true});

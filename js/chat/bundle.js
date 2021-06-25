@@ -11941,7 +11941,7 @@ class participantsList_ParticipantsListInner extends mixins["MegaRenderMixin"] {
           }, l[8868]));
           dropdowns.push(external_React_default.a.createElement(DropdownsUI.DropdownItem, {
             key: "privOperator",
-            icon: "sprite-fm-mono icon-admin",
+            icon: "sprite-fm-mono icon-admin-outline",
             label: l[8875],
             className: "tick-item " + (room.members[contactHash] === FULL ? "active" : ""),
             disabled: contactHash === u_handle,

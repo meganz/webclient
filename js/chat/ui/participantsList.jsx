@@ -238,7 +238,7 @@ class ParticipantsListInner extends MegaRenderMixin {
 
                     dropdowns.push(
                         <DropdownsUI.DropdownItem
-                            key="privOperator" icon="sprite-fm-mono icon-admin"
+                            key="privOperator" icon="sprite-fm-mono icon-admin-outline"
                             label={l[8875]}
                             className={"tick-item " + (room.members[contactHash] === FULL ? "active" : "")}
                             disabled={contactHash === u_handle}

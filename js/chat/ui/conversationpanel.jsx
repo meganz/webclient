@@ -2158,7 +2158,7 @@ export class ConversationPanel extends MegaRenderMixin {
                             <Button
                                 className="right"
                                 disableCheckingVisibility={true}
-                                icon="sprite-fm-mono icon-info"
+                                icon="sprite-fm-mono icon-info-filled"
                                 onClick={() => room.megaChat.toggleUIFlag('convPanelCollapse')} />
                             <Button
                                 className={`

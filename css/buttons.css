@@ -295,6 +295,10 @@ button:not(.mega-button) .icon {
 .conversationsApp .button:not(.disabled) > span {
 	cursor: pointer;
 }
+.top-menu-item.backup i,
+.account.left-pane.info-block.backup-button i {
+    --mask-color: var(--label-yellow);
+}
 .link-button.dropdown {
     align-items: center;
     border: none;

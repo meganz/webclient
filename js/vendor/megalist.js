@@ -315,7 +315,7 @@
 
         if (this._wasRendered) {
             this._contentUpdated();
-            this._applyDOMChanges();
+            this._applyDOMChanges(true);
         }
     };
 
@@ -329,7 +329,7 @@
 
         if (this._wasRendered) {
             this._contentUpdated();
-            this._applyDOMChanges();
+            this._applyDOMChanges(true);
         }
     };
 
@@ -944,10 +944,10 @@
      * of the viewport)
      * @private
      */
-    MegaList.prototype._applyDOMChanges = function() {
+    MegaList.prototype._applyDOMChanges = function(updated) {
         this._recalculate();
 
-        var contentWasUpdated = false;
+        var contentWasUpdated = updated || false;
 
         var first = this._calculated['visibleFirstItemNum'];
         var last = this._calculated['visibleLastItemNum'];

@@ -1865,12 +1865,15 @@ body.de .mega-dialog.new-group-chat {
         padding: 0 36px 6px 36px;
         float: left;
         width: auto;
+        opacity: 0.7;
     }
     .rtl .mega-dialog.export-links-dialog.embed header h2 {
         float: right;
     }
     .mega-dialog.export-links-dialog header h2.active {
         border-color: var(--stroke-info);
+        font: var(--text-h2-bold);
+        opacity: 1;
     }
     .mega-dialog.export-links-dialog.embed .options {
         padding-top: 10px;
@@ -2382,7 +2385,7 @@ body.de .mega-dialog.new-group-chat {
     .mega-dialog.export-links-dialog .embed-content .fm-subheading {
         margin-top: 20px;
         color: var(--text-color-medium);
-        font: var(--text-body1);
+        font: var(--text-body1-bold);
         -webkit-margin-start: 12px;
         margin-inline-start: 12px;
     }

@@ -419,6 +419,8 @@ body.de .mega-dialog.new-group-chat {
 .fm-dialog-table.grid-table {
     width: calc(100% - 16px);
     margin: 0 auto 0;
+    outline: var(--surface-main) solid 8px;
+    outline-offset: -8px;
 }
 .fm-dialog-table.grid-table td {
     display: flex;
@@ -459,7 +461,7 @@ body.de .mega-dialog.new-group-chat {
     width: calc(100% - 300px);
 }
 .fm-dialog-table.grid-table-header th:nth-child(2) {
-    width: calc(100% - 330px);
+    width: calc(100% - 300px);
 }
 .fm-dialog-table.grid-table-header th:nth-child(3), .fm-dialog-table.grid-table td:nth-child(3) {
     width: 95px;

@@ -578,7 +578,6 @@
 
     /**
      * Getting contacts and view them in copy dialog
-     * @param {Boolean} allowConversationTab if true then it means show Conversation Tab
      */
     var handleConversationTabContent = function _handleConversationTabContent() {
         var myChats = megaChat.chats;
@@ -887,20 +886,7 @@
         $.selected = $.selected || [];
 
         // check if we will enable conversation tab
-        var allowConversationTab = false;
-        if ($.dialog === 'copy' && $.selected.length) {
-            allowConversationTab = true;
-
-            for (var i = $.selected.length; i--;) {
-                var n = M.getNodeByHandle($.selected[i]);
-
-                if (n.t !== 0) {
-                    allowConversationTab = false;
-                    break;
-                }
-            }
-        }
-
+        var allowConversationTab = section === 'conversations' && $.dialog === 'copy' && $.selected.length;
         if (allowConversationTab || $.copyToUpload || $.saveToDialogNode) {
             $rubbishBin.addClass('hidden');
             $conversations.removeClass('hidden');

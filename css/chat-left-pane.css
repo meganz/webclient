@@ -1426,7 +1426,7 @@ li.active .call-duration i {
 @media only screen and (max-width: 1368px) and (min-width: 320px)  {
     .profile-shared-folders table.grid-table-header th.name,
     .profile-shared-folders table.shared-with-me td.name {
-        width: 150px;
+        width: 240px;
     }
     .profile-shared-folders table.grid-table-header th.name span,
     .profile-shared-folders table.shared-with-me td.name span {

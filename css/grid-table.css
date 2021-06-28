@@ -1009,6 +1009,10 @@ table.contacts tr.ui-selected .ustatus {
     table.shared-with-me td:nth-child(2) {
         width: 150px !important;
     }
+
+    .contacts-panel table.shared-with-me td:nth-child(2) {
+        width: 240px !important;
+    }
 }
 
 table.shared-with-me td {

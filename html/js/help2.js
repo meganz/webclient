@@ -575,7 +575,7 @@ var Help = (function() {
             }
             else if (args.length === 2) {
                 is_section = true;
-                if (location.hash) {
+                if (args[1].indexOf('#') > -1) {
                     var sec = args.pop();
                     sec = sec.substring(0, sec.indexOf('#'));
                     args.push(sec);

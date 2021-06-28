@@ -54,6 +54,10 @@ MegaData.prototype.accountData = function(cb, blockui, force) {
                         ctx.account.nextplan = res.nextplan;
                     }
 
+                    if (res.mxfer === undefined) {
+                        delete ctx.account.mxfer;
+                    }
+
                     // If a subscription, get the timestamp it will be renewed
                     if (res.stype === 'S') {
                         ctx.account.srenew = res.srenew;
@@ -152,16 +156,24 @@ MegaData.prototype.accountData = function(cb, blockui, force) {
             cb: cb,
             account: account,
             callback: function(res, ctx) {
+                let tmUpdate = false;
+                
                 if (typeof res === 'object') {
                     if (res.p) {
                         u_attr.p = res.p;
                         if (u_attr.p) {
-                            topmenuUI();
+                            tmUpdate = true;
+                        }
+                    }
+                    else {
+                        delete u_attr.p;
+                        if (pstatus) {
+                            tmUpdate = true;
                         }
                     }
                     if (res.b) {
                         u_attr.b = res.b;
-                        topmenuUI();
+                        tmUpdate = true;
                     }
                     if (res.uspw) {
                         u_attr.uspw = res.uspw;
@@ -191,6 +203,13 @@ MegaData.prototype.accountData = function(cb, blockui, force) {
                     ctx.account.justUpgraded = Date.now();
 
                     M.checkStorageQuota(2);
+
+                    // If pro status change is recognised revoke storage quota cache
+                    M.storageQuotaCache = null;        
+                }
+
+                if (tmUpdate) {
+                    topmenuUI();
                 }
 
                 if (uqres) {

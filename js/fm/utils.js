@@ -1790,11 +1790,19 @@ MegaUtils.prototype.checkGoingOverStorageQuota = function(opSize) {
 MegaUtils.prototype.checkLeftStorageBlock = async function(data) {
     'use strict';
 
+    const storageBlock = document.querySelector('.js-lp-storage-usage-block');
+
     if (!u_type || !fminitialized || this.storageQuotaCache) {
+
+        if (u_type === 0) {
+            storageBlock.classList.add('hidden');
+        }
+
         return false;
     }
 
-    const storageBlock = document.querySelector('.js-lp-storage-usage-block');
+    storageBlock.classList.remove('hidden');
+
     const loaderSpinner = storageBlock.querySelector('.loader');
 
     // minimize DOM ops when not needed by only triggering the loader if really needed

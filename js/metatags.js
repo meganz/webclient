@@ -608,7 +608,7 @@ mega.metatags = new function() {
             mTags.mega_desc = l[24022] || mTags.en_desc;
         }
         else if (page.substr(0, 11) === 'help/search') {
-            var term = ucFirst(page.substr(12));
+            var term = ucFirst(page.substr(12)).replace(/\+/g, ' ');
             mTags.en_title = term + ' - Search Help - MEGA';
             mTags.en_desc = 'MEGA\'s Search - Help Centre - ' + term;
             mTags.mega_title = l[24033].replace('$1', term).replace('$2', l[102]);

@@ -732,7 +732,6 @@ function init_page() {
     else if (page.substr(0, 5) === 'blog_' && page.length > 4 && page.length < 10) {
         blogid = page.substr(5, page.length - 2);
         page = 'blogarticle';
-        parsepage(pages['blogarticle']);
         init_blogarticle();
     }
     else if (page.substr(0, 4) == 'blog' && page.length > 4) {

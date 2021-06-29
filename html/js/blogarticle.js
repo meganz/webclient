@@ -2,18 +2,25 @@ function init_blogarticle() {
     if (blogposts === null) {
         return init_blog();
     }
-    parsepage(pages.blogarticle);
-
 
     if (!is_mobile) {
         blog_bind_search();
     }
 
     var post;
-    if (page === 'blogarticle') {
+
+    if (page === 'blogarticle' && blogid) {
         post = blogposts['post_' + blogid];
+        if (post && post.h) {
+            var blogURL = 'blog/' + urlFromTitle(post.h);
+            if (is_extension) {
+                return loadSubPage(blogURL);
+            }
+            location.replace(blogURL);
+        }
     }
     else if (page.substr(0, 5) === 'blog/') {
+        parsepage(pages.blogarticle);
         var postId = blogHeaders[page.substr(5)];
         if (postId) {
             blogid = postId.replace('post_', '');

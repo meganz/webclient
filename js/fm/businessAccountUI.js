@@ -1963,12 +1963,31 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = function () {
             $item.parent().addClass('correctinput');
         }
     };
-
+    const $saveButton = $('.saving-btn-profile', $profileContainer);
+    $saveButton.removeClass('active').addClass('disabled');
+    const changes = Object.create(null);
+    var checkChange = function(value, originalValue, key) {
+        if (value === originalValue) {
+            delete changes[key];
+        }
+        else {
+            changes[key] = true;
+        }
+        if (Object.keys(changes).length > 0) {
+            $saveButton.addClass('active').removeClass('disabled');
+        }
+        else {
+            $saveButton.removeClass('active').addClass('disabled');
+        }
+    };
     // Select country
     bindDropdownEvents($countriesSelect);
     $cCountryOption.addClass('active').attr('data-state', 'active');
     $('>span', $cCountrySelect).text($cCountryOption.text());
-
+    $countriesSelect.rebind('change.businessacc', (e) => {
+        checkChange($(e.target).attr('data-value'), cCountry, 'cCountry');
+        return false;
+    });
     inputs.forEach(function($input) {
         var megaInput = new mega.ui.MegaInputs($input);
         addCorrectValClass($input);
@@ -1977,11 +1996,20 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = function () {
         if (megaInput.updateTitle && ($input.is($cZipInput) || $input.is($cVatInput))) {
             megaInput.updateTitle();
         }
+        const origVal = $input.val();
+        $input.rebind('keyup.businessacc', () => {
+            checkChange($input.val().trim(), origVal, $input.attr('id'));
+            return false;
+        });
     });
 
-    $('.saving-btn-profile', $profileContainer).rebind(
+    $saveButton.rebind(
         'click.suba',
         function companyProfileSaveButtonClick() {
+            if ($saveButton.hasClass('disabled')) {
+                return;
+            }
+            $saveButton.removeClass('active').addClass('disabled');
             var attrsToChange = [];
             var valid = true;
             var isTaxChanged = false;
@@ -2054,6 +2082,7 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = function () {
 
             var settingResultHandler = function (st) {
                 if (st) {
+                    $saveButton.removeClass('active').addClass('disabled');
                     toaster.main.neutral(
                         l[19633],
                         'sprite-fm-uni icon-check',
@@ -2125,6 +2154,7 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = function () {
                     }
                 }
                 else {
+                    $saveButton.addClass('active').removeClass('disabled');
                     msgDialog('warningb', '', l[19528]);
                 }
             };
@@ -2132,6 +2162,9 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = function () {
             if (valid) {
                 var settingPromise = mySelf.business.updateBusinessAttrs(attrsToChange);
                 settingPromise.always(settingResultHandler);
+            }
+            else {
+                $saveButton.addClass('active').removeClass('disabled');
             }
         }
     );

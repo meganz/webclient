@@ -126,6 +126,7 @@ function bindDropdownEvents($select, saveOption, contentBlock) {
         $('.option', $select).removeClass('active').removeAttr('data-state');
         $this.addClass('active').attr('data-state', 'active');
         $('> span', $select).text($this.text());
+        $this.trigger('change');
 
         if (saveOption) {
             var nameLen = String($('#account-firstname').val() || '').trim().length;

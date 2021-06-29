@@ -130,15 +130,16 @@
     box-sizing: border-box;
     color: var(--text-color-white-high);
     font: var(--text-body1);
-    height: 18px;
-    line-height: 18px;
+    height: 14px;
+    line-height: 14px;
     margin: 0;
-    min-width: 18px;
-    padding: 0 3px;
+    min-width: 14px;
+    padding: 1px 4px 0;
     position: absolute;
     right: -3px;
     text-align: center;
     top: -3px;
+    font-size: 12px;
 }
 .conversations .conversations-head-buttons .notifications-count span {
     color: inherit;

@@ -141,7 +141,8 @@ export default class ContactsPanel extends MegaRenderMixin {
     }
 
     render() {
-        const receivedRequestsCount = this.getReceivedRequestsCount();
+        let receivedRequestsCount = this.getReceivedRequestsCount();
+        receivedRequestsCount = receivedRequestsCount > 9 ? "9+" : receivedRequestsCount;
         const { view } = this;
 
         return (
@@ -151,15 +152,16 @@ export default class ContactsPanel extends MegaRenderMixin {
                     receivedRequestsCount={receivedRequestsCount}
                 />
 
-                {view !== ContactsPanel.VIEW.PROFILE && (
+                {view !== ContactsPanel.VIEW.PROFILE &&
                     <div className="contacts-actions">
-                        {view === ContactsPanel.VIEW.RECEIVED_REQUESTS && receivedRequestsCount > 1 &&
-                        <button
-                            className="mega-button action"
-                            onClick={this.handleAcceptAllRequests}>
-                            <i className="sprite-fm-mono icon-check" />
-                            <span>{l[19062]}</span>
-                        </button>
+                        {view === ContactsPanel.VIEW.RECEIVED_REQUESTS && (receivedRequestsCount > 1 ||
+                            receivedRequestsCount === "9+") &&
+                            <button
+                                className="mega-button action"
+                                onClick={this.handleAcceptAllRequests}>
+                                <i className="sprite-fm-mono icon-check" />
+                                <span>{l[19062]}</span>
+                            </button>
                         }
                         <button
                             className="mega-button action"
@@ -168,7 +170,7 @@ export default class ContactsPanel extends MegaRenderMixin {
                             <span>{l[71]}</span>
                         </button>
                     </div>
-                )}
+                }
 
                 <div className="contacts-content">
                     {this.renderView()}

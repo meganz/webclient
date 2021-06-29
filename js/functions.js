@@ -267,6 +267,7 @@ function updateIpcRequests() {
     var ipcLength = Object.keys(M.ipc).length;
 
     if (ipcLength) {
+        ipcLength = ipcLength > 9 ? "9+" : ipcLength;
         $indicator.removeClass('hidden').text(ipcLength);
         $contactTab.addClass('filled').find('span').text(ipcLength);
     }

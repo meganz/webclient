@@ -19488,7 +19488,7 @@ class navigation_Navigation extends mixins["MegaRenderMixin"] {
           }
         }, external_React_default.a.createElement("button", {
           className: "\n                                        mega-button\n                                        action\n                                        " + activeClass + "\n                                    "
-        }, external_React_default.a.createElement("span", null, contactsPanel_ContactsPanel.LABEL[key]), receivedRequestsCount > 0 && VIEW[key] === VIEW.RECEIVED_REQUESTS && external_React_default.a.createElement("div", {
+        }, external_React_default.a.createElement("span", null, contactsPanel_ContactsPanel.LABEL[key]), (receivedRequestsCount > 0 || receivedRequestsCount === "9+") && VIEW[key] === VIEW.RECEIVED_REQUESTS && external_React_default.a.createElement("div", {
           className: "notifications-count ipc-count"
         }, receivedRequestsCount)));
       }
@@ -20774,7 +20774,8 @@ class contactsPanel_ContactsPanel extends mixins["MegaRenderMixin"] {
   }
 
   render() {
-    const receivedRequestsCount = this.getReceivedRequestsCount();
+    let receivedRequestsCount = this.getReceivedRequestsCount();
+    receivedRequestsCount = receivedRequestsCount > 9 ? "9+" : receivedRequestsCount;
     const {
       view
     } = this;
@@ -20785,7 +20786,7 @@ class contactsPanel_ContactsPanel extends mixins["MegaRenderMixin"] {
       receivedRequestsCount: receivedRequestsCount
     }), view !== contactsPanel_ContactsPanel.VIEW.PROFILE && external_React_default.a.createElement("div", {
       className: "contacts-actions"
-    }, view === contactsPanel_ContactsPanel.VIEW.RECEIVED_REQUESTS && receivedRequestsCount > 1 && external_React_default.a.createElement("button", {
+    }, view === contactsPanel_ContactsPanel.VIEW.RECEIVED_REQUESTS && (receivedRequestsCount > 1 || receivedRequestsCount === "9+") && external_React_default.a.createElement("button", {
       className: "mega-button action",
       onClick: this.handleAcceptAllRequests
     }, external_React_default.a.createElement("i", {
@@ -21308,7 +21309,7 @@ class conversations_ConversationsHead extends mixins["MegaRenderMixin"] {
       showTopButtons,
       showAddContact
     } = this.props;
-    const RECEIVED_REQUESTS_COUNT = Object.keys(M.ipc).length;
+    const RECEIVED_REQUESTS_COUNT = Object.keys(M.ipc).length > 9 ? "9+" : Object.keys(M.ipc).length;
     const ROUTES = {
       CHAT: 'fm/chat',
       CONTACTS: 'fm/chat/contacts'
@@ -21321,7 +21322,7 @@ class conversations_ConversationsHead extends mixins["MegaRenderMixin"] {
     }, conversations_React.createElement("div", {
       className: "contacts-toggle"
     }, conversations_React.createElement(ui_buttons["Button"], {
-      className: "\n                                mega-button\n                                round\n                                branded-blue\n                                contacts-toggle-button\n                                " + (contactsActive ? 'active' : '') + "\n                                " + (RECEIVED_REQUESTS_COUNT > 0 ? 'requests' : '') + "\n                            ",
+      className: "\n                                mega-button\n                                round\n                                branded-blue\n                                contacts-toggle-button\n                                " + (contactsActive ? 'active' : '') + "\n                                " + (RECEIVED_REQUESTS_COUNT > 0 || RECEIVED_REQUESTS_COUNT === "9+" ? 'requests' : '') + "\n                            ",
       icon: "\n                                sprite-fm-mono\n                                icon-contacts\n                                " + (CONTACTS_ACTIVE ? '' : 'active') + "\n                            ",
       onClick: () => loadSubPage(CONTACTS_ACTIVE ? ROUTES.CHAT : ROUTES.CONTACTS)
     }, RECEIVED_REQUESTS_COUNT ? conversations_React.createElement("div", {

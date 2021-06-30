@@ -44,7 +44,7 @@
     "@babel/plugin-proposal-class-properties": "7.14.5",
     "@babel/plugin-proposal-decorators": "7.14.5",
     "@babel/plugin-transform-runtime": "7.14.5",
-    "@babel/preset-env": "7.14.5",
+    "@babel/preset-env": "7.14.7",
     "@babel/preset-react": "7.14.5",
     "@babel/runtime": "7.14.6",
     "@lodder/grunt-postcss": "3.0.1",
@@ -66,7 +66,7 @@
     "webpack-cli": "3.3.12"
   },
   "devDependencies": {
-    "@babel/eslint-parser": "7.14.5",
+    "@babel/eslint-parser": "7.14.7",
     "chai": "4.3.4",
     "eslint": "7.29.0",
     "eslint-plugin-compat": "3.9.0",

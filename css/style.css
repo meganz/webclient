@@ -272,10 +272,10 @@ div:not(.grid-table-header-container-sc) > .grid-table-header::after,
 .transfer-table-header::after,
 .contact-top-details::after {
     content: '';
-    width: 100%;
+    width: calc(100% - 16px);
     height: 1px;
     bottom: 0;
-    left: 0;
+    left: 8px;
     background-color: rgba(0,0,0,0.1);
     position: absolute;
 }

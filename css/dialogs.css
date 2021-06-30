@@ -419,6 +419,8 @@ body.de .mega-dialog.new-group-chat {
 .fm-dialog-table.grid-table {
     width: calc(100% - 16px);
     margin: 0 auto 0;
+    outline: var(--surface-main) solid 8px;
+    outline-offset: -8px;
 }
 .fm-dialog-table.grid-table td {
     display: flex;
@@ -459,7 +461,7 @@ body.de .mega-dialog.new-group-chat {
     width: calc(100% - 300px);
 }
 .fm-dialog-table.grid-table-header th:nth-child(2) {
-    width: calc(100% - 330px);
+    width: calc(100% - 300px);
 }
 .fm-dialog-table.grid-table-header th:nth-child(3), .fm-dialog-table.grid-table td:nth-child(3) {
     width: 95px;
@@ -1865,12 +1867,15 @@ body.de .mega-dialog.new-group-chat {
         padding: 0 36px 6px 36px;
         float: left;
         width: auto;
+        opacity: 0.7;
     }
     .rtl .mega-dialog.export-links-dialog.embed header h2 {
         float: right;
     }
     .mega-dialog.export-links-dialog header h2.active {
         border-color: var(--stroke-info);
+        font: var(--text-h2-bold);
+        opacity: 1;
     }
     .mega-dialog.export-links-dialog.embed .options {
         padding-top: 10px;
@@ -2382,7 +2387,7 @@ body.de .mega-dialog.new-group-chat {
     .mega-dialog.export-links-dialog .embed-content .fm-subheading {
         margin-top: 20px;
         color: var(--text-color-medium);
-        font: var(--text-body1);
+        font: var(--text-body1-bold);
         -webkit-margin-start: 12px;
         margin-inline-start: 12px;
     }
@@ -3119,6 +3124,7 @@ body.de .mega-dialog.new-group-chat {
         margin-inline-start: 8px;
         --icon-size: 24px;
         position: absolute;
+        --mask-color: var(--icon-rest);
     }
     .mega-dialog.fm-picker-dialog .dialog-button-container {
         height: 56px;
@@ -3185,9 +3191,9 @@ body.de .mega-dialog.new-group-chat {
         color: var(--text-color-high);
     }
     .mega-dialog.fm-picker-dialog .summary-input.high-light {
-        background: var(--banner-background-info);
-        box-shadow: 0 0 0 1px var(--banner-border-info);
-        color: var(--banner-text-info);
+        background: var(--surface-grey-6);
+        box-shadow: 0 0 0 1px var(--stroke-grey-6);
+        color: var(--text-color-low);
     }
     .mega-dialog.fm-picker-dialog .summary-input #f-name-input {
         border: none;

@@ -73,6 +73,9 @@
     display: flex;
     flex-direction: column;
 }
+.lp-myfiles .storage-usage-panel.hidden {
+    display: none;
+}
 .lp-myfiles .storage-usage-panel .title-block {
     display: flex;
     justify-content: space-between;

@@ -172,6 +172,7 @@ html .theme-light-forced {
         --stroke-main: #fff;
         --stroke-grey-1: #fafafa;
         --stroke-grey-2: #eee;
+        --stroke-grey-6: #eee;
         --stroke-info: #2ba6de;
         --stroke-success: #00bfa5;
         --stroke-warning: #ff9924;
@@ -371,6 +372,7 @@ html .theme-dark-forced {
         --stroke-main: #333;
         --stroke-grey-1: #222;
         --stroke-grey-2: #444;
+        --stroke-grey-6: #000;
         --stroke-info: #6fd7ff;
         --stroke-success: #5afee8;
         --stroke-warning: #fec35a;

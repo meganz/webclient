@@ -732,7 +732,6 @@ function init_page() {
     else if (page.substr(0, 5) === 'blog_' && page.length > 4 && page.length < 10) {
         blogid = page.substr(5, page.length - 2);
         page = 'blogarticle';
-        parsepage(pages['blogarticle']);
         init_blogarticle();
     }
     else if (page.substr(0, 4) == 'blog' && page.length > 4) {
@@ -1190,7 +1189,17 @@ function init_page() {
             $('.contact-new-title.' + link).parent().get(0).scrollIntoView({behavior: "smooth"});
         });
     }
-    else if (page.substr(0, 4) == 'help') {
+    else if (page.substr(0, 4) === 'help') {
+        var urlParts = page.split('/');
+        if (urlParts[1] === 'client' && urlParts.length === 5) {
+            var lastSlash = page.lastIndexOf('/');
+            var newPage = '/' + page.substr(0, lastSlash) + '#' + page.substr(lastSlash + 1);
+            if (is_extension) {
+                return loadSubPage(newPage);
+
+            }
+            location.replace(newPage);
+        }
         return Help.render();
     }
     else if (page === 'privacy') {
@@ -1440,19 +1449,8 @@ function init_page() {
         init_blog();
         api_req({ a: 'log', e: 99740, m: window.u_handle || 'visitor' });
     }
-    else if (is_mobile && (page === 'copyright' || page === 'copyrightnotice')) {
-
-        // Show message that the copyright takedown should be submitted in a desktop browser
-        mobile.initDOM();
-        mobile.messageOverlay.show(l[621], l[19628]).always(function() {
-
-            // On clicking OK in the dialog, go to the file manager if logged in, or start page if not
-            loadSubPage(u_type === 3 ? 'fm' : 'start');
-        });
-        return false;
-    }
     else if (page === 'copyrightnotice') {
-        parsepage(pages['copyrightnotice']);
+        parsepage(is_mobile ? pages.mobile : pages.copyrightnotice);
         copyright.init_cn();
     }
     else if (page === 'copyright') {
@@ -1461,17 +1459,8 @@ function init_page() {
             loadSubPage('copyrightnotice');
         });
     }
-    else if (is_mobile && page === 'disputenotice') {
-        // Show message that the copyright counter-notification should be submitted in a desktop browser
-        mobile.initDOM();
-        mobile.messageOverlay.show(l[621], l[24738]).always(function() {
-            // On clicking OK in the dialog, go to the file manager if logged in, or start page if not
-            loadSubPage(u_type === 3 ? 'fm' : 'start');
-        });
-        return false;
-    }
     else if (page === 'disputenotice') {
-        parsepage(pages['disputenotice']);
+        parsepage(is_mobile ? pages.mobile : pages.disputenotice);
         copyright.init_cndispute();
     }
     else if (page === 'dispute') {

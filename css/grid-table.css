@@ -324,14 +324,13 @@ table tr.ui-selected .link-transfer-status {
     position: absolute;
 }
 
-/* TODO: fix the margin after release */
 .grid-table-header {
     width: 100%;
     background-color: var(--surface-main);
     position: relative;
     font-size: 0;
     white-space: nowrap;
-    margin: 10px 16px 0;
+    padding: 10px 16px 0;
 }
 
 .rtl .grid-table-header {
@@ -1008,6 +1007,10 @@ table.contacts tr.ui-selected .ustatus {
 @media only screen and (max-width: 1368px) and (min-width: 320px)  {
     table.shared-with-me td:nth-child(2) {
         width: 150px !important;
+    }
+
+    .contacts-panel table.shared-with-me td:nth-child(2) {
+        width: 240px !important;
     }
 }
 

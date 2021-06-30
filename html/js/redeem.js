@@ -47,7 +47,7 @@ var redeem = {
                 // business user
 
                 msgDialog(
-                    'warninga',
+                    'error',
                     l[1578],
                     l[22888],
                     '',

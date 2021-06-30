@@ -15,6 +15,8 @@ function dashboardUI() {
         return false;
     }
 
+    loadingDialog.show('loadDashboard');
+
     $('.fm-right-files-block, .section.conversations, .fm-right-account-block').addClass('hidden');
     $('.fm-right-block.dashboard').removeClass('hidden');
 
@@ -27,7 +29,6 @@ function dashboardUI() {
     }
 
     M.onSectionUIOpen('dashboard');
-    accountUI.general.userUIUpdate();
 
     if (u_attr && u_attr.b) {
         $('.fm-right-block.dashboard .non-business-dashboard').addClass('hidden');
@@ -105,6 +106,9 @@ function dashboardUI() {
     // Account data
     /* eslint-disable-next-line complexity */
     M.accountData(function(account) {
+
+        loadingDialog.hide('loadDashboard');
+        accountUI.general.userUIUpdate();
 
         // Display welcome message
         if (u_attr.firstname) {

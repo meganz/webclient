@@ -3244,8 +3244,8 @@
         "string": "Account number:"
     },
     "6203": {
-        "developer_comment": "The SWIFT code e.g. SCBLSGSG for the wire transfer section on the resellers page.",
-        "string": "SWIFT code:"
+        "developer_comment": "The BIC / SWIFT code e.g. SCBLSGSG for the wire transfer section on the resellers page.",
+        "string": "BIC / SWIFT code:"
     },
     "6205": {
         "developer_comment": "The Reference text e.g. person@gmail.com as a note for the receiver of a  wire transfer.",
@@ -4885,7 +4885,7 @@
     },
     "8671": {
         "developer_comment": "A note on the wire transfer dialog.",
-        "string": "European countries have adopted a standard known as an International Bank Account Number (IBAN). New Zealand has not adopted this standard, so if you need to enter an IBAN please send the funds to our Spanish account."
+        "string": "European countries have adopted a standard known as an International Bank Account Number (IBAN). New Zealand banks have not adopted this standard yet. If you need to enter an IBAN, please send the funds to our TransferWise account."
     },
     "8674": {
         "developer_comment": "Web client, title text shown when no search results are available.",
@@ -6265,7 +6265,7 @@
     },
     "16283": {
         "developer_comment": "%1 and %2 would be replaced with amounts, for example \u201c20 GB\u201d and %3 would be replaced with a numeric value which represents the number of days.",
-        "string": "Invite as many friends or coworkers as you want. For every signup under the invited email address, you will receive %1 of complimentary storage plus %2 of transfer quota, both valid for %3 days, provided that the new user installs either MEGA desktop app or a mobile app and starts using MEGA."
+        "string": "Invite as many friends or coworkers as you want. For every signup under the invited email address, you will receive %1 of complimentary storage valid for 365 days, provided the new user installs either the MEGA Desktop App or a MEGA Mobile App and starts using MEGA."
     },
     "16284": {
         "developer_comment": "",
@@ -6741,7 +6741,7 @@
     },
     "16552": {
         "developer_comment": "Android feature description",
-        "string": "Upload all your photos and videos securely for backup & sharing directly from within MEGA."
+        "string": "Securely upload all your photos and videos to MEGA to back them up and share. "
     },
     "16553": {
         "developer_comment": "",
@@ -6837,7 +6837,7 @@
     },
     "16577": {
         "developer_comment": "Android feature description",
-        "string": "Upload all your photos and videos securely for backup & sharing directly from within MEGA."
+        "string": "Securely upload all your photos and videos to MEGA to back them up and share. "
     },
     "16578": {
         "developer_comment": "",
@@ -7817,7 +7817,7 @@
     },
     "17793": {
         "developer_comment": "Message shown to Chrome users when running out of disk space when attempting to download something.",
-        "string": "Unfortunately, Chrome only allows MEGA to use a part of your available disk space which is currently insufficient. Please install the [A1]MEGA desktop app[/A1] or our [A2]Chrome Extension[/A2], or try to [A3]free up some space[/A3]."
+        "string": "Insufficient disk space for MEGA running in Chrome. Please install the [A1]MEGA Desktop App[/A1] or our [A2]Chrome Extension[/A2]. Alternatively, try to [A3]free up some disk space[/A3]."
     },
     "17794": {
         "developer_comment": "Initialising status which appears at the beginning of downloading a file through MEGAsync via a public file link.",
@@ -10893,7 +10893,7 @@
     },
     "19684": {
         "developer_comment": "Description on the MEGA Mobile App product page",
-        "string": "We also provide support for Windows Phone 8 and Windows 10 devices including mobiles, tablets & desktops."
+        "string": "We also support Microsoft Windows 10."
     },
     "19685": {
         "developer_comment": "Heading on the MEGA Mobile App product page",
@@ -10937,7 +10937,7 @@
     },
     "19697": {
         "developer_comment": "Description on the MEGA Mobile App product page",
-        "string": "Our UWP app works on all Windows 10 platforms. It allows you to securely store and share your files, including the ability to automatically upload photos & videos you take, and store files offline."
+        "string": "Our UWP app works on all Windows 10 platforms. It allows you to securely store and share your files, and automatically upload photos and videos you take, with offline access to them."
     },
     "19698": {
         "developer_comment": "Description on the MEGA Mobile App product page",
@@ -11013,7 +11013,7 @@
     },
     "19717": {
         "developer_comment": "Tab\u2019s content in business account product page",
-        "string": "Chat support across web browsers, mobiles and tablets allowing you to chat with your team about that upcoming deadline or getting feedback from a colleague on the latest proposal you shared with them."
+        "string": "Chat with your team using web browsers, smartphones and tablets about that upcoming deadline, or get feedback from colleagues on your latest proposal."
     },
     "19718": {
         "developer_comment": "Tab\u2019s title in business account product page",
@@ -11777,7 +11777,7 @@
     },
     "20137": {
         "developer_comment": "This body text is to encourage users to download the app on the mobile webclient.",
-        "string": "The MEGA mobile app provides powerful end-to-end encrypted features, such as automatic camera uploads, text chat & audio/video calls. [A]Learn more[/A]"
+        "string": "The MEGA Mobile App provides powerful end-to-end encrypted features, such as automatic camera uploads, text chat and audio and video calls. [A]Learn more[/A]"
     },
     "20138": {
         "developer_comment": "a title in business account for daily transfer usage of the account",
@@ -17641,7 +17641,7 @@
     },
     "24674": {
         "developer_comment": "Error message shown to users trying to activate a discount code",
-        "string": "There was an issue while trying to activate your discount code. Please try again later. If the issue persists, you may contact our support team at support@mega.nz."
+        "string": "There was an issue activating your discount code. Please try again later. If the issue persists, contact our support team at support@mega.nz for assistance."
     },
     "24675": {
         "developer_comment": "Error message shown to users trying to activate a discount code",

@@ -364,7 +364,7 @@
 
             if (requiresRerender) {
                 this._repositionRenderedItems();
-                this._applyDOMChanges();
+                this._applyDOMChanges(true);
 
             }
         }
@@ -925,9 +925,7 @@
 
             if (this._lastContentHeight !== this._calculated['contentHeight']) {
                 this._lastContentHeight = this._calculated['contentHeight'];
-                if (this.content.nodeName !== 'TBODY') {
-                    this.content.style.height = this._calculated['contentHeight'] + "px";
-                }
+                this.content.style.height = this._calculated['contentHeight'] + "px";
             }
 
             // scrolled out of the viewport if the last item in the list was removed? scroll back a little bit...
@@ -942,12 +940,12 @@
     /**
      * Internal method, that get called when DOM changes should be done (e.g. render new items since they got in/out
      * of the viewport)
+     *
+     * @var {bool} [contentWasUpdated] pass true to force dimension related updates
      * @private
      */
     MegaList.prototype._applyDOMChanges = function(updated) {
         this._recalculate();
-
-        var contentWasUpdated = updated || false;
 
         var first = this._calculated['visibleFirstItemNum'];
         var last = this._calculated['visibleLastItemNum'];
@@ -1337,7 +1335,7 @@
 
     MegaList.RENDER_ADAPTERS.Table.prototype._rendered = function() {
         var megaList = this.megaList;
-        // megaList.content.style.height = megaList._calculated['contentHeight'] + "px";
+        megaList.content.style.height = megaList._calculated['contentHeight'] + "px";
         Ps.update(megaList.listContainer);
     };
 

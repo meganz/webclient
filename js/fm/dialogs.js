@@ -296,7 +296,7 @@
             placeholder.classList.add('high-light');
             placeholder.classList.remove('correct-input');
             const filetypeIcon = placeholder.querySelector('.target-icon');
-            filetypeIcon.classList.remove('icon-chat-filled', 'icon-folder-24', 'sprite-fm-uni', 'sprite-fm-mono');
+            filetypeIcon.classList.remove('icon-chat-filled', 'icon-folder-filled', 'sprite-fm-uni', 'sprite-fm-mono');
             filetypeIcon.classList.add(
                 'sprite-fm-mono', 
                 section === 'conversations' ? 'icon-chat-filled' : 'icon-folder-filled'

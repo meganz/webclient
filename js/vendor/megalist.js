@@ -944,7 +944,7 @@
      * @var {bool} [contentWasUpdated] pass true to force dimension related updates
      * @private
      */
-    MegaList.prototype._applyDOMChanges = function(updated) {
+    MegaList.prototype._applyDOMChanges = function(contentWasUpdated) {
         this._recalculate();
 
         var first = this._calculated['visibleFirstItemNum'];

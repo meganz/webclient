@@ -31,16 +31,12 @@ base_url = None
 organisation_id = None
 project_id = None
 resource_slug = None
-gitlab_develop_url = None
 transifex_token = None
-gitlab_token = None
 
 base_url = os.getenv('TRANSIFEX_BASE_URL')
 organisation_id = os.getenv('TRANSIFEX_ORGANISATION')
 project_id = os.getenv('TRANSIFEX_PROJECT')
 resource_slug = os.getenv('TRANSIFEX_RESOURCE')
-gitlab_develop_url = os.getenv('GITLAB_DEVELOP_STRINGS_URL')
-gitlab_token = os.getenv('GITLAB_TOKEN')
 transifex_token = os.getenv('TRANSIFEX_TOKEN')
 
 config_file = os.path.join(os.path.dirname(os.path.realpath(__file__)), "transifex.json")
@@ -57,18 +53,14 @@ if os.path.exists(config_file):
     organisation_id = transifex_config.get('ORGANISATION') or organisation_id
     project_id = transifex_config.get('PROJECT') or project_id
     resource_slug = transifex_config.get('RESOURCE') or resource_slug
-    gitlab_develop_url = transifex_config.get('GITLAB_DEVELOP_STRINGS_URL') or gitlab_develop_url
-    gitlab_token = transifex_config.get('GITLAB_TOKEN') or gitlab_token
     transifex_token = transifex_config.get('TRANSIFEX_TOKEN') or transifex_token
 
-if not base_url or not organisation_id or not project_id or not resource_slug or not gitlab_develop_url or not transifex_token:
+if not base_url or not organisation_id or not project_id or not resource_slug or not transifex_token:
      print("ERROR: Incomplete Transifex settings.")
      sys.exit(1)
 
 BASE_URL = base_url
 RESOURCE = resource_slug
-GITLAB_DEVELOP_STRINGS_URL = gitlab_develop_url
-GITLAB_TOKEN = gitlab_token
 PROJECT_ID = "o:" + organisation_id + ":p:" + project_id
 HEADER = {
     "Authorization": "Bearer " + transifex_token,
@@ -139,12 +131,8 @@ def natural_sort(a,b):
         return 0
 
 def create_file(language, content, is_prod = False):
-    if language == "strings" and is_prod:
-        return
     for key, data in content.items():
-        if language == "strings":
-            content[key]['string'] = sanitise_string(data['string'], True, False)
-        elif language == "en":
+        if language == "en":
             content[key] =  sanitise_string(data['string'], True, True)
         else:
             content[key] =  sanitise_string(data['string'], False, True)
@@ -175,7 +163,7 @@ def prepare_english_string(resource):
             "type": "resource_strings_async_downloads"
         }
     }
-    return {'strings': {'url': url, 'payload': payload}}
+    return {'en': {'url': url, 'payload': payload}}
 
 def prepare_translation_string(resource, lang):
     language_strings = {}
@@ -254,7 +242,7 @@ def download_languages(resource, lang = []):
             content = json.loads(response.read().decode('utf8'))
             if content['data']['attributes']['status'] == 'failed':
                 print_error(content['data']['attributes']['errors'])
-                return
+                return False
             else:
                 download_link = content['data']['links']['self']
                 opener = build_opener(NoRedirect)
@@ -265,6 +253,10 @@ def download_languages(resource, lang = []):
                     try:
                         status_request = Request(download_link, headers=HEADER)
                         status_response = urlopen(status_request)
+                        content = json.loads(status_response.read().decode('utf8'))
+                        if content['data']['attributes']['status'] == 'failed':
+                            print_error(content['data']['attributes']['errors'])
+                            return False
                     except HTTPError as e:
                         if e.code == 303:
                             download_response = urlopen(e.headers['Location'])
@@ -293,13 +285,27 @@ def download_languages(resource, lang = []):
 
     return languages
 
-def get_branch_resource_name(is_upload = False, is_force = False):
+def get_branch_resource_name(is_upload = False, is_force = False, is_override = False):
     branch_name = subprocess.check_output(['git', 'symbolic-ref', '--short','-q','HEAD'], universal_newlines=True).strip()
+    branch_resource_name =  RESOURCE + "-" + re.sub('[^A-Za-z0-9]+', '', branch_name)
     if branch_name in ["master", "develop"]:
         if is_upload:
-            print("ERROR: Updating string is not allowed in this branch.")
-        return False
-    branch_resource_name =  RESOURCE + "-" + re.sub('[^A-Za-z0-9]+', '', branch_name)
+            if is_override:
+                version = sys.version_info.major
+                input_note = "WARNING: This command will update main resource file. Type \"YES\" to proceed: "
+                if version == 2:
+                    user_input = raw_input(input_note)
+                else:
+                    user_input = input(input_note)
+                if user_input == "YES":
+                    branch_resource_name = "prod"
+                else:
+                    return "skip_override"
+            else:
+                print("ERROR: Updating string is not allowed in this branch.")
+                return "not_allowed"
+        else:
+            return False
     url = BASE_URL + "/resources/" + PROJECT_ID + ":r:" + branch_resource_name
     request = Request(url, headers=HEADER)
     try:
@@ -322,7 +328,7 @@ def get_branch_resource_name(is_upload = False, is_force = False):
                 else:
                     user_input = input(input_note)
                 if user_input != "YES":
-                    return True
+                    return "skip_force"
             print("Creating new resource... ")
             sys.stdout.flush()
             url = BASE_URL + "/resources"
@@ -428,45 +434,26 @@ def validate_strings(key_value_pairs):
         sys.exit(1)
     return strings
 
-def get_differences():
-    new_strings_found = {}
-    if not GITLAB_TOKEN:
-        print("GITLAB_TOKEN is not set.")
-        sys.exit(1)
+def get_update(filename):
+    new_strings = False
     try:
-        new_file = open(os.path.dirname(os.path.abspath(__file__)) + "/../lang/strings.json", "r")
+        new_file = open(filename, "r")
         new_strings = json.loads(new_file.read(), object_pairs_hook=validate_strings)
         new_file.close()
     except IOError:
-        print("ERROR: File not found.")
-        sys.exit(1)
+        print("ERROR: File {} not found.".format(filename))
+        return False
 
-    gitlab_header = {'Private-Token': GITLAB_TOKEN}
-    request = Request(GITLAB_DEVELOP_STRINGS_URL, headers=gitlab_header)
-    try:
-        response = urlopen(request)
-        current_strings = json.loads(response.read())
-    except HTTPError as e:
-        if e.code == 401:
-            print("ERROR: Invalid GitLab Token credentials.")
-        else:
-            print("ERROR: Cannot fetch strings.json from GitLab.")
-        sys.exit(1)
-
-    for new_key in new_strings:
-        if new_key not in current_strings or new_strings[new_key]['string'] != current_strings[new_key]['string'] or new_strings[new_key]['developer_comment'] != current_strings[new_key]['developer_comment']:
-            new_strings_found[new_key] = new_strings[new_key]
-
-    if new_strings_found:
+    if new_strings:
         print("New string(s) file found! Checking validity...")
-        if not string_validation(new_strings_found):
+        if not string_validation(new_strings):
             print("ERROR: Invalid new string(s).")
             sys.exit(1)
         else:
             print("New strings are valid! :)")
-            return new_strings_found
+            return new_strings
     else:
-        print("No changes found in strings.json")
+        print("No new strings found.")
         return False
 
 def main():
@@ -477,8 +464,9 @@ def main():
 
     parser = argparse.ArgumentParser()
     parser.add_argument("-p", "--production", nargs="?", help="Create production language files", const=True, default=False)
-    parser.add_argument("-l", "--language", nargs="+", help="Select several languages to fetch in comma separated value. (Use Webclient's language code)")
-    parser.add_argument("-u", "--update", nargs="*", help="Parse strings.json and update branch resource file", type=str)
+    parser.add_argument("-l", "--language", nargs=1, help="Select several languages to fetch in comma separated value. (Use Webclient's language code)")
+    parser.add_argument("-u", "--update", nargs="?", help="Parse new strings in a JSON file and update branch resource file", type=str, const="update")
+    parser.add_argument("-fp", "--filepath", nargs="?", help="Custom file path for updating resource file", type=str)
     args = parser.parse_args()
     if args.production:
         is_prod = args.production
@@ -490,15 +478,36 @@ def main():
             sys.exit(1)
     elif args.update != None:
         print("~ Import started ~")
-        new_strings = get_differences()
-        is_force = not new_strings and len(args.update) > 0 and args.update[0] == "force"
+        filepath = os.path.dirname(os.path.abspath(__file__)) + "/../lang/strings.json"
+        if args.filepath != None:
+            filepath = args.filepath
+        is_force = args.update == "force"
+        is_override = args.update == "override_production"
+
+        new_strings = get_update(filepath)
+        if new_strings:
+            is_force = False
+
         if new_strings or is_force:
-            branch_resource_name = get_branch_resource_name(True, is_force)
-            if not branch_resource_name:
+            branch_resource_name = get_branch_resource_name(True, is_force, is_override)
+            if branch_resource_name in ["skip_force", "skip_override", "not_allowed"]:
+                branch_resource_name = False
+            elif not branch_resource_name:
                 print("Failed to get branch resource name")
                 sys.exit(1)
 
-        if new_strings:
+        if new_strings and branch_resource_name:
+            # Pull branch resource file, then merge with new strings in file
+            print("Downloading latest branch resource strings...")
+            branch_resource_strings = download_languages(branch_resource_name, ["en"])
+            if branch_resource_strings:
+                branch_resource_strings = branch_resource_strings['en']
+                for key, value in new_strings.items():
+                    if not value['string']:
+                        branch_resource_strings.pop(key)
+                    else:
+                        branch_resource_strings[key] = value
+
             # Push new string to the branch resource file
             print("Pushing new strings to branch resource file... ")
             sys.stdout.flush()
@@ -536,7 +545,7 @@ def main():
     print("")
     if not branch_resource_name:
         branch_resource_name = get_branch_resource_name()
-    if not is_prod and branch_resource_name:
+    if not is_prod and branch_resource_name and branch_resource_name != "prod":
         print("Fetching Branch Language Files...")
         lang_branch = download_languages(branch_resource_name, languages)
         if lang_branch:
@@ -544,10 +553,6 @@ def main():
         else:
             print("Failed to fetch branch language files.")
         print("")
-
-    # Copy strings to en if lang["strings"] exists
-    if "strings" in lang:
-        lang["en"] = copy.deepcopy(lang["strings"])
 
     print("Creating Translation Files... ")
     sys.stdout.flush()

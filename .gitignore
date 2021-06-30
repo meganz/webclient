@@ -250,11 +250,9 @@ dont-deploy/ui/out/
 # Local diffcheck.py configuration.
 contrib/local_config.py
 
-# Temp language files from Babel
+# Temp language files from Transifex
 lang/*
-!lang/strings.json
 !lang/*_prod.json
-lang/strings_prod.json
 
 # Transifex
 scripts/transifex.json

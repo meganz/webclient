@@ -568,7 +568,7 @@ li.active .call-duration i {
     --icon-size: 20px;
 }
 
-.search-field i.icon-play {
+.search-field i.icon-resume {
     top: 8px;
     right: 39px;
     --icon-size: 17px;

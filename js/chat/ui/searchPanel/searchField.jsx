@@ -3,7 +3,8 @@ import { MegaRenderMixin } from '../../../stores/mixins';
 import { STATUS } from './searchPanel.jsx';
 import { LABEL } from './resultContainer.jsx';
 
-const SEARCH_STATUS_CLASS = `search-field-status`;
+const SEARCH_STATUS_CLASS = 'search-field-status';
+const BASE_ICON_CLASS = 'sprite-fm-mono';
 
 export default class SearchField extends MegaRenderMixin {
     static inputRef = React.createRef();
@@ -74,16 +75,14 @@ export default class SearchField extends MegaRenderMixin {
                     <div
                         // Additional `div` element wrapping the controls, re: increased clickable area
                         className="progress-controls"
-                        onMouseOver={handleHover}
-                        onMouseOut={handleHover}
                         onClick={onToggle}>
-                        <i className={this.state.hovered ? 'sprite-fm-mono icon-pause' : 'small-icon tiny-searching'} />
+                        <i className={`${BASE_ICON_CLASS} icon-pause`} />
                     </div>
                 );
             case STATUS.PAUSED:
                 return (
                     <i
-                        className="sprite-fm-mono icon-play"
+                        className={`${BASE_ICON_CLASS} icon-resume`}
                         onClick={onToggle}
                         onMouseOver={handleHover}
                         onMouseOut={handleHover}
@@ -100,7 +99,7 @@ export default class SearchField extends MegaRenderMixin {
         const { value, searching, status, onChange, onReset } = this.props;
         return (
             <div className="search-field">
-                <i className="sprite-fm-mono icon-preview-reveal search-icon-find"/>
+                <i className={`${BASE_ICON_CLASS} icon-preview-reveal search-icon-find`} />
 
                 <input
                     type="text"
@@ -117,7 +116,16 @@ export default class SearchField extends MegaRenderMixin {
                     }}
                 />
 
-                {searching && <i className="sprite-fm-mono icon-close-component search-icon-reset" onClick={onReset} />}
+                {searching &&
+                    <i
+                        className={`
+                            ${BASE_ICON_CLASS}
+                            icon-close-component
+                            search-icon-reset
+                        `}
+                        onClick={onReset}
+                    />
+                }
 
                 {searching && status && (
                     <>

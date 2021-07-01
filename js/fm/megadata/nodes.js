@@ -189,6 +189,7 @@ MegaData.prototype.getPath = function(id) {
             || (id === 'out-shares')
             || (id === 'public-links')
             || (id === this.InboxID)
+            || (id === 'contacts')
         ) {
             result.push(id);
         }
@@ -205,6 +206,7 @@ MegaData.prototype.getPath = function(id) {
             || (id === 'messages')
             || (id === this.RubbishID)
             || (id === this.InboxID)
+            || (id === 'contacts')
         ) {
             loop = false;
         }

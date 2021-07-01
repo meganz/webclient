@@ -507,7 +507,9 @@ window.ImageExplorer = (function(){
         this.$sourceImage    = this.$container.find('.image-explorer-source');
         this.$mask           = this.$container.find('.image-explorer-mask');
         this.$dragDelegate   = this.$container.find('.image-explorer-drag-delegate');
-        this.$scaleSlider    = this.$container.find('.image-explorer-scale-slider');
+        this.$scaleSlider    = this.$container.find('.zoom-slider');
+        this.$zoomOutButton  = this.$container.find('.zoom-out');
+        this.$zoomInButton   = this.$container.find('.zoom-in');
         this.options         = $.extend({}, this.defaults, opts);
         this.imageProperties = {};
 
@@ -515,7 +517,7 @@ window.ImageExplorer = (function(){
             'getFillScale', 'getContainedScale', 'getCircularContainedScale', 'sliderValToScale', 'scaleToSliderVal',
             'updateImageScale', 'resetImagePosition', 'resetScaleSlider', 'toggleEmpty', 'get$ImageView', 'get$SourceImage',
             'get$Mask', 'get$DragDelegate', 'getMaskedImageProperties', 'showError', 'clearError', 'hasValidImage',
-            '_resetFromError', '_removeError');
+            '_resetFromError', '_removeError', 'initZoomSlider');
 
         this.toggleEmpty(true); //assume the explorer is empty initially and override below if otherwise
 
@@ -571,17 +573,54 @@ window.ImageExplorer = (function(){
         });
     };
 
+    ImageExplorer.prototype.initZoomSlider = function(value = 0) {
+        const container = document.querySelector('.avatar-dialog');
+        const wrapper = container && container.querySelector('.zoom-slider-wrap');
+        const $elm = $('.zoom-slider', wrapper);
+        const setValue = tryCatch(() => {
+            wrapper.dataset.perc = value;
+            $elm.slider('value', value);
+        });
+
+        if (!wrapper) {
+            if (d) {
+                console.error('zoom-slider-wrap not found.');
+            }
+            return;
+        }
+
+        if (wrapper.dataset.perc) {
+            // Update existing slider.
+            return setValue();
+        }
+
+        // Init zoom slider
+        $elm.slider({
+            min: 0,
+            max: 100,
+            range: 'min',
+            step: 1,
+            change: function(e, ui) {
+                $(this).attr('title', `${ui.value}%`);
+                wrapper.dataset.perc = ui.value;
+            },
+            slide: _.bind(function(e, ui) {
+                $(this).attr('title', `${ui.value}%`);
+                this.updateImageScale(this.sliderValToScale(ui.value));
+            },this),
+            create: setValue
+        });
+    }
+
     ImageExplorer.prototype.initScaleSlider = function() {
-        this.$scaleSlider.on('change', _.bind(function(e) {
-            this.updateImageScale(this.sliderValToScale(e.target.value));
+        this.initZoomSlider(0);
+        this.$zoomOutButton.on('click', _.bind(function() {
+            this.$scaleSlider.slider('value', parseInt(this.$scaleSlider.slider('value')) - 10);
+            this.updateImageScale(this.sliderValToScale(this.$scaleSlider.slider('value')));
         }, this));
-        this.$scaleSlider.prev().on('click', _.bind(function() {
-            this.$scaleSlider.val(parseInt(this.$scaleSlider.val()) - 10);
-            this.updateImageScale(this.sliderValToScale(this.$scaleSlider.val()));
-        }, this));
-        this.$scaleSlider.next().on('click', _.bind(function() {
-            this.$scaleSlider.val(parseInt(this.$scaleSlider.val()) + 10);
-            this.updateImageScale(this.sliderValToScale(this.$scaleSlider.val()));
+        this.$zoomInButton.on('click', _.bind(function() {
+            this.$scaleSlider.slider('value', parseInt(this.$scaleSlider.slider('value')) + 10);
+            this.updateImageScale(this.sliderValToScale(this.$scaleSlider.slider('value')));
         }, this));
     };
 
@@ -622,7 +661,7 @@ window.ImageExplorer = (function(){
         }
 
         this.maxScale = Math.max(initialScale, this.options.scaleMax);
-        this.resetScaleSlider(this.scaleToSliderVal(initialScale));
+        this.resetScaleSlider();
         //Always use ImageExplorer.zoomModes.imageZoom when setting the initial scale to center the image.
         this.updateImageScale(initialScale, ImageExplorer.zoomModes.imageZoom);
         this.resetImagePosition();
@@ -648,7 +687,7 @@ window.ImageExplorer = (function(){
     };
 
     ImageExplorer.prototype.sliderValToScale = function(sliderValue) {
-        var sliderValAsUnitInterval = sliderValue / (this.$scaleSlider.attr('max') - this.$scaleSlider.attr('min'));
+        var sliderValAsUnitInterval = sliderValue / (this.$scaleSlider.slider('option', 'max') - this.$scaleSlider.slider('option', 'min'));
         //http://math.stackexchange.com/questions/2489/is-there-a-name-for-0-1 (was tempted to use sliderValAsWombatNumber)
         return this.minScale + (sliderValAsUnitInterval * (this.maxScale - this.minScale));
     };
@@ -657,7 +696,7 @@ window.ImageExplorer = (function(){
         //Slider represents the range between maxScale and minScale, normalised as a percent (the HTML slider range is 0-100).
         var sliderValAsUnitInterval = (scale - this.minScale) / (this.maxScale - this.minScale);
 
-        return sliderValAsUnitInterval * (this.$scaleSlider.attr('max') - this.$scaleSlider.attr('min'));
+        return sliderValAsUnitInterval * (this.$scaleSlider.slider('option', 'max') - this.$scaleSlider.slider('option', 'min'));
     };
 
     ImageExplorer.prototype.updateImageScale = function(newScale, zoomMode){
@@ -718,11 +757,10 @@ window.ImageExplorer = (function(){
         });
     };
 
-    ImageExplorer.prototype.resetScaleSlider = function(initialValue){
-        this.$scaleSlider
-                .val(initialValue)
-                .removeClass('disabled')
-                .removeAttr('disabled');
+    ImageExplorer.prototype.resetScaleSlider = function(){
+        this.$scaleSlider.slider('value', 0)
+            .removeClass('disabled')
+            .removeAttr('disabled');
     };
 
     ImageExplorer.prototype.toggleEmpty = function(toggle) {

@@ -980,14 +980,13 @@ function avatarDialog(close) {
                         <div class="image-explorer-mask circle-mask"></div>
                         <div class="image-explorer-drag-delegate"></div>
                     </div>
-                    <div class="image-explorer-scale-slider-wrapper">
-                        <i class="zoom-out sprite-fm-theme icon-image-zoom-out simpletip" data-simpletip="${l[24927]}">
-                        </i>
-                        <input class="image-explorer-scale-slider disabled" type="range"
-                            min="0" max="100" step="1" value="0" disabled="" />
-                        <i class="zoom-in sprite-fm-theme icon-image-zoom-in simpletip" data-simpletip="${l[24928]}">
-                        </i>
-                    </div>
+                <div class="zoom-slider-wrap">
+                    <i class="zoom-out sprite-fm-theme icon-image-zoom-out simpletip" data-simpletip="${l[24927]}">
+                    </i>
+                    <div class="zoom-slider disabled"></div>
+                    <i class="zoom-in sprite-fm-theme icon-image-zoom-in simpletip" data-simpletip="${l[24928]}">
+                    </i>
+                </div>
                     <input type="file" id="image-upload-and-crop-upload-field" class="image-upload-field"
                         accept="image/jpeg, image/gif, image/png" />
                 </div>

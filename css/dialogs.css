@@ -2806,8 +2806,6 @@ body.de .mega-dialog.new-group-chat {
         border-radius: 16px;
         height: 32px;
         padding: 0 8px;
-        -webkit-padding-end: 32px;
-        padding-inline-end: 32px;
         overflow: hidden;
         box-sizing: border-box;
     }
@@ -2821,7 +2819,7 @@ body.de .mega-dialog.new-group-chat {
         padding: 0;
         margin: 0;
         width: 100%;
-        color: var(--text-color-medium);
+        color: var(--text-color-high);
         font: var(--text-body1);
         line-height: 32px;
     }
@@ -3175,6 +3173,12 @@ body.de .mega-dialog.new-group-chat {
         -webkit-margin-end: 8px;
         margin-inline-end: 8px;
     }
+    .mega-dialog.fm-picker-dialog .search-bar.placeholder .search-icon-reset {
+        -webkit-margin-end: 0;
+        margin-inline-end: 0;
+        cursor: pointer;
+        --mask-color: var(--icon-rest);
+    }
     .mega-dialog.fm-picker-dialog .summary-input.focus {
         border: 1px solid var(--stroke-grey-2);
         color: var(--text-color-low);
@@ -3326,17 +3330,8 @@ body.de .mega-dialog.new-group-chat {
     .mega-dialog.fm-picker-dialog .side-pane .fm-picker-dialog-button.active i  {
         opacity: 1;
     }
-    .mega-dialog.fm-picker-dialog .fm-picker-dialog-button.cloud-drive.active .left-border {
-        background: var(--stroke-error);
-    }
-    .mega-dialog.fm-picker-dialog .fm-picker-dialog-button.shared-with-me.active .left-border {
-        background: var(--stroke-warning);
-    }
-    .mega-dialog.fm-picker-dialog .fm-picker-dialog-button.conversations.active .left-border {
+    .mega-dialog.fm-picker-dialog .fm-picker-dialog-button.active .left-border {
         background: var(--stroke-info);
-    }
-    .mega-dialog.fm-picker-dialog .fm-picker-dialog-button.rubbish-bin.active .left-border {
-        background: var(--stroke-success);
     }
     .mega-dialog.fm-picker-dialog .fm-picker-dialog-tree-panel {
         display: none;

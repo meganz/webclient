@@ -856,7 +856,7 @@ body:not(.mobile) .plan.pro3:not(.current) .pricing-page.plan-button:hover {
 /* Current plan */
 .pricing-page.plan.current {
     border-left: 1px solid transparent;
-    background-color: #EEF8FF;
+    background-color: var(--surface-grey-2);
 }
 .pricing-page.plan.current + .plan {
     border-left: 1px solid transparent;

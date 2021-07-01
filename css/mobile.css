@@ -635,7 +635,18 @@ ul, li {
     overflow: hidden;
     box-sizing:border-box;
 }
-.fm-dialog.mobile.payment-stripe-dialog,
+.fm-dialog.mobile.payment-stripe-dialog {
+    height: initial;
+    margin: 0;
+    right: 0;
+    bottom: 0;
+    top: 0;
+    left: 0;
+    position: fixed;
+    border: none;
+    width: initial;
+    border-radius: unset;
+}
 .fm-dialog.mobile.payment-stripe-success-dialog,
 .fm-dialog.mobile.payment-stripe-failure-dialog {
     height: initial;

@@ -7534,7 +7534,7 @@ let megaList2_MegaList2 = (_dec = Object(mixins["SoonFcWrap"])(30, true), (_clas
       invalidate = true;
     }
 
-    if (nextProps.sortBy !== this.props.sortBy) {
+    if (nextProps.sortBy !== this.props.sortBy || nextProps.currentlyViewedEntry !== this.props.currentlyViewedEntry) {
       invalidate = true;
       this.ps.scrollToY(0);
     }

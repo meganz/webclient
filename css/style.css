@@ -11982,7 +11982,7 @@ div.camera-bottom-txt {
     --mask-color: var(--label-red);
 }
 .account.available .progress-title i {
-    --mask-color: rgba(0,0,0,0.2);
+    --mask-color: var(--label-grey);
 }
 .account.versions .progress-title i {
     --mask-color: var(--label-green);

@@ -507,6 +507,8 @@ def main():
                         branch_resource_strings.pop(key)
                     else:
                         branch_resource_strings[key] = value
+            else:
+                branch_resource_strings = new_strings
 
             # Push new string to the branch resource file
             print("Pushing new strings to branch resource file... ")
@@ -515,7 +517,7 @@ def main():
             payload = {
                 "data": {
                     "attributes": {
-                        "content": json.dumps(new_strings),
+                        "content": json.dumps(branch_resource_strings),
                         "content_encoding": "text",
                     },
                     "relationships": {

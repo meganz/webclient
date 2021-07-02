@@ -293,7 +293,7 @@
 .fm-recents .data-block-view:not(.hidden) {
     display: inline-block;
     vertical-align: top;
-    margin: 8px 4px;
+    margin: 8px 5px;
     padding: 0;
 }
 .fm-recents .data-block-view,

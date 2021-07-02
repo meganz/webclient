@@ -141,8 +141,7 @@ export default class ContactsPanel extends MegaRenderMixin {
     }
 
     render() {
-        let receivedRequestsCount = this.getReceivedRequestsCount();
-        receivedRequestsCount = receivedRequestsCount > 9 ? "9+" : receivedRequestsCount;
+        const receivedRequestsCount = this.getReceivedRequestsCount();
         const { view } = this;
 
         return (
@@ -154,8 +153,8 @@ export default class ContactsPanel extends MegaRenderMixin {
 
                 {view !== ContactsPanel.VIEW.PROFILE &&
                     <div className="contacts-actions">
-                        {view === ContactsPanel.VIEW.RECEIVED_REQUESTS && (receivedRequestsCount > 1 ||
-                            receivedRequestsCount === "9+") &&
+                        {view === ContactsPanel.VIEW.RECEIVED_REQUESTS &&
+                        receivedRequestsCount > 1  &&
                             <button
                                 className="mega-button action"
                                 onClick={this.handleAcceptAllRequests}>

@@ -36,9 +36,10 @@ export default class Navigation extends MegaRenderMixin {
                                         ${activeClass}
                                     `}>
                                         <span>{ContactsPanel.LABEL[key]}</span>
-                                        {(receivedRequestsCount > 0 || receivedRequestsCount === "9+")
+                                        {receivedRequestsCount > 0
                                         && VIEW[key] === VIEW.RECEIVED_REQUESTS &&
-                                            <div className="notifications-count ipc-count">{receivedRequestsCount}</div>
+                                            <div className="notifications-count ipc-count">
+                                                {receivedRequestsCount > 9 ? "9+" : receivedRequestsCount}</div>
                                         }
                                     </button>
                                 </li>

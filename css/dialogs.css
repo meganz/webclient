@@ -6464,7 +6464,10 @@ body.de .mega-dialog.new-group-chat {
         margin: 0 6px;
     }
     .mega-dialog.storage-dialog.almost-full .chart.progressbars span::before {
-        background: var(--surface-warning);
+        background: var(--stroke-warning);
+    }
+    .mega-dialog.storage-dialog.almost-full .chart.progressbars span::after {
+        background: var(--stroke-warning);
     }
     .mega-dialog.storage-dialog.almost-full .size-txt {
         color: var(--text-color-warning) !important;

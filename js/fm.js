@@ -1382,8 +1382,9 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
     $.msgDialog = type;
     $.warningCallback = callback;
 
-    $('#msgDialog').removeClass('confirmation warning info error question ' +
+    var $dialog = $('#msgDialog').removeClass('confirmation warning info error question ' +
         'delete-contact loginrequired-dialog multiple with-close-btn');
+    $dialog.parent().addClass('msg-dialog-container');
     $('#msgDialog aside').addClass('hidden');
 
     if (type === 'clear-bin') {
@@ -1654,7 +1655,8 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
 }
 
 function closeMsg() {
-    $('#msgDialog').addClass('hidden');
+    var $dialog = $('#msgDialog').addClass('hidden');
+    $dialog.parent().removeClass('msg-dialog-container');
 
     if ($.dialog) {
         $('.mega-dialog').removeClass('arrange-to-back');

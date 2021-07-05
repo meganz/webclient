@@ -3869,9 +3869,6 @@ button.l-pane-visibility {
     display: inline-block;
     display: none; /* temporary leave as hide, will either remove it or revive it depends on public feedback */
 }
-.active-folder-link .section-title {
-    padding: 4px 8px 0 8px;
-}
 .not-logged .fm-main.active-folder-link {
     height: 100%;
     height: -webkit-calc(100% - 70px);

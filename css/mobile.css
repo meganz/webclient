@@ -5102,6 +5102,10 @@ div.checkboxOn {
 .mobile.alert-banner .alert-text-container .alert-text a {
     color: white;
     text-decoration: underline;
+    font-family: var(--text-font-family-bold);
+}
+.mobile.alert-banner .alert-text-container .alert-text span {
+    font-family: var(--text-font-family-bold);
 }
 .mobile.alert-banner .alert-icon.close {
     height: 30px;

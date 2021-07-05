@@ -28,6 +28,9 @@
 .lp-myfiles .content-area.ps-active-y:hover {
     border-top: 2px solid var(--stroke-main);
 }
+.fm-other-tree-panel .section-title {
+    display: none;
+}
 .lp-myfiles .section-title,
 .active-folder-link .section-title {
     height: 18px;
@@ -37,6 +40,10 @@
     letter-spacing: 0;
     display: inline-block;
     margin-bottom: 4px;
+}
+.active-folder-link .section-title {
+    padding: 4px 8px 0 8px;
+    display: inline;
 }
 .lp-myfiles .cloud-drive-panel {
     padding: 4px 8px 0 8px;

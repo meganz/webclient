@@ -4125,7 +4125,9 @@ tr:not(.taken-down) .grid-status-icon:not(.read-only):not(.read-and-write) {
     background-color: var(--label-orange);
 }
 .fm-notification-block.grace-business.visible span span,
-.fm-notification-block.grace-business.visible span a {
+.fm-notification-block.grace-business.visible span a,
+.fm-notification-block.expired-business.visible span span,
+.fm-notification-block.expired-business.visible span a {
     font-family: var(--text-font-family-bold);
 }
 .fm-notification-block .notification-block-icon {

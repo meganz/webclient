@@ -327,6 +327,9 @@ MegaData.prototype.clearRubbish = function(all) {
     if (all) {
         loadingDialog.show();
         ulmanager.ulClearTargetDeleted(M.getTreeHandles(M.RubbishID));
+        if (window.selectionManager){
+            selectionManager.clear_selection();
+        }
         return M.req('dr').finally(loadingDialog.hide.bind(loadingDialog));
     }
 
@@ -369,6 +372,9 @@ MegaData.prototype.clearRubbish = function(all) {
             loadingDialog.hide();
 
             if (success === selids.length) {
+                if (window.selectionManager){
+                    selectionManager.clear_selection();
+                }
                 promise.resolve();
             }
             else {

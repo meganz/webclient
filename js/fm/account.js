@@ -821,6 +821,7 @@ accountUI.account = {
                 mega.config.set('skipsmsbanner', 1);
             });
 
+            sms.renderAddPhoneText($text);
             // Show the phone banner, hide the storage/bandwidth usage banner
             $usageBanner.addClass('hidden');
             $addPhoneBanner.removeClass('hidden');
@@ -1012,9 +1013,6 @@ accountUI.account = {
                     $text.removeClass('hidden');
                     $buttonsContainer.addClass('hidden');
                     $phoneNumber.addClass('hidden').text('');
-
-                    // Otherwise set the text for x GB storage and quota
-                    sms.renderAddPhoneText($text);
 
                     // On click of the Add Number button load the add phone dialog
                     $addNumberButton.rebind('click', function() {

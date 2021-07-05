@@ -104,6 +104,7 @@ function blog_load() {
     var blogcontent = '';
     var a = 0;
     var blogstart = blogpage * bloglimit - bloglimit;
+    $('.rss-lnk', '.blog-new').attr('href', cmsStaticPath + 'blog/unsigned/blog.rss');
     for (var i in blogposts) {
         if (blogposts.hasOwnProperty(i)) {
             var mm = blog_month(blogposts[i].t);

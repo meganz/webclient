@@ -389,8 +389,13 @@ def send_upload_request(url, payload):
             request = Request(download_link, headers=HEADER)
             response = urlopen(request)
             download_content = json.loads(response.read())
+            print("Checking for successful upload, pending. \n")
+            if download_content['data']['attributes']['status'] == 'failed':
+                for err in download_content['data']['attributes']['errors']:
+                    print(err['code'] + ": " + err['detail'] + "\n")
+                sys.exit('Failed to upload: Aborting \n')
             if 'data' in download_content and 'attributes' in download_content['data'] and 'status' in download_content['data']['attributes'] and \
-                    download_content['data']['attributes']['status'] not in ['processing', 'pending']:
+                    download_content['data']['attributes']['status'] not in ['processing', 'pending','failed']:
                 return response
         except HTTPError as e:
             content = json.loads(e.read().decode('utf8'))

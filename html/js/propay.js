@@ -567,7 +567,7 @@ pro.propay = {
 
         // Update the style of the dialog to be Pro I-III or Lite, also change the plan name
         $pricingBox.addClass('pro' + pro.propay.planNum);
-        $('.plan-icon', $step2).addClass('pro' + pro.propay.planNum);
+        $('.plan-icon:not(.alarm)', $step2).addClass('pro' + pro.propay.planNum);
         $pricingBox.attr('data-payment', pro.propay.planNum);
         $planName.text(pro.propay.planName);
 

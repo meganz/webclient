@@ -6392,6 +6392,9 @@ body.de .mega-dialog.new-group-chat {
         color: var(--text-color-success);
         cursor: pointer;
     }
+    .mega-dialog.storage-dialog .body-p b {
+        font: var(--text-body1-bold);
+    }
     .mega-dialog.storage-dialog .body-p.medium {
         font: var(--text-body1);
         padding: 2px 0 0 0;

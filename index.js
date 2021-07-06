@@ -927,7 +927,7 @@ function init_page() {
         }
         if (window.nextPage) {
             login_next = window.nextPage;
-            login_txt = l[24766];
+            login_txt =  login_next === 'support' ? l.support_redirect_login : l[24766];
             delete window.nextPage;
         }
         if (is_mobile) {

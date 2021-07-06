@@ -5206,7 +5206,7 @@ tr:not(.taken-down) .grid-status-icon:not(.read-only):not(.read-and-write) {
 .fm-transfers-header .mega-button i {
     --mask-color: var(--icon-rest);
 }
-.fm-transfers-header .mega-button.transfer-clear-completed i {
+.fm-transfers-header .mega-button.transfer-clear-all-icon i {
     --mask-color: var(--secondary-red);
 }
 .fm-right-header .mega-button.fm-new-shared-folder {

@@ -659,22 +659,22 @@
             return false;
         }
 
-        var shouldScroll = false;
+        var scrollToY = -1;
         var itemOffsetTop = Math.floor(elementIndex / this._calculated['itemsPerRow']) * this.options.itemHeight;
         var itemOffsetTopPlusHeight = itemOffsetTop + this.options.itemHeight;
 
         // check if the item is above the visible viewport
         if (itemOffsetTop < this._calculated['scrollTop']) {
-            shouldScroll = true;
+            scrollToY = itemOffsetTop;
         }
         // check if the item is below the visible viewport
         else if (itemOffsetTopPlusHeight > (this._calculated['scrollTop'] + this._calculated['scrollHeight'])) {
-            shouldScroll = true;
+            scrollToY = itemOffsetTopPlusHeight - this._calculated['scrollHeight'];
         }
 
         // have to scroll
-        if (shouldScroll) {
-            this.listContainer.scrollTop = itemOffsetTop;
+        if (scrollToY !== -1) {
+            this.listContainer.scrollTop = scrollToY;
             this._isUserScroll = false;
             this.scrollUpdate();
             this._onScroll();

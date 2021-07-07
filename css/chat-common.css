@@ -954,6 +954,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
     border-bottom-left-radius: var(--border-radius);
     padding: 12px 18px;
     position: relative;
+    text-align: center;
 }
 
 .chat-links-preview-desktop .bottom-buttons button {

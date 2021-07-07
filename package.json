@@ -39,6 +39,9 @@
   "license": "proprietary",
   "private": true,
   "readmeFilename": "README.md",
+  "engines": {
+        "node": "6.9.4"
+  },
   "dependencies": {
     "@babel/core": "7.14.6",
     "@babel/plugin-proposal-class-properties": "7.14.5",

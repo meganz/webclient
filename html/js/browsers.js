@@ -36,8 +36,8 @@ var browserspage = {
         'use strict';
 
         const chromeText = l[20924].replace('%1', 'Chrome<sup>&reg;</sup>');
-        const ffText = l[20924].replace('%1', 'Chrome<sup>&reg;</sup>');
-        const edgeText = l[20924].replace('%1', 'Chrome<sup>&reg;</sup>');
+        const ffText = l[20924].replace('%1', 'Firefox<sup>&reg;</sup>');
+        const edgeText = l[20924].replace('%1', 'Edge<sup>&reg;</sup>');
         const chromeLabel = l[20923].replace('%1', 'Chrome');
         const ffLabel = l[20923].replace('%1', 'Firefox');
         const edgeLabel = l[20923].replace('%1', 'Edge');
@@ -83,7 +83,7 @@ var browserspage = {
         else if (is_android) {
             browser = browser + ' android';
         }
-    
+
         $topBlock.removeClass('unsupported edge chrome firefox opera ios android')
             .addClass(browser);
     },

@@ -44,7 +44,10 @@ export class MegaList2 extends MegaRenderMixin {
             invalidate = true;
         }
 
-        if (nextProps.sortBy !== this.props.sortBy) {
+        if (
+            nextProps.sortBy !== this.props.sortBy ||
+            nextProps.currentlyViewedEntry !== this.props.currentlyViewedEntry
+        ) {
             invalidate = true;
             this.ps.scrollToY(0);
         }

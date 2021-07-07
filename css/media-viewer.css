@@ -177,7 +177,7 @@
             .media-viewer .content embed,
             .media-viewer .content iframe {
                 border: 0;
-                height: 100%;
+                height: auto;
                 width: 100%;
             }
 

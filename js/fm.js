@@ -980,14 +980,13 @@ function avatarDialog(close) {
                         <div class="image-explorer-mask circle-mask"></div>
                         <div class="image-explorer-drag-delegate"></div>
                     </div>
-                    <div class="image-explorer-scale-slider-wrapper">
-                        <i class="zoom-out sprite-fm-theme icon-image-zoom-out simpletip" data-simpletip="${l[24927]}">
-                        </i>
-                        <input class="image-explorer-scale-slider disabled" type="range"
-                            min="0" max="100" step="1" value="0" disabled="" />
-                        <i class="zoom-in sprite-fm-theme icon-image-zoom-in simpletip" data-simpletip="${l[24928]}">
-                        </i>
-                    </div>
+                <div class="zoom-slider-wrap">
+                    <i class="zoom-out sprite-fm-theme icon-image-zoom-out simpletip" data-simpletip="${l[24927]}">
+                    </i>
+                    <div class="zoom-slider disabled"></div>
+                    <i class="zoom-in sprite-fm-theme icon-image-zoom-in simpletip" data-simpletip="${l[24928]}">
+                    </i>
+                </div>
                     <input type="file" id="image-upload-and-crop-upload-field" class="image-upload-field"
                         accept="image/jpeg, image/gif, image/png" />
                 </div>
@@ -1383,8 +1382,9 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
     $.msgDialog = type;
     $.warningCallback = callback;
 
-    $('#msgDialog').removeClass('confirmation warning info error question ' +
+    var $dialog = $('#msgDialog').removeClass('confirmation warning info error question ' +
         'delete-contact loginrequired-dialog multiple with-close-btn');
+    $dialog.parent().addClass('msg-dialog-container');
     $('#msgDialog aside').addClass('hidden');
 
     if (type === 'clear-bin') {
@@ -1655,7 +1655,8 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
 }
 
 function closeMsg() {
-    $('#msgDialog').addClass('hidden');
+    var $dialog = $('#msgDialog').addClass('hidden');
+    $dialog.parent().removeClass('msg-dialog-container');
 
     if ($.dialog) {
         $('.mega-dialog').removeClass('arrange-to-back');
@@ -3361,20 +3362,11 @@ function fm_resize_handler(force) {
 
     if (M.currentrootid === 'shares') {
         var $sharedDetailsBlock = $('.shared-details-block', '.fm-main');
-        var sharedDetailsHeight = Math.round($sharedDetailsBlock.outerHeight());
-        var sharedHeaderHeight = Math.round($('.shared-top-details').outerHeight());
-        var sharedBlockHeight = sharedDetailsHeight - sharedHeaderHeight;
+        var sharedHeaderHeight = Math.round($('.shared-top-details', $sharedDetailsBlock).outerHeight());
 
-        if ($sharedDetailsBlock.closest('.fm-main').hasClass('fm-notification')) {
-            sharedBlockHeight -= 24;
-        }
-
-        if (sharedBlockHeight > 0) {
-            $('.files-grid-view, .fm-blocks-view', $sharedDetailsBlock).css({
-                'height': sharedBlockHeight + "px",
-                'min-height': sharedBlockHeight + "px"
-            });
-        }
+        $('.files-grid-view, .fm-blocks-view', $sharedDetailsBlock).css({
+            'height': `calc(100% - ${sharedHeaderHeight}px)`,
+        });
     }
 
     if (d) {

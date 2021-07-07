@@ -4125,7 +4125,9 @@ tr:not(.taken-down) .grid-status-icon:not(.read-only):not(.read-and-write) {
     background-color: var(--label-orange);
 }
 .fm-notification-block.grace-business.visible span span,
-.fm-notification-block.grace-business.visible span a {
+.fm-notification-block.grace-business.visible span a,
+.fm-notification-block.expired-business.visible span span,
+.fm-notification-block.expired-business.visible span a {
     font-family: var(--text-font-family-bold);
 }
 .fm-notification-block .notification-block-icon {
@@ -5204,7 +5206,7 @@ tr:not(.taken-down) .grid-status-icon:not(.read-only):not(.read-and-write) {
 .fm-transfers-header .mega-button i {
     --mask-color: var(--icon-rest);
 }
-.fm-transfers-header .mega-button.transfer-clear-completed i {
+.fm-transfers-header .mega-button.transfer-clear-all-icon i {
     --mask-color: var(--secondary-red);
 }
 .fm-right-header .mega-button.fm-new-shared-folder {
@@ -10760,7 +10762,7 @@ body:not(.de) .contacts-interation {
     min-width: 20px;
 }
 .files-grid-view.shared-folder-content, .fm-blocks-view.shared-folder-content {
-    height: calc(100% - 119px);
+    height: calc(100% - 128px);
 }
 .shared-details-block .files-grid-view.shared-folder-content {
     padding-top: 14px;
@@ -11979,7 +11981,7 @@ div.camera-bottom-txt {
     --mask-color: var(--label-red);
 }
 .account.available .progress-title i {
-    --mask-color: rgba(0,0,0,0.2);
+    --mask-color: var(--label-grey);
 }
 .account.versions .progress-title i {
     --mask-color: var(--label-green);
@@ -12376,6 +12378,17 @@ div.camera-bottom-txt {
 }
 .chart.progressbars .left-chart span::before {
     margin-left: 50%;
+}
+.chart.progressbars span::after {
+    content: '';
+    background: var(--stroke-dark-grey);
+    width: 6px;
+    height: 6px;
+    position: absolute;
+    z-index: 12;
+    bottom: 0;
+    left: calc(50% - 3px);
+    border-radius: 5px;
 }
 .account.chart.data {
     position: relative;
@@ -15720,7 +15733,7 @@ body.megaChatDisabled .nw-contact-name button.start-chat-button {
     left: 72px;
     z-index: 121;
 }
-.not-logged .corner-messages {
+.not-logged .active-folder-link .corner-messages {
     bottom: 66px;
 }
 /* end corner toasts and transfer popup */

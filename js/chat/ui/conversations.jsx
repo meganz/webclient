@@ -487,7 +487,7 @@ class ConversationsHead extends MegaRenderMixin {
 
     render() {
         const { contactsActive, onSelectDone, showTopButtons, showAddContact } = this.props;
-        const RECEIVED_REQUESTS_COUNT = Object.keys(M.ipc).length > 9 ? "9+" : Object.keys(M.ipc).length;
+        const RECEIVED_REQUESTS_COUNT = Object.keys(M.ipc).length;
         const ROUTES = { CHAT: 'fm/chat', CONTACTS: 'fm/chat/contacts' };
         const CONTACTS_ACTIVE = window.location.pathname.indexOf(ROUTES.CONTACTS) !== -1;
 
@@ -503,7 +503,7 @@ class ConversationsHead extends MegaRenderMixin {
                                 branded-blue
                                 contacts-toggle-button
                                 ${contactsActive ? 'active' : ''}
-                                ${(RECEIVED_REQUESTS_COUNT > 0 || RECEIVED_REQUESTS_COUNT === "9+") ? 'requests' : ''}
+                                ${RECEIVED_REQUESTS_COUNT > 0 ? 'requests' : ''}
                             `}
                             icon={`
                                 sprite-fm-mono
@@ -513,7 +513,7 @@ class ConversationsHead extends MegaRenderMixin {
                             onClick={() => loadSubPage(CONTACTS_ACTIVE ? ROUTES.CHAT : ROUTES.CONTACTS)}>
                             {RECEIVED_REQUESTS_COUNT ?
                                 <div className="notifications-count ipc-count">
-                                    <span>{RECEIVED_REQUESTS_COUNT}</span>
+                                    <span>{RECEIVED_REQUESTS_COUNT > 9 ? "9+" : RECEIVED_REQUESTS_COUNT }</span>
                                 </div> : ''}
                         </Button>
                     </div>

@@ -35,9 +35,6 @@ import tempfile
 import subprocess
 import collections
 import config
-import json
-from functools import cmp_to_key
-from collections import OrderedDict
 from subprocess import CalledProcessError
 
 PLATFORMS = {'posix': 'posix',
@@ -532,29 +529,6 @@ def reduce_validator(file_line_mapping, **extra):
             if analyse_files_for_special_chars(file_path, result):
                 fatal += 1
                 # break
-
-        if 'strings.json' in file_path:
-            try:
-                new_file = open(os.path.dirname(os.path.abspath(__file__)) + "/../lang/strings.json", "r")
-                file_content = new_file.read()
-                new_file.close()
-            except IOError:
-                fatal += 1
-                result.append('Unable to read strings.json')
-                continue
-
-            # Checking duplicated key in strings.json
-            is_duplicate, data = json.loads(file_content, object_pairs_hook=validate_strings)
-            if is_duplicate:
-                fatal += 1
-                result.append('Duplicated keys in strings.json: {}'.format(", ".join(data)))
-            else:
-                # Check if key is out of order
-                keys = list(data.keys())
-                if keys != sorted(keys, key=cmp_to_key(natural_sort)):
-                    fatal += 1
-                    result.append('Keys in strings.json are not sorted. Please run ./scripts/lang.sh')
-
         # Ignore known custom made files
         if file_path in config.VALIDATOR_IGNORE_FILES:
             continue

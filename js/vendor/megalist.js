@@ -315,7 +315,7 @@
 
         if (this._wasRendered) {
             this._contentUpdated();
-            this._applyDOMChanges();
+            this._applyDOMChanges(true);
         }
     };
 
@@ -329,7 +329,7 @@
 
         if (this._wasRendered) {
             this._contentUpdated();
-            this._applyDOMChanges();
+            this._applyDOMChanges(true);
         }
     };
 
@@ -364,7 +364,7 @@
 
             if (requiresRerender) {
                 this._repositionRenderedItems();
-                this._applyDOMChanges();
+                this._applyDOMChanges(true);
 
             }
         }
@@ -659,22 +659,22 @@
             return false;
         }
 
-        var shouldScroll = false;
+        var scrollToY = -1;
         var itemOffsetTop = Math.floor(elementIndex / this._calculated['itemsPerRow']) * this.options.itemHeight;
         var itemOffsetTopPlusHeight = itemOffsetTop + this.options.itemHeight;
 
         // check if the item is above the visible viewport
         if (itemOffsetTop < this._calculated['scrollTop']) {
-            shouldScroll = true;
+            scrollToY = itemOffsetTop;
         }
         // check if the item is below the visible viewport
         else if (itemOffsetTopPlusHeight > (this._calculated['scrollTop'] + this._calculated['scrollHeight'])) {
-            shouldScroll = true;
+            scrollToY = itemOffsetTopPlusHeight - this._calculated['scrollHeight'];
         }
 
         // have to scroll
-        if (shouldScroll) {
-            this.listContainer.scrollTop = itemOffsetTop;
+        if (scrollToY !== -1) {
+            this.listContainer.scrollTop = scrollToY;
             this._isUserScroll = false;
             this.scrollUpdate();
             this._onScroll();
@@ -940,12 +940,12 @@
     /**
      * Internal method, that get called when DOM changes should be done (e.g. render new items since they got in/out
      * of the viewport)
+     *
+     * @var {bool} [contentWasUpdated] pass true to force dimension related updates
      * @private
      */
-    MegaList.prototype._applyDOMChanges = function() {
+    MegaList.prototype._applyDOMChanges = function(contentWasUpdated) {
         this._recalculate();
-
-        var contentWasUpdated = false;
 
         var first = this._calculated['visibleFirstItemNum'];
         var last = this._calculated['visibleLastItemNum'];

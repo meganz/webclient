@@ -413,6 +413,7 @@ table tr.ui-selected .link-transfer-status {
     padding-inline-start: 12px;
     -webkit-padding-end: 14px;
     padding-inline-end: 14px;
+    cursor: pointer;
 }
 
 .grid-table-header.fm th.grid-first-th {
@@ -420,6 +421,7 @@ table tr.ui-selected .link-transfer-status {
     padding-inline-start: 5px;
     -webkit-padding-end: 0;
     padding-inline-end: 0;
+    cursor: pointer;
 }
 .grid-table-header.fm th:first-child {
     padding: 0 6px;

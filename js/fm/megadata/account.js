@@ -700,17 +700,18 @@ MegaData.prototype.showOverStorageQuota = function(quota, options) {
             var $storageChart = $('.fm-account-blocks.storage', $strgdlg);
 
             var fullDeg = 360;
-            var direction = -1;
             var deg = fullDeg * quota.percent / 100;
 
             // Used space chart
-            if (deg <= 180) {
-                $('.left-chart span', $storageChart).css('transform', 'rotate(' + deg * direction + 'deg)');
-                $('.right-chart span', $storageChart).removeAttr('style');
+            if (quota.percent < 50) {
+                $('.left-chart span', $storageChart).css('transform', 'rotate(180deg)');
+                $('.right-chart span', $storageChart).css('transform', `rotate(${180 - deg}deg)`);
+                $('.right-chart', $storageChart).addClass('low-percent-clip');
+                $('.left-chart', $storageChart).addClass('low-percent-clip');
             }
             else {
                 $('.left-chart span', $storageChart).css('transform', 'rotate(180deg)');
-                $('.right-chart span', $storageChart).css('transform', 'rotate(' + (deg - 180) * direction + 'deg)');
+                $('.right-chart span', $storageChart).css('transform', `rotate(${(deg - 180) * -1}deg)`);
             }
 
             $('.chart.data .size-txt', $strgdlg).text(strQuotaUsed);

@@ -7534,7 +7534,7 @@ let megaList2_MegaList2 = (_dec = Object(mixins["SoonFcWrap"])(30, true), (_clas
       invalidate = true;
     }
 
-    if (nextProps.sortBy !== this.props.sortBy) {
+    if (nextProps.sortBy !== this.props.sortBy || nextProps.currentlyViewedEntry !== this.props.currentlyViewedEntry) {
       invalidate = true;
       this.ps.scrollToY(0);
     }
@@ -19145,7 +19145,8 @@ class searchPanel_resultContainer_ResultContainer extends mixins["MegaRenderMixi
 
 
 
-const SEARCH_STATUS_CLASS = "search-field-status";
+const SEARCH_STATUS_CLASS = 'search-field-status';
+const BASE_ICON_CLASS = 'sprite-fm-mono';
 class searchPanel_searchField_SearchField extends mixins["MegaRenderMixin"] {
   constructor(props) {
     super(props);
@@ -19189,16 +19190,14 @@ class searchPanel_searchField_SearchField extends mixins["MegaRenderMixin"] {
         case STATUS.IN_PROGRESS:
           return external_React_default.a.createElement("div", {
             className: "progress-controls",
-            onMouseOver: handleHover,
-            onMouseOut: handleHover,
             onClick: onToggle
           }, external_React_default.a.createElement("i", {
-            className: this.state.hovered ? 'sprite-fm-mono icon-pause' : 'small-icon tiny-searching'
+            className: "sprite-fm-mono icon-pause"
           }));
 
         case STATUS.PAUSED:
           return external_React_default.a.createElement("i", {
-            className: "sprite-fm-mono icon-play",
+            className: "sprite-fm-mono icon-resume",
             onClick: onToggle,
             onMouseOver: handleHover,
             onMouseOut: handleHover
@@ -19246,7 +19245,7 @@ class searchPanel_searchField_SearchField extends mixins["MegaRenderMixin"] {
         onChange(ev);
       }
     }), searching && external_React_default.a.createElement("i", {
-      className: "sprite-fm-mono icon-close-component search-icon-reset",
+      className: "\n                            sprite-fm-mono\n                            icon-close-component\n                            search-icon-reset\n                        ",
       onClick: onReset
     }), searching && status && external_React_default.a.createElement(external_React_default.a.Fragment, null, this.renderStatusControls(), this.renderStatusBanner()));
   }

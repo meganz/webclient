@@ -324,7 +324,7 @@ accountUI.general = {
 
             /* New Used Storage chart */
             var $storageChart = $('.fm-account-blocks.storage', this.$contentBlock);
-            var usedPercentage = Math.round(account.space_used / account.space * 100);
+            var usedPercentage = Math.floor(account.space_used / account.space * 100);
             this.perc_c_s = usedPercentage;
             if (this.perc_c_s > 100) {
                 this.perc_c_s = 100;

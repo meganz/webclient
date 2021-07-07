@@ -5940,6 +5940,9 @@ body.de .mega-dialog.new-group-chat {
     .mega-dialog.limited-bandwidth-dialog .pricing-page.local-currency-tip:not(.hidden) {
         display: block;
     }
+    .mega-dialog.limited-bandwidth-dialog.pro .pricing-page.local-currency-tip {
+        display: none;
+    }
     .mega-dialog.limited-bandwidth-dialog .dialog-scroll-overlay {
         border: 0;
         position: absolute;

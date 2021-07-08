@@ -13650,7 +13650,7 @@ body.landscape .upload-overlay .mobile.filetype-img {
     transition: opacity 200ms ease-in-out 1s;
     transition-delay: 0ms;
     white-space: normal;
-    --mask-color: var(--surface-grey-1-inverted);
+    --mask-color: var(--surface-main-inverted);
 }
 .dark-direct-tooltip.simpletip-tooltip.delay {
     -webkit-transition-delay: 1ms;

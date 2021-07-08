@@ -366,10 +366,11 @@
         });
 
         $button.rebind('click.proRegister', function(e) {
-
-            if ($(this).hasClass('disabled')) {
+            var $this = $(this);
+            if ($this.hasClass('disabled')) {
                 return false;
             }
+            $this.addClass('disabled');
             doProRegister($dialog);
             return false;
         });

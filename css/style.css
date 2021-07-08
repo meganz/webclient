@@ -5530,6 +5530,7 @@ tr:not(.taken-down) .grid-status-icon:not(.read-only):not(.read-and-write) {
     flex-direction: column;
     height: 100%;
     text-align: center;
+    flex-grow: 1;
 }
 .fm-empty-pad {
     margin: auto;
@@ -5578,10 +5579,6 @@ tr:not(.taken-down) .grid-status-icon:not(.read-only):not(.read-and-write) {
 .fm-empty-public-link-bg {
     height: 102px;
     background-position: center -3575px;
-}
-.fm-empty-folder-link .fm-empty-pad {
-    height: 354px;
-    margin-top: -177px;
 }
 .fm-empty-description, .fm-not-logged-description {
     text-align: center;

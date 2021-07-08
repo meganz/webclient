@@ -1280,7 +1280,7 @@ class ConversationsApp extends MegaRenderMixin {
                         contactsActive={megaChat.routingSection === "contacts"}
                         onSelectDone={this.startChatClicked.bind(this)}
                         showTopButtons={self.getContactsPickerButtons()}
-                        showAddContact={true}
+                        showAddContact={M.u && M.u.length > 1}
                     />
 
                     <SearchPanel />

@@ -5609,6 +5609,12 @@ tr:not(.taken-down) .grid-status-icon:not(.read-only):not(.read-and-write) {
     font: var(--text-body1);
     color: var(--text-color-low);
 }
+.empty-share-public.loading {
+    opacity: 0.3;
+}
+.empty-share-public.loading a {
+    cursor: default;
+}
 .empty-share-public a {
     text-decoration: underline;
 }

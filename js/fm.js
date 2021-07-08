@@ -601,6 +601,7 @@ function setContactLink($container) {
                     contactPrefix =  res.match('^C!') ? '' : 'C!';
                     res = 'https://mega.nz/' + contactPrefix + res;
                     $publicLink.attr('data-lnk', res);
+                    mBroadcaster.sendMessage('contact:setContactLink', res);
                 }
             }
         });

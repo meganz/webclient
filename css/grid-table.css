@@ -132,7 +132,7 @@
     box-sizing: content-box;
     display: inline-block;
     margin: 0 16px;
-    min-height: calc(100% - 5px);
+    min-height: calc(100% - 6px);
     min-width: calc(100% - 32px);
     outline: 10px;
     outline-color: var(--surface-main);

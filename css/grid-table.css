@@ -691,6 +691,11 @@ table.fm td[megatype="fname"] {
     min-width: 180px;
 }
 
+table.fm td[megatype="empty"] {
+    display: table-cell;
+    width: 100%;
+}
+
 table.fm td:first-child {
     -webkit-padding-start: 0;
     padding-inline-start: 0;

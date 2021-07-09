@@ -3027,6 +3027,8 @@ class Button extends _stores_mixins_js2__["MegaRenderMixin"] {
       }
     }), toggle && react1.a.createElement("div", {
       className: "\n                            mega-switch\n                            " + (toggle.className ? toggle.className : '') + "\n                            " + (toggle.enabled ? 'toggle-on' : '') + "\n                        ",
+      role: "switch",
+      "aria-checked": !!toggle.enabled,
       onClick: ev => {
         ev.stopPropagation();
 
@@ -24605,6 +24607,8 @@ class miniui_ToggleCheckbox extends mixins["MegaRenderMixin"] {
   render() {
     return external_React_default.a.createElement("div", {
       className: "\n                    mega-switch\n                    " + this.props.className + "\n                    " + (this.state.value ? 'toggle-on' : '') + "\n                ",
+      role: "switch",
+      "aria-checked": !!this.state.value,
       onClick: this.onToggle
     }, external_React_default.a.createElement("div", {
       className: "mega-feature-switch"

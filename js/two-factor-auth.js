@@ -293,11 +293,11 @@ twofactor.account = {
             twofactor.isEnabledForAccount(function(result) {
                 // If enabled, show red button, disable PIN entry text box and Deactivate text
                 if (result) {
-                    $button.addClass('toggle-on enabled');
+                    $button.addClass('toggle-on enabled').trigger('update.accessibility');
                 }
                 else {
                     // Otherwise show green button and Enable text
-                    $button.removeClass('toggle-on enabled');
+                    $button.removeClass('toggle-on enabled').trigger('update.accessibility');
                 }
 
                 // Init the click handler now for the button now that the enabled/disabled status has been retrieved

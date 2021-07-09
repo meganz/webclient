@@ -582,6 +582,8 @@ accountUI.inputs = {
                 newVal = 1;
             }
 
+            $switch.trigger('update.accessibility');
+
             if (typeof onChangeCb === 'function') {
                 onChangeCb(newVal);
             }
@@ -1272,14 +1274,14 @@ accountUI.account = {
             if (defaultValue) {
                 // Render the QR code
                 $('.account.qr-icon', this.$QRSettings).text('').qrcode(QRoptions);
-                $('.mega-switch.enable-qr', this.$QRSettings).addClass('toggle-on');
+                $('.mega-switch.enable-qr', this.$QRSettings).addClass('toggle-on').trigger('update.accessibility');
                 $('.access-qr-container', this.$QRSettings).parent().removeClass('closed');
                 $('.qr-block', this.$QRSettings).removeClass('hidden');
                 $container.addClass('border');
             }
             else {
                 $('.account.qr-icon').text('');
-                $('.mega-switch.enable-qr', this.$QRSettings).removeClass('toggle-on');
+                $('.mega-switch.enable-qr', this.$QRSettings).removeClass('toggle-on').trigger('update.accessibility');
                 $('.access-qr-container', this.$QRSettings).parent().addClass('closed');
                 $('.qr-block', this.$QRSettings).addClass('hidden');
                 $container.removeClass('border');
@@ -2280,6 +2282,7 @@ accountUI.notifications = {
                         ($NToggle.hasClass('toggle-on') ? $.fn.addClass : $.fn.removeClass)
                             .apply($NToggleAll, ['toggle-on']);
                     }
+                    $NToggleAll.trigger('update.accessibility');
                 });
         });
 
@@ -2296,7 +2299,8 @@ accountUI.notifications = {
                     var notifChange = val ? mega.notif.set : mega.notif.unset;
                     notifChange($this.attr('name'), sectionName);
 
-                    (val ? $.fn.addClass : $.fn.removeClass).apply($NToggle, ['toggle-on']);
+                    (val ? $.fn.addClass : $.fn.removeClass).apply($this, ['toggle-on']);
+                    $this.trigger('update.accessibility');
                 });
             }
         );
@@ -2325,6 +2329,7 @@ accountUI.notifications = {
                         mega.enotif.setState(emailId, !val);
                         (val || $EToggle.hasClass('toggle-on') ? $.fn.addClass : $.fn.removeClass)
                             .apply($EToggleAll, ['toggle-on']);
+                        $EToggleAll.trigger('update.accessibility');
                     }
                 );
             });
@@ -2337,6 +2342,7 @@ accountUI.notifications = {
                 function(val) {
                     mega.enotif.setAllState(!val);
                     (val ? $.fn.addClass : $.fn.removeClass).apply($EToggle, ['toggle-on']);
+                    $EToggle.trigger('update.accessibility');
                 }
             );
 
@@ -3442,7 +3448,7 @@ accountUI.contactAndChat = {
                     pushNotificationSettings.disableDnd(this.group);
                     return;
                 }
-                $(this.DOM.toggle, this.DOM.container).addClass('toggle-on');
+                $(this.DOM.toggle, this.DOM.container).addClass('toggle-on').trigger('update.accessibility');
                 this.renderStatus(true);
             }
         },
@@ -3495,7 +3501,7 @@ accountUI.contactAndChat = {
             if (hasDnd) {
                 pushNotificationSettings.disableDnd(group);
                 this.renderStatus(false);
-                $(ev.currentTarget).removeClass('toggle-on');
+                $(ev.currentTarget).removeClass('toggle-on').trigger('update.accessibility');
             }
             else {
                 this.handleDialogOpen();
@@ -3527,7 +3533,7 @@ accountUI.contactAndChat = {
                 var value = parseInt($radio.val(), 10);
 
                 pushNotificationSettings.setDnd(self.group, value === 0 ? 0 : time + value * 60);
-                $(self.DOM.toggle, self.DOM.container).addClass('toggle-on');
+                $(self.DOM.toggle, self.DOM.container).addClass('toggle-on').trigger('update.accessibility');
                 closeDialog();
                 self.renderStatus(true);
             });

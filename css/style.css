@@ -5264,9 +5264,6 @@ tr:not(.taken-down) .grid-status-icon:not(.read-only):not(.read-and-write) {
 .fm-breadcrumbs.root {
     flex-shrink: 0;
 }
-.fm-breadcrumbs.root:first-child:nth-last-child(-n+3) {
-    flex-shrink: 1;
-}
 .fm-breadcrumbs:last-of-type {
     flex-shrink: 0;
     max-width: 70%;

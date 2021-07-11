@@ -84,6 +84,37 @@ mega.textEditorUI = new function TextEditorUI() {
         editor.on('change', changeListner);
     };
 
+    var doClose = () => {
+        $saveButton.addClass('disabled');
+        history.back();
+        mega.textEditorUI.doClose();
+    };
+
+    var confirmSaveOrExit = () => {
+        if ($saveButton.hasClass('disabled')) {
+            doClose();
+        }
+        else {
+            msgDialog(
+                'save_discard_cancel',
+                '',
+                l.msg_dlg_modified_title,
+                l.msg_dlg_modified_text,
+                (e) => {
+                    if (e === 1) {
+                        $saveButton.trigger('click', doClose);
+                    }
+                    else if (e === 0) {
+                        editor.focus();
+                    }
+                    else if (e === -1) {
+                        doClose();
+                    }
+                }
+            );
+        }
+    };
+
     var printText = function() {
         /* eslint-disable no-unsanitized/method */
 
@@ -188,14 +219,7 @@ mega.textEditorUI = new function TextEditorUI() {
             function textEditorCloseBtnClick() {
 
                 if (editor) {
-                    validateAction(
-                        l[22750],
-                        l[22751],
-                        function() {
-                            history.back();
-                            mega.textEditorUI.doClose();
-                        }
-                    );
+                    confirmSaveOrExit();
                 }
                 else {
                     history.back();
@@ -207,7 +231,7 @@ mega.textEditorUI = new function TextEditorUI() {
 
         $saveButton.rebind(
             'click.txt-editor',
-            function textEditorSaveBtnClick() {
+            function textEditorSaveBtnClick(e, cb) {
                 if ($(this).hasClass('disabled')) {
                     return false;
                 }
@@ -215,7 +239,6 @@ mega.textEditorUI = new function TextEditorUI() {
                     $saveButton.addClass('disabled');
 
                     loadingDialog.show('common', l[23131]);
-
                     mega.fileTextEditor.setFile(versionHandle || fileHandle, editor.getValue()).done(function(fh) {
                         if (versionHandle) {
                             mega.fileTextEditor.removeOldVersion(versionHandle);
@@ -231,6 +254,9 @@ mega.textEditorUI = new function TextEditorUI() {
                         bindChangeListner();
 
                         loadingDialog.hide();
+                        if (cb && typeof cb === 'function') {
+                            cb();
+                        }
                     });
                 }
             }

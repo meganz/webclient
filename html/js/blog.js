@@ -329,7 +329,7 @@ function handleInvalidBlogID() {
         loadSubPage(newPage);
     }
     else {
-        window.location.replace('https://mega.nz/' + newPage);
+        window.location.replace(`${getBaseUrl()}/` + newPage);
     }
 }
 

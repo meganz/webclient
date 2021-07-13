@@ -650,7 +650,7 @@
                 self.unregisterScreen(screenId);
             },
             undefined,
-            "https://mega.nz/help/client/webclient/getting-started/how-can-i-share-data-without-requirin" +
+            `${getBaseUrl()}/help/client/webclient/getting-started/how-can-i-share-data-without-requirin` +
             "g-the-recipient-to-register-with-mega-first-57885f6f886688d0168b45b6"
         );
 

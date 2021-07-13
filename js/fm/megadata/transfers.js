@@ -438,6 +438,9 @@ MegaData.prototype.addWebDownload = function(n, z, preview, zipname) {
         if (dlmanager.isOverQuota) {
             dlmanager.showOverQuotaDialog();
         }
+        else {
+            dlmanager.showNothingToDownloadDialog();
+        }
         return;
     }
 

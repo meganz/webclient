@@ -430,6 +430,11 @@ mobile.downloadOverlay = {
             if (dlmanager.isOverQuota) {
                 dlmanager.showOverQuotaDialog();
             }
+            else {
+                dlmanager.showNothingToDownloadDialog(() => {
+                    this.close();
+                });
+            }
             return;
         }
 

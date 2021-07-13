@@ -2014,6 +2014,13 @@ var dlmanager = {
         });
     },
 
+    showNothingToDownloadDialog: function DM_noDownloadDialog(callback) {
+        'use strict';
+
+        loadingDialog.hide();
+        msgDialog('warningb', '', l.empty_download_dlg_title, l.empty_download_dlg_text, callback);
+    },
+
     getCurrentDownloads: function() {
         return array.unique(dl_queue.filter(isQueueActive).map(dlmanager.getGID));
     },

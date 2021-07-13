@@ -651,6 +651,9 @@ mobile.register.new = {
         // Set a flag to check at the end of the registration process
         localStorage.signUpStartedInMobileWeb = '1';
 
+        rv.email = email;
+        rv.password = password;
+
         // Start the new secure registration process
         security.register.startRegistration(firstName, lastName, email, password, fromProPage, completeCallback);
     },
@@ -718,13 +721,14 @@ mobile.register.new = {
         }
 
         // Show an error if the email is already in use
-        else if (result === EEXIST) {
-            mobile.messageOverlay.show(l[9000], '', function() {
+        else if (result === EACCESS || result === EEXIST) {
+            loginFromEphemeral.init();
+            /*mobile.messageOverlay.show(l[9000], '', function() {
                 if (isEphemeral()) {
                     // Prevent the ephemeral session in mobile web if the email has been registered
                     u_logout(true);
                 }
-            });    // Error. This email address is already in use.
+            });  */  // Error. This email address is already in use.
         }
         else {
             // Show an error

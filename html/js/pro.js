@@ -65,7 +65,7 @@ var pro = {
                             results[i]['lps'],   // NEW 'local price symbol'
                             results[i]['lp0']    // NEW 'local price Zero val'
                         ]);
-                        if (results[i].m === 1 && results[i].al !== 100) {
+                        if (results[i].m === 1 && results[i].it !== 1) {
                             if (!maxPlan || maxPlan[2] < results[i]['s']) {
                                 maxPlan = plans[plans.length - 1];
                             }

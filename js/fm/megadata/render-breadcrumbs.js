@@ -307,7 +307,7 @@
      */
     function getPathHTML(items, dictionary, container) {
         let html = '';
-        let currentPathLength = 0;
+        let currentPathLength = items.length === 3 ? 12 : 0;
         const maxPathLength = getMaxPathLength(14, container);
         let extraItems = [];
 

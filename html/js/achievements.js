@@ -7,12 +7,11 @@ const achievementPage = function() {
 
     const $pageStorageBlock = $('.storage-block', '.achievement-page');
     const $cta = $('.js-achievmcta', '.achievement-page');
-    let url = 'register';
 
     if (u_attr && !isEphemeral()) {
         $pageStorageBlock.addClass('logged-in').removeClass('logged-out');
         $cta.text(l[16668]);
-        url = 'fm/dashboard';
+        let url = '/fm/dashboard';
 
         if (M.maf) {
             mega.achievem.bindStorageDataToView($pageStorageBlock, false);
@@ -28,14 +27,9 @@ const achievementPage = function() {
         }
 
         if (is_mobile) {
-            url = 'fm/account';
+            url = '/fm/account';
             mobile.achieve.init();
         }
+        $cta.attr('href', url);
     }
-
-    $cta.rebind('click',() => {
-        loadSubPage(url);
-        return false;
-    });
-
 };

@@ -135,7 +135,7 @@
     min-height: calc(100% - 6px);
     min-width: calc(100% - 32px);
     outline: 10px;
-    outline-color: var(--surface-main);
+    outline-color: var(--stroke-main);
     outline-offset: -10px;
     outline-style: solid;
     position: relative;
@@ -221,8 +221,8 @@ table tr td:last-child::after {
 
 .table-hover tr.ui-selected td::before {
     background: var(--surface-grey-4);
-    border-bottom: 1px solid var(--surface-grey-4);
-    border-top: 1px solid var(--surface-grey-4);
+    border-bottom: 1px solid var(--stroke-grey-4);
+    border-top: 1px solid var(--stroke-grey-4);
 }
 
 .table-hover tr.ui-selected td:first-child::before {
@@ -259,12 +259,12 @@ table tr td:last-child::after {
 }
 
 .table-hover tr.ui-selected td:first-child::before {
-    border-left: 1px solid var(--surface-grey-4);
+    border-left: 1px solid var(--stroke-grey-4);
 }
 
 .rtl .table-hover tr.ui-selected td:first-child::before {
     border-left: none;
-    border-right: 1px solid var(--surface-grey-4);
+    border-right: 1px solid var(--stroke-grey-4);
 }
 
 .table-hover tr:hover td:last-child::before,
@@ -289,7 +289,7 @@ table tr td:last-child::after {
 }
 
 .table-hover tr.ui-selected td:last-child::before {
-    border-right: 1px solid var(--surface-grey-4);
+    border-right: 1px solid var(--stroke-grey-4);
 }
 table tr:hover .grid-url-arrow,
 table tr.ui-selected .grid-url-arrow,
@@ -301,7 +301,7 @@ table tr.ui-selected .link-transfer-status {
 }
 
 .rtl .table-hover tr.ui-selected td:last-child::before {
-    border-left: 1px solid var(--surface-grey-4);
+    border-left: 1px solid var(--stroke-grey-4);
     border-right: none;
 }
 
@@ -311,7 +311,7 @@ table tr.ui-selected .link-transfer-status {
 
 .grid-table-header-container-sc {
     position: relative;
-    background-color: var(--surface-main);
+    background-color: var(--stroke-main);
 }
 
 .grid-table-header-container-sc::after {
@@ -320,13 +320,13 @@ table tr.ui-selected .link-transfer-status {
     height: 1px;
     bottom: 0;
     left: 24px;
-    background-color: var(--surface-grey-2);
+    background-color: var(--stroke-grey-2);
     position: absolute;
 }
 
 .grid-table-header {
     width: 100%;
-    background-color: var(--surface-main);
+    background-color: var(--stroke-main);
     position: relative;
     font-size: 0;
     white-space: nowrap;
@@ -364,7 +364,7 @@ table tr.ui-selected .link-transfer-status {
     box-sizing: border-box;
     height: 24px;
     font: var(--text-body2);
-    color: var(--surface-main-inverted);
+    color: var(--stroke-main-inverted);
     text-align: start;
     white-space: nowrap;
     overflow: hidden;
@@ -394,7 +394,7 @@ table tr.ui-selected .link-transfer-status {
     bottom: 1px;
     height: 20px;
     width: 1px;
-    background-color: var(--surface-mid-grey);
+    background-color: var(--stroke-mid-grey);
     cursor: col-resize;
 }
 .rtl .grid-table-header th:not(.grid-url-header):hover::before {
@@ -440,7 +440,7 @@ table tr.ui-selected .link-transfer-status {
     position: absolute;
     width: 40px;
     height: 24px;
-    background-color: var(--surface-main);
+    background-color: var(--stroke-main);
     right: 0;
     top: 0;
     z-index: 9;
@@ -467,12 +467,12 @@ table tr.ui-selected .link-transfer-status {
 }
 
 .files-grid-view.fm .column-settings.overlap {
-    border-left: 1px solid var(--surface-grey-2);
+    border-left: 1px solid var(--stroke-grey-2);
 }
 
 .rtl .files-grid-view.fm .column-settings.overlap {
     border-left: unset;
-    border-right: 1px solid var(--surface-grey-2);
+    border-right: 1px solid var(--stroke-grey-2);
 }
 
 .out-shared-grid-view > .grid-table-header::after {
@@ -490,7 +490,7 @@ table.grid-table {
 }
 
 table.grid-table tr {
-    border-bottom: 1px solid var(--surface-grey-2);
+    border-bottom: 1px solid var(--stroke-grey-2);
 }
 
 table.grid-table th:first-child,
@@ -532,7 +532,7 @@ table.grid-table .taken-down td,
     color: var(--secondary-red);
 }
 table.grid-table .undecryptable td {
-    color: var(--surface-mid-grey);
+    color: var(--stroke-mid-grey);
 }
 table.grid-table .undecryptable .tranfer-filetype-txt,
 .undecryptable .file-block-title,
@@ -564,7 +564,7 @@ table.grid-table .ver-col-container .ver-size {
     margin-inline-start: 8px;
     height: 15px;
     border-radius: 8px;
-    background-color: var(--surface-mid-grey);
+    background-color: var(--stroke-mid-grey);
     margin-top: 4px;
     display: inline-block;
 }
@@ -1207,7 +1207,7 @@ table.out-shares .fm-chat-users {
     position: relative;
     font-size: 0;
     white-space: nowrap;
-    background-color: var(--surface-main);
+    background-color: var(--stroke-main);
     margin: 0 16px;
     min-width: 1152px;
 }
@@ -1216,7 +1216,7 @@ table.out-shares .fm-chat-users {
     height: 24px;
     font: var(--text-body2);
     padding: 0 13px 0 5px;
-    color: var(--surface-main-inverted);
+    color: var(--stroke-main-inverted);
     text-align: left;
     white-space: nowrap;
     overflow: hidden;
@@ -1247,7 +1247,7 @@ table.out-shares .fm-chat-users {
     height: 1px;
     bottom: 0;
     left: 8px;
-    background-color: var(--surface-grey-2);
+    background-color: var(--stroke-grey-2);
     position: absolute;
 }
 .fm-transfers-block td
@@ -1300,7 +1300,7 @@ table.out-shares .fm-chat-users {
     background-image: none;
 }
 .transfer-table tr {
-    border-bottom: 1px solid var(--surface-grey-2);
+    border-bottom: 1px solid var(--stroke-grey-2);
 }
 .transfer-table td {
     color: var(--text-color-high);

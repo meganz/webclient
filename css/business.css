@@ -38,7 +38,7 @@
 }
 .business-page.bottom-page .top-head,
 .business-page.bottom-page .top-head.floating {
-    background-color: var(--surface-main);
+    background-color: var(--stroke-main);
 }
 .business-page .pages-menu.body {
     background-color: #fff;

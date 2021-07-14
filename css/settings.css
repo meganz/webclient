@@ -145,7 +145,7 @@
     float: none;
 }
 .fm-account-sections .switch-container {
-    border-top: 1px solid var(--surface-grey-2);
+    border-top: 1px solid var(--stroke-grey-2);
     padding: 24px 0 0 0;
 }
 .fm-account-sections .mega-switch + .label-wrap {
@@ -234,7 +234,7 @@
 
 /* Settings. Content. Subsections */
 .account.data-block {
-    border-bottom: 1px solid  var(--surface-grey-2);
+    border-bottom: 1px solid  var(--stroke-grey-2);
     display: flex;
     flex-wrap: wrap;
     position: relative;
@@ -252,7 +252,7 @@
     position: relative;
 }
 .settings-sub-section:not(.hidden) ~ .settings-sub-section {
-    border-top: 1px solid var(--surface-grey-2);
+    border-top: 1px solid var(--stroke-grey-2);
 }
 .settings-sub-section.sub-container:not(.hidden) {
     border: 0;
@@ -299,8 +299,8 @@
 .content-panel .settings-button .sub-title:hover,
 .content-panel .settings-button.active .head-title {
     cursor: pointer;
-    color: var(--surface-main-inverted);
-    background-color: var(--surface-grey-1);
+    color: var(--stroke-main-inverted);
+    background-color: var(--stroke-grey-1);
     box-shadow: 0 1px 4px 0 rgb(0 0 0 / 0.1);
 }
 .content-panel .settings-button .head-title i {
@@ -769,7 +769,7 @@
 
 /* Expanded MEGAdrop details */
 .data-table.megadrop .tab-wrapper {
-    border-bottom: 1px solid var(--surface-grey-2);
+    border-bottom: 1px solid var(--stroke-grey-2);
     display: flex;
     justify-content: flex-start;
     padding: 20px 0 0;

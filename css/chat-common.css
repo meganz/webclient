@@ -61,7 +61,7 @@
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
-    background-color: var(--surface-main);
+    background-color: var(--stroke-main);
     position: absolute;
     right: 0;
 }
@@ -402,7 +402,7 @@
 .join-chat-block {
     height: 72px;
     text-align: center;
-    background-color: var(--surface-main);
+    background-color: var(--stroke-main);
 }
 .join-chat-block .join-chat-button:hover {
     opacity: 1;

@@ -106,7 +106,7 @@
     height: calc(100% - 207px);
 }
 .data-block-view:hover {
-    box-shadow: 0 0 0 4px var(--surface-grey-2);
+    box-shadow: 0 0 0 4px var(--stroke-grey-2);
 }
 .data-block-view.ui-selected,
 .data-block-view.ui-selecting,
@@ -121,7 +121,7 @@
     text-align: center;
     position: static;
     background: var(--surface-grey-1);
-    border: 1px solid var(--surface-grey-4);
+    border: 1px solid var(--stroke-grey-4);
     border-radius: 10px;
     box-sizing: border-box;
     overflow: hidden;
@@ -150,8 +150,8 @@
 .data-block-view.ui-selected .data-block-bg,
 .data-block-view.ui-selecting .data-block-bg,
 .data-block-view.dragover .data-block-bg {
-    background-color: var(--surface-grey-1);
-    border: 1px solid var(--surface-main);
+    background-color: var(--stroke-grey-1);
+    border: 1px solid var(--stroke-main);
 }
 
 .data-block-view.active .thumb .indicator {
@@ -309,7 +309,7 @@
 
 .video-thumb-details {
     font: var(--text-body2);
-    color: var(--surface-main-inverted);
+    color: var(--stroke-main-inverted);
     top: 4px;
     position: absolute;
     text-align: left;

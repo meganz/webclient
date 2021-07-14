@@ -361,7 +361,7 @@ html.gbot {
 .bottom-page.light-blue-top .top-head.floating,
 .bottom-page.light-grey-top .top-head,
 .bottom-page.light-grey-top .top-head.floating {
-    background-color: var(--surface-main);
+    background-color: var(--stroke-main);
 }
 
 .bottom-page.top-bl {
@@ -420,7 +420,7 @@ html.gbot {
 }
 .fmholder .bottom-page.sign .top-head.floating,
 .fmholder .bottom-page.about .top-head.floating {
-    box-shadow: 0 1px 0 0 var(--surface-grey-2);
+    box-shadow: 0 1px 0 0 var(--stroke-grey-2);
 }
 
 .bottom-page.vertical-centered-bl {

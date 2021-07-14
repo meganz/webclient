@@ -1485,7 +1485,7 @@ button.active .semi-big-icon.nwse-resize,
     height: 0;
     border-left: 11px solid transparent;
     border-right: 11px solid transparent;
-    border-top: 9px solid var(--surface-main-inverted);
+    border-top: 9px solid var(--stroke-main-inverted);
     background-image: none;
 }
 .small-icon.icons-sprite.grey-plus {

@@ -409,6 +409,9 @@
                     $('.dialog-picker-button', $dialog).trigger('click');
                 }
             });
+            if ($.saveAsDialog) {
+                $('#f-name-input', $dialog).focus();
+            }
         }
         else {
             for (var i = 0; i < items.length; i++) {

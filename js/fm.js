@@ -2731,7 +2731,7 @@ function closeDialog(ev) {
             delete $.cfpromise;
         }
     }
-    else {
+    else if ($.dialog !== 'terms') {
         delete $.mcImport;
     }
 

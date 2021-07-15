@@ -2006,11 +2006,16 @@ var addressDialog = {
         };
 
         if (event && event.origin === addressDialog.gatewayOrigin && event.data) {
-
+            if (typeof event.data !== 'string') {
+                tryCatch(() => {
+                    api_req({a: 'log', e: 99741, m: JSON.stringify(event.data)});
+                });
+                failHandle(l[1679]);
+                return;
+            }
             if (event.data === 'closeme') {
                 return closeDialog();
             }
-
             if (event.data.startsWith('payfail^')) {
                 failHandle(event.data.split('^')[1]);
             }

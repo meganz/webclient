@@ -8488,6 +8488,9 @@ textarea.mobile.support-text-field {
     box-shadow: none;
     -webkit-box-shadow: none;
 }
+.mobile .improved-recovery-steps .check-sessions .checkdiv::before {
+   display: none;
+}
 .mobile .improved-recovery-steps .check-sessions .checkdiv::after {
     background-position: -25.5px -1850px;
     display: block;

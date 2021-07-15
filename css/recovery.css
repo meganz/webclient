@@ -564,9 +564,12 @@
     height: 20px;
     border-radius: 100%;
 }
-.improved-recovery-steps .check-sessions .checkdiv, .improved-recovery-steps .check-sessions .checkdiv::before {
+.improved-recovery-steps .check-sessions .checkdiv {
     box-shadow: none;
     -webkit-box-shadow:none;
+}
+.improved-recovery-steps .check-sessions .checkdiv::before {
+    display: none;
 }
 .improved-recovery-steps .check-sessions .checkdiv::after {
     background-position: -25.5px -1850px;

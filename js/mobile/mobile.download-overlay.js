@@ -22,6 +22,9 @@ mobile.downloadOverlay = {
 
         // Get initial overlay details
         var node = M.d[nodeHandle];
+        if (!node) {
+            return;
+        }
         var fileName = node.name;
         var fileSizeBytes = node.t === 1 ? node.tb : node.s;
         var fileSize = numOfBytes(fileSizeBytes);

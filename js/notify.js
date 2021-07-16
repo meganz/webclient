@@ -722,7 +722,10 @@ var notify = {
             // Redirect to payment history
             loadSubPage('fm/account/plan');
             mBroadcaster.once('settingPageReady', function () {
-                $('.fm-account-main').data('jsp').scrollToElement($target, true, false);
+                const jsp = $('.fm-account-main').data('jsp');
+                if (jsp) {
+                    jsp.scrollToElement($target, true, false);
+                }
             });
         });
     },

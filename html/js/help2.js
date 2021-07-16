@@ -1085,7 +1085,9 @@ var Help = (function() {
             e.preventDefault();
 
             if (!$this.is('.disabled') && $this.data('href')) {
-                var url = getCleanSitePath($this.data('href').replace('https://mega.nz', ''));
+                var url = getCleanSitePath(
+                    $this.data('href').replace('https://mega.nz', '').replace('https://mega.io', '')
+                );
                 if (url === 'support' && !u_type) {
                     login_next = url;
                     url = 'login';

@@ -869,8 +869,11 @@ mBroadcaster.once('boot_done', function populate_l() {
     l[8440] = l[8440].replace('[A]', '<a href="https://github.com/meganz/">').replace('[/A]', '</a>');
     l[8440] = l[8440].replace('[A2]', '<a href="/contact" class="clickurl">').replace('[/A2]', '</a>');
     l[8441] = l[8441].replace('[A]', '<a href="mailto:bugs@mega.nz">').replace('[/A]', '</a>');
-    l[8441] = l[8441].replace('[A2]', '<a href="https://mega.nz/blog_8">').replace('[/A2]', '</a>');
-    l[19310] = l[19310].replace('[A]', '<a href="https://mega.nz/blog_6" target="_blank">').replace('[/A]', '</a>');
+    l[8441] = l[8441].replace('[A2]', `<a href="${getBaseUrl()}/blog/vulnerability-rewards-the-first-week">`)
+        .replace('[/A2]', '</a>');
+    l[19310] = l[19310]
+        .replace('[A]', `<a href="${getBaseUrl()}/blog/the-mega-vulnerability-reward-program" target="_blank">`)
+        .replace('[/A]', '</a>');
 
 
     l[8644] = l[8644].replace('[S]', '<span class="green">').replace('[/S]', '</span>');
@@ -964,12 +967,12 @@ mBroadcaster.once('boot_done', function populate_l() {
 
     l[16649] = l[16649].replace('%1', '<span class="amount">10.00</span>');
     l[16501] = l[16501].replace('[A1]', '<a class="red" href="mailto:support@mega.nz">').replace('[/A1]', '</a>')
-        .replace('[A2]', '<a class="red" target="_blank" href="https://mega.nz/help/client/android/'
-            + 'accounts-pro-accounts/how-can-i-cancel-the-renewal-of-my-mega-subscription">')
+        .replace('[A2]', `<a class="red" target="_blank" href="${getBaseUrl()}/help/client/android/accounts-and-pro-` +
+            `accounts#how-can-i-cancel-the-renewal-of-my-mega-subscription-57733f8b886688e7028b45cf">`)
         .replace('[/A2]', '</a>')
-        .replace('[A3]', '<a class="red" target="_blank" href="https://mega.nz/help/client/ios/'
-            + 'accounts-pro-accounts/how-does-mega-pro-account-subscription-work-with-apple-in-app-'
-            + 'purchases">')
+        .replace('[A3]', `<a class="red" target="_blank" href="${getBaseUrl()}/help/client/ios/accounts-and-pro-` +
+            `accounts#how-does-mega-pro-account-subscription-work-with-apple-in-app-purchases` +
+            `-57732e9f886688e7028b45bd">`)
         .replace('[/A3]', '</a>');
     l[16596] = escapeHTML(l[16596])
         .replace('[A]', '<a class="red" href="mailto:uwp.alpha@mega.nz">').replace('[/A]', '</a>').replace('uwp@', 'uwp.alpha@');
@@ -998,7 +1001,7 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[A]', '<a href="https://www.microsoft.com/store/apps/9nbs1gzzk3zg" target="_blank">')
         .replace('[/A]', '</a>');
 
-    var linktohelp = 'https://mega.nz/help/client/webclient/cloud-drive/59f13b42f1b7093a7f8b4589';
+    var linktohelp = `${getBaseUrl()}/help/s/59f13b42f1b7093a7f8b4589`;
     l[17097] =  l[17097]
                 .replace('[A]', '<a id="versionhelp" href="' + linktohelp + '" target="_blank" class="red">')
                 .replace('[/A]', '</a>');
@@ -1060,7 +1063,7 @@ mBroadcaster.once('boot_done', function populate_l() {
         + '/backup">')
         .replace('[/A]', '</a>');
     l[20016] = l[20016].replace('[A]', '<a target="_blank" class="red" rel="noopener noreferrer" href="https://mega.nz'
-        + '/blog_48" >')
+        + '/blog/mega-adds-two-factor-authentication" >')
         .replace('[/A]', '</a>')
         .replace('[Br]', '<br><br>');
     l[20022] = l[20022].replace('[Br]', '<br><br>');
@@ -1202,7 +1205,7 @@ mBroadcaster.once('boot_done', function populate_l() {
         + 'target="_blank" rel="noopener noreferrer">').replace('[/A1]', '</a>')
         .replace('[A2]', '<a class="clickurl" href="/takedown" '
             + 'target="_blank" rel="noopener noreferrer">').replace('[/A2]', '</a>')
-        .replace('[A3]', '<a href="https://mega.nz/blog_59" '
+        .replace('[A3]', `<a href="${getBaseUrl()}/blog/transparency-report-2019" `
             + 'target="_blank" rel="noopener noreferrer">').replace('[/A3]', '</a>');
     l[23120] = escapeHTML(l[23120].replace(/&quot;|"/g, '%1')).replace(/%1/g, '"');
     l[23126] = escapeHTML(l[23126].replace(/&quot;|"/g, '%1')).replace(/\[BR]/g, '<br/>').replace(/%1/g, '"');
@@ -1262,7 +1265,8 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[A3]', '<a href="" class="red a3">').replace('[/A3]', '</a>');
     l[23449] = escapeHTML(l[23449]).replace(/\[R\/]/g, '<sup>&reg;</sup>');
     l[24074] = escapeHTML(l[24074]).replace('[A]', '<a>').replace('[/A]', '</a>');
-    l[24141] = escapeHTML(l[24141]).replace('[A]', '<a class="red" href="https://mega.nz/blog_48">')
+    l[24141] = escapeHTML(l[24141])
+        .replace('[A]', `<a class="red" href="${getBaseUrl()}/blog/mega-adds-two-factor-authentication">`)
         .replace('[/A]', '</a>');
     l[24431] = escapeHTML(l[24431]).replace('[A]', '<a href="/repay" class="clickurl">').replace('[/A]', '</a>')
         .replace('[S]', '<span>').replace('[/S]', '</span>');

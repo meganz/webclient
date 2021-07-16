@@ -764,7 +764,7 @@ a.blog-button:hover {
     align-items: center;
 }
 .notification-type {
-    display: table;
+    display: flex;
     table-layout: fixed;
     width: calc(100% - 52px);
     box-sizing: border-box;
@@ -798,10 +798,10 @@ a.blog-button:hover {
 }
 .notification-request-buttons,
 .notification-accepted-bl {
+    flex: 0 0 75px;
     padding: 0 20px 0 8px;
-    width: 105px;
-    vertical-align: middle;
     text-align: right;
+    align-self: center;
 }
 .fm-dialog-button.notifications-button {
     margin-top: 0;
@@ -914,15 +914,13 @@ a.blog-button:hover {
     text-overflow: ellipsis;
     white-space: nowrap;
     color: var(--text-color-high);
-    width: 320px;
 }
 .notification-content {
+    flex: 1 1 320px;
+    overflow: hidden;
     box-sizing: border-box;
-    display: table-cell;
     min-height: 64px;
     padding: 8px 12px 6px;
-    -webkit-padding-end: 24px;
-    padding-inline-end: 24px;
     vertical-align: middle;
 }
 .notification-info {
@@ -931,7 +929,6 @@ a.blog-button:hover {
     font: var(--text-body2);
     padding: 1px 0;
     word-wrap: break-word;
-    width: 320px;
 }
 .notification-date {
     display: block;
@@ -5263,9 +5260,6 @@ tr:not(.taken-down) .grid-status-icon:not(.read-only):not(.read-and-write) {
 }
 .fm-breadcrumbs.root {
     flex-shrink: 0;
-}
-.fm-breadcrumbs.root:first-child:nth-last-child(-n+3) {
-    flex-shrink: 1;
 }
 .fm-breadcrumbs:last-of-type {
     flex-shrink: 0;

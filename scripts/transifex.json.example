@@ -4,5 +4,5 @@
     "BASE_URL": "https://rest.api.transifex.com",
     "ORGANISATION": "meganz-1",
     "PROJECT": "webclient-1",
-    "RESOURCE": "prod",
+    "RESOURCE": "prod"
 }

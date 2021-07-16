@@ -13639,6 +13639,7 @@ body.landscape .upload-overlay .mobile.filetype-img {
     bottom: -9px;
     left: 50%;
     margin: 0 0 0 -11px;
+    --icon-size: 24px;
 }
 .dark-direct-tooltip.simpletip-tooltip {
     display: block;
@@ -13649,6 +13650,7 @@ body.landscape .upload-overlay .mobile.filetype-img {
     transition: opacity 200ms ease-in-out 1s;
     transition-delay: 0ms;
     white-space: normal;
+    --mask-color: var(--surface-main-inverted);
 }
 .dark-direct-tooltip.simpletip-tooltip.delay {
     -webkit-transition-delay: 1ms;

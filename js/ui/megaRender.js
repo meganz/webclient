@@ -31,6 +31,7 @@
                         '</span>' +
                         '<i class="sprite-fm-mono icon-link"></i>' +
                     '</td>' +
+                    '<td megatype="empty"></td>' +
                 '</tr>' +
             '</table>',
 

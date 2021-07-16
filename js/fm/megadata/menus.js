@@ -595,7 +595,7 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
         // This event is context on selection bar
         if ($currentTarget.hasClass('js-statusbarbtn')) {
             id = $.selected[0];
-            currNodeClass = $.gridLastSelected.className;
+            currNodeClass = $.gridLastSelected ? $.gridLastSelected.className : false;
         }
         // This event is context on node itself
         else {

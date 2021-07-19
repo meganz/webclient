@@ -911,9 +911,9 @@ accountUI.account = {
                 else {
                     sel = '';
                 }
-                html += '<div class="option ' + sel + '" data-value="' + country + '">'
-                     +      countries[country]
-                     +  '</div>';
+                html += '<div class="option" data-value="' + country
+                    +   '" data-state="' + sel + '">' + countries[country]
+                    +  '</div>';
             }
             $('.dropdown-scroll', $country).safeHTML(html);
 

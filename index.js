@@ -2075,11 +2075,11 @@ function topbarUI(holderId) {
         element.classList[fminitialized && !folderlink && u_type === 3 ? 'remove' : 'add']('hidden');
     }
 
-    if (u_type === 3 && u_attr.fullname && (element = topbar.querySelector('.name'))) {
+    if (u_type === 3 && u_attr && u_attr.fullname && (element = topbar.querySelector('.name'))) {
         element.textContent = u_attr.fullname;
     }
 
-    if (u_type && u_attr.email && (element = topbar.querySelector('.email'))) {
+    if (u_type && u_attr && u_attr.email && (element = topbar.querySelector('.email'))) {
         element.textContent = u_attr.email;
     }
 

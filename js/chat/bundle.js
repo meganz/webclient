@@ -15257,63 +15257,69 @@ class ChatHandleMessage extends chatHandle_ConversationMessageMixin {
 
 
 
-
 class chatlinkDialog_ChatlinkDialog extends mixins["MegaRenderMixin"] {
   constructor(props) {
     super(props);
+
+    this.onPopupDidMount = $node => {
+      this.$popupNode = $node;
+    };
+
+    this.retrieveChatLink = () => {
+      const {
+        chatRoom
+      } = this.props;
+
+      if (!chatRoom.topic) {
+        delete this.loading;
+        return;
+      }
+
+      this.loading = chatRoom.updatePublicHandle(undefined).always(() => {
+        if (chatRoom.publicLink) {
+          this.setState({
+            'link': getBaseUrl() + '/' + chatRoom.publicLink
+          });
+        } else {
+          this.setState({
+            link: l[20660]
+          });
+        }
+      });
+    };
+
+    this.onClose = () => {
+      if (this.props.onClose) {
+        this.props.onClose();
+      }
+    };
+
+    this.onTopicFieldChanged = e => {
+      this.setState({
+        newTopic: e.target.value
+      });
+    };
+
+    this.onTopicFieldKeyPress = e => {
+      if (e.which === 13) {
+        this.props.chatRoom.setRoomTitle(this.state.newTopic);
+      }
+    };
+
     this.state = {
-      'link': l[5533],
+      link: l[5533],
       newTopic: ''
     };
-    this.onPopupDidMount = this.onPopupDidMount.bind(this);
-    this.onClose = this.onClose.bind(this);
-    this.onTopicFieldChanged = this.onTopicFieldChanged.bind(this);
-    this.onTopicFieldKeyPress = this.onTopicFieldKeyPress.bind(this);
-  }
-
-  onPopupDidMount($node) {
-    this.$popupNode = $node;
   }
 
   componentWillMount() {
-    const self = this;
-    $.dialog = "group-chat-link";
-    self.retrieveChatLink();
-  }
-
-  retrieveChatLink() {
-    const self = this;
-    const chatRoom = self.props.chatRoom;
-
-    if (!chatRoom.topic) {
-      delete self.loading;
-      return;
-    }
-
-    self.loading = chatRoom.updatePublicHandle(undefined).always(function () {
-      if (chatRoom.publicLink) {
-        self.setState({
-          'link': getBaseUrl() + '/' + chatRoom.publicLink
-        });
-      } else {
-        self.setState({
-          'link': l[20660]
-        });
-      }
-    });
-  }
-
-  componentWillUnmount() {
-    super.componentWillUnmount();
-
-    if ($.dialog === "group-chat-link") {
-      closeDialog();
-    }
+    this.retrieveChatLink();
   }
 
   componentDidUpdate() {
-    const self = this;
-    const chatRoom = this.props.chatRoom;
+    const {
+      chatRoom
+    } = this.props;
 
     if (!this.loading && chatRoom.topic) {
       this.retrieveChatLink();
@@ -15327,53 +15333,35 @@ class chatlinkDialog_ChatlinkDialog extends mixins["MegaRenderMixin"] {
 
     const $node = this.$popupNode;
     const $copyButton = $('.copy-to-clipboard', $node);
-    $copyButton.rebind('click', function () {
-      copyToClipboard(self.state.link, self.toastTxt);
+    $copyButton.rebind('click', () => {
+      copyToClipboard(this.state.link, this.toastTxt);
       return false;
     });
     $('span', $copyButton).text(l[1990]);
   }
 
-  onClose() {
-    if (this.props.onClose) {
-      this.props.onClose();
-    }
-  }
-
-  onTopicFieldChanged(e) {
-    this.setState({
-      'newTopic': e.target.value
-    });
-  }
-
-  onTopicFieldKeyPress(e) {
-    const self = this;
-
-    if (e.which === 13) {
-      self.props.chatRoom.setRoomTitle(self.state.newTopic);
-    }
-  }
-
   render() {
-    const self = this;
+    const {
+      chatRoom
+    } = this.props;
+    const {
+      newTopic,
+      link
+    } = this.state;
     const closeButton = external_React_default.a.createElement("button", {
       key: "close",
       className: "mega-button negative links-button",
-      onClick: function () {
-        self.onClose();
-      }
+      onClick: this.onClose
     }, external_React_default.a.createElement("span", null, l[148]));
     return external_React_default.a.createElement(modalDialogs["a" ].ModalDialog, extends_default()({}, this.state, {
-      title: self.props.chatRoom.iAmOperator() && !self.props.chatRoom.topic ? l[9080] : "",
-      className: "chat-rename-dialog export-chat-links-dialog group-chat-link" + (!self.props.chatRoom.topic ? " requires-topic" : ""),
-      onClose: () => {
-        self.onClose(self);
-      },
+      title: chatRoom.iAmOperator() && !chatRoom.topic ? l[9080] : '',
+      className: "\n                    chat-rename-dialog\n                    export-chat-links-dialog\n                    group-chat-link\n                    " + (chatRoom.topic ? '' : 'requires-topic') + "\n                ",
+      onClose: this.onClose,
       dialogName: "chat-link-dialog",
-      dialogType: self.props.chatRoom.iAmOperator() && !self.props.chatRoom.topic ? 'main' : 'graphic',
-      chatRoom: self.props.chatRoom,
-      popupDidMount: self.onPopupDidMount
-    }), self.props.chatRoom.iAmOperator() && !self.props.chatRoom.topic ? external_React_default.a.createElement("section", {
+      dialogType: chatRoom.iAmOperator() && !chatRoom.topic ? 'main' : 'graphic',
+      chatRoom: chatRoom,
+      popupDidMount: this.onPopupDidMount
+    }), chatRoom.iAmOperator() && !chatRoom.topic ? external_React_default.a.createElement("section", {
       className: "content"
     }, external_React_default.a.createElement("div", {
       className: "content-block"
@@ -15382,68 +15370,63 @@ class chatlinkDialog_ChatlinkDialog extends mixins["MegaRenderMixin"] {
     }, l[20617]), external_React_default.a.createElement("div", {
       className: "rename-input-bl",
       style: {
-        width: '320px',
         margin: '10px auto 20px auto'
       }
     }, external_React_default.a.createElement("input", {
       type: "text",
       name: "newTopic",
-      value: self.state.newTopic,
-      ref: function (field) {
-        self.topicInput = field;
+      value: newTopic,
+      ref: field => {
+        this.topicInput = field;
       },
       style: {
-        'paddingLeft': 8
+        paddingLeft: 8
       },
-      onChange: self.onTopicFieldChanged.bind(self),
-      onKeyPress: self.onTopicFieldKeyPress.bind(self),
+      onChange: this.onTopicFieldChanged,
+      onKeyPress: this.onTopicFieldKeyPress,
       placeholder: l[20616],
       maxLength: "30"
-    })))) : external_React_default.a.createElement(external_React_default.a.Fragment, null, external_React_default.a.createElement("header", null, external_React_default.a.createElement("h2", {
+    })))) : external_React_default.a.createElement(external_React_default.a.Fragment, null, external_React_default.a.createElement("header", null, external_React_default.a.createElement("i", {
+      className: "sprite-fm-uni icon-chat-group"
+    }), external_React_default.a.createElement("h2", {
       id: "chat-link-dialog-title"
-    }, external_React_default.a.createElement(utils["default"].EmojiFormattedContent, null, self.props.chatRoom.topic))), external_React_default.a.createElement("section", {
+    }, external_React_default.a.createElement(utils["default"].EmojiFormattedContent, null, chatRoom.topic))), external_React_default.a.createElement("section", {
       className: "content"
     }, external_React_default.a.createElement("div", {
       className: "content-block"
     }, external_React_default.a.createElement("div", {
       className: "chat-link-input"
     }, external_React_default.a.createElement("i", {
-      className: "sprite-fm-mono icon-link-filled"
+      className: "sprite-fm-mono icon-link-small"
     }), external_React_default.a.createElement("input", {
       type: "text",
       readOnly: true,
-      value: !self.props.chatRoom.topic ? l[20660] : self.state.link
+      value: !chatRoom.topic ? l[20660] : link
     })), external_React_default.a.createElement("div", {
       className: "info"
-    }, self.props.chatRoom.publicLink ? l[20644] : null)))), external_React_default.a.createElement("footer", null, external_React_default.a.createElement("div", {
+    }, chatRoom.publicLink ? l[20644] : null)))), external_React_default.a.createElement("footer", null, external_React_default.a.createElement("div", {
       className: "footer-container"
-    }, self.props.chatRoom.iAmOperator() && self.props.chatRoom.publicLink ? external_React_default.a.createElement("button", {
+    }, chatRoom.iAmOperator() && chatRoom.publicLink && external_React_default.a.createElement("button", {
       key: "deleteLink",
-      className: "mega-button links-button" + (self.loading && self.loading.state() === 'pending' ? " disabled" : ""),
-      onClick: function () {
-        self.props.chatRoom.updatePublicHandle(1);
-        self.onClose();
+      className: "\n                                    mega-button\n                                    links-button\n                                    " + (this.loading && this.loading.state() === 'pending' ? 'disabled' : '') + "\n                                ",
+      onClick: () => {
+        chatRoom.updatePublicHandle(1);
+        this.onClose();
       }
-    }, external_React_default.a.createElement("span", null, l[20487])) : null, self.props.chatRoom.topic ? self.props.chatRoom.publicLink ? external_React_default.a.createElement("button", {
-      className: "mega-button positive copy-to-clipboard" + (self.loading && self.loading.state() === 'pending' ? " disabled" : "")
-    }, external_React_default.a.createElement("span", null, l[63])) : closeButton : self.props.chatRoom.iAmOperator() ? external_React_default.a.createElement("button", {
+    }, external_React_default.a.createElement("span", null, l[20487])), chatRoom.topic ? chatRoom.publicLink ? external_React_default.a.createElement("button", {
+      className: "\n                                        mega-button\n                                        positive\n                                        copy-to-clipboard\n                                        " + (this.loading && this.loading.state() === 'pending' ? 'disabled' : '') + "\n                                    "
+    }, external_React_default.a.createElement("span", null, l[63])) : closeButton : chatRoom.iAmOperator() ? external_React_default.a.createElement("button", {
       key: "setTopic",
-      className: "mega-button positive links-button" + (self.state.newTopic && $.trim(self.state.newTopic) ? "" : " disabled"),
-      onClick: function () {
-        if (self.props.chatRoom.iAmOperator()) {
-          self.props.chatRoom.setRoomTitle(self.state.newTopic);
-        }
-      }
+      className: "\n                                        mega-button\n                                        positive\n                                        links-button\n                                        " + (newTopic && $.trim(newTopic) ? '' : 'disabled') + "\n                                    ",
+      onClick: () => chatRoom.iAmOperator() && chatRoom.setRoomTitle(newTopic)
     }, external_React_default.a.createElement("span", null, l[20615])) : closeButton)));
   }
 
 }
-
 chatlinkDialog_ChatlinkDialog.defaultProps = {
-  'requiresUpdateOnResize': true,
-  'disableCheckingVisibility': true
+  requiresUpdateOnResize: true,
+  disableCheckingVisibility: true
 };
-
 // CONCATENATED MODULE: ./js/chat/ui/conversationaudiovideopanel.jsx
 
 
@@ -19487,9 +19470,9 @@ class navigation_Navigation extends mixins["MegaRenderMixin"] {
           }
         }, external_React_default.a.createElement("button", {
           className: "\n                                        mega-button\n                                        action\n                                        " + activeClass + "\n                                    "
-        }, external_React_default.a.createElement("span", null, contactsPanel_ContactsPanel.LABEL[key]), (receivedRequestsCount > 0 || receivedRequestsCount === "9+") && VIEW[key] === VIEW.RECEIVED_REQUESTS && external_React_default.a.createElement("div", {
+        }, external_React_default.a.createElement("span", null, contactsPanel_ContactsPanel.LABEL[key]), receivedRequestsCount > 0 && VIEW[key] === VIEW.RECEIVED_REQUESTS && external_React_default.a.createElement("div", {
           className: "notifications-count ipc-count"
-        }, receivedRequestsCount)));
+        }, receivedRequestsCount > 9 ? "9+" : receivedRequestsCount)));
       }
 
       return null;
@@ -20773,8 +20756,7 @@ class contactsPanel_ContactsPanel extends mixins["MegaRenderMixin"] {
   }
 
   render() {
-    let receivedRequestsCount = this.getReceivedRequestsCount();
-    receivedRequestsCount = receivedRequestsCount > 9 ? "9+" : receivedRequestsCount;
+    const receivedRequestsCount = this.getReceivedRequestsCount();
     const {
       view
     } = this;
@@ -20785,7 +20767,7 @@ class contactsPanel_ContactsPanel extends mixins["MegaRenderMixin"] {
       receivedRequestsCount: receivedRequestsCount
     }), view !== contactsPanel_ContactsPanel.VIEW.PROFILE && external_React_default.a.createElement("div", {
       className: "contacts-actions"
-    }, view === contactsPanel_ContactsPanel.VIEW.RECEIVED_REQUESTS && (receivedRequestsCount > 1 || receivedRequestsCount === "9+") && external_React_default.a.createElement("button", {
+    }, view === contactsPanel_ContactsPanel.VIEW.RECEIVED_REQUESTS && receivedRequestsCount > 1 && external_React_default.a.createElement("button", {
       className: "mega-button action",
       onClick: this.handleAcceptAllRequests
     }, external_React_default.a.createElement("i", {
@@ -21308,7 +21290,7 @@ class conversations_ConversationsHead extends mixins["MegaRenderMixin"] {
       showTopButtons,
       showAddContact
     } = this.props;
-    const RECEIVED_REQUESTS_COUNT = Object.keys(M.ipc).length > 9 ? "9+" : Object.keys(M.ipc).length;
+    const RECEIVED_REQUESTS_COUNT = Object.keys(M.ipc).length;
     const ROUTES = {
       CHAT: 'fm/chat',
       CONTACTS: 'fm/chat/contacts'
@@ -21321,12 +21303,12 @@ class conversations_ConversationsHead extends mixins["MegaRenderMixin"] {
     }, conversations_React.createElement("div", {
       className: "contacts-toggle"
     }, conversations_React.createElement(ui_buttons["Button"], {
-      className: "\n                                mega-button\n                                round\n                                branded-blue\n                                contacts-toggle-button\n                                " + (contactsActive ? 'active' : '') + "\n                                " + (RECEIVED_REQUESTS_COUNT > 0 || RECEIVED_REQUESTS_COUNT === "9+" ? 'requests' : '') + "\n                            ",
+      className: "\n                                mega-button\n                                round\n                                branded-blue\n                                contacts-toggle-button\n                                " + (contactsActive ? 'active' : '') + "\n                                " + (RECEIVED_REQUESTS_COUNT > 0 ? 'requests' : '') + "\n                            ",
       icon: "\n                                sprite-fm-mono\n                                icon-contacts\n                                " + (CONTACTS_ACTIVE ? '' : 'active') + "\n                            ",
       onClick: () => loadSubPage(CONTACTS_ACTIVE ? ROUTES.CHAT : ROUTES.CONTACTS)
     }, RECEIVED_REQUESTS_COUNT ? conversations_React.createElement("div", {
       className: "notifications-count ipc-count"
-    }, conversations_React.createElement("span", null, RECEIVED_REQUESTS_COUNT)) : '')), conversations_React.createElement(ui_buttons["Button"], {
+    }, conversations_React.createElement("span", null, RECEIVED_REQUESTS_COUNT > 9 ? "9+" : RECEIVED_REQUESTS_COUNT)) : '')), conversations_React.createElement(ui_buttons["Button"], {
       group: "conversationsListing",
       className: "mega-button round positive",
       icon: "sprite-fm-mono icon-add"

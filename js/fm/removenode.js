@@ -379,7 +379,7 @@ fmremove.sync = function(selectedNodes, skipDelWarning) {
                     if (e) {
                         M.copyNodes(selectedNodes, M.RubbishID, 1);
                     }
-                }, true);
+            }, 'skipDelWarning');
         }
     }
     else {
@@ -404,7 +404,7 @@ fmremove.sync = function(selectedNodes, skipDelWarning) {
                 if (yes) {
                     moveToRubbish();
                 }
-            }, true);
+            }, 'skipDelWarning');
         }
     }
 };

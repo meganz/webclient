@@ -12,7 +12,7 @@ mobile.messageOverlay = {
      * @param {String} [icon] An optional class name to show an icon, empty-icon classes can be found in mobile.css
      * @param {String} [buttons] An optional second button in place of text-link close
      */
-    show: function(message, subMessage, onSuccess, onFailure, icon, buttons) {
+    show: function(message, subMessage, onSuccess, onFailure, icon, buttons, checkbox) {
         'use strict';
 
         // Cache selectors
@@ -21,6 +21,7 @@ mobile.messageOverlay = {
         var $optionalSecondMessage = $overlay.find('.optional-second-message');
         var $iconElement = $('.mobile.empty-icon', $overlay).attr('class', 'mobile empty-icon hidden');
         var $buttons = $('.buttons', $overlay).removeClass('inline-buttons');
+        var $checkbox = $('.checkbox-block', $overlay).addClass('hidden');
         var $fileManagerHolder = $('.mobile .fmholder');
         var promise = new MegaPromise();
         var reject = function() {
@@ -95,6 +96,21 @@ mobile.messageOverlay = {
             $buttons.removeClass('inline-buttons')
                 .find('.first').addClass('red-button').removeClass('green-button').text(l[1596]).end()
                 .find('.second').addClass('hidden');
+        }
+
+        if (checkbox && typeof checkbox === 'function') {
+            $checkbox.removeClass('hidden').rebind('click.msgcheck', () => {
+                const $o = $('.checkbox-block .checkdiv, .checkbox-block input', $overlay);
+                if ($o.eq(0).hasClass('checkboxOff')) {
+                    $o.removeClass('checkboxOff').addClass('checkboxOn');
+                    checkbox(true);
+                }
+                else {
+                    $o.removeClass('checkboxOn').addClass('checkboxOff');
+                    checkbox(false);
+                }
+                return false;
+            });
         }
 
         // Show the error overlay and prevent scrolling behind

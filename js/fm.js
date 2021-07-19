@@ -1361,7 +1361,8 @@ function renameDialog() {
     }
 }
 
-function msgDialog(type, title, msg, submsg, callback, checkbox) {
+/* eslint-disable-next-line complexity */
+function msgDialog(type, title, msg, submsg, callback, checkboxSetting) {
     'use strict';
     var doneButton  = l[81];
     var extraButton = String(type).split(':');
@@ -1563,7 +1564,7 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
             $('#msgDialog').addClass('confirmation');
         }
 
-        if (checkbox) {
+        if (checkboxSetting) {
             $('#msgDialog .checkbox-block .checkdiv,' +
                 '#msgDialog .checkbox-block input')
                     .removeClass('checkboxOn').addClass('checkboxOff');
@@ -1574,11 +1575,11 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
                 var $o = $('#msgDialog .checkbox-block .checkdiv, #msgDialog .checkbox-block input');
                 if ($('#msgDialog .checkbox-block input').hasClass('checkboxOff')) {
                     $o.removeClass('checkboxOff').addClass('checkboxOn');
-                    mega.config.set('skipDelWarning', 1);
+                    mega.config.set(checkboxSetting, 1);
                 }
                 else {
                     $o.removeClass('checkboxOn').addClass('checkboxOff');
-                    mega.config.remove('skipDelWarning');
+                    mega.config.remove(checkboxSetting);
                 }
 
                 return false;

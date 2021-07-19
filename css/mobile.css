@@ -13849,6 +13849,34 @@ body.landscape .upload-overlay .mobile.filetype-img {
     background-color: unset;
 }
 
+/*
+ * Mobile Account file-management
+ */
+.account-file-management-page .section-block .block-title {
+    font-weight: bold;
+    margin-top: 10px;
+    margin-left: 20px;
+}
+
+.account-file-management-page .content-txt {
+    color: var(--text-color-medium);
+}
+
+/*
+ * End Mobile Account file-management
+ */
+
+/*
+ * Mobile Confirmation dialog checkbox
+ */
+#mobile-ui-error .checkbox-block {
+    bottom: 0;
+    position: absolute;
+}
+
+/*
+ * End Mobile Confirmation checkbox
+ */
 
 /*
  * Retina Sprite for mobile

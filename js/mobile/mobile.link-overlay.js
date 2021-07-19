@@ -241,10 +241,10 @@ mobile.linkOverlay = {
     initRemoveButton: function(nodeHandle) {
 
         'use strict';
-
-        // On Remove Link button click/tap
-        this.$overlay.find('.remove').off('tap').on('tap', function() {
-
+        const removeLink = (e) => {
+            if (!e) {
+                return;
+            }
             // Remove the link
             var exportLink = new mega.Share.ExportLink({
                 'showExportLinkDialog': false,
@@ -252,6 +252,39 @@ mobile.linkOverlay = {
                 'nodesToProcess': [nodeHandle]
             });
             exportLink.removeExportLink();
+        };
+        const toggleConfig = (toggle) => {
+            if (toggle) {
+                mega.config.setn('nowarnpl', 1);
+            }
+            else {
+                mega.config.remove('nowarnpl');
+            }
+        };
+        // On Remove Link button click/tap
+        this.$overlay.find('.remove').off('tap').on('tap', () => {
+            const media = is_video(M.d[nodeHandle]) === 1;
+            const mediaRemoveLink = () => {
+                msgDialog('confirmation', l[882], l[17824], 0, removeLink);
+            };
+            if (mega.config.get('nowarnpl')) {
+                if (media) {
+                    mediaRemoveLink();
+                }
+                else {
+                    removeLink(1);
+                }
+            }
+            else {
+                let subtitle = M.d[nodeHandle].t
+                    ? mega.icu.format(l.plink_remove_dlg_text_folder, 1)
+                    : mega.icu.format(l.plink_remove_dlg_text_file, 1);
+                const title = mega.icu.format(l.plink_remove_dlg_title, 1);
+                if (media) {
+                    subtitle += `<br><br>${l[17824]}`;
+                }
+                msgDialog('confirmation', '', title, subtitle, removeLink, toggleConfig);
+            }
 
             // Prevent default anchor link behaviour
             return false;

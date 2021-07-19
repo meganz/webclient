@@ -2711,6 +2711,9 @@ accountUI.fileManagement = {
 
         // Drag and Drop
         this.dragAndDrop.render();
+
+        // Public Links
+        this.publicLinks.render();
     },
 
     versioning: {
@@ -2962,7 +2965,23 @@ accountUI.fileManagement = {
                     mega.config.setn('ulddd', val ? undefined : 1);
                 });
         }
-    }
+    },
+
+    publicLinks: {
+        render: function() {
+            'use strict';
+
+            var warnplinkId = '#nowarnpl';
+
+            accountUI.inputs.switch.init(
+                warnplinkId,
+                $(warnplinkId, accountUI.$contentBlock).parent(),
+                mega.config.get('nowarnpl'),
+                (val) => {
+                    mega.config.setn('nowarnpl', val);
+                });
+        }
+    },
 };
 
 accountUI.transfers = {

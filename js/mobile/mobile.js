@@ -930,7 +930,12 @@ function accountUI() {
     if (fminitialized && u_type && page === 'fm/account/notifications') {
         mobile.initDOM();
         mobile.account.notifications.init();
-    } else {
+    }
+    else if (fminitialized && u_type && page === 'fm/account/file-management') {
+        mobile.initDOM();
+        mobile.account.filemanagement.init();
+    }
+    else {
         loadSubPage('fm/account');
     }
 }
@@ -961,7 +966,10 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
             if (typeof callback === 'function') {
                 callback(false);
             }
-        }
+        },
+        undefined,
+        undefined,
+        checkbox
     );
 }
 

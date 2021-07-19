@@ -1402,27 +1402,51 @@ FileManager.prototype.initContextUI = function() {
         else {
             var media = false;
             var handles = Array.isArray($.selected) && $.selected.concat();
-            var removeLink = function() {
-                var exportLink = new mega.Share.ExportLink({'updateUI': true, 'nodesToProcess': handles});
-                exportLink.removeExportLink();
+            var removeLink = function(e) {
+                if (e) {
+                    var exportLink = new mega.Share.ExportLink({'updateUI': true, 'nodesToProcess': handles});
+                    exportLink.removeExportLink();
+                }
             };
-
+            let files = 0;
+            let folders = 0;
             for (var i = handles.length; i--;) {
                 if (is_video(M.d[handles[i]]) === 1) {
                     media = true;
-                    break;
+                }
+                if (M.d[handles[i]].t) {
+                    folders++;
+                }
+                else {
+                    files++;
                 }
             }
 
-            if (media) {
-                msgDialog('confirmation', l[882], l[17824], 0, function(e) {
-                    if (e) {
-                        removeLink();
-                    }
-                });
+            var mediaRemoveLink = () => {
+                msgDialog('confirmation', l[882], l[17824], 0, removeLink);
+            };
+
+            if (mega.config.get('nowarnpl')) {
+                if (media) {
+                    mediaRemoveLink();
+                }
+                else {
+                    removeLink(true);
+                }
             }
             else {
-                removeLink();
+                let subtitle = l.plink_remove_dlg_text_mixed;
+                if (files > 0 && folders === 0) {
+                    subtitle = mega.icu.format(l.plink_remove_dlg_text_file, files);
+                }
+                else if (files === 0 && folders > 0) {
+                    subtitle = mega.icu.format(l.plink_remove_dlg_text_folder, folders);
+                }
+                const title = mega.icu.format(l.plink_remove_dlg_title, handles.length);
+                if (media) {
+                    subtitle += `<br><br>${l[17824]}`;
+                }
+                msgDialog('confirmation', '', title, subtitle, removeLink, 'nowarnpl');
             }
         }
     });

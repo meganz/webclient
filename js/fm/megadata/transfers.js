@@ -1941,7 +1941,10 @@ MegaData.prototype.showTransferToast = function showTransferToast(t_type, t_leng
                 onClick: () => {
                     // Hide the toast and overlay, open the transfers page
                     window.toaster.main.hideAll();
-                    document.querySelector('.viewer-overlay').classList.add('hidden');
+                    const el = document.querySelector('.viewer-overlay');
+                    if (el) {
+                        el.classList.add('hidden');
+                    }
                     document.querySelector('.nw-fm-left-icon.transfers').click();
                 }
             });

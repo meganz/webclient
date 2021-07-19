@@ -376,9 +376,10 @@ function getDateStructure() {
     var localeTime = time2date(uniqUnix, 1);
     var result;
     if (locale !== 'ar') {
-        index['y'] = localeTime.indexOf(1987);
-        index['m'] = localeTime.indexOf(4);
-        index['d'] = localeTime.indexOf(23);
+        // thai case using buddhist calendar, 1987 in gregorian calendar is 2530 in buddhist calendar
+        index.y = (locale === 'th') ? localeTime.indexOf(2530) : localeTime.indexOf(1987);
+        index.m = localeTime.indexOf(4);
+        index.d = localeTime.indexOf(23);
 
         result = Object.keys(index).sort(function(a, b) {
             return index[a] - index[b];
@@ -400,9 +401,9 @@ function getDateStructure() {
                 var locale_m = new Intl.DateTimeFormat(locales, options_m).format(uniqTime);
                 var locale_d = new Intl.DateTimeFormat(locales, options_d).format(uniqTime);
 
-                index['y'] = localeTime.indexOf(locale_y);
-                index['m'] = localeTime.indexOf(locale_m);
-                index['d'] = localeTime.indexOf(locale_d);
+                index.y = localeTime.indexOf(locale_y);
+                index.m = localeTime.indexOf(locale_m);
+                index.d = localeTime.indexOf(locale_d);
 
                 result = Object.keys(index).sort(function(a, b) {
                     return index[b] - index[a];

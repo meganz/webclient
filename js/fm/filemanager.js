@@ -950,7 +950,7 @@ FileManager.prototype.initFileManagerUI = function() {
                     }
                 }
                 else if (tab.prev && (M.d[tab.prev] || M.isCustomView(tab.prev) ||
-                    tab.subpages.indexOf(tab.prev) > -1)) {
+                    (tab.subpages && tab.subpages.indexOf(tab.prev) > -1))) {
                     targetFolder = tab.prev;
                 }
                 else {

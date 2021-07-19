@@ -903,7 +903,7 @@
             $rubbishBin.addClass('hidden');
         }
 
-        if ($.copyToShare || $.selectFolderDialog) {
+        if ($.copyToShare || $.selectFolderDialog || !u_type) {
             $sharedMe.addClass('hidden');
         }
         else {

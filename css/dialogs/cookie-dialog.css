@@ -33,6 +33,9 @@
     position: relative;
     -webkit-overflow-scrolling: touch;
 }
+.cookie-dialog .step2 .scrollable-block {
+    padding: 0 30px;
+}
 
 /* Bottom buttons bar */
 .cookie-dialog .bottom-buttons {
@@ -42,6 +45,10 @@
     height: 76px;
     padding: 24px 48px;
     position: relative;
+}
+.cookie-dialog .step2 .bottom-buttons {
+    padding: 14px 30px;
+    height: 60px;
 }
 .rtl .cookie-dialog .bottom-buttons .right {
     float: left;
@@ -84,6 +91,10 @@
     font: var(--text-h2);
     padding: 12px 0;
 }
+.cookie-dialog .step2 .header.medium {
+    font: var(--text-h3);
+    padding: 29px 0 0 0;
+}
 .cookie-dialog .settings-tip {
     color: var(--text-color-low);
     display: none;
@@ -92,6 +103,9 @@
     padding: 0 24px;
     margin: -22px auto 10px auto;
     max-width: 478px;
+}
+.cookie-dialog .step2 .settings-tip {
+    margin-top: 7px;
 }
 .cookie-dialog .settings {
     border-collapse: collapse;

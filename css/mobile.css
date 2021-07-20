@@ -610,7 +610,13 @@ ul, li {
     box-shadow: 0 1px 1px 0 rgba(0,0,0,0.03);
     color:  #555;
 }
-.mobile.red-button, .mobile.download-progress .bar, .mobile.upload-progress .bar, .membership-bott-button, .payment-address-dialog .payment-buy-now, .mobile.green-button, .mobile.default-green-button, .mobile.default-white-button {
+.mobile.red-button,
+.mobile.download-progress .bar,
+.mobile.upload-progress .bar,
+.membership-bott-button,
+.mobile.green-button,
+.mobile.default-green-button,
+.mobile.default-white-button {
     color: white;
     font-size: 13px;
     display: block;
@@ -693,7 +699,7 @@ ul, li {
     -webkit-border-radius: 4px;
     border-radius: 4px;
 }
-.membership-bott-button, .payment-address-dialog .payment-buy-now {
+.membership-bott-button {
     background: #00BFA5;
     border: 1px solid #00A58F;
     background-image: none;
@@ -4352,19 +4358,8 @@ div.checkboxOn {
     text-transform: uppercase;
 }
 .payment-address-dialog .payment-buy-now {
-    font-size: 15px;
-    line-height: 48px;
-    height: 48px;
-    display: block;
-    cursor: pointer;
-    -moz-box-sizing: border-box;
-    -webkit-box-sizing: border-box;
-    box-sizing: border-box;
-    text-align: center;
-    text-transform: lowercase;
-    margin: 0 20px 8px;
-    position: relative;
-    overflow: visible;
+    margin: 0 20px;
+    width: calc(100% - 40px);
 }
 .payment-address-dialog .payment-buy-now:first-letter {
     text-transform: uppercase;

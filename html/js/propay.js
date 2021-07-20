@@ -50,7 +50,7 @@ pro.propay = {
 
         var $stepTwo = $('.payment-section', '.fmholder');
         var $selectedPlanName = $('.top-header.plan-title .plan-name', $stepTwo);
-        var $purchaseButton = $((is_mobile ? '.' : '')  + 'button.purchase', $stepTwo);
+        var $purchaseButton = $('button.purchase', $stepTwo);
 
         // Preload loading/transferring/processing animation
         pro.propay.preloadAnimation();

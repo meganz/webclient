@@ -97,6 +97,7 @@ function render_blogarticle() {
         loadSubPage('blog');
     }
     $('body').addClass('blog-new');
+    $('.rss-lnk', '.blog-new').attr('href', cmsStaticPath + 'blog/unsigned/blog.rss');
     $('#blogarticle_post').safeHTML(content);
     $('#blogarticle_title').safeHTML(btitle);
     $('#blogarticle_date').safeHTML(bdate);

@@ -68,7 +68,18 @@ MegaData.prototype.openSharingDialog = function() {
         }
 
         // Fill the shared folder's name
-        $('.share-dialog-folder-name', $dialog).text(M.d[selectedNode].name);
+        const $folderName = $('.share-dialog-folder-name', $dialog)
+            .text(M.d[selectedNode].name)
+            .removeClass('simpletip')
+            .removeAttr('data-simpletip')
+            .removeAttr('data-simpletipposition');
+
+        if ($folderName.get(0).offsetWidth < $folderName.get(0).scrollWidth) {
+            $folderName
+                .addClass('simpletip')
+                .attr('data-simpletip', M.d[selectedNode].name)
+                .attr('data-simpletipposition', 'top');
+        }
 
         // Fill the shared folder's info
         var foldercnt = M.d[selectedNode].td;

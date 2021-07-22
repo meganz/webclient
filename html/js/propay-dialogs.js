@@ -1798,7 +1798,18 @@ var addressDialog = {
             saveAttribute('taxCode', taxCode);
         } else {
             // Forget Attribute.
-            mega.attr.remove('billinginfo', false, true);
+            var removeAttribute = function(name) {
+                mega.attr.setArrayAttribute('billinginfo', name, '', false, true);
+            };
+            removeAttribute('firstname');
+            removeAttribute('lastname');
+            removeAttribute('address1');
+            removeAttribute('address2');
+            removeAttribute('postcode');
+            removeAttribute('city');
+            removeAttribute('country');
+            removeAttribute('state');
+            removeAttribute('taxCode');
         }
 
 

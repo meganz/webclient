@@ -1729,9 +1729,28 @@ BusinessAccountUI.prototype.initBusinessAccountHeader = function ($accountContai
 /** Show UI elements if the account got expired  */
 BusinessAccountUI.prototype.showExp_GraceUIElements = function() {
     "use strict";
-    if (!u_attr || !u_attr.b || (u_attr.b.s !== -1 && u_attr.b.s !== 2)) {
+    if (!u_attr || !u_attr.b) {
         return;
     }
+
+    if (u_attr.b.m && (!u_attr["^buextra"] || sessionStorage.buextra)) {
+        if (sessionStorage.buextra) {
+            $('.fm-notification-block.business-next-tier').text(l.business_pass_base).addClass('visible');
+        }
+        else {
+            M.accountData((account) => {
+                if (account.space_bus_ext || account.tfsq_bus_ext) {
+                    $('.fm-notification-block.business-next-tier').text(l.business_pass_base).addClass('visible');
+                    sessionStorage.buextra = 1;
+                    mega.attr.set('buextra', 1, -2, 0);
+                }
+            });
+        }
+    }
+    if (u_attr.b.s !== -1 && u_attr.b.s !== 2) {
+        return;
+    }
+
     var msg = '';
     if (u_attr.b.s === -1) { // expired
         if (u_attr.b.m) {
@@ -2375,7 +2394,7 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
         return true;
     };
 
-    var fillInvoiceDetailPage = function (st, invoiceDetail) {
+    var fillInvoiceDetailPage = function(st, invoiceDetail) {
 
 
         if (st !== 1 || !validateInvoice(invoiceDetail)) {
@@ -2424,26 +2443,95 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
         }
 
         // invoice items
-        var $invoiceItemsContainer = $('.inv-payment-table', $invoiceDetailContainer);
-        var $allItems = $('.inv-li-content', $invoiceItemsContainer);
-        var $invItemContent = $($allItems.get(0));
-        var $invItemContentTemplate = $invItemContent.clone(true);
+        const $invoiceItemsContainer = $('.inv-payment-table', $invoiceDetailContainer);
+        const $allItems = $('.inv-li-content', $invoiceItemsContainer);
+        const $invItemContent = $($allItems.get(0));
+        const $invItemContentTemplate = $invItemContent.clone(true);
         $allItems.remove();
         var $invItemHeader = $('.inv-li-table-header', $invoiceItemsContainer);
         var taxSum = 0;
+
+        // for debug...
+        if (d && localStorage.debugNewPrice) {
+            invoiceDetail.items[0].d = "Mega Business (8 users+10TB extra storage+10TB extra transfer)";
+            invoiceDetail.items[0].v = 1;
+            invoiceDetail.items[0].gross = 90;
+            invoiceDetail.items[0].net = 78.26;
+            invoiceDetail.items[0].tax = 11.74;
+            invoiceDetail.items[0].ts = 1603856535;
+            invoiceDetail.items[0].list = { // (NEW FIELD)
+                "u": [8, 40],
+                "s": [10, 25],
+                "t": [10, 25],
+                "du": 3
+            };
+            invoiceDetail.taxrate = 15;
+            invoiceDetail.tot = 90;
+        }
+        // end debug...
+
+        let oldInvoice = false;
+
         for (var k = invoiceDetail.items.length - 1; k >= 0; k--) {
-            var $invItem = $invItemContentTemplate.clone(true);
-            $invItem.find('.inv-pay-date').text(time2date(invoiceDetail.items[k].ts, 1));
-            $invItem.find('.inv-pay-desc').text(invoiceDetail.items[k].d);
-            $('.inv-pay-amou', $invItem).text(formatCurrency(invoiceDetail.items[k].net));
-            $invItem.insertAfter($invItemHeader);
+            let $invItem;
+            if (invoiceDetail.items[k].v && invoiceDetail.items[k].list) {
+                if (invoiceDetail.items[k].list.t) {
+                    $invItem = $invItemContentTemplate.clone(true);
+                    $('.inv-pay-date', $invItem).text(' ');
+                    $('.inv-pay-desc', $invItem).text(l.additional_transfer
+                        .replace('%1', invoiceDetail.items[k].list.t[0]));
+                    $('.inv-pay-amou', $invItem).text(formatCurrency(invoiceDetail.items[k].list.t[1]));
+                    $invItem.insertAfter($invItemHeader);
+                }
+                if (invoiceDetail.items[k].list.s) {
+                    $invItem = $invItemContentTemplate.clone(true);
+                    $('.inv-pay-date', $invItem).text(' ');
+                    $('.inv-pay-desc', $invItem).text(l.additional_storage
+                        .replace('%1', invoiceDetail.items[k].list.s[0]));
+                    $('.inv-pay-amou', $invItem).text(formatCurrency(invoiceDetail.items[k].list.s[1]));
+                    $invItem.insertAfter($invItemHeader);
+                }
+                if (invoiceDetail.items[k].list.u) {
+                    $invItem = $invItemContentTemplate.clone(true);
+                    $('.inv-pay-date', $invItem).text(' ');
+                    let nbUsersText = mega.icu.format(l.users_unit, invoiceDetail.items[k].list.u[0]);
+                    if (invoiceDetail.items[k].list.du) {
+                        nbUsersText += ' ' + mega.icu.format(l.deactive_user_count, invoiceDetail.items[k].list.du);
+                        $('.inv-payment-price-deactive-users', $invoiceItemsContainer).removeClass('hidden');
+                    }
+                    $('.inv-pay-desc', $invItem).text(nbUsersText);
+                    $('.inv-pay-amou', $invItem).text(formatCurrency(invoiceDetail.items[0].list.u[1]));
+                    $invItem.insertAfter($invItemHeader);
+                }
+                $invItem = $invItemContentTemplate.clone(true);
+                $('.inv-pay-date', $invItem).text(time2date(invoiceDetail.items[k].ts, 1));
+                $('.inv-pay-desc', $invItem).text(invoiceDetail.items[k].d);
+                $('.inv-pay-amou', $invItem).text(' ');
+                $invItem.insertAfter($invItemHeader);
+            }
+            else {
+                $invItem = $invItemContentTemplate.clone(true);
+                $('.inv-pay-date', $invItem).text(time2date(invoiceDetail.items[k].ts, 1));
+                $('.inv-pay-desc', $invItem).text(invoiceDetail.items[k].d);
+                $('.inv-pay-amou', $invItem).text(formatCurrency(invoiceDetail.items[k].net));
+                $invItem.insertAfter($invItemHeader);
+                oldInvoice = true;
+            }
+
             taxSum += invoiceDetail.items[k].tax;
         }
 
         if (invoiceDetail.u.taxnum) {
-            $invoiceItemsContainer.find('.inv-payment-price.inv-li-gst .inv-gst-perc')
-                .text((invoiceDetail.taxname || invoiceDetail.u.taxnum[0])
-                    + ': ' + Number(invoiceDetail.taxrate).toFixed(2) + '%');
+            let taxText = '';
+            if (oldInvoice) {
+                taxText = `${(invoiceDetail.taxname || invoiceDetail.u.taxnum[0])}: `
+                    + `${Number(invoiceDetail.taxrate).toFixed(2)}%`;
+            }
+            else {
+                taxText = l.tax_on_invoice.replace('%1', invoiceDetail.taxname || invoiceDetail.u.taxnum[0])
+                    .replace('%2', Number(invoiceDetail.taxrate).toFixed(2) + '%');
+            }
+            $('.inv-payment-price.inv-li-gst .inv-gst-perc', $invoiceItemsContainer).text(taxText);
         }
         $('.inv-payment-price.inv-li-gst .inv-gst-val', $invoiceItemsContainer).text(formatCurrency(taxSum));
         $('.inv-payment-price.inv-li-total .inv-total-val', $invoiceItemsContainer)
@@ -2465,7 +2553,8 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
 
         unhideSection();
 
-        $invoiceDetailContainer.find('.inv-detail-export').off('click.subuser').on('click.subuser',
+        $('.inv-detail-export', $invoiceDetailContainer).rebind(
+            'click.subuser',
             function invoiceDetailExportClickHandler() {
                 M.require('business_invoice').done(
                     function exportOverviewPageToPDF() {
@@ -2496,10 +2585,31 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
                             itemDate = time2date(invoiceDetail.items[0].ts, 1);
                             itemDec = invoiceDetail.items[0].d;
                             itemAmount = invoiceDetail.items[0].net;
+                            if (invoiceDetail.items[0].v && invoiceDetail.items[0].list) {
+                                const rowStart = myPage.indexOf('<li class="inv-li-content"');
+                                if (rowStart) {
+                                    const rowEnd = myPage.indexOf('</li>', rowStart);
+                                    if (rowEnd) {
+                                        const $allItems = $('.inv-li-content', $invoiceItemsContainer);
+                                        if ($allItems.length) {
+                                            let newRows = '';
+                                            for (let k = 0; k < $allItems.length / 2; k++) {
+                                                // safe, 1- no user entry -2- sanitized before on document.
+                                                newRows += $allItems[k].outerHTML;
+                                            }
+                                            myPage = myPage.slice(0, rowStart)
+                                                + newRows + myPage.slice(rowEnd + 5, myPage.length);
+
+                                        }
+                                    }
+                                }
+                            }
+                            else {
+                                myPage = myPage.replace('{8itemDate}', escapeHTML(itemDate));
+                                myPage = myPage.replace('{9itemDesc}', escapeHTML(itemDec));
+                                myPage = myPage.replace('{10itemAmount}', Number(itemAmount).toFixed(2));
+                            }
                         }
-                        myPage = myPage.replace('{8itemDate}', escapeHTML(itemDate));
-                        myPage = myPage.replace('{9itemDesc}', escapeHTML(itemDec));
-                        myPage = myPage.replace('{10itemAmount}', Number(itemAmount).toFixed(2));
 
                         myPage = myPage.replace('{15totalVal}',
                             escapeHTML($invoiceItemsContainer.find('.inv-payment-price.inv-li-gst .inv-gst-perc')[0].textContent));
@@ -2514,8 +2624,8 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
                         newPdfPrintIframe.classList.add('hidden');
                         var pdfIframeParent = pdfPrintIframe.parentNode;
                         pdfIframeParent.replaceChild(newPdfPrintIframe, pdfPrintIframe);
-                        newPdfPrintIframe.onload = function () {
-                            setTimeout(function () {
+                        newPdfPrintIframe.onload = function() {
+                            setTimeout(() => {
                                 newPdfPrintIframe.focus();
                                 newPdfPrintIframe.contentWindow.print();
                             }, 1);

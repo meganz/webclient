@@ -28,7 +28,7 @@ MegaData.prototype.accountData = function(cb, blockui, force) {
             loadingDialog.show();
         }
 
-        api_req({a: 'uq', strg: 1, xfer: 1, pro: 1, v: 1}, {
+        api_req({ a: 'uq', strg: 1, xfer: 1, pro: 1, v: 1, b: (u_attr.b || Object.create(null)).m || 0 }, {
             account: account,
             callback: function(res, ctx) {
                 loadingDialog.hide();
@@ -49,6 +49,15 @@ MegaData.prototype.accountData = function(cb, blockui, force) {
                     ctx.account.servbw_limit = Math.round(res.srvratio);
                     ctx.account.isFull = res.cstrg / res.mstrg >= 1;
                     ctx.account.isAlmostFull = res.cstrg / res.mstrg >= res.uslw / 10000;
+                    // Business base/extra quotas:
+                    if (res.utype === 100) {
+                        ctx.account.space_bus_base = res.b ? res.b.bstrg : undefined; // unit TB
+                        ctx.account.space_bus_ext = res.b ? res.b.estrg : undefined; // unit TB
+                        ctx.account.tfsq_bus_base = res.b ? res.b.bxfer : undefined; // unit TB
+                        ctx.account.tfsq_bus_ext = res.b ? res.b.exfer : undefined; // unit TB
+                        ctx.account.tfsq_bus_used = res.b ? res.b.xfer : undefined; // unit B
+                        ctx.account.space_bus_used = res.b ? res.b.strg : undefined; // unit B
+                    }
 
                     if (res.nextplan) {
                         ctx.account.nextplan = res.nextplan;

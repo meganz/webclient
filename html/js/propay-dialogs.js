@@ -1273,15 +1273,20 @@ var addressDialog = {
             proNum = 'business'; // business account Plan icon
             this.proNum = 100;
             proPlan = l[19510];
-            proPrice = (this.userInfo.nbOfUsers * this.businessPlan.p).toFixed(2);
+
             if (this.businessPlan.pastInvoice && this.businessPlan.currInvoice) {
                 // since API returned values types cant be guarnteed,
                 // sometimes they are strings, and sometimes they are numbers!
                 proPrice = Number(this.businessPlan.currInvoice.t);
                 proPrice = proPrice.toFixed(2);
             }
+            else {
+                proPrice = (this.userInfo.nbOfUsers * this.businessPlan.userFare
+                    + (this.userInfo.quota ? this.userInfo.quota * this.businessPlan.quotaFare : 0)).toFixed(2);
+            }
             this.businessPlan.totalPrice = proPrice;
             this.businessPlan.totalUsers = this.userInfo.nbOfUsers;
+            this.businessPlan.quota = this.userInfo.quota;
             numOfMonths = this.businessPlan.m;
             this.numOfMonths = numOfMonths;
 

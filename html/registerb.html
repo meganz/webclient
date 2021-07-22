@@ -7,6 +7,11 @@
         <div class="bus-reg-info-block rtl-block-if-rtl">
             <div class="bus-reg-subheader">[$19789]</div>
             <input class="underlinedText withIcon" type="number" id="business-nbusrs" placeholder="[$19087]" autofocus data-icon="sprite-fm-mono icon-user">
+            <div class="bus-addition-storage-block hidden">
+                <div class="bus-add-storage-head">[$additional_storage_title]</div>
+                <i class="bus-add-storage-icon sprite-fm-mono icon-cloud"></i><div class="bus-add-storage-body"></div>
+                <div class="bus-add-storage-foot"></div>
+            </div>
             <div class="bus-reg-subheader">[$19790]</div>
             <input class="underlinedText withIcon" type="text" id="business-cname" placeholder="[$19603]" data-icon="sprite-fm-mono icon-building">
             <input class="underlinedText withIcon" type="tel" id="business-tel" placeholder="[$19152]" data-icon="sprite-fm-mono icon-phone">
@@ -72,31 +77,49 @@
             <div class="business-plan-title">
                 Business
             </div>
-            <div class="business-plan-price">
-                <span class="big">10 &euro;</span><span class="sub-unit">[$19533]</span>
+            <div class="business-plan-pricing">
+                <div class="business-plan-peruser bus-internal-block">
+                    <div class="bus-user-price-val-cntr">
+                        <div class="bus-user-price-val"></div>
+                        <div class="bus-user-price-euro">
+                            <div class="bus-user-price-val-euro"></div>
+                        </div>
+                    </div>
+                    <div class="bus-user-price-unit"></div>
+                    
+                </div>
+                <div class="business-plan-peruse bus-internal-block">
+                    <div class="bus-user-price-val"></div>
+                    <div class="bus-user-price-unit">[$storage_transfer]</div>
+                    <!--<div class="bus-user-price-euro">
+                        <div class="bus-user-price-val-euro"></div>
+                    </div>-->
+                </div>
             </div>
-            <div class="business-plan-note"><span>[$23789]</span> / [$23813]</div>
-            <div class="business-plan-info grey business-base-plan">
-                <span class="left">Base Plan (3 Licences)</span>
-                <span class="right">30 &euro;</span>
+            <div class="business-plan-quota-note">
+                <div class="bus-quota-note-head">[$flexible_quotas]</div>
+                <div class="bus-quota-note-body">
+                </div>
             </div>
-            <div class="business-plan-info business-users-plan">
-                <span class="left">7x additional licences</span>
-                <span class="right">70 &euro;</span>
-            </div>
-            <div class="business-plan-info grey hidden">
-                <span class="left">[$19791]</span>
-                <span class="right">100 &euro;</span>
-            </div>
-            <div class="business-plan-info hidden">
-                <span class="left">[$19792]</span>
-                <span class="right">0 &euro;</span>
+            <div class="business-plan-breakdown">
+                <div class="bus-plan-nb-users bus-breakdown-row">
+                    <div class="nb-users-val bus-breakdown-col"></div>
+                    <div class="nb-users-fare bus-breakdown-col right"></div>
+                </div>
+                <div class="bus-plan-ex-quota bus-breakdown-row ">
+                    <div class="ex-quota-val bus-breakdown-col"></div>
+                    <div class="ex-quota-fare bus-breakdown-col right"></div>
+                </div>
             </div>
             <div class="business-plan-total">
-                <span class="left">[$16464]</span>
-                <span class="right">100 &euro;</span>
+                <div class="bus-total-desc bus-total-col">[$16464]</div>
+                <div class="bus-total-val bus-total-col right">$67.36*</div>
+            </div>
+            <div class="bus-price-footer-note">
+                * [$18770]
             </div>
         </div>
+        
 
         <button id="business-reg-btn-mob" class="mega-button positive large bus-reg-btn-2 disabled" tabindex="0">
             <span>[$170]</span>
@@ -107,25 +130,6 @@
         <div class="clear"></div>
     </div>
 
-    <!--<div class="bus-confirm-body confirm hidden">
-        <div class="bus-reg-header">Comfirm your account</div>
-        <div class="bus-reg-input error">
-            <div class="bus-reg-icon email"></div>
-            <input type="email" name=" " placeholder="Email">
-            <div class="error-message">Doesn't match registered email.</div>
-        </div>
-        <div class="bus-reg-btn" id="ddd">
-            <span>Confirm Account </span>
-            <div class="next-arrow"></div>
-        </div>
-        <div class="clear"></div>
-    </div>
-
-    <div class="bus-confirm-body verfication hidden">
-        <div class="bus-confirmImg"></div>
-        <div class="bus-reg-header">Verification emails have been sent</div>
-        <div class="bus-reg-featureTxt">New accounts will be activated after the link in the verification emails has been confirmed and the user sets their own password.</div>
-    </div>-->
 
     <div class="bus-reg-bottom-page rtl-block-if-rtl">
         <div class="page-header">[$1109]</div>

@@ -96,6 +96,7 @@ body {
         /* font family : ONLY FOR PRODUCT PAGES */
             --text-font-family-montserrat-bold: 'montserrat_bold', 'montserrat', arial, sans-serif;
             --text-font-family-montserrat-light: 'montserrat_light', arial, sans-serif;
+            --text-font-family-montserrat-regular: 'montserrat', arial, sans-serif;
 
         /* font */
 

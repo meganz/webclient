@@ -1618,8 +1618,10 @@ accountUI.plan = {
 
         // check if business account
         if (u_attr && u_attr.b) {
-            $('.acc-storage-space', $planContent).addClass('hidden');
-            $('.acc-bandwidth-vol', $planContent).addClass('hidden');
+            if (!u_attr.b.m || u_attr.b.s === -1) {
+                $('.acc-storage-space', $planContent).addClass('hidden');
+                $('.acc-bandwidth-vol', $planContent).addClass('hidden');
+            }
             $('.btn-achievements', $planContent).addClass('hidden');
             $('.data-block.account-balance', $planContent).addClass('hidden');
             $('.acc-setting-menu-balance-acc', '.content-panel.account').addClass('hidden');
@@ -1755,11 +1757,67 @@ accountUI.plan = {
             }
 
             /* achievements */
-            if (!account.maf) {
+            if (!account.maf || (u_attr.p === 100 && u_attr.b && u_attr.b.m)) {
 
-                $('.plan-info.storage > span', $planContent).text(bytesToSize(M.account.space, 0));
-                $('.plan-info.bandwidth > span', $planContent).text(bytesToSize(M.account.tfsq.max, 0));
-                $('.bars-container, .btn-achievements', $planContent).addClass('hidden');
+                $('.btn-achievements', $planContent).addClass('hidden');
+                if (u_attr.p === 100 && u_attr.b && u_attr.b.m) {
+
+                    // Debug code ...
+                    if (d && localStorage.debugNewPrice) {
+                        M.account.space_bus_base = 3;
+                        M.account.space_bus_ext = 2;
+                        M.account.tfsq_bus_base = 3;
+                        M.account.tfsq_bus_ext = 1;
+                        M.account.tfsq_bus_used = 3848290697216; // 3.5 TB
+                        M.account.space_bus_used = 4617948836659; // 4.2 TB
+                    }
+                    // END Debug code
+
+                    const renderBars = (used, base, extra, $container, msg, $overall) => {
+                        let spaceTxt = `${bytesToSize(used)}`;
+                        let baseTxt = spaceTxt;
+                        let storageConsume = used / 1048576; // MB
+                        let storageQuota = (base || 3) * 1048576 + storageConsume; // MB
+                        let extraTxt = l[5816].replace('[X]', base || 3);
+
+                        if (base) {
+
+                            spaceTxt += `/${l[5816]
+                                .replace('[X]', base + (extra || 0))}`;
+
+                            if (extra) {
+                                storageConsume = base;
+                                storageQuota = base + extra;
+                                baseTxt = extraTxt;
+                                extraTxt = msg.replace('%1', extra);
+                            }
+                        }
+
+                        $('.settings-sub-bar', $container)
+                            .css('width', `${100 - storageConsume * 100 / storageQuota}%`);
+                        $('.base-quota-note span', $container).text(baseTxt);
+                        $('.achieve-quota-note span', $container).text(extraTxt);
+                        $overall.text(spaceTxt);
+                    };
+
+                    const $storageContent = $('.acc-storage-space', $planContent);
+                    const $bandwidthContent = $('.acc-bandwidth-vol', $planContent);
+
+                    renderBars(M.account.space_bus_used || M.account.space_used, M.account.space_bus_base,
+                               M.account.space_bus_ext, $storageContent, l.additional_storage,
+                               $('.plan-info.storage > span', $planContent));
+
+                    renderBars(M.account.tfsq_bus_used || M.account.tfsq.used, M.account.tfsq_bus_base,
+                               M.account.tfsq_bus_ext, $bandwidthContent, l.additional_transfer,
+                               $('.plan-info.bandwidth > span', $planContent));
+
+                    $('.bars-container', $planContent).removeClass('hidden');
+                }
+                else {
+                    $('.plan-info.storage > span', $planContent).text(bytesToSize(M.account.space, 0));
+                    $('.plan-info.bandwidth > span', $planContent).text(bytesToSize(M.account.tfsq.max, 0));
+                    $('.bars-container', $planContent).addClass('hidden');
+                }
             }
             else {
                 mega.achievem.parseAccountAchievements();

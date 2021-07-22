@@ -4121,6 +4121,9 @@ tr:not(.taken-down) .grid-status-icon:not(.read-only):not(.read-and-write) {
 .fm-notification-block.grace-business {
     background-color: var(--label-orange);
 }
+.fm-notification-block.business-next-tier {
+    background-color: var(--label-blue);
+}
 .fm-notification-block.grace-business.visible span span,
 .fm-notification-block.grace-business.visible span a,
 .fm-notification-block.expired-business.visible span span,
@@ -13821,10 +13824,43 @@ body.megaChatDisabled .nw-contact-name button.start-chat-button {
    margin-bottom: 8px;
 }
 
-.user-management-view-data .user-management-view-overall-usage .view-info .storage-transfer-data,
-.business-dashboard .view-info .storage-transfer-data {
+.business-dashboard .view-info .storage-transfer-text {
+    display: inline-block;
+    margin-right: 37px;
+    width: 80px;
+}
+.business-dashboard .view-info .storage-transfer-current {
+    display: inline-block;
+    font: var(--text-h3-bold);
+    color: var(--text-color-high);
+}
+.business-dashboard .view-info .storage-transfer-current.hidden {
+    display: none;
+}
+
+.business-dashboard .view-info .storage-transfer-data-details {
+    display: flex;
+}
+
+.business-dashboard .view-info .storage-transfer-data-details-base {
+    margin-right: 40px;
+    width: 80px;
+}
+
+.user-management-view-data .user-management-view-overall-usage .view-info .storage-transfer-data {
    font: var(--text-h1);
    color: var(--text-color-high);
+}
+
+.business-dashboard .view-info .storage-transfer-data {
+   font: var(--text-h3-bold);
+   color: var(--text-color-high);
+}
+
+.business-dashboard .user-management-storage .img,
+.business-dashboard .user-management-transfer .img {
+    width: 60px;
+    height: 60px;
 }
 
 .subaccount-view-used-data {
@@ -15337,11 +15373,9 @@ body.megaChatDisabled .nw-contact-name button.start-chat-button {
 
 .user-management-account-settings .invoice-detail .inv-payment-table ul li {
     padding:8px 0;
-    font-size: 14px;
-    font-weight: 400;
-    color: #888;
-    line-height: 22px;
     position: relative;
+    font: var(--text-caption);
+    color: var(--text-color-black-medium);
 }
 
 .user-management-account-settings .invoice-detail .inv-payment-table ul li:first-child {
@@ -15367,20 +15401,22 @@ body.megaChatDisabled .nw-contact-name button.start-chat-button {
 }
 
 .user-management-account-settings .invoice-detail .inv-payment-table ul li .inv-payment-header:first-child, .user-management-account-settings .invoice-detail .inv-payment-table ul li .inv-payment-item:first-child {
-    width: 100px;
+    width: 60px;
     vertical-align: top;
 }
 
 .user-management-account-settings .invoice-detail .inv-payment-table ul li .inv-payment-header:nth-child(2), .user-management-account-settings .invoice-detail .inv-payment-table ul li .inv-payment-item:nth-child(2) {
     width: auto;
+    margin-left: 15px;
 }
 
 .user-management-account-settings .invoice-detail .inv-payment-table ul li .inv-payment-header:nth-child(3), .user-management-account-settings .invoice-detail .inv-payment-table ul li .inv-payment-item:nth-child(3) {
-    width: 120px;
-    color: #333;
+    width: 55px;
+    color: var(--text-color-black-high);
     text-align: right;
     float: right;
     vertical-align: top;
+    font-weight: bold;
 }
 
 .user-management-account-settings .invoice-detail .inv-payment-table ul .inv-payment-price:not(:last-child)::after {
@@ -15412,16 +15448,24 @@ body.megaChatDisabled .nw-contact-name button.start-chat-button {
     background-color: rgba(0,0,0,0.1);
 }
 
-.user-management-account-settings .invoice-detail .inv-payment-table ul .inv-payment-price .inv-payment-price-detail:first-child {
-    width: calc(100% - 125px);
+.user-management-account-settings .invoice-detail .inv-payment-table ul .inv-payment-price .inv-payment-price-detail:first-child,
+.user-management-account-settings .invoice-detail .inv-payment-table ul .inv-payment-price .inv-gst-perc {
+    width: calc(100% - 90px);
     display: inline-block;
     text-align: right;
 }
 
+.user-management-account-settings .invoice-detail .inv-payment-table ul .inv-payment-price .inv-payment-price-deactive-users {
+    width: calc(100% - 230px);
+    position: absolute;
+}
+
 .user-management-account-settings .invoice-detail .inv-payment-table ul .inv-payment-price .inv-payment-price-detail:last-child {
-    width: 120px;
     display: inline-block;
     text-align: right;
+    color: var(--text-color-black-high);
+    font-weight: bold;
+    float: right;
 }
 
 /*  Business dashboard */

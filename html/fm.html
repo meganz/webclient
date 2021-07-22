@@ -944,6 +944,7 @@
             <div class="fm-notification-block grace-business">
                 <span>[$16316]</span>
             </div>
+            <div class="fm-notification-block business-next-tier"></div>
             <div class="fm-notification-block duplicated-items-found">
                 <span>[$22101]</span>
                 <a class="fix-me-btn">[$22102]</a>
@@ -1978,9 +1979,9 @@
                                                 <div class="inv-payment-item inv-pay-amou">&euro;4.34</div>
                                             </li>
                                             <li class="inv-payment-price inv-li-gst">
+                                                <div class="inv-payment-price-deactive-users hidden">[$deactivated_charging]</div>
                                                 <div class="inv-payment-price-detail inv-gst-perc">[$19301]:</div>
                                                 <div class="inv-payment-price-detail inv-gst-val">&euro;4.34</div>
-
                                             </li>
                                             <li class="inv-payment-price inv-li-total">
                                                 <div class="inv-payment-price-detail">[$19300]:</div>
@@ -2053,6 +2054,7 @@
                                                 <div class="inv-payment-item inv-pay-amou">&euro;4.34</div>
                                             </li>
                                             <li class="inv-payment-price inv-li-gst">
+                                                <div class="inv-payment-price-deactive-users hidden">[$deactivated_charging]</div>
                                                 <div class="inv-payment-price-detail inv-gst-perc">[$19301]:</div>
                                                 <div class="inv-payment-price-detail inv-gst-val">&euro;4.34</div>
 
@@ -3650,7 +3652,17 @@
                                     </div>
                                     <div class="view-info">
                                         <div class="storage-transfer-text">[$495]</div>
-                                        <div class="storage-transfer-data">0 B</div>
+                                        <div class="storage-transfer-current hidden"></div>
+                                        <div class="storage-transfer-data-details">
+                                            <div class="storage-transfer-data-details-base">
+                                                <div class="storage-transfer-data-base-head hidden">[$base_quota]</div>
+                                                <div class="storage-transfer-data">0 B</div>
+                                            </div>
+                                            <div class="storage-transfer-data-details-ext hidden">
+                                                <div class="storage-transfer-data-base-ext">[$additional_quota]</div>
+                                                <div class="storage-transfer-data">0 B</div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
 
@@ -3660,7 +3672,17 @@
                                     </div>
                                     <div class="view-info">
                                         <div class="storage-transfer-text">[$18057]</div>
-                                        <div class="storage-transfer-data">0 B</div>
+                                        <div class="storage-transfer-current hidden"></div>
+                                        <div class="storage-transfer-data-details">
+                                            <div class="storage-transfer-data-details-base">
+                                                <div class="storage-transfer-data-base-head hidden">[$base_quota]</div>
+                                                <div class="storage-transfer-data">0 B</div>
+                                            </div>
+                                            <div class="storage-transfer-data-details-ext hidden">
+                                                <div class="storage-transfer-data-base-ext">[$additional_quota]</div>
+                                                <div class="storage-transfer-data">0 B</div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="user-management-button">

@@ -682,13 +682,17 @@ var redeem = {
             var $whiteBtnSpan = $('span', $whiteBtn);
             var $dlgTitle = $('h2', $dlg);
 
+            if (is_mobile) {
+                $dlgTitle = $('.voucher-head .v-header-text', $dlg);
+            }
+
             $greenBtn.removeClass('disabled');
             $whiteBtn.removeAttr('bFail');
             $dlgTitle.removeClass('red');
 
             if (mega.voucher.businessmonths) {
-                $('.v-storage', $dlg).safeHTML(l[23789].replace('%1', '15 ' + l[20160]));
-                $('.v-transfer', $dlg).safeHTML(l[23813]);
+                $('.v-storage', $dlg).safeHTML(l[23789].replace('%1', l[5816].replace('[X]', 3) + '+'));
+                $('.v-transfer', $dlg).safeHTML(l[23790].replace('%1', l[5816].replace('[X]', 3) + '+'));
 
                 $('.voucher-logo', $dlg).addClass('business-v');
                 $('.plan-icon', $dlg).removeClass('pro1 pro2 pro3 pro4').addClass('business');

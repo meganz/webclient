@@ -3320,7 +3320,8 @@ function fm_resize_handler(force) {
 
         $dashboardContent.removeClass('low-width');
 
-        if ($dashboardContent.width() < 780) {
+        if ($dashboardContent.width() < 780 || !$('.business-dashboard', $dashboardContent).hasClass('hidden')
+            && $dashboardContent.width() < 915) {
             $dashboardContent.addClass('low-width');
         }
     }

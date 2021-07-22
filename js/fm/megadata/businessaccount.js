@@ -1407,8 +1407,11 @@ BusinessAccount.prototype.doPaymentWithAPI = function (payDetails,businessPlan) 
         m: m,
         bq: 0,
         pbq: 0,
-        num: businessPlan.totalUsers        // number of users
+        num: [businessPlan.totalUsers | 0, 0, 0]        // number of users
     };
+    if (businessPlan.quota) {
+        request.num[1] = businessPlan.quota;
+    }
 
     if (mega.uaoref) {
         request.uao = escapeHTML(mega.uaoref);

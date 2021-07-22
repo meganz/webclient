@@ -2824,7 +2824,7 @@ function odqPaywallDialogTexts(user_attr, accountData) {
     }
 
     var filesText = l[23253]; // 0 files
-    var totalFiles = accountData.stats[M.RootID].files +
+    var totalFiles = (accountData.stats[M.RootID] ? accountData.stats[M.RootID].files : 0) +
         (accountData.stats[M.RubbishID] ? accountData.stats[M.RubbishID].files : 0) +
         (accountData.stats[M.InboxID] ? accountData.stats[M.InboxID].files : 0);
     if (totalFiles === 1) {

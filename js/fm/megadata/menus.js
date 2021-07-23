@@ -223,10 +223,6 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
                 items['.open-item'] = 1;
             }
 
-            if (M.currentCustomView) {
-                items['.open-cloud-item'] = 1;
-            }
-
             if (sourceRoot === M.RootID && !folderlink) {
                 items['.sh4r1ng-item'] = 1;
             }
@@ -281,6 +277,10 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
                     items['.edit-file-item'] = 1;
                 }
             }
+        }
+
+        if (M.currentCustomView) {
+            items['.open-cloud-item'] = 1;
         }
 
         if (M.getNodeRights(selNode.h) > 1) {

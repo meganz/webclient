@@ -655,3 +655,56 @@ window.loadSubPage = function(page) {
 
     return loadSubPageNZ.apply(this, arguments);
 };
+
+function BusinessAccount() {}
+
+BusinessAccount.prototype.getBusinessPlanInfo = function(forceUpdate) {
+    "use strict";
+    var operationPromise = new MegaPromise();
+
+    if (!forceUpdate) {
+        if (mega.buinsessAccount && mega.buinsessAccount.cachedBusinessPlan) {
+            var currTime = new Date().getTime();
+            if (mega.buinsessAccount.cachedBusinessPlan.timestamp &&
+                (currTime - mega.buinsessAccount.cachedBusinessPlan.timestamp) < this.invoiceListUpdateFreq) {
+                return operationPromise.resolve(1, mega.buinsessAccount.cachedBusinessPlan);
+            }
+        }
+    }
+
+    var request = {
+        a: "utqa",  // get a list of plans
+        nf: 1,      // extended format
+        b: 1        // also show business plans
+    };
+
+    api_req(request, {
+        callback: function (res) {
+            if ($.isNumeric(res)) {
+                operationPromise.reject(0, res, 'API returned error');
+            }
+            else if (typeof res === 'object') {
+                var currTime = new Date().getTime();
+                mega.buinsessAccount = mega.buinsessAccount || Object.create(null);
+                var businessPlan = Object.create(null);
+                businessPlan.timestamp = currTime;
+                for (var h = 0; h < res.length; h++) {
+                    if (res[h].it) {
+                        businessPlan = res[h];
+                        businessPlan.timestamp = currTime;
+                        break;
+                    }
+                }
+                mega.buinsessAccount.cachedBusinessPlan = businessPlan;
+                operationPromise.resolve(1, businessPlan); // payment gateways list
+            }
+            else {
+                operationPromise.reject(0, 4, 'API returned error, ret=' + res);
+            }
+        }
+
+    });
+
+    return operationPromise;
+
+}

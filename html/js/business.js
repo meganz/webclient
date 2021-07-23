@@ -164,9 +164,9 @@ const businessProductPage = {
             // Show new Business plan content if new API is valid
             $('.business-el-new', $page).removeClass('hidden');
             $('.business-el-old', $page).addClass('hidden');
-            if (this.formHidden) {
+            // if (this.formHidden) {
                 $('.business-el-new.support-form-container', $page).addClass('hidden');
-            }
+            // }
         }
 
         // Show old Business plan content, if new API is incorrect.
@@ -401,6 +401,8 @@ const businessProductPage = {
     initBusinessSupport: function() {
 
         'use strict';
+
+        return;
 
         const formTime = localStorage.formTime;
         const $page = $('.scroll-block.business-page', '.fmholder');

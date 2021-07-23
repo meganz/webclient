@@ -9421,8 +9421,12 @@ body.de .mega-dialog.new-group-chat {
         min-height: 80px;
         overflow: hidden;
         padding: 0 12px;
+        position: relative;
         resize: none;
         width: 100%;
+    }
+    .mega-dialog.feedback-dialog .feedback-dialog-textarea textarea {
+        z-index: 1;
     }
     .mega-dialog.feedback-dialog .feedback-dialog-textarea textarea::selection {
         background: rgba(255, 255, 255, 0.15);

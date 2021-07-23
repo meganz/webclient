@@ -122,6 +122,8 @@ function bindDropdownEvents($select, saveOption, contentBlock) {
 
         var $this = $(this);
 
+        $select.removeClass('error');
+
         // Select dropdown item
         $('.option', $select).removeClass('active').removeAttr('data-state');
         $this.addClass('active').attr('data-state', 'active');

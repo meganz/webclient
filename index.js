@@ -1564,8 +1564,7 @@ function init_page() {
     else if (page === 'business') {
         parsepage(pages['business']);
         document.body.classList.add('business');
-        var businessP = new BusinessProductPage();
-        businessP.init();
+        businessProductPage.init();
     }
     else if (page.substr(0, 4) == 'sync') {
         parsepage(pages['sync']);

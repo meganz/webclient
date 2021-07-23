@@ -12,6 +12,9 @@ var bottompage = {
 
         var $content = $('.bottom-page.scroll-block', '.fmholder');
 
+        // Unbind sliders events
+        $(window).unbind('resize.sliderResize');
+
         if (page.substr(0, 4) === 'help' || page.substr(0, 9) === 'corporate' || page.substr(0, 9) === 'corporate') {
             $('body').addClass('old');
             scrollMenu();
@@ -364,6 +367,124 @@ var bottompage = {
                 $this.addClass('active');
                 $submenu.addClass('active');
             }
+        });
+    },
+
+    /**
+     * Init Common scrollable sliders for mobile devices.
+     * @param {Object} $sliderSection The jQuery selector for the current page or subsection
+     * @param {Object} $scrollBlock The jQuery selector for the scrollable block
+     * @param {Object} $slides The jQuery selector for the slides
+     * @param {Boolean} passing TRUE if we need to show slides withhout scrolling animation
+     * @returns {void}
+     */
+    initSliderEvents: function($sliderSection, $scrollBlock, $slides, passing) {
+
+        'use strict';
+
+        // The box which gets scroll and contains all the child content.
+        const $scrollContent = $scrollBlock.children();
+        const $controls = $('.default-controls', $sliderSection);
+        const $specialControls = $('.sp-control', $sliderSection);
+        const $dots = $('.nav', $controls).add($specialControls);
+        let isRunningAnimation = false;
+
+        // Scroll to first block
+        $scrollBlock.scrollLeft(0);
+        $dots.removeClass('active');
+        $dots.filter('[data-slide="0"]').addClass('active');
+
+        $slides.removeClass('active');
+        $($slides[0]).addClass('active');
+
+        // Scroll to necessary plan block
+        const scrollToPlan = (slideNum) => {
+            let $previousPlan = 0;
+            let planPosition = 0;
+
+            // Prevent scroll event
+            isRunningAnimation = true;
+
+            // Get plan position related to previous plan to include border-spacing
+            $previousPlan = $($slides[slideNum - 1]);
+            planPosition = $previousPlan.length ? $previousPlan.position().left
+                + $scrollBlock.scrollLeft() + $previousPlan.outerWidth() : 0;
+
+            // Set controls dot active state
+            $dots.removeClass('active');
+            $dots.filter(`[data-slide="${slideNum}"]`).addClass('active');
+
+            $slides.removeClass('active');
+            $($slides[slideNum]).addClass('active');
+
+            // Scroll to plan block
+            $scrollBlock.stop().animate({
+                scrollLeft: planPosition
+            }, passing ? 0 : 600, 'swing', () => {
+
+                // Enable on scroll event after auto scrolling
+                isRunningAnimation = false;
+            });
+        };
+
+        // Init scroll event
+        $scrollBlock.rebind('scroll.scrollToPlan', function() {
+            const scrollVal = $(this).scrollLeft();
+            const contentWidth = $scrollContent.outerWidth();
+            const scrollAreaWidth = $scrollBlock.outerWidth();
+            let closestIndex = 0;
+
+            // Prevent on scroll event during auto scrolling or slider
+            if (isRunningAnimation || contentWidth === scrollAreaWidth) {
+                return false;
+            }
+
+            // If block is scrolled
+            if (scrollVal > 0) {
+                closestIndex = Math.round(scrollVal /
+                    (contentWidth - scrollAreaWidth) * $slides.length);
+            }
+
+            // Get closest plan index
+            closestIndex = closestIndex - 1 >= 0 ? closestIndex - 1 : 0;
+
+            // Set controls dot active state
+            $dots.removeClass('active');
+            $dots.filter(`[data-slide="${closestIndex}"]`).addClass('active');
+
+            $slides.removeClass('active');
+            $($slides[closestIndex]).addClass('active');
+        });
+
+        // Init controls dot click
+        $dots.rebind('click.scrollToPlan', function() {
+
+            // Scroll to selected plan
+            scrollToPlan($(this).data('slide'));
+        });
+
+        // Init Previous/Next controls click
+        $('.nav-button', $controls).rebind('click.scrollToPlan', function() {
+            const $this = $(this);
+            let slideNum;
+
+            // Get current plan index
+            slideNum = $('.nav.active', $controls).data('slide');
+
+            // Get prev/next plan index
+            if ($this.is('.prev')) {
+                slideNum = slideNum - 1 > 0 ? slideNum - 1 : 0;
+            }
+            else if (slideNum !== $slides.length - 1) {
+                slideNum += 1;
+            }
+
+            // Scroll to selected plan
+            scrollToPlan(slideNum);
+        });
+
+        $(window).rebind('resize.sliderResize', () => {
+            this.initSliderEvents($sliderSection, $scrollBlock, $slides, passing);
         });
     },
 

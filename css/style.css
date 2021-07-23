@@ -5717,21 +5717,31 @@ tr:not(.taken-down) .grid-status-icon:not(.read-only):not(.read-and-write) {
     height: 140px;
     box-sizing: border-box;
 }
-.add-user-nt-scrolling, .share-message-scroll {
+.add-user-nt-scrolling,
+.share-message-scroll {
     height: 50px;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
     box-sizing: border-box;
     padding: 6px 0;
 }
-.add-user-nt-scrolling .jspVerticalBar, .share-message-scrolling .jspVerticalBar, .cancel-textarea-scroll .jspVerticalBar {
+.add-user-nt-scrolling .jspVerticalBar,
+.share-message-scrolling .jspVerticalBar,
+.cancel-textarea-scroll .jspVerticalBar {
     width: 9px;
 }
-.add-user-nt-scrolling .jspDrag, .share-message-scrolling .jspDrag, .cancel-textarea-scroll .jspDrag {
+.add-user-nt-scrolling .jspDrag,
+.share-message-scrolling .jspDrag,
+.cancel-textarea-scroll .jspDrag {
     width: 6px;
 }
-.add-user-nt-scrolling textarea, .add-contact-hidden, .share-message-scrolling textarea, .share-message-hidden, .feedback-hidden, .cancel-textarea-scroll textarea, .cancel-hidden {
+.add-user-nt-scrolling textarea,
+.add-contact-hidden,
+.share-message-scrolling textarea,
+.share-message-hidden,
+.feedback-hidden,
+.cancel-textarea-scroll textarea,
+.cancel-hidden {
     border: 0;
+    box-sizing: border-box;
     padding: 0;
     background: var(--surface-grey-1);
     font: var(--text-body1);
@@ -5740,28 +5750,35 @@ tr:not(.taken-down) .grid-status-icon:not(.read-only):not(.read-and-write) {
     margin: 0;
     height: 72px;
     padding: 0 16px;
+    position: relative;
     box-sizing: border-box;
     resize: none;
     overflow: hidden;
     min-height: 72px;
+    z-index: 1;
 }
 .cancel-textarea {
     height: 140px;
     line-height: 0;
     font-size: 0;
+    position: relative;
 }
-.cancel-textarea-scroll textarea, .cancel-hidden {
+.cancel-textarea-scroll textarea,
+.cancel-hidden {
     height: 138px;
     padding: 12px 12px;
     min-height: 138px;
 }
-.add-contact-hidden, .share-message-hidden, .feedback-hidden, .cancel-hidden, .feedback-dialog .feedback-dialog-hidden {
+.add-contact-hidden,
+.share-message-hidden,
+.feedback-hidden,
+.cancel-hidden,
+.mega-dialog.feedback-dialog .textarea-scroll .feedback-dialog-hidden {
     position: absolute;
     height: auto;
-    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
-    -moz-opacity: 0;
-    -khtml-opacity: 0;
     opacity: 0;
+    top: 0;
+    z-index: 0;
 }
 .share-message-scrolling {
     padding: 6px 0 5px 0;

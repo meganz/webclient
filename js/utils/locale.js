@@ -1299,6 +1299,39 @@ mBroadcaster.once('boot_done', function populate_l() {
     l.achievem_storagetitle = escapeHTML(l.achievem_storagetitle)
         .replace('[S]', '<span>')
         .replace('[/S]', '</span>');
+    l.bsn_calc_min_users = escapeHTML(l.bsn_calc_min_users)
+        .replace('[BR]', '<br>');
+    l.bsn_calc_min_storage = escapeHTML(l.bsn_calc_min_storage)
+        .replace('[BR]', '<br>');
+    l.bsn_calc_min_transfer = escapeHTML(l.bsn_calc_min_transfer)
+        .replace('[BR]', '<br>');
+    l.bsn_calc_total = escapeHTML(l.bsn_calc_total)
+        .replace('[S]', '<span>')
+        .replace('[/S]', '</span>');
+    l.bsn_page_plan_price = escapeHTML(l.bsn_page_plan_price)
+        .replace('[S]', '<span>')
+        .replace('[/S]', '</span>');
+    l.bsn_plan_more_users = escapeHTML(l.bsn_plan_more_users)
+        .replace('[B]', '<strong>')
+        .replace('[/B]', '</strong>');
+    l.bsn_plan_more_storage = escapeHTML(l.bsn_plan_more_storage)
+        .replace('[B]', '<strong>')
+        .replace('[/B]', '</strong>');
+    l.bsn_plan_more_transfer = escapeHTML(l.bsn_plan_more_transfer)
+        .replace('[B]', '<strong>')
+        .replace('[/B]', '</strong>');
+    l.bsn_versioning_info = escapeHTML(l.bsn_versioning_info)
+        .replace('[S]', '<span>')
+        .replace('[/S]', '</span>')
+        .replace('[BR]', '<br>');
+    l.bsn_backup_info = escapeHTML(l.bsn_backup_info)
+        .replace('[S]', '<span>')
+        .replace('[/S]', '</span>')
+        .replace('[BR]', '<br>');
+    l.bsn_meetings_info = escapeHTML(l.bsn_meetings_info)
+        .replace('[S]', '<span>')
+        .replace('[/S]', '</span>')
+        .replace('[BR]', '<br>');
 
     var common = [
         15536, 16106, 16107, 16119, 16120, 16123, 16124, 16135, 16136, 16137, 16138, 16304, 16313, 16315, 16316,

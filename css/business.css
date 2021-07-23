@@ -62,7 +62,7 @@ i.medium-icon.business-sprite {
 }
 .img.business-top {
     max-width: 1113px;
-    padding: 62px 0 38px 0;
+    padding: 62px 0 0 0;
     width: 200%;
 }
 .bottom-page.angle-bg {
@@ -116,7 +116,7 @@ i.medium-icon.business-sprite {
     background: linear-gradient(to bottom, rgba(255, 255, 255, 1) 0%, rgba(250, 250, 250, 1) 100%);
     box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.15);
     position: relative;
-    margin: 40px auto;
+    margin: 0 auto 40px;
     font-family: LatoWeb, Arial, sans-serif;
 }
 .bottom-page.gradient-block::before {
@@ -131,6 +131,7 @@ i.medium-icon.business-sprite {
 }
 .bottom-page.content-table {
     display: table;
+    position: relative;
     width: 100%;
 }
 .bottom-page.content-cell {
@@ -164,14 +165,14 @@ i.medium-icon.business-sprite {
     text-align: center;
 }
 .business-price {
-    font-size: 24px;
-    line-height: 58px;
+    font-size: 20px;
+    line-height: 44px;
     position: relative;
-    font-family: LatoWebBold, Arial, sans-serif;
+    font-family: var(--text-font-family-bold);
     white-space: nowrap;
 }
 .business-price.montserat {
-    font-family: montserrat, Arial, sans-serif;
+    font-family: var(--text-font-family-montserrat-regular);
 }
 .business-price .business-icon {
     display: inline-block;
@@ -189,7 +190,7 @@ i.medium-icon.business-sprite {
     color: #E1B63F;
 }
 .business-price .big {
-    font-size: 48px;
+    font-size: 36px;
 }
 .business-storage-info {
     font-size: 16px;
@@ -200,12 +201,45 @@ i.medium-icon.business-sprite {
 .business-price-info {
     font-size: 16px;
     line-height: 18px;
-    color: #333333;
-    padding-bottom: 25px;
+    color: var(--text-color-high);
     padding: 0 0 25px 0;
 }
 .business-price-info.top {
     padding: 4px 0 25px 0;
+}
+
+/* Business plan details/pricing */
+.business-plan-caption {
+    font: var(--text-h3);
+    color: var(--text-color-high);
+    padding: 8px 0;
+}
+.business-plan-info {
+    margin: 0;
+    padding: 5px 0;
+}
+.business-plan-info li {
+    color: var(--text-color-high);
+    font: var(--text-h3);
+    list-style-type: none;
+    padding: 8px 0;
+    margin: 0;
+}
+.business-plan-info li strong {
+    font-family: var(--text-font-family-bold);
+    font-weight: normal;
+}
+.business-plan-info.strong {
+    padding: 0;
+}
+.business-plan-info.strong li {
+    font-family: var(--text-font-family-bold);
+    font-size: 18px;
+    line-height: 34px;
+    padding: 0;
+}
+.business-plan-info + hr {
+    margin-top: 14px;
 }
 
 .business-icon {
@@ -415,7 +449,7 @@ i.medium-icon.business-sprite {
 .bottom-page.business-icon.medium {
     width: 76px;
     height: 76px;
-    margin: 0 0 10px 0;
+    margin: 0;
     float: none;
 }
 .bottom-page.business-icon.medium.mega {
@@ -448,6 +482,11 @@ i.medium-icon.business-sprite {
 .bottom-page.business-icon.big.analytics {
     background-position: -9px -1029px;
 }
+.bottom-page.business-icon.big.collaborate {
+    background-position: -227px -841px;
+    height: 102px;
+    width: 141px;
+}
 .bottom-page.business-icon.big.data {
     background-position: -239px -1029px;
     margin-top: -30px;
@@ -470,6 +509,9 @@ i.medium-icon.business-sprite {
     line-height: 30px;
     color: #666666;
     font-family: LatoWeb, Arial, sans-serif;
+}
+.bottom-page.business-text + .business-text {
+    padding-top: 24px;
 }
 .bottom-page.business-text .red {
     color: #f0373a;
@@ -550,9 +592,18 @@ div.bottom-page.slider-controls {
     width: 104%;
 }
 .bottom-page.business4 {
-    max-width: 683px;
-    margin: 5% 10% -5% 0;
-    width: 100%;
+    left: 50%;
+    max-width: 658px;
+    position: relative;
+    transform: translateX(-50%);
+    width: 132%;
+}
+.bottom-page.business5 {
+    left: 50%;
+    max-width: 583px;
+    position: relative;
+    transform: translateX(-50%);
+    width: 117%;
 }
 .bottom-page.horizontal-centered-bl.huge-pad {
     padding-top: 145px;
@@ -570,13 +621,14 @@ div.bottom-page.slider-controls {
     font-size: 36px;
     line-height: 48px;
     color: #333;
+    padding: 0 0 12px;
     position: relative;
     z-index: 1;
     font-family: montserrat_light, montserrat, Arial, sans-serif;
 }
 .business-txt-block {
     max-width: 360px;
-    padding-top: 43px;
+    padding-top: 30px;
     text-align: left;
 }
 .bottom-page.business-icons {
@@ -727,6 +779,168 @@ div.bottom-page.slider-controls {
     padding: 0 40px 65px 0;
 }
 
+/* Compare MEGA with Goodle */
+.business-compare.hidden {
+    display: none;
+}
+.business-compare-data {
+    -webkit-padding-end: 40px;
+    padding-inline-end: 40px;
+    text-align: start;
+}
+.business-compare-result {
+    font-size: 0;
+    line-height: 0;
+    -webkit-margin-start: 12%;
+    margin-inline-start: 12%;
+    text-align: start;
+}
+.business-compare-charts {
+    background-color: #f6f6f6;
+    background-image: linear-gradient(0deg, #e2e1e1 0.7%, #f6f6f6 0.7%, #f6f6f6 50%, #e2e1e1 50%, #e2e1e1 50.7%, #f6f6f6 50.7%, #f6f6f6 100%);
+    background-size: auto 140px;
+    background-position: left bottom;
+    height: 420px;
+    margin: 60px 0 0;
+    position: relative;
+}
+.business-charts-wrap {
+    bottom: 0;
+    height: 40%;
+    position: absolute;
+    width: 100%;
+}
+.business-compare-charts .chart {
+    background-color: #ff7169;
+    background-image: linear-gradient(180deg, #ff7169 0%, #fd3e38 100%);
+    border-radius: 4px 4px 0 0;
+    bottom: 0;
+    height: 0;
+    left: 24%;
+    position: absolute;
+    transition: height 10ms linear;
+    width: 13%;
+}
+.business-compare-charts .chart.google {
+    background-color: #ffd200;
+    background-image: linear-gradient(180deg, #ffd200 0%, #ffa500 100%);
+    left: auto;
+    right: 24%;
+}
+.dark-direct-tooltip.simpletip-tooltip.business-chart-tip {
+    bottom: 100%;
+    font: var(--text-h3);
+    left: 50%;
+    margin: 0 0 20px;
+    padding: 13px 12px;
+    text-align: center;
+    transform: translate(-50%);
+    white-space: nowrap;
+    z-index: 10;
+}
+.en .dark-direct-tooltip.simpletip-tooltip.business-chart-tip {
+    font: var(--text-h2);
+}
+.dark-direct-tooltip.business-chart-tip i.icon-tooltip-arrow {
+    bottom: -8px;
+}
+.business-chart-tip .price {
+    white-space: nowrap;
+}
+.business-compare-company {
+    display: inline-block;
+    left: 13%;
+    position: relative;
+    text-align: center;
+    vertical-align: top;
+    width: 35%;
+}
+.business-compare-company.google {
+    left: 17%;
+}
+.business-compare .business-button {
+    margin-top: 96px;
+}
+
+/* Business support */
+.business-support {
+    background-color: var(--surface-main);
+    border: 2px solid var(--surface-grey-2);
+    border-radius: 8px;
+    box-sizing: border-box;
+    margin: 44px auto 0;
+    max-width: 656px;
+    padding: 48px;
+}
+.business-support .half-sized {
+    float: none;
+    display: inline-block;
+    vertical-align: top;
+    width: calc(50% - 12px);
+}
+.business-support .half-sized:nth-child(2n) {
+    -webkit-margin-start: 24px;
+    margin-inline-start: 24px;
+}
+.business-support .error-message {
+    color: var(--banner-text-error);
+    border-radius: 4px;
+    border: 1px solid var(--banner-border-error);
+    background: var(--banner-background-error);
+    font: var(--text-body1);
+    padding: 2px 8px;
+    position: relative;
+    text-align: center;
+    top: -16px;
+}
+.business-support .mega-input.textarea {
+    margin-bottom: 20px;
+}
+.business-support .mega-button {
+    margin: 64px auto 0;
+}
+.business-support .mega-input.box-style .mega-input-dropdown {
+    top: 80%;
+}
+
+/* Compare block for mobile */
+.business-support .mobile.bp-storage-select,
+.mobile .business-support .dropdown-input.bp-storage-select {
+    display: none;
+}
+.mobile .business-support .mobile.bp-storage-select {
+    display: block;
+}
+.mobile .business-support .default-input {
+    color: var(--text-color-high);
+    background-color: var(--surface-grey-1);
+    font: var(--text-body1);
+    margin-bottom: 12px;
+}
+.mobile .business-support .default-select {
+    color: var(--text-color-high);
+    background-color: var(--surface-grey-1);
+    font: var(--text-body1);
+    float: none;
+    margin: 0 0 12px;
+    outline: none;
+    padding: 0 30px 0 12px;
+    width: 100%;
+}
+.mobile .business-support .mega-input.textarea {
+    margin-bottom: 12px;
+}
+.mobile .business-support .mega-input.box-style.textarea textarea {
+    overflow-y: auto;
+    padding: 12px 13px;
+}
+.mobile .business-support .mega-input textarea:placeholder {
+    color: #999;
+}
+.mobile .business-support .error-message {
+    top: -8px;
+}
+
 /* Temporary layout hack for beautiful Backup block linebreak */
 .business-txt-cols .inline-block:nth-child(3) {
     padding-right: 22px;
@@ -748,16 +962,32 @@ div.bottom-page.slider-controls {
     padding-right: 30px;
 }
 
+@media only screen and (max-width: 1200px) {
+
+    /* Compare MEGA with Goodle */
+    .dark-direct-tooltip.simpletip-tooltip.business-chart-tip,
+    .en .dark-direct-tooltip.simpletip-tooltip.business-chart-tip {
+        font: var(--text-body1);
+        padding: 8px 10px;
+    }
+}
+
 @media only screen and (max-width: 1120px) {
     .bottom-page.business2,
-    .bottom-page.business3 {
+    .bottom-page.business3,
+    .bottom-page.business4,
+    .bottom-page.business5 {
         box-sizing: border-box;
         float: none;
-        padding-right: 30px;
+        left: auto;
         margin: 0 auto;
+        padding-right: 30px;
+        position: static;
+        transform: none;
         width: 100%;
     }
-    .bottom-page.business3 {
+    .bottom-page.business3,
+    .bottom-page.business4 {
         padding: 0 0 0 30px;
     }
     .business-txt-cols .business-text span {
@@ -770,9 +1000,59 @@ div.bottom-page.slider-controls {
     }
 }
 
+@media only screen and (max-width: 1080px) {
+
+    /* Compare MEGA with Goodle */
+    .dark-direct-tooltip.simpletip-tooltip.business-chart-tip,
+    .en .dark-direct-tooltip.simpletip-tooltip.business-chart-tip {
+        font: var(--text-body2);
+        padding: 8px 10px;
+    }
+}
+
 @media only screen and (max-width: 920px) {
+
     .business-cell .business-price .big {
         font-size: 38px;
+    }
+}
+
+@media only screen and (max-width: 890px) {
+
+    .business-big-header {
+        font-size: 30px;
+    }
+
+    /* Business compare block */
+    .business-compare-charts {
+        margin-top: 50px;
+    }
+    .business-compare .business-button {
+        margin: 50px 0 -20px;
+    }
+    .business-table-txt {
+        font-size: 12px;
+    }
+    .business-compare-charts .chart {
+        left: 18%;
+    }
+    .business-compare-charts .chart.google {
+        right: 18%;
+    }
+    .business-compare-company {
+        left: 7%;
+    }
+    .business-compare-company.google {
+        left: 23%;
+    }
+
+    /* Business plan block */
+    .bottom-page.content-cell .business-price {
+        font-size: 16px;
+    }
+    .bottom-page.content-cell .business-price .big {
+        font-size: 26px;
+        line-height: 34px;
     }
 }
 
@@ -816,8 +1096,6 @@ div.bottom-page.slider-controls {
         display: block;
     }
     .bottom-page.big-header.top.dark {
-        font-size: 36px;
-        line-height: 48px;
         padding: 82px 40px 0 40px;
     }
     .top-bl .bottom-page.table,
@@ -826,7 +1104,7 @@ div.bottom-page.slider-controls {
     }
     .img.business-top {
         margin: 15px 0 0 -5%;
-        padding-top: 0;
+        padding: 0;
         width: 150%;
     }
     .business-page .bottom-page.half-sized-cell {
@@ -838,6 +1116,9 @@ div.bottom-page.slider-controls {
     .business-txt-cols .inline-block.col-3,
     .business-txt-cols .inline-block.col-3:nth-child(3) {
         padding-right: 0;
+    }
+    .business-big-header {
+        padding: 0;
     }
      .business-mid-header {
         font-size: 24px;
@@ -855,16 +1136,53 @@ div.bottom-page.slider-controls {
     .bottom-page.business-header.low-bott-pad {
         padding: 22px 0 14px 0;
     }
-    .bottom-page.business-text {
+    .bottom-page.business-text,
+    .business-page .bottom-page.medium-txt {
         font-size: 14px;
         line-height: 24px;
         text-align: center;
+    }
+    .business-tick-txt {
+        font-size: 14px;
     }
     .business-txt-cols .col-3 {
         width: 100%;
     }
     .business-txt-cols .inline-block {
         padding: 0 0 65px 0;
+    }
+    .bottom-page.business-icon.big {
+        margin: 0 auto;
+    }
+
+    /* Business compare block */
+    .business-compare-data {
+        text-align: center;
+    }
+    .business-plan-info li,
+    .business-plan-info.strong li {
+        font-size: 14px;
+    }
+
+    /* Business support */
+    .business-support {
+        background-color: transparent;
+        border: 0;
+        margin: 0 auto;
+        max-width: 656px;
+        padding: 0;
+    }
+    .mobile .business-support {
+        padding-top: 30px;
+    }
+    .business-support .half-sized {
+        width: 100%;
+    }
+    .business-support .half-sized:nth-child(2n) {
+        margin: 0;
+    }
+    .business-support .mega-button {
+        margin: 12px auto 0;
     }
 }
 
@@ -889,10 +1207,6 @@ div.bottom-page.slider-controls {
 }
 
 @media only screen and (max-width: 660px) {
-    .business-page .bottom-page.medium-txt.lato {
-        padding: 20px 0 36px 0;
-        margin: 0 auto;
-    }
     .business-page .bottom-page.right-cell,
     .business-page .bottom-page.left-cell {
         display: block;
@@ -900,19 +1214,12 @@ div.bottom-page.slider-controls {
         height: 50%;
     }
     .bottom-page.gradient-block {
-        margin-top: 12px;
-        margin: 12px auto 4px auto;
+        margin: 12px auto 4px;
     }
     .bottom-page.content-cell {
         display: block;
         width: 100%;
         padding: 18px 20px;
-    }
-    .bottom-page.content-cell .business-price {
-        font-size: 18px;
-    }
-    .bottom-page.content-cell .business-price .big {
-        font-size: 36px;
     }
     .business-price-info.top {
         font-size: 14px;
@@ -937,14 +1244,6 @@ div.bottom-page.slider-controls {
         margin-right: 30px;
         text-align: center;
         padding: 30px 0 64px 0;
-    }
-    .bottom-page.business-icon.big {
-        margin: 0 auto;
-    }
-    .slider-body .bottom-page.business-header {
-        font-size: 20px;
-        line-height: 24px;
-        padding: 16px 0 46px 0;
     }
     .slider-body .bottom-page.business-text {
         font-size: 14px;
@@ -1128,14 +1427,11 @@ div.bottom-page.slider-controls {
         padding: 8px 16px 8px 24px;
     }
     .bottom-page.business2,
-    .bottom-page.business3 {
+    .bottom-page.business3,
+    .bottom-page.business4,
+    .bottom-page.business5 {
         padding: 0;
         display: block;
-    }
-    .bottom-page.business4 {
-        width: 180%;
-        margin: 0 0 -20px -10%;
-        float: none;
     }
     .bottom-page.business-button {
         font-size: 14px;
@@ -1145,12 +1441,18 @@ div.bottom-page.slider-controls {
     .business-txt-cols {
         margin-bottom: 30px;
     }
+
+    /* Business compare block */
+    .business-compare-data {
+        padding: 0;
+    }
+    .business-compare-result {
+        margin: 0;
+    }
 }
 
 @media only screen and (max-width: 565px) {
-    .business-page .bottom-page.big-header.dark {
-        font-size: 26px;
-        line-height: 38px;
+    .business-page .bottom-page.big-header.top.dark {
         margin: 0 auto;
         padding: 47px 0 4px 0;
     }

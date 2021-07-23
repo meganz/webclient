@@ -1,4 +1,9 @@
-/* Old bottom pages stylinng */
+    .bottom-page .inline-block.col-3.hidden,
+    .bottom-page .inline-block.col-2.hidden {
+        display: none;
+    }
+
+/* Old bottom pages styling */
 .privacy-company h1 {
     padding: 45px 0 20px 0;
 }
@@ -844,7 +849,7 @@ body:not(.mobile) .bottom-page.scroll-button:hover {
 .bottom-page.big-header {
     font-size: 36px;
     line-height: 50px;
-    padding: 4px 0 13px 0;
+    padding: 4px 0 12px 0;
     color: #373737;
     font-family: 'montserrat_light', 'montserrat', Arial;
     max-width: 940px;
@@ -6037,7 +6042,7 @@ body:not(.mobile) .bottom-page.dropdown .dropdown-item:hover, .bottom-page.dropd
         padding: 20px 0 0;
     }
     .bottom-page.big-header {
-        padding: 5px 0 34px 0;
+        padding: 5px 0 24px 0;
     }
     .bottom-page.half-sized-cell {
         max-width: none;

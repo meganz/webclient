@@ -254,10 +254,10 @@ i.pricing-sprite,
     background-position: -249px -741px;
 }
 .pricing-sprite.i-icon {
-    width: 11px;
-    height: 11px;
-    background-position: -190px -748px;
-    background-color: #D3D3D3;
+    width: 12px;
+    height: 12px;
+    background-position: -190px -747px;
+    background-color: var(--icon-rest);
     border-radius: 100%;
 }
 .pricing-sprite.big-red-cross {
@@ -391,11 +391,13 @@ i.pricing-sprite,
     max-width: 921px;
     margin: auto;
 }
-.pricing-page.top-header.not-logged, .not-logged .pricing-page.top-header.default {
-    display: none;
-}
 .not-logged .pricing-page.top-header.not-logged {
     display: block;
+}
+.pricing-page.top-header.not-logged,
+.not-logged .pricing-page.top-header.default,
+.not-logged .pricing-page.top-header.hidden {
+    display: none;
 }
 .pricing-page.medium-txt {
     font-size: 20px;
@@ -410,7 +412,7 @@ i.pricing-sprite,
 }
 
 /* Plans */
-.plans-bottom-pad {
+.bottom-page.plans-bottom-pad.mid-wide {
     padding-bottom: 130px;
 }
 .pricing-page.plans-switcher {
@@ -495,15 +497,17 @@ i.pricing-sprite,
     max-width: 1112px;
 }
 .pricing-page.plan {
-    text-align: center;
-    box-sizing: border-box;
-    border: 1px solid var(--stroke-grey-2);
-    position: relative;
     background: var(--surface-main);
+    border: 1px solid var(--stroke-grey-2);
+    box-sizing: border-box;
+    line-height: 0;
+    position: relative;
+    text-align: center;
 }
 .pricing-page.plan.details {
+    flex: 1;
     text-align: left;
-    padding: 11px 0 17px 0;
+    padding: 18px 0;
     border-top: 0;
 }
 
@@ -539,7 +543,7 @@ i.pricing-sprite,
 .pricing-page.old-plan-price {
     height: 27px;
     color: #666666;
-    font-family: 'montserrat', sans-serif;
+    font-family: var(--text-font-family-montserrat-regular);
     font-size: 22px;
     letter-spacing: 0;
     line-height: 27px;
@@ -556,7 +560,7 @@ i.pricing-sprite,
 }
 .pricing-page.plan-price.discounted .price,
 .pricing-page.plan-price.discounted .asterisk {
-    font-family: 'montserrat', sans-serif;
+    font-family: var(--text-font-family-montserrat-regular);
     color: #28C969;
     font-size: 32px;
     font-weight: 600;
@@ -572,24 +576,24 @@ i.pricing-sprite,
     font-size: 28px;
     line-height: 34px;
     color: var(--text-color-high);
-    font-family: var(--text-font-family);
+    font-family: var(--text-font-family-montserrat-light);
 }
 .pricing-page.plan-info {
     font-size: 16px;
     line-height: 24px;
     color: var(--text-color-medium);
-    padding: 8px 10px 20px 10px;
+    padding: 12px 10px 22px 10px;
     white-space: normal;
     box-sizing: border-box;
-    max-width: 374px;
+    max-width: 390px;
     margin: auto;
 }
 .pricing-page.plan-price {
-    font-size: 37px;
-    line-height: 45px;
-    padding: 0 15px;
     color: var(--text-color-high);
-    font-family: var(--text-font-family);
+    font-family: var(--text-font-family-montserrat-light);
+    font-size: 36px;
+    line-height: 45px;
+    padding: 0 15px 4px;
 }
 .pricing-page.plan-price .asterisk {
     font-size: 20px;
@@ -601,10 +605,11 @@ i.pricing-sprite,
 .local-currency .pricing-page.plan-price .asterisk {
     display: inline-block;
 }
-.pricing-page.plan-currency, .pricing-page.plan-period, .pricing-page.plan-data {
+.pricing-page.plan-currency,
+.pricing-page.plan-period,
+.pricing-page.plan-data {
     color: var(--text-color-high);
-    font-size: 16px;
-    line-height: 19px;
+    font: var(--text-h3);
     font-family: var(--text-font-family);
 }
 .pricing-page.plan-data {
@@ -618,19 +623,20 @@ i.pricing-sprite,
 .pricing-page.euro-price {
     font-size: 13px;
     line-height: 18px;
-    padding: 0 5px;
-    height: 20px;
+    padding: 1px 5px;
+    height: 22px;
     box-sizing: border-box;
     color: #666;
     background-color: #FFF;
     border: 1px solid #EBEBEB;
     border-radius: 10px;
     display: inline-block;
-    margin: 8px 0 0 0;
+    margin: 5px 0 8px;
 }
 .pricing-page.euro-price:empty {
     border: 0;
     background-color: transparent;
+    margin-bottom: 0;
 }
 .pricing-page.plan-button {
     font-size: 16px;
@@ -698,7 +704,7 @@ body:not(.mobile) .current .pricing-page.plan-button:hover {
     border-top: 1px solid #D5D5D5;
 }
 .plans-row .pricing-page.plan-info {
-    padding-bottom: 230px;
+    padding-bottom: 250px;
 }
 .plans-row .pricing-page.plan-content {
     position: absolute;
@@ -712,8 +718,8 @@ body:not(.mobile) .current .pricing-page.plan-button:hover {
     margin: 24px auto 8px auto;
 }
 /* Green button for Create new account*/
-.pricing-page.plan .bottom-page.green-button {
-    margin: 21px 0 46px 0;
+.pricing-page.plan .mega-button {
+    margin: 12px 18px 36px;
 }
 
 /* PRO 3 colors */
@@ -735,9 +741,8 @@ body:not(.mobile) .plan.pro3:not(.current) .pricing-page.plan-button:hover {
 /* Current plan tips */
 .plan-tag-description {
     opacity: 0;
+    font: var(--text-body1);
     font-size: 13px;
-    line-height: 20px;
-    font-family: 'LatoWeb', Arial;
     visibility: hidden;
     transition: opacity 300ms ease-in-out;
     position: absolute;
@@ -753,7 +758,7 @@ body:not(.mobile) .plan.pro3:not(.current) .pricing-page.plan-button:hover {
     position: relative;
 }
 .plan-tag-description b {
-    font-family: 'LatoWebBold', Arial;
+    font-family: var(--text-font-family-bold);
     font-weight: normal;
 }
 .plan-tag-description.visible {
@@ -806,29 +811,36 @@ body:not(.mobile) .plan.pro3:not(.current) .pricing-page.plan-button:hover {
     font-size: 15px;
     line-height: 20px;
     color: var(--text-color-medium);
-    padding: 7px 39px 7px 16px;
+    padding: 7px 38px 7px 16px;
     position: relative;
     white-space: normal;
     box-sizing: border-box;
     max-width: 366px;
     margin: auto;
 }
+.pricing-page.plan-feature.text-body1 {
+    font: var(--text-body1);
+    margin: 20px auto;
+    padding: 3px 38px 3px 16px;
+}
+.pricing-page.plan-feature.text-body1 .text-h2 {
+    color: var(--text-color-high);
+    font: var(--text-h2);
+    padding-bottom: 4px;
+}
 .pricing-page.plan-feature span {
     display: inline-block;
 }
 .pricing-page.plan-feature.strong,
 .pricing-page.plan-feature.strong * {
-    font-family: 'LatoWebBold', Arial;
     color: var(--text-color-high);
-}
-.pricing-page.plan .i-icon:hover {
-    background-color: #BCB9B9;
+    font-family: var(--text-font-family-bold);
 }
 .pricing-page.local-currency-tip {
     font-size: 14px;
     line-height: 20px;
-    color: var(--text-color-low);
-    padding: 20px 0 0 0;
+    color: var(--text-color-medium);
+    padding: 20px 0 0;
     text-align: center;
     display: none;
     box-sizing: border-box;
@@ -836,11 +848,8 @@ body:not(.mobile) .plan.pro3:not(.current) .pricing-page.plan-button:hover {
 .local-currency .pricing-page.local-currency-tip:not(.hidden) {
     display: block;
 }
-.pricing-section .bottom-page.green-button {
-    min-width: 270px;
-}
-.pricing-section .green-button.free-button {
-    margin: 40px 0 0 0;
+.pricing-section .mega-button.free-button {
+    margin: 40px 0 0;
 }
 .pricing-section .startpage.default-controls {
     padding: 40px 0 0 0;
@@ -848,7 +857,7 @@ body:not(.mobile) .plan.pro3:not(.current) .pricing-page.plan-button:hover {
 .pricing-page.plan .i-icon {
     position: absolute;
     right: 18px;
-    top: 13px;
+    top: 11px;
     -webkit-transition: background-color 200ms ease-in-out;
     transition: background-color 200ms ease-in-out;
 }
@@ -867,12 +876,312 @@ body:not(.mobile) .plan.pro3:not(.current) .pricing-page.plan-button:hover {
     background-color: transparent;
 }
 
+/* Old Business plan block */
+.js-business-card-old {
+    padding: 0 24px 130px;
+}
+
 /* Business plan */
+.en .pricing-page.top-header.business-el {
+    max-width: 620px;
+}
 .pricing-page.plan.business {
-    background-color: #EEF8FF;
+    background-color: #eef8ff;
+    border-color: #d5d5d5;
     display: block;
     margin: 0 auto;
     max-width: 475px;
+}
+.plan.business .pricing-page.euro-price:empty {
+    height: auto;
+}
+.business-plan-wrapper {
+    box-sizing: border-box;
+    display: flex;
+    max-width: 1030px;
+    margin: 0 auto;
+    padding: 0 40px 130px;
+}
+.local-currency .business-plan-wrapper {
+    padding-bottom: 20px;
+}
+.business-el .pricing-page.local-currency-tip {
+    margin-bottom: 40px;
+}
+.business-plan-column {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    width: 50%;
+}
+.business.pricing-page.plan .i-icon {
+    top: 13px;
+}
+
+/* Business calculator */
+.business-calculator {
+    background-color: var(--secondary-green);
+    color: var(--text-color-white-high);
+    font: var(--text-h3);
+    text-align: center;
+}
+.business-plan-wrapper .pricing-page.plan {
+    border-right: 0;
+    margin: 0;
+}
+.business-plan-label {
+    position: absolute;
+    right: 0;
+    top: -18px;
+    z-index: 10;
+}
+.business-plan-label i {
+    background-position: -315px -816px;
+    height: 18px;
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 9px;
+}
+.business-plan-label span {
+    background-color: var(--secondary-orange);
+    border-radius: 0 0 4px 4px;
+    color: var(--text-color-white-high);
+    display: block;
+    font: var(--text-h3);
+    height: 36px;
+    line-height: 36px;
+    margin: 0 7px 0 0;
+    padding: 0 10px;
+    position: relative;
+    z-index: 1;
+}
+.business-calculator .header {
+    padding: 32px 30px 6px;
+}
+.business-calculator hr {
+    background-color: var(--text-color-white-high);
+    border: 0;
+    height: 1px;
+    margin: 0;
+    opacity: 0.5;
+}
+.business-calculator .title {
+    font: var(--text-h2-bold);
+    padding: 22px 30px 54px;
+}
+.business-slider-label {
+    color: var(--text-color-high);
+    font: var(--text-h3);
+    padding: 0 0 28px;
+    text-align: start;
+}
+.business-slider.ui-slider.ui-widget {
+    background: #dcdcdc;
+    border-radius: 4px;
+    height: 8px;
+    margin: 20px 0 10px;
+}
+.business-slider-values {
+    color: var(--text-color-medium);
+    display: flex;
+    font: var(--text-h3);
+    font-family: var(--text-font-family-montserrat-regular);
+    justify-content: space-between;
+    padding: 0 0 26px;
+    text-align: justify;
+}
+.business-slider-values div {
+    min-width: 30px;
+    text-align: center;
+}
+.business-slider-values div.perc-20 {
+    display: flex;
+    justify-content: space-between;
+    width: calc(20% + 23px);
+}
+.business-slider-values div.perc-20:first-child {
+    display: inline-block;
+    min-width: inherit;
+}
+.business-slider.ui-slider .ui-slider-range {
+    background: var(--secondary-green);
+    border-radius: 4px 0 0 4px;
+    height: 8px;
+}
+.business-slider .handle-wrap {
+    -webkit-margin-end: 30px;
+    margin-inline-end: 30px;
+    position: relative;
+}
+.business-slider .ui-slider-handle {
+    background-color: var(--secondary-green);
+    background-position: -341px -738px;
+    border: 0;
+    border-radius: 100%;
+    box-shadow: none;
+    height: 32px;
+    -webkit-margin-start: -1px;
+    margin-inline-start: -1px;
+    outline: none;
+    position: absolute;
+    top: -13px;
+    width: 32px;
+}
+.business-slider .ui-slider-handle span {
+    box-sizing: border-box;
+    color: var(--secondary-green);
+    display: inline-block;
+    font: var(--text-h2);
+    font-family: var(--text-font-family-montserrat-regular);
+    font-size: 26px;
+    left: 50%;
+    position: absolute;
+    text-align: center;
+    top: -34px;
+    transform: translateX(-50%);
+    white-space: nowrap;
+}
+.business-calculator .business-slider.ui-slider.ui-widget {
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 0;
+    cursor: pointer;
+    height: 4px;
+    margin: 20px 30px 14px;
+}
+.business-calculator .business-slider-values {
+    color: var(--text-color-white-high);
+    font: var(--text-h3);
+    line-height: 20px;
+    padding: 0 30px 34px;
+}
+.business-calculator .business-slider-values div {
+    text-align: justify;
+}
+.business-calculator .business-slider.ui-slider .ui-slider-range {
+    background: var(--text-color-white-high);
+    border-radius: 0;
+    height: 4px;
+}
+.business-calculator .handle-wrap {
+    -webkit-margin-end: 15px;
+    margin-inline-end: 15px;
+}
+.business-calculator .ui-slider-handle {
+    background-color: var(--text-color-white-high);
+    background-position: -312px -742px;
+    height: 24px;
+    -webkit-margin-start: -7px;
+    margin-inline-start: -7px;
+    top: -10px;
+    width: 24px;
+}
+.business-calculator .ui-slider-handle span {
+    color: var(--text-color-white-high);
+    font-size: 20px;
+    top: -28px;
+}
+.business-calculator .footer {
+    padding: 26px 30px;
+}
+.business-calculator .footer span {
+    display: block;
+    font-family: var(--text-font-family-montserrat-regular);
+    font-size: 36px;
+    line-height: 44px;
+}
+
+/* Business quotes */
+.business-quotes {
+    font-size: 0;
+    line-height: 0;
+    overflow: hidden;
+    position: relative;
+    white-space: nowrap;
+}
+.business-quote {
+    display: inline-block;
+    opacity: 0;
+    transition: opacity 600ms ease-in-out;
+    vertical-align: middle;
+    white-space: normal;
+    width: 100%;
+}
+.business-quote.active {
+    opacity: 1;
+}
+.business-quote .title {
+    color: var(--text-color-high);
+    font: var(--text-h2);
+    font-family: var(--text-font-family-montserrat-regular);
+    padding: 50px 0 20px;
+}
+.business-quote .name {
+    color: var(--text-color-high);
+    font: var(--text-h3);
+}
+.business-q-wrap .q-logo {
+    background-position: 100%;
+    background-repeat: no-repeat;
+    cursor: pointer;
+    display: none;
+    height: 40px;
+    width: 164px;
+}
+.business-q-wrap .q-logo.cloudwards {
+    background-position: center -893px;
+}
+.business-q-wrap .q-logo.cloudwards:hover,
+.business-q-wrap .q-logo.cloudwards.active,
+.business-q-wrap .active .q-logo.cloudwards {
+    background-position: center -953px;
+}
+.business-q-wrap .q-logo.pro-privacy {
+    background-position: center -1014px;
+}
+.business-q-wrap .q-logo.pro-privacy:hover,
+.business-q-wrap .q-logo.pro-privacy.active,
+.business-q-wrap .active .q-logo.pro-privacy {
+    background-position: center -1074px;
+}
+.business-q-wrap .q-logo.tech-advisor {
+    background-position: center -1133px;
+}
+.business-q-wrap .q-logo.tech-advisor:hover,
+.business-q-wrap .q-logo.tech-advisor.active,
+.business-q-wrap .active .q-logo.tech-advisor {
+    background-position: center -1193px;
+}
+.business-q-wrap .q-logo.tech-radar {
+    background-position: center -1256px;
+}
+.business-q-wrap .q-logo.tech-radar:hover,
+.business-q-wrap .q-logo.tech-radar.active,
+.business-q-wrap .active .q-logo.tech-radar {
+    background-position: center -1316px;
+}
+.business-q-wrap .q-logo.toms-guide {
+    background-position: center -1376px;
+}
+.business-q-wrap .q-logo.toms-guide:hover,
+.business-q-wrap .q-logo.toms-guide.active,
+.business-q-wrap .active .q-logo.toms-guide {
+    background-position: center -1436px;
+}
+.default-controls.startpage.business-quotes-slider {
+    padding: 20px 0 10px;
+    position: relative;
+    z-index: 1;
+}
+.business-quotes-controls {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+}
+.business-quotes-controls .q-logo {
+    display: inline-block;
+    flex: 0 0 auto;
+    margin: 42px 0 20px;
 }
 
 /* simpletip custom style: pro-tip */
@@ -1270,7 +1579,7 @@ body:not(.mobile) .pricing-page.slider-dot:hover {
     padding: 30px 0 0 0;
     font-family: 'montserrat_light', 'montserrat', Arial;
 }
-.pricing-button.green-button {
+.pricing-button.mega-button {
     margin: 80px 0 -10px 0;
 }
 
@@ -1690,7 +1999,7 @@ body.mobile .redeem-promo-page .mega-input.title-ontop {
     .pricing-section .plans-row .pricing-page.plan.current {
         border-color: #D5D5D5;
     }
-    .local-currency .pricing-page.plan-price {
+    .local-currency .plans-row .pricing-page.plan-price {
         font-size: 27px;
     }
 }
@@ -1707,8 +2016,16 @@ body.mobile .redeem-promo-page .mega-input.title-ontop {
 }
 
 @media only screen and (max-width: 890px) {
-    .pricing-section .startpage.default-controls:not(.hidden) {
+    .mobile-slider-controls.default-controls:not(.hidden) {
         display: inline-block;
+    }
+    .business-quotes-controls {
+        display: none;
+    }
+    .business-q-wrap .q-logo {
+        cursor: default;
+        display: block;
+        margin: 40px auto 0;
     }
 
     /* Plans page header */
@@ -1736,19 +2053,25 @@ body.mobile .redeem-promo-page .mega-input.title-ontop {
         font-size: 22px;
     }
     .pricing-page.plan-info {
-        font-size: 14px;
-        line-height: 21px;
-        padding: 5px 10px 31px 10px;
+        font-size: 13px;
+        line-height: 19px;
+        padding: 4px 10px 10px;
     }
     .pricing-page.plan-price {
         font-size: 30px;
-        line-height: 37px;
+        line-height: 32px;
+    }
+    .local-currency .pricing-page.plan-price {
+        font-size: 20px;
+        line-height: 22px;
+    }
+    .pricing-page.plan-currency,
+    .pricing-page.plan-period,
+    .pricing-page.plan-data {
+        font-size: 12px;
     }
     .plans-row .pricing-page.plan-info {
-        padding-bottom: 195px;
-    }
-    .pricing-page.plan-currency {
-        margin-top: 10px;
+        padding-bottom: 206px;
     }
     .pricing-page.plan-button {
         margin-bottom: 20px;
@@ -1759,6 +2082,129 @@ body.mobile .redeem-promo-page .mega-input.title-ontop {
     }
     .pricing-page.plan .i-icon {
         right: 14px;
+    }
+
+    /* Business plan */
+    .pricing-page.plan-feature.text-body1 {
+        font-size: 12px;
+        line-height: 18px;
+        margin: 3px auto;
+        padding: 8px 38px 8px 16px;
+    }
+    .pricing-page.plan-feature.text-body1 .text-h2 {
+        font-size: 14px;
+        line-height: 20px;
+        padding-bottom: 2px;
+    }
+
+    /* Business calculator */
+    .business-calculator {
+        font-size: 12px;
+        line-height: 18px;
+    }
+    .business-plan-label span {
+        font-size: 12px;
+        height: 30px;
+        line-height: 30px;
+    }
+    .business-calculator .header {
+        padding: 18px 18px 12px;
+    }
+    .business-calculator .title {
+        font-size: 18px;
+        line-height: 27px;
+        padding: 8px 18px 24px;
+    }
+    .business-slider.ui-slider.ui-widget,
+    .business-slider.ui-slider .ui-slider-range {
+        height: 5px;
+    }
+    .business-slider .handle-wrap {
+        -webkit-margin-end: 18px;
+        margin-inline-end: 18px;
+    }
+    .business-slider .ui-slider-handle {
+        background-position: -347px -774px;
+        height: 20px;
+        top: -8px;
+        width: 20px;
+    }
+    .business-slider .ui-slider-handle span {
+        font-size: 16px;
+        line-height: 24px;
+        top: -22px;
+    }
+    .business-slider-label {
+        font-size: 14px;
+        line-height: 20px;
+        padding: 0 0 12px;
+    }
+    .business-slider-values {
+        font-size: 12px;
+        line-height: 16px;
+        padding: 0 0 6px;
+    }
+    .business-slider-values div {
+        min-width: 16px;
+    }
+    .business-slider-values div.perc-20 {
+        display: flex;
+        justify-content: space-between;
+        width: calc(20% + 16px);
+    }
+    .business-calculator .handle-wrap {
+        -webkit-margin-end: 15px;
+        margin-inline-end: 15px;
+    }
+    .business-calculator .ui-slider-handle {
+        background-position: -312px -742px;
+        background-size: 373px auto;
+        height: 24px;
+        top: -10px;
+        width: 24px;
+    }
+    .business-calculator .ui-slider-handle span {
+        font-size: 14px;
+        line-height: 20px;
+        top: -20px;
+    }
+    .business-calculator .business-slider.ui-slider.ui-widget {
+        margin: 20px 18px 12px;
+    }
+    .business-calculator .business-slider-values {
+        font-size: 12px;
+        line-height: 16px;
+        padding: 0 18px 18px;
+    }
+    .business-calculator .footer {
+        padding: 18px;
+    }
+    .business-calculator .footer span {
+        font-size: 20px;
+        line-height: 24px;
+    }
+
+    /* Business quotes */
+    .business-quote .title {
+        font-size: 18px;
+        line-height: 27px;
+        padding-top: 20px;
+        white-space: normal;
+    }
+    .business-quote-logo.cloudwards {
+        background-position: center -931px;
+    }
+    .business-quote-logo.pro-privacy {
+        background-position: center -1051px;
+    }
+    .business-quote-logo.tech-advisor {
+        background-position: center -1171px;
+    }
+    .business-quote-logo.tech-radar {
+        background-position: center -1286px;
+    }
+    .business-quote-logo.toms-guide {
+        background-position: center -1409px;
     }
 
     /* jQ slider */
@@ -1923,7 +2369,7 @@ body.mobile .redeem-promo-page .mega-input.title-ontop {
     }
 }
 
-@media only screen and (max-width: 784px) {
+@media only screen and (max-width: 783px) {
     .bottom-page.horizontal-centered-bl.pricing-pad {
         padding: 0 40px;
     }
@@ -1936,11 +2382,29 @@ body.mobile .redeem-promo-page .mega-input.title-ontop {
     }
 
     /* Plan cards */
-    .plans-bottom-pad {
+    .bottom-page.plans-bottom-pad.mid-wide {
         padding-bottom: 88px;
     }
     .fr .pricing-page.plan-button, .ru .pricing-page.plan-button, .br .pricing-page.plan-button {
         font-size: 14px;
+    }
+
+    /* Business plan */
+    .business-plan-wrapper {
+        display: block;
+        padding-bottom: 94px;
+    }
+    .business-plan-wrapper .pricing-page.plan {
+        border: 1px solid #d5d5d5;
+    }
+    .business-plan-column {
+        display: block;
+        margin: 0 auto;
+        max-width: 475px;
+        width: auto;
+    }
+    .business-calculator {
+        margin-top: 52px;
     }
 
     /* Compare */
@@ -1990,7 +2454,7 @@ body.mobile .redeem-promo-page .mega-input.title-ontop {
     }
 
     /* Business bottom block */
-    .pricing-button.green-button {
+    .pricing-button.mega-button {
         margin: 40px 0 0 0;
     }
     .pricing-page.white-info {
@@ -2044,6 +2508,12 @@ body.mobile .redeem-promo-page .mega-input.title-ontop {
     }
     .pricing-page.plans-wrap {
         padding: 40px 0 0 0;
+    }
+
+    /* Business plan */
+    .business-plan-wrapper {
+        padding-left: 24px;
+        padding-right: 24px;
     }
 
     /* Compare */

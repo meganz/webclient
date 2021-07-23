@@ -7,6 +7,9 @@ pro.proplan = {
     /** The user's current plan data */
     planData: null,
 
+    /** Business plan data */
+    businessPlanData: null,
+
     /** The user's current storage in bytes */
     currentStorageBytes: 0,
 
@@ -41,6 +44,10 @@ pro.proplan = {
         // Cache selectors
         var $body = $('body');
         var $stepOne = $('.pricing-section', $body);
+        const $accountButton = $('.mega-button.account.individual-el', $stepOne);
+        const $accountButtonLabel = $('span', $accountButton);
+        const $freeButton = $(' .free-button.individual-el', $stepOne);
+        const $freeButtonLabel = $('span', $freeButton);
 
         // If selecting a plan after registration
         if (localStorage.keycomplete) {
@@ -54,27 +61,31 @@ pro.proplan = {
                 $body.addClass('key');
 
                 // Set "Get started for FREE" plans and bottom buttons label
-                $('.green-button.account.individual-el, .free-button.individual-el', $stepOne)
-                    .text(l[23960]).attr('href', '/fm');
+                $accountButton.attr('href', '/fm');
+                $accountButtonLabel.text(l[23960]);
+                $freeButton.attr('href', '/fm');
+                $freeButtonLabel.text(l[23960]);
             }
         }
         else if (typeof u_attr === 'undefined') {
 
             // Set "Get started for FREE" plans button label
-            $('.free-button.individual-el', $stepOne)
-                .text(l[23960]).attr('href', '/register');
+            $freeButton.attr('href', '/register');
+            $freeButtonLabel.text(l[23960]);
 
             // Set "Get started Now" bottom button label
-            $('.green-button.account.individual-el', $stepOne)
-                .text(l[24054]).attr('href', '/register');
+            $accountButton.attr('href', '/register');
+            $accountButtonLabel.text(l[24054]);
         }
         else {
 
             $body.addClass('pro');
 
             // Set "Cloud drive" plans and bottom buttons label
-            $('.green-button.account.individual-el, .free-button.individual-el', $stepOne)
-                .text(l[164]).attr('href', '/fm');
+            $accountButton.attr('href', '/fm');
+            $accountButtonLabel.text(l[164]);
+            $freeButton.attr('href', '/fm');
+            $freeButtonLabel.text(l[164]);
         }
 
         // Add click handlers for the pricing boxes
@@ -89,7 +100,7 @@ pro.proplan = {
         // Init plan slider controls
         this.initPlanSliderControls();
 
-        // Init plan period raadio buttons
+        // Init plan period radio buttons
         this.initPlanPeriodControls();
 
         // Init individual/business plans switcher
@@ -100,6 +111,9 @@ pro.proplan = {
 
         // Init Get started for free button
         this.initGetFreeButton();
+
+        // Init business plan tab events
+        this.initBusinessPlanTabEvents();
 
         var prevWindowWidth = $(window).width();
         $(window).rebind('resize.proslider', function() {
@@ -267,105 +281,22 @@ pro.proplan = {
         'use strict';
 
         // The box which gets scroll and contains all the child content.
-        var $pricingPage =  $('.pricing-section', 'body');
-        var $scrollParent = $('.plans-wrap', $pricingPage);
-        var $scrollContent = $('.plans-block', $pricingPage);
-        var $controls = $('.default-controls', $pricingPage);
-        var $dots = $('.nav', $controls);
-        var $row = $('.pricing-page.plans-row', $scrollParent).first();
-        var $plans =  $('.plan:visible', $row);
-        var isRunningAnimation = false;
-        var scrollToPlan;
+        const $plansSection =  $('.plans-section', '.pricing-section');
+        const $scrollBlock = $('.plans-wrap', $plansSection);
+        const $row = $('.pricing-page.plans-row', $scrollBlock).first();
+        const $slides =  $('.plan', $row);
 
-        // Scroll to first block
-        $scrollParent.scrollLeft(0);
-        $dots.removeClass('active');
-        $($dots[0]).addClass('active');
-
-        // Scroll to necessary plan block
-        scrollToPlan = function(slideNum) {
-            var $previousPlan;
-            var planPosition;
-
-            // Prevent scroll event
-            isRunningAnimation = true;
-
-            // Get plan position related to previous plan to include border-spacing
-            $previousPlan = $($plans[slideNum]).prev(':visible');
-            planPosition = $previousPlan.length ? $previousPlan.position().left + $previousPlan.outerWidth() : 0;
-
-            // Set controls dot active state
-            $dots.removeClass('active');
-            $($dots[slideNum]).addClass('active');
-
-            // Scroll to plan block
-            $scrollParent.stop().animate({
-                scrollLeft: planPosition
-            }, 600, 'swing', function() {
-
-                // Enable on scroll event after auto scrolling
-                isRunningAnimation = false;
-            });
-        };
+        // Init default slider events for mobile
+        bottompage.initSliderEvents($plansSection, $scrollBlock, $slides);
 
         // Init scroll event
-        $scrollParent.rebind('scroll.scrollToPlan', function() {
-            var closestIndex;
-            var scrollVal = $(this).scrollLeft();
-
-            // Prevent on scroll event during auto scrolling
-            if (isRunningAnimation) {
-                return false;
-            }
-
-            // If block is scrolled
-            if (scrollVal > 0) {
-                closestIndex = Math.floor(scrollVal /
-                    ($scrollContent.outerWidth() - $scrollParent.outerWidth()) * $plans.length);
-            }
+        $scrollBlock.rebind('scroll.plansScrollEvent', () => {
 
             // Hide simple tip
-            $('.pricing-sprite.i-icon', $scrollContent).trigger('simpletipClose');
+            $('.pricing-sprite.i-icon', $scrollBlock).trigger('simpletipClose');
 
             // Hide plans tag
-            $('.plan.main', $scrollContent).trigger('mouseleave');
-
-            // Get closest plan index
-            closestIndex = closestIndex ? closestIndex : 1;
-
-            // Set controls dot active state
-            $dots.removeClass('active');
-            $dots.filter('.sl' + closestIndex).addClass('active');
-        });
-
-        // Init controls dot click
-        $dots.rebind('click.scrollToPlan', function() {
-            var $this = $(this);
-            var slideNum;
-
-            // Scroll to selected plan
-            slideNum = $this.data('slide') - 1;
-            scrollToPlan(slideNum);
-        });
-
-        // Init Previous/Next controls click
-        $('.nav-button', $controls).rebind('click', function() {
-            var $this = $(this);
-            var slideNum;
-
-            // Get current plan index
-            slideNum = $('.nav.active', $controls).data('slide') - 1;
-
-            // Get prev/next plan index
-            if ($this.is('.prev')) {
-                slideNum = slideNum - 1 > 0 ? slideNum - 1 : 0;
-            }
-            else if (slideNum !== $plans.length - 1) {
-                slideNum += 1;
-            }
-
-            // Scroll to selected plan
-            scrollToPlan(slideNum);
+            $('.plan.main', $scrollBlock).trigger('mouseleave');
         });
     },
 
@@ -847,29 +778,16 @@ pro.proplan = {
 
         "use strict";
 
-        var $stepOne = $('.pricing-section', 'body');
-        var $pricingBoxes = $('.pricing-page.plan', $stepOne);
-        var $businessBoxes = $pricingBoxes.filter('.business');
-        var $businessPrice = $('.plan-price', $businessBoxes);
-        var $businessStorageInfo = $('.plan-feature.storage-b span', $businessBoxes);
-        var businessStorageAmount = '15 ' + l[20160];
+        const $stepOne = $('.plans-section', 'body');
+        const $pricingBoxes = $('.pricing-page.plan', $stepOne);
+        const updateResults = pro.proplan.updateEachPriceBlock("P", $pricingBoxes, undefined, 1);
 
-        var updateResults = pro.proplan.updateEachPriceBlock("P", $pricingBoxes, undefined, 1);
-        var oneLocalPriceFound = updateResults[0];
-
-        if (oneLocalPriceFound) {
+        if (updateResults[0]) {
             $stepOne.addClass('local-currency');
         }
         else {
             $stepOne.removeClass('local-currency');
         }
-
-        var businessPlanIdx = pro.membershipPlans.length - 1;
-        $businessPrice.text(formatCurrency(pro.membershipPlans[businessPlanIdx][pro.UTQA_RES_INDEX_MONTHLYBASEPRICE]));
-
-        $businessStorageInfo.safeHTML(
-            l[23789].replace('%1', '<span>' + businessStorageAmount + '</span>')
-        );
     },
 
     /**
@@ -1096,6 +1014,311 @@ pro.proplan = {
             });
         });
         return false;
+    },
+
+    /**
+     * Init business plan tab events, set plandata
+     * @returns {void}
+     */
+    initBusinessPlanTabEvents: function() {
+
+        'use strict';
+
+        // Set business plan data (users/storage/stransfer/price)
+        this.setBusinessPlanData();
+
+        // Init quotes slider in business section.
+        this.initQuotesSliderControls();
+    },
+
+    /**
+     * Set business plan data (users/storage/stransfer/price)
+     * @returns {void}
+     */
+    setBusinessPlanData: function() {
+
+        'use strict';
+
+        M.require('businessAcc_js').done(function afterLoadingBusinessClass() {
+            const business = new BusinessAccount();
+
+            business.getBusinessPlanInfo(false).done(function planInfoReceived(st, info) {
+
+                pro.proplan.businessPlanData = info;
+
+                // If all new API values exist
+                pro.proplan.businessPlanData.isValidBillingData = info.bd && info.bd.us
+                    && (info.bd.us.p || info.bd.us.lp)
+                    && info.bd.sto && (info.bd.sto.p || info.bd.sto.lp)
+                    && info.bd.sto.s && info.bd.trns && (info.bd.trns.p || info.bd.trns.lp)
+                    && info.bd.trns.t && info.bd.ba.s && info.bd.ba.t;
+
+                // If local currency values exist
+                pro.proplan.businessPlanData.isLocalInfoValid = info.l && info.l.cs && info.l.n
+                    && (info.bd.us.lp || info.lp) && info.bd.sto.lp && info.bd.trns.lp;
+
+                pro.proplan.populateBusinessPlanData();
+            });
+        });
+    },
+
+    /**
+     * Format business plan currency
+     * @param {Number} price The price number
+     * @returns {void}
+     */
+    formatBusinessPriceCurrency: function(price) {
+
+        'use strict';
+
+        // Set Local currency name/sign before the price value if its local
+        return this.businessPlanData.isLocalInfoValid ? this.businessPlanData.l.cs
+            + formatCurrency(price, this.businessPlanData.l.n, 'number') :
+            `${formatCurrency(price, this.businessPlanData.c, 'number')}  \u20ac`;
+    },
+
+    /**
+     * Populate Business plan card data
+     * @returns {void}
+     */
+    populateBusinessPlanData: function() {
+
+        'use strict';
+
+        const $stepOne = $('.pricing-section', '.fmholder');
+        let $businessCard = $('.js-business-card', $stepOne);
+        const pricePerUser = this.businessPlanData.bd && this.businessPlanData.bd.us
+                && this.businessPlanData.bd.us.p ? this.businessPlanData.bd.us.p : this.businessPlanData.p;
+
+        // If new API values exist, populate new business card values
+        if (this.businessPlanData.isValidBillingData) {
+
+            const $storageInfo = $('.plan-feature.storage', $businessCard);
+            const $transferInfo = $('.plan-feature.transfer', $businessCard);
+            const minStorageValue = this.businessPlanData.bd.ba.s / 1024;
+            const minTransferValue = this.businessPlanData.bd.ba.t / 1024;
+            let storagePrice = 0;
+            let transferPrice = 0;
+
+            // If local currency values exist
+            if (this.businessPlanData.isLocalInfoValid) {
+                storagePrice = this.formatBusinessPriceCurrency(this.businessPlanData.bd.sto.lp);
+                transferPrice = this.formatBusinessPriceCurrency(this.businessPlanData.bd.trns.lp);
+            }
+            else {
+                storagePrice = this.formatBusinessPriceCurrency(this.businessPlanData.bd.sto.p);
+                transferPrice = this.formatBusinessPriceCurrency(this.businessPlanData.bd.trns.p);
+            }
+
+            // Set storage and transfer details, simpletip hint
+            $('.js-main', $storageInfo).text(
+                l.bsn_starting_storage.replace('%1', minStorageValue)
+            );
+            $('.js-addition', $storageInfo).text(
+                l.bsn_additional_storage.replace('%1', storagePrice)
+            );
+            $('i', $storageInfo).attr(
+                'data-simpletip', l.bsn_storage_tip.replace('%1', `${minStorageValue} ${l[20160]}`)
+                    .replace('%2', storagePrice)
+            );
+            $('.js-main', $transferInfo).text(
+                l.bsn_starting_transfer.replace('%1', minTransferValue)
+            );
+            $('.js-addition', $transferInfo).text(
+                l.bsn_additional_transfer.replace('%1', transferPrice)
+            );
+            $('i', $transferInfo).attr(
+                'data-simpletip', l.bsn_transfer_tip.replace('%1', `${minTransferValue} ${l[20160]}`)
+                    .replace('%2', transferPrice)
+            );
+
+            // Init price calculator events, populate necessary plan data
+            this.initBusinessPlanCalculator();
+
+            // Show new Business plan card and calculator if new API is valid
+            $('.business-el-new', $stepOne).removeClass('hidden');
+            $('.business-el-old', $stepOne).addClass('hidden');
+        }
+
+        // Show old Business plan card, if new API is incorrect.
+        // TODO: remove when new API is stable
+        else {
+
+            const storageAmount = this.businessPlanData.bd
+                && this.businessPlanData.bd.ba && this.businessPlanData.bd.ba.s ?
+                this.businessPlanData.bd.ba.s / 1024 : 15;
+
+            $businessCard = $('.js-business-card-old', $stepOne);
+            $('.plan-feature.storage-b span', $businessCard).safeHTML(
+                l[23789].replace('%1', `<span>${storageAmount} ${l[20160]}</span>`)
+            );
+
+            $('.business-el-new', $stepOne).addClass('hidden');
+            $('.business-el-old', $stepOne).removeClass('hidden');
+        }
+
+        // Set the plan main prices for both Old and New APIs
+        if (this.businessPlanData.isLocalInfoValid) {
+
+            $businessCard.addClass('local-currency');
+            $('.plan-price .price', $businessCard).text(
+                this.formatBusinessPriceCurrency(
+                    this.businessPlanData.bd && this.businessPlanData.us
+                    && this.businessPlanData.us.lp ? this.businessPlanData.us.lp : this.businessPlanData.lp)
+            );
+            $('.pricing-page.plan-currency', $businessCard).text(
+                this.businessPlanData.l.n
+            );
+            $('.pricing-page.euro-price', $businessCard).text(
+                `${formatCurrency(pricePerUser, this.businessPlanData.c, 'number')}  \u20ac`
+            );
+        }
+        else {
+
+            $businessCard.removeClass('local-currency');
+            $('.plan-price .price', $businessCard).text(
+                `${formatCurrency(pricePerUser, this.businessPlanData.c, 'number')}  \u20ac`
+            );
+        }
+    },
+
+    /**
+     * Init Business plan calculator events
+     * @returns {void}
+     */
+    initBusinessPlanCalculator: function() {
+
+        'use strict';
+
+        const $stepOne = $('.pricing-section', '.fmholder');
+        const $calculator = $('.business-calculator', $stepOne);
+        const $usersSlider = $('.business-slider.users', $calculator);
+        const $storageSlider = $('.business-slider.storage', $calculator);
+        const $transferSlider = $('.business-slider.transfer', $calculator);
+        const $totalPrice = $('.footer span', $calculator);
+        const planInfo = this.businessPlanData;
+        const minStorageValue = planInfo.bd.ba.s / 1024;
+        const minTransferValue = planInfo.bd.ba.t / 1024;
+        let userPrice = 0;
+        let storagePrice = 0;
+        let transferPrice = 0;
+
+        // If local currency values exist
+        if (planInfo.isLocalInfoValid) {
+            userPrice = parseFloat(planInfo.lp);
+            storagePrice = parseFloat(planInfo.bd.sto.lp);
+            transferPrice = parseFloat(planInfo.bd.trns.lp);
+        }
+        else {
+            userPrice = parseFloat(planInfo.p);
+            storagePrice = parseFloat(planInfo.bd.sto.p);
+            transferPrice = parseFloat(planInfo.bd.trns.p);
+        }
+
+        /**
+         * Calculate Business plan price
+         * @param {Number} usersValue Optional. Script will take calculator value if undefined
+         * @param {Number} storageValue Optional. Script will take calculator value if undefined
+         * @param{Number} transferValue Optional. Script will take calculator value if undefined
+         * @returns {Number} Calculated price value
+         */
+        const calculatePrice = (usersValue, storageValue, transferValue) => {
+
+            let totalPrice = 0;
+
+            usersValue = usersValue || $usersSlider.attr('data-value');
+            storageValue = storageValue || $storageSlider.attr('data-value');
+            transferValue = transferValue || $transferSlider.attr('data-value');
+
+            totalPrice = userPrice * usersValue
+                + storagePrice * (storageValue - minStorageValue)
+                + transferPrice * (transferValue - minTransferValue);
+
+            return this.formatBusinessPriceCurrency(totalPrice.toFixed(2));
+        };
+
+        /**
+         * Set slider value
+         * @param {Object} $handle jQ selecter on slider handle
+         * @param {Number} value Selected slider value
+         * @returns {void}
+         */
+        const setSliderValue = ($handle, value) => {
+
+            // Set the value in custom created span in the handle
+            $('span', $handle).text(value);
+            $handle.attr('data-value', value);
+
+            // Calculate the price and set in total
+            $totalPrice.text(calculatePrice());
+        };
+
+        // Init users/storage/transfer sliders at once
+        $usersSlider.add($storageSlider).add($transferSlider).slider({
+            max: 1000,
+            range: 'min',
+            step: 1,
+            change: function(event, ui) {
+                setSliderValue($(this), ui.value);
+            },
+            slide: function(event, ui) {
+                setSliderValue($(this), ui.value);
+            }
+        });
+
+        // Set custom min/current values for each slider
+        $usersSlider.slider({
+            'min': planInfo.bd.minu,
+            'value': planInfo.bd.minu
+        });
+        $storageSlider.slider({
+            'min': minStorageValue,
+            'value': minStorageValue
+        });
+        $transferSlider.slider({
+            'min': minTransferValue,
+            'value': minTransferValue
+        });
+
+        // Set "Most competitive price" values
+        $('.pr1', $calculator).text(
+            l.bsn_calc_monthly_price
+                .replace('%1', `100 ${l[20160]}`)
+                .replace('%2', calculatePrice(3, 97, 0))
+        );
+        $('.pr2', $calculator).text(
+            l.bsn_calc_monthly_price
+                .replace('%1', `1 ${l[23061]}`)
+                .replace('%2',  calculatePrice(3, 997, 0))
+        );
+
+        // Set min values under each slider
+        $('.js-min-users', $calculator).safeHTML(
+            l.bsn_calc_min_users.replace('%1', planInfo.bd.minu)
+        );
+        $('.js-min-storage', $calculator).safeHTML(
+            l.bsn_calc_min_storage.replace('%1', minStorageValue)
+        );
+        $('.js-min-transfer', $calculator).safeHTML(
+            l.bsn_calc_min_transfer.replace('%1', minTransferValue)
+        );
+    },
+
+    /**
+     * Init quotes slider in business section.
+     * @returns {void}
+     */
+    initQuotesSliderControls: function() {
+
+        'use strict';
+
+        // The box which gets scroll and contains all the child content.
+        const $quotesSection = $('.business-q-wrap', '.pricing-section');
+        const $scrollBlock = $('.business-quotes',  $quotesSection);
+        const $slides =  $('.business-quote', $scrollBlock);
+
+        // Init default slider events for mobile
+        bottompage.initSliderEvents($quotesSection, $scrollBlock, $slides, true);
     }
 };
 

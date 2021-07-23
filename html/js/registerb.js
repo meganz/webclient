@@ -89,6 +89,9 @@ BusinessRegister.prototype.initPage = function(preSetNb, preSetName, preSetTel, 
         $pageContainer.find('#business-nbusrs').focus();
         loadingDialog.hide();
     };
+    if (d && localStorage.debugNewPrice) {
+        mySelf.usedGB = 7420;
+    }
 
     // check if this is logged in user
     if (u_type) {
@@ -102,10 +105,21 @@ BusinessRegister.prototype.initPage = function(preSetNb, preSetName, preSetTel, 
         }
         else if (u_attr && u_attr.p && u_attr.p !== 100) {
             mySelf.hasAppleOrGooglePay = true;
-            if (!M.account) {
-                M.accountData();
-            }
         }
+        if (!M.account) {
+            M.accountData(mySelf.initPage.bind(
+                mySelf,
+                mySelf.preSetNb,
+                mySelf.preSetName,
+                mySelf.preSetTel,
+                mySelf.preSetFname,
+                mySelf.preSetLname,
+                mySelf.preSetEmail
+            ));
+            return false;
+        }
+        mySelf.usedGB = M.account.space_used / 1073741824;
+
         $emailInput.val(u_attr['email']);
         $emailInput.prop('disabled', true);
         $emailInput.blur();
@@ -198,29 +212,181 @@ BusinessRegister.prototype.initPage = function(preSetNb, preSetName, preSetTel, 
         unhidePage();
     };
 
-    var updatePriceGadget = function(users) {
+    const isValidBillingData = () => {
+        return mySelf.planInfo.bd &&
+            mySelf.planInfo.bd.us && (mySelf.planInfo.bd.us.p || mySelf.planInfo.bd.us.lp) &&
+            mySelf.planInfo.bd.sto && (mySelf.planInfo.bd.sto.p || mySelf.planInfo.bd.sto.lp) &&
+            mySelf.planInfo.bd.sto.s &&
+            mySelf.planInfo.bd.trns && (mySelf.planInfo.bd.trns.p || mySelf.planInfo.bd.trns.lp) &&
+            mySelf.planInfo.bd.trns.t &&
+            mySelf.planInfo.bd.ba.s && mySelf.planInfo.bd.ba.t;
+    };
+
+    const isUsageCharges = () => {
+        return mySelf.planInfo.bd.ba.s > 0 && mySelf.planInfo.bd.ba.t > 0 && mySelf.planInfo.bd.sto.s > 0
+            && mySelf.planInfo.bd.trns.t > 0;
+    };
+
+    const isLocalInfoValid = () => {
+        return mySelf.planInfo.l && mySelf.planInfo.l.cs && mySelf.planInfo.l.sp && mySelf.planInfo.l.pl
+            && mySelf.planInfo.l.n;
+    };
+    const applyFormat = (val, origDecimal) => {
+        if (origDecimal !== mySelf.planInfo.l.sp[0]) {
+            const reg1 = new RegExp(`\\${origDecimal}`, 'g');
+            const reg2 = new RegExp(`\\${mySelf.planInfo.l.sp[1]}`, 'g');
+            val = val.replace(reg1, '-')
+                .replace(reg2, mySelf.planInfo.l.sp[0])
+                .replace(/-/g, mySelf.planInfo.l.sp[1]);
+        }
+
+        val = mySelf.planInfo.l.pl ? `${mySelf.planInfo.l.cs}${val}`
+            : `${val}${mySelf.planInfo.l.cs}`;
+
+        return val;
+    };
+
+    const updateBreakdown = (users, quota, usrFare, quotaFare, sep) => {
+        users = Math.max(users || 0, mySelf.minUsers);
+        quota = quota || mySelf.extraStorage;
+
+        const mIntl = mega.intl;
+        const intl = mIntl.number;
+        sep = sep || mIntl.decimalSeparator;
+
+        const $breakdown = $('.business-plan-breakdown', $pageContainer);
+        const $usersRow = $('.bus-plan-nb-users.bus-breakdown-row', $breakdown);
+        const $quotaRow = $('.bus-plan-ex-quota.bus-breakdown-row', $breakdown).addClass('hidden');
+
+        let totalUsr;
+        let totalQuota = -1;
+        let total = 0;
+
+        if (mySelf.localPricesMode) {
+            usrFare = usrFare || mySelf.planInfo.bd.us.lp;
+            totalUsr = applyFormat(intl.format(total = usrFare * users), sep);
+
+            if (quota && !Number.isNaN(quota)) {
+                quotaFare = quotaFare || mySelf.planInfo.bd.sto.lp;
+                const temp = quotaFare * quota;
+                total += temp;
+                totalQuota = applyFormat(intl.format(temp), sep);
+            }
+            total = `${applyFormat(intl.format(total), sep)}*`;
+        }
+        else {
+            usrFare = usrFare || mySelf.planInfo.bd && mySelf.planInfo.bd.us.p || mySelf.planInfo.p;
+            totalUsr = `${intl.format(total = usrFare * users)} \u20ac`;
+            if (quota && !Number.isNaN(quota)) {
+                quotaFare = quotaFare || mySelf.planInfo.bd.sto.p;
+                const temp = quotaFare * quota;
+                total += temp;
+                totalQuota = `${intl.format(temp)} \u20ac`;
+            }
+            total = `${intl.format(total)} \u20ac`;
+            $('.bus-price-footer-note', $pageContainer).addClass('hidden');
+        }
+
+        $('.nb-users-val', $usersRow).text(mega.icu.format(l.users_unit, users));
+        $('.nb-users-fare', $usersRow).text(totalUsr);
+
+        if (totalQuota !== -1) {
+            $('.ex-quota-val', $quotaRow).text(l.additional_storage.replace('%1', quota));
+            $('.ex-quota-fare', $quotaRow).text(totalQuota);
+            $quotaRow.removeClass('hidden');
+        }
+
+        $('.business-plan-total .bus-total-val', $pageContainer).text(total);
+
+    };
+
+    const updatePriceGadget = function(users, quota) {
         if (!users) {
             users = mySelf.minUsers; // minimum val
         }
-        var intl = mega.intl.number;
-        var $gadget = $('.bus-reg-plan', $pageContainer);
-        $('.business-plan-price span.big', $gadget).text(intl.format(mySelf.planPrice) + ' \u20ac');
-        $('.business-base-plan span.right', $gadget)
-            .text(intl.format(mySelf.planPrice * mySelf.minUsers) + ' \u20ac'); // minimum
-        $('.business-users-plan span.right', $gadget)
-            .text(intl.format(mySelf.planPrice * (users - mySelf.minUsers)) + ' \u20ac');
-        $('.business-plan-total span.right', $gadget).text(intl.format(mySelf.planPrice * users) + ' \u20ac');
+        const intl = mega.intl.number;
+        let userFare = mySelf.planInfo.p;
+        const extraFares = Object.create(null);
+        extraFares.storageFare = -1;
+        extraFares.transFare = -1;
+        extraFares.storageBase = -1;
+        extraFares.transBase = -1;
+        let localPricesMode = false;
+        let quotaInfoPresent = false;
 
-        const extraUsers = users - mySelf.minUsers;
-        let extraText = l[19504].replace('{0}', extraUsers);
-        if (extraUsers === 0) {
-            extraText = l[24977];
+        if (typeof mySelf.planInfo.bd === 'undefined') {
+            // opps, bd is not available, fall back to old price attribute and warn.
+            console.warn('"bd" is not present in business plan info. Will use old billing');
+            mySelf.planInfo.userFare = userFare;
         }
-        else if (extraUsers === 1) {
-            extraText = l[24978];
+        else if (isValidBillingData()) {
+            // hooray, new billing data.
+            localPricesMode = mySelf.planInfo.bd.us.lp && mySelf.planInfo.bd.sto.lp && mySelf.planInfo.bd.trns.lp;
+            localPricesMode = localPricesMode && isLocalInfoValid();
+            userFare = localPricesMode && mySelf.planInfo.bd.us.lp || mySelf.planInfo.bd.us.p;
+            extraFares.storageFare = localPricesMode && mySelf.planInfo.bd.sto.lp || mySelf.planInfo.bd.sto.p;
+            extraFares.transFare = localPricesMode && mySelf.planInfo.bd.trns.lp || mySelf.planInfo.bd.trns.p;
+            extraFares.storageBase = mySelf.planInfo.bd.ba.s;
+            extraFares.transBase = mySelf.planInfo.bd.ba.t;
+            quotaInfoPresent = isUsageCharges();
+
+            // setting the vals in the plan for payments.
+            mySelf.planInfo.userFare = mySelf.planInfo.bd.us.p;
+        }
+        else {
+            console.error('"bd" in billing info is missing elements. Will use old billing');
+            console.table(mySelf.planInfo.bd);
         }
 
-        $('.business-users-plan .left', $gadget).text(extraText);
+        const $gadget = $('.bus-reg-plan', $pageContainer);
+        const $perUser = $('.business-plan-peruser', $gadget);
+        const $perUse = $('.business-plan-peruse', $gadget).addClass('hidden');
+        const $euroPriceBl = $('.bus-user-price-euro', $gadget).addClass('hidden');
+        const $baseQuotaNote = $('.business-plan-quota-note', $gadget).addClass('hidden');
+
+        const euroPriceText = `${intl.format(mySelf.planInfo.p)} \u20ac`;
+        let priceText = euroPriceText;
+        const sep = intl.decimalSeparator;
+        let currncyAbbrv = '';
+
+        if (localPricesMode) {
+
+            priceText = applyFormat(intl.format(userFare), sep);
+            currncyAbbrv = mySelf.planInfo.l.n;
+
+            $euroPriceBl.removeClass('hidden');
+
+        }
+
+        $('.bus-user-price-val', $perUser).text(priceText);
+        $('.bus-user-price-val-euro', $perUser).text(euroPriceText);
+        $('.bus-user-price-unit', $perUser).text(l.per_user.replace('%1', currncyAbbrv));
+
+        if (quotaInfoPresent) {
+            $('.bus-user-price-val', $perUse).text(l[5816].replace('[X]', extraFares.storageBase / 1024));
+            $('.bus-quota-note-body', $baseQuotaNote)
+                .text(l.base_stroage_note_desc.replace('%1', extraFares.storageBase / 1024)
+                    .replace('%2', intl.format(mySelf.planInfo.bd.sto.p)));
+
+            const neededQuota = mySelf.usedGB - extraFares.storageBase;
+            if (neededQuota > 0) {
+                mySelf.extraStorage = Math.ceil(neededQuota / 1024);
+                const $extraStroage = $('.bus-addition-storage-block', $pageContainer).removeClass('hidden');
+                $('.bus-add-storage-body', $extraStroage)
+                    .text(l.additional_storage.replace('%1', mySelf.extraStorage));
+                $('.bus-add-storage-foot', $extraStroage)
+                    .text(l.additional_storage_desc.replace('%1', extraFares.storageBase / 1024));
+                quota = mySelf.extraStorage;
+
+                mySelf.planInfo.quotaFare = mySelf.planInfo.bd.sto.p;
+            }
+
+            $perUse.removeClass('hidden');
+            $baseQuotaNote.removeClass('hidden');
+        }
+
+        mySelf.localPricesMode = localPricesMode;
+        updateBreakdown(users, quota, userFare, extraFares.storageFare, sep);
     };
 
     // event handler for clicking on terms anchor
@@ -367,7 +533,8 @@ BusinessRegister.prototype.initPage = function(preSetNb, preSetName, preSetTel, 
 
 
     // event handler for change on inputs
-    $('.bus-reg-info-block input', $pageContainer).off('change.suba').on('change.suba',
+    $('.bus-reg-info-block input', $pageContainer).rebind(
+        'change.suba',
         function nbOfUsersChangeEventHandler() {
             var $me = $(this);
             var valid = false;
@@ -376,7 +543,7 @@ BusinessRegister.prototype.initPage = function(preSetNb, preSetName, preSetTel, 
                 valid = true;
             }
             if ($me.attr('id') === 'business-nbusrs') {
-                updatePriceGadget((valid) ? $me.val() : mySelf.minUsers);
+                updateBreakdown(valid ? $me.val() : mySelf.minUsers);
             }
         }
     );
@@ -397,8 +564,13 @@ BusinessRegister.prototype.initPage = function(preSetNb, preSetName, preSetTel, 
                 api_req({ a: 'ucr' });
             }
 
-            mySelf.doRegister($nbUsersInput.val().trim(), $cnameInput.val().trim(),
-                $fnameInput.val().trim(), $lnameInput.val().trim(), $telInput.val().trim(), $emailInput.val().trim(),
+            mySelf.doRegister(
+                $nbUsersInput.val().trim(),
+                $cnameInput.val().trim(),
+                $fnameInput.val().trim(),
+                $lnameInput.val().trim(),
+                $telInput.val().trim(),
+                $emailInput.val().trim(),
                 $passInput.val());
         }
     );
@@ -441,16 +613,8 @@ BusinessRegister.prototype.initPage = function(preSetNb, preSetName, preSetTel, 
         business.getBusinessPlanInfo(false).done(function planInfoReceived(st, info) {
             mySelf.planPrice = Number.parseFloat(info.p);
             mySelf.planInfo = info;
-            updatePriceGadget($nbUsersInput.val() || 3);
-
-            // testing
-            // var userInfo = {
-            //    fname: 'khaled',
-            //    lname: 'daif',
-            //    nbOfUsers: 4
-            // };
-            // mySelf.goToPayment(userInfo);
-            // end of testing
+            mySelf.minUsers = info.minu || 3;
+            updatePriceGadget($nbUsersInput.val() || mySelf.minUsers);
         });
     });
 };
@@ -520,7 +684,8 @@ BusinessRegister.prototype.doRegister = function(nbusers, cname, fname, lname, t
                 lname: lname,
                 nbOfUsers: nbusers,
                 pMethod: pMethod,
-                isUpgrade: isUpgrade
+                isUpgrade: isUpgrade,
+                quota: mySelf.extraStorage
             };
             if (pMethod !== 'voucher') {
                 mySelf.planInfo.usedGatewayId = $paymentMethod.attr('prov-id');

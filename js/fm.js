@@ -17,19 +17,20 @@ function initTextareaScrolling($textarea, textareaMaxHeight, resizeEvent) {
     }
     $textareaClone = $textarea.next('div');
 
-    function textareaScrolling(keyEvents) {
-        var $textareaScrollBlock = $textarea.closest('.textarea-scroll'),
-              $textareaCloneSpan,
-              textareaContent = $textarea.val(),
-              cursorPosition = $textarea.getCursorPosition(),
-              jsp = $textareaScrollBlock.data('jsp'),
-              viewLimitTop = 0,
-              scrPos = 0,
-              viewRatio = 0;
+    const textareaScrolling = (keyEvents) => {
+        const $textareaScrollBlock = $textarea.closest('.textarea-scroll') || $textarea.parent();
+        const cursorPosition = $textarea.getCursorPosition();
+        const viewLimitTop = 0;
+        let $textareaCloneSpan = {};
+        let textareaContent = $textarea.val();
+        let scrPos = 0;
+        let viewRatio = 0;
+        let textareaCloneHeight = 0;
+        let textareaCloneSpanHeight = 0;
 
         // Set textarea height according to  textarea clone height
-        textareaContent = '<span>'+textareaContent.substr(0, cursorPosition) +
-                          '</span>' + textareaContent.substr(cursorPosition, textareaContent.length);
+        textareaContent = `<span>${textareaContent.substr(0, cursorPosition)}</span>
+            ${textareaContent.substr(cursorPosition, textareaContent.length)}`;
 
         // try NOT to update the DOM twice if nothing had changed (and this is NOT a resize event).
         if (keyEvents && $textareaClone.data('lastContent') === textareaContent) {
@@ -41,36 +42,35 @@ function initTextareaScrolling($textarea, textareaMaxHeight, resizeEvent) {
             $textareaClone.safeHTML(textareaContent + '<br />');
         }
 
-        var textareaCloneHeight = $textareaClone.height();
-        $textarea.height(textareaCloneHeight);
-        $textareaCloneSpan = $textareaClone.children('span');
-        var textareaCloneSpanHeight = $textareaCloneSpan.height();
-        scrPos = jsp ? $textareaScrollBlock.find('.jspPane').position().top : 0;
+        textareaCloneHeight = $textareaClone.outerHeight();
+        $textarea.outerHeight(textareaCloneHeight);
+        $textareaCloneSpan = $('span', $textareaClone);
+        textareaCloneSpanHeight = $textareaCloneSpan.outerHeight();
+        scrPos = $textareaScrollBlock.scrollTop();
         viewRatio = Math.round(textareaCloneSpanHeight + scrPos);
 
         // Textarea wrapper scrolling init
         if (textareaCloneHeight > textareaMaxHeight) {
-            $textareaScrollBlock.jScrollPane(
-                {enableKeyboardNavigation: false, showArrows: true, arrowSize: 5, animateScroll: false});
-            if (!jsp && keyEvents) {
-                $textarea.trigger("focus");
+
+            if ($textareaScrollBlock.is('.ps-container')) {
+                Ps.update($textareaScrollBlock[0]);
+            }
+            else {
+                Ps.initialize($textareaScrollBlock[0]);
             }
         }
-        else if (jsp) {
-            jsp.destroy();
-            if (keyEvents) {
-                $textarea.trigger("focus");
-            }
+        else if ($textareaScrollBlock.is('.ps-container')){
+            Ps.destroy($textareaScrollBlock[0]);
+            $textareaScrollBlock.scrollTop(0);
         }
 
         // Scrolling according cursor position
         if (viewRatio > textareaLineHeight || viewRatio < viewLimitTop) {
-            jsp = $textareaScrollBlock.data('jsp');
-            if (textareaCloneSpanHeight > 0 && jsp) {
-                jsp.scrollToY(textareaCloneSpanHeight - textareaLineHeight);
+            if (textareaCloneSpanHeight > 0 && $textareaScrollBlock.is('.ps-container')) {
+                $textareaScrollBlock.scrollTop(textareaCloneSpanHeight - textareaLineHeight);
             }
-            else if (jsp) {
-                jsp.scrollToY(0);
+            else if ($textareaScrollBlock.is('.ps-container')) {
+                $textareaScrollBlock.scrollTop(0);
             }
         }
         $textarea.trigger('autoresized');
@@ -2731,7 +2731,7 @@ function closeDialog(ev) {
             delete $.cfpromise;
         }
     }
-    else {
+    else if ($.dialog !== 'terms') {
         delete $.mcImport;
     }
 
@@ -3320,7 +3320,8 @@ function fm_resize_handler(force) {
 
         $dashboardContent.removeClass('low-width');
 
-        if ($dashboardContent.width() < 780) {
+        if ($dashboardContent.width() < 780 || !$('.business-dashboard', $dashboardContent).hasClass('hidden')
+            && $dashboardContent.width() < 915) {
             $dashboardContent.addClass('low-width');
         }
     }

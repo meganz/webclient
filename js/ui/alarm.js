@@ -14,6 +14,17 @@ var alarm = {
     hidden: 0,
 
     /**
+     * Get active holder
+     * @returns {Object} $holder of the dialog window
+     */
+    handler: function() {
+        'use strict';
+        const holderId = is_fm() && page !== 'start' ? 'fmholder' : 'startholder';
+        const holder = document.getElementById(holderId);
+        return holder && holder.querySelector('.js-topbar');
+    },
+
+    /**
      * Shows the warning popup
      * @param {Object} $button Button which allows to open dialog
      * @param {Object} $dialog The dialog
@@ -89,8 +100,9 @@ var alarm = {
         render: function() {
 
             // Cache lookups
-            var $button = $('.js-dropdown-overquota');
-            var $dialog = $('.top-warning-popup.over-quota');
+            const handlerElem = alarm.handler();
+            var $button = $('.js-dropdown-overquota', handlerElem);
+            var $dialog = $('.top-warning-popup.over-quota', handlerElem);
 
             // Add button click handler
             this.initUpgradeButton($dialog);
@@ -131,9 +143,9 @@ var alarm = {
         render: function() {
 
             // Cache lookups
-
-            var $button = $('.js-dropdown-ephemeral');
-            var $dialog = $('.top-warning-popup.ephemeral-session');
+            const handlerElem = alarm.handler();
+            var $button = $('.js-dropdown-ephemeral', handlerElem);
+            var $dialog = $('.top-warning-popup.ephemeral-session', handlerElem);
 
             // Add button click handler
             this.initRegisterButton($button, $dialog);
@@ -183,8 +195,9 @@ var alarm = {
         render: function(recentPurchase) {
 
             // Cache lookups
-            var $button = $('.js-dropdown-accountlink');
-            var $dialog = $('.top-warning-popup.non-activated-account');
+            const handlerElem = alarm.handler();
+            var $button = $('.js-dropdown-accountlink', handlerElem);
+            var $dialog = $('.top-warning-popup.non-activated-account', handlerElem);
 
             // If they just purchased it, log specific event
             if (recentPurchase) {
@@ -218,8 +231,9 @@ var alarm = {
         render: function() {
 
             // Cache lookups
-            var $button = $('.js-dropdown-astropay');
-            var $dialog = $('.top-warning-popup.astropay-payment-reminder');
+            const handlerElem = alarm.handler();
+            var $button = $('.js-dropdown-astropay', handlerElem);
+            var $dialog = $('.top-warning-popup.astropay-payment-reminder', handlerElem);
 
             // If their last payment info is not set by the API, then their plan is not currently expired.
             if (this.lastPayment === null) {

@@ -1564,8 +1564,7 @@ function init_page() {
     else if (page === 'business') {
         parsepage(pages['business']);
         document.body.classList.add('business');
-        var businessP = new BusinessProductPage();
-        businessP.init();
+        businessProductPage.init();
     }
     else if (page.substr(0, 4) == 'sync') {
         parsepage(pages['sync']);
@@ -2075,11 +2074,11 @@ function topbarUI(holderId) {
         element.classList[fminitialized && !folderlink && u_type === 3 ? 'remove' : 'add']('hidden');
     }
 
-    if (u_type === 3 && u_attr.fullname && (element = topbar.querySelector('.name'))) {
+    if (u_type === 3 && u_attr && u_attr.fullname && (element = topbar.querySelector('.name'))) {
         element.textContent = u_attr.fullname;
     }
 
-    if (u_type && u_attr.email && (element = topbar.querySelector('.email'))) {
+    if (u_type && u_attr && u_attr.email && (element = topbar.querySelector('.email'))) {
         element.textContent = u_attr.email;
     }
 

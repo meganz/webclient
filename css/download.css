@@ -152,7 +152,6 @@ body.en .download.top-bar.expanded::before {
     top: -118px;
     position: fixed;
     background: rgba(255, 255, 255,1);
-    overflow: hidden;
 }
 body:not(.en) .download.top-bar.floating {
     top: -128px;

@@ -104,6 +104,7 @@ function blog_load() {
     var blogcontent = '';
     var a = 0;
     var blogstart = blogpage * bloglimit - bloglimit;
+    $('.rss-lnk', '.blog-new').attr('href', cmsStaticPath + 'blog/unsigned/blog.rss');
     for (var i in blogposts) {
         if (blogposts.hasOwnProperty(i)) {
             var mm = blog_month(blogposts[i].t);
@@ -419,8 +420,10 @@ if (typeof mobileblog !== 'undefined') {
             '<div class="main-content-block blog-new">' +
                 '<div class="blog-new-full empty-bottom">' +
                     '<h2 id="blogarticle_title">' + escapeHTML(blogposts[i].h) + '</h2>' +
-                    '<a href="/blog_22" id="blog_prev" class="blog-new-forward clickurl" style="opacity: 0.4;"></a>' +
-                    '<a href="/blog_21" id="blog_next" class="blog-new-back clickurl active" style="opacity: 1;"></a>'+
+                    '<a href="/blog/mega-exits-beta" id="blog_prev" class="blog-new-forward clickurl"' +
+                    ' style="opacity: 0.4;"></a>' +
+                    '<a href="/blog/new-zealand-storage-node-now-live" id="blog_next" class="blog-new-back clickurl ' +
+                    'active" style="opacity: 1;"></a>' +
                     '<div class="clear"></div>' +
                     '<div class="blog-new-small" id="blogarticle_date">' + blogdate + '</div>' +
                     '<div class="blog-new-date-div"></div>' +

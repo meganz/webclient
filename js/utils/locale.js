@@ -376,9 +376,10 @@ function getDateStructure() {
     var localeTime = time2date(uniqUnix, 1);
     var result;
     if (locale !== 'ar') {
-        index['y'] = localeTime.indexOf(1987);
-        index['m'] = localeTime.indexOf(4);
-        index['d'] = localeTime.indexOf(23);
+        // thai case using buddhist calendar, 1987 in gregorian calendar is 2530 in buddhist calendar
+        index.y = (locale === 'th') ? localeTime.indexOf(2530) : localeTime.indexOf(1987);
+        index.m = localeTime.indexOf(4);
+        index.d = localeTime.indexOf(23);
 
         result = Object.keys(index).sort(function(a, b) {
             return index[a] - index[b];
@@ -400,9 +401,9 @@ function getDateStructure() {
                 var locale_m = new Intl.DateTimeFormat(locales, options_m).format(uniqTime);
                 var locale_d = new Intl.DateTimeFormat(locales, options_d).format(uniqTime);
 
-                index['y'] = localeTime.indexOf(locale_y);
-                index['m'] = localeTime.indexOf(locale_m);
-                index['d'] = localeTime.indexOf(locale_d);
+                index.y = localeTime.indexOf(locale_y);
+                index.m = localeTime.indexOf(locale_m);
+                index.d = localeTime.indexOf(locale_d);
 
                 result = Object.keys(index).sort(function(a, b) {
                     return index[b] - index[a];
@@ -869,8 +870,11 @@ mBroadcaster.once('boot_done', function populate_l() {
     l[8440] = l[8440].replace('[A]', '<a href="https://github.com/meganz/">').replace('[/A]', '</a>');
     l[8440] = l[8440].replace('[A2]', '<a href="/contact" class="clickurl">').replace('[/A2]', '</a>');
     l[8441] = l[8441].replace('[A]', '<a href="mailto:bugs@mega.nz">').replace('[/A]', '</a>');
-    l[8441] = l[8441].replace('[A2]', `<a href="${getBaseUrl()}/blog_8">`).replace('[/A2]', '</a>');
-    l[19310] = l[19310].replace('[A]', `<a href="${getBaseUrl()}/blog_6" target="_blank">`).replace('[/A]', '</a>');
+    l[8441] = l[8441].replace('[A2]', `<a href="${getBaseUrl()}/blog/vulnerability-rewards-the-first-week">`)
+        .replace('[/A2]', '</a>');
+    l[19310] = l[19310]
+        .replace('[A]', `<a href="${getBaseUrl()}/blog/the-mega-vulnerability-reward-program" target="_blank">`)
+        .replace('[/A]', '</a>');
 
 
     l[8644] = l[8644].replace('[S]', '<span class="green">').replace('[/S]', '</span>');
@@ -964,12 +968,12 @@ mBroadcaster.once('boot_done', function populate_l() {
 
     l[16649] = l[16649].replace('%1', '<span class="amount">10.00</span>');
     l[16501] = l[16501].replace('[A1]', '<a class="red" href="mailto:support@mega.nz">').replace('[/A1]', '</a>')
-        .replace('[A2]', `<a class="red" target="_blank" href="${getBaseUrl()}/help/client/android/`
-            + 'accounts-pro-accounts/how-can-i-cancel-the-renewal-of-my-mega-subscription">')
+        .replace('[A2]', `<a class="red" target="_blank" href="${getBaseUrl()}/help/client/android/accounts-and-pro-` +
+            `accounts#how-can-i-cancel-the-renewal-of-my-mega-subscription-57733f8b886688e7028b45cf">`)
         .replace('[/A2]', '</a>')
-        .replace('[A3]', `<a class="red" target="_blank" href="${getBaseUrl()}/help/client/ios/`
-            + 'accounts-pro-accounts/how-does-mega-pro-account-subscription-work-with-apple-in-app-'
-            + 'purchases">')
+        .replace('[A3]', `<a class="red" target="_blank" href="${getBaseUrl()}/help/client/ios/accounts-and-pro-` +
+            `accounts#how-does-mega-pro-account-subscription-work-with-apple-in-app-purchases` +
+            `-57732e9f886688e7028b45bd">`)
         .replace('[/A3]', '</a>');
     l[16596] = escapeHTML(l[16596])
         .replace('[A]', '<a class="red" href="mailto:uwp.alpha@mega.nz">').replace('[/A]', '</a>').replace('uwp@', 'uwp.alpha@');
@@ -1060,7 +1064,7 @@ mBroadcaster.once('boot_done', function populate_l() {
         + '/backup">')
         .replace('[/A]', '</a>');
     l[20016] = l[20016].replace('[A]', '<a target="_blank" class="red" rel="noopener noreferrer" href="https://mega.nz'
-        + '/blog_48" >')
+        + '/blog/mega-adds-two-factor-authentication" >')
         .replace('[/A]', '</a>')
         .replace('[Br]', '<br><br>');
     l[20022] = l[20022].replace('[Br]', '<br><br>');
@@ -1202,7 +1206,7 @@ mBroadcaster.once('boot_done', function populate_l() {
         + 'target="_blank" rel="noopener noreferrer">').replace('[/A1]', '</a>')
         .replace('[A2]', '<a class="clickurl" href="/takedown" '
             + 'target="_blank" rel="noopener noreferrer">').replace('[/A2]', '</a>')
-        .replace('[A3]', `<a href="${getBaseUrl()}/blog_59" `
+        .replace('[A3]', `<a href="${getBaseUrl()}/blog/transparency-report-2019" `
             + 'target="_blank" rel="noopener noreferrer">').replace('[/A3]', '</a>');
     l[23120] = escapeHTML(l[23120].replace(/&quot;|"/g, '%1')).replace(/%1/g, '"');
     l[23126] = escapeHTML(l[23126].replace(/&quot;|"/g, '%1')).replace(/\[BR]/g, '<br/>').replace(/%1/g, '"');
@@ -1262,7 +1266,8 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[A3]', '<a href="" class="red a3">').replace('[/A3]', '</a>');
     l[23449] = escapeHTML(l[23449]).replace(/\[R\/]/g, '<sup>&reg;</sup>');
     l[24074] = escapeHTML(l[24074]).replace('[A]', '<a>').replace('[/A]', '</a>');
-    l[24141] = escapeHTML(l[24141]).replace('[A]', `<a class="red" href="${getBaseUrl()}/blog_48">`)
+    l[24141] = escapeHTML(l[24141])
+        .replace('[A]', `<a class="red" href="${getBaseUrl()}/blog/mega-adds-two-factor-authentication">`)
         .replace('[/A]', '</a>');
     l[24431] = escapeHTML(l[24431]).replace('[A]', '<a href="/repay" class="clickurl">').replace('[/A]', '</a>')
         .replace('[S]', '<span>').replace('[/S]', '</span>');
@@ -1294,6 +1299,39 @@ mBroadcaster.once('boot_done', function populate_l() {
     l.achievem_storagetitle = escapeHTML(l.achievem_storagetitle)
         .replace('[S]', '<span>')
         .replace('[/S]', '</span>');
+    l.bsn_calc_min_users = escapeHTML(l.bsn_calc_min_users)
+        .replace('[BR]', '<br>');
+    l.bsn_calc_min_storage = escapeHTML(l.bsn_calc_min_storage)
+        .replace('[BR]', '<br>');
+    l.bsn_calc_min_transfer = escapeHTML(l.bsn_calc_min_transfer)
+        .replace('[BR]', '<br>');
+    l.bsn_calc_total = escapeHTML(l.bsn_calc_total)
+        .replace('[S]', '<span>')
+        .replace('[/S]', '</span>');
+    l.bsn_page_plan_price = escapeHTML(l.bsn_page_plan_price)
+        .replace('[S]', '<span>')
+        .replace('[/S]', '</span>');
+    l.bsn_plan_more_users = escapeHTML(l.bsn_plan_more_users)
+        .replace('[B]', '<strong>')
+        .replace('[/B]', '</strong>');
+    l.bsn_plan_more_storage = escapeHTML(l.bsn_plan_more_storage)
+        .replace('[B]', '<strong>')
+        .replace('[/B]', '</strong>');
+    l.bsn_plan_more_transfer = escapeHTML(l.bsn_plan_more_transfer)
+        .replace('[B]', '<strong>')
+        .replace('[/B]', '</strong>');
+    l.bsn_versioning_info = escapeHTML(l.bsn_versioning_info)
+        .replace('[S]', '<span>')
+        .replace('[/S]', '</span>')
+        .replace('[BR]', '<br>');
+    l.bsn_backup_info = escapeHTML(l.bsn_backup_info)
+        .replace('[S]', '<span>')
+        .replace('[/S]', '</span>')
+        .replace('[BR]', '<br>');
+    l.bsn_meetings_info = escapeHTML(l.bsn_meetings_info)
+        .replace('[S]', '<span>')
+        .replace('[/S]', '</span>')
+        .replace('[BR]', '<br>');
 
     var common = [
         15536, 16106, 16107, 16119, 16120, 16123, 16124, 16135, 16136, 16137, 16138, 16304, 16313, 16315, 16316,

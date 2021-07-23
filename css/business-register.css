@@ -133,9 +133,9 @@
 }
 
 .bus-reg-plan {
-    width: 380px;
+    width: 460px;
     display: inline-block;
-    border-radius: 24px;
+    border-radius: 8px;
     border: 1px solid var(--divider-color);
     position: absolute;
     right: 0;
@@ -151,24 +151,157 @@
     width: 64px;
     height: 64px;
 }
+.bus-reg-info-block .bus-addition-storage-block {
+    margin-top: 6px;
+    height: 109px;
+    margin-left: 3px;
+}
+.bus-reg-info-block .bus-add-storage-head {
+    margin-bottom: 10px;
+    height: 18px;
+    line-height: 20px;
+    font-size: 13px;
+}
+.bus-reg-info-block .bus-add-storage-body {
+    margin-bottom: 10px;
+    font-size: 14px;
+    line-height: 24px;
+    color: var(--text-color-high);
+    display: inline-block;
+    vertical-align: sub;
+}
+.bus-reg-info-block .bus-add-storage-icon {
+    --icon-size: 24px;
+    margin-right: 8px;
+}
+.bus-reg-info-block .bus-add-storage-foot {
+    font-size: 12px;
+    line-height: 15px;
+    height: 15px;
+}
+.bus-reg-plan .bus-internal-block {
+    margin-left: 16px;
+    margin-right: 16px;
+    margin-top: 13px;
+    background-color: var(--surface-grey-1);
+    border-radius: 8px;
+    border: solid;
+    border-width: 1px;
+    border-color: var(--surface-grey-2);
+    padding-bottom: 14px;
+}
+.bus-reg-plan .bus-internal-block.business-plan-peruse {
+    border-radius: 8px 8px 0 0;
+}
+.bus-reg-plan .bus-user-price-val-cntr {
+    display: inline-block;
+}
+.bus-reg-plan .bus-internal-block.hidden {
+    display: none;
+}
+.bus-reg-plan .business-plan-pricing {
+    font-size: 0;
+}
+.bus-reg-plan .bus-user-price-val {
+    height: 34px;
+    margin-top: 13px;
+    margin-left: 18px;
+    display: inline-block;
+    color: var(--text-color-high);
+    font-family: var(--text-font-family-montserrat-regular);
+    font-size: 28px;
+    line-height: 34px;
+}
+.bus-reg-plan .bus-user-price-unit {
+    vertical-align: text-bottom;
+    margin-left: 10px;
+    display: inline-block;
+    height: 20px;
+    font: var(--text-h3);
+    color: var(--text-color-high);
+    position: absolute;
+    margin-top: 19px;
+}
+.bus-reg-plan .bus-user-price-euro {
+    text-align: center;
+    box-sizing: border-box;
+    height: 22px;
+    width: 48px;
+    border: 1px solid #EBEBEB;
+    border-radius: 10px;
+    background-color: var(--surface-main);
+    color: var(--text-color-medium);
+    font-family: var(--text-font-family);
+    font-size: 13px;
+    display: flex;
+    justify-content: center;
+    margin-left: calc(50% - 24px);
+}
+.bus-reg-plan .bus-user-price-euro.hidden {
+    display: none;
+}
+.bus-reg-plan .business-plan-quota-note {
+    margin: 0 16px auto 16px;
+    padding: 16px;
+    font-family: var(--text-font-family);
+    color: var(--text-color-high);
+    background-color: var(--surface-grey-1);
+    border-radius: 0 0 8px 8px;
+    border: solid;
+    border-width: 1px;
+    border-color: var(--surface-grey-2);
+    border-top-width: 0;
+}
+.bus-reg-plan .bus-quota-note-head {
+    font: var(--text-h3);
+}
+.bus-reg-plan .bus-quota-note-body {
+    font-size: 14px;
+    line-height: 20px;
+    opacity: 0.7;
+    color: var(--text-color-high);
+}
+.bus-reg-plan .business-plan-breakdown {
+    margin-top: 12px;
+    color: var(--text-color-high);
+}
+.bus-reg-plan .bus-breakdown-row {
+    margin-top: 8px;
+    height: 56px;
+    margin-left: 16px;
+    margin-right: 16px;
+}
+.bus-reg-plan .bus-breakdown-col {
+    display: inline-block;
+    font: var(--text-h3);
+    margin: 16px;
+}
+.bus-reg-plan .business-plan-total {
+    margin-top: 20px;
+    color: var(--text-color-high);
+    padding-left: 16px;
+    padding-right: 16px;
+}
+.bus-reg-plan .bus-total-col {
+    display: inline-block;
+    font: var(--text-h1);
+    margin: 29px 16px 16px 16px;
+}
+.bus-reg-plan .bus-price-footer-note {
+    padding-top: 16px;
+    position: absolute;
+    font: var(--text-body1);
+    line-height: 17px;
+    color: var(--text-color-high);
+}
 .bus-reg-plan .business-plan-title {
-    font: var(--text-h2);
+    font-family: var(--text-font-family);
+    font-size: 24px;
+    line-height: 29px;
     color: var(--text-color-high);
     margin: 4px auto 32px;
     width: 100%;
     text-align: center;
-}
-.bus-reg-plan .business-plan-price {
-    width: 90%;
-    min-height: 72px;
-    margin: 16px auto;
-    background-color: var(--secondary-green);
-    border-radius: 4px;
-    color: var(--text-color-white-high);
-    font: var(--text-h3);
-    text-align: center;
-    padding: 16px 0 6px;
-    box-sizing: border-box;
 }
 .mobile.ru .bus-reg-plan .business-plan-price .sub-unit {
     display: block;
@@ -179,38 +312,8 @@
     margin-right: 8px;
 }
 
-.bus-reg-plan .business-plan-note {
-    width: 90%;
-    margin: 4px auto 20px;
-    text-align: center;
-    font: var(--text-body1);
-    color: var(--text-color-low);
-}
-
-.bus-reg-plan .business-plan-info {
-    width: 94%;
-    height: 54px;
-    margin:0 auto;
-    background-color: #fff;
-}
-
-.bus-reg-plan .business-plan-info.grey {
-    width: 94%;
-    height: 54px;
-    margin:0 auto;
-    background-color: rgba(0,0,0,0.03);
-}
-
-.bus-reg-plan .business-plan-info .left,
-.bus-reg-plan .business-plan-info .right {
-    font: var(--text-body1);
-    color: var(--text-color-high);
-    line-height: 54px;
-    padding: 0 13px;
-}
 
 .bus-reg-plan .business-plan-total {
-    height: 64px;
     position: relative;
 }
 
@@ -222,15 +325,6 @@
     left: 0;
     background-color: var(--divider-color);
     position: absolute;
-}
-
-.bus-reg-plan .business-plan-total .left,
-.bus-reg-plan .business-plan-total .right {
-    font: var(--text-font-h1);
-    color: var(--text-color-high);
-    line-height: 64px;
-    padding: 0 13px;
-    margin: 0 3%;
 }
 
 .bus-reg-bottom-page {
@@ -356,7 +450,7 @@
 
     .mega-button.bus-reg-btn-2 {
         display: inline-flex;
-        margin-top: 80px;
+        margin-top: 115px;
     }
 
     .bus-reg-featureBlock {
@@ -467,7 +561,7 @@
 }
 .repay-breakdown-container {
     width: 100%;
-    border-radius: 24px;
+    border-radius: 4px;
     background: var(--surface-main);
     border: 1px solid var(--divider-color);
     position: relative;
@@ -498,19 +592,27 @@
     position: relative;
     display: block;
 }
+.bus-reg-plan.repay .repay-breakdown-tb tr.hidden {
+    display: none;
+}
 .bus-reg-plan.repay .repay-breakdown-tb tr:not(:last-child)::before {
     content: "";
     position: absolute;
     display: block;
     width: 308px;
     height: 1px;
-    background-color:rgba(0,0,0,0.1);
     left: 12px;
     bottom: 0;
+    background-color: var(--divider-color);
+}
+.bus-reg-plan.repay .repay-breakdown-tb tr.expand:not(:last-child)::before {
+    width: 100%;
+    height: 1px;
+    left: 0;
 }
 .bus-reg-plan.repay .repay-breakdown-tb tr th:first-child,
 .bus-reg-plan.repay .repay-breakdown-tb tr td:first-child {
-    width: 94px;
+    width: 123px;
     padding: 12px 0 8px;
     -webkit-padding-end: 8px;
     padding-inline-end: 8px;
@@ -521,45 +623,104 @@
 }
 .bus-reg-plan.repay .repay-breakdown-tb tr th:nth-child(2),
 .bus-reg-plan.repay .repay-breakdown-tb tr td:nth-child(2) {
-    width: 141px;
+   width: 113px;
     -webkit-padding-end: 4px;
     padding-inline-end: 4px;
     box-sizing: border-box;
     display: inline-block;
 }
-.bus-reg-plan.repay .repay-breakdown-tb tr th:nth-child(3),
-.bus-reg-plan.repay .repay-breakdown-tb tr td:nth-child(3) {
+.bus-reg-plan.repay .repay-breakdown-tb tr td:nth-child(2) {
+    cursor: pointer;
+}
+.bus-reg-plan.repay .repay-breakdown-tb tr td.repay-td-total {
+    cursor: default;
+}
+.bus-reg-plan.repay .repay-breakdown-tb tr th:last-child,
+.bus-reg-plan.repay .repay-breakdown-tb tr td:last-child {
     width: calc(100% - 244px);
     -webkit-padding-end: 12px;
     padding-inline-end: 12px;
     box-sizing: border-box;
     text-align: end;
     display: inline-block;
+    opacity: unset;
+}
+.bus-reg-plan.repay .repay-breakdown-tb tr td:nth-child(3) {
+    font-family: var(--text-font-family-bold);
+}
+.bus-reg-plan.repay .repay-breakdown-tb .content-desc {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    width: 81px;
+    display: inline-block;
+    overflow: hidden;
+}
+.bus-reg-plan.repay .repay-breakdown-tb tr td:nth-child(2):after {
+    width: 24px;
+    --icon-size: 24px;
 }
 .bus-reg-plan.repay .repay-breakdown-tb th {
-    font: var(--text-body2);
+    font: var(--text-body1);
     padding: 12px 0 8px;
-    color: var(--text-color-medium);
+    color: var(--text-color-high);
     text-align: start;
 }
+.main-right-block .repay-breakdown-footer {
+    margin-top: 14px;
+    opacity: 0.7;
+}
 .bus-reg-plan.repay .repay-breakdown-tb td {
-    font: var(--text-body2);
-    color: var(--text-color-low);
-    padding: 15px 0;
+    font: var(--text-body1);
+    color: var(--text-color-high);
+    opacity: 0.7;
     text-align: start;
+    padding: 12px 0 8px;
+    height: 40px;
 }
 .bus-reg-plan.repay .repay-breakdown-tb tr:last-child td {
     color: var(--text-color-high);
-    font: var(--text-h1);
-    font-family: var(--text-font-family-semibold);
+    font: var(--text-h2);
+    font-family: var(--text-font-family-bold);
     text-align: start;
     width: 110px;
+    height: 50px;
+    opacity: unset;
 }
 .bus-reg-plan.repay .repay-breakdown-tb tr:last-child td:last-child {
     -webkit-padding-end: 12px;
     padding-inline-end: 12px;
     width: 210px;
     text-align: end;
+}
+.bus-reg-plan.repay .repay-extra-details {
+    background-color: var(--surface-grey-1);
+    font: var(--text-body1);
+    color: var(--text-color-high);
+    max-height: 0;
+    overflow-y: hidden;
+    -webkit-transition: max-height 0.2s ease-in-out;
+    -moz-transition: max-height 0.2s ease-in-out;
+    -o-transition: max-height 0.2s ease-in-out;
+    transition: max-height 0.2s ease-in-out;
+}
+.bus-reg-plan.repay .repay-extra-details.expand {
+   max-height: 40px;
+}
+.bus-reg-plan.repay .repay-breakdown-tb tr.repay-extra-details::before {
+    width: 100%;
+    left: 0;
+}
+.bus-reg-plan.repay .repay-breakdown-tb tr.repay-extra-details td:first-child {
+    width: 235px;
+}
+.bus-reg-plan.repay .repay-breakdown-tb tr.repay-extra-details td:last-child {
+    width: calc(100% - 241px);
+}
+.bus-repay-block .main-left-block .repay-nb-users-info {
+    font: var(--text-caption);
+    color: var(--text-color-black-high);
+    opacity: 0.4;
+    margin-top: -10px;
 }
 @media only screen and (max-width: 800px) {
     .card-container.bus-repay {
@@ -613,5 +774,19 @@
     .repay-btn.small-view-btn {
         margin: 32px auto;
         display: inline-block;
+    }
+    .bus-reg-plan.repay .repay-breakdown-tb tr.repay-extra-details td:first-child {
+        width: 65%;
+        min-width: 234px;
+    }
+    .bus-reg-plan.repay .repay-breakdown-tb tr.repay-extra-details td:last-child {
+        width: 30.5%;
+        min-width: 82px;
+    }
+    .bus-repay-block .main-left-block .repay-nb-users-info {
+        margin-top: -2px;
+    }
+    .bus-reg-plan.repay .repay-breakdown-tb .content-desc {
+        width: calc(100% - 30px);
     }
 }

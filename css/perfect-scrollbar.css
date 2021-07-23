@@ -6,6 +6,7 @@
     -ms-overflow-style: none;
     min-width: 100%;
     max-width: 100%;
+    position: relative;
 }
 
  @supports (-ms-overflow-style: none) {

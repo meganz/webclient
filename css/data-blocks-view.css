@@ -71,7 +71,6 @@
 .data-block-view {
     width: 192px;
     display: inline-block;
-    font-size: 0;
     line-height: 0;
     box-sizing: border-box;
     border-radius: 10px;
@@ -117,7 +116,6 @@
     height: 192px;
     width: 192px;
     display: block;
-    font-size: 0;
     transition: background-color 100ms ease-in-out, box-shadow 100ms ease-in-out;
     text-align: center;
     position: static;

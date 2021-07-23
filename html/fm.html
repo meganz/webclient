@@ -944,6 +944,7 @@
             <div class="fm-notification-block grace-business">
                 <span>[$16316]</span>
             </div>
+            <div class="fm-notification-block business-next-tier"></div>
             <div class="fm-notification-block duplicated-items-found">
                 <span>[$22101]</span>
                 <a class="fix-me-btn">[$22102]</a>
@@ -1978,9 +1979,9 @@
                                                 <div class="inv-payment-item inv-pay-amou">&euro;4.34</div>
                                             </li>
                                             <li class="inv-payment-price inv-li-gst">
+                                                <div class="inv-payment-price-deactive-users hidden">[$deactivated_charging]</div>
                                                 <div class="inv-payment-price-detail inv-gst-perc">[$19301]:</div>
                                                 <div class="inv-payment-price-detail inv-gst-val">&euro;4.34</div>
-
                                             </li>
                                             <li class="inv-payment-price inv-li-total">
                                                 <div class="inv-payment-price-detail">[$19300]:</div>
@@ -2053,6 +2054,7 @@
                                                 <div class="inv-payment-item inv-pay-amou">&euro;4.34</div>
                                             </li>
                                             <li class="inv-payment-price inv-li-gst">
+                                                <div class="inv-payment-price-deactive-users hidden">[$deactivated_charging]</div>
                                                 <div class="inv-payment-price-detail inv-gst-perc">[$19301]:</div>
                                                 <div class="inv-payment-price-detail inv-gst-val">&euro;4.34</div>
 
@@ -2566,7 +2568,7 @@
                                 <button class="mega-button add-number-button">
                                     <span>[$20222]</span>
                                 </button>
-                                <div class="account content-txt add-phone-text">[$20210]</div>
+                                <div class="account content-txt add-phone-text">[$20411]</div>
                                 <div class="green-label phone-number hidden"></div>
                             </div>
                             <div class="settings-sub-section sub-container justify-end gsm-mod-rem-btns hidden">
@@ -3650,7 +3652,17 @@
                                     </div>
                                     <div class="view-info">
                                         <div class="storage-transfer-text">[$495]</div>
-                                        <div class="storage-transfer-data">0 B</div>
+                                        <div class="storage-transfer-current hidden"></div>
+                                        <div class="storage-transfer-data-details">
+                                            <div class="storage-transfer-data-details-base">
+                                                <div class="storage-transfer-data-base-head hidden">[$base_quota]</div>
+                                                <div class="storage-transfer-data">0 B</div>
+                                            </div>
+                                            <div class="storage-transfer-data-details-ext hidden">
+                                                <div class="storage-transfer-data-base-ext">[$additional_quota]</div>
+                                                <div class="storage-transfer-data">0 B</div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
 
@@ -3660,7 +3672,17 @@
                                     </div>
                                     <div class="view-info">
                                         <div class="storage-transfer-text">[$18057]</div>
-                                        <div class="storage-transfer-data">0 B</div>
+                                        <div class="storage-transfer-current hidden"></div>
+                                        <div class="storage-transfer-data-details">
+                                            <div class="storage-transfer-data-details-base">
+                                                <div class="storage-transfer-data-base-head hidden">[$base_quota]</div>
+                                                <div class="storage-transfer-data">0 B</div>
+                                            </div>
+                                            <div class="storage-transfer-data-details-ext hidden">
+                                                <div class="storage-transfer-data-base-ext">[$additional_quota]</div>
+                                                <div class="storage-transfer-data">0 B</div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="user-management-button">
@@ -4229,6 +4251,13 @@
                             <span>[$22684]</span>
                         </div>
                         <div class="columns-wrapper">
+                            <div class="refer-block" data-reftype="invite">
+                                <i class="sprite-fm-uni icon-add-users"></i>
+                                <div class="info">
+                                    [$22689]
+                                </div>
+                                <a>[$71]</a>
+                            </div>
                             <div class="refer-block" data-reftype="url">
                                 <i class="sprite-fm-uni icon-web-link"></i>
                                 <div class="info">
@@ -4249,13 +4278,6 @@
                                     [$22688]
                                 </div>
                                 <a>[$20575]</a>
-                            </div>
-                            <div class="refer-block" data-reftype="invite">
-                                <i class="sprite-fm-uni icon-add-users"></i>
-                                <div class="info">
-                                    [$22689]
-                                </div>
-                                <a>[$71]</a>
                             </div>
                         </div>
                     </div>

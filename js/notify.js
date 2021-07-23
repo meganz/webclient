@@ -722,7 +722,10 @@ var notify = {
             // Redirect to payment history
             loadSubPage('fm/account/plan');
             mBroadcaster.once('settingPageReady', function () {
-                $('.fm-account-main').data('jsp').scrollToElement($target, true, false);
+                const jsp = $('.fm-account-main').data('jsp');
+                if (jsp) {
+                    jsp.scrollToElement($target, true, false);
+                }
             });
         });
     },
@@ -967,7 +970,7 @@ var notify = {
         }
         else if (action === 1) {
             className = 'nt-contact-accepted';
-            title = l[7145];        // Contact relationship established
+            title = l.notification_contact_accepted; // Accepted your contact request
 
             // Add a data attribute for the click handler
             $notificationHtml.attr('data-contact-handle', userHandle);

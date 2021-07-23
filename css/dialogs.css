@@ -1434,12 +1434,8 @@ body.de .mega-dialog.new-group-chat {
     font-size: 15px;
 }
 .mega-dialog.export-chat-links-dialog .export-chat-ink-warning {
-    text-align: center;
     font-size: 15px;
-    margin: 28px auto 16px;
     color: #444;
-    margin-top: 23px;
-    width: 70%;
 }
 .fm-dialogs.export-chat-links-dialog .rename-input-bl input {
     padding-left: 8px;
@@ -7791,9 +7787,17 @@ body.de .mega-dialog.new-group-chat {
     .mega-dialog.group-chat-link {
         width: 520px;
     }
+    .mega-dialog.group-chat-link header {
+        flex-direction: initial;
+    }
+    .mega-dialog.group-chat-link header i {
+        margin: 0 8px 0 0;
+        border-radius: 2px;
+        --icon-size: 32px;
+    }
     .mega-dialog.group-chat-link header h2,
     .mega-dialog.group-chat-link .content-block {
-        text-align: center;
+        text-align: left;
     }
     .fr .mega-dialog.group-chat-link {
         width: 440px;
@@ -7801,7 +7805,7 @@ body.de .mega-dialog.new-group-chat {
     .mega-dialog.group-chat-link .info {
         font: var(--text-body1);
         color: var(--text-color-medium);
-        padding-top: 16px;
+        padding-top: 7px;
     }
     .mega-dialog.group-chat-link .big-icon {
         margin: 12px auto 0 auto;
@@ -7809,21 +7813,23 @@ body.de .mega-dialog.new-group-chat {
     .mega-dialog.group-chat-link .chat-link-input {
         position: relative;
         box-sizing: border-box;
-        padding: 0 10px 0 35px;
+        padding: 0 10px 0 0;
     }
     .mega-dialog.group-chat-link .chat-link-input i {
         position: absolute;
         left: 5px;
-        top: 9px;
-        --icon-size: 24px;
+        top: 50%;
+        transform: translateY(-50%);
+        --icon-size: 28px;
+        --mask-color: var(--icon-rest);
     }
     .mega-dialog.group-chat-link .chat-link-input input {
         width: 100%;
         height: 40px;
-        padding: 10px;
+        padding: 10px 10px 10px 35px;
         margin: 0;
-        border: 1px solid var(--stroke-grey-2);
-        border-radius: 4px;
+        border: 2px solid var(--stroke-grey-2);
+        border-radius: 12px;
         background: var(--surface-grey-1);
         color: var(--text-color-medium);
     }
@@ -9415,8 +9421,12 @@ body.de .mega-dialog.new-group-chat {
         min-height: 80px;
         overflow: hidden;
         padding: 0 12px;
+        position: relative;
         resize: none;
         width: 100%;
+    }
+    .mega-dialog.feedback-dialog .feedback-dialog-textarea textarea {
+        z-index: 1;
     }
     .mega-dialog.feedback-dialog .feedback-dialog-textarea textarea::selection {
         background: rgba(255, 255, 255, 0.15);

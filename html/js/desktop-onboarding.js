@@ -39,8 +39,9 @@
 
                 // Show PRO plan details
                 $('.storage-amount', $voucherBlock)
-                    .safeHTML(l[23789].replace('%1', '<span>15 ' + l[20160] + '</span>'));
-                $('.transfer-amount', $voucherBlock).safeHTML(l[24098]);
+                    .safeHTML(l[23789].replace('%1', '<span>' + l[5816].replace('[X]', 3) + '+</span>'));
+                $('.transfer-amount', $voucherBlock)
+                    .safeHTML(l[23790].replace('%1', '<span>' + l[5816].replace('[X]', 3) + '+</span>'));
             }
             else {
 

@@ -428,10 +428,57 @@ function dashboardUI() {
             dashboardUI.updateWidgets();
         }
         else {
-            $('.business-dashboard .user-management-storage .storage-transfer-data')
-                .text(bytesToSize(account.space_used, 2));
-            $('.business-dashboard .user-management-transfer .storage-transfer-data')
-                .text(bytesToSize(account.tfsq.used, 2));
+
+            // Debug code ...
+            if (d && localStorage.debugNewPrice) {
+                account.space_bus_base = 3;
+                account.space_bus_ext = 2;
+                account.tfsq_bus_base = 3;
+                account.tfsq_bus_ext = 1;
+                account.tfsq_bus_used = 3848290697216; // 3.5 TB
+                account.space_bus_used = 4617948836659; // 4.2 TB
+            }
+            // END Debug code
+
+            const $storageBlk = $('.business-dashboard .user-management-storage');
+            const $transferBlk = $('.business-dashboard .user-management-transfer');
+            const $storageBaseBlk = $('.storage-transfer-data-details-base', $storageBlk);
+            const $transferBaseBlk = $('.storage-transfer-data-details-base', $transferBlk);
+            const $storageExtBlk = $('.storage-transfer-data-details-ext', $storageBlk);
+            const $transferExtBlk = $('.storage-transfer-data-details-ext', $transferBlk);
+
+            $('.storage-transfer-data, .storage-transfer-current', $storageBlk)
+                .text(bytesToSize(account.space_bus_used || account.space_used, 2));
+            $('.storage-transfer-data, .storage-transfer-current', $transferBlk)
+                .text(bytesToSize(account.tfsq_bus_used || account.tfsq.used, 2));
+
+            $('.storage-transfer-data', $storageExtBlk).text(l[5816].replace('[X]', 0));
+            $('.storage-transfer-data', $transferExtBlk).text(l[5816].replace('[X]', 0));
+
+            if (u_attr.b.m) {
+
+                $storageExtBlk.removeClass('hidden');
+                $transferExtBlk.removeClass('hidden');
+                $('.view-info .storage-transfer-current', $storageBlk).removeClass('hidden');
+                $('.view-info .storage-transfer-current', $transferBlk).removeClass('hidden');
+                $('.storage-transfer-data-base-head', $storageBlk).removeClass('hidden');
+                $('.storage-transfer-data-base-head', $transferBlk).removeClass('hidden');
+
+                if (account.space_bus_base) {
+                    $('.storage-transfer-data', $storageBaseBlk)
+                        .text(l[5816].replace('[X]', account.space_bus_base));
+                    if (account.space_bus_ext) {
+                        $('.storage-transfer-data', $storageExtBlk).text(l[5816].replace('[X]', account.space_bus_ext));
+                    }
+                }
+                if (account.tfsq_bus_base) {
+                    $('.storage-transfer-data', $transferBaseBlk)
+                        .text(l[5816].replace('[X]', account.tfsq_bus_base));
+                    if (account.tfsq_bus_ext) {
+                        $('.storage-transfer-data', $transferExtBlk).text(l[5816].replace('[X]', account.tfsq_bus_ext));
+                    }
+                }
+            }
 
             var $dataStats = $('.business-dashboard .subaccount-view-used-data');
 

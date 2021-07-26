@@ -43,7 +43,9 @@ var redeem = {
         this.getVoucherData().then(function(data) {
             var promise;
 
-            if (!data.businessmonths && u_attr && u_attr.b) {
+            // If pro vouchers are used on a business user, we want to show this error message
+            if ((!data.businessmonths && u_attr && u_attr.b)
+                || (!window.bCreatedVoucher && !window.busUpgrade && data.businessmonths)) {
                 // business user
 
                 msgDialog(

@@ -485,12 +485,10 @@ i.pricing-sprite,
 .pricing-page.plans-block {
     border: 1px solid #D5D5D5;
     border-width: 1px 0 1px 0;
+    box-sizing: border-box;
     font-size: 0;
     line-height: 0;
     white-space: nowrap;
-    display: table;
-    table-layout: fixed;
-    box-sizing: border-box;
 }
 .pricing-section .pricing-page.plans-block {
     margin: 0 auto;
@@ -523,8 +521,7 @@ i.pricing-sprite,
     padding: 0 10px;
     background-color: #00BFA5;
     border-radius: 0 0 4px 4px;
-    margin-top: -1px;
-    margin: -1px 0 20px 0;
+    margin: -1px auto 20px;
 }
 .payment-page.discount-header {
     height: 50px;
@@ -586,7 +583,7 @@ i.pricing-sprite,
     white-space: normal;
     box-sizing: border-box;
     max-width: 390px;
-    margin: auto;
+    margin: 0 auto;
 }
 .pricing-page.plan-price {
     color: var(--text-color-high);
@@ -686,13 +683,16 @@ body:not(.mobile) .current .pricing-page.plan-button:hover {
 
 /* If plan block is a part of a Plans list */
 .pricing-page.plans-row {
-    display: table-row;
+    display: flex;
+    justify-content: space-between;
 }
 .plans-row .pricing-page.plan {
-    width: 25%;
-    display: table-cell;
-    vertical-align: top;
     border-width: 0 0 0 1px;
+    display: flex;
+    flex: 0 0 auto;
+    flex-direction: column;
+    vertical-align: top;
+    width: 25%;
 }
 .plans-row .pricing-page.plan.free {
     display: none;
@@ -703,14 +703,8 @@ body:not(.mobile) .current .pricing-page.plan-button:hover {
 .plans-row .pricing-page.plan.details {
     border-top: 1px solid #D5D5D5;
 }
-.plans-row .pricing-page.plan-info {
-    padding-bottom: 250px;
-}
 .plans-row .pricing-page.plan-content {
-    position: absolute;
-    width: 100%;
-    left: 0;
-    bottom: 0;
+    margin-top: auto;
 }
 
 /* Plan icon positioning */
@@ -808,15 +802,15 @@ body:not(.mobile) .plan.pro3:not(.current) .pricing-page.plan-button:hover {
 
 /* Details block */
 .pricing-page.plan-feature {
+    box-sizing: border-box;
+    color: var(--text-color-medium);
     font-size: 15px;
     line-height: 20px;
-    color: var(--text-color-medium);
     padding: 7px 38px 7px 16px;
     position: relative;
-    white-space: normal;
-    box-sizing: border-box;
     max-width: 366px;
-    margin: auto;
+    margin: 0 auto;
+    white-space: normal;
 }
 .pricing-page.plan-feature.text-body1 {
     font: var(--text-body1);
@@ -835,6 +829,10 @@ body:not(.mobile) .plan.pro3:not(.current) .pricing-page.plan-button:hover {
 .pricing-page.plan-feature.strong * {
     color: var(--text-color-high);
     font-family: var(--text-font-family-bold);
+}
+.pricing-page.plans-row .pricing-page.plan-feature {
+    margin: 0;
+    max-width: none;
 }
 .pricing-page.local-currency-tip {
     font-size: 14px;
@@ -1981,7 +1979,6 @@ body.mobile .redeem-promo-page .mega-input.title-ontop {
 @media only screen and (max-width: 1194px) {
     .pricing-section .pricing-page.plans-block {
         border: 0;
-        border-spacing: 10px 0;
         padding: 0 30px;
         max-width: 1194px;
         min-width: 892px;
@@ -1990,6 +1987,7 @@ body.mobile .redeem-promo-page .mega-input.title-ontop {
         border-radius: 4px 4px 0 0;
         border-width: 1px;
         border-color: #D5D5D5;
+        width: calc(25% - 5px);
     }
     .pricing-section .plans-row .pricing-page.plan.details {
         border-radius: 0 0 4px 4px;
@@ -2047,7 +2045,7 @@ body.mobile .redeem-promo-page .mega-input.title-ontop {
         font-size: 12px;
     }
     .pricing-page.plan-label {
-        margin: -1px 0 3px 0;
+        margin: -1px auto 3px;
     }
     .pricing-page.plan-title {
         font-size: 22px;
@@ -2069,9 +2067,6 @@ body.mobile .redeem-promo-page .mega-input.title-ontop {
     .pricing-page.plan-period,
     .pricing-page.plan-data {
         font-size: 12px;
-    }
-    .plans-row .pricing-page.plan-info {
-        padding-bottom: 206px;
     }
     .pricing-page.plan-button {
         margin-bottom: 20px;

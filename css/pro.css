@@ -995,12 +995,12 @@ body:not(.mobile) .plan.pro3:not(.current) .pricing-page.plan-button:hover {
     min-width: 30px;
     text-align: center;
 }
-.business-slider-values div.perc-20 {
+.business-slider-values div.perc-50 {
     display: flex;
     justify-content: space-between;
-    width: calc(20% + 23px);
+    width: calc(50% + 28px);
 }
-.business-slider-values div.perc-20:first-child {
+.business-slider-values div.perc-50:first-child {
     display: inline-block;
     min-width: inherit;
 }
@@ -2147,10 +2147,10 @@ body.mobile .redeem-promo-page .mega-input.title-ontop {
     .business-slider-values div {
         min-width: 16px;
     }
-    .business-slider-values div.perc-20 {
+    .business-slider-values div.perc-50 {
         display: flex;
         justify-content: space-between;
-        width: calc(20% + 16px);
+        width: calc(50% + 16px);
     }
     .business-calculator .handle-wrap {
         -webkit-margin-end: 15px;
@@ -2175,6 +2175,9 @@ body.mobile .redeem-promo-page .mega-input.title-ontop {
         font-size: 12px;
         line-height: 16px;
         padding: 0 18px 18px;
+    }
+    .business-calculator .business-slider-values div.perc-50 {
+        width: calc(50% + 24px);
     }
     .business-calculator .footer {
         padding: 18px;

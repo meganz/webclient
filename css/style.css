@@ -12401,6 +12401,9 @@ div.camera-bottom-txt {
     left: calc(50% - 3px);
     border-radius: 5px;
 }
+.chart.progressbars.exceeded span::after {
+    display: none;
+}
 .account.chart.data {
     position: relative;
     margin: 9px 0 0 0;

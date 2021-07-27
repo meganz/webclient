@@ -1941,6 +1941,9 @@ var dlmanager = {
                     $('.chart.data .gb-txt', $dialog).text(tfsQuotaLimit[1]);
                     $('.fm-account-blocks.bandwidth', $dialog).removeClass('no-percs');
                     $('.chart .perc-txt', $dialog).text(perc + '%');
+                    $('.chart.body .progressbars', $dialog).addClass('exceeded');
+                    $('.left-chart span', $dialog).css('transform', 'rotate(180deg)');
+                    $('.right-chart span', $dialog).css('transform', 'rotate(180deg)');
 
                     // if they granted quota to other users
                     if (account.servbw_limit > 0) {

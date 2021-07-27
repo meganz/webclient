@@ -295,10 +295,10 @@ var tooltiplogin = {
 
         'use strict';
 
-        var $topLoginPopup = $('.top-login-popup');
+        var $button = $('.top-dialog-login-button.loading', '.top-login-popup');
+        var $topLoginPopup = $button.closest('.top-login-popup');
         var $emailField = $topLoginPopup.find('#login-name');
         var $passwordField = $topLoginPopup.find('#login-password');
-        var $button = $topLoginPopup.find('.top-dialog-login-button');
 
         // Remove loading spinner on the button
         $button.removeClass('loading');

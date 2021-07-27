@@ -72,11 +72,11 @@
 }
 .chat-right-area .chat-right-area {
     float: none;
+    border-left: 1px solid var(--divider-color);
 }
 .chat-right-pad {
     padding: 48px 0 0 0;
     height: 100%;
-    border-left: 1px solid var(--divider-color);
     box-sizing: border-box;
 }
 .chat-right-pad.in-call {

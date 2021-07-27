@@ -46,7 +46,7 @@ pro.proplan = {
         var $stepOne = $('.pricing-section', $body);
         const $accountButton = $('.mega-button.account.individual-el', $stepOne);
         const $accountButtonLabel = $('span', $accountButton);
-        const $freeButton = $(' .free-button.individual-el', $stepOne);
+        const $freeButton = $(' .free-button', $stepOne);
         const $freeButtonLabel = $('span', $freeButton);
 
         // If selecting a plan after registration
@@ -1238,12 +1238,12 @@ pro.proplan = {
         };
 
         /**
-         * Set slider value
+         * Set users slider value
          * @param {Object} $handle jQ selecter on slider handle
          * @param {Number} value Selected slider value
          * @returns {void}
          */
-        const setSliderValue = ($handle, value) => {
+        const setUsersSliderValue = ($handle, value) => {
 
             // Set the value in custom created span in the handle
             $('span', $handle).text(value);
@@ -1253,30 +1253,82 @@ pro.proplan = {
             $totalPrice.text(calculatePrice());
         };
 
+        /**
+         * Set storage and transfer slider value
+         * @param {Object} $handle jQ selecter on slider handle
+         * @param {Number} value Selected slider value
+         * @returns {void}
+         */
+        const setDataSlidersValue = ($handle, value) => {
+
+            let result = 0;
+
+            // Small trick which changes slider step if storage value > 1TB
+            if (value <= 100) {
+                $('span', $handle).text(`${value} ${l[20160]}`);
+                result = value;
+            }
+            else if (value < 150) {
+                result = Math.floor((value - 100) / 5) || 1;
+                result *= 100;
+                $('span', $handle).text(`${result} ${l[20160]}`);
+            }
+            else if (value === 150) {
+                $('span', $handle).text(`1 ${l[23061]}`);
+                result = 1000;
+            }
+            else if (value <= 200) {
+                result = Math.floor((value - 150) / 5) || 1;
+                $('span', $handle).text(`${result} ${l[23061]}`);
+                result *= 1000;
+            }
+
+            // Set data attribute for futher calculations
+            $handle.attr('data-value', result);
+
+            // Calculate the price and set in total
+            $totalPrice.text(calculatePrice());
+        };
+
         // Init users/storage/transfer sliders at once
         $usersSlider.add($storageSlider).add($transferSlider).slider({
-            max: 1000,
             range: 'min',
             step: 1,
             change: function(event, ui) {
-                setSliderValue($(this), ui.value);
+                setUsersSliderValue($(this), ui.value);
             },
             slide: function(event, ui) {
-                setSliderValue($(this), ui.value);
+                setUsersSliderValue($(this), ui.value);
+            }
+        });
+
+        // Init Storage  and transfer sliders
+        $storageSlider.add($transferSlider).slider({
+
+            range: 'min',
+            step: 1,
+            change: function(event, ui) {
+                setDataSlidersValue($(this), ui.value);
+            },
+            slide: function(event, ui) {
+                setDataSlidersValue($(this), ui.value);
             }
         });
 
         // Set custom min/current values for each slider
         $usersSlider.slider({
             'min': planInfo.bd.minu,
+            'max': 300,
             'value': planInfo.bd.minu
         });
         $storageSlider.slider({
             'min': minStorageValue,
+            'max': 200,
             'value': minStorageValue
         });
         $transferSlider.slider({
             'min': minTransferValue,
+            'max': 200,
             'value': minTransferValue
         });
 

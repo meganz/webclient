@@ -59,6 +59,11 @@ const businessProductPage = {
                     && info.bd.sto.s && info.bd.trns && info.bd.trns.p
                     && info.bd.trns.t && info.bd.ba.s && info.bd.ba.t;
 
+                // If local currency values exist
+                businessProductPage.businessPlanData.isLocalInfoValid = info.l
+                    && info.l.cs && info.l.n
+                    && (info.bd.us.lp || info.lp) && info.bd.sto.lp && info.bd.trns.lp;
+
                 if (d) {
                     console.log(businessProductPage.businessPlanData);
                 }
@@ -95,7 +100,11 @@ const businessProductPage = {
                     if (typeof res === 'object' && Array.isArray(res.g)
                         && res.g.every(e => e.p && e.st)) {
 
-                        businessProductPage.googlePlansData = res.g;
+                        businessProductPage.googlePlansData = res;
+
+                        businessProductPage.googlePlansData.isLocalInfoValid = res.l
+                            && res.l.s && res.l.n
+                            && Array.isArray(res.g_l) && res.g_l.every(e => e.p && e.st);
 
                         // Init business plan compare sliders
                         businessProductPage.initCompareSliders();
@@ -113,11 +122,14 @@ const businessProductPage = {
      * @param {Number} price The price number
      * @returns {void}
      */
-    formatBusinessPriceCurrency: function(price) {
+    formatBusinessPriceCurrency: function(price, currency, currencySign) {
 
         'use strict';
 
-        return `${formatCurrency(price, this.businessPlanData.c, 'number')}  \u20ac`;
+        // Set Local currency name/sign before the price value if its local
+        return currency && currencySign ? currencySign
+            + formatCurrency(price, currency, 'number') :
+            `${formatCurrency(price, 'EUR', 'number')}  \u20ac`;
     },
 
     /**
@@ -133,23 +145,46 @@ const businessProductPage = {
         // If new API values exist, populate new business card values
         if (this.businessPlanData.isValidBillingData) {
 
-            const userPrice = this.formatBusinessPriceCurrency(
-                this.businessPlanData.bd.us.p
-            );
-            const minPrice = this.formatBusinessPriceCurrency(
-                this.businessPlanData.bd.us.p * this.businessPlanData.bd.minu
-            );
-            const storagePrice = this.formatBusinessPriceCurrency(
-                this.businessPlanData.bd.sto.p
-            );
-            const transferPrice = this.formatBusinessPriceCurrency(
-                this.businessPlanData.bd.trns.p
-            );
+            let currency = '';
+            let currencySign = '';
+            let userPrice = 0;
+            let minPrice = 0;
+            let storagePrice = 0;
+            let transferPrice = 0;
+            let asterisk = '';
+            const minUsers = this.businessPlanData.bd.minu;
             const $businessCard = $('.js-business-card', $page);
 
-            $('.js-min-price span', $businessCard).addClass('big').text(minPrice);
+            if (this.businessPlanData.isLocalInfoValid) {
+
+                currency = this.businessPlanData.l.n;
+                currencySign = this.businessPlanData.l.cs;
+                asterisk = '*';
+                userPrice = this.businessPlanData.bd.us.lp || this.businessPlanData.lp;
+                minPrice = minUsers * userPrice;
+                storagePrice = this.businessPlanData.bd.sto.lp;
+                transferPrice = this.businessPlanData.bd.trns.lp;
+                $businessCard.addClass('local-currency');
+                $('.euro-price', $businessCard).text(
+                    this.formatBusinessPriceCurrency(this.businessPlanData.bd.us.p * minUsers)
+                );
+            }
+            else {
+
+                currency = this.businessPlanData.c;
+                userPrice = this.businessPlanData.bd.us.p;
+                minPrice = minUsers * userPrice;
+                storagePrice = this.businessPlanData.bd.sto.p;
+                transferPrice = this.businessPlanData.bd.trns.p;
+                $businessCard.removeClass('local-currency');
+                $('.euro-price', $businessCard).text('');
+            }
+
+            $('.js-min-price span', $businessCard).addClass('big').text(
+                this.formatBusinessPriceCurrency(minPrice, currency, currencySign) + asterisk
+            );
             $('.js-min-users', $businessCard).text(
-                l.bsn_plan_users.replace('%1', this.businessPlanData.bd.minu)
+                l.bsn_plan_users.replace('%1', minUsers)
             );
             $('.js-min-storage', $businessCard).text(
                 l.bsn_plan_storage.replace('%1', `${this.businessPlanData.bd.ba.s / 1024} ${l[20160]}`)
@@ -157,9 +192,15 @@ const businessProductPage = {
             $('.js-min-transfer', $businessCard).text(
                 l.bsn_plan_transfer.replace('%1', `${this.businessPlanData.bd.ba.t / 1024} ${l[20160]}`)
             );
-            $('.js-price-per-user strong', $businessCard).text(userPrice);
-            $('.js-price-per-storage strong', $businessCard).text(storagePrice);
-            $('.js-price-per-transfer strong', $businessCard).text(transferPrice);
+            $('.js-price-per-user strong', $businessCard).text(
+                this.formatBusinessPriceCurrency(userPrice, currency, currencySign)
+            );
+            $('.js-price-per-storage strong', $businessCard).text(
+                this.formatBusinessPriceCurrency(storagePrice, currency, currencySign)
+            );
+            $('.js-price-per-transfer strong', $businessCard).text(
+                this.formatBusinessPriceCurrency(transferPrice, currency, currencySign)
+            );
 
             // Show new Business plan content if new API is valid
             $('.business-el-new', $page).removeClass('hidden');
@@ -203,12 +244,30 @@ const businessProductPage = {
         const $storageSlider = $('.business-slider.storage', $calculator);
         const $megaChart = $('.chart.mega', $calculator);
         const $googleChart = $('.chart.google', $calculator);
-        const $megaTotal = $('.price', $megaChart);
-        const $googleTotal = $('.price', $googleChart);
+        const $megaTotal = $('.simpletip-tooltip > span', $megaChart);
+        const $googleTotal = $('.simpletip-tooltip > span', $googleChart);
         const minStorageValue = this.businessPlanData.bd.ba.s / 1024;
-        const userPrice = parseFloat(this.businessPlanData.bd.us.p);
-        const storagePrice = parseFloat(this.businessPlanData.bd.sto.p);
+        let megaUserPrice = 0;
+        let megaStoragePrice = 0;
         let maxPrice = 0;
+        let currency = '';
+        let currencySign = '';
+
+        if (this.businessPlanData.isLocalInfoValid && this.googlePlansData.isLocalInfoValid) {
+
+            currency = this.businessPlanData.l.n || this.googlePlansData.l.n;
+            currencySign = this.businessPlanData.l.cs || this.googlePlansData.l.cs;
+            megaUserPrice = this.businessPlanData.bd.us.lp || this.businessPlanData.lp;
+            megaStoragePrice = this.businessPlanData.bd.sto.lp;
+            $('.business-compare-charts', $calculator).attr('title', l[18770]);
+        }
+        else {
+
+            currency = this.businessPlanData.c;
+            megaUserPrice = this.businessPlanData.bd.us.p;
+            megaStoragePrice = this.businessPlanData.bd.sto.p;
+            $('.business-compare-charts', $calculator).removeAttr('title');
+        }
 
         /**
          * Calculate MEGA Business plan price
@@ -223,8 +282,8 @@ const businessProductPage = {
             usersValue = usersValue || $usersSlider.attr('data-value');
             storageValue = storageValue || $storageSlider.attr('data-value');
 
-            totalPrice = userPrice * usersValue
-                + storagePrice * (storageValue - minStorageValue);
+            totalPrice = megaUserPrice * usersValue
+                + megaStoragePrice * (storageValue - minStorageValue);
 
             return totalPrice.toFixed(2);
         };
@@ -237,25 +296,34 @@ const businessProductPage = {
          */
         const calculateGooglePrice = (usersValue, storageValue) => {
 
-            let planPrice = this.googlePlansData[0].p; // Starter plan price per user, EUR
-            let storagePerPlan = this.googlePlansData[0].st; // Starter plan storage, Tb
-            const standartPrice = this.googlePlansData[1].p; // Standart plan price per user, EUR
-            const storagePerStandart = this.googlePlansData[1].st; // Standart plan storage, Tb
-            const plusPrice = this.googlePlansData[2].p; // Plus plan price per user, EUR
-            const storagePerPlus = this.googlePlansData[2].st; // Standart plan storage, Tb
             let usersPrice = 0;
             let storagePrice = 0;
+            let planPrice = 0; // Standart plan price per user, EUR
+            let plusPrice = 0; // Plus plan price per user, EUR
+            let storagePerPlan = this.googlePlansData.g[1].st; // Standart plan storage, Tb
+            const storagePerPlus = this.googlePlansData.g[2].st; // Plus plan storage, Tb
+            const $planTip = $('.business-google-plan-tip', $calculator);
+
+            if (this.businessPlanData.isLocalInfoValid && this.googlePlansData.isLocalInfoValid) {
+                planPrice = this.googlePlansData.g_l[1].p;
+                plusPrice = this.googlePlansData.g_l[2].p;
+            }
+            else {
+                planPrice = this.googlePlansData.g[1].p;
+                plusPrice = this.googlePlansData.g[2].p;
+            }
 
             usersValue = usersValue || $usersSlider.attr('data-value');
             storageValue = storageValue || $storageSlider.attr('data-value');
 
-            if (storageValue >= storagePerStandart && storageValue < storagePerPlus) {
-                planPrice = standartPrice;
-                storagePerPlan = storagePerStandart;
-            }
-            else if (storageValue >= storagePerPlus) {
+            // Change price and storage to Plus plan
+            if (storageValue >= 600) {
                 planPrice = plusPrice;
                 storagePerPlan = storagePerPlus;
+                $planTip.text(l.google_plus_plan_tip);
+            }
+            else {
+                $planTip.text(l.google_standart_plan_tip);
             }
 
             usersPrice = usersValue * planPrice;
@@ -268,45 +336,69 @@ const businessProductPage = {
          * Set chart height
          * @param {Number} mPrice MEGA Price value
          * @param {Number} gPrice Google Price value
+         * @param {Boolean} isNsGooglePlan If TRUE, then google chart height is almost similar to MEGA
          * @returns {void}
          */
-        const setChartHeight = (mPrice, gPrice) => {
+        const setChartHeight = (mPrice, gPrice, isNsGooglePlan) => {
 
-            $megaChart.height(`${mPrice / gPrice * 100 + mPrice / maxPrice * 100}%`);
-            $googleChart.height(`${100 + gPrice / maxPrice * 100}%`);
+            const mPriceHeight = mPrice / gPrice * 100 + mPrice / maxPrice * 100;
+            const gPriceHeight = isNsGooglePlan ? mPriceHeight + 15 : 100 + gPrice / maxPrice * 100;
+
+            $megaChart.outerHeight(`${mPriceHeight}%`);
+            $googleChart.outerHeight(`${gPriceHeight}%`);
         };
 
         /**
-         * Set Users slider value
-         * @param {Object} $handle jQ selecter on slider handle
-         * @param {Number} value Selected slider value
-         * @returns {Number} Calculated price value
+         * Set caclulated prices
+         * @returns {void}
          */
-        const setUsersSliderValue = ($handle, value) => {
+        const setCalculatedPrices = () => {
 
             let megaPrice = 0;
             let googlePrice = 0;
+            const isNsGooglePlan = $storageSlider.attr('data-value') > 1500;
+
+            // Calculate the price and set in total
+            megaPrice = calculateMegaPrice();
+            googlePrice = calculateGooglePrice();
+
+            $megaTotal.text(
+                `${this.formatBusinessPriceCurrency(megaPrice, currency, currencySign)} /${l[931]}`
+            );
+
+            if (isNsGooglePlan) {
+                $googleTotal.text(l.not_supported);
+                $googleChart.addClass('not-supported');
+            }
+            else {
+                $googleTotal.text(
+                    `${this.formatBusinessPriceCurrency(googlePrice, currency, currencySign)} /${l[931]}*`
+                );
+                $googleChart.removeClass('not-supported');
+            }
+
+            // Set chart heights
+            setChartHeight(megaPrice, googlePrice, isNsGooglePlan);
+        };
+
+        /**
+         * Set Users slider handle value and calculated price
+         * @param {Object} $handle jQ selecter on slider handle
+         * @param {Number} value Selected slider value
+         * @returns {void}
+         */
+        const setUsersSliderValue = ($handle, value) => {
 
             // Set the value in custom created span in the handle
             $('span', $handle).text(value);
             $handle.attr('data-value', value);
 
             // Calculate the price and set in total
-            $megaTotal.text(this.formatBusinessPriceCurrency(calculateMegaPrice()));
-            $googleTotal.text(this.formatBusinessPriceCurrency(calculateGooglePrice()));
-
-            // Calculate the price and set in total
-            megaPrice = calculateMegaPrice();
-            googlePrice = calculateGooglePrice();
-            $megaTotal.text(this.formatBusinessPriceCurrency(megaPrice));
-            $googleTotal.text(this.formatBusinessPriceCurrency(googlePrice));
-
-            // Set chart heights
-            setChartHeight(megaPrice, googlePrice);
+            setCalculatedPrices();
         };
 
         /**
-         * Set Users slider value
+         * Set Storage slider value and calculated price
          * @param {Object} $handle jQ selecter on slider handle
          * @param {Number} value Selected slider value
          * @returns {void}
@@ -314,39 +406,32 @@ const businessProductPage = {
         const setStorageSliderValue = ($handle, value) => {
 
             let result = 0;
-            let megaPrice = 0;
-            let googlePrice = 0;
 
             // Small trick which changes slider step if storage value > 1TB
-            if (value >= 1000) {
-
-                if (value === 1000) {
-                    $('span', $handle).text(`1 ${l[20160]}`);
-                    result = value;
-                }
-                else {
-                    result = Math.ceil((value - 1000) / 25);
-                    $('span', $handle).text(`${result} ${l[23061]}`);
-                    result *= 1000;
-                }
-            }
-            else {
-
+            if (value <= 100) {
                 $('span', $handle).text(`${value} ${l[20160]}`);
                 result = value;
+            }
+            else if (value < 150) {
+                result = Math.floor((value - 100) / 5) || 1;
+                result *= 100;
+                $('span', $handle).text(`${result} ${l[20160]}`);
+            }
+            else if (value === 150) {
+                $('span', $handle).text(`1 ${l[23061]}`);
+                result = 1000;
+            }
+            else if (value <= 200) {
+                result = Math.floor((value - 150) / 5) || 1;
+                $('span', $handle).text(`${result} ${l[23061]}`);
+                result *= 1000;
             }
 
             // Set data attribute for futher calculations
             $handle.attr('data-value', result);
 
             // Calculate the price and set in total
-            megaPrice = calculateMegaPrice();
-            googlePrice = calculateGooglePrice();
-            $megaTotal.text(this.formatBusinessPriceCurrency(megaPrice));
-            $googleTotal.text(this.formatBusinessPriceCurrency(googlePrice));
-
-            // Set chart heights
-            setChartHeight(megaPrice, googlePrice);
+            setCalculatedPrices();
         };
 
         // Show compare section
@@ -374,7 +459,7 @@ const businessProductPage = {
         $storageSlider.slider({
 
             min: minStorageValue,
-            max: 1250,
+            max: 200,
             range: 'min',
             step: 1,
             change: function(event, ui) {
@@ -418,7 +503,6 @@ const businessProductPage = {
             this.formHidden = false;
         }
 
-        
         const $supportBlock = $('.business-support', $page);
         const $inputs = $('input', $supportBlock);
         const $firstName = $inputs.filter('#bp-f-name');

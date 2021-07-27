@@ -5102,6 +5102,10 @@ div.checkboxOn {
 .mobile.alert-banner .alert-text-container .alert-text a {
     color: white;
     text-decoration: underline;
+    font-family: var(--text-font-family-bold);
+}
+.mobile.alert-banner .alert-text-container .alert-text span {
+    font-family: var(--text-font-family-bold);
 }
 .mobile.alert-banner .alert-icon.close {
     height: 30px;
@@ -8483,6 +8487,9 @@ textarea.mobile.support-text-field {
 .mobile.improved-recovery-steps .check-sessions .checkdiv, .mobile .improved-recovery-steps .check-sessions .checkdiv::before {
     box-shadow: none;
     -webkit-box-shadow: none;
+}
+.mobile .improved-recovery-steps .check-sessions .checkdiv::before {
+   display: none;
 }
 .mobile .improved-recovery-steps .check-sessions .checkdiv::after {
     background-position: -25.5px -1850px;

@@ -1157,6 +1157,7 @@ body.de .mega-dialog.new-group-chat {
     --mask-color: var(--icon-active);
 }
 .fm-versioning.pad button {
+    -webkit-margin-start: 8px;
     margin-inline-start: 8px;
 }
 .fm-versioning .medium-file-icon {
@@ -1166,6 +1167,7 @@ body.de .mega-dialog.new-group-chat {
     vertical-align: middle;
 }
 .fm-versioning.file-data {
+    -webkit-margin-start: 16px;
     margin-inline-start: 16px;
 }
 .header .fm-versioning.file-data {
@@ -5940,6 +5942,9 @@ body.de .mega-dialog.new-group-chat {
     .mega-dialog.limited-bandwidth-dialog .pricing-page.local-currency-tip:not(.hidden) {
         display: block;
     }
+    .mega-dialog.limited-bandwidth-dialog.pro .pricing-page.local-currency-tip {
+        display: none;
+    }
     .mega-dialog.limited-bandwidth-dialog .dialog-scroll-overlay {
         border: 0;
         position: absolute;
@@ -6296,8 +6301,8 @@ body.de .mega-dialog.new-group-chat {
     }
     .mega-dialog.limited-bandwidth-dialog .pricing-page i {
         position: absolute;
-        right: 18px;
-        top: 13px;
+        right: 10px;
+        top: 10px;
         --icon-size: 16px;
         transition: background-color 200ms ease-in-out;
         --mask-color: var(--text-color-medium);
@@ -6316,9 +6321,6 @@ body.de .mega-dialog.new-group-chat {
     @media only screen and (max-height: 768px) {
         .mega-dialog.limited-bandwidth-dialog .pricing-page.plan-button {
             margin: 12px 0 20px 0;
-        }
-        .mega-dialog.limited-bandwidth-dialog .plans-row .pricing-page.plan-info {
-            padding-bottom: 194px;
         }
         .mega-dialog.limited-bandwidth-dialog .pricing-page.plan-info {
             font-size: 14px;

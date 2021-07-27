@@ -208,6 +208,17 @@ i.medium-icon.business-sprite {
     padding: 4px 0 25px 0;
 }
 
+/* Local currency plan features */
+.local-currency .bottom-page.gradient-block {
+    margin-bottom: 0;
+}
+.business-page .pricing-page.local-currency-tip {
+    margin-bottom: 40px;
+}
+.business-page .pricing-page.euro-price:empty {
+    display: none;
+}
+
 /* Business plan details/pricing */
 .business-plan-caption {
     font: var(--text-h3);
@@ -801,7 +812,7 @@ div.bottom-page.slider-controls {
     background-size: auto 140px;
     background-position: left bottom;
     height: 420px;
-    margin: 60px 0 0;
+    margin: 120px 0 0;
     position: relative;
 }
 .business-charts-wrap {
@@ -814,6 +825,7 @@ div.bottom-page.slider-controls {
     background-color: #ff7169;
     background-image: linear-gradient(180deg, #ff7169 0%, #fd3e38 100%);
     border-radius: 4px 4px 0 0;
+    box-sizing: border-box;
     bottom: 0;
     height: 0;
     left: 24%;
@@ -823,9 +835,13 @@ div.bottom-page.slider-controls {
 }
 .business-compare-charts .chart.google {
     background-color: #ffd200;
-    background-image: linear-gradient(180deg, #ffd200 0%, #ffa500 100%);
+    background-image: linear-gradient(180deg, #ffd200 0%, #ffc100 37%, #ffa500 100%);
     left: auto;
     right: 24%;
+}
+.business-compare-charts .chart.google.not-supported {
+    background: linear-gradient(to bottom, rgba(255, 210, 0, 0.3) 0%, rgba(255, 193, 0, 0.3) 37%, rgba(255, 165, 0, 0.3) 100%);
+    border: 1px dashed #fa6400;
 }
 .dark-direct-tooltip.simpletip-tooltip.business-chart-tip {
     bottom: 100%;
@@ -860,6 +876,11 @@ div.bottom-page.slider-controls {
 }
 .business-compare .business-button {
     margin-top: 96px;
+}
+.business-google-plan-tip {
+    font: var(--text-body1);
+    padding: 32px 0 0;
+    text-align: center;
 }
 
 /* Business support */
@@ -1216,6 +1237,9 @@ div.bottom-page.slider-controls {
     .bottom-page.gradient-block {
         margin: 12px auto 4px;
     }
+    .business-page .pricing-page.local-currency-tip {
+        margin-bottom: 4px;
+    }
     .bottom-page.content-cell {
         display: block;
         width: 100%;
@@ -1448,6 +1472,14 @@ div.bottom-page.slider-controls {
     }
     .business-compare-result {
         margin: 0;
+    }
+}
+
+@media only screen and (max-width: 660px) and (max-height: 780px) {
+  /* Business compare block */
+    .business-compare-charts {
+        background-size: auto 130px;
+        height: 260px;
     }
 }
 

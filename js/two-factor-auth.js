@@ -951,6 +951,7 @@ twofactor.verifyActionDialog = {
 
         // On button click
         $lostDeviceButton.rebind('click', function() {
+            twofactor.verifyActionDialog.closeDialog();
             M.showRecoveryKeyDialog();
         });
     },

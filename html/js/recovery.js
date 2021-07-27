@@ -103,7 +103,7 @@ function AccountRecoveryControl() {
     });
 
     var stepZero = function() {
-        var enteredEmail = self.$emailInput.val();
+        var enteredEmail = self.$emailInput.val().trim();
 
         // Check user skips the email entering
         self.emSkiped = enteredEmail ? false : !self.emSkiped;
@@ -166,7 +166,7 @@ function AccountRecoveryControl() {
                 break;
             }
             case -2: { // Result - Success
-                var email = $('#recover-input1', self.$recoveryContents).val();
+                var email = $('#recover-input1', self.$recoveryContents).val().trim();
                 self.startRecovery(email); // recover
                 break;
             }
@@ -714,7 +714,7 @@ AccountRecoveryControl.prototype.showParkWarning = function _showParkWarning(eas
             return;
         }
 
-        var email = $emailInput.val();
+        var email = $emailInput.val().trim();
 
         closeDialogLocal();
         self.startRecovery(email, true);

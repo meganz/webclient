@@ -136,8 +136,10 @@ var megasync = (function() {
                 'data-client-id': id,
                 'data-link': ns.getMegaSyncUrl(client.name + " " + (is64 ? "64" : "32"))
             };
-            createAndAddToList($list, data, 0, client.name, icon);
-            createAndAddToList($list, data, 1, client.name, icon);
+            if (!$('.option[data-client-id="' + data['data-client-id'] + '"]').length) {
+                createAndAddToList($list, data, 0, client.name, icon);
+                createAndAddToList($list, data, 1, client.name, icon);
+            }
         });
 
         $('.option', $dropdown).rebind('click.selectapp', function() {
@@ -223,9 +225,10 @@ var megasync = (function() {
                 'data-extension-id': id,
                 'data-link': extension.url
             };
-
-            createAndAddToList($list, data, 0, extension.name, icon);
-            createAndAddToList($list, data, 1, extension.name, icon);
+            if (!$('.option[data-extension-id="' + data['data-extension-id'] + '"]').length) {
+                createAndAddToList($list, data, 0, extension.name, icon);
+                createAndAddToList($list, data, 1, extension.name, icon);
+            }
 
             if (id === 0) {
                 preselected = extension;

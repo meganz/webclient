@@ -512,9 +512,9 @@ function dashboardUI() {
                 loadSubPage('fm/links');
             });
 
-            $dataStats.find('.ba-version .ff-occupy').text(bytesToSize(verBytes));
-            // $dataStats.find('.ba-version .file-number').text(verFiles + ' ' + l[2034]);
-            $dataStats.find('.ba-version .file-number').text(verFiles);
+            fileNumText = ffNumText(verFiles, 'file');
+            $('.ba-version .ff-occupy', $dataStats).text(bytesToSize(verBytes));
+            $('.ba-version .file-number', $dataStats).text(fileNumText);
         }
 
         // if this is a business account user (sub or master)

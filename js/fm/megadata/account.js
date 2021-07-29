@@ -166,7 +166,7 @@ MegaData.prototype.accountData = function(cb, blockui, force) {
             account: account,
             callback: function(res, ctx) {
                 let tmUpdate = false;
-                
+
                 if (typeof res === 'object') {
                     if (res.p) {
                         u_attr.p = res.p;
@@ -214,7 +214,7 @@ MegaData.prototype.accountData = function(cb, blockui, force) {
                     M.checkStorageQuota(2);
 
                     // If pro status change is recognised revoke storage quota cache
-                    M.storageQuotaCache = null;        
+                    M.storageQuotaCache = null;
                 }
 
                 if (tmUpdate) {
@@ -515,6 +515,7 @@ MegaData.prototype.showRecoveryKeyDialog = function(version) {
                 }
                 else if (res === 0) {
                     if (!is_mobile) {
+                        fm_showoverlay();
                         $('.mega-dialog.account-reset-confirmation').removeClass('hidden');
                     }
                     else {

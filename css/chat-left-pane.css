@@ -985,7 +985,15 @@ li.active .call-duration i {
 }
 .contacts-table.requests-table th,
 .contacts-table.requests-table td {
-    width: calc(33% - 2px);
+    width: calc(20% - 2px);
+}
+.contacts-table.requests-table th:first-child,
+.contacts-table.requests-table td:first-child {
+    width: calc(30% - 2px);
+}
+.contacts-table.requests-table th:last-child,
+.contacts-table.requests-table td:last-child {
+    width: calc(50% - 2px);
 }
 
 .contacts-table.contact-requests th,

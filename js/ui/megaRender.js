@@ -1484,8 +1484,8 @@
                         var megaListContainer;
 
                         if (this.viewmode) {
-                            megaListOptions.itemWidth = 192 + 4 + 4 + 12 /* 12 = margin-left */;
-                            megaListOptions.itemHeight = 192 + 4 + 4 + 12 /* 12 = margin-top */;
+                            megaListOptions.itemWidth = 192 + 4 + 4 + 16 /* 16 = margin-left */;
+                            megaListOptions.itemHeight = 192 + 4 + 4 + 16 /* 16 = margin-top */;
                             megaListContainer = this.container;
                         }
                         else {

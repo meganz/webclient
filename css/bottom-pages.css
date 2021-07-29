@@ -3900,7 +3900,7 @@ body:not(.mobile) .securitypractice .business-text a.red:hover {
 }
 .opensource-bg::after {
     background-color: white;
-    width: 1024px;
+    width: inherit;
     height: inherit;
     margin: 0 auto;
     content: '';

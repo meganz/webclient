@@ -569,6 +569,7 @@ window.ImageExplorer = (function(){
                     top: imageOffset.top + ui.position.top - ui.originalPosition.top,
                     left: imageOffset.left + ui.position.left - ui.originalPosition.left
                 });
+                this.$mask.css('width', this.$dragDelegate.css('width'));
             }, this)
         });
     };

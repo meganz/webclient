@@ -624,6 +624,16 @@ var Help = (function() {
                 }
             };
 
+            window.redirectToSupport = window.redirectToSupport || function() {
+                'use strict';
+                var newpage = 'support';
+                if (!u_type) {
+                    login_next = newpage;
+                    newpage = 'login';
+                }
+                loadSubPage(newpage);
+            };
+
             $('.support-email-icon').rebind('click', function() {
                 var parts = $(this).parents('.support-article').data('update');
                 if (parts) {
@@ -632,12 +642,7 @@ var Help = (function() {
                         delete window.helpOrigin;
                         return;
                     }
-                    var newpage = 'support';
-                    if (!u_type) {
-                        login_next = newpage;
-                        newpage = 'login';
-                    }
-                    loadSubPage(newpage);
+                    redirectToSupport(window.helpOrigin);
                 }
             });
 

@@ -707,4 +707,23 @@ BusinessAccount.prototype.getBusinessPlanInfo = function(forceUpdate) {
 
     return operationPromise;
 
-}
+};
+
+window.redirectToSupport = (url) => {
+    'use strict';
+    const kvLogin = [['next', 'support'], ['articleUrl', url.replace('mega.io', 'mega.nz')]];
+    const uLang = sessionStorage.lang || localStorage.lang;
+    if (uLang) {
+        kvLogin.push(['lang', uLang, '1']);
+    }
+    const $dlg = $('.loginrequired-dialog', '.common-container');
+    $('header h3', $dlg).text(l[5841]);
+    $('header p', $dlg).text(l.help2_login_text);
+    $('.js-close', $dlg).rebind('click.help2', () => {
+        $('.pro-register', $dlg).removeClass('hidden');
+        closeDialog();
+    });
+    $('.pro-login', $dlg).rebind('click.help2', mega.redirect.bind(mega, 'mega.nz', 'login', kvLogin, null));
+    $('.pro-register', $dlg).addClass('hidden');
+    M.safeShowDialog('loginrequired', $dlg);
+};

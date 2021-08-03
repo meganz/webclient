@@ -3326,7 +3326,7 @@ FileManager.prototype.addGridUI = function(refresh) {
         var dir = 1;
 
         // Excludes colour sorting dialog for contacts
-        if (cls.indexOf('name') !== -1 && $(this).parents('.files-grid-view.contacts-view').length === 0) {
+        if (cls.includes('name') && $(this).parents('.files-grid-view.contacts-view').length === 0 && !pfid) {
             return M.labelSortMenuUI(e);
         }
         else {

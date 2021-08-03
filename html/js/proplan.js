@@ -182,12 +182,24 @@ pro.proplan = {
                 $('span', $planTag).attr('class', 'pro' + $this.data('payment'))
                     .safeHTML($this.data('tag'));
 
-                // Reposition the Tag
-                $planTag.css('width', $this.outerWidth()).addClass('visible').position({
-                    of: $this,
-                    my: 'center bottom',
-                    at: 'center top-10'
-                });
+                // pointer + tag has height of 40, when spacing between planblock and top of browser is < 40, causes bug
+                if ($planBlock[0].getBoundingClientRect().top < 40) {
+                    $planTag.css('width', $this.outerWidth()).addClass('visible').position({
+                        of: $this,
+                        my: 'center top',
+                        at: 'center bottom-40'
+                    });
+                    $planTag.addClass('noafter');
+                }
+                else {
+                    // Reposition the Tag
+                    $planTag.css('width', $this.outerWidth()).addClass('visible').position({
+                        of: $this,
+                        my: 'center bottom',
+                        at: 'center top-10'
+                    });
+                    $planTag.removeClass('noafter');
+                }
 
                 // Hide tag for mobile
                 $(window).rebind('resize.hideprotag', function() {

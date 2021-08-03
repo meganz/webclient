@@ -775,6 +775,9 @@ body:not(.mobile) .plan.pro3:not(.current) .pricing-page.plan-button:hover {
     -webkit-transform: rotate(-45deg);
     background-color: white;
 }
+.plan-tag-description.noafter::after {
+    display: none;
+}
 .plan-tag-description:before {
     content: '';
     display: block;

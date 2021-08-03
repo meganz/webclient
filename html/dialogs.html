@@ -20,8 +20,8 @@
     <div class="create-folder-size-icon full-size hidden"></div>
     <div class="fm-dialog-body">
         <div class="create-folder-input-bl">
-            <i class="sprite-fm-uni icon-folder-24"></i>
             <input type="text" value="" placeholder="[$157]" autofocus />
+            <i class="sprite-fm-mono icon-folder-filled"></i>
         </div>
         <div class="duplicated-input-warning">
             <div class="arrow"></div>
@@ -1497,6 +1497,7 @@
                     <div class="search-bar summary-input placeholder">
                         <i class="sprite-fm-mono icon-preview-reveal"></i>
                         <input type="text" placeholder="[$102]">
+                        <i class="sprite-fm-mono icon-close-component search-icon-reset hidden"></i>
                     </div>
                 </div>
                 <!-- END Templates -->
@@ -3157,7 +3158,7 @@
                     <div class="clear"></div>
                 </div>
 
-                <div id="address-dialog-countries" class="countries mega-input dropdown-input box-style" tabindex="1">
+                <div id="address-dialog-countries" class="countries mega-input dropdown-input underlinedText" tabindex="1">
                     <span>[$481]</span>
                     <i class="sprite-fm-mono icon-dropdown"></i>
                      <div class="mega-input-dropdown hidden">
@@ -3167,32 +3168,17 @@
             </div>
             <div class="content-block address-block">
                 <div class="payment-half-block first">
-                    <div class="mega-input box-style">
-                        <input class="first-name" type="text" value="" placeholder="[$1096]" tabindex="2">
-                    </div>
-                    <div class="mega-input box-style">
-                        <input class="address1" type="text" value="" placeholder="[$561] 1" tabindex="4">
-                    </div>
-                    <div class="mega-input box-style">
-                        <input class="city" type="text" value="" placeholder="[$565]" tabindex="6">
-                    </div>
-                    <div class="mega-input box-style code">
-                        <input class="postcode" type="text" value="" placeholder="[$10659]" tabindex="8">
-                    </div>
-                    <div class="mega-input box-style vat-tax">
-                        <input class="taxcode" type="text" value="" placeholder="[$7347]" tabindex="9">
-                    </div>
+                        <input class="first-name underlinedText" type="text" value="" placeholder="[$1096]" tabindex="2">
+                        <input class="address1 underlinedText" type="text" value="" placeholder="[$561] 1" tabindex="4">
+                        <input class="city underlinedText" type="text" value="" placeholder="[$565]" tabindex="6">
+                        <input class="postcode underlinedText" type="text" value="" placeholder="[$10659]" tabindex="8">
+
                     <div class="clear"></div>
                 </div>
-
                 <div class="payment-half-block second">
-                    <div class="mega-input box-style">
-                        <input class="last-name" type="text" value="" placeholder="[$1097]" tabindex="3">
-                    </div>
-                    <div class="mega-input box-style">
-                        <input class="address2" type="text" value="" placeholder="[$561] 2 ([$2028])" tabindex="5">
-                    </div>
-                    <div id="address-dialog-states" class="states mega-input dropdown-input box-style" tabindex="-1" disabled>
+                        <input class="last-name underlinedText" type="text" value="" placeholder="[$1097]" tabindex="3">
+                        <input class="address2 underlinedText" type="text" value="" placeholder="[$561] 2 ([$2028])" tabindex="5">
+                    <div id="address-dialog-states" class="states mega-input dropdown-input underlinedText" tabindex="-1" disabled>
                          <span>[$7192]</span>
                         <i class="sprite-fm-mono icon-dropdown"></i>
                          <div class="mega-input-dropdown hidden">
@@ -3201,13 +3187,15 @@
                             </div>
                         </div>
                     </div>
-                    <div class="remember-billing-info-wrapper">
-                        <div class="checkbox checkboxOn">
-                            <input id="address-dialog-save-billing-info" class="checkboxOn remember-billing-info" type="checkbox">
-                        </div>
-                        <label for="address-dialog-save-billing-info" class="radio-txt">[$20237]</label>
-                    </div>
+                    <input class="taxcode underlinedText" type="text" value="" placeholder="[$7347]" tabindex="9">
                 </div>
+            </div>
+            <div class="error-message hidden">[$10633]</div>
+            <div class="remember-billing-info-wrapper">
+                <div class="checkbox checkboxOn">
+                    <input id="address-dialog-save-billing-info" class="checkboxOn remember-billing-info" type="checkbox">
+                </div>
+                <label for="address-dialog-save-billing-info" class="radio-txt">[$20237]</label>
             </div>
         </section>
 
@@ -3216,7 +3204,6 @@
                 <button class="mega-button positive large payment-buy-now">
                     <span>[$6190]</span>
                 </button>
-                <div class="error-message hidden">[$10633]</div>
             </div>
 
             <aside>

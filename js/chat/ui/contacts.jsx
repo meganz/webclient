@@ -838,6 +838,7 @@ export class ContactItem extends ContactAwareComponent {
 }
 
 export class ContactPickerWidget extends MegaRenderMixin {
+    contactLinkListener = null;
     static defaultProps = {
         multipleSelectedButtonLabel: false,
         singleSelectedButtonLabel: false,
@@ -854,8 +855,9 @@ export class ContactPickerWidget extends MegaRenderMixin {
     constructor(props) {
         super(props);
         this.state = {
-            'searchValue': '',
-            'selected': this.props.selected || false,
+            searchValue: '',
+            selected: this.props.selected || false,
+            publicLink: undefined
         };
     }
     onSearchChange = ev => {
@@ -864,6 +866,9 @@ export class ContactPickerWidget extends MegaRenderMixin {
     componentDidMount() {
         super.componentDidMount();
         setContactLink();
+        this.contactLinkListener = mBroadcaster.addListener('contact:setContactLink', publicLink =>
+            this.state.publicLink ? null : this.setState({ publicLink })
+        );
     }
     componentDidUpdate() {
 
@@ -873,8 +878,6 @@ export class ContactPickerWidget extends MegaRenderMixin {
             self.scrollToLastSelected = false;
             self.psSelected.scrollToPercentX(100, false);
         }
-
-        setContactLink();
     }
     componentWillMount() {
         if (super.componentWillMount) {
@@ -918,6 +921,10 @@ export class ContactPickerWidget extends MegaRenderMixin {
 
         if (self.props.multiple) {
             $(document.body).off('keypress.contactPicker' + self.getUniqueId());
+        }
+
+        if (this.contactLinkListener) {
+            mBroadcaster.removeListener('contact:setContactLink');
         }
     }
     _eventuallyAddContact(v, contacts, selectableContacts, forced) {
@@ -1376,9 +1383,13 @@ export class ContactPickerWidget extends MegaRenderMixin {
                 }}>
                     <span>{l[101]}</span>
                 </button>
-                <div className="empty-share-public">
-                    <i className="sprite-fm-mono icon-link-circle"></i>
-                    <span dangerouslySetInnerHTML={{__html: l[19111]}}></span>
+                <div
+                    className={`
+                        ${this.state.publicLink ? '' : 'loading'}
+                        empty-share-public
+                    `}>
+                    <i className="sprite-fm-mono icon-link-circle" />
+                    <span dangerouslySetInnerHTML={{ __html: l[19111] }} />
                 </div>
             </div>;
 

@@ -46,6 +46,10 @@ function initMegacmd() {
         var $tab = $(this);
         var osData = $tab.attr('data-os');
 
+        if (!$tab.attr('class')) {
+            return false;
+        }
+
         // Hide windows options as default
         $('.megaapp-windows', $content).addClass('hidden');
 

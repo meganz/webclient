@@ -601,6 +601,7 @@ function setContactLink($container) {
                     contactPrefix =  res.match('^C!') ? '' : 'C!';
                     res = 'https://mega.nz/' + contactPrefix + res;
                     $publicLink.attr('data-lnk', res);
+                    mBroadcaster.sendMessage('contact:setContactLink', res);
                 }
             }
         });
@@ -1623,6 +1624,47 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
                 $.warningCallback = null;
             }
         });
+    }
+    else if (type === 'save_discard_cancel') {
+        $('footer .footer-container', $dialog)
+            .safeHTML(
+                `<div class="space-between">
+                    <button class="mega-button cancel">
+                        <span>@@</span>
+                    </button>
+                    <button class="mega-button discard">
+                        <span>@@</span>
+                    </button>
+                    <button class="mega-button positive confirm">
+                        <span>@@</span>
+                    </button>
+                </div>`,
+                l.msg_dlg_cancel, l.msg_dlg_discard, l.msg_dlg_save);
+
+        $('.mega-button.confirm', $dialog).rebind('click.msgdlg', () => {
+            closeMsg();
+            if ($.warningCallback) {
+                $.warningCallback(1);
+                $.warningCallback = null;
+            }
+        });
+        $('.mega-button.cancel', $dialog).rebind('click.msgdlg', () => {
+            closeMsg();
+            if ($.warningCallback) {
+                $.warningCallback(0);
+                $.warningCallback = null;
+            }
+        });
+        $('.mega-button.discard', $dialog).rebind('click.msgdlg', () => {
+            closeMsg();
+            if ($.warningCallback) {
+                $.warningCallback(-1);
+                $.warningCallback = null;
+            }
+        });
+        $dialog.addClass('confirmation');
+
+        $('aside', $dialog).addClass('hidden');
     }
 
     $('#msgDialog header p.subtitle').text(title);

@@ -291,7 +291,7 @@ function init_reset_pw() {
         }
     };
 
-    $passwords.add($confirms).rebind('keyup.initresetpw, input.initresetpw', function(e) {
+    $passwords.add($confirms).rebind('keyup.initresetpw input.initresetpw', function(e) {
         var valid = _checkInput($(this));
         if (e.keyCode === 13 && valid) {
             var $button = $('.restore-verify-button', $(this).parents('.content-wrapper'));

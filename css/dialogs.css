@@ -718,13 +718,31 @@ body.de .mega-dialog.new-group-chat {
     height: 36px;
     box-sizing: border-box;
     font: var(--text-body1);
-    color: var(--text-color-medium);
+    color: var(--text-color-high);
     padding: 0 8px 0 40px;
     margin: 0;
     background-repeat: no-repeat;
     background-color: transparent;
     border: 0;
     transition: color 200ms ease-in-out;
+}
+.create-folder-input-bl input {
+    float: right;
+}
+.duplicate .create-folder-input-bl {
+    border: 1px solid var(--input-text-underline-error);
+}
+.create-folder-input-bl:hover:not(.duplicate .create-folder-input-bl),
+.create-folder-input-bl:focus-within {
+    border: 1px solid var(--secondary-blue);
+}
+.create-folder-input-bl i {
+    --icon-size: 24px;
+    float: left;
+    --mask-color: var(--icon-inactive);
+}
+.create-folder-input-bl input:focus + i {
+    --mask-color: var(--icon-rest);
 }
 
 /* just to replace padding property from the above class */
@@ -2538,7 +2556,7 @@ body.de .mega-dialog.new-group-chat {
     }
     .mega-dialog.fm-picker-dialog .summary-input .summary-ff-name {
         height: 32px;
-        max-width: 340px;
+        max-width: 280px;
         line-height: 32px;
         -webkit-margin-start: 36px;
         margin-inline-start: 36px;
@@ -2620,7 +2638,8 @@ body.de .mega-dialog.new-group-chat {
         text-overflow: ellipsis;
     }
     .mega-dialog.fm-picker-dialog .summary-input .item-row:first-child .summary-ff-name {
-        max-width: 250px;
+        max-width: 210px;
+        text-overflow: ellipsis;
     }
     .mega-dialog.fm-picker-dialog .summary-input .item-row .delete-item {
         position: absolute;
@@ -2787,8 +2806,6 @@ body.de .mega-dialog.new-group-chat {
         border-radius: 16px;
         height: 32px;
         padding: 0 8px;
-        -webkit-padding-end: 32px;
-        padding-inline-end: 32px;
         overflow: hidden;
         box-sizing: border-box;
     }
@@ -2802,7 +2819,7 @@ body.de .mega-dialog.new-group-chat {
         padding: 0;
         margin: 0;
         width: 100%;
-        color: var(--text-color-medium);
+        color: var(--text-color-high);
         font: var(--text-body1);
         line-height: 32px;
     }
@@ -3156,6 +3173,12 @@ body.de .mega-dialog.new-group-chat {
         -webkit-margin-end: 8px;
         margin-inline-end: 8px;
     }
+    .mega-dialog.fm-picker-dialog .search-bar.placeholder .search-icon-reset {
+        -webkit-margin-end: 0;
+        margin-inline-end: 0;
+        cursor: pointer;
+        --mask-color: var(--icon-rest);
+    }
     .mega-dialog.fm-picker-dialog .summary-input.focus {
         border: 1px solid var(--stroke-grey-2);
         color: var(--text-color-low);
@@ -3212,7 +3235,7 @@ body.de .mega-dialog.new-group-chat {
         margin-inline-start: 8px;
     }
     .mega-dialog.fm-picker-dialog .summary-input.unfold .item-row:first-child .summary-ff-name {
-        max-width: 340px;
+        max-width: 280px;
     }
     .mega-dialog.fm-picker-dialog .summary-input.unfold .item-row:hover .delete-item {
         display: inline-block;
@@ -3307,17 +3330,8 @@ body.de .mega-dialog.new-group-chat {
     .mega-dialog.fm-picker-dialog .side-pane .fm-picker-dialog-button.active i  {
         opacity: 1;
     }
-    .mega-dialog.fm-picker-dialog .fm-picker-dialog-button.cloud-drive.active .left-border {
-        background: var(--stroke-error);
-    }
-    .mega-dialog.fm-picker-dialog .fm-picker-dialog-button.shared-with-me.active .left-border {
-        background: var(--stroke-warning);
-    }
-    .mega-dialog.fm-picker-dialog .fm-picker-dialog-button.conversations.active .left-border {
+    .mega-dialog.fm-picker-dialog .fm-picker-dialog-button.active .left-border {
         background: var(--stroke-info);
-    }
-    .mega-dialog.fm-picker-dialog .fm-picker-dialog-button.rubbish-bin.active .left-border {
-        background: var(--stroke-success);
     }
     .mega-dialog.fm-picker-dialog .fm-picker-dialog-tree-panel {
         display: none;
@@ -3529,7 +3543,7 @@ body.de .mega-dialog.new-group-chat {
         margin-top: -128px;
     }
     .mega-dialog.avatar-dialog .image-explorer-container .image-explorer-image-view .image-explorer-mask.circle-mask {
-        width: 260px;
+        width: 256px;
         height: 260px;
         border-radius: 100%;
         background-clip: padding-box;
@@ -4264,6 +4278,9 @@ body.de .mega-dialog.new-group-chat {
     .mega-dialog.payment-address-dialog-body {
         padding: 30px 30px 10px;
     }
+    .mega-dialog .content-block.payment-address-dialog-body {
+        padding-bottom: 16px;
+    }
     .mega-dialog.payment-address-dialog .plan-icon {
         display: inline-block;
         vertical-align: middle;
@@ -4342,6 +4359,7 @@ body.de .mega-dialog.new-group-chat {
     }
     .mega-dialog.payment-address-dialog .remember-billing-info-wrapper {
         margin-top: 20px;
+        padding-left: 48px;
     }
     .mega-dialog.payment-address-dialog .fm-account-input {
         border-radius: 4px;
@@ -4429,7 +4447,7 @@ body.de .mega-dialog.new-group-chat {
         background: var(--banner-background-error);
         border-radius: 4px;
         padding: 2px 16px;
-        margin-top: 12px;
+        margin: 12px 48px 0 48px;
         text-align: center;
     }
     .mega-dialog.payment-address-dialog .error-message.hidden {
@@ -4462,6 +4480,9 @@ body.de .mega-dialog.new-group-chat {
     .mega-dialog.payment-address-dialog .states.disabled {
         cursor: default;
         opacity: 0.5;
+    }
+    .mega-dialog.payment-address-dialog .states {
+        margin-bottom: 20px;
     }
 
 /* end payment-address-dialog */

@@ -296,6 +296,9 @@ function getCleanSitePath(path) {
             if (path.plan) {
                 window.pickedPlan = path.plan;
             }
+            else if (path.articleUrl) {
+                window.helpOrigin = b64decode(path.articleUrl);
+            }
         }
         if (path.lang && path.lang.length < 6) {
             localStorage.lang = path.lang;

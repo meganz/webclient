@@ -2229,6 +2229,7 @@ ContactItem.defaultProps = {
 class ContactPickerWidget extends _stores_mixins_js2__["MegaRenderMixin"] {
   constructor(props) {
     super(props);
+    this.contactLinkListener = null;
 
     this.onSearchChange = ev => {
       this.setState({
@@ -2237,14 +2238,18 @@ class ContactPickerWidget extends _stores_mixins_js2__["MegaRenderMixin"] {
     };
 
     this.state = {
-      'searchValue': '',
-      'selected': this.props.selected || false
+      searchValue: '',
+      selected: this.props.selected || false,
+      publicLink: undefined
     };
   }
 
   componentDidMount() {
     super.componentDidMount();
     setContactLink();
+    this.contactLinkListener = mBroadcaster.addListener('contact:setContactLink', publicLink => this.state.publicLink ? null : this.setState({
+      publicLink
+    }));
   }
 
   componentDidUpdate() {
@@ -2254,8 +2259,6 @@ class ContactPickerWidget extends _stores_mixins_js2__["MegaRenderMixin"] {
       self.scrollToLastSelected = false;
       self.psSelected.scrollToPercentX(100, false);
     }
-
-    setContactLink();
   }
 
   componentWillMount() {
@@ -2299,6 +2302,10 @@ class ContactPickerWidget extends _stores_mixins_js2__["MegaRenderMixin"] {
 
     if (self.props.multiple) {
       $(document.body).off('keypress.contactPicker' + self.getUniqueId());
+    }
+
+    if (this.contactLinkListener) {
+      mBroadcaster.removeListener('contact:setContactLink');
     }
   }
 
@@ -2735,7 +2742,7 @@ class ContactPickerWidget extends _stores_mixins_js2__["MegaRenderMixin"] {
           contactAddDialog();
         }
       }, react1.a.createElement("span", null, l[101])), react1.a.createElement("div", {
-        className: "empty-share-public"
+        className: "\n                        " + (this.state.publicLink ? '' : 'loading') + "\n                        empty-share-public\n                    "
       }, react1.a.createElement("i", {
         className: "sprite-fm-mono icon-link-circle"
       }), react1.a.createElement("span", {
@@ -22048,7 +22055,7 @@ let conversations_ConversationsApp = (conversations_dec3 = utils["default"].Soon
       contactsActive: megaChat.routingSection === "contacts",
       onSelectDone: this.startChatClicked.bind(this),
       showTopButtons: self.getContactsPickerButtons(),
-      showAddContact: true
+      showAddContact: M.u && M.u.length > 1
     }), conversations_React.createElement(searchPanel_SearchPanel, null), conversations_React.createElement(conversations_PerfectScrollbar, {
       className: "chat-lp-scroll-area",
       chats: megaChat.chats,

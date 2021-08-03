@@ -1924,7 +1924,6 @@ FileManager.prototype.createFolderUI = function() {
         if (errorMsg !== '') {
             $('.duplicated-input-warning span', $inputWrapper).text(errorMsg);
             $inputWrapper.addClass('duplicate');
-            $input.addClass('error');
 
             setTimeout(function () {
                 $inputWrapper.removeClass('duplicate');
@@ -2035,11 +2034,13 @@ FileManager.prototype.createFolderUI = function() {
         if ($(this).val() === l[157]) {
             $(this).val('');
         }
+        $(this).removeAttr('placeholder');
         $('.create-new-folder').addClass('focused');
     });
 
     $('.create-new-folder input').rebind('blur.create-new-f', function() {
         $('.create-new-folder').removeClass('focused');
+        $(this).attr('placeholder', l[157]);
     });
 
     $('.fm-new-shared-folder').rebind('click', function() {
@@ -3326,7 +3327,7 @@ FileManager.prototype.addGridUI = function(refresh) {
         var dir = 1;
 
         // Excludes colour sorting dialog for contacts
-        if (cls.indexOf('name') !== -1 && $(this).parents('.files-grid-view.contacts-view').length === 0) {
+        if (cls.includes('name') && $(this).parents('.files-grid-view.contacts-view').length === 0 && !pfid) {
             return M.labelSortMenuUI(e);
         }
         else {

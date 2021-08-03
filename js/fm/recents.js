@@ -588,6 +588,61 @@ RecentsRender.prototype._renderFiles = function($newRow, action, actionId) {
             return false;
         });
 
+    var expandedIds = [];
+
+    // Use a render function to delay the rendering of a child node till it is in view.
+    var generateRenderFunction = function(i, id) {
+        return function() {
+            if (!self._renderCache[id]) {
+                var nodeAction = action.createEmptyClone();
+                var node = action[i];
+                nodeAction.ts = node.ts;
+                nodeAction.push(node);
+                var $newChildAction = self.generateRow(nodeAction);
+                $newChildAction.addClass(`action-${actionId}-child`);
+                $newChildAction.addClass(i === action.length - 1 ? 'last-child' : 'child-note');
+                self._renderCache[id] = $newChildAction[0];
+            }
+            return self._renderCache[id];
+        };
+    };
+
+    var expandCollapseHelper = function() {
+        self.markSelected();
+        $.hideContextMenu();
+        if ($newRow.hasClass('expanded')) {
+            self._expandedStates[actionId] = false;
+            $newRow.removeClass('expanded').addClass("collapsed");
+            self._dynamicList.remove(expandedIds, false);
+            self._dynamicList.itemRenderChanged(actionId);
+            delete self._actionChildren[actionId];
+            expandedIds = [];
+        }
+        else {
+            // Render new action views.
+            self._expandedStates[actionId] = true;
+            $newRow.removeClass("collapsed").addClass("expanded");
+            expandedIds = [];
+            for (var i = 1; i < action.length; i++) {
+                var id = `${actionId}:${i}`;
+                self._nodeRenderedItemIdMap[action[i].h] = id;
+                self._renderFunctions[id] = generateRenderFunction(i, id);
+                self._childIds[id] = true;
+                expandedIds.push(id);
+            }
+            self._dynamicList.insert(actionId, expandedIds, false);
+            self._dynamicList.itemRenderChanged(actionId);
+            self._actionChildren[actionId] = expandedIds;
+        }
+    };
+    var clickFunction = (e) => {
+        if ((e.detail === 2 || $newRow.hasClass('ui-selected'))
+            && ($newRow.hasClass('expanded') || $newRow.hasClass('collapsed'))) {
+            expandCollapseHelper();
+        }
+        return self._handleSelectionClick(e, action[0].h, $newRow);
+    };
+
     // If more than 1 file in action.
     if (isMore) {
         action.createEmptyClone = function() {
@@ -607,62 +662,18 @@ RecentsRender.prototype._renderFiles = function($newRow, action, actionId) {
             return clone;
         };
 
-        var expandedIds = [];
-
-        // Use a render function to delay the rendering of a child node till it is in view.
-        var generateRenderFunction = function (i, id) {
-            return function () {
-                if (!self._renderCache[id]) {
-                    var nodeAction = action.createEmptyClone();
-                    var node = action[i];
-                    nodeAction.ts = node.ts;
-                    nodeAction.push(node);
-                    var $newChildAction = self.generateRow(nodeAction);
-                    $newChildAction.addClass("action-" + actionId + "-child");
-                    $newChildAction.addClass(i === action.length - 1 ? 'last-child' : 'child-note');
-                    self._renderCache[id] = $newChildAction[0];
-                }
-                return self._renderCache[id];
-            };
-        };
-
-        var expandCollapseHelper = function() {
-            self.markSelected();
-            $.hideContextMenu();
-            if ($newRow.hasClass('expanded')) {
-                self._expandedStates[actionId] = false;
-                $newRow.removeClass('expanded').addClass("collapsed");
-                self._dynamicList.remove(expandedIds, false);
-                self._dynamicList.itemRenderChanged(actionId);
-                delete self._actionChildren[actionId];
-                expandedIds = [];
-            } else {
-                // Render new action views.
-                self._expandedStates[actionId] = true;
-                $newRow.removeClass("collapsed").addClass("expanded");
-                expandedIds = [];
-                for (var i = 1; i < action.length; i++) {
-                    var id = actionId + ":" + i;
-                    self._nodeRenderedItemIdMap[action[i].h] = id;
-                    self._renderFunctions[id] = generateRenderFunction(i, id);
-                    self._childIds[id] = true;
-                    expandedIds.push(id);
-                }
-                self._dynamicList.insert(actionId, expandedIds, false);
-                self._dynamicList.itemRenderChanged(actionId);
-                self._actionChildren[actionId] = expandedIds;
-            }
-        };
-
-        $('.expand-collapse-toggle, .more-less-toggle', $newRow).rebind('click', function() {
+        $('.expand-collapse-toggle, .more-less-toggle', $newRow)
+            .rebind('click.recents', () => {
                 expandCollapseHelper();
                 return false;
-            })
-            .rebind("dblclick", function() {
-            return false;
-        });
+            });
+
+        $newRow.rebind('click.recents', clickFunction);
 
         $newRow.removeClass("single").addClass("group collapsed");
+    }
+    else {
+        $newRow.rebind('click.recents', clickFunction);
     }
 
     $newRow
@@ -673,9 +684,6 @@ RecentsRender.prototype._renderFiles = function($newRow, action, actionId) {
                 self.markSelected($newRow);
             }
             return M.contextMenuUI(e, 1) ? true : false;
-        })
-        .rebind('click', function(e) {
-            return self._handleSelectionClick(e, action[0].h, $newRow);
         });
 
     var $contextMenuButton = $newRow.find(".context-menu-button");
@@ -824,8 +832,8 @@ RecentsRender.prototype._renderMedia = function($newRow, action, actionId) {
         if ($previewsScroll.hasClass('expanded')) {
             self._expandedStates[actionId] = false;
             $previewsScroll.removeClass('expanded');
-            $toggleExpandedButtonText.text(l[19797]);
-            $toggleExpandedButtonIcon.removeClass("bold-crossed-eye").addClass("bold-eye");
+            $toggleExpandedButtonText.text(l.x_more_files.replace('%1', action.length - maxFitOnScreen));
+            $toggleExpandedButtonIcon.removeClass('icon-arrow-up').addClass('icon-arrow-down');
             // Mark thumbs that are no longer viewable as hidden.
             for (var i = maxFitOnScreen; i < renderedIndex; i++) {
                 if (renderedThumbs[i]) {
@@ -838,7 +846,7 @@ RecentsRender.prototype._renderMedia = function($newRow, action, actionId) {
                 self._expandedStates[actionId] = true;
                 $previewsScroll.addClass('expanded');
                 $toggleExpandedButtonText.text(l[19963]);
-                $toggleExpandedButtonIcon.removeClass("bold-eye").addClass("bold-crossed-eye");
+                $toggleExpandedButtonIcon.removeClass('icon-arrow-down').addClass('icon-arrow-up');
                 $('.data-block-view', $previewsScroll).removeClass('hidden');
                 // Inject the rest of the images that were not loaded initially.
                 for (;renderedIndex < action.length; renderedIndex++) {
@@ -851,6 +859,7 @@ RecentsRender.prototype._renderMedia = function($newRow, action, actionId) {
         return false;
     };
 
+    $toggleExpandedButtonText.text(l.x_more_files.replace('%1', action.length - maxFitOnScreen));
     $toggleExpandedButton.rebind('click', function() {
         toggleOpenState();
         return false;
@@ -938,10 +947,25 @@ RecentsRender.prototype._renderMedia = function($newRow, action, actionId) {
         return false;
     });
 
+    $newRow.rebind('click.recents', (e) => {
+        if (e.detail === 2 || e.detail === 1 && $newRow.hasClass('ui-selected')) {
+            if ($newRow.hasClass('expanded')) {
+                $newRow.removeClass('expanded').addClass('collapsed');
+            }
+            else {
+                $newRow.removeClass('collapsed').addClass('expanded');
+            }
+        }
+        return self._handleSelectionClick(e, '', $newRow);
+    }).rebind('dblclick.recents', () => {
+        return false;
+    });
+
     const triggerContextMenu = (ev) => {
         self.markSelected($newRow);
         const sm = selectionManager;
         sm.clear_selection();
+        self._handleSelectionClick(ev, '', $newRow);
         sm.selected_list = action.map(n => n.h);
         sm.add_to_selection(sm.selected_list.pop(), false, true);
         $.hideTopMenu();
@@ -1087,8 +1111,8 @@ RecentsRender.prototype._handleSelectionClick = function(e, handle, $element) {
         selectionManager.add_to_selection(handle);
     }
     else {
-        this.markSelected.apply(this, $element);
         selectionManager.clear_selection();
+        this.markSelected($element);
         selectionManager.add_to_selection(handle);
     }
     return false;

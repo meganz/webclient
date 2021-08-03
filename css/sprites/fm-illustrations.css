@@ -12,7 +12,7 @@
     width: 200px;
     height: 200px;
 
-    --num-of-illustration: 41;
+    --num-of-illustration: 42;
 }
 .sprite-fm-illustration.img-topbar-email-registration,
 .sprite-fm-illustration.img-topbar-email-registration-before::before,
@@ -218,6 +218,11 @@
 .sprite-fm-illustration.img-password-recovery-device3-before::before,
 .sprite-fm-illustration.img-password-recovery-device3-after::after {
     background-position: calc(4000% / (var(--num-of-illustration) - 1)) 0;
+}
+.sprite-fm-illustration.img-file-link-lightbulb,
+.sprite-fm-illustration.img-file-link-lightbulb-before::before,
+.sprite-fm-illustration.img-file-link-lightbulb-after::after {
+    background-position: calc(4100% / (var(--num-of-illustration) - 1)) 0;
 }
 
 /* Wide illustrations */

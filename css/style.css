@@ -1158,7 +1158,7 @@ a.nt-settings-button:hover span {
     top: 0;
     right: 0;
     width: 8px;
-    margin: 0 3px;
+    margin: 0 4px;
     height: 100%;
 }
 .rtl .jspVerticalBar {
@@ -5608,6 +5608,12 @@ tr:not(.taken-down) .grid-status-icon:not(.read-only):not(.read-and-write) {
     padding: 18px 0 0 0;
     font: var(--text-body1);
     color: var(--text-color-low);
+}
+.empty-share-public.loading {
+    opacity: 0.3;
+}
+.empty-share-public.loading a {
+    cursor: default;
 }
 .empty-share-public a {
     text-decoration: underline;

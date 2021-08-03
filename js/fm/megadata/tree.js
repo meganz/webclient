@@ -1130,7 +1130,7 @@ MegaData.prototype.addTreeUI = function() {
         }
     });
 
-    $treeItem.rebind('click.treeUI, contextmenu.treeUI', function(e) {
+    $treeItem.rebind('click.treeUI contextmenu.treeUI', function(e) {
 
         var $this = $(this);
         var id = $this.attr('id').replace('treea_', '');

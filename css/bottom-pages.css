@@ -1563,7 +1563,6 @@ iframe.security-video-container {
     background: -webkit-linear-gradient(top, #ffffff 31%, #ebebeb 100%);
     background: linear-gradient(to bottom, #ffffff 31%, #ebebeb 100%);
     margin-bottom: 50px;
-    font-size: 0;
 }
 .mobile .bottom-page.nav-buttons-bl, .mobile .bottom-page.top-dark-info.small {
     display: none;
@@ -2856,14 +2855,10 @@ body:not(.mobile) .bottom-page.top-dark-button:hover {
     display: none;
 }
 .bottom-page .megaapp-windows {
-    width: 398px;
     position: relative;
-    margin: -30px auto 50px;
+    margin-top: 20px;
     text-align: center;
     white-space: nowrap;
-}
-.megacmd .bottom-page .megaapp-windows {
-    top: -147px;
 }
 .bottom-page .megaapp-linux {
     box-sizing: border-box;
@@ -3905,7 +3900,7 @@ body:not(.mobile) .securitypractice .business-text a.red:hover {
 }
 .opensource-bg::after {
     background-color: white;
-    width: 1024px;
+    width: inherit;
     height: inherit;
     margin: 0 auto;
     content: '';

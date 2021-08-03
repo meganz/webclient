@@ -60,7 +60,7 @@ function translate(html) {
         // if the type is an object (not simple), then it's not allowed on HTML
         console.error(`locale l[${localeNum}] is used in HTML, not a string, val= ${JSON.stringify(l[localeNum])}`);
 
-        return `not supported l[${localeNum}]`;
+        return l[localeNum];
     };
 
     return String(html).replace(/\[\$(\w+)(?:\.(\w+))?\]/g, replacer);
@@ -749,11 +749,19 @@ mBroadcaster.once('boot_done', function populate_l() {
     var i;
 
     if (d) {
-        let dstringids = localStorage.dstringids;
-        for (i = 32000; i--;) {
-            l[i] = dstringids ? '[$' + i + ']' : (l[i] || '(missing-$' + i + ')')
-        }
+        const loaded = l;
+        window.dstringids = localStorage.dstringids;
+        l = new Proxy(loaded, {
+            get: (target, prop) => {
+                if (dstringids) {
+                    return `[$${prop}]`;
+                }
+
+                return target[prop] ? target[prop] : `(missing-$${prop})`;
+            }
+        });
     }
+
     l[0] = 'MEGA ' + new Date().getFullYear();
     if ((lang === 'es') || (lang === 'pt') || (lang === 'sk')) {
         l[0] = 'MEGA';

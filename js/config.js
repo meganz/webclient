@@ -511,6 +511,17 @@
     };
 
     refresh.ui = () => {
+        if (M.account && page.indexOf('fm/account') > -1) {
+            if (!is_mobile) {
+                accountUI.renderAccountPage(M.account);
+            }
+            else if (page === 'fm/account/notifications') {
+                mobile.account.notifications.render();
+            }
+
+            return;
+        }
+
         const view = Object(fmconfig.viewmodes)[M.currentdirid];
         const sort = Object(fmconfig.sortmodes)[M.currentdirid];
 
@@ -526,15 +537,6 @@
             if (stringify(tree) !== M.treenodes) {
 
                 M.renderTree();
-            }
-        }
-
-        if (M.account && page.indexOf('fm/account') > -1) {
-            if (!is_mobile) {
-                accountUI.renderAccountPage(M.account);
-            }
-            else if (page === 'fm/account/notifications') {
-                mobile.account.notifications.render();
             }
         }
     };

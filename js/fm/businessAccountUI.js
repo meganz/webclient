@@ -1677,7 +1677,7 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
 
             nowDate.setMonth(nowDate.getMonth() - 1);
 
-            if (nowDate < adminCreationDate) {
+            if (nowDate < adminCreationDate && nowDate.getMonth() !== adminCreationDate.getMonth()) {
                 break;
             }
         }

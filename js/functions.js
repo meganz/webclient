@@ -2729,7 +2729,7 @@ function blockChromePasswordManager() {
             });
         };
 
-        $newPasswordField.rebind('focus.blockAutofill, mousedown.blockAutofill', function() {
+        $newPasswordField.rebind('focus.blockAutofill mousedown.blockAutofill', function() {
             switchReadonly(this);
         });
 

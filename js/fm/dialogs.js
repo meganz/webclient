@@ -1000,6 +1000,7 @@
             }
 
             $('.search-bar input', $dialog).val('');
+            $('.search-bar.placeholder .search-icon-reset', $dialog).addClass('hidden');
             handleDialogContent(typeof aTab === 'string' && aTab);
             if (aTab === 'conversations') {
                 setDialogBreadcrumb(M.currentrootid === 'chat' && aTarget !== M.RootID ? aTarget : '');
@@ -1237,6 +1238,7 @@
             treesearch = false;
             handleDialogContent(section);
             $('.search-bar input', $dialog).val('');
+            $('.search-bar.placeholder .search-icon-reset', $dialog).addClass('hidden');
             $('.nw-fm-tree-item', $dialog).removeClass('selected');
 
             if ($.copyToShare) {
@@ -1349,7 +1351,12 @@
         $('.search-bar input', $dialog).rebind('keyup.dsb', function(ev) {
             var value = String($(this).val()).toLowerCase();
             var exit = ev.keyCode === 27 || !value;
-
+            if (value) {
+                $('.search-bar.placeholder .search-icon-reset', $dialog).removeClass('hidden');
+            }
+            else {
+                $('.search-bar.placeholder .search-icon-reset', $dialog).addClass('hidden');
+            }
             if (section === 'conversations') {
                 var $lis = $('.nw-contact-item', $dialog).parent();
 
@@ -1395,6 +1402,10 @@
             }
 
             return false;
+        });
+
+        $('.search-bar.placeholder .search-icon-reset', $dialog).rebind('click.dsb', () => {
+            $('.search-bar input', $dialog).val('').trigger('keyup.dsb');
         });
 
         $('.dialog-newfolder-button', $dialog).rebind('click', function() {

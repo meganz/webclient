@@ -3529,7 +3529,7 @@ body.de .mega-dialog.new-group-chat {
         margin-top: -128px;
     }
     .mega-dialog.avatar-dialog .image-explorer-container .image-explorer-image-view .image-explorer-mask.circle-mask {
-        width: 260px;
+        width: 256px;
         height: 260px;
         border-radius: 100%;
         background-clip: padding-box;

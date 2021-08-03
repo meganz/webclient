@@ -431,7 +431,7 @@
                     '<div class="item-row" data-node="@@">' +
                     '    <div class="transfer-filetype-icon file @@"></div>' +
                     '    <div class="summary-ff-name">@@</div> &nbsp; ' + tail +
-                    '</div>', data, icon, str_mtrunc(name, 42), pluralText
+                    '</div>', data, icon, name, pluralText
                 );
 
                 if (single) {

@@ -310,7 +310,7 @@ mega.ui.MegaInputs.prototype.underlinedText._strengthChecker = function() {
             // Hide loading icon
             $wrapper.removeClass('loading');
 
-            $input.rebind('keyup.strengthChecker, input.strengthChecker, change.strengthChecker', function(e) {
+            $input.rebind('keyup.strengthChecker input.strengthChecker change.strengthChecker', function(e) {
 
                 if (e.keyCode === 13) {
                     return false;

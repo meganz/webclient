@@ -460,7 +460,7 @@ var slideshowid;
 
         if (close) {
             $imgWrap.off('mousedown.pickpan');
-            $imgWrap.off('mouseup.pickpan, mouseout.pickpan');
+            $imgWrap.off('mouseup.pickpan mouseout.pickpan');
             $imgWrap.off('mousemove.pickpan');
             return false;
         }
@@ -474,7 +474,7 @@ var slideshowid;
         });
 
         // Stop dragging
-        $imgWrap.rebind('mouseup.pickpan, mouseout.pickpan', function() {
+        $imgWrap.rebind('mouseup.pickpan mouseout.pickpan', function() {
             dragStart = 0;
             $(this).removeClass('picked');
             return false;

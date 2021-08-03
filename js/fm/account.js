@@ -1070,7 +1070,7 @@ accountUI.account = {
 
             // All profile text inputs
             $firstNameField.add($lastNameField).add('.byear, .bmonth, .bdate', $birthdayBlock)
-                .rebind('input.settingsGeneral, change.settingsGeneral', function() {
+                .rebind('input.settingsGeneral change.settingsGeneral', function() {
 
                     var $this = $(this);
                     var $parent = $this.parent();

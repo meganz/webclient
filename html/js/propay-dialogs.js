@@ -1306,6 +1306,14 @@ var addressDialog = {
         // Show the black background overlay and the dialog
         this.$backgroundOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
         this.$dialog.removeClass('hidden');
+
+        this.firstNameMegaInput = new mega.ui.MegaInputs($('.first-name', this.$dialog));
+        this.lastNameMegaInput = new mega.ui.MegaInputs($('.last-name', this.$dialog));
+        this.addressMegaInput = new mega.ui.MegaInputs($('.address1', this.$dialog));
+        this.address2MegaInput = new mega.ui.MegaInputs($('.address2', this.$dialog));
+        this.cityMegaInput = new mega.ui.MegaInputs($('.city', this.$dialog));
+        this.postCodeMegaInput = new mega.ui.MegaInputs($('.postcode', this.$dialog));
+        this.taxCodeMegaInput = new mega.ui.MegaInputs($('.taxcode', this.$dialog));
     },
 
     /**
@@ -1427,10 +1435,23 @@ var addressDialog = {
      */
     initCountryDropdownChangeHandler: function() {
 
+        var inputSelector = function(input) {
+            return Array.isArray(input) ? input[1] : input;
+        };
+
         var $countriesSelect = $('.countries', this.$dialog);
         var $statesSelect = $('.states', this.$dialog);
-        var $postcodeInput = $('.postcode', this.$dialog);
-        var $taxcode = $('input.taxcode', this.$dialog).attr('placeholder', 'VAT ' + l[7347]);
+        var $postcodeInput = inputSelector(this.postCodeMegaInput);
+        var $taxcodeMegaInput = inputSelector(this.taxCodeMegaInput);
+        const $titleElemTaxCode = $('.mega-input-title', $taxcodeMegaInput.$input.parent());
+        const $titleElemPostCode = $('.mega-input-title', $postcodeInput.$input.parent());
+
+        if ($titleElemTaxCode.length) {
+            $taxcodeMegaInput.updateTitle('VAT ' + l[7347]);
+        }
+        else {
+            $taxcodeMegaInput.$input.attr('placeholder','VAT ' + l[7347]);
+        }
 
         // Change the States depending on the selected country
         var changeStates = function(selectedCountryCode) {
@@ -1454,11 +1475,19 @@ var addressDialog = {
 
             // If selecting a country whereby the postcode is named differently, update the placeholder value.
             if (addressDialog.localePostalCodeName.hasOwnProperty(selectedCountryCode)) {
-                $postcodeInput
-                    .attr('placeholder', addressDialog.localePostalCodeName[selectedCountryCode]);
+                if ($titleElemPostCode.length) {
+                    $postcodeInput
+                        .updateTitle(addressDialog.localePostalCodeName[selectedCountryCode]);
+                }
+                else {
+                    $postcodeInput.$input.attr('placeholder',addressDialog.localePostalCodeName[selectedCountryCode]);
+                }
+            }
+            else if ($titleElemPostCode.length) {
+                $postcodeInput.updateTitle(l[10659]);
             }
             else {
-                $postcodeInput.attr('placeholder', l[10659]);
+                $postcodeInput.$input.attr('placeholder',l[10659]);
             }
 
             // If Canada or United States is selected
@@ -1493,7 +1522,12 @@ var addressDialog = {
             }
 
             var taxName = getTaxName(selectedCountryCode);
-            $taxcode.attr('placeholder', taxName + ' ' + l[7347]);
+            if ($titleElemTaxCode.length) {
+                $taxcodeMegaInput.updateTitle(taxName + ' ' + l[7347]);
+            }
+            else {
+                $taxcodeMegaInput.$input.attr('placeholder',taxName + ' ' + l[7347]);
+            }
 
             // Remove any previous validation error
             $statesSelect.removeClass('error');
@@ -1530,48 +1564,60 @@ var addressDialog = {
      * Attempt to prefill the info based on the user_attr information.
      */
     prefillInfo: function(billingInfo) {
+
+        var prefillMultipleInputs = (inputs, value) => {
+            if (Array.isArray(inputs)) {
+                inputs.forEach(($megaInput) => {
+                    $megaInput.$input.val(value).trigger('change');
+                });
+            }
+            else {
+                inputs.$input.val(value).trigger('change');
+            }
+        };
+
         'use strict';
-        var $firstName = this.$dialog.find('input.first-name');
+        var $firstNameInput = this.firstNameMegaInput;
         if (billingInfo && billingInfo.hasOwnProperty('firstname')) {
-            $firstName.val(billingInfo.firstname);
+            prefillMultipleInputs($firstNameInput, billingInfo.firstname);
         } else if (this.businessPlan && this.userInfo && this.userInfo.hasOwnProperty("fname")) {
-            $firstName.val(this.userInfo.fname);
+            prefillMultipleInputs($firstNameInput, this.userInfo.fname);
         } else if (u_attr && u_attr.hasOwnProperty('firstname')) {
-            $firstName.val(u_attr.firstname);
+            prefillMultipleInputs($firstNameInput, u_attr.firstname);
         } else {
-            $firstName.val('');
+            prefillMultipleInputs($firstNameInput, '');
         }
 
-        var $lastName = this.$dialog.find('input.last-name');
+        var $lastNameInput = this.lastNameMegaInput;
         if (billingInfo && billingInfo.hasOwnProperty('lastname')) {
-            $lastName.val(billingInfo.lastname);
+            prefillMultipleInputs($lastNameInput, billingInfo.lastname);
         } else if (this.businessPlan && this.userInfo && this.userInfo.hasOwnProperty("lname")) {
-            $lastName.val(this.userInfo.lname);
+            prefillMultipleInputs($lastNameInput, this.userInfo.lname);
         } else if (u_attr && u_attr.hasOwnProperty('lastname')) {
-            $lastName.val(u_attr.lastname);
+            prefillMultipleInputs($lastNameInput, u_attr.lastname);
         } else {
-            $lastName.val('');
+            prefillMultipleInputs($lastNameInput, '');
         }
 
         if (billingInfo) {
             if (billingInfo.hasOwnProperty('address1')) {
-                this.$dialog.find(".address1").val(billingInfo.address1);
+                prefillMultipleInputs(this.addressMegaInput, billingInfo.address1);
             }
 
             if (billingInfo.hasOwnProperty('address2')) {
-                this.$dialog.find(".address2").val(billingInfo.address2);
+                prefillMultipleInputs(this.address2MegaInput, billingInfo.address2);
             }
 
             if (billingInfo.hasOwnProperty('city')) {
-                this.$dialog.find(".city").val(billingInfo.city);
+                prefillMultipleInputs(this.cityMegaInput, billingInfo.city);
             }
 
             if (billingInfo.hasOwnProperty('postcode')) {
-                this.$dialog.find(".postcode").val(billingInfo.postcode);
+                prefillMultipleInputs(this.postCodeMegaInput, billingInfo.postcode);
             }
 
             if (billingInfo.hasOwnProperty('taxCode')) {
-                $('.taxcode', this.$dialog).val(billingInfo.taxCode);
+                prefillMultipleInputs(this.taxCodeMegaInput, billingInfo.taxCode);
             }
         }
     },
@@ -1720,6 +1766,9 @@ var addressDialog = {
      */
     validateAndPay: function() {
 
+        var inputSelector = function(input) {
+            return Array.isArray(input) ? input[1] : input;
+        };
         // Selectors for form text fields
         var fields = ['first-name', 'last-name', 'address1', 'address2', 'city', 'postcode'];
         var fieldValues = {};
@@ -1740,15 +1789,17 @@ var addressDialog = {
         var $countrySelect = $('.countries', this.$dialog);
         var state = $('.option[data-state="active"]', $stateSelect).attr('data-value');
         var country = $('.option[data-state="active"]', $countrySelect).attr('data-value');
-        var taxCode = $('input.taxcode', this.$dialog).val();
+        var taxCode = inputSelector(this.taxCodeMegaInput).$input.val();
 
         // Selectors for error handling
         var $errorMessage = this.$dialog.find('.error-message', this.$dialog);
+        var $errorMessageContainers = this.$dialog.find('.message-container', this.$dialog);
         var $allInputs = $('.mega-input', this.$dialog);
 
         // Reset state of past error messages
         var stateNotSet = false;
         $errorMessage.addClass('hidden');
+        $errorMessageContainers.addClass('hidden');
         $allInputs.removeClass('error');
 
         // Add red border around the missing fields

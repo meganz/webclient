@@ -4264,6 +4264,9 @@ body.de .mega-dialog.new-group-chat {
     .mega-dialog.payment-address-dialog-body {
         padding: 30px 30px 10px;
     }
+    .mega-dialog .content-block.payment-address-dialog-body {
+        padding-bottom: 16px;
+    }
     .mega-dialog.payment-address-dialog .plan-icon {
         display: inline-block;
         vertical-align: middle;
@@ -4342,6 +4345,7 @@ body.de .mega-dialog.new-group-chat {
     }
     .mega-dialog.payment-address-dialog .remember-billing-info-wrapper {
         margin-top: 20px;
+        padding-left: 48px;
     }
     .mega-dialog.payment-address-dialog .fm-account-input {
         border-radius: 4px;
@@ -4429,7 +4433,7 @@ body.de .mega-dialog.new-group-chat {
         background: var(--banner-background-error);
         border-radius: 4px;
         padding: 2px 16px;
-        margin-top: 12px;
+        margin: 12px 48px 0 48px;
         text-align: center;
     }
     .mega-dialog.payment-address-dialog .error-message.hidden {
@@ -4462,6 +4466,9 @@ body.de .mega-dialog.new-group-chat {
     .mega-dialog.payment-address-dialog .states.disabled {
         cursor: default;
         opacity: 0.5;
+    }
+    .mega-dialog.payment-address-dialog .states {
+        margin-bottom: 20px;
     }
 
 /* end payment-address-dialog */

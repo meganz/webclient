@@ -718,13 +718,31 @@ body.de .mega-dialog.new-group-chat {
     height: 36px;
     box-sizing: border-box;
     font: var(--text-body1);
-    color: var(--text-color-medium);
+    color: var(--text-color-high);
     padding: 0 8px 0 40px;
     margin: 0;
     background-repeat: no-repeat;
     background-color: transparent;
     border: 0;
     transition: color 200ms ease-in-out;
+}
+.create-folder-input-bl input {
+    float: right;
+}
+.duplicate .create-folder-input-bl {
+    border: 1px solid var(--input-text-underline-error);
+}
+.create-folder-input-bl:hover:not(.duplicate .create-folder-input-bl),
+.create-folder-input-bl:focus-within {
+    border: 1px solid var(--secondary-blue);
+}
+.create-folder-input-bl i {
+    --icon-size: 24px;
+    float: left;
+    --mask-color: var(--icon-inactive);
+}
+.create-folder-input-bl input:focus + i {
+    --mask-color: var(--icon-rest);
 }
 
 /* just to replace padding property from the above class */

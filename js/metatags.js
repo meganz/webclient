@@ -585,6 +585,12 @@ mega.metatags = new function() {
             mTags.mega_title = l.achievement_meta_title || mTags.en_title;
             mTags.mega_desc = l.achievement_meta_desc || mTags.en_desc;
         }
+        else if (page === 'support') {
+            mTags.en_title = 'Support - MEGA';
+            mTags.en_desc = 'Get support';
+            mTags.mega_title = l.support_meta_tag || mTags.en_title;
+            mTags.mega_desc = l[516] || mTags.en_desc;
+        }
         else if (page.substr(0, 5) === 'blog/') {
             var notSet = true;
             if (blogHeaders && blogposts) {

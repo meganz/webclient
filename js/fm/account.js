@@ -727,9 +727,9 @@ accountUI.account = {
             $('.acc-setting-country-sec', $profileContent).addClass('hidden');
             if (!u_attr.b.m) {
                 hideOrViewCancelSection(true);
-
             }
             else {
+                $('.cancel-account-block .content-txt.bus-acc', accountUI.$contentBlock).removeClass('hidden');
                 hideOrViewCancelSection(false);
             }
         }
@@ -1510,6 +1510,10 @@ accountUI.account = {
 
                 // Please confirm that all your data will be deleted
                 var confirmMessage = l[1974];
+
+                if (u_attr.b && u_attr.b.m) {
+                    confirmMessage = l.bus_acc_delete_confirm_msg;
+                }
 
                 // Search through their Pro plan purchase history
                 $(account.purchases).each(function(index, purchaseTransaction) {

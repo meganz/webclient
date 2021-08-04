@@ -851,7 +851,7 @@ MegaData.prototype.inviteContact = function (owner, target, msg, contactLink) {
                     invitePromise.resolve(resp.m);
                 }
             }
-            if (typeof resp !== 'object' && contactLink) {
+            if ((typeof resp !== 'object' && contactLink) || (typeof resp === 'number')) {
                 M.inviteContactMessageHandler(resp);
             }
             invitePromise.reject(false);
@@ -883,6 +883,10 @@ MegaData.prototype.inviteContactMessageHandler = function(errorCode) {
 
         // User already exist or owner
         msgDialog('info', '', l[1783]);
+    }
+    // EOVERQUOTA err
+    else if (errorCode === -17) {
+        msgDialog('info', '', l.invalid_invitation_sent);
     }
 };
 

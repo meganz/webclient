@@ -196,6 +196,9 @@ function addNewContact($addButton, cd) {
                     }
                     contactsInfoDialog(title, addedEmails[0], msg);
                 }
+                else {
+                    cd = false;
+                }
 
                 if (cd) {
                     closeDialog();

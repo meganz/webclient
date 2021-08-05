@@ -233,11 +233,10 @@ mobile.cloud = {
         });
 
         // If they choose to Open in MEGA App
-        $openInAppButton.off('tap').on('tap', function() {
+        $openInAppButton.rebind('tap', function() {
 
             // Open the folder in the app
-            mobile.downloadOverlay.redirectToApp($(this), M.currentdirid);
-            return false;
+            return mobile.downloadOverlay.redirectToApp($(this), M.currentdirid);
         });
     },
 

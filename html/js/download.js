@@ -317,7 +317,7 @@ function dl_g(res, ctx) {
                 $('.mobile.filesize').text(bytesToSize(res.s));
                 $('.mobile.dl-megaapp').rebind('click', function() {
                     // Start the download in the app
-                    mobile.downloadOverlay.redirectToApp($(this));
+                    return mobile.downloadOverlay.redirectToApp($(this));
                 });
                 $('img.filetype-img')
                     .attr('src', staticpath + 'images/mobile/extensions/' + fileIcon(dl_node) + '.png');

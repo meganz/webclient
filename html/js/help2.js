@@ -671,7 +671,7 @@ var Help = (function() {
             });
 
             if (question) {
-                $currentQuestion = '#' + question;
+                $currentQuestion = question.startsWith('#') ? question : '#' + question;
                 setTimeout(function() {
                     helpScrollTo($currentQuestion);
                 }, 400);

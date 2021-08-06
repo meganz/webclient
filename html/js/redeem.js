@@ -707,6 +707,7 @@ var redeem = {
                     titleText = l[23493].replace('%n', mega.voucher.businessmonths);
                 }
                 $dlgTitle.text(titleText);
+                descText = l.redeem_bus_acc;
 
                 greenBtnText = l[19516];
                 if (window.bCreatedVoucher || u_type === 3) {

@@ -327,6 +327,7 @@ RepayPage.prototype.initPage = function() {
                 mySelf.planInfo = info;
                 mySelf.planInfo.pastInvoice = res.inv[0];
                 mySelf.planInfo.currInvoice = { et: res.et || 0, t: res.t };
+                mySelf.planInfo.usedGatewayId = res.gw;
                 mySelf.userInfo = {
                     fname: '',
                     lname: '',

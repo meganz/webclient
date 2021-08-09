@@ -3930,9 +3930,6 @@ else if (!browserUpdate) {
         xhr_stack = false;
         for (var i = 0; i < jsl.length; ++i)
         {
-            if (!jj || !jsl[i].j || jsl[i].j > 2) {
-                jsl_loaded[jsl[i].n] = 1;
-            }
             if ((jsl[i].j == 1) && (!jj))
             {
                 if (!fx_startup_cache)
@@ -4352,6 +4349,13 @@ else if (!browserUpdate) {
             ua.details = Object.create(browserdetails(ua));
         }
         catch (e) {}
+
+        // announce the loading finish of relevant resources in jsl
+        for (var i = 0; i < jsl.length; i++) {
+            if (!jj || !jsl[i].j || jsl[i].j > 2) {
+                jsl_loaded[jsl[i].n] = 1;
+            }
+        }
 
         mBroadcaster.sendMessage('boot_done');
 

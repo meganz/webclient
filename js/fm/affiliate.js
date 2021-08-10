@@ -718,6 +718,7 @@ affiliateUI.redemptionDialog = {
         $('#affiliate-payment-type2', this.$dialog).trigger('click');
         $('.next-btn', this.$dialog).addClass('disabled');
         $('#affi-bitcoin-address', this.$dialog).val('');
+        // $('#affiliate-redemption-amount', this.$dialog).attr('data-currencyValue', M.affiliate.balance.available);
 
         affiliateRedemption.reset();
     },
@@ -807,10 +808,13 @@ affiliateUI.redemptionDialog = {
         $amount.rebind('input', function() {
 
             var activeMethodMin = M.affiliate.redeemGateways[$('.payment-type .radioOn input', $step1).val()].min || 50;
+            const megaInput = $(this).data('MegaInputs');
+            if (megaInput) {
+                megaInput.hideError();
+            }
+            const val = megaInput ? megaInput.getValue() : 0;
 
-            $(this).data('MegaInputs').hideError();
-
-            if (this.value >= activeMethodMin && this.value <= balance.available) {
+            if (val >= activeMethodMin && val <= balance.available) {
                 $nextbtn.removeClass('disabled');
             }
             else {
@@ -823,18 +827,22 @@ affiliateUI.redemptionDialog = {
             var $this = $(this);
             var activeMethodMin = M.affiliate.redeemGateways[$('.payment-type .radioOn input', $step1).val()].min || 50;
 
-            if (this.value === '') {
+            const megaInput = $(this).data('MegaInputs');
+            const val = megaInput ? megaInput.getValue() : 0;
+            if (!val) {
                 $('.info.price.requested .local', this.$dialog).text('------');
             }
-            else if (this.value < activeMethodMin) {
+            else if (val < activeMethodMin) {
                 $this.data('MegaInputs').showError(l[23319].replace('%1', formatCurrency(activeMethodMin)));
             }
-            else if (this.value > balance.available) {
+            else if (val > balance.available) {
                 $this.data('MegaInputs').showError(l[23320]);
             }
             else {
-                $('.info.price.requested .local', this.$dialog).text(formatCurrency(this.value));
-                this.value = parseFloat(this.value).toFixed(2);
+                $('.info.price.requested .local', this.$dialog).text(formatCurrency(val));
+                this.value = $this.attr('type') === 'text'
+                    ? formatCurrency(val, 'EUR', 'number')
+                    : parseFloat(val).toFixed(2);
             }
         });
 
@@ -1013,7 +1021,16 @@ affiliateUI.redemptionDialog = {
         'use strict';
 
         var $amountInput = $('#affiliate-redemption-amount', this.$dialog);
-        var amountValue = $amountInput.val();
+        var megaInput = $amountInput.data('MegaInputs') || new mega.ui.MegaInputs($amountInput, {
+            onShowError: function(msg) {
+                $('.amount-message-container', this.$dialog).removeClass('hidden');
+                $('.amount-message-container', this.$dialog).text(msg);
+            },
+            onHideError: function() {
+                $('.amount-message-container', this.$dialog).addClass('hidden');
+            }
+        });
+        var amountValue = megaInput.getValue();
 
         // Summary table update
         $('.requested.price .euro', this.$dialog).addClass('hidden').text('------');
@@ -1024,15 +1041,6 @@ affiliateUI.redemptionDialog = {
         $('.received.price .local', this.$dialog).text('------');
         $('.local-info', this.$dialog).addClass('hidden');
 
-        var megaInput = new mega.ui.MegaInputs($amountInput, {
-            onShowError: function(msg) {
-                $('.amount-message-container', this.$dialog).removeClass('hidden');
-                $('.amount-message-container', this.$dialog).text(msg);
-            },
-            onHideError: function() {
-                $('.amount-message-container', this.$dialog).addClass('hidden');
-            }
-        });
         megaInput.hideError();
 
         // Show the method option if api returns gateway data

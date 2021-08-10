@@ -797,21 +797,25 @@ mobile.affiliate = {
     redeemStep2: function(comeback) {
 
         'use strict';
-
         var $step2 = $('.redeem-body.step2', this.$page);
+        const $amountInput = $('#affiliate-redemption-amount', $step2);
+        const megaInput = $amountInput.data('MegaInputs') || new mega.ui.MegaInputs($amountInput);
 
         if (!comeback) {
-            $('#affiliate-redemption-amount', $step2).val('');
+            $amountInput.val('');
         }
 
         $('.comission span', $step2).text(formatCurrency(M.affiliate.balance.available));
 
         $('.redeem-all-button', $step2).rebind('tap.redeemAll', function() {
-            $('#affiliate-redemption-amount', $step2).val(M.affiliate.balance.available).trigger('change');
+            $amountInput.val(M.affiliate.balance.available).trigger('change');
         });
 
-        $('#affiliate-redemption-amount', $step2).rebind('change', function() {
-            this.value = parseFloat(this.value).toFixed(2);
+        $amountInput.rebind('change.aff blur.aff', function() {
+            const val = megaInput ? megaInput.getValue() : 0;
+            this.value = $(this).attr('type') === 'text'
+                ? formatCurrency(val, 'EUR', 'number')
+                : parseFloat(val).toFixed(2);
         });
     },
 

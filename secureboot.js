@@ -2735,6 +2735,7 @@ else if (!browserUpdate) {
     jsl.push({f:'js/ui/publicServiceAnnouncement.js', n: 'psa_js', j:1,w:1});
     jsl.push({f:'js/ui/megaInputs.js', n: 'megainputs_js', j:1,w:1});
     jsl.push({f:'js/ui/megaInputs-underlinedText.js', n: 'megainputs_underlinedtext_js', j:1,w:1});
+    jsl.push({f:'js/ui/megaInputs-currencyField.js', n: 'megainputs_currencyfield_js', j:1, w:1});
     jsl.push({f:'html/registerb.html', n: 'registerb',j:0});
     jsl.push({f:'html/developersettings.html', n: 'developersettings', j:0});
     jsl.push({f:'html/js/developersettings.js', n: 'developersettings_js', j:1 });

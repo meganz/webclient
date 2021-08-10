@@ -174,7 +174,8 @@ affiliateRedemption.__processBlock2 = function() {
 
     var method = this.requests.first.m;
     var activeMethodMin = M.affiliate.redeemGateways[method].min || 50;
-    var value = $('#affiliate-redemption-amount', this.$step).val();
+    const megaInput = $('#affiliate-redemption-amount', this.$step).data('MegaInputs');
+    const value = megaInput ? megaInput.getValue() : 0;
 
     if (!value){
 
@@ -192,7 +193,7 @@ affiliateRedemption.__processBlock2 = function() {
         return Promise.reject();
     }
 
-    this.requests.first.p = parseFloat($('#affiliate-redemption-amount', this.$step).val());
+    this.requests.first.p = value;
 };
 
 affiliateRedemption.__processBlock3 = function() {

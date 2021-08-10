@@ -13683,6 +13683,13 @@ p a.blog-new-read-more {
     position: absolute;
     left: 12px;
 }
+.mobile.affiliate.redeem-body.step2 .clean-megainputs .mega-input {
+    padding: 0;
+    height: auto;
+}
+.mobile.affiliate.redeem-body.step2 .clean-megainputs .mega-input::before {
+    display: none;
+}
 .mobile.affiliate.comission {
     font-size: 14px;
     line-height: 20px;

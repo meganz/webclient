@@ -1149,6 +1149,9 @@ FileManager.prototype.updFileManagerUI = promisify(function(resolve) {
         if (tb) {
             // If this is out-shares or public-links page, build both cloud-drive tree and it's own
             if (this.currentCustomView) {
+                if (tb.h === M.RubbishID) {
+                    tb = {h: M.RootID};
+                }
                 this.buildtree(tb, this.buildtree.FORCE_REBUILD, 'cloud-drive');
                 this.buildtree({h: this.currentCustomView.type}, this.buildtree.FORCE_REBUILD);
             }

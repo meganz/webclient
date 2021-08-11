@@ -1526,8 +1526,8 @@ MegaData.prototype.moveToRubbish = function(handles) {
 
     // always revoke any sharing status recursively across the affected nodes
     this.revokeShares(handles)
-        .always(function() {
-            var promise = M.safeMoveNodes(M.RubbishID, handles);
+        .always((nodesToMove) => {
+            var promise = M.safeMoveNodes(M.RubbishID, nodesToMove);
 
             if (d) {
                 promise.always(function() {
@@ -1640,7 +1640,7 @@ MegaData.prototype.revokeShares = function(handles) {
             MegaPromise.allDone(promises)
                 .always(function() {
                     console.groupEnd();
-                    promise.resolve();
+                    promise.resolve(handles);
                 });
 
         }, function() {

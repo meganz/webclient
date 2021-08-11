@@ -239,7 +239,8 @@ mega.textEditorUI = new function TextEditorUI() {
                     $saveButton.addClass('disabled');
 
                     loadingDialog.show('common', l[23131]);
-                    mega.fileTextEditor.setFile(versionHandle || fileHandle, editor.getValue()).done(function(fh) {
+
+                    const getSavedFile = function(fh) {
                         if (versionHandle) {
                             mega.fileTextEditor.removeOldVersion(versionHandle);
                         }
@@ -257,6 +258,15 @@ mega.textEditorUI = new function TextEditorUI() {
                         if (cb && typeof cb === 'function') {
                             cb();
                         }
+                    };
+
+                    M.getStorageQuota().then(data => {
+                        if (data.isFull) {
+                            loadingDialog.hide('common');
+                            ulmanager.ulShowOverStorageQuotaDialog();
+                            return false;
+                        }
+                        mega.fileTextEditor.setFile(versionHandle || fileHandle, editor.getValue()).done(getSavedFile);
                     });
                 }
             }
@@ -288,8 +298,15 @@ mega.textEditorUI = new function TextEditorUI() {
                             { name: 'New file.txt' },
                             '',
                             function(handle) {
-                                loadingDialog.hide();
-                                mega.textEditorUI.setupEditor(M.d[handle].name, '', handle);
+                                M.getStorageQuota().then(data => {
+                                    loadingDialog.hide();
+                                    if (data.isFull) {
+                                        ulmanager.ulShowOverStorageQuotaDialog();
+                                        return false;
+                                    }
+
+                                    mega.textEditorUI.setupEditor(M.d[handle].name, '', handle);
+                                });
                             }
                         );
                     }
@@ -308,9 +325,16 @@ mega.textEditorUI = new function TextEditorUI() {
                 openSaveAsDialog(
                     versionHandle || fileHandle,
                     editedTxt,
-                    function(handle) {
-                        loadingDialog.hide();
-                        mega.textEditorUI.setupEditor(M.d[handle].name, editedTxt || savedFileData, handle);
+                    (handle) => {
+                        M.getStorageQuota().then(data => {
+                            loadingDialog.hide();
+                            if (data.isFull) {
+                                ulmanager.ulShowOverStorageQuotaDialog();
+                                return false;
+                            }
+
+                            mega.textEditorUI.setupEditor(M.d[handle].name, editedTxt || savedFileData, handle);
+                        });
                     }
                 );
             }

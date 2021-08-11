@@ -1724,19 +1724,23 @@
 
                 var nodeToSave = $.nodeSaveAs;
                 closeDialog();
-                mega.fileTextEditor.saveFileAs(saveAsName, $.mcselected, $.saveAsContent, nodeToSave).done(
-                    function(handle) {
-                        if ($.saveAsCallBack) {
-                            if (Array.isArray(handle)) {
-                                $.selected = handle;
-                            }
-                            else {
-                                $.selected = [handle];
-                            }
-                            $.saveAsCallBack(handle);
-                        }
+
+                M.getStorageQuota().then(data => {
+                    if (data.isFull) {
+                        ulmanager.ulShowOverStorageQuotaDialog();
+                        return false;
                     }
-                );
+
+                    mega.fileTextEditor.saveFileAs(saveAsName, $.mcselected, $.saveAsContent, nodeToSave).done(
+                        (handle) => {
+                            if ($.saveAsCallBack) {
+                                $.selected = Array.isArray(handle) ? handle : [handle];
+                                $.saveAsCallBack(handle);
+                            }
+                        }
+                    );
+                });
+
                 return false;
             }
 

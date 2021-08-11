@@ -111,6 +111,9 @@ var ulmanager = {
         }
 
         M.safeShowDialog('upload-overquota', function() {
+            // Hide loading dialog as from new text file
+            loadingDialog.phide();
+
             $dialog.removeClass('registered achievements pro slider').addClass('uploads exceeded');
             $('.header-before-icon.exceeded', $dialog).text(l[19135]);
             $('.pricing-page.plan .plan-button', $dialog).rebind('click', function() {

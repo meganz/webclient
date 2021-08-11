@@ -2982,7 +2982,13 @@ function createFileDialog(close, action, params) {
 
     if (!action) {
         action = function(name, t) {
+            if (ulmanager.ulOverStorageQuota) {
+                ulmanager.ulShowOverStorageQuotaDialog();
+                return;
+            }
+
             loadingDialog.pshow();
+
             M.addNewFile(name, t)
                 .done(function(nh) {
                     if (d) {

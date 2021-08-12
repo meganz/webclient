@@ -147,7 +147,10 @@ featurePages.fixMobileChatLinks = function() {
     chatLinks.forEach(function(link) {
         link.addEventListener('click', function(e) {
             e.preventDefault();
-            document.querySelector(link.dataset.scrollTo).scrollIntoView(true);
+            const scrollTo = document.querySelector(link.dataset.scrollTo);
+            if (scrollTo) {
+                scrollTo.scrollIntoView(true);
+            }
         });
     });
 };

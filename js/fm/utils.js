@@ -2545,6 +2545,9 @@ MegaUtils.prototype.getCountryName = function(countryCode) {
     if (this._countries.hasOwnProperty(countryCode)) {
         return this._countries[countryCode];
     } else {
+        if (d) {
+            console.error('Error - getCountryName: unrecognizable country code: ' + countryCode);
+        }
         return null;
     }
 };

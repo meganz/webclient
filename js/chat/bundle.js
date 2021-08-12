@@ -17930,13 +17930,13 @@ let conversationpanel_ConversationPanel = (conversationpanel_dec = utils["defaul
       }), external_React_default.a.createElement("h3", null, external_React_default.a.createElement(utils["default"].EmojiFormattedContent, null, room.topic ? room.getRoomTitle() : " ")), external_React_default.a.createElement("h5", null, usersCount ? l[20233].replace("%s", usersCount) : " "), external_React_default.a.createElement("p", null, l[20595]))), external_React_default.a.createElement("footer", null, external_React_default.a.createElement("div", {
         className: "bottom-buttons"
       }, external_React_default.a.createElement("button", {
-        className: "mega-button positive right",
+        className: "mega-button positive",
         onClick: () => {
           closeJoinDialog();
           megaChat.loginOrRegisterBeforeJoining(room.publicChatHandle);
         }
       }, l[20597]), external_React_default.a.createElement("button", {
-        className: "mega-button right",
+        className: "mega-button",
         onClick: closeJoinDialog
       }, l[18682]))));
     }
@@ -23472,7 +23472,7 @@ if (is_mobile) {
 
     if (anonymouschat) {
       parsepage(pages.mobile);
-      mobile.chatlink.show(pchandle, getSitePath().split('#').pop());
+      mobile.chatlink.show(pchandle, location.hash.substr(1).replace(/[^\w-].+$/, ''));
     } else {
       loadSubPage('fm', event);
     }

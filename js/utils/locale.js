@@ -938,6 +938,7 @@ mBroadcaster.once('boot_done', function populate_l() {
     l[12489] = l[12489].replace('[I]', '<i>').replace('[/I]', '</i>').replace('[I]', '<i>').replace('[/I]', '</i>');
 
     l[16116] = l[16116].replace('[S]', '<span class="red">').replace('[/S]', '</span>');
+    l.bus_acc_delete_msg = l.bus_acc_delete_msg.replace('[S]', '<span class="red">').replace('[/S]', '</span>');
 
     l[16165] = l[16165].replace('[S]', '<a class="red">').replace('[/S]', '</a>').replace('[BR]', '<br/>');
     l[16167] = l[16167].replace('[A]', '<a href="/mobile" class="clickurl">').replace('[/A]', '</a>');

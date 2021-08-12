@@ -1546,14 +1546,14 @@ export class ConversationPanel extends MegaRenderMixin {
                     <footer>
                         <div className="bottom-buttons">
                             <button
-                                className="mega-button positive right"
+                                className="mega-button positive"
                                 onClick={() => {
                                     closeJoinDialog();
                                     megaChat.loginOrRegisterBeforeJoining(room.publicChatHandle);
                                 }}>
                                 {l[20597]}
                             </button>
-                            <button className="mega-button right" onClick={closeJoinDialog}>{l[18682]}</button>
+                            <button className="mega-button" onClick={closeJoinDialog}>{l[18682]}</button>
                         </div>
                     </footer>
                 </ModalDialogsUI.ModalDialog>;

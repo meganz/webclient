@@ -118,13 +118,10 @@ mobile.downloadOverlay = {
         }
 
         // On click/tap
-        $downloadButton.off('tap').on('tap', function() {
+        $downloadButton.rebind('tap', function() {
 
             // Start the download
-            mobile.downloadOverlay.redirectToApp($(this), nodeHandle);
-
-            // Prevent default anchor link behaviour
-            return false;
+            return mobile.downloadOverlay.redirectToApp($(this), nodeHandle);
         });
     },
 
@@ -134,12 +131,9 @@ mobile.downloadOverlay = {
      * @param {String} nodeHandle The internal node handle (optional)
      */
     redirectToApp: function($selector, nodeHandle) {
-
         'use strict';
-
-        var redirectLink = this.getAppLink(nodeHandle);
-        goToMobileApp(redirectLink);
-        return false;
+        $selector.off().addClass('disabled');
+        return goToMobileApp(this.getAppLink(nodeHandle));
     },
 
     /**

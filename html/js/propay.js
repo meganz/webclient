@@ -235,6 +235,9 @@ pro.propay = {
                 // Check if the API has some issue and not returning any gateways at all
                 if (pro.propay.allGateways.length === 0) {
                     console.error('No valid gateways returned from the API');
+                    msgDialog('warningb', '', l.no_payment_providers, '', () => {
+                        loadSubPage('pro');
+                    });
                     return false;
                 }
 
@@ -970,7 +973,8 @@ pro.propay = {
 
         // If they have a Pro balance, select the first option, otherwise select
         // the next payment option (usually API will have it ordered to be Visa)
-        var $option = (parseFloat(pro.propay.proBalance) > 0) ? $payOptions.first() : $payOptions.eq(1);
+        var $option = (parseFloat(pro.propay.proBalance) > 0) ? $payOptions.first()
+            : $payOptions.length > 1 ? $payOptions.eq(1) : $payOptions.eq(0);
 
         // Check the radio button option
         $('input', $option).prop('checked', true);

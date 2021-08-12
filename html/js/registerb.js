@@ -782,7 +782,7 @@ BusinessRegister.prototype.processPayment = function(payDetails, businessPlan) {
         else {
             // redirectToPaymentGateway();
             const isStrip = businessPlan.usedGatewayId ?
-                (businessPlan.usedGatewayId | 1) === addressDialog.gatewayId_stripe : false;
+                (businessPlan.usedGatewayId | 0) === addressDialog.gatewayId_stripe : false;
             addressDialog.processUtcResult(res, isStrip, saleIds);
         }
 

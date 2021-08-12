@@ -322,9 +322,11 @@
                             return M.getCountryName(a).localeCompare(M.getCountryName(b), locale);
                         };
 
+                        var checkCountry = c => M.getCountryName(c) !== null;
+
                         for (var i = res.length; i--;) {
 
-                            res[i].data.cc.sort(sortCountry);
+                            res[i].data.cc.filter(checkCountry).sort(sortCountry);
                             ctx.affiliate.redeemGateways[res[i].gateway] = res[i];
                         }
                         resolve(res);

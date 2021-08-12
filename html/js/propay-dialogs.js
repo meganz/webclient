@@ -1513,10 +1513,21 @@ var addressDialog = {
 
                 $statesSelect.removeClass('disabled').removeAttr('disabled');
                 $statesSelect.attr('tabindex', '7');
+                $statesSelect.rebind('keydown.propay', function(e) {
+                    if (this === document.activeElement) {
+                        if (e.shiftKey && e.keyCode === 9) {
+                            $('.city', this.$dialog).focus();
+                        }
+                        else if (e.keyCode === 9) {
+                            $('.postcode', this.$dialog).focus();
+                        }
+                    }
+                });
             }
             else {
                 $statesSelect.addClass('disabled').attr('disabled', 'disabled');
                 $statesSelect.attr('tabindex', '-1');
+                $statesSelect.off('keydown.propay');
                 $('span', $statesSelect).first().text(l[7192]);
                 $('.option', $statesSelect).removeAttr('data-state').removeClass('active');
             }

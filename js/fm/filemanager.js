@@ -494,7 +494,8 @@ FileManager.prototype.initFileManagerUI = function() {
                     else {
                         M.moveNodes($.moveids, $.movet)
                             .done(function(moves) {
-                                if (moves && M.currentdirid !== 'out-shares' && M.currentdirid !== 'public-links') {
+                                if (moves && M.currentdirid !== 'out-shares' && M.currentdirid !== 'public-links'
+                                    && String(M.currentdirid).split("/")[0] !== "search") {
                                     $ddelm.remove();
                                 }
                             });

@@ -165,14 +165,28 @@ def prepare_english_string(resource):
     }
     return {'en': {'url': url, 'payload': payload}}
 
-def prepare_translation_string(resource, lang):
-    language_strings = {}
-    url = BASE_URL + "/projects/" + PROJECT_ID + "/languages"
+language_cache = None
+
+def get_languages():
+    global language_cache
+    if language_cache != None:
+        return language_cache
     try:
+        url = BASE_URL + "/projects/" + PROJECT_ID + "/languages"
         request = Request(url, headers=HEADER)
         response = urlopen(request)
         content = json.loads(response.read().decode('utf8'))
-        languages = content['data']
+        language_cache = content['data']
+        return language_cache
+    except HTTPError as e:
+        content = json.loads(e.read().decode('utf8'))
+        print_error(content['errors'])
+        return False
+
+def prepare_translation_string(resource, lang):
+    language_strings = {}
+    languages = get_languages()
+    if languages:
         for language in languages:
             if lang == "all" or language['id'] in lang:
                 url = BASE_URL + "/resource_translations_async_downloads"
@@ -205,10 +219,7 @@ def prepare_translation_string(resource, lang):
                 language_code = REMAPPED_CODE[language_code] if language_code in REMAPPED_CODE else language_code
                 language_strings[language_code] = {'url': url, 'payload': payload}
         return language_strings
-    except HTTPError as e:
-        content = json.loads(e.read().decode('utf8'))
-        print_error(content['errors'])
-        return False
+    return False
 
 def download_languages(resource, lang = []):
     languages = {}
@@ -255,7 +266,14 @@ def download_languages(resource, lang = []):
                         status_response = urlopen(status_request)
                         content = json.loads(status_response.read().decode('utf8'))
                         if content['data']['attributes']['status'] == 'failed':
-                            print_error(content['data']['attributes']['errors'])
+                            if content['data']['attributes']['errors']:
+                                tmpDict = {
+                                    'status': content['data']['attributes']['errors'][0]['code'],
+                                    'detail': content['data']['attributes']['errors'][0]['detail']
+                                }
+                                print_error([tmpDict])
+                            else:
+                                print('ERROR: Nothing to download. Was the resource just created?')
                             return False
                     except HTTPError as e:
                         if e.code == 303:
@@ -270,9 +288,13 @@ def download_languages(resource, lang = []):
                             return
                 print('{} => ERROR: Maximum file fetch limit reached.'.format(language))
         except HTTPError as e:
-            content = json.loads(e.read().decode('utf8'))
-            print_error(content['errors'])
-            return False
+            try:
+                content = json.loads(e.read().decode('utf8'))
+                print_error(content['errors'])
+            except JSONDecodeError as e2:
+                print('ERROR: Unable to read error download message')
+            finally:
+                return False
 
     threads = []
     for language, request in all_requests.items():
@@ -461,6 +483,67 @@ def get_update(filename):
         print("No new strings found.")
         return False
 
+def lock_resource(branch_resource_name):
+    url = BASE_URL + "/resource_strings?filter[resource]=" + PROJECT_ID + ":r:" + branch_resource_name
+    languages = get_languages()
+    if languages:
+        lockedTags = []
+        for language in languages:
+            lockedTags.append("locked_" + language["attributes"]["code"])
+        while url != 0:
+            request = Request(url, headers=HEADER)
+            url = 0
+            try:
+                response = urlopen(request)
+                content = json.loads(response.read().decode('utf8'))
+                if response.code == 200:
+                    string_codes = []
+                    for key in content['data']:
+                        updateUrl = BASE_URL + "/resource_strings/" + key['id']
+                        stringTags = key["attributes"]["tags"]
+                        for tag in lockedTags:
+                            if tag not in stringTags:
+                                stringTags.append(tag)
+                        payload = {
+                                    "data": {
+                                        "attributes": {
+                                            "tags": stringTags,
+                                        },
+                                        "id": key['id'],
+                                        "type": "resource_strings"
+                                    }
+                                }
+                        string_codes.append({'url': updateUrl, 'payload': payload})
+
+                    def transifex_patch_strings(url, request):
+                        try:
+                            request = Request(url, headers=HEADER, data=json.dumps(request).encode('utf8'))
+                            request.get_method = lambda: 'PATCH'
+                            response = urlopen(request)
+                            content = json.loads(response.read().decode('utf8'))
+                        except HTTPError as e:
+                            content = json.loads(e.read().decode('utf8'))
+                            print_error(content['errors'])
+                            return False
+
+                    threads = []
+                    for request in string_codes:
+                        t = Thread(target=transifex_patch_strings, args=(request['url'], request['payload']))
+                        threads.append(t)
+                        t.start()
+
+                    for thread in threads:
+                        thread.join()
+            except HTTPError as e:
+                if e.code == 404:
+                    print("Resource file does not exist for this branch. ")
+                else:
+                    content = json.loads(e.read().decode('utf8'))
+                    print_error(content['errors'])
+                    return False
+            if content["links"]["next"] != None:
+                url = content["links"]["next"]
+
 def main():
     print("--- Transifex Language Management ---")
     languages = ""
@@ -538,6 +621,8 @@ def main():
             }
             success = send_upload_request(url, payload)
             if success:
+                print("Locking resource")
+                lock_resource(branch_resource_name)
                 print("Completed")
         print("~ Import completed ~")
         print("")

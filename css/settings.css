@@ -1038,6 +1038,9 @@
     vertical-align: middle;
     white-space: normal;
 }
+.tiny-chart .account.chart.data.hidden {
+    display: none;
+}
 
 
 /* Settings page low width */

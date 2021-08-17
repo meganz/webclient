@@ -10501,6 +10501,9 @@ const LABELS = {
 class gifPanel_GifPanel extends mixins["MegaRenderMixin"] {
   constructor(props) {
     super(props);
+    this.pathRef = '';
+    this.controllerRef = null;
+    this.fetchRef = null;
     this.delayProcID = null;
     this.defaultState = {
       value: '',
@@ -10554,9 +10557,15 @@ class gifPanel_GifPanel extends mixins["MegaRenderMixin"] {
         loading: true,
         unavailable: false
       }, () => {
-        fetch(this.getFormattedPath(path)).then(response => response.json()).then(({
+        this.pathRef = path;
+        this.controllerRef = typeof AbortController === 'function' && new AbortController();
+        this.fetchRef = fetch(this.getFormattedPath(path), {
+          signal: this.controllerRef.signal
+        }).then(response => response.json()).then(({
           data
         }) => {
+          this.fetchRef = this.pathRef = null;
+
           if (this.isMounted()) {
             if (data && data.length) {
               return this.setState(state => ({
@@ -10570,9 +10579,11 @@ class gifPanel_GifPanel extends mixins["MegaRenderMixin"] {
               loading: false
             }, () => this.resultContainerRef.reinitialise());
           }
-        }).catch(ex => this.setState({
-          unavailable: true
-        }, () => console.error('doFetch > error ->', ex, this.state)));
+        }).catch(ex => {
+          return ex.name === 'AbortError' ? null : this.setState({
+            unavailable: true
+          });
+        });
       });
     };
 
@@ -10602,11 +10613,18 @@ class gifPanel_GifPanel extends mixins["MegaRenderMixin"] {
     };
 
     this.handleChange = ev => {
-      const value = ev.target.value;
+      const {
+        value
+      } = ev.target;
       const searching = value.length >= 2;
 
       if (value.length === 0) {
         return this.doReset();
+      }
+
+      if (this.fetchRef !== null && this.pathRef === 'trending' && this.controllerRef) {
+        this.controllerRef.abort();
+        this.fetchRef = this.pathRef = null;
       }
 
       this.setState(state => ({ ...this.defaultState,

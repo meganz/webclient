@@ -263,7 +263,7 @@
         .mega-dialog > footer .footer-container {
             align-items: center;
             display: flex;
-            justify-content: center;
+            justify-content: flex-end;
             width: 100%;
         }
 
@@ -460,6 +460,7 @@
 
             .mega-dialog.dialog-template-graphic > footer .footer-container {
                 padding: 16px 48px 48px 48px;
+                justify-content: center;
             }
 
             .mega-dialog.dialog-template-graphic > footer aside {

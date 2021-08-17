@@ -10174,32 +10174,3 @@ body.de .mega-dialog.new-group-chat {
     }
 
 /* payment-stripe-success/failure-dialog */
-
-/* Revamp onboarding dialog */
-.revamp-onboarding .revamp-onboarding-header {
-    align-items: center;
-    background-color: var(--surface-main);
-}
-.revamp-onboarding .revamp-onboarding-header .illustration {
-    width: 100%;
-    margin-top: 35px;
-    margin-bottom: -20px;
-}
-.revamp-onboarding .revamp-onboarding-header .icon-dialog-close {
-    --mask-color: var(--icon-rest);
-}
-.revamp-onboarding .content-block {
-    text-align: center;
-}
-.revamp-onboarding .content-block .big-header {
-    font: var(--text-h1);
-    text-align: center;
-    color: var(--text-color-high);
-    padding: 46px 0 16px 0;
-}
-.revamp-onboarding .content-block .highlight-blue {
-    font: var(--text-body1-bold);
-    color: var(--text-color-info);
-}
-
-/* End Revamp onboarding dialog */

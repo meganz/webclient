@@ -15799,31 +15799,3 @@ body.megaChatDisabled .nw-contact-name button.start-chat-button {
     bottom: 66px;
 }
 /* end corner toasts and transfer popup */
-
-.revamp-onboarding.revamp-note.right-arrow {
-    position: absolute;
-    color: var(--text-color-high-inverted);
-    background-color: var(--surface-main-inverted);
-    padding: 12px;
-    border-radius: 12px;
-    justify-content: center;
-    display: flex;
-    align-items: center;
-    opacity: 0;
-    transition: var(--transition-all);
-    font: var(--text-body1);
-}
-.revamp-onboarding.revamp-note.right-arrow.active {
-    opacity: 1;
-}
-.revamp-onboarding.revamp-note.right-arrow.active::before {
-    content: '';
-    width: 12px;
-    height: 12px;
-    position: absolute;
-    background: var(--arrow-color, var(--surface-main-inverted));
-    z-index: 123;
-    border: none;
-    transform: rotateZ(-45deg);
-    right: -6px;
-}

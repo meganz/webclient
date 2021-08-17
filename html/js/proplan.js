@@ -1114,8 +1114,8 @@ pro.proplan = {
 
             // If local currency values exist
             if (this.businessPlanData.isLocalInfoValid) {
-                storagePrice = this.formatBusinessPriceCurrency(this.businessPlanData.bd.sto.lp);
-                transferPrice = this.formatBusinessPriceCurrency(this.businessPlanData.bd.trns.lp);
+                storagePrice = this.formatBusinessPriceCurrency(this.businessPlanData.bd.sto.lp) + '*';
+                transferPrice = this.formatBusinessPriceCurrency(this.businessPlanData.bd.trns.lp) + '*';
             }
             else {
                 storagePrice = this.formatBusinessPriceCurrency(this.businessPlanData.bd.sto.p);
@@ -1214,12 +1214,14 @@ pro.proplan = {
         let userPrice = 0;
         let storagePrice = 0;
         let transferPrice = 0;
+        let astrisk = '';
 
         // If local currency values exist
         if (planInfo.isLocalInfoValid) {
             userPrice = parseFloat(planInfo.lp);
             storagePrice = parseFloat(planInfo.bd.sto.lp);
             transferPrice = parseFloat(planInfo.bd.trns.lp);
+            astrisk = '*';
         }
         else {
             userPrice = parseFloat(planInfo.p);
@@ -1246,7 +1248,7 @@ pro.proplan = {
                 + storagePrice * (storageValue - minStorageValue)
                 + transferPrice * (transferValue - minTransferValue);
 
-            return this.formatBusinessPriceCurrency(totalPrice.toFixed(2));
+            return this.formatBusinessPriceCurrency(totalPrice.toFixed(2)) + astrisk;
         };
 
         /**

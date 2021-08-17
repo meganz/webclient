@@ -1808,7 +1808,12 @@ FileManager.prototype.initContextUI = function() {
     });
 
     $(c + '.open-cloud-item').rebind('click', function() {
-        M.openFolder($.selected[0]);
+
+        const target = M.d[$.selected[0]];
+
+        M.openFolder(target.p).then(() => {
+            selectionManager.add_to_selection(target.h, true);
+        });
     });
 
     $(c + '.preview-item').rebind('click', function() {

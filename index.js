@@ -2104,25 +2104,19 @@ function topbarUI(holderId) {
         let container = this.parentNode;
         if (container.classList.contains("show")) {
             container.classList.remove("show");
-            RevampOnboarding.removeFeedbackTip();
         }
         else {
+            if (fmconfig.rvonbrddl === 1) {
+                $('.js-accountbtn.feedback', topbar).removeClass('highlight');
+            }
+            mega.config.set('rvonbrddl', 1);
             var $accountAvatar = $('.js-account-avatar', topbar);
             if (!$accountAvatar.hasClass('rendered')) {
                 $accountAvatar.addClass('rendered').safeHTML(useravatar.contact(u_handle));
             }
             container.classList.add("show");
-            if (!RevampOnboarding.isDone(1)) {
-                RevampOnboarding.showFeedbackTip();
-            }
-        }
-        if (RevampOnboarding.isDone(0)) {
-            $('.revamp-onboarding.popup', topbar).addClass('hidden');
         }
     });
-
-    // TO-DO: Remove this, and put locale string in HTML instead of here.
-    $('.js-accountbtn.feedback', topbar).text(l.v4onboard_feeddropdown);
 
     $('.js-accountbtn', topbar).rebind('click.topAccBtn', function(){
 
@@ -2136,16 +2130,14 @@ function topbarUI(holderId) {
             mLogout();
         }
         else if (this.classList.contains('feedback')) {
-            var $this = $(this);
-            var feedbackDialog = mega.ui.FeedbackDialog.singleton($this);
-            feedbackDialog._type = 'top-button';
+            window.open(
+                'https://survey.mega.co.nz/index.php?r=survey/index&sid=271537&lang=en/c1',
+                '_blank',
+                'noopener,noreferrer'
+            );
         }
 
         var dropdown = document.getElementsByClassName('js-dropdown-account');
-
-        if (dropdown.length) {
-            RevampOnboarding.removeFeedbackTip();
-        }
 
         for (i = dropdown.length; i--;) {
             dropdown[i].classList.remove('show');
@@ -2630,7 +2622,6 @@ function topmenuUI() {
             for (i = elements.length; i--;) {
                 elements[i].classList.remove('show');
             }
-            RevampOnboarding.removeFeedbackTip();
         }
 
         if (!e || !(parent && parent.classList.contains('js-dropdown-account'))) {

@@ -1296,9 +1296,6 @@ mBroadcaster.once('boot_done', function populate_l() {
     l[24852] = escapeHTML(l[24852])
         .replace('[A]', '<a target="_blank" class="green-link clickurl" href="/blog">')
         .replace('[/A]', '</a>');
-    l.v4onboard_dialogtext = escapeHTML(l.v4onboard_dialogtext)
-        .replace('[S]', '<span class="highlight-blue">')
-        .replace('[/S]', '</span>');
     l.achievem_dialogfootertext = escapeHTML(l.achievem_dialogfootertext)
         .replace('[A]', '<a href="/pro" class="clickurl">')
         .replace('[/A]', '</a>');

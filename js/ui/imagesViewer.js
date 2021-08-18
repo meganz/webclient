@@ -146,15 +146,21 @@ var slideshowid;
         // Set the video container's fullscreen state
         var setFullscreenData = function(state) {
             if (state) {
+                $overlay.addClass('fullscreen');
                 $('i', $button).removeClass('icon-fullscreen-enter').addClass('icon-fullscreen-leave');
             }
             else {
+                $overlay.removeClass('fullscreen');
                 $('i', $button).removeClass('icon-fullscreen-leave').addClass('icon-fullscreen-enter');
 
                 // disable slideshow-mode exiting from full screen
                 if (slideshowplay) {
                     slideshow_imgControls(1);
                 }
+            }
+
+            if (!$overlay.is('.video-theatre-mode')) {
+                slideshow_imgPosition($overlay);
             }
         };
 
@@ -366,14 +372,13 @@ var slideshowid;
             $imageControls.addClass('hidden');
             $slideshowControls.removeClass('hidden');
             $prevNextButtons.addClass('hidden');
+            zoom_mode = false;
 
             // hack to start the slideshow in full screen mode
             if (fullScreenManager) {
                 fullScreenManager.enterFullscreen();
             }
 
-            zoom_mode = false;
-            slideshow_imgPosition($overlay);
             return false;
         });
 
@@ -756,9 +761,17 @@ var slideshowid;
         $('.video-timing', $videoControls).text('');
 
         // Init full screen icon
-        $('.v-btn.fullscreen i', $imageControls)
-            .removeClass('icon-fullscreen-leave')
-            .addClass('icon-fullscreen-enter');
+
+        if (fullScreenManager && fullScreenManager.state) {
+            $('.v-btn.fullscreen i', $imageControls)
+                .addClass('icon-fullscreen-leave')
+                .removeClass('icon-fullscreen-enter');
+        }
+        else {
+            $('.v-btn.fullscreen i', $imageControls)
+                .removeClass('icon-fullscreen-leave')
+                .addClass('icon-fullscreen-enter');
+        }
 
         // Turn off pick and pan mode
         slideshow_pickpan($overlay, 1);
@@ -897,6 +910,12 @@ var slideshowid;
                         clearTimeout(mouseIdleTimer);
                     });
                 });
+
+                if (fullScreenManager && fullScreenManager.state) {
+                    $('.viewer-bars', $overlay).noTransition(() => {
+                        $overlay.addClass('fullscreen');  
+                    });
+                }
 
                 if (!fullScreenManager) {
                     slideshow_fullscreen($overlay);

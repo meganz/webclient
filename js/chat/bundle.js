@@ -23490,7 +23490,7 @@ if (is_mobile) {
 
     if (anonymouschat) {
       parsepage(pages.mobile);
-      mobile.chatlink.show(pchandle, location.hash.substr(1).replace(/[^\w-].+$/, ''));
+      mobile.chatlink.show(pchandle, window.location.hash.substr(1).replace(/[^\w-].+$/, ''));
     } else {
       loadSubPage('fm', event);
     }

@@ -329,12 +329,16 @@
             + vhtml
             + singlenodeinfohtml
             + '<div class="properties-float-bl">'
-            + '<div class="properties-small-gray">' + p.t8
-            + '</div><div class="propreties-dark-txt contact-list">'
-            + '<span>' + p.t9 + '</span>'
-            + '<div class="contact-list-icon sprite-fm-mono icon-info-filled"></div>'
-            + '</div></div>'
-            + shareinfohtml;
+            + (n.h === M.RootID || n.h === M.RubbishID || n.h === M.InboxID ?
+                '<div class="contact-list-icon sprite-fm-mono icon-info-filled"></div>'
+                + '</div>'
+                + shareinfohtml :
+                '<div class="properties-small-gray">' + p.t8
+                + '</div><div class="propreties-dark-txt contact-list">'
+                + '<span>' + p.t9 + '</span>'
+                + '<div class="contact-list-icon sprite-fm-mono icon-info-filled"></div>'
+                + '</div></div>'
+                + shareinfohtml);
 
         $('.properties-txt-pad').safeHTML(html);
 

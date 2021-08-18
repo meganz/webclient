@@ -2102,7 +2102,7 @@ if (showLegacyMobilePage) {
     // AMO: Markup should not be passed to `innerHTML` dynamically. -- This isnt reached for the extension, anyway
     // jscs:disable
     document.body.innerHTML = '<div class="bottom-page scroll-block"><div class="main-content-block">'
-                            + '<div class="free-green-tip"></div><div class="main-centered-bl">'
+                            + '<div class="main-centered-bl">'
                             + '<div class="main-logo"></div><div class="main-head-txt" id="m_title"></div>'
                             + '<div class="main-head-txt" id="m_desc"></div><br /><br />'
                             + '<a href="" class="main-button" id="m_appbtn"></a><div class="main-social hidden">'
@@ -2936,7 +2936,6 @@ else if (!browserUpdate) {
     jsl.push({f:'js/fm/linkinfohelper.js', n: 'fm_linkinfohelper_js', j: 1});
     jsl.push({f:'js/fm/affiliatedata.js', n: 'fm_affiliatedata_js', j: 1});
     jsl.push({f:'js/fm/affiliateRedemption.js', n: 'fm_affiliateredemption_js', j: 1});
-    jsl.push({f:'js/fm/revamponboarding.js', n: 'fm_revamponboarding_js', j: 1});
 
     if (localStorage.makeCache) {
         jsl.push({f:'makecache.js', n: 'makecache', j:1});

@@ -33,6 +33,10 @@ export const LABELS = {
 };
 
 export default class GifPanel extends MegaRenderMixin {
+    pathRef = '';
+    controllerRef = null;
+    fetchRef = null;
+
     delayProcID = null;
 
     defaultState = {
@@ -95,23 +99,28 @@ export default class GifPanel extends MegaRenderMixin {
 
     doFetch = path => {
         this.setState({ loading: true, unavailable: false }, () => {
-            fetch(this.getFormattedPath(path))
-                .then(response => response.json())
-                .then(({ data }) => {
-                    if (this.isMounted()) {
-                        if (data && data.length) {
-                            return this.setState(state => ({ results: [...state.results, ...data], loading: false }));
+            this.pathRef = path;
+            this.controllerRef = typeof AbortController === 'function' && new AbortController();
+            this.fetchRef =
+                fetch(this.getFormattedPath(path), { signal: this.controllerRef.signal })
+                    .then(response => response.json())
+                    .then(({ data }) => {
+                        this.fetchRef = this.pathRef = null;
+                        if (this.isMounted()) {
+                            if (data && data.length) {
+                                return this.setState(state => ({
+                                    results: [...state.results, ...data],
+                                    loading: false
+                                }));
+                            }
+                            return this.setState({ bottom: true, loading: false }, () =>
+                                this.resultContainerRef.reinitialise()
+                            );
                         }
-                        return this.setState({ bottom: true, loading: false }, () =>
-                            this.resultContainerRef.reinitialise()
-                        );
-                    }
-                })
-                .catch(ex =>
-                    this.setState({ unavailable: true }, () =>
-                        console.error('doFetch > error ->', ex, this.state)
-                    )
-                );
+                    })
+                    .catch(ex => {
+                        return ex.name === 'AbortError' ? null : this.setState({ unavailable: true });
+                    });
         });
     };
 
@@ -137,11 +146,16 @@ export default class GifPanel extends MegaRenderMixin {
     };
 
     handleChange = ev => {
-        const value = ev.target.value;
+        const { value } = ev.target;
         const searching = value.length >= 2;
 
         if (value.length === 0) {
             return this.doReset();
+        }
+
+        if (this.fetchRef !== null && this.pathRef === 'trending' && this.controllerRef) {
+            this.controllerRef.abort();
+            this.fetchRef = this.pathRef = null;
         }
 
         this.setState(state => ({

@@ -846,9 +846,9 @@ pro.propay = {
                 continue;
             }
 
-            // Add disabled class if this payment method is not supported for this plan
+            // Add hidden class if this payment method is not supported for this plan
             if ((gatewayOpt.supportsExpensivePlans === 0) && (selectedPlanNum !== 4)) {
-                $gateway.addClass('disabled');
+                $gateway.addClass('hidden');
                 $gateway.attr('title', l[7162]);
             }
 

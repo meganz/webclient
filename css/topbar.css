@@ -491,7 +491,7 @@
      -webkit-margin-start: 8px;
     margin-inline-start: 8px;
 }
-.topbar .account-dialog ul.links li button.feedback.highlight {
+.topbar .account-dialog ul.links li button.feedback {
     color: var(--secondary-blue);
 }
 .topbar .account-dialog ul.links li .status-dropdown {

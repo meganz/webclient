@@ -2116,10 +2116,6 @@ function topbarUI(holderId) {
             container.classList.remove("show");
         }
         else {
-            if (fmconfig.rvonbrddl === 1) {
-                $('.js-accountbtn.feedback', topbar).removeClass('highlight');
-            }
-            mega.config.set('rvonbrddl', 1);
             var $accountAvatar = $('.js-account-avatar', topbar);
             if (!$accountAvatar.hasClass('rendered')) {
                 $accountAvatar.addClass('rendered').safeHTML(useravatar.contact(u_handle));

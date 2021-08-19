@@ -11672,6 +11672,7 @@ code, c {
     text-transform: uppercase;
     white-space: nowrap;
     box-sizing: border-box;
+    margin-top: 18px;
 }
 .voucher-logo .plan-info span {
 	height: 21px;
@@ -11714,6 +11715,10 @@ code, c {
 @media only screen and (max-width: 420px) {
     .voucher-info-redeem .mobile.voucher-block {
         padding: 0 24px;
+    }
+    .voucher-info-redeem .mobile.voucher-block .plan-info-container {
+        display: flex;
+        align-items: center;
     }
     .voucher-info-redeem .voucher-logo {
         width: 100%;

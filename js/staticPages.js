@@ -104,7 +104,7 @@ function api_req(req, context) {
 }
 const MegaData = dummy;
 const u_checklogin = boot_auth;
-const u_attr = false;
+const u_attr = undefined;
 MegaData.prototype.getSiteVersion = () => {
     'use strict';
     return (buildVersion && buildVersion.website) || 'dev';

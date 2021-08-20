@@ -2386,7 +2386,9 @@ FileManager.prototype.initUIKeyEvents = function() {
         else if ((e.keyCode === 13) && ($.dialog === 'rename')) {
             $('.rename-dialog-button.rename').trigger('click');
         }
-
+        else if (e.keyCode === 27 && $.dialog && ($.msgDialog === 'confirmation')) {
+            return false;
+        }
         // If the Esc key is pressed while the payment address dialog is visible, close it
         else if ((e.keyCode === 27) && !$('.payment-address-dialog').hasClass('hidden')) {
             addressDialog.closeDialog();

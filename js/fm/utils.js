@@ -1508,11 +1508,11 @@ MegaUtils.prototype.transferFromMegaCoNz = function(data) {
             // If the user is already logged in but with a different account just load that account instead. The
             // hash they came from e.g. a folder link may not be valid for this account so just load the file manager.
             else if (u_k && (JSON.stringify(u_k) !== JSON.stringify(urlParts[0]))) {
-                // if user click MEGAsync pro upgrade button and logged in as different account on webclient.
+                // If the user is transferred from MEGAsync and is logged in as different account on webclient.
                 msgDialog(
                     'warninga',
                     l[882],
-                    l[19341],
+                    l.megasync_transferred_different_user,
                     '',
                     function() {
                         if (!urlParts[2] || String(urlParts[2]).match(/^fm/)) {

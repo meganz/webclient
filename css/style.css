@@ -4254,6 +4254,9 @@ tr:not(.taken-down) .grid-status-icon:not(.read-only):not(.read-and-write) {
     padding: 0 14px;
     background-color: transparent;
 }
+.megaList-content .megaListItem .file-block-title {
+    max-width: 174px;
+}
 .file-block-title::before {
     position: absolute;
     content: '';

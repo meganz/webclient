@@ -326,7 +326,7 @@
 
                         for (var i = res.length; i--;) {
 
-                            res[i].data.cc.filter(checkCountry).sort(sortCountry);
+                            res[i].data.cc = res[i].data.cc.filter(checkCountry).sort(sortCountry);
                             ctx.affiliate.redeemGateways[res[i].gateway] = res[i];
                         }
                         resolve(res);

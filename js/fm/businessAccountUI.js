@@ -2471,6 +2471,7 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
         // end debug...
 
         let oldInvoice = false;
+        let taxExcluded = false;
 
         for (var k = invoiceDetail.items.length - 1; k >= 0; k--) {
             let $invItem;
@@ -2508,6 +2509,8 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
                 $('.inv-pay-desc', $invItem).text(invoiceDetail.items[k].d);
                 $('.inv-pay-amou', $invItem).text(' ');
                 $invItem.insertAfter($invItemHeader);
+
+                taxExcluded = invoiceDetail.items[k].extax;
             }
             else {
                 $invItem = $invItemContentTemplate.clone(true);
@@ -2523,7 +2526,7 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
 
         if (invoiceDetail.u.taxnum) {
             let taxText = '';
-            if (oldInvoice) {
+            if (oldInvoice || taxExcluded) {
                 taxText = `${(invoiceDetail.taxname || invoiceDetail.u.taxnum[0])}: `
                     + `${Number(invoiceDetail.taxrate).toFixed(2)}%`;
             }

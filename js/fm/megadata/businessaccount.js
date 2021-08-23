@@ -1016,8 +1016,9 @@ BusinessAccount.prototype.getInvoiceDetails = function (invoiceID, forceUpdate) 
     }
 
     var request = {
-        "a": "id", // get invoice details
-        "n": invoiceID   // invoice number
+        'a': 'id', // get invoice details
+        'n': invoiceID,   // invoice number
+        'extax': 1
     };
 
     api_req(request, {

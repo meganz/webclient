@@ -336,7 +336,7 @@
     transform: rotate(0);
 }
 .rtl .content-panel .settings-button.closed .head-title i.expand {
-    transform: rotate(180deg);
+    transform: rotate(90deg);
 }
 
 

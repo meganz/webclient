@@ -66,10 +66,6 @@
     left: auto;
     right: 4px; /* 4px is correct position for PS, as jSP is removed */
 }
-.rtl .lp-myfiles .btn-myfiles i.icon-arrow-down {
-    left: auto;
-    right: 12px;
-}
 .lp-myfiles .btn-myfiles.collapse i.icon-arrow-down {
     transform: rotate(270deg);
 }

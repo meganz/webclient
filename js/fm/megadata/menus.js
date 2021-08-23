@@ -994,8 +994,6 @@ MegaData.prototype.reCalcMenuPosition = function(m, x, y, ico) {
 
     var dPos;// new context menu position
     var cor;// corner, check setBordersRadius for more info
-    var rtl = $('body').hasClass('rtl');
-
     if (typeof ico === 'object') {// draw context menu relative to file-settings-icon
         cor = 1;
         dPos = { 'x': x , 'y': y + ico.y + 4 };// position for right-bot
@@ -1038,65 +1036,32 @@ MegaData.prototype.reCalcMenuPosition = function(m, x, y, ico) {
         }
 
         top = horPos(n);
-
-        if (rtl) {
-            if (m.parent().parent('.right-position').length === 0) {
-                if (minX <= (x - nmW)) {
-                    left = '100%';
-                    right = 'auto';
-                }
-                else if (maxX >= (wMax + nmW)) {
-                    n.addClass('right-position');
-                }
-                else {
-                    overlapParentMenu(n);
-
-                    return true;
-                }
+        if (m.parent().parent('.left-position').length === 0) {
+            if (maxX >= (wMax + nmW)) {
+                left = 'auto';
+                right = '100%';
+            }
+            else if (minX <= (x - nmW)) {
+                n.addClass('left-position');
             }
             else {
-                if (maxX >= (wMax + nmW)) {
-                    n.addClass('right-position');
-                }
-                else if (minX <= (x - nmW)) {
-                    left = '100%';
-                    right = 'auto';
-                }
-                else {
-                    overlapParentMenu(n);
+                overlapParentMenu(n);
 
-                    return true;
-                }
+                return true;
             }
         }
         else {
-            if (m.parent().parent('.left-position').length === 0) {
-                if (maxX >= (wMax + nmW)) {
-                    left = 'auto';
-                    right = '100%';
-                }
-                else if (minX <= (x - nmW)) {
-                    n.addClass('left-position');
-                }
-                else {
-                    overlapParentMenu(n);
-
-                    return true;
-                }
+            if (minX <= (x - nmW)) {
+                n.addClass('left-position');
+            }
+            else if (maxX >= (wMax + nmW)) {
+                left = 'auto';
+                right = '100%';
             }
             else {
-                if (minX <= (x - nmW)) {
-                    n.addClass('left-position');
-                }
-                else if (maxX >= (wMax + nmW)) {
-                    left = 'auto';
-                    right = '100%';
-                }
-                else {
-                    overlapParentMenu(n);
+                overlapParentMenu(n);
 
-                    return true;
-                }
+                return true;
             }
         }
 
@@ -1104,13 +1069,7 @@ MegaData.prototype.reCalcMenuPosition = function(m, x, y, ico) {
     }
     else {// right click
         cor = 0;
-
-        if (rtl) {
-            dPos = { 'x': x - 10 - m.outerWidth(), 'y': y + 10 };
-        }
-        else {
-            dPos = { 'x': x + 10, 'y': y + 10 };
-        }
+        dPos = { 'x': x + 10, 'y': y + 10 };
 
         if (cmH + 24 >= wH) {// Handle small windows height
             handleSmall(dPos);
@@ -1139,40 +1098,38 @@ MegaData.prototype.reCalcMenuPosition = function(m, x, y, ico) {
 MegaData.prototype.setBordersRadius = function(m, c) {
     "use strict";
 
-    // var DEF = 12;// default corner radius
-    // var SMALL = 4;// small corner radius
-    // var TOP_LEFT = 1, TOP_RIGHT = 3, BOT_LEFT = 2, BOT_RIGHT = 4;
-    // var tl = DEF, tr = DEF, bl = DEF, br = DEF;
+    var DEF = 12;// default corner radius
+    var SMALL = 4;// small carner radius
+    var TOP_LEFT = 1, TOP_RIGHT = 3, BOT_LEFT = 2, BOT_RIGHT = 4;
+    var tl = DEF, tr = DEF, bl = DEF, br = DEF;
 
-    // var pos = (typeof c === 'undefined') ? 0 : c;
+    var pos = (typeof c === 'undefined') ? 0 : c;
 
-    // switch (pos) {
-    //     case TOP_LEFT:
-    //         tl = SMALL;
-    //         break;
-    //     case TOP_RIGHT:
-    //         tr = SMALL;
-    //         break;
-    //     case BOT_LEFT:
-    //         bl = SMALL;
-    //         break;
-    //     case BOT_RIGHT:
-    //         br = SMALL;
-    //         break;
-    //     default:// situation when c is undefined, all border radius are by DEFAULT
-    //         break;
+    switch (pos) {
+        case TOP_LEFT:
+            tl = SMALL;
+            break;
+        case TOP_RIGHT:
+            tr = SMALL;
+            break;
+        case BOT_LEFT:
+            bl = SMALL;
+            break;
+        case BOT_RIGHT:
+            br = SMALL;
+            break;
+        default:// situation when c is undefined, all border radius are by DEFAULT
+            break;
 
-    // }
+    }
 
-    // // set context menu border radius
-    // m.css({
-    //     'border-top-left-radius': tl,
-    //     'border-top-right-radius': tr,
-    //     'border-bottom-left-radius': bl,
-    //     'border-bottom-right-radius': br
-    // });
-
-    m.css({'border-radius': 12});
+    // set context menu border radius
+    m.css({
+        'border-top-left-radius': tl,
+        'border-top-right-radius': tr,
+        'border-bottom-left-radius': bl,
+        'border-bottom-right-radius': br
+    });
 
     return true;
 };

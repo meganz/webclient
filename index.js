@@ -1557,6 +1557,10 @@ function init_page() {
         parsepage(pages.affiliate);
         affiliateprogram.init();
     }
+    else if (page.substring(0, 7) === 'special') {
+        parsepage(pages.special);
+        troyhuntCampaign.init();
+    }
     else if (page === 'extensions' || page === 'chrome' || page === 'firefox' || page === 'edge') {
         parsepage(pages['browsers']);
         browserspage.init();
@@ -2730,7 +2734,7 @@ function topmenuUI() {
                     'help', 'login', 'mega', 'nzippmember', 'nziphotographer', 'privacy', 'mobileapp',
                     'mobile', 'privacycompany', 'register', 'resellers', 'sdk', 'sync', 'sitemap', 'sourcecode',
                     'support', 'sync', 'takedown', 'terms', 'start', 'security', 'downloadapp', 'affiliate',
-                    'nas', 'pro', 'cookie', 'securechat', 'collaboration', 'storage',
+                    'nas', 'pro', 'cookie', 'securechat', 'collaboration', 'storage', 'special',
                     'achievements'
                 ];
                 var moveTo = {

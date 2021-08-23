@@ -33,8 +33,13 @@
 }
 .dropdown.body.context {
     min-width: 188px;
-    transition: top 100ms ease, left 100ms ease;
     box-shadow: 0 5px 10px 0 rgba(0, 0, 0, 0.3);
+}
+.rtl .dropdown.body.context {
+    direction: rtl;
+}
+.rtl .dropdown.body.context .icon-arrow-right-after::after {
+    transform: scaleX(-1);
 }
 .dropdown.body.submenu {
     -webkit-transition: all 200ms ease-in-out, right 200ms ease-in-out;
@@ -46,6 +51,10 @@
     margin: -8px -4px 0 -4px;
     visibility: hidden;
     opacity: 0;
+}
+.rtl .dropdown.body.submenu {
+    right: 100%;
+    left: auto;
 }
 .fr .dropdown.body.submenu {
     min-width: 252px;

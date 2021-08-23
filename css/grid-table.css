@@ -333,10 +333,6 @@ table tr.ui-selected .link-transfer-status {
     padding: 10px 16px 0;
 }
 
-.rtl .grid-table-header {
-    direction: rtl;
-}
-
 .grid-table-header::after {
     content: '';
     width: calc(100% - 34px);

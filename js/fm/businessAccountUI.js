@@ -2776,7 +2776,7 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function (result, callback) {
         $('footer .add-sub-user span', $dialog).text(l[19084]);
         $('.graphic', $dialog).addClass('hidden');
         $('.dialog-input-title-ontop', $dialog).removeClass('correctinput error');
-        $('footer .mega-switch', $dialog).removeClass('toggle-on');
+        $('footer .mega-switch', $dialog).removeClass('toggle-on').trigger('update.accessibility');
         $('footer .mega-switch .mega-feature-switch', $dialog)
             .attr('style', '');
         $('footer .invite-link-option', $dialog).removeClass('hidden');
@@ -2881,6 +2881,7 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function (result, callback) {
             else {
                 $me.addClass('toggle-on');
             }
+            $me.trigger('update.accessibility');
         });
 
     // event handler for adding sub-users

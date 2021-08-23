@@ -25,6 +25,8 @@ class ToggleCheckbox extends MegaRenderMixin {
                     ${this.props.className}
                     ${this.state.value ? 'toggle-on' : ''}
                 `}
+                role="switch"
+                aria-checked={!!this.state.value}
                 onClick={this.onToggle}>
                 <div className="mega-feature-switch" />
             </div>

@@ -3514,35 +3514,19 @@ FileManager.prototype.initMegaSwitchUI = function() {
 
     'use strict';
 
-    if (this.switchObserver) {
-        this.switchObserver.disconnect();
-    }
+    const $switches = $('.mega-switch');
 
-    const callback = function(mutationsList) {
+    $switches.attr({
+        'role': 'switch',
+        'aria-checked': function() {
+            return this.classList.contains('toggle-on');
+        },
+        'tabindex': '0',
+    });
 
-        for (const mutation of mutationsList) {
-
-            if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
-
-                mutation.target.setAttribute('aria-checked', mutation.target.classList.contains('toggle-on'));
-            }
-        }
-    };
-
-    this.switchObserver = new MutationObserver(callback);
-
-    const switches = document.getElementsByClassName('mega-switch');
-
-    for (let i = switches.length; i--;) {
-
-        switches[i].setAttribute('role', 'switch');
-        switches[i].setAttribute('aria-checked', switches[i].classList.contains('toggle-on'));
-        switches[i].setAttribute('tabindex', '0');
-        // Todo: We need to add label for accessibilty support. we need to update all label to label tag for this.
-        // switches[i].setAttribute('aria-labelledby', '');
-
-        this.switchObserver.observe(switches[i], {attributes: true});
-    }
+    $(document).rebind('update.accessibility', '.mega-switch', e => {
+        e.target.setAttribute('aria-checked', e.target.classList.contains('toggle-on'));
+    });
 };
 
 FileManager.prototype.getDDhelper = function getDDhelper() {

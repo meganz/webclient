@@ -644,7 +644,6 @@ FileManager.prototype.initFileManagerUI = function() {
         });
     });
 
-
     $fmholder
         .rebind('ps-scroll-left.fm-x-scroll ps-scroll-right.fm-x-scroll', function(e) {
             if (!e || !e.target) {
@@ -657,9 +656,14 @@ FileManager.prototype.initFileManagerUI = function() {
                 return;
             }
 
-
-            var scroller = $('.files-grid-view.fm .grid-table-header');
-            scroller.css('left', -1 * e.target.scrollLeft);
+            const $scroller = $('.files-grid-view.fm .grid-table-header');
+            if ($('body').hasClass('rtl')) {
+                $scroller.css('right', -1 *
+                    ($scroller[0].scrollWidth - (e.target.scrollLeft + $scroller[0].clientWidth) + 1));
+            }
+            else {
+                $scroller.css('left', -1 * e.target.scrollLeft);
+            }
 
         });
 
@@ -1039,6 +1043,14 @@ FileManager.prototype.initFileManagerUI = function() {
         $(window).rebind('focus.ps-unfocus', function() {
 
             $(document).off('ps-scroll-y.ps-unfocus');
+        });
+    }
+
+    // Set the table header columns to the correct position on opening the folder in an RTL language
+    if ($('body').hasClass('rtl')) {
+        mBroadcaster.once('mega:openfolder', () => {
+            const $scroller = $('.files-grid-view.fm .grid-table-header');
+            $scroller.css('right', -1 * ($scroller[0].scrollWidth - $scroller[0].clientWidth + 1));
         });
     }
 

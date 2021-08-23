@@ -1576,7 +1576,7 @@ var exportExpiry = {
             if (unixtime() >= expiryTimestamp) {
 
                 // Use 'Expired' string
-                expiryTimestamp = l[1664];
+                expiryTimestamp = l.expired_date_link;
             }
             else {
 

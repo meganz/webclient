@@ -23278,7 +23278,7 @@ Chat.prototype.openChat = function (userHandles, type, chatId, chatShard, chatdU
   self.chats.set(room.roomId, room);
 
   if (setAsActive && !self.currentlyOpenedChat || self.currentlyOpenedChat === room.roomId) {
-    room.show();
+    room.setActive();
   }
 
   room.showAfterCreation = setAsActive !== false;

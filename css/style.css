@@ -6563,6 +6563,10 @@ span.orange {
     left: auto;
     right: 100%;
 }
+.rtl .dropdown.body.submenu.right-position {
+    left: 100%;
+    right: auto;
+}
 .dropdown.body.submenu.overlap-right {
     right: auto;
 }
@@ -10060,6 +10064,10 @@ div.new-bottom-pages li, div.new-bottom-pages p {
 }
 .rtl .arrow.sprite-fm-mono::before {
     left: 0;
+    right: auto;
+}
+.rtl .arrow.sprite-fm-mono::before {
+    left: 10px;
     right: auto;
 }
 .arrow.sprite-fm-mono.desc::before {

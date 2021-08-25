@@ -664,6 +664,11 @@ li.active .call-duration i {
     height: 32px;
 }
 
+.result-table .result-table-row img.emoji {
+    max-width: 14px;
+    max-height: 14px;
+}
+
 .result-table .result-table-row.nil:hover {
     background: var(--surface-grey-2);
 }

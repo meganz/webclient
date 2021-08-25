@@ -902,7 +902,7 @@ var slideshowid;
                     $overlay.removeClass('mouse-idle');
                     mouseIdleTimer = setTimeout(function() {
                         $overlay.addClass('mouse-idle');
-                    }, 4000);
+                    }, 500);
                     $document.rebind('mousemove.idle', _);
                 })();
                 $controls.rebind('mousemove.idle', function() {

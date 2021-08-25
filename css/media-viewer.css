@@ -16,7 +16,7 @@
             z-index: 1000;
         }
         .media-viewer {
-            background: var(--surface-grey-1);
+            background: var(--surface-black);
             display: flex;
             flex-direction: column;
             height: 100%;

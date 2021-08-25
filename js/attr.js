@@ -1386,7 +1386,7 @@
                 if (typeof u_attr === 'object') {
                     delete u_attr[key];
                 }
-                factory.get(true).always(factory.notify);
+                factory.get(true).always(factory.notify.bind(factory));
             }
         };
 

@@ -203,20 +203,18 @@ var versiondialogid;
                 'dv',
                 -2,
                 true
-            )
-            .done(function(r) {
+            ).done(r => {
                 if (r === "0") {
-                    $('#versioning-status').addClass('toggle-on');
+                    $('#versioning-status').addClass('toggle-on').trigger('update.accessibility');
                     fileversioning.dvState = 0;
                 }
                 else if (r === "1") {
-                    $('#versioning-status').removeClass('toggle-on');
+                    $('#versioning-status').removeClass('toggle-on').trigger('update.accessibility');
                     fileversioning.dvState = 1;
                 }
-            })
-            .fail(function (e) {
+            }).fail(e => {
                 if (e === ENOENT) {
-                    $('#versioning-status').addClass('toggle-on');
+                    $('#versioning-status').addClass('toggle-on').trigger('update.accessibility');
                     fileversioning.dvState = 0;
                 }
             });

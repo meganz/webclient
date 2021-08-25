@@ -263,7 +263,10 @@
     width: 26px;
     border-radius: 50%;
 }
-
+.megaList-content .data-block-view:hover .file-settings-icon,
+.megaList-content .data-block-view.ui-selected .file-settings-icon {
+    background: var(--checkbox-fill-inactive);
+}
 .data-block-view:hover .file-settings-icon i,
 .data-block-view.ui-selected .file-settings-icon i {
     --icon-size: 24px;

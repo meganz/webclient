@@ -3316,6 +3316,9 @@ else if (!browserUpdate) {
         'cookie': {f:'html/cookie.html', n: 'cookie', j:0},
         'achievements': {f:'html/achievements.html', n: 'achievements', j:0},
         'achievementsPage_js': {f:'html/js/achievements.js', n: 'achievementsPage_js', j:1},
+        'special': {f:'html/troy-hunt.html', n:'special', j:0},
+        'special_js': {f:'html/js/troy-hunt.js', n:'special_js', j:1},
+        'special_css': {f:'css/troy-hunt.css', n:'special_css', j:2}
     };
 
     var jsl3 = {
@@ -3439,6 +3442,7 @@ else if (!browserUpdate) {
         'nziphotographer': ['nzipp', 'nzipp_js', 'nzipp_css'],
         'business': ['business', 'businessjs'],
         'cookie': ['cookie'],
+        'special': ['special', 'special_js', 'special_css']
     };
 
     if (is_mobile) {

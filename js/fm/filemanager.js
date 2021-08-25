@@ -494,7 +494,8 @@ FileManager.prototype.initFileManagerUI = function() {
                     else {
                         M.moveNodes($.moveids, $.movet)
                             .done(function(moves) {
-                                if (moves && M.currentdirid !== 'out-shares' && M.currentdirid !== 'public-links') {
+                                if (moves && M.currentdirid !== 'out-shares' && M.currentdirid !== 'public-links'
+                                    && String(M.currentdirid).split("/")[0] !== "search") {
                                     $ddelm.remove();
                                 }
                             });
@@ -643,7 +644,6 @@ FileManager.prototype.initFileManagerUI = function() {
         });
     });
 
-
     $fmholder
         .rebind('ps-scroll-left.fm-x-scroll ps-scroll-right.fm-x-scroll', function(e) {
             if (!e || !e.target) {
@@ -656,9 +656,14 @@ FileManager.prototype.initFileManagerUI = function() {
                 return;
             }
 
-
-            var scroller = $('.files-grid-view.fm .grid-table-header');
-            scroller.css('left', -1 * e.target.scrollLeft);
+            const $scroller = $('.files-grid-view.fm .grid-table-header');
+            if ($('body').hasClass('rtl')) {
+                $scroller.css('right', -1 *
+                    ($scroller[0].scrollWidth - (e.target.scrollLeft + $scroller[0].clientWidth) + 1));
+            }
+            else {
+                $scroller.css('left', -1 * e.target.scrollLeft);
+            }
 
         });
 
@@ -1038,6 +1043,14 @@ FileManager.prototype.initFileManagerUI = function() {
         $(window).rebind('focus.ps-unfocus', function() {
 
             $(document).off('ps-scroll-y.ps-unfocus');
+        });
+    }
+
+    // Set the table header columns to the correct position on opening the folder in an RTL language
+    if ($('body').hasClass('rtl')) {
+        mBroadcaster.once('mega:openfolder', () => {
+            const $scroller = $('.files-grid-view.fm .grid-table-header');
+            $scroller.css('right', -1 * ($scroller[0].scrollWidth - $scroller[0].clientWidth + 1));
         });
     }
 
@@ -3513,35 +3526,19 @@ FileManager.prototype.initMegaSwitchUI = function() {
 
     'use strict';
 
-    if (this.switchObserver) {
-        this.switchObserver.disconnect();
-    }
+    const $switches = $('.mega-switch');
 
-    const callback = function(mutationsList) {
+    $switches.attr({
+        'role': 'switch',
+        'aria-checked': function() {
+            return this.classList.contains('toggle-on');
+        },
+        'tabindex': '0',
+    });
 
-        for (const mutation of mutationsList) {
-
-            if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
-
-                mutation.target.setAttribute('aria-checked', mutation.target.classList.contains('toggle-on'));
-            }
-        }
-    };
-
-    this.switchObserver = new MutationObserver(callback);
-
-    const switches = document.getElementsByClassName('mega-switch');
-
-    for (let i = switches.length; i--;) {
-
-        switches[i].setAttribute('role', 'switch');
-        switches[i].setAttribute('aria-checked', switches[i].classList.contains('toggle-on'));
-        switches[i].setAttribute('tabindex', '0');
-        // Todo: We need to add label for accessibilty support. we need to update all label to label tag for this.
-        // switches[i].setAttribute('aria-labelledby', '');
-
-        this.switchObserver.observe(switches[i], {attributes: true});
-    }
+    $(document).rebind('update.accessibility', '.mega-switch', e => {
+        e.target.setAttribute('aria-checked', e.target.classList.contains('toggle-on'));
+    });
 };
 
 FileManager.prototype.getDDhelper = function getDDhelper() {

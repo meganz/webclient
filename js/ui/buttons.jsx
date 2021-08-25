@@ -221,6 +221,8 @@ export class Button extends MegaRenderMixin {
                             ${toggle.className ? toggle.className : ''}
                             ${toggle.enabled ? 'toggle-on' : ''}
                         `}
+                        role="switch"
+                        aria-checked={!!toggle.enabled}
                         onClick={(ev) => {
                             ev.stopPropagation();
                             if (this.props.toggle.onClick) {

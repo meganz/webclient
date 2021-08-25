@@ -2471,6 +2471,7 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
         // end debug...
 
         let oldInvoice = false;
+        let taxExcluded = false;
 
         for (var k = invoiceDetail.items.length - 1; k >= 0; k--) {
             let $invItem;
@@ -2508,6 +2509,8 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
                 $('.inv-pay-desc', $invItem).text(invoiceDetail.items[k].d);
                 $('.inv-pay-amou', $invItem).text(' ');
                 $invItem.insertAfter($invItemHeader);
+
+                taxExcluded = invoiceDetail.items[k].extax;
             }
             else {
                 $invItem = $invItemContentTemplate.clone(true);
@@ -2523,7 +2526,7 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
 
         if (invoiceDetail.u.taxnum) {
             let taxText = '';
-            if (oldInvoice) {
+            if (oldInvoice || taxExcluded) {
                 taxText = `${(invoiceDetail.taxname || invoiceDetail.u.taxnum[0])}: `
                     + `${Number(invoiceDetail.taxrate).toFixed(2)}%`;
             }
@@ -2773,7 +2776,7 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function (result, callback) {
         $('footer .add-sub-user span', $dialog).text(l[19084]);
         $('.graphic', $dialog).addClass('hidden');
         $('.dialog-input-title-ontop', $dialog).removeClass('correctinput error');
-        $('footer .mega-switch', $dialog).removeClass('toggle-on');
+        $('footer .mega-switch', $dialog).removeClass('toggle-on').trigger('update.accessibility');
         $('footer .mega-switch .mega-feature-switch', $dialog)
             .attr('style', '');
         $('footer .invite-link-option', $dialog).removeClass('hidden');
@@ -2878,6 +2881,7 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function (result, callback) {
             else {
                 $me.addClass('toggle-on');
             }
+            $me.trigger('update.accessibility');
         });
 
     // event handler for adding sub-users

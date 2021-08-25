@@ -14,7 +14,7 @@ mega.metatags = new function() {
             'recoverybykey', 'recoverybypark', 'recoveryenterkey',
             'recoverykeychangepass', 'recoveryparkchangepass',
             'redeem', 'repay', 'reset', 'sms', 'start', 'test', 'thanks', 'twofactor',
-            'unsub', 'verify', 'voucher', 'wiretransfer'
+            'unsub', 'verify', 'voucher', 'wiretransfer', 'special'
         ];
 
         if (!page) {
@@ -658,15 +658,15 @@ mega.metatags = new function() {
             mTags.mega_title = 'Desktop Onboarding - MEGA';
             stopBots(metaRobots);
         }
-        else if (page.startsWith('troy-hunt')) {
-            mTags.mega_title = 'Troy Hunt - MEGA';
-            mTags.mega_desc = 'MEGA\'s Troy Hunt Page';
+        else if (page.startsWith('special')) {
+            mTags.mega_title = 'Special - MEGA';
+            mTags.mega_desc = 'MEGA\'s Special Page';
 
             if (page.endsWith('/pro')) {
-                mTags.mega_title = 'Troy Hunt - PRO - MEGA';
+                mTags.mega_title = 'Special - PRO - MEGA';
             }
             else if (page.endsWith('/business')) {
-                mTags.mega_title = 'Troy Hunt - Business - MEGA';
+                mTags.mega_title = 'Special - Business - MEGA';
             }
 
             stopBots(metaRobots);

@@ -36,10 +36,6 @@ MegaData.prototype.buildSubMenu = function(id) {
             '      <i class="sprite-fm-mono icon-cloud"></i>' +
             '      <span>' + escapeHTML(l[164]) + '</span>' +
             '    </span>' + sm +
-            '    <span class="dropdown-item remove-item" id="fi_' + escapeHTML(this.RubbishID) + '">' +
-            '      <i class="sprite-fm-mono icon-bin"></i>' +
-            '      <span>' + escapeHTML(l[168]) + '</span>' +
-            '    </span>' +
             '    <hr />' +
             '    <span class="dropdown-item advanced-item">' +
             '      <i class="sprite-fm-mono icon-target"></i>' +

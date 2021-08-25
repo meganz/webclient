@@ -639,6 +639,20 @@ mobile.affiliate = {
 
                         if (currentStep === 3 && affiliateRedemption.requests.first.m === 2) {
 
+                            if (affiliateRedemption.req1res[0].lf / affiliateRedemption.req1res[0].la > 0.1) {
+                                // Show the warning message if the fees are more than 10% of the total
+                                mobile.messageOverlay.show(
+                                    l[24964],
+                                    l[24965],
+                                    false,
+                                    () => {
+                                        self.closeRedeemPage();
+                                        return false;
+                                    },
+                                    false,
+                                    [l[79], l[78]]);
+                            }
+
                             currentStep++;
                             $('.redeem-progress', self.$page).addClass('with-timer');
                         }

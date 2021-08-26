@@ -8,6 +8,10 @@
 .section.conversations .fm-right-files-block {
     height: 100%;
 }
+.js-messages-scroll-area.ps-in-scrolling,
+.js-messages-scroll-area.ps-in-scrolling:hover {
+    pointer-events: initial;
+}
 .conversation-panels, .conversation-panel {
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;

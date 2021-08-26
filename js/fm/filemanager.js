@@ -1967,11 +1967,14 @@ FileManager.prototype.createFolderUI = function() {
 
     var doCreateFolder = function() {
         var $inputWrapper = $('.create-new-folder.popup .fm-dialog-body');
-        var $input = $inputWrapper.find('input');
+        var $input = $('input', $inputWrapper);
         var name = $input.val();
         var errorMsg = '';
 
-        if (name === '' || !M.isSafeName(name)) {
+        if (name.trim() === '') { // Check if enter a folder name
+            errorMsg = l[1024];
+        }
+        else if (!M.isSafeName(name)) { // Check if folder name is valid
             errorMsg = l[24708];
         }
         else if (duplicated(name)) { // Check if folder name already exists
@@ -2082,7 +2085,7 @@ FileManager.prototype.createFolderUI = function() {
         if ($(this).val() === '') {
             $('.create-new-folder').removeClass('filled-input');
         }
-        if (e.which == 13) {
+        if (e.which === 13) {
             doCreateFolder();
         }
     });

@@ -1279,7 +1279,7 @@ function renameDialog() {
                 errMsg = '';
 
                 if (n.name && value !== n.name) {
-                    if (!value) {
+                    if (!value.trim()) {
                         errMsg = l[5744];
                     }
                     else if (M.isSafeName(value)) {
@@ -2848,7 +2848,11 @@ function createFolderDialog(close) {
 
     var doCreateFolder = function(v) {
         var errorMsg = '';
-        if (!M.isSafeName(v, true)) {
+
+        if (v.trim() === '') {
+            errorMsg = l[1024];
+        }
+        else if (!M.isSafeName(v)) {
             $dialog.removeClass('active');
             errorMsg = l[24708];
         }
@@ -2886,7 +2890,7 @@ function createFolderDialog(close) {
         closeDialog();
         loadingDialog.pshow();
 
-        M.createFolder(target, v.split(/[/\\]/))
+        M.createFolder(target, v)
             .then(function(h) {
                 if (d) {
                     console.log('Created new folder %s->%s', target, h);
@@ -2940,9 +2944,9 @@ function createFolderDialog(close) {
     });
 
     $input.rebind('keypress', function(e) {
-
-        if (e.which === 13 && $(this).val() !== '') {
-            doCreateFolder($(this).val());
+        var v = $(this).val();
+        if (e.which === 13 && v.trim() !== '') {
+            doCreateFolder(v);
         }
     });
 
@@ -2953,16 +2957,7 @@ function createFolderDialog(close) {
         $dialog.removeClass('active');
     });
 
-    $('.fm-dialog-new-folder-button').rebind('click', function() {
-        var v = $input.val();
-
-        if (v === '' || v === l[157]) {
-            alert(l[1024]);
-        }
-        else {
-            doCreateFolder(v);
-        }
-    });
+    $('.fm-dialog-new-folder-button').rebind('click', () => doCreateFolder($input.val()));
 
     M.safeShowDialog('createfolder', function() {
         $dialog.removeClass('hidden');

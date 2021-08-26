@@ -360,7 +360,8 @@ function initAddDialogMultiInputPlugin() {
         onEmailCheck: function() {
             errorMsg(l[7415]);
         },
-        onDoublet: function (u, iType) {
+        onDoublet: function(u, iType) {
+            $addButton.addClass('hidden');
             if (iType === 'opc') {
                 errorMsg(l[17545]);
             }

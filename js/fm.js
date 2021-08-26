@@ -2271,6 +2271,7 @@ function initShareDialogMultiInput(alreadyAddedContacts) {
         minChars: 1,
         accountHolder: (M.u[u_handle] || {}).m || '',
         scrollLocation: 'share',
+        initFocused: false,
         // Exclude from dropdownlist only emails/names which exists in multi-input (tokens)
         excludeCurrent: true,
         onEmailCheck: function() {

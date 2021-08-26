@@ -33,6 +33,7 @@
         url: '',
         visibleComma: false,
         scrollLocation: 'add',
+        initFocused: true,
         /**
          * resultsFormatter
          *
@@ -816,7 +817,9 @@
 
             initTokenInputsScroll($wrapper);
 
-            focus_with_timeout(input_box);
+            if ($(input).data("settings").initFocused) {
+                focus_with_timeout(input_box);
+            }
         }
 
         function resize_input() {

@@ -412,6 +412,12 @@ mega.metatags = new function() {
             mTags.mega_desc = l.mtags_desc_security || mTags.en_desc;
             mTags.image = 'https://cms2.mega.nz/c964ddb7dd27f1acd727747862787486.png';
         }
+        else if (page === 'security/bug-bounty') {
+            mTags.en_title = 'We Welcome Security And Bug Reports - MEGA';
+            mTags.en_desc = 'Earn Bounties For Finding Bugs And Other Issues At MEGA';
+            mTags.mega_title = l.mtags_title_security_bugbounty || mTags.en_title;
+            mTags.mega_desc = l.mtags_desc_security_bugbounty || mTags.en_desc;
+        }
         else if (page === 'privacycompany') {
             mTags.en_title = 'The Privacy Company - MEGA';
             mTags.en_desc = 'MEGA takes your right to privacy seriously and provides the tools to protect it.' +

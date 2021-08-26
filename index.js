@@ -1509,6 +1509,10 @@ function init_page() {
         parsepage(pages['securitypractice']);
         securityPractice.init();
     }
+    else if (page === 'security/bug-bounty') {
+        parsepage(pages.securitypractice);
+        securityPractice.initBounty();
+    }
     else if (page == 'takedown') {
         parsepage(pages['takedown']);
         if (is_mobile) {

@@ -164,12 +164,30 @@ var nicknames = {
             this.contactUserHandle = contactUserHandle;
 
             // Init functionality
+            this.setNicknameDialogTitle();
             this.prefillUserNickname();
             this.initTextSave();
             this.initCancelAndCloseButtons();
             this.initSaveButton();
             this.showDialog();
             this.initInputFocus();
+        },
+
+        /**
+         * Setup the nickname dialog title
+         */
+        setNicknameDialogTitle: function() {
+
+            'use strict';
+
+            var $nicknameDialogTitle = $('#contact-nickname-dialog-title', this.$dialog);
+
+            if (typeof M.u[this.contactUserHandle] === 'undefined' || M.u[this.contactUserHandle].nickname === '') {
+                $nicknameDialogTitle.text(l.set_nickname_label);
+            }
+            else {
+                $nicknameDialogTitle.text(l.edit_nickname_label);
+            }
         },
 
         /**

@@ -134,7 +134,7 @@ export default class ContextMenu extends MegaRenderMixin {
                     }
                     <DropdownItem
                         icon="sprite-fm-mono icon-rename"
-                        label={l[20828]}
+                        label={contact.nickname === '' ? l.set_nickname_label : l.edit_nickname_label}
                         onClick={() => this.handleSetNickname(contact.u)}
                     />
                     <hr />
@@ -182,7 +182,7 @@ export default class ContextMenu extends MegaRenderMixin {
                 />
                 <DropdownItem
                     icon="sprite-fm-mono icon-rename"
-                    label={l[20828]}
+                    label={contact.nickname === '' ? l.set_nickname_label : l.edit_nickname_label}
                     onClick={() => this.handleSetNickname(contact.u)}
                 />
             </>

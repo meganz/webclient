@@ -268,7 +268,9 @@ export class ContactButton extends ContactAwareComponent {
             }
             moreDropdowns.push(
                 <DropdownItem
-                    key="set-nickname" icon="sprite-fm-mono icon-rename" label={l[20828]} onClick={() => {
+                    key="set-nickname" icon="sprite-fm-mono icon-rename"
+                    label={contact.nickname === '' ? l.set_nickname_label : l.edit_nickname_label}
+                    onClick={() => {
                         nicknames.setNicknameDialog.init(contact.u);
                     }} />
             );

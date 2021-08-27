@@ -15732,7 +15732,6 @@ class conversationaudiovideopanel_ConversationAVPanel extends mixins["MegaRender
     var $container = $(external_ReactDOM_default.a.findDOMNode(self));
     self.visiblePanel = false;
     $container.removeClass('visible-panel');
-    $(document).trigger('closeDropdowns');
   }
 
   resizeVideos() {

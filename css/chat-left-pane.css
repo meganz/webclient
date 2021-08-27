@@ -1043,7 +1043,7 @@ li.active .call-duration i {
 .contact-item-controls {
     display: none;
     text-align: right;
-    width: 100%;
+    width: calc(100% - 10px);
 }
 
 .contact-item-controls .mega-button.action {

@@ -14253,6 +14253,15 @@ body.megaChatDisabled .nw-contact-name button.start-chat-button {
     display: inline-block;
     padding: 0 10px;
 }
+.storage-division-container .storage-division-per.one-digit {
+    padding: 0 12px;
+}
+.storage-division-container .storage-division-per.two-digits {
+    padding: 0 8px;
+}
+.storage-division-container .storage-division-per.three-digits {
+    padding: 0 4px;
+}
 
 .storage-division-name {
     position: relative;

@@ -9,7 +9,6 @@ var fileSize;
 var dlResumeInfo;
 var mediaCollectFn;
 var maxDownloadSize = Math.pow(2, 53);
-var dl_advs;
 
 function expandDlBar(close) {
     'use strict';
@@ -639,9 +638,6 @@ function dl_g(res, ctx) {
 
             // This file link is valid to affiliate
             M.affiliate.storeAffiliate(dlpage_ph, 2);
-
-            // Adding advertisement
-            dlPageAds($topBar, res).dump('ads');
         }
         else if (is_mobile) {
             // Load the missing file decryption key dialog for mobile
@@ -860,67 +856,6 @@ function dlPageStartDownload(isDlWithMegaSync) {
         dl_queue.push(fdl_queue_var);
     }
     $.dlhash = getSitePath();
-}
-
-async function dlPageAds($topBar, res) {
-    'use strict';
-
-    if (is_mobile || !('csp' in window)) {
-        return 'unavailing';
-    }
-
-    await csp.init();
-    if (!csp.has('ads') || !csp.has('third')) {
-        return 'unhallowed';
-    }
-
-    dl_advs = new gAdvs(dlpage_ph, res);
-
-    let isRendered = false;
-
-    // Only load iframe that require to be rendered,
-    // Once screensize updated to change layout, trying to render others
-    if (window.innerWidth < 920 || window.innerHeight < 668) {
-        $(window).rebind('resize.downloadAdvs', function() {
-
-            if (window.innerWidth >= 920 && window.innerHeight >= 668) {
-
-                dl_advs.render($('.dl-left-ads', $topBar), 'wphl').dump('wphl');
-                dl_advs.render($('.dl-right-ads', $topBar), 'wphr').dump('wphr');
-                $(window).unbind('resize.downloadAdvs');
-            }
-        });
-
-        isRendered |= await dl_advs.render($('.dl-top-ads', $topBar), 'wpht');
-    }
-    else {
-        $(window).rebind('resize.downloadAdvs', function() {
-
-            if (window.innerWidth < 920 || window.innerHeight < 668) {
-
-                dl_advs.render($('.dl-top-ads', $topBar), 'wpht').dump('wpht');
-                $(window).unbind('resize.downloadAdvs');
-            }
-        });
-
-        isRendered |= await dl_advs.render($('.dl-left-ads', $topBar), 'wphl');
-        isRendered |= await dl_advs.render($('.dl-right-ads', $topBar), 'wphr');
-    }
-
-    // If any one of ads are rendered send stats it is served.
-    if (isRendered) {
-        eventlog(99808);
-    }
-
-    $topBar.rebind('click.hideAds', function(e) {
-
-        if ($(e.target).is('.download.play-video-button')) {
-            dl_advs.destroy();
-            $(window).unbind('resize.downloadAdvs');
-        }
-    });
-
-    return 'showing';
 }
 
 function setMobileAppInfo() {
@@ -1283,11 +1218,5 @@ function dlPageCleanup() {
 
         $(window).trigger('video-destroy');
         dl_node = false;
-    }
-
-    if (dl_advs) {
-        $(window).unbind('resize.downloadAdvs');
-        dl_advs.destroy();
-        dl_advs = false;
     }
 }

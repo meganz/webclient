@@ -875,12 +875,12 @@ function init_page() {
                 // Ask them to log out and click on the confirmation link again
                 if (is_mobile) {
                     parsepage(pages['mobile']);
-                    mobile.messageOverlay.show(l[2480], l[12440], function () {
+                    mobile.messageOverlay.show(l[2480], l[12440], function() {
                         loadSubPage('fm');
                     });
                 }
                 else {
-                    msgDialog('warningb', l[2480], l[12440], false, function () {
+                    msgDialog('warningb', l[2480], l[12440], false, function() {
                         loadSubPage('fm');
                     });
                 }
@@ -892,6 +892,12 @@ function init_page() {
 
                 // If successful
                 if (typeof email === 'string') {
+
+                    if (u_handle && u_handle === result[2]) {
+                        // same account still in active session, let's end.
+                        u_logout(1);
+                    }
+
                     signUpSucceededCallback(email);
                 }
                 else {

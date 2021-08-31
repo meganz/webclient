@@ -3312,7 +3312,6 @@ else if (!browserUpdate) {
         'feature_storage': {f:'html/features-storage.html', n: 'feature_storage', j:0},
         'feature_chat': {f:'html/features-chat.html', n: 'feature_chat', j:0},
         'feature_collaboration': {f:'html/features-collaboration.html', n: 'feature_collaboration', j:0},
-        'gadvs_js': {f:'js/gAdvs.js', n: 'gadvs_js', j:1},
         'cookie': {f:'html/cookie.html', n: 'cookie', j:0},
         'achievements': {f:'html/achievements.html', n: 'achievements', j:0},
         'achievementsPage_js': {f:'html/js/achievements.js', n: 'achievementsPage_js', j:1},
@@ -3398,8 +3397,8 @@ else if (!browserUpdate) {
         'newsignup': ['register', 'register_js', 'zxcvbn_js'],
         'emailverify': ['zxcvbn_js'],
         'resellers': ['resellers'],
-        '!': ['download', 'download_js', 'gadvs_js'],
-        'file': ['download', 'download_js', 'gadvs_js'],
+        '!': ['download', 'download_js'],
+        'file': ['download', 'download_js'],
         'dispute': ['dispute'],
         'disputenotice': ['disputenotice', 'copyright_js'],
         'copyright': ['copyright'],
@@ -4184,10 +4183,6 @@ else if (!browserUpdate) {
                     a: 'g',
                     p: page.substr(0, 5) === 'file/' ? page.substr(5, 8) : page.split('!')[1]
                 };
-
-                // if this is download page, get ads data with g request
-                g.au = ["wphl", "wphr", "wpht"];
-                g.ad = localStorage.adflag || 1;
 
                 xhr(u_sid ? '&sid=' + u_sid : false, g, function(response) {
                     dl_res = Array.isArray(response) && response[0];

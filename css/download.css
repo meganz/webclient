@@ -53,31 +53,7 @@
     height: calc(100% - 60px);
     margin-top: 60px;
 }
-
-.video-theatre-mode .bottom-page.download-content .bottom-page.dl-ads,
-.bottom-page.download-content .dl-ads {
-    display: none;
-    vertical-align: top;
-}
-
-.bottom-page.download-content .dl-left-ads.ads-active,
-.bottom-page.download-content .dl-right-ads.ads-active {
-    box-sizing: border-box;
-    display: table-cell;
-    padding: 0 17px;
-    text-align: left;
-    width: 130px;
-}
-
-@media only screen and (max-width: 920px), (max-height: 668px) {
-    .bottom-page.download-content .dl-ads.table-row.ads-active {
-        display: table-row;
-    }
-    .bottom-page.download-content .dl-ads.table-cell.ads-active {
-        display: none;
-    }
-}
-.bottom-page.download-content .table-cell:not(.dl-ads) {
+.bottom-page.download-content .table-cell {
     vertical-align: middle;
 }
 .bottom-page.dropdown-table {

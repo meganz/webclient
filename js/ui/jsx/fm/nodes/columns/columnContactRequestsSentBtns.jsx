@@ -6,7 +6,7 @@ export class ColumnContactRequestsSentBtns extends MegaRenderMixin {
     static sortable = true;
     static id = "grid-url-header-nw";
     static label = "";
-    static megatype = "grid-url-header-nw";
+    static megatype = "grid-url-header-nw contact-controls-container";
 
     reinviteAllowed = rts => {
         const TIME_FRAME = 60 * 60 * 24 * 14; // 14 days in seconds

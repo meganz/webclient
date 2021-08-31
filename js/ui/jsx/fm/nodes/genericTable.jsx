@@ -107,6 +107,7 @@ export default class GenericTable extends GenericNodePropsComponent {
         key={index + "_" + node[keyProp]}
         >
             {columns}
+            <td className="column-hover" />
         </tr>;
     }
 }

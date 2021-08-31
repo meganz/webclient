@@ -992,15 +992,13 @@ li.active .call-duration i {
 .contacts-table.requests-table td {
     width: calc(20% - 2px);
 }
+.contacts-table.requests-table td.contact-controls-container {
+    width: 49%;
+}
 .contacts-table.requests-table th:first-child,
 .contacts-table.requests-table td:first-child {
     width: calc(30% - 2px);
 }
-.contacts-table.requests-table th:last-child,
-.contacts-table.requests-table td:last-child {
-    width: calc(50% - 2px);
-}
-
 .contacts-table.contact-requests th,
 .contacts-table.contact-requests td {
     width: 33%;
@@ -1095,8 +1093,7 @@ li.active .call-duration i {
     box-shadow: 0 -1px 0 0 var(--stroke-grey-2);
 }
 
-.contacts-table-results tr:hover::before,
-.contacts-table-results tr.ui-selected::before {
+.contacts-table-results tr .column-hover {
     display: block;
     content: '';
     position: absolute;
@@ -1106,10 +1103,14 @@ li.active .call-duration i {
     height: 100%;
     border-radius: 6px;
     box-sizing: border-box;
+    z-index: -1;
+}
+
+.contacts-table-results tr.ui-selected .column-hover {
     background: var(--surface-grey-4);
 }
 
-.contacts-table-results tr:not(tr.ui-selected):hover::before {
+.contacts-table-results tr:not(tr.ui-selected):hover .column-hover {
     border: 1px solid var(--stroke-grey-2);
     background: var(--surface-grey-3);
 }

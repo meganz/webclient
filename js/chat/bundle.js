@@ -8305,7 +8305,9 @@ class genericTable_GenericTable extends genericNodePropsComponent_GenericNodePro
         this.props.onDoubleClick(e, this.props.node);
       },
       key: index + "_" + node[keyProp]
-    }, columns);
+    }, columns, external_React_default.a.createElement("td", {
+      className: "column-hover"
+    }));
   }
 
 }
@@ -20132,7 +20134,7 @@ class columnContactRequestsRcvdBtns_ColumnContactRequestsRcvdBtns extends mixins
 columnContactRequestsRcvdBtns_ColumnContactRequestsRcvdBtns.sortable = true;
 columnContactRequestsRcvdBtns_ColumnContactRequestsRcvdBtns.id = "grid-url-header-nw";
 columnContactRequestsRcvdBtns_ColumnContactRequestsRcvdBtns.label = "";
-columnContactRequestsRcvdBtns_ColumnContactRequestsRcvdBtns.megatype = "grid-url-header-nw";
+columnContactRequestsRcvdBtns_ColumnContactRequestsRcvdBtns.megatype = "grid-url-header-nw contact-controls-container";
 // CONCATENATED MODULE: ./js/chat/ui/contactsPanel/receivedRequests.jsx
 
 
@@ -20248,7 +20250,7 @@ class columnContactRequestsSentBtns_ColumnContactRequestsSentBtns extends mixins
 columnContactRequestsSentBtns_ColumnContactRequestsSentBtns.sortable = true;
 columnContactRequestsSentBtns_ColumnContactRequestsSentBtns.id = "grid-url-header-nw";
 columnContactRequestsSentBtns_ColumnContactRequestsSentBtns.label = "";
-columnContactRequestsSentBtns_ColumnContactRequestsSentBtns.megatype = "grid-url-header-nw";
+columnContactRequestsSentBtns_ColumnContactRequestsSentBtns.megatype = "grid-url-header-nw contact-controls-container";
 // CONCATENATED MODULE: ./js/ui/jsx/fm/nodes/columns/columnContactRequestsRts.jsx
 
 

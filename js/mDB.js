@@ -2300,38 +2300,6 @@ MegaDexie.create = function(name, binary) {
     return new SharedLocalKVStorage.Utils.DexieStorage('mdcdb:' + name, binary);
 };
 
-// Remove obsolete databases.
-mBroadcaster.once('startMega', tryCatch(function _removeObsoleteDatabases() {
-    'use strict';
-
-    if (Date.now() > 163e10) {
-        console.error('Remove me \uD83D\uDD34');
-        return;
-    }
-
-    Dexie.getDatabaseNames()
-        .then(function(r) {
-            for (var i = r.length; i--;) {
-                var n = r[i];
-
-                if (n.substr(0, 6) === '$ctdb_') {
-                    Dexie.delete(n).then(nop).catch(dump);
-                    console.info('Removing obsolete db:%s', n);
-                }
-            }
-        })
-        .catch(nop);
-
-    var entries = Object.keys(localStorage)
-        .filter(function(k) {
-            return k.startsWith('_$mdb$');
-        });
-
-    for (var i = entries.length; i--;) {
-        delete localStorage[entries[i]];
-    }
-}, false));
-
 // --------------------------------------------------------------------------
 // --------------------------------------------------------------------------
 

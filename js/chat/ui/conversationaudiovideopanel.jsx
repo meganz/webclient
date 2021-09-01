@@ -253,7 +253,6 @@ class ConversationAVPanel extends MegaRenderMixin {
 
         self.visiblePanel = false;
         $container.removeClass('visible-panel');
-        $(document).trigger('closeDropdowns');
     }
     resizeVideos() {
         var self = this;

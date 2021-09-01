@@ -487,7 +487,7 @@ def lock_resource(branch_resource_name):
     url = BASE_URL + "/resource_strings?filter[resource]=" + PROJECT_ID + ":r:" + branch_resource_name
     languages = get_languages()
     if languages:
-        lockedTags = []
+        lockedTags = ["do_not_translate"]
         for language in languages:
             lockedTags.append("locked_" + language["attributes"]["code"])
         while url != 0:

@@ -809,7 +809,8 @@ var slideshowid;
                         slideshow_imgControls(1);
                     }
                     else {
-                        slideshow(0, 1);
+                        history.back();
+                        return false;
                     }
                 }
                 else if (e.keyCode === 8 || e.key === 'Backspace') {

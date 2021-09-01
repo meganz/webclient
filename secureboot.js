@@ -2644,7 +2644,6 @@ else if (!browserUpdate) {
     jsl.push({f:'js/utils/watchdog.js', n: 'js_utils_watchdog_js', j: 1});
     jsl.push({f:'js/utils/workers.js', n: 'js_utils_workers_js', j: 1});
     jsl.push({f:'js/utils/trans.js', n: 'js_utils_trans_js', j: 1});
-    jsl.push({f:'js/utils/track.js', n: 'js_utils_track_js', j: 1});
 
     jsl.push({f:'js/vendor/dexie.js', n: 'dexie_js', j:1,w:5});
     jsl.push({f:'js/functions.js', n: 'functions_js', j:1});
@@ -3062,7 +3061,6 @@ else if (!browserUpdate) {
         jsl.push({f:'js/utils/timers.js', n: 'js_utils_timers_js', j: 1});
         jsl.push({f:'js/utils/watchdog.js', n: 'js_utils_watchdog_js', j: 1});
         jsl.push({f:'js/utils/workers.js', n: 'js_utils_workers_js', j: 1});
-        jsl.push({f:'js/utils/track.js', n: 'js_utils_track_js', j: 1});
 
         jsl.push({f:'js/crypto.js', n: 'crypto_js', j: 1, w: 5});
         jsl.push({f:'js/account.js', n: 'user_js', j: 1});
@@ -3091,8 +3089,6 @@ else if (!browserUpdate) {
         jsl.push({f:'js/utils/dom.js', n: 'js_utils_dom_js', j: 1});
         jsl.push({f:'js/utils/network.js', n: 'js_utils_network_js', j: 1});
         jsl.push({f:'js/utils/timers.js', n: 'js_utils_timers_js', j: 1});
-        jsl.push({f:'js/utils/csp.js', n: 'js_utils_csp_js', j: 1});
-        jsl.push({f:'js/utils/track.js', n: 'js_utils_track_js', j: 1});
         jsl.push({f:'js/megaPromise.js', n: 'megapromise_js', j:1,w:5});
         jsl.push({f:'index.js', n: 'index', j:1,w:4});
         jsl.push({f:'js/staticPages.js', n: 'staticPages_js', j:1});
@@ -3312,7 +3308,6 @@ else if (!browserUpdate) {
         'feature_storage': {f:'html/features-storage.html', n: 'feature_storage', j:0},
         'feature_chat': {f:'html/features-chat.html', n: 'feature_chat', j:0},
         'feature_collaboration': {f:'html/features-collaboration.html', n: 'feature_collaboration', j:0},
-        'gadvs_js': {f:'js/gAdvs.js', n: 'gadvs_js', j:1},
         'cookie': {f:'html/cookie.html', n: 'cookie', j:0},
         'achievements': {f:'html/achievements.html', n: 'achievements', j:0},
         'achievementsPage_js': {f:'html/js/achievements.js', n: 'achievementsPage_js', j:1},
@@ -3398,8 +3393,8 @@ else if (!browserUpdate) {
         'newsignup': ['register', 'register_js', 'zxcvbn_js'],
         'emailverify': ['zxcvbn_js'],
         'resellers': ['resellers'],
-        '!': ['download', 'download_js', 'gadvs_js'],
-        'file': ['download', 'download_js', 'gadvs_js'],
+        '!': ['download', 'download_js'],
+        'file': ['download', 'download_js'],
         'dispute': ['dispute'],
         'disputenotice': ['disputenotice', 'copyright_js'],
         'copyright': ['copyright'],
@@ -4184,10 +4179,6 @@ else if (!browserUpdate) {
                     a: 'g',
                     p: page.substr(0, 5) === 'file/' ? page.substr(5, 8) : page.split('!')[1]
                 };
-
-                // if this is download page, get ads data with g request
-                g.au = ["wphl", "wphr", "wpht"];
-                g.ad = localStorage.adflag || 1;
 
                 xhr(u_sid ? '&sid=' + u_sid : false, g, function(response) {
                     dl_res = Array.isArray(response) && response[0];

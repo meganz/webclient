@@ -2127,6 +2127,9 @@ var addressDialog = {
                 if (this.extraDetails.recurring) {
                     iframeSrc += '&r=1';
                 }
+                if (is_mobile) {
+                    iframeSrc += '&mobile=1';
+                }
                 iframeSrc += `&m=${this.numOfMonths}`;
 
                 $stripeIframe.src = iframeSrc;

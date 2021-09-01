@@ -8305,7 +8305,9 @@ class genericTable_GenericTable extends genericNodePropsComponent_GenericNodePro
         this.props.onDoubleClick(e, this.props.node);
       },
       key: index + "_" + node[keyProp]
-    }, columns);
+    }, columns, external_React_default.a.createElement("td", {
+      className: "column-hover"
+    }));
   }
 
 }
@@ -15732,7 +15734,6 @@ class conversationaudiovideopanel_ConversationAVPanel extends mixins["MegaRender
     var $container = $(external_ReactDOM_default.a.findDOMNode(self));
     self.visiblePanel = false;
     $container.removeClass('visible-panel');
-    $(document).trigger('closeDropdowns');
   }
 
   resizeVideos() {
@@ -20132,7 +20133,7 @@ class columnContactRequestsRcvdBtns_ColumnContactRequestsRcvdBtns extends mixins
 columnContactRequestsRcvdBtns_ColumnContactRequestsRcvdBtns.sortable = true;
 columnContactRequestsRcvdBtns_ColumnContactRequestsRcvdBtns.id = "grid-url-header-nw";
 columnContactRequestsRcvdBtns_ColumnContactRequestsRcvdBtns.label = "";
-columnContactRequestsRcvdBtns_ColumnContactRequestsRcvdBtns.megatype = "grid-url-header-nw";
+columnContactRequestsRcvdBtns_ColumnContactRequestsRcvdBtns.megatype = "grid-url-header-nw contact-controls-container";
 // CONCATENATED MODULE: ./js/chat/ui/contactsPanel/receivedRequests.jsx
 
 
@@ -20248,7 +20249,7 @@ class columnContactRequestsSentBtns_ColumnContactRequestsSentBtns extends mixins
 columnContactRequestsSentBtns_ColumnContactRequestsSentBtns.sortable = true;
 columnContactRequestsSentBtns_ColumnContactRequestsSentBtns.id = "grid-url-header-nw";
 columnContactRequestsSentBtns_ColumnContactRequestsSentBtns.label = "";
-columnContactRequestsSentBtns_ColumnContactRequestsSentBtns.megatype = "grid-url-header-nw";
+columnContactRequestsSentBtns_ColumnContactRequestsSentBtns.megatype = "grid-url-header-nw contact-controls-container";
 // CONCATENATED MODULE: ./js/ui/jsx/fm/nodes/columns/columnContactRequestsRts.jsx
 
 
@@ -23278,7 +23279,7 @@ Chat.prototype.openChat = function (userHandles, type, chatId, chatShard, chatdU
   self.chats.set(room.roomId, room);
 
   if (setAsActive && !self.currentlyOpenedChat || self.currentlyOpenedChat === room.roomId) {
-    room.show();
+    room.setActive();
   }
 
   room.showAfterCreation = setAsActive !== false;

@@ -970,6 +970,10 @@ var urlrootfile = '';
 if (is_bot) {
     nocontentcheck = true;
 }
+else if (is_karma) {
+    nocontentcheck = true;
+    bootstaticpath = 'base/';
+}
 
 if (String(location.pathname).indexOf('%') > 0) {
     tmp = mURIDecode(location.pathname);
@@ -2663,6 +2667,7 @@ else if (!browserUpdate) {
     jsl.push({f:'js/utils/watchdog.js', n: 'js_utils_watchdog_js', j: 1});
     jsl.push({f:'js/utils/workers.js', n: 'js_utils_workers_js', j: 1});
     jsl.push({f:'js/utils/trans.js', n: 'js_utils_trans_js', j: 1});
+    jsl.push({f:'js/utils/webgl.js', n: 'webgl_js', j:1});
 
     jsl.push({f:'js/vendor/dexie.js', n: 'dexie_js', j:1,w:5});
     jsl.push({f:'js/functions.js', n: 'functions_js', j:1});
@@ -3349,6 +3354,12 @@ else if (!browserUpdate) {
 
     /* eslint-disable max-len */
     var jsl3 = {
+        'webgl': {
+            'webgl:webgl_js': {f:'js/utils/webgl.js', n: 'webgl:webgl_js', j:5},
+            'webgl:exif_js': {f:'js/vendor/exif.js', n: 'webgl:exif_js', j:5},
+            'webgl:dcraw_js': {f:'js/vendor/dcraw.js', n: 'webgl:dcraw_js', j:5},
+            'webgl:smartcrop_js': {f:'js/vendor/smartcrop.js', n: 'webgl:smartcrop_js', j:5}
+        },
         'chat': {
             /* chat related css */
             'chat_messages_css':{f:'css/chat-messages.css', n: 'chat_messages_css', j:2,'w':5,'c':1,'cache':1,'d':1},
@@ -3889,6 +3900,7 @@ else if (!browserUpdate) {
 
         window.onload = null;
         if (is_karma) {
+            window.jsl = [];
             return;
         }
 
@@ -3965,6 +3977,7 @@ else if (!browserUpdate) {
     var cssCache=false;
     var jsl_loaded={};
     function initall() {
+        var temp;
         var jsar = [];
         var cssar = [];
         var nodedec = {};
@@ -4027,6 +4040,15 @@ else if (!browserUpdate) {
                     }
                     window[jsl[i].n] = blobLink;
                 }
+            }
+            else if (jsl[i].j === 5) {
+                /** @property window.sbj5rsc_webgl */
+                temp = 'sbj5rsc_' + jsl[i].n.split(/[:_]/)[0];
+                if (!window[temp]) {
+                    window[temp] = '';
+                }
+                window[temp] += jsl[i].text;
+                jsl[i].text = '/*j5*/';
             }
             else if (jsl[i].j === 0 && jsl[i].f.match(/\.json$/)) {
                 try {

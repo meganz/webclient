@@ -196,6 +196,7 @@ var mThumbHandler = {
 
     add: function(exts, parser) {
         'use strict';
+        parser = ((handler) => promisify((resolve, reject, data) => handler(data, resolve)))(parser);
 
         exts = String(exts).split(',');
 

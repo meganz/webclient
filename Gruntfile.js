@@ -245,11 +245,11 @@ var Secureboot = function() {
                     for (var j in rscs) {
                         var f = rscs[j];
 
-                        if (f.j == 1) {
+                        if (f.j === 1 || f.j === 5) {
                             f.n = j;
                             js[group].push(f);
                         }
-                        else if (f.j == 2) {
+                        else if (f.j === 2) {
                             f.n = j;
                             css[group].push(f);
                         }
@@ -260,6 +260,7 @@ var Secureboot = function() {
                 }
 
                 var jsl3_new = {};
+                var jsl3_singleBundle = {webgl: 5};
                 [js, css].forEach(function(r) {
                     var length;
                     var content;
@@ -278,7 +279,7 @@ var Secureboot = function() {
                             jsl3_new[g][name] = {
                                 f: filename,
                                 n: name,
-                                j: (pfx[0] == 'c') + 1,
+                                j: jsl3_singleBundle[g] || ((pfx[0] === 'c') + 1),
                                 w: Math.round((length/fileLimit)*30)
                             };
                             content = [];
@@ -294,6 +295,10 @@ var Secureboot = function() {
 
                         for (var i = 0; i < nn.length; i++) {
                             var f    = nn[i];
+                            if (jsl3_singleBundle[g]) {
+                                content.push(fs.readFileSync(f.f).toString());
+                                continue;
+                            }
                             var size = fs.statSync(f.f).size;
                             if (length + size > fileLimit) {
                                 write(g);

@@ -27,7 +27,7 @@
 "use strict";
 
 function SmartCrop(options){
-   this.options = extend({}, SmartCrop.DEFAULTS, options);
+   this.options = Object.assign({}, SmartCrop.DEFAULTS, options);
 }
 SmartCrop.DEFAULTS = {
     width: 0,
@@ -58,10 +58,12 @@ SmartCrop.DEFAULTS = {
     outsideImportance: -0.5,
     ruleOfThirds: true,
     prescale: true,
+    antialias: false,
     canvasFactory: null,
+    resampleWithImageBitmap: false,
     debug: false
 };
-SmartCrop.crop = function(image, options, callback){
+SmartCrop.crop = async function(image, options, callback){
     if(options.aspect){
         options.width = options.aspect;
         options.height = 1;
@@ -93,10 +95,7 @@ SmartCrop.crop = function(image, options, callback){
         if(options.prescale !== false){
             prescale = 1/scale/options.minScale;
             if(prescale < 1) {
-                var prescaledCanvas = smartCrop.canvas(image.width*prescale, image.height*prescale),
-                    ctx = prescaledCanvas.getContext('2d');
-                ctx.drawImage(image, 0, 0, image.width, image.height, 0, 0, prescaledCanvas.width, prescaledCanvas.height);
-                image = prescaledCanvas;
+                image = await smartCrop.resample(image, image.width*prescale, image.height*prescale);
                 smartCrop.options.cropWidth = ~~(options.cropWidth*prescale);
                 smartCrop.options.cropHeight = ~~(options.cropHeight*prescale);
             }
@@ -105,7 +104,7 @@ SmartCrop.crop = function(image, options, callback){
             }
         }
     }
-    var result = smartCrop.analyse(image);
+    const result = await smartCrop.analyse(image);
     for(var i = 0, i_len = result.crops.length; i < i_len; i++) {
         var crop = result.crops[i];
         crop.x = ~~(crop.x/prescale);
@@ -273,23 +272,52 @@ SmartCrop.prototype = {
             d = sqrt(rd*rd+gd*gd+bd*bd);
             return 1-d;
     },
-    analyse: function(image){
+    async resample(image, width, height){
+        const canvas = this.canvas(width, height);
+        const ctx = canvas.getContext('2d');
+        if(this.options.resampleWithImageBitmap) {
+            image = await createImageBitmap(image, {resizeWidth: width, resizeHeight: height, resizeQuality: 'high'});
+            ctx.drawImage(image, 0, 0);
+            return canvas;
+        }
+        if(image instanceof ImageData) {
+            console.warn('If possible, do use an ImageBitmap.');
+            const canvas2 = this.canvas(image.width, image.height);
+            canvas2.getContext('2d').putImageData(image, 0, 0);
+            image = canvas2;
+        }
+        if(this.options.antialias && ctx.filter === 'none') {
+            const cv = this.canvas(image.width, image.height);
+            const cx = cv.getContext('2d');
+            cx.filter = `blur(${(cv.width / canvas.width) >> 1}px)`;
+            cx.drawImage(image, 0, 0);
+            image = cv;
+        }
+        ctx.drawImage(image, 0, 0, image.width, image.height, 0, 0, canvas.width, canvas.height);
+        return canvas;
+    },
+    async analyse(image){
         var result = {},
             options = this.options,
-            canvas = this.canvas(image.width, image.height),
+            canvas, ctx;
+        if(self.OffscreenCanvas && image instanceof OffscreenCanvas || self.HTMLCanvasElement && image instanceof HTMLCanvasElement) {
+            canvas = image;
             ctx = canvas.getContext('2d');
-        ctx.drawImage(image, 0, 0);
+        }
+        else {
+            canvas = this.canvas(image.width, image.height);
+            ctx = canvas.getContext('2d');
+            ctx.drawImage(image, 0, 0);
+        }
         var input = ctx.getImageData(0, 0, canvas.width, canvas.height),
             output = ctx.getImageData(0, 0, canvas.width, canvas.height);
         this.edgeDetect(input, output);
         this.skinDetect(input, output);
         this.saturationDetect(input, output);
 
-        var scoreCanvas = this.canvas(ceil(image.width/options.scoreDownSample), ceil(image.height/options.scoreDownSample)),
-            scoreCtx = scoreCanvas.getContext('2d');
-
         ctx.putImageData(output, 0, 0);
-        scoreCtx.drawImage(canvas, 0, 0, canvas.width, canvas.height, 0, 0, scoreCanvas.width, scoreCanvas.height);
+        const scoreCanvas = await this.resample(canvas, ceil(image.width / options.scoreDownSample), ceil(image.height / options.scoreDownSample)),
+            scoreCtx = scoreCanvas.getContext('2d');
 
         var scoreOutput = scoreCtx.getImageData(0, 0, scoreCanvas.width, scoreCanvas.height);
 
@@ -342,18 +370,6 @@ var min = Math.min,
     abs = Math.abs,
     ceil = Math.ceil,
     sqrt = Math.sqrt;
-
-function extend(o){
-    for(var i = 1, i_len = arguments.length; i < i_len; i++) {
-        var arg = arguments[i];
-        if(arg){
-            for(var name in arg){
-                o[name] = arg[name];
-            }
-        }
-    }
-    return o;
-}
 
 // gets value in the range of [0, 1] where 0 is the center of the pictures
 // returns weight of rule of thirds [0, 1]

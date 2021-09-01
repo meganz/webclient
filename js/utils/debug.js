@@ -100,6 +100,145 @@ function dcTracer(ctr) {
     }
 }
 
+lazy(self, 'runKarmaTests', () => {
+    'use strict';
+    let currentFile = -1;
+    const storage = Object.create(null);
+    const assert = (expr, msg) => {
+        if (!expr) {
+            throw new MEGAException(msg);
+        }
+    };
+    const tag = (v) => v && (v[Symbol.toStringTag] || v.name);
+    const name = (v) => tag(v) || v && tag(v.constructor) || v;
+    const val = (v) => {
+        if (typeof v === 'number' && v > 0x1fff) {
+            return `${v} (0x${v.toString(16)})`;
+        }
+        return v;
+    };
+
+    let value;
+    const chai = {
+        expect: (v) => {
+            value = v;
+            return chai;
+        },
+        eql: (v) => assert(value === v, `Expected '${value}' to be equal to '${v}'`),
+        instanceOf: (v) =>
+            assert(value instanceof v, `Expected '${name(value)}' to be instance of ${name(v)}`),
+        lessThan: (v) => assert(value < v, `Expected ${val(value)} to be less than ${val(v)}`),
+        greaterThan: (v) => assert(value > v, `Expected ${val(value)} to be greater than ${val(v)}`)
+    };
+    chai.assert = assert;
+    chai.to = chai.be = chai;
+
+    self.chai = chai;
+    self.expect = chai.expect;
+
+    self.describe = (name, batch) => {
+        storage[currentFile][name] = batch;
+    };
+
+    return mutex('karma-runner', async(resolve, reject, file = 'webgl', deps = ['tiffjs']) => {
+        currentFile = `test/${file.replace(/\W/g, '')}_test.js`;
+
+        if (!storage[currentFile]) {
+            storage[currentFile] = Object.create(null);
+            await M.require(currentFile, ...deps);
+        }
+
+        const getTestLocation = (name) => {
+            let location;
+            const {stack} = new Error('M');
+
+            if (stack) {
+                const lines = stack.split('\n');
+
+                while (lines.length) {
+                    const line = lines.splice(0, 1)[0];
+                    if (line.includes('_test.js:')) {
+                        location = line.split(/[\s@]/).pop();
+                        break;
+                    }
+                }
+            }
+
+            if (self.d > 1) {
+                console.debug('Testing it %s...', name, location);
+            }
+
+            return location;
+        };
+
+        const TestResult = class {
+            constructor(name, took, location) {
+                this.location = location;
+                this.message = `${name} \u2714`;
+                this.took = performance.now() - took;
+            }
+        };
+
+        const TestError = class extends MEGAException {
+            constructor(name, took, ex) {
+                const partial = ex.name === 'NotSupportedError';
+                const details = String(ex.stack).includes(ex.message) ? '' : ` (${ex.message})`;
+                const status = partial ? `\uD83C\uDF15 (${ex.message})` : `\u2716${details}`;
+                super(`${name}: ${status}`, null, ex.name);
+                this.stack = ex.stack || this.stack;
+                this.color = partial ? 'fd0' : 'f00';
+                this.took = performance.now() - took;
+                this.soft = partial;
+            }
+        };
+
+        const promises = [];
+        self.it = (testName, testFunc) => {
+            promises.push(new Promise((resolve, reject) => {
+                const location = getTestLocation(testName);
+                const tn = 6000;
+                const ts = performance.now();
+                const th = setTimeout(() => {
+                    const ex = new MEGAException(`Timeout of ${tn}ms exceeded.`, 'TimeoutError');
+                    reject(new TestError(testName, ts, ex));
+                }, tn);
+
+                Promise.resolve((async() => testFunc())())
+                    .then(() => {
+                        resolve(new TestResult(testName, ts, location));
+                    })
+                    .catch((ex) => {
+                        reject(new TestError(testName, ts, ex));
+                    })
+                    .finally(() => clearTimeout(th));
+            }));
+        };
+
+        // eslint-disable-next-line guard-for-in
+        for (const name in storage[currentFile]) {
+            console.group(name);
+            console.time(name);
+
+            storage[currentFile][name]();
+            const res = await Promise.allSettled(promises);
+
+            for (let i = 0; i < res.length; ++i) {
+                const {value, reason} = res[i];
+                const result = reason || value;
+                const color = result.color || '0f0';
+                const took = parseFloat(result.took).toFixed(2);
+                const details = `${reason && !reason.soft ? reason.stack || reason : result.location || ''}`;
+                console.log('%c%s %c%sms', `color:#${color}`, result.message, 'color:#abc', took, details);
+            }
+            console.timeEnd(name);
+            console.groupEnd();
+            promises.length = 0;
+        }
+
+        resolve();
+        self.it = null;
+    });
+});
 
 mBroadcaster.once('startMega', async() => {
     'use strict';
@@ -147,7 +286,7 @@ mBroadcaster.once('startMega', async() => {
             var now = Date.now();
             var known = [
                 '1:setUserAvatar', '1:previewimg', '1:procfa', '2:procfa', '3:addScript', '1:MediaElementWrapper',
-                '2:chatImageParser', '2:initall', '3:initall'
+                '2:chatImageParser', '2:initall', '3:initall', '2:MEGAWorkerController'
             ];
             // ^ think twice before whitelisting anything new here...
 

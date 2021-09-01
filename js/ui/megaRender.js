@@ -469,6 +469,7 @@
             }
 
             if (!aUpdate) {
+                delete M.rmItemsInView;
                 M.hideEmptyGrids();
                 $.tresizer();
 

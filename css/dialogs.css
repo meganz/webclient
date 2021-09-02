@@ -1943,6 +1943,7 @@ body.de .mega-dialog.new-group-chat {
     }
     .mega-dialog.export-links-dialog .illustration {
         width: 128px;
+        --width: 128px;
         height: 92px;
         margin: 16px auto;
     }
@@ -4219,6 +4220,7 @@ body.de .mega-dialog.new-group-chat {
     .mega-dialog.add-user-popup .img-dialogs-achievements {
         height: 56px;
         width: 56px;
+        --width: 56px;
     }
     .mega-dialog.add-user-popup .hidden-achievement-cell {
         display: table-cell;
@@ -4833,6 +4835,7 @@ body.de .mega-dialog.new-group-chat {
     .mega-dialog.pro-register-dialog header .graphic.wide {
         height: 120px;
         width: 400px;
+        --width: 400px;
     }
     .mega-dialog.pro-register-dialog header p {
         padding: 0 48px;
@@ -5884,6 +5887,7 @@ body.de .mega-dialog.new-group-chat {
         margin: 0 auto;
         height: 120px;
         width: 336px;
+        --width: 336px;
     }
     .mega-dialog.create-widget-info-dialog .fm-widget-introduction,
     .mega-dialog.create-widget-info-dialog .fm-widget-manage {
@@ -6912,6 +6916,7 @@ body.de .mega-dialog.new-group-chat {
     }
     .mega-dialog.achievements-list-dialog .achievements-cell .image-container .achievement-icon {
         width: 100%;
+        --width: 100%;
     }
 
     .mega-dialog.achievements-list-dialog .ach-install-megasync .achievement-icon {
@@ -8275,6 +8280,7 @@ body.de .mega-dialog.new-group-chat {
     .mega-dialog.verify-phone .verify-ph-icon,
     .mega-dialog.verify-phone .verify-ph-success-icon {
         width: 150px;
+        --width: 150px;
         height: 172px;
         margin: auto;
     }
@@ -8612,6 +8618,7 @@ body.de .mega-dialog.new-group-chat {
         height: 148px;
         margin: 20px auto 8px;
         width: 434px;
+        --width: 434px;
     }
     .mega-dialog.affiliate-guide .big-header {
         font: var(--text-h1);
@@ -8969,6 +8976,7 @@ body.de .mega-dialog.new-group-chat {
         height: 120px;
         margin: 8px auto 24px;
         width: 120px;
+        --width: 120px;
     }
     .mega-dialog.add-reassign-dialog .dialog-input-container {
         padding: 0;
@@ -10069,6 +10077,7 @@ body.de .mega-dialog.new-group-chat {
         height: 64px;
         margin: 0 auto 12px;
         width: 64px;
+        --width: 64px;
     }
     .mega-dialog.recovery-key-info {
         width: 640px;

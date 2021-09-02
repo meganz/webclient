@@ -3288,6 +3288,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     height: 82px;
     margin-right: 20px;
     width: 82px;
+    --width: 82px;
 }
 /* PRO plan expired dialog */
 .astropay-payment-reminder .warning-popup-body {
@@ -3313,6 +3314,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 .warning-icon.sprite-fm-illustration.img-dialog-business-expiry {
     height: 48px;
     width: 48px;
+    --width: 48px;
 }
 .astropay-payment-reminder .right-block {
     display: table-cell;
@@ -11482,6 +11484,7 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
     -webkit-margin-end: 24px;
     margin-inline-end: 24px;
     width: 96px;
+    --width: 96px;
     flex-shrink: 0;
 }
 .tree-item-on-search-hidden,

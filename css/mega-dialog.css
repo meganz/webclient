@@ -239,10 +239,12 @@
             height: 120px;
             margin: 0 auto 24px;
             width: 120px;
+            --width: 120px;
         }
 
         .mega-dialog:not(.dialog-template-message) > header .graphic.wide {
             width: initial;
+            --width: initial;
         }
 
     /* main content layout */

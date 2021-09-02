@@ -279,6 +279,10 @@ body.de .mega-dialog.new-group-chat {
     position: relative;
     min-height: 500px;
 }
+.mega-dialog.add-from-cloud .content-block .content-container {
+    position: relative;
+    z-index: 1;
+}
 .mega-dialog.add-from-cloud .megaList2.megaListContainer {
     height: 400px !important;
 }

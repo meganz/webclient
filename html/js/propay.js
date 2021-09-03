@@ -750,7 +750,7 @@ pro.propay = {
         if (recurringEnabled) {
             $('.subscription-instructions', $step2).removeClass('hidden');
             $('.subscription-instructions', $step2).rebind('click', function() {
-                bottomPageDialog(false, 'terms', l[1712], true);
+                bottomPageDialog(false, 'terms', false, true);
             });
             $('.payment-note-first.recurring', $paymentAddressDialog).removeClass('hidden');
             $('.payment-note-first.one-time', $paymentAddressDialog).addClass('hidden');

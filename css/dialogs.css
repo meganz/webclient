@@ -2559,7 +2559,8 @@ body.de .mega-dialog.new-group-chat {
         border: var(--stroke-grey-1);
         border-radius: 3px;
     }
-    .mega-dialog.fm-picker-dialog .summary-input .summary-ff-name {
+    .mega-dialog.fm-picker-dialog .summary-input .summary-ff-name,
+    .mega-dialog.fm-picker-dialog .summary-input .summary-ff-name-ellipsis {
         height: 32px;
         max-width: 280px;
         line-height: 32px;
@@ -2643,6 +2644,9 @@ body.de .mega-dialog.new-group-chat {
         text-overflow: ellipsis;
     }
     .mega-dialog.fm-picker-dialog .summary-input .item-row:first-child .summary-ff-name {
+        max-width: 250px;
+    }
+    .mega-dialog.fm-picker-dialog .summary-input .item-row:first-child .summary-ff-name-ellipsis {
         max-width: 210px;
         text-overflow: ellipsis;
     }
@@ -3239,7 +3243,8 @@ body.de .mega-dialog.new-group-chat {
         -webkit-margin-start: 8px;
         margin-inline-start: 8px;
     }
-    .mega-dialog.fm-picker-dialog .summary-input.unfold .item-row:first-child .summary-ff-name {
+    .mega-dialog.fm-picker-dialog .summary-input.unfold .item-row:first-child .summary-ff-name,
+    .mega-dialog.fm-picker-dialog .summary-input.unfold .item-row:first-child .summary-ff-name-ellipsis {
         max-width: 280px;
     }
     .mega-dialog.fm-picker-dialog .summary-input.unfold .item-row:hover .delete-item {

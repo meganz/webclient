@@ -1307,13 +1307,19 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
         var outshareTotalFormatted = numOfBytes(outshareTotal, 2);
 
         var rootPrecentage = rootTotal / totalStorage;
-        rootPrecentage = Number.parseFloat(rootPrecentage * 100).toFixed(2);
+        rootPrecentage = Math.round(Number.parseFloat(rootPrecentage * 100).toFixed(2));
         var insharePrecentage = inshareTotal / totalStorage;
-        insharePrecentage = Number.parseFloat(insharePrecentage * 100).toFixed(2);
+        insharePrecentage = Math.round(Number.parseFloat(insharePrecentage * 100).toFixed(2));
         var rubbishPrecentage = rubbishTotal / totalStorage;
-        rubbishPrecentage = Number.parseFloat(rubbishPrecentage * 100).toFixed(2);
+        rubbishPrecentage = Math.round(Number.parseFloat(rubbishPrecentage * 100).toFixed(2));
         var outsharePrecentage = outshareTotal / totalStorage;
-        outsharePrecentage = Number.parseFloat(outsharePrecentage * 100).toFixed(2);
+        outsharePrecentage = Math.round(Number.parseFloat(outsharePrecentage * 100).toFixed(2));
+
+        var digitClassMap = ["one-digit", "two-digits", "three-digits"];
+        var cloudNodeDigitClass = digitClassMap[String(rootPrecentage).length - 1];
+        var inshareNodeDigitClass = digitClassMap[String(insharePrecentage).length - 1];
+        var rubbishNodeDigitClass = digitClassMap[String(rubbishPrecentage).length - 1];
+        var inboxNodeDigitClass = digitClassMap[String(outsharePrecentage).length - 1];
 
         $overviewContainer.find('.user-segments-container.all-subs .user-segment-number').text(numberOfSubs);
         $overviewContainer.find('.user-segments-container.active-subs .user-segment-number').text(activeSubs);
@@ -1326,19 +1332,19 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
         $overviewContainer.find('.storage-division-container.cloud-node .storage-division-num')
             .text(rootTotalFormatted.size + ' ' + rootTotalFormatted.unit);
         $overviewContainer.find('.storage-division-container.cloud-node .storage-division-per')
-            .text(Math.round(rootPrecentage) + '%');
+            .text(rootPrecentage + '%').addClass(cloudNodeDigitClass);
         $overviewContainer.find('.storage-division-container.inshare-node .storage-division-num')
             .text(inshareTotalFormatted.size + ' ' + inshareTotalFormatted.unit);
         $overviewContainer.find('.storage-division-container.inshare-node .storage-division-per')
-            .text(Math.round(insharePrecentage) + '%');
+            .text(insharePrecentage + '%').addClass(inshareNodeDigitClass);
         $overviewContainer.find('.storage-division-container.rubbish-node .storage-division-num')
             .text(rubbishTotalFormatted.size + ' ' + rubbishTotalFormatted.unit);
         $overviewContainer.find('.storage-division-container.rubbish-node .storage-division-per')
-            .text(Math.round(rubbishPrecentage) + '%');
+            .text(rubbishPrecentage + '%').addClass(rubbishNodeDigitClass);
         $overviewContainer.find('.storage-division-container.inbox-node .storage-division-num')
             .text(outshareTotalFormatted.size + ' ' + outshareTotalFormatted.unit);
         $overviewContainer.find('.storage-division-container.inbox-node .storage-division-per')
-            .text(Math.round(outsharePrecentage) + '%');
+            .text(outsharePrecentage + '%').addClass(inboxNodeDigitClass);
 
         $overviewContainer.find('.transfer-analysis-summary .total-transfer-number')
             .text(totalBandwidthFormatted.size + ' ' + totalBandwidthFormatted.unit);

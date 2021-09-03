@@ -74,6 +74,10 @@ export default class ContactList extends MegaRenderMixin {
 
     handleContextMenu = (ev, handle) => {
         ev.persist();
+        if (this.state.selected.length > 1) {
+            // Do not show the context menu if select multiple contacts
+            return null;
+        }
         this.setState({ contextMenuPosition: ev.clientX }, () => {
             let ref = this.contextMenuRefs[handle];
             if (ref && ref.isMounted()) {

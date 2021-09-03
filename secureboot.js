@@ -1072,10 +1072,11 @@ if (!browserUpdate && is_extension)
 }
 
 var page;
-window.redirect = ['about', 'android', 'bird', 'blog', 'business', 'chrome', 'cmd', 'contact', 'collaboration',
-                   'copyright', 'corporate', 'credits', 'dev', 'developers', 'dispute', 'doc', 'edge', 'extensions',
-                   'firefox', 'gdpr', 'help', 'ios', 'mobile', 'nas', 'plugin', 'privacy', 'resellers', 'sdkterms',
-                   'securechat', 'security', 'sourcecode', 'start', 'storage', 'sync', 'takedown', 'terms', 'uwp', 'wp'];
+window.redirect = ['about', 'achievements', 'android', 'bird', 'blog', 'business', 'chrome', 'cmd', 'contact',
+                   'collaboration', 'copyright', 'corporate', 'credits', 'dev', 'developers', 'dispute', 'doc',
+                   'edge', 'extensions', 'firefox', 'gdpr', 'help', 'ios', 'mobile', 'nas', 'plugin', 'privacy',
+                   'resellers', 'sdkterms', 'securechat', 'security', 'sourcecode', 'start', 'storage', 'sync',
+                   'takedown', 'terms', 'uwp', 'wp'];
 var isStaticPage = function(page) {
     'use strict';
     if (page) {
@@ -3311,6 +3312,7 @@ else if (!browserUpdate) {
         'cookie': {f:'html/cookie.html', n: 'cookie', j:0},
         'achievements': {f:'html/achievements.html', n: 'achievements', j:0},
         'achievementsPage_js': {f:'html/js/achievements.js', n: 'achievementsPage_js', j:1},
+        'achievements_css':{f:'css/achievements.css', n: 'achievements_css', j: 2, w: 5, c: 1, d: 1, cache: 1 },
         'special': {f:'html/troy-hunt.html', n:'special', j:0},
         'special_js': {f:'html/js/troy-hunt.js', n:'special_js', j:1},
         'special_css': {f:'css/troy-hunt.css', n:'special_css', j:2}
@@ -3432,7 +3434,7 @@ else if (!browserUpdate) {
         'storage': ['feature_storage', 'features_js'],
         'securechat': ['feature_chat', 'features_js'],
         'collaboration': ['feature_collaboration', 'features_js'],
-        'achievements': ['achievements', 'achievementsPage_js'],
+        'achievements': ['achievements', 'achievementsPage_js', 'achievements_css'],
         'nzippmember': ['nzipp', 'nzipp_js', 'nzipp_css'],
         'nziphotographer': ['nzipp', 'nzipp_js', 'nzipp_css'],
         'business': ['business', 'businessjs'],

@@ -68,6 +68,7 @@
 .cookie-dialog .cookie-icon {
     margin: 0 auto;
     width: 120px;
+    --width: 120px;
     height: 120px;
 }
 .cookie-dialog .header {

@@ -108,6 +108,7 @@
 }
 .mega-dialog.verify-email .locked-account {
     width: 72px;
+    --width: 72px;
     height: 72px;
     margin: 0 auto 16px auto;
 }

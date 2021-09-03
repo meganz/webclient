@@ -479,6 +479,7 @@
 }
 .bus-repay-block .payment-reminder-logo {
     width: 96px;
+    --width: 96px;
     height: 96px;
     display: block;
     margin: 48px auto 24px;

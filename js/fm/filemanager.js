@@ -713,8 +713,9 @@ FileManager.prototype.initFileManagerUI = function() {
             }
             if (currentNodeClass && currentNodeClass.contains('dropdown')
                 && (currentNodeClass.contains('download-item')
-                || currentNodeClass.contains('move-item'))
-                && currentNodeClass.contains('active')) {
+                    || currentNodeClass.contains('move-item'))
+                && currentNodeClass.contains('active')
+                || currentNodeClass.contains('inshare-dl-button0')) {
                 return false;
             }
 
@@ -735,6 +736,13 @@ FileManager.prototype.initFileManagerUI = function() {
         $('.data-block-view .file-settings-icon').removeClass('active');
         $('.grid-table-header-container-sc .column-settings.overlap').removeClass('c-opened');
         $('.js-statusbarbtn.options').removeClass('c-opened');
+
+        const $jqe = $('.shared-details-info-block .fm-share-download');
+        if ($jqe.hasClass('active')) {
+            // close & cleanup
+            $jqe.trigger('click');
+        }
+        $('.fm-share-download').removeClass('active disabled');
 
         // Set to default
         a = $('.dropdown.body.files-menu,.dropdown.body.download');
@@ -3694,6 +3702,8 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
     }
 
     $ddUIitem.rebind('contextmenu', function(e) {
+        $.hideContextMenu(e);
+
         if (e.shiftKey) {
             selectionManager.shift_select_to($(this).attr('id'), false, true, true);
         }

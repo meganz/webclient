@@ -220,6 +220,8 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
     var unhideUsersListSection = function () {
         const $listTable = $('.user-management-list-table', $subAccountsView);
         var $detailListTable = $('.grid-table-user-management', $listTable);
+        var $contentBlock = $('.fm-right-files-block', '.fmholder');
+        var $userManagementBlock = $('.files-grid-view.user-management-view', $contentBlock);
 
         $listTable.removeClass('hidden'); // unhide the list table
         $('.user-management-main-page-buttons', '.fm-right-header-user-management')
@@ -233,6 +235,7 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
         }
         else {
             $subAccountsView.addClass('hidden');
+            $userManagementBlock.addClass('hidden');
             $emptyBlock.removeClass('hidden');
         }
 
@@ -572,7 +575,6 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
             .text(totalBandwidthFormatted.unit);
 
         $('.user-management-overview-bar').removeClass('hidden');
-        $('.files-grid-view.user-management-view').removeClass('hidden');
 
         // handler for clicking on overview bar at the bottom
         $('.user-management-overview-bar').off('click.suba').on('click.suba', function overviewBarClickHandler() {

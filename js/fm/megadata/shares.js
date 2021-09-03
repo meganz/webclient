@@ -226,6 +226,9 @@ MegaData.prototype.initShareAddDialog = function(alreadyAddedContacts, $extraCon
     var extraContentDidMount = function() {
         // Initializes the component of adding new contacts to share
         M.initAddByEmailComponent(alreadyAddedContacts);
+        onIdle(() => {
+            $('.contacts-search-header input', '.mega-dialog.share-add-dialog .share-add-dialog-top').focus();
+        });
     };
 
     var prop = {

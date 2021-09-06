@@ -223,6 +223,12 @@ pro.propay = {
                 }
 
                 gatewayOptions = tempGatewayOptions;
+                // Filter out if they don't support expensive plans
+                if (parseInt(pro.propay.planNum) !== 4) {
+                    gatewayOptions = gatewayOptions.filter((opt) => {
+                        return opt.supportsExpensivePlans !== 0;
+                    });
+                }
 
                 // Make a clone of the array so it can be modified
                 pro.propay.allGateways = JSON.parse(JSON.stringify(gatewayOptions));

@@ -2865,6 +2865,7 @@ body:not(.mobile) .bottom-page.top-dark-button:hover {
     display: table;
     margin: -40px auto 0;
     min-width: 398px;
+    max-width: 398px;
     position: relative;
     text-align: left;
     white-space: nowrap;

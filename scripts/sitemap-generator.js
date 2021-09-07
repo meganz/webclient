@@ -32,7 +32,8 @@ const pages = [
     "refer",
     "about/reliability",
     "about/privacy",
-    "about/jobs"
+    "about/jobs",
+    "achievements"
 ];
 /** lang [lang-code-in-webclient, ISO-639-1 lang code which search engines understand] */
 const langs = [

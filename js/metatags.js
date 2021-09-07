@@ -580,9 +580,10 @@ mega.metatags = new function() {
             stopBots(metaRobots, true);
         }
         else if (page === 'achievements') {
-            mTags.mega_title = 'Achievements - MEGA';
-            mTags.mega_desc = 'Increase your cloud storage';
-            stopBots(metaRobots, true);
+            mTags.en_title = 'Achievements - MEGA';
+            mTags.en_desc = 'Increase your cloud storage';
+            mTags.mega_title = l.achievement_meta_title || mTags.en_title;
+            mTags.mega_desc = l.achievement_meta_desc || mTags.en_desc;
         }
         else if (page.substr(0, 5) === 'blog/') {
             var notSet = true;

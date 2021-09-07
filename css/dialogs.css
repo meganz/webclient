@@ -9444,7 +9444,7 @@ body.de .mega-dialog.new-group-chat {
     }
     .mega-dialog.feedback-dialog .feedback-dialog-textarea,
     .mega-dialog.feedback-dialog .feedback-dialog-input {
-        background: var(--surface-grey-1);
+        background: var(--surface-black);
         border-radius: 4px;
         font-size: 0;
         height: 32px;

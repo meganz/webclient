@@ -57,7 +57,7 @@ export default class PushSettingsDialog extends MegaRenderMixin {
             <ModalDialogsUI.ModalDialog
                 {...this.state}
                 name="push-settings"
-                title={l[16214] /* `Mute` */}
+                title={l.dnd_mute_title /* `Mute` */}
                 subtitle={l[22015] /* `Mute chat notifications for` */}
                 className="push-settings-dialog"
                 dialogName="push-settings-chat-dialog"

@@ -16605,7 +16605,7 @@ class pushSettingsDialog_PushSettingsDialog extends mixins["MegaRenderMixin"] {
   render() {
     return external_React_default.a.createElement(modalDialogs["a" ].ModalDialog, extends_default()({}, this.state, {
       name: "push-settings",
-      title: l[16214],
+      title: l.dnd_mute_title,
       subtitle: l[22015],
       className: "push-settings-dialog",
       dialogName: "push-settings-chat-dialog",

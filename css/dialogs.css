@@ -2653,7 +2653,7 @@ body.de .mega-dialog.new-group-chat {
     .mega-dialog.fm-picker-dialog .summary-input .item-row .delete-item {
         position: absolute;
         right: 8px;
-        top: 0;
+        top: 4px;
         display: none;
         --mask-color: var(--icon-rest);
         --icon-size: 24px;

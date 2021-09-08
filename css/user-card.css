@@ -179,6 +179,10 @@ button.user-card-name:hover {
     transform: translateY(-50%);
     box-sizing: border-box;
 }
+.rtl .user-card-tick-wrap {
+    left: 12px;
+    right: unset;
+}
 .user-card-tick-wrap i {
     margin: 0 0 0 0;
     display:  none;

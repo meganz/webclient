@@ -590,6 +590,9 @@ body.de .mega-dialog.new-group-chat {
     margin-bottom: -1px;
     z-index: 1;
 }
+.rtl .add-from-cloud .fm-dialog-tab {
+   float: right;
+}
 .add-from-cloud.no-incoming .fm-dialog-tab.incoming {
     display: none;
 }
@@ -3846,6 +3849,10 @@ body.de .mega-dialog.new-group-chat {
         top: 16px;
         --mask-color: var(--icon-rest);
         --icon-size: 16px;
+    }
+    .rtl .mega-dialog.properties-dialog .file-status-icon {
+        left: initial;
+        right: 16px;
     }
     .mega-dialog.properties-dialog .taken-down-icon {
         display: none;

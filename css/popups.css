@@ -30,6 +30,9 @@ body.tl .dropdown.body.popup.contacts-search {
     overflow: hidden;
     margin: 0 12px 0 0;
 }
+.rtl .contacts-search-header {
+    margin: 0 12px 0 12px;
+}
 .new-group-chat .contacts-search-header {
     padding: 0;
     border-radius: unset;
@@ -125,6 +128,9 @@ body.tl .dropdown.body.popup.contacts-search {
     vertical-align: middle;
     font-style: normal;
     color: #666;
+}
+.rtl .contacts-search-list .contacts-info.body.contacts-search {
+    padding: 8px 12px;
 }
 .contacts-search-list .contacts-info.body.contacts-search {
     width: calc(100% - 7px);
@@ -298,6 +304,9 @@ body.tl .dropdown.body.popup.contacts-search {
     width: 100%;
     padding: 20px 0;
 }
+.rtl .contacts-search-bottom {
+    padding: 20px 12px;
+}
 .contacts-list-header {
     margin: 0 12px 0 0;
     padding: 0 8px;
@@ -309,6 +318,9 @@ body.tl .dropdown.body.popup.contacts-search {
 }
 .new-group-chat .contacts-list-header {
     margin: 0;
+}
+.rtl .new-group-chat .contacts-list-header {
+    margin: 0 12px 0 12px;
 }
 .contacts-list-empty-txt {
     padding:  25px 0 0 0;
@@ -356,6 +368,9 @@ body.tl .dropdown.body.popup.contacts-search {
     border-radius: 18px;
     font: var(--text-body1);
     color: var(--text-color-high);
+}
+.rtl .popup-header.emoji input {
+    padding: 7px 40px 7px 7px;
 }
 .popup-scroll-area.emoji {
     max-height: 302px;

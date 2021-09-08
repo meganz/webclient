@@ -5234,6 +5234,7 @@ tr:not(.taken-down) .grid-status-icon:not(.read-only):not(.read-and-write) {
 }
 .rtl .fm-header-buttons {
     float: left;
+    width: 100%;
 }
 
 .fm-breadcrumbs-block {
@@ -10938,6 +10939,9 @@ ul.token-input-list-mega {
 }
 .add-user-popup ul.token-input-list-mega {
     padding: 0 15px 0 40px;
+}
+.rtl .add-user-popup ul.token-input-list-mega {
+    padding: 0 40px 0 15px;
 }
 .multiple-input {
     border-radius: 3px;

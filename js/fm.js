@@ -3499,7 +3499,7 @@ function sharedFolderUI() {
                     + '</div>'
                     + '<div class="shared-details-buttons">'
                         + '<button class="mega-button fm-share-download">'
-                            + '<span class="fm-chatbutton-arrow">' + escapeHTML(l[58]) + '</span>'
+                            + '<span class="fm-chatbutton-arrow inshare-dl-button0">' + escapeHTML(l[58]) + '</span>'
                         + '</button>'
                         + '<button class="mega-button fm-share-copy">'
                             + '<span>'

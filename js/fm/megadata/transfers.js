@@ -353,12 +353,16 @@ MegaData.prototype.addWebDownload = function(n, z, preview, zipname) {
 
     if (z) {
         z = ++dlmanager.dlZipID;
-        if (this.d[n[0]] && this.d[n[0]].t && this.d[n[0]].name) {
-            zipname = M.getSafeName(this.d[n[0]].name) + '.zip';
+
+        if (!zipname) {
+            const parent = this.getNodeParent(n[0]);
+            const {name} = this.getNodeByHandle(parent);
+            if (name) {
+                zipname = M.getSafeName(name);
+            }
         }
-        else {
-            zipname = (zipname || ('Archive-' + Math.random().toString(16).slice(-4))) + '.zip';
-        }
+
+        zipname = `${zipname || `Archive-${Math.random().toString(16).slice(-4)}`}.zip`;
     }
     else {
         z = false;

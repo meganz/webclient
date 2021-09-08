@@ -694,6 +694,7 @@
 
 .message.richpreview.preview-confirmation {
     width: 130px;
+    --width: 130px;
     height: 130px;
     margin: -10px 0 0 0;
 }

@@ -1916,6 +1916,7 @@ body.mobile .redeem-promo-page .mega-input.title-ontop {
     margin: 0 auto 10px;
     height: 140px;
     width: 140px;
+    --width: 140px;
 }
 .redeem-promo-page .bottom-page.top-description {
     padding: 24px 0 40px 0;

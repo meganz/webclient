@@ -128,7 +128,9 @@ MegaData.prototype.rmSetupUI = function(u, refresh) {
                 e.stopPropagation();
                 e.currentTarget = $('#treea_' + M.currentdirid);
                 e.calculatePosition = true;
-                $.selected = [M.currentdirid];
+                if (d) {
+                    console.assert(e.currentTarget.length === 1, `Tree ${M.currentdirid} not found.`, e);
+                }
             };
 
             $('.shared-details-info-block .grid-url-arrow').rebind('click.sharesui', function(e) {
@@ -144,25 +146,51 @@ MegaData.prototype.rmSetupUI = function(u, refresh) {
             });
 
             $('.shared-details-info-block .fm-share-download').rebind('click', function(e) {
+                const $this = $(this);
+                if ($this.hasClass('disabled')) {
+                    console.warn('disabled');
+                    return false;
+                }
                 prepareShareMenuHandler(e);
-                var $this = $(this);
-                e.clientX = $this.offset().left;
-                e.clientY = $this.offset().top + $this.height()
 
-                if (!$(this).hasClass('active')) {
-                    megasync.isInstalled(function (err, is) {
+                if ($this.hasClass('active')) {
+                    $this.removeClass('active');
+                    $.hideContextMenu();
+
+                    if (window.selectionManager) {
+                        selectionManager.clear_selection();
+                    }
+                    else {
+                        $.selected = [];
+                    }
+                }
+                else {
+                    $.hideContextMenu();
+                    $this.addClass('active disabled');
+                    megasync.isInstalled((err, is) => {
+                        if (!$this.hasClass('disabled')) {
+                            return false;
+                        }
+                        $this.removeClass('disabled');
+
+                        if (window.selectionManager) {
+                            // selectionManager.resetTo(M.currentdirid);
+                            selectionManager.select_all();
+                        }
+                        else {
+                            $.selected = [M.currentdirid];
+                        }
+
                         if (!err || is) {
                             M.addDownload($.selected);
                         }
                         else {
+                            const {top, left} = $this.offset();
+                            e.clientY = top + $this.height();
+                            e.clientX = left;
                             M.contextMenuUI(e, 3);
                         }
-                        $(this).addClass('active');
                     });
-                }
-                else {
-                    $.hideContextMenu();
-                    $(this).removeClass('active');
                 }
             });
 

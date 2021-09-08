@@ -1292,6 +1292,8 @@ var addressDialog = {
 
             // auto renew is mandatory in business
             this.$dialog.find('.payment-buy-now span').text(l[6172]);
+            // recurring is mandatory in business
+            this.$dialog.find('.payment-plan-txt .recurring').text(`(${l[6965]})`);
         }
         monthsWording = pro.propay.getNumOfMonthsWording(numOfMonths);
 

@@ -196,6 +196,9 @@ function addNewContact($addButton, cd) {
                     }
                     contactsInfoDialog(title, addedEmails[0], msg);
                 }
+                else {
+                    cd = false;
+                }
 
                 if (cd) {
                     closeDialog();
@@ -2271,6 +2274,7 @@ function initShareDialogMultiInput(alreadyAddedContacts) {
         minChars: 1,
         accountHolder: (M.u[u_handle] || {}).m || '',
         scrollLocation: 'share',
+        initFocused: false,
         // Exclude from dropdownlist only emails/names which exists in multi-input (tokens)
         excludeCurrent: true,
         onEmailCheck: function() {
@@ -3495,7 +3499,7 @@ function sharedFolderUI() {
                     + '</div>'
                     + '<div class="shared-details-buttons">'
                         + '<button class="mega-button fm-share-download">'
-                            + '<span class="fm-chatbutton-arrow">' + escapeHTML(l[58]) + '</span>'
+                            + '<span class="fm-chatbutton-arrow inshare-dl-button0">' + escapeHTML(l[58]) + '</span>'
                         + '</button>'
                         + '<button class="mega-button fm-share-copy">'
                             + '<span>'

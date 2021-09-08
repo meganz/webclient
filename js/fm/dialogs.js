@@ -409,6 +409,9 @@
                     $('.dialog-picker-button', $dialog).trigger('click');
                 }
             });
+            if ($.saveAsDialog) {
+                $('#f-name-input', $dialog).focus();
+            }
         }
         else {
             for (var i = 0; i < items.length; i++) {
@@ -416,6 +419,7 @@
                 var n = M.getNodeByHandle(h) || Object(h);
                 var name = names[h] || M.getNameByHandle(h) || n.name;
                 var tail = '<i class="delete-item sprite-fm-mono icon-close-component "></i>';
+                var summary = '<div class="summary-ff-name-ellipsis">@@</div>';
                 var icon = fileIcon(n);
                 var data = n.uuid || h;
 
@@ -423,6 +427,7 @@
                     tail = '<span>(@@)</span>';
                     if (items.length < 2) {
                         tail = '';
+                        summary = '<div class="summary-ff-name">@@</div>';
                     }
                 }
 
@@ -430,7 +435,7 @@
                 $div.safeAppend(
                     '<div class="item-row" data-node="@@">' +
                     '    <div class="transfer-filetype-icon file @@"></div>' +
-                    '    <div class="summary-ff-name">@@</div> &nbsp; ' + tail +
+                        summary + ' &nbsp; ' + tail +
                     '</div>', data, icon, name, pluralText
                 );
 

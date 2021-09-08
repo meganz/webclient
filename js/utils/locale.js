@@ -832,7 +832,6 @@ mBroadcaster.once('boot_done', function populate_l() {
     l[1134] = l[1134].replace('[A]',
         '<a href="http://en.wikipedia.org/wiki/Public-key_cryptography" target="_blank" rel="noopener noreferrer">').replace('[/A]',
         '</a>');
-    l[1148] = l[1148].replace('[A]', '<span class="red">').replace('[/A]', '</span>');
     l[6978] = l[6978].replace('[A]', '<span class="red">').replace('[/A]', '</span>');
     l[1151] = l[1151].replace('[A]', '<span>').replace('[/A]', '</span>');
     l[731] = l[731].replace('[A]', '<a href="/terms" class="clickurl">').replace('[/A]', '</a>');

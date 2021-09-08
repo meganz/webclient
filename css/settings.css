@@ -851,6 +851,7 @@
     height: 84px;
     margin: 16px auto 0;
     width: 84px;
+    --width: 84px;
 }
 .add-phone-num-banner .mega-button + .mega-button {
     display: flex;

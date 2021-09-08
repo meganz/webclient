@@ -1250,7 +1250,7 @@ affiliateUI.redemptionDialog = {
                         $saveCheckbox.removeClass('hidden');
                     }
 
-                    Ps.update($currentStep[0]);
+                    Ps.update($('.cell-content', $currentStep)[0]);
                     $('input', $currentStep).off('focus.jsp');
                 });
             }

@@ -406,6 +406,7 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
 
     // is contextmenu disabled
     if (localStorage.contextmenu) {
+        console.warn('context menus are disabled.');
         return true;
     }
 
@@ -461,7 +462,7 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
 
     };
 
-    $.hideContextMenu();
+    $.hideContextMenu(e);
     $contactDetails.addClass('hidden');
 
     // Used when right click is occured outside item, on empty canvas

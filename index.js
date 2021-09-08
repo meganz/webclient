@@ -1730,7 +1730,7 @@ function init_page() {
         }
         else {
             // Show the voucher info to the user before proceeding to redeem.
-            if (typeof redeem !== 'undefined' && mega.voucher && mega.voucher.businessmonths) {
+            if (typeof redeem !== 'undefined' && mega.voucher) {
                 return redeem.showVoucherInfoDialog();
             }
             // Otherwise go to the Redeem page which will detect the voucher code and show a dialog

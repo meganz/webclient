@@ -621,7 +621,7 @@ function setContactLink($container) {
         var linkData = $(this).attr('data-lnk') || '';
 
         if (linkData.length) {
-            copyToClipboard(linkData, l[371] + '<br/>' + linkData);
+            copyToClipboard(linkData, `${l[371]}<span class="link-text">${linkData}</span>`);
         }
     });
 }
@@ -700,7 +700,7 @@ function contactAddDialog(close, dontWarnBusiness) {
     $d.find('.multiple-input .token-input-token-mega').remove();
     initTokenInputsScroll($('.multiple-input', $d));
     Soon(function() {
-        $('.token-input-input-token-mega input', $d).trigger("focus");
+        $('.add-contact-multiple-input input', $d).trigger("focus");
     });
 
     $('.add-user-popup-button span', $d).text(l[19112])
@@ -714,7 +714,7 @@ function contactAddDialog(close, dontWarnBusiness) {
     }
 
     initTextareaScrolling($textarea, 72);
-    $d.find('.token-input-input-token-mega input').trigger("focus");
+    $('.add-contact-multiple-input input', $d).trigger("focus");
     focusOnInput();
 
     $d.find('.hidden-textarea-info span').rebind('click', function() {

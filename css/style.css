@@ -10969,6 +10969,9 @@ ul.token-input-list-mega {
     z-index: 100;
     display: none;
 }
+.add-user-popup .multiple-input-warning {
+    text-align: center;
+}
 .error .multiple-input-warning, .duplicate .duplicated-input-warning, .error .reg-resend-email-meg {
     display: block;
 }
@@ -10981,7 +10984,7 @@ ul.token-input-list-mega li input,
     border: 0;
     width: 100px;
     float: left;
-    color: var(--text-color-medium);
+    color: var(--text-color-high);
     background-color: transparent;
     max-width: 100%;
     margin: 0;
@@ -11003,7 +11006,7 @@ li.token-input-token-mega {
     padding: 0 20px 0 24px;
     cursor: default;
     font: var(--text-body1);
-    color: var(--text-color-medium);
+    color: var(--text-color-high);
     border-radius: 1px;
     float: left;
     white-space: nowrap;

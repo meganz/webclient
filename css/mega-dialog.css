@@ -127,7 +127,7 @@
     .mega-dialog a,
     .mega-dialog a:visited,
     .mega-dialog a:active {
-        color: var(--text-color-success);
+        color: var(--text-color-info);
         text-decoration: underline;
     }
 

@@ -183,7 +183,7 @@ function linuxMegacmdDropdown() {
         linuxnameindex = {};
         linuxClients = content.object;
 
-        for (var i = 0;i<linuxClients.length;i++) {
+        for (var i = 0;i < linuxClients.length;i++) {
             var val = linuxClients[i];
 
             linuxnameindex[val.name] = i;
@@ -195,8 +195,8 @@ function linuxMegacmdDropdown() {
 
                 icon = (icon === 'red') ? 'redhat' : icon;
 
-                if (val[platform] && platform === platformsel) {
-
+                if (val[platform] && platform === platformsel &&
+                    $('div.option[data-client="' + val.name + '"]', $list).length === 0) {
                     itemNode = mCreateElement('div', {
                         'class': 'option',
                         'data-client': val.name,
@@ -206,7 +206,7 @@ function linuxMegacmdDropdown() {
                     mCreateElement('span', undefined, itemNode).textContent = val.name;
                 }
             });
-        };
+        }
 
         // Dropdown item click event
         $('.option', $dropdown).rebind('click.selectapp', function() {

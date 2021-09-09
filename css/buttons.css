@@ -353,6 +353,9 @@ button:not(.mega-button) .icon {
     transition: var(--transition-opacity);
     z-index: 5;
 }
+.fm-header-buttons .link-button.dropdown .dropdown-content {
+    z-index: 11;
+}
 .link-button.dropdown:hover .dropdown-content {
     display: block;
 }

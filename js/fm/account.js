@@ -265,6 +265,8 @@ accountUI.general = {
             else {
                 $('.left-chart span', $bandwidthChart).css('transform', 'rotate(180deg)');
                 $('.right-chart span', $bandwidthChart).css('transform', `rotate(${(deg - 180) * -1}deg)`);
+                $('.right-chart', $bandwidthChart).removeClass('low-percent-clip');
+                $('.left-chart', $bandwidthChart).removeClass('low-percent-clip');
             }
 
             if (this.perc_c_b > 99 || dlmanager.isOverQuota) {
@@ -281,6 +283,7 @@ accountUI.general = {
             $('.chart.data .pecents-txt', $bandwidthChart).text(b2[0]);
             $('.chart.data .gb-txt', $bandwidthChart).text(b2[1]);
             $('.chart.data .of-txt', $bandwidthChart).text('/');
+            $('.account.chart.data', $bandwidthChart).removeClass('hidden');
             if ((u_attr.p || account.tfsq.ach) && b2[0] > 0) {
                 if (this.perc_c_b > 0) {
                     $bandwidthChart.removeClass('no-percs');
@@ -351,6 +354,8 @@ accountUI.general = {
             else {
                 $('.left-chart span', $storageChart).css('transform', 'rotate(180deg)');
                 $('.right-chart span', $storageChart).css('transform', `rotate(${(deg - 180) * -1}deg)`);
+                $('.right-chart', $storageChart).removeClass('low-percent-clip');
+                $('.left-chart', $storageChart).removeClass('low-percent-clip');
             }
 
             // Maximum disk space
@@ -359,6 +364,7 @@ accountUI.general = {
             $('.chart.data .gb-txt', $storageChart).text(b2[1]);
             $('.chart .perc-txt', $storageChart).text(formatPercentage(usedPercentage / 100));
             $('.chart.data .size-txt', $storageChart).text(bytesToSize(account.space_used));
+            $('.account.chart.data', $storageChart).removeClass('hidden');
             /** End New Used Storage chart */
         },
 

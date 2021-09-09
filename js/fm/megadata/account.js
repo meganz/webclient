@@ -722,13 +722,15 @@ MegaData.prototype.showOverStorageQuota = function(quota, options) {
             else {
                 $('.left-chart span', $storageChart).css('transform', 'rotate(180deg)');
                 $('.right-chart span', $storageChart).css('transform', `rotate(${(deg - 180) * -1}deg)`);
+                $('.right-chart', $storageChart).removeClass('low-percent-clip');
+                $('.left-chart', $storageChart).removeClass('low-percent-clip');
             }
 
             $('.chart.data .size-txt', $strgdlg).text(strQuotaUsed);
             $('.chart.data .pecents-txt', $strgdlg).text(strQuotaLimit[0]);
             $('.chart.data .gb-txt', $strgdlg).text(strQuotaLimit[1]);
             $('.chart.body .perc-txt', $strgdlg).text(quota.percent + '%');
-
+            $('.chart.data', $strgdlg).removeClass('hidden');
         }
         else {
             if ($strgdlg.is(':visible')) {

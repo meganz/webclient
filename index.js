@@ -1215,12 +1215,21 @@ function init_page() {
         }
     }
     else if (page === 'gdpr') {
-        return loadSubPage('privacy', 'override');
+        if (is_extension) {
+            return loadSubPage('privacy');
+        }
+        location.replace('/privacy');
     }
-    else if (page == 'privacycompany') {
+    else if (page === 'privacycompany') {
         parsepage(pages['privacycompany']);
     }
-    else if (page == 'dev' || page == 'developers') {
+    else if (page === 'dev') {
+        if (is_extension) {
+            return loadSubPage('developers');
+        }
+        location.replace('/developers');
+    }
+    else if (page === 'developers') {
         parsepage(pages['dev']);
         dev_init('dev');
     }
@@ -1416,6 +1425,12 @@ function init_page() {
             dev_init('sdk');
         }
     }
+    else if (page === 'about/main') {
+        if (is_extension) {
+            return loadSubPage('about');
+        }
+        location.replace('/about');
+    }
     else if (page.substr(0, 5) === 'about') {
         parsepage(pages.about);
         aboutus.init();
@@ -1542,7 +1557,13 @@ function init_page() {
         });
         $('.credits-main-pad').html(html + '<div class="clear"></div>');
     }
-    else if (page === 'mobile' || page === 'android' || page === 'ios' || page === 'uwp' || page === 'wp') {
+    else if (page === 'android' || page === 'ios' || page === 'uwp' || page === 'wp' || page === 'mobileapp') {
+        if (is_extension) {
+            return loadSubPage('mobile');
+        }
+        location.replace('/mobile');
+    }
+    else if (page === 'mobile') {
         parsepage(pages['mobileapp']);
 
         // On clicking the 'Learn more' button

@@ -78,7 +78,8 @@ var aboutus = {
 
         // Init main menu click
         $('.about.main-menu.item', $page).rebind('click.about', function() {
-            loadSubPage('/about/' + $(this).data('page'));
+            const page = $(this).data('page');
+            loadSubPage(`about${page === 'main' ? '' : `/${page}`}`);
         });
     },
 

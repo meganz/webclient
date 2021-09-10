@@ -227,40 +227,42 @@ mega.metatags = new function() {
 
         if (page === 'refer') {
             mTags.en_title = 'MEGA Referral Program - MEGA';
-            mTags.en_desc = 'Earn 20% of the revenue from each purchase made by a user you have referred to MEGA';
+            mTags.en_desc = 'Refer your contacts to MEGA and earn 20 percent commission for each paid plan sign up.';
             mTags.mega_title = l[23963] || mTags.en_title;
-            mTags.mega_desc = l[22712] || mTags.en_desc;
+            mTags.mega_desc = l.mtags_desc_refer || mTags.en_desc;
             mTags.image = 'https://cms2.mega.nz/07834c8d2b3b05bc352966fe02fe597b.png';
         }
-        else if (page === 'mobileapp' || page === 'mobile'
-            || page === 'android' || page === 'ios' || page === 'uwp' || page === 'wp') {
-
-            mTags.en_title = 'MEGA Mobile Apps - MEGA';
-            mTags.en_desc = 'Securely manage your files and collaborate with everyone from anywhere.';
+        else if (page === 'mobile' || page === 'android' || page === 'ios') {
+            mTags.en_title = 'Cloud Storage at Your Fingertips - MEGA Mobile Apps - MEGA';
+            mTags.en_desc = 'Download the MEGA app to securely upload, access and stream your files across your ' +
+                'devices, or communicate with our end-to-end encrypted chat.';
             mTags.mega_title = l[23965] || mTags.en_title;
-            mTags.mega_desc = l[19683] || mTags.en_desc;
+            mTags.mega_desc = l.mtags_desc_mobile || mTags.en_desc;
             if (page !== 'mobile') {
                 addCanonical(getBaseUrl() + '/mobile');
             }
         }
         else if (page === 'nas') {
-            mTags.en_title = 'MEGA on NAS - MEGA';
-            mTags.en_desc = 'A command line tool to interact with MEGA from your Network Attached Storage device.';
+            mTags.en_title = 'Network Attached Storage (NAS) - MEGA';
+            mTags.en_desc = 'Access your MEGA account directly on your QNAP and Synology Network Attached Storage' +
+                ' (NAS) with our MEGA CMD tool.';
             mTags.mega_title = l[23966] || mTags.en_title;
-            mTags.mega_desc = l[23331] || mTags.en_desc;
+            mTags.mega_desc = l.mtags_desc_nas || mTags.en_desc;
         }
         else if (page === 'sync') {
-            mTags.en_title = 'MEGA Desktop App - MEGA';
-            mTags.en_desc = 'Easy automated synchronisation between your computer and your MEGA cloud';
+            mTags.en_title = 'Desktop App - MEGA';
+            mTags.en_desc = 'Our MEGA Desktop App allows you to easily automate synchronisation between your ' +
+                'computer and your MEGA Cloud Storage. Available for macOS, Windows, and Linux.';
             mTags.mega_title = l[23967] || mTags.en_title;
-            mTags.mega_desc = l[16580] || mTags.en_desc;
+            mTags.mega_desc = l.mtags_desc_sync || mTags.en_desc;
             mTags.image = 'https://cms2.mega.nz/0723d3ca8f856c90f39480c66b4f2646.png';
         }
         else if (page === 'extensions' || page === 'chrome' || page === 'firefox' || page === 'edge') {
-            mTags.en_title = 'Browser Extensions - MEGA';
-            mTags.en_desc = 'Reduce loading times, improve download performance, strengthen security';
+            mTags.en_title = 'Improve Performance and Security - Browser Extensions - MEGA';
+            mTags.en_desc = 'Install the MEGA extension for your browser to reduce load times, improve performance' +
+                ' and strengthen security.';
             mTags.mega_title = l[23968] || mTags.en_title;
-            mTags.mega_desc = l[20921] || mTags.en_desc;
+            mTags.mega_desc = l.mtags_desc_extensions || mTags.en_desc;
             mTags.image = 'https://cms2.mega.nz/b9a5ee1bd8935e2eb8659b1b7b87f0ae.png';
             if (page !== 'extensions') {
                 addCanonical(getBaseUrl() + '/extensions');
@@ -273,31 +275,33 @@ mega.metatags = new function() {
             mTags.mega_desc = l[20931] || mTags.en_desc;
         }
         else if (page === 'cmd') {
-            mTags.en_title = 'MEGAcmd - MEGA';
-            mTags.en_desc = 'A command line tool to work with your MEGA account and files.';
+            mTags.en_title = 'Unleash MEGA\'s Full Potential with MEGA CMD - MEGA';
+            mTags.en_desc = 'System administrators can automate MEGA account access by integrating scripts with ' +
+                'the MEGA CMD tool.';
             mTags.mega_title = l[23970] || mTags.en_title;
-            mTags.mega_desc = l[18775] || mTags.en_desc;
+            mTags.mega_desc = l.mtags_desc_cmd || mTags.en_desc;
             mTags.image = 'https://cms2.mega.nz/75bc1e26149f8962b723a42205434feb.png';
         }
         else if (page === 'pro' || page.substr(0, 6) === 'propay') {
-            mTags.en_title = 'Plans & pricing - MEGA';
-            mTags.en_desc = 'Upgrade to a MEGA PRO account for additional storage and transfer quota. '
-                + 'MEGA provides one of the cheapest cloud storage deals on the Internet.';
+            mTags.en_title = 'Compare Plans and Pricing - MEGA';
+            mTags.en_desc = 'Compare MEGA\'s pricing plans. Get 16% off if you purchase an annual plan. ' +
+                'Start using MEGA\'s secure cloud storage and fast transfers today.';
             mTags.mega_title = l[23971] || mTags.en_title;
             mTags.mega_desc = l[23972] || mTags.en_desc;
             mTags.image = 'https://cms2.mega.nz/559d084a50ad7283acb6f1c433136952.png';
         }
         else if (page === 'register') {
-            mTags.en_title = 'Register - MEGA';
-            mTags.en_desc = 'Create your MEGA account and get up to 50 GB free!';
+            mTags.en_title = 'Create Your Account - MEGA';
+            mTags.en_desc = 'Get started with MEGA, the world\'s largest fully-featured free cloud storage and ' +
+                'communications provider with secure, user-controlled end-to-end encryption.';
             mTags.mega_title = l[23973] || mTags.en_title;
             mTags.mega_desc = l[23974] || mTags.en_desc;
         }
         else if (page === 'login') {
             mTags.en_title = 'Login - MEGA';
-            mTags.en_desc = 'Login to your MEGA account';
+            mTags.en_desc = 'Log in to your MEGA account. Access the world\'s most trusted, protected cloud storage.';
             mTags.mega_title = l[23975] || mTags.en_title;
-            mTags.mega_desc = l[1768] || mTags.en_desc;
+            mTags.mega_desc = l.mtags_desc_login || mTags.en_desc;
         }
         else if (page === 'recovery') {
             mTags.en_title = 'Recovery - MEGA';
@@ -307,21 +311,24 @@ mega.metatags = new function() {
         }
         else if (page === 'terms') {
             mTags.en_title = 'Terms of Service - MEGA';
-            mTags.en_desc = 'Want to know what your rights are when using MEGA\'s services?';
+            mTags.en_desc = 'Please read our Terms of Service that cover how you may access our services, website ' +
+                'domains, and client software.';
             mTags.mega_title = l[23978] || mTags.en_title;
             mTags.mega_desc = l[23979] || mTags.en_desc;
             mTags.image = 'https://cms2.mega.nz/4548c0ab90a611b8b7c5a940811e23b5975b4ba8.png';
         }
         else if (page === 'dispute') {
-            mTags.en_title = 'Copyright Dispute - MEGA';
-            mTags.en_desc = 'Counter-notification process of copyright dispute';
+            mTags.en_title = 'For Copyright Claims and Disputes - MEGA';
+            mTags.en_desc = 'If you believe that access to a file you have uploaded has been wrongly disabled, ' +
+                'please file a counter-notice.';
             mTags.mega_title = l[24967] || mTags.en_title;
             mTags.mega_desc = l[24968] || mTags.en_desc;
             mTags.image = 'https://cms2.mega.nz/4548c0ab90a611b8b7c5a940811e23b5975b4ba8.png';
         }
         else if (page === 'privacy' || page === 'gdpr') {
-            mTags.en_title = 'Privacy Policy - MEGA';
-            mTags.en_desc = 'Find out how MEGA protects your privacy.';
+            mTags.en_title = 'Privacy and Data Policy - GDPR - MEGA';
+            mTags.en_desc = 'MEGA takes privacy very seriously. We are committed to ensuring continued compliance ' +
+                'with data protection regulations including GDPR.';
             mTags.mega_title = l[23980] || mTags.en_title;
             mTags.mega_desc = l[23981] || mTags.en_desc;
             if (page !== 'privacy') {
@@ -330,7 +337,8 @@ mega.metatags = new function() {
         }
         else if (page === 'copyright') {
             mTags.en_title = 'Copyright - MEGA';
-            mTags.en_desc = 'Copyright. Notice of Alleged Infringement "Notice"';
+            mTags.en_desc = 'We respect copyright and require that users of our services comply with applicable' +
+                ' intellectual property laws. Learn more or submit a notice here.';
             mTags.mega_title = l[23983] || mTags.en_title;
             mTags.mega_desc = l[23984] || mTags.en_desc;
         }
@@ -348,77 +356,83 @@ mega.metatags = new function() {
         }
         else if (page === 'takedown') {
             mTags.en_title = 'Takedown Guidance Policy - MEGA';
-            mTags.en_desc = 'MEGA has special policies and procedures in place for anyone wanting access to user data' +
-                            ' and information.';
+            mTags.en_desc = 'MEGA Takedown Policy. Guidance on requesting user information or "takedown" of' +
+                ' user data.';
             mTags.mega_title = l[23988] || mTags.en_title;
             mTags.mega_desc = l[23989] || mTags.en_desc;
             mTags.image = 'https://cms2.mega.nz/c449150b27444c9cc8eb3cad8ab02319744dd61d.png';
         }
         else if (page === 'cookie') {
             mTags.en_title = 'Cookie Policy - MEGA';
-            mTags.en_desc = 'Understand how MEGA collects data from you using Cookies and similar technologies';
+            mTags.en_desc = 'We value your privacy. Learn about the necessary data MEGA collects through cookies ' +
+                'and similar technologies.';
             mTags.mega_title = l[24639] || mTags.en_title;
             mTags.mega_desc = l[24640] || mTags.en_desc;
             mTags.image = 'https://cms2.mega.nz/e5cebb274552eb5e5408db5e834d5ff3ec8c66ef.png'
         }
         else if (page === 'contact') {
             mTags.en_title = 'Contact Us - MEGA';
-            mTags.en_desc = 'Contact MEGA';
+            mTags.en_desc = 'Need help with your account or want to report an issue? Contact our support staff.';
             mTags.mega_title = l[23990] || mTags.en_title;
             mTags.mega_desc = l[23991] || mTags.en_desc;
         }
         else if (page === 'resellers') {
             mTags.en_title = 'Resellers - MEGA';
-            mTags.en_desc =
-                'You can conveniently purchase your MEGA PRO membership from one of our authorized resellers.';
+            mTags.en_desc = 'Conveniently purchase a MEGA Pro membership from one of our authorised resellers: ' +
+                'CloudBasedBackup, 6Media, Pay.mobi or VoucherReseller';
             mTags.mega_title = l[23992] || mTags.en_title;
             mTags.mega_desc = l[23993] || mTags.en_desc;
+            stopBots(metaRobots);
         }
         else if (page === 'securechat') {
-            mTags.en_title = 'Secure Chat - MEGA';
-            mTags.en_desc = 'With MEGA all chat messages, audio and video call are fully encrypted and 100% private';
+            mTags.en_title = 'Private and Secure Communication - MEGA';
+            mTags.en_desc = 'Exchange messages, share your files and have audio and/or video calls with MEGA\'s ' +
+                'end-to-end encrypted chat.';
             mTags.mega_title = l[24608] || mTags.en_title;
             mTags.mega_desc = l[24611] || mTags.en_desc;
         }
         else if (page === 'storage') {
-            mTags.en_title = 'Secure Cloud Storage - MEGA';
-            mTags.en_desc =
-                'MEGA provides generous user-controlled end-to-end encrypted cloud storage and fast transfer';
+            mTags.en_title = 'Secure Cloud Storage and Fast Transfers - MEGA';
+            mTags.en_desc = 'Work remotely and never run out of storage. With MEGA, you\'ll have access to one of ' +
+                'the most generous and secure cloud storage services currently available.';
             mTags.mega_title = l[24606] || mTags.en_title;
             mTags.mega_desc = l[24609] || mTags.en_desc;
         }
         else if (page === 'collaboration') {
-            mTags.en_title = 'Collaboration - MEGA';
-            mTags.en_desc =
-                'With MEGA you can work with your stored files, stay connected and communicate all in one easy place';
+            mTags.en_title = 'Work From Anywhere and Stay Connected - MEGA';
+            mTags.en_desc = 'Securely store files, stay in contact and collaborate in one easy place with MEGA.';
             mTags.mega_title = l[24607] || mTags.en_title;
             mTags.mega_desc = l[24610] || mTags.en_desc;
         }
         else if (page === 'security') {
-            mTags.en_title = 'Security - MEGA';
-            mTags.en_desc = 'Security and why it matters';
+            mTags.en_title = 'Security and Why It Matters - MEGA';
+            mTags.en_desc = 'Your files and chats are end-to-end encrypted with keys controlled by you and ' +
+                'nobody else.';
             mTags.mega_title = l[23994] || mTags.en_title;
-            mTags.mega_desc = l[20004] || mTags.en_desc;
+            mTags.mega_desc = l.mtags_desc_security || mTags.en_desc;
             mTags.image = 'https://cms2.mega.nz/c964ddb7dd27f1acd727747862787486.png';
         }
         else if (page === 'privacycompany') {
-            mTags.en_title = 'Privacy Company - MEGA';
-            mTags.en_desc = 'MEGA is Cloud Storage with Powerful Always-On Privacy.';
+            mTags.en_title = 'The Privacy Company - MEGA';
+            mTags.en_desc = 'MEGA takes your right to privacy seriously and provides the tools to protect it.' +
+                ' We call it User Controlled Encryption, or UCE.';
             mTags.mega_title = l[23995] || mTags.en_title;
-            mTags.mega_desc = l[676] || mTags.en_desc;
+            mTags.mega_desc = l.mtags_desc_privcompany || mTags.en_desc;
         }
         else if (page === 'dev' || page === 'developers') {
-            mTags.en_title = 'MEGA Software Development Kit - MEGA';
-            mTags.en_desc = 'Developers - MEGA Software Development Kit';
+            mTags.en_title = 'Documentation for Developers - MEGA';
+            mTags.en_desc = 'Check out the MEGA C++ client access engine with full documentation including ' +
+                'integration guides, data structures and more.';
             mTags.mega_title = l[23996] || mTags.en_title;
             mTags.mega_desc = l[23997] || mTags.en_desc;
-            if (page === 'developers') {
-                addCanonical(getBaseUrl() + '/dev');
+            if (page === 'dev') {
+                addCanonical(getBaseUrl() + '/developers');
             }
         }
         else if (page === 'doc') {
-            mTags.en_title = 'Documentation - MEGA';
-            mTags.en_desc = 'Developers - Documentation';
+            mTags.en_title = 'Software Developer Documentation - MEGA';
+            mTags.en_desc = 'MEGA provides an API accessible with our software development kit (SDK), with a ' +
+                'full library of developer documentation.';
             mTags.mega_title = l[23998] || mTags.en_title;
             mTags.mega_desc = l[23999] || mTags.en_desc;
         }
@@ -430,21 +444,20 @@ mega.metatags = new function() {
             mTags.mega_desc = l[24001] || mTags.en_desc;
         }
         else if (page === 'sdkterms') {
-            mTags.en_title = 'SDK Terms of Service - MEGA';
-            mTags.en_desc = 'In addition to MEGA\'s Terms of Service and Privacy Policy, which are '
-                + 'incorporated by reference into these terms, these terms apply to applications to '
-                + 'use, and all subsequent use of, MEGA\'s API and SDK.';
+            mTags.en_title = 'SDK Terms and Conditions - Developers - MEGA';
+            mTags.en_desc = 'Check MEGA\'s Terms of Service and Privacy Policy for our API and SDK.';
             mTags.mega_title = l[24002] || mTags.en_title;
             mTags.mega_desc = l[24003] || mTags.en_desc;
         }
         else if (page === 'about/main' || page === 'about') {
-            mTags.en_title = 'About - MEGA';
-            mTags.en_desc = 'MEGA - The Privacy Company';
+            mTags.en_title = 'About Us - Encrypted Cloud Storage - MEGA';
+            mTags.en_desc = 'MEGA launched in 2013 as the world\'s first zero-knowledge, easy to use cloud ' +
+                'storage provider with user-controlled end-to-end encryption.';
             mTags.mega_title = l[24004] || mTags.en_title;
-            mTags.mega_desc = l[23065] || mTags.en_desc;
+            mTags.mega_desc = l.mtags_desc_about || mTags.en_desc;
             mTags.image = 'https://cms2.mega.nz/0fcca13fc3baaf74cd6bdc51850c19c3.png';
-            if (page === 'about') {
-                addCanonical(getBaseUrl() + '/about/main');
+            if (page === 'about/main') {
+                addCanonical(getBaseUrl() + '/about');
             }
             this.addStrucuturedData('Organization', {
                 url: getBaseUrl(),
@@ -452,46 +465,50 @@ mega.metatags = new function() {
             });
         }
         else if (page === 'about/jobs') {
-            mTags.en_title = 'Jobs - MEGA';
-            mTags.en_desc = 'MEGA career opportunities start right here!';
+            mTags.en_title = 'Career Opportunities - MEGA';
+            mTags.en_desc = 'Join the world\'s largest fully-featured cloud storage and privacy company. Check out' +
+                ' our latest job listings and apply today.';
             mTags.mega_title = l[24005] || mTags.en_title;
-            mTags.mega_desc = l[23082] || mTags.en_desc;
+            mTags.mega_desc = l.mtags_desc_about_jobs || mTags.en_desc;
             mTags.image = 'https://cms2.mega.nz/659cd40a308f29a025c2d3b42944a0c9.png';
         }
         else if (page === 'about/privacy') {
-            mTags.en_title = 'Privacy - MEGA';
-            mTags.en_desc = 'MEGA is the Privacy Company';
+            mTags.en_title = 'About MEGA and Our End-to-End Encrypted Cloud Storage - MEGA';
+            mTags.en_desc = 'MEGA is the world\'s leading fully-featured end-to-end encrypted cloud storage provider.' +
+                ' We strive to offer the highest levels of privacy possible.';
             mTags.mega_title = l[24006] || mTags.en_title;
-            mTags.mega_desc = l[23115] || mTags.en_desc;
+            mTags.mega_desc = l.mtags_desc_about_priv || mTags.en_desc;
             mTags.image = 'https://cms2.mega.nz/753f59a51ed56feda0644a1be74c1671.png';
         }
         else if (page === 'about/reliability') {
-            mTags.en_title = 'Reliability - MEGA';
-            mTags.en_desc = 'MEGA\'s mission is not limited to just keeping your valuable data private:'
-                + ' safeguarding it is equally important to us.';
+            mTags.en_title = 'How Reliable is MEGA\'s End-to-End Encrypted Storage? - MEGA';
+            mTags.en_desc = 'MEGA\'s CloudRAID technology means files are split into equal-sized parts and stored' +
+                ' in different countries for additional service robustness.';
             mTags.mega_title = l[24007] || mTags.en_title;
-            mTags.mega_desc = l[23122] || mTags.en_desc;
+            mTags.mega_desc = l.mtags_desc_about_rel || mTags.en_desc;
             mTags.image = 'https://cms2.mega.nz/f1d60e5822b4d755de9be2d0441b9a3b.png';
         }
         else if (page === 'sourcecode') {
-            mTags.en_title = 'Source Code - MEGA';
-            mTags.en_desc = 'Source Code Transparency';
+            mTags.en_title = 'Transparency and Public Source Code - MEGA';
+            mTags.en_desc = 'We publish the full source code for our client apps and welcome independent ' +
+                'verification and integrity checks.';
             mTags.mega_title = l[24008] || mTags.en_title;
-            mTags.mega_desc = l[8438] || mTags.en_desc;
+            mTags.mega_desc = l.mtags_desc_srccode || mTags.en_desc;
             mTags.image = 'https://cms2.mega.nz/147ddec6fa35a6084030513d1ccd2eed.png';
         }
         else if (page === 'credits') {
-            mTags.en_title = 'Credits - MEGA';
-            mTags.en_desc = 'MEGA would like to thank the authors of the following open source '
-                + 'components that contributed essential functionality to our site.';
+            mTags.en_title = 'What Powers MEGA? - Credits - MEGA';
+            mTags.en_desc = 'MEGA would like to thank the authors of the following open source components that ' +
+                'have contributed to the functionality of our site.';
             mTags.mega_title = l[24009] || mTags.en_title;
             mTags.mega_desc = l[24010] || mTags.en_desc;
         }
         else if (page === 'business') {
-            mTags.en_title = 'Business - MEGA';
-            mTags.en_desc = 'The secure solution for your business';
-            mTags.mega_title = l[24011] || 'Business - MEGA';
-            mTags.mega_desc = l[19531] || 'The secure solution for your business';
+            mTags.en_title = 'The Secure Cloud Storage Solution for Your Business - MEGA';
+            mTags.en_desc = 'Massive storage, secure sharing across devices and 24/7 support make MEGA Business ' +
+                'the obvious choice for your team.';
+            mTags.mega_title = l[24011] || mTags.en_title;
+            mTags.mega_desc = l.mtags_desc_business || mTags.en_desc;
             mTags.image = 'https://cms2.mega.nz/730b119f030d91dacb5dc349726e6c17.png';
         }
         else if (page === 'registerb') {
@@ -501,8 +518,9 @@ mega.metatags = new function() {
             mTags.mega_desc = l[19517] || mTags.en_desc;
         }
         else if (page === 'corporate' || page === 'corporate/media') {
-            mTags.en_title = 'Media - MEGA';
-            mTags.en_desc = 'MEGA Media';
+            mTags.en_title = 'Media Assets - MEGA';
+            mTags.en_desc = 'Are you a journalist or technology reviewer? Download our MEGA media resources or ' +
+                'contact us for enquiries.';
             mTags.mega_title = l[24015] || mTags.en_title;
             mTags.mega_desc = l[24089] || mTags.en_desc;
             if (page === 'corporate') {
@@ -511,7 +529,8 @@ mega.metatags = new function() {
         }
         else if (page === 'corporate/reviews') {
             mTags.en_title = 'Reviews - MEGA';
-            mTags.en_desc = 'MEGA reviews';
+            mTags.en_desc = 'MEGA is the largest secure, fully-featured cloud storage provider in the world. ' +
+                'Check out some of our top reviews and product comparisons.';
             mTags.mega_title = l[24086] || mTags.en_title;
             mTags.mega_desc = l[24087] || mTags.en_desc;
         }
@@ -656,7 +675,11 @@ mega.metatags = new function() {
             mTags.section = 'help';
         }
         else if (page === 'start') {
-            mTags.mega_title = 'MEGA';
+            mTags.en_title = 'The Most Trusted, Best-Protected Cloud Storage - MEGA';
+            mTags.en_desc = 'MEGA understands the importance of keeping data and conversations private. We provide ' +
+                'a fantastic user experience that protects users\' right to privacy.';
+            mTags.mega_title = l.mtags_title_start || mTags.en_title;
+            mTags.mega_desc = l.mtags_desc_start || mTags.en_desc;
             if (getCleanSitePath().substr(0, 5) === 'start') {
                 addCanonical(getBaseUrl());
             }

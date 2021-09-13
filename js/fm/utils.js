@@ -678,6 +678,7 @@ MegaUtils.prototype.reload = function megaUtilsReload() {
 
         localStorage.force = true;
         location.reload(true);
+        loadingDialog.hide();
     };
 
     if (u_type !== 3 && page !== 'download') {
@@ -714,6 +715,14 @@ MegaUtils.prototype.reload = function megaUtilsReload() {
             stopsc();
             stopapi();
 
+            if (window.delay) {
+                delay.abort();
+            }
+
+            if (window.fmdb) {
+                waitingPromises.push(new Promise((resolve) => fmdb.invalidate(resolve)));
+            }
+
             if (shouldAbortTransfers) {
                 waitingPromises.push(M.clearFileSystemStorage());
             }
@@ -726,16 +735,7 @@ MegaUtils.prototype.reload = function megaUtilsReload() {
                 waitingPromises.push(megaChat.dropAllDatabases());
             }
 
-            Promise.allSettled(waitingPromises).then((r) => {
-                console.debug('megaUtilsReload', r);
-
-                if (fmdb) {
-                    fmdb.invalidate(_reload);
-                }
-                else {
-                    _reload();
-                }
-            });
+            Promise.allSettled(waitingPromises).then(dump).finally(_reload);
         });
     });
 };

@@ -150,3 +150,11 @@ delay.cancel = function(aProcID) {
     }
     return false;
 };
+delay.abort = () => {
+    'use strict';
+
+    if (d) {
+        console.warn('Aborting all pending scheduled timers...', Object.keys(delay.queue));
+    }
+    Object.keys(delay.queue).forEach((t) => delay.cancel(t));
+};

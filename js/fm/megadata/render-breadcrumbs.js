@@ -12,6 +12,10 @@
      * @return {undefined}
      */
     MegaData.prototype.renderBreadcrumbs = function(items, scope, dictionary, clickAction) {
+        if (!(scope && scope.parentNode)) {
+            return;
+        }
+
         const block = scope.querySelector('.fm-breadcrumbs-block');
         const $block = $(block);
         const dropdown = scope.querySelector('.breadcrumb-dropdown');

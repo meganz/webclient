@@ -5389,11 +5389,16 @@ div.checkboxOn {
 #mobile-ui-contact-card {
     top: 0;
     left: 0;
-    z-index:190;
-    border:0;
+    z-index: 190;
+    border: 0;
+    position: fixed;
 }
 #mobile-ui-contact-card .mobile.logo {
     background-position: -94px -1073px;
+}
+#mobile-ui-contact-card .mobile.logo,
+#mobile-ui-contact-card .mobile.fm-icon.top-icon.menu {
+    display: block;
 }
 .mobile.my-account-page .user-info {
     margin-left: 60px;

@@ -3260,6 +3260,7 @@ accountUI.contactAndChat = {
                 presenceInt.getPresence(u_handle),
                 function(newVal) {
                     presenceInt.setPresence(parseInt(newVal));
+                    showToast('settings', l[16168]);
                 });
 
             // Last seen switch
@@ -3269,6 +3270,7 @@ accountUI.contactAndChat = {
                 lastSeen,
                 function(val) {
                     presenceInt.userPresence.ui_enableLastSeen(Boolean(val));
+                    showToast('settings', l[16168]);
                 });
 
             if (autoawaytimeout !== false) {
@@ -3279,6 +3281,7 @@ accountUI.contactAndChat = {
                     autoaway,
                     function(val) {
                         presenceInt.userPresence.ui_setautoaway(Boolean(val));
+                        showToast('settings', l[16168]);
                     });
 
                 // Prevent changes to autoaway if autoawaylock is set
@@ -3304,6 +3307,7 @@ accountUI.contactAndChat = {
                     persist,
                     function(val) {
                         presenceInt.userPresence.ui_setpersist(Boolean(val));
+                        showToast('settings', l[16168]);
                     });
 
                 // Prevent changes to autoaway if autoawaylock is set
@@ -3369,7 +3373,15 @@ accountUI.contactAndChat = {
                 $('#richpreviews').parent(),
                 // previewGenerationConfirmation -> -1 (unset, default) || true || false
                 previewGenerationConfirmation && previewGenerationConfirmation > 0,
-                val => val ? confirmationDoConfirm() : confirmationDoNever()
+                val => {
+                    if (val){
+                        confirmationDoConfirm();
+                    }
+                    else {
+                        confirmationDoNever();
+                    }
+                    showToast('settings', l[16168]);
+                }
             );
         }
     },
@@ -3508,6 +3520,7 @@ accountUI.contactAndChat = {
                 pushNotificationSettings.disableDnd(group);
                 this.renderStatus(false);
                 $(ev.currentTarget).removeClass('toggle-on').trigger('update.accessibility');
+                showToast('settings', l[16168]);
             }
             else {
                 this.handleDialogOpen();
@@ -3542,6 +3555,7 @@ accountUI.contactAndChat = {
                 $(self.DOM.toggle, self.DOM.container).addClass('toggle-on').trigger('update.accessibility');
                 closeDialog();
                 self.renderStatus(true);
+                showToast('settings', l[16168]);
             });
         },
 

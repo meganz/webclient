@@ -348,7 +348,8 @@
         if ($currentNode && !e.target.classList.contains('simpletip')
             && !$(e.target).closest('.simpletip, .simpletip-tooltip').length > 0
             && !e.target.classList.contains('tooltip-arrow')
-            && !e.target.classList.contains('simpletip-tooltip')) {
+            && !e.target.classList.contains('simpletip-tooltip')
+            && !$currentTriggerer.hasClass('manual-tip')) {
             unmount();
         }
     });

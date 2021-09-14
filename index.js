@@ -649,7 +649,6 @@ function init_page() {
         && (page !== 'storage')
         && (page !== 'collaboration')
         && (page !== 'securechat')
-        && (page !== 'downloadapp')
         && (page !== 'unsub')
         && (page !== 'cookie')
         && (page.indexOf('file/') === -1)
@@ -1624,10 +1623,6 @@ function init_page() {
     else if (page === 'collaboration') {
         parsepage(pages.feature_collaboration);
         featurePages('collaboration');
-    }
-    else if (page === 'downloadapp') {
-        parsepage(pages.downloadapp);
-        desktopOnboarding();
     }
     else if (page == 'done') {
         parsepage(pages['done']);
@@ -2760,7 +2755,7 @@ function topmenuUI() {
                     'copyright', 'corporate', 'credits', 'doc', 'extensions',
                     'help', 'login', 'mega', 'nzippmember', 'nziphotographer', 'privacy', 'mobileapp',
                     'mobile', 'privacycompany', 'register', 'resellers', 'sdk', 'sync', 'sitemap', 'sourcecode',
-                    'support', 'sync', 'takedown', 'terms', 'start', 'security', 'downloadapp', 'affiliate',
+                    'support', 'sync', 'takedown', 'terms', 'start', 'security', 'affiliate',
                     'nas', 'pro', 'cookie', 'securechat', 'collaboration', 'storage', 'special',
                     'achievements'
                 ];

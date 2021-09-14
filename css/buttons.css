@@ -348,7 +348,7 @@ button:not(.mega-button) .icon {
     min-width: 200px;
     padding: 8px 0;
     position: absolute;
-    right: -10px;
+    left: -3px;
     top: 36px;
     transition: var(--transition-opacity);
     z-index: 5;

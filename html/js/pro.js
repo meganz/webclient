@@ -106,12 +106,6 @@ var pro = {
             M.currentdirid = String(M.currentdirid).substr(0, 7) === 'account' ? false : M.currentdirid;
         }
 
-        // if (localStorage.justGotRegistered) {
-        //     delete localStorage.justGotRegistered;
-        //     sessionStorage.onDesktopOnboardingRedirectTo = topage;
-        //     topage = 'downloadapp';
-        // }
-
         loadSubPage(topage);
     },
 

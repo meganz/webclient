@@ -579,7 +579,7 @@ var redeem = {
         if (signup || (u_type === 3 && vd.businessmonths)) {
             // The user just signed up, redirect to the app onboarding
             sessionStorage.voucherData = JSON.stringify(vd);
-            loadSubPage('downloadapp');
+            loadSubPage('fm');
             return false;
         }
 

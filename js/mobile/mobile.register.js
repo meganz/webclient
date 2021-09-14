@@ -218,8 +218,6 @@ mobile.register = {
                 return false;
             }
 
-            // Set a flag indicating the registration came from the webclient.
-            localStorage.signUpStartedInWebclient = '1';
             loadingDialog.show();
 
             // Business accounts have different flow

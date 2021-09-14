@@ -10199,3 +10199,42 @@ body.de .mega-dialog.new-group-chat {
     }
 
 /* payment-stripe-success/failure-dialog */
+
+/* mega-desktopapp-download */
+
+    .mega-desktopapp-download .dialog-top > h2 {
+        font: var(--text-h2-bold);
+        line-height: 32px;
+    }
+    .mega-desktopapp-download .dialog-top > h2 > i {
+        --icon-size: 26px;
+        height: 32px;
+        width: 32px;
+        --mask-color: var(--text-color-white-high);
+        border-radius: 7px;
+        vertical-align: bottom;
+        -webkit-margin-end: 12px;
+        margin-inline-end: 12px;
+        background: var(--label-blue);
+        font-weight: normal;
+    }
+    .mega-desktopapp-download .dialog-top > h2 > i::before {
+        height: var(--icon-size);
+        width: var(--icon-size);
+        top: 3px;
+        position: relative;
+    }
+    .mega-dialog.mega-desktopapp-download .dialog-top .graphic {
+        width: 250px;
+        --width: 250px;
+        height: 150px;
+        margin-bottom: 32px;
+    }
+    .mega-desktopapp-download aside a,
+    .mega-desktopapp-download aside a:active,
+    .mega-desktopapp-download aside a:visited {
+        text-decoration: underline;
+        color: var(--text-color-medium);
+    }
+
+/* End mega-desktopapp-download */

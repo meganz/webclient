@@ -211,10 +211,11 @@ html .theme-light-forced {
         --button-fill-positive-active: linear-gradient(180deg, rgba(76, 255, 194, 1) 0%, rgba(36, 192, 141, 1) 100%);
 
         --button-fill-blue: linear-gradient(180deg, rgba(86, 210, 241, 1) 0%, rgba(43, 166, 222, 1) 100%);
-
-        /* Temporary seccondary blue values, colors values are missing in the library */
         --button-fill-blue-hover: linear-gradient(180deg, rgba(75, 200, 230, 1) 0%, rgba(33, 156, 212, 1) 100%);
         --button-fill-blue-active: linear-gradient(180deg, rgba(151, 232, 250, 1) 0%, rgba(94, 205, 242, 1) 100%);
+
+        --button-fill-white: linear-gradient(180deg, rgba(250, 250, 250, 1) 0%, rgba(242, 242, 242, 1) 100%);
+        --button-fill-white-hover: linear-gradient(180deg, rgba(242, 242, 242, 1) 0%, rgba(237, 237, 237, 1) 100%);
 
     /* banner */
 
@@ -333,6 +334,10 @@ html .theme-light-forced {
         --button-hover: rgba(0, 0, 0, 0.05);
         --text-selection: rgba(0, 0, 0, 0.1);
         --text-selection-inverted: rgba(255, 255, 255, 0.1);
+
+    /* Onboarding */
+        --onboarding-step-border: rgba(0, 0, 0, 0.05);
+        --onboarding-control-panel-fill: linear-gradient(270deg, rgba(189, 233, 251, 1) 0%, rgba(229, 240, 246, 1) 100%);
 }
 
 /* dark theme */
@@ -537,4 +542,8 @@ html .theme-dark-forced {
         --button-hover: rgba(255, 255, 255, 0.1);
         --text-selection: rgba(255, 255, 255, 0.1);
         --text-selection-inverted: rgba(0, 0, 0, 0.1);
+
+    /* Onboarding */
+        --onboarding-step-border: rgba(0, 0, 0, 0.05);
+        --onboarding-control-panel-fill: linear-gradient(270deg, rgba(7, 54, 73, 1) 0%, rgba(19, 89, 127, 1) 100%);
 }

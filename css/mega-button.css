@@ -267,6 +267,9 @@
         background: var(--action);
         box-shadow: none;
         color: var(--text-action);
+        text-overflow: ellipsis;
+        min-width: 0;
+        overflow: hidden;
     }
 
     /* branded colours */

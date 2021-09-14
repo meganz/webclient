@@ -624,7 +624,8 @@ MegaUtils.prototype.uiSaveLang = promisify(function(resolve, reject, aNewLang) {
  *  will perform a former normal cloud reload.
  */
 MegaUtils.prototype.reload = function megaUtilsReload() {
-    function _reload() {
+    'use strict';
+    const _reload = () => {
         var u_sid = u_storage.sid;
         var u_key = u_storage.k;
         var privk = u_storage.privk;
@@ -634,7 +635,6 @@ MegaUtils.prototype.reload = function megaUtilsReload() {
         var mcd = localStorage.testChatDisabled;
         var apipath = debug && localStorage.apipath;
         var cdlogger = debug && localStorage.chatdLogger;
-
 
         localStorage.clear();
         sessionStorage.clear();
@@ -678,44 +678,66 @@ MegaUtils.prototype.reload = function megaUtilsReload() {
 
         localStorage.force = true;
         location.reload(true);
-    }
+    };
 
     if (u_type !== 3 && page !== 'download') {
         stopsc();
         stopapi();
         loadfm(true);
+        return;
     }
-    else {
-        // Show message that this operation will destroy the browser cache and reload the data stored by MEGA
-        msgDialog('confirmation', l[761], l[7713], l[6994], function(doIt) {
-            if (doIt) {
-                M.abortTransfers().then(function() {
-                    loadingDialog.show();
-                    stopsc();
-                    stopapi();
 
-                    var waitingPromises = [
-                        M.clearFileSystemStorage()
-                    ];
+    // Show message that this operation will destroy the browser cache and reload the data stored by MEGA
+    msgDialog('confirmation', l[761], l[7713], l[6994], (doIt) => {
+        if (!doIt) {
+            return;
+        }
 
-                    if (window.megaChatIsReady) {
-                        waitingPromises.push(megaChat.dropAllDatabases());
-                    }
-
-                    MegaPromise.allDone(waitingPromises).then(function(r) {
-                        console.debug('megaUtilsReload', r);
-
-                        if (fmdb) {
-                            fmdb.invalidate(_reload);
-                        }
-                        else {
-                            _reload();
-                        }
-                    });
-                });
+        let shouldAbortTransfers = true;
+        if (!ulmanager.isUploading) {
+            const queue = dl_queue.filter(isQueueActive);
+            let i = queue.length;
+            while (i--) {
+                if (!queue[i].hasResumeSupport) {
+                    break;
+                }
             }
+            shouldAbortTransfers = i >= 0;
+        }
+
+        const promise = shouldAbortTransfers ? M.abortTransfers() : Promise.resolve();
+
+        promise.then(() => {
+            const waitingPromises = [];
+
+            loadingDialog.show();
+            stopsc();
+            stopapi();
+
+            if (shouldAbortTransfers) {
+                waitingPromises.push(M.clearFileSystemStorage());
+            }
+            else {
+                // Trick our onbeforeunlaod() handler.
+                dlmanager.isDownloading = false;
+            }
+
+            if (window.megaChatIsReady) {
+                waitingPromises.push(megaChat.dropAllDatabases());
+            }
+
+            Promise.allSettled(waitingPromises).then((r) => {
+                console.debug('megaUtilsReload', r);
+
+                if (fmdb) {
+                    fmdb.invalidate(_reload);
+                }
+                else {
+                    _reload();
+                }
+            });
         });
-    }
+    });
 };
 
 /**

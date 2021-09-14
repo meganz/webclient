@@ -1337,6 +1337,12 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[S]', '<span>')
         .replace('[/S]', '</span>')
         .replace('[BR]', '<br>');
+    l.recovery_web_step_2 = escapeHTML(l.recovery_web_step_2)
+        .replace('[B]', '<strong>')
+        .replace('[/B]', '</strong>');
+    l.recovery_ios_step_2 = escapeHTML(l.recovery_ios_step_2)
+        .replace('[B]', '<strong>')
+        .replace('[/B]', '</strong>');
 
     var common = [
         15536, 16106, 16107, 16119, 16120, 16123, 16124, 16135, 16136, 16137, 16138, 16304, 16313, 16315, 16316,

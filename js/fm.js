@@ -1384,8 +1384,11 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
             }
         }
     }
+    if (d) {
+        console.assert(!$.warningCallback, 'Check this out...');
+    }
     $.msgDialog = type;
-    $.warningCallback = callback;
+    $.warningCallback = typeof callback === 'function' && ((res) => onIdle(callback.bind(null, res, null)));
 
     var $dialog = $('#msgDialog').removeClass('confirmation warning info error question ' +
         'delete-contact loginrequired-dialog multiple with-close-btn');

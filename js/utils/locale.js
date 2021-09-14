@@ -1337,6 +1337,9 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[S]', '<span>')
         .replace('[/S]', '</span>')
         .replace('[BR]', '<br>');
+    l.onboard_v4_control_finished = escapeHTML(l.onboard_v4_control_finished)
+        .replace('[S]', '<span>').replace('[/S]', '</span>')
+        .replace('[A]', '<a class="clickurl" href="/help">').replace('[/A]', '</a>');
     l.recovery_web_step_2 = escapeHTML(l.recovery_web_step_2)
         .replace('[B]', '<strong>')
         .replace('[/B]', '</strong>');

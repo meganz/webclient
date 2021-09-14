@@ -483,9 +483,6 @@ function u_setrsa(rsakey) {
                             mega.config.set('dlThroughMEGAsync', 1);
                         });
 
-                        // No affiliate guide dialog for new users.
-                        $.noAffGuide = 1;
-
                         // free up memory since it's not useful any longer
                         delete window.businessSubAc;
                         delete localStorage.businessSubAc;

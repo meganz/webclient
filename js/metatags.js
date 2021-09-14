@@ -685,10 +685,6 @@ mega.metatags = new function() {
                 addCanonical(getBaseUrl());
             }
         }
-        else if (page === 'downloadapp') {
-            mTags.mega_title = 'Desktop Onboarding - MEGA';
-            stopBots(metaRobots);
-        }
         else if (page.startsWith('special')) {
             mTags.mega_title = 'Special - MEGA';
             mTags.mega_desc = 'MEGA\'s Special Page';

@@ -772,6 +772,8 @@ FileManager.prototype.initFileManagerUI = function() {
             Ps.enable($.disabledContianer[0]);
             delete $.disabledContianer;
         }
+
+        mBroadcaster.sendMessage('contextmenuclose');
     };
 
     $fmholder.rebind('click.contextmenu', function(e) {
@@ -1282,6 +1284,8 @@ FileManager.prototype.updFileManagerUI = promisify(function(resolve) {
                 }, 3200);
             }
         }, 2000);
+
+        mBroadcaster.sendMessage('updFileManagerUI');
 
         if (d) {
             console.timeEnd('rendernew');
@@ -3701,7 +3705,7 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
         $ddUIgrid.trigger('selectablereinitialized');
     }
 
-    $ddUIitem.rebind('contextmenu', function(e) {
+    $ddUIitem.rebind('contextmenu.filemanager', function(e) {
         $.hideContextMenu(e);
 
         if (e.shiftKey) {
@@ -4369,7 +4373,9 @@ FileManager.prototype.initLeftPanel = function() {
                     // this class will be removed on the next closeDialog()
                     $('.mega-dialog:visible, .overlay:visible').addClass('arrange-to-back');
 
-                    fm_showoverlay();
+                    if (!$dialog.is('#obDialog')) {
+                        fm_showoverlay();
+                    }
                     $dialog.removeClass('hidden arrange-to-back');
                 }
                 $.dialog = String(name);

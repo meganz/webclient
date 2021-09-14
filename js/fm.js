@@ -3821,3 +3821,37 @@ function FMResizablePane(element, opts) {
     }
     return this;
 }
+
+function initDownloadDesktopAppDialog() {
+
+    'use strict';
+
+    const $dialog = $('.mega-dialog.mega-desktopapp-download');
+
+    $('.download-app', $dialog).rebind('click.downloadDesktopAppDialog', () => {
+
+        switch (ua.details.os) {
+            case "Apple":
+                window.location = megasync.getMegaSyncUrl('mac');
+                break;
+            case "Windows":
+                // Download app for Windows
+                window.location = megasync.getMegaSyncUrl(ua.details.is64bit && !ua.details.isARM ?
+                    'windows' : 'windows_x32');
+
+                break;
+            case "Linux":
+                $('aside', $dialog).addClass('hidden');
+                loadSubPage('/sync');
+                break;
+        }
+    });
+
+    clickURLs();
+    $('aside a', $dialog).rebind('click.downloadDesktopAppDialog', closeDialog);
+
+    // Close the share dialog
+    $('button.js-close', $dialog).rebind('click.downloadDesktopAppDialog', closeDialog);
+
+    M.safeShowDialog('onboardingDesktopAppDialog', $dialog);
+}

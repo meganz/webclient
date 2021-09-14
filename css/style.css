@@ -6984,13 +6984,12 @@ table {
     background-color: white;
 }
 .account.tabs-bl,
-.contacts-tabs-bl,
 .shares-tabs-bl {
     background-color: var(--surface-main);
     border-bottom: 1px solid var(--surface-grey-2);
     padding: 16px 16px 0 12px;
 }
-.contacts-tabs-bl, .shares-tabs-bl {
+.shares-tabs-bl {
     box-sizing: border-box;
     margin: 0;
     display: table;
@@ -7003,7 +7002,6 @@ table {
     height: 100%;
 }
 .account.tab-lnk,
-.contacts-tab-lnk,
 .shares-tab-lnk {
     cursor: pointer;
     font: var(--text-h3);
@@ -7021,10 +7019,10 @@ table {
     position: relative;
     margin-bottom: -1px;
 }
-.contacts-tab-lnk.filled, .shares-tab-lnk.filled {
+.shares-tab-lnk.filled {
     padding: 4px 5px 0 24px;
 }
-.contacts-tab-lnk span, .shares-tab-lnk span {
+.shares-tab-lnk span {
     font-size: 12px;
     line-height: 14px;
     height: 14px;
@@ -7040,11 +7038,10 @@ table {
     border-radius: 4px;
     font-family: 'source_sans_prosemibold', Arial, sans-serif;
 }
-.contacts-tab-lnk.filled span, .shares-tab-lnk.filled span {
+.shares-tab-lnk.filled span {
     display: inline-block;
 }
 .shares-tab-lnk.active,
-.contacts-tab-lnk.active,
 .account.tab-lnk.active {
     font: var(--text-h3-bold);
     border-color: var(--secondary-blue);

@@ -410,6 +410,12 @@
 
         /* message */
 
+            .mega-dialog.dialog-template-message {
+                width: auto;
+                max-width: 640px;
+                min-width: 300px;
+            }
+
             .mega-dialog.dialog-template-message > header {
                 flex-direction: row;
                 padding-top: 24px;

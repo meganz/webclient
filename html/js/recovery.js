@@ -493,7 +493,7 @@ AccountRecoveryControl.prototype.prepareInstruction = function _prepareInstructi
     if (device === 'web') {
         instructions += l[18282];
         instructions += '</li><li class="list-point" >';
-        instructions += l[18283];
+        instructions += l.recovery_web_step_2;
         instructions += '</li><li class="list-point" >';
         instructions += l[18284];
         instructions += '</li> <li class="list-point" >';
@@ -521,9 +521,7 @@ AccountRecoveryControl.prototype.prepareInstruction = function _prepareInstructi
     else if (device === 'ios') {
         instructions += l[18291];
         instructions += '</li><li class="list-point" >';
-        instructions += l[18292];
-        instructions += '</li><li class="list-point" >';
-        instructions += l[18293];
+        instructions += l.recovery_ios_step_2;
         instructions += '</li><li class="list-point" >';
         if (this.twoFactor) {
             instructions += l[18638];

@@ -435,3 +435,28 @@ body:not(.mobile) .corporate.main-menu.item:hover span {
         padding: 0;
     }
 }
+
+@media only screen and (min-width: 316px) and (max-width: 410px) {
+    .corporate.main-menu.item {
+        white-space: normal;
+        margin: 0 0 -1px 0;
+        width: 50%;
+    }
+    .corporate.main-menu.item span {
+        width: 100%;
+    }
+}
+
+@media only screen and (max-width: 315px) {
+    .corporate.main-menu.body {
+        white-space: normal;
+        overflow-wrap: break-word;
+    }
+    .corporate.main-menu.item {
+        margin: 0 0 1px 2%;
+        width: 50%;
+    }
+    .corporate.main-menu.item span {
+        width: 100%;
+    }
+}

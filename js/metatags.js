@@ -513,9 +513,10 @@ mega.metatags = new function() {
         }
         else if (page === 'registerb') {
             mTags.en_title = 'Business Account - MEGA';
-            mTags.en_desc = 'Create Business Account';
+            mTags.en_desc = 'With our user-controlled end-to-end encryption, your data and communications have never ' +
+                'been safer. MEGA is the secure solution for your business.';
             mTags.mega_title = l[24012] || mTags.en_title;
-            mTags.mega_desc = l[19517] || mTags.en_desc;
+            mTags.mega_desc = l.mtags_desc_registerb || mTags.en_desc;
         }
         else if (page === 'corporate' || page === 'corporate/media') {
             mTags.en_title = 'Media Assets - MEGA';
@@ -581,7 +582,7 @@ mega.metatags = new function() {
         }
         else if (page === 'blog') {
             mTags.en_title = 'Blog - MEGA';
-            mTags.en_desc = 'MEGA\'s Blog';
+            mTags.en_desc = 'The latest news, releases and company announcements for MEGA.';
             mTags.mega_title = l[24019] || mTags.en_title;
             mTags.mega_desc = l[24020] || mTags.en_desc;
             if (blogmonth || blogsearch) {
@@ -600,7 +601,7 @@ mega.metatags = new function() {
         }
         else if (page === 'achievements') {
             mTags.en_title = 'Achievements - MEGA';
-            mTags.en_desc = 'Increase your cloud storage';
+            mTags.en_desc = 'Free additional cloud storage - 5 GB per achievement, valid for 365 days.';
             mTags.mega_title = l.achievement_meta_title || mTags.en_title;
             mTags.mega_desc = l.achievement_meta_desc || mTags.en_desc;
         }

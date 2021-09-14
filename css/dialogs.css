@@ -1462,7 +1462,7 @@ body.de .mega-dialog.new-group-chat {
 }
 .mega-dialog.export-chat-links-dialog .export-chat-ink-warning {
     font-size: 15px;
-    color: #444;
+    color: var(--text-color-medium);
 }
 .fm-dialogs.export-chat-links-dialog .rename-input-bl input {
     padding-left: 8px;

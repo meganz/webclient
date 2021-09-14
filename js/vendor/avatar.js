@@ -569,7 +569,6 @@ window.ImageExplorer = (function(){
                     top: imageOffset.top + ui.position.top - ui.originalPosition.top,
                     left: imageOffset.left + ui.position.left - ui.originalPosition.left
                 });
-                this.$mask.css('width', this.$dragDelegate.css('width'));
             }, this)
         });
     };
@@ -701,8 +700,8 @@ window.ImageExplorer = (function(){
     };
 
     ImageExplorer.prototype.updateImageScale = function(newScale, zoomMode){
-        var newWidth = Math.round(newScale * this.imageProperties.naturalWidth),
-            newHeight = Math.round(newScale * this.imageProperties.naturalHeight),
+        var newWidth = Math.round(newScale * this.imageProperties.naturalWidth) + 7,
+            newHeight = Math.round(newScale * this.imageProperties.naturalHeight) + 7,
             newMarginLeft,
             newMarginTop;
 
@@ -742,10 +741,10 @@ window.ImageExplorer = (function(){
                 'margin-left': Math.round(newMarginLeft) +'px',
                 'margin-top': Math.round(newMarginTop) +'px'
             });
-            var x1 = this.$mask.offset().left + this.$mask.width() - newMarginLeft - newWidth;
-            var y1 = this.$mask.offset().top + this.$mask.height() - newMarginTop - newHeight;
-            var x2 = this.$mask.offset().left - newMarginLeft;
-            var y2 = this.$mask.offset().top - newMarginTop;
+            var x1 = this.$mask.offset().left + this.$mask.width() - newMarginLeft - newWidth + 4;
+            var y1 = this.$mask.offset().top + this.$mask.height() - newMarginTop - newHeight + 4;
+            var x2 = this.$mask.offset().left - newMarginLeft - 4;
+            var y2 = this.$mask.offset().top - newMarginTop - 4;
 
         this.$dragDelegate.draggable('option', 'containment', [x1, y1, x2, y2]);
     };

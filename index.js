@@ -1137,6 +1137,7 @@ function init_page() {
         regBusiness.initPage();
     }
     else if (page === 'fm/account/history') {
+        $.scrollIntoSection = '.session-history';
         loadSubPage('fm/account/security');
         return false;
     }

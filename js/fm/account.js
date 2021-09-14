@@ -118,6 +118,9 @@ accountUI.renderAccountPage = function(account) {
             $('.fm-account-security', accountUI.$contentBlock).removeClass('hidden');
             sectionClass = 'security';
             accountUI.security.init();
+            if ($.scrollIntoSection && $($.scrollIntoSection, accountUI.$contentBlock).length) {
+                $($.scrollIntoSection, accountUI.$contentBlock)[0].scrollIntoView();
+            }
             break;
 
         case '/fm/account/file-management':

@@ -3196,6 +3196,13 @@ window.onbeforeunload = function () {
         return $.memIOSaveAttempt ? null : l[377];
     }
 
+    if (window.fmdb && window.currsn && fminitialized
+        && Object(fmdb.pending).length && Object.keys(fmdb.pending[0] || {}).length) {
+
+        setsn(currsn);
+        return l[16168];
+    }
+
     if (window.doUnloadLogOut) {
         u_logout();
         delete window.doUnloadLogOut;

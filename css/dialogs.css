@@ -590,6 +590,9 @@ body.de .mega-dialog.new-group-chat {
     margin-bottom: -1px;
     z-index: 1;
 }
+.rtl .add-from-cloud .fm-dialog-tab {
+   float: right;
+}
 .add-from-cloud.no-incoming .fm-dialog-tab.incoming {
     display: none;
 }
@@ -1459,7 +1462,7 @@ body.de .mega-dialog.new-group-chat {
 }
 .mega-dialog.export-chat-links-dialog .export-chat-ink-warning {
     font-size: 15px;
-    color: #444;
+    color: var(--text-color-medium);
 }
 .fm-dialogs.export-chat-links-dialog .rename-input-bl input {
     padding-left: 8px;
@@ -2653,7 +2656,7 @@ body.de .mega-dialog.new-group-chat {
     .mega-dialog.fm-picker-dialog .summary-input .item-row .delete-item {
         position: absolute;
         right: 8px;
-        top: 0;
+        top: 4px;
         display: none;
         --mask-color: var(--icon-rest);
         --icon-size: 24px;
@@ -3846,6 +3849,10 @@ body.de .mega-dialog.new-group-chat {
         top: 16px;
         --mask-color: var(--icon-rest);
         --icon-size: 16px;
+    }
+    .rtl .mega-dialog.properties-dialog .file-status-icon {
+        left: initial;
+        right: 16px;
     }
     .mega-dialog.properties-dialog .taken-down-icon {
         display: none;
@@ -10192,3 +10199,42 @@ body.de .mega-dialog.new-group-chat {
     }
 
 /* payment-stripe-success/failure-dialog */
+
+/* mega-desktopapp-download */
+
+    .mega-desktopapp-download .dialog-top > h2 {
+        font: var(--text-h2-bold);
+        line-height: 32px;
+    }
+    .mega-desktopapp-download .dialog-top > h2 > i {
+        --icon-size: 26px;
+        height: 32px;
+        width: 32px;
+        --mask-color: var(--text-color-white-high);
+        border-radius: 7px;
+        vertical-align: bottom;
+        -webkit-margin-end: 12px;
+        margin-inline-end: 12px;
+        background: var(--label-blue);
+        font-weight: normal;
+    }
+    .mega-desktopapp-download .dialog-top > h2 > i::before {
+        height: var(--icon-size);
+        width: var(--icon-size);
+        top: 3px;
+        position: relative;
+    }
+    .mega-dialog.mega-desktopapp-download .dialog-top .graphic {
+        width: 250px;
+        --width: 250px;
+        height: 150px;
+        margin-bottom: 32px;
+    }
+    .mega-desktopapp-download aside a,
+    .mega-desktopapp-download aside a:active,
+    .mega-desktopapp-download aside a:visited {
+        text-decoration: underline;
+        color: var(--text-color-medium);
+    }
+
+/* End mega-desktopapp-download */

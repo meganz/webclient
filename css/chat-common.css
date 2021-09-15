@@ -78,6 +78,9 @@
     float: none;
     border-left: 1px solid var(--divider-color);
 }
+.rtl .chat-right-pad {
+    padding: 48px 0 0 4px;
+}
 .chat-right-pad {
     padding: 48px 0 0 0;
     height: 100%;
@@ -224,6 +227,9 @@
 .contacts-info .user-card-data {
     line-height: 0;
     padding-right: 15px;
+}
+.rtl .contacts-info .user-card-data {
+    padding-right: 40px;
 }
 .chat-right-area .buttons-block {
     border-top: 1px solid rgba(0,0,0,0.1);
@@ -555,6 +561,9 @@ table.arc-chat-messages-block {
 }
 .chat-dropdown.content.small-pad {
     padding: 0 10px 4px 12px;
+}
+.rtl .chat-contacts-list-inner {
+    padding-left: 4px;
 }
 @-webkit-keyframes fadeinslide {
     0% {

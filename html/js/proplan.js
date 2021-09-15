@@ -584,9 +584,6 @@ pro.proplan = {
 
         var $stepOne = $('.pricing-section', 'body');
         var $getFreeButton = $('.free-button', $stepOne);
-        var signUpStartedInWebclient = localStorage.signUpStartedInWebclient;
-
-        delete localStorage.signUpStartedInWebclient;
 
         // Init button click
         $getFreeButton.rebind('click', function() {
@@ -598,7 +595,7 @@ pro.proplan = {
             }
 
             // If coming from the process key step and they click on the Free button
-            loadSubPage(signUpStartedInWebclient ? 'downloadapp' : 'fm');
+            loadSubPage('fm');
 
             if (localStorage.gotOverquotaWithAchievements) {
                 onIdle(function() {

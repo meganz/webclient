@@ -78,6 +78,9 @@ lazy(mega, 'icu', () => {
          * @returns {Boolean}       True if ICU/Plural
          */
         format: (msg, count) => {
+            if (d && dstringids) {
+                return msg;
+            }
             if (!mega.icu.isICUPlural(msg)) {
                 reportError(`---- Parsing error, not expected ICU message. value = ${msg}`);
                 return null;

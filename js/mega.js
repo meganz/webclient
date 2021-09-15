@@ -1466,8 +1466,9 @@ scparser.$add('_sn', function(a) {
     // sn update?
     if (d) {
         console.log("New SN: " + a.sn);
+        console.assert(a.sn === window.currsn);
     }
-    setsn(a.sn);
+    delay('sc.set-sn', () => setsn(currsn), 2789);
 
     // rewrite accumulated RSA keys to AES to save CPU & bandwidth & space
     crypto_node_rsa2aes();

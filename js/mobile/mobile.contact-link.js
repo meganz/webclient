@@ -42,14 +42,16 @@ MobileContactLink.prototype.showContactLinkInfo = function _showContactLinkInfo(
             var curAvatar = useravatar.contact(email);
             $('.mobile.main-avatar', $mobileContactInfoDlg).html(curAvatar);
         }
-        var isContactHtml = '<div class="mobile contact-verification"> <i class="" > </i > </div >';
+        var isContactHtml = '<div class="mobile contact-verification"> <i class="" > </i> </div>';
         if (u_type) {
-            $mobileContactInfoDlg.addClass('overlay');
             $('.mobile.fm-dialog-close', $mobileContactInfoDlg).removeClass('hidden');
+            $('.mobile.logo', $mobileContactInfoDlg).addClass('hidden');
+            $('.mobile.fm-icon.top-icon.menu', $mobileContactInfoDlg).addClass('hidden');
         }
         else {
-            $mobileContactInfoDlg.removeClass('overlay');
             $('.mobile.fm-dialog-close', $mobileContactInfoDlg).addClass('hidden');
+            $('.mobile.logo', $mobileContactInfoDlg).removeClass('hidden');
+            $('.mobile.fm-icon.top-icon.menu', $mobileContactInfoDlg).removeClass('hidden');
         }
 
         if (handle === u_handle) {
@@ -91,11 +93,11 @@ MobileContactLink.prototype.showContactLinkInfo = function _showContactLinkInfo(
         }
         $('.mobile.text-button.third.cancel, .mobile.fm-dialog-close', $mobileContactInfoDlg)
             .rebind('click', function () {
-            var page = u_type ? 'fm' : 'start';
-            $mobileContactInfoDlg.addClass('hidden');
-            loadSubPage(page);
-        });
-        $mobileContactInfoDlg.removeClass('hidden');
+                var page = u_type ? 'fm' : 'start';
+                $mobileContactInfoDlg.addClass('hidden').removeClass('overlay');
+                loadSubPage(page);
+            });
+        $mobileContactInfoDlg.removeClass('hidden').addClass('overlay');
     };
 
     if (!this.contactName || !this.contactEmail) {

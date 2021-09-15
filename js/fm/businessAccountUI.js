@@ -2781,7 +2781,7 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function (result, callback) {
         $('header h2', $dialog).text(l[19084]).removeClass('hidden');
         $('footer .add-more', $dialog).addClass('hidden');
         $('footer .add-sub-user', $dialog).removeClass('a-ok-btn');
-        $('footer .add-sub-user span', $dialog).text(l[19084]);
+        $('footer .add-sub-user span', $dialog).text(l.bsn_add_users);
         $('.graphic', $dialog).addClass('hidden');
         $('.dialog-input-title-ontop', $dialog).removeClass('correctinput error');
         $('footer .mega-switch', $dialog).removeClass('toggle-on').trigger('update.accessibility');
@@ -2914,7 +2914,7 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function (result, callback) {
             var uEmailTrimed = $uEmail.val().trim();
 
             if (!uNameTrimed.length || !uLastNameTrimed) {
-                $uName.megaInputsShowError(l[1098] + ' ' + l[1099]);
+                $uName.megaInputsShowError(l.error_invalid_name);
                 $uLastName.megaInputsShowError();
 
                 $uName.rebind('keydown.clearErrorsOnName', function() {

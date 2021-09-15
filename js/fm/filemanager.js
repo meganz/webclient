@@ -772,6 +772,8 @@ FileManager.prototype.initFileManagerUI = function() {
             Ps.enable($.disabledContianer[0]);
             delete $.disabledContianer;
         }
+
+        mBroadcaster.sendMessage('contextmenuclose');
     };
 
     $fmholder.rebind('click.contextmenu', function(e) {
@@ -1283,6 +1285,8 @@ FileManager.prototype.updFileManagerUI = promisify(function(resolve) {
             }
         }, 2000);
 
+        mBroadcaster.sendMessage('updFileManagerUI');
+
         if (d) {
             console.timeEnd('rendernew');
         }
@@ -1402,27 +1406,51 @@ FileManager.prototype.initContextUI = function() {
         else {
             var media = false;
             var handles = Array.isArray($.selected) && $.selected.concat();
-            var removeLink = function() {
-                var exportLink = new mega.Share.ExportLink({'updateUI': true, 'nodesToProcess': handles});
-                exportLink.removeExportLink();
+            var removeLink = function(e) {
+                if (e) {
+                    var exportLink = new mega.Share.ExportLink({'updateUI': true, 'nodesToProcess': handles});
+                    exportLink.removeExportLink();
+                }
             };
-
+            let files = 0;
+            let folders = 0;
             for (var i = handles.length; i--;) {
                 if (is_video(M.d[handles[i]]) === 1) {
                     media = true;
-                    break;
+                }
+                if (M.d[handles[i]].t) {
+                    folders++;
+                }
+                else {
+                    files++;
                 }
             }
 
-            if (media) {
-                msgDialog('confirmation', l[882], l[17824], 0, function(e) {
-                    if (e) {
-                        removeLink();
-                    }
-                });
+            var mediaRemoveLink = () => {
+                msgDialog('confirmation', l[882], l[17824], 0, removeLink);
+            };
+
+            if (mega.config.get('nowarnpl')) {
+                if (media) {
+                    mediaRemoveLink();
+                }
+                else {
+                    removeLink(true);
+                }
             }
             else {
-                removeLink();
+                let subtitle = l.plink_remove_dlg_text_mixed;
+                if (files > 0 && folders === 0) {
+                    subtitle = mega.icu.format(l.plink_remove_dlg_text_file, files);
+                }
+                else if (files === 0 && folders > 0) {
+                    subtitle = mega.icu.format(l.plink_remove_dlg_text_folder, folders);
+                }
+                const title = mega.icu.format(l.plink_remove_dlg_title, handles.length);
+                if (media) {
+                    subtitle += `<br><br>${l[17824]}`;
+                }
+                msgDialog('confirmation', '', title, subtitle, removeLink, 'nowarnpl');
             }
         }
     });
@@ -3701,7 +3729,7 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
         $ddUIgrid.trigger('selectablereinitialized');
     }
 
-    $ddUIitem.rebind('contextmenu', function(e) {
+    $ddUIitem.rebind('contextmenu.filemanager', function(e) {
         $.hideContextMenu(e);
 
         if (e.shiftKey) {
@@ -4369,7 +4397,9 @@ FileManager.prototype.initLeftPanel = function() {
                     // this class will be removed on the next closeDialog()
                     $('.mega-dialog:visible, .overlay:visible').addClass('arrange-to-back');
 
-                    fm_showoverlay();
+                    if (!$dialog.is('#obDialog')) {
+                        fm_showoverlay();
+                    }
                     $dialog.removeClass('hidden arrange-to-back');
                 }
                 $.dialog = String(name);

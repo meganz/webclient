@@ -460,6 +460,7 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
             $.disabledContianer = $psContainer;
         }
 
+        mBroadcaster.sendMessage('showcontextmenu');
     };
 
     $.hideContextMenu(e);

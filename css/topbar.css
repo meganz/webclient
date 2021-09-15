@@ -479,6 +479,9 @@
 .topbar .account-dialog ul.links li button span {
     flex: 1;
 }
+.rtl .topbar .account-dialog ul.links li button span {
+    flex: unset;
+}
 .topbar .account-dialog ul.links li button > i {
     --icon-size: 16px;
      -webkit-margin-end: 8px;
@@ -493,6 +496,9 @@
 }
 .topbar .account-dialog ul.links li button.feedback {
     color: var(--secondary-blue);
+}
+.rtl .topbar .account-dialog ul.links li button > span + i {
+    transform: rotate(180deg);
 }
 .topbar .account-dialog ul.links li .status-dropdown {
     position: relative;

@@ -1976,6 +1976,8 @@ FMDB.prototype.invalidate = function fmdb_invalidate(cb, readop) {
         else {
             this.db.delete().then(cb).catch(cb);
         }
+
+        this.pending = [Object.create(null)];
         document.documentElement.classList.remove('fmdb-working');
     };
 

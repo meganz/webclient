@@ -127,7 +127,7 @@
     .mega-dialog a,
     .mega-dialog a:visited,
     .mega-dialog a:active {
-        color: var(--text-color-success);
+        color: var(--text-color-info);
         text-decoration: underline;
     }
 
@@ -263,7 +263,6 @@
         }
 
         .mega-dialog > footer .footer-container {
-            align-items: center;
             display: flex;
             justify-content: flex-end;
             width: 100%;
@@ -410,6 +409,12 @@
             }
 
         /* message */
+
+            .mega-dialog.dialog-template-message {
+                width: auto;
+                max-width: 640px;
+                min-width: 300px;
+            }
 
             .mega-dialog.dialog-template-message > header {
                 flex-direction: row;

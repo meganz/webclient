@@ -649,7 +649,6 @@ function init_page() {
         && (page !== 'storage')
         && (page !== 'collaboration')
         && (page !== 'securechat')
-        && (page !== 'downloadapp')
         && (page !== 'unsub')
         && (page !== 'cookie')
         && (page.indexOf('file/') === -1)
@@ -994,6 +993,11 @@ function init_page() {
         mobile.account.notifications.init();
         return false;
     }
+    else if (is_mobile && fminitialized && u_type && page === 'fm/account/file-management') {
+        mobile.initDOM();
+        mobile.account.filemanagement.init();
+        return false;
+    }
     else if (page === 'achievements') {
         parsepage(pages.achievements);
         achievementPage();
@@ -1137,6 +1141,7 @@ function init_page() {
         regBusiness.initPage();
     }
     else if (page === 'fm/account/history') {
+        $.scrollIntoSection = '.session-history';
         loadSubPage('fm/account/security');
         return false;
     }
@@ -1196,16 +1201,6 @@ function init_page() {
         });
     }
     else if (page.substr(0, 4) === 'help') {
-        var urlParts = page.split('/');
-        if (urlParts[1] === 'client' && urlParts.length === 5) {
-            var lastSlash = page.lastIndexOf('/');
-            var newPage = '/' + page.substr(0, lastSlash) + '#' + page.substr(lastSlash + 1);
-            if (is_extension) {
-                return loadSubPage(newPage);
-
-            }
-            location.replace(newPage);
-        }
         return Help.render();
     }
     else if (page === 'privacy') {
@@ -1215,12 +1210,21 @@ function init_page() {
         }
     }
     else if (page === 'gdpr') {
-        return loadSubPage('privacy', 'override');
+        if (is_extension) {
+            return loadSubPage('privacy');
+        }
+        location.replace('/privacy');
     }
-    else if (page == 'privacycompany') {
+    else if (page === 'privacycompany') {
         parsepage(pages['privacycompany']);
     }
-    else if (page == 'dev' || page == 'developers') {
+    else if (page === 'dev') {
+        if (is_extension) {
+            return loadSubPage('developers');
+        }
+        location.replace('/developers');
+    }
+    else if (page === 'developers') {
         parsepage(pages['dev']);
         dev_init('dev');
     }
@@ -1416,6 +1420,12 @@ function init_page() {
             dev_init('sdk');
         }
     }
+    else if (page === 'about/main') {
+        if (is_extension) {
+            return loadSubPage('about');
+        }
+        location.replace('/about');
+    }
     else if (page.substr(0, 5) === 'about') {
         parsepage(pages.about);
         aboutus.init();
@@ -1542,7 +1552,13 @@ function init_page() {
         });
         $('.credits-main-pad').html(html + '<div class="clear"></div>');
     }
-    else if (page === 'mobile' || page === 'android' || page === 'ios' || page === 'uwp' || page === 'wp') {
+    else if (page === 'android' || page === 'ios' || page === 'uwp' || page === 'wp' || page === 'mobileapp') {
+        if (is_extension) {
+            return loadSubPage('mobile');
+        }
+        location.replace('/mobile');
+    }
+    else if (page === 'mobile') {
         parsepage(pages['mobileapp']);
 
         // On clicking the 'Learn more' button
@@ -1602,10 +1618,6 @@ function init_page() {
     else if (page === 'collaboration') {
         parsepage(pages.feature_collaboration);
         featurePages('collaboration');
-    }
-    else if (page === 'downloadapp') {
-        parsepage(pages.downloadapp);
-        desktopOnboarding();
     }
     else if (page == 'done') {
         parsepage(pages['done']);
@@ -2738,7 +2750,7 @@ function topmenuUI() {
                     'copyright', 'corporate', 'credits', 'doc', 'extensions',
                     'help', 'login', 'mega', 'nzippmember', 'nziphotographer', 'privacy', 'mobileapp',
                     'mobile', 'privacycompany', 'register', 'resellers', 'sdk', 'sync', 'sitemap', 'sourcecode',
-                    'support', 'sync', 'takedown', 'terms', 'start', 'security', 'downloadapp', 'affiliate',
+                    'support', 'sync', 'takedown', 'terms', 'start', 'security', 'affiliate',
                     'nas', 'pro', 'cookie', 'securechat', 'collaboration', 'storage', 'special',
                     'achievements'
                 ];
@@ -3177,6 +3189,13 @@ window.onbeforeunload = function () {
 
     if (window.dlmanager && (dlmanager.isDownloading || ulmanager.isUploading)) {
         return $.memIOSaveAttempt ? null : l[377];
+    }
+
+    if (window.fmdb && window.currsn && fminitialized
+        && Object(fmdb.pending).length && Object.keys(fmdb.pending[0] || {}).length) {
+
+        setsn(currsn);
+        return l[16168];
     }
 
     if (window.doUnloadLogOut) {

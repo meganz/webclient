@@ -410,6 +410,9 @@ var Help = (function() {
         if (question.lastIndexOf('-') !== -1) {
             question = question.substring(question.lastIndexOf('-') + 1);
         }
+        else if (question.indexOf('#') === 0) {
+            question = question.substr(1);
+        }
         return question;
     }
 
@@ -599,8 +602,10 @@ var Help = (function() {
                 });
 
                 if (article[0] && article[0].url) {
-                    loadSubPage(article[0].url);
-                    return;
+                    if (is_extension) {
+                        return loadSubPage(article[0].url);
+                    }
+                    location.replace('/' + article[0].url);
                 }
             }
 

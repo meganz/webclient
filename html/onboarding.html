@@ -1,178 +1,24 @@
-<!-- Please use  ".dropdown-arrow" class to show arrow !-->
-<!-- Please use  ".top-arrow"/".bottom-arrow"/".left-arrow"/".right-arrow" class to choose side of dropdown where arrow should be located !-->
-<!-- Please use  ".left-pos-arrow"/".right-pos-arrow" class to align Top or Bottom arrow to left or right. By default arrow aligned to middle of each side !-->
-<!-- Please use  ".top-pos-arrow"/".bottom-pos-arrow" class to align Left or Right arrow to top or bottom. By default arrow aligned to middle of each side !-->
-<div id="onboarding-dialog-template" class="dropdown body hint onboarding-dialog hidden">
-    <i class="dropdown-white-arrow"></i>
-    <div class="dropdown close-button"></div>
-
-    <!-- Content block !-->
-    <div class="onboarding-dialog-contents"></div>
-
-    <div class="dropdown hint-bottom">
-        <div class="checkbox-block">
-            <div class="checkdiv small checkboxOff">
-                <input type="checkbox" name="disable-hints-checkbox" id="disable-hints-checkbox" class="checkboxOff">
-            </div>
-            <label for="disable-hints-checkbox" class="radio-txt">[$10660]</label>
+<!-- Onboarding blue dialog -->
+<div class="mega-dialog mega-onboarding-dialog dialog-template-message hidden"
+    id="obDialog"
+    role="dialog"
+    aria-labelledby="obDialog-title"
+    aria-modal="true">
+    <i class="sprite-fm-mono icon-tooltip-arrow tooltip-arrow" id="obDialog-arrow"></i>
+    <header>
+        <div>
+            <h2 id="obDialog-title"></h2>
+            <p id="obDialog-text"></p>
         </div>
-        <button class="mega-button right accept">
-            <span>[$5700]</span>
-        </button>
-        <div class="clear"></div>
-    </div>
-
-</div>
-
-<div id="onboarding-screens" class="hidden">
-    <!-- Existing thumbs classes: ".upload, .add-contacts, .chat, .manage-transfers, .share-content, .share-folders, .rubbish-bin" classname !-->
-
-    <!-- Add contacts !-->
-    <div class="dropdown content-block" id="add-contacts"
-         data-position="$.nw-fm-left-icon.contacts:visible"
-         data-position-at="left+52px top"
-         data-position-my="left top+4px"
-         data-classes="dropdown-arrow left-arrow top-pos-arrow"
-    >
-        <div class="dropdown hint-thumb add-contacts"></div>
-        <div class="dropdown hint-info-block">
-            <div class="dropdown hint-header">
-                [$165]
-            </div>
-           <div class="dropdown hint-info">
-               [$17566]
-            </div>
+    </header>
+    <footer>
+        <div class="footer-container">
+            <a class="link-button js-skip">
+                [$onboard_v4_dialog_skip]
+            </a>
+            <button class="mega-button js-next small theme-light-forced">
+                <span>[$556]</span>
+            </button>
         </div>
-        <div class="clear"></div>
-    </div>
-
-    <!-- Conversations !-->
-    <div class="dropdown content-block" id="megachat"
-         data-position="$.nw-fm-left-icon.conversations:visible"
-         data-position-at="left+52px top"
-         data-position-my="left top+4px"
-         data-classes="dropdown-arrow left-arrow top-pos-arrow"
-    >
-        <div class="dropdown hint-thumb chat"></div>
-        <div class="dropdown hint-info-block">
-            <div class="dropdown hint-header">
-                [$7997]
-            </div>
-           <div class="dropdown hint-info">
-               [$17567]
-            </div>
-        </div>
-        <div class="clear"></div>
-    </div>
-
-    <!-- How to Upload !-->
-    <div class="dropdown content-block" id="how-to-upload" data-position="center">
-        <div class="dropdown hint-thumb upload"></div>
-        <div class="dropdown hint-info-block">
-            <div class="dropdown hint-header">
-                [$5687]
-            </div>
-            <div class="dropdown hint-info">
-                <span class="is-chrome hidden">[$17568]</span>
-                <span class="is-ff hidden">[$17569]</span>
-            </div>
-        </div>
-        <div class="clear"></div>
-    </div>
-
-    <!-- Rubbish bin !-->
-    <div class="dropdown content-block" id="rubbish-bin"
-         data-position="$.nw-fm-left-icon.rubbish-bin:visible"
-         data-position-at="left+52px bottom"
-         data-position-my="left bottom-5px"
-         data-classes="dropdown-arrow left-arrow bottom-pos-arrow"
-    >
-        <div class="dropdown hint-thumb rubbish-bin"></div>
-        <div class="dropdown hint-info-block">
-            <div class="dropdown hint-header">
-                [$5738]
-            </div>
-           <div class="dropdown hint-info">
-               [$17570]
-            </div>
-        </div>
-        <div class="clear"></div>
-    </div>
-
-    <!-- Manage your transfers !-->
-    <div class="dropdown content-block" id="manage-transfers"
-         data-position="$.nw-fm-left-icon.transfers:visible"
-         data-position-at="left+52px bottom"
-         data-position-my="left bottom-5px"
-         data-classes="dropdown-arrow left-arrow bottom-pos-arrow"
-    >
-        <div class="dropdown hint-thumb manage-transfers"></div>
-        <div class="dropdown hint-info-block">
-            <div class="dropdown hint-header">
-                [$17571]
-            </div>
-           <div class="dropdown hint-info">
-               [$17572]
-            </div>
-        </div>
-        <div class="clear"></div>
-    </div>
-
-    <!-- Notifications !-->
-    <div class="dropdown content-block" id="have-notifications"
-         data-position="$.top-icon.notification:visible"
-         data-position-at="center+22px bottom+4px"
-         data-position-my="right top"
-         data-classes="dropdown-arrow top-arrow right-pos-arrow"
-    >
-        <div class="dropdown hint-thumb have-notifications"></div>
-        <div class="dropdown hint-info-block">
-            <div class="dropdown hint-header">
-                [$862]
-            </div>
-            <div class="dropdown hint-info">
-                [$17573]
-            </div>
-        </div>
-        <div class="clear"></div>
-    </div>
-
-
-    <!-- Share your content !-->
-    <div class="dropdown content-block" id="share-content"
-         data-position="$tr.file.megaListItem:visible:first .transfer-filetype-icon, .data-block-view.file:visible:first"
-         data-position-at="center bottom+7px"
-         data-position-my="center top"
-         data-classes="dropdown-arrow top-arrow"
-    >
-        <div class="dropdown hint-thumb share-content"></div>
-        <div class="dropdown hint-info-block">
-            <div class="dropdown hint-header">
-                [$17574]
-            </div>
-           <div class="dropdown hint-info">
-               [$17575]
-            </div>
-        </div>
-        <div class="clear"></div>
-    </div>
-
-    <!-- Sharing folders !-->
-    <div class="dropdown content-block" id="share-folders"
-         data-position="$tr.folder.megaListItem:visible:first .transfer-filetype-icon, .data-block-view.folder:visible:first"
-         data-position-at="center bottom+7px"
-         data-position-my="center top"
-         data-classes="dropdown-arrow top-arrow"
-    >
-        <div class="dropdown hint-thumb share-folders"></div>
-        <div class="dropdown hint-info-block">
-            <div class="dropdown hint-header">
-                [$17576]
-            </div>
-           <div class="dropdown hint-info">
-               [$17577]
-            </div>
-        </div>
-        <div class="clear"></div>
-    </div>
+    </footer>
 </div>

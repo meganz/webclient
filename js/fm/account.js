@@ -118,6 +118,9 @@ accountUI.renderAccountPage = function(account) {
             $('.fm-account-security', accountUI.$contentBlock).removeClass('hidden');
             sectionClass = 'security';
             accountUI.security.init();
+            if ($.scrollIntoSection && $($.scrollIntoSection, accountUI.$contentBlock).length) {
+                $($.scrollIntoSection, accountUI.$contentBlock)[0].scrollIntoView();
+            }
             break;
 
         case '/fm/account/file-management':
@@ -265,6 +268,8 @@ accountUI.general = {
             else {
                 $('.left-chart span', $bandwidthChart).css('transform', 'rotate(180deg)');
                 $('.right-chart span', $bandwidthChart).css('transform', `rotate(${(deg - 180) * -1}deg)`);
+                $('.right-chart', $bandwidthChart).removeClass('low-percent-clip');
+                $('.left-chart', $bandwidthChart).removeClass('low-percent-clip');
             }
 
             if (this.perc_c_b > 99 || dlmanager.isOverQuota) {
@@ -281,6 +286,7 @@ accountUI.general = {
             $('.chart.data .pecents-txt', $bandwidthChart).text(b2[0]);
             $('.chart.data .gb-txt', $bandwidthChart).text(b2[1]);
             $('.chart.data .of-txt', $bandwidthChart).text('/');
+            $('.account.chart.data', $bandwidthChart).removeClass('hidden');
             if ((u_attr.p || account.tfsq.ach) && b2[0] > 0) {
                 if (this.perc_c_b > 0) {
                     $bandwidthChart.removeClass('no-percs');
@@ -351,6 +357,8 @@ accountUI.general = {
             else {
                 $('.left-chart span', $storageChart).css('transform', 'rotate(180deg)');
                 $('.right-chart span', $storageChart).css('transform', `rotate(${(deg - 180) * -1}deg)`);
+                $('.right-chart', $storageChart).removeClass('low-percent-clip');
+                $('.left-chart', $storageChart).removeClass('low-percent-clip');
             }
 
             // Maximum disk space
@@ -359,6 +367,7 @@ accountUI.general = {
             $('.chart.data .gb-txt', $storageChart).text(b2[1]);
             $('.chart .perc-txt', $storageChart).text(formatPercentage(usedPercentage / 100));
             $('.chart.data .size-txt', $storageChart).text(bytesToSize(account.space_used));
+            $('.account.chart.data', $storageChart).removeClass('hidden');
             /** End New Used Storage chart */
         },
 
@@ -2705,6 +2714,9 @@ accountUI.fileManagement = {
 
         // Drag and Drop
         this.dragAndDrop.render();
+
+        // Public Links
+        this.publicLinks.render();
     },
 
     versioning: {
@@ -2956,7 +2968,23 @@ accountUI.fileManagement = {
                     mega.config.setn('ulddd', val ? undefined : 1);
                 });
         }
-    }
+    },
+
+    publicLinks: {
+        render: function() {
+            'use strict';
+
+            var warnplinkId = '#nowarnpl';
+
+            accountUI.inputs.switch.init(
+                warnplinkId,
+                $(warnplinkId, accountUI.$contentBlock).parent(),
+                mega.config.get('nowarnpl'),
+                (val) => {
+                    mega.config.setn('nowarnpl', val);
+                });
+        }
+    },
 };
 
 accountUI.transfers = {
@@ -3254,6 +3282,7 @@ accountUI.contactAndChat = {
                 presenceInt.getPresence(u_handle),
                 function(newVal) {
                     presenceInt.setPresence(parseInt(newVal));
+                    showToast('settings', l[16168]);
                 });
 
             // Last seen switch
@@ -3263,6 +3292,7 @@ accountUI.contactAndChat = {
                 lastSeen,
                 function(val) {
                     presenceInt.userPresence.ui_enableLastSeen(Boolean(val));
+                    showToast('settings', l[16168]);
                 });
 
             if (autoawaytimeout !== false) {
@@ -3273,6 +3303,7 @@ accountUI.contactAndChat = {
                     autoaway,
                     function(val) {
                         presenceInt.userPresence.ui_setautoaway(Boolean(val));
+                        showToast('settings', l[16168]);
                     });
 
                 // Prevent changes to autoaway if autoawaylock is set
@@ -3298,6 +3329,7 @@ accountUI.contactAndChat = {
                     persist,
                     function(val) {
                         presenceInt.userPresence.ui_setpersist(Boolean(val));
+                        showToast('settings', l[16168]);
                     });
 
                 // Prevent changes to autoaway if autoawaylock is set
@@ -3363,7 +3395,15 @@ accountUI.contactAndChat = {
                 $('#richpreviews').parent(),
                 // previewGenerationConfirmation -> -1 (unset, default) || true || false
                 previewGenerationConfirmation && previewGenerationConfirmation > 0,
-                val => val ? confirmationDoConfirm() : confirmationDoNever()
+                val => {
+                    if (val){
+                        confirmationDoConfirm();
+                    }
+                    else {
+                        confirmationDoNever();
+                    }
+                    showToast('settings', l[16168]);
+                }
             );
         }
     },
@@ -3502,6 +3542,7 @@ accountUI.contactAndChat = {
                 pushNotificationSettings.disableDnd(group);
                 this.renderStatus(false);
                 $(ev.currentTarget).removeClass('toggle-on').trigger('update.accessibility');
+                showToast('settings', l[16168]);
             }
             else {
                 this.handleDialogOpen();
@@ -3536,6 +3577,7 @@ accountUI.contactAndChat = {
                 $(self.DOM.toggle, self.DOM.container).addClass('toggle-on').trigger('update.accessibility');
                 closeDialog();
                 self.renderStatus(true);
+                showToast('settings', l[16168]);
             });
         },
 

@@ -204,6 +204,12 @@
         width: 36px;
     }
 
+    .global-toast-container .toast span.link-text {
+        font: var(--text-body2);
+        color: var(--text-color-medium);
+        margin-left: 12px;
+    }
+
 /* end global-toast-container style */
 
 /* alert-toast-container style */

@@ -2971,6 +2971,7 @@ else if (!browserUpdate) {
         jsl.push({f:'js/mobile/mobile.account.history.js', n: 'mobile_account_history_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.account.change-password.js', n: 'mobile_account_change_pass_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.account.notifications.js', n: 'mobile_account_notifications_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.account.file-management.js', n: 'mobile_account_file_management_js', j:1, w: 1});
         jsl.push({f:'js/mobile/mobile.achieve.js', n: 'mobile_achieve_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.achieve.how-it-works.js', n: 'mobile_achieve_how_it_works_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.achieve.invites.js', n: 'mobile_achieve_invites_js', j: 1, w: 1});
@@ -3301,8 +3302,6 @@ else if (!browserUpdate) {
         'business_invoice': {f:'html/invoicePDF.html', n: 'business_invoice', j:0},
         'securitypractice': {f:'html/security-practice.html', n: 'securitypractice', j:0},
         'securitypractice_js': {f:'html/js/security-practice.js', n: 'securitypractice_js', j:1},
-        'downloadapp_js': {f:'html/js/desktop-onboarding.js', n: 'downloadapp_js', j:1},
-        'downloadapp': {f:'html/desktop-onboarding.html', n: 'downloadapp', j:0},
         'codemirror_js': {f:'js/vendor/codemirror.js', n: 'codemirror_js', j:1},
         'codemirrorscroll_js': {f:'js/vendor/simplescrollbars.js', n: 'codemirrorscroll_js', j:1},
         'features_js': {f:'html/js/features.js', n: 'features_js', j:1},
@@ -3415,7 +3414,6 @@ else if (!browserUpdate) {
         'dev': ['dev','dev_js','sdkterms'],
         'sdk': ['dev','dev_js','sdkterms'],
         'doc': ['dev','dev_js','sdkterms'],
-        'downloadapp': ['downloadapp_js', 'downloadapp', 'sync_js'],
         'help': ['lunr_js', 'help2_welcome', 'help2_page', 'help_js'],
         'recover': ['reset', 'reset_js'],
         'redeem': ['redeem', 'redeem_js'],

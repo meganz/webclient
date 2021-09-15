@@ -621,7 +621,7 @@ function setContactLink($container) {
         var linkData = $(this).attr('data-lnk') || '';
 
         if (linkData.length) {
-            copyToClipboard(linkData, l[371] + '<br/>' + linkData);
+            copyToClipboard(linkData, `${l[371]}<span class="link-text">${linkData}</span>`);
         }
     });
 }
@@ -700,7 +700,7 @@ function contactAddDialog(close, dontWarnBusiness) {
     $d.find('.multiple-input .token-input-token-mega').remove();
     initTokenInputsScroll($('.multiple-input', $d));
     Soon(function() {
-        $('.token-input-input-token-mega input', $d).trigger("focus");
+        $('.add-contact-multiple-input input', $d).trigger("focus");
     });
 
     $('.add-user-popup-button span', $d).text(l[19112])
@@ -714,7 +714,7 @@ function contactAddDialog(close, dontWarnBusiness) {
     }
 
     initTextareaScrolling($textarea, 72);
-    $d.find('.token-input-input-token-mega input').trigger("focus");
+    $('.add-contact-multiple-input input', $d).trigger("focus");
     focusOnInput();
 
     $d.find('.hidden-textarea-info span').rebind('click', function() {
@@ -1361,7 +1361,8 @@ function renameDialog() {
     }
 }
 
-function msgDialog(type, title, msg, submsg, callback, checkbox) {
+/* eslint-disable-next-line complexity */
+function msgDialog(type, title, msg, submsg, callback, checkboxSetting) {
     'use strict';
     var doneButton  = l[81];
     var extraButton = String(type).split(':');
@@ -1384,8 +1385,11 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
             }
         }
     }
+    if (d) {
+        console.assert(!$.warningCallback, 'Check this out...');
+    }
     $.msgDialog = type;
-    $.warningCallback = callback;
+    $.warningCallback = typeof callback === 'function' && ((res) => onIdle(callback.bind(null, res, null)));
 
     var $dialog = $('#msgDialog').removeClass('confirmation warning info error question ' +
         'delete-contact loginrequired-dialog multiple with-close-btn');
@@ -1563,7 +1567,7 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
             $('#msgDialog').addClass('confirmation');
         }
 
-        if (checkbox) {
+        if (checkboxSetting) {
             $('#msgDialog .checkbox-block .checkdiv,' +
                 '#msgDialog .checkbox-block input')
                     .removeClass('checkboxOn').addClass('checkboxOff');
@@ -1574,11 +1578,11 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
                 var $o = $('#msgDialog .checkbox-block .checkdiv, #msgDialog .checkbox-block input');
                 if ($('#msgDialog .checkbox-block input').hasClass('checkboxOff')) {
                     $o.removeClass('checkboxOff').addClass('checkboxOn');
-                    mega.config.set('skipDelWarning', 1);
+                    mega.config.set(checkboxSetting, 1);
                 }
                 else {
                     $o.removeClass('checkboxOn').addClass('checkboxOff');
-                    mega.config.remove('skipDelWarning');
+                    mega.config.remove(checkboxSetting);
                 }
 
                 return false;
@@ -3817,4 +3821,38 @@ function FMResizablePane(element, opts) {
         $element.data('fmresizable', this);
     }
     return this;
+}
+
+function initDownloadDesktopAppDialog() {
+
+    'use strict';
+
+    const $dialog = $('.mega-dialog.mega-desktopapp-download');
+
+    $('.download-app', $dialog).rebind('click.downloadDesktopAppDialog', () => {
+
+        switch (ua.details.os) {
+            case "Apple":
+                window.location = megasync.getMegaSyncUrl('mac');
+                break;
+            case "Windows":
+                // Download app for Windows
+                window.location = megasync.getMegaSyncUrl(ua.details.is64bit && !ua.details.isARM ?
+                    'windows' : 'windows_x32');
+
+                break;
+            case "Linux":
+                $('aside', $dialog).addClass('hidden');
+                loadSubPage('/sync');
+                break;
+        }
+    });
+
+    clickURLs();
+    $('aside a', $dialog).rebind('click.downloadDesktopAppDialog', closeDialog);
+
+    // Close the share dialog
+    $('button.js-close', $dialog).rebind('click.downloadDesktopAppDialog', closeDialog);
+
+    M.safeShowDialog('onboardingDesktopAppDialog', $dialog);
 }

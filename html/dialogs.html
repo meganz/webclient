@@ -2331,7 +2331,7 @@
         <section class="content">
             <div class="content-block">
                 <div class="multiple-input">
-                    <i class="sprite-fm-mono icon-email"></i>
+                    <i class="sprite-fm-mono icon-email-filled"></i>
                     <form autocomplete="disabled">
                         <input type="text" class="add-contact-multiple-input" id="add-user-dialog-input" name="" />
                     </form>
@@ -5362,7 +5362,6 @@
         <section class="content">
             <div class="content-block">
                 <h3 class="step-main-question pre-register">[$19852]</h3>
-                <h3 class="step-main-question post-register">[$20187]</h3>
                 <p class="first-paragraph pre-register">[$19853]</p>
                 <p class="first-paragraph post-register">[$20188]</p>
                 <p class="second-paragraph pre-register">[$19854]</p>
@@ -5380,7 +5379,7 @@
                             <span>[$17386]</span>
                         </button><!--
                         --><button class="mega-button positive save-recovery-key-button">
-                            <span>[$17694]</span>
+                            <span>[$58]</span>
                         </button>
                     </div>
                 </div>
@@ -5522,7 +5521,7 @@
                         <span>[$19103]</span>
                     </button><!--
                     --><button class="mega-button positive add-sub-user">
-                        <span>[$19084]</span>
+                        <span>[$bsn_add_users]</span>
                     </button>
                 </div>
                 <div class="invite-link-option">
@@ -6575,5 +6574,42 @@
                 <span>[$6690]</span>
             </button>
         </div>
+    </div>
+
+    <!-- Dialog: Download desktop app dialog -->
+    <div class="mega-dialog dialog-template-graphic mega-desktopapp-download hidden"
+        role="dialog"
+        aria-labelledby="mega-desktopapp-download-title"
+        aria-modal="true">
+
+        <button class="close js-close" aria-label="[$148]">
+            <i class="sprite-fm-mono icon-dialog-close"></i>
+        </button>
+
+        <header class="dialog-top">
+            <div class="graphic sprite-fm-illustration img-dialog-desktop-app"></div>
+            <h2 id="mega-desktopapp-download-title">
+                <i class="sprite-fm-mono icon-sync"></i>[$19639]
+            </h2>
+        </header>
+
+        <section class="content">
+            <div class="content-block dialog-bottom">
+                <p>[$desktopapp_dialog_desc]</p>
+            </div>
+        </section>
+
+        <footer>
+            <div class="footer-container">
+                <button class="mega-button positive download-app">
+                    <span>[$desktopapp_dialog_btn]</span>
+                </button>
+            </div>
+            <aside>
+                <div>
+                    <a class="clickurl" href="/sync">[$desktopapp_dialog_other_os]</a>
+                </div>
+            </aside>
+        </footer>
     </div>
 </section>

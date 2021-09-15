@@ -103,6 +103,7 @@
 
     shrink.bitdef = Object.assign(Object.create(null), {
         v04: ['rvonbrddl', 'rvonbrdfd', 'rvonbrdas'],
+        obv4:['obcd', 'obcduf', 'obcdmyf', 'obcdda'],
         xb1: [
             // do NOT change the order, add new entries at the tail UP TO 31, and 8 per row.
             'cws', 'ctt', 'viewmode', 'dbDropOnLogout', 'dlThroughMEGAsync', 'sdss', 'tpp', 'ulddd',
@@ -517,6 +518,9 @@
             }
             else if (page === 'fm/account/notifications') {
                 mobile.account.notifications.render();
+            }
+            else if (page === 'fm/account/file-management') {
+                mobile.account.filemanagement.render();
             }
 
             return;

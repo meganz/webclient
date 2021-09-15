@@ -865,6 +865,7 @@
                             <div class="sub-title" data-scrollto="rubbish-cleaning">[$20229]</div>
                             <div class="sub-title" data-scrollto="user-interface">[$16158]</div>
                             <div class="sub-title" data-scrollto="dialog-options">[$20169]</div>
+                            <div class="sub-title" data-scrollto="link-options">[$setting_section_plink]</div>
                         </div>
                     </div>
                     <div class="settings-button slide-in-out ts-500 closed transfers">
@@ -951,16 +952,37 @@
                 <div class="fm-notification-close fix-me-close sprite-fm-mono icon-close-component"></div>
             </div>
 
+            <div class="onboarding-control-panel hidden">
+                <div class="onboarding-control-panel-content">
+                    <button class="close js-close mega-button action icon" aria-label="[$148]">
+                        <i class="sprite-fm-mono icon-dialog-close icon24"></i>
+                    </button>
+                    <div class="onboarding-control-panel-title-bg"></div>
+                    <div class="onboarding-control-panel-title"></div>
+                    <div class="onboarding-control-panel-step"></div>
+                </div>
+                <div class="onboarding-control-panel-dismiss hidden">
+                    <i class="sprite-fm-uni icon-question icon48"></i>
+                    <div class="question-content">[$onboard_v4_control_dismiss_question]</div>
+                    <button class="mega-button js-dismiss-cancel">
+                        <span>[$82]</span>
+                    </button>
+                    <button class="mega-button positive js-dismiss">
+                        <span>[$2005]</span>
+                    </button>
+                </div>
+                <div class="onboarding-control-panel-complete hidden">
+                    <i class="sprite-fm-mono icon-accept icon24"></i>
+                    <div class="question-content">[$onboard_v4_control_finished]</div>
+                    <button class="close js-close mega-button action icon" aria-label="[$148]">
+                        <i class="sprite-fm-mono icon-dialog-close icon24"></i>
+                    </button>
+                </div>
+            </div>
+
             <div class="shares-tabs-bl hidden">
                 <button class="shares-tab-lnk in-shares" data-folder="shares">[$16770]</button>
                 <button class="shares-tab-lnk out-shares" data-folder="out-shares">[$5543]</button>
-                <div class="clear"></div>
-            </div>
-
-            <div class="contacts-tabs-bl hidden">
-                <div class="contacts-tab-lnk contacts" data-folder="contacts">[$165]</div>
-                <div class="contacts-tab-lnk ipc" data-folder="ipc">[$5863]<span></span></div>
-                <div class="contacts-tab-lnk opc" data-folder="opc">[$5862]</div>
                 <div class="clear"></div>
             </div>
 
@@ -2428,12 +2450,12 @@
                             <div class="account chart-block tiny-chart">
                                 <div class="account chart body">
                                     <div class="account chart progressbars">
-                                        <div class="chart0 main-chart right-chart"><span></span></div>
-                                        <div class="chart0 main-chart left-chart"><span></span></div>
+                                        <div class="chart0 main-chart right-chart low-percent-clip"><span></span></div>
+                                        <div class="chart0 main-chart left-chart low-percent-clip"><span></span></div>
                                     </div>
                                     <div class="perc-txt"></div>
                                 </div>
-                                <div class="account chart data">
+                                <div class="account chart data hidden">
                                     <div class="fm-account-header"><span>[$16119]</span></div>
                                     <span class="size-txt">2.93 GB</span>
                                     <span class="of-txt">/</span>
@@ -2448,12 +2470,12 @@
                             <div class="account chart-block tiny-chart">
                                 <div class="account chart body">
                                     <div class="account chart progressbars">
-                                        <div class="chart0 main-chart right-chart"><span></span></div>
-                                        <div class="chart0 main-chart left-chart"><span></span></div>
+                                        <div class="chart0 main-chart right-chart low-percent-clip"><span></span></div>
+                                        <div class="chart0 main-chart left-chart low-percent-clip"><span></span></div>
                                     </div>
                                     <div class="perc-txt"></div>
                                 </div>
-                                <div class="account chart data">
+                                <div class="account chart data hidden">
                                     <div class="fm-account-header"><span>[$16120]</span></div>
                                     <span class="size-txt">2.93 GB</span>
                                     <span class="of-txt">/</span>
@@ -3298,6 +3320,19 @@
                             </div>
                         </div>
                     </div>
+                    <div class="account data-block link-options">
+                        <div class="settings-left-block">
+                            <div class="title-txt">[$setting_section_plink]</div>
+                        </div>
+                        <div class="settings-right-block">
+                            <div class="settings-sub-section">
+                                <div class="subtitle-txt">[$setting_plink_warn]</div>
+                                <div class="mega-switch" id="nowarnpl">
+                                    <div class="mega-feature-switch no-trans-init"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="fm-account-transfers fm-account-sections">
                     <div class="account data-block upload-and-download">
@@ -3846,12 +3881,12 @@
                                 <div class="account chart-block tiny-chart">
                                     <div class="account chart body">
                                         <div class="account chart progressbars">
-                                            <div class="chart0 main-chart right-chart"><span></span></div>
-                                            <div class="chart0 main-chart left-chart"><span></span></div>
+                                            <div class="chart0 main-chart right-chart low-percent-clip"><span></span></div>
+                                            <div class="chart0 main-chart left-chart low-percent-clip"><span></span></div>
                                         </div>
                                         <div class="perc-txt"></div>
                                     </div>
-                                    <div class="account chart data">
+                                    <div class="account chart data hidden">
                                         <div class="fm-account-header"><span>[$16119]</span></div>
                                         <span class="size-txt">2.93 GB</span>
                                         <span class="of-txt">/</span>
@@ -3866,12 +3901,12 @@
                                 <div class="account chart-block tiny-chart">
                                     <div class="account chart body">
                                         <div class="account chart progressbars">
-                                            <div class="chart0 main-chart right-chart"><span></span></div>
-                                            <div class="chart0 main-chart left-chart"><span></span></div>
+                                            <div class="chart0 main-chart right-chart low-percent-clip"><span></span></div>
+                                            <div class="chart0 main-chart left-chart low-percent-clip"><span></span></div>
                                         </div>
                                         <div class="perc-txt"></div>
                                     </div>
-                                    <div class="account chart data">
+                                    <div class="account chart data hidden">
                                         <div class="fm-account-header"><span>[$16120]</span></div>
                                         <span class="size-txt">2.93 GB</span>
                                         <span class="of-txt">/</span>

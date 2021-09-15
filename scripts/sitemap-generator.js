@@ -2,17 +2,15 @@ const pages = [
     "", // empty page to represent the root
     "start",
     "business",
-    "mobile", "ios", "android",
+    "mobile",
     "sync",
     "cmd",
     "extensions", "chrome", "firefox", "edge",
     "nas",
     "help",
-    "about/main",
-    "uwp",
+    "developers",
     "about",
     "pro",
-    "resellers",
     "corporate/media",
     "corporate/reviews",
     "contact",
@@ -33,7 +31,13 @@ const pages = [
     "about/reliability",
     "about/privacy",
     "about/jobs",
-    "achievements"
+    "achievements",
+    "registerb",
+    "register",
+    "login",
+    "cookie",
+    "dispute",
+    "sdkterms"
 ];
 /** lang [lang-code-in-webclient, ISO-639-1 lang code which search engines understand] */
 const langs = [

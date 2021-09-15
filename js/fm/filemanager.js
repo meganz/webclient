@@ -2661,7 +2661,7 @@ FileManager.prototype.addTransferPanelUI = function() {
                     ids.map(fm_tfsresume);
                 }
                 else {
-                    ids.map(fm_tfspause);
+                    ids.filter(id => !String(id).startsWith('LOCKed_')).map(fm_tfspause);
                 }
             }
             else {

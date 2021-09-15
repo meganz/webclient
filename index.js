@@ -1196,16 +1196,6 @@ function init_page() {
         });
     }
     else if (page.substr(0, 4) === 'help') {
-        var urlParts = page.split('/');
-        if (urlParts[1] === 'client' && urlParts.length === 5) {
-            var lastSlash = page.lastIndexOf('/');
-            var newPage = '/' + page.substr(0, lastSlash) + '#' + page.substr(lastSlash + 1);
-            if (is_extension) {
-                return loadSubPage(newPage);
-
-            }
-            location.replace(newPage);
-        }
         return Help.render();
     }
     else if (page === 'privacy') {

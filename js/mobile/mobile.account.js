@@ -27,6 +27,7 @@ mobile.account = {
         mobile.account.initCancelAccountButton($page);
         mobile.account.initAddPhoneNumberButton($page);
         mobile.account.initSessionHistoryButton($page);
+        mobile.account.initFileManagementButton($page);
         mobile.account.fetchAndDisplayTwoFactorAuthStatus($page);
         mobile.account.initChangePasswordButton($page);
         mobile.account.initNotificationButton($page);
@@ -501,6 +502,15 @@ mobile.account = {
 
             // Load the Session History page
             loadSubPage('fm/account/history');
+            return false;
+        });
+    },
+
+    initFileManagementButton: function($page) {
+        'use strict';
+        const $buttonBlock = $('.account-file-management-block', $page);
+        $buttonBlock.rebind('click.acc', () => {
+            loadSubPage('fm/account/file-management');
             return false;
         });
     },

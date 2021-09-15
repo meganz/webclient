@@ -519,6 +519,9 @@
             else if (page === 'fm/account/notifications') {
                 mobile.account.notifications.render();
             }
+            else if (page === 'fm/account/file-management') {
+                mobile.account.filemanagement.render();
+            }
 
             return;
         }

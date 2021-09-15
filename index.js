@@ -993,6 +993,11 @@ function init_page() {
         mobile.account.notifications.init();
         return false;
     }
+    else if (is_mobile && fminitialized && u_type && page === 'fm/account/file-management') {
+        mobile.initDOM();
+        mobile.account.filemanagement.init();
+        return false;
+    }
     else if (page === 'achievements') {
         parsepage(pages.achievements);
         achievementPage();

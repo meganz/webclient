@@ -448,7 +448,7 @@ function dl_g(res, ctx) {
             });
 
             $('.mid-button.download-file, button.download-file, .mobile.dl-browser')
-                .rebind('click', function() {
+                .rebind('click', (e) => {
                     $('.download.progress-bar').width('0%');
                     $('.open-in-folder').addClass('hidden');
 
@@ -460,8 +460,15 @@ function dl_g(res, ctx) {
                             // If 'msd' (MegaSync download) flag is turned on and application is installed
                             if (res.msd !== 0 && (!err || is)) {
                                 $('.megasync-overlay').removeClass('downloading');
-                                megasync.download(dlpage_ph, a32_to_base64(base64_to_a32(dlkey).slice(0, 8)));
-                                dlPageStartDownload(true);
+                                megasync.download(dlpage_ph, a32_to_base64(base64_to_a32(dlkey).slice(0, 8)), (err) => {
+                                    if (err) {
+                                        uncheckMegaSyncDownload();
+                                        $(e.currentTarget).trigger('click');
+                                    }
+                                    else {
+                                        dlPageStartDownload(true);
+                                    }
+                                }, true);
                             }
                             else {
                                 dlmanager.showMEGASyncOverlay(fdl_filesize > maxDownloadSize);

@@ -337,18 +337,22 @@ var megasync = (function() {
                 lastDownload = null;
             }
         },
-        error: function (next, ev) {
+        error: function(next, ev, closeFlag) {
             enabled = false;
             next = (typeof next === "function") ? next : function() {};
-            next(ev || new Error("Internal error"));
-            megaSyncIsNotResponding();
+            if (closeFlag) {
+                megaSyncIsNotResponding(next.bind(this, ev || new Error("Internal error")));
+            }
+            else {
+                next(ev || new Error("Internal error"));
+                megaSyncIsNotResponding();
+            }
         }
     };
 
     function megaSyncIsNotResponding(nextIfYes) {
         if (lastCheckStatus && lastCheckTime) {
             api_req({ a: 'log', e: 99800, m: 'MEGASync is not responding' });
-
             msgDialog(
                 'confirmation',
                 'MEGASync is not responding',
@@ -438,7 +442,7 @@ var megasync = (function() {
         return promise;
     }
 
-    function SyncAPI(args, next) {
+    function SyncAPI(args, next, closeFlag) {
 
         megaSyncRequest(args, function(ev, response) {
             api_handle(next, response, args);
@@ -447,7 +451,7 @@ var megasync = (function() {
                 lastCheckStatus = 0;
                 lastCheckTime = Date.now();
             }
-            handler.error(next, ev);
+            handler.error(next, ev, closeFlag);
         });
     }
 
@@ -752,9 +756,9 @@ var megasync = (function() {
      *
      * @return {Boolean} Always return true
      */
-    ns.download = function(pubKey, privKey) {
+    ns.download = function(pubKey, privKey, next, closeFlag) {
         lastDownload = [pubKey, privKey];
-        SyncAPI({a: "l", h: pubKey, k: privKey});
+        SyncAPI({a: "l", h: pubKey, k: privKey}, next, closeFlag);
         return true;
     };
 

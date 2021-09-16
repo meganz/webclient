@@ -563,7 +563,9 @@ class SelectionManager2_DOM extends SelectionManager2Base {
         var $element = $('#' + nodeHandle, $selectable);
         var $jsp = $element.getParentJScrollPane();
         if ($jsp) {
+            var jspXPosition = $jsp.getContentPositionX();
             $jsp.scrollToElement($element);
+            $jsp.scrollToX(jspXPosition); // Keep the element remain the horizontal position after scrolling
         }
         else if (M.megaRender && M.megaRender.megaList) {
             M.megaRender.megaList.scrollToItem(nodeHandle);

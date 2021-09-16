@@ -5370,8 +5370,8 @@ div.checkboxOn {
     border: 2px solid #fff;
     background-color: #fff;
     position: absolute;
-    right: -4px;
-    bottom: -4px;
+    right: 1px;
+    bottom: 1px;
     -moz-border-radius: 20px;
     -webkit-border-radius: 20px;
     border-radius: 20px;
@@ -5383,7 +5383,7 @@ div.checkboxOn {
     background-image: url(../images/mobile/mobile-sprite.png);
     background-repeat: no-repeat;
     background-size: -280px -2232px;
-    background-position: -50px -2163px;
+    background-position: -50px -2162px;
     display: block;
     position: relative;
 }

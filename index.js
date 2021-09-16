@@ -451,7 +451,7 @@ function init_page() {
             }
             else {
                 loadSubPage('fm');
-                processContactLink();
+                M.onFileManagerReady(processContactLink);
                 return;
             }
         }

@@ -337,6 +337,7 @@ class SelectContactDialog extends MegaRenderMixin {
                             selectableContacts="true"
                             onSelectDone={self.props.onSelectClicked}
                             onSelected={self.onSelected}
+                            onClose={self.props.onClose}
                             selected={self.state.selected}
                             contacts={M.u}
                             headerClasses="left-aligned"

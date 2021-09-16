@@ -310,6 +310,7 @@ export class DropdownContactsSelector extends MegaRenderMixin {
             vertOffset={this.props.vertOffset}
         >
             <ContactPickerWidget
+                onClose={this.props.closeDropdown}
                 active={this.props.active}
                 className="popup contacts-search tooltip-blur small-footer"
                 contacts={M.u}

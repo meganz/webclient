@@ -469,8 +469,13 @@ class ArchConversationsListItem extends MegaRenderMixin {
 class ConversationsHead extends MegaRenderMixin {
     requestReceivedListener = null;
 
+    state = {
+        receivedRequestsCount: 0
+    };
+
     constructor(props) {
         super(props);
+        this.state.receivedRequestsCount = Object.keys(M.ipc).length;
     }
 
     componentWillUnmount() {
@@ -482,28 +487,31 @@ class ConversationsHead extends MegaRenderMixin {
 
     componentDidMount() {
         super.componentDidMount();
-        this.requestReceivedListener = mBroadcaster.addListener('fmViewUpdate:ipc', () => updateIpcRequests());
+        this.requestReceivedListener = mBroadcaster.addListener('fmViewUpdate:ipc', () =>
+            this.setState({ receivedRequestsCount: Object.keys(M.ipc).length })
+        );
     }
 
     render() {
-        const { contactsActive, onSelectDone, showTopButtons, showAddContact } = this.props;
-        const RECEIVED_REQUESTS_COUNT = Object.keys(M.ipc).length;
+        const { contactsActive, showTopButtons, showAddContact, onSelectDone } = this.props;
+        const { receivedRequestsCount } = this.state;
         const ROUTES = { CHAT: 'fm/chat', CONTACTS: 'fm/chat/contacts' };
-        const CONTACTS_ACTIVE = window.location.pathname.indexOf(ROUTES.CONTACTS) !== -1;
+        const CONTACTS_ACTIVE = window.location.pathname.includes(ROUTES.CONTACTS);
 
         return (
             <div className="lp-header">
-                <span>{l[5902]}</span>
+                <span>{l[5902] /* `Conversations` */}</span>
                 <div className="conversations-head-buttons">
                     <div className="contacts-toggle">
                         <Button
+                            receivedRequestCount={receivedRequestsCount}
                             className={`
                                 mega-button
                                 round
                                 branded-blue
                                 contacts-toggle-button
                                 ${contactsActive ? 'active' : ''}
-                                ${RECEIVED_REQUESTS_COUNT > 0 ? 'requests' : ''}
+                                ${receivedRequestsCount > 0 ? 'requests' : ''}
                             `}
                             icon={`
                                 sprite-fm-mono
@@ -511,10 +519,11 @@ class ConversationsHead extends MegaRenderMixin {
                                 ${CONTACTS_ACTIVE ? '' : 'active'}
                             `}
                             onClick={() => loadSubPage(CONTACTS_ACTIVE ? ROUTES.CHAT : ROUTES.CONTACTS)}>
-                            {RECEIVED_REQUESTS_COUNT ?
-                                <div className="notifications-count ipc-count">
-                                    <span>{RECEIVED_REQUESTS_COUNT > 9 ? "9+" : RECEIVED_REQUESTS_COUNT }</span>
-                                </div> : ''}
+                            {!!receivedRequestsCount && (
+                                <div className="notifications-count">
+                                    <span>{receivedRequestsCount > 9 ? '9+' : receivedRequestsCount }</span>
+                                </div>
+                            )}
                         </Button>
                     </div>
                     <Button

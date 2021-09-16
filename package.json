@@ -79,7 +79,7 @@
     "eslint-plugin-react": "7.25.1",
     "eslint-plugin-sonarjs": "0.7.0",
     "eslint-plugin-unicorn": "36.0.0",
-    "htmlhint": "0.15.1",
+    "htmlhint": "0.15.2",
     "jscpd": "3.3.26",
     "karma": "6.3.4",
     "karma-chai": "0.1.0",
@@ -95,7 +95,7 @@
     "sinon": "11.1.2",
     "stylelint": "13.13.1",
     "stylelint-config-standard": "22.0.0",
-    "stylelint-no-unsupported-browser-features": "5.0.1",
+    "stylelint-no-unsupported-browser-features": "5.0.2",
     "webpack-dev-server": "3.11.2"
   }
 }

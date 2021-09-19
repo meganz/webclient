@@ -308,6 +308,7 @@ MegaData.prototype.addWebDownload = function(n, z, preview, zipname) {
     var paths = {};
     var zipsize = 0;
     var entries = [];
+    let quiet = false;
 
     if (!is_extension && !preview && !z && (dlMethod === MemoryIO || dlMethod === FlashIO)) {
         var nf = [], cbs = [];
@@ -322,6 +323,7 @@ MegaData.prototype.addWebDownload = function(n, z, preview, zipname) {
             }
         }
 
+        quiet = n && M.d[n[0]] && M.d[n[0]].t && M.d[n[0]].tb;
         n = nf;
 
         if (cbs.length) {
@@ -334,6 +336,7 @@ MegaData.prototype.addWebDownload = function(n, z, preview, zipname) {
         nodes = n;
         paths = preview;
         preview = false;
+        quiet = true;
     }
     else {
         for (var i in n) {
@@ -442,7 +445,7 @@ MegaData.prototype.addWebDownload = function(n, z, preview, zipname) {
         if (dlmanager.isOverQuota) {
             dlmanager.showOverQuotaDialog();
         }
-        else {
+        else if (!currDownloadSize && !quiet) {
             dlmanager.showNothingToDownloadDialog();
         }
         return;

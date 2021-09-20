@@ -196,6 +196,10 @@ MegaData.prototype.getPath = function(id) {
         else if (!id || (id.length !== 11)) {
             return [];
         }
+        else if (inshare && id.length === 11 && !this.d[id]) {
+            result.push(id, 'shares');
+            return result;
+        }
         else if (window.megaChatIsReady && megaChat.chats[id]) {
             return [id, 'contacts'];
         }

@@ -42,6 +42,7 @@
 #obDialog .link-button {
     color: var(--text-color-white-high);
     margin-right: auto;
+    min-width: 80px;
 }
 .rtl #obDialog .link-button {
     margin-left: auto;

@@ -8441,63 +8441,55 @@ var tooltips = __webpack_require__(13);
 
 
 class columnNodeName_ColumnNodeName extends genericNodePropsComponent_GenericNodePropsComponent {
+  constructor(...args) {
+    super(...args);
+
+    this.getThumbnailSrc = node => {
+      node.imgId = "preview_" + node.h;
+      node.seen = node.seen || 1;
+      return window.noThumbURI || '';
+    };
+  }
+
   render() {
-    let {
+    const {
       nodeAdapter
     } = this.props;
-    let {
+    const {
       node,
       requestThumbnailCb
     } = nodeAdapter.props;
-    let iconClass = "transfer-filetype-icon " + (nodeAdapter.nodeProps.isFolder ? " folder " : "") + '' + nodeAdapter.nodeProps.icon;
-
-    if (node.su) {
-      iconClass += ' inbound-share';
-    }
-
-    let icon = external_React_default.a.createElement("span", {
-      className: iconClass
-    }, " ");
-    let src = null;
-
-    if ((is_image(node) || is_video(node)) && node.fa) {
-      src = thumbnails[node.h];
-
-      if (!src) {
-        node.imgId = "preview_" + node.h;
-
-        if (!node.seen) {
-          node.seen = 1;
-        }
-
-        src = window.noThumbURI || '';
-      }
-
-      icon = external_React_default.a.createElement(tooltips["a" ].Tooltip, {
-        withArrow: true,
-        className: "tooltip-handler-container",
-        onShown: () => {
-          requestThumbnailCb(node, true);
-        }
-      }, external_React_default.a.createElement(tooltips["a" ].Handler, {
-        className: "transfer-filetype-icon " + fileIcon(node)
-      }, " "), external_React_default.a.createElement(tooltips["a" ].Contents, {
-        className: "img-preview"
-      }, external_React_default.a.createElement("div", {
-        className: "dropdown img-wrapper img-block",
-        id: "preview_" + node.h
-      }, external_React_default.a.createElement("img", {
-        alt: "",
-        className: "thumbnail-placeholder " + node.h,
-        src: src,
-        width: "156",
-        height: "156"
-      }))));
-    }
-
     return external_React_default.a.createElement("td", {
       megatype: columnNodeName_ColumnNodeName.megatype
-    }, icon, external_React_default.a.createElement("span", {
+    }, is_image(node) || is_video(node) ? external_React_default.a.createElement(tooltips["a" ].Tooltip, {
+      withArrow: true,
+      className: "tooltip-handler-container",
+      onShown: () => {
+        if (!thumbnails[node.h]) {
+          requestThumbnailCb(node, true);
+        }
+      }
+    }, external_React_default.a.createElement(tooltips["a" ].Handler, {
+      className: "transfer-filetype-icon " + fileIcon(node)
+    }), external_React_default.a.createElement(tooltips["a" ].Contents, {
+      className: "img-preview"
+    }, external_React_default.a.createElement("div", {
+      className: "dropdown img-wrapper img-block",
+      id: "preview_" + node.h
+    }, external_React_default.a.createElement("img", {
+      alt: "",
+      className: "thumbnail-placeholder " + node.h,
+      src: thumbnails[node.h] || this.getThumbnailSrc(node),
+      width: "156",
+      height: "156",
+      onLoad: () => {
+        if (thumbnails[node.h]) {
+          this.safeForceUpdate();
+        }
+      }
+    })))) : external_React_default.a.createElement("span", {
+      className: "\n                            transfer-filetype-icon\n                            " + (nodeAdapter.nodeProps.isFolder ? 'folder' : '') + "\n                            " + nodeAdapter.nodeProps.icon + "\n                            " + (node.su ? 'inbound-share' : '') + "\n                        "
+    }), external_React_default.a.createElement("span", {
       className: "tranfer-filetype-txt"
     }, nodeAdapter.nodeProps.title));
   }

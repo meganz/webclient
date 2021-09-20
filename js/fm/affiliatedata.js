@@ -631,9 +631,23 @@
      */
     AffiliateData.prototype.storeAffiliate = function(value, type) {
         /* eslint-disable local-rules/misc-warnings */
-        localStorage.affid = value;
-        localStorage.affts = Date.now();
-        localStorage.afftype = type;
+        sessionStorage.affid = value;
+        sessionStorage.affts = Date.now();
+        sessionStorage.afftype = type;
+        if ('csp' in window) {
+            csp.init().then(() => {
+                if (csp.has('analyze')) {
+                    localStorage.affid = sessionStorage.affid;
+                    localStorage.affts = sessionStorage.affts;
+                    localStorage.afftype = sessionStorage.afftype;
+                }
+                else {
+                    delete localStorage.affid;
+                    delete localStorage.affts;
+                    delete localStorage.afftype;
+                }
+            });
+        }
         /* eslint-enable local-rules/misc-warnings */
     };
 
@@ -649,16 +663,10 @@
      */
     Object.defineProperty(mega, 'affid', {
         get: function() {
-            var storage = localStorage;
-            var id = storage.affid;
-
-            if (id) {
-                var ts = storage.affts;
-                var type = storage.afftype || 2;
-
-                return {id: id, t: type, ts: Math.floor(ts / 1000)};
+            const storage = sessionStorage.affid ? sessionStorage : localStorage;
+            if (storage.affid) {
+                return { id: storage.affid, t: storage.afftype || 2, ts: Math.floor(storage.affts / 1000) };
             }
-
             return false;
         }
     });

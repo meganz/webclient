@@ -294,22 +294,18 @@ function getCleanSitePath(path) {
             target.uaoref = path.uao;
         }
         if (path.aff) {
-            if (path.aff_time) {
-                // eslint-disable-next-line sonarjs/no-inverted-boolean-check
-                if (!(localStorage.affts > (path.aff_time *= 1000))) {
-                    localStorage.affid = path.aff;
-                    localStorage.affts = path.aff_time;
-
-                    // Future proof, currently only public link affiliate data is coming from other agent.
-                    // Later, url from other agents will contains type for it to support other type.
-                    localStorage.afftype = path.aff_type || 2;
-                }
+            if (!path.aff_time) {
+                sessionStorage.affid = path.aff;
+                sessionStorage.affts = Date.now();
+                sessionStorage.afftype = 1;
             }
-            else {
-                // if only aff parameter is passed, treat it as aff referral url.
-                localStorage.affid = path.aff;
-                localStorage.affts = Date.now();
-                localStorage.afftype = 1;
+            else if (!(sessionStorage.affts > (path.aff_time *= 1000))) {
+                sessionStorage.affid = path.aff;
+                sessionStorage.affts = path.aff_time;
+
+                // Future proof, currently only public link affiliate data is coming from other agent.
+                // Later, url from other agents will contains type for it to support other type.
+                sessionStorage.afftype = path.aff_type || 2;
             }
         }
         if (path.csp) {
@@ -841,8 +837,8 @@ var mega = {
             to += '/' + page;
         }
 
-        var affid = storage.affid;
-        var affts = storage.affts;
+        var affid = sessionStorage.affid || storage.affid;
+        var affts = sessionStorage.affts || storage.affts;
         if (affid && affts && !(Date.now() - affts > 864e5)) {
             to += '/aff=' + affid;
         }
@@ -4695,6 +4691,22 @@ mBroadcaster.once('startMega', function() {
 
         setTimeout(function() {
             M.req({a: 'mrt', t: mt}).dump('uTagMT');
+        });
+    }
+    if (sessionStorage.affid && 'csp' in window) {
+        delay('aff:cspchk:movelocal', function() {
+            csp.init().then(function() {
+                if (csp.has('analyze')) {
+                    localStorage.affid = sessionStorage.affid;
+                    localStorage.affts = sessionStorage.affts;
+                    localStorage.afftype = sessionStorage.afftype;
+                }
+                else {
+                    delete localStorage.affid;
+                    delete localStorage.affts;
+                    delete localStorage.afftype;
+                }
+            });
         });
     }
 

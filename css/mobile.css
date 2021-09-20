@@ -5380,6 +5380,7 @@ div.checkboxOn {
 #mobile-ui-contact-card .contact-verification i {
     width: 36px;
     height: 36px;
+
     background-image: url(../images/mobile/mobile-sprite.png);
     background-repeat: no-repeat;
     background-size: -280px -2232px;
@@ -8276,8 +8277,8 @@ textarea.mobile.support-text-field {
     background-repeat: no-repeat;
     padding-left: 29px;
     margin: -16px 2px 2px 3px;
-    padding-bottom: 6px;
-    padding-top: 2px;
+    padding-bottom: 8px;
+    padding-top: 4px;
 }
 .mobile .improved-recovery-steps .recover-image-block {
     width: 172px;

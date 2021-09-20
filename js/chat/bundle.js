@@ -1007,10 +1007,10 @@ class Dropdown extends _stores_mixins_js1__["MegaRenderMixin"] {
 
       return true;
     } else if (this.props.focused != nextProps.focused) {
-        return true;
-      } else if (this.state && this.state.active != nextState.active) {
-          return true;
-        }
+      return true;
+    } else if (this.state && this.state.active != nextState.active) {
+      return true;
+    }
 
     return undefined;
   }
@@ -1237,14 +1237,14 @@ class DropdownContactsSelector extends _stores_mixins_js1__["MegaRenderMixin"] {
     if (this.props.active != nextProps.active) {
       return true;
     } else if (this.props.focused != nextProps.focused) {
-        return true;
-      } else if (this.state && this.state.active != nextState.active) {
-          return true;
-        } else if (this.state && JSON.stringify(this.state.selected) != JSON.stringify(nextState.selected)) {
-            return true;
-          } else {
-            return undefined;
-          }
+      return true;
+    } else if (this.state && this.state.active != nextState.active) {
+      return true;
+    } else if (this.state && JSON.stringify(this.state.selected) != JSON.stringify(nextState.selected)) {
+      return true;
+    } else {
+      return undefined;
+    }
   }
 
   onSelected(nodes) {
@@ -1666,7 +1666,7 @@ class ContactButton extends _stores_mixins_js2__["ContactAwareComponent"] {
       moreDropdowns.push(react1.a.createElement(_ui_dropdowns_jsx6__["DropdownItem"], {
         key: "set-nickname",
         icon: "sprite-fm-mono icon-rename",
-        label: l[20828],
+        label: contact.nickname === '' ? l.set_nickname_label : l.edit_nickname_label,
         onClick: () => {
           nicknames.setNicknameDialog.init(contact.u);
         }
@@ -2902,8 +2902,8 @@ class Button extends _stores_mixins_js2__["MegaRenderMixin"] {
       $('.conversationsApp').rebind('mousedown.button' + this.getUniqueId(), this.onBlur);
       $(document).rebind('keyup.button' + this.getUniqueId(), e => {
         if (this.state.focused === true && e.keyCode === 27) {
-            this.onBlur();
-          }
+          this.onBlur();
+        }
       });
 
       if (this._pageChangeListener) {
@@ -10545,8 +10545,8 @@ class gifPanel_GifPanel extends mixins["MegaRenderMixin"] {
         keyCode
       }) => {
         if (keyCode && keyCode === 27) {
-            return searchField_SearchField.hasValue() ? this.doReset() : this.props.onToggle();
-          }
+          return searchField_SearchField.hasValue() ? this.doReset() : this.props.onToggle();
+        }
       });
     };
 
@@ -19368,8 +19368,8 @@ class searchPanel_SearchPanel extends mixins["MegaRenderMixin"] {
       } = ev;
 
       if (keyCode && keyCode === 27) {
-          return searchPanel_searchField_SearchField.hasValue() ? this.handleReset() : this.toggleMinimize();
-        }
+        return searchPanel_searchField_SearchField.hasValue() ? this.handleReset() : this.toggleMinimize();
+      }
     };
 
     this.handleChange = ev => {
@@ -19768,7 +19768,7 @@ class contextMenu_ContextMenu extends mixins["MegaRenderMixin"] {
         onClick: () => loadSubPage('fm/chat/contacts/' + contact.u)
       }), external_React_default.a.createElement(ui_dropdowns["DropdownItem"], {
         icon: "sprite-fm-mono icon-rename",
-        label: l[20828],
+        label: contact.nickname === '' ? l.set_nickname_label : l.edit_nickname_label,
         onClick: () => this.handleSetNickname(contact.u)
       }), external_React_default.a.createElement("hr", null), external_React_default.a.createElement(ui_dropdowns["DropdownItem"], {
         submenu: true,
@@ -19800,7 +19800,7 @@ class contextMenu_ContextMenu extends mixins["MegaRenderMixin"] {
       onClick: () => this.handleAddContact(contact.u)
     }), external_React_default.a.createElement(ui_dropdowns["DropdownItem"], {
       icon: "sprite-fm-mono icon-rename",
-      label: l[20828],
+      label: contact.nickname === '' ? l.set_nickname_label : l.edit_nickname_label,
       onClick: () => this.handleSetNickname(contact.u)
     }));
   }
@@ -19981,48 +19981,48 @@ class contactList_ContactList extends mixins["MegaRenderMixin"] {
     } = this.props;
 
     if (contacts && contacts.length > 1) {
-        return external_React_default.a.createElement("div", {
-          className: "contacts-list"
-        }, external_React_default.a.createElement(fmView_FMView, {
-          dataSource: this.props.contacts,
-          customFilterFn: r => {
-            return r.c === 1;
+      return external_React_default.a.createElement("div", {
+        className: "contacts-list"
+      }, external_React_default.a.createElement(fmView_FMView, {
+        dataSource: this.props.contacts,
+        customFilterFn: r => {
+          return r.c === 1;
+        },
+        currentlyViewedEntry: "contacts",
+        onSelected: this.onSelected,
+        onHighlighted: this.onHighlighted,
+        searchValue: this.state.searchValue,
+        onExpand: this.onExpand,
+        onAttachClicked: this.onAttachClicked,
+        viewMode: 0,
+        currentdirid: "contacts",
+        megaListItemHeight: 59,
+        headerContainerClassName: "contacts-table contacts-table-head",
+        containerClassName: "contacts-table contacts-table-results",
+        onContextMenu: (ev, handle) => this.handleContextMenu(ev, handle),
+        listAdapterColumns: [columnContactName_ColumnContactName, columnContactStatus_ColumnContactStatus, [columnContactLastInteraction_ColumnContactLastInteraction, {
+          interactions: this.state.interactions
+        }], [columnContactButtons_ColumnContactButtons, {
+          onContextMenuRef: (handle, node) => {
+            this.contextMenuRefs[handle] = node;
           },
-          currentlyViewedEntry: "contacts",
-          onSelected: this.onSelected,
-          onHighlighted: this.onHighlighted,
-          searchValue: this.state.searchValue,
-          onExpand: this.onExpand,
-          onAttachClicked: this.onAttachClicked,
-          viewMode: 0,
-          currentdirid: "contacts",
-          megaListItemHeight: 59,
-          headerContainerClassName: "contacts-table contacts-table-head",
-          containerClassName: "contacts-table contacts-table-results",
-          onContextMenu: (ev, handle) => this.handleContextMenu(ev, handle),
-          listAdapterColumns: [columnContactName_ColumnContactName, columnContactStatus_ColumnContactStatus, [columnContactLastInteraction_ColumnContactLastInteraction, {
-            interactions: this.state.interactions
-          }], [columnContactButtons_ColumnContactButtons, {
-            onContextMenuRef: (handle, node) => {
-              this.contextMenuRefs[handle] = node;
-            },
-            onActiveChange: opened => {
-              if (!opened) {
-                this.setState({
-                  contextMenuPosition: null
-                });
-              }
-            },
-            contextMenuPosition: this.state.contextMenuPosition
-          }]],
-          initialSortBy: ['status', 'asc'],
-          fmConfigSortEnabled: true,
-          fmConfigSortId: "contacts",
-          NilComponent: external_React_default.a.createElement(nil_Nil, {
-            title: l[5737]
-          })
-        }));
-      }
+          onActiveChange: opened => {
+            if (!opened) {
+              this.setState({
+                contextMenuPosition: null
+              });
+            }
+          },
+          contextMenuPosition: this.state.contextMenuPosition
+        }]],
+        initialSortBy: ['status', 'asc'],
+        fmConfigSortEnabled: true,
+        fmConfigSortId: "contacts",
+        NilComponent: external_React_default.a.createElement(nil_Nil, {
+          title: l[5737]
+        })
+      }));
+    }
 
     return external_React_default.a.createElement(nil_Nil, {
       title: l[5737]
@@ -20722,12 +20722,12 @@ class contactsPanel_ContactsPanel extends mixins["MegaRenderMixin"] {
       keyCode
     }) => {
       if (keyCode === 27) {
-          const HAS_DIALOG_OPENED = $.dialog || ['.contact-nickname-dialog', '.fingerprint-dialog', '.context'].some(selector => {
-            const dialog = document.querySelector(selector);
-            return dialog && dialog.offsetHeight > 0;
-          });
-          return HAS_DIALOG_OPENED ? keyCode : loadSubPage('fm/chat');
-        }
+        const HAS_DIALOG_OPENED = $.dialog || ['.contact-nickname-dialog', '.fingerprint-dialog', '.context'].some(selector => {
+          const dialog = document.querySelector(selector);
+          return dialog && dialog.offsetHeight > 0;
+        });
+        return HAS_DIALOG_OPENED ? keyCode : loadSubPage('fm/chat');
+      }
     };
 
     this.handleAcceptAllRequests = () => {

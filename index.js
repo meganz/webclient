@@ -960,7 +960,7 @@ function init_page() {
         mobile.achieve.howItWorks.init();
         return false;
     }
-    else if (is_mobile && u_type && page === 'fm/account/plan') {
+    else if (is_mobile && u_type && (page === 'fm/account/plan' || page === 'fm/account/security')) {
         return loadSubPage('fm/account');
     }
     else if (is_mobile && u_type && page === 'fm/account/invites') {

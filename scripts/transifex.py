@@ -483,6 +483,71 @@ def get_update(filename):
         print("No new strings found.")
         return False
 
+def has_locked_msgs(is_prod):
+
+    if is_prod != True:
+        return False
+
+    from datetime import datetime, timedelta
+    checkDate = datetime.today() - timedelta(days=21)
+    checkDateStr = checkDate.strftime("%Y-%m-%d")
+
+    print("Started checking for Locked strings in PROD in past 3 weeks ..... " + checkDateStr)
+
+    url = BASE_URL + "/resource_strings?filter[resource]=" + PROJECT_ID + ":r:prod&filter[tags][all]=*"
+    url+= "filter[strings_date_modified][gte]=" + checkDateStr
+
+    languages = get_languages()
+
+    lockingTag= ["locked"];
+    for language in languages:
+            lockingTag.append("locked_" + language["attributes"]["code"])
+
+    print("Locking tags we are checking are: ", lockingTag)
+    nextPage = url
+    flaggedStrings=[]
+    pageNB = 1
+
+    while nextPage != None:
+        print("Page check for tags ", pageNB)
+        pageNB+=1
+
+        request = Request(nextPage, headers=HEADER)
+        nextPage = None
+        try:
+            response = urlopen(request)
+            if response.code == 200:
+                content = json.loads(response.read().decode("utf8"))
+                tagedStrings = content["data"]
+                for string in tagedStrings:
+                    if(string["attributes"] and string["attributes"]["tags"]):
+                        for strTag in string["attributes"]["tags"]:
+                            if strTag in lockingTag:
+                                flaggedStrings.append(string["attributes"]["key"])
+                                break
+                if content["links"] and content["links"]["next"] and len(content["links"]["next"]) > 10 :
+                    nextPage = content["links"]["next"]
+            else:
+                print("ERROR: Checking recent resource strings --- Returned status!=200 ,Status=" , response.code)
+                if len(flaggedStrings) > 0 :
+                    print("Found tagged string till the Error got raised: ", flaggedStrings)
+                sys.exit(1)
+
+        except HTTPError as e:
+            print("ERROR: Checking recent resource strings --- Exception:" , e.code)
+            content = json.loads(e.read().decode("utf8"))
+            print_error(content["errors"])
+            if len(flaggedStrings) > 0 :
+                    print("Found tagged string till the EXCEPTION got raised: ", flaggedStrings)
+            sys.exit(1)
+
+    if len(flaggedStrings) > 0 :
+        print("Found tagged string as locked. Process will exit: ", flaggedStrings)
+        sys.exit(1)
+    else:
+        print("SUCCESS ... checking for Locked strings in PROD. None found")
+    return False
+
 def lock_resource(branch_resource_name):
     url = BASE_URL + "/resource_strings?filter[resource]=" + PROJECT_ID + ":r:" + branch_resource_name
     languages = get_languages()
@@ -645,6 +710,8 @@ def main():
         else:
             print("Failed to fetch branch language files.")
         print("")
+    else:
+        has_locked_msgs(is_prod or branch_resource_name == "prod")
 
     print("Creating Translation Files... ")
     sys.stdout.flush()

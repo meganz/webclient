@@ -2610,6 +2610,9 @@ function classifyPassword(password) {
     'use strict';
 
     if (typeof zxcvbn !== 'function') {
+        onIdle(() => {
+            throw new Error('zxcvbn init fault');
+        });
         console.error('zxcvbn is not inited');
         return false;
     }

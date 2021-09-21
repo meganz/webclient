@@ -741,6 +741,13 @@ var redeem = {
                 }
                 $dlgTitle.text(l[22114]);
 
+                // pro voucher redemption
+                if (u_type === 3) {
+                    greenBtnText = l[458];
+                    whiteBtnText = l[82];
+                    descText = l[23496];
+                }
+
                 // Is this PRO voucher being used for a business registration?
                 if (window.bCreatedVoucher) {
                     $greenBtn.addClass('disabled');
@@ -765,8 +772,14 @@ var redeem = {
                         loadSubPage('registerb');
                         return false;
                     }
-                    login_txt = l[7712];
-                    loadSubPage('login');
+                    if (u_type === 3) {
+                        delete localStorage.voucher;
+                    }
+                    // if not logged in, redirect to login pg, otherwise close dialog and stay on redeem pg
+                    if (!u_type) {
+                        login_txt = l[7712];
+                        loadSubPage('login');
+                    }
                     return false;
                 });
 

@@ -608,8 +608,8 @@ var redeem = {
             history.replaceState({ subpage: 'fm' }, "", '/fm');
 
             // Show Business plan details
-            $('.storage-amount', $voucherBlock).safeHTML(l[23789].replace('%1', '15 ' + l[20160]));
-            $('.transfer-amount', $voucherBlock).safeHTML(l[23813]);
+            $('.storage-amount', $voucherBlock).safeHTML(l[23789].replace('%1', l[5816].replace('[X]', 3) + '+'));
+            $('.transfer-amount', $voucherBlock).safeHTML(l[23790].replace('%1', l[5816].replace('[X]', 3) + '+'));
 
             if (window.bCreatedVoucher) {
                 delete window.bCreatedVoucher;

@@ -109,8 +109,17 @@ function blog_load() {
         if (blogposts.hasOwnProperty(i)) {
             var mm = blog_month(blogposts[i].t);
 
-            if ((blogmonth && (mm === blogmonth)) || ((!blogmonth) && (!blogsearch))
-                    || (blogsearch && (blog_searchmath(blogposts[i], blogsearch)))) {
+            if (
+                (blogmonth && ((mm === blogmonth)
+                    || (
+                        // If the month = 0 we are requesting the year so match that instead
+                        parseInt(blogmonth.split('_')[1]) === 0
+                        && parseInt(mm.split('_')[0]) === parseInt(blogmonth.split('_')[0])
+                    ))
+                )
+                || ((!blogmonth) && (!blogsearch))
+                || (blogsearch && (blog_searchmath(blogposts[i], blogsearch)))
+            ) {
                 var introtxt = blogposts[i].introtxt;
                 introtxt += ' [...]';
                 if (a >= blogstart && a < bloglimit * blogpage) {
@@ -264,24 +273,96 @@ function blog_archive() {
         }
     }
 
-    var blogarchive = '';
+    const blogarchive = [];
+    const blogyears = [];
     for (mm in blogmonths) {
         if (blogmonths.hasOwnProperty(mm)) {
             mm = escapeHTML(mm);
             var y = mm.split('_')[0];
+            if (blogyears[y]) {
+                blogyears[y] += blogmonths[mm];
+            }
+            else {
+                blogyears[y] = blogmonths[mm];
+            }
+        }
+    }
+    const archiveClasslist = 'blog-new-archive-lnk clickurl';
+    for (let yy in blogyears) {
+        if (blogyears.hasOwnProperty(yy)) {
+            yy = escapeHTML(yy);
+            blogarchive.unshift(
+                `<div class="blog-archive-button slide-in-out ts-500 closed">
+                    <div class="head-title">
+                        <i class="sprite-fm-mono icon-arrow-right expand"></i>
+                        <span>
+                            <a class="blog-year ${archiveClasslist}" href="/blog_${yy}_0">
+                                ${yy}<span class="blog-archive-number">${escapeHTML(blogyears[yy])}</span>
+                            </a>
+                        </span>
+                    </div>
+                    <div class="sub-menu slide-item blogyears-${yy}"></div>
+                </div>`
+            );
+        }
+    }
+    const $archive = $('#blog_archive', '.blog-new-right');
+    $archive.safeHTML(blogarchive.join(''));
+    for (mm in blogmonths) {
+        if (blogmonths.hasOwnProperty(mm)) {
+            mm = escapeHTML(mm);
+            const y = mm.split('_')[0];
 
             var date = new Date();
             date.setMonth(parseInt(mm.split('_')[1]) - 1);
             date.setYear(y);
             date.setDate(1);
             date = date.getTime() / 1000;
-
-            blogarchive += '<a href="/blog_' + mm + '" class="blog-new-archive-lnk clickurl">'
-                + time2date(date, 3) + '<span class="blog-archive-number">'
-                + escapeHTML(blogmonths[mm]) + '</span></a>';
+            const countspan = `<span class="blog-archive-number">${escapeHTML(blogmonths[mm])}</span>`;
+            $(`.blogyears-${y}`, $archive).safeAppend(`
+                <div class="sub-title blogmonths-${mm.split('_')[1]}">
+                    <a href="/blog_${mm}" class="${archiveClasslist}">${time2date(date, 3)}${countspan}</a>
+                </div>
+            `);
         }
     }
-    $('#blog_archive').safeHTML(blogarchive);
+    bindArchiveEvents($archive);
+    let $button = $('.blog-archive-button', $archive).eq(0);
+    if (blogsearch) {
+        $('i', $button).click();
+        return;
+    }
+    if (blogmonth) {
+        const month = parseInt(blogmonth.split('_')[1]);
+        $button = $(`.blogyears-${blogmonth.split('_')[0]}`, $archive).closest('.blog-archive-button');
+        $('i', $button).click();
+        if (month) {
+            $(`.blogmonths-${month}`, $archive).addClass('active');
+        }
+        else {
+            $button.addClass('active');
+        }
+    }
+    else {
+        $button.addClass('active');
+        $('i', $button).click();
+    }
+
+}
+
+function bindArchiveEvents($archive) {
+    'use strict';
+    $('.blog-archive-button', $archive).rebind('click.blog', function(e) {
+        e.stopPropagation();
+        $('a.blog-year', this).click();
+    });
+    $('.blog-archive-button i', $archive).rebind('click.blog', function(e) {
+        e.stopPropagation();
+        $(this).closest('.blog-archive-button').toggleClass('closed');
+    });
+    $('.blog-archive-button .sub-title', $archive).rebind('click.blog', function() {
+        $('a.blog-new-archive-lnk', this).trigger('click');
+    });
     clickURLs();
 }
 

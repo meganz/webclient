@@ -1972,10 +1972,10 @@ FileManager.prototype.createFolderUI = function() {
         var errorMsg = '';
 
         if (name.trim() === '') { // Check if enter a folder name
-            errorMsg = l[1024];
+            errorMsg = l.EmptyName;
         }
         else if (!M.isSafeName(name)) { // Check if folder name is valid
-            errorMsg = l[24708];
+            errorMsg = name.length > 250 ? l.LongName : l[24708];
         }
         else if (duplicated(name)) { // Check if folder name already exists
             errorMsg = l[23219];

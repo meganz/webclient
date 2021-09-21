@@ -796,6 +796,7 @@ var redeem = {
             $('button.js-close', $dlg).rebind(
                 'click',
                 function() {
+                    delete localStorage.voucher;
                     if (is_mobile) {
                         if (mega.voucher.businessmonths) {
                             loadSubPage('registerb');

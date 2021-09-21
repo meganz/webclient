@@ -18976,11 +18976,11 @@ const NilRow = ({
   className: "nil-container"
 }, external_React_default.a.createElement("i", {
   className: "sprite-fm-mono icon-preview-reveal"
-}), external_React_default.a.createElement("span", null, LABEL.NO_RESULTS), isFirstQuery && external_React_default.a.createElement("div", {
+}), external_React_default.a.createElement("span", null, resultContainer_LABEL.NO_RESULTS), isFirstQuery && external_React_default.a.createElement("div", {
   className: "search-messages",
   onClick: onSearchMessages,
   dangerouslySetInnerHTML: {
-    __html: LABEL.SEARCH_MESSAGES_INLINE.replace('[A]', '<a>').replace('[/A]', '</a>')
+    __html: resultContainer_LABEL.SEARCH_MESSAGES_INLINE.replace('[A]', '<a>').replace('[/A]', '</a>')
   }
 })));
 
@@ -19047,7 +19047,7 @@ const TYPE = {
   MEMBER: 3,
   NIL: 4
 };
-const LABEL = {
+const resultContainer_LABEL = {
   MESSAGES: l[6868],
   CONTACTS_AND_CHATS: l[20174],
   NO_RESULTS: l[8674],
@@ -19064,7 +19064,7 @@ class searchPanel_resultContainer_ResultContainer extends mixins["MegaRenderMixi
     super(props);
 
     this.renderRecents = recents => external_React_default.a.createElement(resultTable_ResultTable, {
-      heading: LABEL.RECENT
+      heading: resultContainer_LABEL.RECENT
     }, recents.map(recent => external_React_default.a.createElement(resultRow_ResultRow, {
       key: recent.data,
       type: TYPE.MEMBER,
@@ -19115,7 +19115,7 @@ class searchPanel_resultContainer_ResultContainer extends mixins["MegaRenderMixi
           isEmpty: RESULT_TABLE[key] && RESULT_TABLE[key].length < 1,
           props: {
             key: index,
-            heading: key === 'MESSAGES' ? LABEL.MESSAGES : LABEL.CONTACTS_AND_CHATS
+            heading: key === 'MESSAGES' ? resultContainer_LABEL.MESSAGES : resultContainer_LABEL.CONTACTS_AND_CHATS
           }
         };
 
@@ -19127,7 +19127,7 @@ class searchPanel_resultContainer_ResultContainer extends mixins["MegaRenderMixi
           const SEARCH_MESSAGES = external_React_default.a.createElement("button", {
             className: "search-messages mega-button",
             onClick: onSearchMessages
-          }, external_React_default.a.createElement("span", null, LABEL.SEARCH_MESSAGES_CTA));
+          }, external_React_default.a.createElement("span", null, resultContainer_LABEL.SEARCH_MESSAGES_CTA));
           const NO_RESULTS = external_React_default.a.createElement(resultRow_ResultRow, {
             type: TYPE.NIL,
             isFirstQuery: isFirstQuery,
@@ -19172,17 +19172,17 @@ class searchPanel_searchField_SearchField extends mixins["MegaRenderMixin"] {
         case STATUS.IN_PROGRESS:
           return external_React_default.a.createElement("div", {
             className: "search-field-status searching info"
-          }, LABEL.DECRYPTING_RESULTS);
+          }, resultContainer_LABEL.DECRYPTING_RESULTS);
 
         case STATUS.PAUSED:
           return external_React_default.a.createElement("div", {
             className: "search-field-status paused info"
-          }, LABEL.SEARCH_PAUSED);
+          }, resultContainer_LABEL.SEARCH_PAUSED);
 
         case STATUS.COMPLETED:
           return external_React_default.a.createElement("div", {
             className: "search-field-status complete success"
-          }, LABEL.SEARCH_COMPLETE);
+          }, resultContainer_LABEL.SEARCH_COMPLETE);
 
         default:
           return null;
@@ -19471,38 +19471,61 @@ class searchPanel_SearchPanel extends mixins["MegaRenderMixin"] {
 class navigation_Navigation extends mixins["MegaRenderMixin"] {
   constructor(props) {
     super(props);
+    this.requestReceivedListener = null;
+    this.state = {
+      receivedRequestsCount: 0
+    };
+    this.state.receivedRequestsCount = Object.keys(M.ipc).length;
+  }
+
+  componentWillUnmount() {
+    super.componentWillUnmount();
+
+    if (this.requestReceivedListener) {
+      mBroadcaster.removeListener(this.requestReceivedListener);
+    }
+  }
+
+  componentDidMount() {
+    super.componentDidMount();
+    this.requestReceivedListener = mBroadcaster.addListener('fmViewUpdate:ipc', () => this.setState({
+      receivedRequestsCount: Object.keys(M.ipc).length
+    }));
   }
 
   render() {
     const {
-      view,
-      receivedRequestsCount
+      view
     } = this.props;
     const {
-      VIEW
+      receivedRequestsCount
+    } = this.state;
+    const {
+      VIEW,
+      LABEL
     } = contactsPanel_ContactsPanel;
     return external_React_default.a.createElement("div", {
       className: "contacts-navigation"
     }, external_React_default.a.createElement("ul", null, Object.keys(VIEW).map(key => {
       let activeClass = view === VIEW[key] ? 'active' : '';
 
-      if (view === VIEW.PROFILE && VIEW[key] === contactsPanel_ContactsPanel.VIEW.CONTACTS) {
+      if (view === VIEW.PROFILE && VIEW[key] === VIEW.CONTACTS) {
         activeClass = 'active';
       }
 
-      if (VIEW[key] !== contactsPanel_ContactsPanel.VIEW.PROFILE) {
+      if (VIEW[key] !== VIEW.PROFILE) {
         return external_React_default.a.createElement("li", {
           key: key,
           onClick: () => {
             let page = key.toLowerCase().split("_")[0];
-            page = page === "contacts" ? "" : page;
+            page = page === 'contacts' ? '' : page;
             loadSubPage("fm/chat/contacts/" + page);
           }
         }, external_React_default.a.createElement("button", {
-          className: "\n                                        mega-button\n                                        action\n                                        " + activeClass + "\n                                    "
-        }, external_React_default.a.createElement("span", null, contactsPanel_ContactsPanel.LABEL[key]), receivedRequestsCount > 0 && VIEW[key] === VIEW.RECEIVED_REQUESTS && external_React_default.a.createElement("div", {
-          className: "notifications-count ipc-count"
-        }, receivedRequestsCount > 9 ? "9+" : receivedRequestsCount)));
+          className: "\n                                            mega-button\n                                            action\n                                            " + activeClass + "\n                                        "
+        }, external_React_default.a.createElement("span", null, LABEL[key]), receivedRequestsCount > 0 && VIEW[key] === VIEW.RECEIVED_REQUESTS && external_React_default.a.createElement("div", {
+          className: "notifications-count"
+        }, receivedRequestsCount > 9 ? '9+' : receivedRequestsCount)));
       }
 
       return null;
@@ -20798,8 +20821,7 @@ class contactsPanel_ContactsPanel extends mixins["MegaRenderMixin"] {
     return external_React_default.a.createElement("div", {
       className: "contacts-panel"
     }, external_React_default.a.createElement(navigation_Navigation, {
-      view: view,
-      receivedRequestsCount: receivedRequestsCount
+      view: view
     }), view !== contactsPanel_ContactsPanel.VIEW.PROFILE && external_React_default.a.createElement("div", {
       className: "contacts-actions"
     }, view === contactsPanel_ContactsPanel.VIEW.RECEIVED_REQUESTS && receivedRequestsCount > 1 && external_React_default.a.createElement("button", {
@@ -21303,6 +21325,10 @@ class conversations_ConversationsHead extends mixins["MegaRenderMixin"] {
   constructor(props) {
     super(props);
     this.requestReceivedListener = null;
+    this.state = {
+      receivedRequestsCount: 0
+    };
+    this.state.receivedRequestsCount = Object.keys(M.ipc).length;
   }
 
   componentWillUnmount() {
@@ -21315,22 +21341,26 @@ class conversations_ConversationsHead extends mixins["MegaRenderMixin"] {
 
   componentDidMount() {
     super.componentDidMount();
-    this.requestReceivedListener = mBroadcaster.addListener('fmViewUpdate:ipc', () => updateIpcRequests());
+    this.requestReceivedListener = mBroadcaster.addListener('fmViewUpdate:ipc', () => this.setState({
+      receivedRequestsCount: Object.keys(M.ipc).length
+    }));
   }
 
   render() {
     const {
       contactsActive,
-      onSelectDone,
       showTopButtons,
-      showAddContact
+      showAddContact,
+      onSelectDone
     } = this.props;
-    const RECEIVED_REQUESTS_COUNT = Object.keys(M.ipc).length;
+    const {
+      receivedRequestsCount
+    } = this.state;
     const ROUTES = {
       CHAT: 'fm/chat',
       CONTACTS: 'fm/chat/contacts'
     };
-    const CONTACTS_ACTIVE = window.location.pathname.indexOf(ROUTES.CONTACTS) !== -1;
+    const CONTACTS_ACTIVE = window.location.pathname.includes(ROUTES.CONTACTS);
     return conversations_React.createElement("div", {
       className: "lp-header"
     }, conversations_React.createElement("span", null, l[5902]), conversations_React.createElement("div", {
@@ -21338,12 +21368,13 @@ class conversations_ConversationsHead extends mixins["MegaRenderMixin"] {
     }, conversations_React.createElement("div", {
       className: "contacts-toggle"
     }, conversations_React.createElement(ui_buttons["Button"], {
-      className: "\n                                mega-button\n                                round\n                                branded-blue\n                                contacts-toggle-button\n                                " + (contactsActive ? 'active' : '') + "\n                                " + (RECEIVED_REQUESTS_COUNT > 0 ? 'requests' : '') + "\n                            ",
+      receivedRequestCount: receivedRequestsCount,
+      className: "\n                                mega-button\n                                round\n                                branded-blue\n                                contacts-toggle-button\n                                " + (contactsActive ? 'active' : '') + "\n                                " + (receivedRequestsCount > 0 ? 'requests' : '') + "\n                            ",
       icon: "\n                                sprite-fm-mono\n                                icon-contacts\n                                " + (CONTACTS_ACTIVE ? '' : 'active') + "\n                            ",
       onClick: () => loadSubPage(CONTACTS_ACTIVE ? ROUTES.CHAT : ROUTES.CONTACTS)
-    }, RECEIVED_REQUESTS_COUNT ? conversations_React.createElement("div", {
-      className: "notifications-count ipc-count"
-    }, conversations_React.createElement("span", null, RECEIVED_REQUESTS_COUNT > 9 ? "9+" : RECEIVED_REQUESTS_COUNT)) : '')), conversations_React.createElement(ui_buttons["Button"], {
+    }, !!receivedRequestsCount && conversations_React.createElement("div", {
+      className: "notifications-count"
+    }, conversations_React.createElement("span", null, receivedRequestsCount > 9 ? '9+' : receivedRequestsCount)))), conversations_React.createElement(ui_buttons["Button"], {
       group: "conversationsListing",
       className: "mega-button round positive",
       icon: "sprite-fm-mono icon-add"

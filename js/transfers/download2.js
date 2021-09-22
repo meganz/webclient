@@ -1445,10 +1445,18 @@ var dlmanager = {
 
             const $dialog = $('.limited-bandwidth-dialog');
             this._overquotaClickListeners($dialog);
+            let lastCheck = Date.now();
 
             if ($dialog.is(':visible') || $dlPageCountdown) {
                 const $countdown = $('.countdown', $dialog).removeClass('hidden');
                 const tick = () => {
+                    const curTime = Date.now();
+                    if (lastCheck + 1000 < curTime) {
+                        // Convert ms to s and remove difference from remaining
+                        timeLeft -= Math.floor((curTime - lastCheck) / 1000);
+                        delay('overquota:retry', () => this._onQuotaRetry(), timeLeft * 1000);
+                    }
+                    lastCheck = curTime;
                     const time = secondsToTime(timeLeft--, 1);
 
                     if (time) {

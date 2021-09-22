@@ -904,7 +904,7 @@
             $rubbishBin.addClass('hidden');
             $conversations.addClass('hidden');
         }
-        if (M.getNodeRoot($.selected[0]) === M.RubbishID) {
+        if (M.getNodeRoot($.selected[0]) === M.RubbishID || $.copyDialog || $.moveDialog) {
             $rubbishBin.addClass('hidden');
         }
 

@@ -99,6 +99,85 @@ function BusinessAccountUI() {
         });
         return true;
     };
+
+    // private function to update the sub user left panel
+    this.updateSubUserLeftPanel = function(subUserLeftPanelHeader) {
+        var $me = $(subUserLeftPanelHeader);
+        var disabledFound = false;
+        var $subUserLeftPanel = $('.fm-left-panel');
+        var $subUsers = $(
+            '.fm-tree-panel .content-panel.user-management .nw-user-management-item[id]',
+            $subUserLeftPanel
+        );
+        var $contentBlock = $('.fm-right-files-block', '.fmholder');
+        var $userManagementBlock = $('.files-grid-view.user-management-view', $contentBlock);
+        var $emptyBlock = $('.fm-empty-user-management', $contentBlock);
+
+        $('.user-management-tree-panel-header', $subUserLeftPanel).removeClass('active');
+        $userManagementBlock.removeClass('hidden');
+        $emptyBlock.addClass('hidden');
+
+        $me.addClass('active');
+
+        for (var k = 0; k < $subUsers.length; k++) {
+            var $subUser = $($subUsers[k]);
+            if ($me.hasClass('enabled-accounts')) {
+                if (!$('.user-management-status', $subUser).hasClass('disabled')) {
+                    $subUser.removeClass('hidden');
+                }
+                else {
+                    $subUser.addClass('hidden');
+                }
+            }
+            else {
+                if ($('.user-management-status', $subUser).hasClass('disabled')) {
+                    $subUser.removeClass('hidden');
+                    disabledFound = true;
+                }
+                else {
+                    $subUser.addClass('hidden');
+                }
+            }
+        }
+
+        var $subAccountsView = $('.fmholder .fm-right-files-block .files-grid-view.user-management-view');
+        var $usersTable = $('.user-management-list-table', $subAccountsView);
+        var $subUsersTableRow = $('tr', $usersTable);
+
+        for (var h = 1; h < $subUsersTableRow.length; h++) {
+            const $currentRow = $($subUsersTableRow[h]);
+            if ($me.hasClass('enabled-accounts')) {
+                if (!$('.user-management-status', $currentRow).hasClass('disabled')) {
+                    $currentRow.removeClass('hidden');
+                    $('.dis-en-icon.enabled-icon', $currentRow).addClass('hidden');
+                    $('.dis-en-icon.disabled-icon', $currentRow).removeClass('hidden');
+                }
+                else {
+                    $currentRow.addClass('hidden');
+                }
+            }
+            else {
+                if ($('.user-management-status', $currentRow).hasClass('disabled')) {
+                    $currentRow.removeClass('hidden');
+                    $('.dis-en-icon.enabled-icon', $currentRow).removeClass('hidden');
+                    $('.dis-en-icon.disabled-icon', $currentRow).addClass('hidden');
+                }
+                else {
+                    $currentRow.addClass('hidden');
+                }
+            }
+        }
+        if (!disabledFound && !$me.hasClass('enabled-accounts') && $usersTable.is(":visible ")) {
+            $userManagementBlock.addClass('hidden');
+            $emptyBlock.removeClass('hidden');
+        }
+
+        initTreeScroll();
+
+        const $listTable = $('.user-management-list-table', $subAccountsView);
+        $('tr', $listTable).removeClass('last-row');
+        $('tr:visible:last', $listTable).addClass('last-row');
+    };
 }
 
 /**
@@ -330,76 +409,8 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
         loadingDialog.phide();
 
         // 2- left pane headers (enabled,disabled) sub-users
-        $('.user-management-tree-panel-header').off('click.subuser');
-        $('.user-management-tree-panel-header').on('click.subuser', function subUserLeftPanelHeaderClickHandler() {
-            var me = $(this);
-            var disabledFound = false;
-            var $subUsers = $('.fm-tree-panel .content-panel.user-management .nw-user-management-item');
-            var $contentBlock = $('.fm-right-files-block', '.fmholder');
-            var $userManagementBlock = $('.files-grid-view.user-management-view', $contentBlock);
-            var $emptyBlock = $('.fm-empty-user-management', $contentBlock);
-
-            $('.user-management-tree-panel-header').removeClass('active');
-            $userManagementBlock.removeClass('hidden');
-            $emptyBlock.addClass('hidden');
-
-            me.addClass('active');
-
-            for (var k = 0; k < $subUsers.length; k++) {
-                if (me.hasClass('enabled-accounts')) {
-                    if (!$($subUsers[k]).find('.user-management-status').hasClass('disabled')) {
-                        $($subUsers[k]).removeClass('hidden');
-                    }
-                    else {
-                        $($subUsers[k]).addClass('hidden');
-                    }
-                }
-                else {
-                    if ($($subUsers[k]).find('.user-management-status').hasClass('disabled')) {
-                        $($subUsers[k]).removeClass('hidden');
-                        disabledFound = true;
-                    }
-                    else {
-                        $($subUsers[k]).addClass('hidden');
-                    }
-                }
-            }
-
-            var $subUsersTableRow = $('tr', $usersTable);
-
-            for (var h = 1; h < $subUsersTableRow.length; h++) {
-                const $currentRow = $($subUsersTableRow[h]);
-                if (me.hasClass('enabled-accounts')) {
-                    if (!$('.user-management-status', $currentRow).hasClass('disabled')) {
-                        $currentRow.removeClass('hidden');
-                        $('.dis-en-icon.enabled-icon', $currentRow).addClass('hidden');
-                        $('.dis-en-icon.disabled-icon', $currentRow).removeClass('hidden');
-                    }
-                    else {
-                        $currentRow.addClass('hidden');
-                    }
-                }
-                else {
-                    if ($('.user-management-status', $currentRow).hasClass('disabled')) {
-                        $currentRow.removeClass('hidden');
-                        $('.dis-en-icon.enabled-icon', $currentRow).removeClass('hidden');
-                        $('.dis-en-icon.disabled-icon', $currentRow).addClass('hidden');
-                    }
-                    else {
-                        $currentRow.addClass('hidden');
-                    }
-                }
-            }
-            if (!disabledFound && !me.hasClass('enabled-accounts') && $usersTable.is(":visible ")) {
-                $userManagementBlock.addClass('hidden');
-                $emptyBlock.removeClass('hidden');
-            }
-
-            initTreeScroll();
-
-            const $listTable = $('.user-management-list-table', $subAccountsView);
-            $('tr', $listTable).removeClass('last-row');
-            $('tr:visible:last', $listTable).addClass('last-row');
+        $('.user-management-tree-panel-header', '.fm-left-panel.user-management').rebind('click.subuser', function() {
+            mySelf.updateSubUserLeftPanel(this);
         });
 
         // 3- on clicking on a sub-user to view his info (from left pane or row)
@@ -2215,6 +2226,11 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = function () {
             setTaxName(value);
         });
 
+    // event handler for clicking left panel
+    $('.user-management-tree-panel-header', '.fm-left-panel.user-management').rebind('click.subuser', function() {
+        mySelf.updateSubUserLeftPanel(this);
+    });
+
     unhideSection();
 
 };
@@ -3725,7 +3741,7 @@ BusinessAccountUI.prototype.UIEventsHandler = function (subuser) {
             // $userRow.addClass('hidden');
             leftPanelClass = 'disabled-accounts';
         }
-        $('.user-management-tree-panel-header.' + leftPanelClass).trigger('click.subuser');
+        self.updateSubUserLeftPanel($('.user-management-tree-panel-header.' + leftPanelClass)[0]);
     };
 
     if (!$usersLeftPanel.hasClass('hidden') && $usersLeftPanel.hasClass('active')) {

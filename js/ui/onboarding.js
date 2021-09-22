@@ -331,7 +331,8 @@ mBroadcaster.addListener('fm:initialized', () => {
                 return false;
             }
 
-            this.currentStep.markActive(this.currentStepIndex);
+            this.currentStep.markActive();
+            this.currentStep.currentActionIndex = 0;
             this.currentStep.executeAction();
         }
 

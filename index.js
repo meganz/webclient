@@ -451,7 +451,7 @@ function init_page() {
             }
             else {
                 loadSubPage('fm');
-                processContactLink();
+                M.onFileManagerReady(processContactLink);
                 return;
             }
         }
@@ -960,7 +960,7 @@ function init_page() {
         mobile.achieve.howItWorks.init();
         return false;
     }
-    else if (is_mobile && u_type && page === 'fm/account/plan') {
+    else if (is_mobile && u_type && (page === 'fm/account/plan' || page === 'fm/account/security')) {
         return loadSubPage('fm/account');
     }
     else if (is_mobile && u_type && page === 'fm/account/invites') {
@@ -1730,7 +1730,7 @@ function init_page() {
         }
         else {
             // Show the voucher info to the user before proceeding to redeem.
-            if (typeof redeem !== 'undefined' && mega.voucher && mega.voucher.businessmonths) {
+            if (typeof redeem !== 'undefined' && mega.voucher) {
                 return redeem.showVoucherInfoDialog();
             }
             // Otherwise go to the Redeem page which will detect the voucher code and show a dialog

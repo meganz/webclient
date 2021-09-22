@@ -3,44 +3,66 @@ import { MegaRenderMixin } from '../../../stores/mixins';
 import ContactsPanel from './contactsPanel.jsx';
 
 export default class Navigation extends MegaRenderMixin {
+    requestReceivedListener = null;
+
+    state = {
+        receivedRequestsCount: 0
+    }
+
     constructor(props) {
         super(props);
+        this.state.receivedRequestsCount = Object.keys(M.ipc).length;
+    }
+
+    componentWillUnmount() {
+        super.componentWillUnmount();
+        if (this.requestReceivedListener) {
+            mBroadcaster.removeListener(this.requestReceivedListener);
+        }
+    }
+
+    componentDidMount() {
+        super.componentDidMount();
+        this.requestReceivedListener = mBroadcaster.addListener('fmViewUpdate:ipc', () =>
+            this.setState({ receivedRequestsCount: Object.keys(M.ipc).length })
+        );
     }
 
     render() {
-        const { view, receivedRequestsCount } = this.props;
-        const { VIEW } = ContactsPanel;
+        const { view } = this.props;
+        const { receivedRequestsCount } = this.state;
+        const { VIEW, LABEL } = ContactsPanel;
 
         return (
             <div className="contacts-navigation">
                 <ul>
                     {Object.keys(VIEW).map(key => {
                         let activeClass = view === VIEW[key] ? 'active' : '';
-                        if (view === VIEW.PROFILE && VIEW[key] === ContactsPanel.VIEW.CONTACTS) {
+                        if (view === VIEW.PROFILE && VIEW[key] === VIEW.CONTACTS) {
                             // Profile is subsection of Contacts.
                             activeClass = 'active';
                         }
-                        if (VIEW[key] !== ContactsPanel.VIEW.PROFILE) {
+                        if (VIEW[key] !== VIEW.PROFILE) {
                             return (
                                 <li
                                     key={key}
                                     onClick={() => {
                                         let page = key.toLowerCase().split("_")[0];
-                                        page = page === "contacts" ? "" : page;
-                                        loadSubPage("fm/chat/contacts/" + page);
+                                        page = page === 'contacts' ? '' : page;
+                                        loadSubPage(`fm/chat/contacts/${page}`);
                                     }}>
                                     <button
                                         className={`
-                                        mega-button
-                                        action
-                                        ${activeClass}
-                                    `}>
-                                        <span>{ContactsPanel.LABEL[key]}</span>
-                                        {receivedRequestsCount > 0
-                                        && VIEW[key] === VIEW.RECEIVED_REQUESTS &&
-                                            <div className="notifications-count ipc-count">
-                                                {receivedRequestsCount > 9 ? "9+" : receivedRequestsCount}</div>
-                                        }
+                                            mega-button
+                                            action
+                                            ${activeClass}
+                                        `}>
+                                        <span>{LABEL[key]}</span>
+                                        {receivedRequestsCount > 0 && VIEW[key] === VIEW.RECEIVED_REQUESTS && (
+                                            <div className="notifications-count">
+                                                {receivedRequestsCount > 9 ? '9+' : receivedRequestsCount}
+                                            </div>
+                                        )}
                                     </button>
                                 </li>
                             );

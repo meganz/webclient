@@ -268,7 +268,9 @@ export class ContactButton extends ContactAwareComponent {
             }
             moreDropdowns.push(
                 <DropdownItem
-                    key="set-nickname" icon="sprite-fm-mono icon-rename" label={l[20828]} onClick={() => {
+                    key="set-nickname" icon="sprite-fm-mono icon-rename"
+                    label={contact.nickname === '' ? l.set_nickname_label : l.edit_nickname_label}
+                    onClick={() => {
                         nicknames.setNicknameDialog.init(contact.u);
                     }} />
             );
@@ -1082,6 +1084,9 @@ export class ContactPickerWidget extends MegaRenderMixin {
             e.stopPropagation();
 
             contactAddDialog();
+            if (this.props.onClose) {
+                this.props.onClose();
+            }
         };
 
         if (self.props.readOnly) {
@@ -1380,6 +1385,9 @@ export class ContactPickerWidget extends MegaRenderMixin {
                 <div className="fm-empty-description small">{l[19115]}</div>
                 <button className="mega-button positive large fm-empty-button" onClick={function() {
                     contactAddDialog();
+                    if (self.props.onClose) {
+                        self.props.onClose();
+                    }
                 }}>
                     <span>{l[101]}</span>
                 </button>

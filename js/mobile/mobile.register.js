@@ -220,6 +220,9 @@ mobile.register = {
 
             loadingDialog.show();
 
+            $passwordField.val('');
+            $confirmPasswordField.val('');
+
             // Business accounts have different flow
             if (registerInfo || localStorage.businessSubAc) {
                 var signupcode = '';

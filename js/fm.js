@@ -1279,7 +1279,7 @@ function renameDialog() {
                 errMsg = '';
 
                 if (n.name && value !== n.name) {
-                    if (!value) {
+                    if (!value.trim()) {
                         errMsg = l[5744];
                     }
                     else if (M.isSafeName(value)) {
@@ -1289,6 +1289,14 @@ function renameDialog() {
                         }
                         else {
                             M.rename(n.h, value);
+                        }
+                    }
+                    else if (value.length > 250) {
+                        if (nodeType === 1) {
+                            errMsg = l.LongName;
+                        }
+                        else if (nodeType === 0) {
+                            errMsg = l.LongName1;
                         }
                     }
                     else {
@@ -2848,7 +2856,13 @@ function createFolderDialog(close) {
 
     var doCreateFolder = function(v) {
         var errorMsg = '';
-        if (!M.isSafeName(v, true)) {
+        if (v.trim() === '' || v.trim() === l[157]) {
+            errorMsg = l.EmptyName;
+        }
+        else if (v.length > 250) {
+            errorMsg = l.LongName;
+        }
+        else if (M.isSafeName(v, true) === false) {
             $dialog.removeClass('active');
             errorMsg = l[24708];
         }
@@ -2863,18 +2877,7 @@ function createFolderDialog(close) {
         }
 
         if (errorMsg !== '') {
-            $('.duplicated-input-warning span', $dialog).text(errorMsg);
-            $dialog.addClass('duplicate');
-            $input.addClass('error');
-
-            setTimeout(
-                function() {
-                    $input.removeClass('error');
-                    $dialog.removeClass('duplicate');
-                    $input.trigger("focus");
-                },
-                2000
-            );
+            showErrorCreatingFileFolder(errorMsg, $dialog, $input);
 
             return;
         }
@@ -2886,7 +2889,7 @@ function createFolderDialog(close) {
         closeDialog();
         loadingDialog.pshow();
 
-        M.createFolder(target, v.split(/[/\\]/))
+        M.createFolder(target, v)
             .then(function(h) {
                 if (d) {
                     console.log('Created new folder %s->%s', target, h);
@@ -2940,9 +2943,9 @@ function createFolderDialog(close) {
     });
 
     $input.rebind('keypress', function(e) {
-
-        if (e.which === 13 && $(this).val() !== '') {
-            doCreateFolder($(this).val());
+        var v = $(this).val();
+        if (e.which === 13 && v.trim() !== '') {
+            doCreateFolder(v);
         }
     });
 
@@ -2953,16 +2956,7 @@ function createFolderDialog(close) {
         $dialog.removeClass('active');
     });
 
-    $('.fm-dialog-new-folder-button').rebind('click', function() {
-        var v = $input.val();
-
-        if (v === '' || v === l[157]) {
-            alert(l[1024]);
-        }
-        else {
-            doCreateFolder(v);
-        }
-    });
+    $('.fm-dialog-new-folder-button').rebind('click', () => doCreateFolder($input.val()));
 
     M.safeShowDialog('createfolder', function() {
         $dialog.removeClass('hidden');
@@ -2970,6 +2964,22 @@ function createFolderDialog(close) {
         $dialog.removeClass('active');
         return $dialog;
     });
+}
+
+function showErrorCreatingFileFolder(errorMsg, $dialog, $input) {
+    "use strict";
+    $('.duplicated-input-warning span', $dialog).text(errorMsg);
+    $dialog.addClass('duplicate');
+    $input.addClass('error');
+
+    setTimeout(
+        () => {
+            $input.removeClass('error');
+            $dialog.removeClass('duplicate');
+            $input.trigger("focus");
+        },
+        2000
+    );
 }
 
 function createFileDialog(close, action, params) {
@@ -3058,16 +3068,24 @@ function createFileDialog(close, action, params) {
         var target = $.cftarget = $.cftarget || M.currentdirid;
 
         v = $.trim(v);
+        v = v.slice(0, -4);
+        var errorMsg = '';
 
-        if (!M.isSafeName(v)) {
+        if (v === '' || v === l[17506]) {
+            errorMsg = l[8566];
+        }
+        else if (v.length > 250) {
+            errorMsg = l.LongName1;
+        }
+        else if (!M.isSafeName(v)) {
             $dialog.removeClass('active');
-            $input.addClass('error');
-            return;
+            errorMsg = l[24708];
         }
         else if (duplicated(v, target)) {
-            $dialog.addClass('duplicate');
-            $input.addClass('error');
-
+            errorMsg = l[23219];
+        }
+        if (errorMsg !== '') {
+            showErrorCreatingFileFolder(errorMsg, $dialog, $input);
             return;
         }
         closeFunction();
@@ -3098,7 +3116,7 @@ function createFileDialog(close, action, params) {
 
     $input.rebind('keypress.fileDialog', function(e) {
 
-        if (e.which === 13 && $(this).val() !== '') {
+        if (e.which === 13) {
             doCreateFile($(this).val());
         }
         else {
@@ -3117,13 +3135,7 @@ function createFileDialog(close, action, params) {
 
     $('.create-file', $dialog).rebind('click.fileDialog', function() {
         var v = $input.val();
-
-        if (v === '' || v === l[17506]) {
-            msgDialog('warninga', '', l[8566]);
-        }
-        else {
-            doCreateFile(v);
-        }
+        doCreateFile(v);
     });
 
     M.safeShowDialog('createfile', function() {

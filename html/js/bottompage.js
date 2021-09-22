@@ -274,7 +274,7 @@ var bottompage = {
                     of: $this,
                     my: "center top",
                     at: "center bottom",
-                    collision: "fit"
+                    collision: "none"
                 });
             }
 

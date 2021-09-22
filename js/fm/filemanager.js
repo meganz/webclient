@@ -1967,12 +1967,15 @@ FileManager.prototype.createFolderUI = function() {
 
     var doCreateFolder = function() {
         var $inputWrapper = $('.create-new-folder.popup .fm-dialog-body');
-        var $input = $inputWrapper.find('input');
+        var $input = $('input', $inputWrapper);
         var name = $input.val();
         var errorMsg = '';
 
-        if (name === '' || !M.isSafeName(name)) {
-            errorMsg = l[24708];
+        if (name.trim() === '') { // Check if enter a folder name
+            errorMsg = l.EmptyName;
+        }
+        else if (!M.isSafeName(name)) { // Check if folder name is valid
+            errorMsg = name.length > 250 ? l.LongName : l[24708];
         }
         else if (duplicated(name)) { // Check if folder name already exists
             errorMsg = l[23219];
@@ -2082,7 +2085,7 @@ FileManager.prototype.createFolderUI = function() {
         if ($(this).val() === '') {
             $('.create-new-folder').removeClass('filled-input');
         }
-        if (e.which == 13) {
+        if (e.which === 13) {
             doCreateFolder();
         }
     });
@@ -2661,7 +2664,7 @@ FileManager.prototype.addTransferPanelUI = function() {
                     ids.map(fm_tfsresume);
                 }
                 else {
-                    ids.map(fm_tfspause);
+                    ids.filter(id => !String(id).startsWith('LOCKed_')).map(fm_tfspause);
                 }
             }
             else {

@@ -5329,6 +5329,7 @@ div.checkboxOn {
     vertical-align: top;
 }
 .mobile.my-account-page .account-page-contents {
+    height: calc(100% - 68px);
     margin-top: 68px;
     overflow: scroll;
 }
@@ -5369,8 +5370,8 @@ div.checkboxOn {
     border: 2px solid #fff;
     background-color: #fff;
     position: absolute;
-    right: -4px;
-    bottom: -4px;
+    right: 1px;
+    bottom: 1px;
     -moz-border-radius: 20px;
     -webkit-border-radius: 20px;
     border-radius: 20px;
@@ -5379,10 +5380,11 @@ div.checkboxOn {
 #mobile-ui-contact-card .contact-verification i {
     width: 36px;
     height: 36px;
+
     background-image: url(../images/mobile/mobile-sprite.png);
     background-repeat: no-repeat;
     background-size: -280px -2232px;
-    background-position: -50px -2163px;
+    background-position: -50px -2162px;
     display: block;
     position: relative;
 }
@@ -8275,8 +8277,8 @@ textarea.mobile.support-text-field {
     background-repeat: no-repeat;
     padding-left: 29px;
     margin: -16px 2px 2px 3px;
-    padding-bottom: 6px;
-    padding-top: 2px;
+    padding-bottom: 8px;
+    padding-top: 4px;
 }
 .mobile .improved-recovery-steps .recover-image-block {
     width: 172px;

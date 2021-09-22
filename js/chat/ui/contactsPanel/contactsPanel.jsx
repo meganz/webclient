@@ -146,10 +146,7 @@ export default class ContactsPanel extends MegaRenderMixin {
 
         return (
             <div className="contacts-panel">
-                <Navigation
-                    view={view}
-                    receivedRequestsCount={receivedRequestsCount}
-                />
+                <Navigation view={view} />
 
                 {view !== ContactsPanel.VIEW.PROFILE &&
                     <div className="contacts-actions">
@@ -159,14 +156,14 @@ export default class ContactsPanel extends MegaRenderMixin {
                                 className="mega-button action"
                                 onClick={this.handleAcceptAllRequests}>
                                 <i className="sprite-fm-mono icon-check" />
-                                <span>{l[19062]}</span>
+                                <span>{l[19062] /* `Accept all` */}</span>
                             </button>
                         }
                         <button
                             className="mega-button action"
                             onClick={() => contactAddDialog()}>
                             <i className="sprite-fm-mono icon-add-circle" />
-                            <span>{l[71]}</span>
+                            <span>{l[71] /* `Add contact` */}</span>
                         </button>
                     </div>
                 }

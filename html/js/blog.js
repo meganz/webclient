@@ -127,16 +127,17 @@ function blog_load() {
                     if (blogposts[i].by) {
                         by = blogposts[i].by;
                     }
+                    const href = `/blog/${escapeHTML(blogposts[i].th)}`;
                     blogcontent += '<div class="blog-new-item" data-blogid="blog/' + escapeHTML(blogposts[i].th) + '">';
-                    blogcontent += '<h2>' + escapeHTML(blogposts[i].h) + '</h2>';
+                    blogcontent += `<h2><a href="${href}" class="clickurl">${escapeHTML(blogposts[i].h)}</a></h2>`;
                     blogcontent += '<div class="blog-new-small">' + acc_time2date(blogposts[i].t) + '</div>';
                     blogcontent += '<div class="blog-new-date-div"></div>';
                     blogcontent += '<div class="blog-new-small"><span>By:</span> ' + escapeHTML(by) + '</div>';
-                    blogcontent += '<div class="clear"></div><img alt="" data-img="loading_'
-                        + escapeHTML(blogposts[i].attaches.simg) + '" src="'
-                        + CMS.img(blogposts[i].attaches.simg) + '" />';
+                    blogcontent += `<div class="clear"></div><a class="clickurl" href="${href}"><img alt=""
+                                         data-img="loading_${escapeHTML(blogposts[i].attaches.simg)}"
+                                         src="${CMS.img(blogposts[i].attaches.simg)}" /></a>`;
                     blogcontent += '<p><span class="blog-new-description">' + introtxt + '</span>';
-                    blogcontent += '<a class="blog-new-read-more">' + l[8512] + '</a>';
+                    blogcontent += `<a class="blog-new-read-more clickurl" href="${href}">${l[8512]}</a>`;
                     blogcontent += '<span class="clear"></span></p> </div>';
                 }
                 a++;
@@ -156,9 +157,7 @@ function blog_load() {
         blog_archive();
         blogcontent += blog_pager();
         $('.blog-new-left').safeHTML(blogcontent);
-        $('.blog-new-read-more, .blog-new-item img, .blog-new-item h2').rebind('click', function() {
-            loadSubPage($(this).parents('.blog-new-item').data('blogid'));
-        });
+        clickURLs();
         $('.blog-pagination-button').rebind('click', function() {
             var c = $(this).attr('class');
             if (c && c.indexOf('next') > -1) {

@@ -1264,7 +1264,7 @@ form {
 .blog-new-item {
     padding: 10px 35px 41px 0;
 }
-.blog-new.new-bottom-pages h2 {
+.blog-new.new-bottom-pages h2 a {
     margin: 0;
     font-size: 19px;
     line-height: 29px;

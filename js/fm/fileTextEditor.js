@@ -93,6 +93,10 @@ mega.fileTextEditor = new function FileTextEditor() {
                 dlmanager.setUserFlags();
                 dlmanager.showOverQuotaDialog();
             }
+            // local file does not exist
+            else if (ev === ENOENT) {
+                showToast('view', l[22]);
+            }
             operationPromise.reject();
         });
 

@@ -2862,7 +2862,7 @@ function createFolderDialog(close) {
         else if (v.length > 250) {
             errorMsg = l.LongName;
         }
-        else if (M.isSafeName(v, true) === false) {
+        else if (M.isSafeName(v) === false) {
             $dialog.removeClass('active');
             errorMsg = l[24708];
         }

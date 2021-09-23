@@ -1520,20 +1520,18 @@ accountUI.account = {
                 }
 
                 // Search through their Pro plan purchase history
-                $(account.purchases).each(function(index, purchaseTransaction) {
-
+                for (var i = 0; i < M.account.purchases.length; i++) {
                     // Get payment method name
-                    var paymentMethodId = purchaseTransaction[4];
+                    var paymentMethodId = M.account.purchases[i][4];
                     var paymentMethod = pro.getPaymentGatewayName(paymentMethodId).name;
 
                     // If they have paid with iTunes or Google Play in the past
-                    if ((paymentMethod === 'apple') || (paymentMethod === 'google')) {
-
+                    if (paymentMethod === 'apple' || paymentMethod === 'google') {
                         // Update confirmation message to remind them to cancel iTunes or Google Play
                         confirmMessage += ' ' + l[8854];
-                        return false;
+                        break;
                     }
-                });
+                }
 
                 /**
                  * Finalise the account cancellation process

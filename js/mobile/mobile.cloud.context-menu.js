@@ -85,6 +85,7 @@ mobile.cloud.contextMenu = {
             mobile.cloud.contextMenu.initFolderOpenButtonHandler($folderContextMenu, nodeHandle);
             mobile.cloud.contextMenu.initDownloadButton($folderContextMenu, nodeHandle);
             mobile.cloud.contextMenu.initMegadropButtons($folderContextMenu, nodeHandle);
+            mobile.cloud.contextMenu.initRenameButton($folderContextMenu, nodeHandle);
             mobile.cloud.contextMenu.initDeleteButton($folderContextMenu, nodeHandle);
             mobile.cloud.contextMenu.initCloseButton($folderContextMenu);
             mobile.cloud.contextMenu.initOverlayTap($folderContextMenu);
@@ -124,6 +125,7 @@ mobile.cloud.contextMenu = {
 
             // Initialise buttons
             mobile.cloud.contextMenu.initPreviewButton($fileContextMenu, nodeHandle);
+            mobile.cloud.contextMenu.initRenameButton($fileContextMenu, nodeHandle);
             mobile.cloud.contextMenu.initDeleteButton($fileContextMenu, nodeHandle);
             mobile.cloud.contextMenu.initCloseButton($fileContextMenu);
             mobile.cloud.contextMenu.initOverlayTap($folderContextMenu);
@@ -430,6 +432,30 @@ mobile.cloud.contextMenu = {
             // Show the Get/Manage link overlay and close the context menu
             mobile.cloud.contextMenu.hide();
             mobile.linkOverlay.show(nodeHandle);
+            return false;
+        });
+    },
+
+    /**
+     * Functionality for showing the overlay which will let the user rename file/folder
+     * @param {Object} $contextMenu A jQuery object for the folder/file context menu container
+     * @param {String} nodeHandle The node handle for this folder/file
+     * @returns {Boolean} Returns false
+     */
+    initRenameButton: function($contextMenu, nodeHandle) {
+
+        'use strict';
+
+        // When the Rename button is tapped
+        $('.rename-button', $contextMenu).rebind('tap', () => {
+
+            if (!validateUserAction(true)) {
+                return false;
+            }
+
+            // Show the Rename overlay and close the context menu
+            mobile.renameOverlay.init(nodeHandle);
+            mobile.cloud.contextMenu.hide();
             return false;
         });
     },

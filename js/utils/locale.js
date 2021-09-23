@@ -933,6 +933,11 @@ mBroadcaster.once('boot_done', function populate_l() {
     l[1993] = l[1993].replace('[A]', '<a href="/register" class="clickurl">').replace('[/A]', '</a>');
 
     l[5931] = l[5931].replace('[A]', '<a href="/fm/account" class="clickurl">').replace('[/A]', '</a>');
+    l[6216] = l[6216]
+        .replace('[A1]', '<a href="/fm/account/security/change-email" class="clickurl">')
+        .replace('[/A1]', '</a>')
+        .replace('[A2]', '<a href="mailto:support@mega.nz">')
+        .replace('[/A2]', '</a>');
     l[6976] = l[6976].replace('%1', '<span class="plan-name"></span>');
     l[7156] = l[7156].replace('[A]', '<a href="/mobile" class="clickurl">').replace('[/A]', '</a>');
     l[7002] = l[7002].replace('[A]', '<a href="/contact" class="clickurl">').replace('[/A]', '</a>');

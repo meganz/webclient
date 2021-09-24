@@ -148,7 +148,7 @@ MegaData.prototype.menuItems = function menuItems() {
         dbfetch.geta(nodes)
             .always(function () {
                 var preparedItems = M.menuItemsSync();
-                    checkMegaSync(preparedItems);
+                checkMegaSync(preparedItems);
             });
     }
     else {

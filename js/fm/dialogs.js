@@ -991,6 +991,10 @@
      * @param {String|Object} [aMode] Copy dialog mode (share, save, etc)
      */
     var handleOpenDialog = function(aTab, aTarget, aMode) {
+        // Save an snapshot of selected nodes at time of invocation, given $.hideContextMenu(); could swap
+        // the internal list as part of cleanup performed during closing context-menus, e.g. for in-shares
+        const preUserSelection = window.selectionManager && selectionManager.get_selected() || $.selected;
+
         onIdle(function() {
             /** @name $.copyDialog */
             /** @name $.moveDialog */
@@ -1002,6 +1006,17 @@
                 /** @name $.copyToUpload */
                 /** @name $.saveToDialog */
                 $[aMode.key || aMode] = aMode.value || true;
+            }
+
+            if (preUserSelection && preUserSelection.length) {
+                const postSelection = window.selectionManager && selectionManager.get_selected() || $.selected;
+
+                if (preUserSelection !== postSelection) {
+                    $.selected = preUserSelection;
+                    if (window.selectionManager) {
+                        selectionManager.reinitialize();
+                    }
+                }
             }
 
             $('.search-bar input', $dialog).val('');

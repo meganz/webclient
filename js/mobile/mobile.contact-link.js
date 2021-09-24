@@ -21,7 +21,12 @@ MobileContactLink.prototype.showContactLinkInfo = function _showContactLinkInfo(
         if (!mega.ui.contactLinkCardDialog) {
             return;
         }
-        $('#fmholder').append(mega.ui.contactLinkCardDialog);
+        if (!u_type) {
+            $('#startholder').safeAppend(mega.ui.contactLinkCardDialog);
+        }
+        else {
+            $('#fmholder').safeAppend(mega.ui.contactLinkCardDialog);
+        }
         $mobileContactInfoDlg = $('#mobile-ui-contact-card');
     }
 

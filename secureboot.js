@@ -2952,6 +2952,7 @@ else if (!browserUpdate) {
     // Load files common to all mobile pages
     if (is_mobile) {
         jsl.push({f:'html/top-mobile.html', n: 'top-mobile', j:0});
+        jsl.push({f:'html/mobile-add-contact-card.html', n: 'mobile-add-contact-card', j:0});
         jsl.push({f:'css/mobile.css', n: 'mobile_css', j: 2, w: 30, c: 1, d: 1, m: 1});
         jsl.push({f:'css/mobile-help.css', n: 'mobile_css', j: 2, w: 30, c: 1, d: 1, m: 1});
         jsl.push({f:'css/mobile-top-menu.css', n: 'mobile_top_menu_css',  j: 2, w: 30, c: 1, d: 1, m: 1});

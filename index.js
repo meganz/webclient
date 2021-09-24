@@ -430,15 +430,7 @@ function init_page() {
         else {
             var processContactLink = function() {
                 if (!mega.ui.contactLinkCardDialog) {
-                    // because there's a strange solution applied by someone to clear the top-mobile
-                    // and to re-do everything in the header in mobile.html !!
-                    // --> in order to stop the snow ball of duplication(html code)
-                    // i will get the dialog from memory and store it in memory to be embadded when needed.
-                    var startTokenLine = '<!-- important token to get the below dialog to memory, DONT REMOVE LINE-->';
-                    var endTokenLine = '<!-- important token to get the above dialog to memory, DONT REMOVE LINE-->';
-                    var startPos = pages['top-mobile'].indexOf(startTokenLine) + startTokenLine.length;
-                    var endPos = pages['top-mobile'].indexOf(endTokenLine);
-                    var contactLinkCardHtml = pages['top-mobile'].substring(startPos, endPos);
+                    var contactLinkCardHtml = pages['mobile-add-contact-card'];
                     if (contactLinkCardHtml) {
                         mega.ui.contactLinkCardDialog = contactLinkCardHtml;
                     }

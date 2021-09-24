@@ -266,9 +266,8 @@ function init_start() {
     }
     else if (is_mobile && page === 'start') {
         if (!mega.ui.contactLinkCardDialog) {
-            var contactLinkCardHtml = $('#mobile-ui-contact-card');
-            if (contactLinkCardHtml && contactLinkCardHtml.length) {
-                contactLinkCardHtml = contactLinkCardHtml[0].outerHTML;
+            var contactLinkCardHtml = pages['mobile-add-contact-card'];
+            if (contactLinkCardHtml) {
                 mega.ui.contactLinkCardDialog = contactLinkCardHtml;
             }
         }

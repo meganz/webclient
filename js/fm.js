@@ -659,7 +659,7 @@ function contactVsUserDialog() {
  *
  * Handle add contact dialog UI
  * @param {Boolean} close               dialog parameter
- * @param {Boolean} dontWarnBusiness    if true, then porceed to show the dialog
+ * @param {Boolean} dontWarnBusiness    if true, then proceed to show the dialog
  */
 function contactAddDialog(close, dontWarnBusiness) {
     var $d = $('.add-user-popup');
@@ -703,7 +703,7 @@ function contactAddDialog(close, dontWarnBusiness) {
         $('.add-contact-multiple-input input', $d).trigger("focus");
     });
 
-    $('.add-user-popup-button span', $d).text(l[19112])
+    $('.add-user-popup-button span', $d).text(l[19112]);
     $('.add-user-popup-button', $d).addClass('hidden');
 
     if (u_attr && u_attr.b) {
@@ -714,7 +714,7 @@ function contactAddDialog(close, dontWarnBusiness) {
     }
 
     initTextareaScrolling($textarea, 72);
-    $('.add-contact-multiple-input input', $d).trigger("focus");
+    $('input.add-contact-multiple-input', $d).trigger("focus");
     focusOnInput();
 
     $d.find('.hidden-textarea-info span').rebind('click', function() {

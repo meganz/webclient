@@ -724,7 +724,6 @@ FileManager.prototype.initFileManagerUI = function() {
             }
         }
 
-        $('.grid-url-arrow').removeClass('active');
         $('.nw-sorting-menu').addClass('hidden');
         $('.colour-sorting-menu').addClass('hidden');
         $('.fm-start-chat-dropdown').addClass('hidden').removeClass('active');
@@ -743,6 +742,12 @@ FileManager.prototype.initFileManagerUI = function() {
             $jqe.trigger('click');
         }
         $('.fm-share-download').removeClass('active disabled');
+
+        const $threeDotsContextMenu = $('.shared-details-info-block .grid-url-arrow');
+        if ($threeDotsContextMenu.hasClass('active')) {
+            $threeDotsContextMenu.trigger('click');
+        }
+        $('.grid-url-arrow').removeClass('active');
 
         // Set to default
         a = $('.dropdown.body.files-menu,.dropdown.body.download');

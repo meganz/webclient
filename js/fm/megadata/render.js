@@ -83,6 +83,7 @@ MegaData.prototype.rmSetupUI = function(u, refresh) {
     }
 
     var cmIconHandler = function _cmIconHandler(listView, elm, ev) {
+        $.hideContextMenu(ev);
         var target = listView ? $(this).closest('tr') : $(this).parents('.data-block-view');
 
         if (!target.hasClass('ui-selected')) {
@@ -105,7 +106,6 @@ MegaData.prototype.rmSetupUI = function(u, refresh) {
             $(this).addClass('active');
         }
         else {
-            $.hideContextMenu();
             $(this).removeClass('active');
         }
 
@@ -122,6 +122,7 @@ MegaData.prototype.rmSetupUI = function(u, refresh) {
     if (!u) {
 
         if (this.currentrootid === 'shares') {
+            let savedUserSelection = null;
 
             var prepareShareMenuHandler = function(e) {
                 e.preventDefault();
@@ -134,14 +135,33 @@ MegaData.prototype.rmSetupUI = function(u, refresh) {
             };
 
             $('.shared-details-info-block .grid-url-arrow').rebind('click.sharesui', function(e) {
+                const $this = $(this);
                 prepareShareMenuHandler(e);
-                if (!$(this).hasClass('active')) {
-                    M.contextMenuUI(e, 1);
-                    $(this).addClass('active');
+                if ($this.hasClass('active')) {
+                    $this.removeClass('active');
+                    $.hideContextMenu();
+
+                    $.selected = savedUserSelection || [];
+                    savedUserSelection = false;
+
+                    if (window.selectionManager) {
+                        return selectionManager.reinitialize();
+                    }
                 }
                 else {
                     $.hideContextMenu();
-                    $(this).removeClass('active');
+
+                    // Replace the selection to the parent node
+                    if (window.selectionManager) {
+                        savedUserSelection = selectionManager.get_selected();
+                        selectionManager.resetTo(M.currentdirid);
+                    }
+                    else {
+                        savedUserSelection = $.selected;
+                        $.selected = [M.currentdirid];
+                    }
+                    M.contextMenuUI(e, 1);
+                    $this.addClass('active');
                 }
             });
 

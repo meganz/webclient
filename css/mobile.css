@@ -1104,6 +1104,12 @@ ul, li {
 .mobile.fm-block.disable-scroll .fm-scrolling {
     overflow: hidden;
 }
+.mobile.fm-floating-header {
+    position: relative;
+    display: flex;
+    align-items: center;
+    background-color: #f5f6f7;
+}
 .mobile.folders-files-text {
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
@@ -1115,6 +1121,44 @@ ul, li {
     height: 42px;
     line-height: 18px;
     padding: 12px 0 12px 20px;
+}
+.mobile.fm-floating-header .mobile.sort-grid-item-main {
+    position: absolute;
+    right: 10px;
+    cursor: pointer;
+}
+.mobile.sort-grid-item-main i {
+    --icon-size: 24px;
+    opacity: 0.5;
+}
+.mobile.sort .context-menu-item {
+    display: flex;
+    align-items: center;
+}
+.mobile.sort .context-menu-item .fm-icon {
+    background-image: url("../images/mobile/sorting.png") !important;
+    background-repeat: no-repeat;
+    width: 24px;
+    height: 24px;
+    background-size: 477px 172px;
+}
+.mobile.sort .context-menu-item.nameasc .fm-icon {
+    background-position: -52px -16px;
+}
+.mobile.sort .context-menu-item.namedesc .fm-icon {
+    background-position: -82px -16px;
+}
+.mobile.sort .context-menu-item.sizeasc .fm-icon {
+    background-position: -122px -16px;
+}
+.mobile.sort .context-menu-item.sizedesc .fm-icon {
+    background-position: -152px -16px;
+}
+.mobile.sort .context-menu-item.firstadd .fm-icon {
+    background-position: -182px -16px;
+}
+.mobile.sort .context-menu-item.lastadd .fm-icon {
+    background-position: -212px -16px;
 }
 .mobile.bottom-action-bar {
     -webkit-box-sizing: border-box;
@@ -2086,7 +2130,7 @@ ul, li {
 .mobile.empty-rubbishbin {
     background-color: #f5f6f7;
 }
-.mobile.empty-rubbishbin .folders-files-text {
+.mobile.empty-rubbishbin .fm-floating-header {
     display: none;
 }
 .mobile.empty-cloud .empty-cloud-block, .mobile.empty-folder .empty-folder-block, .mobile.empty-rubbishbin .empty-rubbishbin-block  {

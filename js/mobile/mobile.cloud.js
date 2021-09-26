@@ -54,6 +54,8 @@ mobile.cloud = {
         // Initialise context menu on each row
         mobile.cloud.contextMenu.init();
 
+        mobile.cloud.sort.init();
+
         // Initialise the bottom action bar for Scroll-to-Top, Add Folder, Upload File functionality etc
         mobile.cloud.actionBar.init();
 

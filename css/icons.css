@@ -889,6 +889,12 @@ button.active .semi-big-icon.nwse-resize,
 .medium-icon.icons-img.red-heart {
     background-position: -111px -825px;
 }
+.medium-icon.icons-img.fullscreen.icon-fullscreen-enter {
+    background-position: -95px -580px;
+}
+.medium-icon.icons-img.fullscreen.icon-fullscreen-leave {
+    background-position: -141px -580px;
+}
 .medium-icon.icons-img.fullscreen {
     background-position: -95px -580px;
 }

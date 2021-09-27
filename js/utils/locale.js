@@ -1346,6 +1346,15 @@ mBroadcaster.once('boot_done', function populate_l() {
     l.recovery_ios_step_2 = escapeHTML(l.recovery_ios_step_2)
         .replace('[B]', '<strong>')
         .replace('[/B]', '</strong>');
+    l.warning_has_subs_with_3p = l.warning_has_subs_with_3p
+        .replace('[A1]', '<a class="red" href="mailto:support@mega.nz">').replace('[/A1]', '</a>')
+        .replace('[A2]', `<a class="red" target="_blank" href="${getBaseUrl()}/help/client/android/accounts-and-pro-` +
+            `accounts#how-can-i-cancel-the-renewal-of-my-mega-subscription-57733f8b886688e7028b45cf">`)
+        .replace('[/A2]', '</a>')
+        .replace('[A3]', `<a class="red" target="_blank" href="${getBaseUrl()}/help/client/ios/accounts-and-pro-` +
+            `accounts#how-does-mega-pro-account-subscription-work-with-apple-in-app-purchases` +
+            `-57732e9f886688e7028b45bd">`)
+        .replace('[/A3]', '</a>');
 
     var common = [
         15536, 16106, 16107, 16119, 16120, 16123, 16124, 16135, 16136, 16137, 16138, 16304, 16313, 16315, 16316,

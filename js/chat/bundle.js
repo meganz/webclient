@@ -1007,10 +1007,10 @@ class Dropdown extends _stores_mixins_js1__["MegaRenderMixin"] {
 
       return true;
     } else if (this.props.focused != nextProps.focused) {
-      return true;
-    } else if (this.state && this.state.active != nextState.active) {
-      return true;
-    }
+        return true;
+      } else if (this.state && this.state.active != nextState.active) {
+          return true;
+        }
 
     return undefined;
   }
@@ -1237,14 +1237,14 @@ class DropdownContactsSelector extends _stores_mixins_js1__["MegaRenderMixin"] {
     if (this.props.active != nextProps.active) {
       return true;
     } else if (this.props.focused != nextProps.focused) {
-      return true;
-    } else if (this.state && this.state.active != nextState.active) {
-      return true;
-    } else if (this.state && JSON.stringify(this.state.selected) != JSON.stringify(nextState.selected)) {
-      return true;
-    } else {
-      return undefined;
-    }
+        return true;
+      } else if (this.state && this.state.active != nextState.active) {
+          return true;
+        } else if (this.state && JSON.stringify(this.state.selected) != JSON.stringify(nextState.selected)) {
+            return true;
+          } else {
+            return undefined;
+          }
   }
 
   onSelected(nodes) {
@@ -2902,8 +2902,8 @@ class Button extends _stores_mixins_js2__["MegaRenderMixin"] {
       $('.conversationsApp').rebind('mousedown.button' + this.getUniqueId(), this.onBlur);
       $(document).rebind('keyup.button' + this.getUniqueId(), e => {
         if (this.state.focused === true && e.keyCode === 27) {
-          this.onBlur();
-        }
+            this.onBlur();
+          }
       });
 
       if (this._pageChangeListener) {
@@ -7780,7 +7780,7 @@ let megaList2_MegaList2 = (_dec = Object(mixins["SoonFcWrap"])(30, true), (_clas
     }
   }
 
-  requestThumbnailCb(node, immediate) {
+  requestThumbnailCb(node, immediate, callback) {
     if (thumbnails[node.h]) {
       return;
     }
@@ -7792,7 +7792,7 @@ let megaList2_MegaList2 = (_dec = Object(mixins["SoonFcWrap"])(30, true), (_clas
     this.thumbsThatRequireLoading.push(node);
 
     if (immediate) {
-      fm_thumbnails('standalone', this.thumbsThatRequireLoading);
+      fm_thumbnails('standalone', this.thumbsThatRequireLoading, callback);
       this.thumbsThatRequireLoading = [];
     }
   }
@@ -8443,18 +8443,31 @@ var tooltips = __webpack_require__(13);
 class columnNodeName_ColumnNodeName extends genericNodePropsComponent_GenericNodePropsComponent {
   constructor(...args) {
     super(...args);
+    this.state = {
+      src: null
+    };
 
-    this.getThumbnailSrc = node => {
+    this.setAttributes = () => {
+      const {
+        node
+      } = this.props;
       node.imgId = "preview_" + node.h;
       node.seen = node.seen || 1;
-      return window.noThumbURI || '';
     };
+  }
+
+  componentDidMount() {
+    super.componentDidMount();
+    this.setAttributes();
   }
 
   render() {
     const {
       nodeAdapter
     } = this.props;
+    const {
+      src
+    } = this.state;
     const {
       node,
       requestThumbnailCb
@@ -8465,8 +8478,10 @@ class columnNodeName_ColumnNodeName extends genericNodePropsComponent_GenericNod
       withArrow: true,
       className: "tooltip-handler-container",
       onShown: () => {
-        if (!thumbnails[node.h]) {
-          requestThumbnailCb(node, true);
+        if (!src) {
+          requestThumbnailCb(node, true, handle => this.setState({
+            src: thumbnails[handle]
+          }));
         }
       }
     }, external_React_default.a.createElement(tooltips["a" ].Handler, {
@@ -8479,14 +8494,7 @@ class columnNodeName_ColumnNodeName extends genericNodePropsComponent_GenericNod
     }, external_React_default.a.createElement("img", {
       alt: "",
       className: "thumbnail-placeholder " + node.h,
-      src: thumbnails[node.h] || this.getThumbnailSrc(node),
-      width: "156",
-      height: "156",
-      onLoad: () => {
-        if (thumbnails[node.h]) {
-          this.safeForceUpdate();
-        }
-      }
+      src: node.fa ? src || staticpath + "/images/mega/ajax-loader-tiny.gif" : window.noThumbURI
     })))) : external_React_default.a.createElement("span", {
       className: "\n                            transfer-filetype-icon\n                            " + (nodeAdapter.nodeProps.isFolder ? 'folder' : '') + "\n                            " + nodeAdapter.nodeProps.icon + "\n                            " + (node.su ? 'inbound-share' : '') + "\n                        "
     }), external_React_default.a.createElement("span", {
@@ -8496,9 +8504,9 @@ class columnNodeName_ColumnNodeName extends genericNodePropsComponent_GenericNod
 
 }
 columnNodeName_ColumnNodeName.sortable = true;
-columnNodeName_ColumnNodeName.id = "name";
+columnNodeName_ColumnNodeName.id = 'name';
 columnNodeName_ColumnNodeName.label = l[86];
-columnNodeName_ColumnNodeName.megatype = "fname";
+columnNodeName_ColumnNodeName.megatype = 'fname';
 // CONCATENATED MODULE: ./js/ui/jsx/fm/nodes/columns/columnSize.jsx
 
 
@@ -10545,8 +10553,8 @@ class gifPanel_GifPanel extends mixins["MegaRenderMixin"] {
         keyCode
       }) => {
         if (keyCode && keyCode === 27) {
-          return searchField_SearchField.hasValue() ? this.doReset() : this.props.onToggle();
-        }
+            return searchField_SearchField.hasValue() ? this.doReset() : this.props.onToggle();
+          }
       });
     };
 
@@ -19368,8 +19376,8 @@ class searchPanel_SearchPanel extends mixins["MegaRenderMixin"] {
       } = ev;
 
       if (keyCode && keyCode === 27) {
-        return searchPanel_searchField_SearchField.hasValue() ? this.handleReset() : this.toggleMinimize();
-      }
+          return searchPanel_searchField_SearchField.hasValue() ? this.handleReset() : this.toggleMinimize();
+        }
     };
 
     this.handleChange = ev => {
@@ -20004,48 +20012,48 @@ class contactList_ContactList extends mixins["MegaRenderMixin"] {
     } = this.props;
 
     if (contacts && contacts.length > 1) {
-      return external_React_default.a.createElement("div", {
-        className: "contacts-list"
-      }, external_React_default.a.createElement(fmView_FMView, {
-        dataSource: this.props.contacts,
-        customFilterFn: r => {
-          return r.c === 1;
-        },
-        currentlyViewedEntry: "contacts",
-        onSelected: this.onSelected,
-        onHighlighted: this.onHighlighted,
-        searchValue: this.state.searchValue,
-        onExpand: this.onExpand,
-        onAttachClicked: this.onAttachClicked,
-        viewMode: 0,
-        currentdirid: "contacts",
-        megaListItemHeight: 59,
-        headerContainerClassName: "contacts-table contacts-table-head",
-        containerClassName: "contacts-table contacts-table-results",
-        onContextMenu: (ev, handle) => this.handleContextMenu(ev, handle),
-        listAdapterColumns: [columnContactName_ColumnContactName, columnContactStatus_ColumnContactStatus, [columnContactLastInteraction_ColumnContactLastInteraction, {
-          interactions: this.state.interactions
-        }], [columnContactButtons_ColumnContactButtons, {
-          onContextMenuRef: (handle, node) => {
-            this.contextMenuRefs[handle] = node;
+        return external_React_default.a.createElement("div", {
+          className: "contacts-list"
+        }, external_React_default.a.createElement(fmView_FMView, {
+          dataSource: this.props.contacts,
+          customFilterFn: r => {
+            return r.c === 1;
           },
-          onActiveChange: opened => {
-            if (!opened) {
-              this.setState({
-                contextMenuPosition: null
-              });
-            }
-          },
-          contextMenuPosition: this.state.contextMenuPosition
-        }]],
-        initialSortBy: ['status', 'asc'],
-        fmConfigSortEnabled: true,
-        fmConfigSortId: "contacts",
-        NilComponent: external_React_default.a.createElement(nil_Nil, {
-          title: l[5737]
-        })
-      }));
-    }
+          currentlyViewedEntry: "contacts",
+          onSelected: this.onSelected,
+          onHighlighted: this.onHighlighted,
+          searchValue: this.state.searchValue,
+          onExpand: this.onExpand,
+          onAttachClicked: this.onAttachClicked,
+          viewMode: 0,
+          currentdirid: "contacts",
+          megaListItemHeight: 59,
+          headerContainerClassName: "contacts-table contacts-table-head",
+          containerClassName: "contacts-table contacts-table-results",
+          onContextMenu: (ev, handle) => this.handleContextMenu(ev, handle),
+          listAdapterColumns: [columnContactName_ColumnContactName, columnContactStatus_ColumnContactStatus, [columnContactLastInteraction_ColumnContactLastInteraction, {
+            interactions: this.state.interactions
+          }], [columnContactButtons_ColumnContactButtons, {
+            onContextMenuRef: (handle, node) => {
+              this.contextMenuRefs[handle] = node;
+            },
+            onActiveChange: opened => {
+              if (!opened) {
+                this.setState({
+                  contextMenuPosition: null
+                });
+              }
+            },
+            contextMenuPosition: this.state.contextMenuPosition
+          }]],
+          initialSortBy: ['status', 'asc'],
+          fmConfigSortEnabled: true,
+          fmConfigSortId: "contacts",
+          NilComponent: external_React_default.a.createElement(nil_Nil, {
+            title: l[5737]
+          })
+        }));
+      }
 
     return external_React_default.a.createElement(nil_Nil, {
       title: l[5737]
@@ -20745,12 +20753,12 @@ class contactsPanel_ContactsPanel extends mixins["MegaRenderMixin"] {
       keyCode
     }) => {
       if (keyCode === 27) {
-        const HAS_DIALOG_OPENED = $.dialog || ['.contact-nickname-dialog', '.fingerprint-dialog', '.context'].some(selector => {
-          const dialog = document.querySelector(selector);
-          return dialog && dialog.offsetHeight > 0;
-        });
-        return HAS_DIALOG_OPENED ? keyCode : loadSubPage('fm/chat');
-      }
+          const HAS_DIALOG_OPENED = $.dialog || ['.contact-nickname-dialog', '.fingerprint-dialog', '.context'].some(selector => {
+            const dialog = document.querySelector(selector);
+            return dialog && dialog.offsetHeight > 0;
+          });
+          return HAS_DIALOG_OPENED ? keyCode : loadSubPage('fm/chat');
+        }
     };
 
     this.handleAcceptAllRequests = () => {

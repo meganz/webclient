@@ -7821,7 +7821,7 @@ body.de .mega-dialog.new-group-chat {
         width: 100px;
         height: 100px;
         font-size: 38px;
-        line-height: 94px;
+        line-height: 96px;
         font-family: 'LatoWebSemibold', Arial, sans-serif;
         margin: 0 auto;
         float: none;
@@ -7832,6 +7832,7 @@ body.de .mega-dialog.new-group-chat {
     .mega-dialog.qr-contact .avatar-wrapper img {
         width: 96px;
         height: 96px;
+        margin-top: 2px;
     }
     .mega-dialog.qr-contact .qr-contact-name {
         color: var(--text-color-high);

@@ -109,8 +109,7 @@ export default class StreamNode extends MegaRenderMixin {
 
     @SoonFcWrap(350, true)
     @rAFWrap()
-    onResizeObserved(args) {
-        const [w, h] = args;
+    onResizeObserved(w, h) {
         const { stream } = this.props;
 
         if (!(stream instanceof CallManager2.Peer) || stream.isFake) {

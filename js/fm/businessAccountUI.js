@@ -920,9 +920,9 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
     }
 
     if (subUser.isAdmin) {
-        $subAccountContainer.find('.profile-button-container .migrate-data, .profile-button-container .edit-profile, '
+        $('.profile-button-container .migrate-data,'
             + '.profile-button-container .resend-verification, .profile-button-container .disable-account,' +
-            '.profile-button-container .reset-sub-user-password').addClass('disabled');
+            '.profile-button-container .reset-sub-user-password', $subAccountContainer).addClass('disabled');
         $subAccountContainer.find('.admin-icon.role').removeClass('hidden');
     }
     else {

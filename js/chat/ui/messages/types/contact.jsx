@@ -107,6 +107,7 @@ export default class Contact extends AbstractGenericMessage {
                                 label={l[5868] /* `View profile` */}
                                 onClick={() => {
                                     loadSubPage("fm/chat/contacts/" + contact.u);
+                                    mBroadcaster.sendMessage('contact:open');
                                 }}
                             />
                             <hr/>
@@ -115,12 +116,13 @@ export default class Contact extends AbstractGenericMessage {
                                 label={l[8632] /* `Start new chat` */}
                                 onClick={() => {
                                     loadSubPage("fm/chat/p/" + contact.u);
+                                    mBroadcaster.sendMessage('chat:open');
                                 }}
                             />
                         </>
                     )}
 
-                    {!HAS_RELATIONSHIP && (
+                    {!HAS_RELATIONSHIP &&  !is_eplusplus && (
                         <DropdownItem
                             icon="sprite-fm-mono icon-add-filled"
                             label={l[71] /* `Add contact` */}

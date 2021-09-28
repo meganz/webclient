@@ -110,6 +110,82 @@ button:not(.mega-button) .icon {
     background-repeat: no-repeat;
     float: left;
 }
+button.icon-dropdown.disabled > i {
+    cursor: default;
+}
+.icon-dropdown.disabled {
+    cursor: default;
+    opacity: 0.6;
+}
+button.icon-dropdown:not(.disabled):hover,
+button.icon-dropdown.active {
+    background-image: url(../images/mega/new-chat-sprite.png);
+    background-repeat: no-repeat;
+    background-position: -64px -657px;
+}
+button.icon-dropdown:not(.disabled).active {
+    background-position: -64px -699px;
+}
+button.icon-dropdown:not(.disabled):hover::before,
+button.icon-dropdown:not(.disabled):hover::after,
+button.icon-dropdown.active::before,
+button.icon-dropdown.active::after {
+    content: '';
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    left: 0;
+    top: 0;
+    border-radius: 2px;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.05);
+}
+
+
+button.disabled.visible {
+    cursor: default;
+    opacity: 0.6;
+}
+.link-button.left {
+    margin-left: 5px;
+}
+.link-button.right {
+    margin-right: 5px;
+}
+.link-button.light {
+    font-size: 13px;
+    white-space: normal;
+    height: 32px;
+    color: #333;
+    border-radius: 4px;
+    margin: 2px 0;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+.link-button.light.hidden {
+    display: none;
+}
+.link-button.light span,
+.dropdown-item.link-button.light span {
+    padding-right: 20px;
+    /* TODO: validate */
+    /*padding-top: 2px;*/ /* to fix the illusion of the text not being centred */
+}
+.link-button.light:not(.disabled):hover,
+.dropdown-item.link-button.light:not(.disabled):hover {
+    background-color: var(--surface-main);
+}
+/* buttons for business account */
+button:not(.mega-button) .icon {
+    width: 24px;
+    height: 24px;
+    margin: 3px 8px 4px 0;
+    background-image: url(../images/mega/fm-main-sprite.png);
+    box-sizing: border-box;
+    background-repeat: no-repeat;
+    float: left;
+}
 .link-button {
     display: block;
     cursor: pointer;

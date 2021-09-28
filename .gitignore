@@ -272,6 +272,8 @@ jsconfig.json #vscode js config
 /webclient.sln
 /vwd.webinfo
 
+css/chat-bundle.css.map
+
 #############
 ## PHPstorm project metadata
 #############

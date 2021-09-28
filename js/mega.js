@@ -2186,10 +2186,8 @@ var mclp;
 
 function loadfm(force) {
     "use strict";
+    assert(!is_chatlink);
 
-    if (anonymouschat) {
-        return;
-    }
     if (force) {
         localStorage.force = true;
         loadfm.loaded = false;
@@ -3406,7 +3404,7 @@ function init_chat(action) {
         var __init_chat = function() {
             var result = false;
 
-            if ((anonymouschat || u_type) && !megaChatIsReady) {
+            if ((is_chatlink || u_type || is_eplusplus) && !megaChatIsReady) {
                 if (d) {
                     console.info('Initializing the chat...');
                 }
@@ -3442,7 +3440,7 @@ function init_chat(action) {
                     mclp.always(__init_chat);
                 });
         }
-        else if (anonymouschat) {
+        else if (is_chatlink) {
             mclp.always(__init_chat);
         }
         else if (pfid) {
@@ -3699,7 +3697,7 @@ function loadfm_done(mDBload) {
 
         if ((location.host === 'mega.nz' || !megaChatIsDisabled) && !is_mobile) {
 
-            if (!pfid && u_type === 3 && !loadfm.chatloading) {
+            if (!pfid && !loadfm.chatloading && (u_type === 3 || is_eplusplus)) {
                 loadfm.chatloading = true;
 
                 M.require('chat')

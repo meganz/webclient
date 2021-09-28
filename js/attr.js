@@ -11,6 +11,17 @@
     var ATTRIB_CACHE_NON_CONTACT_EXP_TIME = 2 * 60 * 60;
     var REVOKE_INFLIGHT = !1; // Lyubo is not happy so disabled for now :)
 
+    var ATTR_REQ_CHANNEL = {
+        '*keyring': 6,
+        '*!authring': 6,
+        '*!authRSA': 6,
+        '*!authCu255': 6,
+        '+puCu255': 6,
+        '+sigCu255': 6,
+        '+puEd255': 6,
+        '+sigPubk': 6
+    };
+
     /**
      * Assemble property name on Mega API.
      *
@@ -367,10 +378,18 @@
             }
             else {
                 if (chathandle) {
-                    api_req({'a': 'mcuga', "ph": chathandle, 'u': userhandle, 'ua': attribute, 'v': 1}, myCtx);
+                    api_req(
+                        {'a': 'mcuga', "ph": chathandle, 'u': userhandle, 'ua': attribute, 'v': 1},
+                        myCtx,
+                        ATTR_REQ_CHANNEL[attribute]
+                    );
                 }
                 else {
-                    api_req({'a': 'uga', 'u': userhandle, 'ua': attribute, 'v': 1}, myCtx);
+                    api_req(
+                        {'a': 'uga', 'u': userhandle, 'ua': attribute, 'v': 1},
+                        myCtx,
+                        ATTR_REQ_CHANNEL[attribute]
+                    );
                 }
             }
         };
@@ -486,7 +505,7 @@
                             resolve();
                         }
                     }
-                });
+                }, ATTR_REQ_CHANNEL[attribute]);
             });
     });
 
@@ -669,6 +688,20 @@
             }
         };
 
+        if (window.is_chatlink) {
+            switch (attrName) {
+                case 'authRSA':
+                case 'authring':
+                case 'authCu255':
+                    if (d) {
+                        logger.warn('Leaving attribute "%s" into memory-only mode.', attribute);
+                    }
+                    // @todo smartly sync/merge those attributes when the (full reg.) user moves away from the chat-link
+                    queueMicrotask(() => settleFunction([]));
+                    return thePromise;
+            }
+        }
+
         // Assemble context for this async API request.
         myCtx.ua = attribute;
         myCtx.callback = settleFunction;
@@ -687,7 +720,7 @@
                     version
                 ];
 
-                api_req(apiCall, myCtx);
+                api_req(apiCall, myCtx, ATTR_REQ_CHANNEL[attribute]);
             }
             else {
                 // retrieve version/data from cache or server?
@@ -706,7 +739,7 @@
                             savedValue
                         ];
                     }
-                    api_req(apiCall, myCtx);
+                    api_req(apiCall, myCtx, ATTR_REQ_CHANNEL[attribute]);
                 });
 
             }
@@ -714,7 +747,7 @@
         else {
             apiCall[attribute] = savedValue;
 
-            api_req(apiCall, myCtx);
+            api_req(apiCall, myCtx, ATTR_REQ_CHANNEL[attribute]);
         }
 
 

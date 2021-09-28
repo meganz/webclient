@@ -218,6 +218,11 @@
             transition: opacity 200ms ease-in-out;
         }
 
+        .mega-dialog.start-meeting button.close i {
+            --mask-color: var(--secondary-white);
+            opacity: 1;
+        }
+
         .mega-dialog button.close i:hover {
             opacity: 0.8;
         }

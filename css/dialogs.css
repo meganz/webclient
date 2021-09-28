@@ -148,6 +148,12 @@
 }
 
 /* Send Contact Dialog */
+.mega-dialog.new-group-chat .content-block {
+    padding: 0;
+}
+.mega-dialog.new-group-chat .group-chat-dialog.content {
+    padding: 0 48px;
+}
 .mega-dialog.send-contact, .mega-dialog.new-group-chat {
     width: 420px;
 }
@@ -164,10 +170,14 @@ body.de .mega-dialog.new-group-chat {
     padding: 0 0 0 12px;
 }
 .mega-dialog.send-contact .contacts-search-scroll, .mega-dialog.new-group-chat .contacts-search-scroll {
+    margin: 8px auto 0;
     height: 320px !important;
 }
 .contacts-search-header .small-icon.conversations {
     opacity: 0.65;
+}
+.mega-dialog.send-contact .content-block {
+    padding: 0;
 }
 /* End of Send Contact Dialog */
 
@@ -1592,6 +1602,18 @@ body.de .mega-dialog.new-group-chat {
 .fm-dialog-body .nw-conversations-item {
     padding-left: 13px;
     border: 0;
+    color: #333;
+    font-family: 'LatoWeb';
+    font-size: 14px;
+    letter-spacing: 1px;
+    line-height: 17px;
+    margin-left: 34px;
+    padding: 8px 0 14px 0;
+    width: 343px;
+}
+.contact-nickname-dialog .horizontal-bar {
+    background-color: #00bfa5;
+    height: 1px;
 }
 .share-dialog-tree-panel.active {
     display: block;
@@ -7847,23 +7869,46 @@ body.de .mega-dialog.new-group-chat {
     .mega-dialog.group-chat-link .content-block {
         text-align: left;
     }
+    .mega-dialog.group-chat-link.in-call-info header h2,
+    .mega-dialog.group-chat-link.in-call-info .content-block {
+        text-align: left;
+    }
     .fr .mega-dialog.group-chat-link {
         width: 440px;
     }
+    .mega-dialog.group-chat-link .link-input-container,
+    .mega-dialog.invite .link-input-container {
+        position: relative;
+    }
+    .mega-dialog.group-chat-link .link-input-container input {
+        padding-right: 75px;
+    }
+    .mega-dialog.group-chat-link .link-input-container button {
+        position: absolute;
+        top: 50%;
+        right: 0;
+        transform: translateY(-50%);
+        border-radius: 0 4px 4px 0;
+        z-index: 11;
+    }
     .mega-dialog.group-chat-link .info {
-        font: var(--text-body1);
         color: var(--text-color-medium);
         padding-top: 7px;
+    }
+    .mega-dialog.group-chat-link .info span {
+        color: var(--text-color-high);
     }
     .mega-dialog.group-chat-link .big-icon {
         margin: 12px auto 0 auto;
     }
-    .mega-dialog.group-chat-link .chat-link-input {
+    .mega-dialog.group-chat-link .chat-link-input,
+    .mega-dialog.invite .chat-link-input {
         position: relative;
         box-sizing: border-box;
         padding: 0 10px 0 0;
     }
-    .mega-dialog.group-chat-link .chat-link-input i {
+    .mega-dialog.group-chat-link .chat-link-input i,
+    .mega-dialog.invite .chat-link-input i {
         position: absolute;
         left: 5px;
         top: 50%;
@@ -7871,7 +7916,8 @@ body.de .mega-dialog.new-group-chat {
         --icon-size: 28px;
         --mask-color: var(--icon-rest);
     }
-    .mega-dialog.group-chat-link .chat-link-input input {
+    .mega-dialog.group-chat-link .chat-link-input input,
+    .mega-dialog.invite .chat-link-input input {
         width: 100%;
         height: 40px;
         padding: 10px 10px 10px 35px;

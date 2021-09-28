@@ -3,6 +3,7 @@
     "plugins": [
         "stylelint-no-unsupported-browser-features"
     ],
+    "ignoreFiles": ["css/chat-bundle.css"],
     "rules": {
         "indentation": null,
         "declaration-no-important": null,

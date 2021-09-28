@@ -1,0 +1,52 @@
+.guest-register {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 300px;
+    background: #444;
+
+    &-content {
+        height: 100%;
+        padding: 20px;
+        box-sizing: border-box;
+        font: var(--text-body1);
+        color: var(--text-color-high);
+        text-align: center;
+
+        i {
+            margin: 0 auto 10px;
+
+            &.registration {
+                width: 190px;
+                height: 60px;
+            }
+        }
+
+        button {
+            /* [...] */
+
+            &.close-guest-register {
+                position: absolute;
+                top: 5px;
+                right: 0;
+                border: 0 none;
+                background: transparent;
+                cursor: pointer;
+
+                span {
+                    display: none;
+                }
+
+                i {
+                    --icon-size: 24px;
+                    --mask-color: var(--icon-rest);
+                }
+            }
+
+            &.register-button {
+                margin: 20px 0 0;
+            }
+        }
+    }
+}

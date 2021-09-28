@@ -78,7 +78,7 @@
             $('header > p', $dialog).removeClass('hidden');
             $('header > p > a', $dialog).rebind('click.doSignup', function() {
                 closeDialog();
-                megaChat.loginOrRegisterBeforeJoining(undefined, true, false);
+                megaChat.loginOrRegisterBeforeJoining(undefined, true, false, false, options.onLoginSuccessCb);
             });
         }
         else if (options.showRegister) {
@@ -135,6 +135,11 @@
         $('.top-login-forgot-pass', $dialog).rebind('click.loginreq', function(e) {
             e.preventDefault();
             aPromise.reject();
+            if (is_chatlink) {
+                is_chatlink = false;
+                delete megaChat.initialPubChatHandle;
+                megaChat.destroy();
+            }
             loadSubPage('recovery');
         });
 

@@ -11193,20 +11193,78 @@ Thank You dialog
 /**
  * Chatlink preview page styles
  */
+ .mobile.chat-links-preview {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
 .chatlink-mobile-header {
-    display: block;
-    text-align: center;
-    padding-top: 18px;
+    display: flex;
+    justify-content: center;
+    padding-top: 32px;
     padding-bottom: 18px;
-    height: 42px;
-    position: relative;
-    box-shadow: 0 2px 3px 0 rgba(0,0,0,0.15);
 
+    position: relative;
 }
-.chatlink-mobile-header a {
-    float: none;
+.chatlink-mobile-header i {
+    --icon-size: 50px;
+}
+.chatlink-mobile-body {
+    flex-grow: 2;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+.chatlink-mobile-body i {
+    --icon-size: 50px;
+    margin-bottom: 30px;
+}
+.chatlink-mobile-body h2 {
+    color: #121212;
+    font: var(--text-h2-montserrat-bold);
+    letter-spacing: 0;
+    text-align: center;
+    max-width: 350px;
+    margin: 0;
+}
+.chatlink-mobile-body img {
+    height: 124px;
+}
+.chatlink-mobile-body p,
+.chatlink-mobile-body .members {
+    font: var(--text-body1);
+    color: var(--text-color-black-low);
+    text-align: center;
+    max-width: 250px;
+    margin: 16px auto;
+}
+.chatlink-mobile-body .members {
     display: inline-block;
+    margin: 20px auto;
 }
+.chatlink-mobile-body .link-block {
+    display: flex;
+    flex-direction: column;
+    height: 140px;
+    padding: 0 40px 30px;
+    justify-content: space-around;
+    align-items: center;
+    text-align: center;
+}
+.chatlink-mobile-body .link-block button.mega-button {
+    padding: 0 20px;
+    min-width: 200px;
+    display: block;
+    max-width: 300px;
+}
+.chatlink-mobile-body .link-block a {
+    font: var(--text-h3);
+    text-decoration: underline;
+    color: var(--text-color-high);
+}
+
 .chatlink-red-row {
     display: block;
     background: linear-gradient(180deg, #FF626C 0%, #FF333A 100%);

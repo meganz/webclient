@@ -1,0 +1,93 @@
+.participants {
+    height: calc(100% - 70px);
+    color: var(--text-color-high);
+
+    &-list {
+        height: calc(100% - 30px);
+
+        &.guest {
+            overflow: hidden;
+            height: calc(100% - 320px);
+        }
+    }
+
+    ul {
+        display: block;
+        height: 100%;
+
+        li {
+            overflow: hidden;
+            margin: 0 15px;
+
+            .avatar-wrapper {
+                border-radius: 4px;
+                width: 24px;
+                height: 24px;
+                margin: 7px 0 0 0;
+
+                span {
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    font: var(--text-body2);
+                }
+
+                img {
+                    width: 24px;
+                    height: 24px;
+                }
+            }
+
+            .name {
+                overflow: hidden;
+                float: left;
+                padding: 9px 0 0 10px;
+                width: calc(100% - 100px);
+
+                span {
+                    display: block;
+                    float: left;
+
+                    &:first-child {
+                        overflow: hidden;
+                        max-width: 120px;
+                        text-overflow: ellipsis;
+                        white-space: nowrap;
+                        font: var(--text-body1);
+                    }
+
+                    i {
+                        display: block;
+                        margin: -3px 0 0 0;
+                        --icon-size: 24px;
+                        --mask-color: var(--icon-rest);
+                    }
+                }
+            }
+
+            .status {
+                float: right;
+                margin: 5px 0 0 0;
+
+                i {
+                    display: inline-block;
+                    margin: 0 0 0 3px;
+                    --icon-size: 24px;
+                    --mask-color: var(--icon-rest);
+
+                    &.inactive { --mask-color: var(--secondary-red); }
+                }
+            }
+        }
+    }
+
+    .add-participants {
+        margin: 20px 0 0 0;
+        text-align: center;
+
+        button {
+            margin: 0 auto;
+        }
+    }
+}

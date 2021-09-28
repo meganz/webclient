@@ -177,6 +177,7 @@ FileManager.prototype.initFileManagerUI = function() {
             || $.dialog === 'affiliate-redeem-dialog'
             || $.dialog === 'discount-offer'
             || $.dialog === 'voucher-info-dlg'
+            || $.dialog === "chat-incoming-call"
             || String($.dialog).startsWith('verify-email')
             || localStorage.awaitingConfirmationAccount) {
 
@@ -249,6 +250,12 @@ FileManager.prototype.initFileManagerUI = function() {
     }
 
     $.doDD = function(e, ui, a, type) {
+
+        // Prevent drop behavior for the `Local` component
+        // See: ui/meetings/local.jsx
+        if (ui.helper.hasClass('local-stream')) {
+            return;
+        }
 
         function nRevert(r) {
             try {
@@ -3881,8 +3888,8 @@ FileManager.prototype.onSectionUIOpen = function(id) {
     if (d) {
         console.log('sectionUIopen', id, folderlink);
     }
-    if (!anonymouschat && $.hideContextMenu) {
-       $.hideContextMenu();
+    if ($.hideContextMenu) {
+        $.hideContextMenu();
     }
 
     $('.nw-fm-left-icon', $fmholder).removeClass('active');
@@ -3891,6 +3898,13 @@ FileManager.prototype.onSectionUIOpen = function(id) {
     }
     else {
         $('.nw-fm-left-icon.inbox', $fmholder).addClass('hidden');
+    }
+
+    if (u_type === 3 || window.is_eplusplus) {
+        $('.nw-fm-left-icon.conversations', $fmholder).removeClass('hidden');
+    }
+    else {
+        $('.nw-fm-left-icon.conversations', $fmholder).addClass('hidden');
     }
 
     // view or hide left icon for business account, confirmed and payed
@@ -4074,7 +4088,7 @@ FileManager.prototype.onSectionUIOpen = function(id) {
         $('.contacts-tabs-bl').addClass('hidden');
     }
 
-    $(".fm-left-panel").removeClass('hidden');
+    $(".fm-left-panel:not(.chat-lp-body)").removeClass('hidden');
 
     if (id !== "recents") {
         $(".fm-recents.container").addClass('hidden');

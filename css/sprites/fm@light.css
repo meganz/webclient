@@ -1,0 +1,19 @@
+/* AUTO GENERATED, DO NOT EDIT MANUALLY */
+.sprite-fm {
+    background: url(../../images/sprites/fm@light.svg) no-repeat;
+    background-size: 200%;
+    display: block;
+    content: '';
+    width: 16px;
+    height: 16px;
+}
+.sprite-fm.icon-notifications {
+   background-position: 0 0;
+}
+.sprite-fm.icon-notifications-muted {
+   background-position: 100% 0;
+}
+.sprite-fm.icon-settings {
+   background-position: 0 100%;
+}
+

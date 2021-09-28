@@ -228,7 +228,7 @@ class ParticipantsListInner extends MegaRenderMixin {
                     );
                 }
 
-                if (room.iAmOperator() || contactHash === u_handle) {
+                if (room.iAmOperator()) {
                     // operator
                     dropdowns.push(
                         <div key="setPermLabel" className="dropdown-items-info">
@@ -287,7 +287,7 @@ class ParticipantsListInner extends MegaRenderMixin {
                         dropdownPositionMy="left top"
                         dropdownPositionAt="left top"
                         dropdowns={dropdowns}
-                        dropdownDisabled={contactHash === u_handle || anonymouschat}
+                        dropdownDisabled={contactHash === u_handle || is_chatlink || is_eplusplus}
                         dropdownButtonClasses="contacts-icon"
                         dropdownRemoveButton={dropdownRemoveButton}
                         dropdownIconClasses={dropdownIconClasses}

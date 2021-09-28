@@ -1,0 +1,237 @@
+.join-meeting {
+    position: fixed;
+    top: 45px;
+    width: 100%;
+    height: 100%;
+    background: var(--surface-grey-1);
+    z-index: 140;
+
+    @mixin small-screen {
+        @media only screen and (max-height: 600px) {
+            @content;
+        }
+    }
+
+    a {
+        color: var(--text-color-info);
+    }
+
+    &-head {
+        text-align: center;
+
+        h1 {
+            margin: 24px 0 88px 0;
+
+            @include small-screen {
+                font: var(--text-h2);
+                margin-top: 14px;
+                margin-bottom: 18px;
+            }
+        }
+
+        .join-meeting-logo {
+            /* [...] */
+
+            i {
+                display: block;
+                margin: 40px auto 0;
+                width: 195px;
+                height: 65px;
+            }
+        }
+    }
+
+    &-content {
+        text-align: center;
+
+        button {
+            display: block;
+            min-height: 48px;
+            min-width: 139px;
+            margin: 0 auto 24px;
+            font: var(--text-h3);
+        }
+
+        p {
+            font: var(--text-body1);
+            color: var(--text-color-medium);
+        }
+
+         a {
+             display: inline-block;
+             margin: 0 0 0 5px;
+         }
+    }
+
+    &-chat {
+        position: absolute;
+        left: 50%;
+        bottom: 70px;
+        transform: translateX(-50%);
+        width: 720px;
+        border-radius: 30px;
+        box-shadow: var(--dialog-shadow);
+        border: 1px solid rgba(0, 0, 0, 0.05);
+        font: var(--text-body1);
+        color: var(--text-color-medium);
+        background: var(--surface-main);
+
+        &.expanded {
+            overflow: hidden;
+            height: 180px;
+            padding: 0 0 30px 0;
+        }
+
+        .chat-content {
+            padding: 15px;
+
+            &-head {
+                cursor: pointer;
+            }
+
+            button {
+                position: absolute;
+                top: 12px;
+                right: 10px;
+                border: 0 none;
+                background: transparent;
+
+                i {
+                    --icon-size: 24px;
+                    --mask-color: var(--icon-rest);
+                    cursor: pointer;
+                }
+
+                span {
+                    position: fixed;
+                    bottom: -9999px;
+                    visibility: hidden;
+                }
+            }
+        }
+
+        .chat-body {
+            margin: 10px 0 0 0;
+        }
+    }
+
+    .card {
+        overflow: hidden;
+        position: relative;
+        width: 800px;
+        height: 300px;
+        margin: 0 auto;
+        box-sizing: border-box;
+        box-shadow: 0 1px 10px 0 rgba(0, 0, 0, 0.10);
+        border-radius: 30px;
+        background: var(--surface-main);
+
+        @include small-screen {
+            height: 230px;
+        }
+
+        &-body {
+            overflow: hidden;
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 50%;
+            box-sizing: border-box;
+            text-align: center;
+
+            h2 {
+                /* [...] */
+
+                @include small-screen {
+                    font: var(--text-h3);
+                }
+            }
+
+            h4 {
+                display: block;
+            }
+
+            button {
+                justify-content: center;
+                margin: 0 0 26px 0;
+            }
+        }
+
+        &-preview {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 50%;
+            height: 100%;
+
+            body.theme-dark & .preview {
+                background: #111;
+            }
+        }
+
+        &-fields {
+            margin: 40px 0 48px 0;
+
+            @include small-screen {
+                margin: 20px 0 20px 0;
+            }
+
+            .mega-input {
+                width: 140px;
+                margin: 0 15px 0 0;
+
+                .required-red {
+                    padding: 0 0 0 4px;
+                }
+            }
+        }
+    }
+
+    .unsupported-container {
+        overflow: hidden;
+        position: relative;
+        width: 605px;
+        margin: 0 auto;
+        box-sizing: border-box;
+        box-shadow: 0 1px 10px 0 rgba(0, 0, 0, 0.10);
+        border-radius: 30px;
+        background: var(--surface-main);
+
+        i {
+            float: left;
+            margin: 30px 0 0 37px;
+            --icon-size: 52px;
+        }
+
+        .unsupported-info {
+            float: left;
+            margin: 30px 0 25px 36px;
+
+            h3 {
+                font: var(--text-h3);
+
+                &:first-child {
+                    margin: 0 0 20px 0;
+                    color: var(--secondary-red);
+                }
+                &:last-child {
+                    margin: 0 0 10px 0;
+                    color: var(--text-color-high);
+                }
+            }
+
+            ul {
+                padding: 0 0 0 18px;
+                color: var(--text-color-medium);
+
+                li {
+                    /* [...] */
+                }
+            }
+        }
+    }
+
+    .messages.scroll-area > .js-messages-scroll-area {
+        max-height: 140px;
+    }
+}

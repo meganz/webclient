@@ -969,6 +969,9 @@ function addToTransferTable(gid, elem, q) {
 }
 MegaData.prototype.addToTransferTable = function(gid, ttl, elem) {
     var T = ttl || this.getTransferTableLengths();
+    if (T === false) {
+        return;
+    }
 
     if (d > 1) {
         var logger = (gid[0] === 'u' ? ulmanager : dlmanager).logger;

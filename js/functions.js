@@ -1335,10 +1335,7 @@ function generateAnonymousReport() {
     }
     else {
         report.numOpenedChats = Object.keys(megaChat.chats).length;
-        report.haveRtc = megaChat.rtc ? true : false;
-        if (report.haveRtc) {
-            report.rtcStatsAnonymousId = base64urlencode(megaChat.rtc.ownAnonId);
-        }
+        report.haveRtc = typeof SfuClient !== 'undefined' && SfuClient.platformHasSupport();
     }
 
     var chatStates = {};
@@ -1371,23 +1368,6 @@ function generateAnonymousReport() {
             roomUniqueIdMap[k] = roomUniqueId;
             roomUniqueId++;
         });
-
-        if (report.haveRtc) {
-            report.calls = [];
-            var calls = megaChat.plugins.callManager._calls;
-            var len = calls.length;
-            for (var i = 0; i < len; i++) {
-                var call = calls[i];
-                var rtcCall = call.rtcCall;
-                report.calls.push({
-                    cid: base64urlencode(rtcCall.id),
-                    chatid: base64urlencode(rtcCall.chatid),
-                    callid: base64urlencode(rtcCall.id),
-                    endReason: call.state,
-                    isJoiner: rtcCall.isJoiner ? 1 : 0
-                });
-            }
-        };
 
         report.chatRoomState = chatStates;
     };

@@ -79,16 +79,16 @@
     justify-content: space-between;
     margin: 14px 0 0 12px;
 }
-.conversations .conversations-head-copy {
-    overflow: hidden;
-    float: left;
-    margin: 3px 0 0 0;
-}
-.conversations h2 {
+.conversations .conversations-head h2 {
     overflow: hidden;
     margin: 2px 0 0 0;
     text-overflow: ellipsis;
     white-space: nowrap;
+}
+.conversations .conversations-head-copy {
+    overflow: hidden;
+    float: left;
+    margin: 3px 0 0 0;
 }
 .conversations .conversations-head-buttons {
     display: flex;
@@ -463,14 +463,6 @@ li.active .call-duration i {
     40%, 60% {
         transform: translate3d(0, 2px, 0);
     }
-}
-.have-incoming-ringing-call .unread-messages .tiny-icon,
-.new-messages-indicator .tiny-icon {
-    -webkit-animation: ring 1s cubic-bezier(.36,.07,.19,.97) infinite; /* Safari, Chrome and Opera > 12.1 */
-    -moz-animation: ring 1s cubic-bezier(.36,.07,.19,.97) infinite; /* Firefox < 16 */
-    -ms-animation: ring 1s cubic-bezier(.36,.07,.19,.97) infinite; /* Internet Explorer */
-    -o-animation: ring 1s cubic-bezier(.36,.07,.19,.97) infinite; /* Opera < 12.1 */
-    animation: ring 1s cubic-bezier(.36,.07,.19,.97) infinite;
 }
 
 /* Private Chat Styles */

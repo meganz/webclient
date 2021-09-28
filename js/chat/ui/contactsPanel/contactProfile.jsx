@@ -211,6 +211,7 @@ export default class ContactProfile extends MegaRenderMixin {
                                     <Button
                                         className="mega-button round simpletip"
                                         icon="sprite-fm-mono icon-video-call-filled"
+                                        disabled={!megaChat.hasSupportForCalls}
                                         attrs={{ 'data-simpletip': l[5897] }}
                                         onClick={() => {
                                             if (M.isInvalidUserStatus()) {

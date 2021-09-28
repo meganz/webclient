@@ -455,21 +455,19 @@ UserPresence.prototype.reconnect = function presence_reconnect(self) {
             }
         };
     }
-    else {
-        if ((!self._puRequest || self._puRequest.state() !== "pending") && !anonymouschat) {
-            self.connectionRetryManager.pause();
-            self._puRequest = asyncApiReq({'a': 'pu'})
-                .always(function() {
-                    self.connectionRetryManager.unpause();
-                })
-                .done(function(res) {
-                    if (typeof res == 'string') {
-                        self.url = res;
-                    }
+    else if ((!self._puRequest || self._puRequest.state() !== "pending") && !is_chatlink) {
+        self.connectionRetryManager.pause();
+        self._puRequest = asyncApiReq({'a': 'pu'})
+            .always(() => {
+                self.connectionRetryManager.unpause();
+            })
+            .done((res) => {
+                if (typeof res == 'string') {
+                    self.url = res;
+                }
 
-                    self.reconnect();
-                });
-        }
+                self.reconnect();
+            });
     }
 };
 

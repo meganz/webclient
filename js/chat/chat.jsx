@@ -6,6 +6,10 @@ require("./chatGlobalEventManager.jsx");
 // load chatRoom.jsx, so that its included in bundle.js, despite that ChatRoom is legacy ES ""class""
 require("./chatRoom.jsx");
 
+// ensure that the Incoming dialog is included, so that it would be added to the window scope for accessing from
+// vanilla JS
+require("./ui/meetings/workflow/incoming.jsx");
+
 import ChatRouting from "./chatRouting.jsx";
 
 const EMOJI_DATASET_VERSION = 3;
@@ -42,6 +46,8 @@ function Chat() {
     this.is_initialized = false;
     this.logger = MegaLogger.getLogger("chat");
 
+    this.mbListeners = [];
+
     this.chats = new MegaDataMap();
     this.chatUIFlags = new MegaDataMap();
     this.initChatUIFlagsManagement();
@@ -57,6 +63,7 @@ function Chat() {
     this._imageAttributeCache = Object.create(null);
     this._queuedMccPackets = [];
     this._queuedMessageUpdates = [];
+    this._queuedChatRoomEvents = {};
 
     this.handleToId = Object.create(null);
     this.publicChatKeys = Object.create(null);
@@ -96,7 +103,7 @@ function Chat() {
          */
         'plugins': {
             'chatdIntegration': ChatdIntegration,
-            'callManager': CallManager,
+            'callManager2': CallManager2,
             'urlFilter': UrlFilter,
             'emoticonShortcutsFilter': EmoticonShortcutsFilter,
             'emoticonsFilter': EmoticonsFilter,
@@ -106,8 +113,9 @@ function Chat() {
             'btRtfFilter': BacktickRtfFilter,
             'rtfFilter': RtfFilter,
             'richpreviewsFilter': RichpreviewsFilter,
+            'chatToastIntegration': ChatToastIntegration,
             'chatStats': ChatStats,
-            'geoLocationLinks': GeoLocationLinks
+            'geoLocationLinks': GeoLocationLinks,
         },
         'chatNotificationOptions':  {
             'textMessages': {
@@ -177,6 +185,8 @@ function Chat() {
         this,
         {
             "currentlyOpenedChat": null,
+            "displayArchivedChats": false,
+            "activeCall": null,
             'routingSection': null,
             'routingSubSection': null,
             'routingParams': null,
@@ -184,6 +194,14 @@ function Chat() {
     );
 
     this.routing = new ChatRouting(this);
+
+    Object.defineProperty(this, 'hasSupportForCalls', {
+        get: function() {
+            return typeof SfuClient !== 'undefined' && typeof TransformStream !== 'undefined' &&
+                window.RTCRtpSender &&
+                !!RTCRtpSender.prototype.createEncodedStreams;
+        }
+    });
 
     return this;
 };
@@ -205,12 +223,14 @@ Chat.prototype.init = promisify(function(resolve, reject) {
         console.time('megachat:plugins:init');
     }
 
+
     // really simple plugin architecture that will initialize all plugins into self.options.plugins[name] = instance
     self.plugins = Object.create(null);
     self.plugins.chatNotifications = new ChatNotifications(self, self.options.chatNotificationOptions);
     self.plugins.chatNotifications.notifications.rebind('onAfterNotificationCreated.megaChat', function() {
         self.updateSectionUnreadCount();
     });
+
 
     Object.keys(self.options.plugins).forEach(plugin => {
         self.plugins[plugin] = new self.options.plugins[plugin](self);
@@ -246,7 +266,7 @@ Chat.prototype.init = promisify(function(resolve, reject) {
     // @todo where is this used?
     self.$container = $('.fm-chat-block');
 
-    if (!anonymouschat) {
+    if (!is_chatlink) {
         $('.activity-status-block, .activity-status').show();
     }
 
@@ -273,9 +293,6 @@ Chat.prototype.init = promisify(function(resolve, reject) {
                 $('#contact_' + c.u + ' .start-chat-button').removeClass("active");
             }
         }
-        if (room.callManagerCall) {
-            room.callManagerCall.endCall();
-        }
     });
 
     $body.rebind('mouseover.notsentindicator', '.tooltip-trigger', function() {
@@ -294,15 +311,10 @@ Chat.prototype.init = promisify(function(resolve, reject) {
         $notification.addClass('hidden').removeAttr('style');
     });
 
-    let sitePath = getCleanSitePath();
-    if (anonymouschat) {
-        this.publicChatKeys[pchandle] = sitePath.split('#').pop();
-        Chat.mcf[pchandle] = pchandle;
-    }
-    else if (sitePath.substr(0, 5) === 'chat/' && sitePath.indexOf('#') > 0) {
-        sitePath = sitePath.substr(5).split('#');
-        this.publicChatKeys[sitePath[0]] = sitePath[1];
-        Chat.mcf[sitePath[0]] = sitePath[0];
+    if (is_chatlink) {
+        const {ph, key} = is_chatlink;
+        Chat.mcf[ph] = key;
+        this.publicChatKeys[ph] = key;
     }
 
     var promises = [];
@@ -327,6 +339,11 @@ Chat.prototype.init = promisify(function(resolve, reject) {
             res = res[0].value.concat(res.slice(1));
             self.logger.info('chats settled...', res);
 
+            if (is_mobile) {
+                // No more business here...
+                return;
+            }
+
             // eslint-disable-next-line react/no-render-return-value
             self.$conversationsAppInstance = ReactDOM.render(
                 self.$conversationsApp = <ConversationsUI.ConversationsApp
@@ -335,7 +352,8 @@ Chat.prototype.init = promisify(function(resolve, reject) {
                     routingSubSection={self.routingSubSection}
                     routingParams={self.routingParams}
                 />,
-                self.domSectionNode = document.querySelector('.section.conversations')
+                self.domSectionNode = document.querySelector(!is_chatlink ?
+                    '.section.conversations' : '.chat-links-preview > .chat-app-container')
             );
 
             self.onChatsHistoryReady()
@@ -355,12 +373,14 @@ Chat.prototype.init = promisify(function(resolve, reject) {
             setInterval(self._syncDnd.bind(self), 60000);
             setInterval(self.removeMessagesByRetentionTime.bind(self, null), 20000);
 
+            self.autoJoinIfNeeded();
+
             return true;
         })
         .then(resolve)
         .catch(reject);
 
-    mBroadcaster.addListener("beforepagechange", (page) => {
+    const bpcListener = mBroadcaster.addListener("beforepagechange", (page) => {
         // Reduce flickering when coming back to chat + ensure the ContactsPanel's components are properly destroyed
 
         if (page.indexOf("chat") === -1) {
@@ -379,6 +399,7 @@ Chat.prototype.init = promisify(function(resolve, reject) {
             }
         }
     });
+    this.mbListeners.push(bpcListener);
 });
 
 Chat.prototype._syncDnd = function() {
@@ -462,11 +483,13 @@ Chat.prototype.initChatUIFlagsManagement = function() {
         }
     });
 
-    mBroadcaster.addListener('fmconfig:cUIF', tryCatch((v) => {
-        if (self.loadChatUIFlagsFromConfig(v)) {
-            self.chatUIFlags.trackDataChange(0xDEAD);
-        }
-    }));
+    this.mbListeners.push(
+        mBroadcaster.addListener('fmconfig:cUIF', tryCatch((v) => {
+            if (self.loadChatUIFlagsFromConfig(v)) {
+                self.chatUIFlags.trackDataChange(0xDEAD);
+            }
+        }))
+    );
 };
 
 Chat.prototype.unregisterUploadListeners = function(destroy) {
@@ -857,6 +880,10 @@ Chat.prototype.destroy = function(isLogout) {
 
     self.isLoggingOut = isLogout;
 
+    for (let i = 0; i < this.mbListeners.length; i++) {
+        mBroadcaster.removeListener(this.mbListeners[i]);
+    }
+
     if (self.rtc && self.rtc.logout) {
         self.rtc.logout();
     }
@@ -886,6 +913,8 @@ Chat.prototype.destroy = function(isLogout) {
         self.chats.remove(roomJid);
     });
 
+    // must be set before chatd disconnect, because of potential .destroy -> reinit and event queueing.
+    self.is_initialized = false;
 
     if (
         self.plugins.chatdIntegration &&
@@ -898,7 +927,13 @@ Chat.prototype.destroy = function(isLogout) {
         });
     }
 
-    self.is_initialized = false;
+    for (const pluginName in self.plugins) {
+        const plugin = self.plugins[pluginName];
+        if (plugin.destroy) {
+            plugin.destroy();
+        }
+    }
+
 };
 
 /**
@@ -1080,7 +1115,7 @@ Chat.prototype.reorderContactTree = function() {
  * @returns [roomId {string}, room {MegaChatRoom}, {Deferred}]
  */
 Chat.prototype.openChat = function(userHandles, type, chatId, chatShard, chatdUrl, setAsActive, chatHandle,
-                                   publicChatKey, ck) {
+                                   publicChatKey, ck, isMeeting) {
     var self = this;
     var room = false;
     type = type || "private";
@@ -1235,10 +1270,12 @@ Chat.prototype.openChat = function(userHandles, type, chatId, chatShard, chatdUr
         chatHandle,
         publicChatKey,
         ck,
+        isMeeting,
         0
     );
 
     self.chats.set(room.roomId, room);
+
 
     if (setAsActive && !self.currentlyOpenedChat || self.currentlyOpenedChat === room.roomId) {
         room.setActive();
@@ -1248,6 +1285,15 @@ Chat.prototype.openChat = function(userHandles, type, chatId, chatShard, chatdUr
 
     this.trigger('onRoomInitialized', [room]);
     room.setState(ChatRoom.STATE.JOINING);
+
+    if (this._queuedChatRoomEvents[chatId]) {
+        for (const event of this._queuedChatRoomEvents[chatId]) {
+            room.trigger(event[0], event[1]);
+        }
+        delete this._queuedChatRoomEvents[chatId];
+        delete this._queuedChatRoomEvents[chatId + "_timer"];
+    }
+
     return [roomId, room, MegaPromise.resolve(roomId, self.chats[roomId])];
 };
 
@@ -1483,7 +1529,7 @@ Chat.prototype.refreshConversations = function() {
         $('.section.conversations .fm-right-files-block').append(self.$container);
     }
     self.$leftPane = self.$leftPane || $('.conversationsApp .fm-left-panel');
-    if (anonymouschat) {
+    if (is_chatlink || megaChat._joinDialogIsShown) {
         self.$leftPane.addClass('hidden');
     }
     else {
@@ -1519,18 +1565,18 @@ Chat.prototype.getChatNum = function(idx) {
     return this.chats[this.chats.keys()[idx]];
 };
 
-Chat.prototype.navigate = promisify(function megaChatNavigate(resolve, reject, location, event) {
-    this.routing.route(resolve, reject, location, event);
+Chat.prototype.navigate = promisify(function megaChatNavigate(resolve, reject, location, event, isLandingPage) {
+    this.routing.route(resolve, reject, location, event, isLandingPage);
 });
 
 if (is_mobile) {
-    Chat.prototype.navigate = function(location, event) {
+    Chat.prototype.navigate = function(location, event, isLandingPage) {
         if (d) {
-            this.logger.warn('mobile-nop navigate(%s)', location);
+            this.logger.warn('mobile-nop navigate(%s)', location, event, isLandingPage);
         }
-        if (anonymouschat) {
-            parsepage(pages.mobile);
-            mobile.chatlink.show(pchandle, window.location.hash.substr(1).replace(/[^\w-].+$/, ''));
+        if (is_chatlink) {
+            // parsepage(pages.mobile);
+            mobile.chatlink.show(is_chatlink.ph, is_chatlink.key);
         }
         else {
             loadSubPage('fm', event);
@@ -1544,8 +1590,8 @@ if (is_mobile) {
  *
  * @returns boolean true if room was automatically shown and false if the listing page is shown
  */
-Chat.prototype.renderListing = promisify(function megaChatRenderListing(resolve, reject, location) {
-    if (!M.chat) {
+Chat.prototype.renderListing = promisify(function megaChatRenderListing(resolve, reject, location, isInitial) {
+    if (!isInitial && !M.chat) {
         console.debug('renderListing: Not in chat.');
         return reject(EACCESS);
     }
@@ -1589,7 +1635,7 @@ Chat.prototype.renderListing = promisify(function megaChatRenderListing(resolve,
 
     if (location) {
         $('.fm-empty-conversations').addClass('hidden');
-        return this.navigate(location).then(resolve).catch(reject);
+        return this.navigate(location, undefined, isInitial).then(resolve).catch(reject);
     }
 
     resolve(ENOENT);
@@ -2021,7 +2067,7 @@ Chat.prototype.createAndShowPrivateRoom = promisify(function(resolve, reject, h)
         .catch(reject);
 });
 
-Chat.prototype.createAndShowGroupRoomFor = function(contactHashes, topic, keyRotation, createChatLink) {
+Chat.prototype.createAndShowGroupRoomFor = function(contactHashes, topic, keyRotation, createChatLink, isMeeting) {
     this.trigger(
         'onNewGroupChatRequest',
         [
@@ -2029,10 +2075,20 @@ Chat.prototype.createAndShowGroupRoomFor = function(contactHashes, topic, keyRot
             {
                 'topic': topic || "",
                 'keyRotation': keyRotation,
-                'createChatLink': createChatLink
+                'createChatLink': createChatLink,
+                'isMeeting': isMeeting
             }
         ]
     );
+};
+
+Chat.prototype.createAndStartMeeting = function(topic, audio, video) {
+    megaChat.createAndShowGroupRoomFor([], topic, false, 2, true);
+    megaChat.rebind('onRoomInitialized.meetingCreate', function(e, room) {
+        room.rebind('onNewMeetingReady.meetingCreate', function() {
+            room.startCall(audio, video);
+        });
+    });
 };
 
 /**
@@ -2524,12 +2580,13 @@ Chat.prototype.getFrequentContacts = function() {
         var msgs = mb.messages.slice(Math.max(0, len - maxMessages), len);
         for (var i = 0; i < msgs.length; i++) {
             var msg = msgs[i];
-            var contactHandle = msg.userId === "gTxFhlOd_LQ" && msg.meta ? msg.meta.userId : msg.userId;
+            var contactHandle = msg.userId === mega.BID && msg.meta ? msg.meta.userId : msg.userId;
             if (r.type === "private" && contactHandle === u_handle) {
                 contactHandle = contactHandle || r.getParticipantsExceptMe()[0];
             }
 
             if (
+                contactHandle !== mega.BID &&
                 contactHandle !== strongvelope.COMMANDER &&
                 contactHandle in M.u && M.u[contactHandle].c === 1 &&
                 contactHandle !== u_handle
@@ -2608,13 +2665,9 @@ Chat.prototype.eventuallyAddDldTicketToReq = function(req) {
     }
 
     var currentRoom = this.getCurrentRoom();
-    if (currentRoom && currentRoom.type == "public" && currentRoom.publicChatHandle && (
-        anonymouschat || (
-            currentRoom.membersSetFromApi &&
-            !currentRoom.membersSetFromApi.members[u_handle]
-        )
-    )
-    ) {
+    if (currentRoom && currentRoom.type === "public" && currentRoom.publicChatHandle
+        && (is_chatlink || currentRoom.membersSetFromApi && !currentRoom.membersSetFromApi.members[u_handle])) {
+
         req['cauth'] = currentRoom.publicChatHandle;
     }
 };
@@ -2650,16 +2703,23 @@ Chat.prototype.removeMessagesByRetentionTime = function(chatId) {
     }
 };
 
-Chat.prototype.loginOrRegisterBeforeJoining = function(chatHandle, forceRegister, forceLogin, notJoinReq) {
+Chat.prototype.loginOrRegisterBeforeJoining = function(
+    chatHandle,
+    forceRegister,
+    forceLogin,
+    notJoinReq,
+    onLoginSuccessCb
+) {
     if (!chatHandle && page !== 'securechat' && (page === 'chat' || page.indexOf('chat') > -1)) {
         chatHandle = getSitePath().split("chat/")[1].split("#")[0];
     }
     assert(chatHandle, 'missing chat handle when calling megaChat.loginOrRegisterBeforeJoining');
 
+    const chatRoom = megaChat.getCurrentRoom();
     var chatKey = "#" + window.location.hash.split("#").pop();
     var finish = function(stay) {
         if (!notJoinReq) {
-            localStorage.autoJoinOnLoginChat = JSON.stringify([chatHandle, unixtime(), chatKey]);
+            localStorage.autoJoinOnLoginChat = JSON.stringify([chatHandle, unixtime(), chatKey, chatRoom.chatId]);
         }
 
         if (!stay) {
@@ -2669,12 +2729,13 @@ Chat.prototype.loginOrRegisterBeforeJoining = function(chatHandle, forceRegister
     };
     var doShowLoginDialog = function() {
         mega.ui.showLoginRequiredDialog({
-                minUserType: 3,
-                skipInitialDialog: 1
-            })
-            .done(function() {
-                if (page !== 'login') {
-                    finish();
+            minUserType: 3,
+            skipInitialDialog: 1,
+            onLoginSuccessCb: onLoginSuccessCb
+        })
+            .done(() => {
+                if (page !== 'login' && onLoginSuccessCb) {
+                    onLoginSuccessCb();
                 }
             });
     };
@@ -2701,7 +2762,8 @@ Chat.prototype.loginOrRegisterBeforeJoining = function(chatHandle, forceRegister
                     mega.ui.sendSignupLinkDialog(registerData);
                     megaChat.destroy();
                 }
-            }
+            },
+            onLoginSuccessCb: onLoginSuccessCb
         });
     };
 
@@ -2725,6 +2787,7 @@ Chat.prototype.loginOrRegisterBeforeJoining = function(chatHandle, forceRegister
         doShowRegisterDialog();
     }
 };
+
 
 /**
  * highlight
@@ -2772,6 +2835,93 @@ Chat.prototype.highlight = (text, matches, dontEscape) => {
     }
 
     return text;
+};
+
+/**
+ * Should be used only when keys are expected to had changed after room's protocol handlers were initialized (e.g.
+ * after E++ account creation)
+ */
+Chat.prototype.updateKeysInProtocolHandlers = function() {
+    this.chats.forEach((r) => {
+        let ph = r.protocolHandler;
+        if (ph) {
+            ph.reinitWithNewData(
+                u_handle,
+                u_privCu25519,
+                u_privEd25519,
+                u_pubEd25519,
+                ph.chatMode
+            );
+        }
+    });
+};
+
+
+/**
+ * A method called only once when chat inits first, to detect if we want to init Meetings UI
+ */
+Chat.prototype.eventuallyInitMeetingUI = function() {
+    if (!window.location.hash) {
+        return;
+    }
+
+    let loc = page.split("#")[0];
+    loc = loc.replace("fm/", "/");
+    if (loc.indexOf("chat/") === 0) {
+        this.initialPubChatHandle = loc.substr(5).split("?")[0];
+    }
+};
+
+
+Chat.prototype.enqueueChatRoomEvent = function(eventName, eventData) {
+    if (!this.is_initialized) {
+        // was destroyed
+        return;
+    }
+    const chatId = eventData.chatId;
+
+    if (this._queuedChatRoomEvents[chatId + "_timer"]) {
+        clearTimeout(this._queuedChatRoomEvents[chatId + "_timer"]);
+    }
+    // cleanup if room not initialized in 15s
+    this._queuedChatRoomEvents[chatId + "_timer"] = setTimeout(() => {
+        delete this._queuedChatRoomEvents[chatId + "_timer"];
+        delete this._queuedChatRoomEvents[chatId];
+    }, 15e3);
+
+    this._queuedChatRoomEvents[chatId] = this._queuedChatRoomEvents[chatId] || [];
+    this._queuedChatRoomEvents[chatId].push([eventName, eventData]);
+};
+
+
+Chat.prototype.autoJoinIfNeeded = function() {
+    const rawAutoLoginInfo = localStorage.autoJoinOnLoginChat;
+    if (u_type && rawAutoLoginInfo) {
+        var autoLoginChatInfo = tryCatch(JSON.parse.bind(JSON))(rawAutoLoginInfo) || false;
+
+
+        if (unixtime() - 2 * 60 * 60 < autoLoginChatInfo[1]) {
+            const req = this.plugins.chatdIntegration.getMciphReqFromHandleAndKey(
+                autoLoginChatInfo[0],
+                autoLoginChatInfo[2].substr(1)
+            );
+
+            // Bind for when the room gets initialized by the mcpc ap
+            megaChat.rebind('onRoomInitialized.autoJoin', (e, megaRoom) => {
+                if (megaRoom.chatId === autoLoginChatInfo[3]) {
+                    megaRoom.setActive();
+                    megaChat.unbind('onRoomInitialized.autoJoin');
+                    localStorage.removeItem("autoJoinOnLoginChat");
+                }
+            });
+
+            // send the join mciph
+            M.req(req);
+        }
+        else {
+            localStorage.removeItem("autoJoinOnLoginChat");
+        }
+    }
 };
 
 window.Chat = Chat;

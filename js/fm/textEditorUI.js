@@ -455,6 +455,7 @@ mega.textEditorUI = new function TextEditorUI() {
         if ($containerDialog) {
             $containerDialog.addClass('hidden');
             window.textEditorVisible = false;
+            mBroadcaster.sendMessage('textEditor:close');
         }
     };
 
@@ -472,6 +473,7 @@ mega.textEditorUI = new function TextEditorUI() {
             pushHistoryState();
             $containerDialog.removeClass('hidden');
             window.textEditorVisible = true;
+            mBroadcaster.sendMessage('textEditor:open');
             $myTextarea = $('.content .txtar', $editorContainer);
             if (!editor) {
                 editor = CodeMirror.fromTextArea($myTextarea[0], {

@@ -5106,8 +5106,7 @@ let streamNode_StreamNode = (_dec = Object(mixins["SoonFcWrap"])(30, true), _dec
     }
   }
 
-  onResizeObserved(args) {
-    const [w, h] = args;
+  onResizeObserved(w, h) {
     const {
       stream
     } = this.props;

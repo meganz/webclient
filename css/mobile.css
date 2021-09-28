@@ -11557,6 +11557,9 @@ code, c {
     }
 }
 /** Password Reminder Overlay **/
+.mobile.password-reminder-overlay.overlay {
+    position: fixed;
+}
 .mobile.password-reminder-overlay .dont-show-again-container {
     margin-top: 12px;
     text-align: center;

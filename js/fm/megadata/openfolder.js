@@ -342,11 +342,11 @@
                         resolve(id);
                     }
 
-                    onIdle(function _() {
+                    onIdle(function _(isInitial) {
                         if (!megaChatIsReady) {
                             // Wait for the chat to be ready (lazy loading)
                             M.renderChatIsLoading();
-                            return mBroadcaster.once('chat_initialized', SoonFc(20, _));
+                            return mBroadcaster.once('chat_initialized', SoonFc(20, _.bind(this, true)));
                         }
                         if (!self.chat) {
                             // We moved elsewhere meanwhile
@@ -354,7 +354,7 @@
                         }
 
                         M.addTreeUI();
-                        megaChat.renderListing(id).then(resolve).catch(reject);
+                        megaChat.renderListing(id, isInitial).then(resolve).catch(reject);
                     });
                 });
             }

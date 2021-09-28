@@ -318,7 +318,13 @@
             $('aside .login-text a, .register-side-pane.header a', $dialog)
                 .rebind('click.doSignup', function() {
                     closeRegisterDialog($dialog, true);
-                    megaChat.loginOrRegisterBeforeJoining(undefined, false, true);
+                    megaChat.loginOrRegisterBeforeJoining(
+                        undefined,
+                        false,
+                        true,
+                        undefined,
+                        opts.onLoginSuccessCb
+                    );
                 });
         }
         else if (options.showLogin) {

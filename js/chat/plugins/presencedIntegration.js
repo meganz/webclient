@@ -3,13 +3,19 @@
  *
  *
  * @param megaChat
- * @returns {PresencedIntegration}
+ * @returns {PresencedIntegration|false}
  * @constructor
  */
 
 var PresencedIntegration = function(megaChat) {
+    if (is_chatlink) {
+        return false;
+    }
+
     var self = this;
     var loggerOpts = {};
+
+
     if (localStorage.presencedDebug) {
         loggerOpts['minLogLevel'] = function() { return MegaLogger.LEVELS.DEBUG; };
         loggerOpts['transport'] = function(level, args) {
@@ -110,7 +116,7 @@ PresencedIntegration.cssClassToPresence = function(strPresence) {
 };
 
 PresencedIntegration.prototype.init = function() {
-    if (anonymouschat) {
+    if (is_chatlink) {
         return;
     }
     var self = this;
@@ -118,7 +124,7 @@ PresencedIntegration.prototype.init = function() {
 
     var userPresence = new UserPresence(
         u_handle,
-        !!RTC,
+        typeof SfuClient !== 'undefined' && SfuClient.platformHasSupport(), // RTC
         false,
         function presencedIntegration_connectedcb(isConnected) {
             // Tip: This cb can be called multiple times with the same isConnected argument, e.g. twice in case of
@@ -252,7 +258,7 @@ PresencedIntegration.prototype._updateuicb = function presencedIntegration_updat
         [
             u_handle,
             presence,
-            !!RTC
+            !!megaChat.hasSupportForCalls // RTC
         ]
     );
 };

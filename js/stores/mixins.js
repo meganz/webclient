@@ -2,6 +2,7 @@ import ReactDOM from "react-dom";
 import React from "react";
 
 var INTERSECTION_OBSERVER_AVAILABLE = typeof IntersectionObserver !== 'undefined';
+var RESIZE_OBSERVER_AVAILABLE = typeof ResizeObserver !== 'undefined';
 
 // copied from Facebook's shallowEqual, used in PureRenderMixin, because it was defined as a _private_ module and
 // adapted to be a bit more optimal for functions...
@@ -195,6 +196,16 @@ export const SoonFcWrap = (milliseconds, local) => {
     };
 };
 
+export const rAFWrap = () => {
+    return function(target, propertyKey, descriptor) {
+        let old = descriptor.value;
+        descriptor.value = function() {
+            return old.apply(this, arguments);
+        };
+        return descriptor;
+    };
+};
+
 export const trycatcher = () => (t, p, d) => (d.value = tryCatch(d.value)) && d;
 
 export class MegaRenderMixin extends React.Component {
@@ -255,6 +266,21 @@ export class MegaRenderMixin extends React.Component {
                     }
                 }
             });
+
+            Object.keys(this).forEach((k) => {
+                if (this[k] && this[k].apply) {
+                    let orig = this[k];
+                    this[k] = function() {
+                        let s = performance.now();
+                        let r = orig.apply(this, arguments);
+                        s = performance.now() - s;
+                        if (s > 30) {
+                            console.error(k, this, "took", s, "ms", 'returned', r);
+                        }
+                        return r;
+                    };
+                }
+            });
         }
 
         if (DEBUG_THIS) {
@@ -274,13 +300,24 @@ export class MegaRenderMixin extends React.Component {
         chatGlobalEventManager.removeEventListener('resize', 'megaRenderMixing' + this.getUniqueId());
         chatGlobalEventManager.removeEventListener('hashchange', 'hc' + this.getUniqueId());
 
+        var node = this.findDOMNode();
         if (this.__intersectionObserverInstance) {
-            var node = this.findDOMNode();
             if (node) {
                 this.__intersectionObserverInstance.unobserve(node);
             }
             this.__intersectionObserverInstance.disconnect();
             this.__intersectionObserverInstance = undefined;
+        }
+
+        if (this.onResizeObserved) {
+            if (!RESIZE_OBSERVER_AVAILABLE) {
+                $(document.body).unbind('resize.resObs' + this.getUniqueId());
+            }
+            else {
+                this.__resizeObserverInstance.unobserve(node);
+                this.__resizeObserverInstance.disconnect();
+                this.__resizeObserverInstance = undefined;
+            }
         }
 
         var instanceId = this.getUniqueId();
@@ -344,8 +381,9 @@ export class MegaRenderMixin extends React.Component {
             this._recurseAddListenersIfNeeded("s", this.state);
         }
 
+        var node = this.findDOMNode();
+
         if (INTERSECTION_OBSERVER_AVAILABLE && !this.customIsEventuallyVisible) {
-            var node = this.findDOMNode();
             if (node) {
                 this.__intersectionVisibility = false;
 
@@ -374,6 +412,19 @@ export class MegaRenderMixin extends React.Component {
                     );
                     this.__intersectionObserverInstance.observe(node);
                 }, 150);
+            }
+        }
+        if (this.onResizeObserved) {
+            if (!RESIZE_OBSERVER_AVAILABLE) {
+                $(document.body).rebind('resize.resObs' + this.getUniqueId(), () => {
+                    this.onResizeObserved(node.offsetWidth, node.offsetHeight);
+                });
+            }
+            else {
+                this.__resizeObserverInstance = new ResizeObserver((entries) => {
+                    this.onResizeObserved(entries[0].contentRect.width, entries[0].contentRect.height);
+                });
+                this.__resizeObserverInstance.observe(node);
             }
         }
 
@@ -776,6 +827,12 @@ export class MegaRenderMixin extends React.Component {
                 "state:", this.state
             );
         }
+
+        if (this.domNode && !this.domNode.isConnected) {
+            // empty cache if node was removed from DOM externally
+            delete this.domNode;
+        }
+
     }
 
     componentWillReceiveProps(nextProps, nextContext) {
@@ -878,8 +935,13 @@ export class ContactAwareComponent extends MegaRenderMixin {
         const syncName = !ContactAwareComponent.unavailableNames[contactHandle] && !contact.firstName &&
             !contact.lastName;
         const syncMail = megaChat.FORCE_EMAIL_LOADING ||
-            (contact.c === 1 || contact.c === 2) && !contact.m && !anonymouschat;
-        const syncAvtr = !contact.avatar && !avatars[contactHandle] &&
+            (contact.c === 1 || contact.c === 2) && !contact.m && !is_chatlink;
+
+        // If this is a chatlink, chat (Avatar -> generateContactAvatarMeta) may had been initialized a text avatar
+        // too early. Ensure such avatar is retrieved and trust `unavailableAvatars` in that case:
+        const syncAvtr = (
+                is_chatlink && (!contact.avatar || contact.avatar?.type === "text") || !contact.avatar
+            ) && !avatars[contactHandle] &&
             !ContactAwareComponent.unavailableAvatars[contactHandle];
 
         const loader = () => {
@@ -891,7 +953,7 @@ export class ContactAwareComponent extends MegaRenderMixin {
             }
 
             const promises = [];
-            const chatHandle = pchandle || (this.props.chatRoom && this.props.chatRoom.publicChatHandle);
+            const chatHandle = is_chatlink.ph || (this.props.chatRoom && this.props.chatRoom.publicChatHandle);
 
             if (syncName) {
                 promises.push(M.syncUsersFullname(contactHandle, chatHandle, new MegaPromise()));

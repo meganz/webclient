@@ -225,6 +225,17 @@
     top: 0;
     border-radius: inherit;
 }
+.message .call-info {
+    display: flex;
+    justify-content: space-between;
+}
+.in-call .message .call-info {
+    display: block;
+    justify-content: unset;
+}
+.in-call .message .call-info-avatars {
+    margin: 10px 0 0 0;
+}
 .message .call-info-container {
     display: flex;
     align-items: center;
@@ -809,6 +820,12 @@ body.theme-dark .message .audio-player {
     padding-inline-start: 12px;
 }
 
+.message .audio-player i {
+    --mask-color: var(--icon-rest);
+    --icon-size: 24px;
+    padding-inline-start: 12px;
+}
+
 .message .audio-player .audio-player__play-btn {
     width: 0;
     height: 0;
@@ -1050,15 +1067,24 @@ body.theme-dark .message .audio-player {
     color: var(--text-color-medium);
 }
 
-.message .geolocation .geolocation__img {
-    background-image: url(../images/mega/link_location@2x.png);
-    background-size: contain;
+.message .geolocation .geolocation__icon {
+    position: relative;
     width: 112px;
     height: 112px;
-    position: relative;
-    left: -35px;
-    top: 5px;
-    display: inline-block;
+    margin: 5px;
+    border-radius: 4px;
+    background: #E2574C;
+}
+
+.message .geolocation .geolocation__icon i {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    margin: 0 auto;
+    --mask-color: var(--secondary-white);
+    --icon-size: 64px;
+
 }
 
 .message .geolocation .geolocation__data-list {

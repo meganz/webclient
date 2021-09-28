@@ -1006,10 +1006,6 @@
     z-index: 10;
 }
 
-.main-start-chat-dropdown .dropdown-white-arrow {
-    margin-left: -7px;
-}
-
 .dropdown.reactions-dropdown .dropdown-white-arrow {
     display: none !important;
 }

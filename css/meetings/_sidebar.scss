@@ -1,0 +1,114 @@
+@import '_sidebarControls.scss';
+@import '_participants.scss';
+@import '_historyPanel.scss';
+
+.sidebar {
+    position: relative;
+    float: left;
+    width: 300px;
+    height: 100%;
+    box-sizing: border-box;
+    background: var(--surface-main);
+    z-index: 1;
+
+    //
+    // Sidebar streams / Speaker mode
+    // --------------------------------------------------------------------
+
+    &-streams-container {
+        height: calc(100% - 70px);
+
+        &.guest {
+            height: calc(100% - 365px);
+        }
+    }
+
+    &-streams {
+        overflow: hidden;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-gap: 8px;
+        padding: 8px 16px 0 16px;
+
+        .stream-node {
+            overflow: hidden;
+            border: 0 none;
+            border-radius: 8px;
+            background: #222;
+
+            &.active {
+                border: 2px solid #6FD7FF;
+
+                .stream-node-content {
+                    overflow: hidden;
+                    border: 2px solid #222;
+                    border-radius: 8px;
+                }
+            }
+
+            &-status {
+                bottom: 5px;
+                left: 5px;
+
+                span {
+                    width: 24px;
+                    height: 24px;
+                    margin: 0 2px 0 0;
+
+                    i { --icon-size: 16px; }
+                }
+            }
+
+            .call-role-icon {
+                padding: 5px;
+                --icon-size: 18px;
+                --mask-color: var(--secondary-white);
+            }
+
+            .loading-icon {
+                width: 64px;
+                height: 64px;
+                margin-left: -32px;
+                margin-top: -32px;
+                filter: invert(0);
+            }
+        }
+    }
+
+    //
+    // Sidebar head
+    // --------------------------------------------------------------------
+
+    &-head {
+        padding: 16px;
+
+        h2 {
+            margin: 0 0 0 5px;
+            color: var(--text-color-high);
+        }
+
+        button {
+            margin: 0 5px 0 0;
+
+            &.add {
+                position: absolute;
+                top: 15px;
+                right: 20px;
+
+                i { --mask-color: var(--secondary-white) }
+            }
+
+            i {
+                margin: 0 auto;
+                --icon-size: 24px;
+                --mask-color: var(--icon-rest);
+            }
+
+            span {
+                position: fixed;
+                bottom: -9999px;
+                visibility: hidden;
+            }
+        }
+    }
+}

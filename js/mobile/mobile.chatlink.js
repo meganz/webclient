@@ -14,13 +14,13 @@ mobile.chatlink = {
 
         var $overlay = $('.mobile.chat-links-preview');
 
-        $('.chatlink-mobile-header a, .chatlink-mobile-header', $overlay).rebind('click.home', function(e) {
+        $('.chatlink-mobile-body i', $overlay).rebind('click.home', () => {
             window.location = "/";
             return false;
         });
 
 
-        $('.chatlink-red-row', $overlay).rebind('click.appdld', function() {
+        $('.btn-download-mega', $overlay).rebind('click.appdld', () => {
             window.location = getMobileStoreLink();
             return false;
         });
@@ -31,13 +31,12 @@ mobile.chatlink = {
         );
 
         // On click/tap
-        $('.chatlink-contents a', $overlay).rebind('tap', function() {
+        $('a', $overlay).rebind('tap', () => {
             $(this).off().addClass('disabled');
 
             // Start the download
             return goToMobileApp(`chat/${publicHandle}#${chatKey}`);
         });
-
 
         this.linkInfo = new LinkInfoHelper(
             publicHandle,
@@ -46,22 +45,25 @@ mobile.chatlink = {
             true
         );
 
-        anonymouschat = true;
-        if (!u_handle) {
-            u_handle = "AAAAAAAAAAA";
-        }
-
-        var self = this;
         init_chat(0x104DF11E5)
-            .always(function() {
-                self.retrieved = self.linkInfo.getInfo();
-                self.retrieved.done(function(result) {
+            .always(() => {
+                this.retrieved = this.linkInfo.getInfo();
+                this.retrieved.done((result) => {
+
+                    if (result.mr) {
+                        $('p', $overlay)
+                            .text(
+                                'Install MEGA app to start a meeting. '
+                                + 'Receive 20 GB of secure and private cloud storage for free.'
+                            );
+                    }
                     if (result.topic) {
-                        var topic = megaChat.plugins.emoticonsFilter.processHtmlMessage(htmlentities(result.topic || ""));
-                        $('h3', $overlay).html(topic);
+                        const topic = megaChat.plugins.emoticonsFilter
+                            .processHtmlMessage(htmlentities(result.topic || ""));
+                        $('h2.topic', $overlay).safeHTML(topic);
                     }
                     if (result.ncm) {
-                        $('h5', $overlay).text(l[20233].replace("%s", result.ncm));
+                        $('.members', $overlay).text(l[20233].replace("%s", result.ncm));
                     }
                 })
             });

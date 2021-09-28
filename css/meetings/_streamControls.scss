@@ -1,0 +1,102 @@
+.stream-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    bottom: -250px;
+    padding: 0 0 24px 0;
+    width: 100%;
+    text-align: center;
+    transition: opacity 500ms ease-in-out, bottom 500ms ease-in-out;
+
+    ul {
+        display: block;
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        list-style: none;
+
+        li {
+            display: inline-block;
+            padding: 0 11px 0 11px;
+
+            button {
+                cursor: pointer;
+
+                &.inactive {
+                    /* [...] */
+
+                    i { --mask-color: #ff6560; }
+                }
+
+                &.end-call {
+                    color: var(--text-color-high);
+
+                    i { --mask-color: var(--secondary-white); }
+                }
+
+                i {
+                    display: block;
+                    margin: 0 auto;
+                    --icon-size: 32px;
+                    --mask-color: var(--icon-active);
+                }
+
+                span {
+                    position: fixed;
+                    bottom: -9999px;
+                    visibility: hidden;
+                }
+
+                .active-indicator {
+                    position: absolute;
+                    top: -1px;
+                    right: 2px;
+                    width: 12px;
+                    height: 12px;
+                    border-radius: 200px;
+                    background: #88FF5B;
+                }
+            }
+        }
+    }
+
+    //
+    // Button group
+    // TODO: refactor -- possibly part of `Button`
+    // --------------------------------------------------------------------
+
+    .button-group {
+        position: relative;
+
+        &-menu {
+            display: none;
+            position: absolute;
+            transform: translateY(-100%);
+
+            &.expanded { display: block; }
+
+            .button-group-item {
+                margin: 0 0 10px 0;
+            }
+        }
+    }
+
+    .stream-debug {
+        /* [...] */
+
+        button {
+            float: left;
+            margin: 0 5px 0 0;
+
+            i {
+                --icon-size: 20px;
+                --mask-color: var(--secondary-white);
+            }
+
+            span {
+                text-indent: -9999px;
+            }
+        }
+    }
+}

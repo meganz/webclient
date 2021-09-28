@@ -1,0 +1,45 @@
+.participants-notice {
+    width: 460px;
+    margin: 0 auto;
+
+    &.user-alone {
+        margin-top: -140px;
+    }
+
+    &-heading {
+        padding: 12px 48px;
+        border-radius: 34px;
+        text-align: center;
+        background: var(--surface-highlight-1);
+
+        h1 {
+            margin: 0;
+            color: var(--secondary-white);
+        }
+    }
+
+    &-content {
+        width: 460px;
+        padding: 22px 62px;
+        margin: 12px auto 0;
+        box-sizing: border-box;
+        border-radius: 34px;
+        text-align: center;
+        background: var(--surface-highlight-1);
+
+        h3 { color: var(--secondary-white); }
+
+        .mega-input {
+            margin: 0 0 16px 0;
+        }
+
+        .peers-invite {
+            margin: 40px 0 0 0;
+
+            hr {
+                border: 0 none;
+                border-top: 1px solid #444;
+            }
+        }
+    }
+}

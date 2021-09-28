@@ -165,6 +165,9 @@ var crypt = (function() {
             myCtx.callback = __settleFunction;
 
             var __retrieveRsaKeyFunc = function() {
+                if (Object(window.u_attr).u === userhandle) {
+                    return __settleFunction({u: u_attr.u, pubk: u_attr.pubk});
+                }
                 // Fire it off.
                 api_req({a: 'uk', u: userhandle}, myCtx);
             };
@@ -374,7 +377,7 @@ var crypt = (function() {
             }
         };
 
-        if (!anonymouschat && (authring.hadInitialised() === false || typeof u_authring === 'undefined')) {
+        if (!is_chatlink && (authring.hadInitialised() === false || typeof u_authring === 'undefined')) {
             // Need to initialise the authentication system (authring).
             if (d > 1) {
                 logger.debug('Waiting for authring to initialise first.', 'Tried to access: ', userhandle, keyType);

@@ -2446,7 +2446,9 @@ label.iPhoneCheckLabelOff span {
 .contacts-panel .fm-contact-requests, .contacts-panel .fm-received-requests {
     display: block;
 }
-.not-logged .contacts-panel .fm-contact-requests, .not-logged .nw-fm-left-icon.conversations, .not-logged .contacts-panel .fm-received-requests {
+
+.not-logged .contacts-panel .fm-contact-requests,
+.not-logged .contacts-panel .fm-received-requests {
     display: none;
 }
 .content-panel {
@@ -15877,5 +15879,9 @@ body.megaChatDisabled .nw-contact-name button.start-chat-button {
 }
 .not-logged .active-folder-link .corner-messages {
     bottom: 66px;
+}
+.in-call .corner-messages {
+    bottom: 24px;
+    left: 24px;
 }
 /* end corner toasts and transfer popup */

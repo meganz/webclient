@@ -182,6 +182,12 @@ LinkInfoHelper.prototype.retrieve = function() {
         return MegaPromise.resolve();
     }
     else if (self.is_chatlink) {
+        if (window.is_chatlink && is_chatlink.pnh === self.node_handle) {
+            self.info.ncm = is_chatlink.ncm;
+            self.info.ct = is_chatlink.ct;
+            return MegaPromise.resolve();
+        }
+
         self._promise = asyncApiReq({
             'a': 'mcphurl',
             'v': Chatd.VERSION,
@@ -190,6 +196,7 @@ LinkInfoHelper.prototype.retrieve = function() {
             .done(function (r) {
                 self.info['ncm'] = r.ncm;
                 self.info['ct'] = r.ct;
+                self.info.mr = r.mr;
             })
             .fail(function (e) {
                 self.failed = true;

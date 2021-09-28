@@ -1,0 +1,69 @@
+.mode {
+    float: left;
+
+    button {
+        float: left;
+        padding: 0;
+        text-align: left;
+        border: 0;
+        font: var(--text-h3);
+        color: var(--secondary-white);
+        background: transparent;
+        cursor: pointer;
+
+        i {
+            float: left;
+            margin: 0 8px 0 0;
+            --icon-size: 24px;
+            --mask-color: var(--icon-rest);
+        }
+
+        div {
+            display: block;
+            float: left;
+            width: auto;
+            height: auto;
+            color: var(--secondary-white);
+        }
+    }
+
+    &-toggle {
+        overflow: hidden;
+
+        i {
+            display: block;
+            float: left;
+            margin: 6px 0 0 10px;
+            --icon-size: 16px;
+            --mask-color: var(--icon-rest);
+        }
+    }
+
+    &-menu {
+        display: none;
+        position: absolute;
+        top: 100%;
+        margin: 8px 0 0 0;
+        padding: 7px;
+        border-radius: 12px;
+        border: var(--context-menu-border);
+        background: var(--surface-main);
+        box-shadow: var(--dropdown-shadow);
+
+        &.expanded { display: block; }
+
+        .mode-option {
+            overflow: hidden;
+            padding: 8px;
+            opacity: 0.7;
+
+            &:hover { opacity: 1; }
+
+            &.active {
+                border-radius: 4px;
+                background: var(--surface-grey-1);
+                opacity: 1;
+            }
+        }
+    }
+}

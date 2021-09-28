@@ -295,7 +295,7 @@ ConnectionRetryManager.prototype.startedConnecting = function(waitForPromise, de
         function() {
             return self.options.functions.isConnected();
         },
-        500,
+        1500,
         self.options.connectTimeout + (delayed ? delayed : 0),
         undefined,
         waitForPromise,

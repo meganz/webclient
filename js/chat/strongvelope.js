@@ -70,7 +70,7 @@ var strongvelope = {};
     var MESSAGE_REFERENCE_SIZE = strongvelope.MESSAGE_REFERENCE_SIZE;
 
     /** User handle of chat API. */
-    strongvelope.COMMANDER = 'gTxFhlOd_LQ';
+    strongvelope.COMMANDER = typeof mega !== 'undefined' && mega.BID ? mega.BID : 'gTxFhlOd_LQ';
     var COMMANDER = strongvelope.COMMANDER;
 
     /** Flag of temporary key ID. */
@@ -743,17 +743,14 @@ var strongvelope = {};
     strongvelope.ProtocolHandler = function(ownHandle, myPrivCu25519,
             myPrivEd25519, myPubEd25519, chatMode, chatUnifiedKey) {
 
-        this.ownHandle = ownHandle || u_handle;
-        this.myPrivCu25519 = myPrivCu25519 || u_privCu25519;
-        this.myPrivEd25519 = myPrivEd25519 || u_privEd25519;
-        this.myPubEd25519 = myPubEd25519;
-        if (!this.myPubEd25519 && chatMode !== CHAT_MODE.PUBLIC) {
-            this.myPubEd25519 = crypt.getPubKeyFromPrivKey(this.myPrivEd25519, 'Ed25519');
-        }
+
+
 
         this.keyId = null;
         this.participantKeys = {};
-        this.participantKeys[this.ownHandle] = {};
+
+        this.reinitWithNewData(ownHandle, myPrivCu25519, myPrivEd25519, myPubEd25519, chatMode);
+
         this.otherParticipants = new Set();
         this.includeParticipants = new Set();
         this.excludeParticipants = new Set();
@@ -805,6 +802,25 @@ var strongvelope = {};
         }
     };
 
+
+    strongvelope.ProtocolHandler.prototype.reinitWithNewData = function(
+        ownHandle,
+        myPrivCu25519,
+        myPrivEd25519,
+        myPubEd25519,
+        chatMode
+    ) {
+        this.ownHandle = ownHandle || u_handle;
+
+        this.myPrivCu25519 = myPrivCu25519 || u_privCu25519;
+        this.myPrivEd25519 = myPrivEd25519 || u_privEd25519;
+        this.myPubEd25519 = myPubEd25519;
+        if (!this.myPubEd25519 && chatMode !== CHAT_MODE.PUBLIC) {
+            this.myPubEd25519 = crypt.getPubKeyFromPrivKey(this.myPrivEd25519, 'Ed25519');
+        }
+        this.participantKeys[this.ownHandle] = {};
+
+    };
 
     /**
      * Parses a message and extracts the sender keys.
@@ -2312,7 +2328,6 @@ var strongvelope = {};
      */
     strongvelope.ProtocolHandler.prototype.switchOffOpenMode = function() {
         var self = this;
-        self.unifiedKey = null;
         self.chatMode = CHAT_MODE.CLOSED;
         self.keyRotation = true;
     };

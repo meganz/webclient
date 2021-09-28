@@ -99,7 +99,7 @@ MegaData.prototype.accountData = function(cb, blockui, force) {
                 }
             }
         });
-        if (!anonymouschat) {
+        if (!is_chatlink) {
             api_req({a: 'uga', u: u_handle, ua: '^!rubbishtime', v: 1}, {
                 account: account,
                 callback: function(res, ctx) {

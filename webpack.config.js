@@ -30,8 +30,10 @@ var BABEL_LOADER_OPTIONS = {
 
 var webpackConfigs = {
     dev: {
+        cache: {
+            type: 'memory'
+        },
         mode: 'development',
-        cache: false,
         entry: {
             app: [
                 'webpack-dev-server/client?http://localhost:8089', // WebpackDevServer host and port

@@ -526,7 +526,7 @@ MegaData.prototype.syncContactEmail = function(userHash, promise, forced) {
         forced = true;
     }
 
-    if (!forced && (!user || anonymouschat || user.c !== 1 && user.c !== 2)) {
+    if (!forced && (is_chatlink || !user || user.c !== 1 && user.c !== 2)) {
         return promise ? promise.reject() : false;
     }
 

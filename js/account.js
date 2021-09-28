@@ -205,24 +205,52 @@ function u_checklogin3a(res, ctx) {
             document.body.classList.add('rk-saved');
         }
 
-        if (r > 2 && !is_embed) {
-            return mBroadcaster.crossTab.initialize(function() {
-                ctx.checkloginresult(ctx, r);
-            });
-        }
+        (window.M && typeof M.getPersistentData === 'function' ? M.getPersistentData('e++ck') : Promise.reject())
+            .then((data) => {
+                if (r < 3) {
+                    assert(!u_attr.privk, 'a privk is set.');
+                    assert(u_attr.u === data.u, 'found another e++ account.');
+                    window.is_eplusplus = true;
+                    return;
+                }
+
+                // Former E++ account user.
+                window.is_eplusplus = false;
+                return M.getPersistentDataEntries('e++', true)
+                    .then((records) => {
+                        if (d) {
+                            console.debug('Migrating E++ account records...', records);
+                        }
+
+                        const pfx = 'e++ua!';
+                        const keys = Object.keys(records);
+
+                        for (let i = keys.length; i--;) {
+                            const key = keys[i];
+
+                            if (key.startsWith(pfx)) {
+                                attribCache.setItem(key.substr(pfx.length), records[key]);
+                            }
+                            M.delPersistentData(key);
+                        }
+                    });
+            })
+            .always(() => {
         // there was a race condition between importing and business accounts creation.
         // in normal users there's no problem, however in business the user will be disabled
         // till they pay. therefore, if the importing didnt finish before 'upb' then the importing
         // will fail.
-        if ($.createanonuser === u_attr.u) {
-            M.importWelcomePDF().always(function imprtingFinishedCallback() {
-                ctx.checkloginresult(ctx, r);
+                if ($.createanonuser === u_attr.u) {
+                    M.importWelcomePDF().always(() => ctx.checkloginresult(ctx, r));
+                    delete $.createanonuser;
+                }
+                else if (r > 2 && !is_embed) {
+                    mBroadcaster.crossTab.initialize(() => ctx.checkloginresult(ctx, r));
+                }
+                else {
+                    ctx.checkloginresult(ctx, r);
+                }
             });
-            delete $.createanonuser;
-        }
-        else {
-            ctx.checkloginresult(ctx, r);
-        }
     }
 }
 
@@ -513,6 +541,55 @@ function u_setrsa(rsakey) {
     api_req(request, ctx);
 
     return $promise;
+}
+
+function u_eplusplus(firstName, lastName) {
+    'use strict';
+    return new Promise((resolve, reject) => {
+        if (window.u_k || window.u_type !== false || window.u_privk) {
+            return reject(EEXIST);
+        }
+
+        u_storage = init_storage(localStorage);
+        u_checklogin({
+            checkloginresult: tryCatch((u_ctx, r) => {
+                if (r !== 0) {
+                    return reject(r);
+                }
+                if (u_attr.privk) {
+                    return reject(u_attr.u);
+                }
+                u_type = r;
+
+                var data = {
+                    u: u_attr.u,
+                };
+                M.setPersistentData('e++ck', data)
+                    .then(() => {
+                        return Promise.allSettled([
+                            mega.attr.set(
+                                'firstname', base64urlencode(to8(firstName)), -1, false
+                            ),
+                            mega.attr.set(
+                                'lastname', base64urlencode(to8(lastName)), -1, false
+                            )
+                        ]);
+                    })
+                    .then(() => {
+                        process_u([{c: 0, u: u_attr.u}]);
+                        return authring.initAuthenticationSystem();
+                    })
+                    .then(() => {
+                        // Update top menu controls (Logout)
+                        onIdle(() => topmenuUI());
+
+                        is_eplusplus = true;
+                        resolve(u_attr.u);
+                    })
+                    .catch(reject);
+            }, reject)
+        }, true);
+    });
 }
 
 // Save user's Recovery/Master key to disk

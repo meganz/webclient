@@ -1,6 +1,6 @@
 // chatd interface
 
-var CHATD_TAG = localStorage.chatdTag || '8';
+var CHATD_TAG = localStorage.chatdTag ? localStorage.chatdTag : '10';
 
 var Chatd = function(userId, megaChat, options) {
     var self = this;
@@ -51,27 +51,6 @@ var Chatd = function(userId, megaChat, options) {
             return Chatd.LOGGER_LEVEL;
         }
     });
-
-    // Initialize with a dummy webrtc event handler
-    self.rtcHandler = self.defaultRtcHandler = {
-        handleMessage: function(shard, msg, len) {},
-        onClientLeftCall: function(chat, userid, clientid) {},
-        onClientJoinedCall: function(chat, userid, clientid) {},
-        onKickedFromChatroom: function(chat) {},
-        handleCallData: function(shard, cmd, payloadLen) {
-            var type = cmd.charCodeAt(31);
-            if (type === CallDataType.kRinging) {
-                var chatid = cmd.substr(1, 8);
-                var userid = cmd.substr(9, 8);
-                var clientid = cmd.substr(17, 4);
-                var callid = cmd.substr(23, 8);
-                shard.rtcmd(chatid, userid, clientid, RTCMD.CALL_REQ_DECLINE,
-                    callid + String.fromCharCode(Term.kErrNotSupported));
-            }
-        },
-        onShutdown: function() {},
-        onChatOnline: function(chat) {}
-    };
 
     // load persistent client id, or generate one if none was stored
     self.identity = Chatd.pack32le((Math.random() * 0xffffffff) | 0) +
@@ -175,7 +154,12 @@ Chatd.Opcode = {
     'HANDLELEAVE': 47,
     'REACTIONSN': 48,
     'MSGIDTIMESTAMP': 49,
-    'NEWMSGIDTIMESTAMP': 50
+    'NEWMSGIDTIMESTAMP': 50,
+    'JOINEDCALL': 51,
+    'LEFTCALL': 52,
+    'CALLSTATE': 53,
+    'CALLEND': 54,
+    'DELCALLREASON': 55,
 };
 
 // privilege levels
@@ -242,7 +226,7 @@ Chatd.sendingnum = 2 << 30;
 
 Chatd.prototype._proxyEventsToRooms = function() {
     "use strict";
-    var self = this;
+
     [
         'onMessagesHistoryDone',
         'onMessageStore',
@@ -265,10 +249,17 @@ Chatd.prototype._proxyEventsToRooms = function() {
         'onAddReaction',
         'onDelReaction',
         'onReactionSn',
-        'onAddDelReactionReject'
+        'onAddDelReactionReject',
+        'onJoinCall',
+        'onLeftCall',
+        'onCallState',
+        'onCallEnd',
     ]
-        .forEach(function(eventName) {
-            self.rebind(eventName + '.chatdProxy', function(e, eventData) {
+        .forEach((eventName) => {
+            this.rebind(eventName + '.chatdProxy', (e, eventData) => {
+                if (!this.megaChat.is_initialized) {
+                    return;
+                }
                 assert(eventData.chatId, 'chatid is missing');
                 var chatRoom = megaChat.getChatById(eventData.chatId);
                 if (chatRoom) {
@@ -277,6 +268,7 @@ Chatd.prototype._proxyEventsToRooms = function() {
                 else {
                     if (d) {
                         console.warn("chatRoom was missing for event:", eventName, eventData);
+                        megaChat.enqueueChatRoomEvent(eventName, eventData);
                     }
                 }
             });
@@ -454,7 +446,7 @@ Chatd.Shard = function(chatd, shard) {
 
     Object.defineProperty(self, 'userIsActive', {
         get: function() {
-            return megaChat.activeCallManagerCall || mega.active;
+            return megaChat.haveAnyActiveCall() || mega.active;
         }
     });
 
@@ -536,13 +528,15 @@ Chatd.Shard.prototype.triggerEventOnAllChats = function(evtName) {
 
 Chatd.Shard.prototype.retrieveMcurlAndExecOnce = promisify(function(resolve, reject, chatId) {
     'use strict';
-    var publicChatHandle = anonymouschat && pchandle;
     var chatHandleOrId = chatId;
+    let publicChatHandle = is_chatlink.ph;
 
-    if (publicChatHandle) {
-        chatHandleOrId = pchandle;
-    }
-    else {
+    // should chatHandleOrId become === publicChatHandle?
+    // if (publicChatHandle) {
+    //     chatHandleOrId = pchandle;
+    // } else { ... }
+
+    if (!publicChatHandle) {
         var chatRoom = megaChat.getChatById(chatId);
         if (chatRoom && chatRoom.publicChatHandle) {
             publicChatHandle = chatRoom.publicChatHandle;
@@ -679,7 +673,6 @@ Chatd.Shard.prototype.handleDisconnect = function() {
     for (var chatid in self.chatIds) {
         var chat = chats[chatid];
         assert(chat);
-        chat._clearCallInfo();
         chats[chatid]._setLoginState(LoginState.DISCONN);
     }
     chatd.trigger('onClose', {
@@ -752,17 +745,9 @@ Chatd.cmdsToArrayStrings = function(cmd, tx) {
 Chatd.cmdToString = function(cmd, tx) {
     var opCode = cmd.charCodeAt(0);
     var result;
-    if (opCode >= Chatd.Opcode.RTMSG_BROADCAST && opCode <= Chatd.Opcode.RTMSG_ENDPOINT) {
-        var rtcmdInfo = RtcModule.rtcmdToString(cmd, tx, opCode);
-        result = rtcmdInfo[0];
-        return [result, rtcmdInfo[1]];
-    }
+
     result = constStateToText(Chatd.Opcode, opCode);
-    if (opCode === Chatd.Opcode.CALLDATA) {
-        var ret = RtcModule.callDataToString(cmd, tx);
-        result += ret[0];
-        return [result, ret[1]];
-    }
+
     // To ease debugging, please add more commands here when needed
     // (debugging = console grepping for ids, etc, so thats why, I'm parsing
     // them here and showing them in non-hex format)
@@ -887,8 +872,10 @@ Chatd.cmdToString = function(cmd, tx) {
                     case strongvelope.MESSAGE_TYPES.CALL_END:
                         // call-end management message format is:
                         // callId.8 endCallReason.1 callDuration.4
+                        var callId = base64urlencode(parsed.payload.substr(0, 8));
+                        result += " callId: " + callId;
                         var reason = parsed.payload.charCodeAt(8);
-                        result += " callend-type: " + constStateToText(CallManager.CALL_END_REMOTE_REASON, reason) +
+                        result += " callend-type: " + constStateToText(CallManager2.CALL_END_REMOTE_REASON, reason) +
                             " dur: " + Chatd.unpack32le(parsed.payload.substr(9, 4));
                         break;
                 }
@@ -956,6 +943,44 @@ Chatd.cmdToString = function(cmd, tx) {
 
             return [result, 17];
 
+        case Chatd.Opcode.JOINEDCALL:
+        case Chatd.Opcode.LEFTCALL:
+            result += ' chatId: ' + base64urlencode(cmd.substr(1, 8)) +
+                ' callId: ' + base64urlencode(cmd.substr(9, 8)) + ' participants: ';
+            var participantsLen = cmd.charCodeAt(17);
+
+            var participantsCmd = cmd.substr(18);
+            for (var i = 0; i < participantsLen * 8; i += 8) {
+                result += ' ' + base64urlencode(participantsCmd.substr(i, 8));
+            }
+
+            return [result, 18 + participantsLen * 8];
+
+        case Chatd.Opcode.CALLSTATE:
+            result += ' chatId: ' + base64urlencode(cmd.substr(1, 8)) +
+                ' userId: ' + base64urlencode(cmd.substr(9, 8)) +
+                ' callId: ' + base64urlencode(cmd.substr(17, 8));
+
+            result += " ringing: " + cmd.charCodeAt(25);
+
+            return [result, cmd.charCodeAt(0) === Chatd.Opcode.CALLSTATE ? 26 : 17];
+
+        case Chatd.Opcode.CALLEND:
+            result += ' chatId: ' + base64urlencode(cmd.substr(1, 8)) +
+                ' callId: ' + base64urlencode(cmd.substr(9, 8));
+
+            result += " reason: " + cmd.charCodeAt(17);
+
+            return [result, 17];
+
+        case Chatd.Opcode.DELCALLREASON:
+            result += ' chatId: ' + base64urlencode(cmd.substr(1, 8)) +
+                ' callId: ' + base64urlencode(cmd.substr(9, 8));
+
+            result += " reason: " + cmd.charCodeAt(17);
+
+            return [result, 18];
+
         case Chatd.Opcode.MSGIDTIMESTAMP:
         case Chatd.Opcode.NEWMSGIDTIMESTAMP:
             // <msgxid.8> <msgid.8> <ts.4>
@@ -1000,36 +1025,6 @@ Chatd.Shard.prototype.cmd = function(opCode, cmd, sendFirst) {
     }
 
     return this.triggerSendIfAble(sendFirst);
-};
-/*
- * Checks if the shard has a clientId assigned. It may be
- * connected and fully operational for text chat, but not yet assigned a clientId,
- * which is needed for webrtc
- */
-Chatd.Shard.prototype.rtcmd = function(chatid, userid, clientid, rtcmdCode, payload) {
-    if (!this.clientId) {
-        console.warn("Chatd.Shard.rtcmd: Trying to send an RTCMD when we don't yet have a CLIENTID assigned");
-        return false;
-    }
-    var opcode;
-    if (!userid) {
-        userid = '\0\0\0\0\0\0\0\0';
-        clientid = '\0\0\0\0';
-        opcode = Chatd.Opcode.RTMSG_BROADCAST;
-    } else if (!clientid) {
-        clientid = '\0\0\0\0';
-        opcode = Chatd.Opcode.RTMSG_USER;
-    } else {
-        opcode = Chatd.Opcode.RTMSG_ENDPOINT;
-    }
-
-    var len = payload ? payload.length + 1 : 1;
-    var data = chatid + userid + clientid + Chatd.pack16le(len) + String.fromCharCode(rtcmdCode);
-    if (payload) {
-        data += payload;
-    }
-
-    return this.cmd(opcode, data);
 };
 
 Chatd.Shard.prototype.sendKeepAlive = function(forced) {
@@ -1415,8 +1410,6 @@ Chatd.Shard.prototype.exec = function(a) {
                     if (priv === -1) { // we left the chatroom
                         if (chat) {
                             chat._setLoginState(null); // chat disabled, don't join upon re/connect
-                            chat._clearCallInfo();
-                            chatd.rtcHandler.onKickedFromChatroom(chat);
                         }
                     } else if (priv === 0 || priv === 1 || priv === 2 || priv === 3) {
                         // ^^ explicit and easy to read...despite that i could have done >= 1 <= 3 or something like
@@ -1448,12 +1441,6 @@ Chatd.Shard.prototype.exec = function(a) {
                     }
                     else {
                         self.logger.error("Not sure how to handle priv: " + priv + ".");
-                    }
-                } else {
-                    if (priv === -1) { // Someone else left the group chat
-                        if (chat) {
-                            chat.onUserLeftRoom(userIdBin);
-                        }
                     }
                 }
 
@@ -1531,7 +1518,7 @@ Chatd.Shard.prototype.exec = function(a) {
 
                 len = 23 + Chatd.unpack16le(cmd.substr(21, 2));
                 var rtcmd = cmd.charCodeAt(23);
-                self.chatd.rtcHandler.handleMessage(self, cmd, len);
+                // self.chatd.rtcHandler.handleMessage(self, cmd, len);
                 break;
             case Chatd.Opcode.CALLDATA:
                 self.keepAlive.restart();
@@ -1542,7 +1529,7 @@ Chatd.Shard.prototype.exec = function(a) {
                     break; // will be re-checked and cause error
                 }
                 // checks if payload spans outside actual cmd.length
-                chatd.rtcHandler.handleCallData(self, cmd, pllen);
+                // chatd.rtcHandler.handleCallData(self, cmd, pllen);
                 break;
             case Chatd.Opcode.INCALL:
             case Chatd.Opcode.ENDCALL:
@@ -1563,11 +1550,6 @@ Chatd.Shard.prototype.exec = function(a) {
                 }
                 var userid = cmd.substr(9, 8);
                 var clientid = cmd.substr(17, 4);
-                if (opcode === Chatd.Opcode.INCALL) {
-                    chat.onInCall(userid, clientid);
-                } else {
-                    chat.onEndCall(userid, clientid);
-                }
                 break;
             case Chatd.Opcode.CLIENTID:
                 self.keepAlive.restart();
@@ -1636,7 +1618,6 @@ Chatd.Shard.prototype.exec = function(a) {
 
                 len = 21;
                 break;
-
 
             case Chatd.Opcode.NEWMSGID:
                 self.keepAlive.restart();
@@ -1741,7 +1722,6 @@ Chatd.Shard.prototype.exec = function(a) {
                     var loginState = chat.loginState();
                     if ((loginState !== null) && (loginState < LoginState.HISTDONE)) {
                         chat._setLoginState(LoginState.HISTDONE); // logged in
-                        self.chatd.rtcHandler.onChatOnline(chat);
                     }
                     // chat.restoreIfNeeded(cmd.substr(1, 8));
                 }
@@ -1881,7 +1861,7 @@ Chatd.Shard.prototype.exec = function(a) {
                 self.keepAlive.restart();
                 var chatId2 = base64urlencode(cmd.substr(1, 8));
                 var userId2 = base64urlencode(cmd.substr(9, 8));
-                userId2  = userId2 === "gTxFhlOd_LQ" ? u_handle : userId2;
+                userId2  = userId2 === mega.BID ? u_handle : userId2;
                 var msgId2 = base64urlencode(cmd.substr(17, 8));
                 len = cmd.substr(25, 1).charCodeAt(0);
                 var emoji2 = cmd.substr(26, len);
@@ -1901,7 +1881,7 @@ Chatd.Shard.prototype.exec = function(a) {
                 self.keepAlive.restart();
                 var chatId3 = base64urlencode(cmd.substr(1, 8));
                 var userId3 = base64urlencode(cmd.substr(9, 8));
-                userId3  = userId3 === "gTxFhlOd_LQ" ? u_handle : userId3;
+                userId3  = userId3 === mega.BID ? u_handle : userId3;
                 var msgId3 = base64urlencode(cmd.substr(17, 8));
                 len = cmd.substr(25, 1).charCodeAt(0);
                 var emoji3 = cmd.substr(26, len);
@@ -1929,6 +1909,69 @@ Chatd.Shard.prototype.exec = function(a) {
 
                 len = 17;
 
+                break;
+
+            case Chatd.Opcode.JOINEDCALL:
+            case Chatd.Opcode.LEFTCALL:
+                self.keepAlive.restart();
+
+                var participantsLen = cmd.charCodeAt(17);
+                var participantsCmd = cmd.substr(18);
+                var parts = [];
+                for (var i = 0; i < participantsLen * 8; i += 8) {
+                    parts.push(base64urlencode(participantsCmd.substr(i, 8)));
+                }
+
+                self.chatd.trigger(
+                    cmd.charCodeAt(0) === Chatd.Opcode.JOINEDCALL ? 'onJoinCall' : 'onLeftCall',
+                    {
+                        chatId: base64urlencode(cmd.substr(1, 8)),
+                        callId: base64urlencode(cmd.substr(9, 8)),
+                        participants: parts
+                    });
+
+                len = 18 + participantsLen * 8;
+                break;
+
+            case Chatd.Opcode.CALLSTATE:
+                self.keepAlive.restart();
+
+                self.chatd.trigger(
+                    'onCallState',
+                    {
+                        chatId: base64urlencode(cmd.substr(1, 8)),
+                        userId: base64urlencode(cmd.substr(9, 8)),
+                        callId: base64urlencode(cmd.substr(17, 8)),
+                        arg: cmd.charCodeAt(25),
+                    });
+                len = 26;
+                break;
+
+            case Chatd.Opcode.CALLEND:
+                self.keepAlive.restart();
+
+                self.chatd.trigger(
+                    'onCallEnd',
+                    {
+                        chatId: base64urlencode(cmd.substr(1, 8)),
+                        callId: base64urlencode(cmd.substr(9, 8)),
+                        arg: cmd.charCodeAt(17),
+                        removeActive: true
+                    });
+                len = 17;
+                break;
+
+            case Chatd.Opcode.DELCALLREASON:
+                self.keepAlive.restart();
+                self.chatd.trigger(
+                    'onCallEnd',
+                    {
+                        chatId: base64urlencode(cmd.substr(1, 8)),
+                        callId: base64urlencode(cmd.substr(9, 8)),
+                        arg: cmd.charCodeAt(17),
+                        removeActive: true
+                    });
+                len = 18;
                 break;
 
             default:
@@ -2029,7 +2072,7 @@ Chatd.prototype.leave = function(chatId) {
 
 // gracefully terminate all connections/calls
 Chatd.prototype.shutdown = function() {
-    this.rtcHandler.onShutdown();
+    // this.rtcHandler.onShutdown();
 };
 
 // submit a new message to the chatId
@@ -2127,7 +2170,6 @@ Chatd.Messages = function(chatd, shard, chatId, oldInstance) {
     // expired message list
     this.expired = {};
     this.needsRestore = true;
-    this._clearCallInfo();
     this._loginState = oldInstance ? oldInstance._loginState : LoginState.DISCONN;
 };
 
@@ -2148,9 +2190,6 @@ Chatd.Messages.prototype.loginState = function() {
     return this._loginState;
 };
 
-Chatd.Messages.prototype._clearCallInfo = function() {
-    this.callInfo = new CallInfo();
-};
 
 // send JOIN
 Chatd.Messages.prototype.join = function() {
@@ -2163,7 +2202,6 @@ Chatd.Messages.prototype.join = function() {
     var chatRoom = self.chatd.megaChat.getChatById(base64urlencode(self.chatId));
 
     // reset chat state before join
-    self._clearCallInfo();
     self._setLoginState(LoginState.JOIN_SENT); // joining
     // send a `JOIN` (if no local messages are buffered) or a `JOINRANGEHIST` (if local messages are buffered)
     if (
@@ -2770,14 +2808,6 @@ Chatd.prototype.msgreferencelist = function(chatId) {
     }
 };
 
-// set webrtc message handler
-Chatd.prototype.setRtcHandler = function(handler) {
-    if (handler) {
-        this.rtcHandler = handler;
-    } else {
-        this.rtcHandler = this.defaultRtcHandler;
-    }
-};
 
 Chatd.prototype._reinitChatIdHistory = function(chatId, resetNums) {
     var self = this;
@@ -3458,60 +3488,8 @@ Chatd.Messages.prototype.check = function(chatId, msgid) {
     // If this message does not exist in the history, a HIST should be called. However, this should be handled in the
     // implementing code (which tracks more info regarding the actual history, messages, last recv/delivered, etc
 };
-Chatd.Messages.prototype.onInCall = function(userid, clientid) {
-    var self = this;
-    // We ignore preliminary INCALLs and CALLDATAs that chatd sends before we join (for fast call answer on mobile)
-    if (self._loginState < LoginState.JOIN_RECEIVED) {
-        return;
-    }
-    var parts = self.callInfo.participants;
-    var endpointId = userid + clientid;
-    var val = parts[endpointId];
-    if (val != null) {
-        if (!isNaN(val)) {
-            if (base64urlencode(userid) !== u_handle) {
-                self.chatd.logger.warn("Received INCALL for a user that has valid A/V flags, but that user is not us");
-            }
-        } else {
-            self.chatd.logger.warn("INCALL received for user that is already known to be in the call");
-            return;
-        }
-    }
-    parts[endpointId] = true; // to be replaced by av flags when RtcModule receives CALLDATA for that peer
-    self.chatd.rtcHandler.onClientJoinedCall(self, userid, clientid);
-};
 
-Chatd.Messages.prototype.onEndCall = function(userid, clientid) {
-    var self = this;
-    // We ignore preliminary INCALLs and CALLDATAs that chatd sends before we join (for fast call answer on mobile)
-    if (self._loginState < LoginState.JOIN_RECEIVED) {
-        return;
-    }
 
-    var info = self.callInfo;
-    var parts = info.participants;
-    var endpointId = userid + clientid;
-    if (parts[endpointId] == null) {
-        self.chatd.logger.warn("ENDCALL received for user that is not known to be in the call", JSON.stringify(parts));
-        return; // Don't have it, should not normally happend
-    }
-    delete parts[endpointId];
-    if (info.participantCount() === 0) {
-        self._clearCallInfo();
-    }
-    self.chatd.rtcHandler.onClientLeftCall(self, userid, clientid);
-};
-
-Chatd.Messages.prototype.onUserLeftRoom = function(userid) {
-    var self = this;
-    var parts = self.callInfo.participants;
-    for (var k in parts) {
-        if (k.substr(0, 8) === userid) {
-            delete parts[k];
-            self.chatd.rtcHandler.onClientLeftCall(self, userid, k.substr(8, 4));
-        }
-    }
-};
 
 // get a list of reference messages
 Chatd.Messages.prototype.getreferencelist = function() {

@@ -12,7 +12,7 @@ function IndexedDBKVStorage(name) {
     this.delcache = Object.create(null);    // delete items that are pending deletion from the DB
 }
 
-IndexedDBKVStorage.prototype = Object.create(null);
+inherits(IndexedDBKVStorage, null);
 
 // sets fmdb reference and prefills the memory cache from the DB
 // (call this ONCE as soon as the user-specific IndexedDB is open)
@@ -21,6 +21,23 @@ IndexedDBKVStorage.prototype.load = function() {
     'use strict';
     var self = this;
     return new MegaPromise(function(resolve) {
+        if (is_eplusplus) {
+            var pfx = 'e++' + self.name + '!';
+            M.getPersistentDataEntries(pfx, true)
+                .then(function(store) {
+                    var keys = Object.keys(store);
+                    for (var i = keys.length; i--;) {
+                        if (store[keys[i]]) {
+                            self.dbcache[keys[i].substr(pfx.length)] = store[keys[i]];
+                        }
+                        else if (d) {
+                            console.warn('Malformed data in entry.', keys[i], store[keys[i]]);
+                        }
+                    }
+                })
+                .always(resolve);
+            return;
+        }
         if (!window.fmdb) {
             return resolve();
         }
@@ -43,14 +60,20 @@ IndexedDBKVStorage.prototype.flush = function() {
     var fmdb = window.fmdb || false;
 
     for (k in this.delcache) {
-        if (fmdb) {
+        if (is_eplusplus) {
+            M.delPersistentData('e++' + this.name + '!' + k).always(nop);
+        }
+        else if (fmdb) {
             fmdb.del(this.name, k);
         }
         delete this.dbcache[k];
     }
 
     for (k in this.newcache) {
-        if (fmdb) {
+        if (is_eplusplus) {
+            M.setPersistentData('e++' + this.name + '!' + k, this.newcache[k]).always(nop);
+        }
+        else if (fmdb) {
             fmdb.add(this.name, {k: k, d: {v: this.newcache[k]}});
         }
         this.dbcache[k] = this.newcache[k];
@@ -119,7 +142,7 @@ IndexedDBKVStorage.prototype.saveState = function() {
             console.debug('attribcache:savestate(%s)...', currsn, fminitialized);
         }
 
-        if (fminitialized && currsn) {
+        if (fminitialized && currsn || is_eplusplus) {
             if (window.fmdb) {
                 setsn(currsn);
             }
@@ -133,9 +156,20 @@ IndexedDBKVStorage.prototype.saveState = function() {
 // Clear DB Table and in-memory contents.
 IndexedDBKVStorage.prototype.clear = promisify(function __IDBKVClear(resolve, reject) {
     'use strict';
-
+    var self = this;
     console.error("This function should not be used under normal conditions...");
-    IndexedDBKVStorage.call(this, this.name);
+    self.constructor.call(this, this.name);
+
+    if (is_eplusplus) {
+        M.getPersistentDataEntries('e++' + this.name + '!')
+            .then(function(r) {
+                return Promise.allSettled(r.map(function(k) {
+                    return M.delPersistentData(k);
+                }));
+            })
+            .then(resolve).catch(reject);
+        return;
+    }
 
     if (window.fmdb && Object(fmdb.db).hasOwnProperty(this.name)) {
         return fmdb.db[this.name].clear().then(resolve).catch(reject);

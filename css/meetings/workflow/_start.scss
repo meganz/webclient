@@ -1,0 +1,73 @@
+.start-meeting {
+    overflow: hidden;
+    height: 520px;
+    width: 430px;
+    border-radius: 30px;
+    text-align: center;
+
+    &-preview {
+        width: 430px;
+        height: 323px;
+    }
+
+    &-title {
+        overflow: hidden;
+        display: flex;
+        justify-content: center;
+        height: 30px;
+
+        input {
+            display: block;
+            float: left;
+            width: 190px;
+            font-size: 20px;
+            line-height: 24px;
+            border: 0 none;
+            border-bottom: 1px solid var(--input-text-underline-hover);
+            background: transparent;
+            color: var(--text-color-high);
+
+            &::selection { background: var(--surface-grey-2); }
+        }
+
+        h2 {
+            overflow: hidden;
+            display: block;
+            float: left;
+            max-width: 250px;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            margin: 0;
+            cursor: pointer;
+        }
+
+        button {
+            margin: 3px 0 0 7px;
+
+            &.editing {
+                padding-top: 5px;
+            }
+
+            i {
+                --icon-size: 24px;
+                --mask-color: var(--icon-inactive);
+            }
+
+            span {
+                position: fixed;
+                bottom: -9999px;
+                visibility: hidden;
+            }
+        }
+    }
+
+    &-button {
+        display: block;
+        margin: 24px auto;
+        padding: 0 60px;
+    }
+
+    a {
+        color: var(--text-color-info);
+    }
+}

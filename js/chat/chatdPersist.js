@@ -730,7 +730,7 @@
 
                 if (
                     keyId !== 0 &&
-                    base64urlencode(userId) !== "gTxFhlOd_LQ" &&
+                    base64urlencode(userId) !== mega.BID &&
                     found &&
                     found.userId !== userId
                 ) {

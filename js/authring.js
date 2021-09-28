@@ -132,6 +132,11 @@ var authring = (function () {
                 continue;
             }
 
+            // Skip non-contact's fingerprints
+            if (!(userhandle in M.u && M.u[userhandle].c >= 0 && M.u[userhandle].c < 2)) {
+                continue;
+            }
+
             result += this._serialiseRecord(userhandle, record.fingerprint,
                                             record.method, record.confidence);
         }
@@ -274,40 +279,18 @@ var authring = (function () {
      * @param keyType {string}
      *     Type of key for authentication records. Values are 'Ed25519',
      *     'Cu25519' or 'RSA'.
-     * @param [preCleanedUpVals] pass an authring-like hash to set the keyType's authring, remotely to
-     * `preCleanedUpVals`
      *
      * @return {MegaPromise}
      *     A promise that is resolved when the original asynch code is settled.
      */
-    ns.setContacts = function(keyType, preCleanedUpVals) {
+    ns.setContacts = function(keyType) {
         if (ns._PROPERTIES[keyType] === undefined) {
             logger.error('Unsupported authentication key type: ' + keyType);
             return MegaPromise.reject(EARGS);
         }
 
-        var promise = new MegaPromise();
-
-        this.onAuthringReady('setContacts')
-            .fail(function() {
-                promise.reject.apply(promise, arguments);
-            })
-            .done(function() {
-                var val;
-                if (!preCleanedUpVals) {
-                    val = ns._getCleanedUpAuthring(keyType);
-                }
-                else {
-                    val = preCleanedUpVals;
-                }
-
-                var attrPromise = mega.attr.set(ns._PROPERTIES[keyType],
-                    {'': ns.serialise(val)}, false, true);
-
-                promise.linkDoneAndFailTo(attrPromise);
-            });
-
-        return promise;
+        return this.onAuthringReady('setContacts')
+            .then(() => mega.attr.set(ns._PROPERTIES[keyType], {'': ns.serialise(u_authring[keyType])}, false, true));
     };
 
 
@@ -367,10 +350,6 @@ var authring = (function () {
 
         assertUserHandle(userhandle);
 
-        if (!M.u[userhandle] || typeof M.u[userhandle].c === 'undefined') {
-            // we don't want to track non-contacts, but allow ex-contacts to be added/set in the authring.
-            return;
-        }
         if (ns._PROPERTIES[keyType] === undefined) {
             logger.error('Unsupported key type: ' + keyType);
 
@@ -734,7 +713,7 @@ var authring = (function () {
         var keyringPromise = ns._initKeyringAndEd25519();
 
         keyringPromise.done(function __baseAuthSystemDone() {
-            var rsaPromise = ns._initKeyPair('RSA');
+            var rsaPromise = window.u_privk ? ns._initKeyPair('RSA') : MegaPromise.resolve();
             var cu25519Promise = ns._initKeyPair('Cu25519');
 
             var prefilledRsaKeysPromise = new MegaPromise();
@@ -754,7 +733,6 @@ var authring = (function () {
 
         masterPromise
             .done(function() {
-                ns.initialSetup();
                 ns._initialisingPromise = true;
             })
             .fail(function() {
@@ -788,42 +766,6 @@ var authring = (function () {
             }
         });
         return MegaPromise.allDone(loadingPromises);
-    };
-
-
-    ns._getCleanedUpAuthring = function(keyType) {
-        var val = {};
-        var store = (u_authring[keyType] || {});
-        var keys = Object.keys(store);
-        for (var i = 0; i < keys.length; i++) {
-            var h = keys[i];
-            if (M.u[h] && typeof M.u[h].c !== 'undefined' && M.u[h].c !== 2) {
-                val[h] = u_authring[keyType][h];
-            }
-        }
-        return val;
-    };
-
-    ns.initialSetup = function() {
-        // initial re-setup so that .setContacts would clean any non-contacts stucked in authring.
-        var keyTypes = Object.keys(ns._PROPERTIES);
-        for (var i = 0; i < keyTypes.length; i++) {
-            var keyType = keyTypes[i];
-
-            var authringVals = Object.keys(u_authring[keyType] || {});
-            authringVals.sort();
-
-            var authringCleanedKeys = ns._getCleanedUpAuthring(keyType);
-            var authringCleanedVals = Object.keys(authringCleanedKeys);
-            authringCleanedVals.sort();
-
-            // after sorting those 2, IF they are not the same (e.g. one have contact, that the other one doesn't),
-            // that simply means the `_getCleanedUpAuthring` removed non-contact fingerprint (that were never contacts
-            // or have shares).
-            if (authringVals.join(',') !== authringCleanedVals.join(',')) {
-                ns.setContacts(keyType, authringCleanedKeys);
-            }
-        }
     };
 
     /**
@@ -987,6 +929,11 @@ var authring = (function () {
         if (keyType !== 'RSA' && keyType !== 'Cu25519') {
             logger.error('Unsupported key type for initialisation: ' + keyType);
 
+            return MegaPromise.reject(EARGS);
+        }
+
+        if (keyType === 'RSA' && !window.u_privk) {
+            logger.error('Unable to initialize RSA keypair...');
             return MegaPromise.reject(EARGS);
         }
 

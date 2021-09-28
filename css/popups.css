@@ -1,7 +1,11 @@
 /* Search contacts popup */
 .dropdown.body.popup.contacts-search {
     width: 420px;
-    padding: 0 0 0 12px;
+    padding: 0;
+    border-radius: 24px;
+}
+.dropdown.body.popup.contacts-search.main-start-chat-dropdown {
+    height: 602px;
 }
 body.it .dropdown.body.popup.contacts-search,
 body.br .dropdown.body.popup.contacts-search,
@@ -17,6 +21,7 @@ body.tl .dropdown.body.popup.contacts-search {
     left: auto !important;
 }
 .popup.add-participant-selector .dropdown-white-arrow {
+    top: -55px;
     margin-left: 50px;
 }
 .new-group-chat .description.chatlinks-intermediate-msg {
@@ -28,7 +33,7 @@ body.tl .dropdown.body.popup.contacts-search {
     box-sizing: border-box;
     border-radius: 19px;
     overflow: hidden;
-    margin: 0 12px 0 0;
+    margin: 0 48px;
 }
 .rtl .contacts-search-header {
     margin: 0 12px 0 12px;
@@ -60,8 +65,8 @@ body.tl .dropdown.body.popup.contacts-search {
     border-radius: 18px;
     font: var(--text-body1);
     line-height: 24px;
-    color: var(--text-color-medium);
-    background: var(--surface-grey-1);
+    color: var(--text-color-high);
+    background: var(--surface-grey-2);
     box-sizing: border-box;
 }
 .contacts-search-header input::-webkit-input-placeholder {
@@ -114,6 +119,26 @@ body.tl .dropdown.body.popup.contacts-search {
     max-height: 426px;
     overflow: hidden;
 }
+.main-start-chat-dropdown .contacts-search-scroll {
+    position: relative;
+    margin: 5px 0 0 0;
+    padding: 7px 0 0 0;
+    max-height: 366px;
+    min-height: 366px;
+}
+.main-start-chat-dropdown .contacts-search-scroll::before {
+    display: block;
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background: var(--divider-color);
+}
+.contacts-search-scroll .contacts-search-subsection {
+    padding: 0 48px;
+}
 .contacts-search-scroll .jspPane {
     min-height: 70%;
 }
@@ -132,17 +157,47 @@ body.tl .dropdown.body.popup.contacts-search {
 .rtl .contacts-search-list .contacts-info.body.contacts-search {
     padding: 8px 12px;
 }
+.contacts-search-list .contacts-info .user-card-data {
+    max-width: 80%;
+    padding-inline-start: 10px;
+}
+.contacts-search-list .user-card-data .user-card-name {
+    padding: 0 5px 0 0;
+}
+.contacts-search-list .user-card-data .user-card-status {
+    display: inline;
+}
+.contacts-search-list .user-card-data .user-card-status span {
+    display: none;
+}
 .contacts-search-list .contacts-info.body.contacts-search {
-    width: calc(100% - 7px);
-    height: 49px;
-    border-bottom: 1px solid var(--table-border);
-    padding: 8px 0;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 4px 0;
     cursor: pointer;
     box-sizing: border-box;
 }
+.contacts-search-list .contacts-info.body.contacts-search::before {
+    display: block;
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+.contacts-search-list .contacts-info.body.contacts-search .user-card-tick-wrap {
+    right: 1px;
+}
+.contacts-search-list .contacts-info.body.contacts-search .avatar-wrapper {
+    width: 24px;
+    height: 24px;
+    font: var(--text-body1);
+}
 .contacts-search-list .contacts-info.body.contacts-search img {
-    width: 32px;
-    height: 32px;
+    width: 24px;
+    height: 24px;
 }
 .contacts-search-list .contacts-info.body.contacts-search:last-child {
     margin-bottom:  12px;
@@ -165,13 +220,10 @@ body.tl .dropdown.body.popup.contacts-search {
     max-width: -moz-calc(100% - 24px);
     max-width: calc(100% - 24px);
 }
-.dropdown.body.popup.contacts-search footer {
-    padding-right: 12px;
-}
 .horizontal-contacts-list {
     height: 78px;
-    margin-right:  12px;
     position: relative;
+    padding: 0 48px;
 }
 .horizontal-contacts-list div.ps-container > .ps-scrollbar-x-rail > .ps-scrollbar-x {
     height: 6px;
@@ -274,12 +326,22 @@ body.tl .dropdown.body.popup.contacts-search {
 }
 .contacts-search-buttons {
     display: flex;
-    padding: 19px 9px 5px 0;
+    padding: 48px 48px 24px 48px;
     align-items: center;
-    justify-content: space-evenly;
+    justify-content: space-between;
 }
 .contacts-search-buttons .button-wrapper {
     text-align: center;
+}
+.contacts-search-buttons .button-wrapper .new-meeting {
+    background: var(--surface-error);
+}
+.contacts-search-buttons .button-wrapper .new-chatlink {
+    background: linear-gradient(180deg, rgba(86, 210, 241, 1) 0%, rgba(43, 166, 222, 1) 100%);
+}
+.contacts-search-buttons .button-wrapper .new-meeting i,
+.contacts-search-buttons .button-wrapper .new-chatlink i {
+    --mask-color: var(--secondary-white);
 }
 .contacts-search-buttons .button-title {
     display: block;
@@ -302,13 +364,14 @@ body.tl .dropdown.body.popup.contacts-search {
 }
 .contacts-search-bottom {
     width: 100%;
-    padding: 20px 0;
+    padding: 10px 0 20px 42px;
+    box-sizing: border-box;
+    border-top: 1px solid var(--divider-color);
 }
 .rtl .contacts-search-bottom {
     padding: 20px 12px;
 }
 .contacts-list-header {
-    margin: 0 12px 0 0;
     padding: 0 8px;
     height:  20px;
     border-radius: 4px;
@@ -338,7 +401,14 @@ body.tl .dropdown.body.popup.contacts-search {
     padding: 7px 0 0 0;
 }
 .add-participant-selector .contacts-search-header {
-    margin: 0 0 12px 0;
+    margin: 0 48px;
+}
+.add-participant-selector .horizontal-contacts-list {
+    padding-top: 24px;
+    padding-bottom: 12px;
+}
+.add-participant-selector footer {
+    padding: 24px 48px;
 }
 /* End of Search contacts popup */
 

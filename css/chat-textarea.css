@@ -211,11 +211,14 @@
     min-height: 34px;
     position: relative;
     top: 4px;
-    margin: 0 0 20px 0;
-    padding: 6px 46px 6px 6px;
+    margin: 0;
+    padding: 6px 46px 0 6px;
     -webkit-box-shadow: none;
     -moz-box-shadow: none;
     box-shadow: none;
+}
+.edit-typing-area button {
+    margin: 11px 0 8px 8px;
 }
 .chat-textarea.edit-typing-area hr {
     display:  none;

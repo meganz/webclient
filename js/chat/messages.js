@@ -134,7 +134,7 @@ Message._getTextContentsForDialogType = function(message) {
             );
 
             if (textMessage.splice) {
-                textMessage = CallManager._getMultiStringTextContentsForMessage(message, textMessage);
+                textMessage = CallManager2._getMltiStrTxtCntsForMsg(message, textMessage);
             }
             else {
                 textMessage = textMessage.replace("[X]", contactName);
@@ -153,28 +153,27 @@ Message._getTextContentsForDialogType = function(message) {
             var meta = message.meta;
 
             var isGroupOrPublic = message.chatRoom.type === "group" || message.chatRoom.type === "public";
-            if (meta.reason === CallManager.CALL_END_REMOTE_REASON.CALL_ENDED || (
-                    meta.reason === CallManager.CALL_END_REMOTE_REASON.FAILED && meta.duration >= 5
-                )
-            ) {
+            if (meta.reason === CallManager2.CALL_END_REMOTE_REASON.CALL_ENDED || (
+                meta.reason === CallManager2.CALL_END_REMOTE_REASON.FAILED && meta.duration >= 5
+            )) {
                 textMessage = mega.ui.chat.getMessageString("call-ended", isGroupOrPublic);
             }
-            else if (meta.reason === CallManager.CALL_END_REMOTE_REASON.REJECTED) {
+            else if (meta.reason === CallManager2.CALL_END_REMOTE_REASON.REJECTED) {
                 textMessage = mega.ui.chat.getMessageString("call-rejected", isGroupOrPublic);
             }
-            else if (meta.reason === CallManager.CALL_END_REMOTE_REASON.CANCELED && contact.u === u_handle) {
+            else if (meta.reason === CallManager2.CALL_END_REMOTE_REASON.CANCELED && contact.u === u_handle) {
                 textMessage = mega.ui.chat.getMessageString("call-canceled", isGroupOrPublic);
             }
-            else if (meta.reason === CallManager.CALL_END_REMOTE_REASON.CANCELED && contact.u !== u_handle) {
+            else if (meta.reason === CallManager2.CALL_END_REMOTE_REASON.CANCELED && contact.u !== u_handle) {
                 textMessage = mega.ui.chat.getMessageString("call-missed", isGroupOrPublic);
             }
-            else if (meta.reason === CallManager.CALL_END_REMOTE_REASON.NO_ANSWER && contact.u !== u_handle) {
+            else if (meta.reason === CallManager2.CALL_END_REMOTE_REASON.NO_ANSWER && contact.u !== u_handle) {
                 textMessage = mega.ui.chat.getMessageString("call-missed", isGroupOrPublic);
             }
-            else if (meta.reason === CallManager.CALL_END_REMOTE_REASON.NO_ANSWER && contact.u === u_handle) {
+            else if (meta.reason === CallManager2.CALL_END_REMOTE_REASON.NO_ANSWER && contact.u === u_handle) {
                 textMessage = mega.ui.chat.getMessageString("call-timeout", isGroupOrPublic);
             }
-            else if (meta.reason === CallManager.CALL_END_REMOTE_REASON.FAILED) {
+            else if (meta.reason === CallManager2.CALL_END_REMOTE_REASON.FAILED) {
                 textMessage = mega.ui.chat.getMessageString("call-failed", isGroupOrPublic);
             }
             else {
@@ -185,7 +184,7 @@ Message._getTextContentsForDialogType = function(message) {
 
 
             if (textMessage.splice) {
-                textMessage = CallManager._getMultiStringTextContentsForMessage(message, textMessage);
+                textMessage = CallManager2._getMltiStrTxtCntsForMsg(message, textMessage);
             }
             else {
                 textMessage = textMessage.replace("[X]", contactName);
@@ -193,7 +192,7 @@ Message._getTextContentsForDialogType = function(message) {
             }
         }
         else if (textMessage.splice) {
-            textMessage = CallManager._getMultiStringTextContentsForMessage(message, textMessage);
+            textMessage = CallManager2._getMltiStrTxtCntsForMsg(message, textMessage);
         }
         else {
             textMessage = textMessage.replace("[X]", contactName);
@@ -235,7 +234,7 @@ Message.getContactForMessage = function(message) {
         contact = M.u[message.userId];
     }
     else {
-        console.error("No idea how to get contact for: ", message);
+        // console.error("No idea how to get contact for: ", message);
 
         return {};
     }
@@ -1635,8 +1634,8 @@ function MessagesBuff(chatRoom, chatdInt) {
                         apps would have this feature already in production by that date */
                         v.dialogType === "remoteCallEnded" && v.meta && v.meta.userId !== u_handle &&
                         (
-                            v.meta.reason === CallManager.CALL_END_REMOTE_REASON.CANCELED ||
-                            v.meta.reason === CallManager.CALL_END_REMOTE_REASON.NO_ANSWER
+                            v.meta.reason === CallManager2.CALL_END_REMOTE_REASON.CANCELED ||
+                            v.meta.reason === CallManager2.CALL_END_REMOTE_REASON.NO_ANSWER
                         )
                     ) ||
                     v.textContents /* not false-based value */
@@ -1804,7 +1803,7 @@ MessagesBuff.prototype.setLastSeen = function(msgId, isFromChatd, force) {
                 self.joined &&
                 !self.isRetrievingHistory &&
                 typeof self.chatRoom.members[u_handle] !== 'undefined' &&
-                !anonymouschat
+                !is_chatlink
             )
         ) {
             delay('MessagesBuff.setLastSeen:' + this, function() {
@@ -2287,7 +2286,7 @@ MessagesBuff.prototype.detachMessages = SoonFc(70, function() {
     if (!room.megaChat.plugins.chatdIntegration.chatd.chatdPersist) {
         return false;
     }
-    if (room.type === "public" && !anonymouschat && room.publicChatHandle && room.publicChatKey) {
+    if (room.type === "public" && !is_chatlink && room.publicChatHandle && room.publicChatKey) {
         // do not detach messages in pub mode..otherwise, IF the user joins - the chat history that would get
         // persisted may contain missing messages in the iDB db.
         return false;

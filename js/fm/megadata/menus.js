@@ -148,7 +148,7 @@ MegaData.prototype.menuItems = function menuItems() {
         dbfetch.geta(nodes)
             .always(function () {
                 var preparedItems = M.menuItemsSync();
-                    checkMegaSync(preparedItems);
+                checkMegaSync(preparedItems);
             });
     }
     else {
@@ -635,7 +635,10 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
 
             // Add .send-files-item to show Send files item
             if (!window.megaChatIsDisabled) {
-                flt += ',.startchat-item, .startaudiovideo-item, .send-files-item';
+                flt += ',.startchat-item, .send-files-item';
+                if (megaChat && megaChat.hasSupportForCalls) {
+                    flt += ',startaudiovideo-item';
+                }
             }
             var $menuCmi = $(menuCMI);
             $menuCmi.filter(flt).show();

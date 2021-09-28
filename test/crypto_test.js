@@ -303,6 +303,7 @@ describe("crypto unit test", function() {
 
             it("cached Ed25519 key, uninitialised authring", function(done) {
                 mStub(ns._logger, '_log');
+                mStub(window, 'u_privk', 'private key');
                 mStub(window, 'u_handle', 'me3456789xw');
                 mStub(window, 'u_attr', {});
                 mStub(window, 'u_authring', {Ed25519: undefined});

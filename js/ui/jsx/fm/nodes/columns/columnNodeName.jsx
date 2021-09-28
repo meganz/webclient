@@ -1,21 +1,31 @@
-import Tooltips from "../../../../tooltips.jsx";
-import React from "react";
-import {GenericNodePropsComponent} from "../genericNodePropsComponent";
+import React from 'react';
+import Tooltips from '../../../../tooltips.jsx';
+import { GenericNodePropsComponent } from '../genericNodePropsComponent';
 
 export class ColumnNodeName extends GenericNodePropsComponent {
     static sortable = true;
-    static id = "name";
+    static id = 'name';
     static label = l[86] /* `Name` */;
-    static megatype = "fname";
+    static megatype = 'fname';
 
-    getThumbnailSrc = node => {
+    state = {
+        src: null
+    };
+
+    setAttributes = () => {
+        const { node } = this.props;
         node.imgId = `preview_${node.h}`;
         node.seen = node.seen || 1;
-        return window.noThumbURI || '';
     };
+
+    componentDidMount() {
+        super.componentDidMount();
+        this.setAttributes();
+    }
 
     render() {
         const { nodeAdapter } = this.props;
+        const { src } = this.state;
         const { node, requestThumbnailCb } = nodeAdapter.props;
 
         return (
@@ -25,27 +35,26 @@ export class ColumnNodeName extends GenericNodePropsComponent {
                         withArrow={true}
                         className="tooltip-handler-container"
                         onShown={() => {
-                            if (!thumbnails[node.h]) {
-                                requestThumbnailCb(node, true);
+                            if (!src) {
+                                requestThumbnailCb(node, true, handle => this.setState({ src: thumbnails[handle] }));
                             }
                         }}>
-                        <Tooltips.Handler className={`transfer-filetype-icon ${fileIcon(node)}`} />
-                        <Tooltips.Contents
-                            className="img-preview">
-                            <div className="dropdown img-wrapper img-block" id={`preview_${node.h}`}>
+                        <Tooltips.Handler className={`transfer-filetype-icon ${fileIcon(node)}`}/>
+                        <Tooltips.Contents className="img-preview">
+                            <div
+                                className="dropdown img-wrapper img-block"
+                                id={`preview_${node.h}`}>
                                 <img
                                     alt=""
                                     className={`thumbnail-placeholder ${node.h}`}
-                                    src={thumbnails[node.h] || this.getThumbnailSrc(node)}
-                                    width="156"
-                                    height="156"
-                                    onLoad={() => {
-                                        if (thumbnails[node.h]) {
-                                            // Trigger force update after `fm_thumbnail_render` had set the
-                                            // `src` attribute
-                                            this.safeForceUpdate();
-                                        }
-                                    }}
+                                    src={
+                                        node.fa ?
+                                            // Render the downloaded node thumbnail or loading an indication during
+                                            // the actual download; see `requestThumbnailCb`, `fm_thumbnails`
+                                            src || `${staticpath}/images/mega/ajax-loader-tiny.gif` :
+                                            // Node has no thumbnail, render placeholder
+                                            window.noThumbURI
+                                    }
                                 />
                             </div>
                         </Tooltips.Contents>

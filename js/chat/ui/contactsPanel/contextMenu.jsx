@@ -97,6 +97,7 @@ export default class ContextMenu extends MegaRenderMixin {
                     <div className="dropdown body submenu">
                         <DropdownItem
                             icon="sprite-fm-mono icon-phone"
+                            disabled={!megaChat.hasSupportForCalls}
                             label={l[5896]}
                             onClick={() =>
                                 this.close(() =>
@@ -110,6 +111,7 @@ export default class ContextMenu extends MegaRenderMixin {
                         />
                         <DropdownItem
                             icon="sprite-fm-mono icon-video-call-filled"
+                            disabled={!megaChat.hasSupportForCalls}
                             label={l[5897]}
                             onClick={() =>
                                 this.close(() =>

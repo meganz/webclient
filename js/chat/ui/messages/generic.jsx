@@ -145,7 +145,7 @@ export default class GenericConversationMessage extends ConversationMessageMixin
             this.doCancelRetry(e, msg);
         }
         else {
-            this.props.onDeleteClicked(e, this.props.message);
+            this.props.onDeleteClicked(this.props.message);
         }
     }
 

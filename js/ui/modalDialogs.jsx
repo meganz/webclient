@@ -16,6 +16,7 @@ export class ExtraFooterElement extends MegaRenderMixin {
 class ModalDialog extends MegaRenderMixin {
     static defaultProps = {
         'hideable': true,
+        'noCloseOnClickOutside': false,
         'closeDlgOnClickOverlay': true,
         'showSelectedNum': false,
         'selectedNum': 0
@@ -30,38 +31,40 @@ class ModalDialog extends MegaRenderMixin {
 
     componentDidMount() {
         super.componentDidMount();
-        var self = this;
-        $(document.body).addClass('overlayed');
-        $('.fm-dialog-overlay').removeClass('hidden');
+
+        if (!this.props.hideOverlay) {
+            $(document.body).addClass('overlayed');
+            $('.fm-dialog-overlay').removeClass('hidden');
+        }
 
         // blur the chat textarea if its selected.
         $('textarea:focus').trigger("blur");
 
+        if (!this.props.noCloseOnClickOutside) {
+            const convApp = document.querySelector('.conversationsApp');
+            if (convApp) {
+                convApp.removeEventListener('click', this.onBlur);
+                convApp.addEventListener('click', this.onBlur);
+            }
 
-        var convApp = document.querySelector('.conversationsApp');
-        if (convApp) {
-            convApp.removeEventListener('click', this.onBlur);
-            convApp.addEventListener('click', this.onBlur);
+            $('.fm-modal-dialog').rebind('click.modalDialogOv' + this.getUniqueId(), ({ target }) => {
+                if ($(target).is('.fm-modal-dialog')) {
+                    this.onBlur();
+                }
+            });
+
+            $('.fm-dialog-overlay').rebind('click.modalDialog' + this.getUniqueId(), () => {
+                if (this.props.closeDlgOnClickOverlay) {
+                    this.onBlur();
+                }
+                return false;
+            });
         }
 
-
-        $('.fm-modal-dialog').rebind('click.modalDialogOv' + this.getUniqueId(), function(e) {
-            if ($(e.target).is('.fm-modal-dialog')) {
-                self.onBlur();
+        $(document).rebind('keyup.modalDialog' + this.getUniqueId(), ({ keyCode }) => {
+            if (!this.props.stopKeyPropagation && keyCode === 27 /* ESC */) {
+                this.onBlur();
             }
-        });
-
-        $(document).rebind('keyup.modalDialog' + self.getUniqueId(), function(e) {
-            if (e.keyCode == 27) { // escape key maps to keycode `27`
-                self.onBlur();
-            }
-        });
-
-        $('.fm-dialog-overlay').rebind('click.modalDialog' + self.getUniqueId(), function() {
-            if (self.props.closeDlgOnClickOverlay) {
-                self.onBlur();
-            }
-            return false;
         });
     }
     onBlur(e) {
@@ -79,15 +82,19 @@ class ModalDialog extends MegaRenderMixin {
     }
     componentWillUnmount() {
         super.componentWillUnmount();
-        var convApp = document.querySelector('.conversationsApp');
-        if (convApp) {
-            convApp.removeEventListener('click', this.onBlur);
+        if (!this.props.noCloseOnClickOutside) {
+            var convApp = document.querySelector('.conversationsApp');
+            if (convApp) {
+                convApp.removeEventListener('click', this.onBlur);
+            }
+            $('.fm-dialog-overlay').off('click.modalDialog' + this.getUniqueId());
         }
-        $(document).off('keyup.modalDialog' + this.getUniqueId());
+        if (!this.props.hideOverlay) {
+            $(document.body).removeClass('overlayed');
+            $('.fm-dialog-overlay').addClass('hidden');
+        }
         $(this.domNode).off('dialog-closed.modalDialog' + this.getUniqueId());
-        $(document.body).removeClass('overlayed');
-        $('.fm-dialog-overlay').addClass('hidden');
-        $('.fm-dialog-overlay').off('click.modalDialog' + this.getUniqueId());
+        $(document).off('keyup.modalDialog' + this.getUniqueId());
     }
     onCloseClicked() {
         var self = this;
@@ -227,7 +234,7 @@ class ModalDialog extends MegaRenderMixin {
                                     {
                                         self.props.icon ?
                                             <i className={`graphic ${self.props.icon}`} />
-                                            : null
+                                            : self.props.iconElement
                                     }
                                     <div>
                                         <h3 id={self.props.dialogName ? self.props.dialogName + "-title" : null}>
@@ -242,7 +249,7 @@ class ModalDialog extends MegaRenderMixin {
                                     {
                                         self.props.icon ?
                                             <i className={`graphic ${self.props.icon}`} />
-                                            : null
+                                            : self.props.iconElement
                                     }
                                     <h2 id={self.props.dialogName ? self.props.dialogName + "-title" : null}>
                                         {self.props.title}{selectedNumEle}

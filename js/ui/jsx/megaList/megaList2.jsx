@@ -304,7 +304,7 @@ export class MegaList2 extends MegaRenderMixin {
         }
     }
 
-    requestThumbnailCb(node, immediate) {
+    requestThumbnailCb(node, immediate, callback) {
         if (thumbnails[node.h]) {
             return;
         }
@@ -313,7 +313,7 @@ export class MegaList2 extends MegaRenderMixin {
         }
         this.thumbsThatRequireLoading.push(node);
         if (immediate) {
-            fm_thumbnails('standalone', this.thumbsThatRequireLoading);
+            fm_thumbnails('standalone', this.thumbsThatRequireLoading, callback);
             this.thumbsThatRequireLoading = [];
         }
     }

@@ -639,25 +639,37 @@ class SelectionManager2_DOM extends SelectionManager2Base {
         }
     }
     add_to_selection(nodeId, scrollTo, alreadySorted) {
-        let res = super.add_to_selection(nodeId, scrollTo, alreadySorted);
+        const res = super.add_to_selection(nodeId, scrollTo, alreadySorted);
         if (res === false) {
             return res;
         }
 
-        var selectionSize = false;
-        for (var i = this.selected_list.length; i--;) {
-            var n = this.selected_list[i];
-            var e = document.getElementById(n);
-            if (e) {
-                e.classList.add(this.CLS_UI_SELECTED);
+        delay('selMan:notify:selection', () => {
+            let selectionSize = false;
+
+            if (oIsFrozen(this)) {
+                // Destroyed.
+                return;
             }
-            if ((n = M.d[n])) {
-                selectionSize += n.t ? n.tb : n.s;
+
+            for (let i = this.selected_list.length; i--;) {
+                let n = this.selected_list[i];
+                const e = document.getElementById(n);
+                if (e) {
+                    if ((n = M.d[n])) {
+                        selectionSize += n.t ? n.tb : n.s;
+                    }
+                    e.classList.add(this.CLS_UI_SELECTED);
+                }
             }
-        }
-        if (selectionSize !== false) {
-            this.selectionNotification(selectionSize);
-        }
+
+            if (selectionSize === false) {
+                this.hideSelectionBar();
+            }
+            else {
+                this.selectionNotification(selectionSize);
+            }
+        }, 20);
 
         return res;
     }

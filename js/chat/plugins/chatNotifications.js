@@ -15,6 +15,7 @@ var ChatNotifications = function(megaChat, options) {
     options.anfFlag = "chat_enabled";
 
     self.notifications = new MegaNotifications(options);
+    self._incomingDialogContainers = {};
 
     megaChat
         .rebind('onRoomInitialized.chatNotifications', function(e, megaRoom) {
@@ -23,8 +24,14 @@ var ChatNotifications = function(megaChat, options) {
                     var cnSel = '.conversation-panel[data-room-id="' + megaRoom.chatId + '"]';
                     var uiElement = document.querySelector(cnSel);
 
-                    if (!uiElement || uiElement.querySelector(".call-block") &&
-                        !uiElement.querySelector(".call-block.small-block")) {
+                    if (
+                        // Meetings call w/o chat sidebar opened
+                        document.querySelector('body.in-call') && !document.querySelector('.chat-opened') ||
+                        // Regular call w/o messages area opened
+                        !uiElement ||
+                        uiElement.querySelector('.call-block') &&
+                        !uiElement.querySelector('.call-block.small-block')
+                    ) {
                         return;
                     }
 
@@ -168,46 +175,6 @@ var ChatNotifications = function(megaChat, options) {
                 .rebind('onChatIsFocused.chatNotifications', function() {
                     onIdle(resetChatNotificationCounters);
                 })
-                .rebind('onCallRequestSent.chatNotifications', function(e, callManagerCall, mediaOptions) {
-                    if (!pushNotificationSettings.isAllowedForChatId(megaRoom.chatId)) {
-                        return;
-                    }
-
-                    var sid = callManagerCall.id;
-                    var n = self.notifications.notify(
-                        'outgoing-call',
-                        {
-                            'sound': 'incoming_voice_video_call',
-                            'soundLoop': true,
-                            'alwaysPlaySound': true,
-                            'group': megaRoom.chatId,
-                            'incrementCounter': false,
-                            'icon': avatars[u_handle],
-                            'anfFlag': 'chat_enabled',
-                            'params': {
-                                'room': megaRoom,
-                                'from': generateAvatarMeta(u_handle).fullName,
-                                'isVideoCall': mediaOptions.video
-                            }
-                        },
-                        !megaRoom.isActive()
-                    );
-                    n.on('onClick', function() {
-                        window.focus();
-                        megaRoom.activateWindow();
-                        megaRoom.show();
-                    });
-
-                    var evtId = generateEventSuffixFromArguments("", "chatNotifStopSoundOut", rand(10000));
-                    var stopSound = function(e, callManagerCall) {
-                        if (callManagerCall.id === sid) {
-                            n.forceStopSound();
-                            callManagerCall.off('StateChanged' + evtId);
-                        }
-                    };
-
-                    callManagerCall.on('StateChanged' + evtId, stopSound);
-                })
                 .rebind('CallTerminated.chatNotifications', function(e, origEvent, room) {
                     self.notifications.resetCounterGroup(room.chatId, "incoming-voice-video-call");
                     var contact = M.u[room.getParticipantsExceptMe()[0]];
@@ -253,19 +220,23 @@ var ChatNotifications = function(megaChat, options) {
                     megaChat.updateSectionUnreadCount();
                 });
         })
-        .rebind('onIncomingCall.chatNotifications', function(e,
-             room,
-             contactName,
-             avatar,
-             isVideoCall,
-             sid,
-             callManagerCall,
-             dialogMessage
-        ) {
+        .rebind('onIncomingCall.chatNotifications', function(e, room, callId, userId, callManager) {
 
             if (!pushNotificationSettings.isAllowedForChatId(room.chatId)) {
                 return;
             }
+            if (
+                megaChat.initialPubChatHandle && megaChat.initialPubChatHandle === room.publicChatHandle ||
+                megaChat.initialChatId && megaChat.initialChatId === room.chatId
+            ) {
+                return;
+            }
+            if (is_chatlink) {
+                return;
+            }
+
+            let name = M.getNameByHandle(userId);
+            let avatar = useravatar.contact(userId, '', 'div');
 
             var n = self.notifications.notify(
                 'incoming-voice-video-call',
@@ -279,37 +250,112 @@ var ChatNotifications = function(megaChat, options) {
                     'icon': avatar,
                     'params': {
                         'room': room,
-                        'from': contactName,
-                        'isVideoCall': isVideoCall
+                        'from': name
                     }
                 },
                 !room.isActive()
             );
+
             n.on('onClick', function() {
                 window.focus();
                 room.activateWindow();
                 room.show();
             });
 
-            var changeListener = function() {
-                if (dialogMessage.seen === true) {
-                    n.setUnread(false);
-
-                    dialogMessage.removeChangeListener(changeListener);
+            var evtId = generateEventSuffixFromArguments("", "chatNotifStopSound", rand(10000));
+            var removeNotif = function(e) {
+                if (e.data.callId === callId || !room.ringingCalls.exists(callId)) {
+                    if (self._incomingDialogContainers[callId]) {
+                        const node = self._incomingDialogContainers[callId];
+                        ReactDOM.unmountComponentAtNode(node);
+                        node.parentNode.removeChild(node);
+                        delete self._incomingDialogContainers[callId];
+                    }
+                    n.forceStopSound();
+                    callManager.off('onRingingStopped' + evtId);
                 }
             };
 
-            dialogMessage.addChangeListener(changeListener);
+            let videoEnabled = false;
+
+            const dialogContainer = document.createElement("div");
+            const dialog = React.createElement(ChatCallIncomingDialog, {
+                key: room.chatId,
+                chatRoom: room,
+                onClose: () => {
+                    room.ringingCalls.clear();
+                    megaChat.plugins.callManager2.trigger("onRingingStopped", {
+                        callId: callId,
+                        chatRoom: room
+                    });
+                },
+                callerId: room.ringingCalls[callId],
+                onAnswer: () => {
+                    room.activateWindow();
+                    room.show();
+                    room.ringingCalls.clear();
+                    room.joinCall(true, videoEnabled);
+                    megaChat.plugins.callManager2.trigger("onRingingStopped", {
+                        callId: callId,
+                        chatRoom: room
+                    });
+                },
+                onToggleVideo: (newVal) => {
+                    videoEnabled = !newVal;
+                },
+                onReject: () => {
+                    room.ringingCalls.clear();
+                    room.rejectCall();
+                    megaChat.plugins.callManager2.trigger("onRingingStopped", {
+                        callId: callId,
+                        chatRoom: room
+                    });
+                }
+            });
+
+            self._incomingDialogContainers[callId] = dialogContainer;
+            document.body.append(dialogContainer);
+            ReactDOM.render(dialog, dialogContainer);
+
+            callManager.on('onRingingStopped' + evtId, removeNotif);
+        })
+        .rebind('onOutgoingCallRinging', (e, megaRoom, callId, userId, callManager) => {
+
+            var n = self.notifications.notify(
+                'outgoing-call',
+                {
+                    'sound': 'incoming_voice_video_call',
+                    'soundLoop': true,
+                    'alwaysPlaySound': true,
+                    'group': megaRoom.chatId,
+                    'incrementCounter': false,
+                    'icon': avatars[u_handle],
+                    'anfFlag': 'chat_enabled',
+                    'params': {
+                        'room': megaRoom,
+                        'from': generateAvatarMeta(u_handle).fullName
+                    }
+                },
+                !megaRoom.isActive()
+            );
+
+            n.on('onClick', function() {
+                window.focus();
+                megaRoom.activateWindow();
+                megaRoom.show();
+            });
+
 
             var evtId = generateEventSuffixFromArguments("", "chatNotifStopSound", rand(10000));
-            var stopSound = function(e, callManagerCall, oldState, newState) {
-                if (callManagerCall.id === sid) {
+            var removeNotif = function(e) {
+                if (e.data.callId === callId) {
                     n.forceStopSound();
-                    callManagerCall.off('StateChanged' + evtId);
+                    callManager.off('onRingingStopped' + evtId);
                 }
             };
 
-            callManagerCall.on('StateChanged' + evtId, stopSound);
+            callManager.on('onRingingStopped' + evtId, removeNotif);
+
         })
         .rebind('onCallAnswered.chatNotifications', function(e, room) {
             self.notifications.resetCounterGroup(room.chatId, "incoming-voice-video-call");

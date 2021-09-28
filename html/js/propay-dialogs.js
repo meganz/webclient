@@ -784,15 +784,19 @@ var voucherDialog = {
         // Flag 'pro: 1' includes the Pro balance in the response
         api_req({ a: 'uq', pro: 1 }, {
             callback : function(result) {
-
                 // If successful result
-                if ((typeof result === 'object') && result.balance && result.balance[0]) {
+                if (typeof result === 'object') {
+                    if (result.balance && result.balance[0]) {
+                        // Convert to a float
+                        var balance = parseFloat(result.balance[0][0]);
 
-                    // Convert to a float
-                    var balance = parseFloat(result.balance[0][0]);
+                        // Cache for various uses later on
 
-                    // Cache for various uses later on
-                    pro.propay.proBalance = balance;
+                        pro.propay.proBalance = balance;
+                    }
+
+                    // Fetch the user's subscription payment gateway id if has any
+                    pro.propay.userSubsGatewayId = result.sgwids && result.sgwids.length > 0 ? result.sgwids[0] : null;
                 }
 
                 // Run the callback

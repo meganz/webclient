@@ -12,6 +12,8 @@ import ContactsPanel from './contactsPanel/contactsPanel.jsx';
 import ModalDialogsUI from './../../ui/modalDialogs.jsx';
 import { Avatar, ContactAwareName } from "./contacts.jsx";
 var StartGroupChatWizard = require('./startGroupChatWizard.jsx').StartGroupChatWizard;
+import {Start as StartMeetingDialog} from "./meetings/workflow/start.jsx";
+import MeetingsCallEndedDialog from "./meetings/meetingsCallEndedDialog.jsx";
 
 var getRoomName = function(chatRoom) {
     return chatRoom.getRoomTitle();
@@ -184,7 +186,11 @@ class ConversationsListItem extends MegaRenderMixin {
                     </div>;
             const voiceClipType = Message.MANAGEMENT_MESSAGE_TYPES.VOICE_CLIP;
 
-            if (lastMessage.textContents && lastMessage.textContents[1] === voiceClipType) {
+            if (
+                lastMessage.textContents &&
+                lastMessage.textContents[1] === voiceClipType &&
+                lastMessage.getAttachmentMeta()[0]
+            ) {
                 const playTime = secondsToTimeShort(lastMessage.getAttachmentMeta()[0].playtime);
                 lastMessageDiv = (
                     <div className={lastMsgDivClasses}>
@@ -234,48 +240,9 @@ class ConversationsListItem extends MegaRenderMixin {
         this._lastMessageDivCache = lastMessageDiv;
         this._lastMessageDatetimeDivCache = lastMessageDatetimeDiv;
 
-        if (chatRoom.callManagerCall && chatRoom.callManagerCall.isActive() === true) {
-            var mediaOptions = chatRoom.callManagerCall.getMediaOptions();
-
-            var mutedMicrophone = null;
-            var activeCamera = null;
-            var onHold = null;
-            if (chatRoom.callManagerCall.rtcCall.isOnHold()) {
-                onHold = <i className="small-icon grey-call-on-hold"></i>;
-            }
-            else {
-                if (!mediaOptions.audio) {
-                    mutedMicrophone = <i className="small-icon grey-crossed-mic"></i>;
-                }
-                if (mediaOptions.video) {
-                    activeCamera = <i className="small-icon grey-videocam"></i>;
-                }
-            }
-            inCallDiv = <div className="call-duration">
-                {mutedMicrophone}
-                {activeCamera}
-                {onHold}
-                <span className="call-counter" data-room-id={chatRoom.chatId}>{
-                    secondsToTimeShort(chatRoom._currentCallCounter)
-                }</span>
-            </div>;
-
-            classString += " call-active";
-            // hide archived div when it is in a call.
-            archivedDiv = "";
-        }
 
         if (chatRoom.type !== "public") {
             nameClassString += " privateChat";
-        }
-        if (
-            chatRoom.callManagerCall &&
-            (
-                chatRoom.callManagerCall.state === CallManagerCall.STATE.WAITING_RESPONSE_INCOMING ||
-                chatRoom.callManagerCall.state === CallManagerCall.STATE.WAITING_RESPONSE_OUTGOING
-            )
-        ) {
-            classString += " have-incoming-ringing-call";
         }
 
         var roomTitle = <utils.EmojiFormattedContent>{chatRoom.getRoomTitle()}</utils.EmojiFormattedContent>;
@@ -501,44 +468,46 @@ class ConversationsHead extends MegaRenderMixin {
         return (
             <div className="lp-header">
                 <span>{l[5902] /* `Conversations` */}</span>
-                <div className="conversations-head-buttons">
-                    <div className="contacts-toggle">
+                {!is_eplusplus && !is_chatlink && (
+                    <div className="conversations-head-buttons">
+                        <div className="contacts-toggle">
+                            <Button
+                                receivedRequestCount={receivedRequestsCount}
+                                className={`
+                                    mega-button
+                                    round
+                                    branded-blue
+                                    contacts-toggle-button
+                                    ${contactsActive ? 'active' : ''}
+                                    ${receivedRequestsCount > 0 ? 'requests' : ''}
+                                `}
+                                icon={`
+                                    sprite-fm-mono
+                                    icon-contacts
+                                    ${CONTACTS_ACTIVE ? '' : 'active'}
+                                `}
+                                onClick={() => loadSubPage(CONTACTS_ACTIVE ? ROUTES.CHAT : ROUTES.CONTACTS)}>
+                                {!!receivedRequestsCount && (
+                                    <div className="notifications-count">
+                                        <span>{receivedRequestsCount > 9 ? '9+' : receivedRequestsCount }</span>
+                                    </div>
+                                )}
+                            </Button>
+                        </div>
                         <Button
-                            receivedRequestCount={receivedRequestsCount}
-                            className={`
-                                mega-button
-                                round
-                                branded-blue
-                                contacts-toggle-button
-                                ${contactsActive ? 'active' : ''}
-                                ${receivedRequestsCount > 0 ? 'requests' : ''}
-                            `}
-                            icon={`
-                                sprite-fm-mono
-                                icon-contacts
-                                ${CONTACTS_ACTIVE ? '' : 'active'}
-                            `}
-                            onClick={() => loadSubPage(CONTACTS_ACTIVE ? ROUTES.CHAT : ROUTES.CONTACTS)}>
-                            {!!receivedRequestsCount && (
-                                <div className="notifications-count">
-                                    <span>{receivedRequestsCount > 9 ? '9+' : receivedRequestsCount }</span>
-                                </div>
-                            )}
+                            group="conversationsListing"
+                            className="mega-button round positive"
+                            icon="sprite-fm-mono icon-add">
+                            <DropdownContactsSelector
+                                className="main-start-chat-dropdown"
+                                onSelectDone={onSelectDone}
+                                multiple={false}
+                                showTopButtons={showTopButtons}
+                                showAddContact={showAddContact}
+                            />
                         </Button>
                     </div>
-                    <Button
-                        group="conversationsListing"
-                        className="mega-button round positive"
-                        icon="sprite-fm-mono icon-add">
-                        <DropdownContactsSelector
-                            className="main-start-chat-dropdown"
-                            onSelectDone={onSelectDone}
-                            multiple={false}
-                            showTopButtons={showTopButtons}
-                            showAddContact={showAddContact}
-                        />
-                    </Button>
-                </div>
+                )}
             </div>
         );
     }
@@ -904,10 +873,21 @@ class ConversationsApp extends MegaRenderMixin {
         super(props);
         this.state = {
             leftPaneWidth: mega.config.get('leftPaneWidth'),
-            startGroupChatDialogShown: false
+            startGroupChatDialogShown: false,
+            startMeetingDialog: false
         };
 
         this._cacheRouting();
+
+        megaChat.rebind('onStartNewMeeting.convApp', () => this.startMeeting());
+    }
+    startMeeting() {
+        if (megaChat.hasSupportForCalls) {
+            this.setState({ startMeetingDialog: true });
+        }
+        else {
+            showToast('warning', l[7211]);
+        }
     }
     _cacheRouting() {
         this.routingSection = this.props.megaChat.routingSection;
@@ -1077,7 +1057,7 @@ class ConversationsApp extends MegaRenderMixin {
         }
 
         megaChat.$leftPane = megaChat.$leftPane || $('.conversationsApp .fm-left-panel');
-        if (anonymouschat) {
+        if (is_chatlink && !is_eplusplus) {
             megaChat.$leftPane.addClass('hidden');
         }
         else {
@@ -1095,6 +1075,7 @@ class ConversationsApp extends MegaRenderMixin {
         window.removeEventListener('resize', this.handleWindowResize);
         $(document).off('keydown.megaChatTextAreaFocus');
         mBroadcaster.removeListener(this.fmConfigLeftPaneListener);
+        delete this.props.megaChat.$conversationsAppInstance;
     }
 
     componentDidUpdate() {
@@ -1110,7 +1091,7 @@ class ConversationsApp extends MegaRenderMixin {
             return;
         }
         // small piece of what is done in fm_resize_handler...
-        if (anonymouschat) {
+        if (is_chatlink && !is_eplusplus) {
             $('.fm-right-files-block, .fm-right-account-block')
                 .filter(':visible')
                 .css({
@@ -1161,18 +1142,74 @@ class ConversationsApp extends MegaRenderMixin {
                     }
                 },
                 {
+                    key: 'newMeeting',
+                    className: 'new-meeting',
+                    title: 'New meeting',
+                    icon: 'sprite-fm-mono icon-video-call-filled',
+                    onClick: () => {
+                        if (megaChat.hasSupportForCalls) {
+                            this.setState({ startMeetingDialog: true });
+                        }
+                        else {
+                            showToast('warning', l[7211]);
+                        }
+                    }
+                },
+                {
                     key: 'newChatLink',
+                    className: 'new-chatlink',
                     title: l[20638],
                     icon: 'sprite-fm-mono icon-channel-new',
                     onClick: () => {
                         this.startGroupChatFlow = 2;
                         this.setState({ startGroupChatDialogShown: true });
                     }
-                },
-
+                }
             ];
         }
         return this._topButtonsContactsPicker;
+    }
+    createMeetingEndDlgIfNeeded() {
+        if (megaChat.initialPubChatHandle || megaChat.initialChatId) {
+            let chatRoom = megaChat.getCurrentRoom();
+            if (!chatRoom) {
+                return null;
+            }
+            if (!chatRoom.initialMessageHistLoaded /* haven't received the CALL info yet */) {
+                return null;
+            }
+            if ($.dialog && $.dialog !== 'meetings-ended') {
+                /* ModalDialog's should be integrated into M.safeShowDialog as some stage */
+                M.safeShowDialog('meetings-ended', () => {
+                    this.safeForceUpdate();
+                });
+                return null;
+            }
+            if (megaChat.meetingDialogClosed === chatRoom.chatId) {
+                return null;
+            }
+
+            const activeCallIds = chatRoom.activeCallIds.keys();
+            if (
+                chatRoom.isMeeting &&
+                activeCallIds.length === 0 &&
+                (
+                    megaChat.initialPubChatHandle && chatRoom.publicChatHandle === megaChat.initialPubChatHandle ||
+                    chatRoom.chatId === megaChat.initialChatId
+                )
+            ) {
+                return (
+                    <MeetingsCallEndedDialog
+                        onClose={() => {
+                            // temporary, only available during the Standalone page when anonymous
+                            megaChat.meetingDialogClosed = chatRoom.chatId;
+                            megaChat.trackDataChange();
+                        }}
+                    />
+                );
+            }
+        }
+        return null;
     }
     render() {
         var self = this;
@@ -1193,9 +1230,20 @@ class ConversationsApp extends MegaRenderMixin {
                 />;
         }
 
+        var startMeetingDialog = null;
+        if (self.state.startMeetingDialog === true) {
+            startMeetingDialog = (
+                <StartMeetingDialog
+                    onStart={(topic, audio, video) => {
+                        megaChat.createAndStartMeeting(topic, audio, video);
+                        this.setState({ startMeetingDialog: false });
+                    }}
+                    onClose={() => this.setState({ startMeetingDialog: false })}
+                />
+            );
+        }
 
         var leftPanelStyles = {};
-
         if (self.state.leftPaneWidth) {
             leftPanelStyles.width = self.state.leftPaneWidth;
         }
@@ -1239,13 +1287,42 @@ class ConversationsApp extends MegaRenderMixin {
             </div>;
             isLoading = true;
         }
+        else if (
+            /* is chat link scenario, where we want to delay the loading until hist had finished loading */
+            is_chatlink && (
+                !megaChat.getCurrentRoom() || /* not initialized the chat link room */
+                megaChat.getCurrentRoom().initialMessageHistLoaded === false /* haven't loaded the history yet */
+            )
+        ) {
+            loadingOrEmpty = <div className="fm-empty-messages">
+                <div className="loading-spinner js-messages-loading light manual-management" style={{"top":"50%"}}>
+                    <div className="main-loader" style={{
+                        "position":"fixed",
+                        "top": "50%",
+                        "left": "50%",
+                        "marginLeft": "72px"
+                    }}></div>
+                </div>
+            </div>;
+
+            const currentChatRoom = megaChat.getCurrentRoom();
+            if (currentChatRoom) {
+                // if we are waiting for messages to be loaded, trigger a force update once thats done.
+                currentChatRoom.one('onMessagesHistoryDone.loadingStop', () => this.safeForceUpdate());
+            }
+            isLoading = true;
+        }
 
         var rightPaneStyles = {};
-        if (anonymouschat) {
+        if (is_chatlink && !is_eplusplus) {
             rightPaneStyles = {'marginLeft': 0};
         }
 
-        const rightPane = <div className="fm-right-files-block in-chat" style={rightPaneStyles}>
+        let meetingsCallEndedDialog = this.createMeetingEndDlgIfNeeded();
+
+        const rightPane = <div className={`fm-right-files-block in-chat ${
+            is_chatlink ? " chatlink" : ""
+        }`} style={rightPaneStyles}>
             {loadingOrEmpty}
             {
                 !isLoading && megaChat.routingSection === "archived" &&
@@ -1257,7 +1334,8 @@ class ConversationsApp extends MegaRenderMixin {
             {!isLoading && megaChat.routingSection === "notFound" &&
                 <span><center>Section not found</center></span>
             }
-            {!isLoading &&
+            {!isLoading && meetingsCallEndedDialog}
+            {!isLoading ?
                 <ConversationPanels
                     {...this.props}
                     chatUIFlags={megaChat.chatUIFlags}
@@ -1265,7 +1343,7 @@ class ConversationsApp extends MegaRenderMixin {
                     className={megaChat.routingSection !== "chat" ? 'hidden' : ''}
                     currentlyOpenedChat={megaChat.currentlyOpenedChat}
                     chats={megaChat.chats}
-                />
+                /> : null
             }
         </div>;
 
@@ -1279,11 +1357,20 @@ class ConversationsApp extends MegaRenderMixin {
         }
 
         return (
-            <div className="conversationsApp" key="conversationsApp">
+            <div
+                key="conversationsApp"
+                className="conversationsApp">
                 {startGroupChatDialog}
-                <div className="fm-left-panel chat-lp-body" style={leftPanelStyles}>
+                {startMeetingDialog}
+                <div
+                    className={`
+                        fm-left-panel
+                        chat-lp-body
+                        ${is_chatlink && 'hidden' || ''}
+                        ${megaChat._joinDialogIsShown && 'hidden' || ''}
+                    `}
+                    style={leftPanelStyles}>
                     <div className="left-pane-drag-handle" />
-
                     <ConversationsHead
                         megaChat={megaChat}
                         contactsActive={megaChat.routingSection === "contacts"}
@@ -1291,9 +1378,7 @@ class ConversationsApp extends MegaRenderMixin {
                         showTopButtons={self.getContactsPickerButtons()}
                         showAddContact={M.u && M.u.length > 1}
                     />
-
                     <SearchPanel />
-
                     <PerfectScrollbar
                         className="chat-lp-scroll-area"
                         chats={megaChat.chats}
@@ -1301,18 +1386,17 @@ class ConversationsApp extends MegaRenderMixin {
                             megaChat.$chatTreePanePs = ref;
                         }}>
                         {megaChat.chats.length > 0 &&
-                            <div
-                                className={`
-                                    content-panel
-                                    conversations
-                                    active
-                                `}>
-                                <span className="heading">Contacts and Groups</span>
-                                <ConversationsList quickSearchText={this.state.quickSearchText} />
-                            </div>
+                        <div
+                            className={`
+                                content-panel
+                                conversations
+                                active
+                            `}>
+                            <span className="heading">Contacts and Groups</span>
+                            <ConversationsList quickSearchText={this.state.quickSearchText}/>
+                        </div>
                         }
                     </PerfectScrollbar>
-
                     <div
                         className={arcBtnClass}
                         onClick={this.archiveChatsClicked}>

@@ -1033,7 +1033,7 @@ FMDB.prototype.stripnode = Object.freeze({
         'use strict';
         // mcf may contain 'undefined' values, which should NOT be set, otherwise they may replace the mcfCache
         var cache = {};
-        var keys = ['id', 'cs', 'g', 'u', 'ts', 'ct', 'ck', 'f', 'm'];
+        var keys = ['id', 'cs', 'g', 'u', 'ts', 'ct', 'ck', 'f', 'm', 'mr'];
         for (var idx = keys.length; idx--;) {
             var k = keys[idx];
 
@@ -1041,6 +1041,9 @@ FMDB.prototype.stripnode = Object.freeze({
                 cache[k] = mcf[k];
             }
         }
+        // transient properties, that need to be resetted
+        cache.n = mcf.n || undefined;
+
         FMDB._mcfCache[cache.id] = Object.assign({}, FMDB._mcfCache[mcf.id], cache);
         Object.assign(mcf, FMDB._mcfCache[cache.id]);
 

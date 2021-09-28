@@ -14,6 +14,13 @@ if [[ "$1" == "--fix" ]]; then
     git pull $remote develop
 fi
 
+
+if [[ $(git status|grep "scss") ]]; then
+    ./node_modules/.bin/sass --load-path="css/" --no-source-map css/chat-bundle.scss css/chat-bundle.css
+    # if map was created during development (build.sh)
+    rm -rf css/chat-bundle.css.map
+fi
+
 NODE_ENV="production" ./node_modules/.bin/webpack  --config webpack.config.js
 
 # If OSX, use gsed

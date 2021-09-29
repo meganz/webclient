@@ -380,14 +380,8 @@
     display: block;
     background-position: -2px -37px;
 }
-.transfer-progress-icon.close {
-    background-position: -9px -1764px;
-}
-.transfer-progress-icon.expand {
-    background-position: -39px -1766px;
-}
 .transfer-progress-icon.collapse {
-    background-position: -72px -1766px;
+    height: auto;
 }
 .transfer-progress-icon.wait {
     background-position: -195px -342px;

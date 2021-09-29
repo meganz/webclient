@@ -236,21 +236,22 @@ function u_checklogin3a(res, ctx) {
                     });
             })
             .always(() => {
-        // there was a race condition between importing and business accounts creation.
-        // in normal users there's no problem, however in business the user will be disabled
-        // till they pay. therefore, if the importing didnt finish before 'upb' then the importing
-        // will fail.
-                if ($.createanonuser === u_attr.u) {
+                // there was a race condition between importing and business accounts creation.
+                // in normal users there's no problem, however in business the user will be disabled
+                // till they pay. therefore, if the importing didnt finish before 'upb' then the importing
+                // will fail.
+                if (r > 2 && !is_embed) {
+                    mBroadcaster.crossTab.initialize(() => ctx.checkloginresult(ctx, r));
+                }
+                else if ($.createanonuser === u_attr.u) {
                     M.importWelcomePDF().always(() => ctx.checkloginresult(ctx, r));
                     delete $.createanonuser;
-                }
-                else if (r > 2 && !is_embed) {
-                    mBroadcaster.crossTab.initialize(() => ctx.checkloginresult(ctx, r));
                 }
                 else {
                     ctx.checkloginresult(ctx, r);
                 }
-            });
+            }
+        );
     }
 }
 

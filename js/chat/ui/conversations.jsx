@@ -354,6 +354,7 @@ class ArchConversationsListItem extends MegaRenderMixin {
 
         var lastMessageDiv = null;
         var lastMessageDatetimeDiv = null;
+        var emptyMessage = null;
         var lastMsgDivClasses = "conversation-message";
         var lastMessage = chatRoom.messagesBuff.getLatestTextMessage();
         if (lastMessage) {
@@ -376,7 +377,7 @@ class ArchConversationsListItem extends MegaRenderMixin {
              * 3. I'd connected to chatd and joined the room.
               */
 
-            var emptyMessage = (
+            emptyMessage = (
                 (
                     chatRoom.messagesBuff.messagesHistoryIsLoading() ||
                     this.loadingShown ||
@@ -412,26 +413,34 @@ class ArchConversationsListItem extends MegaRenderMixin {
                             <utils.EmojiFormattedContent>{chatRoom.getRoomTitle()}</utils.EmojiFormattedContent>
                             {chatRoom.type === "group" ? <i className="sprite-fm-uni icon-ekr-key"/> : undefined}
                         </div>
-                        {lastMessageDiv}
-                        {lastMessageDatetimeDiv}
+                        <div className="last-message-info">
+                            {lastMessageDiv}
+                            {emptyMessage ? null : (
+                                <div className="conversations-separator">
+                                    <i className="sprite-fm-mono icon-dot"/>
+                                </div>
+                            )}
+                            {lastMessageDatetimeDiv}
+                        </div>
                     </div>
-                    <div className="archived-badge">{l[19067]}</div>
+                    <div className="archived-badge">{l[19067] /* `Archived` */}</div>
                 </td>
                 <td width="330">
                     <div className="archived-on">
                         <div className="archived-date-time">{lastMessageDatetimeDiv}</div>
-                        <div className="clear" />
+                        <div className="clear"/>
                     </div>
-                    <button
-                        className="mega-button unarchive-chat right"
+                    <Button
+                        className="mega-button action unarchive-chat right"
+                        icon="sprite-fm-mono icon-rewind"
                         onClick={this.props.onUnarchiveConversationClicked.bind(this)}>
-                        <span>{l[19065]}</span>
-                    </button>
+                        <span>{l[19065] /* `Unarchive` */}</span>
+                    </Button>
                 </td>
             </tr>
         );
     }
-};
+}
 
 class ConversationsHead extends MegaRenderMixin {
     requestReceivedListener = null;
@@ -825,48 +834,51 @@ class ArchivedConversationsList extends MegaRenderMixin {
                 />;
             }
         }
+
         return (
-        <div className="chat-content-block archived-chats">
-            <div className="files-grid-view archived-chat-view">
-                <table className="grid-table-header" width="100%" cellSpacing="0" cellPadding="0" border="0">
-                    <tbody>
-                        <tr>
-                            <th className="calculated-width" onClick={self.onSortNameClicked}>
-                                <div className="is-chat name">
-                                    {l[86]}
-                                    <i
-                                        className={
-                                            nameOrderClass ? `sprite-fm-mono icon-arrow-${nameOrderClass}` : ''
-                                        }
-                                    />
-                                </div>
-                            </th>
-                            <th width="330" onClick={self.onSortTimeClicked}>
-                                <div className={"is-chat arrow interaction " + timerOrderClass}>
-                                    {l[5904]}
-                                    <i
-                                        className={
-                                            timerOrderClass ? `sprite-fm-mono icon-arrow-${timerOrderClass}` : ''
-                                        }
-                                    />
-                                </div>
-                            </th>
-                        </tr>
-                    </tbody>
-                </table>
-                <div className="grid-scrolling-table archive-chat-list">
-                    <table className="grid-table arc-chat-messages-block">
+            <div className="chat-content-block archived-chats">
+                <div className="files-grid-view archived-chat-view">
+                    <table className="grid-table-header" width="100%" cellSpacing="0" cellPadding="0" border="0">
                         <tbody>
-                            {currConvsList}
+                            <tr>
+                                <th className="calculated-width" onClick={self.onSortNameClicked}>
+                                    <div className="is-chat name">
+                                        {l[86]}
+                                        <i
+                                            className={
+                                                nameOrderClass ? `sprite-fm-mono icon-arrow-${nameOrderClass}` : ''
+                                            }
+                                        />
+                                    </div>
+                                </th>
+                                <th width="330" onClick={self.onSortTimeClicked}>
+                                    <div className={"is-chat arrow interaction " + timerOrderClass}>
+                                        {l[5904]}
+                                        <i
+                                            className={
+                                                timerOrderClass ? `sprite-fm-mono icon-arrow-${timerOrderClass}` : ''
+                                            }
+                                        />
+                                    </div>
+                                </th>
+                            </tr>
                         </tbody>
                     </table>
+                    <div className="grid-scrolling-table archive-chat-list">
+                        <div className="grid-wrapper">
+                            <table className="grid-table arc-chat-messages-block table-hover">
+                                <tbody>
+                                    {currConvsList}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
+                {confirmUnarchiveDialog}
             </div>
-            {confirmUnarchiveDialog}
-        </div>
         );
     }
-};
+}
 
 class ConversationsApp extends MegaRenderMixin {
     constructor(props) {

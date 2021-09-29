@@ -3138,6 +3138,8 @@ function loadSubPage(tpage, event) {
         return false;
     }
 
+    mBroadcaster.sendMessage('beforepagechange', tpage);
+    window.is_chatlink = false;
     dlid = false;
 
     if (tpage) {
@@ -3203,7 +3205,6 @@ function loadSubPage(tpage, event) {
         return false;
     }
 
-    mBroadcaster.sendMessage('beforepagechange', tpage);
     if (jsl.length > 0) {
         loadingDialog.show();
         jsl_start();

@@ -61,7 +61,7 @@
         room.sfuApp = this;
         this.callId = callId;
         this.callManagerCall = megaChat.plugins.callManager2.registerCall(this, room, callId);
-        this.room.meetingsLoading = "Joining...";
+        this.room.meetingsLoading = l.joining;
     };
 
     SfuApp.VIDEO_DEBUG_MODE = d && typeof localStorage.videoDebugMode !== 'undefined';

@@ -2316,6 +2316,7 @@ class ContactPickerWidget extends _stores_mixins_js2__["MegaRenderMixin"] {
   constructor(props) {
     super(props);
     this.contactLinkListener = null;
+    this.containerRef = react1.a.createRef();
 
     this.onSearchChange = ev => {
       this.setState({
@@ -2326,13 +2327,13 @@ class ContactPickerWidget extends _stores_mixins_js2__["MegaRenderMixin"] {
     this.state = {
       searchValue: '',
       selected: this.props.selected || false,
-      publicLink: undefined
+      publicLink: M.account && M.account.contactLink || undefined
     };
   }
 
   componentDidMount() {
     super.componentDidMount();
-    setContactLink();
+    setContactLink(this.containerRef && this.containerRef.current);
     this.contactLinkListener = mBroadcaster.addListener('contact:setContactLink', publicLink => this.state.publicLink ? null : this.setState({
       publicLink
     }));
@@ -2862,6 +2863,7 @@ class ContactPickerWidget extends _stores_mixins_js2__["MegaRenderMixin"] {
     const totalContactsNum = contacts.length + frequentContacts.length;
     const searchPlaceholderMsg = totalContactsNum === 1 ? l[23749] : l[23750].replace('[X]', totalContactsNum);
     return react1.a.createElement("div", {
+      ref: this.containerRef,
       className: "\n                    " + (this.props.className || '') + "\n                    " + extraClasses + "\n                "
     }, topButtons, multipleContacts, !this.props.readOnly && haveContacts && react1.a.createElement("div", {
       className: "\n                            contacts-search-header\n                            " + this.props.headerClasses + "\n                        "

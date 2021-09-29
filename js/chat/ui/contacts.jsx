@@ -865,6 +865,7 @@ export class ContactItem extends ContactAwareComponent {
 
 export class ContactPickerWidget extends MegaRenderMixin {
     contactLinkListener = null;
+    containerRef = React.createRef();
     static defaultProps = {
         multipleSelectedButtonLabel: false,
         singleSelectedButtonLabel: false,
@@ -883,7 +884,7 @@ export class ContactPickerWidget extends MegaRenderMixin {
         this.state = {
             searchValue: '',
             selected: this.props.selected || false,
-            publicLink: undefined
+            publicLink: M.account && M.account.contactLink || undefined
         };
     }
     onSearchChange = ev => {
@@ -891,7 +892,7 @@ export class ContactPickerWidget extends MegaRenderMixin {
     };
     componentDidMount() {
         super.componentDidMount();
-        setContactLink();
+        setContactLink(this.containerRef && this.containerRef.current);
         this.contactLinkListener = mBroadcaster.addListener('contact:setContactLink', publicLink =>
             this.state.publicLink ? null : this.setState({ publicLink })
         );
@@ -1445,6 +1446,7 @@ export class ContactPickerWidget extends MegaRenderMixin {
         const searchPlaceholderMsg = totalContactsNum === 1 ? l[23749] : l[23750].replace('[X]', totalContactsNum);
         return (
             <div
+                ref={this.containerRef}
                 className={`
                     ${this.props.className || ''}
                     ${extraClasses}

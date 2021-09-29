@@ -25568,6 +25568,7 @@ class conversations_ArchConversationsListItem extends mixins["MegaRenderMixin"] 
 
     var lastMessageDiv = null;
     var lastMessageDatetimeDiv = null;
+    var emptyMessage = null;
     var lastMessage = chatRoom.messagesBuff.getLatestTextMessage();
 
     if (lastMessage) {
@@ -25583,7 +25584,7 @@ class conversations_ArchConversationsListItem extends mixins["MegaRenderMixin"] 
         className: "date-time"
       }, getTimeMarker(lastMessage.delay, true));
     } else {
-      var emptyMessage = chatRoom.messagesBuff.messagesHistoryIsLoading() || this.loadingShown || chatRoom.messagesBuff.joined === false ? l[7006] : l[8000];
+      emptyMessage = chatRoom.messagesBuff.messagesHistoryIsLoading() || this.loadingShown || chatRoom.messagesBuff.joined === false ? l[7006] : l[8000];
       lastMessageDiv = conversations_React.createElement("div", null, conversations_React.createElement("div", {
         className: "conversation-message"
       }, emptyMessage));
@@ -25608,7 +25609,13 @@ class conversations_ArchConversationsListItem extends mixins["MegaRenderMixin"] 
       className: nameClassString
     }, conversations_React.createElement(utils["default"].EmojiFormattedContent, null, chatRoom.getRoomTitle()), chatRoom.type === "group" ? conversations_React.createElement("i", {
       className: "sprite-fm-uni icon-ekr-key"
-    }) : undefined), lastMessageDiv, lastMessageDatetimeDiv), conversations_React.createElement("div", {
+    }) : undefined), conversations_React.createElement("div", {
+      className: "last-message-info"
+    }, lastMessageDiv, emptyMessage ? null : conversations_React.createElement("div", {
+      className: "conversations-separator"
+    }, conversations_React.createElement("i", {
+      className: "sprite-fm-mono icon-dot"
+    })), lastMessageDatetimeDiv)), conversations_React.createElement("div", {
       className: "archived-badge"
     }, l[19067])), conversations_React.createElement("td", {
       width: "330"
@@ -25618,8 +25625,9 @@ class conversations_ArchConversationsListItem extends mixins["MegaRenderMixin"] 
       className: "archived-date-time"
     }, lastMessageDatetimeDiv), conversations_React.createElement("div", {
       className: "clear"
-    })), conversations_React.createElement("button", {
-      className: "mega-button unarchive-chat right",
+    })), conversations_React.createElement(ui_buttons["Button"], {
+      className: "mega-button action unarchive-chat right",
+      icon: "sprite-fm-mono icon-rewind",
       onClick: this.props.onUnarchiveConversationClicked.bind(this)
     }, conversations_React.createElement("span", null, l[19065]))));
   }
@@ -26044,9 +26052,11 @@ class conversations_ArchivedConversationsList extends mixins["MegaRenderMixin"] 
       className: timerOrderClass ? "sprite-fm-mono icon-arrow-" + timerOrderClass : ''
     })))))), conversations_React.createElement("div", {
       className: "grid-scrolling-table archive-chat-list"
+    }, conversations_React.createElement("div", {
+      className: "grid-wrapper"
     }, conversations_React.createElement("table", {
-      className: "grid-table arc-chat-messages-block"
-    }, conversations_React.createElement("tbody", null, currConvsList)))), confirmUnarchiveDialog);
+      className: "grid-table arc-chat-messages-block table-hover"
+    }, conversations_React.createElement("tbody", null, currConvsList))))), confirmUnarchiveDialog);
   }
 
 }

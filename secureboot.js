@@ -3450,7 +3450,7 @@ else if (!browserUpdate) {
     }
 
     if (page.substr(0, 5) === 'chat/') {
-        // jsl = [{f: langFilepath, n: 'lang', j: 3}];
+        jsl = [{f: langFilepath, n: 'lang', j: 3}];
         // ^ @todo: consider loading only needed files...
         jsl.push({f:'html/chatlink.html', n: 'chatlink', j: 0});
 

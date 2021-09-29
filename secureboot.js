@@ -3216,6 +3216,9 @@ else if (!browserUpdate) {
     if (typeof TextEncoder !== 'function') {
         jsl.push({f:'js/vendor/encoding.js', n: 'encoding_js', j:1});
     }
+    if (page.substr(0, 5) === 'chat/') {
+        jsl.push({f:'html/chatlink.html', n: 'chatlink', j: 0});
+    }
 
     var jsl2 =
     {
@@ -3450,9 +3453,9 @@ else if (!browserUpdate) {
     }
 
     if (page.substr(0, 5) === 'chat/') {
-        jsl = [{f: langFilepath, n: 'lang', j: 3}];
+        // jsl = [{f: langFilepath, n: 'lang', j: 3}];
         // ^ @todo: consider loading only needed files...
-        jsl.push({f:'html/chatlink.html', n: 'chatlink', j: 0});
+        // jsl.push({f:'html/chatlink.html', n: 'chatlink', j: 0});
 
         tmp = Object.keys(jsl3.chat);
         for (var u = 0; u < tmp.length; ++u) {

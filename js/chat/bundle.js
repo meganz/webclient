@@ -1068,10 +1068,10 @@ class Dropdown extends _stores_mixins_js1__["MegaRenderMixin"] {
 
       return true;
     } else if (this.props.focused != nextProps.focused) {
-        return true;
-      } else if (this.state && this.state.active != nextState.active) {
-          return true;
-        }
+      return true;
+    } else if (this.state && this.state.active != nextState.active) {
+      return true;
+    }
 
     return undefined;
   }
@@ -1298,14 +1298,14 @@ class DropdownContactsSelector extends _stores_mixins_js1__["MegaRenderMixin"] {
     if (this.props.active != nextProps.active) {
       return true;
     } else if (this.props.focused != nextProps.focused) {
-        return true;
-      } else if (this.state && this.state.active != nextState.active) {
-          return true;
-        } else if (this.state && JSON.stringify(this.state.selected) != JSON.stringify(nextState.selected)) {
-            return true;
-          } else {
-            return undefined;
-          }
+      return true;
+    } else if (this.state && this.state.active != nextState.active) {
+      return true;
+    } else if (this.state && JSON.stringify(this.state.selected) != JSON.stringify(nextState.selected)) {
+      return true;
+    } else {
+      return undefined;
+    }
   }
 
   onSelected(nodes) {
@@ -3105,8 +3105,8 @@ class Button extends _stores_mixins_js2__["MegaRenderMixin"] {
       $('.conversationsApp').rebind('mousedown.button' + this.getUniqueId(), this.onBlur);
       $(document).rebind('keyup.button' + this.getUniqueId(), e => {
         if (this.state.focused === true && e.keyCode === 27) {
-            this.onBlur();
-          }
+          this.onBlur();
+        }
       });
 
       if (this._pageChangeListener) {
@@ -3621,8 +3621,8 @@ class ModalDialog extends _stores_mixins_js1__["MegaRenderMixin"] {
       keyCode
     }) => {
       if (!this.props.stopKeyPropagation && keyCode === 27) {
-          this.onBlur();
-        }
+        this.onBlur();
+      }
     });
   }
 
@@ -11866,8 +11866,8 @@ class gifPanel_GifPanel extends mixins["MegaRenderMixin"] {
         keyCode
       }) => {
         if (keyCode && keyCode === 27) {
-            return searchField_SearchField.hasValue() ? this.doReset() : this.props.onToggle();
-          }
+          return searchField_SearchField.hasValue() ? this.doReset() : this.props.onToggle();
+        }
       });
     };
 
@@ -23499,8 +23499,8 @@ class searchPanel_SearchPanel extends mixins["MegaRenderMixin"] {
       } = ev;
 
       if (keyCode && keyCode === 27) {
-          return searchField_SearchField.hasValue() ? this.handleReset() : this.toggleMinimize();
-        }
+        return searchField_SearchField.hasValue() ? this.handleReset() : this.toggleMinimize();
+      }
     };
 
     this.handleChange = ev => {
@@ -24137,48 +24137,48 @@ class contactList_ContactList extends mixins["MegaRenderMixin"] {
     } = this.props;
 
     if (contacts && contacts.length > 1) {
-        return external_React_default.a.createElement("div", {
-          className: "contacts-list"
-        }, external_React_default.a.createElement(fmView_FMView, {
-          dataSource: this.props.contacts,
-          customFilterFn: r => {
-            return r.c === 1;
+      return external_React_default.a.createElement("div", {
+        className: "contacts-list"
+      }, external_React_default.a.createElement(fmView_FMView, {
+        dataSource: this.props.contacts,
+        customFilterFn: r => {
+          return r.c === 1;
+        },
+        currentlyViewedEntry: "contacts",
+        onSelected: this.onSelected,
+        onHighlighted: this.onHighlighted,
+        searchValue: this.state.searchValue,
+        onExpand: this.onExpand,
+        onAttachClicked: this.onAttachClicked,
+        viewMode: 0,
+        currentdirid: "contacts",
+        megaListItemHeight: 59,
+        headerContainerClassName: "contacts-table contacts-table-head",
+        containerClassName: "contacts-table contacts-table-results",
+        onContextMenu: (ev, handle) => this.handleContextMenu(ev, handle),
+        listAdapterColumns: [columnContactName_ColumnContactName, columnContactStatus_ColumnContactStatus, [columnContactLastInteraction_ColumnContactLastInteraction, {
+          interactions: this.state.interactions
+        }], [columnContactButtons_ColumnContactButtons, {
+          onContextMenuRef: (handle, node) => {
+            this.contextMenuRefs[handle] = node;
           },
-          currentlyViewedEntry: "contacts",
-          onSelected: this.onSelected,
-          onHighlighted: this.onHighlighted,
-          searchValue: this.state.searchValue,
-          onExpand: this.onExpand,
-          onAttachClicked: this.onAttachClicked,
-          viewMode: 0,
-          currentdirid: "contacts",
-          megaListItemHeight: 59,
-          headerContainerClassName: "contacts-table contacts-table-head",
-          containerClassName: "contacts-table contacts-table-results",
-          onContextMenu: (ev, handle) => this.handleContextMenu(ev, handle),
-          listAdapterColumns: [columnContactName_ColumnContactName, columnContactStatus_ColumnContactStatus, [columnContactLastInteraction_ColumnContactLastInteraction, {
-            interactions: this.state.interactions
-          }], [columnContactButtons_ColumnContactButtons, {
-            onContextMenuRef: (handle, node) => {
-              this.contextMenuRefs[handle] = node;
-            },
-            onActiveChange: opened => {
-              if (!opened) {
-                this.setState({
-                  contextMenuPosition: null
-                });
-              }
-            },
-            contextMenuPosition: this.state.contextMenuPosition
-          }]],
-          initialSortBy: ['status', 'asc'],
-          fmConfigSortEnabled: true,
-          fmConfigSortId: "contacts",
-          NilComponent: external_React_default.a.createElement(nil_Nil, {
-            title: l[5737]
-          })
-        }));
-      }
+          onActiveChange: opened => {
+            if (!opened) {
+              this.setState({
+                contextMenuPosition: null
+              });
+            }
+          },
+          contextMenuPosition: this.state.contextMenuPosition
+        }]],
+        initialSortBy: ['status', 'asc'],
+        fmConfigSortEnabled: true,
+        fmConfigSortId: "contacts",
+        NilComponent: external_React_default.a.createElement(nil_Nil, {
+          title: l[5737]
+        })
+      }));
+    }
 
     return external_React_default.a.createElement(nil_Nil, {
       title: l[5737]
@@ -24879,12 +24879,12 @@ class contactsPanel_ContactsPanel extends mixins["MegaRenderMixin"] {
       keyCode
     }) => {
       if (keyCode === 27) {
-          const HAS_DIALOG_OPENED = $.dialog || ['.contact-nickname-dialog', '.fingerprint-dialog', '.context'].some(selector => {
-            const dialog = document.querySelector(selector);
-            return dialog && dialog.offsetHeight > 0;
-          });
-          return HAS_DIALOG_OPENED ? keyCode : loadSubPage('fm/chat');
-        }
+        const HAS_DIALOG_OPENED = $.dialog || ['.contact-nickname-dialog', '.fingerprint-dialog', '.context'].some(selector => {
+          const dialog = document.querySelector(selector);
+          return dialog && dialog.offsetHeight > 0;
+        });
+        return HAS_DIALOG_OPENED ? keyCode : loadSubPage('fm/chat');
+      }
     };
 
     this.handleAcceptAllRequests = () => {
@@ -26328,8 +26328,8 @@ let conversations_ConversationsApp = (_dec3 = utils["default"].SoonFcWrap(80), (
       }
 
       if (!chatRoom.initialMessageHistLoaded) {
-          return null;
-        }
+        return null;
+      }
 
       if ($.dialog && $.dialog !== 'meetings-ended') {
         M.safeShowDialog('meetings-ended', () => {

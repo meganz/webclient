@@ -773,7 +773,7 @@
   margin: 20px 0 0;
 }
 
-.stream {
+.conversations .stream {
   display: grid;
   position: relative;
   float: left;
@@ -781,28 +781,28 @@
   height: 100%;
   background: #222;
 }
-.stream.full {
+.conversations .stream.full {
   width: 100%;
 }
-.stream.hovered .stream-controls {
+.conversations .stream.hovered .stream-controls {
   bottom: 0;
 }
-.stream.hovered .sidebar-controls {
+.conversations .stream.hovered .sidebar-controls {
   right: 24px;
 }
-.stream.hovered .stream-head, .stream .stream-head.active {
+.conversations .stream.hovered .stream-head, .conversations .stream .stream-head.active {
   top: 0;
 }
-.stream-container {
+.conversations .stream-container {
   margin: auto;
 }
-.stream .with-notice {
+.conversations .stream .with-notice {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
 }
-.stream .alert {
+.conversations .stream .alert {
   position: absolute;
   bottom: 10px;
   left: 10px;
@@ -811,24 +811,24 @@
   background: #07BFA5;
   color: #FFF;
 }
-.stream .alert-content {
+.conversations .stream .alert-content {
   float: left;
 }
-.stream .alert-content span {
+.conversations .stream .alert-content span {
   display: block;
   float: left;
   padding: 0 4px 0 0;
 }
-.stream .alert-content span:first-child {
+.conversations .stream .alert-content span:first-child {
   font-weight: bold;
 }
-.stream .alert-control {
+.conversations .stream .alert-control {
   float: left;
   margin: 0 0 0 20px;
   padding: 0 0 0 10px;
   border-left: 1px solid #FFF;
 }
-.stream .alert button {
+.conversations .stream .alert button {
   width: 15px;
   height: 15px;
   padding: 0;
@@ -838,7 +838,7 @@
   background: #FFF;
   cursor: pointer;
 }
-.stream .stream-on-hold {
+.conversations .stream .stream-on-hold {
   position: absolute;
   top: 50%;
   left: 50%;
@@ -848,27 +848,26 @@
   text-align: center;
   cursor: pointer;
 }
-.stream .stream-on-hold i {
+.conversations .stream .stream-on-hold i {
   display: block;
   margin: 0 auto;
   --icon-size: 80px;
   --mask-color: var(--surface-grey-1);
 }
-.stream .stream-on-hold span {
+.conversations .stream .stream-on-hold span {
   font: var(--text-h3);
   color: var(--secondary-white);
 }
-
-.carousel {
+.conversations .carousel {
   width: 100%;
   height: 100%;
 }
-.carousel-container {
+.conversations .carousel-container {
   width: 100%;
   height: 100%;
   transform-style: preserve-3d;
 }
-.carousel-container .carousel-page {
+.conversations .carousel-container .carousel-page {
   display: none;
   position: absolute;
   top: 0;
@@ -877,14 +876,13 @@
   margin: auto;
   transition: transform 500ms, opacity 800ms, z-index 500ms;
 }
-.carousel-container .carousel-page.active {
+.conversations .carousel-container .carousel-page.active {
   display: block;
   position: relative;
   z-index: 900;
 }
-
-.carousel-button-prev,
-.carousel-button-next {
+.conversations .carousel-button-prev,
+.conversations .carousel-button-next {
   position: absolute;
   top: 50%;
   width: 96px;
@@ -898,17 +896,17 @@
   opacity: 0.6;
   transition: opacity 500ms ease-in-out;
 }
-.carousel-button-prev:hover,
-.carousel-button-next:hover {
+.conversations .carousel-button-prev:hover,
+.conversations .carousel-button-next:hover {
   opacity: 1;
 }
-.carousel-button-prev:hover div,
-.carousel-button-next:hover div {
+.conversations .carousel-button-prev:hover div,
+.conversations .carousel-button-next:hover div {
   display: block;
 }
 @media only screen and (max-height: 760px) {
-  .carousel-button-prev,
-.carousel-button-next {
+  .conversations .carousel-button-prev,
+.conversations .carousel-button-next {
     top: auto;
     bottom: 322px;
     width: 56px;
@@ -916,27 +914,27 @@
     transform: none;
   }
 }
-.carousel-button-prev i,
-.carousel-button-next i {
+.conversations .carousel-button-prev i,
+.conversations .carousel-button-next i {
   display: block;
   margin: 0 auto;
   --icon-size: 48px;
   --mask-color: var(--icon-rest);
 }
 @media only screen and (max-height: 760px) {
-  .carousel-button-prev i,
-.carousel-button-next i {
+  .conversations .carousel-button-prev i,
+.conversations .carousel-button-next i {
     --icon-size: 28px;
   }
 }
-.carousel-button-prev span,
-.carousel-button-next span {
+.conversations .carousel-button-prev span,
+.conversations .carousel-button-next span {
   position: fixed;
   bottom: -9999px;
   visibility: hidden;
 }
-.carousel-button-prev div,
-.carousel-button-next div {
+.conversations .carousel-button-prev div,
+.conversations .carousel-button-next div {
   display: none;
   position: absolute;
   left: 50%;
@@ -949,22 +947,20 @@
   background-color: rgba(0, 0, 0, 0.4);
 }
 @media only screen and (max-height: 760px) {
-  .carousel-button-prev div,
-.carousel-button-next div {
+  .conversations .carousel-button-prev div,
+.conversations .carousel-button-next div {
     top: -32px;
     bottom: auto;
   }
 }
-
-.carousel-button-prev {
+.conversations .carousel-button-prev {
   left: 8px;
 }
-
-.carousel-button-next {
+.conversations .carousel-button-next {
   right: 8px;
 }
 @media only screen and (max-height: 760px) {
-  .carousel-button-next {
+  .conversations .carousel-button-next {
     right: 21px;
   }
 }
@@ -1296,30 +1292,30 @@
   visibility: hidden;
 }
 
-.collapse {
+.conversations .collapse {
   height: 100%;
 }
-.collapse-head {
+.conversations .collapse-head {
   overflow: hidden;
   margin: 0 15px;
   border-bottom: 1px solid var(--stroke-grey-2);
   cursor: pointer;
 }
-.collapse-head i {
+.conversations .collapse-head i {
   display: block;
   float: left;
   --icon-size: 24px;
   margin: -1px 3px 0 0;
   --mask-color: var(--icon-rest);
 }
-.collapse-head h5 {
+.conversations .collapse-head h5 {
   display: block;
   float: left;
   margin: 0;
   font: var(--text-body1-bold);
   color: var(--text-color-high);
 }
-.collapse-head .participants-count {
+.conversations .collapse-head .participants-count {
   display: block;
   float: left;
   width: 15px;
@@ -1332,12 +1328,12 @@
   background: var(--secondary-blue);
   color: var(--secondary-white);
 }
-.collapse ul {
+.conversations .collapse ul {
   list-style: none;
   margin: 0;
   padding: 0;
 }
-.collapse ul li {
+.conversations .collapse ul li {
   padding: 8px 0;
   border-bottom: 1px solid var(--stroke-grey-2);
 }
@@ -1961,5 +1957,3 @@ body.theme-dark .preview {
     left: 400px;
   }
 }
-
-/*# sourceMappingURL=chat-bundle.css.map */

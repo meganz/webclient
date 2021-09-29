@@ -12353,10 +12353,16 @@ class local_Local extends abstractGenericMessage_AbstractGenericMessage {
     var _this$props$message, _this$props$message$m;
 
     const callId = (_this$props$message = this.props.message) == null ? void 0 : (_this$props$message$m = _this$props$message.meta) == null ? void 0 : _this$props$message$m.callId;
+    let debugMsg = "";
+
+    if (d && callId) {
+      debugMsg = ": callId: " + callId;
+    }
+
     return external_React_default.a.createElement("div", {
       className: "message date-time simpletip",
       "data-simpletip": time2date(this.getTimestamp())
-    }, this.getTimestampAsString(), d && callId && ": msgId: " + callId);
+    }, this.getTimestampAsString(), debugMsg);
   }
 
   getClassNames() {

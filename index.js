@@ -3139,7 +3139,12 @@ function loadSubPage(tpage, event) {
     }
 
     mBroadcaster.sendMessage('beforepagechange', tpage);
-    window.is_chatlink = false;
+    if (window.is_chatlink) {
+        window.is_chatlink = false;
+        delete megaChat.initialPubChatHandle;
+        delete M.currentdirid;
+        megaChat.destroy();
+    }
     dlid = false;
 
     if (tpage) {

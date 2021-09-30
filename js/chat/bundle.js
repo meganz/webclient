@@ -25185,6 +25185,23 @@ start_Start.STREAMS = {
 
 
 class meetingsCallEndedDialog_MeetingsCallEndedDialog extends mixins["MegaRenderMixin"] {
+  constructor(props) {
+    super(props);
+    this.state = {
+      'safeShowDialogRendered': false
+    };
+  }
+
+  componentDidMount() {
+    super.componentDidMount();
+    M.safeShowDialog('meetings-ended', () => {
+      this.setState({
+        'safeShowDialogRendered': true
+      });
+      return this.findDOMNode();
+    });
+  }
+
   componentWillUnmount() {
     super.componentWillUnmount();
 
@@ -25197,6 +25214,11 @@ class meetingsCallEndedDialog_MeetingsCallEndedDialog extends mixins["MegaRender
     const {
       onClose
     } = this.props;
+
+    if (!this.state.safeShowDialogRendered) {
+      return null;
+    }
+
     return external_React_default.a.createElement(modalDialogs["a" ].ModalDialog, {
       className: "meetings-call-ended-dialog",
       dialogType: "message",
@@ -26328,13 +26350,6 @@ let conversations_ConversationsApp = (_dec3 = utils["default"].SoonFcWrap(80), (
       }
 
       if (!chatRoom.initialMessageHistLoaded) {
-        return null;
-      }
-
-      if ($.dialog && $.dialog !== 'meetings-ended') {
-        M.safeShowDialog('meetings-ended', () => {
-          this.safeForceUpdate();
-        });
         return null;
       }
 

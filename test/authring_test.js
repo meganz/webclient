@@ -909,7 +909,7 @@ describe("authring unit test", function() {
                 var attributePromise = _stubMegaPromise(sinon);
                 mStub(mega.attr, 'get').returns(attributePromise);
                 mStub(window, 'u_keyring', undefined);
-                mStub(window, 'u_attr', {});
+                mStub(window, 'u_attr', {u: 'me3456789xw'});
                 mStub(window, 'u_privEd25519', undefined);
                 mStub(window, 'u_pubEd25519', undefined);
                 mStub(window, 'pubEd25519', {});
@@ -941,8 +941,13 @@ describe("authring unit test", function() {
                 assert.strictEqual(nacl.sign.keyPair.fromSeed.callCount, 1);
                 assert.strictEqual(asmCrypto.bytes_to_string.callCount, 1);
                 assert.strictEqual(u_pubEd25519, 'public key');
-                assert.deepEqual(u_attr, { keyring: keyRing, puEd255: 'public key', prEd255: 'private key' });
-                assert.deepEqual(pubEd25519, { 'me3456789xw': 'public key' });
+                assert.deepEqual(u_attr, {
+                    u: 'me3456789xw',
+                    keyring: keyRing,
+                    puEd255: 'public key',
+                    prEd255: 'private key'
+                });
+                assert.deepEqual(pubEd25519, {'me3456789xw': 'public key'});
                 assert.strictEqual(authring.getContacts.callCount, 1);
                 assert.strictEqual(masterPromise.linkDoneAndFailTo.callCount, 1);
                 assert.strictEqual(masterPromise.linkDoneAndFailTo.args[0][0], 'authring');
@@ -955,7 +960,7 @@ describe("authring unit test", function() {
                 var attributePromise = _stubMegaPromise(sinon);
                 mStub(mega.attr, 'get').returns(attributePromise);
                 mStub(window, 'u_keyring', undefined);
-                mStub(window, 'u_attr', {});
+                mStub(window, 'u_attr', {u: 'me3456789xw'});
                 mStub(window, 'u_privEd25519', undefined);
                 mStub(window, 'u_pubEd25519', undefined);
                 mStub(window, 'pubEd25519', {});
@@ -986,8 +991,13 @@ describe("authring unit test", function() {
                 assert.deepEqual(u_keyring, keyRing);
                 assert.strictEqual(u_privEd25519, 'private key');
                 assert.strictEqual(u_pubEd25519, 'public key');
-                assert.deepEqual(u_attr, { keyring: keyRing, puEd255: 'public key', prEd255: 'private key' });
-                assert.deepEqual(pubEd25519, { 'me3456789xw': 'public key' });
+                assert.deepEqual(u_attr, {
+                    u: 'me3456789xw',
+                    keyring: keyRing,
+                    puEd255: 'public key',
+                    prEd255: 'private key'
+                });
+                assert.deepEqual(pubEd25519, {'me3456789xw': 'public key'});
                 assert.strictEqual(authring.getContacts.callCount, 1);
                 assert.strictEqual(masterPromise.linkDoneAndFailTo.callCount, 1);
                 assert.deepEqual(masterPromise.linkDoneAndFailTo.args[0][0],
@@ -1023,8 +1033,9 @@ describe("authring unit test", function() {
                 mStub(nacl.box, 'keyPair').returns(
                     { secretKey: 'private key', publicKey: 'public key' });
                 mStub(asmCrypto, 'bytes_to_string').callsFake(_echo);
-                mStub(window, 'u_keyring', {});
-                mStub(window, 'u_attr', {keyring: {}});
+                const keyring = {};
+                mStub(window, 'u_keyring', keyring);
+                mStub(window, 'u_attr', {u: 'me3456789xw', keyring});
                 mStub(window, 'u_privCu25519', undefined);
                 mStub(window, 'u_pubCu25519', undefined);
                 mStub(window, 'pubCu25519', {});
@@ -1042,8 +1053,13 @@ describe("authring unit test", function() {
                 assert.deepEqual(u_keyring, keyRing);
                 assert.strictEqual(u_privCu25519, 'private key');
                 assert.strictEqual(u_pubCu25519, 'public key');
-                assert.deepEqual(u_attr, { keyring: keyRing, puCu255: 'public key', prCu255: 'private key' });
-                assert.deepEqual(pubCu25519, { 'me3456789xw': 'public key' });
+                assert.deepEqual(u_attr, {
+                    u: 'me3456789xw',
+                    keyring: keyRing,
+                    puCu255: 'public key',
+                    prCu255: 'private key'
+                });
+                assert.deepEqual(pubCu25519, {'me3456789xw': 'public key'});
                 assert.strictEqual(ns.signKey.callCount, 1);
                 assert.strictEqual(mega.attr.set.callCount, 3);
                 assert.strictEqual(ns.getContacts.callCount, 1);
@@ -1092,15 +1108,15 @@ describe("authring unit test", function() {
                 var signaturePromise = { done: sinon.stub(),
                                          fail: sinon.stub() };
                 mStub(mega.attr, 'get').returns(signaturePromise);
-                mStub(window, 'u_keyring', {prCu255: 'private key'});
-                mStub(window, 'u_attr', {keyring: {}});
+                const keyring = {prCu255: 'private key'};
+                mStub(window, 'u_keyring', keyring);
+                mStub(window, 'u_attr', {u: 'me3456789xw', keyring});
                 mStub(window, 'u_privCu25519', undefined);
                 mStub(window, 'u_pubCu25519', undefined);
                 mStub(window, 'pubCu25519', {});
                 mStub(window, 'u_handle', 'me3456789xw');
                 mStub(window, 'u_privEd25519', 'my private Eddie');
                 mStub(window, 'u_pubEd25519', 'my public Eddie');
-                mStub(window, 'base64urldecode').callsFake(_echo);
                 mStub(crypt, 'getPubKeyFromPrivKey').returns('public key');
                 mStub(ns, '_checkPubKey');
                 mStub(crypt, 'setPubKey');
@@ -1124,11 +1140,12 @@ describe("authring unit test", function() {
                 var callback = pubkeyPromise.done.args[0][0];
                 // Nothing happens here for a Cu25519 key pair.
 
+                // mStub(window, 'base64urldecode').callsFake(_echo);
                 callback = signaturePromise.done.args[0][0];
                 callback('squiggle');
-                assert.strictEqual(base64urldecode.callCount, 1);
+                // assert.strictEqual(base64urldecode.callCount, 1);
                 assert.strictEqual(gotSignaturePromise.resolve.callCount, 1);
-                assert.strictEqual(gotSignaturePromise.resolve.args[0][0], 'squiggle');
+                assert.strictEqual(gotSignaturePromise.resolve.args[0][0], base64urldecode('squiggle'));
 
                 callback = sigKeyComboPromise.done.args[0][0];
                 callback(['squiggle', 'Cu25519 pubkey']);
@@ -1140,8 +1157,13 @@ describe("authring unit test", function() {
                 assert.deepEqual(u_keyring, keyRing);
                 assert.strictEqual(u_privCu25519, 'private key');
                 assert.strictEqual(u_pubCu25519, 'public key');
-                assert.deepEqual(u_attr, { keyring: keyRing, puCu255: 'public key', prCu255: 'private key' });
-                assert.deepEqual(pubCu25519, { 'me3456789xw': 'public key' });
+                assert.deepEqual(u_attr, {
+                    u: 'me3456789xw',
+                    keyring: keyRing,
+                    puCu255: 'public key',
+                    prCu255: 'private key'
+                });
+                assert.deepEqual(pubCu25519, {'me3456789xw': 'public key'});
             });
 
             it('RSA key', function() {
@@ -1162,11 +1184,13 @@ describe("authring unit test", function() {
                 var signaturePromise = { done: sinon.stub(),
                                          fail: sinon.stub() };
                 mStub(mega.attr, 'get').returns(signaturePromise);
+                const keyring = {};
+                mStub(window, 'u_keyring', keyring);
+                mStub(window, 'u_attr', {u: 'me3456789xw', keyring});
                 mStub(window, 'u_privk', 'private key');
                 mStub(window, 'u_handle', 'me3456789xw');
                 mStub(window, 'u_privEd25519', 'my private Eddie');
                 mStub(window, 'u_pubEd25519', 'my public Eddie');
-                mStub(window, 'base64urldecode').callsFake(_echo);
                 var pubkeyPromise = { done: sinon.stub(),
                                       resolve: sinon.stub() };
                 mStub(crypt, 'getPubKeyAttribute').returns(pubkeyPromise);
@@ -1189,11 +1213,12 @@ describe("authring unit test", function() {
                 var callback = pubkeyPromise.done.args[0][0];
                 // Nothing testable happens here for an RSA key pair.
 
+                // mStub(window, 'base64urldecode').callsFake(_echo);
                 callback = signaturePromise.done.args[0][0];
                 callback('squiggle');
-                assert.strictEqual(base64urldecode.callCount, 1);
+                // assert.strictEqual(base64urldecode.callCount, 1);
                 assert.strictEqual(gotSignaturePromise.resolve.callCount, 1);
-                assert.strictEqual(gotSignaturePromise.resolve.args[0][0], 'squiggle');
+                assert.strictEqual(gotSignaturePromise.resolve.args[0][0], base64urldecode('squiggle'));
 
                 callback = sigKeyComboPromise.done.args[0][0];
                 callback(['squiggle', 'RSA pubkey']);
@@ -1217,6 +1242,7 @@ describe("authring unit test", function() {
                 var signaturePromise = { done: sinon.stub(),
                                          fail: sinon.stub() };
                 mStub(mega.attr, 'get').returns(signaturePromise);
+                mStub(window, 'u_attr', {u: 'me3456789xw', keyring: {}});
                 mStub(window, 'u_privk', 'private key');
                 mStub(window, 'u_handle', 'me3456789xw');
                 mStub(window, 'u_privEd25519', 'my private Eddie');
@@ -1226,7 +1252,6 @@ describe("authring unit test", function() {
                 mStub(crypt, 'getPubKeyAttribute').returns(pubkeyPromise);
                 mStub(mega.attr, 'set');
                 mStub(ns, 'signKey').returns('squiggle');
-                mStub(window, 'base64urlencode').callsFake(_echo);
 
                 var result = ns._initKeyPair('RSA');
                 assert.strictEqual(result, masterPromise);
@@ -1246,6 +1271,7 @@ describe("authring unit test", function() {
                 var callback = pubkeyPromise.done.args[0][0];
                 // Nothing testable happens here for an RSA key pair.
 
+                mStub(window, 'base64urlencode').callsFake(_echo);
                 callback = signaturePromise.fail.args[0][0];
                 callback(ENOENT);
                 assert.strictEqual(gotSignaturePromise.resolve.callCount, 1);
@@ -1276,6 +1302,7 @@ describe("authring unit test", function() {
                 var signaturePromise = { done: sinon.stub(),
                                          fail: sinon.stub() };
                 mStub(mega.attr, 'get').returns(signaturePromise);
+                mStub(window, 'u_attr', {u: 'me3456789xw', keyring: {}});
                 mStub(window, 'u_privk', 'private key');
                 mStub(window, 'u_handle', 'me3456789xw');
                 mStub(window, 'u_privEd25519', 'my private Eddie');
@@ -1326,11 +1353,11 @@ describe("authring unit test", function() {
                 var signaturePromise = { done: sinon.stub(),
                                          fail: sinon.stub() };
                 mStub(mega.attr, 'get').returns(signaturePromise);
+                mStub(window, 'u_attr', {u: 'me3456789xw', keyring: {}});
                 mStub(window, 'u_privk', 'private key');
                 mStub(window, 'u_handle', 'me3456789xw');
                 mStub(window, 'u_privEd25519', 'my private Eddie');
                 mStub(window, 'u_pubEd25519', 'my public Eddie');
-                mStub(window, 'base64urldecode').callsFake(_echo);
                 var pubkeyPromise = { done: sinon.stub(),
                                       resolve: sinon.stub() };
                 mStub(crypt, 'getPubKeyAttribute').returns(pubkeyPromise);
@@ -1356,11 +1383,12 @@ describe("authring unit test", function() {
                 var callback = pubkeyPromise.done.args[0][0];
                 // Nothing testable happens here for an RSA key pair.
 
+                // mStub(window, 'base64urldecode').callsFake(_echo);
                 callback = signaturePromise.done.args[0][0];
                 callback('squiggle');
-                assert.strictEqual(base64urldecode.callCount, 1);
+                // assert.strictEqual(base64urldecode.callCount, 1);
                 assert.strictEqual(gotSignaturePromise.resolve.callCount, 1);
-                assert.strictEqual(gotSignaturePromise.resolve.args[0][0], 'squiggle');
+                assert.strictEqual(gotSignaturePromise.resolve.args[0][0], base64urldecode('squiggle'));
 
                 callback = sigKeyComboPromise.done.args[0][0];
                 callback(['squiggle', 'RSA pubkey']);
@@ -1376,6 +1404,8 @@ describe("authring unit test", function() {
                 var masterPromise = { linkDoneAndFailTo: sinon.stub() };
                 mStub(window, 'MegaPromise').returns(masterPromise);
                 mStub(window, 'u_keyring', {});
+                mStub(window, 'u_handle', 'me3456789xw');
+                mStub(window, 'u_attr', {u: 'me3456789xw', keyring: {}});
                 mStub(ns, '_setupKeyPair').returns('setup promise');
 
                 var result = ns._initKeyPair('Cu25519');

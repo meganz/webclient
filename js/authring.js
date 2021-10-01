@@ -57,6 +57,34 @@ var authring = (function () {
     };
     var _ALLOWED_AUTHENTICATION_METHODS = [0x00, 0x01, 0x02];
 
+    const isUserHandle = tryCatch((userHandle) => {
+        return typeof userHandle === 'string' && base64urldecode(userHandle).length === 8;
+    });
+
+    const safeStateAssert = (promise, cond) => {
+        if (cond === '$keyring') {
+            cond = u_keyring && window.u_attr && window.u_attr.keyring === u_keyring;
+        }
+        if (cond === undefined || cond) {
+            cond = window.u_attr && isUserHandle(window.u_handle)
+                && typeof u_attr === 'object' && u_attr.u === u_handle;
+        }
+
+        if (!cond) {
+            const msg = 'The system went into an invalid state for ongoing auth-ring operations :skull:';
+
+            onIdle(() => {
+                throw new SecurityError(msg);
+            });
+            console.error(msg, window.u_attr);
+
+            if (promise) {
+                promise.reject(EINTERNAL);
+            }
+        }
+
+        return !!cond;
+    };
 
     /**
      * "Enumeration" of confidence in contact's key. The values in here must fit
@@ -801,6 +829,10 @@ var authring = (function () {
         // Load private keys.
         var attributePromise = mega.attr.get(u_handle, 'keyring', false, false);
         attributePromise.done(function __attributePromiseResolve(result) {
+            // Ensure we're in a safe-state.
+            if (!safeStateAssert(masterPromise, result && typeof result === 'object')) {
+                return;
+            }
             // Set local values.
             u_keyring = result;
             u_attr.keyring = u_keyring;
@@ -825,6 +857,11 @@ var authring = (function () {
             if (result === ENOENT) {
                 // We don't have it set up, yet. Let's do so now.
                 logger.warn('Authentication system seems non-existent. Setting up ...');
+
+                // Ensure we're in a safe-state.
+                if (!safeStateAssert(masterPromise)) {
+                    return;
+                }
 
                 // Make a new key pair.
                 var keyPair = nacl.sign.keyPair();
@@ -888,6 +925,11 @@ var authring = (function () {
             return MegaPromise.reject(EARGS);
         }
 
+        // Ensure we're in a safe-state.
+        if (!safeStateAssert(null, '$keyring')) {
+            return MegaPromise.reject(EACCESS);
+        }
+
         window[crypt.PRIVKEY_VARIABLE_MAPPING[keyType]] = privKey;
         window[crypt.PUBKEY_VARIABLE_MAPPING[keyType]] = pubKey;
         u_keyring[crypt.PRIVKEY_ATTRIBUTE_MAPPING[keyType]] = privKey;
@@ -935,6 +977,11 @@ var authring = (function () {
         if (keyType === 'RSA' && !window.u_privk) {
             logger.error('Unable to initialize RSA keypair...');
             return MegaPromise.reject(EARGS);
+        }
+
+        // Ensure we're in a safe-state.
+        if (!safeStateAssert()) {
+            return MegaPromise.reject(EACCESS);
         }
 
         var privKey = (keyType === 'RSA')
@@ -987,6 +1034,10 @@ var authring = (function () {
             var sigKeyComboPromise = MegaPromise.all([gotSignaturePromise,
                                                       pubkeyPromise]);
             sigKeyComboPromise.done(function __signatureComboResolve(result) {
+                // Ensure we're in a safe-state.
+                if (!safeStateAssert(masterPromise, !!result)) {
+                    return;
+                }
                 var signature = result[0];
                 if (signature) {
                     // Now check the key's signature.
@@ -1018,6 +1069,11 @@ var authring = (function () {
 
                 if (keyType === 'RSA') {
                     // We don't need the rest for RSA keys.
+                    return;
+                }
+
+                // Ensure we're in a safe-state.
+                if (!safeStateAssert(masterPromise, '$keyring')) {
                     return;
                 }
 

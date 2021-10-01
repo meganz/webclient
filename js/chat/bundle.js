@@ -2398,7 +2398,7 @@ class ContactPickerWidget extends _stores_mixins_js2__["MegaRenderMixin"] {
     }
 
     if (this.contactLinkListener) {
-      mBroadcaster.removeListener('contact:setContactLink');
+      mBroadcaster.removeListener(this.contactLinkListener);
     }
   }
 

@@ -957,7 +957,7 @@ export class ContactPickerWidget extends MegaRenderMixin {
         }
 
         if (this.contactLinkListener) {
-            mBroadcaster.removeListener('contact:setContactLink');
+            mBroadcaster.removeListener(this.contactLinkListener);
         }
     }
     _eventuallyAddContact(v, contacts, selectableContacts, forced) {

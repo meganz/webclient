@@ -5,7 +5,7 @@ import Call from '../call.jsx';
 import Button from '../button.jsx';
 
 export default class Preview extends MegaRenderMixin {
-    static NAMESPACE = 'preview';
+    static NAMESPACE = 'preview-meeting';
 
     static STREAMS = {
         AUDIO: 1,

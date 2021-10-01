@@ -7903,13 +7903,13 @@ body.de .mega-dialog.new-group-chat {
         margin: 12px auto 0 auto;
     }
     .mega-dialog.group-chat-link .chat-link-input,
-    .mega-dialog.invite .chat-link-input {
+    .mega-dialog.invite-meeting .chat-link-input {
         position: relative;
         box-sizing: border-box;
         padding: 0 10px 0 0;
     }
     .mega-dialog.group-chat-link .chat-link-input i,
-    .mega-dialog.invite .chat-link-input i {
+    .mega-dialog.invite-meeting .chat-link-input i {
         position: absolute;
         left: 5px;
         top: 50%;
@@ -7918,7 +7918,7 @@ body.de .mega-dialog.new-group-chat {
         --mask-color: var(--icon-rest);
     }
     .mega-dialog.group-chat-link .chat-link-input input,
-    .mega-dialog.invite .chat-link-input input {
+    .mega-dialog.invite-meeting .chat-link-input input {
         width: 100%;
         height: 40px;
         padding: 10px 10px 10px 35px;

@@ -1,7 +1,3 @@
-@import '_sidebarControls.scss';
-@import '_participants.scss';
-@import '_historyPanel.scss';
-
 .sidebar {
     position: relative;
     float: left;
@@ -10,6 +6,11 @@
     box-sizing: border-box;
     background: var(--surface-main);
     z-index: 1;
+
+    @import '_collapse.scss';
+    @import '_participants.scss';
+    @import '_guest.scss';
+    @import '_historyPanel.scss';
 
     //
     // Sidebar streams / Speaker mode

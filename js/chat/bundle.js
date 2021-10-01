@@ -6958,7 +6958,7 @@ class invite_Invite extends mixins["MegaRenderMixin"] {
   }
 
 }
-invite_Invite.NAMESPACE = 'invite';
+invite_Invite.NAMESPACE = 'invite-meeting';
 // CONCATENATED MODULE: ./js/chat/ui/meetings/workflow/end.jsx
 
 
@@ -21068,7 +21068,7 @@ class preview_Preview extends mixins["MegaRenderMixin"] {
   }
 
 }
-preview_Preview.NAMESPACE = 'preview';
+preview_Preview.NAMESPACE = 'preview-meeting';
 preview_Preview.STREAMS = {
   AUDIO: 1,
   VIDEO: 2

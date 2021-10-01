@@ -64,7 +64,7 @@
         this.room.meetingsLoading = "Joining...";
     };
 
-    SfuApp.VIDEO_DEBUG_MODE = d && typeof localStorage.videoDebugMode !== 'undefined';
+    SfuApp.VIDEO_DEBUG_MODE = !!(d && typeof localStorage.videoDebugMode !== 'undefined');
 
 
     SfuApp.prototype.onServerError = function(errCode) {

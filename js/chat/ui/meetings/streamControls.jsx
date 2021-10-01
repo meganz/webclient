@@ -48,7 +48,7 @@ export default class StreamControls extends MegaRenderMixin {
 
         return (
             <div className="stream-controls">
-                {d && this.renderDebug()}
+                {d ? this.renderDebug() : ''}
                 <ul>
                     <li>
                         <Button

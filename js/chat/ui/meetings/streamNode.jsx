@@ -301,7 +301,7 @@ export default class StreamNode extends MegaRenderMixin {
                             />
                         )}
                         <div className="stream-node-content">
-                            {SfuApp.VIDEO_DEBUG_MODE && this.renderVideoDebugMode()}
+                            {SfuApp.VIDEO_DEBUG_MODE ? this.renderVideoDebugMode() : ''}
                             {this.renderContent()}
                             {this.renderStatus()}
                         </div>

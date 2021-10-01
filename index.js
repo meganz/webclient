@@ -781,14 +781,8 @@ function init_page() {
             mega.ui.theme.setWithUA();
         }
     }
-    else if (page.substr(0, 10) == 'blogsearch') {
-        blogsearch = decodeURIComponent(page.substr(11, page.length - 1));
-        if (!blogsearch) {
-            loadSubPage('blog');
-        }
-        page = 'blog';
-        parsepage(pages['blogarticle']);
-        init_blog();
+    else if (page.substr(0, 4) === 'blog') {
+        loadBlog();
     }
     else if (page.substr(0, 6) == 'verify') {
         parsepage(pages['change_email']);
@@ -798,23 +792,6 @@ function init_page() {
         parsepage(pages.corporate);
         corporate.init();
     }
-    else if (page.substr(0, 5) === 'blog/') {
-        // eslint-disable-next-line dot-notation
-        init_blogarticle();
-    }
-    else if (page.substr(0, 5) === 'blog_' && page.length > 4 && page.length < 10) {
-        blogid = page.substr(5, page.length - 2);
-        page = 'blogarticle';
-        init_blogarticle();
-    }
-    else if (page.substr(0, 4) == 'blog' && page.length > 4) {
-        blogmonth = page.substr(5, page.length - 2);
-        page = 'blog';
-        blogpage = 1;
-        parsepage(pages['blog']);
-        init_blog();
-    }
-
     // If user has been invited to join MEGA and they are not already registered
     else if (page.substr(0, 9) == 'newsignup') {
 
@@ -1533,11 +1510,6 @@ function init_page() {
         if (is_mobile) {
             mobile.takedown.show();
         }
-    }
-    else if (page == 'blog') {
-        parsepage(pages['blog']);
-        init_blog();
-        api_req({ a: 'log', e: 99740, m: window.u_handle || 'visitor' });
     }
     else if (page === 'copyrightnotice') {
         parsepage(is_mobile ? pages.mobile : pages.copyrightnotice);

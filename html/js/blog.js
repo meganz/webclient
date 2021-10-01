@@ -26,6 +26,84 @@ var blogpostnum;
 var blogmonth = false;
 var blogsearch = false;
 
+function loadBlog() {
+    'use strict';
+    blogid = false;
+    blogmonth = false;
+    blogsearch = false;
+    if (page.length > 4) {
+        if (page.substr(0, 10) === 'blogsearch') {
+            // Redirect to /blog/search/query
+            const loc = page.replace('blogsearch', '/blog/search');
+            if (is_extension) {
+                return loadSubPage(loc);
+            }
+            return location.replace(loc);
+        }
+        else if (page.substr(0, 5) === 'blog_') {
+            if (page.length >= 10) {
+                // Redirect to /blog/date/yyyy/mm
+                const dateParts = page.substr(5, page.length - 2).split('_');
+                const loc = `/blog/date/${dateParts[0]}/${dateParts[1]}`;
+                if (is_extension) {
+                    return loadSubPage(loc);
+                }
+                return location.replace(loc);
+            }
+            // Load /blog_id URL
+            blogid = page.substr(5, page.length - 2);
+            page = 'blogarticle';
+            init_blogarticle();
+        }
+        else {
+            const urlParts = page.split('/');
+            if (urlParts.length === 2) {
+                // Load a /blog/title URL
+                blogid = true;
+                init_blogarticle();
+            }
+            else if (urlParts.length >= 3) {
+                if (urlParts[1] === 'date') {
+                    // Load /blog/date/yyyy(?/mm) URL
+                    const yearPart = decodeURIComponent(urlParts[2]);
+                    const monthPart = urlParts.length > 3 ? decodeURIComponent(urlParts[3]) : '0';
+
+                    if (/^\d+$/.test(yearPart + monthPart)) {
+                        blogmonth = `${yearPart}_${parseInt(monthPart)}`;
+                        blogpage = 1;
+                    }
+                    else {
+                        page = 'blog';
+                    }
+                }
+                else if (urlParts[1] === 'search') {
+                    // Load /blog/search/query URL
+                    blogsearch = decodeURIComponent(urlParts[2]);
+                    if (!blogsearch) {
+                        page = 'blog';
+                    }
+                }
+                else {
+                    page = 'blog';
+                }
+                parsepage(pages.blog);
+                init_blog();
+            }
+            else {
+                page = 'blog';
+                parsepage(pages.blog);
+                init_blog();
+            }
+        }
+    }
+    else {
+        // Load the /blog page
+        parsepage(pages.blog);
+        init_blog();
+        api_req({ a: 'log', e: 99740, m: window.u_handle || 'visitor' });
+    }
+}
+
 function blog_bind_search() {
     'use strict';
 
@@ -48,7 +126,7 @@ function blog_bind_search() {
 
 function init_blog_callback() {
     blog_bind_search();
-    if (page === 'blogarticle' || page.substr(0, 5) === 'blog/') {
+    if (blogid) {
         init_blogarticle();
     }
     else if (is_mobile) {
@@ -248,7 +326,7 @@ function blog_searchmath(post, keyword) {
 
 
 function blog_search() {
-    loadSubPage('blogsearch/' + encodeURIComponent($('#blog_searchinput').val()));
+    loadSubPage(`blog/search/${encodeURIComponent($('#blog_searchinput', '.blog-new-right').val())}`);
 }
 
 function blog_month(t) {
@@ -295,7 +373,7 @@ function blog_archive() {
                     <div class="head-title">
                         <i class="sprite-fm-mono icon-arrow-right expand"></i>
                         <span>
-                            <a class="blog-year ${archiveClasslist}" href="/blog_${yy}_0">
+                            <a class="blog-year ${archiveClasslist}" href="/blog/date/${yy}">
                                 ${yy}<span class="blog-archive-number">${escapeHTML(blogyears[yy])}</span>
                             </a>
                         </span>
@@ -320,7 +398,8 @@ function blog_archive() {
             const countspan = `<span class="blog-archive-number">${escapeHTML(blogmonths[mm])}</span>`;
             $(`.blogyears-${y}`, $archive).safeAppend(`
                 <div class="sub-title blogmonths-${mm.split('_')[1]}">
-                    <a href="/blog_${mm}" class="${archiveClasslist}">${time2date(date, 3)}${countspan}</a>
+                    <a href="/blog/date/${y}/${mm.split('_')[1]}"
+                       class="${archiveClasslist}">${time2date(date, 3)}${countspan}</a>
                 </div>
             `);
         }
@@ -403,6 +482,7 @@ function handleInvalidBlogID() {
     }
     else {
         newPage = 'blog';
+        blogid = false;
     }
 
     // This function can be triggered by the normal boot or the legacy system (which does not have loadSubPage)
@@ -476,7 +556,7 @@ var eventHandlers = [
 ];
 
 if (typeof mobileblog !== 'undefined') {
-    var blogid = getSitePath().substr(1).replace('blog_', '');
+    blogid = getSitePath().substr(1).replace('blog_', '');
     CMS.scope = 'blog';
     CMS.get('blog', function(err, data) {
         'use strict';

@@ -580,7 +580,7 @@ mega.metatags = new function() {
             mTags.mega_title = 'Business Signup - MEGA';
             stopBots(metaRobots);
         }
-        else if (page === 'blog') {
+        else if (page === 'blog' || page.substr(0, 9) === 'blog/date') {
             mTags.en_title = 'Blog - MEGA';
             mTags.en_desc = 'The latest news, releases and company announcements for MEGA.';
             mTags.mega_title = l[24019] || mTags.en_title;
@@ -589,7 +589,7 @@ mega.metatags = new function() {
                 stopBots(metaRobots, true);
             }
         }
-        else if (page.substr(0, 10) === 'blogsearch') {
+        else if (page.substr(0, 11) === 'blog/search') {
             mTags.mega_title = 'Blog search - MEGA';
             mTags.mega_desc = 'MEGA\'s Blog';
             stopBots(metaRobots, true);

@@ -3,10 +3,6 @@ function init_blogarticle() {
         return init_blog();
     }
 
-    if (!is_mobile) {
-        blog_bind_search();
-    }
-
     var post;
 
     if (page === 'blogarticle' && blogid) {
@@ -76,6 +72,9 @@ function render_blogarticle() {
     }
 
     clickURLs();
+    if (!is_mobile) {
+        blog_bind_search();
+    }
     content = '';
     if (blogposts[i].attaches.bimg) {
         content += '<img alt=""  integrity="ni:///sha-256;'

@@ -1111,6 +1111,12 @@ button.fm-empty-button {
     100% { opacity:1; }
 }
 
+.contact-button-loading {
+    display: inline-block;
+    max-width: calc(100% - 60px);
+    padding: 0 10px 0 0;
+}
+
 .contact-name-loading {
     background-color: #E5E5E5;
     width: 96px;
@@ -1122,13 +1128,13 @@ button.fm-empty-button {
     vertical-align: top;
     box-sizing: border-box;
     position: relative;
-    margin: 5px 12px 4px -20px;
+    margin: 5px 0 4px 0;
     -webkit-animation: fadeInOutLoopSubtle 2s linear infinite;
     animation: fadeInOutLoopSubtle 2s linear infinite;
 }
 
 .contacts-info.body.right-chat-contact-card .contact-name-loading {
-    margin: 11px 0 0 -19px;
+    margin: 6px 0 0 0;
 }
 
 .avatar-wrapper.default-bg {

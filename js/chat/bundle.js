@@ -1792,6 +1792,7 @@ class ContactButton extends _stores_mixins_js2__["ContactAwareComponent"] {
       label = react1.a.createElement("em", {
         className: "contact-name-loading"
       });
+      classes = "contact-button-loading " + classes;
     }
 
     return this.props.noContextMenu ? react1.a.createElement("div", {

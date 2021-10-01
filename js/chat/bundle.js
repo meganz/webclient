@@ -5172,7 +5172,7 @@ let streamNode_StreamNode = (_dec = Object(mixins["SoonFcWrap"])(30, true), _dec
       onSpeakerChange: onSpeakerChange
     }), external_React_default.a.createElement("div", {
       className: "stream-node-content"
-    }, SfuApp.VIDEO_DEBUG_MODE && this.renderVideoDebugMode(), this.renderContent(), this.renderStatus())));
+    }, SfuApp.VIDEO_DEBUG_MODE ? this.renderVideoDebugMode() : '', this.renderContent(), this.renderStatus())));
   }
 
 }, _class2.LOADING_STATE = {
@@ -5282,7 +5282,7 @@ class streamControls_StreamControls extends mixins["MegaRenderMixin"] {
     };
     return external_React_default.a.createElement("div", {
       className: "stream-controls"
-    }, d && this.renderDebug(), external_React_default.a.createElement("ul", null, external_React_default.a.createElement("li", null, external_React_default.a.createElement(meetings_button["a" ], {
+    }, d ? this.renderDebug() : '', external_React_default.a.createElement("ul", null, external_React_default.a.createElement("li", null, external_React_default.a.createElement(meetings_button["a" ], {
       simpletip: { ...SIMPLETIP,
         label: audioLabel
       },
@@ -20927,7 +20927,7 @@ class loading_Loading extends mixins["MegaRenderMixin"] {
       className: "loading-container"
     }, external_React_default.a.createElement("div", {
       className: "loading-indication"
-    }))), d && this.renderDebug());
+    }))), d ? this.renderDebug() : '');
   }
 
 }

@@ -328,7 +328,7 @@ export class ContactButton extends ContactAwareComponent {
         }
 
         if (label) {
-            classes = "user-card-name " + classes;
+            classes = `user-card-name ${classes}`;
             icon = "";
             dropdownPosition = "left bottom";
             vertOffset = 25;
@@ -337,6 +337,7 @@ export class ContactButton extends ContactAwareComponent {
 
         if (!contact.name && !contact.m && !self.props.noLoading && this.isLoadingContactInfo()) {
             label = <em className="contact-name-loading" />;
+            classes = `contact-button-loading ${classes}`;
         }
 
         return (

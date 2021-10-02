@@ -2527,10 +2527,10 @@ FileManager.prototype.addTransferPanelUI = function() {
         var file;
         var tclear;
 
-        $('.dropdown.body.files-menu .dropdown-item').hide();
+        $('.dropdown.body.files-menu .dropdown-item').addClass('hidden');
         var $menuitems = $('.dropdown.body.files-menu .dropdown-item');
 
-        $menuitems.filter('.transfer-pause,.transfer-play,.move-up,.move-down,.transfer-clear').show();
+        $menuitems.filter('.transfer-pause,.transfer-play,.move-up,.move-down,.transfer-clear').removeClass('hidden');
 
         tclear = $menuitems.filter('.transfer-clear').contents('span').get(0) || {};
         tclear.textContent = l[103];
@@ -2557,58 +2557,57 @@ FileManager.prototype.addTransferPanelUI = function() {
             });
 
             if (finished === ids.length) {
-                $menuitems.hide()
-                    .filter('.transfer-clear').show();
+                $menuitems.addClass('hidden')
+                    .filter('.transfer-clear').removeClass('hidden');
                 tclear.textContent = l[7218];
             }
             else {
                 if (started) {
-                    $menuitems.filter('.move-up,.move-down').hide();
+                    $menuitems.filter('.move-up,.move-down').addClass('hidden');
                 }
                 if (paused === ids.length) {
-                    $menuitems.filter('.transfer-pause').hide();
+                    $menuitems.filter('.transfer-pause').addClass('hidden');
                 }
 
                 var prev = target.first().prev();
                 var next = target.last().next();
 
                 if (prev.length === 0 || !prev.hasClass('transfer-queued')) {
-                    $menuitems.filter('.move-up').hide();
+                    $menuitems.filter('.move-up').addClass('hidden');
                 }
                 if (next.length === 0) {
-                    $menuitems.filter('.move-down').hide();
+                    $menuitems.filter('.move-down').addClass('hidden');
                 }
             }
         }
         else if (!(file = GlobalProgress[$(target).attr('id')])) {
             /* no file, it is a finished operation */
-            $menuitems.hide()
-                .filter('.transfer-clear')
-                .show();
+            $menuitems.addClass('hidden')
+                .filter('.transfer-clear').removeClass('hidden');
             tclear.textContent = l[7218];
         }
         else {
             if (file.started) {
-                $menuitems.filter('.move-up,.move-down').hide();
+                $menuitems.filter('.move-up,.move-down').addClass('hidden');
             }
             if (file.paused) {
-                $menuitems.filter('.transfer-pause').hide();
+                $menuitems.filter('.transfer-pause').addClass('hidden');
             }
             else {
-                $menuitems.filter('.transfer-play').hide();
+                $menuitems.filter('.transfer-play').addClass('hidden');
             }
 
             if (!target.prev().length || !target.prev().hasClass('transfer-queued')) {
-                $menuitems.filter('.move-up').hide();
+                $menuitems.filter('.move-up').addClass('hidden');
             }
             if (target.next().length === 0) {
-                $menuitems.filter('.move-down').hide();
+                $menuitems.filter('.move-down').addClass('hidden');
             }
         }
 
         // XXX: Hide context-menu's menu-up/down items for now to check if that's the
         // origin of some problems, users can still use the new d&d logic to move transfers
-        $menuitems.filter('.move-up,.move-down').hide();
+        $menuitems.filter('.move-up,.move-down').addClass('hidden');
 
         var parent = $menuitems.parent();
         parent

@@ -1468,7 +1468,18 @@ scparser.$add('_sn', function(a) {
         console.log("New SN: " + a.sn);
         console.assert(a.sn === window.currsn);
     }
-    delay('sc.set-sn', () => setsn(currsn), 2789);
+    delay('sc.set-sn', () => {
+        if (window.fmdb) {
+            const {fmdb} = window;
+            if (d) {
+                console.assert(fmdb.db || fmdb.crashed, 'Invalid FMDB State..');
+            }
+
+            if (fmdb.db) {
+                setsn(currsn);
+            }
+        }
+    }, 2789);
 
     // rewrite accumulated RSA keys to AES to save CPU & bandwidth & space
     crypto_node_rsa2aes();

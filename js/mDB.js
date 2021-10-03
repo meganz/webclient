@@ -21,6 +21,9 @@ function FMDB(plainname, schema, channelmap) {
         return new FMDB(plainname, schema, channelmap);
     }
 
+    // DB Instance.
+    this.db = false;
+
     // DB name suffix, derived from u_handle and u_k
     this.name = false;
 
@@ -56,7 +59,7 @@ function FMDB(plainname, schema, channelmap) {
     this.commit = false;
 
     // a DB error occurred, do not touch IndexedDB for the rest of the session
-    this.crashed = false;
+    this.crashed = true;
 
     // DB invalidation process: callback and ready flag
     this.inval_cb = false;
@@ -150,12 +153,11 @@ FMDB.prototype.init = function fmdb_init(result, wipe) {
                 fmdb.logger.warn('Marking DB as crashed.', error);
 
                 if (fmdb.db) {
-                    onIdle(function() {
-                        fmdb.db.delete();
-                        fmdb.db = false;
-                    });
+                    const {db} = fmdb;
+                    queueMicrotask(() => db.delete());
                 }
 
+                fmdb.db = null;
                 eventlog(99724, '$init:' + error, true);
             }
 
@@ -321,7 +323,7 @@ FMDB.prototype.drop = function fmdb_drop() {
     else {
         var fmdb = this;
 
-        this.invalidate(function() {
+        this.invalidate(() => {
 
             fmdb.db.delete().then(function() {
                 fmdb.logger.debug("IndexedDB deleted...");
@@ -331,7 +333,7 @@ FMDB.prototype.drop = function fmdb_drop() {
                 promise.resolve();
             });
 
-            this.db = null;
+            fmdb.db = null;
         });
     }
 

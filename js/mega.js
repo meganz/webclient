@@ -1014,12 +1014,10 @@ scparser.$add('opc', {
         // outgoing pending contact
         processOPC([a]);
 
-        if (
-            fminitialized && M.chat && (
-                megaChatIsReady ||
-                megaChat.routingSection === "contacts" && megaChat.routingSubSection === "sent"
-            )
-        ) {
+        if (fminitialized && M.chat && megaChatIsReady
+            && megaChat.routingSection === "contacts"
+            && megaChat.routingSubSection === "sent") {
+
             mBroadcaster.sendMessage('fmViewUpdate:opc');
         }
     }

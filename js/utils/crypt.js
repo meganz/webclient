@@ -122,7 +122,7 @@ var crypt = (function() {
             var myCtx = {};
             /** Function to settle the promise for the RSA pub key attribute. */
             var __settleFunction = function(res, ctx, xhr, tResult, fromCache) {
-                if (typeof res === 'object') {
+                if (typeof res === 'object' && res.pubk) {
 
                     var debugUserHandle = userhandle;
                     if (userhandle !== res.u) {
@@ -153,7 +153,7 @@ var crypt = (function() {
                     }
                 }
                 else {
-                    if (d > 1 || is_karma) {
+                    if (d > 1 || is_karma || userhandle === window.u_handle) {
                         logger.warn(keyType + ' pub key for ' + userhandle + ' could not be retrieved: ' + res);
                     }
                     masterPromise.reject(res, [res, userData]);

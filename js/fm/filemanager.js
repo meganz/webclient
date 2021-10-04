@@ -4436,6 +4436,13 @@ FileManager.prototype.initLeftPanel = function() {
         _openDialog(dialogName, dispatcher);
     };
 
+    /**
+     * Don't use this method, unless you know what you are doing.
+     * This method would ditch the currently queued dialogs, without notifying via
+     * sendMessage('closedialog') or .trigger('dialog-closed').
+     * This may cause side effects of some dialogs, not unmounting correctly, despite being hidden.
+     * E.g. this is specially dangerous with dialogs that do keyboard shortcuts or other global events.
+     */
     Object.defineProperty(FileManager.prototype.safeShowDialog, 'abort', {
         value: function _abort() {
             if (d && $.dialog) {

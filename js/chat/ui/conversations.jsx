@@ -1183,6 +1183,7 @@ class ConversationsApp extends MegaRenderMixin {
     }
     createMeetingEndDlgIfNeeded() {
         if (megaChat.initialPubChatHandle || megaChat.initialChatId) {
+
             let chatRoom = megaChat.getCurrentRoom();
             if (!chatRoom) {
                 return null;
@@ -1190,13 +1191,7 @@ class ConversationsApp extends MegaRenderMixin {
             if (!chatRoom.initialMessageHistLoaded /* haven't received the CALL info yet */) {
                 return null;
             }
-            if ($.dialog && $.dialog !== 'meetings-ended') {
-                /* ModalDialog's should be integrated into M.safeShowDialog as some stage */
-                M.safeShowDialog('meetings-ended', () => {
-                    this.safeForceUpdate();
-                });
-                return null;
-            }
+
             if (megaChat.meetingDialogClosed === chatRoom.chatId) {
                 return null;
             }

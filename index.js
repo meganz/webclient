@@ -3110,6 +3110,13 @@ function loadSubPage(tpage, event) {
         return false;
     }
 
+    mBroadcaster.sendMessage('beforepagechange', tpage);
+    if (window.is_chatlink) {
+        window.is_chatlink = false;
+        delete megaChat.initialPubChatHandle;
+        delete M.currentdirid;
+        megaChat.destroy();
+    }
     dlid = false;
 
     if (tpage) {
@@ -3175,7 +3182,6 @@ function loadSubPage(tpage, event) {
         return false;
     }
 
-    mBroadcaster.sendMessage('beforepagechange', tpage);
     if (jsl.length > 0) {
         loadingDialog.show();
         jsl_start();

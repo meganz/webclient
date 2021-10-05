@@ -483,6 +483,11 @@ var ulmanager = {
         }
         var tid = ++file.__umRetries;
         file.__umRetryTimer[tid] = setTimeout(function() {
+            // Could become frozen {} after this timeout.
+            if (!file.id) {
+                return;
+            }
+
             var q = file.__umRetryTimer || {};
             delete q[tid];
 

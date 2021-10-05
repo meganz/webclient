@@ -1942,9 +1942,7 @@ var exportExpiry = {
 
             var $thumb = $('.video-thumbnail img', $embedTab).attr('src', noThumbURI);
 
-            getImage(n, 1).then(function(uri) {
-                $thumb.attr('src', uri);
-            }).catch(console.debug.bind(console));
+            getImage(n, 1).then((uri) => $thumb.attr('src', uri)).catch(dump);
 
             $('.code-field .code', $embedTab).rebind('click.selectTxt', function() {
                 selectText('embed-code-field');

@@ -29,7 +29,6 @@ mobile.slideshow = {
      * @param {String} nodeHandle The handle of the image to load first
      */
     init: function(nodeHandle) {
-
         'use strict';
 
         // Cache selector
@@ -43,6 +42,7 @@ mobile.slideshow = {
         mobile.slideshow.initNextImageFunctionality();
         mobile.slideshow.initCloseButton();
         mobile.slideshow.initHideShowToggleForHeaderAndButtons(nodeHandle);
+
         mobile.slideshow.fetchImageFromApi(nodeHandle, mobile.slideshow.displayImage, 'mid', true);
 
         mobile.initOverlayPopstateHandler(mobile.slideshow.$overlay);
@@ -156,8 +156,16 @@ mobile.slideshow = {
      * @param {Boolean} initialLoad Optional flag for if this is the initial load of the previewer
      */
     fetchImageFromApi: function(nodeHandle, callbackFunction, slideClass, initialLoad) {
-
         'use strict';
+        var node = M.getNodeByHandle(nodeHandle);
+
+        if (is_video(node)) {
+            mobile.slideshow.showLoadingAnimation();
+            queueMicrotask(() => {
+                callbackFunction(nodeHandle, slideClass);
+            });
+            return;
+        }
 
         // If this is the first load, show a regular loading dialog until the whole previewer has loaded
         if (typeof initialLoad !== 'undefined') {
@@ -180,7 +188,6 @@ mobile.slideshow = {
             return;
         }
 
-        var node = M.getNodeByHandle(nodeHandle);
         var done = function(uri) {
             // Update global object with the image so it's ready for display
             mobile.slideshow.previews[nodeHandle] = {src: uri};
@@ -220,7 +227,6 @@ mobile.slideshow = {
 
         // Get the node and image data
         var node = M.getNodeByHandle(nodeHandle);
-        var imageSource = mobile.slideshow.previews[nodeHandle].src;
 
         // Get the current slide number and how many images total in this folder e.g. '5 of 30'
         var currentSlideNum = mobile.slideshow.imagesInCurrentViewMap[nodeHandle];
@@ -233,7 +239,6 @@ mobile.slideshow = {
         // Set file name and image src
         $fileName.text(node.name);
         $currentFileNumAndTotal.text(currentFileNumAndTotalText);
-        $image.attr('src', imageSource);
 
         // Change slide
         mobile.slideshow.changeSlide(slideClass);
@@ -256,12 +261,12 @@ mobile.slideshow = {
             $videoDiv.removeClass('hidden');
             mobile.slideshow.$overlay.addClass('video');
 
-            M.require('videostream').tryCatch(function() {
-                iniVideoStreamLayout(node, mobile.slideshow.$overlay).then(function(ok) {
+            iniVideoStreamLayout(node, mobile.slideshow.$overlay)
+                .then((ok) => {
                     if (ok) {
                         mobile.slideshow.$overlay.find('.scroll-block').addClass('video');
                         $('.video-block, .video-controls', mobile.slideshow.$overlay).removeClass('hidden');
-                        $('.viewer-button.fs', mobile.slideshow.$overlay).rebind('tap.toggleHeader', function (e) {
+                        $('.viewer-button.fs', mobile.slideshow.$overlay).rebind('tap.toggleHeader', function(e) {
                             e.stopPropagation();
                             if (!mobile.slideshow.isLandscape) {
                                 mobile.slideshow.hideHFFlag = !mobile.slideshow.hideHFFlag;
@@ -273,16 +278,19 @@ mobile.slideshow = {
 
                         // Autoplay the video / audio file
                         if ($.autoplay === nodeHandle) {
-                            onIdle(function() {
+                            queueMicrotask(() => {
                                 $('.play-video-button', mobile.slideshow.$overlay).trigger('click');
                             });
                             delete $.autoplay;
                         }
                     }
                 });
-            });
         }
         else {
+            const store = mobile.slideshow.previews[nodeHandle];
+            if (store) {
+                $image.attr('src', store.src);
+            }
             $image.removeClass('hidden');
             $videoDiv.addClass('hidden');
             return false;
@@ -385,6 +393,9 @@ mobile.slideshow = {
 
         // Destroy any streaming instance
         $(window).trigger('video-destroy');
+
+        sessionStorage.removeItem('previewNode');
+        sessionStorage.removeItem('previewTime');
     },
 
     /**
@@ -547,8 +558,6 @@ mobile.slideshow = {
         mobile.slideshow.cleanupCurrentlyViewedInstance();
         mobile.slideshow.$overlay.find('.slides.mid img').remove();
         mobile.slideshow.$overlay.find('.slides.mid').prepend('<img alt="" /></div>');
-        sessionStorage.removeItem('previewNode');
-        sessionStorage.removeItem('previewTime');
     },
 
     /**

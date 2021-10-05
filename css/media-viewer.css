@@ -264,7 +264,9 @@
                 max-height: 100%;
                 max-width: 100%;
                 min-height: 70%;
-                object-fit: contain;
+                background-size: contain;
+                background-repeat: no-repeat;
+                background-position: center;
             }
             .video-theatre-mode .media-viewer video {
                 height: 100%;
@@ -520,6 +522,9 @@
         .mouse-idle .vad .video-progress-bar.vad {
             opacity: 1;
             visibility: visible;
+        }
+        .mouse-idle {
+            cursor: none !important;
         }
         .vad.mouse-idle .viewer-vad-control {
             bottom: 16px;

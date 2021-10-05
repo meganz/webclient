@@ -364,6 +364,13 @@
             });
         }
 
+        if (window.d && (e.ctrlKey || e.metaKey) && MediaInfoLib.isFileSupported(files[0])) {
+            window.d = 2;
+            document.body.textContent = 'Local videostream.js Test...';
+            const video = mCreateElement('video', {width: 1280, height: 720, controls: true}, 'body');
+            return M.require('videostream').then(() => Streamer(files[0], video)).catch(dump);
+        }
+
         if (e.dataTransfer
                 && e.dataTransfer.items
                 && e.dataTransfer.items.length > 0 && e.dataTransfer.items[0].webkitGetAsEntry) {

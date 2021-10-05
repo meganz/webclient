@@ -4,202 +4,158 @@
  * @param {Number}        [aStartOffset]  offset to start retrieveing data from
  * @param {Number}        [aEndOffset]    retrieve data until this offset
  * @param {Function}      [aProgress]     callback function which is called with the percent complete
- * @returns {MegaPromise}
+ * @returns {Promise} Uint8Array
  */
-function megaUtilsGFSFetch(aData, aStartOffset, aEndOffset, aProgress) {
+async function megaUtilsGFSFetch(aData, aStartOffset, aEndOffset, aProgress) {
     'use strict';
 
-    var promise = new MegaPromise();
+    if (typeof aData !== 'object') {
+        aData = await megaUtilsGFSFetch.getTicketData(aData);
+    }
 
-    var fetcher = function(data) {
+    aEndOffset = parseInt(aEndOffset);
+    aStartOffset = parseInt(aStartOffset);
 
-        aEndOffset = parseInt(aEndOffset);
-        aStartOffset = parseInt(aStartOffset);
+    if (aEndOffset === -1 || aEndOffset > aData.s) {
+        aEndOffset = aData.s;
+    }
 
-        if (aEndOffset === -1 || aEndOffset > data.s) {
-            aEndOffset = data.s;
-        }
+    if (!aStartOffset && aStartOffset !== 0
+        || aStartOffset > aData.s || !aEndOffset
+        || aEndOffset < aStartOffset) {
 
-        if ((!aStartOffset && aStartOffset !== 0)
-            || aStartOffset > data.s || !aEndOffset
-            || aEndOffset < aStartOffset) {
+        return Promise.reject(ERANGE);
+    }
+    const byteOffset = aStartOffset % 16;
 
-            return promise.reject(ERANGE, data);
-        }
-        var byteOffset = aStartOffset % 16;
+    if (byteOffset) {
+        aStartOffset -= byteOffset;
+    }
 
-        if (byteOffset) {
-            aStartOffset -= byteOffset;
-        }
-
-        var request = {
-            method: 'POST',
-            type: 'arraybuffer',
-            url: data.g + '/' + aStartOffset + '-' + (aEndOffset - 1)
-        };
-
-        if (typeof aProgress === 'function') {
-            aProgress = (function(aProgress) {
-                return function(ev) {
-                    if (ev.lengthComputable) {
-                        // Calculate percentage downloaded e.g. 49.23
-                        var percentComplete = ((ev.loaded / ev.total) * 100);
-
-                        // Pass the percent complete to the callback function
-                        aProgress(percentComplete, ev.loaded, ev.total);
-                    }
-                };
-            })(aProgress);
-
-            request.prepare = function(xhr) {
-                xhr.addEventListener('progress', aProgress, false);
-            };
-        }
-
-        if (Array.isArray(data.g)) {
-            request = CloudRaidRequest.fetch(data, aStartOffset, aEndOffset, aProgress);
-        }
-        else {
-            request = M.xhr(request);
-        }
-
-        request.then(function(ev, response) {
-            data.macs = {};
-            data.writer = [];
-
-            if (!data.nonce) {
-                var key = data.key;
-
-                data.nonce = JSON.stringify([
-                    key[0] ^ key[4],
-                    key[1] ^ key[5],
-                    key[2] ^ key[6],
-                    key[3] ^ key[7],
-                    key[4], key[5]
-                ]);
-            }
-
-            Decrypter.unshift([
-                [data, aStartOffset],
-                data.nonce,
-                aStartOffset / 16,
-                new Uint8Array(response || ev.target.response)
-            ], function resolver() {
-                try {
-                    var buffer = data.writer.shift().data.buffer;
-
-                    if (byteOffset) {
-                        buffer = buffer.slice(byteOffset);
-                    }
-
-                    data.buffer = buffer;
-                    promise.resolve(data);
-                }
-                catch (ex) {
-                    promise.reject(ex);
-                }
-            });
-
-        }).catch(function() {
-            promise.reject.apply(promise, arguments);
-        });
+    const request = {
+        method: 'POST',
+        type: 'arraybuffer',
+        url: `${aData.g}/${aStartOffset}-${aEndOffset - 1}`
     };
 
-    if (typeof aData !== 'object') {
-        var key;
-        var handle;
-        var error = EARGS;
+    if (typeof aProgress === 'function') {
+        aProgress = ((cb) => (ev) =>
+            ev.lengthComputable && cb(ev.loaded / ev.total * 100, ev.loaded, ev.total))(aProgress);
 
-        // If a ufs-node's handle provided
-        if (String(aData).length === 8) {
-            handle = aData;
-        }
-        else {
-            // if a public-link provided, eg #!<handle>!<key>
-            aData = String(aData).replace(/^.*?#!/, '').split('!');
+        request.prepare = function(xhr) {
+            xhr.addEventListener('progress', aProgress, false);
+        };
+    }
 
-            if (aData.length === 2 && aData[0].length === 8) {
-                handle = aData[0];
-                key = base64_to_a32(aData[1]).slice(0, 8);
-            }
-        }
+    const ev = await(
+        Array.isArray(aData.g)
+            ? CloudRaidRequest.fetch(aData, aStartOffset, aEndOffset, aProgress)
+            : M.xhr(request)
+    );
+    aData.macs = {};
+    aData.writer = [];
 
-        if (handle) {
-            var callback = function(res) {
-                if (typeof res === 'object' && res.g) {
-                    res.key = key;
-                    res.handle = handle;
+    if (!aData.nonce) {
+        const {key} = aData;
 
-                    if (typeof res.g === 'object') {
-                        // API may gives a fake array...
-                        res.g = Object.values(res.g);
+        aData.nonce = JSON.stringify([
+            key[0] ^ key[4], key[1] ^ key[5], key[2] ^ key[6], key[3] ^ key[7], key[4], key[5]
+        ]);
+    }
 
-                        if (res.g[0] < 0) {
-                            res.e = res.e || res.g[0];
-                        }
-                    }
+    return new Promise((resolve, reject) => {
+        const uint8 = new Uint8Array(ev.target.response);
+        const method = window.dlmanager && dlmanager.isDownloading ? 'unshift' : 'push';
 
-                    if (!res.e) {
-                        delete dlmanager.efq;
-                        if (res.efq) {
-                            dlmanager.efq = true;
-                        }
-                        return fetcher(res);
-                    }
-                }
+        Decrypter[method]([[aData, aStartOffset], aData.nonce, aStartOffset / 16, uint8], tryCatch(() => {
+            let {data: uint8} = aData.writer.shift();
 
-                promise.reject(res && res.e || res);
-            };
-            var req = {a: 'g', g: 1, ssl: use_ssl};
-
-            if (window.fetchStreamSupport) {
-                // can handle CloudRAID downloads.
-                req.v = 2;
+            if (byteOffset) {
+                uint8 = new Uint8Array(uint8.buffer.slice(byteOffset));
             }
 
-            // IF this is an anonymous chat OR a chat that I'm not a part of
-            if (M.chat && megaChatIsReady) {
-                megaChat.eventuallyAddDldTicketToReq(req);
-            }
+            uint8.payload = aData;
+            resolve(uint8);
+        }, reject));
+    });
+}
 
-            if (d && String(apipath).indexOf('staging') > 0) {
-                var s = sessionStorage;
-                if (s.dltfefq || s.dltflimit) {
-                    req.f = [s.dltfefq | 0, s.dltflimit | 0];
-                }
-            }
+megaUtilsGFSFetch.getTicket = (aData) => {
+    'use strict';
+    let key, handle;
+    const req = {a: 'g', g: 1, ssl: use_ssl};
 
-            if (!key) {
-                req.n = handle;
-                key = M.getNodeByHandle(handle).k;
-            }
-            else {
-                req.p = handle;
-            }
-
-            if (!Array.isArray(key) || key.length !== 8) {
-                error = EKEY;
-            }
-            else {
-                error = 0;
-                M.req(req, pfid ? 1 : 0).always(callback);
-            }
-        }
-
-        if (error) {
-            onIdle(function() {
-                promise.reject(error);
-            });
-        }
+    // If a ufs-node's handle provided
+    if (String(aData).length === 8) {
+        handle = aData;
     }
     else {
-        onIdle(fetcher.bind(null, aData));
+        // if a public-link provided, eg #!<handle>!<key>
+        aData = String(aData).replace(/^.*?#!/, '').split('!');
+
+        if (aData.length === 2 && aData[0].length === 8) {
+            handle = aData[0];
+            key = base64_to_a32(aData[1]).slice(0, 8);
+        }
     }
 
-    aData = undefined;
+    if (key) {
+        req.p = handle;
+    }
+    else {
+        req.n = handle;
+        key = M.getNodeByHandle(handle).k;
+    }
 
-    return promise;
-}
+    if (!handle || !Array.isArray(key) || key.length !== 8) {
+        return {error: EARGS};
+    }
+
+    if (window.fetchStreamSupport) {
+        // can handle CloudRAID downloads.
+        req.v = 2;
+    }
+
+    // IF this is an anonymous chat OR a chat that I'm not a part of
+    if (M.chat && megaChatIsReady) {
+        megaChat.eventuallyAddDldTicketToReq(req);
+    }
+
+    return {req, key, handle};
+};
+
+megaUtilsGFSFetch.getTicketData = async(aData) => {
+    'use strict';
+    const {req, key, handle, error} = megaUtilsGFSFetch.getTicket(aData);
+    if (error) {
+        return Promise.reject(error);
+    }
+    const res = await M.req(req, window.pfid ? 1 : 0);
+
+    if (typeof res === 'object' && res.g) {
+        res.key = key;
+        res.handle = handle;
+
+        if (typeof res.g === 'object') {
+            // API may gives a fake array...
+            res.g = Object.values(res.g);
+
+            if (res.g[0] < 0) {
+                res.e = res.e || res.g[0];
+            }
+        }
+
+        if (!res.e) {
+            delete dlmanager.efq;
+            if (res.efq) {
+                dlmanager.efq = true;
+            }
+            return res;
+        }
+    }
+
+    return Promise.reject(res && res.e || res);
+};
 
 /**
  * Promise-based XHR request
@@ -254,7 +210,7 @@ function megaUtilsXHR(aURLOrOptions, aData) {
 
     try {
         if (d) {
-            MegaLogger.getLogger('muXHR').info(method + 'ing', url, options, aData);
+            console.info(`${method}ing`, url, options, aData);
         }
         xhr.open(method, url);
         if (options.timeout) {

@@ -1019,7 +1019,7 @@ var ulmanager = {
                 var file = ctx.file;
                 var done = function() {
                     // get thumb/prev created if it wasn't already, eg. an mp4 renamed as avi/mov/etc
-                    if (is_video(n) === 1 && String(n.fa).indexOf(':0*') < 0) {
+                    if (is_video(n) === 1 && String(n.fa).indexOf(':0*') < 0 && !Object(file).__getVTNPid) {
                         var aes = new sjcl.cipher.aes([
                             n.k[0] ^ n.k[4], n.k[1] ^ n.k[5], n.k[2] ^ n.k[6], n.k[3] ^ n.k[7]
                         ]);
@@ -1380,7 +1380,7 @@ ChunkUpload.prototype.updateprogress = function() {
 };
 
 ChunkUpload.prototype.abort = function() {
-    if (d && this.logger) {
+    if (d > 1 && this.logger) {
         this.logger.info('Aborting', this.oet, Boolean(this.xhr));
     }
 
@@ -1572,7 +1572,7 @@ ChunkUpload.prototype.upload = function() {
     url = dlmanager.uChangePort(this.file.posturl + this.suffix, this.altport ? 8080 : 0);
     xhr._murl = url;
 
-    if (d) {
+    if (d > 1) {
         this.logger.info("pushing", url);
     }
 
@@ -1621,7 +1621,7 @@ ChunkUpload.prototype.io_ready = function(res) {
 };
 
 ChunkUpload.prototype.done = function(ee) {
-    if (d && this.logger) {
+    if (d > 1 && this.logger) {
         this.logger.info('.done');
     }
 
@@ -1650,7 +1650,9 @@ ChunkUpload.prototype.run = function(done) {
         this.logger.warn('Intentionally blocking the first chunk.');
     }
     else {
-        this.logger.info('.run');
+        if (d > 1) {
+            this.logger.info('.run');
+        }
         if (!this.file.ul_reader) {
             this.file.ul_reader = new FileUploadReader(this.file);
 

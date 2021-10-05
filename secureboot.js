@@ -1,7 +1,7 @@
 // Release version information is replaced by the build scripts
 var buildVersion = { website: '', chrome: '', firefox: '', commit: '', timestamp: '', dateTime: '' };
 
-var m;
+var m, tmp;
 var browserUpdate = 0;
 var apipath;
 var pageLoadTime;
@@ -58,7 +58,7 @@ var is_huawei = is_mobile && (ua.indexOf('huawei') > 0 || ua.indexOf('hmscore') 
 
 if (is_android && !is_huawei) {
     // detect huawei devices by model
-    var tmp = [
+    tmp = [
         'ana-al00', 'ana-nx9', 'ang-an00', 'art-l28', 'brq-an00', 'cdy-nx9b', 'dra-lx9', 'els-n39', 'els-nx9',
         'jef-nx9', 'jny-lx2', 'lio-an00m', 'lio-l29', 'lio-n29', 'med-lx9', 'noh-an00', 'noh-lg', 'noh-nx9',
         'nop-an00', 'oce-an10', 'oce-an50', 'tas-l29', 'tet-an00'
@@ -74,7 +74,7 @@ if (is_android && !is_huawei) {
 // @todo get rid of 'm' around the codebase!
 m = !!is_mobile;
 
-var tmp = getCleanSitePath();
+tmp = getCleanSitePath();
 var is_selenium = !ua.indexOf('mozilla/5.0 (selenium; ');
 var is_embed = String(location.pathname).substr(0, 6) === '/embed' || tmp.substr(0, 2) === 'E!';
 var is_drop = location.pathname === '/drop' || tmp.substr(0, 2) === 'D!';
@@ -727,6 +727,8 @@ if (location.host === 'mega.io') {
     tmp = undefined;
 }
 
+tmp = is_mobile && Object(window.clientInformation).vendor === 'Google Inc.';
+
 var mega = {
     ui: {},
     state: 0,
@@ -735,7 +737,7 @@ var mega = {
     updateURL: defaultStaticPath + 'current_ver.txt',
     chrome: (
         typeof window.chrome === 'object'
-        && window.chrome.runtime !== undefined
+        && (window.chrome.runtime !== undefined || tmp)
         && String(window.webkitRTCPeerConnection).indexOf('native') > 0
     ),
     browserBrand: [
@@ -3898,7 +3900,7 @@ else if (!browserUpdate) {
         var rightProgressBlock = document.getElementById('loadinganimright');
 
         // Fix exception thrown when going from mobile web /login page to mobile web /register page
-        if (is_mobile && (rightProgressBlock === null)) {
+        if (!rightProgressBlock || !leftProgressBlock) {
             return false;
         }
 

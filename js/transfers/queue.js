@@ -51,6 +51,9 @@ function MegaQueue(worker, limit, name) {
         value: String(name || 'unk'),
         writable: false
     });
+    Object.defineProperty(this, '__identity', {
+        value: `mQueue[${this.qname}.${makeUUID().substr(-12)}]`
+    });
     switch (name) {
         case 'downloader':
         case 'zip-writer':
@@ -64,16 +67,17 @@ function MegaQueue(worker, limit, name) {
             parentLogger = ulmanager.logger;
             break;
     }
-    this.logger = MegaLogger.getLogger('mQueue[' + this.qname + ']', {}, parentLogger);
-    if (d) {
-        MegaQueue.weakRef.push(this);
+    this.logger = MegaLogger.getLogger(this.__identity, {}, parentLogger);
+
+    if (MegaQueue.weakRef) {
+        MegaQueue.weakRef.set(this, Object.getPrototypeOf(this));
     }
 
     MegaEvents.call(this);
 }
 inherits(MegaQueue, MegaEvents);
 
-MegaQueue.weakRef = [];
+MegaQueue.weakRef = window.d > 1 && new WeakMap();
 
 MegaQueue.prototype.getSize = function() {
     return this._limit;
@@ -291,10 +295,8 @@ MegaQueue.prototype.process = function(sp) {
     if (this._paused) {
         return false;
     }
-    if (this._later) {
-        clearTimeout(this._later);
-        delete this._later;
-    }
+    delay.cancel(this.__identity);
+
     if (!this._queue) {
         console.error('queue destroyed', this.qname, sp);
         return false;
@@ -345,9 +347,8 @@ MegaQueue.prototype.destroy = function() {
     if (!oIsFrozen(this)) {
         this.logger.info('', 'Destroying ' + this.qname, this._queue.length, this._pending);
 
-        if (this._later) {
-            clearTimeout(this._later);
-        }
+        delay.cancel(this.__identity);
+
         /**
         this._pending.forEach(function(aRunningTask) {
             if (d) {
@@ -377,25 +378,20 @@ MegaQueue.prototype.destroy = function() {
                 this.logger[fn]('The queue "%s" was not empty.', this.qname, this._queue);
             }
 
-            array.remove(MegaQueue.weakRef, this);
+            if (MegaQueue.weakRef) {
+                MegaQueue.weakRef.delete(this);
+            }
         }
         oDestroy(this);
     }
 };
 
 MegaQueue.prototype._process = function(ms, sp) {
-    if (this._later) {
-        clearTimeout(this._later);
-    }
-    if (!sp) {
+    'use strict';
+    if (!sp && d > 1) {
         sp = new Error(this.qname + ' stack pointer');
     }
-    var queue = this;
-
-    this._later = setTimeout(function() {
-        queue.process(sp);
-        queue = undefined;
-    }, ms || 10);
+    delay(this.__identity, () => this.process(sp), ms || 10);
 };
 
 MegaQueue.prototype.push = function(arg, next, self) {

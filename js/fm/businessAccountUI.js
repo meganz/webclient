@@ -746,20 +746,6 @@ BusinessAccountUI.prototype.showLinkPasswordDialog = function (invitationLink) {
                                 localStorage.businessSubAc = JSON.stringify(res);
                                 loadSubPage('register');
                             }
-                            else {
-                                var msgTxt = l[18795];
-                                // 'You are currently logged in. ' +
-                                //  'Would you like to log out and proceed with business account registration ? ';
-                                // closeDialog();
-                                msgDialog('confirmation', l[968], msgTxt, '', function (e) {
-                                    if (e) {
-                                        mLogout();
-                                    }
-                                    else {
-                                        loadSubPage('');
-                                    }
-                                });
-                            }
                         }
                     });
 
@@ -773,7 +759,23 @@ BusinessAccountUI.prototype.showLinkPasswordDialog = function (invitationLink) {
         return $dialog;
     };
 
-    M.safeShowDialog('invite-link-pwd', prepareSubAccountLinkDialog);
+    if (u_type) {
+        const msgTxt = l[18795];
+        // 'You are currently logged in. ' +
+        //  'Would you like to log out and proceed with business account registration ? ';
+        // closeDialog();
+        msgDialog('confirmation', l[968], msgTxt, '', function (e) {
+            if (e) {
+                mLogout();
+            }
+            else {
+                loadSubPage('');
+            }
+        });
+    }
+    else {
+        M.safeShowDialog('invite-link-pwd', prepareSubAccountLinkDialog);
+    }
 
 };
 

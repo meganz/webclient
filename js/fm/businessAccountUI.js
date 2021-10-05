@@ -764,7 +764,7 @@ BusinessAccountUI.prototype.showLinkPasswordDialog = function (invitationLink) {
         // 'You are currently logged in. ' +
         //  'Would you like to log out and proceed with business account registration ? ';
         // closeDialog();
-        msgDialog('confirmation', l[968], msgTxt, '', function (e) {
+        msgDialog('confirmation', l[968], msgTxt, '', (e) => {
             if (e) {
                 mLogout();
             }

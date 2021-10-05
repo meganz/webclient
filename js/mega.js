@@ -997,7 +997,7 @@ scparser.$add('t', function(a, scnodes) {
 
     if (fminitialized && !is_mobile) {
         // update versioning info.
-        i = scnodes.length > 1 && scnodes[1].h || rootNode.h;
+        i = scnodes.length > 1 && Object(scnodes[1]).h || rootNode.h;
         if (i) {
             // TODO: ensure this is backward compatible...
             fileversioning.updateFileVersioningDialog(i);

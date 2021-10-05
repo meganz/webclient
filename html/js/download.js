@@ -615,7 +615,7 @@ function dl_g(res, ctx) {
                                 if (ok === null) {
                                     showPreviewButton($infoBlock);
                                 }
-                            });
+                            }).catch(dump);
                         }
                         return false;
                     }

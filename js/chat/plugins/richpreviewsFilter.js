@@ -45,11 +45,11 @@ var RichpreviewsFilter = function(megaChat) {
         });
 
     megaChat.rebind("onInit.richpreviewsFilter", function() {
-        if (anonymouschat === true) {
+        if (is_chatlink) {
             return;
         }
         RichpreviewsFilter.syncFromAttribute();
-        mBroadcaster.addListener("attr:rp", function() {
+        self.mBListener = mBroadcaster.addListener("attr:rp", () => {
             RichpreviewsFilter.syncFromAttribute();
         });
     });
@@ -505,6 +505,12 @@ RichpreviewsFilter.prototype.insertPreview = function(messageObj) {
 
     var self = this;
     self.processMessage(false, messageObj, true);
+};
+
+
+RichpreviewsFilter.prototype.destroy = function() {
+    "use strict";
+    mBroadcaster.removeListener(this.mBListener);
 };
 
 /**

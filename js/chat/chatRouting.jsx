@@ -3,17 +3,23 @@ export default class ChatRouting {
         this.megaChat = megaChatInstance;
     }
     openCustomView(sectionName) {
-        let megaChat = this.megaChat;
+        const megaChat = this.megaChat;
         megaChat.routingSection = sectionName;
         megaChat.hideAllChats();
         delete megaChat.lastOpenedChat;
     }
-    route(resolve, reject, location, event) {
+    route(resolve, reject, location, event, isLandingPage) {
         if (!M.chat) {
             console.error('This function is meant to navigate within the chat...');
             return;
         }
+
         let megaChat = this.megaChat;
+
+        if (isLandingPage) {
+            megaChat.eventuallyInitMeetingUI();
+        }
+
 
         var args = String(location || '').split('/').map(String.trim).filter(String);
 
@@ -39,6 +45,11 @@ export default class ChatRouting {
             this.megaChat.routingSection = 'chat';
 
             [resolve, location] = this.routeChat(resolve, reject, location, sectionName, args);
+        }
+        else if (sectionName === "new_meeting") {
+            megaChat.trigger('onStartNewMeeting');
+            loadSubPage("/fm/chat");
+            return;
         }
         else if (!sectionName) {
             this.megaChat.routingSection = 'chat';
@@ -129,8 +140,8 @@ export default class ChatRouting {
                     }
 
                     if (ex === ENOENT && megaChat.publicChatKeys[roomId]) {
-                        msgDialog('warninga', l[20641], l[20642], 0, function() {
-                            loadSubPage(anonymouschat ? 'start' : 'fm/chat', event);
+                        msgDialog('warninga', l[20641], l[20642], 0, () => {
+                            loadSubPage(is_chatlink ? 'start' : 'fm/chat', event);
                         });
                     }
                     else {
@@ -146,6 +157,159 @@ export default class ChatRouting {
         }
 
         return [resolve, location];
+    }
+
+    initFmAndChat(targetChatId) {
+        assert(!fminitialized);
+        return new Promise((res, rej) => {
+            // reset, so that once the fm and chat had initialized the browser won't always redirect back to the chat
+            // link, but allow whoever is using this method to navigate where they want.
+            M.currentdirid = targetChatId ? "fm/chat/" + targetChatId : undefined;
+            loadSubPage('fm');
+
+            mBroadcaster.once('chat_initialized', () => {
+                authring.onAuthringReady()
+                    .then(res, rej);
+            });
+        });
+    }
+    reinitAndOpenExistingChat(chatId, publicChatHandle = false, cbBeforeOpen = undefined) {
+        const chatUrl = "fm/chat/c/" + chatId;
+        publicChatHandle = publicChatHandle || megaChat.initialPubChatHandle;
+        const meetingDialogClosed = megaChat.meetingDialogClosed;
+        megaChat.destroy();
+        is_chatlink = false;
+
+        loadingDialog.pshow();
+
+        return new Promise((resolve, reject) => {
+            this.initFmAndChat(chatId)
+                .always(() => {
+                    megaChat.initialPubChatHandle = publicChatHandle;
+                    megaChat.initialChatId = chatId;
+                    megaChat.meetingDialogClosed = meetingDialogClosed;
+
+                    const next = () => {
+                        mBroadcaster.once('pagechange', () => {
+                            // prevent recursion
+                            onIdle(() => {
+                                loadingDialog.phide();
+                                megaChat.renderListing(chatUrl, true)
+                                    .catch((ex) => {
+                                        console.error("Failed to megaChat.renderListing:", ex);
+                                        reject(ex);
+                                    })
+                                    .always(() => {
+                                        megaChat.updateKeysInProtocolHandlers();
+                                        const chatRoom = megaChat.getChatById(chatId);
+                                        assert(chatRoom);
+                                        if (chatRoom.state === ChatRoom.STATE.READY) {
+                                            resolve(chatRoom);
+                                        }
+                                        else {
+                                            chatRoom.rebind('onMessagesHistoryDone.reinitAndOpenExistingChat', () => {
+                                                if (chatRoom.state === ChatRoom.STATE.READY) {
+                                                    resolve(chatRoom);
+                                                    chatRoom.unbind('onMessagesHistoryDone.reinitAndOpenExistingChat');
+                                                }
+                                            });
+                                        }
+                                    });
+                            });
+                        });
+
+                        loadSubPage(chatUrl);
+                    };
+                    if (cbBeforeOpen) {
+                        cbBeforeOpen().then(next, (ex) => {
+                            console.error(
+                                "Failed to execute `cbBeforeOpen`, got a reject of the returned promise:",
+                                ex
+                            );
+                        });
+                    }
+                    else {
+                        next();
+                    }
+                })
+                .catch((ex) => reject(ex));
+        });
+    }
+    reinitAndJoinPublicChat(chatId, initialPubChatHandle, publicChatKey) {
+        initialPubChatHandle = initialPubChatHandle || megaChat.initialPubChatHandle;
+        const meetingDialogClosed = megaChat.meetingDialogClosed;
+        megaChat.destroy();
+        is_chatlink = false;
+
+        loadingDialog.pshow();
+
+        return new Promise((res, rej) => {
+            this.initFmAndChat(chatId)
+                .then(() => {
+                    megaChat.initialPubChatHandle = initialPubChatHandle;
+                    megaChat.initialChatId = chatId;
+                    megaChat.meetingDialogClosed = meetingDialogClosed;
+
+                    // generate key for mciphReq
+                    const mciphReq = megaChat.plugins.chatdIntegration.getMciphReqFromHandleAndKey(
+                        initialPubChatHandle,
+                        publicChatKey
+                    );
+
+                    const isReady = (chatRoom) => {
+                        if (chatRoom.state === ChatRoom.STATE.READY) {
+                            res(chatRoom);
+                            loadingDialog.phide();
+                        }
+                        else {
+                            chatRoom.rebind('onMessagesHistoryDone.reinitAndOpenExistingChat', () => {
+                                if (chatRoom.state === ChatRoom.STATE.READY) {
+                                    res(chatRoom);
+                                    loadingDialog.phide();
+                                    chatRoom.unbind('onMessagesHistoryDone.reinitAndOpenExistingChat');
+                                }
+                            });
+                        }
+                    };
+
+                    const join = () => {
+                        // Because rooms may exist in case we were previously a part of them, we need to handle this in
+                        // 2 diff ways
+                        const existingRoom = megaChat.getChatById(chatId);
+                        if (!existingRoom) {
+                            megaChat.rebind('onRoomInitialized.reinitAndJoinPublicChat', (e, megaRoom) => {
+                                if (megaRoom.chatId === chatId) {
+                                    megaRoom.setActive();
+                                    isReady(megaRoom);
+                                    megaChat.unbind('onRoomInitialized.reinitAndJoinPublicChat');
+                                }
+                            });
+                        }
+                        else {
+                            existingRoom.setActive();
+                            isReady(existingRoom);
+                        }
+                    };
+                    join();
+
+
+                    M.req(mciphReq)
+                        .then(() => {
+                            join();
+                        })
+                        .catch((ex) => {
+                            if (ex === -12) {
+                                // already in the room.
+                                join();
+                            }
+                            else {
+                                loadingDialog.phide();
+                                console.error("Bad response for mciphReq:", mciphReq, ex);
+                                rej(ex);
+                            }
+                        });
+                });
+        });
     }
 }
 

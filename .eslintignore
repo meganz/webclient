@@ -32,3 +32,5 @@ contrib/Electron/main.js
 js/chat/emojidata/emojis.json
 eslint-local-rules.js
 Gruntfile.js
+js/chat/sfuClient.js
+worker.sfuClient.bundle.js

@@ -52,6 +52,8 @@ function _timing(proto, min, max) {
             proto[keys[i]] = wrap(keys[i], proto[keys[i]]);
         }
     }
+
+    return proto;
 }
 
 var _warnOnce = SoonFc(400, function _warnOnce(where) {
@@ -527,6 +529,13 @@ MegaDataMap.prototype.destroy = tryCatch(function() {
         return self._removeDefinedProperty(k);
     });
     Object.freeze(this);
+});
+
+MegaDataMap.prototype.clear = tryCatch(function() {
+    Object.keys(this).map((k) => {
+        return this._removeDefinedProperty(k);
+    });
+    this.trackDataChange();
 });
 
 MegaDataMap.prototype.setObservable = function(k, defaultValue) {

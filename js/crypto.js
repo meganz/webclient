@@ -328,6 +328,9 @@ function api_reset() {
         '#': api_esplit // numeric error code
     });
 
+    // off band attribute requests (keys) for chat
+    api_init(6, 'cs');
+
 }
 
 mBroadcaster.once('boot_done', api_reset);
@@ -358,6 +361,7 @@ function api_setsid(sid) {
     apixs[3].sid = sid;
     apixs[4].sid = sid;
     apixs[5].sid = sid;
+    apixs[6].sid = sid;
 }
 
 function api_setfolder(h) {

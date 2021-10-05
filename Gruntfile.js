@@ -541,7 +541,7 @@ const [postTaskFinalizer, postHtmlTreeWalker, postHtmlURLRebase, postCssURLRebas
     const read = (path, length, offset) => {
         const buf = Buffer.alloc(length);
         const fd = fs.openSync(path, 'r');
-        fs.readSync(fd, buf, 0, length, offset || 0);
+        fs.readSync(fd, buf, 0, length, Math.round(offset || 0));
         fs.closeSync(fd);
         return buf;
     };

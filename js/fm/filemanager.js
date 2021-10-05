@@ -177,6 +177,7 @@ FileManager.prototype.initFileManagerUI = function() {
             || $.dialog === 'affiliate-redeem-dialog'
             || $.dialog === 'discount-offer'
             || $.dialog === 'voucher-info-dlg'
+            || $.dialog === "chat-incoming-call"
             || String($.dialog).startsWith('verify-email')
             || localStorage.awaitingConfirmationAccount) {
 
@@ -249,6 +250,12 @@ FileManager.prototype.initFileManagerUI = function() {
     }
 
     $.doDD = function(e, ui, a, type) {
+
+        // Prevent drop behavior for the `Local` component
+        // See: ui/meetings/local.jsx
+        if (ui.helper.hasClass('local-stream')) {
+            return;
+        }
 
         function nRevert(r) {
             try {
@@ -724,7 +731,6 @@ FileManager.prototype.initFileManagerUI = function() {
             }
         }
 
-        $('.grid-url-arrow').removeClass('active');
         $('.nw-sorting-menu').addClass('hidden');
         $('.colour-sorting-menu').addClass('hidden');
         $('.fm-start-chat-dropdown').addClass('hidden').removeClass('active');
@@ -743,6 +749,12 @@ FileManager.prototype.initFileManagerUI = function() {
             $jqe.trigger('click');
         }
         $('.fm-share-download').removeClass('active disabled');
+
+        const $threeDotsContextMenu = $('.shared-details-info-block .grid-url-arrow');
+        if ($threeDotsContextMenu.hasClass('active')) {
+            $threeDotsContextMenu.trigger('click');
+        }
+        $('.grid-url-arrow').removeClass('active');
 
         // Set to default
         a = $('.dropdown.body.files-menu,.dropdown.body.download');
@@ -1957,7 +1969,7 @@ FileManager.prototype.initContextUI = function() {
         $('.transfer-table tr.ui-selected').removeClass('ui-selected');
     });
 
-    if (localStorage.folderLinkImport) {
+    if (sessionStorage.folderLinkImport || $.onImportCopyNodes) {
         onIdle(M.importFolderLinkNodes.bind(M, false));
     }
 };
@@ -2515,10 +2527,10 @@ FileManager.prototype.addTransferPanelUI = function() {
         var file;
         var tclear;
 
-        $('.dropdown.body.files-menu .dropdown-item').hide();
+        $('.dropdown.body.files-menu .dropdown-item').addClass('hidden');
         var $menuitems = $('.dropdown.body.files-menu .dropdown-item');
 
-        $menuitems.filter('.transfer-pause,.transfer-play,.move-up,.move-down,.transfer-clear').show();
+        $menuitems.filter('.transfer-pause,.transfer-play,.move-up,.move-down,.transfer-clear').removeClass('hidden');
 
         tclear = $menuitems.filter('.transfer-clear').contents('span').get(0) || {};
         tclear.textContent = l[103];
@@ -2545,58 +2557,57 @@ FileManager.prototype.addTransferPanelUI = function() {
             });
 
             if (finished === ids.length) {
-                $menuitems.hide()
-                    .filter('.transfer-clear').show();
+                $menuitems.addClass('hidden')
+                    .filter('.transfer-clear').removeClass('hidden');
                 tclear.textContent = l[7218];
             }
             else {
                 if (started) {
-                    $menuitems.filter('.move-up,.move-down').hide();
+                    $menuitems.filter('.move-up,.move-down').addClass('hidden');
                 }
                 if (paused === ids.length) {
-                    $menuitems.filter('.transfer-pause').hide();
+                    $menuitems.filter('.transfer-pause').addClass('hidden');
                 }
 
                 var prev = target.first().prev();
                 var next = target.last().next();
 
                 if (prev.length === 0 || !prev.hasClass('transfer-queued')) {
-                    $menuitems.filter('.move-up').hide();
+                    $menuitems.filter('.move-up').addClass('hidden');
                 }
                 if (next.length === 0) {
-                    $menuitems.filter('.move-down').hide();
+                    $menuitems.filter('.move-down').addClass('hidden');
                 }
             }
         }
         else if (!(file = GlobalProgress[$(target).attr('id')])) {
             /* no file, it is a finished operation */
-            $menuitems.hide()
-                .filter('.transfer-clear')
-                .show();
+            $menuitems.addClass('hidden')
+                .filter('.transfer-clear').removeClass('hidden');
             tclear.textContent = l[7218];
         }
         else {
             if (file.started) {
-                $menuitems.filter('.move-up,.move-down').hide();
+                $menuitems.filter('.move-up,.move-down').addClass('hidden');
             }
             if (file.paused) {
-                $menuitems.filter('.transfer-pause').hide();
+                $menuitems.filter('.transfer-pause').addClass('hidden');
             }
             else {
-                $menuitems.filter('.transfer-play').hide();
+                $menuitems.filter('.transfer-play').addClass('hidden');
             }
 
             if (!target.prev().length || !target.prev().hasClass('transfer-queued')) {
-                $menuitems.filter('.move-up').hide();
+                $menuitems.filter('.move-up').addClass('hidden');
             }
             if (target.next().length === 0) {
-                $menuitems.filter('.move-down').hide();
+                $menuitems.filter('.move-down').addClass('hidden');
             }
         }
 
         // XXX: Hide context-menu's menu-up/down items for now to check if that's the
         // origin of some problems, users can still use the new d&d logic to move transfers
-        $menuitems.filter('.move-up,.move-down').hide();
+        $menuitems.filter('.move-up,.move-down').addClass('hidden');
 
         var parent = $menuitems.parent();
         parent
@@ -3876,8 +3887,8 @@ FileManager.prototype.onSectionUIOpen = function(id) {
     if (d) {
         console.log('sectionUIopen', id, folderlink);
     }
-    if (!anonymouschat && $.hideContextMenu) {
-       $.hideContextMenu();
+    if ($.hideContextMenu) {
+        $.hideContextMenu();
     }
 
     $('.nw-fm-left-icon', $fmholder).removeClass('active');
@@ -3886,6 +3897,13 @@ FileManager.prototype.onSectionUIOpen = function(id) {
     }
     else {
         $('.nw-fm-left-icon.inbox', $fmholder).addClass('hidden');
+    }
+
+    if (u_type === 3 || window.is_eplusplus) {
+        $('.nw-fm-left-icon.conversations', $fmholder).removeClass('hidden');
+    }
+    else {
+        $('.nw-fm-left-icon.conversations', $fmholder).addClass('hidden');
     }
 
     // view or hide left icon for business account, confirmed and payed
@@ -4069,7 +4087,7 @@ FileManager.prototype.onSectionUIOpen = function(id) {
         $('.contacts-tabs-bl').addClass('hidden');
     }
 
-    $(".fm-left-panel").removeClass('hidden');
+    $(".fm-left-panel:not(.chat-lp-body)").removeClass('hidden');
 
     if (id !== "recents") {
         $(".fm-recents.container").addClass('hidden');
@@ -4418,6 +4436,13 @@ FileManager.prototype.initLeftPanel = function() {
         _openDialog(dialogName, dispatcher);
     };
 
+    /**
+     * Don't use this method, unless you know what you are doing.
+     * This method would ditch the currently queued dialogs, without notifying via
+     * sendMessage('closedialog') or .trigger('dialog-closed').
+     * This may cause side effects of some dialogs, not unmounting correctly, despite being hidden.
+     * E.g. this is specially dangerous with dialogs that do keyboard shortcuts or other global events.
+     */
     Object.defineProperty(FileManager.prototype.safeShowDialog, 'abort', {
         value: function _abort() {
             if (d && $.dialog) {

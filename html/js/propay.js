@@ -33,6 +33,9 @@ pro.propay = {
 
     paymentStatusChecker: null,
 
+    /** The user's subscription payment gateway id */
+    userSubsGatewayId: null,
+
     /**
      * Initialises the page and functionality
      */
@@ -96,8 +99,11 @@ pro.propay = {
         }
 
         // Initialise the main purchase button
-        $purchaseButton.rebind('click.purchase', function() {
-
+        $purchaseButton.rebind('click.purchase', () => {
+            if (is_mobile) {
+                pro.propay.userSubsGatewayId =
+                    M.account.sgwids && M.account.sgwids.length > 0 ? M.account.sgwids[0] : null;
+            }
             pro.propay.startPurchaseProcess();
             return false;
         });
@@ -1126,7 +1132,13 @@ pro.propay = {
             }
             else if (pro.propay.proPaymentMethod.indexOf('ecp') === 0
                 || pro.propay.proPaymentMethod.toLowerCase().indexOf('stripe') === 0) {
-                addressDialog.init();
+                if (pro.propay.userSubsGatewayId === 2 || pro.propay.userSubsGatewayId === 3) {
+                    // Detect the user has subscribed to a Pro plan with Google Play or Apple iTunes
+                    msgDialog('warninga', '', l.warning_has_subs_with_3p);
+                }
+                else {
+                    addressDialog.init();
+                }
             }
             else if (pro.propay.proPaymentMethod === 'voucher') {
                 voucherDialog.init();

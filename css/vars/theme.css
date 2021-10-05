@@ -113,9 +113,12 @@ body {
             --text-h3-bold: bold 16px/24px var(--text-font-family-semibold);
             --text-body1-bold: bold 14px/20px var(--text-font-family-semibold);
 
-            /* body2, caption and data are currently never bold */
-
+        /* body2, caption and data are currently never bold */
             --text-code1: 12px/24px var(--text-font-family-code);
+
+        /* font : ONLY FOR PRODUCT PAGES */
+            --text-h2-montserrat-bold: 20px/30px var(--text-font-family-montserrat-bold);
+            --text-body1-montserrat-light: 20px/30px var(--text-font-family-montserrat-light);
 
     /* transitions */
 

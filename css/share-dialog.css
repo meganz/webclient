@@ -336,6 +336,7 @@
     box-sizing: border-box;
     height: 80px;
     margin: 0 48px 8px 48px;
+    padding: 0;
 }
 
 .mega-dialog.share-add-dialog .horizontal-contacts-list .selected-contact-card {

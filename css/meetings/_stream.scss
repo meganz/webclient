@@ -1,0 +1,213 @@
+@mixin small-screen {
+    @media only screen and (max-height: 760px) {
+        @content;
+    }
+}
+
+
+.stream {
+    display: grid;
+    position: relative;
+    float: left;
+    width: calc(100% - 300px);
+    height: 100%;
+    background: #222;
+
+    &.full { width: 100%; }
+
+    &.hovered .stream-controls { bottom: 0; }
+    &.hovered .sidebar-controls { right: 24px; }
+    &.hovered .stream-head, .stream-head.active { top: 0; }
+
+    @import '_streamControls.scss';
+    @import '_sidebarControls.scss';
+    @import '_participantsNotice.scss';
+
+    &-container {
+        margin: auto;
+    }
+
+    .with-notice {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+
+    //
+    // Alert
+    // --------------------------------------------------------------------
+
+    .alert {
+        position: absolute;
+        bottom: 10px;
+        left: 10px;
+        padding: 10px;
+        border-radius: 4px;
+        background: #07BFA5;
+        color: #FFF;
+
+        &-content {
+            float: left;
+
+            span {
+                display: block;
+                float: left;
+                padding: 0 4px 0 0;
+
+                &:first-child { font-weight: bold; }
+            }
+        }
+
+        &-control {
+            float: left;
+            margin: 0 0 0 20px;
+            padding: 0 0 0 10px;
+            border-left: 1px solid #FFF;
+        }
+
+        button {
+            width: 15px;
+            height: 15px;
+            padding: 0;
+            border: 0 none;
+            border-radius: 200px;
+            text-indent: -9999px;
+            background: #FFF;
+            cursor: pointer;
+        }
+    }
+
+    .stream-on-hold {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font: var(--text-h2);
+        color: var(--secondary-white);
+        text-align: center;
+        cursor: pointer;
+
+        i {
+            display: block;
+            margin: 0 auto;
+            --icon-size: 80px;
+            --mask-color: var(--surface-grey-1);
+        }
+
+        span {
+            font: var(--text-h3);
+            color: var(--secondary-white);
+        }
+    }
+}
+
+//
+// Carousel
+// --------------------------------------------------------------------
+
+.carousel {
+    width: 100%;
+    height: 100%;
+
+    &-container {
+        width: 100%;
+        height: 100%;
+        transform-style: preserve-3d;
+
+        .carousel-page {
+            display: none;
+            position: absolute;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            margin: auto;
+            transition: transform 500ms, opacity 800ms, z-index 500ms;
+
+            &.active {
+                display: block;
+                position: relative;
+                z-index: 900;
+            }
+        }
+    }
+}
+
+.carousel-button-prev,
+.carousel-button-next {
+    position: absolute;
+    top: 50%;
+    width: 96px;
+    height: 96px;
+    transform: translateY(-50%);
+    border-radius: 200px;
+    background: rgba(0, 0, 0, 0.4);
+    border: 0 none;
+    cursor: pointer;
+    z-index: 1;
+    opacity: 0.6;
+    transition: opacity 500ms ease-in-out;
+
+    &:hover {
+        opacity: 1;
+    }
+
+    &:hover div {
+        display: block;
+    }
+
+    @include small-screen {
+        top: auto;
+        bottom: 322px;
+        width: 56px;
+        height: 56px;
+        transform: none;
+    }
+
+    i {
+        display: block;
+        margin: 0 auto;
+        --icon-size: 48px;
+        --mask-color: var(--icon-rest);
+
+        @include small-screen {
+            --icon-size: 28px;
+        }
+    }
+
+    span {
+        position: fixed;
+        bottom: -9999px;
+        visibility: hidden;
+    }
+
+    div {
+        display: none;
+        position: absolute;
+        left: 50%;
+        bottom: -30px;
+        padding: 3px 6px;
+        transform: translateX(-50%);
+        border-radius: 4px;
+        font: var(--text-body2);
+        color: var(--secondary-white);
+        background-color: rgba(0, 0, 0, 0.4);
+
+        @include small-screen {
+            top: -32px;
+            bottom: auto;
+        }
+    }
+}
+
+.carousel-button-prev {
+    left: 8px;
+}
+
+.carousel-button-next {
+    right: 8px;
+
+    @include small-screen {
+        right: 21px;
+    }
+}

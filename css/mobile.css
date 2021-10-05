@@ -5329,7 +5329,6 @@ div.checkboxOn {
     vertical-align: top;
 }
 .mobile.my-account-page .account-page-contents {
-    height: calc(100% - 68px);
     margin-top: 68px;
     overflow: scroll;
 }
@@ -6783,7 +6782,9 @@ textarea.mobile.support-text-field {
 .mobile.video .download.video-block video {
     width: 100%;
     height: 100%;
-    object-fit: contain;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
     -moz-border-radius: 3px;
     -webkit-border-radius: 3px;
     border-radius: 3px;
@@ -6986,15 +6987,96 @@ textarea.mobile.support-text-field {
 .mobile.video.play-video-button {
     display: none;
 }
+/*
 .video-theatre-mode .play-video-button {
     display: none;
-}
+}*/
 .paused .play-video-button {
     display: block;
 }
 .paused .viewer-pending  {
     display: none;
 }
+
+/* Bounce animation */
+.viewer-pending {
+    margin: -8px 0 0 -48px;
+    width: 96px;
+    top: 50%;
+    left: 50%;
+    text-align: center;
+    z-index: 10;
+    position: absolute;
+    font-size: 0;
+    line-height: 0;
+    white-space: nowrap;
+}
+.viewer-pending > div {
+    width: 16px;
+    height: 16px;
+    margin: 0 8px;
+    background-color: white;
+    -moz-border-radius: 100%;
+    -webkit-border-radius: 100%;
+    border-radius: 100%;
+    display: inline-block;
+    -webkit-animation: sk-bouncedelay 1.4s infinite ease-in-out both;
+    animation: sk-bouncedelay 1.4s infinite ease-in-out both;
+}
+.viewer-pending .bounce1 {
+    -webkit-animation-delay: -0.32s;
+    animation-delay: -0.32s;
+}
+.viewer-pending .bounce2 {
+    -webkit-animation-delay: -0.16s;
+    animation-delay: -0.16s;
+}
+.viewer-pending span {
+    color: #d90007;
+    margin-top: 16px;
+    margin-left: -14px;
+    font-weight: bold;
+    font-size: initial;
+    line-height: normal;
+    text-shadow: 2px 0 2px #000;
+    animation: blinker 1s linear infinite;
+    -webkit-animation: blinker 1s linear infinite;
+}
+
+@keyframes blinker {
+    50% {
+        opacity: 0;
+    }
+}
+
+@-webkit-keyframes blinker {
+    50% {
+        opacity: 0;
+    }
+}
+
+@-webkit-keyframes sk-bouncedelay {
+    0%,
+    80%,
+    100% {
+        -webkit-transform: scale(0);
+    }
+    40% {
+        -webkit-transform: scale(1);
+    }
+}
+
+@keyframes sk-bouncedelay {
+    0%,
+    80%,
+    100% {
+        transform: scale(0);
+    }
+    40% {
+        transform: scale(1);
+    }
+}
+
 /* controls */
 .video-theatre-mode .viewer-bottom-bl {
     background-image: linear-gradient(0deg, rgba(0,0,0,0.40) 0%, rgba(0,0,0,0) 100%);
@@ -11194,20 +11276,78 @@ Thank You dialog
 /**
  * Chatlink preview page styles
  */
+ .mobile.chat-links-preview {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
 .chatlink-mobile-header {
-    display: block;
-    text-align: center;
-    padding-top: 18px;
+    display: flex;
+    justify-content: center;
+    padding-top: 32px;
     padding-bottom: 18px;
-    height: 42px;
-    position: relative;
-    box-shadow: 0 2px 3px 0 rgba(0,0,0,0.15);
 
+    position: relative;
 }
-.chatlink-mobile-header a {
-    float: none;
+.chatlink-mobile-header i {
+    --icon-size: 50px;
+}
+.chatlink-mobile-body {
+    flex-grow: 2;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+.chatlink-mobile-body i {
+    --icon-size: 50px;
+    margin-bottom: 30px;
+}
+.chatlink-mobile-body h2 {
+    color: #121212;
+    font: var(--text-h2-montserrat-bold);
+    letter-spacing: 0;
+    text-align: center;
+    max-width: 350px;
+    margin: 0;
+}
+.chatlink-mobile-body img {
+    height: 124px;
+}
+.chatlink-mobile-body p,
+.chatlink-mobile-body .members {
+    font: var(--text-body1);
+    color: var(--text-color-black-low);
+    text-align: center;
+    max-width: 250px;
+    margin: 16px auto;
+}
+.chatlink-mobile-body .members {
     display: inline-block;
+    margin: 20px auto;
 }
+.chatlink-mobile-body .link-block {
+    display: flex;
+    flex-direction: column;
+    height: 140px;
+    padding: 0 40px 30px;
+    justify-content: space-around;
+    align-items: center;
+    text-align: center;
+}
+.chatlink-mobile-body .link-block button.mega-button {
+    padding: 0 20px;
+    min-width: 200px;
+    display: block;
+    max-width: 300px;
+}
+.chatlink-mobile-body .link-block a {
+    font: var(--text-h3);
+    text-decoration: underline;
+    color: var(--text-color-high);
+}
+
 .chatlink-red-row {
     display: block;
     background: linear-gradient(180deg, #FF626C 0%, #FF333A 100%);
@@ -11500,6 +11640,9 @@ code, c {
     }
 }
 /** Password Reminder Overlay **/
+.mobile.password-reminder-overlay.overlay {
+    position: fixed;
+}
 .mobile.password-reminder-overlay .dont-show-again-container {
     margin-top: 12px;
     text-align: center;

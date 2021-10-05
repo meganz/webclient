@@ -864,9 +864,16 @@ FullScreenManager.prototype.enterFullscreen = function() {
         var $videoControls = $('.video-controls', $wrapper);
         var $playVideoButton = $('.play-video-button', $wrapper);
         var $document = $(document);
-        var duration;
-        var timer;
         var filters = Object.create(null);
+        let duration, timer, playevent;
+
+        const props = Object.defineProperties(Object.create(null), {
+            duration: {
+                get() {
+                    return duration || streamer && streamer.duration;
+                }
+            }
+        });
 
         /* Drag status */
         let timeDrag = false;
@@ -927,7 +934,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
         // programmatic timeupdate helper
         setTimeUpdate = function() {
             if (streamer) {
-                onTimeUpdate(streamer.currentTime, duration || streamer.duration);
+                onTimeUpdate(streamer.currentTime, props.duration);
             }
         };
         $video.rebind('timeupdate.xyz', setTimeUpdate);
@@ -939,6 +946,12 @@ FullScreenManager.prototype.enterFullscreen = function() {
                 if (videoElement.paused || videoElement.ended) {
                     $('i', $playpause).removeClass('icon-pause').addClass('icon-play');
                     $playVideoButton.removeClass('hidden');
+                    $pendingBlock.addClass('hidden');
+
+                    if (is_mobile && playevent) {
+                        clearTimeout(hideMobileVideoControls);
+                        $videoControls.removeClass('invisible');
+                    }
                 }
                 else {
                     $('i', $playpause).removeClass('icon-play').addClass('icon-pause');
@@ -969,7 +982,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
         };
 
         var getTimeOffset = function(x) {
-            var maxduration = streamer && streamer.duration || 0;
+            var maxduration = props.duration || 0;
             var position = x - $progress.offset().left; // Click pos
             var percentage = Math.max(0, Math.min(100, 100 * position / $progress.width()));
             var selectedTime = Math.round(maxduration * percentage / 100);
@@ -1037,7 +1050,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
 
         // Seek by specified number of seconds.
         var seekBy = function(sec) {
-            streamer.currentTime = Math.min(streamer.duration, Math.max(0, streamer.currentTime + sec));
+            streamer.currentTime = Math.min(props.duration, Math.max(0, streamer.currentTime + sec));
         };
 
         // Set Init Values
@@ -1046,17 +1059,26 @@ FullScreenManager.prototype.enterFullscreen = function() {
         $('.video-timing', $wrapper).text('00:00');
         $progressBar.removeAttr('style');
         $volumeBar.find('style').removeAttr('style');
-        $playVideoButton.removeClass('hidden');
-        setDuration(0);
+        if ($('.viewer-pending', $wrapper).hasClass('hidden')) {
+            $playVideoButton.removeClass('hidden');
+        }
+
+        duration = MediaAttribute(node).data.playtime || 0;
+        setDuration(duration);
         onTimeUpdate(0, 1);
+
+        if (duration && options.startTime) {
+            onTimeUpdate(options.startTime, duration);
+        }
+
+        if (options.filter) {
+            applyVideoFilter.apply(this, options.filter.map(v => v / 10));
+        }
 
         // Add event listeners for video specific events
         $video.rebind('play pause', function() {
             changeButtonState('playpause');
         });
-
-        var playevent;
-        var $vc;
 
         $video.rebind('playing', function() {
             if (streamer.duration) {
@@ -1064,7 +1086,18 @@ FullScreenManager.prototype.enterFullscreen = function() {
 
                 if (!playevent) {
                     playevent = true;
-                    setDuration(streamer.duration);
+                    if (streamer.duration > duration) {
+                        setDuration(streamer.duration);
+                    }
+
+                    if (is_audio(node)) {
+                        streamer.on('duration', (ev, value) => {
+                            if (duration < value) {
+                                setDuration(value);
+                                return true;
+                            }
+                        });
+                    }
 
                     // play/pause on click
                     $video.rebind('click', function() {
@@ -1082,7 +1115,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
                         $playpause.trigger('click');
                     });
 
-                    $vc = $('.vol-wrapper', $wrapper);
+                    const $vc = $('.vol-wrapper', $wrapper);
 
                     if (streamer.hasAudio) {
                         $vc.addClass('audio').removeAttr('title');
@@ -1118,9 +1151,9 @@ FullScreenManager.prototype.enterFullscreen = function() {
             setIdle(false);
             clearTimeout(timer);
             $document.off('mousemove.idle');
-            if (streamer.currentTime >= streamer.duration) {
+            if (streamer.currentTime + 0.01 >= props.duration) {
                 delete sessionStorage.previewTime;
-                progressBarElementStyle.setProperty('width', '100%');
+                onIdle(() => progressBarElementStyle.setProperty('width', '100%'));
             }
             // playevent = false;
         });
@@ -1143,7 +1176,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
                 }
                 else {
                     later(hideControls);
-                    if (streamer.currentTime >= streamer.duration) {
+                    if (streamer.currentTime >= props.duration) {
                         streamer.currentTime = 0;
                     }
                     else {
@@ -1230,18 +1263,6 @@ FullScreenManager.prototype.enterFullscreen = function() {
             return false;
         });
 
-        if (options.startTime) {
-            var playtime = MediaAttribute(node).data.playtime;
-            if (playtime) {
-                setDuration(playtime);
-                onTimeUpdate(options.startTime, playtime);
-            }
-        }
-
-        if (options.filter) {
-            applyVideoFilter.apply(this, options.filter.map(function(v) { return v / 10; }));
-        }
-
         // Update Progress Bar control
         var updatebar = function(x) {
             if (streamer) {
@@ -1253,6 +1274,9 @@ FullScreenManager.prototype.enterFullscreen = function() {
 
                 if (!timeDrag) {
                     streamer.currentTime = o.time;
+
+                    // Also set startTime, needed by AudioStream.
+                    options.startTime = o.time;
                 }
             }
         };
@@ -1376,7 +1400,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
                     streamer.currentTime = 0;
                     break;
                 case 'End':
-                    streamer.currentTime = streamer.duration - 0.2;
+                    streamer.currentTime = props.duration - 0.2;
                     break;
                 case 'Digit1':
                 case 'Digit2':
@@ -1387,7 +1411,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
                 case 'Digit7':
                 case 'Digit8':
                 case 'Digit9':
-                    streamer.currentTime = streamer.duration * key.substr(5) / 10;
+                    streamer.currentTime = props.duration * key.substr(5) / 10;
                     break;
                 case 'Numpad0':
                 case 'Numpad1':
@@ -1470,10 +1494,9 @@ FullScreenManager.prototype.enterFullscreen = function() {
 
     // @private get additional video instance..
     var _getVideoAdInstance = function(node, $wrapper, videoElement, options) {
+        var pan, vad;
         var vAdInstance = Object.create(null);
         var opt = {autoplay: options.autoplay};
-        var pan = videoElement.parentNode;
-        var vad = videoElement.cloneNode();
         var $control = $('.viewer-vad-control', $wrapper).removeClass('skip');
         var $thumb = $('.thumb', $control).removeClass('active');
         var $pendingBlock = $('.viewer-pending', $wrapper);
@@ -1544,19 +1567,8 @@ FullScreenManager.prototype.enterFullscreen = function() {
             vAdInstance.disabled = true;
             return vAdInstance;
         }
-
-        getImage(node, 1)
-            .then(function(uri) {
-                $('img', $thumb.addClass('active')).attr('src', vad.poster = uri);
-            });
-        vad.id = '';
-        vad.style.zIndex = 9;
-        pan.insertBefore(vad, videoElement);
-        videoElement.classList.add('hidden');
-        vad.addEventListener('ended', dsp);
-        vad.addEventListener('click', nop, true);
-        vad.addEventListener('contextmenu', nop, true);
-        $wrapper.addClass('vad');
+        videoElement.addEventListener('click', nop, true);
+        videoElement.addEventListener('contextmenu', nop, true);
 
         var rs = {};
         var ts = 15807e5;
@@ -1585,11 +1597,31 @@ FullScreenManager.prototype.enterFullscreen = function() {
             if (d) {
                 console.debug('pra', res, [vAdInstance]);
             }
+            videoElement.removeEventListener('click', nop, true);
+            videoElement.removeEventListener('contextmenu', nop, true);
+
             if (!vAdInstance || !res || res < 0 || typeof res !== 'object') {
                 return vAdInstance && vAdInstance.skip();
             }
             pra[res.id] = now - ts | 0;
             localStorage.pra = JSON.stringify(pra);
+
+            getImage(node, 1)
+                .then((uri) => {
+                    $('img', $thumb.addClass('active')).attr('src', uri);
+                })
+                .catch(dump);
+
+            pan = videoElement.parentNode;
+            vad = videoElement.cloneNode();
+            vad.id = '';
+            vad.style.zIndex = 9;
+            $wrapper.addClass('vad');
+            videoElement.before(vad);
+            videoElement.classList.add('hidden');
+            vad.addEventListener('ended', dsp);
+            vad.addEventListener('click', nop, true);
+            vad.addEventListener('contextmenu', nop, true);
 
             vAdInstance.stream = Streamer(res.l, vad, opt);
             vAdInstance.stream.on('playing', function() {
@@ -1906,6 +1938,10 @@ FullScreenManager.prototype.enterFullscreen = function() {
                 eventlog(99738, JSON.stringify([1, s.hasVideo, audio, s.options.type]));
             }
             mBroadcaster.sendMessage('trk:event', 'videostream', 'playing');
+
+            if (!is_audio(node)) {
+                $(videoElement).css('background-image', ``);
+            }
         });
 
         if (typeof dataURLToAB === 'function') {
@@ -1929,8 +1965,13 @@ FullScreenManager.prototype.enterFullscreen = function() {
         var $video = $wrapper.find('.video-block');
         var $videoControl = $wrapper.find('.video-controls');
         var $adControl = $('.viewer-vad-control', $wrapper);
+        var videoElement = $('video', $video).get(0);
 
         $video.rebind('touchstart', function(ev) {
+            if (videoElement && videoElement.ended) {
+                $('.play-video-button', $wrapper).trigger('click');
+                return false;
+            }
             if ($(ev.target).is('.mobile-gallery, #video')) {
                 if ($videoControl.hasClass('invisible')) {
                     $adControl.removeClass('bottom');
@@ -2000,7 +2041,11 @@ FullScreenManager.prototype.enterFullscreen = function() {
                 var c = MediaAttribute.getCodecStrings(node);
                 if (c) {
                     $fn.attr('title', node.name + ' (' + c + ')');
-                    getImage(node, 1).then(uri => $video.attr('poster', uri)).catch(dump);
+                    getImage(node, 1).then(uri => {
+                        const a = !is_audio(node) && MediaAttribute(node).data || false;
+                        $video.css('background-size', a.width > a.height ? 'cover' : 'contain');
+                        $video.css('background-image', `url(${uri})`);
+                    }).catch(dump);
                 }
 
                 var $videoControls = $('.video-controls', $wrapper);
@@ -2354,6 +2399,9 @@ FullScreenManager.prototype.enterFullscreen = function() {
 
                     mediaCodecs = data;
                     data.version = res[0] | 0;
+                    if (data.version < 3) {
+                        console.error('Got unexpected mc-list version.', data.version, res);
+                    }
                     if (db) {
                         db.kv.put({k: 'l', t: Date.now(), v: data});
                     }
@@ -2893,14 +2941,16 @@ FullScreenManager.prototype.enterFullscreen = function() {
             }
 
             M.gfsfetch(entry.file, byteOffset, byteOffset + byteLength)
-                .tryCatch(function(data) {
+                .then((data) => {
+                    const {buffer} = data;
                     if (typeof entry.file === 'string') {
+                        data = data.payload;
                         data.size = data.s;
                         entry.file = data;
                     }
-                    resolve(data.buffer);
-                    delete data.buffer;
-                }, reject);
+                    resolve(buffer);
+                })
+                .catch(reject);
         });
     };
 
@@ -2930,6 +2980,11 @@ FullScreenManager.prototype.enterFullscreen = function() {
             if (d) {
                 console.debug('MediaInfo collect already running...');
             }
+            return;
+        }
+
+        if (M.currentrootid === M.RubbishID) {
+            delay.cancel('mediainfo:collect');
             return;
         }
 
@@ -3010,10 +3065,10 @@ FullScreenManager.prototype.enterFullscreen = function() {
     'use strict';
 
     const mp4brands = new Set([
-        'mp41', 'mp42',
+        'mp41', 'mp42', 'mp4v',
         'isom', 'iso2', 'iso4', 'iso5',
         '3gp4', '3gp5', '3gp6', '3gp7', '3gp8',
-        'avc1', 'f4v ', 'M4V '
+        'avc1', 'f4v ', 'nvr1', 'FACE', 'M4V ', 'M4VH', 'M4VP', 'XAVC', 'MSNV'
     ]);
 
     function xxkey(k) {
@@ -3146,6 +3201,9 @@ FullScreenManager.prototype.enterFullscreen = function() {
                 else if (videocodec === 'av01') {
                     return MediaSource.isTypeSupported('video/mp4; codecs="av01.2.23M.12"') ? 1 : 0;
                 }
+                else if (videocodec === 'vp09') {
+                    return MediaSource.isTypeSupported('video/mp4; codecs="vp09.03.62.12"') ? 1 : 0;
+                }
                 else if (videocodec === 'hev1' || videocodec === 'hvc1') {
                     return MediaSource.isTypeSupported('video/mp4; codecs="' + videocodec + '.1.6.L93.90"') ? 1 : 0;
                 }
@@ -3192,13 +3250,6 @@ FullScreenManager.prototype.enterFullscreen = function() {
 
         return 0;
     };
-
-    if (sessionStorage.vsPlayAnything) {
-        MediaAttribute.isTypeSupported = function() {
-            console.warn.apply(console, arguments);
-            return 1;
-        };
-    }
 
     var mediaTypeCache = Object.create(null);
 
@@ -3524,10 +3575,10 @@ FullScreenManager.prototype.enterFullscreen = function() {
             M.req(req).tryCatch(success, reject);
 
             if (Object(res.General).InternetMediaType === 'video/mp4') {
-                const known = new Set(['qt  ', ...mp4brands]);
+                const known = new Set(['qt  ', 'M4A ', ...mp4brands]);
 
                 if (!known.has(res.container)) {
-                    eventlog(99729, JSON.stringify([2, res.containerid, res.container, res.vcodec, res.height]));
+                    eventlog(99729, JSON.stringify([3, res.containerid, res.container, res.vcodec, res.height]));
                 }
             }
 
@@ -3609,6 +3660,12 @@ FullScreenManager.prototype.enterFullscreen = function() {
             return true;
         }
     });
+
+    if (sessionStorage.vsPlayAnything) {
+        MediaAttribute.getMediaType = () => 1;
+        MediaAttribute.isTypeSupported = () => 1;
+        MediaAttribute.canPlayMedia = async() => 1;
+    }
 
     /**
      * @name MediaAttribute

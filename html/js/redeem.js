@@ -96,7 +96,7 @@ var redeem = {
                     })
                     .catch(function(ex) {
                         console.error('uavr failed...', ex);
-                        redeem.showErrorDialog();
+                        redeem.showErrorDialog(ex);
                     });
 
                 // No longer needed.
@@ -152,11 +152,12 @@ var redeem = {
      * Show dialog to the user to confirm something...
      * @param {String} title
      * @param {String} message
+     * @param {String} submessage
      * @param {String|Array} [buttons]
      * @param {Boolean} [error]
      * @returns {MegaPromise}
      */
-    showDialog: function(title, message, buttons, error) {
+    showDialog: function(title, message, submessage, buttons, error) {
         'use strict';
 
         if (buttons && !Array.isArray(buttons)) {
@@ -166,6 +167,7 @@ var redeem = {
         return new MegaPromise(function(resolve, reject) {
             if (is_mobile) {
                 var icon = (error ? 'invalid-' : '') + 'voucher';
+                message = submessage || message;
                 return mobile.messageOverlay.show(title, message, icon, buttons).then(resolve).catch(reject);
             }
 
@@ -175,7 +177,7 @@ var redeem = {
                 type += ':!^' + buttons[0] + '!' + buttons[1];
             }
 
-            msgDialog(type, title, message, false, function(yup) {
+            msgDialog(type, title, message, submessage, (yup) => {
                 if (yup) {
                     return resolve();
                 }
@@ -186,16 +188,18 @@ var redeem = {
 
     /**
      * Show error dialog.
-     * @param {String} [message]
+     * @param {String|number} [message] The message or API error to display
      */
     showErrorDialog: function(message) {
         'use strict';
-
+        if (message < 0) {
+            message = message === ETOOMANY ? l.redeem_etoomany : l[473];
+        }
         // Show 'Oops, that does not seem to be a valid voucher code.' if none given
         message = message || l[473];
 
         // With buttons, 'Contact Support' & 'Cloud Drive'
-        this.showDialog(l[20416], message, [l[18148], l[19266]], true)
+        this.showDialog(l[20416], l[47], message, [l[18148], l[19266]], true)
             .then(function() {
                 redeem.goToCloud();
             })

@@ -870,6 +870,9 @@
 .dropdown-avatar:hover::before {
     opacity: 0.1;
 }
+.dropdown-avatar .contact-name-loading {
+    margin: 7px 0 0 0;
+}
 .dropdown-fingerprint {
     position: relative;
     padding: 11px 8px 6px 8px;
@@ -1004,10 +1007,6 @@
     top: 8px;
     margin: 0;
     z-index: 10;
-}
-
-.main-start-chat-dropdown .dropdown-white-arrow {
-    margin-left: -7px;
 }
 
 .dropdown.reactions-dropdown .dropdown-white-arrow {

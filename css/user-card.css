@@ -147,11 +147,14 @@ button.user-card-name:hover {
     max-width: calc(100% - 40px);
     padding-top: 6px;
 }
-.chat-contacts-list .user-card-data .small-icon.audio-call {
-    margin-top: 6px;
+.chat-contacts-list .user-card-data .audio-call {
+    margin-top: 5px;
     display: block;
     float: right;
-    opacity: 0.3;
+}
+.chat-contacts-list .user-card-data .audio-call i {
+    --icon-size: 24px;
+    --mask-color: var(--icon-inactive);
 }
 .right-chat-contact-card .user-card-name {
     padding-top: 0;

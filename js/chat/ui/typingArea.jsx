@@ -516,7 +516,14 @@ export class TypingArea extends MegaRenderMixin {
                 textareaMaxHeight = 100;
             }
             else {
-                var $messagesContainer = $('.messages-block:visible');
+                if (!self.props.chatRoom.$rConversationPanel) {
+                    return 100;
+                }
+                var $messagesContainer = $(
+                    '.messages-block',
+                    /* trick to minimize the :visible damange */
+                    self.props.chatRoom.$rConversationPanel.findDOMNode()
+                );
                 textareaMaxHeight = $messagesContainer.height() * textareaMaxHeight;
             }
         }
@@ -731,18 +738,17 @@ export class TypingArea extends MegaRenderMixin {
             const className = 'mega-button right';
             buttons = [
                 <Button
-                    className={className}
                     key="save"
-                    icon=""
+                    className={`${className} positive`}
+                    label={l[776] /* `Save` */}
                     onClick={self.onSaveClicked.bind(self)}
-                    label={l[776]} />,
-
+                />,
                 <Button
-                    className={className}
                     key="cancel"
-                    icon=""
+                    className={className}
+                    label={l[1718] /* `Cancel` */}
                     onClick={self.onCancelClicked.bind(self)}
-                    label={l[1718]} />
+                />
             ];
         }
 

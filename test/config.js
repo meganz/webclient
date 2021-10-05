@@ -36,7 +36,7 @@ function _hideDebug() {
 function _stubMegaPromise(sinon, sandbox) {
     var meths = [
         "then","done","fail","resolve","reject","always","linkDoneTo",
-        "linkFailTo","linkDoneAndFailTo","linkDoneAndFailToResult"
+        "linkFailTo","linkDoneAndFailTo","linkDoneAndFailToResult","catch"
     ];
     var promise = {};
 

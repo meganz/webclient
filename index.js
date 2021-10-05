@@ -30,16 +30,15 @@ var subdirid = false;
 var subsubdirid = false;
 var blogmonth = false;
 var blogsearch = false;
-var notifications;
+var unread;
 var account = false;
 var register_txt = false;
 var login_next = false;
 var loggedout = false;
-var anonymouschat = false;
 var flhashchange = false;
+var is_chatlink = false;
 var avatars = {};
 var mega_title = 'MEGA';
-var pchandle = false;
 
 var pro_json = '[[["N02zLAiWqRU",1,500,1024,1,"9.99","EUR"],["zqdkqTtOtGc",1,500,1024,12,"99.99","EUR"],["j-r9sea9qW4",2,2048,4096,1,"19.99","EUR"],["990PKO93JQU",2,2048,4096,12,"199.99","EUR"],["bG-i_SoVUd0",3,4096,8182,1,"29.99","EUR"],["e4dkakbTRWQ",3,4096,8182,12,"299.99","EUR"]]]';
 
@@ -411,6 +410,89 @@ function init_page() {
         loadingDialog.hide();
     }
 
+    if (is_chatlink || page.substr(0, 5) === 'chat/') {
+        if (fminitialized && megaChatIsReady) {
+            // tried to navigate internally to a chat link, do a force redirect.
+            // Can be triggered by the back button.
+            assert(
+                megaChat.initialChatId,
+                'missing .initialChatId, did this page initialized from a standalone chat/meeting link?'
+            );
+            loadSubPage(`fm/chat/c/${megaChat.initialChatId}`);
+            return false;
+        }
+
+        if (typeof is_chatlink !== 'object') {
+            is_chatlink = Object.create(null);
+        }
+
+        Object.defineProperties(is_chatlink, {
+            ph: {value: page.substr(5, 8)},
+            key: {value: page.substr(14).split("?")[0]},
+            pnh: {
+                get: function() {
+                    return this.url && this.ph;
+                }
+            }
+        });
+
+        M.chat = true;
+        if (!u_handle) {
+            assert(!u_type);
+            u_handle = "AAAAAAAAAAA";
+        }
+
+        parsepage(pages.chatlink);
+
+
+        const init = () => {
+            init_chat(0x104DF11E5)
+                .then(() => megaChat.renderListing(page, true))
+                .then(() => megaChat.renderMyStatus())
+                .then(() => {
+                    document.querySelector('.chat-links-preview .chat-links-logo-header a.logo')
+                        .addEventListener('click', () => {
+                            is_chatlink = false;
+                            delete megaChat.initialPubChatHandle;
+                            delete M.currentdirid;
+                            megaChat.destroy();
+                            if (u_type) {
+                                loadSubPage("fm");
+                            }
+                            else {
+                                loadSubPage("start");
+                            }
+                        });
+
+                    $(`.chat-links-preview${is_mobile ? '.mobile' : '.section'}`).removeClass('hidden');
+                })
+                .dump('init_chat');
+        };
+
+        // Authring (user's keys) are required to be loaded before the chat is, otherwise strongvelope would init
+        // with undefined pub keys
+        if (u_type) {
+            // show loading
+            for (const node of document.querySelectorAll(
+                '.section.chat-links-preview, .section.chat-links-preview .fm-chat-is-loading'
+            )) {
+                node.classList.remove('hidden');
+            }
+
+            // init authring -> init chat
+            authring.onAuthringReady()
+                .then(init, (ex) => {
+                    console.error("Failed to initialize authring:", ex);
+                });
+        }
+        else {
+            init();
+        }
+
+        return;
+    }
+    is_chatlink = false;
+
     var oldPFKey = pfkey;
 
     // contact link handling...
@@ -430,15 +512,7 @@ function init_page() {
         else {
             var processContactLink = function() {
                 if (!mega.ui.contactLinkCardDialog) {
-                    // because there's a strange solution applied by someone to clear the top-mobile
-                    // and to re-do everything in the header in mobile.html !!
-                    // --> in order to stop the snow ball of duplication(html code)
-                    // i will get the dialog from memory and store it in memory to be embadded when needed.
-                    var startTokenLine = '<!-- important token to get the below dialog to memory, DONT REMOVE LINE-->';
-                    var endTokenLine = '<!-- important token to get the above dialog to memory, DONT REMOVE LINE-->';
-                    var startPos = pages['top-mobile'].indexOf(startTokenLine) + startTokenLine.length;
-                    var endPos = pages['top-mobile'].indexOf(endTokenLine);
-                    var contactLinkCardHtml = pages['top-mobile'].substring(startPos, endPos);
+                    var contactLinkCardHtml = pages['mobile-add-contact-card'];
                     if (contactLinkCardHtml) {
                         mega.ui.contactLinkCardDialog = contactLinkCardHtml;
                     }
@@ -707,14 +781,8 @@ function init_page() {
             mega.ui.theme.setWithUA();
         }
     }
-    else if (page.substr(0, 10) == 'blogsearch') {
-        blogsearch = decodeURIComponent(page.substr(11, page.length - 1));
-        if (!blogsearch) {
-            loadSubPage('blog');
-        }
-        page = 'blog';
-        parsepage(pages['blogarticle']);
-        init_blog();
+    else if (page.substr(0, 4) === 'blog') {
+        loadBlog();
     }
     else if (page.substr(0, 6) == 'verify') {
         parsepage(pages['change_email']);
@@ -724,23 +792,6 @@ function init_page() {
         parsepage(pages.corporate);
         corporate.init();
     }
-    else if (page.substr(0, 5) === 'blog/') {
-        // eslint-disable-next-line dot-notation
-        init_blogarticle();
-    }
-    else if (page.substr(0, 5) === 'blog_' && page.length > 4 && page.length < 10) {
-        blogid = page.substr(5, page.length - 2);
-        page = 'blogarticle';
-        init_blogarticle();
-    }
-    else if (page.substr(0, 4) == 'blog' && page.length > 4) {
-        blogmonth = page.substr(5, page.length - 2);
-        page = 'blog';
-        blogpage = 1;
-        parsepage(pages['blog']);
-        init_blog();
-    }
-
     // If user has been invited to join MEGA and they are not already registered
     else if (page.substr(0, 9) == 'newsignup') {
 
@@ -1460,11 +1511,6 @@ function init_page() {
             mobile.takedown.show();
         }
     }
-    else if (page == 'blog') {
-        parsepage(pages['blog']);
-        init_blog();
-        api_req({ a: 'log', e: 99740, m: window.u_handle || 'visitor' });
-    }
     else if (page === 'copyrightnotice') {
         parsepage(is_mobile ? pages.mobile : pages.copyrightnotice);
         copyright.init_cn();
@@ -1848,44 +1894,6 @@ function init_page() {
             }
         }
 
-        if (page.substr(0, 4) === "chat") {
-            id = page;
-            page = "chat";
-            if (u_type === false || is_mobile && u_type) {
-                // for the sake of simplicity and fast loading...we are "faking" a logged out user for the case,
-                // where a user tries to open a chatlink
-                if (u_type) {
-                    u_type = false;
-                }
-                anonymouschat = true;
-                u_handle = "AAAAAAAAAAA";
-                pchandle = id.substr(5, 8);
-
-                loadingInitDialog.show();
-                init_chat(0x104DF11E5)
-                    .always(function() {
-                        M.chat = true;
-                        megaChat.renderListing(id)
-                            .catch((ex) => {
-                                console.error("Chat link init failed:", ex);
-                            })
-                            .always(function() {
-                                // @todo is this needed?..
-                                megaChat.renderMyStatus();
-                            });
-                    })
-                    .dump('init_chat');
-            }
-            else if (u_type === 0) {
-                // ephemeral
-                mega.ui.sendSignupLinkDialog({}, false);
-            }
-            else {
-                anonymouschat = false;
-                pchandle = false;
-            }
-        }
-
         if (!fminitialized) {
             if (id) {
                 M.currentdirid = id;
@@ -1897,10 +1905,9 @@ function init_page() {
                 fm_addhtml();
             }
 
-            if (!anonymouschat) {
-                mega.initLoadReport();
-                loadfm();
-            }
+            assert(!is_chatlink);
+            mega.initLoadReport();
+            loadfm();
         }
         else if ((!pfid || flhashchange) && (id && id !== M.currentdirid || page === 'start')) {
             M.openFolder(id, true);
@@ -1910,7 +1917,7 @@ function init_page() {
                 M.openTransfersPanel();
             }
 
-            if (u_type === 0 && !u_attr.terms) {
+            if (u_type === 0 && !u_attr.terms && !is_eplusplus) {
                 $.termsAgree = function () {
                     u_attr.terms = 1;
                     api_req({ a: 'up', terms: 'Mq' });
@@ -1958,10 +1965,6 @@ function init_page() {
         let fmholder = document.getElementById('fmholder');
         // try to determinate visibility, without needing to use :visible
         if (!fmholder || fmholder.classList.contains("hidden") || fmholder.style.display === "none") {
-            if (anonymouschat) {
-                $('.nw-fm-left-icons-panel').addClass('hidden');
-                $('.top-head .logo').css("display", "block");
-            }
             if (fmholder) {
                 fmholder.removeAttribute("style");
                 fmholder.classList.remove('hidden');
@@ -2455,7 +2458,7 @@ function topmenuUI() {
             }
 
             // Otherwise show the ephemeral session warning
-            else if (($.len(M.c[M.RootID] || {})) && (page !== 'register')) {
+            else if (!is_eplusplus && ($.len(M.c[M.RootID] || {})) && page !== 'register') {
                 if (alarm.ephemeralSession) {
                     alarm.ephemeralSession.render();
                 }
@@ -2547,12 +2550,7 @@ function topmenuUI() {
 
             parent = e.target.parentNode;
             // if event is triggered by inner element of mega-button, try pull classname of the button.
-            if (parent.classList.contains('mega-button')) {
-                c = parent.className;
-            }
-            else {
-                c = e.target.className;
-            }
+            c = parent && parent.classList.contains('mega-button') ? parent.className : e.target.className;
         }
         elements = document.getElementsByClassName('js-more-menu menu-open');
 
@@ -3082,6 +3080,16 @@ function loadSubPage(tpage, event) {
     if (M.chat && megaChatIsReady) {
         // navigating within the chat, skip the bloatware
         if (tpage !== 'securechat' && tpage.indexOf('chat') > -1) {
+            if (fminitialized && tpage.startsWith("chat/") && megaChatIsReady) {
+                // tried to navigate internally to a chat link, do a force redirect.
+                // Can be triggered by the back button.
+                assert(
+                    megaChat.initialChatId,
+                    'missing .initialChatId, did this page initialized from a standalone chat/meeting link?'
+                );
+                loadSubPage(`fm/chat/c/${megaChat.initialChatId}`);
+                return false;
+            }
             megaChat.navigate(tpage, event);
             return false;
         }
@@ -3097,6 +3105,13 @@ function loadSubPage(tpage, event) {
         return false;
     }
 
+    mBroadcaster.sendMessage('beforepagechange', tpage);
+    if (window.is_chatlink) {
+        window.is_chatlink = false;
+        delete megaChat.initialPubChatHandle;
+        delete M.currentdirid;
+        megaChat.destroy();
+    }
     dlid = false;
 
     if (tpage) {
@@ -3162,7 +3177,6 @@ function loadSubPage(tpage, event) {
         return false;
     }
 
-    mBroadcaster.sendMessage('beforepagechange', tpage);
     if (jsl.length > 0) {
         loadingDialog.show();
         jsl_start();

@@ -148,7 +148,7 @@ MegaData.prototype.menuItems = function menuItems() {
         dbfetch.geta(nodes)
             .always(function () {
                 var preparedItems = M.menuItemsSync();
-                    checkMegaSync(preparedItems);
+                checkMegaSync(preparedItems);
             });
     }
     else {
@@ -422,7 +422,7 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
             var $this = $(this);
             var a = $this.find('a.dropdown-item');
             var x = a.filter(function() {
-                return $(this).css('display') === 'none';
+                return $(this).hasClass('hidden');
             });
             if (x.length === a.length || a.length === 0) {
                 $this.addClass('hidden');
@@ -474,7 +474,7 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
         });
         fupload.dispatchEvent(mEvent);
 
-        $(menuCMI).filter('.dropdown-item').hide();
+        $(menuCMI).filter('.dropdown-item').addClass('hidden');
         var itemsViewed = false;
         var ignoreGrideExtras = false;
 
@@ -482,14 +482,14 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
             // Enable upload item menu for clould-drive, don't show it for rubbish and rest of crew
             if (M.getNodeRights(M.currentCustomView.nodeID || M.currentdirid) && (M.currentrootid !== M.RubbishID)) {
                 if (M.currentrootid === 'contacts') {
-                    $(menuCMI).filter('.addcontact-item').show();
+                    $(menuCMI).filter('.addcontact-item').removeClass('hidden');
                     ignoreGrideExtras = true;
                 }
                 else {
-                    $(menuCMI).filter('.fileupload-item,.newfolder-item,.newfile-item').show();
+                    $(menuCMI).filter('.fileupload-item,.newfolder-item,.newfile-item').removeClass('hidden');
 
                     if (is_chrome_firefox & 2 || 'webkitdirectory' in document.createElement('input')) {
-                        $(menuCMI).filter('.folderupload-item').show();
+                        $(menuCMI).filter('.folderupload-item').removeClass('hidden');
                     }
                 }
                 itemsViewed = true;
@@ -503,7 +503,7 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
 
         if (!ignoreGrideExtras && M.viewmode) {
             itemsViewed = true;
-            $('.files-menu.context .dropdown-item.sort-grid-item-main').show();
+            $('.files-menu.context .dropdown-item.sort-grid-item-main').removeClass('hidden');
             if (M.currentdirid === 'shares') {
                 $('.files-menu.context .dropdown-item.sort-grid-item').attr('style', 'display:none !important');
                 $('.files-menu.context .dropdown-item.sort-grid-item.s-inshare').attr('style', '');
@@ -528,13 +528,13 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
         }
     }
     else if (ll === 3) {// we want just the download menu
-        $(menuCMI).hide();
+        $(menuCMI).addClass('hidden');
         m = $('.dropdown.body.download');
         menuCMI = '.dropdown.body.download .dropdown-item';
-        $(menuCMI).show();
+        $(menuCMI).removeClass('hidden');
     }
     else if (ll === 4 || ll === 5) {// contactUI
-        $(menuCMI).hide();
+        $(menuCMI).addClass('hidden');
 
         asyncShow = true;
         M.menuItems()
@@ -550,7 +550,7 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
                 }
 
                 for (var item in items) {
-                    $(menuCMI).filter(item).show();
+                    $(menuCMI).filter(item).removeClass('hidden');
                 }
 
                 // Hide Info item if properties dialog is opened
@@ -563,7 +563,8 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
     }
     else if (ll === 7) { // Columns selection menu
         if (M && M.columnsWidth && M.columnsWidth.cloud) {
-            var $currMenuItems = $('.files-menu.context .dropdown-item').hide().filter('.visible-col-select');
+            var $currMenuItems = $('.files-menu.context .dropdown-item')
+                .addClass('hidden').filter('.visible-col-select');
             for (var col in M.columnsWidth.cloud) {
                 if (M.columnsWidth.cloud[col] && M.columnsWidth.cloud[col].disabled) {
                     continue;
@@ -571,11 +572,11 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
                 else {
                     if (M.columnsWidth.cloud[col] && M.columnsWidth.cloud[col].viewed) {
                         $currMenuItems.filter('[megatype="' + col + '"]').attr('isviewed', 'y')
-                            .show().find('i').removeClass('icon-add').addClass('icon-check');
+                            .removeClass('hidden').find('i').removeClass('icon-add').addClass('icon-check');
                     }
                     else {
                         $currMenuItems.filter('[megatype="' + col + '"]').removeAttr('isviewed')
-                            .show().find('i').removeClass('icon-check').addClass('icon-add');
+                            .removeClass('hidden').find('i').removeClass('icon-check').addClass('icon-add');
                     }
                 }
             }
@@ -584,7 +585,7 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
     else if (ll) {// Click on item
 
         // Hide all menu-items
-        $(menuCMI).hide();
+        $(menuCMI).addClass('hidden');
 
         var id;
         var currNodeClass;
@@ -635,10 +636,13 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
 
             // Add .send-files-item to show Send files item
             if (!window.megaChatIsDisabled) {
-                flt += ',.startchat-item, .startaudiovideo-item, .send-files-item';
+                flt += ',.startchat-item, .send-files-item';
+                if (megaChat && megaChat.hasSupportForCalls) {
+                    flt += ',startaudiovideo-item';
+                }
             }
             var $menuCmi = $(menuCMI);
-            $menuCmi.filter(flt).show();
+            $menuCmi.filter(flt).removeClass('hidden');
 
             // Enable All buttons
             $menuCmi.filter('.startaudiovideo-item, .send-files-item')
@@ -721,25 +725,25 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
             else {
                 flt += ',.findupes-item';
             }
-            if (M.v.length && folderlink ) {
+            if (M.v.length && folderlink) {
                 flt += ',.zipdownload-item,.download-item';
             }
             $.selected = [M.RootID];
-            $(menuCMI).filter(flt).show();
+            $(menuCMI).filter(flt).removeClass('hidden');
         }
         else if (currNodeClass && $(e.currentTarget).hasClass('inbox')) {
             $.selected = [M.InboxID];
-            $(menuCMI).filter('.properties-item').show();
+            $(menuCMI).filter('.properties-item').removeClass('hidden');
         }
         else if (currNodeClass && currNodeClass.indexOf('rubbish-bin') > -1) {
             $.selected = [M.RubbishID];
-            $(menuCMI).filter('.properties-item').show();
+            $(menuCMI).filter('.properties-item').removeClass('hidden');
             if (currNodeClass.indexOf('filled') > -1) {
-                $(menuCMI).filter('.clearbin-item').show();
+                $(menuCMI).filter('.clearbin-item').removeClass('hidden');
             }
         }
         else if (currNodeClass && currNodeClass.indexOf('contacts-item') > -1) {
-            $(menuCMI).filter('.addcontact-item').show();
+            $(menuCMI).filter('.addcontact-item').removeClass('hidden');
         }
         else if (currNodeClass && currNodeClass.indexOf('messages-item') > -1) {
             e.preventDefault();
@@ -757,25 +761,25 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
                     var $menuCMI = $(menuCMI);
 
                     for (var item in items) {
-                        $menuCMI.filter(item).show();
+                        $menuCMI.filter(item).removeClass('hidden');
                     }
 
                     // Hide context menu items not needed for undecrypted nodes
                     if (missingkeys[id]) {
-                        $menuCMI.filter('.add-star-item').hide();
-                        $menuCMI.filter('.download-item').hide();
-                        $menuCMI.filter('.rename-item').hide();
-                        $menuCMI.filter('.copy-item').hide();
-                        $menuCMI.filter('.move-item').hide();
-                        $menuCMI.filter('.getlink-item').hide();
-                        $menuCMI.filter('.embedcode-item').hide();
-                        $menuCMI.filter('.colour-label-items').hide();
-                        $menuCMI.filter('.send-to-contact-item').hide();
+                        $menuCMI.filter('.add-star-item').addClass('hidden');
+                        $menuCMI.filter('.download-item').addClass('hidden');
+                        $menuCMI.filter('.rename-item').addClass('hidden');
+                        $menuCMI.filter('.copy-item').addClass('hidden');
+                        $menuCMI.filter('.move-item').addClass('hidden');
+                        $menuCMI.filter('.getlink-item').addClass('hidden');
+                        $menuCMI.filter('.embedcode-item').addClass('hidden');
+                        $menuCMI.filter('.colour-label-items').addClass('hidden');
+                        $menuCMI.filter('.send-to-contact-item').addClass('hidden');
                     }
                     else if (M.getNodeShare(id).down === 1) {
-                        $menuCMI.filter('.copy-item').hide();
-                        $menuCMI.filter('.move-item').hide();
-                        $menuCMI.filter('.send-to-contact-item').hide();
+                        $menuCMI.filter('.copy-item').addClass('hidden');
+                        $menuCMI.filter('.move-item').addClass('hidden');
+                        $menuCMI.filter('.send-to-contact-item').addClass('hidden');
                     }
                     else {
                         if (items['.getlink-item']) {
@@ -798,13 +802,13 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
 
                     // Hide Info item if properties dialog is opened
                     if ($.dialog === 'properties') {
-                        $menuCMI.filter('.properties-item').hide();
+                        $menuCMI.filter('.properties-item').addClass('hidden');
                     }
 
                     // Hide items for selection Bar Options button
                     if (!$currentTarget.attr('id')) {
                         $menuCMI.filter('.download-item, .sh4r1ng-item, .send-to-contact-item,' +
-                            '.getlink-item, .remove-item').hide();
+                            '.getlink-item, .remove-item').addClass('hidden');
                     }
 
                     onIdle(showContextMenu);

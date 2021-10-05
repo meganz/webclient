@@ -594,6 +594,8 @@
                 newName = this.getNewName(newName);
             } while (this.getNodeByName(target, newName) || this.locateFileInUploadQueue(target, newName));
 
+            delete keepBothState[target]['~/.names.db'];
+
             return newName;
         },
 

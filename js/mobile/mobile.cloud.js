@@ -645,13 +645,16 @@ mobile.cloud = {
             var $currentFileRow = $(this);
             var nodeHandle = $currentFileRow.data('handle');
             var node = M.d[nodeHandle];
-            var fileName = node.name;
+            var isVideo = is_video(node);
 
             // Clear selection
             mobile.cloud.deselect();
 
             // If this is an image, load the preview slideshow
-            if (is_image(node) && fileext(fileName) !== 'pdf' || is_video(node)) {
+            if (isVideo || is_image3(node)) {
+                if (isVideo) {
+                    $.autoplay = nodeHandle;
+                }
                 mobile.slideshow.init(nodeHandle);
             }
             else {

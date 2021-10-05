@@ -14,7 +14,10 @@ export const RETENTION_FORMAT = { HOURS: l[7132], DAYS: l[16290], WEEKS: l[16293
  */
 var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, chatId, chatShard, chatdUrl, noUI,
                          publicChatHandle, publicChatKey,
-                         ck, retentionTime) {
+                         ck,
+                         isMeeting,
+                         retentionTime
+) {
     var self = this;
 
     this.logger = MegaLogger.getLogger("room[" + roomId + "]", {}, megaChat.logger);
@@ -49,7 +52,10 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
             observers: 0,
             dnd: null,
             alwaysNotify: null,
-            retentionTime: 0
+            retentionTime: 0,
+            sfuApp: null,
+            activeCallIds: null,
+            meetingsLoading: null
         }
     );
 
@@ -78,6 +84,15 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
 
     this.activeSearches = 0;
     self.members = {};
+    this.activeCallIds = new MegaDataMap(this);
+    this.ringingCalls = new MegaDataMap(this);
+    this.ringingCalls.addChangeListener(() => {
+        // force full re-render since basically, the root `Conversations` app may need to render/remove a dialog
+        megaChat.safeForceUpdate();
+    });
+
+
+    this.isMeeting = isMeeting;
 
     if (type === "private") {
         users.forEach(function(userHandle) {
@@ -144,7 +159,7 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
 
     // activity on a specific room (show, hidden, got new message, etc)
     self.rebind('onMessagesBuffAppend.lastActivity', function(e, msg) {
-        if (anonymouschat) {
+        if (is_chatlink) {
             return;
         }
 
@@ -281,6 +296,28 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
     });
 
 
+    // Handle chatd telling the client that the user is already in the room when visiting a chat link
+    if (is_chatlink && !is_chatlink.callId) {
+        const unbind = () => {
+            self.unbind('onMessagesHistoryDone.chatlinkAlreadyIn');
+            self.unbind('onMembersUpdated.chatlinkAlreadyIn');
+        };
+
+
+        self.rebind('onMembersUpdated.chatlinkAlreadyIn', (e, eventData) => {
+            if (eventData.userId === u_handle && eventData.priv >= 0) {
+                unbind();
+                return this.megaChat.routing.reinitAndOpenExistingChat(this.chatId, this.publicChatHandle);
+            }
+        });
+        self.rebind('onMessagesHistoryDone.chatlinkAlreadyIn', (e, data) => {
+            if (!data.chatdPersist) {
+                // we don't care about ChatdPersist messages...we want to know when the history had been received
+                // from the server (which means members list was received)
+                unbind();
+            }
+        });
+    }
     /**
      * Manually proxy contact related data change events, for more optimal UI rerendering.
      */
@@ -421,7 +458,7 @@ ChatRoom.STATE = {
 };
 
 ChatRoom.INSTANCE_INDEX = 0;
-ChatRoom.ANONYMOUS_PARTICIPANT = 'gTxFhlOd_LQ';
+ChatRoom.ANONYMOUS_PARTICIPANT = mega.BID;
 ChatRoom.ARCHIVED = 0x01;
 
 ChatRoom.MembersSet = function(chatRoom) {
@@ -482,6 +519,19 @@ ChatRoom.MembersSet.prototype.trackFromActionPacket = function(ap, isMcf) {
             self.update(u_h, apMembers[u_h]);
         }
     });
+
+    // detect if I was added to a room
+    if (
+        !isMcf &&
+        ap.m === 1 &&
+        !ap.n &&
+        ap.url &&
+        ap.ou !== u_handle &&
+        typeof ap.p === 'undefined' &&
+        !ap.topicChange
+    ) {
+        self.chatRoom.trigger('onMeAdded', ap.ou);
+    }
 };
 
 ChatRoom.MembersSet.prototype.init = function(handle, privilege) {
@@ -526,12 +576,11 @@ ChatRoom.prototype.trackMemberUpdatesFromActionPacket = function(ap, isMcf) {
  * If there is no call or there is no chatd chat with this chatid, returns an empty array
  */
 ChatRoom.prototype.getCallParticipants = function() {
-    var chat = this.getChatIdMessages();
-    if (!chat) {
+    var ids = this.activeCallIds.keys();
+    if (ids.length === 0) {
         return [];
-    } else {
-        return Object.keys(chat.callInfo.participants);
     }
+    return this.activeCallIds[ids[0]];
 };
 
 ChatRoom.prototype.getChatIdMessages = function() {
@@ -723,45 +772,6 @@ ChatRoom.prototype.isOnlineForCalls = function() {
     return chatdChat.loginState() >= LoginState.HISTDONE;
 };
 
-ChatRoom.prototype._retrieveTurnServerFromLoadBalancer = function(timeout) {
-    'use strict';
-
-    var self = this;
-    var anonId = "";
-    var $promise = new MegaPromise();
-
-    if (self.megaChat.rtc && self.megaChat.rtc.ownAnonId) {
-        anonId = self.megaChat.rtc.ownAnonId;
-    }
-
-    M.xhr({
-        timeout: timeout || 10000,
-        url: "https://" + self.megaChat.options.loadbalancerService + "/?service=turn&anonid=" + anonId
-    }).then(function(ev, r) {
-            r = JSON.parse(r);
-            if (r.turn && r.turn.length > 0) {
-                var servers = [];
-                r.turn.forEach(function(v) {
-                    var transport = v.transport || 'udp';
-
-                    servers.push({
-                        urls: 'turn:' + v.host + ':' + v.port + '?transport=' + transport,
-                        username: "inoo20jdnH",
-                        credential: '02nNKDBkkS'
-                    });
-                });
-                self.megaChat.rtc.updateIceServers(servers);
-            }
-
-            $promise.resolve();
-        })
-        .catch(function() {
-            $promise.reject.apply($promise, arguments);
-        });
-
-    return $promise;
-};
-
 /**
  * Check whether a chat is archived or not.
  *
@@ -781,9 +791,7 @@ ChatRoom.prototype.isArchived = function() {
  */
 ChatRoom.prototype.isDisplayable = function() {
     var self = this;
-    return ((self.showArchived === true) ||
-            !self.isArchived() ||
-            (self.callManagerCall && self.callManagerCall.isActive()));
+    return self.showArchived === true || !self.isArchived() || self.activeCall;
 };
 
 /**
@@ -1229,17 +1237,43 @@ ChatRoom.prototype.updatePublicHandle = function(d, callback) {
     return megaChat.plugins.chatdIntegration.updateChatPublicHandle(self.chatId, d, callback);
 };
 
+
+/**
+ * Returns true if the current user is in the members list
+ *
+ * @returns {boolean}
+ */
+ChatRoom.prototype.iAmInRoom = function() {
+    return !(!this.members.hasOwnProperty(u_handle) || this.members[u_handle] === -1);
+};
+
 /**
  * Join a chat via a public chat handle
  */
 ChatRoom.prototype.joinViaPublicHandle = function() {
     var self = this;
 
-    if ((
-            !self.members.hasOwnProperty(u_handle) || self.members[u_handle] === -1
-        ) && self.type === "public" && self.publicChatHandle) {
+    // Standalone page.
+    if (!fminitialized && is_chatlink) {
+        // is logged in?
+        if (u_type) {
+            return new Promise((res, rej) => {
+                self.megaChat.plugins.chatdIntegration.joinChatViaPublicHandle(self)
+                    .then(() => {
+                        self.megaChat.routing.reinitAndOpenExistingChat(self.chatId, self.publicChatHandle)
+                            .then(res, rej);
+                    }, (ex) => {
+                        console.error("Failed joining a chat room (u_type)", ex);
+                        rej(ex);
+                    });
+            });
+        }
+        return;
+    }
+    if (!self.iAmInRoom() && self.type === "public" && self.publicChatHandle) {
         return megaChat.plugins.chatdIntegration.joinChatViaPublicHandle(self);
     }
+    return Promise.reject();
 };
 
 /**
@@ -1301,9 +1335,6 @@ ChatRoom.prototype.show = function() {
     var self = this;
 
     if (self.isCurrentlyActive) {
-        if (!self.messagesBlockEnabled && self.callManagerCall && self.getUnreadCount() > 0) {
-            self.trigger('toggleMessages');
-        }
         return false;
     }
     self.megaChat.hideAllChats();
@@ -1398,9 +1429,10 @@ ChatRoom.prototype.isLoading = function() {
 /**
  * Returns relative url for this room
  *
+ * @param {boolean} getRawLink ture/false to return the raw link to fm/chat/c/... and ignore the is_chatlink flag
  * @returns {string}
  */
-ChatRoom.prototype.getRoomUrl = function() {
+ChatRoom.prototype.getRoomUrl = function(getRawLink) {
     var self = this;
 
     if (self.type === "private") {
@@ -1410,10 +1442,10 @@ ChatRoom.prototype.getRoomUrl = function() {
             return "fm/chat/p/" + contact.u;
         }
     }
-    else if (self.type === "public" && self.publicChatHandle && self.publicChatKey) {
+    else if (!getRawLink && is_chatlink && self.type === "public" && self.publicChatHandle && self.publicChatKey) {
         return "chat/" + self.publicChatHandle + "#" + self.publicChatKey;
     }
-    else if (self.type === "public" && !self.publicChatHandle) {
+    else if (self.type === "public") {
         return "fm/chat/c/" + self.roomId;
     }
     else if (self.type === "group" || self.type === "public") {
@@ -1783,6 +1815,7 @@ ChatRoom.prototype.onUploadStart = function(data) {
 };
 
 ChatRoom.prototype.uploadFromComputer = function() {
+    this.scrolledToBottom = true;
     $('#fileselect1').trigger('click');
 };
 
@@ -1896,7 +1929,7 @@ ChatRoom._fnRequireParticipantKeys = function(fn, scope) {
 
         return ChatdIntegration._ensureKeysAreLoaded(undefined, participants)
             .done(function() {
-                origFn.apply(self, args)
+                origFn.apply(self, args);
             })
             .fail(function() {
                 self.logger.error("Failed to retr. keys.");
@@ -1904,25 +1937,154 @@ ChatRoom._fnRequireParticipantKeys = function(fn, scope) {
     };
 };
 
-ChatRoom.prototype.startAudioCall = ChatRoom._fnRequireParticipantKeys(function() {
-    var self = this;
-    return self.megaChat.plugins.callManager.startCall(self, {audio: true, video:false});
-});
 
-ChatRoom.prototype.joinCall = ChatRoom._fnRequireParticipantKeys(function() {
-    var self = this;
-    assert(self.type === "group" || self.type === "public", "Can't join non-group chat call.");
-
-    if (self.megaChat.activeCallManagerCall) {
-        self.megaChat.activeCallManagerCall.endCall();
+ChatRoom.prototype.joinCall = ChatRoom._fnRequireParticipantKeys(function(audio, video, callId) {
+    // return self.megaChat.plugins.callManager.joinCall(self, {audio: true, video:false});
+    if (this.activeCallIds.length === 0) {
+        return;
+    }
+    if (!megaChat.hasSupportForCalls) {
+        return;
+    }
+    if (this.meetingsLoading) {
+        return;
     }
 
-    return self.megaChat.plugins.callManager.joinCall(self, {audio: true, video:false});
+    this.meetingsLoading = l.joining /* `Joining` */;
+
+    this.rebind("onCallEnd.start", (e, data) => {
+        if (data.callId === callId) {
+            // ensure that the Loading/Joining/Starting overlay is removed if the call ended
+            // (or had failed to start)
+            this.meetingsLoading = false;
+        }
+    });
+
+    callId = callId || this.activeCallIds.keys()[0];
+    asyncApiReq({'a': 'mcmj', 'cid': this.chatId, "mid": callId})
+        .then((r) => {
+            var app = new SfuApp(this, callId);
+            window.sfuClient = app.sfuClient = new SfuClient(
+                u_handle,
+                app,
+                (
+                    this.protocolHandler.chatMode === strongvelope.CHAT_MODE.PUBLIC &&
+                    str_to_ab(this.protocolHandler.unifiedKey)
+                ),
+                {
+                    'speak': true,
+                    'moderator': true
+                },
+                r.url.replace("https://", "wss://")
+            );
+            app.sfuClient.muteAudio(!audio);
+            app.sfuClient.muteCamera(!video);
+            app.sfuClient.connect(r.url, callId, this.type !== "private");
+        }, () => {
+            this.meetingsLoading = false;
+            this.unbind("onCallEnd.start");
+        });
+
 });
 
+
+ChatRoom.prototype.rejectCall = function(callId) {
+    if (this.activeCallIds.length === 0) {
+        return;
+    }
+
+    callId = callId || this.activeCallIds.keys()[0];
+
+    if (this.type === "private") {
+        return asyncApiReq({
+            'a': 'mcme',
+            'cid': this.chatId,
+            'mid': callId
+        });
+    }
+    return Promise.resolve();
+};
+
+/**
+ * Used in "chat link" pages to join the user before joining the call if needed.
+ *
+ * @param {boolean} audioFlag
+ * @param {boolean} videoFlag
+ */
+ChatRoom.prototype.joinCallFromLink = function(audioFlag, videoFlag) {
+    loadingDialog.show();
+    if (this.iAmInRoom()) {
+        this.joinCall(audioFlag, videoFlag);
+        loadingDialog.hide();
+    }
+    else {
+        this.joinViaPublicHandle()
+            .then(() => {
+                this.joinCall(audioFlag, videoFlag);
+            })
+            .catch(() => {
+                console.error("Joining failed.");
+            })
+            .always(function() {
+                loadingDialog.hide();
+            });
+    }
+};
+
+ChatRoom.prototype.startAudioCall = ChatRoom._fnRequireParticipantKeys(function() {
+    return this.startCall(true, false);
+});
 ChatRoom.prototype.startVideoCall = ChatRoom._fnRequireParticipantKeys(function() {
-    var self = this;
-    return self.megaChat.plugins.callManager.startCall(self, {audio: true, video: true});
+    return this.startCall(true, true);
+});
+ChatRoom.prototype.startCall = ChatRoom._fnRequireParticipantKeys(function(audio, video) {
+    if (!megaChat.hasSupportForCalls) {
+        return;
+    }
+    // return self.megaChat.plugins.callManager.startCall(self, {audio: true, video: true});
+
+    if (this.activeCallIds.length > 0) {
+        this.joinCall(this.activeCallIds.keys()[0]);
+        return;
+    }
+
+    this.meetingsLoading = l.starting /* `Starting` */;
+
+    const opts = {'a': 'mcms', 'cid': this.chatId};
+    if (localStorage.sfuId) {
+        opts.sfu = parseInt(localStorage.sfuId, 10);
+    }
+
+    asyncApiReq(opts)
+        .then((r) => {
+            var app = new SfuApp(this, r.callId);
+            window.sfuClient = app.sfuClient = new SfuClient(
+                u_handle,
+                app,
+                (
+                    this.protocolHandler.chatMode === strongvelope.CHAT_MODE.PUBLIC &&
+                    str_to_ab(this.protocolHandler.unifiedKey)
+                ),
+                {
+                    'speak': true,
+                    'moderator': true
+                },
+                r.sfu.replace("https://", "wss://")
+            );
+            app.sfuClient.muteAudio(!audio);
+            app.sfuClient.muteCamera(!video);
+
+            this.rebind("onCallEnd.start", (e, data) => {
+                if (data.callId === r.callId) {
+                    this.meetingsLoading = false;
+                }
+            });
+            // r.callId
+            sfuClient.connect(r.sfu.replace("https://", "wss://"), r.callId, this.type !== "private");
+        }, () => {
+            this.meetingsLoading = false;
+            this.unbind("onCallEnd.start");
+        });
 });
 
 
@@ -1930,8 +2092,15 @@ ChatRoom.prototype.stateIsLeftOrLeaving = function() {
     return (
         this.state == ChatRoom.STATE.LEFT || this.state == ChatRoom.STATE.LEAVING ||
         (
-            this.state === ChatRoom.STATE.READY && this.membersSetFromApi &&
-            !this.membersSetFromApi.members.hasOwnProperty(u_handle)
+            /* Chatlinks don't receive members list from API, so we trust chatd */
+            (
+                !is_chatlink  &&
+                this.state === ChatRoom.STATE.READY && this.membersSetFromApi &&
+                !this.membersSetFromApi.members.hasOwnProperty(u_handle)
+            ) || (
+                /* if its a chatlink, trust chatd members list */
+                is_chatlink && !this.members.hasOwnProperty(u_handle)
+            )
         )
     );
 };
@@ -2031,54 +2200,42 @@ ChatRoom.prototype.truncate = function() {
     }
 };
 
+ChatRoom.prototype.getActiveCalls = function() {
+    return this.activeCallIds.map((parts, id) => {
+        return parts.indexOf(u_handle) > -1 ? id : undefined;
+    }).length > 0;
+};
+
+
 ChatRoom.prototype.haveActiveCall = function() {
-    return this.callManagerCall && this.callManagerCall.isActive() === true;
+    return this.getActiveCalls().length > 0;
 };
 
 ChatRoom.prototype.haveActiveOnHoldCall = function() {
-    return this.callManagerCall && this.callManagerCall.rtcCall.isOnHold();
+    let activeCallIds = this.getActiveCalls();
+    for (var i = 0; i < activeCallIds.length; i++) {
+        let call = megaChat.plugins.callManager2.calls[this.chatId + "_" + activeCallIds[i]];
+        if (call && call.av & SfuClient.Av.onHold) {
+            return true;
+        }
+    }
+    return false;
 };
 
 ChatRoom.prototype.havePendingGroupCall = function() {
-    var self = this;
-    var haveCallParticipants = self.getCallParticipants().length > 0;
-    if (self.type !== "group" && self.type !== "public") {
+    if (this.type !== "group" && this.type !== "public") {
         return false;
     }
-    var call = self.callManagerCall;
-    if (call && (
-            call.state === CallManagerCall.STATE.WAITING_RESPONSE_INCOMING ||
-            call.state === CallManagerCall.STATE.WAITING_RESPONSE_OUTGOING
-        )
-    ) {
-        return true;
-    }
-    else if (!self.callManagerCall && haveCallParticipants) {
-        return true;
-    }
-    else {
-        return false;
-    }
+    return this.activeCallIds.length > 0;
 };
+
 /**
  * Returns whether there is a call in the room that we can answer (1on1 or group) or join (group)
  * This is used e.g. to determine whether to display a small handset icon in the notification area
  * for the room in the LHP
  */
 ChatRoom.prototype.havePendingCall = function() {
-    var self = this;
-    var call = self.callManagerCall;
-    if (call) {
-        return (
-            call.state === CallManagerCall.STATE.WAITING_RESPONSE_INCOMING ||
-            call.state === CallManagerCall.STATE.WAITING_RESPONSE_OUTGOING
-        );
-    }
-    else if (self.type === "group" || self.type === "public") {
-        return self.getCallParticipants().length > 0;
-    } else {
-        return false;
-    }
+    return this.activeCallIds.length > 0;
 };
 
 /**
@@ -2116,13 +2273,11 @@ ChatRoom.prototype.callParticipantsUpdated = function(
         msgId = self.getActiveCallMessageId(true);
     }
 
-    var callParts = self.getCallParticipants();
-    var uniqueCallParts = {};
-    callParts.forEach(function(handleAndSid) {
-        var handle = base64urlencode(handleAndSid.substr(0, 8));
-        uniqueCallParts[handle] = true;
-    });
-    self.uniqueCallParts = uniqueCallParts;
+    const callParts = self.getCallParticipants() || [];
+    self.uniqueCallParts = {};
+    for (let i = 0; i < callParts.length; i++) {
+        self.uniqueCallParts[callParts[i]] = true;
+    }
 
     var msg = self.messagesBuff.getMessageById(msgId);
     msg && msg.wrappedChatDialogMessage && msg.wrappedChatDialogMessage.trackDataChange();
@@ -2189,7 +2344,7 @@ ChatRoom.prototype.scrollToMessageId = function(msgId, index, retryActive) {
     self.isScrollingToMessageId = true;
 
     if (!self.$rConversationPanel) {
-        self.one('onComponentDidMount.scrollToMsgId' + msgId, function() {
+        self.one('onHistoryPanelComponentDidMount.scrollToMsgId' + msgId, function() {
             self.scrollToMessageId(msgId, index);
         });
         return;

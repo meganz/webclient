@@ -25,25 +25,26 @@ function GeoLocation(props) {
     }
 
     return (
-        <div className="geolocation" onClick={() => handleOnclick(latitude, lng)}>
-            <div className="geolocation__details">
-                <figure className="geolocation__img">
-                </figure>
-                <ul className="geolocation__data-list">
-                    <li>
+        <div className="geolocation-container">
+            <div className="geolocation" onClick={() => handleOnclick(latitude, lng)}>
+                <div className="geolocation__details">
+                    <div className="geolocation__icon">
+                        <i className="sprite-fm-mono icon-location" />
+                    </div>
+                    <ul className="geolocation__data-list">
+                        <li>
                         <span className="geolocation__title">
                             {l[20789]}
                         </span>
-                    </li>
-                    <li>
-                        <p>
-                            <span className="geolocation__coordinates-icon"></span>
-                            <span className="geolocation__coordinates">
-                                {'https://maps.google.com'}
-                            </span>
-                        </p>
-                    </li>
-                </ul>
+                        </li>
+                        <li>
+                            <p>
+                                <span className="geolocation__coordinates-icon" />
+                                <span className="geolocation__coordinates">https://maps.google.com</span>
+                            </p>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </div>
     );

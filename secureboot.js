@@ -1,7 +1,7 @@
 // Release version information is replaced by the build scripts
 var buildVersion = { website: '', chrome: '', firefox: '', commit: '', timestamp: '', dateTime: '' };
 
-var m;
+var m, tmp;
 var browserUpdate = 0;
 var apipath;
 var pageLoadTime;
@@ -58,7 +58,7 @@ var is_huawei = is_mobile && (ua.indexOf('huawei') > 0 || ua.indexOf('hmscore') 
 
 if (is_android && !is_huawei) {
     // detect huawei devices by model
-    var tmp = [
+    tmp = [
         'ana-al00', 'ana-nx9', 'ang-an00', 'art-l28', 'brq-an00', 'cdy-nx9b', 'dra-lx9', 'els-n39', 'els-nx9',
         'jef-nx9', 'jny-lx2', 'lio-an00m', 'lio-l29', 'lio-n29', 'med-lx9', 'noh-an00', 'noh-lg', 'noh-nx9',
         'nop-an00', 'oce-an10', 'oce-an50', 'tas-l29', 'tet-an00'
@@ -74,7 +74,7 @@ if (is_android && !is_huawei) {
 // @todo get rid of 'm' around the codebase!
 m = !!is_mobile;
 
-var tmp = getCleanSitePath();
+tmp = getCleanSitePath();
 var is_selenium = !ua.indexOf('mozilla/5.0 (selenium; ');
 var is_embed = String(location.pathname).substr(0, 6) === '/embed' || tmp.substr(0, 2) === 'E!';
 var is_drop = location.pathname === '/drop' || tmp.substr(0, 2) === 'D!';
@@ -93,6 +93,7 @@ var is_webcache = location.host === 'webcache.googleusercontent.com';
 var is_livesite = location.host === 'mega.nz' || location.host === 'mega.io'
     || location.host === 'smoketest.mega.nz' || is_extension;
 var is_litesite = !is_embed && location.host === 'mega.io';
+var is_eplusplus = false;
 
 self.fetchStreamSupport = (
     window.fetch && !window.MSBlobBuilder
@@ -354,13 +355,6 @@ function isHelpLink(page) {
     'use strict';
     page = getCleanSitePath(page);
     return page.indexOf('help/') === 0;
-}
-
-// Check whether the provided `page` points to a chat link
-function isChatLink(page) {
-    'use strict';
-    page = mURIDecode(page).replace(/^[#/]+/, '');
-    return page.indexOf('chat/') === 0 ? page : false;
 }
 
 // Safer wrapper around decodeURIComponent
@@ -733,6 +727,8 @@ if (location.host === 'mega.io') {
     tmp = undefined;
 }
 
+tmp = is_mobile && Object(window.clientInformation).vendor === 'Google Inc.';
+
 var mega = {
     ui: {},
     state: 0,
@@ -741,7 +737,7 @@ var mega = {
     updateURL: defaultStaticPath + 'current_ver.txt',
     chrome: (
         typeof window.chrome === 'object'
-        && window.chrome.runtime !== undefined
+        && (window.chrome.runtime !== undefined || tmp)
         && String(window.webkitRTCPeerConnection).indexOf('native') > 0
     ),
     browserBrand: [
@@ -907,6 +903,21 @@ Object.defineProperty(mega, 'user', {
     get: function() {
         'use strict';
         return typeof u_attr === 'object' && u_attr.u === window.u_handle && u_attr.u || false;
+    }
+});
+
+Object.defineProperty(mega, 'BID', {
+    get: function() {
+        'use strict';
+        if (!mega.flags.bid) {
+            return 'gTxFhlOd_LQ';
+        }
+        else if (mega.flags.bid === 3) {
+            return '-aw4PbDRAKo';
+        }
+
+        console.error("Invalid/unknown bid.");
+        return 'gTxFhlOd_LQ';
     }
 });
 
@@ -2898,6 +2909,9 @@ else if (!browserUpdate) {
         // CSS Revamp changes
         jsl.push({f:'css/components/fm-left-pane.css', n: 'components_fm_left_pane_css', j:2, w:30, c:1, d:1, cache:1});
 
+        // `Meetings` UI styles
+        jsl.push({f:'css/chat-bundle.css', n: 'meetings_css', j:2, w:30, c:1, d:1, cache:1});
+
         jsl.push({f:'html/key.html', n: 'key', j:0});
         jsl.push({f:'html/login.html', n: 'login', j:0});
         jsl.push({f:'html/fm.html', n: 'fm', j:0, w:3});
@@ -2937,10 +2951,6 @@ else if (!browserUpdate) {
         jsl.push({f:'makecache.js', n: 'makecache', j:1});
     }
 
-    if (localStorage.enableDevtools) {
-        jsl.push({f:'dont-deploy/transcripter/exporter.js', n: 'tse_js', j:1});
-    }
-
     if (lang === 'ar' || lang === 'fa') {
         jsl.push({f:'css/lang_ar.css', n: 'lang_arabic_css', j: 2, w: 30, c: 1, d: 1, m: 1});
     }
@@ -2952,6 +2962,7 @@ else if (!browserUpdate) {
     // Load files common to all mobile pages
     if (is_mobile) {
         jsl.push({f:'html/top-mobile.html', n: 'top-mobile', j:0});
+        jsl.push({f:'html/mobile-add-contact-card.html', n: 'mobile-add-contact-card', j:0});
         jsl.push({f:'css/mobile.css', n: 'mobile_css', j: 2, w: 30, c: 1, d: 1, m: 1});
         jsl.push({f:'css/mobile-help.css', n: 'mobile_css', j: 2, w: 30, c: 1, d: 1, m: 1});
         jsl.push({f:'css/mobile-top-menu.css', n: 'mobile_top_menu_css',  j: 2, w: 30, c: 1, d: 1, m: 1});
@@ -3111,6 +3122,7 @@ else if (!browserUpdate) {
         jsl.push({f:'html/js/propay.js', n: 'propay_js', j:1});
         jsl.push({f:'html/js/propay-dialogs.js', n: 'propay_js', j:1});
         jsl.push({f:'js/ui/dropdowns.js', n: 'dropdowns_js', j:1});
+        jsl.push({f:'css/animations.css', n: 'animations_css', j:2, w:30, c:1, d:1, cache:1});
         jsl.push({f:'css/pro.css', n: 'pro_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/about.css', n: 'about_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/media-viewer.css', n: 'media_viewer_css', j:2,w:5,c:1,d:1,cache:1});
@@ -3205,6 +3217,9 @@ else if (!browserUpdate) {
     // If the TextEncoder is not supported natively (IE, Edge) then load the polyfill
     if (typeof TextEncoder !== 'function') {
         jsl.push({f:'js/vendor/encoding.js', n: 'encoding_js', j:1});
+    }
+    if (page.substr(0, 5) === 'chat/') {
+        jsl.push({f:'html/chatlink.html', n: 'chatlink', j: 0});
     }
 
     var jsl2 =
@@ -3313,6 +3328,7 @@ else if (!browserUpdate) {
         'special_css': {f:'css/troy-hunt.css', n:'special_css', j:2}
     };
 
+    /* eslint-disable max-len */
     var jsl3 = {
         'chat': {
             /* chat related css */
@@ -3340,19 +3356,16 @@ else if (!browserUpdate) {
             'autolinker_js': {f:'js/vendor/autolinker.js', n: 'autolinker_js', j:1},
             'strongvelope_js': {f:'js/chat/strongvelope.js', n: 'strongvelope_js', j:1},
             'adapter_js': {f:'js/vendor/chat/adapter.js', n: 'adapter_js', j:1},
-            'megawebrtcadapt_js': {f:'js/chat/webrtcAdapter.js', n: 'megawebrtcadapt_js', j:1},
-            'rtcstats_js': {f:'js/chat/rtcStats.js', n: 'rtcstats_js', j:1},
-            'webrtcsdp_js': {f:'js/chat/webrtcSdp.js', n: 'webrtcsdp_js', j:1},
-            'webrtc_js': {f:'js/chat/webrtc.js', n: 'webrtc_js', j:1},
-            'webrtcimpl_js': {f:'js/chat/webrtcImpl.js', n: 'webrtcimpl_js', j:1},
             'chatdpersist_js': {f:'js/chat/chatdPersist.js', n: 'chatdpersist_js', j:1},
             'chatd_js': {f:'js/chat/chatd.js', n: 'chatd_js', j:1},
+            'sfuClient_js': {f:'js/chat/sfuClient.js', n: 'sfuClient_js', j:1},
+            'sfuAppImpl_js': {f:'js/chat/sfuAppImpl.js', n: 'sfuAppImpl_js', j:1},
             'incomingcalldialog_js': {f:'js/chat/ui/incomingCallDialog.js', n: 'incomingcalldialog_js', j:1},
             'emojiUtils_js': {f:'js/utils/emoji.js', n: 'emojiUtils_js', j:1},
             'chatdInt_js': {f:'js/chat/plugins/chatdIntegration.js', n: 'chatdInt_js', j:1},
-            'callManager_js': {f:'js/chat/plugins/callManager.js', n: 'callManager_js', j:1},
+            'callManager2_js': {f:'js/chat/plugins/callManager2.js', n: 'callManager2_js', j:1},
             'geoLocationLinks_js': {f:'js/chat/plugins/geoLocationLinks.js', n: 'geoLocationLinks_js', j:1},
-            'cne_js': {f:'js/chat/callNotificationsEngine.js', n: 'cne_js', j:1},
+            'cti_js': {f:'js/chat/plugins/chatToastIntegration.js', n: 'cti_js', j:1},
             'urlFilter_js': {f:'js/chat/plugins/urlFilter.js', n: 'urlFilter_js', j:1},
             'emoticonShortcutsFilter_js': {f:'js/chat/plugins/emoticonShortcutsFilter.js', n: 'emoticonShortcutsFilter_js', j:1},
             'emoticonsFilter_js': {f:'js/chat/plugins/emoticonsFilter.js', n: 'emoticonsFilter_js', j:1},
@@ -3361,7 +3374,7 @@ else if (!browserUpdate) {
             'chatnotifications_js': {f:'js/chat/plugins/chatNotifications.js', n: 'chatnotifications_js', j:1},
             'callfeedback_js': {f:'js/chat/plugins/callFeedback.js', n: 'callfeedback_js', j:1},
             'persistedTypeArea_js': {f:'js/chat/plugins/persistedTypeArea.js', n: 'persistedTypeArea_js', j:1, w:1},
-            'presencedIntegration_js': {f:'js/chat/plugins/presencedIntegration.js', n: 'presInt_js', j:1, w:1},
+            'presencedIntegration_js': {f:'js/chat/plugins/presencedIntegration.js', n: 'presencedIntegration_js', j:1, w:1},
             'richpreviewsFilt_js': {f:'js/chat/plugins/richpreviewsFilter.js', n: 'richpreviewsFilt_js', j:1, w:1},
             'chatStats_js': {f:'js/chat/plugins/chatStats.js', n: 'chatStats_js', j:1, w:1},
             'crm_js': {f:'js/connectionRetryManager.js', n: 'crm_js', j:1},
@@ -3439,6 +3452,18 @@ else if (!browserUpdate) {
     if (is_mobile) {
         // Page specific
         subpages['!'] = ['download_js'];
+    }
+
+    if (page.substr(0, 5) === 'chat/') {
+        // jsl = [{f: langFilepath, n: 'lang', j: 3}];
+        // ^ @todo: consider loading only needed files...
+        // jsl.push({f:'html/chatlink.html', n: 'chatlink', j: 0});
+
+        tmp = Object.keys(jsl3.chat);
+        for (var u = 0; u < tmp.length; ++u) {
+            jsl.push(jsl3.chat[tmp[u]]);
+        }
+        tmp = 0;
     }
 
     page = ({
@@ -3875,7 +3900,7 @@ else if (!browserUpdate) {
         var rightProgressBlock = document.getElementById('loadinganimright');
 
         // Fix exception thrown when going from mobile web /login page to mobile web /register page
-        if (is_mobile && (rightProgressBlock === null)) {
+        if (!rightProgressBlock || !leftProgressBlock) {
             return false;
         }
 

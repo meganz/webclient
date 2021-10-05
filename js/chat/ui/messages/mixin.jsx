@@ -55,6 +55,11 @@ class ConversationMessageMixin extends ContactAwareComponent {
         this.addContactListeners();
     }
 
+    haveMeetingsCall = () => {
+        // Meetings call is currently ongoing and the `HistoryPanel` is active?
+        return document.querySelector('.meetings-call') && document.querySelector('.chat-opened');
+    };
+
     removeContactListeners() {
         const users = this._contactChangeListeners;
 
@@ -345,6 +350,7 @@ class ConversationMessageMixin extends ContactAwareComponent {
                         'data-simpletipposition': "top"
                     }}>
                     <DropdownEmojiSelector
+                        horizOffset={this.haveMeetingsCall() ? -150 : 0}
                         onActiveChange={this._emojiOnActiveStateChange}
                         className="popup emoji reactions-dropdown"
                         onClick={this.emojiSelected}
@@ -378,6 +384,7 @@ class ConversationMessageMixin extends ContactAwareComponent {
                 }}
             >
                 <DropdownEmojiSelector
+                    horizOffset={this.haveMeetingsCall() ? -110 : 0}
                     noArrow={true}
                     onActiveChange={this._emojiOnActiveStateChange}
                     className="popup emoji reactions-dropdown"

@@ -129,7 +129,7 @@ export default class Local extends AbstractGenericMessage {
             return console.error(`Message with type: ${message.type} -- no text string defined. Message: ${message}`);
         }
 
-        messageText = CallManager._getMultiStringTextContentsForMessage(
+        messageText = CallManager2._getMltiStrTxtCntsForMsg(
             message,
             messageText.splice ? messageText : [messageText],
             true
@@ -248,9 +248,17 @@ export default class Local extends AbstractGenericMessage {
         // https://mega.nz/file/RIkX2YjZ#aAtDzJCR1ZZYRGTpPwnL3iBS9SyG9WhPlTEpB5dVv7g
         // -------------------------------------------------------------------------
 
+        // debugging purposes
+        const callId = this.props.message?.meta?.callId;
+
+        let debugMsg = "";
+        if (d && callId) {
+            debugMsg = `: callId: ${callId}`;
+        }
         return (
             <div className="message date-time simpletip" data-simpletip={time2date(this.getTimestamp())}>
                 {this.getTimestampAsString()}
+                {debugMsg}
             </div>
         );
     }
@@ -287,8 +295,15 @@ export default class Local extends AbstractGenericMessage {
             <>
                 <div className="message text-block">
                     <div className="message call-inner-block">
-                        {this._getAvatarsListing()}
-                        <div className="call-info-container" dangerouslySetInnerHTML={{ __html: this._getText() }} />
+                        <div className="call-info">
+                            <div
+                                className="call-info-container"
+                                dangerouslySetInnerHTML={{ __html: this._getText() }} />
+                            <div className="call-info-avatars">
+                                {this._getAvatarsListing()}
+                                <div className="clear" />
+                            </div>
+                        </div>
                     </div>
                 </div>
                 {getState && getState() === Message.STATE.NOT_SENT ? null : this._getButtons()}

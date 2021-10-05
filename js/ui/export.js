@@ -1942,9 +1942,7 @@ var exportExpiry = {
 
             var $thumb = $('.video-thumbnail img', $embedTab).attr('src', noThumbURI);
 
-            getImage(n, 1).then(function(uri) {
-                $thumb.attr('src', uri);
-            }).catch(console.debug.bind(console));
+            getImage(n, 1).then((uri) => $thumb.attr('src', uri)).catch(dump);
 
             $('.code-field .code', $embedTab).rebind('click.selectTxt', function() {
                 selectText('embed-code-field');
@@ -2959,7 +2957,8 @@ var exportExpiry = {
         var $nodeId = $('#' + nodeId);
         var $tree = $('#treea_' + nodeId).add('#treea_os_' + nodeId).add('#treea_pl_' + nodeId);
 
-        if ($nodeId.length === 0 && M.currentdirid.indexOf('chat') === -1) {
+        // eslint-disable-next-line sonarjs/no-collapsible-if
+        if ($nodeId.length === 0 && !String(M.currentdirid).includes('chat')) {
 
             // not inserted in the DOM, retrieve the nodeMap cache and update that DOM node instead.
             if (M.megaRender && M.megaRender.hasDOMNode(nodeId)) {

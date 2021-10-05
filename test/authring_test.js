@@ -37,7 +37,7 @@ describe("authring unit test", function() {
                                   + 'KqWMI8OX3eXT45+IyWCTTA5yeip/GThvkS8O2HBF'
                                   + 'aNLvSAFq5/5lQG');
 
-    var SERIALISED_RING_ED25519 = atob('me3456789xwh/jHfoVSiYWJr+FQEb9InG3vtSwDKi7jnrvz3HCH+Md+hVKJhYmv4VARv0icbe+1LAg==');
+    var SERIALISED_RING_ED25519 = atob('you456789xwh/jHfoVSiYWJr+FQEb9InG3vtSwI=');
     var RING_ED25519 = {'me3456789xw': {fingerprint: ED25519_STRING_FINGERPRINT,
                                         method: ns.AUTHENTICATION_METHOD.SEEN,
                                         confidence: ns.KEY_CONFIDENCE.UNSURE},
@@ -103,14 +103,13 @@ describe("authring unit test", function() {
 
         it('_splitSingleTAuthRecord()', function() {
             var result = ns._deserialiseRecord(SERIALISED_RING_ED25519);
-            assert.strictEqual(result.userhandle, 'me3456789xw');
-            assert.deepEqual(result.value, RING_ED25519['me3456789xw']);
-            assert.strictEqual(result.rest,
-                base64urldecode('you456789xw') + ED25519_STRING_FINGERPRINT + String.fromCharCode(0x02));
+            assert.strictEqual(result.userhandle, 'you456789xw');
+            assert.deepEqual(result.value, RING_ED25519['you456789xw']);
+            assert.strictEqual(result.rest, '');
         });
 
         it('deserialise()', function() {
-            assert.deepEqual(ns.deserialise(SERIALISED_RING_ED25519), RING_ED25519);
+            assert.deepEqual(ns.deserialise(SERIALISED_RING_ED25519), {you456789xw: RING_ED25519.you456789xw});
         });
     });
 
@@ -291,20 +290,14 @@ describe("authring unit test", function() {
             var aesKey = asmCrypto.bytes_to_string(asmCrypto.hex_to_bytes('0f0e0d0c0b0a09080706050403020100'));
 
             it("authring for Ed25519", function() {
+                var callback;
                 mStub(u_authring, 'Ed25519', RING_ED25519);
                 mStub(mega.attr, 'set').returns('foo');
                 mStub(window, 'u_handle', 'Nxmg3MOw0CI');
-                var fakePromise = { done: sinon.stub(),
-                                    fail: function() {}};
-                mStub(fakePromise, 'fail').returns(fakePromise);
+                var fakePromise = { then: (a0) => { callback = a0; return fakePromise}};
                 mStub(ns, 'onAuthringReady').returns(fakePromise);
-                var masterPromise = { resolve: sinon.stub(),
-                                      linkDoneAndFailTo: sinon.stub()};
-                mStub(window, 'MegaPromise').returns(masterPromise);
-                assert.strictEqual(ns.setContacts('Ed25519'), masterPromise);
-                var callback = fakePromise.done.args[0][0];
+                assert.strictEqual(ns.setContacts('Ed25519'), fakePromise);
                 callback();
-                assert.strictEqual(masterPromise.linkDoneAndFailTo.args[0][0], 'foo');
                 assert.strictEqual(mega.attr.set.callCount, 1);
                 assert.lengthOf(mega.attr.set.args[0], 4);
                 assert.strictEqual(mega.attr.set.args[0][0], 'authring');
@@ -323,18 +316,12 @@ describe("authring unit test", function() {
                     'h': 'Nxmg3MOw0CI',
                     'c': 2
                 };
-                
-                var fakePromise = { done: sinon.stub(),
-                    fail: function() {}};
-                mStub(fakePromise, 'fail').returns(fakePromise);
+
+                var callback;
+                var fakePromise = { then: (a0) => { callback = a0; return fakePromise}};
                 mStub(ns, 'onAuthringReady').returns(fakePromise);
-                var masterPromise = { resolve: sinon.stub(),
-                    linkDoneAndFailTo: sinon.stub()};
-                mStub(window, 'MegaPromise').returns(masterPromise);
-                assert.strictEqual(ns.setContacts('RSA'), masterPromise);
-                var callback = fakePromise.done.args[0][0];
+                assert.strictEqual(ns.setContacts('RSA'), fakePromise);
                 callback();
-                assert.strictEqual(masterPromise.linkDoneAndFailTo.args[0][0], 'foo');
                 assert.strictEqual(mega.attr.set.callCount, 1);
                 assert.lengthOf(mega.attr.set.args[0], 4);
                 assert.strictEqual(mega.attr.set.args[0][0], 'authRSA');
@@ -856,6 +843,7 @@ describe("authring unit test", function() {
                 var masterPromise = _stubMegaPromise(sinon);
                 var prefilledRsaKeysPromise = { linkDoneAndFailTo: sinon.stub() };
                 mStub(window, 'MegaPromise');
+                mStub(window, 'u_privk', 'private key');
                 MegaPromise.onCall(0).returns(masterPromise);
                 MegaPromise.onCall(1).returns(prefilledRsaKeysPromise);
                 mStub(MegaPromise, 'all').returns('combo');

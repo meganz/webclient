@@ -2052,6 +2052,9 @@ accountUI.plan = {
                     .catch(function(ex) {
                         loadingDialog.hide();
                         if (ex) {
+                            if (ex === ETOOMANY) {
+                                ex = l.redeem_etoomany;
+                            }
                             msgDialog('warninga', l[135], l[47], ex);
                         }
                     });

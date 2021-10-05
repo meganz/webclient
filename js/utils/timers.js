@@ -114,7 +114,7 @@ function delay(aProcID, aFunction, aTimeout) {
         q = delay.queue[aProcID] = Object.create(null);
 
         q.pun = aProcID;
-        q.tid = setTimeout(function(q) {
+        q.tid = setTimeout(() => {
             if (d > 2) {
                 console.debug('dispatching delayed function...', aProcID);
             }
@@ -127,7 +127,7 @@ function delay(aProcID, aFunction, aTimeout) {
             else {
                 delay(q.pun, q.tsk, rem);
             }
-        }, t, q);
+        }, t);
     }
     q.tde = t;
     q.tsk = aFunction;

@@ -1355,6 +1355,9 @@ mBroadcaster.once('boot_done', function populate_l() {
             `accounts#how-does-mega-pro-account-subscription-work-with-apple-in-app-purchases` +
             `-57732e9f886688e7028b45bd">`)
         .replace('[/A3]', '</a>');
+    l.redeem_etoomany = l.redeem_etoomany
+        .replace('[A]', `<a class="clickurl" href="/support">`)
+        .replace('[/A]', '</a>');
 
     var common = [
         15536, 16106, 16107, 16119, 16120, 16123, 16124, 16135, 16136, 16137, 16138, 16304, 16313, 16315, 16316,

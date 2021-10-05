@@ -2550,12 +2550,7 @@ function topmenuUI() {
 
             parent = e.target.parentNode;
             // if event is triggered by inner element of mega-button, try pull classname of the button.
-            if (parent.classList.contains('mega-button')) {
-                c = parent.className;
-            }
-            else {
-                c = e.target.className;
-            }
+            c = parent && parent.classList.contains('mega-button') ? parent.className : e.target.className;
         }
         elements = document.getElementsByClassName('js-more-menu menu-open');
 

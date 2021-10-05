@@ -357,6 +357,7 @@
     const saveLocally = async() => {
         let storage = localStorage;
 
+        /**
         if ('csp' in window) {
             await csp.init();
 
@@ -364,6 +365,7 @@
                 storage = sessionStorage;
             }
         }
+        /**/
 
         const config = await filter(fmconfig).catch(dump);
 

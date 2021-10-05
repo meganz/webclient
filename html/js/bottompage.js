@@ -67,7 +67,7 @@ var bottompage = {
         if ('csp' in window) {
             $cs.removeClass('hidden').rebind('click.csp', function() {
                 if (!this.classList.contains('top-menu-item')) {
-                    csp.showCookiesDialog('step2');
+                    csp.init().then((shown) => !shown && csp.showCookiesDialog('step2'));
                     return false;
                 }
             });

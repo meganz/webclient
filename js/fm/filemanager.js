@@ -1969,7 +1969,7 @@ FileManager.prototype.initContextUI = function() {
         $('.transfer-table tr.ui-selected').removeClass('ui-selected');
     });
 
-    if (localStorage.folderLinkImport) {
+    if (sessionStorage.folderLinkImport || $.onImportCopyNodes) {
         onIdle(M.importFolderLinkNodes.bind(M, false));
     }
 };

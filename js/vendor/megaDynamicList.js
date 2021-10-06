@@ -220,7 +220,7 @@
 
         this.options = $.extend({}, SETTINGS, options);
 
-        this._debug = localStorage.d || 0;
+        this._debug = d || 0;
     };
 
     /**

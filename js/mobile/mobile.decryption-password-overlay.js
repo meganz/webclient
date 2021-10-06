@@ -99,7 +99,7 @@ mobile.decryptionPasswordOverlay = {
 
                     getInfoPromise.done(function signupCodeGettingSuccessHandler(status, res) {
                         mySelf.$overlay.addClass('hidden');
-                        if (localStorage.d) {
+                        if (d) {
                             console.log(res);
                         }
                         if (!res.e || !res.firstname || !res.bpubk || !res.bu) {

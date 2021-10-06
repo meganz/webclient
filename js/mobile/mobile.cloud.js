@@ -37,6 +37,7 @@ mobile.cloud = {
 
 
         // Render the file manager header, folders, files and footer
+        this.initScrollBarToTop();
         this.initTitleMenu();
         this.renderHeader();
         this.initGridViewToggleHandler();
@@ -594,6 +595,15 @@ mobile.cloud = {
         }
 
         return $template;
+    },
+
+    /**
+     * Init the scroll bar to the top of the page
+     */
+    initScrollBarToTop: function() {
+        'use strict';
+
+        $('.fm-scrolling', '.mobile.file-manager-block').scrollTop(0);
     },
 
     /**

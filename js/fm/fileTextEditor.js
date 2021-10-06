@@ -94,7 +94,7 @@ mega.fileTextEditor = new function FileTextEditor() {
                 dlmanager.showOverQuotaDialog();
             }
             // local file does not exist
-            else if (ev === ENOENT) {
+            else if (ex === ENOENT) {
                 showToast('view', l[22]);
             }
             operationPromise.reject();

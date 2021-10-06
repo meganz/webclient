@@ -17,38 +17,27 @@ inherits(IndexedDBKVStorage, null);
 // sets fmdb reference and prefills the memory cache from the DB
 // (call this ONCE as soon as the user-specific IndexedDB is open)
 // (this is robust against an undefined fmdb reference)
-IndexedDBKVStorage.prototype.load = function() {
+IndexedDBKVStorage.prototype.load = async function() {
     'use strict';
-    var self = this;
-    return new MegaPromise(function(resolve) {
-        if (is_eplusplus) {
-            var pfx = 'e++' + self.name + '!';
-            M.getPersistentDataEntries(pfx, true)
-                .then(function(store) {
-                    var keys = Object.keys(store);
-                    for (var i = keys.length; i--;) {
-                        if (store[keys[i]]) {
-                            self.dbcache[keys[i].substr(pfx.length)] = store[keys[i]];
-                        }
-                        else if (d) {
-                            console.warn('Malformed data in entry.', keys[i], store[keys[i]]);
-                        }
-                    }
-                })
-                .always(resolve);
-            return;
+    if (window.is_eplusplus) {
+        const pfx = `e++${this.name}!`;
+        const store = await M.getPersistentDataEntries(pfx, true).catch(dump) || {};
+        const keys = Object.keys(store);
+        for (let i = keys.length; i--;) {
+            if (store[keys[i]]) {
+                this.dbcache[keys[i].substr(pfx.length)] = store[keys[i]];
+            }
+            else if (d) {
+                console.warn('Malformed data in entry.', keys[i], store[keys[i]]);
+            }
         }
-        if (!window.fmdb) {
-            return resolve();
+    }
+    else if (window.fmdb) {
+        const r = await fmdb.get(this.name).catch(dump) || [];
+        for (let i = r.length; i--;) {
+            this.dbcache[r[i].k] = r[i].v;
         }
-        fmdb.get(self.name)
-            .always(function(r) {
-                for (var i = r.length; i--;) {
-                    self.dbcache[r[i].k] = r[i].v;
-                }
-                resolve();
-            });
-    });
+    }
 };
 
 // flush new items / deletions to the DB (in channel 0, this should

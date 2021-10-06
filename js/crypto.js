@@ -407,6 +407,7 @@ function api_cancel(q) {
             // setting the "cancelled" flag ensures that
             // subsequent onerror/onload/onprogress callbacks are ignored.
             q.xhr.cancelled = true;
+            q.xhr.onprogress = q.xhr.onloadend = null;
             if (q.xhr.abort) q.xhr.abort();
             q.xhr = false;
         }
@@ -486,50 +487,74 @@ if (typeof Uint8Array.prototype.indexOf !== 'function' || is_firefox_web_ext) {
 }
 
 // this kludge emulates moz-chunked-arraybuffer with XHR-style callbacks
-function chunkedfetch(xhr, uri, postdata, httpMethod) {
-    "use strict";
+async function chunkedfetch(xhr, uri, body) {
+    'use strict';
 
-    var fail = function(ex) {
-        if (d) {
-            console.error("Fetch error", ex);
-        }
-        // at this point fake a partial data to trigger a retry..
-        xhr.status = 206;
-        xhr.onloadend();
-    };
-    var requestBody = {
-        method: 'POST',
-        body: postdata
-    };
+    let signal;
+    if (typeof AbortController !== 'undefined') {
+        const controller = new AbortController();
+        xhr.abort = async() => controller.abort();
+        signal = controller.signal;
+    }
+    const evt = {loaded: 0};
+    const highWaterMark = 0x2000000;
+    const response = await fetch(uri, {method: body ? 'POST' : 'GET', body, signal});
 
-    if (httpMethod === 'GET') {
-        requestBody.method = 'GET';
-        delete requestBody.body;
+    xhr.status = response.status;
+    xhr.totalBytes = response.headers.get('Original-Content-Length') | 0;
+
+    if (xhr.q && xhr.q.c === 4 && mega.leaveNodesInMemory === undefined) {
+        mega.leaveNodesInMemory = highWaterMark > xhr.totalBytes;
     }
 
-    fetch(uri, requestBody).then(function(response) {
-        var reader = response.body.getReader();
-        var evt = {loaded: 0};
-        xhr.status = response.status;
-        xhr.totalBytes = response.headers.get('Original-Content-Length') | 0;
+    if (typeof WritableStream !== 'undefined' && xhr.totalBytes > highWaterMark && !localStorage.nfbp) {
+        const queueingStrategy =
+            typeof ByteLengthQueuingStrategy !== 'undefined'
+            && 'highWaterMark' in ByteLengthQueuingStrategy.prototype
+            && new ByteLengthQueuingStrategy({highWaterMark});
 
-        (function chunkedread() {
-            return reader.read().then(function(r) {
-                if (r.done) {
-                    // signal completion through .onloadend()
-                    xhr.response = null;
-                    xhr.onloadend();
+        return response.body.pipeTo(new WritableStream({
+            async write(chunk) {
+                // console.warn('fetch/write', chunk.byteLength);
+
+                xhr.response = chunk;
+                evt.loaded += chunk.byteLength;
+                xhr.onprogress(evt);
+
+                while (decWorkerPool.busy || fmdb && fmdb.busy) {
+                    if (d) {
+                        console.info('fetch/backpressure (%d%%)', evt.loaded * 100 / xhr.totalBytes);
+                    }
+                    // apply backpressure
+                    await sleep(BACKPRESSURE_WAIT_TIME);
                 }
-                else {
-                    // feed received chunk to JSONSplitter via .onprogress()
-                    evt.loaded += r.value.length;
-                    xhr.response = r.value;
-                    xhr.onprogress(evt);
-                    chunkedread();
-                }
-            }).catch(fail);
-        })();
-    }).catch(fail);
+            },
+            close() {
+                xhr.response = null;
+                console.debug('fetch/close');
+            },
+            abort(ex) {
+                xhr.response = null;
+                console.error('fetch/abort', ex);
+            }
+        }, queueingStrategy));
+    }
+
+    const reader = response.body.getReader();
+    while (true) {
+        const {value, done} = await reader.read();
+
+        if (done) {
+            break;
+        }
+
+        // feed received chunk to JSONSplitter via .onprogress()
+        xhr.response = value;
+        evt.loaded += value.length;
+        xhr.onprogress(evt);
+    }
+
+    xhr.response = null;
 }
 
 // send pending API request on channel q
@@ -721,7 +746,7 @@ function api_proc(q) {
 
         if (typeof q.cmdsBuffer[0] === 'string') {
             q.url += '&' + q.cmdsBuffer[0];
-            q.rawreq = '';
+            delete q.rawreq;
         }
         else {
             if (q.cmdsBuffer.length === 1 && q.cmdsBuffer[0].length) {
@@ -740,7 +765,7 @@ function api_proc(q) {
 function api_send(q) {
     "use strict";
 
-    var logger = d && MegaLogger.getLogger('crypt');
+    const logger = d && MegaLogger.getLogger('crypt');
     q.timer = false;
 
     if (q.xhr === false) {
@@ -751,7 +776,8 @@ function api_send(q) {
     }
 
     if (logger) {
-        logger.debug("Sending API request: " + q.rawreq + " to " + String(q.url).replace(/sid=[\w-]+/, 'sid=\u2026'));
+        logger.debug('Sending API request: %s', q.rawreq || q.cmdsBuffer[0],
+                     String(q.url).replace(/sid=[\w-]+/, 'sid=\u2026'));
     }
 
     // reset number of bytes received and response size
@@ -763,7 +789,20 @@ function api_send(q) {
     if (q.split && chunked_method == 2) {
         // use chunked fetch with JSONSplitter input type Uint8Array
         q.splitter = new JSONSplitter(q.split, q.xhr, true);
-        chunkedfetch(q.xhr, q.url, q.rawreq, (q.service === 'wsc') ? 'GET' : null);
+
+        chunkedfetch(q.xhr, q.url, q.rawreq)
+            .then(() => q.xhr && q.xhr.onloadend())
+            .catch(ex => {
+                if (logger) {
+                    logger.error('Fetch error.', ex);
+                }
+
+                if (q.xhr) {
+                    // at this point fake a partial data to trigger a retry..
+                    q.xhr.status = 206;
+                    q.xhr.onloadend();
+                }
+            });
     }
     else {
         // use legacy XHR API
@@ -1051,14 +1090,15 @@ var initialscfetch;
 
 // last step of the streamed SC response processing
 function sc_residue(sc) {
-    /*jshint validthis: true */
     "use strict";
 
     if (sc.sn) {
         // enqueue new sn
-        currsn = sc.sn;
-        scq[scqhead++] = [{ a: '_sn', sn: currsn }];
-        resumesc();
+        if (initialscfetch || currsn !== sc.sn || scqhead !== scqtail) {
+            currsn = sc.sn;
+            scq[scqhead++] = [{a: '_sn', sn: currsn}];
+            resumesc();
+        }
 
         if (initialscfetch) {
             // we have concluded the post-load SC fetch, as we have now
@@ -1074,7 +1114,9 @@ function sc_residue(sc) {
         }
         else if (!waiturl) {
             console.error("Strange error, we dont know WSC url and we didnt get it");
-            return getsc(true);
+            waitbackoff = Math.min(9e3, waitbackoff << 1);
+            waittimeout = setTimeout(getsc, waitbackoff, true);
+            return;
         }
         waittimeout = delay('reinit:wsc', waitsc, waitbackoff);
 
@@ -2956,6 +2998,8 @@ var newmissingkeys = false;
 
 // whenever a node fails to decrypt, call this.
 function crypto_reportmissingkey(n) {
+    'use strict';
+
     if (!M.d[n.h] || typeof M.d[n.h].k === 'string') {
         var change = false;
 
@@ -2965,7 +3009,7 @@ function crypto_reportmissingkey(n) {
         }
 
         for (var p = 8; (p = n.k.indexOf(':', p)) >= 0; p += 32) {
-            if (p == 8 || n.k[p - 9] == '/') {
+            if (p === 8 || n.k[p - 9] === '/') {
                 var id = n.k.substr(p - 8, 8);
                 if (!missingkeys[n.h][id]) {
                     missingkeys[n.h][id] = true;
@@ -2980,19 +3024,96 @@ function crypto_reportmissingkey(n) {
 
         if (change) {
             newmissingkeys = true;
-            if (fmdb) fmdb.add('mk', { h : n.h,
-                                       d : { s : Object.keys(missingkeys[n.h]) }
-                                     });
+
+            if (fmdb) {
+                fmdb.add('mk', {
+                    h: n.h,
+                    d: {s: Object.keys(missingkeys[n.h])}
+                });
+            }
+
+            if (fminitialized) {
+                delay('reqmissingkeys', crypto_reqmissingkeys, 7e3);
+            }
         }
     }
     else if (d) {
-        var mk = window._mkshxx = window._mkshxx || {};
-        mk[n.h] = 1;
+        const mk = window._mkshxx = window._mkshxx || new Set();
+        mk.add(n.h);
 
-        delay('debug::mkshkk', function() {
-            console.debug('crypto_reportmissingkey', Object.keys(mk));
+        delay('debug::mkshkk', () => {
+            console.debug('crypto_reportmissingkey', [...mk]);
             window._mkshxx = undefined;
         }, 4100);
+    }
+}
+
+async function crypto_reqmissingkeys() {
+    'use strict';
+
+    if (!newmissingkeys) {
+        if (d) {
+            console.debug('No new missing keys.');
+        }
+        return;
+    }
+
+    const cr = [[], [], []];
+    const nodes = Object.create(null);
+    const shares = Object.create(null);
+
+    const handles = Object.keys(missingkeys);
+    const sharenodes = await Promise.allSettled(handles.map(h => M.getShareNodes(h)));
+
+    crypto_fixmissingkeys(missingkeys);
+
+    for (let idx = 0; idx < handles.length; ++idx) {
+        const n = handles[idx];
+        if (!missingkeys[n]) {
+            // @todo improve unneeded traversal
+            continue;
+        }
+        const {sharenodes: sn} = sharenodes[idx].value || {sn: []};
+
+        for (let j = sn.length; j--;) {
+            const s = sn[j];
+
+            if (shares[s] === undefined) {
+                shares[s] = cr[0].length;
+                cr[0].push(s);
+            }
+
+            if (nodes[n] === undefined) {
+                nodes[n] = cr[1].length;
+                cr[1].push(n);
+            }
+
+            cr[2].push(shares[s], nodes[n]);
+        }
+    }
+
+    if (!cr[1].length) {
+        // if (d) {
+        //     console.debug('No missing keys.');
+        // }
+        return;
+    }
+
+    if (cr[0].length) {
+        // if (d) {
+        //     console.debug('Requesting missing keys...', cr);
+        // }
+        const res = await Promise.resolve(M.req({a: 'k', cr, i: requesti})).catch(dump);
+
+        if (typeof res === 'object' && typeof res[0] === 'object') {
+            if (d) {
+                console.debug('Processing crypto response...', res);
+            }
+            crypto_proccr(res[0]);
+        }
+    }
+    else if (d) {
+        console.debug(`Keys ${cr[1]} missing, but no related shares found.`);
     }
 }
 

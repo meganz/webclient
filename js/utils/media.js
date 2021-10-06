@@ -3750,30 +3750,21 @@ mBroadcaster.once('startMega', function isAudioContextSupported() {
         }, false));
     }
 
-    if ('AudioContext' in window) {
-        var ctx;
-        var stream;
+    /** @property mega.fullAudioContextSupport */
+    lazy(mega, 'fullAudioContextSupport', () => {
+        return tryCatch(() => {
+            const ctx = new AudioContext();
+            onIdle(() => ctx && typeof ctx.close === 'function' && ctx.close());
 
-        try {
-            ctx = new AudioContext();
-            stream = new MediaStream();
+            let stream = new MediaStream();
+            console.assert('active' in stream);
             stream = ctx.createMediaStreamDestination();
-            if (stream.stream.getTracks()[0].readyState !== 'live') {
+            if (stream.stream.getTracks()[0].readyState !== 'live' || stream.numberOfInputs !== 1) {
                 throw new Error('audio track is not live');
             }
-        }
-        catch (ex) {
+            return true;
+        }, (ex) => {
             console.debug('This browser does not support advanced audio streaming...', ex);
-        }
-        finally {
-            if (ctx && typeof ctx.close === 'function') {
-                var p = ctx.close();
-                if (p instanceof Promise) {
-                    p.then(function() {
-                        mega.fullAudioContextSupport = stream && stream.numberOfInputs === 1;
-                    });
-                }
-            }
-        }
-    }
+        })();
+    });
 });

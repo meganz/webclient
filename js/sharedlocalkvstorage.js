@@ -521,33 +521,30 @@ SharedLocalKVStorage.Utils.lazyInitCall = function(proto, method, master, fn) {
         fn = master;
         master = true;
     }
-    proto[method] = function __SLKVLazyInitCall() {
-        var self = this;
-
+    proto[method] = function __SLKVLazyInitCall(...args) {
         if (master && !mBroadcaster.crossTab.master) {
             // the method shall dealt with it.
-            return fn.apply(self, arguments);
+            return fn.apply(this, arguments);
         }
 
-        var args = toArray.apply(null, arguments);
-        return new Promise(function(resolve, reject) {
-            var name = self.__slkvLazyInitMutex || (self.__slkvLazyInitMutex = 'lIMutex' + makeUUID().slice(-13));
-            mutex.lock(name).then(function(unlock) {
-                var onReadyState = function() {
-                    delete self.__slkvLazyInitMutex;
-                    return (self[method] = fn).apply(self, args).then(resolve).catch(reject);
+        return new Promise((resolve, reject) => {
+            const name = this.__slkvLazyInitMutex || (this.__slkvLazyInitMutex = `lIMutex${makeUUID().slice(-13)}`);
+            mutex.lock(name).then((unlock) => {
+                const onReadyState = () => {
+                    delete this.__slkvLazyInitMutex;
+                    return (this[method] = fn).apply(this, args).then(resolve).catch(reject);
                 };
 
-                if (Object.hasOwnProperty.call(self, '__slkvLazyInitReady')) {
-                    return onReadyState().always(unlock);
+                if (Object.hasOwnProperty.call(this, '__slkvLazyInitReady')) {
+                    return onReadyState().finally(unlock);
                 }
 
-                self.lazyInit()
-                    .then(function() {
-                        Object.defineProperty(self, '__slkvLazyInitReady', {value: 1});
+                this.lazyInit()
+                    .then(() => {
+                        Object.defineProperty(this, '__slkvLazyInitReady', {value: 1});
                         return onReadyState();
                     })
-                    .always(unlock);
+                    .finally(unlock);
             }).catch(reject);
         });
     };
@@ -557,28 +554,23 @@ SharedLocalKVStorage.Utils.lazyInitCall = function(proto, method, master, fn) {
 
 SharedLocalKVStorage.Utils._requiresMutex = function SLKVMutexWrapper(origFunc, methodName) {
     'use strict';
-    return function __SLKVMutexWrapper() {
-        var self = this;
-        var args = toArray.apply(null, arguments);
-        var name = this.__mutexLockName || (this.__mutexLockName = 'slkv' + makeUUID().slice(-13));
-        return new MegaPromise(function(resolve, reject) {
+    return function __SLKVMutexWrapper(...args) {
+        const name = this.__mutexLockName || (this.__mutexLockName = `slkv${makeUUID().slice(-13)}`);
+        return new MegaPromise((resolve, reject) => {
             mutex.lock(name)
-                .then(function(unlock) {
-                    var wrap = function(dsp) {
-                        return function(arg) {
-                            if (d > 1) {
-                                self.logger.warn('Releasing lock(%s) from %s...', name, methodName);
-                                console.timeEnd(name);
-                            }
-                            unlock().always(dsp.bind(null, arg)).catch(reject);
-                        };
+                .then((unlock) => {
+                    const wrap = (dsp) => (arg) => {
+                        if (d > 1) {
+                            this.logger.warn('Releasing lock(%s) from %s...', name, methodName);
+                            console.timeEnd(name);
+                        }
+                        unlock().then(() => dsp(arg)).catch(reject);
                     };
                     if (d > 1) {
-                        self.logger.warn('Lock(%s) acquired for %s...', name, methodName, [self, args]);
+                        this.logger.warn('Lock(%s) acquired for %s...', name, methodName, [this, ...args]);
                         console.time(name);
                     }
-                    origFunc.apply(self, args).then(wrap(resolve)).catch(wrap(reject));
-                    wrap = args = undefined;
+                    origFunc.apply(this, args).then(wrap(resolve)).catch(wrap(reject));
                 })
                 .catch(reject);
         });
@@ -618,14 +610,13 @@ lazy(SharedLocalKVStorage.Utils.DexieStorage.prototype, 'db', function() {
 
 SharedLocalKVStorage.Utils._requiresDbReady = function SLKVDBConnRequired(fn) {
     'use strict';
-    return function __requiresDBConnWrapper() {
+    return function __requiresDBConnWrapper(...args) {
 
         if (this.dbState === SharedLocalKVStorage.DB_STATE.READY) {
             return fn.apply(this, arguments);
         }
 
         var self = this;
-        var args = toArray.apply(null, arguments);
         var promise = new MegaPromise();
 
         if (!u_handle) {
@@ -655,7 +646,7 @@ SharedLocalKVStorage.Utils._requiresDbReady = function SLKVDBConnRequired(fn) {
                 var p = self.dbLoadingPromise;
                 delete self.dbLoadingPromise;
 
-                if (d) {
+                if (d > 1) {
                     self.db.$__OwnerInstance = self;
                 }
 

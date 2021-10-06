@@ -729,7 +729,7 @@ MegaUtils.prototype.reload = function megaUtilsReload(force) {
             }
 
             if (window.fmdb) {
-                waitingPromises.push(new Promise((resolve) => fmdb.invalidate(resolve)));
+                waitingPromises.push(fmdb.invalidate());
             }
 
             if (shouldAbortTransfers) {
@@ -1711,7 +1711,7 @@ MegaUtils.prototype.getStorageState = function(force) {
         }
         promise.resolve(value | 0);
     }).catch(function(ex) {
-        if (d) {
+        if (d && ex !== ENOENT) {
             console.warn(ex);
         }
         promise.reject(ex);

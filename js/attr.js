@@ -1149,7 +1149,7 @@
                 M.u[userHandle].firstName = M.u[userHandle].lastName = "";
                 M.syncUsersFullname(userHandle);
             }
-            else {
+            else if (d) {
                 console.warn('uaPacketParser: Unknown user %s handling first/lastname', userHandle);
             }
         };

@@ -5717,8 +5717,8 @@ class local_Minimized extends mixins["MegaRenderMixin"] {
       simpletip: { ...SIMPLETIP_PROPS,
         label: videoLabel
       },
-      className: "\n                                    mega-button\n                                    theme-light-forced\n                                    round\n                                    large\n                                    " + (this.isActive(SfuClient.Av.Video) ? '' : 'inactive') + "\n                                ",
-      icon: "\n                                    " + (this.isActive(SfuClient.Av.Video) ? 'icon-video-call-filled' : 'icon-video-off') + "\n                                ",
+      className: "\n                                    mega-button\n                                    theme-light-forced\n                                    round\n                                    large\n                                    " + (this.isActive(SfuClient.Av.Camera) ? '' : 'inactive') + "\n                                ",
+      icon: "\n                                    " + (this.isActive(SfuClient.Av.Camera) ? 'icon-video-call-filled' : 'icon-video-off') + "\n                                ",
       onClick: ev => {
         ev.stopPropagation();
         onVideoClick();

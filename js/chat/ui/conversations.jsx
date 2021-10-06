@@ -1156,7 +1156,7 @@ class ConversationsApp extends MegaRenderMixin {
                 {
                     key: 'newMeeting',
                     className: 'new-meeting',
-                    title: 'New meeting',
+                    title: l.new_meeting,
                     icon: 'sprite-fm-mono icon-video-call-filled',
                     onClick: () => {
                         if (megaChat.hasSupportForCalls) {
@@ -1393,15 +1393,15 @@ class ConversationsApp extends MegaRenderMixin {
                             megaChat.$chatTreePanePs = ref;
                         }}>
                         {megaChat.chats.length > 0 &&
-                        <div
-                            className={`
-                                content-panel
-                                conversations
-                                active
-                            `}>
-                            <span className="heading">Contacts and Groups</span>
-                            <ConversationsList quickSearchText={this.state.quickSearchText}/>
-                        </div>
+                            <div
+                                className={`
+                                    content-panel
+                                    conversations
+                                    active
+                                `}>
+                                <span className="heading">{l.contacts_and_groups}</span>
+                                <ConversationsList quickSearchText={this.state.quickSearchText}/>
+                            </div>
                         }
                     </PerfectScrollbar>
                     <div

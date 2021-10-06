@@ -224,17 +224,22 @@ const contextMenu = (function(defaultIsRTL, defaultAnimationDuration) {
      */
     function close(menu) {
         return new Promise(resolve => {
-            const menuRoot = menu.closest('[data-menu-root]');
+            const menuRoot = menu ? menu.closest('[data-menu-root]') : null;
 
-            clearTimeout(menu.openingTimeout);
-            clearTimeout(menu.closingTimeout);
-            menu.classList.add('closing');
-            menu.classList.remove('opening', 'visible');
-            menu.closingTimeout = setTimeout((menu, resolve) => {
-                menu.classList.remove('closing');
-                menu.setAttribute('aria-expanded', false);
+            if (menu && menuRoot) {
+                clearTimeout(menu.openingTimeout);
+                clearTimeout(menu.closingTimeout);
+                menu.classList.add('closing');
+                menu.classList.remove('opening', 'visible');
+                menu.closingTimeout = setTimeout((menu, resolve) => {
+                    menu.classList.remove('closing');
+                    menu.setAttribute('aria-expanded', false);
+                    resolve();
+                }, menuRoot.animationDuration, menu, resolve);
+            }
+            else {
                 resolve();
-            }, menuRoot.animationDuration, menu, resolve);
+            }
         });
     }
 

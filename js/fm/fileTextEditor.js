@@ -72,7 +72,7 @@ mega.fileTextEditor = new function FileTextEditor() {
         }
 
         // get the data
-        M.gfsfetch(handle, 0, -1).done(function(data) {
+        M.gfsfetch(handle, 0, -1).then((data) => {
 
             if (data.buffer === null) {
                 return operationPromise.reject();
@@ -88,10 +88,14 @@ mega.fileTextEditor = new function FileTextEditor() {
             });
             binaryReader.readAsText(bData);
 
-        }).fail(function(ev) {
-            if (ev === EOVERQUOTA || Object(ev.target).status === 509) {
+        }).catch((ex) => {
+            if (ex === EOVERQUOTA || Object(ex.target).status === 509) {
                 dlmanager.setUserFlags();
                 dlmanager.showOverQuotaDialog();
+            }
+            // local file does not exist
+            else if (ex === ENOENT) {
+                showToast('view', l[22]);
             }
             operationPromise.reject();
         });

@@ -1792,6 +1792,7 @@ class ContactButton extends _stores_mixins_js2__["ContactAwareComponent"] {
       label = react1.a.createElement("em", {
         className: "contact-name-loading"
       });
+      classes = "contact-button-loading " + classes;
     }
 
     return this.props.noContextMenu ? react1.a.createElement("div", {
@@ -2316,6 +2317,7 @@ class ContactPickerWidget extends _stores_mixins_js2__["MegaRenderMixin"] {
   constructor(props) {
     super(props);
     this.contactLinkListener = null;
+    this.containerRef = react1.a.createRef();
 
     this.onSearchChange = ev => {
       this.setState({
@@ -2326,13 +2328,13 @@ class ContactPickerWidget extends _stores_mixins_js2__["MegaRenderMixin"] {
     this.state = {
       searchValue: '',
       selected: this.props.selected || false,
-      publicLink: undefined
+      publicLink: M.account && M.account.contactLink || undefined
     };
   }
 
   componentDidMount() {
     super.componentDidMount();
-    setContactLink();
+    setContactLink(this.containerRef && this.containerRef.current);
     this.contactLinkListener = mBroadcaster.addListener('contact:setContactLink', publicLink => this.state.publicLink ? null : this.setState({
       publicLink
     }));
@@ -2396,7 +2398,7 @@ class ContactPickerWidget extends _stores_mixins_js2__["MegaRenderMixin"] {
     }
 
     if (this.contactLinkListener) {
-      mBroadcaster.removeListener('contact:setContactLink');
+      mBroadcaster.removeListener(this.contactLinkListener);
     }
   }
 
@@ -2862,6 +2864,7 @@ class ContactPickerWidget extends _stores_mixins_js2__["MegaRenderMixin"] {
     const totalContactsNum = contacts.length + frequentContacts.length;
     const searchPlaceholderMsg = totalContactsNum === 1 ? l[23749] : l[23750].replace('[X]', totalContactsNum);
     return react1.a.createElement("div", {
+      ref: this.containerRef,
       className: "\n                    " + (this.props.className || '') + "\n                    " + extraClasses + "\n                "
     }, topButtons, multipleContacts, !this.props.readOnly && haveContacts && react1.a.createElement("div", {
       className: "\n                            contacts-search-header\n                            " + this.props.headerClasses + "\n                        "
@@ -4630,7 +4633,7 @@ class streamHead_StreamHead extends mixins["MegaRenderMixin"] {
         }
       }), external_React_default.a.createElement("div", {
         className: "info"
-      }, "Copy this link to send your invite"), external_React_default.a.createElement("div", {
+      }, l.copy_and_share), external_React_default.a.createElement("div", {
         className: "link-input-container"
       }, external_React_default.a.createElement("div", {
         className: "mega-input with-icon box-style"
@@ -5169,7 +5172,7 @@ let streamNode_StreamNode = (_dec = Object(mixins["SoonFcWrap"])(30, true), _dec
       onSpeakerChange: onSpeakerChange
     }), external_React_default.a.createElement("div", {
       className: "stream-node-content"
-    }, SfuApp.VIDEO_DEBUG_MODE && this.renderVideoDebugMode(), this.renderContent(), this.renderStatus())));
+    }, SfuApp.VIDEO_DEBUG_MODE ? this.renderVideoDebugMode() : '', this.renderContent(), this.renderStatus())));
   }
 
 }, _class2.LOADING_STATE = {
@@ -5279,7 +5282,7 @@ class streamControls_StreamControls extends mixins["MegaRenderMixin"] {
     };
     return external_React_default.a.createElement("div", {
       className: "stream-controls"
-    }, d && this.renderDebug(), external_React_default.a.createElement("ul", null, external_React_default.a.createElement("li", null, external_React_default.a.createElement(meetings_button["a" ], {
+    }, d ? this.renderDebug() : '', external_React_default.a.createElement("ul", null, external_React_default.a.createElement("li", null, external_React_default.a.createElement(meetings_button["a" ], {
       simpletip: { ...SIMPLETIP,
         label: audioLabel
       },
@@ -5714,8 +5717,8 @@ class local_Minimized extends mixins["MegaRenderMixin"] {
       simpletip: { ...SIMPLETIP_PROPS,
         label: videoLabel
       },
-      className: "\n                                    mega-button\n                                    theme-light-forced\n                                    round\n                                    large\n                                    " + (this.isActive(SfuClient.Av.Video) ? '' : 'inactive') + "\n                                ",
-      icon: "\n                                    " + (this.isActive(SfuClient.Av.Video) ? 'icon-video-call-filled' : 'icon-video-off') + "\n                                ",
+      className: "\n                                    mega-button\n                                    theme-light-forced\n                                    round\n                                    large\n                                    " + (this.isActive(SfuClient.Av.Camera) ? '' : 'inactive') + "\n                                ",
+      icon: "\n                                    " + (this.isActive(SfuClient.Av.Camera) ? 'icon-video-call-filled' : 'icon-video-off') + "\n                                ",
       onClick: ev => {
         ev.stopPropagation();
         onVideoClick();
@@ -6359,7 +6362,7 @@ class participants_Participant extends mixins["MegaRenderMixin"] {
       contact: M.u[handle]
     }), external_React_default.a.createElement("div", {
       className: "name"
-    }, external_React_default.a.createElement("span", null, name, " \xA0"), handle === u_handle && external_React_default.a.createElement("span", null, "(me)"), chatRoom.isMeeting && call_Call.isModerator(chatRoom, handle) && external_React_default.a.createElement("span", null, external_React_default.a.createElement("i", {
+    }, external_React_default.a.createElement("span", null, name, " \xA0"), handle === u_handle && external_React_default.a.createElement("span", null, l.me), chatRoom.isMeeting && call_Call.isModerator(chatRoom, handle) && external_React_default.a.createElement("span", null, external_React_default.a.createElement("i", {
       className: this.baseIconClass + " icon-admin"
     }))), external_React_default.a.createElement("div", {
       className: "status"
@@ -6928,7 +6931,7 @@ class invite_Invite extends mixins["MegaRenderMixin"] {
         });
         e.preventDefault();
       }
-    }, field ? 'Collapse meeting link' : 'Expand meeting link', external_React_default.a.createElement("i", {
+    }, field ? l.collapse_meeting_link : l.expand_meeting_link, external_React_default.a.createElement("i", {
       className: "sprite-fm-mono " + (field ? 'icon-arrow-up' : 'icon-arrow-down')
     })), field && link && external_React_default.a.createElement("div", {
       className: "chat-link-input"
@@ -6955,7 +6958,7 @@ class invite_Invite extends mixins["MegaRenderMixin"] {
   }
 
 }
-invite_Invite.NAMESPACE = 'invite';
+invite_Invite.NAMESPACE = 'invite-meeting';
 // CONCATENATED MODULE: ./js/chat/ui/meetings/workflow/end.jsx
 
 
@@ -12353,10 +12356,16 @@ class local_Local extends abstractGenericMessage_AbstractGenericMessage {
     var _this$props$message, _this$props$message$m;
 
     const callId = (_this$props$message = this.props.message) == null ? void 0 : (_this$props$message$m = _this$props$message.meta) == null ? void 0 : _this$props$message$m.callId;
+    let debugMsg = "";
+
+    if (d && callId) {
+      debugMsg = ": callId: " + callId;
+    }
+
     return external_React_default.a.createElement("div", {
       className: "message date-time simpletip",
       "data-simpletip": time2date(this.getTimestamp())
-    }, this.getTimestampAsString(), d && callId && ": msgId: " + callId);
+    }, this.getTimestampAsString(), debugMsg);
   }
 
   getClassNames() {
@@ -20918,7 +20927,7 @@ class loading_Loading extends mixins["MegaRenderMixin"] {
       className: "loading-container"
     }, external_React_default.a.createElement("div", {
       className: "loading-indication"
-    }))), d && this.renderDebug());
+    }))), d ? this.renderDebug() : '');
   }
 
 }
@@ -21059,7 +21068,7 @@ class preview_Preview extends mixins["MegaRenderMixin"] {
   }
 
 }
-preview_Preview.NAMESPACE = 'preview';
+preview_Preview.NAMESPACE = 'preview-meeting';
 preview_Preview.STREAMS = {
   AUDIO: 1,
   VIDEO: 2
@@ -22610,7 +22619,7 @@ let conversationpanel_ConversationPanel = (conversationpanel_dec = utils["defaul
       initialView: u_type || is_eplusplus ? join_Join.VIEW.ACCOUNT : join_Join.VIEW.INITIAL,
       chatRoom: room,
       onJoinGuestClick: (firstName, lastName, audioFlag, videoFlag) => {
-        room.meetingsLoading = "Joining meeting...";
+        room.meetingsLoading = l.joining;
         u_eplusplus(firstName, lastName).then(() => {
           megaChat.routing.reinitAndJoinPublicChat(room.chatId, room.publicChatHandle, room.publicChatKey).then(() => {
             delete megaChat.initialPubChatHandle;
@@ -25116,7 +25125,7 @@ class start_Start extends mixins["MegaRenderMixin"] {
       }
     };
 
-    this.state.topic = M.getNameByHandle(u_handle) + "'s meeting";
+    this.state.topic = l.default_meeting_topic.replace('%NAME', M.getNameByHandle(u_handle));
   }
 
   componentDidMount() {
@@ -25185,6 +25194,23 @@ start_Start.STREAMS = {
 
 
 class meetingsCallEndedDialog_MeetingsCallEndedDialog extends mixins["MegaRenderMixin"] {
+  constructor(props) {
+    super(props);
+    this.state = {
+      'safeShowDialogRendered': false
+    };
+  }
+
+  componentDidMount() {
+    super.componentDidMount();
+    M.safeShowDialog('meetings-ended', () => {
+      this.setState({
+        'safeShowDialogRendered': true
+      });
+      return this.findDOMNode();
+    });
+  }
+
   componentWillUnmount() {
     super.componentWillUnmount();
 
@@ -25197,6 +25223,11 @@ class meetingsCallEndedDialog_MeetingsCallEndedDialog extends mixins["MegaRender
     const {
       onClose
     } = this.props;
+
+    if (!this.state.safeShowDialogRendered) {
+      return null;
+    }
+
     return external_React_default.a.createElement(modalDialogs["a" ].ModalDialog, {
       className: "meetings-call-ended-dialog",
       dialogType: "message",
@@ -25560,6 +25591,7 @@ class conversations_ArchConversationsListItem extends mixins["MegaRenderMixin"] 
 
     var lastMessageDiv = null;
     var lastMessageDatetimeDiv = null;
+    var emptyMessage = null;
     var lastMessage = chatRoom.messagesBuff.getLatestTextMessage();
 
     if (lastMessage) {
@@ -25575,7 +25607,7 @@ class conversations_ArchConversationsListItem extends mixins["MegaRenderMixin"] 
         className: "date-time"
       }, getTimeMarker(lastMessage.delay, true));
     } else {
-      var emptyMessage = chatRoom.messagesBuff.messagesHistoryIsLoading() || this.loadingShown || chatRoom.messagesBuff.joined === false ? l[7006] : l[8000];
+      emptyMessage = chatRoom.messagesBuff.messagesHistoryIsLoading() || this.loadingShown || chatRoom.messagesBuff.joined === false ? l[7006] : l[8000];
       lastMessageDiv = conversations_React.createElement("div", null, conversations_React.createElement("div", {
         className: "conversation-message"
       }, emptyMessage));
@@ -25600,7 +25632,13 @@ class conversations_ArchConversationsListItem extends mixins["MegaRenderMixin"] 
       className: nameClassString
     }, conversations_React.createElement(utils["default"].EmojiFormattedContent, null, chatRoom.getRoomTitle()), chatRoom.type === "group" ? conversations_React.createElement("i", {
       className: "sprite-fm-uni icon-ekr-key"
-    }) : undefined), lastMessageDiv, lastMessageDatetimeDiv), conversations_React.createElement("div", {
+    }) : undefined), conversations_React.createElement("div", {
+      className: "last-message-info"
+    }, lastMessageDiv, emptyMessage ? null : conversations_React.createElement("div", {
+      className: "conversations-separator"
+    }, conversations_React.createElement("i", {
+      className: "sprite-fm-mono icon-dot"
+    })), lastMessageDatetimeDiv)), conversations_React.createElement("div", {
       className: "archived-badge"
     }, l[19067])), conversations_React.createElement("td", {
       width: "330"
@@ -25610,8 +25648,9 @@ class conversations_ArchConversationsListItem extends mixins["MegaRenderMixin"] 
       className: "archived-date-time"
     }, lastMessageDatetimeDiv), conversations_React.createElement("div", {
       className: "clear"
-    })), conversations_React.createElement("button", {
-      className: "mega-button unarchive-chat right",
+    })), conversations_React.createElement(ui_buttons["Button"], {
+      className: "mega-button action unarchive-chat right",
+      icon: "sprite-fm-mono icon-rewind",
       onClick: this.props.onUnarchiveConversationClicked.bind(this)
     }, conversations_React.createElement("span", null, l[19065]))));
   }
@@ -26036,9 +26075,11 @@ class conversations_ArchivedConversationsList extends mixins["MegaRenderMixin"] 
       className: timerOrderClass ? "sprite-fm-mono icon-arrow-" + timerOrderClass : ''
     })))))), conversations_React.createElement("div", {
       className: "grid-scrolling-table archive-chat-list"
+    }, conversations_React.createElement("div", {
+      className: "grid-wrapper"
     }, conversations_React.createElement("table", {
-      className: "grid-table arc-chat-messages-block"
-    }, conversations_React.createElement("tbody", null, currConvsList)))), confirmUnarchiveDialog);
+      className: "grid-table arc-chat-messages-block table-hover"
+    }, conversations_React.createElement("tbody", null, currConvsList))))), confirmUnarchiveDialog);
   }
 
 }
@@ -26291,7 +26332,7 @@ let conversations_ConversationsApp = (_dec3 = utils["default"].SoonFcWrap(80), (
       }, {
         key: 'newMeeting',
         className: 'new-meeting',
-        title: 'New meeting',
+        title: l.new_meeting,
         icon: 'sprite-fm-mono icon-video-call-filled',
         onClick: () => {
           if (megaChat.hasSupportForCalls) {
@@ -26328,13 +26369,6 @@ let conversations_ConversationsApp = (_dec3 = utils["default"].SoonFcWrap(80), (
       }
 
       if (!chatRoom.initialMessageHistLoaded) {
-        return null;
-      }
-
-      if ($.dialog && $.dialog !== 'meetings-ended') {
-        M.safeShowDialog('meetings-ended', () => {
-          this.safeForceUpdate();
-        });
         return null;
       }
 
@@ -26527,10 +26561,10 @@ let conversations_ConversationsApp = (_dec3 = utils["default"].SoonFcWrap(80), (
         megaChat.$chatTreePanePs = ref;
       }
     }, megaChat.chats.length > 0 && conversations_React.createElement("div", {
-      className: "\n                                content-panel\n                                conversations\n                                active\n                            "
+      className: "\n                                    content-panel\n                                    conversations\n                                    active\n                                "
     }, conversations_React.createElement("span", {
       className: "heading"
-    }, "Contacts and Groups"), conversations_React.createElement(conversations_ConversationsList, {
+    }, l.contacts_and_groups), conversations_React.createElement(conversations_ConversationsList, {
       quickSearchText: this.state.quickSearchText
     }))), conversations_React.createElement("div", {
       className: arcBtnClass,
@@ -28382,7 +28416,7 @@ Chat.prototype._doLoadImages = function () {
   var chatImageParser = function (h, data) {
     var n = M.chd[(self._imageLoadCache[h] || [])[0]] || false;
 
-    if (data !== 0xDEAD) {
+    if (n && data !== 0xDEAD) {
       n.src = mObjectURL([data.buffer || data], 'image/jpeg');
       n.srcBuffer = data;
     } else if (d) {

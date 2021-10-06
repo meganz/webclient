@@ -9,4 +9,7 @@
     &.minimized {
         display: none;
     }
+
+    @import '_stream.scss';
+    @import '_sidebar.scss';
 }

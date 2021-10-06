@@ -997,7 +997,7 @@ scparser.$add('t', function(a, scnodes) {
 
     if (fminitialized && !is_mobile) {
         // update versioning info.
-        i = scnodes.length > 1 && scnodes[1].h || rootNode.h;
+        i = scnodes.length > 1 && Object(scnodes[1]).h || rootNode.h;
         if (i) {
             // TODO: ensure this is backward compatible...
             fileversioning.updateFileVersioningDialog(i);
@@ -1014,12 +1014,10 @@ scparser.$add('opc', {
         // outgoing pending contact
         processOPC([a]);
 
-        if (
-            fminitialized && M.chat && (
-                megaChatIsReady ||
-                megaChat.routingSection === "contacts" && megaChat.routingSubSection === "sent"
-            )
-        ) {
+        if (fminitialized && M.chat && megaChatIsReady
+            && megaChat.routingSection === "contacts"
+            && megaChat.routingSubSection === "sent") {
+
             mBroadcaster.sendMessage('fmViewUpdate:opc');
         }
     }
@@ -1468,7 +1466,18 @@ scparser.$add('_sn', function(a) {
         console.log("New SN: " + a.sn);
         console.assert(a.sn === window.currsn);
     }
-    delay('sc.set-sn', () => setsn(currsn), 2789);
+    delay('sc.set-sn', () => {
+        if (window.fmdb) {
+            const {fmdb} = window;
+            if (d) {
+                console.assert(fmdb.db || fmdb.crashed, 'Invalid FMDB State..');
+            }
+
+            if (fmdb.db) {
+                setsn(currsn);
+            }
+        }
+    }, 2789);
 
     // rewrite accumulated RSA keys to AES to save CPU & bandwidth & space
     crypto_node_rsa2aes();

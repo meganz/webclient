@@ -1783,7 +1783,7 @@ Chat.prototype._doLoadImages = function() {
     var chatImageParser = function(h, data) {
         var n = M.chd[(self._imageLoadCache[h] || [])[0]] || false;
 
-        if (data !== 0xDEAD) {
+        if (n && data !== 0xDEAD) {
             // Set the attachment node image source
             n.src = mObjectURL([data.buffer || data], 'image/jpeg');
             n.srcBuffer = data;

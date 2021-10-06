@@ -870,6 +870,9 @@
 .dropdown-avatar:hover::before {
     opacity: 0.1;
 }
+.dropdown-avatar .contact-name-loading {
+    margin: 7px 0 0 0;
+}
 .dropdown-fingerprint {
     position: relative;
     padding: 11px 8px 6px 8px;

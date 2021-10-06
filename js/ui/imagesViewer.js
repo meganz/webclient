@@ -753,8 +753,7 @@ var slideshowid;
         $('.viewer-progress p, .video-time-bar', $content).removeAttr('style');
 
         // Clear video file data
-        // "/" poster src is required to fix flickering in Chrome when moving from a video to another
-        $video.attr('poster', '/').removeAttr('poster src').addClass('hidden');
+        $video.css('background-image', ``).removeAttr('poster src').addClass('hidden');
         $videoControls.addClass('hidden');
         $('.video-time-bar', $videoControls).removeAttr('style');
         $('.video-progress-bar', $videoControls).removeAttr('title');
@@ -914,7 +913,7 @@ var slideshowid;
 
                 if (fullScreenManager && fullScreenManager.state) {
                     $('.viewer-bars', $overlay).noTransition(() => {
-                        $overlay.addClass('fullscreen');  
+                        $overlay.addClass('fullscreen');
                     });
                 }
 
@@ -1051,17 +1050,17 @@ var slideshowid;
             if (!preqs[n.h]) {
                 preqs[n.h] = 1;
 
-                M.gfsfetch(n.link || n.h, 0, -1).done(function(data) {
+                M.gfsfetch(n.link || n.h, 0, -1).then((data) => {
                     preview({type: 'application/pdf'}, n.h, data.buffer);
-                }).fail(function(ev) {
+                }).catch((ex) => {
                     if (d) {
-                        console.warn('Failed to retrieve PDF, failing back to broken eye image...', ev);
+                        console.warn('Failed to retrieve PDF, failing back to broken eye image...', ex);
                     }
 
                     previewimg(n.h, null);
                     delete previews[n.h].buffer;
                     preqs[n.h] = 0; // to retry again
-                    if (ev === EOVERQUOTA || Object(ev.target).status === 509) {
+                    if (ex === EOVERQUOTA || Object(ex.target).status === 509) {
                         dlmanager.setUserFlags();
                         dlmanager.showOverQuotaDialog();
                     }
@@ -1160,18 +1159,18 @@ var slideshowid;
                 }
             };
 
-            M.gfsfetch(n.link || n.h, 0, -1, progress).tryCatch(function(data) {
+            M.gfsfetch(n.link || n.h, 0, -1, progress).then((data) => {
                 preview({type: filemime(n, 'image/jpeg')}, n.h, data.buffer);
                 if (!exifImageRotation.fromImage) {
                     previews[n.h].orientation = parseInt(EXIF.readFromArrayBuffer(data, true).Orientation) || 1;
                 }
-            }, function(ev) {
-                if (ev === EOVERQUOTA || Object(ev.target).status === 509) {
+            }).catch((ex) => {
+                if (ex === EOVERQUOTA || Object(ex.target).status === 509) {
                     eventlog(99703, true);
                 }
 
                 if (d) {
-                    console.debug('slideshow failed to load original %s', n.h, ev.target && ev.target.status || ev);
+                    console.debug('slideshow failed to load original %s', n.h, ex.target && ex.target.status || ex);
                 }
 
                 if (slideshow_handle() === n.h) {
@@ -1203,6 +1202,20 @@ var slideshowid;
         var $content = $('.content', $overlay);
         var $video = $('video', $content);
         var $playVideoButton = $('.play-video-button', $content);
+        let bgsize = 'auto';
+
+        if (is_audio(n)) {
+            bgsize = 'contain';
+        }
+        else {
+            if (previews[id].fma === undefined) {
+                previews[id].fma = MediaAttribute(n).data || false;
+            }
+
+            if (previews[id].fma.width > previews[id].fma.height) {
+                bgsize = 'cover';
+            }
+        }
 
         $playVideoButton.rebind('click', function() {
             if (dlmanager.isOverQuota) {
@@ -1230,6 +1243,10 @@ var slideshowid;
             $('.viewer-pending', $content).removeClass('hidden');
             $('.video-controls', $overlay).removeClass('hidden');
             $overlay.addClass('video-theatre-mode');
+
+            // Hide play button.
+            $(this).addClass('hidden');
+            $('.video-controls .playpause i', $overlay).removeClass('icon-play').addClass('icon-pause');
 
             initVideoStream(n, $overlay, destroy).done(function(streamer) {
                 preqs[n.h] = streamer;
@@ -1286,7 +1303,9 @@ var slideshowid;
         }
 
         if (previews[id].poster !== undefined) {
-            $video.attr('poster', previews[id].poster);
+            // $video.attr('poster', previews[id].poster);
+            $video.css('background-size', bgsize);
+            $video.css('background-image', `url(${previews[id].poster})`);
         }
         else if (String(n.fa).indexOf(':1*') > 0) {
             getImage(n, 1).then(function(uri) {
@@ -1299,7 +1318,9 @@ var slideshowid;
                         $video = $('.content video', $overlay);
                     }
 
-                    $video.attr('poster', uri);
+                    // $video.attr('poster', uri);
+                    $video.css('background-size', bgsize);
+                    $video.css('background-image', `url(${uri})`);
                 }
             }).catch(console.debug.bind(console));
         }
@@ -1307,7 +1328,7 @@ var slideshowid;
         previews[id].poster = previews[id].poster || '';
 
         if ($.autoplay === id || page === 'download') {
-            onIdle(function() {
+            queueMicrotask(() => {
                 $playVideoButton.trigger('click');
             });
             delete $.autoplay;

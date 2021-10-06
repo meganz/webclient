@@ -47,7 +47,7 @@ export default class Loading extends MegaRenderMixin {
                         <div className="loading-indication" />
                     </div>
                 </div>
-                {d && this.renderDebug()}
+                {d ? this.renderDebug() : ''}
             </div>
         );
     }

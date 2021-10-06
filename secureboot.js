@@ -1,7 +1,7 @@
 // Release version information is replaced by the build scripts
 var buildVersion = { website: '', chrome: '', firefox: '', commit: '', timestamp: '', dateTime: '' };
 
-var m;
+var m, tmp;
 var browserUpdate = 0;
 var apipath;
 var pageLoadTime;
@@ -58,7 +58,7 @@ var is_huawei = is_mobile && (ua.indexOf('huawei') > 0 || ua.indexOf('hmscore') 
 
 if (is_android && !is_huawei) {
     // detect huawei devices by model
-    var tmp = [
+    tmp = [
         'ana-al00', 'ana-nx9', 'ang-an00', 'art-l28', 'brq-an00', 'cdy-nx9b', 'dra-lx9', 'els-n39', 'els-nx9',
         'jef-nx9', 'jny-lx2', 'lio-an00m', 'lio-l29', 'lio-n29', 'med-lx9', 'noh-an00', 'noh-lg', 'noh-nx9',
         'nop-an00', 'oce-an10', 'oce-an50', 'tas-l29', 'tet-an00'
@@ -74,7 +74,7 @@ if (is_android && !is_huawei) {
 // @todo get rid of 'm' around the codebase!
 m = !!is_mobile;
 
-var tmp = getCleanSitePath();
+tmp = getCleanSitePath();
 var is_selenium = !ua.indexOf('mozilla/5.0 (selenium; ');
 var is_embed = String(location.pathname).substr(0, 6) === '/embed' || tmp.substr(0, 2) === 'E!';
 var is_drop = location.pathname === '/drop' || tmp.substr(0, 2) === 'D!';
@@ -727,6 +727,8 @@ if (location.host === 'mega.io') {
     tmp = undefined;
 }
 
+tmp = is_mobile && Object(window.clientInformation).vendor === 'Google Inc.';
+
 var mega = {
     ui: {},
     state: 0,
@@ -735,7 +737,7 @@ var mega = {
     updateURL: defaultStaticPath + 'current_ver.txt',
     chrome: (
         typeof window.chrome === 'object'
-        && window.chrome.runtime !== undefined
+        && (window.chrome.runtime !== undefined || tmp)
         && String(window.webkitRTCPeerConnection).indexOf('native') > 0
     ),
     browserBrand: [
@@ -2384,6 +2386,10 @@ else if (!browserUpdate) {
                         }
                     }
 
+                    if (dump.m.indexOf(':skull:') > 0) {
+                        maxStackLines = 50;
+                    }
+
                     dump.s = dump.s.splice(0, maxStackLines).join("\n");
 
                     if (dump.s.indexOf('Unknown script code:') !== -1
@@ -2842,7 +2848,6 @@ else if (!browserUpdate) {
         jsl.push({f:'js/ui/theme.js', n: 'theme_js', j: 1, w: 1});
 
         jsl.push({f:'css/buttons.css', n: 'buttons_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'css/vars/text-input.css', n: 'vars_text_input_css', j:2, w:30, c:1, d:1, cache:1});
         jsl.push({f:'css/components.css', n: 'components_css', j:2, w:30, c:1, d:1, cache:1});
 
         jsl.push({f:'html/top.html', n: 'top', j:0});
@@ -3039,6 +3044,7 @@ else if (!browserUpdate) {
     jsl.push({f:'css/toast.css', n: 'toast_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/general.css', n: 'general_css', j:2, w:5, c:1, d:1, cache: 1});
     jsl.push({f:'css/megainput.css', n: 'megainput_css', j:2, w:5, c:1, d:1, cache: 1});
+    jsl.push({f:'css/vars/text-input.css', n: 'vars_text_input_css', j:2, w:30, c:1, d:1, cache:1});
     jsl.push({f:'css/retina-images.css', n: 'retina_images_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
 
     // We need to keep a consistent order in loaded resources, so that if users
@@ -3898,7 +3904,7 @@ else if (!browserUpdate) {
         var rightProgressBlock = document.getElementById('loadinganimright');
 
         // Fix exception thrown when going from mobile web /login page to mobile web /register page
-        if (is_mobile && (rightProgressBlock === null)) {
+        if (!rightProgressBlock || !leftProgressBlock) {
             return false;
         }
 

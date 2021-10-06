@@ -474,10 +474,10 @@ class Minimized extends MegaRenderMixin {
                                     theme-light-forced
                                     round
                                     large
-                                    ${this.isActive(SfuClient.Av.Video) ? '' : 'inactive'}
+                                    ${this.isActive(SfuClient.Av.Camera) ? '' : 'inactive'}
                                 `}
                                 icon={`
-                                    ${this.isActive(SfuClient.Av.Video) ? 'icon-video-call-filled' : 'icon-video-off'}
+                                    ${this.isActive(SfuClient.Av.Camera) ? 'icon-video-call-filled' : 'icon-video-off'}
                                 `}
                                 onClick={ev => {
                                     ev.stopPropagation();

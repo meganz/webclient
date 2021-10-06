@@ -20,7 +20,7 @@ export const HAS_CONTACTS = () => {
 export default class Invite extends MegaRenderMixin {
     wrapperRef = React.createRef();
 
-    static NAMESPACE = 'invite';
+    static NAMESPACE = 'invite-meeting';
 
     state = {
         loading: true,
@@ -281,7 +281,7 @@ export default class Invite extends MegaRenderMixin {
                                         this.setState({ field: !field });
                                         e.preventDefault();
                                     }}>
-                                    {field ? 'Collapse meeting link' : 'Expand meeting link'}
+                                    {field ? l.collapse_meeting_link : l.expand_meeting_link}
                                     <i className={`sprite-fm-mono ${field ? 'icon-arrow-up' : 'icon-arrow-down'}`} />
                                 </a>
                                 {field && link && (

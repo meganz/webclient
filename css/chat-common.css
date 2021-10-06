@@ -426,11 +426,6 @@
     position: relative;
 }
 
-.archived-chat-view .grid-table-header th {
-    margin-top: 12px;
-    color: var(--text-color-medium);
-}
-
 .archived-chat-view .grid-table-header th i {
     float: right;
     --icon-size: 24px;
@@ -440,8 +435,8 @@
 .arc-chat-messages-block tr.arc-chat-list {
     height: 72px;
 }
-.arc-chat-messages-block tr.arc-chat-list.ui-selected {
-    background: var(--surface-grey-1);
+.arc-chat-messages-block tr.arc-chat-list.ui-selected .archived-badge {
+    background-color: var(--surface-grey-1);
 }
 
 .arc-chat-messages-block tr.arc-chat-list .nw-contact-avatar {
@@ -449,9 +444,11 @@
 }
 
 .arc-chat-messages-block .fm-chat-user-info {
-    margin: 7px 0 0;
-    -webkit-padding-start: 8px;
-    padding-inline-start: 8px;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    margin: 0 0 0 7px;
+    padding: 0;
     width: calc(100% - 160px);
 }
 .arc-chat-messages-block .fm-chat-user-info .user-card-name {
@@ -459,15 +456,17 @@
 }
 
 .arc-chat-messages-block .user-card-name.conversation-name {
-    font: var(--text-body1);
+    display: flex;
+    font: var(--text-body1-bold);
     color: var(--text-color-high);
 }
 .arc-chat-messages-block .user-card-name.conversation-name i {
-    float: right;
-    margin: 2px 6px;
+    margin: 0 8px;
 }
 .arc-chat-messages-block .archived-on {
-    margin-top: 22px;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
     display: inline-block;
 }
 .arc-chat-messages-block .archived-date-time {
@@ -475,9 +474,25 @@
     font: var(--text-body2);
     color: var(--text-color-low);
 }
+.arc-chat-messages-block .last-message-info {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+}
 .arc-chat-messages-block .conversation-message {
     float: none;
+    width: auto;
     color: var(--text-color-medium);
+}
+.arc-chat-messages-block .conversations-separator {
+    margin: 1px 5px 0 5px;
+}
+.arc-chat-messages-block .date-time {
+    color: var(--text-color-medium);
+}
+.arc-chat-messages-block .conversation-message .emoji {
+    width: 14px;
+    height: 14px;
 }
 .arc-chat-messages-block .archived-badge {
     float: right;
@@ -485,9 +500,9 @@
     margin-top: 25px;
     margin-right: 10px;
     padding: 0 8px;
-    border-radius: 4px;
-    background-color: var(--surface-grey-4);
-    font: var(--text-caption);
+    border-radius: 32px;
+    background-color: var(--surface-grey-2);
+    font: var(--text-body2);
     color: var(--text-color-high);
 }
 table.arc-chat-messages-block {
@@ -513,8 +528,9 @@ table.arc-chat-messages-block {
 .conversations-pane .archived-badge + .conversation-message {
     margin: 0 76px 0 0;
 }
-.arc-chat-messages-block .arc-chat-list:hover button.mega-button {
-   display: inline-block;
+.arc-chat-messages-block .arc-chat-list:hover button.mega-button,
+.arc-chat-messages-block .arc-chat-list.ui-selected button.mega-button {
+    display: flex;
 }
 .arc-chat-messages-block button.mega-button {
     display: none;
@@ -522,10 +538,6 @@ table.arc-chat-messages-block {
     position: absolute;
     right: 20px;
 }
-.arc-chat-messages-block .arc-chat-list.ui-selected button.mega-button {
-    display: inline-block;
-}
-
 .chat-dropdown.container.is-loading {
     opacity: 0.4;
 }
@@ -1099,6 +1111,12 @@ button.fm-empty-button {
     100% { opacity:1; }
 }
 
+.contact-button-loading {
+    display: inline-block;
+    max-width: calc(100% - 60px);
+    padding: 0 10px 0 0;
+}
+
 .contact-name-loading {
     background-color: #E5E5E5;
     width: 96px;
@@ -1110,13 +1128,13 @@ button.fm-empty-button {
     vertical-align: top;
     box-sizing: border-box;
     position: relative;
-    margin: 5px 12px 4px -20px;
+    margin: 5px 0 4px 0;
     -webkit-animation: fadeInOutLoopSubtle 2s linear infinite;
     animation: fadeInOutLoopSubtle 2s linear infinite;
 }
 
 .contacts-info.body.right-chat-contact-card .contact-name-loading {
-    margin: 11px 0 0 -19px;
+    margin: 6px 0 0 0;
 }
 
 .avatar-wrapper.default-bg {

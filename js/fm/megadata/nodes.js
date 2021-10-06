@@ -4183,14 +4183,14 @@ MegaData.prototype.importFolderLinkNodes = function importFolderLinkNodes(nodes)
         });
     };
 
-    if (localStorage.folderLinkImport && !folderlink) {
+    if (($.onImportCopyNodes || sessionStorage.folderLinkImport) && !folderlink) {
         loadingDialog.show('import');
         if ($.onImportCopyNodes) {
             _import($.onImportCopyNodes);
         }
         else {
             var kv = MegaDexie.create(u_handle);
-            var key = 'import.' + localStorage.folderLinkImport;
+            var key = `import.${sessionStorage.folderLinkImport}`;
 
             kv.get(key)
                 .then(function(data) {
@@ -4207,7 +4207,7 @@ MegaData.prototype.importFolderLinkNodes = function importFolderLinkNodes(nodes)
                 });
         }
         nodes = null;
-        delete localStorage.folderLinkImport;
+        delete sessionStorage.folderLinkImport;
     }
 
     var sel = [].concat(nodes || []);
@@ -4215,22 +4215,25 @@ MegaData.prototype.importFolderLinkNodes = function importFolderLinkNodes(nodes)
     if (sel.length) {
         var FLRootID = M.RootID;
 
-        mega.ui.showLoginRequiredDialog().done(function() {
+        mega.ui.showLoginRequiredDialog().then(() => {
             loadingDialog.show();
-            localStorage.folderLinkImport = FLRootID;
+
+            tryCatch(() => {
+                sessionStorage.folderLinkImport = FLRootID;
+            })();
 
             // It is import so need to clear existing attribute for new node.
             $.clearCopyNodeAttr = true;
 
-            M.getCopyNodes(sel)
-                .done(function(nodes) {
+            return M.getCopyNodes(sel)
+                .then((nodes) => {
                     var data = [sel, nodes, nodes.opSize];
                     var fallback = function() {
                         $.onImportCopyNodes = data;
                         loadSubPage('fm');
                     };
 
-                    if (nodes.length > 6000) {
+                    if (!sessionStorage.folderLinkImport || nodes.length > 6000) {
                         fallback();
                     }
                     else {
@@ -4246,14 +4249,15 @@ MegaData.prototype.importFolderLinkNodes = function importFolderLinkNodes(nodes)
                                 fallback();
                             });
                     }
-                }).always(function() {
-                    delete $.clearCopyNodeAttr;
                 });
-        }).fail(function(aError) {
-            // If no aError, it was canceled
-            if (aError) {
-                alert(aError);
+        }).catch((ex) => {
+            // If no ex, it was canceled
+            if (ex) {
+                console.error(ex);
+                msgDialog('warninga', l[135], l[47], ex);
             }
+        }).finally(() => {
+            delete $.clearCopyNodeAttr;
         });
     }
 };

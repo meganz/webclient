@@ -37,6 +37,7 @@ mobile.cloud = {
 
 
         // Render the file manager header, folders, files and footer
+        this.initScrollBarToTop();
         this.initTitleMenu();
         this.renderHeader();
         this.initGridViewToggleHandler();
@@ -597,6 +598,15 @@ mobile.cloud = {
     },
 
     /**
+     * Init the scroll bar to the top of the page
+     */
+    initScrollBarToTop: function() {
+        'use strict';
+
+        $('.fm-scrolling', '.mobile.file-manager-block').scrollTop(0);
+    },
+
+    /**
      * Init TitleMenu
      */
     initTitleMenu: function() {
@@ -645,13 +655,16 @@ mobile.cloud = {
             var $currentFileRow = $(this);
             var nodeHandle = $currentFileRow.data('handle');
             var node = M.d[nodeHandle];
-            var fileName = node.name;
+            var isVideo = is_video(node);
 
             // Clear selection
             mobile.cloud.deselect();
 
             // If this is an image, load the preview slideshow
-            if (is_image(node) && fileext(fileName) !== 'pdf' || is_video(node)) {
+            if (isVideo || is_image3(node)) {
+                if (isVideo) {
+                    $.autoplay = nodeHandle;
+                }
                 mobile.slideshow.init(nodeHandle);
             }
             else {

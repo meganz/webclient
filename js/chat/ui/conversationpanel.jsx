@@ -1497,7 +1497,7 @@ export class ConversationPanel extends MegaRenderMixin {
                         initialView={u_type || is_eplusplus ? Join.VIEW.ACCOUNT : Join.VIEW.INITIAL}
                         chatRoom={room}
                         onJoinGuestClick={(firstName, lastName, audioFlag, videoFlag) => {
-                            room.meetingsLoading = "Joining meeting...";
+                            room.meetingsLoading = l.joining;
                             u_eplusplus(firstName, lastName)
                                 .then(() => {
                                     megaChat.routing.reinitAndJoinPublicChat(

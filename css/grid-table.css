@@ -638,7 +638,7 @@ table.grid-table .grid-status-icon.icon-takedown {
     --mask-color: var(--secondary-red);
 }
 
-table.grid-table i:not(.verified-user-icon) {
+table.grid-table i:not(.verified-user-icon):not(.icon-dot) {
     --mask-color: var(--icon-rest);
     --icon-size: 24px;
     display: inline-block;
@@ -1427,9 +1427,8 @@ table.out-shares .fm-chat-users {
 table.arc-chat-messages-block td {
     padding-left: 5px;
     height: 24px;
-    line-height: 24px;
     vertical-align: top;
-    font-size: 14px;
+    font: var(--text-body2);
     cursor: default;
     box-sizing: border-box;
     position: relative;

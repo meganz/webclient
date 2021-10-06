@@ -1,6 +1,5 @@
-.invite {
+.invite-meeting {
     width: 415px;
-    //padding: 12px 48px 24px;
 
     button {
         display: inline-block;
@@ -64,8 +63,8 @@
         border-top: 1px solid var(--divider-color);
         border-bottom: 1px solid var(--divider-color);
 
-        & > .invite-nil,
-        & > .invite-loading{
+        & > .invite-meeting-nil,
+        & > .invite-meeting-loading{
             position: absolute;
             top: 50%;
             left: 50%;

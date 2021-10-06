@@ -251,10 +251,14 @@ export default class Local extends AbstractGenericMessage {
         // debugging purposes
         const callId = this.props.message?.meta?.callId;
 
+        let debugMsg = "";
+        if (d && callId) {
+            debugMsg = `: callId: ${callId}`;
+        }
         return (
             <div className="message date-time simpletip" data-simpletip={time2date(this.getTimestamp())}>
                 {this.getTimestampAsString()}
-                {d && callId && ": msgId: " + callId}
+                {debugMsg}
             </div>
         );
     }

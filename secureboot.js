@@ -2386,6 +2386,10 @@ else if (!browserUpdate) {
                         }
                     }
 
+                    if (dump.m.indexOf(':skull:') > 0) {
+                        maxStackLines = 50;
+                    }
+
                     dump.s = dump.s.splice(0, maxStackLines).join("\n");
 
                     if (dump.s.indexOf('Unknown script code:') !== -1

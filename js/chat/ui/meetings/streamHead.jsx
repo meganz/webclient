@@ -154,7 +154,7 @@ export default class StreamHead extends MegaRenderMixin {
                 <section className="content">
                     <div className="content-block">
                         <div className="info" dangerouslySetInnerHTML={{ __html: this.getModerators()}} />
-                        <div className="info">Copy this link to send your invite</div>
+                        <div className="info">{l.copy_and_share /* `Copy this link to send your invite` */}</div>
                         <div className="link-input-container">
                             <div className="mega-input with-icon box-style">
                                 <i className="sprite-fm-mono icon-link" />

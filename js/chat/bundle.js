@@ -4633,7 +4633,7 @@ class streamHead_StreamHead extends mixins["MegaRenderMixin"] {
         }
       }), external_React_default.a.createElement("div", {
         className: "info"
-      }, "Copy this link to send your invite"), external_React_default.a.createElement("div", {
+      }, l.copy_and_share), external_React_default.a.createElement("div", {
         className: "link-input-container"
       }, external_React_default.a.createElement("div", {
         className: "mega-input with-icon box-style"
@@ -6362,7 +6362,7 @@ class participants_Participant extends mixins["MegaRenderMixin"] {
       contact: M.u[handle]
     }), external_React_default.a.createElement("div", {
       className: "name"
-    }, external_React_default.a.createElement("span", null, name, " \xA0"), handle === u_handle && external_React_default.a.createElement("span", null, "(me)"), chatRoom.isMeeting && call_Call.isModerator(chatRoom, handle) && external_React_default.a.createElement("span", null, external_React_default.a.createElement("i", {
+    }, external_React_default.a.createElement("span", null, name, " \xA0"), handle === u_handle && external_React_default.a.createElement("span", null, l.me), chatRoom.isMeeting && call_Call.isModerator(chatRoom, handle) && external_React_default.a.createElement("span", null, external_React_default.a.createElement("i", {
       className: this.baseIconClass + " icon-admin"
     }))), external_React_default.a.createElement("div", {
       className: "status"
@@ -6931,7 +6931,7 @@ class invite_Invite extends mixins["MegaRenderMixin"] {
         });
         e.preventDefault();
       }
-    }, field ? 'Collapse meeting link' : 'Expand meeting link', external_React_default.a.createElement("i", {
+    }, field ? l.collapse_meeting_link : l.expand_meeting_link, external_React_default.a.createElement("i", {
       className: "sprite-fm-mono " + (field ? 'icon-arrow-up' : 'icon-arrow-down')
     })), field && link && external_React_default.a.createElement("div", {
       className: "chat-link-input"
@@ -25125,7 +25125,7 @@ class start_Start extends mixins["MegaRenderMixin"] {
       }
     };
 
-    this.state.topic = M.getNameByHandle(u_handle) + "'s meeting";
+    this.state.topic = l.default_meeting_topic.replace('%NAME', M.getNameByHandle(u_handle));
   }
 
   componentDidMount() {
@@ -26332,7 +26332,7 @@ let conversations_ConversationsApp = (_dec3 = utils["default"].SoonFcWrap(80), (
       }, {
         key: 'newMeeting',
         className: 'new-meeting',
-        title: 'New meeting',
+        title: l.new_meeting,
         icon: 'sprite-fm-mono icon-video-call-filled',
         onClick: () => {
           if (megaChat.hasSupportForCalls) {
@@ -26561,10 +26561,10 @@ let conversations_ConversationsApp = (_dec3 = utils["default"].SoonFcWrap(80), (
         megaChat.$chatTreePanePs = ref;
       }
     }, megaChat.chats.length > 0 && conversations_React.createElement("div", {
-      className: "\n                                content-panel\n                                conversations\n                                active\n                            "
+      className: "\n                                    content-panel\n                                    conversations\n                                    active\n                                "
     }, conversations_React.createElement("span", {
       className: "heading"
-    }, "Contacts and Groups"), conversations_React.createElement(conversations_ConversationsList, {
+    }, l.contacts_and_groups), conversations_React.createElement(conversations_ConversationsList, {
       quickSearchText: this.state.quickSearchText
     }))), conversations_React.createElement("div", {
       className: arcBtnClass,

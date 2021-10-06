@@ -3238,12 +3238,12 @@ function bottomPageDialog(close, pp, hh, tickbox) {
         }
         $dialog.rebind('dialog-closed', closeDialog).removeClass('hidden');
 
-        $('.bp-main', $dialog)
-            .safeHTML(translate(String(pages[pp])
-                .split('((TOP))')[1]
-                .split('((BOTTOM))')[0]
-                .replace('main-mid-pad new-bottom-pages', ''))
-            );
+        const $bottomPageDialogMain = $('.bp-main', $dialog);
+        $bottomPageDialogMain.safeHTML(translate(String(pages[pp])
+            .split('((TOP))')[1]
+            .split('((BOTTOM))')[0]
+            .replace('main-mid-pad new-bottom-pages', ''))
+        );
 
         $('.bp-body', $dialog).jScrollPane({
             showArrows: true,
@@ -3251,6 +3251,10 @@ function bottomPageDialog(close, pp, hh, tickbox) {
             animateScroll: true,
             verticalDragMinHeight: 50
         });
+
+        if (pp === 'terms') {
+            $('a[href]', $bottomPageDialogMain).attr('target', '_blank');
+        }
         jScrollFade('.bp-body');
         clickURLs();
         scrollToURLs();

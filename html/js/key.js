@@ -1,6 +1,9 @@
 
 /** Initialise they keys required for operation. */
 function init_key() {
+    if (typeof u_k_aes === 'undefined') {
+        return loadSubPage('start');
+    }
     $('.key1').addClass('hidden');
     $('.key2').removeClass('hidden');
 

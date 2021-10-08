@@ -4303,6 +4303,7 @@ body.de .mega-dialog.new-group-chat {
 
     .mega-dialog.payment-address-dialog {
         width: 730px;
+        max-height: 100vh;
     }
     .mega-dialog.payment-address-dialog header {
         align-items: center;
@@ -4686,6 +4687,7 @@ body.de .mega-dialog.new-group-chat {
 
     .mega-dialog.wire-transfer-dialog {
         width: 1145px;
+        max-width: 100vw;
     }
     .mega-dialog.wire-transfer-dialog .content-block {
         padding-bottom: 48px;
@@ -4717,6 +4719,7 @@ body.de .mega-dialog.new-group-chat {
     .mega-dialog.wire-transfer-dialog .resellers-top-txt .wire-transfer-details th {
         padding-right: 15px;
         text-align: start;
+        white-space: nowrap;
     }
     .mega-dialog.wire-transfer-dialog .resellers-top-txt .wire-transfer-details .bank-address {
         padding-bottom: 15px;

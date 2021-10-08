@@ -1254,6 +1254,16 @@ var addressDialog = {
         var numOfMonths;
         var monthsWording;
 
+        if (!is_mobile) {
+            var $contentSection = $('section.content', this.$dialog);
+            if ($contentSection.is('.ps-container')) {
+                Ps.update($contentSection[0]);
+            }
+            else {
+                Ps.initialize($contentSection[0]);
+            }
+        }
+
         // in case we are coming from normal users sign ups (PRO)
         if (!this.businessPlan || !this.userInfo) {
             // Get the selected package

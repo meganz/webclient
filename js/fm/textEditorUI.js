@@ -74,7 +74,7 @@ mega.textEditorUI = new function TextEditorUI() {
 
     };
 
-    var bindChangeListner = function() {
+    const bindEventsListner = function() {
 
         var changeListner = function() {
             $saveButton.removeClass('disabled');
@@ -82,10 +82,18 @@ mega.textEditorUI = new function TextEditorUI() {
         };
 
         editor.on('change', changeListner);
+
+        $(window).rebind('keydown.texteditor', (e) => {
+            if (e.code === 'Escape') {
+                // IE not supported.
+                confirmSaveOrExit();
+            }
+        });
     };
 
     var doClose = () => {
         $saveButton.addClass('disabled');
+        $(window).off('keydown.texteditor');
         history.back();
         mega.textEditorUI.doClose();
     };
@@ -252,7 +260,7 @@ mega.textEditorUI = new function TextEditorUI() {
                         versionHandle = fh;
                         savedFileData = editor.getValue();
 
-                        bindChangeListner();
+                        bindEventsListner();
 
                         loadingDialog.hide();
                         if (cb && typeof cb === 'function') {
@@ -500,7 +508,7 @@ mega.textEditorUI = new function TextEditorUI() {
             if (editor) {
                 savedFileData = txt;
                 editor.setValue(txt);
-                bindChangeListner();
+                bindEventsListner();
             }
             $saveButton.addClass('disabled');
 

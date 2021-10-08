@@ -5389,6 +5389,15 @@ class local_Local extends mixins["MegaRenderMixin"] {
   }
 
   render() {
+    const {
+      streams,
+      minimized
+    } = this.props;
+
+    if (streams.length === 0 && !minimized) {
+      return null;
+    }
+
     const STREAM_PROPS = { ...this.props,
       ratioClass: this.getRatioClass(),
       collapsed: this.state.collapsed,
@@ -5396,7 +5405,7 @@ class local_Local extends mixins["MegaRenderMixin"] {
       onLoadedData: this.onLoadedData
     };
 
-    if (this.props.minimized) {
+    if (minimized) {
       return external_React_default.a.createElement(utils["default"].RenderTo, {
         element: document.body
       }, external_React_default.a.createElement(local_Stream, STREAM_PROPS));
@@ -5413,6 +5422,11 @@ class local_Stream extends mixins["MegaRenderMixin"] {
   constructor(props) {
     super(props);
     this.containerRef = external_React_default.a.createRef();
+    this.DRAGGABLE_OPTIONS = {
+      scroll: 'false',
+      cursor: 'move',
+      opacity: 0.8
+    };
     this.EVENTS = {
       MINIMIZE: ['slideshow:open', 'contact:open', 'textEditor:open', 'chat:open'],
       EXPAND: ['slideshow:close', 'textEditor:close']
@@ -5451,26 +5465,18 @@ class local_Stream extends mixins["MegaRenderMixin"] {
       const container = this.containerRef && this.containerRef.current;
 
       if (container) {
-        $(container).draggable({
-          containment: 'body',
-          scroll: 'false',
-          cursor: 'move',
-          opacity: 0.8
+        $(container).draggable({ ...this.DRAGGABLE_OPTIONS,
+          containment: this.props.mode === call_Call.MODE.MINI ? 'body' : '.meetings-call .stream'
         });
       }
     };
 
-    this.toggleDraggable = () => {
-      const {
-        mode
-      } = this.props;
-      const {
-        containerRef
-      } = this;
-      const $container = containerRef && containerRef.current && $(containerRef.current);
+    this.repositionDraggable = () => {
+      const wrapperEl = this.props.wrapperRef && this.props.wrapperRef.current;
+      const localEl = this.containerRef && this.containerRef.current;
 
-      if ($container && $container.draggable('instance') !== undefined) {
-        $container.draggable('option', 'disabled', mode !== call_Call.MODE.MINI);
+      if (localEl.offsetLeft + localEl.offsetWidth > wrapperEl.offsetWidth) {
+        localEl.style.left = 'auto';
       }
     };
 
@@ -5586,9 +5592,16 @@ class local_Stream extends mixins["MegaRenderMixin"] {
     this.unbindEvents();
   }
 
-  componentDidUpdate() {
+  componentDidUpdate(prevProps) {
     super.componentDidUpdate();
-    this.toggleDraggable();
+
+    if (this.props.mode !== prevProps.mode) {
+      this.initDraggable();
+    }
+
+    if (this.props.sidebar !== prevProps.sidebar && this.props.sidebar) {
+      this.repositionDraggable();
+    }
   }
 
   componentDidMount() {
@@ -5603,7 +5616,6 @@ class local_Stream extends mixins["MegaRenderMixin"] {
       POSITION_MODIFIER
     } = local_Local;
     const {
-      streams,
       mode,
       minimized,
       sidebar,
@@ -5613,10 +5625,6 @@ class local_Stream extends mixins["MegaRenderMixin"] {
       onCallExpand
     } = this.props;
     const IS_MINI_MODE = mode === call_Call.MODE.MINI;
-
-    if (streams.length === 0 && !minimized) {
-      return null;
-    }
 
     if (collapsed) {
       return external_React_default.a.createElement("div", {
@@ -5835,6 +5843,7 @@ const MOUSE_OUT_DELAY = 2500;
 class stream_Stream extends mixins["MegaRenderMixin"] {
   constructor(...args) {
     super(...args);
+    this.wrapperRef = external_React_default.a.createRef();
     this.containerRef = external_React_default.a.createRef();
     this.nodeRefs = [];
     this.chunks = [];
@@ -6196,6 +6205,7 @@ class stream_Stream extends mixins["MegaRenderMixin"] {
       onSpeakerChange
     } = this.props;
     return external_React_default.a.createElement("div", {
+      ref: this.wrapperRef,
       className: "\n                    stream\n                    " + (sidebar ? '' : 'full') + "\n                    " + (hovered ? 'hovered' : '') + "\n                ",
       onMouseMove: this.handleMouseMove,
       onMouseOut: this.handleMouseOut
@@ -6234,6 +6244,7 @@ class stream_Stream extends mixins["MegaRenderMixin"] {
       minimized: minimized,
       sidebar: sidebar,
       forcedLocal: forcedLocal,
+      wrapperRef: this.wrapperRef,
       onAudioClick: onAudioClick,
       onVideoClick: onVideoClick,
       onCallEnd: onCallEnd,

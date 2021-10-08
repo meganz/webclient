@@ -17,6 +17,7 @@ const PAGINATION = { PREV: 1, NEXT: 2 };
 const MOUSE_OUT_DELAY = 2500;
 
 export default class Stream extends MegaRenderMixin {
+    wrapperRef = React.createRef();
     containerRef = React.createRef();
 
     nodeRefs = [];
@@ -465,6 +466,7 @@ export default class Stream extends MegaRenderMixin {
 
         return (
             <div
+                ref={this.wrapperRef}
                 className={`
                     ${NAMESPACE}
                     ${sidebar ? '' : 'full'}
@@ -519,6 +521,7 @@ export default class Stream extends MegaRenderMixin {
                     minimized={minimized}
                     sidebar={sidebar}
                     forcedLocal={forcedLocal}
+                    wrapperRef={this.wrapperRef}
                     onAudioClick={onAudioClick}
                     onVideoClick={onVideoClick}
                     onCallEnd={onCallEnd}

@@ -837,6 +837,11 @@ var mega = {
             to += '/aff=' + affid;
         }
 
+        var uLang = sessionStorage.lang || storage.lang;
+        if (uLang) {
+            to += '/lang=' + uLang;
+        }
+
         if (storage.csp) {
             to += '/csp=' + storage.csp;
         }

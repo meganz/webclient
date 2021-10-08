@@ -248,10 +248,6 @@ mBroadcaster.once('boot_done', () => {
         'use strict';
         const selectedPlan = $('.pricing-page.plan.selected', 'body').data('payment');
         const kvLogin = [['next', 'propay_' + selectedPlan]];
-        const uLang = sessionStorage.lang || localStorage.lang;
-        if (uLang) {
-            kvLogin.push(['lang', uLang, '1']);
-        }
         const kvReg = [['next', '1'], ['plan', selectedPlan]];
         if (is_mobile) {
             const $mobileDlg = $('.mobile.loginrequired-dialog', '#startholder');
@@ -712,10 +708,6 @@ BusinessAccount.prototype.getBusinessPlanInfo = function(forceUpdate) {
 window.redirectToSupport = (url) => {
     'use strict';
     const kvLogin = [['next', 'support'], ['articleUrl', url.replace('mega.io', 'mega.nz')]];
-    const uLang = sessionStorage.lang || localStorage.lang;
-    if (uLang) {
-        kvLogin.push(['lang', uLang, '1']);
-    }
     const $dlg = $('.loginrequired-dialog', '.common-container');
     $('header h3', $dlg).text(l[5841]);
     $('header p', $dlg).text(l.help2_login_text);

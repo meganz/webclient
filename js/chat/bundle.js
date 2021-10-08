@@ -13534,7 +13534,12 @@ class metaRichpreviewMegaLinks_MetaRichpreviewMegaLinks extends mixin["Conversat
         } else if (!megaLinkInfo.is_dir) {
           desc = bytesToSize(megaLinkInfo.info.size);
         } else {
-          desc = external_React_default.a.createElement("span", null, fm_contains(megaLinkInfo.info.s[1], megaLinkInfo.info.s[2] - 1), external_React_default.a.createElement("br", null), bytesToSize(megaLinkInfo.info.size));
+          const totalNumberOfFiles = megaLinkInfo.info.s[1];
+          const numOfVersionedFiles = megaLinkInfo.info.s[4];
+          const folderCount = megaLinkInfo.info.s[2];
+          const totalFileSize = megaLinkInfo.info.size;
+          const versionsSize = megaLinkInfo.info.s[3];
+          desc = external_React_default.a.createElement("span", null, fm_contains(totalNumberOfFiles - numOfVersionedFiles, folderCount - 1), external_React_default.a.createElement("br", null), bytesToSize(totalFileSize - versionsSize));
         }
 
         previewContainer = external_React_default.a.createElement("div", {

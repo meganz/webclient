@@ -74,7 +74,7 @@ var authring = (function () {
             const msg = 'The system went into an invalid state for ongoing auth-ring operations :skull:';
 
             onIdle(() => {
-                throw new SecurityError(msg);
+                throw new Error(msg);
             });
             console.error(msg, window.u_attr);
 

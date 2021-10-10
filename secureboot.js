@@ -2380,7 +2380,10 @@ else if (!browserUpdate) {
 
                     dump.s = String(errobj.stack)
                         .replace(omsg, '').replace(re, '')
-                        .split("\n").map(mTrim).filter(String);
+                        .split("\n").map(mTrim)
+                        .filter(function(s, idx, a) {
+                            return s.length && a[idx - 1] !== s;
+                        });
 
                     for (var idx = 1; idx < dump.s.length; idx++) {
                         var s = dump.s[idx];

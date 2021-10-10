@@ -97,9 +97,12 @@ function mouseMoveEntropy(e) {
 // Store some random bits for reseeding RNG in the future
 function saveRandSeed() {
     'use strict';
-    var randseed = new Uint8Array(32);
-    asmCrypto.getRandomValues(randseed);
-    localStorage.randseed = base64urlencode(asmCrypto.bytes_to_string(randseed));
+    // @todo move this out of localStorage..
+    tryCatch(() => {
+        const randseed = new Uint8Array(32);
+        asmCrypto.getRandomValues(randseed);
+        localStorage.randseed = base64urlencode(asmCrypto.bytes_to_string(randseed));
+    })();
     saveRandSeed.needed = false;
 }
 saveRandSeed.needed = !localStorage.randseed;

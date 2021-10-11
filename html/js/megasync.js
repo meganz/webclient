@@ -519,7 +519,7 @@ var megasync = (function() {
         else {
             if (requestArgs.a === "t") { // is get status request
 
-                if (localStorage.jj && localStorage.d) {
+                if (d > 1) {
                     console.info("status: " + response.s + " progress: " + response.p + "  total: " + response.t
                         + "  speed: " + response.v);
                 }

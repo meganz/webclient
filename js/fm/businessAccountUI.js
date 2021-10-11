@@ -733,7 +733,7 @@ BusinessAccountUI.prototype.showLinkPasswordDialog = function (invitationLink) {
                     getInfoPromise.fail(failureAction);
 
                     getInfoPromise.done(function signupCodeGettingSuccessHandler(status, res) {
-                        if (localStorage.d) {
+                        if (d) {
                             console.log(res);
                         }
                         if (!res.e || !res.firstname || !res.bpubk || !res.bu) {
@@ -795,7 +795,7 @@ BusinessAccountUI.prototype.openInvitationLink = function (signupCode) {
     getInfoPromise.fail(failureAction);
 
     getInfoPromise.done(function signupCodeGettingSuccessHandler(status, res) {
-        if (localStorage.d) {
+        if (d) {
             console.log(res);
         }
         if (!res.e || !res.firstname || !res.bpubk || !res.bu) {

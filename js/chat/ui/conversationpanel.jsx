@@ -1840,17 +1840,24 @@ export class ConversationPanels extends MegaRenderMixin {
                 emptyMessage = '';
             }
 
+            const hasContacts = !!contactsList.length || !!contactsListOffline.length;
             return (
                 <div>
-                    <div className="chat-right-area">
-                        <div className="chat-right-area contacts-list-scroll">
-                            <div className="chat-right-pad">
-                                {contactsList}
-                                {contactsListOffline}
+                    {hasContacts && (
+                        <div className="chat-right-area">
+                            <div className="chat-right-area contacts-list-scroll">
+                                <div className="chat-right-pad">
+                                    {contactsList}
+                                    {contactsListOffline}
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div className="fm-empty-section empty-messages">
+                    )}
+                    <div
+                        className={`
+                            fm-empty-section
+                            ${hasContacts ? 'empty-messages' : 'empty-conversations'}
+                        `}>
                         <div className="fm-empty-pad">
                             <i className="section-icon sprite-fm-mono icon-chat-filled"/>
                             <div className="fm-empty-cloud-txt small"

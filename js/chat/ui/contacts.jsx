@@ -5,7 +5,7 @@ import utils from '../../ui/utils.jsx';
 import { PerfectScrollbar } from '../../ui/perfectScrollbar.jsx';
 import { Button } from '../../ui/buttons.jsx';
 import { Dropdown, DropdownItem } from '../../ui/dropdowns.jsx';
-import Call from './meetings/call.jsx';
+import ContactsPanel from './contactsPanel/contactsPanel.jsx';
 
 export const MAX_FREQUENTS = 3;
 const EMPTY_ARR = [];
@@ -1270,6 +1270,7 @@ export class ContactPickerWidget extends MegaRenderMixin {
                                 <Button
                                     className={`
                                         ${className || ''}
+                                        ${key === 'newChatLink' ? 'branded-blue' : ''}
                                         mega-button
                                         round
                                     `}
@@ -1416,9 +1417,6 @@ export class ContactPickerWidget extends MegaRenderMixin {
         }
         else {
             contactsList = <div className="chat-contactspicker-no-contacts">
-                <div className="contacts-list-header">
-                    {l[165]}
-                </div>
                 <div className="section-icon sprite-fm-mono icon-contacts"></div>
                 <div className="fm-empty-cloud-txt small">{l[784]}</div>
                 <div className="fm-empty-description small">{l[19115]}</div>
@@ -1487,7 +1485,7 @@ export class ContactPickerWidget extends MegaRenderMixin {
                 )}
                 {contactsList}
                 {selectFooter}
-                {this.props.showAddContact && (
+                {ContactsPanel.hasContacts() && this.props.showAddContact && (
                     <div className="contacts-search-bottom">
                         <Button
                             className="mega-button action positive"

@@ -71,6 +71,10 @@
     position: absolute;
     width: calc(100% - 256px);
 }
+.fm-empty-section.empty-conversations {
+    position: absolute;
+    width: 100%;
+}
 
 .messages-block {
     overflow: hidden;

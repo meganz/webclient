@@ -6351,7 +6351,12 @@ class participants_Participant extends mixins["MegaRenderMixin"] {
         call,
         stream
       } = this.props;
-      return call && (call.localAudioMuted === null || !!call.localAudioMuted) || stream && stream.audioMuted;
+
+      if (call) {
+        return call.localAudioMuted === null || !!call.localAudioMuted;
+      }
+
+      return stream && stream.audioMuted;
     };
 
     this.videoMuted = () => {
@@ -6359,7 +6364,12 @@ class participants_Participant extends mixins["MegaRenderMixin"] {
         call,
         stream
       } = this.props;
-      return call && !call.localVideoStream || stream && stream.videoMuted;
+
+      if (call) {
+        return !(call.av & SfuClient.Av.Camera);
+      }
+
+      return stream && stream.videoMuted;
     };
   }
 

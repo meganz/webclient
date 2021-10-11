@@ -1133,8 +1133,11 @@ pro.propay = {
             else if (pro.propay.proPaymentMethod.indexOf('ecp') === 0
                 || pro.propay.proPaymentMethod.toLowerCase().indexOf('stripe') === 0) {
                 if (pro.propay.userSubsGatewayId === 2 || pro.propay.userSubsGatewayId === 3) {
-                    // Detect the user has subscribed to a Pro plan with Google Play or Apple iTunes
-                    msgDialog('warninga', '', l.warning_has_subs_with_3p);
+                    // Detect the user has subscribed to a Pro plan with Google Play or Apple store
+                    // pop up the warning dialog but let the user proceed with an upgrade
+                    msgDialog('warninga', '', l.warning_has_subs_with_3p, '', () => {
+                        addressDialog.init();
+                    });
                 }
                 else {
                     addressDialog.init();

@@ -1078,6 +1078,10 @@ button.fm-empty-button {
 .chat-contactspicker-no-contacts {
     margin-top: 8px;
     text-align: center;
+    padding: 0 48px;
+}
+.main-start-chat-dropdown .chat-contactspicker-no-contacts {
+    min-height: 358px;
 }
 .chat-contactspicker-no-contacts .empty-share-public {
     text-align: center;

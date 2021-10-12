@@ -1453,35 +1453,38 @@ export class ContactPickerWidget extends MegaRenderMixin {
                 {topButtons}
                 {multipleContacts}
                 {!this.props.readOnly && haveContacts && (
-                    <div
-                        className={`
-                            contacts-search-header
-                            ${this.props.headerClasses}
-                        `}>
-                        <i className="sprite-fm-mono icon-preview-reveal"/>
-                        <input
-                            autoFocus
-                            type="search"
-                            placeholder={searchPlaceholderMsg}
-                            ref={nodeRef => {
-                                this.contactSearchField = nodeRef;
-                            }}
-                            onChange={this.onSearchChange}
-                            value={this.state.searchValue}
-                        />
+                    <>
                         <div
                             className={`
-                                search-result-clear
-                                ${this.state.searchValue && this.state.searchValue.length > 0 ? '' : 'hidden'}
-                            `}
-                            onClick={() => {
-                                this.setState({ searchValue: '' }, () =>
-                                    this.contactSearchField.focus()
-                                );
-                            }}>
-                            <i className="sprite-fm-mono icon-close-component"/>
+                                contacts-search-header
+                                ${this.props.headerClasses}
+                            `}>
+                            <i className="sprite-fm-mono icon-preview-reveal"/>
+                            <input
+                                autoFocus
+                                type="search"
+                                placeholder={searchPlaceholderMsg}
+                                ref={nodeRef => {
+                                    this.contactSearchField = nodeRef;
+                                }}
+                                onChange={this.onSearchChange}
+                                value={this.state.searchValue}
+                            />
+                            <div
+                                className={`
+                                    search-result-clear
+                                    ${this.state.searchValue && this.state.searchValue.length > 0 ? '' : 'hidden'}
+                                `}
+                                onClick={() => {
+                                    this.setState({ searchValue: '' }, () =>
+                                        this.contactSearchField.focus()
+                                    );
+                                }}>
+                                <i className="sprite-fm-mono icon-close-component"/>
+                            </div>
                         </div>
-                    </div>
+                        <div className="contacts-search-header-separator" />
+                    </>
                 )}
                 {contactsList}
                 {selectFooter}

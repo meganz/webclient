@@ -2864,8 +2864,8 @@ class ContactPickerWidget extends _stores_mixins_js2__["MegaRenderMixin"] {
     return react1.a.createElement("div", {
       ref: this.containerRef,
       className: "\n                    " + (this.props.className || '') + "\n                    " + extraClasses + "\n                "
-    }, topButtons, multipleContacts, !this.props.readOnly && haveContacts && react1.a.createElement("div", {
-      className: "\n                            contacts-search-header\n                            " + this.props.headerClasses + "\n                        "
+    }, topButtons, multipleContacts, !this.props.readOnly && haveContacts && react1.a.createElement(react1.a.Fragment, null, react1.a.createElement("div", {
+      className: "\n                                contacts-search-header\n                                " + this.props.headerClasses + "\n                            "
     }, react1.a.createElement("i", {
       className: "sprite-fm-mono icon-preview-reveal"
     }), react1.a.createElement("input", {
@@ -2878,7 +2878,7 @@ class ContactPickerWidget extends _stores_mixins_js2__["MegaRenderMixin"] {
       onChange: this.onSearchChange,
       value: this.state.searchValue
     }), react1.a.createElement("div", {
-      className: "\n                                search-result-clear\n                                " + (this.state.searchValue && this.state.searchValue.length > 0 ? '' : 'hidden') + "\n                            ",
+      className: "\n                                    search-result-clear\n                                    " + (this.state.searchValue && this.state.searchValue.length > 0 ? '' : 'hidden') + "\n                                ",
       onClick: () => {
         this.setState({
           searchValue: ''
@@ -2886,7 +2886,9 @@ class ContactPickerWidget extends _stores_mixins_js2__["MegaRenderMixin"] {
       }
     }, react1.a.createElement("i", {
       className: "sprite-fm-mono icon-close-component"
-    }))), contactsList, selectFooter, _contactsPanel_contactsPanel_jsx7__["a"].hasContacts() && this.props.showAddContact && react1.a.createElement("div", {
+    }))), react1.a.createElement("div", {
+      className: "contacts-search-header-separator"
+    })), contactsList, selectFooter, _contactsPanel_contactsPanel_jsx7__["a"].hasContacts() && this.props.showAddContact && react1.a.createElement("div", {
       className: "contacts-search-bottom"
     }, react1.a.createElement(_ui_buttons_jsx5__["Button"], {
       className: "mega-button action positive",

@@ -15824,6 +15824,9 @@ class generic_GenericConversationMessage extends mixin["ConversationMessageMixin
   }
 
   _favourite(h) {
+    if (M.isInvalidUserStatus()) {
+      return;
+    }
     var newFavState = Number(!M.isFavourite(h));
     M.favourite([h], newFavState);
   }

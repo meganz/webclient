@@ -121,7 +121,7 @@
 
     SfuApp.prototype.onDisconnect = function(termCode, willReconnect) {
         if (!willReconnect) {
-            this.room.trigger("onCallEnd", {'callId': this.callId});
+            this.room.trigger("onCallEnd", {'callId': this.callId, 'showCallFeedback': true});
             if (this.sfuClient.termCode === 1) {
                 msgDialog('warningb', '', l[20200]);
             }

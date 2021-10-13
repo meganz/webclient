@@ -1412,29 +1412,29 @@ var slideshowid;
     // a method to fetch scripts and files needed to run pdfviewer
     // and then excute them on iframe element [#pdfpreviewdiv1]
     function prepareAndViewPdfViewer(data) {
+        const signal = tryCatch(() => {
+            const elm = document.getElementById('pdfpreviewdiv1');
+            elm.classList.remove('hidden');
+
+            const ev = document.createEvent("HTMLEvents");
+            ev.initEvent("pdfjs-openfile.meganz", true);
+            ev.data = data.buffer || data.src;
+            elm.contentDocument.body.dispatchEvent(ev);
+            return true;
+        });
+
         if (_pdfSeen) {
-            var success = false;
-            tryCatch(function() {
-                var elm = document.getElementById('pdfpreviewdiv1');
-                elm.classList.remove('hidden');
 
-                var ev = document.createEvent("HTMLEvents");
-                ev.initEvent("pdfjs-openfile.meganz", true);
-                ev.data = data.buffer || data.src;
-                elm.contentDocument.body.dispatchEvent(ev);
-                success = true;
-            })();
-
-            if (success) {
+            if (signal()) {
                 return;
             }
         }
-        M.require('pdfjs2', 'pdfviewer', 'pdfviewercss', 'pdfviewerjs').done(function() {
+
+        M.require('pdfjs2', 'pdfviewer', 'pdfviewercss', 'pdfviewerjs').then(() => {
             var myPage = pages['pdfviewer'];
             myPage = myPage.replace('viewer.css', window.pdfviewercss);
             myPage = myPage.replace('../build/pdf.js', window.pdfjs2);
             myPage = myPage.replace('viewer.js', window.pdfviewerjs);
-            localStorage.setItem('currPdfPrev2', JSON.stringify(data.src));
             // remove then re-add iframe to avoid History changes [push]
             var pdfIframe = document.getElementById('pdfpreviewdiv1');
             var newPdfIframe = document.createElement('iframe');
@@ -1445,6 +1445,10 @@ var slideshowid;
             var doc = newPdfIframe.contentWindow.document;
             doc.open();
             doc.write(myPage);
+            doc.addEventListener('pdfjs-webViewerInitialized.meganz', function ack() {
+                doc.removeEventListener('pdfjs-webViewerInitialized.meganz', ack);
+                queueMicrotask(signal);
+            });
             doc.close();
             _pdfSeen = true;
         });

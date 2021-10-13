@@ -29,6 +29,9 @@ var notify = {
     /** A list of already rendered pending contact request IDs (multiple can exist with reminders) */
     renderedContactRequests: [],
 
+    /** Temp list of accepted contact requests */
+    acceptedContactRequests: [],
+
     /**
      * Initialise the notifications system
      */
@@ -590,6 +593,9 @@ var notify = {
         notify.setHeightForNotifications();
         notify.initPopupScrolling();
 
+        // reset accepted list once rendered
+        notify.acceptedContactRequests = [];
+
         // Add click handlers for various notifications
         notify.initFullContactClickHandler();
         notify.initShareClickHandler();
@@ -767,6 +773,7 @@ var notify = {
             // Mark all notifications as seen and close the popup
             // (because they clicked on a notification within the popup)
             notify.closePopup();
+            notify.acceptedContactRequests.push(pendingContactId);
 
             // Update IPC indicator
             delay('updateIpcRequests', updateIpcRequests, 1000);
@@ -897,6 +904,7 @@ var notify = {
 
         var pendingContactId = notification.data.p;
         var mostRecentNotification = true;
+        let isNotAccepted = true;
         var className = '';
         var title = '';
 
@@ -909,8 +917,11 @@ var notify = {
             }
         }
 
+        if (notify.acceptedContactRequests.includes(pendingContactId)) {
+            isNotAccepted = false;
+        }
         // If this is the most recent contact request from this user
-        if (mostRecentNotification) {
+        if (mostRecentNotification && isNotAccepted) {
 
             // If this IPC notification also exists in the state
             if (typeof M.ipc[pendingContactId] === 'object') {

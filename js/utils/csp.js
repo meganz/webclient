@@ -46,17 +46,19 @@ lazy(self, 'csp', function() {
     };
 
     const canShowDialog = promisify(resolve => {
-        const exclude = {'cookie': 1, 'megadrop': 1, 'privacy': 1, 'takedown': 1, 'terms': 1};
+        const exclude = {'cookie': 1, 'download':1, 'megadrop': 1, 'privacy': 1, 'takedown': 1, 'terms': 1};
 
-        (function check(page) {
-            if (exclude[String(page).split('/')[0]]) {
+        (function check() {
+            const page = String(window.page);
+
+            if (exclude[page.split('/')[0]] || pfid || page.indexOf('chat') > -1) {
                 return mBroadcaster.once('pagechange', check);
             }
             if ($.msgDialog) {
-                return mBroadcaster.once('msgdialog-closed', SoonFc(200, () => check(window.page)));
+                return mBroadcaster.once('msgdialog-closed', SoonFc(200, check));
             }
             resolve();
-        })(window.page);
+        })();
     });
 
     mBroadcaster.addListener('login2', () => sgValue(value).dump('csp.login'));

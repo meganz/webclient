@@ -399,7 +399,11 @@ function init_page() {
         return false;
     }
     if (page === "fm/ipc") {
-        return loadSubPage("/fm/chat/contacts/received");
+        if (u_type) {
+            return loadSubPage("/fm/chat/contacts/received");
+        }
+        login_next = '/fm/chat/contacts/received';
+        return loadSubPage('/login');
     }
     if (page === "fm/opc") {
         return loadSubPage("/fm/chat/contacts/sent");

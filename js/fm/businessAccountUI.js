@@ -1126,11 +1126,11 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
         var rubbishTotalFormatted = numOfBytes(rubbishInfo[0], 2);
         var inshareInternalTotalFormatted = numOfBytes(inshareInternalInfo[0], 2);
         var inshareExternalTotalFormatted = numOfBytes(inshareExternalInfo[0], 2);
-        var outshareTotalFormatted = numOfBytes(outshareInfo[0], 2);
+        var outshareTotalFormatted = numOfBytes(outshareInfo[0] - (outshareInfo[3] || 0), 2);
         var outshareTotalInternalFormatted = numOfBytes(outshareInternalInfo[0], 2);
 
         var versionsTotalFormatted = numOfBytes(rootInfo[3] + rubbishInfo[3]
-            + inshareInternalInfo[3] + inshareExternalInfo[3] + outshareInfo[3], 2);
+            + inshareInternalInfo[3] + inshareExternalInfo[3], 2);
 
         // fill in UI
         $('.user-management-view-data .user-management-storage .storage-transfer-data',
@@ -1191,7 +1191,7 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
         $('.file-number', $inShareExSection).text(inShareExFileNumText);
 
         var outShareExFolderNumText = ffNumText(outshareInfo[2], 'folder');
-        var outShareExFileNumText = ffNumText(outshareInfo[1], 'file');
+        var outShareExFileNumText = ffNumText(outshareInfo[1] - (outshareInfo[4] || 0), 'file');
         $('.ff-occupy', $outShareExternalSection).text(outshareTotalFormatted.size + ' ' +
             outshareTotalFormatted.unit);
         $('.folder-number', $outShareExternalSection).text(outShareExFolderNumText);
@@ -1211,7 +1211,7 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
         $('.file-number', $rubbishSection).text(rubbishFileNumText);
 
         var versionsFileNumText = ffNumText(rootInfo[4] + rubbishInfo[4]
-            + inshareInternalInfo[4] + inshareExternalInfo[4] + outshareInfo[4], 'file');
+            + inshareInternalInfo[4] + inshareExternalInfo[4], 'file');
         $('.ff-occupy', $versionsSection).text(versionsTotalFormatted.size + ' ' + versionsTotalFormatted.unit);
         $('.file-number', $versionsSection).text(versionsFileNumText);
     };

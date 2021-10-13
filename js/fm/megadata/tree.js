@@ -1182,6 +1182,7 @@ MegaData.prototype.addTreeUI = function() {
 
             id = cv ? cv.prefixPath + id : id;
 
+            $.hideTopMenu();
             M.openFolder(id, e.ctrlKey);
         }
 

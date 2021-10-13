@@ -21,21 +21,23 @@ mega.fileTextEditor = new function FileTextEditor() {
      * @returns {Void}              void
      */
     var storeFileData = function(handle, data) {
-
-        // store the data in memory
-        filesDataMap[handle] = data;
-
+        // If the handle is already in a slot update the data
+        if (slotsMap.includes(handle)) {
+            filesDataMap[handle] = data;
+            return;
+        }
+        // If there is something in the current slot dump it
         if (slotsMap[slotIndex]) {
             filesDataMap[slotsMap[slotIndex]] = null;
             delete filesDataMap[slotsMap[slotIndex]];
         }
-        // reserve the slot
+        // Add the handle to the slot and increment the index
         slotsMap[slotIndex++] = handle;
-
-        var slots = maxFilesInMemory - 1;
+        // store the data in memory
+        filesDataMap[handle] = data;
 
         // round-robin
-        if (slotIndex > slots) {
+        if (slotIndex > maxFilesInMemory - 1) {
             slotIndex = 0;
         }
     };

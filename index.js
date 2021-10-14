@@ -2735,7 +2735,7 @@ function topmenuUI() {
             else if (className.indexOf('cookies-settings') > -1) {
                 topMenu(1);
                 if ('csp' in window) {
-                    csp.showCookiesDialog('step2');
+                    csp.init().then((shown) => !shown && csp.showCookiesDialog('step2'));
                 }
             }
             else {

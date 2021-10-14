@@ -1,5 +1,5 @@
 /** @function window.csp */
-lazy(self, 'csp', function() {
+lazy(self, 'csp', () => {
     'use strict';
 
     let value;
@@ -66,6 +66,7 @@ lazy(self, 'csp', function() {
 
     return Object.freeze({
         init: mutex(tag, async(resolve) => {
+            let shown = false;
             const val = await sgValue().catch(nop) >>> 0;
             const chg = value && mega.user && value !== val ? value : false;
 
@@ -73,9 +74,10 @@ lazy(self, 'csp', function() {
             if (chg || !csp.has('essential')) {
                 await canShowDialog();
                 await csp.showCookiesDialog(chg);
+                shown = true;
             }
 
-            resolve(value);
+            resolve(shown);
         }),
 
         reset: async() => {
@@ -319,5 +321,5 @@ mBroadcaster.once('startMega', async() => {
         delete window.csp;
         return;
     }
-    csp.init();
+    // csp.init();
 });

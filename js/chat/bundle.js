@@ -18359,7 +18359,7 @@ let streamNode_StreamNode = (streamNode_dec = Object(mixins["SoonFcWrap"])(30, t
         loading
       } = this.state;
 
-      if (!stream.isOnHold && stream.source && stream.source.srcObject !== null && (!stream.videoMuted || stream.haveScreenshare)) {
+      if (StreamNode.isStreaming(stream)) {
         return external_React_default.a.createElement(external_React_default.a.Fragment, null, loading !== StreamNode.LOADING_STATE.LOADED && external_React_default.a.createElement("i", {
           className: "sprite-fm-theme icon-loading-spinner loading-icon"
         }), external_React_default.a.createElement("video", {
@@ -18611,6 +18611,8 @@ let streamNode_StreamNode = (streamNode_dec = Object(mixins["SoonFcWrap"])(30, t
   INITIALIZED: 1,
   LOADING: 1,
   LOADED: 2
+}, streamNode_class2.isStreaming = stream => {
+  return stream && !stream.isOnHold && stream.source && stream.source.srcObject !== null && (!stream.videoMuted || stream.haveScreenshare);
 }, streamNode_temp), (applyDecoratedDescriptor_default()(streamNode_class.prototype, "updateVideoStreamThrottled", [streamNode_dec, streamNode_dec2], Object.getOwnPropertyDescriptor(streamNode_class.prototype, "updateVideoStreamThrottled"), streamNode_class.prototype), applyDecoratedDescriptor_default()(streamNode_class.prototype, "onResizeObserved", [_dec3, _dec4], Object.getOwnPropertyDescriptor(streamNode_class.prototype, "onResizeObserved"), streamNode_class.prototype)), streamNode_class));
 
 // CONCATENATED MODULE: ./js/chat/ui/meetings/sidebarControls.jsx
@@ -18865,6 +18867,20 @@ class local_Stream extends mixins["MegaRenderMixin"] {
       options: false
     };
 
+    this.getStreamSource = () => {
+      const {
+        call,
+        mode,
+        forcedLocal
+      } = this.props;
+
+      if (mode === call_Call.MODE.MINI) {
+        return forcedLocal ? call.getLocalStream() : call.getActiveStream();
+      }
+
+      return call.getLocalStream();
+    };
+
     this.unbindEvents = () => {
       const events = [...this.EVENTS.MINIMIZE, ...this.EVENTS.EXPAND];
 
@@ -18983,9 +18999,7 @@ class local_Stream extends mixins["MegaRenderMixin"] {
 
     this.renderMiniMode = () => {
       const {
-        call,
         isOnHold,
-        forcedLocal,
         onLoadedData
       } = this.props;
 
@@ -18994,14 +19008,13 @@ class local_Stream extends mixins["MegaRenderMixin"] {
       }
 
       return external_React_default.a.createElement(streamNode_StreamNode, {
-        stream: forcedLocal ? call.getLocalStream() : call.getActiveStream(),
+        stream: this.getStreamSource(),
         onLoadedData: onLoadedData
       });
     };
 
     this.renderSelfView = () => {
       const {
-        call,
         isOnHold,
         onLoadedData
       } = this.props;
@@ -19014,7 +19027,7 @@ class local_Stream extends mixins["MegaRenderMixin"] {
       }
 
       return external_React_default.a.createElement(external_React_default.a.Fragment, null, external_React_default.a.createElement(streamNode_StreamNode, {
-        stream: call.getLocalStream(),
+        stream: this.getStreamSource(),
         onLoadedData: onLoadedData
       }), external_React_default.a.createElement(meetings_button["a" ], {
         className: "\n                        mega-button\n                        theme-light-forced\n                        action\n                        small\n                        local-stream-options-control\n                        " + (options ? 'active' : '') + "\n                    ",
@@ -19075,7 +19088,7 @@ class local_Stream extends mixins["MegaRenderMixin"] {
 
     return external_React_default.a.createElement("div", {
       ref: this.containerRef,
-      className: "\n                    " + NAMESPACE + "\n                    " + ratioClass + "\n                    " + (IS_MINI_MODE ? 'mini' : '') + "\n                    " + (minimized ? 'minimized' : '') + "\n                    " + (this.state.options ? 'active' : '') + "\n                    " + (sidebar && !minimized ? POSITION_MODIFIER : '') + "\n                ",
+      className: "\n                    " + NAMESPACE + "\n                    " + (streamNode_StreamNode.isStreaming(this.getStreamSource()) ? ratioClass : '') + "\n                    " + (IS_MINI_MODE ? 'mini' : '') + "\n                    " + (minimized ? 'minimized' : '') + "\n                    " + (this.state.options ? 'active' : '') + "\n                    " + (sidebar && !minimized ? POSITION_MODIFIER : '') + "\n                ",
       onClick: ({
         target
       }) => minimized && target.classList.contains(NAMESPACE + "-overlay") && onCallExpand()

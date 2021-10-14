@@ -3801,6 +3801,19 @@ else if (!browserUpdate) {
         {
             try {
                 jsl[this.jsi].text = this.response || this.responseText;
+                if (!is_livesite) {
+                    var entry = jsl[this.jsi];
+                    if (entry && entry.j === 3 && entry.f.indexOf('_prod') === -1
+                        && entry.text.indexOf('<!DOCTYPE html>') > -1) {
+                        console.warn('Lang file ' +
+                            entry.f + ' cannot be found. Switching to _prod lang file');
+                        entry.f = entry.f.replace('.json', '_prod.json');
+                        entry.text = null;
+                        jsl[this.jsi] = entry;
+                        return xhr_load(jsl[this.jsi].f, this.jsi, xhri);
+                    }
+                }
+
             }
             catch (ex) {
                 return siteLoadError(ex, bootstaticpath + Object(jsl[this.jsi]).f);

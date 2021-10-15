@@ -84,9 +84,14 @@ class MetaRichpreviewMegaLinks extends ConversationMessageMixin {
                     desc = bytesToSize(megaLinkInfo.info.size);
                 }
                 else {
+                    const totalNumberOfFiles = megaLinkInfo.info.s[1];
+                    const numOfVersionedFiles = megaLinkInfo.info.s[4];
+                    const folderCount = megaLinkInfo.info.s[2];
+                    const totalFileSize = megaLinkInfo.info.size;
+                    const versionsSize = megaLinkInfo.info.s[3];
                     desc = <span>
-                        {fm_contains(megaLinkInfo.info.s[1], megaLinkInfo.info.s[2] - 1)}<br/>
-                        {bytesToSize(megaLinkInfo.info.size)}
+                        {fm_contains(totalNumberOfFiles - numOfVersionedFiles, folderCount - 1)}<br/>
+                        {bytesToSize(totalFileSize - versionsSize)}
                     </span>;
                 }
 

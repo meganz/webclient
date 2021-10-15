@@ -1525,6 +1525,9 @@ FileManager.prototype.initContextUI = function() {
     });
     // eslint-disable-next-line local-rules/jquery-scopes
     $(c + '.newfile-item').rebind('click', function() {
+        if (M.isInvalidUserStatus()) {
+            return;
+        }
         createFileDialog();
     });
 

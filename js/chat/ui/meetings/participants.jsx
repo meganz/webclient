@@ -15,18 +15,26 @@ class Participant extends MegaRenderMixin {
 
     audioMuted = () => {
         const { call, stream } = this.props;
-        return (
-            call && (call.localAudioMuted === null || !!call.localAudioMuted) ||
-            stream && stream.audioMuted
-        );
+
+        // Local stream (me)
+        if (call) {
+            return call.localAudioMuted === null || !!call.localAudioMuted;
+        }
+
+        // Participant streams
+        return stream && stream.audioMuted;
     };
 
     videoMuted = () => {
         const { call, stream } = this.props;
-        return (
-            call && !call.localVideoStream ||
-            stream && stream.videoMuted
-        );
+
+        // Local stream (me)
+        if (call) {
+            return !(call.av & SfuClient.Av.Camera);
+        }
+
+        // Participant streams
+        return stream && stream.videoMuted;
     };
 
     render() {

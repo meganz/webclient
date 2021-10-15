@@ -127,6 +127,7 @@
             justify-content: center;
             overflow: hidden;
             position: relative;
+            height: 100%;
         }
         .media-viewer button.gallery-btn {
             border-radius: 4px;

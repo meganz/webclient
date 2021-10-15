@@ -108,7 +108,7 @@
             // do NOT change the order, add new entries at the tail UP TO 31, and 8 per row.
             'cws', 'ctt', 'viewmode', 'dbDropOnLogout', 'dlThroughMEGAsync', 'sdss', 'tpp', 'ulddd',
             'cbvm', 'mgvm', 'uiviewmode', 'uisorting', 'uidateformat', 'skipsmsbanner', 'skipDelWarning', 'rsv1',
-            'rsv2'
+            'nowarnpl', 'zip64n'
         ]
     });
 
@@ -357,6 +357,7 @@
     const saveLocally = async() => {
         let storage = localStorage;
 
+        /**
         if ('csp' in window) {
             await csp.init();
 
@@ -364,6 +365,7 @@
                 storage = sessionStorage;
             }
         }
+        /**/
 
         const config = await filter(fmconfig).catch(dump);
 

@@ -58,3 +58,17 @@
 .small.checkboxOn::before {
     background-position: -35px -446px;
 }
+.checkbox-block {
+    display: flex;
+}
+.checkbox-txt {
+    font: var(--text-body1);
+    color: var(--text-color-medium);
+    -webkit-padding-end: 28px;
+    padding-inline-end: 28px;
+    max-width: calc(100% - 31px);
+    box-sizing: border-box;
+    display: inline-block;
+    transition: 0.3s;
+    vertical-align: middle;
+}

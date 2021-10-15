@@ -776,7 +776,7 @@ body.de .mega-dialog.new-group-chat {
 
 /* MegaSync dialog */
 .nw-dark-overlay.megasync-overlay {
-    background-color: rgba(0,0,0,0.1);
+    background-color: var(--surface-black-bar);
     transition: all 200ms ease-in-out;
 }
 .nw-dark-overlay.megasync-overlay .default-select-dropdown::before,
@@ -1074,11 +1074,21 @@ body.de .mega-dialog.new-group-chat {
 }
 .megasync-content .fm-dialog-close {
     opacity: 0.8;
-    right: 8px;
-    top: 8px;
+    right: 16px;
+    top: 16px;
+    background: none;
+}
+.rtl .megasync-content .fm-dialog-close {
+    left: 16px;
+    right: auto;
 }
 .megasync-content .fm-dialog-close:hover {
     opacity: 1;
+}
+.megasync-content .fm-dialog-close i {
+    --icon-size: 24px;
+    margin-top: 3px;
+    --mask-color: var(--icon-rest);
 }
 .megasync-slide-info {
     display: table-cell;
@@ -4303,6 +4313,7 @@ body.de .mega-dialog.new-group-chat {
 
     .mega-dialog.payment-address-dialog {
         width: 730px;
+        max-height: 100vh;
     }
     .mega-dialog.payment-address-dialog header {
         align-items: center;
@@ -4686,6 +4697,7 @@ body.de .mega-dialog.new-group-chat {
 
     .mega-dialog.wire-transfer-dialog {
         width: 1145px;
+        max-width: 100vw;
     }
     .mega-dialog.wire-transfer-dialog .content-block {
         padding-bottom: 48px;
@@ -4717,6 +4729,7 @@ body.de .mega-dialog.new-group-chat {
     .mega-dialog.wire-transfer-dialog .resellers-top-txt .wire-transfer-details th {
         padding-right: 15px;
         text-align: start;
+        white-space: nowrap;
     }
     .mega-dialog.wire-transfer-dialog .resellers-top-txt .wire-transfer-details .bank-address {
         padding-bottom: 15px;
@@ -10289,3 +10302,124 @@ body.de .mega-dialog.new-group-chat {
     }
 
 /* End mega-desktopapp-download */
+
+/* Report Abuse dialog Begin */
+.mega-dialog.report-abuse {
+    max-height: 90vh;
+}
+
+.mega-dialog.report-abuse .subtitle {
+    font: var(--text-h3-bold);
+    color: var(--text-color-error);
+    margin-bottom: 20px;
+}
+
+.mega-dialog.report-abuse .content-block {
+    min-height: 300px;
+}
+
+.mega-dialog.report-abuse .content-block form > * > p:first-child {
+    padding-bottom: 10px;
+}
+
+@media screen and (max-height: 500px) {
+    .mega-dialog.report-abuse .content-block {
+        min-height: 50px;
+    }
+}
+
+.mega-dialog.report-abuse .content-block > section {
+    padding-top: 10px;
+}
+
+.mega-dialog.report-abuse .radio-buttons > * {
+    margin: 10px 0;
+    display: flex;
+}
+
+.mega-dialog.report-abuse input.form-control,
+.mega-dialog.report-abuse textarea.form-control {
+    width: 100%;
+    height: 36px;
+    box-sizing: border-box;
+    font: var(--text-body1);
+    color: var(--text-color-high);
+    padding: 0 8px;
+    margin: 0;
+    border: 1px solid var(--stroke-grey-2);
+    background: var(--surface-grey-1);
+    border-radius: 4px;
+    transition: color 200ms ease-in-out;
+}
+
+.mega-dialog.report-abuse textarea.form-control {
+    height: 100px;
+    padding: 8px;
+}
+.mega-dialog.report-abuse form .form-row {
+    margin-bottom: 20px;
+}
+.mega-dialog.report-abuse form .form-row > p {
+    margin-bottom: 4px;
+}
+.mega-dialog.report-abuse form .form-row.two-col {
+    display: flex;
+}
+.mega-dialog.report-abuse form .form-row.two-col input.form-control:first-child {
+    margin-right: 20px;
+}
+.mega-dialog.report-abuse form .form-row.two-col .form-control.half {
+    width: calc(50% - 10px);
+}
+.mega-dialog.report-abuse form .form-row.two-col :placeholder-shown {
+    opacity: 2;
+}
+.mega-dialog.report-abuse textarea::placeholder,
+.mega-dialog.report-abuse input::placeholder {
+    color: var(--surface-mid-grey);
+}
+.mega-dialog.report-abuse .mega-input.form-control {
+    width: 100%;
+    height: 36px;
+    box-sizing: border-box;
+    font: var(--text-body1);
+    color: var(--text-color-high);
+    padding: 0;
+    margin: 0;
+    border: 1px solid var(--stroke-grey-2);
+    background: var(--surface-grey-1);
+    border-radius: 4px;
+    transition: color 200ms ease-in-out;
+}
+.mega-dialog.report-abuse .mega-input.form-control::before {
+    content: none;
+}
+.mega-dialog.report-abuse .mega-input.form-control .placeholder {
+    opacity: 0.4;
+}
+.mega-dialog.report-abuse .mega-input-dropdown .dropdown-scroll {
+    max-height: 250px;
+}
+.mega-dialog.report-abuse .form-control.error {
+    border: 1px solid var(--input-text-underline-error);
+}
+.mega-dialog.report-abuse a {
+    text-decoration: underline;
+    user-select: text;
+}
+.mega-dialog.report-abuse a:hover {
+    text-decoration: none;
+}
+.mega-dialog.report-abuse .message-container {
+    box-sizing: border-box;
+    color: var(--banner-text-error);
+    text-align: center;
+    background: var(--banner-background-error);
+    border: 1px solid var(--banner-border-error);
+    border-radius: 4px;
+    font: var(--text-body1);
+    padding: 2px;
+    margin-bottom: 10px;
+}
+
+/* Report Abuse dialog End */

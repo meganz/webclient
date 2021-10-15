@@ -145,12 +145,18 @@ var slideshowid;
 
         // Set the video container's fullscreen state
         var setFullscreenData = function(state) {
+
+            if (page === 'download') {
+                updateDownloadPageContainer($overlay, state);
+                return false;
+            }
+
             if (state) {
-                $overlay.addClass('fullscreen');
+                $overlay.addClass('fullscreen').removeClass('browserscreen');
                 $('i', $button).removeClass('icon-fullscreen-enter').addClass('icon-fullscreen-leave');
             }
             else {
-                $overlay.removeClass('fullscreen');
+                $overlay.addClass('browserscreen').removeClass('fullscreen');
                 $('i', $button).removeClass('icon-fullscreen-leave').addClass('icon-fullscreen-enter');
 
                 // disable slideshow-mode exiting from full screen
@@ -165,6 +171,26 @@ var slideshowid;
         };
 
         fullScreenManager = FullScreenManager($button, $overlay).change(setFullscreenData);
+    }
+
+    function updateDownloadPageContainer($overlay, state) {
+
+        var $button = $('footer .v-btn.fullscreen', $overlay);
+
+        if (state) {
+            $overlay.parents('.download.download-page').addClass('fullscreen').removeClass('browserscreen');
+            $('i', $button).removeClass('icon-fullscreen-enter').addClass('icon-fullscreen-leave');
+            $overlay.addClass('fullscreen').removeClass('browserscreen');
+        }
+        else {
+            $overlay.parents('.download.download-page').removeClass('browserscreen fullscreen');
+            $('i', $button).removeClass('icon-fullscreen-leave').addClass('icon-fullscreen-enter');
+            $overlay.removeClass('browserscreen fullscreen');
+        }
+
+        if (!$overlay.is('.video-theatre-mode')) {
+            slideshow_imgPosition($overlay);
+        }
     }
 
     function slideshow_favourite(n, $overlay) {
@@ -412,6 +438,13 @@ var slideshowid;
         $nextButton.rebind('click.mediaviewer', function() {
             slideshow_next();
             slideshow_timereset();
+            return false;
+        });
+
+        $('.v-btn.browserscreen', $overlay).rebind('click.media-viewer', () => {
+            $overlay.addClass('browserscreen');
+            $overlay.parents('.download.download-page').addClass('browserscreen');
+            slideshow_zoom($overlay, 1);
             return false;
         });
 
@@ -724,7 +757,7 @@ var slideshowid;
         // Checking if this the first preview (not a preview navigation)
         if (!slideshowid) {
             // then pushing fake states of history/hash
-            if (!history.state || history.state.view !== id) {
+            if (page !== 'download' && (!history.state || history.state.view !== id)) {
                 pushHistoryState();
             }
             _hideCounter = hideCounter;
@@ -738,8 +771,11 @@ var slideshowid;
             $.selected = [n.h];
         }
         mBroadcaster.sendMessage('slideshow:open', n);
-        sessionStorage.setItem('previewNode', id);
-        pushHistoryState(true, Object.assign({subpage: page}, history.state, {view: slideshowid}));
+
+        if (page !== 'download') {
+            sessionStorage.setItem('previewNode', id);
+            pushHistoryState(true, Object.assign({subpage: page}, history.state, {view: slideshowid}));
+        }
 
         // Clear previousy set data
         zoom_mode = false;
@@ -787,14 +823,16 @@ var slideshowid;
 
         // Bind static events is viewer is not in slideshow mode to avoid unnecessary rebinds
         if (!slideshowplay) {
-            $overlay.removeClass('fullscreen mouse-idle slideshow video pdf');
+            $overlay.removeClass('fullscreen browserscreen mouse-idle slideshow video pdf');
 
             // Bind keydown events
             $document.rebind('keydown.slideshow', function(e) {
-                if (e.keyCode === 37 && slideshowid && !e.altKey && !e.ctrlKey) {
+                const isDownloadPage = page === 'download';
+
+                if (e.keyCode === 37 && slideshowid && !e.altKey && !e.ctrlKey && !isDownloadPage) {
                     slideshow_prev();
                 }
-                else if (e.keyCode === 39 && slideshowid) {
+                else if (e.keyCode === 39 && slideshowid && !isDownloadPage) {
                     slideshow_next();
                 }
                 else if (e.keyCode === 46 && fullScreenManager) {
@@ -807,12 +845,17 @@ var slideshowid;
                     else if (slideshowplay) {
                         slideshow_imgControls(1);
                     }
+                    else if (isDownloadPage) {
+                        $overlay.removeClass('fullscreen browserscreen');
+                        $overlay.parents('.download.download-page').removeClass('fullscreen browserscreen');
+                        slideshow_zoom($overlay, 1);
+                    }
                     else {
                         history.back();
                         return false;
                     }
                 }
-                else if (e.keyCode === 8 || e.key === 'Backspace') {
+                else if ((e.keyCode === 8 || e.key === 'Backspace') && !isDownloadPage) {
                     history.back();
                     return false;
                 }
@@ -820,6 +863,15 @@ var slideshowid;
 
             // Close icon
             $('.v-btn.close, .viewer-error-close', $overlay).rebind('click.media-viewer', function() {
+                if (page === 'download') {
+                    if ($(document).fullScreen()) {
+                        fullScreenManager.exitFullscreen();
+                    }
+                    $overlay.removeClass('fullscreen browserscreen');
+                    $overlay.parents('.download.download-page').removeClass('fullscreen browserscreen');
+                    slideshow_zoom($overlay, 1);
+                    return false;
+                }
                 history.back();
                 return false;
             });

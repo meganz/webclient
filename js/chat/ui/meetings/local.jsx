@@ -53,6 +53,18 @@ export default class Local extends MegaRenderMixin {
     }
 
     render() {
+        const { streams, minimized } = this.props;
+
+        // Only one call participant (i.e. me) -> render `Local` only if the call is minimized
+        if (streams.length === 0 && !minimized) {
+            return null;
+        }
+
+        //
+        // `Local`
+        // https://mega.nz/file/kQF0XTRb#LbmJE578Rbt60U7zzd5L-_ARyBloeuiXO1-hjJrcVQE
+        // -------------------------------------------------------------------------
+
         const STREAM_PROPS = {
             ...this.props,
             ratioClass: this.getRatioClass(),
@@ -61,12 +73,7 @@ export default class Local extends MegaRenderMixin {
             onLoadedData: this.onLoadedData
         };
 
-        //
-        // `Local`
-        // https://mega.nz/file/kQF0XTRb#LbmJE578Rbt60U7zzd5L-_ARyBloeuiXO1-hjJrcVQE
-        // -------------------------------------------------------------------------
-
-        if (this.props.minimized) {
+        if (minimized) {
             return (
                 <utils.RenderTo element={document.body}>
                     <Stream {...STREAM_PROPS} />
@@ -82,6 +89,12 @@ export default class Local extends MegaRenderMixin {
 
 class Stream extends MegaRenderMixin {
     containerRef = React.createRef();
+
+    DRAGGABLE_OPTIONS = {
+        scroll: 'false',
+        cursor: 'move',
+        opacity: 0.8
+    };
 
     EVENTS = {
         MINIMIZE: [
@@ -137,29 +150,29 @@ class Stream extends MegaRenderMixin {
 
     initDraggable = () => {
         const container = this.containerRef && this.containerRef.current;
+
         if (container) {
             $(container).draggable({
-                containment: 'body',
-                scroll: 'false',
-                cursor: 'move',
-                opacity: 0.8
+                ...this.DRAGGABLE_OPTIONS,
+                // Constrain the dragging to within the bounds of the body (in minimized mode) or the stream
+                // container (when the call is expanded, excl. the sidebar)
+                containment: this.props.mode === Call.MODE.MINI ? 'body' : '.meetings-call .stream'
             });
         }
     };
 
     /**
-     * toggleDraggable
-     * @description Toggle the draggable behavior based on the current mode; enabled only if `Local` is minimized.
-     * @see MODE
+     * repositionDraggable
+     * @description Updates the position of the `Local` component. The position update is applied only if `Local` is
+     * positioned above the sidebar.
      */
 
-    toggleDraggable = () => {
-        const { mode } = this.props;
-        const { containerRef } = this;
-        const $container = containerRef && containerRef.current && $(containerRef.current);
+    repositionDraggable = () => {
+        const wrapperEl = this.props.wrapperRef && this.props.wrapperRef.current;
+        const localEl = this.containerRef && this.containerRef.current;
 
-        if ($container && $container.draggable('instance') !== undefined) {
-            $container.draggable('option', 'disabled', mode !== Call.MODE.MINI);
+        if (localEl.offsetLeft + localEl.offsetWidth > wrapperEl.offsetWidth) {
+            localEl.style.left = 'auto';
         }
     };
 
@@ -311,9 +324,18 @@ class Stream extends MegaRenderMixin {
         this.unbindEvents();
     }
 
-    componentDidUpdate() {
+    componentDidUpdate(prevProps) {
         super.componentDidUpdate();
-        this.toggleDraggable();
+
+        // Reinitialize the drag behavior if the view mode had been changed
+        if (this.props.mode !== prevProps.mode) {
+            this.initDraggable();
+        }
+
+        // Reposition the `Local` if the sidebar had been toggled and it's currently open
+        if (this.props.sidebar !== prevProps.sidebar && this.props.sidebar) {
+            this.repositionDraggable();
+        }
     }
 
     componentDidMount() {
@@ -325,7 +347,6 @@ class Stream extends MegaRenderMixin {
     render() {
         const { NAMESPACE, POSITION_MODIFIER } = Local;
         const {
-            streams,
             mode,
             minimized,
             sidebar,
@@ -336,11 +357,6 @@ class Stream extends MegaRenderMixin {
         } = this.props;
         const IS_MINI_MODE = mode === Call.MODE.MINI;
         const IS_SELF_VIEW = !IS_MINI_MODE;
-
-        // Only one call participant (i.e. me) -> render `Local` only if the call is minimized
-        if (streams.length === 0 && !minimized) {
-            return null;
-        }
 
         if (collapsed) {
             return (

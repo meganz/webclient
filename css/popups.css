@@ -352,7 +352,6 @@ body.tl .dropdown.body.popup.contacts-search {
 .contacts-search-buttons i,
 .contacts-search-bottom i {
     --icon-size: 24px;
-    --mask-color: var(--icon-rest);
 }
 .contacts-search-bottom i {
     --mask-color: var(--secondary-green);

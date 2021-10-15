@@ -581,6 +581,7 @@ MegaUtils.prototype.uiSaveLang = promisify(function(resolve, reject, aNewLang) {
 
         loadingDialog.hide();
 
+        /**
         if ('csp' in window) {
             await csp.init();
 
@@ -588,6 +589,7 @@ MegaUtils.prototype.uiSaveLang = promisify(function(resolve, reject, aNewLang) {
                 storage = sessionStorage;
             }
         }
+        /**/
 
         // Store the new language in localStorage to be used upon reload
         storage.lang = aNewLang;

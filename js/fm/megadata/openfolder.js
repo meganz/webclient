@@ -168,7 +168,7 @@
 
             if (is_mobile) {
                 // Ignore sort modes set in desktop until that is supported in mobile...
-                this.overrideSortMode = this.overrideSortMode || ['name', 1];
+                // this.overrideSortMode = this.overrideSortMode || ['name', 1];
             }
 
             if (this.overrideSortMode) {

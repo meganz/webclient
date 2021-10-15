@@ -2771,6 +2771,9 @@ accountUI.fileManagement = {
             $('#delete-all-versions', accountUI.$contentBlock).rebind('click', function() {
 
                 if (!$(this).hasClass('disabled')) {
+                    if (M.isInvalidUserStatus()) {
+                        return;
+                    }
                     msgDialog('remove', l[1003], l[17581], l[1007], function(e) {
 
                         if (e) {

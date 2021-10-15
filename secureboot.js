@@ -839,6 +839,11 @@ var mega = {
             to += '/aff=' + affid;
         }
 
+        var uLang = sessionStorage.lang || storage.lang;
+        if (uLang) {
+            to += '/lang=' + uLang;
+        }
+
         if (storage.csp) {
             to += '/csp=' + storage.csp;
         }
@@ -2375,7 +2380,10 @@ else if (!browserUpdate) {
 
                     dump.s = String(errobj.stack)
                         .replace(omsg, '').replace(re, '')
-                        .split("\n").map(mTrim).filter(String);
+                        .split("\n").map(mTrim)
+                        .filter(function(s, idx, a) {
+                            return s.length && a[idx - 1] !== s;
+                        });
 
                     for (var idx = 1; idx < dump.s.length; idx++) {
                         var s = dump.s[idx];
@@ -2992,6 +3000,7 @@ else if (!browserUpdate) {
         jsl.push({f:'js/mobile/mobile.cloud.js', n: 'mobile_cloud_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.cloud.action-bar.js', n: 'mobile_cloud_action_bar_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.cloud.context-menu.js', n: 'mobile_cloud_context_menu_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.cloud.sort.js', n: 'mobile_cloud_context_sort_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.create-folder-overlay.js', n: 'mobile_create_folder_overlay_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.decryption-key-overlay.js', n: 'mobile_mobile_dec_key_overlay_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.decryption-password-overlay.js', n: 'mobile_dec_pass_overlay_js', j: 1, w: 1});
@@ -3329,7 +3338,8 @@ else if (!browserUpdate) {
         'achievements_css':{f:'css/achievements.css', n: 'achievements_css', j: 2, w: 5, c: 1, d: 1, cache: 1 },
         'special': {f:'html/troy-hunt.html', n:'special', j:0},
         'special_js': {f:'html/js/troy-hunt.js', n:'special_js', j:1},
-        'special_css': {f:'css/troy-hunt.css', n:'special_css', j:2}
+        'special_css': {f:'css/troy-hunt.css', n:'special_css', j:2},
+        'reportabuse_js': {f:'js/ui/reportAbuse.js', n:'reportabuse_js', j:1},
     };
 
     /* eslint-disable max-len */
@@ -3792,6 +3802,19 @@ else if (!browserUpdate) {
         {
             try {
                 jsl[this.jsi].text = this.response || this.responseText;
+                if (!is_livesite) {
+                    var entry = jsl[this.jsi];
+                    if (entry && entry.j === 3 && entry.f.indexOf('_prod') === -1
+                        && entry.text.indexOf('<!DOCTYPE html>') > -1) {
+                        console.warn('Lang file ' +
+                            entry.f + ' cannot be found. Switching to _prod lang file');
+                        entry.f = entry.f.replace('.json', '_prod.json');
+                        entry.text = null;
+                        jsl[this.jsi] = entry;
+                        return xhr_load(jsl[this.jsi].f, this.jsi, xhri);
+                    }
+                }
+
             }
             catch (ex) {
                 return siteLoadError(ex, bootstaticpath + Object(jsl[this.jsi]).f);

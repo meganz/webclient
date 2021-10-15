@@ -1383,7 +1383,7 @@ class ConversationsApp extends MegaRenderMixin {
                         contactsActive={megaChat.routingSection === "contacts"}
                         onSelectDone={this.startChatClicked.bind(this)}
                         showTopButtons={self.getContactsPickerButtons()}
-                        showAddContact={M.u && M.u.length > 1}
+                        showAddContact={ContactsPanel.hasContacts()}
                     />
                     <SearchPanel />
                     <PerfectScrollbar
@@ -1404,12 +1404,14 @@ class ConversationsApp extends MegaRenderMixin {
                             </div>
                         }
                     </PerfectScrollbar>
-                    <div
-                        className={arcBtnClass}
-                        onClick={this.archiveChatsClicked}>
-                        <div className="heading">{l[19066]}</div>
-                        <div className="indicator">{archivedChatsCount}</div>
-                    </div>
+                    {megaChat.chats.length > 0 && (
+                        <div
+                            className={arcBtnClass}
+                            onClick={this.archiveChatsClicked}>
+                            <div className="heading">{l[19066] /* `Archived chats` */}</div>
+                            <div className="indicator">{archivedChatsCount}</div>
+                        </div>
+                    )}
                 </div>
                 {rightPane}
             </div>

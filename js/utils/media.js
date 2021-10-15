@@ -1362,6 +1362,11 @@ FullScreenManager.prototype.enterFullscreen = function() {
 
         // Video playback keyboard event handler.
         var videoKeyboardHandler = function(ev) {
+
+            if (window.disableVideoKeyboardHandler) {
+                return false;
+            }
+
             var bubble = false;
             var key = !ev.ctrlKey && ev.target.nodeName !== 'INPUT' && playevent && (ev.code || ev.key);
 

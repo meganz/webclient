@@ -1415,31 +1415,9 @@ function generateAnonymousReport() {
 
     report.jslC = jslcomplete;
     report.jslI = jsli;
-    report.scripts = {};
     report.host = window.location.host;
 
     var promises = [];
-
-    $('script').each(function() {
-        var self = this;
-        var src = self.src.replace(window.location.host, "$current");
-        if (is_chrome_firefox) {
-            if (!promises.length) {
-                promises.push(MegaPromise.resolve());
-            }
-            report.scripts[self.src] = false;
-            return;
-        }
-        promises.push(
-            M.xhr({type: "text", url: self.src})
-                .then(function(ev, r) {
-                    report.scripts[src] = [MurmurHash3(r, 0x4ef5391a), r.length];
-                })
-                .catch(function() {
-                    report.scripts[src] = false;
-                })
-        );
-    });
 
     report.version = null; // TODO: how can we find this?
 

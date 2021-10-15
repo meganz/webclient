@@ -20,7 +20,7 @@ export default class Nil extends MegaRenderMixin {
                     <i className="section-icon sprite-fm-mono icon-contacts" />
                     <div className="fm-empty-cloud-txt">{title}</div>
                     <div className="fm-empty-description">
-                        {l[19114]}
+                        {l[19115]}
                     </div>
                     <Button
                         className="mega-button positive large fm-empty-button"

@@ -897,6 +897,10 @@ li.active .call-duration i {
     z-index: 130;
 }
 
+.contacts-panel .back-to-landing {
+    margin: 15px 0 15px 32px;
+}
+
 .contacts-navigation {
     position: relative;
     width: 100%;

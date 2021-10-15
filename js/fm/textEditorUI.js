@@ -4,7 +4,7 @@
  * */
 mega.textEditorUI = new function TextEditorUI() {
     "use strict";
-    var $myTextarea;
+    var $editorTextarea;
 
     var fileHandle;
     var versionHandle;
@@ -18,7 +18,6 @@ mega.textEditorUI = new function TextEditorUI() {
     var $editorContainer;
     var $menuBar;
     var $saveButton;
-
 
     /**
      * Check if the file content has been changed and show a message if so
@@ -74,7 +73,7 @@ mega.textEditorUI = new function TextEditorUI() {
 
     };
 
-    var bindChangeListner = function() {
+    const bindEventsListner = function() {
 
         var changeListner = function() {
             $saveButton.removeClass('disabled');
@@ -82,10 +81,18 @@ mega.textEditorUI = new function TextEditorUI() {
         };
 
         editor.on('change', changeListner);
+
+        $(window).rebind('keydown.texteditor', (e) => {
+            if (e.code === 'Escape') {
+                // IE not supported.
+                confirmSaveOrExit();
+            }
+        });
     };
 
     var doClose = () => {
         $saveButton.addClass('disabled');
+        $(window).off('keydown.texteditor');
         history.back();
         mega.textEditorUI.doClose();
     };
@@ -116,8 +123,6 @@ mega.textEditorUI = new function TextEditorUI() {
     };
 
     var printText = function() {
-        /* eslint-disable no-unsanitized/method */
-
         // Everything is sanitized.
 
         var mywindow = window.open('', escapeHTML(fileName), 'height=600,width=800');
@@ -134,24 +139,52 @@ mega.textEditorUI = new function TextEditorUI() {
         mywindow.focus();
         mywindow.print();
         mywindow.close();
-        /* eslint-enable no-unsanitized/method */
         return true;
     };
 
-
-
     /** Init Controller
+     * @param {jQuery} $viewerContainer  just use the plain text content block, aka viewer-mode
      *@returns {Void}       void
      */
-    var init = function() {
+    var init = function(txt, $viewerContainer) {
+        $containerDialog = $viewerContainer || $('.text-editor-container', 'body');
+        $editorContainer = $('.text-editor', $containerDialog.removeClass('hidden'));
+
+        $editorTextarea = $('.content .txtar', $editorContainer);
+        window.textEditorVisible = true;
+
+        if (!editor) {
+            editor = CodeMirror.fromTextArea($editorTextarea[0], {
+                lineNumbers: true,
+                scrollbarStyle: "overlay",
+                autofocus: true,
+                lineWrapping: true
+            });
+        }
+
+        savedFileData = txt;
+        editor.setValue(txt);
+
         if (initialized) {
+            // Nothing else to do.
+            return;
+        }
+        initialized = true;
+
+        $editorContainer.resizable({
+            handles: 'e',
+            resize: function() {
+                if (editor) {
+                    editor.setSize();
+                }
+            }
+        });
+
+        if ($viewerContainer) {
+            // No more business here.
             return;
         }
 
-        // there's no jquery parent for this container.
-        // eslint-disable-next-line local-rules/jquery-scopes
-        $containerDialog = $('.text-editor-container', 'body');
-        $editorContainer = $('.text-editor', $containerDialog);
         $menuBar = $('.text-editor-bars', $editorContainer);
         $saveButton = $('.save-btn', $editorContainer);
 
@@ -169,20 +202,6 @@ mega.textEditorUI = new function TextEditorUI() {
             boundingElement: $containerDialog[0]
         });
 
-        $editorContainer.resizable({
-            handles: 'e',
-            resize: function() {
-                var cm = $('.CodeMirror', $editorContainer)[0];
-                if (cm) {
-                    cm = cm.CodeMirror;
-                    if (cm) {
-                        cm.setSize();
-                    }
-                }
-            }
-        });
-
-        /* eslint-disable sonarjs/no-duplicate-string */
         $('.file-btn', $menuBar).rebind(
             'click.txt-editor',
             function textEditorMenuOpen() {
@@ -252,7 +271,7 @@ mega.textEditorUI = new function TextEditorUI() {
                         versionHandle = fh;
                         savedFileData = editor.getValue();
 
-                        bindChangeListner();
+                        bindEventsListner();
 
                         loadingDialog.hide();
                         if (cb && typeof cb === 'function') {
@@ -266,7 +285,8 @@ mega.textEditorUI = new function TextEditorUI() {
                             ulmanager.ulShowOverStorageQuotaDialog();
                             return false;
                         }
-                        mega.fileTextEditor.setFile(versionHandle || fileHandle, editor.getValue()).done(getSavedFile);
+                        mega.fileTextEditor.setFile(versionHandle || fileHandle, editor.getValue())
+                            .done(getSavedFile);
                     });
                 }
             }
@@ -292,12 +312,12 @@ mega.textEditorUI = new function TextEditorUI() {
                 validateAction(
                     l[22750],
                     l[22752],
-                    function() {
+                    () => {
                         // loadingDialog.show();
                         openSaveAsDialog(
-                            { name: 'New file.txt' },
+                            {name: 'New file.txt'},
                             '',
-                            function(handle) {
+                            (handle) => {
                                 M.getStorageQuota().then(data => {
                                     loadingDialog.hide();
                                     if (data.isFull) {
@@ -345,9 +365,6 @@ mega.textEditorUI = new function TextEditorUI() {
             function getLinkFileMenuClick() {
                 selectionManager.clear_selection();
                 selectionManager.add_to_selection(versionHandle || fileHandle);
-
-                // there's no jquery parent for this container.
-                // eslint-disable-next-line local-rules/jquery-scopes
                 $('.dropdown.body.context .dropdown-item.getlink-item').trigger('click');
             }
         );
@@ -357,9 +374,6 @@ mega.textEditorUI = new function TextEditorUI() {
             function sendToContactMenuClick() {
                 selectionManager.clear_selection();
                 selectionManager.add_to_selection(versionHandle || fileHandle);
-
-                // there's no jquery parent for this container.
-                // eslint-disable-next-line local-rules/jquery-scopes
                 $('.dropdown.body.context .dropdown-item.send-to-contact-item').trigger('click');
             }
         );
@@ -391,7 +405,7 @@ mega.textEditorUI = new function TextEditorUI() {
                 validateAction(
                     l[22750],
                     l[22753],
-                    function() {
+                    () => {
                         M.saveAs(savedFileData, fileName);
                     }
                 );
@@ -444,14 +458,12 @@ mega.textEditorUI = new function TextEditorUI() {
                 return true;
             }
         );
-
-        initialized = true;
-        /* eslint-enable sonarjs/no-duplicate-string */
     };
 
     this.doClose = function() {
-        // eslint-disable-next-line no-unused-expressions
-        editor && editor.setValue('');
+        if (editor) {
+            editor.setValue('');
+        }
         if ($containerDialog) {
             $containerDialog.addClass('hidden');
             window.textEditorVisible = false;
@@ -465,57 +477,80 @@ mega.textEditorUI = new function TextEditorUI() {
      * @param {String} txt          File textual content
      * @param {String} handle       Node handle
      * @param {Boolean} isReadonly  Flag to open Editor in read-only mode
+     * @param {jQuery} $viewerContainer  just use the plain text content block, aka viewer-mode
      * @returns {Void}              void
      */
-    this.setupEditor = function(fName, txt, handle, isReadonly) {
-        M.require('codemirror_js', 'codemirrorscroll_js').done(function() {
-            init();
-            pushHistoryState();
-            $containerDialog.removeClass('hidden');
-            window.textEditorVisible = true;
-            mBroadcaster.sendMessage('textEditor:open');
-            $myTextarea = $('.content .txtar', $editorContainer);
-            if (!editor) {
-                editor = CodeMirror.fromTextArea($myTextarea[0], {
-                    lineNumbers: true,
-                    scrollbarStyle: "overlay",
-                    autofocus: true,
-                    lineWrapping: true
+    this.setupEditor = function(fName, txt, handle, isReadonly, $viewerContainer) {
+        M.require('codemirror_js', 'codemirrorscroll_js').done(() => {
+
+            if ($viewerContainer) {
+                this.cleanup();
+                init(txt, $viewerContainer);
+                editor.options.readOnly = true;
+
+                // Stop scroll event propagation when scroll inside codemirror
+                $('.CodeMirror-scroll', $editorContainer).rebind('scroll.txtviewer mousewheel.txtviewer', (e) => {
+                    e.stopPropagation();
+
+                    delay('txt.viewer:scroll-info', () => {
+                        const info = editor && editor.getScrollInfo() || false;
+
+                        if (info.top * 100 / info.height > 90) {
+                            mBroadcaster.sendMessage('txt.viewer:scroll-bottom', editor, info);
+                        }
+                    }, 60);
                 });
             }
-            // Without parentheses && will be applied first,
-            // I want JS to start from left and go in with first match
-            // eslint-disable-next-line no-extra-parens
-            if (isReadonly || folderlink || (M.currentrootid === 'shares' && M.getNodeRights(handle) < 1)) {
-                editor.options.readOnly = true;
-                $('header .file-btn', $editorContainer).addClass('disabled');
-                $('.save-btn', $editorContainer).addClass('hidden');
-            }
             else {
-                editor.options.readOnly = false;
-                $('header .file-btn', $editorContainer).removeClass('disabled');
-                $('footer .save-btn', $editorContainer).removeClass('hidden');
-            }
+                pushHistoryState();
+                init(txt);
+                mBroadcaster.sendMessage('textEditor:open');
 
-            if (editor) {
-                savedFileData = txt;
-                editor.setValue(txt);
-                bindChangeListner();
-            }
-            $saveButton.addClass('disabled');
+                // Without parentheses && will be applied first,
+                // I want JS to start from left and go in with first match
+                // eslint-disable-next-line no-extra-parens
+                if (isReadonly || folderlink || (M.currentrootid === 'shares' && M.getNodeRights(handle) < 1)) {
+                    editor.options.readOnly = true;
+                    $('header .file-btn', $editorContainer).addClass('disabled');
+                    $('.save-btn', $editorContainer).addClass('hidden');
+                }
+                else {
+                    editor.options.readOnly = false;
+                    $('header .file-btn', $editorContainer).removeClass('disabled');
+                    $('footer .save-btn', $editorContainer).removeClass('hidden');
+                }
 
-            $('.text-editor-file-name span', $editorContainer).text(fName);
+                bindEventsListner();
+                $saveButton.addClass('disabled');
+                $('.text-editor-file-name span', $editorContainer).text(fName);
+
+                editor.focus();
+            }
 
             if (Array.isArray(handle)) {
                 handle = handle[0];
             }
-            editor.focus();
 
             fileHandle = handle;
             versionHandle = '';
             fileName = fName;
-            api_req({ a: 'log', e: 99807, m: 'File Text Editor opened' });
+            if (page !== 'download') {
+                eventlog(99807);
+            }
         });
     };
 
+    /**
+     * Clear editor instance to avoid container conflicts.
+     * @returns {Void} void
+     */
+    this.cleanup = function() {
+        this.doClose();
+        if (editor) {
+            editor.toTextArea();
+        }
+        editor = undefined;
+        savedFileData = undefined;
+        initialized = false;
+    };
 };

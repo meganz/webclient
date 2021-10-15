@@ -22,6 +22,10 @@ body .text-editor-container *.hidden {
     min-width: 800px;
     width: 80%;
 }
+.text-editor textarea.txtar {
+    background-color: var(--surface-main);
+    border: 0;
+}
 .text-editor > header,
 .text-editor > footer {
     background-color: var(--surface-grey-1);
@@ -135,3 +139,10 @@ body .text-editor-container *.hidden {
     margin-top: 2px;
 }
 
+/* Download Page TextViewer */
+.download.main-pad .text-editor {
+    width: 100%;
+}
+.download.main-pad .text-editor > section {
+    padding: 0;
+}

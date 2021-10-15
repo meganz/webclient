@@ -156,9 +156,6 @@ html .theme-light-forced {
         --surface-grey-4: var(--surface-grey-2);
         --surface-grey-5: var(--surface-main);
         --surface-grey-6: var(--surface-grey-2);
-        --surface-grey-7: var(--surface-main);
-        --surface-grey-8: var(--surface-grey-2);
-        --surface-grey-9: var(--surface-grey-2);
         --surface-light-grey: /* not present in this theme */;
         --surface-mid-grey: #ccc;
         --surface-dark-grey: linear-gradient(180deg, rgba(85, 85, 85, 1) 0%, rgba(68, 68, 68, 1) 100%);
@@ -365,9 +362,6 @@ html .theme-dark-forced {
         --surface-grey-4: var(--surface-grey-1);
         --surface-grey-5: var(--surface-grey-2);
         --surface-grey-6: var(--surface-black);
-        --surface-grey-7: var(--surface-grey-1);
-        --surface-grey-8: var(--surface-main);
-        --surface-grey-9: rgba(255, 255, 255, 0.32);
         --surface-light-grey: linear-gradient(180deg, rgba(230, 230, 230, 1) 0%, rgba(204, 204, 204, 1) 100%);
         --surface-mid-grey: #666;
         --surface-dark-grey: linear-gradient(180deg, #e6e6e6 0%, #ccc 100%);
@@ -478,6 +472,7 @@ html .theme-dark-forced {
     /* dialog */
 
         --dialog-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.7);
+        --dialog-shadow-thin: 0 1px 2px 0 rgba(0, 0, 0, 0.1);
 
 
     /* dropdown/tooltip */

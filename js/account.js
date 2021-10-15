@@ -506,7 +506,7 @@ function u_setrsa(rsakey) {
                             M.showRecoveryKeyDialog(1);
 
                             if ('csp' in window) {
-                                csp.showCookiesDialog('nova');
+                                csp.init().then((shown) => !shown && csp.showCookiesDialog('nova'));
                             }
 
                             mega.config.set('dlThroughMEGAsync', 1);

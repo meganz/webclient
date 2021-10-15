@@ -21,22 +21,63 @@ mega.fileTextEditor = new function FileTextEditor() {
      * @returns {Void}              void
      */
     var storeFileData = function(handle, data) {
-
-        // store the data in memory
-        filesDataMap[handle] = data;
-
+        // If the handle is already in a slot update the data
+        if (slotsMap.includes(handle)) {
+            filesDataMap[handle] = data;
+            return;
+        }
+        // If there is something in the current slot dump it
         if (slotsMap[slotIndex]) {
             filesDataMap[slotsMap[slotIndex]] = null;
             delete filesDataMap[slotsMap[slotIndex]];
         }
-        // reserve the slot
+        // Add the handle to the slot and increment the index
         slotsMap[slotIndex++] = handle;
-
-        var slots = maxFilesInMemory - 1;
+        // store the data in memory
+        filesDataMap[handle] = data;
 
         // round-robin
-        if (slotIndex > slots) {
+        if (slotIndex > maxFilesInMemory - 1) {
             slotIndex = 0;
+        }
+    };
+
+    /**
+     * Get as Text from Buffer
+     * @param   {ArrayBuffer} buffer    Text Data in ArrayBuffer
+     * @returns {Promise}               Promise of the Blob Text
+     */
+    this.getTextFromBuffer = function(buffer) {
+        const bData = new Blob([buffer], { type: "text/plain" });
+        return M.readBlob(bData, 'readAsText');
+    };
+
+    /**
+     * Get cached data
+     * @param {String} handle    Node handle
+     */
+    this.getCachedData = function(handle) {
+        if (filesDataMap[handle]) {
+            return filesDataMap[handle];
+        }
+    };
+
+    /**
+     * Cache data
+     * @param {String} handle           Node handle
+     * @param {String} text             Text content to be cached
+     * @param {boolean} isPartialData   Is Partial data flag
+     */
+    this.cacheData = function(handle, text, isPartialData) {
+
+        if (filesDataMap[handle]) {
+            if (filesDataMap[handle].partial && !isPartialData) {
+                this.clearCachedFileData(handle);
+                storeFileData(handle, {text: text, partial: isPartialData});
+            }
+        }
+        else {
+            storeFileData(handle, {text: text, partial: isPartialData});
         }
     };
 

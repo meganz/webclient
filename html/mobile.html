@@ -278,7 +278,12 @@
                         <div class="mobile alert-icon fm-icon close white close-alert-banner"></div>
                     </div>
                 </div>
-                <div class="mobile folders-files-text"></div>
+                <div class="mobile fm-floating-header">
+                    <div class="mobile folders-files-text"></div>
+                    <div class="mobile sort-grid-item-main">
+                        <i class="sprite-fm-mono icon-queue-down"></i>
+                    </div>
+                </div>
 
                 <!-- Template for folders -->
                 <div class="mobile fm-item folder template">
@@ -541,6 +546,37 @@
     </div>
 </div>
 
+<div class="mobile context-menu-container sort hidden">
+    <div class="context-menu-item nameasc" data-sortby="name" data-sortdir="1">
+        <div class="mobile fm-icon"></div>
+        <span class="mobile text">[$msort_nameasc]</span>
+    </div>
+    <div class="light-grey-bar"></div>
+    <div class="context-menu-item namedesc" data-sortby="name" data-sortdir="-1">
+        <div class="mobile fm-icon"></div>
+        <span class="mobile text">[$msort_namedesc]</span>
+    </div>
+    <div class="light-grey-bar"></div>
+    <div class="context-menu-item sizeasc" data-sortby="size" data-sortdir="-1">
+        <div class="mobile fm-icon"></div>
+        <span class="mobile text">[$msort_largest]</span>
+    </div>
+    <div class="light-grey-bar"></div>
+    <div class="context-menu-item sizedesc" data-sortby="size" data-sortdir="1">
+        <div class="mobile fm-icon"></div>
+        <span class="mobile text">[$msort_smallest]</span>
+    </div>
+    <div class="light-grey-bar"></div>
+    <div class="context-menu-item firstadd" data-sortby="ts" data-sortdir="1">
+        <div class="mobile fm-icon"></div>
+        <span class="mobile text">[$msort_newest]</span>
+    </div>
+    <div class="light-grey-bar"></div>
+    <div class="context-menu-item lastadd" data-sortby="ts" data-sortdir="-1">
+        <div class="mobile fm-icon"></div>
+        <span class="mobile text">[$msort_oldest]</span>
+    </div>
+</div>
 
 <!-- Affiliate  redemtion history context menu -->
 <div class="mobile context-menu-container small affliate-history hidden">

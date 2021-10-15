@@ -18889,18 +18889,26 @@ class local_Stream extends mixins["MegaRenderMixin"] {
     };
 
     this.initDraggable = () => {
-      const container = this.containerRef && this.containerRef.current;
+      var _this$containerRef;
 
-      if (container) {
-        $(container).draggable({ ...this.DRAGGABLE_OPTIONS,
-          containment: this.props.mode === call_Call.MODE.MINI ? 'body' : '.meetings-call .stream'
+      const {
+        minimized,
+        wrapperRef
+      } = this.props;
+      const containerEl = (_this$containerRef = this.containerRef) == null ? void 0 : _this$containerRef.current;
+
+      if (containerEl) {
+        $(containerEl).draggable({ ...this.DRAGGABLE_OPTIONS,
+          containment: minimized ? 'body' : wrapperRef == null ? void 0 : wrapperRef.current
         });
       }
     };
 
     this.repositionDraggable = () => {
-      const wrapperEl = this.props.wrapperRef && this.props.wrapperRef.current;
-      const localEl = this.containerRef && this.containerRef.current;
+      var _this$props$wrapperRe, _this$containerRef2;
+
+      const wrapperEl = (_this$props$wrapperRe = this.props.wrapperRef) == null ? void 0 : _this$props$wrapperRe.current;
+      const localEl = (_this$containerRef2 = this.containerRef) == null ? void 0 : _this$containerRef2.current;
 
       if (localEl.offsetLeft + localEl.offsetWidth > wrapperEl.offsetWidth) {
         localEl.style.left = 'auto';

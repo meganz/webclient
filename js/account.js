@@ -213,6 +213,7 @@ function u_checklogin3a(res, ctx) {
                     window.is_eplusplus = true;
                     return;
                 }
+                onIdle(() => eventlog(99746, true));
 
                 // Former E++ account user.
                 window.is_eplusplus = false;
@@ -250,8 +251,7 @@ function u_checklogin3a(res, ctx) {
                 else {
                     ctx.checkloginresult(ctx, r);
                 }
-            }
-        );
+            });
     }
 }
 
@@ -483,8 +483,10 @@ function u_setrsa(rsakey) {
             // Update u_attr and store user data on account activation
             u_checklogin({
                 checkloginresult: function(ctx, r) {
+                    const assertMsg = `Invalid activation procedure (${parseInt(r)}:${request.mk ? 1 : 0}) :skull:`;
+
                     u_type = r;
-                    if (ASSERT(u_type === 3, 'Invalid activation procedure.')) {
+                    if (ASSERT(u_type === 3, assertMsg)) {
                         var user = {
                             u: u_attr.u,
 
@@ -506,7 +508,12 @@ function u_setrsa(rsakey) {
                             M.showRecoveryKeyDialog(1);
 
                             if ('csp' in window) {
-                                csp.init().then((shown) => !shown && csp.showCookiesDialog('nova'));
+                                const storage = localStorage;
+                                const value = storage[`csp.${u_handle}`];
+
+                                if (storage.csp && value !== storage.csp) {
+                                    csp.init().then((shown) => !shown && csp.showCookiesDialog('nova'));
+                                }
                             }
 
                             mega.config.set('dlThroughMEGAsync', 1);
@@ -555,6 +562,9 @@ function u_eplusplus(firstName, lastName) {
         u_checklogin({
             checkloginresult: tryCatch((u_ctx, r) => {
                 if (r !== 0) {
+                    if (d) {
+                        console.warn('Unexpected E++ account procedure...', r);
+                    }
                     return reject(r);
                 }
                 if (u_attr.privk) {
@@ -583,6 +593,7 @@ function u_eplusplus(firstName, lastName) {
                     .then(() => {
                         // Update top menu controls (Logout)
                         onIdle(() => topmenuUI());
+                        onIdle(() => eventlog(99744));
 
                         is_eplusplus = true;
                         resolve(u_attr.u);

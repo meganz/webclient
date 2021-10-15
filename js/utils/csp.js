@@ -21,6 +21,11 @@ lazy(self, 'csp', () => {
     const sgValue = async(newValue, byUser) => {
         const u_handle = mega.user;
 
+        if (d) {
+            console.group('csp.sgValue(%s, %s)', newValue, byUser, u_handle);
+            console.trace();
+        }
+
         if ((newValue >>>= 0) & CS_ESSENT) {
 
             if (u_handle) {
@@ -33,32 +38,50 @@ lazy(self, 'csp', () => {
                         // different settings, ask to reconfigure.
                         onIdle(() => csp.init());
                     }
+                    if (d) {
+                        console.info('csp.sgValue sync', value, srv);
+                        console.groupEnd();
+                    }
                     return;
                 }
 
                 storage['csp.' + u_handle] = newValue;
-                return srv === newValue ? -srv : mega.attr.set('csp', newValue, -2, 1);
+                const res = srv === newValue ? -srv : mega.attr.set('csp', newValue, -2, 1);
+
+                if (d) {
+                    console.info('csp.sgValue-set result', res);
+                    console.groupEnd();
+                }
+                return res;
             }
 
             storage.csp = newValue;
         }
-        return u_handle && mega.attr.get(u_handle, 'csp', -2, 1) || storage.csp;
+
+        const res = u_handle && mega.attr.get(u_handle, 'csp', -2, 1) || storage.csp;
+
+        if (d) {
+            console.info('csp.sgValue-get result', res);
+            console.groupEnd();
+        }
+        return res;
     };
 
     const canShowDialog = promisify(resolve => {
-        const exclude = {'cookie': 1, 'download':1, 'megadrop': 1, 'privacy': 1, 'takedown': 1, 'terms': 1};
+        const exclude = {
+            cookie: 1, download: 1, file: 1, folder: 1,
+            megadrop: 1, privacy: 1, takedown: 1, terms: 1
+        };
 
-        (function check() {
-            const page = String(window.page);
-
-            if (exclude[page.split('/')[0]] || pfid || page.indexOf('chat') > -1) {
+        (function check(page) {
+            if (pfid || exclude[String(page).split('/')[0]]) {
                 return mBroadcaster.once('pagechange', check);
             }
             if ($.msgDialog) {
-                return mBroadcaster.once('msgdialog-closed', SoonFc(200, check));
+                return mBroadcaster.once('msgdialog-closed', SoonFc(200, () => check(window.page)));
             }
             resolve();
-        })();
+        })(window.page);
     });
 
     mBroadcaster.addListener('login2', () => sgValue(value).dump('csp.login'));
@@ -66,6 +89,12 @@ lazy(self, 'csp', () => {
 
     return Object.freeze({
         init: mutex(tag, async(resolve) => {
+
+            if (d) {
+                console.group('csp.init invoked...', value);
+                console.trace();
+            }
+
             let shown = false;
             const val = await sgValue().catch(nop) >>> 0;
             const chg = value && mega.user && value !== val ? value : false;
@@ -75,6 +104,11 @@ lazy(self, 'csp', () => {
                 await canShowDialog();
                 await csp.showCookiesDialog(chg);
                 shown = true;
+            }
+
+            if (d) {
+                console.info('csp.init [leaving]', value, shown);
+                console.groupEnd();
             }
 
             resolve(shown);

@@ -214,11 +214,6 @@ var bottompage = {
                 // Scroll to saved position and reset previous focus
                 $('#startholder', $body).scrollTop(sessionData).trigger('mouseover');
 
-                if (page === 'download') {
-
-                    // Collapse download bar
-                    expandDlBar(1);
-                }
             }
         };
     },
@@ -570,7 +565,7 @@ var bottompage = {
         if (page === 'download') {
 
             // Select download bar as it contains top header and product page menu
-            $topHeader = $('.download.top-bar', $fmHolder);
+            $topHeader = $('.download.download-page', $fmHolder);
         }
         else {
 
@@ -620,21 +615,6 @@ var bottompage = {
 
                 // Return menus static positions
                 $topHeader.removeClass('floating activated').css('width',  '');
-            }
-
-            // Download bar collapse/expand
-            if (page === 'download') {
-
-                if (topPos > 50 && $topHeader.hasClass('expanded')) {
-
-                    // Collapse download bar
-                    expandDlBar(1);
-                }
-                else if (topPos < 10 && $topHeader.hasClass('auto')) {
-
-                    // Expand download bar
-                    expandDlBar();
-                }
             }
         });
     },

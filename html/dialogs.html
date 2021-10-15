@@ -133,7 +133,9 @@
     </div>
     <div class="megasync-content slider slide1">
         <header>
-            <div class="fm-dialog-close medium"></div>
+            <div class="fm-dialog-close medium">
+                <i class="sprite-fm-mono icon-dialog-close"></i>
+            </div>
             <div class="clear"></div>
         </header>
         <div class="megasync-body">
@@ -665,6 +667,9 @@
 
         <footer>
             <nav class="viewer-bars image-controls hidden">
+                <button class="v-btn simpletip browserscreen" aria-label="Expand" data-simpletipoffset="2" data-simpletip="[$20172]" data-simpletipposition="top">
+                    <i class="sprite-fm-mono icon-new-window"></i>
+                </button>
                 <ul class="bar">
                      <li class="hidden">
                         <button class="v-btn view" aria-label="[[grid view]]">
@@ -6612,6 +6617,538 @@
                     <a class="clickurl" href="/sync">[$desktopapp_dialog_other_os]</a>
                 </div>
             </aside>
+        </footer>
+    </div>
+
+    <!-- Dialog: Report Abuse -->
+    <div class="mega-dialog dialog-template-main report-abuse hidden"
+        role="dialog"
+        aria-labelledby="report-abuse-title"
+        aria-modal="true">
+
+        <button class="close js-close" aria-label="[$148]">
+            <i class="sprite-fm-mono icon-dialog-close"></i>
+        </button>
+
+        <header>
+            <h2 id="report-abuse-title">[$ra_title]</h2>
+        </header>
+
+        <section class="content-block js-reportabuse-scroll-panel">
+            <span class="js-subtitle subtitle"></span>
+
+            <form id="reportAbuseForm">
+
+                <section class="js-step1 abusetypes-block">
+                    <p>[$ra_lbl_selcttype]</p>
+                    <div class="radio-buttons">
+                        <div class="label-wrap">
+                            <div class="abusetype radioOff">
+                                <input type="radio" class="abusetype radioOff" value="A">
+                            </div>
+                            <div class="radio-txt">[$ra_type_a]</div>
+                        </div>
+                        <div class="label-wrap">
+                            <div class="abusetype radioOff">
+                                <input type="radio" class="abusetype radioOff" value="B">
+                            </div>
+                            <div class="radio-txt">[$ra_type_b]</div>
+                        </div>
+                        <div class="label-wrap">
+                            <div class="abusetype radioOff">
+                                <input type="radio" class="abusetype radioOff" value="C">
+                            </div>
+                            <div class="radio-txt">[$ra_type_c]</div>
+                        </div>
+                        <div class="label-wrap">
+                            <div class="abusetype radioOff">
+                                <input type="radio" class="abusetype radioOff" value="D">
+                            </div>
+                            <div class="radio-txt">[$ra_type_d]</div>
+                        </div>
+                        <div class="label-wrap">
+                            <div class="abusetype radioOff">
+                                <input type="radio" class="abusetype radioOff" value="E">
+                            </div>
+                            <div class="radio-txt">[$ra_type_e]</div>
+                        </div>
+                        <div class="label-wrap">
+                            <div class="abusetype radioOff">
+                                <input type="radio" class="abusetype radioOff" value="F">
+                            </div>
+                            <div class="radio-txt">[$ra_type_f]</div>
+                        </div>
+                        <div class="label-wrap">
+                            <div class="abusetype radioOff">
+                                <input type="radio" class="abusetype radioOff" value="G">
+                            </div>
+                            <div class="radio-txt">[$ra_type_g]</div>
+                        </div>
+                        <div class="label-wrap">
+                            <div class="abusetype radioOff">
+                                <input type="radio" class="abusetype radioOff" value="H">
+                            </div>
+                            <div class="radio-txt">[$ra_type_h]</div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="js-step2 hidden">
+                </section>
+
+                <section class="js-step3 hidden">
+                </section>
+
+                <section class="js-step4 hidden">
+                </section>
+            </form>
+
+            <div class="js-abuseerror message-container hidden">
+                [$ra_msg_selectoption]
+            </div>
+
+
+            <template id="abuseTemplate">
+                <!-- A- Child Sexual Abuse Material -->
+                <section>
+                    <div id="abuseA">
+                        <div class="form-row">
+                            <p>[$ra_lbl_webpublised_opt]</p>
+                            <textarea class="form-control js-website" placeholder="[$ra_txt_webpublised_pholder]" maxlength="255"></textarea>
+                        </div>
+                        <div class="form-row">
+                            <p>[$ra_lbl_usrpublised_opt]</p>
+                            <input class="form-control js-username" placeholder="[$ra_txt_usrpublised_pholder]" type="text" maxlength="255" />
+                        </div>
+                        <div class="form-row">
+                            <div class="checkbox-block">
+                                <div class="js-abuse-a-check checkboxOff checkbox">
+                                    <input class="checkboxOff" type="checkbox" name="abuse-a-check">
+                                </div>
+                                <label class="checkbox-txt">[$ra_chk_illegcontent]</label>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- B- Revenge porn, Stolen intimate adult photos, Upskirt adult photos -->
+                <section>
+                    <div id="abuseB">
+                        <p>[$ra_lbl_selctsubtype]</p>
+                        <div class="radio-buttons">
+                            <div class="label-wrap">
+                                <div class="abuseBType radioOff">
+                                    <input type="radio" class="abuseBType radioOff" value="R">
+                                </div>
+                                <div class="radio-txt">[$ra_type_r]</div>
+                            </div>
+                            <div class="label-wrap">
+                                <div class="abuseBType radioOff">
+                                    <input type="radio" class="abuseBType radioOff" value="S">
+                                </div>
+                                <div class="radio-txt">[$ra_type_s]</div>
+                            </div>
+                            <div class="label-wrap">
+                                <div class="abuseBType radioOff">
+                                    <input type="radio" class="abuseBType radioOff" value="U">
+                                </div>
+                                <div class="radio-txt">[$ra_type_u]</div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- R- Revenge porn -->
+                <!-- S- Stolen intimate adult photos -->
+                <section >
+                    <div id="abuseRandS">
+                        <p>[$ra_lbl_contsubject]</p>
+                        <div class="radio-buttons">
+                            <div class="label-wrap">
+                                <div class="contentowner radioOff">
+                                    <input type="radio" class="contentowner radioOff" value="true">
+                                </div>
+                                <div class="radio-txt">[$78]</div>
+                            </div>
+                            <div class="label-wrap">
+                                <div class="contentowner radioOff">
+                                    <input type="radio" class="contentowner radioOff" value="false">
+                                </div>
+                                <div class="radio-txt">[$79]</div>
+                            </div>
+                        </div>
+                        <div class="js-yesblock hidden">
+                            <div class="form-row">
+                                <p>[$ra_lbl_webpublised_opt]</p>
+                                <textarea class="form-control js-website" placeholder="[$ra_txt_webpublised_pholder]" maxlength="255"></textarea>
+                            </div>
+                            <div class="form-row">
+                                <p>[$ra_lbl_usrpublised_opt]</p>
+                                <input class="form-control js-username" placeholder="[$ra_txt_usrpublised_pholder]" type="text" maxlength="255" />
+                            </div>
+                        </div>
+                        <div class="js-noblock hidden">
+                            <div class="message-container">
+                                [$ra_msg_notauthrised]
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- U- Upskirt adult photos -->
+                <section>
+                    <div id="abuseU">
+                        <div class="form-row">
+                            <p>[$ra_lbl_webpublised_opt]</p>
+                            <textarea class="form-control js-website" placeholder="[$ra_txt_webpublised_pholder]" maxlength="255"></textarea>
+                        </div>
+                        <div class="form-row">
+                            <p>[$ra_lbl_usrpublised_opt]</p>
+                            <input class="form-control js-username" placeholder="[$ra_txt_usrpublised_pholder]" type="text" maxlength="255" />
+                        </div>
+                    </div>
+                </section>
+
+                <!-- C- Murder, Rape, Gore, Bestiality, Animal killing -->
+                <section>
+                    <div id="abuseC">
+                        <p>[$ra_lbl_selctsubtype]</p>
+                        <div class="radio-buttons">
+                            <div class="label-wrap">
+                                <div class="abuseSubType radioOff">
+                                    <input type="radio" class="abuseSubType radioOff" value="Murder">
+                                </div>
+                                <div class="radio-txt">[$ra_type_murder]</div>
+                            </div>
+                            <div class="label-wrap">
+                                <div class="abuseSubType radioOff">
+                                    <input type="radio" class="abuseSubType radioOff" value="Rape">
+                                </div>
+                                <div class="radio-txt">[$ra_type_rape]</div>
+                            </div>
+                            <div class="label-wrap">
+                                <div class="abuseSubType radioOff">
+                                    <input type="radio" class="abuseSubType radioOff" value="Gore">
+                                </div>
+                                <div class="radio-txt">[$ra_type_gore]</div>
+                            </div>
+                            <div class="label-wrap">
+                                <div class="abuseSubType radioOff">
+                                    <input type="radio" class="abuseSubType radioOff" value="Bestiality">
+                                </div>
+                                <div class="radio-txt">[$ra_type_bastiality]</div>
+                            </div>
+                            <div class="label-wrap">
+                                <div class="abuseSubType radioOff">
+                                    <input type="radio" class="abuseSubType radioOff" value="Animal killing">
+                                </div>
+                                <div class="radio-txt">[$ra_type_animkill]</div>
+                            </div>
+                        </div>
+                        <br>
+                        <div class="form-row">
+                            <p>[$ra_lbl_webpublised_opt]</p>
+                            <textarea class="form-control js-website" placeholder="[$ra_txt_webpublised_pholder]" maxlength="255"></textarea>
+                        </div>
+                        <div class="form-row">
+                            <p>[$ra_lbl_usrpublised_opt]</p>
+                            <input class="form-control js-username" placeholder="[$ra_txt_usrpublised_pholder]" type="text" maxlength="255" />
+                        </div>
+                    </div>
+                </section>
+
+                <!-- D- Violent extremism, Terrorism -->
+                <section>
+                    <div id="abuseD">
+                        <p>[$ra_lbl_selctsubtype]</p>
+                        <div class="radio-buttons">
+                            <div class="label-wrap">
+                                <div class="abuseSubType radioOff">
+                                    <input type="radio" class="abuseSubType radioOff" value="Violent extremism">
+                                </div>
+                                <div class="radio-txt">[$ra_type_violent]</div>
+                            </div>
+                            <div class="label-wrap">
+                                <div class="abuseSubType radioOff">
+                                    <input type="radio" class="abuseSubType radioOff" value="Terrorism">
+                                </div>
+                                <div class="radio-txt">[$ra_type_terror]</div>
+                            </div>
+                        </div>
+                        <br>
+                        <div class="form-row">
+                            <p>[$ra_lbl_webpublised_opt]</p>
+                            <textarea class="form-control js-website" placeholder="[$ra_txt_webpublised_pholder]" maxlength="255"></textarea>
+                        </div>
+                        <div class="form-row">
+                            <p>[$ra_lbl_usrpublised_opt]</p>
+                            <input class="form-control js-username" placeholder="[$ra_txt_usrpublised_pholder]" type="text" maxlength="255" />
+                        </div>
+                    </div>
+                </section>
+
+                <!-- E- Virus, Malware, Fraud, Hacked data, Game hacks -->
+                <section>
+                    <div id="abuseE">
+                        <p>[$ra_lbl_selctsubtype]</p>
+                        <div class="radio-buttons">
+                            <div class="label-wrap">
+                                <div class="abuseSubType radioOff">
+                                    <input type="radio" class="abuseSubType radioOff" value="Virus">
+                                </div>
+                                <div class="radio-txt">[$ra_type_virus]</div>
+                            </div>
+                            <div class="label-wrap">
+                                <div class="abuseSubType radioOff">
+                                    <input type="radio" class="abuseSubType radioOff" value="Malware">
+                                </div>
+                                <div class="radio-txt">[$ra_type_malware]</div>
+                            </div>
+                            <div class="label-wrap">
+                                <div class="abuseSubType radioOff">
+                                    <input type="radio" class="abuseSubType radioOff" value="Fraud">
+                                </div>
+                                <div class="radio-txt">[$ra_type_fraud]</div>
+                            </div>
+                            <div class="label-wrap">
+                                <div class="abuseSubType radioOff">
+                                    <input type="radio" class="abuseSubType radioOff" value="Hacked data">
+                                </div>
+                                <div class="radio-txt">[$ra_type_hacked]</div>
+                            </div>
+                            <div class="label-wrap">
+                                <div class="abuseSubType radioOff">
+                                    <input type="radio" class="abuseSubType radioOff" value="Game hacks">
+                                </div>
+                                <div class="radio-txt">[$ra_type_gamehack]</div>
+                            </div>
+                        </div>
+                        <br>
+                        <div class="form-row">
+                            <p>[$ra_lbl_webpublised_opt]</p>
+                            <textarea class="form-control js-website" placeholder="[$ra_txt_webpublised_pholder]" maxlength="255"></textarea>
+                        </div>
+                        <div class="form-row">
+                            <p>[$ra_lbl_usrpublised_opt]</p>
+                            <input class="form-control js-username" placeholder="[$ra_txt_usrpublised_pholder]" type="text" maxlength="255" />
+                        </div>
+                    </div>
+                </section>
+
+                <!-- F- Copyright, Intellectual Property -->
+                <section>
+                    <div id="abuseF">
+                        <p>[$ra_lbl_selctsubtype]</p>
+                        <div class="radio-buttons">
+                            <div class="label-wrap">
+                                <div class="abuseFType radioOff">
+                                    <input type="radio" class="abuseFType radioOff" value="CR">
+                                </div>
+                                <div class="radio-txt">[$ra_type_copyright]</div>
+                            </div>
+                            <div class="label-wrap">
+                                <div class="abuseFType radioOff">
+                                    <input type="radio" class="abuseFType radioOff" value="IP">
+                                </div>
+                                <div class="radio-txt">[$ra_type_intellectual]</div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- CR- Copyright -->
+                <section >
+                    <div id="abuseCR">
+                        <p>[$ra_lbl_meterialowner]</p>
+                        <div class="radio-buttons">
+                            <div class="label-wrap">
+                                <div class="contentowner radioOff">
+                                    <input type="radio" class="contentowner radioOff" value="true">
+                                </div>
+                                <div class="radio-txt">[$78]</div>
+                            </div>
+                            <div class="label-wrap">
+                                <div class="contentowner radioOff">
+                                    <input type="radio" class="contentowner radioOff" value="false">
+                                </div>
+                                <div class="radio-txt">[$79]</div>
+                            </div>
+                        </div>
+                        <div class="js-yesblock hidden">
+                           <p>[$ra_lbl_lodgecomplain] <a href="https://mega.io/copyright" class="clickurl" target="_blank">https://mega.io/copyright</a></p>
+                        </div>
+                        <div class="js-noblock hidden">
+                            <div class="message-container">
+                                [$ra_msg_cr_ip_notauthrised]
+                            </div>
+                            <div class="hidden">1111</div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- IP- Intellectual Property -->
+                <section >
+                    <div id="abuseIP">
+                        <p>[$ra_lbl_meterialowner]</p>
+                        <div class="radio-buttons">
+                            <div class="label-wrap">
+                                <div class="contentowner radioOff">
+                                    <input type="radio" class="contentowner radioOff" value="true">
+                                </div>
+                                <div class="radio-txt">[$78]</div>
+                            </div>
+                            <div class="label-wrap">
+                                <div class="contentowner radioOff">
+                                    <input type="radio" class="contentowner radioOff" value="false">
+                                </div>
+                                <div class="radio-txt">[$79]</div>
+                            </div>
+                        </div>
+                        <div class="js-yesblock hidden">
+                            <div class="form-row">
+                                <p>[$ra_lbl_webpublised]</p>
+                                <textarea class="form-control js-website" placeholder="[$ra_txt_webpublised_pholder]" maxlength="255"></textarea>
+                            </div>
+                            <div class="form-row">
+                                <p>[$ra_lbl_usrpublised]</p>
+                                <input class="form-control js-username" placeholder="[$ra_txt_usrpublised_pholder]" type="text" maxlength="255" />
+                            </div>
+                            <div class="form-row">
+                                <p>[$ra_lbl_meterialdesc]</p>
+                                <textarea class="form-control js-desc" placeholder="[$ra_txt_decribeabuse_pholder]" maxlength="255"></textarea>
+                            </div>
+                            <div class="form-row">
+                                <p>[$ra_lbl_ownerdetails]</p>
+                                <div class="form-row two-col">
+                                    <input class="form-control js-owner" placeholder="[$ra_lbl_owner]" type="text" maxlength="255" />
+                                    <input class="form-control js-email" placeholder="[$ra_lbl_email]" type="email" maxlength="255" />
+                                </div>
+                                <div class="form-row two-col">
+                                    <input class="form-control js-phone" placeholder="[$ra_lbl_phone]" type="text" maxlength="255" />
+                                    <input class="form-control js-address" placeholder="[$ra_lbl_address]" type="text" maxlength="255" />
+                                </div>
+                                <div class="form-row two-col">
+                                    <input class="form-control js-province" placeholder="[$ra_lbl_province]" type="text" maxlength="255" />
+                                    <input class="form-control js-postalcode" placeholder="[$ra_lbl_postalcode]" type="text" maxlength="255" />
+                                </div>
+                                <div class="form-row two-col">
+                                    <div class="mega-input form-control half dropdown-input js-countryselector" id="report-country">
+                                        <span class="placeholder">[$ra_lbl_country]</span>
+                                        <i class="sprite-fm-mono icon-dropdown"></i>
+                                        <div class="mega-input-dropdown hidden"><div class="dropdown-scroll"></div></div>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="form-row">
+                                <div class="checkbox-block">
+                                    <div class="js-abuse-ip-believe checkboxOff checkbox">
+                                        <input class="checkboxOff" type="checkbox" name="abuse-believe-check">
+                                    </div>
+                                    <label class="checkbox-txt">[$ra_chk_faithconfirm]</label>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="checkbox-block">
+                                    <div class="js-abuse-ip-aware checkboxOff checkbox">
+                                        <input class="checkboxOff" type="checkbox" name="abuse-aware-check">
+                                    </div>
+                                    <label class="checkbox-txt">[$ra_chk_agreeterms]</label>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <br>
+                            </div>
+                         </div>
+                         <div class="js-noblock hidden">
+                             <div class="message-container">
+                                 [$ra_msg_cr_ip_notauthrised]
+                             </div>
+                         </div>
+
+                    </div>
+                </section>
+
+                <!-- G- Racism, Hate -->
+                <section>
+                    <div id="abuseG">
+                        <p>[$ra_lbl_selctsubtype]</p>
+                        <div class="radio-buttons">
+                            <div class="label-wrap">
+                                <div class="abuseSubType radioOff">
+                                    <input type="radio" class="abuseSubType radioOff" value="Racism">
+                                </div>
+                                <div class="radio-txt">[$ra_type_racism]</div>
+                            </div>
+                            <div class="label-wrap">
+                                <div class="abuseSubType radioOff">
+                                    <input type="radio" class="abuseSubType radioOff" value="Hate">
+                                </div>
+                                <div class="radio-txt">[$ra_type_hate]</div>
+                            </div>
+                        </div>
+                        <br>
+                        <div class="form-row">
+                            <p>[$ra_lbl_webpublised_opt]</p>
+                            <textarea class="form-control js-website" placeholder="[$ra_txt_webpublised_pholder]" maxlength="255"></textarea>
+                        </div>
+                        <div class="form-row">
+                            <p>[$ra_lbl_usrpublised_opt]</p>
+                            <input class="form-control js-username" placeholder="[$ra_txt_usrpublised_pholder]" type="text" maxlength="255" />
+                        </div>
+                    </div>
+                </section>
+
+                <!-- H- Others -->
+                <section>
+                    <div id="abuseH">
+                        <div class="form-row">
+                            <p>[$ra_lbl_decribeabuse]</p>
+                            <textarea class="form-control js-desc" placeholder="[$ra_txt_decribeabusetype_pholder]"></textarea>
+                        </div>
+                        <div class="form-row">
+                            <p>[$ra_lbl_webpublised_opt]</p>
+                            <textarea class="form-control js-website" placeholder="[$ra_txt_webpublised_pholder]" maxlength="255"></textarea>
+                        </div>
+                        <div class="form-row">
+                            <p>[$ra_lbl_usrpublised_opt]</p>
+                            <input class="form-control js-username" placeholder="[$ra_txt_usrpublised_pholder]" type="text" maxlength="255" />
+                        </div>
+                    </div>
+                </section>
+
+            </template>
+
+        </section>
+
+        <!-- container Footer -->
+        <footer>
+            <div class="footer-container space-between">
+                <div>
+                    <button class="mega-button action back">
+                        <div>
+                            <i class="sprite-fm-mono icon-arrow-left"></i>
+                        </div>
+                        <span>[$822]</span>
+                    </button>
+                </div>
+                <div class="select-wrapper">
+
+                    <button class="mega-button cancel">
+                        <span>[$82]</span>
+                    </button>
+                    <button class="mega-button positive next">
+                        <span>[$556]</span>
+                    </button>
+                    <button class="mega-button positive submit">
+                        <span>[$btn_submitreport]</span>
+                    </button>
+                    <button class="mega-button positive ok">
+                        <span>[$81]</span>
+                    </button>
+
+                </div>
+            </div>
         </footer>
     </div>
 </section>

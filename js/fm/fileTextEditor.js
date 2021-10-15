@@ -43,6 +43,45 @@ mega.fileTextEditor = new function FileTextEditor() {
     };
 
     /**
+     * Get as Text from Buffer
+     * @param   {ArrayBuffer} buffer    Text Data in ArrayBuffer
+     * @returns {Promise}               Promise of the Blob Text
+     */
+    this.getTextFromBuffer = function(buffer) {
+        const bData = new Blob([buffer], { type: "text/plain" });
+        return M.readBlob(bData, 'readAsText');
+    };
+
+    /**
+     * Get cached data
+     * @param {String} handle    Node handle
+     */
+    this.getCachedData = function(handle) {
+        if (filesDataMap[handle]) {
+            return filesDataMap[handle];
+        }
+    };
+
+    /**
+     * Cache data
+     * @param {String} handle           Node handle
+     * @param {String} text             Text content to be cached
+     * @param {boolean} isPartialData   Is Partial data flag
+     */
+    this.cacheData = function(handle, text, isPartialData) {
+
+        if (filesDataMap[handle]) {
+            if (filesDataMap[handle].partial && !isPartialData) {
+                this.clearCachedFileData(handle);
+                storeFileData(handle, {text: text, partial: isPartialData});
+            }
+        }
+        else {
+            storeFileData(handle, {text: text, partial: isPartialData});
+        }
+    };
+
+    /**
      * Get file data
      * @param {String} handle       Node handle
      * @returns {MegaPromise}       Promise of the operation

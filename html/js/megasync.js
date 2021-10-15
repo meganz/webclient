@@ -531,7 +531,7 @@ var megasync = (function() {
                     dlprogress(requestArgs.h, prec.toPrecision(3), response.p, response.t, response.v);
                     if (currStatus !== l[17592]) { // 'Downloading with MEGAsync .'
                         currStatus = l[17592]; // 'Downloading with MEGAsync .'
-                        $topBar = $('.download.top-bar').removeClass('paused');
+                        $topBar = $('.download.download-page').removeClass('paused');
                         $('.download.eta-block .light-txt', $topBar).text(currStatus);
                     }
                     setTimeout(_statusTick, 1000);
@@ -547,9 +547,9 @@ var megasync = (function() {
                     else {
                         if (currStatus !== l[17593]) { // 'Download is queued in MEGAsync .'
                             $('.download.progress-bar').width('100%');
-                            $('.download.top-bar').removeClass('downloading').addClass('download-complete');
+                            $('.download.download-page').removeClass('downloading').addClass('download-complete');
                             currStatus = l[17593]; // 'Download is queued in MEGAsync .'
-                            $topBar = $('.download.top-bar');
+                            $topBar = $('.download.download-page');
                             $('.download.eta-block .light-txt', $topBar).text(currStatus);
                         }
                     }
@@ -568,9 +568,9 @@ var megasync = (function() {
                 else if (response.s && response.s == 6) { // allow implied convert
                     // STATE_COMPLETED = 6
                     dlprogress(-0xbadf, 100, response.t, response.t);
-                    $('.download.top-bar').removeClass('paused');
+                    $('.download.download-page').removeClass('paused');
                     $('.download.progress-bar').width('100%');
-                    $('.download.top-bar').removeClass('downloading').addClass('download-complete');
+                    $('.download.download-page').removeClass('downloading').addClass('download-complete');
                     var $pageScrollBlock = $('.bottom-page.scroll-block');
                     $pageScrollBlock.addClass('resumable');
                     if (window.dlpage_ph) {
@@ -594,7 +594,7 @@ var megasync = (function() {
                     // then send a new update status request after longer timeout 3 sec
                     if (currStatus !== l[17594]) { // 'Download-Paused in MEGAsync !'
                         currStatus = l[17594]; // 'Download-Paused in MEGAsync !'
-                        $topBar = $('.download.top-bar').addClass('paused');
+                        $topBar = $('.download.download-page').addClass('paused');
                         $('.download.eta-block .light-txt', $topBar).text(currStatus);
                     }
                     setTimeout(_statusTick, 3000);
@@ -604,7 +604,7 @@ var megasync = (function() {
                     // then send a new update status request after longer timeout 3 sec
                     if (currStatus !== l[17603]) { // 'Download retrying in MEGAsync !'
                         currStatus = l[17603]; // 'Download retrying in MEGAsync !'
-                        $topBar = $('.download.top-bar').addClass('paused');
+                        $topBar = $('.download.download-page').addClass('paused');
                         $('.download.eta-block .light-txt', $topBar).text(currStatus);
                     }
                     setTimeout(_statusTick, 3000);
@@ -614,7 +614,7 @@ var megasync = (function() {
                     // then send a new update status request
                     if (currStatus !== l[17604]) { // 'Download completing in MEGAsync .'
                         currStatus = l[17604]; // 'Download completing in MEGAsync .'
-                        $topBar = $('.download.top-bar').addClass('paused');
+                        $topBar = $('.download.download-page').addClass('paused');
                         $('.download.eta-block .light-txt', $topBar).text(currStatus);
                     }
                     setTimeout(_statusTick, 1000);

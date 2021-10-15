@@ -3338,7 +3338,8 @@ else if (!browserUpdate) {
         'achievements_css':{f:'css/achievements.css', n: 'achievements_css', j: 2, w: 5, c: 1, d: 1, cache: 1 },
         'special': {f:'html/troy-hunt.html', n:'special', j:0},
         'special_js': {f:'html/js/troy-hunt.js', n:'special_js', j:1},
-        'special_css': {f:'css/troy-hunt.css', n:'special_css', j:2}
+        'special_css': {f:'css/troy-hunt.css', n:'special_css', j:2},
+        'reportabuse_js': {f:'js/ui/reportAbuse.js', n:'reportabuse_js', j:1},
     };
 
     /* eslint-disable max-len */

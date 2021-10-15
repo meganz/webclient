@@ -550,7 +550,7 @@ def has_locked_msgs(is_prod):
         print("SUCCESS ... checking for Locked strings in PROD. None found")
     return False
 
-def lock_resource(branch_resource_name):
+def lock_resource(branch_resource_name, keys):
     url = BASE_URL + "/resource_strings?filter[resource]=" + PROJECT_ID + ":r:" + branch_resource_name
     languages = get_languages()
     if languages:
@@ -566,21 +566,22 @@ def lock_resource(branch_resource_name):
                 if response.code == 200:
                     string_codes = []
                     for key in content['data']:
-                        updateUrl = BASE_URL + "/resource_strings/" + key['id']
-                        stringTags = key["attributes"]["tags"]
-                        for tag in lockedTags:
-                            if tag not in stringTags:
-                                stringTags.append(tag)
-                        payload = {
-                                    "data": {
-                                        "attributes": {
-                                            "tags": stringTags,
-                                        },
-                                        "id": key['id'],
-                                        "type": "resource_strings"
+                        if key["attributes"]["key"] in keys:
+                            updateUrl = BASE_URL + "/resource_strings/" + key['id']
+                            stringTags = key["attributes"]["tags"]
+                            for tag in lockedTags:
+                                if tag not in stringTags:
+                                    stringTags.append(tag)
+                            payload = {
+                                        "data": {
+                                            "attributes": {
+                                                "tags": stringTags,
+                                            },
+                                            "id": key['id'],
+                                            "type": "resource_strings"
+                                        }
                                     }
-                                }
-                        string_codes.append({'url': updateUrl, 'payload': payload})
+                            string_codes.append({'url': updateUrl, 'payload': payload})
 
                     def transifex_patch_strings(url, request):
                         try:
@@ -692,7 +693,7 @@ def main():
             success = send_upload_request(url, payload)
             if success:
                 print("Locking resource")
-                lock_resource(branch_resource_name)
+                lock_resource(branch_resource_name, new_strings.keys())
                 print("Completed")
         print("~ Import completed ~")
         print("")

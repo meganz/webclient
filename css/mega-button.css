@@ -125,6 +125,33 @@
         width: var(--height);
     }
 
+    /* merge multiple buttons */
+    .merge-mega-button {
+        display: inline-flex;
+        align-items: center;
+    }
+    .merge-mega-button > :not(:first-child,:last-child) {
+        border-radius: 0;
+    }
+    .merge-mega-button > button:first-child,
+    .merge-mega-button > :first-child > button {
+        border-radius: 4px 0 0 4px;
+    }
+    .rtl .merge-mega-button > button:first-child,
+    .rtl .merge-mega-button > :first-child > button {
+        border-radius: 0 4px 4px 0;
+    }
+    .merge-mega-button > button:last-child,
+    .merge-mega-button > :last-child > button {
+        border-radius: 0 4px 4px 0;
+        margin-left: -2px;
+    }
+    .rtl .merge-mega-button > button:last-child,
+    .rtl .merge-mega-button > :last-child > button {
+        border-radius: 4px 0 0 4px;
+        margin-right: -2px;
+    }
+
 /* end: shape modifiers */
 
 /* content */

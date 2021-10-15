@@ -15,7 +15,7 @@ function setTransferStatus(dl, status, ethrow, lock, fatalError) {
     }
 
     if (page === 'download') {
-        var $dlTopBar = $('.download.top-bar');
+        var $dlTopBar = $('.download.download-page');
         var $dlMainTNfo = $('.download.main-transfer-info');
         var $dlTopBarErrorBlock = $('.download.main-transfer-error', $dlTopBar);
 

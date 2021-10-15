@@ -1300,7 +1300,7 @@ var dlmanager = {
         }
 
         if (page === 'download') {
-            var $dtb = $('.download.top-bar');
+            var $dtb = $('.download.download-page');
             $dtb.removeClass('stream-overquota overquota');
             $('.see-our-plans', $dtb).addClass('hidden').off('click');
             $('.download.over-transfer-quota', $dtb).addClass('hidden');
@@ -1606,7 +1606,7 @@ var dlmanager = {
                 });
 
             if (page === 'download') {
-                var $dtb = $('.download.top-bar');
+                var $dtb = $('.download.download-page');
 
                 $('.see-our-plans', $dtb).removeClass('hidden').rebind('click', onclick);
 
@@ -2266,7 +2266,7 @@ var dlmanager = {
                     open(megasync.getMegaSyncUrl() || (getAppBaseUrl() + '#sync'));
                 }
             }
-            if ($('.download.top-bar').hasClass('video')) {
+            if ($('.download.download-page').hasClass('video')) {
                 $elm.removeClass('visible');
             }
         });

@@ -2097,6 +2097,18 @@ function topbarUI(holderId) {
         element.classList[fminitialized ? 'remove' : 'add']('hidden');
     }
 
+    const theme = u_attr && u_attr['^!webtheme'] !== undefined ? u_attr['^!webtheme'] : 0;
+    let logoClass = 'mega-logo-dark';
+
+    $('.logo-full', '.js-topbar').removeClass('img-mega-logo-light', 'mega-logo-dark');
+    if (theme === '1'){
+        logoClass = 'img-mega-logo-light';
+    }
+    else {
+        logoClass = 'mega-logo-dark';
+    }
+    $('.logo-full', '.js-topbar').addClass(logoClass);
+
     element = topbar.querySelector('.js-dropdown-notification');
 
     if (element) {
@@ -2864,7 +2876,7 @@ function topmenuUI() {
     });
 
     // If the main Mega M logo in the header is clicked
-    $('.top-head, .fm-main, .bar-table').find('.logo').rebind('click', function () {
+    $('.logo, .logo-full', '.top-head, .fm-main, .bar-table').rebind('click', () => {
         if (typeof loadingInitDialog === 'undefined' || !loadingInitDialog.active) {
             loadSubPage(u_type ? 'fm' : 'start');
         }
@@ -3008,9 +3020,15 @@ function parsepage(pagehtml) {
 
     $('#startholder').safeHTML(pagehtml).removeClass('hidden');
 
-    // if this is bottom page we have to enforce light mode for now.
-    document.body.classList.remove('theme-dark');
-    document.body.classList.add('theme-light', 'bottom-pages');
+    // if this is bottom page & not Download Page we have to enforce light mode for now.
+    if (page === 'download' && !is_mobile) {
+        const theme = u_attr && u_attr['^!webtheme'] !== undefined ? u_attr['^!webtheme'] : 0;
+        mega.ui.theme.set(theme);
+    }
+    else {
+        document.body.classList.remove('theme-dark');
+        document.body.classList.add('theme-light', 'bottom-pages');
+    }
 
     $('body, html, .bottom-pages .fmholder').stop(true, true).scrollTop(0);
     bottompage.init();

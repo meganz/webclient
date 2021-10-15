@@ -627,3 +627,18 @@
 .business .top-head .top-buttons.business {
     display: block;
 }
+/* Download Page Topbar changes */
+.topbar .logo-full {
+    --width: 98px;
+    width: 98px;
+    height: 32px;
+    display: none;
+    cursor: pointer;
+}
+.bottom-page.download .topbar .logo-full {
+    display: inline-block;
+}
+.bottom-page.download .topbar .logo,
+.bottom-page.download .topbar .logo-wrapper button {
+    display: none;
+}

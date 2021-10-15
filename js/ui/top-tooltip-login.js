@@ -329,7 +329,6 @@ var tooltiplogin = {
                 onIdle(function() {
                     topmenuUI();
                     tooltiplogin.init(1);
-                    showRegisterSidePane(1);
 
                     if (dlmanager.isOverQuota) {
                         dlmanager._onOverquotaDispatchRetry();

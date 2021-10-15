@@ -128,6 +128,7 @@ function bindDropdownEvents($select, saveOption, contentBlock) {
         $('.option', $select).removeClass('active').removeAttr('data-state');
         $this.addClass('active').attr('data-state', 'active');
         $('> span', $select).text($this.text());
+        $('> span', $select).removeClass('placeholder');
         $this.trigger('change');
 
         if (saveOption) {

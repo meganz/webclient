@@ -33,10 +33,13 @@ export default class Preview extends MegaRenderMixin {
         const { audio, video } = this.state;
         navigator.mediaDevices.getUserMedia({ audio, video })
             .then(stream => {
-                this.videoRef.current.srcObject = stream;
-                this.stream = stream;
-                if (this.props.onToggle) {
-                    this.props.onToggle(this.state.audio, this.state.video);
+                const videoRef = this.videoRef.current;
+                if (videoRef) {
+                    videoRef.srcObject = stream;
+                    this.stream = stream;
+                    if (this.props.onToggle) {
+                        this.props.onToggle(this.state.audio, this.state.video);
+                    }
                 }
             })
             .catch(ex => console.error(ex.name + ": " + ex.message));

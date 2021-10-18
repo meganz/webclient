@@ -22361,11 +22361,15 @@ class preview_Preview extends mixins["MegaRenderMixin"] {
         audio,
         video
       }).then(stream => {
-        this.videoRef.current.srcObject = stream;
-        this.stream = stream;
+        const videoRef = this.videoRef.current;
 
-        if (this.props.onToggle) {
-          this.props.onToggle(this.state.audio, this.state.video);
+        if (videoRef) {
+          videoRef.srcObject = stream;
+          this.stream = stream;
+
+          if (this.props.onToggle) {
+            this.props.onToggle(this.state.audio, this.state.video);
+          }
         }
       }).catch(ex => console.error(ex.name + ": " + ex.message));
     };

@@ -494,9 +494,9 @@ mega.textEditorUI = new function TextEditorUI() {
 
                     delay('txt.viewer:scroll-info', () => {
                         const info = editor && editor.getScrollInfo() || false;
-
-                        if (info.top * 100 / info.height > 90) {
-                            mBroadcaster.sendMessage('txt.viewer:scroll-bottom', editor, info);
+                        const scrollPos = info.height - (info.top + info.clientHeight);
+                        if (scrollPos <= 20) {
+                            mBroadcaster.sendMessage('txt.viewer:scroll-bottom', editor);
                         }
                     }, 60);
                 });

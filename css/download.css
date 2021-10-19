@@ -691,15 +691,15 @@ button.megasync-slider.prev {
     background-color: var(--surface-grey-1);
 }
 .video-theatre-mode .download.video-block {
-    height: calc(100vh - 360px);
+    height: calc(100vh - 280px);
     border: 0;
     border-radius: 0;
 }
 .video-theatre-mode .download.video-block:not(:-webkit-full-screen){
-    height: calc(100vh - 360px) !important;
+    height: calc(100vh - 280px) !important;
 }
 .video-theatre-mode .download.video-block:not(:-moz-full-screen) {
-    height: calc(100vh - 360px) !important;
+    height: calc(100vh - 280px) !important;
 }
 .video-theatre-mode .download.video-block:-webkit-full-screen {
     height: 100vh !important;
@@ -855,6 +855,7 @@ body:not(.en) .video-theatre-mode.stream-overquota .download.video-block {
     border-width: 1px 0 1px 0;
     left: 0;
     right: 0;
+    width: calc(100% - 1px);
 }
 .download-page.download-content.fullscreen,
 .download-page.download-content.browserscreen {
@@ -1210,11 +1211,15 @@ body:not(.en) .video-theatre-mode.stream-overquota .download.video-block {
 .image .download.info-block .file-type-wrapper {
     display: none;
 }
-.download.image-block .media-viewer-container:not(.browserscreen, .fullscreen) {
+.download.image-block .media-viewer-container {
     position: relative;
     z-index: 99;
 }
-.media-viewer-container .v-btn.browserscreen,
+.download.image-block .media-viewer-container.browserscreen,
+.download.image-block .media-viewer-container.fullscreen {
+    position: fixed;
+    z-index: 999;
+}
 .download.image-block .media-viewer-container.browserscreen .v-btn.browserscreen,
 .download.image-block .media-viewer-container.fullscreen .v-btn.browserscreen {
     display: none;

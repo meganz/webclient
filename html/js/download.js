@@ -594,9 +594,9 @@ function dl_g(res, ctx) {
 
                                 if (partial) {
                                     // @todo streaming
-                                    mBroadcaster.once('txt.viewer:scroll-bottom', (editor, info) => {
+                                    mBroadcaster.once('txt.viewer:scroll-bottom', (editor) => {
                                         $('.viewer-pending', $containerB).removeClass('hidden');
-
+                                        const ln = editor.lineCount();
                                         M.gfsfetch(dl_node.link, 0, -1)
                                             .then((data) => {
                                                 return mega.fileTextEditor.getTextFromBuffer(data.buffer);
@@ -604,7 +604,7 @@ function dl_g(res, ctx) {
                                             .then(txt => {
                                                 mega.fileTextEditor.cacheData(dl_node.link, txt, false);
                                                 editor.setValue(txt);
-                                                editor.scrollTo(info.left, info.top);
+                                                editor.scrollIntoView(ln);
                                             })
                                             .catch(onError)
                                             .finally(onLoadEnd);

@@ -630,25 +630,70 @@
      * @returns {void}
      */
     AffiliateData.prototype.storeAffiliate = function(value, type) {
-        /* eslint-disable local-rules/misc-warnings */
         sessionStorage.affid = value;
         sessionStorage.affts = Date.now();
         sessionStorage.afftype = type;
-        if ('csp' in window) {
-            csp.init().then(() => {
+
+        this.persist();
+    };
+
+    AffiliateData.prototype.persist = function() {
+        const WAIT_TIME = 2e4;
+        const tag = 'AffiliateData:persist.deferred';
+
+        if (this.persist.running) {
+            return;
+        }
+        this.persist.running = true;
+
+        delay(tag, async() => {
+            let hold = pfid || page === 'download' || String(page).includes('chat');
+            if (!hold) {
+                // Hold showing the cookie dialog for this if the FM was just loaded (e.g. less than 20 seconds ago)
+                hold = window.loadfm && Date.now() - loadfm.loaded < WAIT_TIME;
+            }
+
+            if (hold) {
+                if (d) {
+                    console.warn('Holding showing cookie-dialog for affiliate-tags...', sessionStorage.affid);
+                }
+                mBroadcaster.once('pagechange', SoonFc(60, () => {
+                    this.persist.running = false;
+                    this.persist();
+                }));
+                return;
+            }
+
+            if (sessionStorage.affid && 'csp' in window) {
+                const storage = localStorage;
+                const {affid, affts, afftype} = sessionStorage;
+
+                delete sessionStorage.affid;
+                delete sessionStorage.affts;
+                delete sessionStorage.afftype;
+
+                if (d) {
+                    console.info('Dispatching cookie-dialog for affiliate-tags...', affid);
+                }
+                await csp.init();
+
                 if (csp.has('analyze')) {
-                    localStorage.affid = sessionStorage.affid;
-                    localStorage.affts = sessionStorage.affts;
-                    localStorage.afftype = sessionStorage.afftype;
+                    storage.affid = affid;
+                    storage.affts = affts;
+                    storage.afftype = afftype;
                 }
                 else {
-                    delete localStorage.affid;
-                    delete localStorage.affts;
-                    delete localStorage.afftype;
+                    delete storage.affid;
+                    delete storage.affts;
+                    delete storage.afftype;
+                    sessionStorage.affid = affid;
+                    sessionStorage.affts = affts;
+                    sessionStorage.afftype = afftype;
                 }
-            });
-        }
-        /* eslint-enable local-rules/misc-warnings */
+            }
+
+            this.persist.running = false;
+        }, WAIT_TIME / 3);
     };
 
     /**

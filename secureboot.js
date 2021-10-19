@@ -4745,20 +4745,12 @@ mBroadcaster.once('startMega', function() {
             M.req({a: 'mrt', t: mt}).dump('uTagMT');
         });
     }
+
     if (sessionStorage.affid && 'csp' in window) {
         delay('aff:cspchk:movelocal', function() {
-            csp.init().then(function() {
-                if (csp.has('analyze')) {
-                    localStorage.affid = sessionStorage.affid;
-                    localStorage.affts = sessionStorage.affts;
-                    localStorage.afftype = sessionStorage.afftype;
-                }
-                else {
-                    delete localStorage.affid;
-                    delete localStorage.affts;
-                    delete localStorage.afftype;
-                }
-            });
+            if ('affiliate' in M) {
+                M.affiliate.persist();
+            }
         });
     }
 

@@ -949,6 +949,14 @@ function init_page() {
 
                     if (u_handle && u_handle === result[2]) {
                         // same account still in active session, let's end.
+                        if ('csp' in window) {
+                            const storage = localStorage;
+                            const value = storage[`csp.${u_handle}`];
+
+                            if (value) {
+                                storage.csp = value;
+                            }
+                        }
                         u_logout(1);
                     }
 

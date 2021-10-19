@@ -2057,10 +2057,9 @@ MegaUtils.prototype.onDexieDB = promisify(function(resolve, reject, name, schema
  * @param {String} [action] Pre-defined action to perform.
  * @param {String} [key] action key.
  * @param {String} [value] action key value.
- * @param {*} [essential] as per EU's cookie law, is this an essential 'cookie'?
  * @returns {Promise}
  */
-MegaUtils.prototype.onPersistentDB = promisify(function(resolve, reject, action, key, value, essential) {
+MegaUtils.prototype.onPersistentDB = promisify(function(resolve, reject, action, key, value) {
     'use strict';
 
     this.onDexieDB('$ps', {kv: '&k'}).then(function(db) {
@@ -2078,7 +2077,7 @@ MegaUtils.prototype.onPersistentDB = promisify(function(resolve, reject, action,
             }).catch(reject);
         }
         else {
-            M.onPersistentDB.fallback.call(null, action, key, value, essential).then(resolve, reject);
+            M.onPersistentDB.fallback.call(null, action, key, value).then(resolve, reject);
         }
     }, reject);
 });
@@ -2088,14 +2087,13 @@ MegaUtils.prototype.onPersistentDB = promisify(function(resolve, reject, action,
  * @param {String} action The fallback action being performed
  * @param {String} key The storage key identifier
  * @param {*} [value] The storage key value
- * @param {*} [essential] as per EU's cookie law, is this an essential 'cookie'?
  * @returns {Promise}
  */
-MegaUtils.prototype.onPersistentDB.fallback = promisify(function(resolve, reject, action, key, value, essential) {
+MegaUtils.prototype.onPersistentDB.fallback = async function(action, key, value) {
     'use strict';
     const pfx = '$ps!';
     const parse = tryCatch(JSON.parse.bind(JSON));
-    const storage = essential ? localStorage : sessionStorage;
+    const storage = localStorage;
     key = pfx + (key || '');
 
     var getValue = function(key) {
@@ -2118,18 +2116,13 @@ MegaUtils.prototype.onPersistentDB.fallback = promisify(function(resolve, reject
     }
     else if (action === 'rem') {
         value = storage[key];
-        delete localStorage[key];
-        delete sessionStorage[key];
+        delete storage[key];
     }
     else if (action === 'enum') {
-        var entries = Object.keys(storage)
-            .filter(function(k) {
-                return k.startsWith(key);
-            })
-            .map(function(k) {
-                return k.substr(pfx.length);
-            });
-        var result = entries;
+        const entries = Object.keys(storage)
+            .filter((k) => k.startsWith(key))
+            .map((k) => k.substr(pfx.length));
+        let result = entries;
 
         if (value) {
             // Read contents
@@ -2143,8 +2136,8 @@ MegaUtils.prototype.onPersistentDB.fallback = promisify(function(resolve, reject
         value = result;
     }
 
-    resolve(value);
-});
+    return value;
+};
 
 // Get FileSystem storage ignoring polyfills.
 lazy(MegaUtils.prototype, 'requestFileSystem', function() {
@@ -2318,105 +2311,23 @@ MegaUtils.prototype.getFileSystemEntries = promisify(function(resolve, reject, a
 /**
  * Retrieve data saved into persistent storage
  * @param {String} k The key identifying the data
- * @param {*} [essential] as per EU's cookie law, is this an essential 'cookie'?
  * @returns {Promise}
  */
-MegaUtils.prototype.getPersistentData = async function(k, essential) {
+MegaUtils.prototype.getPersistentData = async function(k) {
     'use strict';
-
-    if (!essential && 'csp' in window) {
-        const value = await this.onPersistentDB.fallback('get', k).catch(nop);
-
-        if (value !== undefined) {
-            await csp.init();
-            if (csp.has('pref')) {
-                await this.onPersistentDB.fallback('rem', k).catch(nop);
-                await this.setPersistentData(k, value).catch(dump);
-            }
-            return value;
-        }
-    }
-
-    if (M.requestFileSystem) {
-        const entry = await this.getFileSystemEntry(k).catch(nop);
-
-        if (entry) {
-            const data = tryCatch(e => JSON.parse(e), false)(await this.readFileEntry(entry, 'readAsText').catch(nop));
-
-            if (data !== undefined) {
-                if (!essential) {
-                    // @todo remove in ~4 months..
-                    await this.delPersistentData(k).catch(nop);
-                    await this.setPersistentData(k, data).catch(dump);
-                }
-                return data;
-            }
-        }
-    }
-
-    return this.onPersistentDB('get', k, null, true);
+    return this.onPersistentDB('get', k);
 };
 
 /**
  * Save data into persistent storage
  * @param {String} k The key identifying the data to store
  * @param {*} v The value/data to store
- * @param {*} [essential] as per EU's cookie law, is this an essential 'cookie'?
  * @returns {Promise}
  */
-MegaUtils.prototype.setPersistentData = promisify(async function(resolve, reject, k, v, essential) {
+MegaUtils.prototype.setPersistentData = async function(k, v) {
     'use strict';
-
-    var self = this;
-    var fallback = function() {
-        self.onPersistentDB('set', k, v, true).then(resolve, reject);
-    };
-
-    if (!essential && 'csp' in window) {
-        await csp.init();
-        if (!csp.has('pref')) {
-            return this.onPersistentDB.fallback('set', k, v).then(resolve, reject);
-        }
-    }
-
-    // @todo deprecate...
-    if (essential && M.requestFileSystem) {
-        var tmpPromise = this.getFileSystemEntry(k, true);
-
-        tmpPromise.then(function(entry) {
-            entry.createWriter(function(writer) {
-
-                writer.onwriteend = function() {
-                    if (writer.readyState !== writer.DONE) {
-                        return reject(EACCESS);
-                    }
-
-                    writer.onwriteend = function() {
-                        resolve();
-                    };
-
-                    writer.write(new Blob([tryCatch(JSON.stringify.bind(JSON))(v) || '{}']));
-                };
-
-                writer.onerror = function(e) {
-                    reject(e);
-                };
-
-                writer.truncate(0);
-
-            }, reject);
-        }).catch(function(ex) {
-            if (Object(ex).name === 'SecurityError') {
-                // Running on Incognito mode?
-                return fallback();
-            }
-            reject(ex);
-        });
-    }
-    else {
-        fallback();
-    }
-});
+    return this.onPersistentDB('set', k, v);
+};
 
 /**
  * Remove previously stored persistent data
@@ -2427,11 +2338,8 @@ MegaUtils.prototype.delPersistentData = function(k) {
     'use strict';
 
     return Promise.allSettled([
-        this.onPersistentDB.fallback('rem', k),
-        this.onPersistentDB('rem', k, null, true),
-        M.requestFileSystem && promisify((resolve, reject) => {
-            this.getFileSystemEntry(k).then(entry => entry.remove(resolve, reject)).catch(reject);
-        })()
+        this.onPersistentDB('rem', k),
+        this.onPersistentDB.fallback('rem', k)
     ]);
 };
 
@@ -2505,51 +2413,8 @@ MegaUtils.prototype.getPersistentDataEntries = promisify(async function(resolve,
         }, fail);
     };
 
-    if ('csp' in window) {
-        const value = await this.onPersistentDB.fallback('enum', aPrefix, aReadContents).catch(nop);
-
-        if (Object.keys(value || {}).length) {
-            append(value);
-        }
-    }
-
-    if (M.requestFileSystem) {
-        this.getFileSystemEntries(aPrefix, false)
-            .then(function(result) {
-                var entries = Object.keys(result);
-
-                if (!aReadContents) {
-                    return entries;
-                }
-
-                var promises = [];
-                for (var i = 0; i < entries.length; ++i) {
-                    promises.push(M.readFileEntry(result[entries[i]], 'readAsText'));
-                }
-
-                return Promise.allSettled(promises)
-                    .then(function(r) {
-                        var parse = tryCatch(JSON.parse.bind(JSON), false);
-
-                        for (var i = 0; i < r.length; ++i) {
-                            if (r[i].status === 'fulfilled') {
-                                result[entries[i]] = parse(r[i].value);
-                            }
-                            else {
-                                console.warn('Failed to read filesystem entry...', entries[i], r[i].reason);
-                                result[entries[i]] = false;
-                            }
-                        }
-                        return result;
-                    });
-            })
-            .then(append)
-            .catch(nop)
-            .finally(fallback);
-    }
-    else {
-        fallback();
-    }
+    // why the closure? check out git blame, some logic was removed here and no need to refactor everything, yet.
+    fallback();
 });
 
 /**

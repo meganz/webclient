@@ -6562,7 +6562,7 @@ ChatRoom.prototype.joinCall = ChatRoom._fnRequireParticipantKeys(function (audio
     }
   });
   callId = callId || this.activeCallIds.keys()[0];
-  asyncApiReq({
+  return asyncApiReq({
     'a': 'mcmj',
     'cid': this.chatId,
     "mid": callId
@@ -6574,7 +6574,7 @@ ChatRoom.prototype.joinCall = ChatRoom._fnRequireParticipantKeys(function (audio
     }, r.url.replace("https://", "wss://"));
     app.sfuClient.muteAudio(!audio);
     app.sfuClient.muteCamera(!video);
-    app.sfuClient.connect(r.url, callId, this.type !== "private");
+    return app.sfuClient.connect(r.url, callId, this.type !== "private");
   }, () => {
     this.meetingsLoading = false;
     this.unbind("onCallEnd.start");
@@ -24002,14 +24002,19 @@ let conversationpanel_ConversationPanel = (conversationpanel_dec = utils["defaul
       onJoinGuestClick: (firstName, lastName, audioFlag, videoFlag) => {
         room.meetingsLoading = l.joining;
         u_eplusplus(firstName, lastName).then(() => {
-          megaChat.routing.reinitAndJoinPublicChat(room.chatId, room.publicChatHandle, room.publicChatKey).then(() => {
-            delete megaChat.initialPubChatHandle;
-            megaChat.getChatById(room.chatId).joinCall(audioFlag, videoFlag);
-          }, ex => {
-            console.error("Failed to join room:", ex);
-          });
-        }, () => {
-          msgDialog('warninga', l[135], "Failed to create E++ account. Please try again later.");
+          return megaChat.routing.reinitAndJoinPublicChat(room.chatId, room.publicChatHandle, room.publicChatKey);
+        }).then(() => {
+          delete megaChat.initialPubChatHandle;
+          return megaChat.getChatById(room.chatId).joinCall(audioFlag, videoFlag);
+        }).catch(ex => {
+          if (d) {
+            console.error('E++ account failure!', ex);
+          }
+
+          setTimeout(() => {
+            msgDialog('warninga', l[135], "Failed to create E++ account. Please try again later.", escapeHTML(api_strerror(ex) || ex));
+          }, 1234);
+          eventlog(99745, JSON.stringify([1, String(ex).split('\n')[0]]));
         });
       },
       onJoinClick: (audioFlag, videoFlag) => {

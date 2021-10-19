@@ -39,7 +39,7 @@ body .text-editor-container *.hidden {
     flex-direction: column;
     flex: 1 1 auto;
     overflow: hidden;
-    padding: 0 24px;
+    padding: 0 4px 0 24px;
 }
 .text-editor > footer {
     align-items: center;

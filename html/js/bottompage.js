@@ -555,7 +555,12 @@ var bottompage = {
         var topResize = function() {
 
             if ($topHeader.hasClass('floating')) {
-                $topHeader.outerWidth($topHeader.parent().outerWidth());
+                if ($topHeader.parent().outerWidth() === 0 && $topHeader.parent().length > 1) {
+                    $topHeader.outerWidth($($topHeader.parent()[1]).outerWidth());
+                }
+                else {
+                    $topHeader.outerWidth($topHeader.parent().outerWidth());
+                }
             }
             else {
                 $topHeader.css('width',  '');
@@ -566,6 +571,10 @@ var bottompage = {
 
             // Select download bar as it contains top header and product page menu
             $topHeader = $('.download.download-page', $fmHolder);
+        }
+        else if (page === 'security/bug-bounty') {
+            $topHeader = $('.bottom-page.scroll-block.corporate .top-head, ' +
+                '.pages-menu-wrap .pages-menu.body', $fmHolder);
         }
         else {
 

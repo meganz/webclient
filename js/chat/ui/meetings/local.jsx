@@ -119,6 +119,24 @@ class Stream extends MegaRenderMixin {
         options: false
     };
 
+    /**
+     * getStreamSource
+     * @description Retrieves the stream source based on the current call mode.
+     * @see Call.MODE
+     * @see renderMiniMode
+     * @see renderSelfView
+     */
+
+    getStreamSource = () => {
+        const { call, mode, forcedLocal } = this.props;
+
+        if (mode === Call.MODE.MINI) {
+            return forcedLocal ? call.getLocalStream() : call.getActiveStream();
+        }
+
+        return call.getLocalStream();
+    };
+
     unbindEvents = () => {
         const events = [...this.EVENTS.MINIMIZE, ...this.EVENTS.EXPAND];
         for (let i = events.length; i--;) {
@@ -275,7 +293,7 @@ class Stream extends MegaRenderMixin {
     };
 
     renderMiniMode = () => {
-        const { call, isOnHold, forcedLocal, onLoadedData } = this.props;
+        const { isOnHold, onLoadedData } = this.props;
 
         if (isOnHold) {
             return this.renderOnHoldStreamNode();
@@ -283,14 +301,14 @@ class Stream extends MegaRenderMixin {
 
         return (
             <StreamNode
-                stream={forcedLocal ? call.getLocalStream() : call.getActiveStream()}
+                stream={this.getStreamSource()}
                 onLoadedData={onLoadedData}
             />
         );
     };
 
     renderSelfView = () => {
-        const { call, isOnHold, onLoadedData } = this.props;
+        const { isOnHold, onLoadedData } = this.props;
         const { options } = this.state;
 
         if (isOnHold) {
@@ -300,7 +318,7 @@ class Stream extends MegaRenderMixin {
         return (
             <>
                 <StreamNode
-                    stream={call.getLocalStream()}
+                    stream={this.getStreamSource()}
                     onLoadedData={onLoadedData}
                 />
                 <Button
@@ -347,15 +365,7 @@ class Stream extends MegaRenderMixin {
 
     render() {
         const { NAMESPACE, POSITION_MODIFIER } = Local;
-        const {
-            mode,
-            minimized,
-            sidebar,
-            ratioClass,
-            collapsed,
-            toggleCollapsedMode,
-            onCallExpand,
-        } = this.props;
+        const { mode, minimized, sidebar, ratioClass, collapsed, toggleCollapsedMode, onCallExpand } = this.props;
         const IS_MINI_MODE = mode === Call.MODE.MINI;
         const IS_SELF_VIEW = !IS_MINI_MODE;
 
@@ -380,7 +390,7 @@ class Stream extends MegaRenderMixin {
                 ref={this.containerRef}
                 className={`
                     ${NAMESPACE}
-                    ${ratioClass}
+                    ${StreamNode.isStreaming(this.getStreamSource()) ? ratioClass : ''}
                     ${IS_MINI_MODE ? 'mini' : ''}
                     ${minimized ? 'minimized' : ''}
                     ${this.state.options ? 'active' : ''}

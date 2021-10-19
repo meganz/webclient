@@ -12,7 +12,16 @@ export default class StreamNode extends MegaRenderMixin {
         INITIALIZED: 1,
         LOADING: 1,
         LOADED: 2
-    }
+    };
+
+    static isStreaming = stream => {
+        return (
+            stream &&
+            !stream.isOnHold &&
+            (stream.source && stream.source.srcObject !== null) &&
+            (!stream.videoMuted || stream.haveScreenshare)
+        );
+    };
 
     constructor(props) {
         super(props);
@@ -181,11 +190,7 @@ export default class StreamNode extends MegaRenderMixin {
         const { stream, onDoubleClick, onLoadedData } = this.props;
         const { loading } = this.state;
 
-        if (
-            !stream.isOnHold &&
-            (stream.source && stream.source.srcObject !== null) &&
-            (!stream.videoMuted || stream.haveScreenshare)
-        ) {
+        if (StreamNode.isStreaming(stream)) {
             return (
                 <>
                     {loading !== StreamNode.LOADING_STATE.LOADED && (

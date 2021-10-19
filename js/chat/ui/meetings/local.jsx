@@ -149,14 +149,15 @@ class Stream extends MegaRenderMixin {
     };
 
     initDraggable = () => {
-        const container = this.containerRef && this.containerRef.current;
+        const { minimized, wrapperRef } = this.props;
+        const containerEl = this.containerRef?.current;
 
-        if (container) {
-            $(container).draggable({
+        if (containerEl) {
+            $(containerEl).draggable({
                 ...this.DRAGGABLE_OPTIONS,
                 // Constrain the dragging to within the bounds of the body (in minimized mode) or the stream
                 // container (when the call is expanded, excl. the sidebar)
-                containment: this.props.mode === Call.MODE.MINI ? 'body' : '.meetings-call .stream'
+                containment: minimized ? 'body' : wrapperRef?.current
             });
         }
     };
@@ -168,8 +169,8 @@ class Stream extends MegaRenderMixin {
      */
 
     repositionDraggable = () => {
-        const wrapperEl = this.props.wrapperRef && this.props.wrapperRef.current;
-        const localEl = this.containerRef && this.containerRef.current;
+        const wrapperEl = this.props.wrapperRef?.current;
+        const localEl = this.containerRef?.current;
 
         if (localEl.offsetLeft + localEl.offsetWidth > wrapperEl.offsetWidth) {
             localEl.style.left = 'auto';

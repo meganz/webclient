@@ -10396,7 +10396,7 @@ class contactProfile_ContactProfile extends mixins["MegaRenderMixin"] {
       containerClassName: "grid-table shared-with-me",
       onContextMenu: (ev, handle) => this.handleContextMenu(ev, handle),
       listAdapterColumns: [columnFavIcon["a" ], [columnSharedFolderName_ColumnSharedFolderName, {
-        'label': "Shared folders from " + M.getNameByHandle(this.props.handle)
+        'label': "" + l.shared_folders_from.replace('%NAME', M.getNameByHandle(this.props.handle))
       }], columnSharedFolderAccess_ColumnSharedFolderAccess, columnSharedFolderButtons_ColumnSharedFolderButtons]
     });
   }
@@ -22882,7 +22882,7 @@ class conversationpanel_ConversationRightArea extends mixins["MegaRenderMixin"] 
         style: {
           margin: "6px"
         }
-      }, "(read only chat)");
+      }, l.read_only_chat);
     }
 
     var excludedParticipants = room.type === "group" || room.type === "public" ? room.members && Object.keys(room.members).length > 0 ? Object.keys(room.members) : room.getParticipants() : room.getParticipants();

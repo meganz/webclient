@@ -1795,7 +1795,10 @@ a.blog-new-archive-lnk:hover {
     margin: 0;
     padding: 7px 0 0 0;
 }
-.blog-new-full ul li, .sync li, .affiliate li, .pro li:not(.no-red-dot) {
+.blog-new-full ul li,
+.sync li,
+.affiliate li,
+.pro li:not(.no-red-dot) {
     margin: 0;
     padding: 0 0 18px 20px;
     font-size: 14px;
@@ -1804,9 +1807,16 @@ a.blog-new-archive-lnk:hover {
     text-align: left;
     font-weight: normal;
     list-style-type: none;
-    background-position: -15px -3px;
-    background-image: url(../images/mega/dev-point.png);
-    background-repeat: no-repeat;
+    position: relative;
+}
+.blog-new-full ul li::before,
+.sync li::before,
+.affiliate li::before,
+.pro li:not(.no-red-dot)::before {
+    content: "\25CF";
+    color: var(--text-color-error);
+    position: absolute;
+    left: 0;
 }
 .blog-new-full ul li {
     line-height: 24px;

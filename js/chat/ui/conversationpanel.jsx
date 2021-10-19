@@ -169,7 +169,7 @@ export class ConversationRightArea extends MegaRenderMixin {
         var isReadOnlyElement = null;
 
         if (room.isReadOnly()) {
-            isReadOnlyElement = <center className="center" style={{margin: "6px"}}>(read only chat)</center>;
+            isReadOnlyElement = <center className="center" style={{margin: "6px"}}>{l.read_only_chat}</center>;
         }
         var excludedParticipants = room.type === "group" || room.type === "public" ?
             (

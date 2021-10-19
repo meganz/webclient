@@ -156,7 +156,7 @@ export default class ContactProfile extends MegaRenderMixin {
             listAdapterColumns={[
                 ColumnFavIcon,
                 [ColumnSharedFolderName, {
-                    'label': `Shared folders from ${M.getNameByHandle(this.props.handle)}`
+                    'label': `${l.shared_folders_from.replace('%NAME', M.getNameByHandle(this.props.handle))}`
                 }],
                 ColumnSharedFolderAccess,
                 ColumnSharedFolderButtons

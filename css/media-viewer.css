@@ -88,6 +88,9 @@
             transition: var(--transition-bg-color);
             display: block;
         }
+        .media-viewer button.v-btn.browserscreen {
+            display: none;
+        }
 
     /* Header */
 

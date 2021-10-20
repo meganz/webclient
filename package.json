@@ -55,7 +55,6 @@
     "cssnano": "5.0.8",
     "grunt": "1.4.1",
     "grunt-contrib-concat": "2.0.0",
-    "grunt-htmljson": "0.1.1",
     "grunt-posthtml": "0.5.2",
     "htmlnano": "1.1.1",
     "postcss": "8.3.9",

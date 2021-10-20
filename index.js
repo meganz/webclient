@@ -2129,10 +2129,18 @@ function topbarUI(holderId) {
 
     if (u_type === 3 && u_attr && u_attr.fullname && (element = topbar.querySelector('.name'))) {
         element.textContent = u_attr.fullname;
+        if (u_attr.fullname.length > 16) {
+            // If the user full name is too long, shrink and add the simpletip to show the full name
+            $(element).addClass('simpletip').attr('data-simpletip', u_attr.fullname);
+        }
     }
 
     if (u_type && u_attr && u_attr.email && (element = topbar.querySelector('.email'))) {
         element.textContent = u_attr.email;
+        if (u_attr.email.length > 19) {
+            // If the user email is too long, shrink and add the simpletip to show the full email
+            $(element).addClass('simpletip').attr('data-simpletip', u_attr.email);
+        }
     }
 
     if (holderId === 'fmholder') {

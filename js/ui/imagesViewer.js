@@ -186,6 +186,7 @@ var slideshowid;
             $overlay.parents('.download.download-page').removeClass('browserscreen fullscreen');
             $('i', $button).removeClass('icon-fullscreen-leave').addClass('icon-fullscreen-enter');
             $overlay.removeClass('browserscreen fullscreen');
+            slideshow_zoom($overlay, false);
         }
 
         if (!$overlay.is('.video-theatre-mode')) {
@@ -444,7 +445,7 @@ var slideshowid;
         $('.v-btn.browserscreen', $overlay).rebind('click.media-viewer', () => {
             $overlay.addClass('browserscreen');
             $overlay.parents('.download.download-page').addClass('browserscreen');
-            slideshow_zoom($overlay, 1);
+            slideshow_zoom($overlay, false);
             return false;
         });
 
@@ -848,7 +849,7 @@ var slideshowid;
                     else if (isDownloadPage) {
                         $overlay.removeClass('fullscreen browserscreen');
                         $overlay.parents('.download.download-page').removeClass('fullscreen browserscreen');
-                        slideshow_zoom($overlay, 1);
+                        slideshow_zoom($overlay, false);
                     }
                     else {
                         history.back();
@@ -869,7 +870,7 @@ var slideshowid;
                     }
                     $overlay.removeClass('fullscreen browserscreen');
                     $overlay.parents('.download.download-page').removeClass('fullscreen browserscreen');
-                    slideshow_zoom($overlay, 1);
+                    slideshow_zoom($overlay, false);
                     return false;
                 }
                 history.back();

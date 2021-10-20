@@ -2864,8 +2864,8 @@ class ContactPickerWidget extends _stores_mixins_js2__["MegaRenderMixin"] {
     return react1.a.createElement("div", {
       ref: this.containerRef,
       className: "\n                    " + (this.props.className || '') + "\n                    " + extraClasses + "\n                "
-    }, topButtons, multipleContacts, !this.props.readOnly && haveContacts && react1.a.createElement("div", {
-      className: "\n                            contacts-search-header\n                            " + this.props.headerClasses + "\n                        "
+    }, topButtons, multipleContacts, !this.props.readOnly && haveContacts && react1.a.createElement(react1.a.Fragment, null, react1.a.createElement("div", {
+      className: "\n                                contacts-search-header\n                                " + this.props.headerClasses + "\n                            "
     }, react1.a.createElement("i", {
       className: "sprite-fm-mono icon-preview-reveal"
     }), react1.a.createElement("input", {
@@ -2878,7 +2878,7 @@ class ContactPickerWidget extends _stores_mixins_js2__["MegaRenderMixin"] {
       onChange: this.onSearchChange,
       value: this.state.searchValue
     }), react1.a.createElement("div", {
-      className: "\n                                search-result-clear\n                                " + (this.state.searchValue && this.state.searchValue.length > 0 ? '' : 'hidden') + "\n                            ",
+      className: "\n                                    search-result-clear\n                                    " + (this.state.searchValue && this.state.searchValue.length > 0 ? '' : 'hidden') + "\n                                ",
       onClick: () => {
         this.setState({
           searchValue: ''
@@ -2886,7 +2886,9 @@ class ContactPickerWidget extends _stores_mixins_js2__["MegaRenderMixin"] {
       }
     }, react1.a.createElement("i", {
       className: "sprite-fm-mono icon-close-component"
-    }))), contactsList, selectFooter, _contactsPanel_contactsPanel_jsx7__["a"].hasContacts() && this.props.showAddContact && react1.a.createElement("div", {
+    }))), react1.a.createElement("div", {
+      className: "contacts-search-header-separator"
+    })), contactsList, selectFooter, _contactsPanel_contactsPanel_jsx7__["a"].hasContacts() && this.props.showAddContact && react1.a.createElement("div", {
       className: "contacts-search-bottom"
     }, react1.a.createElement(_ui_buttons_jsx5__["Button"], {
       className: "mega-button action positive",
@@ -6560,7 +6562,7 @@ ChatRoom.prototype.joinCall = ChatRoom._fnRequireParticipantKeys(function (audio
     }
   });
   callId = callId || this.activeCallIds.keys()[0];
-  asyncApiReq({
+  return asyncApiReq({
     'a': 'mcmj',
     'cid': this.chatId,
     "mid": callId
@@ -6572,7 +6574,7 @@ ChatRoom.prototype.joinCall = ChatRoom._fnRequireParticipantKeys(function (audio
     }, r.url.replace("https://", "wss://"));
     app.sfuClient.muteAudio(!audio);
     app.sfuClient.muteCamera(!video);
-    app.sfuClient.connect(r.url, callId, this.type !== "private");
+    return app.sfuClient.connect(r.url, callId, this.type !== "private");
   }, () => {
     this.meetingsLoading = false;
     this.unbind("onCallEnd.start");
@@ -10396,7 +10398,7 @@ class contactProfile_ContactProfile extends mixins["MegaRenderMixin"] {
       containerClassName: "grid-table shared-with-me",
       onContextMenu: (ev, handle) => this.handleContextMenu(ev, handle),
       listAdapterColumns: [columnFavIcon["a" ], [columnSharedFolderName_ColumnSharedFolderName, {
-        'label': "Shared folders from " + M.getNameByHandle(this.props.handle)
+        'label': "" + l.shared_folders_from.replace('%NAME', M.getNameByHandle(this.props.handle))
       }], columnSharedFolderAccess_ColumnSharedFolderAccess, columnSharedFolderButtons_ColumnSharedFolderButtons]
     });
   }
@@ -18357,7 +18359,7 @@ let streamNode_StreamNode = (streamNode_dec = Object(mixins["SoonFcWrap"])(30, t
         loading
       } = this.state;
 
-      if (!stream.isOnHold && stream.source && stream.source.srcObject !== null && (!stream.videoMuted || stream.haveScreenshare)) {
+      if (StreamNode.isStreaming(stream)) {
         return external_React_default.a.createElement(external_React_default.a.Fragment, null, loading !== StreamNode.LOADING_STATE.LOADED && external_React_default.a.createElement("i", {
           className: "sprite-fm-theme icon-loading-spinner loading-icon"
         }), external_React_default.a.createElement("video", {
@@ -18609,6 +18611,8 @@ let streamNode_StreamNode = (streamNode_dec = Object(mixins["SoonFcWrap"])(30, t
   INITIALIZED: 1,
   LOADING: 1,
   LOADED: 2
+}, streamNode_class2.isStreaming = stream => {
+  return stream && !stream.isOnHold && stream.source && stream.source.srcObject !== null && (!stream.videoMuted || stream.haveScreenshare);
 }, streamNode_temp), (applyDecoratedDescriptor_default()(streamNode_class.prototype, "updateVideoStreamThrottled", [streamNode_dec, streamNode_dec2], Object.getOwnPropertyDescriptor(streamNode_class.prototype, "updateVideoStreamThrottled"), streamNode_class.prototype), applyDecoratedDescriptor_default()(streamNode_class.prototype, "onResizeObserved", [_dec3, _dec4], Object.getOwnPropertyDescriptor(streamNode_class.prototype, "onResizeObserved"), streamNode_class.prototype)), streamNode_class));
 
 // CONCATENATED MODULE: ./js/chat/ui/meetings/sidebarControls.jsx
@@ -18863,6 +18867,20 @@ class local_Stream extends mixins["MegaRenderMixin"] {
       options: false
     };
 
+    this.getStreamSource = () => {
+      const {
+        call,
+        mode,
+        forcedLocal
+      } = this.props;
+
+      if (mode === call_Call.MODE.MINI) {
+        return forcedLocal ? call.getLocalStream() : call.getActiveStream();
+      }
+
+      return call.getLocalStream();
+    };
+
     this.unbindEvents = () => {
       const events = [...this.EVENTS.MINIMIZE, ...this.EVENTS.EXPAND];
 
@@ -18889,18 +18907,26 @@ class local_Stream extends mixins["MegaRenderMixin"] {
     };
 
     this.initDraggable = () => {
-      const container = this.containerRef && this.containerRef.current;
+      var _this$containerRef;
 
-      if (container) {
-        $(container).draggable({ ...this.DRAGGABLE_OPTIONS,
-          containment: this.props.mode === call_Call.MODE.MINI ? 'body' : '.meetings-call .stream'
+      const {
+        minimized,
+        wrapperRef
+      } = this.props;
+      const containerEl = (_this$containerRef = this.containerRef) == null ? void 0 : _this$containerRef.current;
+
+      if (containerEl) {
+        $(containerEl).draggable({ ...this.DRAGGABLE_OPTIONS,
+          containment: minimized ? 'body' : wrapperRef == null ? void 0 : wrapperRef.current
         });
       }
     };
 
     this.repositionDraggable = () => {
-      const wrapperEl = this.props.wrapperRef && this.props.wrapperRef.current;
-      const localEl = this.containerRef && this.containerRef.current;
+      var _this$props$wrapperRe, _this$containerRef2;
+
+      const wrapperEl = (_this$props$wrapperRe = this.props.wrapperRef) == null ? void 0 : _this$props$wrapperRe.current;
+      const localEl = (_this$containerRef2 = this.containerRef) == null ? void 0 : _this$containerRef2.current;
 
       if (localEl.offsetLeft + localEl.offsetWidth > wrapperEl.offsetWidth) {
         localEl.style.left = 'auto';
@@ -18973,9 +18999,7 @@ class local_Stream extends mixins["MegaRenderMixin"] {
 
     this.renderMiniMode = () => {
       const {
-        call,
         isOnHold,
-        forcedLocal,
         onLoadedData
       } = this.props;
 
@@ -18984,14 +19008,13 @@ class local_Stream extends mixins["MegaRenderMixin"] {
       }
 
       return external_React_default.a.createElement(streamNode_StreamNode, {
-        stream: forcedLocal ? call.getLocalStream() : call.getActiveStream(),
+        stream: this.getStreamSource(),
         onLoadedData: onLoadedData
       });
     };
 
     this.renderSelfView = () => {
       const {
-        call,
         isOnHold,
         onLoadedData
       } = this.props;
@@ -19004,7 +19027,7 @@ class local_Stream extends mixins["MegaRenderMixin"] {
       }
 
       return external_React_default.a.createElement(external_React_default.a.Fragment, null, external_React_default.a.createElement(streamNode_StreamNode, {
-        stream: call.getLocalStream(),
+        stream: this.getStreamSource(),
         onLoadedData: onLoadedData
       }), external_React_default.a.createElement(meetings_button["a" ], {
         className: "\n                        mega-button\n                        theme-light-forced\n                        action\n                        small\n                        local-stream-options-control\n                        " + (options ? 'active' : '') + "\n                    ",
@@ -19065,7 +19088,7 @@ class local_Stream extends mixins["MegaRenderMixin"] {
 
     return external_React_default.a.createElement("div", {
       ref: this.containerRef,
-      className: "\n                    " + NAMESPACE + "\n                    " + ratioClass + "\n                    " + (IS_MINI_MODE ? 'mini' : '') + "\n                    " + (minimized ? 'minimized' : '') + "\n                    " + (this.state.options ? 'active' : '') + "\n                    " + (sidebar && !minimized ? POSITION_MODIFIER : '') + "\n                ",
+      className: "\n                    " + NAMESPACE + "\n                    " + (streamNode_StreamNode.isStreaming(this.getStreamSource()) ? ratioClass : '') + "\n                    " + (IS_MINI_MODE ? 'mini' : '') + "\n                    " + (minimized ? 'minimized' : '') + "\n                    " + (this.state.options ? 'active' : '') + "\n                    " + (sidebar && !minimized ? POSITION_MODIFIER : '') + "\n                ",
       onClick: ({
         target
       }) => minimized && target.classList.contains(NAMESPACE + "-overlay") && onCallExpand()
@@ -22882,7 +22905,7 @@ class conversationpanel_ConversationRightArea extends mixins["MegaRenderMixin"] 
         style: {
           margin: "6px"
         }
-      }, "(read only chat)");
+      }, l.read_only_chat);
     }
 
     var excludedParticipants = room.type === "group" || room.type === "public" ? room.members && Object.keys(room.members).length > 0 ? Object.keys(room.members) : room.getParticipants() : room.getParticipants();
@@ -23979,14 +24002,19 @@ let conversationpanel_ConversationPanel = (conversationpanel_dec = utils["defaul
       onJoinGuestClick: (firstName, lastName, audioFlag, videoFlag) => {
         room.meetingsLoading = l.joining;
         u_eplusplus(firstName, lastName).then(() => {
-          megaChat.routing.reinitAndJoinPublicChat(room.chatId, room.publicChatHandle, room.publicChatKey).then(() => {
-            delete megaChat.initialPubChatHandle;
-            megaChat.getChatById(room.chatId).joinCall(audioFlag, videoFlag);
-          }, ex => {
-            console.error("Failed to join room:", ex);
-          });
-        }, () => {
-          msgDialog('warninga', l[135], "Failed to create E++ account. Please try again later.");
+          return megaChat.routing.reinitAndJoinPublicChat(room.chatId, room.publicChatHandle, room.publicChatKey);
+        }).then(() => {
+          delete megaChat.initialPubChatHandle;
+          return megaChat.getChatById(room.chatId).joinCall(audioFlag, videoFlag);
+        }).catch(ex => {
+          if (d) {
+            console.error('E++ account failure!', ex);
+          }
+
+          setTimeout(() => {
+            msgDialog('warninga', l[135], "Failed to create E++ account. Please try again later.", escapeHTML(api_strerror(ex) || ex));
+          }, 1234);
+          eventlog(99745, JSON.stringify([1, String(ex).split('\n')[0]]));
         });
       },
       onJoinClick: (audioFlag, videoFlag) => {

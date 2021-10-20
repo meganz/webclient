@@ -169,7 +169,7 @@ export class ConversationRightArea extends MegaRenderMixin {
         var isReadOnlyElement = null;
 
         if (room.isReadOnly()) {
-            isReadOnlyElement = <center className="center" style={{margin: "6px"}}>(read only chat)</center>;
+            isReadOnlyElement = <center className="center" style={{margin: "6px"}}>{l.read_only_chat}</center>;
         }
         var excludedParticipants = room.type === "group" || room.type === "public" ?
             (
@@ -1500,25 +1500,31 @@ export class ConversationPanel extends MegaRenderMixin {
                             room.meetingsLoading = l.joining;
                             u_eplusplus(firstName, lastName)
                                 .then(() => {
-                                    megaChat.routing.reinitAndJoinPublicChat(
+                                    return megaChat.routing.reinitAndJoinPublicChat(
                                         room.chatId,
                                         room.publicChatHandle,
                                         room.publicChatKey
-                                    ).then(
-                                        () => {
-                                            delete megaChat.initialPubChatHandle;
-                                            megaChat.getChatById(room.chatId).joinCall(audioFlag, videoFlag);
-                                        },
-                                        (ex) => {
-                                            console.error("Failed to join room:", ex);
-                                        }
                                     );
-                                }, () => {
-                                    msgDialog(
-                                        'warninga',
-                                        l[135],
-                                        "Failed to create E++ account. Please try again later."
-                                    );
+                                })
+                                .then(() => {
+                                    delete megaChat.initialPubChatHandle;
+                                    return megaChat.getChatById(room.chatId).joinCall(audioFlag, videoFlag);
+                                })
+                                .catch((ex) => {
+                                    if (d) {
+                                        console.error('E++ account failure!', ex);
+                                    }
+
+                                    setTimeout(() => {
+                                        msgDialog(
+                                            'warninga',
+                                            l[135],
+                                            "Failed to create E++ account. Please try again later.",
+                                            escapeHTML(api_strerror(ex) || ex)
+                                        );
+                                    }, 1234);
+
+                                    eventlog(99745, JSON.stringify([1, String(ex).split('\n')[0]]));
                                 });
                         }}
                         onJoinClick={(audioFlag, videoFlag) => {

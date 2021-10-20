@@ -149,10 +149,6 @@
         background-image: url(../images/mega/empty-sprite@2x.png);
         background-size: 294px auto;
     }
-    .blog-article li, .blog-new-full ul li, .sync li, .affiliate li, .pro li:not(.no-red-dot) {
-        background-image: url(../images/mega/dev-point-new.png);
-        background-size: 39px auto;
-    }
     .blog-new-full ul ul li {
         background-image: url(../images/mega/dev-point-gray-new.png);
         background-size: 39px auto;

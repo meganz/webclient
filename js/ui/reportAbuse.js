@@ -170,12 +170,12 @@ class ReportAbuse {
             closeDialog();
         });
         this.$btnBack.rebind('click.reportabuse', () => {
-            onIdle(this.initReportAbuseScroll);
-            this.setScrollPosition(true);
             this.$errormessage.addClass('hidden');
             this.$btnSubmit.removeClass('disabled');
             const prev = this.currentStep - 1;
             this.goback(prev);
+            this.setScrollPosition(true);
+            this.initReportAbuseScroll();
         });
         this.$btnNext.rebind('click.reportabuse',() => {
 
@@ -217,6 +217,7 @@ class ReportAbuse {
                     break;
             }
             this.setScrollPosition(true);
+            this.initReportAbuseScroll();
         });
     }
 
@@ -346,20 +347,19 @@ class ReportAbuse {
 
         this.$btnSubmit.rebind('click.reportabuse', () => {
 
-            if (!$.trim($abuseDesc.val())) {
-                this.$errormessage.text(l.ra_lbl_decribeabuse).removeClass('hidden');
-                return false;
-            }
-
             const opts = {
                 a: 'rab',
                 t: this.selectedAbuseType,
                 f: window.location.href,
                 w: $publishedWebsite.val(),
                 wu: $publishedUser.val(),
-                d: $abuseDesc.val()
+                d: this.formValidator($abuseDesc)
             };
 
+            if (!opts.d) {
+                this.$errormessage.text(l.ra_lbl_decribeabuse).removeClass('hidden');
+                return false;
+            }
             this.submitAbuseReport(opts);
         });
     }
@@ -419,6 +419,7 @@ class ReportAbuse {
             this.$btnSubmit.addClass('hidden');
         }
 
+        this.initReportAbuseScroll();
     }
 
     /**
@@ -444,7 +445,6 @@ class ReportAbuse {
         const $address = $('.js-address', this.$abuseform);
         const $province = $('.js-province', this.$abuseform);
         const $postalcode = $('.js-postalcode', this.$abuseform);
-        // const $country = $('.js-country', this.$abuseform);
         const $country = $('.js-countryselector', this.$abuseform);
 
         this.renderCountry();
@@ -510,24 +510,34 @@ class ReportAbuse {
             }
 
             opts.t = this.selectedAbuseType;
-            opts.w = $.trim($publishedWebsite.val());
-            opts.wu = $.trim($publishedUser.val());
-            opts.d = $.trim($descr.val());
-            opts.owner = $.trim($owner.val());
-            opts.email = $.trim($email.val());
-            opts.phone = $.trim($phone.val());
-            opts.address = $.trim($address.val());
-            opts.province = $.trim($province.val());
-            opts.postalcode = $.trim($postalcode.val());
+            opts.w = this.formValidator($publishedWebsite);
+            opts.wu = this.formValidator($publishedUser);
+            opts.d = this.formValidator($descr);
+            opts.owner = this.formValidator($owner);
+            opts.email = this.formValidator($email);
+            opts.phone = this.formValidator($phone);
+            opts.address = this.formValidator($address);
+            opts.province = this.formValidator($province);
+            opts.postalcode = this.formValidator($postalcode);
 
-            $phone.removeClass('error');
-            $email.removeClass('error');
-            $country.removeClass('error');
+            if (opts.country) {
+                $country.removeClass('error');
+            }
+            else {
+                $country.addClass('error');
+            }
 
             const isValid = Object.values(opts).every(x => (x !== null && x !== '' && x !== undefined));
 
             if (!isValid) {
                 this.$errormessage.text(l.ra_formvalidation).removeClass('hidden');
+                this.setScrollPosition();
+                return false;
+            }
+
+            if (!opts.country) {
+                this.$errormessage.text(l[568]).removeClass('hidden');
+                $country.addClass('error');
                 this.setScrollPosition();
                 return false;
             }
@@ -546,16 +556,21 @@ class ReportAbuse {
                 return false;
             }
 
-            if (!opts.country) {
-                this.$errormessage.text(l[568]).removeClass('hidden');
-                $country.addClass('error');
-                this.setScrollPosition();
-                return false;
-            }
-
             this.submitAbuseReport(opts);
 
         });
+
+    }
+
+    formValidator($elem) {
+        const val = $.trim($elem.val());
+        if (val) {
+            $elem.removeClass('error');
+        }
+        else {
+            $elem.addClass('error');
+        }
+        return val;
     }
 
     loadView() {
@@ -707,7 +722,7 @@ class ReportAbuse {
 
     setScrollPosition(isTop) {
         const element = document.getElementsByClassName('js-reportabuse-scroll-panel').item(0);
-        element.scrollTop = isTop ? 1 : element.scrollHeight - element.clientHeight;
+        element.scrollTop = isTop ? 0 : element.scrollHeight - element.clientHeight;
     }
 }
 

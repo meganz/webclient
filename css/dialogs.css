@@ -10307,19 +10307,12 @@ body.de .mega-dialog.new-group-chat {
 .mega-dialog.report-abuse {
     max-height: 90vh;
 }
-
 .mega-dialog.report-abuse .subtitle {
     font: var(--text-h3-bold);
     color: var(--text-color-error);
-    margin-bottom: 20px;
 }
-
 .mega-dialog.report-abuse .content-block {
     min-height: 300px;
-}
-
-.mega-dialog.report-abuse .content-block form > * > p:first-child {
-    padding-bottom: 10px;
 }
 
 @media screen and (max-height: 500px) {
@@ -10331,12 +10324,17 @@ body.de .mega-dialog.new-group-chat {
 .mega-dialog.report-abuse .content-block > section {
     padding-top: 10px;
 }
-
+.mega-dialog.report-abuse .sub-container {
+    margin-top: 24px;
+}
+.mega-dialog.report-abuse .abusetypes-block p {
+    color: var(--text-color-medium);
+    margin-bottom: 20px;
+}
 .mega-dialog.report-abuse .radio-buttons > * {
-    margin: 10px 0;
+    margin: 12px 0;
     display: flex;
 }
-
 .mega-dialog.report-abuse input.form-control,
 .mega-dialog.report-abuse textarea.form-control {
     width: 100%;
@@ -10351,16 +10349,22 @@ body.de .mega-dialog.new-group-chat {
     border-radius: 4px;
     transition: color 200ms ease-in-out;
 }
-
 .mega-dialog.report-abuse textarea.form-control {
     height: 100px;
     padding: 8px;
 }
 .mega-dialog.report-abuse form .form-row {
-    margin-bottom: 20px;
+    margin-bottom: 12px;
 }
-.mega-dialog.report-abuse form .form-row > p {
-    margin-bottom: 4px;
+.mega-dialog.report-abuse form > section {
+    margin-top: 20px;
+}
+.mega-dialog.report-abuse form > section.abusetypes-block {
+    margin-top: 10px;
+}
+.mega-dialog.report-abuse form p {
+    margin-bottom: 6px;
+    color: var(--text-color-higher);
 }
 .mega-dialog.report-abuse form .form-row.two-col {
     display: flex;
@@ -10377,6 +10381,10 @@ body.de .mega-dialog.new-group-chat {
 .mega-dialog.report-abuse textarea::placeholder,
 .mega-dialog.report-abuse input::placeholder {
     color: var(--surface-mid-grey);
+}
+.mega-dialog.report-abuse textarea:focus::placeholder,
+.mega-dialog.report-abuse input:focus::placeholder {
+    opacity: 0;
 }
 .mega-dialog.report-abuse .mega-input.form-control {
     width: 100%;
@@ -10420,6 +10428,16 @@ body.de .mega-dialog.new-group-chat {
     font: var(--text-body1);
     padding: 2px;
     margin-bottom: 10px;
+}
+.mega-dialog.report-abuse .radio-buttons .radio-txt {
+    color: var(--text-color-higher);
+}
+.mega-dialog.report-abuse .checkbox-block {
+    margin-top: 20px;
+}
+.mega-dialog.report-abuse .checkbox-block .checkbox-txt {
+    font: var(--text-body2);
+    color: var(--text-color-higher);
 }
 
 /* Report Abuse dialog End */

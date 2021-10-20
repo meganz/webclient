@@ -949,6 +949,14 @@ function init_page() {
 
                     if (u_handle && u_handle === result[2]) {
                         // same account still in active session, let's end.
+                        if ('csp' in window) {
+                            const storage = localStorage;
+                            const value = storage[`csp.${u_handle}`];
+
+                            if (value) {
+                                storage.csp = value;
+                            }
+                        }
                         u_logout(1);
                     }
 
@@ -1508,6 +1516,10 @@ function init_page() {
     else if (page === 'security') {
         parsepage(pages['securitypractice']);
         securityPractice.init();
+    }
+    else if (page === 'security/bug-bounty') {
+        parsepage(pages.securitypractice);
+        securityPractice.initBounty();
     }
     else if (page == 'takedown') {
         parsepage(pages['takedown']);
@@ -2808,7 +2820,7 @@ function topmenuUI() {
                     mLogout();
                 }
                 else if (className.indexOf('transparency') > -1) {
-                    window.open('https://mega.nz/Mega_Transparency_Report_202009.pdf', '_blank');
+                    window.open('https://mega.io/Mega_Transparency_Report_September_2021.pdf', '_blank');
                 }
             }
             return false;

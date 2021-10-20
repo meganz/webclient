@@ -3068,7 +3068,6 @@ function createFileDialog(close, action, params) {
         var target = $.cftarget = $.cftarget || M.currentdirid;
 
         v = $.trim(v);
-        v = v.slice(0, -4);
         var errorMsg = '';
 
         if (v === '' || v === l[17506]) {

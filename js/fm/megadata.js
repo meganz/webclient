@@ -116,11 +116,6 @@ function MegaData() {
         });
     })(this);
 
-    // Initialize affiliate dataset on-demand
-    lazy(this, 'affiliate', function() {
-        return new AffiliateData();
-    });
-
     // XXX: do NOT change the order, add new entries at the tail, and ask before removing anything..
     const sortRules = {
         'name': this.sortByName.bind(this),
@@ -302,3 +297,9 @@ function MegaData() {
 
 MegaData.prototype = new MegaUtils();
 MegaData.prototype.constructor = MegaData;
+
+// Initialize affiliate dataset on-demand
+lazy(MegaData.prototype, 'affiliate', () => {
+    'use strict';
+    return new AffiliateData();
+});

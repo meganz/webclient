@@ -100,6 +100,7 @@ body {
 
         /* font */
 
+            --text-h0: 36px/54px var(--text-font-family);
             --text-h1: 24px/36px var(--text-font-family);
             --text-h2: 20px/30px var(--text-font-family);
             --text-h3: 16px/24px var(--text-font-family);
@@ -108,6 +109,7 @@ body {
             --text-caption: 10px/16px var(--text-font-family);
             --text-data: 40px/60px var(--text-font-family);
 
+            --text-h0-bold: bold 36px/54px var(--text-font-family-semibold);
             --text-h1-bold: bold 24px/36px var(--text-font-family-semibold);
             --text-h2-bold: bold 20px/30px var(--text-font-family-semibold);
             --text-h3-bold: bold 16px/24px var(--text-font-family-semibold);

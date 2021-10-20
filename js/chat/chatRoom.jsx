@@ -1961,7 +1961,7 @@ ChatRoom.prototype.joinCall = ChatRoom._fnRequireParticipantKeys(function(audio,
     });
 
     callId = callId || this.activeCallIds.keys()[0];
-    asyncApiReq({'a': 'mcmj', 'cid': this.chatId, "mid": callId})
+    return asyncApiReq({'a': 'mcmj', 'cid': this.chatId, "mid": callId})
         .then((r) => {
             var app = new SfuApp(this, callId);
             window.sfuClient = app.sfuClient = new SfuClient(
@@ -1979,7 +1979,7 @@ ChatRoom.prototype.joinCall = ChatRoom._fnRequireParticipantKeys(function(audio,
             );
             app.sfuClient.muteAudio(!audio);
             app.sfuClient.muteCamera(!video);
-            app.sfuClient.connect(r.url, callId, this.type !== "private");
+            return app.sfuClient.connect(r.url, callId, this.type !== "private");
         }, () => {
             this.meetingsLoading = false;
             this.unbind("onCallEnd.start");

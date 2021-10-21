@@ -21,7 +21,7 @@
 
 .corporate .bottom-page.full-block.active .bug-container .img-txt {
     position: absolute;
-    top: 40%;
+    top: 50%;
     left: 50%;
     -webkit-transform: translate(-50%, -50%); /* iOS */
     transform: translate(-50%, -50%);
@@ -54,7 +54,8 @@
 }
 
 .corporate-content .bottom-page.full-block.active .bug-txt {
-   padding-left: 140px;
+    padding-left: 140px;
+    padding-bottom: 88px;
 }
 
 .corporate-content .bottom-page.full-block.active .bug-txt p a {
@@ -298,6 +299,12 @@ body:not(.mobile) .corporate.main-menu.item:hover span {
 .corporate-content .contact-us {
     padding: 78px 275px 315px 275px;
 }
+@media only screen and (max-width: 1290px) {
+    .corporate-content .bottom-page.full-block.active .bug-txt {
+        padding-left: 28px;
+        padding-right: 28px;
+    }
+}
 
 @media only screen and (max-width: 1060px) {
     .corporate-content .media-page-overview {
@@ -390,6 +397,7 @@ body:not(.mobile) .corporate.main-menu.item:hover span {
     .corporate-content .bottom-page.full-block.active .bug-txt {
         padding-left: 16px;
         padding-right: 16px;
+        padding-bottom: 64px;
     }
 
     .corporate .bottom-page.full-block.active .bug-txt .title {
@@ -473,6 +481,9 @@ body:not(.mobile) .corporate.main-menu.item:hover span {
 }
 
 @media only screen and (max-width: 569px) {
+    .corporate.main-menu.body{
+        padding: unset;
+    }
     .corporate-content .media-page-overview .col-4 {
         padding-left: 28px;
         padding-right: 28px;
@@ -544,9 +555,12 @@ body:not(.mobile) .corporate.main-menu.item:hover span {
     .corporate-content .bottom-page.full-block.active blockquote {
         padding: 0;
     }
-
+    .corporate.main-menu.body{
+        padding: unset;
+    }
     .corporate .bottom-page.full-block.active .bug-container .img-txt {
         font: var(--text-h2-bold);
+        margin-top: 10px;
     }
 
     .corporate.main-menu.item {
@@ -557,6 +571,9 @@ body:not(.mobile) .corporate.main-menu.item:hover span {
 @media only screen and (max-width: 320px) {
     .corporate.main-menu.item {
         margin: 0 0 -1px 15px;
+    }
+    .corporate .bottom-page.full-block.active .bug-container .img-txt {
+        font: var(--text-h3-bold);
     }
 }
 

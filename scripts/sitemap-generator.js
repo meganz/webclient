@@ -19,6 +19,7 @@ const pages = [
     "securechat",
     "blog",
     "security",
+    "security/bug-bounty",
     "credits",
     "terms",
     "privacy",

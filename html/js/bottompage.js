@@ -269,7 +269,7 @@ var bottompage = {
                     of: $this,
                     my: "center top",
                     at: "center bottom",
-                    collision: "none"
+                    collision: "fit"
                 });
             }
 

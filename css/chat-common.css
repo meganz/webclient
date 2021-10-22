@@ -173,6 +173,9 @@
     overflow: hidden;
     padding: 0 0 0 12px;
 }
+.chat-topic-block .contacts-info .user-card-data .user-card-name {
+    max-width: 100%;
+}
 .contacts-info.body.short {
     padding: 0;
 }

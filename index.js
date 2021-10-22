@@ -1279,7 +1279,9 @@ function init_page() {
         location.replace('/privacy');
     }
     else if (page === 'privacycompany') {
-        parsepage(pages['privacycompany']);
+        // Redirect to the security page
+        loadSubPage('security');
+        return false;
     }
     else if (page === 'dev') {
         if (is_extension) {
@@ -2783,7 +2785,7 @@ function topmenuUI() {
                     'about', 'account', 'backup', 'blog', 'cmd', 'contact',
                     'copyright', 'corporate', 'credits', 'doc', 'extensions',
                     'help', 'login', 'mega', 'nzippmember', 'nziphotographer', 'privacy', 'mobileapp',
-                    'mobile', 'privacycompany', 'register', 'resellers', 'sdk', 'sync', 'sitemap', 'sourcecode',
+                    'mobile', 'register', 'resellers', 'sdk', 'sync', 'sitemap', 'sourcecode',
                     'support', 'sync', 'takedown', 'terms', 'start', 'security', 'affiliate',
                     'nas', 'pro', 'cookie', 'securechat', 'collaboration', 'storage', 'special',
                     'achievements'

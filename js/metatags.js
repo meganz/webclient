@@ -418,13 +418,6 @@ mega.metatags = new function() {
             mTags.mega_title = l.mtags_title_security_bugbounty || mTags.en_title;
             mTags.mega_desc = l.mtags_desc_security_bugbounty || mTags.en_desc;
         }
-        else if (page === 'privacycompany') {
-            mTags.en_title = 'The Privacy Company - MEGA';
-            mTags.en_desc = 'MEGA takes your right to privacy seriously and provides the tools to protect it.' +
-                ' We call it User Controlled Encryption, or UCE.';
-            mTags.mega_title = l[23995] || mTags.en_title;
-            mTags.mega_desc = l.mtags_desc_privcompany || mTags.en_desc;
-        }
         else if (page === 'dev' || page === 'developers') {
             mTags.en_title = 'Documentation for Developers - MEGA';
             mTags.en_desc = 'Check out the MEGA C++ client access engine with full documentation including ' +

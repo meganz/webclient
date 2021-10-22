@@ -1909,7 +1909,7 @@ MegaData.prototype.showTransferToast = function showTransferToast(t_type, t_leng
     t_type = t_type ? t_type : 'd';
 
     // If the user is viewing a slideshow
-    if (window.slideshowid) {
+    if (window.slideshowid && page !== 'download') {
 
         let icons = ['upload'];
         const text = document.createElement('span');

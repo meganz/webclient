@@ -5,7 +5,7 @@ const path = require("path");
 
 const cwd = process.cwd();
 const debug = process.env.DEBUG;
-const basename = p => p.replace(/^.*\//, '');
+const basename = p => p.replace(/\\+/g, '/').replace(/^.*\//, '');
 
 const rebaseURLs = true;
 const usePostCSS = true;
@@ -886,18 +886,24 @@ module.exports = function(grunt) {
                 },
             }
         },
-        htmljson: {
-            required: {
-                src: Secureboot.getHTML(),
-                dest: "html/templates.json",
-            },
-            /*
-            extra: {
-                src: rules.htmlExtra,
-                dest: "html/extra.json",
-            },
-            */
-        },
+    });
+
+    grunt.registerTask('htmljson', () => {
+        const res = {};
+        const exclude = {embedplayer: 1};
+        const files = Secureboot.getHTML().sort();
+
+        for (let i = files.length; i--;) {
+            const file = files[i];
+            const name = basename(file).split('.')[0];
+
+            if (!exclude[name]) {
+                res[name] = fs.readFileSync(path.join(cwd, file)).toString('utf-8');
+            }
+        }
+
+        // @todo split mobile/desktop files.
+        fs.writeFileSync(path.join(cwd, 'html', 'templates.json'), JSON.stringify(res));
     });
 
     grunt.registerTask('cleanup', () => {
@@ -919,7 +925,6 @@ module.exports = function(grunt) {
         }
     });
 
-    grunt.loadNpmTasks('grunt-htmljson');
     grunt.loadNpmTasks('grunt-contrib-concat');
 
     // Default task(s).

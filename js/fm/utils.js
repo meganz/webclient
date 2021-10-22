@@ -2173,8 +2173,9 @@ MegaUtils.prototype.getFileSystemAccess = promisify(function(resolve, reject, wr
             }
             resolve(fs);
         };
+        let type = 1;
         var request = function(quota) {
-            M.requestFileSystem(1, quota, success, reject);
+            M.requestFileSystem(type, quota, success, reject);
         };
 
         delete this.fscache[token];
@@ -2186,7 +2187,11 @@ MegaUtils.prototype.getFileSystemAccess = promisify(function(resolve, reject, wr
                 navigator.webkitPersistentStorage.requestQuota(1e10, request, reject);
             }
             else {
-                reject(EBLOCKED);
+                type = 0;
+                navigator.webkitTemporaryStorage.requestQuota(1e10, request, (err) => {
+                    console.error(err);
+                    reject(EBLOCKED);
+                });
             }
         }, reject);
     }

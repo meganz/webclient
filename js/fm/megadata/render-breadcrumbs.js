@@ -412,10 +412,10 @@
         }
         else if (n) {
             id = n.h;
-            $.selected = [];
+            let toSelect;
 
             if (!n.t) {
-                $.selected.push(id);
+                toSelect = id;
                 id = n.p;
             }
 
@@ -425,7 +425,8 @@
 
             this.openFolder(id)
                 .always(() => {
-                    if ($.selected.length) {
+                    if (toSelect) {
+                        $.selected = [toSelect];
                         reselect(1);
                     }
                 });

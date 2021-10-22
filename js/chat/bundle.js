@@ -18853,10 +18853,24 @@ class local_Stream extends mixins["MegaRenderMixin"] {
   constructor(props) {
     super(props);
     this.containerRef = external_React_default.a.createRef();
-    this.DRAGGABLE_OPTIONS = {
-      scroll: 'false',
-      cursor: 'move',
-      opacity: 0.8
+    this.DRAGGABLE = {
+      POSITION: {
+        top: undefined,
+        left: undefined
+      },
+      OPTIONS: {
+        scroll: 'false',
+        cursor: 'move',
+        opacity: 0.8,
+        start: () => {
+          if (this.state.options) {
+            this.handleOptionsToggle();
+          }
+        },
+        stop: (event, ui) => {
+          this.DRAGGABLE.POSITION = ui.position;
+        }
+      }
     };
     this.EVENTS = {
       MINIMIZE: ['slideshow:open', 'contact:open', 'textEditor:open', 'chat:open'],
@@ -18916,7 +18930,7 @@ class local_Stream extends mixins["MegaRenderMixin"] {
       const containerEl = (_this$containerRef = this.containerRef) == null ? void 0 : _this$containerRef.current;
 
       if (containerEl) {
-        $(containerEl).draggable({ ...this.DRAGGABLE_OPTIONS,
+        $(containerEl).draggable({ ...this.DRAGGABLE.OPTIONS,
           containment: minimized ? 'body' : wrapperRef == null ? void 0 : wrapperRef.current
         });
       }
@@ -18964,8 +18978,11 @@ class local_Stream extends mixins["MegaRenderMixin"] {
         toggleCollapsedMode
       } = this.props;
       const IS_SPEAKER_VIEW = mode === call_Call.MODE.SPEAKER && forcedLocal;
+      const {
+        POSITION
+      } = this.DRAGGABLE;
       return external_React_default.a.createElement("div", {
-        className: meetings_local_Local.NAMESPACE + "-options theme-dark-forced"
+        className: "\n                     " + meetings_local_Local.NAMESPACE + "-options\n                     " + (POSITION.left < 200 ? 'options-top' : '') + "\n                     " + (POSITION.left < 200 && POSITION.top < 100 ? 'options-bottom' : '') + "\n                     theme-dark-forced\n                 "
       }, external_React_default.a.createElement("ul", null, external_React_default.a.createElement("li", null, external_React_default.a.createElement(meetings_button["a" ], {
         icon: "sprite-fm-mono icon-download-standard",
         onClick: () => this.setState({

@@ -2062,7 +2062,14 @@ MegaUtils.prototype.onDexieDB = promisify(function(resolve, reject, name, schema
 MegaUtils.prototype.onPersistentDB = promisify(function(resolve, reject, action, key, value) {
     'use strict';
 
-    this.onDexieDB('$ps', {kv: '&k'}).then(function(db) {
+    this.onDexieDB('$ps', {kv: '&k'}).then((db) => {
+        const ack = (value) => {
+            if (!value && action === 'get') {
+                return reject(ENOENT);
+            }
+            resolve(value);
+        };
+
         if (!action) {
             // No pre-defined action given, the caller is responsible of db.close()'ing
             resolve(db);
@@ -2071,13 +2078,13 @@ MegaUtils.prototype.onPersistentDB = promisify(function(resolve, reject, action,
             var c = db.kv;
             var r = action === 'get' ? c.get(key) : action === 'set' ? c.put({k: key, v: value}) : c.delete(key);
 
-            r.then(function(result) {
+            r.then((result) => {
                 onIdle(db.close.bind(db));
-                resolve(action === 'get' ? result.v : null);
+                ack(action === 'get' && result && result.v || null);
             }).catch(reject);
         }
         else {
-            M.onPersistentDB.fallback.call(null, action, key, value).then(resolve, reject);
+            this.onPersistentDB.fallback.call(null, action, key, value).then(ack).catch(reject);
         }
     }, reject);
 });

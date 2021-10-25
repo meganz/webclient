@@ -5364,18 +5364,6 @@ div.checkboxOn {
 .mobile.main-block.my-account-page, .mobile.main-block.verify-login-page {
     background-color: #F5F6F7;
 }
-.mobile.my-account-page .fm-header {
-    background: #fff;
-    position: fixed;
-    width: 100%;
-}
-.mobile.my-account-page .content-cell {
-    vertical-align: top;
-}
-.mobile.my-account-page .account-page-contents {
-    margin-top: 68px;
-    overflow: scroll;
-}
 .mobile.my-account-page .avatar-name-block {
     opacity: 0.9;
     background-color: #fff;
@@ -9910,7 +9898,7 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll, .mob
 }
 
 /* Fix the header */
- .mobile.main-block.my-account-page .fm-header, .mobile.fm-header.mobile.fm-header.fixed {
+.mobile.fm-header.fixed {
     position: fixed;
     width: 100%;
     background-color: #fff;
@@ -11684,9 +11672,6 @@ code, c {
     }
 }
 /** Password Reminder Overlay **/
-.mobile.password-reminder-overlay.overlay {
-    position: fixed;
-}
 .mobile.password-reminder-overlay .dont-show-again-container {
     margin-top: 12px;
     text-align: center;

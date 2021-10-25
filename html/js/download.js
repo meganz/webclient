@@ -425,7 +425,7 @@ function dl_g(res, ctx) {
                                 megasync.download(dlpage_ph, a32_to_base64(base64_to_a32(dlkey).slice(0, 8)), (err) => {
                                     if (err) {
                                         setStandardDownloadOptions();
-                                        $(e.currentTarget).trigger('click');
+                                        $('.js-default-download').trigger('click');
                                     }
                                     else {
                                         dlPageStartDownload(true);

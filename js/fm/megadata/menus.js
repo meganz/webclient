@@ -497,7 +497,7 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
         }
 
         if (M.currentrootid === M.RubbishID && M.v.length) {
-            $('.files-menu.context .dropdown-item.clearbin-item').attr('style', '');
+            $('.files-menu.context .dropdown-item.clearbin-item').removeClass('hidden');
             itemsViewed = true;
         }
 
@@ -505,21 +505,19 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
             itemsViewed = true;
             $('.files-menu.context .dropdown-item.sort-grid-item-main').removeClass('hidden');
             if (M.currentdirid === 'shares') {
-                $('.files-menu.context .dropdown-item.sort-grid-item').attr('style', 'display:none !important');
-                $('.files-menu.context .dropdown-item.sort-grid-item.s-inshare').attr('style', '');
+                $('.files-menu.context .dropdown-item.sort-grid-item').addClass('hidden');
+                $('.files-menu.context .dropdown-item.sort-grid-item.s-inshare').removeClass('hidden');
             }
             else if (M.currentdirid === 'out-shares') {
-                $('.files-menu.context .dropdown-item.sort-grid-item').attr('style', 'display:none !important');
-                $('.files-menu.context .dropdown-item.sort-grid-item.s-outshare').attr('style', '');
+                $('.files-menu.context .dropdown-item.sort-grid-item').addClass('hidden');
+                $('.files-menu.context .dropdown-item.sort-grid-item.s-outshare').removeClass('hidden');
             }
             else {
-                $('.files-menu.context .dropdown-item.sort-grid-item').attr('style', 'display:none !important');
-                $('.files-menu.context .dropdown-item.sort-grid-item.s-fm').attr('style', '');
+                $('.files-menu.context .dropdown-item.sort-grid-item').addClass('hidden');
+                $('.files-menu.context .dropdown-item.sort-grid-item.s-fm').removeClass('hidden');
                 if (folderlink) {
-                    $('.files-menu.context .dropdown-item.sort-grid-item.s-fm.sort-label')
-                        .attr('style', 'display:none !important');
-                    $('.files-menu.context .dropdown-item.sort-grid-item.s-fm.sort-fav')
-                        .attr('style', 'display:none !important');
+                    $('.files-menu.context .dropdown-item.sort-grid-item.s-fm.sort-label').addClass('hidden');
+                    $('.files-menu.context .dropdown-item.sort-grid-item.s-fm.sort-fav').addClass('hidden');
                 }
             }
         }

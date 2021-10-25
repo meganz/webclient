@@ -942,6 +942,7 @@ RecentsRender.prototype._renderMedia = function($newRow, action, actionId) {
         else {
             $newRow.removeClass('collapsed').addClass('expanded');
         }
+        self._dynamicList.itemRenderChanged(actionId);
         return false;
     }).rebind("dblclick", function() {
         return false;

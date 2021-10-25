@@ -6683,9 +6683,6 @@ span.orange {
     margin: 0 -8px;
     padding: 0 8px;
 }
-.dropdown.body.submenu .dropdown-item {
-    display: flex !important;
-}
 .dropdown-item.sort-grid-item i {
     background-position: 100px 100px;
     background-repeat: no-repeat;

@@ -512,3 +512,6 @@ body.tl .dropdown.body.popup.contacts-search {
 .dark-direct-tooltip.simpletip-tooltip.bluetip i {
     --mask-color: var(--label-blue);
 }
+.dark-direct-tooltip.simpletip-tooltip.large-width {
+    max-width: 320px;
+}

@@ -290,7 +290,7 @@ accountUI.general = {
             if ((u_attr.p || account.tfsq.ach) && b2[0] > 0) {
                 if (this.perc_c_b > 0) {
                     $bandwidthChart.removeClass('no-percs');
-                    $('.chart .perc-txt', $bandwidthChart).text(this.perc_c_b + '%');
+                    $('.chart .perc-txt', $bandwidthChart).text(formatPercentage(this.perc_c_b / 100));
                 }
                 else {
                     $bandwidthChart.addClass('no-percs');

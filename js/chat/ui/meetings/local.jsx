@@ -479,9 +479,9 @@ class Minimized extends MegaRenderMixin {
     render() {
         const { unread } = this.state;
         const { isOnHold, onCallExpand, onCallEnd, onAudioClick, onVideoClick } = this.props;
-        const audioLabel = this.isActive(SfuClient.Av.Audio) ? l[16708] /* `Unmute` */ : l[16214] /* `Mute` */;
+        const audioLabel = this.isActive(SfuClient.Av.Audio) ? l[16214] /* `Mute` */ : l[16708] /* `Mute` */;
         const videoLabel =
-            this.isActive(SfuClient.Av.Video) ? l[22894] /* `Disable video` */ : l[22893] /* `Enable video` */;
+            this.isActive(SfuClient.Av.Camera) ? l[22894] /* `Disable video` */ : l[22893] /* `Enable video` */;
         const SIMPLETIP_PROPS = { position: 'top', offset: 5 };
 
         return (

@@ -19161,8 +19161,8 @@ class local_Minimized extends mixins["MegaRenderMixin"] {
       onAudioClick,
       onVideoClick
     } = this.props;
-    const audioLabel = this.isActive(SfuClient.Av.Audio) ? l[16708] : l[16214];
-    const videoLabel = this.isActive(SfuClient.Av.Video) ? l[22894] : l[22893];
+    const audioLabel = this.isActive(SfuClient.Av.Audio) ? l[16214] : l[16708];
+    const videoLabel = this.isActive(SfuClient.Av.Camera) ? l[22894] : l[22893];
     const SIMPLETIP_PROPS = {
       position: 'top',
       offset: 5

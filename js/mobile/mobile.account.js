@@ -202,14 +202,14 @@ mobile.account = {
         var spaceUsed = M.account.cstrg;
         var spaceTotal = M.account.mstrg;
         var percentageUsed = spaceUsed / spaceTotal * 100;
-        var percentageUsedText = Math.round(percentageUsed);
+        var percentageUsedText = percentageUsed / 100;
         var spaceUsedText = bytesToSize(spaceUsed, 2);
         var spaceTotalText = bytesToSize(spaceTotal, 0);
 
         // Display the used and total storage e.g. 0.02% (4.8 GB of 200 GB)
         $usedStorage.text(spaceUsedText);
         $totalStorage.text(spaceTotalText);
-        $percentageUsed.text(percentageUsedText);
+        $percentageUsed.text(formatPercentage(percentageUsedText));
 
         // Colour text red and show a message if over quota, or use orange if close to using all quota
         if (percentageUsed >= 100) {

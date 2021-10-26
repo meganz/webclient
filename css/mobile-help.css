@@ -2972,9 +2972,6 @@
     #help2-main .block:nth-child(1), #help2-main .block:nth-child(2), #help2-main .block:nth-child(4), #help2-main .block:nth-child(5) {
         border-right: 1px solid #eee;
     }
-    #help2-main .block:nth-child(4), #help2-main .block:nth-child(5), #help2-main .block:nth-child(6) {
-        border-bottom: none;
-    }
     #help2-main .first-search-section {
         height: 260px;
         background-color: #f44;

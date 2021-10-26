@@ -355,6 +355,7 @@ affiliateUI.referralUrlDialog = {
 
         if (clear) {
             $urlBlock.empty();
+            $('.url-input', this.$dialog).val('');
             return Promise.resolve();
         }
 

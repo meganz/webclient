@@ -326,7 +326,7 @@
             cmsBackoff = 0; /* reset backoff */
         };
         var url = cmsStaticPath + CMS.scope + '/' + id;
-        q.open("GET", url);
+        q.open("GET", `${url}?v=${Math.floor(Date.now() / 36e5)}`);
         q.responseType = 'arraybuffer';
         q.send();
     }

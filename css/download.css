@@ -1068,7 +1068,10 @@ body:not(.en) .video-theatre-mode.stream-overquota .download.video-block {
 }
 
 /* Dropdown Button */
-.options-dropdown,
+.options-dropdown {
+    position: relative;
+    display: none;
+}
 .download-dropdown {
     position: relative;
     display: inline-block;

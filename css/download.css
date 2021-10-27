@@ -846,10 +846,9 @@ body:not(.en) .video-theatre-mode.stream-overquota .download.video-block {
     * New Layout styles
 */
 .download-page.download-content {
-    height: calc(100% - 122px);
+    height: calc(100% - 62px);
     position: absolute;
     margin-top: 60px;
-    margin-bottom: 60px;
     background-color: var(--surface-grey-1);
     border: 1px solid var(--surface-grey-1);
     border-width: 1px 0 1px 0;

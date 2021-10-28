@@ -79,15 +79,17 @@ var securityPractice = {
     initBounty: function() {
         "use strict";
         const $securityPage = $('.bottom-page.scroll-block.securitypractice', 'body');
-        $securityPage[0].style.setProperty('display', 'none', 'important');
+        $securityPage.remove();
 
         const $bountyPage = $('.bottom-page.scroll-block.corporate', 'body');
         $bountyPage.removeClass('hidden');
-
         this.fetchCMS($bountyPage);
 
         securityPractice.showSubsectionContent($bountyPage, 'bug-bounty');
 
+        if (!is_mobile) {
+            $('.bottom-page.corporate-content',$bountyPage).css('padding-top', '86px');
+        }
     },
 
     fetchCMS: function($page) {

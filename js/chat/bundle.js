@@ -15824,6 +15824,9 @@ class generic_GenericConversationMessage extends mixin["ConversationMessageMixin
   }
 
   _favourite(h) {
+    if (M.isInvalidUserStatus()) {
+      return;
+    }
     var newFavState = Number(!M.isFavourite(h));
     M.favourite([h], newFavState);
   }
@@ -18853,10 +18856,24 @@ class local_Stream extends mixins["MegaRenderMixin"] {
   constructor(props) {
     super(props);
     this.containerRef = external_React_default.a.createRef();
-    this.DRAGGABLE_OPTIONS = {
-      scroll: 'false',
-      cursor: 'move',
-      opacity: 0.8
+    this.DRAGGABLE = {
+      POSITION: {
+        top: undefined,
+        left: undefined
+      },
+      OPTIONS: {
+        scroll: 'false',
+        cursor: 'move',
+        opacity: 0.8,
+        start: () => {
+          if (this.state.options) {
+            this.handleOptionsToggle();
+          }
+        },
+        stop: (event, ui) => {
+          this.DRAGGABLE.POSITION = ui.position;
+        }
+      }
     };
     this.EVENTS = {
       MINIMIZE: ['slideshow:open', 'contact:open', 'textEditor:open', 'chat:open'],
@@ -18916,7 +18933,7 @@ class local_Stream extends mixins["MegaRenderMixin"] {
       const containerEl = (_this$containerRef = this.containerRef) == null ? void 0 : _this$containerRef.current;
 
       if (containerEl) {
-        $(containerEl).draggable({ ...this.DRAGGABLE_OPTIONS,
+        $(containerEl).draggable({ ...this.DRAGGABLE.OPTIONS,
           containment: minimized ? 'body' : wrapperRef == null ? void 0 : wrapperRef.current
         });
       }
@@ -18964,8 +18981,11 @@ class local_Stream extends mixins["MegaRenderMixin"] {
         toggleCollapsedMode
       } = this.props;
       const IS_SPEAKER_VIEW = mode === call_Call.MODE.SPEAKER && forcedLocal;
+      const {
+        POSITION
+      } = this.DRAGGABLE;
       return external_React_default.a.createElement("div", {
-        className: meetings_local_Local.NAMESPACE + "-options theme-dark-forced"
+        className: "\n                     " + meetings_local_Local.NAMESPACE + "-options\n                     " + (POSITION.left < 200 ? 'options-top' : '') + "\n                     " + (POSITION.left < 200 && POSITION.top < 100 ? 'options-bottom' : '') + "\n                     theme-dark-forced\n                 "
       }, external_React_default.a.createElement("ul", null, external_React_default.a.createElement("li", null, external_React_default.a.createElement(meetings_button["a" ], {
         icon: "sprite-fm-mono icon-download-standard",
         onClick: () => this.setState({
@@ -19141,8 +19161,8 @@ class local_Minimized extends mixins["MegaRenderMixin"] {
       onAudioClick,
       onVideoClick
     } = this.props;
-    const audioLabel = this.isActive(SfuClient.Av.Audio) ? l[16708] : l[16214];
-    const videoLabel = this.isActive(SfuClient.Av.Video) ? l[22894] : l[22893];
+    const audioLabel = this.isActive(SfuClient.Av.Audio) ? l[16214] : l[16708];
+    const videoLabel = this.isActive(SfuClient.Av.Camera) ? l[22894] : l[22893];
     const SIMPLETIP_PROPS = {
       position: 'top',
       offset: 5
@@ -22344,11 +22364,15 @@ class preview_Preview extends mixins["MegaRenderMixin"] {
         audio,
         video
       }).then(stream => {
-        this.videoRef.current.srcObject = stream;
-        this.stream = stream;
+        const videoRef = this.videoRef.current;
 
-        if (this.props.onToggle) {
-          this.props.onToggle(this.state.audio, this.state.video);
+        if (videoRef) {
+          videoRef.srcObject = stream;
+          this.stream = stream;
+
+          if (this.props.onToggle) {
+            this.props.onToggle(this.state.audio, this.state.video);
+          }
         }
       }).catch(ex => console.error(ex.name + ": " + ex.message));
     };

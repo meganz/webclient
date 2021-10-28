@@ -1180,6 +1180,15 @@
   box-shadow: var(--dropdown-shadow);
   z-index: 1;
 }
+.local-stream .local-stream-options.options-top {
+  top: -50%;
+  transform: none;
+}
+.local-stream .local-stream-options.options-bottom {
+  top: 30%;
+  left: 10px;
+  transform: none;
+}
 .local-stream .local-stream-options ul {
   margin: 0;
   padding: 0;

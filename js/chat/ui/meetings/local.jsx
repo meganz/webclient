@@ -90,10 +90,24 @@ export default class Local extends MegaRenderMixin {
 class Stream extends MegaRenderMixin {
     containerRef = React.createRef();
 
-    DRAGGABLE_OPTIONS = {
-        scroll: 'false',
-        cursor: 'move',
-        opacity: 0.8
+    DRAGGABLE = {
+        POSITION: {
+            top: undefined,
+            left: undefined
+        },
+        OPTIONS: {
+            scroll: 'false',
+            cursor: 'move',
+            opacity: 0.8,
+            start: () => {
+                if (this.state.options) {
+                    this.handleOptionsToggle();
+                }
+            },
+            stop: (event, ui) => {
+                this.DRAGGABLE.POSITION = ui.position;
+            }
+        }
     };
 
     EVENTS = {
@@ -172,7 +186,7 @@ class Stream extends MegaRenderMixin {
 
         if (containerEl) {
             $(containerEl).draggable({
-                ...this.DRAGGABLE_OPTIONS,
+                ...this.DRAGGABLE.OPTIONS,
                 // Constrain the dragging to within the bounds of the body (in minimized mode) or the stream
                 // container (when the call is expanded, excl. the sidebar)
                 containment: minimized ? 'body' : wrapperRef?.current
@@ -239,9 +253,16 @@ class Stream extends MegaRenderMixin {
         } = this.props;
         // `Speaker` mode and `forcedLocal` -> `Display in main view`, i.e. the local stream is in `Speaker` mode
         const IS_SPEAKER_VIEW = mode === Call.MODE.SPEAKER && forcedLocal;
+        const { POSITION } = this.DRAGGABLE;
 
         return (
-            <div className={`${Local.NAMESPACE}-options theme-dark-forced`}>
+            <div
+                className={`
+                     ${Local.NAMESPACE}-options
+                     ${POSITION.left < 200 ? 'options-top' : ''}
+                     ${POSITION.left < 200 && POSITION.top < 100 ? 'options-bottom' : ''}
+                     theme-dark-forced
+                 `}>
                 <ul>
                     <li>
                         <Button
@@ -458,9 +479,9 @@ class Minimized extends MegaRenderMixin {
     render() {
         const { unread } = this.state;
         const { isOnHold, onCallExpand, onCallEnd, onAudioClick, onVideoClick } = this.props;
-        const audioLabel = this.isActive(SfuClient.Av.Audio) ? l[16708] /* `Unmute` */ : l[16214] /* `Mute` */;
+        const audioLabel = this.isActive(SfuClient.Av.Audio) ? l[16214] /* `Mute` */ : l[16708] /* `Mute` */;
         const videoLabel =
-            this.isActive(SfuClient.Av.Video) ? l[22894] /* `Disable video` */ : l[22893] /* `Enable video` */;
+            this.isActive(SfuClient.Av.Camera) ? l[22894] /* `Disable video` */ : l[22893] /* `Enable video` */;
         const SIMPLETIP_PROPS = { position: 'top', offset: 5 };
 
         return (

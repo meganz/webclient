@@ -290,7 +290,7 @@ accountUI.general = {
             if ((u_attr.p || account.tfsq.ach) && b2[0] > 0) {
                 if (this.perc_c_b > 0) {
                     $bandwidthChart.removeClass('no-percs');
-                    $('.chart .perc-txt', $bandwidthChart).text(this.perc_c_b + '%');
+                    $('.chart .perc-txt', $bandwidthChart).text(formatPercentage(this.perc_c_b / 100));
                 }
                 else {
                     $bandwidthChart.addClass('no-percs');
@@ -1234,6 +1234,11 @@ accountUI.account = {
                                 $('.user-name').text(u_attr.name);
                                 $('.name', '.account-dialog').text(u_attr.fullname);
                                 $('.top-menu-logged .name', '.top-menu-popup').text(u_attr.name);
+
+                                if (u_attr.fullname.length > 16) {
+                                    $('.name', '.account-dialog').addClass('simpletip')
+                                        .attr('data-simpletip', u_attr.fullname);
+                                }
                                 showToast('settings', l[7698]);
                                 accountUI.account.profiles.bindEvents();
                                 // update megadrop username for existing megadrop

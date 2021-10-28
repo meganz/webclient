@@ -1214,7 +1214,7 @@ mBroadcaster.once('boot_done', function populate_l() {
         + 'target="_blank" rel="noopener noreferrer">').replace('[/A1]', '</a>')
         .replace('[A2]', '<a class="clickurl" href="/takedown" '
             + 'target="_blank" rel="noopener noreferrer">').replace('[/A2]', '</a>')
-        .replace('[A3]', `<a href="${getBaseUrl()}/blog/transparency-report-2019" `
+        .replace('[A3]', `<a href="https://mega.io/Mega_Transparency_Report_September_2021.pdf" `
             + 'target="_blank" rel="noopener noreferrer">').replace('[/A3]', '</a>');
     l[23120] = escapeHTML(l[23120].replace(/&quot;|"/g, '%1')).replace(/%1/g, '"');
     l[23126] = escapeHTML(l[23126].replace(/&quot;|"/g, '%1')).replace(/\[BR]/g, '<br/>').replace(/%1/g, '"');

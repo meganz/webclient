@@ -3983,6 +3983,9 @@ body:not(.mobile) .securitypractice .business-text a.red:hover {
 .opensource-icon.ios {
     background-position: center -950px;
 }
+.opensource-icon.cmd {
+    background-position: center -1369px;
+}
 .opensource-icon.windowsphone {
     background-position: center -1090px;
 }

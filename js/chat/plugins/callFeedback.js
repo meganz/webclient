@@ -17,50 +17,52 @@ var CallFeedback = function(megaChat, options) {
     megaChat
         .rebind('onRoomInitialized.CallFeedback', function(e, megaRoom) {
             megaRoom
-                .rebind('call-ended.CallFeedback', function(e, eventData) {
+                .rebind('onCallEnd.CallFeedback', function(e, { showCallFeedback }) {
                     // do append this after a while, so that the remote call ended would be shown first.
-                    setTimeout(function () {
-                        var msgId = 'call-feedback' + unixtime();
-                        megaRoom.appendMessage(
-                            new ChatDialogMessage({
-                                messageId: msgId,
-                                type: 'call-feedback',
-                                authorContact: eventData.getPeer(),
-                                delay: unixtime(),
-                                buttons: {
-                                    'noThanks': {
-                                        'type': 'secondary',
-                                        'classes': 'mega-button',
-                                        'text': l[8898],
-                                        'callback': function() {
-                                            megaRoom.messagesBuff.removeMessageById(msgId);
-                                            megaRoom.trigger('resize');
-                                        }
-                                    },
-                                    'sendFeedback': {
-                                        'type': 'primary',
-                                        'classes': 'mega-button positive',
-                                        'text': l[1403],
-                                        'callback': function() {
-                                            var feedbackDialog = mega.ui.FeedbackDialog.singleton(
-                                                undefined,
-                                                undefined,
-                                                "call-ended"
-                                            );
-                                            feedbackDialog._type = "call-ended";
-                                            feedbackDialog.on('onHide.callEnded', function () {
-
+                    if (showCallFeedback) {
+                        setTimeout(function () {
+                            var msgId = 'call-feedback' + unixtime();
+                            megaRoom.appendMessage(
+                                new ChatDialogMessage({
+                                    messageId: msgId,
+                                    type: 'call-feedback',
+                                    authorContact: M.u[u_handle],
+                                    delay: unixtime(),
+                                    buttons: {
+                                        'noThanks': {
+                                            'type': 'secondary',
+                                            'classes': 'mega-button',
+                                            'text': l[8898],
+                                            'callback': function() {
                                                 megaRoom.messagesBuff.removeMessageById(msgId);
                                                 megaRoom.trigger('resize');
+                                            }
+                                        },
+                                        'sendFeedback': {
+                                            'type': 'primary',
+                                            'classes': 'mega-button positive',
+                                            'text': l[1403],
+                                            'callback': function() {
+                                                var feedbackDialog = mega.ui.FeedbackDialog.singleton(
+                                                    undefined,
+                                                    undefined,
+                                                    "call-ended"
+                                                );
+                                                feedbackDialog._type = "call-ended";
+                                                feedbackDialog.on('onHide.callEnded', function () {
 
-                                                feedbackDialog.off('onHide.callEnded');
-                                            });
-                                        }
-                                    },
-                                }
-                            })
-                        );
-                    });
+                                                    megaRoom.messagesBuff.removeMessageById(msgId);
+                                                    megaRoom.trigger('resize');
+
+                                                    feedbackDialog.off('onHide.callEnded');
+                                                });
+                                            }
+                                        },
+                                    }
+                                })
+                            );
+                        });
+                    }
                 }, 1000);
         });
 };

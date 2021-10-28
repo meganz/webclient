@@ -770,19 +770,12 @@ var redeem = {
             $whiteBtn.rebind(
                 'click',
                 function() {
-                    closeDialog();
-                    if ($(this).attr('bFail')) {
-                        delete localStorage.voucher;
-                        loadSubPage('registerb');
-                        return false;
-                    }
-                    if (u_type === 3) {
-                        delete localStorage.voucher;
-                    }
-                    // if not logged in, redirect to login pg, otherwise close dialog and stay on redeem pg
-                    if (!u_type) {
+                    if (!window.bCreatedVoucher && u_type !== 3) {
                         login_txt = l[7712];
                         loadSubPage('login');
+                    }
+                    else {
+                        $('button.js-close, .close-voucher-redeem', $dlg).eq(0).trigger('click');
                     }
                     return false;
                 });
@@ -810,17 +803,13 @@ var redeem = {
                     return false;
                 });
 
-            $('button.js-close', $dlg).rebind(
-                'click',
+            $('button.js-close, .close-voucher-redeem', $dlg).rebind(
+                'click.redeem',
                 function() {
+                    const voucher = localStorage.voucher;
                     delete localStorage.voucher;
                     if (is_mobile) {
-                        if (mega.voucher.businessmonths) {
-                            loadSubPage('registerb');
-                        }
-                        else {
-                            loadSubPage('redeem');
-                        }
+                        loadSubPage(`redeem${voucher}`);
                     }
                     else {
                         closeDialog();

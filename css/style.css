@@ -6683,9 +6683,6 @@ span.orange {
     margin: 0 -8px;
     padding: 0 8px;
 }
-.dropdown.body.submenu .dropdown-item {
-    display: flex !important;
-}
 .dropdown-item.sort-grid-item i {
     background-position: 100px 100px;
     background-repeat: no-repeat;
@@ -13899,6 +13896,7 @@ body.megaChatDisabled .nw-contact-name button.start-chat-button {
     padding-inline-end: 48px;
 }
 .business-dashboard .user-management-button {
+    margin-left: -4px;
     min-width: 20%;
     text-align: end;
 }

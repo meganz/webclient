@@ -582,16 +582,16 @@ var voucherDialog = {
                 $newBalanceAmount.addClass('red');
             }
 
-            $storageAmount.text(bytesToSize(M.account.space));
-            $newStorageAmount.text(bytesToSize(M.account.space - oldStorage + newStorage));
+            $storageAmount.text(bytesToSize(M.account.space, 0));
+            $newStorageAmount.text(bytesToSize(M.account.space - oldStorage + newStorage, 0));
 
             if (M.account.type) {
-                $transferAmount.text(bytesToSize(M.account.tfsq.max));
-                $newTransferAmount.text(bytesToSize(M.account.tfsq.max + newTransfer));
+                $transferAmount.text(bytesToSize(M.account.tfsq.max, 0));
+                $newTransferAmount.text(bytesToSize(M.account.tfsq.max + newTransfer, 0));
             }
             else {
                 $transferAmount.text('Limited');
-                $newTransferAmount.text(bytesToSize(newTransfer));
+                $newTransferAmount.text(bytesToSize(newTransfer, 0));
             }
         }
 

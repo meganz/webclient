@@ -942,6 +942,7 @@ RecentsRender.prototype._renderMedia = function($newRow, action, actionId) {
         else {
             $newRow.removeClass('collapsed').addClass('expanded');
         }
+        self._dynamicList.itemRenderChanged(actionId);
         return false;
     }).rebind("dblclick", function() {
         return false;
@@ -962,12 +963,11 @@ RecentsRender.prototype._renderMedia = function($newRow, action, actionId) {
     });
 
     const triggerContextMenu = (ev) => {
-        self.markSelected($newRow);
         const sm = selectionManager;
         sm.clear_selection();
-        self._handleSelectionClick(ev, '', $newRow);
         sm.selected_list = action.map(n => n.h);
         sm.add_to_selection(sm.selected_list.pop(), false, true);
+        self.markSelected($newRow);
         $.hideTopMenu();
         return !!M.contextMenuUI(ev, 3);
     };
@@ -1108,11 +1108,12 @@ RecentsRender.prototype._handleSelectionClick = function(e, handle, $element) {
     $.hideContextMenu();
     if (e.ctrlKey !== false || e.metaKey !== false) {
         this.appendSelected.apply(this, $element);
-        selectionManager.add_to_selection(handle);
     }
     else {
         selectionManager.clear_selection();
         this.markSelected($element);
+    }
+    if (handle) {
         selectionManager.add_to_selection(handle);
     }
     return false;

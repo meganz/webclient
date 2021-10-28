@@ -175,6 +175,7 @@
 .meetings-call .stream .participants-notice {
   width: 460px;
   margin: 0 auto;
+  backdrop-filter: blur(10px);
 }
 .meetings-call .stream .participants-notice.user-alone {
   margin-top: -140px;
@@ -1957,5 +1958,3 @@ body.theme-dark .preview-meeting {
     left: 400px;
   }
 }
-
-/*# sourceMappingURL=chat-bundle.css.map */

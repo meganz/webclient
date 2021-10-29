@@ -104,7 +104,7 @@ twofactor.loginDialog = {
             }
 
             // Hide previous warnings for incorrect PIN codes
-            $warningText.addClass('hidden');
+            $warningText.addClass('v-hidden');
 
             // Trim whitespace from the ends of the PIN entered
             var pinCode = $pinCodeInput.val();
@@ -214,7 +214,7 @@ twofactor.loginDialog = {
         // then show a message that the PIN code was incorrect and clear the text field
         $overlay.removeClass('hidden');
         $submitButton.removeClass('loading');
-        $warningText.removeClass('hidden');
+        $warningText.removeClass('v-hidden');
         $pinCodeInput.val('');
 
         // Put the focus back in the PIN input field
@@ -236,7 +236,7 @@ twofactor.loginDialog = {
 
         // Hide loading spinner, warning text and clear the text input
         $submitButton.removeClass('loading');
-        $warningText.addClass('hidden');
+        $warningText.addClass('v-hidden');
         $pinCodeInput.val('');
     },
 

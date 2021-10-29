@@ -8,6 +8,21 @@
  *  MORE TO COME
  */
 
+/* Important general classnames */
+.hidden {
+    display: none !important;
+}
+.o-hidden {
+    opacity: 0 !important;
+}
+.v-hidden {
+    visibility: hidden !important;
+}
+.vo-hidden {
+    visibility: hidden !important;
+    opacity: 0 !important;
+}
+
 /* Light mode */
 /* TEXT: */
 /* Common value */

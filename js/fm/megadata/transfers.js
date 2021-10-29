@@ -799,7 +799,7 @@ MegaData.prototype.dlerror = function(dl, error) {
     if (slideshowid === dl.id && !previews[slideshowid]) {
         $('.img-wrap', $overlay).addClass('hidden');
         $('.viewer-pending', $overlay).addClass('hidden');
-        $('.viewer-progress', $overlay).addClass('hidden');
+        $('.viewer-progress', $overlay).addClass('vo-hidden');
         $('.viewer-error', $overlay).removeClass('hidden');
         $('.viewer-error-txt', $overlay).text(errorstr);
     }

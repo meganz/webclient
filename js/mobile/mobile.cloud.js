@@ -33,8 +33,7 @@ mobile.cloud = {
 
         // jQuery selectors
         var $otherPages = $('#fmholder > div:not(.hidden)');
-        var $fileManager = $('.mobile.file-manager-block');
-
+        var $excludes = $('.mobile.file-manager-block, .mobile.top-menu-popup, .mobile.context-menu-container');
 
         // Render the file manager header, folders, files and footer
         this.initScrollBarToTop();
@@ -66,8 +65,8 @@ mobile.cloud = {
         // Hide other pages that may be showing and show the Cloud Drive
         $otherPages.addClass('hidden');
 
-        // Show the file manager after everything is ready
-        $fileManager.removeClass('hidden');
+        // Show the excluded element after everything is ready
+        $excludes.removeClass('hidden');
 
         // Set viewmode to show thumbnails and render thumbnails after everything else because it can take longer
         M.viewmode = 1;

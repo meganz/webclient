@@ -17,12 +17,6 @@
     justify-content: flex-end;
 }
 
-/* TODO:  remove once hidden has highest priority */
-.fm-right-account-block div.hidden,
-.content-panel .settings-button div.hidden {
-    display: none;
-}
-
 /* Settings. Common styles. Text colors */
 .fm-account-main .green-label {
     background-color: initial;
@@ -1038,10 +1032,6 @@
     vertical-align: middle;
     white-space: normal;
 }
-.tiny-chart .account.chart.data.hidden {
-    display: none;
-}
-
 
 /* Settings page low width */
 .fm-account-main.low-width .settings-left-block {

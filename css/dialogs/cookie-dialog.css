@@ -224,9 +224,6 @@
 .active-saved-cookies .settings-cell.saved {
     display: table-cell;
 }
-.active-saved-cookies .settings-cell.hidden {
-    display: none;
-}
 
 /* Step 3. Third Party Cookies */
 .cookie-dialog .info-block {

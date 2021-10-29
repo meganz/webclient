@@ -1,8 +1,3 @@
-.download *.hidden,
-.download.download-page *.download.hidden,
-.download.download-page *.video-controls.hidden {
-    display: none;
-}
 .bottom-page.download {
     height: 100%;
     background-color: var(--surface-main);
@@ -737,8 +732,6 @@ button.megasync-slider.prev {
 }
 .video-mode-wrapper .checkbox-bl,
 .video-theatre-mode > .checkbox-bl,
-.video-theatre-mode .download.transfer-wrapper .checkbox-bl.hidden,
-.video-theatre-mode .download.buttons-block.hidden,
 .video-theatre-mode.downloading .download.transfer-wrapper .download.checkbox-bl,
 .video-theatre-mode.downloading .video-mode-wrapper,
 .video-theatre-mode.download-complete .download.transfer-wrapper .download.checkbox-bl,
@@ -794,9 +787,6 @@ button.megasync-slider.prev {
     margin: 0 auto;
     padding: 12px 10px 8px;
     border-radius: 0;
-}
-.download.over-transfer-quota.hidden {
-    display: none;
 }
 .download.over-transfer-quota .download.video-transfer-buttons {
     float: right;

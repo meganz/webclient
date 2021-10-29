@@ -20,10 +20,8 @@
     z-index: 1120;
 }
 
-.top-menu-popup.hidden {
+.top-menu-popup.o-hidden {
     right: -257px;
-    display: block !important;
-    opacity: 0;
 }
 
 .rtl.top-menu-popup {
@@ -33,16 +31,6 @@
 
 .rtl.top-menu-popup.hidden {
     left: -257px;
-}
-
-.mobile.top-menu-popup.hidden {
-    display: block !important;
-    width: 0;
-}
-
-.mobile .top-menu-scroll {
-    overflow: scroll;
-    -webkit-overflow-scrolling: touch;
 }
 
 .top-menu-scroll {
@@ -488,9 +476,6 @@
     text-align: left;
     margin: 22px 20px;
     min-width: 170px;
-}
-.pages-menu.submenu-link.hidden {
-    display: none;
 }
 .pages-menu.submenu-link i {
     width: 32px;

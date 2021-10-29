@@ -93,9 +93,6 @@ html.dark-mode .mobile.slides.mid {
 html.dark-mode .mobile.slides.mid img {
     filter: none;
 }
-html.dark-mode .mobile.context-menu-container.hidden {
-    display: none !important;
-}
 
 /* Re-enable selection and highlighting for specific things */
 input, textarea {
@@ -105,9 +102,6 @@ input, textarea {
     -moz-user-select: text !important;
     -ms-user-select: text !important;
     user-select: text !important;
-}
-.hidden {
-    display: none !important;
 }
 a, a:link, a:visited, a:hover, a:active {
     outline: none;
@@ -4472,16 +4466,6 @@ div.checkboxOn {
     text-align: center;
     font-size: 14px;
 }
-.payment-address-dialog .error-message.hidden {
-    display: block;
-    visibility: hidden;
-}
-.payment-address-dialog .default-dropdown-item.template {
-    display: none;
-}
-.payment-address-dialog .default-dropdown-item.hidden {
-    display: none;
-}
 .payment-address-dialog .states.disabled {
     cursor: default;
     opacity: 0.5;
@@ -5281,10 +5265,10 @@ div.checkboxOn {
 .fmholder {
     overflow: hidden;
 }
-.mobile.context-menu-container.hidden {
-    display: block !important;
+
+/* Special hidden */
+.mobile.context-menu-container.o-hidden {
     overflow: hidden;
-    opacity: 0;
     transition: opacity 200ms ease-in-out, transform 200ms ease-in-out;
     transform: translateY(calc(100% + 8px));
 }
@@ -7440,6 +7424,8 @@ textarea.mobile.support-text-field {
     top: auto;
     bottom: 0;
 }
+
+/* Special hidden */
 .mobile.video.slideshow-image-previewer.video-theatre-mode .slideshow-header.hidden + .content-row .viewer-bottom-bl {
     display: block;
 }
@@ -8212,9 +8198,6 @@ textarea.mobile.support-text-field {
     height: auto;
     text-align: left;
 }
-.mobile .improved-recovery-steps .hidden {
-    display: none;
-}
 .mobile .improved-recovery-steps ol.app-instructions-list {
     list-style-type: none;
     -webkit-margin-before: 1em;
@@ -8982,9 +8965,6 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll, .mob
 .local-currency .reg-st3-bott-title.price .green-star-img {
     display: inline-block;
 }
-.mobile.key .reg-st3-txt-achprogram.hidden {
-    display: block !important;
-}
 .reg-st3-bott-title.price .euro-price {
     font-size: 16px;
     background-color: #fff;
@@ -9462,14 +9442,6 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll, .mob
 }
 
 /* Pro page step 2 voucher dialog */
-.mobile.voucher-dialog.hidden {
-    display: hidden;
-    bottom: -100%;
-    overflow: hidden;
-    opacity: 0;
-    -webkit-transition: opacity 200ms ease-in-out, bottom 200ms ease-in-out;
-    transition: opacity 200ms ease-in-out, bottom 200ms ease-in-out;
-}
 .mobile.voucher-dialog {
     background-color: #fff;
     border-radius: 12px;
@@ -10834,9 +10806,6 @@ Thank You dialog
     }
     .ios.app-info-block .mobile.download-app {
         width: 152px;
-    }
-    .app-info-block .mobile.application-txt.hidden .mobile.download-app {
-        margin-top:8px;
     }
     .android.app-info-block .mobile.download-app {
         background-position: 0 -496px;
@@ -12946,9 +12915,6 @@ p a.blog-new-read-more {
     -webkit-box-sizing: border-box;
     box-sizing: border-box;
     max-width: calc(100% - 2px);
-}
-.orange-notification.body.hidden {
-    display: none;
 }
 .orange-notification.cell {
     display: table-cell;

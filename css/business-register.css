@@ -196,9 +196,6 @@
 .bus-reg-plan .bus-user-price-val-cntr {
     display: inline-block;
 }
-.bus-reg-plan .bus-internal-block.hidden {
-    display: none;
-}
 .bus-reg-plan .business-plan-pricing {
     font-size: 0;
 }
@@ -236,9 +233,6 @@
     display: flex;
     justify-content: center;
     margin-left: calc(50% - 24px);
-}
-.bus-reg-plan .bus-user-price-euro.hidden {
-    display: none;
 }
 .bus-reg-plan .business-plan-quota-note {
     margin: 0 16px auto 16px;
@@ -592,9 +586,6 @@
 .bus-reg-plan.repay .repay-breakdown-tb tr {
     position: relative;
     display: block;
-}
-.bus-reg-plan.repay .repay-breakdown-tb tr.hidden {
-    display: none;
 }
 .bus-reg-plan.repay .repay-breakdown-tb tr:not(:last-child)::before {
     content: "";

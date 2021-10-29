@@ -40,7 +40,7 @@ mobile.cloud.sort = {
             mobile.cloud.sort.hide();
         });
 
-        $('.context-menu-container.sort').removeClass('hidden');
+        $('.context-menu-container.sort').removeClass('o-hidden');
     },
 
     /**
@@ -54,7 +54,7 @@ mobile.cloud.sort = {
 
         // Hide overlay
         $overlay.addClass('hidden');
-        $('.context-menu-container.sort').addClass('hidden');
+        $('.context-menu-container.sort').addClass('o-hidden');
     },
 
     /**

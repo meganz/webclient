@@ -47,9 +47,6 @@
     -webkit-transition: all 200ms ease-in-out;
     transition: all 200ms ease-in-out;
 }
-.bottom-menu .link.hidden {
-    display: none;
-}
 .bottom-menu .link:hover {
     color: #333333;
 }

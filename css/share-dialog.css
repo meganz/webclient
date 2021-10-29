@@ -22,6 +22,10 @@
     position: relative;
 }
 
+.mega-dialog.share-dialog .share-dialog-permissions-menu {
+    transition: opacity 200ms;
+}
+
 .share-dialog-top-body .share-dialog-shared-item {
     display: inline-block;
     height: 48px;

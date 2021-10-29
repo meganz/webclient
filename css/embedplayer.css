@@ -27,9 +27,8 @@ textarea {
     outline: 0;
 }
 
-.hidden,
-body *.hidden {
-    display: none;
+.hidden {
+    display: none !important;
 }
 .video-wrapper.main-blur-block {
     filter: blur(0.45em);

@@ -124,7 +124,7 @@ export default class Contact extends AbstractGenericMessage {
 
                     {!HAS_RELATIONSHIP &&  !is_eplusplus && (
                         <DropdownItem
-                            icon="sprite-fm-mono icon-add-filled"
+                            icon="sprite-fm-mono icon-add"
                             label={l[71] /* `Add contact` */}
                             onClick={() => this._handleAddContact(contactEmail)}
                         />

@@ -208,7 +208,7 @@ export class ContactButton extends ContactAwareComponent {
             moreDropdowns.push(
                 <DropdownItem
                     key="view2"
-                    icon="sprite-fm-mono icon-add-filled"
+                    icon="sprite-fm-mono icon-add"
                     label={l[101] /* `Add Contact` */}
                     onClick={() => {
                         const isAnonymousUser = (!u_handle || u_type !== 3);

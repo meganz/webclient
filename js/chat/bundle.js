@@ -1677,7 +1677,7 @@ class ContactButton extends _stores_mixins_js2__["ContactAwareComponent"] {
     } else if (!is_chatlink && !is_eplusplus && (!contact.c || contact.c === 2 && contact.u !== u_handle)) {
       moreDropdowns.push(react1.a.createElement(_ui_dropdowns_jsx6__["DropdownItem"], {
         key: "view2",
-        icon: "sprite-fm-mono icon-add-filled",
+        icon: "sprite-fm-mono icon-add",
         label: l[101],
         onClick: () => {
           const isAnonymousUser = !u_handle || u_type !== 3;
@@ -12668,7 +12668,7 @@ class contact_Contact extends abstractGenericMessage_AbstractGenericMessage {
         mBroadcaster.sendMessage('chat:open');
       }
     })), !HAS_RELATIONSHIP && !is_eplusplus && external_React_default.a.createElement(ui_dropdowns["DropdownItem"], {
-      icon: "sprite-fm-mono icon-add-filled",
+      icon: "sprite-fm-mono icon-add",
       label: l[71],
       onClick: () => this._handleAddContact(contactEmail)
     }), this._getContactDeleteButton(message)));

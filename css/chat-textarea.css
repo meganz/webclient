@@ -9,9 +9,9 @@
     margin: 0 18px 18px;
     padding: 14px 78px 14px 54px;
     min-height: 48px;
-    background-color: var(--surface-main);
+    background-color: var(--stroke-main);
     border-radius: 4px;
-    border: 1px solid var(--surface-mid-grey);
+    border: 1px solid var(--stroke-mid-grey);
     box-sizing: border-box;
     position: relative;
 }
@@ -104,7 +104,7 @@
     height: 100%;
     margin: 0;
     border: 0;
-    background-color: var(--surface-mid-grey);
+    background-color: var(--stroke-mid-grey);
 }
 .chat-textarea .grey-small-plus {
     -moz-opacity: 0.73;
@@ -130,7 +130,7 @@
     box-sizing: border-box;
     display: block;
     white-space: pre-wrap;
-    background-color: var(--surface-main);
+    background-color: var(--stroke-main);
 }
 .chat-textarea-scroll textarea[disabled="disabled"], .disabled .chat-textarea-scroll textarea {
     /* TODO: add disabled state */

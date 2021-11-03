@@ -11,10 +11,10 @@ body .text-editor-container *.hidden {
     left: 0;
     width: 100%;
     z-index: 800;
-    background-color: var(--surface-overlay-background);
+    background-color: var(--stroke-overlay-background);
 }
 .text-editor {
-    background-color: var(--surface-main);
+    background-color: var(--stroke-main);
     display: flex;
     flex-direction: column;
     height: 100%;
@@ -28,7 +28,7 @@ body .text-editor-container *.hidden {
 }
 .text-editor > header,
 .text-editor > footer {
-    background-color: var(--surface-grey-1);
+    background-color: var(--stroke-grey-1);
     display: flex;
     flex-direction: column;
     flex: 0 0 auto;
@@ -94,7 +94,7 @@ body .text-editor-container *.hidden {
 }
 .text-editor-bars .bar.menu > li > button:hover,
 .text-editor-bars .bar.menu > li > button.active {
-    background-color: var(--surface-grey-2);
+    background-color: var(--stroke-grey-2);
 }
 
 .text-editor-bars .bar.control {

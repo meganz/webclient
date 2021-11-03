@@ -13851,7 +13851,7 @@ body.landscape .upload-overlay .mobile.filetype-img {
     transition: opacity 200ms ease-in-out 1s;
     transition-delay: 0ms;
     white-space: normal;
-    --mask-color: var(--surface-main-inverted);
+    --mask-color: var(--stroke-main-inverted);
 }
 .dark-direct-tooltip i.icon-tooltip-arrow {
     position: absolute;

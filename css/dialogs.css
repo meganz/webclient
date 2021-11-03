@@ -327,11 +327,11 @@ body.de .mega-dialog.new-group-chat {
     padding: 5px;
     border-radius: 4px;
     font: var(--text-body1);
-    color: var(--surface-main-inverted);
+    color: var(--stroke-main-inverted);
     background: transparent;
 }
 .mega-dialog.add-from-cloud .fm-header-buttons input::placeholder {
-    color: var(--surface-main-inverted);
+    color: var(--stroke-main-inverted);
     opacity: 0.3;
 }
 .mega-dialog.add-from-cloud .fm-header-buttons.active-search input {
@@ -433,7 +433,7 @@ body.de .mega-dialog.new-group-chat {
 .fm-dialog-table.grid-table {
     width: calc(100% - 16px);
     margin: 0 auto 0;
-    outline: var(--surface-main) solid 8px;
+    outline: var(--stroke-main) solid 8px;
     outline-offset: -8px;
 }
 .fm-dialog-table.grid-table td {
@@ -2426,7 +2426,7 @@ body.de .mega-dialog.new-group-chat {
     .mega-dialog.export-links-dialog .embed-content .settings-container {
         overflow: auto;
         margin-top: 8px;
-        background-color: var(--surface-main);
+        background-color: var(--stroke-main);
         border: 1px solid var(--stroke-grey-2);
         border-radius: 4px;
         min-height: 44px;
@@ -3328,7 +3328,7 @@ body.de .mega-dialog.new-group-chat {
     .mega-dialog.fm-picker-dialog .side-pane .fm-picker-dialog-button .tooltip {
         height: 20px;
         padding: 0 8px;
-        background-color: var(--surface-main-inverted);
+        background-color: var(--stroke-main-inverted);
         color: var(--text-color-high-inverted);
         font: var(--text-body2);
         line-height: 20px;
@@ -3954,7 +3954,7 @@ body.de .mega-dialog.new-group-chat {
     }
     .mega-dialog.properties-dialog.shared .properties-elements-counter span {
         background: var(--surface-main-inverted);
-        border: 2px solid var(--surface-main);
+        border: 2px solid var(--stroke-main);
         border-radius: 50%;
         color: var(--text-color-high-inverted);
         display: block;
@@ -8487,7 +8487,7 @@ body.de .mega-dialog.new-group-chat {
         .mega-dialog.voucher-info-redeem .voucher-logo {
             width: 450px;
             height: 72px;
-            background-color: var(--surface-grey-1);
+            background-color: var(--stroke-grey-1);
             border: 2px solid var(--stroke-grey-2);
             border-radius: 12px;
             display: flex;

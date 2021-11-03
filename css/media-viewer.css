@@ -33,7 +33,7 @@
         .media-viewer .viewer-bars {
             align-items: center;
             background: var(--surface-grey-2);
-            border: 2px solid var(--surface-black);
+            border: 2px solid var(--stroke-black);
             border-width: 0 0 2px;
             box-sizing: border-box;
             display: flex;

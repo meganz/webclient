@@ -1,6 +1,6 @@
 /* BASICS */
 .CodeMirror {
-    background-color: var(--surface-main);
+    background-color: var(--stroke-main);
     box-sizing: border-box;
     color: var(--text-color-high);
     direction: ltr;
@@ -23,7 +23,7 @@
 
 /* GUTTER */
 .CodeMirror-gutters {
-    background-color: var(--surface-main);
+    background-color: var(--stroke-main);
     white-space: nowrap;
 }
 .CodeMirror-linenumber {
@@ -43,14 +43,14 @@
 
 /* CURSOR */
 .CodeMirror-cursor {
-    border-left: 1px solid var(--surface-main-inverted);
+    border-left: 1px solid var(--stroke-main-inverted);
     border-right: none;
     width: 0;
 }
 
 /* Shown when moving in bi-directional text */
 .CodeMirror div.CodeMirror-secondarycursor {
-    border-left: 1px solid var(--surface-mid-grey);
+    border-left: 1px solid var(--stroke-mid-grey);
 }
 .cm-fat-cursor .CodeMirror-cursor {
     width: auto;

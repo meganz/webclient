@@ -1,6 +1,6 @@
 .chat-topic-block {
     align-items: center;
-    background-color: var(--surface-main);
+    background-color: var(--stroke-main);
     box-sizing: content-box;
     display: flex;
     padding: 0 20px 0 12px;
@@ -80,7 +80,7 @@
     overflow: hidden;
     height: calc(100% - 49px);
     position: relative;
-    background-color: var(--surface-main);
+    background-color: var(--stroke-main);
     margin-right: 256px;
 }
 .messages-block.small-block {
@@ -182,7 +182,7 @@
     transition: background-color 200ms ease-in-out;
 }
 .message.content-area:hover::before {
-    background-color: var(--surface-grey-3);
+    background-color: var(--stroke-grey-3);
 }
 .message.small-rounded-avatar {
     display: flex;
@@ -217,8 +217,8 @@
     padding: 19px 22px;
     margin-top: 4px;
     position: relative;
-    background-color: var(--surface-grey-1);
-    border: 1px solid var(--surface-grey-2);
+    background-color: var(--stroke-grey-1);
+    border: 1px solid var(--stroke-grey-2);
 }
 .message.with-border .message.text-block::before {
     content: '';
@@ -403,7 +403,7 @@
     margin: auto;
 }
 .not-sent.message.body:not(.retrying) {
-    background-color: var(--surface-error);
+    background-color: var(--stroke-error);
     padding: 12px 24px 12px 24px;
 }
 .not-sent:not(.retrying) .message.user-card-name, .not-sent:not(.retrying) .message.text-block {
@@ -486,8 +486,8 @@
     margin: 0;
     display: inline-block;
     padding: 0 4px;
-    background-color: var(--surface-grey-1);
-    border: 1px solid var(--surface-grey-2);
+    background-color: var(--stroke-grey-1);
+    border: 1px solid var(--stroke-grey-2);
     border-radius: 3px;
     font: var(--text-code1);
 }
@@ -508,7 +508,7 @@
     margin: 0;
     display: inline;
     padding: 0 4px;
-    background-color: var(--surface-grey-1);
+    background-color: var(--stroke-grey-1);
     border-radius: 3px;
     font: var(--text-code1);
     white-space: normal;
@@ -714,8 +714,8 @@
     margin: -10px 0 0 0;
 }
 .message.richpreview.container {
-    background-color: var(--surface-grey-1);
-    border: 1px solid var(--surface-grey-2);
+    background-color: var(--stroke-grey-1);
+    border: 1px solid var(--stroke-grey-2);
 }
 .message.richpreview.container.confirmation {
     cursor: default;
@@ -802,14 +802,14 @@
     height: 50px;
     width: 402px;
     border-radius: 8px;
-    background-color: var(--surface-grey-1);
-    border: 1px solid var(--surface-grey-2);
+    background-color: var(--stroke-grey-1);
+    border: 1px solid var(--stroke-grey-2);
     position: relative;
     margin-top: 10px;
     margin-bottom: 10px;
 }
 body.theme-dark .message .audio-player {
-    background-color: var(--surface-main);
+    background-color: var(--stroke-main);
 }
 
 .message .audio-player i {
@@ -948,15 +948,15 @@ body.theme-dark .message .audio-player {
     height: 23px;
     border-radius: 11px;
     box-sizing: border-box;
-    background-color: var(--surface-grey-2);
-    border: 1px solid var(--surface-grey-1);
+    background-color: var(--stroke-grey-2);
+    border: 1px solid var(--stroke-grey-1);
     cursor: pointer;
     z-index: 1;
 }
 
 .reactions-bar > div:hover {
-    background-color: var(--surface-grey-1);
-    border-color: var(--surface-grey-2);
+    background-color: var(--stroke-grey-1);
+    border-color: var(--stroke-grey-2);
 }
 
 .reactions-bar > div.reactions-button {
@@ -964,14 +964,14 @@ body.theme-dark .message .audio-player {
     margin-top: 0;
     height: 24px;
     border-radius: 11px;
-    background-color: var(--surface-grey-2);
-    border: 1px solid var(--surface-grey-1);
+    background-color: var(--stroke-grey-2);
+    border: 1px solid var(--stroke-grey-1);
     cursor: pointer;
     z-index: 1;
 }
 .reactions-bar > div.reactions-button:hover {
-    background-color: var(--surface-grey-1);
-    border-color: var(--surface-grey-2);
+    background-color: var(--stroke-grey-1);
+    border-color: var(--stroke-grey-2);
 }
 .reactions-bar > div.reactions-button i {
     --icon-size: 24px;
@@ -1057,8 +1057,8 @@ body.theme-dark .message .audio-player {
 .message .geolocation {
     height: 122px;
     width: 402px;
-    background-color: var(--surface-grey-1);
-    border: 1px solid var(--surface-grey-2);
+    background-color: var(--stroke-grey-1);
+    border: 1px solid var(--stroke-grey-2);
     border-radius: 8px;
     cursor: pointer;
     position: relative;

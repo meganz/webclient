@@ -96,7 +96,7 @@
     margin-bottom: 6px;
 }
 .lp-myfiles .storage-usage-panel .title-block .plan {
-    color: var(--surface-main-inverted);
+    color: var(--stroke-main-inverted);
     font: var(--text-body2);
     line-height: 18px;
     margin-right: 16px;
@@ -138,7 +138,7 @@
     background-position: -6px -350px;
 }
 .storage-usage-panel .storage-txt {
-    color: var(--surface-main-inverted);
+    color: var(--stroke-main-inverted);
 }
 .storage-usage-panel .loader.loading + .storage-txt {
     visibility: hidden;
@@ -157,23 +157,23 @@
 }
 .nw-fm-tree-item.selected {
     border-radius: 4px;
-    background-color: var(--surface-grey-1);
-    color: var(--surface-main-inverted);
+    background-color: var(--stroke-grey-1);
+    color: var(--stroke-main-inverted);
 }
 .nw-fm-tree-item:hover,
 .nw-fm-tree-item.hovered {
-    background-color: var(--surface-grey-1);
+    background-color: var(--stroke-grey-1);
     border-radius: 4px;
     cursor: pointer;
 }
 .nw-fm-tree-item:hover .nw-fm-tree-folder,
 .nw-fm-tree-item.dragover .nw-fm-tree-folder {
-    color: var(--surface-link-inverted);
+    color: var(--stroke-link-inverted);
 }
 .nw-fm-tree-item.selected .nw-fm-tree-folder,
 .nw-fm-tree-item.selected .nw-fm-tree-arrow {
-    color: var(--surface-main-inverted);
-    --mask-color: var(--surface-main-inverted);
+    color: var(--stroke-main-inverted);
+    --mask-color: var(--stroke-main-inverted);
 }
 .nw-fm-tree-item .sprite-fm-mono {
     --mask-color: var(--icon-rest);
@@ -212,7 +212,7 @@
     margin-inline-start: 24px;
 }
 .tree-item-dragger span.sprite-fm-mono {
-    background-color: var(--surface-grey-2);
+    background-color: var(--stroke-grey-2);
 }
 .tree-item-dragger span.item-name {
     line-height: 24px;

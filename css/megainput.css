@@ -72,7 +72,7 @@
     display: none;
 }
 .mega-input input:-webkit-autofill {
-    box-shadow: 0 0 0 50px var(--surface-main) inset;
+    box-shadow: 0 0 0 50px var(--stroke-main) inset;
     -webkit-text-fill-color: var(--text-color-high);
 }
 .mega-input input::placeholder,
@@ -155,7 +155,7 @@
 
 /* Default underlined input style */
 .mega-input::before {
-    border: 1px solid var(--surface-mid-grey);
+    border: 1px solid var(--stroke-mid-grey);
     border-width: 0 0 1px;
     box-sizing: border-box;
     content: "";
@@ -177,7 +177,7 @@
 }
 .mega-input.box-style::before {
     background: var(--surface-grey-1);
-    border-color: var(--surface-grey-2);
+    border-color: var(--stroke-grey-2);
     border-radius: 4px;
     border-width: 1px;
 }
@@ -273,7 +273,7 @@
     opacity: 0.5;
 }
 .mega-input.box-style.disabled::before {
-    border-color: var(--surface-mid-grey);
+    border-color: var(--stroke-mid-grey);
     display: block;
 }
 .mega-input.dropdown-input.disabled > span {

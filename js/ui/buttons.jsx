@@ -23,7 +23,7 @@ export class Button extends MegaRenderMixin {
         }
 
         if (this.state.focused !== nextState.focused && nextState.focused === true) {
-            $('.conversationsApp').rebind('mousedown.button' + this.getUniqueId(), this.onBlur);
+            $('.conversationsApp, .join-meeting').rebind('mousedown.button' + this.getUniqueId(), this.onBlur);
 
             $(document).rebind('keyup.button' + this.getUniqueId(), e => {
                 if (this.state.focused === true && e.keyCode === 27 /* `ESC` */) {

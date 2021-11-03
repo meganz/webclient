@@ -36,18 +36,18 @@ var browserspage = {
         'use strict';
 
         const chromeText = l[20924].replace('%1', 'Chrome<sup>&reg;</sup>');
-        const ffText = l[20924].replace('%1', 'Firefox<sup>&reg;</sup>');
+        // const ffText = l[20924].replace('%1', 'Firefox<sup>&reg;</sup>');
         const edgeText = l[20924].replace('%1', 'Edge<sup>&reg;</sup>');
         const chromeLabel = l[20923].replace('%1', 'Chrome');
-        const ffLabel = l[20923].replace('%1', 'Firefox');
+        // const ffLabel = l[20923].replace('%1', 'Firefox');
         const edgeLabel = l[20923].replace('%1', 'Edge');
 
         $('.bottom-page.top-dark-button.chrome span.label', this.$topContianer).safeHTML(chromeLabel);
-        $('.bottom-page.top-dark-button.ff span.label', this.$topContianer).safeHTML(ffLabel);
+        // $('.bottom-page.top-dark-button.ff span.label', this.$topContianer).safeHTML(ffLabel);
         $('.bottom-page.top-dark-button.edge span.label', this.$topContianer).safeHTML(edgeLabel);
 
         $('.bottom-page.top-copyrights .chrome em', this.$topContianer).safeHTML(chromeText);
-        $('.bottom-page.top-copyrights .ff em', this.$topContianer).safeHTML(ffText);
+        // $('.bottom-page.top-copyrights .ff em', this.$topContianer).safeHTML(ffText);
         $('.bottom-page.top-copyrights .edge em', this.$topContianer).safeHTML(edgeText);
     },
 
@@ -61,16 +61,10 @@ var browserspage = {
         var $browserLinks = $topBlock.find('.top-copyrights .available');
 
         if (browser === 'chrome')  {
-            $('.a1', $browserLinks).text('Firefox');
-            $('.a3', $browserLinks).text('Edge');
-        }
-        else if (browser === 'firefox')  {
-            $('.a1', $browserLinks).text('Chrome');
-            $('.a3', $browserLinks).text('Edge');
+            $('.a1', $browserLinks).text('Edge');
         }
         else if (browser === 'edge')  {
             $('.a1', $browserLinks).text('Chrome');
-            $('.a3', $browserLinks).text('Firefox');
         }
         else {
             browser = 'unsupported';
@@ -78,10 +72,12 @@ var browserspage = {
         }
 
         if (is_ios) {
-            browser = browser + ' ios';
+            // firefox is always passed as argument to this function on mobile
+            browser = 'firefox ios';
         }
         else if (is_android) {
-            browser = browser + ' android';
+            // firefox is always passed as argument to this function on mobile
+            browser = 'firefox android';
         }
 
         $topBlock.removeClass('unsupported edge chrome firefox opera ios android')

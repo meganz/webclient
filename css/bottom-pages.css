@@ -2283,7 +2283,8 @@ body:not(.mobile) .bottom-page.top-dark-button:hover {
 .chrome .bottom-page.top-copyrights .content.chrome, .firefox .bottom-page.top-copyrights .content.ff, .opera .bottom-page.top-copyrights .content.opera, .edge .bottom-page.top-copyrights .content.edge, .unsupported .bottom-page.top-copyrights .unsupported {
     display: block;
 }
-.ios .bottom-page.top-copyrights {
+.ios .bottom-page.top-copyrights,
+.android .bottom-page.top-copyrights {
     padding-top: 0;
 }
 .unsupported .bottom-page.top-copyrights:not(.small-pad) {

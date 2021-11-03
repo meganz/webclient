@@ -1358,6 +1358,11 @@ mBroadcaster.once('boot_done', function populate_l() {
     l.redeem_etoomany = l.redeem_etoomany
         .replace('[A]', `<a class="clickurl" href="/support">`)
         .replace('[/A]', '</a>');
+    l.extensions_top_btn_info = escapeHTML(l.extensions_top_btn_info).replace(/\[R\/]/g, '<sup>&reg;</sup>');
+    l.extensions_avbl_desktop = escapeHTML(l.extensions_avbl_desktop).replace('[A1]', '<a href="" class="red a1">')
+        .replace('[/A1]', '</a>');
+    l.extensions_avbl_mobile = escapeHTML(l.extensions_avbl_mobile).replace(/\[S]/g, '<strong>')
+        .replace(/\[\/S]/g, '</strong>');
 
     var common = [
         15536, 16106, 16107, 16119, 16120, 16123, 16124, 16135, 16136, 16137, 16138, 16304, 16313, 16315, 16316,

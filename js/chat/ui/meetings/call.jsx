@@ -62,7 +62,8 @@ export default class Call extends MegaRenderMixin {
         invite: false,
         end: false,
         ephemeral: false,
-        ephemeralAccounts: []
+        ephemeralAccounts: [],
+        guest: Call.isGuest()
     };
 
     /**
@@ -333,7 +334,7 @@ export default class Call extends MegaRenderMixin {
 
     render() {
         const { minimized, streams, call, chatRoom, parent, sfuApp, onDeleteMessage } = this.props;
-        const { mode, view, sidebar, forcedLocal, invite, end, ephemeral, ephemeralAccounts } = this.state;
+        const { mode, view, sidebar, forcedLocal, invite, end, ephemeral, ephemeralAccounts, guest } = this.state;
         const STREAM_PROPS = {
             mode,
             streams,
@@ -383,6 +384,8 @@ export default class Call extends MegaRenderMixin {
                 {sidebar && (
                     <Sidebar
                         {...STREAM_PROPS}
+                        guest={guest}
+                        onGuestClose={() => this.setState({ guest: false })}
                         onSidebarClose={() => this.setState({ ...Call.STATE.DEFAULT })}
                         onDeleteMessage={onDeleteMessage}
                     />

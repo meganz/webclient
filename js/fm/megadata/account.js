@@ -730,7 +730,7 @@ MegaData.prototype.showOverStorageQuota = function(quota, options) {
             $('.chart.data .pecents-txt', $strgdlg).text(strQuotaLimit[0]);
             $('.chart.data .gb-txt', $strgdlg).text(strQuotaLimit[1]);
             $('.chart.body .perc-txt', $strgdlg).text(quota.percent + '%');
-            $('.chart.data', $strgdlg).removeClass('hidden');
+
         }
         else {
             if ($strgdlg.is(':visible')) {

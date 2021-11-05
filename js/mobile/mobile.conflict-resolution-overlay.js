@@ -106,7 +106,7 @@ mobile.conflictResolutionDialog = {
             mobile.initCheckbox("repeat-action-container");
         }
 
-        loadingDialog.hide();
+        loadingDialog.phide();
         this.show();
 
         return promise;

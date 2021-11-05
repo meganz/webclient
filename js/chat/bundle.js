@@ -21228,35 +21228,7 @@ class collapse_Collapse extends mixins["MegaRenderMixin"] {
   }
 
 }
-// CONCATENATED MODULE: ./js/chat/ui/meetings/guest.jsx
-
-
-
-class guest_Guest extends mixins["MegaRenderMixin"] {
-  constructor(props) {
-    super(props);
-  }
-
-  render() {
-    return external_React_default.a.createElement("div", {
-      className: "guest-register"
-    }, external_React_default.a.createElement("div", {
-      className: "guest-register-content"
-    }, external_React_default.a.createElement(meetings_button["a" ], {
-      className: "close-guest-register",
-      icon: "icon-close-component",
-      onClick: this.props.onGuestClose
-    }, external_React_default.a.createElement("span", null, l[148])), external_React_default.a.createElement("div", null, external_React_default.a.createElement("i", {
-      className: "sprite-fm-illustration-wide registration"
-    }), l.meetings_signup), external_React_default.a.createElement(meetings_button["a" ], {
-      className: "mega-button positive register-button",
-      onClick: () => loadSubPage('register')
-    }, l[968])));
-  }
-
-}
 // CONCATENATED MODULE: ./js/chat/ui/meetings/participants.jsx
-
 
 
 
@@ -21323,16 +21295,14 @@ class participants_Participant extends mixins["MegaRenderMixin"] {
 class participants_Participants extends mixins["MegaRenderMixin"] {
   constructor(props) {
     super(props);
-    this.participantsListRef = null;
   }
 
   render() {
     const {
       streams,
       call,
-      chatRoom,
       guest,
-      onGuestClose
+      chatRoom
     } = this.props;
     return external_React_default.a.createElement("div", {
       className: "participants"
@@ -21344,9 +21314,6 @@ class participants_Participants extends mixins["MegaRenderMixin"] {
     }, external_React_default.a.createElement(perfectScrollbar["PerfectScrollbar"], {
       options: {
         'suppressScrollX': true
-      },
-      ref: ref => {
-        this.participantsListRef = ref;
       }
     }, external_React_default.a.createElement("ul", null, external_React_default.a.createElement("li", null, external_React_default.a.createElement(participants_Participant, {
       call: call,
@@ -21360,9 +21327,34 @@ class participants_Participants extends mixins["MegaRenderMixin"] {
       stream: stream,
       handle: stream.userHandle,
       name: stream.name
-    }))))))), guest && external_React_default.a.createElement(guest_Guest, {
-      onGuestClose: () => onGuestClose(this.participantsListRef)
-    }));
+    }))))))));
+  }
+
+}
+// CONCATENATED MODULE: ./js/chat/ui/meetings/guest.jsx
+
+
+
+class guest_Guest extends mixins["MegaRenderMixin"] {
+  constructor(props) {
+    super(props);
+  }
+
+  render() {
+    return external_React_default.a.createElement("div", {
+      className: "guest-register"
+    }, external_React_default.a.createElement("div", {
+      className: "guest-register-content"
+    }, external_React_default.a.createElement(meetings_button["a" ], {
+      className: "close-guest-register",
+      icon: "icon-close-component",
+      onClick: this.props.onGuestClose
+    }, external_React_default.a.createElement("span", null, l[148])), external_React_default.a.createElement("div", null, external_React_default.a.createElement("i", {
+      className: "sprite-fm-illustration-wide registration"
+    }), l.meetings_signup), external_React_default.a.createElement(meetings_button["a" ], {
+      className: "mega-button positive register-button",
+      onClick: () => loadSubPage('register')
+    }, l[968])));
   }
 
 }
@@ -21383,9 +21375,6 @@ class sidebar_Sidebar extends mixins["MegaRenderMixin"] {
   constructor(props) {
     super(props);
     this.historyPanel = null;
-    this.state = {
-      guest: false
-    };
 
     this.renderHead = () => {
       const {
@@ -21417,13 +21406,11 @@ class sidebar_Sidebar extends mixins["MegaRenderMixin"] {
         mode,
         call,
         streams,
+        guest,
         chatRoom,
         forcedLocal,
         onSpeakerChange
       } = this.props;
-      const {
-        guest
-      } = this.state;
       const localStream = call.getLocalStream();
       return external_React_default.a.createElement("div", {
         className: "\n                    sidebar-streams-container\n                    " + (guest ? 'guest' : '') + "\n                "
@@ -21454,11 +21441,7 @@ class sidebar_Sidebar extends mixins["MegaRenderMixin"] {
           className: stream.isActive || stream.clientId === call.forcedActiveStream ? 'active' : '',
           onClick: onSpeakerChange
         });
-      })))), guest && external_React_default.a.createElement(guest_Guest, {
-        onGuestClose: () => this.setState({
-          guest: false
-        })
-      }));
+      })))));
     };
 
     this.renderChatView = () => {
@@ -21483,30 +21466,30 @@ class sidebar_Sidebar extends mixins["MegaRenderMixin"] {
       const {
         call,
         streams,
+        guest,
         chatRoom
       } = this.props;
       return external_React_default.a.createElement(participants_Participants, {
         streams: streams,
         call: call,
         chatRoom: chatRoom,
-        guest: this.state.guest,
-        onGuestClose: participantsListRef => this.setState({
-          guest: false
-        }, () => participantsListRef.reinitialise())
+        guest: guest
       });
     };
-
-    this.state.guest = call_Call.isGuest();
   }
 
   render() {
     const {
       mode,
-      view
+      view,
+      guest,
+      onGuestClose
     } = this.props;
     return external_React_default.a.createElement("div", {
       className: "\n                    sidebar\n                    " + (view === call_Call.VIEW.CHAT ? 'chat-opened' : 'theme-dark-forced') + "\n                "
-    }, this.renderHead(), view === call_Call.VIEW.PARTICIPANTS && mode === call_Call.MODE.SPEAKER && this.renderSpeakerMode(), view === call_Call.VIEW.CHAT && this.renderChatView(), view === call_Call.VIEW.PARTICIPANTS && mode === call_Call.MODE.THUMBNAIL && this.renderParticipantsView());
+    }, this.renderHead(), view === call_Call.VIEW.PARTICIPANTS && mode === call_Call.MODE.SPEAKER && this.renderSpeakerMode(), view === call_Call.VIEW.CHAT && this.renderChatView(), view === call_Call.VIEW.PARTICIPANTS && mode === call_Call.MODE.THUMBNAIL && this.renderParticipantsView(), guest && view !== call_Call.VIEW.CHAT && external_React_default.a.createElement(guest_Guest, {
+      onGuestClose: onGuestClose
+    }));
   }
 
 }
@@ -22010,7 +21993,8 @@ class call_Call extends mixins["MegaRenderMixin"] {
       invite: false,
       end: false,
       ephemeral: false,
-      ephemeralAccounts: []
+      ephemeralAccounts: [],
+      guest: call_Call.isGuest()
     };
 
     this.customIsEventuallyVisible = () => true;
@@ -22195,7 +22179,8 @@ class call_Call extends mixins["MegaRenderMixin"] {
       invite,
       end,
       ephemeral,
-      ephemeralAccounts
+      ephemeralAccounts,
+      guest
     } = this.state;
     const STREAM_PROPS = {
       mode,
@@ -22229,6 +22214,10 @@ class call_Call extends mixins["MegaRenderMixin"] {
       onHoldClick: this.handleHoldToggle,
       onThumbnailDoubleClick: streamNode => this.handleSpeakerChange(streamNode)
     })), sidebar && external_React_default.a.createElement(sidebar_Sidebar, extends_default()({}, STREAM_PROPS, {
+      guest: guest,
+      onGuestClose: () => this.setState({
+        guest: false
+      }),
       onSidebarClose: () => this.setState({ ...call_Call.STATE.DEFAULT
       }),
       onDeleteMessage: onDeleteMessage

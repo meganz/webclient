@@ -6432,6 +6432,12 @@ body.de .mega-dialog.new-group-chat {
         font: var(--text-body1);
         padding: 0 0 12px 0;
     }
+    .mega-dialog.storage-dialog .body-header {
+        font: var(--text-h3);
+        color: var(--text-color-medium);
+        max-width: 420px;
+        margin: 0 auto;
+    }
     .mega-dialog.storage-dialog .odq-warning .body-p {
         font-family: var(--text-font-family-semibold);
         color: var(--text-color-high);

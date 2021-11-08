@@ -189,7 +189,7 @@ html .theme-light-forced {
         --stroke-warning: #ff9924;
         --stroke-error: #fd3e38;
         --stroke-scrim: rgba(255, 255, 255, 0.32);
-        --stroke-overlay-backgroud: rgba(204, 204, 204, 0.9);
+        --stroke-overlay-background: rgba(204, 204, 204, 0.9);
 
     /* icons */
 
@@ -404,7 +404,7 @@ html .theme-dark-forced {
         --stroke-warning: #fec35a;
         --stroke-error: #ff7e79;
         --stroke-scrim: rgba(0, 0, 0, 0.32);
-        --stroke-overlay-backgroud: rgba(0, 0, 0, 0.8);
+        --stroke-overlay-background: rgba(0, 0, 0, 0.8);
 
     /* icons */
 

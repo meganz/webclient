@@ -701,8 +701,10 @@ MegaData.prototype.showOverStorageQuota = function(quota, options) {
                 $('.fm-main').addClass('fm-notification almost-full');
             }
             $strgdlg.addClass('almost-full');
-            $('header h2', $strgdlgBodyAFull).text(myOptions.title || l[16311]);
-            $('.body-header', $strgdlgBodyAFull).safeHTML(myOptions.body || l[16312]);
+            $('header h2.almost-full', $strgdlg).text(myOptions.title || l[16312]);
+            if (myOptions.body) {
+                $('.body-header', $strgdlgBodyAFull).safeHTML(myOptions.body);
+            }
 
             // Storage chart and info
             var strQuotaLimit = bytesToSize(quota.mstrg, 0).split(' ');

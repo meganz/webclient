@@ -1720,18 +1720,33 @@ FileManager.prototype.initContextUI = function() {
     });
 
     $(c + '.clearprevious-versions').rebind('click', function() {
+
         if (M.isInvalidUserStatus()) {
             return;
         }
-        if ($.selected && $.selected[0]) {
-            var fh = $.selected[0];
-            msgDialog('remove', l[1003], l[17154], l[1007], function(e) {
+
+        if ($.selected && $.selected.length > 0) {
+
+            const fvNode = [];
+
+            for (let i = $.selected.length; i--;) {
+
+                const selected = M.getNodeByHandle($.selected[i]);
+
+                if (!selected.t && selected.tvf) {
+                    fvNode.push($.selected[i]);
+                }
+            }
+
+            msgDialog('remove', l[1003], mega.icu.format(l[17154], fvNode.length), l[1007], (e) => {
+
                 if (e) {
-                    fileversioning.clearPreviousVersions(fh);
+                    for (let i = fvNode.length; i--;) {
+                        fileversioning.clearPreviousVersions(fvNode[i]);
+                    }
                 }
             });
         }
-
     });
 
     $(c + '.findupes-item').rebind('click', M.findDupes);

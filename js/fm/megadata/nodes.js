@@ -2405,7 +2405,14 @@ MegaData.prototype.isFavourite = function(nodesId) {
  * @param {Number} versionsNumber  Number of previous versions.
  */
 MegaData.prototype.versioningDomUpdate = function(fh) {
+
     var $nodeView = $('#' + fh);
+
+    // For cached node but not rendered on dom, using cached selector will update missing dom node as well
+    if (M.megaRender && M.megaRender.nodeMap[fh]) {
+        $nodeView = $(M.megaRender.nodeMap[fh]);
+    }
+
     var $versionsCol = $nodeView.find('td[megatype="versions"]');
 
     if (M.d[fh] && M.d[fh].tvf) {// Add versioning

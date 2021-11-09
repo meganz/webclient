@@ -238,14 +238,9 @@ export default class Local extends AbstractGenericMessage {
         // contrary to many of the other message types, for this specific message type (`Text`) we need timestamps
         // rendered irrespective of the grouping.
         //
-        // `Text` timestamp w/o grouping
-        // https://mega.nz/file/lM1hDKqZ#iJOhEi3uLhuIcUvzxM5CMggy2KgzqoLvpWQ0ZA0Xp9U
-        //
-        // `Text` timestamp w/o grouping, group calls
-        // https://mega.nz/file/JR8TDIaQ#47XxaTBlfTcmrByNQliWomkM-IRQUMJIpqogzFjQmKg
-        //
-        // Timestamp w/ grouping, e.g. three separate messages
-        // https://mega.nz/file/RIkX2YjZ#aAtDzJCR1ZZYRGTpPwnL3iBS9SyG9WhPlTEpB5dVv7g
+        // - `Text` timestamp w/o grouping
+        // - `Text` timestamp w/o grouping, group calls
+        // - Timestamp w/ grouping, e.g. three separate messages
         // -------------------------------------------------------------------------
 
         // debugging purposes

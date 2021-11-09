@@ -350,13 +350,6 @@ export default class Call extends MegaRenderMixin {
 
         //
         // `Call`
-        // https://mega.nz/file/8UUTQIQT#6WSKPYSkyH9efaZi1WNZocf3GFn0nJpIIat6F1n_7ck
-        // https://mega.nz/file/5BVFHaxR#iekG3QCDL7wzGXySrObToLVX8PcjgD1jsQVeA_AHBAE
-        // https://mega.nz/file/8UUTQIQT#6WSKPYSkyH9efaZi1WNZocf3GFn0nJpIIat6F1n_7ck
-        // https://mega.nz/file/YcE3wIIC#JxpJWWw3NK6zxnzwUdBbQNEws6RyT8YNCqDaFIYAUvE
-        //
-        // Component hierarchy
-        // [...] add component hierarchy model
         // -------------------------------------------------------------------------
 
         return (

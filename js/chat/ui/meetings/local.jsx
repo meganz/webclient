@@ -62,7 +62,6 @@ export default class Local extends MegaRenderMixin {
 
         //
         // `Local`
-        // https://mega.nz/file/kQF0XTRb#LbmJE578Rbt60U7zzd5L-_ARyBloeuiXO1-hjJrcVQE
         // -------------------------------------------------------------------------
 
         const STREAM_PROPS = {

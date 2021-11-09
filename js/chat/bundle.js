@@ -26816,7 +26816,7 @@ class ChatRouting {
     const method = page === 'chat' || page === 'fm/chat' || page === location || event && event.type === 'popstate' ? 'replaceState' : 'pushState';
     M.currentdirid = String(page = location).replace('fm/', '');
 
-    if (location.substr(0, 13) === "chat/contacts") {
+    if (location.substr(0, 13) === "chat/contacts" || location.substr(0, 13) === "chat/archived") {
       location = "fm/" + location;
     }
 

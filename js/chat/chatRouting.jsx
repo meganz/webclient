@@ -95,7 +95,7 @@ export default class ChatRouting {
         || event && event.type === 'popstate' ? 'replaceState' : 'pushState';
 
         M.currentdirid = String(page = location).replace('fm/', '');
-        if (location.substr(0, 13) === "chat/contacts") {
+        if (location.substr(0, 13) === "chat/contacts" || location.substr(0, 13) === "chat/archived") {
             // ensure that chat/contacts is always opened with fm/ prefix
             location = "fm/" + location;
         }

@@ -241,14 +241,12 @@ export default class Stream extends MegaRenderMixin {
 
         //
         //  `Thumbnail Mode`
-        // https://mega.nz/file/sdMjRS4D#ei6rt9RmEEBFJSYudcCvZWTxn2MzMGMJPsugSwspoWI
         // -------------------------------------------------------------------------
 
         if (mode === Call.MODE.THUMBNAIL) {
 
             //
             // Default, i.e. streams aligned within single page grid.
-            // https://mega.nz/file/sdMjRS4D#ei6rt9RmEEBFJSYudcCvZWTxn2MzMGMJPsugSwspoWI
             // ------------------------------------------------------
 
             if (streams.length <= MAX_STREAMS_PER_PAGE) {
@@ -288,7 +286,6 @@ export default class Stream extends MegaRenderMixin {
 
             //
             // Carousel behavior with variable amount of pages, incl. previous/next behavior.
-            // https://mega.nz/file/ZccxDKKK#1f6tqe7yg3Pad-i8uMfsbqDVZMnnWijktSxvYRVOKsU
             // ------------------------------------------------------------------------------
 
             const { page } = this.state;
@@ -354,7 +351,6 @@ export default class Stream extends MegaRenderMixin {
 
         //
         //  `Speaker Mode`
-        // https://mega.nz/file/5BVFHaxR#iekG3QCDL7wzGXySrObToLVX8PcjgD1jsQVeA_AHBAE
         // -------------------------------------------------------------------------
 
         const activeStream = call.getActiveStream();

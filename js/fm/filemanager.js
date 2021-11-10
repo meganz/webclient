@@ -4077,7 +4077,7 @@ FileManager.prototype.onSectionUIOpen = function(id) {
         $('.shared-grid-view').addClass('hidden');
     }
 
-    if (id !== 'out-shares') {
+    if (M.currentdirid !== 'out-shares') {
         $('.out-shared-blocks-view').addClass('hidden');
         $('.out-shared-grid-view').addClass('hidden');
     }

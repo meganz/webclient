@@ -3153,7 +3153,7 @@
         border-right: 1px solid #eee;
     }
     #help2-main .block:nth-child(4), #help2-main .block:nth-child(5), #help2-main .block:nth-child(6) {
-        border-bottom: none;
+        border-bottom: 1px solid #eee;
     }
 
     #help2-main .block.link div {
@@ -3758,7 +3758,8 @@
         margin-right: 0;
     }
 }
-@media only screen and (min-device-width: 320px) and (max-device-width: 375px){
+
+@media only screen and (min-width: 320px) and (max-width: 375px) {
     body {
         min-width: 320px;
         margin: 0;

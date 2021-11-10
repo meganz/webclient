@@ -514,7 +514,7 @@ def reduce_validator(file_line_mapping, **extra):
     """
 
     exclude = ['vendor', 'asm', 'sjcl', 'dont-deploy', 'secureboot', 'test']
-    special_chars_exclude = ['secureboot', 'test', 'emoji', 'dont-deploy', 'pdf.worker']
+    special_chars_exclude = ['secureboot', 'test', 'emoji', 'dont-deploy', 'pdf.worker', 'images']
     logging.info('Analyzing modified files ...')
     result = ['\nValidator output:\n=================']
     warning = 'This is a security product. Do not add unverifiable code to the repository!'

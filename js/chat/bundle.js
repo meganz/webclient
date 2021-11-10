@@ -23362,6 +23362,7 @@ let conversationpanel_ConversationPanel = (conversationpanel_dec = utils["defaul
 
     self.props.chatRoom._uiIsMounted = true;
     self.props.chatRoom.$rConversationPanel = self;
+    self.props.chatRoom.trigger('onComponentDidMount');
   }
 
   eventuallyInit() {

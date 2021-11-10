@@ -514,7 +514,7 @@ def reduce_validator(file_line_mapping, **extra):
     """
 
     exclude = ['vendor', 'asm', 'sjcl', 'dont-deploy', 'secureboot', 'test']
-    special_chars_exclude = ['secureboot', 'test', 'emoji', 'dont-deploy', 'pdf.worker', 'images']
+    special_chars_exclude = ['secureboot', 'test', 'emoji', 'dont-deploy', 'pdf.worker', 'images' + os.path.sep]
     logging.info('Analyzing modified files ...')
     result = ['\nValidator output:\n=================']
     warning = 'This is a security product. Do not add unverifiable code to the repository!'
@@ -548,7 +548,7 @@ def reduce_validator(file_line_mapping, **extra):
                           .format(file_path, warning))
             # continue
 
-        if os.path.getsize(file_path) > 150000 and not file_extension in ['.css', '.html']:
+        if os.path.getsize(file_path) > 190000 and not file_extension in ['.css', '.html']:
             result.append('The file "{}" has turned too big, '
                           'any new functions must be moved elsewhere.'.format(file_path))
             # continue

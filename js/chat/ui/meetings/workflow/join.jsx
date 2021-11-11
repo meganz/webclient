@@ -1,9 +1,11 @@
 import React from 'react';
 import { MegaRenderMixin } from '../../../../stores/mixins';
+import ModalDialogsUI from '../../../../ui/modalDialogs.jsx';
 import utils from '../../../../ui/utils.jsx';
 import Button from '../button.jsx';
 import Preview from './preview.jsx';
 import HistoryPanel from "../../historyPanel.jsx";
+import MeetingsCallEndedDialog from '../meetingsCallEndedDialog.jsx';
 
 export default class Join extends MegaRenderMixin {
     static NAMESPACE = 'join-meeting';
@@ -12,7 +14,6 @@ export default class Join extends MegaRenderMixin {
         INITIAL: 0,
         GUEST: 1,
         ACCOUNT: 2,
-        LOGIN: 3,
         UNSUPPORTED: 4
     };
 
@@ -22,12 +23,16 @@ export default class Join extends MegaRenderMixin {
         firstName: '',
         lastName: '',
         previewAudio: false,
-        previewVideo: false
+        previewVideo: false,
+        ephemeralDialog: false
     };
 
     constructor(props) {
         super(props);
-        this.state.view = props.initialView || this.state.view;
+        this.state.view = sessionStorage.guestForced ? Join.VIEW.GUEST : props.initialView || this.state.view;
+        if (localStorage.awaitingConfirmationAccount) {
+            this.showConfirmationDialog();
+        }
     }
 
     handleKeyDown = ({ key }) => {
@@ -50,6 +55,43 @@ export default class Join extends MegaRenderMixin {
             .map(el => el && el.classList.add('hidden'));
     };
 
+    showConfirmationDialog = () => {
+        megaChat.destroy();
+        return mega.ui.sendSignupLinkDialog(JSON.parse(localStorage.awaitingConfirmationAccount), () => {
+            delete localStorage.awaitingConfirmationAccount;
+            u_logout(true);
+            location.reload();
+        });
+    };
+
+    Ephemeral = () => {
+        const onCancel = () => this.setState({ ephemeralDialog: false });
+        const onConfirm = () => {
+            u_logout(true);
+            sessionStorage.guestForced = true;
+            location.reload();
+        };
+
+        return (
+            <ModalDialogsUI.ModalDialog
+                name="end-ephemeral"
+                dialogType="message"
+                icon="sprite-fm-uni icon-warning"
+                title="Join as guest and end your ephemeral session?"
+                noCloseOnClickOutside={true}
+                buttons={[
+                    { key: 'cancel', label: 'Cancel', onClick: onCancel },
+                    { key: 'continue', label: 'Continue', className: 'positive', onClick: onConfirm }
+                ]}
+                onClose={onCancel}>
+                <p>
+                    The data you are storing will be lost if you join the meeting as a guest.
+                    To preserve your files, <a href="#" onClick={() => loadSubPage('register')}>Create an account</a>.
+                </p>
+            </ModalDialogsUI.ModalDialog>
+        );
+    };
+
     Head = () => {
         return (
             <div className={`${Join.NAMESPACE}-head`}>
@@ -62,13 +104,68 @@ export default class Join extends MegaRenderMixin {
                     />
                 </div>
                 <h1>{l.you_have_invitation.replace('%1', this.props.chatRoom?.topic)}</h1>
+                {isEphemeral() && (
+                    <div className="ephemeral-info">
+                        <i className="sprite-fm-uni icon-warning" />
+                        <p>
+                            You are using an ephemeral session. The data you are storing will be lost if you join
+                            the meeting as a guest.
+                        </p>
+                    </div>
+                )}
             </div>
         );
     };
 
-    Intro = () =>
-        <>
-            <div className={`${Join.NAMESPACE}-content`}>
+    Intro = () => {
+        const $$CONTAINER = ({ children }) =>
+            <>
+                <div className={`${Join.NAMESPACE}-content`}>{children}</div>
+                {this.Chat()}
+            </>;
+
+        //
+        // Ephemeral session, w/ `Join as guest` and `Create account` controls
+        // https://mega.nz/file/4EMzXaQY#g2HGbYKVj_nNk2HL8rwDfZ5gEZcePBSXP6yIn1sde04
+        // -------------------------------------------------------------------------
+
+        if (isEphemeral()) {
+            return (
+                <$$CONTAINER>
+                    <Button
+                        className="mega-button positive"
+                        onClick={() => this.setState({ ephemeralDialog: true })}>
+                        {l.join_as_guest /* `Join as guest` */}
+                    </Button>
+                    <Button
+                        className="mega-button"
+                        onClick={() => loadSubPage('register')}>
+                        {l[5582] /* `Create account` */}
+                    </Button>
+                    <span>
+                        {l[5585] /* `Already have an account?` */}
+                        <a
+                            href="#"
+                            onClick={ev => {
+                                ev.preventDefault();
+                                mega.ui.showLoginRequiredDialog({ minUserType: 3, skipInitialDialog: 1 })
+                                    .done(() => this.setState({ view: Join.VIEW.ACCOUNT }));
+                            }}>
+                            Login
+                        </a>
+                    </span>
+                </$$CONTAINER>
+            );
+        }
+
+
+        //
+        // Default state for guests, w/ `Join as guest`, `Login` and `Create account` controls
+        // https://mega.nz/file/QB9GiCLS#dRZxfZde231SHp_JHgyoN6kKIEbyzqWSSnkwOin_Fpc
+        // -------------------------------------------------------------------------
+
+        return (
+            <$$CONTAINER>
                 <Button
                     className="mega-button positive"
                     onClick={() => this.setState({ view: Join.VIEW.GUEST })}>
@@ -89,7 +186,7 @@ export default class Join extends MegaRenderMixin {
                 </Button>
                 <p>
                     <span
-                        dangerouslySetInnerHTML={{ __html: l[20635] }}
+                        dangerouslySetInnerHTML={{ __html: l[20635] /* `Don't have an account? Create one now` */ }}
                         onClick={e => {
                             e.preventDefault();
                             megaChat.loginOrRegisterBeforeJoining(
@@ -102,9 +199,9 @@ export default class Join extends MegaRenderMixin {
                         }}
                     />
                 </p>
-            </div>
-            {this.Chat()}
-        </>;
+            </$$CONTAINER>
+        );
+    };
 
     Chat = () => {
         const { chatRoom } = this.props;
@@ -227,11 +324,6 @@ export default class Join extends MegaRenderMixin {
             </Button>
         </this.Card>;
 
-    Login = () =>
-        <div>
-            <h1>LOGIN DIALOG</h1>
-        </div>;
-
     Unsupported = () =>
         <div className="unsupported-container">
             <i className="sprite-fm-uni icon-error" />
@@ -253,8 +345,6 @@ export default class Join extends MegaRenderMixin {
                 return this.Guest();
             case Join.VIEW.ACCOUNT:
                 return this.Account();
-            case Join.VIEW.LOGIN:
-                return this.Login();
             case Join.VIEW.UNSUPPORTED:
                 return this.Unsupported();
         }
@@ -265,8 +355,11 @@ export default class Join extends MegaRenderMixin {
         document.addEventListener('keydown', this.handleKeyDown);
         this.hidePanels();
         megaChat._joinDialogIsShown = true;
-
         alarm.hideAllWarningPopups();
+        if ($.dialog === MeetingsCallEndedDialog.dialogName) {
+            closeDialog();
+        }
+        sessionStorage.removeItem('guestForced');
     }
 
     componentWillUnmount() {
@@ -280,15 +373,13 @@ export default class Join extends MegaRenderMixin {
     }
 
     render() {
-        if (!this.props.chatRoom) {
-            return null;
-        }
-
+        const { view, ephemeralDialog } = this.state;
         return (
             <utils.RenderTo element={document.body}>
                 <div className={Join.NAMESPACE}>
                     {this.Head()}
-                    {this.View(this.state.view)}
+                    {this.View(view)}
+                    {ephemeralDialog && <this.Ephemeral />}
                 </div>
             </utils.RenderTo>
         );

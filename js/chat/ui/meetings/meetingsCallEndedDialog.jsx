@@ -3,16 +3,19 @@ import ModalDialogsUI from '../../../ui/modalDialogs.jsx';
 import { MegaRenderMixin } from '../../../stores/mixins';
 
 export default class MeetingsCallEndedDialog extends MegaRenderMixin {
+    static dialogName = 'meetings-ended-dialog'
+
     constructor(props) {
         super(props);
         this.state = {
             'safeShowDialogRendered': false
         };
     }
+
     componentDidMount() {
         super.componentDidMount();
 
-        M.safeShowDialog('meetings-ended', () => {
+        M.safeShowDialog(MeetingsCallEndedDialog.dialogName, () => {
             this.setState({'safeShowDialogRendered': true});
             return this.findDOMNode();
         });
@@ -21,7 +24,7 @@ export default class MeetingsCallEndedDialog extends MegaRenderMixin {
     componentWillUnmount() {
         super.componentWillUnmount();
 
-        if ($.dialog === "meetings-ended") {
+        if ($.dialog === MeetingsCallEndedDialog.dialogName) {
             closeDialog();
         }
     }

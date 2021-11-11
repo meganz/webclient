@@ -779,6 +779,9 @@ export class ConversationPanel extends MegaRenderMixin {
                 });
             }, rand_range(5, 10) * 1000);
         }
+        if (is_chatlink && self.props.chatRoom.isMeeting && u_type !== false && u_type < 3) {
+            eventlog(99747, JSON.stringify([1, u_type | 0]), true);
+        }
         self.props.chatRoom._uiIsMounted = true;
         self.props.chatRoom.$rConversationPanel = self;
         self.props.chatRoom.trigger('onComponentDidMount');
@@ -1751,14 +1754,15 @@ export class ConversationPanel extends MegaRenderMixin {
                                             room.publicChatHandle,
                                             room.publicChatKey
                                         ).then(
-                                            () => {
-                                                delete megaChat.initialPubChatHandle;
-                                            },
-                                            (ex) => {
-                                                console.error("Failed to join room:", ex);
-                                            }
+                                            () => delete megaChat.initialPubChatHandle,
+                                            ex => console.error("Failed to join room:", ex)
                                         );
                                     };
+
+                                    if (u_type === 0) {
+                                        return loadSubPage('register');
+                                    }
+
                                     if (u_type === false) {
                                         clearTimeout(self.state.setNonLoggedInJoinChatDlgTrue);
                                         megaChat.loginOrRegisterBeforeJoining(
@@ -1768,13 +1772,13 @@ export class ConversationPanel extends MegaRenderMixin {
                                             false,
                                             join
                                         );
+                                        return;
                                     }
-                                    else {
-                                        clearTimeout(self.state.setNonLoggedInJoinChatDlgTrue);
-                                        join();
-                                    }
+
+                                    clearTimeout(self.state.setNonLoggedInJoinChatDlgTrue);
+                                    join();
                                 }}>
-                                {l[20597]}
+                                {l[20597] /* `Join Group` */}
                             </div>
                         </div>
                         ) :

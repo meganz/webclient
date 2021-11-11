@@ -1444,6 +1444,9 @@ mBroadcaster.once('boot_done', function populate_l() {
     l.extensions_avbl_desktop = escapeHTML(l.extensions_avbl_desktop).replace('[A1]', '<a href="" class="red a1"></a>');
     l.extensions_avbl_mobile = escapeHTML(l.extensions_avbl_mobile).replace(/\[S]/g, '<strong>')
         .replace(/\[\/S]/g, '</strong>');
+    l.cookie_banner_txt = escapeHTML(l.cookie_banner_txt)
+        .replace('[A]', '<a href="/cookie" class="clickurl" target="_blank">')
+        .replace('[/A]', '</a>');
 
     l.about_vision_desc = escapeHTML(l.about_vision_desc)
         .replace(/\[S]/g, '<span>')

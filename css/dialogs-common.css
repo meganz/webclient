@@ -1,6 +1,135 @@
 /**
- * Dialogs CSS for mobile and desktop devices.
+ * Dialogs, low visual impact dialogs (banners) CSS for mobile and desktop devices.
  */
+
+/* Banner template */
+
+.mega-banner-container {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+.mega-banner-template {
+    --border-radius: 24px;
+    --mask-color: var(--text-color-high);
+    background: var(--surface-main);
+    bottom: 0;
+    box-shadow: 0 4px 16px 0 rgb(0 0 0 / 0.1);
+    box-sizing: border-box;
+    color: var(--text-color-medium);
+    display: flex;
+    flex-direction: column;
+    font: var(--text-body1);
+    position: fixed;
+    width: 100%;
+    z-index: 1090;
+}
+
+.mega-banner-template.hidden {
+    display: none;
+}
+
+/* close button */
+.mega-banner-template button.close {
+    align-items: center;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    outline: none;
+    padding: 0;
+    position: absolute;
+    right: 16px;
+    top: 16px;
+    z-index: 2010;
+}
+
+.rtl .mega-banner-template button.close {
+    left: 16px;
+    right: initial;
+}
+
+.mega-banner-template button.close i {
+    --icon-size: 24px;
+    margin: 0;
+    opacity: 0.6;
+    transition: opacity 200ms ease-in-out;
+}
+
+@media (hover: hover) {
+    .mega-banner-template button.close i:hover {
+        opacity: 0.8;
+    }
+}
+
+.mega-banner-template > .content {
+    align-items: center;
+    display: flex;
+    padding: 24px 80px;
+}
+
+.mega-banner-template .graphic {
+    --width: 74px;
+    height: 74px;
+    flex: 0 0 auto;
+    margin: 0 2px;
+    -webkit-margin-end: 20px;
+    margin-inline-end: 20px;
+    width: 74px;
+}
+
+.mega-banner-template header {
+    align-items: center;
+    display: flex;
+    flex: 1 1 auto;
+}
+
+.mega-banner-template header h3 {
+    color: var(--text-color-high);
+    font: var(--text-body1-bold);
+    margin: 0 0 8px;
+    padding: 0;
+}
+
+.mega-banner-template header p {
+    font: var(--text-body1);
+    color: var(--text-color-medium);
+    padding: 0;
+    margin: 0;
+}
+
+.mega-banner-template header p a,
+.mega-banner-template header p a:visited {
+    color: var(--text-color-medium);
+    text-decoration: underline;
+}
+
+@media (hover: hover) {
+    .mega-banner-template header p a:hover {
+        text-decoration: none;
+    }
+}
+
+.mega-banner-template header .info {
+    flex: 1 1 auto;
+}
+
+.mega-banner-template .buttons {
+    display: flex;
+    flex: 0 0  auto;
+    -webkit-margin-start: 60px;
+    margin-inline-start: 60px;
+}
+
+.mega-banner-template .buttons button ~ button {
+    -webkit-margin-start: 16px;
+    margin-inline-start: 16px;
+}
+
+/* Dialogs */
 
 .mega-dialog-container.common-container {
     z-index: 1300;
@@ -36,14 +165,14 @@
     text-overflow: ellipsis;
 }
 .fm-dialog-title.small {
-    font-family: 'LatoWeb', 'source_sans_proregular';
+    font-family: var(--text-font-family);
     font-size: 16px;
     line-height: 25px;
     letter-spacing: -0.18px;
     color: #666666;
 }
 .fm-dialog-title.medium {
-    font-family: 'LatoWeb', 'source_sans_proregular';
+    font-family: var(--text-font-family);
     font-size: 18px;
     color: #333;
     padding-top: 23px;
@@ -63,7 +192,68 @@
     font-size: 16px;
 }
 
+/* Low resolution displays */
+
+@media only screen and (max-width: 860px) {
+
+    /* Cookie banner */
+
+    .mega-banner-template > .content {
+        padding: 24px 48px;
+    }
+
+    .mega-banner-template .buttons {
+        -webkit-margin-start: 24px;
+        margin-inline-start: 24px;
+    }
+}
+
+@media only screen and (max-width: 720px) {
+
+    /* Cookie banner */
+
+    .mega-banner-template > .content {
+        display: block;
+        padding: 24px;
+    }
+
+    .mega-banner-template .buttons {
+        justify-content: space-between;
+        margin: 15px 0 0;
+    }
+
+    .mega-banner-template .buttons button {
+        width: calc(50% - 6px);
+    }
+}
+
 /* Mobile only */
+
+/* Banner template */
+
+.mobile .mega-banner-template {
+    border-radius: 4px;
+    bottom: 10px;
+    box-shadow: 1px 1px 5px 0 rgb(147 147 147 / 0.5);
+    left: 10px;
+    width: calc(100% - 20px);
+    z-index: 190;
+}
+
+.mobile .mega-banner-template button.close i {
+    --icon-size: 20px;
+}
+
+.mobile .mega-banner-template header h3 {
+    font-size: 13px;
+}
+
+.mobile .mega-banner-template header p {
+    font: var(--text-body2);
+}
+
+/* Mobile dialogs */
+
 .mobile .mega-dialog-container .mega-dialog {
     max-height: calc(100% - 30px);
     width: calc(100% - 30px);
@@ -126,7 +316,7 @@
     cursor: default;
 }
 .verify-email.content-block .text.red .dropdown.body::after {
-    content: '';
+    content: "";
     bottom: -10px;
     left: 0;
     height: 34px;
@@ -307,8 +497,8 @@ h3.verify-email.header-txt {
 }
 
 .mobile .mega-dialog .mega-button::before {
-    box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
-    content: '';
+    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.15);
+    content: "";
     display: block;
     position: absolute;
     width: 100%;
@@ -344,7 +534,7 @@ h3.verify-email.header-txt {
         text-align: center;
         line-height: 24px;
         margin-bottom: 0;
-        font-family: 'LatoWeb', Arial, sans-serif;
+        font-family: var(--text-font-family);
     }
 
     .mobile .verify-email-login-to-account .content-block {
@@ -369,7 +559,7 @@ h3.verify-email.header-txt {
         text-align: center;
         line-height: 24px;
         margin-bottom: 0;
-        font-family: 'LatoWeb', Arial, sans-serif;
+        font-family: var(--text-font-family);
         margin-top: 18px;
     }
 

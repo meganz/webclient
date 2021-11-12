@@ -10167,6 +10167,9 @@ div.new-bottom-pages li, div.new-bottom-pages p {
 .search .search-bottom-wrapper {
     display: flex;
 }
+.search .search-bottom-wrapper.hidden {
+    display: none;
+}
 .empty-search-bottom-menu {
     position: absolute;
     bottom: 0;

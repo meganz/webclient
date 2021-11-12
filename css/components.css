@@ -16,6 +16,9 @@
 .search .selection-status-bar {
     display: none;
 }
+.search-multi .selection-status-bar {
+    display: block;
+}
 .fm-right-files-block.item-selected .selection-status-bar {
     margin-bottom: 0;
     -khtml-toast-notification: 1;

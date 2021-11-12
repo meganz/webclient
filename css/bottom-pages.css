@@ -1193,10 +1193,12 @@ body:not(.mobile) .bottom-page.scroll-button:hover {
     vertical-align: top;
 }
 .bottom-page.left-cell .img-description {
-    padding-right: 30px;
+    padding-inline-end: 30px;
+    -webkit-padding-end: 30px;
 }
 .bottom-page.right-cell .img-description {
-    padding-left: 30px;
+    padding-inline-start: 30px;
+    -webkit-padding-start: 30px;
 }
 .bottom-page.img-description.no-pad {
     padding: 0 2px 0 0;
@@ -4577,6 +4579,9 @@ a.opensource-icon-txt.coming-soon {
 }
 .affiliate-page .bottom-page.content {
     overflow: hidden;
+}
+.rtl .affiliate-page .bottom-page.startpage {
+    direction: rtl;
 }
 .affiliate-page .bottom-page.top-title {
     color: white;

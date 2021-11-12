@@ -480,17 +480,17 @@ pro.proplan = {
                 ['20 ' + l[17696], '15 ' + l[17696], '', l[24076]]
             ],
             [
-                ['2 ' + l[20160], '9' + separator + '99', '&euro;', l[23818].replace('%1', l[5819])],
-                ['2 ' + l[20160], '10' + separator + '27', '&euro;', l[23947]],
-                ['2 ' + l[20160], '9' + separator + '99', '&euro;', l[23818].replace('%1', '2 ' + l[20160])]
+                ['2 ' + l[20160], '9' + separator + '99', 'EUR', l[23818].replace('%1', l[5819])],
+                ['2 ' + l[20160], '10' + separator + '27', 'EUR', l[23947]],
+                ['2 ' + l[20160], '9' + separator + '99', 'EUR', l[23818].replace('%1', '2 ' + l[20160])]
             ],
             [
-                ['8 ' + l[20160], '19' + separator + '99', '&euro;', l[23818].replace('%1', l[6125])],
+                ['8 ' + l[20160], '19' + separator + '99', 'EUR', l[23818].replace('%1', l[6125])],
                 ['8 ' + l[20160], '', '', ''],
                 ['8 ' + l[20160], '', '', '']
             ],
             [
-                ['16 ' + l[20160], '29' + separator + '99', '&euro;', l[23818].replace('%1', l[6126])],
+                ['16 ' + l[20160], '29' + separator + '99', 'EUR', l[23818].replace('%1', l[6126])],
                 ['16 ' + l[20160], '', '', ''],
                 ['16 ' + l[20160], '', '', '']
             ]
@@ -537,8 +537,9 @@ pro.proplan = {
                     }
 
                     // Set price and currency
-                    $('.price', $resultBlock).text(planInfo[1]);
-                    $('.currency', $resultBlock).safeHTML(planInfo[2] ? planInfo[2] : ' ');
+                    $('.price', $resultBlock).safeHTML(value === 1 ? planInfo[1] :
+                        formatCurrency(planInfo[1], planInfo[2])
+                            .replace('\u20ac', '<span class="currency">\u20ac</span>'));
 
                     // Change plan tip
                     if (planInfo[3]) {
@@ -686,17 +687,18 @@ pro.proplan = {
             var $planName = $('.pricing-page.plan-title', $pricingBox);
             var $planButton = $('.pricing-page.plan-button', $pricingBox);
             var basePrice;
-            var basePriceCurrencySign;
+            var baseCurrency;
 
             if (currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE]) {
-                $currncyAbbrev.text(currentPlan[pro.UTQA_RES_INDEX_LOCALPRICECURRENCY]);
-                $euroPrice.text(intl.format(currentPlan[priceIndex]) + ' ' + euroSign);
 
                 // Calculate the base price in local currency
-                basePrice = currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE].toString();
+                basePrice = currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE];
+                baseCurrency = currentPlan[pro.UTQA_RES_INDEX_LOCALPRICECURRENCY];
+
+                $currncyAbbrev.text(baseCurrency);
+                $euroPrice.text(formatCurrency(currentPlan[priceIndex]));
 
                 if (pageType === "P") {
-                    zeroPrice = currentPlan[pro.UTQA_RES_INDEX_LOCALPRICEZERO];
                     oneLocalPriceFound = true;
                 }
 
@@ -707,15 +709,11 @@ pro.proplan = {
             }
             else {
                 // Calculate the base price
-                basePrice = currentPlan[pro.UTQA_RES_INDEX_PRICE].toString();
-                basePriceCurrencySign = euroSign;
+                basePrice = currentPlan[pro.UTQA_RES_INDEX_PRICE];
+                baseCurrency = 'EUR';
             }
 
             // Calculate the monthly base price
-            var basePriceParts = basePrice.split('.');
-            var basePriceDollars = basePriceParts[0];
-            var basePriceCents = basePriceParts[1] || '00';
-
             var storageGigabytes = currentPlan[pro.UTQA_RES_INDEX_STORAGE];
             var storageBytes = storageGigabytes * 1024 * 1024 * 1024;
             var storageFormatted = numOfBytes(storageBytes, 0);
@@ -736,8 +734,7 @@ pro.proplan = {
                 $planButton.first().text(l[23776].replace('%1', planName));
             }
 
-            $price.text(currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE] ? basePrice :
-                basePriceDollars + mega.intl.decimalSeparator + basePriceCents + ' ' + basePriceCurrencySign);
+            $price.text(formatCurrency(basePrice, baseCurrency));
 
             // Get storage
             storageValue = storageSizeRounded + ' ' + storageFormatted.unit;
@@ -749,7 +746,7 @@ pro.proplan = {
             pro.proplan.updatePlanData($pricingBox, storageValue, bandwidthValue, period);
         }
 
-        return pageType === "P" ? [oneLocalPriceFound, zeroPrice] : classType;
+        return pageType === "P" ? [oneLocalPriceFound] : classType;
     },
 
     /**
@@ -767,15 +764,13 @@ pro.proplan = {
 
         // Update storage
         if ($storageTip && $storageTip.attr('data-simpletip')) {
-            $('span', $storageAmount)
-                .safeHTML(l[23789].replace('%1', '<span>' + storageValue + '</span>'));
+            $('span span', $storageAmount).text(storageValue);
             $storageTip.attr('data-simpletip', l[23807].replace('%1', '[U]' + storageValue + '[/U]'));
         }
 
         // Update bandwidth
         if ($bandwidthTip && $bandwidthTip.data('simpletip')) {
-            $('span', $bandwidthAmount)
-                .safeHTML(l[23790].replace('%1', '<span>' + bandwidthValue + '</span>'));
+            $('span span', $bandwidthAmount).text(bandwidthValue);
             $bandwidthTip.attr('data-simpletip', bandwidthText.replace('%1', '[U]' + bandwidthValue + '[/U]'));
         }
     },
@@ -1063,27 +1058,12 @@ pro.proplan = {
                     && info.bd.trns.t && info.bd.ba.s && info.bd.ba.t;
 
                 // If local currency values exist
-                pro.proplan.businessPlanData.isLocalInfoValid = info.l && info.l.cs && info.l.n
-                    && (info.bd.us.lp || info.lp) && info.bd.sto.lp && info.bd.trns.lp;
+                pro.proplan.businessPlanData.isLocalInfoValid = info.l && info.l.lcs && info.l.lc
+                    && info.bd.us.lp && info.bd.sto.lp && info.bd.trns.lp;
 
                 pro.proplan.populateBusinessPlanData();
             });
         });
-    },
-
-    /**
-     * Format business plan currency
-     * @param {Number} price The price number
-     * @returns {void}
-     */
-    formatBusinessPriceCurrency: function(price) {
-
-        'use strict';
-
-        // Set Local currency name/sign before the price value if its local
-        return this.businessPlanData.isLocalInfoValid ? this.businessPlanData.l.cs
-            + formatCurrency(price, this.businessPlanData.l.n, 'number') :
-            `${formatCurrency(price, this.businessPlanData.c, 'number')}  \u20ac`;
     },
 
     /**
@@ -1096,8 +1076,7 @@ pro.proplan = {
 
         const $stepOne = $('.pricing-section', '.fmholder');
         let $businessCard = $('.js-business-card', $stepOne);
-        const pricePerUser = this.businessPlanData.bd && this.businessPlanData.bd.us
-                && this.businessPlanData.bd.us.p ? this.businessPlanData.bd.us.p : this.businessPlanData.p;
+        const pricePerUser = this.businessPlanData.bd && this.businessPlanData.bd.us && this.businessPlanData.bd.us.p;
 
         // If new API values exist, populate new business card values
         if (this.businessPlanData.isValidBillingData) {
@@ -1111,12 +1090,12 @@ pro.proplan = {
 
             // If local currency values exist
             if (this.businessPlanData.isLocalInfoValid) {
-                storagePrice = this.formatBusinessPriceCurrency(this.businessPlanData.bd.sto.lp) + '*';
-                transferPrice = this.formatBusinessPriceCurrency(this.businessPlanData.bd.trns.lp) + '*';
+                storagePrice = formatCurrency(this.businessPlanData.bd.sto.lp, this.businessPlanData.l.lc) + '*';
+                transferPrice = formatCurrency(this.businessPlanData.bd.trns.lp, this.businessPlanData.l.lc) + '*';
             }
             else {
-                storagePrice = this.formatBusinessPriceCurrency(this.businessPlanData.bd.sto.p);
-                transferPrice = this.formatBusinessPriceCurrency(this.businessPlanData.bd.trns.p);
+                storagePrice = formatCurrency(this.businessPlanData.bd.sto.p);
+                transferPrice = formatCurrency(this.businessPlanData.bd.trns.p);
             }
 
             // Set storage and transfer details, simpletip hint
@@ -1171,23 +1150,14 @@ pro.proplan = {
 
             $businessCard.addClass('local-currency');
             $('.plan-price .price', $businessCard).text(
-                this.formatBusinessPriceCurrency(
-                    this.businessPlanData.bd && this.businessPlanData.us
-                    && this.businessPlanData.us.lp ? this.businessPlanData.us.lp : this.businessPlanData.lp)
-            );
-            $('.pricing-page.plan-currency', $businessCard).text(
-                this.businessPlanData.l.n
-            );
-            $('.pricing-page.euro-price', $businessCard).text(
-                `${formatCurrency(pricePerUser, this.businessPlanData.c, 'number')}  \u20ac`
-            );
+                formatCurrency(this.businessPlanData.bd.us.lp, this.businessPlanData.l.lc));
+            $('.pricing-page.plan-currency', $businessCard).text(this.businessPlanData.l.lc);
+            $('.pricing-page.euro-price', $businessCard).text(formatCurrency(pricePerUser));
         }
         else {
 
             $businessCard.removeClass('local-currency');
-            $('.plan-price .price', $businessCard).text(
-                `${formatCurrency(pricePerUser, this.businessPlanData.c, 'number')}  \u20ac`
-            );
+            $('.plan-price .price', $businessCard).text(formatCurrency(pricePerUser));
         }
     },
 
@@ -1215,13 +1185,13 @@ pro.proplan = {
 
         // If local currency values exist
         if (planInfo.isLocalInfoValid) {
-            userPrice = parseFloat(planInfo.lp);
+            userPrice = parseFloat(planInfo.bd.us.lp);
             storagePrice = parseFloat(planInfo.bd.sto.lp);
             transferPrice = parseFloat(planInfo.bd.trns.lp);
             astrisk = '*';
         }
         else {
-            userPrice = parseFloat(planInfo.p);
+            userPrice = parseFloat(planInfo.bd.us.p);
             storagePrice = parseFloat(planInfo.bd.sto.p);
             transferPrice = parseFloat(planInfo.bd.trns.p);
         }
@@ -1245,7 +1215,8 @@ pro.proplan = {
                 + storagePrice * (storageValue - minStorageValue)
                 + transferPrice * (transferValue - minTransferValue);
 
-            return this.formatBusinessPriceCurrency(totalPrice.toFixed(2)) + astrisk;
+            return this.businessPlanData.isLocalInfoValid ?
+                formatCurrency(totalPrice, this.businessPlanData.l.lc) : formatCurrency(totalPrice) + astrisk;
         };
 
         /**

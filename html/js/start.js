@@ -72,11 +72,11 @@ function init_start() {
     //     $('.mid-green-link.refer', $page).removeClass('hidden');
     // }
 
-    $('.dropbox span', $page).text(intl.format(dropboxPrice));
+    $('.dropbox span', $page).text(formatCurrency(dropboxPrice));
 
-    $('.mega span', $page).text(intl.format(megaPrice));
+    $('.mega span', $page).text(formatCurrency(megaPrice));
 
-    $('.gdrive span', $page).text(intl.format(gdrivePrice));
+    $('.gdrive span', $page).text(formatCurrency(gdrivePrice));
 
     /**
      * detectSwipe

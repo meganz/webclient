@@ -24,7 +24,6 @@ var pro = {
     UTQA_RES_INDEX_LOCALPRICE: 8,
     UTQA_RES_INDEX_LOCALPRICECURRENCY: 9,
     UTQA_RES_INDEX_LOCALPRICECURRENCYSAVE: 10,
-    UTQA_RES_INDEX_LOCALPRICEZERO: 11,
 
     /**
      * Load pricing plan information from the API. The data will be loaded into 'pro.membershipPlans'.
@@ -42,7 +41,7 @@ var pro = {
         }
         else {
             // Get the membership plans.
-            api_req({ a: 'utqa', nf: 1, b: 1 }, {
+            api_req({ a: 'utqa', nf: 2, b: 1 }, {
                 callback: function(results) {
 
                     // The rest of the webclient expects this data in an array format
@@ -50,20 +49,31 @@ var pro = {
                     var plans = [];
                     var maxPlan = null;
                     var minPlan = null;
-                    for (var i = 0; i < results.length; i++) {
+                    var lmbps = {};
+
+                    for (var i = 1; i < results.length; i++) {
+
+                        let discount = 0;
+
+                        if (results[i].m === 1) {
+                            lmbps[results[i].mbp] = results[i].lp;
+                        }
+                        else {
+                            discount = lmbps[results[i].mbp] * results[i].m - results[i].lp;
+                        }
+
                         plans.push([
-                            results[i]['id'],    // id
-                            results[i]['al'],    // account level
-                            results[i]['s'],     // storage
-                            results[i]['t'],     // transfer
-                            results[i]['m'],     // months
-                            results[i]['p'],     // price
-                            results[i]['c'],     // currency
-                            results[i]['mbp'],   // monthly base price
-                            results[i]['lp'],    // NEW 'local price'
-                            results[i]['lpc'],   // NEW 'local price currency'
-                            results[i]['lps'],   // NEW 'local price symbol'
-                            results[i]['lp0']    // NEW 'local price Zero val'
+                            results[i].id,          // id
+                            results[i].al,          // account level
+                            results[i].s,           // storage
+                            results[i].t,           // transfer
+                            results[i].m,           // months
+                            results[i].p / 100,     // price
+                            results[0].l.c,           // currency
+                            results[i].mbp / 100,   // monthly base price
+                            results[i].lp / 100,    // local price
+                            results[0].l.lc,          // local price currency
+                            discount / 100,         // local price save
                         ]);
                         if (results[i].m === 1 && results[i].it !== 1) {
                             if (!maxPlan || maxPlan[2] < results[i]['s']) {

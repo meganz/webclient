@@ -719,7 +719,8 @@
 .bottom-page.compare-feature i {
     display: inline-block;
     vertical-align: top;
-    margin: 0 10px 0 0;
+    margin-inline-end: 10px;
+    -webkit-margin-end: 10px;
 }
 .en .bottom-page.compare-feature i {
     margin: 0 15px 0 0;
@@ -773,6 +774,9 @@
 }
 .bottom-page.compare-block.big {
     margin: 0 20px;
+}
+.rtl .bottom-page.compare-block {
+    direction: rtl;
 }
 .bottom-page.compare-txt {
     font-size: 18px;

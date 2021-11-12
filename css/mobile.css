@@ -13037,6 +13037,9 @@ p a.blog-new-read-more {
     table-layout: fixed;
     margin: 18px 0 -17px 0;
 }
+.rtl .mobile.affiliate-comission-bl .cell {
+    direction: rtl;
+}
 .mobile.affiliate-comission-bl .cell {
     display: table-cell;
     width: 33.333333%;
@@ -13910,6 +13913,9 @@ body.landscape .upload-overlay .mobile.filetype-img {
     height: 16px;
     margin: 0;
     overflow: hidden;
+}
+.rtl .dark-direct-tooltip.simpletip-tooltip {
+    direction: rtl;
 }
 .dark-direct-tooltip.simpletip-tooltip.delay {
     -webkit-transition-delay: 1ms;

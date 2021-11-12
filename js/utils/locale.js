@@ -595,7 +595,8 @@ function daysSince1Jan2000() {
  * @param {Number} value Value to format
  * @param {String} [currency] Currency to use in currency formatting. Default: 'EUR'
  * @param {String} [display] display type of currency format, supporting types are below:
- *                  'symbol' - use a localized currency symbol such as "$" - Default,
+ *                  'narrowSymbol' - use a localized currency symbol such as "$" - Default,
+ *                  'symbol' - use a localized currency symbol but with country code such as "NZ$",
  *                  'code' - use the ISO currency code such as "NZD",
  *                  'name' - use a localized currency name such as "dollar"
  *                  'number' - just number with correct decimal
@@ -607,7 +608,7 @@ function formatCurrency(value, currency, display) {
 
     value = typeof value === 'string' ? parseFloat(value) : value;
     currency = currency || 'EUR';
-    display = display || 'symbol';
+    display = display || 'narrowSymbol';
     var displayNumber = false;
 
     if (display === 'number') {
@@ -615,7 +616,15 @@ function formatCurrency(value, currency, display) {
         displayNumber = true;
     }
 
-    var locales = getCountryAndLocales().locales;
+    const cnl = getCountryAndLocales();
+    let locales = cnl.locales;
+
+    // If locale is Arabic and country is non-Arabic country or non set,
+    if (locale === 'ar' && arabics.indexOf(cnl.country) < 0) {
+        // To avoid Chrome bug, set Egypt as default country.
+        locales = 'ar-EG';
+    }
+
     var options = {'style': 'currency', 'currency': currency, currencyDisplay: display};
 
     var result = value.toLocaleString(locales, options);
@@ -626,7 +635,7 @@ function formatCurrency(value, currency, display) {
     }
 
     // Romanian with Euro Symbol currency display is currently buggy on all browsers, so doing this to polyfill it
-    if (locales.startsWith('ro') && currency === 'EUR' && display === 'symbol') {
+    if (locales.startsWith('ro') && currency === 'EUR' && (display === 'symbol' || display === 'narrowSymbol')) {
         result = result.replace('EUR', '\u20ac');
     }
 
@@ -655,10 +664,22 @@ function getCountryAndLocales() {
 
     'use strict';
 
-    var country;
+    let country = 'ISO';
+    let locales = '';
 
-    if (u_attr) {
-        country = u_attr.country ? u_attr.country : u_attr.ipcc || 'ISO';
+    // If user logged in and country data is set on Mega, using it.
+    if (u_attr && u_attr.country) {
+        country = u_attr.country;
+        locales = locale + '-' + country;
+    }
+    // Otherwise, try grab country data from browser's navigator.languages
+    else if (navigator.languages) {
+
+        locales = navigator.languages.filter(l => l !== locale && l.startsWith(locale))[0];
+
+        if (locales) {
+            country = locales.replace(`${locale}-`, '');
+        }
     }
 
     // cnl is exist and has same country as u_attr return cached version.
@@ -666,7 +687,7 @@ function getCountryAndLocales() {
         return $.cnl;
     }
 
-    var locales = mega.intl.test(locale + '-' + country) || mega.intl.test(locale) || 'ISO';
+    locales = mega.intl.test(locales) || mega.intl.test(locale) || 'ISO';
 
     return $.cnl = {country: country, locales: locales};
 }
@@ -1088,6 +1109,8 @@ mBroadcaster.once('boot_done', function populate_l() {
     l[20195] = l[20195].replace('[B]', '<b>').replace('[/B]', '</b>');
     l[23708] = l[23708].replace('[B]', '').replace('[/B]', '');
     l[23709] = l[23709].replace('[B]', '').replace('[/B]', '');
+    l['23789.s'] = escapeHTML(l[23789]).replace('%1', '<span></span>');
+    l['23790.s'] = escapeHTML(l[23790]).replace('%1', '<span></span>');
 
     // Mobile only
     if (is_mobile) {
@@ -1312,19 +1335,27 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[BR]', '<br>');
     l.bsn_calc_total = escapeHTML(l.bsn_calc_total)
         .replace('[S]', '<span>')
-        .replace('[/S]', '</span>');
+        .replace('[/S]', '</span>')
+        .replace('%1', '');
     l.bsn_page_plan_price = escapeHTML(l.bsn_page_plan_price)
         .replace('[S]', '<span>')
-        .replace('[/S]', '</span>');
+        .replace('[/S]', '</span>')
+        .replace('%1', '');
+    l.bsn_plan_users = escapeHTML(l.bsn_plan_users).replace('%1', '<span></span>');
+    l.bsn_plan_storage = escapeHTML(l.bsn_plan_storage).replace('%1', '<span></span>');
+    l.bsn_plan_transfer = escapeHTML(l.bsn_plan_transfer).replace('%1', '<span></span>');
     l.bsn_plan_more_users = escapeHTML(l.bsn_plan_more_users)
         .replace('[B]', '<strong>')
-        .replace('[/B]', '</strong>');
+        .replace('[/B]', '</strong>')
+        .replace('%1', '');
     l.bsn_plan_more_storage = escapeHTML(l.bsn_plan_more_storage)
         .replace('[B]', '<strong>')
-        .replace('[/B]', '</strong>');
+        .replace('[/B]', '</strong>')
+        .replace('%1', '');
     l.bsn_plan_more_transfer = escapeHTML(l.bsn_plan_more_transfer)
         .replace('[B]', '<strong>')
-        .replace('[/B]', '</strong>');
+        .replace('[/B]', '</strong>')
+        .replace('%1', '');
     l.bsn_versioning_info = escapeHTML(l.bsn_versioning_info)
         .replace('[S]', '<span>')
         .replace('[/S]', '</span>')
@@ -1451,10 +1482,14 @@ lazy(mega, 'intl', function _() {
     /** @property mega.intl.locale */
     lazy(ns, 'locale', function() {
         const locale = window.locale || window.lang;
-        const country = window.u_attr && (u_attr.country || u_attr.ipcc) || mega.ipcc;
+        let navLocales;
+
+        if (navigator.languages) {
+            navLocales = navigator.languages.filter(l => l !== locale && l.startsWith(locale))[0];
+        }
 
         // @todo Polyfill Intl.Locale() and return an instance of it instead?
-        return this.test(locale + '-' + country) || this.test(locale) || 'en';
+        return this.test(navLocales) || this.test(locale) || 'en';
     });
 
     /** @function mega.intl.get */

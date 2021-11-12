@@ -34,6 +34,9 @@
     --icon-size: 16px;
     margin: 0 8px;
 }
+.rtl .fm-affiliate .breadcrumbs {
+    direction: rtl;
+}
 .rtl .fm-affiliate .breadcrumbs i {
     transform: rotate(180deg);
 }
@@ -51,6 +54,9 @@
     position: relative;
     overflow: hidden;
     width: 100%;
+}
+.rtl .fm-affiliate.scroll-block {
+    direction: rtl;
 }
 .fm-affiliate.content {
     box-sizing: border-box;
@@ -401,6 +407,10 @@
 .fm-affiliate.chart-dates i {
     cursor: pointer;
     --icon-size: 16px;
+}
+.rtl .fm-affiliate.chart-dates .icon-arrow-left,
+.rtl .fm-affiliate.chart-dates .icon-arrow-right {
+    transform: rotateY(180deg);
 }
 .fm-affiliate.chart-dates .dates {
     color: var(--text-color-medium);

@@ -228,31 +228,15 @@ BusinessRegister.prototype.initPage = function(preSetNb, preSetName, preSetTel, 
     };
 
     const isLocalInfoValid = () => {
-        return mySelf.planInfo.l && mySelf.planInfo.l.cs && mySelf.planInfo.l.sp && mySelf.planInfo.l.pl
-            && mySelf.planInfo.l.n;
-    };
-    const applyFormat = (val, origDecimal) => {
-        if (origDecimal !== mySelf.planInfo.l.sp[0]) {
-            const reg1 = new RegExp(`\\${origDecimal}`, 'g');
-            const reg2 = new RegExp(`\\${mySelf.planInfo.l.sp[1]}`, 'g');
-            val = val.replace(reg1, '-')
-                .replace(reg2, mySelf.planInfo.l.sp[0])
-                .replace(/-/g, mySelf.planInfo.l.sp[1]);
-        }
-
-        val = mySelf.planInfo.l.pl ? `${mySelf.planInfo.l.cs}${val}`
-            : `${val}${mySelf.planInfo.l.cs}`;
-
-        return val;
+        return mySelf.planInfo.l && mySelf.planInfo.l.lcs && mySelf.planInfo.l.lc;
     };
 
-    const updateBreakdown = (users, quota, usrFare, quotaFare, sep) => {
+    const updateBreakdown = (users, quota, usrFare, quotaFare) => {
         users = Math.max(users || 0, mySelf.minUsers);
         quota = quota || mySelf.extraStorage;
 
         const mIntl = mega.intl;
         const intl = mIntl.number;
-        sep = sep || mIntl.decimalSeparator;
 
         const $breakdown = $('.business-plan-breakdown', $pageContainer);
         const $usersRow = $('.bus-plan-nb-users.bus-breakdown-row', $breakdown);
@@ -264,26 +248,26 @@ BusinessRegister.prototype.initPage = function(preSetNb, preSetName, preSetTel, 
 
         if (mySelf.localPricesMode) {
             usrFare = usrFare || mySelf.planInfo.bd.us.lp;
-            totalUsr = applyFormat(intl.format(total = usrFare * users), sep);
+            totalUsr = formatCurrency(total = usrFare * users, mySelf.planInfo.l.lc);
 
             if (quota && !Number.isNaN(quota)) {
                 quotaFare = quotaFare || mySelf.planInfo.bd.sto.lp;
                 const temp = quotaFare * quota;
                 total += temp;
-                totalQuota = applyFormat(intl.format(temp), sep);
+                totalQuota = formatCurrency(temp, mySelf.planInfo.l.lc);
             }
-            total = `${applyFormat(intl.format(total), sep)}*`;
+            total = `${formatCurrency(total, mySelf.planInfo.l.lc)}*`;
         }
         else {
             usrFare = usrFare || mySelf.planInfo.bd && mySelf.planInfo.bd.us.p || mySelf.planInfo.p;
-            totalUsr = `${intl.format(total = usrFare * users)} \u20ac`;
+            totalUsr = formatCurrency(total = usrFare * users);
             if (quota && !Number.isNaN(quota)) {
                 quotaFare = quotaFare || mySelf.planInfo.bd.sto.p;
                 const temp = quotaFare * quota;
                 total += temp;
-                totalQuota = `${intl.format(temp)} \u20ac`;
+                totalQuota = formatCurrency(temp);
             }
-            total = `${intl.format(total)} \u20ac`;
+            total = formatCurrency(total);
             $('.bus-price-footer-note', $pageContainer).addClass('hidden');
         }
 
@@ -305,7 +289,6 @@ BusinessRegister.prototype.initPage = function(preSetNb, preSetName, preSetTel, 
             users = mySelf.minUsers; // minimum val
         }
         const intl = mega.intl.number;
-        let userFare = mySelf.planInfo.p;
         const extraFares = Object.create(null);
         extraFares.storageFare = -1;
         extraFares.transFare = -1;
@@ -314,29 +297,27 @@ BusinessRegister.prototype.initPage = function(preSetNb, preSetName, preSetTel, 
         let localPricesMode = false;
         let quotaInfoPresent = false;
 
-        if (typeof mySelf.planInfo.bd === 'undefined') {
-            // opps, bd is not available, fall back to old price attribute and warn.
-            console.warn('"bd" is not present in business plan info. Will use old billing');
-            mySelf.planInfo.userFare = userFare;
-        }
-        else if (isValidBillingData()) {
-            // hooray, new billing data.
-            localPricesMode = mySelf.planInfo.bd.us.lp && mySelf.planInfo.bd.sto.lp && mySelf.planInfo.bd.trns.lp;
-            localPricesMode = localPricesMode && isLocalInfoValid();
-            userFare = localPricesMode && mySelf.planInfo.bd.us.lp || mySelf.planInfo.bd.us.p;
-            extraFares.storageFare = localPricesMode && mySelf.planInfo.bd.sto.lp || mySelf.planInfo.bd.sto.p;
-            extraFares.transFare = localPricesMode && mySelf.planInfo.bd.trns.lp || mySelf.planInfo.bd.trns.p;
-            extraFares.storageBase = mySelf.planInfo.bd.ba.s;
-            extraFares.transBase = mySelf.planInfo.bd.ba.t;
-            quotaInfoPresent = isUsageCharges();
+        if (typeof mySelf.planInfo.bd === 'undefined' || !isValidBillingData()) {
 
-            // setting the vals in the plan for payments.
-            mySelf.planInfo.userFare = mySelf.planInfo.bd.us.p;
+            // opps, bd is not available, new version of api cannot allow this.
+            console.error('"bd" is not present or not valid. Something is wrong.');
+            return false;
         }
-        else {
-            console.error('"bd" in billing info is missing elements. Will use old billing');
-            console.table(mySelf.planInfo.bd);
-        }
+
+        // hooray, new billing data.
+        localPricesMode = mySelf.planInfo.bd.us.lp && mySelf.planInfo.bd.sto.lp && mySelf.planInfo.bd.trns.lp;
+        localPricesMode = localPricesMode && isLocalInfoValid();
+
+        const userFare = localPricesMode && mySelf.planInfo.bd.us.lp || mySelf.planInfo.bd.us.p;
+        extraFares.storageFare = localPricesMode && mySelf.planInfo.bd.sto.lp || mySelf.planInfo.bd.sto.p;
+        extraFares.transFare = localPricesMode && mySelf.planInfo.bd.trns.lp || mySelf.planInfo.bd.trns.p;
+        extraFares.storageBase = mySelf.planInfo.bd.ba.s;
+        extraFares.transBase = mySelf.planInfo.bd.ba.t;
+        quotaInfoPresent = isUsageCharges();
+
+        // setting the vals in the plan for payments.
+        mySelf.planInfo.userFare = mySelf.planInfo.bd.us.p;
+
 
         const $gadget = $('.bus-reg-plan', $pageContainer);
         const $perUser = $('.business-plan-peruser', $gadget);
@@ -344,15 +325,14 @@ BusinessRegister.prototype.initPage = function(preSetNb, preSetName, preSetTel, 
         const $euroPriceBl = $('.bus-user-price-euro', $gadget).addClass('hidden');
         const $baseQuotaNote = $('.business-plan-quota-note', $gadget).addClass('hidden');
 
-        const euroPriceText = `${intl.format(mySelf.planInfo.p)} \u20ac`;
+        const euroPriceText = formatCurrency(mySelf.planInfo.bd.us.p);
         let priceText = euroPriceText;
-        const sep = intl.decimalSeparator;
         let currncyAbbrv = '';
 
         if (localPricesMode) {
 
-            priceText = applyFormat(intl.format(userFare), sep);
-            currncyAbbrv = mySelf.planInfo.l.n;
+            priceText = formatCurrency(userFare, mySelf.planInfo.l.lc);
+            currncyAbbrv = mySelf.planInfo.l.lc;
 
             $euroPriceBl.removeClass('hidden');
 
@@ -386,7 +366,7 @@ BusinessRegister.prototype.initPage = function(preSetNb, preSetName, preSetTel, 
         }
 
         mySelf.localPricesMode = localPricesMode;
-        updateBreakdown(users, quota, userFare, extraFares.storageFare, sep);
+        updateBreakdown(users, quota, userFare, extraFares.storageFare);
     };
 
     // event handler for clicking on terms anchor

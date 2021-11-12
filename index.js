@@ -2871,7 +2871,7 @@ function topmenuUI() {
                     tooltipWidth = $tooltip.outerWidth();
                     buttonPos = $this.position().left;
                     tooltipPos = buttonPos + $this.outerWidth() / 2 - tooltipWidth / 2;
-                    if ($('body').width() - (tooltipPos + tooltipWidth) > 0) {
+                    if ($(document.body).width() - ($this.offset().left + tooltipPos + tooltipWidth) > 0) {
                         $tooltip.css({
                             'left': tooltipPos,
                             'right': 'auto'

@@ -2300,7 +2300,9 @@ class ContactItem extends _stores_mixins_js2__["ContactAwareComponent"] {
       hideVerifiedBadge: true,
       chatRoom: this.props.chatRoom
     }), react1.a.createElement("div", {
-      className: "user-card-data"
+      className: "user-card-data simpletip",
+      "data-simpletip": username,
+      "data-simpletipposition": "top"
     }, react1.a.createElement(ContactButton, {
       noContextMenu: this.props.noContextMenu,
       contact: contact,

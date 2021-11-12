@@ -146,7 +146,8 @@ var bottompage = {
         };
 
         var showAnimated = function($content) {
-            var $blocks = $('.animated, .fadein', $content);
+            // add circular-spread here later
+            var $blocks = $('.animated, .fadein, .circular-spread, .text-focus-contract', $content);
 
             for (var i = $blocks.length - 1; i >= 0; i--) {
 
@@ -158,6 +159,10 @@ var bottompage = {
                     }
                 }
                 else if ($block.hasClass('start-animation')) {
+                    // dont reset circular spread animation
+                    if ($block.hasClass('circular-spread') || $block.hasClass('text-focus-contract')) {
+                        return;
+                    }
                     $block.removeClass('start-animation');
                 }
             }

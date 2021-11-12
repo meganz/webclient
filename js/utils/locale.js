@@ -1364,6 +1364,20 @@ mBroadcaster.once('boot_done', function populate_l() {
     l.extensions_avbl_mobile = escapeHTML(l.extensions_avbl_mobile).replace(/\[S]/g, '<strong>')
         .replace(/\[\/S]/g, '</strong>');
 
+    l.about_vision_desc = escapeHTML(l.about_vision_desc)
+        .replace(/\[S]/g, '<span>')
+        .replace(/\[\/S]/g, '</span>');
+    l.about_vision_title = escapeHTML(l.about_vision_title)
+        .replace(/\[S]/g, '<span>')
+        .replace(/\[\/S]/g, '</span>');
+    l.about_contributors = escapeHTML(l.about_contributors)
+        .replace(/\[S]/g, '<span>')
+        .replace(/\[\/S]/g, '</span>');
+    // cant reduce size
+    l.jobs_opportunity_invert_card_desc = escapeHTML(l.jobs_opportunity_invert_card_desc)
+        .replace(/\[BR]/g, '<br>');
+    l.jobs_grow_invert_card_desc = escapeHTML(l.jobs_grow_invert_card_desc)
+        .replace('[BR]', '<br>');
     var common = [
         15536, 16106, 16107, 16119, 16120, 16123, 16124, 16135, 16136, 16137, 16138, 16304, 16313, 16315, 16316,
         16341, 16358, 16359, 16360, 16361, 16375, 16382, 16383, 16384, 16394, 18228, 18423, 18425, 18444, 18268,

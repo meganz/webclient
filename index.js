@@ -2794,7 +2794,6 @@ function topmenuUI() {
                 var moveTo = {
                     'account': 'fm/account',
                     'affiliate': 'refer',
-                    'about': 'about/main',
                     'corporate': 'corporate/media'
                 };
 

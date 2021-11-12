@@ -2770,7 +2770,7 @@ function topmenuUI() {
             else if (className.indexOf('cookies-settings') > -1) {
                 topMenu(1);
                 if ('csp' in window) {
-                    csp.init().then((shown) => !shown && csp.showCookiesDialog('step2'));
+                    csp.trigger().dump('csp.trigger');
                 }
             }
             else {

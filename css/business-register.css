@@ -140,7 +140,7 @@
     position: absolute;
     right: 0;
     top: 240px;
-    background-color: var(--surface-main);
+    background-color: var(--stroke-main);
 }
 
 .bus-reg-plan .plan-icon {

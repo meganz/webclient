@@ -701,8 +701,10 @@ MegaData.prototype.showOverStorageQuota = function(quota, options) {
                 $('.fm-main').addClass('fm-notification almost-full');
             }
             $strgdlg.addClass('almost-full');
-            $('header h2', $strgdlgBodyAFull).text(myOptions.title || l[16311]);
-            $('.body-header', $strgdlgBodyAFull).safeHTML(myOptions.body || l[16312]);
+            $('header h2.almost-full', $strgdlg).text(myOptions.title || l[16312]);
+            if (myOptions.body) {
+                $('.body-header', $strgdlgBodyAFull).safeHTML(myOptions.body);
+            }
 
             // Storage chart and info
             var strQuotaLimit = bytesToSize(quota.mstrg, 0).split(' ');
@@ -730,7 +732,7 @@ MegaData.prototype.showOverStorageQuota = function(quota, options) {
             $('.chart.data .pecents-txt', $strgdlg).text(strQuotaLimit[0]);
             $('.chart.data .gb-txt', $strgdlg).text(strQuotaLimit[1]);
             $('.chart.body .perc-txt', $strgdlg).text(quota.percent + '%');
-            $('.chart.data', $strgdlg).removeClass('hidden');
+
         }
         else {
             if ($strgdlg.is(':visible')) {

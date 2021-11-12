@@ -69,8 +69,8 @@ lazy(self, 'csp', () => {
 
     const canShowDialog = promisify(resolve => {
         const exclude = {
-            cookie: 1, download: 1, file: 1, folder: 1,
-            megadrop: 1, privacy: 1, takedown: 1, terms: 1
+            download: 1, file: 1, folder: 1,
+            megadrop: 1
         };
 
         (function check(page) {
@@ -121,6 +121,17 @@ lazy(self, 'csp', () => {
                 await mega.attr.remove('csp', -2, 1).catch(nop);
             }
             return csp.init();
+        },
+
+        trigger: async() => {
+            if (!storage.csp) {
+                value = 0;
+                storage.csp = CS_ESSENT;
+            }
+            const shown = await csp.init();
+            console.assert(!shown);
+
+            return csp.showCookiesDialog('step2');
         },
 
         has: (opt, ns = 'cs') => {

@@ -383,6 +383,8 @@ def get_branch_resource_name(is_upload = False, is_force = False, is_override = 
                 content = json.loads(response.read().decode('utf8'))
                 print("")
                 print("New Resource {} has been created.".format(branch_resource_name))
+                if (is_force):
+                    return "force_done"
                 return branch_resource_name
             except HTTPError as e:
                 content = json.loads(e.read().decode('utf8'))
@@ -614,6 +616,7 @@ def main():
     languages = ""
     is_prod = False
     branch_resource_name = None
+    fetch_branch = True
 
     parser = argparse.ArgumentParser()
     parser.add_argument("-p", "--production", nargs="?", help="Create production language files", const=True, default=False)
@@ -643,7 +646,9 @@ def main():
 
         if new_strings or is_force:
             branch_resource_name = get_branch_resource_name(True, is_force, is_override)
-            if branch_resource_name in ["skip_force", "skip_override", "not_allowed"]:
+            if branch_resource_name in ["skip_force", "skip_override", "not_allowed", "force_done"]:
+                if branch_resource_name == "force_done":
+                    fetch_branch = False
                 branch_resource_name = False
             elif not branch_resource_name:
                 print("Failed to get branch resource name")
@@ -702,7 +707,7 @@ def main():
     print("")
     if not branch_resource_name:
         branch_resource_name = get_branch_resource_name()
-    if not is_prod and branch_resource_name and branch_resource_name != "prod":
+    if not is_prod and branch_resource_name and branch_resource_name != "prod" and fetch_branch:
         print("Fetching Branch Language Files...")
         lang_branch = download_languages(branch_resource_name, languages)
         if lang_branch:

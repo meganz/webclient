@@ -1,5 +1,5 @@
 .fm-recents.container {
-    background-color: var(--surface-main);
+    background-color: var(--stroke-main);
     display: flex;
     flex-direction: column;
     height: calc(100% - 48px);
@@ -11,7 +11,7 @@
 }
 .fm-recents.header {
     font: var(--text-body1);
-    border-bottom: 1px solid var(--surface-grey-2);
+    border-bottom: 1px solid var(--stroke-grey-2);
     padding: 14px 0 14px 28px;
 }
 .fm-recents.content {
@@ -352,17 +352,17 @@
 }
 .fm-recents .more-less-toggle {
     border-radius: 12px;
-    background-color: var(--surface-grey-2);
+    background-color: var(--stroke-grey-2);
     padding: 2px 6px 2px 6px;
     color: var(--text-color-high);
 }
 .fm-recents.content-row.ui-selected .more-less-toggle {
-    background-color: var(--surface-main);
+    background-color: var(--stroke-main);
 }
 .simpletip-tooltip.recents-file-path span i {
     display: inline-block;
     --icon-size: 16px;
-    --mask-color: var(--surface-main);
+    --mask-color: var(--stroke-main);
     position: static;
     margin: 0 4px 2px;
     vertical-align: middle;
@@ -410,17 +410,17 @@
 .fm-recents.content-row:hover .content,
 .fm-recents.content-row.ui-selected .content {
     border-radius: 6px;
-    border: 1px solid var(--surface-grey-2);
+    border: 1px solid var(--stroke-grey-2);
     position: relative;
 }
 .fm-recents.content-row.ui-selected .content {
-    border-color: var(--surface-grey-4);
+    border-color: var(--stroke-grey-4);
 }
 .fm-recents.content-row:hover .content {
-    background-color: var(--surface-grey-3);
+    background-color: var(--stroke-grey-3);
 }
 .fm-recents.content-row.ui-selected .content {
-    background-color: var(--surface-grey-4);
+    background-color: var(--stroke-grey-4);
 }
 .fm-recents.content-row.ui-selected .content::before {
     content: '';

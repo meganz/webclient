@@ -2746,7 +2746,8 @@ function topmenuUI() {
         });
 
     $('.top-menu-item, .logout', $topMenu)
-        .rebind('click.menuitem tap.menuitem', function() {
+        // eslint-disable-next-line complexity -- @todo refactor
+        .rebind('click.menuitem tap.menuitem', function(ev) {
             var $this = $(this);
             var $scrollBlock = $('.top-menu-scroll', $topMenu);
             var className = $this.attr('class') || '';
@@ -2769,7 +2770,7 @@ function topmenuUI() {
             else if (className.indexOf('cookies-settings') > -1) {
                 topMenu(1);
                 if ('csp' in window) {
-                    csp.init().then((shown) => !shown && csp.showCookiesDialog('step2'));
+                    csp.trigger().dump('csp.trigger');
                 }
             }
             else {
@@ -2793,7 +2794,6 @@ function topmenuUI() {
                 var moveTo = {
                     'account': 'fm/account',
                     'affiliate': 'refer',
-                    'about': 'about/main',
                     'corporate': 'corporate/media'
                 };
 
@@ -2821,7 +2821,7 @@ function topmenuUI() {
                     feedbackDialog._type = 'top-button';
                 }
                 else if (className.indexOf('refresh') > -1) {
-                    M.reload();
+                    M.reload(ev.ctrlKey || ev.metaKey);
                 }
                 else if (!is_mobile && className.indexOf('languages') > -1) {
                     langDialog.show();

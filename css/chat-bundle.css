@@ -175,6 +175,7 @@
 .meetings-call .stream .participants-notice {
   width: 460px;
   margin: 0 auto;
+  backdrop-filter: blur(10px);
 }
 .meetings-call .stream .participants-notice.user-alone {
   margin-top: -140px;
@@ -1417,16 +1418,6 @@
 .join-meeting-head {
   text-align: center;
 }
-.join-meeting-head h1 {
-  margin: 24px 0 88px 0;
-}
-@media only screen and (max-height: 600px) {
-  .join-meeting-head h1 {
-    font: var(--text-h2);
-    margin-top: 14px;
-    margin-bottom: 18px;
-  }
-}
 .join-meeting-head .join-meeting-logo {
   /* [...] */
 }
@@ -1436,7 +1427,27 @@
   width: 195px;
   height: 65px;
 }
+.join-meeting-head h1 {
+  margin: 24px 0 0 0;
+}
+@media only screen and (max-height: 600px) {
+  .join-meeting-head h1 {
+    font: var(--text-h2);
+    margin-top: 14px;
+    margin-bottom: 18px;
+  }
+}
+.join-meeting-head .ephemeral-info {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--label-orange);
+}
+.join-meeting-head .ephemeral-info p {
+  padding: 0 0 0 10px;
+}
 .join-meeting-content {
+  margin: 88px 0 0 0;
   text-align: center;
 }
 .join-meeting-content button {
@@ -1503,7 +1514,7 @@
   position: relative;
   width: 800px;
   height: 300px;
-  margin: 0 auto;
+  margin: 88px auto 0;
   box-sizing: border-box;
   box-shadow: 0 1px 10px 0 rgba(0, 0, 0, 0.1);
   border-radius: 30px;

@@ -15,7 +15,6 @@ export default class SidebarControls extends MegaRenderMixin {
 
         //
         // `SidebarControls`
-        // https://mega.nz/file/wYFwULoT#0IbvYQGgmpfq2jwz7S_hKMJRDrP2rr3-frQUJIifNa0
         // -------------------------------------------------------------------------
 
         return (

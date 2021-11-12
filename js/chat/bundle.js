@@ -478,7 +478,9 @@ let MegaRenderMixin = (_dec = logcall(), _dec2 = SoonFcWrap(50, true), _dec3 = l
       if (node) {
         this.__intersectionVisibility = false;
         setTimeout(() => {
-          this.__intersectionObserverInstance = new IntersectionObserver(([entry]) => {
+          this.__intersectionObserverInstance = new IntersectionObserver(_ref => {
+            let [entry] = _ref;
+
             if (entry.intersectionRatio < 0.2 && !entry.isIntersecting) {
               this.__intersectionVisibility = false;
             } else {
@@ -1477,7 +1479,7 @@ var react1 = __webpack_require__.n(react1__);
 var _stores_mixins_js2__ = __webpack_require__(1);
 var _ui_utils_jsx3__ = __webpack_require__(7);
 var _ui_perfectScrollbar_jsx4__ = __webpack_require__(12);
-var _ui_buttons_jsx5__ = __webpack_require__(4);
+var _ui_buttons_jsx5__ = __webpack_require__(5);
 var _ui_dropdowns_jsx6__ = __webpack_require__(2);
 var _contactsPanel_contactsPanel_jsx7__ = __webpack_require__(18);
 
@@ -1501,8 +1503,8 @@ const closeDropdowns = () => {
 };
 
 class ContactsListItem extends _stores_mixins_js2__["ContactAwareComponent"] {
-  constructor(...args) {
-    super(...args);
+  constructor() {
+    super(...arguments);
     this.attachRerenderCallback = _attchRerenderCbContacts;
   }
 
@@ -1533,8 +1535,8 @@ ContactsListItem.defaultProps = {
   'skipQueuedUpdatesOnResize': true
 };
 class ContactButton extends _stores_mixins_js2__["ContactAwareComponent"] {
-  constructor(...args) {
-    super(...args);
+  constructor() {
+    super(...arguments);
     this.attachRerenderCallbacks = _attchRerenderCbContacts;
   }
 
@@ -1677,7 +1679,7 @@ class ContactButton extends _stores_mixins_js2__["ContactAwareComponent"] {
     } else if (!is_chatlink && !is_eplusplus && (!contact.c || contact.c === 2 && contact.u !== u_handle)) {
       moreDropdowns.push(react1.a.createElement(_ui_dropdowns_jsx6__["DropdownItem"], {
         key: "view2",
-        icon: "sprite-fm-mono icon-add-filled",
+        icon: "sprite-fm-mono icon-add",
         label: l[101],
         onClick: () => {
           const isAnonymousUser = !u_handle || u_type !== 3;
@@ -1982,8 +1984,8 @@ ContactFingerprint.defaultProps = {
   'skipQueuedUpdatesOnResize': true
 };
 class Avatar extends _stores_mixins_js2__["ContactAwareComponent"] {
-  constructor(...args) {
-    super(...args);
+  constructor() {
+    super(...arguments);
     this.attachRerenderCallbacks = _attchRerenderCbContacts;
   }
 
@@ -2267,8 +2269,8 @@ ContactCard.defaultProps = {
   'skipQueuedUpdatesOnResize': true
 };
 class ContactItem extends _stores_mixins_js2__["ContactAwareComponent"] {
-  constructor(...args) {
-    super(...args);
+  constructor() {
+    super(...arguments);
     this.attachRerenderCallbacks = _attchRerenderCbContacts;
   }
 
@@ -2298,7 +2300,9 @@ class ContactItem extends _stores_mixins_js2__["ContactAwareComponent"] {
       hideVerifiedBadge: true,
       chatRoom: this.props.chatRoom
     }), react1.a.createElement("div", {
-      className: "user-card-data"
+      className: "user-card-data simpletip",
+      "data-simpletip": username,
+      "data-simpletipposition": "top"
     }, react1.a.createElement(ContactButton, {
       noContextMenu: this.props.noContextMenu,
       contact: contact,
@@ -2921,6 +2925,115 @@ ContactPickerWidget.defaultProps = {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+var react0__ = __webpack_require__(0);
+var react0 = __webpack_require__.n(react0__);
+var _stores_mixins1__ = __webpack_require__(1);
+
+
+
+class Group extends _stores_mixins1__["MegaRenderMixin"] {
+  constructor(props) {
+    super(props);
+    this.containerRef = react0.a.createRef();
+    this.state = {
+      expanded: false
+    };
+
+    this.toggleEvents = () => this.state.expanded ? $(document).rebind("mousedown." + Group.NAMESPACE, ev => !this.containerRef.current.contains(ev.target) && this.doToggle()).rebind("keydown." + Group.NAMESPACE, _ref => {
+      let {
+        keyCode
+      } = _ref;
+      return keyCode && keyCode === 27 && this.doToggle();
+    }) : $(document).unbind("." + Group.NAMESPACE);
+
+    this.doToggle = () => this.setState(state => ({
+      expanded: !state.expanded
+    }), () => this.toggleEvents());
+  }
+
+  render() {
+    const {
+      active,
+      onHold,
+      screenSharing,
+      children
+    } = this.props;
+
+    if (children && children.length) {
+      return react0.a.createElement("div", {
+        ref: this.containerRef,
+        className: Group.BASE_CLASS
+      }, react0.a.createElement("div", {
+        className: "\n                            " + Group.BASE_CLASS + "-menu\n                            " + (this.state.expanded ? 'expanded' : '') + "\n                        ",
+        onClick: this.doToggle
+      }, children.map((item, index) => react0.a.createElement("div", {
+        key: index,
+        className: Group.BASE_CLASS + "-item"
+      }, item))), react0.a.createElement("button", {
+        className: "mega-button theme-light-forced round large",
+        onClick: this.doToggle
+      }, active && react0.a.createElement("div", {
+        className: "active-indicator"
+      }), react0.a.createElement("i", {
+        className: "\n                                sprite-fm-mono\n                                " + (screenSharing ? 'icon-end-screenshare' : '') + "\n                                " + (!onHold && !screenSharing && 'icon-options') + "\n                            "
+      })));
+    }
+
+    return null;
+  }
+
+}
+
+Group.NAMESPACE = 'buttonGroup';
+Group.BASE_CLASS = 'button-group';
+
+class Button extends _stores_mixins1__["MegaRenderMixin"] {
+  constructor(props) {
+    super(props);
+    this.buttonRef = react0.a.createRef();
+  }
+
+  componentDidUpdate() {
+    super.componentDidUpdate();
+
+    if (this.props.simpletip) {
+      $(this.buttonRef.current).trigger('simpletipUpdated');
+    }
+  }
+
+  render() {
+    const {
+      children,
+      className,
+      style,
+      simpletip,
+      icon,
+      onClick
+    } = this.props;
+    return react0.a.createElement("button", {
+      ref: this.buttonRef,
+      className: "\n                    " + (className ? className : '') + "\n                    " + (simpletip ? 'simpletip' : '') + "\n                ",
+      style: style,
+      "data-simpletip": simpletip == null ? void 0 : simpletip.label,
+      "data-simpletipposition": simpletip == null ? void 0 : simpletip.position,
+      "data-simpletipoffset": simpletip == null ? void 0 : simpletip.offset,
+      "data-simpletip-class": simpletip == null ? void 0 : simpletip.className,
+      onClick: onClick
+    }, icon && react0.a.createElement("i", {
+      className: "sprite-fm-mono " + icon
+    }), children);
+  }
+
+}
+
+Button.Group = Group;
+__webpack_exports__["a"] = (Button);
+
+/***/ }),
+
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
 __webpack_require__.r(__webpack_exports__);
 __webpack_require__.d(__webpack_exports__, "Button", function() { return Button; });
 var _extends0__ = __webpack_require__(6);
@@ -2999,7 +3112,7 @@ class Button extends _stores_mixins_js2__["MegaRenderMixin"] {
     }
 
     if (this.state.focused !== nextState.focused && nextState.focused === true) {
-      $('.conversationsApp').rebind('mousedown.button' + this.getUniqueId(), this.onBlur);
+      $('.conversationsApp, .join-meeting, .main-blur-block').rebind('mousedown.button' + this.getUniqueId(), this.onBlur);
       $(document).rebind('keyup.button' + this.getUniqueId(), e => {
         if (this.state.focused === true && e.keyCode === 27) {
           this.onBlur();
@@ -3093,7 +3206,7 @@ class Button extends _stores_mixins_js2__["MegaRenderMixin"] {
   unbindEvents() {
     $(document).off('keyup.button' + this.getUniqueId());
     $(document).off('closeDropdowns.' + this.getUniqueId());
-    $('.conversationsApp').unbind('mousedown.button' + this.getUniqueId());
+    $('.conversationsApp, .join-meeting, .main-blur-block').unbind('mousedown.button' + this.getUniqueId());
 
     if (this._pageChangeListener) {
       mBroadcaster.removeListener(this._pageChangeListener);
@@ -3151,112 +3264,6 @@ class Button extends _stores_mixins_js2__["MegaRenderMixin"] {
   }
 
 }
-
-/***/ }),
-
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-var react0__ = __webpack_require__(0);
-var react0 = __webpack_require__.n(react0__);
-var _stores_mixins1__ = __webpack_require__(1);
-
-
-
-class Group extends _stores_mixins1__["MegaRenderMixin"] {
-  constructor(props) {
-    super(props);
-    this.containerRef = react0.a.createRef();
-    this.state = {
-      expanded: false
-    };
-
-    this.toggleEvents = () => this.state.expanded ? $(document).rebind("mousedown." + Group.NAMESPACE, ev => !this.containerRef.current.contains(ev.target) && this.doToggle()).rebind("keydown." + Group.NAMESPACE, ({
-      keyCode
-    }) => keyCode && keyCode === 27 && this.doToggle()) : $(document).unbind("." + Group.NAMESPACE);
-
-    this.doToggle = () => this.setState(state => ({
-      expanded: !state.expanded
-    }), () => this.toggleEvents());
-  }
-
-  render() {
-    const {
-      active,
-      onHold,
-      screenSharing,
-      children
-    } = this.props;
-
-    if (children && children.length) {
-      return react0.a.createElement("div", {
-        ref: this.containerRef,
-        className: Group.BASE_CLASS
-      }, react0.a.createElement("div", {
-        className: "\n                            " + Group.BASE_CLASS + "-menu\n                            " + (this.state.expanded ? 'expanded' : '') + "\n                        ",
-        onClick: this.doToggle
-      }, children.map((item, index) => react0.a.createElement("div", {
-        key: index,
-        className: Group.BASE_CLASS + "-item"
-      }, item))), react0.a.createElement("button", {
-        className: "mega-button theme-light-forced round large",
-        onClick: this.doToggle
-      }, active && react0.a.createElement("div", {
-        className: "active-indicator"
-      }), react0.a.createElement("i", {
-        className: "\n                                sprite-fm-mono\n                                " + (screenSharing ? 'icon-end-screenshare' : '') + "\n                                " + (!onHold && !screenSharing && 'icon-options') + "\n                            "
-      })));
-    }
-
-    return null;
-  }
-
-}
-
-Group.NAMESPACE = 'buttonGroup';
-Group.BASE_CLASS = 'button-group';
-
-class Button extends _stores_mixins1__["MegaRenderMixin"] {
-  constructor(props) {
-    super(props);
-    this.buttonRef = react0.a.createRef();
-  }
-
-  componentDidUpdate() {
-    super.componentDidUpdate();
-
-    if (this.props.simpletip) {
-      $(this.buttonRef.current).trigger('simpletipUpdated');
-    }
-  }
-
-  render() {
-    const {
-      children,
-      className,
-      style,
-      simpletip,
-      icon,
-      onClick
-    } = this.props;
-    return react0.a.createElement("button", {
-      ref: this.buttonRef,
-      className: "\n                    " + (className ? className : '') + "\n                    " + (simpletip ? 'simpletip' : '') + "\n                ",
-      style: style,
-      "data-simpletip": simpletip == null ? void 0 : simpletip.label,
-      "data-simpletipposition": simpletip == null ? void 0 : simpletip.position,
-      "data-simpletipoffset": simpletip == null ? void 0 : simpletip.offset,
-      "data-simpletip-class": simpletip == null ? void 0 : simpletip.className,
-      onClick: onClick
-    }, icon && react0.a.createElement("i", {
-      className: "sprite-fm-mono " + icon
-    }), children);
-  }
-
-}
-
-Button.Group = Group;
-__webpack_exports__["a"] = (Button);
 
 /***/ }),
 
@@ -3604,9 +3611,11 @@ class ModalDialog extends _stores_mixins_js1__["MegaRenderMixin"] {
         convApp.addEventListener('click', this.onBlur);
       }
 
-      $('.fm-modal-dialog').rebind('click.modalDialogOv' + this.getUniqueId(), ({
-        target
-      }) => {
+      $('.fm-modal-dialog').rebind('click.modalDialogOv' + this.getUniqueId(), _ref => {
+        let {
+          target
+        } = _ref;
+
         if ($(target).is('.fm-modal-dialog')) {
           this.onBlur();
         }
@@ -3620,9 +3629,11 @@ class ModalDialog extends _stores_mixins_js1__["MegaRenderMixin"] {
       });
     }
 
-    $(document).rebind('keyup.modalDialog' + this.getUniqueId(), ({
-      keyCode
-    }) => {
+    $(document).rebind('keyup.modalDialog' + this.getUniqueId(), _ref2 => {
+      let {
+        keyCode
+      } = _ref2;
+
       if (!this.props.stopKeyPropagation && keyCode === 27) {
         this.onBlur();
       }
@@ -4696,7 +4707,7 @@ __webpack_require__.d(__webpack_exports__, "ConversationMessageMixin", function(
 var react0__ = __webpack_require__(0);
 var react0 = __webpack_require__.n(react0__);
 var _stores_mixins_js1__ = __webpack_require__(1);
-var _ui_buttons_jsx2__ = __webpack_require__(4);
+var _ui_buttons_jsx2__ = __webpack_require__(5);
 var _ui_emojiDropdown_jsx3__ = __webpack_require__(17);
 
 
@@ -5448,7 +5459,11 @@ ChatRoom.MembersSet.PRIVILEGE_STATE = {
   'LEFT': -1
 };
 
-ChatRoom.encryptTopic = function (protocolHandler, newTopic, participants, isPublic = false) {
+ChatRoom.encryptTopic = function (protocolHandler, newTopic, participants, isPublic) {
+  if (isPublic === void 0) {
+    isPublic = false;
+  }
+
   if (protocolHandler instanceof strongvelope.ProtocolHandler && participants.size > 0) {
     const topic = protocolHandler.embeddedEncryptTo(newTopic, strongvelope.MESSAGE_TYPES.TOPIC_CHANGE, participants, undefined, isPublic);
 
@@ -7514,8 +7529,8 @@ class genericTable_GenericTable extends genericNodePropsComponent["a" ] {
 
 
 class adapters_GenericListAdapter extends mixins["MegaRenderMixin"] {
-  constructor(...args) {
-    super(...args);
+  constructor() {
+    super(...arguments);
     this.customIsEventuallyVisible = true;
   }
 
@@ -7600,8 +7615,8 @@ var tooltips = __webpack_require__(16);
 
 
 class columnNodeName_ColumnNodeName extends genericNodePropsComponent["a" ] {
-  constructor(...args) {
-    super(...args);
+  constructor() {
+    super(...arguments);
     this.state = {
       src: null
     };
@@ -9221,7 +9236,7 @@ var external_React_default = __webpack_require__.n(external_React_);
 var mixins = __webpack_require__(1);
 
 // EXTERNAL MODULE: ./js/ui/buttons.jsx
-var buttons = __webpack_require__(4);
+var buttons = __webpack_require__(5);
 
 // CONCATENATED MODULE: ./js/chat/ui/contactsPanel/navigation.jsx
 
@@ -9412,8 +9427,8 @@ columnContactStatus_ColumnContactStatus.megatype = "status";
 
 
 class columnContactLastInteraction_ColumnContactLastInteraction extends genericNodePropsComponent["a" ] {
-  constructor(...args) {
-    super(...args);
+  constructor() {
+    super(...arguments);
 
     this.getLastInteractionIcon = handle => {
       const {
@@ -9900,8 +9915,8 @@ columnContactRequestsTs_ColumnContactRequestsTs.megatype = "ts";
 
 
 class columnContactRequestsRcvdBtns_ColumnContactRequestsRcvdBtns extends mixins["MegaRenderMixin"] {
-  constructor(...args) {
-    super(...args);
+  constructor() {
+    super(...arguments);
 
     this.reinviteAllowed = rts => {
       const UTC_DATE_NOW = Math.floor(Date.now() / 1000);
@@ -10021,8 +10036,8 @@ class receivedRequests_ReceivedRequests extends mixins["MegaRenderMixin"] {
 
 
 class columnContactRequestsSentBtns_ColumnContactRequestsSentBtns extends mixins["MegaRenderMixin"] {
-  constructor(...args) {
-    super(...args);
+  constructor() {
+    super(...arguments);
 
     this.reinviteAllowed = rts => {
       const UTC_DATE_NOW = Math.floor(Date.now() / 1000);
@@ -10525,9 +10540,11 @@ class contactsPanel_ContactsPanel extends mixins["MegaRenderMixin"] {
 
     this.getReceivedRequestsCount = () => this.props.received && Object.keys(this.props.received).length;
 
-    this.handleToggle = ({
-      keyCode
-    }) => {
+    this.handleToggle = _ref => {
+      let {
+        keyCode
+      } = _ref;
+
       if (keyCode === 27) {
         const HAS_DIALOG_OPENED = $.dialog || ['.contact-nickname-dialog', '.fingerprint-dialog', '.context'].some(selector => {
           const dialog = document.querySelector(selector);
@@ -10921,7 +10938,7 @@ var utils = __webpack_require__(7);
 var mixins = __webpack_require__(1);
 
 // EXTERNAL MODULE: ./js/ui/buttons.jsx
-var ui_buttons = __webpack_require__(4);
+var ui_buttons = __webpack_require__(5);
 
 // EXTERNAL MODULE: ./js/ui/dropdowns.jsx
 var ui_dropdowns = __webpack_require__(2);
@@ -11433,9 +11450,12 @@ class cloudBrowserModalDialog_CloudBrowserDialog extends mixins["MegaRenderMixin
           this.props.onClose();
           onIdle(() => {
             const createPublicLink = () => {
-              M.createPublicLink(highlightedNode).then(({
-                link
-              }) => this.props.room.sendMessage(link));
+              M.createPublicLink(highlightedNode).then(_ref => {
+                let {
+                  link
+                } = _ref;
+                return this.props.room.sendMessage(link);
+              });
             };
 
             return mega.megadrop.isDropExist(highlightedNode).length ? msgDialog('confirmation', l[1003], l[17403].replace('%1', escapeHTML(highlightedNode.name)), l[18229], e => {
@@ -11577,8 +11597,8 @@ const LIMIT = {
   MONTHS: 12
 };
 class historyRetentionDialog_HistoryRetentionDialog extends external_React_["Component"] {
-  constructor(...args) {
-    super(...args);
+  constructor() {
+    super(...arguments);
     this.inputRef = external_React_default.a.createRef();
     this.state = {
       selectedTimeFormat: historyRetentionDialog_HistoryRetentionDialog.labels.timeFormats.plural.hours,
@@ -11831,13 +11851,14 @@ historyRetentionDialog_HistoryRetentionDialog.timeFrame = {
   [l[6788]]: 30
 };
 
-function CustomRadioButton({
-  checked = false,
-  label,
-  name,
-  value,
-  onChange
-}) {
+function CustomRadioButton(_ref) {
+  let {
+    checked = false,
+    label,
+    name,
+    value,
+    onChange
+  } = _ref;
   return external_React_default.a.createElement("label", {
     key: value,
     className: "radio-txt"
@@ -12668,7 +12689,7 @@ class contact_Contact extends abstractGenericMessage_AbstractGenericMessage {
         mBroadcaster.sendMessage('chat:open');
       }
     })), !HAS_RELATIONSHIP && !is_eplusplus && external_React_default.a.createElement(ui_dropdowns["DropdownItem"], {
-      icon: "sprite-fm-mono icon-add-filled",
+      icon: "sprite-fm-mono icon-add",
       label: l[71],
       onClick: () => this._handleAddContact(contactEmail)
     }), this._getContactDeleteButton(message)));
@@ -12735,8 +12756,8 @@ class contact_Contact extends abstractGenericMessage_AbstractGenericMessage {
 
 
 class attachment_Attachment extends abstractGenericMessage_AbstractGenericMessage {
-  constructor(...args) {
-    super(...args);
+  constructor() {
+    super(...arguments);
 
     this._isRevoked = node => !M.chd[node.ch] || node.revoked;
   }
@@ -12915,10 +12936,12 @@ class attachment_Attachment extends abstractGenericMessage_AbstractGenericMessag
 
       var preview = external_React_default.a.createElement("div", {
         className: "data-block-view medium " + noThumbPrev,
-        onClick: ({
-          target,
-          currentTarget
-        }) => {
+        onClick: _ref => {
+          let {
+            target,
+            currentTarget
+          } = _ref;
+
           if (isPreviewable && target === currentTarget) {
             this.props.onPreviewStart(v);
           }
@@ -13214,9 +13237,10 @@ class audioContainer_AudioContainer extends external_React_default.a.Component {
         return false;
       }
 
-      M.gfsfetch(h, 0, -1).then(({
-        buffer
-      }) => {
+      M.gfsfetch(h, 0, -1).then(_ref => {
+        let {
+          buffer
+        } = _ref;
         this.setState(() => {
           return {
             audioBlobUrl: mObjectURL([buffer], 'audio/mp4'),
@@ -13751,7 +13775,7 @@ var ReactDOM = __webpack_require__(10);
 
 
 
-var ButtonsUI = __webpack_require__(4);
+var ButtonsUI = __webpack_require__(5);
 
 class emojiAutocomplete_EmojiAutocomplete extends mixins["MegaRenderMixin"] {
   constructor(props) {
@@ -14104,19 +14128,25 @@ const NODE_CLASS = 'node';
 const RESULT_CONTAINER_CLASS = 'gif-panel-results';
 const RESULTS_END_CLASS = 'results-end';
 
-const resultContainer_Nil = ({
-  children
-}) => external_React_default.a.createElement("div", {
-  className: "no-results-container"
-}, external_React_default.a.createElement("div", {
-  className: "no-results-content"
-}, external_React_default.a.createElement("i", {
-  className: "huge-icon sad-smile"
-}), external_React_default.a.createElement("span", null, children)));
+const resultContainer_Nil = _ref => {
+  let {
+    children
+  } = _ref;
+  return external_React_default.a.createElement("div", {
+    className: "no-results-container"
+  }, external_React_default.a.createElement("div", {
+    className: "no-results-content"
+  }, external_React_default.a.createElement("i", {
+    className: "huge-icon sad-smile"
+  }), external_React_default.a.createElement("span", null, children)));
+};
 
 class resultContainer_ResultContainer extends mixins["MegaRenderMixin"] {
   constructor(props) {
+    var _this;
+
     super(props);
+    _this = this;
     this.intersectionObserver = null;
 
     this.initializeIntersectionObserver = () => {
@@ -14140,9 +14170,13 @@ class resultContainer_ResultContainer extends mixins["MegaRenderMixin"] {
       }
     };
 
-    this.toggleIntersectionObserver = (node, action = 'observe') => {
-      if (node && this.intersectionObserver) {
-        this.intersectionObserver[action](node);
+    this.toggleIntersectionObserver = function (node, action) {
+      if (action === void 0) {
+        action = 'observe';
+      }
+
+      if (node && _this.intersectionObserver) {
+        _this.intersectionObserver[action](node);
       }
     };
   }
@@ -14205,13 +14239,14 @@ class resultContainer_ResultContainer extends mixins["MegaRenderMixin"] {
     if (results.length) {
       return external_React_default.a.createElement(external_React_default.a.Fragment, null, external_React_default.a.createElement("div", {
         className: RESULT_CONTAINER_CLASS
-      }, results.map(({
-        slug,
-        images: {
-          fixed_width_downsampled
-        },
-        title
-      }, index) => {
+      }, results.map((_ref2, index) => {
+        let {
+          slug,
+          images: {
+            fixed_width_downsampled
+          },
+          title
+        } = _ref2;
         return external_React_default.a.createElement(result_Result, {
           key: slug + "--" + index,
           image: fixed_width_downsampled,
@@ -14304,9 +14339,11 @@ class gifPanel_GifPanel extends mixins["MegaRenderMixin"] {
         if (this.clickedOutsideComponent(ev)) {
           this.props.onToggle();
         }
-      }).rebind('keydown.gifPanel', ({
-        keyCode
-      }) => {
+      }).rebind('keydown.gifPanel', _ref => {
+        let {
+          keyCode
+        } = _ref;
+
         if (keyCode && keyCode === 27) {
           return searchField_SearchField.hasValue() ? this.doReset() : this.props.onToggle();
         }
@@ -14330,9 +14367,10 @@ class gifPanel_GifPanel extends mixins["MegaRenderMixin"] {
         this.controllerRef = typeof AbortController === 'function' && new AbortController();
         this.fetchRef = fetch(this.getFormattedPath(path), {
           signal: this.controllerRef.signal
-        }).then(response => response.json()).then(({
-          data
-        }) => {
+        }).then(response => response.json()).then(_ref2 => {
+          let {
+            data
+          } = _ref2;
           this.fetchRef = this.pathRef = null;
 
           if (this.isMounted()) {
@@ -15315,8 +15353,8 @@ let typingArea_TypingArea = (_dec = Object(mixins["SoonFcWrap"])(60), _dec2 = Ob
 
 
 class text_Text extends abstractGenericMessage_AbstractGenericMessage {
-  constructor(...args) {
-    super(...args);
+  constructor() {
+    super(...arguments);
 
     this.isRichPreview = message => message.metaType === Message.MESSAGE_META_TYPE.RICH_PREVIEW;
 
@@ -15827,6 +15865,7 @@ class generic_GenericConversationMessage extends mixin["ConversationMessageMixin
     if (M.isInvalidUserStatus()) {
       return;
     }
+
     var newFavState = Number(!M.isFavourite(h));
     M.favourite([h], newFavState);
   }
@@ -17885,7 +17924,7 @@ pushSettingsDialog_PushSettingsDialog.options = {
 };
 pushSettingsDialog_PushSettingsDialog.default = pushSettingsDialog_PushSettingsDialog.options[pushSettingsDialog_PushSettingsDialog.options.length - 1];
 // EXTERNAL MODULE: ./js/chat/ui/meetings/button.jsx
-var meetings_button = __webpack_require__(5);
+var meetings_button = __webpack_require__(4);
 
 // CONCATENATED MODULE: ./js/chat/ui/meetings/modeSwitch.jsx
 
@@ -17900,9 +17939,12 @@ class modeSwitch_ModeSwitch extends mixins["MegaRenderMixin"] {
       expanded: false
     };
 
-    this.toggleEvents = () => this.state.expanded ? $(document).rebind("mousedown." + modeSwitch_ModeSwitch.NAMESPACE, ev => !this.containerRef.current.contains(ev.target) && this.doToggle()).rebind("keydown." + modeSwitch_ModeSwitch.NAMESPACE, ({
-      keyCode
-    }) => keyCode && keyCode === 27 && this.doToggle()) : $(document).unbind("." + modeSwitch_ModeSwitch.NAMESPACE);
+    this.toggleEvents = () => this.state.expanded ? $(document).rebind("mousedown." + modeSwitch_ModeSwitch.NAMESPACE, ev => !this.containerRef.current.contains(ev.target) && this.doToggle()).rebind("keydown." + modeSwitch_ModeSwitch.NAMESPACE, _ref => {
+      let {
+        keyCode
+      } = _ref;
+      return keyCode && keyCode === 27 && this.doToggle();
+    }) : $(document).unbind("." + modeSwitch_ModeSwitch.NAMESPACE);
 
     this.doToggle = () => this.setState(state => ({
       expanded: !state.expanded
@@ -17935,10 +17977,11 @@ class modeSwitch_ModeSwitch extends mixins["MegaRenderMixin"] {
       }));
     };
 
-    this.Option = ({
-      label,
-      mode
-    }) => {
+    this.Option = _ref2 => {
+      let {
+        label,
+        mode
+      } = _ref2;
       return external_React_default.a.createElement("div", {
         className: "\n                    " + modeSwitch_ModeSwitch.BASE_CLASS + "-option\n                    " + (mode === this.props.mode ? 'active' : '') + "\n                ",
         onClick: () => {
@@ -18013,9 +18056,11 @@ class streamHead_StreamHead extends mixins["MegaRenderMixin"] {
       banner: !state.banner
     }), () => callback && callback());
 
-    this.handleDialogClose = ({
-      target
-    }) => {
+    this.handleDialogClose = _ref => {
+      let {
+        target
+      } = _ref;
+
       if (this.state.dialog) {
         const {
           topicRef,
@@ -18429,11 +18474,14 @@ let streamNode_StreamNode = (streamNode_dec = Object(mixins["SoonFcWrap"])(30, t
         userHandle
       } = this.props.stream;
 
-      const $$CONTAINER = ({
-        children
-      }) => external_React_default.a.createElement("div", {
-        className: "stream-node-status theme-dark-forced"
-      }, children);
+      const $$CONTAINER = _ref => {
+        let {
+          children
+        } = _ref;
+        return external_React_default.a.createElement("div", {
+          className: "stream-node-status theme-dark-forced"
+        }, children);
+      };
 
       const onHoldLabel = l[23542].replace('%s', M.getNameByHandle(userHandle));
 
@@ -18464,7 +18512,11 @@ let streamNode_StreamNode = (streamNode_dec = Object(mixins["SoonFcWrap"])(30, t
     this.updateVideoStream();
   }
 
-  triggerFakeResize(currentVisibility = 0xDEAD) {
+  triggerFakeResize(currentVisibility) {
+    if (currentVisibility === void 0) {
+      currentVisibility = 0xDEAD;
+    }
+
     if (currentVisibility === true || currentVisibility === 0xDEAD && this.isComponentVisible()) {
       var node = this.findDOMNode();
       this.onResizeObserved(node.offsetWidth, node.offsetHeight);
@@ -18950,9 +19002,11 @@ class local_Stream extends mixins["MegaRenderMixin"] {
       }
     };
 
-    this.handleOptionsClose = ({
-      target
-    }) => {
+    this.handleOptionsClose = _ref => {
+      let {
+        target
+      } = _ref;
+
       if (this.state.options && !target.classList.contains('icon-options')) {
         this.setState({
           options: false
@@ -19109,9 +19163,12 @@ class local_Stream extends mixins["MegaRenderMixin"] {
     return external_React_default.a.createElement("div", {
       ref: this.containerRef,
       className: "\n                    " + NAMESPACE + "\n                    " + (streamNode_StreamNode.isStreaming(this.getStreamSource()) ? ratioClass : '') + "\n                    " + (IS_MINI_MODE ? 'mini' : '') + "\n                    " + (minimized ? 'minimized' : '') + "\n                    " + (this.state.options ? 'active' : '') + "\n                    " + (sidebar && !minimized ? POSITION_MODIFIER : '') + "\n                ",
-      onClick: ({
-        target
-      }) => minimized && target.classList.contains(NAMESPACE + "-overlay") && onCallExpand()
+      onClick: _ref2 => {
+        let {
+          target
+        } = _ref2;
+        return minimized && target.classList.contains(NAMESPACE + "-overlay") && onCallExpand();
+      }
     }, IS_MINI_MODE && this.renderMiniMode(), !IS_MINI_MODE && this.renderSelfView(), minimized && external_React_default.a.createElement(local_Minimized, extends_default()({}, this.props, {
       onOptionsToggle: this.handleOptionsToggle
     })));
@@ -19311,8 +19368,11 @@ const PAGINATION = {
 };
 const MOUSE_OUT_DELAY = 2500;
 class stream_Stream extends mixins["MegaRenderMixin"] {
-  constructor(...args) {
-    super(...args);
+  constructor() {
+    var _this;
+
+    super(...arguments);
+    _this = this;
     this.wrapperRef = external_React_default.a.createRef();
     this.containerRef = external_React_default.a.createRef();
     this.nodeRefs = [];
@@ -19397,15 +19457,19 @@ class stream_Stream extends mixins["MegaRenderMixin"] {
       return null;
     };
 
-    this.scaleNodes = (columns, forced = false) => {
+    this.scaleNodes = function (columns, forced) {
+      if (forced === void 0) {
+        forced = false;
+      }
+
       const {
         streams,
         isOnHold,
         minimized,
         mode
-      } = this.props;
-      const container = this.containerRef.current;
-      this.lastRescaledCache = forced ? null : this.lastRescaledCache;
+      } = _this.props;
+      const container = _this.containerRef.current;
+      _this.lastRescaledCache = forced ? null : _this.lastRescaledCache;
 
       if (isOnHold || minimized || !container) {
         return;
@@ -19414,14 +19478,14 @@ class stream_Stream extends mixins["MegaRenderMixin"] {
       const parentRef = container.parentNode;
       const containerWidth = parentRef.offsetWidth;
       const containerHeight = parentRef.offsetHeight - 100;
-      const streamsInUI = streams.length > MAX_STREAMS_PER_PAGE ? this.chunks[this.state.page] : streams;
+      const streamsInUI = streams.length > MAX_STREAMS_PER_PAGE ? _this.chunks[_this.state.page] : streams;
 
       if (streamsInUI) {
         const streamCountInUI = streamsInUI.length;
         let rows;
 
         if (mode === call_Call.MODE.THUMBNAIL) {
-          columns = typeof columns === 'number' ? columns : this.getColumns(streamCountInUI);
+          columns = typeof columns === 'number' ? columns : _this.getColumns(streamCountInUI);
           rows = Math.ceil(streamCountInUI / columns);
         } else {
           rows = 1;
@@ -19436,12 +19500,13 @@ class stream_Stream extends mixins["MegaRenderMixin"] {
           targetWidth = targetHeight / 9 * 16;
         }
 
-        const nodeRefs = this.nodeRefs.flat();
+        const nodeRefs = _this.nodeRefs.flat();
+
         const nodeRefsLength = nodeRefs.length;
         const viewMode = mode || call_Call.MODE.SPEAKER;
 
         if (viewMode === call_Call.MODE.THUMBNAIL && columns !== 4 && (targetWidth < 160 || targetHeight < 120)) {
-          return this.scaleNodes(4);
+          return _this.scaleNodes(4);
         }
 
         let cache = viewMode + ":" + targetWidth + ":" + targetHeight + ":" + nodeRefsLength + ":" + rows + ":" + streamCountInUI + ":" + columns;
@@ -19450,11 +19515,11 @@ class stream_Stream extends mixins["MegaRenderMixin"] {
           cache += nodeRefs[i].cacheKey + ":";
         }
 
-        if (this.lastRescaledCache === cache) {
+        if (_this.lastRescaledCache === cache) {
           return;
         }
 
-        this.lastRescaledCache = cache;
+        _this.lastRescaledCache = cache;
 
         for (let i = 0; i < nodeRefsLength; i++) {
           const node = nodeRefs[i];
@@ -20524,9 +20589,10 @@ let historyPanel_HistoryPanel = (historyPanel_dec = utils["default"].SoonFcWrap(
     this.$container = null;
     this.$messages = null;
 
-    this.onKeyboardScroll = ({
-      keyCode
-    }) => {
+    this.onKeyboardScroll = _ref => {
+      let {
+        keyCode
+      } = _ref;
       const scrollbar = this.messagesListScrollable;
       const domNode = scrollbar == null ? void 0 : scrollbar.domNode;
 
@@ -20769,7 +20835,11 @@ let historyPanel_HistoryPanel = (historyPanel_dec = utils["default"].SoonFcWrap(
     }
   }
 
-  onMessagesScrollUserScroll(ps, offset = 5) {
+  onMessagesScrollUserScroll(ps, offset) {
+    if (offset === void 0) {
+      offset = 5;
+    }
+
     var self = this;
     var scrollPositionY = ps.getScrollPositionY();
     var isAtTop = ps.isAtTop();
@@ -21227,35 +21297,7 @@ class collapse_Collapse extends mixins["MegaRenderMixin"] {
   }
 
 }
-// CONCATENATED MODULE: ./js/chat/ui/meetings/guest.jsx
-
-
-
-class guest_Guest extends mixins["MegaRenderMixin"] {
-  constructor(props) {
-    super(props);
-  }
-
-  render() {
-    return external_React_default.a.createElement("div", {
-      className: "guest-register"
-    }, external_React_default.a.createElement("div", {
-      className: "guest-register-content"
-    }, external_React_default.a.createElement(meetings_button["a" ], {
-      className: "close-guest-register",
-      icon: "icon-close-component",
-      onClick: this.props.onGuestClose
-    }, external_React_default.a.createElement("span", null, l[148])), external_React_default.a.createElement("div", null, external_React_default.a.createElement("i", {
-      className: "sprite-fm-illustration-wide registration"
-    }), l.meetings_signup), external_React_default.a.createElement(meetings_button["a" ], {
-      className: "mega-button positive register-button",
-      onClick: () => loadSubPage('register')
-    }, l[968])));
-  }
-
-}
 // CONCATENATED MODULE: ./js/chat/ui/meetings/participants.jsx
-
 
 
 
@@ -21322,16 +21364,14 @@ class participants_Participant extends mixins["MegaRenderMixin"] {
 class participants_Participants extends mixins["MegaRenderMixin"] {
   constructor(props) {
     super(props);
-    this.participantsListRef = null;
   }
 
   render() {
     const {
       streams,
       call,
-      chatRoom,
       guest,
-      onGuestClose
+      chatRoom
     } = this.props;
     return external_React_default.a.createElement("div", {
       className: "participants"
@@ -21343,9 +21383,6 @@ class participants_Participants extends mixins["MegaRenderMixin"] {
     }, external_React_default.a.createElement(perfectScrollbar["PerfectScrollbar"], {
       options: {
         'suppressScrollX': true
-      },
-      ref: ref => {
-        this.participantsListRef = ref;
       }
     }, external_React_default.a.createElement("ul", null, external_React_default.a.createElement("li", null, external_React_default.a.createElement(participants_Participant, {
       call: call,
@@ -21359,9 +21396,34 @@ class participants_Participants extends mixins["MegaRenderMixin"] {
       stream: stream,
       handle: stream.userHandle,
       name: stream.name
-    }))))))), guest && external_React_default.a.createElement(guest_Guest, {
-      onGuestClose: () => onGuestClose(this.participantsListRef)
-    }));
+    }))))))));
+  }
+
+}
+// CONCATENATED MODULE: ./js/chat/ui/meetings/guest.jsx
+
+
+
+class guest_Guest extends mixins["MegaRenderMixin"] {
+  constructor(props) {
+    super(props);
+  }
+
+  render() {
+    return external_React_default.a.createElement("div", {
+      className: "guest-register"
+    }, external_React_default.a.createElement("div", {
+      className: "guest-register-content"
+    }, external_React_default.a.createElement(meetings_button["a" ], {
+      className: "close-guest-register",
+      icon: "icon-close-component",
+      onClick: this.props.onGuestClose
+    }, external_React_default.a.createElement("span", null, l[148])), external_React_default.a.createElement("div", null, external_React_default.a.createElement("i", {
+      className: "sprite-fm-illustration-wide registration"
+    }), l.meetings_signup), external_React_default.a.createElement(meetings_button["a" ], {
+      className: "mega-button positive register-button",
+      onClick: () => loadSubPage('register')
+    }, l[968])));
   }
 
 }
@@ -21382,9 +21444,6 @@ class sidebar_Sidebar extends mixins["MegaRenderMixin"] {
   constructor(props) {
     super(props);
     this.historyPanel = null;
-    this.state = {
-      guest: false
-    };
 
     this.renderHead = () => {
       const {
@@ -21416,13 +21475,11 @@ class sidebar_Sidebar extends mixins["MegaRenderMixin"] {
         mode,
         call,
         streams,
+        guest,
         chatRoom,
         forcedLocal,
         onSpeakerChange
       } = this.props;
-      const {
-        guest
-      } = this.state;
       const localStream = call.getLocalStream();
       return external_React_default.a.createElement("div", {
         className: "\n                    sidebar-streams-container\n                    " + (guest ? 'guest' : '') + "\n                "
@@ -21453,11 +21510,7 @@ class sidebar_Sidebar extends mixins["MegaRenderMixin"] {
           className: stream.isActive || stream.clientId === call.forcedActiveStream ? 'active' : '',
           onClick: onSpeakerChange
         });
-      })))), guest && external_React_default.a.createElement(guest_Guest, {
-        onGuestClose: () => this.setState({
-          guest: false
-        })
-      }));
+      })))));
     };
 
     this.renderChatView = () => {
@@ -21482,30 +21535,30 @@ class sidebar_Sidebar extends mixins["MegaRenderMixin"] {
       const {
         call,
         streams,
+        guest,
         chatRoom
       } = this.props;
       return external_React_default.a.createElement(participants_Participants, {
         streams: streams,
         call: call,
         chatRoom: chatRoom,
-        guest: this.state.guest,
-        onGuestClose: participantsListRef => this.setState({
-          guest: false
-        }, () => participantsListRef.reinitialise())
+        guest: guest
       });
     };
-
-    this.state.guest = call_Call.isGuest();
   }
 
   render() {
     const {
       mode,
-      view
+      view,
+      guest,
+      onGuestClose
     } = this.props;
     return external_React_default.a.createElement("div", {
       className: "\n                    sidebar\n                    " + (view === call_Call.VIEW.CHAT ? 'chat-opened' : 'theme-dark-forced') + "\n                "
-    }, this.renderHead(), view === call_Call.VIEW.PARTICIPANTS && mode === call_Call.MODE.SPEAKER && this.renderSpeakerMode(), view === call_Call.VIEW.CHAT && this.renderChatView(), view === call_Call.VIEW.PARTICIPANTS && mode === call_Call.MODE.THUMBNAIL && this.renderParticipantsView());
+    }, this.renderHead(), view === call_Call.VIEW.PARTICIPANTS && mode === call_Call.MODE.SPEAKER && this.renderSpeakerMode(), view === call_Call.VIEW.CHAT && this.renderChatView(), view === call_Call.VIEW.PARTICIPANTS && mode === call_Call.MODE.THUMBNAIL && this.renderParticipantsView(), guest && view !== call_Call.VIEW.CHAT && external_React_default.a.createElement(guest_Guest, {
+      onGuestClose: onGuestClose
+    }));
   }
 
 }
@@ -22009,7 +22062,8 @@ class call_Call extends mixins["MegaRenderMixin"] {
       invite: false,
       end: false,
       ephemeral: false,
-      ephemeralAccounts: []
+      ephemeralAccounts: [],
+      guest: call_Call.isGuest()
     };
 
     this.customIsEventuallyVisible = () => true;
@@ -22194,7 +22248,8 @@ class call_Call extends mixins["MegaRenderMixin"] {
       invite,
       end,
       ephemeral,
-      ephemeralAccounts
+      ephemeralAccounts,
+      guest
     } = this.state;
     const STREAM_PROPS = {
       mode,
@@ -22228,6 +22283,10 @@ class call_Call extends mixins["MegaRenderMixin"] {
       onHoldClick: this.handleHoldToggle,
       onThumbnailDoubleClick: streamNode => this.handleSpeakerChange(streamNode)
     })), sidebar && external_React_default.a.createElement(sidebar_Sidebar, extends_default()({}, STREAM_PROPS, {
+      guest: guest,
+      onGuestClose: () => this.setState({
+        guest: false
+      }),
       onSidebarClose: () => this.setState({ ...call_Call.STATE.DEFAULT
       }),
       onDeleteMessage: onDeleteMessage
@@ -22312,9 +22371,12 @@ class loading_Loading extends mixins["MegaRenderMixin"] {
     closeDialog == null ? void 0 : closeDialog();
     (_notify = notify) == null ? void 0 : _notify.closePopup();
     (_alarm = alarm) == null ? void 0 : _alarm.hideAllWarningPopups();
-    document.querySelectorAll('.js-dropdown-account').forEach(({
-      classList
-    }) => classList.contains('show') && classList.remove('show'));
+    document.querySelectorAll('.js-dropdown-account').forEach(_ref => {
+      let {
+        classList
+      } = _ref;
+      return classList.contains('show') && classList.remove('show');
+    });
   }
 
   render() {
@@ -22478,7 +22540,83 @@ preview_Preview.STREAMS = {
   AUDIO: 1,
   VIDEO: 2
 };
+// CONCATENATED MODULE: ./js/chat/ui/meetings/meetingsCallEndedDialog.jsx
+
+
+
+class meetingsCallEndedDialog_MeetingsCallEndedDialog extends mixins["MegaRenderMixin"] {
+  constructor(props) {
+    super(props);
+    this.state = {
+      'safeShowDialogRendered': false
+    };
+  }
+
+  componentDidMount() {
+    super.componentDidMount();
+    M.safeShowDialog(meetingsCallEndedDialog_MeetingsCallEndedDialog.dialogName, () => {
+      this.setState({
+        'safeShowDialogRendered': true
+      });
+      return this.findDOMNode();
+    });
+  }
+
+  componentWillUnmount() {
+    super.componentWillUnmount();
+
+    if ($.dialog === meetingsCallEndedDialog_MeetingsCallEndedDialog.dialogName) {
+      closeDialog();
+    }
+  }
+
+  render() {
+    const {
+      onClose
+    } = this.props;
+
+    if (!this.state.safeShowDialogRendered) {
+      return null;
+    }
+
+    return external_React_default.a.createElement(modalDialogs["a" ].ModalDialog, {
+      className: "meetings-call-ended-dialog",
+      dialogType: "message",
+      title: l.meeting_ended,
+      buttons: [{
+        label: l.view_history,
+        key: "view",
+        className: "action",
+        onClick: onClose
+      }, {
+        label: l[81],
+        key: "ok",
+        className: "negative",
+        onClick: () => {
+          if (is_chatlink) {
+            is_chatlink = false;
+            delete megaChat.initialPubChatHandle;
+            megaChat.destroy();
+          }
+
+          loadSubPage(u_type === 0 ? 'register' : 'securechat');
+        }
+      }],
+      iconElement: external_React_default.a.createElement("div", {
+        className: "avatar"
+      }, external_React_default.a.createElement("div", {
+        "data-color": "color12",
+        className: "avatar-wrapper small-rounded-avatar color12"
+      }, "X")),
+      onClose: onClose
+    });
+  }
+
+}
+meetingsCallEndedDialog_MeetingsCallEndedDialog.dialogName = 'meetings-ended-dialog';
 // CONCATENATED MODULE: ./js/chat/ui/meetings/workflow/join.jsx
+
+
 
 
 
@@ -22494,14 +22632,16 @@ class join_Join extends mixins["MegaRenderMixin"] {
       firstName: '',
       lastName: '',
       previewAudio: false,
-      previewVideo: false
+      previewVideo: false,
+      ephemeralDialog: false
     };
 
-    this.handleKeyDown = ({
-      key
-    }) => {
+    this.handleKeyDown = _ref => {
       var _this$props$onClose, _this$props;
 
+      let {
+        key
+      } = _ref;
       return key && key === 'Escape' ? (_this$props$onClose = (_this$props = this.props).onClose) == null ? void 0 : _this$props$onClose.call(_this$props) : true;
     };
 
@@ -22513,6 +22653,47 @@ class join_Join extends mixins["MegaRenderMixin"] {
       return [document.querySelector('.nw-fm-left-icons-panel'), document.querySelector('.chat-app-container')].map(el => el && el.classList.add('hidden'));
     };
 
+    this.showConfirmationDialog = () => {
+      megaChat.destroy();
+      return mega.ui.sendSignupLinkDialog(JSON.parse(localStorage.awaitingConfirmationAccount), () => {
+        delete localStorage.awaitingConfirmationAccount;
+        u_logout(true);
+        location.reload();
+      });
+    };
+
+    this.Ephemeral = () => {
+      const onCancel = () => this.setState({
+        ephemeralDialog: false
+      });
+
+      return external_React_default.a.createElement(modalDialogs["a" ].ModalDialog, {
+        name: "end-ephemeral",
+        dialogType: "message",
+        icon: "sprite-fm-uni icon-warning",
+        title: "Join as guest and end your ephemeral session?",
+        noCloseOnClickOutside: true,
+        buttons: [{
+          key: 'cancel',
+          label: 'Cancel',
+          onClick: onCancel
+        }, {
+          key: 'continue',
+          label: 'Continue',
+          className: 'positive',
+          onClick: () => {
+            u_logout(true);
+            sessionStorage.guestForced = true;
+            location.reload();
+          }
+        }],
+        onClose: onCancel
+      }, external_React_default.a.createElement("p", null, "The data you are storing will be lost if you join the meeting as a guest. To preserve your files, ", external_React_default.a.createElement("a", {
+        href: "#",
+        onClick: () => loadSubPage('register')
+      }, "Create an account"), "."));
+    };
+
     this.Head = () => {
       var _this$props$chatRoom;
 
@@ -22522,36 +22703,72 @@ class join_Join extends mixins["MegaRenderMixin"] {
         className: join_Join.NAMESPACE + "-logo"
       }, external_React_default.a.createElement("i", {
         className: "\n                            sprite-fm-illustration-wide\n                            " + (document.body.classList.contains('theme-dark') ? 'mega-logo-dark' : 'img-mega-logo-light') + "\n                        "
-      })), external_React_default.a.createElement("h1", null, l.you_have_invitation.replace('%1', (_this$props$chatRoom = this.props.chatRoom) == null ? void 0 : _this$props$chatRoom.topic)));
+      })), external_React_default.a.createElement("h1", null, l.you_have_invitation.replace('%1', (_this$props$chatRoom = this.props.chatRoom) == null ? void 0 : _this$props$chatRoom.topic)), isEphemeral() && external_React_default.a.createElement("div", {
+        className: "ephemeral-info"
+      }, external_React_default.a.createElement("i", {
+        className: "sprite-fm-uni icon-warning"
+      }), external_React_default.a.createElement("p", null, "You are using an ephemeral session. The data you are storing will be lost if you join the meeting as a guest.")));
     };
 
-    this.Intro = () => external_React_default.a.createElement(external_React_default.a.Fragment, null, external_React_default.a.createElement("div", {
-      className: join_Join.NAMESPACE + "-content"
-    }, external_React_default.a.createElement(meetings_button["a" ], {
-      className: "mega-button positive",
-      onClick: () => this.setState({
-        view: join_Join.VIEW.GUEST
-      })
-    }, l.join_as_guest), external_React_default.a.createElement(meetings_button["a" ], {
-      className: "mega-button",
-      onClick: () => {
-        var _this$props$chatRoom2;
+    this.Intro = () => {
+      const $$CONTAINER = _ref2 => {
+        let {
+          children
+        } = _ref2;
+        return external_React_default.a.createElement(external_React_default.a.Fragment, null, external_React_default.a.createElement("div", {
+          className: join_Join.NAMESPACE + "-content"
+        }, children), this.Chat());
+      };
 
-        megaChat.loginOrRegisterBeforeJoining((_this$props$chatRoom2 = this.props.chatRoom) == null ? void 0 : _this$props$chatRoom2.publicChatHandle, false, true, undefined, () => this.setState({
-          view: join_Join.VIEW.ACCOUNT
-        }));
+      if (isEphemeral()) {
+        return external_React_default.a.createElement($$CONTAINER, null, external_React_default.a.createElement(meetings_button["a" ], {
+          className: "mega-button positive",
+          onClick: () => this.setState({
+            ephemeralDialog: true
+          })
+        }, l.join_as_guest), external_React_default.a.createElement(meetings_button["a" ], {
+          className: "mega-button",
+          onClick: () => loadSubPage('register')
+        }, l[5582]), external_React_default.a.createElement("span", null, l[5585], external_React_default.a.createElement("a", {
+          href: "#",
+          onClick: ev => {
+            ev.preventDefault();
+            mega.ui.showLoginRequiredDialog({
+              minUserType: 3,
+              skipInitialDialog: 1
+            }).done(() => this.setState({
+              view: join_Join.VIEW.ACCOUNT
+            }));
+          }
+        }, "Login")));
       }
-    }, l[171]), external_React_default.a.createElement("p", null, external_React_default.a.createElement("span", {
-      dangerouslySetInnerHTML: {
-        __html: l[20635]
-      },
-      onClick: e => {
-        e.preventDefault();
-        megaChat.loginOrRegisterBeforeJoining(this.props.chatRoom.publicChatHandle, true, undefined, undefined, () => this.setState({
-          view: join_Join.VIEW.ACCOUNT
-        }));
-      }
-    }))), this.Chat());
+
+      return external_React_default.a.createElement($$CONTAINER, null, external_React_default.a.createElement(meetings_button["a" ], {
+        className: "mega-button positive",
+        onClick: () => this.setState({
+          view: join_Join.VIEW.GUEST
+        })
+      }, l.join_as_guest), external_React_default.a.createElement(meetings_button["a" ], {
+        className: "mega-button",
+        onClick: () => {
+          var _this$props$chatRoom2;
+
+          megaChat.loginOrRegisterBeforeJoining((_this$props$chatRoom2 = this.props.chatRoom) == null ? void 0 : _this$props$chatRoom2.publicChatHandle, false, true, undefined, () => this.setState({
+            view: join_Join.VIEW.ACCOUNT
+          }));
+        }
+      }, l[171]), external_React_default.a.createElement("p", null, external_React_default.a.createElement("span", {
+        dangerouslySetInnerHTML: {
+          __html: l[20635]
+        },
+        onClick: e => {
+          e.preventDefault();
+          megaChat.loginOrRegisterBeforeJoining(this.props.chatRoom.publicChatHandle, true, undefined, undefined, () => this.setState({
+            view: join_Join.VIEW.ACCOUNT
+          }));
+        }
+      })));
+    };
 
     this.Chat = () => {
       const {
@@ -22579,29 +22796,33 @@ class join_Join extends mixins["MegaRenderMixin"] {
       }))));
     };
 
-    this.Card = ({
-      children
-    }) => external_React_default.a.createElement("div", {
-      className: "card"
-    }, external_React_default.a.createElement("div", {
-      className: "card-body"
-    }, children, external_React_default.a.createElement("div", null, external_React_default.a.createElement("a", {
-      href: "/securechat"
-    }, "Learn more about MEGA Meetings"))), external_React_default.a.createElement("div", {
-      className: "card-preview"
-    }, external_React_default.a.createElement(preview_Preview, {
-      onToggle: (audio, video) => this.setState({
-        previewAudio: audio,
-        previewVideo: video
-      })
-    })));
+    this.Card = _ref3 => {
+      let {
+        children
+      } = _ref3;
+      return external_React_default.a.createElement("div", {
+        className: "card"
+      }, external_React_default.a.createElement("div", {
+        className: "card-body"
+      }, children, external_React_default.a.createElement("div", null, external_React_default.a.createElement("a", {
+        href: "/securechat"
+      }, "Learn more about MEGA Meetings"))), external_React_default.a.createElement("div", {
+        className: "card-preview"
+      }, external_React_default.a.createElement(preview_Preview, {
+        onToggle: (audio, video) => this.setState({
+          previewAudio: audio,
+          previewVideo: video
+        })
+      })));
+    };
 
-    this.Field = ({
-      name,
-      children
-    }) => {
+    this.Field = _ref4 => {
       var _this$state$name;
 
+      let {
+        name,
+        children
+      } = _ref4;
       return external_React_default.a.createElement("div", {
         className: "\n                    mega-input\n                    title-ontop\n                    " + ((_this$state$name = this.state[name]) != null && _this$state$name.length ? 'valued' : '') + "\n                "
       }, external_React_default.a.createElement("div", {
@@ -22663,8 +22884,6 @@ class join_Join extends mixins["MegaRenderMixin"] {
       }
     }, "Join"));
 
-    this.Login = () => external_React_default.a.createElement("div", null, external_React_default.a.createElement("h1", null, "LOGIN DIALOG"));
-
     this.Unsupported = () => external_React_default.a.createElement("div", {
       className: "unsupported-container"
     }, external_React_default.a.createElement("i", {
@@ -22686,15 +22905,16 @@ class join_Join extends mixins["MegaRenderMixin"] {
         case join_Join.VIEW.ACCOUNT:
           return this.Account();
 
-        case join_Join.VIEW.LOGIN:
-          return this.Login();
-
         case join_Join.VIEW.UNSUPPORTED:
           return this.Unsupported();
       }
     };
 
-    this.state.view = props.initialView || this.state.view;
+    this.state.view = sessionStorage.guestForced ? join_Join.VIEW.GUEST : props.initialView || this.state.view;
+
+    if (localStorage.awaitingConfirmationAccount) {
+      this.showConfirmationDialog();
+    }
   }
 
   componentDidMount() {
@@ -22703,6 +22923,12 @@ class join_Join extends mixins["MegaRenderMixin"] {
     this.hidePanels();
     megaChat._joinDialogIsShown = true;
     alarm.hideAllWarningPopups();
+
+    if ($.dialog === meetingsCallEndedDialog_MeetingsCallEndedDialog.dialogName) {
+      closeDialog();
+    }
+
+    sessionStorage.removeItem('guestForced');
   }
 
   componentWillUnmount() {
@@ -22717,15 +22943,15 @@ class join_Join extends mixins["MegaRenderMixin"] {
   }
 
   render() {
-    if (!this.props.chatRoom) {
-      return null;
-    }
-
+    const {
+      view,
+      ephemeralDialog
+    } = this.state;
     return external_React_default.a.createElement(utils["default"].RenderTo, {
       element: document.body
     }, external_React_default.a.createElement("div", {
       className: join_Join.NAMESPACE
-    }, this.Head(), this.View(this.state.view)));
+    }, this.Head(), this.View(view), ephemeralDialog && external_React_default.a.createElement(this.Ephemeral, null)));
   }
 
 }
@@ -22734,7 +22960,6 @@ join_Join.VIEW = {
   INITIAL: 0,
   GUEST: 1,
   ACCOUNT: 2,
-  LOGIN: 3,
   UNSUPPORTED: 4
 };
 // CONCATENATED MODULE: ./js/chat/ui/conversationpanel.jsx
@@ -23370,8 +23595,13 @@ let conversationpanel_ConversationPanel = (conversationpanel_dec = utils["defaul
       }, rand_range(5, 10) * 1000);
     }
 
+    if (is_chatlink && self.props.chatRoom.isMeeting && u_type !== false && u_type < 3) {
+      eventlog(99747, JSON.stringify([1, u_type | 0]), true);
+    }
+
     self.props.chatRoom._uiIsMounted = true;
     self.props.chatRoom.$rConversationPanel = self;
+    self.props.chatRoom.trigger('onComponentDidMount');
   }
 
   eventuallyInit() {
@@ -24202,20 +24432,21 @@ let conversationpanel_ConversationPanel = (conversationpanel_dec = utils["defaul
       className: "mega-button large positive",
       onClick: () => {
         const join = () => {
-          megaChat.routing.reinitAndJoinPublicChat(room.chatId, room.publicChatHandle, room.publicChatKey).then(() => {
-            delete megaChat.initialPubChatHandle;
-          }, ex => {
-            console.error("Failed to join room:", ex);
-          });
+          megaChat.routing.reinitAndJoinPublicChat(room.chatId, room.publicChatHandle, room.publicChatKey).then(() => delete megaChat.initialPubChatHandle, ex => console.error("Failed to join room:", ex));
         };
+
+        if (u_type === 0) {
+          return loadSubPage('register');
+        }
 
         if (u_type === false) {
           clearTimeout(self.state.setNonLoggedInJoinChatDlgTrue);
           megaChat.loginOrRegisterBeforeJoining(room.publicChatHandle, false, false, false, join);
-        } else {
-          clearTimeout(self.state.setNonLoggedInJoinChatDlgTrue);
-          join();
+          return;
         }
+
+        clearTimeout(self.state.setNonLoggedInJoinChatDlgTrue);
+        join();
       }
     }, l[20597])) : external_React_default.a.createElement(composedTextArea_ComposedTextArea, {
       chatRoom: room,
@@ -24518,22 +24749,25 @@ class resultRow_MemberRow extends mixins["MegaRenderMixin"] {
 
 }
 
-const NilRow = ({
-  onSearchMessages,
-  isFirstQuery
-}) => external_React_default.a.createElement("div", {
-  className: "result-table-row nil"
-}, external_React_default.a.createElement("div", {
-  className: "nil-container"
-}, external_React_default.a.createElement("i", {
-  className: "sprite-fm-mono icon-preview-reveal"
-}), external_React_default.a.createElement("span", null, LABEL.NO_RESULTS), isFirstQuery && external_React_default.a.createElement("div", {
-  className: "search-messages",
-  onClick: onSearchMessages,
-  dangerouslySetInnerHTML: {
-    __html: LABEL.SEARCH_MESSAGES_INLINE.replace('[A]', '<a>').replace('[/A]', '</a>')
-  }
-})));
+const NilRow = _ref => {
+  let {
+    onSearchMessages,
+    isFirstQuery
+  } = _ref;
+  return external_React_default.a.createElement("div", {
+    className: "result-table-row nil"
+  }, external_React_default.a.createElement("div", {
+    className: "nil-container"
+  }, external_React_default.a.createElement("i", {
+    className: "sprite-fm-mono icon-preview-reveal"
+  }), external_React_default.a.createElement("span", null, LABEL.NO_RESULTS), isFirstQuery && external_React_default.a.createElement("div", {
+    className: "search-messages",
+    onClick: onSearchMessages,
+    dangerouslySetInnerHTML: {
+      __html: LABEL.SEARCH_MESSAGES_INLINE.replace('[A]', '<a>').replace('[/A]', '</a>')
+    }
+  })));
+};
 
 class resultRow_ResultRow extends mixins["MegaRenderMixin"] {
   constructor(props) {
@@ -25064,9 +25298,11 @@ class start_Start extends mixins["MegaRenderMixin"] {
       if (this.state.editing && !ev.target.classList.contains(start_Start.CLASS_NAMES.EDIT) && !ev.target.classList.contains(start_Start.CLASS_NAMES.INPUT)) {
         this.toggleEdit();
       }
-    }).rebind("keyup." + start_Start.NAMESPACE, ({
-      keyCode
-    }) => {
+    }).rebind("keyup." + start_Start.NAMESPACE, _ref => {
+      let {
+        keyCode
+      } = _ref;
+
       if (this.state.editing) {
         const [ENTER, ESCAPE] = [13, 27];
         return keyCode === ENTER ? this.toggleEdit() : keyCode === ESCAPE ? this.doReset() : null;
@@ -25165,79 +25401,6 @@ start_Start.STREAMS = {
   AUDIO: 1,
   VIDEO: 2
 };
-// CONCATENATED MODULE: ./js/chat/ui/meetings/meetingsCallEndedDialog.jsx
-
-
-
-class meetingsCallEndedDialog_MeetingsCallEndedDialog extends mixins["MegaRenderMixin"] {
-  constructor(props) {
-    super(props);
-    this.state = {
-      'safeShowDialogRendered': false
-    };
-  }
-
-  componentDidMount() {
-    super.componentDidMount();
-    M.safeShowDialog('meetings-ended', () => {
-      this.setState({
-        'safeShowDialogRendered': true
-      });
-      return this.findDOMNode();
-    });
-  }
-
-  componentWillUnmount() {
-    super.componentWillUnmount();
-
-    if ($.dialog === "meetings-ended") {
-      closeDialog();
-    }
-  }
-
-  render() {
-    const {
-      onClose
-    } = this.props;
-
-    if (!this.state.safeShowDialogRendered) {
-      return null;
-    }
-
-    return external_React_default.a.createElement(modalDialogs["a" ].ModalDialog, {
-      className: "meetings-call-ended-dialog",
-      dialogType: "message",
-      title: l.meeting_ended,
-      buttons: [{
-        label: l.view_history,
-        key: "view",
-        className: "action",
-        onClick: onClose
-      }, {
-        label: l[81],
-        key: "ok",
-        className: "negative",
-        onClick: () => {
-          if (is_chatlink) {
-            is_chatlink = false;
-            delete megaChat.initialPubChatHandle;
-            megaChat.destroy();
-          }
-
-          loadSubPage(u_type === 0 ? 'register' : 'securechat');
-        }
-      }],
-      iconElement: external_React_default.a.createElement("div", {
-        className: "avatar"
-      }, external_React_default.a.createElement("div", {
-        "data-color": "color12",
-        className: "avatar-wrapper small-rounded-avatar color12"
-      }, "X")),
-      onClose: onClose
-    });
-  }
-
-}
 // CONCATENATED MODULE: ./js/chat/ui/conversations.jsx
 
 
@@ -26620,7 +26783,7 @@ var react1 = __webpack_require__.n(react1__);
 var _stores_mixins2__ = __webpack_require__(1);
 var _contacts_jsx3__ = __webpack_require__(3);
 var _ui_modalDialogs_jsx4__ = __webpack_require__(8);
-var _button_jsx5__ = __webpack_require__(5);
+var _button_jsx5__ = __webpack_require__(4);
 
 
 
@@ -26826,7 +26989,7 @@ class ChatRouting {
     const method = page === 'chat' || page === 'fm/chat' || page === location || event && event.type === 'popstate' ? 'replaceState' : 'pushState';
     M.currentdirid = String(page = location).replace('fm/', '');
 
-    if (location.substr(0, 13) === "chat/contacts") {
+    if (location.substr(0, 13) === "chat/contacts" || location.substr(0, 13) === "chat/archived") {
       location = "fm/" + location;
     }
 
@@ -26899,7 +27062,15 @@ class ChatRouting {
     });
   }
 
-  reinitAndOpenExistingChat(chatId, publicChatHandle = false, cbBeforeOpen = undefined) {
+  reinitAndOpenExistingChat(chatId, publicChatHandle, cbBeforeOpen) {
+    if (publicChatHandle === void 0) {
+      publicChatHandle = false;
+    }
+
+    if (cbBeforeOpen === void 0) {
+      cbBeforeOpen = undefined;
+    }
+
     const chatUrl = "fm/chat/c/" + chatId;
     publicChatHandle = publicChatHandle || megaChat.initialPubChatHandle;
     const meetingDialogClosed = megaChat.meetingDialogClosed;
@@ -27324,9 +27495,10 @@ Chat.prototype._syncDnd = function () {
   const chats = this.chats;
 
   if (chats && chats.length > 0) {
-    chats.forEach(({
-      chatId
-    }) => {
+    chats.forEach(_ref => {
+      let {
+        chatId
+      } = _ref;
       const dnd = pushNotificationSettings.getDnd(chatId);
 
       if (dnd && dnd < unixtime()) {
@@ -28951,9 +29123,10 @@ Chat.prototype.openChatAndAttachNodes = function (targets, nodes) {
     var attachFolders = roomId => {
       return new MegaPromise((resolve, reject) => {
         var createPublicLink = (nodeId, room) => {
-          M.createPublicLink(nodeId).then(({
-            link
-          }) => {
+          M.createPublicLink(nodeId).then(_ref2 => {
+            let {
+              link
+            } = _ref2;
             room.sendMessage(link);
             resolve(room);
           }).catch(reject);

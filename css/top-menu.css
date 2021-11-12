@@ -5,7 +5,7 @@
 /* Side menu */
 
 .top-menu-popup {
-    background-color: var(--surface-main);
+    background-color: var(--stroke-main);
     box-shadow: 0 0 0 1px var(--stroke-grey-2);
     box-sizing: border-box;
     font-size: 0;
@@ -144,7 +144,7 @@
 .top-menu-divider {
     display: inline-flex;
     height: 1px;
-    background-color: var(--surface-grey-2);
+    background-color: var(--stroke-grey-2);
     margin: 10px 0;
     width: 100%;
 }
@@ -193,8 +193,8 @@
 
 .fm-products-nav .pages-menu.body {
     margin-top: 0;
-    background-color: var(--surface-main);
-    border-top: 1px solid var(--surface-grey-2);
+    background-color: var(--stroke-main);
+    border-top: 1px solid var(--stroke-grey-2);
     min-width: 100%;
     z-index: 140;
 }
@@ -404,7 +404,7 @@
     text-align: center;
     white-space: nowrap;
     z-index: 190;
-    background-color: var(--surface-main);
+    background-color: var(--stroke-main);
     -webkit-transition: top 600ms ease-in-out;
     transition: top 600ms ease-in-out;
 }
@@ -459,7 +459,7 @@
 }
 .pages-menu.submenu {
     border-radius: 8px;
-    background-color: var(--surface-main);
+    background-color: var(--stroke-main);
     position: absolute;
     box-shadow: var(--dropdown-shadow);
     overflow: hidden;

@@ -208,7 +208,7 @@ export class ContactButton extends ContactAwareComponent {
             moreDropdowns.push(
                 <DropdownItem
                     key="view2"
-                    icon="sprite-fm-mono icon-add-filled"
+                    icon="sprite-fm-mono icon-add"
                     label={l[101] /* `Add Contact` */}
                     onClick={() => {
                         const isAnonymousUser = (!u_handle || u_type !== 3);
@@ -852,7 +852,10 @@ export class ContactItem extends ContactAwareComponent {
             </div>
             <Avatar contact={contact} className="avatar-wrapper small-rounded-avatar" hideVerifiedBadge={true}
                 chatRoom={this.props.chatRoom} />
-            <div className="user-card-data">
+            <div
+                className="user-card-data simpletip"
+                data-simpletip={username}
+                data-simpletipposition="top">
                 <ContactButton
                     noContextMenu={this.props.noContextMenu}
                     contact={contact}

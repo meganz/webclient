@@ -43,7 +43,6 @@ export default class StreamControls extends MegaRenderMixin {
 
         //
         // `StreamControls`
-        // https://mega.nz/file/RZNmWJ4Y#X7gc2SsQbGmpbMQNRMNcLksBwnc1G9ozeEwqPfRpfe4
         // -------------------------------------------------------------------------
 
         return (

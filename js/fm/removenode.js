@@ -145,7 +145,9 @@ function removeUInode(h, parent) {
                 }
                 else {
                     $('.files-grid-view').addClass('hidden');
-                    $('.fm-empty-folder').removeClass('hidden');
+                    if (M.currentdirid !== 'public-links') {
+                        $('.fm-empty-folder').removeClass('hidden');
+                    }
                 }
                 $('.grid-table.fm tr').remove();
             }

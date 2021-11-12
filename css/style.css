@@ -1189,7 +1189,7 @@ a.nt-settings-button:hover span {
     opacity: 0;
 }
 .jspDrag {
-    background-color: var(--surface-main-inverted);
+    background-color: var(--stroke-main-inverted);
     border-radius: 8px;
     width: 8px;
     position: relative;
@@ -2208,7 +2208,7 @@ img.blog-new-logos {
     left: 50%;
     margin: 0 0 0 -9px;
     border: 9px solid #000;
-    border-color: var(--surface-main-inverted) transparent transparent transparent;
+    border-color: var(--stroke-main-inverted) transparent transparent transparent;
     background-repeat: no-repeat;
 }
 .properties-context-item {
@@ -2724,7 +2724,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     white-space: nowrap;
     font-size: 14px;
     line-height: 24px;
-    color: var(--surface-link-inverted);
+    color: var(--stroke-link-inverted);
     height: 24px;
     text-overflow: ellipsis;
     overflow: hidden;
@@ -3227,7 +3227,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     width: 10px;
     height: 10px;
     margin: -2px 0 0 -2px;
-    border: 2px solid var(--surface-main);
+    border: 2px solid var(--stroke-main);
     box-sizing: border-box;
     border-radius: 100%;
     background-color: inherit;
@@ -3639,7 +3639,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     z-index: 21;
 }
 .transfer-panel-opened .nw-fm-left-icons-panel {
-     border-right: 2px solid var(--surface-grey-1);
+     border-right: 2px solid var(--stroke-grey-1);
 }
 .nw-fm-left-icons-panel .bottom-icons {
     position: absolute;
@@ -3814,7 +3814,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     transition: opacity 200ms ease-in-out;
 }
 .nw-fm-left-icon.active {
-    background-color: var(--surface-black);
+    background-color: var(--stroke-black);
 }
 .nw-fm-left-icon:hover::before, .nw-fm-left-icon.active::before {
     opacity: 1;
@@ -3991,7 +3991,7 @@ button.l-pane-visibility {
 }
 
 .light-overlay {
-    background-color: var(--surface-main);
+    background-color: var(--stroke-main);
     height: 100%;
     left: 0;
     position: absolute;
@@ -5065,7 +5065,7 @@ tr:not(.taken-down) .grid-status-icon:not(.read-only):not(.read-and-write) {
 }
 
 .thumb .transfer-filetype-icon img {
-    background-color: var(--surface-mid-grey);
+    background-color: var(--stroke-mid-grey);
     display: inline-block;
     height: 18px;
     margin: 3px 2px;
@@ -5151,7 +5151,7 @@ tr:not(.taken-down) .grid-status-icon:not(.read-only):not(.read-and-write) {
 }
 .transfer-type::after {
     z-index: 10;
-    background-color: var(--surface-main);
+    background-color: var(--stroke-main);
     border-radius: 100%;
 }
 .transfer-type ul :nth-child(odd) {
@@ -5261,7 +5261,7 @@ tr:not(.taken-down) .grid-status-icon:not(.read-only):not(.read-and-write) {
     -moz-box-sizing: border-box;
     box-sizing: border-box;
     white-space: nowrap;
-    background-color: var(--surface-main);
+    background-color: var(--stroke-main);
     position: relative;
     overflow: hidden;
 }
@@ -5364,7 +5364,7 @@ tr:not(.taken-down) .grid-status-icon:not(.read-only):not(.read-and-write) {
     display: flex;
     align-items: center;
     padding: 0 4px;
-    background-color: var(--surface-main);
+    background-color: var(--stroke-main);
 }
 
 .crumb-overflow-link.hidden {
@@ -5465,7 +5465,7 @@ tr:not(.taken-down) .grid-status-icon:not(.read-only):not(.read-and-write) {
     box-sizing: border-box;
     border-radius: 4px;
     font: var(--text-body1);
-    color: var(--surface-main-inverted);
+    color: var(--stroke-main-inverted);
     opacity: 0.7;
     display: flex;
     position: relative;
@@ -5475,7 +5475,7 @@ tr:not(.taken-down) .grid-status-icon:not(.read-only):not(.read-and-write) {
 
 .breadcrumb-dropdown a:hover {
     opacity: 1;
-    background-color: var(--surface-grey-4);
+    background-color: var(--stroke-grey-4);
 }
 
 .breadcrumb-dropdown a i {
@@ -5542,7 +5542,7 @@ tr:not(.taken-down) .grid-status-icon:not(.read-only):not(.read-and-write) {
 }
 
 .fm-files-view-icon i {
-    --mask-color: var(--surface-mid-grey);
+    --mask-color: var(--stroke-mid-grey);
     --icon-size: 24px;
 }
 
@@ -5706,7 +5706,7 @@ tr:not(.taken-down) .grid-status-icon:not(.read-only):not(.read-and-write) {
 .ui-selectable-helper {
     position: absolute;
     z-index: 100;
-    border: 1px dotted var(--surface-mid-grey);
+    border: 1px dotted var(--stroke-mid-grey);
 }
 .context-menu, .dialog-sorting-menu, .fm-sorting-menu {
     min-width: 160px;
@@ -7047,8 +7047,8 @@ table {
 }
 .account.tabs-bl,
 .shares-tabs-bl {
-    background-color: var(--surface-main);
-    border-bottom: 1px solid var(--surface-grey-2);
+    background-color: var(--stroke-main);
+    border-bottom: 1px solid var(--stroke-grey-2);
     padding: 16px 16px 0 12px;
 }
 .shares-tabs-bl {
@@ -10143,7 +10143,7 @@ div.new-bottom-pages li, div.new-bottom-pages p {
     background-image: none;
 }
 .search-bottom-wrapper {
-    background-color: var(--surface-grey-2);
+    background-color: var(--stroke-grey-2);
     height: 64px;
     z-index: 12;
     width: 100%;
@@ -10174,7 +10174,7 @@ div.new-bottom-pages li, div.new-bottom-pages p {
     display: none;
 }
 .empty-search-bg {
-    background-color: var(--surface-grey-2);
+    background-color: var(--stroke-grey-2);
     height: 30px;
     margin-left: 2px;
 }
@@ -10797,7 +10797,7 @@ body:not(.de) .contacts-interation {
     display: inline-block;
     vertical-align: middle;
     font: var(--text-body1);
-    background-color: var(--surface-grey-2);
+    background-color: var(--stroke-grey-2);
     padding: 2px 10px;
     border-radius: 50px;
     color: var(--text-color-high);
@@ -10846,7 +10846,7 @@ body:not(.de) .contacts-interation {
     height: 100%;
     left: -20px;
     top: 0;
-    background: linear-gradient(to right, rgba(255,255,255,0) 0%, var(--surface-grey-1) 100%);
+    background: linear-gradient(to right, rgba(255, 255, 255, 0) 0%, var(--stroke-grey-1) 100%);
 }
 .shared-details-buttons .mega-button {
     min-width: 20px;
@@ -11689,7 +11689,7 @@ body.pro:after {
 .nw-fm-percentage.upload, .nw-fm-percentage.download {
     position: absolute;
     float: none;
-    background-color: var(--surface-grey-2);
+    background-color: var(--stroke-grey-2);
     margin: 8px 0;
     -webkit-margin-start: 8px;
     margin-inline-start: 8px;
@@ -11698,7 +11698,7 @@ body.pro:after {
     margin: 12px 0;
     -webkit-margin-start: 12px;
     margin-inline-start: 12px;
-    background-color: var(--surface-grey-2);
+    background-color: var(--stroke-grey-2);
 }
 .nw-fm-percentage.upload p, .nw-fm-percentage.upload li, .nw-fm-percentage.upload ul, .nw-fm-percentage.upload {
     width: 24px;
@@ -12861,7 +12861,7 @@ div.camera-bottom-txt {
 .ui-selectable-helper {
     position: absolute;
     z-index: 100;
-    border: 1px solid var(--surface-mid-grey);
+    border: 1px solid var(--stroke-mid-grey);
     background: var(--surface-highlight-2);
 }
 /**
@@ -15079,7 +15079,7 @@ body.megaChatDisabled .nw-contact-name button.start-chat-button {
     height: 100%;
     position: relative;
     overflow: hidden;
-    border-top: 1px solid var(--surface-grey-2);
+    border-top: 1px solid var(--stroke-grey-2);
 }
 
 .user-management-view .icon-wrapper i {
@@ -15687,8 +15687,8 @@ body.megaChatDisabled .nw-contact-name button.start-chat-button {
 .dragger-content {
     min-height: 20px;
     position: absolute;
-    background-color: var(--surface-grey-1);
-    border: 2px solid var(--surface-main);
+    background-color: var(--stroke-grey-1);
+    border: 2px solid var(--stroke-main);
     border-radius: 8px;
     padding: 7px 13px 7px 13px;
     margin: -34px 0 0 -65px;

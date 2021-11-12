@@ -625,7 +625,7 @@ MegaUtils.prototype.uiSaveLang = promisify(function(resolve, reject, aNewLang) {
  *  Under non-activated/registered accounts this
  *  will perform a former normal cloud reload.
  */
-MegaUtils.prototype.reload = function megaUtilsReload() {
+MegaUtils.prototype.reload = function megaUtilsReload(force) {
     'use strict';
     const _reload = () => {
         var u_sid = u_storage.sid;
@@ -637,6 +637,8 @@ MegaUtils.prototype.reload = function megaUtilsReload() {
         var mcd = localStorage.testChatDisabled;
         var apipath = debug && localStorage.apipath;
         var cdlogger = debug && localStorage.chatdLogger;
+
+        force = force || sessionStorage.fmAetherReload;
 
         localStorage.clear();
         sessionStorage.clear();
@@ -678,7 +680,12 @@ MegaUtils.prototype.reload = function megaUtilsReload() {
             localStorage.hashLogic = 1;
         }
 
-        localStorage.force = true;
+        if (force) {
+            localStorage.force = true;
+        }
+        else {
+            sessionStorage.fmAetherReload = 1;
+        }
         location.reload(true);
         loadingDialog.hide();
     };

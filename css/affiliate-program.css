@@ -6,7 +6,7 @@
     display: none;
 }
 .affiliate-program .nw-fm-left-icons-panel {
-    border-right: 2px solid var(--surface-grey-1);
+    border-right: 2px solid var(--stroke-grey-1);
 }
 .fm-affiliate .breadcrumbs {
     --mask-color: var(--text-color-medium);
@@ -34,11 +34,14 @@
     --icon-size: 16px;
     margin: 0 8px;
 }
+.rtl .fm-affiliate .breadcrumbs {
+    direction: rtl;
+}
 .rtl .fm-affiliate .breadcrumbs i {
     transform: rotate(180deg);
 }
 .fm-affiliate.body {
-    background-color: var(--surface-grey-1);
+    background-color: var(--stroke-grey-1);
     display: none;
     height: calc(100% - 48px);
     overflow: hidden;
@@ -51,6 +54,9 @@
     position: relative;
     overflow: hidden;
     width: 100%;
+}
+.rtl .fm-affiliate.scroll-block {
+    direction: rtl;
 }
 .fm-affiliate.content {
     box-sizing: border-box;
@@ -168,7 +174,7 @@
     line-height: inherit;
 }
 .fm-affiliate .commission-body {
-    border-top: 1px solid var(--surface-grey-2);
+    border-top: 1px solid var(--stroke-grey-2);
     color: var(--text-color-medium);
     font: var(--text-body2);
     position: relative;
@@ -226,7 +232,7 @@
 .fm-affiliate.redeem-details,
 .fm-affiliate.redeem-details:hover td::before {
     background: var(--surface-grey-1);
-    border-color: var(--surface-grey-1);
+    border-color: var(--stroke-grey-1);
 }
 .fm-affiliate.redeem-details td:last-child::after,
 .rtl .fm-affiliate.redeem-details td:last-child::after {
@@ -337,7 +343,7 @@
 /* Registrations chart */
 .fm-affiliate.charts-head {
     align-items: center;
-    background-color: var(--surface-grey-1);
+    background-color: var(--stroke-grey-1);
     display: flex;
     margin: -1px 0 0 0;
     padding: 14px 22px;
@@ -402,6 +408,10 @@
     cursor: pointer;
     --icon-size: 16px;
 }
+.rtl .fm-affiliate.chart-dates .icon-arrow-left,
+.rtl .fm-affiliate.chart-dates .icon-arrow-right {
+    transform: rotateY(180deg);
+}
 .fm-affiliate.chart-dates .dates {
     color: var(--text-color-medium);
     display: inline-flex;
@@ -425,7 +435,7 @@
 }
 .fm-affiliate.list-item {
     align-items: center;
-    box-shadow: 0 -1px 0 0 var(--surface-grey-2);
+    box-shadow: 0 -1px 0 0 var(--stroke-grey-2);
     display: flex;
     font: var(--text-body2);
     padding: 7px 0 8px 0;

@@ -1,5 +1,5 @@
 .top-head {
-    background-color: var(--surface-grey-2);
+    background-color: var(--stroke-grey-2);
     position: relative;
 }
 .topbar {
@@ -8,7 +8,7 @@
     display: flex;
     font-size: 0;
     padding: 0 16px;
-    background-color: var(--surface-main);
+    background-color: var(--stroke-main);
     height: 48px;
 }
 
@@ -73,7 +73,7 @@
     margin: 0 16px;
     box-sizing: border-box;
     width: 100%;
-    color: var(--surface-main-inverted);
+    color: var(--stroke-main-inverted);
     font: var(--text-body1);
 }
 .topbar-searcher button {
@@ -85,12 +85,12 @@
     background-color: transparent;
 }
 .topbar-searcher input::placeholder {
-    color: var(--surface-main-inverted);
+    color: var(--stroke-main-inverted);
     opacity: 0.3;
 }
 .topbar-searcher button i {
     --icon-size: 16px;
-    --mask-color: var(--surface-main-inverted);
+    --mask-color: var(--stroke-main-inverted);
 }
 /* mini search */
 
@@ -528,7 +528,7 @@
     box-shadow: var(--dropdown-shadow);
   }
 .topbar .account-dialog ul.links li .status-dropdown:hover .dropbtn {
-    background-color: var(--surface-grey-2);
+    background-color: var(--stroke-grey-2);
     color: var(--text-color-high);
 }
 .topbar .account-dialog ul.links li .status-dropdown:hover .dropdown-content {

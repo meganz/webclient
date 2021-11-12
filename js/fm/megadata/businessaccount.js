@@ -1107,7 +1107,7 @@ BusinessAccount.prototype.getListOfPaymentGateways = function (forceUpdate) {
  * @param {Boolean} forceUpdate         force updating from API
  * @returns {Promise}                   resolves when we get the answer
  */
-BusinessAccount.prototype.getBusinessPlanInfo = function (forceUpdate) {
+BusinessAccount.prototype.getBusinessPlanInfo = function(forceUpdate) {
     "use strict";
     var operationPromise = new MegaPromise();
 
@@ -1122,8 +1122,8 @@ BusinessAccount.prototype.getBusinessPlanInfo = function (forceUpdate) {
     }
 
     var request = {
-        a: "utqa",  // get a list of plans
-        nf: 1,      // extended format
+        a: 'utqa',  // get a list of plans
+        nf: 2,      // extended format
         b: 1        // also show business plans
     };
 
@@ -1140,7 +1140,15 @@ BusinessAccount.prototype.getBusinessPlanInfo = function (forceUpdate) {
                 for (var h = 0; h < res.length; h++) {
                     if (res[h].it) {
                         businessPlan = res[h];
+                        businessPlan.bd.us.lp /= 100;
+                        businessPlan.bd.us.p /= 100;
+                        businessPlan.bd.trns.lp /= 100;
+                        businessPlan.bd.trns.p /= 100;
+                        businessPlan.bd.sto.lp /= 100;
+                        businessPlan.bd.sto.p /= 100;
                         businessPlan.timestamp = currTime;
+                        businessPlan.l = res[0].l;
+                        businessPlan.c = res[0].l.c;
                         break;
                     }
                 }

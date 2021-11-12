@@ -1351,6 +1351,18 @@ ul, li {
 .mobile.fm-icon.manage-link {
     background-position: 0px -1707px;
 }
+.mobile.context-menu-container .rename-button {
+    background-position: -3px -4383px;
+}
+.mobile.context-menu-container .rename-button .sprite-fm-mono::before,
+.mobile.context-menu-container .rename-button .sprite-fm-mono-after::after {
+    --icon-size: 24px;
+}
+.mobile.context-menu-container .rename-button .icon-rename {
+    margin: 6px -1px 0 18px;
+    width: 42px;
+    height: 35px;
+}
 .mobile.fm-icon.open-context-menu {
     background-position: -197px -1660px;
     height: 100%;
@@ -3934,6 +3946,29 @@ div.checkboxOn {
 .mobile.create-new-folder-dialog .folder-input-container {
     margin: 24px 8px 4px 8px;
 }
+.mobile.mobile-rename-overlay .rename-overlay-input {
+    background-color: #fafafa;
+    border: 1px solid #eee;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    color: #333;
+    font-size: 14px;
+    line-height: 48px;
+    width: 100%;
+}
+.mobile.mobile-rename-overlay .rename-input {
+    font-family: 'LatoWeb', serif;
+    background-color: #fafafa;
+    border: none;
+    padding: 5% 20%;
+    color: #333;
+    font-size: 14px;
+    text-align: center;
+}
 .mobile.create-new-folder-dialog .folder-name-input {
     font-family:'LatoWeb';
     background-color: #fafafa;
@@ -3983,21 +4018,30 @@ div.checkboxOn {
     box-sizing: border-box;
     float: right;
 }
-.mobile.create-new-folder-dialog .folder-name-warning-block {
+.mobile.create-new-folder-dialog .folder-name-warning-block,
+.mobile.mobile-rename-overlay .folder-name-warning-block {
     position: relative;
 }
-.mobile.create-new-folder-dialog .folder-name-warning-block .fm-icon.red-warning {
+.mobile.create-new-folder-dialog .folder-name-warning-block .fm-icon.red-warning,
+.mobile.mobile-rename-overlay .folder-name-warning-block .fm-icon.red-warning {
     left: -4px;
     position: absolute;
     top: -3px;
     margin-top: 6px;
 }
-.mobile.create-new-folder-dialog .folder-name-warning-block .warning-text, .two-factor-page .warning-text-field, .mobile.verify-number .warning-text-field {
+.mobile.create-new-folder-dialog .folder-name-warning-block .warning-text,
+.two-factor-page .warning-text-field,
+.mobile.verify-number .warning-text-field,
+.mobile.mobile-rename-overlay .folder-name-warning-block .warning-text {
     opacity: 0.75;
     color: #131313;
     font-size: 12px;
     line-height: 15px;
     padding: 16px 0 16px 31px;
+}
+.mobile.mobile-rename-overlay .folder-name-warning-block .warning-text {
+    overflow-wrap: break-word;
+    white-space: normal;
 }
 .mobile .two-factor-page .warning-text-field, .mobile.verify-number .warning-text-field {
     color: #eb4444;
@@ -5136,7 +5180,6 @@ div.checkboxOn {
 .mobile.alert-banner .alert-text-container {
     position: absolute;
     left: 10px;
-    margin-right: 50px;
     text-align: left;
     height: 50px;
     float: left;
@@ -12994,6 +13037,9 @@ p a.blog-new-read-more {
     table-layout: fixed;
     margin: 18px 0 -17px 0;
 }
+.rtl .mobile.affiliate-comission-bl .cell {
+    direction: rtl;
+}
 .mobile.affiliate-comission-bl .cell {
     display: table-cell;
     width: 33.333333%;
@@ -13851,7 +13897,7 @@ body.landscape .upload-overlay .mobile.filetype-img {
     transition: opacity 200ms ease-in-out 1s;
     transition-delay: 0ms;
     white-space: normal;
-    --mask-color: var(--surface-main-inverted);
+    --mask-color: var(--stroke-main-inverted);
 }
 .dark-direct-tooltip i.icon-tooltip-arrow {
     position: absolute;
@@ -13867,6 +13913,9 @@ body.landscape .upload-overlay .mobile.filetype-img {
     height: 16px;
     margin: 0;
     overflow: hidden;
+}
+.rtl .dark-direct-tooltip.simpletip-tooltip {
+    direction: rtl;
 }
 .dark-direct-tooltip.simpletip-tooltip.delay {
     -webkit-transition-delay: 1ms;

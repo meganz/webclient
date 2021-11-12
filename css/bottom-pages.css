@@ -361,7 +361,7 @@ html.gbot {
 .bottom-page.light-blue-top .top-head.floating,
 .bottom-page.light-grey-top .top-head,
 .bottom-page.light-grey-top .top-head.floating {
-    background-color: var(--surface-main);
+    background-color: var(--stroke-main);
 }
 
 .bottom-page.top-bl {
@@ -420,7 +420,7 @@ html.gbot {
 }
 .fmholder .bottom-page.sign .top-head.floating,
 .fmholder .bottom-page.about .top-head.floating {
-    box-shadow: 0 1px 0 0 var(--surface-grey-2);
+    box-shadow: 0 1px 0 0 var(--stroke-grey-2);
 }
 
 .bottom-page.vertical-centered-bl {
@@ -448,6 +448,14 @@ html.gbot {
 }
 .bottom-page.vertical-centered-cell {
     vertical-align: middle;
+}
+.bottom-page.horizontal-centered-bl.jobs {
+    max-width: unset;
+    padding: unset;
+}
+.bottom-page.horizontal-centered-bl.wide.jobs {
+    max-width: unset;
+    padding: unset;
 }
 .bottom-page.horizontal-centered-bl {
     max-width: 970px;
@@ -720,7 +728,34 @@ body:not(.mobile) .bottom-page.scroll-button:hover {
     color: #000000;
     text-align: center;
     padding: 15px 0 21px 0;
-    font-family: 'montserrat', 'LatoWeb', 'source_sans_proregular', arial;
+    font-family: montserrat, LatoWeb, "source_sans_proregular", arial, sans-serif;
+}
+.bottom-page.big-icon-info.about {
+    font-size: 32px;
+    line-height: 39px;
+    font-family: LatoWebBlack, sans-serif;
+}
+.bottom-page.flip-card-title {
+    font-size: 32px;
+    line-height: 39px;
+    text-align: left;
+    font-family: LatoWebBlack, sans-serif;
+    padding: 15px 0 30px 40px;
+    color: var(--text-color-high);
+}
+.bottom-page.flip-card-desc {
+    font-size: 24px;
+    line-height: 33px;
+    padding-left: 40px;
+    text-align: left;
+    color: var(--text-color-high);
+    padding-right: 40px;
+}
+.bottom-page.flip-card-desc.invert {
+    color: var(--text-color-high-inverted);
+    font-size: 18px;
+    padding-top: 24px;
+    line-height: 26px;
 }
 .bottom-page.big-icon-info.mid-txt {
     font-size: 24px;
@@ -733,6 +768,14 @@ body:not(.mobile) .bottom-page.scroll-button:hover {
     color: #666666;
     padding: 0 0 16px 0;
     font-family: 'LatoWeb', 'source_sans_proregular', Arial;
+}
+.bottom-page.mid-icon-info.short.about {
+    font-size: 20px;
+    line-height: 26px;
+    color: #333333;
+    max-width: 400px;
+    padding-left: 48px;
+    padding-right: 48px;
 }
 .bottom-page.mid-icon-info:last-child {
     padding: 0 0 10px 0;
@@ -783,6 +826,9 @@ body:not(.mobile) .bottom-page.scroll-button:hover {
 .bottom-page .col-3 {
     width: 33.333333%;
 }
+.bottom-page .vision-col-4 {
+    width: 25%;
+}
 .bottom-page .col-4 {
     width: 25%;
 }
@@ -796,6 +842,9 @@ body:not(.mobile) .bottom-page.scroll-button:hover {
     padding: 26px 15px;
 }
 .inline-block.mid-pad {
+    padding: 26px 28px;
+}
+.inline-block.inner-pad {
     padding: 26px 28px;
 }
 .inline-block.mid-pad.max-width {
@@ -826,7 +875,7 @@ body:not(.mobile) .bottom-page.scroll-button:hover {
     padding-top: 100px;
 }
 .bottom-page.ultra-huge-top-pad {
-    padding-top: 118px;
+    padding-top: 112px;
 }
 .bottom-page.angle-pad {
     padding-top: 236px;
@@ -855,6 +904,27 @@ body:not(.mobile) .bottom-page.scroll-button:hover {
     max-width: 940px;
     margin: 0 auto;
 }
+.bottom-page .jobs-top-header {
+    inline-size: 700px;
+    overflow-wrap: break-word;
+    margin: 0 auto;
+    font-size: 48px;
+    line-height: 58px;
+    padding: 4px 0 24px;
+    color: var(--text-color-high);
+    font-family: "montserrat_bold", montserrat, Arial, sans-serif;
+}
+.bottom-page.jobs-dream-container {
+    display: table;
+    width: 100%;
+    margin: 0 auto;
+    background:
+        linear-gradient(
+        0deg,
+        white 75%,
+        #FAFAFA 25%
+        );
+}
 .bottom-page.big-header i, .bottom-page.big-header span {
     display: inline-block;
     vertical-align: top;
@@ -864,6 +934,10 @@ body:not(.mobile) .bottom-page.scroll-button:hover {
 }
 .bottom-page.big-header.light {
     font-family: 'montserrat_light', 'montserrat', 'LatoWebLight', Arial;
+}
+.bottom-page.big-header.bold {
+    font-family: var(--text-font-family-montserrat-bold);
+      padding: 4px 0 86px;
 }
 .bottom-page.big-header.max-width {
     max-width: 895px;
@@ -1193,10 +1267,12 @@ body:not(.mobile) .bottom-page.scroll-button:hover {
     vertical-align: top;
 }
 .bottom-page.left-cell .img-description {
-    padding-right: 30px;
+    padding-inline-end: 30px;
+    -webkit-padding-end: 30px;
 }
 .bottom-page.right-cell .img-description {
-    padding-left: 30px;
+    padding-inline-start: 30px;
+    -webkit-padding-start: 30px;
 }
 .bottom-page.img-description.no-pad {
     padding: 0 2px 0 0;
@@ -1360,6 +1436,19 @@ body:not(.mobile) .bottom-btn-container .bus-plan.button-48-height.red:hover {
 .bottom-page.horizontal-centered-bl.mid-wide {
     max-width: 1194px;
     padding: 0 40px;
+}
+.bottom-page.jobs-life-container {
+    width: 100%;
+    margin: 0 auto;
+    display: table;
+    padding-bottom: 158px;
+}
+.bottom-page.card.img {
+    height: 64px;
+    width: 64px;
+    box-sizing: content-box;
+    padding-left: 32px;
+    padding-top: 32px;
 }
 .video-info-block {
     display: block;
@@ -1690,6 +1779,18 @@ iframe.security-video-container {
 .bottom-page.light-bg {
     background-color: #F5F5F5;
 }
+.bottom-page.red-bg {
+    background-color: #BF1515;
+    align-self: end;
+    z-index: 1;
+}
+/*.bottom-page.red-bg,*/
+/*.about.img-wrap-office,*/
+/*.about.vision-title,*/
+/*.about.vision-desc,*/
+/*.auto-slider{*/
+/*   grid-area: 1/1;*/
+/*}*/
 .bottom-page.cols-container {
     display: table;
     width: 100%;
@@ -2283,7 +2384,8 @@ body:not(.mobile) .bottom-page.top-dark-button:hover {
 .chrome .bottom-page.top-copyrights .content.chrome, .firefox .bottom-page.top-copyrights .content.ff, .opera .bottom-page.top-copyrights .content.opera, .edge .bottom-page.top-copyrights .content.edge, .unsupported .bottom-page.top-copyrights .unsupported {
     display: block;
 }
-.ios .bottom-page.top-copyrights {
+.ios .bottom-page.top-copyrights,
+.android .bottom-page.top-copyrights {
     padding-top: 0;
 }
 .unsupported .bottom-page.top-copyrights:not(.small-pad) {
@@ -4577,6 +4679,9 @@ a.opensource-icon-txt.coming-soon {
 .affiliate-page .bottom-page.content {
     overflow: hidden;
 }
+.rtl .affiliate-page .bottom-page.startpage {
+    direction: rtl;
+}
 .affiliate-page .bottom-page.top-title {
     color: white;
     font-family: 'LatoWebBold', 'source_sans_probold', Arial;
@@ -5093,6 +5198,112 @@ body:not(.mobile) .bottom-page.dropdown .dropdown-item:hover, .bottom-page.dropd
     }
 }
 
+@media only screen and (max-width: 1440px) {
+    .bottom-page.mid-icon-info.short.about {
+        font-size: 18px;
+        line-height: 26px;
+        max-width: 300px;
+        padding-left: 32px;
+        padding-right: 32px;
+    }
+    .bottom-page.big-icon-info.about {
+        font-size: 30px;
+        line-height: 36px;
+    }
+    .bottom-page .jobs-top-header {
+        font-size: 42px;
+        line-height: 52px;
+    }
+    .bottom-page.card.img {
+        padding-left: 32px;
+        padding-top: 32px;
+    }
+    .bottom-page.flip-card-title {
+        font-size: 24px;
+        line-height: 29px;
+        padding: 15px 0 24px 32px;
+    }
+    .bottom-page.flip-card-desc {
+        font-size: 18px;
+        line-height: 26px;
+        padding-left: 32px;
+        padding-right: 32px;
+    }
+    .bottom-page.jobs-life-container {
+        padding-bottom: 78px;
+    }
+}
+
+@media only screen and (orientation: landscape) and (max-width: 900px) {
+    .bottom-page.big-bott-pad.jobs {
+        padding-bottom: 48px;
+    }
+}
+
+@media only screen and (max-width: 768px) {
+    .megasync .bottom-page.right-cell,
+    .megasync .bottom-page.left-cell {
+        width: 100%;
+        display: block;
+    }
+    .megasync .sync-3 .bottom-page img {
+        margin: 32px auto;
+    }
+    .bottom-page .jobs-top-header {
+        font-size: 36px;
+        line-height: 44px;
+        inline-size: 400px;
+    }
+    .bottom-page.card.img {
+        width: 48px;
+        height: 48px;
+    }
+    .bottom-page.flip-card-title {
+        font-size: 22px;
+        line-height: 27px;
+        padding: 15px 0 24px 32px;
+    }
+    .bottom-page.flip-card-desc {
+        font-size: 18px;
+        line-height: 26px;
+        padding-left: 32px;
+    }
+    .bottom-page.jobs-life-container {
+        padding-bottom: 70px;
+    }
+}
+
+@media only screen and (max-width: 390px) {
+    .bottom-page.mid-icon-info.short.about {
+        font-size: 16px;
+    }
+    .bottom-page .jobs-top-header {
+        inline-size: 300px;
+        font-size: 30px;
+        line-height: 37px;
+    }
+    .bottom-page.flip-card-title {
+        font-size: 20px;
+        line-height: 24px;
+        padding: 15px 0 24px 32px;
+    }
+    .bottom-page.flip-card-desc {
+        font-size: 16px;
+        line-height: 23px;
+        padding-left: 32px;
+        max-width: 278px;
+    }
+    .bottom-page.jobs-life-container {
+        padding-bottom: 88px;
+    }
+}
+
+@media only screen and (max-width: 300px) {
+    .bottom-page .jobs-top-header {
+        inline-size: 250px;
+    }
+}
+
 @media only screen and (max-width: 1900px) {
     .bottom-page.angle-bg {
         background-size: cover !important;
@@ -5129,7 +5340,6 @@ body:not(.mobile) .bottom-page.dropdown .dropdown-item:hover, .bottom-page.dropd
         padding-bottom: 180px;
     }
 }
-
 @media only screen and (max-width: 1280px) {
     .onboarding-suggestions.promo-vouchers .bottom-page.horizontal-centered-bl {
         padding: 0 72px;
@@ -5216,6 +5426,20 @@ body:not(.mobile) .bottom-page.dropdown .dropdown-item:hover, .bottom-page.dropd
 @media only screen and (max-width: 1005px) {
     .affiliate.icon-info, .affiliate.refer-header {
         font-size: 24px;
+    }
+    .bottom-page.location-right-dist {
+        width: 100%;
+        display: table;
+    }
+    .location-wrapper {
+        display: inline-block;
+        vertical-align: top;
+    }
+    .bottom-page.location-left-dist {
+        padding-bottom: 40px;
+    }
+    .top.img {
+        width: 100%;
     }
 }
 
@@ -5338,13 +5562,20 @@ body:not(.mobile) .bottom-page.dropdown .dropdown-item:hover, .bottom-page.dropd
     .bottom-page.img.ios2 {
         margin: 80px -12.5% 0 -12.5%;
     }
+
     .bottom-page.top-dark-info.medium, .bottom-page.big-header, .bottom-page.dark-big-header, .bottom-page.large-header, .bottom-page.large-header.big, .bottom-page.business-header, .bottom-page.container-title, .bottom-page.bold-title {
         font-size: 30px;
     }
+
     .mobileapp .top-bl .horizontal-centered-bl {
         min-height: auto;
     }
+
+    .top.img {
+        width: unset;
+    }
 }
+
 
 @media only screen and (max-width: 870px) {
     .bottom-btn-container p {
@@ -5378,9 +5609,21 @@ body:not(.mobile) .bottom-page.dropdown .dropdown-item:hover, .bottom-page.dropd
 }
 
 @media only screen and (max-width: 783px) {
+    .bottom-page.flip-card-desc.invert {
+        font-size: 16px;
+    }
+    .bottom-page .inline-block.col-3.about {
+        padding-left: 24px;
+        padding-right: 24px;
+    }
     .bottom-page.small-txt {
         font-size: 14px;
         line-height: 24px;
+    }
+    .inline-block.inner-pad {
+        padding: unset;
+        padding-top: 50px;
+        text-align: center;
     }
     .bottom-page.img.mobile-top {
         margin: 0 0 50px;
@@ -5743,16 +5986,6 @@ body:not(.mobile) .bottom-page.dropdown .dropdown-item:hover, .bottom-page.dropd
     }
 }
 
-@media only screen and (max-width: 768px) {
-    .megasync .bottom-page.right-cell, .megasync .bottom-page.left-cell {
-        width: 100%;
-        display: block;
-    }
-    .megasync .sync-3 .bottom-page img {
-        margin: 32px auto;
-    }
-}
-
 @media only screen and (max-width: 702px) {
     .bottom-page.img.ios2 {
         margin-top: 0;
@@ -5866,6 +6099,9 @@ body:not(.mobile) .bottom-page.dropdown .dropdown-item:hover, .bottom-page.dropd
     .feature-page .app-links a.bottom-page.dark-button {
         display: block;
         margin: 16px auto 0;
+    }
+    .bottom-page .vision-col-4 {
+        width: 50%;
     }
 }
 
@@ -6388,6 +6624,18 @@ body:not(.mobile) .bottom-page.dropdown .dropdown-item:hover, .bottom-page.dropd
 }
 
 @media only screen and (max-width: 420px) {
+    .bottom-page.jobs-life-container {
+        padding-bottom: 46px;
+    }
+    .bottom-page.flip-card-desc.invert {
+        font-size: 14px;
+        line-height: 20px;
+        padding-top: 16px;
+    }
+    .bottom-page.flip-card-desc {
+        font-size: 16px;
+        line-height: 23px;
+    }
     .cmd-top-img {
         margin-left: -20px;
         margin-right: -20px;

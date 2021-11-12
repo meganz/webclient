@@ -137,7 +137,6 @@ export default class StreamHead extends MegaRenderMixin {
      * Dialog
      * @description The call information dialog -- contains list of the call moderators, incl.
      * link for the current call.
-     * https://mega.nz/file/gA9m0LIA#Mq9VW9PIRxaCH1mzyVsHq4wZNTBmdSA4rI4Xt3KJmik
      * @returns {JSX.Element}
      */
 
@@ -209,7 +208,6 @@ export default class StreamHead extends MegaRenderMixin {
 
         //
         // `StreamHead`
-        // https://mega.nz/file/NIEQnJAI#JgToTKENVCiACRvd-yxRsOyNrDpsEAk77G92c_uYYMA
         // -------------------------------------------------------------------------
 
         return (

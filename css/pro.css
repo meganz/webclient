@@ -479,6 +479,9 @@ i.pricing-sprite,
     scrollbar-width: none;
     -webkit-overflow-scrolling: touch;
 }
+.rtl .pricing-page.plans-wrap {
+    direction: rtl;
+}
 .pricing-page.plans-wrap::-webkit-scrollbar {
   display: none;
 }
@@ -866,7 +869,7 @@ body:not(.mobile) .plan.pro3:not(.current) .pricing-page.plan-button:hover {
 /* Current plan */
 .pricing-page.plan.current {
     border-left: 1px solid transparent;
-    background-color: var(--surface-grey-2);
+    background-color: var(--stroke-grey-2);
 }
 .pricing-page.plan.current + .plan {
     border-left: 1px solid transparent;
@@ -892,6 +895,12 @@ body:not(.mobile) .plan.pro3:not(.current) .pricing-page.plan-button:hover {
     display: block;
     margin: 0 auto;
     max-width: 475px;
+}
+.rtl .pricing-page.plan.business,
+.rtl .business-calculator .header,
+.rtl .business-calculator span, 
+.rtl .business-calculator .footer {
+    direction: rtl;
 }
 .plan.business .pricing-page.euro-price:empty {
     height: auto;
@@ -1308,6 +1317,9 @@ body:not(.mobile) .pricing-page.slider-dot:hover {
     width: 100%;
     max-width: 1009px;
     margin: 0 auto;
+}
+.rtl .pricing-page.compare-block {
+    direction: rtl;
 }
 .pricing-page.compare-cell {
     display: table-cell;

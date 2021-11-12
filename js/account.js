@@ -849,7 +849,7 @@ function isNonActivatedAccount() {
 }
 
 function isEphemeral() {
-    return (u_type === 0);
+    return !is_eplusplus && u_type !== false && u_type < 3;
 }
 
 /**

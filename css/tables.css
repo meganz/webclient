@@ -196,13 +196,13 @@
 .data-table tr:hover td::before,
 .data-table tr.active td::before {
     background: var(--surface-grey-3);
-    border-color: var(--surface-grey-2);
+    border-color: var(--stroke-grey-2);
 }
 .data-table tr.active td::before,
 .data-table tr.active td:last-child::before,
 .data-table tr.active td:first-child::before {
     background: var(--surface-grey-4);
-    border-color: var(--surface-grey-4);
+    border-color: var(--stroke-grey-4);
 }
 .data-table tr.active td:first-child::before {
     background-image: linear-gradient(var(--secondary-blue), var(--secondary-blue));
@@ -218,7 +218,7 @@
 .data-table tr.expanded,
 .fm-affiliate.redeem-details {
     background: var(--surface-grey-1);
-    border-color: var(--surface-grey-1);
+    border-color: var(--stroke-grey-1);
 }
 .data-table tr.expanded td::before {
     display: none;
@@ -277,7 +277,7 @@
     position: relative;
 }
 .mega-data-box table th {
-    border: 1px solid var(--surface-grey-2);
+    border: 1px solid var(--stroke-grey-2);
     border-width: 0 0 0 1px;
     font: var(--text-body1);
     padding: 2px 16px 3px;
@@ -296,7 +296,7 @@
 
 /* Data box table header */
 .mega-data-box .mega-data-header {
-    border-bottom: 1px solid var(--surface-grey-2);
+    border-bottom: 1px solid var(--stroke-grey-2);
     padding: 0 22px;
 }
 

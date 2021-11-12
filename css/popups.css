@@ -492,13 +492,13 @@ body.tl .dropdown.body.popup.contacts-search {
     opacity: 1;
 }
 .dark-direct-tooltip.simpletip-tooltip i {
-    --mask-color: var(--surface-grey-1-inverted);
+    --mask-color: var(--stroke-grey-1-inverted);
     --icon-size: 24px;
     height: 16px;
     overflow: hidden;
 }
 .dark-direct-tooltip.simpletip-tooltip.inverted i {
-    --mask-color: var(--surface-grey-1);
+    --mask-color: var(--stroke-grey-1);
 }
 .dark-direct-tooltip.simpletip-tooltip.center-align {
     text-align: center;

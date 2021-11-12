@@ -61,8 +61,8 @@ const businessProductPage = {
 
                 // If local currency values exist
                 businessProductPage.businessPlanData.isLocalInfoValid = info.l
-                    && info.l.cs && info.l.n
-                    && (info.bd.us.lp || info.lp) && info.bd.sto.lp && info.bd.trns.lp;
+                    && info.l.lcs && info.l.lc
+                    && info.bd.us.lp && info.bd.sto.lp && info.bd.trns.lp;
 
                 if (d) {
                     console.log(businessProductPage.businessPlanData);
@@ -118,21 +118,6 @@ const businessProductPage = {
     },
 
     /**
-     * Format business plan currency
-     * @param {Number} price The price number
-     * @returns {void}
-     */
-    formatBusinessPriceCurrency: function(price, currency, currencySign) {
-
-        'use strict';
-
-        // Set Local currency name/sign before the price value if its local
-        return currency && currencySign ? currencySign
-            + formatCurrency(price, currency, 'number') :
-            `${formatCurrency(price, 'EUR', 'number')}  \u20ac`;
-    },
-
-    /**
      * Populate Business plan card data
      * @returns {void}
      */
@@ -146,7 +131,6 @@ const businessProductPage = {
         if (this.businessPlanData.isValidBillingData) {
 
             let currency = '';
-            let currencySign = '';
             let userPrice = 0;
             let minPrice = 0;
             let storagePrice = 0;
@@ -157,21 +141,18 @@ const businessProductPage = {
 
             if (this.businessPlanData.isLocalInfoValid) {
 
-                currency = this.businessPlanData.l.n;
-                currencySign = this.businessPlanData.l.cs;
+                currency = this.businessPlanData.l.lc;
                 asterisk = '*';
-                userPrice = this.businessPlanData.bd.us.lp || this.businessPlanData.lp;
+                userPrice = this.businessPlanData.bd.us.lp;
                 minPrice = minUsers * userPrice;
                 storagePrice = this.businessPlanData.bd.sto.lp;
                 transferPrice = this.businessPlanData.bd.trns.lp;
                 $businessCard.addClass('local-currency');
-                $('.euro-price', $businessCard).text(
-                    this.formatBusinessPriceCurrency(this.businessPlanData.bd.us.p * minUsers)
-                );
+                $('.euro-price', $businessCard).text(formatCurrency(this.businessPlanData.bd.us.p * minUsers));
             }
             else {
 
-                currency = this.businessPlanData.c;
+                currency = this.businessPlanData.l.c;
                 userPrice = this.businessPlanData.bd.us.p;
                 minPrice = minUsers * userPrice;
                 storagePrice = this.businessPlanData.bd.sto.p;
@@ -181,26 +162,14 @@ const businessProductPage = {
             }
 
             $('.js-min-price span', $businessCard).addClass('big').text(
-                this.formatBusinessPriceCurrency(minPrice, currency, currencySign) + asterisk
+                formatCurrency(minPrice, currency) + asterisk
             );
-            $('.js-min-users', $businessCard).text(
-                l.bsn_plan_users.replace('%1', minUsers)
-            );
-            $('.js-min-storage', $businessCard).text(
-                l.bsn_plan_storage.replace('%1', `${this.businessPlanData.bd.ba.s / 1024} ${l[20160]}`)
-            );
-            $('.js-min-transfer', $businessCard).text(
-                l.bsn_plan_transfer.replace('%1', `${this.businessPlanData.bd.ba.t / 1024} ${l[20160]}`)
-            );
-            $('.js-price-per-user strong', $businessCard).text(
-                this.formatBusinessPriceCurrency(userPrice, currency, currencySign)
-            );
-            $('.js-price-per-storage strong', $businessCard).text(
-                this.formatBusinessPriceCurrency(storagePrice, currency, currencySign)
-            );
-            $('.js-price-per-transfer strong', $businessCard).text(
-                this.formatBusinessPriceCurrency(transferPrice, currency, currencySign)
-            );
+            $('.js-min-users span', $businessCard).text(minUsers);
+            $('.js-min-storage span', $businessCard).text(`${this.businessPlanData.bd.ba.s / 1024} ${l[20160]}`);
+            $('.js-min-transfer span', $businessCard).text(`${this.businessPlanData.bd.ba.t / 1024} ${l[20160]}`);
+            $('.js-price-per-user strong', $businessCard).text(formatCurrency(userPrice, currency));
+            $('.js-price-per-storage strong', $businessCard).text(formatCurrency(storagePrice, currency));
+            $('.js-price-per-transfer strong', $businessCard).text(formatCurrency(transferPrice, currency));
 
             // Show new Business plan content if new API is valid
             $('.business-el-new', $page).removeClass('hidden');
@@ -219,7 +188,7 @@ const businessProductPage = {
                 this.businessPlanData.bd.ba.s / 1024 : 15;
             const $businessCard = $('.js-business-card-old', $page);
 
-            $('.business-price .big', $businessCard).text(this.businessPlanData.p);
+            $('.business-price .big', $businessCard).text(formatCurrency(this.businessPlanData.bd.us.p));
             $('.business-storage-info', $businessCard)
                 .text(l[23789].replace('%1', `${storageAmount} ${l[20160]} *`));
             $('.business-price-note', $businessCard)
@@ -251,19 +220,17 @@ const businessProductPage = {
         let megaStoragePrice = 0;
         let maxPrice = 0;
         let currency = '';
-        let currencySign = '';
 
         if (this.businessPlanData.isLocalInfoValid && this.googlePlansData.isLocalInfoValid) {
 
-            currency = this.businessPlanData.l.n || this.googlePlansData.l.n;
-            currencySign = this.businessPlanData.l.cs || this.googlePlansData.l.cs;
-            megaUserPrice = this.businessPlanData.bd.us.lp || this.businessPlanData.lp;
+            currency = this.businessPlanData.l.lc || this.googlePlansData.l.n;
+            megaUserPrice = this.businessPlanData.bd.us.lp;
             megaStoragePrice = this.businessPlanData.bd.sto.lp;
             $('.business-compare-charts', $calculator).attr('title', l[18770]);
         }
         else {
 
-            currency = this.businessPlanData.c;
+            currency = this.businessPlanData.l.c;
             megaUserPrice = this.businessPlanData.bd.us.p;
             megaStoragePrice = this.businessPlanData.bd.sto.p;
             $('.business-compare-charts', $calculator).removeAttr('title');
@@ -362,18 +329,14 @@ const businessProductPage = {
             megaPrice = calculateMegaPrice();
             googlePrice = calculateGooglePrice();
 
-            $megaTotal.text(
-                `${this.formatBusinessPriceCurrency(megaPrice, currency, currencySign)} /${l[931]}`
-            );
+            $('span', $megaTotal).text(formatCurrency(megaPrice, currency));
 
             if (isNsGooglePlan) {
-                $googleTotal.text(l.not_supported);
                 $googleChart.addClass('not-supported');
             }
             else {
-                $googleTotal.text(
-                    `${this.formatBusinessPriceCurrency(googlePrice, currency, currencySign)} /${l[931]}*`
-                );
+
+                $('span', $googleTotal).text(formatCurrency(googlePrice, currency));
                 $googleChart.removeClass('not-supported');
             }
 

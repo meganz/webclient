@@ -73,7 +73,7 @@
 .nw-fm-tree-item:hover .colour-label-ind,
 .nw-fm-tree-item.hovered .colour-label-ind,
 .nw-fm-tree-item.selected .colour-label-ind {
-    box-shadow: 0 0 0 1px var(--surface-main);
+    box-shadow: 0 0 0 1px var(--stroke-main);
 }
 .nw-fm-tree-item.label {
     -webkit-padding-end: 46px;
@@ -121,7 +121,7 @@
 /* Filters */
 .filter-block.body,
 .filter-block.tree {
-    background-color: var(--surface-grey-3);
+    background-color: var(--stroke-grey-3);
     box-shadow: inset 0px 0px 0px 1px rgba(0, 0, 0, 0.1);
     font-size: 0;
     color: var(--text-color-high);

@@ -635,6 +635,10 @@
         <div class="mobile fm-icon manage-link"></div>
         <span class="mobile text">[$6909]</span>
     </div>
+    <div class="context-menu-item rename-button">
+        <i class="mobile sprite-fm-mono icon-rename"></i>
+        <span class="mobile text">[$61]</span>
+    </div>
     <div class="context-menu-item delete-button">
         <div class="mobile fm-icon delete"></div>
         <span class="mobile text">[$1730]</span>
@@ -663,6 +667,10 @@
     <div class="context-menu-item link-button">
         <div class="mobile fm-icon manage-link"></div>
         <span class="mobile text">[$6909]</span>
+    </div>
+    <div class="context-menu-item rename-button">
+        <i class="mobile sprite-fm-mono icon-rename"></i>
+        <span class="mobile text">[$61]</span>
     </div>
     <div class="context-menu-item delete-button">
         <div class="mobile fm-icon delete"></div>
@@ -2692,6 +2700,35 @@
     </div>
 </div>
 
+<!-- File/Folder rename overlay !-->
+<div class="mobile main-block hidden mobile-rename-overlay">
+    <div class="mobile content-row first">
+        <div class="mobile content-cell">
+            <a class="mobile logo"></a>
+            <div class="mobile fm-dialog-close"></div>
+            <div class="mobile white-block">
+                <img alt="" src="{staticpath}images/mobile/extensions/image.png" class="mobile filetype-img" />
+                <div class="mobile filename">
+                    <div class="mobile rename-overlay-input">
+                        <input class="mobile rename-input" value="[$5533]">
+                    </div>
+                    <div class="mobile folder-name-warning-block hidden">
+                        <div class="mobile fm-icon red-warning"></div>
+                        <div class="mobile warning-text">[$7729]</div>
+                    </div>
+                </div>
+                <div class="mobile file-download-info">
+                    <div class="mobile filesize"></div>
+                </div>
+                <div class="mobile buttons">
+                    <a class="mobile green-button first"> <i></i> <span>[$61]</span> </a>
+                </div>
+                <a class="mobile text-button third cancel"><span>[$148]</span> </a>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Megadrop info overlay !-->
 <div class="mobile main-block hidden overlay" id="mobile-ui-megadrop-info">
     <div class="wu-main">
@@ -3547,7 +3584,6 @@
         </div>
         <div class="voucher-plan-price">
             <span class="price"></span>
-            <span class="payment-eurosign">&euro;</span>
         </div>
     </div>
 
@@ -3557,10 +3593,10 @@
         <div class="mobile fm-icon currency-sign-filled"></div>
         <div class="mobile right-block">
             <div class="mobile voucher-sub-title">[$7201]</div>
-            <span class="mobile balance-amount">0.00</span><span class="mobile payment-eurosign">&nbsp; &euro;</span>
+            <span class="mobile balance-amount">0.00</span>
             <span class="mobile right-span">
                     <span class="mobile fm-icon small-gray-arrow"></span>
-                    <span class="mobile new-balance-amount">0.00</span><span class="mobile payment-eurosign">&nbsp; &euro;</span>
+                    <span class="mobile new-balance-amount">0.00</span>
                 </span>
         </div>
     </div>

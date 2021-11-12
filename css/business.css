@@ -38,7 +38,7 @@
 }
 .business-page.bottom-page .top-head,
 .business-page.bottom-page .top-head.floating {
-    background-color: var(--surface-main);
+    background-color: var(--stroke-main);
 }
 .business-page .pages-menu.body {
     background-color: #fff;
@@ -842,6 +842,10 @@ div.bottom-page.slider-controls {
 .business-compare-charts .chart.google.not-supported {
     background: linear-gradient(to bottom, rgba(255, 210, 0, 0.3) 0%, rgba(255, 193, 0, 0.3) 37%, rgba(255, 165, 0, 0.3) 100%);
     border: 1px dashed #fa6400;
+}
+.business-compare-charts .chart.google:not(.not-supported) span.not-supported,
+.business-compare-charts .chart.google.not-supported span.supported {
+    display: none;
 }
 .dark-direct-tooltip.simpletip-tooltip.business-chart-tip {
     bottom: 100%;

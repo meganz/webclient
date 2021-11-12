@@ -119,6 +119,7 @@ body {
             --text-code1: 12px/24px var(--text-font-family-code);
 
         /* font : ONLY FOR PRODUCT PAGES */
+            --text-h1-montserrat-bold: 24px/36px var(--text-font-family-montserrat-bold);
             --text-h2-montserrat-bold: 20px/30px var(--text-font-family-montserrat-bold);
             --text-body1-montserrat-light: 20px/30px var(--text-font-family-montserrat-light);
 
@@ -178,12 +179,18 @@ html .theme-light-forced {
         --stroke-main: #fff;
         --stroke-grey-1: #fafafa;
         --stroke-grey-2: #eee;
+        --stroke-grey-3: #fafafa;
+        --stroke-grey-4: #eee;
         --stroke-grey-6: #eee;
         --stroke-dark-grey: #555555;
+        --stroke-mid-grey: #ccc;
+        --stroke-black: #000;
         --stroke-info: #2ba6de;
         --stroke-success: #00bfa5;
         --stroke-warning: #ff9924;
         --stroke-error: #fd3e38;
+        --stroke-scrim: rgba(255, 255, 255, 0.32);
+        --stroke-overlay-background: rgba(204, 204, 204, 0.9);
 
     /* icons */
 
@@ -312,6 +319,9 @@ html .theme-light-forced {
         --progress-bar-fill4: #1d1d1d;
 
     /* inverted */
+        --stroke-main-inverted: #333;
+        --stroke-grey-1-inverted: #222;
+        --stroke-link-inverted: #676767;
 
     /* TODO: remove this once the library is updated */
         --surface-overlay-background: rgba(204, 204, 204, 0.9);
@@ -384,12 +394,18 @@ html .theme-dark-forced {
         --stroke-main: #333;
         --stroke-grey-1: #222;
         --stroke-grey-2: #444;
+        --stroke-grey-3: #444;
+        --stroke-grey-4: #222;
         --stroke-grey-6: #000;
         --stroke-dark-grey: #e6e6e6;
+        --stroke-mid-grey: #666;
+        --stroke-black: #000;
         --stroke-info: #6fd7ff;
         --stroke-success: #5afee8;
         --stroke-warning: #fec35a;
         --stroke-error: #ff7e79;
+        --stroke-scrim: rgba(0, 0, 0, 0.32);
+        --stroke-overlay-background: rgba(0, 0, 0, 0.8);
 
     /* icons */
 
@@ -516,6 +532,9 @@ html .theme-dark-forced {
         --progress-bar-fill4: #1d1d1d;
 
     /* inverted */
+        --stroke-main-inverted: #fff;
+        --stroke-grey-1-inverted: #fafafa;
+        --stroke-link-inverted: #c7c7c7;
 
     /* TODO: remove this once the library is updated */
 

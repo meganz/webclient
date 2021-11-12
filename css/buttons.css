@@ -98,7 +98,7 @@ button.disabled.visible {
 }
 .link-button.light:not(.disabled):hover,
 .dropdown-item.link-button.light:not(.disabled):hover {
-    background-color: var(--surface-main);
+    background-color: var(--stroke-main);
 }
 /* buttons for business account */
 button:not(.mega-button) .icon {

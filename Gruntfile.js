@@ -517,10 +517,11 @@ var Secureboot = function() {
     return ns;
 }();
 
-const log = console.log;
-console.log = function(s) {
-    if (s && s[0] !== '>') {
-        log.apply(console, arguments);
+const stdout = process.stdout;
+const write = stdout.write;
+stdout.write = function(s) {
+    if (s && !String(s).includes('.css\x1b[0m created.')) {
+        write.apply(stdout, arguments);
     }
 };
 
@@ -878,7 +879,7 @@ module.exports = function(grunt) {
                 },
                 get files() {
                     if (!concatGroups) {
-                        console.log = log;
+                        stdout.write = write;
                         postTaskFinalizer();
                         concatGroups = Secureboot.getGroups(true);
                     }

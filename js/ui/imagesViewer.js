@@ -334,7 +334,7 @@ var slideshowid;
             return;
         }
 
-        if (wrapper.dataset.perc) {
+        if ($elm.slider('instance')) {
             // Update existing slider.
             return setValue();
         }

@@ -647,7 +647,11 @@
         this.persist.running = true;
 
         delay(tag, async() => {
-            let hold = pfid || page === 'download' || String(page).includes('chat');
+            const holders = {
+                cookie: 1, download: 1, file: 1, folder: 1,
+                megadrop: 1, privacy: 1, takedown: 1, terms: 1
+            };
+            let hold = pfid || holders[page] || String(page).includes('chat');
             if (!hold) {
                 // Hold showing the cookie dialog for this if the FM was just loaded (e.g. less than 20 seconds ago)
                 hold = window.loadfm && Date.now() - loadfm.loaded < WAIT_TIME;

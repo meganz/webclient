@@ -554,19 +554,18 @@ var voucherDialog = {
         var oldStorage = oldPlan ? (oldPlan[2] * Math.pow(1024, 3)) : 0;
         var newStorage = Math.max(pro.propay.selectedProPackage[2] * Math.pow(1024, 3), oldStorage);
         var newTransfer = pro.propay.selectedProPackage[3] * Math.pow(1024, 3);
-        var intl = mega.intl.number;
 
         // Update template
         this.$dialog.find('.plan-icon').removeClass('pro1 pro2 pro3 pro4').addClass('pro' + proNum);
         this.$dialog.find('.voucher-plan-title').text(proPlan);
         this.$dialog.find('.voucher-plan-txt .duration').text(monthsWording);
-        this.$dialog.find('.voucher-plan-price .price').text(intl.format(proPrice));
+        this.$dialog.find('.voucher-plan-price .price').text(formatCurrency(proPrice));
         this.$dialog.find('#voucher-code-input input').val('');
         const hasSufficientBalance = this.changeColourIfSufficientBalance();
 
         var $voucherAccountBalance = this.$dialog.find('.voucher-account-balance');
         var $balanceAmount = $voucherAccountBalance.find('.balance-amount');
-        $balanceAmount.text(intl.format(balance));
+        $balanceAmount.text(formatCurrency(balance));
 
         // Mobile specific dialog enhancements
         if (is_mobile) {
@@ -576,7 +575,7 @@ var voucherDialog = {
             var $transferAmount = $voucherAccountBalance.find('.transfer-amount');
             var $newTransferAmount = $voucherAccountBalance.find('.new-transfer-amount');
 
-            $newBalanceAmount.text(newBalance);
+            $newBalanceAmount.text(formatCurrency(newBalance));
 
             if (newBalance < 0) {
                 $newBalanceAmount.addClass('red');
@@ -752,8 +751,10 @@ var voucherDialog = {
                     var newBalance = parseFloat(balance - proPrice).toFixed(2);
 
                     // Update dialog details
-                    voucherDialog.$dialog.find('.voucher-account-balance .balance-amount').text(balance);
-                    voucherDialog.$dialog.find('.voucher-account-balance .new-balance-amount').text(newBalance);
+                    voucherDialog.$dialog.find('.voucher-account-balance .balance-amount')
+                        .text(formatCurrency(balance));
+                    voucherDialog.$dialog.find('.voucher-account-balance .new-balance-amount')
+                        .text(formatCurrency(newBalance));
                     const sufficientBalance = voucherDialog.changeColourIfSufficientBalance();
 
                     if (!sufficientBalance) {
@@ -942,8 +943,7 @@ var wireTransferDialog = {
                     proPrice = numOfMonths === 1 ? mega.intl.number.format(discountInfo.emp)
                         : mega.intl.number.format(discountInfo.eyp);
                 }
-                this.$dialog.find('.amount').text(mega.intl.number.format(proPrice)).closest('tr')
-                    .removeClass('hidden');
+                this.$dialog.find('.amount').text(formatCurrency(proPrice)).closest('tr').removeClass('hidden');
             }
             else {
                 this.$dialog.find('.amount').closest('tr').addClass('hidden');
@@ -1319,7 +1319,7 @@ var addressDialog = {
             .addClass(proNum);
         this.$dialog.find('.payment-plan-title').text(proPlan);
         this.$dialog.find('.payment-plan-txt .duration').text(monthsWording);
-        this.proPrice = mega.intl.number.format(proPrice);
+        this.proPrice = formatCurrency(proPrice);
         this.$dialog.find('.payment-plan-price .price').text(this.proPrice);
 
         // Show the black background overlay and the dialog
@@ -2299,7 +2299,7 @@ var cardDialog = {
         // Update the Pro plan details
         this.$dialog.find('.plan-icon').removeClass('pro1 pro2 pro3 pro4').addClass('pro' + proNum);
         this.$dialog.find('.payment-plan-title').text(proPlan);
-        this.$dialog.find('.payment-plan-price').text(proPrice + '\u20AC');
+        this.$dialog.find('.payment-plan-price').text(formatCurrency(proPrice));
         this.$dialog.find('.payment-plan-txt').text(monthsWording + ' ' + l[6965] + ' ');
 
         // Remove rogue colon in translation text

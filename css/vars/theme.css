@@ -119,6 +119,7 @@ body {
             --text-code1: 12px/24px var(--text-font-family-code);
 
         /* font : ONLY FOR PRODUCT PAGES */
+            --text-h1-montserrat-bold: 24px/36px var(--text-font-family-montserrat-bold);
             --text-h2-montserrat-bold: 20px/30px var(--text-font-family-montserrat-bold);
             --text-body1-montserrat-light: 20px/30px var(--text-font-family-montserrat-light);
 

@@ -595,7 +595,6 @@ function daysSince1Jan2000() {
  * @param {Number} value Value to format
  * @param {String} [currency] Currency to use in currency formatting. Default: 'EUR'
  * @param {String} [display] display type of currency format, supporting types are below:
- *                  'narrowSymbol' - use a localized currency symbol such as "$" - Default,
  *                  'symbol' - use a localized currency symbol but with country code such as "NZ$",
  *                  'code' - use the ISO currency code such as "NZD",
  *                  'name' - use a localized currency name such as "dollar"
@@ -608,7 +607,8 @@ function formatCurrency(value, currency, display) {
 
     value = typeof value === 'string' ? parseFloat(value) : value;
     currency = currency || 'EUR';
-    display = display || 'narrowSymbol';
+    display = display || 'symbol';
+
     var displayNumber = false;
 
     if (display === 'number') {
@@ -635,7 +635,7 @@ function formatCurrency(value, currency, display) {
     }
 
     // Romanian with Euro Symbol currency display is currently buggy on all browsers, so doing this to polyfill it
-    if (locales.startsWith('ro') && currency === 'EUR' && (display === 'symbol' || display === 'narrowSymbol')) {
+    if (locales.startsWith('ro') && currency === 'EUR' && display === 'symbol') {
         result = result.replace('EUR', '\u20ac');
     }
 

@@ -2519,7 +2519,7 @@ FileManager.prototype.initUIKeyEvents = function() {
             }
         }
 
-        delay('render:search_breadcrumbs', () => M.renderSearchBreadcrumbs());
+        M.renderSearchBreadcrumbs();
     });
 };
 
@@ -3738,7 +3738,7 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
                 $.hideTopMenu();
             },
             stop: function (e, u) {
-                delay('render:search_breadcrumbs', () => M.renderSearchBreadcrumbs());
+                M.renderSearchBreadcrumbs();
             }
         });
         // Since selectablecreate is triggered only on first creation of the selectable widget, we need to find a way
@@ -3773,7 +3773,7 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
             // }
         }
 
-        delay('render:search_breadcrumbs', () => M.renderSearchBreadcrumbs());
+        M.renderSearchBreadcrumbs();
         $.hideTopMenu();
         M.hideClickHint();
 
@@ -3813,7 +3813,7 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
         if (!mega.cttHintTimer) {
             M.showClickHint();
         }
-        delay('render:search_breadcrumbs', () => M.renderSearchBreadcrumbs());
+        M.renderSearchBreadcrumbs();
         $.hideContextMenu(e);
         if ($.hideTopMenu) {
             $.hideTopMenu();

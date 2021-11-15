@@ -1292,9 +1292,8 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[/A]', '</a>');
     l[23446] = escapeHTML(l[23446]).replace(/\[S]/g, '<strong>').replace(/\[\/S]/g, '</strong>');
     l[23447] = escapeHTML(l[23447]).replace(/\[S]/g, '<strong>').replace(/\[\/S]/g, '</strong>');
-    l[23448] = escapeHTML(l[23448]).replace('[A1]', '<a href="" class="red a1">').replace('[/A1]', '</a>')
-        .replace('[A2]', '<a href="" class="red a2">').replace('[/A2]', '</a>')
-        .replace('[A3]', '<a href="" class="red a3">').replace('[/A3]', '</a>');
+    l[23448] = escapeHTML(l[23448]).replace('[A1]', '<a href="" class="red a1"></a>')
+        .replace('[A2]', '<a href="" class="red a2"></a>');
     l[23449] = escapeHTML(l[23449]).replace(/\[R\/]/g, '<sup>&reg;</sup>');
     l[24074] = escapeHTML(l[24074]).replace('[A]', '<a>').replace('[/A]', '</a>');
     l[24141] = escapeHTML(l[24141])
@@ -1390,8 +1389,7 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[A]', `<a class="clickurl" href="/support">`)
         .replace('[/A]', '</a>');
     l.extensions_top_btn_info = escapeHTML(l.extensions_top_btn_info).replace(/\[R\/]/g, '<sup>&reg;</sup>');
-    l.extensions_avbl_desktop = escapeHTML(l.extensions_avbl_desktop).replace('[A1]', '<a href="" class="red a1">')
-        .replace('[/A1]', '</a>');
+    l.extensions_avbl_desktop = escapeHTML(l.extensions_avbl_desktop).replace('[A1]', '<a href="" class="red a1"></a>');
     l.extensions_avbl_mobile = escapeHTML(l.extensions_avbl_mobile).replace(/\[S]/g, '<strong>')
         .replace(/\[\/S]/g, '</strong>');
 

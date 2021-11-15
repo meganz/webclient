@@ -136,6 +136,7 @@
                 .addClass('disabled');
 
             $('.feedback-dialog-body').removeClass('hidden');
+            $('.mega-dialog.feedback-dialog footer').removeClass('hidden');
             $('.feedback-result-pad').addClass('hidden');
 
             $('.collected-data', self.$dialog)

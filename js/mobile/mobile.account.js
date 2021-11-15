@@ -119,6 +119,8 @@ mobile.account = {
         M.accountData(
             function() {
 
+                loadingInitDialog.hide();
+
                 // Hide the loading dialog after request completes
                 loadingDialog.hide();
 

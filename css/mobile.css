@@ -6082,6 +6082,82 @@ textarea.mobile.support-text-field {
     margin: 8px 24px;
 }
 
+/* Change email page */
+.mobile.my-account-change-email-page .body-text {
+    color: #818993;
+    font: var(--text-body1);
+    line-height: 24px;
+    margin: 26px 24px 24px;
+}
+.mobile.my-account-change-email-page .email-input {
+    display: flex;
+    align-items: center;
+    height: 48px;
+    background-color: #f8f8f8;
+    border: 1px solid #eee;
+    padding: 0 16px 0 18px;
+    box-sizing: border-box;
+    position: relative;
+    margin: 0 24px 24px;
+    border-radius: 3px;
+}
+.mobile.my-account-change-email-page .email-input.email-new.error {
+    border: 1px solid var(--stroke-error);
+    margin-bottom: 6px;
+}
+.mobile.my-account-change-email-page .email-input.email-new + .email-input-error {
+    display: none;
+}
+.mobile.my-account-change-email-page .email-input.email-new.error + .email-input-error {
+    display: block;
+    margin: 0 24px 24px;
+    font: var(--text-body2);
+    color: var(--text-color-error);
+}
+.mobile.my-account-change-email-page .email-input input {
+    background-color: #F8F8F8;
+    border: 0;
+    padding: 0;
+    margin: 0;
+    color: var(--text-color-medium);
+    font: var(--text-body1);
+    height: 26px;
+    width: 100%;
+    display: block;
+}
+.mobile.my-account-change-email-page .email-input .email-new-input:focus {
+    color: var(--text-color-high);
+}
+.mobile.my-account-change-email-page .email-input span {
+    padding-right: 10px;
+    --icon-size: 24px;
+    --mask-color: var(--icon-inactive);
+}
+.mobile.my-account-change-email-page .update-email-button {
+    margin: 8px 24px;
+}
+.mobile.my-account-change-email-page .email-change-step2 .step2-block {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 100%;
+}
+.mobile.my-account-change-email-page .email-change-step2 span {
+    display: block;
+    text-align: center;
+    font: var(--text-body1);
+    color: var(--text-color-high);
+    margin: 0 24px 12px;
+}
+.mobile.my-account-change-email-page .step2-text .email-change-header {
+    font: var(--text-h3-bold);
+}
+.mobile.my-account-change-email-page .email-change-step2 button {
+    margin: 8px 24px;
+}
+
+/* End Change email page */
+
 .mobile.recovery-key-page .mobile.recovery-key-block, .two-factor-qr-block {
     background-color: #fff;
     padding: 32px 0 26px 0;
@@ -10354,6 +10430,64 @@ Thank You dialog
     display: none;
 }
 
+/* Verify code page */
+.mobile.verify-code-page .body-text {
+    color: #818993;
+    font: var(--text-body1);
+    line-height: 24px;
+    margin: 26px 24px 24px;
+}
+.mobile.verify-code-page .signin-input.password {
+    margin: 0 24px;
+}
+.mobile.verify-code-page .signin-input.password.error {
+    border: 1px solid var(--stroke-error);
+    margin-bottom: 6px;
+}
+.mobile.verify-code-page .signin-input.password + .password-input-error {
+    display: none;
+}
+.mobile.verify-code-page .signin-input.password.error + .password-input-error {
+    display: block;
+    margin: 0 24px 24px;
+    font: var(--text-body2);
+    color: var(--text-color-error);
+}
+.mobile.verify-code-page .verify-password-button {
+    margin: 24px;
+}
+.mobile.verify-code-page .verify-step2 .step2-block {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 100%;
+}
+.mobile.verify-code-page .verify-step2 .step2-text span {
+    display: block;
+    text-align: center;
+    font: var(--text-body1);
+    color: var(--text-color-high);
+    margin: 0 24px 12px;
+    overflow-wrap: break-word;
+}
+.mobile.verify-code-page .verify-step2 .step2-text span.verify-header {
+    font: var(--text-h3-bold);
+}
+.mobile.verify-code-page .step2-icon {
+    --icon-size: 56px;
+    width: 100%;
+    height: 56px;
+    margin-bottom: 16px;
+}
+.mobile.verify-code-page .step2-icon span {
+    margin: auto;
+}
+.mobile.verify-code-page .verify-step2 button {
+    margin: 12px 24px;
+}
+
+/* End Verify code page */
+
 /* Only media queries after here */
 @media only screen and (max-width: 970px) {
     .securitypractice .security-page-video-block {
@@ -12938,6 +13072,14 @@ p a.blog-new-read-more {
 .mobile .button-block.data-list .fm-icon {
     top: 4px;
     margin-top: 0;
+}
+.mobile .button-block .sprite-fm-mono {
+    position: absolute;
+    left: 22px;
+    width: 20px;
+    height: 20px;
+    --icon-size: 20px;
+    --mask-color: #818993;
 }
 .mobile.button-block .content {
     position: relative;

@@ -483,7 +483,7 @@
                 M.currentdirid === 'shares' || // Share root page
                 M.currentdirid === 'out-shares' || // Out-share root page
                 M.currentdirid === 'public-links' || // Public-link root page
-                M.currentrootid === 'contacts' || // Contacts pages
+                String(M.currentdirid).startsWith('chat/contacts') || // Contacts pages
                 M.currentrootid === M.RubbishID || // Rubbish bin
                 (M.currentrootid === undefined && M.currentdirid !== 'transfers') // Dashboard and Settings pages
             ));

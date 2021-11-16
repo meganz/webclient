@@ -161,7 +161,7 @@ function dl_g(res, ctx) {
         }
         if (fdl_file.name) {
             var $pageScrollBlock = $(is_mobile ? '.bottom-page.scroll-block' : '.download.download-page')
-                .removeClass('video video-theatre-mode resumable txtfile image');
+                .removeClass('video video-theatre-mode downloading resumable txtfile image');
             var filename = M.getSafeName(fdl_file.name) || 'unknown.bin';
             var filenameLength = filename.length;
             var fileExtPos = filename.lastIndexOf('.') > 0 ? filename.lastIndexOf('.') : filenameLength;

@@ -3531,6 +3531,33 @@ body:not(.mobile) .mobile-apps-button:hover {
     background-position: -134px -2731px;
     width: 146px;
 }
+.bottom-page.appstore-button {
+    display: inline-block;
+    height: 57px;
+    margin: 30px 15px 0;
+    width: 169px;
+}
+.bottom-page.appstore-button.android {
+    width: 216px;
+    height: auto;
+    margin: 0 0 -14px;
+}
+.bottom-page.appstore-button.huawei {
+    margin-left: 10px;
+    width: 200px;
+}
+.bottom-page.appstore-button.small {
+    margin: 0;
+    width: 131px;
+}
+.bottom-page.appstore-button.small.android {
+    margin: -4px 0 0 -10px;
+    width: 168px;
+}
+.bottom-page.appstore-button.small.huawei {
+    margin-left: -10px;
+    width: 150px;
+}
 .dark-blue-bg .bottom-page.dark-button:first-child {
     margin-right: 30px;
 }
@@ -6099,6 +6126,23 @@ body:not(.mobile) .bottom-page.dropdown .dropdown-item:hover, .bottom-page.dropd
     .feature-page .app-links a.bottom-page.dark-button {
         display: block;
         margin: 16px auto 0;
+    }
+    .bottom-page.appstore-button {
+        height: auto;
+        width: 200px;
+    }
+    .bottom-page.appstore-button.android {
+        height: auto;
+        width: 230px;
+    }
+    .bottom-page.appstore-button.huawei {
+        height: auto;
+        width: 202px;
+        margin: 10px 10px 0;
+    }
+    .bottom-page.appstore-button.small {
+        margin: 0;
+        width: 131px;
     }
     .bottom-page .vision-col-4 {
         width: 50%;

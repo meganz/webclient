@@ -363,11 +363,23 @@ body.rtl .feature-page * {
 
         /* app store links */
 
-            .feature-page .app-links a,
-            .feature-page .app-links a:first-child {
+            .feature-page .app-links a {
                 margin: 16px 8px 0;
+                display: block;
             }
-
+            .bottom-page.appstore-button.small {
+                width: 131px;
+                height: auto;
+                margin: 0;
+            }
+            .bottom-page.appstore-button.small.android {
+                margin: 0;
+                width: 150px;
+            }
+            .bottom-page.appstore-button.small.huawei {
+                margin: 0;
+                width: 132px;
+            }
         /* end app store links */
     }
 

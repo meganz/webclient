@@ -86,6 +86,7 @@ var bottompage = {
 
         // Show/hide Referal Program and Pricing menu items for different acctount types
         bottompage.changeMenuItemsList($content);
+        localeImages($content);
     },
 
     /**

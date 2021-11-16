@@ -64,8 +64,37 @@ accountUI.renderAccountPage = function(account) {
     }
 
     var id = getSitePath();
-    if (u_attr && u_attr.b && !u_attr.b.m && id === '/fm/account/plan') {
+    if (u_attr && u_attr.b && !u_attr.b.m && id.startsWith('/fm/account/plan')) {
         id = '/fm/account';
+    }
+
+    // Parse subSectionId and remove sub section part from id
+    const accountRootUrl = '/fm/account';
+    let subSectionId;
+
+    if (id.length > accountRootUrl.length) {
+        let urlPart0;
+        let urlPart1;
+        const sectionUrl = id.substr(accountRootUrl.length + 1, id.length);
+        const sectionUrlParts = sectionUrl.split('/');
+
+        if (sectionUrlParts.length === 1) {
+            urlPart0 = sectionUrlParts[0];
+        }
+        else {
+            urlPart0 = sectionUrlParts[0];
+            urlPart1 = sectionUrlParts[1];
+        }
+
+        const $accountSubSectionElement = $(`.settings-button.account-s .sub-title[data-scrollto='${urlPart0}']`);
+        if ($accountSubSectionElement.length > 0) {
+            id = accountRootUrl;
+            subSectionId = urlPart0;
+        }
+        else {
+            id = `${accountRootUrl}/${urlPart0}`;
+            subSectionId = urlPart1;
+        }
     }
 
     var sectionClass;
@@ -180,6 +209,10 @@ accountUI.renderAccountPage = function(account) {
 
     mBroadcaster.sendMessage('settingPageReady');
     fmLeftMenuUI();
+
+    if (subSectionId) {
+        $(`.settings-button.${sectionClass} .sub-title[data-scrollto='${subSectionId}']`).trigger('click');
+    }
 
     loadingDialog.hide();
 };
@@ -632,6 +665,32 @@ accountUI.leftPane = {
         }, 600);
     },
 
+    getPageUrlBySection: function($section) {
+
+        'use strict';
+
+        switch (true) {
+            case $section.hasClass('account-s'):
+                return 'fm/account';
+            case $section.hasClass('plan'):
+                return 'fm/account/plan';
+            case $section.hasClass('notifications'):
+                return 'fm/account/notifications';
+            case $section.hasClass('security'):
+                return 'fm/account/security';
+            case $section.hasClass('file-management'):
+                return 'fm/account/file-management';
+            case $section.hasClass('transfers'):
+                return 'fm/account/transfers';
+            case $section.hasClass('contact-chats'):
+                return 'fm/account/contact-chats';
+            case $section.hasClass('reseller'):
+                return 'fm/account/reseller';
+            default:
+                return 'fm/account';
+        }
+    },
+
     bindEvents: function() {
 
         'use strict';
@@ -640,35 +699,10 @@ accountUI.leftPane = {
 
         $('.settings-button', $settingsPane).rebind('click', function() {
 
-            if ($(this).attr('class').indexOf('active') === -1) {
+            const $this = $(this);
+            if (!$this.hasClass('active')) {
                 accountUI.$contentBlock.scrollTop(0);
-
-                switch (true) {
-                    case $(this).hasClass('account-s'):
-                        loadSubPage('fm/account');
-                        break;
-                    case $(this).hasClass('plan'):
-                        loadSubPage('fm/account/plan');
-                        break;
-                    case $(this).hasClass('notifications'):
-                        loadSubPage('fm/account/notifications');
-                        break;
-                    case $(this).hasClass('security'):
-                        loadSubPage('fm/account/security');
-                        break;
-                    case $(this).hasClass('file-management'):
-                        loadSubPage('fm/account/file-management');
-                        break;
-                    case $(this).hasClass('transfers'):
-                        loadSubPage('fm/account/transfers');
-                        break;
-                    case $(this).hasClass('contact-chats'):
-                        loadSubPage('fm/account/contact-chats');
-                        break;
-                    case $(this).hasClass('reseller'):
-                        loadSubPage('fm/account/reseller');
-                        break;
-                }
+                loadSubPage(accountUI.leftPane.getPageUrlBySection($this));
             }
         });
 
@@ -682,18 +716,23 @@ accountUI.leftPane = {
 
         $('.settings-button .sub-title', $settingsPane).rebind('click', function() {
 
-            var $this = $(this);
-            var $parentBtn = $this.closest('.settings-button');
-            var $target = $('.data-block.' + $this.attr('data-scrollto'));
-            var targetPosition = $target.position().top;
+            const $this = $(this);
+            const $parentBtn = $this.closest('.settings-button');
+            const dataScrollto = $this.attr('data-scrollto');
+            const $target = $(`.data-block.${dataScrollto}`);
+            const targetPosition = $target.position().top;
+            const parentPage = accountUI.leftPane.getPageUrlBySection($parentBtn);
+            const page = `${parentPage}/${dataScrollto}`;
 
             if ($parentBtn.hasClass('active')) {
                 accountUI.$contentBlock.animate({scrollTop: targetPosition}, 500);
+                pushHistoryState(page);
             }
             else {
                 $parentBtn.trigger('click');
                 mBroadcaster.once('settingPageReady', function () {
-                    accountUI.$contentBlock.animate({scrollTop: targetPosition}, 500);
+                    pushHistoryState(page);
+                    accountUI.$contentBlock.animate({scrollTop: $target.position().top}, 500);
                 });
             }
         });

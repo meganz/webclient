@@ -1063,7 +1063,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
             $playVideoButton.removeClass('hidden');
         }
 
-        duration = MediaAttribute(node).data.playtime || 0;
+        duration = options.playtime || MediaAttribute(node).data.playtime || 0;
         setDuration(duration);
         onTimeUpdate(0, 1);
 
@@ -1785,6 +1785,16 @@ FullScreenManager.prototype.enterFullscreen = function() {
                 options.type = c && c[0];
             }
         }
+
+        options.filesize = node.s;
+        options.playtime = MediaAttribute(node).data.playtime;
+        options.bitrate = options.filesize / options.playtime;
+
+        if (d && options.bitrate) {
+            console.info('%s, %s', node.name, bytesToSize(node.s),
+                         secondsToTime(options.playtime), bytesToSpeed(options.bitrate));
+        }
+
         var s = _getStreamerInstance(node, $wrapper, videoElement, options);
 
         destroy = destroy || function() {

@@ -161,10 +161,10 @@ export default class ContextMenu extends MegaRenderMixin {
                     </div>
                     <hr />
                     <DropdownItem
-                        icon="sprite-fm-mono icon-disabled-filled"
+                        icon="sprite-fm-mono icon-disable"
                         label={l[1001]}
                         disabled={!!contact.b}
-                        className="red"
+                        className=""
                         onClick={() =>
                             this.close(() =>
                                 fmremove(contact.u)

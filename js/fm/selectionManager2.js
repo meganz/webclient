@@ -655,10 +655,10 @@ class SelectionManager2_DOM extends SelectionManager2Base {
             for (let i = this.selected_list.length; i--;) {
                 let n = this.selected_list[i];
                 const e = document.getElementById(n);
+                if ((n = M.d[n])) {
+                    selectionSize += n.t ? n.tb : n.s;
+                }
                 if (e) {
-                    if ((n = M.d[n])) {
-                        selectionSize += n.t ? n.tb : n.s;
-                    }
                     e.classList.add(this.CLS_UI_SELECTED);
                 }
             }
@@ -771,7 +771,7 @@ class SelectionManager2_DOM extends SelectionManager2Base {
      */
     showSelectionBar(notificationText) {
 
-        var $selectionBar = $('.selection-status-bar').removeClass('hidden');
+        var $selectionBar = $('.selection-status-bar');
         var jsp;
 
         $selectionBar.find('.selection-bar-col').safeHTML(notificationText);
@@ -804,6 +804,9 @@ class SelectionManager2_DOM extends SelectionManager2Base {
                 scrollBarY.scrollTop = scrollBarY.scrollHeight - scrollBarY.clientHeight;
             }
         }
+        if (this.currentdirid.substr(0, 7) !== 'search/' || this.selected_list.length > 0) {
+            $selectionBar.removeClass('hidden');
+        }
         this.showRequiredLinks();
     }
 
@@ -817,7 +820,10 @@ class SelectionManager2_DOM extends SelectionManager2Base {
         if (selectionBar) {
             selectionBar.classList.add('hidden');
         }
-
+        const block = document.querySelector('.search-multi');
+        if (block) {
+            block.classList.remove('search-multi');
+        }
         this.selected_totalSize = 0;
         this.vSelectionBar = null;
     }

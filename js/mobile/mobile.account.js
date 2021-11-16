@@ -30,6 +30,7 @@ mobile.account = {
         mobile.account.initFileManagementButton($page);
         mobile.account.fetchAndDisplayTwoFactorAuthStatus($page);
         mobile.account.initChangePasswordButton($page);
+        mobile.account.initChangeEmailButton($page);
         mobile.account.initNotificationButton($page);
 
         // Init the titleMenu for this page.
@@ -117,6 +118,8 @@ mobile.account = {
         // Fetch all account data from the API
         M.accountData(
             function() {
+
+                loadingInitDialog.hide();
 
                 // Hide the loading dialog after request completes
                 loadingDialog.hide();
@@ -529,7 +532,16 @@ mobile.account = {
         $buttonBlock.off('tap').on('tap', function() {
 
             // Load the Session History page
-            loadSubPage('fm/account/email-and-pass');
+            loadSubPage('fm/account/security/change-password');
+            return false;
+        });
+    },
+
+    initChangeEmailButton: function($page) {
+        'use strict';
+        const $buttonBlock = $('.account-change-email-block', $page);
+        $buttonBlock.rebind('tap.acc', () => {
+            loadSubPage('fm/account/security/change-email');
             return false;
         });
     },

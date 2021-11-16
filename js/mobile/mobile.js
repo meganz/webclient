@@ -927,13 +927,32 @@ var alarm = {
 function accountUI() {
     'use strict';
 
-    if (fminitialized && u_type && page === 'fm/account/notifications') {
-        mobile.initDOM();
-        mobile.account.notifications.init();
+    const notificationURL = 'fm/account/notifications';
+    const filemanagementURL = 'fm/account/file-management';
+
+    if (fminitialized && u_type && page.startsWith(notificationURL)) {
+        if (page === notificationURL) {
+            mobile.initDOM();
+            mobile.account.notifications.init();
+        }
+        else {
+            loadSubPage(notificationURL);
+        }
     }
-    else if (fminitialized && u_type && page === 'fm/account/file-management') {
-        mobile.initDOM();
-        mobile.account.filemanagement.init();
+    else if (fminitialized && u_type && page.startsWith(filemanagementURL)) {
+        if (page === filemanagementURL) {
+            mobile.initDOM();
+            mobile.account.filemanagement.init();
+        }
+        else {
+            loadSubPage(filemanagementURL);
+        }
+    }
+    else if (fminitialized && u_type && page === 'fm/account/security/session-history') {
+        loadSubPage('fm/account/history');
+    }
+    else if (fminitialized && u_type && page === 'fm/account/security/backup-key') {
+        loadSubPage('backup');
     }
     else {
         loadSubPage('fm/account');

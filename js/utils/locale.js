@@ -67,6 +67,58 @@ function translate(html) {
 }
 
 /**
+ * Loads localisation for images
+ * Apply the locale-img class and the data-baseimg attribute for the image to be loaded in its localised version
+ *    Images will be loaded from /images/mega/locale/lang_data-baseimg
+ *        If the locale image is not present /images/mega/locale/en_data-baseimg will be used
+ * For language codes see languages defined in secureboot
+ *
+ * @param {string|jQuery} scope The optional scope to perform the load on
+ * @returns {void} void
+ */
+function localeImages(scope) {
+    'use strict';
+    const $imgs = $('.locale-img', scope || 'body');
+    const fallbackLang = 'en';
+    const prepImg = ($img, src, fbsrc) => {
+        const img = new Image();
+        const onload = () => {
+            $img.replaceWith(img);
+        };
+        const onerr = () => {
+            if (fbsrc) {
+                if (d) {
+                    console.warn(`Image ${src} missing. Using fallback`);
+                }
+                prepImg($img, fbsrc, undefined);
+            }
+            else if (d) {
+                console.error(`Error loading fallback image ${src}`);
+            }
+        };
+        img.classList = $img.get(0).classList;
+        if (typeof img.decode === 'function') {
+            img.src = src;
+            img.decode().then(onload).catch(onerr);
+        }
+        else {
+            img.onload = onload;
+            img.onerror = onerr;
+            img.src = src;
+        }
+    };
+    for (let i = 0; i < $imgs.length; i++) {
+        if ($imgs.eq(i).attr('data-baseimg')) {
+            const base = $imgs.eq(i).attr('data-baseimg');
+            $imgs.eq(i).removeAttr('data-baseimg');
+            const ls = `${staticpath}images/mega/locale/${lang}_${base}`;
+            const fs = `${staticpath}images/mega/locale/${fallbackLang}_${base}`;
+            prepImg($imgs.eq(i), ls, fs);
+        }
+    }
+}
+
+/**
  * Set Date time object for time2date
  * @param {String} locales Locale string
  * @param {Number} format format number for the case.
@@ -1292,9 +1344,8 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[/A]', '</a>');
     l[23446] = escapeHTML(l[23446]).replace(/\[S]/g, '<strong>').replace(/\[\/S]/g, '</strong>');
     l[23447] = escapeHTML(l[23447]).replace(/\[S]/g, '<strong>').replace(/\[\/S]/g, '</strong>');
-    l[23448] = escapeHTML(l[23448]).replace('[A1]', '<a href="" class="red a1">').replace('[/A1]', '</a>')
-        .replace('[A2]', '<a href="" class="red a2">').replace('[/A2]', '</a>')
-        .replace('[A3]', '<a href="" class="red a3">').replace('[/A3]', '</a>');
+    l[23448] = escapeHTML(l[23448]).replace('[A1]', '<a href="" class="red a1"></a>')
+        .replace('[A2]', '<a href="" class="red a2"></a>');
     l[23449] = escapeHTML(l[23449]).replace(/\[R\/]/g, '<sup>&reg;</sup>');
     l[24074] = escapeHTML(l[24074]).replace('[A]', '<a>').replace('[/A]', '</a>');
     l[24141] = escapeHTML(l[24141])
@@ -1390,8 +1441,7 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[A]', `<a class="clickurl" href="/support">`)
         .replace('[/A]', '</a>');
     l.extensions_top_btn_info = escapeHTML(l.extensions_top_btn_info).replace(/\[R\/]/g, '<sup>&reg;</sup>');
-    l.extensions_avbl_desktop = escapeHTML(l.extensions_avbl_desktop).replace('[A1]', '<a href="" class="red a1">')
-        .replace('[/A1]', '</a>');
+    l.extensions_avbl_desktop = escapeHTML(l.extensions_avbl_desktop).replace('[A1]', '<a href="" class="red a1"></a>');
     l.extensions_avbl_mobile = escapeHTML(l.extensions_avbl_mobile).replace(/\[S]/g, '<strong>')
         .replace(/\[\/S]/g, '</strong>');
 

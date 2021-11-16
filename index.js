@@ -789,8 +789,14 @@ function init_page() {
         loadBlog();
     }
     else if (page.substr(0, 6) == 'verify') {
-        parsepage(pages['change_email']);
-        emailchange.main();
+        if (is_mobile) {
+            mobile.initDOM();
+            mobile.verify.init();
+        }
+        else {
+            parsepage(pages.change_email);
+            emailchange.main();
+        }
     }
     else if (page.substr(0, 9) === 'corporate') {
         parsepage(pages.corporate);
@@ -1046,9 +1052,15 @@ function init_page() {
         mobile.account.history.init();
         return false;
     }
-    else if (is_mobile && u_type && page === 'fm/account/email-and-pass') {
+    else if (is_mobile && u_type
+        && (page === 'fm/account/security/change-password' || page === 'fm/account/email-and-pass')) {
         parsepage(pages['mobile']);
         mobile.account.changePassword.init();
+        return false;
+    }
+    else if (is_mobile && u_type && page === 'fm/account/security/change-email') {
+        mobile.initDOM();
+        mobile.account.changeEmail.init();
         return false;
     }
     else if (is_mobile && fminitialized && u_type && page === 'fm/account/notifications') {
@@ -2871,7 +2883,7 @@ function topmenuUI() {
                     tooltipWidth = $tooltip.outerWidth();
                     buttonPos = $this.position().left;
                     tooltipPos = buttonPos + $this.outerWidth() / 2 - tooltipWidth / 2;
-                    if ($('body').width() - (tooltipPos + tooltipWidth) > 0) {
+                    if ($(document.body).width() - ($this.offset().left + tooltipPos + tooltipWidth) > 0) {
                         $tooltip.css({
                             'left': tooltipPos,
                             'right': 'auto'

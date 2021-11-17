@@ -782,8 +782,9 @@ var slideshowid;
         zoom_mode = false;
         switchedSides = false;
         $('header .file-name', $overlay).text(n.name);
-        $('.viewer-progress, .viewer-error, video, #pdfpreviewdiv1', $overlay)
-            .addClass('hidden');
+        $('.viewer-error, video, #pdfpreviewdiv1', $overlay).addClass('hidden');
+        $('.viewer-progress', $overlay).addClass('vo-hidden');
+
         $imageControls.addClass('hidden');
         $prevNextButtons.addClass('hidden');
         $playVideoButton.addClass('hidden');
@@ -1195,7 +1196,7 @@ var slideshowid;
                     }
                     return;
                 }
-                $progressBar.removeClass('hidden');
+                $progressBar.removeClass('vo-hidden');
 
                 if (loadingDeg <= 180) {
                     $('.right-c p', $progressBar).css('transform', 'rotate(' + loadingDeg + 'deg)');
@@ -1207,7 +1208,7 @@ var slideshowid;
                 }
 
                 if (loadingDeg === 360) {
-                    $progressBar.addClass('hidden');
+                    $progressBar.addClass('vo-hidden');
                     $('p', $progressBar).removeAttr('style');
                 }
             };
@@ -1227,7 +1228,7 @@ var slideshowid;
                 }
 
                 if (slideshow_handle() === n.h) {
-                    $progressBar.addClass('hidden');
+                    $progressBar.addClass('vo-hidden');
                 }
 
                 if (!(loadPreview || isCached)) {
@@ -1481,7 +1482,7 @@ var slideshowid;
         if (previews[id].type === 'application/pdf') {
             $overlay.addClass('pdf');
             $pendingBlock.addClass('hidden');
-            $progressBlock.addClass('hidden');
+            $progressBlock.addClass('vo-hidden');
             $bottomBar.addClass('hidden');
             $imgWrap.addClass('hidden');
             // preview pdfs using pdfjs for all browsers #8036
@@ -1603,7 +1604,7 @@ var slideshowid;
             $img.removeClassWith('exif-rotation-').addClass('exif-rotation-' + rot).attr('data-exif', rot);
 
             $pendingBlock.addClass('hidden');
-            $progressBlock.addClass('hidden');
+            $progressBlock.addClass('vo-hidden');
         };
         img.src = src;
     }

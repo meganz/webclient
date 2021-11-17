@@ -906,8 +906,23 @@ MegaData.prototype.reCalcMenuPosition = function(m, x, y, ico) {
 
     var TOP_MARGIN = 12;
     var SIDE_MARGIN = 12;
+
+    let hiddenUpdate;
+
+    // make it as visitble hidden for temporary to get context size to avoid 'display: none!important' return size 0 bug
+    // Somehow 'display: none' with '!important' causing jQuery offsetWidth and offsetHeight malfunction.
+    if (m.hasClass('hidden')) {
+        m.removeClass('hidden').addClass('v-hidden');
+        hiddenUpdate = true;
+    }
+
     var cmW = m.outerWidth();// dimensions without margins calculated
     var cmH = m.outerHeight();// dimensions without margins calculated
+
+    if (hiddenUpdate) {
+        m.removeClass('v-hidden').addClass('hidden');
+    }
+
     var wH = window.innerHeight;
     var wW = window.innerWidth;
     var maxX = wW - SIDE_MARGIN;// max horizontal coordinate, right side of window

@@ -156,9 +156,6 @@ video.localViewport {
     vertical-align: top;
     width: 48px;
 }
-.call.button.hidden {
-    display: none;
-}
 .call.button i {
     --icon-size: 38px;
     --mask-color: var(--stroke-grey-2);

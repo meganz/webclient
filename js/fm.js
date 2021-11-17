@@ -2022,11 +2022,14 @@ function generateShareDialogRow(displayNameOrEmail, email, shareRights, userHand
 function hideShareDialogPermMenu() {
     "use strict";
     var $shareDialog = $('.mega-dialog.share-dialog');
-    var $permissionMenu = $('.share-dialog-permissions-menu', $shareDialog);
+    var $permissionMenu = $('.share-dialog-permissions-menu', $shareDialog).addClass('o-hidden');
 
-    $permissionMenu.fadeOut(200);
     $('.option', $permissionMenu).removeClass('active');
     $('.share-dialog-access-node', $shareDialog).removeClass('active');
+
+    setTimeout(() => {
+        $permissionMenu.addClass('hidden');
+    }, 200);
 }
 
 /**
@@ -2039,14 +2042,16 @@ function hideShareDialogPermMenu() {
 function showShareDialogPermMenu($this, x, y) {
     "use strict";
     var $shareDialog = $('.mega-dialog.share-dialog');
-    var $permissionMenu = $('.share-dialog-permissions-menu', $shareDialog);
+    var $permissionMenu = $('.share-dialog-permissions-menu', $shareDialog).removeClass('hidden').addClass('o-hidden');
     var permissionLevel = checkMultiInputPermission($this);
 
     $('.option', $permissionMenu).removeClass('active');
     $('.option.' + permissionLevel[0], $permissionMenu).addClass('active');
     $permissionMenu.css('right', x + 'px');
     $permissionMenu.css('top', y + 'px');
-    $permissionMenu.fadeIn(200);
+    onIdle(() => {
+        $permissionMenu.removeClass('o-hidden');
+    });
 }
 
 /**
@@ -2558,39 +2563,6 @@ function initShareDialog() {
         }
         return false;
     });
-}
-
-function addImportedDataToSharedDialog(data) {
-    $.each(data, function(ind, val) {
-        $('.share-add-dialog .share-multiple-input').tokenInput("add", {id: val, name: val});
-    });
-
-    closeImportContactNotification('.share-add-dialog');
-}
-
-function addImportedDataToAddContactsDialog(data) {
-    $.each(data, function(ind, val) {
-        $('.add-user-popup .add-contact-multiple-input').tokenInput("add", {id: val, name: val});
-    });
-
-    closeImportContactNotification('.add-user-popup');
-}
-
-function closeImportContactNotification(c) {
-    loadingDialog.hide();
-    if (!$('.imported-contacts-notification').is(".hidden")) {
-        $('.imported-contacts-notification').fadeOut(200);
-    }
-
-    if (!$(c + ' .import-contacts-dialog').is(".hidden")) {
-        $(c + ' .import-contacts-dialog').fadeOut(200);
-    }
-    $('.import-contacts-link.active').removeClass('active');
-
-    // Remove focus from input element, related to tokeninput plugin
-    if ($(c + ' input#token-input-').is(":focus")) {
-        $(c + ' input#token-input-').trigger("blur");
-    }
 }
 
 /**

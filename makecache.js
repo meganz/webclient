@@ -216,7 +216,7 @@ function cacheHTML() {
 	$('#hiddendiv').html(html);
 	$('#hiddendiv .widget-block').remove();
 	// open the main menu to make it visible to crawlers:
-	$('#hiddendiv .top-menu-popup').removeClass('hidden');
+	$('#hiddendiv .top-menu-popup').removeClass('o-hidden');
 	$('#hiddendiv .top-menu-popup.submenu-item').addClass('expanded');
 	// remove all hidden elements from the crawlers:
 	$('#hiddendiv .hidden').remove();

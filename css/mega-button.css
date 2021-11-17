@@ -226,10 +226,6 @@
             flex-shrink: 0;
         }
 
-        .mega-button i.hidden {
-            display: none;
-        }
-
         /* spacing */
 
             .mega-button > div {
@@ -257,10 +253,6 @@
 /* end: content */
 
 /* appearance modifiers */
-
-    .mega-button.hidden {
-        display: none;
-    }
 
     /* TODO: remove this and use 'disabled' attribute on buttons */
     .mega-button.disabled {

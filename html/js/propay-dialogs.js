@@ -1822,13 +1822,13 @@ var addressDialog = {
         var taxCode = inputSelector(this.taxCodeMegaInput).$input.val();
 
         // Selectors for error handling
-        var $errorMessage = this.$dialog.find('.error-message', this.$dialog);
-        var $errorMessageContainers = this.$dialog.find('.message-container', this.$dialog);
+        var $errorMessage = $('.error-message', this.$dialog);
+        var $errorMessageContainers = $('.message-container', this.$dialog);
         var $allInputs = $('.mega-input', this.$dialog);
 
         // Reset state of past error messages
         var stateNotSet = false;
-        $errorMessage.addClass('hidden');
+        $errorMessage.addClass(is_mobile ? 'v-hidden' : 'hidden');
         $errorMessageContainers.addClass('hidden');
         $allInputs.removeClass('error');
 
@@ -1857,7 +1857,7 @@ var addressDialog = {
                 !fieldValues['city'] || !fieldValues['postcode'] || !country || stateNotSet) {
 
             // Show a general error and exit early if they are not complete
-            $errorMessage.removeClass('hidden');
+            $errorMessage.removeClass('v-hidden');
             return false;
         }
 

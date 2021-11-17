@@ -1,10 +1,5 @@
 /* Media viewer */
 
-    /* TODO: Remove it once hidden is high piority */
-    body .media-viewer-container .media-viewer *.hidden {
-        display: none;
-    }
-
     /* Common styles */
 
         .media-viewer-container {
@@ -569,11 +564,6 @@
             visibility: visible;
             width: 36px;
             z-index: 10;
-        }
-        .viewer-progress.hidden {
-            display: block;
-            opacity: 0;
-            visibility: none;
         }
         .viewer-progress ul {
             background: var(--progress-bar-background);

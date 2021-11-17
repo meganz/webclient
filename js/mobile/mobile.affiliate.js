@@ -460,7 +460,7 @@ mobile.affiliate = {
         $overlay.removeClass('hidden');
 
         // Show Context menu
-        $contextMenu.removeClass('hidden');
+        $contextMenu.removeClass('o-hidden');
     },
 
     /**
@@ -477,7 +477,7 @@ mobile.affiliate = {
         $overlay.addClass('hidden');
 
         // Hide Context menu
-        $contextMenu.addClass('hidden');
+        $contextMenu.addClass('o-hidden');
     },
 
     /**

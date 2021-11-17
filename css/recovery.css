@@ -777,9 +777,6 @@
     width: 10%;
     text-align: center;
 }
-.improved-recovery-steps .hidden {
-    display: none;
-}
 .backup-recover.withoutkey p:last-of-type {
     margin-bottom: 32px;
 }
@@ -807,9 +804,6 @@
 .improved-recovery-steps.recovery-key-dialog.post-register .skip-button {
     display: block;
     cursor: pointer;
-}
-.improved-recovery-steps.recovery-key-dialog.post-register .skip-button.hidden {
-    display: none;
 }
 .improved-recovery-steps.post-register .skip-button:hover {
     text-decoration: underline;

@@ -68,9 +68,6 @@
     background-repeat: no-repeat;
     cursor: pointer;
 }
-.wu-data .wu-logo.hidden {
-    display: none;
-}
 .wu-data .wu-email {
     float: left;
     width: 100%;

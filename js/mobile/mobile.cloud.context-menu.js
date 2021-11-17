@@ -75,9 +75,9 @@ mobile.cloud.contextMenu = {
             mobile.cloud.contextMenu.initRestoreButton($rubbishBinContextMenu, nodeHandle);
             mobile.cloud.contextMenu.initRubbishBinDelete($rubbishBinContextMenu, nodeHandle);
 
-            $fileContextMenu.addClass('hidden');
-            $folderContextMenu.addClass('hidden');
-            $rubbishBinContextMenu.removeClass('hidden');
+            $fileContextMenu.addClass('o-hidden');
+            $folderContextMenu.addClass('o-hidden');
+            $rubbishBinContextMenu.removeClass('o-hidden');
         }
         else if (nodeType === 1) {
 
@@ -118,8 +118,8 @@ mobile.cloud.contextMenu = {
             }
 
             // Hide the file context menu if open and show the folder context menu
-            $fileContextMenu.addClass('hidden');
-            $folderContextMenu.removeClass('hidden');
+            $fileContextMenu.addClass('o-hidden');
+            $folderContextMenu.removeClass('o-hidden');
         }
         else {
 
@@ -139,8 +139,8 @@ mobile.cloud.contextMenu = {
             }
 
             // Hide the folder context menu if open and show the file context menu
-            $folderContextMenu.addClass('hidden');
-            $fileContextMenu.removeClass('hidden');
+            $folderContextMenu.addClass('o-hidden');
+            $fileContextMenu.removeClass('o-hidden');
         }
 
         if (pfid) {
@@ -164,9 +164,9 @@ mobile.cloud.contextMenu = {
         $overlay.addClass('hidden');
 
         // Hide the file context menu if open and show the folder context menu
-        $fileContextMenu.addClass('hidden');
-        $folderContextMenu.addClass('hidden');
-        $rubbishBinContextMenu.addClass('hidden');
+        $fileContextMenu.addClass('o-hidden');
+        $folderContextMenu.addClass('o-hidden');
+        $rubbishBinContextMenu.addClass('o-hidden');
     },
 
     /**

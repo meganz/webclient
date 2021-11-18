@@ -22992,28 +22992,19 @@ var conversationpanel_dec, conversationpanel_dec2, conversationpanel_class;
 
 
 
-var ENABLE_GROUP_CALLING_FLAG = true;
-var MAX_USERS_CHAT_PRIVATE = 100;
+const ENABLE_GROUP_CALLING_FLAG = true;
+const MAX_USERS_CHAT_PRIVATE = 100;
 class conversationpanel_JoinCallNotification extends mixins["MegaRenderMixin"] {
   customIsEventuallyVisible() {
     return this.props.chatRoom.isCurrentlyActive;
   }
 
-  componentDidUpdate() {
-    super.componentDidUpdate();
-    var $node = $(this.findDOMNode());
-    var room = this.props.chatRoom;
-    $('button.joinActiveCall', $node).rebind('click.joinCall', function (e) {
-      room.joinCall();
-      e.preventDefault();
-      return false;
-    });
-  }
-
   render() {
-    let room = this.props.chatRoom;
+    const {
+      chatRoom
+    } = this.props;
 
-    if (room.activeCall) {
+    if (chatRoom.activeCall || window.sfuClient) {
       return null;
     }
 
@@ -23023,19 +23014,18 @@ class conversationpanel_JoinCallNotification extends mixins["MegaRenderMixin"] {
       }, external_React_default.a.createElement("i", {
         className: "sprite-fm-mono icon-phone"
       }), "There is an active call in this room, but your browser does not support calls.");
-    } else {
-      let translatedCode = escapeHTML(l[20460] || "There is an active group call. [A]Join[/A]");
-      translatedCode = translatedCode.replace("[A]", '<button class="mega-button positive joinActiveCall small">').replace('[/A]', '</button>');
-      return external_React_default.a.createElement("div", {
-        className: "in-call-notif neutral join"
-      }, external_React_default.a.createElement("i", {
-        className: "sprite-fm-mono icon-phone"
-      }), external_React_default.a.createElement("span", {
-        dangerouslySetInnerHTML: {
-          __html: translatedCode
-        }
-      }));
     }
+
+    return external_React_default.a.createElement("div", {
+      className: "in-call-notif neutral join"
+    }, external_React_default.a.createElement("i", {
+      className: "sprite-fm-mono icon-phone"
+    }), external_React_default.a.createElement("span", {
+      onClick: () => chatRoom.joinCall(),
+      dangerouslySetInnerHTML: {
+        __html: escapeHTML(l[20460] || 'There is an active group call. [A]Join[/A]').replace('[A]', '<button class="mega-button positive joinActiveCall small">').replace('[/A]', '</button>')
+      }
+    }));
   }
 
 }
@@ -23312,10 +23302,11 @@ class conversationpanel_ConversationRightArea extends mixins["MegaRenderMixin"] 
     }, external_React_default.a.createElement("i", {
       className: "sprite-fm-mono icon-eye-reveal"
     }), room.observers)) : external_React_default.a.createElement("div", null), external_React_default.a.createElement(accordion_AccordionPanel, {
+      key: "options",
       className: "have-animation buttons",
       title: l[7537],
-      key: "options",
-      chatRoom: room
+      chatRoom: room,
+      sfuClient: window.sfuClient
     }, external_React_default.a.createElement("div", null, addParticipantBtn, startAudioCallButton, startVideoCallButton, room.type == "group" || room.type == "public" ? external_React_default.a.createElement("div", {
       className: renameButtonClass,
       onClick: e => {
@@ -24551,7 +24542,7 @@ function isStartCallDisabled(room) {
     return true;
   }
 
-  return !room.isOnlineForCalls() || room.isReadOnly() || !room.chatId || room.activeCall || (room.type === "group" || room.type === "public") && false || room.getCallParticipants().length > 0;
+  return !room.isOnlineForCalls() || room.isReadOnly() || !room.chatId || room.activeCall || window.sfuClient || (room.type === "group" || room.type === "public") && false || room.getCallParticipants().length > 0;
 }
 // CONCATENATED MODULE: ./js/chat/ui/searchPanel/resultTable.jsx
 

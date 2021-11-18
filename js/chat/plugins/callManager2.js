@@ -873,8 +873,8 @@
 
     CallManager2.prototype.onCallState = function(eventData, chatRoom) {
         if (eventData.userId === u_handle) {
-            // caller is me, ring locally for 1on1s
-            if (chatRoom.type === "private") {
+            // caller is me and call was locally initiated (web) -> ring locally for 1on1s
+            if (chatRoom.type === 'private' && this.calls[`${eventData.chatId}_${eventData.callId}`]) {
                 if (eventData.arg) {
                     chatRoom.megaChat.trigger('onOutgoingCallRinging', [
                         chatRoom,

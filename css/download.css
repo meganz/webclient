@@ -167,10 +167,7 @@ button.small i.folder-with-loupe {
     align-items: center;
     display: flex;
     height: 28px;
-    background-color: #ff333a;
-    border-radius: 4px;
-    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1);
-    padding: 4px 12px;
+    padding: 4px 0;
     font-size: 0;
 }
 .download.overquoata-error:not(.hidden) + button {
@@ -181,12 +178,14 @@ button.small i.folder-with-loupe {
     font-size: 14px;
     line-height: 24px;
     display: inline-block;
-    color: white;
+    color: var(--text-color-error);
     vertical-align: top;
 }
 .download.overquoata-error i {
      -webkit-margin-end: 8px;
     margin-inline-end: 8px;
+    --icon-size: 24px;
+    --mask-color: var(--text-color-error);
 }
 .download.state-text {
     color: var(--text-color-high);
@@ -759,10 +758,10 @@ button.megasync-slider.prev {
     /* Hide overquota counter for single download */
     display: none;
 }
-.video .download.over-transfer-quota:not(.hidden) {
+.download.over-transfer-quota:not(.hidden) {
     display: block;
 }
-.video .download.over-transfer-quota {
+.download.over-transfer-quota {
     padding: 8px;
 }
 .download.overquota-message {
@@ -822,6 +821,12 @@ button.megasync-slider.prev {
 body.logged:not(.en) .video-theatre-mode.overquota .download.video-block,
 body:not(.en) .video-theatre-mode.stream-overquota .download.video-block {
     height: calc(100% - 150px);
+}
+body.pro-user .download.over-transfer-quota .overquota-message-block {
+    display: none;
+}
+body:not(.pro-user) .download.over-transfer-quota .overquoata-error {
+    display: none;
 }
 /* end of Video dl page */
 
@@ -988,12 +993,21 @@ body:not(.en) .video-theatre-mode.stream-overquota .download.video-block {
 
 /* BEGIN .download.in-progress */
 .download.in-progress,
+.overquota .download.in-progress,
+.stream-overquota .download.in-progress,
 .video.resumable .download.in-progress {
     display: none;
 }
+.error:not(.overquota) .download.in-progress,
 .downloading .download.in-progress,
 .download-complete .download.in-progress {
     display: block;
+}
+.downloading.stream-overquota .download.in-progress,
+.downloading.overquota .download.in-progress,
+.download-complete.stream-overquota .download.in-progress,
+.download-complete.overquota .download.in-progress {
+    display: none;
 }
 /* END .download.in-progress */
 

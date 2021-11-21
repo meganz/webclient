@@ -241,11 +241,13 @@
     margin: 10px 0 0 0;
 }
 .message .call-info-container {
+    min-width: 151px;
     display: flex;
     align-items: center;
     white-space: normal;
 }
 .message .call-info-content {
+    min-width: 100px;
     position: relative;
     font: var(--text-body2);
     color: var(--text-color-medium);

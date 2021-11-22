@@ -356,6 +356,7 @@ mobile.account = {
 
             // Show Cancel Subscription overlay
             $cancelSubscriptionOverlay.removeClass('hidden');
+            $('.mobile.my-account-page').addClass('hidden');
             return false;
         });
 
@@ -375,6 +376,7 @@ mobile.account = {
                     // Hide the Cancel Subscription button and overlay
                     $cancelSubscriptionButton.addClass('hidden');
                     $cancelSubscriptionOverlay.addClass('hidden');
+                    $('.mobile.my-account-page').removeClass('hidden');
                 }
             });
 
@@ -387,6 +389,7 @@ mobile.account = {
 
             // Hide the overlay
             $cancelSubscriptionOverlay.addClass('hidden');
+            $('.mobile.my-account-page').removeClass('hidden');
             return false;
         });
 

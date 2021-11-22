@@ -271,8 +271,8 @@ mobile.account = {
                 mobile.account.initShowSubscriptionInfoOverlay($page);
             }
 
-            // Otherwise if ECP or Sabadell
-            else if (gatewayId === 16 || gatewayId === 17) {
+            // Otherwise if ECP, Sabadell, or Stripe
+            else if (gatewayId === 16 || gatewayId === 17 || gatewayId === 19) {
 
                 // Show a loading dialog while the data is fetched from the API
                 loadingDialog.show();

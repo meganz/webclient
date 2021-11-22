@@ -821,6 +821,19 @@
 
         if (section === 'cloud-drive' || section === 'folder-link') {
             M.buildtree(M.d[M.RootID], 'fm-picker-dialog', 'cloud-drive');
+
+            const $folderContainer = $('.folder-container', $dialog);
+            const $treePanel = $('.fm-picker-dialog-tree-panel', $folderContainer);
+            const $cloudDrive = $treePanel.filter('.cloud-drive');
+            const $cloudDriveFolders = $('.dialog-content-block ul li', $cloudDrive);
+            const $dialogPanelHeader = $('.fm-picker-dialog-panel-header', $treePanel);
+            const $emptyCloudDrive = $('.dialog-empty-block.cloud-drive', $folderContainer);
+
+            if ($cloudDriveFolders.length > 0) {
+                $emptyCloudDrive.removeClass('active');
+                $cloudDrive.addClass('active');
+                $dialogPanelHeader.removeClass('hidden');
+            }
         }
         else if (section === 'shared-with-me') {
             M.buildtree({h: 'shares'}, 'fm-picker-dialog');

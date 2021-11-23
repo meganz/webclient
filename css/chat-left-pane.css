@@ -1129,6 +1129,17 @@ li.active .call-duration i {
     cursor: pointer;
 }
 
+.contacts-table th:not(:last-child):hover::before {
+    content: "";
+    position: absolute;
+    right: 0;
+    bottom: -3px;
+    height: 21px;
+    width: 1px;
+    background-color: var(--stroke-mid-grey);
+    cursor: col-resize;
+}
+
 .contacts-table th i {
     float: right;
     padding: 0 5px 0 0;

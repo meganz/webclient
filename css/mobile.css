@@ -6846,31 +6846,11 @@ textarea.mobile.support-text-field {
     text-align: center;
 }
 .mobile.cancel-subscription-overlay .buttons {
-    margin-top: 5px;
     text-align: center;
 }
 .mobile.cancel-subscription-overlay .red-button {
-    display: inline-block;
-    width: 47%;
     border: 1px solid #ff4246;
-    height: 44px;
-    line-height: 40px;
     font-size: 14px;
-}
-.mobile.cancel-subscription-overlay .red-button.close-button {
-    background: #fff;
-    border: 1px solid #ff4246;
-    -moz-border-radius: 2px;
-    -webkit-border-radius: 2px;
-    border-radius: 2px;
-    color: #ff4246;
-    margin-right: 2px;
-}
-.mobile.cancel-subscription-overlay .red-button.confirm-ok-button {
-    -moz-border-radius: 2px;
-    -webkit-border-radius: 2px;
-    border-radius: 2px;
-    margin-left: 2px;
 }
 /* Video player Download page */
 .mobile.video .mobile.filename {

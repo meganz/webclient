@@ -1,5 +1,5 @@
 import React from 'react';
-import { MegaRenderMixin } from '../../../stores/mixins.js';
+import { MegaRenderMixin } from '../../mixins';
 import ComposedTextArea from "../composedTextArea.jsx";
 import HistoryPanel from "../historyPanel.jsx";
 import Call from './call.jsx';

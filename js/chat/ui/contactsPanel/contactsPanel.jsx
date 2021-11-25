@@ -1,5 +1,5 @@
 import React from 'react';
-import {MegaRenderMixin} from '../../../stores/mixins.js';
+import {MegaRenderMixin} from '../../mixins';
 import Navigation from './navigation.jsx';
 import ContactList from './contactList.jsx';
 import ReceivedRequests from './receivedRequests.jsx';

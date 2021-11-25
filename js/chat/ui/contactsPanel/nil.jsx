@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button } from '../../../ui/buttons.jsx';
-import { MegaRenderMixin } from '../../../stores/mixins';
+import { MegaRenderMixin } from '../../mixins';
 
 export default class Nil extends MegaRenderMixin {
     constructor(props) {

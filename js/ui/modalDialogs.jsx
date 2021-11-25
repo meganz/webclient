@@ -1,7 +1,7 @@
 var React = require("react");
 var ReactDOM = require("react-dom");
 import utils  from "./utils.jsx";
-import {MegaRenderMixin} from "../stores/mixins.js";
+import {MegaRenderMixin} from "../chat/mixins";
 import Tooltips from "./tooltips.jsx";
 import Forms from "./forms.jsx";
 

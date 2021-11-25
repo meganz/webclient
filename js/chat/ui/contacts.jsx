@@ -1,6 +1,6 @@
 import React from 'react';
-import {ContactAwareComponent} from '../../stores/mixins.js';
-import {MegaRenderMixin} from '../../stores/mixins.js';
+import {ContactAwareComponent} from '../mixins';
+import {MegaRenderMixin} from '../mixins';
 import utils from '../../ui/utils.jsx';
 import { PerfectScrollbar } from '../../ui/perfectScrollbar.jsx';
 import { Button } from '../../ui/buttons.jsx';

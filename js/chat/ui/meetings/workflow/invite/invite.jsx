@@ -1,5 +1,5 @@
 import React from 'react';
-import { MegaRenderMixin } from '../../../../../stores/mixins';
+import { MegaRenderMixin } from '../../../../mixins';
 import ModalDialogsUI from '../../../../../ui/modalDialogs.jsx';
 import Button from '../../button.jsx';
 import { ContactCard, MAX_FREQUENTS } from '../../../contacts.jsx';

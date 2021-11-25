@@ -1,5 +1,5 @@
 import React from 'react';
-import { MegaRenderMixin, rAFWrap, SoonFcWrap } from '../../../stores/mixins';
+import { MegaRenderMixin, rAFWrap, SoonFcWrap } from '../../mixins';
 import { Avatar } from '../contacts.jsx';
 import Call from './call.jsx';
 import StreamNodeMenu from './streamNodeMenu.jsx';

@@ -1,5 +1,5 @@
 import React from 'react';
-import {MegaRenderMixin} from '../../../stores/mixins';
+import {MegaRenderMixin} from '../../mixins';
 import Nil from './nil.jsx';
 import FMView from "../../../ui/jsx/fm/fmView";
 import {ColumnContactRequestsEmail} from "../../../ui/jsx/fm/nodes/columns/columnContactRequestsEmail";

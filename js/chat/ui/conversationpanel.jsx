@@ -1,6 +1,6 @@
 import React from 'react';
 import utils from './../../ui/utils.jsx';
-import {MegaRenderMixin, timing} from './../../stores/mixins.js';
+import {MegaRenderMixin, timing} from './../mixins';
 import {Button} from './../../ui/buttons.jsx';
 import ModalDialogsUI from './../../ui/modalDialogs.jsx';
 import CloudBrowserModalDialog from './../../ui/cloudBrowserModalDialog.jsx';

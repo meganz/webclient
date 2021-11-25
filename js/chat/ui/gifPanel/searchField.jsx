@@ -1,5 +1,5 @@
 import React from 'react';
-import { MegaRenderMixin } from '../../../stores/mixins';
+import { MegaRenderMixin } from '../../mixins';
 import { LABELS } from './gifPanel.jsx';
 
 export default class SearchField extends MegaRenderMixin {

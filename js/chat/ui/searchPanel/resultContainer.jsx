@@ -2,7 +2,7 @@ import React from 'react';
 import ResultTable  from './resultTable.jsx';
 import ResultRow  from './resultRow.jsx';
 import { STATUS } from './searchPanel.jsx';
-import { MegaRenderMixin } from '../../../stores/mixins';
+import { MegaRenderMixin } from '../../mixins';
 
 export const TYPE = {
     MESSAGE: 1,

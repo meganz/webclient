@@ -1,5 +1,5 @@
 import React from 'react';
-import {MegaRenderMixin} from '../../../stores/mixins.js';
+import {MegaRenderMixin} from '../../mixins';
 import {Avatar, ContactPresence} from '../contacts.jsx';
 import {Button} from '../../../ui/buttons.jsx';
 import {Dropdown} from '../../../ui/dropdowns.jsx';

@@ -1,6 +1,6 @@
 import React from 'react';
 import ModalDialogsUI from '../../../ui/modalDialogs.jsx';
-import { MegaRenderMixin } from '../../../stores/mixins';
+import { MegaRenderMixin } from '../../mixins';
 
 export default class MeetingsCallEndedDialog extends MegaRenderMixin {
     static dialogName = 'meetings-ended-dialog'

@@ -1,6 +1,6 @@
 var React = require("react");
 var ReactDOM = require("react-dom");
-import {MegaRenderMixin} from "../../stores/mixins.js";
+import {MegaRenderMixin} from "../mixins";
 import utils from './../../ui/utils.jsx';
 
 class SharedFileItem extends MegaRenderMixin {

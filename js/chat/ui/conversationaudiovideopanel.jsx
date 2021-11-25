@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {MegaRenderMixin} from './../../stores/mixins.js';
+import {MegaRenderMixin} from './../mixins';
 import {Avatar} from './../ui/contacts.jsx';
 import utils from './../../ui/utils.jsx';
 

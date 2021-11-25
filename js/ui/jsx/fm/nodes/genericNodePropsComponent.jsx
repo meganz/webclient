@@ -1,4 +1,4 @@
-import {MegaRenderMixin} from "../../../../stores/mixins";
+import {MegaRenderMixin} from "../../../../chat/mixins";
 import {NodeProperties} from "./nodeProperties";
 
 export class GenericNodePropsComponent extends MegaRenderMixin {

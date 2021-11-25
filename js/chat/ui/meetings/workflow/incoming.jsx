@@ -1,5 +1,5 @@
 import React from 'react';
-import { MegaRenderMixin } from '../../../../stores/mixins';
+import { MegaRenderMixin } from '../../../mixins';
 import { Avatar } from '../../contacts.jsx';
 import ModalDialogsUI from '../../../../ui/modalDialogs.jsx';
 import Button from '../button.jsx';

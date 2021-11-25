@@ -1,7 +1,7 @@
 var React = require("react");
 var ReactDOM = require("react-dom");
 
-import {MegaRenderMixin, schedule, SoonFcWrap} from "../stores/mixins.js";
+import {MegaRenderMixin, schedule, SoonFcWrap} from "../chat/mixins";
 
 /**
  * jScrollPane helper

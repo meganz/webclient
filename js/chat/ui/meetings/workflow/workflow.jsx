@@ -1,5 +1,5 @@
 import React from 'react';
-import { MegaRenderMixin } from '../../../../stores/mixins';
+import { MegaRenderMixin } from '../../../mixins';
 import utils from '../../../../ui/utils.jsx';
 import { Start } from './start.jsx';
 import Button from '../button.jsx';

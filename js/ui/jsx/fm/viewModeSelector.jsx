@@ -1,5 +1,5 @@
 import React from 'react';
-import {MegaRenderMixin} from "../../../stores/mixins.js";
+import {MegaRenderMixin} from "../../../chat/mixins";
 
 export default class ViewModeSelector extends MegaRenderMixin {
     static VIEW_MODE = {

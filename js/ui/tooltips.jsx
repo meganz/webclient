@@ -1,7 +1,7 @@
 var React = require("react");
 var ReactDOM = require("react-dom");
 var utils = require("./utils.jsx");
-import {MegaRenderMixin} from "../stores/mixins.js";
+import {MegaRenderMixin} from "../chat/mixins";
 
 
 class Handler extends MegaRenderMixin {

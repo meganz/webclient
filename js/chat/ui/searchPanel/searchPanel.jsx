@@ -1,5 +1,5 @@
 import React from 'react';
-import { MegaRenderMixin } from '../../../stores/mixins';
+import { MegaRenderMixin } from '../../mixins';
 import SearchField from './searchField.jsx';
 import ResultContainer  from './resultContainer.jsx';
 import { PerfectScrollbar } from '../../../ui/perfectScrollbar.jsx';

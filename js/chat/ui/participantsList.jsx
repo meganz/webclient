@@ -1,5 +1,5 @@
 import React from 'react';
-import {MegaRenderMixin} from './../../stores/mixins.js';
+import {MegaRenderMixin} from './../mixins';
 
 var DropdownsUI = require('./../../ui/dropdowns.jsx');
 var ContactsUI = require('./../ui/contacts.jsx');

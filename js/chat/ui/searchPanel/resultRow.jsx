@@ -1,7 +1,7 @@
 import React from 'react';
 import { TYPE, LABEL } from './resultContainer.jsx';
 import { Avatar, ContactPresence, LastActivity, MembersAmount } from '../contacts.jsx';
-import { MegaRenderMixin } from '../../../stores/mixins';
+import { MegaRenderMixin } from '../../mixins';
 import { EmojiFormattedContent } from '../../../ui/utils.jsx';
 import { ContactAwareName } from '../contacts.jsx';
 import { EVENTS } from './searchPanel.jsx';

@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {MegaRenderMixin, SoonFcWrap} from "../../stores/mixins.js";
+import {MegaRenderMixin, SoonFcWrap} from "../mixins";
 import utils from "../../ui/utils.jsx";
 import {AltPartsConvMessage} from "./messages/alterParticipants.jsx";
 import {TruncatedMessage} from "./messages/truncated.jsx";

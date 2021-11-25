@@ -1307,7 +1307,6 @@ class ConversationsApp extends MegaRenderMixin {
                         "position":"fixed",
                         "top": "50%",
                         "left": "50%",
-                        "marginLeft": "72px"
                     }}></div>
                 </div>
             </div>;

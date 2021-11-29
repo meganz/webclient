@@ -201,7 +201,8 @@ mega.tpw = new function TransferProgressWidget() {
                 $overQuotaBanner.find('.content-txt').text(l[18085]);
 
                 $overQuotaBanner.find('.quota-info-pct-txt').text('100%');
-                $overQuotaBanner.find('.quota-info-pr-txt').text(bytesToSize(acc.tfsq.used) + ' ' + l[5775]);
+                $('.quota-info-pr-txt', $overQuotaBanner)
+                    .text(l[5775].replace('%1', bytesToSize(acc.tfsq.used)));
                 const $action = $('.action', $overQuotaBanner);
                 $action.addClass('negative');
 

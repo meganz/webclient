@@ -29022,6 +29022,7 @@ class ConfirmDialog extends _chat_mixins1__.wl {
         "label": self.props.cancelLabel,
         "key": "cancel",
         "onClick": function (e) {
+          ConfirmDialog.clearState(self);
           self.props.onClose(self);
           e.preventDefault();
           e.stopPropagation();
@@ -29031,7 +29032,6 @@ class ConfirmDialog extends _chat_mixins1__.wl {
         "key": "select",
         "className": "positive",
         "onClick": function (e) {
-          ConfirmDialog.clearState(self);
           self.onConfirmClicked();
           e.preventDefault();
           e.stopPropagation();

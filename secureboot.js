@@ -3194,6 +3194,7 @@ else if (!browserUpdate) {
             jsl.push({f:'js/mobile/mobile.message-overlay.js', n: 'mobile_message_overlay_js', j: 1, w: 1});
             jsl.push({f:'js/mobile/mobile.terms.js', n: 'mobile_terms_js', j: 1, w: 1});
             jsl.push({f:'css/retina-images.css', n: 'retina_images_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
+            jsl.push({f:'js/mobile/mobile.privacy.js', n: 'mobile_privacy_js', j: 1, w: 1});
         }
         else {
             jsl.push({f:'js/vendor/perfect-scrollbar.js', n: 'ps_js', j:1,w:1});

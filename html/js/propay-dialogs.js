@@ -572,6 +572,7 @@ var voucherDialog = {
             var $newBalanceAmount = $voucherAccountBalance.find('.new-balance-amount');
             var $storageAmount = $voucherAccountBalance.find('.storage-amount');
             var $newStorageAmount = $voucherAccountBalance.find('.new-storage-amount');
+            var $currentAchievementsAmount = $('.current-achievements-amount', $voucherAccountBalance);
             var $transferAmount = $voucherAccountBalance.find('.transfer-amount');
             var $newTransferAmount = $voucherAccountBalance.find('.new-transfer-amount');
 
@@ -582,7 +583,11 @@ var voucherDialog = {
             }
 
             $storageAmount.text(bytesToSize(M.account.space, 0));
-            $newStorageAmount.text(bytesToSize(M.account.space - oldStorage + newStorage, 0));
+            $newStorageAmount.text(bytesToSize(newStorage, 0));
+            if (M.maf.storage.current) {
+                $currentAchievementsAmount.text(`+ ${bytesToSize(M.maf.storage.current, 0)}`);
+                $currentAchievementsAmount.removeClass('hidden');
+            }
 
             if (M.account.type) {
                 $transferAmount.text(bytesToSize(M.account.tfsq.max, 0));

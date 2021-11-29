@@ -9532,7 +9532,14 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll, .mob
 .mobile.voucher-dialog .right-block {
     margin-left: 64px;
 }
-.mobile.voucher-dialog .voucher-account-balance .balance-amount, .mobile.voucher-dialog .voucher-account-balance .payment-eurosign, .mobile.voucher-dialog .voucher-account-balance .storage-amount, .mobile.voucher-dialog .voucher-account-balance .transfer-amount, .mobile.voucher-dialog .voucher-account-balance .new-balance-amount, .mobile.voucher-dialog .voucher-account-balance .new-storage-amount, .mobile.voucher-dialog .voucher-account-balance .new-transfer-amount {
+.mobile.voucher-dialog .voucher-account-balance .balance-amount,
+.mobile.voucher-dialog .voucher-account-balance .payment-eurosign,
+.mobile.voucher-dialog .voucher-account-balance .storage-amount,
+.mobile.voucher-dialog .voucher-account-balance .transfer-amount,
+.mobile.voucher-dialog .voucher-account-balance .new-balance-amount,
+.mobile.voucher-dialog .voucher-account-balance .new-storage-amount,
+.mobile.voucher-dialog .voucher-account-balance .new-transfer-amount,
+.mobile.voucher-dialog .voucher-account-balance .current-achievements-amount {
     color: #ed2942;
     display: inline-block;
     font-family: 'LatoWebBold', 'source_sans_prosemibold', sans-serif;
@@ -9542,7 +9549,11 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll, .mob
 .mobile.voucher-dialog .voucher-account-balance.sufficient-funds .balance-amount, .mobile.voucher-dialog .voucher-account-balance .storage-amount, .mobile.voucher-dialog .voucher-account-balance .transfer-amount, .mobile.voucher-dialog .voucher-account-balance.sufficient-funds .payment-eurosign {
     color: #495057;
 }
-.mobile.voucher-dialog .voucher-account-balance.sufficient-funds .new-balance-amount, .mobile.voucher-dialog .voucher-account-balance .new-storage-amount, .mobile.voucher-dialog .voucher-account-balance .new-transfer-amount, .mobile.voucher-dialog .voucher-account-balance.sufficient-funds .right-span .payment-eurosign {
+.mobile.voucher-dialog .voucher-account-balance.sufficient-funds .new-balance-amount,
+.mobile.voucher-dialog .voucher-account-balance .new-storage-amount,
+.mobile.voucher-dialog .voucher-account-balance .new-transfer-amount,
+.mobile.voucher-dialog .voucher-account-balance.sufficient-funds .right-span .payment-eurosign,
+.mobile.voucher-dialog .voucher-account-balance .current-achievements-amount {
     color: #00A58F;
 }
 .mobile.voucher-dialog .voucher-information-help {

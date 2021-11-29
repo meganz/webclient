@@ -494,6 +494,7 @@ class ConfirmDialog extends MegaRenderMixin {
                         "key": "cancel",
                         /* eslint-disable-next-line sonarjs/no-identical-functions */
                         "onClick": function(e) {
+                            ConfirmDialog.clearState(self);
                             self.props.onClose(self);
                             e.preventDefault();
                             e.stopPropagation();
@@ -504,7 +505,6 @@ class ConfirmDialog extends MegaRenderMixin {
                         "key": "select",
                         "className": "positive",
                         "onClick": function(e) {
-                            ConfirmDialog.clearState(self);
                             self.onConfirmClicked();
                             e.preventDefault();
                             e.stopPropagation();

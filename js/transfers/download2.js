@@ -1947,6 +1947,8 @@ var dlmanager = {
                     $('.chart.data .size-txt', $dialog).text(bytesToSize(tfsQuotaUsed, 0));
                     $('.chart.data .pecents-txt', $dialog).text(tfsQuotaLimit[0]);
                     $('.chart.data .gb-txt', $dialog).text(tfsQuotaLimit[1]);
+                    $('.chart.data .used', $dialog).text(bytesToSize(tfsQuotaUsed, 0));
+                    $('.chart.data .total', $dialog).text(`${tfsQuotaLimit[0]} ${tfsQuotaLimit[1]}`);
                     $('.fm-account-blocks.bandwidth', $dialog).removeClass('no-percs');
                     $('.chart .perc-txt', $dialog).text(perc + '%');
                     $('.chart.body .progressbars', $dialog).addClass('exceeded');

@@ -370,7 +370,9 @@ var megasync = (function() {
                             nextIfYes();
                         }
                     }
-
+                    else if (page === "download") {
+                        setTransferStatus(0, l[17795]);// 'No response from MEGAsync'
+                    }
                 }
             );
         }

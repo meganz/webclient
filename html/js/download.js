@@ -427,10 +427,8 @@ function dl_g(res, ctx) {
                                         setStandardDownloadOptions();
                                         $('.js-default-download').trigger('click');
                                     }
-                                    else {
-                                        dlPageStartDownload(true);
-                                    }
                                 }, true);
+                                dlPageStartDownload(true);
                             }
                             else {
                                 dlmanager.showMEGASyncOverlay(fdl_filesize > maxDownloadSize);

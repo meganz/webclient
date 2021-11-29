@@ -3737,8 +3737,8 @@ function loadfm_done(mDBload) {
             }
         }
 
-        // Check business account is expired on initial phase.
-        if (u_attr && u_attr.b) {
+        // Check business account is expired on initial phase in desktop web.
+        if (!is_mobile && u_attr && u_attr.b) {
             M.require('businessAcc_js', 'businessAccUI_js').done(() => {
 
                 var business_ui = new BusinessAccountUI();

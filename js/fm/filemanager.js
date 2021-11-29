@@ -1349,6 +1349,7 @@ FileManager.prototype.initContextUI = function() {
 
             $this.next('.submenu')
                 .css({'top': menuPos.top})
+                .removeClass('hidden')
                 .addClass('active');
 
             $this.addClass('opened');

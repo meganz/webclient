@@ -368,16 +368,42 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
     }
 
     // For multiple selections, should check all have the right permission.
-    if ((".remove-item" in items) && (items['.remove-item'] === 1) && ($.selected.length > 1)) {
-        var removeItemFlag = true;
-        for (var g = 1; g < $.selected.length; g++) {
-            if (M.getNodeRights($.selected[g]) <= 1) {
+    if ($.selected.length > 1) {
+
+        let removeItemFlag = true;
+        let clearVersioned = false;
+
+        for (var g = 0; g < $.selected.length; g++) {
+
+            // If any of node has read only rights or less, stop loop
+            if (folderlink || M.getNodeRights($.selected[g]) <= 1) {
+
                 removeItemFlag = false;
+                clearVersioned = false;
+
+                break;
+            }
+
+            const selected = M.getNodeByHandle($.selected[g]);
+
+            // If there is any folder selected, do not show clear version option
+            if (selected.t) {
+                clearVersioned = false;
+                break;
+            }
+            else if (selected.tvf) {
+                clearVersioned = true;
             }
         }
+
         if (!removeItemFlag) {
             delete items['.remove-item'];
             delete items['.move-item'];
+        }
+
+        // if there is no folder selected, selected file nodes are versioned, user has right to clear it.
+        if (clearVersioned) {
+            items['.clearprevious-versions'] = 1;
         }
     }
 

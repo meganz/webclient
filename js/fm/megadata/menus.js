@@ -275,7 +275,7 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
             }
         }
 
-        if (M.currentCustomView) {
+        if (M.currentCustomView || M.currentdirid.startsWith('search/')) {
             items['.open-cloud-item'] = 1;
         }
 

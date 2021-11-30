@@ -5393,6 +5393,9 @@ div.checkboxOn {
 .mobile.main-block.my-account-page, .mobile.main-block.verify-login-page {
     background-color: #F5F6F7;
 }
+.mobile.main-block.my-account-page .fm-scrolling {
+    max-height: calc(100vh - 66px);
+}
 .mobile.my-account-page .avatar-name-block {
     opacity: 0.9;
     background-color: #fff;

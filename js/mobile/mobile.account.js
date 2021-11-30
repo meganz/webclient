@@ -348,6 +348,9 @@ mobile.account = {
         var $confirmButton = $cancelSubscriptionOverlay.find('.confirm-ok-button');
         var $closeButton = $cancelSubscriptionOverlay.find('.close-button');
 
+        // Display the proper PRO plan icon
+        $('.plan-icon', $cancelSubscriptionOverlay).addClass('pro' + u_attr.p);
+
         // On clicking/tapping the Cancel Subscription button
         $cancelSubscriptionButton.off('tap').on('tap', function() {
 

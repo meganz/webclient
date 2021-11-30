@@ -10121,6 +10121,7 @@ class Contact extends AbstractGenericMessage {
 
     this._handleAddContact = contactEmail => {
       let exists = false;
+      const ownerEmail = M.u[u_handle] ? M.u[u_handle].m : u_attr.email;
       Object.keys(M.opc).forEach(function (k) {
         if (!exists && M.opc[k].m === contactEmail && !M.opc[k].hasOwnProperty('dts')) {
           exists = true;
@@ -10132,7 +10133,7 @@ class Contact extends AbstractGenericMessage {
         closeDialog();
         msgDialog('warningb', '', l[17545]);
       } else {
-        M.inviteContact(M.u[u_handle].m, contactEmail);
+        M.inviteContact(ownerEmail, contactEmail);
         closeDialog();
         msgDialog('info', l[150], l[5898].replace('[X]', contactEmail));
       }
@@ -10201,7 +10202,7 @@ class Contact extends AbstractGenericMessage {
         loadSubPage("fm/chat/p/" + contact.u);
         mBroadcaster.sendMessage('chat:open');
       }
-    })), !HAS_RELATIONSHIP && !is_eplusplus && external_React_default().createElement(dropdowns.DropdownItem, {
+    })), u_type && u_type > 2 && !HAS_RELATIONSHIP && !is_eplusplus && external_React_default().createElement(dropdowns.DropdownItem, {
       icon: "sprite-fm-mono icon-add",
       label: l[71],
       onClick: () => this._handleAddContact(contactEmail)

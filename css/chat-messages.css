@@ -991,7 +991,6 @@ body.theme-dark .message .audio-player {
     margin: 0 3px 0 0;
 }
 .reactions-bar > div > span.message.text-block {
-    width: 6px;
     height: 11px;
     font-family: var(--text-font-family-black);
     font-size: 9px;

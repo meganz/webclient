@@ -207,93 +207,60 @@ button.small i.folder-with-loupe {
     background-color: var(--banner-background-warning);
     border: 1px solid var(--banner-border-warning);
 }
-
-.download.warning-block {
-    display: none;
-    max-width: 768px;
-    margin: 0 auto 40px;
-    padding: 16px;
-    box-sizing: border-box;
-    width: 100%;
-    border-radius: 12px;
-    font-size: 13px;
-    line-height: 20px;
+/* WARNIG BLOCK BEGIN */
+.download.download-page .download.warning-block {
     background-color: #333;
-    letter-spacing: 0.5px;
-    position: relative;
-    color: #FAFAFA;
-    height: 0;
-    z-index: 10;
-    transition: visibility 200ms ease-in-out, margin-bottom 200ms ease-in-out;
-    visibility: hidden;
-    opacity: 0;
-    overflow: visible;
-}
-.download.download-page.video .download.warning-block.video-warning.visible {
-    display: table;
-}
- .download.download-page:not(.video) .download.warning-block.usual.visible {
-    display: block;
-}
-.download.warning-block span {
-    display: block;
-}
-.download.warning-block .mega-button span {
-    white-space: nowrap;
-}
-.download.warning-block span a, .download.warning-block span a:link, .download.warning-block span a:visited, .download.warning-block span a:active {
-    color: inherit;
-    text-decoration: underline;
-    position: relative;
-}
-.download.warning-block span a:hover {
-    text-decoration: none;
-}
-.download.warning-block a.underlined {
-    color: #FAFAFA;
-    font-size: 13px;
-    text-decoration: underline;
-    margin: 20px 15px 0 0;
-    position: relative;
-}
-.download.warning-block a.underlined:hover {
-    text-decoration: none;
-}
-.video .download.warning-block a.underlined {
-    color: #F0373B;
-}
-.download.warning-block.visible {
-    height: auto;
-    visibility: visible;
-    opacity: 1;
-}
-.download.video .download.warning-block {
     max-width: 768px;
-    margin: 0 0 -20px -384px;
+    min-width: 768px;
     position: fixed;
     left: 50%;
     bottom: 78px;
-    border-radius: 4px;
-    box-shadow: 0 1px 4px 0 rgba(0,0,0,0.1);
-    height: 0;
+    color: #fafafa;
+    border-radius: 12px;
+    box-shadow: var(--dialog-shadow);
     z-index: 100;
-    -webkit-transition: visibility 200ms ease-in-out, margin-bottom 200ms ease-in-out;
     transition: visibility 200ms ease-in-out, margin-bottom 200ms ease-in-out;
     visibility: hidden;
     opacity: 0;
     overflow: visible;
     padding: 15px 20px 15px 15px;
+    transform: translate(-50%, 20px);
 }
-.download.video .download.warning-block .download.big-icon {
-    margin: -43px 0 0 -6px;
-    top:  50%;
+.download.download-page .download.warning-block::before {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top:  0;
+    border-radius: inherit;
+    box-shadow: inset 0 0 0 1px #ffffff66;
 }
-.download.video .download.warning-block .mega-button {
-    margin-top: 0;
+.download.download-page .download.warning-block.visible {
+    display: table;
+    animation: seconds 1s forwards;
 }
-.download.video .download.warning-block .table-cell:last-child {
-    width: 20px;
-    padding: 0 0 0 10px;
+.download.download-page .download.warning-block .content-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.download.download-page .download.warning-block .content-wrapper .content {
+    flex-grow: 1;
+}
+.download.warning-block .mega-button span {
+    white-space: nowrap;
+}
+.download.warning-block .content a,
+.download.warning-block .content a:link,
+.download.warning-block .content a:visited,
+.download.warning-block .content a:active {
+    color: inherit;
+    text-decoration: underline;
+    position: relative;
+}
+.download.warning-block .content a:hover {
+    text-decoration: none;
 }
 .download.warning-block  .fm-dialog-close {
     opacity: 0.9;
@@ -317,40 +284,7 @@ button.small i.folder-with-loupe {
 .download.warning-block  .fm-dialog-close:hover {
     opacity: 1;
 }
-.download.video .download.warning-block::before {
-    content: '';
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    left: 0;
-    top:  0;
-    border-radius: inherit;
-    box-shadow: inset 0px 0px 0px 1px rgba(255,255,255,0.4);
-}
-.download.video .download.warning-block.visible {
-    animation: seconds 1s forwards;
-}
-.download.download-page.video .download.warning-block.video-warning.visible {
-    display: table;
-}
-.warning-back {
-    content: '';
-    display: block;
-    width: 100%;
-    height: 150px;
-    position: fixed;
-    bottom: 0;
-    z-index: 10;
-    background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2ZmZmZmZiIgc3RvcC1vcGFjaXR5PSIwIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNmZmZmZmYiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
-    background: linear-gradient(to bottom, rgba(255,255,255,0) 0%,rgba(255,255,255,1) 100%);
-    transition: visibility 200ms ease-in-out;
-    visibility:hidden;
-    height: 0;
-}
-.download.warning-block.visible + .warning-back {
- -webkit-animation: seconds 1s forwards;
-  animation: seconds 1s forwards;
-}
+
 @-webkit-keyframes seconds {
   0% {
     margin-bottom: -384px;
@@ -375,24 +309,7 @@ button.small i.folder-with-loupe {
     opacity: 1;
   }
 }
-.download.big-icon {
-    position: absolute;
-    top: 0;
-    margin: 9px 0 0 -6px;
-}
-.download.warning-block .table-cell {
-    display: table-cell;
-    padding: 0px 0px 0px 84px;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
-    height: 66px;
-    vertical-align: middle;
-    width: 1%;
-}
-.download.warning-block .mega-button {
-    margin: 12px 0 0 0;
-}
+/* WARNIG BLOCK END */
 
 .download .block-view-file-type {
     margin: 0;
@@ -626,9 +543,7 @@ button.megasync-slider.prev {
     height: 100%;
     object-fit: cover;
 }
-.video .download.warning-block .table-cell {
-    width: 100%;
-}
+
 .video.video-theatre-mode .download.video-block video {
     object-fit: contain;
 }

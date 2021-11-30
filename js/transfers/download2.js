@@ -1302,7 +1302,6 @@ var dlmanager = {
         if (page === 'download') {
             var $dtb = $('.download.download-page');
             $dtb.removeClass('stream-overquota overquota');
-            $('.see-our-plans', $dtb).addClass('hidden').off('click');
             $('.download.over-transfer-quota', $dtb).addClass('hidden');
             $(window).trigger('resize');
         }
@@ -1608,9 +1607,10 @@ var dlmanager = {
             if (page === 'download') {
                 var $dtb = $('.download.download-page');
 
-                $('.see-our-plans', $dtb).removeClass('hidden').rebind('click', onclick);
+                $('.see-our-plans', $dtb).rebind('click', onclick);
 
                 $('.download.over-transfer-quota', $dtb).removeClass('hidden');
+                $('.resume-download', $dtb).removeClass('hidden');
                 $dtb.addClass('stream-overquota');
                 $(window).trigger('resize');
             }

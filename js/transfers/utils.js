@@ -21,6 +21,7 @@ function setTransferStatus(dl, status, ethrow, lock, fatalError) {
 
         if (status === l[20666]) {
             $('.download.error-text', $dlTopBar).addClass('hidden');
+            $('.download.over-transfer-quota', $dlTopBar).removeClass('hidden');
             $dlTopBarErrorBlock = $('.download.overquoata-error', $dlTopBar);
         }
 

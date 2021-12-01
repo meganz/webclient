@@ -1,4 +1,4 @@
-function dashboardUI() {
+function dashboardUI(updProcess) {
     "use strict";
 
     // Prevent ephemeral session to access dashboard via url
@@ -15,7 +15,11 @@ function dashboardUI() {
         return false;
     }
 
-    loadingDialog.show('loadDashboard');
+    updProcess = updProcess || false;
+
+    if (!updProcess) {
+        loadingDialog.show('loadDashboard');
+    }
 
     $('.fm-right-files-block, .section.conversations, .fm-right-account-block').addClass('hidden');
     $('.fm-right-block.dashboard').removeClass('hidden');
@@ -106,8 +110,9 @@ function dashboardUI() {
     // Account data
     /* eslint-disable-next-line complexity */
     M.accountData(function(account) {
-
-        loadingDialog.hide('loadDashboard');
+        if (!updProcess) {
+            loadingDialog.hide('loadDashboard');
+        }
         accountUI.general.userUIUpdate();
 
         // Display welcome message
@@ -143,58 +148,9 @@ function dashboardUI() {
             $('.fm-right-block.dashboard').removeClass('active-achievements');
         }
 
-        // Referrals Widget
-        if (mega.flags.refpr) {
-
-            M.affiliate.getBalance().then(() => {
-                let prefix = '.non-business-dashboard ';
-                if (u_attr.b) {
-                    prefix = '.business-dashboard ';
-                }
-
-                const $referralWidget = $(prefix + '.account.widget.referrals');
-                const balance = M.affiliate.balance;
-                var localCurrency;
-                var localTotal;
-                var localAvailable;
-
-                if (balance) {
-                    localCurrency = balance.localCurrency;
-
-                    $referralWidget.removeClass('hidden');
-
-                    if (localCurrency === 'EUR') {
-                        localTotal = formatCurrency(balance.localTotal);
-                        localAvailable = formatCurrency(balance.localAvailable);
-
-                        $('.euro', $referralWidget).addClass('hidden');
-                    }
-                    else {
-                        localTotal = formatCurrency(balance.localTotal, localCurrency, 'number');
-                        localAvailable = formatCurrency(balance.localAvailable, localCurrency, 'number');
-
-                        $('.euro', $referralWidget).removeClass('hidden');
-                        $('.referral-value.local .currency', $referralWidget).text(localCurrency);
-                        $('.referral-value.total.euro', $referralWidget)
-                            .text(formatCurrency(balance.pending + balance.available));
-                        $('.referral-value.available.euro', $referralWidget).text(formatCurrency(balance.available));
-                    }
-
-                    $('.referral-value.total.local .value', $referralWidget)
-                        .text(localTotal);
-                    $('.referral-value.available.local .value', $referralWidget)
-                        .text(localAvailable);
-
-                    // Referral widget button
-                    $('button.referral-program', $referralWidget).rebind('click.refer', () => {
-                        loadSubPage('/fm/refer');
-                    });
-                }
-            }).catch(ex => {
-                if (d) {
-                    console.error('Update affiliate data failed: ', ex);
-                }
-            });
+        if (!updProcess) {
+            // Only render the referral program widget if loading the dashboard page UI initially
+            dashboardUI.renderReferralWidget();
         }
 
         // Elements for free/pro accounts. Expires date / Registration date
@@ -582,6 +538,62 @@ function dashboardUI() {
     // Init dashboard content scrolling
     initDashboardScroll();
 }
+dashboardUI.renderReferralWidget = function() {
+    "use strict";
+
+    // Referrals Widget
+    if (mega.flags.refpr) {
+        M.affiliate.getBalance().then(() => {
+            let prefix = '.non-business-dashboard ';
+            if (u_attr.b) {
+                prefix = '.business-dashboard ';
+            }
+
+            const $referralWidget = $(prefix + '.account.widget.referrals');
+            const balance = M.affiliate.balance;
+            var localCurrency;
+            var localTotal;
+            var localAvailable;
+
+            if (balance) {
+                localCurrency = balance.localCurrency;
+
+                $referralWidget.removeClass('hidden');
+
+                if (localCurrency === 'EUR') {
+                    localTotal = formatCurrency(balance.localTotal);
+                    localAvailable = formatCurrency(balance.localAvailable);
+
+                    $('.euro', $referralWidget).addClass('hidden');
+                }
+                else {
+                    localTotal = formatCurrency(balance.localTotal, localCurrency, 'number');
+                    localAvailable = formatCurrency(balance.localAvailable, localCurrency, 'number');
+
+                    $('.euro', $referralWidget).removeClass('hidden');
+                    $('.referral-value.local .currency', $referralWidget).text(localCurrency);
+                    $('.referral-value.total.euro', $referralWidget)
+                        .text(formatCurrency(balance.pending + balance.available));
+                    $('.referral-value.available.euro', $referralWidget).text(formatCurrency(balance.available));
+                }
+
+                $('.referral-value.total.local .value', $referralWidget)
+                    .text(localTotal);
+                $('.referral-value.available.local .value', $referralWidget)
+                    .text(localAvailable);
+
+                // Referral widget button
+                $('button.referral-program', $referralWidget).rebind('click.refer', () => {
+                    loadSubPage('/fm/refer');
+                });
+            }
+        }).catch(ex => {
+            if (d) {
+                console.error('Update affiliate data failed: ', ex);
+            }
+        });
+    }
+};
 dashboardUI.updateWidgets = function(widget) {
     /* Contacts block */
     dashboardUI.updateContactsWidget();

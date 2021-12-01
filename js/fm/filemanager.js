@@ -1287,7 +1287,7 @@ FileManager.prototype.updFileManagerUI = promisify(function(resolve) {
 
         delay('dashboard:upd', function() {
             if (M.currentdirid === 'dashboard') {
-                dashboardUI();
+                dashboardUI(true);
             }
             else if (UImain === M.currentdirid) {
                 delay('rendernew:mediainfo:collect', function() {

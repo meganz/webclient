@@ -418,7 +418,7 @@
             M.onFileManagerReady(accountUI);
         }
         else if (id && id.substr(0, 9) === 'dashboard') {
-            M.onFileManagerReady(dashboardUI);
+            M.onFileManagerReady(() => dashboardUI());
         }
         else if (id && id.substr(0, 7) === 'recents') {
             M.onFileManagerReady(openRecents);

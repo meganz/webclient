@@ -627,6 +627,7 @@ function init_page() {
                 if (is_mobile) {
                     mobile.initDOM();
                     mobile.decryptionKeyOverlay.show(pfid, true, pfkey);
+                    fm_hideoverlay();
                 }
                 else {
                     // Insert placeholder background page while waiting for user input

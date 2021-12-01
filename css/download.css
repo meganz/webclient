@@ -1028,6 +1028,7 @@ body:not(.pro-user) .download.over-transfer-quota .overquoata-error {
 .rtl .options-dropdown-content,
 .rtl .download-dropdown-content {
     left: 0;
+    right: unset;
 }
 .options-dropdown-content div,
 .download-dropdown-content div {
@@ -1050,6 +1051,10 @@ body:not(.pro-user) .download.over-transfer-quota .overquoata-error {
     font: var(--text-body1);
     transition: var(--transition-bg-color), var(--transition-color);
 }
+.rtl .options-dropdown-content a,
+.rtl .download-dropdown-content a {
+    padding: 12px 12px 12px 56px;
+}
 .download-dropdown-content a i {
     margin-right: 12px;
     --icon-size: 18px;
@@ -1070,6 +1075,12 @@ body:not(.pro-user) .download.over-transfer-quota .overquoata-error {
     --mask-color: var(--text-color-high);
     color: var(--text-color-high);
     background: var(--surface-grey-1);
+}
+.download-dropdown-content a:hover i:last-child {
+    --mask-color: var(--text-color-medium);
+}
+.download-dropdown-content a:hover i:last-child:hover {
+    --mask-color: var(--icon-active);
 }
 .options-dropdown:hover .options-dropdown-content,
 .download-dropdown:hover .download-dropdown-content {

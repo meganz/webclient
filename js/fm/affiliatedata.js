@@ -670,29 +670,26 @@
 
             if (sessionStorage.affid && 'csp' in window) {
                 const storage = localStorage;
-                const {affid, affts, afftype} = sessionStorage;
-
-                delete sessionStorage.affid;
-                delete sessionStorage.affts;
-                delete sessionStorage.afftype;
 
                 if (d) {
-                    console.info('Dispatching cookie-dialog for affiliate-tags...', affid);
+                    console.info('Dispatching cookie-dialog for affiliate-tags...', sessionStorage.affid);
                 }
                 await csp.init();
 
                 if (csp.has('analyze')) {
-                    storage.affid = affid;
-                    storage.affts = affts;
-                    storage.afftype = afftype;
+                    if (sessionStorage.affid) {
+                        storage.affid = sessionStorage.affid;
+                        storage.affts = sessionStorage.affts;
+                        storage.afftype = sessionStorage.afftype;
+                        delete sessionStorage.affid;
+                        delete sessionStorage.affts;
+                        delete sessionStorage.afftype;
+                    }
                 }
                 else {
                     delete storage.affid;
                     delete storage.affts;
                     delete storage.afftype;
-                    sessionStorage.affid = affid;
-                    sessionStorage.affts = affts;
-                    sessionStorage.afftype = afftype;
                 }
             }
 

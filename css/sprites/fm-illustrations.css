@@ -238,6 +238,11 @@
 .sprite-fm-illustration.img-dialog-desktop-app-after::after {
     background-position: calc(200% / 19) calc(var(--scale) * -500);
 }
+.sprite-fm-illustration.img-dialog-payment-card-exp,
+.sprite-fm-illustration.img-dialog-payment-card-exp-before::before,
+.sprite-fm-illustration.img-dialog-payment-card-exp-after::after {
+    background-position: calc(300% / 19) calc(var(--scale) * -500);
+}
 
 /* Wide illustrations */
 .sprite-fm-illustration-wide,

@@ -1408,6 +1408,27 @@ scparser.$add('pses', function(a) {
     notify.notifyFromActionPacket(a);
 });
 
+// Payment card status
+scparser.$add('cce', () => {
+    'use strict';
+    // assuming that this AP will come only to PRO/Business accounts.
+    if (fminitialized) {
+        delay(
+            'cceAP',
+            () => {
+                M.req({ a: 'uq', pro: 1 }).then((res) => {
+                    if (typeof res === 'object') {
+                        M.showPaymentCardBanner(res.cce);
+                        if (M.account && res.cce) {
+                            M.account.cce = res.cce;
+                        }
+                    }
+                });
+            },
+            2000);
+    }
+});
+
 scparser.mcpc = scparser.mcc = function (a) {
     // MEGAchat
     if (megaChatIsReady) {

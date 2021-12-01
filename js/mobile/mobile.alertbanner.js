@@ -34,13 +34,7 @@ mobile.alertBanner = {
         this.$fmScrolling = this.$fileManagerBlock.find(".mobile.fm-scrolling");
         this.$alertBanner = $(".mobile.alert-banner");
         this.$alertBannerText = this.$alertBanner.find(".alert-text");
-        var $alertBannerCloseButton = this.$alertBanner.find(".alert-close");
-
-        // Handle close button click.
-        $alertBannerCloseButton.off('tap').on('tap', function() {
-            mobile.alertBanner.close();
-            return false;
-        });
+        this.$alertBannerCloseButton = this.$alertBanner.find(".alert-close");
     },
 
     /**
@@ -77,6 +71,12 @@ mobile.alertBanner = {
         this.$alertBanner.removeClass('closed hidden');
         this.$alertBanner.off('tap');
 
+        // Handle close button click.
+        this.$alertBannerCloseButton.rebind('tap', () => {
+            mobile.alertBanner.close();
+            return false;
+        });
+
         this.removeTimeout();
 
         return this;
@@ -107,7 +107,9 @@ mobile.alertBanner = {
      */
     close: function() {
         'use strict';
-        this.$alertBanner.addClass('closed');
+        if (this.$alertBanner) {
+            this.$alertBanner.addClass('closed');
+        }
     },
 
     /**

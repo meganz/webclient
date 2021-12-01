@@ -1397,6 +1397,9 @@ ul, li {
 .mobile.fm-icon.credit-card {
     background-position: -148px -2136px;
 }
+.mobile.fm-icon.card {
+    background-position: 0 -2008px;
+}
 .mobile.fm-icon.rocket {
     background-position: -148px -2101px;
 }
@@ -2165,6 +2168,15 @@ ul, li {
     margin: 0 auto 20px auto;
     background-image: url(../images/mobile/mobile-sprite.png);
     background-repeat: no-repeat;
+}
+.mobile.empty-icon.sprite-fm-illustration {
+    background: url("../../images/sprites/fm-illustration-sprite.svg") no-repeat;
+    background-size: 2000%;
+}
+.mobile.empty-icon.sprite-fm-illustration.img-dialog-payment-card-exp {
+    --width: 145px;
+    --height: 109px;
+    background-position: calc(300% / 19) calc(var(--scale) * -500);
 }
 .landscape .mobile.empty-icon {
     margin-bottom: 2px;
@@ -5125,10 +5137,10 @@ div.checkboxOn {
 }
 /* Alert Banner */
 .mobile.alert-banner {
-    height: 60px;
+    min-height: 60px;
     width: 100%;
     background-color: #2ba6de;
-    display: block;
+    display: flex;
     -webkit-transition: margin-top .3s ease-in-out;
     -moz-transition: margin-top .3s ease-in-out;
     -o-transition: margin-top .3s ease-in-out;
@@ -5148,6 +5160,7 @@ div.checkboxOn {
 }
 .mobile.alert-banner.closed {
     margin-top: -60px;
+    display: none;
 }
 .mobile.alert-banner.warning {
     background-color: rgba(0252, 130, 23, 1);
@@ -5156,7 +5169,7 @@ div.checkboxOn {
     background: rgba(255, 69, 69, 1);
 }
 .mobile.alert-banner .alert-close {
-    height: 60px;
+    /*height: 60px;*/
     width: 40px;
     float: right;
 }
@@ -5164,10 +5177,10 @@ div.checkboxOn {
     display:none;
 }
 .mobile.alert-banner .alert-text-container {
-    position: absolute;
+    position: relative;
     left: 10px;
     text-align: left;
-    height: 50px;
+    /*height: 50px;*/
     float: left;
     font-size: small;
     color: white;
@@ -5192,9 +5205,9 @@ div.checkboxOn {
     font-family: var(--text-font-family-bold);
 }
 .mobile.alert-banner .alert-icon.close {
-    height: 30px;
+    /*height: 30px;*/
     width: 30px;
-    margin-top: 15px;
+    /*margin-top: 15px;*/
     margin-right: 5px;
     background-position: -82px -1143px;
     -webkit-transform: scale(0.8, 0.8);
@@ -14209,7 +14222,95 @@ body.landscape .upload-overlay .mobile.filetype-img {
 /*
  * End Mobile Confirmation checkbox
  */
-
+.mobile.payment-card-page .card-info.payment-card {
+    margin-top: 34px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.mobile.payment-card-page .card-info.payment-card .payment-card-top {
+    width: 285.96px;
+    height: 134px;
+    background-color: #00BFA5;
+    background-image: url("../images/mega/Surface-card-green.png");
+    background-size: 285px;
+}
+.mobile.payment-card-page .card-info.payment-card.mc .payment-card-top {
+    background-color: #F3A03F;
+    background-image: url("../images/mega/Surface-card-orange.png");
+    background-size: 285px;
+}
+.mobile.payment-card-page .card-info.payment-card.visa .payment-card-top {
+    background-color: #4BB8F3;
+    background-image: url("../images/mega/Surface-card-blue.png");
+    background-size: 285px;
+}
+.mobile.payment-card-page .card-info.payment-card .payment-card-icon {
+    --icon-size: 38px;
+    margin-top: 14px;
+    margin-left: 17px;
+}
+.mobile.payment-card-page .card-info.payment-card.visa .payment-card-icon i {
+    background-image: url("../images/mega/icon-visa.svg");
+    background-size: 100%;
+    width: 38px;
+    height: 38px;
+    display: block;
+}
+.mobile.payment-card-page .card-info.payment-card:not(.mc):not(.visa) .payment-card-icon i {
+    background-image: url("../images/mega/icon-payment-outline.svg");
+    background-size: 100%;
+    width: 38px;
+    height: 38px;
+    display: block;
+}
+.mobile.payment-card-page .card-info.payment-card .payment-card-bottom {
+    width: 285.96px;
+    height: 48px;
+    background-color: #03A892;
+}
+.mobile.payment-card-page .card-info.payment-card.mc .payment-card-bottom {
+    background-color: #E58D27;
+}
+.mobile.payment-card-page .card-info.payment-card.visa .payment-card-bottom {
+    background-color: #23A1E5;
+}
+.mobile.payment-card-page .card-info.payment-card .payment-card-nb {
+    display: flex;
+    margin-top: 14px;
+    margin-left: 17px;
+}
+.mobile.payment-card-page .card-info.payment-card .payment-card-dots {
+    margin-right: 12px;
+    color: var(--text-color-white-higher);
+    font-size: 14px;
+}
+.mobile.payment-card-page .card-info.payment-card .payment-card-digits {
+    font: var(--text-h3);
+    color: var(--text-color-white-higher);
+    font-family: var(--text-font-family-bold);
+    margin-top: 2px;
+}
+.mobile.payment-card-page .card-info.payment-card .payment-card-expiry-lbl {
+    display: inline-block;
+}
+.mobile.payment-card-page .card-info.payment-card .payment-card-expiry-val {
+    display: inline-block;
+}
+.mobile.payment-card-page .card-info.payment-card .payment-card-expiry {
+    margin-top: 6px;
+    margin-left: 17px;
+    color: var(--text-color-white-higher);
+    font: var(--text-caption);
+}
+.mobile.payment-card-page .card-info.payment-card .payment-card-edit {
+    display: inline-block;
+    color: var(--text-color-white-higher);
+    margin-top: 16px;
+    margin-left: 17px;
+    font: var(--text-caption);
+    text-decoration: underline;
+}
 /*
  * Retina Sprite for mobile
  * Please leave it on the bottom to make sure it override on Retina.
@@ -14226,15 +14327,42 @@ body.landscape .upload-overlay .mobile.filetype-img {
     .android .mobile.tablet-img {
         background-image: url(../images/mobile/android@2x.png);
     }
-    .mobile.logo, .mobile.white-mega-logo, .mobile.download-speed, .mobile.upload-speed, .mobile.download-percents, .mobile.red-button.disabled i, .mobile.warning-icon, .mobile.fm-icon, .mobile.fm-item-link, .mobile.empty-icon, .mobile.signin-input span, .mobile.loader, .mobile.homepage .feature-icon, .mobile.homepage .company-logo, .checkboxOn.square i, .mobile.fm-dialog-close, .mobile.top-menu-popup .top-icon.close, .mobile.slideshow-back-arrow, .mobile.slideshow-forward-arrow, .default-select, .ui-selectmenu-button.ui-button, .mobile.select-wrapper::after, #mobile-ui-contact-card .contact-verification i, .mobile.auth-app-select-dialog .cancel-button-icon, .mobile.signin-input span, .mobile.country-input span, .mobile.phone-number-input span,
-        .mobile.membership-step2 .provider-icon.voucher,
-        .mobile.membership-step2 .provider-icon.ecpVI,
-        .mobile.membership-step2 .provider-icon.ecpMC,
-        .mobile .improved-recovery-steps .nav-back-icon,
-        .mobile.default-grey-select,
-        .mobile-sprite
-    {
+    .mobile.logo,
+    .mobile.white-mega-logo,
+    .mobile.download-speed,
+    .mobile.upload-speed,
+    .mobile.download-percents,
+    .mobile.red-button.disabled i,
+    .mobile.warning-icon,
+    .mobile.fm-icon,
+    .mobile.fm-item-link,
+    .mobile.signin-input span,
+    .mobile.loader,
+    .mobile.homepage .feature-icon,
+    .mobile.homepage .company-logo,
+    .checkboxOn.square i,
+    .mobile.fm-dialog-close,
+    .mobile.top-menu-popup .top-icon.close,
+    .mobile.slideshow-back-arrow,
+    .mobile.slideshow-forward-arrow,
+    .default-select,
+    .ui-selectmenu-button.ui-button,
+    .mobile.select-wrapper::after,
+    #mobile-ui-contact-card .contact-verification i,
+    .mobile.auth-app-select-dialog .cancel-button-icon,
+    .mobile.country-input span,
+    .mobile.phone-number-input span,
+    .mobile.membership-step2 .provider-icon.voucher,
+    .mobile.membership-step2 .provider-icon.ecpVI,
+    .mobile.membership-step2 .provider-icon.ecpMC,
+    .mobile .improved-recovery-steps .nav-back-icon,
+    .mobile.default-grey-select,
+    .mobile-sprite {
         background-image: url(../images/mobile/mobile-sprite@2x.png) !important;
+        background-size: 280px auto;
+    }
+    .mobile.empty-icon {
+        background-image: url("../images/mobile/mobile-sprite@2x.png");
         background-size: 280px auto;
     }
     .mobile.registration-confirm-email .email-icon {

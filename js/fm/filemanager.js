@@ -4430,7 +4430,7 @@ FileManager.prototype.initLeftPanel = function() {
                         !$dialog.hasClass('fm-dialog-mobile') &&
                         !$dialog.hasClass('fm-dialog')) {
 
-                        throw new Error('Unexpected dialog type...');
+                        throw new Error(`Unexpected dialog(${name}) type...`);
                     }
 
                     // arrange to back any non-controlled dialogs,

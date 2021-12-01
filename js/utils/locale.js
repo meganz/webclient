@@ -1452,6 +1452,10 @@ mBroadcaster.once('boot_done', function populate_l() {
     l.cookie_banner_txt = escapeHTML(l.cookie_banner_txt)
         .replace('[A]', '<a href="/cookie" class="clickurl" target="_blank">')
         .replace('[/A]', '</a>');
+    l.payment_card_almost_exp = l.payment_card_almost_exp
+        .replace('[A]', '<a>').replace('[/A]', '</a>');
+    l.payment_card_exp = l.payment_card_exp
+        .replace('[A]', '<a>').replace('[/A]', '</a>');
 
     l.about_vision_desc = escapeHTML(l.about_vision_desc)
         .replace(/\[S]/g, '<span>')

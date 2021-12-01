@@ -168,7 +168,7 @@
 .meetings-call .stream .sidebar-controls ul span.participants-count {
   right: -3px;
   bottom: -4px;
-  line-height: 17px;
+  line-height: 21px;
   color: var(--text-color-black-high);
   background: var(--secondary-white);
 }
@@ -424,7 +424,7 @@
   border-radius: 4px;
   text-align: center;
   font: var(--text-body2);
-  line-height: 15px;
+  line-height: 16px;
   background: var(--secondary-blue);
   color: var(--secondary-white);
 }

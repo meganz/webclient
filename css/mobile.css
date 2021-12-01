@@ -209,7 +209,7 @@ ul, li {
 .mobile.main-block.error-overlay {
     position: fixed;
     top: 0;
-    z-index: 2300;
+    z-index: 190;
     overflow: hidden;
 }
 .mobile.content-row {

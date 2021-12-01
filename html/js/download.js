@@ -641,6 +641,7 @@ function dl_g(res, ctx) {
             // Load the missing file decryption key dialog for mobile
             parsepage(pages['mobile']);
             mobile.decryptionKeyOverlay.show(dlpage_ph, false, key);
+            fm_hideoverlay();
             return false;
         }
         else {

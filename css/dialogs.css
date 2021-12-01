@@ -9079,6 +9079,17 @@ body.de .mega-dialog.new-group-chat {
 
 /* end payment-reminder dialog */
 
+/* payment-reminder dialog */
+
+    .mega-dialog.payment-card-expired header .graphic {
+        width: 116px;
+        height: 80px;
+        --width: 116px;
+        --height: 80px;
+    }
+
+/* end payment-reminder dialog */
+
 /* user-management-able-user-dialog shared styles */
 
     .mega-dialog.user-management-able-user-dialog .re-enable-large-icon {

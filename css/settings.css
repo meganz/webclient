@@ -1089,3 +1089,104 @@
     height: 2px;
     background: var(--surface-main);
 }
+.account.account-card-info .mega-data-header {
+    height: 68px;
+}
+.account.account-card-info .card-info.payment-card {
+    margin-bottom: 24px;
+}
+.account.account-card-info .payment-card-icon {
+    display: inline-block;
+}
+.account.account-card-info.visa .payment-card-icon i {
+    background-image: url("../images/mega/icon-visa.svg");
+    background-size: 100%;
+    width: 46px;
+    height: 45px;
+    margin-top: 17px;
+}
+.account.account-card-info .payment-card-icon i {
+    margin-top: 14px;
+    --icon-size: 48px;
+    margin-left: 24px;
+}
+.account.account-card-info:not(.mc):not(.visa) .payment-card-icon i {
+    background-image: url("../images/mega/icon-payment-outline.svg");
+    background-size: 100%;
+    width: 46px;
+    height: 45px;
+    margin-top: 17px;
+}
+.account.account-card-info .payment-card-top {
+    width: 364px;
+    border-radius: 8px 8px 0 0;
+    height: 171px;
+    background-color: #00BFA5;
+    background-image: url("../images/mega/Surface-card-green.png");
+    direction: ltr;
+}
+.account.account-card-info .payment-card-bottom {
+    width: 364px;
+    border-radius: 0 0 8px 8px;
+    height: 61px;
+    background-color: #03A892;
+    direction: ltr;
+}
+.account.account-card-info.visa .payment-card-top {
+    background-color: #4BB8F3;
+    background-image: url("../images/mega/Surface-card-blue.png");
+}
+.account.account-card-info.mc .payment-card-top {
+    background-color: #F3A03F;
+    background-image: url("../images/mega/Surface-card-orange.png");
+}
+.account.account-card-info.visa .payment-card-bottom {
+    background-color: #23A1E5;
+}
+.account.account-card-info.mc .payment-card-bottom {
+    background-color: #E58D27;
+}
+.account.account-card-info .payment-card-nb {
+    height: 34px;
+    margin: 14px 37px 6px 26px;
+    display: flex;
+    align-content: center;
+}
+.account.account-card-info .payment-card-expiry {
+    height: 20px;
+    margin-left: 26px;
+}
+.account.account-card-info .payment-card-dots {
+    display: inline-block;
+    width: 62px;
+    color: var(--text-color-white-higher);
+    font-size: 17px;
+    margin-right: 15px;
+    margin-top: 6px;
+    letter-spacing: 1px;
+}
+.account.account-card-info .payment-card-digits {
+    font: var(--text-h1);
+    color: var(--text-color-white-higher);
+    font-family: var(--text-font-family-bold);
+}
+.account.account-card-info .payment-card-expiry-lbl {
+    display: inline-block;
+    color: var(--text-color-white-higher);
+    font: var(--text-body1);
+}
+.account.account-card-info .payment-card-expiry-val {
+    display: inline-block;
+    color: var(--text-color-white-higher);
+    font: var(--text-body1);
+    margin-left: 1px;
+}
+.account.account-card-info .payment-card-edit {
+    display: inline-block;
+    color: var(--text-color-white-higher);
+    font: var(--text-body1);
+    margin-left: 26px;
+    margin-top: 26px;
+    text-decoration: underline;
+}
+

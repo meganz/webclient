@@ -2024,6 +2024,14 @@ var addressDialog = {
 
             $('.stripe-error', $stripeFailureDialog).text(error || '');
 
+            if (addressDialog.stripeSaleId === 'EDIT') {
+                $((is_mobile ? '.fail-head' : '.payment-stripe-failure-dialog-title'), $stripeFailureDialog)
+                    .text(l.payment_gw_update_fail);
+                $('.err-txt', $stripeFailureDialog).safeHTML(l.payment_gw_update_fail_desc
+                    .replace('[A]', '<a href="mailto:support@mega.nz">')
+                    .replace('[/A]', '</a>'));
+            }
+
             $stripeIframe.remove();
             $stripeDialog.addClass('hidden');
             M.safeShowDialog('stripe-pay-failure', $stripeFailureDialog);
@@ -2045,11 +2053,25 @@ var addressDialog = {
             }
             else if (event.data === 'paysuccess') {
 
-                addressDialog.stripeCheckerCounter = 0;
+                if (addressDialog.stripeSaleId === 'EDIT') {
+                    closeDialog();
 
-                pro.propay.paymentStatusChecker =
-                    setTimeout(addressDialog.stripePaymentChecker
-                        .bind(addressDialog, addressDialog.stripeSaleId), 500);
+                    msgDialog('info', '', l.payment_card_update, l.payment_card_update_desc, () => {
+                        if (!is_mobile && page.includes('fm/account/plan')) {
+                            accountUI.plan.init(M.account);
+                        }
+                        else if (is_mobile && page === 'fm/account/paymentcard') {
+                            mobile.account.paymentCard.init();
+                        }
+                    });
+                }
+                else {
+                    addressDialog.stripeCheckerCounter = 0;
+
+                    pro.propay.paymentStatusChecker =
+                        setTimeout(addressDialog.stripePaymentChecker
+                            .bind(addressDialog, addressDialog.stripeSaleId), 500);
+                }
             }
             else if (event.data.startsWith('action^')) {
                 const destURL = event.data.split('^')[1] || '';
@@ -2103,13 +2125,15 @@ var addressDialog = {
                     $('.fm-dialog.mobile.payment-stripe-dialog, .mega-dialog.payment-stripe-dialog .iframe-container');
                 let $stripeIframe = $('iframe#stripe-widget', $stripeDialog);
                 $stripeIframe.remove();
+                const sandBoxCSP = 'allow-scripts allow-same-origin allow-forms'
+                    + (utcResult.edit ? ' allow-popups' : '');
 
                 $stripeIframe = mCreateElement(
                     'iframe',
                     {
                         width: '100%',
                         height: '100%',
-                        sandbox: 'allow-scripts allow-same-origin allow-forms',
+                        sandbox: sandBoxCSP,
                         frameBorder: '0'
                     },
                     $iframeContainer[0]
@@ -2131,37 +2155,52 @@ var addressDialog = {
                         this.gatewayOrigin = testSrc.origin;
                         const secret = payInfo.searchParams.get('s');
                         const env = payInfo.searchParams.get('e');
+                        const editType = payInfo.searchParams.get('t');
+                        const planprice = payInfo.searchParams.get('pp');
                         if (secret) {
                             testSrc.searchParams.append('s', secret);
                         }
                         if (env) {
                             testSrc.searchParams.append('e', env);
                         }
+                        if (editType) {
+                            testSrc.searchParams.append('t', editType);
+                        }
+                        if (editType) {
+                            testSrc.searchParams.append('pp', planprice);
+                        }
                         iframeSrc = testSrc.toString();
                     }
                 }
 
-                iframeSrc += `&p=${this.proNum}`;
-                iframeSrc += `&pp=${b64encode(this.proPrice)}`;
+                this.stripeSaleId = 'EDIT';
+
+                if (!utcResult.edit) {
+
+                    iframeSrc += `&p=${this.proNum}`;
+                    if (this.extraDetails.recurring) {
+                        iframeSrc += '&r=1';
+                    }
+                    iframeSrc += `&m=${this.numOfMonths}`;
+
+                    this.stripeSaleId = saleId;
+                }
+
 
                 const locale = addressDialog.stripeLocal();
                 if (locale) {
                     iframeSrc += '&l=' + locale;
                 }
-                if (this.extraDetails.recurring) {
-                    iframeSrc += '&r=1';
-                }
+
                 if (is_mobile) {
                     iframeSrc += '&mobile=1';
                 }
-                iframeSrc += `&m=${this.numOfMonths}`;
 
                 $stripeIframe.src = iframeSrc;
                 $stripeIframe.id = 'stripe-widget';
 
                 pro.propay.hideLoadingOverlay();
                 loadingDialog.hide();
-                this.stripeSaleId = saleId;
 
                 M.safeShowDialog('stripe-pay', $stripeDialog);
 

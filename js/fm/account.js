@@ -656,6 +656,13 @@ accountUI.leftPane = {
             $menuItems.filter('.reseller').removeClass('hidden');
         }
 
+        if (accountUI.plan.paymentCard.validateUser(M.account)) {
+            $('.acc-setting-menu-card-info', $menuItems).removeClass('hidden');
+        }
+        else {
+            $('.acc-setting-menu-card-info', $menuItems).addClass('hidden');
+        }
+
         $menuItems.filter(':not(.' + sectionClass + ')').addClass('closed').removeClass('active');
         $currentMenuItem.addClass('active');
 
@@ -1651,7 +1658,7 @@ accountUI.plan = {
 
         "use strict";
 
-        var $planContent = $('.fm-account-plan.fm-account-sections', accountUI.$contentBlock);
+        const $planContent = $('.fm-account-plan.fm-account-sections', accountUI.$contentBlock);
 
         // Plan - Account type
         this.accountType.render(account);
@@ -1665,6 +1672,9 @@ accountUI.plan = {
         this.history.renderPurchase(account);
         this.history.renderTransaction(account);
         this.history.bindEvents(account);
+
+        // Plan - Payment card
+        this.paymentCard.init(account, $planContent);
 
         // check if business account
         if (u_attr && u_attr.b) {
@@ -2037,6 +2047,111 @@ accountUI.plan = {
         }
     },
 
+    paymentCard: {
+
+        $paymentSection: null,
+
+        validateCardResponse: function(res) {
+            'use strict';
+            return res && (res.gw === (addressDialog || {}).gatewayId_stripe || 19) && res.brand && res.last4
+                && res.exp_month && res.exp_year;
+        },
+
+        validateUser: function(account) {
+            'use strict';
+            return (u_attr.p || u_attr.b) && account.stype === 'S'
+                && ((Array.isArray(account.sgw) && account.sgw.includes('Stripe'))
+                    || (Array.isArray(account.sgwids)
+                        && account.sgwids.includes((addressDialog || {}).gatewayId_stripe || 19)));
+        },
+
+        init: function(account, $planSection) {
+            'use strict';
+
+            this.$paymentSection = $('.account.account-card-info', $planSection);
+
+            const hideCardSection = () => {
+                this.$paymentSection.addClass('hidden');
+
+                $('.settings-button .acc-setting-menu-card-info', '.content-panel.account')
+                    .addClass('hidden');
+            };
+
+            // check if we should show the section (uq response)
+            if (this.validateUser(account)) {
+
+                api_req({ a: 'cci' }, {
+                    callback: (res) => {
+                        if (typeof res === 'object' && this.validateCardResponse(res)) {
+                            return this.render(res);
+                        }
+
+                        hideCardSection();
+                    }
+                });
+            }
+            else {
+                hideCardSection();
+            }
+        },
+
+        render: function(cardInfo) {
+            'use strict';
+
+            if (cardInfo && this.$paymentSection) {
+
+
+                if (cardInfo.brand === 'visa') {
+
+                    this.$paymentSection.addClass('visa').removeClass('mc');
+                    $('.payment-card-icon i', this.$paymentSection)
+                        .removeClass('sprite-fm-uni icon-mastercard-border');
+
+                }
+                else if (cardInfo.brand === 'mastercard') {
+
+                    this.$paymentSection.addClass('mc').removeClass('visa');
+                    $('.payment-card-icon i', this.$paymentSection).addClass('sprite-fm-uni icon-mastercard-border');
+
+                }
+                else {
+                    this.$paymentSection.removeClass('visa mc');
+                }
+
+                $('.payment-card-nb .payment-card-digits', this.$paymentSection).text(cardInfo.last4);
+                $('.payment-card-expiry .payment-card-expiry-val', this.$paymentSection)
+                    .text(`${String(cardInfo.exp_month).padStart(2, '0')}/${String(cardInfo.exp_year).substr(-2)}`);
+
+                $('.payment-card-bottom a.payment-card-edit', this.$paymentSection).rebind('click', () => {
+
+                    loadingDialog.show();
+
+                    api_req({ a: 'gw19_ccc' }, {
+                        callback: (res) => {
+                            loadingDialog.hide();
+
+                            if ($.isNumeric(res)) {
+                                msgDialog('warninga', '', l.edit_card_error.replace('%1', res), l.edit_card_error_des);
+                            }
+                            else if (typeof res === 'string') {
+                                addressDialog.processUtcResult(
+                                    {
+                                        EUR: res,
+                                        edit: true
+                                    },
+                                    true
+                                );
+                            }
+                        }
+                    });
+                });
+
+                this.$paymentSection.removeClass('hidden');
+            }
+        }
+
+    },
+
     balance: {
 
         render: function(account) {
@@ -2399,6 +2514,10 @@ accountUI.notifications = {
                     $EToggle.trigger('update.accessibility');
                 }
             );
+
+            if (accountUI.plan.paymentCard.validateUser(M.account)) {
+                $('.switch-container.card-exp-switch', $notifictionContent).removeClass('hidden');
+            }
 
             // Hide the loading screen.
             loadingDialog.hide('enotif');

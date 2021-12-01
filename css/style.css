@@ -4176,6 +4176,7 @@ tr:not(.taken-down) .grid-status-icon:not(.read-only):not(.read-and-write) {
     display: flex;
 }
 .fm-notification-block.almost-full,
+.fm-notification-block.payment-card-almost-expired,
 .fm-notification-block.grace-business {
     background-color: var(--label-orange);
 }

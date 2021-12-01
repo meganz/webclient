@@ -1052,6 +1052,11 @@ function init_page() {
         mobile.account.history.init();
         return false;
     }
+    else if (is_mobile && u_type && page === 'fm/account/paymentcard') {
+        parsepage(pages.mobile);
+        mobile.account.paymentCard.init();
+        return false;
+    }
     else if (is_mobile && u_type
         && (page === 'fm/account/security/change-password' || page === 'fm/account/email-and-pass')) {
         parsepage(pages['mobile']);

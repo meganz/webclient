@@ -68,9 +68,6 @@
     white-space: nowrap;
     width: 100%;
 }
-.mega-input.hidden {
-    display: none;
-}
 .mega-input input:-webkit-autofill {
     box-shadow: 0 0 0 50px var(--stroke-main) inset;
     -webkit-text-fill-color: var(--text-color-high);
@@ -397,8 +394,7 @@
     margin-right: 14px;
 }
 
-.mega-input-dropdown .option.template,
-.mega-input-dropdown .option.hidden {
+.mega-input-dropdown .option.template {
     display: none;
 }
 .mega-input-dropdown .option span {

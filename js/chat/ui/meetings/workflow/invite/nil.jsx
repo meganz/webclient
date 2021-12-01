@@ -1,5 +1,5 @@
 import React from 'react';
-import { MegaRenderMixin } from '../../../../../stores/mixins';
+import { MegaRenderMixin } from '../../../../mixins';
 import Invite, { HAS_CONTACTS } from './invite.jsx';
 
 export default class Nil extends MegaRenderMixin {

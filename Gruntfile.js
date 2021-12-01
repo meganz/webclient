@@ -519,11 +519,13 @@ var Secureboot = function() {
 
 const stdout = process.stdout;
 const write = stdout.write;
-stdout.write = function(s) {
-    if (s && !String(s).includes('.css\x1b[0m created.')) {
-        write.apply(stdout, arguments);
-    }
-};
+if (!debug) {
+    stdout.write = function(s) {
+        if (s && !String(s).includes('.css\x1b[39m created.')) {
+            write.apply(stdout, arguments);
+        }
+    };
+}
 
 const [postTaskFinalizer, postHtmlTreeWalker, postHtmlURLRebase, postCssURLRebase] = (() => {
     'use strict';

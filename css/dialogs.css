@@ -1872,9 +1872,6 @@ body.de .mega-dialog.new-group-chat {
     .mega-dialog.password-dialog .decryption-in-progress i {
         animation: rotate 0.8s infinite linear;
     }
-    .mega-dialog.password-dialog .decryption-in-progress.hidden {
-        display: none;
-    }
 
 /* end password-dialog */
 
@@ -2214,11 +2211,6 @@ body.de .mega-dialog.new-group-chat {
     .rtl .mega-dialog.export-links-dialog .icons i {
         float: left;
     }
-    .mega-dialog.export-links-dialog .icons i.calendar.hidden {
-        display: block;
-        opacity: 0;
-        visibility: hidden;
-    }
     .mega-dialog.export-links-dialog .icons i input {
         position: absolute;
         width: 100%;
@@ -2290,9 +2282,6 @@ body.de .mega-dialog.new-group-chat {
         opacity: 1;
         padding: 0 20px;
         border-bottom: 2px solid var(--stroke-error);
-    }
-    .mega-dialog.export-links-dialog .hidden {
-        display: none;
     }
     .mega-dialog.export-links-dialog .settings-container {
         overflow: auto;
@@ -2540,9 +2529,6 @@ body.de .mega-dialog.new-group-chat {
     }
     .mega-dialog.fm-picker-dialog .summary-row.unfold {
         align-items: flex-start;
-    }
-    .mega-dialog.fm-picker-dialog .summary-row.hidden {
-        display: none;
     }
     .mega-dialog.fm-picker-dialog .summary-row .summary-title {
         font: var(--text-body1);
@@ -3423,9 +3409,6 @@ body.de .mega-dialog.new-group-chat {
         align-items: center;
         cursor: pointer;
     }
-    .mega-dialog.fm-picker-dialog .share-dialog-permissions.hidden {
-        display: none;
-    }
     .mega-dialog.fm-picker-dialog .share-dialog-permissions i {
         display: none;
         --icon-size: 24px;
@@ -4291,9 +4274,6 @@ body.de .mega-dialog.new-group-chat {
         display: table;
         margin-top: 24px;
     }
-    .mega-dialog.add-user-popup .hidden-achievement-info.hidden {
-        display: none;
-    }
     .mega-dialog.add-user-popup .hidden-textarea-info {
         text-align: center;
         margin-top: 10px;
@@ -4505,9 +4485,6 @@ body.de .mega-dialog.new-group-chat {
         margin: 12px 48px 0 48px;
         text-align: center;
     }
-    .mega-dialog.payment-address-dialog .error-message.hidden {
-        display: none;
-    }
     .mega-dialog.payment-address-dialog .payment-half-block .fm-account-input input {
         color: var(--text-color-high);
     }
@@ -4527,9 +4504,6 @@ body.de .mega-dialog.new-group-chat {
         color: var(--text-color-low);
     }
     .mega-dialog.payment-address-dialog .default-dropdown-item.template {
-        display: none;
-    }
-    .mega-dialog.payment-address-dialog .default-dropdown-item.hidden {
         display: none;
     }
     .mega-dialog.payment-address-dialog .states.disabled {
@@ -4597,9 +4571,6 @@ body.de .mega-dialog.new-group-chat {
         display: inline-block;
         padding: 24px 0 16px;
     }
-    .mega-dialog.new-contact .new-user-message.hidden {
-        display: none;
-    }
     .mega-dialog.new-contact .new-contact-avatar .semi-mid-avatar {
         position: relative;
         width: 100%;
@@ -4613,9 +4584,6 @@ body.de .mega-dialog.new-group-chat {
 
     .mega-dialog.pro-login-dialog {
         width: 490px;
-    }
-    .mega-dialog.pro-login-dialog.hidden {
-        display: none;
     }
     .mega-dialog.pro-login-dialog header {
         margin-bottom: 10px;
@@ -4803,9 +4771,6 @@ body.de .mega-dialog.new-group-chat {
         margin-top: 30px;
         width: 100%;
     }
-    .mega-dialog.languages-dialog .show-more-languages.hidden {
-        display: none;
-    }
     .mega-dialog.languages-dialog .show-more-languages .show-more-text {
         color: #999;
         display: table-cell;
@@ -4891,9 +4856,6 @@ body.de .mega-dialog.new-group-chat {
     .mega-dialog.pro-register-dialog header p {
         padding: 0 48px;
         text-align: center;
-    }
-    .mega-dialog.pro-register-dialog header a.hidden {
-        display: none;
     }
     .mega-dialog.pro-register-dialog .dialog-register-form {
         margin-top: 24px;
@@ -5006,14 +4968,8 @@ body.de .mega-dialog.new-group-chat {
     .credentials-warning-dialog .resetCredentials .reset-credentials-button {
         margin-top: 24px;
     }
-    .mega-dialog.credentials-warning-dialog .resetCredentials .reset-credentials-button.hidden {
-        display: none;
-    }
     .mega-dialog.credentials-warning-dialog .verifyCredentials .verify-contact-button {
         margin-top: 24px;
-    }
-    .mega-dialog.credentials-warning-dialog .verifyCredentials .verify-contact-button.hidden {
-        display: none;
     }
     .mega-dialog.credentials-warning-dialog .postResetCredentials .title,
     .mega-dialog.credentials-warning-dialog .verifyCredentials .title {
@@ -5517,9 +5473,6 @@ body.de .mega-dialog.new-group-chat {
         margin: 15px 21px 0 21px;
         text-align: start;
     }
-    .mega-dialog .achievement-dialog.reward.hidden {
-        display: none;
-    }
     .mega-dialog .achievement-dialog.reward i {
         vertical-align: top;
     }
@@ -5579,9 +5532,6 @@ body.de .mega-dialog.new-group-chat {
     }
     .mega-dialog .achievement-dialog.bottom-block .achievement-dialog.reward:last-of-type {
         border-bottom: none;
-    }
-    .mega-dialog .achievement-dialog.bottom-block .achievement-dialog.reward.hidden {
-        display: none;
     }
     .mega-dialog .achievement-dialog.bottom-block .achievement-dialog.reward i {
         margin: 10px 0 10px 0;
@@ -5753,9 +5703,6 @@ body.de .mega-dialog.new-group-chat {
         letter-spacing: 0.1px;
         line-height: 20px;
     }
-    .mega-dialog.voucher-dialog .voucher-dialog-buttons button.hidden {
-        display: none;
-    }
     .mega-dialog.voucher-dialog .voucher-dialog-td {
         display: table-cell;
         overflow: hidden;
@@ -5767,9 +5714,6 @@ body.de .mega-dialog.new-group-chat {
     .mega-dialog.voucher-dialog .voucher-input-container {
         display: flex;
         width: 100%;
-    }
-    .mega-dialog.voucher-dialog .voucher-input-container.hidden {
-        display: none;
     }
     .mega-dialog.voucher-dialog .voucher-input-container .fm-account-input {
         flex: 1;
@@ -6236,8 +6180,7 @@ body.de .mega-dialog.new-group-chat {
     .logged .mega-dialog.limited-bandwidth-dialog.achievements .overquota-bott-buttons button .registered {
         display: block;
     }
-    .mega-dialog.limited-bandwidth-dialog.hidden-bottom .dialog.overquota-bott-bl,
-    .mega-dialog.limited-bandwidth-dialog.dialog.overquota-bott-bl.hidden {
+    .mega-dialog.limited-bandwidth-dialog.hidden-bottom .dialog.overquota-bott-bl {
         display: none !important;
     }
     .mega-dialog.limited-bandwidth-dialog .dialog.transfer-overquota-txt span.countdown {
@@ -6923,9 +6866,6 @@ body.de .mega-dialog.new-group-chat {
         display: inline-block;
         --mask-color: var(--text-color-high);
     }
-    .mega-dialog.achievements-list-dialog .achieved-block.invitees .new-dialog-icon.hidden {
-        display: none;
-    }
     .mega-dialog.achievements-list-dialog .achieved-block.invitees .new-dialog-icon:hover {
         opacity: 1;
     }
@@ -6953,9 +6893,6 @@ body.de .mega-dialog.new-group-chat {
     .mega-dialog.achievements-list-dialog .achievements-cell:nth-child(3n) {
         -webkit-margin-end: 0;
         margin-inline-end: 0;
-    }
-    .mega-dialog.achievements-list-dialog .achievements-cell.hidden {
-        display: none;
     }
     .mega-dialog.achievements-list-dialog .achievements-cell .image-container {
         width: 128px;
@@ -7582,10 +7519,6 @@ body.de .mega-dialog.new-group-chat {
             padding: 4px 0;
             text-align: center;
             width: 302px;
-        }
-        .mega-dialog.verify-two-factor-login .warning-text-field.hidden {
-            display: block;
-            visibility: hidden;
         }
         .mega-dialog.verify-two-factor-login .loading-image img {
             width: 28px;
@@ -8220,9 +8153,6 @@ body.de .mega-dialog.new-group-chat {
     .mega-dialog.affiliate-redeem .withdraw-details .warning {
         display: flex;
     }
-    .mega-dialog.affiliate-redeem .withdraw-details .warning.hidden {
-        display: none;
-    }
     .mega-dialog.affiliate-redeem .withdraw-details .warning i {
         flex-shrink: 0;
         --icon-size: 24px;
@@ -8293,9 +8223,6 @@ body.de .mega-dialog.new-group-chat {
         margin-inline-start: 12px;
         cursor: pointer;
     }
-    .mega-dialog.affiliate-redeem .hidden {
-        display: none;
-    }
     .mega-dialog.affiliate-redeem .mega-input-title-ontop input {
         -webkit-padding-start: 8px;
         padding-inline-start: 8px;
@@ -8326,9 +8253,6 @@ body.de .mega-dialog.new-group-chat {
         color: white;
         margin-bottom: 36px;
     }
-    .mega-dialog.verify-phone footer .hidden {
-        display: none;
-    }
     .mega-dialog.verify-phone.suspended button.close,
     .mega-dialog.verify-phone.suspended .not-now-button {
         display: none;
@@ -8348,9 +8272,6 @@ body.de .mega-dialog.new-group-chat {
         font-size: 13px;
         cursor: pointer;
         display: block;
-    }
-    .mega-dialog.verify-phone .verify-ph-info .green-lnk.hidden {
-        display: none;
     }
     .mega-dialog.verify-phone .verify-ph-info .phone-num {
         color: var(--text-color-low);
@@ -8640,9 +8561,6 @@ body.de .mega-dialog.new-group-chat {
     .mega-dialog.recovery-key-dialog .recover-paste-block .right-section > button:not(.hidden) {
         min-width: auto;
     }
-    .mega-dialog.recovery-key-dialog .recover-paste-block button.hidden {
-        display: none;
-    }
     .mega-dialog.recovery-key-dialog i {
         --mask-color: var(--text-color-medium);
     }
@@ -8910,12 +8828,6 @@ body.de .mega-dialog.new-group-chat {
     .mega-dialog.user-management-add-user-dialog header {
         margin-bottom: 8px;
     }
-    .mega-dialog.user-management-add-user-dialog button.close.hidden {
-        display: none;
-    }
-    .mega-dialog.user-management-add-user-dialog header .graphic.hidden {
-        display: none;
-    }
     .mega-dialog.user-management-add-user-dialog .dialog-subtitle {
         text-align: center;
         margin-bottom: 0;
@@ -8946,9 +8858,6 @@ body.de .mega-dialog.new-group-chat {
         white-space: nowrap;
         display: inline-block;
     }
-    .mega-dialog.user-management-add-user-dialog button.toggle-optional-inputs .toggle-title.hidden {
-        display: none;
-    }
     .mega-dialog.user-management-add-user-dialog button.toggle-optional-inputs.show .close-icon {
         transform: rotate(180deg);
     }
@@ -8958,9 +8867,6 @@ body.de .mega-dialog.new-group-chat {
     .rtl .mega-dialog.user-management-add-user-dialog .default-button-no-border {
         float: right;
     }
-    .mega-dialog.user-management-add-user-dialog .invite-link-option.hidden {
-        display: none;
-    }
     .mega-dialog.user-management-add-user-dialog .invite-link-option .enable-pw-txt {
         color: var(--text-color-low);
         max-width: 270px;
@@ -8968,9 +8874,6 @@ body.de .mega-dialog.new-group-chat {
         -webkit-margin-end: 12px;
         margin-inline-end: 12px;
         display: inline-block;
-    }
-    .mega-dialog.user-management-add-user-dialog .invite-link-option .enable-pw-txt.hidden {
-        display: none;
     }
     .mega-dialog.user-management-add-user-dialog {
         width: 598px;
@@ -8985,9 +8888,6 @@ body.de .mega-dialog.new-group-chat {
         padding: 8px 12px;
         display: flex;
         justify-content: space-between;
-    }
-    .mega-dialog.user-management-add-user-dialog .verification-container.hidden {
-        display: none;
     }
     .mega-dialog.user-management-add-user-dialog .optional-input-container {
         display: none;
@@ -9175,6 +9075,17 @@ body.de .mega-dialog.new-group-chat {
     .mega-dialog.payment-reminder {
         width: 596px;
         text-align: center;
+    }
+
+/* end payment-reminder dialog */
+
+/* payment-reminder dialog */
+
+    .mega-dialog.payment-card-expired header .graphic {
+        width: 116px;
+        height: 80px;
+        --width: 116px;
+        --height: 80px;
     }
 
 /* end payment-reminder dialog */
@@ -9389,25 +9300,15 @@ body.de .mega-dialog.new-group-chat {
 
 /* registration-page-success */
 
-    .mega-dialog.registration-page-success header .hidden {
-        display: none;
-    }
-    .mega-dialog.registration-page-success footer.hidden {
-        display: none;
-    }
-    .mega-dialog.registration-page-success .reg-success-special {
-        display: none;
-    }
-    .mega-dialog.registration-page-success.special .reg-success-normal {
-        display: none;
-    }
-    .mega-dialog.registration-page-success.special .reg-success-special {
-        display: block;
-    }
+    .mega-dialog.registration-page-success .reg-success-special,
+    .mega-dialog.registration-page-success.special .reg-success-normal,
     .mega-dialog.registration-page-success .reg-success-special .reg-success-txt.chat-header,
     .mega-dialog.registration-page-success .reg-success-special .chat-message,
     .mega-dialog.registration-page-success.chatlink .reg-success-special .reg-success-txt {
         display: none;
+    }
+    .mega-dialog.registration-page-success.special .reg-success-special {
+        display: block;
     }
     .mega-dialog.registration-page-success.chatlink .reg-success-special .reg-success-txt.chat-header {
         display: block;
@@ -9422,9 +9323,6 @@ body.de .mega-dialog.new-group-chat {
     }
     .mega-dialog.registration-page-success .reg-resend-email-txt {
         font: var(--text-h3);
-    }
-    .mega-dialog.registration-page-success button.close.hidden {
-        display: none;
     }
 
 /* end registration-page-success */
@@ -9635,9 +9533,6 @@ body.de .mega-dialog.new-group-chat {
         justify-content: center;
         padding-top: 40px;
         width: 100%;
-    }
-    .mega-dialog.feedback-dialog footer.hidden {
-        display: none;
     }
 
 /* end feedback-dialog */

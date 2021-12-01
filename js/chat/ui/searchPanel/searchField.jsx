@@ -1,5 +1,5 @@
 import React from 'react';
-import { MegaRenderMixin } from '../../../stores/mixins';
+import { MegaRenderMixin } from '../../mixins';
 import { STATUS } from './searchPanel.jsx';
 import { LABEL } from './resultContainer.jsx';
 

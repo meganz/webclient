@@ -6,9 +6,6 @@
     overflow: hidden;
     position: relative;
 }
-.fm-recents.container.hidden {
-    display: none;
-}
 .fm-recents.header {
     font: var(--text-body1);
     border-bottom: 1px solid var(--stroke-grey-2);

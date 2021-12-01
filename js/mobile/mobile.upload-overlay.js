@@ -161,7 +161,7 @@ mobile.uploadOverlay = {
         var secondsElapsed = (currentTime - mobile.uploadOverlay.startTime) / 1000;
         var bytesPerSecond = secondsElapsed ? bytesLoaded / secondsElapsed : 0;
         var speed = numOfBytes(bytesPerSecond, 2, true);
-        var speedSizeRounded = Math.round(speed.size);
+        var speedSizeRounded = parseInt(speed.size);
         var speedText = speedSizeRounded + ' ' + speed.unit;
 
         // Display the upload progress and speed

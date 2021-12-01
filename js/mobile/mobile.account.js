@@ -22,6 +22,7 @@ mobile.account = {
         // Initialise functionality
         mobile.account.fetchAccountInformation($page);
         mobile.account.initUpgradeAccountButton($page);
+        mobile.account.initPaymentCardButton($page);
         mobile.account.initAchievementsButton($page);
         mobile.account.initRecoveryKeyButton($page);
         mobile.account.initCancelAccountButton($page);
@@ -271,8 +272,8 @@ mobile.account = {
                 mobile.account.initShowSubscriptionInfoOverlay($page);
             }
 
-            // Otherwise if ECP or Sabadell
-            else if (gatewayId === 16 || gatewayId === 17) {
+            // Otherwise if ECP, Sabadell, or Stripe
+            else if (gatewayId === 16 || gatewayId === 17 || gatewayId === 19) {
 
                 // Show a loading dialog while the data is fetched from the API
                 loadingDialog.show();
@@ -347,12 +348,17 @@ mobile.account = {
         var $cancelSubscriptionOverlay = $('.mobile.cancel-subscription-overlay');
         var $confirmButton = $cancelSubscriptionOverlay.find('.confirm-ok-button');
         var $closeButton = $cancelSubscriptionOverlay.find('.close-button');
+        const $paymentCard = $('.button-block.payment-card', $page);
+
+        // Display the proper PRO plan icon
+        $('.plan-icon', $cancelSubscriptionOverlay).addClass('pro' + u_attr.p);
 
         // On clicking/tapping the Cancel Subscription button
         $cancelSubscriptionButton.off('tap').on('tap', function() {
 
             // Show Cancel Subscription overlay
             $cancelSubscriptionOverlay.removeClass('hidden');
+            $('.mobile.my-account-page').addClass('hidden');
             return false;
         });
 
@@ -372,6 +378,10 @@ mobile.account = {
                     // Hide the Cancel Subscription button and overlay
                     $cancelSubscriptionButton.addClass('hidden');
                     $cancelSubscriptionOverlay.addClass('hidden');
+                    $('.mobile.my-account-page').removeClass('hidden');
+                    $paymentCard.addClass('hidden');
+
+                    M.account.lastupdate = 0;
                 }
             });
 
@@ -384,6 +394,7 @@ mobile.account = {
 
             // Hide the overlay
             $cancelSubscriptionOverlay.addClass('hidden');
+            $('.mobile.my-account-page').removeClass('hidden');
             return false;
         });
 
@@ -506,6 +517,35 @@ mobile.account = {
             // Load the Session History page
             loadSubPage('fm/account/history');
             return false;
+        });
+    },
+
+    /**
+     * Initialize the Payment card button
+     * @param {Object} $page The jQuery selector for the current page
+     */
+    initPaymentCardButton: function($page) {
+        'use strict';
+
+        M.accountData((account) => {
+
+            if ((u_attr.p || u_attr.b) && account.stype === 'S'
+                && ((Array.isArray(account.sgw) && account.sgw.includes('Stripe'))
+                    || (Array.isArray(account.sgwids)
+                        && account.sgwids.includes((addressDialog || {}).gatewayId_stripe || 19)))) {
+
+                const $cardBlock = $('.button-block.payment-card', $page);
+
+                // On clicking/tapping the button
+                $cardBlock.rebind('tap', () => {
+
+                    // Load the Session History page
+                    loadSubPage('fm/account/paymentcard');
+                    return false;
+                });
+
+                $cardBlock.removeClass('hidden');
+            }
         });
     },
 

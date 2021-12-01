@@ -141,7 +141,7 @@ function topMenu(close) {
         $.topMenu = '';
         $topMenuBtn.removeClass('menu-open');
 
-        $topMenu.addClass('hidden');
+        $topMenu.addClass('o-hidden');
 
         // If on mobile, hide the menu and also remove the close click/tap handler on the dark background overlay
         if (is_mobile) {
@@ -153,7 +153,7 @@ function topMenu(close) {
     else {
         $.topMenu = 'topmenu';
         $topMenuBtn.addClass('menu-open');
-        $topMenu.removeClass('hidden');
+        $topMenu.removeClass('o-hidden');
 
         if (u_type) {
             const $menuAvatar = $('.avatar-block', $topMenu);
@@ -321,7 +321,7 @@ function topPopupAlign(button, popup, topPos) {
     };
 
     // If top menu is opened - set timeout to count correct positions
-    if (!$('.top-menu-popup', 'body').hasClass('hidden')) {
+    if (!$('.top-menu-popup').hasClass('o-hidden') || $('body').hasClass('hidden')) {
         setTimeout(function () {
             $.popupAlign();
         }, 250);
@@ -1050,6 +1050,11 @@ function init_page() {
     else if (is_mobile && u_type && page === 'fm/account/history') {
         parsepage(pages['mobile']);
         mobile.account.history.init();
+        return false;
+    }
+    else if (is_mobile && u_type && page === 'fm/account/paymentcard') {
+        parsepage(pages.mobile);
+        mobile.account.paymentCard.init();
         return false;
     }
     else if (is_mobile && u_type
@@ -2582,7 +2587,7 @@ function topmenuUI() {
         $menuAuthButtons.removeClass('hidden');
 
         if (u_type === 0) {
-            $('.top-menu-item.login', $topMenu).addClass('hidden');
+            $('.top-menu-item.login', $topMenu).addClass('o-hidden');
             $menuLogoutButton.removeClass('hidden');
         }
     }

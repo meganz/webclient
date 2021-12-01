@@ -1,6 +1,6 @@
 import React from 'react';
 import utils from './../../ui/utils.jsx';
-import {MegaRenderMixin, timing} from './../../stores/mixins.js';
+import {MegaRenderMixin, timing} from './../mixins';
 import {Button} from './../../ui/buttons.jsx';
 import ModalDialogsUI from './../../ui/modalDialogs.jsx';
 import CloudBrowserModalDialog from './../../ui/cloudBrowserModalDialog.jsx';
@@ -23,51 +23,45 @@ import ComposedTextArea from "./composedTextArea.jsx";
 import Loading from "./meetings/workflow/loading.jsx";
 import Join from "./meetings/workflow/join";
 
-var ENABLE_GROUP_CALLING_FLAG = true;
-
-// eslint-disable-next-line id-length
-var MAX_USERS_CHAT_PRIVATE = 100;
+const ENABLE_GROUP_CALLING_FLAG = true;
+const MAX_USERS_CHAT_PRIVATE = 100;
 
 export class JoinCallNotification extends MegaRenderMixin {
     customIsEventuallyVisible() {
         return this.props.chatRoom.isCurrentlyActive;
     }
-    componentDidUpdate() {
-        super.componentDidUpdate();
-        var $node = $(this.findDOMNode());
-        var room = this.props.chatRoom;
-        $('button.joinActiveCall', $node)
-            .rebind('click.joinCall', function(e) {
-                room.joinCall();
-                e.preventDefault();
-                return false;
-            });
-    }
+
     render() {
-        let room = this.props.chatRoom;
-        if (room.activeCall) {
+        const { chatRoom } = this.props;
+
+        if (chatRoom.activeCall || window.sfuClient) {
             return null;
         }
 
         if (!megaChat.hasSupportForCalls) {
-            return <div className="in-call-notif yellow join">
-                <i className="sprite-fm-mono icon-phone"/>
-                There is an active call in this room, but your browser does not support calls.
-            </div>;
+            return (
+                <div className="in-call-notif yellow join">
+                    <i className="sprite-fm-mono icon-phone"/>
+                    There is an active call in this room, but your browser does not support calls.
+                </div>
+            );
         }
-        else {
-            let translatedCode = escapeHTML(l[20460] || "There is an active group call. [A]Join[/A]");
-            translatedCode = translatedCode
-                .replace("[A]", '<button class="mega-button positive joinActiveCall small">')
-                .replace('[/A]', '</button>');
 
-            return <div className="in-call-notif neutral join">
+        return (
+            <div className="in-call-notif neutral join">
                 <i className="sprite-fm-mono icon-phone"/>
-                <span dangerouslySetInnerHTML={{__html: translatedCode}}></span>
-            </div>;
-        }
+                <span
+                    onClick={() => chatRoom.joinCall()}
+                    dangerouslySetInnerHTML={{
+                        __html: escapeHTML(l[20460] || 'There is an active group call. [A]Join[/A]')
+                            .replace('[A]', '<button class="mega-button positive joinActiveCall small">')
+                            .replace('[/A]', '</button>')
+                    }}
+                />
+            </div>
+        );
     }
-};
+}
 
 export class ConversationRightArea extends MegaRenderMixin {
     static defaultProps = {
@@ -415,8 +409,12 @@ export class ConversationRightArea extends MegaRenderMixin {
                             </span>
                         </div> : <div></div>}
 
-                        <AccordionPanel className="have-animation buttons" title={l[7537]} key="options"
-                            chatRoom={room}>
+                        <AccordionPanel
+                            key="options"
+                            className="have-animation buttons"
+                            title={l[7537]}
+                            chatRoom={room}
+                            sfuClient={window.sfuClient}>
                             <div>
                             {addParticipantBtn}
                             {startAudioCallButton}
@@ -1895,7 +1893,7 @@ function isStartCallDisabled(room) {
     if (!megaChat.hasSupportForCalls) {
         return true;
     }
-    return !room.isOnlineForCalls() || room.isReadOnly() || !room.chatId || room.activeCall ||
+    return !room.isOnlineForCalls() || room.isReadOnly() || !room.chatId || room.activeCall || window.sfuClient ||
         (
             (room.type === "group" || room.type === "public")
             && !ENABLE_GROUP_CALLING_FLAG

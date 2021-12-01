@@ -84,7 +84,7 @@ var bottompage = {
         bottompage.initBackToScroll();
         bottompage.initScrollToContent();
 
-        // Show/hide Referal Program and Pricing menu items for different acctount types
+        // Show/hide Referral Program and Pricing menu items for different account types
         bottompage.changeMenuItemsList($content);
         localeImages($content);
     },
@@ -108,11 +108,11 @@ var bottompage = {
 
         // Show/Hide Pricing link for Business sub accounts and admin expired
         if (u_attr && u_attr.b && u_attr.b.s !== -1) {
-            $('.bottom-menu .pro', $bottomMenu).addClass('hidden');
+            $('a.link.pro', $bottomMenu).addClass('hidden');
             $('.pages-menu.link.pro', $pagesMenu).addClass('hidden');
         }
         else {
-            $('.bottom-menu .pro', $bottomMenu).removeClass('hidden');
+            $('a.link.pro', $bottomMenu).removeClass('hidden');
             $('.pages-menu.link.pro', $pagesMenu).removeClass('hidden');
         }
     },

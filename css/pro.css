@@ -395,8 +395,7 @@ i.pricing-sprite,
     display: block;
 }
 .pricing-page.top-header.not-logged,
-.not-logged .pricing-page.top-header.default,
-.not-logged .pricing-page.top-header.hidden {
+.not-logged .pricing-page.top-header.default {
     display: none;
 }
 .pricing-page.medium-txt {
@@ -1610,9 +1609,6 @@ body:not(.mobile) .pricing-page.slider-dot:hover {
     box-sizing: border-box;
     max-width: calc(100% - 2px);
 }
-.orange-notification.body.hidden {
-    display: none;
-}
 .orange-notification.cell {
     display: table-cell;
     vertical-align: middle;
@@ -1793,9 +1789,6 @@ body:not(.mobile) .pricing-page.slider-dot:hover {
     padding-right: 14px;
     margin-left: 17px;
 }
-.payment-duration .save-money.hidden {
-    display: none;
-}
 .payment-duration .opt-note {
     display: none;
 }
@@ -1838,8 +1831,7 @@ body:not(.mobile) .pricing-page.slider-dot:hover {
 .payment-duration .membership-radio-label .price {
     display: inline-block;
 }
-.payment-duration .membership-radio-label.discounted .hyphen,
-.payment-duration .membership-radio-label .hidden {
+.payment-duration .membership-radio-label.discounted .hyphen {
     display: none;
 }
 .provider-details .provider-icon {
@@ -1905,9 +1897,6 @@ body:not(.mobile) .pricing-page.slider-dot:hover {
     margin: 12px 0 0 0;
     padding: 8px;
     transition: all 200ms ease-in-out 0s;
-}
-.payment-section .subscription-instructions.hidden {
-    display: none;
 }
 
 /* Promotion Voucher code, I will remove once I have more time */

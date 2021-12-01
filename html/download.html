@@ -208,11 +208,6 @@
                                                 <span>[$233]</span>
                                             </div>
 
-                                            <div class="download overquoata-error left hidden">
-                                                <i class="semi-small-icon icons-sprite white-warning"></i>
-                                                <span>[$233]</span>
-                                            </div>
-
                                             <div class="clear"></div>
                                         </div>
                                         <div class="download speed-block">
@@ -245,25 +240,6 @@
 
                         </div>
 
-
-                        <div class="download transfer-buttons">
-                            <button class="mega-button large download share-content-button hidden">
-                                <i class="semi-small-icon icons-sprite linked"></i>
-                                <span>[$1344]</span>
-                            </button>
-                            <button class="mega-button download see-our-plans positive hidden">
-                                <span>[$16353]</span>
-                            </button>
-                            <button class="mega-button branded-red download create-account-button hidden">
-                                <span>[$16352]</span>
-                            </button>
-                            <button class="mega-button positive download get-more-bonuses hidden">
-                                <span>[$16309]</span>
-                            </button>
-                        </div>
-
-
-
                         <!-- Remove hidden class from over-transfer-quota when a user has gone over the quota allowance -->
                         <div class="download over-transfer-quota hidden">
                             <div class="download overquota-message-block">
@@ -271,10 +247,14 @@
                                     [$7100]
                                 </div>
                             </div>
+                            <div class="download overquoata-error">
+                                <i class="sprite-fm-mono icon-exclamation-filled"></i>
+                                <span>[$233]</span>
+                            </div>
                             <div class="download video-transfer-buttons">
-                                <!-- [$16309] - Get more bonuses -->
-                                <!-- [$16352] - Register for bonuses -->
-                                <!-- [$16353] - See our plans -->
+                                <button class="mega-button resume-download js-resume-download">
+                                    <span>[$1649]</span>
+                                </button>
                                 <button class="mega-button positive see-our-plans">
                                     <span>[$16353]</span>
                                 </button>
@@ -284,21 +264,6 @@
                             </div>
                             <div class="clear"></div>
                         </div>
-                    </div>
-                </div>
-
-                <!-- Please add "visible" classname -->
-                <!-- Please add "ff"/"safari"/"opera"/"edge"/"ie" classname -->
-                <div class="download warning-block usual">
-                    <i class="download big-icon"></i>
-                    <!-- Please Change text according browser -->
-                    <div class="table-cell">
-                        <span class="txt">[$16866]</span>
-                        <button class="mega-button right">
-                            <span>[$20697]</span>
-                        </button>
-                        <a class="clickurl underlined right" href="/sync">[$8512]</a>
-                        <div class="clear"></div>
                     </div>
                 </div>
 
@@ -341,17 +306,20 @@
         </section>
         <!-- Please add "visible" classname !-->
         <!-- Please add "ff"/"safari"/"opera"/"edge"/"ie" classname !-->
-        <div class="download warning-block video-warning">
-            <i class="download big-icon"></i>
-            <!-- Please Change text according browser !-->
-            <div class="table-cell">
-                <span class="txt">[$16866]</span>
-            </div>
-            <div class="table-cell">
-                <div  class="fm-dialog-close medium"></div>
-                <button class="mega-button">
-                    <span>[$20697]</span>
-                </button>
+        <div class="download warning-block">
+
+            <div  class="fm-dialog-close medium"></div>
+            <div class="content-wrapper">
+                <i class="download big-icon"></i>
+                <div class="content">
+                    <span class="txt">[$16866]</span>
+                </div>
+                <div>
+                    <button class="mega-button">
+                        <span>[$20697]</span>
+                    </button>
+                </div>
+
             </div>
         </div>
 

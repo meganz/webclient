@@ -247,7 +247,6 @@ function dl_g(res, ctx) {
                 $pageScrollBlock.addClass('resumable');
                 $('.download.state-text.resume').addClass('hidden');
                 $('.download.state-text.save').removeClass('hidden');
-                $('.download.transfer-buttons a').addClass('hidden');
 
                 $('.js-save-download').removeClass('hidden');
 
@@ -427,10 +426,8 @@ function dl_g(res, ctx) {
                                         setStandardDownloadOptions();
                                         $('.js-default-download').trigger('click');
                                     }
-                                    else {
-                                        dlPageStartDownload(true);
-                                    }
                                 }, true);
+                                dlPageStartDownload(true);
                             }
                             else {
                                 dlmanager.showMEGASyncOverlay(fdl_filesize > maxDownloadSize);
@@ -643,6 +640,7 @@ function dl_g(res, ctx) {
             // Load the missing file decryption key dialog for mobile
             parsepage(pages['mobile']);
             mobile.decryptionKeyOverlay.show(dlpage_ph, false, key);
+            fm_hideoverlay();
             return false;
         }
         else {
@@ -732,13 +730,11 @@ function dlPageStartDownload(isDlWithMegaSync) {
     $downloadPage.find('.standalone-download-message').removeClass('hidden');
     $downloadPage.find('.download.eta-block .dark-numbers').text('');
     $downloadPage.find('.download.eta-block .light-txt').text(l[1042] + '\u2026');
-    $('.download.transfer-buttons', $downloadPage).removeClass('hidden');
     $('.download.warning-block').removeClass('visible');
 
     if (isDlWithMegaSync) {
         $('.download .pause-transfer').addClass('hidden');
         $('.download.speed-block .dark-numbers').css('display', 'none');
-        $('.download.transfer-buttons', $downloadPage).addClass('hidden');
         return;
     }
 
@@ -821,8 +817,6 @@ function dlprogress(fileid, perc, bytesloaded, bytestotal,kbps, dl_queue_num)
     $('.download.main-transfer-error', $dowloadWrapper).addClass('hidden');
     $('.download.overquoata-error', $dowloadWrapper).addClass('hidden');
     $('.download.state-text', $dowloadWrapper).addClass('hidden');
-    $('.see-our-plans, .get-more-bonuses, .create-account-button.inline', $dowloadWrapper)
-        .addClass('hidden');
 
     if (dl_queue[dl_queue_num]) {
         if (!dl_queue[dl_queue_num].st) {

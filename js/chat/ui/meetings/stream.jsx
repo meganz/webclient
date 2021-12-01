@@ -1,5 +1,5 @@
 import React from 'react';
-import { MegaRenderMixin } from '../../../stores/mixins';
+import { MegaRenderMixin } from '../../mixins';
 import Call from './call.jsx';
 import StreamHead from './streamHead.jsx';
 import StreamNode from './streamNode.jsx';

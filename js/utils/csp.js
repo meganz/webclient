@@ -141,9 +141,11 @@ lazy(self, 'csp', () => {
             return value & bitdef[ns][opt[1]];
         },
 
-        showCookiesDialog: promisify((resolve, reject, step, chg) => M.safeShowDialog(tag, () => {
+        showCookiesDialog: promisify((resolve, reject, step, chg) => {
+            const banner = document.querySelector('.cookie-banner');
             const dialog = document.querySelector('.cookie-dialog');
-            if (!dialog) {
+
+            if (!banner || !dialog) {
                 return reject(tag);
             }
 
@@ -151,9 +153,11 @@ lazy(self, 'csp', () => {
                 value = 0;
                 step = null;
             }
+
+            const $banner = $(banner);
+            const $dialog = $(dialog);
             const first = !csp.has('essential');
             const qsa = (sel, cb) => dialog.querySelectorAll(sel).forEach(cb);
-            const hideBlocks = () => qsa('.content-block', e => e.classList.remove('active'));
 
             const forEachCell = (cb, p = '') => qsa('.settings-cell' + p, cell => {
                 const toggle = cell.querySelector('.mega-switch');
@@ -167,62 +171,50 @@ lazy(self, 'csp', () => {
             });
 
             const showBlock = (step) => {
-                const qsa = (sel, cb) => step.querySelectorAll(sel).forEach(cb);
+                const qsa = (sel, cb) => dialog.querySelectorAll(sel).forEach(cb);
                 const all = (sel = '.current') => {
                     sel += ' .mega-switch:not(.all)';
-                    const total = step.querySelectorAll(sel).length;
+                    const total = dialog.querySelectorAll(sel).length;
 
                     if (total) {
-                        const active = step.querySelectorAll(sel + '.toggle-on').length;
+                        const active = dialog.querySelectorAll(`${sel}.toggle-on`).length;
 
-                        const toggleSwitch = step.querySelector(sel.split(':')[0] + '.all');
+                        const toggleSwitch = dialog.querySelector(`${sel.split(':')[0]}.all`);
                         toggleSwitch.classList[total === active ? 'add' : 'remove']('toggle-on');
                         toggleSwitch.setAttribute('aria-checked', total === active ? 'true' : 'false');
                     }
                 };
 
-                hideBlocks();
-                step = dialog.querySelector('.content-block.' + step);
-                step.classList.add('active');
+                if (step === 'step1') {
 
-                // Hide the back button
-                let tmp = step.querySelector('.close-settings');
-                if (tmp) {
-                    if (!first && step.classList.contains('step2')) {
-                        tmp.classList.add('hidden');
+                    if ($.dialog === tag) {
+
+                        closeDialog();
                     }
-                    else {
-                        tmp.classList.remove('hidden');
-                    }
+
+                    banner.classList.remove('hidden');
+                    all('.saved');
+                    all('.current');
+
+                    return false;
                 }
-                tmp = !chg;
 
-                if (tmp) {
-                    step.classList.remove('active-saved-cookies');
+                banner.classList.add('hidden');
+                M.safeShowDialog(tag, $dialog);
 
-                    if (step.classList.contains('step2')) {
-                        step.querySelector('.save-settings').classList.remove('hidden');
-                        step.querySelector('.use-saved-settings').classList.add('hidden');
-                        step.querySelector('.use-current-settings').classList.add('hidden');
+                if (chg) {
+                    dialog.classList.add('active-saved-cookies');
+                    dialog.querySelector('.save-settings').classList.add('hidden');
+                    dialog.querySelector('.close-settings').classList.add('hidden');
+                    dialog.querySelector('.use-saved-settings').classList.remove('hidden');
+                    dialog.querySelector('.use-current-settings').classList.remove('hidden');
 
-                        qsa('.settings-cell.current', e => e.classList.remove('hidden'));
-                    }
-                }
-                else {
-                    step.classList.add('active-saved-cookies');
-
-                    if (step.classList.contains('step2')) {
-                        step.querySelector('.save-settings').classList.add('hidden');
-                        step.querySelector('.use-saved-settings').classList.remove('hidden');
-                        step.querySelector('.use-current-settings').classList.remove('hidden');
-
-                        forEachCell((type, toggle) => {
-                            toggle.classList[chg & bitdef.cs[type[1]] ? 'add' : 'remove']('toggle-on');
-                        }, '.saved');
-                    }
+                    forEachCell((type, toggle) => {
+                        toggle.classList[chg & bitdef.cs[type[1]] ? 'add' : 'remove']('toggle-on');
+                    }, '.saved');
 
                     if (is_mobile) {
-                        const $tabs = $('.settings-tab', step);
+                        const $tabs = $('.settings-tab', dialog);
 
                         $tabs.rebind('click.tabs', function() {
                             $tabs.removeClass('active');
@@ -232,26 +224,40 @@ lazy(self, 'csp', () => {
                                 qsa('.settings-cell.current', e => e.classList.add('hidden'));
                                 qsa('.settings-cell.saved', e => e.classList.remove('hidden'));
 
-                                step.querySelector('.use-current-settings').classList.add('hidden');
-                                step.querySelector('.use-saved-settings').classList.remove('hidden');
+                                dialog.querySelector('.use-current-settings').classList.add('hidden');
+                                dialog.querySelector('.use-saved-settings').classList.remove('hidden');
                             }
                             else {
                                 qsa('.settings-cell.saved', e => e.classList.add('hidden'));
                                 qsa('.settings-cell.current', e => e.classList.remove('hidden'));
 
-                                step.querySelector('.use-saved-settings').classList.add('hidden');
-                                step.querySelector('.use-current-settings').classList.remove('hidden');
+                                dialog.querySelector('.use-saved-settings').classList.add('hidden');
+                                dialog.querySelector('.use-current-settings').classList.remove('hidden');
                             }
                         });
 
-                        if (step.classList.contains('step2')) {
-                            step.querySelector('.use-current-settings').classList.add('positive');
-                        }
+                        dialog.querySelector('.use-current-settings').classList.add('positive');
                         $tabs.filter('[data-type="current"]').trigger('click');
                     }
                 }
+                else {
+                    dialog.classList.remove('active-saved-cookies');
+                    dialog.querySelector('.save-settings').classList.remove('hidden');
+                    dialog.querySelector('.close-settings').classList.remove('hidden');
+                    dialog.querySelector('.use-saved-settings').classList.add('hidden');
+                    dialog.querySelector('.use-current-settings').classList.add('hidden');
 
-                $('.mega-switch', step).rebind('mousedown.toggle', function() {
+                    qsa('.settings-cell.current', e => e.classList.remove('hidden'));
+
+                    if (first) {
+                        dialog.querySelector('.close-settings').classList.remove('hidden');
+                    }
+                    else {
+                        dialog.querySelector('.close-settings').classList.add('hidden');
+                    }
+                }
+
+                $('.mega-switch', dialog).rebind('mousedown.toggle', function() {
                     if (!this.classList.contains('disabled')) {
 
                         if (this.classList.contains('all')) {
@@ -279,20 +285,28 @@ lazy(self, 'csp', () => {
                 all('.current');
                 onIdle(clickURLs);
 
-                if ('Ps' in window) {
-                    const scroll = step.querySelector('.scrollable-block');
+                if (!is_mobile) {
+
+                    const scroll = dialog.querySelector('.scrollable-block');
+
                     onIdle(() => {
                         scroll.scrollTop = 0;
                         Ps[scroll.classList.contains('ps-container') ? 'update' : 'initialize'](scroll);
                     });
                 }
+
                 return false;
             };
 
-            const $dialog = $(dialog);
-
             const save = async(ev) => {
-                onIdle(() => $.dialog === tag && closeDialog());
+                onIdle(() => {
+
+                    if ($.dialog === tag) {
+
+                        closeDialog();
+                    }
+                    banner.classList.add('hidden');
+                });
                 $('.fm-dialog-overlay').off('click.csp');
                 $('*', $dialog.off()).off();
                 delay.cancel('csp.timer');
@@ -330,33 +344,29 @@ lazy(self, 'csp', () => {
                 step = 'step2';
             }
 
+            forEachCell((type, toggle) => toggle.classList[csp.has(type) ? 'add' : 'remove']('toggle-on'), '.current');
+            showBlock(step || 'step1');
+
+            $('.accept-cookies', $banner).rebind('click.ac', (ev) => {
+                forEachCell((type, toggle) => toggle.classList.add('toggle-on'));
+                return save(ev);
+            });
+            $('.cookie-settings', $banner).rebind('click.ac', () => showBlock('step2'));
+
+            // $('.fm-dialog-overlay').rebind('click.csp', save);
+            $('.use-saved-settings', $dialog).rebind('click.ac', () => save(true));
+            $('.save-settings, .use-current-settings', $dialog).rebind('click.ac', save);
+            $('.close-settings', $dialog).rebind('click.ac', () => showBlock('step1'));
+            $('.cookie-settings', $dialog).rebind('click.ac', () => showBlock('step2'));
+
             console.assert(!delay.has('csp.timer'));
             delay('csp.timer', () => {
-                if (!elementIsVisible(dialog)) {
+                if (!elementIsVisible(banner) && !elementIsVisible(dialog)) {
                     // Some extension did hide the dialog (?)
                     save(-0xBADF);
                 }
             }, 7654);
-
-            forEachCell((type, toggle) => toggle.classList[csp.has(type) ? 'add' : 'remove']('toggle-on'), '.current');
-            showBlock(step || 'step1');
-
-            $('.accept-cookies', $dialog).rebind('click.ac', (ev) => {
-                forEachCell((type, toggle) => toggle.classList.add('toggle-on'));
-                return save(ev);
-            });
-
-            $dialog.rebind('dialog-closed.csp', save);
-            // $('.fm-dialog-overlay').rebind('click.csp', save);
-            $('.use-saved-settings', $dialog).rebind('click.ac', () => save(true));
-            $('.save-settings, .use-current-settings', $dialog).rebind('click.ac', save);
-
-            $('.close-settings', $dialog).rebind('click.ac', () => showBlock('step1'));
-            $('.cookie-settings', $dialog).rebind('click.ac', () => showBlock('step2'));
-            $('.thirdparty.details', $dialog).rebind('click.ac', () => showBlock('step3'));
-
-            return $dialog;
-        }))
+        })
     });
 });
 

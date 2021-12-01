@@ -3,7 +3,7 @@ import { WhosTyping } from "./whosTyping.jsx";
 import { TypingArea } from "./typingArea.jsx";
 import { Button } from "../../ui/buttons.jsx";
 import { Dropdown, DropdownItem } from "../../ui/dropdowns.jsx";
-import { MegaRenderMixin } from "../../stores/mixins.js";
+import { MegaRenderMixin } from "../mixins";
 
 export default class ComposedTextArea extends MegaRenderMixin {
     render() {

@@ -933,6 +933,11 @@ mBroadcaster.once('boot_done', function populate_l() {
     l[1993] = l[1993].replace('[A]', '<a href="/register" class="clickurl">').replace('[/A]', '</a>');
 
     l[5931] = l[5931].replace('[A]', '<a href="/fm/account" class="clickurl">').replace('[/A]', '</a>');
+    l[6216] = l[6216]
+        .replace('[A1]', '<a href="/fm/account/security/change-email" class="clickurl">')
+        .replace('[/A1]', '</a>')
+        .replace('[A2]', '<a href="mailto:support@mega.nz">')
+        .replace('[/A2]', '</a>');
     l[6976] = l[6976].replace('%1', '<span class="plan-name"></span>');
     l[7156] = l[7156].replace('[A]', '<a href="/mobile" class="clickurl">').replace('[/A]', '</a>');
     l[7002] = l[7002].replace('[A]', '<a href="/contact" class="clickurl">').replace('[/A]', '</a>');
@@ -1285,6 +1290,15 @@ mBroadcaster.once('boot_done', function populate_l() {
     l['23062.k'] = l[23062].replace('[%s]', l[7049]);
     l[23066] = l[23066].replace('[A]', '<a class="clickurl" href="/security" '
         + 'target="_blank" rel="noopener noreferrer">').replace('[/A]', '</a>');
+    l[23067] = l[23067].replace('[S]', '<span class="num">').replace('[/S]', '</span>')
+        .replace('%1', '<span></span>');
+    l[23068] = l[23068].replace('[S]', '<span class="num">').replace('[/S]', '</span>')
+        .replace('%1', '<span></span>');
+    l[23069] = l[23069].replace('[S]', '<span class="num">').replace('[/S]', '</span>')
+        .replace('%1', '<span></span>');
+    l.about_countries_info_text = l.about_countries_info_text
+        .replace('[S]', '<span class="num">').replace('[/S]', '</span>')
+        .replace('%1', '<span></span>');
     l[23075] = l[23075].replace('[A1]', '<a class="clickurl" href="/terms" '
         + 'target="_blank" rel="noopener noreferrer">').replace('[/A1]', '</a>')
         .replace('[A2]', '<a class="clickurl" href="/takedown" '
@@ -1444,10 +1458,14 @@ mBroadcaster.once('boot_done', function populate_l() {
     l.extensions_avbl_desktop = escapeHTML(l.extensions_avbl_desktop).replace('[A1]', '<a href="" class="red a1"></a>');
     l.extensions_avbl_mobile = escapeHTML(l.extensions_avbl_mobile).replace(/\[S]/g, '<strong>')
         .replace(/\[\/S]/g, '</strong>');
+    l.cookie_banner_txt = escapeHTML(l.cookie_banner_txt)
+        .replace('[A]', '<a href="/cookie" class="clickurl" target="_blank">')
+        .replace('[/A]', '</a>');
+    l.payment_card_almost_exp = l.payment_card_almost_exp
+        .replace('[A]', '<a>').replace('[/A]', '</a>');
+    l.payment_card_exp = l.payment_card_exp
+        .replace('[A]', '<a>').replace('[/A]', '</a>');
 
-    l.about_vision_desc = escapeHTML(l.about_vision_desc)
-        .replace(/\[S]/g, '<span>')
-        .replace(/\[\/S]/g, '</span>');
     l.about_vision_title = escapeHTML(l.about_vision_title)
         .replace(/\[S]/g, '<span>')
         .replace(/\[\/S]/g, '</span>');
@@ -1458,6 +1476,8 @@ mBroadcaster.once('boot_done', function populate_l() {
     l.jobs_opportunity_invert_card_desc = escapeHTML(l.jobs_opportunity_invert_card_desc)
         .replace(/\[BR]/g, '<br>');
     l.jobs_grow_invert_card_desc = escapeHTML(l.jobs_grow_invert_card_desc)
+        .replace('[BR]', '<br>');
+    l.about_job_expressions_txt = escapeHTML(l.about_job_expressions_txt)
         .replace('[BR]', '<br>');
     var common = [
         15536, 16106, 16107, 16119, 16120, 16123, 16124, 16135, 16136, 16137, 16138, 16304, 16313, 16315, 16316,

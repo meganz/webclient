@@ -621,17 +621,17 @@ var versiondialogid;
                     });
 
                     $('.fm-versioning .pad .top-column button.js-clear-previous')
-                    .rebind('click', function() {
+                        .rebind('click', function() {
 
-                        if (!$(this).hasClass('disabled')) {
-                            msgDialog('remove', l[1003], l[17154], l[1007], function(e) {
-                                if (e) {
-                                    fileversioning.clearPreviousVersions(fh);
-                                    current_sel_version = fh;
-                                }
-                            });
-                        }
-                    });
+                            if (!$(this).hasClass('disabled')) {
+                                msgDialog('remove', l[1003], mega.icu.format(l[17154], 1), l[1007], e => {
+                                    if (e) {
+                                        fileversioning.clearPreviousVersions(fh);
+                                        current_sel_version = fh;
+                                    }
+                                });
+                            }
+                        });
                     refreshHeader(fh);
                     pd.removeClass('hidden');
                     // Init scrolling

@@ -1,6 +1,6 @@
 import {Button} from "../../../../buttons.jsx";
 import React from "react";
-import {MegaRenderMixin} from "../../../../../stores/mixins";
+import {MegaRenderMixin} from "../../../../../chat/mixins";
 
 export class ColumnContactRequestsSentBtns extends MegaRenderMixin {
     static sortable = true;

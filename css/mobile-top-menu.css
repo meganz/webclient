@@ -16,13 +16,8 @@
     border-left: 1px solid #EDEDED;
     box-sizing: border-box;
 }
-.top-menu-popup.hidden {
+.mobile.top-menu-popup.o-hidden {
     right: -257px;
-    display: block;
-    opacity: 0;
-}
-.mobile.top-menu-popup.hidden {
-    display: block !important;
     width: 0;
 }
 .mobile .top-menu-scroll {

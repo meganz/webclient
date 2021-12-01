@@ -1,5 +1,5 @@
 import React from 'react';
-import {MegaRenderMixin} from "../../../../stores/mixins.js";
+import {MegaRenderMixin} from "../../../../chat/mixins";
 import {GenericNodePropsComponent} from "./genericNodePropsComponent";
 
 export class GenericTableHeader extends MegaRenderMixin {

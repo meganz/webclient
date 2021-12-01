@@ -11,7 +11,7 @@ export default class Contact extends AbstractGenericMessage {
 
     _handleAddContact = (contactEmail) => {
         let exists = false;
-
+        const ownerEmail = M.u[u_handle] ? M.u[u_handle].m : u_attr.email;
         Object.keys(M.opc).forEach(function(k) {
             if (!exists && M.opc[k].m === contactEmail && !M.opc[k].hasOwnProperty('dts')) {
                 exists = true;
@@ -28,7 +28,7 @@ export default class Contact extends AbstractGenericMessage {
             );
         }
         else {
-            M.inviteContact(M.u[u_handle].m, contactEmail);
+            M.inviteContact(ownerEmail, contactEmail);
             closeDialog();
             msgDialog(
                 'info',
@@ -122,7 +122,7 @@ export default class Contact extends AbstractGenericMessage {
                         </>
                     )}
 
-                    {!HAS_RELATIONSHIP &&  !is_eplusplus && (
+                    {u_type && u_type > 2 && !HAS_RELATIONSHIP &&  !is_eplusplus && (
                         <DropdownItem
                             icon="sprite-fm-mono icon-add"
                             label={l[71] /* `Add contact` */}

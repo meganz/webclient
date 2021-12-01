@@ -2,6 +2,7 @@ const eventsMinDistance = 80;
 const slideIndex = 1;
 let resizeTimer;
 let carouselInterval;
+const persistTime = 3600000; // 1hr
 
 /**
  * Bottom pages functionality
@@ -22,38 +23,21 @@ var aboutus = {
         if ($timelines.length > 0) {
             aboutus.initTimeline($timelines);
         }
-        if (carouselInterval) {
-            clearInterval(carouselInterval);
-        }
         aboutus.setOverLayText($page);
-        aboutus.initCarouselAnimation($page);
-        aboutus.initHoverEffects($page);
         aboutus.setLangContentInDOM($page);
+        aboutus.initCollapsible($page);
 
         // Event to handle resizing
         $(window).resize(() => {
             clearTimeout(resizeTimer);
             resizeTimer = setTimeout(aboutus.resizeTimelineHandler.bind(null, $page), 100);
         });
+
+        aboutus.fetchTeamTailorJobsWithCache(persistTime, $page).then(() => {
+            aboutus.initHoverEffects($page);
+        });
     },
 
-    // fetchCMS: function() {
-    //     "use strict";
-    //     CMS.scope = 'team';
-    //     if (this.members) {
-    //         this.insMembersInHTML(this.members);
-    //     } else {
-    //         var self = this;
-    //         CMS.get('team_en', function (err, data) {
-    //             if (err) {
-    //                 console.error('Failed to fetch team data');
-    //                 return false;
-    //             }
-    //             self.members = data.object;
-    //             self.insMembersInHTML(data.object);
-    //         });
-    //     }
-    // },
     /**
      * Show blocks related to subpage name
      * @param {Object} $page The jQuery selector for the current page
@@ -103,24 +87,6 @@ var aboutus = {
             loadSubPage(`about${page === 'main' ? '' : `/${page}`}`);
         });
     },
-
-    // insMembersInHTML: function(members) {
-    //     'use strict';
-    //     members.sort(function() {
-    //         return 0.5 - Math.random();
-    //     });
-    //     var aboutContent = '';
-    //     for (var i = members.length; i--;) {
-    //         aboutContent +=
-    //             '<div class="bottom-page inline-block col-6 fadein">' +
-    //             '<img class="shadow" src="' + CMS.img(members[i].photo)
-    //             + '" alt="' + escapeHTML(members[i].name) + '">' +
-    //             '<span class="bold">' + escapeHTML(members[i].name) + '</span>' +
-    //             '<span>' + escapeHTML(members[i].role) + '</span>' +
-    //             '</div>';
-    //     }
-    //     $('.members', '.bottom-page').safeHTML(aboutContent);
-    // },
 
     // timeline handlers
     // adapted from https://codyhouse.co/gem/horizontal-timeline
@@ -189,9 +155,41 @@ var aboutus = {
                 aboutus.showNewContent(timelineComponents, timelineTotWidth, 'prev');
             });
 
-            // prevent default event listener issue
+            // prevent default event listener issue, change position of divs in DOM
             if (is_mobile) {
-                timelineComponents.eventsContent.css('touch-action','pan-y');
+                timelineComponents.eventsContent.css('touch-action', 'pan-y');
+                $(window).rebind('orientationchange.aboutcarousel',() => {
+
+                    if (page !== 'about') {
+                        return $(window).off('orientationchange.aboutcarousel');
+                    }
+                    if (window.innerHeight > window.innerWidth) {
+                        // portrait
+                        $(".carousel-photo.container", '.events-content').get().forEach((container) => {
+                            const $photoContainer = $(container);
+                            const $textContainer = $(".carousel-text-container", $photoContainer);
+                            $textContainer.detach().insertAfter($('.gradient-wrapper', $photoContainer));
+                        });
+                    }
+                    else if (window.innerWidth > window.innerHeight) {
+                        // landscape
+                        $(".carousel-photo.container", '.events-content').get().forEach((container) => {
+                            const $photoContainer = $(container);
+                            const $textContainer = $(".carousel-text-container", $photoContainer);
+                            const $gradientWrapper = $(".gradient-wrapper", $photoContainer);
+                            const isAfter = $textContainer.prevAll().filter($gradientWrapper).length !== 0;
+                            if (isAfter) {
+                                $textContainer.detach().insertBefore($('.gradient-wrapper', $photoContainer));
+                            }
+                        });
+                    }
+                });
+                $(window).trigger('orientationchange.aboutcarousel');
+
+                const officeImageContainer = ".about.office-locations-container";
+                const $infoBlock = $(".about.location-info-block", officeImageContainer);
+                $infoBlock.detach().insertBefore($('.office-img-container', officeImageContainer));
+                $(".about-text-wrapper", officeImageContainer).css('margin-bottom','56px');
             }
             // swipe (phone) function handler
             timelineComponents.eventsContent.rebind('swipeleft.about', () =>  {
@@ -365,6 +363,17 @@ var aboutus = {
         }
 
         // event is the event we are going to
+        // currEvent is the event we are currently on.
+
+        // $visibleContent is content we currently on
+        // $selectedContent is next content.
+        $visibleContent.prev().removeClass('left');
+        $visibleContent.next().removeClass('right');
+
+        $selectedContent.prev().addClass('left');
+        $selectedContent.next().addClass('right');
+
+
 
         // TODO super hacky css tricks for the timeline dates -> will fix & generalise
         if (currEvent.attr('data-date').split('/')[2] !== '2013') {
@@ -430,31 +439,6 @@ var aboutus = {
         element.style["-o-transform"] = `${property}(${value})`;
         element.style.transform = `${property}(${value})`;
     },
-
-    initCarouselAnimation: function($page) {
-        "use strict";
-
-        const $slider = $('#about-slider', $page);
-
-        $('> div:gt(0)', $slider).addClass('hidden');
-
-        carouselInterval = setInterval(() =>  {
-            // bug with firefox decode() the image prior to changing its display,
-            // as firefox doesnt decode images that arent within viewport
-            // causing flickering.
-            if (page !== 'about') {
-                return clearInterval(carouselInterval);
-            }
-            const imgDecode = $('.about.office1', $page).get(slideIndex);
-            imgDecode.decode().then(() => {
-
-                const $slide = $('> div:first', $slider).addClass('hidden');
-
-                $slide.next().removeClass('hidden');
-                $slide.appendTo('#about-slider');
-            });
-        },  3000);
-    },
     setOverLayText: function($page) {
         "use strict";
         if (is_mobile) {
@@ -469,11 +453,50 @@ var aboutus = {
     initHoverEffects: function($page) {
         "use strict";
         $('.single-job-container',$page).hover(function(){
-            $('.job-title', $(this)).addClass('hover');
-            $('.job-list-arrow', $(this)).addClass('hover');
+            const $scope = $(this);
+            $('.job-title', $scope).addClass('hover');
+            $('.job-list-arrow', $scope).addClass('hover');
         }, function() {
-            $('.job-title', $(this)).removeClass('hover');
-            $('.job-list-arrow', $(this)).removeClass('hover');
+            const $scope = $(this);
+            $('.job-title', $scope).removeClass('hover');
+            $('.job-list-arrow', $scope).removeClass('hover');
+        });
+        $('.expand-leaders', $page).hover(function(){
+            const $scope = $(this);
+            $('.expand-text', $scope).addClass('hover');
+            $('.leaders-see-more-arrow', $scope).addClass('hover');
+        }, function() {
+            const $scope = $(this);
+            $('.expand-text', $scope).removeClass('hover');
+            $('.leaders-see-more-arrow', $scope).removeClass('hover');
+        });
+    },
+
+    initCollapsible: function($page) {
+        "use strict";
+        const $dropDown = $('.expand-leaders', $page);
+
+        $dropDown.rebind('click.about', () => {
+            const $block = $('.leaders-collapsible', $page);
+            const collapsibleSection = '.about.leadership-col4';
+            const $collapseBlock = $('.expand-leaders.collapse', collapsibleSection);
+            const $expandBlock = $('.expand-leaders.expand', collapsibleSection);
+            const content = $block[0];
+
+            if ($block.hasClass('open')) {
+                $block.removeClass('open');
+                $collapseBlock.addClass('hidden');
+                $expandBlock.removeClass('hidden');
+                $('.leadership-team-container', $page)[0].scrollIntoView();
+                content.style.maxHeight = null;
+            }
+            else {
+                $block.addClass('open');
+                $collapseBlock.removeClass('hidden');
+                $expandBlock.addClass('hidden');
+                // overflow hidden anyway
+                content.style.maxHeight = `${9999}px`;
+            }
         });
     },
     // Actual Resizing Event
@@ -483,11 +506,124 @@ var aboutus = {
         if ($timelines.length > 0) {
             aboutus.initTimeline($timelines);
         }
+        const $block = $('.leaders-collapsible', $page);
+        if ($block.length > 0) {
+            const content = $block[0];
+            // overflow hidden anyway
+            content.style.maxHeight = `${9999}px`;
+        }
     },
 
     setLangContentInDOM: function($page) {
         "use strict";
         const $content = $('.about.promise-title',$page);
         $content.attr('pop-lang',l.about_our_promise_title);
-    }
+    },
+
+    populateJobs: function(jobData, $page) {
+        "use strict";
+        const $jobContainer = $('.right-side-jobs-container', $page);
+        const $noJobsTemplate = $('.no-jobs.template', $jobContainer);
+        const $departmentTitleTemplate = $('.department-title', $jobContainer);
+        const $singleJobContainerTemplate = $('.single-job-container.template', $jobContainer);
+        const $bottomPaddingTemplate = $('.bottom-padding.template', $jobContainer);
+        const $exploreJobsTemplate = $('.explore-jobs.template', $jobContainer);
+
+        $noJobsTemplate.remove();
+        $departmentTitleTemplate.remove();
+        $singleJobContainerTemplate.remove();
+        $bottomPaddingTemplate.remove();
+        $exploreJobsTemplate.remove();
+        if (Object.keys(jobData).length > 0) {
+            for (const department in jobData) {
+
+                const $titleBlock = $departmentTitleTemplate.clone()
+                    .text(department).removeClass('template').removeClass('hidden');
+                const title = $titleBlock.prop('outerHTML');
+                $jobContainer.safeAppend(title);
+
+                for (let i = 0; i < jobData[department].length; i++) {
+                    const jobTitle = escapeHTML(jobData[department][i].title);
+                    const jobDataDesc = escapeHTML(jobData[department][i].jobDesc);
+                    const jobDataLink = escapeHTML(jobData[department][i].jobLink);
+
+                    const $singleJobContainerBlock = $singleJobContainerTemplate.clone()
+                        .removeClass('template').removeClass('hidden');
+                    $singleJobContainerBlock.attr('href', jobDataLink);
+                    $('.job-title span', $singleJobContainerBlock).text(jobTitle);
+                    $('.job-desc', $singleJobContainerBlock).text(jobDataDesc);
+                    const singleJobContainer = $singleJobContainerBlock.prop('outerHTML');
+                    $jobContainer.safeAppend(singleJobContainer);
+
+                }
+                const $bottomPaddingBlock = $bottomPaddingTemplate.clone()
+                    .removeClass('template').removeClass('hidden');
+                const bottomPadding = $bottomPaddingBlock.prop('outerHTML');
+                $jobContainer.safeAppend(bottomPadding);
+            }
+            const $exploreJobsBlock = $exploreJobsTemplate.clone().removeClass('template').removeClass('hidden');
+            const exploreJobs = $exploreJobsBlock.prop('outerHTML');
+            $jobContainer.safeAppend(exploreJobs);
+        }
+        else {
+            const $noJobsBlock = $noJobsTemplate.clone().removeClass('template').removeClass('hidden');
+            $noJobsBlock.text(l.about_no_vacancies_available);
+            const noJobs = $noJobsBlock.prop('outerHTML');
+            $jobContainer.safeAppend(noJobs);
+        }
+    },
+
+    fetchTeamTailorJobsWithCache: async function(persistTime, $page) {
+        "use strict";
+        const jobData = sessionStorage.getItem('teamtailorfetch');
+        const now = Date.now();
+        if (jobData === null || JSON.parse(jobData).cacheTimer < now) {
+            const cachedJobs = {
+                jobs: [],
+                cacheTimer: "",
+            };
+            M.req({a: 'ttfj'}).then((jobs) => {
+                // If there is are jobs
+                if (jobs.length > 0) {
+                    const transformedData = Object.create(null);
+                    for (let i = 0; i < jobs.length; i++) {
+                        const department = jobs[i][2];
+                        const job = Object.create(null);
+
+                        job.title = jobs[i][1];
+                        job.jobDesc = jobs[i][3];
+                        job.jobLink = jobs[i][4];
+
+                        if (transformedData[department]) {
+                            transformedData[department].push(job);
+                        }
+                        else {
+                            transformedData[department] = [job];
+                        }
+                    }
+                    cachedJobs.jobs.push(transformedData);
+                    const now = Date.now();
+                    cachedJobs.cacheTimer = now + persistTime;
+                    sessionStorage.setItem('teamtailorfetch', JSON.stringify(cachedJobs));
+                    aboutus.populateJobs(transformedData, $page);
+                }
+                else {
+                    // no jobs
+                    cachedJobs.jobs.push([]);
+                    const cacheTime = Date.now() + persistTime;
+                    cachedJobs.cacheTimer = cacheTime + persistTime;
+                    sessionStorage.setItem('teamtailorfetch', JSON.stringify(cachedJobs));
+                    aboutus.populateJobs(cachedJobs.jobs[0], $page);
+                }
+            }).catch((ex) => {
+                // api error just log, and populate with empty array
+                console.warn(ex);
+                cachedJobs.jobs.push([]);
+                aboutus.populateJobs(cachedJobs.jobs[0], $page);
+            });
+        }
+        else {
+            aboutus.populateJobs(JSON.parse(jobData).jobs[0], $page);
+        }
+    },
 };

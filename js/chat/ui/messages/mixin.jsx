@@ -1,5 +1,5 @@
 import React from 'react';
-import {ContactAwareComponent} from '../../../stores/mixins.js';
+import {ContactAwareComponent} from '../../mixins';
 import {Button} from "../../../ui/buttons.jsx";
 import {DropdownEmojiSelector} from "../../../ui/emojiDropdown.jsx";
 

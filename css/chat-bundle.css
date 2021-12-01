@@ -982,7 +982,7 @@
 .stream-node:after {
   content: "";
   display: block;
-  padding-top: calc(9/16 * 100%);
+  padding-top: 56.25%;
 }
 .stream-node:hover .node-menu {
   display: block;

@@ -93,9 +93,6 @@ html.dark-mode .mobile.slides.mid {
 html.dark-mode .mobile.slides.mid img {
     filter: none;
 }
-html.dark-mode .mobile.context-menu-container.hidden {
-    display: none !important;
-}
 
 /* Re-enable selection and highlighting for specific things */
 input, textarea {
@@ -105,9 +102,6 @@ input, textarea {
     -moz-user-select: text !important;
     -ms-user-select: text !important;
     user-select: text !important;
-}
-.hidden {
-    display: none !important;
 }
 a, a:link, a:visited, a:hover, a:active {
     outline: none;
@@ -215,7 +209,7 @@ ul, li {
 .mobile.main-block.error-overlay {
     position: fixed;
     top: 0;
-    z-index: 2300;
+    z-index: 190;
     overflow: hidden;
 }
 .mobile.content-row {
@@ -1403,6 +1397,9 @@ ul, li {
 .mobile.fm-icon.credit-card {
     background-position: -148px -2136px;
 }
+.mobile.fm-icon.card {
+    background-position: 0 -2008px;
+}
 .mobile.fm-icon.rocket {
     background-position: -148px -2101px;
 }
@@ -2171,6 +2168,15 @@ ul, li {
     margin: 0 auto 20px auto;
     background-image: url(../images/mobile/mobile-sprite.png);
     background-repeat: no-repeat;
+}
+.mobile.empty-icon.sprite-fm-illustration {
+    background: url("../../images/sprites/fm-illustration-sprite.svg") no-repeat;
+    background-size: 2000%;
+}
+.mobile.empty-icon.sprite-fm-illustration.img-dialog-payment-card-exp {
+    --width: 145px;
+    --height: 109px;
+    background-position: calc(300% / 19) calc(var(--scale) * -500);
 }
 .landscape .mobile.empty-icon {
     margin-bottom: 2px;
@@ -4472,16 +4478,6 @@ div.checkboxOn {
     text-align: center;
     font-size: 14px;
 }
-.payment-address-dialog .error-message.hidden {
-    display: block;
-    visibility: hidden;
-}
-.payment-address-dialog .default-dropdown-item.template {
-    display: none;
-}
-.payment-address-dialog .default-dropdown-item.hidden {
-    display: none;
-}
 .payment-address-dialog .states.disabled {
     cursor: default;
     opacity: 0.5;
@@ -4691,16 +4687,18 @@ div.checkboxOn {
     line-height: 24px;
     color: #666666;
     padding: 0 0 6px 0;
+    white-space: normal;
+    text-align: start;
 }
 .fm-dialog .dialog.pro-exceeded-txt {
     display: inline-block;
     max-width: 504px;
 }
 .limited-bandwidth-dialog .account.chart-block, .storage-dialog .account.chart-block {
-    display: inline-block;
-    margin: 11px 0 20px 0;
+    display: block;
+    margin: 11px auto 20px;
     padding: 18px 0 0 0;
-    text-align: left;
+    text-align: center;
     font-size: 16px;
 }
 .storage-dialog .account.chart-block {
@@ -5139,10 +5137,10 @@ div.checkboxOn {
 }
 /* Alert Banner */
 .mobile.alert-banner {
-    height: 60px;
+    min-height: 60px;
     width: 100%;
     background-color: #2ba6de;
-    display: block;
+    display: flex;
     -webkit-transition: margin-top .3s ease-in-out;
     -moz-transition: margin-top .3s ease-in-out;
     -o-transition: margin-top .3s ease-in-out;
@@ -5162,6 +5160,7 @@ div.checkboxOn {
 }
 .mobile.alert-banner.closed {
     margin-top: -60px;
+    display: none;
 }
 .mobile.alert-banner.warning {
     background-color: rgba(0252, 130, 23, 1);
@@ -5170,7 +5169,7 @@ div.checkboxOn {
     background: rgba(255, 69, 69, 1);
 }
 .mobile.alert-banner .alert-close {
-    height: 60px;
+    /*height: 60px;*/
     width: 40px;
     float: right;
 }
@@ -5178,10 +5177,10 @@ div.checkboxOn {
     display:none;
 }
 .mobile.alert-banner .alert-text-container {
-    position: absolute;
+    position: relative;
     left: 10px;
     text-align: left;
-    height: 50px;
+    /*height: 50px;*/
     float: left;
     font-size: small;
     color: white;
@@ -5206,9 +5205,9 @@ div.checkboxOn {
     font-family: var(--text-font-family-bold);
 }
 .mobile.alert-banner .alert-icon.close {
-    height: 30px;
+    /*height: 30px;*/
     width: 30px;
-    margin-top: 15px;
+    /*margin-top: 15px;*/
     margin-right: 5px;
     background-position: -82px -1143px;
     -webkit-transform: scale(0.8, 0.8);
@@ -5281,10 +5280,10 @@ div.checkboxOn {
 .fmholder {
     overflow: hidden;
 }
-.mobile.context-menu-container.hidden {
-    display: block !important;
+
+/* Special hidden */
+.mobile.context-menu-container.o-hidden {
     overflow: hidden;
-    opacity: 0;
     transition: opacity 200ms ease-in-out, transform 200ms ease-in-out;
     transform: translateY(calc(100% + 8px));
 }
@@ -5406,6 +5405,9 @@ div.checkboxOn {
 /* My Account page */
 .mobile.main-block.my-account-page, .mobile.main-block.verify-login-page {
     background-color: #F5F6F7;
+}
+.mobile.main-block.my-account-page .fm-scrolling {
+    max-height: calc(100vh - 66px);
 }
 .mobile.my-account-page .avatar-name-block {
     opacity: 0.9;
@@ -6860,31 +6862,11 @@ textarea.mobile.support-text-field {
     text-align: center;
 }
 .mobile.cancel-subscription-overlay .buttons {
-    margin-top: 5px;
     text-align: center;
 }
 .mobile.cancel-subscription-overlay .red-button {
-    display: inline-block;
-    width: 47%;
     border: 1px solid #ff4246;
-    height: 44px;
-    line-height: 40px;
     font-size: 14px;
-}
-.mobile.cancel-subscription-overlay .red-button.close-button {
-    background: #fff;
-    border: 1px solid #ff4246;
-    -moz-border-radius: 2px;
-    -webkit-border-radius: 2px;
-    border-radius: 2px;
-    color: #ff4246;
-    margin-right: 2px;
-}
-.mobile.cancel-subscription-overlay .red-button.confirm-ok-button {
-    -moz-border-radius: 2px;
-    -webkit-border-radius: 2px;
-    border-radius: 2px;
-    margin-left: 2px;
 }
 /* Video player Download page */
 .mobile.video .mobile.filename {
@@ -7440,6 +7422,8 @@ textarea.mobile.support-text-field {
     top: auto;
     bottom: 0;
 }
+
+/* Special hidden */
 .mobile.video.slideshow-image-previewer.video-theatre-mode .slideshow-header.hidden + .content-row .viewer-bottom-bl {
     display: block;
 }
@@ -8212,9 +8196,6 @@ textarea.mobile.support-text-field {
     height: auto;
     text-align: left;
 }
-.mobile .improved-recovery-steps .hidden {
-    display: none;
-}
 .mobile .improved-recovery-steps ol.app-instructions-list {
     list-style-type: none;
     -webkit-margin-before: 1em;
@@ -8982,9 +8963,6 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll, .mob
 .local-currency .reg-st3-bott-title.price .green-star-img {
     display: inline-block;
 }
-.mobile.key .reg-st3-txt-achprogram.hidden {
-    display: block !important;
-}
 .reg-st3-bott-title.price .euro-price {
     font-size: 16px;
     background-color: #fff;
@@ -9462,14 +9440,6 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll, .mob
 }
 
 /* Pro page step 2 voucher dialog */
-.mobile.voucher-dialog.hidden {
-    display: hidden;
-    bottom: -100%;
-    overflow: hidden;
-    opacity: 0;
-    -webkit-transition: opacity 200ms ease-in-out, bottom 200ms ease-in-out;
-    transition: opacity 200ms ease-in-out, bottom 200ms ease-in-out;
-}
 .mobile.voucher-dialog {
     background-color: #fff;
     border-radius: 12px;
@@ -9558,7 +9528,14 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll, .mob
 .mobile.voucher-dialog .right-block {
     margin-left: 64px;
 }
-.mobile.voucher-dialog .voucher-account-balance .balance-amount, .mobile.voucher-dialog .voucher-account-balance .payment-eurosign, .mobile.voucher-dialog .voucher-account-balance .storage-amount, .mobile.voucher-dialog .voucher-account-balance .transfer-amount, .mobile.voucher-dialog .voucher-account-balance .new-balance-amount, .mobile.voucher-dialog .voucher-account-balance .new-storage-amount, .mobile.voucher-dialog .voucher-account-balance .new-transfer-amount {
+.mobile.voucher-dialog .voucher-account-balance .balance-amount,
+.mobile.voucher-dialog .voucher-account-balance .payment-eurosign,
+.mobile.voucher-dialog .voucher-account-balance .storage-amount,
+.mobile.voucher-dialog .voucher-account-balance .transfer-amount,
+.mobile.voucher-dialog .voucher-account-balance .new-balance-amount,
+.mobile.voucher-dialog .voucher-account-balance .new-storage-amount,
+.mobile.voucher-dialog .voucher-account-balance .new-transfer-amount,
+.mobile.voucher-dialog .voucher-account-balance .current-achievements-amount {
     color: #ed2942;
     display: inline-block;
     font-family: 'LatoWebBold', 'source_sans_prosemibold', sans-serif;
@@ -9568,7 +9545,11 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll, .mob
 .mobile.voucher-dialog .voucher-account-balance.sufficient-funds .balance-amount, .mobile.voucher-dialog .voucher-account-balance .storage-amount, .mobile.voucher-dialog .voucher-account-balance .transfer-amount, .mobile.voucher-dialog .voucher-account-balance.sufficient-funds .payment-eurosign {
     color: #495057;
 }
-.mobile.voucher-dialog .voucher-account-balance.sufficient-funds .new-balance-amount, .mobile.voucher-dialog .voucher-account-balance .new-storage-amount, .mobile.voucher-dialog .voucher-account-balance .new-transfer-amount, .mobile.voucher-dialog .voucher-account-balance.sufficient-funds .right-span .payment-eurosign {
+.mobile.voucher-dialog .voucher-account-balance.sufficient-funds .new-balance-amount,
+.mobile.voucher-dialog .voucher-account-balance .new-storage-amount,
+.mobile.voucher-dialog .voucher-account-balance .new-transfer-amount,
+.mobile.voucher-dialog .voucher-account-balance.sufficient-funds .right-span .payment-eurosign,
+.mobile.voucher-dialog .voucher-account-balance .current-achievements-amount {
     color: #00A58F;
 }
 .mobile.voucher-dialog .voucher-information-help {
@@ -10834,9 +10815,6 @@ Thank You dialog
     }
     .ios.app-info-block .mobile.download-app {
         width: 152px;
-    }
-    .app-info-block .mobile.application-txt.hidden .mobile.download-app {
-        margin-top:8px;
     }
     .android.app-info-block .mobile.download-app {
         background-position: 0 -496px;
@@ -12947,9 +12925,6 @@ p a.blog-new-read-more {
     box-sizing: border-box;
     max-width: calc(100% - 2px);
 }
-.orange-notification.body.hidden {
-    display: none;
-}
 .orange-notification.cell {
     display: table-cell;
     vertical-align: middle;
@@ -14247,7 +14222,95 @@ body.landscape .upload-overlay .mobile.filetype-img {
 /*
  * End Mobile Confirmation checkbox
  */
-
+.mobile.payment-card-page .card-info.payment-card {
+    margin-top: 34px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.mobile.payment-card-page .card-info.payment-card .payment-card-top {
+    width: 285.96px;
+    height: 134px;
+    background-color: #00BFA5;
+    background-image: url("../images/mega/Surface-card-green.png");
+    background-size: 285px;
+}
+.mobile.payment-card-page .card-info.payment-card.mc .payment-card-top {
+    background-color: #F3A03F;
+    background-image: url("../images/mega/Surface-card-orange.png");
+    background-size: 285px;
+}
+.mobile.payment-card-page .card-info.payment-card.visa .payment-card-top {
+    background-color: #4BB8F3;
+    background-image: url("../images/mega/Surface-card-blue.png");
+    background-size: 285px;
+}
+.mobile.payment-card-page .card-info.payment-card .payment-card-icon {
+    --icon-size: 38px;
+    margin-top: 14px;
+    margin-left: 17px;
+}
+.mobile.payment-card-page .card-info.payment-card.visa .payment-card-icon i {
+    background-image: url("../images/mega/icon-visa.svg");
+    background-size: 100%;
+    width: 38px;
+    height: 38px;
+    display: block;
+}
+.mobile.payment-card-page .card-info.payment-card:not(.mc):not(.visa) .payment-card-icon i {
+    background-image: url("../images/mega/icon-payment-outline.svg");
+    background-size: 100%;
+    width: 38px;
+    height: 38px;
+    display: block;
+}
+.mobile.payment-card-page .card-info.payment-card .payment-card-bottom {
+    width: 285.96px;
+    height: 48px;
+    background-color: #03A892;
+}
+.mobile.payment-card-page .card-info.payment-card.mc .payment-card-bottom {
+    background-color: #E58D27;
+}
+.mobile.payment-card-page .card-info.payment-card.visa .payment-card-bottom {
+    background-color: #23A1E5;
+}
+.mobile.payment-card-page .card-info.payment-card .payment-card-nb {
+    display: flex;
+    margin-top: 14px;
+    margin-left: 17px;
+}
+.mobile.payment-card-page .card-info.payment-card .payment-card-dots {
+    margin-right: 12px;
+    color: var(--text-color-white-higher);
+    font-size: 14px;
+}
+.mobile.payment-card-page .card-info.payment-card .payment-card-digits {
+    font: var(--text-h3);
+    color: var(--text-color-white-higher);
+    font-family: var(--text-font-family-bold);
+    margin-top: 2px;
+}
+.mobile.payment-card-page .card-info.payment-card .payment-card-expiry-lbl {
+    display: inline-block;
+}
+.mobile.payment-card-page .card-info.payment-card .payment-card-expiry-val {
+    display: inline-block;
+}
+.mobile.payment-card-page .card-info.payment-card .payment-card-expiry {
+    margin-top: 6px;
+    margin-left: 17px;
+    color: var(--text-color-white-higher);
+    font: var(--text-caption);
+}
+.mobile.payment-card-page .card-info.payment-card .payment-card-edit {
+    display: inline-block;
+    color: var(--text-color-white-higher);
+    margin-top: 16px;
+    margin-left: 17px;
+    font: var(--text-caption);
+    text-decoration: underline;
+}
 /*
  * Retina Sprite for mobile
  * Please leave it on the bottom to make sure it override on Retina.
@@ -14264,15 +14327,42 @@ body.landscape .upload-overlay .mobile.filetype-img {
     .android .mobile.tablet-img {
         background-image: url(../images/mobile/android@2x.png);
     }
-    .mobile.logo, .mobile.white-mega-logo, .mobile.download-speed, .mobile.upload-speed, .mobile.download-percents, .mobile.red-button.disabled i, .mobile.warning-icon, .mobile.fm-icon, .mobile.fm-item-link, .mobile.empty-icon, .mobile.signin-input span, .mobile.loader, .mobile.homepage .feature-icon, .mobile.homepage .company-logo, .checkboxOn.square i, .mobile.fm-dialog-close, .mobile.top-menu-popup .top-icon.close, .mobile.slideshow-back-arrow, .mobile.slideshow-forward-arrow, .default-select, .ui-selectmenu-button.ui-button, .mobile.select-wrapper::after, #mobile-ui-contact-card .contact-verification i, .mobile.auth-app-select-dialog .cancel-button-icon, .mobile.signin-input span, .mobile.country-input span, .mobile.phone-number-input span,
-        .mobile.membership-step2 .provider-icon.voucher,
-        .mobile.membership-step2 .provider-icon.ecpVI,
-        .mobile.membership-step2 .provider-icon.ecpMC,
-        .mobile .improved-recovery-steps .nav-back-icon,
-        .mobile.default-grey-select,
-        .mobile-sprite
-    {
+    .mobile.logo,
+    .mobile.white-mega-logo,
+    .mobile.download-speed,
+    .mobile.upload-speed,
+    .mobile.download-percents,
+    .mobile.red-button.disabled i,
+    .mobile.warning-icon,
+    .mobile.fm-icon,
+    .mobile.fm-item-link,
+    .mobile.signin-input span,
+    .mobile.loader,
+    .mobile.homepage .feature-icon,
+    .mobile.homepage .company-logo,
+    .checkboxOn.square i,
+    .mobile.fm-dialog-close,
+    .mobile.top-menu-popup .top-icon.close,
+    .mobile.slideshow-back-arrow,
+    .mobile.slideshow-forward-arrow,
+    .default-select,
+    .ui-selectmenu-button.ui-button,
+    .mobile.select-wrapper::after,
+    #mobile-ui-contact-card .contact-verification i,
+    .mobile.auth-app-select-dialog .cancel-button-icon,
+    .mobile.country-input span,
+    .mobile.phone-number-input span,
+    .mobile.membership-step2 .provider-icon.voucher,
+    .mobile.membership-step2 .provider-icon.ecpVI,
+    .mobile.membership-step2 .provider-icon.ecpMC,
+    .mobile .improved-recovery-steps .nav-back-icon,
+    .mobile.default-grey-select,
+    .mobile-sprite {
         background-image: url(../images/mobile/mobile-sprite@2x.png) !important;
+        background-size: 280px auto;
+    }
+    .mobile.empty-icon {
+        background-image: url("../images/mobile/mobile-sprite@2x.png");
         background-size: 280px auto;
     }
     .mobile.registration-confirm-email .email-icon {

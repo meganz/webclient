@@ -3,7 +3,7 @@ import { hot } from 'react-hot-loader/root';
 var React = require("react");
 import utils from './../../ui/utils.jsx';
 var PerfectScrollbar = require('./../../ui/perfectScrollbar.jsx').PerfectScrollbar;
-import {MegaRenderMixin, timing} from './../../stores/mixins.js';
+import {MegaRenderMixin, timing} from './../mixins';
 import {Button} from './../../ui/buttons.jsx';
 import {DropdownContactsSelector} from './../../ui/dropdowns.jsx';
 import {ConversationPanels} from "./../ui/conversationpanel.jsx";
@@ -1307,7 +1307,6 @@ class ConversationsApp extends MegaRenderMixin {
                         "position":"fixed",
                         "top": "50%",
                         "left": "50%",
-                        "marginLeft": "72px"
                     }}></div>
                 </div>
             </div>;

@@ -1,5 +1,5 @@
 import React from 'react';
-import {MegaRenderMixin} from "../../../stores/mixins.js";
+import {MegaRenderMixin} from "../../../chat/mixins";
 import {MegaList2} from "../megaList/megaList2.jsx";
 import GenericGrid from "./nodes/genericGrid.jsx";
 import GenericTable, {GenericTableHeader}

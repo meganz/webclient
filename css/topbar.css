@@ -120,10 +120,6 @@
     width: 32px;
 }
 
-.topbar .mini-search.hidden {
-    display: none;
-}
-
 .topbar .mini-search .topbar-searcher {
     background: transparent;
     display: flex;
@@ -235,10 +231,6 @@
     align-items: center;
     display: flex;
     height: 100%;
-}
-
-.topbar-links > .dropdown.hidden {
-    display: none;
 }
 
 /* Icon Button */
@@ -616,10 +608,6 @@
     display: flex;
     -webkit-margin-end: 16px;
     margin-inline-end: 16px;
-}
-
-.top-head .top-buttons.hidden {
-    display: none;
 }
 
 .top-head .top-buttons.business {

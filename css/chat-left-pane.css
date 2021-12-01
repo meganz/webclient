@@ -121,9 +121,6 @@
 .conversations button.contacts-toggle-button.active::before {
     opacity: 1;
 }
-.ipc-count.hidden {
-    display: none;
-}
 .conversations button.contacts-toggle-button .notifications-count {
     background: var(--secondary-red);
     border-radius: 9px;
@@ -1130,6 +1127,17 @@ li.active .call-duration i {
     color: var(--text-color-medium);
     text-align: left;
     cursor: pointer;
+}
+
+.contacts-table th:not(:last-child):hover::before {
+    content: "";
+    position: absolute;
+    right: 0;
+    bottom: -3px;
+    height: 21px;
+    width: 1px;
+    background-color: var(--stroke-mid-grey);
+    cursor: col-resize;
 }
 
 .contacts-table th i {

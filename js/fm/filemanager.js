@@ -1349,6 +1349,7 @@ FileManager.prototype.initContextUI = function() {
 
             $this.next('.submenu')
                 .css({'top': menuPos.top})
+                .removeClass('hidden')
                 .addClass('active');
 
             $this.addClass('opened');
@@ -1719,18 +1720,33 @@ FileManager.prototype.initContextUI = function() {
     });
 
     $(c + '.clearprevious-versions').rebind('click', function() {
+
         if (M.isInvalidUserStatus()) {
             return;
         }
-        if ($.selected && $.selected[0]) {
-            var fh = $.selected[0];
-            msgDialog('remove', l[1003], l[17154], l[1007], function(e) {
+
+        if ($.selected && $.selected.length > 0) {
+
+            const fvNode = [];
+
+            for (let i = $.selected.length; i--;) {
+
+                const selected = M.getNodeByHandle($.selected[i]);
+
+                if (!selected.t && selected.tvf) {
+                    fvNode.push($.selected[i]);
+                }
+            }
+
+            msgDialog('remove', l[1003], mega.icu.format(l[17154], fvNode.length), l[1007], (e) => {
+
                 if (e) {
-                    fileversioning.clearPreviousVersions(fh);
+                    for (let i = fvNode.length; i--;) {
+                        fileversioning.clearPreviousVersions(fvNode[i]);
+                    }
                 }
             });
         }
-
     });
 
     $(c + '.findupes-item').rebind('click', M.findDupes);
@@ -4414,7 +4430,7 @@ FileManager.prototype.initLeftPanel = function() {
                         !$dialog.hasClass('fm-dialog-mobile') &&
                         !$dialog.hasClass('fm-dialog')) {
 
-                        throw new Error('Unexpected dialog type...');
+                        throw new Error(`Unexpected dialog(${name}) type...`);
                     }
 
                     // arrange to back any non-controlled dialogs,

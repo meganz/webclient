@@ -1588,7 +1588,7 @@ var exportExpiry = {
             $linkItem.addClass('dateSet');
 
             // Show it
-            $expiryIcon.removeClass('hidden');
+            $expiryIcon.removeClass('vo-hidden');
         }
         else {
 
@@ -1596,7 +1596,7 @@ var exportExpiry = {
             $linkItem.removeClass('dateSet');
 
             // Hide it
-            $expiryIcon.addClass('hidden');
+            $expiryIcon.addClass('vo-hidden');
         }
 
         // Set or clear the text
@@ -1795,7 +1795,7 @@ var exportExpiry = {
         $cogIcons = $('.icons .cog', $linksTab);
 
         // Set Export links default states
-        $calendarIcons.addClass('hidden');
+        $calendarIcons.addClass('vo-hidden');
         $lockIcons.addClass('hidden');
         $cogIcons.addClass('hidden');
         $setPasswordtem.addClass('hidden');
@@ -2101,7 +2101,7 @@ var exportExpiry = {
                 var $dropdown = $('.dropdown.export', $linksTab);
                 var itemsLength = $('.item', $linksTab).length;
                 var $currentItem = $this.closest('.item');
-                var expiryLabel = $('.calendar.hidden', $currentItem).length ? l[8953] : l[23665];
+                var expiryLabel = $('.calendar.o-hidden.v-hidden', $currentItem).length ? l[8953] : l[23665];
                 var passwordLabel = $('.lock.hidden', $currentItem).length ? l[17454] : l[23666];
                 var removeLabel = itemsLength === 1 ? l[23668] : l[6821];
 
@@ -2416,7 +2416,7 @@ var exportExpiry = {
              +      '<div class="icons">'
              +          '<i class="sprite-fm-theme icon-settings cog"></i>'
              +          '<i class="sprite-fm-uni icon-lock lock hidden"></i>'
-             +          '<i class="sprite-fm-uni icon-calendar calendar hidden">'
+             +          '<i class="sprite-fm-uni icon-calendar calendar vo-hidden">'
              +              '<input type="text" class="set-date" data-node-handle="' + nodeHandle + '">'
              +          '</i>'
              +      '</div>'

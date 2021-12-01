@@ -139,9 +139,6 @@ body.mobile.bottom-pages {
 .lato-semibold {
     font-family: var(--text-font-family-semibold);
 }
-.hidden {
-    display: none;
-}
 ::selection {
     background: var(--text-selection);
     color: var(--text-color-high);
@@ -631,9 +628,6 @@ a.blog-button:hover {
     display: block;
     float: left;
 }
-.new-messages-indicator .chat-pending-call.hidden {
-    display: none;
-}
 .notification-num {
     display: inline-block;
     position: absolute;
@@ -781,9 +775,6 @@ a.blog-button:hover {
     display: block;
     text-transform: uppercase;
 }
-.notification-avatar.hidden {
-    display: none;
-}
 .notification-item .avatar-wrapper {
     width: 32px;
     height: 32px;
@@ -806,10 +797,13 @@ a.blog-button:hover {
 .fm-dialog-button.notifications-button {
     margin-top: 0;
 }
-.nt-contact-request .notification-request-buttons, .nt-contact-request.accepted .notification-accepted-bl {
+.nt-contact-request .notification-request-buttons,
+.nt-contact-request.accepted .notification-accepted-bl {
     display: table-cell;
 }
-.nt-contact-request.accepted .notification-request-buttons, .nt-contact-request.not-now .notification-request-buttons, .nt-contact-request .notification-request-buttons.hidden, .notification-accepted-bl {
+.nt-contact-request.accepted .notification-request-buttons,
+.nt-contact-request.not-now .notification-request-buttons,
+.notification-accepted-bl {
     display: none;
 }
 .notification-accepted {
@@ -886,9 +880,6 @@ a.blog-button:hover {
     --icon-size: 32px;
     flex-shrink: 0;
     flex-grow: 0;
-}
-.notification-item .notification-icon.hidden {
-    display: none;
 }
 .notification-item .notification-icon i {
     display: none;
@@ -4185,6 +4176,7 @@ tr:not(.taken-down) .grid-status-icon:not(.read-only):not(.read-and-write) {
     display: flex;
 }
 .fm-notification-block.almost-full,
+.fm-notification-block.payment-card-almost-expired,
 .fm-notification-block.grace-business {
     background-color: var(--label-orange);
 }
@@ -5367,9 +5359,6 @@ tr:not(.taken-down) .grid-status-icon:not(.read-only):not(.read-and-write) {
     background-color: var(--stroke-main);
 }
 
-.crumb-overflow-link.hidden {
-    display: none;
-}
 .crumb-overflow-link .breadcrumb-dropdown-link {
     border-radius: 12px;
     height: 24px;
@@ -5425,9 +5414,6 @@ tr:not(.taken-down) .grid-status-icon:not(.read-only):not(.read-and-write) {
     width: 100%;
     display: block;
     overflow: hidden;
-}
-.fm-breadcrumbs.hidden {
-    display: none;
 }
 
 .breadcrumb-dropdown {
@@ -7198,9 +7184,6 @@ table {
     margin-top: -2px;
     margin-bottom: 15px;
 }
-.account.left-pane.big-txt.suba-pay-bill.hidden {
-    display: none;
-}
 .left-pane.info-block.business-users .account.left-pane.big-txt.suba-status.disabled,
 .left-pane.info-block.business-users .account.left-pane.big-txt.suba-status.pending,
 .left-pane.info-block.business-users .account.left-pane.big-txt.suba-days-left {
@@ -7211,9 +7194,6 @@ table {
 .left-pane.info-block.business-users .account.left-pane.big-txt.suba-days-left {
     margin-top: -10px;
 }
-.left-pane.info-block.business-users .account.left-pane.big-txt.suba-days-left.hidden {
-    display: none;
-}
 .account.left-pane.big-txt span {
     color: #777777;
     padding-left: 5px;
@@ -7221,9 +7201,6 @@ table {
 .account.left-pane.big-txt .pay-bill-btn span {
     color: unset;
     padding-left: unset;
-}
-.account.left-pane .account.left-pane.hidden {
-    display: none;
 }
 .account.widget .fm-account-blocks {
     padding-top: 10px;
@@ -7291,9 +7268,6 @@ table {
 .account.data-table td:last-of-type {
     text-align: end;
 }
-.account.data-table.hidden {
-    display: none;
-}
 .account.data-table .empty td {
     color: var(--text-color-low);
 }
@@ -7341,9 +7315,6 @@ table {
 }
 .business-dashboard .account.referral-block {
     width: auto;
-}
-.account.widget.referrals.hidden {
-    display: none;
 }
 .account.achievements button.more-bonuses,
 .account.referrals button.referral-program {
@@ -12046,9 +12017,6 @@ div.camera-bottom-txt {
 .data-block.storage-data .chart-warning {
     margin: 12px 0 -15px 10px;
 }
-.account.progress-list.hidden {
-    display: none;
-}
 .empty.account.pr-item i,
 .empty .account.progress-title {
     opacity: 0.3;
@@ -12058,9 +12026,6 @@ div.camera-bottom-txt {
 }
 .account.progress-item {
     display: table-row;
-}
-.account.progress-item.hidden {
-    display: none;
 }
 .account.progress-data {
     display: table-cell;
@@ -13410,9 +13375,6 @@ body.megaChatDisabled .nw-contact-name button.start-chat-button {
     align-items: center;
     justify-content: center;
 }
-.user-management-overview-bar-data.hidden {
-    display: none;
-}
 .user-management-overview-bar-data .info-block:first-child {
     padding-left: 0;
 }
@@ -13439,9 +13401,6 @@ body.megaChatDisabled .nw-contact-name button.start-chat-button {
     max-width: 180px;
     vertical-align: middle;
 }
-.user-management-overview-bar-data .info-block .title.hidden {
-    display: none;
-}
 .user-management-overview-bar-data .info-block .value {
     border-radius: 11px;
     background: var(--surface-main);
@@ -13455,17 +13414,11 @@ body.megaChatDisabled .nw-contact-name button.start-chat-button {
     display: inline-block;
     vertical-align: middle;
 }
-.user-management-overview-bar-data .info-block .title2.hidden {
-    display: none;
-}
 .user-management-overview-bar-data .info-block .number {
     color: var(--text-color-high);
     font: var(--text-body1);
     display: inline-block;
     vertical-align: middle;
-}
-.user-management-overview-bar-data .info-block .number.hidden {
-    display: none;
 }
 .user-management-overview-bar-data button {
     margin: 16px 0 16px 80px;
@@ -13499,9 +13452,6 @@ body.megaChatDisabled .nw-contact-name button.start-chat-button {
     margin: 1px 8px;
     align-items: center;
     border-radius: 4px;
-}
-.content-panel.user-management .nw-user-management-item.hidden {
-    display: none;
 }
 .content-panel.user-management .nw-user-management-item:hover {
     background: var(--surface-main);
@@ -13551,9 +13501,6 @@ body.megaChatDisabled .nw-contact-name button.start-chat-button {
     display: inline-flex;
     --icon-size: 16px;
     margin: 0 8px;
-}
-.user-management-breadcrumb i.hidden {
-    display: none;
 }
 .rtl .user-management-breadcrumb i {
     transform: rotate(180deg);
@@ -13959,9 +13906,6 @@ body.megaChatDisabled .nw-contact-name button.start-chat-button {
     display: inline-block;
     font: var(--text-h3-bold);
     color: var(--text-color-high);
-}
-.business-dashboard .view-info .storage-transfer-current.hidden {
-    display: none;
 }
 
 .business-dashboard .view-info .storage-transfer-data-details {
@@ -14684,9 +14628,6 @@ body.megaChatDisabled .nw-contact-name button.start-chat-button {
     text-align: center;
     display: block;
 }
-.toggle-optional-inputs-container.hidden {
-    display: none;
-}
 .user-management-dialog .default-button-no-border,
 .fm-right-header-user-management .default-button-no-border,
 .user-management-view .default-button-no-border {
@@ -15189,9 +15130,6 @@ body.megaChatDisabled .nw-contact-name button.start-chat-button {
     position: relative;
     cursor: pointer;
 }
-.files-grid-view.user-management-view .user-management-list-table tr td .icon-wrapper.hidden {
-    display: none;
-}
 
 .user-management-list-table tr td .user-management-name {
     font: var(--text-body1);
@@ -15229,9 +15167,6 @@ body.megaChatDisabled .nw-contact-name button.start-chat-button {
     vertical-align: middle;
 }
 
-.user-management-list-table .fm-user-management-user .admin-icon.hidden {
-    display: none;
-}
 
 .user-management-account-settings {
     background: var(--surface-grey-1);
@@ -15284,9 +15219,6 @@ body.megaChatDisabled .nw-contact-name button.start-chat-button {
     left: 0;
     display: flex;
     flex-direction: column;
-}
-.user-management-account-settings .invoice-detail.hidden {
-    display: none;
 }
 
 .user-management-account-settings .invoice-detail .invoice-button {
@@ -15547,7 +15479,7 @@ body.megaChatDisabled .nw-contact-name button.start-chat-button {
 }
 
 .user-management-account-settings .invoice-detail .inv-payment-table ul li .inv-payment-header:nth-child(3), .user-management-account-settings .invoice-detail .inv-payment-table ul li .inv-payment-item:nth-child(3) {
-    width: 55px;
+    width: 75px;
     color: var(--text-color-black-high);
     text-align: right;
     float: right;
@@ -15586,7 +15518,7 @@ body.megaChatDisabled .nw-contact-name button.start-chat-button {
 
 .user-management-account-settings .invoice-detail .inv-payment-table ul .inv-payment-price .inv-payment-price-detail:first-child,
 .user-management-account-settings .invoice-detail .inv-payment-table ul .inv-payment-price .inv-gst-perc {
-    width: calc(100% - 90px);
+    width: calc(100% - 110px);
     display: inline-block;
     text-align: right;
 }

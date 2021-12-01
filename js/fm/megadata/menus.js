@@ -275,7 +275,7 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
             }
         }
 
-        if (M.currentCustomView) {
+        if (M.currentCustomView || M.currentdirid.startsWith('search/')) {
             items['.open-cloud-item'] = 1;
         }
 
@@ -368,16 +368,42 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
     }
 
     // For multiple selections, should check all have the right permission.
-    if ((".remove-item" in items) && (items['.remove-item'] === 1) && ($.selected.length > 1)) {
-        var removeItemFlag = true;
-        for (var g = 1; g < $.selected.length; g++) {
-            if (M.getNodeRights($.selected[g]) <= 1) {
+    if ($.selected.length > 1) {
+
+        let removeItemFlag = true;
+        let clearVersioned = false;
+
+        for (var g = 0; g < $.selected.length; g++) {
+
+            // If any of node has read only rights or less, stop loop
+            if (folderlink || M.getNodeRights($.selected[g]) <= 1) {
+
                 removeItemFlag = false;
+                clearVersioned = false;
+
+                break;
+            }
+
+            const selected = M.getNodeByHandle($.selected[g]);
+
+            // If there is any folder selected, do not show clear version option
+            if (selected.t) {
+                clearVersioned = false;
+                break;
+            }
+            else if (selected.tvf) {
+                clearVersioned = true;
             }
         }
+
         if (!removeItemFlag) {
             delete items['.remove-item'];
             delete items['.move-item'];
+        }
+
+        // if there is no folder selected, selected file nodes are versioned, user has right to clear it.
+        if (clearVersioned) {
+            items['.clearprevious-versions'] = 1;
         }
     }
 
@@ -906,8 +932,23 @@ MegaData.prototype.reCalcMenuPosition = function(m, x, y, ico) {
 
     var TOP_MARGIN = 12;
     var SIDE_MARGIN = 12;
+
+    let hiddenUpdate;
+
+    // make it as visitble hidden for temporary to get context size to avoid 'display: none!important' return size 0 bug
+    // Somehow 'display: none' with '!important' causing jQuery offsetWidth and offsetHeight malfunction.
+    if (m.hasClass('hidden')) {
+        m.removeClass('hidden').addClass('v-hidden');
+        hiddenUpdate = true;
+    }
+
     var cmW = m.outerWidth();// dimensions without margins calculated
     var cmH = m.outerHeight();// dimensions without margins calculated
+
+    if (hiddenUpdate) {
+        m.removeClass('v-hidden').addClass('hidden');
+    }
+
     var wH = window.innerHeight;
     var wW = window.innerWidth;
     var maxX = wW - SIDE_MARGIN;// max horizontal coordinate, right side of window

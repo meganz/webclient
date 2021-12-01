@@ -791,9 +791,6 @@ div.bottom-page.slider-controls {
 }
 
 /* Compare MEGA with Goodle */
-.business-compare.hidden {
-    display: none;
-}
 .business-compare-data {
     -webkit-padding-end: 40px;
     padding-inline-end: 40px;

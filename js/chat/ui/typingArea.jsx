@@ -1,7 +1,7 @@
 // libs
 var React = require("react");
 var ReactDOM = require("react-dom");
-import { MegaRenderMixin, SoonFcWrap } from './../../stores/mixins.js';
+import { MegaRenderMixin, SoonFcWrap } from './../mixins';
 import { DropdownEmojiSelector } from './../../ui/emojiDropdown.jsx';
 import { Button } from './../../ui/buttons.jsx';
 import { EmojiAutocomplete } from './emojiAutocomplete.jsx';

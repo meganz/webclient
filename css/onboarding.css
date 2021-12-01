@@ -167,9 +167,6 @@
     border-radius: 12px;
     background: var(--surface-grey-1);
 }
-.onboarding-control-panel .onboarding-control-panel-content.hidden {
-    display: none;
-}
 .onboarding-control-panel .mega-button.close {
     position: absolute;
     right: 15px;
@@ -303,10 +300,6 @@
     align-items: center;
     font: var(--text-body1);
     color: var(--text-color-high);
-}
-.onboarding-control-panel .onboarding-control-panel-dismiss.hidden,
-.onboarding-control-panel .onboarding-control-panel-complete.hidden {
-    display: none;
 }
 .onboarding-control-panel .onboarding-control-panel-dismiss *,
 .onboarding-control-panel .onboarding-control-panel-complete * {

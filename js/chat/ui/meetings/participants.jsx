@@ -1,5 +1,5 @@
 import React from 'react';
-import { MegaRenderMixin } from '../../../stores/mixins';
+import { MegaRenderMixin } from '../../mixins';
 import { Avatar } from '../contacts.jsx';
 import { PerfectScrollbar } from '../../../ui/perfectScrollbar.jsx';
 import Collapse from './collapse.jsx';

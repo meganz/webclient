@@ -1,5 +1,5 @@
 import React from 'react';
-import { MegaRenderMixin } from '../../../stores/mixins';
+import { MegaRenderMixin } from '../../mixins';
 
 class Group extends MegaRenderMixin {
     static NAMESPACE = 'buttonGroup'

@@ -1290,6 +1290,15 @@ mBroadcaster.once('boot_done', function populate_l() {
     l['23062.k'] = l[23062].replace('[%s]', l[7049]);
     l[23066] = l[23066].replace('[A]', '<a class="clickurl" href="/security" '
         + 'target="_blank" rel="noopener noreferrer">').replace('[/A]', '</a>');
+    l[23067] = l[23067].replace('[S]', '<span class="num">').replace('[/S]', '</span>')
+        .replace('%1', '<span></span>');
+    l[23068] = l[23068].replace('[S]', '<span class="num">').replace('[/S]', '</span>')
+        .replace('%1', '<span></span>');
+    l[23069] = l[23069].replace('[S]', '<span class="num">').replace('[/S]', '</span>')
+        .replace('%1', '<span></span>');
+    l.about_countries_info_text = l.about_countries_info_text
+        .replace('[S]', '<span class="num">').replace('[/S]', '</span>')
+        .replace('%1', '<span></span>');
     l[23075] = l[23075].replace('[A1]', '<a class="clickurl" href="/terms" '
         + 'target="_blank" rel="noopener noreferrer">').replace('[/A1]', '</a>')
         .replace('[A2]', '<a class="clickurl" href="/takedown" '
@@ -1453,9 +1462,6 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[A]', '<a href="/cookie" class="clickurl" target="_blank">')
         .replace('[/A]', '</a>');
 
-    l.about_vision_desc = escapeHTML(l.about_vision_desc)
-        .replace(/\[S]/g, '<span>')
-        .replace(/\[\/S]/g, '</span>');
     l.about_vision_title = escapeHTML(l.about_vision_title)
         .replace(/\[S]/g, '<span>')
         .replace(/\[\/S]/g, '</span>');
@@ -1466,6 +1472,8 @@ mBroadcaster.once('boot_done', function populate_l() {
     l.jobs_opportunity_invert_card_desc = escapeHTML(l.jobs_opportunity_invert_card_desc)
         .replace(/\[BR]/g, '<br>');
     l.jobs_grow_invert_card_desc = escapeHTML(l.jobs_grow_invert_card_desc)
+        .replace('[BR]', '<br>');
+    l.about_job_expressions_txt = escapeHTML(l.about_job_expressions_txt)
         .replace('[BR]', '<br>');
     var common = [
         15536, 16106, 16107, 16119, 16120, 16123, 16124, 16135, 16136, 16137, 16138, 16304, 16313, 16315, 16316,

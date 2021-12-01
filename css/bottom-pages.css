@@ -722,33 +722,6 @@ body:not(.mobile) .bottom-page.scroll-button:hover {
     padding: 15px 0 21px 0;
     font-family: montserrat, LatoWeb, "source_sans_proregular", arial, sans-serif;
 }
-.bottom-page.big-icon-info.about {
-    font-size: 32px;
-    line-height: 39px;
-    font-family: LatoWebBlack, sans-serif;
-}
-.bottom-page.flip-card-title {
-    font-size: 32px;
-    line-height: 39px;
-    text-align: left;
-    font-family: LatoWebBlack, sans-serif;
-    padding: 15px 0 30px 40px;
-    color: var(--text-color-high);
-}
-.bottom-page.flip-card-desc {
-    font-size: 24px;
-    line-height: 33px;
-    padding-left: 40px;
-    text-align: left;
-    color: var(--text-color-high);
-    padding-right: 40px;
-}
-.bottom-page.flip-card-desc.invert {
-    color: var(--text-color-high-inverted);
-    font-size: 18px;
-    padding-top: 24px;
-    line-height: 26px;
-}
 .bottom-page.big-icon-info.mid-txt {
     font-size: 24px;
     line-height: 30px;
@@ -760,14 +733,6 @@ body:not(.mobile) .bottom-page.scroll-button:hover {
     color: #666666;
     padding: 0 0 16px 0;
     font-family: 'LatoWeb', 'source_sans_proregular', Arial;
-}
-.bottom-page.mid-icon-info.short.about {
-    font-size: 20px;
-    line-height: 26px;
-    color: #333333;
-    max-width: 400px;
-    padding-left: 48px;
-    padding-right: 48px;
 }
 .bottom-page.mid-icon-info:last-child {
     padding: 0 0 10px 0;
@@ -817,9 +782,6 @@ body:not(.mobile) .bottom-page.scroll-button:hover {
 }
 .bottom-page .col-3 {
     width: 33.333333%;
-}
-.bottom-page .vision-col-4 {
-    width: 25%;
 }
 .bottom-page .col-4 {
     width: 25%;
@@ -895,27 +857,6 @@ body:not(.mobile) .bottom-page.scroll-button:hover {
     font-family: 'montserrat_light', 'montserrat', Arial;
     max-width: 940px;
     margin: 0 auto;
-}
-.bottom-page .jobs-top-header {
-    inline-size: 700px;
-    overflow-wrap: break-word;
-    margin: 0 auto;
-    font-size: 48px;
-    line-height: 58px;
-    padding: 4px 0 24px;
-    color: var(--text-color-high);
-    font-family: "montserrat_bold", montserrat, Arial, sans-serif;
-}
-.bottom-page.jobs-dream-container {
-    display: table;
-    width: 100%;
-    margin: 0 auto;
-    background:
-        linear-gradient(
-        0deg,
-        white 75%,
-        #FAFAFA 25%
-        );
 }
 .bottom-page.big-header i, .bottom-page.big-header span {
     display: inline-block;
@@ -1423,19 +1364,6 @@ body:not(.mobile) .bottom-btn-container .bus-plan.button-48-height.red:hover {
     max-width: 1194px;
     padding: 0 40px;
 }
-.bottom-page.jobs-life-container {
-    width: 100%;
-    margin: 0 auto;
-    display: table;
-    padding-bottom: 158px;
-}
-.bottom-page.card.img {
-    height: 64px;
-    width: 64px;
-    box-sizing: content-box;
-    padding-left: 32px;
-    padding-top: 32px;
-}
 .video-info-block {
     display: block;
     width: calc(100% - 36px);
@@ -1765,18 +1693,6 @@ iframe.security-video-container {
 .bottom-page.light-bg {
     background-color: #F5F5F5;
 }
-.bottom-page.red-bg {
-    background-color: #BF1515;
-    align-self: end;
-    z-index: 1;
-}
-/*.bottom-page.red-bg,*/
-/*.about.img-wrap-office,*/
-/*.about.vision-title,*/
-/*.about.vision-desc,*/
-/*.auto-slider{*/
-/*   grid-area: 1/1;*/
-/*}*/
 .bottom-page.cols-container {
     display: table;
     width: 100%;
@@ -4764,48 +4680,6 @@ body:not(.mobile) .bottom-page.dropdown .dropdown-item:hover, .bottom-page.dropd
     }
 }
 
-@media only screen and (max-width: 1440px) {
-    .bottom-page.mid-icon-info.short.about {
-        font-size: 18px;
-        line-height: 26px;
-        max-width: 300px;
-        padding-left: 32px;
-        padding-right: 32px;
-    }
-    .bottom-page.big-icon-info.about {
-        font-size: 30px;
-        line-height: 36px;
-    }
-    .bottom-page .jobs-top-header {
-        font-size: 42px;
-        line-height: 52px;
-    }
-    .bottom-page.card.img {
-        padding-left: 32px;
-        padding-top: 32px;
-    }
-    .bottom-page.flip-card-title {
-        font-size: 24px;
-        line-height: 29px;
-        padding: 15px 0 24px 32px;
-    }
-    .bottom-page.flip-card-desc {
-        font-size: 18px;
-        line-height: 26px;
-        padding-left: 32px;
-        padding-right: 32px;
-    }
-    .bottom-page.jobs-life-container {
-        padding-bottom: 78px;
-    }
-}
-
-@media only screen and (orientation: landscape) and (max-width: 900px) {
-    .bottom-page.big-bott-pad.jobs {
-        padding-bottom: 48px;
-    }
-}
-
 @media only screen and (max-width: 768px) {
     .megasync .bottom-page.right-cell,
     .megasync .bottom-page.left-cell {
@@ -4814,59 +4688,6 @@ body:not(.mobile) .bottom-page.dropdown .dropdown-item:hover, .bottom-page.dropd
     }
     .megasync .sync-3 .bottom-page img {
         margin: 32px auto;
-    }
-    .bottom-page .jobs-top-header {
-        font-size: 36px;
-        line-height: 44px;
-        inline-size: 400px;
-    }
-    .bottom-page.card.img {
-        width: 48px;
-        height: 48px;
-    }
-    .bottom-page.flip-card-title {
-        font-size: 22px;
-        line-height: 27px;
-        padding: 15px 0 24px 32px;
-    }
-    .bottom-page.flip-card-desc {
-        font-size: 18px;
-        line-height: 26px;
-        padding-left: 32px;
-    }
-    .bottom-page.jobs-life-container {
-        padding-bottom: 70px;
-    }
-}
-
-@media only screen and (max-width: 390px) {
-    .bottom-page.mid-icon-info.short.about {
-        font-size: 16px;
-    }
-    .bottom-page .jobs-top-header {
-        inline-size: 300px;
-        font-size: 30px;
-        line-height: 37px;
-    }
-    .bottom-page.flip-card-title {
-        font-size: 20px;
-        line-height: 24px;
-        padding: 15px 0 24px 32px;
-    }
-    .bottom-page.flip-card-desc {
-        font-size: 16px;
-        line-height: 23px;
-        padding-left: 32px;
-        max-width: 278px;
-    }
-    .bottom-page.jobs-life-container {
-        padding-bottom: 88px;
-    }
-}
-
-@media only screen and (max-width: 300px) {
-    .bottom-page .jobs-top-header {
-        inline-size: 250px;
     }
 }
 
@@ -5132,13 +4953,6 @@ body:not(.mobile) .bottom-page.dropdown .dropdown-item:hover, .bottom-page.dropd
 }
 
 @media only screen and (max-width: 783px) {
-    .bottom-page.flip-card-desc.invert {
-        font-size: 16px;
-    }
-    .bottom-page .inline-block.col-3.about {
-        padding-left: 24px;
-        padding-right: 24px;
-    }
     .bottom-page.small-txt {
         font-size: 14px;
         line-height: 24px;
@@ -6150,18 +5964,6 @@ body:not(.mobile) .bottom-page.dropdown .dropdown-item:hover, .bottom-page.dropd
 }
 
 @media only screen and (max-width: 420px) {
-    .bottom-page.jobs-life-container {
-        padding-bottom: 46px;
-    }
-    .bottom-page.flip-card-desc.invert {
-        font-size: 14px;
-        line-height: 20px;
-        padding-top: 16px;
-    }
-    .bottom-page.flip-card-desc {
-        font-size: 16px;
-        line-height: 23px;
-    }
     .cmd-top-img {
         margin-left: -20px;
         margin-right: -20px;

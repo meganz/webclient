@@ -536,11 +536,11 @@
         },
 
         fillStats: function($page, muser, dactive, bfiles, mcountries) {
-            // Locale of million and biliion will comes
-            $('.register-count .num', $page).text(muser + 'M+');
-            $('.daily-active .num', $page).text(dactive + 'M+');
-            $('.files-count .num', $page).text(bfiles + 'B+');
-            $('.mega-countries .num', $page).text(mcountries + '+');
+            // Locale of million and biliion will comes -> should be localised now
+            $('.register-count .num span', $page).text(muser);
+            $('.daily-active .num span', $page).text(dactive);
+            $('.files-count .num span', $page).text(bfiles);
+            $('.mega-countries .num span', $page).text(mcountries);
         },
 
         dynamicStatsCount: function($page) {

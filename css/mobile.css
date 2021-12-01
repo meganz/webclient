@@ -209,8 +209,12 @@ ul, li {
 .mobile.main-block.error-overlay {
     position: fixed;
     top: 0;
-    z-index: 190;
+    z-index: 2300;
     overflow: hidden;
+}
+#mobile-decryption-key-overlay,
+#mobile-password-decryption-overlay {
+    z-index: 190;
 }
 .mobile.content-row {
     display: table-row;

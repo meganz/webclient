@@ -1737,10 +1737,7 @@ export class ConversationPanel extends MegaRenderMixin {
 
                         {
                             (
-                                is_chatlink &&
-                                room.type === "public" &&
-                                room.publicChatHandle && room.publicChatKey &&
-                                room.publicChatHandle === megaChat.initialPubChatHandle
+                                room.isAnonymous()
                             ) ?
                         (
                         <div className="join-chat-block">

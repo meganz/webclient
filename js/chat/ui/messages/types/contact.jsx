@@ -66,6 +66,8 @@ export default class Contact extends AbstractGenericMessage {
     _getContactCard(message, contact, contactEmail) {
         const HAS_RELATIONSHIP = M.u[contact.u].c === 1;
         let name = M.getNameByHandle(contact.u);
+        const { chatRoom } = this.props;
+        const isAnonView = chatRoom.isAnonymous();
         if (megaChat.FORCE_EMAIL_LOADING) {
             name += "(" + contact.m + ")";
         }
@@ -83,7 +85,7 @@ export default class Contact extends AbstractGenericMessage {
                 >
                     <div className="dropdown-avatar rounded">
                         {this._getContactAvatar(contact, 'context-avatar')}
-                        <div className="dropdown-user-name">
+                        {!isAnonView ?  <div className="dropdown-user-name">
                             <div className="name">
                                 {HAS_RELATIONSHIP && (
                                     // Contact is present within the contact list,
@@ -96,7 +98,7 @@ export default class Contact extends AbstractGenericMessage {
                             <div className="email">
                                 {M.u[contact.u].m}
                             </div>
-                        </div>
+                        </div> : <div className="dropdown-user-name"></div>}
                     </div>
                     <ContactFingerprint contact={M.u[contact.u]} />
 
@@ -137,9 +139,10 @@ export default class Contact extends AbstractGenericMessage {
     }
 
     getContents() {
-        const { message } = this.props;
+        const { message, chatRoom } = this.props;
         const textContents = message.textContents.substr(2, message.textContents.length);
         const attachmentMeta = JSON.parse(textContents);
+        const isAnonView = chatRoom.isAnonymous();
 
         if (!attachmentMeta) {
             return console.error(`Message w/ type: ${message.type} -- no attachment meta defined. Message: ${message}`);
@@ -168,13 +171,13 @@ export default class Contact extends AbstractGenericMessage {
             contacts = [
                 ...contacts,
                 <div key={contact.u}>
-                    <div className="message shared-info">
+                    {!isAnonView ? <div className="message shared-info">
                         <div className="message data-title">{M.getNameByHandle(contact.u)}</div>
                         {M.u[contact.u] ?
                             <ContactVerified className="right-align" contact={M.u[contact.u]}/> :
                             null}
                         <div className="user-card-email">{contactEmail}</div>
-                    </div>
+                    </div> : <div className="message shared-info"></div>}
                     <div className="message shared-data">
                         <div className="data-block-view semi-big">
                             {

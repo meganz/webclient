@@ -782,7 +782,15 @@ ChatRoom.prototype.isArchived = function() {
     return (self.flags & ChatRoom.ARCHIVED);
 };
 
-
+/**
+ * Check whether a chatRoom is in anonymous view
+ *
+ * @returns {Boolean}
+ */
+ChatRoom.prototype.isAnonymous = function() {
+    return is_chatlink && this.type === "public" && this.publicChatHandle &&
+        this.publicChatKey && this.publicChatHandle === megaChat.initialPubChatHandle;
+};
 
 /**
  * Check whether a chat is displayable.

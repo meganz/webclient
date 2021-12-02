@@ -3316,6 +3316,10 @@ ChatRoom.prototype.isArchived = function () {
   return self.flags & ChatRoom.ARCHIVED;
 };
 
+ChatRoom.prototype.isAnonymous = function () {
+  return is_chatlink && this.type === "public" && this.publicChatHandle && this.publicChatKey && this.publicChatHandle === megaChat.initialPubChatHandle;
+};
+
 ChatRoom.prototype.isDisplayable = function () {
   var self = this;
   return self.showArchived === true || !self.isArchived() || self.activeCall;
@@ -10163,6 +10167,10 @@ class Contact extends AbstractGenericMessage {
   _getContactCard(message, contact, contactEmail) {
     const HAS_RELATIONSHIP = M.u[contact.u].c === 1;
     let name = M.getNameByHandle(contact.u);
+    const {
+      chatRoom
+    } = this.props;
+    const isAnonView = chatRoom.isAnonymous();
 
     if (megaChat.FORCE_EMAIL_LOADING) {
       name += "(" + contact.m + ")";
@@ -10179,7 +10187,7 @@ class Contact extends AbstractGenericMessage {
       horizOffset: 4
     }, external_React_default().createElement("div", {
       className: "dropdown-avatar rounded"
-    }, this._getContactAvatar(contact, 'context-avatar'), external_React_default().createElement("div", {
+    }, this._getContactAvatar(contact, 'context-avatar'), !isAnonView ? external_React_default().createElement("div", {
       className: "dropdown-user-name"
     }, external_React_default().createElement("div", {
       className: "name"
@@ -10190,7 +10198,9 @@ class Contact extends AbstractGenericMessage {
       contact: contact
     })), external_React_default().createElement("div", {
       className: "email"
-    }, M.u[contact.u].m))), external_React_default().createElement(ui_contacts.ContactFingerprint, {
+    }, M.u[contact.u].m)) : external_React_default().createElement("div", {
+      className: "dropdown-user-name"
+    })), external_React_default().createElement(ui_contacts.ContactFingerprint, {
       contact: M.u[contact.u]
     }), HAS_RELATIONSHIP && external_React_default().createElement((external_React_default()).Fragment, null, external_React_default().createElement(dropdowns.DropdownItem, {
       icon: "sprite-fm-mono icon-user-filled",
@@ -10215,10 +10225,12 @@ class Contact extends AbstractGenericMessage {
 
   getContents() {
     const {
-      message
+      message,
+      chatRoom
     } = this.props;
     const textContents = message.textContents.substr(2, message.textContents.length);
     const attachmentMeta = JSON.parse(textContents);
+    const isAnonView = chatRoom.isAnonymous();
 
     if (!attachmentMeta) {
       return console.error("Message w/ type: " + message.type + " -- no attachment meta defined. Message: " + message);
@@ -10242,7 +10254,7 @@ class Contact extends AbstractGenericMessage {
 
       contacts = [...contacts, external_React_default().createElement("div", {
         key: contact.u
-      }, external_React_default().createElement("div", {
+      }, !isAnonView ? external_React_default().createElement("div", {
         className: "message shared-info"
       }, external_React_default().createElement("div", {
         className: "message data-title"
@@ -10251,7 +10263,9 @@ class Contact extends AbstractGenericMessage {
         contact: M.u[contact.u]
       }) : null, external_React_default().createElement("div", {
         className: "user-card-email"
-      }, contactEmail)), external_React_default().createElement("div", {
+      }, contactEmail)) : external_React_default().createElement("div", {
+        className: "message shared-info"
+      }), external_React_default().createElement("div", {
         className: "message shared-data"
       }, external_React_default().createElement("div", {
         className: "data-block-view semi-big"
@@ -21927,7 +21941,7 @@ let ConversationPanel = (conversationpanel_dec = utils["default"].SoonFcWrap(360
       onDeleteClicked: this.handleDeleteDialog
     })), !is_chatlink && room.state != ChatRoom.STATE.LEFT && (room.havePendingGroupCall() || room.havePendingCall()) ? external_React_default().createElement(JoinCallNotification, {
       chatRoom: room
-    }) : null, is_chatlink && room.type === "public" && room.publicChatHandle && room.publicChatKey && room.publicChatHandle === megaChat.initialPubChatHandle ? external_React_default().createElement("div", {
+    }) : null, room.isAnonymous() ? external_React_default().createElement("div", {
       className: "join-chat-block"
     }, external_React_default().createElement("div", {
       className: "mega-button large positive",

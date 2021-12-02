@@ -8691,6 +8691,10 @@ class Breadcrumbs extends mixins.wl {
           breadcrumbClasses += " folder";
         }
 
+        if (nodeId.length === 11 && M.u[nodeId]) {
+          return;
+        }
+
         if (nodeId === "shares") {
           breadcrumbClasses += " shared-with-me";
         }

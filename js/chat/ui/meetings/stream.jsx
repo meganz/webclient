@@ -430,7 +430,7 @@ export default class Stream extends MegaRenderMixin {
     };
 
     specShouldComponentUpdate(nextProps) {
-        if (nextProps.minimized !== this.props.minimized) {
+        if (nextProps.minimized !== this.props.minimized || nextProps.mode !== this.props.mode) {
             return true;
         }
         return null;

@@ -10126,25 +10126,21 @@ class Local extends AbstractGenericMessage {
 class Contact extends AbstractGenericMessage {
   constructor(props) {
     super(props);
+    this.DIALOG = {
+      ADDED: addedEmail => msgDialog('info', l[150], l[5898].replace('[X]', addedEmail)),
+      DUPLICATE: () => msgDialog('warningb', '', l[17545])
+    };
+
+    this._doAddContact = contactEmail => M.inviteContact(M.u[u_handle] ? M.u[u_handle].m : u_attr.email, contactEmail);
 
     this._handleAddContact = contactEmail => {
-      let exists = false;
-      const ownerEmail = M.u[u_handle] ? M.u[u_handle].m : u_attr.email;
-      Object.keys(M.opc).forEach(function (k) {
-        if (!exists && M.opc[k].m === contactEmail && !M.opc[k].hasOwnProperty('dts')) {
-          exists = true;
-          return false;
-        }
-      });
+      var _this$props$chatRoom;
 
-      if (exists) {
-        closeDialog();
-        msgDialog('warningb', '', l[17545]);
-      } else {
-        M.inviteContact(ownerEmail, contactEmail);
-        closeDialog();
-        msgDialog('info', l[150], l[5898].replace('[X]', contactEmail));
+      if ((_this$props$chatRoom = this.props.chatRoom) != null && _this$props$chatRoom.isAnonymous()) {
+        return this._doAddContact(contactEmail).done(addedEmail => this.DIALOG.ADDED(addedEmail)).catch(this.DIALOG.DUPLICATE);
       }
+
+      return Object.values(M.opc).some(opc => opc.m === contactEmail) ? this.DIALOG.DUPLICATE() : this._doAddContact(contactEmail).done(addedEmail => this.DIALOG.ADDED(addedEmail));
     };
 
     this._getContactAvatar = (contact, className) => external_React_default().createElement(ui_contacts.Avatar, {
@@ -10216,7 +10212,7 @@ class Contact extends AbstractGenericMessage {
         loadSubPage("fm/chat/p/" + contact.u);
         mBroadcaster.sendMessage('chat:open');
       }
-    })), u_type && u_type > 2 && !HAS_RELATIONSHIP && !is_eplusplus && external_React_default().createElement(dropdowns.DropdownItem, {
+    })), u_type && u_type > 2 && contact.u !== u_handle && !HAS_RELATIONSHIP && !is_eplusplus && external_React_default().createElement(dropdowns.DropdownItem, {
       icon: "sprite-fm-mono icon-add",
       label: l[71],
       onClick: () => this._handleAddContact(contactEmail)

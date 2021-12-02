@@ -9,36 +9,36 @@ export default class Contact extends AbstractGenericMessage {
         super(props);
     }
 
-    _handleAddContact = (contactEmail) => {
-        let exists = false;
-        const ownerEmail = M.u[u_handle] ? M.u[u_handle].m : u_attr.email;
-        Object.keys(M.opc).forEach(function(k) {
-            if (!exists && M.opc[k].m === contactEmail && !M.opc[k].hasOwnProperty('dts')) {
-                exists = true;
-                return false;
-            }
-        });
+    DIALOG = {
+        ADDED: addedEmail =>
+            // `Contact invited`
+            // `The user has been invited and will appear in your contact list once accepted.`
+            msgDialog('info', l[150], l[5898].replace('[X]', addedEmail)),
+        DUPLICATE: () =>
+            // `Invite already sent, waiting for response.`
+            msgDialog('warningb', '', l[17545])
+    };
 
-        if (exists) {
-            closeDialog();
-            msgDialog(
-                'warningb',
-                '',
-                l[17545] /* `Invite already sent, waiting for response.` */
-            );
+    _doAddContact = contactEmail => M.inviteContact(M.u[u_handle] ? M.u[u_handle].m : u_attr.email, contactEmail);
+
+    _handleAddContact = contactEmail => {
+        // Anonymous view -> no `M.opc` available for this state; invoke directly contact request.
+        // Render the resulting message dialog (`The user has been invited [...]` or `Invite already sent [...]`)
+        // based on the actual API response.
+        if (this.props.chatRoom?.isAnonymous()) {
+            return this._doAddContact(contactEmail)
+                .done(addedEmail => this.DIALOG.ADDED(addedEmail))
+                .catch(this.DIALOG.DUPLICATE);
         }
-        else {
-            M.inviteContact(ownerEmail, contactEmail);
-            closeDialog();
-            msgDialog(
-                'info',
-                // `Contact invited`
-                l[150],
-                // `The user [X] has been invited and will appear in your contact list once accepted.`
-                l[5898].replace('[X]', contactEmail)
-            );
-        }
-    }
+
+        return (
+            // Look into if contact request was already sent (`M.opc`) before invoking API request.
+            Object.values(M.opc).some(opc => opc.m === contactEmail) ?
+                this.DIALOG.DUPLICATE() :
+                this._doAddContact(contactEmail)
+                    .done(addedEmail => this.DIALOG.ADDED(addedEmail))
+        );
+    };
 
     _getContactAvatar = (contact, className) => (
         <Avatar
@@ -124,7 +124,7 @@ export default class Contact extends AbstractGenericMessage {
                         </>
                     )}
 
-                    {u_type && u_type > 2 && !HAS_RELATIONSHIP &&  !is_eplusplus && (
+                    {u_type && u_type > 2 && contact.u !== u_handle && !HAS_RELATIONSHIP && !is_eplusplus && (
                         <DropdownItem
                             icon="sprite-fm-mono icon-add"
                             label={l[71] /* `Add contact` */}

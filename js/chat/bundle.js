@@ -22527,7 +22527,7 @@ class searchField_SearchField extends mixins.wl {
     }), external_React_default().createElement("input", {
       type: "text",
       autoComplete: "disabled",
-      placeholder: "Search",
+      placeholder: l[102],
       ref: searchField_SearchField.inputRef,
       value: value,
       onChange: ev => {

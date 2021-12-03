@@ -10,14 +10,19 @@ var TermCode;
     TermCode[TermCode["kFlagError"] = 128] = "kFlagError";
     TermCode[TermCode["kFlagDisconn"] = 64] = "kFlagDisconn";
     TermCode[TermCode["kUserHangup"] = 0] = "kUserHangup";
+    TermCode[TermCode["kTooManyParticipants"] = 1] = "kTooManyParticipants";
+    TermCode[TermCode["kLeavingRoom"] = 2] = "kLeavingRoom";
     //====
     TermCode[TermCode["kRtcDisconn"] = 64] = "kRtcDisconn";
     TermCode[TermCode["kSigDisconn"] = 65] = "kSigDisconn";
     TermCode[TermCode["kSvrShuttingDown"] = 66] = "kSvrShuttingDown";
+    TermCode[TermCode["kChatDisconn"] = 67] = "kChatDisconn";
     //====
     TermCode[TermCode["kErrSignaling"] = 128] = "kErrSignaling";
     TermCode[TermCode["kErrNoCall"] = 129] = "kErrNoCall";
     TermCode[TermCode["kErrAuth"] = 130] = "kErrAuth";
+    TermCode[TermCode["kErrApiTimeout"] = 131] = "kErrApiTimeout";
+    TermCode[TermCode["kErrSdp"] = 132] = "kErrSdp";
     TermCode[TermCode["kErrGeneral"] = 191] = "kErrGeneral";
 })(TermCode || (TermCode = {}));
 ;
@@ -345,7 +350,7 @@ function compressedSdpToString(sdp) {
 }
 
 ;// CONCATENATED MODULE: ../shared/commitId.ts
-const COMMIT_ID = '26b186b4e5';
+const COMMIT_ID = 'd45358926e';
 /* harmony default export */ const commitId = (COMMIT_ID);
 
 ;// CONCATENATED MODULE: ./client.ts
@@ -372,6 +377,10 @@ var ConnState;
     ConnState[ConnState["kJoining"] = 2] = "kJoining";
     ConnState[ConnState["kJoined"] = 3] = "kJoined";
 })(ConnState || (ConnState = {}));
+var StatsFlags;
+(function (StatsFlags) {
+    StatsFlags[StatsFlags["kSendingScreen"] = 1] = "kSendingScreen";
+})(StatsFlags || (StatsFlags = {}));
 class SfuClient {
     constructor(userId, app, callKey, options, url) {
         this.peers = new Map();
@@ -414,6 +423,7 @@ class SfuClient {
         this._speakerDetector = new SpeakerDetector(this);
         this._statsRecorder = new StatsRecorder(this);
     }
+    get noMicInputSignalled() { return this._noMicInputSignalled; }
     static platformHasSupport() {
         return window.RTCRtpSender &&
             !!RTCRtpSender.prototype.createEncodedStreams;
@@ -622,6 +632,7 @@ class SfuClient {
             this.isGroup = isGroup;
         }
         delete this.termCode;
+        delete this._noMicInputSignalled;
         this._setConnState(ConnState.kConnecting);
         this._fire("onConnecting");
         this.reinit();
@@ -687,8 +698,18 @@ class SfuClient {
         this._stopAndDelLocalTrack("_screenTrack");
     }
     disconnect(termCode) {
+        if (this._connState === ConnState.kDisconnected) {
+            console.log("disconnect: Already disconnected");
+            return Promise.resolve();
+        }
         termCode = this.termCode = (termCode != null) ? termCode : termCodes.kUserHangup;
         if (this.conn) {
+            if (this.conn.readyState === WebSocket.OPEN) {
+                try {
+                    this.send({ a: "BYE", rsn: termCode });
+                }
+                catch (ex) { }
+            }
             let promise = this._disconnectPromise = createPromiseWithResolveMethods();
             this.conn.close();
             return promise;
@@ -756,7 +777,7 @@ class SfuClient {
             ivs: ivs,
             av: this.availAv
         };
-        if (this.cid) {
+        if (this.cid) { // when reconnecting, tell the SFU the CID of the previous connection, so it can kill it instantly
             offerCmd.cid = this.cid;
         }
         if (this.initialVthumbCount) {
@@ -1156,9 +1177,7 @@ class SfuClient {
         if (msg.err != null) {
             let strError = termCodes[msg.err];
             let logMsg = "Server closed connection with error ";
-            if (strError) {
-                logMsg += strError ? strError : `(${msg.err})`;
-            }
+            logMsg += strError ? strError : `(${msg.err})`;
             if (msg.msg) {
                 logMsg += ": " + msg.msg;
             }
@@ -1329,16 +1348,6 @@ class SfuClient {
             spt: spt,
             tmp: tmp,
             stmp: screenTmp
-        });
-    }
-    requestServerStats(enable) {
-        if (this._connState !== ConnState.kJoined) {
-            console.warn("requestServerStats called without having joined a call");
-            return;
-        }
-        this.send({
-            a: "STATS_RQ",
-            on: enable ? 1 : 0
         });
     }
     isSpeaker() {
@@ -1540,6 +1549,7 @@ class SfuClient {
         let timer = this.micMutedWarnTimer = setTimeout(() => {
             if (this.micMutedWarnTimer === timer) {
                 delete this.micMutedWarnTimer;
+                this._noMicInputSignalled = true;
                 this._fire('onNoMicInput');
             }
         }, SfuClient.kMicMutedWarnTimeout);
@@ -1605,7 +1615,8 @@ class SfuClient {
             console.warn("pollStats called while not in kJoined state");
             return;
         }
-        let stats = this.rtcStats = { pl: 0, jtr: 1000000 };
+        let flags = this._screenTrack ? StatsFlags.kSendingScreen : 0;
+        let stats = this.rtcStats = { pl: 0, jtr: 1000000, f: flags };
         this.hasConnStats = false;
         let promises = [this.pollTxVideoStats(), this.pollMicAudioLevel()];
         for (let rxTrack of this.inVideoTracks.values()) {
@@ -1792,7 +1803,7 @@ SfuClient.msgHandlerMap = {
     "SPEAK_OFF": SfuClient.prototype.msgSpeakOff,
     "KEY": SfuClient.prototype.msgKey,
     "MOD": SfuClient.prototype.msgMod,
-    "STAT": SfuClient.prototype.msgSfuStats, //SFU load stats
+    "STAT": SfuClient.prototype.msgSfuStats,
 };
 class Slot {
     constructor(client, xponder, generateIv) {
@@ -1800,7 +1811,6 @@ class Slot {
         this.rxStatCtx = {};
         // needs to be accessed by VideoPlayer
         this.rxStatsCallbacks = new Map; // key is a VideoPlayer object that receives the stats
-        this.sentLayers = SfuClient.kSpatialLayerCount;
         this.client = client;
         this.xponder = xponder;
         xponder.slot = this;
@@ -1849,6 +1859,78 @@ class Slot {
     isSendingTrack() {
         return this.sentTrack != null;
     }
+    async pollRxStats() {
+        let client = this.client;
+        let connStats = client.rtcStats;
+        let ctx = this.rxStatCtx;
+        let rtpParsed;
+        let stats = await this.xponder.receiver.getStats();
+        let parseConnStats = !client.hasConnStats;
+        for (let stat of stats.values()) {
+            if (stat.type === "inbound-rtp") {
+                if (!ctx.prev) {
+                    ctx.prev = stat;
+                }
+                else {
+                    let prev = ctx.prev;
+                    ctx.prev = stat;
+                    let period = (stat.timestamp - prev.timestamp) / 1000;
+                    let plostPerSecond = (stat.packetsLost - prev.packetsLost) / period;
+                    connStats.pl += plostPerSecond;
+                    if (!this.isVideo && (stat.jitter != null)) {
+                        let jtr = Math.round(stat.jitter * 1000);
+                        if (connStats.jtr > jtr) {
+                            connStats.jtr = jtr;
+                        }
+                    }
+                    let cbs = this.rxStatsCallbacks;
+                    if (cbs.size) {
+                        // more detailed stats for app
+                        let info = {
+                            plost: plostPerSecond,
+                            nacktx: (stat.nackCount - prev.nackCount) / period,
+                            kbps: ((stat.bytesReceived - prev.bytesReceived) / 128) / period,
+                            keyfps: (stat.keyFramesDecoded - prev.keyFramesDecoded) / period
+                        };
+                        for (let cb of cbs.values()) { // may get unassigned while getting stats
+                            cb(this, info, stat);
+                        }
+                    }
+                    rtpParsed = true;
+                }
+                if (!parseConnStats) {
+                    return;
+                }
+            }
+            else if (parseConnStats && stat.type === "candidate-pair" && stat.nominated) {
+                this.client.parseConnStats(stat);
+                parseConnStats = false;
+                if (rtpParsed) {
+                    return;
+                }
+            }
+        }
+    }
+}
+class VideoSlot extends Slot {
+    constructor(client, xponder, generateIv) {
+        super(client, xponder, generateIv);
+        this.players = new Set();
+        this.isHiRes = false;
+        this.sentLayers = SfuClient.kSpatialLayerCount;
+        this.isVideo = true;
+    }
+    reassignV(fromCid, iv, isHiRes, noDetach, releaseCb) {
+        this.isHiRes = isHiRes;
+        if (!noDetach) {
+            this._detachAllPlayers();
+        }
+        else { // track reusing can be done only for the same cid, for hires<->lowres interchange
+            assert(fromCid === this.cid);
+        }
+        this._releaseTrackCb = releaseCb;
+        super.reassign(fromCid, iv);
+    }
     setEncoderParams(cb) {
         let sender = this.xponder.sender;
         let params = sender.getParameters(); // this may block for > 1000ms!
@@ -1883,82 +1965,6 @@ class Slot {
         }
         console.warn(`setTxSvcLayerCount: Enabling only first ${count} layers`);
         return sender.setParameters(params);
-    }
-    async pollRxStats() {
-        let client = this.client;
-        let connStats = client.rtcStats;
-        let ctx = this.rxStatCtx;
-        let rtpParsed;
-        let stats = await this.xponder.receiver.getStats();
-        let parseConnStats = !client.hasConnStats;
-        for (let stat of stats.values()) {
-            if (stat.type === "inbound-rtp") {
-                if (!ctx.prev) {
-                    ctx.prev = stat;
-                }
-                else {
-                    let prev = ctx.prev;
-                    ctx.prev = stat;
-                    let period = (stat.timestamp - prev.timestamp) / 1000;
-                    let plostPerSecond = (stat.packetsLost - prev.packetsLost) / period;
-                    connStats.pl += plostPerSecond;
-                    if (!(this instanceof VideoSlot)) {
-                        let jtr;
-                        if (stat.jitter) {
-                            jtr = Math.round(stat.jitter * 1000);
-                            if (connStats.jtr > jtr) {
-                                connStats.jtr = jtr;
-                            }
-                        }
-                        else {
-                            jtr = 0;
-                        }
-                    }
-                    let cbs = this.rxStatsCallbacks;
-                    if (cbs.size) {
-                        // more detailed stats for app
-                        let info = {
-                            plost: plostPerSecond,
-                            nacktx: (stat.nackCount - prev.nackCount) / period,
-                            kbps: ((stat.bytesReceived - prev.bytesReceived) / 128) / period,
-                            keyfps: (stat.keyFramesDecoded - prev.keyFramesDecoded) / period
-                        };
-                        for (let cb of cbs.values()) { // may get unassigned while getting stats
-                            cb(this, info, stat);
-                        }
-                    }
-                    rtpParsed = true;
-                }
-                if (!parseConnStats) {
-                    return;
-                }
-            }
-            else if (parseConnStats && stat.type === "candidate-pair" && stat.nominated) {
-                this.client.parseConnStats(stat);
-                parseConnStats = false;
-                if (rtpParsed) {
-                    return;
-                }
-            }
-        }
-    }
-}
-class VideoSlot extends Slot {
-    constructor() {
-        super(...arguments);
-        this.players = new Set();
-        this.isHiRes = false;
-    }
-    reassignV(fromCid, iv, isHiRes, noDetach, releaseCb) {
-        this.isHiRes = isHiRes;
-        if (!noDetach) {
-            this._detachAllPlayers();
-        }
-        else { // track reusing can be done only for the same cid, for hires<->lowres interchange
-            assert(fromCid === this.cid);
-        }
-        this._releaseTrackCb = releaseCb;
-        super.reassign(fromCid, iv);
     }
     _detachAllPlayers() {
         if (!this.players.size) {
@@ -2493,8 +2499,6 @@ class SvcDriver {
     constructor(client) {
         this.client = client;
         this.lowestRttSeen = 10000; // force recalculation on first stat sample
-        this.plostUpper = 1;
-        this.plostLower = 0.01;
         this.currSvcQuality = SvcDriver.kMaxQualityIndex;
     }
     async onStats() {
@@ -2506,6 +2510,9 @@ class SvcDriver {
         }
         if (plost == null) {
             plost = 0;
+        }
+        else if (plost > 2) { // we shouldn't care so much about the magnitude of loss bursts, only about their occurrence
+            plost = 2;
         }
         if (this.maRtt == null) {
             this.maRtt = rtt;
@@ -2527,10 +2534,10 @@ class SvcDriver {
         if (tsNow - this.tsLastSwitch < SvcDriver.kMinTimeBetweenSwitches) {
             return; // too early
         }
-        if (this.currSvcQuality > 0 && (rtt > this.rttUpper || plost > this.plostUpper)) {
+        if (this.currSvcQuality > 0 && (rtt > this.rttUpper || plost > SvcDriver.kPlostUpper)) {
             this.switchRxSvcQuality(-1);
         }
-        else if (this.currSvcQuality < SvcDriver.kMaxQualityIndex && rtt < this.rttLower && plost < this.plostLower) {
+        else if (this.currSvcQuality < SvcDriver.kMaxQualityIndex && rtt < this.rttLower && plost < SvcDriver.kPlostLower) {
             this.switchRxSvcQuality(+1);
         }
         this.checkAdaptTxSvcQuality(stats);
@@ -2570,6 +2577,8 @@ class SvcDriver {
         return true;
     }
 }
+SvcDriver.kPlostUpper = 1;
+SvcDriver.kPlostLower = 0.1;
 SvcDriver.kRttLowerHeadroom = 30;
 SvcDriver.kRttUpperHeadroom = 250;
 SvcDriver.kMinTimeBetweenSwitches = 6000;
@@ -2720,6 +2729,9 @@ class StatsRecorder {
             samples: arrs,
             trsn: termReason,
         };
+        if (this.client.noMicInputSignalled) {
+            data.nomic = 1;
+        }
         if (this.client.isGroup) {
             data.grp = 1;
         }

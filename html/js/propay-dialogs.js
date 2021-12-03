@@ -1260,6 +1260,8 @@ var addressDialog = {
         var monthsWording;
 
         if (!is_mobile) {
+            $('.error-message', this.$dialog).addClass('hidden');
+
             var $contentSection = $('section.content', this.$dialog);
             if ($contentSection.is('.ps-container')) {
                 Ps.update($contentSection[0]);
@@ -1862,7 +1864,16 @@ var addressDialog = {
                 !fieldValues['city'] || !fieldValues['postcode'] || !country || stateNotSet) {
 
             // Show a general error and exit early if they are not complete
-            $errorMessage.removeClass('v-hidden');
+            $errorMessage.removeClass(is_mobile ? 'v-hidden' : 'hidden');
+
+            // Scroll down to the error message automatically if on large scaled displays
+            const $contentSection = $('section.content.ps-container', this.$dialog);
+            if ($contentSection.length > 0) {
+                const scrollBottom = $contentSection.get(0).scrollHeight - $contentSection.get(0).clientHeight;
+                if (scrollBottom > 0) {
+                    $contentSection.scrollTop(scrollBottom);
+                }
+            }
             return false;
         }
 

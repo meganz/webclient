@@ -313,7 +313,7 @@ class Stream extends MegaRenderMixin {
     };
 
     renderMiniMode = () => {
-        const { isOnHold, onLoadedData } = this.props;
+        const { isOnHold, forcedLocal, onLoadedData } = this.props;
 
         if (isOnHold) {
             return this.renderOnHoldStreamNode();
@@ -321,6 +321,7 @@ class Stream extends MegaRenderMixin {
 
         return (
             <StreamNode
+                className={forcedLocal ? 'local-stream-mirrored' : ''}
                 stream={this.getStreamSource()}
                 onLoadedData={onLoadedData}
             />
@@ -338,6 +339,7 @@ class Stream extends MegaRenderMixin {
         return (
             <>
                 <StreamNode
+                    className="local-stream-mirrored"
                     stream={this.getStreamSource()}
                     onLoadedData={onLoadedData}
                 />

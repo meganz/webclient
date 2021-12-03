@@ -66,7 +66,10 @@ export default class Sidebar extends MegaRenderMixin {
                                 mode={mode}
                                 chatRoom={chatRoom}
                                 stream={localStream}
-                                className={forcedLocal ? 'active' : ''}
+                                className={`
+                                    local-stream-mirrored
+                                    ${forcedLocal ? 'active' : ''}
+                                `}
                                 onClick={() => {
                                     mBroadcaster.sendMessage('meetings:collapse');
                                     onSpeakerChange(localStream);

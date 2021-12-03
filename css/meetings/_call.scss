@@ -13,3 +13,7 @@
     @import '_stream.scss';
     @import '_sidebar.scss';
 }
+
+.local-stream-mirrored video {
+    transform: scaleX(-1);
+}

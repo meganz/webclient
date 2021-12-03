@@ -95,7 +95,11 @@ export default class Preview extends MegaRenderMixin {
         const SIMPLETIP_PROPS = { label: undefined, position: 'top', className: 'theme-dark-forced' };
 
         return (
-            <div className={NAMESPACE}>
+            <div
+                className={`
+                    ${NAMESPACE}
+                    local-stream-mirrored
+                `}>
                 {video && <div className={`${NAMESPACE}-video-overlay`} />}
                 <video className={video ? 'streaming' : ''} muted={true} autoPlay={true} ref={this.videoRef} />
                 {!video && this.renderAvatar()}

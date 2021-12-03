@@ -16598,6 +16598,7 @@ class Stream extends mixins.wl {
     this.renderMiniMode = () => {
       const {
         isOnHold,
+        forcedLocal,
         onLoadedData
       } = this.props;
 
@@ -16606,6 +16607,7 @@ class Stream extends mixins.wl {
       }
 
       return external_React_default().createElement(StreamNode, {
+        className: forcedLocal ? 'local-stream-mirrored' : '',
         stream: this.getStreamSource(),
         onLoadedData: onLoadedData
       });
@@ -16625,6 +16627,7 @@ class Stream extends mixins.wl {
       }
 
       return external_React_default().createElement((external_React_default()).Fragment, null, external_React_default().createElement(StreamNode, {
+        className: "local-stream-mirrored",
         stream: this.getStreamSource(),
         onLoadedData: onLoadedData
       }), external_React_default().createElement(meetings_button.Z, {
@@ -16863,6 +16866,7 @@ class ParticipantsNotice extends mixins.wl {
     }
 
     return external_React_default().createElement((external_React_default()).Fragment, null, external_React_default().createElement(StreamNode, {
+      className: "local-stream-mirrored",
       stream: call.getLocalStream()
     }), streamContainer(call.left ? this.renderUserAlone() : this.renderUserWaiting()));
   }
@@ -17160,6 +17164,7 @@ class stream_Stream extends mixins.wl {
       const targetStream = forcedLocal ? call.getLocalStream() : activeStream;
       return forcedLocal || activeStream ? external_React_default().createElement(StreamNode, {
         key: targetStream.clientId,
+        className: forcedLocal ? 'local-stream-mirrored' : '',
         stream: targetStream,
         chatRoom: chatRoom,
         menu: true,
@@ -19016,7 +19021,7 @@ class Sidebar extends mixins.wl {
         mode: mode,
         chatRoom: chatRoom,
         stream: localStream,
-        className: forcedLocal ? 'active' : '',
+        className: "\n                                    local-stream-mirrored\n                                    " + (forcedLocal ? 'active' : '') + "\n                                ",
         onClick: () => {
           mBroadcaster.sendMessage('meetings:collapse');
           onSpeakerChange(localStream);
@@ -20027,7 +20032,7 @@ class Preview extends mixins.wl {
       className: 'theme-dark-forced'
     };
     return external_React_default().createElement("div", {
-      className: NAMESPACE
+      className: "\n                    " + NAMESPACE + "\n                    local-stream-mirrored\n                "
     }, video && external_React_default().createElement("div", {
       className: NAMESPACE + "-video-overlay"
     }), external_React_default().createElement("video", {

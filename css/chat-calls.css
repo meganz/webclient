@@ -466,6 +466,7 @@ button.call:hover i {
 }
 
 .in-call-notif.neutral {
+    min-width: 254px;
     box-sizing: border-box;
     height: 36px;
     border: var(--stroke-grey-2);

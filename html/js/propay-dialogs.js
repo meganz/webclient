@@ -1267,6 +1267,20 @@ var addressDialog = {
             else {
                 Ps.initialize($contentSection[0]);
             }
+            const $paymentIcons = $('.payment-icons', this.$dialog);
+            const specialLogos = ['stripeAE', 'stripeJC', 'stripeUP', 'stripeDD'];
+            if (specialLogos.includes(pro.propay.proPaymentMethod)) {
+
+                $('i', $paymentIcons).addClass('hidden');
+                $('.payment-provider-icon', $paymentIcons)
+                    .removeClass('hidden stripeAE stripeJC stripeUP stripeDD')
+                    .addClass(pro.propay.proPaymentMethod);
+            }
+            else {
+                $('i', $paymentIcons).removeClass('hidden');
+                $('.payment-provider-icon', $paymentIcons).addClass('hidden')
+                    .removeClass('stripeAE stripeJC stripeUP stripeDD');
+            }
         }
 
         // in case we are coming from normal users sign ups (PRO)
@@ -2117,6 +2131,7 @@ var addressDialog = {
     processUtcResult: function(utcResult, isStripe, saleId) {
         'use strict';
         this.gatewayOrigin = null;
+
         if (isStripe) {
             this.stripeSaleId = null;
             if (utcResult.EUR) {
@@ -2184,6 +2199,10 @@ var addressDialog = {
                     iframeSrc += `&m=${this.numOfMonths}`;
 
                     this.stripeSaleId = saleId;
+
+                    if (pro.propay.proPaymentMethod) {
+                        iframeSrc += `&g=${b64encode(pro.propay.proPaymentMethod)}`;
+                    }
                 }
 
 

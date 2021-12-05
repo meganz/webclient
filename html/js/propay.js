@@ -254,7 +254,7 @@ pro.propay = {
                 }
 
                 // Separate into two groups, the first group has 6 providers, the second has the rest
-                var primaryGatewayOptions = gatewayOptions.splice(0, 6);
+                var primaryGatewayOptions = gatewayOptions.splice(0, 9);
                 var secondaryGatewayOptions = gatewayOptions;
 
                 // Show payment duration (e.g. month or year) and renewal option radio options
@@ -1060,7 +1060,7 @@ pro.propay = {
     initShowMoreOptionsButton: function() {
 
         // If there are more than 6 payment options, enable the button to show more
-        if (pro.propay.allGateways.length > 6) {
+        if (pro.propay.allGateways.length > 9) {
 
             var $showMoreButton = $('.provider-show-more', '.payment-section');
 

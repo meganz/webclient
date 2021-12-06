@@ -3343,6 +3343,7 @@ else if (!browserUpdate) {
         'special_js': {f:'html/js/troy-hunt.js', n:'special_js', j:1},
         'special_css': {f:'css/troy-hunt.css', n:'special_css', j:2},
         'reportabuse_js': {f:'js/ui/reportAbuse.js', n:'reportabuse_js', j:1},
+        'zipreader_js': {f:'js/zipreader.js', n: 'zipreader_js', j:1 },
     };
 
     /* eslint-disable max-len */

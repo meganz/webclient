@@ -201,7 +201,6 @@ body:not(.mobile) .about.top-info a:hover {
     margin-bottom: -10px;
     grid-column: 1/6;
     grid-row: 1;
-;
 }
 
 /* --------------------------------

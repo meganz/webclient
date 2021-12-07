@@ -77,7 +77,7 @@ export default class Join extends MegaRenderMixin {
                 name="end-ephemeral"
                 dialogType="message"
                 icon="sprite-fm-uni icon-warning"
-                title="Join as guest and end your ephemeral session?"
+                title={l.ephemeral_data_lost_title}
                 noCloseOnClickOutside={true}
                 buttons={[
                     { key: 'cancel', label: 'Cancel', onClick: onCancel },
@@ -85,8 +85,7 @@ export default class Join extends MegaRenderMixin {
                 ]}
                 onClose={onCancel}>
                 <p>
-                    The data you are storing will be lost if you join the meeting as a guest.
-                    To preserve your files, <a href="#" onClick={() => loadSubPage('register')}>Create an account</a>.
+                    {l.ephemeral_data_lost} <a href="#" onClick={() => loadSubPage('register')}>{l[1076]}</a>.
                 </p>
             </ModalDialogsUI.ModalDialog>
         );
@@ -108,8 +107,7 @@ export default class Join extends MegaRenderMixin {
                     <div className="ephemeral-info">
                         <i className="sprite-fm-uni icon-warning" />
                         <p>
-                            You are using an ephemeral session. The data you are storing will be lost if you join
-                            the meeting as a guest.
+                            {l.ephemeral_data_store_lost}
                         </p>
                     </div>
                 )}
@@ -240,7 +238,7 @@ export default class Join extends MegaRenderMixin {
             <div className="card-body">
                 {children}
                 <div>
-                    <a href="/securechat">Learn more about MEGA Meetings</a>
+                    <a href="/securechat">{l.how_meetings_work}</a>
                 </div>
             </div>
             <div className="card-preview">
@@ -274,10 +272,10 @@ export default class Join extends MegaRenderMixin {
 
     Guest = () =>
         <this.Card>
-            <h2>Enter your name to join the meeting</h2>
+            <h2>{l.enter_name_join_meeting}</h2>
             <div className="card-fields">
-                <this.Field name="firstName">First Name</this.Field>
-                <this.Field name="lastName">Last Name</this.Field>
+                <this.Field name="firstName">{l[1096]}</this.Field>
+                <this.Field name="lastName">{l[1097]}</this.Field>
             </div>
             <Button
                 className={`
@@ -305,13 +303,13 @@ export default class Join extends MegaRenderMixin {
                         );
                     }
                 }}>
-                Join
+                {l.join_chat_button}
             </Button>
         </this.Card>;
 
     Account = () =>
         <this.Card>
-            <h4>Join meeting now?</h4>
+            <h4>{l.join_meeting}</h4>
             <Button
                 className={`mega-button positive large ${this.state.joining && " loading disabled"}`}
                 onClick={() => {

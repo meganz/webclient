@@ -20180,7 +20180,7 @@ class Join extends mixins.wl {
         name: "end-ephemeral",
         dialogType: "message",
         icon: "sprite-fm-uni icon-warning",
-        title: "Join as guest and end your ephemeral session?",
+        title: l.ephemeral_data_lost_title,
         noCloseOnClickOutside: true,
         buttons: [{
           key: 'cancel',
@@ -20197,10 +20197,10 @@ class Join extends mixins.wl {
           }
         }],
         onClose: onCancel
-      }, external_React_default().createElement("p", null, "The data you are storing will be lost if you join the meeting as a guest. To preserve your files, ", external_React_default().createElement("a", {
+      }, external_React_default().createElement("p", null, l.ephemeral_data_lost, " ", external_React_default().createElement("a", {
         href: "#",
         onClick: () => loadSubPage('register')
-      }, "Create an account"), "."));
+      }, l[1076]), "."));
     };
 
     this.Head = () => {
@@ -20216,7 +20216,7 @@ class Join extends mixins.wl {
         className: "ephemeral-info"
       }, external_React_default().createElement("i", {
         className: "sprite-fm-uni icon-warning"
-      }), external_React_default().createElement("p", null, "You are using an ephemeral session. The data you are storing will be lost if you join the meeting as a guest.")));
+      }), external_React_default().createElement("p", null, l.ephemeral_data_store_lost)));
     };
 
     this.Intro = () => {
@@ -20315,7 +20315,7 @@ class Join extends mixins.wl {
         className: "card-body"
       }, children, external_React_default().createElement("div", null, external_React_default().createElement("a", {
         href: "/securechat"
-      }, "Learn more about MEGA Meetings"))), external_React_default().createElement("div", {
+      }, l.how_meetings_work))), external_React_default().createElement("div", {
         className: "card-preview"
       }, external_React_default().createElement(Preview, {
         onToggle: (audio, video) => this.setState({
@@ -20350,13 +20350,13 @@ class Join extends mixins.wl {
       }));
     };
 
-    this.Guest = () => external_React_default().createElement(this.Card, null, external_React_default().createElement("h2", null, "Enter your name to join the meeting"), external_React_default().createElement("div", {
+    this.Guest = () => external_React_default().createElement(this.Card, null, external_React_default().createElement("h2", null, l.enter_name_join_meeting), external_React_default().createElement("div", {
       className: "card-fields"
     }, external_React_default().createElement(this.Field, {
       name: "firstName"
-    }, "First Name"), external_React_default().createElement(this.Field, {
+    }, l[1096]), external_React_default().createElement(this.Field, {
       name: "lastName"
-    }, "Last Name")), external_React_default().createElement(meetings_button.Z, {
+    }, l[1097])), external_React_default().createElement(meetings_button.Z, {
       className: "\n                    mega-button\n                    positive\n                    large\n                    " + (this.state.firstName.length && this.state.lastName.length ? '' : 'disabled') + "\n                    " + (this.state.joining && " loading disabled") + "\n                ",
       onClick: () => {
         if (this.state.joining) {
@@ -20379,9 +20379,9 @@ class Join extends mixins.wl {
           this.props.onJoinGuestClick(firstName, lastName, previewAudio, previewVideo);
         }
       }
-    }, "Join"));
+    }, l.join_chat_button));
 
-    this.Account = () => external_React_default().createElement(this.Card, null, external_React_default().createElement("h4", null, "Join meeting now?"), external_React_default().createElement(meetings_button.Z, {
+    this.Account = () => external_React_default().createElement(this.Card, null, external_React_default().createElement("h4", null, l.join_meeting), external_React_default().createElement(meetings_button.Z, {
       className: "mega-button positive large " + (this.state.joining && " loading disabled"),
       onClick: () => {
         if (!this.state.joining) {

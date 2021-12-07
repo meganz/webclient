@@ -662,6 +662,13 @@ var notify = {
                 msgDialog('info', '', l[20427]);
             }
         });
+
+        $('.nt-contact-request', this.$popup).rebind('click.notif', function(e) {
+            if (!$(e.target).hasClass('notifications-button') && $(this).attr('data-uhandle')) {
+                loadSubPage(`fm/chat/contacts/${$(this).attr('data-uhandle')}`);
+                notify.closePopup();
+            }
+        });
     },
 
     /**
@@ -953,6 +960,12 @@ var notify = {
 
         // Populate other template information
         $notificationHtml.addClass(className);
+        if (notification.data && notification.data.m) {
+            const user = M.getUserByEmail(notification.data.m);
+            if (user && user.h) {
+                $notificationHtml.attr('data-uhandle', user.h);
+            }
+        }
         $notificationHtml.find('.notification-info').text(title);
         $notificationHtml.find('.notifications-button.accept').attr('data-pending-contact-id', pendingContactId);
 

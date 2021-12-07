@@ -45,22 +45,23 @@ export default class Local extends AbstractGenericMessage {
         )
     );
 
-    _getExtraInfo = (message) => {
+    _getExtraInfo = message => {
+        const { meta, type } = message;
         const participantNames = this._getParticipantNames(message);
-        const HAS_PARTICIPANTS = participantNames && !!participantNames.length;
-        const ENDED  = message.type === MESSAGE_TYPE.ENDED || message.type === MESSAGE_TYPE.FAILED;
-        const HAS_DURATION = message.meta && message.meta.duration;
+        const HAS_PARTICIPANTS = participantNames && !!participantNames.length && participantNames.length > 1;
+        const HAS_DURATION = meta && meta.duration;
+        const ENDED = type === MESSAGE_TYPE.ENDED || type === MESSAGE_TYPE.FAILED || type === MESSAGE_TYPE.CANCELLED;
 
         let messageExtraInfo = [
             HAS_PARTICIPANTS ? mega.utils.trans.listToString(participantNames, l[20234] /* `With %s` */) : ''
         ];
 
-        if (ENDED && HAS_DURATION) {
+        if (ENDED) {
             messageExtraInfo = [
                 ...messageExtraInfo,
                 HAS_PARTICIPANTS ? '. ' : '',
                 // `Call duration: [[XX seconds]]`
-                l[7208].replace('[X]', '[[' + secToDuration(message.meta.duration) + ']]')
+                HAS_DURATION ? l[7208].replace('[X]', `[[${secToDuration(meta.duration)}]]`) : ''
             ];
         }
 

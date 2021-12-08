@@ -235,6 +235,22 @@
 .provider-icon.sabadellMC {
     background-position: 0 -1980px;
 }
+.provider-icon.stripeAE {
+    background-image: url("../images/mega/Amex.svg");
+    background-size: unset;
+}
+.provider-icon.stripeJC {
+    background-image: url("../images/mega/JCB.svg");
+    background-size: unset;
+}
+.provider-icon.stripeUP {
+    background-image: url("../images/mega/UnionPay.svg");
+    background-size: unset;
+}
+.provider-icon.stripeDD {
+    background-image: url("../images/mega/Discover.svg");
+    background-size: unset;
+}
 
 /* Pricing icons */
 .pricing-sprite,

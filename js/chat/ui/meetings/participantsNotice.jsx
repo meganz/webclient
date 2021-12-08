@@ -87,7 +87,7 @@ export default class ParticipantsNotice extends MegaRenderMixin {
 
         return (
             <>
-                <StreamNode stream={call.getLocalStream()} />
+                <StreamNode className="local-stream-mirrored" stream={call.getLocalStream()} />
                 {streamContainer(call.left ? this.renderUserAlone() : this.renderUserWaiting())}
             </>
         );

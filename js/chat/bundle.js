@@ -346,22 +346,6 @@ function Chat() {
   this.publicChatKeys = Object.create(null);
   this.options = {
     'delaySendMessageIfRoomNotAvailableTimeout': 3000,
-    'loadbalancerService': 'gelb.karere.mega.nz',
-    'rtc': {
-      iceServers: [{
-        urls: 'turn:trn270n001.karere.mega.nz:3478?transport=udp',
-        username: "inoo20jdnH",
-        credential: '02nNKDBkkS'
-      }, {
-        urls: 'turn:trn302n001.karere.mega.nz:3478?transport=udp',
-        username: "inoo20jdnH",
-        credential: '02nNKDBkkS'
-      }, {
-        urls: 'turn:trn530n001.karere.mega.nz:3478?transport=udp',
-        username: "inoo20jdnH",
-        credential: '02nNKDBkkS'
-      }]
-    },
     filePickerOptions: {},
     'plugins': {
       'chatdIntegration': ChatdIntegration,
@@ -3314,6 +3298,10 @@ ChatRoom.prototype.isOnlineForCalls = function () {
 ChatRoom.prototype.isArchived = function () {
   var self = this;
   return self.flags & ChatRoom.ARCHIVED;
+};
+
+ChatRoom.prototype.isAnonymous = function () {
+  return is_chatlink && this.type === "public" && this.publicChatHandle && this.publicChatKey && this.publicChatHandle === megaChat.initialPubChatHandle;
 };
 
 ChatRoom.prototype.isDisplayable = function () {
@@ -8691,6 +8679,10 @@ class Breadcrumbs extends mixins.wl {
           breadcrumbClasses += " folder";
         }
 
+        if (nodeId.length === 11 && M.u[nodeId]) {
+          return;
+        }
+
         if (nodeId === "shares") {
           breadcrumbClasses += " shared-with-me";
         }
@@ -10118,25 +10110,21 @@ class Local extends AbstractGenericMessage {
 class Contact extends AbstractGenericMessage {
   constructor(props) {
     super(props);
+    this.DIALOG = {
+      ADDED: addedEmail => msgDialog('info', l[150], l[5898].replace('[X]', addedEmail)),
+      DUPLICATE: () => msgDialog('warningb', '', l[17545])
+    };
+
+    this._doAddContact = contactEmail => M.inviteContact(M.u[u_handle] ? M.u[u_handle].m : u_attr.email, contactEmail);
 
     this._handleAddContact = contactEmail => {
-      let exists = false;
-      const ownerEmail = M.u[u_handle] ? M.u[u_handle].m : u_attr.email;
-      Object.keys(M.opc).forEach(function (k) {
-        if (!exists && M.opc[k].m === contactEmail && !M.opc[k].hasOwnProperty('dts')) {
-          exists = true;
-          return false;
-        }
-      });
+      var _this$props$chatRoom;
 
-      if (exists) {
-        closeDialog();
-        msgDialog('warningb', '', l[17545]);
-      } else {
-        M.inviteContact(ownerEmail, contactEmail);
-        closeDialog();
-        msgDialog('info', l[150], l[5898].replace('[X]', contactEmail));
+      if ((_this$props$chatRoom = this.props.chatRoom) != null && _this$props$chatRoom.isAnonymous()) {
+        return this._doAddContact(contactEmail).done(addedEmail => this.DIALOG.ADDED(addedEmail)).catch(this.DIALOG.DUPLICATE);
       }
+
+      return Object.values(M.opc).some(opc => opc.m === contactEmail) ? this.DIALOG.DUPLICATE() : this._doAddContact(contactEmail).done(addedEmail => this.DIALOG.ADDED(addedEmail));
     };
 
     this._getContactAvatar = (contact, className) => external_React_default().createElement(ui_contacts.Avatar, {
@@ -10159,6 +10147,10 @@ class Contact extends AbstractGenericMessage {
   _getContactCard(message, contact, contactEmail) {
     const HAS_RELATIONSHIP = M.u[contact.u].c === 1;
     let name = M.getNameByHandle(contact.u);
+    const {
+      chatRoom
+    } = this.props;
+    const isAnonView = chatRoom.isAnonymous();
 
     if (megaChat.FORCE_EMAIL_LOADING) {
       name += "(" + contact.m + ")";
@@ -10175,7 +10167,7 @@ class Contact extends AbstractGenericMessage {
       horizOffset: 4
     }, external_React_default().createElement("div", {
       className: "dropdown-avatar rounded"
-    }, this._getContactAvatar(contact, 'context-avatar'), external_React_default().createElement("div", {
+    }, this._getContactAvatar(contact, 'context-avatar'), !isAnonView ? external_React_default().createElement("div", {
       className: "dropdown-user-name"
     }, external_React_default().createElement("div", {
       className: "name"
@@ -10186,7 +10178,9 @@ class Contact extends AbstractGenericMessage {
       contact: contact
     })), external_React_default().createElement("div", {
       className: "email"
-    }, M.u[contact.u].m))), external_React_default().createElement(ui_contacts.ContactFingerprint, {
+    }, M.u[contact.u].m)) : external_React_default().createElement("div", {
+      className: "dropdown-user-name"
+    })), external_React_default().createElement(ui_contacts.ContactFingerprint, {
       contact: M.u[contact.u]
     }), HAS_RELATIONSHIP && external_React_default().createElement((external_React_default()).Fragment, null, external_React_default().createElement(dropdowns.DropdownItem, {
       icon: "sprite-fm-mono icon-user-filled",
@@ -10202,7 +10196,7 @@ class Contact extends AbstractGenericMessage {
         loadSubPage("fm/chat/p/" + contact.u);
         mBroadcaster.sendMessage('chat:open');
       }
-    })), u_type && u_type > 2 && !HAS_RELATIONSHIP && !is_eplusplus && external_React_default().createElement(dropdowns.DropdownItem, {
+    })), u_type && u_type > 2 && contact.u !== u_handle && !HAS_RELATIONSHIP && !is_eplusplus && external_React_default().createElement(dropdowns.DropdownItem, {
       icon: "sprite-fm-mono icon-add",
       label: l[71],
       onClick: () => this._handleAddContact(contactEmail)
@@ -10211,10 +10205,12 @@ class Contact extends AbstractGenericMessage {
 
   getContents() {
     const {
-      message
+      message,
+      chatRoom
     } = this.props;
     const textContents = message.textContents.substr(2, message.textContents.length);
     const attachmentMeta = JSON.parse(textContents);
+    const isAnonView = chatRoom.isAnonymous();
 
     if (!attachmentMeta) {
       return console.error("Message w/ type: " + message.type + " -- no attachment meta defined. Message: " + message);
@@ -10238,7 +10234,7 @@ class Contact extends AbstractGenericMessage {
 
       contacts = [...contacts, external_React_default().createElement("div", {
         key: contact.u
-      }, external_React_default().createElement("div", {
+      }, !isAnonView ? external_React_default().createElement("div", {
         className: "message shared-info"
       }, external_React_default().createElement("div", {
         className: "message data-title"
@@ -10247,7 +10243,9 @@ class Contact extends AbstractGenericMessage {
         contact: M.u[contact.u]
       }) : null, external_React_default().createElement("div", {
         className: "user-card-email"
-      }, contactEmail)), external_React_default().createElement("div", {
+      }, contactEmail)) : external_React_default().createElement("div", {
+        className: "message shared-info"
+      }), external_React_default().createElement("div", {
         className: "message shared-data"
       }, external_React_default().createElement("div", {
         className: "data-block-view semi-big"
@@ -16584,6 +16582,7 @@ class Stream extends mixins.wl {
     this.renderMiniMode = () => {
       const {
         isOnHold,
+        forcedLocal,
         onLoadedData
       } = this.props;
 
@@ -16592,6 +16591,7 @@ class Stream extends mixins.wl {
       }
 
       return external_React_default().createElement(StreamNode, {
+        className: forcedLocal ? 'local-stream-mirrored' : '',
         stream: this.getStreamSource(),
         onLoadedData: onLoadedData
       });
@@ -16611,6 +16611,7 @@ class Stream extends mixins.wl {
       }
 
       return external_React_default().createElement((external_React_default()).Fragment, null, external_React_default().createElement(StreamNode, {
+        className: "local-stream-mirrored",
         stream: this.getStreamSource(),
         onLoadedData: onLoadedData
       }), external_React_default().createElement(meetings_button.Z, {
@@ -16849,6 +16850,7 @@ class ParticipantsNotice extends mixins.wl {
     }
 
     return external_React_default().createElement((external_React_default()).Fragment, null, external_React_default().createElement(StreamNode, {
+      className: "local-stream-mirrored",
       stream: call.getLocalStream()
     }), streamContainer(call.left ? this.renderUserAlone() : this.renderUserWaiting()));
   }
@@ -17146,6 +17148,7 @@ class stream_Stream extends mixins.wl {
       const targetStream = forcedLocal ? call.getLocalStream() : activeStream;
       return forcedLocal || activeStream ? external_React_default().createElement(StreamNode, {
         key: targetStream.clientId,
+        className: forcedLocal ? 'local-stream-mirrored' : '',
         stream: targetStream,
         chatRoom: chatRoom,
         menu: true,
@@ -19002,7 +19005,7 @@ class Sidebar extends mixins.wl {
         mode: mode,
         chatRoom: chatRoom,
         stream: localStream,
-        className: forcedLocal ? 'active' : '',
+        className: "\n                                    local-stream-mirrored\n                                    " + (forcedLocal ? 'active' : '') + "\n                                ",
         onClick: () => {
           mBroadcaster.sendMessage('meetings:collapse');
           onSpeakerChange(localStream);
@@ -20013,7 +20016,7 @@ class Preview extends mixins.wl {
       className: 'theme-dark-forced'
     };
     return external_React_default().createElement("div", {
-      className: NAMESPACE
+      className: "\n                    " + NAMESPACE + "\n                    local-stream-mirrored\n                "
     }, video && external_React_default().createElement("div", {
       className: NAMESPACE + "-video-overlay"
     }), external_React_default().createElement("video", {
@@ -20177,7 +20180,7 @@ class Join extends mixins.wl {
         name: "end-ephemeral",
         dialogType: "message",
         icon: "sprite-fm-uni icon-warning",
-        title: "Join as guest and end your ephemeral session?",
+        title: l.ephemeral_data_lost_title,
         noCloseOnClickOutside: true,
         buttons: [{
           key: 'cancel',
@@ -20194,10 +20197,10 @@ class Join extends mixins.wl {
           }
         }],
         onClose: onCancel
-      }, external_React_default().createElement("p", null, "The data you are storing will be lost if you join the meeting as a guest. To preserve your files, ", external_React_default().createElement("a", {
+      }, external_React_default().createElement("p", null, l.ephemeral_data_lost, " ", external_React_default().createElement("a", {
         href: "#",
         onClick: () => loadSubPage('register')
-      }, "Create an account"), "."));
+      }, l[1076]), "."));
     };
 
     this.Head = () => {
@@ -20213,7 +20216,7 @@ class Join extends mixins.wl {
         className: "ephemeral-info"
       }, external_React_default().createElement("i", {
         className: "sprite-fm-uni icon-warning"
-      }), external_React_default().createElement("p", null, "You are using an ephemeral session. The data you are storing will be lost if you join the meeting as a guest.")));
+      }), external_React_default().createElement("p", null, l.ephemeral_data_store_lost)));
     };
 
     this.Intro = () => {
@@ -20312,7 +20315,7 @@ class Join extends mixins.wl {
         className: "card-body"
       }, children, external_React_default().createElement("div", null, external_React_default().createElement("a", {
         href: "/securechat"
-      }, "Learn more about MEGA Meetings"))), external_React_default().createElement("div", {
+      }, l.how_meetings_work))), external_React_default().createElement("div", {
         className: "card-preview"
       }, external_React_default().createElement(Preview, {
         onToggle: (audio, video) => this.setState({
@@ -20347,13 +20350,13 @@ class Join extends mixins.wl {
       }));
     };
 
-    this.Guest = () => external_React_default().createElement(this.Card, null, external_React_default().createElement("h2", null, "Enter your name to join the meeting"), external_React_default().createElement("div", {
+    this.Guest = () => external_React_default().createElement(this.Card, null, external_React_default().createElement("h2", null, l.enter_name_join_meeting), external_React_default().createElement("div", {
       className: "card-fields"
     }, external_React_default().createElement(this.Field, {
       name: "firstName"
-    }, "First Name"), external_React_default().createElement(this.Field, {
+    }, l[1096]), external_React_default().createElement(this.Field, {
       name: "lastName"
-    }, "Last Name")), external_React_default().createElement(meetings_button.Z, {
+    }, l[1097])), external_React_default().createElement(meetings_button.Z, {
       className: "\n                    mega-button\n                    positive\n                    large\n                    " + (this.state.firstName.length && this.state.lastName.length ? '' : 'disabled') + "\n                    " + (this.state.joining && " loading disabled") + "\n                ",
       onClick: () => {
         if (this.state.joining) {
@@ -20376,9 +20379,9 @@ class Join extends mixins.wl {
           this.props.onJoinGuestClick(firstName, lastName, previewAudio, previewVideo);
         }
       }
-    }, "Join"));
+    }, l.join_chat_button));
 
-    this.Account = () => external_React_default().createElement(this.Card, null, external_React_default().createElement("h4", null, "Join meeting now?"), external_React_default().createElement(meetings_button.Z, {
+    this.Account = () => external_React_default().createElement(this.Card, null, external_React_default().createElement("h4", null, l.join_meeting), external_React_default().createElement(meetings_button.Z, {
       className: "mega-button positive large " + (this.state.joining && " loading disabled"),
       onClick: () => {
         if (!this.state.joining) {
@@ -21923,7 +21926,7 @@ let ConversationPanel = (conversationpanel_dec = utils["default"].SoonFcWrap(360
       onDeleteClicked: this.handleDeleteDialog
     })), !is_chatlink && room.state != ChatRoom.STATE.LEFT && (room.havePendingGroupCall() || room.havePendingCall()) ? external_React_default().createElement(JoinCallNotification, {
       chatRoom: room
-    }) : null, is_chatlink && room.type === "public" && room.publicChatHandle && room.publicChatKey && room.publicChatHandle === megaChat.initialPubChatHandle ? external_React_default().createElement("div", {
+    }) : null, room.isAnonymous() ? external_React_default().createElement("div", {
       className: "join-chat-block"
     }, external_React_default().createElement("div", {
       className: "mega-button large positive",
@@ -22527,7 +22530,7 @@ class searchField_SearchField extends mixins.wl {
     }), external_React_default().createElement("input", {
       type: "text",
       autoComplete: "disabled",
-      placeholder: "Search",
+      placeholder: l[102],
       ref: searchField_SearchField.inputRef,
       value: value,
       onChange: ev => {

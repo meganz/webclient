@@ -66,6 +66,7 @@
     cursor: pointer;
     display: inline-flex;
     margin-bottom: 8px;
+    width: 200px;
 }
 .bus-reg-body .bus-reg-radio.not-first-child,
 .card-container.bus-repay .bus-reg-radio.not-first-child {

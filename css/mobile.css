@@ -3591,6 +3591,28 @@ div.checkboxOn {
 .mobile.membership-step2 .provider-icon.ecpMC {
     background-position: -243px -1516px;
 }
+.mobile.membership-step2 .provider-icon.stripeMC,
+.mobile.membership-step2 .provider-icon.stripeVI {
+    width: 32px;
+    height: 32px;
+    margin: 0 0 4px;
+    background-size: 32px;
+}
+.mobile.membership-step2 .provider-icon.stripeVI {
+    background-position: 0 -5375px;
+}
+.mobile.membership-step2 .provider-icon.stripeMC {
+    background-position: 0 -3264px;
+}
+.mobile.membership-step2 .provider-icon.stripeDD,
+.mobile.membership-step2 .provider-icon.stripeUP,
+.mobile.membership-step2 .provider-icon.stripeJC,
+.mobile.membership-step2 .provider-icon.stripeAE {
+    height: 32px;
+    width: 32px;
+    background-size: 32px;
+    margin: 0 0 4px;
+}
 .mobile.membership-step2 .charge-information-container {
     margin-bottom: 6px;
 }

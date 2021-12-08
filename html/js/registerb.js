@@ -164,7 +164,11 @@ BusinessRegister.prototype.initPage = function(preSetNb, preSetName, preSetTel, 
             ecpMC: 'sprite-fm-uni icon-mastercard-border',
             Stripe2: 'sprite-fm-theme icon-stripe',
             stripeVI: 'sprite-fm-uni icon-visa-border',
-            stripeMC: 'sprite-fm-uni icon-mastercard-border'
+            stripeMC: 'sprite-fm-uni icon-mastercard-border',
+            stripeAE: 'provider-icon stripeAE',
+            stripeJC: 'provider-icon stripeJC',
+            stripeUP: 'provider-icon stripeUP',
+            stripeDD: 'provider-icon stripeDD'
         };
 
         var radioHtml = '<div class="bus-reg-radio-option"> <div class="bus-reg-radio payment-[x] radioOff" prov-id="[Y]"></div>';

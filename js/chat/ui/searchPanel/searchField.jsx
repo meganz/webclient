@@ -104,7 +104,7 @@ export default class SearchField extends MegaRenderMixin {
                 <input
                     type="text"
                     autoComplete="disabled"
-                    placeholder="Search"
+                    placeholder={l[102]}
                     ref={SearchField.inputRef}
                     value={value}
                     onChange={ev => {

@@ -738,6 +738,10 @@
   visibility: hidden;
 }
 
+.local-stream-mirrored video {
+  transform: scaleX(-1);
+}
+
 .mode {
   float: left;
 }

@@ -477,6 +477,7 @@ body.tl .dropdown.body.popup.contacts-search {
     transition: opacity 200ms ease-in-out 1s;
     transition-delay: 0.5s;
     white-space: normal;
+    max-width: 700px;
 }
 .rtl .dark-direct-tooltip.simpletip-tooltip {
     direction: rtl;

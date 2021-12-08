@@ -3905,7 +3905,7 @@ else if (!browserUpdate) {
             'es6s =' +
             ' ({...{a:23}}).a === 23' + // C60 E79 F55 O47 S11
             ' && Promise.prototype.finally' + // C63 E18 F58 O50 S11
-            ' && (async()=>{})[Symbol.toStringTag] === "AsyncFunction"' + // C55 E15 F52 O42 S10.1
+            ' && (Array.prototype.values === Array.prototype[Symbol.iterator])' + // C66 E12 F60 O53 S9
             ' && (function *(a=1,){yield a})(2).next().value === 2', // C58 E14 F52 O45 S10
             function(error) {
                 if (error || !window.es6s) {

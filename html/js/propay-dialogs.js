@@ -1260,12 +1260,28 @@ var addressDialog = {
         var monthsWording;
 
         if (!is_mobile) {
+            $('.error-message', this.$dialog).addClass('hidden');
+
             var $contentSection = $('section.content', this.$dialog);
             if ($contentSection.is('.ps-container')) {
                 Ps.update($contentSection[0]);
             }
             else {
                 Ps.initialize($contentSection[0]);
+            }
+            const $paymentIcons = $('.payment-icons', this.$dialog);
+            const specialLogos = ['stripeAE', 'stripeJC', 'stripeUP', 'stripeDD'];
+            if (specialLogos.includes(pro.propay.proPaymentMethod)) {
+
+                $('i', $paymentIcons).addClass('hidden');
+                $('.payment-provider-icon', $paymentIcons)
+                    .removeClass('hidden stripeAE stripeJC stripeUP stripeDD')
+                    .addClass(pro.propay.proPaymentMethod);
+            }
+            else {
+                $('i', $paymentIcons).removeClass('hidden');
+                $('.payment-provider-icon', $paymentIcons).addClass('hidden')
+                    .removeClass('stripeAE stripeJC stripeUP stripeDD');
             }
         }
 
@@ -1862,7 +1878,16 @@ var addressDialog = {
                 !fieldValues['city'] || !fieldValues['postcode'] || !country || stateNotSet) {
 
             // Show a general error and exit early if they are not complete
-            $errorMessage.removeClass('v-hidden');
+            $errorMessage.removeClass(is_mobile ? 'v-hidden' : 'hidden');
+
+            // Scroll down to the error message automatically if on large scaled displays
+            const $contentSection = $('section.content.ps-container', this.$dialog);
+            if ($contentSection.length > 0) {
+                const scrollBottom = $contentSection.get(0).scrollHeight - $contentSection.get(0).clientHeight;
+                if (scrollBottom > 0) {
+                    $contentSection.scrollTop(scrollBottom);
+                }
+            }
             return false;
         }
 
@@ -2117,6 +2142,7 @@ var addressDialog = {
     processUtcResult: function(utcResult, isStripe, saleId) {
         'use strict';
         this.gatewayOrigin = null;
+
         if (isStripe) {
             this.stripeSaleId = null;
             if (utcResult.EUR) {
@@ -2184,6 +2210,10 @@ var addressDialog = {
                     iframeSrc += `&m=${this.numOfMonths}`;
 
                     this.stripeSaleId = saleId;
+
+                    if (pro.propay.proPaymentMethod) {
+                        iframeSrc += `&g=${b64encode(pro.propay.proPaymentMethod)}`;
+                    }
                 }
 
 

@@ -360,7 +360,7 @@ export default class Stream extends MegaRenderMixin {
             forcedLocal || activeStream ?
                 <StreamNode
                     key={targetStream.clientId}
-                    className={forcedLocal ? 'local-stream-mirrored' : ''}
+                    className={forcedLocal && !call.isSharingScreen() ? 'local-stream-mirrored' : ''}
                     stream={targetStream}
                     chatRoom={chatRoom}
                     menu={true}

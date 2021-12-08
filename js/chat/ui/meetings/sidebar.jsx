@@ -67,7 +67,7 @@ export default class Sidebar extends MegaRenderMixin {
                                 chatRoom={chatRoom}
                                 stream={localStream}
                                 className={`
-                                    local-stream-mirrored
+                                    ${call.isSharingScreen() ? '' : 'local-stream-mirrored'}
                                     ${forcedLocal ? 'active' : ''}
                                 `}
                                 onClick={() => {

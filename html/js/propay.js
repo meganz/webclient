@@ -767,7 +767,7 @@ pro.propay = {
 
         // Update depending on recurring or one off payment
         $('button.purchase span', $step2).text(subscribeOrPurchase);
-        $('.payment-instructions', $step2).safeHTML(subscribeOrPurchaseInstruction);
+        $(is_mobile ? '.payment-info' : '.payment-instructions', $step2).safeHTML(subscribeOrPurchaseInstruction);
         $('.choose-renewal .duration-text', $step2).text(autoRenewMonthOrYearQuestion);
         $('.charge-information', $step2).text(chargeInfoDuration);
         $('.payment-buy-now span', $paymentDialog).text(subscribeOrPurchase);

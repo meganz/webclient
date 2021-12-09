@@ -69,8 +69,8 @@ var useravatar = (function() {
         if (color === false) {
             color = user.charCodeAt(0) % _colors.length;
         }
-
-        return {letters: name.toUpperCase()[0], color: _colors[color], colorIndex: color + 1};
+        const ch = String.fromCodePoint(name.codePointAt(0));
+        return {letters: ch.toUpperCase(), color: _colors[color], colorIndex: color + 1};
     }
 
     /**

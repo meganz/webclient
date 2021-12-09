@@ -78,7 +78,7 @@ export class ContactButton extends ContactAwareComponent {
 
         var moreDropdowns = [];
 
-        var username = M.getNameByHandle(contact.u);
+        var username = <utils.EmojiFormattedContent>{M.getNameByHandle(contact.u)}</utils.EmojiFormattedContent>;
 
         var onContactClicked = function() {
             if (contact.c === 2) {
@@ -695,6 +695,7 @@ export class ContactCard extends ContactAwareComponent {
         if (contact.u === u_handle) {
             username += " (" + escapeHTML(l[8885]) + ")";
         }
+        username = <utils.EmojiFormattedContent>{username}</utils.EmojiFormattedContent>;
         var dropdowns = this.props.dropdowns ? this.props.dropdowns : [];
         var noContextMenu = this.props.noContextMenu ? this.props.noContextMenu : "";
         var noContextButton = this.props.noContextButton ? this.props.noContextButton : "";

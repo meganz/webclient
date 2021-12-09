@@ -107,9 +107,13 @@ mega.fileTextEditor = new function FileTextEditor() {
         }
 
         // this is empty file, no need to bother Data Servers + API
-        if (node.s <= 0) {
+        if (node.s <= 0 && M.d[node.h]) {
             storeFileData(handle, '');
             return operationPromise.resolve(filesDataMap[handle]);
+        }
+        else if (node.s <= 0) {
+            showToast('view', l[22]);
+            return operationPromise.reject();
         }
 
         // get the data

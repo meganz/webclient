@@ -1271,12 +1271,13 @@ var addressDialog = {
             }
             const $paymentIcons = $('.payment-icons', this.$dialog);
             const specialLogos = ['stripeAE', 'stripeJC', 'stripeUP', 'stripeDD'];
-            if (specialLogos.includes(pro.propay.proPaymentMethod)) {
+            const gate = this.businessPlan && this.businessPlan.usedGateName || pro.propay.proPaymentMethod;
+            if (specialLogos.includes(gate)) {
 
                 $('i', $paymentIcons).addClass('hidden');
                 $('.payment-provider-icon', $paymentIcons)
                     .removeClass('hidden stripeAE stripeJC stripeUP stripeDD')
-                    .addClass(pro.propay.proPaymentMethod);
+                    .addClass(gate);
             }
             else {
                 $('i', $paymentIcons).removeClass('hidden');
@@ -2211,8 +2212,10 @@ var addressDialog = {
 
                     this.stripeSaleId = saleId;
 
-                    if (pro.propay.proPaymentMethod) {
-                        iframeSrc += `&g=${b64encode(pro.propay.proPaymentMethod)}`;
+                    const gate = this.businessPlan && this.businessPlan.usedGateName || pro.propay.proPaymentMethod;
+
+                    if (gate) {
+                        iframeSrc += `&g=${b64encode(gate)}`;
                     }
                 }
 

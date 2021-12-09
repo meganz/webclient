@@ -171,7 +171,8 @@ BusinessRegister.prototype.initPage = function(preSetNb, preSetName, preSetTel, 
             stripeDD: 'provider-icon stripeDD'
         };
 
-        var radioHtml = '<div class="bus-reg-radio-option"> <div class="bus-reg-radio payment-[x] radioOff" prov-id="[Y]"></div>';
+        var radioHtml = '<div class="bus-reg-radio-option"> ' +
+            '<div class="bus-reg-radio payment-[x] radioOff" prov-id="[Y]" gate-n="[Z]"></div>';
         var textHtml = '<div class="provider">[x]</div>';
         var iconHtml = `<div class="payment-icon">
                             <i class="[x]"></i>
@@ -184,7 +185,8 @@ BusinessRegister.prototype.initPage = function(preSetNb, preSetName, preSetTel, 
         if (!window.businessVoucher) {
             var paymentGatewayToAdd = '';
             for (var k = 0; k < list.length; k++) {
-                var payRadio = radioHtml.replace('[x]', list[k].gatewayName).replace('[Y]', list[k].gatewayId);
+                var payRadio = radioHtml.replace('[x]', list[k].gatewayName).replace('[Y]', list[k].gatewayId).
+                    replace('[Z]', list[k].gatewayName);
                 var payText = textHtml.replace('[x]', list[k].displayName);
                 var payIcon = iconHtml.replace('[x]', icons[list[k].gatewayName]);
                 paymentGatewayToAdd += payRadio + payText + payIcon;
@@ -673,6 +675,7 @@ BusinessRegister.prototype.doRegister = function(nbusers, cname, fname, lname, t
             };
             if (pMethod !== 'voucher') {
                 mySelf.planInfo.usedGatewayId = $paymentMethod.attr('prov-id');
+                mySelf.planInfo.usedGateName = $paymentMethod.attr('gate-n');
             }
             mySelf.goToPayment(userInfo);
         });

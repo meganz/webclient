@@ -16581,6 +16581,7 @@ class Stream extends mixins.wl {
 
     this.renderMiniMode = () => {
       const {
+        call,
         isOnHold,
         forcedLocal,
         onLoadedData
@@ -16591,7 +16592,7 @@ class Stream extends mixins.wl {
       }
 
       return external_React_default().createElement(StreamNode, {
-        className: forcedLocal ? 'local-stream-mirrored' : '',
+        className: forcedLocal && !call.isSharingScreen() ? 'local-stream-mirrored' : '',
         stream: this.getStreamSource(),
         onLoadedData: onLoadedData
       });
@@ -16599,6 +16600,7 @@ class Stream extends mixins.wl {
 
     this.renderSelfView = () => {
       const {
+        call,
         isOnHold,
         onLoadedData
       } = this.props;
@@ -16611,7 +16613,7 @@ class Stream extends mixins.wl {
       }
 
       return external_React_default().createElement((external_React_default()).Fragment, null, external_React_default().createElement(StreamNode, {
-        className: "local-stream-mirrored",
+        className: call.isSharingScreen() ? '' : 'local-stream-mirrored',
         stream: this.getStreamSource(),
         onLoadedData: onLoadedData
       }), external_React_default().createElement(meetings_button.Z, {
@@ -17148,7 +17150,7 @@ class stream_Stream extends mixins.wl {
       const targetStream = forcedLocal ? call.getLocalStream() : activeStream;
       return forcedLocal || activeStream ? external_React_default().createElement(StreamNode, {
         key: targetStream.clientId,
-        className: forcedLocal ? 'local-stream-mirrored' : '',
+        className: forcedLocal && !call.isSharingScreen() ? 'local-stream-mirrored' : '',
         stream: targetStream,
         chatRoom: chatRoom,
         menu: true,
@@ -19005,7 +19007,7 @@ class Sidebar extends mixins.wl {
         mode: mode,
         chatRoom: chatRoom,
         stream: localStream,
-        className: "\n                                    local-stream-mirrored\n                                    " + (forcedLocal ? 'active' : '') + "\n                                ",
+        className: "\n                                    " + (call.isSharingScreen() ? '' : 'local-stream-mirrored') + "\n                                    " + (forcedLocal ? 'active' : '') + "\n                                ",
         onClick: () => {
           mBroadcaster.sendMessage('meetings:collapse');
           onSpeakerChange(localStream);

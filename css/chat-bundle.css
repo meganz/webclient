@@ -80,29 +80,6 @@
   bottom: -9999px;
   visibility: hidden;
 }
-.meetings-call .stream .stream-controls ul li button .active-indicator {
-  position: absolute;
-  top: -1px;
-  right: 2px;
-  width: 12px;
-  height: 12px;
-  border-radius: 200px;
-  background: #88FF5B;
-}
-.meetings-call .stream .stream-controls .button-group {
-  position: relative;
-}
-.meetings-call .stream .stream-controls .button-group-menu {
-  display: none;
-  position: absolute;
-  transform: translateY(-100%);
-}
-.meetings-call .stream .stream-controls .button-group-menu.expanded {
-  display: block;
-}
-.meetings-call .stream .stream-controls .button-group-menu .button-group-item {
-  margin: 0 0 10px 0;
-}
 .meetings-call .stream .stream-controls .stream-debug {
   /* [...] */
 }
@@ -1240,6 +1217,12 @@
 }
 .local-stream.minimized {
   z-index: 1000;
+  width: 320px;
+  height: 240px;
+}
+.local-stream.minimized.ratio-16-9 {
+  width: 334px;
+  height: 188px;
 }
 .local-stream.minimized:hover .local-stream-overlay, .local-stream.minimized.active .local-stream-overlay {
   display: block;
@@ -1264,15 +1247,18 @@
   background: linear-gradient(to bottom, rgba(0, 0, 0, 0.6) 0, rgba(0, 0, 0, 0) 100%);
 }
 .local-stream.minimized .local-stream-overlay .local-stream-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   position: absolute;
-  top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%);
+  bottom: 20px;
+  transform: translate(-50%);
   width: 100%;
   text-align: center;
 }
 .local-stream.minimized .local-stream-overlay .local-stream-controls button {
-  margin: 0 32px 0 0;
+  margin: 0 24px 0 0;
 }
 .local-stream.minimized .local-stream-overlay .local-stream-controls button:last-child {
   margin-right: 0;
@@ -1284,6 +1270,13 @@
 .local-stream.minimized .local-stream-overlay .local-stream-controls button.end-call {
   background: #ff6863;
   background: linear-gradient(0deg, #ff6863 0%, #ff9c97 100%);
+}
+.local-stream.minimized .local-stream-overlay .local-stream-controls .button-group {
+  margin-right: 24px;
+}
+.local-stream.minimized .local-stream-overlay .local-stream-controls .button-group .active-indicator {
+  top: -1px;
+  right: 2px;
 }
 .local-stream.minimized .local-stream-notifications {
   position: absolute;
@@ -1341,6 +1334,35 @@
   border-radius: 24px;
   background: transparent;
   border: 0 none;
+}
+
+.stream-controls .button-group,
+.local-stream-controls .button-group {
+  position: relative;
+}
+.stream-controls .button-group-menu,
+.local-stream-controls .button-group-menu {
+  display: none;
+  position: absolute;
+  transform: translateY(-100%);
+}
+.stream-controls .button-group-menu.expanded,
+.local-stream-controls .button-group-menu.expanded {
+  display: block;
+}
+.stream-controls .button-group-menu .button-group-item,
+.local-stream-controls .button-group-menu .button-group-item {
+  margin: 0 0 10px 0;
+}
+.stream-controls .button-group .active-indicator,
+.local-stream-controls .button-group .active-indicator {
+  position: absolute;
+  top: -1px;
+  right: 2px;
+  width: 12px;
+  height: 12px;
+  border-radius: 200px;
+  background: #88FF5B;
 }
 
 .start-meeting {
@@ -1972,5 +1994,3 @@ body.theme-dark .preview-meeting {
     left: 400px;
   }
 }
-
-/*# sourceMappingURL=chat-bundle.css.map */

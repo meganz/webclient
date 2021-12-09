@@ -4,6 +4,7 @@ import utils from '../../../ui/utils.jsx';
 import Button from './button.jsx';
 import Call from './call.jsx';
 import StreamNode from './streamNode.jsx';
+import StreamExtendedControls from "./streamExtendedControls";
 
 export default class Local extends MegaRenderMixin {
     collapseListener = null;
@@ -479,7 +480,8 @@ class Minimized extends MegaRenderMixin {
 
     render() {
         const { unread } = this.state;
-        const { isOnHold, onCallExpand, onCallEnd, onAudioClick, onVideoClick } = this.props;
+        const { call, onCallExpand, onCallEnd, onAudioClick, onVideoClick,
+                onScreenSharingClick, onHoldClick } = this.props;
         const audioLabel = this.isActive(SfuClient.Av.Audio) ? l[16214] /* `Mute` */ : l[16708] /* `Mute` */;
         const videoLabel =
             this.isActive(SfuClient.Av.Camera) ? l[22894] /* `Disable video` */ : l[22893] /* `Enable video` */;
@@ -498,54 +500,57 @@ class Minimized extends MegaRenderMixin {
                         }}
                     />
 
-                    {!isOnHold && (
-                        <div className={`${Local.NAMESPACE}-controls`}>
-                            <Button
-                                simpletip={{ ...SIMPLETIP_PROPS, label: audioLabel }}
-                                className={`
-                                    mega-button
-                                    theme-light-forced
-                                    round
-                                    large
-                                    ${this.isActive(SfuClient.Av.Audio) ? '' : 'inactive'}
-                                `}
-                                icon={`${this.isActive(SfuClient.Av.Audio) ? 'icon-audio-filled' : 'icon-audio-off'}`}
-                                onClick={ev => {
-                                    ev.stopPropagation();
-                                    onAudioClick();
-                                }}>
-                                <span>{audioLabel}</span>
-                            </Button>
-                            <Button
-                                simpletip={{ ...SIMPLETIP_PROPS, label: videoLabel }}
-                                className={`
-                                    mega-button
-                                    theme-light-forced
-                                    round
-                                    large
-                                    ${this.isActive(SfuClient.Av.Camera) ? '' : 'inactive'}
-                                `}
-                                icon={`
-                                    ${this.isActive(SfuClient.Av.Camera) ? 'icon-video-call-filled' : 'icon-video-off'}
-                                `}
-                                onClick={ev => {
-                                    ev.stopPropagation();
-                                    onVideoClick();
-                                }}>
-                                <span>{videoLabel}</span>
-                            </Button>
-                            <Button
-                                simpletip={{ ...SIMPLETIP_PROPS, label: l[5884] /* `End call` */ }}
-                                className="mega-button theme-dark-forced round large end-call"
-                                icon="icon-end-call"
-                                onClick={ev => {
-                                    ev.stopPropagation();
-                                    onCallEnd();
-                                }}>
-                                <span>{l[5884] /* `End call` */}</span>
-                            </Button>
-                        </div>
-                    )}
+                    <div className={`${Local.NAMESPACE}-controls`}>
+                        <Button
+                            simpletip={{ ...SIMPLETIP_PROPS, label: audioLabel }}
+                            className={`
+                                mega-button
+                                theme-light-forced
+                                round
+                                large
+                                ${this.isActive(SfuClient.Av.Audio) ? '' : 'inactive'}
+                            `}
+                            icon={`${this.isActive(SfuClient.Av.Audio) ? 'icon-audio-filled' : 'icon-audio-off'}`}
+                            onClick={ev => {
+                                ev.stopPropagation();
+                                onAudioClick();
+                            }}>
+                            <span>{audioLabel}</span>
+                        </Button>
+                        <Button
+                            simpletip={{ ...SIMPLETIP_PROPS, label: videoLabel }}
+                            className={`
+                                mega-button
+                                theme-light-forced
+                                round
+                                large
+                                ${this.isActive(SfuClient.Av.Camera) ? '' : 'inactive'}
+                            `}
+                            icon={`
+                                ${this.isActive(SfuClient.Av.Camera) ? 'icon-video-call-filled' : 'icon-video-off'}
+                            `}
+                            onClick={ev => {
+                                ev.stopPropagation();
+                                onVideoClick();
+                            }}>
+                            <span>{videoLabel}</span>
+                        </Button>
+                        <StreamExtendedControls
+                            call={call}
+                            onScreenSharingClick={onScreenSharingClick}
+                            onHoldClick={onHoldClick}
+                        />
+                        <Button
+                            simpletip={{ ...SIMPLETIP_PROPS, label: l[5884] /* `End call` */ }}
+                            className="mega-button theme-dark-forced round large end-call"
+                            icon="icon-end-call"
+                            onClick={ev => {
+                                ev.stopPropagation();
+                                onCallEnd();
+                            }}>
+                            <span>{l[5884] /* `End call` */}</span>
+                        </Button>
+                    </div>
                 </div>
                 {unread ? (
                     <div className={`${Local.NAMESPACE}-notifications`}>

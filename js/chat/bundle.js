@@ -9873,15 +9873,20 @@ class Local extends AbstractGenericMessage {
     this._getParticipantNames = message => message.meta && message.meta.participants && !!message.meta.participants.length && message.meta.participants.map(handle => "[[" + escapeHTML(M.getNameByHandle(handle)) + "]]");
 
     this._getExtraInfo = message => {
+      const {
+        meta,
+        type
+      } = message;
+
       const participantNames = this._getParticipantNames(message);
 
-      const HAS_PARTICIPANTS = participantNames && !!participantNames.length;
-      const ENDED = message.type === MESSAGE_TYPE.ENDED || message.type === MESSAGE_TYPE.FAILED;
-      const HAS_DURATION = message.meta && message.meta.duration;
+      const HAS_PARTICIPANTS = participantNames && !!participantNames.length && participantNames.length > 1;
+      const HAS_DURATION = meta && meta.duration;
+      const ENDED = type === MESSAGE_TYPE.ENDED || type === MESSAGE_TYPE.FAILED || type === MESSAGE_TYPE.CANCELLED;
       let messageExtraInfo = [HAS_PARTICIPANTS ? mega.utils.trans.listToString(participantNames, l[20234]) : ''];
 
-      if (ENDED && HAS_DURATION) {
-        messageExtraInfo = [...messageExtraInfo, HAS_PARTICIPANTS ? '. ' : '', l[7208].replace('[X]', '[[' + secToDuration(message.meta.duration) + ']]')];
+      if (ENDED) {
+        messageExtraInfo = [...messageExtraInfo, HAS_PARTICIPANTS ? '. ' : '', HAS_DURATION ? l[7208].replace('[X]', "[[" + secToDuration(meta.duration) + "]]") : ''];
       }
 
       return messageExtraInfo && messageExtraInfo.reduce((acc, cur) => (acc + cur).replace(/\[\[/g, '<span class="bold">').replace(/]]/g, '</span>'));

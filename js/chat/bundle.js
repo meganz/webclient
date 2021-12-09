@@ -15,8 +15,8 @@ var external_React_default = __webpack_require__.n(external_React_);
 // EXTERNAL MODULE: external "ReactDOM"
 var external_ReactDOM_ = __webpack_require__(533);
 var external_ReactDOM_default = __webpack_require__.n(external_ReactDOM_);
-// EXTERNAL MODULE: ./js/chat/ui/conversations.jsx + 72 modules
-var conversations = __webpack_require__(916);
+// EXTERNAL MODULE: ./js/chat/ui/conversations.jsx + 73 modules
+var conversations = __webpack_require__(230);
 ;// CONCATENATED MODULE: ./js/chat/chatRouting.jsx
 class ChatRouting {
   constructor(megaChatInstance) {
@@ -8430,7 +8430,7 @@ ContactsPanel.getUserFingerprint = handle => {
 
 /***/ }),
 
-/***/ 916:
+/***/ 230:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -16232,6 +16232,48 @@ class SidebarControls extends mixins.wl {
   }
 
 }
+;// CONCATENATED MODULE: ./js/chat/ui/meetings/streamExtendedControls.jsx
+
+
+
+class StreamExtendedControls extends mixins.wl {
+  constructor() {
+    super(...arguments);
+
+    this.isActive = type => {
+      return !!(this.props.call.av & type);
+    };
+  }
+
+  render() {
+    const SIMPLETIP = {
+      position: 'top',
+      offset: 8,
+      className: 'theme-dark-forced'
+    };
+    const screenSharingLabel = this.isActive(SfuClient.Av.Screen) ? l[22890] : l[22889];
+    const callHoldLabel = this.isActive(SfuClient.Av.onHold) ? l[23459] : l[23460];
+    return external_React_default().createElement(meetings_button.Z.Group, {
+      active: this.isActive(SfuClient.Av.Screen)
+    }, external_React_default().createElement(meetings_button.Z, {
+      simpletip: { ...SIMPLETIP,
+        label: screenSharingLabel
+      },
+      className: "\n                        mega-button\n                        theme-light-forced\n                        round\n                        large\n                        " + (this.isActive(SfuClient.Av.Screen) ? 'active' : '') + "\n                    ",
+      icon: "\n                        " + (this.isActive(SfuClient.Av.Screen) ? 'icon-end-screenshare' : 'icon-screen-share') + "\n                    ",
+      onClick: this.props.onScreenSharingClick
+    }, external_React_default().createElement("span", null, screenSharingLabel)), external_React_default().createElement(meetings_button.Z, {
+      simpletip: { ...SIMPLETIP,
+        label: callHoldLabel,
+        position: 'left'
+      },
+      className: "\n                        mega-button\n                        theme-light-forced\n                        round\n                        large\n                        " + (this.isActive(SfuClient.Av.onHold) ? 'active' : '') + "\n                    ",
+      icon: this.isActive(SfuClient.Av.onHold) ? 'icon-play' : 'icon-pause',
+      onClick: this.props.onHoldClick
+    }, external_React_default().createElement("span", null, callHoldLabel)));
+  }
+
+}
 ;// CONCATENATED MODULE: ./js/chat/ui/meetings/streamControls.jsx
 
 
@@ -16275,8 +16317,6 @@ class StreamControls extends mixins.wl {
     const avFlags = this.props.call.av;
     const audioLabel = avFlags & SfuClient.Av.Audio ? l[16214] : l[16708];
     const videoLabel = avFlags & SfuClient.Av.Camera ? l[22894] : l[22893];
-    const screenSharingLabel = avFlags & SfuClient.Av.Screen ? l[22890] : l[22889];
-    const callHoldLabel = avFlags & SfuClient.Av.onHold ? l[23459] : l[23460];
     const SIMPLETIP = {
       position: 'top',
       offset: 8,
@@ -16298,24 +16338,11 @@ class StreamControls extends mixins.wl {
       className: "\n                                mega-button\n                                theme-light-forced\n                                round\n                                large\n                                " + (avFlags & SfuClient.Av.Camera ? '' : 'inactive') + "\n                            ",
       icon: "" + (avFlags & SfuClient.Av.Camera ? 'icon-video-call-filled' : 'icon-video-off'),
       onClick: this.props.onVideoClick
-    }, external_React_default().createElement("span", null, videoLabel))), external_React_default().createElement("li", null, external_React_default().createElement(meetings_button.Z.Group, {
-      active: !!(avFlags & SfuClient.Av.Screen)
-    }, external_React_default().createElement(meetings_button.Z, {
-      simpletip: { ...SIMPLETIP,
-        label: screenSharingLabel
-      },
-      className: "\n                                    mega-button\n                                    theme-light-forced\n                                    round\n                                    large\n                                    " + (avFlags & SfuClient.Av.Screen ? 'active' : '') + "\n                                ",
-      icon: "\n                                    " + (avFlags & SfuClient.Av.Screen ? 'icon-end-screenshare' : 'icon-screen-share') + "\n                                ",
-      onClick: this.props.onScreenSharingClick
-    }, external_React_default().createElement("span", null, screenSharingLabel)), external_React_default().createElement(meetings_button.Z, {
-      simpletip: { ...SIMPLETIP,
-        label: callHoldLabel,
-        position: 'left'
-      },
-      className: "\n                                    mega-button\n                                    theme-light-forced\n                                    round\n                                    large\n                                    " + (avFlags & SfuClient.Av.onHold ? 'active' : '') + "\n                                ",
-      icon: avFlags & SfuClient.Av.onHold ? "icon-play" : "icon-pause",
-      onClick: this.props.onHoldClick
-    }, external_React_default().createElement("span", null, callHoldLabel)))), external_React_default().createElement("li", null, external_React_default().createElement(meetings_button.Z, {
+    }, external_React_default().createElement("span", null, videoLabel))), external_React_default().createElement("li", null, external_React_default().createElement(StreamExtendedControls, {
+      call: this.props.call,
+      onScreenSharingClick: this.props.onScreenSharingClick,
+      onHoldClick: this.props.onHoldClick
+    })), external_React_default().createElement("li", null, external_React_default().createElement(meetings_button.Z, {
       simpletip: { ...SIMPLETIP,
         label: l[5884]
       },
@@ -16327,6 +16354,7 @@ class StreamControls extends mixins.wl {
 
 }
 ;// CONCATENATED MODULE: ./js/chat/ui/meetings/local.jsx
+
 
 
 
@@ -16730,11 +16758,13 @@ class Minimized extends mixins.wl {
       unread
     } = this.state;
     const {
-      isOnHold,
+      call,
       onCallExpand,
       onCallEnd,
       onAudioClick,
-      onVideoClick
+      onVideoClick,
+      onScreenSharingClick,
+      onHoldClick
     } = this.props;
     const audioLabel = this.isActive(SfuClient.Av.Audio) ? l[16214] : l[16708];
     const videoLabel = this.isActive(SfuClient.Av.Camera) ? l[22894] : l[22893];
@@ -16754,13 +16784,13 @@ class Minimized extends mixins.wl {
         ev.stopPropagation();
         onCallExpand();
       }
-    }), !isOnHold && external_React_default().createElement("div", {
+    }), external_React_default().createElement("div", {
       className: local_Local.NAMESPACE + "-controls"
     }, external_React_default().createElement(meetings_button.Z, {
       simpletip: { ...SIMPLETIP_PROPS,
         label: audioLabel
       },
-      className: "\n                                    mega-button\n                                    theme-light-forced\n                                    round\n                                    large\n                                    " + (this.isActive(SfuClient.Av.Audio) ? '' : 'inactive') + "\n                                ",
+      className: "\n                                mega-button\n                                theme-light-forced\n                                round\n                                large\n                                " + (this.isActive(SfuClient.Av.Audio) ? '' : 'inactive') + "\n                            ",
       icon: "" + (this.isActive(SfuClient.Av.Audio) ? 'icon-audio-filled' : 'icon-audio-off'),
       onClick: ev => {
         ev.stopPropagation();
@@ -16770,13 +16800,17 @@ class Minimized extends mixins.wl {
       simpletip: { ...SIMPLETIP_PROPS,
         label: videoLabel
       },
-      className: "\n                                    mega-button\n                                    theme-light-forced\n                                    round\n                                    large\n                                    " + (this.isActive(SfuClient.Av.Camera) ? '' : 'inactive') + "\n                                ",
-      icon: "\n                                    " + (this.isActive(SfuClient.Av.Camera) ? 'icon-video-call-filled' : 'icon-video-off') + "\n                                ",
+      className: "\n                                mega-button\n                                theme-light-forced\n                                round\n                                large\n                                " + (this.isActive(SfuClient.Av.Camera) ? '' : 'inactive') + "\n                            ",
+      icon: "\n                                " + (this.isActive(SfuClient.Av.Camera) ? 'icon-video-call-filled' : 'icon-video-off') + "\n                            ",
       onClick: ev => {
         ev.stopPropagation();
         onVideoClick();
       }
-    }, external_React_default().createElement("span", null, videoLabel)), external_React_default().createElement(meetings_button.Z, {
+    }, external_React_default().createElement("span", null, videoLabel)), external_React_default().createElement(StreamExtendedControls, {
+      call: call,
+      onScreenSharingClick: onScreenSharingClick,
+      onHoldClick: onHoldClick
+    }), external_React_default().createElement(meetings_button.Z, {
       simpletip: { ...SIMPLETIP_PROPS,
         label: l[5884]
       },
@@ -17310,7 +17344,8 @@ class stream_Stream extends mixins.wl {
         this.scaleNodes(undefined, true);
       },
       onSpeakerChange: onSpeakerChange,
-      onModeChange: onModeChange
+      onModeChange: onModeChange,
+      onHoldClick: onHoldClick
     }));
   }
 
@@ -30040,7 +30075,7 @@ function _extends() {
 /******/ 	// Load entry module and return exports
 /******/ 	__webpack_require__(662);
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __webpack_require__(916);
+/******/ 	var __webpack_exports__ = __webpack_require__(230);
 /******/ 	
 /******/ })()
 ;

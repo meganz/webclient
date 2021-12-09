@@ -2,7 +2,7 @@ import React from 'react';
 import { MegaRenderMixin } from '../../mixins';
 import Button from './button.jsx';
 import { STREAM_ACTIONS } from './stream.jsx';
-import Call from './call.jsx';
+import StreamExtendedControls from "./streamExtendedControls";
 
 export default class StreamControls extends MegaRenderMixin {
     constructor(props) {
@@ -36,9 +36,6 @@ export default class StreamControls extends MegaRenderMixin {
         const audioLabel = avFlags & SfuClient.Av.Audio ? l[16214] /* `Mute` */ : l[16708] /* `Unmute` */;
         const videoLabel =
             avFlags & SfuClient.Av.Camera ? l[22894] /* `Disable video` */ : l[22893] /* `Enable video` */;
-        const screenSharingLabel =
-            avFlags & SfuClient.Av.Screen ? l[22890] /* `End screen sharing` */ : l[22889] /* `Start screen sharing` */;
-        const callHoldLabel = avFlags & SfuClient.Av.onHold ? l[23459] /* `Resume call` */ : l[23460] /* `Hold call` */;
         const SIMPLETIP = { position: 'top', offset: 8, className: 'theme-dark-forced' };
 
         //
@@ -80,36 +77,11 @@ export default class StreamControls extends MegaRenderMixin {
                         </Button>
                     </li>
                     <li>
-                        <Button.Group active={!!(avFlags & SfuClient.Av.Screen)}>
-                            <Button
-                                simpletip={{ ...SIMPLETIP, label: screenSharingLabel }}
-                                className={`
-                                    mega-button
-                                    theme-light-forced
-                                    round
-                                    large
-                                    ${avFlags & SfuClient.Av.Screen ? 'active' : ''}
-                                `}
-                                icon={`
-                                    ${avFlags & SfuClient.Av.Screen ? 'icon-end-screenshare' : 'icon-screen-share'}
-                                `}
-                                onClick={this.props.onScreenSharingClick}>
-                                <span>{screenSharingLabel}</span>
-                            </Button>
-                            <Button
-                                simpletip={{ ...SIMPLETIP, label: callHoldLabel, position: 'left' }}
-                                className={`
-                                    mega-button
-                                    theme-light-forced
-                                    round
-                                    large
-                                    ${avFlags & SfuClient.Av.onHold ? 'active' : ''}
-                                `}
-                                icon={avFlags & SfuClient.Av.onHold ? "icon-play" : "icon-pause"}
-                                onClick={this.props.onHoldClick}>
-                                <span>{callHoldLabel}</span>
-                            </Button>
-                        </Button.Group>
+                        <StreamExtendedControls
+                            call={this.props.call}
+                            onScreenSharingClick={this.props.onScreenSharingClick}
+                            onHoldClick={this.props.onHoldClick}
+                        />
                     </li>
                     <li>
                         <Button

@@ -169,6 +169,7 @@ body:not(.mobile) .about.top-info a:hover {
 }
 .about.numbers-info .lang .num {
     padding-top: 8px;
+    white-space: nowrap;
 }
 .about.numbers-info .num span, .en .about.numbers-info .num {
     font-size: 54px;

@@ -1084,11 +1084,11 @@ if (!browserUpdate && is_extension)
 }
 
 var page;
-window.redirect = ['about', 'achievements', 'android', 'bird', 'blog', 'business', 'chrome', 'cmd', 'contact',
-                   'collaboration', 'copyright', 'corporate', 'credits', 'dev', 'developers', 'dispute', 'doc',
-                   'edge', 'extensions', 'firefox', 'gdpr', 'help', 'ios', 'mobile', 'nas', 'plugin', 'privacy',
-                   'resellers', 'sdkterms', 'securechat', 'security', 'sourcecode', 'start', 'storage', 'sync',
-                   'takedown', 'terms', 'uwp', 'wp'];
+window.redirect = ['about', 'achievements', 'android', 'bird', 'blog', 'business', 'chrome', 'cmd',
+                   'contact', 'collaboration', 'copyright', 'corporate', 'credits', 'desktop', 'dev',
+                   'developers', 'dispute', 'doc', 'edge', 'extensions', 'firefox', 'gdpr', 'help', 'ios',
+                   'mobile', 'nas', 'plugin', 'privacy', 'resellers', 'sdkterms', 'securechat', 'security',
+                   'sourcecode', 'start', 'storage', 'sync', 'takedown', 'terms', 'uwp', 'wp'];
 var isStaticPage = function(page) {
     'use strict';
     if (page) {
@@ -3289,7 +3289,7 @@ else if (!browserUpdate) {
         'help2_welcome': {f:'html/help2_welcome.html', n: 'help2_welcome', j: 0},
         'help2_page': {f:'html/help2_page.html', n: 'help2_page', j: 0},
         'help_js': {f:'html/js/help2.js', n: 'help_js', j:1},
-        'sync': {f:'html/sync.html', n: 'sync', j:0},
+        'desktop': {f:'html/desktop.html', n: 'desktop', j:0},
         'sync_js': {f:'html/js/sync.js', n: 'sync_js', j:1},
         'cmd': {f:'html/megacmd.html', n: 'cmd', j:0},
         'mobileapp': {f:'html/mobileapp.html', n: 'mobileapp', j:0},
@@ -3430,7 +3430,7 @@ else if (!browserUpdate) {
         'copyrightnotice': ['copyrightnotice', 'copyright_js'],
         'privacy': ['privacy'],
         'takedown': ['takedown'],
-        'sync': ['sync', 'sync_js'],
+        'desktop': ['desktop', 'sync_js'],
         'cmd': ['cmd', 'megacmd_js'],
         'mobile': ['mobileapp'],
         'nas': ['nas'],

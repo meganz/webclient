@@ -1062,7 +1062,7 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders, target) 
                 hideMEGAsyncDialog();
 
                 if (!syncData) {
-                    loadSubPage('sync');
+                    loadSubPage('desktop');
                 }
                 // if the user is running MEGAsync 3.0+
                 else if (!syncData.verNotMeet) {

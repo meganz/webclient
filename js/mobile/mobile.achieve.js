@@ -375,7 +375,7 @@ mobile.achieve = {
         mobile.achieve.$page.find('.install-mega-sync').off('tap').on('tap', function() {
 
             // Load the page
-            loadSubPage('sync');
+            loadSubPage('desktop');
             return false;
         });
     },

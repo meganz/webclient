@@ -16891,7 +16891,7 @@ class ParticipantsNotice extends mixins.wl {
     }
 
     return external_React_default().createElement((external_React_default()).Fragment, null, external_React_default().createElement(StreamNode, {
-      className: "local-stream-mirrored",
+      className: call.isSharingScreen() ? '' : 'local-stream-mirrored',
       stream: call.getLocalStream()
     }), streamContainer(call.left ? this.renderUserAlone() : this.renderUserWaiting()));
   }

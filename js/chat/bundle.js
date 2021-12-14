@@ -20879,7 +20879,7 @@ class ConversationRightArea extends mixins.wl {
       }
     }, external_React_default().createElement("i", {
       className: "sprite-fm-mono icon-rename"
-    }), external_React_default().createElement("span", null, l[9080])) : null, !room.isReadOnly() && room.type === "public" ? external_React_default().createElement("div", {
+    }), external_React_default().createElement("span", null, l[9080])) : null, room.type === "public" ? external_React_default().createElement("div", {
       className: "\n                                                link-button\n                                                light\n                                                " + (Call.isGuest() ? 'disabled' : '') + "\n                                            ",
       onClick: e => {
         if ($(e.target).closest('.disabled').length > 0) {

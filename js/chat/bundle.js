@@ -4167,6 +4167,10 @@ ChatRoom.prototype.joinCall = ChatRoom._fnRequireParticipantKeys(function (audio
     return;
   }
 
+  if (window.sfuClient) {
+    window.sfuClient.app.destroy();
+  }
+
   this.meetingsLoading = l.joining;
   this.rebind("onCallEnd.start", (e, data) => {
     if (data.callId === callId) {
@@ -4187,7 +4191,8 @@ ChatRoom.prototype.joinCall = ChatRoom._fnRequireParticipantKeys(function (audio
     app.sfuClient.muteAudio(!audio);
     app.sfuClient.muteCamera(!video);
     return app.sfuClient.connect(r.url, callId, this.type !== "private");
-  }, () => {
+  }, ex => {
+    console.error('Failed to join call:', ex);
     this.meetingsLoading = false;
     this.unbind("onCallEnd.start");
   });
@@ -4268,7 +4273,8 @@ ChatRoom.prototype.startCall = ChatRoom._fnRequireParticipantKeys(function (audi
       }
     });
     sfuClient.connect(r.sfu.replace("https://", "wss://"), r.callId, this.type !== "private");
-  }, () => {
+  }, ex => {
+    console.error('Failed to start call:', ex);
     this.meetingsLoading = false;
     this.unbind("onCallEnd.start");
   });

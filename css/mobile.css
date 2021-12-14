@@ -677,11 +677,9 @@ ul, li {
 }
 .mobile.payment-stripe-success-dialog .success-desc,
 .mobile.payment-stripe-failure-dialog .fail-desc {
-    margin-top: 20px;
     font-family: 'LatoWeb', sans-serif;
-    margin-left: 40px;
-    margin-right: 40px;
     font-size: 15px;
+    margin: 20px 40px 80px;
     text-align: center;
     line-height: 20px;
 }
@@ -1025,11 +1023,6 @@ ul, li {
 .mobile.registration-confirm-email .mobile.fm-block {
     padding-bottom: 24px;
     border-bottom: 1px solid #eee;
-}
-.mobile.full-page-scrollable {
-    overflow: scroll;
-    -webkit-overflow-scrolling: touch;
-    display: block;
 }
 .mobile.full-page-scrollable {
     overflow: scroll;

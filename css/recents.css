@@ -307,8 +307,8 @@
 }
 .fm-recents .data-block-view,
 .fm-recents .data-block-bg,
-.fm-recents .block-view-file-type,
-.fm-recents .data-block-view .data-block-bg img {
+.fm-recents .data-block-bg.thumb .block-view-file-type,
+.fm-recents .data-block-view .data-block-bg.thumb img {
     width: 120px;
     height: 120px;
 }

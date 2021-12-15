@@ -3875,6 +3875,7 @@ function loadfm_done(mDBload) {
                     }
                 });
                 M.myChatFilesFolder.init();
+                M.getCameraUploads();
             }
         }
         else {

@@ -74,7 +74,8 @@
 /* =============================== *\
         Temp Buttons
 \* =============================== */
-.btn-myfiles {
+.btn-myfiles,
+.btn-galleries {
     border-radius: 4px;
     box-sizing: border-box;
     cursor: pointer;
@@ -95,8 +96,12 @@
     text-overflow: ellipsis;
     white-space: nowrap;
 }
-
-.btn-myfiles i {
+.btn-galleries {
+    -webkit-padding-start: 4px;
+    padding-inline-start: 4px;
+}
+.btn-myfiles i,
+.btn-galleries i {
     -webkit-margin-end: 8px;
     margin-inline-end: 8px;
     margin-top: 4px;
@@ -105,21 +110,30 @@
     float: left;
     --mask-color: var(--stroke-main-inverted);
 }
-.rtl .btn-myfiles i {
+.btn-myfiles.active i:not(.icon-arrow-down),
+.btn-galleries.active i:not(.icon-arrow-down) {
+    --mask-color: var(--secondary-blue);
+}
+.rtl .btn-myfiles i,
+.rtl .btn-galleries i {
     float: right;
 }
 
 .btn-myfiles:hover,
-.btn-myfiles.active {
+.btn-myfiles.active,
+.btn-galleries:hover,
+.btn-galleries.active {
     cursor: pointer;
     color: var(--stroke-main-inverted);
     background-color: var(--stroke-grey-1);
     box-shadow: 0 1px 4px 0 rgba(0,0,0,0.1);
 }
-.btn-myfiles.active {
+.btn-myfiles.active,
+.btn-galleries.active {
     opacity: 1;
 }
-.btn-myfiles span {
+.btn-myfiles span,
+.btn-galleries span {
     -webkit-margin-end: 8px;
     margin-inline-end: 8px;
 }

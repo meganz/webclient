@@ -716,7 +716,7 @@ class SelectionManager2_DOM extends SelectionManager2Base {
      * @returns {Boolean}
      */
     selectionNotification(nodeId, isAddToSelection) {
-        if (M.chat || typeof nodeId !== 'number' && !M.d[nodeId]) {
+        if (M.chat || M.currentCustomView.type === 'gallery' || typeof nodeId !== 'number' && !M.d[nodeId]) {
             return false;
         }
 

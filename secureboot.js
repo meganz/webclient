@@ -2869,6 +2869,8 @@ else if (!browserUpdate) {
         jsl.push({f:'css/important.css', n: 'important_css', j:2, w:30, c:1, d:1, cache:1});
         jsl.push({f:'css/fm-lists.css', n: 'fm_lists_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/grid-table.css', n: 'grid_table_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/tabs.css', n: 'tabs_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/empty-pages.css', n: 'empty_page_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'js/vendor/megalist.js', n: 'megalist_js', j:1, w:5});
         jsl.push({f:'js/vendor/megaDynamicList.js', n: 'mega_dynamic_list_js', j:1, w:5});
         jsl.push({f:'js/fm/quickfinder.js', n: 'fm_quickfinder_js', j:1, w:1});
@@ -2888,6 +2890,9 @@ else if (!browserUpdate) {
         jsl.push({f:'js/fm/affiliate.js', n: 'fm_affiliate_js', j: 1});
         jsl.push({f:'js/ui/contextMenu.js', n: 'context_menu_js', j: 1});
         jsl.push({f:'js/ui/searchbar.js', n: 'searchbar_js', j:1});
+
+        jsl.push({f:'css/gallery.css', n: 'gallery_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'js/fm/gallery.js', n: 'fm_gallery_js', j:1});
 
         jsl.push({f:'js/ui/onboarding.js', n: 'onboarding_js', j:1,w:1});
         jsl.push({f:'js/ui/sms.js', n: 'sms_js', j: 1, w: 1});

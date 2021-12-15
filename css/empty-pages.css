@@ -1,0 +1,131 @@
+/* Empty data blocks */
+.fm-empty-section,
+.fm-empty-sharef {
+    align-items: center;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    text-align: center;
+    flex-grow: 1;
+    background: var(--surface-grey-1);
+}
+.fm-empty-pad {
+    margin: auto;
+}
+.fm-empty-section .mega-button.large {
+    margin-top: 30px;
+}
+.fm-empty-section i.section-icon,
+.fm-empty-sharef i.section-icon {
+    --icon-size: 192px;
+    --mask-color: var(--secondary-grey);
+    display: inline-block;
+}
+.fm-empty-section.fm-empty-user-management {
+    z-index: 2;
+}
+.fm-empty-sharef.fm-empty-pad {
+    top: 0;
+    margin-top: 0;
+}
+.not-logged .fm-empty-contacts .fm-empty-description,
+.not-logged .fm-empty-contacts .fm-empty-button {
+    display: none;
+}
+.fm-empty-contacts button {
+    margin: 0;
+}
+.fm-empty-cloud-txt {
+    color: var(--text-color-high);
+    font: var(--text-h0);
+    margin-top: 8px;
+}
+.fm-empty-description {
+    color: var(--text-color-medium);
+    font: var(--text-body1);
+    padding: 8px 20px 0;
+}
+.fm-not-logged-description {
+    color: var(--text-color-medium);
+    font: var(--text-body1);
+    padding: 10px 20px 0;
+}
+.fm-not-logged-description span {
+    color: var(--text-color-success);
+}
+.fm-empty-public-link-bg {
+    height: 102px;
+    background-position: center -3575px;
+}
+.fm-empty-description,
+.fm-not-logged-description {
+    text-align: center;
+    padding: 10px 20px 18px;
+}
+.fm-empty-description.small,
+.fm-not-logged-description.small {
+    padding: 1px 20px 29px;
+    font: var(--text-body1);
+    color: var(--text-color-medium);
+}
+.fm-empty-options {
+    display: flex;
+    justify-content: center;
+}
+.fm-empty-options .fm-empty-options-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font: var(--text-body1);
+    color: var(--text-color-medium);
+    max-width: 192px;
+    margin: 72px 30px 0;
+}
+.fm-empty-options .fm-empty-options-item i {
+    --icon-size: 48px;
+    --mask-color: var(--secondary-blue);
+    margin-bottom: 24px;
+}
+.fm-not-logged-description.footnote-text,
+.description.footnote-text {
+    color: var(--text-color-low);
+    font: var(--text-body2);
+    margin-top: 16px;
+}
+.fm-not-logged-text,
+.not-logged .empty-share-public {
+    display: none;
+}
+.not-logged .fm-not-logged-text {
+    display: block;
+}
+
+/* Share public link in Empty Contacts block */
+.empty-share-public {
+    padding: 18px 0 0;
+    font: var(--text-body1);
+    color: var(--text-color-low);
+}
+.empty-share-public.loading {
+    opacity: 0.3;
+}
+.empty-share-public.loading a {
+    cursor: default;
+}
+.empty-share-public a {
+    text-decoration: underline;
+}
+.empty-share-public span {
+    color: var(--text-color-high);
+    font: var(--text-body1-bold);
+    vertical-align: middle;
+}
+.empty-share-public i {
+    --icon-size: 24px;
+    --mask-color: var(--secondary-blue);
+    display: inline-block;
+    -webkit-margin-end: 8px;
+    margin-inline-end: 8px;
+    vertical-align: middle;
+}

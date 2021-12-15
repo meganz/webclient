@@ -354,3 +354,166 @@
     right: 8px;
     bottom: 64px;
 }
+
+.block-view-file-type {
+    width: 82px;
+    height: 84px;
+    display: block;
+    background-position: 0 -3234px;
+    background-image: url("../images/mega/files-icons.png");
+    background-repeat: no-repeat;
+    position: absolute;
+    left: 50%;
+    top: 45%;
+    transform: translate(-50%, -50%);
+}
+.fm-recents .data-block-bg:not(.thumb) .block-view-file-type {
+    top: 50%;
+}
+.block-view-file-type.thumb {
+    width: 156px;
+    height: 156px;
+    margin: -78px 0 0 -78px;
+    background: none;
+}
+.block-view-file-type.word {
+    background-position: 0 6px;
+}
+.block-view-file-type.web-lang {
+    background-position: 0 -114px;
+}
+.block-view-file-type.web-data {
+    background-position: 0 -234px;
+}
+.block-view-file-type.video {
+    background-position: 0 -354px;
+}
+.block-view-file-type.openoffice {
+    background-position: 0 -474px;
+}
+.block-view-file-type.keynote {
+    background-position: 0 -594px;
+}
+.block-view-file-type.numbers {
+    background-position: 0 -714px;
+}
+.block-view-file-type.vcard {
+    background-position: 0 -834px;
+}
+.block-view-file-type.torrent {
+    background-position: 0 -954px;
+}
+.block-view-file-type.text {
+    background-position: 0 -1074px;
+}
+.block-view-file-type.pages {
+    background-position: 0 -1194px;
+}
+.block-view-file-type.spreadsheet {
+    background-position: 0 -1314px;
+}
+.block-view-file-type.recovery {
+    background-position: 0 -1434px;
+}
+.block-view-file-type.dmg {
+    background-position: 0 -1554px;
+}
+.block-view-file-type.raw {
+    background-position: 0 -1674px;
+}
+.block-view-file-type.premiere {
+    background-position: 0 -1794px;
+}
+.block-view-file-type.powerpoint {
+    background-position: 0 -1914px;
+}
+.block-view-file-type.megasync {
+    background-position: 0 -2034px;
+}
+.block-view-file-type.megasync-mac {
+    background-position: 0 -2154px;
+}
+.block-view-file-type.photoshop {
+    background-position: 0 -2274px;
+}
+.block-view-file-type.pdf {
+    background-position: 0 -2394px;
+}
+.block-view-file-type.experience {
+    background-position: 0 -2514px;
+}
+.block-view-file-type.indesign {
+    background-position: 0 -2634px;
+}
+.block-view-file-type.image {
+    background-position: 0 -2754px;
+}
+.block-view-file-type.illustrator {
+    background-position: 0 -2874px;
+}
+.block-view-file-type.sketch-alt {
+    background-position: 0 -2994px;
+}
+.block-view-file-type.sketch {
+    background-position: 0 -3114px;
+}
+.block-view-file-type.generic {
+    background-position: 0 -3234px;
+}
+.block-view-file-type.font {
+    background-position: 0 -3354px;
+}
+.block-view-file-type.executable {
+    background-position: 0 -3474px;
+}
+.block-view-file-type.excel {
+    background-position: 0 -3594px;
+}
+.block-view-file-type.compressed {
+    background-position: 0 -3714px;
+}
+.block-view-file-type.cad {
+    background-position: 0 -3834px;
+}
+.block-view-file-type.audio {
+    background-position: 0 -3954px;
+}
+.block-view-file-type.aftereffects {
+    background-position: 0 -4074px;
+}
+.block-view-file-type.threed {
+    background-position: 0 -4194px;
+}
+.block-view-file-type.folder {
+    background-position: 0 -4314px;
+}
+.rubbish-bin .block-view-file-type.folder {
+    background-position: 0 -4434px;
+}
+.block-view-file-type.photo-folder {
+    background-position: 0 -4554px;
+}
+.rubbish-bin .block-view-file-type.photo-folder {
+    background-position: 0 -4674px;
+}
+.fm-blocks-view.shared-view .block-view-file-type.folder,
+.shared-blocks-view .block-view-file-type.folder,
+.fm-blocks-view.contacts-view .block-view-file-type.folder,
+.contacts-blocks-view .block-view-file-type.folder,
+.block-view-file-type.folder.inbound-share,
+.contact-details-view .block-view-file-type.folder-shared {
+    background-position: 0 -4794px;
+}
+.block-view-file-type.folder-shared,
+.out-shared-blocks-view .block-view-file-type.folder {
+    background-position: 0 -5034px;
+}
+.rubbish-bin .block-view-file-type.folder-shared {
+    background-position: 0 -5154px;
+}
+.block-view-file-type.puf-folder {
+    background-position: 0 -5274px;
+}
+.rubbish-bin .block-view-file-type.puf-folder {
+    background-position: 0 -5394px;
+}

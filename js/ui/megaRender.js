@@ -574,6 +574,10 @@
                     $('.fm-empty-incoming.contact-details-view').removeClass('hidden');
                     $('.contact-share-notification').addClass('hidden');
                 }
+                else if (M.currentCustomView.type === 'gallery') {
+                    $(`.fm-empty-${M.currentdirid}`).removeClass('hidden');
+                    $('.gallery-view').addClass('hidden');
+                }
                 else if (this.logger) {
                     this.logger.info('Empty folder not handled...', M.currentdirid, M.currentrootid);
                 }

@@ -302,7 +302,7 @@ MegaData.prototype.renderTree = function() {
     });
 
     build('shares');
-    // We are no longer build this tree, howevee, just leave this for potential later usage.
+    // We are no longer build this tree, however, just leave this for potential later usage.
     // build('out-shares');
     // build('public-links');
     build(M.RootID);
@@ -317,11 +317,10 @@ MegaData.prototype.renderTree = function() {
 };
 
 MegaData.prototype.hideEmptyGrids = function hideEmptyGrids() {
+
     'use strict';
-    $('.fm-empty-trashbin,.fm-empty-contacts,.fm-empty-search')
-        .add('.fm-empty-cloud,.fm-invalid-folder,.fm-empty-filter').addClass('hidden');
-    $('.fm-empty-folder,.fm-empty-incoming,.fm-empty-folder-link')
-        .add('.fm-empty-outgoing,.fm-empty-public-link,.fm-empty-user-management').addClass('hidden');
+
+    $('.fm-empty-section:not(.transfer-panel-empty-txt):not(.fm-recents)').addClass('hidden');
     $('.fm-empty-section.fm-empty-sharef').remove();
 };
 

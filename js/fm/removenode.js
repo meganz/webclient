@@ -19,6 +19,13 @@ function removeUInode(h, parent) {
         }
     }
 
+    if (M.currentCustomView.type === 'gallery') {
+        mega.gallery.checkEveryGalleryDelete(h);
+    }
+    else {
+        mega.gallery.nodeUpdated = true;
+    }
+
     // Update M.v it's used for at least preview slideshow
     for (var k = M.v.length; k--;) {
         var v = M.v[k].ch || M.v[k].h;
@@ -126,6 +133,18 @@ function removeUInode(h, parent) {
                 else {
                     $('.fm-empty-cloud').removeClass('hidden');
                 }
+            }
+            break;
+        case 'photos':
+        case 'images':
+        case 'videos':
+            if (!hasItems) {
+
+                __markEmptied();
+                $('.files-grid-view').addClass('hidden');
+                $('.grid-table.fm tr').remove();
+
+                $(`.fm-empty-${M.currentdirid}`).removeClass('hidden');
             }
             break;
         default:

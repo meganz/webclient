@@ -2770,10 +2770,6 @@ else if (!browserUpdate) {
         jsl.push({f:'html/megadrop.html', n: 'megadrop', j:0});
         jsl.push({f:'html/nomegadrop.html', n: 'nomegadrop', j:0});
         jsl.push({f:'js/fm/transfer-progress-widget.js', n: 'tpw_js', j:1});
-        jsl.push({f:'js/fm/fileTextEditor.js', n: 'filetexteditor_js', j:1});
-        jsl.push({f:'js/fm/textEditorUI.js', n: 'texteditorui_js', j:1});
-        jsl.push({f:'css/codemirror.css', n: 'codemirror_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'css/txteditor.css', n: 'txteditor_css', j:2,w:5,c:1,d:1,cache:1});
 
         // Bottom pages for desktop
         jsl.push({f:'css/bottom-pages-animations.css', n: 'bottom-pages-animations_css', j:2,w:5,c:1,d:1,cache:1});
@@ -2783,6 +2779,12 @@ else if (!browserUpdate) {
         is_chrome_firefox |= 4;
         jsl.push({f:'js/transfers/meths/firefox-extension.js', n: 'dl_firefox', j: 1, w: 3});
     }
+
+    // TextEditor
+    jsl.push({f:'js/fm/fileTextEditor.js', n: 'filetexteditor_js', j:1});
+    jsl.push({f:'js/fm/textEditorUI.js', n: 'texteditorui_js', j:1});
+    jsl.push({f:'css/codemirror.css', n: 'codemirror_css', j:2,w:5,c:1,d:1,cache:1});
+    jsl.push({f:'css/txteditor.css', n: 'txteditor_css', j:2,w:5,c:1,d:1,cache:1});
 
     // Transfers
     jsl.push({f:'js/transfers/xhr2.js', n: 'xhr_js', j:1});

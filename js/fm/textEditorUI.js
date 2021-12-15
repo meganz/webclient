@@ -155,10 +155,11 @@ mega.textEditorUI = new function TextEditorUI() {
 
         if (!editor) {
             editor = CodeMirror.fromTextArea($editorTextarea[0], {
-                lineNumbers: true,
+                lineNumbers: !is_mobile,
                 scrollbarStyle: "overlay",
                 autofocus: true,
-                lineWrapping: true
+                lineWrapping: true,
+                readOnly: $viewerContainer ? 'nocursor' : false
             });
         }
 
@@ -489,7 +490,6 @@ mega.textEditorUI = new function TextEditorUI() {
             if ($viewerContainer) {
                 this.cleanup();
                 init(txt, $viewerContainer);
-                editor.options.readOnly = true;
 
                 // Stop scroll event propagation when scroll inside codemirror
                 $('.CodeMirror-scroll', $editorContainer).rebind('scroll.txtviewer mousewheel.txtviewer', (e) => {
@@ -513,7 +513,7 @@ mega.textEditorUI = new function TextEditorUI() {
                 // I want JS to start from left and go in with first match
                 // eslint-disable-next-line no-extra-parens
                 if (isReadonly || folderlink || (M.currentrootid === 'shares' && M.getNodeRights(handle) < 1)) {
-                    editor.options.readOnly = true;
+                    editor.options.readOnly = 'nocursor';
                     $('header .file-btn', $editorContainer).addClass('disabled');
                     $('.save-btn', $editorContainer).addClass('hidden');
                 }

@@ -416,6 +416,10 @@ div.CodeMirror-dragcursors {
 .CodeMirror-overlayscroll.CodeMirror-focused .CodeMirror-overlayscroll-vertical {
     opacity: 1;
 }
+.mobile .CodeMirror-overlayscroll .CodeMirror-overlayscroll-horizontal,
+.mobile .CodeMirror-overlayscroll-vertical {
+    opacity: 1;
+}
 .CodeMirror-wrap .CodeMirror-overlayscroll-vertical {
     height: 100%;
 }
@@ -441,6 +445,9 @@ div.CodeMirror-dragcursors {
 .CodeMirror-overlayscroll-vertical div:hover,
 .CodeMirror-overlayscroll-horizontal div:active,
 .CodeMirror-overlayscroll-vertical div:active {
+    opacity: 0.7;
+}
+.mobile .CodeMirror-overlayscroll-horizontal div {
     opacity: 0.7;
 }
 

@@ -34,18 +34,25 @@ mobile.slideshow = {
         // Cache selector
         mobile.slideshow.$overlay = $('.mobile.slideshow-image-previewer');
 
-        // Initialise the rest of the functionality
+        if (page === 'download') {
+            $(mobile.slideshow.$overlay).addClass('download-previewer');
+        }
+        else {
+            $(mobile.slideshow.$overlay).removeClass('download-previewer');
+
+            // Initialise the rest of the functionality
+            mobile.slideshow.buildListOfImagesInDirectory();
+            mobile.slideshow.hideOrShowNavigationButtons();
+            mobile.slideshow.initPreviousImageFunctionality();
+            mobile.slideshow.initNextImageFunctionality();
+            mobile.initOverlayPopstateHandler(mobile.slideshow.$overlay);
+        }
+
         mobile.slideshow.initLandscapeView(nodeHandle);
-        mobile.slideshow.buildListOfImagesInDirectory();
-        mobile.slideshow.hideOrShowNavigationButtons();
-        mobile.slideshow.initPreviousImageFunctionality();
-        mobile.slideshow.initNextImageFunctionality();
         mobile.slideshow.initCloseButton();
         mobile.slideshow.initHideShowToggleForHeaderAndButtons(nodeHandle);
 
         mobile.slideshow.fetchImageFromApi(nodeHandle, mobile.slideshow.displayImage, 'mid', true);
-
-        mobile.initOverlayPopstateHandler(mobile.slideshow.$overlay);
     },
 
     /**

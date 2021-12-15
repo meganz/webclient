@@ -672,7 +672,9 @@ mobile.cloud = {
                 // Otherwise show the download overlay immediately
                 mobile.downloadOverlay.showOverlay(nodeHandle);
 
-                var $overlay = $('.mobile.bottom-page.scroll-block.download');
+                // var $overlay = $('.mobile.bottom-page.scroll-block.download');
+                var $overlay = $('.mobile.download-page');
+
                 $('.mobile.filetype-img').removeClass('hidden');
                 $('.video-block, .video-controls', $overlay).addClass('hidden');
 

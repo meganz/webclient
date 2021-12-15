@@ -216,6 +216,13 @@ ul, li {
 #mobile-password-decryption-overlay {
     z-index: 190;
 }
+.mobile.main-block.error-overlay.download {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
 .mobile.content-row {
     display: table-row;
 }
@@ -613,6 +620,7 @@ ul, li {
 .mobile.upload-progress .bar,
 .membership-bott-button,
 .mobile.green-button,
+.mobile.default-button,
 .mobile.default-green-button,
 .mobile.default-white-button {
     color: white;
@@ -632,6 +640,7 @@ ul, li {
     border-radius: 4px;
     overflow: hidden;
     box-sizing:border-box;
+    text-align: center;
 }
 .fm-dialog.mobile.payment-stripe-dialog {
     height: initial;
@@ -705,6 +714,9 @@ ul, li {
     -moz-border-radius: 4px;
     -webkit-border-radius: 4px;
     border-radius: 4px;
+}
+.mobile.green-button.disabled {
+    opacity: 0.3;
 }
 .membership-bott-button {
     background: #00BFA5;
@@ -805,7 +817,9 @@ ul, li {
 .mobile.content-row.second {
     display: none;
 }
-.wrong-file .mobile.content-row, .downloading .mobile.content-row, .uploading .mobile.content-row {
+.wrong-file .mobile.content-row:not(.download),
+.downloading .mobile.content-row:not(.download),
+.uploading .mobile.content-row {
     display: table;
     width: 100%;
     height: 100%;
@@ -813,14 +827,18 @@ ul, li {
     vertical-align: middle;
     text-align: center;
 }
-.wrong-file .mobile.content-row.second, .downloading .mobile.content-row.second, .uploading .mobile.content-row.second {
+.wrong-file .mobile.content-row.second,
+.downloading .mobile.content-row.second,
+.uploading .mobile.content-row.second {
     background: white;
     background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2ZmZmZmZiIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNmZmZmZmYiIHN0b3Atb3BhY2l0eT0iMCIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
     background: -moz-linear-gradient(top, rgba(255,255,255,1) 0%, rgba(255,255,255,0) 100%);
     background: -webkit-linear-gradient(top, rgba(255,255,255,1) 0%, rgba(255,255,255,0) 100%);
     background: linear-gradient(to bottom, rgba(255,255,255,1) 0%, rgba(255,255,255,0) 100%);
 }
-.wrong-file .mobile.main-block, .downloading .mobile.main-block, .uploading .mobile.main-block {
+.wrong-file .mobile.main-block:not(.download),
+.downloading .mobile.main-block:not(.download),
+.uploading .mobile.main-block {
     display: block;
 }
 .mobile.app-info-block {
@@ -842,7 +860,7 @@ ul, li {
 }
 .wrong-file .mobile.wrong-file-block, .downloading .mobile.application-txt, .uploading .mobile.application-txt {
     display: block;
-    margin: 8px auto 0;
+    margin: 8px auto;
     background: rgba(235,68,68,0.05);
     border: 1px solid rgba(235,68,68,0.40);
     -moz-border-radius: 2px;
@@ -982,6 +1000,7 @@ ul, li {
 }
 .downloading .mobile.download-progress, .uploading .mobile.upload-progress {
     display: block;
+    text-align: center;
 }
 .mobile.download-progress .bar, .mobile.upload-progress .bar {
     width: 0;
@@ -1635,14 +1654,21 @@ ul, li {
 .mobile.fm-icon.light {
     opacity: 0.53;
 }
-
-.mobile.content-cell .mobile.menu.dl-page, .mobile#mobile-ui-notFound .menu, .mobile.error-overlay .menu  {
+.mobile.download a.mobile.logo,
+.mobile#mobile-ui-notfound a.mobile.logo,
+.mobile.error-overlay a.mobile.logo {
+    left: 10px;
+    top: 18px;
+}
+.mobile.content-cell .mobile.menu.dl-page,
+.mobile#mobile-ui-notfound .menu,
+.mobile.error-overlay .menu  {
     position: absolute;
-    top: 20px;
-    right: 16px;
+    top: 13px;
+    right: 6px;
     opacity: .5;
 }
-.mobile#mobile-ui-notFound .menu {
+.mobile#mobile-ui-notfound .menu {
     display: inline;
 }
 .mobile.logo {
@@ -3288,7 +3314,8 @@ div.checkboxOn {
     white-space: normal;
 /*    text-align: left;*/
 }
-.mobile.overlay-info p.error-message {
+.mobile.overlay-info p.error-message,
+.mobile.main-block.error-overlay .title.bold {
     color: #d90007;
 }
 .mobile.overlay-info p.bold {
@@ -5028,6 +5055,20 @@ div.checkboxOn {
     z-index: 1;
     border-top: 1px solid #eee;
 }
+/* Download Page Image Viewer */
+.download-previewer .mobile.slideshow-header .slideshow-file-number-and-total,
+.download-previewer .mobile.slideshow-buttons,
+.download-previewer .mobile.slide-show-navigation,
+.download-previewer .mobile.slide-show-navigation .slideshow-forward-arrow {
+    display: none;
+}
+.downloading .download-previewer .mobile.content-row,
+.downloading .download-previewer .mobile.content-cell,
+.download-complete .download-previewer .mobile.content-row,
+.download-complete .download-previewer .mobile.content-cell,
+.download-complete .download-previewer .mobile.slideshow-wrapper {
+    display: block;
+}
 .mobile.left-buttons {
     display: inline-block;
     float: left;
@@ -6206,6 +6247,12 @@ textarea.mobile.support-text-field {
 .mobile.main-block.error-overlay .password-decryption-body-text {
     white-space: normal;
 }
+.mobile.main-block.error-overlay .title {
+    color: var(--text-color-black-high);
+    font: var(--text-h3-bold);
+    display: inline-block;
+    margin-bottom: 16px;
+}
 .mobile.recover-account-body-text a {
     color: #eb4444;
 }
@@ -6888,9 +6935,6 @@ textarea.mobile.support-text-field {
     font-size: 14px;
 }
 /* Video player Download page */
-.mobile.video .mobile.filename {
-    margin: 8px auto 0;
-}
 .mobile.video .download.main-pad {
     width: 656px;
     min-height: 590px;
@@ -7501,6 +7545,7 @@ textarea.mobile.support-text-field {
     display: none;
 }
 .mobile.download.video .video-block {
+    width: 100%;
     display: block;
 }
 /*  Video Ad */
@@ -10584,7 +10629,9 @@ Thank You dialog
         width: -moz-calc((100% - 60px) / 4);
         width: calc((100% - 60px) / 4);
     }
-    .mobile.video .download.video-block {
+    .download-page .previewer-block,
+    .mobile.video .download.video-block,
+    .download-page.image .image-block {
         height: 236px;
     }
     .security-page-video-block.mobile.video .download.video-block {
@@ -10594,8 +10641,10 @@ Thank You dialog
 
 
 @media only screen and (orientation:portrait) and (max-height: 1280px) {
-    .mobile.video .download.video-block {
-        height: 200px;
+    .download-page .previewer-block,
+    .mobile.video .download.video-block,
+    .download-page.image .image-block {
+        height: 236px;
     }
     .security-page-video-block.mobile.video .download.video-block {
         height: auto;
@@ -10847,7 +10896,9 @@ Thank You dialog
         width: -moz-calc((100% - 36px) / 2);
         width: calc((100% - 36px) / 2);
     }
-    .mobile.video .download.video-block {
+    .download-page .previewer-block,
+    .mobile.video .download.video-block,
+    .download-page.image .image-block {
         height: 194px;
     }
     .security-page-video-block.mobile.video .download.video-block {
@@ -10900,7 +10951,9 @@ Thank You dialog
     .mobile.overlay-info {
         min-height: 0px;
     }
-    .mobile.video .download.video-block {
+    .download-page .previewer-block,
+    .mobile.video .download.video-block,
+    .download-page.image .image-block {
         height: 176px;
     }
     .security-page-video-block.mobile.video .download.video-block {
@@ -11316,10 +11369,12 @@ Thank You dialog
         width: -moz-calc((100% - 36px) / 2);
         width: calc((100% - 36px) / 2);
     }
-    .mobile.video .download.video-block {
+    .download-page .previewer-block,
+    .mobile.video .download.video-block,
+    .download-page.image .image-block {
         height: 150px;
     }
-        .security-page-video-block .mobile.video .download.video-block {
+    .security-page-video-block .mobile.video .download.video-block {
         height: auto;
     }
     .mobile.grid-view .file .fm-item-img {
@@ -14461,3 +14516,239 @@ body.landscape .upload-overlay .mobile.filetype-img {
  * Retina Sprite for mobile Ends
  * Please no more new styling after this.
  */
+
+ /* Download Page */
+.mobile.main-block.download > .mobile.content-row.download .content-cell {
+    vertical-align: top;
+}
+.download-page {
+    height: calc(100% - 116px);
+    margin-top: 66px;
+    margin-bottom: 50px;
+    overflow: auto;
+    display: flex;
+    flex-direction: column;
+    box-shadow: inset 0 2px 3px 0 rgb(0 0 0 / 0.1);
+}
+.download-page .content-block {
+    flex-direction: column;
+    max-width: 420px;
+    margin: 0 auto;
+    width: 100%;
+}
+.download-page .previewer-block {
+    display: flex;
+    align-items: center;
+    padding: 16px;
+}
+.download-page .video-block,
+.download-page .image-block,
+.download-page .pdf-block,
+.download-page .text-block {
+    display: none;
+}
+.download-page.video .video-block {
+    display: block;
+}
+.download-page.image .image-block {
+    display: block;
+    display: flex;
+    align-items: center;
+    position: relative;
+    width: 100%;
+    justify-content: center;
+}
+.download-page.image .image-block.pdf {
+    background-color: #F7F7F7;
+}
+.download-page.pdf .pdf-block {
+    display: block;
+}
+.download-page.txtfile .text-block {
+    display: block;
+    width: 100%;
+    height: 100%;
+    background-color: #f7f7f7;
+    position: relative;
+}
+.download-page.image .image-block img {
+    max-width: 100%;
+    max-height: 100%;
+}
+.download-page.image .image-block.fullscreen {
+    position: fixed;
+    height: 100%;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    z-index: 99;
+    display: flex;
+    align-items: center;
+    padding: 0;
+    background-color: black;
+}
+.download-page .info-block {
+    padding: 0 16px 32px;
+    text-align: left;
+}
+.download-page.mobile .viewer-pending {
+    position: absolute;
+    z-index: 99;
+    margin: auto;
+    transform: translate(-50%, -50%);
+}
+.download-page .info-block .filename {
+    font: var(--text-h3-bold);
+    max-width: 338px;
+}
+.download-page .info-block .file-download-info .filesize{
+    padding: 0 16px 0 0;
+}
+.download-page .info-block .mobile.buttons {
+    margin: 0 0 8px;
+}
+.downloading .mobile.green-button {
+    display: none;
+}
+.mobile .mobile.default-button,
+.mobile .mobile.green-button.dl-browser {
+    background: #FFFFFF;
+    background-image: linear-gradient(-180deg, rgba(255,255,255,0.5) 0%, rgba(238,238,238,0.75) 100%);
+    border: 1px solid #DFDFDF;
+    box-shadow: 0 1px 1px 0 rgba(0,0,0,0.03);
+    border-radius: 4px;
+    color: #555;
+}
+.mobile .mobile.green-button.dl-browser.disabled {
+    background: #eee;
+    background-image: linear-gradient(-180deg, rgba(255,255,255,0.2) 0%, rgba(238,238,238,0.5) 100%);
+    border: 1px solid #eee;
+    box-shadow: 0 1px 1px 0 rgba(0,0,0,0.03);
+    border-radius: 4px;
+    color: #676d7599;
+}
+.mobile.download-progress .bar.green {
+    color: white;
+    font-size: 13px;
+    display: block;
+    height: 44px;
+    line-height: 43px;
+    background: #07BEB1;
+    background-image: linear-gradient(-180deg, #07BEB1 0%, #00BFA5 100%);
+    background-color: linear-gradient(-180deg, #07BEB1 0%, #00BFA5 100%);
+    border: 1px solid #00A58F;
+    box-shadow: 0 1px 1px 0 rgb(0 0 0 / 0.1), inset 0 2px 1px 0 rgb(255 255 255 / 0.2);
+    position: absolute;
+    border-radius: 0;
+    overflow: hidden;
+    box-sizing:border-box;
+}
+.download-complete .mobile.filesize {
+    color: var(--text-color-success);
+}
+.download-page .viewer-pending span{
+    margin-left: 0;
+}
+.download.error-msg {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.download.icon-error {
+    float: left;
+    vertical-align: top;
+    --icon-size: 64px;
+}
+.download.error-content {
+    margin-top: 24px;
+}
+.download.error-title {
+    font: var(--text-h3-bold);
+    margin: 0 0 30px;
+    color: var(--surface-grey-1-inverted);
+    text-align: center;
+    white-space: normal;
+}
+.download.error-description {
+    color: #676D75;
+    font: var(--text-body1);
+    margin: 15px 0 10px;
+    text-align: left;
+}
+.download.error-list-item {
+    font: var(--text-body2);
+    color: #676D75;
+    padding: 0 0 0 16px;
+    position: relative;
+    text-align: left;
+    margin-bottom: 2px;
+    white-space: normal;
+}
+.download.error-list-item::before {
+    display: block;
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 7px;
+    height: 4px;
+    width: 4px;
+    background-color: var(--text-color-medium);
+    border-radius: 100%;
+}
+.download .links-block {
+    padding: 16px;
+}
+.decrypt-page {
+    height: calc(100% - 116px);
+    margin-top: 66px;
+    margin-bottom: 50px;
+    overflow: auto;
+    display: flex;
+    flex-direction: column;
+    box-shadow: inset 0 2px 3px 0 rgb(0 0 0 / 0.1);
+    text-align: left;
+}
+.error-page {
+    height: calc(100% - 146px);
+    margin-top: 66px;
+    margin-bottom: 80px;
+    overflow: auto;
+    display: flex;
+    flex-direction: column;
+    box-shadow: inset 0 2px 3px 0 rgb(0 0 0 / 0.1);
+    text-align: left;
+}
+.error-page .content-block {
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+}
+.decrypt-page .content-block,
+.error-page .content-block {
+    padding: 16px;
+}
+.decrypt-page p b,
+.error-page p b {
+    color: black;
+    font-weight: bolder;
+}
+
+@media only screen and (orientation: landscape) and (max-width: 321px), only screen and (orientation: portrait) and (max-height: 569px) {
+
+    .download-page,
+    .decrypt-page,
+    .error-page {
+        height: calc(100% - 136px);
+        margin-top: 66px;
+        margin-bottom: 70px;
+    }
+
+    .download-page .previewer-block {
+        height: 150px;
+    }
+
+    .download-page.image .image-block {
+        height: 150px;
+    }
+}

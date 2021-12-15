@@ -1855,11 +1855,13 @@ body:not(.mobile) .about.white-button:hover {
         padding-top: 20px;
     }
 }
+
 @media only screen and (orientation: landscape) and (max-height: 900px) {
     .about.office1 {
         max-height: unset;
     }
 }
+
 @media only screen and (orientation: landscape) and (max-width: 1366px) {
     .about .location-grid-wrapper {
         display: grid;
@@ -1886,6 +1888,7 @@ body:not(.mobile) .about.white-button:hover {
         grid-template-columns: repeat(8, 1fr);
     }
 }
+
 @media only screen and (orientation: landscape) and (max-width: 900px) {
     .about.office1 {
         max-height: unset;

@@ -840,6 +840,9 @@ MegaData.prototype.showOverStorageQuota = function(quota, options) {
 
     }
 
+    if (u_type === 0) {
+        $('.get-bonuses', $strgdlg).addClass('disabled');
+    }
 
     var closeDialog = function() {
         $strgdlg.off('dialog-closed');
@@ -851,7 +854,9 @@ MegaData.prototype.showOverStorageQuota = function(quota, options) {
 
     $('button', $strgdlg).rebind('click', function() {
         var $this = $(this);
-
+        if ($this.hasClass('disabled')) {
+            return false;
+        }
         closeDialog();
 
         if ($this.hasClass('choose-plan')) {

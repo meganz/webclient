@@ -1861,6 +1861,11 @@ body:not(.mobile) .about.white-button:hover {
         max-height: 35vw;
     }
 }
+@media only screen and (orientation: landscape) and (max-height: 900px) and (max-width: 1200px) {
+    .about.office1 {
+        max-height: 50vw;
+    }
+}
 
 @media only screen and (orientation: landscape) and (max-width: 1366px) {
     .about .location-grid-wrapper {

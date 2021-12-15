@@ -141,3 +141,23 @@
 .download.main-pad .text-editor > section {
     padding: 0;
 }
+
+/* Mobile Download Page TextViewer */
+.download-page.mobile .text-editor {
+    min-width: 100%;
+    text-align: left;
+}
+.download-page.mobile .text-editor > section {
+    padding: 0;
+}
+
+.download-page.mobile .CodeMirror-sizer {
+    border-right-width: 0;
+}
+.download-page.mobile .CodeMirror {
+    background: repeating-linear-gradient(to right, #f7f7f7, #f7f7f7 8px, white 8px, white calc(100% - 8px));
+}
+.download-page.mobile .CodeMirror-overlayscroll-horizontal div,
+.CodeMirror-overlayscroll-vertical div {
+    z-index: 999;
+}

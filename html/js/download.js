@@ -160,7 +160,7 @@ function dl_g(res, ctx) {
             }
         }
         if (fdl_file.name) {
-            var $pageScrollBlock = $(is_mobile ? '.bottom-page.scroll-block' : '.download.download-page')
+            var $pageScrollBlock = $(is_mobile ? '.mobile.download-page' : '.download.download-page')
                 .removeClass('video video-theatre-mode downloading resumable txtfile image');
             var filename = M.getSafeName(fdl_file.name) || 'unknown.bin';
             var filenameLength = filename.length;
@@ -328,6 +328,9 @@ function dl_g(res, ctx) {
                                 if (size === dlResumeInfo.byteOffset && !$pageScrollBlock.hasClass('downloading')) {
                                     $('.download.state-text.resume').removeClass('hidden');
                                     setDownloadOptions();
+                                }
+                                if (is_mobile && $('body').hasClass('downloading')) {
+                                    $('.mobile .download-progress span').text(l[5740]);
                                 }
                             }
                             else if (size === fdl_filesize) {
@@ -509,15 +512,34 @@ function dl_g(res, ctx) {
                 $('.download.speed-block .light-txt').text('');
             }
 
-            var showPreviewButton = function($infoBlock) {
+            var showPreviewButton = function() {
 
                 if (is_image2(dl_node) || isVideo) {
 
-                    window.mediaConIsDl = true;
                     $pageScrollBlock.addClass('image');
-                    $('.media-viewer-container').appendTo('.js-image-preview');
 
-                    if (!is_mobile) {
+                    if (is_mobile) {
+                        const supported = dlmanager.canSaveToDisk(dl_node);
+                        $('.mobile.filetype-img').addClass('hidden');
+
+                        if (String(res.fa).indexOf(':1*') > 0) {
+                            $('.viewer-pending', '.download-page.mobile').removeClass('hidden');
+                            getImage(dl_node, 1).then((uri) => {
+                                const $imageBlock = $('.js-image-preview');
+                                $('img', $imageBlock.addClass('thumb')).attr('src', uri);
+                                $('.viewer-pending', '.download-page.mobile').addClass('hidden');
+                                if (supported) {
+                                    $imageBlock.addClass('clickable ' + fileIcon(dl_node)).removeClass('hidden')
+                                        .rebind('click', () => {
+                                            mobile.slideshow.init(dl_node.h);
+                                        });
+                                }
+                            });
+                        }
+                    }
+                    else {
+                        window.mediaConIsDl = true;
+                        $('.media-viewer-container').appendTo('.js-image-preview');
                         slideshow(dl_node);
                     }
 
@@ -559,10 +581,12 @@ function dl_g(res, ctx) {
                     }
                 });
             }
-            else if (is_text(dl_node) && !is_mobile) {
+            else if (is_text(dl_node)) {
                 // if it's textual file, then handle the UI.
+                $('.mobile.filetype-img').addClass('hidden');
 
-                const $containerB = $('.download.main-pad .js-text-viewer');
+                const $containerB =  is_mobile ? $('.download-page.mobile .js-text-viewer')
+                    : $('.download.main-pad .js-text-viewer');
                 $('.viewer-pending', $containerB).removeClass('hidden');
                 $pageScrollBlock.addClass('txtfile');
 
@@ -662,23 +686,33 @@ function dl_g(res, ctx) {
         $('.mobile.application-txt').safeHTML(l[8950]);
 
         if (!fdl_queue_var) {
-            // Show file not found overlay
-            $('#mobile-ui-notFound').removeClass('hidden');
 
+            setMobileAppInfo();
+
+            // Show file not found overlay
+            $('#mobile-ui-notfound').removeClass('hidden');
+
+            let elm = '';
             if (!dlpage_key && !msg && res !== EBLOCKED && res !== ENOENT) {
-                msg = l[7945] + '<p>' + l[7946];
+                elm = '.download.some-reason';
             }
             else if (res === ETOOMANY) {
-                msg = l[243] + '<p>' + l[731];
+                elm = '.download.deleted-user';
             }
             else if (res.e === ETEMPUNAVAIL) {
-                msg = l[1191] + '<p>' + l[253];
+                elm = '.download.temporarty-error';
             }
             else {
-                msg = '<p>' + (msg || l[243]);
+                elm = '.download.some-reason';
             }
 
-            $('.mobile.na-file-txt').safeHTML(msg);
+            $(elm).removeClass('hidden');
+
+            const $btnClose = $('.js-close-error', '#mobile-ui-notfound');
+            $btnClose.rebind('tap', () => {
+                mobile.loadCloudDrivePage();
+                return false;
+            });
         }
         else {
             // Show the download overlay
@@ -741,6 +775,7 @@ function dlPageStartDownload(isDlWithMegaSync) {
     if (is_mobile) {
         if (!Object(fdl_queue_var).lastProgress) {
             $('body').addClass('downloading').find('.bar').width('1%');
+            $('.mobile .download-progress span').text(l[5740]);
         }
     }
     else if (mediaCollectFn) {
@@ -1032,7 +1067,7 @@ function dlbeforecomplete(filename) {
 
         $dlprogress.off('click');
         $('body').addClass('download-complete');
-        $('.download-progress .bar').width('100%');
+        $('.download-progress .bar').css('width', '100%');
         $('.mobile.download-speed, .mobile.download-percents').text('');
 
         // Store a log for statistics
@@ -1127,4 +1162,7 @@ function dlPageCleanup() {
         delete window.mediaConIsDl;
     }
 
+    if (is_mobile && sessionStorage.previewNode) {
+        delete sessionStorage.previewNode;
+    }
 }

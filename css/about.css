@@ -1858,7 +1858,7 @@ body:not(.mobile) .about.white-button:hover {
 
 @media only screen and (orientation: landscape) and (max-height: 900px) {
     .about.office1 {
-        max-height: unset;
+        max-height: 35vw;
     }
 }
 

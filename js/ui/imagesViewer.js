@@ -127,6 +127,7 @@ var slideshowid;
         var valid = true;
         var h = slideshow_handle();
         var step = dir === 'next' ? 'forward' : 'backward';
+        $.videoAutoFullScreen = $(document).fullScreen();
 
         $.each(dl_queue || [], function(id, file) {
             if (file.id === h && file.preview) {
@@ -139,8 +140,14 @@ var slideshowid;
         }
         var steps = slideshowsteps();
         if (steps[step].length > 0) {
+            const newShownHandle = steps[step][0];
+            if ($.videoAutoFullScreen && is_video(M.getNodeByHandle(newShownHandle))) {
+                // Autoplay the next/prev video if it's in full screen mode
+                $.autoplay = newShownHandle;
+            }
+
             mBroadcaster.sendMessage('slideshow:' + dir, steps);
-            slideshow(steps[step][0]);
+            slideshow(newShownHandle);
         }
     }
 
@@ -726,6 +733,7 @@ var slideshowid;
             zoom_mode = false;
             switchedSides = false;
             slideshowid = false;
+            $.videoAutoFullScreen = false;
             _hideCounter = false;
             slideshowplay = false;
             preselection = undefined;
@@ -818,17 +826,24 @@ var slideshowid;
         $('.video-progress-bar', $videoControls).removeAttr('title');
         $('.video-timing', $videoControls).text('');
 
-        // Init full screen icon
-
-        if (fullScreenManager && fullScreenManager.state) {
+        // Init full screen icon and related data attributes
+        if ($document.fullScreen()) {
             $('.v-btn.fullscreen i', $imageControls)
                 .addClass('icon-fullscreen-leave')
                 .removeClass('icon-fullscreen-enter');
+
+            $content.attr('data-fullscreen', 'true');
+            $('.v-btn.fs', $videoControls).addClass('cancel-fullscreen').removeClass('go-fullscreen');
+            $('.v-btn.fs i', $videoControls).addClass('icon-fullscreen-leave').removeClass('icon-fullscreen-enter');
         }
         else {
             $('.v-btn.fullscreen i', $imageControls)
                 .removeClass('icon-fullscreen-leave')
                 .addClass('icon-fullscreen-enter');
+
+            $content.attr('data-fullscreen', 'false');
+            $('.v-btn.fs', $videoControls).removeClass('cancel-fullscreen').addClass('go-fullscreen');
+            $('.v-btn.fs i', $videoControls).removeClass('icon-fullscreen-leave').addClass('icon-fullscreen-enter');
         }
 
         // Turn off pick and pan mode

@@ -742,6 +742,7 @@ function FullScreenManager($button, $element) {
     else {
         $document.rebind('fullscreenchange.' + iid, function() {
             state = $document.fullScreen();
+
             for (var i = listeners.length; i--;) {
                 listeners[i](state);
             }
@@ -770,14 +771,18 @@ function FullScreenManager($button, $element) {
 FullScreenManager.prototype = Object.create(null);
 
 // destroy full screen manager instance
-FullScreenManager.prototype.destroy = function() {
+FullScreenManager.prototype.destroy = function(keep) {
     'use strict';
 
     if (!this.destroyed) {
         this.destroyed = true;
         this.$button.off('click.' + this.iid);
         this.$document.off('fullscreenchange.' + this.iid);
-        this.exitFullscreen();
+
+        if (!keep) {
+            this.exitFullscreen();
+        }
+        this.$button = this.$document = this.listeners = null;
     }
 };
 
@@ -968,6 +973,10 @@ FullScreenManager.prototype.enterFullscreen = function() {
                     if (is_mobile && playevent) {
                         clearTimeout(hideMobileVideoControls);
                         $videoControls.removeClass('invisible');
+                    }
+
+                    if (videoElement.ended && typeof slideshow_next === 'function' && $document.fullScreen()) {
+                        onIdle(slideshow_next);
                     }
                 }
                 else {
@@ -1270,6 +1279,12 @@ FullScreenManager.prototype.enterFullscreen = function() {
         };
         updateVolumeBar();
 
+        // Add the event listener of clicking mute/unmute buttons from the right click menu when play video/audio
+        $video.rebind('volumechange', () => {
+            changeButtonState('mute');
+            updateVolumeBar();
+        });
+
         // Bind Mute button
         $mute.rebind('click', function() {
             if ($(this).parent('.vol-wrapper').hasClass('audio')) {
@@ -1495,6 +1510,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
             if (options.vad) {
                 return false;
             }
+            fullScreenManager.destroy(!!$.videoAutoFullScreen);
             window.removeEventListener('keydown', videoKeyboardHandler, true);
             $wrapper.removeClass('mouse-idle video-theatre-mode video').off('is-over-quota');
             $pendingBlock.addClass('hidden');
@@ -1506,7 +1522,6 @@ FullScreenManager.prototype.enterFullscreen = function() {
             $(window).off('video-destroy.main');
             videoElement = streamer = null;
             dlmanager.isStreaming = false;
-            fullScreenManager.destroy();
             pagemetadata();
             return false;
         });

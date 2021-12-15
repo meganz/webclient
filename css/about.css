@@ -401,8 +401,6 @@ Timeline
     align-self: center;
     position: relative;
     user-select: none !important;
-    padding-left: 76px;
-    padding-right: 76px;
 }
 .about.promise-desc {
     font-family: var(--text-font-family-montserrat-bold);
@@ -469,7 +467,7 @@ Timeline
     width: 100%;
     object-fit: cover;
     height: 100%;
-    max-height:60vh;
+    max-height:65vh;
     filter: brightness(0.15);
 }
 .about.office1 img {
@@ -1360,7 +1358,6 @@ body:not(.mobile) .about.white-button:hover {
     animation-iteration-count: 1;
     animation-direction: normal;
     animation-fill-mode: forwards;
-    white-space: nowrap;
 }
 
 @keyframes circular-spread {
@@ -1379,10 +1376,12 @@ body:not(.mobile) .about.white-button:hover {
         letter-spacing: 2em;
         filter: blur(12px);
         opacity: 0;
+        white-space: nowrap;
     }
     100% {
         filter: blur(0);
         opacity: 1;
+        white-space: unset;
     }
 }
 
@@ -1856,7 +1855,11 @@ body:not(.mobile) .about.white-button:hover {
         padding-top: 20px;
     }
 }
-
+@media only screen and (orientation: landscape) and (max-height: 900px) {
+    .about.office1 {
+        max-height: unset;
+    }
+}
 @media only screen and (orientation: landscape) and (max-width: 1366px) {
     .about .location-grid-wrapper {
         display: grid;
@@ -1884,6 +1887,9 @@ body:not(.mobile) .about.white-button:hover {
     }
 }
 @media only screen and (orientation: landscape) and (max-width: 900px) {
+    .about.office1 {
+        max-height: unset;
+    }
     .about .bottom-page.big-bott-pad.jobs {
         padding-bottom: 48px;
     }
@@ -2332,8 +2338,6 @@ body:not(.mobile) .about.white-button:hover {
         font-size: 30px;
         line-height: 37px;
         max-width: 500px;
-        padding-left: 60px;
-        padding-right: 60px;
     }
     .about .overlay-text1 {
         padding: 30px 0 0 30px;
@@ -2467,7 +2471,7 @@ body:not(.mobile) .about.white-button:hover {
 
 @media only screen and (max-width: 490px) {
     .about.office1 {
-        max-height: 70vh;
+        /*max-height: 70vh;*/
     }
     .about.dream-img {
         height: 150px;
@@ -2497,6 +2501,12 @@ body:not(.mobile) .about.white-button:hover {
 }
 
 @media only screen and (max-width: 420px) {
+    .about.vision-desc {
+        font-size: 26px;
+    }
+    .about.office1 {
+        max-height: unset;
+    }
     .about .bottom-page.jobs-life-container {
         padding-bottom: 46px;
     }
@@ -2653,8 +2663,6 @@ body:not(.mobile) .about.white-button:hover {
         font-size: 22px;
     }
     .about.vision-desc {
-        padding-left: 24px;
-        padding-right: 24px;
         max-width: 300px;
     }
     .about.city-title {
@@ -3036,9 +3044,6 @@ body:not(.mobile) .about.white-button:hover {
 }
 
 @media only screen and (max-width: 315px) {
-    .about.office1 {
-        max-height: 100vh;
-    }
     .about .carousel-text-container {
         width: 230px;
     }

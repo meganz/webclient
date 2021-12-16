@@ -1284,7 +1284,7 @@
             mega.attr.get(userHandle, 'ps', -2, 1, function(res, ctx) {
                 u_attr[ctx.ua] = res;
 
-                if (fminitialized && typeof pushNotificationSettings !== 'undefined') {
+                if (fminitialized && megaChatIsReady && typeof pushNotificationSettings !== 'undefined') {
                     pushNotificationSettings.init();
                 }
             });

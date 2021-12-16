@@ -130,6 +130,9 @@
     width: auto;
     z-index: 10;
 }
+.dropdown.body span.loading {
+    line-height: 32px;
+}
 .dropdown-white-arrow {
     display: none;
     width: 12px;

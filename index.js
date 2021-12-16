@@ -727,6 +727,7 @@ function init_page() {
         && (page !== 'resellers')
         && (page !== 'security')
         && (page !== 'storage')
+        && (page !== 'objectstorage')
         && (page !== 'collaboration')
         && (page !== 'securechat')
         && (page !== 'unsub')
@@ -1707,6 +1708,10 @@ function init_page() {
     else if (page === 'collaboration') {
         parsepage(pages.feature_collaboration);
         featurePages('collaboration');
+    }
+    else if (page === 'objectstorage'){
+        parsepage(pages.object_storage);
+        featurePages('objectstorage');
     }
     else if (page == 'done') {
         parsepage(pages['done']);
@@ -2814,7 +2819,7 @@ function topmenuUI() {
                     'mobile', 'register', 'resellers', 'sdk', 'sitemap', 'sourcecode',
                     'support', 'takedown', 'terms', 'start', 'security', 'affiliate',
                     'nas', 'pro', 'cookie', 'securechat', 'collaboration', 'storage', 'special',
-                    'achievements'
+                    'achievements', 'objectstorage'
                 ];
                 var moveTo = {
                     'account': 'fm/account',

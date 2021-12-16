@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="48px" height="48px" viewBox="0 0 48 48" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>icon/scalable copy</title>
+    <g id="icon/scalable-copy" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <rect id="Rectangle" x="0" y="0" width="48" height="48"></rect>
+        <polygon id="Path-2" stroke="#3077F1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" points="24 14 12 20 24 26 36 20"></polygon>
+        <polyline id="Path-8" stroke="#3077F1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" points="12 20 12 33 24 39 36 33 36 20"></polyline>
+        <line x1="24" y1="26" x2="24" y2="38" id="Path-9" stroke="#3077F1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></line>
+        <line x1="24" y1="8" x2="24" y2="20" id="Path-9-Copy" stroke="#3077F1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></line>
+        <path d="M18,30 C18,30 7,36 7,36 C7,36 18,30 18,30 Z" id="Path-9-Copy-3" stroke="#3077F1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+        <path d="M41,30 C41,30 37.3333333,32 30,36 C37.3333333,32 41,30 41,30 Z" id="Path-9-Copy-4" stroke="#3077F1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" transform="translate(35.500000, 33.000000) scale(-1, 1) translate(-35.500000, -33.000000) "></path>
+        <polyline id="Path-9-Copy-2" stroke="#3077F1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" points="28 11 24 7 20 11"></polyline>
+        <polyline id="Path-10" stroke="#3077F1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" points="7 31 6 37 12 38"></polyline>
+        <polyline id="Path-10-Copy" stroke="#3077F1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" transform="translate(39.000000, 34.500000) scale(-1, 1) translate(-39.000000, -34.500000) " points="37 31 36 37 42 38"></polyline>
+    </g>
+</svg>

@@ -2877,6 +2877,14 @@ div.checkboxOn {
     border: none;
     border-radius: 3px;
 }
+.objectstorage .register-agreement-checkbox .checkboxOn,
+.objectstorage .register-agreement-checkbox .checkboxOff,
+.objectstorage-mobile .mobile.provider-list-item .checkboxOn,
+.objectstorage-mobile .mobile.provider-list-item .checkboxOff {
+    float: none;
+    border: none;
+    border-radius: 3px;
+}
 .checkboxOff span,
 .checkboxOn span {
 	display: block;
@@ -9155,6 +9163,9 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll, .mob
     word-break: break-word;
     line-height: 26px;
 }
+.objectstorage-mobile .provider-selector-dialog .dialog-heading-text {
+    margin: 12px;
+}
 .mobile.dialog-body-text, .mobile.payment-result .payment-result-txt {
     font-size: 14px;
     color: #676D75;
@@ -10297,7 +10308,9 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll, .mob
     right: 0;
     bottom: 0;
 }
-.mobile.country-selector-dialog {
+.mobile.country-selector-dialog,
+.objectstorage-mobile .mobile.country-selector-dialog,
+.objectstorage-mobile .mobile.provider-selector-dialog {
     position: absolute;
     top: 10px;
     bottom: 10px;
@@ -10325,7 +10338,8 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll, .mob
     left: 12px;
     right: 12px;
 }
-.mobile.country-selector-dialog .fm-block {
+.mobile.country-selector-dialog .fm-block,
+.mobile.provider-selector-dialog .fm-block {
     height: calc(100% - 136px);
 }
 .mobile.country-list-item {
@@ -10791,7 +10805,9 @@ Thank You dialog
         margin: 0 auto;
         padding: 36px 38px;
     }
-    .mobile.country-selector-dialog {
+    .mobile.country-selector-dialog,
+    .objectstorage-mobile .mobile.country-selector-dialog,
+    .objectstorage-mobile .mobile.provider-selector-dialog {
         max-width: 420px;
         left: 50%;
         margin-left: -210px;
@@ -10803,8 +10819,6 @@ Thank You dialog
         margin: 150px auto 0;
     }
 }
-
-
 @media only screen and (orientation:landscape) and (max-width: 800px), only screen and (orientation:portrait) and (max-height: 800px) {
     .mobile.homepage .company-slogan {
         font-size: 24px;

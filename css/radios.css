@@ -13,6 +13,17 @@ div.radioOn, div.radioOff {
     vertical-align: top;
     width: 18px;
 }
+.objectstorage .register-radio-option div.radioOn,
+.objectstorage .register-radio-option div.radioOff,
+.objectstorage .register-radio-option1 div.radioOn,
+.objectstorage .register-radio-option1 div.radioOff,
+.objectstorage .register-radio-option2 div.radioOn,
+.objectstorage .register-radio-option2 div.radioOff,
+.objectstorage .register-radio-option3 div.radioOn,
+.objectstorage .register-radio-option3 div.radioOff {
+    -webkit-margin-end: 8px;
+    margin-inline-end: 8px;
+}
 .mobile .payment-type-wrapper div.radioOn,
 .mobile .payment-type-wrapper div.radioOff {
     margin-top: 6px;
@@ -49,6 +60,18 @@ div.radioOff::after {
     height: 4px;
     margin: calc(50% - 2px);
     width: 4px;
+}
+.objectstorage .register-radio-option div.radioOn::before,
+.objectstorage .register-radio-option1 div.radioOn::before,
+.objectstorage .register-radio-option2 div.radioOn::before,
+.objectstorage .register-radio-option3 div.radioOn::before {
+    background: #3077F1;
+}
+.objectstorage .register-radio-option div.radioOn::after,
+.objectstorage .register-radio-option1 div.radioOn::after,
+.objectstorage .register-radio-option2 div.radioOn::after,
+.objectstorage .register-radio-option3 div.radioOn::after {
+    box-shadow: inset 0 0 0 1px #3077F1;
 }
 .mobile .payment-type-wrapper div.radioOn::after,
 .mobile .payment-type-wrapper div.radioOff::after {

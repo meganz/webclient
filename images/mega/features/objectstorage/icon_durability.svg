@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="48px" height="48px" viewBox="0 0 48 48" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>icon/durability copy</title>
+    <g id="icon/durability-copy" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <rect id="Rectangle" x="0" y="0" width="48" height="48"></rect>
+        <path d="M24,43 C19.8333333,41.5 16.1666667,39.1666667 13,36 C9.83333333,32.8333333 8.16666667,28.5 8,23 L8,11 L24,5 L40,11 L40,23 C39.8333333,28.5 38.1666667,32.8333333 35,36 C31.8333333,39.1666667 28.1666667,41.5 24,43 Z" id="Path-15" stroke="#3077F1" stroke-width="2" stroke-linejoin="round"></path>
+        <circle id="Oval" stroke="#3077F1" stroke-width="2" cx="24" cy="23" r="10"></circle>
+        <line x1="24" y1="33" x2="24" y2="42" id="Line-2" stroke="#3077F1" stroke-width="2" stroke-linecap="square"></line>
+        <line x1="24" y1="6" x2="24" y2="13" id="Line-2-Copy" stroke="#3077F1" stroke-width="2" stroke-linecap="square"></line>
+        <polyline id="Path-4" stroke="#3077F1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" points="20 26 20 19 24 24 28 19 28 26"></polyline>
+    </g>
+</svg>

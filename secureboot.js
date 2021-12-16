@@ -1087,7 +1087,7 @@ var page;
 window.redirect = ['about', 'achievements', 'android', 'bird', 'blog', 'business', 'chrome', 'cmd',
                    'contact', 'collaboration', 'copyright', 'corporate', 'credits', 'desktop', 'dev',
                    'developers', 'dispute', 'doc', 'edge', 'extensions', 'firefox', 'gdpr', 'help', 'ios',
-                   'mobile', 'nas', 'plugin', 'privacy', 'resellers', 'sdkterms', 'securechat', 'security',
+                   'mobile', 'nas', 'objectstorage', 'plugin', 'privacy', 'resellers', 'sdkterms', 'securechat', 'security',
                    'sourcecode', 'start', 'storage', 'sync', 'takedown', 'terms', 'uwp', 'wp'];
 var isStaticPage = function(page) {
     'use strict';
@@ -3156,6 +3156,9 @@ else if (!browserUpdate) {
         jsl.push({f:'css/general.css', n: 'general_css', j:2, w:5, c:1, d:1, cache: 1});
         jsl.push({f:'css/vars/theme.css', n: 'vars_theme_css', j:2, w:30, c:1, d:1, cache:1});
         jsl.push({f:'css/grid-table.css', n: 'grid_table_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'js/states-countries.js', n: 'states_countries_js', j:1});
+        jsl.push({f:'css/checkboxes.css', n: 'checkboxes_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'js/utils/icu.js', n: 'js_utils_icu_js', j: 1});
 
         // Sprites
         jsl.push({f:'css/sprites/fm-uni@uni.css', n: 'fm_uni_css', j:2, w:30, c:1, d:1, cache:1});
@@ -3345,6 +3348,7 @@ else if (!browserUpdate) {
         'special_js': {f:'html/js/troy-hunt.js', n:'special_js', j:1},
         'special_css': {f:'css/troy-hunt.css', n:'special_css', j:2},
         'reportabuse_js': {f:'js/ui/reportAbuse.js', n:'reportabuse_js', j:1},
+        'object_storage': {f:'html/objectstorage.html', n: 'object_storage', j:0},
     };
 
     /* eslint-disable max-len */
@@ -3465,7 +3469,8 @@ else if (!browserUpdate) {
         'nziphotographer': ['nzipp', 'nzipp_js', 'nzipp_css'],
         'business': ['business', 'businessjs'],
         'cookie': ['cookie'],
-        'special': ['special', 'special_js', 'special_css']
+        'special': ['special', 'special_js', 'special_css'],
+        'objectstorage': ['object_storage', 'features_js']
     };
 
     if (is_mobile) {

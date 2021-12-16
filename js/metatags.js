@@ -412,6 +412,13 @@ mega.metatags = new function() {
             mTags.mega_desc = l.mtags_desc_security || mTags.en_desc;
             mTags.image = 'https://cms2.mega.nz/c964ddb7dd27f1acd727747862787486.png';
         }
+        else if (page === 'objectstorage') {
+            mTags.en_title = 'S4 Object Storage Beta Registration - MEGA';
+            mTags.en_desc = 'MEGA\'s S4 beta program starts soon, for a limited number of participants. ' +
+                'Sign up to become a beta tester and get &#8364 1,000 worth of storage for free.';
+            mTags.mega_title = l.ri_s4_metatag_title || mTags.en_title;
+            mTags.mega_desc = l.ri_s4_metatag_desc || mTags.en_desc;
+        }
         else if (page === 'security/bug-bounty') {
             mTags.en_title = 'We Welcome Security And Bug Reports - MEGA';
             mTags.en_desc = 'Earn Bounties For Finding Bugs And Other Issues At MEGA';

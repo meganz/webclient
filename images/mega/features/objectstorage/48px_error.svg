@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="48px" height="48px" viewBox="0 0 48 48" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>48/icon/Error</title>
+    <g id="48/icon/Error" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <rect id="Rectangle" x="0" y="0" width="48" height="48"></rect>
+        <path d="M22.254113,8.12421878 L6.66285916,36.0243573 C6.12402657,36.988584 6.46887667,38.2070544 7.43310341,38.745887 C7.73128183,38.9125161 8.06716798,39 8.40874613,39 L39.5912539,39 C40.6958234,39 41.5912539,38.1045695 41.5912539,37 C41.5912539,36.6584219 41.50377,36.3225357 41.3371408,36.0243573 L25.745887,8.12421878 C25.2070544,7.15999203 23.988584,6.81514194 23.0243573,7.35397453 C22.7012895,7.53451244 22.4346509,7.80115094 22.254113,8.12421878 Z" id="Path-16" stroke="#E95C5C" stroke-width="2" stroke-linejoin="round"></path>
+        <circle id="Oval" fill="#E95C5C" cx="24" cy="33" r="2"></circle>
+        <polygon id="Path-17" stroke="#E95C5C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" points="24 28 23 19 25 19"></polygon>
+    </g>
+</svg>

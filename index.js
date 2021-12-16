@@ -717,6 +717,7 @@ function init_page() {
         && (page !== 'chrome')
         && (page !== 'firefox')
         && (page !== 'edge')
+        && (page !== 'desktop')
         && (page !== 'sync')
         && (page !== 'cmd')
         && (page !== 'terms')
@@ -1674,12 +1675,18 @@ function init_page() {
         document.body.classList.add('business');
         businessProductPage.init();
     }
-    else if (page.substr(0, 4) == 'sync') {
-        parsepage(pages['sync']);
+    else if (page.substr(0, 7) === 'desktop') {
+        parsepage(pages.desktop);
         M.require('sync_js').then(function() {
             onIdle(topmenuUI);
             initMegasync();
         });
+    }
+    else if (page.substr(0, 4) === 'sync') {
+        if (is_extension) {
+            return loadSubPage('desktop');
+        }
+        location.replace('/desktop');
     }
     else if (page == 'cmd') {
         parsepage(pages['cmd']);
@@ -2712,7 +2719,7 @@ function topmenuUI() {
     });
 
     $headerDownloadMega.rebind('click.downloadmega', function() {
-        loadSubPage('sync');
+        loadSubPage('desktop');
     });
 
     // try individual button in business mode
@@ -2802,10 +2809,10 @@ function topmenuUI() {
                 /*  TODO: Add bird when its done */
                 var subPages = [
                     'about', 'account', 'backup', 'blog', 'cmd', 'contact',
-                    'copyright', 'corporate', 'credits', 'doc', 'extensions',
+                    'copyright', 'corporate', 'credits', 'desktop', 'doc', 'extensions',
                     'help', 'login', 'mega', 'nzippmember', 'nziphotographer', 'privacy', 'mobileapp',
-                    'mobile', 'register', 'resellers', 'sdk', 'sync', 'sitemap', 'sourcecode',
-                    'support', 'sync', 'takedown', 'terms', 'start', 'security', 'affiliate',
+                    'mobile', 'register', 'resellers', 'sdk', 'sitemap', 'sourcecode',
+                    'support', 'takedown', 'terms', 'start', 'security', 'affiliate',
                     'nas', 'pro', 'cookie', 'securechat', 'collaboration', 'storage', 'special',
                     'achievements'
                 ];

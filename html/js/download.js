@@ -408,7 +408,7 @@ function dl_g(res, ctx) {
                 .rebind('click', (event) => {
 
                     if (event.target.classList.contains('js-megasync-qus')) {
-                        window.open(getAppBaseUrl() + '/sync', "_blank");
+                        window.open(getAppBaseUrl() + '/desktop', "_blank");
                         return false;
                     }
 
@@ -1121,7 +1121,7 @@ function sync_switchOS(os)
     }
     else if (os == 'linux')
     {
-        syncurl = '/sync';
+        syncurl = '/desktop';
         var ostxt = 'For Linux';
         if (l[1158].indexOf('Windows') > -1) ostxt = l[1158].replace('Windows','Linux');
         if (l[1158].indexOf('Mac') > -1) ostxt = l[1158].replace('Mac','Linux');
@@ -1132,10 +1132,17 @@ function sync_switchOS(os)
     }
     $('.sync-bottom-txt a').rebind('click',function(e)
     {
-        var c = $(this).attr('class');
-        if (c && c.indexOf('windows') > -1) sync_switchOS('windows');
-        else if (c && c.indexOf('mac') > -1) sync_switchOS('mac');
-        else if (c && c.indexOf('linux') > -1) loadSubPage('sync');
+        const $this = $(this);
+        if ($this.hasClass('windows')) {
+            sync_switchOS('windows');
+        }
+        else if ($this.hasClass('mac')) {
+            sync_switchOS('mac');
+        }
+        else if ($this.hasClass('linux')) {
+            loadSubPage('desktop');
+        }
+
         return false;
     });
 }

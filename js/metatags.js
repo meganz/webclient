@@ -249,7 +249,7 @@ mega.metatags = new function() {
             mTags.mega_title = l[23966] || mTags.en_title;
             mTags.mega_desc = l.mtags_desc_nas || mTags.en_desc;
         }
-        else if (page === 'sync') {
+        else if (page === 'desktop') {
             mTags.en_title = 'Desktop App - MEGA';
             mTags.en_desc = 'Our MEGA Desktop App allows you to easily automate synchronisation between your ' +
                 'computer and your MEGA Cloud Storage. Available for macOS, Windows, and Linux.';

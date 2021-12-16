@@ -1075,12 +1075,12 @@ mBroadcaster.once('boot_done', function populate_l() {
 
     l[12439] = l[12439].replace('[A1]', '').replace('[/A1]', '').replace('[A2]', '').replace('[/A2]', '');
 
-    l[16865] = escapeHTML(l[16865]).replace('[A]', '<a href="/sync" class="clickurl">').replace('[/A]', '</a>');
-    l[16866] = escapeHTML(l[16866]).replace('[A]', '<a href="/sync" class="clickurl">').replace('[/A]', '</a>');
-    l[16870] = escapeHTML(l[16870]).replace('[A]', '<a href="/sync" class="clickurl">').replace('[/A]', '</a>');
-    l[16883] = escapeHTML(l[16883]).replace('[A]', '<a href="/sync" class="clickurl">').replace('[/A]', '</a>');
+    l[16865] = escapeHTML(l[16865]).replace('[A]', '<a href="/desktop" class="clickurl">').replace('[/A]', '</a>');
+    l[16866] = escapeHTML(l[16866]).replace('[A]', '<a href="/desktop" class="clickurl">').replace('[/A]', '</a>');
+    l[16870] = escapeHTML(l[16870]).replace('[A]', '<a href="/desktop" class="clickurl">').replace('[/A]', '</a>');
+    l[16883] = escapeHTML(l[16883]).replace('[A]', '<a href="/desktop" class="clickurl">').replace('[/A]', '</a>');
     l[17793] = escapeHTML(l[17793])
-        .replace('[A1]', '<a href="/sync" class="clickurl">').replace('[/A1]', '</a>')
+        .replace('[A1]', '<a href="/desktop" class="clickurl">').replace('[/A1]', '</a>')
         .replace('[A2]', '<a href="/extensions" class="clickurl">').replace('[/A2]', '</a>')
         .replace('[A3]', '<a class="freeupdiskspace">').replace('[/A3]', '</a>');
 
@@ -1202,9 +1202,9 @@ mBroadcaster.once('boot_done', function populate_l() {
         + 'href="https://mega.nz/SecurityWhitepaper.pdf">').replace('[/A2]', '</a>');
     l[20607] = l[20607].replace('[A1]', '<a class="clickurl" href="/mobile">')
         .replace('[/A1]', '</a>');
-    l[20607] = l[20607].replace('[A2]', '<a class="clickurl" href="/sync">')
+    l[20607] = l[20607].replace('[A2]', '<a class="clickurl" href="/desktop">')
         .replace('[/A2]', '</a>');
-    l[20609] = l[20609].replace('[A]', '<a class="clickurl" href="/sync">').replace('[/A]', '</a>');
+    l[20609] = l[20609].replace('[A]', '<a class="clickurl" href="/desktop">').replace('[/A]', '</a>');
     l[20846] = l[20846]
         .replace('[A]', '<a href="https://mega.nz/linux/MEGAsync/" target="_blank" class="download-all-link">')
         .replace('[/A]', '</a>');

@@ -3830,7 +3830,7 @@ function initDownloadDesktopAppDialog() {
                 break;
             case "Linux":
                 $('aside', $dialog).addClass('hidden');
-                loadSubPage('/sync');
+                loadSubPage('/desktop');
                 break;
         }
     });

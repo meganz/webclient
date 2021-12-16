@@ -12,7 +12,7 @@ mobile.notFoundOverlay = {
         var message = typeof e === 'string' && e;
 
         // Store the selector
-        var $overlay = $('#mobile-ui-notFound');
+        var $overlay = $('#mobile-ui-notfound');
         var $errorText = $overlay.find('.na-file-txt');
         var $image = $overlay.find('.filetype-img');
 

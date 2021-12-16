@@ -67,7 +67,7 @@
                 <i class="top-menu-icon menus-sprite right-arrow"></i>
             </div>
             <div class="top-submenu">
-                <div class="top-menu-item sync">[$19639]</div>
+                <div class="top-menu-item desktop">[$19639]</div>
                 <div class="top-menu-item mobile">[$19682]</div>
                 <div class="top-menu-item extensions">[$16603]</div>
                 <div class="top-menu-item cmd">MEGA CMD</div>
@@ -82,6 +82,7 @@
             </div>
             <div class="top-submenu">
                 <div class="top-menu-item storage">[$24401]</div>
+                <div class="top-menu-item objectstorage">[$ri_s4_tab]</div>
                 <div class="top-menu-item security">[$7337]</div>
                 <div class="top-menu-item collaboration">[$24367]</div>
                 <div class="top-menu-item securechat">[$24432]</div>
@@ -277,7 +278,7 @@
                             <div class="mobile alert-icon fm-icon close white close-alert-banner"></div>
                         </div>
                     </div>
-                    
+
                 </div>
                 <div class="mobile fm-floating-header">
                     <div class="mobile folders-files-text"></div>
@@ -2482,124 +2483,49 @@
 
 
 <!-- File not found overlay !-->
-<div class="mobile main-block hidden" id="mobile-ui-notFound">
+<div class="mobile main-block download hidden" id="mobile-ui-notfound">
     <div class="mobile content-row first">
         <div class="mobile content-cell">
             <div class="mobile fm-icon top-icon menu right"></div>
-            <a class="mobile logo"></a>
-            <div class="mobile white-block">
-                <img alt="" src="{staticpath}images/mobile/extensions/na.png" class="mobile filetype-img" />
-                <div class="mobile na-file-txt">
-                    [$243]
+            <a class="mobile fm-icon mega logo"></a>
+            <div class="error-page">
+                <div class="mobile content-block">
+                    <div class="download error-msg some-reason hidden">
+                        <i class="download sprite-fm-uni icon-error"></i>
+                        <div class="download error-content">
+                            <div class="download error-title">[$243]</div>
+                            <div class="download error-description">[$244]</div>
+                            <div class="download error-list-item">[$246]</div>
+                            <div class="download error-list-item">[$247]</div>
+                            <div class="download error-list-item">[$248]</div>
+                        </div>
+                    </div>
+                    <div class="download error-msg deleted-user hidden">
+                        <i class="download sprite-fm-uni icon-error"></i>
+                        <div class="download error-content">
+                            <div class="download error-title">[$243]</div>
+                            <div class="download error-list-item">[$731]</div>
+                        </div>
+                    </div>
+                    <div class="download error-msg invalid-error hidden">
+                        <i class="download sprite-fm-uni icon-error"></i>
+                        <div class="download error-content">
+                            <div class="download error-title">[$20198]</div>
+                            <div class="download error-list-item">[$20199]</div>
+                        </div>
+                    </div>
+                    <div class="download error-msg temporarty-error hidden">
+                        <i class="download sprite-fm-uni icon-error"></i>
+                        <div class="download error-content">
+                            <div class="download error-title">[$1191]</div>
+                            <div class="download error-list-item">[$253]</div>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-
-<!-- Download page mobile / File download overlay !-->
-<div class="mobile main-block hidden" id="mobile-ui-main">
-    <div class="mobile content-row first">
-        <div class="mobile content-cell">
-            <div class="fm-header">
-                <a class="mobile logo" href="https://mega.nz"></a>
-                <div class="mobile fm-icon top-icon menu right dl-page"></div>
-                <div class="mobile fm-dialog-close hidden"></div>
-            </div>
-            <div class="mobile white-block">
-                <img alt="" src="{staticpath}images/mobile/extensions/image.png" class="mobile filetype-img" />
-                <div class="mobile bottom-page scroll-block download" id="video-container">
-                    <!-- Video player Elements-->
-                    <div class="download video-block">
-                        <div class="viewer-top-bl">
-                            <div class="viewer-filename">
-                                <div class="mobile filename">[$5533]</div>
-                            </div>
-                        </div>
-                        <video id="video" data-autoplayvideo="false" data-playvideoonclick="false"></video>
-                        <div class="download play-video-button"></div>
-                        <div class="viewer-pending hidden">
-                            <div class="bounce1"></div>
-                            <div class="bounce2"></div>
-                            <div class="bounce3"></div>
-                        </div>
-
-                        <div class="viewer-vad-control lato hidden">
-                            <div class="thumb">
-                                <img alt="" />
-                            </div>
-                            <div class="counter">
-                                0
-                            </div>
-                            <div class="label">
-                                <span>[$22879]</span><i class="mobile fm-icon small-skip-icon"></i>
-                            </div>
-                        </div>
-                        <div class="video-progress-bar vad" title="">
-                            <div class="video-time-bar"></div>
-                        </div>
-
-                        <div class="viewer-bottom-bl">
-                            <div id="video-controls" class="video-controls" data-state="hidden">
-                                <div data-state="play" class="viewer-button left playpause">
-                                    <i class="medium-icon icons-img play"></i>
-                                </div>
-                                <div class="volume-control left hidden" style="">
-                                    <div data-state="mute" class="viewer-button mute">
-                                        <i class="medium-icon icons-img volume"></i>
-                                    </div>
-                                    <div class="video-vol-range">
-                                        <div class="volume-bar"><span style="height: 100%;"></span></div>
-                                    </div>
-                                </div>
-                                <div class="video-timing current left">00:00</div>
-                                <div data-state="go-fullscreen" class="viewer-button right fs">
-                                    <i class="medium-icon icons-img fullscreen"></i>
-                                </div>
-                                <div class="video-timing duration right">03:09</div>
-                                <div class="video-progress-block">
-                                    <div class="video-progress-bar">
-                                        <div class="video-time-bar"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- End of Video player Elements-->
-                    <div class="mobile filename"><em>[$5533]</em></div>
-                    <div class="mobile file-download-info">
-                        <div class="mobile download-speed"></div>
-                        <div class="mobile filesize"></div>
-                        <div class="mobile download-percents"></div>
-                    </div>
-                    <div class="mobile buttons inline-buttons">
-                        <a class="mobile red-button second dl-browser"> <i></i> <span>[$58]</span> </a>
-                        <a class="mobile red-button first dl-megaapp"> <i></i> <span>[$8948]</span> </a>
-                    </div>
-                    <!-- Progressbar is hidden. "downloading" body class will show it !-->
-                    <!-- Set width to ".bar" block !-->
-                    <a class="mobile download-progress">
-                        <div class="bar"></div>
-                        <span class="mobile">[$8949]</span>
-                    </a>
+                <div class="links-block">
+                    <a class="mobile default-button js-close-error"><span>[$148]</span> </a>
                 </div>
-            </div>
-            <div class="mobile app-info-cell">
-                <div class="mobile app-info-block">
-                    <div class="mobile wrong-file-block">
-                        <div class="mobile error-txt file-too-large hidden">[$8951]</div>
-                        <div class="mobile error-txt file-unsupported hidden">[$8952]</div>
-                    </div>
-                    <div class="mobile application-txt standalone-download-message hidden">
-                        [$8950]
-                    </div>
-                    <div class="mobile application-txt file-manager-download-message hidden">
-                        [$16107]
-                    </div>
-                    <a class="mobile text-button third cancel hidden"><span>[$148]</span> </a>
-                    <a class="mobile download-app"></a>
-                </div>
+
             </div>
             <a class="mobile app-advertisement-block download-app">
                 <div class="mobile app-advertisement-aligner">
@@ -2616,6 +2542,159 @@
     </div>
 </div>
 
+<!-- Download page mobile / File download overlay !-->
+<div class="mobile main-block download hidden" id="mobile-ui-main">
+    <div class="mobile content-row download first">
+        <div class="mobile content-cell">
+            <div class="fm-header">
+                <a class="mobile fm-icon mega logo"></a>
+                <div class="mobile fm-icon top-icon menu right dl-page"></div>
+                <div class="mobile fm-dialog-close hidden"></div>
+            </div>
+            <div class="download-page mobile download">
+                <div class="content-block">
+                    <div class="previewer-block">
+                        <img alt="" src="{staticpath}images/mobile/extensions/image.png" class="mobile filetype-img" />
+                        <!-- Video player Elements-->
+                        <div class="download video-block">
+                            <div class="viewer-top-bl">
+                                <div class="viewer-filename">
+                                    <div class="mobile filename">[$5533]</div>
+                                </div>
+                            </div>
+                            <video id="video" data-autoplayvideo="false" data-playvideoonclick="false"></video>
+                            <div class="download play-video-button"></div>
+                            <div class="viewer-pending hidden">
+                                <div class="bounce1"></div>
+                                <div class="bounce2"></div>
+                                <div class="bounce3"></div>
+                            </div>
+
+                            <div class="viewer-vad-control lato hidden">
+                                <div  class="thumb">
+                                    <img alt="" />
+                                </div>
+                                <div class="counter">
+                                    0
+                                </div>
+                                <div class="label">
+                                    <span>[$22879]</span><i class="mobile fm-icon small-skip-icon"></i>
+                                </div>
+                            </div>
+                            <div class="video-progress-bar vad" title="">
+                                <div class="video-time-bar"></div>
+                            </div>
+
+                            <div class="viewer-bottom-bl">
+                                <div id="video-controls" class="video-controls" data-state="hidden">
+                                    <div data-state="play" class="viewer-button left playpause">
+                                        <i class="medium-icon icons-img play"></i>
+                                    </div>
+                                    <div class="volume-control left hidden" style="">
+                                        <div data-state="mute" class="viewer-button mute">
+                                            <i class="medium-icon icons-img volume"></i>
+                                        </div>
+                                        <div class="video-vol-range">
+                                            <div class="volume-bar"><span style="height: 100%;"></span></div>
+                                        </div>
+                                    </div>
+                                    <div class="video-timing current left">00:00</div>
+                                    <div data-state="go-fullscreen" class="viewer-button right fs">
+                                        <i class="medium-icon icons-img fullscreen"></i>
+                                    </div>
+                                    <div class="video-timing duration right">03:09</div>
+                                    <div class="video-progress-block">
+                                        <div class="video-progress-bar">
+                                            <div class="video-time-bar"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Image Previewer block -->
+                        <div class="download image-block js-image-preview">
+                            <img />
+                            <div class="bouncing-loader viewer-pending hidden">
+                                <span></span><span></span><span></span>
+                            </div>
+                        </div>
+
+                        <!-- Text File -->
+                        <div class="download text-block js-text-viewer">
+                            <div class="text-editor">
+                                <section class="content js-textview">
+                                    <textarea class="txtar"></textarea>
+                                </section>
+                                <div class="block-view-file-type text js-text-viewer-icon hidden"></div>
+                            </div>
+                            <div class="bouncing-loader viewer-pending hidden">
+                                <span></span><span></span><span></span>
+                            </div>
+                        </div>
+
+                        <!-- PDF File -->
+                        <div class="download pdf-block js-pdf-viewer">
+                            <!-- PDF to be placed here -->
+                        </div>
+
+
+                    </div>
+                    <div class="info-block">
+
+                        <!-- End of Video player Elements-->
+                        <div class="mobile filename"><em>[$5533]</em></div>
+                        <div class="mobile file-download-info">
+                            <div class="mobile filesize"></div>
+                            <div class="mobile download-percents"></div>
+                            <div class="mobile download-speed hidden"></div>
+                        </div>
+
+                        <div class="mobile app-info-cell">
+                            <div class="mobile app-info-block">
+                                <div class="mobile wrong-file-block">
+                                    <div class="mobile error-txt file-too-large hidden">[$8951]</div>
+                                    <div class="mobile error-txt file-unsupported hidden">[$8952]</div>
+                                </div>
+                                <div class="mobile application-txt standalone-download-message hidden">
+                                    [$8950]
+                                </div>
+                                <div class="mobile application-txt file-manager-download-message hidden">
+                                    [$16107]
+                                </div>
+                                <a class="mobile text-button third cancel hidden"><span>[$148]</span> </a>
+                                <a class="mobile download-app"></a>
+                            </div>
+                        </div>
+
+                        <div class="mobile buttons">
+                            <a class="mobile green-button first dl-megaapp"> <i></i> <span>[$8948]</span> </a>
+                            <a class="mobile green-button second dl-browser"> <i></i> <span>[$58]</span> </a>
+                        </div>
+                        <!-- Progressbar is hidden. "downloading" body class will show it !-->
+                        <!-- Set width to ".bar" block !-->
+                        <a class="mobile download-progress">
+                            <div class="bar green"></div>
+                            <span class="mobile">[$8949]</span>
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+            <a class="mobile app-advertisement-block download-app">
+                <div class="mobile app-advertisement-aligner">
+                    <div class="mobile mega-app-icon">
+                        <i class="mobile white-mega-logo">
+                        </i>
+                    </div>
+                    <div class="mobile app-advertisement-text">
+                        <span>[$mobile_app_advertisement]</span>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+</div>
 
 <!-- File delete overlay !-->
 <div class="mobile main-block hidden" id="mobile-ui-delete">
@@ -2896,24 +2975,24 @@
 
 
 <!-- Decryption key overlay for file/folder links without a decryption key !-->
-<div class="mobile main-block error-overlay hidden" id="mobile-decryption-key-overlay">
-    <div class="mobile content-row first">
+<div class="mobile main-block download error-overlay hidden" id="mobile-decryption-key-overlay">
+    <div class="mobile content-row download first">
         <div class="mobile content-cell">
             <div class="mobile fm-icon top-icon menu right"></div>
-            <a href="" class="mobile logo"></a>
-            <div class="mobile white-block">
-                <div class="mobile overlay-info initial-message hidden">
-                    <p>[$7945]</p>
-                    <p>[$7972]</p>
+            <a class="mobile fm-icon mega logo"></a>
+            <div class="mobile decrypt-page">
+                <div class="content-block">
+                    <div class="mobile overlay-info initial-message hidden">
+                        <span class="title">[$1026]</span>
+                        <p>[$7945] [$7972]</p>
+                    </div>
+                    <div class="mobile overlay-info error-message hidden">
+                        <span class="title">[$16471]</span>
+                        <p>[$16472]</p>
+                    </div>
+                    <textarea class="mobile grey-textarea decryption-key" placeholder="[$1028]"></textarea>
+                    <a class="mobile green-button decrypt-button"> <i></i> <span>[$1027]</span> </a>
                 </div>
-                <div class="mobile overlay-info error-message hidden">
-                    <p>
-                        <strong>[$16471]</strong>
-                    </p>
-                    <p>[$16472]</p>
-                </div>
-                <textarea class="mobile grey-textarea decryption-key" placeholder="[$1028]"></textarea>
-                <a class="mobile red-button decrypt-button"> <i></i> <span>[$1027]</span> </a>
             </div>
         </div>
     </div>
@@ -2921,23 +3000,25 @@
 
 
 <!-- Decryption password overlay for password protected links !-->
-<div class="mobile main-block error-overlay hidden" id="mobile-password-decryption-overlay">
-    <div class="mobile content-row first">
+<div class="mobile main-block download error-overlay hidden" id="mobile-password-decryption-overlay">
+    <div class="mobile content-row download first">
         <div class="mobile content-cell">
             <div class="mobile fm-icon top-icon menu right"></div>
             <a href="" class="mobile logo"></a>
-            <div class="mobile white-block">
-                <div class="mobile overlay-info initial-message">
-                    <p class="error-message">[$9071]</p>
-                    <p>[$9072]</p>
+            <div class="mobile decrypt-page">
+                <div class="content-block">
+                    <div class="mobile overlay-info initial-message">
+                        <span class="title error-message">[$9070]</span>
+                        <p>[$9071] [$9072]</p>
+                    </div>
+                    <input type="password" class="mobile grey-textarea decryption-password" placeholder="[$9073]" />
+                    <a class="mobile green-button decrypt-button disabled">
+                        <span class="decrypt-text">[$1027]</span>
+                        <span class="decrypting-spinner">
+                            <img alt="" src="{staticpath}images/mobile/button-loader.gif" />
+                        </span>
+                    </a>
                 </div>
-                <input type="password" class="mobile grey-textarea decryption-password" placeholder="[$9073]" />
-                <a class="mobile red-button decrypt-button">
-                    <span class="decrypt-text">[$1027]</span>
-                    <span class="decrypting-spinner">
-                        <img alt="" src="{staticpath}images/mobile/button-loader.gif" />
-                    </span>
-                </a>
             </div>
         </div>
     </div>
@@ -3346,7 +3427,7 @@
     <!-- iframe will be inserted here -->
 </div>
 
-<div class="fm-dialog mobile payment-stripe-success-dialog hidden">
+<div class="fm-dialog mobile full-page-scrollable payment-stripe-success-dialog hidden">
     <div class="btn-close-dialog"></div>
     <i class="graphic sprite-fm-uni icon-success success-logo"></i>
     <div class="success-head">[$25047]</div>
@@ -3355,7 +3436,7 @@
     </div>
 </div>
 
-<div class="fm-dialog mobile payment-stripe-failure-dialog hidden">
+<div class="fm-dialog mobile full-page-scrollable payment-stripe-failure-dialog hidden">
     <div class="btn-close-dialog"></div>
     <i class="graphic sprite-fm-uni icon-error fail-logo"></i>
     <div class="fail-head">[$25049]</div>

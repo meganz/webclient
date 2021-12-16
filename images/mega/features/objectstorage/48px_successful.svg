@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="48px" height="48px" viewBox="0 0 48 48" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>48/icon/Successful</title>
+    <g id="48/icon/Successful" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <rect id="Rectangle" x="0" y="0" width="48" height="48"></rect>
+        <polygon id="Star" stroke="#27A862" stroke-width="2" stroke-linejoin="round" points="24 38.4 19.3412572 41.3866649 16.8 36.4707658 11.2720779 36.7279221 11.5292342 31.2 6.61333513 28.6587428 9.6 24 6.61333513 19.3412572 11.5292342 16.8 11.2720779 11.2720779 16.8 11.5292342 19.3412572 6.61333513 24 9.6 28.6587428 6.61333513 31.2 11.5292342 36.7279221 11.2720779 36.4707658 16.8 41.3866649 19.3412572 38.4 24 41.3866649 28.6587428 36.4707658 31.2 36.7279221 36.7279221 31.2 36.4707658 28.6587428 41.3866649"></polygon>
+        <polyline id="Path-14" stroke="#27A862" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" points="19 24 23 28 30 20"></polyline>
+    </g>
+</svg>

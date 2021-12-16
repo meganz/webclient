@@ -2072,7 +2072,17 @@ var addressDialog = {
                 return;
             }
             if (event.data === 'closeme') {
-                return closeDialog();
+                closeDialog();
+                // Load the proper page UI after close the stripe payment dialog
+                if (page === 'registerb') {
+                    page = '';
+                    loadSubPage('registerb');
+                }
+                else if (page === 'repay') {
+                    page = '';
+                    loadSubPage('repay');
+                }
+                return;
             }
             if (event.data.startsWith('payfail^')) {
                 failHandle(event.data.split('^')[1]);

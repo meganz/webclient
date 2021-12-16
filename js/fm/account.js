@@ -248,9 +248,9 @@ accountUI.general = {
 
             var pf = navigator.platform.toUpperCase();
 
-            // If this is Linux let them goes to sync page to select linux type
+            // If this is Linux send them to desktop page to select linux type
             if (pf.indexOf('LINUX') > -1) {
-                loadSubPage('sync');
+                loadSubPage('desktop');
             }
             // else directly give link of the file.
             else {

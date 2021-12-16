@@ -346,14 +346,20 @@ var slideshowid;
             range: 'min',
             step: 0.01,
             change: function(e, ui) {
-                $(this).attr('title', `${ui.value}%`);
+                $('.ui-slider-handle .mv-zoom-slider', this).text(`${ui.value}%`);
                 wrapper.dataset.perc = ui.value;
             },
             slide: function(e, ui) {
-                $(this).attr('title', `${ui.value}%`);
+                $('.ui-slider-handle .mv-zoom-slider', this).text(`${ui.value}%`);
                 slideshow_zoom(container, false, ui.value);
             },
-            create: setValue
+            create: () => {
+                setValue();
+                $('.ui-slider-handle', $elm).safeAppend(
+                    `<div class="mv-zoom-slider dark-direct-tooltip"></div>
+                    <i class="mv-zoom-slider-arrow sprite-fm-mono icon-tooltip-arrow"></i>`
+                );
+            }
         });
     }
 

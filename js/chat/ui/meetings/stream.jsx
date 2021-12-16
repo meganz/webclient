@@ -530,6 +530,7 @@ export default class Stream extends MegaRenderMixin {
                     }}
                     onSpeakerChange={onSpeakerChange}
                     onModeChange={onModeChange}
+                    onHoldClick={onHoldClick}
                 />
             </div>
         );

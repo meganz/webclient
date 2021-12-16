@@ -651,9 +651,10 @@ function daysSince1Jan2000() {
  *                  'code' - use the ISO currency code such as "NZD",
  *                  'name' - use a localized currency name such as "dollar"
  *                  'number' - just number with correct decimal
+ * @param {Boolean} noDecimals If the number should be displayed without decimals
  * @returns {String} formated currency value
  */
-function formatCurrency(value, currency, display) {
+function formatCurrency(value, currency, display, noDecimals) {
 
     'use strict';
 
@@ -678,6 +679,10 @@ function formatCurrency(value, currency, display) {
     }
 
     var options = {'style': 'currency', 'currency': currency, currencyDisplay: display};
+    if (noDecimals) {
+        options = {'style': 'currency', 'currency': currency, currencyDisplay: display, maximumFractionDigits: 0,
+                   minimumFractionDigits: 0};
+    }
 
     var result = value.toLocaleString(locales, options);
 
@@ -1075,12 +1080,12 @@ mBroadcaster.once('boot_done', function populate_l() {
 
     l[12439] = l[12439].replace('[A1]', '').replace('[/A1]', '').replace('[A2]', '').replace('[/A2]', '');
 
-    l[16865] = escapeHTML(l[16865]).replace('[A]', '<a href="/sync" class="clickurl">').replace('[/A]', '</a>');
-    l[16866] = escapeHTML(l[16866]).replace('[A]', '<a href="/sync" class="clickurl">').replace('[/A]', '</a>');
-    l[16870] = escapeHTML(l[16870]).replace('[A]', '<a href="/sync" class="clickurl">').replace('[/A]', '</a>');
-    l[16883] = escapeHTML(l[16883]).replace('[A]', '<a href="/sync" class="clickurl">').replace('[/A]', '</a>');
+    l[16865] = escapeHTML(l[16865]).replace('[A]', '<a href="/desktop" class="clickurl">').replace('[/A]', '</a>');
+    l[16866] = escapeHTML(l[16866]).replace('[A]', '<a href="/desktop" class="clickurl">').replace('[/A]', '</a>');
+    l[16870] = escapeHTML(l[16870]).replace('[A]', '<a href="/desktop" class="clickurl">').replace('[/A]', '</a>');
+    l[16883] = escapeHTML(l[16883]).replace('[A]', '<a href="/desktop" class="clickurl">').replace('[/A]', '</a>');
     l[17793] = escapeHTML(l[17793])
-        .replace('[A1]', '<a href="/sync" class="clickurl">').replace('[/A1]', '</a>')
+        .replace('[A1]', '<a href="/desktop" class="clickurl">').replace('[/A1]', '</a>')
         .replace('[A2]', '<a href="/extensions" class="clickurl">').replace('[/A2]', '</a>')
         .replace('[A3]', '<a class="freeupdiskspace">').replace('[/A3]', '</a>');
 
@@ -1202,9 +1207,9 @@ mBroadcaster.once('boot_done', function populate_l() {
         + 'href="https://mega.nz/SecurityWhitepaper.pdf">').replace('[/A2]', '</a>');
     l[20607] = l[20607].replace('[A1]', '<a class="clickurl" href="/mobile">')
         .replace('[/A1]', '</a>');
-    l[20607] = l[20607].replace('[A2]', '<a class="clickurl" href="/sync">')
+    l[20607] = l[20607].replace('[A2]', '<a class="clickurl" href="/desktop">')
         .replace('[/A2]', '</a>');
-    l[20609] = l[20609].replace('[A]', '<a class="clickurl" href="/sync">').replace('[/A]', '</a>');
+    l[20609] = l[20609].replace('[A]', '<a class="clickurl" href="/desktop">').replace('[/A]', '</a>');
     l[20846] = l[20846]
         .replace('[A]', '<a href="https://mega.nz/linux/MEGAsync/" target="_blank" class="download-all-link">')
         .replace('[/A]', '</a>');
@@ -1466,6 +1471,41 @@ mBroadcaster.once('boot_done', function populate_l() {
     l.payment_card_exp = l.payment_card_exp
         .replace('[A]', '<a>').replace('[/A]', '</a>');
 
+    l.ri_s4_header = l.ri_s4_header
+        .replace('[A1]', '<h1>')
+        .replace('[/A1]', '</h1>')
+        .replace('[A2]', '<h2>')
+        .replace('[/A2]', '</h2>');
+    l.ri_s4_subheader = l.ri_s4_subheader
+        .replace('%1', '&#8364 1,000')
+        .replace('[B]', '<strong>')
+        .replace('[/B]', '</strong>');
+    l.ri_s4_card1_desc = l.ri_s4_card1_desc
+        .replace('[B]', '<strong>')
+        .replace('[/B]', '</strong>');
+    l.ri_s4_card3_desc = l.ri_s4_card3_desc
+        .replace('[B]', '<strong>')
+        .replace('[/B]', '</strong>');
+    l.ri_s4_card4_desc = l.ri_s4_card4_desc
+        .replace('%1', '&#8364 2.99')
+        .replace('[B]', '<strong>')
+        .replace('[/B]', '</strong>');
+    l.ri_s4_card5_desc = l.ri_s4_card5_desc
+        .replace('[B]', '<strong>')
+        .replace('[/B]', '</strong>');
+    l.ri_s4_betat_header = l.ri_s4_betat_header
+        .replace('%1', '&#8364 1,000');
+    l.ri_s4_regf_q6_ans1 = l.ri_s4_regf_q6_ans1
+        .replace('[B]', '<strong>')
+        .replace('[/B]', '</strong>');
+    l.ri_s4_regf_q6_ans2 = l.ri_s4_regf_q6_ans2
+        .replace('[B]', '<strong>')
+        .replace('[/B]', '</strong>');
+    l.ri_s4_regf_success = l.ri_s4_regf_success
+        .replace('[BR]', '<br>');
+    l.about_vision_desc = escapeHTML(l.about_vision_desc)
+        .replace(/\[S]/g, '<span>')
+        .replace(/\[\/S]/g, '</span>');
     l.about_vision_title = escapeHTML(l.about_vision_title)
         .replace(/\[S]/g, '<span>')
         .replace(/\[\/S]/g, '</span>');

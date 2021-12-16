@@ -728,3 +728,92 @@ window.redirectToSupport = (url) => {
     $('.pro-register', $dlg).addClass('hidden');
     M.safeShowDialog('loginrequired', $dlg);
 };
+
+const MegaUtils = dummy;
+
+MegaUtils.prototype.getCountries = function() {
+    'use strict';
+
+    if (!this._countries) {
+        this._countries = (new RegionsCollection()).countries;
+    }
+    return this._countries;
+};
+
+MegaUtils.prototype.sortObjFn = function(key, order, alternativeFn) {
+    'use strict';
+
+    if (!order) {
+        order = 1;
+    }
+
+    if (typeof key !== 'function') {
+        var k = key;
+        key = function(o) {
+            return o[k];
+        };
+    }
+
+    return function(a, b, tmpOrder) {
+        var currentOrder = tmpOrder ? tmpOrder : order;
+
+        var aVal = key(a);
+        var bVal = key(b);
+
+        if (typeof aVal === 'string' && typeof bVal === 'string') {
+            return aVal.localeCompare(bVal, locale) * currentOrder;
+        }
+        else if (typeof aVal === 'string' && typeof bVal === 'undefined') {
+            return 1 * currentOrder;
+        }
+        else if (typeof aVal === 'undefined' && typeof bVal === 'string') {
+            return -1 * currentOrder;
+        }
+        else if (typeof aVal === 'number' && typeof bVal === 'undefined') {
+            return 1 * currentOrder;
+        }
+        else if (typeof aVal === 'undefined' && typeof bVal === 'number') {
+            return -1 * currentOrder;
+        }
+        else if (typeof aVal === 'undefined' && typeof bVal === 'undefined') {
+            if (alternativeFn) {
+                return alternativeFn(a, b, currentOrder);
+            }
+            else {
+                return -1 * currentOrder;
+            }
+        }
+        else if (typeof aVal === 'number' && typeof bVal === 'number') {
+            var _a = aVal || 0;
+            var _b = bVal || 0;
+            if (_a > _b) {
+                return 1 * currentOrder;
+            }
+            if (_a < _b) {
+                return -1 * currentOrder;
+            }
+            else {
+                if (alternativeFn) {
+                    return alternativeFn(a, b, currentOrder);
+                }
+                else {
+                    return 0;
+                }
+            }
+        }
+        else {
+            return 0;
+        }
+    };
+};
+
+function isValidEmail(email) {
+
+    'use strict';
+    // reference to html spec https://html.spec.whatwg.org/multipage/input.html#e-mail-state-(type=email)
+    // with one modification, that the standard allows emails like khaled@mega
+    // which is possible in local environment/networks but not in WWW.
+    // so I applied + instead of * at the end
+    var regex = /^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/;
+    return regex.test(email);
+}

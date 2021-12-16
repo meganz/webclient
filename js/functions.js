@@ -2712,7 +2712,7 @@ function blockChromePasswordManager() {
 
 /**
  * Attach the download file link handler
- * Use in /sync and /cmd
+ * Use in /desktop and /cmd
  * @param $links
  */
 /*exported registerLinuxDownloadButton */

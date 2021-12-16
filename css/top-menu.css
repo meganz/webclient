@@ -528,7 +528,7 @@
     background-position: -145px -148px;
 }
 .menus-sprite.rounded.encryption {
-    background-color: #4A90E2;
+    background-color: #7A8B9A;
     background-position: -195px -148px;
 }
 .menus-sprite.rounded.securechat {
@@ -542,6 +542,10 @@
 .menus-sprite.rounded.share {
     background-color: #FFA700;
     background-position: -95px -198px;
+}
+.menus-sprite.rounded.objectstorage {
+    background-color: #4A90E2;
+    background-position: -191px -197px;
 }
 
 /* Business account */

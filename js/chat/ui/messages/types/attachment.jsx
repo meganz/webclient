@@ -112,7 +112,7 @@ export default class Attachment extends AbstractGenericMessage {
                                             dd.doRerender();
                                         }
                                     });
-                                return <span>{l[5533] /* `Loading...` */}</span>;
+                                return <span className="loading">{l[5533] /* `Loading...` */}</span>;
                             }
                             else if (!NODE_DOESNT_EXISTS_ANYMORE[v.h]) {
                                 downloadButton = <DropdownItem

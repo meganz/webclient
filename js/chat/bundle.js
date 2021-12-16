@@ -10385,7 +10385,9 @@ class Attachment extends AbstractGenericMessage {
                   dd.doRerender();
                 }
               });
-              return external_React_default().createElement("span", null, l[5533]);
+              return external_React_default().createElement("span", {
+                className: "loading"
+              }, l[5533]);
             } else if (!NODE_DOESNT_EXISTS_ANYMORE[v.h]) {
               downloadButton = external_React_default().createElement(dropdowns.DropdownItem, {
                 icon: "sprite-fm-mono icon-download-small",

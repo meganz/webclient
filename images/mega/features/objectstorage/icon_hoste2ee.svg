@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="48px" height="48px" viewBox="0 0 48 48" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>icon/hoste2ee copy</title>
+    <g id="icon/hoste2ee-copy" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <rect id="Rectangle" x="0" y="0" width="48" height="48"></rect>
+        <rect id="Rectangle" stroke="#3077F1" stroke-width="2" x="13" y="23" width="22" height="20" rx="2"></rect>
+        <path d="M16,23 L16,18 C16,12 18.6666667,9 24,9 C29.3333333,9 32,12 32,18 L32,23" id="Path-11" stroke="#3077F1" stroke-width="2"></path>
+        <circle id="Oval" stroke="#3077F1" stroke-width="2" cx="24" cy="30" r="2"></circle>
+        <line x1="24" y1="37" x2="24" y2="33" id="Line" stroke="#3077F1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></line>
+        <circle id="Oval-Copy-2" stroke="#3077F1" stroke-width="2" cx="7" cy="41" r="2"></circle>
+        <circle id="Oval-Copy-4" stroke="#3077F1" stroke-width="2" cx="7" cy="7" r="2"></circle>
+        <circle id="Oval-Copy-3" stroke="#3077F1" stroke-width="2" cx="41" cy="41" r="2"></circle>
+        <circle id="Oval-Copy-5" stroke="#3077F1" stroke-width="2" cx="41" cy="7" r="2"></circle>
+        <polyline id="Path-12" stroke="#3077F1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" points="7 10 7 18 16 18"></polyline>
+        <polyline id="Path-12-Copy-2" stroke="#3077F1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" transform="translate(10.000000, 35.000000) scale(1, -1) translate(-10.000000, -35.000000) " points="7 32 7 38 13 38"></polyline>
+        <polyline id="Path-12-Copy-3" stroke="#3077F1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" transform="translate(38.000000, 33.000000) scale(-1, -1) translate(-38.000000, -33.000000) " points="35 28 35 38 41 38"></polyline>
+        <polyline id="Path-12-Copy" stroke="#3077F1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" transform="translate(36.500000, 12.000000) scale(-1, 1) translate(-36.500000, -12.000000) " points="32 10 32 14 41 14"></polyline>
+    </g>
+</svg>

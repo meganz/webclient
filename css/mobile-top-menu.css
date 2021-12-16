@@ -504,8 +504,12 @@
     background-color: #00C1A5;
     background-position: -148px -170px;
 }
-.menus-sprite.rounded.encryption {
+.menus-sprite.rounded.objectstorage {
     background-color: #4A90E2;
+    background-position: -198px -226px;
+}
+.menus-sprite.rounded.encryption {
+    background-color: #7A8B9A;
     background-position: -198px -167px;
 }
 .menus-sprite.rounded.securechat {

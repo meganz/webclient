@@ -50,6 +50,7 @@
         ["corporate/review"],
         ["contact"],
         ["storage"],
+        ["objectstorage"],
         ["collaboration"],
         ["securechat"],
         ["blog"],

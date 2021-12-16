@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="48px" height="48px" viewBox="0 0 48 48" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>icon/variety copy</title>
+    <g id="icon/variety-copy" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <rect id="Rectangle" x="0" y="0" width="48" height="48"></rect>
+        <circle id="Oval" stroke="#3077F1" stroke-width="2" stroke-linejoin="round" cx="13" cy="24" r="3"></circle>
+        <polygon id="Oval-Copy" stroke="#3077F1" stroke-width="2" stroke-linejoin="round" points="35 38 38 35 35 32 32 35"></polygon>
+        <rect id="Rectangle" stroke="#3077F1" stroke-width="2" stroke-linejoin="round" x="21" y="21" width="6" height="6" rx="1"></rect>
+        <line x1="21" y1="13" x2="27" y2="13" id="Line" stroke="#3077F1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></line>
+        <line x1="21" y1="13" x2="27" y2="13" id="Line-Copy" stroke="#3077F1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" transform="translate(24.000000, 13.000000) rotate(90.000000) translate(-24.000000, -13.000000) "></line>
+        <line x1="21.5" y1="35.5" x2="26.5" y2="35.5" id="Line-Copy-2" stroke="#3077F1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" transform="translate(24.000000, 35.500000) rotate(90.000000) translate(-24.000000, -35.500000) "></line>
+        <line x1="21" y1="32" x2="24" y2="35" id="Line-Copy-3" stroke="#3077F1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" transform="translate(22.500000, 33.500000) rotate(90.000000) translate(-22.500000, -33.500000) "></line>
+        <line x1="24" y1="32" x2="27" y2="35" id="Line-Copy-4" stroke="#3077F1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" transform="translate(25.500000, 33.500000) scale(-1, 1) rotate(90.000000) translate(-25.500000, -33.500000) "></line>
+        <path d="M33.2243416,10.5918861 L35,10 L35,10 L36.7756584,10.5918861 C37.0742633,10.6914211 37.3085789,10.9257367 37.4081139,11.2243416 L38,13 L38,13 L37.4081139,14.7756584 C37.3085789,15.0742633 37.0742633,15.3085789 36.7756584,15.4081139 L35,16 L35,16 L33.2243416,15.4081139 C32.9257367,15.3085789 32.6914211,15.0742633 32.5918861,14.7756584 L32,13 L32,13 L32.5918861,11.2243416 C32.6914211,10.9257367 32.9257367,10.6914211 33.2243416,10.5918861 Z" id="Rectangle-Copy-6" stroke="#3077F1" stroke-width="2" stroke-linejoin="round"></path>
+        <polygon id="Path-7" stroke="#3077F1" stroke-width="2" stroke-linejoin="round" points="35 21 32 27 38 27"></polygon>
+        <polygon id="Path-7-Copy" stroke="#3077F1" stroke-width="2" stroke-linejoin="round" transform="translate(13.000000, 13.000000) scale(1, -1) translate(-13.000000, -13.000000) " points="13 10 10 16 16 16"></polygon>
+        <rect id="Rectangle" stroke="#3077F1" stroke-width="2" x="5" y="5" width="38" height="38" rx="2"></rect>
+        <rect id="Rectangle" fill="#3077F1" x="10" y="32" width="2" height="2" rx="1"></rect>
+        <rect id="Rectangle-Copy-3" fill="#3077F1" x="14" y="32" width="2" height="2" rx="1"></rect>
+        <rect id="Rectangle-Copy-4" fill="#3077F1" x="14" y="36" width="2" height="2" rx="1"></rect>
+        <rect id="Rectangle-Copy-5" fill="#3077F1" x="10" y="36" width="2" height="2" rx="1"></rect>
+    </g>
+</svg>

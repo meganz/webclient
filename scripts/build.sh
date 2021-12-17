@@ -14,11 +14,9 @@ if [[ "$1" == "--fix" ]]; then
     git pull $remote develop
 fi
 
-
-if [[ $(git status|grep "scss") ]]; then
+if [ -n "$(git status --porcelain|grep scss)" -o "$1" == "--force" ]; then
     ./node_modules/.bin/sass --load-path="css/" --no-source-map css/chat-bundle.scss css/chat-bundle.css
-    # if map was created during development (build.sh)
-    rm -rf css/chat-bundle.css.map
+    [[ $? -ne 0 ]] && exit 127
 fi
 
 NODE_ENV="production" ./node_modules/.bin/webpack  --config webpack.config.js
@@ -46,10 +44,14 @@ cat $build_file \
     | $SED_BINARY -E 's!_?inheritsLoose(_default|[0-9]+)\(\)!inherits!g' \
     | $SED_BINARY -E 's!_?assertThisInitialized(_default|[0-9]+)\(\)!!g' \
     | $SED_BINARY -E 's!/\*[^*]+\*/\s*!!g' > $temp_file1
+[[ $? -ne 0 ]] && exit 15
 
 mv $temp_file1 $build_file
+[[ $? -ne 0 ]] && exit 23
 
 if [[ "$1" == "--fix" ]]; then
     git commit -a -m "chat/bundle.js update"
     git push $remote $(git symbolic-ref --short -q HEAD)
 fi
+
+exit $?

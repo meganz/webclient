@@ -709,6 +709,9 @@ function dl_g(res, ctx) {
             $(elm).removeClass('hidden');
 
             const $btnClose = $('.js-close-error', '#mobile-ui-notfound');
+
+            $btnClose.removeClass('hidden');
+
             $btnClose.rebind('tap', () => {
                 mobile.loadCloudDrivePage();
                 return false;

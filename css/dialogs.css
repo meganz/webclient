@@ -390,6 +390,7 @@ body.de .mega-dialog.new-group-chat {
 .mega-dialog .fm-breadcrumbs-wrapper.breadcrumbs-bottom .fm-breadcrumbs-block {
     height: 40px;
     padding: 5px 0 0 5px;
+    overflow: visible;
 }
 .mega-dialog .fm-breadcrumbs-wrapper.breadcrumbs-bottom .crumb-overflow-link {
     background: none;

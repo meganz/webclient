@@ -161,6 +161,12 @@ function setDateTimeFormat(locales, format) {
             case 13:
                 options.month = 'long';
                 break;
+            case 14:
+                options.year = 'numeric';
+                break;
+            case 15:
+                options.month = 'short';
+                options.day = 'numeric';
         }
     }
 
@@ -203,8 +209,10 @@ function setDateTimeFormat(locales, format) {
  * Non full date formats:
  *       10: Mon (Only day of the week long version)
  *       11: Monday (Only day of the week short version)
- *       12: Jan (Only month long version)
- *       13: January (Only month short version)
+ *       12: Jan (Only month short version)
+ *       13: January (Only month long version)
+ *       14: 2021 (Only year)
+ *       15: dd mm (Date format with short month and without time and year)
  */
 function time2date(unixTime, format) {
     'use strict';
@@ -375,7 +383,10 @@ function calculateCalendar(type, unixTime) {
     var startDate;
     var endDate;
 
-    if (type === 'w') {
+    if (type === 'd') {
+        startDate = endDate = time;
+    }
+    else if (type === 'w') {
         var timeDay = time.getDay();
 
         startDate = new Date(unixTime - 86400000 * timeDay);
@@ -405,6 +416,9 @@ function calculateCalendar(type, unixTime) {
         endDate.setFullYear(timeYear + 1);
         endDate.setMonth(0);
         endDate.setDate(0);
+    }
+    else {
+        return false;
     }
 
     startDate = startDate.setHours(0, 0, 0, 0) / 1000;

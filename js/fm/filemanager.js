@@ -876,6 +876,10 @@ FileManager.prototype.initFileManagerUI = function() {
                 prev: null,
                 subpages: [M.InboxID, M.RubbishID, 'recents', 'shares', 'out-shares', 'public-links']
             },
+            'gallery':         {root: 'photos',    prev: null, subpages: ['photos', 'images', 'videos']},
+            'photos':          {root: 'photos',    prev: null},
+            'images':          {root: 'images',    prev: null},
+            'videos':          {root: 'videos',    prev: null},
             'folder-link':     {root: M.RootID,    prev: null},
             'conversations':   {root: 'chat',      prev: null, subpages: ['contacts']},
             'transfers':       {root: 'transfers', prev: null},
@@ -918,7 +922,6 @@ FileManager.prototype.initFileManagerUI = function() {
                         // do if there's no transfers, we will allow going to transfers page
                         return false;
                     }
-
                 }
                 else {
                     mega.tpw.hideWidget();
@@ -1905,6 +1908,10 @@ FileManager.prototype.initContextUI = function() {
 
         const target = M.d[$.selected[0]];
 
+        if (M.currentdirid === 'photos' || M.currentdirid === 'images' || M.currentdirid === 'videos') {
+            M.fmTabState.gallery.prev = M.currentdirid;
+        }
+
         M.openFolder(target.p).then(() => {
             selectionManager.add_to_selection(target.h, true);
         });
@@ -2417,7 +2424,8 @@ FileManager.prototype.initUIKeyEvents = function() {
             e.keyCode == 46 &&
             s.length > 0 &&
             !$.dialog &&
-            (M.getNodeRights(M.currentdirid) > 1 || M.currentCustomView)
+            (M.getNodeRights(M.currentdirid) > 1 || M.currentCustomView) &&
+            M.currentCustomView.type !== 'gallery'
         ) {
             // delete
             fmremove(s);
@@ -2521,7 +2529,8 @@ FileManager.prototype.initUIKeyEvents = function() {
             is_selection_manager_available &&
             e.keyCode == 65 &&
             e.ctrlKey &&
-            !$.dialog
+            !$.dialog &&
+            M.currentCustomView.type !== 'gallery'
         ) {
             if (is_transfers_or_accounts) {
                 return;
@@ -3058,7 +3067,9 @@ FileManager.prototype.addIconUI = function(aQuiet, refresh) {
         }
     }
     // user management ui update is handled in Business Account classes.
-    else if (this.v.length && this.currentdirid.substr(0, 15) !== 'user-management') {
+    else if (this.v.length && this.currentdirid.substr(0, 15) !== 'user-management' &&
+        M.currentCustomView.type !== 'gallery') {
+
         $('.fm-blocks-view.fm').removeClass('hidden');
         if (this.currentCustomView) {
             $('.fm-blocks-view.fm').addClass(this.currentCustomView.type + '-view');
@@ -3371,6 +3382,9 @@ FileManager.prototype.addGridUI = function(refresh) {
             $(viewModeClass).removeClass('hidden');
         }
     }
+    else if (M.currentCustomView.type === 'gallery') {
+        initGridScrolling();
+    }
     else if (this.v.length) {
 
         $('.files-grid-view.fm').removeClass('hidden');
@@ -3648,10 +3662,9 @@ FileManager.prototype.getDDhelper = function getDDhelper() {
 FileManager.prototype.addSelectDragDropUI = function(refresh) {
     "use strict";
 
-    if (this.currentdirid && this.currentdirid.substr(0, 7) === 'account') {
+    if (this.currentdirid && (this.currentdirid.substr(0, 7) === 'account' || M.currentCustomView.type === 'gallery')) {
         return false;
     }
-
 
     if (d) {
         console.time('selectddUI');
@@ -3937,7 +3950,6 @@ FileManager.prototype.onSectionUIOpen = function(id) {
         $('.nw-fm-left-icon.user-management', $fmholder).addClass('hidden');
     }
 
-
     switch (id) {
         case 'opc':
         case 'ipc':
@@ -3955,6 +3967,11 @@ FileManager.prototype.onSectionUIOpen = function(id) {
             break;
         case 'affiliate':
             tmpId = 'dashboard';
+            break;
+        case 'photos':
+        case 'images':
+        case 'videos':
+            tmpId = 'gallery';
             break;
         default:
             tmpId = id;
@@ -3984,10 +4001,13 @@ FileManager.prototype.onSectionUIOpen = function(id) {
 
     this.currentTreeType = M.treePanelType();
 
-    $('.fm-left-menu', $fmholder).removeClass(
-        'cloud-drive folder-link shared-with-me rubbish-bin contacts out-shares public-links ' +
-        'conversations opc ipc inbox account dashboard transfers recents user-management affiliate'
-    ).addClass(tmpId);
+    if (tmpId === 'cloud-drive' || tmpId === 'gallery') {
+        $('.nw-fm-left-icon.gallery', $fmholder).removeClass('hidden');
+    }
+    else {
+        $('.nw-fm-left-icon.gallery', $fmholder).addClass('hidden');
+    }
+
     $('.fm.fm-right-header, .fm-import-to-cloudrive, .fm-download-as-zip', $fmholder).addClass('hidden');
     $('.fm-import-to-cloudrive, .fm-download-as-zip', $fmholder).off('click');
 
@@ -4012,7 +4032,6 @@ FileManager.prototype.onSectionUIOpen = function(id) {
             $('.nw-fm-left-icons-panel .logo', $fmholder).removeClass('hidden');
             $('.fm-main', $fmholder).addClass('active-folder-link');
             $('.fm-right-header', $fmholder).addClass('folder-link');
-            $('.fm-left-menu', $fmholder).addClass('folder-link');
             $('.nw-fm-tree-header.folder-link', $fmholder).removeClass('hidden');
 
             var $prodNav = $('.fm-products-nav').text('');
@@ -4046,15 +4065,20 @@ FileManager.prototype.onSectionUIOpen = function(id) {
     }
 
     if (id !== 'conversations' || id !== "archivedchats") {
-        if (id !== 'user-management') {
-            $('.fm-right-header').removeClass('hidden');
-            $('.fm-right-header-user-management').addClass('hidden');
-        }
-        else {
+        if (id === 'user-management') {
             $('.fm-right-header').addClass('hidden');
             $('.fm-right-header-user-management').removeClass('hidden');
             M.hideEmptyGrids();
         }
+        else if (M.isCustomView(id).type === 'gallery') {
+            $('.fm-right-header').addClass('hidden');
+            $('.fm-right-header-user-management').addClass('hidden');
+        }
+        else {
+            $('.fm-right-header').removeClass('hidden');
+            $('.fm-right-header-user-management').addClass('hidden');
+        }
+
         $('.fm-chat-block').addClass('hidden');
     }
 
@@ -4108,6 +4132,10 @@ FileManager.prototype.onSectionUIOpen = function(id) {
 
     if (id !== 'contacts') {
         $('.contacts-tabs-bl').addClass('hidden');
+    }
+
+    if (tmpId !== 'gallery') {
+        $('.gallery-view').addClass('hidden');
     }
 
     $(".fm-left-panel:not(.chat-lp-body)").removeClass('hidden');
@@ -4164,7 +4192,8 @@ FileManager.prototype.onSectionUIOpen = function(id) {
     let panel;
 
     if ((id === 'cloud-drive' && !folderlink) || id === 'shared-with-me' || id === 'out-shares' ||
-        id === 'public-links' || id === 'inbox' || id === 'rubbish-bin' || id === 'recents') {
+        id === 'public-links' || id === 'inbox' || id === 'rubbish-bin' || id === 'recents' ||
+        id === "photos" || id === "images" || id === "videos") {
         M.initLeftPanel();
     }
     else if (id === 'cloud-drive' || id === 'dashboard' || id === 'account') {
@@ -4294,17 +4323,20 @@ FileManager.prototype.initStatusBarLinks = function() {
 FileManager.prototype.initLeftPanel = function() {
     'use strict';
 
+    const isGallery = M.currentCustomView.type === 'gallery';
     let elements = document.getElementsByClassName('js-lpbtn');
 
     for (var i = elements.length; i--;) {
         elements[i].classList.remove('active');
     }
 
-    elements = document.getElementsByClassName('js-lp-myfiles');
+    elements = document.getElementsByClassName(isGallery ? 'js-lp-gallery' : 'js-lp-myfiles');
 
     for (var j = elements.length; j--;) {
         elements[j].classList.remove('hidden');
     }
+
+    document.getElementsByClassName('js-lp-storage-usage')[0].classList.remove('hidden');
 
     this.checkLeftStorageBlock();
 
@@ -4326,6 +4358,10 @@ FileManager.prototype.initLeftPanel = function() {
     else if (M.currentrootid === M.RubbishID) {
         $('.js-lpbtn[data-link="bin"]').addClass('active');
     }
+    else if (isGallery) {
+        $(`.js-lpbtn[data-link="${M.currentdirid}"]`).addClass('active');
+    }
+
 
     $('.js-lpbtn').rebind('click.openSubTab', function(e) {
 
@@ -4348,9 +4384,68 @@ FileManager.prototype.initLeftPanel = function() {
         else if (link === 'upgrade') {
             loadSubPage('pro');
         }
+        else if (M.isCustomView(link).type === 'gallery') {
+
+            onIdle(() => {
+
+                const gallery = mega.gallery[link];
+
+                if (gallery && link === M.previousdirid) {
+
+                    gallery.mode = false;
+                    gallery.setMode('a', 1);
+                }
+            });
+        }
     });
 };
 
+FileManager.prototype.getCameraUploads = async function() {
+
+    "use strict";
+
+    const nodes = [];
+    const res = await Promise.resolve(mega.attr.get(u_handle, "cam", false, true)).catch(nop);
+
+    if (!res) {
+        return;
+    }
+
+    const handle = base64urlencode(res.h);
+
+    if (!handle) {
+        return;
+    }
+
+    nodes.push(handle);
+    M.CameraId = handle;
+
+    this.cameraUploadUI();
+
+    // Currently not in use, enable it once requires it.
+    // handle = base64urlencode(res.sh);
+
+    // if (handle) {
+    //     nodes.push(handle);
+    //     M.SecondCameraId = handle;
+    // }
+
+    return nodes;
+};
+
+FileManager.prototype.cameraUploadUI = function() {
+
+    "use strict";
+
+    if (M.CameraId) {
+
+        const target = document.querySelector('#treea_' + M.CameraId + ' .nw-fm-tree-folder');
+
+        if (target) {
+            target.classList.add('camera-folder');
+        }
+    }
+};
 
 (function(global) {
     'use strict';

@@ -350,6 +350,9 @@ MegaData.prototype.buildtree = function(n, dialog, stype, sDeepIndex) {
                 else if (mega.megadrop.pufs[curItemHandle] && mega.megadrop.pufs[curItemHandle].s !== 1) {
                     node.classList.add('puf-folder');
                 }
+                else if (curItemHandle === M.CameraId) {
+                    node.classList.add('camera-folder');
+                }
                 node.textContent = name;
                 html = node.parentNode.parentNode;
 
@@ -1311,6 +1314,11 @@ MegaData.prototype.onTreeUIOpen = function(id, event, ignoreScroll) {
     else if (id_s === 'recents') {
         this.onSectionUIOpen('recents');
     }
+    else if (M.isCustomView(id_s).type === 'gallery') {
+        this.onSectionUIOpen(id_s);
+    }
+
+
 
     if (!fminitialized) {
         if (d) {

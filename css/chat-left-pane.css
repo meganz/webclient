@@ -70,10 +70,6 @@
     top: 0;
     margin: 8px 0 0 8px;
 }
-.fm-left-menu.conversations {
-    height: 46px;
-    background-color: var(--stroke-grey-2);
-}
 .conversations .conversations-head {
     display: flex;
     justify-content: space-between;

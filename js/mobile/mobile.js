@@ -1125,6 +1125,7 @@ function removeFromMultiInputDDL() {}
 function slideshow_handle() {}
 function dashboardUI() {}
 function affiliateUI() {}
+function galleryUI() {}
 accountUI.account = {
     renderBirthYear: function() {},
     renderBirthMonth: function() {},

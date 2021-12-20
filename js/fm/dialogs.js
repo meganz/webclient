@@ -226,24 +226,31 @@
         }
 
         const scope = dialog.querySelector('.fm-picker-breadcrumbs');
-        const dictionary = handle => {
+        const dictionary = function _(handle) {
+
+            // If this is gallery view, make it default to root path instead
+            if (M.isCustomView(handle).type === 'gallery') {
+                return _(M.RootID);
+            }
+
             let name = names[handle] || M.getNameByHandle(handle) || '';
             let id = handle;
             let typeClass = 'folder';
 
+            const typeClasses = {
+                [M.RootID]: 'cloud-drive',
+                [M.RubbishID]: 'rubbish-bin',
+                'contacts': 'contacts',
+                'shares': 'shared-with-me'
+            };
+
             if (handle === M.RootID) {
                 if (!folderlink) {
-                    typeClass = 'cloud-drive';
+                    typeClass = typeClasses[handle];
                 }
             }
-            else if (handle === M.RubbishID) {
-                typeClass = 'rubbish-bin';
-            }
-            else if (handle === 'contacts') {
-                typeClass = 'contacts';
-            }
-            else if (handle === 'shares') {
-                typeClass = 'shared-with-me';
+            else if (typeClasses[handle]) {
+                typeClass = typeClasses[handle];
             }
             else if (handle.length === 11) {
                 typeClass = 'contact';

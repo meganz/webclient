@@ -1396,7 +1396,8 @@ MegaUtils.prototype.checkForDuplication = function(id) {
     if (M.currentrootid === M.RubbishID
         || id === 'shares'
         || String(id).indexOf('search/') > -1
-        || M.getNodeRights(id) < 2) {
+        || M.getNodeRights(id) < 2
+        || M.currentCustomView.type === 'gallery') {
         return;
     }
 

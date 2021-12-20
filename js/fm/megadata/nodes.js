@@ -190,6 +190,9 @@ MegaData.prototype.getPath = function(id) {
             || (id === 'public-links')
             || (id === this.InboxID)
             || (id === 'contacts')
+            || (id === 'photos')
+            || (id === 'images')
+            || (id === 'videos')
         ) {
             result.push(id);
         }
@@ -265,8 +268,14 @@ MegaData.prototype.isCustomView = function(pathOrID) {
     var result = Object.create(null);
     result.original = pathOrID;
 
+    if (pathOrID === 'photos' || pathOrID === 'images' || pathOrID === 'videos') {
+        result.type = 'gallery';
+        result.nodeID = pathOrID;
+        result.prefixTree = '';
+        result.prefixPath = '';
+    }
     // This is a out-share id from tree
-    if (pathOrID.substr(0, 3) === 'os_') {
+    else if (pathOrID.substr(0, 3) === 'os_') {
         result.type = 'out-shares';
         result.nodeID = pathOrID.replace('os_', '');
         result.prefixTree = 'os_';
@@ -1014,6 +1023,7 @@ MegaData.prototype.moveNodes = function moveNodes(n, t, quiet, folderDefaultConf
                 && String(M.currentdirid).split("/")[0] !== "search") {
                 removeUInode(h, p);
             }
+
             M.nodeUpdated(n);
             newnodes.push(n);
 
@@ -1778,6 +1788,13 @@ MegaData.prototype.nodeUpdated = function(n, ignoreDB) {
         // if node in cached mode in editor, clear it
         if (mega && mega.fileTextEditor) {
             mega.fileTextEditor.clearCachedFileData(n.h);
+        }
+
+        if (M.currentCustomView.type === 'gallery') {
+            mega.gallery.checkEveryGalleryUpdate(n);
+        }
+        else {
+            mega.gallery.nodeUpdated = true;
         }
 
         // Update versioning dialog if it is open and the folder is its parent folder,

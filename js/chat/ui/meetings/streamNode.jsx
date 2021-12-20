@@ -277,6 +277,7 @@ export default class StreamNode extends MegaRenderMixin {
             chatRoom,
             menu,
             className,
+            simpleTip,
             ephemeralAccounts,
             onClick,
             onCallMinimize,
@@ -291,7 +292,12 @@ export default class StreamNode extends MegaRenderMixin {
                     ${onClick ? 'clickable' : ''}
                     ${className ? className : ''}
                     ${this.state.loading !== StreamNode.LOADING_STATE.LOADED ? 'loading' : ''}
+                    ${simpleTip ? 'simpletip' : ''}
                 `}
+                data-simpletip={simpleTip?.label}
+                data-simpletipposition={simpleTip?.position}
+                data-simpletipoffset={simpleTip?.offset}
+                data-simpletip-class={simpleTip?.className}
                 onClick={() => onClick && onClick(stream)}>
                 {stream && (
                     <>

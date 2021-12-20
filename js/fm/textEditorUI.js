@@ -503,6 +503,14 @@ mega.textEditorUI = new function TextEditorUI() {
                         }
                     }, 60);
                 });
+
+                // For stopping showing keyboard on mobile browsers
+                if (is_mobile) {
+                    $('.CodeMirror-scroll', $editorContainer).rebind('click tap', () => {
+                        document.activeElement.blur();
+                        return false;
+                    });
+                }
             }
             else {
                 pushHistoryState();

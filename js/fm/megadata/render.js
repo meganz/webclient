@@ -39,9 +39,6 @@ MegaData.prototype.renderMain = function(aUpdate) {
                 fa_duplicates = Object.create(null);
                 fa_reqcnt = 0;
             }
-            if ($.rmItemsInView) {
-                $.rmInitJSP = this.fsViewSel;
-            }
         }
         this.rmSetupUI(aUpdate, aUpdate ? !!$.dbOpenHandle : false);
     }
@@ -51,6 +48,16 @@ MegaData.prototype.renderMain = function(aUpdate) {
     if (!container || typeof container === 'string') {
         this.megaRender.destroy();
         delete this.megaRender;
+    }
+    else if (!aUpdate) {
+        Object.defineProperty(this, 'rmItemsInView', {
+            get() {
+                const l = Object(M.megaRender).megaList;
+                const c = l && l._calculated || false;
+                return c.itemsPerPage + c.itemsPerRow * 2 | 0;
+            },
+            configurable: true
+        });
     }
 
     if (d) {

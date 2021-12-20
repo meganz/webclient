@@ -3884,16 +3884,6 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
         M.hideClickHint();
     });
 
-    if ($.rmInitJSP) {
-        var jsp = $($.rmInitJSP).data('jsp');
-        if (jsp) {
-            jsp.reinitialise();
-        }
-        if (d) {
-            console.log('jsp:!u', !!jsp);
-        }
-        delete $.rmInitJSP;
-    }
     if (!refresh) {
         $.tresizer();
     }

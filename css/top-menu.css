@@ -240,6 +240,10 @@
     padding: 24px 6px 6px;
 }
 
+.top-menu-footer .logout {
+    flex-shrink: 0;
+}
+
 .top-mega-version {
     font: var(--text-body1-bold);
     color: var(--text-color-low);

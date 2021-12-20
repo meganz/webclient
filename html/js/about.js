@@ -132,7 +132,7 @@ var aboutus = {
                 $(this).addClass('selected');
                 aboutus.updateOlderEvents($(this));
                 // hacky way to update timeline for now
-                const step = $(this).attr('class') === 'older-event selected' ? "prev" : "next";
+                const step = $(this).hasClass('older-event selected') ? "prev" : "next";
                 const $selectedDate = $('.selected', timelineComponents.eventsWrapper);
                 const $newEvent = $selectedDate.parent('li').children('a');
                 aboutus.updateOlderEvents($newEvent);

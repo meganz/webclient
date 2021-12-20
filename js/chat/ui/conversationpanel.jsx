@@ -437,7 +437,7 @@ export class ConversationRightArea extends MegaRenderMixin {
                                 ) : null
                             }
                             {
-                                (!room.isReadOnly() && (room.type === "public")) ?
+                                room.type === "public" ?
                                     (
                                         <div
                                             className={`

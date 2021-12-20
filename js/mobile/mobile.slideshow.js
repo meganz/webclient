@@ -24,6 +24,9 @@ mobile.slideshow = {
     /** The flag for hiding header and footer buttons */
     hideHFFlag: false,
 
+    /** Define Array of file types required to load in full size */
+    requiredFullSizeImgTypes: {'gif': null},
+
     /**
      * Initialise the preview slideshow
      * @param {String} nodeHandle The handle of the image to load first
@@ -162,9 +165,11 @@ mobile.slideshow = {
      * @param {String} slideClass The slide to show e.g. left, mid, or right
      * @param {Boolean} initialLoad Optional flag for if this is the initial load of the previewer
      */
-    fetchImageFromApi: function(nodeHandle, callbackFunction, slideClass, initialLoad) {
+    fetchImageFromApi: async function(nodeHandle, callbackFunction, slideClass, initialLoad) {
         'use strict';
         var node = M.getNodeByHandle(nodeHandle);
+        const ext = fileext(node.name, false, true);
+        const loadFullSize = ext in mobile.slideshow.requiredFullSizeImgTypes;
 
         if (is_video(node)) {
             mobile.slideshow.showLoadingAnimation();
@@ -175,7 +180,7 @@ mobile.slideshow = {
         }
 
         // If this is the first load, show a regular loading dialog until the whole previewer has loaded
-        if (typeof initialLoad !== 'undefined') {
+        if (typeof initialLoad !== 'undefined' && page !== 'download') {
             loadingDialog.show();
         }
         else {
@@ -207,12 +212,25 @@ mobile.slideshow = {
             callbackFunction(nodeHandle, slideClass);
         };
 
-        getImage(node, 1).then(done).catch(function(ex) {
+        if (loadFullSize) {
+            const data = await M.gfsfetch(node.link || node.h, 0, -1).catch(nop);
+
+            if (data) {
+                done(mObjectURL([data.buffer || data], `image/${ext}`));
+                return;
+            }
+            if (d) {
+                console.warn('Failed to retrieve full GIF file, failing back to load preview image...');
+            }
+        }
+
+        getImage(node, 1).then(done).catch((ex) => {
             if (d) {
                 console.warn('Preview image retrieval failed.', nodeHandle, ex);
             }
             done(window.noThumbURI);
         });
+
     },
 
     /**
@@ -576,7 +594,13 @@ mobile.slideshow = {
 
         // On close button click/tap
         mobile.slideshow.$overlay.find('.fm-dialog-close').off().on('tap', function(e) {
-            mobile.slideshow.close();
+            if (page === 'download') {
+                mobile.slideshow.hideHFFlag = true;
+                $('.mobile.slideshow-image-previewer').removeClass('fullscreen').addClass('browserscreen');
+            }
+            else {
+                mobile.slideshow.close();
+            }
             // Prevent double taps
             return false;
         });
@@ -716,5 +740,6 @@ mobile.slideshow = {
         }
         mobile.slideshow.initDownloadButton(nodeHandle);
 
-    }
+    },
+
 };

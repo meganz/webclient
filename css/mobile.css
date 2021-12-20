@@ -5066,7 +5066,8 @@ div.checkboxOn {
 /* Download Page Image Viewer */
 .download-previewer .mobile.slideshow-header .slideshow-file-number-and-total,
 .download-previewer .mobile.slideshow-buttons,
-.download-previewer .mobile.slide-show-navigation,
+.download-previewer .mobile.slide-show-navigation .slideshow-back-arrow,
+.download-previewer .mobile.slide-show-navigation .slideshow-forward-arrow,
 .download-previewer .mobile.slide-show-navigation .slideshow-forward-arrow {
     display: none;
 }
@@ -5077,6 +5078,13 @@ div.checkboxOn {
 .download-complete .download-previewer .mobile.slideshow-wrapper {
     display: block;
 }
+.mobile.slideshow-image-previewer.fullscreen {
+    position: fixed;
+}
+.mobile.slideshow-image-previewer.browserscreen .slideshow-header {
+    display: none;
+}
+
 .mobile.left-buttons {
     display: inline-block;
     float: left;
@@ -5111,6 +5119,12 @@ div.checkboxOn {
     -ms-transition: left 200ms ease-in-out;
     transition: left 200ms ease-in-out;
     background: rgba(0, 0, 0, 1);
+}
+.mobile.slideshow-image-previewer.browserscreen .mobile.slides {
+    background-color: white;
+}
+.pdf .mobile.slideshow-image-previewer.browserscreen .mobile.slides {
+    background-color: #F7F7F7;
 }
 .mobile.slides.left {
     left: -100%;
@@ -14611,6 +14625,9 @@ body.landscape .upload-overlay .mobile.filetype-img {
     z-index: 99;
     margin: auto;
     transform: translate(-50%, -50%);
+}
+.download-page.mobile .browserscreen .viewer-pending > div {
+    background-color: #b2b2b3;
 }
 .download-page .info-block .filename {
     font: var(--text-h3-bold);

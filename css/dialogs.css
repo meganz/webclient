@@ -2090,6 +2090,7 @@ body.de .mega-dialog.new-group-chat {
         cursor: pointer;
     }
     .mega-dialog.export-links-dialog button.remove-date {
+        left: -4px;
         z-index: 1200;
     }
     .mega-dialog.export-links-dialog .links {

@@ -1110,6 +1110,7 @@ MegaData.prototype.addTreeUI = function() {
 
     $(
         '.fm-tree-panel .nw-fm-tree-item,' +
+        '.js-fm-left-panel .js-lpbtn.cloud-drive,' +
         '.rubbish-bin,' +
         '.fm-breadcrumbs,' +
         '.nw-fm-left-icons-panel .nw-fm-left-icon,' +

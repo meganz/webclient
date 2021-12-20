@@ -314,6 +314,20 @@ FileManager.prototype.initFileManagerUI = function() {
                     }
                 }
             }
+            else if (c && c.indexOf('js-lpbtn') > -1 && a === 'drop') {
+                if (c.indexOf('cloud-drive') > -1) {
+                    // Drag and drop to the cloud drive in the file manager left panel
+                    t = M.RootID;
+                }
+                else if (c.indexOf('rubbish-bin') > -1) {
+                    // Drag and drop to the rubbish bin in the file manager left panel
+                    t = M.RubbishID;
+                }
+            }
+            else if (c && c.indexOf('js-lpbtn') > -1 && c.indexOf('cloud-drive') > -1 && a === 'over') {
+                // Drag and over the cloud drive in the file manager left panel
+                t = M.RootID;
+            }
             else if (c && c.indexOf('nw-fm-tree-item') > -1 && !$(e.target).visible(!0)) {
                 dd = 'download';
             }

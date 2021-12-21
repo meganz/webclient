@@ -25,7 +25,7 @@
     left: 50%;
     -webkit-transform: translate(-50%, -50%); /* iOS */
     transform: translate(-50%, -50%);
-    font: var(--text-h0-bold);
+    font: var(--text-h0-bb-bold);
     color: var(--text-color-black-high);
     font-family: var(--text-font-family-montserrat-light);
 }

@@ -142,7 +142,16 @@ MegaData.prototype.sortByEmail = function(d) {
 };
 
 MegaData.prototype.sortByModTime = function(d) {
-    this.sortfn = function(a, b, d) {
+    this.sortfn = this.sortByModTimeFn();
+    this.sortd = d;
+    this.sort();
+};
+
+MegaData.prototype.sortByModTimeFn = () => {
+
+    "use strict";
+
+    return (a, b, d) => {
 
         // folder not having mtime, so sort by Name.
         if (!a.mtime || !b.mtime) {
@@ -157,8 +166,6 @@ MegaData.prototype.sortByModTime = function(d) {
 
         return M.doFallbackSortWithName(a, b, d);
     };
-    this.sortd = d;
-    this.sort();
 };
 
 MegaData.prototype.sortByDateTime = function(d) {

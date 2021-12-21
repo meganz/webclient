@@ -320,6 +320,10 @@
             }
         }
 
+        if (localStorage.testWebGL) {
+            return WebGLMEGAContext.test(...files);
+        }
+
         if (localStorage.testDCRaw) {
             (function _rawNext(files) {
                 var file = files.pop();
@@ -327,12 +331,6 @@
                     return console.info('No more files.');
                 }
                 var id = Math.random() * 9999 | 0;
-                window.__render_thumb = function(img, u8) {
-                    console.timeEnd('createthumbnail' + id);
-                    console.info('testDCRaw result', toArray.apply(null, arguments));
-                    onIdle(_rawNext.bind(null, files));
-                    M.saveAs(u8, file.name + '.png');
-                };
                 var img = is_image(file.name);
                 var raw = typeof img === 'string' && img;
 
@@ -341,7 +339,13 @@
                     return _rawNext(files);
                 }
 
-                createthumbnail(file, false, id, null, null, {raw: raw});
+                createthumbnail(file, false, id, null, null, {raw: raw})
+                    .then((res) => {
+                        console.info('testDCRaw result', res);
+                        onIdle(_rawNext.bind(null, files));
+                        M.saveAs(res.preview, `${file.name}.png`);
+                    })
+                    .dump(id);
 
             })(toArray.apply(null, files));
             return;

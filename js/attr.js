@@ -1291,6 +1291,31 @@
         };
         uaPacketParserHandler['^!csp'] = () => 'csp' in window && csp.init();
 
+        uaPacketParserHandler['*!cam'] = function(userHandle) {
+
+            mega.attr.get(userHandle, "cam", false, true, (res, ctx) => {
+
+                u_attr[ctx.ua] = base64urlencode(
+                    tlvstore.blockEncrypt(
+                        tlvstore.containerToTlvRecords(res), u_k, tlvstore.BLOCK_ENCRYPTION_SCHEME.AES_GCM_12_16
+                    )
+                );
+
+                if (fminitialized) {
+
+                    M.CameraId = base64urlencode(res.h);
+                    // M.SecondCameraId = base64urlencode(res.sh);
+
+                    M.cameraUploadUI();
+                    mega.gallery.nodeUpdated = true;
+
+                    if (M.currentCustomView.type === 'gallery') {
+                        galleryUI();
+                    }
+                }
+            });
+        };
+
         if (d) {
             global._uaPacketParserHandler = uaPacketParserHandler;
         }

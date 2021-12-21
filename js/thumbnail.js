@@ -1,8 +1,9 @@
 /* jshint -W003 */// 'noThumbURI' was used before it was defined.
 
 function createnodethumbnail(node, aes, id, imagedata, opt, ph, file) {
+    'use strict';
     storedattr[id] = Object.assign(Object.create(null), {'$ph': ph, target: node});
-    createthumbnail(file || false, aes, id, imagedata, node, opt);
+    createthumbnail(file || false, aes, id, imagedata, node, opt).catch(nop);
 
     var uled = ulmanager.getEventDataByHandle(node);
     if (uled && !uled.thumb) {
@@ -56,449 +57,122 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
         onPreviewRetry = !!opt;
     }
 
+    const tag = `createthumbnail(${file && file.name || Math.random().toString(26).slice(-6)}).${id}`;
+    const debug = (m, ...a) => console.warn(`[${tag}] ${m}`, ...a);
+
+    const n = M.getNodeByHandle(node);
+    const fa = String(n && n.fa);
+    const ph = Object(storedattr[id]).$ph;
+    const createThumbnail = !fa.includes(':0*');
+    const createPreview = !fa.includes(':1*') || onPreviewRetry;
+    const canStoreAttr = !n || !n.u || n.u === u_handle && n.f !== u_handle;
+
+    if (!createThumbnail && !createPreview) {
+        debug('Neither thumbnail nor preview needs to be created.', n);
+        return Promise.resolve(EEXIST);
+    }
+
     if (d) {
-        console.time('createthumbnail' + id);
+        console.time(tag);
     }
 
     var sendToPreview = function(h, ab) {
         var n = h && M.getNodeByHandle(h);
 
-        if (n && fileext(n.name) !== 'pdf' && !is_video(n)) {
+        if (n && fileext(n.name, 0, 1) !== 'pdf' && !is_video(n)) {
             previewimg(h, ab || dataURLToAB(noThumbURI));
         }
     };
 
-    var img = new Image();
-    img.id = id;
-    img.aes = aes;
-    img.onload = tryCatch(function() {
-        var t = new Date().getTime();
-        var n = M.getNodeByHandle(node);
-        var fa = '' + (n && n.fa);
-        var ph = Object(storedattr[id]).$ph;
-        var dataURI;
-        var canvas;
-        var ctx;
-        var ab;
-        var imageType = 'image/jpeg';
-        var canStoreAttr = !n || !n.u || (n.u === u_handle && n.f !== u_handle);
+    const getSourceImage = async(source) => {
+        const buffer = await webgl.readAsArrayBuffer(source);
 
-        if (img.doesSupportAlpha) {
-            var transparent;
-
-            canvas = document.createElement('canvas');
-            ctx = canvas.getContext("2d");
-            canvas.width = this.naturalWidth;
-            canvas.height = this.naturalHeight;
-            ctx.drawImage(this, 0, 0, canvas.width, canvas.height);
-            ab = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
-
-            for (var i = 0; i < ab.length; i += 4) {
-                if (ab[i + 3] < 0xff) {
-                    transparent = true;
-                    break;
-                }
+        if (thumbHandler) {
+            const res = await thumbHandler(buffer);
+            source = res.buffer || res;
+        }
+        else if (isRawImage) {
+            if (typeof dcraw === 'undefined') {
+                await Promise.resolve(M.require('dcrawjs')).catch(dump);
             }
-
-            if (transparent) {
-                imageType = 'image/png';
+            const {data, orientation} = webgl.decodeRAWImage(isRawImage, buffer);
+            if (data) {
+                source = data;
+                source.orientation = orientation;
             }
         }
+        return source;
+    };
 
-        if (d) {
-            console.debug('createthumbnail', imageType);
-        }
+    const store = ({thumbnail, preview}) => {
+        if (canStoreAttr) {
+            // FIXME hack into cipher and extract key
+            const key = aes._key[0].slice(0, 4);
 
-        // thumbnail:
-        if (fa.indexOf(':0*') < 0) {
-            // XXX: Make this width/height divisible by 16 for optimal SmartCrop results!
-            var options = {
-                width: 240,
-                height: 240
-            };
-
-            canvas = document.createElement('canvas');
-            ctx = canvas.getContext("2d");
-            canvas.width = options.width;
-            canvas.height = options.height;
-
-            if (this.naturalWidth > options.width || this.naturalHeight > options.height) {
-                if (d) {
-                    console.time('smartcrop');
-                }
-                var crop = SmartCrop.crop(this, options).topCrop;
-                ctx.drawImage(this, crop.x, crop.y, crop.width, crop.height, 0, 0, canvas.width, canvas.height);
-
-                if (d) {
-                    console.timeEnd('smartcrop');
-                }
+            if (thumbnail) {
+                api_storefileattr(id, 0, key, thumbnail, n.h, ph);
             }
-            else {
-                imageType = 'image/png';
-
-                ctx.drawImage(this,
-                    (options.width / 2) - (this.naturalWidth / 2),
-                    (options.height / 2) - (this.naturalHeight / 2));
-            }
-
-            ab = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
-
-            var len = ab.byteLength;
-            while (len-- && !ab[len]) {}
-            if (len < 0) {
-                console.warn('All pixels are black, aborting thumbnail creation...', ab.byteLength);
-                return img.onerror('Unsupported image type/format.');
-            }
-            len = ab.byteLength;
-            while (len-- && ab[len] === 0xff) {}
-            if (len < 0) {
-                console.warn('All pixels are white, aborting thumbnail creation...', ab.byteLength);
-                return img.onerror('...potentially tainted canvas');
-            }
-
-            dataURI = canvas.toDataURL(imageType, 0.80);
-            // if (d) console.log('THUMBNAIL', dataURI);
-
-            if (canStoreAttr) {
-                ab = dataURLToAB(dataURI);
-
-                // FIXME hack into cipher and extract key
-                api_storefileattr(this.id, 0, this.aes._key[0].slice(0, 4), ab.buffer, n && n.h, ph);
-            }
-
-            if (node) {
-                delete th_requested[node];
-            }
-        }
-
-        // preview image:
-        if (fa.indexOf(':1*') < 0 || onPreviewRetry) {
-            canvas = document.createElement('canvas');
-            var preview_x = this.width,
-                preview_y = this.height;
-            if (preview_x > 1000) {
-                preview_y = Math.round(preview_y * 1000 / preview_x);
-                preview_x = 1000;
-            }
-            else if (preview_y > 1000) {
-                preview_x = Math.round(preview_x * 1000 / preview_y);
-                preview_y = 1000;
-            }
-            ctx = canvas.getContext("2d");
-            canvas.width = preview_x;
-            canvas.height = preview_y;
-            ctx.drawImage(this, 0, 0, preview_x, preview_y);
-
-            dataURI = canvas.toDataURL('image/jpeg', 0.85);
-            // if (d) console.log('PREVIEW', dataURI);
-
-            ab = dataURLToAB(dataURI);
 
             // only store preview when the user is the file owner, and when it's not a
             // retry (because then there is already a preview image, it's just unavailable)
-
-            if (!onPreviewRetry && canStoreAttr && fa.indexOf(':1*') < 0) {
-                if (d) {
-                    console.log('Storing preview...', n);
-                }
-                // FIXME hack into cipher and extract key
-                api_storefileattr(this.id, 1, this.aes._key[0].slice(0, 4), ab.buffer, n && n.h, ph);
+            if (preview && !onPreviewRetry) {
+                api_storefileattr(id, 1, key, preview, n.h, ph);
             }
+        }
 
-            sendToPreview(node, ab);
+        if (node) {
+            delete th_requested[node];
+        }
+        sendToPreview(node, preview);
 
+        return {thumbnail, preview};
+    };
+
+    return (async() => {
+        const exifFromImage = !!exifImageRotation.fromImage;
+
+        if (isVideo && file) {
+            await Promise.resolve(M.require('videostream'));
+            imagedata = await Streamer.getThumbnail(file);
+        }
+        else if (isRawImage && !exifFromImage) {
+            // We don't need to rotate images ourselves, so we will decode it into a worker.
             if (d) {
-                console.log('total time:', new Date().getTime() - t);
+                debug('Leaving %s image decoding to worker...', isRawImage);
             }
+            isRawImage = false;
         }
 
-        if (d) {
-            console.timeEnd('createthumbnail' + id);
+        let source = imagedata || file;
+
+        if (thumbHandler || isRawImage) {
+            source = await getSourceImage(source);
         }
 
-        delete this.aes;
-        img = null;
-    }, img.onerror = function(e) {
+        if (!(source instanceof ImageData) && !exifFromImage) {
+            source = await webgl.getRotatedImageData(source);
+        }
+
+        const res = store(await webgl.worker('scissor', {source, createPreview, createThumbnail}));
+
         if (d) {
-            console.timeEnd('createthumbnail' + id);
-            console.warn('Failed to create thumbnail', e);
+            console.timeEnd(tag);
+        }
+        return res;
+    })().catch(ex => {
+        if (d) {
+            console.timeEnd(tag);
+            debug('Failed to create thumbnail', ex);
         }
 
         sendToPreview(node);
-        api_req({a: 'log', e: 99665, m: 'Thumbnail creation failed.'});
-        mBroadcaster.sendMessage('fa:error', id, e, false, 2);
+        mBroadcaster.sendMessage('fa:error', id, ex, false, 2);
+
+        if (!window.pfid && canStoreAttr) {
+            eventlog(99665, fileext(M.getNodeByHandle(node).name));
+        }
+        throw new MEGAException(ex, imagedata || file);
     });
-
-    if (typeof FileReader !== 'undefined') {
-        var loader = function() {
-            var ThumbFR = new FileReader();
-            ThumbFR.onload = function(e) {
-                var thumbData;
-                var orientation;
-                var u8 = new Uint8Array(ThumbFR.result);
-
-                if (u8.byteLength < 4) {
-                    console.error('Unable to create thumbnail, data too short...');
-                    return;
-                }
-
-                img.dataSize = u8.byteLength;
-                img.is64bit = browserdetails(ua).is64bit;
-
-                // Deal with huge images...
-                if (!img.is64bit && img.dataSize > (36 * 1024 * 1024)) {
-                    // Let dcraw try to extract a thumbnail
-                    if (typeof dcraw !== 'undefined') {
-                        isRawImage = isRawImage || 'not-really';
-                    }
-                    img.huge = true;
-                }
-
-                if (thumbHandler) {
-                    return thumbHandler(u8.buffer, function(ab) {
-                        if (ab) {
-                            __render_thumb(img, ab);
-                        }
-                        else {
-                            if (d) {
-                                console.debug('%s failed to process the resource...', thumbHandler.name);
-                            }
-                            img.src = 'data:text/xml,decoderror';
-                        }
-                    });
-                }
-
-                if (isRawImage) {
-                    var FS = dcraw.FS;
-                    var run = dcraw.run;
-                    var filename = file.name || (Math.random() * Date.now()).toString(36) + '.' + isRawImage;
-
-                    try {
-                        var cwd = '/MEGA-' + Date.now();
-                        FS.mkdir(cwd);
-                        FS.chdir(cwd);
-
-                        if (d) {
-                            console.time('dcraw-load');
-                        }
-                        var data = FS.createDataFile('.', filename, u8, true, false);
-                        if (d) {
-                            console.timeEnd('dcraw-load');
-                        }
-
-                        if (d) {
-                            console.time('dcraw-proc');
-                        }
-                        if (d) {
-                            run(['-i', '-v', filename]);
-                        }
-                        run(['-e', filename]);
-                        if (d) {
-                            console.timeEnd('dcraw-proc');
-                        }
-                    }
-                    catch (e) {
-                        if (d) {
-                            console.error('dcraw error', e);
-                        }
-                    }
-
-                    var thumb = filename.substr(0, filename.lastIndexOf('.'));
-                    try {
-                        thumbData = FS.readFile(thumb + '.thumb.jpg');
-                    }
-                    catch (e) {
-                        if (e.code !== 'ENOENT') {
-                            console.error('FS.readFile error', e);
-                        }
-
-                        try {
-                            var ppm = FS.readFile(thumb + '.thumb.ppm');
-                            thumbData = ppmtojpeg(ppm);
-                        }
-                        catch (e) {
-                            if (e.code !== 'ENOENT') {
-                                console.error('FS.readFile error', e);
-                            }
-                            else {
-                                if (d) {
-                                    console.log(filename + ' has no thumbnail, converting whole image...');
-                                    console.time('dcraw-conv');
-                                }
-                                api_req({a: 'log', e: 99662, m: 'RAW image w/o thumbnail.'});
-
-                                run(['-O', thumb + '.ppm', filename]);
-
-                                try {
-                                    thumbData = ppmtojpeg(FS.readFile(thumb + '.ppm'));
-                                }
-                                catch (e) {
-                                }
-
-                                if (d) {
-                                    console.timeEnd('dcraw-conv');
-                                }
-                            }
-                        }
-                    }
-
-                    try {
-                        FS.unlink(filename);
-                    }
-                    catch (ex) {
-                        if (ex.code !== 'ENOENT') {
-                            console.error('FS.unlink error', ex);
-                        }
-                    }
-
-                    if (thumbData) {
-                        api_req({a: 'log', e: 99663, m: 'RAW image processed.'});
-                    }
-                    else {
-                        api_req({a: 'log', e: 99664, m: 'Failed to decode RAW image.'});
-                    }
-
-                    try {
-                        FS.readdir('.').map(function(n) {
-                            n != '.' && n != '..' && FS.unlink(n)
-                        });
-                        FS.readdir('/tmp').map(function(n) {
-                            n != '.' && n != '..' && FS.unlink('/tmp/' + n)
-                        });
-                        FS.chdir('..');
-                        FS.rmdir(cwd);
-                    }
-                    catch (e) {
-                        if (d) {
-                            console.error('dcraw error', e);
-                        }
-                    }
-
-                    switch (isRawImage) {
-                        // TODO: add other suitable formats
-                        case 'PEF':
-                            orientation = +u8[115];
-                            break;
-                    }
-                }
-
-                __render_thumb(img, thumbData || u8, orientation, isRawImage);
-                file = imagedata = undefined;
-            };
-            if (!file) {
-                var defMime = 'image/jpeg';
-                var curMime = MediaInfoLib.isFileSupported(node) ? defMime : filemime(M.d[node], defMime);
-                file = new Blob([new Uint8Array(imagedata)], {type: curMime});
-            }
-            if (mega.chrome && file.size > 6e8) {
-                console.warn('Aborting thumbnail creation due https://crbug.com/536816 ...');
-                img.src = 'data:text/xml,overflow';
-                return;
-            }
-            ThumbFR.readAsArrayBuffer(file);
-        };
-        var timeout = parseInt(localStorage.delayedThumbnailCreation) || 350 + Math.floor(Math.random() * 600);
-
-        loader = setTimeout.bind(window, loader, timeout);
-
-        if (isRawImage) {
-            M.require('dcrawjs').always(function() {
-                'use strict';
-
-                if (typeof dcraw !== 'undefined') {
-                    loader();
-                }
-                else {
-                    console.error('Failed to load dcraw.js');
-                }
-            });
-        }
-        else if (isVideo && file) {
-            M.require('videostream').tryCatch(function() {
-                Streamer.getThumbnail(file)
-                    .then(__render_thumb.bind(null, img))
-                    .catch(function(ex) {
-                        if (d) {
-                            console.warn('Aborting thumbnail creation for video file...', ex);
-                        }
-                        img.src = 'data:text/xml,streamerror';
-                    });
-            });
-        }
-        else {
-            loader();
-        }
-    }
-}
-
-function __render_thumb(img, u8, orientation, noMagicNumCheck) {
-    'use strict';
-
-    if (u8 && !noMagicNumCheck) {
-        var dv = new DataView(u8.buffer || u8);
-        // Perform magic number checks for each recognized image type by is_image() per file extension.
-        // Anything handled from mThumbHandler is meant to return a PNG, so we don't need to add a magic for eg SVG.
-        switch (dv.getUint16(0)) {
-            case 0xFFD8: // JPEG
-            case 0x4D4D: // TIFF, big-endian
-            case 0x4949: // TIFF, little-endian
-            case 0x424D: // BMP
-                break;
-
-            default:
-                if (dv.byteLength > 24 && dv.getUint32(20) === 0x68656963) { // HEIC
-                    break;
-                }
-                if (dv.byteLength > 24 && dv.getUint32(20) === 0x61766966) { // AVIF
-                    u8.type = 'image/avif';
-                    break;
-                }
-                if (dv.byteLength > 12 && dv.getUint32(8) === 0x57454250) { // WEBP
-                    img.doesSupportAlpha = true;
-                    break;
-                }
-                switch (dv.getUint32(0)) {
-                    case 0x89504e47: // PNG
-                        img.doesSupportAlpha = true;
-                        break;
-                    case 0x47494638: // GIF8
-                    case 0x47494639: // GIF9
-                        break;
-
-                    default:
-                        if (d) {
-                            console.warn('Unrecognized image format.', dv);
-                        }
-                        u8 = null;
-                }
-        }
-        dv = undefined;
-    }
-
-    if (u8) {
-        if (orientation === undefined || orientation < 1 || orientation > 8) {
-            if (d) {
-                console.time('exif');
-            }
-            var exif = EXIF.readFromArrayBuffer(u8, true);
-            orientation = parseInt(exif.Orientation) || 1;
-            if (d) {
-                console.timeEnd('exif');
-                console.debug('EXIF', exif, orientation);
-            }
-            exif = undefined;
-        }
-    }
-
-    if (!u8 || (img.huge && img.dataSize === u8.byteLength)) {
-        if (d) {
-            console.warn('Unable to generate thumbnail...');
-        }
-        img.src = noThumbURI;
-    }
-    else {
-        exifImageRotation(img, u8, orientation);
-    }
 }
 
 mBroadcaster.once('startMega', function() {
@@ -518,30 +192,31 @@ mBroadcaster.once('startMega', function() {
 
 /**
  * Rotate images as per the extracted EXIF orientation
- * @param {Image|Object} target Image element where to render the result
- * @param {ArrayBuffer} buffer The image file data
+ * @param {ArrayBuffer} source The image file data
  * @param {Number} orientation The EXIF rotation value
  */
-function exifImageRotation(target, buffer, orientation) {
+async function exifImageRotation(source, orientation) {
     'use strict';
-    var blobURI = mObjectURL([buffer], buffer.type || 'image/jpeg');
 
     orientation |= 0;
     if (orientation < 2 || exifImageRotation.fromImage < 0) {
         // No rotation needed.
-        target.src = blobURI;
+        return source;
     }
-    else {
+
+    return new Promise((resolve, reject) => {
         var img = new Image();
         var canvas = document.createElement('canvas');
-        var signalError = function() {
-            // let the target reach its onerror...
-            target.src = 'data:text/xml,error';
-
+        const cleanup = () => {
             if (exifImageRotation.fromImage) {
                 document.body.removeChild(img);
                 document.body.removeChild(canvas);
             }
+            URL.revokeObjectURL(img.src);
+        };
+        var signalError = function() {
+            reject();
+            cleanup();
         };
 
         if (exifImageRotation.fromImage) {
@@ -550,6 +225,7 @@ function exifImageRotation(target, buffer, orientation) {
             document.body.appendChild(img);
             document.body.appendChild(canvas);
         }
+
         img.onload = tryCatch(function() {
             var width = this.naturalWidth;
             var height = this.naturalHeight;
@@ -624,12 +300,9 @@ function exifImageRotation(target, buffer, orientation) {
 
             ctx.drawImage(img, 0, 0);
             ctx.restore();
-            target.src = canvas.toDataURL();
 
-            if (exifImageRotation.fromImage) {
-                document.body.removeChild(img);
-                document.body.removeChild(canvas);
-            }
+            queueMicrotask(cleanup);
+            resolve(ctx.getImageData(0, 0, canvas.width, canvas.height));
 
         }, img.onerror = function(ev) {
             if (d) {
@@ -637,58 +310,11 @@ function exifImageRotation(target, buffer, orientation) {
             }
             signalError();
         });
-        onIdle(function() {
-            img.src = blobURI;
-        });
-    }
 
-    setTimeout(function() {
-        URL.revokeObjectURL(blobURI);
-    }, 1e4);
-}
-
-function ppmtojpeg(ppm) {
-    var jpeg;
-    if (ppm[0] == 80 && ppm[1] == 54) // P6
-    {
-        var dim = '',
-            i = 2,
-            j;
-        if (d) {
-            console.time('ppmtojpeg');
-        }
-        while (ppm[++i] != 10) dim += String.fromCharCode(ppm[i]);
-        dim = dim.split(' ').map(Number);
-
-        if (ppm[i + 1] == 50 && ppm[i + 2] == 53 && ppm[i + 3] == 53) // 255
-        {
-            ppm = ppm.subarray(i + 5);
-            var canvas = document.createElement('canvas');
-            canvas.width = dim[0];
-            canvas.height = dim[1];
-            var ctx = canvas.getContext('2d');
-            var imageData = ctx.createImageData(canvas.width, canvas.height);
-            var ppmLen = ppm.byteLength,
-                iLen = canvas.width * canvas.height * 4;
-            i = 0;
-            j = 0;
-            while (i < ppmLen && j < iLen) {
-                var a = ppm[i] | ppm[i + 1] | ppm[i + 2];
-                imageData.data[j] = ppm[i];         // R
-                imageData.data[j + 1] = ppm[i + 1]; // G
-                imageData.data[j + 2] = ppm[i + 2]; // B
-                imageData.data[j + 3] = a ? 208 : 0;// A
-                j += 4;
-                i += 3;
-            }
-            ctx.putImageData(imageData, 0, 0);
-            jpeg = dataURLToAB(canvas.toDataURL('image/png', 0.90));
-        }
-        if (d) {
-            console.timeEnd('ppmtojpeg');
-        }
-    }
-    return jpeg;
+        img.src = source instanceof Blob
+            ? URL.createObjectURL(source)
+            : mObjectURL([source], source.type || 'image/jpeg');
+    });
 }
 
 function dataURLToAB(dataURL) {

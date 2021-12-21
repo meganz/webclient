@@ -39,9 +39,6 @@ MegaData.prototype.renderMain = function(aUpdate) {
                 fa_duplicates = Object.create(null);
                 fa_reqcnt = 0;
             }
-            if ($.rmItemsInView) {
-                $.rmInitJSP = this.fsViewSel;
-            }
         }
         this.rmSetupUI(aUpdate, aUpdate ? !!$.dbOpenHandle : false);
     }
@@ -51,6 +48,16 @@ MegaData.prototype.renderMain = function(aUpdate) {
     if (!container || typeof container === 'string') {
         this.megaRender.destroy();
         delete this.megaRender;
+    }
+    else if (!aUpdate) {
+        Object.defineProperty(this, 'rmItemsInView', {
+            get() {
+                const l = Object(M.megaRender).megaList;
+                const c = l && l._calculated || false;
+                return c.itemsPerPage + c.itemsPerRow * 2 | 0;
+            },
+            configurable: true
+        });
     }
 
     if (d) {
@@ -295,7 +302,7 @@ MegaData.prototype.renderTree = function() {
     });
 
     build('shares');
-    // We are no longer build this tree, howevee, just leave this for potential later usage.
+    // We are no longer build this tree, however, just leave this for potential later usage.
     // build('out-shares');
     // build('public-links');
     build(M.RootID);
@@ -310,11 +317,10 @@ MegaData.prototype.renderTree = function() {
 };
 
 MegaData.prototype.hideEmptyGrids = function hideEmptyGrids() {
+
     'use strict';
-    $('.fm-empty-trashbin,.fm-empty-contacts,.fm-empty-search')
-        .add('.fm-empty-cloud,.fm-invalid-folder,.fm-empty-filter').addClass('hidden');
-    $('.fm-empty-folder,.fm-empty-incoming,.fm-empty-folder-link')
-        .add('.fm-empty-outgoing,.fm-empty-public-link,.fm-empty-user-management').addClass('hidden');
+
+    $('.fm-empty-section:not(.transfer-panel-empty-txt):not(.fm-recents)').addClass('hidden');
     $('.fm-empty-section.fm-empty-sharef').remove();
 };
 

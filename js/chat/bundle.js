@@ -16162,6 +16162,7 @@ let StreamNode = (streamNode_dec = (0,mixins.M9)(30, true), streamNode_dec2 = (0
       chatRoom,
       menu,
       className,
+      simpleTip,
       ephemeralAccounts,
       onClick,
       onCallMinimize,
@@ -16169,7 +16170,11 @@ let StreamNode = (streamNode_dec = (0,mixins.M9)(30, true), streamNode_dec2 = (0
     } = this.props;
     return external_React_default().createElement("div", {
       ref: this.nodeRef,
-      className: "\n                    stream-node\n                    " + (onClick ? 'clickable' : '') + "\n                    " + (className ? className : '') + "\n                    " + (this.state.loading !== StreamNode.LOADING_STATE.LOADED ? 'loading' : '') + "\n                ",
+      className: "\n                    stream-node\n                    " + (onClick ? 'clickable' : '') + "\n                    " + (className ? className : '') + "\n                    " + (this.state.loading !== StreamNode.LOADING_STATE.LOADED ? 'loading' : '') + "\n                    " + (simpleTip ? 'simpletip' : '') + "\n                ",
+      "data-simpletip": simpleTip == null ? void 0 : simpleTip.label,
+      "data-simpletipposition": simpleTip == null ? void 0 : simpleTip.position,
+      "data-simpletipoffset": simpleTip == null ? void 0 : simpleTip.offset,
+      "data-simpletip-class": simpleTip == null ? void 0 : simpleTip.className,
       onClick: () => onClick && onClick(stream)
     }, stream && external_React_default().createElement((external_React_default()).Fragment, null, menu && external_React_default().createElement(StreamNodeMenu, {
       privilege: chatRoom && chatRoom.members[stream.userHandle],
@@ -19040,6 +19045,9 @@ class Sidebar extends mixins.wl {
         onSpeakerChange
       } = this.props;
       const localStream = call.getLocalStream();
+      const SIMPLE_TIP = {
+        className: 'theme-dark-forced'
+      };
       return external_React_default().createElement("div", {
         className: "\n                    sidebar-streams-container\n                    " + (guest ? 'guest' : '') + "\n                "
       }, external_React_default().createElement(perfectScrollbar.F, {
@@ -19055,6 +19063,9 @@ class Sidebar extends mixins.wl {
         mode: mode,
         chatRoom: chatRoom,
         stream: localStream,
+        simpleTip: { ...SIMPLE_TIP,
+          label: l[8885]
+        },
         className: "\n                                    " + (call.isSharingScreen() ? '' : 'local-stream-mirrored') + "\n                                    " + (forcedLocal ? 'active' : '') + "\n                                ",
         onClick: () => {
           mBroadcaster.sendMessage('meetings:collapse');
@@ -19066,6 +19077,9 @@ class Sidebar extends mixins.wl {
           mode: mode,
           chatRoom: chatRoom,
           stream: stream,
+          simpleTip: { ...SIMPLE_TIP,
+            label: M.getNameByHandle(stream.userHandle)
+          },
           className: stream.isActive || stream.clientId === call.forcedActiveStream ? 'active' : '',
           onClick: onSpeakerChange
         });
@@ -20879,7 +20893,7 @@ class ConversationRightArea extends mixins.wl {
       }
     }, external_React_default().createElement("i", {
       className: "sprite-fm-mono icon-rename"
-    }), external_React_default().createElement("span", null, l[9080])) : null, !room.isReadOnly() && room.type === "public" ? external_React_default().createElement("div", {
+    }), external_React_default().createElement("span", null, l[9080])) : null, room.type === "public" ? external_React_default().createElement("div", {
       className: "\n                                                link-button\n                                                light\n                                                " + (Call.isGuest() ? 'disabled' : '') + "\n                                            ",
       onClick: e => {
         if ($(e.target).closest('.disabled').length > 0) {

@@ -429,6 +429,9 @@
         else if (id && id.substr(0, 7) === 'search/') {
             this.search = true;
         }
+        else if (cv.type === 'gallery') {
+            M.onFileManagerReady(galleryUI);
+        }
         else if (id && (id.substr(0, 11) === 'out-shares/' || id.substr(0, 13) === 'public-links/')) {
             fetchdbnodes = true;
             id = cv.nodeID;

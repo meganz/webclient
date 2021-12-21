@@ -233,6 +233,18 @@ mBroadcaster.once('boot_done', function() {
         return this;
     };
 
+    // @todo remove once Fx60 is upgraded on Jenkins
+    if (Promise.prototype.finally === undefined) {
+        Promise.prototype.finally = function(cb) {
+            return this.then(
+                (res) => Promise.resolve(cb()).then(() => res),
+                (ex) => Promise.resolve(cb())
+                    .then(() => {
+                        throw ex;
+                    }));
+        };
+    }
+
     if (Promise.allSettled === undefined) {
         Promise.allSettled = function(promises) {
             var done = function(result) {

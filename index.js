@@ -2620,6 +2620,7 @@ function topmenuUI() {
             // if event is triggered by inner element of mega-button, try pull classname of the button.
             c = parent && parent.classList.contains('mega-button') ? parent.className : e.target.className;
         }
+        c = typeof c === 'string' ? c : '';
         elements = document.getElementsByClassName('js-more-menu menu-open');
 
         if (!e || !e.target.closest('.top-menu-popup, .js-more-menu') && elements.length &&

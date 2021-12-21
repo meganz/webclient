@@ -940,7 +940,7 @@ var ulmanager = {
                     file.faid,
                     null, null,
                     {raw: img !== 1 && img, isVideo: vid}
-                );
+                ).catch(nop);
 
                 var uled = ulmanager.ulEventData[file.id];
                 if (uled) {

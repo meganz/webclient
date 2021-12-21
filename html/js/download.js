@@ -522,19 +522,21 @@ function dl_g(res, ctx) {
                         const supported = dlmanager.canSaveToDisk(dl_node);
                         $('.mobile.filetype-img').addClass('hidden');
 
-                        if (String(res.fa).indexOf(':1*') > 0) {
-                            $('.viewer-pending', '.download-page.mobile').removeClass('hidden');
-                            getImage(dl_node, 1).then((uri) => {
-                                const $imageBlock = $('.js-image-preview');
-                                $('img', $imageBlock.addClass('thumb')).attr('src', uri);
-                                $('.viewer-pending', '.download-page.mobile').addClass('hidden');
-                                if (supported) {
-                                    $imageBlock.addClass('clickable ' + fileIcon(dl_node)).removeClass('hidden')
-                                        .rebind('click', () => {
-                                            mobile.slideshow.init(dl_node.h);
-                                        });
-                                }
-                            });
+                        const $imageBlock = $('.js-image-preview');
+                        window.mediaConIsDl = true;
+
+                        $('.mobile.slideshow-image-previewer').addClass('browserscreen')
+                            .appendTo('.js-image-preview').removeClass('hidden');
+
+                        mobile.slideshow.init(dl_node.h);
+
+                        if (supported) {
+                            mobile.slideshow.hideHFFlag = true;
+                            $imageBlock.addClass('clickable ' + fileIcon(dl_node)).removeClass('hidden')
+                                .rebind('click', () => {
+                                    $('.mobile.slideshow-image-previewer').addClass('fullscreen')
+                                        .removeClass('browserscreen');
+                                });
                         }
                     }
                     else {
@@ -1168,7 +1170,9 @@ function dlPageCleanup() {
     }
 
     if (window.mediaConIsDl) {
-        $('.media-viewer-container').appendTo('body');
+        const wrapper = is_mobile ? '#startholder' : 'body';
+        const container = is_mobile ? '.mobile.slideshow-image-previewer' : '.media-viewer-container';
+        $(container).appendTo(wrapper);
         delete window.mediaConIsDl;
     }
 

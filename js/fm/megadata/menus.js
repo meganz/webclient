@@ -325,6 +325,21 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
         items['.getlink-item'] = 1;
     }
 
+    if (M.currentCustomView.type === 'gallery') {
+
+        items['.open-cloud-item'] = 1;
+
+        delete items['.move-item'];
+        delete items['.copy-item'];
+        delete items['.rename-item'];
+        delete items['.remove-item'];
+        delete items['.add-star-item'];
+        delete items['.colour-label-items'];
+        delete items['.embedcode-item'];
+        delete items['.properties-versions'];
+        delete items['.clearprevious-versions'];
+    }
+
     if ((sourceRoot === M.RootID) && !folderlink) {
         items['.move-item'] = 1;
         items['.getlink-item'] = 1;

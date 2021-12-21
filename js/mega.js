@@ -3875,6 +3875,7 @@ function loadfm_done(mDBload) {
                     }
                 });
                 M.myChatFilesFolder.init();
+                M.getCameraUploads();
             }
         }
         else {
@@ -3967,139 +3968,250 @@ var th_requested = Object.create(null);
 var fa_duplicates = Object.create(null);
 var fa_reqcnt = 0;
 var fa_addcnt = 8;
-var fa_tnwait = 0;
+
+/** @property fm_thumbnails.exclude */
+lazy(fm_thumbnails, 'exclude', () => {
+    'use strict';
+    const res = {
+        photos: 1, images: 1, videos: 1
+    };
+    return Object.setPrototypeOf(res, null);
+});
 
 function fm_thumbnails(mode, nodeList, callback)
 {
-    var treq = {}, a = 0, max = Math.max($.rmItemsInView || 1, 71) + fa_addcnt, u = max - Math.floor(max / 3), y;
-    if (!fa_reqcnt)
-        fa_tnwait = y;
-    if (d)
-        console.time('fm_thumbnails');
-
+    'use strict';
+    if (M.chat && mode !== 'standalone' || fm_thumbnails.exclude[M.currentdirid]) {
+        return;
+    }
     nodeList = (mode === 'standalone' ? nodeList : false) || M.v;
 
-    if (!M.chat || mode === 'standalone')
-    {
-        for (var i = 0; i < nodeList.length; i++) {
-            var n = nodeList[i];
-            if (n && !missingkeys[n.h] && n.fa && String(n.fa).indexOf(':0') > 0)
-            {
-                if (fa_tnwait == n.h && n.seen)
-                    fa_tnwait = 0;
-                // if (!fa_tnwait && !thumbnails[n.h] && !th_requested[n.h])
-                if (n.seen && !thumbnails[n.h] && !th_requested[n.h])
-                {
-                    if (typeof fa_duplicates[n.fa] == 'undefined')
-                        fa_duplicates[n.fa] = 0;
-                    else
-                        fa_duplicates[n.fa] = 1;
-                    treq[n.h] =
-                        {
-                            fa: n.fa,
-                            k: n.k
-                        };
-                    th_requested[n.h] = 1;
-                    th_pending[n.h] = [];
+    let count = 0;
+    const transparent = {WEBP: 1, PNG: 1, SVG: 1, GIF: 1};
+    const max = Math.max(M.rmItemsInView | 0, 32) + fa_addcnt;
+    const min = Math.floor(max * 0.6);
+    const treq = [];
 
-                    if (u == a)
-                        y = n.h;
-                    if (++a > max)
-                    {
-                        if (!n.seen)
-                            break;
-                        y = n.h;
-                    }
-                }
-                else if (n.seen && n.seen !== 2)
-                {
-                    fm_thumbnail_render(n);
-                }
+    const onTheFly =
+        !is_mobile && M.viewmode && mode !== 'standalone'
+        && !mega.config.get('noflytn') ? Object.create(null) : false;
 
-                if (mode === 'standalone' && typeof callback === 'function') {
-                    if (thumbnails[n.h]) {
-                        onIdle(callback.bind(null, n.h));
-                    }
-                    else if (th_pending[n.h]) {
-                        th_pending[n.h].push(onIdle.bind(null, callback.bind(null, n.h)));
-                    }
+    if (d) {
+        console.time('fm_thumbnails');
+    }
+
+    // enqueue thumbnail retrieval.
+    const queue = (n) => {
+        let type = ':0*';
+
+        if (onTheFly && !transparent[fileext(n.name, true, true)] && String(n.fa).includes(':1*')) {
+            type = ':1*';
+            onTheFly[n.h] = {fa: n.fa, k: n.k};
+        }
+
+        if (!String(n.fa).includes(type)) {
+            return;
+        }
+        type = type[1] | 0;
+
+        const r = th_requested[n.h] | 0;
+        if (!thumbnails[n.h] && !r || r !== type + 1 && r < 2) {
+            if (typeof fa_duplicates[n.fa] == 'undefined') {
+                fa_duplicates[n.fa] = 0;
+            }
+            else {
+                fa_duplicates[n.fa] = 1;
+            }
+
+            if (!treq[type]) {
+                treq[type] = {};
+            }
+            treq[type][n.h] = {fa: n.fa, k: n.k};
+
+            if (!th_pending[n.h]) {
+                th_pending[n.h] = [];
+            }
+            th_requested[n.h] = ++type;
+
+            if (++count > max && !n.seen) {
+                // break
+                return true;
+            }
+        }
+        else if (n.seen !== 2) {
+            fm_thumbnail_render(n);
+        }
+    };
+
+    for (let i = 0; i < nodeList.length; i++) {
+        const n = nodeList[i];
+
+        if (n && n.fa && !missingkeys[n.h]) {
+            if (n.seen && queue(n)) {
+                break;
+            }
+
+            if (mode === 'standalone' && typeof callback === 'function') {
+                if (thumbnails[n.h]) {
+                    onIdle(callback.bind(null, n.h));
+                }
+                else if (th_pending[n.h]) {
+                    th_pending[n.h].push(onIdle.bind(null, callback.bind(null, n.h)));
                 }
             }
         }
-        if (y)
-            fa_tnwait = y;
-        if (a > 0)
-        {
-            fa_reqcnt += a;
-            if (d)
-                console.log('Requesting %d thumbs (%d loaded)', a, fa_reqcnt);
+    }
 
-            var rt = Date.now();
-            var cdid = M.currentdirid;
-            api_getfileattr(treq, 0, function(ctx, node, uint8arr)
-            {
-                if (mode === 'standalone' && typeof callback === 'function') {
-                    onIdle(callback.bind(null, node));
-                }
-                if (th_pending[node]) {
-                    for (var t = th_pending[node].length; t--;) {
-                        th_pending[node][t]();
-                    }
-                    delete th_pending[node];
-                }
-                if (uint8arr === 0xDEAD)
-                {
-                    if (d)
-                        console.log('Aborted thumbnail retrieval for ' + node);
-                    delete th_requested[node];
-                    return;
-                }
-                if (rt)
-                {
-                    if (((Date.now() - rt) > 4000) && ((fa_addcnt += u) > 300))
-                        fa_addcnt = 301;
-                    rt = 0;
-                }
-                try {
-                    var blob = new Blob([uint8arr], {type: 'image/jpeg'});
-                } catch (err) {}
-                if (blob.size < 25)
-                    blob = new Blob([uint8arr.buffer]);
-                // thumbnailblobs[node] = blob;
-                thumbnails[node] = myURL.createObjectURL(blob);
+    if (count > 0) {
+        if (d) {
+            console.log('Requesting %d thumbs (%d loaded)', count, fa_reqcnt, treq);
+        }
+        fa_reqcnt += count;
 
-                var targetNode = M.getNodeByHandle(node);
+        let ts = Date.now();
+        const pwd = M.currentdirid;
 
-                if (targetNode && targetNode.seen && M.currentdirid === cdid) {
-                    fm_thumbnail_render(targetNode);
-                }
+        // foreach node list
+        const forEach = (cb) => {
+            for (let i = nodeList.length; i--;) {
+                cb(nodeList[i]);
+            }
+        };
 
-                // deduplicate in view when there is a duplicate fa:
-                if (targetNode && fa_duplicates[targetNode.fa] > 0)
-                {
-                    for (var i = 0; i < nodeList.length; i++)
-                    {
-                        var n = nodeList[i];
-                        if (n.h !== node && n.fa === targetNode.fa && !thumbnails[n.h])
-                        {
-                            thumbnails[n.h] = thumbnails[node];
-                            if (n.seen && M.currentdirid === cdid)  {
-                                fm_thumbnail_render(n);
-                            }
-                            if (mode === 'standalone' && typeof callback === 'function') {
-                                onIdle(callback.bind(null, n.h));
-                            }
-                        }
-                    }
+        // revoke thumbnail.
+        const revoke = (h) => {
+            if (d > 1) {
+                console.info(`Revoking thumbnail ${h}, ${thumbnails[h]}`);
+            }
+            URL.revokeObjectURL(thumbnails[h]);
+
+            forEach((n) => {
+                if (n.h !== h && thumbnails[n.h] === thumbnails[h]) {
+                    thumbnails[n.h] = null;
                 }
             });
+            thumbnails[h] = null;
+        };
+
+        // append (add) new thumbnail.
+        const append = (node, url) => {
+            if (thumbnails[node]) {
+                revoke(node);
+            }
+            thumbnails[node] = url;
+        };
+
+        // render & deduplicate loaded thumbnails.
+        const render = (node) => {
+            const targetNode = M.getNodeByHandle(node);
+            if (!targetNode) {
+                return;
+            }
+
+            if (d > 1) {
+                console.info(`Rendering thumbnail ${node}, ${thumbnails[node]}`, targetNode);
+            }
+
+            if (targetNode.seen && M.currentdirid === pwd) {
+                fm_thumbnail_render(targetNode);
+            }
+
+            // deduplicate in view when there is a duplicate fa:
+            if (fa_duplicates[targetNode.fa] > 0) {
+                forEach((n) => {
+                    if (n.h !== node && n.fa === targetNode.fa && !thumbnails[n.h]) {
+                        thumbnails[n.h] = thumbnails[node];
+
+                        if (n.seen && M.currentdirid === pwd) {
+                            fm_thumbnail_render(n);
+                        }
+
+                        if (mode === 'standalone' && typeof callback === 'function') {
+                            onIdle(callback.bind(null, n.h));
+                        }
+                    }
+                });
+            }
+        };
+
+        // re-queue thumbnail retrieval.
+        const requeue = (node, data, callback) => {
+            treq[0][node] = data;
+
+            delay('fm:thumbnails.requeue', () => {
+                api_getfileattr(treq[0], 0, callback);
+                treq[0] = {};
+            }, 4321);
+        };
+
+        // handle thumbnail retrieval.
+        const onload = async(ctx, node, uint8) => {
+            if (mode === 'standalone' && typeof callback === 'function') {
+                onIdle(callback.bind(null, node));
+            }
+
+            if (th_pending[node]) {
+                for (let t = th_pending[node].length; t--;) {
+                    th_pending[node][t]();
+                }
+                delete th_pending[node];
+            }
+
+            if (uint8 === 0xDEAD) {
+                if (d) {
+                    console.log(`Aborted thumbnail retrieval for ${node}`);
+                }
+                delete th_requested[node];
+                return;
+            }
+
+            if (ts) {
+                if (Date.now() - ts > 4000 && (fa_addcnt += min) > 300) {
+                    fa_addcnt = 301;
+                }
+                ts = 0;
+            }
+
+            if (onTheFly[node]) {
+                // uint8 = (await M.gfsfetch(node, 0, -1)).buffer;
+                const blob = await webgl.getDynamicThumbnail(uint8, {ats: 1}).catch(nop);
+
+                if (blob) {
+                    append(node, URL.createObjectURL(blob));
+                }
+                else {
+                    if (d) {
+                        console.debug(`Failed to generate on-the-fly thumbnail for ${node}`);
+                    }
+                    requeue(node, onTheFly[node], onload);
+                }
+
+                onTheFly[node] = null;
+            }
+            else {
+                append(node, mObjectURL([uint8.buffer || uint8], 'image/jpeg'));
+            }
+
+            render(node);
+        };
+
+        if (treq[0]) {
+            api_getfileattr(treq[0], 0, onload);
         }
+        if (treq[1]) {
+            api_getfileattr(treq[1], 1, onload);
+        }
+        treq[0] = {};
     }
-    if (d)
+
+    if (d) {
         console.timeEnd('fm_thumbnails');
+    }
 }
 
 function fm_thumbnail_render(n) {
+    'use strict';
+
     if (n && thumbnails[n.h]) {
         var imgNode = document.getElementById(n.imgId || n.h);
 

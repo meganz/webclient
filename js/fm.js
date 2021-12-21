@@ -762,10 +762,12 @@ function fmtopUI() {
 
     var $contactsTabBlock = $('.contacts-tabs-bl');
     var $sharesTabBlock = $('.shares-tabs-bl');
+    var $galleryTabBlock = $('.gallery-tabs-bl');
 
-    $contactsTabBlock.add($sharesTabBlock).addClass('hidden');
-    $contactsTabBlock.find('.contacts-tab-lnk.active').removeClass('active');
-    $sharesTabBlock.find('.shares-tab-lnk.active').removeClass('active');
+    $contactsTabBlock.add($sharesTabBlock).add($galleryTabBlock).addClass('hidden');
+    $('.contacts-tab-lnk.active', $contactsTabBlock).removeClass('active');
+    $('.shares-tab-lnk.active', $sharesTabBlock).removeClass('active');
+    $('.gallery-tab-lnk.active', $galleryTabBlock).removeClass('active');
 
     $('.fm-clearbin-button,.fm-add-user,.fm-new-folder,.fm-file-upload,.fm-folder-upload,.fm-uploads')
         .add('.fm-new-shared-folder,.fm-new-link').addClass('hidden');
@@ -858,6 +860,15 @@ function fmtopUI() {
             }
             else {
                 showUploadBlock();
+            }
+        }
+        else if (M.currentCustomView.type === 'gallery') {
+
+            $galleryTabBlock.removeClass('hidden');
+
+            if (mega.gallery[M.currentdirid]) {
+                $('.gallery-tab-lnk', $galleryTabBlock).removeClass('active');
+                $(`.gallery-tab-lnk-${mega.gallery[M.currentdirid].mode}`, $galleryTabBlock).addClass('active');
             }
         }
         else if (String(M.currentdirid).length === 8
@@ -1097,7 +1108,8 @@ function FMShortcuts() {
             !is_fm() ||
             !selectionManager ||
             M.currentrootid === 'chat' || // prevent shortcut for chat
-            M.currentrootid === undefined // prevent shortcut for file transfer, dashboard, settings
+            M.currentrootid === undefined || // prevent shortcut for file transfer, dashboard, settings
+            M.currentCustomView.type === 'gallery'
         ) {
             return true;
         }

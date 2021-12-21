@@ -98,6 +98,20 @@ function is_rawimage(name, ext) {
     return is_image.raw[ext] && ext;
 }
 
+/**
+ * Same as is_image3(), additionally checking whether the node meet requirements for photo/media gallery.
+ * @param {String|MegaNode|Object} n An ufs-node, or filename
+ * @param {String} [ext] Optional filename extension
+ * @returns {Number|String|Function|Boolean}
+ */
+function is_photo(n, ext) {
+    'use strict';
+
+    ext = ext || fileext(n && n.name || n, true, true);
+
+    return (ext !== 'PSD' && is_image3(n, ext)) || is_video(n);
+}
+
 is_image.def = {
     'JPG': 1,
     'JPEG': 1,
@@ -196,6 +210,7 @@ var mThumbHandler = {
 
     add: function(exts, parser) {
         'use strict';
+        parser = ((handler) => promisify((resolve, reject, data) => handler(data, resolve)))(parser);
 
         exts = String(exts).split(',');
 

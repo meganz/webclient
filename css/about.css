@@ -198,13 +198,10 @@ body:not(.mobile) .about.top-info a:hover {
     line-height: 0;
 }
 .about.img-wrap-office {
-    filter: brightness(0.15);
-}
-.about.img-wrap-office.selected {
-    display: block;
-}
-.about.img-wrap-office.unselected {
-    display: none;
+    position: relative;
+    margin-bottom: -10px;
+    grid-column: 1/6;
+    grid-row: 1;
 }
 
 /* --------------------------------
@@ -366,17 +363,19 @@ Timeline
     }
 }
 /* Timeline end */
+.about.vision-block {
+    grid-column: 1/6;
+    grid-row: 1;
+}
 .about.vision-title {
     font-family: var(--text-font-family-montserrat-bold);
     font-size: 48px;
     color: var(--stroke-grey-1);
     text-align: center;
-    padding-top: 120px;
+    margin-top: 80px;
     z-index: 1;
     line-height: 58px;
-    position: absolute;
-    left: 0;
-    right: 0;
+    position: relative;
     user-select: none !important;
 }
 .about.promise-title {
@@ -398,16 +397,11 @@ Timeline
     line-height: 58px;
     margin: 0 auto;
     z-index: 1;
-    position: absolute;
-    left: 0;
-    right: 0;
-    /*!*top: 45%;*!*/
-    /*transform: translateY(-50%);*/
-    /*margin-top: 15vh;*/
-    top: 30%;
+    margin-top: 60px;
+    margin-bottom: 50px;
+    align-self: center;
+    position: relative;
     user-select: none !important;
-    padding-left: 76px;
-    padding-right: 76px;
 }
 .about.promise-desc {
     font-family: var(--text-font-family-montserrat-bold);
@@ -473,7 +467,9 @@ Timeline
 .about.office1 {
     width: 100%;
     object-fit: cover;
-    height: 700px;
+    height: 100%;
+    max-height:65vh;
+    filter: brightness(0.15);
 }
 .about.office1 img {
     filter: brightness(50%);
@@ -481,6 +477,7 @@ Timeline
 .about.vision-grid-container {
     position: relative;
     display: grid;
+    grid-template-columns: 1fr;
 }
 .about .carousel-wrapper {
     overflow: hidden;
@@ -883,6 +880,8 @@ Timeline
     background-color: #BF1515;
     align-self: end;
     z-index: 1;
+    grid-column: 1/6;
+    margin-top: -20px;
 }
 .about .bottom-page.card.img {
     height: 64px;
@@ -1360,7 +1359,6 @@ body:not(.mobile) .about.white-button:hover {
     animation-iteration-count: 1;
     animation-direction: normal;
     animation-fill-mode: forwards;
-    white-space: nowrap;
 }
 
 @keyframes circular-spread {
@@ -1379,10 +1377,12 @@ body:not(.mobile) .about.white-button:hover {
         letter-spacing: 2em;
         filter: blur(12px);
         opacity: 0;
+        white-space: nowrap;
     }
     100% {
         filter: blur(0);
         opacity: 1;
+        white-space: unset;
     }
 }
 
@@ -1431,9 +1431,6 @@ body:not(.mobile) .about.white-button:hover {
     }
     .about.leadership-team-container {
         padding-top: 96px;
-    }
-    .about.office1 {
-        height: 600px;
     }
     .about .jobs-top-pad {
         padding-top: unset;
@@ -1516,7 +1513,6 @@ body:not(.mobile) .about.white-button:hover {
     }
     .about.vision-title {
         font-size: 36px;
-        padding-top: 136px;
         line-height: 44px;
     }
     .about.promise-desc {
@@ -1638,7 +1634,6 @@ body:not(.mobile) .about.white-button:hover {
 
 @media only screen and (max-width: 1050px) {
     .about.vision-title {
-        padding-top: 104px;
         font-size: 28px;
         line-height: 34px;
     }
@@ -1646,10 +1641,6 @@ body:not(.mobile) .about.white-button:hover {
         font-size: 36px;
         line-height: 44px;
         max-width: 700px;
-        top: 25%;
-    }
-    .about.office1 {
-        height: 600px;
     }
     .about .flip-card-inner {
         width: 100%;
@@ -1866,6 +1857,18 @@ body:not(.mobile) .about.white-button:hover {
     }
 }
 
+@media only screen and (orientation: landscape) and (max-height: 900px) {
+    .about.office1 {
+        max-height: 35vw;
+    }
+}
+
+@media only screen and (orientation: landscape) and (max-height: 900px) and (max-width: 1200px) {
+    .about.office1 {
+        max-height: 50vw;
+    }
+}
+
 @media only screen and (orientation: landscape) and (max-width: 1366px) {
     .about .location-grid-wrapper {
         display: grid;
@@ -1892,7 +1895,11 @@ body:not(.mobile) .about.white-button:hover {
         grid-template-columns: repeat(8, 1fr);
     }
 }
+
 @media only screen and (orientation: landscape) and (max-width: 900px) {
+    .about.office1 {
+        max-height: unset;
+    }
     .about .bottom-page.big-bott-pad.jobs {
         padding-bottom: 48px;
     }
@@ -2334,21 +2341,13 @@ body:not(.mobile) .about.white-button:hover {
 
 @media only screen and (max-width: 675px) {
     .about.vision-title {
-        padding-top: 80px;
         font-size: 28px;
         line-height: 34px;
     }
     .about.vision-desc {
-        top: 20%;
         font-size: 30px;
         line-height: 37px;
         max-width: 500px;
-        padding-bottom: 150px;
-        padding-left: 60px;
-        padding-right: 60px;
-    }
-    .about.office1 {
-        height: 600px;
     }
     .about .overlay-text1 {
         padding: 30px 0 0 30px;
@@ -2482,7 +2481,7 @@ body:not(.mobile) .about.white-button:hover {
 
 @media only screen and (max-width: 490px) {
     .about.office1 {
-        height: 700px;
+        /*max-height: 70vh;*/
     }
     .about.dream-img {
         height: 150px;
@@ -2512,6 +2511,12 @@ body:not(.mobile) .about.white-button:hover {
 }
 
 @media only screen and (max-width: 420px) {
+    .about.vision-desc {
+        font-size: 26px;
+    }
+    .about.office1 {
+        max-height: unset;
+    }
     .about .bottom-page.jobs-life-container {
         padding-bottom: 46px;
     }
@@ -2668,9 +2673,6 @@ body:not(.mobile) .about.white-button:hover {
         font-size: 22px;
     }
     .about.vision-desc {
-        top: 15%;
-        padding-left: 24px;
-        padding-right: 24px;
         max-width: 300px;
     }
     .about.city-title {
@@ -2796,12 +2798,6 @@ body:not(.mobile) .about.white-button:hover {
     }
     .about .grid-row-gap {
         row-gap: 30px;
-    }
-    .about.vision-title {
-        padding-top: 50px;
-    }
-    .about.office1 {
-        height: 700px;
     }
     .about .carousel-date {
         font-size: 16px;

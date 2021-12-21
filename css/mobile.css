@@ -1111,6 +1111,9 @@ ul, li {
 .bottom-pages .fm-scrolling {
     max-height: none;
 }
+.mobile.main-block.js-country-selector .fm-scrolling {
+    max-height: calc(100vh - 144px);
+}
 .mobile.fm-block.disable-scroll .fm-scrolling {
     overflow: hidden;
 }

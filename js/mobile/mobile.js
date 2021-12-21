@@ -1135,6 +1135,7 @@ accountUI.account = {
 };
 
 function bindDropdownEvents() {}
+mega.gallery = {};
 
 /** Global function to be used in mobile mode, checking if the action can be taken by the user.
  * It checks the user validity (Expired business, or ODQ Paywall)

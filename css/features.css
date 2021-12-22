@@ -681,6 +681,10 @@ body.rtl .feature-page * {
         flex-wrap: wrap;
     }
 
+    .feature-page.objectstorage .icon-block .icons {
+        align-items: stretch;
+    }
+
     .feature-page .icon-block.columns-2 .icon {
         width: 50%;
     }
@@ -699,8 +703,9 @@ body.rtl .feature-page * {
         border-radius: 16px;
         box-shadow: 4px 4px 20px 0 rgba(0, 0, 0, 0.08);
         margin: 10px 34px 32px 0;
-        height: 245px;
+        height: auto;
         width: 328px;
+        padding-bottom: 20px;
     }
     .feature-page .icon-block .icon img {
         display: block;
@@ -801,7 +806,6 @@ body.rtl .feature-page * {
         }
         .feature-page.objectstorage .icon-block .icon {
             width: 400px;
-            height: 222px;
             margin-right: 20px;
             margin-left: 7px;
         }
@@ -858,6 +862,7 @@ body.rtl .feature-page * {
         .feature-page.objectstorage .icon-block .icon {
             border: none;
             box-shadow: none;
+            margin-bottom: 0;
         }
 
         .feature-page .icon-block .icon p {

@@ -603,6 +603,18 @@ class MEGACanvasElement extends MEGAImageElement {
         return this;
     }
 
+    async getIntrinsicImage(source, maxSize = 2160) {
+        if (!exifImageRotation.fromImage) {
+            source = await this.getRotatedImageData(source);
+        }
+        const {width = maxSize, height = maxSize} = await webgl.loadImage(source).catch(nop) || source;
+
+        maxSize = Math.min(maxSize, width, height);
+        source = await this.createPreviewImage(source, {type: 'image/png', maxWidth: maxSize, maxHeight: maxSize});
+
+        return source;
+    }
+
     getImageData(sx, sy, sw, sh, flip = true) {
         const {ctx, renderingContextType} = this;
 
@@ -1529,8 +1541,10 @@ class MEGAWorker extends Array {
             worker.jobs--;
             this.running.delete(token);
 
-            if (this.pending.length) {
-                this.post(worker, this.pending.pop());
+            while (this.pending.length) {
+                if (this.post(worker, this.pending.pop())) {
+                    break;
+                }
             }
 
             if (!error && (self.d || self.is_karma)) {
@@ -1550,12 +1564,14 @@ class MEGAWorker extends Array {
     }
 
     post(worker, {resolve, reject, command, payload}) {
-        const token = makeUUID();
-        const t = MEGAWorker.getTransferable(payload);
+        return tryCatch(() => {
+            const token = makeUUID();
+            const t = MEGAWorker.getTransferable(payload);
 
-        worker.postMessage({token, command, payload}, t);
-        this.running.set(token, {token, worker, resolve, reject});
-        worker.jobs++;
+            worker.postMessage({token, command, payload}, t);
+            this.running.set(token, {token, worker, resolve, reject});
+            return ++worker.jobs;
+        }, reject)();
     }
 
     queue(command, payload) {

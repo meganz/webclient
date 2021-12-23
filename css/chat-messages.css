@@ -757,6 +757,7 @@
     left: auto;
     top: auto;
     position: static;
+    transform: none;
 }
 
 .richpreview.have-icon .block-view-file-type {

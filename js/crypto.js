@@ -2056,7 +2056,7 @@ function api_getfileattr(fa, type, procfa, errfa) {
     var re = new RegExp('(\\d+):' + type + '\\*([a-zA-Z0-9-_]+)');
 
     for (n in fa) {
-        if ((r = re.exec(fa[n].fa))) {
+        if (fa[n] && (r = re.exec(fa[n].fa))) {
             t = base64urldecode(r[2]);
             if (t.length === 8) {
                 if (!h[t]) {
@@ -2201,6 +2201,16 @@ fa_handler.prototype = {
         var h, j, p, l, k;
 
         i = 0;
+        const procfa = (res) => ctx.procfa(ctx, ctx.h[h], res);
+        const decrypt = tryCatch((k) => {
+            const ts = new Uint8Array(response, p, l);
+
+            const data = asmCrypto.AES_CBC.decrypt(ts, a32_to_ab([
+                k[0] ^ k[4], k[1] ^ k[5], k[2] ^ k[6], k[3] ^ k[7]
+            ]), false);
+
+            procfa(data);
+        }, () => procfa(0xDEAD));
 
         // response is an ArrayBuffer structured
         // [handle.8 position.4] data
@@ -2227,12 +2237,7 @@ fa_handler.prototype = {
             }
 
             if ((k = ctx.k[h])) {
-                var ts = new Uint8Array(response, p, l);
-
-                var td = asmCrypto.AES_CBC.decrypt(ts,
-                    a32_to_ab([k[0] ^ k[4], k[1] ^ k[5], k[2] ^ k[6], k[3] ^ k[7]]), false);
-
-                ctx.procfa(ctx, ctx.h[h], td);
+                decrypt(k);
             }
 
             i += 12;

@@ -946,25 +946,10 @@ window.ImageUploadAndCrop = (function(){
             return this._onFileProcessed2(imageData);
         }
 
-        var self = this;
-        var img = new Image();
-        img.onload = img.onerror = function() {
-            self._onFileProcessed2(this.src);
-
-            if (exifImageRotation.fromImage) {
-                document.body.removeChild(img);
-            }
-        };
-        if (exifImageRotation.fromImage) {
-            img.style.imageOrientation = 'none';
-            document.body.appendChild(img);
-        }
-
-        var orientation = 1;
-        onIdle(function() {
-            exifImageRotation(img, imageData, orientation);
+        queueMicrotask(async() => {
+            this.options.maxImageDimension = NaN;
+            this._onFileProcessed2(URL.createObjectURL(await webgl.getIntrinsicImage(imageData, 2160)));
         });
-        orientation = EXIF.readFromArrayBuffer(imageData).Orientation;
     };
 
     ImageUploadAndCrop.prototype._onFileProcessed2 = function(imageSrc){

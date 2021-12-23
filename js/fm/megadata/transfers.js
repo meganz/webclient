@@ -1384,7 +1384,7 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders, target) 
             // On ephemeral was undefined
             target = M.RootID;
         }
-        dbfetch.get(String(target), new MegaPromise()).always(function() {
+        dbfetch.get(String(target)).finally(() => {
             makeDirProc();
             // M.checkGoingOverStorageQuota(ulOpSize).done(makeDirProc);
         });

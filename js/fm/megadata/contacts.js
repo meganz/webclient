@@ -708,7 +708,7 @@ MegaData.prototype.delOPC = function(id) {
 // Update M.ipc and related localStorage
 MegaData.prototype.addIPC = function(u, ignoreDB) {
     this.ipc[u.p] = u;
-    if (fmdb && !pfkey) {
+    if (fmdb && !ignoreDB && !pfkey) {
         fmdb.add('ipc', {p: u.p, d: u});
     }
 };

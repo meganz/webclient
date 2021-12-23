@@ -319,13 +319,6 @@
         return parseHTML(versionsTemplate).firstChild;
     };
 
-    var classListMultiple = false;
-    tryCatch(function() {
-        var te = document.createElement("test");
-        te.classList.add("foo", "bar");
-        classListMultiple = te.classList.contains("bar");
-    }, false);
-
     mBroadcaster.once('startMega', function() {
         logger = MegaLogger.getLogger('MegaRender');
 
@@ -773,7 +766,7 @@
          * @param aHandle
          */
         hasDOMNode: function(aHandle) {
-            return this.nodeMap[aHandle] ? true : false;
+            return !!this.nodeMap[aHandle];
         },
 
         /**
@@ -781,14 +774,8 @@
          * @param {Object} aDOMNode    DOM node to set class over
          * @param {Array}  aClassNames An array of classes
          */
-        addClasses: classListMultiple ? function(aDOMNode, aClassNames) {
-            aDOMNode.classList.add.apply(aDOMNode.classList, aClassNames);
-        } : function(aDOMNode, aClassNames) {
-            var len = aClassNames.length;
-            while (len--) {
-                // XXX: classList.add does support an array, but not in all browsers
-                aDOMNode.classList.add(aClassNames[len]);
-            }
+        addClasses: function(aDOMNode, aClassNames) {
+            aDOMNode.classList.add(...aClassNames);
         },
 
         /**
@@ -796,14 +783,8 @@
          * @param {Object} aDOMNode    DOM node to set class over
          * @param {Array}  aClassNames An array of classes
          */
-        removeClasses: classListMultiple ? function(aDOMNode, aClassNames) {
-            aDOMNode.classList.remove.apply(aDOMNode.classList, aClassNames);
-        } : function(aDOMNode, aClassNames) {
-            // XXX: classList.add does support an array, but not in all browsers
-            var len = aClassNames.length;
-            while (len--) {
-                aDOMNode.classList.remove(aClassNames[len]);
-            }
+        removeClasses: function(aDOMNode, aClassNames) {
+            aDOMNode.classList.remove(...aClassNames);
         },
 
         /**

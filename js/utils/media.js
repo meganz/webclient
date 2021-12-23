@@ -1805,7 +1805,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
         options.playtime = MediaAttribute(node).data.playtime;
         options.bitrate = options.filesize / options.playtime;
 
-        if (d && options.bitrate) {
+        if (d && options.bitrate && typeof bytesToSize === 'function') {
             console.info('%s, %s', node.name, bytesToSize(node.s),
                          secondsToTime(options.playtime), bytesToSpeed(options.bitrate));
         }

@@ -357,6 +357,13 @@ MegaData.prototype.addWebDownload = function(n, z, preview, zipname) {
     if (z) {
         z = ++dlmanager.dlZipID;
 
+        if (!zipname && n.length === 1) {
+            const {name} = M.getNodeByHandle(n[0]);
+            if (name) {
+                zipname = M.getSafeName(name).replace(/\.\w{2,5}$/, '');
+            }
+        }
+
         if (!zipname) {
             const parent = this.getNodeParent(n[0]);
             const {name} = this.getNodeByHandle(parent);

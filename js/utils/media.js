@@ -3602,7 +3602,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
                 resolve(self);
             };
 
-            M.req(req).tryCatch(success, reject);
+            const promise = M.req(req).then(success).catch(reject);
 
             if (Object(res.General).InternetMediaType === 'video/mp4') {
                 const known = new Set(['qt  ', 'M4A ', ...mp4brands]);
@@ -3612,7 +3612,13 @@ FullScreenManager.prototype.enterFullscreen = function() {
                 }
             }
 
-            if (!res.vcodec && req.n) {
+            promise.finally(() => {
+                if (res.vcodec || req.ph) {
+                    if (d) {
+                        console.debug('Not adding cover-art...', res, [req]);
+                    }
+                    return;
+                }
                 if (Object(res.General).Cover_Data) {
                     try {
                         setImage(self, str_to_ab(atob(res.General.Cover_Data)));
@@ -3624,7 +3630,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
                 else if (res.container === 'MPEG Audio' || res.container === 'FLAC') {
                     getID3CoverArt(res.entry).then(setImage.bind(null, self)).catch(console.debug.bind(console));
                 }
-            }
+            });
         });
     };
 

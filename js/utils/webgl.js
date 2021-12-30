@@ -80,17 +80,6 @@ class MEGAImageElement {
         }
     }
 
-    decode() {
-        const options = {decode: true};
-        if (typeof this.type === 'object') {
-            Object.assign(options, this.type);
-        }
-        else {
-            options.type = this.type;
-        }
-        return this.loadImage(this.source, options);
-    }
-
     loadImage(source, type = MEGAImageElement.DEFAULT_FORMAT, options = null) {
         return new Promise((resolve, reject) => {
             let objectURL;
@@ -131,7 +120,7 @@ class MEGAImageElement {
                 }
                 if (error) {
                     const message = error.message || 'The source image cannot be decoded!';
-                    return reject(new MEGAException(message, 'EncodingError'));
+                    return reject(new MEGAException(message, image, 'EncodingError'));
                 }
                 resolve(image);
             };
@@ -140,7 +129,7 @@ class MEGAImageElement {
             image.crossOrigin = '';
             image.src = source;
 
-            if (options && options.decode && 'decode' in image) {
+            if ('decode' in image) {
                 return image.decode().then(() => loadend()).catch(loadend);
             }
 
@@ -448,33 +437,42 @@ class MEGAImageElement {
         return new ImageData(data, width, height);
     }
 
-    createImageBitmap(source) {
-        if (!self.supImageBitmap) {
-            // https://caniuse.com/createimagebitmap
-            return new Promise((resolve, reject) => {
+    async createImageBitmap(source) {
+        // https://caniuse.com/createimagebitmap
 
-                if (source instanceof Blob) {
-                    if (self.isWorkerScope) {
-                        // @todo Blob support..
-                        return reject(new MEGAException('TBD: Blob Support.', 'NotSupportedError'));
+        // @todo https://crbug.com/979890
+        // @todo https://bugzilla.mozilla.org/show_bug.cgi?id=1367251
+
+        if (self.supImageBitmap) {
+            const bitmap = await createImageBitmap(source)
+                .catch(ex => {
+                    if (self.d) {
+                        dump(`Failed to create ImageBitmap from ${source[Symbol.toStringTag]}...`, ex, source);
                     }
-                    return this.loadImage(source).then(resolve).catch(reject);
-                }
+                });
 
-                const {ctx} = new MEGACanvasElement(source.width, source.height);
-                if (source instanceof ImageData) {
-                    ctx.putImageData(source, 0, 0);
-                }
-                else {
-                    ctx.drawImage(source, 0, 0);
-                }
-
-                resolve(ctx.canvas);
-            });
+            if (bitmap) {
+                return bitmap;
+            }
         }
 
-        // @todo https://bugzilla.mozilla.org/show_bug.cgi?id=1367251
-        return createImageBitmap(source);
+        if (source instanceof Blob) {
+            if (self.isWorkerScope) {
+                // @todo Blob support..
+                throw new MEGAException('TBD: Blob Support.', 'NotSupportedError');
+            }
+            return this.loadImage(source);
+        }
+
+        const {ctx} = new MEGACanvasElement(source.width, source.height);
+        if (source instanceof ImageData) {
+            ctx.putImageData(source, 0, 0);
+        }
+        else {
+            ctx.drawImage(source, 0, 0);
+        }
+
+        return ctx.canvas;
     }
 
     async getRotatedImageData(source) {
@@ -503,6 +501,10 @@ class MEGAImageElement {
         if (!expr) {
             throw new MEGAException(message || 'Failed assertion.');
         }
+    }
+
+    getError() {
+        return 0;
     }
 
     tryCatch(cb, onerror) {
@@ -546,7 +548,11 @@ class MEGACanvasElement extends MEGAImageElement {
             options = ctx;
             ctx = '2d';
         }
-        if (typeof OffscreenCanvas === 'undefined') {
+        // @todo https://bugzilla.mozilla.org/show_bug.cgi?id=801176
+        if (self.supOffscreenCanvas) {
+            this.ctx = new OffscreenCanvas(width, height).getContext(ctx, options);
+        }
+        else {
             if (typeof document === 'undefined') {
                 throw new MEGAException('Out of scope.');
             }
@@ -555,9 +561,6 @@ class MEGACanvasElement extends MEGAImageElement {
             canvas.height = height;
 
             this.ctx = canvas.getContext(ctx, options);
-        }
-        else {
-            this.ctx = new OffscreenCanvas(width, height).getContext(ctx, options);
         }
 
         this.faced = null;
@@ -901,6 +904,8 @@ class MEGACanvasElement extends MEGAImageElement {
             maxWidth = maxWidth || sw;
             maxHeight = maxHeight || sh;
 
+            ats = ats || sw < maxWidth && sh < maxHeight;
+
             // @todo deprecate the following at the earliest convenience.
             // i.e. those are experiments to make the on-the-fly cropping in line with current live-site thumbnails.
             const thumbnail = maxWidth === maxHeight && ats > 0;
@@ -1117,7 +1122,10 @@ class MEGACanvasElement extends MEGAImageElement {
             throw new MEGAException('The image is tainted!', 'SecurityError');
         }
 
-        if (type === 'thumb') {
+        if (type === 'broken') {
+            type = MEGAImageElement.THUMBNAIL_TYPE;
+        }
+        else if (type === 'thumb') {
             type = this.isTransparent(data) ? MEGAImageElement.ALPHA_FORMAT : MEGAImageElement.THUMBNAIL_TYPE;
         }
         return this.convertToBlob(type, quality);
@@ -1195,6 +1203,15 @@ class MEGACanvasElement extends MEGAImageElement {
                 sy += bh;
             }
             data = canvas.ctx.getImageData(0, 0, width, height);
+        }
+        else if (typeof data === 'number') {
+            const pixel = (data < 0x100 ? data << 24 | data >> 4 << 16 | (data & 15) << 8 | 0xff : data) >>> 0;
+            data = new Uint32Array(width * height).fill(pixel);
+            data[width - 1] = pixel >>> 16; // anti tainted watermark
+            data = this.createImageData(data.buffer, width, height);
+            if (self.d > 1) {
+                console.debug('createImage, %s (0x%s)', pixel >>> 0, pixel.toString(16), pixel >>> 16, data);
+            }
         }
         else if (!data) {
             const size = 0xffff;
@@ -1387,6 +1404,10 @@ class WebGLMEGAContext extends MEGACanvasElement {
         this.gl.viewport(sx, sy, width, height);
     }
 
+    getError() {
+        return this.gl.getError();
+    }
+
     clearRect(sx, sy, sw, sh) {
         const {gl} = this;
         this.viewport(sw, sh, sx, sy);
@@ -1412,10 +1433,34 @@ class WebGLMEGAContext extends MEGACanvasElement {
         gl.drawArrays(gl.TRIANGLES, 0, 6);
         gl.flush();
 
-        const result = type && await this.convertTo(type, quality);
+        let error = this.getError();
+        let result = !error && type && await this.convertTo(type, quality);
 
         gl.deleteBuffer(b1);
         gl.deleteBuffer(b2);
+
+        if (error) {
+            error = `WebGL Error: ${error}`;
+            if (self.d) {
+                dump(error, '--- Trying to fallback to canvas...');
+            }
+
+            type = type === 'thumb' ? 'broken' : type;
+            result = await new MEGACanvasElement()
+                ._drawImage(image, sx, sy, sw, sh, dx, dy, dw, dh, type, quality)
+                .then((res) => {
+                    if (self.d) {
+                        dump('Falling back succeed!', res);
+                    }
+                    return res;
+                })
+                .catch(ex => {
+                    if (self.d) {
+                        dump('Falling back failed...', ex);
+                    }
+                    throw new MEGAException(error);
+                });
+        }
 
         return result;
     }
@@ -1866,7 +1911,7 @@ WebGLMEGAContext.test = async(...files) => {
     console.log(files);
 };
 
-if (typeof lazy === 'undefined') {
+if (self.isWorkerScope) {
     echo = (v) => v;
     lazy = (t, p, s) => Object.defineProperty(t, p, {
         get() {
@@ -1875,6 +1920,7 @@ if (typeof lazy === 'undefined') {
         },
         configurable: true
     });
+    self.tryCatch = MEGAImageElement.prototype.tryCatch;
     eventlog = (e) => fetch(`${apipath}cs?id=0&wwk=1`, {method: 'post', body: JSON.stringify([{a: 'log', e}])});
 }
 
@@ -1902,6 +1948,7 @@ lazy(self, 'faceDetector', () => Promise.resolve((async() => {
 
 ((self) => {
     'use strict';
+    let waiter = false;
     const debug = self.d > 0 ? self.d : self.is_karma || self.location.host !== 'mega.nz';
 
     const dump = (() => {
@@ -1916,11 +1963,20 @@ lazy(self, 'faceDetector', () => Promise.resolve((async() => {
         return (m, ...a) => console.warn(`[webgl:worker/%c${pid}%c] ${m}`, ...rgb, ...a);
     })();
 
+    if (self.OffscreenCanvas) {
+        // @todo https://bugzilla.mozilla.org/show_bug.cgi?id=801176
+        tryCatch(() => {
+            self.supOffscreenCanvas = Boolean(new self.OffscreenCanvas(1, 1).getContext('2d'));
+        }, (ex) => {
+            dump('This browser does lack proper OffscreenCanvas support.', [ex]);
+        })();
+    }
+
     if (!self.isWorkerScope && self.ImageBitmap && typeof createImageBitmap === 'function') {
         // Test for proper ImageBitmap compliance.
         // https://bugs.webkit.org/show_bug.cgi?id=182424
 
-        (async() => {
+        waiter = (async() => {
             const sample =
                 'data:image/jpeg;base64,/9j/4QBiRXhpZgAATU0AKgAAAAgABQESAAMAAAABAAcAAAEaAAUAAAABAAAASgEbAAUAAAA' +
                 'BAAAAUgEoAAMAAAABAAIAAAITAAMAAAABAAEAAAAAAAAAAABIAAAAAQAAAEgAAAAB/9sAQwABAQEBAQEBAQEBAQEBAQEBA' +
@@ -1934,11 +1990,16 @@ lazy(self, 'faceDetector', () => Promise.resolve((async() => {
             temp = await createImageBitmap(temp).catch(echo);
             temp = await ctx.drawImage(temp, 0, 0, 'imaged').catch(echo);
 
-            Object.defineProperty(self, 'supImageBitmap', {value: temp && temp.data && temp.data[9] === 123});
+            const value = temp && temp.data && temp.data[9];
+            Object.defineProperty(self, 'supImageBitmap', {value: value === 123});
 
             if (!self.supImageBitmap && debug) {
-                dump('This browser does lack proper ImageBitmap support.', temp);
+                dump('This browser does lack proper ImageBitmap support.', value, temp);
             }
+
+            queueMicrotask(() => {
+                waiter = null;
+            });
         })();
     }
 
@@ -1972,8 +2033,10 @@ lazy(self, 'faceDetector', () => Promise.resolve((async() => {
             return {thumbnail, preview};
         },
         'convert': async(data) => {
-            const {blob, buffer, target, quality} = data;
-            const image = await webgl.loadImage(blob || buffer, (blob || buffer).type);
+            const {blob, buffer, target = 'image/jpeg', quality = 0.9} = data;
+
+            data = blob || buffer || data;
+            const image = await webgl.loadImage(data, data.type);
 
             return webgl.drawImage(image, 0, 0, image.width, image.height, target, quality);
         }
@@ -2016,7 +2079,9 @@ lazy(self, 'faceDetector', () => Promise.resolve((async() => {
      *  @memberOf window
      */
     lazy(self, 'webgl', () => {
-        const canUseWorker = !self.isWorkerScope && self.OffscreenCanvas && self.supImageBitmap;
+        const props = lazy(Object.create(null), 'canUseWorker', () => {
+            return !self.isWorkerScope && self.supOffscreenCanvas && self.supImageBitmap;
+        });
         const MEGARenderingContext = self.isWebGLSupported ? WebGLMEGAContext : MEGACanvasElement;
         const webgl = new MEGARenderingContext();
 
@@ -2050,23 +2115,34 @@ lazy(self, 'faceDetector', () => Promise.resolve((async() => {
          * @memberOf webgl
          */
         lazy(webgl, 'worker', () => {
-            const data = {d: debug, supImageBitmap: !!self.supImageBitmap, apipath};
-            const worker = new MEGAWorkerController(gMessageHandler, canUseWorker ? data : false);
-            const handler = (...args) => worker.handler(...args);
+            const parity = lazy(Object.create(null), 'worker', () => {
+                const data = {d: debug, supImageBitmap: !!self.supImageBitmap, apipath};
+                return new MEGAWorkerController(gMessageHandler, props.canUseWorker ? data : false);
+            });
+            const wrap = (method) => {
+                if (!waiter) {
+                    return (...args) => parity.worker[method](...args);
+                }
+                return (...args) => Promise.resolve(waiter).then(() => parity.worker[method](...args));
+            };
+            const handler = wrap('handler');
+
+            if (self.d && !waiter) {
+                dump('waiter wrap was unneeded...', waiter);
+            }
 
             Object.defineProperties(handler, {
                 attach: {
-                    value: (...args) => worker.attach(...args)
+                    value: wrap('attach')
                 },
                 detach: {
-                    value: (...args) => worker.detach(...args)
-                },
-                [Symbol('__worker__')]: {value: self.d && worker}
+                    value: wrap('detach')
+                }
             });
             return handler;
         });
 
-        (async() => {
+        waiter = (async() => {
             const res = [];
             const colors = [];
             const check = (feat, msg) => {
@@ -2075,10 +2151,13 @@ lazy(self, 'faceDetector', () => Promise.resolve((async() => {
                 MEGACanvasElement.sup |= self[feat] && MEGACanvasElement[`SUPPORT_${(msg || feat).toUpperCase()}`];
             };
 
+            if (waiter) {
+                await waiter;
+            }
             check('isWebGLSupported', 'WebGL2');
-            check(canUseWorker && 'Worker', 'Worker');
-            check('OffscreenCanvas');
-            check(self.supImageBitmap && 'ImageBitmap', 'ImageBitmap');
+            check(props.canUseWorker && 'Worker', 'Worker');
+            check('supOffscreenCanvas', 'OffscreenCanvas');
+            check('supImageBitmap', 'ImageBitmap');
 
             await(async() => {
                 let v = 'yes!';
@@ -2119,6 +2198,10 @@ lazy(self, 'faceDetector', () => Promise.resolve((async() => {
                     dump(`${ua}components support:  ${res.join('%c   ')}`, ...colors.slice(0, -1));
                 }
             }
+
+            queueMicrotask(() => {
+                waiter = null;
+            });
         })();
 
         return webgl;

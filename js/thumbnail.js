@@ -27,7 +27,8 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
 
     if (window.omitthumb) {
         console.warn('Omitting thumb creation on purpose...', arguments);
-        return;
+        mBroadcaster.sendMessage('fa:error', id, 'omitthumb', false, 2);
+        return Promise.resolve();
     }
 
     if (typeof opt === 'object') {
@@ -118,6 +119,8 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
             if (preview && !onPreviewRetry) {
                 api_storefileattr(id, 1, key, preview, n.h, ph);
             }
+
+            // @todo make async and hold until api_storefileattr() completes (SC-ack)
         }
 
         if (node) {
@@ -129,11 +132,24 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
     };
 
     return (async() => {
+        const ext = fileext(file && file.name || n.name);
         const exifFromImage = !!exifImageRotation.fromImage;
 
-        if (isVideo && file) {
-            await Promise.resolve(M.require('videostream'));
-            imagedata = await Streamer.getThumbnail(file);
+        // @todo move all this to a reusable helper across upload/download
+        isVideo = isVideo || MediaInfoLib.isFileSupported(n);
+
+        if (isVideo && (file || imagedata && n.s >= imagedata.byteLength)) {
+            file = file || new File([imagedata], n.name, {type: filemime(n)});
+
+            // @todo FIXME mp3 may be wrongly detected as MLP (?!)
+            if (is_audio(n) || ext === 'mp3') {
+                const buffer = imagedata && imagedata.buffer;
+                imagedata = await getID3CoverArt(buffer || imagedata || file).catch(nop) || imagedata;
+            }
+            else {
+                await Promise.resolve(M.require('videostream'));
+                imagedata = await Streamer.getThumbnail(file).catch(nop) || imagedata;
+            }
         }
         else if (isRawImage && !exifFromImage) {
             // We don't need to rotate images ourselves, so we will decode it into a worker.
@@ -169,7 +185,12 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
         mBroadcaster.sendMessage('fa:error', id, ex, false, 2);
 
         if (!window.pfid && canStoreAttr) {
-            eventlog(99665, fileext(M.getNodeByHandle(node).name));
+            eventlog(99665, JSON.stringify([
+                1,
+                ext,
+                String(ex && ex.message || ex).split('\n')[0].substr(0, 64),
+                fa.includes(':8*') && String(MediaAttribute.getCodecStrings(n)) || 'na'
+            ]));
         }
         throw new MEGAException(ex, imagedata || file);
     });

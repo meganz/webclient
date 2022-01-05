@@ -637,6 +637,51 @@ function secondsToDays(seconds) {
     return seconds / (24 * 60 * 60);
 }
 
+function formatTimeField(field, value) {
+    'use strict';
+    return `${value}${field} `;
+}
+
+function secondsToTimeLong(secs) {
+    'use strict';
+
+    if (isNaN(secs) || secs === Infinity) {
+        return '--:--:--';
+    }
+    if (secs < 0) {
+        return '';
+    }
+
+    const years = Math.floor(secs / (365 * 24 * 60 * 60));
+    const divisor_for_months = secs % (365 * 24 * 60 * 60);
+    const months = Math.floor(divisor_for_months / (30 * 24 * 60 * 60));
+    const divisor_for_days = divisor_for_months % (30 * 24 * 60 * 60);
+    const days = Math.floor(divisor_for_days / (24 * 60 * 60));
+    const divisor_for_hours = divisor_for_days % (24 * 60 * 60);
+    const hours = uplpad(Math.floor(divisor_for_hours / (60 * 60)), 2);
+    const divisor_for_minutes = divisor_for_hours % (60 * 60);
+    const minutes = uplpad(Math.floor(divisor_for_minutes / 60), 2);
+    const divisor_for_seconds = divisor_for_minutes % 60;
+    const seconds = uplpad(Math.floor(divisor_for_seconds), 2);
+
+    const fields = ['y', 'm', 'd', 'h', 'm'];
+    const values = [years, months, days, hours, minutes];
+    const time_fields = [];
+
+    for (let i = 0; i < values.length; i++) {
+        if (values[i] > 0) {
+            for (let j = i; j < values.length; j++) {
+                time_fields.push(formatTimeField(fields[j], values[j]));
+            }
+            break;
+        }
+    }
+
+    time_fields.push(`${seconds}s `);
+
+    return time_fields.join('');
+}
+
 /**
  * Calculate the number of days since the given date
  * @param {String} dateStr The date string, in YYYY-MM-DD format

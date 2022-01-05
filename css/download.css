@@ -687,7 +687,7 @@ button.megasync-slider.prev {
     color: var(--text-color-high);
 }
 .download.transfer-overquota-txt span.countdown {
-    margin: 0 2px;
+    margin: -5px 2px 0;
 }
 .download.transfer-overquota-txt span {
     padding: 0 2px;

@@ -2279,6 +2279,7 @@ function topmenuUI() {
     var $menuRefreshItem = $('.top-menu-item.refresh-item', $topMenu);
     var $menuHomeItem = $('.top-menu-item.start', $topMenu);
     var $menuPricingItem = $('.top-menu-item.pro', $topMenu);
+    const $menuAchievementsItem = $('.top-menu-item.achievements', $topMenu);
     var $menuBackupItem = $('.top-menu-item.backup', $topMenu);
     var $menuAffiliateItem = $('.top-menu-item.affiliate', $topMenu);
     var $menuFeedbackItem = $('.top-menu-item.feedback', $topMenu);
@@ -2306,6 +2307,7 @@ function topmenuUI() {
     $menuBackupItem.addClass('hidden').next('.top-menu-divider').addClass('hidden');
     $menuHomeItem.removeClass('hidden');
     $menuPricingItem.removeClass('hidden');
+    $menuAchievementsItem.removeClass('hidden');
     $menuFmItem.addClass('hidden');
     $menuLogoutButton.addClass('hidden');
     $menuAuthButtons.addClass('hidden');
@@ -2510,6 +2512,11 @@ function topmenuUI() {
         }
         else {
             document.body.classList.remove('business-user');
+        }
+
+        if (!mega.flags.ach || Object(window.u_attr).b) {
+            // Hide Achievements menu item for an non-achievement account and business account
+            $menuAchievementsItem.addClass('hidden');
         }
 
         // Show PRO plan expired warning popup (if applicable)

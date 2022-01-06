@@ -1284,7 +1284,7 @@ function init_page() {
         });
     }
     else if (page.substr(0, 4) === 'help') {
-        return Help.render();
+        return location.replace('https://help.mega.io' + location.hash);
     }
     else if (page === 'privacy') {
         parsepage(pages['privacy']);
@@ -2823,7 +2823,7 @@ function topmenuUI() {
                 var subPages = [
                     'about', 'account', 'backup', 'blog', 'cmd', 'contact',
                     'copyright', 'corporate', 'credits', 'desktop', 'doc', 'extensions',
-                    'help', 'login', 'mega', 'nzippmember', 'nziphotographer', 'privacy', 'mobileapp',
+                    'login', 'mega', 'nzippmember', 'nziphotographer', 'privacy', 'mobileapp',
                     'mobile', 'register', 'resellers', 'sdk', 'sitemap', 'sourcecode',
                     'support', 'takedown', 'terms', 'start', 'security', 'affiliate',
                     'nas', 'pro', 'cookie', 'securechat', 'collaboration', 'storage', 'special',
@@ -2869,6 +2869,9 @@ function topmenuUI() {
                 }
                 else if (className.indexOf('transparency') > -1) {
                     window.open('https://mega.io/Mega_Transparency_Report_September_2021.pdf', '_blank');
+                }
+                else if (className.includes('help')) {
+                    window.open('https://help.mega.io');
                 }
             }
             return false;

@@ -492,7 +492,8 @@ export default class HistoryPanel extends MegaRenderMixin {
                 var headerText = l[8002];
 
                 if (contactName) {
-                    headerText = headerText.replace("%s", "<span>" + htmlentities(contactName) + "</span>");
+                    headerText = headerText.replace("%s", "<span>" + megaChat.plugins.emoticonsFilter
+                        .processHtmlMessage(htmlentities(contactName)) + "</span>");
                 }
                 else {
                     headerText = megaChat.plugins.emoticonsFilter.processHtmlMessage(htmlentities(room.getRoomTitle()));

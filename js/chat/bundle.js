@@ -23987,6 +23987,10 @@ let ConversationsApp = (conversations_dec3 = utils["default"].SoonFcWrap(80), (c
         'margin-left': "0px"
       });
     } else {
+      if (megaChat.$leftPane && megaChat.$leftPane.hasClass('resizable-pane-active')) {
+        return;
+      }
+
       const newMargin = $('.fm-left-panel').width() + $('.nw-fm-left-icons-panel').width() + "px";
       $('.fm-right-files-block, .fm-right-account-block').filter(':visible').css({
         'margin-inline-start': newMargin,

@@ -203,6 +203,8 @@ mega.textEditorUI = new function TextEditorUI() {
             boundingElement: $containerDialog[0]
         });
 
+        const $saveAsBtn = $('.file-menu .save-as-f', $editorContainer);
+
         $('.file-btn', $menuBar).rebind(
             'click.txt-editor',
             function textEditorMenuOpen() {
@@ -257,6 +259,11 @@ mega.textEditorUI = new function TextEditorUI() {
                 }
                 if (editor) {
                     $saveButton.addClass('disabled');
+
+                    if (M.getNodeRights(fileHandle) < 2) {
+                        $saveAsBtn.trigger('click');
+                        return false;
+                    }
 
                     loadingDialog.show('common', l[23131]);
 
@@ -338,7 +345,7 @@ mega.textEditorUI = new function TextEditorUI() {
             }
         );
 
-        $('.file-menu .save-as-f', $menuBar).rebind(
+        $saveAsBtn.rebind(
             'click.txt-editor',
             function saveAsMenuClick() {
                 // loadingDialog.show();
@@ -433,7 +440,7 @@ mega.textEditorUI = new function TextEditorUI() {
                     switch (event.code) {
                         case 'KeyS':
                             if (event.shiftKey) {
-                                $('.context-menu .save-as-f', $editorContainer).trigger('click');
+                                $saveAsBtn.trigger('click');
                             }
                             else {
                                 $saveButton.trigger('click');

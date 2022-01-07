@@ -3776,7 +3776,7 @@ function FMResizablePane(element, opts) {
             maxHeight: opts.maxHeight,
             maxWidth: opts.maxWidth,
             start: function(e, ui) {
-
+                $(self.element).addClass('resizable-pane-active');
             },
             resize: function(e, ui) {
                 var css_attrs = {
@@ -3804,6 +3804,7 @@ function FMResizablePane(element, opts) {
                 $self.trigger('resize', [e, ui]);
             },
             'stop': function(e, ui) {
+                $(self.element).removeClass('resizable-pane-active');
                 $self.trigger('resizestop', [e, ui]);
                 $(window).trigger('resize');
             }

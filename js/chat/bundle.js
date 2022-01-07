@@ -5587,7 +5587,7 @@ class ContactButton extends _mixins1__._p {
     var contact = self.props.contact;
     var dropdowns = self.props.dropdowns ? self.props.dropdowns : [];
     var moreDropdowns = [];
-    var username = M.getNameByHandle(contact.u);
+    var username = react0().createElement(_ui_utils_jsx2__["default"].EmojiFormattedContent, null, M.getNameByHandle(contact.u));
 
     var onContactClicked = function () {
       if (contact.c === 2) {
@@ -6164,6 +6164,7 @@ class ContactCard extends _mixins1__._p {
       username += " (" + escapeHTML(l[8885]) + ")";
     }
 
+    username = react0().createElement(_ui_utils_jsx2__["default"].EmojiFormattedContent, null, username);
     var dropdowns = this.props.dropdowns ? this.props.dropdowns : [];
     var noContextMenu = this.props.noContextMenu ? this.props.noContextMenu : "";
     var noContextButton = this.props.noContextButton ? this.props.noContextButton : "";
@@ -7096,9 +7097,12 @@ class Nil extends mixins.wl {
 var fmView = __webpack_require__(61);
 // EXTERNAL MODULE: ./js/chat/ui/contacts.jsx
 var contacts = __webpack_require__(13);
+// EXTERNAL MODULE: ./js/ui/utils.jsx
+var utils = __webpack_require__(79);
 // EXTERNAL MODULE: ./js/ui/jsx/fm/nodes/genericNodePropsComponent.jsx + 1 modules
 var genericNodePropsComponent = __webpack_require__(297);
 ;// CONCATENATED MODULE: ./js/ui/jsx/fm/nodes/columns/columnContactName.jsx
+
 
 
 
@@ -7117,7 +7121,7 @@ class ColumnContactName extends genericNodePropsComponent.L {
       className: "contact-item"
     }, external_React_default().createElement("div", {
       className: "contact-item-user"
-    }, nodeAdapter.nodeProps.title), external_React_default().createElement("div", {
+    }, external_React_default().createElement(utils.EmojiFormattedContent, null, nodeAdapter.nodeProps.title)), external_React_default().createElement("div", {
       className: "contact-item-email"
     }, node.m)), external_React_default().createElement("div", {
       className: "clear"
@@ -7218,6 +7222,7 @@ var dropdowns = __webpack_require__(78);
 
 
 
+
 class ContextMenu extends mixins.wl {
   constructor(props) {
     super(props);
@@ -7268,7 +7273,7 @@ class ContextMenu extends mixins.wl {
         className: "avatar-wrapper context-avatar"
       }), external_React_default().createElement("div", {
         className: "dropdown-profile"
-      }, external_React_default().createElement("span", null, M.getNameByHandle(contact.u)), external_React_default().createElement(contacts.ContactPresence, {
+      }, external_React_default().createElement("span", null, external_React_default().createElement(utils.EmojiFormattedContent, null, M.getNameByHandle(contact.u))), external_React_default().createElement(contacts.ContactPresence, {
         contact: contact
       }))), external_React_default().createElement(dropdowns.DropdownItem, {
         icon: "sprite-fm-mono icon-chat",
@@ -8004,6 +8009,7 @@ ColumnSharedFolderButtons.megatype = "grid-url-header-nw";
 
 
 
+
 class ContactProfile extends mixins.wl {
   constructor(props) {
     super(props);
@@ -8018,7 +8024,7 @@ class ContactProfile extends mixins.wl {
         onClick: () => loadSubPage('fm/chat/contacts')
       }, ContactsPanel.LABEL.CONTACTS), external_React_default().createElement("i", {
         className: "sprite-fm-mono icon-arrow-right"
-      })), external_React_default().createElement("li", null, M.getNameByHandle(handle))));
+      })), external_React_default().createElement("li", null, external_React_default().createElement(utils.EmojiFormattedContent, null, M.getNameByHandle(handle)))));
     };
 
     this.Credentials = () => {
@@ -8174,7 +8180,7 @@ class ContactProfile extends mixins.wl {
         className: "profile-photo avatar-wrapper contacts-medium-avatar"
       }), external_React_default().createElement("div", {
         className: "profile-info"
-      }, external_React_default().createElement("h2", null, M.getNameByHandle(handle), external_React_default().createElement(contacts.ContactPresence, {
+      }, external_React_default().createElement("h2", null, external_React_default().createElement(utils.EmojiFormattedContent, null, M.getNameByHandle(handle)), external_React_default().createElement(contacts.ContactPresence, {
         contact: contact
       })), external_React_default().createElement("span", null, contact.m)), HAS_RELATIONSHIP && external_React_default().createElement("div", {
         className: "profile-controls"
@@ -18566,7 +18572,7 @@ let HistoryPanel = (historyPanel_dec = utils["default"].SoonFcWrap(50), historyP
         var headerText = l[8002];
 
         if (contactName) {
-          headerText = headerText.replace("%s", "<span>" + htmlentities(contactName) + "</span>");
+          headerText = headerText.replace("%s", "<span>" + megaChat.plugins.emoticonsFilter.processHtmlMessage(htmlentities(contactName)) + "</span>");
         } else {
           headerText = megaChat.plugins.emoticonsFilter.processHtmlMessage(htmlentities(room.getRoomTitle()));
         }
@@ -23987,6 +23993,10 @@ let ConversationsApp = (conversations_dec3 = utils["default"].SoonFcWrap(80), (c
         'margin-left': "0px"
       });
     } else {
+      if (megaChat.$leftPane && megaChat.$leftPane.hasClass('resizable-pane-active')) {
+        return;
+      }
+
       const newMargin = $('.fm-left-panel').width() + $('.nw-fm-left-icons-panel').width() + "px";
       $('.fm-right-files-block, .fm-right-account-block').filter(':visible').css({
         'margin-inline-start': newMargin,

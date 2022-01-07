@@ -1111,6 +1111,9 @@ class ConversationsApp extends MegaRenderMixin {
                 });
         }
         else {
+            if (megaChat.$leftPane && megaChat.$leftPane.hasClass('resizable-pane-active')) {
+                return;
+            }
             const newMargin = ($('.fm-left-panel').width() + $('.nw-fm-left-icons-panel').width()) + "px";
             $('.fm-right-files-block, .fm-right-account-block')
                 .filter(':visible')

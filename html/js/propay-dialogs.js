@@ -554,44 +554,48 @@ var voucherDialog = {
         var oldStorage = oldPlan ? (oldPlan[2] * Math.pow(1024, 3)) : 0;
         var newStorage = Math.max(pro.propay.selectedProPackage[2] * Math.pow(1024, 3), oldStorage);
         var newTransfer = pro.propay.selectedProPackage[3] * Math.pow(1024, 3);
-        var intl = mega.intl.number;
 
         // Update template
         this.$dialog.find('.plan-icon').removeClass('pro1 pro2 pro3 pro4').addClass('pro' + proNum);
         this.$dialog.find('.voucher-plan-title').text(proPlan);
         this.$dialog.find('.voucher-plan-txt .duration').text(monthsWording);
-        this.$dialog.find('.voucher-plan-price .price').text(intl.format(proPrice));
+        this.$dialog.find('.voucher-plan-price .price').text(formatCurrency(proPrice));
         this.$dialog.find('#voucher-code-input input').val('');
         const hasSufficientBalance = this.changeColourIfSufficientBalance();
 
         var $voucherAccountBalance = this.$dialog.find('.voucher-account-balance');
         var $balanceAmount = $voucherAccountBalance.find('.balance-amount');
-        $balanceAmount.text(intl.format(balance));
+        $balanceAmount.text(formatCurrency(balance));
 
         // Mobile specific dialog enhancements
         if (is_mobile) {
             var $newBalanceAmount = $voucherAccountBalance.find('.new-balance-amount');
             var $storageAmount = $voucherAccountBalance.find('.storage-amount');
             var $newStorageAmount = $voucherAccountBalance.find('.new-storage-amount');
+            var $currentAchievementsAmount = $('.current-achievements-amount', $voucherAccountBalance);
             var $transferAmount = $voucherAccountBalance.find('.transfer-amount');
             var $newTransferAmount = $voucherAccountBalance.find('.new-transfer-amount');
 
-            $newBalanceAmount.text(newBalance);
+            $newBalanceAmount.text(formatCurrency(newBalance));
 
             if (newBalance < 0) {
                 $newBalanceAmount.addClass('red');
             }
 
-            $storageAmount.text(bytesToSize(M.account.space));
-            $newStorageAmount.text(bytesToSize(M.account.space - oldStorage + newStorage));
+            $storageAmount.text(bytesToSize(M.account.space, 0));
+            $newStorageAmount.text(bytesToSize(newStorage, 0));
+            if (M.maf.storage.current) {
+                $currentAchievementsAmount.text(`+ ${bytesToSize(M.maf.storage.current, 0)}`);
+                $currentAchievementsAmount.removeClass('hidden');
+            }
 
             if (M.account.type) {
-                $transferAmount.text(bytesToSize(M.account.tfsq.max));
-                $newTransferAmount.text(bytesToSize(M.account.tfsq.max + newTransfer));
+                $transferAmount.text(bytesToSize(M.account.tfsq.max, 0));
+                $newTransferAmount.text(bytesToSize(M.account.tfsq.max + newTransfer, 0));
             }
             else {
                 $transferAmount.text('Limited');
-                $newTransferAmount.text(bytesToSize(newTransfer));
+                $newTransferAmount.text(bytesToSize(newTransfer, 0));
             }
         }
 
@@ -752,8 +756,10 @@ var voucherDialog = {
                     var newBalance = parseFloat(balance - proPrice).toFixed(2);
 
                     // Update dialog details
-                    voucherDialog.$dialog.find('.voucher-account-balance .balance-amount').text(balance);
-                    voucherDialog.$dialog.find('.voucher-account-balance .new-balance-amount').text(newBalance);
+                    voucherDialog.$dialog.find('.voucher-account-balance .balance-amount')
+                        .text(formatCurrency(balance));
+                    voucherDialog.$dialog.find('.voucher-account-balance .new-balance-amount')
+                        .text(formatCurrency(newBalance));
                     const sufficientBalance = voucherDialog.changeColourIfSufficientBalance();
 
                     if (!sufficientBalance) {
@@ -768,6 +774,9 @@ var voucherDialog = {
                 loadingDialog.hide();
 
                 if (ex) {
+                    if (ex === ETOOMANY) {
+                        ex = l.redeem_etoomany;
+                    }
                     msgDialog('warninga', l[135], l[47], ex, function() {
                         voucherDialog.showBackgroundOverlay();
                     });
@@ -939,8 +948,7 @@ var wireTransferDialog = {
                     proPrice = numOfMonths === 1 ? mega.intl.number.format(discountInfo.emp)
                         : mega.intl.number.format(discountInfo.eyp);
                 }
-                this.$dialog.find('.amount').text(mega.intl.number.format(proPrice)).closest('tr')
-                    .removeClass('hidden');
+                this.$dialog.find('.amount').text(formatCurrency(proPrice)).closest('tr').removeClass('hidden');
             }
             else {
                 this.$dialog.find('.amount').closest('tr').addClass('hidden');
@@ -1251,6 +1259,33 @@ var addressDialog = {
         var numOfMonths;
         var monthsWording;
 
+        if (!is_mobile) {
+            $('.error-message', this.$dialog).addClass('hidden');
+
+            var $contentSection = $('section.content', this.$dialog);
+            if ($contentSection.is('.ps-container')) {
+                Ps.update($contentSection[0]);
+            }
+            else {
+                Ps.initialize($contentSection[0]);
+            }
+            const $paymentIcons = $('.payment-icons', this.$dialog);
+            const specialLogos = ['stripeAE', 'stripeJC', 'stripeUP', 'stripeDD'];
+            const gate = this.businessPlan && this.businessPlan.usedGateName || pro.propay.proPaymentMethod;
+            if (specialLogos.includes(gate)) {
+
+                $('i', $paymentIcons).addClass('hidden');
+                $('.payment-provider-icon', $paymentIcons)
+                    .removeClass('hidden stripeAE stripeJC stripeUP stripeDD')
+                    .addClass(gate);
+            }
+            else {
+                $('i', $paymentIcons).removeClass('hidden');
+                $('.payment-provider-icon', $paymentIcons).addClass('hidden')
+                    .removeClass('stripeAE stripeJC stripeUP stripeDD');
+            }
+        }
+
         // in case we are coming from normal users sign ups (PRO)
         if (!this.businessPlan || !this.userInfo) {
             // Get the selected package
@@ -1306,7 +1341,7 @@ var addressDialog = {
             .addClass(proNum);
         this.$dialog.find('.payment-plan-title').text(proPlan);
         this.$dialog.find('.payment-plan-txt .duration').text(monthsWording);
-        this.proPrice = mega.intl.number.format(proPrice);
+        this.proPrice = formatCurrency(proPrice);
         this.$dialog.find('.payment-plan-price .price').text(this.proPrice);
 
         // Show the black background overlay and the dialog
@@ -1809,13 +1844,13 @@ var addressDialog = {
         var taxCode = inputSelector(this.taxCodeMegaInput).$input.val();
 
         // Selectors for error handling
-        var $errorMessage = this.$dialog.find('.error-message', this.$dialog);
-        var $errorMessageContainers = this.$dialog.find('.message-container', this.$dialog);
+        var $errorMessage = $('.error-message', this.$dialog);
+        var $errorMessageContainers = $('.message-container', this.$dialog);
         var $allInputs = $('.mega-input', this.$dialog);
 
         // Reset state of past error messages
         var stateNotSet = false;
-        $errorMessage.addClass('hidden');
+        $errorMessage.addClass(is_mobile ? 'v-hidden' : 'hidden');
         $errorMessageContainers.addClass('hidden');
         $allInputs.removeClass('error');
 
@@ -1844,7 +1879,16 @@ var addressDialog = {
                 !fieldValues['city'] || !fieldValues['postcode'] || !country || stateNotSet) {
 
             // Show a general error and exit early if they are not complete
-            $errorMessage.removeClass('hidden');
+            $errorMessage.removeClass(is_mobile ? 'v-hidden' : 'hidden');
+
+            // Scroll down to the error message automatically if on large scaled displays
+            const $contentSection = $('section.content.ps-container', this.$dialog);
+            if ($contentSection.length > 0) {
+                const scrollBottom = $contentSection.get(0).scrollHeight - $contentSection.get(0).clientHeight;
+                if (scrollBottom > 0) {
+                    $contentSection.scrollTop(scrollBottom);
+                }
+            }
             return false;
         }
 
@@ -2006,6 +2050,14 @@ var addressDialog = {
 
             $('.stripe-error', $stripeFailureDialog).text(error || '');
 
+            if (addressDialog.stripeSaleId === 'EDIT') {
+                $((is_mobile ? '.fail-head' : '.payment-stripe-failure-dialog-title'), $stripeFailureDialog)
+                    .text(l.payment_gw_update_fail);
+                $('.err-txt', $stripeFailureDialog).safeHTML(l.payment_gw_update_fail_desc
+                    .replace('[A]', '<a href="mailto:support@mega.nz">')
+                    .replace('[/A]', '</a>'));
+            }
+
             $stripeIframe.remove();
             $stripeDialog.addClass('hidden');
             M.safeShowDialog('stripe-pay-failure', $stripeFailureDialog);
@@ -2020,18 +2072,42 @@ var addressDialog = {
                 return;
             }
             if (event.data === 'closeme') {
-                return closeDialog();
+                closeDialog();
+                // Load the proper page UI after close the stripe payment dialog
+                if (page === 'registerb') {
+                    page = '';
+                    loadSubPage('registerb');
+                }
+                else if (page === 'repay') {
+                    page = '';
+                    loadSubPage('repay');
+                }
+                return;
             }
             if (event.data.startsWith('payfail^')) {
                 failHandle(event.data.split('^')[1]);
             }
             else if (event.data === 'paysuccess') {
 
-                addressDialog.stripeCheckerCounter = 0;
+                if (addressDialog.stripeSaleId === 'EDIT') {
+                    closeDialog();
 
-                pro.propay.paymentStatusChecker =
-                    setTimeout(addressDialog.stripePaymentChecker
-                        .bind(addressDialog, addressDialog.stripeSaleId), 500);
+                    msgDialog('info', '', l.payment_card_update, l.payment_card_update_desc, () => {
+                        if (!is_mobile && page.includes('fm/account/plan')) {
+                            accountUI.plan.init(M.account);
+                        }
+                        else if (is_mobile && page === 'fm/account/paymentcard') {
+                            mobile.account.paymentCard.init();
+                        }
+                    });
+                }
+                else {
+                    addressDialog.stripeCheckerCounter = 0;
+
+                    pro.propay.paymentStatusChecker =
+                        setTimeout(addressDialog.stripePaymentChecker
+                            .bind(addressDialog, addressDialog.stripeSaleId), 500);
+                }
             }
             else if (event.data.startsWith('action^')) {
                 const destURL = event.data.split('^')[1] || '';
@@ -2077,6 +2153,7 @@ var addressDialog = {
     processUtcResult: function(utcResult, isStripe, saleId) {
         'use strict';
         this.gatewayOrigin = null;
+
         if (isStripe) {
             this.stripeSaleId = null;
             if (utcResult.EUR) {
@@ -2085,13 +2162,15 @@ var addressDialog = {
                     $('.fm-dialog.mobile.payment-stripe-dialog, .mega-dialog.payment-stripe-dialog .iframe-container');
                 let $stripeIframe = $('iframe#stripe-widget', $stripeDialog);
                 $stripeIframe.remove();
+                const sandBoxCSP = 'allow-scripts allow-same-origin allow-forms'
+                    + (utcResult.edit ? ' allow-popups' : '');
 
                 $stripeIframe = mCreateElement(
                     'iframe',
                     {
                         width: '100%',
                         height: '100%',
-                        sandbox: 'allow-scripts allow-same-origin allow-forms',
+                        sandbox: sandBoxCSP,
                         frameBorder: '0'
                     },
                     $iframeContainer[0]
@@ -2113,37 +2192,58 @@ var addressDialog = {
                         this.gatewayOrigin = testSrc.origin;
                         const secret = payInfo.searchParams.get('s');
                         const env = payInfo.searchParams.get('e');
+                        const editType = payInfo.searchParams.get('t');
+                        const planprice = payInfo.searchParams.get('pp');
                         if (secret) {
                             testSrc.searchParams.append('s', secret);
                         }
                         if (env) {
                             testSrc.searchParams.append('e', env);
                         }
+                        if (editType) {
+                            testSrc.searchParams.append('t', editType);
+                        }
+                        if (editType) {
+                            testSrc.searchParams.append('pp', planprice);
+                        }
                         iframeSrc = testSrc.toString();
                     }
                 }
 
-                iframeSrc += `&p=${this.proNum}`;
-                iframeSrc += `&pp=${b64encode(this.proPrice)}`;
+                this.stripeSaleId = 'EDIT';
+
+                if (!utcResult.edit) {
+
+                    iframeSrc += `&p=${this.proNum}`;
+                    if (this.extraDetails.recurring) {
+                        iframeSrc += '&r=1';
+                    }
+                    iframeSrc += `&m=${this.numOfMonths}`;
+
+                    this.stripeSaleId = saleId;
+
+                    const gate = this.businessPlan && this.businessPlan.usedGateName || pro.propay.proPaymentMethod;
+
+                    if (gate) {
+                        iframeSrc += `&g=${b64encode(gate)}`;
+                    }
+                }
+
 
                 const locale = addressDialog.stripeLocal();
                 if (locale) {
                     iframeSrc += '&l=' + locale;
                 }
-                if (this.extraDetails.recurring) {
-                    iframeSrc += '&r=1';
-                }
+
                 if (is_mobile) {
                     iframeSrc += '&mobile=1';
                 }
-                iframeSrc += `&m=${this.numOfMonths}`;
 
                 $stripeIframe.src = iframeSrc;
                 $stripeIframe.id = 'stripe-widget';
 
                 pro.propay.hideLoadingOverlay();
                 loadingDialog.hide();
-                this.stripeSaleId = saleId;
 
                 M.safeShowDialog('stripe-pay', $stripeDialog);
 
@@ -2286,7 +2386,7 @@ var cardDialog = {
         // Update the Pro plan details
         this.$dialog.find('.plan-icon').removeClass('pro1 pro2 pro3 pro4').addClass('pro' + proNum);
         this.$dialog.find('.payment-plan-title').text(proPlan);
-        this.$dialog.find('.payment-plan-price').text(proPrice + '\u20AC');
+        this.$dialog.find('.payment-plan-price').text(formatCurrency(proPrice));
         this.$dialog.find('.payment-plan-txt').text(monthsWording + ' ' + l[6965] + ' ');
 
         // Remove rogue colon in translation text

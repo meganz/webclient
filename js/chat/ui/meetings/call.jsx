@@ -1,5 +1,5 @@
 import React from 'react';
-import { MegaRenderMixin } from '../../../stores/mixins';
+import { MegaRenderMixin } from '../../mixins';
 import Stream, { STREAM_ACTIONS, MAX_STREAMS } from './stream.jsx';
 import Sidebar from './sidebar.jsx';
 import Invite from './workflow/invite/invite.jsx';
@@ -62,7 +62,8 @@ export default class Call extends MegaRenderMixin {
         invite: false,
         end: false,
         ephemeral: false,
-        ephemeralAccounts: []
+        ephemeralAccounts: [],
+        guest: Call.isGuest()
     };
 
     /**
@@ -333,7 +334,7 @@ export default class Call extends MegaRenderMixin {
 
     render() {
         const { minimized, streams, call, chatRoom, parent, sfuApp, onDeleteMessage } = this.props;
-        const { mode, view, sidebar, forcedLocal, invite, end, ephemeral, ephemeralAccounts } = this.state;
+        const { mode, view, sidebar, forcedLocal, invite, end, ephemeral, ephemeralAccounts, guest } = this.state;
         const STREAM_PROPS = {
             mode,
             streams,
@@ -349,13 +350,6 @@ export default class Call extends MegaRenderMixin {
 
         //
         // `Call`
-        // https://mega.nz/file/8UUTQIQT#6WSKPYSkyH9efaZi1WNZocf3GFn0nJpIIat6F1n_7ck
-        // https://mega.nz/file/5BVFHaxR#iekG3QCDL7wzGXySrObToLVX8PcjgD1jsQVeA_AHBAE
-        // https://mega.nz/file/8UUTQIQT#6WSKPYSkyH9efaZi1WNZocf3GFn0nJpIIat6F1n_7ck
-        // https://mega.nz/file/YcE3wIIC#JxpJWWw3NK6zxnzwUdBbQNEws6RyT8YNCqDaFIYAUvE
-        //
-        // Component hierarchy
-        // [...] add component hierarchy model
         // -------------------------------------------------------------------------
 
         return (
@@ -383,6 +377,8 @@ export default class Call extends MegaRenderMixin {
                 {sidebar && (
                     <Sidebar
                         {...STREAM_PROPS}
+                        guest={guest}
+                        onGuestClose={() => this.setState({ guest: false })}
                         onSidebarClose={() => this.setState({ ...Call.STATE.DEFAULT })}
                         onDeleteMessage={onDeleteMessage}
                     />

@@ -19,16 +19,6 @@
     &-head {
         text-align: center;
 
-        h1 {
-            margin: 24px 0 88px 0;
-
-            @include small-screen {
-                font: var(--text-h2);
-                margin-top: 14px;
-                margin-bottom: 18px;
-            }
-        }
-
         .join-meeting-logo {
             /* [...] */
 
@@ -39,9 +29,31 @@
                 height: 65px;
             }
         }
+
+        h1 {
+            margin: 24px 0 0 0;
+
+            @include small-screen {
+                font: var(--text-h2);
+                margin-top: 14px;
+                margin-bottom: 18px;
+            }
+        }
+
+        .ephemeral-info {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--label-orange);
+
+            p {
+                padding: 0 0 0 10px;
+            }
+        }
     }
 
     &-content {
+        margin: 88px 0 0 0;
         text-align: center;
 
         button {
@@ -120,7 +132,7 @@
         position: relative;
         width: 800px;
         height: 300px;
-        margin: 0 auto;
+        margin: 88px auto 0;
         box-sizing: border-box;
         box-shadow: 0 1px 10px 0 rgba(0, 0, 0, 0.10);
         border-radius: 30px;

@@ -1,7 +1,8 @@
 import React from 'react';
-import { MegaRenderMixin } from '../../../stores/mixins.js';
+import { MegaRenderMixin } from '../../mixins';
 import { DropdownItem } from '../../../ui/dropdowns.jsx';
 import { Avatar, ContactPresence } from '../contacts.jsx';
+import { EmojiFormattedContent } from '../../../ui/utils.jsx';
 import ContactsPanel from './contactsPanel.jsx';
 
 export default class ContextMenu extends MegaRenderMixin {
@@ -53,7 +54,8 @@ export default class ContextMenu extends MegaRenderMixin {
                                 className="avatar-wrapper context-avatar"
                             />
                             <div className="dropdown-profile">
-                                <span>{M.getNameByHandle(contact.u)}</span>
+                                <span><EmojiFormattedContent>{M.getNameByHandle(contact.u)}
+                                </EmojiFormattedContent></span>
                                 <ContactPresence contact={contact} />
                             </div>
                         </div>
@@ -161,10 +163,10 @@ export default class ContextMenu extends MegaRenderMixin {
                     </div>
                     <hr />
                     <DropdownItem
-                        icon="sprite-fm-mono icon-disabled-filled"
+                        icon="sprite-fm-mono icon-disable"
                         label={l[1001]}
                         disabled={!!contact.b}
-                        className="red"
+                        className=""
                         onClick={() =>
                             this.close(() =>
                                 fmremove(contact.u)

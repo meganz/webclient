@@ -47,37 +47,6 @@
                     bottom: -9999px;
                     visibility: hidden;
                 }
-
-                .active-indicator {
-                    position: absolute;
-                    top: -1px;
-                    right: 2px;
-                    width: 12px;
-                    height: 12px;
-                    border-radius: 200px;
-                    background: #88FF5B;
-                }
-            }
-        }
-    }
-
-    //
-    // Button group
-    // TODO: refactor -- possibly part of `Button`
-    // --------------------------------------------------------------------
-
-    .button-group {
-        position: relative;
-
-        &-menu {
-            display: none;
-            position: absolute;
-            transform: translateY(-100%);
-
-            &.expanded { display: block; }
-
-            .button-group-item {
-                margin: 0 0 10px 0;
             }
         }
     }

@@ -782,7 +782,15 @@ ChatRoom.prototype.isArchived = function() {
     return (self.flags & ChatRoom.ARCHIVED);
 };
 
-
+/**
+ * Check whether a chatRoom is in anonymous view
+ *
+ * @returns {Boolean}
+ */
+ChatRoom.prototype.isAnonymous = function() {
+    return is_chatlink && this.type === "public" && this.publicChatHandle &&
+        this.publicChatKey && this.publicChatHandle === megaChat.initialPubChatHandle;
+};
 
 /**
  * Check whether a chat is displayable.
@@ -1949,6 +1957,9 @@ ChatRoom.prototype.joinCall = ChatRoom._fnRequireParticipantKeys(function(audio,
     if (this.meetingsLoading) {
         return;
     }
+    if (window.sfuClient) {
+        window.sfuClient.app.destroy();
+    }
 
     this.meetingsLoading = l.joining /* `Joining` */;
 
@@ -1961,7 +1972,7 @@ ChatRoom.prototype.joinCall = ChatRoom._fnRequireParticipantKeys(function(audio,
     });
 
     callId = callId || this.activeCallIds.keys()[0];
-    asyncApiReq({'a': 'mcmj', 'cid': this.chatId, "mid": callId})
+    return asyncApiReq({'a': 'mcmj', 'cid': this.chatId, "mid": callId})
         .then((r) => {
             var app = new SfuApp(this, callId);
             window.sfuClient = app.sfuClient = new SfuClient(
@@ -1979,8 +1990,9 @@ ChatRoom.prototype.joinCall = ChatRoom._fnRequireParticipantKeys(function(audio,
             );
             app.sfuClient.muteAudio(!audio);
             app.sfuClient.muteCamera(!video);
-            app.sfuClient.connect(r.url, callId, this.type !== "private");
-        }, () => {
+            return app.sfuClient.connect(r.url, callId, this.type !== "private");
+        }, ex => {
+            console.error('Failed to join call:', ex);
             this.meetingsLoading = false;
             this.unbind("onCallEnd.start");
         });
@@ -2081,7 +2093,8 @@ ChatRoom.prototype.startCall = ChatRoom._fnRequireParticipantKeys(function(audio
             });
             // r.callId
             sfuClient.connect(r.sfu.replace("https://", "wss://"), r.callId, this.type !== "private");
-        }, () => {
+        }, ex => {
+            console.error('Failed to start call:', ex);
             this.meetingsLoading = false;
             this.unbind("onCallEnd.start");
         });

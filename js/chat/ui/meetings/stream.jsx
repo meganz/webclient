@@ -1,5 +1,5 @@
 import React from 'react';
-import { MegaRenderMixin } from '../../../stores/mixins';
+import { MegaRenderMixin } from '../../mixins';
 import Call from './call.jsx';
 import StreamHead from './streamHead.jsx';
 import StreamNode from './streamNode.jsx';
@@ -17,6 +17,7 @@ const PAGINATION = { PREV: 1, NEXT: 2 };
 const MOUSE_OUT_DELAY = 2500;
 
 export default class Stream extends MegaRenderMixin {
+    wrapperRef = React.createRef();
     containerRef = React.createRef();
 
     nodeRefs = [];
@@ -240,14 +241,12 @@ export default class Stream extends MegaRenderMixin {
 
         //
         //  `Thumbnail Mode`
-        // https://mega.nz/file/sdMjRS4D#ei6rt9RmEEBFJSYudcCvZWTxn2MzMGMJPsugSwspoWI
         // -------------------------------------------------------------------------
 
         if (mode === Call.MODE.THUMBNAIL) {
 
             //
             // Default, i.e. streams aligned within single page grid.
-            // https://mega.nz/file/sdMjRS4D#ei6rt9RmEEBFJSYudcCvZWTxn2MzMGMJPsugSwspoWI
             // ------------------------------------------------------
 
             if (streams.length <= MAX_STREAMS_PER_PAGE) {
@@ -287,7 +286,6 @@ export default class Stream extends MegaRenderMixin {
 
             //
             // Carousel behavior with variable amount of pages, incl. previous/next behavior.
-            // https://mega.nz/file/ZccxDKKK#1f6tqe7yg3Pad-i8uMfsbqDVZMnnWijktSxvYRVOKsU
             // ------------------------------------------------------------------------------
 
             const { page } = this.state;
@@ -353,7 +351,6 @@ export default class Stream extends MegaRenderMixin {
 
         //
         //  `Speaker Mode`
-        // https://mega.nz/file/5BVFHaxR#iekG3QCDL7wzGXySrObToLVX8PcjgD1jsQVeA_AHBAE
         // -------------------------------------------------------------------------
 
         const activeStream = call.getActiveStream();
@@ -363,6 +360,7 @@ export default class Stream extends MegaRenderMixin {
             forcedLocal || activeStream ?
                 <StreamNode
                     key={targetStream.clientId}
+                    className={forcedLocal && !call.isSharingScreen() ? 'local-stream-mirrored' : ''}
                     stream={targetStream}
                     chatRoom={chatRoom}
                     menu={true}
@@ -465,6 +463,7 @@ export default class Stream extends MegaRenderMixin {
 
         return (
             <div
+                ref={this.wrapperRef}
                 className={`
                     ${NAMESPACE}
                     ${sidebar ? '' : 'full'}
@@ -519,6 +518,7 @@ export default class Stream extends MegaRenderMixin {
                     minimized={minimized}
                     sidebar={sidebar}
                     forcedLocal={forcedLocal}
+                    wrapperRef={this.wrapperRef}
                     onAudioClick={onAudioClick}
                     onVideoClick={onVideoClick}
                     onCallEnd={onCallEnd}
@@ -530,6 +530,7 @@ export default class Stream extends MegaRenderMixin {
                     }}
                     onSpeakerChange={onSpeakerChange}
                     onModeChange={onModeChange}
+                    onHoldClick={onHoldClick}
                 />
             </div>
         );

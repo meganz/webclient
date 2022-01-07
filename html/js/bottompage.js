@@ -67,7 +67,7 @@ var bottompage = {
         if ('csp' in window) {
             $cs.removeClass('hidden').rebind('click.csp', function() {
                 if (!this.classList.contains('top-menu-item')) {
-                    csp.showCookiesDialog('step2');
+                    csp.trigger().dump('csp.trigger');
                     return false;
                 }
             });
@@ -84,8 +84,9 @@ var bottompage = {
         bottompage.initBackToScroll();
         bottompage.initScrollToContent();
 
-        // Show/hide Referal Program and Pricing menu items for different acctount types
+        // Show/hide Referral Program and Pricing menu items for different account types
         bottompage.changeMenuItemsList($content);
+        localeImages($content);
     },
 
     /**
@@ -107,11 +108,11 @@ var bottompage = {
 
         // Show/Hide Pricing link for Business sub accounts and admin expired
         if (u_attr && u_attr.b && u_attr.b.s !== -1) {
-            $('.bottom-menu .pro', $bottomMenu).addClass('hidden');
+            $('a.link.pro', $bottomMenu).addClass('hidden');
             $('.pages-menu.link.pro', $pagesMenu).addClass('hidden');
         }
         else {
-            $('.bottom-menu .pro', $bottomMenu).removeClass('hidden');
+            $('a.link.pro', $bottomMenu).removeClass('hidden');
             $('.pages-menu.link.pro', $pagesMenu).removeClass('hidden');
         }
     },
@@ -146,7 +147,8 @@ var bottompage = {
         };
 
         var showAnimated = function($content) {
-            var $blocks = $('.animated, .fadein', $content);
+            // add circular-spread here later
+            var $blocks = $('.animated, .fadein, .circular-spread, .text-focus-contract', $content);
 
             for (var i = $blocks.length - 1; i >= 0; i--) {
 
@@ -158,6 +160,10 @@ var bottompage = {
                     }
                 }
                 else if ($block.hasClass('start-animation')) {
+                    // dont reset circular spread animation
+                    if ($block.hasClass('circular-spread') || $block.hasClass('text-focus-contract')) {
+                        return;
+                    }
                     $block.removeClass('start-animation');
                 }
             }
@@ -214,11 +220,6 @@ var bottompage = {
                 // Scroll to saved position and reset previous focus
                 $('#startholder', $body).scrollTop(sessionData).trigger('mouseover');
 
-                if (page === 'download') {
-
-                    // Collapse download bar
-                    expandDlBar(1);
-                }
             }
         };
     },
@@ -274,7 +275,7 @@ var bottompage = {
                     of: $this,
                     my: "center top",
                     at: "center bottom",
-                    collision: "none"
+                    collision: "fit"
                 });
             }
 
@@ -560,7 +561,12 @@ var bottompage = {
         var topResize = function() {
 
             if ($topHeader.hasClass('floating')) {
-                $topHeader.outerWidth($topHeader.parent().outerWidth());
+                if ($topHeader.parent().outerWidth() === 0 && $topHeader.parent().length > 1) {
+                    $topHeader.outerWidth($($topHeader.parent()[1]).outerWidth());
+                }
+                else {
+                    $topHeader.outerWidth($topHeader.parent().outerWidth());
+                }
             }
             else {
                 $topHeader.css('width',  '');
@@ -570,7 +576,11 @@ var bottompage = {
         if (page === 'download') {
 
             // Select download bar as it contains top header and product page menu
-            $topHeader = $('.download.top-bar', $fmHolder);
+            $topHeader = $('.download.download-page', $fmHolder);
+        }
+        else if (page === 'security/bug-bounty') {
+            $topHeader = $('.bottom-page.scroll-block.corporate .top-head, ' +
+                '.pages-menu-wrap .pages-menu.body', $fmHolder);
         }
         else {
 
@@ -620,21 +630,6 @@ var bottompage = {
 
                 // Return menus static positions
                 $topHeader.removeClass('floating activated').css('width',  '');
-            }
-
-            // Download bar collapse/expand
-            if (page === 'download') {
-
-                if (topPos > 50 && $topHeader.hasClass('expanded')) {
-
-                    // Collapse download bar
-                    expandDlBar(1);
-                }
-                else if (topPos < 10 && $topHeader.hasClass('auto')) {
-
-                    // Expand download bar
-                    expandDlBar();
-                }
             }
         });
     },

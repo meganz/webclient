@@ -31,9 +31,13 @@ mobile.decryptionPasswordOverlay = {
     initDecryptButton: function(page) {
 
         'use strict';
+        const $password = $('.decryption-password', this.$overlay);
+        const $decryptButton = $('.decrypt-button', this.$overlay);
 
         // Add click/tap handler
-        this.$overlay.find('.decrypt-button').off('tap').on('tap', function() {
+        $decryptButton.rebind('tap', () => {
+
+            $password.blur();
 
             // is this a subuser invitation link
             if (page.substr(0, 14) === 'businesssignup') {
@@ -45,6 +49,21 @@ mobile.decryptionPasswordOverlay = {
             }
             return false;
         });
+
+        $password.rebind('input keypress', function(e) {
+            var length = String($(this).val() || '').length;
+
+            if (length) {
+                $decryptButton.removeClass('disabled').addClass('active');
+                if (e.keyCode === 13) {
+                    $decryptButton.click();
+                }
+            }
+            else {
+                $decryptButton.removeClass('active').addClass('disabled');
+            }
+        });
+
     },
 
     /**
@@ -70,7 +89,6 @@ mobile.decryptionPasswordOverlay = {
 
         var enteredPassword = $password.val();
         if (!enteredPassword.length) {
-            $errorMessage.addClass('bold').text(l[970]);  // Please enter a valid password...
             $decryptButton.removeClass('decrypting ios').text(l[1027]);   // Decrypt
             return false;
         }
@@ -99,7 +117,7 @@ mobile.decryptionPasswordOverlay = {
 
                     getInfoPromise.done(function signupCodeGettingSuccessHandler(status, res) {
                         mySelf.$overlay.addClass('hidden');
-                        if (localStorage.d) {
+                        if (d) {
                             console.log(res);
                         }
                         if (!res.e || !res.firstname || !res.bpubk || !res.bu) {
@@ -164,7 +182,6 @@ mobile.decryptionPasswordOverlay = {
 
         // If no password given show an error message
         if (!password) {
-            $errorMessage.addClass('bold').text(l[970]);  // Please enter a valid password...
             $decryptButton.removeClass('decrypting ios').text(l[1027]);   // Decrypt
             return false;
         }
@@ -240,7 +257,8 @@ mobile.decryptionPasswordOverlay = {
 
                 // Show error and abort
                 $errorMessage.addClass('bold').text(l[9076]);  // The link could not be decrypted...
-                $decryptButton.removeClass('decrypting ios').text(l[1027]);   // Decrypt
+                $password.val('');
+                $decryptButton.removeClass('decrypting ios active').addClass('disabled').text(l[1027]);   // Decrypt
                 return false;
             }
 

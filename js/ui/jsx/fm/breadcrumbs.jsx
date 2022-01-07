@@ -1,5 +1,5 @@
 import React from 'react';
-import {MegaRenderMixin} from "../../../stores/mixins.js";
+import {MegaRenderMixin} from "../../../chat/mixins";
 
 export default class Breadcrumbs extends MegaRenderMixin {
     constructor(props) {
@@ -175,7 +175,9 @@ export default class Breadcrumbs extends MegaRenderMixin {
                     else {
                         breadcrumbClasses += " folder";
                     }
-
+                    if (nodeId.length === 11 && M.u[nodeId]) {
+                        return;
+                    }
                     if (nodeId === "shares") {
                         breadcrumbClasses += " shared-with-me";
                     }

@@ -27,9 +27,15 @@ var BABEL_LOADER_OPTIONS = {
     comments: false
 };
 
-
 var webpackConfigs = {
     dev: {
+        devServer: {
+            port: 8089,
+            hot: true,
+            static: __dirname,
+            liveReload: false,
+            historyApiFallback: true
+        },
         cache: {
             type: 'memory'
         },
@@ -61,17 +67,13 @@ var webpackConfigs = {
         },
         module: {
             rules: [
-                {test: /\.less$/, loader: "style!css!less"},
-                //{ test: /\.js$/, exclude: /node_modules/, loader: 'babel-loader'},
-                //{ test: /\.jsx$/, loaders: ['react-hot', 'jsx?harmony&stripTypes&insertPragma=React.DOM'], exclude: 'node_modules'},
-                //{test: /\.jsx$/, loaders: ['react-hot', 'babel-loader?experimental=true&optional=runtime'], exclude: 'node_modules'},
+                {
+                    test: /\.less$/,
+                    use: ['style-loader', 'css-loader', 'less-loader']
+                },
                 {
                     test: /\.(js|jsx)$/,
                     exclude: /(node_modules|bower_components)/,
-                    // include: [
-                    //     path.join(__dirname, '../js'), // + any other paths that need to be transpiled
-                    //     /\/node_modules\/react/,
-                    // ],
                     use: [
                         'react-hot-loader/webpack',
                         {
@@ -96,8 +98,8 @@ var webpackConfigs = {
             app: entryPoints
         },
         performance: {
-            maxAssetSize: 899000,
-            maxEntrypointSize: 899000
+            maxAssetSize: 999000,
+            maxEntrypointSize: 999000
         },
         output: {
             path: __dirname + "/",
@@ -109,7 +111,10 @@ var webpackConfigs = {
         },
         module: {
             rules: [
-                {test: /\.less$/, loader: "style!css!less"},
+                {
+                    test: /\.less$/,
+                    use: ['style-loader', 'css-loader', 'less-loader']
+                },
                 {
                     test: /\.(js|jsx)$/,
                     exclude: /(node_modules|bower_components)/,

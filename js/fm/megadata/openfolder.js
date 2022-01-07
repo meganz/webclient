@@ -168,7 +168,7 @@
 
             if (is_mobile) {
                 // Ignore sort modes set in desktop until that is supported in mobile...
-                this.overrideSortMode = this.overrideSortMode || ['name', 1];
+                // this.overrideSortMode = this.overrideSortMode || ['name', 1];
             }
 
             if (this.overrideSortMode) {
@@ -418,7 +418,7 @@
             M.onFileManagerReady(accountUI);
         }
         else if (id && id.substr(0, 9) === 'dashboard') {
-            M.onFileManagerReady(dashboardUI);
+            M.onFileManagerReady(() => dashboardUI());
         }
         else if (id && id.substr(0, 7) === 'recents') {
             M.onFileManagerReady(openRecents);
@@ -428,6 +428,9 @@
         }
         else if (id && id.substr(0, 7) === 'search/') {
             this.search = true;
+        }
+        else if (cv.type === 'gallery') {
+            M.onFileManagerReady(galleryUI);
         }
         else if (id && (id.substr(0, 11) === 'out-shares/' || id.substr(0, 13) === 'public-links/')) {
             fetchdbnodes = true;
@@ -462,7 +465,7 @@
             }
         }
 
-        var promise = new MegaPromise();
+        let {promise} = mega;
         var finish = function() {
             _openFolderCompletion.call(M, id = cv.original || id, firstopen);
 
@@ -503,12 +506,12 @@
             finish();
         };
 
-        promise.then(function(h) {
+        promise.then((h) => {
             if (d) {
                 console.warn('openFolder completed for %s, currentdir=%s', maph(id), maph(M.currentdirid));
                 console.assert(id.endsWith(h));
             }
-            delay('mega:openfolder!' + id, function() {
+            delay(`mega:openfolder!${id}`, () => {
                 if (M.currentdirid !== id) {
                     return;
                 }
@@ -520,8 +523,8 @@
                 mBroadcaster.sendMessage('mega:openfolder', id);
                 $.tresizer();
             }, 90);
-        });
-        var masterPromise = promise;
+        }).catch(dump);
+        const masterPromise = promise;
 
         fetchdbnodes = fetchdbnodes || dbfetch.isLoading(id);
 

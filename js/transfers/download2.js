@@ -1300,9 +1300,8 @@ var dlmanager = {
         }
 
         if (page === 'download') {
-            var $dtb = $('.download.top-bar');
+            var $dtb = $('.download.download-page');
             $dtb.removeClass('stream-overquota overquota');
-            $('.see-our-plans', $dtb).addClass('hidden').off('click');
             $('.download.over-transfer-quota', $dtb).addClass('hidden');
             $(window).trigger('resize');
         }
@@ -1416,8 +1415,15 @@ var dlmanager = {
         'use strict';
 
         const onQuotaInfo = (res) => {
+            const $dialog = $('.limited-bandwidth-dialog', 'body');
+
             let timeLeft = 3600;
-            if (Object(res.tah).length) {
+            if (u_type > 2 && u_attr.p) {
+                timeLeft = (M.account.expiry || 0) - unixtime();
+                timeLeft = timeLeft > 0 ? timeLeft : 0;
+            }
+            else if (Object(res.tah).length) {
+
                 let add = 1;
                 // let size = 0;
 
@@ -1436,14 +1442,15 @@ var dlmanager = {
             }
 
             clearInterval(this._overQuotaTimeLeftTick);
-            delay('overquota:retry', () => this._onQuotaRetry(), timeLeft * 1000);
+            if (timeLeft < 3600 * 24) {
+                delay('overquota:retry', () => this._onQuotaRetry(), timeLeft * 1000);
+            }
 
-            let $dlPageCountdown = $('.download.transfer-overquota-txt').text(String(l[7100]).replace('%1', ''));
+            let $dlPageCountdown = $('.transfer-overquota-txt', $dialog).text(String(l[7100]).replace('%1', ''));
             if (!$dlPageCountdown.is(':visible')) {
                 $dlPageCountdown = null;
             }
 
-            const $dialog = $('.limited-bandwidth-dialog');
             this._overquotaClickListeners($dialog);
             let lastCheck = Date.now();
 
@@ -1454,21 +1461,25 @@ var dlmanager = {
                     if (lastCheck + 1000 < curTime) {
                         // Convert ms to s and remove difference from remaining
                         timeLeft -= Math.floor((curTime - lastCheck) / 1000);
-                        delay('overquota:retry', () => this._onQuotaRetry(), timeLeft * 1000);
+                        if (timeLeft < 3600 * 24) {
+                            delay('overquota:retry', () => this._onQuotaRetry(), timeLeft * 1000);
+                        }
                     }
                     lastCheck = curTime;
-                    const time = secondsToTime(timeLeft--, 1);
+                    const time = secondsToTimeLong(timeLeft--);
 
                     if (time) {
                         $countdown.safeHTML(time);
+                        $countdown.removeClass('hidden');
 
                         if ($dlPageCountdown) {
-                            const html = '<span class="countdown">' + secondsToTime(timeLeft) + '</span>';
+                            const html = `<span class="countdown">${secondsToTimeLong(timeLeft)}</span>`;
                             $dlPageCountdown.safeHTML(escapeHTML(l[7100]).replace('%1', html));
                         }
                     }
                     else {
                         $countdown.text('');
+                        $countdown.addClass('hidden');
 
                         if ($dlPageCountdown) {
                             $dlPageCountdown.text(String(l[7100]).replace('%1', ''));
@@ -1491,17 +1502,12 @@ var dlmanager = {
                 }
 
                 // XXX: replaced uqFastTrack usage by directly checking for pro flag ...
-                if (this.onOverQuotaProClicked && u_type || Object(u_attr).p) {
+                if (this.onOverQuotaProClicked && u_type) {
                     // The user loged/registered in another tab, poll the uq command every
                     // 30 seconds until we find a pro status and then retry with fresh download
 
                     const proStatus = res.mxfer;
                     this.logger.debug('overquota:proStatus', proStatus);
-
-                    if (proStatus) {
-                        // Got PRO, resume dl immediately.
-                        return this._onQuotaRetry(true);
-                    }
 
                     delay('overquota:uqft', () => this._overquotaInfo(), 30000);
                 }
@@ -1606,11 +1612,12 @@ var dlmanager = {
                 });
 
             if (page === 'download') {
-                var $dtb = $('.download.top-bar');
+                var $dtb = $('.download.download-page');
 
-                $('.see-our-plans', $dtb).removeClass('hidden').rebind('click', onclick);
+                $('.see-our-plans', $dtb).rebind('click', onclick);
 
                 $('.download.over-transfer-quota', $dtb).removeClass('hidden');
+                $('.resume-download', $dtb).removeClass('hidden');
                 $dtb.addClass('stream-overquota');
                 $(window).trigger('resize');
             }
@@ -1947,6 +1954,8 @@ var dlmanager = {
                     $('.chart.data .size-txt', $dialog).text(bytesToSize(tfsQuotaUsed, 0));
                     $('.chart.data .pecents-txt', $dialog).text(tfsQuotaLimit[0]);
                     $('.chart.data .gb-txt', $dialog).text(tfsQuotaLimit[1]);
+                    $('.chart.data .used', $dialog).text(bytesToSize(tfsQuotaUsed, 0));
+                    $('.chart.data .total', $dialog).text(`${tfsQuotaLimit[0]} ${tfsQuotaLimit[1]}`);
                     $('.fm-account-blocks.bandwidth', $dialog).removeClass('no-percs');
                     $('.chart .perc-txt', $dialog).text(perc + '%');
                     $('.chart.body .progressbars', $dialog).addClass('exceeded');
@@ -2266,7 +2275,7 @@ var dlmanager = {
                     open(megasync.getMegaSyncUrl() || (getAppBaseUrl() + '#sync'));
                 }
             }
-            if ($('.download.top-bar').hasClass('video')) {
+            if ($('.download.download-page').hasClass('video')) {
                 $elm.removeClass('visible');
             }
         });

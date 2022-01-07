@@ -103,6 +103,7 @@
             // Select switches.
             var $EAll = this.$page.find('.email-notifications .mega-switch#enotif-all');
             var $EEach = this.$page.find('.email-notifications .mega-switch:not(#enotif-all)');
+            const $page = this.$page;
 
             // Hide achievements toggle if achievements not an option for this user.
             (M.account.maf ? $.fn.removeClass : $.fn.addClass).apply(
@@ -128,6 +129,14 @@
                     mega.enotif.setAllState(!newState);
                     (newState ? $.fn.addClass : $.fn.removeClass).apply($EEach, ['toggle-on']);
                 });
+
+                if ((u_attr.p || u_attr.b) && M.account.stype === 'S'
+                    && ((Array.isArray(M.account.sgw) && M.account.sgw.includes('Stripe'))
+                        || (Array.isArray(M.account.sgwids)
+                            && M.account.sgwids.includes((addressDialog || {}).gatewayId_stripe || 19)))) {
+
+                    $('.notification-setting-row.payment-card-noti', $page).removeClass('hidden');
+                }
 
                 loadingDialog.hide('mobile:account/notifications:enotify');
             });

@@ -15,12 +15,13 @@ function setTransferStatus(dl, status, ethrow, lock, fatalError) {
     }
 
     if (page === 'download') {
-        var $dlTopBar = $('.download.top-bar');
+        var $dlTopBar = $('.download.download-page');
         var $dlMainTNfo = $('.download.main-transfer-info');
         var $dlTopBarErrorBlock = $('.download.main-transfer-error', $dlTopBar);
 
         if (status === l[20666]) {
             $('.download.error-text', $dlTopBar).addClass('hidden');
+            $('.download.over-transfer-quota', $dlTopBar).removeClass('hidden');
             $dlTopBarErrorBlock = $('.download.overquoata-error', $dlTopBar);
         }
 

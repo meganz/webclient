@@ -1,5 +1,5 @@
 var React = require("react");
-import {MegaRenderMixin} from "../stores/mixins.js";
+import {MegaRenderMixin} from "../chat/mixins";
 
 class AccordionPanel extends MegaRenderMixin {
     render() {

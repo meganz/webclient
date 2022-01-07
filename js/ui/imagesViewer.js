@@ -145,12 +145,18 @@ var slideshowid;
 
         // Set the video container's fullscreen state
         var setFullscreenData = function(state) {
+
+            if (page === 'download') {
+                updateDownloadPageContainer($overlay, state);
+                return false;
+            }
+
             if (state) {
-                $overlay.addClass('fullscreen');
+                $overlay.addClass('fullscreen').removeClass('browserscreen');
                 $('i', $button).removeClass('icon-fullscreen-enter').addClass('icon-fullscreen-leave');
             }
             else {
-                $overlay.removeClass('fullscreen');
+                $overlay.addClass('browserscreen').removeClass('fullscreen');
                 $('i', $button).removeClass('icon-fullscreen-leave').addClass('icon-fullscreen-enter');
 
                 // disable slideshow-mode exiting from full screen
@@ -165,6 +171,27 @@ var slideshowid;
         };
 
         fullScreenManager = FullScreenManager($button, $overlay).change(setFullscreenData);
+    }
+
+    function updateDownloadPageContainer($overlay, state) {
+
+        var $button = $('footer .v-btn.fullscreen', $overlay);
+
+        if (state) {
+            $overlay.parents('.download.download-page').addClass('fullscreen').removeClass('browserscreen');
+            $('i', $button).removeClass('icon-fullscreen-enter').addClass('icon-fullscreen-leave');
+            $overlay.addClass('fullscreen').removeClass('browserscreen');
+        }
+        else {
+            $overlay.parents('.download.download-page').removeClass('browserscreen fullscreen');
+            $('i', $button).removeClass('icon-fullscreen-leave').addClass('icon-fullscreen-enter');
+            $overlay.removeClass('browserscreen fullscreen');
+            slideshow_imgPosition($overlay);
+        }
+
+        if (!$overlay.is('.video-theatre-mode')) {
+            slideshow_imgPosition($overlay);
+        }
     }
 
     function slideshow_favourite(n, $overlay) {
@@ -307,7 +334,7 @@ var slideshowid;
             return;
         }
 
-        if (wrapper.dataset.perc) {
+        if ($elm.slider('instance')) {
             // Update existing slider.
             return setValue();
         }
@@ -319,14 +346,20 @@ var slideshowid;
             range: 'min',
             step: 0.01,
             change: function(e, ui) {
-                $(this).attr('title', `${ui.value}%`);
+                $('.ui-slider-handle .mv-zoom-slider', this).text(`${ui.value}%`);
                 wrapper.dataset.perc = ui.value;
             },
             slide: function(e, ui) {
-                $(this).attr('title', `${ui.value}%`);
+                $('.ui-slider-handle .mv-zoom-slider', this).text(`${ui.value}%`);
                 slideshow_zoom(container, false, ui.value);
             },
-            create: setValue
+            create: () => {
+                setValue();
+                $('.ui-slider-handle', $elm).safeAppend(
+                    `<div class="mv-zoom-slider dark-direct-tooltip"></div>
+                    <i class="mv-zoom-slider-arrow sprite-fm-mono icon-tooltip-arrow"></i>`
+                );
+            }
         });
     }
 
@@ -412,6 +445,13 @@ var slideshowid;
         $nextButton.rebind('click.mediaviewer', function() {
             slideshow_next();
             slideshow_timereset();
+            return false;
+        });
+
+        $('.v-btn.browserscreen', $overlay).rebind('click.media-viewer', () => {
+            $overlay.addClass('browserscreen');
+            $overlay.parents('.download.download-page').addClass('browserscreen');
+            slideshow_imgPosition($overlay);
             return false;
         });
 
@@ -724,7 +764,7 @@ var slideshowid;
         // Checking if this the first preview (not a preview navigation)
         if (!slideshowid) {
             // then pushing fake states of history/hash
-            if (!history.state || history.state.view !== id) {
+            if (page !== 'download' && (!history.state || history.state.view !== id)) {
                 pushHistoryState();
             }
             _hideCounter = hideCounter;
@@ -738,23 +778,26 @@ var slideshowid;
             $.selected = [n.h];
         }
         mBroadcaster.sendMessage('slideshow:open', n);
-        sessionStorage.setItem('previewNode', id);
-        pushHistoryState(true, Object.assign({subpage: page}, history.state, {view: slideshowid}));
+
+        if (page !== 'download') {
+            sessionStorage.setItem('previewNode', id);
+            pushHistoryState(true, Object.assign({subpage: page}, history.state, {view: slideshowid}));
+        }
 
         // Clear previousy set data
         zoom_mode = false;
         switchedSides = false;
         $('header .file-name', $overlay).text(n.name);
-        $('.viewer-progress, .viewer-error, video, #pdfpreviewdiv1', $overlay)
-            .addClass('hidden');
+        $('.viewer-error, video, #pdfpreviewdiv1', $overlay).addClass('hidden');
+        $('.viewer-progress', $overlay).addClass('vo-hidden');
+
         $imageControls.addClass('hidden');
         $prevNextButtons.addClass('hidden');
         $playVideoButton.addClass('hidden');
         $('.viewer-progress p, .video-time-bar', $content).removeAttr('style');
 
         // Clear video file data
-        // "/" poster src is required to fix flickering in Chrome when moving from a video to another
-        $video.attr('poster', '/').removeAttr('poster src').addClass('hidden');
+        $video.css('background-image', ``).removeAttr('poster src').addClass('hidden');
         $videoControls.addClass('hidden');
         $('.video-time-bar', $videoControls).removeAttr('style');
         $('.video-progress-bar', $videoControls).removeAttr('title');
@@ -788,14 +831,16 @@ var slideshowid;
 
         // Bind static events is viewer is not in slideshow mode to avoid unnecessary rebinds
         if (!slideshowplay) {
-            $overlay.removeClass('fullscreen mouse-idle slideshow video pdf');
+            $overlay.removeClass('fullscreen browserscreen mouse-idle slideshow video pdf');
 
             // Bind keydown events
             $document.rebind('keydown.slideshow', function(e) {
-                if (e.keyCode === 37 && slideshowid && !e.altKey && !e.ctrlKey) {
+                const isDownloadPage = page === 'download';
+
+                if (e.keyCode === 37 && slideshowid && !e.altKey && !e.ctrlKey && !isDownloadPage) {
                     slideshow_prev();
                 }
-                else if (e.keyCode === 39 && slideshowid) {
+                else if (e.keyCode === 39 && slideshowid && !isDownloadPage) {
                     slideshow_next();
                 }
                 else if (e.keyCode === 46 && fullScreenManager) {
@@ -808,12 +853,17 @@ var slideshowid;
                     else if (slideshowplay) {
                         slideshow_imgControls(1);
                     }
+                    else if (isDownloadPage) {
+                        $overlay.removeClass('fullscreen browserscreen');
+                        $overlay.parents('.download.download-page').removeClass('fullscreen browserscreen');
+                        slideshow_imgPosition($overlay);
+                    }
                     else {
                         history.back();
                         return false;
                     }
                 }
-                else if (e.keyCode === 8 || e.key === 'Backspace') {
+                else if ((e.keyCode === 8 || e.key === 'Backspace') && !isDownloadPage) {
                     history.back();
                     return false;
                 }
@@ -821,6 +871,15 @@ var slideshowid;
 
             // Close icon
             $('.v-btn.close, .viewer-error-close', $overlay).rebind('click.media-viewer', function() {
+                if (page === 'download') {
+                    if ($(document).fullScreen()) {
+                        fullScreenManager.exitFullscreen();
+                    }
+                    $overlay.removeClass('fullscreen browserscreen');
+                    $overlay.parents('.download.download-page').removeClass('fullscreen browserscreen');
+                    slideshow_imgPosition($overlay);
+                    return false;
+                }
                 history.back();
                 return false;
             });
@@ -914,7 +973,7 @@ var slideshowid;
 
                 if (fullScreenManager && fullScreenManager.state) {
                     $('.viewer-bars', $overlay).noTransition(() => {
-                        $overlay.addClass('fullscreen');  
+                        $overlay.addClass('fullscreen');
                     });
                 }
 
@@ -1051,17 +1110,17 @@ var slideshowid;
             if (!preqs[n.h]) {
                 preqs[n.h] = 1;
 
-                M.gfsfetch(n.link || n.h, 0, -1).done(function(data) {
+                M.gfsfetch(n.link || n.h, 0, -1).then((data) => {
                     preview({type: 'application/pdf'}, n.h, data.buffer);
-                }).fail(function(ev) {
+                }).catch((ex) => {
                     if (d) {
-                        console.warn('Failed to retrieve PDF, failing back to broken eye image...', ev);
+                        console.warn('Failed to retrieve PDF, failing back to broken eye image...', ex);
                     }
 
                     previewimg(n.h, null);
                     delete previews[n.h].buffer;
                     preqs[n.h] = 0; // to retry again
-                    if (ev === EOVERQUOTA || Object(ev.target).status === 509) {
+                    if (ex === EOVERQUOTA || Object(ex.target).status === 509) {
                         dlmanager.setUserFlags();
                         dlmanager.showOverQuotaDialog();
                     }
@@ -1143,7 +1202,7 @@ var slideshowid;
                     }
                     return;
                 }
-                $progressBar.removeClass('hidden');
+                $progressBar.removeClass('vo-hidden');
 
                 if (loadingDeg <= 180) {
                     $('.right-c p', $progressBar).css('transform', 'rotate(' + loadingDeg + 'deg)');
@@ -1155,27 +1214,27 @@ var slideshowid;
                 }
 
                 if (loadingDeg === 360) {
-                    $progressBar.addClass('hidden');
+                    $progressBar.addClass('vo-hidden');
                     $('p', $progressBar).removeAttr('style');
                 }
             };
 
-            M.gfsfetch(n.link || n.h, 0, -1, progress).tryCatch(function(data) {
+            M.gfsfetch(n.link || n.h, 0, -1, progress).then((data) => {
                 preview({type: filemime(n, 'image/jpeg')}, n.h, data.buffer);
                 if (!exifImageRotation.fromImage) {
                     previews[n.h].orientation = parseInt(EXIF.readFromArrayBuffer(data, true).Orientation) || 1;
                 }
-            }, function(ev) {
-                if (ev === EOVERQUOTA || Object(ev.target).status === 509) {
+            }).catch((ex) => {
+                if (ex === EOVERQUOTA || Object(ex.target).status === 509) {
                     eventlog(99703, true);
                 }
 
                 if (d) {
-                    console.debug('slideshow failed to load original %s', n.h, ev.target && ev.target.status || ev);
+                    console.debug('slideshow failed to load original %s', n.h, ex.target && ex.target.status || ex);
                 }
 
                 if (slideshow_handle() === n.h) {
-                    $progressBar.addClass('hidden');
+                    $progressBar.addClass('vo-hidden');
                 }
 
                 if (!(loadPreview || isCached)) {
@@ -1203,6 +1262,20 @@ var slideshowid;
         var $content = $('.content', $overlay);
         var $video = $('video', $content);
         var $playVideoButton = $('.play-video-button', $content);
+        let bgsize = 'auto';
+
+        if (is_audio(n)) {
+            bgsize = 'contain';
+        }
+        else {
+            if (previews[id].fma === undefined) {
+                previews[id].fma = MediaAttribute(n).data || false;
+            }
+
+            if (previews[id].fma.width > previews[id].fma.height) {
+                bgsize = 'cover';
+            }
+        }
 
         $playVideoButton.rebind('click', function() {
             if (dlmanager.isOverQuota) {
@@ -1230,6 +1303,10 @@ var slideshowid;
             $('.viewer-pending', $content).removeClass('hidden');
             $('.video-controls', $overlay).removeClass('hidden');
             $overlay.addClass('video-theatre-mode');
+
+            // Hide play button.
+            $(this).addClass('hidden');
+            $('.video-controls .playpause i', $overlay).removeClass('icon-play').addClass('icon-pause');
 
             initVideoStream(n, $overlay, destroy).done(function(streamer) {
                 preqs[n.h] = streamer;
@@ -1286,7 +1363,9 @@ var slideshowid;
         }
 
         if (previews[id].poster !== undefined) {
-            $video.attr('poster', previews[id].poster);
+            // $video.attr('poster', previews[id].poster);
+            $video.css('background-size', bgsize);
+            $video.css('background-image', `url(${previews[id].poster})`);
         }
         else if (String(n.fa).indexOf(':1*') > 0) {
             getImage(n, 1).then(function(uri) {
@@ -1299,7 +1378,9 @@ var slideshowid;
                         $video = $('.content video', $overlay);
                     }
 
-                    $video.attr('poster', uri);
+                    // $video.attr('poster', uri);
+                    $video.css('background-size', bgsize);
+                    $video.css('background-image', `url(${uri})`);
                 }
             }).catch(console.debug.bind(console));
         }
@@ -1307,7 +1388,7 @@ var slideshowid;
         previews[id].poster = previews[id].poster || '';
 
         if ($.autoplay === id || page === 'download') {
-            onIdle(function() {
+            queueMicrotask(() => {
                 $playVideoButton.trigger('click');
             });
             delete $.autoplay;
@@ -1338,29 +1419,29 @@ var slideshowid;
     // a method to fetch scripts and files needed to run pdfviewer
     // and then excute them on iframe element [#pdfpreviewdiv1]
     function prepareAndViewPdfViewer(data) {
+        const signal = tryCatch(() => {
+            const elm = document.getElementById('pdfpreviewdiv1');
+            elm.classList.remove('hidden');
+
+            const ev = document.createEvent("HTMLEvents");
+            ev.initEvent("pdfjs-openfile.meganz", true);
+            ev.data = data.buffer || data.src;
+            elm.contentDocument.body.dispatchEvent(ev);
+            return true;
+        });
+
         if (_pdfSeen) {
-            var success = false;
-            tryCatch(function() {
-                var elm = document.getElementById('pdfpreviewdiv1');
-                elm.classList.remove('hidden');
 
-                var ev = document.createEvent("HTMLEvents");
-                ev.initEvent("pdfjs-openfile.meganz", true);
-                ev.data = data.buffer || data.src;
-                elm.contentDocument.body.dispatchEvent(ev);
-                success = true;
-            })();
-
-            if (success) {
+            if (signal()) {
                 return;
             }
         }
-        M.require('pdfjs2', 'pdfviewer', 'pdfviewercss', 'pdfviewerjs').done(function() {
+
+        M.require('pdfjs2', 'pdfviewer', 'pdfviewercss', 'pdfviewerjs').then(() => {
             var myPage = pages['pdfviewer'];
             myPage = myPage.replace('viewer.css', window.pdfviewercss);
             myPage = myPage.replace('../build/pdf.js', window.pdfjs2);
             myPage = myPage.replace('viewer.js', window.pdfviewerjs);
-            localStorage.setItem('currPdfPrev2', JSON.stringify(data.src));
             // remove then re-add iframe to avoid History changes [push]
             var pdfIframe = document.getElementById('pdfpreviewdiv1');
             var newPdfIframe = document.createElement('iframe');
@@ -1371,6 +1452,10 @@ var slideshowid;
             var doc = newPdfIframe.contentWindow.document;
             doc.open();
             doc.write(myPage);
+            doc.addEventListener('pdfjs-webViewerInitialized.meganz', function ack() {
+                doc.removeEventListener('pdfjs-webViewerInitialized.meganz', ack);
+                queueMicrotask(signal);
+            });
             doc.close();
             _pdfSeen = true;
         });
@@ -1403,7 +1488,7 @@ var slideshowid;
         if (previews[id].type === 'application/pdf') {
             $overlay.addClass('pdf');
             $pendingBlock.addClass('hidden');
-            $progressBlock.addClass('hidden');
+            $progressBlock.addClass('vo-hidden');
             $bottomBar.addClass('hidden');
             $imgWrap.addClass('hidden');
             // preview pdfs using pdfjs for all browsers #8036
@@ -1525,7 +1610,7 @@ var slideshowid;
             $img.removeClassWith('exif-rotation-').addClass('exif-rotation-' + rot).attr('data-exif', rot);
 
             $pendingBlock.addClass('hidden');
-            $progressBlock.addClass('hidden');
+            $progressBlock.addClass('vo-hidden');
         };
         img.src = src;
     }

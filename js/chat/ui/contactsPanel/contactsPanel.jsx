@@ -1,5 +1,5 @@
 import React from 'react';
-import {MegaRenderMixin} from '../../../stores/mixins.js';
+import {MegaRenderMixin} from '../../mixins';
 import Navigation from './navigation.jsx';
 import ContactList from './contactList.jsx';
 import ReceivedRequests from './receivedRequests.jsx';
@@ -25,6 +25,8 @@ export default class ContactsPanel extends MegaRenderMixin {
         RECEIVED_REQUESTS: l[5863],
         SENT_REQUESTS: l[5862]
     };
+
+    static hasContacts = () => M.u.some(contact => contact.c === 1);
 
     static hasRelationship = contact => contact && contact.c === 1;
 
@@ -146,27 +148,31 @@ export default class ContactsPanel extends MegaRenderMixin {
 
         return (
             <div className="contacts-panel">
-                <Navigation view={view} />
+                <Navigation
+                    view={view}
+                    contacts={this.props.contacts}
+                />
 
-                {view !== ContactsPanel.VIEW.PROFILE &&
+                {view !== ContactsPanel.VIEW.PROFILE && (
                     <div className="contacts-actions">
-                        {view === ContactsPanel.VIEW.RECEIVED_REQUESTS &&
-                        receivedRequestsCount > 1  &&
+                        {view === ContactsPanel.VIEW.RECEIVED_REQUESTS && receivedRequestsCount > 1  && (
                             <button
                                 className="mega-button action"
                                 onClick={this.handleAcceptAllRequests}>
                                 <i className="sprite-fm-mono icon-check" />
                                 <span>{l[19062] /* `Accept all` */}</span>
                             </button>
-                        }
-                        <button
-                            className="mega-button action"
-                            onClick={() => contactAddDialog()}>
-                            <i className="sprite-fm-mono icon-add-circle" />
-                            <span>{l[71] /* `Add contact` */}</span>
-                        </button>
+                        )}
+                        {ContactsPanel.hasContacts() && (
+                            <button
+                                className="mega-button action"
+                                onClick={() => contactAddDialog()}>
+                                <i className="sprite-fm-mono icon-add-circle" />
+                                <span>{l[71] /* `Add contact` */}</span>
+                            </button>
+                        )}
                     </div>
-                }
+                )}
 
                 <div className="contacts-content">
                     {this.renderView()}

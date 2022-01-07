@@ -14,7 +14,6 @@
     },
     "plugins": [
         "compat",
-        "dollar-sign",
         "es",
         "jquery",
         "local-rules",
@@ -162,7 +161,6 @@
         // ESLint plugins configuration follows
 
         "compat/compat": 1,
-        "dollar-sign/dollar-sign": 2,
 
         "es/no-atomics": 2,
         "es/no-exponential-operators": 2,

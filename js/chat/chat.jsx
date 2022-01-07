@@ -70,32 +70,6 @@ function Chat() {
 
     this.options = {
         'delaySendMessageIfRoomNotAvailableTimeout': 3000,
-        'loadbalancerService': 'gelb.karere.mega.nz',
-        'rtc': {
-            iceServers: [
-/*                {
-                    urls: ['turn:trnxxxx.karere.mega.nz:3478?transport=udp'],   // Luxembourg
-                    username: "inoo20jdnH",
-                    credential: '02nNKDBkkS'
-                }
-*/
-                {
-                    urls: 'turn:trn270n001.karere.mega.nz:3478?transport=udp',   // Luxembourg
-                    username: "inoo20jdnH",
-                    credential: '02nNKDBkkS'
-                },
-                {
-                    urls: 'turn:trn302n001.karere.mega.nz:3478?transport=udp',   // Luxembourg
-                    username: "inoo20jdnH",
-                    credential: '02nNKDBkkS'
-                },
-                {
-                    urls: 'turn:trn530n001.karere.mega.nz:3478?transport=udp',   // Luxembourg
-                    username: "inoo20jdnH",
-                    credential: '02nNKDBkkS'
-                }
-            ]
-        },
         filePickerOptions: {
         },
         /**

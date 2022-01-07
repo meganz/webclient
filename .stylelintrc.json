@@ -13,6 +13,7 @@
         "color-hex-length": null,
         "custom-property-empty-line-before": null,
         "declaration-empty-line-before": null,
+        "selector-class-pattern": null,
 
         "no-irregular-whitespace": true,
         "no-missing-end-of-source-newline": true,
@@ -39,7 +40,8 @@
                 "ignore": [
                     "css-appearance",
                     "css-gradients",
-                    "css-masks"
+                    "css-masks",
+                    "multicolumn"
                 ],
                 "severity": "warning"
             }
@@ -100,6 +102,12 @@
         ],
         "max-line-length": [
             120,
+            {
+                "severity": "warning"
+            }
+        ],
+        "color-function-notation": [
+            "legacy",
             {
                 "severity": "warning"
             }

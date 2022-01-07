@@ -1,5 +1,5 @@
 import React from 'react';
-import { MegaRenderMixin } from '../../../stores/mixins';
+import { MegaRenderMixin } from '../../mixins';
 import Button from './button';
 import Call from './call';
 import StreamNode from './streamNode';
@@ -87,7 +87,10 @@ export default class ParticipantsNotice extends MegaRenderMixin {
 
         return (
             <>
-                <StreamNode stream={call.getLocalStream()} />
+                <StreamNode
+                    className={call.isSharingScreen() ? '' : 'local-stream-mirrored'}
+                    stream={call.getLocalStream()}
+                />
                 {streamContainer(call.left ? this.renderUserAlone() : this.renderUserWaiting())}
             </>
         );

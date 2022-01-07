@@ -1,6 +1,6 @@
 var React = require("react");
 import utils from './utils.jsx';
-import {MegaRenderMixin} from "../stores/mixins.js";
+import {MegaRenderMixin} from "../chat/mixins";
 import {ContactPickerWidget} from './../chat/ui/contacts.jsx';
 
 export class Dropdown extends MegaRenderMixin {

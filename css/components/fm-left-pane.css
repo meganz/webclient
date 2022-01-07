@@ -11,7 +11,8 @@
     padding: 3px 0;
     text-overflow: ellipsis;
 }
-.lp-myfiles {
+.lp-myfiles,
+.lp-gallery {
     background: var(--surface-grey-2);
     display: flex;
     flex-direction: column;
@@ -32,7 +33,8 @@
     display: none;
 }
 .lp-myfiles .section-title,
-.active-folder-link .section-title {
+.active-folder-link .section-title,
+.lp-gallery .section-title {
     height: 18px;
     opacity: 0.7;
     color: var(--text-color-medium);
@@ -40,12 +42,15 @@
     letter-spacing: 0;
     display: inline-block;
     margin-bottom: 4px;
+    -webkit-padding-start: 6px;
+    padding-inline-start: 6px;
 }
 .active-folder-link .section-title {
     padding: 4px 8px 0 8px;
     display: inline;
 }
-.lp-myfiles .cloud-drive-panel {
+.lp-myfiles .cloud-drive-panel,
+.lp-gallery .library-panel {
     padding: 4px 8px 0 8px;
 }
 .lp-myfiles .ps-active-y .cloud-drive-panel {
@@ -79,30 +84,28 @@
 .lp-myfiles .shared-panel {
     margin: 8px 8px 16px 8px;
 }
-.lp-myfiles .storage-usage-panel {
+.lp-storage-usage .storage-usage-panel {
     padding: 12px;
     border-top: 2px solid var(--stroke-main);
     display: flex;
     flex-direction: column;
 }
-.lp-myfiles .storage-usage-panel.hidden {
+.lp-storage-usage .storage-usage-panel.hidden {
     display: none;
 }
-.lp-myfiles .storage-usage-panel .title-block {
+.lp-storage-usage .storage-usage-panel .title-block {
     display: flex;
     justify-content: space-between;
-}
-.lp-myfiles .storage-usage-panel .title-block {
     margin-bottom: 6px;
 }
-.lp-myfiles .storage-usage-panel .title-block .plan {
-    color: var(--surface-main-inverted);
+.lp-storage-usage .storage-usage-panel .title-block .plan {
+    color: var(--stroke-main-inverted);
     font: var(--text-body2);
     line-height: 18px;
     margin-right: 16px;
     white-space: nowrap;
 }
-.lp-myfiles .storage-usage-panel .storage-graph {
+.lp-storage-usage .storage-usage-panel .storage-graph {
     height: 6px;
     background-color: rgba(0,0,0,0.2);
     border-radius: 8px;
@@ -110,16 +113,16 @@
     position: relative;
     overflow: hidden;
 }
-.lp-myfiles .storage-usage-panel .storage-graph span {
+.lp-storage-usage .storage-usage-panel .storage-graph span {
     position: absolute;
     background: var(--surface-dark-grey);
     height: 6px;
     border-radius: 8px 0 0 8px;
 }
-.lp-myfiles .storage-usage-panel.warning .storage-graph span {
+.lp-storage-usage .storage-usage-panel.warning .storage-graph span {
     background: var(--secondary-orange);
 }
-.lp-myfiles .storage-usage-panel.over .storage-graph span {
+.lp-storage-usage .storage-usage-panel.over .storage-graph span {
     background: var(--secondary-red);
 }
 .storage-usage-panel .info {
@@ -138,7 +141,7 @@
     background-position: -6px -350px;
 }
 .storage-usage-panel .storage-txt {
-    color: var(--surface-main-inverted);
+    color: var(--stroke-main-inverted);
 }
 .storage-usage-panel .loader.loading + .storage-txt {
     visibility: hidden;
@@ -157,23 +160,23 @@
 }
 .nw-fm-tree-item.selected {
     border-radius: 4px;
-    background-color: var(--surface-grey-1);
-    color: var(--surface-main-inverted);
+    background-color: var(--stroke-grey-1);
+    color: var(--stroke-main-inverted);
 }
 .nw-fm-tree-item:hover,
 .nw-fm-tree-item.hovered {
-    background-color: var(--surface-grey-1);
+    background-color: var(--stroke-grey-1);
     border-radius: 4px;
     cursor: pointer;
 }
 .nw-fm-tree-item:hover .nw-fm-tree-folder,
 .nw-fm-tree-item.dragover .nw-fm-tree-folder {
-    color: var(--surface-link-inverted);
+    color: var(--stroke-link-inverted);
 }
 .nw-fm-tree-item.selected .nw-fm-tree-folder,
 .nw-fm-tree-item.selected .nw-fm-tree-arrow {
-    color: var(--surface-main-inverted);
-    --mask-color: var(--surface-main-inverted);
+    color: var(--stroke-main-inverted);
+    --mask-color: var(--stroke-main-inverted);
 }
 .nw-fm-tree-item .sprite-fm-mono {
     --mask-color: var(--icon-rest);
@@ -212,7 +215,7 @@
     margin-inline-start: 24px;
 }
 .tree-item-dragger span.sprite-fm-mono {
-    background-color: var(--surface-grey-2);
+    background-color: var(--stroke-grey-2);
 }
 .tree-item-dragger span.item-name {
     line-height: 24px;

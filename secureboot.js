@@ -1,7 +1,7 @@
 // Release version information is replaced by the build scripts
 var buildVersion = { website: '', chrome: '', firefox: '', commit: '', timestamp: '', dateTime: '' };
 
-var m;
+var m, tmp;
 var browserUpdate = 0;
 var apipath;
 var pageLoadTime;
@@ -58,7 +58,7 @@ var is_huawei = is_mobile && (ua.indexOf('huawei') > 0 || ua.indexOf('hmscore') 
 
 if (is_android && !is_huawei) {
     // detect huawei devices by model
-    var tmp = [
+    tmp = [
         'ana-al00', 'ana-nx9', 'ang-an00', 'art-l28', 'brq-an00', 'cdy-nx9b', 'dra-lx9', 'els-n39', 'els-nx9',
         'jef-nx9', 'jny-lx2', 'lio-an00m', 'lio-l29', 'lio-n29', 'med-lx9', 'noh-an00', 'noh-lg', 'noh-nx9',
         'nop-an00', 'oce-an10', 'oce-an50', 'tas-l29', 'tet-an00'
@@ -74,7 +74,7 @@ if (is_android && !is_huawei) {
 // @todo get rid of 'm' around the codebase!
 m = !!is_mobile;
 
-var tmp = getCleanSitePath();
+tmp = getCleanSitePath();
 var is_selenium = !ua.indexOf('mozilla/5.0 (selenium; ');
 var is_embed = String(location.pathname).substr(0, 6) === '/embed' || tmp.substr(0, 2) === 'E!';
 var is_drop = location.pathname === '/drop' || tmp.substr(0, 2) === 'D!';
@@ -643,8 +643,9 @@ if (!browserUpdate) try
     }
 
     if (!is_livesite && !is_karma && !is_webcache) {
-        dd = d = d > 0 ? d : !localStorage.nfd;
+        d = d > 0 ? d : !localStorage.nfd;
         jj = d > 0 && !sessionStorage.dbgContentCheck;
+        dd = 1;
     }
 
     if (!is_extension && window.dd) {
@@ -727,6 +728,8 @@ if (location.host === 'mega.io') {
     tmp = undefined;
 }
 
+tmp = is_mobile && Object(window.clientInformation).vendor === 'Google Inc.';
+
 var mega = {
     ui: {},
     state: 0,
@@ -735,7 +738,7 @@ var mega = {
     updateURL: defaultStaticPath + 'current_ver.txt',
     chrome: (
         typeof window.chrome === 'object'
-        && window.chrome.runtime !== undefined
+        && (window.chrome.runtime !== undefined || tmp)
         && String(window.webkitRTCPeerConnection).indexOf('native') > 0
     ),
     browserBrand: [
@@ -835,6 +838,11 @@ var mega = {
         var affts = sessionStorage.affts || storage.affts;
         if (affid && affts && !(Date.now() - affts > 864e5)) {
             to += '/aff=' + affid;
+        }
+
+        var uLang = sessionStorage.lang || storage.lang;
+        if (uLang) {
+            to += '/lang=' + uLang;
         }
 
         if (storage.csp) {
@@ -963,6 +971,10 @@ var urlrootfile = '';
 if (is_bot) {
     nocontentcheck = true;
 }
+else if (is_karma) {
+    nocontentcheck = true;
+    bootstaticpath = 'base/';
+}
 
 if (String(location.pathname).indexOf('%') > 0) {
     tmp = mURIDecode(location.pathname);
@@ -1077,11 +1089,11 @@ if (!browserUpdate && is_extension)
 }
 
 var page;
-window.redirect = ['about', 'achievements', 'android', 'bird', 'blog', 'business', 'chrome', 'cmd', 'contact',
-                   'collaboration', 'copyright', 'corporate', 'credits', 'dev', 'developers', 'dispute', 'doc',
-                   'edge', 'extensions', 'firefox', 'gdpr', 'help', 'ios', 'mobile', 'nas', 'plugin', 'privacy',
-                   'resellers', 'sdkterms', 'securechat', 'security', 'sourcecode', 'start', 'storage', 'sync',
-                   'takedown', 'terms', 'uwp', 'wp'];
+window.redirect = ['about', 'achievements', 'android', 'bird', 'blog', 'business', 'chrome', 'cmd',
+                   'contact', 'collaboration', 'copyright', 'corporate', 'credits', 'desktop', 'dev',
+                   'developers', 'dispute', 'doc', 'edge', 'extensions', 'firefox', 'gdpr', 'help', 'ios',
+                   'mobile', 'nas', 'objectstorage', 'plugin', 'privacy', 'resellers', 'sdkterms', 'securechat', 'security',
+                   'sourcecode', 'start', 'storage', 'sync', 'takedown', 'terms', 'uwp', 'wp'];
 var isStaticPage = function(page) {
     'use strict';
     if (page) {
@@ -2081,8 +2093,7 @@ if (is_ios) {
 
 // Determine whether to show the legacy mobile page for these links so that they redirect back to the app
 var showLegacyMobilePage = m && (
-    page.substr(0, 6) === 'verify'
-    || page.substr(0, 9) === 'newsignup'
+    page.substr(0, 9) === 'newsignup'
     || page.substr(0, 7) === 'account'
     || is_old_windows_phone && page.substr(0, 7) === 'confirm'
 );
@@ -2373,7 +2384,10 @@ else if (!browserUpdate) {
 
                     dump.s = String(errobj.stack)
                         .replace(omsg, '').replace(re, '')
-                        .split("\n").map(mTrim).filter(String);
+                        .split("\n").map(mTrim)
+                        .filter(function(s, idx, a) {
+                            return s.length && a[idx - 1] !== s;
+                        });
 
                     for (var idx = 1; idx < dump.s.length; idx++) {
                         var s = dump.s[idx];
@@ -2382,6 +2396,10 @@ else if (!browserUpdate) {
                             maxStackLines = idx;
                             break;
                         }
+                    }
+
+                    if (dump.m.indexOf(':skull:') > 0) {
+                        maxStackLines = 50;
                     }
 
                     dump.s = dump.s.splice(0, maxStackLines).join("\n");
@@ -2650,6 +2668,7 @@ else if (!browserUpdate) {
     jsl.push({f:'js/utils/watchdog.js', n: 'js_utils_watchdog_js', j: 1});
     jsl.push({f:'js/utils/workers.js', n: 'js_utils_workers_js', j: 1});
     jsl.push({f:'js/utils/trans.js', n: 'js_utils_trans_js', j: 1});
+    jsl.push({f:'js/utils/webgl.js', n: 'webgl_js', j:1});
 
     jsl.push({f:'js/vendor/dexie.js', n: 'dexie_js', j:1,w:5});
     jsl.push({f:'js/functions.js', n: 'functions_js', j:1});
@@ -2757,10 +2776,6 @@ else if (!browserUpdate) {
         jsl.push({f:'html/megadrop.html', n: 'megadrop', j:0});
         jsl.push({f:'html/nomegadrop.html', n: 'nomegadrop', j:0});
         jsl.push({f:'js/fm/transfer-progress-widget.js', n: 'tpw_js', j:1});
-        jsl.push({f:'js/fm/fileTextEditor.js', n: 'filetexteditor_js', j:1});
-        jsl.push({f:'js/fm/textEditorUI.js', n: 'texteditorui_js', j:1});
-        jsl.push({f:'css/codemirror.css', n: 'codemirror_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'css/txteditor.css', n: 'txteditor_css', j:2,w:5,c:1,d:1,cache:1});
 
         // Bottom pages for desktop
         jsl.push({f:'css/bottom-pages-animations.css', n: 'bottom-pages-animations_css', j:2,w:5,c:1,d:1,cache:1});
@@ -2770,6 +2785,12 @@ else if (!browserUpdate) {
         is_chrome_firefox |= 4;
         jsl.push({f:'js/transfers/meths/firefox-extension.js', n: 'dl_firefox', j: 1, w: 3});
     }
+
+    // TextEditor
+    jsl.push({f:'js/fm/fileTextEditor.js', n: 'filetexteditor_js', j:1});
+    jsl.push({f:'js/fm/textEditorUI.js', n: 'texteditorui_js', j:1});
+    jsl.push({f:'css/codemirror.css', n: 'codemirror_css', j:2,w:5,c:1,d:1,cache:1});
+    jsl.push({f:'css/txteditor.css', n: 'txteditor_css', j:2,w:5,c:1,d:1,cache:1});
 
     // Transfers
     jsl.push({f:'js/transfers/xhr2.js', n: 'xhr_js', j:1});
@@ -2842,7 +2863,6 @@ else if (!browserUpdate) {
         jsl.push({f:'js/ui/theme.js', n: 'theme_js', j: 1, w: 1});
 
         jsl.push({f:'css/buttons.css', n: 'buttons_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'css/vars/text-input.css', n: 'vars_text_input_css', j:2, w:30, c:1, d:1, cache:1});
         jsl.push({f:'css/components.css', n: 'components_css', j:2, w:30, c:1, d:1, cache:1});
 
         jsl.push({f:'html/top.html', n: 'top', j:0});
@@ -2850,6 +2870,8 @@ else if (!browserUpdate) {
         jsl.push({f:'css/important.css', n: 'important_css', j:2, w:30, c:1, d:1, cache:1});
         jsl.push({f:'css/fm-lists.css', n: 'fm_lists_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/grid-table.css', n: 'grid_table_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/tabs.css', n: 'tabs_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/empty-pages.css', n: 'empty_page_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'js/vendor/megalist.js', n: 'megalist_js', j:1, w:5});
         jsl.push({f:'js/vendor/megaDynamicList.js', n: 'mega_dynamic_list_js', j:1, w:5});
         jsl.push({f:'js/fm/quickfinder.js', n: 'fm_quickfinder_js', j:1, w:1});
@@ -2869,6 +2891,9 @@ else if (!browserUpdate) {
         jsl.push({f:'js/fm/affiliate.js', n: 'fm_affiliate_js', j: 1});
         jsl.push({f:'js/ui/contextMenu.js', n: 'context_menu_js', j: 1});
         jsl.push({f:'js/ui/searchbar.js', n: 'searchbar_js', j:1});
+
+        jsl.push({f:'css/gallery.css', n: 'gallery_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'js/fm/gallery.js', n: 'fm_gallery_js', j:1});
 
         jsl.push({f:'js/ui/onboarding.js', n: 'onboarding_js', j:1,w:1});
         jsl.push({f:'js/ui/sms.js', n: 'sms_js', j: 1, w: 1});
@@ -2974,7 +2999,9 @@ else if (!browserUpdate) {
         jsl.push({f:'js/mobile/mobile.account.js', n: 'mobile_account_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.account.cancel.js', n: 'mobile_account_cancel_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.account.history.js', n: 'mobile_account_history_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.account.paymentcard.js', n: 'mobile_payment_card_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.account.change-password.js', n: 'mobile_account_change_pass_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.account.change-email.js', n: 'mobile_account_change_email_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.account.notifications.js', n: 'mobile_account_notifications_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.account.file-management.js', n: 'mobile_account_file_management_js', j:1, w: 1});
         jsl.push({f:'js/mobile/mobile.achieve.js', n: 'mobile_achieve_js', j: 1, w: 1});
@@ -2987,6 +3014,7 @@ else if (!browserUpdate) {
         jsl.push({f:'js/mobile/mobile.cloud.js', n: 'mobile_cloud_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.cloud.action-bar.js', n: 'mobile_cloud_action_bar_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.cloud.context-menu.js', n: 'mobile_cloud_context_menu_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.cloud.sort.js', n: 'mobile_cloud_context_sort_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.create-folder-overlay.js', n: 'mobile_create_folder_overlay_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.decryption-key-overlay.js', n: 'mobile_mobile_dec_key_overlay_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.decryption-password-overlay.js', n: 'mobile_dec_pass_overlay_js', j: 1, w: 1});
@@ -3006,6 +3034,7 @@ else if (!browserUpdate) {
         jsl.push({f:'js/mobile/mobile.recovery.enter-key.js', n: 'mobile_rec_enter_key_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.recovery.change-password.js', n: 'mobile_rec_change_password_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.register.js', n: 'mobile_register_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.rename-overlay.js', n: 'mobile_rename_overlay_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.signin.js', n: 'mobile_signin_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.slideshow.js', n: 'mobile_slideshow_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.support.js', n: 'mobile_support_js', j: 1, w: 1});
@@ -3034,11 +3063,13 @@ else if (!browserUpdate) {
         jsl.push({f:'js/mobile/mobile.over-storage-quota-overlay.js', n: 'mobile_over_storage_quota_overlay_js', j: 1 });
         jsl.push({f:'js/mobile/mobile.resume-transfers-overlay.js', n: 'mobile_resume_transfers_overlay_js', j: 1, w: 1});
         jsl.push({f:'html/mvoucherinfo.html', n: 'mvoucherinfo', j: 0, w: 1});
+        jsl.push({f:'js/mobile/mobile.verify.js', n: 'mobile_verify_js', j: 1, w:1});
     }
 
     jsl.push({f:'css/toast.css', n: 'toast_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/general.css', n: 'general_css', j:2, w:5, c:1, d:1, cache: 1});
     jsl.push({f:'css/megainput.css', n: 'megainput_css', j:2, w:5, c:1, d:1, cache: 1});
+    jsl.push({f:'css/vars/text-input.css', n: 'vars_text_input_css', j:2, w:30, c:1, d:1, cache:1});
     jsl.push({f:'css/retina-images.css', n: 'retina_images_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
 
     // We need to keep a consistent order in loaded resources, so that if users
@@ -3136,6 +3167,9 @@ else if (!browserUpdate) {
         jsl.push({f:'css/general.css', n: 'general_css', j:2, w:5, c:1, d:1, cache: 1});
         jsl.push({f:'css/vars/theme.css', n: 'vars_theme_css', j:2, w:30, c:1, d:1, cache:1});
         jsl.push({f:'css/grid-table.css', n: 'grid_table_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'js/states-countries.js', n: 'states_countries_js', j:1});
+        jsl.push({f:'css/checkboxes.css', n: 'checkboxes_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'js/utils/icu.js', n: 'js_utils_icu_js', j: 1});
 
         // Sprites
         jsl.push({f:'css/sprites/fm-uni@uni.css', n: 'fm_uni_css', j:2, w:30, c:1, d:1, cache:1});
@@ -3177,6 +3211,7 @@ else if (!browserUpdate) {
             jsl.push({f:'js/mobile/mobile.message-overlay.js', n: 'mobile_message_overlay_js', j: 1, w: 1});
             jsl.push({f:'js/mobile/mobile.terms.js', n: 'mobile_terms_js', j: 1, w: 1});
             jsl.push({f:'css/retina-images.css', n: 'retina_images_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
+            jsl.push({f:'js/mobile/mobile.privacy.js', n: 'mobile_privacy_js', j: 1, w: 1});
         }
         else {
             jsl.push({f:'js/vendor/perfect-scrollbar.js', n: 'ps_js', j:1,w:1});
@@ -3268,7 +3303,7 @@ else if (!browserUpdate) {
         'help2_welcome': {f:'html/help2_welcome.html', n: 'help2_welcome', j: 0},
         'help2_page': {f:'html/help2_page.html', n: 'help2_page', j: 0},
         'help_js': {f:'html/js/help2.js', n: 'help_js', j:1},
-        'sync': {f:'html/sync.html', n: 'sync', j:0},
+        'desktop': {f:'html/desktop.html', n: 'desktop', j:0},
         'sync_js': {f:'html/js/sync.js', n: 'sync_js', j:1},
         'cmd': {f:'html/megacmd.html', n: 'cmd', j:0},
         'mobileapp': {f:'html/mobileapp.html', n: 'mobileapp', j:0},
@@ -3283,7 +3318,6 @@ else if (!browserUpdate) {
         'webpjs': {f:'js/vendor/webp.js', n: 'webpjs', j:1},
         'videostream': {f:'js/vendor/videostream.js', n: 'videostream', j:1},
         'mediainfo': {f:'js/vendor/mediainfo.js', n: 'mediainfo', j:1},
-        'privacycompany': {f:'html/privacycompany.html', n: 'privacycompany', j:0},
         'zxcvbn_js': {f:'js/vendor/zxcvbn.js', n: 'zxcvbn_js', j:1},
         'redeem': {f:'html/redeem.html', n: 'redeem', j:0},
         'unsub': {f:'html/unsub.html', n: 'unsub', j:0},
@@ -3323,11 +3357,19 @@ else if (!browserUpdate) {
         'achievements_css':{f:'css/achievements.css', n: 'achievements_css', j: 2, w: 5, c: 1, d: 1, cache: 1 },
         'special': {f:'html/troy-hunt.html', n:'special', j:0},
         'special_js': {f:'html/js/troy-hunt.js', n:'special_js', j:1},
-        'special_css': {f:'css/troy-hunt.css', n:'special_css', j:2}
+        'special_css': {f:'css/troy-hunt.css', n:'special_css', j:2},
+        'reportabuse_js': {f:'js/ui/reportAbuse.js', n:'reportabuse_js', j:1},
+        'object_storage': {f:'html/objectstorage.html', n: 'object_storage', j:0},
     };
 
     /* eslint-disable max-len */
     var jsl3 = {
+        'webgl': {
+            'webgl:webgl_js': {f:'js/utils/webgl.js', n: 'webgl:webgl_js', j:5},
+            'webgl:exif_js': {f:'js/vendor/exif.js', n: 'webgl:exif_js', j:5},
+            'webgl:dcraw_js': {f:'js/vendor/dcraw.js', n: 'webgl:dcraw_js', j:5},
+            'webgl:smartcrop_js': {f:'js/vendor/smartcrop.js', n: 'webgl:smartcrop_js', j:5}
+        },
         'chat': {
             /* chat related css */
             'chat_messages_css':{f:'css/chat-messages.css', n: 'chat_messages_css', j:2,'w':5,'c':1,'cache':1,'d':1},
@@ -3407,9 +3449,9 @@ else if (!browserUpdate) {
         'disputenotice': ['disputenotice', 'copyright_js'],
         'copyright': ['copyright'],
         'copyrightnotice': ['copyrightnotice', 'copyright_js'],
-        'privacy': ['privacy', 'privacycompany'],
+        'privacy': ['privacy'],
         'takedown': ['takedown'],
-        'sync': ['sync', 'sync_js'],
+        'desktop': ['desktop', 'sync_js'],
         'cmd': ['cmd', 'megacmd_js'],
         'mobile': ['mobileapp'],
         'nas': ['nas'],
@@ -3444,7 +3486,8 @@ else if (!browserUpdate) {
         'nziphotographer': ['nzipp', 'nzipp_js', 'nzipp_css'],
         'business': ['business', 'businessjs'],
         'cookie': ['cookie'],
-        'special': ['special', 'special_js', 'special_css']
+        'special': ['special', 'special_js', 'special_css'],
+        'objectstorage': ['object_storage', 'features_js']
     };
 
     if (is_mobile) {
@@ -3786,6 +3829,19 @@ else if (!browserUpdate) {
         {
             try {
                 jsl[this.jsi].text = this.response || this.responseText;
+                if (!is_livesite) {
+                    var entry = jsl[this.jsi];
+                    if (entry && entry.j === 3 && entry.f.indexOf('_prod') === -1
+                        && entry.text.indexOf('<!DOCTYPE html>') > -1) {
+                        console.warn('Lang file ' +
+                            entry.f + ' cannot be found. Switching to _prod lang file');
+                        entry.f = entry.f.replace('.json', '_prod.json');
+                        entry.text = null;
+                        jsl[this.jsi] = entry;
+                        return xhr_load(jsl[this.jsi].f, this.jsi, xhri);
+                    }
+                }
+
             }
             catch (ex) {
                 return siteLoadError(ex, bootstaticpath + Object(jsl[this.jsi]).f);
@@ -3855,6 +3911,7 @@ else if (!browserUpdate) {
 
         window.onload = null;
         if (is_karma) {
+            window.jsl = [];
             return;
         }
 
@@ -3873,7 +3930,7 @@ else if (!browserUpdate) {
             'es6s =' +
             ' ({...{a:23}}).a === 23' + // C60 E79 F55 O47 S11
             ' && Promise.prototype.finally' + // C63 E18 F58 O50 S11
-            ' && (async()=>{})[Symbol.toStringTag] === "AsyncFunction"' + // C55 E15 F52 O42 S10.1
+            ' && (Array.prototype.values === Array.prototype[Symbol.iterator])' + // C66 E12 F60 O53 S9
             ' && (function *(a=1,){yield a})(2).next().value === 2', // C58 E14 F52 O45 S10
             function(error) {
                 if (error || !window.es6s) {
@@ -3898,7 +3955,7 @@ else if (!browserUpdate) {
         var rightProgressBlock = document.getElementById('loadinganimright');
 
         // Fix exception thrown when going from mobile web /login page to mobile web /register page
-        if (is_mobile && (rightProgressBlock === null)) {
+        if (!rightProgressBlock || !leftProgressBlock) {
             return false;
         }
 
@@ -3931,9 +3988,9 @@ else if (!browserUpdate) {
     var cssCache=false;
     var jsl_loaded={};
     function initall() {
+        var temp;
         var jsar = [];
         var cssar = [];
-        var nodedec = {};
         var j2re1 = /(?:\.\.\/)+/g;
         var j2re2 = /\/en\//g;
         var j2tr2 = '/' + lang + '/';
@@ -3994,6 +4051,15 @@ else if (!browserUpdate) {
                     window[jsl[i].n] = blobLink;
                 }
             }
+            else if (jsl[i].j === 5) {
+                /** @property window.sbj5rsc_webgl */
+                temp = 'sbj5rsc_' + jsl[i].n.split(/[:_]/)[0];
+                if (!window[temp]) {
+                    window[temp] = '';
+                }
+                window[temp] += jsl[i].text;
+                jsl[i].text = '/*j5*/';
+            }
             else if (jsl[i].j === 0 && jsl[i].f.match(/\.json$/)) {
                 try {
                     var templates = JSON.parse(jsl[i].text);
@@ -4006,22 +4072,9 @@ else if (!browserUpdate) {
                 }
             }
             else if (jsl[i].j == 0) pages[jsl[i].n] = jsl[i].text;
-
-            if (jsl[i].n === 'sjcl_js' || jsl[i].n === 'nodedec_js' || jsl[i].n === 'asmcrypto_js') {
-                nodedec[jsl[i].n] = jsl[i].text;
-            }
         }
         if (window.URL)
         {
-            nodedec = !jj && !is_extension && !("ActiveXObject" in window) && nodedec;
-
-            if (nodedec && Object.keys(nodedec).length === 3) {
-                tmp = String(nodedec.nodedec_js).split(/importScripts\([^)]+\)/);
-
-                nodedec = [tmp.shift(), nodedec.sjcl_js, nodedec.asmcrypto_js, tmp.join(';')];
-                mega.nodedecBlobURI = mObjectURL(nodedec, 'text/javascript');
-                nodedec = tmp = undefined;
-            }
             if (localStorage.makeCache && !cssCache) cssCache=cssar;
             if (cssar.length)
             {
@@ -4556,96 +4609,6 @@ function lazy(target, property, stub) {
     return target;
 }
 
-function promisify(fc) {
-    'use strict';
-    var a$yncMethod = function() {
-        var self = this;
-        var args = [];
-        if (arguments.length) {
-            var len = arguments.length;
-            args = Array(len);
-            while (len--) {
-                args[len] = arguments[len];
-            }
-        }
-        return new Promise(function(resolve, reject) {
-            var result = a$yncMethod.__function__.apply(self, [resolve, reject].concat(args));
-            if (result instanceof Promise) {
-                if (d > 2) {
-                    console.assert(a$yncMethod.__function__[Symbol.toStringTag] === "AsyncFunction");
-                }
-                result.catch(reject);
-            }
-        });
-    };
-    a$yncMethod.prototype = undefined;
-    Object.defineProperty(fc, '__method__', {value: a$yncMethod});
-    Object.defineProperty(a$yncMethod, '__function__', {value: fc});
-    return a$yncMethod;
-}
-
-function mutex(name, handler) {
-    'use strict';
-    if (typeof name === 'function') {
-        handler = name;
-        name = null;
-    }
-    var mMutexMethod = function() {
-        var self = this;
-        var args = arguments.length ? toArray.apply(null, arguments) : [];
-        name = name || this.__mutex_lock_name_$;
-        if (!name) {
-            name = (this.constructor.name || '$') + makeUUID().slice(-13);
-            Object.defineProperty(this, '__mutex_lock_name_$', {value: name});
-        }
-        return new Promise(function(resolve, reject) {
-            mutex.lock(name).then(function(unlock) {
-                var res = function(a0) {
-                    unlock().always(resolve.bind(null, a0));
-                };
-                var rej = function(a0) {
-                    unlock().always(reject.bind(null, a0));
-                };
-                return mMutexMethod.__function__.apply(self, [res, rej].concat(args));
-            }).catch(function(ex) {
-                console.error(ex);
-                mutex.unlock(name).always(reject.bind(null, ex));
-            });
-        });
-    };
-    mMutexMethod.prototype = undefined;
-    Object.defineProperty(handler, '__method__', {value: mMutexMethod});
-    Object.defineProperty(mMutexMethod, '__name__', {value: name});
-    Object.defineProperty(mMutexMethod, '__function__', {value: handler});
-    return Object.freeze(mMutexMethod);
-}
-
-mutex.queue = Object.create(null);
-mutex.lock = promisify(function(resolve, reject, name) {
-    'use strict';
-    resolve = resolve.bind(this, mutex.unlock.bind(mutex, name));
-
-    if (mutex.queue[name]) {
-        mutex.queue[name].push(resolve);
-    }
-    else {
-        mutex.queue[name] = [];
-        resolve();
-    }
-});
-mutex.unlock = promisify(function(resolve, reject, name) {
-    'use strict';
-    var next = (mutex.queue[name] || []).shift();
-    if (next) {
-        onIdle(next);
-    }
-    else {
-        delete mutex.queue[name];
-    }
-    resolve();
-});
-Object.freeze(mutex);
-
 function b64encode(str) {
     'use strict';
     // eslint-disable-next-line local-rules/hints
@@ -4691,11 +4654,6 @@ function echo(a) {
 }
 
 var dump = nop;
-var smbl = typeof Symbol === 'function' ? Symbol : function(s) {
-    'use strict';
-    return '<<<' + s;
-};
-
 mBroadcaster.once('startMega', function() {
     'use strict';
 
@@ -4716,20 +4674,12 @@ mBroadcaster.once('startMega', function() {
             M.req({a: 'mrt', t: mt}).dump('uTagMT');
         });
     }
+
     if (sessionStorage.affid && 'csp' in window) {
         delay('aff:cspchk:movelocal', function() {
-            csp.init().then(function() {
-                if (csp.has('analyze')) {
-                    localStorage.affid = sessionStorage.affid;
-                    localStorage.affts = sessionStorage.affts;
-                    localStorage.afftype = sessionStorage.afftype;
-                }
-                else {
-                    delete localStorage.affid;
-                    delete localStorage.affts;
-                    delete localStorage.afftype;
-                }
-            });
+            if ('affiliate' in M) {
+                M.affiliate.persist();
+            }
         });
     }
 

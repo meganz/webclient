@@ -1,5 +1,5 @@
 .top-head {
-    background-color: var(--surface-grey-2);
+    background-color: var(--stroke-grey-2);
     position: relative;
 }
 .topbar {
@@ -8,7 +8,7 @@
     display: flex;
     font-size: 0;
     padding: 0 16px;
-    background-color: var(--surface-main);
+    background-color: var(--stroke-main);
     height: 48px;
 }
 
@@ -73,7 +73,7 @@
     margin: 0 16px;
     box-sizing: border-box;
     width: 100%;
-    color: var(--surface-main-inverted);
+    color: var(--stroke-main-inverted);
     font: var(--text-body1);
 }
 .topbar-searcher button {
@@ -85,12 +85,12 @@
     background-color: transparent;
 }
 .topbar-searcher input::placeholder {
-    color: var(--surface-main-inverted);
+    color: var(--stroke-main-inverted);
     opacity: 0.3;
 }
 .topbar-searcher button i {
     --icon-size: 16px;
-    --mask-color: var(--surface-main-inverted);
+    --mask-color: var(--stroke-main-inverted);
 }
 /* mini search */
 
@@ -118,10 +118,6 @@
     height: 32px;
     position: relative;
     width: 32px;
-}
-
-.topbar .mini-search.hidden {
-    display: none;
 }
 
 .topbar .mini-search .topbar-searcher {
@@ -235,10 +231,6 @@
     align-items: center;
     display: flex;
     height: 100%;
-}
-
-.topbar-links > .dropdown.hidden {
-    display: none;
 }
 
 /* Icon Button */
@@ -431,6 +423,13 @@
     letter-spacing: 0;
     line-height: 20px;
  }
+.topbar .account-dialog .account-info .name,
+.topbar .account-dialog .account-info .email {
+    max-width: 160px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
 .topbar .account-dialog .account-info .activity-text {
     opacity: 0.7;
     color: var(--text-color-higher);
@@ -521,7 +520,7 @@
     box-shadow: var(--dropdown-shadow);
   }
 .topbar .account-dialog ul.links li .status-dropdown:hover .dropbtn {
-    background-color: var(--surface-grey-2);
+    background-color: var(--stroke-grey-2);
     color: var(--text-color-high);
 }
 .topbar .account-dialog ul.links li .status-dropdown:hover .dropdown-content {
@@ -611,10 +610,6 @@
     margin-inline-end: 16px;
 }
 
-.top-head .top-buttons.hidden {
-    display: none;
-}
-
 .top-head .top-buttons.business {
     display: none;
     position: relative;
@@ -626,4 +621,19 @@
 
 .business .top-head .top-buttons.business {
     display: block;
+}
+/* Download Page Topbar changes */
+.topbar .logo-full {
+    --width: 98px;
+    width: 98px;
+    height: 32px;
+    display: none;
+    cursor: pointer;
+}
+.bottom-page.download .topbar .logo-full {
+    display: inline-block;
+}
+.bottom-page.download .topbar .logo,
+.bottom-page.download .topbar .logo-wrapper button {
+    display: none;
 }

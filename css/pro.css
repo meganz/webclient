@@ -235,6 +235,22 @@
 .provider-icon.sabadellMC {
     background-position: 0 -1980px;
 }
+.provider-icon.stripeAE {
+    background-image: url("../images/mega/Amex.svg");
+    background-size: unset;
+}
+.provider-icon.stripeJC {
+    background-image: url("../images/mega/JCB.svg");
+    background-size: unset;
+}
+.provider-icon.stripeUP {
+    background-image: url("../images/mega/UnionPay.svg");
+    background-size: unset;
+}
+.provider-icon.stripeDD {
+    background-image: url("../images/mega/Discover.svg");
+    background-size: unset;
+}
 
 /* Pricing icons */
 .pricing-sprite,
@@ -395,8 +411,7 @@ i.pricing-sprite,
     display: block;
 }
 .pricing-page.top-header.not-logged,
-.not-logged .pricing-page.top-header.default,
-.not-logged .pricing-page.top-header.hidden {
+.not-logged .pricing-page.top-header.default {
     display: none;
 }
 .pricing-page.medium-txt {
@@ -478,6 +493,9 @@ i.pricing-sprite,
     -ms-overflow-style: none;
     scrollbar-width: none;
     -webkit-overflow-scrolling: touch;
+}
+.rtl .pricing-page.plans-wrap {
+    direction: rtl;
 }
 .pricing-page.plans-wrap::-webkit-scrollbar {
   display: none;
@@ -866,7 +884,7 @@ body:not(.mobile) .plan.pro3:not(.current) .pricing-page.plan-button:hover {
 /* Current plan */
 .pricing-page.plan.current {
     border-left: 1px solid transparent;
-    background-color: var(--surface-grey-2);
+    background-color: var(--stroke-grey-2);
 }
 .pricing-page.plan.current + .plan {
     border-left: 1px solid transparent;
@@ -892,6 +910,12 @@ body:not(.mobile) .plan.pro3:not(.current) .pricing-page.plan-button:hover {
     display: block;
     margin: 0 auto;
     max-width: 475px;
+}
+.rtl .pricing-page.plan.business,
+.rtl .business-calculator .header,
+.rtl .business-calculator span, 
+.rtl .business-calculator .footer {
+    direction: rtl;
 }
 .plan.business .pricing-page.euro-price:empty {
     height: auto;
@@ -1309,6 +1333,9 @@ body:not(.mobile) .pricing-page.slider-dot:hover {
     max-width: 1009px;
     margin: 0 auto;
 }
+.rtl .pricing-page.compare-block {
+    direction: rtl;
+}
 .pricing-page.compare-cell {
     display: table-cell;
     border: 1px solid #DEDEDE;
@@ -1598,9 +1625,6 @@ body:not(.mobile) .pricing-page.slider-dot:hover {
     box-sizing: border-box;
     max-width: calc(100% - 2px);
 }
-.orange-notification.body.hidden {
-    display: none;
-}
 .orange-notification.cell {
     display: table-cell;
     vertical-align: middle;
@@ -1781,9 +1805,6 @@ body:not(.mobile) .pricing-page.slider-dot:hover {
     padding-right: 14px;
     margin-left: 17px;
 }
-.payment-duration .save-money.hidden {
-    display: none;
-}
 .payment-duration .opt-note {
     display: none;
 }
@@ -1826,8 +1847,7 @@ body:not(.mobile) .pricing-page.slider-dot:hover {
 .payment-duration .membership-radio-label .price {
     display: inline-block;
 }
-.payment-duration .membership-radio-label.discounted .hyphen,
-.payment-duration .membership-radio-label .hidden {
+.payment-duration .membership-radio-label.discounted .hyphen {
     display: none;
 }
 .provider-details .provider-icon {
@@ -1893,9 +1913,6 @@ body:not(.mobile) .pricing-page.slider-dot:hover {
     margin: 12px 0 0 0;
     padding: 8px;
     transition: all 200ms ease-in-out 0s;
-}
-.payment-section .subscription-instructions.hidden {
-    display: none;
 }
 
 /* Promotion Voucher code, I will remove once I have more time */

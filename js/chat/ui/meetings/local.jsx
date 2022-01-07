@@ -1,9 +1,10 @@
 import React from 'react';
-import { MegaRenderMixin } from '../../../stores/mixins';
+import { MegaRenderMixin } from '../../mixins';
 import utils from '../../../ui/utils.jsx';
 import Button from './button.jsx';
 import Call from './call.jsx';
 import StreamNode from './streamNode.jsx';
+import StreamExtendedControls from "./streamExtendedControls";
 
 export default class Local extends MegaRenderMixin {
     collapseListener = null;
@@ -53,6 +54,17 @@ export default class Local extends MegaRenderMixin {
     }
 
     render() {
+        const { streams, minimized } = this.props;
+
+        // Only one call participant (i.e. me) -> render `Local` only if the call is minimized
+        if (streams.length === 0 && !minimized) {
+            return null;
+        }
+
+        //
+        // `Local`
+        // -------------------------------------------------------------------------
+
         const STREAM_PROPS = {
             ...this.props,
             ratioClass: this.getRatioClass(),
@@ -61,12 +73,7 @@ export default class Local extends MegaRenderMixin {
             onLoadedData: this.onLoadedData
         };
 
-        //
-        // `Local`
-        // https://mega.nz/file/kQF0XTRb#LbmJE578Rbt60U7zzd5L-_ARyBloeuiXO1-hjJrcVQE
-        // -------------------------------------------------------------------------
-
-        if (this.props.minimized) {
+        if (minimized) {
             return (
                 <utils.RenderTo element={document.body}>
                     <Stream {...STREAM_PROPS} />
@@ -82,6 +89,26 @@ export default class Local extends MegaRenderMixin {
 
 class Stream extends MegaRenderMixin {
     containerRef = React.createRef();
+
+    DRAGGABLE = {
+        POSITION: {
+            top: undefined,
+            left: undefined
+        },
+        OPTIONS: {
+            scroll: 'false',
+            cursor: 'move',
+            opacity: 0.8,
+            start: () => {
+                if (this.state.options) {
+                    this.handleOptionsToggle();
+                }
+            },
+            stop: (event, ui) => {
+                this.DRAGGABLE.POSITION = ui.position;
+            }
+        }
+    };
 
     EVENTS = {
         MINIMIZE: [
@@ -104,6 +131,24 @@ class Stream extends MegaRenderMixin {
 
     state = {
         options: false
+    };
+
+    /**
+     * getStreamSource
+     * @description Retrieves the stream source based on the current call mode.
+     * @see Call.MODE
+     * @see renderMiniMode
+     * @see renderSelfView
+     */
+
+    getStreamSource = () => {
+        const { call, mode, forcedLocal } = this.props;
+
+        if (mode === Call.MODE.MINI) {
+            return forcedLocal ? call.getLocalStream() : call.getActiveStream();
+        }
+
+        return call.getLocalStream();
     };
 
     unbindEvents = () => {
@@ -136,30 +181,31 @@ class Stream extends MegaRenderMixin {
     };
 
     initDraggable = () => {
-        const container = this.containerRef && this.containerRef.current;
-        if (container) {
-            $(container).draggable({
-                containment: 'body',
-                scroll: 'false',
-                cursor: 'move',
-                opacity: 0.8
+        const { minimized, wrapperRef } = this.props;
+        const containerEl = this.containerRef?.current;
+
+        if (containerEl) {
+            $(containerEl).draggable({
+                ...this.DRAGGABLE.OPTIONS,
+                // Constrain the dragging to within the bounds of the body (in minimized mode) or the stream
+                // container (when the call is expanded, excl. the sidebar)
+                containment: minimized ? 'body' : wrapperRef?.current
             });
         }
     };
 
     /**
-     * toggleDraggable
-     * @description Toggle the draggable behavior based on the current mode; enabled only if `Local` is minimized.
-     * @see MODE
+     * repositionDraggable
+     * @description Updates the position of the `Local` component. The position update is applied only if `Local` is
+     * positioned above the sidebar.
      */
 
-    toggleDraggable = () => {
-        const { mode } = this.props;
-        const { containerRef } = this;
-        const $container = containerRef && containerRef.current && $(containerRef.current);
+    repositionDraggable = () => {
+        const wrapperEl = this.props.wrapperRef?.current;
+        const localEl = this.containerRef?.current;
 
-        if ($container && $container.draggable('instance') !== undefined) {
-            $container.draggable('option', 'disabled', mode !== Call.MODE.MINI);
+        if (localEl.offsetLeft + localEl.offsetWidth > wrapperEl.offsetWidth) {
+            localEl.style.left = 'auto';
         }
     };
 
@@ -207,9 +253,16 @@ class Stream extends MegaRenderMixin {
         } = this.props;
         // `Speaker` mode and `forcedLocal` -> `Display in main view`, i.e. the local stream is in `Speaker` mode
         const IS_SPEAKER_VIEW = mode === Call.MODE.SPEAKER && forcedLocal;
+        const { POSITION } = this.DRAGGABLE;
 
         return (
-            <div className={`${Local.NAMESPACE}-options theme-dark-forced`}>
+            <div
+                className={`
+                     ${Local.NAMESPACE}-options
+                     ${POSITION.left < 200 ? 'options-top' : ''}
+                     ${POSITION.left < 200 && POSITION.top < 100 ? 'options-bottom' : ''}
+                     theme-dark-forced
+                 `}>
                 <ul>
                     <li>
                         <Button
@@ -269,7 +322,8 @@ class Stream extends MegaRenderMixin {
 
         return (
             <StreamNode
-                stream={forcedLocal ? call.getLocalStream() : call.getActiveStream()}
+                className={forcedLocal && !call.isSharingScreen() ? 'local-stream-mirrored' : ''}
+                stream={this.getStreamSource()}
                 onLoadedData={onLoadedData}
             />
         );
@@ -286,7 +340,8 @@ class Stream extends MegaRenderMixin {
         return (
             <>
                 <StreamNode
-                    stream={call.getLocalStream()}
+                    className={call.isSharingScreen() ? '' : 'local-stream-mirrored'}
+                    stream={this.getStreamSource()}
                     onLoadedData={onLoadedData}
                 />
                 <Button
@@ -311,9 +366,18 @@ class Stream extends MegaRenderMixin {
         this.unbindEvents();
     }
 
-    componentDidUpdate() {
+    componentDidUpdate(prevProps) {
         super.componentDidUpdate();
-        this.toggleDraggable();
+
+        // Reinitialize the drag behavior if the view mode had been changed
+        if (this.props.mode !== prevProps.mode) {
+            this.initDraggable();
+        }
+
+        // Reposition the `Local` if the sidebar had been toggled and it's currently open
+        if (this.props.sidebar !== prevProps.sidebar && this.props.sidebar) {
+            this.repositionDraggable();
+        }
     }
 
     componentDidMount() {
@@ -324,23 +388,9 @@ class Stream extends MegaRenderMixin {
 
     render() {
         const { NAMESPACE, POSITION_MODIFIER } = Local;
-        const {
-            streams,
-            mode,
-            minimized,
-            sidebar,
-            ratioClass,
-            collapsed,
-            toggleCollapsedMode,
-            onCallExpand,
-        } = this.props;
+        const { mode, minimized, sidebar, ratioClass, collapsed, toggleCollapsedMode, onCallExpand } = this.props;
         const IS_MINI_MODE = mode === Call.MODE.MINI;
         const IS_SELF_VIEW = !IS_MINI_MODE;
-
-        // Only one call participant (i.e. me) -> render `Local` only if the call is minimized
-        if (streams.length === 0 && !minimized) {
-            return null;
-        }
 
         if (collapsed) {
             return (
@@ -363,7 +413,7 @@ class Stream extends MegaRenderMixin {
                 ref={this.containerRef}
                 className={`
                     ${NAMESPACE}
-                    ${ratioClass}
+                    ${StreamNode.isStreaming(this.getStreamSource()) ? ratioClass : ''}
                     ${IS_MINI_MODE ? 'mini' : ''}
                     ${minimized ? 'minimized' : ''}
                     ${this.state.options ? 'active' : ''}
@@ -430,10 +480,11 @@ class Minimized extends MegaRenderMixin {
 
     render() {
         const { unread } = this.state;
-        const { isOnHold, onCallExpand, onCallEnd, onAudioClick, onVideoClick } = this.props;
-        const audioLabel = this.isActive(SfuClient.Av.Audio) ? l[16708] /* `Unmute` */ : l[16214] /* `Mute` */;
+        const { call, onCallExpand, onCallEnd, onAudioClick, onVideoClick,
+                onScreenSharingClick, onHoldClick } = this.props;
+        const audioLabel = this.isActive(SfuClient.Av.Audio) ? l[16214] /* `Mute` */ : l[16708] /* `Mute` */;
         const videoLabel =
-            this.isActive(SfuClient.Av.Video) ? l[22894] /* `Disable video` */ : l[22893] /* `Enable video` */;
+            this.isActive(SfuClient.Av.Camera) ? l[22894] /* `Disable video` */ : l[22893] /* `Enable video` */;
         const SIMPLETIP_PROPS = { position: 'top', offset: 5 };
 
         return (
@@ -449,54 +500,57 @@ class Minimized extends MegaRenderMixin {
                         }}
                     />
 
-                    {!isOnHold && (
-                        <div className={`${Local.NAMESPACE}-controls`}>
-                            <Button
-                                simpletip={{ ...SIMPLETIP_PROPS, label: audioLabel }}
-                                className={`
-                                    mega-button
-                                    theme-light-forced
-                                    round
-                                    large
-                                    ${this.isActive(SfuClient.Av.Audio) ? '' : 'inactive'}
-                                `}
-                                icon={`${this.isActive(SfuClient.Av.Audio) ? 'icon-audio-filled' : 'icon-audio-off'}`}
-                                onClick={ev => {
-                                    ev.stopPropagation();
-                                    onAudioClick();
-                                }}>
-                                <span>{audioLabel}</span>
-                            </Button>
-                            <Button
-                                simpletip={{ ...SIMPLETIP_PROPS, label: videoLabel }}
-                                className={`
-                                    mega-button
-                                    theme-light-forced
-                                    round
-                                    large
-                                    ${this.isActive(SfuClient.Av.Video) ? '' : 'inactive'}
-                                `}
-                                icon={`
-                                    ${this.isActive(SfuClient.Av.Video) ? 'icon-video-call-filled' : 'icon-video-off'}
-                                `}
-                                onClick={ev => {
-                                    ev.stopPropagation();
-                                    onVideoClick();
-                                }}>
-                                <span>{videoLabel}</span>
-                            </Button>
-                            <Button
-                                simpletip={{ ...SIMPLETIP_PROPS, label: l[5884] /* `End call` */ }}
-                                className="mega-button theme-dark-forced round large end-call"
-                                icon="icon-end-call"
-                                onClick={ev => {
-                                    ev.stopPropagation();
-                                    onCallEnd();
-                                }}>
-                                <span>{l[5884] /* `End call` */}</span>
-                            </Button>
-                        </div>
-                    )}
+                    <div className={`${Local.NAMESPACE}-controls`}>
+                        <Button
+                            simpletip={{ ...SIMPLETIP_PROPS, label: audioLabel }}
+                            className={`
+                                mega-button
+                                theme-light-forced
+                                round
+                                large
+                                ${this.isActive(SfuClient.Av.Audio) ? '' : 'inactive'}
+                            `}
+                            icon={`${this.isActive(SfuClient.Av.Audio) ? 'icon-audio-filled' : 'icon-audio-off'}`}
+                            onClick={ev => {
+                                ev.stopPropagation();
+                                onAudioClick();
+                            }}>
+                            <span>{audioLabel}</span>
+                        </Button>
+                        <Button
+                            simpletip={{ ...SIMPLETIP_PROPS, label: videoLabel }}
+                            className={`
+                                mega-button
+                                theme-light-forced
+                                round
+                                large
+                                ${this.isActive(SfuClient.Av.Camera) ? '' : 'inactive'}
+                            `}
+                            icon={`
+                                ${this.isActive(SfuClient.Av.Camera) ? 'icon-video-call-filled' : 'icon-video-off'}
+                            `}
+                            onClick={ev => {
+                                ev.stopPropagation();
+                                onVideoClick();
+                            }}>
+                            <span>{videoLabel}</span>
+                        </Button>
+                        <StreamExtendedControls
+                            call={call}
+                            onScreenSharingClick={onScreenSharingClick}
+                            onHoldClick={onHoldClick}
+                        />
+                        <Button
+                            simpletip={{ ...SIMPLETIP_PROPS, label: l[5884] /* `End call` */ }}
+                            className="mega-button theme-dark-forced round large end-call"
+                            icon="icon-end-call"
+                            onClick={ev => {
+                                ev.stopPropagation();
+                                onCallEnd();
+                            }}>
+                            <span>{l[5884] /* `End call` */}</span>
+                        </Button>
+                    </div>
                 </div>
                 {unread ? (
                     <div className={`${Local.NAMESPACE}-notifications`}>

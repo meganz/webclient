@@ -12,8 +12,8 @@ mobile.notFoundOverlay = {
         var message = typeof e === 'string' && e;
 
         // Store the selector
-        var $overlay = $('#mobile-ui-notFound');
-        var $errorText = $overlay.find('.na-file-txt');
+        var $overlay = $('#mobile-ui-notfound');
+        var $errorText = $overlay.find('.error-title');
         var $image = $overlay.find('.filetype-img');
 
         if (parseInt(e) === EARGS) {
@@ -33,6 +33,7 @@ mobile.notFoundOverlay = {
         }
 
         // Show the overlay
+        $('.download.some-reason', $overlay).removeClass('hidden');
         $overlay.removeClass('hidden').addClass('overlay');
     }
 };

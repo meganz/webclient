@@ -369,7 +369,7 @@
             <i class="sprite-fm-mono icon-bin"></i>
             <span>[$83]</span>
         </a>
-        <a class="dropdown-item removeshare-item red">
+        <a class="dropdown-item removeshare-item">
             <i class="sprite-fm-mono icon-logout"></i>
             <span>[$5866]</span>
         </a>
@@ -425,9 +425,13 @@
                 <div class="nw-fm-left-border"></div>
                 <div class="dark-tooltip">[$16668]</div>
             </div>
-            <div class="nw-fm-left-icon cloud-drive active sprite-fm-uni-before icon-files-before js-fm-tab" aria-role="button" name="cloud-drive">
+            <div class="nw-fm-left-icon cloud-drive sprite-fm-uni-before icon-files-before js-fm-tab" aria-role="button" name="cloud-drive">
                 <div class="nw-fm-left-border"></div>
                 <div class="dark-tooltip">[$24681]</div>
+            </div>
+            <div class="nw-fm-left-icon gallery sprite-fm-uni-before icon-gallery-before js-fm-tab" aria-role="button" name="gallery">
+                <div class="nw-fm-left-border"></div>
+                <div class="dark-tooltip">[$gallery_title]</div>
             </div>
             <div class="nw-fm-left-icon conversations sprite-fm-uni-before icon-chat-before js-fm-tab" aria-role="button" name="conversations">
                 <div class="nw-fm-left-border"></div>
@@ -648,7 +652,32 @@
                         </button>
                     </div>
                 </div>
+            </section>
+            <!-- My Files Section End -->
 
+            <!-- Gallery Section Begin -->
+            <section class="js-lp-gallery lp-gallery" >
+                <div class="lp-header">
+                    <span>[$gallery_title]</span>
+                </div>
+                <div class="content-area js-gallery-panel">
+                    <div class="library-panel">
+                        <span class="section-title">[$gallery_subtitle]</span>
+                        <button class="btn-galleries js-lpbtn photos js-fm-tab" data-link="photos">
+                            <i class="sprite-fm-mono icon-photos"></i>[$gallery_photos]
+                        </button>
+                        <button class="btn-galleries js-lpbtn images js-fm-tab" data-link="images">
+                            <i class="sprite-fm-mono icon-images"></i>[$gallery_images]
+                        </button>
+                        <button class="btn-galleries js-lpbtn videos js-fm-tab" data-link="videos">
+                            <i class="sprite-fm-mono icon-videos"></i>[$gallery_videos]
+                        </button>
+                    </div>
+                </div>
+            </section>
+            <!-- Gallery Section End -->
+
+            <section class="js-lp-storage-usage lp-storage-usage">
                 <div class="storage-usage-panel js-lp-storage-usage-block">
                     <div class="title-block">
                         <div class="plan"></div>
@@ -667,9 +696,8 @@
                     </div>
                 </div>
             </section>
-            <!-- My Files Section End -->
 
-            <!-- My Files Section Begin -->
+            <!-- My User Management Section Begin -->
             <section class="js-lp-usermanagement lp-usermanagement-header">
                 <div class="lp-header">
                     <span>[$18677]</span>
@@ -678,7 +706,7 @@
                     </button>
                 </div>
             </section>
-            <!-- My Files Section End -->
+            <!-- My User Management Section End -->
 
             <div class="user-management-tree-panel-header enabled-accounts active hidden">
                 <i class="sprite-fm-mono icon-arrow-right"></i>
@@ -808,6 +836,7 @@
                         <div class="sub-menu slide-item">
                             <div class="sub-title" data-scrollto="account-type">[$17022]</div>
                             <div class="sub-title acc-setting-menu-balance-acc" data-scrollto="account-balance">[$449]</div>
+                            <div class="sub-title acc-setting-menu-card-info hidden" data-scrollto="account-card-info">[$payment_card]</div>
                             <div class="sub-title" data-scrollto="purchase-history">[$430]</div>
                             <div class="sub-title" data-scrollto="transaction-history">[$431]</div>
                         </div>
@@ -935,6 +964,14 @@
                 <a class="fix-me-btn">[$22102]</a>
                 <div class="fm-notification-close fix-me-close sprite-fm-mono icon-close-component"></div>
             </div>
+            <div class="fm-notification-block payment-card-status payment-card-expired">
+                <div>[$payment_card_exp]</div>
+                <i class="fm-notification-close sprite-fm-mono icon-close-component close-banner"></i>
+            </div>
+            <div class="fm-notification-block payment-card-status payment-card-almost-expired">
+                <div>[$payment_card_almost_exp]</div>
+                <i class="fm-notification-close sprite-fm-mono icon-close-component close-banner"></i>
+            </div>
 
             <div class="onboarding-control-panel hidden">
                 <div class="onboarding-control-panel-content">
@@ -970,6 +1007,15 @@
                 <div class="clear"></div>
             </div>
 
+            <div class="gallery-tabs-bl hidden">
+                <div class="gallery-section-title"></div>
+                <button class="gallery-tab-lnk gallery-tab-lnk-y years" data-folder="y">[$gallery_years]</button>
+                <button class="gallery-tab-lnk gallery-tab-lnk-m months" data-folder="m">[$gallery_months]</button>
+                <button class="gallery-tab-lnk gallery-tab-lnk-d days" data-folder="d">[$gallery_days]</button>
+                <button class="gallery-tab-lnk gallery-tab-lnk-a all" data-folder="a">[$gallery_all]</button>
+                <div class="clear"></div>
+            </div>
+
             <div class="fm-right-header fm hidden">
 
                 <div class="fm-header-buttons">
@@ -996,7 +1042,7 @@
                                 <span>[$99]</span>
                             </button>
                             <input type="file" id="fileselect1" title="" class="hidden" multiple />
-                          </div>
+                        </div>
                     </div>
 
                     <button class="mega-button no-hover action fm-new-folder" title="[$5545]">
@@ -1175,7 +1221,7 @@
                     <div class="user-management-title">
                         [$24538]
                     </div>
-                   <i class="sprite-fm-mono icon-arrow-right"></i>
+                    <i class="sprite-fm-mono icon-arrow-right"></i>
                     <div class="user-management-subuser-name">[$983]</div>
                 </div>
 
@@ -1244,7 +1290,7 @@
             </div>
             <div class="fm-empty-section fm-empty-search hidden">
                 <div class="fm-empty-pad">
-                     <i class="section-icon sprite-fm-mono icon-preview-reveal"></i>
+                    <i class="section-icon sprite-fm-mono icon-preview-reveal"></i>
                     <div class="fm-empty-cloud-txt">[$978]</div>
                 </div>
                 <div class="empty-search-bottom-menu">
@@ -1326,6 +1372,60 @@
                 </div>
             </div>
 
+            <div class="fm-empty-section fm-empty-photos hidden">
+                <div class="fm-empty-pad">
+                    <i class="section-icon sprite-fm-theme icon-gallery-photos"></i>
+                    <div class="fm-empty-cloud-txt">[$gallery_photos_welcome]</div>
+                    <div class="fm-empty-description">[$gallery_get_start]</div>
+                    <div class="fm-empty-options">
+                        <div class="fm-empty-options-item">
+                            <i class="sprite-fm-mono icon-mobile"></i>
+                            [$gallery_get_start_instruction_2]
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="fm-empty-section fm-empty-images hidden">
+                <div class="fm-empty-pad">
+                    <i class="section-icon sprite-fm-theme icon-gallery-photos"></i>
+                    <div class="fm-empty-cloud-txt">[$gallery_images_welcome]</div>
+                    <div class="fm-empty-description">[$gallery_get_start]</div>
+                    <div class="fm-empty-options">
+                        <div class="fm-empty-options-item">
+                            <i class="sprite-fm-mono icon-camera-uploads"></i>
+                            [$gallery_get_start_instruction_1]
+                        </div>
+                        <div class="fm-empty-options-item">
+                            <i class="sprite-fm-mono icon-pc"></i>
+                            [$gallery_get_start_instruction_3]
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="fm-empty-section fm-empty-videos hidden">
+                <div class="fm-empty-pad">
+                    <i class="section-icon sprite-fm-theme icon-gallery-photos"></i>
+                    <div class="fm-empty-cloud-txt">[$gallery_videos_welcome]</div>
+                    <div class="fm-empty-description">[$gallery_get_start]</div>
+                    <div class="fm-empty-options">
+                        <div class="fm-empty-options-item">
+                            <i class="sprite-fm-mono icon-camera-uploads"></i>
+                            [$gallery_get_start_instruction_1]
+                        </div>
+                        <div class="fm-empty-options-item">
+                            <i class="sprite-fm-mono icon-mobile"></i>
+                            [$gallery_get_start_instruction_2]
+                        </div>
+                        <div class="fm-empty-options-item">
+                            <i class="sprite-fm-mono icon-pc"></i>
+                            [$gallery_get_start_instruction_3]
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="files-grid-view fm hidden">
                 <div class="grid-table-header-container-sc">
                     <table width="100%" border="0" cellspacing="0" cellpadding="0" class="grid-table-header fm">
@@ -1366,9 +1466,9 @@
                                 <div class="grid-view-resize">&nbsp;</div>
                             </th>
                             <!--<th megatype="extras">
-                                <div class="arrow ">[$17150]</div>
-                                <div class="grid-view-resize">&nbsp;</div>
-                            </th>-->
+                        <div class="arrow ">[$17150]</div>
+                        <div class="grid-view-resize">&nbsp;</div>
+                    </th>-->
                             <th megatype="extras" class="grid-url-header"></th>
                             <th></th>
                         </tr>
@@ -1389,7 +1489,7 @@
                                 <th class="grid-sixth-th grid-url-header">URL</th>
                             </tr>
                         </table>
-                     </div>
+                    </div>
                 </div>
             </div>
 
@@ -1415,13 +1515,13 @@
                 </table>
                 <div class="grid-scrolling-table contacts">
                     <!-- <div class="grid-wrapper"> -->
-                        <div class="add-new-contact">
-                            <div class="avatar-wrapper small-rounded-avatar">
-                                <i class="small-icon fm-s green-plus"></i>
-                            </div>
-                            <div class="contact-green-info">[$19106]</div>
+                    <div class="add-new-contact">
+                        <div class="avatar-wrapper small-rounded-avatar">
+                            <i class="small-icon fm-s green-plus"></i>
                         </div>
-                        <table width="100%" border="0" cellspacing="0" cellpadding="0" class="grid-table table-hover contacts"></table>
+                        <div class="contact-green-info">[$19106]</div>
+                    </div>
+                    <table width="100%" border="0" cellspacing="0" cellpadding="0" class="grid-table table-hover contacts"></table>
                     <!-- </div> -->
                 </div>
             </div>
@@ -1823,7 +1923,7 @@
                             <div class="daily-transfer-container">
                                 <div class="daily-transfer-title">[$19226]:</div>
 
-                                <div class="mega-input dropdown-input text-style inline chart-month-selector"  id="chart-month-selector">
+                                <div class="mega-input dropdown-input text-style inline chart-month-selector" id="chart-month-selector">
                                     <div class="mega-input-title"></div>
                                     <span>[$996]</span>
                                     <i class="sprite-fm-mono icon-dropdown"></i>
@@ -2302,9 +2402,37 @@
                 </div>
             </div>
 
+            <div class="gallery-view hidden" id="gallery-view">
+                <div class="gallery-view-scrolling"></div>
+
+                <div class="gallery-view-zoom-control">
+                    <button class="btn-icon zoom-out simpletip" aria-label="" data-simpletip="[$24927]">
+                        <i class="sprite-fm-mono icon-minimise"></i>
+                    </button>
+                    <button class="btn-icon zoom-in simpletip" aria-label="" data-simpletip="[$24928]">
+                        <i class="sprite-fm-mono icon-add"></i>
+                    </button>
+                </div>
+
+                <!-- Templates for Gallery list -->
+                <div class="content-row template" id="gallery-cr-template">
+                    <div class="content-block">
+                        <a class="data-block-view template" id="gallery-dbv-template">
+                            <span class="data-block-bg">
+                                <span class="block-view-file-type image file sprite-fm-mono icon-images"><img/></span>
+                                <div class="video-thumb-details">
+                                    <span>00:00</span>
+                                </div>
+                            </span>
+                        </a>
+                    </div>
+                </div>
+                <!-- END Templates for Gallery list -->
+            </div>
+
             <div class="selection-status-bar hidden">
                 <span class="selection-bar-col"></span>
-                <div class="selection-links-wrapper" >
+                <div class="selection-links-wrapper">
                     <button class="mega-button simpletip small action js-statusbarbtn download" data-simpletipoffset="2" data-simpletip="[$58]" data-simpletipposition="top">
                         <div><i class="sprite-fm-mono icon-download-small"></i></div>
                     </button>
@@ -2820,6 +2948,32 @@
                             </div>
                         </div>
                     </div>
+                    <div class="account data-block account-card-info hidden">
+                        
+                        <div class="settings-full-block">
+                            <div class="mega-data-header">[$payment_card]</div>
+                            <div class="card-info payment-card">
+                                <div class="payment-card-top">
+                                    <div class="payment-card-icon">
+                                        <i class="sprite-fm-uni icon-mastercard-border"></i>
+                                    </div>
+                                    <div class="payment-card-nb">
+                                        <div class="payment-card-dots">&#9679; &#9679; &#9679; &#9679;</div>
+                                        <div class="payment-card-dots">&#9679; &#9679; &#9679; &#9679;</div>
+                                        <div class="payment-card-dots">&#9679; &#9679; &#9679; &#9679;</div>
+                                        <div class="payment-card-digits">5644</div>
+                                    </div>
+                                    <div class="payment-card-expiry">
+                                        <div class="payment-card-expiry-lbl">[$23622]</div>
+                                        <div class="payment-card-expiry-val"></div>
+                                    </div>
+                                </div>
+                                <div class="payment-card-bottom">
+                                    <a class="payment-card-edit">[$edit_card]</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     <div class="account data-block purchase-history">
                         <div class="settings-full-block">
                             <div class="mega-data-header">
@@ -2967,7 +3121,7 @@
                                 <div class="subtitle-txt">[$165]</div>
                                 <div class="settings-sub-section">
                                     <div class="switch-label">
-                                    [$16148]
+                                        [$16148]
                                     </div>
                                     <div class="mega-switch toggle-on" id="enotif-contact-request" name="contact-request">
                                         <div class="mega-feature-switch"></div>
@@ -3030,9 +3184,20 @@
                                 <div class="subtitle-txt">[$23280]</div>
                                 <div class="settings-sub-section">
                                     <div class="switch-label">
-                                       [$23281]
+                                        [$23281]
                                     </div>
                                     <div class="mega-switch toggle-on" id="enotif-referral-program" name="referral-program">
+                                        <div class="mega-feature-switch"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="switch-container card-exp-switch hidden">
+                                <div class="subtitle-txt">[$payment_card_noti_title]</div>
+                                <div class="settings-sub-section">
+                                    <div class="switch-label">
+                                        [$payment_card_noti_desc]
+                                    </div>
+                                    <div class="mega-switch toggle-on" id="enotif-card-expiry" name="card-expiry">
                                         <div class="mega-feature-switch"></div>
                                     </div>
                                 </div>

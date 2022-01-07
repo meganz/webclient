@@ -156,12 +156,9 @@ video.localViewport {
     vertical-align: top;
     width: 48px;
 }
-.call.button.hidden {
-    display: none;
-}
 .call.button i {
     --icon-size: 38px;
-    --mask-color: var(--surface-grey-2);
+    --mask-color: var(--stroke-grey-2);
     background: transparent;
     position: static;
 }
@@ -405,7 +402,7 @@ button.call:hover i {
 .call-header .icon-video-call-filled {
     margin-right: 8px;
     --icon-size: 24px;
-    --mask-color: var(--surface-grey-2);
+    --mask-color: var(--stroke-grey-2);
 }
 .call-header .icon-video-call-filled.warn {
     --mask-color: var(--secondary-orange);
@@ -423,7 +420,7 @@ button.call:hover i {
 .call-header .call-switch-view {
     margin-right: 16px;
     --icon-size: 24px;
-    --mask-color: var(--surface-grey-2);
+    --mask-color: var(--stroke-grey-2);
     cursor: pointer;
 }
 
@@ -464,11 +461,12 @@ button.call:hover i {
     background-color: var(--secondary-green)
 }
 .in-call-notif.gray {
-    background-color: var(--surface-grey-1);
+    background-color: var(--stroke-grey-1);
     color: var(--text-color-high);
 }
 
 .in-call-notif.neutral {
+    min-width: 254px;
     box-sizing: border-box;
     height: 36px;
     border: var(--stroke-grey-2);
@@ -479,7 +477,7 @@ button.call:hover i {
     color: var(--text-color-high);
     border-radius: 18px;
     text-align: center;
-    background-color: var(--surface-grey-1);
+    background-color: var(--stroke-grey-1);
     width: auto;
     box-shadow: var(--dialog-shadow);
 }
@@ -567,7 +565,7 @@ button.call:hover i {
 .call-block.grid .participantsContainer .icon-pause {
     margin: 10px;
     --icon-size: 38px;
-    --mask-color: var(--surface-grey-2);
+    --mask-color: var(--stroke-grey-2);
 }
 .call-block.grid .participantsContainer .icon-audio-off.on-hold,
 .call-block.carousel .activeStream .icon-audio-off.on-hold {
@@ -894,7 +892,7 @@ button.call:hover i {
     margin-bottom: 8px;
 }
 .dropdown.call-actions i {
-    --mask-color: var(--surface-grey-2);
+    --mask-color: var(--stroke-grey-2);
 }
 .rtc-stats {
     position: absolute; /* Sit on top of the page content */
@@ -922,7 +920,7 @@ button.call:hover i {
 }
 .call-on-hold.body.me:hover .call-on-hold.icon {
     border-radius: 100%;
-    background-color: var(--surface-scrim);
+    background-color: var(--stroke-scrim);
     width: 100px;
     height: 100px;
 }

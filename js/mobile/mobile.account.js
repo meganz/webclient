@@ -22,6 +22,7 @@ mobile.account = {
         // Initialise functionality
         mobile.account.fetchAccountInformation($page);
         mobile.account.initUpgradeAccountButton($page);
+        mobile.account.initPaymentCardButton($page);
         mobile.account.initAchievementsButton($page);
         mobile.account.initRecoveryKeyButton($page);
         mobile.account.initCancelAccountButton($page);
@@ -30,6 +31,7 @@ mobile.account = {
         mobile.account.initFileManagementButton($page);
         mobile.account.fetchAndDisplayTwoFactorAuthStatus($page);
         mobile.account.initChangePasswordButton($page);
+        mobile.account.initChangeEmailButton($page);
         mobile.account.initNotificationButton($page);
 
         // Init the titleMenu for this page.
@@ -118,6 +120,8 @@ mobile.account = {
         M.accountData(
             function() {
 
+                loadingInitDialog.hide();
+
                 // Hide the loading dialog after request completes
                 loadingDialog.hide();
 
@@ -202,14 +206,14 @@ mobile.account = {
         var spaceUsed = M.account.cstrg;
         var spaceTotal = M.account.mstrg;
         var percentageUsed = spaceUsed / spaceTotal * 100;
-        var percentageUsedText = Math.round(percentageUsed);
+        var percentageUsedText = percentageUsed / 100;
         var spaceUsedText = bytesToSize(spaceUsed, 2);
         var spaceTotalText = bytesToSize(spaceTotal, 0);
 
         // Display the used and total storage e.g. 0.02% (4.8 GB of 200 GB)
         $usedStorage.text(spaceUsedText);
         $totalStorage.text(spaceTotalText);
-        $percentageUsed.text(percentageUsedText);
+        $percentageUsed.text(formatPercentage(percentageUsedText));
 
         // Colour text red and show a message if over quota, or use orange if close to using all quota
         if (percentageUsed >= 100) {
@@ -268,8 +272,8 @@ mobile.account = {
                 mobile.account.initShowSubscriptionInfoOverlay($page);
             }
 
-            // Otherwise if ECP or Sabadell
-            else if (gatewayId === 16 || gatewayId === 17) {
+            // Otherwise if ECP, Sabadell, or Stripe
+            else if (gatewayId === 16 || gatewayId === 17 || gatewayId === 19) {
 
                 // Show a loading dialog while the data is fetched from the API
                 loadingDialog.show();
@@ -344,12 +348,17 @@ mobile.account = {
         var $cancelSubscriptionOverlay = $('.mobile.cancel-subscription-overlay');
         var $confirmButton = $cancelSubscriptionOverlay.find('.confirm-ok-button');
         var $closeButton = $cancelSubscriptionOverlay.find('.close-button');
+        const $paymentCard = $('.button-block.payment-card', $page);
+
+        // Display the proper PRO plan icon
+        $('.plan-icon', $cancelSubscriptionOverlay).addClass('pro' + u_attr.p);
 
         // On clicking/tapping the Cancel Subscription button
         $cancelSubscriptionButton.off('tap').on('tap', function() {
 
             // Show Cancel Subscription overlay
             $cancelSubscriptionOverlay.removeClass('hidden');
+            $('.mobile.my-account-page').addClass('hidden');
             return false;
         });
 
@@ -369,6 +378,10 @@ mobile.account = {
                     // Hide the Cancel Subscription button and overlay
                     $cancelSubscriptionButton.addClass('hidden');
                     $cancelSubscriptionOverlay.addClass('hidden');
+                    $('.mobile.my-account-page').removeClass('hidden');
+                    $paymentCard.addClass('hidden');
+
+                    M.account.lastupdate = 0;
                 }
             });
 
@@ -381,6 +394,7 @@ mobile.account = {
 
             // Hide the overlay
             $cancelSubscriptionOverlay.addClass('hidden');
+            $('.mobile.my-account-page').removeClass('hidden');
             return false;
         });
 
@@ -506,6 +520,35 @@ mobile.account = {
         });
     },
 
+    /**
+     * Initialize the Payment card button
+     * @param {Object} $page The jQuery selector for the current page
+     */
+    initPaymentCardButton: function($page) {
+        'use strict';
+
+        M.accountData((account) => {
+
+            if ((u_attr.p || u_attr.b) && account.stype === 'S'
+                && ((Array.isArray(account.sgw) && account.sgw.includes('Stripe'))
+                    || (Array.isArray(account.sgwids)
+                        && account.sgwids.includes((addressDialog || {}).gatewayId_stripe || 19)))) {
+
+                const $cardBlock = $('.button-block.payment-card', $page);
+
+                // On clicking/tapping the button
+                $cardBlock.rebind('tap', () => {
+
+                    // Load the Session History page
+                    loadSubPage('fm/account/paymentcard');
+                    return false;
+                });
+
+                $cardBlock.removeClass('hidden');
+            }
+        });
+    },
+
     initFileManagementButton: function($page) {
         'use strict';
         const $buttonBlock = $('.account-file-management-block', $page);
@@ -529,7 +572,16 @@ mobile.account = {
         $buttonBlock.off('tap').on('tap', function() {
 
             // Load the Session History page
-            loadSubPage('fm/account/email-and-pass');
+            loadSubPage('fm/account/security/change-password');
+            return false;
+        });
+    },
+
+    initChangeEmailButton: function($page) {
+        'use strict';
+        const $buttonBlock = $('.account-change-email-block', $page);
+        $buttonBlock.rebind('tap.acc', () => {
+            loadSubPage('fm/account/security/change-email');
             return false;
         });
     },

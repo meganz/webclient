@@ -1,6 +1,6 @@
 import React from 'react';
 import utils from './../../ui/utils.jsx';
-import {MegaRenderMixin, timing} from './../../stores/mixins.js';
+import {MegaRenderMixin, timing} from './../mixins';
 import {Button} from './../../ui/buttons.jsx';
 import ModalDialogsUI from './../../ui/modalDialogs.jsx';
 import CloudBrowserModalDialog from './../../ui/cloudBrowserModalDialog.jsx';
@@ -23,51 +23,45 @@ import ComposedTextArea from "./composedTextArea.jsx";
 import Loading from "./meetings/workflow/loading.jsx";
 import Join from "./meetings/workflow/join";
 
-var ENABLE_GROUP_CALLING_FLAG = true;
-
-// eslint-disable-next-line id-length
-var MAX_USERS_CHAT_PRIVATE = 100;
+const ENABLE_GROUP_CALLING_FLAG = true;
+const MAX_USERS_CHAT_PRIVATE = 100;
 
 export class JoinCallNotification extends MegaRenderMixin {
     customIsEventuallyVisible() {
         return this.props.chatRoom.isCurrentlyActive;
     }
-    componentDidUpdate() {
-        super.componentDidUpdate();
-        var $node = $(this.findDOMNode());
-        var room = this.props.chatRoom;
-        $('button.joinActiveCall', $node)
-            .rebind('click.joinCall', function(e) {
-                room.joinCall();
-                e.preventDefault();
-                return false;
-            });
-    }
+
     render() {
-        let room = this.props.chatRoom;
-        if (room.activeCall) {
+        const { chatRoom } = this.props;
+
+        if (chatRoom.activeCall || window.sfuClient) {
             return null;
         }
 
         if (!megaChat.hasSupportForCalls) {
-            return <div className="in-call-notif yellow join">
-                <i className="sprite-fm-mono icon-phone"/>
-                There is an active call in this room, but your browser does not support calls.
-            </div>;
+            return (
+                <div className="in-call-notif yellow join">
+                    <i className="sprite-fm-mono icon-phone"/>
+                    There is an active call in this room, but your browser does not support calls.
+                </div>
+            );
         }
-        else {
-            let translatedCode = escapeHTML(l[20460] || "There is an active group call. [A]Join[/A]");
-            translatedCode = translatedCode
-                .replace("[A]", '<button class="mega-button positive joinActiveCall small">')
-                .replace('[/A]', '</button>');
 
-            return <div className="in-call-notif neutral join">
+        return (
+            <div className="in-call-notif neutral join">
                 <i className="sprite-fm-mono icon-phone"/>
-                <span dangerouslySetInnerHTML={{__html: translatedCode}}></span>
-            </div>;
-        }
+                <span
+                    onClick={() => chatRoom.joinCall()}
+                    dangerouslySetInnerHTML={{
+                        __html: escapeHTML(l[20460] || 'There is an active group call. [A]Join[/A]')
+                            .replace('[A]', '<button class="mega-button positive joinActiveCall small">')
+                            .replace('[/A]', '</button>')
+                    }}
+                />
+            </div>
+        );
     }
-};
+}
 
 export class ConversationRightArea extends MegaRenderMixin {
     static defaultProps = {
@@ -169,7 +163,7 @@ export class ConversationRightArea extends MegaRenderMixin {
         var isReadOnlyElement = null;
 
         if (room.isReadOnly()) {
-            isReadOnlyElement = <center className="center" style={{margin: "6px"}}>(read only chat)</center>;
+            isReadOnlyElement = <center className="center" style={{margin: "6px"}}>{l.read_only_chat}</center>;
         }
         var excludedParticipants = room.type === "group" || room.type === "public" ?
             (
@@ -415,8 +409,12 @@ export class ConversationRightArea extends MegaRenderMixin {
                             </span>
                         </div> : <div></div>}
 
-                        <AccordionPanel className="have-animation buttons" title={l[7537]} key="options"
-                            chatRoom={room}>
+                        <AccordionPanel
+                            key="options"
+                            className="have-animation buttons"
+                            title={l[7537]}
+                            chatRoom={room}
+                            sfuClient={window.sfuClient}>
                             <div>
                             {addParticipantBtn}
                             {startAudioCallButton}
@@ -439,7 +437,7 @@ export class ConversationRightArea extends MegaRenderMixin {
                                 ) : null
                             }
                             {
-                                (!room.isReadOnly() && (room.type === "public")) ?
+                                room.type === "public" ?
                                     (
                                         <div
                                             className={`
@@ -779,10 +777,12 @@ export class ConversationPanel extends MegaRenderMixin {
                 });
             }, rand_range(5, 10) * 1000);
         }
+        if (is_chatlink && self.props.chatRoom.isMeeting && u_type !== false && u_type < 3) {
+            eventlog(99747, JSON.stringify([1, u_type | 0]), true);
+        }
         self.props.chatRoom._uiIsMounted = true;
         self.props.chatRoom.$rConversationPanel = self;
-
-
+        self.props.chatRoom.trigger('onComponentDidMount');
     }
     eventuallyInit(doResize) {
         var self = this;
@@ -1500,25 +1500,31 @@ export class ConversationPanel extends MegaRenderMixin {
                             room.meetingsLoading = l.joining;
                             u_eplusplus(firstName, lastName)
                                 .then(() => {
-                                    megaChat.routing.reinitAndJoinPublicChat(
+                                    return megaChat.routing.reinitAndJoinPublicChat(
                                         room.chatId,
                                         room.publicChatHandle,
                                         room.publicChatKey
-                                    ).then(
-                                        () => {
-                                            delete megaChat.initialPubChatHandle;
-                                            megaChat.getChatById(room.chatId).joinCall(audioFlag, videoFlag);
-                                        },
-                                        (ex) => {
-                                            console.error("Failed to join room:", ex);
-                                        }
                                     );
-                                }, () => {
-                                    msgDialog(
-                                        'warninga',
-                                        l[135],
-                                        "Failed to create E++ account. Please try again later."
-                                    );
+                                })
+                                .then(() => {
+                                    delete megaChat.initialPubChatHandle;
+                                    return megaChat.getChatById(room.chatId).joinCall(audioFlag, videoFlag);
+                                })
+                                .catch((ex) => {
+                                    if (d) {
+                                        console.error('E++ account failure!', ex);
+                                    }
+
+                                    setTimeout(() => {
+                                        msgDialog(
+                                            'warninga',
+                                            l[135],
+                                            "Failed to create E++ account. Please try again later.",
+                                            escapeHTML(api_strerror(ex) || ex)
+                                        );
+                                    }, 1234);
+
+                                    eventlog(99745, JSON.stringify([1, String(ex).split('\n')[0]]));
                                 });
                         }}
                         onJoinClick={(audioFlag, videoFlag) => {
@@ -1731,10 +1737,7 @@ export class ConversationPanel extends MegaRenderMixin {
 
                         {
                             (
-                                is_chatlink &&
-                                room.type === "public" &&
-                                room.publicChatHandle && room.publicChatKey &&
-                                room.publicChatHandle === megaChat.initialPubChatHandle
+                                room.isAnonymous()
                             ) ?
                         (
                         <div className="join-chat-block">
@@ -1746,14 +1749,15 @@ export class ConversationPanel extends MegaRenderMixin {
                                             room.publicChatHandle,
                                             room.publicChatKey
                                         ).then(
-                                            () => {
-                                                delete megaChat.initialPubChatHandle;
-                                            },
-                                            (ex) => {
-                                                console.error("Failed to join room:", ex);
-                                            }
+                                            () => delete megaChat.initialPubChatHandle,
+                                            ex => console.error("Failed to join room:", ex)
                                         );
                                     };
+
+                                    if (u_type === 0) {
+                                        return loadSubPage('register');
+                                    }
+
                                     if (u_type === false) {
                                         clearTimeout(self.state.setNonLoggedInJoinChatDlgTrue);
                                         megaChat.loginOrRegisterBeforeJoining(
@@ -1763,13 +1767,13 @@ export class ConversationPanel extends MegaRenderMixin {
                                             false,
                                             join
                                         );
+                                        return;
                                     }
-                                    else {
-                                        clearTimeout(self.state.setNonLoggedInJoinChatDlgTrue);
-                                        join();
-                                    }
+
+                                    clearTimeout(self.state.setNonLoggedInJoinChatDlgTrue);
+                                    join();
                                 }}>
-                                {l[20597]}
+                                {l[20597] /* `Join Group` */}
                             </div>
                         </div>
                         ) :
@@ -1840,17 +1844,24 @@ export class ConversationPanels extends MegaRenderMixin {
                 emptyMessage = '';
             }
 
+            const hasContacts = !!contactsList.length || !!contactsListOffline.length;
             return (
                 <div>
-                    <div className="chat-right-area">
-                        <div className="chat-right-area contacts-list-scroll">
-                            <div className="chat-right-pad">
-                                {contactsList}
-                                {contactsListOffline}
+                    {hasContacts && (
+                        <div className="chat-right-area">
+                            <div className="chat-right-area contacts-list-scroll">
+                                <div className="chat-right-pad">
+                                    {contactsList}
+                                    {contactsListOffline}
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div className="fm-empty-section empty-messages">
+                    )}
+                    <div
+                        className={`
+                            fm-empty-section
+                            ${hasContacts ? 'empty-messages' : 'empty-conversations'}
+                        `}>
                         <div className="fm-empty-pad">
                             <i className="section-icon sprite-fm-mono icon-chat-filled"/>
                             <div className="fm-empty-cloud-txt small"
@@ -1879,7 +1890,7 @@ function isStartCallDisabled(room) {
     if (!megaChat.hasSupportForCalls) {
         return true;
     }
-    return !room.isOnlineForCalls() || room.isReadOnly() || !room.chatId || room.activeCall ||
+    return !room.isOnlineForCalls() || room.isReadOnly() || !room.chatId || room.activeCall || window.sfuClient ||
         (
             (room.type === "group" || room.type === "public")
             && !ENABLE_GROUP_CALLING_FLAG

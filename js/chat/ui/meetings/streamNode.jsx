@@ -1,5 +1,5 @@
 import React from 'react';
-import { MegaRenderMixin, rAFWrap, SoonFcWrap } from '../../../stores/mixins';
+import { MegaRenderMixin, rAFWrap, SoonFcWrap } from '../../mixins';
 import { Avatar } from '../contacts.jsx';
 import Call from './call.jsx';
 import StreamNodeMenu from './streamNodeMenu.jsx';
@@ -12,7 +12,16 @@ export default class StreamNode extends MegaRenderMixin {
         INITIALIZED: 1,
         LOADING: 1,
         LOADED: 2
-    }
+    };
+
+    static isStreaming = stream => {
+        return (
+            stream &&
+            !stream.isOnHold &&
+            (stream.source && stream.source.srcObject !== null) &&
+            (!stream.videoMuted || stream.haveScreenshare)
+        );
+    };
 
     constructor(props) {
         super(props);
@@ -181,11 +190,7 @@ export default class StreamNode extends MegaRenderMixin {
         const { stream, onDoubleClick, onLoadedData } = this.props;
         const { loading } = this.state;
 
-        if (
-            !stream.isOnHold &&
-            (stream.source && stream.source.srcObject !== null) &&
-            (!stream.videoMuted || stream.haveScreenshare)
-        ) {
+        if (StreamNode.isStreaming(stream)) {
             return (
                 <>
                     {loading !== StreamNode.LOADING_STATE.LOADED && (
@@ -272,6 +277,7 @@ export default class StreamNode extends MegaRenderMixin {
             chatRoom,
             menu,
             className,
+            simpleTip,
             ephemeralAccounts,
             onClick,
             onCallMinimize,
@@ -286,7 +292,12 @@ export default class StreamNode extends MegaRenderMixin {
                     ${onClick ? 'clickable' : ''}
                     ${className ? className : ''}
                     ${this.state.loading !== StreamNode.LOADING_STATE.LOADED ? 'loading' : ''}
+                    ${simpleTip ? 'simpletip' : ''}
                 `}
+                data-simpletip={simpleTip?.label}
+                data-simpletipposition={simpleTip?.position}
+                data-simpletipoffset={simpleTip?.offset}
+                data-simpletip-class={simpleTip?.className}
                 onClick={() => onClick && onClick(stream)}>
                 {stream && (
                     <>

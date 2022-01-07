@@ -47,7 +47,7 @@ a, a:link, a:visited, a:hover, a:active {
     outline: none;
 }
 .hidden {
-    display: none;
+    display: none !important;
 }
 .clear {
     clear: both;
@@ -262,9 +262,6 @@ a.continue-button {
     line-height: 30px;
     padding-top: 20px;
     text-decoration: underline;
-}
-a.continue-button.hidden {
-    display: none;
 }
 
 @media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {

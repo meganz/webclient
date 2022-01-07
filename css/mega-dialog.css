@@ -11,6 +11,7 @@
         /* z-index of dialog relate elements
          *
          * overlay - 1100
+         * low visual impact dialog (banner) - 1090
          * normal dialog - 1115
          * modal dialog - 1200
          * arranged back dialog - 900

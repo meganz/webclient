@@ -1,5 +1,5 @@
 import React from 'react';
-import { MegaRenderMixin } from '../../stores/mixins';
+import { MegaRenderMixin } from '../mixins';
 import ModalDialogsUI from './../../ui/modalDialogs.jsx';
 
 export default class PushSettingsDialog extends MegaRenderMixin {

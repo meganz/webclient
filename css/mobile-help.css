@@ -2817,9 +2817,6 @@
 #help2-main .sidebar-sort-container {
     margin-bottom: 40px;
 }
-#help2-main .hidden {
-    display: none;
-}
 #help2-main .mobile-navigation-header {
     display: none;
 }
@@ -2971,9 +2968,6 @@
     }
     #help2-main .block:nth-child(1), #help2-main .block:nth-child(2), #help2-main .block:nth-child(4), #help2-main .block:nth-child(5) {
         border-right: 1px solid #eee;
-    }
-    #help2-main .block:nth-child(4), #help2-main .block:nth-child(5), #help2-main .block:nth-child(6) {
-        border-bottom: none;
     }
     #help2-main .first-search-section {
         height: 260px;
@@ -3156,7 +3150,7 @@
         border-right: 1px solid #eee;
     }
     #help2-main .block:nth-child(4), #help2-main .block:nth-child(5), #help2-main .block:nth-child(6) {
-        border-bottom: none;
+        border-bottom: 1px solid #eee;
     }
 
     #help2-main .block.link div {
@@ -3761,7 +3755,8 @@
         margin-right: 0;
     }
 }
-@media only screen and (min-device-width: 320px) and (max-device-width: 375px){
+
+@media only screen and (min-width: 320px) and (max-width: 375px) {
     body {
         min-width: 320px;
         margin: 0;

@@ -24,28 +24,38 @@ mobile.slideshow = {
     /** The flag for hiding header and footer buttons */
     hideHFFlag: false,
 
+    /** Define Array of file types required to load in full size */
+    requiredFullSizeImgTypes: {'gif': null},
+
     /**
      * Initialise the preview slideshow
      * @param {String} nodeHandle The handle of the image to load first
      */
     init: function(nodeHandle) {
-
         'use strict';
 
         // Cache selector
         mobile.slideshow.$overlay = $('.mobile.slideshow-image-previewer');
 
-        // Initialise the rest of the functionality
+        if (page === 'download') {
+            $(mobile.slideshow.$overlay).addClass('download-previewer');
+        }
+        else {
+            $(mobile.slideshow.$overlay).removeClass('download-previewer');
+
+            // Initialise the rest of the functionality
+            mobile.slideshow.buildListOfImagesInDirectory();
+            mobile.slideshow.hideOrShowNavigationButtons();
+            mobile.slideshow.initPreviousImageFunctionality();
+            mobile.slideshow.initNextImageFunctionality();
+            mobile.initOverlayPopstateHandler(mobile.slideshow.$overlay);
+        }
+
         mobile.slideshow.initLandscapeView(nodeHandle);
-        mobile.slideshow.buildListOfImagesInDirectory();
-        mobile.slideshow.hideOrShowNavigationButtons();
-        mobile.slideshow.initPreviousImageFunctionality();
-        mobile.slideshow.initNextImageFunctionality();
         mobile.slideshow.initCloseButton();
         mobile.slideshow.initHideShowToggleForHeaderAndButtons(nodeHandle);
-        mobile.slideshow.fetchImageFromApi(nodeHandle, mobile.slideshow.displayImage, 'mid', true);
 
-        mobile.initOverlayPopstateHandler(mobile.slideshow.$overlay);
+        mobile.slideshow.fetchImageFromApi(nodeHandle, mobile.slideshow.displayImage, 'mid', true);
     },
 
     /**
@@ -155,12 +165,22 @@ mobile.slideshow = {
      * @param {String} slideClass The slide to show e.g. left, mid, or right
      * @param {Boolean} initialLoad Optional flag for if this is the initial load of the previewer
      */
-    fetchImageFromApi: function(nodeHandle, callbackFunction, slideClass, initialLoad) {
-
+    fetchImageFromApi: async function(nodeHandle, callbackFunction, slideClass, initialLoad) {
         'use strict';
+        var node = M.getNodeByHandle(nodeHandle);
+        const ext = fileext(node.name, false, true);
+        const loadFullSize = ext in mobile.slideshow.requiredFullSizeImgTypes;
+
+        if (is_video(node)) {
+            mobile.slideshow.showLoadingAnimation();
+            queueMicrotask(() => {
+                callbackFunction(nodeHandle, slideClass);
+            });
+            return;
+        }
 
         // If this is the first load, show a regular loading dialog until the whole previewer has loaded
-        if (typeof initialLoad !== 'undefined') {
+        if (typeof initialLoad !== 'undefined' && page !== 'download') {
             loadingDialog.show();
         }
         else {
@@ -180,7 +200,6 @@ mobile.slideshow = {
             return;
         }
 
-        var node = M.getNodeByHandle(nodeHandle);
         var done = function(uri) {
             // Update global object with the image so it's ready for display
             mobile.slideshow.previews[nodeHandle] = {src: uri};
@@ -193,12 +212,25 @@ mobile.slideshow = {
             callbackFunction(nodeHandle, slideClass);
         };
 
-        getImage(node, 1).then(done).catch(function(ex) {
+        if (loadFullSize) {
+            const data = await M.gfsfetch(node.link || node.h, 0, -1).catch(nop);
+
+            if (data) {
+                done(mObjectURL([data.buffer || data], `image/${ext}`));
+                return;
+            }
+            if (d) {
+                console.warn('Failed to retrieve full GIF file, failing back to load preview image...');
+            }
+        }
+
+        getImage(node, 1).then(done).catch((ex) => {
             if (d) {
                 console.warn('Preview image retrieval failed.', nodeHandle, ex);
             }
             done(window.noThumbURI);
         });
+
     },
 
     /**
@@ -220,7 +252,6 @@ mobile.slideshow = {
 
         // Get the node and image data
         var node = M.getNodeByHandle(nodeHandle);
-        var imageSource = mobile.slideshow.previews[nodeHandle].src;
 
         // Get the current slide number and how many images total in this folder e.g. '5 of 30'
         var currentSlideNum = mobile.slideshow.imagesInCurrentViewMap[nodeHandle];
@@ -233,7 +264,6 @@ mobile.slideshow = {
         // Set file name and image src
         $fileName.text(node.name);
         $currentFileNumAndTotal.text(currentFileNumAndTotalText);
-        $image.attr('src', imageSource);
 
         // Change slide
         mobile.slideshow.changeSlide(slideClass);
@@ -256,12 +286,12 @@ mobile.slideshow = {
             $videoDiv.removeClass('hidden');
             mobile.slideshow.$overlay.addClass('video');
 
-            M.require('videostream').tryCatch(function() {
-                iniVideoStreamLayout(node, mobile.slideshow.$overlay).then(function(ok) {
+            iniVideoStreamLayout(node, mobile.slideshow.$overlay)
+                .then((ok) => {
                     if (ok) {
                         mobile.slideshow.$overlay.find('.scroll-block').addClass('video');
                         $('.video-block, .video-controls', mobile.slideshow.$overlay).removeClass('hidden');
-                        $('.viewer-button.fs', mobile.slideshow.$overlay).rebind('tap.toggleHeader', function (e) {
+                        $('.viewer-button.fs', mobile.slideshow.$overlay).rebind('tap.toggleHeader', function(e) {
                             e.stopPropagation();
                             if (!mobile.slideshow.isLandscape) {
                                 mobile.slideshow.hideHFFlag = !mobile.slideshow.hideHFFlag;
@@ -273,16 +303,19 @@ mobile.slideshow = {
 
                         // Autoplay the video / audio file
                         if ($.autoplay === nodeHandle) {
-                            onIdle(function() {
+                            queueMicrotask(() => {
                                 $('.play-video-button', mobile.slideshow.$overlay).trigger('click');
                             });
                             delete $.autoplay;
                         }
                     }
                 });
-            });
         }
         else {
+            const store = mobile.slideshow.previews[nodeHandle];
+            if (store) {
+                $image.attr('src', store.src);
+            }
             $image.removeClass('hidden');
             $videoDiv.addClass('hidden');
             return false;
@@ -385,6 +418,9 @@ mobile.slideshow = {
 
         // Destroy any streaming instance
         $(window).trigger('video-destroy');
+
+        sessionStorage.removeItem('previewNode');
+        sessionStorage.removeItem('previewTime');
     },
 
     /**
@@ -547,8 +583,6 @@ mobile.slideshow = {
         mobile.slideshow.cleanupCurrentlyViewedInstance();
         mobile.slideshow.$overlay.find('.slides.mid img').remove();
         mobile.slideshow.$overlay.find('.slides.mid').prepend('<img alt="" /></div>');
-        sessionStorage.removeItem('previewNode');
-        sessionStorage.removeItem('previewTime');
     },
 
     /**
@@ -560,7 +594,13 @@ mobile.slideshow = {
 
         // On close button click/tap
         mobile.slideshow.$overlay.find('.fm-dialog-close').off().on('tap', function(e) {
-            mobile.slideshow.close();
+            if (page === 'download') {
+                mobile.slideshow.hideHFFlag = true;
+                $('.mobile.slideshow-image-previewer').removeClass('fullscreen').addClass('browserscreen');
+            }
+            else {
+                mobile.slideshow.close();
+            }
             // Prevent double taps
             return false;
         });
@@ -700,5 +740,6 @@ mobile.slideshow = {
         }
         mobile.slideshow.initDownloadButton(nodeHandle);
 
-    }
+    },
+
 };

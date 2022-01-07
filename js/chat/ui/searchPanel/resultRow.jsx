@@ -1,7 +1,7 @@
 import React from 'react';
 import { TYPE, LABEL } from './resultContainer.jsx';
 import { Avatar, ContactPresence, LastActivity, MembersAmount } from '../contacts.jsx';
-import { MegaRenderMixin } from '../../../stores/mixins';
+import { MegaRenderMixin } from '../../mixins';
 import { EmojiFormattedContent } from '../../../ui/utils.jsx';
 import { ContactAwareName } from '../contacts.jsx';
 import { EVENTS } from './searchPanel.jsx';
@@ -165,7 +165,6 @@ class MemberRow extends MegaRenderMixin {
         const userCard = {
             graphic: (
                 // `Graphic` result of member type -- the last activity status is shown as graphic icon
-                // https://mega.nz/file/0MMymIDZ#_uglL1oUSJnH-bkp4IWfNL_hk6iEsQW77GHYXEvHWOs
                 <div className="graphic">
                     {isGroup ?
                         <span dangerouslySetInnerHTML={{
@@ -194,7 +193,6 @@ class MemberRow extends MegaRenderMixin {
             ),
             textual: (
                 // `Textual` result of member type -- last activity as plain text
-                // https://mega.nz/file/RcUWiKpC#onYjToPq3whTYyMseLal5v0OxiAge0j2p9I5eO_qwoI
                 <div className="textual">
                     {isGroup ?
                         <>

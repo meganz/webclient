@@ -64,7 +64,9 @@
 
                         var rated = $('.rating a.active', self.$dialog)[0].className;
                         rated = rated.replace("rate", "").replace("active", "").replace(/\s+/g, "");
+                        self._report.userId = u_handle;
                         self._report.rated = rated;
+                        self._report.calls = [{ callid: self._callId, chatid: self._chatId }];
                         var dump = JSON.stringify(self._report);
 
                         var reportId = MurmurHash3(JSON.stringify(dump), 0x4ef5391a);
@@ -136,6 +138,7 @@
                 .addClass('disabled');
 
             $('.feedback-dialog-body').removeClass('hidden');
+            $('.mega-dialog.feedback-dialog footer').removeClass('hidden');
             $('.feedback-result-pad').addClass('hidden');
 
             $('.collected-data', self.$dialog)

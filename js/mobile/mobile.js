@@ -597,27 +597,20 @@ var mobile = {
         var promises = [];
         var seenByCountUpd = {};
 
-        var _setCountUpdNode = promisify(function(resolve, reject, node) {
-
-            var promise = MegaPromise.resolve();
+        const _setCountUpdNode = async(node) => {
 
             if (!M.d[node.p]) {
-                promise = dbfetch.get(node.p);
+                await dbfetch.acquire(node.p);
             }
 
-            promise.always(function() {
+            var parents = M.getPath(node.h);
+            var pIndex = parents.indexOf(M.currentdirid);
+            var pInCurrentView = parents[--pIndex];
 
-                var parents = M.getPath(node.h);
-                var pIndex = parents.indexOf(M.currentdirid);
-                var pInCurrentView = parents[--pIndex];
-
-                if (pIndex > -1 && !countUpdNodes[pInCurrentView]) {
-                    countUpdNodes[pInCurrentView] = M.d[pInCurrentView];
-                }
-
-                resolve(node.h);
-            });
-        });
+            if (pIndex > -1 && !countUpdNodes[pInCurrentView]) {
+                countUpdNodes[pInCurrentView] = M.d[pInCurrentView];
+            }
+        };
 
         for (var i = newnodes.length; i--;) {
 
@@ -927,13 +920,32 @@ var alarm = {
 function accountUI() {
     'use strict';
 
-    if (fminitialized && u_type && page === 'fm/account/notifications') {
-        mobile.initDOM();
-        mobile.account.notifications.init();
+    const notificationURL = 'fm/account/notifications';
+    const filemanagementURL = 'fm/account/file-management';
+
+    if (fminitialized && u_type && page.startsWith(notificationURL)) {
+        if (page === notificationURL) {
+            mobile.initDOM();
+            mobile.account.notifications.init();
+        }
+        else {
+            loadSubPage(notificationURL);
+        }
     }
-    else if (fminitialized && u_type && page === 'fm/account/file-management') {
-        mobile.initDOM();
-        mobile.account.filemanagement.init();
+    else if (fminitialized && u_type && page.startsWith(filemanagementURL)) {
+        if (page === filemanagementURL) {
+            mobile.initDOM();
+            mobile.account.filemanagement.init();
+        }
+        else {
+            loadSubPage(filemanagementURL);
+        }
+    }
+    else if (fminitialized && u_type && page === 'fm/account/security/session-history') {
+        loadSubPage('fm/account/history');
+    }
+    else if (fminitialized && u_type && page === 'fm/account/security/backup-key') {
+        loadSubPage('backup');
     }
     else {
         loadSubPage('fm/account');
@@ -1106,6 +1118,7 @@ function removeFromMultiInputDDL() {}
 function slideshow_handle() {}
 function dashboardUI() {}
 function affiliateUI() {}
+function galleryUI() {}
 accountUI.account = {
     renderBirthYear: function() {},
     renderBirthMonth: function() {},
@@ -1115,6 +1128,7 @@ accountUI.account = {
 };
 
 function bindDropdownEvents() {}
+mega.gallery = {};
 
 /** Global function to be used in mobile mode, checking if the action can be taken by the user.
  * It checks the user validity (Expired business, or ODQ Paywall)

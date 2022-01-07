@@ -149,22 +149,15 @@
         const block = document.querySelector('.fm-main .fm-right-files-block:not(.in-chat)');
 
         if (this.currentdirid && this.currentdirid.substr(0, 7) === 'search/') {
-            let sel;
-
-            if (this.viewmode) {
-                sel = document.querySelector('.fm-blocks-view .ui-selected');
+            if (block) {
+                block.classList.remove('search-multi');
             }
-            else {
-                sel = document.querySelector('.grid-table .ui-selected');
-            }
+            if (selectionManager && selectionManager.selected_list.length > 0) {
+                block.classList.add('search');
 
-            if (sel) {
-                if (block) {
-                    block.classList.add('search');
-                }
-
-                const scope = document.querySelector('.fm-right-files-block.search .search-bottom-wrapper');
-                const items = this.getPath(sel.id);
+                const scope = block.querySelector('.search-bottom-wrapper');
+                scope.classList.remove('hidden');
+                const items = this.getPath(selectionManager.selected_list[0]);
 
                 const dictionary = handle => {
                     let id = '';
@@ -210,9 +203,15 @@
                     };
                 };
 
-                this.renderBreadcrumbs(items, scope, dictionary, id => {
-                    breadcrumbClickHandler.call(this, id);
-                });
+                if (selectionManager.selected_list.length === 1) {
+                    this.renderBreadcrumbs(items, scope, dictionary, id => {
+                        breadcrumbClickHandler.call(this, id);
+                    });
+                }
+                else {
+                    scope.classList.add('hidden');
+                    block.classList.add('search-multi');
+                }
 
                 return;
             }
@@ -412,10 +411,10 @@
         }
         else if (n) {
             id = n.h;
-            $.selected = [];
+            let toSelect;
 
             if (!n.t) {
-                $.selected.push(id);
+                toSelect = id;
                 id = n.p;
             }
 
@@ -425,7 +424,8 @@
 
             this.openFolder(id)
                 .always(() => {
-                    if ($.selected.length) {
+                    if (toSelect) {
+                        $.selected = [toSelect];
                         reselect(1);
                     }
                 });

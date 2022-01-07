@@ -87,9 +87,6 @@ button.disabled.visible {
     align-items: center;
     width: 100%;
 }
-.link-button.light.hidden {
-    display: none;
-}
 .link-button.light span,
 .dropdown-item.link-button.light span {
     padding-right: 20px;
@@ -98,7 +95,7 @@ button.disabled.visible {
 }
 .link-button.light:not(.disabled):hover,
 .dropdown-item.link-button.light:not(.disabled):hover {
-    background-color: var(--surface-main);
+    background-color: var(--stroke-main);
 }
 /* buttons for business account */
 button:not(.mega-button) .icon {
@@ -162,9 +159,6 @@ button.disabled.visible {
     display: flex;
     align-items: center;
     width: 100%;
-}
-.link-button.light.hidden {
-    display: none;
 }
 .link-button.light span,
 .dropdown-item.link-button.light span {
@@ -233,9 +227,6 @@ button:not(.mega-button) .icon {
     padding: 0;
     display: inline-block;
     width: 100%;
-}
-.dropdown-item.link-button.light.hidden {
-    display: none;
 }
 .link-button.light:not(.disabled):hover,
 .dropdown-item.link-button.light:not(.disabled):hover {

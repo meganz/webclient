@@ -2,7 +2,7 @@ import React from 'react';
 import ResultTable  from './resultTable.jsx';
 import ResultRow  from './resultRow.jsx';
 import { STATUS } from './searchPanel.jsx';
-import { MegaRenderMixin } from '../../../stores/mixins';
+import { MegaRenderMixin } from '../../mixins';
 
 export const TYPE = {
     MESSAGE: 1,
@@ -44,7 +44,6 @@ export default class ResultContainer extends MegaRenderMixin {
 
         //
         // `Recent` table
-        // https://mega.nz/#!hd0HRQ4Q!Dhgt8Ju26CXQ3-jKFsYXqaxxllEIUP-0lB_yJ5yZuY8
         // ----------------------------------------------------------------------
 
         <ResultTable heading={LABEL.RECENT}>
@@ -58,9 +57,6 @@ export default class ResultContainer extends MegaRenderMixin {
 
         //
         // Result table -- `Contacts and Chats` and `Messages`, incl. `No Results`
-        // https://mega.nz/#!VUkHRS4L!S2fz1aQ9Y93RZe5ky75Th9zBbdudGnApNs90TNO4eG8
-        // https://mega.nz/#!tEt3iaIB!XxxZTSnbCdhE0cuzYBP_owiLFvv0cxrOVq4PMiB0Irc
-        // https://mega.nz/#!hd0HRQ4Q!Dhgt8Ju26CXQ3-jKFsYXqaxxllEIUP-0lB_yJ5yZuY8
         // ----------------------------------------------------------------------
 
         if (status === STATUS.COMPLETED && results.length < 1) {

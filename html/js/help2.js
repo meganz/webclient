@@ -487,8 +487,6 @@ var Help = (function() {
             // cleanup any bogus data entered by the user..
             page = 'help/search/' + searchTerm.replace(/\s+/g, '+');
             pushHistoryState(true, page);
-
-            M.v.length = articles.length;
             parsepage(Data.help_search_tpl.html);
 
             if (words.length === 0) {

@@ -597,6 +597,92 @@ MegaData.prototype.showClickHint = function(force) {
     return false;
 };
 
+MegaData.prototype.showPaymentCardBanner = function(status) {
+    'use strict';
+
+    if (is_mobile) {
+        mobile.alertBanner.close();
+    }
+    else {
+        $('.fm-notification-block.payment-card-status').removeClass('visible');
+    }
+
+    if (!status) {
+        return;
+    }
+    if (status === 1) {
+
+        mega.attr.get(u_handle, 'cardalmostexp', -2, true).always((res) => {
+            if (res !== '1') {
+
+                if (is_mobile) {
+                    const $banner = mobile.alertBanner.showWarning(l.payment_card_almost_exp);
+                    $banner.$alertBanner.rebind('tap', loadSubPage.bind(null, 'fm/account/paymentcard'));
+
+                    $banner.$alertBannerCloseButton.rebind('tap', () => {
+                        mobile.alertBanner.close();
+                        mega.attr.set('cardalmostexp', '1', -2, true);
+                        return false;
+                    });
+                }
+                else {
+                    const $banner = $('.fm-notification-block.payment-card-almost-expired').addClass('visible');
+
+                    $('i.close-banner', $banner).rebind('click', () => {
+                        $banner.removeClass('visible');
+                        mega.attr.set('cardalmostexp', '1', -2, true);
+                    });
+
+                    $('a', $banner)
+                        // .rebind('click', loadSubPage.bind(null, 'fm/account/plan/account-card-info'));
+                        .rebind('click', loadSubPage.bind(null, 'fm/account/plan/account-card-info'));
+                }
+
+            }
+        });
+    }
+
+    else if (status === 2) {
+
+        if (is_mobile) {
+            const $banner = mobile.alertBanner.showError(l.payment_card_exp);
+            $banner.$alertBanner.rebind('tap', loadSubPage.bind(null, 'fm/account/paymentcard'));
+
+            mobile.messageOverlay.show(
+                l.payment_card_exp_title,
+                l.payment_card_exp_desc,
+                'sprite-fm-illustration img-dialog-payment-card-exp',
+                [l[148], l[707]])
+                .then(loadSubPage.bind(null, 'fm/account/paymentcard'));
+        }
+
+        else {
+            const $banner = $('.fm-notification-block.payment-card-expired').addClass('visible');
+
+            $('i.close-banner', $banner).rebind('click', () => {
+                $banner.removeClass('visible');
+            });
+
+            $('a', $banner)
+                .rebind('click', loadSubPage.bind(null, 'fm/account/plan/account-card-info'));
+
+            const $dialog = $('.payment-reminder.payment-card-expired');
+
+            $('.close', $dialog).rebind('click', closeDialog);
+
+
+            $('.update-payment-card', $dialog)
+                .rebind('click', () => {
+                    closeDialog();
+                    loadSubPage('fm/account/plan/account-card-info');
+                });
+
+            M.safeShowDialog('expired-card-dialog', $dialog);
+        }
+    }
+};
+
+
 /**
  * Show storage overquota dialog
  * @param {*} quota Storage quota data, as returned from M.getStorageQuota()
@@ -701,8 +787,10 @@ MegaData.prototype.showOverStorageQuota = function(quota, options) {
                 $('.fm-main').addClass('fm-notification almost-full');
             }
             $strgdlg.addClass('almost-full');
-            $('header h2', $strgdlgBodyAFull).text(myOptions.title || l[16311]);
-            $('.body-header', $strgdlgBodyAFull).safeHTML(myOptions.body || l[16312]);
+            $('header h2.almost-full', $strgdlg).text(myOptions.title || l[16312]);
+            if (myOptions.body) {
+                $('.body-header', $strgdlgBodyAFull).safeHTML(myOptions.body);
+            }
 
             // Storage chart and info
             var strQuotaLimit = bytesToSize(quota.mstrg, 0).split(' ');
@@ -730,7 +818,7 @@ MegaData.prototype.showOverStorageQuota = function(quota, options) {
             $('.chart.data .pecents-txt', $strgdlg).text(strQuotaLimit[0]);
             $('.chart.data .gb-txt', $strgdlg).text(strQuotaLimit[1]);
             $('.chart.body .perc-txt', $strgdlg).text(quota.percent + '%');
-            $('.chart.data', $strgdlg).removeClass('hidden');
+
         }
         else {
             if ($strgdlg.is(':visible')) {
@@ -863,3 +951,21 @@ function voucherData(arr) {
     }
     return vouchers;
 }
+
+mBroadcaster.once('fm:initialized', () => {
+    'use strict';
+
+    if (u_attr && (u_attr.p || u_attr.b)) {
+
+        if (M.account) {
+            M.showPaymentCardBanner(M.account.cce);
+        }
+        else {
+            M.req({ a: 'uq', pro: 1 }).then((res) => {
+                if (typeof res === 'object' && res.cce) {
+                    M.showPaymentCardBanner(res.cce);
+                }
+            });
+        }
+    }
+});

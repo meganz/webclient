@@ -9,36 +9,36 @@ export default class Contact extends AbstractGenericMessage {
         super(props);
     }
 
-    _handleAddContact = (contactEmail) => {
-        let exists = false;
+    DIALOG = {
+        ADDED: addedEmail =>
+            // `Contact invited`
+            // `The user has been invited and will appear in your contact list once accepted.`
+            msgDialog('info', l[150], l[5898].replace('[X]', addedEmail)),
+        DUPLICATE: () =>
+            // `Invite already sent, waiting for response.`
+            msgDialog('warningb', '', l[17545])
+    };
 
-        Object.keys(M.opc).forEach(function(k) {
-            if (!exists && M.opc[k].m === contactEmail && !M.opc[k].hasOwnProperty('dts')) {
-                exists = true;
-                return false;
-            }
-        });
+    _doAddContact = contactEmail => M.inviteContact(M.u[u_handle] ? M.u[u_handle].m : u_attr.email, contactEmail);
 
-        if (exists) {
-            closeDialog();
-            msgDialog(
-                'warningb',
-                '',
-                l[17545] /* `Invite already sent, waiting for response.` */
-            );
+    _handleAddContact = contactEmail => {
+        // Anonymous view -> no `M.opc` available for this state; invoke directly contact request.
+        // Render the resulting message dialog (`The user has been invited [...]` or `Invite already sent [...]`)
+        // based on the actual API response.
+        if (this.props.chatRoom?.isAnonymous()) {
+            return this._doAddContact(contactEmail)
+                .done(addedEmail => this.DIALOG.ADDED(addedEmail))
+                .catch(this.DIALOG.DUPLICATE);
         }
-        else {
-            M.inviteContact(M.u[u_handle].m, contactEmail);
-            closeDialog();
-            msgDialog(
-                'info',
-                // `Contact invited`
-                l[150],
-                // `The user [X] has been invited and will appear in your contact list once accepted.`
-                l[5898].replace('[X]', contactEmail)
-            );
-        }
-    }
+
+        return (
+            // Look into if contact request was already sent (`M.opc`) before invoking API request.
+            Object.values(M.opc).some(opc => opc.m === contactEmail) ?
+                this.DIALOG.DUPLICATE() :
+                this._doAddContact(contactEmail)
+                    .done(addedEmail => this.DIALOG.ADDED(addedEmail))
+        );
+    };
 
     _getContactAvatar = (contact, className) => (
         <Avatar
@@ -66,6 +66,8 @@ export default class Contact extends AbstractGenericMessage {
     _getContactCard(message, contact, contactEmail) {
         const HAS_RELATIONSHIP = M.u[contact.u].c === 1;
         let name = M.getNameByHandle(contact.u);
+        const { chatRoom } = this.props;
+        const isAnonView = chatRoom.isAnonymous();
         if (megaChat.FORCE_EMAIL_LOADING) {
             name += "(" + contact.m + ")";
         }
@@ -83,7 +85,7 @@ export default class Contact extends AbstractGenericMessage {
                 >
                     <div className="dropdown-avatar rounded">
                         {this._getContactAvatar(contact, 'context-avatar')}
-                        <div className="dropdown-user-name">
+                        {!isAnonView ?  <div className="dropdown-user-name">
                             <div className="name">
                                 {HAS_RELATIONSHIP && (
                                     // Contact is present within the contact list,
@@ -96,7 +98,7 @@ export default class Contact extends AbstractGenericMessage {
                             <div className="email">
                                 {M.u[contact.u].m}
                             </div>
-                        </div>
+                        </div> : <div className="dropdown-user-name"></div>}
                     </div>
                     <ContactFingerprint contact={M.u[contact.u]} />
 
@@ -122,9 +124,9 @@ export default class Contact extends AbstractGenericMessage {
                         </>
                     )}
 
-                    {!HAS_RELATIONSHIP &&  !is_eplusplus && (
+                    {u_type && u_type > 2 && contact.u !== u_handle && !HAS_RELATIONSHIP && !is_eplusplus && (
                         <DropdownItem
-                            icon="sprite-fm-mono icon-add-filled"
+                            icon="sprite-fm-mono icon-add"
                             label={l[71] /* `Add contact` */}
                             onClick={() => this._handleAddContact(contactEmail)}
                         />
@@ -137,9 +139,10 @@ export default class Contact extends AbstractGenericMessage {
     }
 
     getContents() {
-        const { message } = this.props;
+        const { message, chatRoom } = this.props;
         const textContents = message.textContents.substr(2, message.textContents.length);
         const attachmentMeta = JSON.parse(textContents);
+        const isAnonView = chatRoom.isAnonymous();
 
         if (!attachmentMeta) {
             return console.error(`Message w/ type: ${message.type} -- no attachment meta defined. Message: ${message}`);
@@ -168,13 +171,13 @@ export default class Contact extends AbstractGenericMessage {
             contacts = [
                 ...contacts,
                 <div key={contact.u}>
-                    <div className="message shared-info">
+                    {!isAnonView ? <div className="message shared-info">
                         <div className="message data-title">{M.getNameByHandle(contact.u)}</div>
                         {M.u[contact.u] ?
                             <ContactVerified className="right-align" contact={M.u[contact.u]}/> :
                             null}
                         <div className="user-card-email">{contactEmail}</div>
-                    </div>
+                    </div> : <div className="message shared-info"></div>}
                     <div className="message shared-data">
                         <div className="data-block-view semi-big">
                             {

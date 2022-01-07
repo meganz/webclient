@@ -327,11 +327,11 @@ body.de .mega-dialog.new-group-chat {
     padding: 5px;
     border-radius: 4px;
     font: var(--text-body1);
-    color: var(--surface-main-inverted);
+    color: var(--stroke-main-inverted);
     background: transparent;
 }
 .mega-dialog.add-from-cloud .fm-header-buttons input::placeholder {
-    color: var(--surface-main-inverted);
+    color: var(--stroke-main-inverted);
     opacity: 0.3;
 }
 .mega-dialog.add-from-cloud .fm-header-buttons.active-search input {
@@ -390,6 +390,7 @@ body.de .mega-dialog.new-group-chat {
 .mega-dialog .fm-breadcrumbs-wrapper.breadcrumbs-bottom .fm-breadcrumbs-block {
     height: 40px;
     padding: 5px 0 0 5px;
+    overflow: visible;
 }
 .mega-dialog .fm-breadcrumbs-wrapper.breadcrumbs-bottom .crumb-overflow-link {
     background: none;
@@ -433,7 +434,7 @@ body.de .mega-dialog.new-group-chat {
 .fm-dialog-table.grid-table {
     width: calc(100% - 16px);
     margin: 0 auto 0;
-    outline: var(--surface-main) solid 8px;
+    outline: var(--stroke-main) solid 8px;
     outline-offset: -8px;
 }
 .fm-dialog-table.grid-table td {
@@ -776,7 +777,7 @@ body.de .mega-dialog.new-group-chat {
 
 /* MegaSync dialog */
 .nw-dark-overlay.megasync-overlay {
-    background-color: rgba(0,0,0,0.1);
+    background-color: var(--surface-black-bar);
     transition: all 200ms ease-in-out;
 }
 .nw-dark-overlay.megasync-overlay .default-select-dropdown::before,
@@ -1074,11 +1075,21 @@ body.de .mega-dialog.new-group-chat {
 }
 .megasync-content .fm-dialog-close {
     opacity: 0.8;
-    right: 8px;
-    top: 8px;
+    right: 16px;
+    top: 16px;
+    background: none;
+}
+.rtl .megasync-content .fm-dialog-close {
+    left: 16px;
+    right: auto;
 }
 .megasync-content .fm-dialog-close:hover {
     opacity: 1;
+}
+.megasync-content .fm-dialog-close i {
+    --icon-size: 24px;
+    margin-top: 3px;
+    --mask-color: var(--icon-rest);
 }
 .megasync-slide-info {
     display: table-cell;
@@ -1862,9 +1873,6 @@ body.de .mega-dialog.new-group-chat {
     .mega-dialog.password-dialog .decryption-in-progress i {
         animation: rotate 0.8s infinite linear;
     }
-    .mega-dialog.password-dialog .decryption-in-progress.hidden {
-        display: none;
-    }
 
 /* end password-dialog */
 
@@ -2204,11 +2212,6 @@ body.de .mega-dialog.new-group-chat {
     .rtl .mega-dialog.export-links-dialog .icons i {
         float: left;
     }
-    .mega-dialog.export-links-dialog .icons i.calendar.hidden {
-        display: block;
-        opacity: 0;
-        visibility: hidden;
-    }
     .mega-dialog.export-links-dialog .icons i input {
         position: absolute;
         width: 100%;
@@ -2280,9 +2283,6 @@ body.de .mega-dialog.new-group-chat {
         opacity: 1;
         padding: 0 20px;
         border-bottom: 2px solid var(--stroke-error);
-    }
-    .mega-dialog.export-links-dialog .hidden {
-        display: none;
     }
     .mega-dialog.export-links-dialog .settings-container {
         overflow: auto;
@@ -2416,7 +2416,7 @@ body.de .mega-dialog.new-group-chat {
     .mega-dialog.export-links-dialog .embed-content .settings-container {
         overflow: auto;
         margin-top: 8px;
-        background-color: var(--surface-main);
+        background-color: var(--stroke-main);
         border: 1px solid var(--stroke-grey-2);
         border-radius: 4px;
         min-height: 44px;
@@ -2530,9 +2530,6 @@ body.de .mega-dialog.new-group-chat {
     }
     .mega-dialog.fm-picker-dialog .summary-row.unfold {
         align-items: flex-start;
-    }
-    .mega-dialog.fm-picker-dialog .summary-row.hidden {
-        display: none;
     }
     .mega-dialog.fm-picker-dialog .summary-row .summary-title {
         font: var(--text-body1);
@@ -3318,7 +3315,7 @@ body.de .mega-dialog.new-group-chat {
     .mega-dialog.fm-picker-dialog .side-pane .fm-picker-dialog-button .tooltip {
         height: 20px;
         padding: 0 8px;
-        background-color: var(--surface-main-inverted);
+        background-color: var(--stroke-main-inverted);
         color: var(--text-color-high-inverted);
         font: var(--text-body2);
         line-height: 20px;
@@ -3412,9 +3409,6 @@ body.de .mega-dialog.new-group-chat {
         display: flex;
         align-items: center;
         cursor: pointer;
-    }
-    .mega-dialog.fm-picker-dialog .share-dialog-permissions.hidden {
-        display: none;
     }
     .mega-dialog.fm-picker-dialog .share-dialog-permissions i {
         display: none;
@@ -3944,7 +3938,7 @@ body.de .mega-dialog.new-group-chat {
     }
     .mega-dialog.properties-dialog.shared .properties-elements-counter span {
         background: var(--surface-main-inverted);
-        border: 2px solid var(--surface-main);
+        border: 2px solid var(--stroke-main);
         border-radius: 50%;
         color: var(--text-color-high-inverted);
         display: block;
@@ -4281,9 +4275,6 @@ body.de .mega-dialog.new-group-chat {
         display: table;
         margin-top: 24px;
     }
-    .mega-dialog.add-user-popup .hidden-achievement-info.hidden {
-        display: none;
-    }
     .mega-dialog.add-user-popup .hidden-textarea-info {
         text-align: center;
         margin-top: 10px;
@@ -4303,6 +4294,7 @@ body.de .mega-dialog.new-group-chat {
 
     .mega-dialog.payment-address-dialog {
         width: 730px;
+        max-height: 100vh;
     }
     .mega-dialog.payment-address-dialog header {
         align-items: center;
@@ -4428,6 +4420,26 @@ body.de .mega-dialog.new-group-chat {
     .mega-dialog.payment-address-dialog .payment-cc-icon {
         position: absolute;
     }
+    .mega-dialog.payment-address-dialog .payment-provider-icon {
+        width: 48px;
+        height: 48px;
+        float: right;
+        display: inline-block;
+        margin-right: 5px;
+        background-size: 48px;
+    }
+    .mega-dialog.payment-address-dialog .payment-provider-icon.stripeAE {
+        background-image: url("../images/mega/Amex.svg");
+    }
+    .mega-dialog.payment-address-dialog .payment-provider-icon.stripeJC {
+        background-image: url("../images/mega/JCB.svg");
+    }
+    .mega-dialog.payment-address-dialog .payment-provider-icon.stripeUP {
+        background-image: url("../images/mega/UnionPay.svg");
+    }
+    .mega-dialog.payment-address-dialog .payment-provider-icon.stripeDD {
+        background-image: url("../images/mega/Discover.svg");
+    }
     .mega-dialog.payment-address-dialog .payment-cc-icon.visa {
         right: 0;
         --icon-size: 48px;
@@ -4494,9 +4506,6 @@ body.de .mega-dialog.new-group-chat {
         margin: 12px 48px 0 48px;
         text-align: center;
     }
-    .mega-dialog.payment-address-dialog .error-message.hidden {
-        display: none;
-    }
     .mega-dialog.payment-address-dialog .payment-half-block .fm-account-input input {
         color: var(--text-color-high);
     }
@@ -4516,9 +4525,6 @@ body.de .mega-dialog.new-group-chat {
         color: var(--text-color-low);
     }
     .mega-dialog.payment-address-dialog .default-dropdown-item.template {
-        display: none;
-    }
-    .mega-dialog.payment-address-dialog .default-dropdown-item.hidden {
         display: none;
     }
     .mega-dialog.payment-address-dialog .states.disabled {
@@ -4586,9 +4592,6 @@ body.de .mega-dialog.new-group-chat {
         display: inline-block;
         padding: 24px 0 16px;
     }
-    .mega-dialog.new-contact .new-user-message.hidden {
-        display: none;
-    }
     .mega-dialog.new-contact .new-contact-avatar .semi-mid-avatar {
         position: relative;
         width: 100%;
@@ -4602,9 +4605,6 @@ body.de .mega-dialog.new-group-chat {
 
     .mega-dialog.pro-login-dialog {
         width: 490px;
-    }
-    .mega-dialog.pro-login-dialog.hidden {
-        display: none;
     }
     .mega-dialog.pro-login-dialog header {
         margin-bottom: 10px;
@@ -4686,6 +4686,7 @@ body.de .mega-dialog.new-group-chat {
 
     .mega-dialog.wire-transfer-dialog {
         width: 1145px;
+        max-width: 100vw;
     }
     .mega-dialog.wire-transfer-dialog .content-block {
         padding-bottom: 48px;
@@ -4717,6 +4718,7 @@ body.de .mega-dialog.new-group-chat {
     .mega-dialog.wire-transfer-dialog .resellers-top-txt .wire-transfer-details th {
         padding-right: 15px;
         text-align: start;
+        white-space: nowrap;
     }
     .mega-dialog.wire-transfer-dialog .resellers-top-txt .wire-transfer-details .bank-address {
         padding-bottom: 15px;
@@ -4789,9 +4791,6 @@ body.de .mega-dialog.new-group-chat {
         display: table;
         margin-top: 30px;
         width: 100%;
-    }
-    .mega-dialog.languages-dialog .show-more-languages.hidden {
-        display: none;
     }
     .mega-dialog.languages-dialog .show-more-languages .show-more-text {
         color: #999;
@@ -4878,9 +4877,6 @@ body.de .mega-dialog.new-group-chat {
     .mega-dialog.pro-register-dialog header p {
         padding: 0 48px;
         text-align: center;
-    }
-    .mega-dialog.pro-register-dialog header a.hidden {
-        display: none;
     }
     .mega-dialog.pro-register-dialog .dialog-register-form {
         margin-top: 24px;
@@ -4993,14 +4989,8 @@ body.de .mega-dialog.new-group-chat {
     .credentials-warning-dialog .resetCredentials .reset-credentials-button {
         margin-top: 24px;
     }
-    .mega-dialog.credentials-warning-dialog .resetCredentials .reset-credentials-button.hidden {
-        display: none;
-    }
     .mega-dialog.credentials-warning-dialog .verifyCredentials .verify-contact-button {
         margin-top: 24px;
-    }
-    .mega-dialog.credentials-warning-dialog .verifyCredentials .verify-contact-button.hidden {
-        display: none;
     }
     .mega-dialog.credentials-warning-dialog .postResetCredentials .title,
     .mega-dialog.credentials-warning-dialog .verifyCredentials .title {
@@ -5504,9 +5494,6 @@ body.de .mega-dialog.new-group-chat {
         margin: 15px 21px 0 21px;
         text-align: start;
     }
-    .mega-dialog .achievement-dialog.reward.hidden {
-        display: none;
-    }
     .mega-dialog .achievement-dialog.reward i {
         vertical-align: top;
     }
@@ -5566,9 +5553,6 @@ body.de .mega-dialog.new-group-chat {
     }
     .mega-dialog .achievement-dialog.bottom-block .achievement-dialog.reward:last-of-type {
         border-bottom: none;
-    }
-    .mega-dialog .achievement-dialog.bottom-block .achievement-dialog.reward.hidden {
-        display: none;
     }
     .mega-dialog .achievement-dialog.bottom-block .achievement-dialog.reward i {
         margin: 10px 0 10px 0;
@@ -5740,9 +5724,6 @@ body.de .mega-dialog.new-group-chat {
         letter-spacing: 0.1px;
         line-height: 20px;
     }
-    .mega-dialog.voucher-dialog .voucher-dialog-buttons button.hidden {
-        display: none;
-    }
     .mega-dialog.voucher-dialog .voucher-dialog-td {
         display: table-cell;
         overflow: hidden;
@@ -5754,9 +5735,6 @@ body.de .mega-dialog.new-group-chat {
     .mega-dialog.voucher-dialog .voucher-input-container {
         display: flex;
         width: 100%;
-    }
-    .mega-dialog.voucher-dialog .voucher-input-container.hidden {
-        display: none;
     }
     .mega-dialog.voucher-dialog .voucher-input-container .fm-account-input {
         flex: 1;
@@ -6223,13 +6201,11 @@ body.de .mega-dialog.new-group-chat {
     .logged .mega-dialog.limited-bandwidth-dialog.achievements .overquota-bott-buttons button .registered {
         display: block;
     }
-    .mega-dialog.limited-bandwidth-dialog.hidden-bottom .dialog.overquota-bott-bl,
-    .mega-dialog.limited-bandwidth-dialog.dialog.overquota-bott-bl.hidden {
+    .mega-dialog.limited-bandwidth-dialog.hidden-bottom .dialog.overquota-bott-bl {
         display: none !important;
     }
     .mega-dialog.limited-bandwidth-dialog .dialog.transfer-overquota-txt span.countdown {
         margin: 0 5px;
-        vertical-align: top;
     }
     .mega-dialog.limited-bandwidth-dialog .dialog.transfer-overquota-txt span span {
         color: var(--text-color-medium);
@@ -6418,6 +6394,12 @@ body.de .mega-dialog.new-group-chat {
     .mega-dialog.storage-dialog .body-p {
         font: var(--text-body1);
         padding: 0 0 12px 0;
+    }
+    .mega-dialog.storage-dialog .body-header {
+        font: var(--text-h3);
+        color: var(--text-color-medium);
+        max-width: 420px;
+        margin: 0 auto;
     }
     .mega-dialog.storage-dialog .odq-warning .body-p {
         font-family: var(--text-font-family-semibold);
@@ -6904,9 +6886,6 @@ body.de .mega-dialog.new-group-chat {
         display: inline-block;
         --mask-color: var(--text-color-high);
     }
-    .mega-dialog.achievements-list-dialog .achieved-block.invitees .new-dialog-icon.hidden {
-        display: none;
-    }
     .mega-dialog.achievements-list-dialog .achieved-block.invitees .new-dialog-icon:hover {
         opacity: 1;
     }
@@ -6934,9 +6913,6 @@ body.de .mega-dialog.new-group-chat {
     .mega-dialog.achievements-list-dialog .achievements-cell:nth-child(3n) {
         -webkit-margin-end: 0;
         margin-inline-end: 0;
-    }
-    .mega-dialog.achievements-list-dialog .achievements-cell.hidden {
-        display: none;
     }
     .mega-dialog.achievements-list-dialog .achievements-cell .image-container {
         width: 128px;
@@ -7563,10 +7539,6 @@ body.de .mega-dialog.new-group-chat {
             padding: 4px 0;
             text-align: center;
             width: 302px;
-        }
-        .mega-dialog.verify-two-factor-login .warning-text-field.hidden {
-            display: block;
-            visibility: hidden;
         }
         .mega-dialog.verify-two-factor-login .loading-image img {
             width: 28px;
@@ -8201,9 +8173,6 @@ body.de .mega-dialog.new-group-chat {
     .mega-dialog.affiliate-redeem .withdraw-details .warning {
         display: flex;
     }
-    .mega-dialog.affiliate-redeem .withdraw-details .warning.hidden {
-        display: none;
-    }
     .mega-dialog.affiliate-redeem .withdraw-details .warning i {
         flex-shrink: 0;
         --icon-size: 24px;
@@ -8274,9 +8243,6 @@ body.de .mega-dialog.new-group-chat {
         margin-inline-start: 12px;
         cursor: pointer;
     }
-    .mega-dialog.affiliate-redeem .hidden {
-        display: none;
-    }
     .mega-dialog.affiliate-redeem .mega-input-title-ontop input {
         -webkit-padding-start: 8px;
         padding-inline-start: 8px;
@@ -8307,9 +8273,6 @@ body.de .mega-dialog.new-group-chat {
         color: white;
         margin-bottom: 36px;
     }
-    .mega-dialog.verify-phone footer .hidden {
-        display: none;
-    }
     .mega-dialog.verify-phone.suspended button.close,
     .mega-dialog.verify-phone.suspended .not-now-button {
         display: none;
@@ -8329,9 +8292,6 @@ body.de .mega-dialog.new-group-chat {
         font-size: 13px;
         cursor: pointer;
         display: block;
-    }
-    .mega-dialog.verify-phone .verify-ph-info .green-lnk.hidden {
-        display: none;
     }
     .mega-dialog.verify-phone .verify-ph-info .phone-num {
         color: var(--text-color-low);
@@ -8474,7 +8434,7 @@ body.de .mega-dialog.new-group-chat {
         .mega-dialog.voucher-info-redeem .voucher-logo {
             width: 450px;
             height: 72px;
-            background-color: var(--surface-grey-1);
+            background-color: var(--stroke-grey-1);
             border: 2px solid var(--stroke-grey-2);
             border-radius: 12px;
             display: flex;
@@ -8620,9 +8580,6 @@ body.de .mega-dialog.new-group-chat {
     }
     .mega-dialog.recovery-key-dialog .recover-paste-block .right-section > button:not(.hidden) {
         min-width: auto;
-    }
-    .mega-dialog.recovery-key-dialog .recover-paste-block button.hidden {
-        display: none;
     }
     .mega-dialog.recovery-key-dialog i {
         --mask-color: var(--text-color-medium);
@@ -8891,12 +8848,6 @@ body.de .mega-dialog.new-group-chat {
     .mega-dialog.user-management-add-user-dialog header {
         margin-bottom: 8px;
     }
-    .mega-dialog.user-management-add-user-dialog button.close.hidden {
-        display: none;
-    }
-    .mega-dialog.user-management-add-user-dialog header .graphic.hidden {
-        display: none;
-    }
     .mega-dialog.user-management-add-user-dialog .dialog-subtitle {
         text-align: center;
         margin-bottom: 0;
@@ -8927,9 +8878,6 @@ body.de .mega-dialog.new-group-chat {
         white-space: nowrap;
         display: inline-block;
     }
-    .mega-dialog.user-management-add-user-dialog button.toggle-optional-inputs .toggle-title.hidden {
-        display: none;
-    }
     .mega-dialog.user-management-add-user-dialog button.toggle-optional-inputs.show .close-icon {
         transform: rotate(180deg);
     }
@@ -8939,9 +8887,6 @@ body.de .mega-dialog.new-group-chat {
     .rtl .mega-dialog.user-management-add-user-dialog .default-button-no-border {
         float: right;
     }
-    .mega-dialog.user-management-add-user-dialog .invite-link-option.hidden {
-        display: none;
-    }
     .mega-dialog.user-management-add-user-dialog .invite-link-option .enable-pw-txt {
         color: var(--text-color-low);
         max-width: 270px;
@@ -8949,9 +8894,6 @@ body.de .mega-dialog.new-group-chat {
         -webkit-margin-end: 12px;
         margin-inline-end: 12px;
         display: inline-block;
-    }
-    .mega-dialog.user-management-add-user-dialog .invite-link-option .enable-pw-txt.hidden {
-        display: none;
     }
     .mega-dialog.user-management-add-user-dialog {
         width: 598px;
@@ -8966,9 +8908,6 @@ body.de .mega-dialog.new-group-chat {
         padding: 8px 12px;
         display: flex;
         justify-content: space-between;
-    }
-    .mega-dialog.user-management-add-user-dialog .verification-container.hidden {
-        display: none;
     }
     .mega-dialog.user-management-add-user-dialog .optional-input-container {
         display: none;
@@ -9156,6 +9095,17 @@ body.de .mega-dialog.new-group-chat {
     .mega-dialog.payment-reminder {
         width: 596px;
         text-align: center;
+    }
+
+/* end payment-reminder dialog */
+
+/* payment-reminder dialog */
+
+    .mega-dialog.payment-card-expired header .graphic {
+        width: 116px;
+        height: 80px;
+        --width: 116px;
+        --height: 80px;
     }
 
 /* end payment-reminder dialog */
@@ -9370,25 +9320,15 @@ body.de .mega-dialog.new-group-chat {
 
 /* registration-page-success */
 
-    .mega-dialog.registration-page-success header .hidden {
-        display: none;
-    }
-    .mega-dialog.registration-page-success footer.hidden {
-        display: none;
-    }
-    .mega-dialog.registration-page-success .reg-success-special {
-        display: none;
-    }
-    .mega-dialog.registration-page-success.special .reg-success-normal {
-        display: none;
-    }
-    .mega-dialog.registration-page-success.special .reg-success-special {
-        display: block;
-    }
+    .mega-dialog.registration-page-success .reg-success-special,
+    .mega-dialog.registration-page-success.special .reg-success-normal,
     .mega-dialog.registration-page-success .reg-success-special .reg-success-txt.chat-header,
     .mega-dialog.registration-page-success .reg-success-special .chat-message,
     .mega-dialog.registration-page-success.chatlink .reg-success-special .reg-success-txt {
         display: none;
+    }
+    .mega-dialog.registration-page-success.special .reg-success-special {
+        display: block;
     }
     .mega-dialog.registration-page-success.chatlink .reg-success-special .reg-success-txt.chat-header {
         display: block;
@@ -9403,9 +9343,6 @@ body.de .mega-dialog.new-group-chat {
     }
     .mega-dialog.registration-page-success .reg-resend-email-txt {
         font: var(--text-h3);
-    }
-    .mega-dialog.registration-page-success button.close.hidden {
-        display: none;
     }
 
 /* end registration-page-success */
@@ -9616,9 +9553,6 @@ body.de .mega-dialog.new-group-chat {
         justify-content: center;
         padding-top: 40px;
         width: 100%;
-    }
-    .mega-dialog.feedback-dialog footer.hidden {
-        display: none;
     }
 
 /* end feedback-dialog */
@@ -10289,3 +10223,142 @@ body.de .mega-dialog.new-group-chat {
     }
 
 /* End mega-desktopapp-download */
+
+/* Report Abuse dialog Begin */
+.mega-dialog.report-abuse {
+    max-height: 90vh;
+}
+.mega-dialog.report-abuse .subtitle {
+    font: var(--text-h3-bold);
+    color: var(--text-color-error);
+}
+.mega-dialog.report-abuse .content-block {
+    min-height: 300px;
+}
+
+@media screen and (max-height: 500px) {
+    .mega-dialog.report-abuse .content-block {
+        min-height: 50px;
+    }
+}
+
+.mega-dialog.report-abuse .content-block > section {
+    padding-top: 10px;
+}
+.mega-dialog.report-abuse .sub-container {
+    margin-top: 24px;
+}
+.mega-dialog.report-abuse .abusetypes-block p {
+    color: var(--text-color-medium);
+    margin-bottom: 20px;
+}
+.mega-dialog.report-abuse .radio-buttons > * {
+    margin: 12px 0;
+    display: flex;
+}
+.mega-dialog.report-abuse input.form-control,
+.mega-dialog.report-abuse textarea.form-control {
+    width: 100%;
+    height: 36px;
+    box-sizing: border-box;
+    font: var(--text-body1);
+    color: var(--text-color-high);
+    padding: 0 8px;
+    margin: 0;
+    border: 1px solid var(--stroke-grey-2);
+    background: var(--surface-grey-1);
+    border-radius: 4px;
+    transition: color 200ms ease-in-out;
+}
+.mega-dialog.report-abuse textarea.form-control {
+    height: 100px;
+    padding: 8px;
+}
+.mega-dialog.report-abuse form .form-row {
+    margin-bottom: 12px;
+}
+.mega-dialog.report-abuse form > section {
+    margin-top: 20px;
+}
+.mega-dialog.report-abuse form > section.abusetypes-block {
+    margin-top: 10px;
+}
+.mega-dialog.report-abuse form p {
+    margin-bottom: 6px;
+    color: var(--text-color-higher);
+}
+.mega-dialog.report-abuse form .form-row.two-col {
+    display: flex;
+}
+.mega-dialog.report-abuse form .form-row.two-col input.form-control:first-child {
+    margin-right: 20px;
+}
+.mega-dialog.report-abuse form .form-row.two-col .form-control.half {
+    width: calc(50% - 10px);
+}
+.mega-dialog.report-abuse form .form-row.two-col :placeholder-shown {
+    opacity: 2;
+}
+.mega-dialog.report-abuse textarea::placeholder,
+.mega-dialog.report-abuse input::placeholder {
+    color: var(--surface-mid-grey);
+}
+.mega-dialog.report-abuse textarea:focus::placeholder,
+.mega-dialog.report-abuse input:focus::placeholder {
+    opacity: 0;
+}
+.mega-dialog.report-abuse .mega-input.form-control {
+    width: 100%;
+    height: 36px;
+    box-sizing: border-box;
+    font: var(--text-body1);
+    color: var(--text-color-high);
+    padding: 0;
+    margin: 0;
+    border: 1px solid var(--stroke-grey-2);
+    background: var(--surface-grey-1);
+    border-radius: 4px;
+    transition: color 200ms ease-in-out;
+}
+.mega-dialog.report-abuse .mega-input.form-control::before {
+    content: none;
+}
+.mega-dialog.report-abuse .mega-input.form-control .placeholder {
+    opacity: 0.4;
+}
+.mega-dialog.report-abuse .mega-input-dropdown .dropdown-scroll {
+    max-height: 250px;
+}
+.mega-dialog.report-abuse .form-control.error {
+    border: 1px solid var(--input-text-underline-error);
+}
+.mega-dialog.report-abuse a {
+    text-decoration: underline;
+    user-select: text;
+}
+.mega-dialog.report-abuse a:hover {
+    text-decoration: none;
+}
+.mega-dialog.report-abuse .message-container {
+    box-sizing: border-box;
+    color: var(--banner-text-error);
+    text-align: center;
+    background: var(--banner-background-error);
+    border: 1px solid var(--banner-border-error);
+    border-radius: 4px;
+    font: var(--text-body1);
+    padding: 2px;
+    margin-bottom: 10px;
+}
+.mega-dialog.report-abuse .radio-buttons .radio-txt {
+    color: var(--text-color-higher);
+}
+.mega-dialog.report-abuse .checkbox-block {
+    margin-top: 20px;
+}
+.mega-dialog.report-abuse .checkbox-block .checkbox-txt {
+    font: var(--text-body2);
+    color: var(--text-color-higher);
+}
+
+/* Report Abuse dialog End */

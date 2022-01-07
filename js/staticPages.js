@@ -122,12 +122,14 @@ MegaData.prototype.req = promisify(function(resolve, reject, params, ch) {
 MegaData.prototype.uiSaveLang = promisify(async function(resolve, reject, aNewLang) {
     'use strict';
     let storage = localStorage;
+    /**
     if ('csp' in window) {
         await csp.init();
         if (!csp.has('pref')) {
             storage = sessionStorage;
         }
     }
+    /**/
     storage.lang = aNewLang;
     resolve();
 });
@@ -248,10 +250,6 @@ mBroadcaster.once('boot_done', () => {
         'use strict';
         const selectedPlan = $('.pricing-page.plan.selected', 'body').data('payment');
         const kvLogin = [['next', 'propay_' + selectedPlan]];
-        const uLang = sessionStorage.lang || localStorage.lang;
-        if (uLang) {
-            kvLogin.push(['lang', uLang, '1']);
-        }
         const kvReg = [['next', '1'], ['plan', selectedPlan]];
         if (is_mobile) {
             const $mobileDlg = $('.mobile.loginrequired-dialog', '#startholder');
@@ -673,8 +671,8 @@ BusinessAccount.prototype.getBusinessPlanInfo = function(forceUpdate) {
     }
 
     var request = {
-        a: "utqa",  // get a list of plans
-        nf: 1,      // extended format
+        a: 'utqa',  // get a list of plans
+        nf: 2,      // extended format
         b: 1        // also show business plans
     };
 
@@ -691,7 +689,14 @@ BusinessAccount.prototype.getBusinessPlanInfo = function(forceUpdate) {
                 for (var h = 0; h < res.length; h++) {
                     if (res[h].it) {
                         businessPlan = res[h];
+                        businessPlan.bd.us.lp /= 100;
+                        businessPlan.bd.us.p /= 100;
+                        businessPlan.bd.trns.lp /= 100;
+                        businessPlan.bd.trns.p /= 100;
+                        businessPlan.bd.sto.lp /= 100;
+                        businessPlan.bd.sto.p /= 100;
                         businessPlan.timestamp = currTime;
+                        businessPlan.l = res[0].l;
                         break;
                     }
                 }
@@ -712,10 +717,6 @@ BusinessAccount.prototype.getBusinessPlanInfo = function(forceUpdate) {
 window.redirectToSupport = (url) => {
     'use strict';
     const kvLogin = [['next', 'support'], ['articleUrl', url.replace('mega.io', 'mega.nz')]];
-    const uLang = sessionStorage.lang || localStorage.lang;
-    if (uLang) {
-        kvLogin.push(['lang', uLang, '1']);
-    }
     const $dlg = $('.loginrequired-dialog', '.common-container');
     $('header h3', $dlg).text(l[5841]);
     $('header p', $dlg).text(l.help2_login_text);
@@ -727,3 +728,92 @@ window.redirectToSupport = (url) => {
     $('.pro-register', $dlg).addClass('hidden');
     M.safeShowDialog('loginrequired', $dlg);
 };
+
+const MegaUtils = dummy;
+
+MegaUtils.prototype.getCountries = function() {
+    'use strict';
+
+    if (!this._countries) {
+        this._countries = (new RegionsCollection()).countries;
+    }
+    return this._countries;
+};
+
+MegaUtils.prototype.sortObjFn = function(key, order, alternativeFn) {
+    'use strict';
+
+    if (!order) {
+        order = 1;
+    }
+
+    if (typeof key !== 'function') {
+        var k = key;
+        key = function(o) {
+            return o[k];
+        };
+    }
+
+    return function(a, b, tmpOrder) {
+        var currentOrder = tmpOrder ? tmpOrder : order;
+
+        var aVal = key(a);
+        var bVal = key(b);
+
+        if (typeof aVal === 'string' && typeof bVal === 'string') {
+            return aVal.localeCompare(bVal, locale) * currentOrder;
+        }
+        else if (typeof aVal === 'string' && typeof bVal === 'undefined') {
+            return 1 * currentOrder;
+        }
+        else if (typeof aVal === 'undefined' && typeof bVal === 'string') {
+            return -1 * currentOrder;
+        }
+        else if (typeof aVal === 'number' && typeof bVal === 'undefined') {
+            return 1 * currentOrder;
+        }
+        else if (typeof aVal === 'undefined' && typeof bVal === 'number') {
+            return -1 * currentOrder;
+        }
+        else if (typeof aVal === 'undefined' && typeof bVal === 'undefined') {
+            if (alternativeFn) {
+                return alternativeFn(a, b, currentOrder);
+            }
+            else {
+                return -1 * currentOrder;
+            }
+        }
+        else if (typeof aVal === 'number' && typeof bVal === 'number') {
+            var _a = aVal || 0;
+            var _b = bVal || 0;
+            if (_a > _b) {
+                return 1 * currentOrder;
+            }
+            if (_a < _b) {
+                return -1 * currentOrder;
+            }
+            else {
+                if (alternativeFn) {
+                    return alternativeFn(a, b, currentOrder);
+                }
+                else {
+                    return 0;
+                }
+            }
+        }
+        else {
+            return 0;
+        }
+    };
+};
+
+function isValidEmail(email) {
+
+    'use strict';
+    // reference to html spec https://html.spec.whatwg.org/multipage/input.html#e-mail-state-(type=email)
+    // with one modification, that the standard allows emails like khaled@mega
+    // which is possible in local environment/networks but not in WWW.
+    // so I applied + instead of * at the end
+    var regex = /^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/;
+    return regex.test(email);
+}

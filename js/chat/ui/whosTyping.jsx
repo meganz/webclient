@@ -1,7 +1,5 @@
 var React = require("react");
-var ReactDOM = require("react-dom");
-import {MegaRenderMixin} from './../../stores/mixins.js';
-var RenderDebugger = require('./../../stores/mixins.js').RenderDebugger;
+import {MegaRenderMixin} from '../mixins';
 
 class WhosTyping extends MegaRenderMixin {
     constructor(props) {

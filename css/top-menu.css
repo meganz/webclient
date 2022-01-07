@@ -5,7 +5,7 @@
 /* Side menu */
 
 .top-menu-popup {
-    background-color: var(--surface-main);
+    background-color: var(--stroke-main);
     box-shadow: 0 0 0 1px var(--stroke-grey-2);
     box-sizing: border-box;
     font-size: 0;
@@ -20,10 +20,8 @@
     z-index: 1120;
 }
 
-.top-menu-popup.hidden {
+.top-menu-popup.o-hidden {
     right: -257px;
-    display: block !important;
-    opacity: 0;
 }
 
 .rtl.top-menu-popup {
@@ -33,16 +31,6 @@
 
 .rtl.top-menu-popup.hidden {
     left: -257px;
-}
-
-.mobile.top-menu-popup.hidden {
-    display: block !important;
-    width: 0;
-}
-
-.mobile .top-menu-scroll {
-    overflow: scroll;
-    -webkit-overflow-scrolling: touch;
 }
 
 .top-menu-scroll {
@@ -144,7 +132,7 @@
 .top-menu-divider {
     display: inline-flex;
     height: 1px;
-    background-color: var(--surface-grey-2);
+    background-color: var(--stroke-grey-2);
     margin: 10px 0;
     width: 100%;
 }
@@ -193,8 +181,8 @@
 
 .fm-products-nav .pages-menu.body {
     margin-top: 0;
-    background-color: var(--surface-main);
-    border-top: 1px solid var(--surface-grey-2);
+    background-color: var(--stroke-main);
+    border-top: 1px solid var(--stroke-grey-2);
     min-width: 100%;
     z-index: 140;
 }
@@ -250,6 +238,10 @@
     display: flex;
     justify-content: space-between;
     padding: 24px 6px 6px;
+}
+
+.top-menu-footer .logout {
+    flex-shrink: 0;
 }
 
 .top-mega-version {
@@ -404,7 +396,7 @@
     text-align: center;
     white-space: nowrap;
     z-index: 190;
-    background-color: var(--surface-main);
+    background-color: var(--stroke-main);
     -webkit-transition: top 600ms ease-in-out;
     transition: top 600ms ease-in-out;
 }
@@ -459,7 +451,7 @@
 }
 .pages-menu.submenu {
     border-radius: 8px;
-    background-color: var(--surface-main);
+    background-color: var(--stroke-main);
     position: absolute;
     box-shadow: var(--dropdown-shadow);
     overflow: hidden;
@@ -488,9 +480,6 @@
     text-align: left;
     margin: 22px 20px;
     min-width: 170px;
-}
-.pages-menu.submenu-link.hidden {
-    display: none;
 }
 .pages-menu.submenu-link i {
     width: 32px;
@@ -543,7 +532,7 @@
     background-position: -145px -148px;
 }
 .menus-sprite.rounded.encryption {
-    background-color: #4A90E2;
+    background-color: #7A8B9A;
     background-position: -195px -148px;
 }
 .menus-sprite.rounded.securechat {
@@ -557,6 +546,10 @@
 .menus-sprite.rounded.share {
     background-color: #FFA700;
     background-position: -95px -198px;
+}
+.menus-sprite.rounded.objectstorage {
+    background-color: #4A90E2;
+    background-position: -191px -197px;
 }
 
 /* Business account */

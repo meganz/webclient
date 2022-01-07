@@ -87,7 +87,7 @@ button.bottom-info {
     border-radius: 3px;
     background: linear-gradient(180deg, #FFFFFF 0%, #FCFCFC 100%);
     box-shadow: 0 1px 2px 0 rgba(0,0,0,0.15);
-    color: #777;
+    color: var(--text-color-black-medium);
     cursor: pointer;
     display: inline-block;
     font-family: 'source_sans_proregular', sans-serif;

@@ -1,5 +1,5 @@
 var React = require("react");
-import {MegaRenderMixin, SoonFcWrap} from "../stores/mixins.js";
+import {MegaRenderMixin, SoonFcWrap} from "../chat/mixins";
 
 /**
  * perfect-scrollbar React helper

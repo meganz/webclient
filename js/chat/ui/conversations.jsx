@@ -3,7 +3,7 @@ import { hot } from 'react-hot-loader/root';
 var React = require("react");
 import utils from './../../ui/utils.jsx';
 var PerfectScrollbar = require('./../../ui/perfectScrollbar.jsx').PerfectScrollbar;
-import {MegaRenderMixin, timing} from './../../stores/mixins.js';
+import {MegaRenderMixin, timing} from './../mixins';
 import {Button} from './../../ui/buttons.jsx';
 import {DropdownContactsSelector} from './../../ui/dropdowns.jsx';
 import {ConversationPanels} from "./../ui/conversationpanel.jsx";
@@ -1111,6 +1111,9 @@ class ConversationsApp extends MegaRenderMixin {
                 });
         }
         else {
+            if (megaChat.$leftPane && megaChat.$leftPane.hasClass('resizable-pane-active')) {
+                return;
+            }
             const newMargin = ($('.fm-left-panel').width() + $('.nw-fm-left-icons-panel').width()) + "px";
             $('.fm-right-files-block, .fm-right-account-block')
                 .filter(':visible')
@@ -1156,7 +1159,7 @@ class ConversationsApp extends MegaRenderMixin {
                 {
                     key: 'newMeeting',
                     className: 'new-meeting',
-                    title: 'New meeting',
+                    title: l.new_meeting,
                     icon: 'sprite-fm-mono icon-video-call-filled',
                     onClick: () => {
                         if (megaChat.hasSupportForCalls) {
@@ -1307,7 +1310,6 @@ class ConversationsApp extends MegaRenderMixin {
                         "position":"fixed",
                         "top": "50%",
                         "left": "50%",
-                        "marginLeft": "72px"
                     }}></div>
                 </div>
             </div>;
@@ -1383,7 +1385,7 @@ class ConversationsApp extends MegaRenderMixin {
                         contactsActive={megaChat.routingSection === "contacts"}
                         onSelectDone={this.startChatClicked.bind(this)}
                         showTopButtons={self.getContactsPickerButtons()}
-                        showAddContact={M.u && M.u.length > 1}
+                        showAddContact={ContactsPanel.hasContacts()}
                     />
                     <SearchPanel />
                     <PerfectScrollbar
@@ -1393,23 +1395,25 @@ class ConversationsApp extends MegaRenderMixin {
                             megaChat.$chatTreePanePs = ref;
                         }}>
                         {megaChat.chats.length > 0 &&
-                        <div
-                            className={`
-                                content-panel
-                                conversations
-                                active
-                            `}>
-                            <span className="heading">Contacts and Groups</span>
-                            <ConversationsList quickSearchText={this.state.quickSearchText}/>
-                        </div>
+                            <div
+                                className={`
+                                    content-panel
+                                    conversations
+                                    active
+                                `}>
+                                <span className="heading">{l.contacts_and_groups}</span>
+                                <ConversationsList quickSearchText={this.state.quickSearchText}/>
+                            </div>
                         }
                     </PerfectScrollbar>
-                    <div
-                        className={arcBtnClass}
-                        onClick={this.archiveChatsClicked}>
-                        <div className="heading">{l[19066]}</div>
-                        <div className="indicator">{archivedChatsCount}</div>
-                    </div>
+                    {megaChat.chats.length > 0 && (
+                        <div
+                            className={arcBtnClass}
+                            onClick={this.archiveChatsClicked}>
+                            <div className="heading">{l[19066] /* `Archived chats` */}</div>
+                            <div className="indicator">{archivedChatsCount}</div>
+                        </div>
+                    )}
                 </div>
                 {rightPane}
             </div>

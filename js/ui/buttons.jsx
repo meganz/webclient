@@ -1,5 +1,5 @@
 import React from 'react';
-import { MegaRenderMixin } from "../stores/mixins.js";
+import { MegaRenderMixin } from "../chat/mixins";
 
 let _buttonGroups = {};
 
@@ -23,7 +23,8 @@ export class Button extends MegaRenderMixin {
         }
 
         if (this.state.focused !== nextState.focused && nextState.focused === true) {
-            $('.conversationsApp').rebind('mousedown.button' + this.getUniqueId(), this.onBlur);
+            $('.conversationsApp, .join-meeting, .main-blur-block')
+                .rebind('mousedown.button' + this.getUniqueId(), this.onBlur);
 
             $(document).rebind('keyup.button' + this.getUniqueId(), e => {
                 if (this.state.focused === true && e.keyCode === 27 /* `ESC` */) {
@@ -128,7 +129,7 @@ export class Button extends MegaRenderMixin {
     unbindEvents() {
         $(document).off('keyup.button' + this.getUniqueId());
         $(document).off('closeDropdowns.' + this.getUniqueId());
-        $('.conversationsApp').unbind('mousedown.button' + this.getUniqueId());
+        $('.conversationsApp, .join-meeting, .main-blur-block').unbind('mousedown.button' + this.getUniqueId());
 
         if (this._pageChangeListener) {
             mBroadcaster.removeListener(this._pageChangeListener);

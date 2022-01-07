@@ -125,8 +125,8 @@ var ZIPClass = function(totalSize) {
 
     this.isZip64 = isZip64 /* make it public */
 
-    if (isZip64 && !localStorage.zip64warnShown) {
-        localStorage.zip64warnShown = !0;
+    if (isZip64 && !mega.config.get('zip64n')) {
+        mega.config.set('zip64n', 1);
         msgDialog('warninga', l[34], l[2033]);
     }
 

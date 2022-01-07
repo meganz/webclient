@@ -2875,9 +2875,6 @@
 #help2-main .sidebar-sort-container {
     margin-bottom: 40px;
 }
-#help2-main .hidden {
-    display: none;
-}
 @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
     #help2-main .getstart-img, #help2-main .usemega-img, #help2-main .browsearticle-button .article-arrow, #help2-main .block-megachat, #help2-main .block-megasync, #help2-main .block-business, #help2-main .feedback-logo, .feedback-logo,#help2-main .yes-icon, #help2-main .no-icon, #help2-main .support-link-icon, #help2-main .support-email-icon, #help2-main .block-ios-desktop, #help2-main .block-windows-desktop, #help2-main .block-linux-desktop, #help2-main .support-search-icon, #help2-main .support-go-back-icon, #help2-main input.submit, #help2-main .device-menu-icon, #help2-main .result-filter-icon, #help2-main .megachat-icon, #help2-main .megasync-icon, #help2-main .ios-icon, #help2-main .ios-desktop-icon, #help2-main .windows-desktop-icon, #help2-main .linux-desktop-icon, #help2-main .windowsphone-icon, #help2-main .android-icon, #help2-main .block-webclient, #help2-main .block-mobile, #help2-main .block-ios, #help2-main .block-windowsphone, #help2-main .block-ios-megasync, #help2-main .block-windows-megasync, #help2-main .block-linux-megasync, #help2-main .close-icon, #help2-main .iOS-mobile-block, #help2-main .android-mobile-block, #help2-main .window-mobile-block, #help2-main .support-section-header-clone .support-go-back-icon, #help2-main .block-android,  #help2-main .support-section-header-clone .support-search-icon, #help2-main .nav-arrow, #help2-main .cmd-icon, #help2-main .block-cmd, #help2-main .block-uwp, #help2-main .uwp-icon, #help2-main .megasync-icon {
         background-image: url(../images/mega/help2/welcome_icons@2x.png);

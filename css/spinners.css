@@ -165,7 +165,7 @@
     .bouncing-loader > span {
         -webkit-animation: sk-bouncedelay 1.4s infinite ease-in-out both;
         animation: sk-bouncedelay 1.4s infinite ease-in-out both;
-        background-color: var(--surface-main-inverted);
+        background-color: var(--stroke-main-inverted);
         border-radius: 100%;
         display: inline-block;
         height: 16px;
@@ -233,7 +233,7 @@
         animation-duration: 1.3s;
         animation-iteration-count: infinite;
         animation-name: bounce_fountaing;
-        background-color: var(--surface-grey-1-inverted);
+        background-color: var(--stroke-grey-1-inverted);
         border-radius: 8px;
         height: 7px;
         position: absolute;
@@ -285,22 +285,22 @@
 
     @-webkit-keyframes bounce_fountaing {
         0% {
-            background-color: var(--surface-grey-1-inverted);
+            background-color: var(--stroke-grey-1-inverted);
             -webkit-transform: scale(1);
         }
         100% {
-            background-color: var(--surface-grey-1);
+            background-color: var(--stroke-grey-1);
             -webkit-transform: scale(0.3);
         }
     }
 
     @keyframes bounce_fountaing {
         0% {
-            background-color: var(--surface-grey-1-inverted);
+            background-color: var(--stroke-grey-1-inverted);
             transform: scale(1);
         }
         100% {
-            background-color: var(--surface-grey-1);
+            background-color: var(--stroke-grey-1);
             transform: scale(0.3);
         }
     }

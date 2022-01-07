@@ -360,6 +360,7 @@ function browserdetails(useragent) {
         details.engine = 'Webkit';
         details.blink = useragent.match(/\bchrom[eium]+\/(\d+(?:\.\d+)?)/);
         if (details.blink) {
+            details.engine = 'Blink';
             details.blink = String(details.blink[1] || '').replace(/\.0+$/, '');
         }
     }

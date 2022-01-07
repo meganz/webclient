@@ -67,6 +67,58 @@ function translate(html) {
 }
 
 /**
+ * Loads localisation for images
+ * Apply the locale-img class and the data-baseimg attribute for the image to be loaded in its localised version
+ *    Images will be loaded from /images/mega/locale/lang_data-baseimg
+ *        If the locale image is not present /images/mega/locale/en_data-baseimg will be used
+ * For language codes see languages defined in secureboot
+ *
+ * @param {string|jQuery} scope The optional scope to perform the load on
+ * @returns {void} void
+ */
+function localeImages(scope) {
+    'use strict';
+    const $imgs = $('.locale-img', scope || 'body');
+    const fallbackLang = 'en';
+    const prepImg = ($img, src, fbsrc) => {
+        const img = new Image();
+        const onload = () => {
+            $img.replaceWith(img);
+        };
+        const onerr = () => {
+            if (fbsrc) {
+                if (d) {
+                    console.warn(`Image ${src} missing. Using fallback`);
+                }
+                prepImg($img, fbsrc, undefined);
+            }
+            else if (d) {
+                console.error(`Error loading fallback image ${src}`);
+            }
+        };
+        img.classList = $img.get(0).classList;
+        if (typeof img.decode === 'function') {
+            img.src = src;
+            img.decode().then(onload).catch(onerr);
+        }
+        else {
+            img.onload = onload;
+            img.onerror = onerr;
+            img.src = src;
+        }
+    };
+    for (let i = 0; i < $imgs.length; i++) {
+        if ($imgs.eq(i).attr('data-baseimg')) {
+            const base = $imgs.eq(i).attr('data-baseimg');
+            $imgs.eq(i).removeAttr('data-baseimg');
+            const ls = `${staticpath}images/mega/locale/${lang}_${base}`;
+            const fs = `${staticpath}images/mega/locale/${fallbackLang}_${base}`;
+            prepImg($imgs.eq(i), ls, fs);
+        }
+    }
+}
+
+/**
  * Set Date time object for time2date
  * @param {String} locales Locale string
  * @param {Number} format format number for the case.
@@ -109,6 +161,12 @@ function setDateTimeFormat(locales, format) {
             case 13:
                 options.month = 'long';
                 break;
+            case 14:
+                options.year = 'numeric';
+                break;
+            case 15:
+                options.month = 'short';
+                options.day = 'numeric';
         }
     }
 
@@ -151,8 +209,10 @@ function setDateTimeFormat(locales, format) {
  * Non full date formats:
  *       10: Mon (Only day of the week long version)
  *       11: Monday (Only day of the week short version)
- *       12: Jan (Only month long version)
- *       13: January (Only month short version)
+ *       12: Jan (Only month short version)
+ *       13: January (Only month long version)
+ *       14: 2021 (Only year)
+ *       15: dd mm (Date format with short month and without time and year)
  */
 function time2date(unixTime, format) {
     'use strict';
@@ -323,7 +383,10 @@ function calculateCalendar(type, unixTime) {
     var startDate;
     var endDate;
 
-    if (type === 'w') {
+    if (type === 'd') {
+        startDate = endDate = time;
+    }
+    else if (type === 'w') {
         var timeDay = time.getDay();
 
         startDate = new Date(unixTime - 86400000 * timeDay);
@@ -353,6 +416,9 @@ function calculateCalendar(type, unixTime) {
         endDate.setFullYear(timeYear + 1);
         endDate.setMonth(0);
         endDate.setDate(0);
+    }
+    else {
+        return false;
     }
 
     startDate = startDate.setHours(0, 0, 0, 0) / 1000;
@@ -571,6 +637,51 @@ function secondsToDays(seconds) {
     return seconds / (24 * 60 * 60);
 }
 
+function formatTimeField(field, value) {
+    'use strict';
+    return `${value}${field} `;
+}
+
+function secondsToTimeLong(secs) {
+    'use strict';
+
+    if (isNaN(secs) || secs === Infinity) {
+        return '--:--:--';
+    }
+    if (secs < 0) {
+        return '';
+    }
+
+    const years = Math.floor(secs / (365 * 24 * 60 * 60));
+    const divisor_for_months = secs % (365 * 24 * 60 * 60);
+    const months = Math.floor(divisor_for_months / (30 * 24 * 60 * 60));
+    const divisor_for_days = divisor_for_months % (30 * 24 * 60 * 60);
+    const days = Math.floor(divisor_for_days / (24 * 60 * 60));
+    const divisor_for_hours = divisor_for_days % (24 * 60 * 60);
+    const hours = uplpad(Math.floor(divisor_for_hours / (60 * 60)), 2);
+    const divisor_for_minutes = divisor_for_hours % (60 * 60);
+    const minutes = uplpad(Math.floor(divisor_for_minutes / 60), 2);
+    const divisor_for_seconds = divisor_for_minutes % 60;
+    const seconds = uplpad(Math.floor(divisor_for_seconds), 2);
+
+    const fields = ['y', 'm', 'd', 'h', 'm'];
+    const values = [years, months, days, hours, minutes];
+    const time_fields = [];
+
+    for (let i = 0; i < values.length; i++) {
+        if (values[i] > 0) {
+            for (let j = i; j < values.length; j++) {
+                time_fields.push(formatTimeField(fields[j], values[j]));
+            }
+            break;
+        }
+    }
+
+    time_fields.push(`${seconds}s `);
+
+    return time_fields.join('');
+}
+
 /**
  * Calculate the number of days since the given date
  * @param {String} dateStr The date string, in YYYY-MM-DD format
@@ -595,19 +706,21 @@ function daysSince1Jan2000() {
  * @param {Number} value Value to format
  * @param {String} [currency] Currency to use in currency formatting. Default: 'EUR'
  * @param {String} [display] display type of currency format, supporting types are below:
- *                  'symbol' - use a localized currency symbol such as "$" - Default,
+ *                  'symbol' - use a localized currency symbol but with country code such as "NZ$",
  *                  'code' - use the ISO currency code such as "NZD",
  *                  'name' - use a localized currency name such as "dollar"
  *                  'number' - just number with correct decimal
+ * @param {Boolean} noDecimals If the number should be displayed without decimals
  * @returns {String} formated currency value
  */
-function formatCurrency(value, currency, display) {
+function formatCurrency(value, currency, display, noDecimals) {
 
     'use strict';
 
     value = typeof value === 'string' ? parseFloat(value) : value;
     currency = currency || 'EUR';
     display = display || 'symbol';
+
     var displayNumber = false;
 
     if (display === 'number') {
@@ -615,8 +728,20 @@ function formatCurrency(value, currency, display) {
         displayNumber = true;
     }
 
-    var locales = getCountryAndLocales().locales;
+    const cnl = getCountryAndLocales();
+    let locales = cnl.locales;
+
+    // If locale is Arabic and country is non-Arabic country or non set,
+    if (locale === 'ar' && arabics.indexOf(cnl.country) < 0) {
+        // To avoid Chrome bug, set Egypt as default country.
+        locales = 'ar-EG';
+    }
+
     var options = {'style': 'currency', 'currency': currency, currencyDisplay: display};
+    if (noDecimals) {
+        options = {'style': 'currency', 'currency': currency, currencyDisplay: display, maximumFractionDigits: 0,
+                   minimumFractionDigits: 0};
+    }
 
     var result = value.toLocaleString(locales, options);
 
@@ -655,10 +780,22 @@ function getCountryAndLocales() {
 
     'use strict';
 
-    var country;
+    let country = 'ISO';
+    let locales = '';
 
-    if (u_attr) {
-        country = u_attr.country ? u_attr.country : u_attr.ipcc || 'ISO';
+    // If user logged in and country data is set on Mega, using it.
+    if (u_attr && u_attr.country) {
+        country = u_attr.country;
+        locales = locale + '-' + country;
+    }
+    // Otherwise, try grab country data from browser's navigator.languages
+    else if (navigator.languages) {
+
+        locales = navigator.languages.filter(l => l !== locale && l.startsWith(locale))[0];
+
+        if (locales) {
+            country = locales.replace(`${locale}-`, '');
+        }
     }
 
     // cnl is exist and has same country as u_attr return cached version.
@@ -666,7 +803,7 @@ function getCountryAndLocales() {
         return $.cnl;
     }
 
-    var locales = mega.intl.test(locale + '-' + country) || mega.intl.test(locale) || 'ISO';
+    locales = mega.intl.test(locales) || mega.intl.test(locale) || 'ISO';
 
     return $.cnl = {country: country, locales: locales};
 }
@@ -860,6 +997,11 @@ mBroadcaster.once('boot_done', function populate_l() {
     l[1993] = l[1993].replace('[A]', '<a href="/register" class="clickurl">').replace('[/A]', '</a>');
 
     l[5931] = l[5931].replace('[A]', '<a href="/fm/account" class="clickurl">').replace('[/A]', '</a>');
+    l[6216] = l[6216]
+        .replace('[A1]', '<a href="/fm/account/security/change-email" class="clickurl">')
+        .replace('[/A1]', '</a>')
+        .replace('[A2]', '<a href="mailto:support@mega.nz">')
+        .replace('[/A2]', '</a>');
     l[6976] = l[6976].replace('%1', '<span class="plan-name"></span>');
     l[7156] = l[7156].replace('[A]', '<a href="/mobile" class="clickurl">').replace('[/A]', '</a>');
     l[7002] = l[7002].replace('[A]', '<a href="/contact" class="clickurl">').replace('[/A]', '</a>');
@@ -997,12 +1139,12 @@ mBroadcaster.once('boot_done', function populate_l() {
 
     l[12439] = l[12439].replace('[A1]', '').replace('[/A1]', '').replace('[A2]', '').replace('[/A2]', '');
 
-    l[16865] = escapeHTML(l[16865]).replace('[A]', '<a href="/sync" class="clickurl">').replace('[/A]', '</a>');
-    l[16866] = escapeHTML(l[16866]).replace('[A]', '<a href="/sync" class="clickurl">').replace('[/A]', '</a>');
-    l[16870] = escapeHTML(l[16870]).replace('[A]', '<a href="/sync" class="clickurl">').replace('[/A]', '</a>');
-    l[16883] = escapeHTML(l[16883]).replace('[A]', '<a href="/sync" class="clickurl">').replace('[/A]', '</a>');
+    l[16865] = escapeHTML(l[16865]).replace('[A]', '<a href="/desktop" class="clickurl">').replace('[/A]', '</a>');
+    l[16866] = escapeHTML(l[16866]).replace('[A]', '<a href="/desktop" class="clickurl">').replace('[/A]', '</a>');
+    l[16870] = escapeHTML(l[16870]).replace('[A]', '<a href="/desktop" class="clickurl">').replace('[/A]', '</a>');
+    l[16883] = escapeHTML(l[16883]).replace('[A]', '<a href="/desktop" class="clickurl">').replace('[/A]', '</a>');
     l[17793] = escapeHTML(l[17793])
-        .replace('[A1]', '<a href="/sync" class="clickurl">').replace('[/A1]', '</a>')
+        .replace('[A1]', '<a href="/desktop" class="clickurl">').replace('[/A1]', '</a>')
         .replace('[A2]', '<a href="/extensions" class="clickurl">').replace('[/A2]', '</a>')
         .replace('[A3]', '<a class="freeupdiskspace">').replace('[/A3]', '</a>');
 
@@ -1088,6 +1230,8 @@ mBroadcaster.once('boot_done', function populate_l() {
     l[20195] = l[20195].replace('[B]', '<b>').replace('[/B]', '</b>');
     l[23708] = l[23708].replace('[B]', '').replace('[/B]', '');
     l[23709] = l[23709].replace('[B]', '').replace('[/B]', '');
+    l['23789.s'] = escapeHTML(l[23789]).replace('%1', '<span></span>');
+    l['23790.s'] = escapeHTML(l[23790]).replace('%1', '<span></span>');
 
     // Mobile only
     if (is_mobile) {
@@ -1122,9 +1266,9 @@ mBroadcaster.once('boot_done', function populate_l() {
         + 'href="https://mega.nz/SecurityWhitepaper.pdf">').replace('[/A2]', '</a>');
     l[20607] = l[20607].replace('[A1]', '<a class="clickurl" href="/mobile">')
         .replace('[/A1]', '</a>');
-    l[20607] = l[20607].replace('[A2]', '<a class="clickurl" href="/sync">')
+    l[20607] = l[20607].replace('[A2]', '<a class="clickurl" href="/desktop">')
         .replace('[/A2]', '</a>');
-    l[20609] = l[20609].replace('[A]', '<a class="clickurl" href="/sync">').replace('[/A]', '</a>');
+    l[20609] = l[20609].replace('[A]', '<a class="clickurl" href="/desktop">').replace('[/A]', '</a>');
     l[20846] = l[20846]
         .replace('[A]', '<a href="https://mega.nz/linux/MEGAsync/" target="_blank" class="download-all-link">')
         .replace('[/A]', '</a>');
@@ -1210,11 +1354,20 @@ mBroadcaster.once('boot_done', function populate_l() {
     l['23062.k'] = l[23062].replace('[%s]', l[7049]);
     l[23066] = l[23066].replace('[A]', '<a class="clickurl" href="/security" '
         + 'target="_blank" rel="noopener noreferrer">').replace('[/A]', '</a>');
+    l[23067] = l[23067].replace('[S]', '<span class="num">').replace('[/S]', '</span>')
+        .replace('%1', '<span></span>');
+    l[23068] = l[23068].replace('[S]', '<span class="num">').replace('[/S]', '</span>')
+        .replace('%1', '<span></span>');
+    l[23069] = l[23069].replace('[S]', '<span class="num">').replace('[/S]', '</span>')
+        .replace('%1', '<span></span>');
+    l.about_countries_info_text = l.about_countries_info_text
+        .replace('[S]', '<span class="num">').replace('[/S]', '</span>')
+        .replace('%1', '<span></span>');
     l[23075] = l[23075].replace('[A1]', '<a class="clickurl" href="/terms" '
         + 'target="_blank" rel="noopener noreferrer">').replace('[/A1]', '</a>')
         .replace('[A2]', '<a class="clickurl" href="/takedown" '
             + 'target="_blank" rel="noopener noreferrer">').replace('[/A2]', '</a>')
-        .replace('[A3]', `<a href="${getBaseUrl()}/blog/transparency-report-2019" `
+        .replace('[A3]', `<a href="https://mega.io/Mega_Transparency_Report_September_2021.pdf" `
             + 'target="_blank" rel="noopener noreferrer">').replace('[/A3]', '</a>');
     l[23120] = escapeHTML(l[23120].replace(/&quot;|"/g, '%1')).replace(/%1/g, '"');
     l[23126] = escapeHTML(l[23126].replace(/&quot;|"/g, '%1')).replace(/\[BR]/g, '<br/>').replace(/%1/g, '"');
@@ -1269,9 +1422,8 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[/A]', '</a>');
     l[23446] = escapeHTML(l[23446]).replace(/\[S]/g, '<strong>').replace(/\[\/S]/g, '</strong>');
     l[23447] = escapeHTML(l[23447]).replace(/\[S]/g, '<strong>').replace(/\[\/S]/g, '</strong>');
-    l[23448] = escapeHTML(l[23448]).replace('[A1]', '<a href="" class="red a1">').replace('[/A1]', '</a>')
-        .replace('[A2]', '<a href="" class="red a2">').replace('[/A2]', '</a>')
-        .replace('[A3]', '<a href="" class="red a3">').replace('[/A3]', '</a>');
+    l[23448] = escapeHTML(l[23448]).replace('[A1]', '<a href="" class="red a1"></a>')
+        .replace('[A2]', '<a href="" class="red a2"></a>');
     l[23449] = escapeHTML(l[23449]).replace(/\[R\/]/g, '<sup>&reg;</sup>');
     l[24074] = escapeHTML(l[24074]).replace('[A]', '<a>').replace('[/A]', '</a>');
     l[24141] = escapeHTML(l[24141])
@@ -1312,19 +1464,27 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[BR]', '<br>');
     l.bsn_calc_total = escapeHTML(l.bsn_calc_total)
         .replace('[S]', '<span>')
-        .replace('[/S]', '</span>');
+        .replace('[/S]', '</span>')
+        .replace('%1', '');
     l.bsn_page_plan_price = escapeHTML(l.bsn_page_plan_price)
         .replace('[S]', '<span>')
-        .replace('[/S]', '</span>');
+        .replace('[/S]', '</span>')
+        .replace('%1', '');
+    l.bsn_plan_users = escapeHTML(l.bsn_plan_users).replace('%1', '<span></span>');
+    l.bsn_plan_storage = escapeHTML(l.bsn_plan_storage).replace('%1', '<span></span>');
+    l.bsn_plan_transfer = escapeHTML(l.bsn_plan_transfer).replace('%1', '<span></span>');
     l.bsn_plan_more_users = escapeHTML(l.bsn_plan_more_users)
         .replace('[B]', '<strong>')
-        .replace('[/B]', '</strong>');
+        .replace('[/B]', '</strong>')
+        .replace('%1', '');
     l.bsn_plan_more_storage = escapeHTML(l.bsn_plan_more_storage)
         .replace('[B]', '<strong>')
-        .replace('[/B]', '</strong>');
+        .replace('[/B]', '</strong>')
+        .replace('%1', '');
     l.bsn_plan_more_transfer = escapeHTML(l.bsn_plan_more_transfer)
         .replace('[B]', '<strong>')
-        .replace('[/B]', '</strong>');
+        .replace('[/B]', '</strong>')
+        .replace('%1', '');
     l.bsn_versioning_info = escapeHTML(l.bsn_versioning_info)
         .replace('[S]', '<span>')
         .replace('[/S]', '</span>')
@@ -1355,7 +1515,69 @@ mBroadcaster.once('boot_done', function populate_l() {
             `accounts#how-does-mega-pro-account-subscription-work-with-apple-in-app-purchases` +
             `-57732e9f886688e7028b45bd">`)
         .replace('[/A3]', '</a>');
+    l.redeem_etoomany = l.redeem_etoomany
+        .replace('[A]', `<a class="clickurl" href="/support">`)
+        .replace('[/A]', '</a>');
+    l.extensions_top_btn_info = escapeHTML(l.extensions_top_btn_info).replace(/\[R\/]/g, '<sup>&reg;</sup>');
+    l.extensions_avbl_desktop = escapeHTML(l.extensions_avbl_desktop).replace('[A1]', '<a href="" class="red a1"></a>');
+    l.extensions_avbl_mobile = escapeHTML(l.extensions_avbl_mobile).replace(/\[S]/g, '<strong>')
+        .replace(/\[\/S]/g, '</strong>');
+    l.cookie_banner_txt = escapeHTML(l.cookie_banner_txt)
+        .replace('[A]', '<a href="/cookie" class="clickurl" target="_blank">')
+        .replace('[/A]', '</a>');
+    l.payment_card_almost_exp = l.payment_card_almost_exp
+        .replace('[A]', '<a>').replace('[/A]', '</a>');
+    l.payment_card_exp = l.payment_card_exp
+        .replace('[A]', '<a>').replace('[/A]', '</a>');
 
+    l.ri_s4_header = l.ri_s4_header
+        .replace('[A1]', '<h1>')
+        .replace('[/A1]', '</h1>')
+        .replace('[A2]', '<h2>')
+        .replace('[/A2]', '</h2>');
+    l.ri_s4_subheader = l.ri_s4_subheader
+        .replace('%1', '&#8364 1,000')
+        .replace('[B]', '<strong>')
+        .replace('[/B]', '</strong>');
+    l.ri_s4_card1_desc = l.ri_s4_card1_desc
+        .replace('[B]', '<strong>')
+        .replace('[/B]', '</strong>');
+    l.ri_s4_card3_desc = l.ri_s4_card3_desc
+        .replace('[B]', '<strong>')
+        .replace('[/B]', '</strong>');
+    l.ri_s4_card4_desc = l.ri_s4_card4_desc
+        .replace('%1', '&#8364 2.99')
+        .replace('[B]', '<strong>')
+        .replace('[/B]', '</strong>');
+    l.ri_s4_card5_desc = l.ri_s4_card5_desc
+        .replace('[B]', '<strong>')
+        .replace('[/B]', '</strong>');
+    l.ri_s4_betat_header = l.ri_s4_betat_header
+        .replace('%1', '&#8364 1,000');
+    l.ri_s4_regf_q6_ans1 = l.ri_s4_regf_q6_ans1
+        .replace('[B]', '<strong>')
+        .replace('[/B]', '</strong>');
+    l.ri_s4_regf_q6_ans2 = l.ri_s4_regf_q6_ans2
+        .replace('[B]', '<strong>')
+        .replace('[/B]', '</strong>');
+    l.ri_s4_regf_success = l.ri_s4_regf_success
+        .replace('[BR]', '<br>');
+    l.about_vision_desc = escapeHTML(l.about_vision_desc)
+        .replace(/\[S]/g, '<span>')
+        .replace(/\[\/S]/g, '</span>');
+    l.about_vision_title = escapeHTML(l.about_vision_title)
+        .replace(/\[S]/g, '<span>')
+        .replace(/\[\/S]/g, '</span>');
+    l.about_contributors = escapeHTML(l.about_contributors)
+        .replace(/\[S]/g, '<span>')
+        .replace(/\[\/S]/g, '</span>');
+    // cant reduce size
+    l.jobs_opportunity_invert_card_desc = escapeHTML(l.jobs_opportunity_invert_card_desc)
+        .replace(/\[BR]/g, '<br>');
+    l.jobs_grow_invert_card_desc = escapeHTML(l.jobs_grow_invert_card_desc)
+        .replace('[BR]', '<br>');
+    l.about_job_expressions_txt = escapeHTML(l.about_job_expressions_txt)
+        .replace('[BR]', '<br>');
     var common = [
         15536, 16106, 16107, 16119, 16120, 16123, 16124, 16135, 16136, 16137, 16138, 16304, 16313, 16315, 16316,
         16341, 16358, 16359, 16360, 16361, 16375, 16382, 16383, 16384, 16394, 18228, 18423, 18425, 18444, 18268,
@@ -1443,10 +1665,14 @@ lazy(mega, 'intl', function _() {
     /** @property mega.intl.locale */
     lazy(ns, 'locale', function() {
         const locale = window.locale || window.lang;
-        const country = window.u_attr && (u_attr.country || u_attr.ipcc) || mega.ipcc;
+        let navLocales;
+
+        if (navigator.languages) {
+            navLocales = navigator.languages.filter(l => l !== locale && l.startsWith(locale))[0];
+        }
 
         // @todo Polyfill Intl.Locale() and return an instance of it instead?
-        return this.test(locale + '-' + country) || this.test(locale) || 'en';
+        return this.test(navLocales) || this.test(locale) || 'en';
     });
 
     /** @function mega.intl.get */

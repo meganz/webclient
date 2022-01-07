@@ -1,11 +1,11 @@
 import React from 'react';
-import {ContactAwareComponent} from '../../stores/mixins.js';
-import {MegaRenderMixin} from '../../stores/mixins.js';
+import {ContactAwareComponent} from '../mixins';
+import {MegaRenderMixin} from '../mixins';
 import utils from '../../ui/utils.jsx';
 import { PerfectScrollbar } from '../../ui/perfectScrollbar.jsx';
 import { Button } from '../../ui/buttons.jsx';
 import { Dropdown, DropdownItem } from '../../ui/dropdowns.jsx';
-import Call from './meetings/call.jsx';
+import ContactsPanel from './contactsPanel/contactsPanel.jsx';
 
 export const MAX_FREQUENTS = 3;
 const EMPTY_ARR = [];
@@ -78,7 +78,7 @@ export class ContactButton extends ContactAwareComponent {
 
         var moreDropdowns = [];
 
-        var username = M.getNameByHandle(contact.u);
+        var username = <utils.EmojiFormattedContent>{M.getNameByHandle(contact.u)}</utils.EmojiFormattedContent>;
 
         var onContactClicked = function() {
             if (contact.c === 2) {
@@ -208,7 +208,7 @@ export class ContactButton extends ContactAwareComponent {
             moreDropdowns.push(
                 <DropdownItem
                     key="view2"
-                    icon="sprite-fm-mono icon-add-filled"
+                    icon="sprite-fm-mono icon-add"
                     label={l[101] /* `Add Contact` */}
                     onClick={() => {
                         const isAnonymousUser = (!u_handle || u_type !== 3);
@@ -695,6 +695,7 @@ export class ContactCard extends ContactAwareComponent {
         if (contact.u === u_handle) {
             username += " (" + escapeHTML(l[8885]) + ")";
         }
+        username = <utils.EmojiFormattedContent>{username}</utils.EmojiFormattedContent>;
         var dropdowns = this.props.dropdowns ? this.props.dropdowns : [];
         var noContextMenu = this.props.noContextMenu ? this.props.noContextMenu : "";
         var noContextButton = this.props.noContextButton ? this.props.noContextButton : "";
@@ -852,7 +853,10 @@ export class ContactItem extends ContactAwareComponent {
             </div>
             <Avatar contact={contact} className="avatar-wrapper small-rounded-avatar" hideVerifiedBadge={true}
                 chatRoom={this.props.chatRoom} />
-            <div className="user-card-data">
+            <div
+                className="user-card-data simpletip"
+                data-simpletip={username}
+                data-simpletipposition="top">
                 <ContactButton
                     noContextMenu={this.props.noContextMenu}
                     contact={contact}
@@ -1270,6 +1274,7 @@ export class ContactPickerWidget extends MegaRenderMixin {
                                 <Button
                                     className={`
                                         ${className || ''}
+                                        ${key === 'newChatLink' ? 'branded-blue' : ''}
                                         mega-button
                                         round
                                     `}
@@ -1416,9 +1421,6 @@ export class ContactPickerWidget extends MegaRenderMixin {
         }
         else {
             contactsList = <div className="chat-contactspicker-no-contacts">
-                <div className="contacts-list-header">
-                    {l[165]}
-                </div>
                 <div className="section-icon sprite-fm-mono icon-contacts"></div>
                 <div className="fm-empty-cloud-txt small">{l[784]}</div>
                 <div className="fm-empty-description small">{l[19115]}</div>
@@ -1455,39 +1457,42 @@ export class ContactPickerWidget extends MegaRenderMixin {
                 {topButtons}
                 {multipleContacts}
                 {!this.props.readOnly && haveContacts && (
-                    <div
-                        className={`
-                            contacts-search-header
-                            ${this.props.headerClasses}
-                        `}>
-                        <i className="sprite-fm-mono icon-preview-reveal"/>
-                        <input
-                            autoFocus
-                            type="search"
-                            placeholder={searchPlaceholderMsg}
-                            ref={nodeRef => {
-                                this.contactSearchField = nodeRef;
-                            }}
-                            onChange={this.onSearchChange}
-                            value={this.state.searchValue}
-                        />
+                    <>
                         <div
                             className={`
-                                search-result-clear
-                                ${this.state.searchValue && this.state.searchValue.length > 0 ? '' : 'hidden'}
-                            `}
-                            onClick={() => {
-                                this.setState({ searchValue: '' }, () =>
-                                    this.contactSearchField.focus()
-                                );
-                            }}>
-                            <i className="sprite-fm-mono icon-close-component"/>
+                                contacts-search-header
+                                ${this.props.headerClasses}
+                            `}>
+                            <i className="sprite-fm-mono icon-preview-reveal"/>
+                            <input
+                                autoFocus
+                                type="search"
+                                placeholder={searchPlaceholderMsg}
+                                ref={nodeRef => {
+                                    this.contactSearchField = nodeRef;
+                                }}
+                                onChange={this.onSearchChange}
+                                value={this.state.searchValue}
+                            />
+                            <div
+                                className={`
+                                    search-result-clear
+                                    ${this.state.searchValue && this.state.searchValue.length > 0 ? '' : 'hidden'}
+                                `}
+                                onClick={() => {
+                                    this.setState({ searchValue: '' }, () =>
+                                        this.contactSearchField.focus()
+                                    );
+                                }}>
+                                <i className="sprite-fm-mono icon-close-component"/>
+                            </div>
                         </div>
-                    </div>
+                        <div className="contacts-search-header-separator" />
+                    </>
                 )}
                 {contactsList}
                 {selectFooter}
-                {this.props.showAddContact && (
+                {ContactsPanel.hasContacts() && this.props.showAddContact && (
                     <div className="contacts-search-bottom">
                         <Button
                             className="mega-button action positive"

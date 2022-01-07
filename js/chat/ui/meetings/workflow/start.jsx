@@ -1,5 +1,5 @@
 import React from 'react';
-import { MegaRenderMixin } from '../../../../stores/mixins';
+import { MegaRenderMixin } from '../../../mixins';
 import ModalDialogsUI from '../../../../ui/modalDialogs.jsx';
 import Button from '../button.jsx';
 import Preview from './preview.jsx';
@@ -29,8 +29,7 @@ export class Start extends MegaRenderMixin {
 
     constructor(props) {
         super(props);
-        // TODO: look into how it's best to construct the topic dynamically, re: translation specifics
-        this.state.topic = `${M.getNameByHandle(u_handle)}'s meeting`;
+        this.state.topic = l.default_meeting_topic.replace('%NAME', M.getNameByHandle(u_handle));
     }
 
     handleChange = ev => this.setState({ topic: ev.target.value });

@@ -248,10 +248,6 @@ body.rtl .achievement-page * {
         display: none;
     }
 
-    .achievement-page .storage-block .item.hidden {
-        display: none;
-    }
-
     @media only screen and (max-width: 984px) {
 
         .achievement-page .storage-block h2 {

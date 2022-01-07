@@ -1,6 +1,6 @@
 var React = require("react");
 var utils = require("./utils.jsx");
-import {MegaRenderMixin} from "../stores/mixins.js";
+import {MegaRenderMixin} from "../chat/mixins";
 var DropdownsUI = require('./dropdowns.jsx');
 var PerfectScrollbar = require('./perfectScrollbar.jsx').PerfectScrollbar;
 

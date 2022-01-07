@@ -5,7 +5,7 @@ const path = require("path");
 
 const cwd = process.cwd();
 const debug = process.env.DEBUG;
-const basename = p => p.replace(/^.*\//, '');
+const basename = p => p.replace(/\\+/g, '/').replace(/^.*\//, '');
 
 const rebaseURLs = true;
 const usePostCSS = true;
@@ -245,11 +245,11 @@ var Secureboot = function() {
                     for (var j in rscs) {
                         var f = rscs[j];
 
-                        if (f.j == 1) {
+                        if (f.j === 1 || f.j === 5) {
                             f.n = j;
                             js[group].push(f);
                         }
-                        else if (f.j == 2) {
+                        else if (f.j === 2) {
                             f.n = j;
                             css[group].push(f);
                         }
@@ -260,6 +260,7 @@ var Secureboot = function() {
                 }
 
                 var jsl3_new = {};
+                var jsl3_singleBundle = {webgl: 5};
                 [js, css].forEach(function(r) {
                     var length;
                     var content;
@@ -278,7 +279,7 @@ var Secureboot = function() {
                             jsl3_new[g][name] = {
                                 f: filename,
                                 n: name,
-                                j: (pfx[0] == 'c') + 1,
+                                j: jsl3_singleBundle[g] || ((pfx[0] === 'c') + 1),
                                 w: Math.round((length/fileLimit)*30)
                             };
                             content = [];
@@ -294,6 +295,10 @@ var Secureboot = function() {
 
                         for (var i = 0; i < nn.length; i++) {
                             var f    = nn[i];
+                            if (jsl3_singleBundle[g]) {
+                                content.push(fs.readFileSync(f.f).toString());
+                                continue;
+                            }
                             var size = fs.statSync(f.f).size;
                             if (length + size > fileLimit) {
                                 write(g);
@@ -517,12 +522,15 @@ var Secureboot = function() {
     return ns;
 }();
 
-const log = console.log;
-console.log = function(s) {
-    if (s && s[0] !== '>') {
-        log.apply(console, arguments);
-    }
-};
+const stdout = process.stdout;
+const write = stdout.write;
+if (!debug) {
+    stdout.write = function(s) {
+        if (s && !String(s).includes('.css\x1b[39m created.')) {
+            write.apply(stdout, arguments);
+        }
+    };
+}
 
 const [postTaskFinalizer, postHtmlTreeWalker, postHtmlURLRebase, postCssURLRebase] = (() => {
     'use strict';
@@ -878,7 +886,7 @@ module.exports = function(grunt) {
                 },
                 get files() {
                     if (!concatGroups) {
-                        console.log = log;
+                        stdout.write = write;
                         postTaskFinalizer();
                         concatGroups = Secureboot.getGroups(true);
                     }
@@ -886,18 +894,24 @@ module.exports = function(grunt) {
                 },
             }
         },
-        htmljson: {
-            required: {
-                src: Secureboot.getHTML(),
-                dest: "html/templates.json",
-            },
-            /*
-            extra: {
-                src: rules.htmlExtra,
-                dest: "html/extra.json",
-            },
-            */
-        },
+    });
+
+    grunt.registerTask('htmljson', () => {
+        const res = {};
+        const exclude = {embedplayer: 1};
+        const files = Secureboot.getHTML().sort();
+
+        for (let i = files.length; i--;) {
+            const file = files[i];
+            const name = basename(file).split('.')[0];
+
+            if (!exclude[name]) {
+                res[name] = fs.readFileSync(path.join(cwd, file)).toString('utf-8');
+            }
+        }
+
+        // @todo split mobile/desktop files.
+        fs.writeFileSync(path.join(cwd, 'html', 'templates.json'), JSON.stringify(res));
     });
 
     grunt.registerTask('cleanup', () => {
@@ -919,7 +933,6 @@ module.exports = function(grunt) {
         }
     });
 
-    grunt.loadNpmTasks('grunt-htmljson');
     grunt.loadNpmTasks('grunt-contrib-concat');
 
     // Default task(s).

@@ -2,19 +2,22 @@
         selection-status-bar
 \* =============================== */
 .selection-status-bar {
-    background-color: var(--surface-grey-2);
+    background-color: var(--stroke-grey-2);
     height: 64px;
     padding: 6px 12px;
     box-sizing: border-box;
     cursor: default;
     flex-shrink: 0;
-    border-left: 2px solid var(--surface-main);
+    border-left: 2px solid var(--stroke-main);
 }
 .rtl .selection-status-bar {
     display: rtl;
 }
 .search .selection-status-bar {
     display: none;
+}
+.search-multi .selection-status-bar {
+    display: block;
 }
 .fm-right-files-block.item-selected .selection-status-bar {
     margin-bottom: 0;
@@ -26,8 +29,8 @@
 
 .selection-status-bar .selection-bar-col span {
     display: inline-block;
-    color: var(--surface-main-inverted);
-    background-color: var(--surface-main);
+    color: var(--stroke-main-inverted);
+    background-color: var(--stroke-main);
     height: 28px;
     text-align: center;
     -webkit-margin-start: 10px;
@@ -71,12 +74,13 @@
 /* =============================== *\
         Temp Buttons
 \* =============================== */
-.btn-myfiles {
+.btn-myfiles,
+.btn-galleries {
     border-radius: 4px;
     box-sizing: border-box;
     cursor: pointer;
     opacity: 0.7;
-    color: var(--surface-main-inverted);
+    color: var(--stroke-main-inverted);
     width: 100%;
     margin: 2px 0;
     border: none;
@@ -92,31 +96,44 @@
     text-overflow: ellipsis;
     white-space: nowrap;
 }
-
-.btn-myfiles i {
+.btn-galleries {
+    -webkit-padding-start: 4px;
+    padding-inline-start: 4px;
+}
+.btn-myfiles i,
+.btn-galleries i {
     -webkit-margin-end: 8px;
     margin-inline-end: 8px;
     margin-top: 4px;
     --icon-size: 24px;
     line-height: 32px;
     float: left;
-    --mask-color: var(--surface-main-inverted);
+    --mask-color: var(--stroke-main-inverted);
 }
-.rtl .btn-myfiles i {
+.btn-myfiles.active i:not(.icon-arrow-down),
+.btn-galleries.active i:not(.icon-arrow-down) {
+    --mask-color: var(--secondary-blue);
+}
+.rtl .btn-myfiles i,
+.rtl .btn-galleries i {
     float: right;
 }
 
 .btn-myfiles:hover,
-.btn-myfiles.active {
+.btn-myfiles.active,
+.btn-galleries:hover,
+.btn-galleries.active {
     cursor: pointer;
-    color: var(--surface-main-inverted);
-    background-color: var(--surface-grey-1);
+    color: var(--stroke-main-inverted);
+    background-color: var(--stroke-grey-1);
     box-shadow: 0 1px 4px 0 rgba(0,0,0,0.1);
 }
-.btn-myfiles.active {
+.btn-myfiles.active,
+.btn-galleries.active {
     opacity: 1;
 }
-.btn-myfiles span {
+.btn-myfiles span,
+.btn-galleries span {
     -webkit-margin-end: 8px;
     margin-inline-end: 8px;
 }

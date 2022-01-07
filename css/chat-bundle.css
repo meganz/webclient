@@ -80,29 +80,6 @@
   bottom: -9999px;
   visibility: hidden;
 }
-.meetings-call .stream .stream-controls ul li button .active-indicator {
-  position: absolute;
-  top: -1px;
-  right: 2px;
-  width: 12px;
-  height: 12px;
-  border-radius: 200px;
-  background: #88FF5B;
-}
-.meetings-call .stream .stream-controls .button-group {
-  position: relative;
-}
-.meetings-call .stream .stream-controls .button-group-menu {
-  display: none;
-  position: absolute;
-  transform: translateY(-100%);
-}
-.meetings-call .stream .stream-controls .button-group-menu.expanded {
-  display: block;
-}
-.meetings-call .stream .stream-controls .button-group-menu .button-group-item {
-  margin: 0 0 10px 0;
-}
 .meetings-call .stream .stream-controls .stream-debug {
   /* [...] */
 }
@@ -168,13 +145,14 @@
 .meetings-call .stream .sidebar-controls ul span.participants-count {
   right: -3px;
   bottom: -4px;
-  line-height: 17px;
+  line-height: 21px;
   color: var(--text-color-black-high);
   background: var(--secondary-white);
 }
 .meetings-call .stream .participants-notice {
   width: 460px;
   margin: 0 auto;
+  backdrop-filter: blur(10px);
 }
 .meetings-call .stream .participants-notice.user-alone {
   margin-top: -140px;
@@ -423,7 +401,7 @@
   border-radius: 4px;
   text-align: center;
   font: var(--text-body2);
-  line-height: 15px;
+  line-height: 16px;
   background: var(--secondary-blue);
   color: var(--secondary-white);
 }
@@ -737,6 +715,10 @@
   visibility: hidden;
 }
 
+.local-stream-mirrored video {
+  transform: scaleX(-1);
+}
+
 .mode {
   float: left;
 }
@@ -981,7 +963,7 @@
 .stream-node:after {
   content: "";
   display: block;
-  padding-top: calc(9/16 * 100%);
+  padding-top: 56.25%;
 }
 .stream-node:hover .node-menu {
   display: block;
@@ -1180,6 +1162,15 @@
   box-shadow: var(--dropdown-shadow);
   z-index: 1;
 }
+.local-stream .local-stream-options.options-top {
+  top: -50%;
+  transform: none;
+}
+.local-stream .local-stream-options.options-bottom {
+  top: 30%;
+  left: 10px;
+  transform: none;
+}
 .local-stream .local-stream-options ul {
   margin: 0;
   padding: 0;
@@ -1226,6 +1217,12 @@
 }
 .local-stream.minimized {
   z-index: 1000;
+  width: 320px;
+  height: 240px;
+}
+.local-stream.minimized.ratio-16-9 {
+  width: 334px;
+  height: 188px;
 }
 .local-stream.minimized:hover .local-stream-overlay, .local-stream.minimized.active .local-stream-overlay {
   display: block;
@@ -1250,15 +1247,18 @@
   background: linear-gradient(to bottom, rgba(0, 0, 0, 0.6) 0, rgba(0, 0, 0, 0) 100%);
 }
 .local-stream.minimized .local-stream-overlay .local-stream-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   position: absolute;
-  top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%);
+  bottom: 20px;
+  transform: translate(-50%);
   width: 100%;
   text-align: center;
 }
 .local-stream.minimized .local-stream-overlay .local-stream-controls button {
-  margin: 0 32px 0 0;
+  margin: 0 24px 0 0;
 }
 .local-stream.minimized .local-stream-overlay .local-stream-controls button:last-child {
   margin-right: 0;
@@ -1270,6 +1270,13 @@
 .local-stream.minimized .local-stream-overlay .local-stream-controls button.end-call {
   background: #ff6863;
   background: linear-gradient(0deg, #ff6863 0%, #ff9c97 100%);
+}
+.local-stream.minimized .local-stream-overlay .local-stream-controls .button-group {
+  margin-right: 24px;
+}
+.local-stream.minimized .local-stream-overlay .local-stream-controls .button-group .active-indicator {
+  top: -1px;
+  right: 2px;
 }
 .local-stream.minimized .local-stream-notifications {
   position: absolute;
@@ -1327,6 +1334,35 @@
   border-radius: 24px;
   background: transparent;
   border: 0 none;
+}
+
+.stream-controls .button-group,
+.local-stream-controls .button-group {
+  position: relative;
+}
+.stream-controls .button-group-menu,
+.local-stream-controls .button-group-menu {
+  display: none;
+  position: absolute;
+  transform: translateY(-100%);
+}
+.stream-controls .button-group-menu.expanded,
+.local-stream-controls .button-group-menu.expanded {
+  display: block;
+}
+.stream-controls .button-group-menu .button-group-item,
+.local-stream-controls .button-group-menu .button-group-item {
+  margin: 0 0 10px 0;
+}
+.stream-controls .button-group .active-indicator,
+.local-stream-controls .button-group .active-indicator {
+  position: absolute;
+  top: -1px;
+  right: 2px;
+  width: 12px;
+  height: 12px;
+  border-radius: 200px;
+  background: #88FF5B;
 }
 
 .start-meeting {
@@ -1408,16 +1444,6 @@
 .join-meeting-head {
   text-align: center;
 }
-.join-meeting-head h1 {
-  margin: 24px 0 88px 0;
-}
-@media only screen and (max-height: 600px) {
-  .join-meeting-head h1 {
-    font: var(--text-h2);
-    margin-top: 14px;
-    margin-bottom: 18px;
-  }
-}
 .join-meeting-head .join-meeting-logo {
   /* [...] */
 }
@@ -1427,7 +1453,27 @@
   width: 195px;
   height: 65px;
 }
+.join-meeting-head h1 {
+  margin: 24px 0 0 0;
+}
+@media only screen and (max-height: 600px) {
+  .join-meeting-head h1 {
+    font: var(--text-h2);
+    margin-top: 14px;
+    margin-bottom: 18px;
+  }
+}
+.join-meeting-head .ephemeral-info {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--label-orange);
+}
+.join-meeting-head .ephemeral-info p {
+  padding: 0 0 0 10px;
+}
 .join-meeting-content {
+  margin: 88px 0 0 0;
   text-align: center;
 }
 .join-meeting-content button {
@@ -1494,7 +1540,7 @@
   position: relative;
   width: 800px;
   height: 300px;
-  margin: 0 auto;
+  margin: 88px auto 0;
   box-sizing: border-box;
   box-shadow: 0 1px 10px 0 rgba(0, 0, 0, 0.1);
   border-radius: 30px;

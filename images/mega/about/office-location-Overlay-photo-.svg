@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="816px" height="549px" viewBox="0 0 816 549" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>Overlay-BlackroomPortraits</title>
+    <defs>
+        <rect id="path-1" x="0" y="0" width="816" height="549"></rect>
+        <radialGradient cx="50%" cy="50.0233897%" fx="50%" fy="50.0233897%" r="53.5048758%" gradientTransform="translate(0.500000,0.500234),scale(0.843783,1.000000),rotate(51.401525),translate(-0.500000,-0.500234)" id="radialGradient-3">
+            <stop stop-color="#000000" stop-opacity="0.706233098" offset="0%"></stop>
+            <stop stop-color="#000000" offset="0.0467793925%"></stop>
+            <stop stop-color="#000000" stop-opacity="0.0603624891" offset="100%"></stop>
+        </radialGradient>
+        <radialGradient cx="44.1162829%" cy="38.4746437%" fx="44.1162829%" fy="38.4746437%" r="52.5884481%" id="radialGradient-4">
+            <stop stop-color="#000000" offset="0%"></stop>
+            <stop stop-color="#000000" stop-opacity="0" offset="100%"></stop>
+        </radialGradient>
+    </defs>
+    <g id="Final-About-MEGA-web" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="about/_Desktop_1440px" transform="translate(-100.000000, -4367.000000)">
+            <g id="Overlay-BlackroomPortraits" transform="translate(100.000000, 4367.000000)">
+                <mask id="mask-2" fill="white">
+                    <use xlink:href="#path-1"></use>
+                </mask>
+                <g id="Mask" opacity="0.7" style="mix-blend-mode: multiply;"></g>
+                <ellipse id="Oval" fill="url(#radialGradient-3)" style="mix-blend-mode: darken;" mask="url(#mask-2)" cx="-7.5" cy="-31" rx="470.5" ry="397"></ellipse>
+                <circle id="Oval" fill="url(#radialGradient-4)" opacity="0.7" mask="url(#mask-2)" cx="137" cy="86" r="408"></circle>
+                <circle id="Oval-Copy-2" fill="url(#radialGradient-4)" opacity="0.7" mask="url(#mask-2)" cx="711" cy="774" r="408"></circle>
+            </g>
+        </g>
+    </g>
+</svg>

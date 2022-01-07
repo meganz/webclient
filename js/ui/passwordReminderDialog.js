@@ -305,7 +305,7 @@
 
             var skipButtonSpan = this.dialog.querySelector('.button-prd-skip span');
             if (skipButtonSpan) {
-                skipButtonSpan.innerText = l[148];
+                skipButtonSpan.innerText = l[967];
                 this.succeeded = true;
             }
         }
@@ -622,6 +622,7 @@
 
 
     PasswordReminderDialog.prototype.resetUI = function() {
+        $('.button-prd-skip span', $(this.dialog)).text(l[1379]);
         if (this.dialog) {
             this.dialog.classList.remove('wrong');
         }
@@ -694,6 +695,9 @@
 
         if (is_mobile) {
             this.dialog.classList.add('overlay');
+            if (page === 'fm/account') {
+                $('.mobile.my-account-page').addClass('hidden');
+            }
         }
         else {
             fm_showoverlay();
@@ -714,6 +718,9 @@
         this.dialog.classList.add('hidden');
         if (is_mobile) {
             this.dialog.classList.remove('overlay');
+            if (page === 'fm/account') {
+                $('.mobile.my-account-page').removeClass('hidden');
+            }
         }
 
         this.resetUI();

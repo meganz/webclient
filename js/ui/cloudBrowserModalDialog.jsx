@@ -1,5 +1,5 @@
 import React from 'react';
-import {MegaRenderMixin} from "../stores/mixins.js";
+import {MegaRenderMixin} from "../chat/mixins";
 import ModalDialogsUI from './modalDialogs.jsx';
 import ViewModeSelector from "./jsx/fm/viewModeSelector.jsx";
 import Breadcrumbs from "./jsx/fm/breadcrumbs.jsx";

@@ -3,8 +3,31 @@ var currsn;     // current *network* sn (not to be confused with the IndexedDB/m
 var fminitialized = false;
 var requesti = makeid(10);
 var folderlink = false;
-var fetcher = null;
-var workerstate;
+var dumpsremaining;
+var residualfm;
+var workers; // worker pool
+var fmdb; // the FM DB engine (cf. mDB.js)
+var ufsc; // global ufs-size-cache instance
+var mclp; // promise waiting for mc to load
+
+Object.defineProperties(window, {
+    // How many nodes are written on a single DB transaction (per table)
+    FMDB_FLUSH_THRESHOLD: {
+        value: parseInt(localStorage.fmdbbl) || 9087
+    },
+    // How many nodes can be awaiting in memory before applying back-pressure.
+    BACKPRESSURE_FMDB_LIMIT: {
+        value: 72696
+    },
+    // How many nodes can be awaiting decryption (per worker) before applying back-pressure.
+    BACKPRESSURE_WORKER_LIMIT: {
+        value: 8192
+    },
+    // Time to wait (in seconds) when applying backpressure
+    BACKPRESSURE_WAIT_TIME: {
+        value: 420 / 1000
+    }
+});
 
 // Set up the MegaLogger's root logger
 MegaLogger.rootLogger = new MegaLogger(
@@ -214,7 +237,6 @@ if (typeof loadingInitDialog === 'undefined') {
 var scq = Object.create(null);           // hash of [actionpacket, [nodes]]
 var scqtail = 0;                         // next scq index to process
 var scqhead = 0;                         // next scq index to write
-var shareworker = Object.create(null);   // which worker knows about which sharekeys?
 var scloadtnodes = false;                // if `t` packet requires nodes in memory
 var scinflight = false;                  // don't run more than one execsc() "thread"
 var sccount = 0;                         // number of actionpackets processed at connection loss
@@ -275,7 +297,7 @@ function sc_fqueuet(scni, packet) {
 }
 
 // fetch from db the queued scfetches
-function sc_fetcher() {
+async function sc_fetcher() {
     "use strict";
 
     if ($.scFetcherRunning) {
@@ -285,81 +307,66 @@ function sc_fetcher() {
         return;
     }
 
-    var queue   = scfetches;
-    var handles = Object.keys(queue);
-    var fsubtree = scfsubtree;
+    const queue = scfetches;
+    const handles = Object.keys(queue);
+    const fsubtree = scfsubtree;
     scfetches = Object.create(null);
     scfsubtree = Object.create(null);
 
     if (!handles.length) {
-        return onIdle(resumesc);
+        return queueMicrotask(resumesc);
     }
     $.scFetcherRunning = true;
 
-    if (d > 1) {
-        console.warn('Retrieving from DB nodes required to parse action-packets...', handles.length, handles);
+    if (d) {
+        console.info('Retrieving from DB nodes required to parse action-packets...', handles);
     }
-    // NB: This shitty logic is in need of urgent review...
-    // debugger
+    // console.time('sc:fetcher');
 
-    (function _proc() {
-        var bunch = handles.splice(0, 8192);
+    while (handles.length) {
+        const bunch = handles.splice(0, 8192);
+        await dbfetch.geta(bunch).catch(dump);
 
-        if (!bunch.length) {
-            onIdle(sc_fetcher);
-            $.scFetcherRunning = false;
-        }
-        else {
-            // finish bunch processing
-            var finish = function() {
-                for (var i = bunch.length; i--;) {
-                    var h = bunch[i];
-                    for (var p = queue[h].length; p--;) {
-                        var scqi = queue[h][p];
-                        if (!--scwaitnodes[scqi]) {
-                            delete scwaitnodes[scqi];
-                        }
+        // Retrieve all needed subtrees and file versions if any, and then finish the batch processing
+        const subtree = new Set();
+
+        for (let i = bunch.length; i--;) {
+            const n = M.d[bunch[i]];
+
+            if (n) {
+                if (n.t) {
+                    if (fsubtree[n.h]) {
+                        // entire subtree
+                        subtree.add(n.h);
                     }
                 }
-
-                onIdle(function _scfr() {
-                    resumesc();
-                    onIdle(_proc);
-                });
-            };
-
-            dbfetch.geta(bunch, new MegaPromise())
-                .always(function() {
-                    // Retrieve all needed subtrees and file versions if any, and then finish the batch processing
-                    var subtree = Object.create(null);
-
-                    for (var i = bunch.length; i--;) {
-                        var h = bunch[i];
-
-                        if (M.d[h]) {
-                            if (M.d[h].t) {
-                                if (fsubtree[h]) {
-                                    // entire subtree
-                                    subtree[h] = 1;
-                                }
-                            }
-                            else if (M.d[h].tvf) {
-                                // file versions
-                                subtree[h] = 1;
-                            }
-                        }
-                    }
-                    subtree = Object.keys(subtree);
-
-                    if (subtree.length) {
-                        dbfetch.tree(subtree, -1, new MegaPromise()).always(finish);
-                    }
-                    else {
-                        finish();
-                    }
-                });
+                else if (n.tvf) {
+                    // file versions
+                    subtree.add(n.h);
+                }
+            }
         }
-    })();
+
+        if (subtree.size) {
+            await dbfetch.tree([...subtree]).catch(dump);
+        }
+
+        for (let i = bunch.length; i--;) {
+            const h = bunch[i];
+            for (let p = queue[h].length; p--;) {
+                const scqi = queue[h][p];
+                if (!--scwaitnodes[scqi]) {
+                    delete scwaitnodes[scqi];
+                }
+            }
+        }
+
+        queueMicrotask(resumesc);
+    }
+    // console.timeEnd('sc:fetcher');
+
+    $.scFetcherRunning = false;
+    queueMicrotask(sc_fetcher);
 }
 
 /**
@@ -373,7 +380,7 @@ function startNodesFetching(scni) {
 
         if (scloadtnodes && scq[scni] && scq[scni][0] && sc_fqueuet(scni)) {
             // fetch required nodes from db
-            sc_fetcher();
+            sc_fetcher().catch(dump);
         }
         else {
             // resume processing, if appropriate and needed
@@ -394,14 +401,15 @@ function sc_packet(a) {
     }
 
     // record history
-    if (sc_history) {
-        sc_history.push(a.a);
-    }
+    // if (sc_history) {
+    //     sc_history.push(a.a);
+    // }
 
     // check if this packet needs nodes to be present,
     // unless `fromapi` where nodes are placed in memory already as received.
-    if (!loadfm.fromapi) {
-        var inflight = $.len(scfetches);
+    // if (!loadfm.fromapi)
+    {
+        const inflight = $.len(scfetches);
 
         scloadtnodes = true;
 
@@ -421,7 +429,7 @@ function sc_packet(a) {
             case 't':
                 // If no workers, all scnodes should be ready
                 // OR the scnodes are ready but not the ap set yet
-                if (!workers || (scq[scqhead] && !scq[scqhead][0])) {
+                if (!decWorkerPool.ok || scq[scqhead] && !scq[scqhead][0]) {
                     sc_fqueuet(scqhead, a);
                 }
                 break;
@@ -459,17 +467,8 @@ function sc_packet(a) {
         }
 
         if (prockey) {
-            if (workers && rsasharekeys[a.n]) {
-                // set scq slot number
-                a.scqi = scqhead++;
-
-                var p = a.scqi % workers.length;
-
-                // pin the nodes of this share to the same worker
-                // (it is the only one that knows the sharekey)
-                shareworker[a.n] = p;
-
-                workers[p].postMessage(a);
+            if (decWorkerPool.ok && rsasharekeys[a.n]) {
+                decWorkerPool.postPacket(a, scqhead++);
                 return;
             }
 
@@ -501,59 +500,14 @@ function sc_packet(a) {
 function sc_node(n) {
     "use strict";
 
-    var p, id;
-
     crypto_rsacheck(n);
 
-    if (!workers) {
+    if (!decWorkerPool.ok) {
         crypto_decryptnode(n);
         if (scq[scqhead]) scq[scqhead][1].push(n);
         else scq[scqhead] = [null, [n]];
         // sc_packet() call will follow
         return;
-    }
-
-    // own node?
-    if (n.k && n.k.substr(0, 11) === u_handle) p = -1;
-    else {
-        // no - do we have an existing share key?
-        for (p = 8; (p = n.k.indexOf(':', p)) >= 0; ) {
-            if (++p === 9 || n.k[p-10] === '/') {
-                id = n.k.substr(p-9, 8);
-                if (shareworker[id] || u_sharekeys[id]) {
-                    break;
-                }
-            }
-        }
-    }
-
-    if (p >= 0) {
-        var pp = n.k.indexOf('/', p+21);
-
-        if (pp < 0) {
-            pp = n.k.length;
-        }
-
-        // rewrite key to the minimum
-        n.k = id + ':' + n.k.substr(p, pp-p);
-
-        if (shareworker[id] >= 0) {
-            // the key is already known to a worker
-            p = shareworker[id];
-        }
-        else {
-            // pick a pseudorandom worker (round robin)
-            p = scqhead % workers.length;
-
-            // record for future nodes in the same share
-            shareworker[id] = p;
-
-            // send sharekey
-            workers[p].postMessage({ h : id, sk : u_sharekeys[id][0] });
-        }
-    }
-    else {
-        p = scqhead % workers.length;
     }
 
     if (nodesinflight[scqhead]) {
@@ -566,7 +520,7 @@ function sc_node(n) {
 
     n.scni = scqhead;       // set scq slot number (sc_packet() call will follow)
     n.arrivalOrder = nodes_scqi_order++; // storing arrival order
-    workers[p].postMessage(n);
+    decWorkerPool.postNode(n, scqhead % decWorkerPool.length);
 }
 
 // inter-actionpacket state, gets reset in getsc()
@@ -575,6 +529,7 @@ var scpubliclinksuiupd;
 var scContactsSharesUIUpdate;
 var loadavatars = [];
 var scinshare = Object.create(null);
+var sckeyrequest = Object.create(null);
 
 // sc packet parser
 var scparser = Object.create(null);
@@ -664,7 +619,6 @@ scparser.$add('s', {
         }
 
         var n, i;
-        var tsharekey = '';
         var prockey = false;
 
         if (a.o === u_handle) {
@@ -721,15 +675,24 @@ scparser.$add('s', {
         }
         else {
             if (a.n && typeof a.k !== 'undefined' && !u_sharekeys[a.n]) {
-                if (!Array.isArray(a.k)) {
-                    // XXX: misdirected actionpackets?
-                    srvlog('Got share action-packet with invalid key.');
+                /**
+                if (a.k && typeof a.k === 'string') {
+                    // @todo temp test.
+                    const k = base64_to_a32(a.k);
+                    if (k.length === 4) {
+                        console.warn('invalid share-key fixup.', a.k, k);
+                        a.k = k;
+                    }
                 }
-                else {
+                /**/
+                if (Array.isArray(a.k)) {
                     // a.k has been processed by the worker
                     crypto_setsharekey(a.n, a.k);
-                    tsharekey = a32_to_base64(u_k_aes.encrypt(a.k));
                     prockey = true;
+                }
+                else if (d) {
+                    // XXX: misdirected actionpackets?
+                    console.warn('Got share action-packet with invalid key, wait for it.', a.n, a.k, [a]);
                 }
             }
 
@@ -899,9 +862,9 @@ scparser.$add('t', function(a, scnodes) {
         return;
     }
 
-    var i;
-    var ufsc = new UFSSizeCache();
-    var rootNode = scnodes.length && scnodes[0] || false;
+    let i;
+    const ufsc = new UFSSizeCache();
+    let rootNode = scnodes.length && scnodes[0] || false;
 
     // is this tree a new inshare with root scinshare.h? set share-relevant
     // attributes in its root node.
@@ -937,8 +900,8 @@ scparser.$add('t', function(a, scnodes) {
     if (fminitialized && !pfid && a.ou && a.ou !== u_handle
         && rootNode && rootNode.p && !rootNode.su) {
 
-        var targetid = rootNode.p;
-        var pnodes = [];
+        const targetid = rootNode.p;
+        const pnodes = [];
 
         for (i = 0; i < scnodes.length; i++) {
             if (scnodes[i] && scnodes[i].p === targetid) {
@@ -957,6 +920,7 @@ scparser.$add('t', function(a, scnodes) {
         });
     }
 
+    const mns = $.moveNodeShares;
     for (i = 0; i < scnodes.length; i++) {
         if (scnodes[i]) {
             delete scnodes[i].i;
@@ -966,38 +930,40 @@ scparser.$add('t', function(a, scnodes) {
             M.addNode(scnodes[i]);
             ufsc.feednode(scnodes[i]);
 
-            var h = scnodes[i].h;
+            if (mns) {
+                const {h} = scnodes[i];
+                const share = mns[h];
 
-            if (!$.moveNodeShares || !$.moveNodeShares[h]) {
-                continue;
-            }
+                if (share) {
 
-            for (var su in $.moveNodeShares[h]) {
-                if ($.moveNodeShares[h][su]) {
-                    M.nodeShare(h, $.moveNodeShares[h][su], true);
-                    if (su === 'EXP') {
-                        scpubliclinksuiupd = true;
+                    // eslint-disable-next-line guard-for-in
+                    for (const su in share) {
+                        M.nodeShare(h, share[su], true);
+
+                        if (su === 'EXP') {
+                            scpubliclinksuiupd = true;
+                        }
+                        else {
+                            scsharesuiupd = true;
+                        }
                     }
-                    else {
-                        scsharesuiupd = true;
-                    }
+
+                    delete mns[h];
                 }
             }
-
-            delete $.moveNodeShares[h];
         }
     }
 
     ufsc.save(rootNode);
 
-    if (d) {
+    if (d > 1) {
         // f2 if set must be empty since the nodes must have been processed through workers.
         console.assert(!a.t || !a.t.f2 || !a.t.f2.length, 'Check this...');
     }
 
     if (fminitialized && !is_mobile) {
         // update versioning info.
-        i = scnodes.length > 1 && scnodes[1].h || rootNode.h;
+        i = scnodes.length > 1 && Object(scnodes[1]).h || rootNode.h;
         if (i) {
             // TODO: ensure this is backward compatible...
             fileversioning.updateFileVersioningDialog(i);
@@ -1014,12 +980,10 @@ scparser.$add('opc', {
         // outgoing pending contact
         processOPC([a]);
 
-        if (
-            fminitialized && M.chat && (
-                megaChatIsReady ||
-                megaChat.routingSection === "contacts" && megaChat.routingSubSection === "sent"
-            )
-        ) {
+        if (fminitialized && M.chat && megaChatIsReady
+            && megaChat.routingSection === "contacts"
+            && megaChat.routingSubSection === "sent") {
+
             mBroadcaster.sendMessage('fmViewUpdate:opc');
         }
     }
@@ -1209,12 +1173,12 @@ scparser.$add('k', function(a) {
     if (a.cr) {
         crypto_proccr(a.cr);
     }
-    // FIXME: obsolete - remove & replace
-    /*else
-     if (!folderlink) api_req({
-     a: 'k',
-     cr: crypto_makecr(actionPacket.n, [actionPacket.h], true)
-     });*/
+    else if (!pfid) {
+        if (!sckeyrequest[a.h]) {
+            sckeyrequest[a.h] = [];
+        }
+        sckeyrequest[a.h].push(...a.n);
+    }
 
     scsharesuiupd = true;
 });
@@ -1304,22 +1268,24 @@ scparser.$add('d', function(a) {
 
     // This is node move
     if (a.m) {
-        $.moveNodeShares = !$.moveNodeShares ? {} : $.moveNodeShares;
+        if (d) {
+            console.time(`sc:d.${a.n}`);
+        }
+        $.moveNodeShares = $.moveNodeShares || Object.create(null);
         (function _checkMoveNodeShare(h) {
-            // XXX: are or should we ensure all needed nodes are loaded into memory (?)
-            var n = M.d[h] || false;
-
-            if (n.shares) {
-                $.moveNodeShares[h] = n.shares;
-            }
-            if (n.t) {
-                for (var childHandle in M.c[h]) {
-                    if (M.c[h][childHandle]) {
-                        _checkMoveNodeShare(childHandle);
-                    }
+            const n = M.d[h];
+            if (n) {
+                if (n.shares) {
+                    $.moveNodeShares[h] = n.shares;
+                }
+                if (n.t && M.c[h]) {
+                    Object.keys(M.c[h]).forEach(_checkMoveNodeShare);
                 }
             }
         })(a.n);
+        if (d) {
+            console.timeEnd(`sc:d.${a.n}`);
+        }
     }
 
     // node deletion
@@ -1410,6 +1376,27 @@ scparser.$add('pses', function(a) {
     notify.notifyFromActionPacket(a);
 });
 
+// Payment card status
+scparser.$add('cce', () => {
+    'use strict';
+    // assuming that this AP will come only to PRO/Business accounts.
+    if (fminitialized) {
+        delay(
+            'cceAP',
+            () => {
+                M.req({ a: 'uq', pro: 1 }).then((res) => {
+                    if (typeof res === 'object') {
+                        M.showPaymentCardBanner(res.cce);
+                        if (M.account && res.cce) {
+                            M.account.cce = res.cce;
+                        }
+                    }
+                });
+            },
+            2000);
+    }
+});
+
 scparser.mcpc = scparser.mcc = function (a) {
     // MEGAchat
     if (megaChatIsReady) {
@@ -1468,7 +1455,18 @@ scparser.$add('_sn', function(a) {
         console.log("New SN: " + a.sn);
         console.assert(a.sn === window.currsn);
     }
-    delay('sc.set-sn', () => setsn(currsn), 2789);
+    delay('sc.set-sn', () => {
+        if (window.fmdb) {
+            const {fmdb} = window;
+            if (d) {
+                console.assert(fmdb.db || fmdb.crashed, 'Invalid FMDB State..');
+            }
+
+            if (fmdb.db) {
+                setsn(currsn);
+            }
+        }
+    }, 2789);
 
     // rewrite accumulated RSA keys to AES to save CPU & bandwidth & space
     crypto_node_rsa2aes();
@@ -1487,6 +1485,7 @@ scparser.$add('_sn', function(a) {
 scparser.$add('_fm', function() {
     // completed initial processing, enable UI
     crypto_fixmissingkeys(missingkeys);
+    delay('reqmissingkeys', crypto_reqmissingkeys, 4e3);
     loadfm_done();
 });
 
@@ -1598,6 +1597,24 @@ scparser.$finalize = function() {
                 scpubliclinksuiupd = false;
             }
 
+            if (!pfid && $.len(sckeyrequest)) {
+                const keyof = (h) => crypto_keyok(M.d[h]);
+                if (d) {
+                    console.debug('Supplying requested keys...', sckeyrequest);
+                }
+                // eslint-disable-next-line guard-for-in
+                for (const h in sckeyrequest) {
+                    const n = sckeyrequest[h].filter(keyof);
+                    const cr = crypto_makecr(n, [h], true);
+
+                    if (cr[2].length) {
+                        api_req({a: 'k', cr, i: requesti});
+                    }
+                }
+
+                sckeyrequest = Object.create(null);
+            }
+
             if ("chat/contacts/" + scContactsSharesUIUpdate === M.currentdirid) {
                 onIdle(function(handle) {
                     mBroadcaster.sendMessage('fmViewUpdate:' + handle);
@@ -1695,110 +1712,18 @@ function fm_updated(n) {
         removeUInode(n.h);
         newnodes.push(n);
         if (M.megaRender) delete M.megaRender.nodeMap[n.h];
-        M.updFileManagerUI();
-        // FIXME: ...?
-    }
-}
-
-var treelogger;
-
-// load tree for active GLOBAL context - either we load a folderlink or the user tree,
-// they never coexist, there is no encapsulation/separation of state.
-// (this "constructor" merely initialises the relevant *global* variables!)
-// FIXME: remove all global state and allow multiple client states to coexist peacefully
-function TreeFetcher() {
-    // next round-robin worker to assign
-    nextworker = 0;
-
-    // mapping of parent node to worker (to keep child nodes local to their sharekeys)
-    parentworker = Object.create(null);
-
-    // worker pending state dump counter
-    dumpsremaining = 0;
-
-    // residual fm (minus ok/f elements) post-filtration
-    residualfm = false;
-
-    // console logging
-    treelogger = MegaLogger.getLogger('TreeFetcher');
-
-    // erase existing RootID
-    // reason: tree_node must set up the workers as soon as the first node of a folder
-    // link arrives, and this is how it knows that it is the first node.
-    M.RootID = false;
-}
-
-// worker pool
-var workers;
-
-function killworkerpool() {
-    "use strict";
-
-    // terminate existing workers
-    if (workers) {
-        var l = workers.length;
-        while (l--) {
-            workers[l].onmessage = null;
-            workers[l].terminate();
-        }
-
-        // workers === false implies "no workers available here"
-        workers = false;
+        delay('ui:fm.updated', () => M.updFileManagerUI());
     }
 }
 
 function initworkerpool() {
     "use strict";
 
-    killworkerpool();
-
-    workers = [];
-
-    if (!pfid) {
-        // worker state for a user account fetch
-        workerstate = {
-            u_handle : u_handle,
-            u_privk  : u_privk,
-            u_k      : u_k,
-            d        : d
-        };
-    }
-    var workerURL = mega.nodedecBlobURI;
-    if (!workerURL) {
-        workerURL = 'nodedec.js';
-
-        if (!is_extension && !is_karma) {
-            workerURL = '/' + workerURL;
-        }
-    }
-
-    for (var i = Math.min(mega.maxWorkers, 10); i--;) {
-        try {
-            var w = new Worker(workerURL);
-
-            w.onmessage = worker_procmsg;
-            w.onerror = function(err) {
-                console.error('[nodedec worker error]', err);
-
-                // TODO: retry gettree
-                killworkerpool();
-            };
-            if (workerstate) {
-                w.postMessage(workerstate);
-            }
-            workers.push(w);
-        }
-        catch (ex) {
-            console.error(ex);
-            if (!workers.length) {
-                workers = null;
-            }
-            break;
-        }
-    }
+    // re/initialize workers (with state for a user account fetch, if applies)
+    decWorkerPool.init(worker_procmsg, 8, !pfid && {d, u_k, u_privk, u_handle, usk: u_attr['*~usk']});
 
     if (d) {
-        console.debug('initworkerpool', workerURL, workers && workers.length);
+        console.debug('initworkerpool', decWorkerPool);
     }
 }
 
@@ -1815,54 +1740,12 @@ function fm_forcerefresh(light) {
 
     if (fmdb && !fmdb.crashed) {
         execsc = function() {}; // stop further SC processing
-        fmdb.invalidate(function(){
-            location.reload();
-        });
+        fmdb.invalidate().finally(() => location.reload());
     }
     else {
         location.reload();
     }
 }
-
-// initiate fetch of node tree
-// FIXME: what happens when the user pastes a folder link over his loaded/loading account?
-TreeFetcher.prototype.fetch = function treefetcher_fetch(force) {
-    "use strict";
-
-    var req_params = {
-        a: 'f',
-        c: 1,
-        r: 1
-    };
-
-    // we disallow treecache usage if this is a forced reload
-    force = force || localStorage.force;
-    if (!force) {
-        req_params.ca = 1;
-    }
-    else if (mBroadcaster.crossTab.master) {
-        delete localStorage.force;
-    }
-
-    if (!megaChatIsDisabled && typeof Chatd !== 'undefined') {
-        req_params['cv'] = Chatd.VERSION;
-    }
-
-    api_req(req_params, {
-        progress: function(perc) {
-            loadingInitDialog.step2(parseInt(perc));    // FIXME: make generic
-
-            if (perc > 99 && !mega.loadReport.ttlb) {
-                // Load performance report -- time to last byte
-                mega.loadReport.ttlb          = Date.now() - mega.loadReport.stepTimeStamp;
-                mega.loadReport.stepTimeStamp = Date.now();
-
-                mega.loadReport.ttlb += mega.loadReport.ttfb;
-                mega.loadReport.ttfm = mega.loadReport.stepTimeStamp;
-            }
-        }
-    }, 4);
-};
 
 // triggers a full reload including wiping the remote treecache
 // (e.g. because the treecache is damaged or too old)
@@ -1905,25 +1788,11 @@ function fm_fullreload(q, logMsg) {
 
     if (fmdb) {
         // bring DB to a defined state
-        fmdb.invalidate(done);
+        fmdb.invalidate().finally(done);
     }
     else {
         done();
     }
-}
-
-// FIXME: make part of comprehensive client state object
-var nextworker;
-var parentworker = Object.create(null);
-
-// get next worker index (round robin)
-function treefetcher_getnextworker() {
-    "use strict";
-
-    if (nextworker >= workers.length) {
-        nextworker = 0;
-    }
-    return nextworker++;
 }
 
 // this receives the ok elements one by one as per the filter rule
@@ -1938,8 +1807,8 @@ function tree_ok0(ok) {
     // bind outbound share root to specific worker, post ok element to that worker
     // FIXME: check if nested outbound shares are returned with all shareufskeys!
     // if that is not the case, we need to bind all ok handles to the same worker
-    if (workers) {
-        workers[parentworker[ok.h] = treefetcher_getnextworker()].postMessage(ok);
+    if (decWorkerPool.ok) {
+        decWorkerPool.postNode(ok);
     }
     else if (crypto_handleauthcheck(ok.h, ok.ha)) {
         if (d) console.log("Successfully decrypted sharekeys for " + ok.h);
@@ -1947,7 +1816,7 @@ function tree_ok0(ok) {
         u_sharekeys[ok.h] = [key, new sjcl.cipher.aes(key)];
     }
     else {
-        treelogger.error("handleauthcheck() failed for " + ok.h);
+        console.error(`handleauthcheck() failed for ${ok.h}`);
     }
 }
 
@@ -1978,9 +1847,9 @@ function emplacenode(node, noc) {
 
         if (node.hash) {
             if (!M.h[node.hash]) {
-                M.h[node.hash] = Object.create(null);
+                M.h[node.hash] = new Set();
             }
-            M.h[node.hash][node.h] = 1;
+            M.h[node.hash].add(node.h);
         }
     }
     else if (node.t > 1 && node.t < 5) {
@@ -1994,7 +1863,15 @@ function emplacenode(node, noc) {
         srvlog2('parent-less', node.t, node.h);
     }
 
-    M.d[node.h] = new MegaNode(node);
+    if (!node.h || node.h.length !== 8) {
+        if (d && !node.h) {
+            console.error('Invalid node placement.', node);
+        }
+        M.d[node.h] = node;
+    }
+    else {
+        M.d[node.h] = Object.setPrototypeOf(node, MegaNode.prototype);
+    }
 }
 
 // this receives the node objects one by one as per the filter rule
@@ -2003,14 +1880,8 @@ function tree_node(node) {
 
     if (pfkey && !M.RootID) {
         // set up the workers for folder link decryption
-        workerstate = {
-            n_h   : node.h,
-            pfkey : pfkey,
-            d: d
-        };
-
-        if (workers) {
-            for (var i = workers.length; i--; ) workers[i].postMessage(workerstate);
+        if (decWorkerPool.ok) {
+            decWorkerPool.signal({d, n_h: node.h, pfkey});
         }
         else {
             var key = base64_to_a32(pfkey);
@@ -2029,28 +1900,14 @@ function tree_node(node) {
 
     // children inherit their parents' worker bindings; unbound inshare roots receive a new binding
     // unbound nodes go to a random worker (round-robin assignment)
-    if (!workers) {
+    if (decWorkerPool.ok) {
+        decWorkerPool.postNode(node);
+    }
+    else {
         crypto_decryptnode(node);
         worker_procmsg({data: node});
     }
-    else if (node.p && parentworker[node.p] >= 0) {
-        workers[parentworker[node.h] = parentworker[node.p]].postMessage(node);
-    }
-    else if (parentworker[node.h] >= 0) {
-        workers[parentworker[node.h]].postMessage(node);
-    }
-    else if (node.sk) {
-        workers[parentworker[node.h] = treefetcher_getnextworker()].postMessage(node);
-    }
-    else {
-        workers[treefetcher_getnextworker()].postMessage(node);
-    }
 }
-
-// FIXME: move all of these globals to a future "ClientSession" global object encapsulating
-// all state and functionality
-var residualfm;
-var dumpsremaining;
 
 // this receives the remainder of the JSON after the filter was applied
 function tree_residue(fm, ctx) {
@@ -2060,13 +1917,9 @@ function tree_residue(fm, ctx) {
     residualfm = fm[0] || false;
 
     // request an "I am done" confirmation ({}) from all workers
-    if (workers) {
-        var i = workers.length;
-        dumpsremaining = i;
-
-        while (i--) {
-            workers[i].postMessage({});
-        }
+    if (decWorkerPool.ok) {
+        dumpsremaining = decWorkerPool.length;
+        decWorkerPool.signal({});
     }
     else {
         dumpsremaining = 1;
@@ -2125,18 +1978,25 @@ function worker_procmsg(ev) {
             if (ufsc.cache && ev.data.p) {
                 ufsc.feednode(ev.data);
             }
-            else if (fmdb) {
+
+            const ok = fmdb && !fmdb.crashed;
+            const emplace = mega.leaveNodesInMemory || !ok || fminitialized || M.isInRoot(ev.data, true);
+
+            if (ok) {
                 fmdb.add('f', {
                     h : ev.data.h,
                     p : ev.data.p,
                     s : ev.data.s >= 0 ? ev.data.s : -ev.data.t,
                     t : ev.data.t ? 1262304e3 - ev.data.ts : ev.data.ts,
                     c : ev.data.hash || '',
+                    fa: ev.data.fa || '',
                     d : ev.data
                 });
             }
 
-            emplacenode(ev.data);
+            if (emplace) {
+                emplacenode(ev.data);
+            }
         }
     }
     else if (ev.data[0] === 'console') {
@@ -2150,7 +2010,9 @@ function worker_procmsg(ev) {
         srvlog2.apply(null, ev.data[1]);
     }
     else if (ev.data.done) {
-        if (d) console.log("Worker done, " + dumpsremaining + " remaining");
+        if (d) {
+            console.log(`Worker ${dumpsremaining} done, ${ev.data.jobs} jobs completed.`);
+        }
 
         if (ev.data.sharekeys) {
             for (h in ev.data.sharekeys) {
@@ -2169,20 +2031,15 @@ function worker_procmsg(ev) {
                 }
             }
 
-            window.loadingInitDialog.step3();
-            setTimeout(loadfm_callback, 300, residualfm);
-            residualfm = false;
+            decWorkerPool.cleanup();
+            loadfm.fromapi = true;
+            dbfetchfm();
         }
     }
     else {
         console.error("Unidentified nodedec worker response:", ev.data);
     }
 }
-
-// the FM DB engine (cf. mDB.js)
-var fmdb;
-var ufsc;
-var mclp;
 
 function loadfm(force) {
     "use strict";
@@ -2202,7 +2059,7 @@ function loadfm(force) {
             loadingInitDialog.step1();
         }
         if (!loadfm.loading) {
-            if (workers !== false) {
+            if (!decWorkerPool.ok) {
                 initworkerpool();
             }
             M.reset();
@@ -2219,9 +2076,10 @@ function loadfm(force) {
                 console.error('No master key found... please contact support@mega.nz');
             }
             else {
+                const f_table_schema = '&h, p, s, c, t, fa';
                 fmdb = FMDB(u_handle, {
                     // channel 0: transactional by _sn update
-                    f      : '&h, p, s, c, t', // nodes - handle, parent, size (negative size: type), checksum
+                    f      : f_table_schema,   // nodes - handle, parent, size (negative size: type), checksum
                     s      : '&o_t',           // shares - origin/target; both incoming & outgoing
                     ok     : '&h',             // ownerkeys for outgoing shares - handle
                     mk     : '&h',             // missing node keys - handle
@@ -2247,7 +2105,7 @@ function loadfm(force) {
     }
 }
 
-function fetchfm(sn) {
+async function fetchfm(sn) {
     "use strict";
 
     // we always intially fetch historical actionpactions
@@ -2260,42 +2118,63 @@ function fetchfm(sn) {
     // Get the media codecs list ready
     mclp = MediaInfoLib.getMediaCodecsList();
 
-    var promise;
-    if (is_mobile) {
-        promise = MegaPromise.resolve();
-    }
-    else {
+    // worker pending state dump counter
+    dumpsremaining = 0;
+
+    // residual fm (minus ok/f elements) post-filtration
+    residualfm = false;
+
+    // erase existing RootID
+    // reason: tree_node must set up the workers as soon as the first node of a folder
+    // link arrives, and this is how it knows that it is the first node.
+    M.RootID = false;
+
+    if (!is_mobile) {
         // activate/prefetch attribute cache at this early stage
-        promise = attribCache.load();
+        await attribCache.load();
     }
 
-    promise.always(function() {
+    if (sn) {
+        currsn = sn;
+        return dbfetchfm();
+    }
 
-        if (sn) {
-            currsn = sn;
+    // no cache requested or available - get from API.
+    // load tree for active GLOBAL context - either we load a folderlink or the
+    // user tree, they never coexist, there is no encapsulation/separation of state.
+    const req = {a: 'f', c: 1, r: 1};
 
-            if (is_selenium) {
-                // It runs too fast in some accounts...
-                delay(dbfetchfm, 1300);
-            }
-            else {
-                dbfetchfm();
-            }
-        }
-        else {
-            // no cache requested or available - get from API
-            fetcher = new TreeFetcher();
-            fetcher.fetch();
+    // we disallow treecache usage if this is a forced reload
+    if (!localStorage.force) {
+        req.ca = 1;
+    }
+    else if (mBroadcaster.crossTab.master) {
+        delete localStorage.force;
+    }
 
-            mega.loadReport.mode = 2;
+    api_req(req, {
+        progress: (pcn) => {
+            window.loadingInitDialog.step2(parseInt(pcn));
 
-            if (!folderlink) {
-                // dbToNet holds the time wasted trying to read local DB, and having found we have to query the server.
-                mega.loadReport.dbToNet       = Date.now() - mega.loadReport.startTime;
+            if (pcn > 99 && !mega.loadReport.ttlb) {
+                // Load performance report -- time to last byte
+                mega.loadReport.ttlb = Date.now() - mega.loadReport.stepTimeStamp;
                 mega.loadReport.stepTimeStamp = Date.now();
+
+                mega.loadReport.ttlb += mega.loadReport.ttfb;
+                mega.loadReport.ttfm = mega.loadReport.stepTimeStamp;
             }
         }
-    });
+    }, 4);
+
+    /** @property mega.loadReport.mode */
+    Object.defineProperty(mega.loadReport, 'mode', {value: 2, writable: false});
+
+    if (!folderlink) {
+        // dbToNet holds the time wasted trying to read local DB, and having found we have to query the server.
+        mega.loadReport.dbToNet = Date.now() - mega.loadReport.startTime;
+        mega.loadReport.stepTimeStamp = Date.now();
+    }
 }
 
 function dbfetchfm() {
@@ -2312,18 +2191,17 @@ function dbfetchfm() {
         opc: processOPC,
         ipc: processIPC,
         ps: function(r) {
-            processPS(r, true);
-            r = r.map(function(n) {
-                return n.h;
-            });
-            return dbfetch.geta(r);
+            if (r.length) {
+                processPS(r, true);
+                // processPS may invokes nodeShare(), that uses acquire.
+                return dbfetch.acquire(r.map(n => n.h));
+            }
         },
         puf: function _(r) {
-            mega.megadrop.pufProcessDb(r);
-            r = r.map(function(n) {
-                return n.h;
-            });
-            return dbfetch.geta(r);
+            if (r.length) {
+                mega.megadrop.pufProcessDb(r);
+                return dbfetch.geta(r.map(n => n.h));
+            }
         },
         suba: process_suba,
         pup: mega.megadrop.pupProcessDb,
@@ -2356,21 +2234,47 @@ function dbfetchfm() {
 
     loadingInitDialog.step2();
 
+    const isFromAPI = !!loadfm.fromapi;
+    const loadReport = isFromAPI ? nop : (key) => {
+        const now = Date.now();
+        mega.loadReport[key] = now - mega.loadReport.stepTimeStamp;
+        mega.loadReport.stepTimeStamp = now;
+    };
+    const finish = () => {
+        window.loadingInitDialog.step3();
+
+        if (isFromAPI) {
+            setTimeout(loadfm_callback, 420, residualfm);
+            residualfm = false;
+        }
+        else {
+            getsc(true);
+        }
+    };
+
+    if (!window.fmdb) {
+        console.assert(isFromAPI);
+        return onIdle(finish);
+    }
+
+    if (isFromAPI) {
+        // Tree nodes are already in memory.
+        delete tables.tree;
+    }
+
     if (d) {
         console.time('dbfetchfm');
     }
 
     Promise.allSettled([fmdb.get('ok'), dbfetch.init()])
-        .then(function(r) {
+        .then((r) => {
             checkSettled(r);
             process_ok(r[0].value, true);
 
-            mega.loadReport.recvNodes     = Date.now() - mega.loadReport.stepTimeStamp;
-            mega.loadReport.stepTimeStamp = Date.now();
-
+            loadReport('recvNodes');
             return Promise.allSettled([fmdb.get('mk'), fmdb.get('u'), fmdb.get('s')]);
         })
-        .then(function(r) {
+        .then((r) => {
             var promises = [];
 
             checkSettled(r);
@@ -2378,9 +2282,9 @@ function dbfetchfm() {
             mega.loadReport.pn1 = Date.now() - mega.loadReport.stepTimeStamp;
 
             process_u(r[1].value, true);
-            mega.loadReport.pn2 = Date.now() - mega.loadReport.stepTimeStamp;
+            loadReport('pn2');
             // @todo deprecate those pn1-pn5 ...
-            mega.loadReport.pn3 = Date.now() - mega.loadReport.stepTimeStamp;
+            loadReport('pn3');
 
             r = r[2].value;
             for (var i = r.length; i--;) {
@@ -2397,7 +2301,7 @@ function dbfetchfm() {
                     promises.push(M.nodeShare(r[i].h, r[i], true));
                 }
             }
-            mega.loadReport.pn4 = Date.now() - mega.loadReport.stepTimeStamp;
+            loadReport('pn4');
 
             if (promises.length) {
                 // handle all outbound shares through a single promise.
@@ -2409,11 +2313,11 @@ function dbfetchfm() {
                 var t = it[j];
                 promises.push(fmdb.get(t).then(tableProc(t)).catch(dump));
             }
-            mega.loadReport.pn5 = Date.now() - mega.loadReport.stepTimeStamp;
+            loadReport('pn5');
 
             return Promise.allSettled(promises);
         })
-        .then(function(r) {
+        .then((r) => {
             checkSettled(r);
 
             if (d) {
@@ -2421,29 +2325,21 @@ function dbfetchfm() {
                 console.timeEnd('dbfetchfm');
             }
 
-            mega.loadReport.mode = 1;
-            mega.loadReport.procNodeCount = Object.keys(M.d || {}).length;
-            mega.loadReport.procNodes = Date.now() - mega.loadReport.stepTimeStamp;
-            mega.loadReport.stepTimeStamp = Date.now();
+            if (!isFromAPI) {
+                mega.loadReport.mode = 1;
+                mega.loadReport.procNodeCount = Object.keys(M.d || {}).length;
+                loadReport('procNodes');
+            }
 
             if (!mBroadcaster.crossTab.master && window.fmdb) {
                 // on a secondary tab, prevent writing to DB once we have read its contents
                 fmdb.crashed = 666;
+                fmdb.pending = [[]];
             }
             console.assert(window.fmdb, 'check what is going on here...');
-
-            if (ufsc) {
-                if (d && $.len(ufsc.cache || {})) {
-                    console.warn('found non-flushed ufs-cache entries...', [ufsc.cache], ufsc);
-                }
-                delete ufsc.cache;
-            }
-
-            // fetch & process new actionpackets
-            window.loadingInitDialog.step3();
-            getsc(true);
         })
-        .catch(function(ex) {
+        .then(finish)
+        .catch((ex) => {
             console.error(ex);
             siteLoadError(ex, 'dbfetchfm');
         });
@@ -2478,26 +2374,22 @@ function treetype(h) {
 }
 
 // determine whether a node is shared
-function shared(h) {
+async function shared(h) {
     "use strict";
-    var promise = new MegaPromise();
 
-    dbfetch.get(h).always(function() {
-        var rc = false;
+    if (!M.d[h]) {
+        await dbfetch.acquire(h);
+    }
 
-        while (h && M.d[h]) {
-            if (M.d[h].shares) {
-                rc = h;
-                break;
-            }
-
-            h = M.d[h].p;
+    let rc = false;
+    while (h && M.d[h]) {
+        if (M.d[h].shares) {
+            rc = h;
+            break;
         }
-
-        promise.resolve(rc);
-    });
-
-    return promise;
+        h = M.d[h].p;
+    }
+    return rc;
 }
 
 // returns sharing user (or false if not in an inshare)
@@ -2691,10 +2583,11 @@ function doShare(nodeId, targets, dontShowShareDialog) {
     var childNodesId;
 
     M.getNodes(nodeId, true)
-        .wait(function(r) {
+        .then((r) => {
             childNodesId = r;
             targets.forEach(targetsForeach);
-        });
+        })
+        .catch(dump);
 
     // Create new lists of users, active (with user handle) and non existing (pending)
     var targetsForeach = function(value) {
@@ -2840,35 +2733,36 @@ function process_f(f, cb, updateVersioning) {
  *
  */
 function processIPC(ipc, ignoreDB) {
+    'use strict';
 
-    if (d) console.debug('processIPC');
+    for (let i = 0; i < ipc.length; ++i) {
 
-    for (var i in ipc) {
-        if (ipc.hasOwnProperty(i)) {
+        // Update ipc status
+        M.addIPC(ipc[i], ignoreDB);
 
-            // Update ipc status
-            M.addIPC(ipc[i], ignoreDB);
+        // Deletion of incomming pending contact request, user who sent request, canceled it
+        if (ipc[i].dts) {
+            M.delIPC(ipc[i].p);
+            delete M.ipc[ipc[i].p];
 
-            // Deletion of incomming pending contact request, user who sent request, canceled it
-            if (ipc[i].dts) {
-                M.delIPC(ipc[i].p);
-                $('#ipc_' + ipc[i].p).remove();
-                delete M.ipc[ipc[i].p];
-                if (Object.keys(M.ipc).length) {
+            if (fminitialized) {
+                $(`#ipc_${ipc[i].p}`).remove();
+
+                if ($.len(M.ipc)) {
                     updateIpcRequests();
                 }
 
                 // Update token.input plugin
                 removeFromMultiInputDDL('.share-multiple-input', {id: ipc[i].m, name: ipc[i].m});
             }
-            else {
-                // Don't prevent contact creation when there's already IPC available
-                // When user add contact who already sent IPC, server will automatically create full contact
-                var contactName = M.getNameByHandle(ipc[i].p);
+        }
+        else if (fminitialized) {
+            // Don't prevent contact creation when there's already IPC available
+            // When user add contact who already sent IPC, server will automatically create full contact
+            var contactName = M.getNameByHandle(ipc[i].p);
 
-                // Update token.input plugin
-                addToMultiInputDropDownList('.share-multiple-input', [{id: ipc[i].m, name: contactName}]);
-            }
+            // Update token.input plugin
+            addToMultiInputDropDownList('.share-multiple-input', [{id: ipc[i].m, name: contactName}]);
         }
     }
 }
@@ -2879,18 +2773,21 @@ function processIPC(ipc, ignoreDB) {
  * @param {array.<JSON_objects>} pending contacts
  */
 function processOPC(opc, ignoreDB) {
+    'use strict';
 
-    if (d) console.debug('processOPC');
-
-    for (var i in opc) {
+    for (let i = 0; i < opc.length; ++i) {
         M.addOPC(opc[i], ignoreDB);
+
         if (opc[i].dts) {
             M.delOPC(opc[i].p);
-            $('#opc_' + opc[i].p).remove();
 
-            // Update tokenInput plugin
-            removeFromMultiInputDDL('.share-multiple-input', {id: opc[i].m, name: opc[i].m});
-            removeFromMultiInputDDL('.add-contact-multiple-input', {id: opc[i].m, name: opc[i].m});
+            if (fminitialized) {
+                $(`#opc_${opc[i].p}`).remove();
+
+                // Update tokenInput plugin
+                removeFromMultiInputDDL('.share-multiple-input', {id: opc[i].m, name: opc[i].m});
+                removeFromMultiInputDDL('.add-contact-multiple-input', {id: opc[i].m, name: opc[i].m});
+            }
         }
         else {
             // Search through M.opc to find duplicated e-mail with .dts
@@ -2898,17 +2795,22 @@ function processOPC(opc, ignoreDB) {
             // And update sent-request grid
             for (var k in M.opc) {
                 if (M.opc[k].dts && (M.opc[k].m === opc[i].m)) {
-                    $('#opc_' + k).remove();
                     delete M.opc[k];
+
+                    if (fminitialized) {
+                        $(`#opc_${k}`).remove();
+                    }
                     break;
                 }
             }
 
-            var contactName = M.getNameByHandle(opc[i].p);
+            if (fminitialized) {
+                const contactName = M.getNameByHandle(opc[i].p);
 
-            // Update tokenInput plugin
-            addToMultiInputDropDownList('.share-multiple-input', [{id: opc[i].m, name: contactName}]);
-            addToMultiInputDropDownList('.add-contact-multiple-input', [{id: opc[i].m, name: contactName}]);
+                // Update tokenInput plugin
+                addToMultiInputDropDownList('.share-multiple-input', [{id: opc[i].m, name: contactName}]);
+                addToMultiInputDropDownList('.add-contact-multiple-input', [{id: opc[i].m, name: contactName}]);
+            }
         }
     }
 }
@@ -2997,16 +2899,9 @@ function processPH(publicHandles) {
  * @param {array.<JSON_objects>} pending shares
  */
 function processPS(pendingShares, ignoreDB) {
-    if (d) console.debug('processPS');
-    var ps;
-    var nodeHandle = '';
-    var pendingContactId = '';
-    var shareRights = 0;
-    var timeStamp = 0;
-    var contactName = '';
-
-    for (var i in pendingShares) {
-        ps = pendingShares[i];
+    'use strict';
+    for (let i = 0; i < pendingShares.length; ++i) {
+        const ps = pendingShares[i];
 
         // From gettree
         if (ps.h) {
@@ -3014,11 +2909,11 @@ function processPS(pendingShares, ignoreDB) {
         }
         // Situation different from gettree, s2 from API response, doesn't have .h attr instead have .n
         else {
-            nodeHandle = ps.n;
-            pendingContactId = ps.p;
-            shareRights = ps.r;
-            timeStamp = ps.ts;
-            contactName = M.getNameByHandle(pendingContactId);
+            const timeStamp = ps.ts;
+            const nodeHandle = ps.n;
+            const shareRights = ps.r;
+            const pendingContactId = ps.p;
+            const contactName = M.getNameByHandle(pendingContactId);
 
             // shareRights is undefined when user denies pending contact request
             // .op is available when user accepts pending contact request and
@@ -3037,7 +2932,7 @@ function processPS(pendingShares, ignoreDB) {
                     });
                 }
 
-                if (M.opc && M.opc[ps.p]) {
+                if (fminitialized && M.opc && M.opc[ps.p]) {
                     // Update tokenInput plugin
                     addToMultiInputDropDownList('.share-multiple-input', [{
                             id: M.opc[pendingContactId].m,
@@ -3534,7 +3429,6 @@ function loadfm_callback(res) {
         processMCF(loadfm.chatmcf);
     }
     M.avatars();
-    loadfm.fromapi = true;
 
     if (localStorage['treefixup$' + u_handle]) {
         // We found inconsistent tree nodes and forced a reload, log it.
@@ -3573,12 +3467,8 @@ function loadfm_callback(res) {
 
         // If we have shares, and if a share is for this node, record it on the nodes share list
         if (res.s) {
-            for (var i in res.s) {
-                if (res.s.hasOwnProperty(i)) {
-
-                    var nodeHandle = res.s[i].h;
-                    M.nodeShare(nodeHandle, res.s[i]);
-                }
+            for (let i = res.s.length; i--;) {
+                M.nodeShare(res.s[i].h, res.s[i]);
             }
         }
 
@@ -3607,6 +3497,7 @@ function loadfm_callback(res) {
         if (res.sr) {
             crypto_procsr(res.sr);
         }
+        setsn(currsn = res.sn);
 
         mega.loadReport.procNodeCount = Object.keys(M.d || {}).length;
         mega.loadReport.procNodes     = Date.now() - mega.loadReport.stepTimeStamp;
@@ -3614,35 +3505,16 @@ function loadfm_callback(res) {
 
         // Time to save the ufs-size-cache, from which M.tree nodes will be created and being
         // those dependant on in-memory-nodes from the initial load to set flags such SHARED.
-        console.assert(ufsc, 'check this...');
-        if (ufsc) {
-            if (localStorage.ufsis) {
-                ufsc.saveInitialState()
-                    .then(function() {
-                        setsn(res.sn);
-                        currsn = res.sn;
-                        getsc(true);
-                    })
-                    .catch(dump);
-                return;
-            }
+        (async() => ufsc.save())().catch(dump)
+            .finally(() => {
+                // commit transaction and set sn
+                setsn(res.sn);
+                currsn = res.sn;
 
-            ufsc.save();
-        }
-
-        // commit transaction and set sn
-        setsn(res.sn);
-        currsn = res.sn;
-
-        // retrieve initial batch of action packets, if any
-        // we'll then complete the process using loadfm_done
-        if (is_selenium) {
-            // It runs too fast in some accounts...
-            delay(getsc.bind(null, true), 1300);
-        }
-        else {
-            getsc(true);
-        }
+                // retrieve initial batch of action packets, if any
+                // we'll then complete the process using loadfm_done
+                getsc(true);
+            });
     });
 }
 
@@ -3728,8 +3600,8 @@ function loadfm_done(mDBload) {
             }
         }
 
-        // Check business account is expired on initial phase.
-        if (u_attr && u_attr.b) {
+        // Check business account is expired on initial phase in desktop web.
+        if (!is_mobile && u_attr && u_attr.b) {
             M.require('businessAcc_js', 'businessAccUI_js').done(() => {
 
                 var business_ui = new BusinessAccountUI();
@@ -3789,7 +3661,7 @@ function loadfm_done(mDBload) {
                     r.EAGAINs, // -3/-4s while loading
                     r.e500s, // http err 500 while loading
                     r.errs, // any other errors while loading
-                    workers && workers.length || -666,
+                    decWorkerPool.ok && decWorkerPool.length || -666,
                     r.ttlb | 0, // time to last byte
                     r.ttfm | 0, // time to fm since ttlb
                     u_type === 3 ? (mBroadcaster.crossTab.master ? 1 : 0) : -1, // master, or slave tab?
@@ -3845,6 +3717,7 @@ function loadfm_done(mDBload) {
                     }
                 });
                 M.myChatFilesFolder.init();
+                M.getCameraUploads();
             }
         }
         else {
@@ -3937,139 +3810,250 @@ var th_requested = Object.create(null);
 var fa_duplicates = Object.create(null);
 var fa_reqcnt = 0;
 var fa_addcnt = 8;
-var fa_tnwait = 0;
+
+/** @property fm_thumbnails.exclude */
+lazy(fm_thumbnails, 'exclude', () => {
+    'use strict';
+    const res = {
+        photos: 1, images: 1, videos: 1
+    };
+    return Object.setPrototypeOf(res, null);
+});
 
 function fm_thumbnails(mode, nodeList, callback)
 {
-    var treq = {}, a = 0, max = Math.max($.rmItemsInView || 1, 71) + fa_addcnt, u = max - Math.floor(max / 3), y;
-    if (!fa_reqcnt)
-        fa_tnwait = y;
-    if (d)
-        console.time('fm_thumbnails');
-
+    'use strict';
+    if (M.chat && mode !== 'standalone' || fm_thumbnails.exclude[M.currentdirid]) {
+        return;
+    }
     nodeList = (mode === 'standalone' ? nodeList : false) || M.v;
 
-    if (!M.chat || mode === 'standalone')
-    {
-        for (var i = 0; i < nodeList.length; i++) {
-            var n = nodeList[i];
-            if (n && !missingkeys[n.h] && n.fa && String(n.fa).indexOf(':0') > 0)
-            {
-                if (fa_tnwait == n.h && n.seen)
-                    fa_tnwait = 0;
-                // if (!fa_tnwait && !thumbnails[n.h] && !th_requested[n.h])
-                if (n.seen && !thumbnails[n.h] && !th_requested[n.h])
-                {
-                    if (typeof fa_duplicates[n.fa] == 'undefined')
-                        fa_duplicates[n.fa] = 0;
-                    else
-                        fa_duplicates[n.fa] = 1;
-                    treq[n.h] =
-                        {
-                            fa: n.fa,
-                            k: n.k
-                        };
-                    th_requested[n.h] = 1;
-                    th_pending[n.h] = [];
+    let count = 0;
+    const transparent = {WEBP: 1, PNG: 1, SVG: 1, GIF: 1};
+    const max = Math.max(M.rmItemsInView | 0, 32) + fa_addcnt;
+    const min = Math.floor(max * 0.6);
+    const treq = [];
 
-                    if (u == a)
-                        y = n.h;
-                    if (++a > max)
-                    {
-                        if (!n.seen)
-                            break;
-                        y = n.h;
-                    }
-                }
-                else if (n.seen && n.seen !== 2)
-                {
-                    fm_thumbnail_render(n);
-                }
+    const onTheFly =
+        !is_mobile && M.viewmode && mode !== 'standalone'
+        && !mega.config.get('noflytn') ? Object.create(null) : false;
 
-                if (mode === 'standalone' && typeof callback === 'function') {
-                    if (thumbnails[n.h]) {
-                        onIdle(callback.bind(null, n.h));
-                    }
-                    else if (th_pending[n.h]) {
-                        th_pending[n.h].push(onIdle.bind(null, callback.bind(null, n.h)));
-                    }
+    if (d) {
+        console.time('fm_thumbnails');
+    }
+
+    // enqueue thumbnail retrieval.
+    const queue = (n) => {
+        let type = ':0*';
+
+        if (onTheFly && !transparent[fileext(n.name, true, true)] && String(n.fa).includes(':1*')) {
+            type = ':1*';
+            onTheFly[n.h] = {fa: n.fa, k: n.k};
+        }
+
+        if (!String(n.fa).includes(type)) {
+            return;
+        }
+        type = type[1] | 0;
+
+        const r = th_requested[n.h] | 0;
+        if (!thumbnails[n.h] && !r || r !== type + 1 && r < 2) {
+            if (typeof fa_duplicates[n.fa] == 'undefined') {
+                fa_duplicates[n.fa] = 0;
+            }
+            else {
+                fa_duplicates[n.fa] = 1;
+            }
+
+            if (!treq[type]) {
+                treq[type] = {};
+            }
+            treq[type][n.h] = {fa: n.fa, k: n.k};
+
+            if (!th_pending[n.h]) {
+                th_pending[n.h] = [];
+            }
+            th_requested[n.h] = ++type;
+
+            if (++count > max && !n.seen) {
+                // break
+                return true;
+            }
+        }
+        else if (n.seen !== 2) {
+            fm_thumbnail_render(n);
+        }
+    };
+
+    for (let i = 0; i < nodeList.length; i++) {
+        const n = nodeList[i];
+
+        if (n && n.fa && !missingkeys[n.h]) {
+            if (n.seen && queue(n)) {
+                break;
+            }
+
+            if (mode === 'standalone' && typeof callback === 'function') {
+                if (thumbnails[n.h]) {
+                    onIdle(callback.bind(null, n.h));
+                }
+                else if (th_pending[n.h]) {
+                    th_pending[n.h].push(onIdle.bind(null, callback.bind(null, n.h)));
                 }
             }
         }
-        if (y)
-            fa_tnwait = y;
-        if (a > 0)
-        {
-            fa_reqcnt += a;
-            if (d)
-                console.log('Requesting %d thumbs (%d loaded)', a, fa_reqcnt);
+    }
 
-            var rt = Date.now();
-            var cdid = M.currentdirid;
-            api_getfileattr(treq, 0, function(ctx, node, uint8arr)
-            {
-                if (mode === 'standalone' && typeof callback === 'function') {
-                    onIdle(callback.bind(null, node));
-                }
-                if (th_pending[node]) {
-                    for (var t = th_pending[node].length; t--;) {
-                        th_pending[node][t]();
-                    }
-                    delete th_pending[node];
-                }
-                if (uint8arr === 0xDEAD)
-                {
-                    if (d)
-                        console.log('Aborted thumbnail retrieval for ' + node);
-                    delete th_requested[node];
-                    return;
-                }
-                if (rt)
-                {
-                    if (((Date.now() - rt) > 4000) && ((fa_addcnt += u) > 300))
-                        fa_addcnt = 301;
-                    rt = 0;
-                }
-                try {
-                    var blob = new Blob([uint8arr], {type: 'image/jpeg'});
-                } catch (err) {}
-                if (blob.size < 25)
-                    blob = new Blob([uint8arr.buffer]);
-                // thumbnailblobs[node] = blob;
-                thumbnails[node] = myURL.createObjectURL(blob);
+    if (count > 0) {
+        if (d) {
+            console.log('Requesting %d thumbs (%d loaded)', count, fa_reqcnt, treq);
+        }
+        fa_reqcnt += count;
 
-                var targetNode = M.getNodeByHandle(node);
+        let ts = Date.now();
+        const pwd = M.currentdirid;
 
-                if (targetNode && targetNode.seen && M.currentdirid === cdid) {
-                    fm_thumbnail_render(targetNode);
-                }
+        // foreach node list
+        const forEach = (cb) => {
+            for (let i = nodeList.length; i--;) {
+                cb(nodeList[i]);
+            }
+        };
 
-                // deduplicate in view when there is a duplicate fa:
-                if (targetNode && fa_duplicates[targetNode.fa] > 0)
-                {
-                    for (var i = 0; i < nodeList.length; i++)
-                    {
-                        var n = nodeList[i];
-                        if (n.h !== node && n.fa === targetNode.fa && !thumbnails[n.h])
-                        {
-                            thumbnails[n.h] = thumbnails[node];
-                            if (n.seen && M.currentdirid === cdid)  {
-                                fm_thumbnail_render(n);
-                            }
-                            if (mode === 'standalone' && typeof callback === 'function') {
-                                onIdle(callback.bind(null, n.h));
-                            }
-                        }
-                    }
+        // revoke thumbnail.
+        const revoke = (h) => {
+            if (d > 1) {
+                console.info(`Revoking thumbnail ${h}, ${thumbnails[h]}`);
+            }
+            URL.revokeObjectURL(thumbnails[h]);
+
+            forEach((n) => {
+                if (n.h !== h && thumbnails[n.h] === thumbnails[h]) {
+                    thumbnails[n.h] = null;
                 }
             });
+            thumbnails[h] = null;
+        };
+
+        // append (add) new thumbnail.
+        const append = (node, url) => {
+            if (thumbnails[node]) {
+                revoke(node);
+            }
+            thumbnails[node] = url;
+        };
+
+        // render & deduplicate loaded thumbnails.
+        const render = (node) => {
+            const targetNode = M.getNodeByHandle(node);
+            if (!targetNode) {
+                return;
+            }
+
+            if (d > 1) {
+                console.info(`Rendering thumbnail ${node}, ${thumbnails[node]}`, targetNode);
+            }
+
+            if (targetNode.seen && M.currentdirid === pwd) {
+                fm_thumbnail_render(targetNode);
+            }
+
+            // deduplicate in view when there is a duplicate fa:
+            if (fa_duplicates[targetNode.fa] > 0) {
+                forEach((n) => {
+                    if (n.h !== node && n.fa === targetNode.fa && !thumbnails[n.h]) {
+                        thumbnails[n.h] = thumbnails[node];
+
+                        if (n.seen && M.currentdirid === pwd) {
+                            fm_thumbnail_render(n);
+                        }
+
+                        if (mode === 'standalone' && typeof callback === 'function') {
+                            onIdle(callback.bind(null, n.h));
+                        }
+                    }
+                });
+            }
+        };
+
+        // re-queue thumbnail retrieval.
+        const requeue = (node, data, callback) => {
+            treq[0][node] = data;
+
+            delay('fm:thumbnails.requeue', () => {
+                api_getfileattr(treq[0], 0, callback);
+                treq[0] = {};
+            }, 4321);
+        };
+
+        // handle thumbnail retrieval.
+        const onload = async(ctx, node, uint8) => {
+            if (mode === 'standalone' && typeof callback === 'function') {
+                onIdle(callback.bind(null, node));
+            }
+
+            if (th_pending[node]) {
+                for (let t = th_pending[node].length; t--;) {
+                    th_pending[node][t]();
+                }
+                delete th_pending[node];
+            }
+
+            if (uint8 === 0xDEAD) {
+                if (d) {
+                    console.log(`Aborted thumbnail retrieval for ${node}`);
+                }
+                delete th_requested[node];
+                return;
+            }
+
+            if (ts) {
+                if (Date.now() - ts > 4000 && (fa_addcnt += min) > 300) {
+                    fa_addcnt = 301;
+                }
+                ts = 0;
+            }
+
+            if (onTheFly[node]) {
+                // uint8 = (await M.gfsfetch(node, 0, -1)).buffer;
+                const blob = await webgl.getDynamicThumbnail(uint8, {ats: 1}).catch(nop);
+
+                if (blob) {
+                    append(node, URL.createObjectURL(blob));
+                }
+                else {
+                    if (d) {
+                        console.debug(`Failed to generate on-the-fly thumbnail for ${node}`);
+                    }
+                    requeue(node, onTheFly[node], onload);
+                }
+
+                onTheFly[node] = null;
+            }
+            else {
+                append(node, mObjectURL([uint8.buffer || uint8], 'image/jpeg'));
+            }
+
+            render(node);
+        };
+
+        if (treq[0]) {
+            api_getfileattr(treq[0], 0, onload);
         }
+        if (treq[1]) {
+            api_getfileattr(treq[1], 1, onload);
+        }
+        treq[0] = {};
     }
-    if (d)
+
+    if (d) {
         console.timeEnd('fm_thumbnails');
+    }
 }
 
 function fm_thumbnail_render(n) {
+    'use strict';
+
     if (n && thumbnails[n.h]) {
         var imgNode = document.getElementById(n.imgId || n.h);
 

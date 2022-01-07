@@ -36,7 +36,7 @@ function Soon(callback) {
  */
 function SoonFc(ms, global, callback) {
     'use strict';
-    var expando = '__delay_call_wrap_' + Math.random() * Math.pow(2, 56);
+    const expando = `__delay_call_wrap_${Math.random() * Math.pow(2, 56)}`;
 
     // Handle arguments optionality
     ms = global = callback = null;
@@ -56,15 +56,8 @@ function SoonFc(ms, global, callback) {
     }
     ms = ms || 160;
 
-    var sfc = function __soonfc() {
-        var self = this;
-        var idx = arguments.length;
-        var args = new Array(idx);
-        while (idx--) {
-            args[idx] = arguments[idx];
-        }
-
-        idx = expando;
+    const sfc = function __soonfc(...args) {
+        let idx = expando;
 
         if (global === false) {
             if (!(expando in this)) {
@@ -74,12 +67,10 @@ function SoonFc(ms, global, callback) {
             idx += this[expando];
         }
 
-        delay(idx, function() {
-            callback.apply(self, args);
-        }, ms);
+        delay(idx, () => callback.apply(this, args), ms);
     };
     if (d > 1) {
-        Object.defineProperty(sfc, smbl(callback.name || 'callback'), {value: callback});
+        Object.defineProperty(sfc, Symbol(callback.name || 'callback'), {value: callback});
     }
     return sfc;
 }
@@ -114,7 +105,7 @@ function delay(aProcID, aFunction, aTimeout) {
         q = delay.queue[aProcID] = Object.create(null);
 
         q.pun = aProcID;
-        q.tid = setTimeout(function(q) {
+        q.tid = setTimeout(() => {
             if (d > 2) {
                 console.debug('dispatching delayed function...', aProcID);
             }
@@ -127,7 +118,7 @@ function delay(aProcID, aFunction, aTimeout) {
             else {
                 delay(q.pun, q.tsk, rem);
             }
-        }, t, q);
+        }, t);
     }
     q.tde = t;
     q.tsk = aFunction;
@@ -158,3 +149,147 @@ delay.abort = () => {
     }
     Object.keys(delay.queue).forEach((t) => delay.cancel(t));
 };
+
+/**
+ * @function window.tSleep
+ * @see {@link window.sleep}
+ */
+lazy(self, 'tSleep', function tSleep() {
+    'use strict';
+    return (ts, data) => new Promise(resolve => setTimeout(resolve, ts * 1e3, data));
+});
+
+/**
+ * Sleep for a given number of seconds.
+ * @param {Number} ts Number of seconds.
+ * @param {*} [data] Any data to pass through.
+ * @returns {Promise} fulfilled on timeout.
+ * @function window.sleep
+ * @description This is a low-level high performance non-throttled helper whose use takes careful thought.
+ */
+lazy(self, 'sleep', function sleep() {
+    'use strict';
+
+    if (!window.isSecureContext || typeof Worklet === 'undefined' || !Worklet.prototype.addModule) {
+        if (d) {
+            console.warn('Weak sleep() implementation, using throttled-setTimeout()');
+        }
+        return tSleep;
+    }
+
+    const MIN_THRESHOLD = 100;
+    const MAX_THRESHOLD = 4e6;
+
+    const pending = new Set();
+    let threshold = MAX_THRESHOLD;
+
+    let worklet = class extends AudioWorkletNode {
+        constructor(ctx) {
+            super(ctx, 'mega-worklet-messenger');
+            this.port.onmessage = (ev) => this.handleMessage(ev);
+            this._connected = false;
+            this.dispatch();
+        }
+
+        get ready() {
+            return true;
+        }
+
+        attach() {
+            if (!this._connected) {
+                this._connected = true;
+                this.connect(this.context.destination);
+            }
+        }
+
+        detach() {
+            if (this._connected) {
+                this.port.postMessage({message: 'sleep'});
+                this.disconnect(this.context.destination);
+                this._connected = false;
+            }
+        }
+
+        dispatch() {
+            this.attach();
+            this.port.postMessage({threshold, message: 'schedule'});
+        }
+
+        handleMessage(ev) {
+            // console.debug('worklet-message', ev.data);
+
+            if (ev.data.message !== 'dispatch') {
+                return;
+            }
+            const tick = performance.now();
+
+            threshold = MAX_THRESHOLD;
+            for (const res of pending) {
+                const {ts, now, data} = res;
+                const elapsed = tick - now;
+
+                if (elapsed + 21 > ts) {
+                    res(data);
+                    pending.delete(res);
+                }
+                else {
+                    threshold = Math.max(MIN_THRESHOLD, Math.min(ts - elapsed, threshold));
+                }
+            }
+
+            if (pending.size) {
+                // re-schedule as per new threshold
+                queueMicrotask(() => this.dispatch());
+            }
+            else {
+                queueMicrotask(() => this.detach());
+            }
+        }
+    };
+
+    mega.worklet.then((ctx) => {
+        // override as the only class instance.
+        worklet = new worklet(ctx);
+    }).catch(ex => {
+        if (d) {
+            console.warn('The audio worklet failed to start, falling back to low-precision sleep()...', ex);
+        }
+
+        delete window.sleep;
+        window[`sl${'e'}ep`] = tSleep;
+
+        for (const res of pending) {
+            tSleep(res.ts / 1e3, res.data).then(res);
+        }
+        pending.clear();
+    });
+
+    return (ts, data) => new Promise(resolve => {
+        ts = ts * 1e3 | 0;
+
+        resolve.ts = ts;
+        resolve.data = data;
+        resolve.now = performance.now();
+        pending.add(resolve);
+
+        // resist-fingerprint-aware..
+        threshold = Math.max(MIN_THRESHOLD, Math.min(ts, threshold));
+
+        if (worklet.ready) {
+            queueMicrotask(() => worklet.dispatch());
+        }
+    });
+});
+
+/** @property mega.worklet */
+lazy(mega, 'worklet', function worklet() {
+    'use strict';
+    return Promise.resolve((async() => {
+        const ctx = new AudioContext();
+        if (ctx.state !== 'running') {
+            throw new SecurityError('The AudioContext was not allowed to start?');
+        }
+        await ctx.audioWorklet.addModule(`${is_extension ? '' : '/'}worklet.js?v=1`);
+        return ctx;
+    })());
+});

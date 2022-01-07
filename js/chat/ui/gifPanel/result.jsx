@@ -1,5 +1,5 @@
 import React from 'react';
-import { MegaRenderMixin } from '../../../stores/mixins';
+import { MegaRenderMixin } from '../../mixins';
 import { HAS_INTERSECTION_OBSERVER, NODE_CLASS, NODE_CONTAINER_CLASS } from './resultContainer.jsx';
 
 export default class Result extends MegaRenderMixin {

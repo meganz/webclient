@@ -75,9 +75,9 @@ mobile.cloud.contextMenu = {
             mobile.cloud.contextMenu.initRestoreButton($rubbishBinContextMenu, nodeHandle);
             mobile.cloud.contextMenu.initRubbishBinDelete($rubbishBinContextMenu, nodeHandle);
 
-            $fileContextMenu.addClass('hidden');
-            $folderContextMenu.addClass('hidden');
-            $rubbishBinContextMenu.removeClass('hidden');
+            $fileContextMenu.addClass('o-hidden');
+            $folderContextMenu.addClass('o-hidden');
+            $rubbishBinContextMenu.removeClass('o-hidden');
         }
         else if (nodeType === 1) {
 
@@ -85,6 +85,7 @@ mobile.cloud.contextMenu = {
             mobile.cloud.contextMenu.initFolderOpenButtonHandler($folderContextMenu, nodeHandle);
             mobile.cloud.contextMenu.initDownloadButton($folderContextMenu, nodeHandle);
             mobile.cloud.contextMenu.initMegadropButtons($folderContextMenu, nodeHandle);
+            mobile.cloud.contextMenu.initRenameButton($folderContextMenu, nodeHandle);
             mobile.cloud.contextMenu.initDeleteButton($folderContextMenu, nodeHandle);
             mobile.cloud.contextMenu.initCloseButton($folderContextMenu);
             mobile.cloud.contextMenu.initOverlayTap($folderContextMenu);
@@ -117,13 +118,14 @@ mobile.cloud.contextMenu = {
             }
 
             // Hide the file context menu if open and show the folder context menu
-            $fileContextMenu.addClass('hidden');
-            $folderContextMenu.removeClass('hidden');
+            $fileContextMenu.addClass('o-hidden');
+            $folderContextMenu.removeClass('o-hidden');
         }
         else {
 
             // Initialise buttons
             mobile.cloud.contextMenu.initPreviewButton($fileContextMenu, nodeHandle);
+            mobile.cloud.contextMenu.initRenameButton($fileContextMenu, nodeHandle);
             mobile.cloud.contextMenu.initDeleteButton($fileContextMenu, nodeHandle);
             mobile.cloud.contextMenu.initCloseButton($fileContextMenu);
             mobile.cloud.contextMenu.initOverlayTap($folderContextMenu);
@@ -137,8 +139,8 @@ mobile.cloud.contextMenu = {
             }
 
             // Hide the folder context menu if open and show the file context menu
-            $folderContextMenu.addClass('hidden');
-            $fileContextMenu.removeClass('hidden');
+            $folderContextMenu.addClass('o-hidden');
+            $fileContextMenu.removeClass('o-hidden');
         }
 
         if (pfid) {
@@ -162,9 +164,9 @@ mobile.cloud.contextMenu = {
         $overlay.addClass('hidden');
 
         // Hide the file context menu if open and show the folder context menu
-        $fileContextMenu.addClass('hidden');
-        $folderContextMenu.addClass('hidden');
-        $rubbishBinContextMenu.addClass('hidden');
+        $fileContextMenu.addClass('o-hidden');
+        $folderContextMenu.addClass('o-hidden');
+        $rubbishBinContextMenu.addClass('o-hidden');
     },
 
     /**
@@ -430,6 +432,30 @@ mobile.cloud.contextMenu = {
             // Show the Get/Manage link overlay and close the context menu
             mobile.cloud.contextMenu.hide();
             mobile.linkOverlay.show(nodeHandle);
+            return false;
+        });
+    },
+
+    /**
+     * Functionality for showing the overlay which will let the user rename file/folder
+     * @param {Object} $contextMenu A jQuery object for the folder/file context menu container
+     * @param {String} nodeHandle The node handle for this folder/file
+     * @returns {Boolean} Returns false
+     */
+    initRenameButton: function($contextMenu, nodeHandle) {
+
+        'use strict';
+
+        // When the Rename button is tapped
+        $('.rename-button', $contextMenu).rebind('tap', () => {
+
+            if (!validateUserAction(true)) {
+                return false;
+            }
+
+            // Show the Rename overlay and close the context menu
+            mobile.renameOverlay.init(nodeHandle);
+            mobile.cloud.contextMenu.hide();
             return false;
         });
     },

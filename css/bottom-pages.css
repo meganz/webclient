@@ -1,8 +1,3 @@
-    .bottom-page .inline-block.col-3.hidden,
-    .bottom-page .inline-block.col-2.hidden {
-        display: none;
-    }
-
 /* Old bottom pages styling */
 .privacy-company h1 {
     padding: 45px 0 20px 0;
@@ -361,16 +356,13 @@ html.gbot {
 .bottom-page.light-blue-top .top-head.floating,
 .bottom-page.light-grey-top .top-head,
 .bottom-page.light-grey-top .top-head.floating {
-    background-color: var(--surface-main);
+    background-color: var(--stroke-main);
 }
 
 .bottom-page.top-bl {
     table-layout: fixed;
     padding-top: 128px;
     box-sizing: border-box;
-}
-.onboarding-suggestions.megasync .bottom-page.top-bl {
-    padding-top: 0;
 }
 .mobile .bottom-page.top-bl {
     padding-top: 0;
@@ -420,7 +412,7 @@ html.gbot {
 }
 .fmholder .bottom-page.sign .top-head.floating,
 .fmholder .bottom-page.about .top-head.floating {
-    box-shadow: 0 1px 0 0 var(--surface-grey-2);
+    box-shadow: 0 1px 0 0 var(--stroke-grey-2);
 }
 
 .bottom-page.vertical-centered-bl {
@@ -448,6 +440,14 @@ html.gbot {
 }
 .bottom-page.vertical-centered-cell {
     vertical-align: middle;
+}
+.bottom-page.horizontal-centered-bl.jobs {
+    max-width: unset;
+    padding: unset;
+}
+.bottom-page.horizontal-centered-bl.wide.jobs {
+    max-width: unset;
+    padding: unset;
 }
 .bottom-page.horizontal-centered-bl {
     max-width: 970px;
@@ -720,7 +720,7 @@ body:not(.mobile) .bottom-page.scroll-button:hover {
     color: #000000;
     text-align: center;
     padding: 15px 0 21px 0;
-    font-family: 'montserrat', 'LatoWeb', 'source_sans_proregular', arial;
+    font-family: montserrat, LatoWeb, "source_sans_proregular", arial, sans-serif;
 }
 .bottom-page.big-icon-info.mid-txt {
     font-size: 24px;
@@ -798,6 +798,9 @@ body:not(.mobile) .bottom-page.scroll-button:hover {
 .inline-block.mid-pad {
     padding: 26px 28px;
 }
+.inline-block.inner-pad {
+    padding: 26px 28px;
+}
 .inline-block.mid-pad.max-width {
     max-width: 485px;
 }
@@ -826,7 +829,7 @@ body:not(.mobile) .bottom-page.scroll-button:hover {
     padding-top: 100px;
 }
 .bottom-page.ultra-huge-top-pad {
-    padding-top: 118px;
+    padding-top: 112px;
 }
 .bottom-page.angle-pad {
     padding-top: 236px;
@@ -864,6 +867,10 @@ body:not(.mobile) .bottom-page.scroll-button:hover {
 }
 .bottom-page.big-header.light {
     font-family: 'montserrat_light', 'montserrat', 'LatoWebLight', Arial;
+}
+.bottom-page.big-header.bold {
+    font-family: var(--text-font-family-montserrat-bold);
+      padding: 4px 0 86px;
 }
 .bottom-page.big-header.max-width {
     max-width: 895px;
@@ -941,9 +948,6 @@ body:not(.mobile) .bottom-page.scroll-button:hover {
 }
 .side-txt .bottom-page.table-cell {
     vertical-align: top;
-}
-.bottom-page.table.hidden {
-    display: none;
 }
 .vertical-centered-cell .bottom-page.table {
     height: 100%;
@@ -1027,9 +1031,6 @@ body:not(.mobile) .bottom-page.scroll-button:hover {
     display: inline-block;
     margin: 27px 0 0 0;
     font-family: 'LatoWeb', 'source_sans_proregular';
-}
-.mid-green-link.hidden {
-    display: none;
 }
 .mid-green-link.small {
     font-size: 16px;
@@ -1193,10 +1194,12 @@ body:not(.mobile) .bottom-page.scroll-button:hover {
     vertical-align: top;
 }
 .bottom-page.left-cell .img-description {
-    padding-right: 30px;
+    padding-inline-end: 30px;
+    -webkit-padding-end: 30px;
 }
 .bottom-page.right-cell .img-description {
-    padding-left: 30px;
+    padding-inline-start: 30px;
+    -webkit-padding-start: 30px;
 }
 .bottom-page.img-description.no-pad {
     padding: 0 2px 0 0;
@@ -2283,7 +2286,8 @@ body:not(.mobile) .bottom-page.top-dark-button:hover {
 .chrome .bottom-page.top-copyrights .content.chrome, .firefox .bottom-page.top-copyrights .content.ff, .opera .bottom-page.top-copyrights .content.opera, .edge .bottom-page.top-copyrights .content.edge, .unsupported .bottom-page.top-copyrights .unsupported {
     display: block;
 }
-.ios .bottom-page.top-copyrights {
+.ios .bottom-page.top-copyrights,
+.android .bottom-page.top-copyrights {
     padding-top: 0;
 }
 .unsupported .bottom-page.top-copyrights:not(.small-pad) {
@@ -2794,9 +2798,6 @@ body:not(.mobile) .bottom-page.top-dark-button:hover {
     padding: 12px 5px 0;
     width: 100%;
 }
-.megaapp-linux .bottom-page.radio-buttons.hidden {
-    display: none;
-}
 .megaapp-linux .bottom-page.radio-buttons label:last-child {
     -webkit-padding-end: 0;
     padding-inline-end: 0;
@@ -2869,9 +2870,6 @@ body:not(.mobile) .bottom-page.top-dark-button:hover {
     position: relative;
     text-align: left;
     white-space: nowrap;
-}
-.bottom-page .megaapp-linux.hidden {
-    display: none;
 }
 .bottom-page .megaapp-linux.dark {
     background-color: #333;
@@ -3429,6 +3427,33 @@ body:not(.mobile) .mobile-apps-button:hover {
     background-position: -134px -2731px;
     width: 146px;
 }
+.bottom-page.appstore-button {
+    display: inline-block;
+    height: 57px;
+    margin: 30px 15px 0;
+    width: 169px;
+}
+.bottom-page.appstore-button.android {
+    width: 216px;
+    height: auto;
+    margin: 0 0 -14px;
+}
+.bottom-page.appstore-button.huawei {
+    margin-left: 10px;
+    width: 200px;
+}
+.bottom-page.appstore-button.small {
+    margin: 0;
+    width: 131px;
+}
+.bottom-page.appstore-button.small.android {
+    margin: -4px 0 0 -10px;
+    width: 168px;
+}
+.bottom-page.appstore-button.small.huawei {
+    margin-left: -10px;
+    width: 150px;
+}
 .dark-blue-bg .bottom-page.dark-button:first-child {
     margin-right: 30px;
 }
@@ -3983,6 +4008,9 @@ body:not(.mobile) .securitypractice .business-text a.red:hover {
 .opensource-icon.ios {
     background-position: center -950px;
 }
+.opensource-icon.cmd {
+    background-position: center -1369px;
+}
 .opensource-icon.windowsphone {
     background-position: center -1090px;
 }
@@ -4004,59 +4032,11 @@ a.opensource-icon-txt.coming-soon {
 }
 /*  end of Open source */
 /* Desktop download during onboarding phase */
-.onboarding-suggestions .megaapp-linux {
-    margin: 0 auto 32px;
-}
-.onboarding-suggestions .megaapp-linux .bottom-page.radio-buttons {
-    justify-content: flex-start;
-}
-.onboarding-suggestions .top-buttons,
-.onboarding-suggestions .btn-icon.js-more-menu,
-.onboarding-suggestions .top-icon.notification,
-.onboarding-suggestions .top-icon.achievements,
-.onboarding-suggestions .membership-status-block {
-    display: none;
-}
-.onboarding-suggestions .bottom-page.top-description {
-    margin: 26px auto 26px;
-    padding: 0;
-    font-size: 15px;
-    line-height: 24px;
-}
-.onboarding-suggestions .bottom-page.vertical-centered-bl.top-bl {
-    background-color: #fafafa;
-    height: 100%;
-}
-.onboarding-suggestions .bottom-page.bottom-bar {
-    bottom: 0;
-    position: absolute;
-    left: 0;
-    right: 0;
-    height: 120px;
-    color: #A1A7AF;
-    background-color: white;
-    display: table;
-    width: 100%;
-    font-size: 15px
-}
-.onboarding-suggestions .button-wrappers {
-    margin: 0 auto;
-    display: table-cell;
-    vertical-align: middle;
-    text-align: center;
-}
-.onboarding-suggestions .text-button:hover {
-    text-decoration: underline;
-    cursor: pointer;
-}
 .mega-button.positive.height-48.redirect-clouddrive, .mega-button.positive.height-48.download-app {
     font-size: 16px;
     padding: 0 24px;
     z-index: 999;
     margin-top: 10px;
-}
-.mega-button.positive.redirect-clouddrive.hidden, .mega-button.positive.download-app.hidden {
-    display: none;
 }
 .onboard-container-size .bottom-page.horizontal-centered-bl {
     min-height: 680px;
@@ -4068,186 +4048,6 @@ a.opensource-icon-txt.coming-soon {
 }
 .onboard-container-size .bottom-page.horizontal-centered-bl.resize {
     min-height: 600px;
-}
-.onboarding-suggestions .download-app {
-    min-width: 240px;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
-}
-.onboarding-suggestions .onboard-image-wrapper {
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 130px;
-    top: 0;
-    z-index: 0;
-    text-align: center;
-}
-.onboarding-suggestions .onboard-image {
-    width: 102px;
-    height: 102px;
-    background-image: url(../images/mega/onboarding_download.png);
-    background-repeat: no-repeat;
-    background-position: 0 0;
-    background-size: 600px auto;
-    margin: 0 auto;
-    position: absolute;
-    bottom: 0;
-    right: 0;
-    left: 0;
-}
-.onboarding-suggestions .onboard-image-wrapper .onboard-image.desktop-active {
-    background-position: 0 -457px;
-    width: 227px;
-    height: 138px;
-}
-.onboarding-suggestions .onboard-image-wrapper .onboard-image.desktop-inactive {
-    background-position: -373px 0;
-    width: 227px;
-    height: 138px;
-}
-.onboarding-suggestions .onboard-image-wrapper .onboard-image.clouds {
-    background-position: center -163px;
-    max-width: 505px;
-    width: 100%;
-    height: 98px;
-    bottom: -10px;
-    opacity: 1;
-    -webkit-transition: all 100ms ease-in-out;
-    -moz-transition: all 100ms ease-in-out;
-    -o-transition: all 100ms ease-in-out;
-    -ms-transition: all 100ms ease-in-out;
-    transition: all 100ms ease-in-out;
-}
-.onboarding-suggestions .onboard-image-wrapper .onboard-image.clouds.hidden, .onboarding-suggestions .onboard-image-wrapper .onboard-image.logo-mega.hidden, .onboarding-suggestions .onboard-image-wrapper .onboard-image.down-arrow.hidden {
-    opacity: 0;
-    display: block;
-    -webkit-transition: all 100ms ease-in-out;
-    -moz-transition: all 100ms ease-in-out;
-    -o-transition: all 100ms ease-in-out;
-    -ms-transition: all 100ms ease-in-out;
-    transition: all 100ms ease-in-out;
-}
-.onboarding-suggestions .onboard-image-wrapper .onboard-image.logo-mega {
-    background-position: -260px -7px;
-    width: 80px;
-    height: 80px;
-    bottom: 222px;
-    opacity: 0;
-    display: none;
-    -webkit-transition: all 200ms ease-in-out;
-    -moz-transition: all 200ms ease-in-out;
-    -o-transition: all 200ms ease-in-out;
-    -ms-transition: all 200ms ease-in-out;
-    transition: all 200ms ease-in-out;
-}
-.onboarding-suggestions .onboard-image-wrapper .onboard-image.logo-mega.visible {
-    opacity: 1;
-    display: block;
-    -webkit-transition: all 200ms ease-in-out;
-    -moz-transition: all 200ms ease-in-out;
-    -o-transition: all 200ms ease-in-out;
-    -ms-transition: all 200ms ease-in-out;
-    transition: all 200ms ease-in-out;
-}
-.onboarding-suggestions .onboard-image-wrapper .onboard-image.down-arrow {
-    background-position: -260px -80px;
-    width: 80px;
-    height: 80px;
-    bottom: 147px;
-    opacity: 0;
-    -webkit-transition: all 200ms ease-in-out;
-    -moz-transition: all 200ms ease-in-out;
-    -o-transition: all 200ms ease-in-out;
-    -ms-transition: all 200ms ease-in-out;
-    transition: all 200ms ease-in-out;
-}
-.onboarding-suggestions .onboard-image-wrapper .onboard-image.down-arrow.visible {
-    -webkit-animation: downward-arrow 2s infinite ease-in-out; /* Safari 4+ */
-    -moz-animation: downward-arrow 2s infinite ease-in-out; /* Fx 5+ */
-    -o-animation: downward-arrow 2s infinite ease-in-out; /* Opera 12+ */
-    animation: downward-arrow 2s infinite ease-in-out; /* IE 10+, Fx 29+ */
-}
-.onboarding-suggestions .onboard-image.mobile-apps {
-    background-position: -35px -292px;
-    width: 154px;
-    height: 160px;
-    bottom: 0;
-    position: relative;
-    display: none;
-    margin: 0 auto 20px;
-}
-.onboarding-suggestions .onboard-image-wrapper .onboard-image.transfer-progress {
-    background-position: -237px -320px;
-    width: 126px;
-    height: 114px;
-    bottom: 168px;
-}
-.onboarding-suggestions .onboard-image-wrapper .onboard-image.transfer-speed {
-    background-position: -421px -326px;
-    width: 167px;
-    height: 104px;
-    bottom: 83px;
-    left: 362px;
-    z-index: -1;
-}
-.onboarding-suggestions .onboard-image-wrapper .onboard-image.folder-select {
-    background-position: -441px -468px;
-    width: 128px;
-    height: 104px;
-    left: -347px;
-    bottom: 68px;
-}
-.onboarding-suggestions .badge {
-    font-family: 'LatoWebBold', 'source_sans_probold', Arial;
-}
-.onboarding-suggestions .text-button.redirect-clouddrive-link {
-    display: inline-block;
-    font-family: 'LatoWeb', 'source_sans_proregular', sans-serif;
-    font-size: 15px;
-    color: #818993;
-    margin-top: 64px;
-}
-.onboarding-suggestions .text-button.redirect-clouddrive-link.hidden {
-    display: none;
-}
-.onboarding-suggestions .cmd .default-select.megaapp-dropdown {
-    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.15);
-    -webkit-box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.15);
-    -moz-box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.15);
-    height: 40px;
-    line-height: 39px;
-    background-position: right -8356px;
-    -webkit-transition: all 200ms ease-in-out;
-    -moz-transition: all 200ms ease-in-out;
-    -o-transition: all 200ms ease-in-out;
-    -ms-transition: all 200ms ease-in-out;
-    transition: all 200ms ease-in-out;
-    width: 250px;
-    margin-top: 20px;
-}
-.onboarding-suggestions .cmd .default-select.megaapp-dropdown:hover {
-    box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.15);
-    -webkit-box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.15);
-    -moz-box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.15);
-    -webkit-transition: all 200ms ease-in-out;
-    -moz-transition: all 200ms ease-in-out;
-    -o-transition: all 200ms ease-in-out;
-    -ms-transition: all 200ms ease-in-out;
-    transition: all 200ms ease-in-out;
-}
-.onboarding-suggestions .cmd .default-select::before {
-    height: 40px;
-}
-.onboarding-suggestions .cmd.megaapp-linux .bottom-page.split-buttons {
-    width: 250px;
-    white-space: nowrap;
-    margin: 0 auto;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
-    padding: 0;
 }
 .split-buttons div.radioOn, .split-buttons div.radioOff {
     float: left;
@@ -4273,9 +4073,6 @@ a.opensource-icon-txt.coming-soon {
     -ms-transition: all 200ms ease-in-out;
     transition: all 200ms ease-in-out;
     border: 1px solid #ddd;
-}
-.onboarding-suggestions .split-buttons div:first-of-type {
-    margin-right: 8px;
 }
 .split-buttons div.radioOn::before, .split-buttons div.radioOff::before {
     width: 100%;
@@ -4341,218 +4138,11 @@ a.opensource-icon-txt.coming-soon {
     color: #495057;
     font-family: 'LatoWebBold', Arial;
 }
-.onboarding-suggestions .megaapp-linux-info {
-    padding: 0;
-}
-.onboarding-suggestions .megaapp-linux.cmd {
-    margin-bottom: 8px;
-    z-index: 9999;
-    position: relative;
-}
-.onboarding-suggestions.linux .cmd .default-select.megaapp-dropdown, .onboarding-suggestions.linux .cmd.megaapp-linux .bottom-page.split-buttons, .onboarding-suggestions.linux .download-app {
-    width: 300px;
-}
-.onboarding-suggestions.linux .download-app {
-    margin-top: 0px;
-}
-.onboarding-suggestions .top-description.mobile-download, .onboarding-suggestions .top-dark-info.medium.mobile-download, .onboarding-suggestions a.fm-avatar {
-    display: none;
-}
-.onboarding-suggestions a.logo {
-    cursor: default;
-}
-.onboarding-suggestions .bottom-page.big-icon.sync-icon {
-    transform: scale(.75);
-}
-.onboarding-suggestions .bottom-page.top-dark-info.medium {
-    font-size: 28px;
-    line-height: 42px;
-}
-.onboarding-suggestions .bottom-page.top-dark-info.medium {
-    font-size: 28px;
-    line-height: 42px;
-    color: #495057;
-}
-.bottom-page.onboarding-suggestions {
-    min-height: 680px;
-    min-width: 1024px;
-}
-.onboarding-suggestions .os-mac-windows-toggle, .onboarding-suggestions .os-linux-toggle {
-    font-family: 'LatoWebBold', Arial;
-}
-.onboarding-suggestions .megaapp-linux .megaapp-dropdown-list {
-    z-index: 9999;
-}
-.onboarding-suggestions .promo-voucher-card {
-    height: 62px;
-    width: 100%;
-    background-color: #fff;
-    border-radius: 4px;
-    box-sizing: border-box;
-    max-width: 420px;
-    margin: 0 auto;
-    border: 1px solid #eee;
-    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, .15);
-}
-.onboarding-suggestions .promo-voucher-card.yellow-block {
-    background-color: #FFAF00;
-    border: 1px solid #FD8116;
-    color: #fff;
-}
-.onboarding-suggestions .promo-voucher-card.red-block {
-    background-color: #eb4444;
-    border: 1px solid #d90007;
-    color: #fff;
-}
-.onboarding-suggestions .promo-voucher-card.blue-block {
-    background-color: #46B4E5;
-    border: unset;
-    box-shadow: 0 1px 1px 0 rgba(0,0,0,0.05);
-    color: #fff;
-}
-.onboarding-suggestions .promo-voucher-block {
-    margin: 0 auto 36px;
-}
-.onboarding-suggestions .pro-crest-container {
-    width: 60px;
-    box-sizing: border-box;
-    position: absolute;
-    height: 100%;
-    display: inline-block;
-    top: 0;
-    left: 0;
-}
 .mobile .payment-method {
     width: 50%;
 }
 .pro-crest-container .plan-icon {
     margin: 14px 0 0 14px;
-}
-.onboarding-suggestions .pro-crest-container::after, .onboarding-suggestions .storage-block::after {
-    content: '';
-    border-right: 1px solid #ddd;
-    position: absolute;
-    height: 24px;
-    right: 0;
-    top: 18px;
-}
-.onboarding-suggestions .promo-voucher-inner-wrapper {
-    position: relative;
-    height: 100%;
-}
-.onboarding-suggestions .pro-detail-wrapper {
-    width: calc(100% - 60px);
-    position: relative;
-    height: 100%;
-    box-sizing: border-box;
-    margin-left: 60px;
-    display: table;
-    height: 60px;
-}
-.onboarding-suggestions .storage-block, .onboarding-suggestions .transfer-block {
-    width: 49%;
-    box-sizing: border-box;
-    position: relative;
-    height: 100%;
-    display: table-cell;
-    text-align: center;
-    font-size: 14px;
-    line-height: 20px;
-    vertical-align: middle;
-}
-.onboarding-suggestions .storage-amount span, .onboarding-suggestions .transfer-amount span {
-    font-family: 'LatoWebBold', Arial;
-    font-size: 17px;
-    line-height: 25px;
-    display: block;
-}
-.onboarding-suggestions .promo-voucher-card.yellow-block .storage-amount,
-.onboarding-suggestions .promo-voucher-card.yellow-block .transfer-amount {
-    color: #fff;
-}
-.onboarding-suggestions .pro-detail-aligners {
-    font-size: 12px;
-    line-height: 20px;
-    text-transform: uppercase;
-    white-space: normal;
-    padding: 0 10px;
-}
-.en .onboarding-suggestions .pro-detail-aligners {
-    font-size: 14px;
-}
-.onboarding-suggestions .pro-detail-aligners span {
-    font-family: 'LatoWebBold', Arial;
-    font-size: 17px;
-    line-height: 25px;
-    display: block;
-}
-.onboarding-suggestions .promo-voucher-background {
-    display: none;
-}
-.onboarding-suggestions.promo-vouchers .bottom-page.half-page {
-    width: 50%;
-    display: table;
-    position: relative;
-    float: left;
-    height: 100%;
-}
-.onboarding-suggestions.promo-vouchers .bottom-page.half-page.right-side {
-    background-color: #F4F4F6;
-    box-sizing: border-box;
-}
-.promo-vouchers .onboard-container-size .bottom-page.horizontal-centered-bl {
-    display: table-cell;
-    vertical-align: middle;
-    padding: 0 110px;
-}
-.onboarding-suggestions .bottom-page.section-border {
-    width: 36px;
-    height: 2px;
-    border-radius: 4px;
-    background-color: #eee;
-    margin: 0 auto 24px;
-}
-/*.onboarding-suggestions.promo-vouchers .bottom-page.top-dark-info.medium,
-.onboarding-suggestions.promo-vouchers .bottom-page.top-description {
-    text-align: left;
-}
-.onboarding-suggestions.promo-vouchers .promo-voucher-card,
-.onboarding-suggestions.promo-vouchers .mega-button.positive.height-48.redirect-clouddrive,
-.onboarding-suggestions.promo-vouchers .mega-button.positive.height-48.download-app {
-    margin: 0 0;
-}
-.onboarding-suggestions.promo-vouchers .mega-button.positive.height-48.redirect-clouddrive,
-.onboarding-suggestions.promo-vouchers .mega-button.positive.height-48.download-app {
-    float: left;
-}*/
-.onboarding-suggestions.promo-vouchers .text-button.redirect-clouddrive-link {
-    color: #bbb;
-    margin-top: 80px;
-}
-.onboarding-suggestions.promo-vouchers .bottom-page.bottom-bar {
-    height: 200px;
-}
-.onboarding-suggestions.promo-vouchers .onboard-image-wrapper {
-    bottom: 200px
-}
-.onboarding-suggestions.promo-vouchers .button-wrappers {
-    width: 100%;
-    position: relative;
-    display: block;
-}
-.onboarding-suggestions.promo-vouchers .bottom-page.vertical-centered-bl.top-bl {
-    background-color: #fff;
-}
-.onboarding-suggestions.promo-vouchers .promo-voucher-card {
-    max-width: 360px;
-}
-.onboarding-suggestions a.red:hover {
-    text-decoration: underline;
-}
-.onboarding-suggestions.megasync .bottom-page.top-bl {
-    max-height: 700px;
-    min-height: 455px;
-    table-layout: fixed;
 }
 .mobile button.inline, .mobile .megaapp-button-info {
     display: none;
@@ -4573,6 +4163,9 @@ a.opensource-icon-txt.coming-soon {
 }
 .affiliate-page .bottom-page.content {
     overflow: hidden;
+}
+.rtl .affiliate-page .bottom-page.startpage {
+    direction: rtl;
 }
 .affiliate-page .bottom-page.top-title {
     color: white;
@@ -4804,9 +4397,6 @@ body:not(.mobile) .affiliate.refer-cell:hover .affiliate.refer-header {
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
     box-sizing: border-box;
-}
-.bottom-page.green-button.hidden {
-    display: none;
 }
 .en .bottom-page.green-button {
     font-size: 18px;
@@ -5090,6 +4680,17 @@ body:not(.mobile) .bottom-page.dropdown .dropdown-item:hover, .bottom-page.dropd
     }
 }
 
+@media only screen and (max-width: 768px) {
+    .megasync .bottom-page.right-cell,
+    .megasync .bottom-page.left-cell {
+        width: 100%;
+        display: block;
+    }
+    .megasync .sync-3 .bottom-page img {
+        margin: 32px auto;
+    }
+}
+
 @media only screen and (max-width: 1900px) {
     .bottom-page.angle-bg {
         background-size: cover !important;
@@ -5126,11 +4727,7 @@ body:not(.mobile) .bottom-page.dropdown .dropdown-item:hover, .bottom-page.dropd
         padding-bottom: 180px;
     }
 }
-
 @media only screen and (max-width: 1280px) {
-    .onboarding-suggestions.promo-vouchers .bottom-page.horizontal-centered-bl {
-        padding: 0 72px;
-    }
     .bottom-page.img.bird-img2 {
         margin-left: 36px;
     }
@@ -5156,43 +4753,6 @@ body:not(.mobile) .bottom-page.dropdown .dropdown-item:hover, .bottom-page.dropd
 }
 
 @media only screen and (max-width: 1180px) {
-    .onboarding-suggestions.promo-vouchers .bottom-page.horizontal-centered-bl {
-        padding: 0 40px;
-    }
-    .onboarding-suggestions .bottom-page.top-dark-info.medium {
-        font-size: 24px;
-        line-height: 36px;
-    }
-    .onboarding-suggestions .bottom-page.top-description {
-        font-size: 13px;
-        line-height: 22px;
-    }
-    .onboarding-suggestions .text-button.redirect-clouddrive-link {
-        font-size: 13px;
-        line-height: 22px;
-    }
-    .onboarding-suggestions.promo-vouchers .promo-voucher-card {
-        width: 320px;
-    }
-    .onboarding-suggestions .storage-amount span, .onboarding-suggestions .transfer-amount span {
-        font-size: 16px;
-        line-height: 24px;
-    }
-    .mega-button.positive.height-48.redirect-clouddrive, .mega-button.positive.height-48.download-app {
-        font-size: 15px;
-    }
-    .onboarding-suggestions .onboard-image-wrapper .onboard-image.transfer-progress, .onboarding-suggestions .onboard-image-wrapper .onboard-image.transfer-speed, .onboarding-suggestions .onboard-image-wrapper .onboard-image.folder-select {
-        transform: scale(.75);
-    }
-    .onboarding-suggestions .onboard-image-wrapper .onboard-image.folder-select {
-        left: -310px;
-    }
-    .onboarding-suggestions .onboard-image-wrapper .onboard-image.transfer-progress {
-        bottom: 148px;
-    }
-    .onboarding-suggestions .onboard-image-wrapper .onboard-image.transfer-speed {
-        left: 340px;
-    }
     .affiliate.refer-cell {
         width: 50%;
     }
@@ -5213,6 +4773,20 @@ body:not(.mobile) .bottom-page.dropdown .dropdown-item:hover, .bottom-page.dropd
 @media only screen and (max-width: 1005px) {
     .affiliate.icon-info, .affiliate.refer-header {
         font-size: 24px;
+    }
+    .bottom-page.location-right-dist {
+        width: 100%;
+        display: table;
+    }
+    .location-wrapper {
+        display: inline-block;
+        vertical-align: top;
+    }
+    .bottom-page.location-left-dist {
+        padding-bottom: 40px;
+    }
+    .top.img {
+        width: 100%;
     }
 }
 
@@ -5305,9 +4879,6 @@ body:not(.mobile) .bottom-page.dropdown .dropdown-item:hover, .bottom-page.dropd
         max-width: 100%;
         margin: 20px auto;
     }
-    .onboarding-suggestions .bottom-page.horizontal-centered-bl {
-        max-width: 720px;
-    }
     .bottom-page.img.tm {
         padding: 120px 0 0 0;
     }
@@ -5335,13 +4906,20 @@ body:not(.mobile) .bottom-page.dropdown .dropdown-item:hover, .bottom-page.dropd
     .bottom-page.img.ios2 {
         margin: 80px -12.5% 0 -12.5%;
     }
+
     .bottom-page.top-dark-info.medium, .bottom-page.big-header, .bottom-page.dark-big-header, .bottom-page.large-header, .bottom-page.large-header.big, .bottom-page.business-header, .bottom-page.container-title, .bottom-page.bold-title {
         font-size: 30px;
     }
+
     .mobileapp .top-bl .horizontal-centered-bl {
         min-height: auto;
     }
+
+    .top.img {
+        width: unset;
+    }
 }
+
 
 @media only screen and (max-width: 870px) {
     .bottom-btn-container p {
@@ -5378,6 +4956,11 @@ body:not(.mobile) .bottom-page.dropdown .dropdown-item:hover, .bottom-page.dropd
     .bottom-page.small-txt {
         font-size: 14px;
         line-height: 24px;
+    }
+    .inline-block.inner-pad {
+        padding: unset;
+        padding-top: 50px;
+        text-align: center;
     }
     .bottom-page.img.mobile-top {
         margin: 0 0 50px;
@@ -5740,16 +5323,6 @@ body:not(.mobile) .bottom-page.dropdown .dropdown-item:hover, .bottom-page.dropd
     }
 }
 
-@media only screen and (max-width: 768px) {
-    .megasync .bottom-page.right-cell, .megasync .bottom-page.left-cell {
-        width: 100%;
-        display: block;
-    }
-    .megasync .sync-3 .bottom-page img {
-        margin: 32px auto;
-    }
-}
-
 @media only screen and (max-width: 702px) {
     .bottom-page.img.ios2 {
         margin-top: 0;
@@ -5864,6 +5437,26 @@ body:not(.mobile) .bottom-page.dropdown .dropdown-item:hover, .bottom-page.dropd
         display: block;
         margin: 16px auto 0;
     }
+    .bottom-page.appstore-button {
+        height: auto;
+        width: 200px;
+    }
+    .bottom-page.appstore-button.android {
+        height: auto;
+        width: 230px;
+    }
+    .bottom-page.appstore-button.huawei {
+        height: auto;
+        width: 202px;
+        margin: 10px 10px 0;
+    }
+    .bottom-page.appstore-button.small {
+        margin: 0;
+        width: 131px;
+    }
+    .bottom-page .vision-col-4 {
+        width: 50%;
+    }
 }
 
 @media only screen and (max-width: 660px) {
@@ -5975,10 +5568,6 @@ body:not(.mobile) .bottom-page.dropdown .dropdown-item:hover, .bottom-page.dropd
     }
     .bottom-page.top-description {
         padding: 40px 0 25px 0;
-    }
-    .onboarding-suggestions .bottom-page.top-description {
-        font-size: 14px;
-        line-height: 22px;
     }
     .securitypractice .bottom-page.large-subheader {
         font-size: 16px;
@@ -6183,13 +5772,6 @@ body:not(.mobile) .bottom-page.dropdown .dropdown-item:hover, .bottom-page.dropd
         padding-left: 0;
         padding-right: 0;
     }
-    .onboarding-suggestions .bottom-page.vertical-centered-bl.top-bl {
-        max-height: initial;
-        min-height: 680px;
-    }
-    .onboarding-suggestions .bottom-page.horizontal-centered-bl.resize {
-        min-height: 640px;
-    }
     .bird .bottom-page.top-dark-button {
         min-width: auto;
     }
@@ -6357,9 +5939,6 @@ body:not(.mobile) .bottom-page.dropdown .dropdown-item:hover, .bottom-page.dropd
     .megasync .bottom-page.img.mobile-view {
         margin-top: 24px;
     }
-    .onboarding-suggestions .onboard-image-wrapper .onboard-image.folder-select, .onboarding-suggestions .onboard-image-wrapper .onboard-image.transfer-progress, .onboarding-suggestions .onboard-image-wrapper .onboard-image.transfer-speed {
-        display: none;
-    }
     .bottom-page.top-dark-button {
         margin-left: -15px;
         margin-right: -15px;
@@ -6522,9 +6101,6 @@ body:not(.mobile) .bottom-page.dropdown .dropdown-item:hover, .bottom-page.dropd
     }
     .affitiate.calc-price {
         font-size: 40px;
-    }
-    .es .onboarding-suggestions .pro-detail-aligners {
-        font-size: 10px;
     }
 }
 
@@ -6721,7 +6297,6 @@ body:not(.mobile) .bottom-page.dropdown .dropdown-item:hover, .bottom-page.dropd
         background-image: url(../images/mega/security-page@2x.png);
         background-size: 750px auto;
     }
-    .onboarding-suggestions .onboard-image,
     .redeem-promo-page .onboard-image {
         background-image: url(../images/mega/onboarding_download@2x.png);
         background-size: 600px auto;
@@ -6770,9 +6345,6 @@ body:not(.mobile) .bottom-page.unsub .tip-wrapper .underline-btn-txt {
 }
 .bottom-page.unsub .sent-email-logo {
     display: inline-block;
-}
-.bottom-page.unsub .sent-email-logo.hidden {
-    display: none;
 }
 .bottom-page.unsub .button-container {
     padding-top: 40px;

@@ -1,5 +1,5 @@
 import React from 'react';
-import { MegaRenderMixin } from '../../../../../stores/mixins';
+import { MegaRenderMixin } from '../../../../mixins';
 import ModalDialogsUI from '../../../../../ui/modalDialogs.jsx';
 import Button from '../../button.jsx';
 import { ContactCard, MAX_FREQUENTS } from '../../../contacts.jsx';
@@ -281,7 +281,7 @@ export default class Invite extends MegaRenderMixin {
                                         this.setState({ field: !field });
                                         e.preventDefault();
                                     }}>
-                                    {field ? 'Collapse meeting link' : 'Expand meeting link'}
+                                    {field ? l.collapse_meeting_link : l.expand_meeting_link}
                                     <i className={`sprite-fm-mono ${field ? 'icon-arrow-up' : 'icon-arrow-down'}`} />
                                 </a>
                                 {field && link && (

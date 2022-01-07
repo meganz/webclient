@@ -8,6 +8,7 @@ var cachepages = [
     "copyright",
     "copyrightnotice",
     "credits",
+    "desktop",
     "dev",
     "doc",
     "firefox",
@@ -22,14 +23,12 @@ var cachepages = [
     "login",
     "mobile",
     "privacy",
-    "privacycompany",
     "pro",
     "register",
     "resellers",
     "sdk",
     "sourcecode",
     "start",
-    "sync",
     "takedown",
     "terms",
 	"cmd"
@@ -51,14 +50,13 @@ var titles = {
 	'login' : 'Login - MEGA',
 	'mobile' : 'Mobile Apps - MEGA',
 	'privacy' : 'Privacy Policy - MEGA',
-	'privacycompany' : 'The Privacy Company - MEGA',
 	'register' : 'Register free account - MEGA',
 	'resellers' : 'Resellers - MEGA',
 	'sdk' : 'Software Development Kit - MEGA',
 	'sourcecode' : 'Public Sourcecode - MEGA',
 	'start' : 'MEGA',
 	'' : 'MEGA',
-	'sync' : 'MEGAsync - MEGA',
+	'desktop' : 'MEGAsync - MEGA',
 	'takedown' : 'Takedown Policy - MEGA',
 	'terms' : 'Terms of Service - MEGA',
 	'cmd' : 'MEGAcmd - MEGA',
@@ -218,7 +216,7 @@ function cacheHTML() {
 	$('#hiddendiv').html(html);
 	$('#hiddendiv .widget-block').remove();
 	// open the main menu to make it visible to crawlers:
-	$('#hiddendiv .top-menu-popup').removeClass('hidden');
+	$('#hiddendiv .top-menu-popup').removeClass('o-hidden');
 	$('#hiddendiv .top-menu-popup.submenu-item').addClass('expanded');
 	// remove all hidden elements from the crawlers:
 	$('#hiddendiv .hidden').remove();

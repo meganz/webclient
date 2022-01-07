@@ -231,15 +231,13 @@ var ulmanager = {
      */
     onUploadFinished: function(aUploadID) {
         'use strict';
-
-        if (typeof aUploadID !== 'number' || aUploadID < 8001) {
-            return MegaPromise.reject(EARGS);
-        }
-
-        return new MegaPromise(function(resolve, reject) {
+        return new Promise((resolve, reject) => {
             var _ev1;
             var _ev2;
             var _ev3;
+            if (typeof aUploadID !== 'number' || aUploadID < 8001) {
+                return reject(EARGS);
+            }
             var queue = ul_queue.filter(isQueueActive);
             var i = queue.length;
 
@@ -286,7 +284,7 @@ var ulmanager = {
             logger.debug('Waiting for upload %d to finish...', aUploadID, [aFile]);
         }
 
-        this.onUploadFinished(aUploadID).wait(function(h) {
+        this.onUploadFinished(aUploadID).always((h) => {
             if (d) {
                 logger.debug('Upload %s finished...', aUploadID, h);
             }
@@ -483,6 +481,11 @@ var ulmanager = {
         }
         var tid = ++file.__umRetries;
         file.__umRetryTimer[tid] = setTimeout(function() {
+            // Could become frozen {} after this timeout.
+            if (!file.id) {
+                return;
+            }
+
             var q = file.__umRetryTimer || {};
             delete q[tid];
 
@@ -935,7 +938,7 @@ var ulmanager = {
                     file.faid,
                     null, null,
                     {raw: img !== 1 && img, isVideo: vid}
-                );
+                ).catch(nop);
 
                 var uled = ulmanager.ulEventData[file.id];
                 if (uled) {
@@ -1014,7 +1017,7 @@ var ulmanager = {
                 var file = ctx.file;
                 var done = function() {
                     // get thumb/prev created if it wasn't already, eg. an mp4 renamed as avi/mov/etc
-                    if (is_video(n) === 1 && String(n.fa).indexOf(':0*') < 0) {
+                    if (is_video(n) === 1 && String(n.fa).indexOf(':0*') < 0 && !Object(file).__getVTNPid) {
                         var aes = new sjcl.cipher.aes([
                             n.k[0] ^ n.k[4], n.k[1] ^ n.k[5], n.k[2] ^ n.k[6], n.k[3] ^ n.k[7]
                         ]);
@@ -1100,11 +1103,11 @@ var ulmanager = {
         if (identical && fmconfig.ul_skipIdentical) {
             n = identical;
         }
-        else if ((!M.h[uq.hash] || !Object.keys(M.h[uq.hash]).length) && !identical) {
+        else if ((!M.h[uq.hash] || !M.h[uq.hash].size) && !identical) {
             return ulmanager.ulStart(File);
         }
         else if (M.h[uq.hash]) {
-            n = mNode || M.d[Object.keys(M.h[uq.hash])[0]];
+            n = mNode || M.d[M.h[uq.hash].first];
             // identical = n;
         }
         if (!n) {
@@ -1229,7 +1232,7 @@ var ulmanager = {
             var identical = ulmanager.ulIdentical(aFile);
             ulmanager.logger.info(aFile.name, "fingerprint", aFile.hash, M.h[aFile.hash], identical);
 
-            if ((M.h[aFile.hash] && Object.keys(M.h[aFile.hash]).length) || identical) {
+            if (M.h[aFile.hash] && M.h[aFile.hash].size || identical) {
                 ulmanager.ulDeDuplicate(aFileUpload, identical, hashNode);
             }
             else {
@@ -1240,32 +1243,15 @@ var ulmanager = {
         var promises = [];
 
         if (!M.c[aFile.target]) {
-            promises.push(dbfetch.get(aFile.target, new MegaPromise()));
+            promises.push(dbfetch.get(aFile.target));
         }
 
-        var isHashFetchNeeded = false;
-
-        if (!M.h[aFile.hash]) {
-            isHashFetchNeeded = true;
-        }
-        else {
-            var hashesArray = Object.keys(M.h[aFile.hash]);
-            if (!hashesArray.length || !M.d[hashesArray[0]]) {
-                isHashFetchNeeded = true;
-            }
-        }
-
-        if (isHashFetchNeeded && !mega.megadrop.isInit()) {
-            promises.push(
-                dbfetch.hash(aFile.hash)
-                    .always(function(node) {
-                        hashNode = node;
-                    })
-            );
+        if ((!M.h[aFile.hash] || !M.d[M.h[aFile.hash].first]) && !mega.megadrop.isInit()) {
+            promises.push(dbfetch.hash(aFile.hash).then(node => (hashNode = node)));
         }
 
         if (promises.length) {
-            MegaPromise.allDone(promises).wait(startUpload);
+            Promise.allSettled(promises).then(startUpload);
         }
         else {
             startUpload();
@@ -1375,7 +1361,7 @@ ChunkUpload.prototype.updateprogress = function() {
 };
 
 ChunkUpload.prototype.abort = function() {
-    if (d && this.logger) {
+    if (d > 1 && this.logger) {
         this.logger.info('Aborting', this.oet, Boolean(this.xhr));
     }
 
@@ -1567,7 +1553,7 @@ ChunkUpload.prototype.upload = function() {
     url = dlmanager.uChangePort(this.file.posturl + this.suffix, this.altport ? 8080 : 0);
     xhr._murl = url;
 
-    if (d) {
+    if (d > 1) {
         this.logger.info("pushing", url);
     }
 
@@ -1616,7 +1602,7 @@ ChunkUpload.prototype.io_ready = function(res) {
 };
 
 ChunkUpload.prototype.done = function(ee) {
-    if (d && this.logger) {
+    if (d > 1 && this.logger) {
         this.logger.info('.done');
     }
 
@@ -1645,7 +1631,9 @@ ChunkUpload.prototype.run = function(done) {
         this.logger.warn('Intentionally blocking the first chunk.');
     }
     else {
-        this.logger.info('.run');
+        if (d > 1) {
+            this.logger.info('.run');
+        }
         if (!this.file.ul_reader) {
             this.file.ul_reader = new FileUploadReader(this.file);
 

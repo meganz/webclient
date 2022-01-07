@@ -220,7 +220,7 @@
 
         this.options = $.extend({}, SETTINGS, options);
 
-        this._debug = localStorage.d || 0;
+        this._debug = d || 0;
     };
 
     /**
@@ -291,10 +291,10 @@
      * Should be triggered when an items render properties are changed (eg Height).
      * @param index
      */
-    MegaDynamicList.prototype.itemRenderChanged = function(id) {
+    MegaDynamicList.prototype.itemRenderChanged = function(id, domCheck) {
         'use strict';
         this._updateHeight(id);
-        this._viewChanged();
+        this._viewChanged(domCheck);
     };
 
     /**
@@ -317,11 +317,34 @@
      */
     MegaDynamicList.prototype._updateHeight = function(id) {
         'use strict';
-        var newHeight = this.options.itemHeightCallback(id);
-        this._calculated['contentHeight'] += newHeight - this._heights[id];
+
+        let list;
+
+        if (id) {
+            list = [id];
+        }
+        else {
+            list = this.items;
+        }
+
+        for (var i = 0; i < list.length; i++) {
+            var key = list[i];
+
+            var newHeight = this.options.itemHeightCallback(key);
+            this._calculated['contentHeight'] += newHeight - this._heights[key];
+            this._heights[key] = newHeight;
+        }
         this.content.style.height = this._calculated['contentHeight'] + "px";
-        this._heights[id] = newHeight;
         this._calculateHeightAndOffsets(true);
+
+        // scrolled out of the viewport if the last item in the list was removed? scroll back a little bit...
+        if (this._calculated['scrollHeight'] + this._calculated['scrollTop'] > this._calculated['contentHeight']) {
+
+            this.listContainer.scrollTop = this._calculated['contentHeight'] - this._calculated['scrollHeight'];
+            this._isUserScroll = false;
+            Ps.update(this.listContainer);
+            this._isUserScroll = true;
+        }
     };
 
     /**
@@ -713,6 +736,12 @@
     MegaDynamicList.prototype.scrollToItemPosition = function(position) {
         'use strict';
         this.listContainer.scrollTop = this._offsets[this.items[position]] + (this.options.viewPortBuffer * 2);
+        this._viewChanged(true);
+    };
+
+    MegaDynamicList.prototype.scrollToItem = function(item) {
+        'use strict';
+        this.listContainer.scrollTop = this._offsets[item]
         this._viewChanged(true);
     };
 

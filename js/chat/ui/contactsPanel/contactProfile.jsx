@@ -1,8 +1,9 @@
 import React from 'react';
-import {MegaRenderMixin} from '../../../stores/mixins.js';
+import {MegaRenderMixin} from '../../mixins';
 import {Avatar, ContactPresence} from '../contacts.jsx';
 import {Button} from '../../../ui/buttons.jsx';
 import {Dropdown} from '../../../ui/dropdowns.jsx';
+import { EmojiFormattedContent } from '../../../ui/utils.jsx';
 import ContactsPanel from './contactsPanel.jsx';
 import ContextMenu from './contextMenu.jsx';
 import FMView from "../../../ui/jsx/fm/fmView.jsx";
@@ -91,7 +92,7 @@ export default class ContactProfile extends MegaRenderMixin {
                         <i className="sprite-fm-mono icon-arrow-right" />
                     </li>
                     <li>
-                        {M.getNameByHandle(handle)}
+                        <EmojiFormattedContent>{M.getNameByHandle(handle)}</EmojiFormattedContent>
                     </li>
                 </ul>
             </div>
@@ -156,7 +157,7 @@ export default class ContactProfile extends MegaRenderMixin {
             listAdapterColumns={[
                 ColumnFavIcon,
                 [ColumnSharedFolderName, {
-                    'label': `Shared folders from ${M.getNameByHandle(this.props.handle)}`
+                    'label': `${l.shared_folders_from.replace('%NAME', M.getNameByHandle(this.props.handle))}`
                 }],
                 ColumnSharedFolderAccess,
                 ColumnSharedFolderButtons
@@ -183,7 +184,7 @@ export default class ContactProfile extends MegaRenderMixin {
 
                             <div className="profile-info">
                                 <h2>
-                                    {M.getNameByHandle(handle)}
+                                    <EmojiFormattedContent>{M.getNameByHandle(handle)}</EmojiFormattedContent>
                                     <ContactPresence contact={contact} />
                                 </h2>
                                 <span>{contact.m}</span>

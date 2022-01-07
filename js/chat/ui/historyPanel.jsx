@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {MegaRenderMixin, SoonFcWrap} from "../../stores/mixins.js";
+import {MegaRenderMixin, SoonFcWrap} from "../mixins";
 import utils from "../../ui/utils.jsx";
 import {AltPartsConvMessage} from "./messages/alterParticipants.jsx";
 import {TruncatedMessage} from "./messages/truncated.jsx";
@@ -492,7 +492,8 @@ export default class HistoryPanel extends MegaRenderMixin {
                 var headerText = l[8002];
 
                 if (contactName) {
-                    headerText = headerText.replace("%s", "<span>" + htmlentities(contactName) + "</span>");
+                    headerText = headerText.replace("%s", "<span>" + megaChat.plugins.emoticonsFilter
+                        .processHtmlMessage(htmlentities(contactName)) + "</span>");
                 }
                 else {
                     headerText = megaChat.plugins.emoticonsFilter.processHtmlMessage(htmlentities(room.getRoomTitle()));

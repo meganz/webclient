@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="48px" height="48px" viewBox="0 0 48 48" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>icon/Map_flag</title>
+    <g id="icon/Map_flag" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Group">
+            <rect id="Rectangle-Copy-2" x="6" y="6" width="36" height="36"></rect>
+            <path d="M35,6 C36.7183176,6 37.6366735,8.02384342 36.5051534,9.31700922 L36.5051534,9.31700922 L30.658,16 L36.5051534,22.6829908 C37.602385,23.9369697 36.7720932,25.8780138 35.1539722,25.9945013 L35.1539722,25.9945013 L35,26 L17,26 L17,40 C17,41.1045695 16.1045695,42 15,42 C13.9456382,42 13.0818349,41.1841222 13.0054857,40.1492623 L13,40 L13,8 C13,6.8954305 13.8954305,6 15,6 Z M30.591,10 L17,10 L17,22 L30.592,22 L26.4948466,17.3170092 C25.8738626,16.6073132 25.8373342,15.5682166 26.3852612,14.8197676 L26.3852612,14.8197676 L26.4948466,14.6829908 L30.591,10 Z" id="Combined-Shape" fill="#BF1515" fill-rule="nonzero"></path>
+            <rect id="Rectangle" x="0" y="0" width="48" height="48"></rect>
+        </g>
+    </g>
+</svg>

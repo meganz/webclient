@@ -799,7 +799,7 @@ MegaData.prototype.dlerror = function(dl, error) {
     if (slideshowid === dl.id && !previews[slideshowid]) {
         $('.img-wrap', $overlay).addClass('hidden');
         $('.viewer-pending', $overlay).addClass('hidden');
-        $('.viewer-progress', $overlay).addClass('hidden');
+        $('.viewer-progress', $overlay).addClass('vo-hidden');
         $('.viewer-error', $overlay).removeClass('hidden');
         $('.viewer-error-txt', $overlay).text(errorstr);
     }
@@ -819,10 +819,10 @@ MegaData.prototype.dlerror = function(dl, error) {
                     $('.download.speed-block span').text('');
                     $('.download .pause-transfer').removeClass('hidden').addClass('active')
                         .find('span').text(l[1649]);
-                    $('.download.top-bar').addClass('overquota');
+                    $('.download.download-page').addClass('overquota');
                 }
                 else {
-                    $('.download.top-bar').removeClass('overquota');
+                    $('.download.download-page').removeClass('overquota');
                 }
             }
             else {
@@ -1062,7 +1062,7 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders, target) 
                 hideMEGAsyncDialog();
 
                 if (!syncData) {
-                    loadSubPage('sync');
+                    loadSubPage('desktop');
                 }
                 // if the user is running MEGAsync 3.0+
                 else if (!syncData.verNotMeet) {
@@ -1384,7 +1384,7 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders, target) 
             // On ephemeral was undefined
             target = M.RootID;
         }
-        dbfetch.get(String(target), new MegaPromise()).always(function() {
+        dbfetch.get(String(target)).finally(() => {
             makeDirProc();
             // M.checkGoingOverStorageQuota(ulOpSize).done(makeDirProc);
         });
@@ -1909,7 +1909,7 @@ MegaData.prototype.showTransferToast = function showTransferToast(t_type, t_leng
     t_type = t_type ? t_type : 'd';
 
     // If the user is viewing a slideshow
-    if (window.slideshowid) {
+    if (window.slideshowid && page !== 'download') {
 
         let icons = ['upload'];
         const text = document.createElement('span');
@@ -2039,11 +2039,11 @@ function fm_tfspause(gid, overquota) {
         if (page === 'download') {
             if (overquota === true) {
                 setTransferStatus(gid, l[20666]);
-                $('.download.top-bar').addClass('overquota');
+                $('.download.download-page').addClass('overquota');
             }
             $('.download .pause-transfer').removeClass('hidden').addClass('active')
                 .find('span').text(l[1649]);
-            $('.download.top-bar').addClass('paused-transfer');
+            $('.download.download-page').addClass('paused-transfer');
             $('.download.eta-block .dark-numbers').text('');
             $('.download.eta-block .light-txt').text(l[1651]);
             $('.download.speed-block .dark-numbers').text('');
@@ -2104,12 +2104,12 @@ function fm_tfsresume(gid) {
             mega.tpw.resumeDownloadUpload(mega.tpw.DOWNLOAD, { id: gid.split('_').pop() });
 
             if (page === 'download'
-                && $('.download.top-bar').hasClass('overquota')
+                && $('.download.download-page').hasClass('overquota')
                 || $tr.find('.transfer-status').hasClass('overquota')) {
 
                 if (page === 'download') {
                     $('.download .pause-transfer').removeClass('hidden').addClass('active');
-                    $('.download.top-bar').addClass('paused-transfer');
+                    $('.download.download-page').addClass('paused-transfer');
                 }
 
                 if (dlmanager.isOverFreeQuota) {
@@ -2122,7 +2122,7 @@ function fm_tfsresume(gid) {
 
             if (page === 'download') {
                 $('.download .pause-transfer').removeClass('active').find('span').text(l[9112]);
-                $('.download.top-bar').removeClass('paused-transfer');
+                $('.download.download-page').removeClass('paused-transfer');
                 $('.download.speed-block .light-txt').safeHTML('&mdash; ' + l['23062.k']);
             }
             else {

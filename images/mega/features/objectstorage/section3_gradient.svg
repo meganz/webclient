@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1440px" height="991px" viewBox="0 0 1440 991" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>Section3_Gradient BG Copy</title>
+    <defs>
+        <rect id="path-1" x="0" y="0" width="1440" height="991"></rect>
+        <radialGradient cx="50%" cy="50.0513692%" fx="50%" fy="50.0513692%" r="44.8232052%" id="radialGradient-3">
+            <stop stop-color="#2C69F5" offset="0%"></stop>
+            <stop stop-color="#0E61FF" stop-opacity="0" offset="100%"></stop>
+        </radialGradient>
+        <filter x="-4.0%" y="-4.0%" width="108.0%" height="108.0%" filterUnits="objectBoundingBox" id="filter-4">
+            <feGaussianBlur stdDeviation="16" in="SourceGraphic"></feGaussianBlur>
+        </filter>
+        <radialGradient cx="50%" cy="50.0513692%" fx="50%" fy="50.0513692%" r="44.8232052%" id="radialGradient-5">
+            <stop stop-color="#38A5FF" offset="0%"></stop>
+            <stop stop-color="#0E61FF" stop-opacity="0" offset="100%"></stop>
+        </radialGradient>
+        <filter x="-3.1%" y="-3.1%" width="106.3%" height="106.3%" filterUnits="objectBoundingBox" id="filter-6">
+            <feGaussianBlur stdDeviation="16" in="SourceGraphic"></feGaussianBlur>
+        </filter>
+        <radialGradient cx="50%" cy="50.0513692%" fx="50%" fy="50.0513692%" r="44.8232052%" id="radialGradient-7">
+            <stop stop-color="#3888FF" offset="0%"></stop>
+            <stop stop-color="#0E61FF" stop-opacity="0" offset="100%"></stop>
+        </radialGradient>
+        <filter x="-3.5%" y="-3.5%" width="107.1%" height="107.1%" filterUnits="objectBoundingBox" id="filter-8">
+            <feGaussianBlur stdDeviation="16" in="SourceGraphic"></feGaussianBlur>
+        </filter>
+        <radialGradient cx="50%" cy="50.0513692%" fx="50%" fy="50.0513692%" r="44.8232052%" gradientTransform="translate(0.500000,0.500514),scale(0.668090,1.000000),rotate(90.000000),translate(-0.500000,-0.500514)" id="radialGradient-9">
+            <stop stop-color="#2100FF" stop-opacity="0.699217043" offset="0%"></stop>
+            <stop stop-color="#0009FC" stop-opacity="0" offset="100%"></stop>
+        </radialGradient>
+        <filter x="-2.8%" y="-4.1%" width="105.5%" height="108.2%" filterUnits="objectBoundingBox" id="filter-10">
+            <feGaussianBlur stdDeviation="16" in="SourceGraphic"></feGaussianBlur>
+        </filter>
+    </defs>
+    <g id="OH_RYIP_draft" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="OH_RYIP_5.1" transform="translate(0.000000, -1348.000000)">
+            <g id="Section3_Gradient-BG-Copy" transform="translate(0.000000, 1348.000000)">
+                <mask id="mask-2" fill="white">
+                    <use xlink:href="#path-1"></use>
+                </mask>
+                <g id="Mask"></g>
+                <circle id="Right-bottom" fill="url(#radialGradient-3)" filter="url(#filter-4)" mask="url(#mask-2)" cx="1367.5" cy="764.5" r="599.5"></circle>
+                <circle id="Left-top" fill="url(#radialGradient-5)" filter="url(#filter-6)" mask="url(#mask-2)" cx="41.5" cy="40.5" r="764.5"></circle>
+                <circle id="Middle" fill="url(#radialGradient-7)" filter="url(#filter-8)" mask="url(#mask-2)" cx="748.5" cy="644.5" r="676.5"></circle>
+                <path d="M309.540426,1603.38161 C807.125883,1523.52316 1438.94082,1015.04947 918.613141,919.593675 C398.285462,824.137878 693.043652,450.425312 352.266695,450.425312 C11.4897379,450.425312 -628.796298,633.719398 -628.796298,974.496355 C-628.796298,1315.27331 -188.04503,1683.24005 309.540426,1603.38161 Z" id="Bottom-top" fill="url(#radialGradient-9)" opacity="0.580544608" filter="url(#filter-10)" mask="url(#mask-2)"></path>
+            </g>
+        </g>
+    </g>
+</svg>

@@ -1,5 +1,5 @@
 import React from "react";
-import {MegaRenderMixin} from "../../../../../stores/mixins";
+import {MegaRenderMixin} from "../../../../../chat/mixins";
 
 export class ColumnContactRequestsTs extends MegaRenderMixin {
     static sortable = true;

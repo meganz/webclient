@@ -184,8 +184,8 @@
     left: 16px;
     top: 4px;
     border-radius: 4px;
-    background-color: var(--surface-grey-3);
-    border: 1px solid var(--surface-grey-2);
+    background-color: var(--stroke-grey-3);
+    border: 1px solid var(--stroke-grey-2);
     z-index: -1;
 }
 .transfer-task-row::before {
@@ -228,7 +228,7 @@
     content: "";
     width: 1px;
     height: 16px;
-    background-color: var(--surface-grey-2);
+    background-color: var(--stroke-grey-2);
     display: block;
     position: absolute;
     top: 4px;
@@ -330,7 +330,7 @@
     position: absolute;
     right: -8px;
     top: 6px;
-    background-color: var(--surface-mid-grey);
+    background-color: var(--stroke-mid-grey);
 }
 .transfer-task-row:hover .transfer-complete-actions {
     display: inline-block;
@@ -429,7 +429,7 @@ button.btn-icon .transfer-progress-icon {
     height: 32px;
     display: block;
     text-align: center;
-    background-color: var(--surface-grey-2);
+    background-color: var(--stroke-grey-2);
     color: var(--text-color-high);
     line-height: 32px;
     cursor: pointer;
@@ -446,7 +446,7 @@ button.btn-icon .transfer-progress-icon {
     width: 100%;
     min-width: 148px;
     max-width: 536px;
-    background-color: var(--surface-main);
+    background-color: var(--stroke-main);
     padding: 24px;
     margin-bottom: 4px;
     box-sizing: border-box;
@@ -551,7 +551,7 @@ button.btn-icon .transfer-progress-icon {
 .quota-info-pct-circle .overlay {
     width: 54px;
     height: 54px;
-    background-color: var(--surface-main);
+    background-color: var(--stroke-main);
     position: absolute;
     display: block;
     left: 5px;

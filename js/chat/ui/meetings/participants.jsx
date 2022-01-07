@@ -1,9 +1,8 @@
 import React from 'react';
-import { MegaRenderMixin } from '../../../stores/mixins';
+import { MegaRenderMixin } from '../../mixins';
 import { Avatar } from '../contacts.jsx';
 import { PerfectScrollbar } from '../../../ui/perfectScrollbar.jsx';
 import Collapse from './collapse.jsx';
-import Guest from './guest.jsx';
 import Call from './call.jsx';
 
 class Participant extends MegaRenderMixin {
@@ -15,18 +14,26 @@ class Participant extends MegaRenderMixin {
 
     audioMuted = () => {
         const { call, stream } = this.props;
-        return (
-            call && (call.localAudioMuted === null || !!call.localAudioMuted) ||
-            stream && stream.audioMuted
-        );
+
+        // Local stream (me)
+        if (call) {
+            return call.localAudioMuted === null || !!call.localAudioMuted;
+        }
+
+        // Participant streams
+        return stream && stream.audioMuted;
     };
 
     videoMuted = () => {
         const { call, stream } = this.props;
-        return (
-            call && !call.localVideoStream ||
-            stream && stream.videoMuted
-        );
+
+        // Local stream (me)
+        if (call) {
+            return !(call.av & SfuClient.Av.Camera);
+        }
+
+        // Participant streams
+        return stream && stream.videoMuted;
     };
 
     render() {
@@ -36,7 +43,7 @@ class Participant extends MegaRenderMixin {
                 <Avatar contact={M.u[handle]} />
                 <div className="name">
                     <span>{name} &nbsp;</span>
-                    {handle === u_handle && <span>(me)</span>}
+                    {handle === u_handle && <span>{l.me}</span>}
                     {chatRoom.isMeeting && Call.isModerator(chatRoom, handle) && (
                         <span>
                             <i className={`${this.baseIconClass} icon-admin`} />
@@ -63,14 +70,12 @@ class Participant extends MegaRenderMixin {
 }
 
 export default class Participants extends MegaRenderMixin {
-    participantsListRef = null;
-
     constructor(props) {
         super(props);
     }
 
     render() {
-        const { streams, call, chatRoom, guest, onGuestClose } = this.props;
+        const { streams, call, guest, chatRoom } = this.props;
         return (
             <div className="participants">
                 <Collapse
@@ -82,11 +87,7 @@ export default class Participants extends MegaRenderMixin {
                             participants-list
                             ${guest ? 'guest' : ''}
                         `}>
-                        <PerfectScrollbar
-                            options={{ 'suppressScrollX': true }}
-                            ref={ref => {
-                                this.participantsListRef = ref;
-                            }}>
+                        <PerfectScrollbar options={{ 'suppressScrollX': true }}>
                             <ul>
                                 <li>
                                     <Participant
@@ -110,7 +111,6 @@ export default class Participants extends MegaRenderMixin {
                         </PerfectScrollbar>
                     </div>
                 </Collapse>
-                {guest && <Guest onGuestClose={() => onGuestClose(this.participantsListRef)} />}
             </div>
         );
     }

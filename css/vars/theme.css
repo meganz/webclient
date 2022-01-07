@@ -100,6 +100,7 @@ body {
 
         /* font */
 
+            --text-h0: 30px/44px var(--text-font-family);
             --text-h1: 24px/36px var(--text-font-family);
             --text-h2: 20px/30px var(--text-font-family);
             --text-h3: 16px/24px var(--text-font-family);
@@ -108,15 +109,22 @@ body {
             --text-caption: 10px/16px var(--text-font-family);
             --text-data: 40px/60px var(--text-font-family);
 
+            --text-h0-bold: 30px/44px var(--text-font-family-semibold);
             --text-h1-bold: bold 24px/36px var(--text-font-family-semibold);
             --text-h2-bold: bold 20px/30px var(--text-font-family-semibold);
             --text-h3-bold: bold 16px/24px var(--text-font-family-semibold);
             --text-body1-bold: bold 14px/20px var(--text-font-family-semibold);
 
+        /* this is temporary until bug bounty moves to wordpress */
+
+            --text-h0-bb: 36px/54px var(--text-font-family);
+            --text-h0-bb-bold: bold 36px/54px var(--text-font-family-semibold);
+
         /* body2, caption and data are currently never bold */
             --text-code1: 12px/24px var(--text-font-family-code);
 
         /* font : ONLY FOR PRODUCT PAGES */
+            --text-h1-montserrat-bold: 24px/36px var(--text-font-family-montserrat-bold);
             --text-h2-montserrat-bold: 20px/30px var(--text-font-family-montserrat-bold);
             --text-body1-montserrat-light: 20px/30px var(--text-font-family-montserrat-light);
 
@@ -156,9 +164,6 @@ html .theme-light-forced {
         --surface-grey-4: var(--surface-grey-2);
         --surface-grey-5: var(--surface-main);
         --surface-grey-6: var(--surface-grey-2);
-        --surface-grey-7: var(--surface-main);
-        --surface-grey-8: var(--surface-grey-2);
-        --surface-grey-9: var(--surface-grey-2);
         --surface-light-grey: /* not present in this theme */;
         --surface-mid-grey: #ccc;
         --surface-dark-grey: linear-gradient(180deg, rgba(85, 85, 85, 1) 0%, rgba(68, 68, 68, 1) 100%);
@@ -173,18 +178,26 @@ html .theme-light-forced {
         --surface-overlay: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.1) 0%, rgba(20, 20, 20, 0.3) 100%);
         --surface-highlight-1: rgba(250, 250, 250, 0.8);
         --surface-highlight-2: rgba(250, 250, 250, 0.4);
+        --surface-inner-shadow: rgba(250, 250, 250, 0.6);
 
     /* strokes */
 
         --stroke-main: #fff;
         --stroke-grey-1: #fafafa;
         --stroke-grey-2: #eee;
+        --stroke-grey-3: #fafafa;
+        --stroke-grey-4: #eee;
         --stroke-grey-6: #eee;
         --stroke-dark-grey: #555555;
+        --stroke-mid-grey: #ccc;
+        --stroke-black: #000;
         --stroke-info: #2ba6de;
         --stroke-success: #00bfa5;
         --stroke-warning: #ff9924;
         --stroke-error: #fd3e38;
+        --stroke-highlight: #fafafa;
+        --stroke-scrim: rgba(255, 255, 255, 0.32);
+        --stroke-overlay-background: rgba(204, 204, 204, 0.9);
 
     /* icons */
 
@@ -313,6 +326,9 @@ html .theme-light-forced {
         --progress-bar-fill4: #1d1d1d;
 
     /* inverted */
+        --stroke-main-inverted: #333;
+        --stroke-grey-1-inverted: #222;
+        --stroke-link-inverted: #676767;
 
     /* TODO: remove this once the library is updated */
         --surface-overlay-background: rgba(204, 204, 204, 0.9);
@@ -320,6 +336,7 @@ html .theme-light-forced {
         --surface-link-inverted: #676767;
         --surface-grey-1-inverted: #222;
         --stroke-grey-2-inverted: #444;
+        --text-color-higher-inverted: var(--text-color-white-higher);
         --text-color-high-inverted: var(--text-color-white-high);
         --text-color-medium-inverted: var(--text-color-white-medium);
         --text-color-low-inverted: var(--text-color-white-low);
@@ -365,9 +382,6 @@ html .theme-dark-forced {
         --surface-grey-4: var(--surface-grey-1);
         --surface-grey-5: var(--surface-grey-2);
         --surface-grey-6: var(--surface-black);
-        --surface-grey-7: var(--surface-grey-1);
-        --surface-grey-8: var(--surface-main);
-        --surface-grey-9: rgba(255, 255, 255, 0.32);
         --surface-light-grey: linear-gradient(180deg, rgba(230, 230, 230, 1) 0%, rgba(204, 204, 204, 1) 100%);
         --surface-mid-grey: #666;
         --surface-dark-grey: linear-gradient(180deg, #e6e6e6 0%, #ccc 100%);
@@ -382,18 +396,26 @@ html .theme-dark-forced {
         --surface-overlay: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0.7) 100%);
         --surface-highlight-1: rgba(34, 34, 34, 0.8);
         --surface-highlight-2: rgba(34, 34, 34, 0.4);
+        --surface-inner-shadow: rgba(34, 34, 34, 0.6);
 
     /* strokes */
 
         --stroke-main: #333;
         --stroke-grey-1: #222;
         --stroke-grey-2: #444;
+        --stroke-grey-3: #444;
+        --stroke-grey-4: #222;
         --stroke-grey-6: #000;
         --stroke-dark-grey: #e6e6e6;
+        --stroke-mid-grey: #666;
+        --stroke-black: #000;
         --stroke-info: #6fd7ff;
         --stroke-success: #5afee8;
         --stroke-warning: #fec35a;
         --stroke-error: #ff7e79;
+        --stroke-highlight: #111;
+        --stroke-scrim: rgba(0, 0, 0, 0.32);
+        --stroke-overlay-background: rgba(0, 0, 0, 0.8);
 
     /* icons */
 
@@ -478,6 +500,7 @@ html .theme-dark-forced {
     /* dialog */
 
         --dialog-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.7);
+        --dialog-shadow-thin: 0 1px 2px 0 rgba(0, 0, 0, 0.1);
 
 
     /* dropdown/tooltip */
@@ -519,6 +542,9 @@ html .theme-dark-forced {
         --progress-bar-fill4: #1d1d1d;
 
     /* inverted */
+        --stroke-main-inverted: #fff;
+        --stroke-grey-1-inverted: #fafafa;
+        --stroke-link-inverted: #c7c7c7;
 
     /* TODO: remove this once the library is updated */
 
@@ -527,6 +553,7 @@ html .theme-dark-forced {
         --surface-link-inverted: #C7C7C7;
         --surface-grey-1-inverted: #fafafa;
         --stroke-grey-2-inverted: #eee;
+        --text-color-higher-inverted: var(--text-color-black-higher);
         --text-color-high-inverted: var(--text-color-black-high);
         --text-color-medium-inverted: var(--text-color-black-medium);
         --text-color-low-inverted: var(--text-color-black-low);

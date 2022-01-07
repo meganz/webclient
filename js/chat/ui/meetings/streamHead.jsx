@@ -1,5 +1,5 @@
 import React from 'react';
-import { MegaRenderMixin } from '../../../stores/mixins';
+import { MegaRenderMixin } from '../../mixins';
 import ModalDialogsUI from '../../../ui/modalDialogs.jsx';
 import Button from './button.jsx';
 import ModeSwitch from './modeSwitch.jsx';
@@ -137,7 +137,6 @@ export default class StreamHead extends MegaRenderMixin {
      * Dialog
      * @description The call information dialog -- contains list of the call moderators, incl.
      * link for the current call.
-     * https://mega.nz/file/gA9m0LIA#Mq9VW9PIRxaCH1mzyVsHq4wZNTBmdSA4rI4Xt3KJmik
      * @returns {JSX.Element}
      */
 
@@ -154,7 +153,7 @@ export default class StreamHead extends MegaRenderMixin {
                 <section className="content">
                     <div className="content-block">
                         <div className="info" dangerouslySetInnerHTML={{ __html: this.getModerators()}} />
-                        <div className="info">Copy this link to send your invite</div>
+                        <div className="info">{l.copy_and_share /* `Copy this link to send your invite` */}</div>
                         <div className="link-input-container">
                             <div className="mega-input with-icon box-style">
                                 <i className="sprite-fm-mono icon-link" />
@@ -209,7 +208,6 @@ export default class StreamHead extends MegaRenderMixin {
 
         //
         // `StreamHead`
-        // https://mega.nz/file/NIEQnJAI#JgToTKENVCiACRvd-yxRsOyNrDpsEAk77G92c_uYYMA
         // -------------------------------------------------------------------------
 
         return (

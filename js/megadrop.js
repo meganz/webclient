@@ -146,7 +146,7 @@ mega.megadrop = (function() {
         }
         count = list.length;
         if (count) {// MEGAdrop detected in source tree
-            shared(target).done(function(res) {
+            shared(target).then((res) => {
                 if (res) {// Full share or pub link found
                     showRemoveWarning(list).done(function() {
                         promise.resolve(sel, target);

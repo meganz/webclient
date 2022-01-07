@@ -185,14 +185,36 @@ function CreateWorkers(url, message, size) {
     }, size, url.split('/').pop().split('.').shift() + '-worker');
 }
 
-
-(function(global) {
+/** @property window.backgroundNacl */
+lazy(self, 'backgroundNacl', function backgroundNacl() {
     "use strict";
 
     var x = 0;
     var backgroundNacl = Object.create(null);
 
-    Object.defineProperty(global, 'backgroundNacl', {value: backgroundNacl});
+    /** @property window.backgroundNacl.workers */
+    lazy(backgroundNacl, 'workers', () => {
+        const mw = Math.min(mega.maxWorkers, 4);
+        const workers = CreateWorkers('naclworker.js', (ctx, e, release) => release(e.data), mw);
+
+        workers._taggedTasks = Object.create(null);
+        workers.removeTasksByTagName = function(tagName) {
+            if (this._taggedTasks[tagName]) {
+                const tasks = this._taggedTasks[tagName];
+
+                for (let i = tasks.length; i--;) {
+                    if (tasks[i]) {
+                        this.filter(tasks[i].taskId);
+                        tasks[i].reject(0xDEAD);
+                    }
+                }
+
+                delete this._taggedTasks[tagName];
+            }
+        };
+
+        return workers;
+    });
 
     // create aliases for all (used by us) nacl funcs, that return promises
     backgroundNacl.sign = {
@@ -209,30 +231,6 @@ function CreateWorkers(url, message, size) {
              */
             'verify': function(msg, sig, publicKey, tagName) {
                 var masterPromise = new MegaPromise();
-
-                if (!backgroundNacl.workers) {
-                    backgroundNacl.workers = CreateWorkers('naclworker.js',
-                        function(ctx, e, release) {
-                            release(e.data);
-                        }
-                    );
-
-                    backgroundNacl.workers._taggedTasks = {};
-
-                    backgroundNacl.workers.removeTasksByTagName = function(tagName) {
-                        if (backgroundNacl.workers._taggedTasks[tagName]) {
-                            var tasks = backgroundNacl.workers._taggedTasks[tagName];
-                            for (var i = tasks.length - 1; i >= 0; i--) {
-                                if (tasks[i]) {
-                                    backgroundNacl.workers.filter(tasks[i].taskId);
-                                    tasks[i].reject(0xDEAD);
-                                }
-                            }
-
-                            backgroundNacl.workers._taggedTasks[tagName] = [];
-                        }
-                    };
-                }
 
                 var taskId = (tagName ? tagName + "_" : "") + "req" + (x++);
                 backgroundNacl.workers.push(
@@ -267,4 +265,6 @@ function CreateWorkers(url, message, size) {
             }
         }
     };
-})(self);
+
+    return backgroundNacl;
+});

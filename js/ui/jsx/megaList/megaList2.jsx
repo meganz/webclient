@@ -1,6 +1,6 @@
 import React from 'react';
 import {PerfectScrollbar} from "../../perfectScrollbar.jsx";
-import {MegaRenderMixin, SoonFcWrap} from "../../../stores/mixins.js";
+import {MegaRenderMixin, SoonFcWrap} from "../../../chat/mixins";
 
 /**
  * Required props:

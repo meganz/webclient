@@ -64,8 +64,37 @@ accountUI.renderAccountPage = function(account) {
     }
 
     var id = getSitePath();
-    if (u_attr && u_attr.b && !u_attr.b.m && id === '/fm/account/plan') {
+    if (u_attr && u_attr.b && !u_attr.b.m && id.startsWith('/fm/account/plan')) {
         id = '/fm/account';
+    }
+
+    // Parse subSectionId and remove sub section part from id
+    const accountRootUrl = '/fm/account';
+    let subSectionId;
+
+    if (id.length > accountRootUrl.length) {
+        let urlPart0;
+        let urlPart1;
+        const sectionUrl = id.substr(accountRootUrl.length + 1, id.length);
+        const sectionUrlParts = sectionUrl.split('/');
+
+        if (sectionUrlParts.length === 1) {
+            urlPart0 = sectionUrlParts[0];
+        }
+        else {
+            urlPart0 = sectionUrlParts[0];
+            urlPart1 = sectionUrlParts[1];
+        }
+
+        const $accountSubSectionElement = $(`.settings-button.account-s .sub-title[data-scrollto='${urlPart0}']`);
+        if ($accountSubSectionElement.length > 0) {
+            id = accountRootUrl;
+            subSectionId = urlPart0;
+        }
+        else {
+            id = `${accountRootUrl}/${urlPart0}`;
+            subSectionId = urlPart1;
+        }
     }
 
     var sectionClass;
@@ -181,6 +210,10 @@ accountUI.renderAccountPage = function(account) {
     mBroadcaster.sendMessage('settingPageReady');
     fmLeftMenuUI();
 
+    if (subSectionId) {
+        $(`.settings-button.${sectionClass} .sub-title[data-scrollto='${subSectionId}']`).trigger('click');
+    }
+
     loadingDialog.hide();
 };
 
@@ -215,9 +248,9 @@ accountUI.general = {
 
             var pf = navigator.platform.toUpperCase();
 
-            // If this is Linux let them goes to sync page to select linux type
+            // If this is Linux send them to desktop page to select linux type
             if (pf.indexOf('LINUX') > -1) {
-                loadSubPage('sync');
+                loadSubPage('desktop');
             }
             // else directly give link of the file.
             else {
@@ -290,7 +323,7 @@ accountUI.general = {
             if ((u_attr.p || account.tfsq.ach) && b2[0] > 0) {
                 if (this.perc_c_b > 0) {
                     $bandwidthChart.removeClass('no-percs');
-                    $('.chart .perc-txt', $bandwidthChart).text(this.perc_c_b + '%');
+                    $('.chart .perc-txt', $bandwidthChart).text(formatPercentage(this.perc_c_b / 100));
                 }
                 else {
                     $bandwidthChart.addClass('no-percs');
@@ -623,6 +656,13 @@ accountUI.leftPane = {
             $menuItems.filter('.reseller').removeClass('hidden');
         }
 
+        if (accountUI.plan.paymentCard.validateUser(M.account)) {
+            $('.acc-setting-menu-card-info', $menuItems).removeClass('hidden');
+        }
+        else {
+            $('.acc-setting-menu-card-info', $menuItems).addClass('hidden');
+        }
+
         $menuItems.filter(':not(.' + sectionClass + ')').addClass('closed').removeClass('active');
         $currentMenuItem.addClass('active');
 
@@ -630,6 +670,32 @@ accountUI.leftPane = {
             $currentMenuItem.removeClass('closed');
             initTreeScroll();
         }, 600);
+    },
+
+    getPageUrlBySection: function($section) {
+
+        'use strict';
+
+        switch (true) {
+            case $section.hasClass('account-s'):
+                return 'fm/account';
+            case $section.hasClass('plan'):
+                return 'fm/account/plan';
+            case $section.hasClass('notifications'):
+                return 'fm/account/notifications';
+            case $section.hasClass('security'):
+                return 'fm/account/security';
+            case $section.hasClass('file-management'):
+                return 'fm/account/file-management';
+            case $section.hasClass('transfers'):
+                return 'fm/account/transfers';
+            case $section.hasClass('contact-chats'):
+                return 'fm/account/contact-chats';
+            case $section.hasClass('reseller'):
+                return 'fm/account/reseller';
+            default:
+                return 'fm/account';
+        }
     },
 
     bindEvents: function() {
@@ -640,35 +706,10 @@ accountUI.leftPane = {
 
         $('.settings-button', $settingsPane).rebind('click', function() {
 
-            if ($(this).attr('class').indexOf('active') === -1) {
+            const $this = $(this);
+            if (!$this.hasClass('active')) {
                 accountUI.$contentBlock.scrollTop(0);
-
-                switch (true) {
-                    case $(this).hasClass('account-s'):
-                        loadSubPage('fm/account');
-                        break;
-                    case $(this).hasClass('plan'):
-                        loadSubPage('fm/account/plan');
-                        break;
-                    case $(this).hasClass('notifications'):
-                        loadSubPage('fm/account/notifications');
-                        break;
-                    case $(this).hasClass('security'):
-                        loadSubPage('fm/account/security');
-                        break;
-                    case $(this).hasClass('file-management'):
-                        loadSubPage('fm/account/file-management');
-                        break;
-                    case $(this).hasClass('transfers'):
-                        loadSubPage('fm/account/transfers');
-                        break;
-                    case $(this).hasClass('contact-chats'):
-                        loadSubPage('fm/account/contact-chats');
-                        break;
-                    case $(this).hasClass('reseller'):
-                        loadSubPage('fm/account/reseller');
-                        break;
-                }
+                loadSubPage(accountUI.leftPane.getPageUrlBySection($this));
             }
         });
 
@@ -682,18 +723,23 @@ accountUI.leftPane = {
 
         $('.settings-button .sub-title', $settingsPane).rebind('click', function() {
 
-            var $this = $(this);
-            var $parentBtn = $this.closest('.settings-button');
-            var $target = $('.data-block.' + $this.attr('data-scrollto'));
-            var targetPosition = $target.position().top;
+            const $this = $(this);
+            const $parentBtn = $this.closest('.settings-button');
+            const dataScrollto = $this.attr('data-scrollto');
+            const $target = $(`.data-block.${dataScrollto}`);
+            const targetPosition = $target.position().top;
+            const parentPage = accountUI.leftPane.getPageUrlBySection($parentBtn);
+            const page = `${parentPage}/${dataScrollto}`;
 
             if ($parentBtn.hasClass('active')) {
                 accountUI.$contentBlock.animate({scrollTop: targetPosition}, 500);
+                pushHistoryState(page);
             }
             else {
                 $parentBtn.trigger('click');
                 mBroadcaster.once('settingPageReady', function () {
-                    accountUI.$contentBlock.animate({scrollTop: targetPosition}, 500);
+                    pushHistoryState(page);
+                    accountUI.$contentBlock.animate({scrollTop: $target.position().top}, 500);
                 });
             }
         });
@@ -1234,6 +1280,11 @@ accountUI.account = {
                                 $('.user-name').text(u_attr.name);
                                 $('.name', '.account-dialog').text(u_attr.fullname);
                                 $('.top-menu-logged .name', '.top-menu-popup').text(u_attr.name);
+
+                                if (u_attr.fullname.length > 16) {
+                                    $('.name', '.account-dialog').addClass('simpletip')
+                                        .attr('data-simpletip', u_attr.fullname);
+                                }
                                 showToast('settings', l[7698]);
                                 accountUI.account.profiles.bindEvents();
                                 // update megadrop username for existing megadrop
@@ -1607,7 +1658,7 @@ accountUI.plan = {
 
         "use strict";
 
-        var $planContent = $('.fm-account-plan.fm-account-sections', accountUI.$contentBlock);
+        const $planContent = $('.fm-account-plan.fm-account-sections', accountUI.$contentBlock);
 
         // Plan - Account type
         this.accountType.render(account);
@@ -1621,6 +1672,9 @@ accountUI.plan = {
         this.history.renderPurchase(account);
         this.history.renderTransaction(account);
         this.history.bindEvents(account);
+
+        // Plan - Payment card
+        this.paymentCard.init(account, $planContent);
 
         // check if business account
         if (u_attr && u_attr.b) {
@@ -1993,6 +2047,111 @@ accountUI.plan = {
         }
     },
 
+    paymentCard: {
+
+        $paymentSection: null,
+
+        validateCardResponse: function(res) {
+            'use strict';
+            return res && (res.gw === (addressDialog || {}).gatewayId_stripe || 19) && res.brand && res.last4
+                && res.exp_month && res.exp_year;
+        },
+
+        validateUser: function(account) {
+            'use strict';
+            return (u_attr.p || u_attr.b) && account.stype === 'S'
+                && ((Array.isArray(account.sgw) && account.sgw.includes('Stripe'))
+                    || (Array.isArray(account.sgwids)
+                        && account.sgwids.includes((addressDialog || {}).gatewayId_stripe || 19)));
+        },
+
+        init: function(account, $planSection) {
+            'use strict';
+
+            this.$paymentSection = $('.account.account-card-info', $planSection);
+
+            const hideCardSection = () => {
+                this.$paymentSection.addClass('hidden');
+
+                $('.settings-button .acc-setting-menu-card-info', '.content-panel.account')
+                    .addClass('hidden');
+            };
+
+            // check if we should show the section (uq response)
+            if (this.validateUser(account)) {
+
+                api_req({ a: 'cci' }, {
+                    callback: (res) => {
+                        if (typeof res === 'object' && this.validateCardResponse(res)) {
+                            return this.render(res);
+                        }
+
+                        hideCardSection();
+                    }
+                });
+            }
+            else {
+                hideCardSection();
+            }
+        },
+
+        render: function(cardInfo) {
+            'use strict';
+
+            if (cardInfo && this.$paymentSection) {
+
+
+                if (cardInfo.brand === 'visa') {
+
+                    this.$paymentSection.addClass('visa').removeClass('mc');
+                    $('.payment-card-icon i', this.$paymentSection)
+                        .removeClass('sprite-fm-uni icon-mastercard-border');
+
+                }
+                else if (cardInfo.brand === 'mastercard') {
+
+                    this.$paymentSection.addClass('mc').removeClass('visa');
+                    $('.payment-card-icon i', this.$paymentSection).addClass('sprite-fm-uni icon-mastercard-border');
+
+                }
+                else {
+                    this.$paymentSection.removeClass('visa mc');
+                }
+
+                $('.payment-card-nb .payment-card-digits', this.$paymentSection).text(cardInfo.last4);
+                $('.payment-card-expiry .payment-card-expiry-val', this.$paymentSection)
+                    .text(`${String(cardInfo.exp_month).padStart(2, '0')}/${String(cardInfo.exp_year).substr(-2)}`);
+
+                $('.payment-card-bottom a.payment-card-edit', this.$paymentSection).rebind('click', () => {
+
+                    loadingDialog.show();
+
+                    api_req({ a: 'gw19_ccc' }, {
+                        callback: (res) => {
+                            loadingDialog.hide();
+
+                            if ($.isNumeric(res)) {
+                                msgDialog('warninga', '', l.edit_card_error.replace('%1', res), l.edit_card_error_des);
+                            }
+                            else if (typeof res === 'string') {
+                                addressDialog.processUtcResult(
+                                    {
+                                        EUR: res,
+                                        edit: true
+                                    },
+                                    true
+                                );
+                            }
+                        }
+                    });
+                });
+
+                this.$paymentSection.removeClass('hidden');
+            }
+        }
+
+    },
+
     balance: {
 
         render: function(account) {
@@ -2052,6 +2211,9 @@ accountUI.plan = {
                     .catch(function(ex) {
                         loadingDialog.hide();
                         if (ex) {
+                            if (ex === ETOOMANY) {
+                                ex = l.redeem_etoomany;
+                            }
                             msgDialog('warninga', l[135], l[47], ex);
                         }
                     });
@@ -2352,6 +2514,10 @@ accountUI.notifications = {
                     $EToggle.trigger('update.accessibility');
                 }
             );
+
+            if (accountUI.plan.paymentCard.validateUser(M.account)) {
+                $('.switch-container.card-exp-switch', $notifictionContent).removeClass('hidden');
+            }
 
             // Hide the loading screen.
             loadingDialog.hide('enotif');
@@ -2768,6 +2934,9 @@ accountUI.fileManagement = {
             $('#delete-all-versions', accountUI.$contentBlock).rebind('click', function() {
 
                 if (!$(this).hasClass('disabled')) {
+                    if (M.isInvalidUserStatus()) {
+                        return;
+                    }
                     msgDialog('remove', l[1003], l[17581], l[1007], function(e) {
 
                         if (e) {

@@ -254,7 +254,7 @@ pro.propay = {
                 }
 
                 // Separate into two groups, the first group has 6 providers, the second has the rest
-                var primaryGatewayOptions = gatewayOptions.splice(0, 6);
+                var primaryGatewayOptions = gatewayOptions.splice(0, 9);
                 var secondaryGatewayOptions = gatewayOptions;
 
                 // Show payment duration (e.g. month or year) and renewal option radio options
@@ -322,14 +322,14 @@ pro.propay = {
 
                 // Get the price and number of months duration
                 var price = currentPlan[pro.UTQA_RES_INDEX_PRICE];
-                var currencySymbol = ' \u20ac';
+                var currency = 'EUR';
                 var discountedPriceY = '';
                 var discountedPriceM = '';
                 var discountSaveY = '';
                 var discountSaveM = '';
                 if (currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE]) {
                     price = currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE];
-                    currencySymbol = '';
+                    currency = currentPlan[pro.UTQA_RES_INDEX_LOCALPRICECURRENCY];
                     if (discountInfo) {
                         discountSaveY = discountInfo.lyps || '';
                         discountSaveM = discountInfo.lmps || '';
@@ -366,7 +366,7 @@ pro.propay = {
                 $durationOption.attr('data-plan-index', i);
                 $durationOption.attr('data-plan-months', numOfMonths);
                 $('.duration', $durationOption).text(monthsWording);
-                $('.price', $durationOption).text(price + currencySymbol);
+                $('.price', $durationOption).text(formatCurrency(price, currency));
 
                 // Show amount they will save
                 if (numOfMonths === 12) {
@@ -386,23 +386,25 @@ pro.propay = {
                     }
 
                     $('.save-money', $durationOption).removeClass('hidden');
-                    $('.save-money .amount', $durationOption).text(discount + currencySymbol);
+                    $('.save-money .amount', $durationOption).text(formatCurrency(discount, currency));
                     if (discountedPriceY) {
                         $('.oldPrice', $durationOption).text($('.price', $durationOption).text())
                             .removeClass('hidden');
                         $('.crossline', $durationOption).removeClass('hidden');
-                        $('.price', $durationOption).text(discountedPriceY + currencySymbol);
+                        $('.price', $durationOption).text(formatCurrency(discountedPriceY, currency));
                         $('.membership-radio-label', $durationOption).addClass('discounted');
                     }
                 }
                 else if (numOfMonths === 1 && discountedPriceM) {
-                    let savedAmount = discountSaveM + currencySymbol;
+
+                    const savedAmount = formatCurrency(discountSaveM, currency);
                     const $saveContainer = $('.save-money', $durationOption).removeClass('hidden');
+
                     $('.amount', $saveContainer).text(savedAmount);
                     $('.oldPrice', $durationOption).text($('.price', $durationOption).text())
                         .removeClass('hidden');
                     $('.crossline', $durationOption).removeClass('hidden');
-                    $('.price', $durationOption).text(discountedPriceM + currencySymbol);
+                    $('.price', $durationOption).text(formatCurrency(discountedPriceM, currency));
                     $('.membership-radio-label', $durationOption).addClass('discounted');
                 }
 
@@ -517,19 +519,11 @@ pro.propay = {
         var numOfMonths = currentPlan[pro.UTQA_RES_INDEX_MONTHS];
         var monthOrYearWording = numOfMonths === 1 ? l[931] : l[932];
         var bandwidthText = numOfMonths === 1 ? l[23808] : l[24065];
-        var intl = mega.intl.number;
 
         // Get the current plan price
-        var price = currentPlan[pro.UTQA_RES_INDEX_PRICE].split('.');
+        var localCurrency = currentPlan[pro.UTQA_RES_INDEX_LOCALPRICECURRENCY];
+        var euroPrice = formatCurrency(currentPlan[pro.UTQA_RES_INDEX_PRICE]);
 
-        // If less than 12 months is selected, use the monthly base price instead
-        //if (numOfMonths !== 12) {
-        //    price = currentPlan[pro.UTQA_RES_INDEX_MONTHLYBASEPRICE].split('.');
-        //}
-
-        var dollars = price[0];
-        var cents = price[1];
-        var decimal = mega.intl.decimalSeparator;
         // Get the current plan's bandwidth, then convert the number to 'x GBs' or 'x TBs'
         var storageGigabytes = currentPlan[pro.UTQA_RES_INDEX_STORAGE];
         var storageBytes = storageGigabytes * 1024 * 1024 * 1024;
@@ -546,7 +540,6 @@ pro.propay = {
 
         // Set selectors
         var $step2 = $('.payment-section', '.fmholder');
-        var $chargeAmount = $('.charge-information .amount', $step2);
         var $pricingBox = $('.pricing-page.plan', $step2);
         var $planName = $('.plan-title', $pricingBox);
         var $priceNum = $('.plan-price .price', $pricingBox);
@@ -560,12 +553,12 @@ pro.propay = {
 
         var euroSign = '\u20ac';
         var localPrice;
+
         if (currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE]) {
             $step2.addClass('local-currency');
-            $currncyAbbrev.text(currentPlan[pro.UTQA_RES_INDEX_LOCALPRICECURRENCY]);
-            $euroPrice.text(intl.format(currentPlan[pro.UTQA_RES_INDEX_PRICE]) +
-                ' ' + euroSign);
-            localPrice = '' + currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE];
+            $currncyAbbrev.text(localCurrency);
+            $euroPrice.text(euroPrice);
+            localPrice = formatCurrency(currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE], localCurrency);
             $('.local-currency-tip', $step2).removeClass('hidden');
         }
         else {
@@ -592,24 +585,19 @@ pro.propay = {
             $priceNum.text(localPrice);
         }
         else {
-            $priceNum.text(dollars + decimal + cents + ' ' + euroSign);    // EUR symbol
+            $priceNum.text(euroPrice);
         }
         $pricePeriod.text('/' + monthOrYearWording);
 
-        // Update the charge information for question 3
-        $chargeAmount.text(dollars + decimal + cents);
-
         // Update storage
         if ($storageTip && $storageTip.attr('data-simpletip')) {
-            $('span', $storageAmount)
-                .safeHTML(l[23789].replace('%1', '<span>' + storageValue + '</span>'));
+            $('span span', $storageAmount).text(storageValue);
             $storageTip.attr('data-simpletip', l[23807].replace('%1', '[U]' + storageValue + '[/U]'));
         }
 
         // Update bandwidth
         if ($bandwidthTip && $bandwidthTip.data('simpletip')) {
-            $('span', $bandwidthAmount)
-                .safeHTML(l[23790].replace('%1', '<span>' + bandwidthValue + '</span>'));
+            $('span span', $bandwidthAmount).text(bandwidthValue);
             $bandwidthTip.attr('data-simpletip', bandwidthText.replace('%1', '[U]' + bandwidthValue + '[/U]'));
         }
 
@@ -618,7 +606,7 @@ pro.propay = {
         if (discountInfo && discountInfo.al && discountInfo.pd && discountInfo.al === pro.propay.planNum) {
             const $discountHeader = $('.payment-page.discount-header', $step2);
 
-            $('.discount-header-text', $discountHeader).text(l[24670].replace('$1', discountInfo.pd + '%'));
+            $('.discount-header-text', $discountHeader).text(l[24670].replace('$1', formatPercentage(discountInfo.pd)));
             $discountHeader.removeClass('hidden');
 
             const oldPriceText = $priceNum.text();
@@ -627,12 +615,12 @@ pro.propay = {
             let newEuroText = oldEuroText;
 
             if (numOfMonths === 1) {
-                const euroFormatted = discountInfo.emp ? (intl.format(discountInfo.emp) + ' ' + euroSign) : '';
+                const euroFormatted = discountInfo.emp ? formatCurrency(discountInfo.emp) : '';
                 newPriceText = discountInfo.lmp || euroFormatted || oldPriceText;
                 newEuroText = euroFormatted || oldEuroText;
             }
             else {
-                const euroFormatted = discountInfo.eyp ? (intl.format(discountInfo.eyp) + ' ' + euroSign) : '';
+                const euroFormatted = discountInfo.eyp ? formatCurrency(discountInfo.eyp) : '';
                 newPriceText = discountInfo.lyp || euroFormatted || oldPriceText;
                 newEuroText = euroFormatted || oldEuroText;
             }
@@ -675,9 +663,11 @@ pro.propay = {
         var planIndex = $selectDurationOption.parent().attr('data-plan-index');
         var currentPlan = pro.membershipPlans[planIndex];
         var numOfMonths = currentPlan[pro.UTQA_RES_INDEX_MONTHS];
-        var price = currentPlan[pro.UTQA_RES_INDEX_PRICE] + ' \u20ac';     // 0.00 EUR symbol
-        if (currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE]) {
-            price = currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE] + '*';
+        var price = formatCurrency(currentPlan[pro.UTQA_RES_INDEX_PRICE]);
+        var localPrice = currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE];
+
+        if (localPrice) {
+            price = formatCurrency(localPrice, currentPlan[pro.UTQA_RES_INDEX_LOCALPRICECURRENCY]) + '*';
         }
 
         // Get the value for whether the user wants the plan to renew automatically
@@ -1070,7 +1060,7 @@ pro.propay = {
     initShowMoreOptionsButton: function() {
 
         // If there are more than 6 payment options, enable the button to show more
-        if (pro.propay.allGateways.length > 6) {
+        if (pro.propay.allGateways.length > 9) {
 
             var $showMoreButton = $('.provider-show-more', '.payment-section');
 
@@ -1133,8 +1123,11 @@ pro.propay = {
             else if (pro.propay.proPaymentMethod.indexOf('ecp') === 0
                 || pro.propay.proPaymentMethod.toLowerCase().indexOf('stripe') === 0) {
                 if (pro.propay.userSubsGatewayId === 2 || pro.propay.userSubsGatewayId === 3) {
-                    // Detect the user has subscribed to a Pro plan with Google Play or Apple iTunes
-                    msgDialog('warninga', '', l.warning_has_subs_with_3p);
+                    // Detect the user has subscribed to a Pro plan with Google Play or Apple store
+                    // pop up the warning dialog but let the user proceed with an upgrade
+                    msgDialog('warninga', '', l.warning_has_subs_with_3p, '', () => {
+                        addressDialog.init();
+                    });
                 }
                 else {
                     addressDialog.init();

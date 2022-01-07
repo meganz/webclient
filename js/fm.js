@@ -659,7 +659,7 @@ function contactVsUserDialog() {
  *
  * Handle add contact dialog UI
  * @param {Boolean} close               dialog parameter
- * @param {Boolean} dontWarnBusiness    if true, then porceed to show the dialog
+ * @param {Boolean} dontWarnBusiness    if true, then proceed to show the dialog
  */
 function contactAddDialog(close, dontWarnBusiness) {
     var $d = $('.add-user-popup');
@@ -703,7 +703,7 @@ function contactAddDialog(close, dontWarnBusiness) {
         $('.add-contact-multiple-input input', $d).trigger("focus");
     });
 
-    $('.add-user-popup-button span', $d).text(l[19112])
+    $('.add-user-popup-button span', $d).text(l[19112]);
     $('.add-user-popup-button', $d).addClass('hidden');
 
     if (u_attr && u_attr.b) {
@@ -714,7 +714,7 @@ function contactAddDialog(close, dontWarnBusiness) {
     }
 
     initTextareaScrolling($textarea, 72);
-    $('.add-contact-multiple-input input', $d).trigger("focus");
+    $('input.add-contact-multiple-input', $d).trigger("focus");
     focusOnInput();
 
     $d.find('.hidden-textarea-info span').rebind('click', function() {
@@ -762,10 +762,12 @@ function fmtopUI() {
 
     var $contactsTabBlock = $('.contacts-tabs-bl');
     var $sharesTabBlock = $('.shares-tabs-bl');
+    var $galleryTabBlock = $('.gallery-tabs-bl');
 
-    $contactsTabBlock.add($sharesTabBlock).addClass('hidden');
-    $contactsTabBlock.find('.contacts-tab-lnk.active').removeClass('active');
-    $sharesTabBlock.find('.shares-tab-lnk.active').removeClass('active');
+    $contactsTabBlock.add($sharesTabBlock).add($galleryTabBlock).addClass('hidden');
+    $('.contacts-tab-lnk.active', $contactsTabBlock).removeClass('active');
+    $('.shares-tab-lnk.active', $sharesTabBlock).removeClass('active');
+    $('.gallery-tab-lnk.active', $galleryTabBlock).removeClass('active');
 
     $('.fm-clearbin-button,.fm-add-user,.fm-new-folder,.fm-file-upload,.fm-folder-upload,.fm-uploads')
         .add('.fm-new-shared-folder,.fm-new-link').addClass('hidden');
@@ -858,6 +860,15 @@ function fmtopUI() {
             }
             else {
                 showUploadBlock();
+            }
+        }
+        else if (M.currentCustomView.type === 'gallery') {
+
+            $galleryTabBlock.removeClass('hidden');
+
+            if (mega.gallery[M.currentdirid]) {
+                $('.gallery-tab-lnk', $galleryTabBlock).removeClass('active');
+                $(`.gallery-tab-lnk-${mega.gallery[M.currentdirid].mode}`, $galleryTabBlock).addClass('active');
             }
         }
         else if (String(M.currentdirid).length === 8
@@ -1097,7 +1108,8 @@ function FMShortcuts() {
             !is_fm() ||
             !selectionManager ||
             M.currentrootid === 'chat' || // prevent shortcut for chat
-            M.currentrootid === undefined // prevent shortcut for file transfer, dashboard, settings
+            M.currentrootid === undefined || // prevent shortcut for file transfer, dashboard, settings
+            M.currentCustomView.type === 'gallery'
         ) {
             return true;
         }
@@ -2022,11 +2034,14 @@ function generateShareDialogRow(displayNameOrEmail, email, shareRights, userHand
 function hideShareDialogPermMenu() {
     "use strict";
     var $shareDialog = $('.mega-dialog.share-dialog');
-    var $permissionMenu = $('.share-dialog-permissions-menu', $shareDialog);
+    var $permissionMenu = $('.share-dialog-permissions-menu', $shareDialog).addClass('o-hidden');
 
-    $permissionMenu.fadeOut(200);
     $('.option', $permissionMenu).removeClass('active');
     $('.share-dialog-access-node', $shareDialog).removeClass('active');
+
+    setTimeout(() => {
+        $permissionMenu.addClass('hidden');
+    }, 200);
 }
 
 /**
@@ -2039,14 +2054,16 @@ function hideShareDialogPermMenu() {
 function showShareDialogPermMenu($this, x, y) {
     "use strict";
     var $shareDialog = $('.mega-dialog.share-dialog');
-    var $permissionMenu = $('.share-dialog-permissions-menu', $shareDialog);
+    var $permissionMenu = $('.share-dialog-permissions-menu', $shareDialog).removeClass('hidden').addClass('o-hidden');
     var permissionLevel = checkMultiInputPermission($this);
 
     $('.option', $permissionMenu).removeClass('active');
     $('.option.' + permissionLevel[0], $permissionMenu).addClass('active');
     $permissionMenu.css('right', x + 'px');
     $permissionMenu.css('top', y + 'px');
-    $permissionMenu.fadeIn(200);
+    onIdle(() => {
+        $permissionMenu.removeClass('o-hidden');
+    });
 }
 
 /**
@@ -2560,39 +2577,6 @@ function initShareDialog() {
     });
 }
 
-function addImportedDataToSharedDialog(data) {
-    $.each(data, function(ind, val) {
-        $('.share-add-dialog .share-multiple-input').tokenInput("add", {id: val, name: val});
-    });
-
-    closeImportContactNotification('.share-add-dialog');
-}
-
-function addImportedDataToAddContactsDialog(data) {
-    $.each(data, function(ind, val) {
-        $('.add-user-popup .add-contact-multiple-input').tokenInput("add", {id: val, name: val});
-    });
-
-    closeImportContactNotification('.add-user-popup');
-}
-
-function closeImportContactNotification(c) {
-    loadingDialog.hide();
-    if (!$('.imported-contacts-notification').is(".hidden")) {
-        $('.imported-contacts-notification').fadeOut(200);
-    }
-
-    if (!$(c + ' .import-contacts-dialog').is(".hidden")) {
-        $(c + ' .import-contacts-dialog').fadeOut(200);
-    }
-    $('.import-contacts-link.active').removeClass('active');
-
-    // Remove focus from input element, related to tokeninput plugin
-    if ($(c + ' input#token-input-').is(":focus")) {
-        $(c + ' input#token-input-').trigger("blur");
-    }
-}
-
 /**
  * Check the dialog has token input that is already filled up by user or any unsaved changes.
  * Warn user closing dialog will lose all inserted input and unsaved changes.
@@ -3068,7 +3052,6 @@ function createFileDialog(close, action, params) {
         var target = $.cftarget = $.cftarget || M.currentdirid;
 
         v = $.trim(v);
-        v = v.slice(0, -4);
         var errorMsg = '';
 
         if (v === '' || v === l[17506]) {
@@ -3238,12 +3221,12 @@ function bottomPageDialog(close, pp, hh, tickbox) {
         }
         $dialog.rebind('dialog-closed', closeDialog).removeClass('hidden');
 
-        $('.bp-main', $dialog)
-            .safeHTML(translate(String(pages[pp])
-                .split('((TOP))')[1]
-                .split('((BOTTOM))')[0]
-                .replace('main-mid-pad new-bottom-pages', ''))
-            );
+        const $bottomPageDialogMain = $('.bp-main', $dialog);
+        $bottomPageDialogMain.safeHTML(translate(String(pages[pp])
+            .split('((TOP))')[1]
+            .split('((BOTTOM))')[0]
+            .replace('main-mid-pad new-bottom-pages', ''))
+        );
 
         $('.bp-body', $dialog).jScrollPane({
             showArrows: true,
@@ -3251,6 +3234,10 @@ function bottomPageDialog(close, pp, hh, tickbox) {
             animateScroll: true,
             verticalDragMinHeight: 50
         });
+
+        if (pp === 'terms') {
+            $('a[href]', $bottomPageDialogMain).attr('target', '_blank');
+        }
         jScrollFade('.bp-body');
         clickURLs();
         scrollToURLs();
@@ -3789,7 +3776,7 @@ function FMResizablePane(element, opts) {
             maxHeight: opts.maxHeight,
             maxWidth: opts.maxWidth,
             start: function(e, ui) {
-
+                $(self.element).addClass('resizable-pane-active');
             },
             resize: function(e, ui) {
                 var css_attrs = {
@@ -3817,6 +3804,7 @@ function FMResizablePane(element, opts) {
                 $self.trigger('resize', [e, ui]);
             },
             'stop': function(e, ui) {
+                $(self.element).removeClass('resizable-pane-active');
                 $self.trigger('resizestop', [e, ui]);
                 $(window).trigger('resize');
             }
@@ -3855,7 +3843,7 @@ function initDownloadDesktopAppDialog() {
                 break;
             case "Linux":
                 $('aside', $dialog).addClass('hidden');
-                loadSubPage('/sync');
+                loadSubPage('/desktop');
                 break;
         }
     });

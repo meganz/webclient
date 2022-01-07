@@ -320,6 +320,10 @@
             }
         }
 
+        if (localStorage.testWebGL) {
+            return WebGLMEGAContext.test(...files);
+        }
+
         if (localStorage.testDCRaw) {
             (function _rawNext(files) {
                 var file = files.pop();
@@ -327,12 +331,6 @@
                     return console.info('No more files.');
                 }
                 var id = Math.random() * 9999 | 0;
-                window.__render_thumb = function(img, u8) {
-                    console.timeEnd('createthumbnail' + id);
-                    console.info('testDCRaw result', toArray.apply(null, arguments));
-                    onIdle(_rawNext.bind(null, files));
-                    M.saveAs(u8, file.name + '.png');
-                };
                 var img = is_image(file.name);
                 var raw = typeof img === 'string' && img;
 
@@ -341,7 +339,13 @@
                     return _rawNext(files);
                 }
 
-                createthumbnail(file, false, id, null, null, {raw: raw});
+                createthumbnail(file, false, id, null, null, {raw: raw})
+                    .then((res) => {
+                        console.info('testDCRaw result', res);
+                        onIdle(_rawNext.bind(null, files));
+                        M.saveAs(res.preview, `${file.name}.png`);
+                    })
+                    .dump(id);
 
             })(toArray.apply(null, files));
             return;
@@ -362,6 +366,13 @@
                     })
                     .catch(console.debug.bind(console));
             });
+        }
+
+        if (window.d && (e.ctrlKey || e.metaKey) && MediaInfoLib.isFileSupported(files[0])) {
+            window.d = 2;
+            document.body.textContent = 'Local videostream.js Test...';
+            const video = mCreateElement('video', {width: 1280, height: 720, controls: true}, 'body');
+            return M.require('videostream').then(() => Streamer(files[0], video)).catch(dump);
         }
 
         if (e.dataTransfer
@@ -476,7 +487,7 @@
                 M.currentdirid === 'shares' || // Share root page
                 M.currentdirid === 'out-shares' || // Out-share root page
                 M.currentdirid === 'public-links' || // Public-link root page
-                M.currentrootid === 'contacts' || // Contacts pages
+                String(M.currentdirid).startsWith('chat/contacts') || // Contacts pages
                 M.currentrootid === M.RubbishID || // Rubbish bin
                 (M.currentrootid === undefined && M.currentdirid !== 'transfers') // Dashboard and Settings pages
             ));

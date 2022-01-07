@@ -33,10 +33,10 @@ mobile.cloud = {
 
         // jQuery selectors
         var $otherPages = $('#fmholder > div:not(.hidden)');
-        var $fileManager = $('.mobile.file-manager-block');
-
+        var $excludes = $('.mobile.file-manager-block, .mobile.top-menu-popup, .mobile.context-menu-container');
 
         // Render the file manager header, folders, files and footer
+        this.initScrollBarToTop();
         this.initTitleMenu();
         this.renderHeader();
         this.initGridViewToggleHandler();
@@ -53,6 +53,8 @@ mobile.cloud = {
         // Initialise context menu on each row
         mobile.cloud.contextMenu.init();
 
+        mobile.cloud.sort.init();
+
         // Initialise the bottom action bar for Scroll-to-Top, Add Folder, Upload File functionality etc
         mobile.cloud.actionBar.init();
 
@@ -63,8 +65,8 @@ mobile.cloud = {
         // Hide other pages that may be showing and show the Cloud Drive
         $otherPages.addClass('hidden');
 
-        // Show the file manager after everything is ready
-        $fileManager.removeClass('hidden');
+        // Show the excluded element after everything is ready
+        $excludes.removeClass('hidden');
 
         // Set viewmode to show thumbnails and render thumbnails after everything else because it can take longer
         M.viewmode = 1;
@@ -597,6 +599,15 @@ mobile.cloud = {
     },
 
     /**
+     * Init the scroll bar to the top of the page
+     */
+    initScrollBarToTop: function() {
+        'use strict';
+
+        $('.fm-scrolling', '.mobile.file-manager-block').scrollTop(0);
+    },
+
+    /**
      * Init TitleMenu
      */
     initTitleMenu: function() {
@@ -645,20 +656,25 @@ mobile.cloud = {
             var $currentFileRow = $(this);
             var nodeHandle = $currentFileRow.data('handle');
             var node = M.d[nodeHandle];
-            var fileName = node.name;
+            var isVideo = is_video(node);
 
             // Clear selection
             mobile.cloud.deselect();
 
             // If this is an image, load the preview slideshow
-            if (is_image(node) && fileext(fileName) !== 'pdf' || is_video(node)) {
+            if (isVideo || is_image3(node)) {
+                if (isVideo) {
+                    $.autoplay = nodeHandle;
+                }
                 mobile.slideshow.init(nodeHandle);
             }
             else {
                 // Otherwise show the download overlay immediately
                 mobile.downloadOverlay.showOverlay(nodeHandle);
 
-                var $overlay = $('.mobile.bottom-page.scroll-block.download');
+                // var $overlay = $('.mobile.bottom-page.scroll-block.download');
+                var $overlay = $('.mobile.download-page');
+
                 $('.mobile.filetype-img').removeClass('hidden');
                 $('.video-block, .video-controls', $overlay).addClass('hidden');
 

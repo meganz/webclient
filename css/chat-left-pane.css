@@ -70,10 +70,6 @@
     top: 0;
     margin: 8px 0 0 8px;
 }
-.fm-left-menu.conversations {
-    height: 46px;
-    background-color: var(--surface-grey-2);
-}
 .conversations .conversations-head {
     display: flex;
     justify-content: space-between;
@@ -101,7 +97,7 @@
 }
 .conversations button.contacts-toggle-button.active {
     --outer-padding: 4px;
-    border: 2px solid var(--surface-grey-2);
+    border: 2px solid var(--stroke-grey-2);
 }
 .conversations button.contacts-toggle-button::before {
     border-radius: 100%;
@@ -120,9 +116,6 @@
 }
 .conversations button.contacts-toggle-button.active::before {
     opacity: 1;
-}
-.ipc-count.hidden {
-    display: none;
 }
 .conversations button.contacts-toggle-button .notifications-count {
     background: var(--secondary-red);
@@ -171,7 +164,7 @@
 .content-panel.conversations,
 .archived-chats .archive-chat-list {
     display: block;
-    background-color: var(--surface-grey-2);
+    background-color: var(--stroke-grey-2);
 }
 .content-panel.conversations span.heading {
     display: block;
@@ -181,7 +174,7 @@
 }
 .archived-chats .archive-chat-list {
     min-height: initial;
-    background-color: var(--surface-main);
+    background-color: var(--stroke-main);
 }
 .conversation-reduce-height {
     position: relative;
@@ -201,11 +194,11 @@
     background-color: transparent;
 }
 .conversations-pane li:hover {
-    background-color: var(--surface-main);
+    background-color: var(--stroke-main);
     box-shadow: 0 2px 3px 0 rgba(0, 0, 0, 0.1);
 }
 .conversations-pane li:hover .unread-messages-container {
-    background-color: var(--surface-main);
+    background-color: var(--stroke-main);
 }
 .conversations-pane .conversation-avatar {
     overflow: hidden;
@@ -279,11 +272,11 @@
     text-align: right;
 }
 .conversations-pane li.active {
-    background-color: var(--surface-grey-1);
+    background-color: var(--stroke-grey-1);
     box-shadow: 0 2px 3px 0 rgba(0, 0, 0, 0.1);
 }
 .conversations-pane li.active .unread-messages-container {
-    background-color: var(--surface-grey-1);
+    background-color: var(--stroke-grey-1);
 }
 .conversations-pane li.active .user-card-name {
     color: var(--text-color-higher);
@@ -367,7 +360,7 @@ li.active .call-duration i {
 .left-pane-button {
     align-items: center;
     background: var(--surface-grey-2);
-    border-top: 2px solid var(--surface-grey-1);
+    border-top: 2px solid var(--stroke-grey-1);
     box-sizing: border-box;
     cursor: pointer;
     display: flex;
@@ -897,11 +890,15 @@ li.active .call-duration i {
     z-index: 130;
 }
 
+.contacts-panel .back-to-landing {
+    margin: 15px 0 15px 32px;
+}
+
 .contacts-navigation {
     position: relative;
     width: 100%;
     padding: 0 0 0 32px;
-    border-bottom: 1px solid var(--surface-grey-2);
+    border-bottom: 1px solid var(--stroke-grey-2);
 }
 
 .contacts-navigation ul {
@@ -1085,8 +1082,8 @@ li.active .call-duration i {
 
 .contacts-table-results tr {
     position: relative;
-    border-top: 3px solid var(--surface-main);
-    border-bottom: 4px solid var(--surface-main);
+    border-top: 3px solid var(--stroke-main);
+    border-bottom: 4px solid var(--stroke-main);
     box-shadow: 0 -1px 0 0 var(--stroke-grey-2);
 }
 
@@ -1126,6 +1123,17 @@ li.active .call-duration i {
     color: var(--text-color-medium);
     text-align: left;
     cursor: pointer;
+}
+
+.contacts-table th:not(:last-child):hover::before {
+    content: "";
+    position: absolute;
+    right: 0;
+    bottom: -3px;
+    height: 21px;
+    width: 1px;
+    background-color: var(--stroke-mid-grey);
+    cursor: col-resize;
 }
 
 .contacts-table th i {
@@ -1371,8 +1379,8 @@ li.active .call-duration i {
     display: block;
     position: relative;
     border-radius: 4px;
-    border-top: 3px solid var(--surface-main);
-    border-bottom: 4px solid var(--surface-main);
+    border-top: 3px solid var(--stroke-main);
+    border-bottom: 4px solid var(--stroke-main);
     box-shadow: 0 -1px 0 0 var(--stroke-grey-2);
 
 }

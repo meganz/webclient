@@ -48,7 +48,7 @@ describe('Test promisify and mutex', function() {
         var tag = 'begin';
         var push = function(resolve) {
             result.push(tag);
-            onIdle(resolve);
+            queueMicrotask(resolve);
         };
         var fail = function(ex) {
             onIdle(function() {
@@ -65,7 +65,7 @@ describe('Test promisify and mutex', function() {
         assert.strictEqual(push.__method__, mMethod);
         assert.strictEqual(mMethod.__function__, push);
         assert.strictEqual(mutex.lock.__function__.__method__, mutex.lock);
-        assert.strictEqual(mutex.unlock.__function__.__method__, mutex.unlock);
+        assert.strictEqual(mutex.unlock[Symbol.toStringTag], 'AsyncFunction');
 
         push(mutex.unlock);
         mutex.lock('foo').then(function(unlock) {

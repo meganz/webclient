@@ -1,5 +1,5 @@
 import React from 'react';
-import { MegaRenderMixin } from '../../../stores/mixins.js';
+import { MegaRenderMixin } from '../../mixins';
 import ComposedTextArea from "../composedTextArea.jsx";
 import HistoryPanel from "../historyPanel.jsx";
 import Call from './call.jsx';
@@ -13,15 +13,8 @@ import Guest from './guest.jsx';
 export default class Sidebar extends MegaRenderMixin {
     historyPanel = null;
 
-    state = {
-        guest: false
-    };
-
     constructor(props) {
         super(props);
-        // TODO: Use the `is_eplusplus` value.
-        // Look into setting to `false` after successful registration.
-        this.state.guest = Call.isGuest();
     }
 
     renderHead = () => {
@@ -54,10 +47,9 @@ export default class Sidebar extends MegaRenderMixin {
     };
 
     renderSpeakerMode = () => {
-        const { mode, call, streams, chatRoom, forcedLocal, onSpeakerChange } = this.props;
-        const { guest } = this.state;
+        const { mode, call, streams, guest, chatRoom, forcedLocal, onSpeakerChange } = this.props;
         const localStream = call.getLocalStream();
-
+        const SIMPLE_TIP = {className: 'theme-dark-forced'};
         return (
             <div
                 className={`
@@ -74,7 +66,11 @@ export default class Sidebar extends MegaRenderMixin {
                                 mode={mode}
                                 chatRoom={chatRoom}
                                 stream={localStream}
-                                className={forcedLocal ? 'active' : ''}
+                                simpleTip={{...SIMPLE_TIP, label: l[8885]}}
+                                className={`
+                                    ${call.isSharingScreen() ? '' : 'local-stream-mirrored'}
+                                    ${forcedLocal ? 'active' : ''}
+                                `}
                                 onClick={() => {
                                     mBroadcaster.sendMessage('meetings:collapse');
                                     onSpeakerChange(localStream);
@@ -87,6 +83,7 @@ export default class Sidebar extends MegaRenderMixin {
                                         mode={mode}
                                         chatRoom={chatRoom}
                                         stream={stream}
+                                        simpleTip={{...SIMPLE_TIP, label: M.getNameByHandle(stream.userHandle)}}
                                         className={
                                             stream.isActive || stream.clientId === call.forcedActiveStream ?
                                                 'active' :
@@ -99,7 +96,6 @@ export default class Sidebar extends MegaRenderMixin {
                         </div>
                     </Collapse>
                 </PerfectScrollbar>
-                {guest && <Guest onGuestClose={() => this.setState({ guest: false })} />}
             </div>
         );
     };
@@ -122,28 +118,22 @@ export default class Sidebar extends MegaRenderMixin {
     };
 
     renderParticipantsView = () => {
-        const { call, streams, chatRoom } = this.props;
+        const { call, streams, guest, chatRoom } = this.props;
         return (
             <Participants
                 streams={streams}
                 call={call}
                 chatRoom={chatRoom}
-                guest={this.state.guest}
-                onGuestClose={participantsListRef =>
-                    this.setState({ guest: false }, () => participantsListRef.reinitialise())
-                }
+                guest={guest}
             />
         );
     };
 
     render() {
-        const { mode, view } = this.props;
+        const { mode, view, guest, onGuestClose } = this.props;
 
         //
         // `Sidebar`
-        // https://mega.nz/file/8UUTQIQT#6WSKPYSkyH9efaZi1WNZocf3GFn0nJpIIat6F1n_7ck
-        // https://mega.nz/file/5BVFHaxR#iekG3QCDL7wzGXySrObToLVX8PcjgD1jsQVeA_AHBAE
-        // https://mega.nz/file/YcE3wIIC#JxpJWWw3NK6zxnzwUdBbQNEws6RyT8YNCqDaFIYAUvE
         // -------------------------------------------------------------------------
 
         return (
@@ -156,6 +146,7 @@ export default class Sidebar extends MegaRenderMixin {
                 {view === Call.VIEW.PARTICIPANTS && mode === Call.MODE.SPEAKER && this.renderSpeakerMode()}
                 {view === Call.VIEW.CHAT && this.renderChatView()}
                 {view === Call.VIEW.PARTICIPANTS && mode === Call.MODE.THUMBNAIL && this.renderParticipantsView()}
+                {guest && view !== Call.VIEW.CHAT && <Guest onGuestClose={onGuestClose} />}
             </div>
         );
     }

@@ -1,6 +1,7 @@
 .participants-notice {
     width: 460px;
     margin: 0 auto;
+    backdrop-filter: blur(10px);
 
     &.user-alone {
         margin-top: -140px;

@@ -94,32 +94,6 @@ MegaPromise.asMegaPromiseProxy  = function(p) {
 };
 
 /**
- * Show the loading dialog if a promise takes longer than 200ms
- * @returns {MegaPromise}
- */
-MegaPromise.busy = function() {
-    var promise = new MegaPromise();
-
-    if (fminitialized && !loadingDialog.active) {
-        var timer = setTimeout(function() {
-            timer = null;
-            loadingDialog.pshow();
-        }, 200);
-
-        promise.always(function() {
-            if (timer) {
-                clearTimeout(timer);
-            }
-            else {
-                loadingDialog.phide();
-            }
-        });
-    }
-
-    return promise;
-};
-
-/**
  * Common function to be used as reject callback to promises.
  *
  * @param promise {MegaPromise}

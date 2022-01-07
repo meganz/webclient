@@ -1,6 +1,6 @@
 /* BASICS */
 .CodeMirror {
-    background-color: var(--surface-main);
+    background-color: var(--stroke-main);
     box-sizing: border-box;
     color: var(--text-color-high);
     direction: ltr;
@@ -23,7 +23,7 @@
 
 /* GUTTER */
 .CodeMirror-gutters {
-    background-color: var(--surface-main);
+    background-color: var(--stroke-main);
     white-space: nowrap;
 }
 .CodeMirror-linenumber {
@@ -43,14 +43,14 @@
 
 /* CURSOR */
 .CodeMirror-cursor {
-    border-left: 1px solid var(--surface-main-inverted);
+    border-left: 1px solid var(--stroke-main-inverted);
     border-right: none;
     width: 0;
 }
 
 /* Shown when moving in bi-directional text */
 .CodeMirror div.CodeMirror-secondarycursor {
-    border-left: 1px solid var(--surface-mid-grey);
+    border-left: 1px solid var(--stroke-mid-grey);
 }
 .cm-fat-cursor .CodeMirror-cursor {
     width: auto;
@@ -416,6 +416,10 @@ div.CodeMirror-dragcursors {
 .CodeMirror-overlayscroll.CodeMirror-focused .CodeMirror-overlayscroll-vertical {
     opacity: 1;
 }
+.mobile .CodeMirror-overlayscroll .CodeMirror-overlayscroll-horizontal,
+.mobile .CodeMirror-overlayscroll-vertical {
+    opacity: 1;
+}
 .CodeMirror-wrap .CodeMirror-overlayscroll-vertical {
     height: 100%;
 }
@@ -441,6 +445,9 @@ div.CodeMirror-dragcursors {
 .CodeMirror-overlayscroll-vertical div:hover,
 .CodeMirror-overlayscroll-horizontal div:active,
 .CodeMirror-overlayscroll-vertical div:active {
+    opacity: 0.7;
+}
+.mobile .CodeMirror-overlayscroll-horizontal div {
     opacity: 0.7;
 }
 

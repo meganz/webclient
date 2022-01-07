@@ -39,7 +39,7 @@ var psa = {
         // Get the last announcement number they have seen from localStorage
         Promise.allSettled([
             M.getPersistentData('lastSeenPsaId'),
-            window.u_handle && mega.attr.get(u_handle, 'lastPsa', -2, true)
+            u_handle && u_handle !== 'AAAAAAAAAAA' && mega.attr.get(u_handle, 'lastPsa', -2, true)
         ]).then((res) => {
             psa.lastSeenPsaId = res[1].value || res[0].value;
 

@@ -378,7 +378,7 @@ var aboutus = {
         // TODO super hacky css tricks for the timeline dates -> will fix & generalise
         if (currEvent.attr('data-date').split('/')[2] !== '2013') {
             if (!event.hasClass('small-dot') && step === 'prev' && event.attr('data-date').split('/')[2] === '2013') {
-                $('p', event).text("Dec, 2013");
+                $('p', event).text(`${l[24035]}, 2013`);
                 $('p', event).css('right', 45);
             }
         }

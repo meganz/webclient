@@ -162,6 +162,7 @@
             }
             .media-viewer .img-wrap img,
             .media-viewer .img-wrap img[src=""].active {
+                background: var(--image-background);
                 opacity: 0;
                 position: absolute;
                 -webkit-transition: opacity 10ms ease-in-out;

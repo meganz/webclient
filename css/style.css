@@ -4810,12 +4810,11 @@ tr:not(.taken-down) .grid-status-icon:not(.read-only):not(.read-and-write) {
 .rubbish-bin .export-icon.puf-folder, .share-folder-icon div.puf-folder {
     background-position: -113px -5399px;
 }
-.thumb .block-view-file-type, .thumb .img-block, .img-block.thumb {
-    background-repeat: repeat;
-    background-size: 24px 24px;
-    background-position: 0 0, 0 12px, 12px -12px, -12px 0;
-    background-image: linear-gradient(45deg, rgba(222,222,222,0.72) 25%, transparent 25%), linear-gradient(-45deg, rgba(222,222,222,0.72) 25%, transparent 25%), linear-gradient(45deg, transparent 75%, rgba(222,222,222,0.72) 75%), linear-gradient(-45deg, transparent 75%, rgba(222,222,222,0.72) 75%);
-    -moz-border-radius: 4px;
+.thumb .block-view-file-type,
+.thumb .img-block,
+.img-block.thumb {
+    background: none;
+    border-radius: 4px;
     width: 156px;
     height: 156px;
     margin: 0;
@@ -4827,7 +4826,9 @@ tr:not(.taken-down) .grid-status-icon:not(.read-only):not(.read-and-write) {
     left: -1px;
     transform: none;
 }
-.thumb.video .block-view-file-type, .thumb.video .img-block, .img-block.thumb.video {
+.thumb.video .block-view-file-type,
+.thumb.video .img-block,
+.img-block.thumb.video {
     background-color: black;
     background-image: none;
 }

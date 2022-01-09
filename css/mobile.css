@@ -1755,15 +1755,13 @@ ul, li {
     margin: 9px 0 0 8px;
 }
 .mobile.fm-item-img img {
+    background: var(--image-background);
     width: 32px;
-    -moz-border-radius: 2px;
-    -webkit-border-radius: 2px;
     border-radius: 2px;
     position: absolute;
     top: 0;
     bottom: 0;
     margin: auto;
-    position:absolute
 }
 .mobile.fm-item-img.folder img {
     width: 36px;
@@ -5017,6 +5015,7 @@ div.checkboxOn {
     overflow: hidden;
 }
 .mobile.slides img {
+    background: var(--image-background);
     max-height: 100%;
     max-width: 100%;
     position: absolute;
@@ -6077,6 +6076,7 @@ textarea.mobile.support-text-field {
     height: 36px;
 }
 .mobile.grid-view .file.thumb .fm-item-img img {
+    background: var(--image-background);
     position: relative;
     margin: 0 0;
     min-width: 100%;

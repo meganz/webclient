@@ -25,7 +25,7 @@ mobile.slideshow = {
     hideHFFlag: false,
 
     /** Define Array of file types required to load in full size */
-    requiredFullSizeImgTypes: {'gif': null},
+    requiredFullSizeImgTypes: {'gif': 3e6, 'png': 4e5},
 
     /**
      * Initialise the preview slideshow
@@ -167,9 +167,9 @@ mobile.slideshow = {
      */
     fetchImageFromApi: async function(nodeHandle, callbackFunction, slideClass, initialLoad) {
         'use strict';
-        var node = M.getNodeByHandle(nodeHandle);
+        const node = M.getNodeByHandle(nodeHandle);
         const ext = fileext(node.name, false, true);
-        const loadFullSize = ext in mobile.slideshow.requiredFullSizeImgTypes;
+        const loadFullSize = node.s < mobile.slideshow.requiredFullSizeImgTypes[ext];
 
         if (is_video(node)) {
             mobile.slideshow.showLoadingAnimation();

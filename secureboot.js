@@ -664,6 +664,7 @@ if (!browserUpdate) try
         cmsStaticPath = 'https://smoketest.static.mega.nz/cms/';
         defaultStaticPath = staticpath;
         d = 1;
+        is_litesite = !!localStorage.testIO;
     }
 
     if (d > 0) {

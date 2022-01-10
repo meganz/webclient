@@ -755,6 +755,10 @@ function formatCurrency(value, currency, display, noDecimals) {
         result = result.replace('EUR', '\u20ac');
     }
 
+    if (locale === 'fr' && display === 'symbol') {
+        result = result.replace(/([^1-9A-Za-z])([A-Z]{2})/, '$1 $2');
+    }
+
     return result;
 }
 

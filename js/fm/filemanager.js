@@ -4373,7 +4373,14 @@ FileManager.prototype.initLeftPanel = function() {
 
             if (M.currentdirid === M.RootID || $(e.target).hasClass('js-cloudtree-expander')) {
                 $el.toggleClass('collapse');
-                $('.content-panel.active').toggleClass('collapse');
+                const $treeContentPanel = $('.content-panel.active');
+                if ($treeContentPanel.hasClass('collapse')) {
+                    $treeContentPanel.removeClass('collapse');
+                    M.addTreeUIDelayed();
+                }
+                else {
+                    $treeContentPanel.addClass('collapse');
+                }
                 $.tresizer();
             }
             else {

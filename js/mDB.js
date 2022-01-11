@@ -180,7 +180,7 @@ FMDB.prototype.init = function fmdb_init(result, wipe) {
     var openDataBase = function() {
         // start inter-tab heartbeat
         // fmdb.beacon();
-        fmdb.db = new Dexie(dbpfx + fmdb.name);
+        fmdb.db = new Dexie(dbpfx + fmdb.name, {chromeTransactionDurability: 'relaxed'});
 
         // There is some inconsistency in Chrome 58.0.3029.110 that could cause indexedDB OPs to take ages...
         setTimeout(function() {
@@ -1457,14 +1457,14 @@ FMDB.prototype.getbykey = async function fmdb_getbykey(table, index, anyof, wher
                         const data = isMap ? [...t[a].values()] : t[a];
 
                         if (a & 1) {
-                            // deletion - always by bare index
-                            for (j = data.length; j--;) {
-                                f = this._value(data[j]);
+                            // no need to record a deletion unless we got db entries
+                            if (dbRecords) {
+                                // deletion - always by bare index
+                                for (j = data.length; j--;) {
+                                    f = this._value(data[j]);
 
-                                if (typeof matches[f] == 'undefined') {
-                                    // boolean false means "record deleted"
-                                    if (dbRecords) {
-                                        // no need to record a deletion unless we got db entries
+                                    if (typeof matches[f] == 'undefined') {
+                                        // boolean false means "record deleted"
                                         matches[f] = false;
                                         match++;
                                     }
@@ -1819,16 +1819,38 @@ FMDB.prototype.exists = function(haystack, needle) {
 
 /**
  * Check whether two indexedDB-stored values are equal.
- * @param {ArrayBuffer|String} a1 first item to compare
- * @param {ArrayBuffer|String} a2 second item to compere
+ * @param {ArrayBuffer} a1 first item to compare
+ * @param {ArrayBuffer} a2 second item to compere
  * @returns {Boolean} true if both are deep equal
  */
 FMDB.prototype.equal = function(a1, a2) {
     'use strict';
-    return !indexedDB.cmp(a1, a2);
+    const len = a1.byteLength;
+
+    if (len === a2.byteLength) {
+        a1 = new Uint8Array(a1);
+        a2 = new Uint8Array(a2);
+
+        let i = 0;
+        while (i < len) {
+            if (a1[i] !== a2[i]) {
+                return false;
+            }
+            ++i;
+        }
+
+        return true;
+    }
+
+    return false;
 };
 
-// See {@link FMDB.equal}
+/**
+ * Check whether two indexedDB-stored values are equal.
+ * @param {String} a1 first item to compare
+ * @param {String} a2 second item to compere
+ * @returns {Boolean} true if both are deep equal
+ */
 FMDB.prototype.equals = function(a1, a2) {
     'use strict';
     return a1 === a2;
@@ -1871,20 +1893,17 @@ FMDB.prototype._value = function(value) {
  */
 FMDB.prototype.compare = function(table, key, value, store) {
     'use strict';
-    var eq = store[key];
+    let eq = store[key];
 
-    if (!this._raw(store)) {
-        // It's also encrypted
-        if (d > 1) {
-            console.assert(typeof value === typeof eq);
+    if (this._raw(store)) {
+
+        if (!this._cache[eq]) {
+            this._cache[eq] = this.toStore(eq);
         }
-        return this.equal(value, eq);
+        eq = this._cache[eq];
     }
 
-    if (!this._cache[eq]) {
-        this._cache[eq] = this.toStore(eq);
-    }
-    return this.equal(value, this._cache[eq]);
+    return this.equal(value, eq);
 };
 
 /**
@@ -2045,7 +2064,7 @@ function mDBcls() {
 class MegaDexie extends Dexie {
     constructor(aUniqueID, ...args) {
         const dbname = MegaDexie.getDBName(...args);
-        super(dbname);
+        super(dbname, {chromeTransactionDurability: 'relaxed'});
 
         this.__dbUniqueID = this.__fromUniqueID(aUniqueID + args[0]);
         this.__rememberDBName(dbname);

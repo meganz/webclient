@@ -66,6 +66,10 @@ body {
             --avatar-teal: linear-gradient(225deg, rgba(0, 213, 226, 1) 0%, rgba(0, 172, 193, 1) 100%);
             --avatar-yellow: linear-gradient(225deg, rgba(255, 235, 0, 1) 0%, rgba(255, 211, 0, 1) 100%);
 
+        /* Transparent images background */
+
+            --image-background: #fff;
+
     /* text */
 
         /* base colors */

@@ -1262,6 +1262,7 @@ body.rtl .feature-page * {
     .feature-page.objectstorage .content-two-column .register-interest .register-agreement-checkbox {
         margin-left: 40px;
     }
+    .objectstorage .s3provider-checkbox .checkboxOn,
     .objectstorage-mobile .s3provider-checkbox .checkboxOn,
     .objectstorage .register-agreement-checkbox .checkboxOn {
         background: #3077F1;

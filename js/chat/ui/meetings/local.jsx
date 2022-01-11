@@ -54,10 +54,10 @@ export default class Local extends MegaRenderMixin {
     }
 
     render() {
-        const { streams, minimized } = this.props;
+        const { streams, minimized, call } = this.props;
 
-        // Only one call participant (i.e. me) -> render `Local` only if the call is minimized
-        if (streams.length === 0 && !minimized) {
+        // Only one call participant (i.e. me) -> render `Local` only if the call is minimized or if I am sharing screen
+        if (streams.length === 0 && !minimized && !call.isSharingScreen()) {
             return null;
         }
 

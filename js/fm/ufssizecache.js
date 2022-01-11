@@ -112,16 +112,12 @@ UFSSizeCache.prototype._saveTreeState = function(n, entry) {
 };
 
 // @private
-UFSSizeCache.prototype._getVersions = async function(rootNode) {
+UFSSizeCache.prototype._getVersions = function(rootNode) {
     'use strict';
     const versions = [...this.versions];
 
-    if (d) {
-        console.debug('Fetching versions...', [...versions]);
-
-        if (rootNode && !M.d[rootNode.h]) {
-            console.error('Versions should have been loaded prior to parsing action-packets!');
-        }
+    if (d && rootNode && !M.d[rootNode.h]) {
+        console.error('Versions should have been loaded prior to parsing action-packets!');
     }
 
     for (let i = versions.length; i--;) {
@@ -144,15 +140,7 @@ UFSSizeCache.prototype._getVersions = async function(rootNode) {
         if (d) {
             console.warn('Versions retrieval...', [...versions]);
         }
-        /**
-        // @todo find a way to reliably retain *all* versions into memory..
-        while (window.fmdb && fmdb.hasPendingWrites('f')) {
-            // Sleep since if there are too many pending writes the dirty-read logic could cause a bottleneck..
-            console.info('Holding to load versions until fmdb is flushed...');
-            await sleep(2);
-        }
-        /**/
-        await dbfetch.geta(versions);
+        return dbfetch.geta(versions);
     }
 };
 
@@ -168,7 +156,10 @@ UFSSizeCache.prototype.save = async function(rootNode) {
     }
 
     if (this.versions.size) {
-        await this._getVersions(rootNode);
+        const promise = this._getVersions(rootNode);
+        if (promise) {
+            await promise;
+        }
     }
 
     for (var h in this.cache) {

@@ -131,6 +131,7 @@
     width: 124px;
 }
 .data-block-view .data-block-bg img {
+    background: var(--image-background);
     width: 192px;
     height: 192px;
     vertical-align: middle;

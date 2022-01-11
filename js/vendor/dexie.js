@@ -4,24 +4,25 @@
  *
  * By David Fahlander, david.fahlander@gmail.com
  *
- * Version 3.0.3.meganz, 2021-10-13T14:45:00.544Z
+ * Version 3.2.0.meganz, 2022-01-04T18:14:52.305Z
  *
- * http://dexie.org
+ * https://dexie.org
  *
  * Apache License Version 2.0, January 2004, http://www.apache.org/licenses/
  */
- 
+
 (function (global, factory) {
 typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
 typeof define === 'function' && define.amd ? define(factory) :
 (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.Dexie = factory());
 })(this, (function () { 'use strict';
 
-const keys = Object.keys;
-const isArray = Array.isArray;
 const _global = typeof self !== 'undefined' ? self :
     typeof window !== 'undefined' ? window :
         global;
+
+const keys = Object.keys;
+const isArray = Array.isArray;
 if (typeof Promise !== 'undefined' && !_global.Promise) {
     _global.Promise = Promise;
 }
@@ -175,10 +176,10 @@ const concat = [].concat;
 function flatten(a) {
     return concat.apply([], a);
 }
-const intrinsicTypeNames = "Boolean,String,Date,RegExp,Blob,File,FileList,ArrayBuffer,DataView,Uint8ClampedArray,ImageBitmap,ImageData,Map,Set,CryptoKey"
+const intrinsicTypeNames = "Boolean,String,Date,RegExp,Blob,File,FileList,FileSystemFileHandle,ArrayBuffer,DataView,Uint8ClampedArray,ImageBitmap,ImageData,Map,Set,CryptoKey"
     .split(',').concat(flatten([8, 16, 32, 64].map(num => ["Int", "Uint", "Float"].map(t => t + num + "Array")))).filter(t => _global[t]);
 const intrinsicTypes = intrinsicTypeNames.map(t => _global[t]);
-const intrinsicTypeNameSet = arrayToObject(intrinsicTypeNames, x => [x, true]);
+arrayToObject(intrinsicTypeNames, x => [x, true]);
 let circularRefs = null;
 function deepClone(any) {
     circularRefs = new WeakMap();
@@ -217,47 +218,6 @@ function innerDeepClone(any) {
 const { toString } = {};
 function toStringTag(o) {
     return toString.call(o).slice(8, -1);
-}
-const getValueOf = (val, type) => type === "Array" ? '' + val.map(v => getValueOf(v, toStringTag(v))) :
-    type === "ArrayBuffer" ? '' + new Uint8Array(val) :
-        type === "Date" ? val.getTime() :
-            ArrayBuffer.isView(val) ? '' + new Uint8Array(val.buffer) :
-                val;
-function getObjectDiff(a, b, rv, prfx) {
-    rv = rv || {};
-    prfx = prfx || '';
-    for (const prop in a) {
-        if (!hasOwn(b, prop))
-            rv[prfx + prop] = undefined;
-        else {
-            var ap = a[prop], bp = b[prop];
-            if (typeof ap === 'object' && typeof bp === 'object' && ap && bp) {
-                const apTypeName = toStringTag(ap);
-                const bpTypeName = toStringTag(bp);
-                if (apTypeName === bpTypeName) {
-                    if (intrinsicTypeNameSet[apTypeName] || isArray(ap)) {
-                        if (getValueOf(ap, apTypeName) !== getValueOf(bp, bpTypeName)) {
-                            rv[prfx + prop] = b[prop];
-                        }
-                    }
-                    else {
-                        getObjectDiff(ap, bp, rv, prfx + prop + ".");
-                    }
-                }
-                else {
-                    rv[prfx + prop] = b[prop];
-                }
-            }
-            else if (ap !== bp)
-                rv[prfx + prop] = b[prop];
-        }
-    }
-    for (const prop in b) {
-        if (!hasOwn(a, prop)) {
-            rv[prfx + prop] = b[prop];
-        }
-    }
-    return rv;
 }
 function getIteratorOf(x) {
     let i;
@@ -360,7 +320,8 @@ var defaultTexts = {
     VersionChanged: "Database version changed by other database connection",
     DatabaseClosed: "Database has been closed",
     Abort: "Transaction aborted",
-    TransactionInactive: "Transaction has already completed or failed"
+    TransactionInactive: "Transaction has already completed or failed",
+    MissingAPI: "IndexedDB API missing."
 };
 function DexieError(name, msg) {
     this._e = getErrorWithStack();
@@ -393,7 +354,8 @@ derive(ModifyError).from(DexieError);
 function BulkError(msg, failures) {
     this._e = getErrorWithStack();
     this.name = "BulkError";
-    this.failures = failures;
+    this.failures = Object.keys(failures).map(pos => failures[pos]);
+    this.failuresByPos = failures;
     this.message = getMultiErrorMessage(msg, failures);
 }
 derive(BulkError).from(DexieError);
@@ -1210,7 +1172,10 @@ function globalError(err, promise) {
 var rejection = DexiePromise.reject;
 
 function tempTransaction(db, mode, storeNames, fn) {
-    if (!db._state.openComplete && (!PSD.letThrough)) {
+    if (!db.idbdb || (!db._state.openComplete && (!PSD.letThrough && !db._vip))) {
+        if (db._state.openComplete) {
+            return rejection(new exceptions.DatabaseClosed(db._state.dbOpenError));
+        }
         if (!db._state.isBeingOpened) {
             if (!db._options.autoOpen)
                 return rejection(new exceptions.DatabaseClosed());
@@ -1237,7 +1202,7 @@ function tempTransaction(db, mode, storeNames, fn) {
     }
 }
 
-const DEXIE_VERSION = '3.0.3.meganz';
+const DEXIE_VERSION = '3.2.0.meganz';
 const maxString = String.fromCharCode(65535);
 const minKey = -Infinity;
 const INVALID_KEY_ARGUMENT = "Invalid key provided. Keys must be of type string, number, Date or Array<string | number | Date>.";
@@ -1268,13 +1233,91 @@ const AnyRange = {
 };
 
 function workaroundForUndefinedPrimKey(keyPath) {
-    return function (obj) {
-        if (getByKeyPath(obj, keyPath) === undefined) {
-            obj = deepClone(obj);
-            delByKeyPath(obj, keyPath);
+    return typeof keyPath === "string" && !keyPath.includes('.')
+        ? (obj) => {
+            if (obj[keyPath] === undefined && (keyPath in obj)) {
+                obj = deepClone(obj);
+                delete obj[keyPath];
+            }
+            return obj;
         }
-        return obj;
-    };
+        : (obj) => obj;
+}
+
+function cmp(a, b) {
+    try {
+        const ta = type(a);
+        const tb = type(b);
+        if (ta !== tb) {
+            if (ta === 'Array')
+                return 1;
+            if (tb === 'Array')
+                return -1;
+            if (ta === 'binary')
+                return 1;
+            if (tb === 'binary')
+                return -1;
+            if (ta === 'string')
+                return 1;
+            if (tb === 'string')
+                return -1;
+            if (ta === 'Date')
+                return 1;
+            if (tb !== 'Date')
+                return NaN;
+            return -1;
+        }
+        switch (ta) {
+            case 'number':
+            case 'Date':
+            case 'string':
+                return a > b ? 1 : a < b ? -1 : 0;
+            case 'binary': {
+                return compareUint8Arrays(getUint8Array(a), getUint8Array(b));
+            }
+            case 'Array':
+                return compareArrays(a, b);
+        }
+    }
+    catch (_a) { }
+    return NaN;
+}
+function compareArrays(a, b) {
+    const al = a.length;
+    const bl = b.length;
+    const l = al < bl ? al : bl;
+    for (let i = 0; i < l; ++i) {
+        const res = cmp(a[i], b[i]);
+        if (res !== 0)
+            return res;
+    }
+    return al === bl ? 0 : al < bl ? -1 : 1;
+}
+function compareUint8Arrays(a, b) {
+    const al = a.length;
+    const bl = b.length;
+    const l = al < bl ? al : bl;
+    for (let i = 0; i < l; ++i) {
+        if (a[i] !== b[i])
+            return a[i] < b[i] ? -1 : 1;
+    }
+    return al === bl ? 0 : al < bl ? -1 : 1;
+}
+function type(x) {
+    const t = typeof x;
+    if (t !== 'object')
+        return t;
+    if (ArrayBuffer.isView(x))
+        return 'binary';
+    const tsTag = toStringTag(x);
+    return tsTag === 'ArrayBuffer' ? 'binary' : tsTag;
+}
+function getUint8Array(a) {
+    if (a instanceof Uint8Array)
+        return a;
+    if (ArrayBuffer.isView(a))
+        return new Uint8Array(a.buffer, a.byteOffset, a.byteLength);
+    return new Uint8Array(a);
 }
 
 class Table {
@@ -1328,14 +1371,8 @@ class Table {
             console.warn(`The query ${JSON.stringify(indexOrCrit)} on ${this.name} would benefit of a ` +
                 `compound index [${keyPaths.join('+')}]`);
         const { idxByName } = this.schema;
-        const idb = this.db._deps.indexedDB;
         function equals(a, b) {
-            try {
-                return idb.cmp(a, b) === 0;
-            }
-            catch (e) {
-                return false;
-            }
+            return cmp(a, b) === 0;
         }
         const [idx, filterFunction] = keyPaths.reduce(([prevIndex, prevFilterFn], keyPath) => {
             const index = idxByName[keyPath];
@@ -1434,15 +1471,22 @@ class Table {
         });
     }
     update(keyOrObject, modifications) {
-        if (typeof modifications !== 'object' || isArray(modifications))
-            throw new exceptions.InvalidArgument("Modifications must be an object.");
         if (typeof keyOrObject === 'object' && !isArray(keyOrObject)) {
-            keys(modifications).forEach(keyPath => {
-                setByKeyPath(keyOrObject, keyPath, modifications[keyPath]);
-            });
             const key = getByKeyPath(keyOrObject, this.schema.primKey.keyPath);
             if (key === undefined)
                 return rejection(new exceptions.InvalidArgument("Given object does not contain its primary key"));
+            try {
+                if (typeof modifications !== "function") {
+                    keys(modifications).forEach(keyPath => {
+                        setByKeyPath(keyOrObject, keyPath, modifications[keyPath]);
+                    });
+                }
+                else {
+                    modifications(keyOrObject, { value: keyOrObject, primKey: key });
+                }
+            }
+            catch (_a) {
+            }
             return this.where(":id").equals(key).modify(modifications);
         }
         else {
@@ -1502,7 +1546,7 @@ class Table {
                 const result = wantResults ? results : lastResult;
                 if (numFailures === 0)
                     return result;
-                throw new BulkError(`${this.name}.bulkAdd(): ${numFailures} of ${numObjects} operations failed`, Object.keys(failures).map(pos => failures[pos]));
+                throw new BulkError(`${this.name}.bulkAdd(): ${numFailures} of ${numObjects} operations failed`, failures);
             });
         });
     }
@@ -1525,7 +1569,7 @@ class Table {
                 const result = wantResults ? results : lastResult;
                 if (numFailures === 0)
                     return result;
-                throw new BulkError(`${this.name}.bulkPut(): ${numFailures} of ${numObjects} operations failed`, Object.keys(failures).map(pos => failures[pos]));
+                throw new BulkError(`${this.name}.bulkPut(): ${numFailures} of ${numObjects} operations failed`, failures);
             });
         });
     }
@@ -1975,8 +2019,7 @@ class Collection {
             }
             const coreTable = ctx.table.core;
             const { outbound, extractKey } = coreTable.schema.primaryKey;
-            const limit = 'testmode' in Dexie$1 ? 1 : 2000;
-            const { cmp } = this.db.core;
+            const limit = this.db._options.modifyChunkSize || 200;
             const totalFailures = [];
             let successCount = 0;
             const failedKeys = [];
@@ -1990,7 +2033,11 @@ class Collection {
             return this.clone().primaryKeys().then(keys => {
                 const nextChunk = (offset) => {
                     const count = Math.min(limit, keys.length - offset);
-                    return coreTable.getMany({ trans, keys: keys.slice(offset, offset + count) }).then(values => {
+                    return coreTable.getMany({
+                        trans,
+                        keys: keys.slice(offset, offset + count),
+                        cache: "immutable"
+                    }).then(values => {
                         const addValues = [];
                         const putValues = [];
                         const putKeys = outbound ? [] : null;
@@ -2016,6 +2063,12 @@ class Collection {
                                 }
                             }
                         }
+                        const criteria = isPlainKeyRange(ctx) &&
+                            ctx.limit === Infinity &&
+                            (typeof changes !== 'function' || changes === deleteCallback) && {
+                            index: ctx.index,
+                            range: ctx.range
+                        };
                         return Promise.resolve(addValues.length > 0 &&
                             coreTable.mutate({ trans, type: 'add', values: addValues })
                                 .then(res => {
@@ -2023,11 +2076,22 @@ class Collection {
                                     deleteKeys.splice(parseInt(pos), 1);
                                 }
                                 applyMutateResult(addValues.length, res);
-                            })).then(res => putValues.length > 0 &&
-                            coreTable.mutate({ trans, type: 'put', keys: putKeys, values: putValues })
-                                .then(res => applyMutateResult(putValues.length, res))).then(() => deleteKeys.length > 0 &&
-                            coreTable.mutate({ trans, type: 'delete', keys: deleteKeys })
-                                .then(res => applyMutateResult(deleteKeys.length, res))).then(() => {
+                            })).then(() => (putValues.length > 0 || (criteria && typeof changes === 'object')) &&
+                            coreTable.mutate({
+                                trans,
+                                type: 'put',
+                                keys: putKeys,
+                                values: putValues,
+                                criteria,
+                                changeSpec: typeof changes !== 'function'
+                                    && changes
+                            }).then(res => applyMutateResult(putValues.length, res))).then(() => (deleteKeys.length > 0 || (criteria && changes === deleteCallback)) &&
+                            coreTable.mutate({
+                                trans,
+                                type: 'delete',
+                                keys: deleteKeys,
+                                criteria
+                            }).then(res => applyMutateResult(deleteKeys.length, res))).then(() => {
                             return keys.length > offset + count && nextChunk(offset + limit);
                         });
                     });
@@ -2058,9 +2122,10 @@ class Collection {
                 });
             });
         }
-        return this.modify((value, ctx) => ctx.value = null);
+        return this.modify(deleteCallback);
     }
 }
+const deleteCallback = (value, ctx) => ctx.value = null;
 
 function createCollectionConstructor(db) {
     return makeClassConstructor(Collection.prototype, function Collection(whereClause, keyRangeGenerator) {
@@ -2447,31 +2512,13 @@ function createWhereClauseConstructor(db) {
             index: index === ":id" ? null : index,
             or: orCollection
         };
-        const indexedDB = db._deps.indexedDB;
-        if (!indexedDB)
-            throw new exceptions.MissingAPI("indexedDB API missing");
-        this._cmp = this._ascending = indexedDB.cmp.bind(indexedDB);
-        this._descending = (a, b) => indexedDB.cmp(b, a);
-        this._max = (a, b) => indexedDB.cmp(a, b) > 0 ? a : b;
-        this._min = (a, b) => indexedDB.cmp(a, b) < 0 ? a : b;
+        this._cmp = this._ascending = cmp;
+        this._descending = (a, b) => cmp(b, a);
+        this._max = (a, b) => cmp(a, b) > 0 ? a : b;
+        this._min = (a, b) => cmp(a, b) < 0 ? a : b;
         this._IDBKeyRange = db._deps.IDBKeyRange;
     });
 }
-
-function safariMultiStoreFix(storeNames) {
-    return storeNames.length === 1 ? storeNames[0] : storeNames;
-}
-let getMaxKey = (IdbKeyRange) => {
-    try {
-        IdbKeyRange.only([[]]);
-        getMaxKey = () => [[]];
-        return [[]];
-    }
-    catch (e) {
-        getMaxKey = () => maxString;
-        return maxString;
-    }
-};
 
 function eventRejectHandler(reject) {
     return wrap(function (event) {
@@ -2532,7 +2579,10 @@ class Transaction {
         if (!this.active)
             throw new exceptions.TransactionInactive();
         assert(this._completion._state === null);
-        idbtrans = this.idbtrans = idbtrans || idbdb.transaction(safariMultiStoreFix(this.storeNames), this.mode);
+        idbtrans = this.idbtrans = idbtrans ||
+            (this.db.core
+                ? this.db.core.transaction(this.storeNames, this.mode, { durability: this.chromeTransactionDurability })
+                : idbdb.transaction(this.storeNames, this.mode, { durability: this.chromeTransactionDurability }));
         idbtrans.onerror = wrap(ev => {
             preventDefault(ev);
             this._reject(idbtrans.error);
@@ -2615,8 +2665,12 @@ class Transaction {
         });
     }
     abort() {
-        this.active && this._reject(new exceptions.Abort());
-        this.active = false;
+        if (this.active) {
+            this.active = false;
+            if (this.idbtrans)
+                this.idbtrans.abort();
+            this._reject(new exceptions.Abort());
+        }
     }
     table(tableName) {
         const memoizedTables = (this._memoizedTables || (this._memoizedTables = {}));
@@ -2634,11 +2688,12 @@ class Transaction {
 }
 
 function createTransactionConstructor(db) {
-    return makeClassConstructor(Transaction.prototype, function Transaction(mode, storeNames, dbschema, parent) {
+    return makeClassConstructor(Transaction.prototype, function Transaction(mode, storeNames, dbschema, chromeTransactionDurability, parent) {
         this.db = db;
         this.mode = mode;
         this.storeNames = storeNames;
         this.schema = dbschema;
+        this.chromeTransactionDurability = chromeTransactionDurability;
         this.idbtrans = null;
         this.on = Events(this, "complete", "error", "abort");
         this.parent = parent || null;
@@ -2696,6 +2751,21 @@ function createTableSchema(name, primKey, indexes) {
     };
 }
 
+function safariMultiStoreFix(storeNames) {
+    return storeNames.length === 1 ? storeNames[0] : storeNames;
+}
+let getMaxKey = (IdbKeyRange) => {
+    try {
+        IdbKeyRange.only([[]]);
+        getMaxKey = () => [[]];
+        return [[]];
+    }
+    catch (e) {
+        getMaxKey = () => maxString;
+        return maxString;
+    }
+};
+
 function getKeyExtractor(keyPath) {
     if (keyPath == null) {
         return () => undefined;
@@ -2717,16 +2787,6 @@ function getSinglePathKeyExtractor(keyPath) {
     }
 }
 
-function getEffectiveKeys(primaryKey, req) {
-    if (req.type === 'delete')
-        return req.keys;
-    return req.keys || req.values.map(primaryKey.extractKey);
-}
-function getExistingValues(table, req, effectiveKeys) {
-    return req.type === 'add' ? Promise.resolve(new Array(req.values.length)) :
-        table.getMany({ trans: req.trans, keys: effectiveKeys });
-}
-
 function arrayify(arrayLike) {
     return [].slice.call(arrayLike);
 }
@@ -2738,8 +2798,7 @@ function getKeyPathAlias(keyPath) {
             keyPath :
             `[${keyPath.join('+')}]`;
 }
-function createDBCore(db, indexedDB, IdbKeyRange, tmpTrans) {
-    const cmp = indexedDB.cmp.bind(indexedDB);
+function createDBCore(db, IdbKeyRange, tmpTrans) {
     function extractSchema(db, trans) {
         const tables = arrayify(db.objectStoreNames);
         return {
@@ -2809,7 +2868,7 @@ function createDBCore(db, indexedDB, IdbKeyRange, tmpTrans) {
     }
     function createDbCoreTable(tableSchema) {
         const tableName = tableSchema.name;
-        function mutate({ trans, type, keys, values, range, wantResults }) {
+        function mutate({ trans, type, keys, values, range }) {
             return new Promise((resolve, reject) => {
                 resolve = wrap(resolve);
                 const store = trans.objectStore(tableName);
@@ -2823,29 +2882,21 @@ function createDBCore(db, indexedDB, IdbKeyRange, tmpTrans) {
                 }
                 if (length === 0)
                     return resolve({ numFailures: 0, failures: {}, results: [], lastResult: undefined });
-                const results = wantResults && [...(keys ?
-                        keys :
-                        getEffectiveKeys(tableSchema.primaryKey, { type, keys, values }))];
                 let req;
+                const reqs = [];
                 const failures = [];
                 let numFailures = 0;
                 const errorHandler = event => {
                     ++numFailures;
                     preventDefault(event);
-                    if (results)
-                        results[event.target._reqno] = undefined;
-                    failures[event.target._reqno] = event.target.error;
-                };
-                const setResult = ({ target }) => {
-                    results[target._reqno] = target.result;
                 };
                 if (type === 'deleteRange') {
                     if (range.type === 4 )
-                        return resolve({ numFailures, failures, results, lastResult: undefined });
+                        return resolve({ numFailures, failures, results: [], lastResult: undefined });
                     if (range.type === 3 )
-                        req = store.clear();
+                        reqs.push(req = store.clear());
                     else
-                        req = store.delete(makeIDBKeyRange(range));
+                        reqs.push(req = store.delete(makeIDBKeyRange(range)));
                 }
                 else {
                     const [args1, args2] = isAddOrPut ?
@@ -2855,32 +2906,30 @@ function createDBCore(db, indexedDB, IdbKeyRange, tmpTrans) {
                         [keys, null];
                     if (isAddOrPut) {
                         for (let i = 0; i < length; ++i) {
-                            req = (args2 && args2[i] !== undefined ?
+                            reqs.push(req = (args2 && args2[i] !== undefined ?
                                 store[type](args1[i], args2[i]) :
-                                store[type](args1[i]));
-                            req._reqno = i;
-                            if (results && results[i] === undefined) {
-                                req.onsuccess = setResult;
-                            }
+                                store[type](args1[i])));
                             req.onerror = errorHandler;
                         }
                     }
                     else {
                         for (let i = 0; i < length; ++i) {
-                            req = store[type](args1[i]);
-                            req._reqno = i;
+                            reqs.push(req = store[type](args1[i]));
                             req.onerror = errorHandler;
                         }
                     }
                 }
                 const done = event => {
                     const lastResult = event.target.result;
-                    if (results)
-                        results[length - 1] = lastResult;
+                    for (let i = reqs.length; i--;) {
+                        if (reqs[i].error != null)
+                            failures[i] = reqs[i].error;
+                        reqs[i] = reqs[i].result;
+                    }
                     resolve({
                         numFailures,
                         failures,
-                        results,
+                        results: type === "delete" ? keys : reqs,
                         lastResult
                     });
                 };
@@ -3082,7 +3131,6 @@ function createDBCore(db, indexedDB, IdbKeyRange, tmpTrans) {
                 throw new Error(`Table '${name}' not found`);
             return tableMap[name];
         },
-        cmp,
         MIN_KEY: -Infinity,
         MAX_KEY: getMaxKey(IdbKeyRange),
         schema
@@ -3093,12 +3141,12 @@ function createMiddlewareStack(stackImpl, middlewares) {
     return middlewares.reduce((down, { create }) => ({ ...down, ...create(down) }), stackImpl);
 }
 function createMiddlewareStacks(middlewares, idbdb, { IDBKeyRange, indexedDB }, tmpTrans) {
-    const dbcore = createMiddlewareStack(createDBCore(idbdb, indexedDB, IDBKeyRange, tmpTrans), middlewares.dbcore);
+    const dbcore = createMiddlewareStack(createDBCore(idbdb, IDBKeyRange, tmpTrans), middlewares.dbcore);
     return {
         dbcore
     };
 }
-function generateMiddlewareStacks(db, tmpTrans) {
+function generateMiddlewareStacks({ _novip: db }, tmpTrans) {
     const idbdb = tmpTrans.db;
     const stacks = createMiddlewareStacks(db._middlewares, idbdb, db._deps, tmpTrans);
     db.core = stacks.dbcore;
@@ -3113,7 +3161,7 @@ function generateMiddlewareStacks(db, tmpTrans) {
     });
 }
 
-function setApiOnPlace(db, objs, tableNames, dbschema) {
+function setApiOnPlace({ _novip: db }, objs, tableNames, dbschema) {
     tableNames.forEach(tableName => {
         const schema = dbschema[tableName];
         objs.forEach(obj => {
@@ -3134,7 +3182,7 @@ function setApiOnPlace(db, objs, tableNames, dbschema) {
         });
     });
 }
-function removeTablesApi(db, objs) {
+function removeTablesApi({ _novip: db }, objs) {
     objs.forEach(obj => {
         for (let key in obj) {
             if (obj[key] instanceof db.Table)
@@ -3166,7 +3214,7 @@ function runUpgraders(db, oldVersion, idbUpgradeTrans, reject) {
             updateTablesAndIndexes(db, oldVersion, trans, idbUpgradeTrans).catch(rejectTransaction);
     });
 }
-function updateTablesAndIndexes(db, oldVersion, trans, idbUpgradeTrans) {
+function updateTablesAndIndexes({ _novip: db }, oldVersion, trans, idbUpgradeTrans) {
     const queue = [];
     const versions = db._versions;
     let globalSchema = db._dbSchema = buildGlobalSchema(db, db.idbdb, idbUpgradeTrans);
@@ -3315,12 +3363,7 @@ function createMissingTables(newSchema, idbtrans) {
     });
 }
 function deleteRemovedTables(newSchema, idbtrans) {
-    for (var i = 0; i < idbtrans.db.objectStoreNames.length; ++i) {
-        var storeName = idbtrans.db.objectStoreNames[i];
-        if (newSchema[storeName] == null) {
-            idbtrans.db.deleteObjectStore(storeName);
-        }
-    }
+    [].slice.call(idbtrans.db.objectStoreNames).forEach(storeName => newSchema[storeName] == null && idbtrans.db.deleteObjectStore(storeName));
 }
 function addIndex(store, idx) {
     store.createIndex(idx.name, idx.keyPath, { unique: idx.unique, multiEntry: idx.multi });
@@ -3343,7 +3386,7 @@ function buildGlobalSchema(db, idbdb, tmpTrans) {
     });
     return globalSchema;
 }
-function readGlobalSchema(db, idbdb, tmpTrans) {
+function readGlobalSchema({ _novip: db }, idbdb, tmpTrans) {
     db.verno = idbdb.version / 10;
     const globalSchema = db._dbSchema = buildGlobalSchema(db, idbdb, tmpTrans);
     db._storeNames = slice(idbdb.objectStoreNames, 0);
@@ -3354,7 +3397,7 @@ function verifyInstalledSchema(db, tmpTrans) {
     const diff = getSchemaDiff(installedSchema, db._dbSchema);
     return !(diff.add.length || diff.change.some(ch => ch.add.length || ch.change.length));
 }
-function adjustToExistingIndexNames(db, schema, idbtrans) {
+function adjustToExistingIndexNames({ _novip: db }, schema, idbtrans) {
     const storeNames = idbtrans.db.objectStoreNames;
     for (let i = 0; i < storeNames.length; ++i) {
         const storeName = storeNames[i];
@@ -3428,7 +3471,7 @@ class Version {
         return this;
     }
     upgrade(upgradeFunction) {
-        this._cfg.contentUpgrade = upgradeFunction;
+        this._cfg.contentUpgrade = promisableChain(this._cfg.contentUpgrade || nop, upgradeFunction);
         return this;
     }
 }
@@ -3446,38 +3489,37 @@ function createVersionConstructor(db) {
     });
 }
 
-let databaseEnumerator;
-function DatabaseEnumerator(indexedDB) {
-    const hasDatabasesNative = indexedDB && typeof indexedDB.databases === 'function';
-    let dbNamesTable;
-    if (!hasDatabasesNative) {
-        const db = new Dexie$1(DBNAMES_DB, { addons: [] });
-        db.version(1).stores({ dbnames: 'name' });
-        dbNamesTable = db.table('dbnames');
+function getDbNamesTable(indexedDB, IDBKeyRange) {
+    let dbNamesDB = indexedDB["_dbNamesDB"];
+    if (!dbNamesDB) {
+        dbNamesDB = indexedDB["_dbNamesDB"] = new Dexie$1(DBNAMES_DB, {
+            addons: [],
+            indexedDB,
+            IDBKeyRange,
+        });
+        dbNamesDB.version(1).stores({ dbnames: "name" });
     }
-    return {
-        getDatabaseNames() {
-            return hasDatabasesNative
-                ?
-                    DexiePromise.resolve(indexedDB.databases()).then(infos => infos
-                        .map(info => info.name)
-                        .filter(name => name !== DBNAMES_DB))
-                :
-                    dbNamesTable.toCollection().primaryKeys();
-        },
-        add(name) {
-            return !hasDatabasesNative && name !== DBNAMES_DB && dbNamesTable.put({ name }).catch(nop);
-        },
-        remove(name) {
-            return !hasDatabasesNative && name !== DBNAMES_DB && dbNamesTable.delete(name).catch(nop);
-        }
-    };
+    return dbNamesDB.table("dbnames");
 }
-function initDatabaseEnumerator(indexedDB) {
-    try {
-        databaseEnumerator = DatabaseEnumerator(indexedDB);
-    }
-    catch (e) { }
+function hasDatabasesNative(indexedDB) {
+    return indexedDB && typeof indexedDB.databases === "function";
+}
+function getDatabaseNames({ indexedDB, IDBKeyRange, }) {
+    return hasDatabasesNative(indexedDB)
+        ? Promise.resolve(indexedDB.databases()).then((infos) => infos
+            .map((info) => info.name)
+            .filter((name) => name !== DBNAMES_DB))
+        : getDbNamesTable(indexedDB, IDBKeyRange).toCollection().primaryKeys();
+}
+function _onDatabaseCreated({ indexedDB, IDBKeyRange }, name) {
+    !hasDatabasesNative(indexedDB) &&
+        name !== DBNAMES_DB &&
+        getDbNamesTable(indexedDB, IDBKeyRange).put({ name }).catch(nop);
+}
+function _onDatabaseDeleted({ indexedDB, IDBKeyRange }, name) {
+    !hasDatabasesNative(indexedDB) &&
+        name !== DBNAMES_DB &&
+        getDbNamesTable(indexedDB, IDBKeyRange).delete(name).catch(nop);
 }
 
 function vip(fn) {
@@ -3485,6 +3527,20 @@ function vip(fn) {
         PSD.letThrough = true;
         return fn();
     });
+}
+
+function idbReady() {
+    var isSafari = !navigator.userAgentData &&
+        /Safari\//.test(navigator.userAgent) &&
+        !/Chrom(e|ium)\//.test(navigator.userAgent);
+    if (!isSafari || !indexedDB.databases)
+        return Promise.resolve();
+    var intervalId;
+    return new Promise(function (resolve) {
+        var tryIdb = function () { return indexedDB.databases().finally(resolve); };
+        intervalId = setInterval(tryIdb, 100);
+        tryIdb();
+    }).finally(function () { return clearInterval(intervalId); });
 }
 
 function dexieOpen(db) {
@@ -3498,18 +3554,23 @@ function dexieOpen(db) {
     state.isBeingOpened = true;
     state.dbOpenError = null;
     state.openComplete = false;
+    const openCanceller = state.openCanceller;
+    function throwIfCancelled() {
+        if (state.openCanceller !== openCanceller)
+            throw new exceptions.DatabaseClosed('db.open() was cancelled');
+    }
     let resolveDbReady = state.dbReadyResolve,
-    upgradeTransaction = null;
-    return DexiePromise.race([state.openCanceller, new DexiePromise((resolve, reject) => {
+    upgradeTransaction = null, wasCreated = false;
+    return DexiePromise.race([openCanceller, (typeof navigator === 'undefined' ? DexiePromise.resolve() : idbReady()).then(() => new DexiePromise((resolve, reject) => {
+            throwIfCancelled();
             if (!indexedDB)
-                throw new exceptions.MissingAPI("indexedDB API not found. If using IE10+, make sure to run your code on a server URL " +
-                    "(not locally). If using old Safari versions, make sure to include indexedDB polyfill.");
+                throw new exceptions.MissingAPI();
             const dbName = db.name;
             const req = state.autoSchema ?
                 indexedDB.open(dbName) :
                 indexedDB.open(dbName, Math.round(db.verno * 10));
             if (!req)
-                throw new exceptions.MissingAPI("IndexedDB API not available");
+                throw new exceptions.MissingAPI();
             req.onerror = eventRejectHandler(reject);
             req.onblocked = wrap(db._fireOnBlocked);
             req.onupgradeneeded = wrap(e => {
@@ -3526,13 +3587,14 @@ function dexieOpen(db) {
                 else {
                     upgradeTransaction.onerror = eventRejectHandler(reject);
                     var oldVer = e.oldVersion > Math.pow(2, 62) ? 0 : e.oldVersion;
-                    db.idbdb = req.result;
+                    wasCreated = oldVer < 1;
+                    db._novip.idbdb = req.result;
                     runUpgraders(db, oldVer / 10, upgradeTransaction, reject);
                 }
             }, reject);
             req.onsuccess = wrap(() => {
                 upgradeTransaction = null;
-                const idbdb = db.idbdb = req.result;
+                const idbdb = db._novip.idbdb = req.result;
                 const objectStoreNames = slice(idbdb.objectStoreNames);
                 if (objectStoreNames.length > 0)
                     try {
@@ -3554,32 +3616,38 @@ function dexieOpen(db) {
                     state.vcFired = true;
                     db.on("versionchange").fire(ev);
                 });
-                databaseEnumerator.add(dbName);
+                idbdb.onclose = wrap(ev => {
+                    db.on("close").fire(ev);
+                });
+                if (wasCreated)
+                    _onDatabaseCreated(db._deps, dbName);
                 resolve();
             }, reject);
-        })]).then(() => {
+        }))]).then(() => {
+        throwIfCancelled();
         state.onReadyBeingFired = [];
-        return DexiePromise.resolve(vip(db.on.ready.fire)).then(function fireRemainders() {
+        return DexiePromise.resolve(vip(() => db.on.ready.fire(db.vip))).then(function fireRemainders() {
             if (state.onReadyBeingFired.length > 0) {
                 let remainders = state.onReadyBeingFired.reduce(promisableChain, nop);
                 state.onReadyBeingFired = [];
-                return DexiePromise.resolve(vip(remainders)).then(fireRemainders);
+                return DexiePromise.resolve(vip(() => remainders(db.vip))).then(fireRemainders);
             }
         });
     }).finally(() => {
         state.onReadyBeingFired = null;
-    }).then(() => {
         state.isBeingOpened = false;
+    }).then(() => {
         return db;
     }).catch(err => {
+        state.dbOpenError = err;
         try {
             upgradeTransaction && upgradeTransaction.abort();
         }
-        catch (e) { }
-        state.isBeingOpened = false;
-        db.close();
-        state.dbOpenError = err;
-        return rejection(state.dbOpenError);
+        catch (_a) { }
+        if (openCanceller === state.openCanceller) {
+            db._close();
+        }
+        return rejection(err);
     }).finally(() => {
         state.openComplete = true;
         resolveDbReady();
@@ -3679,7 +3747,6 @@ function createVirtualIndexMiddleware(down) {
                 const virtualIndex = {
                     ...lowLevelIndex,
                     isVirtual,
-                    isPrimaryKey: !isVirtual && lowLevelIndex.isPrimaryKey,
                     keyTail,
                     keyLength,
                     extractKey: getKeyExtractor(keyPath),
@@ -3751,7 +3818,10 @@ function createVirtualIndexMiddleware(down) {
                             key != null ?
                                 cursor.continue(pad(key, req.reverse ? down.MAX_KEY : down.MIN_KEY, keyTail)) :
                                 req.unique ?
-                                    cursor.continue(pad(cursor.key, req.reverse ? down.MIN_KEY : down.MAX_KEY, keyTail)) :
+                                    cursor.continue(cursor.key.slice(0, keyLength)
+                                        .concat(req.reverse
+                                        ? down.MIN_KEY
+                                        : down.MAX_KEY, keyTail)) :
                                     cursor.continue();
                         }
                         const virtualCursor = Object.create(cursor, {
@@ -3759,6 +3829,11 @@ function createVirtualIndexMiddleware(down) {
                             continuePrimaryKey: {
                                 value(key, primaryKey) {
                                     cursor.continuePrimaryKey(pad(key, down.MAX_KEY, keyTail), primaryKey);
+                                }
+                            },
+                            primaryKey: {
+                                get() {
+                                    return cursor.primaryKey;
                                 }
                             },
                             key: {
@@ -3792,131 +3867,6 @@ const virtualIndexMiddleware = {
     create: createVirtualIndexMiddleware
 };
 
-const hooksMiddleware = {
-    stack: "dbcore",
-    name: "HooksMiddleware",
-    level: 2,
-    create: (downCore) => ({
-        ...downCore,
-        table(tableName) {
-            const downTable = downCore.table(tableName);
-            const { primaryKey } = downTable.schema;
-            const tableMiddleware = {
-                ...downTable,
-                mutate(req) {
-                    const dxTrans = PSD.trans;
-                    const { deleting, creating, updating } = dxTrans.table(tableName).hook;
-                    switch (req.type) {
-                        case 'add':
-                            if (creating.fire === nop)
-                                break;
-                            return dxTrans._promise('readwrite', () => addPutOrDelete(req), true);
-                        case 'put':
-                            if (creating.fire === nop && updating.fire === nop)
-                                break;
-                            return dxTrans._promise('readwrite', () => addPutOrDelete(req), true);
-                        case 'delete':
-                            if (deleting.fire === nop)
-                                break;
-                            return dxTrans._promise('readwrite', () => addPutOrDelete(req), true);
-                        case 'deleteRange':
-                            if (deleting.fire === nop)
-                                break;
-                            return dxTrans._promise('readwrite', () => deleteRange(req), true);
-                    }
-                    return downTable.mutate(req);
-                    function addPutOrDelete(req) {
-                        const dxTrans = PSD.trans;
-                        const keys = req.keys || getEffectiveKeys(primaryKey, req);
-                        if (!keys)
-                            throw new Error("Keys missing");
-                        req = req.type === 'add' || req.type === 'put' ?
-                            { ...req, keys, wantResults: true } :
-                            { ...req };
-                        if (req.type !== 'delete')
-                            req.values = [...req.values];
-                        if (req.keys)
-                            req.keys = [...req.keys];
-                        return getExistingValues(downTable, req, keys).then(existingValues => {
-                            const contexts = keys.map((key, i) => {
-                                const existingValue = existingValues[i];
-                                const ctx = { onerror: null, onsuccess: null };
-                                if (req.type === 'delete') {
-                                    deleting.fire.call(ctx, key, existingValue, dxTrans);
-                                }
-                                else if (req.type === 'add' || existingValue === undefined) {
-                                    const generatedPrimaryKey = creating.fire.call(ctx, key, req.values[i], dxTrans);
-                                    if (key == null && generatedPrimaryKey != null) {
-                                        key = generatedPrimaryKey;
-                                        req.keys[i] = key;
-                                        if (!primaryKey.outbound) {
-                                            setByKeyPath(req.values[i], primaryKey.keyPath, key);
-                                        }
-                                    }
-                                }
-                                else {
-                                    const objectDiff = getObjectDiff(existingValue, req.values[i]);
-                                    const additionalChanges = updating.fire.call(ctx, objectDiff, key, existingValue, dxTrans);
-                                    if (additionalChanges) {
-                                        const requestedValue = req.values[i];
-                                        Object.keys(additionalChanges).forEach(keyPath => {
-                                            if (hasOwn(requestedValue, keyPath)) {
-                                                requestedValue[keyPath] = additionalChanges[keyPath];
-                                            }
-                                            else {
-                                                setByKeyPath(requestedValue, keyPath, additionalChanges[keyPath]);
-                                            }
-                                        });
-                                    }
-                                }
-                                return ctx;
-                            });
-                            return downTable.mutate(req).then(({ failures, results, numFailures, lastResult }) => {
-                                for (let i = 0; i < keys.length; ++i) {
-                                    const primKey = results ? results[i] : keys[i];
-                                    const ctx = contexts[i];
-                                    if (primKey == null) {
-                                        ctx.onerror && ctx.onerror(failures[i]);
-                                    }
-                                    else {
-                                        ctx.onsuccess && ctx.onsuccess(req.type === 'put' && existingValues[i] ?
-                                            req.values[i] :
-                                            primKey
-                                        );
-                                    }
-                                }
-                                return { failures, results, numFailures, lastResult };
-                            }).catch(error => {
-                                contexts.forEach(ctx => ctx.onerror && ctx.onerror(error));
-                                return Promise.reject(error);
-                            });
-                        });
-                    }
-                    function deleteRange(req) {
-                        return deleteNextChunk(req.trans, req.range, 10000);
-                    }
-                    function deleteNextChunk(trans, range, limit) {
-                        return downTable.query({ trans, values: false, query: { index: primaryKey, range }, limit })
-                            .then(({ result }) => {
-                            return addPutOrDelete({ type: 'delete', keys: result, trans }).then(res => {
-                                if (res.numFailures > 0)
-                                    return Promise.reject(res.failures[0]);
-                                if (result.length < limit) {
-                                    return { failures: [], numFailures: 0, lastResult: undefined };
-                                }
-                                else {
-                                    return deleteNextChunk(trans, { ...range, lower: result[result.length - 1], lowerOpen: true }, limit);
-                                }
-                            });
-                        });
-                    }
-                }
-            };
-            return tableMiddleware;
-        },
-    })
-};
-
 class Dexie$1 {
     constructor(name, options) {
         this._middlewares = {};
@@ -3939,6 +3889,7 @@ class Dexie$1 {
         this._storeNames = [];
         this._allTables = {};
         this.idbdb = null;
+        this._novip = this;
         const state = {
             dbOpenError: null,
             isBeingOpened: false,
@@ -3958,7 +3909,7 @@ class Dexie$1 {
         });
         this._state = state;
         this.name = name;
-        this.on = Events(this, "populate", "blocked", "versionchange", { ready: [promisableChain, nop] });
+        this.on = Events(this, "populate", "blocked", "versionchange", "close", { ready: [promisableChain, nop] });
         this.on.ready.subscribe = override(this.on.ready.subscribe, subscribe => {
             return (subscriber, bSticky) => {
                 Dexie$1.vip(() => {
@@ -4005,7 +3956,7 @@ class Dexie$1 {
                 console.warn(`Upgrade '${this.name}' blocked by other connection holding version ${ev.oldVersion / 10}`);
         });
         this._maxKey = getMaxKey(options.IDBKeyRange);
-        this._createTransaction = (mode, storeNames, dbschema, parentTransaction) => new this.Transaction(mode, storeNames, dbschema, parentTransaction);
+        this._createTransaction = (mode, storeNames, dbschema, parentTransaction) => new this.Transaction(mode, storeNames, dbschema, this._options.chromeTransactionDurability, parentTransaction);
         this._fireOnBlocked = ev => {
             this.on("blocked").fire(ev);
             connections
@@ -4013,7 +3964,7 @@ class Dexie$1 {
                 .map(c => c.on("versionchange").fire(ev));
         };
         this.use(virtualIndexMiddleware);
-        this.use(hooksMiddleware);
+        this.vip = Object.create(this, { _vip: { value: true } });
         addons.forEach(addon => addon(this));
     }
     version(versionNumber) {
@@ -4035,7 +3986,10 @@ class Dexie$1 {
         return versionInstance;
     }
     _whenReady(fn) {
-        return this._state.openComplete || PSD.letThrough ? fn() : new DexiePromise((resolve, reject) => {
+        return (this.idbdb && (this._state.openComplete || PSD.letThrough || this._vip)) ? fn() : new DexiePromise((resolve, reject) => {
+            if (this._state.openComplete) {
+                return reject(new exceptions.DatabaseClosed(this._state.dbOpenError));
+            }
             if (!this._state.isBeingOpened) {
                 if (!this._options.autoOpen) {
                     reject(new exceptions.DatabaseClosed());
@@ -4065,8 +4019,9 @@ class Dexie$1 {
     open() {
         return dexieOpen(this);
     }
-    close() {
-        const idx = connections.indexOf(this), state = this._state;
+    _close() {
+        const state = this._state;
+        const idx = connections.indexOf(this);
         if (idx >= 0)
             connections.splice(idx, 1);
         if (this.idbdb) {
@@ -4074,18 +4029,22 @@ class Dexie$1 {
                 this.idbdb.close();
             }
             catch (e) { }
-            this.idbdb = null;
+            this._novip.idbdb = null;
         }
-        this._options.autoOpen = false;
-        state.dbOpenError = new exceptions.DatabaseClosed();
-        if (state.isBeingOpened)
-            state.cancelOpen(state.dbOpenError);
         state.dbReadyPromise = new DexiePromise(resolve => {
             state.dbReadyResolve = resolve;
         });
         state.openCanceller = new DexiePromise((_, reject) => {
             state.cancelOpen = reject;
         });
+    }
+    close() {
+        this._close();
+        const state = this._state;
+        this._options.autoOpen = false;
+        state.dbOpenError = new exceptions.DatabaseClosed();
+        if (state.isBeingOpened)
+            state.cancelOpen(state.dbOpenError);
     }
     delete() {
         const hasArguments = arguments.length > 0;
@@ -4095,7 +4054,7 @@ class Dexie$1 {
                 this.close();
                 var req = this._deps.indexedDB.deleteDatabase(this.name);
                 req.onsuccess = wrap(() => {
-                    databaseEnumerator.remove(this.name);
+                    _onDatabaseDeleted(this._deps, this.name);
                     resolve();
                 });
                 req.onerror = eventRejectHandler(reject);
@@ -4199,11 +4158,56 @@ class Dexie$1 {
     }
 }
 
+function getObjectDiff(a, b, rv, prfx) {
+    rv = rv || {};
+    prfx = prfx || '';
+    for (const prop in a) {
+        if (!hasOwn(b, prop)) {
+            rv[prfx + prop] = undefined;
+        }
+        else {
+            const ap = a[prop], bp = b[prop];
+            if (typeof ap === 'object' && typeof bp === 'object' && ap && bp) {
+                const apTypeName = toStringTag(ap);
+                const bpTypeName = toStringTag(bp);
+                if (apTypeName !== bpTypeName) {
+                    rv[prfx + prop] = b[prop];
+                }
+                else if (apTypeName === 'Object') {
+                    getObjectDiff(ap, bp, rv, prfx + prop + '.');
+                }
+                else if (ap !== bp) {
+                    rv[prfx + prop] = b[prop];
+                }
+            }
+            else if (ap !== bp)
+                rv[prfx + prop] = b[prop];
+        }
+    }
+    for (const prop in b) {
+        if (!hasOwn(a, prop)) {
+            rv[prfx + prop] = b[prop];
+        }
+    }
+    return rv;
+}
+
+let domDeps;
+try {
+    domDeps = {
+        indexedDB: _global.indexedDB || _global.mozIndexedDB || _global.webkitIndexedDB || _global.msIndexedDB,
+        IDBKeyRange: _global.IDBKeyRange || _global.webkitIDBKeyRange
+    };
+}
+catch (e) {
+    domDeps = { indexedDB: null, IDBKeyRange: null };
+}
+
 const Dexie = Dexie$1;
 props(Dexie, {
     ...fullNameExceptions,
     delete(databaseName) {
-        const db = new Dexie(databaseName);
+        const db = new Dexie(databaseName, { addons: [] });
         return db.delete();
     },
     exists(name) {
@@ -4213,9 +4217,12 @@ props(Dexie, {
         }).catch('NoSuchDatabaseError', () => false);
     },
     getDatabaseNames(cb) {
-        return databaseEnumerator ?
-            databaseEnumerator.getDatabaseNames().then(cb) :
-            DexiePromise.resolve([]);
+        try {
+            return getDatabaseNames(Dexie.dependencies).then(cb);
+        }
+        catch (_a) {
+            return rejection(new exceptions.MissingAPI());
+        }
     },
     defineClass() {
         function Class(content) {
@@ -4283,22 +4290,13 @@ props(Dexie, {
     shallowClone: shallowClone,
     deepClone: deepClone,
     getObjectDiff: getObjectDiff,
+    cmp,
     asap: asap$1,
     minKey: minKey,
     addons: [],
     connections: connections,
     errnames: errnames,
-    dependencies: (() => {
-        try {
-            return {
-                indexedDB: _global.indexedDB || _global.mozIndexedDB || _global.webkitIndexedDB || _global.msIndexedDB,
-                IDBKeyRange: _global.IDBKeyRange || _global.webkitIDBKeyRange
-            };
-        }
-        catch (e) {
-            return { indexedDB: null, IDBKeyRange: null };
-        }
-    })(),
+    dependencies: domDeps,
     semVer: DEXIE_VERSION,
     version: DEXIE_VERSION.split('.')
         .map(n => parseInt(n) | 0)
@@ -4306,9 +4304,16 @@ props(Dexie, {
 });
 Dexie.maxKey = getMaxKey(Dexie.dependencies.IDBKeyRange);
 
-initDatabaseEnumerator(Dexie$1.dependencies.indexedDB);
 DexiePromise.rejectionMapper = mapError;
 setDebug(debug, dexieStackFrameFilter);
+
+var namedExports = /*#__PURE__*/Object.freeze({
+__proto__: null,
+Dexie: Dexie$1,
+'default': Dexie$1
+});
+
+Object.assign(Dexie$1, namedExports, { default: Dexie$1 });
 
 return Dexie$1;
 

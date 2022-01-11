@@ -16437,10 +16437,11 @@ class local_Local extends mixins.wl {
   render() {
     const {
       streams,
-      minimized
+      minimized,
+      call
     } = this.props;
 
-    if (streams.length === 0 && !minimized) {
+    if (streams.length === 0 && !minimized && !call.isSharingScreen()) {
       return null;
     }
 
@@ -16909,8 +16910,8 @@ class ParticipantsNotice extends mixins.wl {
       return null;
     }
 
-    return external_React_default().createElement((external_React_default()).Fragment, null, external_React_default().createElement(StreamNode, {
-      className: call.isSharingScreen() ? '' : 'local-stream-mirrored',
+    return external_React_default().createElement((external_React_default()).Fragment, null, call.isSharingScreen() ? null : external_React_default().createElement(StreamNode, {
+      className: "local-stream-mirrored",
       stream: call.getLocalStream()
     }), streamContainer(call.left ? this.renderUserAlone() : this.renderUserWaiting()));
   }

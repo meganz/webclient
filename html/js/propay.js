@@ -86,7 +86,7 @@ pro.propay = {
                 : (discountInfo.m === 1 ? l[24849] : l[24850]);
             $('.top-header.plan-title', $stepTwo).safeHTML(discountTitle
                 .replace('%1', pro.propay.planName)
-                .replace('%2', discountInfo.pd + '%'));
+                .replace('%2', formatPercentage(discountInfo.pd / 100)));
             $('.stores-desc', $stepTwo).addClass('hidden');
             discountInfo.used = 1;
         }
@@ -606,7 +606,8 @@ pro.propay = {
         if (discountInfo && discountInfo.al && discountInfo.pd && discountInfo.al === pro.propay.planNum) {
             const $discountHeader = $('.payment-page.discount-header', $step2);
 
-            $('.discount-header-text', $discountHeader).text(l[24670].replace('$1', formatPercentage(discountInfo.pd)));
+            $('.discount-header-text', $discountHeader)
+                .text(l[24670].replace('$1', formatPercentage(discountInfo.pd / 100)));
             $discountHeader.removeClass('hidden');
 
             const oldPriceText = $priceNum.text();

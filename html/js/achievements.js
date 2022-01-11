@@ -5,6 +5,13 @@
 const achievementPage = function() {
     'use strict';
 
+    // If an non-achievement account or business account is trying to access the achievement page,
+    // redirect to home.
+    if (!mega.flags.ach || Object(window.u_attr).b) {
+        loadSubPage('fm');
+        return;
+    }
+
     const $pageStorageBlock = $('.storage-block', '.achievement-page');
     const $cta = $('.js-achievmcta', '.achievement-page');
 

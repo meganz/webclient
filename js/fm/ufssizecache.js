@@ -2,14 +2,12 @@
  * UFS Size Cache handling.
  */
 function UFSSizeCache() {
-    // handle[d, f, b, parent, td, tf, tb]
-    this.cache = Object.create(null);
-}
-
-lazy(UFSSizeCache.prototype, 'tbsp', function() {
     'use strict';
-    return Promise.resolve();
-});
+    // handle[d, f, b, parent, td, tf, tb, tvf, tvb, fv, n{}]
+    this.cache = Object.create(null);
+    // version linkage.
+    this.versions = new Set();
+}
 
 // add node n to the folders cache
 // assumptions:
@@ -22,9 +20,15 @@ UFSSizeCache.prototype.feednode = function(n) {
     if (n.p) {
         if (!this.cache[n.p]) {
             // create previously unknown parent
-            this.cache[n.p] = [n.t, 1 - n.t, n.s || 0, false, 0, 0, 0, 0, 0, 0];
+            this.cache[n.p] = [n.t, 1 - n.t, n.s || 0, false, 0, 0, 0, 0, 0, 0, null];
         }
-        else if (!n.fv && !this.cache[n.p][9]) {
+        else if (n.fv || this.cache[n.p][9]) {
+            if (this.cache[n.p][9]) {
+                // we only need the last version.
+                this.versions.delete(n.p);
+            }
+        }
+        else {
             // update known parent
             this.cache[n.p][1 - n.t]++;
             if (n.s) {
@@ -33,11 +37,12 @@ UFSSizeCache.prototype.feednode = function(n) {
         }
 
         // record parent linkage
-        if (!this.cache[n.h]) {
-            this.cache[n.h] = [0, 0, 0, n.p, 0, 0, 0, 0, 0, 0];
+        if (this.cache[n.h]) {
+            this.cache[n.h][10] = (n.t || n.fv) && n;
+            this.cache[n.h][3] = n.p;
         }
         else {
-            this.cache[n.h][3] = n.p;
+            this.cache[n.h] = [0, 0, 0, n.p, 0, 0, 0, 0, 0, 0, (n.t || n.fv) && n];
         }
 
         // record file version
@@ -45,6 +50,16 @@ UFSSizeCache.prototype.feednode = function(n) {
             this.cache[n.h][1] = 1;
             this.cache[n.h][2] = n.s;
             this.cache[n.h][9] = 1;
+
+            if (!this.cache[n.p][9]) {
+                // version linkage (the parent is no longer in memory or not received yet)
+                this.versions.add(n.p);
+            }
+        }
+        else if (this.versions.has(n.h)) {
+            // prevent loading this version later.
+            this.versions.delete(n.h);
+            this.cache[n.h][10] = n;
         }
     }
 };
@@ -90,15 +105,48 @@ UFSSizeCache.prototype._saveTreeState = function(n, entry) {
     this._saveNodeState(n, entry);
 
     if (!entry[3]) {
-        while ((n = M.d[n.p])) {
+        while ((n = M.d[n.p] || this.cache[n.p] && this.cache[n.p][10])) {
             this._saveNodeState(n, entry);
         }
     }
 };
 
+// @private
+UFSSizeCache.prototype._getVersions = function(rootNode) {
+    'use strict';
+    const versions = [...this.versions];
+
+    if (d && rootNode && !M.d[rootNode.h]) {
+        console.error('Versions should have been loaded prior to parsing action-packets!');
+    }
+
+    for (let i = versions.length; i--;) {
+        const h = versions[i];
+
+        if (M.d[h] || !this.cache[h] || this.cache[h][10]) {
+            if (d) {
+                if (!M.d[h] && (!this.cache[h] || !this.cache[h][10].fv)) {
+                    console.error('Bogus feednode()... fix it.', h, [...this.cache[h]]);
+                }
+                else if (d > 1) {
+                    console.debug('Version %s already in memory.', h, [...this.cache[h]]);
+                }
+            }
+            versions.splice(i, 1);
+        }
+    }
+
+    if (versions.length) {
+        if (d) {
+            console.warn('Versions retrieval...', [...versions]);
+        }
+        return dbfetch.geta(versions);
+    }
+};
+
 // Save computed td / tf / tb / tvf /tvb for all folders
 // if no root node is provided, cache is a full cloud tree
-UFSSizeCache.prototype.save = function(rootNode) {
+UFSSizeCache.prototype.save = async function(rootNode) {
     'use strict';
     this.sum();
 
@@ -107,72 +155,35 @@ UFSSizeCache.prototype.save = function(rootNode) {
         console.time('ufsc.save');
     }
 
+    if (this.versions.size) {
+        const promise = this._getVersions(rootNode);
+        if (promise) {
+            await promise;
+        }
+    }
+
     for (var h in this.cache) {
-        var n = M.d[h];
+        const n = M.d[h] || this.cache[h][10];
         if (n) {
-            if (rootNode && !this.cache[h][3] && !n.su) {
-                if (rootNode.p !== h) {
-                    srvlog('UFSSizeCache Error 0xBADF', null, true);
-                    console.warn('Uh..oh... internal error, try menu->reload', rootNode.p, h, this.cache[h]);
-                    if (d > 1) debugger
-                }
-                // continue;
+            if (d > 1 && rootNode && !this.cache[h][3] && !n.su) {
+                // this may happens for outgoing shares moved to the rubbish-bin
+                const msg = 'Uh..oh... internal (api?) error, try menu->reload';
+                console.assert(rootNode.p === h, msg, rootNode.p, h, this.cache[h]);
             }
 
             this._saveTreeState(n, this.cache[h]);
-            this.cache[h] = null;
         }
     }
 
     if (d) {
         console.timeEnd('ufsc.save');
-        if (d > 1) {
-            this._cache = this.cache;
+        if (d > 2) {
+            this._cache = [this.cache, [...this.versions]];
         }
     }
-    delete this.cache;
+    this.cache = null;
+    this.versions = null;
 };
-
-// @see {@link UFSSizeCache.save}
-UFSSizeCache.prototype.saveInitialState = promisify(function(resolve) {
-    'use strict';
-
-    console.time('ufs.sum');
-    this.sum();
-    console.timeEnd('ufs.sum');
-
-    console.time('ufs.keys');
-    var keys = Object.keys(this.cache);
-    console.timeEnd('ufs.keys');
-
-    console.time('ufs.sis');
-    console.debug('Storing %d ufs cache entries...', keys.length);
-
-    var tick = 0;
-    var self = this;
-    onIdle(function _asyncLoop() {
-        var bulk = keys.splice(0, 12282);
-        for (var i = 0; i < bulk.length; ++i) {
-            var h = bulk[i];
-            var n = M.d[h];
-            if (n) {
-                self._saveTreeState(n, self.cache[h]);
-            }
-        }
-
-        if (keys.length) {
-            if (!(++tick % 6)) {
-                return onIdle(_asyncLoop);
-            }
-            self.tbsp.then(_asyncLoop);
-        }
-        else {
-            delete self.cache;
-            console.timeEnd('ufs.sis');
-            onIdle(resolve);
-        }
-    });
-});
 
 // Add node to indexedDB
 UFSSizeCache.prototype.addToDB = function(n) {
@@ -185,6 +196,7 @@ UFSSizeCache.prototype.addToDB = function(n) {
             s: n.s >= 0 ? n.s : -n.t,
             t: n.t ? 1262304e3 - n.ts : n.ts,
             c: n.hash || '',
+            fa: n.fa || '',
             d: n
         });
     }
@@ -355,7 +367,7 @@ UFSSizeCache.prototype.delNode = function(h, ignoreDB) {
         if (d) {
             console.debug('ufsc.del', h, td, tf, tb, tvf, tvb);
 
-            if (!td && td !== 0) debugger;
+            // if (!td && td !== 0) debugger;
         }
 
         while ((n = M.d[n.p])) {

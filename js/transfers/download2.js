@@ -804,13 +804,32 @@ var dlmanager = {
                 var attr = dec_attr(ab, key);
 
                 if (typeof attr === 'object' && typeof attr.n === 'string') {
-                    if (have_ab && page !== 'download'
-                            && res.s <= 48 * 1048576
-                            && is_image(attr.n)
-                            && (!res.fa
-                                || res.fa.indexOf(':0*') < 0
-                                || res.fa.indexOf(':1*') < 0 || ctx.object.preview === -1)) {
-                        ctx.object.data = new ArrayBuffer(res.s);
+
+                    const misThumb = !res.fa
+                        || !String(res.fa).includes(':0*')
+                        || !String(res.fa).includes(':1*')
+                        || ctx.object.preview === -1;
+
+                    if (d) {
+                        this.logger.warn('[%s] Missing thumb/prev, may try to generate...', attr.n, [res], [attr]);
+                    }
+
+                    if (page !== 'download' && misThumb && !sessionStorage.gOOMtrap) {
+                        const image = is_image(attr.n);
+                        const audio = !image && is_audio(attr.n);
+                        const video = !audio && is_video(attr.n);
+                        const limit = 96 * 1048576;
+
+                        if (res.s < limit || video) {
+                            tryCatch(() => {
+                                Object.defineProperty(ctx.object, 'misThumbData', {
+                                    writable: true,
+                                    value: new ArrayBuffer(Math.min(res.s, limit))
+                                });
+                            }, () => {
+                                sessionStorage.gOOMtrap = 1;
+                            })();
+                        }
                     }
 
                     // dlmanager.onNolongerOverquota();
@@ -1048,7 +1067,7 @@ var dlmanager = {
             return false;
         }
 
-        if (file.data) {
+        if (file.misThumbData) {
             var options = {
                 onPreviewRetry: file.preview === -1
             };
@@ -1057,13 +1076,17 @@ var dlmanager = {
             }
             createnodethumbnail(
                 file.id,
-                new sjcl.cipher.aes([dl_key[0] ^ dl_key[4], dl_key[1]
-                    ^ dl_key[5], dl_key[2] ^ dl_key[6], dl_key[3] ^ dl_key[7]]),
+                new sjcl.cipher.aes([
+                    dl_key[0] ^ dl_key[4],
+                    dl_key[1] ^ dl_key[5],
+                    dl_key[2] ^ dl_key[6],
+                    dl_key[3] ^ dl_key[7]
+                ]),
                 ++ulmanager.ulFaId,
-                file.data,
+                file.misThumbData,
                 options
             );
-            file.data = null;
+            file.misThumbData = false;
         }
 
         return true;
@@ -1167,10 +1190,7 @@ var dlmanager = {
             }
             var logger = dl.writer && dl.writer.logger || dlmanager.logger;
 
-            // As of Firefox 37, this method will neuter the array buffer.
             var abLen = task.data.byteLength;
-            var abDup = dl.data && (is_chrome_firefox & 4) && new Uint8Array(task.data);
-
             var ready = function _onWriterReady() {
                 if (dl.cancelled || oIsFrozen(dl.writer)) {
                     if (d) {
@@ -1180,12 +1200,12 @@ var dlmanager = {
                 }
                 dl.writer.pos += abLen;
 
-                if (dl.data) {
+                if (dl.misThumbData && task.offset + abLen <= dl.misThumbData.byteLength) {
                     new Uint8Array(
-                        dl.data,
+                        dl.misThumbData,
                         task.offset,
                         abLen
-                    ).set(abDup || task.data);
+                    ).set(task.data);
                 }
 
                 dlmanager.setResumeInfo(dl, dl.writer.pos)
@@ -1415,8 +1435,15 @@ var dlmanager = {
         'use strict';
 
         const onQuotaInfo = (res) => {
+            const $dialog = $('.limited-bandwidth-dialog', 'body');
+
             let timeLeft = 3600;
-            if (Object(res.tah).length) {
+            if (u_type > 2 && u_attr.p) {
+                timeLeft = (M.account.expiry || 0) - unixtime();
+                timeLeft = timeLeft > 0 ? timeLeft : 0;
+            }
+            else if (Object(res.tah).length) {
+
                 let add = 1;
                 // let size = 0;
 
@@ -1435,14 +1462,15 @@ var dlmanager = {
             }
 
             clearInterval(this._overQuotaTimeLeftTick);
-            delay('overquota:retry', () => this._onQuotaRetry(), timeLeft * 1000);
+            if (timeLeft < 3600 * 24) {
+                delay('overquota:retry', () => this._onQuotaRetry(), timeLeft * 1000);
+            }
 
-            let $dlPageCountdown = $('.download.transfer-overquota-txt').text(String(l[7100]).replace('%1', ''));
+            let $dlPageCountdown = $('.transfer-overquota-txt', $dialog).text(String(l[7100]).replace('%1', ''));
             if (!$dlPageCountdown.is(':visible')) {
                 $dlPageCountdown = null;
             }
 
-            const $dialog = $('.limited-bandwidth-dialog');
             this._overquotaClickListeners($dialog);
             let lastCheck = Date.now();
 
@@ -1453,21 +1481,25 @@ var dlmanager = {
                     if (lastCheck + 1000 < curTime) {
                         // Convert ms to s and remove difference from remaining
                         timeLeft -= Math.floor((curTime - lastCheck) / 1000);
-                        delay('overquota:retry', () => this._onQuotaRetry(), timeLeft * 1000);
+                        if (timeLeft < 3600 * 24) {
+                            delay('overquota:retry', () => this._onQuotaRetry(), timeLeft * 1000);
+                        }
                     }
                     lastCheck = curTime;
-                    const time = secondsToTime(timeLeft--, 1);
+                    const time = secondsToTimeLong(timeLeft--);
 
                     if (time) {
                         $countdown.safeHTML(time);
+                        $countdown.removeClass('hidden');
 
                         if ($dlPageCountdown) {
-                            const html = '<span class="countdown">' + secondsToTime(timeLeft) + '</span>';
+                            const html = `<span class="countdown">${secondsToTimeLong(timeLeft)}</span>`;
                             $dlPageCountdown.safeHTML(escapeHTML(l[7100]).replace('%1', html));
                         }
                     }
                     else {
                         $countdown.text('');
+                        $countdown.addClass('hidden');
 
                         if ($dlPageCountdown) {
                             $dlPageCountdown.text(String(l[7100]).replace('%1', ''));
@@ -1490,17 +1522,12 @@ var dlmanager = {
                 }
 
                 // XXX: replaced uqFastTrack usage by directly checking for pro flag ...
-                if (this.onOverQuotaProClicked && u_type || Object(u_attr).p) {
+                if (this.onOverQuotaProClicked && u_type) {
                     // The user loged/registered in another tab, poll the uq command every
                     // 30 seconds until we find a pro status and then retry with fresh download
 
                     const proStatus = res.mxfer;
                     this.logger.debug('overquota:proStatus', proStatus);
-
-                    if (proStatus) {
-                        // Got PRO, resume dl immediately.
-                        return this._onQuotaRetry(true);
-                    }
 
                     delay('overquota:uqft', () => this._overquotaInfo(), 30000);
                 }

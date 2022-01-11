@@ -115,6 +115,14 @@ var bottompage = {
             $('a.link.pro', $bottomMenu).removeClass('hidden');
             $('.pages-menu.link.pro', $pagesMenu).removeClass('hidden');
         }
+
+        if (!mega.flags.ach || Object(window.u_attr).b) {
+            // Hide Achievements link for an non-achievement account and business account
+            $('a.link.achievements', $bottomMenu).addClass('hidden');
+        }
+        else {
+            $('a.link.achievements', $bottomMenu).removeClass('hidden');
+        }
     },
 
     /**

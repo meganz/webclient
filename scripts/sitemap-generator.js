@@ -19,7 +19,6 @@ const pages = [
     "securechat",
     "blog",
     "security",
-    "security/bug-bounty",
     "credits",
     "terms",
     "privacy",
@@ -38,7 +37,8 @@ const pages = [
     "login",
     "cookie",
     "dispute",
-    "sdkterms"
+    "sdkterms",
+    "objectstorage"
 ];
 /** lang [lang-code-in-webclient, ISO-639-1 lang code which search engines understand] */
 const langs = [
@@ -70,7 +70,7 @@ const pageModDate = {
   // example entry
   // 'pro' : '2021-01-18'
 };
-const genericModDate = '2021-02-18';
+const genericModDate = '2021-01-06';
 
 console.log('Starting sitemap generator V2 ........');
 

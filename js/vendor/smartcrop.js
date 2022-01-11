@@ -276,12 +276,22 @@ SmartCrop.prototype = {
         const canvas = this.canvas(width, height);
         const ctx = canvas.getContext('2d');
         if(this.options.resampleWithImageBitmap) {
-            image = await createImageBitmap(image, {resizeWidth: width, resizeHeight: height, resizeQuality: 'high'});
-            ctx.drawImage(image, 0, 0);
-            return canvas;
+            const options = {
+                resizeWidth: width,
+                resizeHeight: height,
+                resizeQuality: 'high'
+            };
+            const bitmap = await createImageBitmap(image, options)
+                .catch((ex) => {
+                    SmartCrop.dump('createImageBitmap failed!', ex);
+                });
+            if (bitmap) {
+                ctx.drawImage(bitmap, 0, 0);
+                return canvas;
+            }
         }
         if(image instanceof ImageData) {
-            console.warn('If possible, do use an ImageBitmap.');
+            SmartCrop.dump('Got an ImageData, do use ImageBitmap which should be faster!');
             const canvas2 = this.canvas(image.width, image.height);
             canvas2.getContext('2d').putImageData(image, 0, 0);
             image = canvas2;
@@ -392,6 +402,15 @@ function saturation(r, g, b){
     var l = (maximum + minumum) / 2,
         d = maximum-minumum;
     return l > 0.5 ? d/(2-maximum-minumum) : d/(maximum+minumum);
+}
+
+const warn = console.warn.bind(console, '[SmartCrop]');
+
+if (typeof lazy === 'function') {
+    lazy(SmartCrop, 'dump', () => self.dump || warn);
+}
+else {
+    SmartCrop.dump = self.dump || warn;
 }
 
 // amd

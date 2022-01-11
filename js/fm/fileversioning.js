@@ -25,27 +25,43 @@ var versiondialogid;
 
         /**
          * Get all the versions for given file handle.
-         * @param h is expected to be a file handle.
-         * @return It returns a list of handles of all the versions if everything works fine,
+         * @param {String} h is expected to be a file handle.
+         * @return {Array} an array of ufs-nodes of all the versions if everything works fine,
          *         otherwise it returns list with current version.
          */
         getAllVersionsSync: function(h) {
-            var v = [];
-            if (M.d[h]) {
-                v.push(M.d[h]);
-            }
+            return this.getVersionHandles(h, true).map(h => M.d[h]);
+        },
+
+        /**
+         * Get all the versions for given file handle.
+         * @param {String} h is expected to be a file handle.
+         * @param {Boolean} [includeroot] include {@h} in result.
+         * @returns {Array} ufs-node's handles of all the versions.
+         */
+        getVersionHandles(h, includeroot = false) {
+            const res = includeroot ? [h] : [];
+
             while (M.c[h]) {
-                var k = Object.keys(M.c[h]);
-                if (k.length !== 1 // the chain should be only 1 parent-child.
-                        || M.c[h][k[0]] !== 1 // the node's parent chain stops.
-                        || (M.d[k[0]] && M.d[k[0]].t !== 0) // the node's parent is not a file.
-                        ) {
-                    break;
+                h = this.getChildVersion(h);
+                if (h) {
+                    res.push(h);
                 }
-                v.push(M.d[k[0]]);
-                h = k[0];
             }
-            return v;
+            return res;
+        },
+
+        /**
+         * Retrieve a single version child
+         * @param {String} h is expected to be a file handle.
+         * @returns {Boolean|String} child handle or false
+         */
+        getChildVersion(h) {
+            const c = Object.keys(M.c[h]);
+            // 1. the chain should be 1 parent-child.
+            // 2. the node's parent chain stops.
+            // 3. the node's parent is a file.
+            return c.length === 1 && M.c[h][c[0]] === 1 && (!M.d[c[0]] || !M.d[c[0]].t) && c[0];
         },
 
         /**
@@ -53,25 +69,9 @@ var versiondialogid;
          * @param h is expected to be the file handle of the current file.
          * @param ph is expected to be the file handle of an older version.
          * @return It returns true if ph is an older version of h, otherwise false.
-        */
+         */
         checkPreviousVersionSync: function(h, ph) {
-            if (h === ph) {
-                return true;
-            }
-            while (M.c[h]) {
-                var k = Object.keys(M.c[h]);
-                if (k.length !== 1 // the chain should be only 1 parent-child.
-                        || M.c[h][k[0]] !== 1 // the node's parent chain stops.
-                        || (M.d[k[0]] && M.d[k[0]].t !== 0) // the node's parent is not a file.
-                        ) {
-                    break;
-                }
-                if (k[0] === ph) {
-                    return true;
-                }
-                h = k[0];
-            }
-            return false;
+            return h === ph || this.getVersionHandles(h).includes(ph);
         },
 
         /**
@@ -80,18 +80,7 @@ var versiondialogid;
          * @return It returns the previous file of the given file handle, otherwise it returns false.
          */
         getPreviousVersionSync: function(h) {
-            if (!M.c[h]) {
-                return false;
-            }
-            var k = Object.keys(M.c[h]);
-            if (k.length !== 1 // the chain should be only 1 parent-child.
-                    || M.c[h][k[0]] !== 1 // the node's parent chain stops.
-                    || (M.d[k[0]] && M.d[k[0]].t !== 0) // the node's parent is not a file.
-                    ) {
-                return false;
-            }
-
-            return M.d[k[0]];
+            return M.c[h] && M.d[this.getChildVersion(h)] || false;
         },
 
         /**

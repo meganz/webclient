@@ -643,8 +643,9 @@ if (!browserUpdate) try
     }
 
     if (!is_livesite && !is_karma && !is_webcache) {
-        dd = d = d > 0 ? d : !localStorage.nfd;
+        d = d > 0 ? d : !localStorage.nfd;
         jj = d > 0 && !sessionStorage.dbgContentCheck;
+        dd = 1;
     }
 
     if (!is_extension && window.dd) {
@@ -663,6 +664,7 @@ if (!browserUpdate) try
         cmsStaticPath = 'https://smoketest.static.mega.nz/cms/';
         defaultStaticPath = staticpath;
         d = 1;
+        is_litesite = !!localStorage.testIO;
     }
 
     if (d > 0) {
@@ -3990,7 +3992,6 @@ else if (!browserUpdate) {
         var temp;
         var jsar = [];
         var cssar = [];
-        var nodedec = {};
         var j2re1 = /(?:\.\.\/)+/g;
         var j2re2 = /\/en\//g;
         var j2tr2 = '/' + lang + '/';
@@ -4072,22 +4073,9 @@ else if (!browserUpdate) {
                 }
             }
             else if (jsl[i].j == 0) pages[jsl[i].n] = jsl[i].text;
-
-            if (jsl[i].n === 'sjcl_js' || jsl[i].n === 'nodedec_js' || jsl[i].n === 'asmcrypto_js') {
-                nodedec[jsl[i].n] = jsl[i].text;
-            }
         }
         if (window.URL)
         {
-            nodedec = !jj && !is_extension && !("ActiveXObject" in window) && nodedec;
-
-            if (nodedec && Object.keys(nodedec).length === 3) {
-                tmp = String(nodedec.nodedec_js).split(/importScripts\([^)]+\)/);
-
-                nodedec = [tmp.shift(), nodedec.sjcl_js, nodedec.asmcrypto_js, tmp.join(';')];
-                mega.nodedecBlobURI = mObjectURL(nodedec, 'text/javascript');
-                nodedec = tmp = undefined;
-            }
             if (localStorage.makeCache && !cssCache) cssCache=cssar;
             if (cssar.length)
             {
@@ -4622,96 +4610,6 @@ function lazy(target, property, stub) {
     return target;
 }
 
-function promisify(fc) {
-    'use strict';
-    var a$yncMethod = function() {
-        var self = this;
-        var args = [];
-        if (arguments.length) {
-            var len = arguments.length;
-            args = Array(len);
-            while (len--) {
-                args[len] = arguments[len];
-            }
-        }
-        return new Promise(function(resolve, reject) {
-            var result = a$yncMethod.__function__.apply(self, [resolve, reject].concat(args));
-            if (result instanceof Promise) {
-                if (d > 2) {
-                    console.assert(a$yncMethod.__function__[Symbol.toStringTag] === "AsyncFunction");
-                }
-                result.catch(reject);
-            }
-        });
-    };
-    a$yncMethod.prototype = undefined;
-    Object.defineProperty(fc, '__method__', {value: a$yncMethod});
-    Object.defineProperty(a$yncMethod, '__function__', {value: fc});
-    return a$yncMethod;
-}
-
-function mutex(name, handler) {
-    'use strict';
-    if (typeof name === 'function') {
-        handler = name;
-        name = null;
-    }
-    var mMutexMethod = function() {
-        var self = this;
-        var args = arguments.length ? toArray.apply(null, arguments) : [];
-        name = name || this.__mutex_lock_name_$;
-        if (!name) {
-            name = (this.constructor.name || '$') + makeUUID().slice(-13);
-            Object.defineProperty(this, '__mutex_lock_name_$', {value: name});
-        }
-        return new Promise(function(resolve, reject) {
-            mutex.lock(name).then(function(unlock) {
-                var res = function(a0) {
-                    unlock().always(resolve.bind(null, a0));
-                };
-                var rej = function(a0) {
-                    unlock().always(reject.bind(null, a0));
-                };
-                return mMutexMethod.__function__.apply(self, [res, rej].concat(args));
-            }).catch(function(ex) {
-                console.error(ex);
-                mutex.unlock(name).always(reject.bind(null, ex));
-            });
-        });
-    };
-    mMutexMethod.prototype = undefined;
-    Object.defineProperty(handler, '__method__', {value: mMutexMethod});
-    Object.defineProperty(mMutexMethod, '__name__', {value: name});
-    Object.defineProperty(mMutexMethod, '__function__', {value: handler});
-    return Object.freeze(mMutexMethod);
-}
-
-mutex.queue = Object.create(null);
-mutex.lock = promisify(function(resolve, reject, name) {
-    'use strict';
-    resolve = resolve.bind(this, mutex.unlock.bind(mutex, name));
-
-    if (mutex.queue[name]) {
-        mutex.queue[name].push(resolve);
-    }
-    else {
-        mutex.queue[name] = [];
-        resolve();
-    }
-});
-mutex.unlock = promisify(function(resolve, reject, name) {
-    'use strict';
-    var next = (mutex.queue[name] || []).shift();
-    if (next) {
-        onIdle(next);
-    }
-    else {
-        delete mutex.queue[name];
-    }
-    resolve();
-});
-Object.freeze(mutex);
-
 function b64encode(str) {
     'use strict';
     // eslint-disable-next-line local-rules/hints
@@ -4757,11 +4655,6 @@ function echo(a) {
 }
 
 var dump = nop;
-var smbl = typeof Symbol === 'function' ? Symbol : function(s) {
-    'use strict';
-    return '<<<' + s;
-};
-
 mBroadcaster.once('startMega', function() {
     'use strict';
 

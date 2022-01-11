@@ -58,8 +58,7 @@
     padding-inline-end: 16px;
 }
 .lp-myfiles .content-panel.cloud-drive.collapse {
-    height: 0;
-    transition: height 0.25s ease-in;
+    display: none;
 }
 .lp-myfiles .btn-myfiles i.icon-arrow-down {
     --icon-size: 20px;

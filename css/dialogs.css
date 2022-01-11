@@ -6206,7 +6206,6 @@ body.de .mega-dialog.new-group-chat {
     }
     .mega-dialog.limited-bandwidth-dialog .dialog.transfer-overquota-txt span.countdown {
         margin: 0 5px;
-        vertical-align: top;
     }
     .mega-dialog.limited-bandwidth-dialog .dialog.transfer-overquota-txt span span {
         color: var(--text-color-medium);

@@ -32,12 +32,12 @@ function _timing(proto, min, max) {
     min = min || 10;
     max = max || 70;
     var wrap = function(f, m) {
-        return function() {
+        return function(...args) {
             var t = performance.now();
-            var r = m.apply(this, arguments);
+            var r = m.apply(this, args);
             if ((t = performance.now() - t) > min) {
                 var fn = t > max ? 'error' : 'warn';
-                console[fn]('[timing] %s.%s: %fms', this, f, t, [this], toArray.apply(null, arguments));
+                console[fn]('[timing] %s.%s: %fms', this, f, t, [this], args);
             }
             return r;
         };
@@ -56,9 +56,8 @@ function _timing(proto, min, max) {
     return proto;
 }
 
-var _warnOnce = SoonFc(400, function _warnOnce(where) {
-    var args = toArray.apply(null, arguments).slice(1);
-    var prop = '__warn_once_' + MurmurHash3(args[0], -0x7ff);
+const _warnOnce = SoonFc(400, function _warnOnce(where, ...args) {
+    const prop = `__warn_once_${MurmurHash3(args[0], -0x7ff)}`;
 
     if (!where[prop]) {
         _defineNonEnum(where, prop, 1);
@@ -226,19 +225,13 @@ MegaDataEmitter.prototype.trigger = function(event, data) {
 
     // @todo require all trigger() calls to provide an array to prevent checking for isArray()
     data = data ? Array.isArray(data) ? data : [data] : [];
+    data = [event, ...data];
 
-    var idx = data.length;
-    var tmp = new Array(idx + 1);
-    while (idx) {
-        tmp[idx--] = data[idx];
-    }
-    tmp[0] = event;
-    data = tmp;
-
-    var res;
+    let idx = 0;
+    let res, tmp;
     var type = emitter.types[0];
     var namespace = emitter.namespaces[0];
-    var handlers = [].concat(emitter.events[type] || []);
+    const handlers = [...(emitter.events[type] || [])];
     while ((tmp = handlers[idx++]) && !event.isPropagationStopped()) {
         event.currentTarget = this;
         event.namespace = namespace;
@@ -321,21 +314,18 @@ lazy(MegaDataMap.prototype, '__ident_0', function() {
 
 /** @function MegaDataMap.prototype._schedule */
 lazy(MegaDataMap.prototype, '_schedule', function() {
-    var task = null;
-    var self = this;
-    var callTask = function _callTask() {
+    let task = null;
+    const callTask = () => {
         if (task) {
             queueMicrotask(task);
             task = null;
         }
     };
-    return function _scheduler(callback) {
+    return (callback) => {
         if (!task) {
             queueMicrotask(callTask);
         }
-        task = function _task() {
-            callback.call(self);
-        };
+        task = () => callback.call(this);
     };
 });
 
@@ -350,13 +340,7 @@ _defineValue(MegaDataMap.prototype, 'valueOf', function() {
     return this.__ident_0;
 });
 
-MegaDataMap.prototype.trackDataChange = function() {
-    var idx = arguments.length;
-    var args = new Array(idx);
-    while (idx--) {
-        args[idx] = arguments[idx];
-    }
-
+MegaDataMap.prototype.trackDataChange = function(...args) {
     var self = this;
     this._schedule(function _trackDataChange() {
         var that = self;
@@ -448,11 +432,7 @@ MegaDataMap.prototype.removeChangeListener = function(cb) {
 };
 
 MegaDataMap.prototype._enqueueChangeListenersDsp = function(args) {
-    var self = this;
-
-    delay('mdm:cl:q.' + this.__ident_0, function() {
-        self._dispatchChangeListeners(args);
-    }, 40);
+    delay(`mdm:cl:q.${this.__ident_0}`, () => this._dispatchChangeListeners(args), 40);
 };
 
 MegaDataMap.prototype._dispatchChangeListeners = function(args) {

@@ -87,10 +87,12 @@ export default class ParticipantsNotice extends MegaRenderMixin {
 
         return (
             <>
-                <StreamNode
-                    className={call.isSharingScreen() ? '' : 'local-stream-mirrored'}
-                    stream={call.getLocalStream()}
-                />
+                {call.isSharingScreen() ? null : (
+                    <StreamNode
+                        className="local-stream-mirrored"
+                        stream={call.getLocalStream()}
+                    />
+                )}
                 {streamContainer(call.left ? this.renderUserAlone() : this.renderUserWaiting())}
             </>
         );

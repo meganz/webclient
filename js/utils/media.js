@@ -3602,7 +3602,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
                 resolve(self);
             };
 
-            M.req(req).tryCatch(success, reject);
+            const promise = M.req(req).then(success).catch(reject);
 
             if (Object(res.General).InternetMediaType === 'video/mp4') {
                 const known = new Set(['qt  ', 'M4A ', ...mp4brands]);
@@ -3612,7 +3612,13 @@ FullScreenManager.prototype.enterFullscreen = function() {
                 }
             }
 
-            if (!res.vcodec && req.n) {
+            promise.finally(() => {
+                if (res.vcodec || req.ph) {
+                    if (d) {
+                        console.debug('Not adding cover-art...', res, [req]);
+                    }
+                    return;
+                }
                 if (Object(res.General).Cover_Data) {
                     try {
                         setImage(self, str_to_ab(atob(res.General.Cover_Data)));
@@ -3624,7 +3630,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
                 else if (res.container === 'MPEG Audio' || res.container === 'FLAC') {
                     getID3CoverArt(res.entry).then(setImage.bind(null, self)).catch(console.debug.bind(console));
                 }
-            }
+            });
         });
     };
 
@@ -3750,30 +3756,21 @@ mBroadcaster.once('startMega', function isAudioContextSupported() {
         }, false));
     }
 
-    if ('AudioContext' in window) {
-        var ctx;
-        var stream;
+    /** @property mega.fullAudioContextSupport */
+    lazy(mega, 'fullAudioContextSupport', () => {
+        return tryCatch(() => {
+            const ctx = new AudioContext();
+            onIdle(() => ctx && typeof ctx.close === 'function' && ctx.close());
 
-        try {
-            ctx = new AudioContext();
-            stream = new MediaStream();
+            let stream = new MediaStream();
+            console.assert('active' in stream);
             stream = ctx.createMediaStreamDestination();
-            if (stream.stream.getTracks()[0].readyState !== 'live') {
+            if (stream.stream.getTracks()[0].readyState !== 'live' || stream.numberOfInputs !== 1) {
                 throw new Error('audio track is not live');
             }
-        }
-        catch (ex) {
+            return true;
+        }, (ex) => {
             console.debug('This browser does not support advanced audio streaming...', ex);
-        }
-        finally {
-            if (ctx && typeof ctx.close === 'function') {
-                var p = ctx.close();
-                if (p instanceof Promise) {
-                    p.then(function() {
-                        mega.fullAudioContextSupport = stream && stream.numberOfInputs === 1;
-                    });
-                }
-            }
-        }
-    }
+        })();
+    });
 });

@@ -40,6 +40,8 @@ describe("webgl.js test", function() {
         'lySE0V0ISH5brPRvOY0WhMX3j8aUiOw2MzOjvLi9X01zZuPFQsD82dXZ0dBWURvz7t6J21cGGHkf//ZAA==';
 
     const now = Date.now();
+    const samplePNGWithSolidColor = webgl.createImage(0xd9, 80, 60, 'image/png');
+    const sampleJPEGWithSolidColor = webgl.createImage(0xd9, 80, 60, 'image/jpeg');
     const sampleForThumbnailCreation = webgl.createImage('pattern', 640, 480, 'image/jpeg');
     const sample2x3ExifMeta = {
         '1': {
@@ -93,7 +95,7 @@ describe("webgl.js test", function() {
     };
 
     const doWebGLAndCanvasTest = (name, test) => {
-        if (webgl.doesSupport('webgl2')) {
+        if (self.isWebGLSupported) {
             it(`${name} (WebGL)`, async() => test(webgl));
         }
 
@@ -636,6 +638,98 @@ describe("webgl.js test", function() {
         chai.expect(image).to.be.instanceOf(Image);
         chai.expect(image.width).to.eql(~~(height * MEGAImageElement.ASPECT_RATIO_16_9));
         chai.expect(image.height).to.eql(height);
+    });
+
+    doWebGLAndCanvasTest('can work with corrupted image data', async(ctx) => {
+        const test = async(sample, offset, width, height) => {
+            chai.expect(sample).to.be.instanceOf(Blob);
+            if (offset < 0) {
+                offset = sample.size - -offset;
+            }
+            chai.expect(offset).to.be.greaterThan(99);
+            chai.expect(sample.size).to.be.greaterThan(offset);
+
+            const type = String(sample.type).split('/')[1] || 'jpg';
+            sample = sample.slice(0, offset);
+
+            // premature EOF
+            const blob = await ctx.createPreviewImage(sample).catch(echo);
+            if (blob instanceof Error) {
+                if (blob.name === 'EncodingError') {
+                    // The error happened during ctx.loadImage()
+                    chai.expect(blob.data).to.be.instanceOf(Image);
+                }
+                else if (ctx.renderingContextType === '2d') {
+                    chai.expect(blob.message).to.eql('The image is tainted!');
+                    chai.expect(blob.name).to.eql('SecurityError');
+                }
+                else {
+                    chai.expect(blob.message).to.eql('WebGL Error: 1281');
+                    chai.expect(blob.name).to.eql('InvalidStateError');
+                }
+                chai.expect(blob).to.be.instanceOf(MEGAException);
+                return;
+            }
+            chai.expect(blob).to.be.instanceOf(Blob);
+
+            const image = await ctx.loadImage(blob);
+            chai.expect(image).to.be.instanceOf(Image);
+            chai.expect(image.width).to.be.eql(width);
+            chai.expect(image.height).to.be.eql(height);
+
+            // damaged, result not tainted
+            const uint8 = new Uint8Array(await ctx.readAsArrayBuffer(sample));
+            const uint16 = new Uint16Array(uint8.byteLength + 1 & -2);
+            new Uint8Array(uint16.buffer).set(uint8);
+
+            for (offset >>= 1; offset < uint16.length; ++offset) {
+                uint16[offset] = (Math.random() * 0x10000) | 0;
+            }
+
+            const thumb = await ctx.createThumbnailImage(uint16, {type: 'imaged', ats: 1}).catch(echo);
+            if (thumb instanceof Error) {
+                chai.expect(thumb.name).to.be.eql('EncodingError');
+                chai.expect(thumb).to.be.instanceOf(MEGAException);
+                console.info(`${ctx[Symbol.toStringTag]}.${type}: Cannot test damaged files...`, sample.size);
+                return;
+            }
+
+            chai.expect(thumb).to.be.instanceOf(ImageData);
+            chai.expect(thumb.width + thumb.height).to.eql(Math.min(width, height) << 1);
+
+            const uint32 = new Uint32Array(thumb.data.buffer);
+            chai.expect(uint32.length).to.be.eql(3600);
+
+            if (ctx.isTainted(thumb)) {
+                console.info(`${ctx[Symbol.toStringTag]}.${type}: Loading succeed, but tainted.`, uint32.slice(0, 4));
+                return;
+            }
+
+            const pixel = type === 'png' ? 0xd9 : 0xff;
+            for (let i = width >> 1; --i > 0;) {
+                chai.expect(uint32[i] >>> 24).to.be.eql(pixel);
+            }
+
+            return true;
+        };
+
+        const res = await Promise.allSettled([
+            test(await samplePNGWithSolidColor, 107, 80, 60),
+            test(await sampleJPEGWithSolidColor, -51, 80, 60)
+        ]);
+
+        const fails = res.filter(res => {
+            if (res.reason) {
+                throw res.reason;
+            }
+            return !res.value;
+        });
+        if (fails.length) {
+            if (!self.is_karma) {
+                throw new MEGAException('partially', 'NotSupportedError');
+            }
+            console.warn('This browser cannot handle corrupt image data.');
+        }
     });
 
     it('can invoke worker scissor (thumb/prev creation)', async() => {

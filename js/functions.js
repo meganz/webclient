@@ -1025,8 +1025,8 @@ function mKeyDialog(ph, fl, keyr, selector) {
 }
 
 function mRandomToken(pfx) {
-    // return (pfx || '!') + '$' + (Math.random() * Date.now()).toString(36);
-    return (pfx || '') + '!' + (Date.now() - 15e11).toString(36) + rand(0x10000).toString(36);
+    'use strict';
+    return `${pfx || ''}!${Math.random().toString(28).slice(-9)}`;
 }
 
 function str_mtrunc(str, len) {
@@ -1616,7 +1616,7 @@ mBroadcaster.addListener('crossTab:master', function _setup() {
                 }
                 _exit();
 
-                dbfetch.coll([M.RubbishID], new MegaPromise()).wait(_proc);
+                dbfetch.coll([M.RubbishID]).finally(_proc);
 
             }, RUBSCHED_WAITPROC);
         }
@@ -2230,7 +2230,7 @@ if (typeof sjcl !== 'undefined') {
                 var selectedNodeHandle = elem.selectedNodeHandle;
                 var userHandle = elem.userHandle;
                 var step = 2;
-                var packet = null;
+                var packet = false;
                 var idtag = mRandomToken('s2');
                 var promise = new MegaPromise();
                 var resolve = function() {
@@ -2268,8 +2268,14 @@ if (typeof sjcl !== 'undefined') {
                     callback : function(res, ctx) {
 
                         if (typeof res === 'object') {
-                            // FIXME: examine error codes in res.r, display error
-                            // to user if needed
+                            if (res.r && res.r[0] === ENOENT) {
+                                if (d) {
+                                    console.error('User %s not found as part of this share.', ctx.userHandle, ctx);
+                                }
+                                onIdle(() => msgDialog('warninga', l[135], l[47], l[23433]));
+                                delete M.scAckQueue[idtag];
+                                --step;
+                            }
 
                             // If it was a user handle, the share is a full share
                             if (M.u[ctx.userHandle]) {
@@ -2445,96 +2451,6 @@ function getNumberColPrefs(colName) {
         default: return null;
     }
 }
-
-// Constructs an extensible hashmap-like class...
-function Hash(a, b, c, d) {
-    if (!(this instanceof Hash)) {
-        return new Hash(a, b, c, d);
-    }
-    var properties;
-    var self = this;
-    var args = toArray.apply(null, arguments);
-    var proto = Hash.prototype;
-
-    if (typeof args[0] === 'string') {
-        Object.defineProperty(self, 'instance', {value: args.shift()});
-        proto = self;
-    }
-
-    if (Array.isArray(args[0])) {
-        properties = args.shift();
-    }
-
-    if (args[0] === false) {
-        args.shift();
-        proto = null;
-    }
-
-    if (typeof args[0] === 'object') {
-        var methods = args.shift();
-        var SuperHash = function SuperHash() {};
-        SuperHash.prototype = Object.create(proto);
-
-        for (var k in methods) {
-            Object.defineProperty(SuperHash.prototype, k, {value: methods[k]});
-        }
-        Object.freeze(SuperHash.prototype);
-
-        self = new SuperHash();
-    }
-
-    if (properties) {
-        for (var i = properties.length; i--;) {
-            Object.defineProperty(self, properties[i], {
-                value: Hash(properties[i]),
-                enumerable: true
-            });
-        }
-    }
-
-    return self;
-}
-
-Hash.prototype = Object.create(null, {
-    constructor: {
-        value: Hash
-    },
-    first: {
-        get: function first() {
-            for (var k in this) {
-                return k
-            }
-        }
-    },
-    keys: {
-        get: function keys() {
-            return Object.keys(this);
-        }
-    },
-    values: {
-        get: function values() {
-            return Object.values(this);
-        }
-    },
-    length: {
-        get: function length() {
-            return this.keys.length;
-        }
-    },
-    hasOwnProperty: {
-        value: function hasOwnProperty(k) {
-            if (d) {
-                console.warn('You should not need to call Hash.hasOwnProperty...');
-            }
-            return Object.prototype.hasOwnProperty.call(this, k);
-        }
-    },
-    toString: {
-        value: function toString() {
-            return '[hash ' + (this.instance || 'Unknown') + ']';
-        }
-    }
-});
 
 function invalidLinkError() {
     'use strict';

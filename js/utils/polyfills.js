@@ -32,54 +32,6 @@ mBroadcaster.once('startMega', function() {
     }
 });
 
-
-/** getOwnPropertyDescriptors polyfill */
-if (!Object.hasOwnProperty('getOwnPropertyDescriptors')) {
-    Object.defineProperty(Object, 'getOwnPropertyDescriptors', {
-        value: function getOwnPropertyDescriptors(obj) {
-            'use strict';
-
-            var result = {};
-            for (var key in obj) {
-                if (obj.hasOwnProperty(key)) {
-                    result[key] = Object.getOwnPropertyDescriptor(obj, key);
-                }
-            }
-
-            return result;
-        }
-    });
-}
-
-/** setPrototypeOf (weak) polyfill */
-if (Object.setPrototypeOf === undefined) {
-    Object.setPrototypeOf = function(target, proto) {
-        'use strict';
-        target.__proto__ = proto;
-        return target;
-    };
-}
-
-if (!String.prototype.startsWith) {
-    // determines whether a string begins with the characters of a specified string
-    String.prototype.startsWith = function(searchString, position) {
-        'use strict';
-        return this.substr(position || 0, searchString.length) === searchString;
-    };
-}
-
-if (!String.prototype.endsWith) {
-    String.prototype.endsWith = function(searchStr, pos) {
-        'use strict';
-
-        // This works much better than >= because it compensates for NaN:
-        if (!(pos < this.length)) {
-            pos = this.length;
-        }
-        return this.substr((pos | 0) - searchStr.length, searchStr.length) === searchStr;
-    };
-}
-
 mBroadcaster.once('startMega', tryCatch(function() {
     'use strict';
 
@@ -209,19 +161,16 @@ mBroadcaster.once('boot_done', function() {
     }
 });
 
-mBroadcaster.once('boot_done', function() {
-    'use strict';
+if (typeof window.queueMicrotask !== "function") {
+    const tbsp = Promise.resolve();
 
-    if (typeof window.queueMicrotask !== "function") {
-        var tbsp = Promise.resolve();
+    window.queueMicrotask = (callback) => {
+        'use strict';
+        tbsp.then(callback);
+    };
+}
 
-        window.queueMicrotask = function(callback) {
-            tbsp.then(callback);
-        };
-    }
-});
-
-mBroadcaster.once('boot_done', function() {
+(() => {
     'use strict';
     Promise.prototype.always = function(fc) {
         return this.then(fc).catch(fc);
@@ -259,7 +208,28 @@ mBroadcaster.once('boot_done', function() {
             return Promise.all(promises.map(map));
         };
     }
-});
+
+    Object.defineProperty(Set.prototype, 'first', {
+        get: function first() {
+            for (const item of this) {
+                return item;
+            }
+            return false;
+        }
+    });
+
+    if (!Array.prototype.flat) {
+        const reduce = Array.prototype.reduce;
+        const concat = Array.prototype.concat.bind([]);
+        Object.defineProperty(Array.prototype, 'flat', {
+            value: function flat(depth = 1) {
+                return depth < 2 ? depth ? concat(...this) : this
+                    : reduce.call(this, (a, o) =>
+                        (Array.isArray(o) && a.push(...flat.call(o, depth - 1)) || a.push(o)) && a, []);
+            }
+        });
+    }
+})();
 
 mBroadcaster.once('boot_done', function() {
     'use strict';
@@ -274,6 +244,104 @@ mBroadcaster.once('boot_done', function() {
     Object.defineProperty(mega, 'es2019', {value: mg && mg.length === 2 && mg[0] === 'm1' && mg[1] === 'm2'});
 });
 
+
+// ----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
+// {{{ BEGIN: Helpers, with direct dependency on polyfills or latest ECMAScript
+
+if (typeof WeakRef === 'undefined') {
+    const wm = new WeakMap();
+
+    WeakRef = class {
+        constructor(ref) {
+            wm.set(this, ref);
+        }
+        deref() {
+            return wm.get(this);
+        }
+    };
+}
+
+class IWeakSet extends Set {
+    add(obj) {
+        if (!this.has(obj)) {
+            super.add(new WeakRef(obj));
+        }
+    }
+    has(obj) {
+        for (const value of this) {
+            if (value === obj) {
+                return true;
+            }
+        }
+    }
+    delete(obj) {
+        for (const ref of super.values()) {
+            if (ref.deref() === obj) {
+                super.delete(ref);
+                return true;
+            }
+        }
+    }
+    remove(set) {
+        for (const ref of super.values()) {
+            if (set.has(ref.deref())) {
+                super.delete(ref);
+            }
+        }
+        set.clear();
+    }
+    get size() {
+        const result = [...this].length;
+        if (d && super.size !== result) {
+            console.warn('IWeakSet: Garbage collection took action (%s/%s)', result, super.size, this);
+        }
+        return result;
+    }
+    *[Symbol.iterator]() {
+        for (const ref of super.values()) {
+            const value = ref.deref();
+            if (value) {
+                yield value;
+            }
+        }
+    }
+    get [Symbol.toStringTag]() {
+        return 'IWeakSet';
+    }
+}
+
+/** Very simple LRU using Map() */
+class LRUMap extends Map {
+    constructor(capacity = 250, notifier = null) {
+        super();
+        Object.defineProperty(this, 'capacity', {value: capacity});
+        Object.defineProperty(this, 'notifier', {value: notifier || self.d > 0 && dump.bind(null, [this])});
+    }
+    get(key) {
+        if (super.has(key)) {
+            const value = super.get(key);
+            super.delete(key);
+            super.set(key, value);
+            return value;
+        }
+    }
+    set(key, value) {
+        if (this.size === this.capacity) {
+            for (const [k, v] of this) {
+                if (this.notifier) {
+                    queueMicrotask(() => this.notifier(v, k));
+                }
+                super.delete(k);
+                break;
+            }
+        }
+        super.set(key, value);
+    }
+    get [Symbol.toStringTag]() {
+        return 'LRUMap';
+    }
+}
 
 /**
  * Instantiate a sub-class, similar to our inherits() but with es6 classes.
@@ -302,6 +370,109 @@ const mSubClass = (name, sup, target) => {
     return cl;
 };
 
+/**
+ * Helper to mimic async functions.
+ * @param {Function} fc function method.
+ * @returns {function(...[*]): Promise<void>} promise
+ * @deprecated Use async/await instead.
+ */
+function promisify(fc) {
+    'use strict';
+    const a$yncMethod = function(...args) {
+        return new Promise((resolve, reject) => {
+            const result = a$yncMethod.__function__.apply(this, [resolve, reject, ...args]);
+            if (result instanceof Promise) {
+                if (d > 2) {
+                    console.assert(a$yncMethod.__function__[Symbol.toStringTag] === "AsyncFunction");
+                }
+                result.catch(reject);
+            }
+        });
+    };
+    a$yncMethod.prototype = undefined;
+    Object.defineProperty(fc, '__method__', {value: a$yncMethod});
+    Object.defineProperty(a$yncMethod, '__function__', {value: fc});
+    return a$yncMethod;
+}
+
+/**
+ * Mutex impl. for Promises.
+ * @param {String} [name] unique lock name
+ * @param {Function} handler function dispatcher.
+ * @returns {function(...[*]): Promise<void>} promise.
+ */
+function mutex(name, handler) {
+    'use strict';
+    if (typeof name === 'function') {
+        handler = name;
+        name = null;
+    }
+    const mMutexMethod = function(...args) {
+        name = name || this.__mutex_lock_name_$;
+        if (!name) {
+            name = (this.constructor.name || '$') + makeUUID().slice(-13);
+            Object.defineProperty(this, '__mutex_lock_name_$', {value: name});
+        }
+        return new Promise((resolve, reject) => {
+            mutex.lock(name).then((unlock) => {
+                const rej = (a0) => unlock().then(() => reject(a0));
+                const res = (a0) => unlock().then(() => resolve(a0));
+                return mMutexMethod.__function__.apply(this, [res, rej, ...args]);
+            }).catch((ex) => {
+                console.error(ex);
+                mutex.unlock(name).finally(reject.bind(null, ex));
+            });
+        });
+    };
+    mMutexMethod.prototype = undefined;
+    Object.defineProperty(handler, '__method__', {value: mMutexMethod});
+    Object.defineProperty(mMutexMethod, '__name__', {value: name});
+    Object.defineProperty(mMutexMethod, '__function__', {value: handler});
+    return Object.freeze(mMutexMethod);
+}
+
+mutex.queue = Object.create(null);
+mutex.lock = promisify((resolve, reject, name) => {
+    'use strict';
+    resolve = resolve.bind(null, mutex.unlock.bind(mutex, name));
+
+    if (mutex.queue[name]) {
+        mutex.queue[name].push(resolve);
+    }
+    else {
+        mutex.queue[name] = [];
+        resolve();
+    }
+});
+mutex.unlock = async(name) => {
+    'use strict';
+    const next = (mutex.queue[name] || []).shift();
+    if (next) {
+        queueMicrotask(next);
+    }
+    else {
+        delete mutex.queue[name];
+    }
+};
+Object.freeze(mutex);
+
+/** @property mega.promise */
+Object.defineProperty(mega, 'promise', {
+    get: function() {
+        'use strict';
+        let rej, res;
+        const promise = new Promise((resolve, reject) => {
+            rej = reject;
+            res = resolve;
+        });
+        Object.defineProperty(promise, 'reject', {value: rej});
+        Object.defineProperty(promise, 'resolve', {value: res});
+        return  Object.freeze(promise);
+    }
+});
+
+/** @property window.SyntaxError */
+/** @property window.SecurityError */
 tryCatch((mock) => {
     'use strict';
     mock('SyntaxError');
@@ -313,39 +484,6 @@ tryCatch((mock) => {
     }
 });
 
-// https://github.com/uxitten/polyfill/blob/master/string.polyfill.js
-// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/padStart
-if (!String.prototype.padStart) {
-    String.prototype.padStart = function padStart(targetLength, padString) {
-        "use strict";
-        // truncate if number, or convert non-number to 0;
-        targetLength >>= 0;
-        padString = String(typeof padString === 'undefined' ? ' ' : padString);
-        if (this.length >= targetLength) {
-            return String(this);
-        }
-        targetLength -= this.length;
-        if (targetLength > padString.length) {
-            // append to original to ensure we are longer than needed
-            padString += padString.repeat(targetLength / padString.length);
-        }
-        return padString.slice(0, targetLength) + String(this);
-    };
-}
-if (!String.prototype.padEnd) {
-    String.prototype.padEnd = function padEnd(targetLength, padString) {
-        "use strict";
-        // floor if number or convert non-number to 0;
-        targetLength >>= 0;
-        padString = String(typeof padString === 'undefined' ? ' ' : padString);
-        if (this.length > targetLength) {
-            return String(this);
-        }
-        targetLength -= this.length;
-        if (targetLength > padString.length) {
-            // append to original to ensure we are longer than needed
-            padString += padString.repeat(targetLength / padString.length);
-        }
-        return String(this) + padString.slice(0, targetLength);
-    };
-}
+// }}} END: Helpers, with direct dependency on polyfills or latest ECMAScript
+// ----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------

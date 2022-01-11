@@ -1,30 +1,43 @@
+var d;
+var u_k;
+var usk;
+var u_handle;
+var u_privk;
+var u_k_aes;
+var missingkeys;
+var vkey = new Set();
+var ckey = new Set();
+var u_sharekeys = Object.create(null);
+
 if (typeof importScripts !== 'undefined') {
     importScripts('sjcl.js', 'rsaasm.js');
 
-    var firefox_boost = false;
-    var d;
-
     self.postMessage = self.webkitPostMessage || self.postMessage;
 
-    function init(debug) {
-        u_sharekeys = {};
+    let jobs;
+    const init = function(debug) {
+        'use strict';
+
+        jobs = 0;
+        d = !!debug;
+        u_sharekeys = Object.create(null);
         missingkeys = false;
-    }
+    };
 
     init();
 
     self.onmessage = function(e) {
-        var req = e.data;
-        var key;
+        'use strict';
+        const req = e.data;
+        jobs++;
 
         if (req.scqi >= 0) {
-            // actionpacket - we do CPU-intensive stuff here, e.g. decrypting
-            // sharekeys
-            if (req.a == 's' || req.a == 's2' && req.n && req.k) {
-                var k = crypto_process_sharekey(req.n, req.k);
+            // actionpacket - we do CPU-intensive stuff here, e.g. decrypting share-keys
+            if ((req.a === 's' || req.a === 's2') && req.n && req.k) {
+                const k = crypto_process_sharekey(req.n, req.k);
 
                 if (k === false) {
-                    console.warn("Failed to decrypt RSA share key for " + req.n + ": " + req.k);
+                    console.warn(`Failed to decrypt RSA share key for ${req.n}: ${req.k}`);
                 }
                 else {
                     req.k = k;
@@ -48,7 +61,7 @@ if (typeof importScripts !== 'undefined') {
                 if (d) {
                     console.log("Successfully decrypted sharekeys for " + req.h);
                 }
-                key = decrypt_key(u_k_aes, base64_to_a32(req.k));
+                const key = decrypt_key(u_k_aes, base64_to_a32(req.k));
                 u_sharekeys[req.h] = [key, new sjcl.cipher.aes(key)];
             }
             else if (d) {
@@ -57,9 +70,9 @@ if (typeof importScripts !== 'undefined') {
         }
         else if (req.u_k) {
             // setup for user account
-            init();
+            init(req.d);
 
-            d = req.d;
+            usk = req.usk;
             u_handle = req.u_handle;
             u_privk = req.u_privk;
             u_k_aes = new sjcl.cipher.aes(req.u_k);
@@ -68,7 +81,7 @@ if (typeof importScripts !== 'undefined') {
             // setup folder link
             init(req.d);
 
-            key = base64_to_a32(req.pfkey);
+            const key = base64_to_a32(req.pfkey);
             u_sharekeys[req.n_h] = [key, new sjcl.cipher.aes(key)];
         }
         else {
@@ -77,7 +90,7 @@ if (typeof importScripts !== 'undefined') {
             for (var h in u_sharekeys) u_sharekeys[h] = u_sharekeys[h][0];
 
             // done - post state back to main thread
-            self.postMessage({ done: 1, sharekeys: u_sharekeys });
+            self.postMessage({ done: 1, sharekeys: u_sharekeys, jobs });
             init();
         }
     };
@@ -87,14 +100,35 @@ if (typeof importScripts !== 'undefined') {
             self.postMessage(['srvlog2', [].slice.call(arguments)]);
         };
     }
-}
+    if (typeof delay === 'undefined') {
+        const q = new Map();
+        delay = (tag, cb, t) => {
+            'use strict';
+            let e = q.get(tag);
+            if (!e) {
+                (e = Object.create(null)).tid = setTimeout((e) => {
+                    q.delete(e.pun);
+                    const rem = e.tde - (performance.now() - e.tik);
+                    return rem < 77 ? queueMicrotask(e.tsk) : delay(e.pun, e.tsk, rem);
+                }, t, e);
+                q.set(e.pun = tag, e);
+            }
+            e.tde = t;
+            e.tsk = cb;
+            e.tik = performance.now();
+        };
+    }
 
-var u_k;
-var u_handle;
-var u_privk;
-var u_k_aes;
-var u_sharekeys = {};
-var vkey = {};
+    /* eslint-disable no-use-before-define,no-empty-function,no-empty,strict */
+    lazy = () => {};
+    tryCatch = (fn) => (...args) => {
+        // eslint-disable-next-line local-rules/hints
+        try {
+            return fn(...args);
+        }
+        catch (ex) {}
+    };
+}
 
 function crypto_process_sharekey(handle, key) {
     if (key.length > 43) {
@@ -115,12 +149,13 @@ function crypto_process_sharekey(handle, key) {
 // CORRUPT: { h, p, u, ts, t, k (object), s (for t == 0) }
 // OK:      { h, p, u, ts, t, k (object), s (for t == 0), name, hash, mtime, ar (containing attributes other than n/c/t) }
 function crypto_decryptnode(n) {
-    var key, k;
-    var id;
-    var p, pp;
+    'use strict';
+    let key, k, id, p, pp;
 
     // is this node in OK or CORRUPT state or a keyless (root) node? no decryption needed.
-    if (typeof n.k == 'undefined' || n.name) return;
+    if (typeof n.k === 'undefined' || n.name) {
+        return n;
+    }
 
     if (typeof n.k == 'string') {
         // inbound share root? set parent to sharing user; extract & store sharekey.
@@ -128,7 +163,7 @@ function crypto_decryptnode(n) {
             key = crypto_process_sharekey(n.h, n.sk);
 
             if (key) {
-                if (key.length != 4 && key.length != 8) {
+                if (key.length !== 4 && key.length !== 8) {
                     srvlog2('invalid-aes-key-size', n.h, n.k.length, n.sk.length, key.length);
                 }
                 else {
@@ -139,18 +174,19 @@ function crypto_decryptnode(n) {
         }
 
         // does the logged in user own the node? (user key is guaranteed to be located first in .k)
-        if (n.k.length == 43 || n.k.length == 22) {
+        if (n.k.length === 43 || n.k.length === 22) {
             id = u_handle;
             p = 0;
         }
-        else if (n.k[11] == ':' && u_handle === n.k.substr(0, 11)) {
+        else if (n.k[11] === ':' && u_handle === n.k.substr(0, 11)) {
             id = u_handle;
             p = 12; // save calculation.  u_handle.length+1;
-        } else {
+        }
+        else {
             // do we have a suitable sharekey?
-            for (p = 8; (p = n.k.indexOf(':', p)) >= 0; ) {
-                if (++p == 9 || n.k[p-10] == '/') {
-                    id = n.k.substr(p-9, 8);
+            for (p = 8; (p = n.k.indexOf(':', p)) >= 0;) {
+                if (++p === 9 || n.k[p - 10] === '/') {
+                    id = n.k.substr(p - 9, 8);
                     if (u_sharekeys[id]) {
                         break;
                     }
@@ -159,7 +195,7 @@ function crypto_decryptnode(n) {
         }
 
         if (p >= 0) {
-            var pp = n.k.indexOf('/', p+21);
+            pp = n.k.indexOf('/', p + 21);
 
             if (pp < 0) {
                 pp = n.k.length;
@@ -173,45 +209,34 @@ function crypto_decryptnode(n) {
                 k = base64_to_a32(key);
 
                 // check for permitted key lengths (4 == folder, 8 == file)
-                if (k.length == 4 || k.length == 8) {
+                if (k.length === 4 || k.length === 8) {
                     k = decrypt_key(id === u_handle ? u_k_aes : u_sharekeys[id][1], k);
                 }
                 else {
                     if (d) {
-                        console.error("Received invalid key length (" + k.length + "): " + n.h);
+                        console.error(`Received invalid key length (${k.length}): ${n.h}`);
                     }
                     k = false;
                 }
             }
-            else {
+            else if (u_privk) {
                 // long keys: RSA
-                if (u_privk) {
-                    var t = base64urldecode(key);
-                    try {
-                        if (t) {
-                            k = crypto_rsadecrypt(t, u_privk);
+                const t = base64urldecode(key);
+                if (t) {
+                    tryCatch((t) => {
+                        k = crypto_rsadecrypt(t, u_privk);
 
-                            if (k !== false) {
-                                k = str_to_a32(k.substr(0, n.t ? 16 : 32));
-                            }
+                        if (k !== false) {
+                            k = str_to_a32(k.substr(0, n.t ? 16 : 32));
                         }
-                        else {
-                            if (d) {
-                                console.warn("Corrupt key for node " + n.h);
-                            }
-                        }
-                    }
-                    catch (e) {
-                        if (d) {
-                            console.error('u_privk error: ' + e);
-                        }
-                    }
+                    })(t);
                 }
-                else {
-                    if (d) {
-                        console.log("Received RSA key, but have no public key published: " + n.h);
-                    }
+                else if (d) {
+                    console.warn(`Corrupt key for node ${n.h}`);
                 }
+            }
+            else if (d) {
+                console.log(`Received RSA key, but have no public key published: ${n.h}`);
             }
         }
     }
@@ -221,31 +246,29 @@ function crypto_decryptnode(n) {
     }
 
     if (k) {
-        if (n.a) crypto_procattr(n, k);
-        else {
-            if (d && n.t < 2) {
-                console.warn('Missing attribute for node ' + n.h);
-            }
+        if (n.a) {
+            crypto_procattr(n, k);
+        }
+        else if (d && n.t < 2) {
+            console.warn(`Missing attribute for node ${n.h}`);
         }
     }
     else {
         if (d) {
-            vkey[n.h] = 1;
-            if (vkey.t) {
-                clearTimeout(vkey.t);
-            }
-            vkey.t = setTimeout(function() {
-                delete vkey.t;
-                console.debug("Can't extract a valid key for", Object.keys(vkey));
-                vkey = {};
+            vkey.add(n.h);
+            delay('nodedec:vkey:store', () => {
+                console.debug("Can't extract a valid key for", [...vkey]);
+                vkey.clear();
             }, 4000);
         }
 
-        if (missingkeys) crypto_reportmissingkey(n);
+        if (missingkeys) {
+            crypto_reportmissingkey(n);
+        }
     }
+
+    return n;
 }
-var vkey = {};
-var ckey = {};
 
 // generate attributes block for given node using AES-CBC with MEGA canary
 // (also generates random (folder-type) key if missing)
@@ -294,14 +317,13 @@ function crypto_makeattr(n, nn) {
         a32_to_ab([nn.k[0] ^ nn.k[4], nn.k[1] ^ nn.k[5], nn.k[2] ^ nn.k[6], nn.k[3] ^ nn.k[7]]), false);
 }
 
-// derived node attr directory
-var dattrs = ['ar', 'name', 'hash', 'mtime', 'fav', 'lbl', 'f', 'rr'];
-
 // clear all node attributes, including derived ones
 function crypto_clearattr(n) {
-    var old = {};
+    // derived node attr directory, see crypto_procattr()
+    const dattrs = ['ar', 'name', 'hash', 'mtime', 'fav', 'lbl', 'f', 'rr', 'gps'];
+    const old = {};
 
-    for (var i = dattrs.length; i--; ) {
+    for (let i = dattrs.length; i--;) {
         if (typeof n[dattrs[i]] != 'undefined') {
             old[dattrs[i]] = n[dattrs[i]];
             delete n[dattrs[i]];
@@ -313,9 +335,7 @@ function crypto_clearattr(n) {
 
 // restore previously cleared attributes
 function crypto_restoreattr(n, old) {
-    for (var i in old) {
-        n[i] = old[i];
-    }
+    Object.assign(n, old);
 }
 
 // if decryption of .a is successful, set .name, .hash, .mtime, .k and .ar and clear .a
@@ -375,24 +395,54 @@ function crypto_procattr(n, key) {
                 delete o.rr;
             }
 
+            if (o.l && o.l.length === 8 || o.gp && o.gp.length === 16) {
+                tryCatch(() => decode_coords(n, o))();
+            }
+
             n.k = key;
             n.ar = o;
             delete n.a;
         }
-        else if (d) {
+        else if (d > 1) {
             console.warn("Incomplete attributes for node " + n.h);
         }
     }
     else if (d) {
-        ckey[n.h] = 1;
-        if (ckey.t) {
-            clearTimeout(ckey.t);
-        }
-        ckey.t = setTimeout(function() {
-            delete ckey.t;
-            console.debug("Corrupted attributes or key for", Object.keys(ckey));
-            ckey = {};
+        ckey.add(n.h);
+        delay('nodedec:ckey:store', () => {
+            console.debug("Corrupted attributes or key for", [...ckey]);
+            ckey.clear();
         }, 4000);
+    }
+}
+
+// decode/decrypt GPS coords in l/gp node attributes.
+function decode_coords(n, o) {
+    const coords = o.l;
+
+    if (o.gp) {
+        usk = self.usk || typeof u_attr !== 'undefined' && u_attr['*~usk'];
+
+        if (usk) {
+            // if (typeof usk === 'string') {
+            //     usk = new sjcl.cipher.aes(decrypt_key(u_k_aes, base64_to_a32(usk)));
+            // }
+            //
+            // let tmp = usk.decrypt(base64_to_a32(o.gp));
+        }
+    }
+
+    if (coords) {
+        const dec = str => {
+            const buf = Uint8Array.from(base64urldecode(str), c => c.charCodeAt(0));
+            return buf[2] << 16 | buf[1] << 8 | buf[0];
+        };
+        const lat = -90 + 180 * dec(String(coords).substr(0, 4)) / 0xFFFFFF;
+        const lon = -180 + 360 * dec(String(coords).substr(4, 4)) / 0x01000000;
+
+        if (lat >= -90 && lat <= 90 && lon >= -180 && lon <= 180) {
+            n.gps = [lat, lon];
+        }
     }
 }
 
@@ -646,10 +696,6 @@ function ab_to_base64(ab) {
     return base64urlencode(ab_to_str(ab));
 }
 
-if (firefox_boost) {
-    ab_to_str_depad = mozAB2SDepad;
-}
-
 function ab_to_str(ab) {
     var b = '', i;
     var ab8 = new Uint8Array(ab);
@@ -724,9 +770,10 @@ function dec_attr(attr, key) {
  * @return {String}
  *     Browser's native string encoding.
  */
-var from8 = firefox_boost ? mozFrom8 : function (utf8) {
+function from8(utf8) {
+    'use strict';
     return decodeURIComponent(escape(utf8));
-};
+}
 
 
 (function _console(global) {
@@ -776,34 +823,237 @@ var from8 = firefox_boost ? mozFrom8 : function (utf8) {
 
 })(self);
 
-function MegaNode(node) {
-    'use strict';
+// --------------------------------------------------------------------------
 
-    if (!node || !node.h || node.h.length !== 8) {
-        return Object(node || null);
+class MegaNode {
+    constructor(node) {
+        if (node) {
+            Object.assign(this, node);
+        }
+
+        if (d && String(this).length !== 8) {
+            console.error('Instantiated invalid MegaNode instance.', this);
+        }
     }
-    Object.assign(this, node);
 
-    // XXX: While setPrototypeOf() did seem faster, it does increases mem usage by ~1GB for 1M-nodes account..(v8 bug?)
-    // return Object.setPrototypeOf(node, MegaNode.prototype);
+    toString() {
+        return this.h || '';
+    }
+
+    valueOf() {
+        return this.s || 0;
+    }
 }
 
-MegaNode.prototype = Object.create(null, {
-    constructor: {
-        value: MegaNode
-    },
-    toString: {
-        value: function toString() {
-            'use strict';
+Object.setPrototypeOf(MegaNode.prototype, null);
 
-            return this.h || '';
-        }
-    },
-    valueOf: {
-        value: function valueOf() {
-            'use strict';
+// --------------------------------------------------------------------------
 
-            return this.s || 0;
+lazy(self, 'decWorkerPool', function decWorkerPool() {
+    'use strict';
+    let head, tail, next;
+    const shareWorker = new Map();
+    const parentWorker = new Map();
+
+    /** @class decWorkerPool */
+    return new class extends Array {
+        get url() {
+            const WORKER_VERSION = 2;
+            return `${window.is_extension || window.is_karma ? '' : '/'}nodedec.js?v=${WORKER_VERSION}`;
         }
-    }
+
+        get ok() {
+            return this.length > 0;
+        }
+
+        get limit() {
+            return this.length * BACKPRESSURE_WORKER_LIMIT;
+        }
+
+        get busy() {
+            const res = head - tail > this.limit;
+            if (d && res) {
+                console.debug('decWorkerPool.busy', head, tail);
+            }
+            return res;
+        }
+
+        get load() {
+            return tail * 100 / head | 0;
+        }
+
+        _terminate(worker) {
+            worker.onmessage = worker.onerror = null;
+            tryCatch(() => worker.terminate())();
+        }
+
+        /** cleanup internal data */
+        cleanup() {
+            shareWorker.clear();
+            parentWorker.clear();
+            head = tail = next = 0;
+        }
+
+        /** terminate and cleanup worker pool */
+        kill() {
+            for (let i = this.length; i--;) {
+                this._terminate(this[i]);
+            }
+            this.length = 0;
+            this.cleanup();
+        }
+
+        /** initialize worker pool */
+        init(handler, size = 4, state = false) {
+            this.kill();
+
+            let errorHandler = (ex) => {
+                queueMicrotask(() => this.kill());
+                console.error(`FATAL: ${this.url} worker error.`, ex);
+            };
+
+            let messageHandler = (ev) => {
+                const {scqi, t} = ev.data;
+                if (scqi || t >= 0) {
+                    tail++;
+                }
+                return handler(ev);
+            };
+
+            let appendWorker = tryCatch(() => {
+                const w = new Worker(this.url);
+
+                w.onerror = errorHandler;
+                w.onmessage = messageHandler;
+
+                if (state) {
+                    w.postMessage(state);
+                }
+                return this.push(w);
+            });
+
+            while (size--) {
+                if (!appendWorker()) {
+                    if (!this.length) {
+                        this.kill();
+                    }
+                    break;
+                }
+            }
+
+            appendWorker = errorHandler = messageHandler = state = undefined;
+        }
+
+        /** get next worker index (round robin) */
+        getNextWorker(slot) {
+            if (slot !== undefined) {
+                return slot;
+            }
+
+            if (next >= this.length) {
+                next = 0;
+            }
+            return next++;
+        }
+
+        /** get a suitable worker index for a shared node */
+        getShareIndex(n, slot) {
+            let p, id;
+
+            // own node?
+            if (!n.k || n.k.substr(0, 11) === u_handle) {
+                p = -1;
+            }
+            else {
+                // no - do we have an existing share key?
+                for (p = 8; (p = n.k.indexOf(':', p)) >= 0;) {
+                    if (++p === 9 || n.k[p - 10] === '/') {
+                        id = n.k.substr(p - 9, 8);
+                        if (shareWorker.has(id) || u_sharekeys[id]) {
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if (p >= 0) {
+                let pp = n.k.indexOf('/', p + 21);
+
+                if (pp < 0) {
+                    pp = n.k.length;
+                }
+
+                // rewrite key to the minimum
+                n.k = id + ':' + n.k.substr(p, pp - p);
+
+                if (shareWorker.has(id)) {
+                    // the key is already known to a worker
+                    slot = shareWorker.get(id);
+                }
+                else {
+                    // pick a pseudorandom worker (round robin)
+                    slot = this.getNextWorker(slot);
+
+                    // record for future nodes in the same share
+                    shareWorker.set(id, slot);
+
+                    // send share-key
+                    this[slot].postMessage({h: id, sk: u_sharekeys[id][0]});
+                }
+            }
+
+            return slot;
+        }
+
+        /** post something to *all* workers */
+        signal(data) {
+            for (const worker of this) {
+                worker.postMessage(data);
+            }
+        }
+
+        /** post a node to a worker for decryption */
+        postNode(n, slot) {
+            slot = this.getShareIndex(n, slot);
+
+            if (slot === undefined) {
+                if (parentWorker.has(n.p)) {
+                    slot = parentWorker.get(n.p);
+                    parentWorker.set(n.h, slot);
+                }
+                else if (parentWorker.has(n.h)) {
+                    slot = parentWorker.get(n.h);
+                }
+            }
+
+            // pick a pseudorandom worker (round robin)
+            slot = this.getNextWorker(slot);
+
+            if (n.t >= 0) {
+                ++head;
+            }
+            this[slot].postMessage(n);
+
+            if (n.sk || n.ha) {
+                parentWorker.set(n.h, slot);
+            }
+
+            return slot;
+        }
+
+        /** post action packet for sharekey decryption */
+        postPacket(a, slot) {
+            // set scq slot number
+            a.scqi = slot;
+
+            slot = a.scqi % this.length;
+
+            // pin the nodes of this share to the same worker
+            // (it is the only one that knows the sharekey)
+            shareWorker.set(a.n, slot);
+
+            ++head;
+            this[slot].postMessage(a);
+        }
+    };
 });

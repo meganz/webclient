@@ -963,6 +963,10 @@ body.theme-dark .message .audio-player {
     z-index: 1;
 }
 
+.reactions-bar > .disabled {
+    opacity: 1;
+}
+
 .reactions-bar > div:hover {
     background-color: var(--stroke-grey-1);
     border-color: var(--stroke-grey-2);

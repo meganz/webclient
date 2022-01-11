@@ -781,7 +781,7 @@ function getFormData(userEmail, betaT, answers) {
         }
     }
 
-    for (let i = 1; i < rolesList.length; i++) {
+    for (let i = 0; i < rolesList.length; i++) {
         if ($('.radioOn', $('.register-role', $registerForm)).next().data('value') === i) {
             roleName = rolesList[i];
         }

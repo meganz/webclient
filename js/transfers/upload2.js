@@ -231,15 +231,13 @@ var ulmanager = {
      */
     onUploadFinished: function(aUploadID) {
         'use strict';
-
-        if (typeof aUploadID !== 'number' || aUploadID < 8001) {
-            return MegaPromise.reject(EARGS);
-        }
-
-        return new MegaPromise(function(resolve, reject) {
+        return new Promise((resolve, reject) => {
             var _ev1;
             var _ev2;
             var _ev3;
+            if (typeof aUploadID !== 'number' || aUploadID < 8001) {
+                return reject(EARGS);
+            }
             var queue = ul_queue.filter(isQueueActive);
             var i = queue.length;
 
@@ -286,7 +284,7 @@ var ulmanager = {
             logger.debug('Waiting for upload %d to finish...', aUploadID, [aFile]);
         }
 
-        this.onUploadFinished(aUploadID).wait(function(h) {
+        this.onUploadFinished(aUploadID).always((h) => {
             if (d) {
                 logger.debug('Upload %s finished...', aUploadID, h);
             }
@@ -1105,11 +1103,11 @@ var ulmanager = {
         if (identical && fmconfig.ul_skipIdentical) {
             n = identical;
         }
-        else if ((!M.h[uq.hash] || !Object.keys(M.h[uq.hash]).length) && !identical) {
+        else if ((!M.h[uq.hash] || !M.h[uq.hash].size) && !identical) {
             return ulmanager.ulStart(File);
         }
         else if (M.h[uq.hash]) {
-            n = mNode || M.d[Object.keys(M.h[uq.hash])[0]];
+            n = mNode || M.d[M.h[uq.hash].first];
             // identical = n;
         }
         if (!n) {
@@ -1234,7 +1232,7 @@ var ulmanager = {
             var identical = ulmanager.ulIdentical(aFile);
             ulmanager.logger.info(aFile.name, "fingerprint", aFile.hash, M.h[aFile.hash], identical);
 
-            if ((M.h[aFile.hash] && Object.keys(M.h[aFile.hash]).length) || identical) {
+            if (M.h[aFile.hash] && M.h[aFile.hash].size || identical) {
                 ulmanager.ulDeDuplicate(aFileUpload, identical, hashNode);
             }
             else {
@@ -1245,32 +1243,15 @@ var ulmanager = {
         var promises = [];
 
         if (!M.c[aFile.target]) {
-            promises.push(dbfetch.get(aFile.target, new MegaPromise()));
+            promises.push(dbfetch.get(aFile.target));
         }
 
-        var isHashFetchNeeded = false;
-
-        if (!M.h[aFile.hash]) {
-            isHashFetchNeeded = true;
-        }
-        else {
-            var hashesArray = Object.keys(M.h[aFile.hash]);
-            if (!hashesArray.length || !M.d[hashesArray[0]]) {
-                isHashFetchNeeded = true;
-            }
-        }
-
-        if (isHashFetchNeeded && !mega.megadrop.isInit()) {
-            promises.push(
-                dbfetch.hash(aFile.hash)
-                    .always(function(node) {
-                        hashNode = node;
-                    })
-            );
+        if ((!M.h[aFile.hash] || !M.d[M.h[aFile.hash].first]) && !mega.megadrop.isInit()) {
+            promises.push(dbfetch.hash(aFile.hash).then(node => (hashNode = node)));
         }
 
         if (promises.length) {
-            MegaPromise.allDone(promises).wait(startUpload);
+            Promise.allSettled(promises).then(startUpload);
         }
         else {
             startUpload();

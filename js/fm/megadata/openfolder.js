@@ -465,7 +465,7 @@
             }
         }
 
-        var promise = new MegaPromise();
+        let {promise} = mega;
         var finish = function() {
             _openFolderCompletion.call(M, id = cv.original || id, firstopen);
 
@@ -506,12 +506,12 @@
             finish();
         };
 
-        promise.then(function(h) {
+        promise.then((h) => {
             if (d) {
                 console.warn('openFolder completed for %s, currentdir=%s', maph(id), maph(M.currentdirid));
                 console.assert(id.endsWith(h));
             }
-            delay('mega:openfolder!' + id, function() {
+            delay(`mega:openfolder!${id}`, () => {
                 if (M.currentdirid !== id) {
                     return;
                 }
@@ -523,8 +523,8 @@
                 mBroadcaster.sendMessage('mega:openfolder', id);
                 $.tresizer();
             }, 90);
-        });
-        var masterPromise = promise;
+        }).catch(dump);
+        const masterPromise = promise;
 
         fetchdbnodes = fetchdbnodes || dbfetch.isLoading(id);
 

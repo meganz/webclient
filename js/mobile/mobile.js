@@ -597,27 +597,20 @@ var mobile = {
         var promises = [];
         var seenByCountUpd = {};
 
-        var _setCountUpdNode = promisify(function(resolve, reject, node) {
-
-            var promise = MegaPromise.resolve();
+        const _setCountUpdNode = async(node) => {
 
             if (!M.d[node.p]) {
-                promise = dbfetch.get(node.p);
+                await dbfetch.acquire(node.p);
             }
 
-            promise.always(function() {
+            var parents = M.getPath(node.h);
+            var pIndex = parents.indexOf(M.currentdirid);
+            var pInCurrentView = parents[--pIndex];
 
-                var parents = M.getPath(node.h);
-                var pIndex = parents.indexOf(M.currentdirid);
-                var pInCurrentView = parents[--pIndex];
-
-                if (pIndex > -1 && !countUpdNodes[pInCurrentView]) {
-                    countUpdNodes[pInCurrentView] = M.d[pInCurrentView];
-                }
-
-                resolve(node.h);
-            });
-        });
+            if (pIndex > -1 && !countUpdNodes[pInCurrentView]) {
+                countUpdNodes[pInCurrentView] = M.d[pInCurrentView];
+            }
+        };
 
         for (var i = newnodes.length; i--;) {
 

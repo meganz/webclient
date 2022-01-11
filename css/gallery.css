@@ -132,6 +132,7 @@
     align-items: center;
 }
 .gallery-view .data-block-view .data-block-bg.thumb img {
+    background: var(--image-background);
     width: auto;
     height: auto;
     max-width: 100%;

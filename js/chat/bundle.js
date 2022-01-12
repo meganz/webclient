@@ -18507,12 +18507,13 @@ let HistoryPanel = (historyPanel_dec = utils["default"].SoonFcWrap(50), historyP
 
       if ($sidebar.hasClass('chat-opened') && scrollBlockHeight !== $messages.outerHeight()) {
         $messages.css('height', scrollBlockHeight);
+        self.refreshUI(true);
       }
 
       return;
     }
 
-    var scrollBlockHeight = $('.chat-content-block', self.$container).outerHeight() - ($('.chat-topic-block', self.$container).outerHeight() || 0) - ($('.call-block', self.$container).outerHeight() || 0) - (is_chatlink ? $('.join-chat-block', self.$container).outerHeight() : $('.chat-textarea-block', self.$container).outerHeight());
+    var scrollBlockHeight = $('.chat-content-block', self.$container).outerHeight() - ($('.chat-topic-block', self.$container).outerHeight() || 0) - ($('.call-block', self.$container).outerHeight() || 0) - (is_chatlink ? $('.join-chat-block', self.$container).outerHeight() : $('.messages-block .chat-textarea-block', self.$container).outerHeight());
 
     if (scrollBlockHeight !== self.$messages.outerHeight()) {
       self.$messages.css('height', scrollBlockHeight);

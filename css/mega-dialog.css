@@ -80,6 +80,10 @@
         font-family: var(--text-font-family);
     }
 
+    .mega-dialog strong {
+        font-family: var(--text-font-family-bold);
+    }
+
     .mega-dialog > header h2,
     .mega-dialog > header h3 {
         font-weight: 400;

@@ -695,7 +695,8 @@ export class ContactCard extends ContactAwareComponent {
         if (contact.u === u_handle) {
             username += " (" + escapeHTML(l[8885]) + ")";
         }
-        username = <utils.EmojiFormattedContent>{username}</utils.EmojiFormattedContent>;
+
+        var escapedUsername = <utils.EmojiFormattedContent>{username}</utils.EmojiFormattedContent>;
         var dropdowns = this.props.dropdowns ? this.props.dropdowns : [];
         var noContextMenu = this.props.noContextMenu ? this.props.noContextMenu : "";
         var noContextButton = this.props.noContextButton ? this.props.noContextButton : "";
@@ -703,14 +704,14 @@ export class ContactCard extends ContactAwareComponent {
         var highlightSearchValue = self.props.highlightSearchValue ? self.props.highlightSearchValue : false;
         var emailTooltips = self.props.emailTooltips ? self.props.emailTooltips : false;
         var searchValue = self.props.searchValue ? self.props.searchValue : "";
-
         var usernameBlock;
+
         if (!noContextMenu) {
             usernameBlock = <ContactButton key="lnk" dropdowns={dropdowns}
                 noContextMenu={noContextMenu}
                 contact={contact}
                 className="light"
-                label={username}
+                label={escapedUsername}
                 chatRoom={this.props.chatRoom}
                 dropdownRemoveButton={dropdownRemoveButton}
             />;
@@ -727,11 +728,11 @@ export class ContactCard extends ContactAwareComponent {
                 }
 
                 if (matches.length > 0) {
-                    username = <span dangerouslySetInnerHTML={{
+                    escapedUsername = <span dangerouslySetInnerHTML={{
                         __html: megaChat.highlight(
-                            username,
+                            megaChat.plugins.emoticonsFilter.processHtmlMessage(escapeHTML(username)),
                             matches,
-                            false
+                            true
                         )
                     }}></span>;
                 }
@@ -740,10 +741,10 @@ export class ContactCard extends ContactAwareComponent {
                 usernameBlock = <div
                     className="user-card-name light simpletip"
                     data-simpletip={contact.m}
-                    data-simpletipposition="top">{username}</div>;
+                    data-simpletipposition="top">{escapedUsername}</div>;
             }
             else {
-                usernameBlock = <div className="user-card-name light">{username}</div>;
+                usernameBlock = <div className="user-card-name light">{escapedUsername}</div>;
             }
         }
 

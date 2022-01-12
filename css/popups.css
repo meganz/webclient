@@ -197,6 +197,10 @@ body.tl .dropdown.body.popup.contacts-search {
     width: 24px;
     height: 24px;
 }
+.contacts-search-list .contacts-info.body.contacts-search .emoji {
+    width: 17px;
+    height: 17px;
+}
 .contacts-search-list .contacts-info.body.contacts-search:last-child {
     margin-bottom:  12px;
 }

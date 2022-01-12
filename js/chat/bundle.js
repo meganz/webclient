@@ -6164,7 +6164,7 @@ class ContactCard extends _mixins1__._p {
       username += " (" + escapeHTML(l[8885]) + ")";
     }
 
-    username = react0().createElement(_ui_utils_jsx2__["default"].EmojiFormattedContent, null, username);
+    var escapedUsername = react0().createElement(_ui_utils_jsx2__["default"].EmojiFormattedContent, null, username);
     var dropdowns = this.props.dropdowns ? this.props.dropdowns : [];
     var noContextMenu = this.props.noContextMenu ? this.props.noContextMenu : "";
     var noContextButton = this.props.noContextButton ? this.props.noContextButton : "";
@@ -6181,7 +6181,7 @@ class ContactCard extends _mixins1__._p {
         noContextMenu: noContextMenu,
         contact: contact,
         className: "light",
-        label: username,
+        label: escapedUsername,
         chatRoom: this.props.chatRoom,
         dropdownRemoveButton: dropdownRemoveButton
       });
@@ -6199,9 +6199,9 @@ class ContactCard extends _mixins1__._p {
         }
 
         if (matches.length > 0) {
-          username = react0().createElement("span", {
+          escapedUsername = react0().createElement("span", {
             dangerouslySetInnerHTML: {
-              __html: megaChat.highlight(username, matches, false)
+              __html: megaChat.highlight(megaChat.plugins.emoticonsFilter.processHtmlMessage(escapeHTML(username)), matches, true)
             }
           });
         }
@@ -6212,11 +6212,11 @@ class ContactCard extends _mixins1__._p {
           className: "user-card-name light simpletip",
           "data-simpletip": contact.m,
           "data-simpletipposition": "top"
-        }, username);
+        }, escapedUsername);
       } else {
         usernameBlock = react0().createElement("div", {
           className: "user-card-name light"
-        }, username);
+        }, escapedUsername);
       }
     }
 

@@ -175,6 +175,7 @@ describe("mega.utils.trans", function() {
                     placeholderItemList.push(`$${k}`);
                 }
                 var id = langMap[locale] + ":" + x;
+                window.lang = window.lang === 'en-GB' ? 'en' : window.lang;
                 var translated = trans.listToString(placeholderItemList, "%s");
 
                 // console.error(JSON.stringify({

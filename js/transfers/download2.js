@@ -1466,7 +1466,9 @@ var dlmanager = {
                 delay('overquota:retry', () => this._onQuotaRetry(), timeLeft * 1000);
             }
 
-            let $dlPageCountdown = $('.transfer-overquota-txt', $dialog).text(String(l[7100]).replace('%1', ''));
+            let $dlPageCountdown = $('.download.transfer-overquota-txt', 'body')
+                .text(String(l[7100]).replace('%1', ''));
+
             if (!$dlPageCountdown.is(':visible')) {
                 $dlPageCountdown = null;
             }

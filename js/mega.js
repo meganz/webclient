@@ -1173,7 +1173,7 @@ scparser.$add('k', function(a) {
     if (a.cr) {
         crypto_proccr(a.cr);
     }
-    else if (!pfid) {
+    else if (!pfid && a.n) {
         if (!sckeyrequest[a.h]) {
             sckeyrequest[a.h] = [];
         }

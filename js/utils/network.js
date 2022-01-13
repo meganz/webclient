@@ -278,6 +278,13 @@ function eventlog(id, msg, once) {
 
         if (msg) {
             req.m = String(msg);
+
+            if (req.m.length > 666) {
+                if (d) {
+                    console.error('The message provided for %s is too large...', id, [req.m]);
+                }
+                delete req.m;
+            }
         }
 
         if (!once || !eventlog.sent[id]) {

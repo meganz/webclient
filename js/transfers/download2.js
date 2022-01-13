@@ -804,23 +804,35 @@ var dlmanager = {
                 var attr = dec_attr(ab, key);
 
                 if (typeof attr === 'object' && typeof attr.n === 'string') {
-
-                    const misThumb = !res.fa
-                        || !String(res.fa).includes(':0*')
-                        || !String(res.fa).includes(':1*')
-                        || ctx.object.preview === -1;
+                    const minSize = 1e3;
 
                     if (d) {
-                        this.logger.warn('[%s] Missing thumb/prev, may try to generate...', attr.n, [res], [attr]);
+                        console.assert(res.s > minSize || !ctx.object.preview, 'What are we previewing?');
                     }
 
-                    if (page !== 'download' && misThumb && !sessionStorage.gOOMtrap) {
+                    if (page !== 'download'
+                        && (
+                            !res.fa
+                            || !String(res.fa).includes(':0*')
+                            || !String(res.fa).includes(':1*')
+                            || ctx.object.preview === -1
+                        )
+                        && res.s > minSize
+                        && !sessionStorage.gOOMtrap) {
+
                         const image = is_image(attr.n);
                         const audio = !image && is_audio(attr.n);
                         const video = !audio && is_video(attr.n);
                         const limit = 96 * 1048576;
 
-                        if (res.s < limit || video) {
+                        if (res.s < limit && (image || audio) || video) {
+                            // eslint-disable-next-line max-depth
+                            if (d) {
+                                this.logger.warn(
+                                    '[%s] Missing thumb/prev, will try to generate...', attr.n, [res], [attr]
+                                );
+                            }
+
                             tryCatch(() => {
                                 Object.defineProperty(ctx.object, 'misThumbData', {
                                     writable: true,

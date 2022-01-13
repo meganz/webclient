@@ -28187,7 +28187,7 @@ class FMView extends mixins.wl {
       if (handle === 'shares') {
         newState.isLoading = true;
         this.setState(newState);
-        dbfetch.geta(Object.keys(M.c.shares || {}), new MegaPromise()).done(() => {
+        dbfetch.geta(Object.keys(M.c.shares || {})).always(() => {
           this.finishedLoading(newState);
         });
         return;

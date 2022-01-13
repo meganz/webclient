@@ -264,11 +264,7 @@
     height: auto;
 }
 .chat-right-area .link-button.light.push-settings-button > span:first-of-type {
-    width: calc(100% - 80px);
-    padding: 0 0 0 4px;
-    text-overflow: ellipsis;
-    overflow: hidden;
-    white-space: nowrap;
+    width: calc(100% - 100px);
 }
 .chat-right-area .link-button.push-settings-button span.label--green {
     display: block;
@@ -278,6 +274,9 @@
 .chat-right-area .link-button.push-settings-button span.label--green strong {
     color: var(--label-green);
     font: var(--text-body1-bold);
+}
+.chat-right-area .link-button.clear-history-button {
+    height: auto;
 }
 .chat-right-area .link-button.history-retention-btn {
     height: 53px;

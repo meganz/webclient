@@ -511,24 +511,17 @@ export class ConversationRightArea extends MegaRenderMixin {
                             {pushSettingsBtn}
                             {endCallButton}
 
-                            <div
-                                className={`
-                                    link-button
-                                    light
-                                    ${dontShowTruncateButton || !room.members.hasOwnProperty(u_handle) ?
-                                    'disabled' : ''}
-                                `}
-                                onClick={e => {
-                                    if ($(e.target).closest('.disabled').length > 0) {
-                                        return false;
-                                    }
+                            <Button
+                                className="link-button light clear-history-button"
+                                disabled={dontShowTruncateButton || !room.members.hasOwnProperty(u_handle)}
+                                onClick={() => {
                                     if (self.props.onTruncateClicked) {
                                         self.props.onTruncateClicked();
                                     }
                                 }}>
                                 <i className="sprite-fm-mono icon-remove" />
-                                <span>{l[8871] /* `Clear Chat History` */}</span>
-                            </div>
+                                <span className="accordion-clear-history-text">{l[8871] /* Clear Chat History */}</span>
+                            </Button>
 
                                 {retentionHistoryBtn}
 

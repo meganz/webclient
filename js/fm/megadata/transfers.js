@@ -1042,10 +1042,10 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders, target) 
     if (u.length > 999 && !ignoreWarning && !localStorage[flag]) {
         var showMEGAsyncDialog = function(button, syncData) {
             $('.download-button.download').safeHTML(button);
-            $('.megasync-upload-overlay').show();
+            $('.megasync-upload-overlay').removeClass('hidden');
             var $chk = $('.megasync-upload-overlay .checkdiv');
             var hideMEGAsyncDialog = function() {
-                $('.megasync-upload-overlay').hide();
+                $('.megasync-upload-overlay').addClass('hidden');
                 $(document).off('keyup.megasync-upload');
                 $('.download-button.continue, .fm-dialog-close').off('click');
                 $('.download-button.download').off('click');
@@ -1083,6 +1083,12 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders, target) 
                     delete localStorage[flag];
                 }
             });
+
+            delay('msDialog.timer', () => {
+                if (!elementIsVisible(document.querySelector('.megasync-upload-overlay'))) {
+                    onclick();
+                }
+            }, 2000);
         };
         dlmanager.isMEGAsyncRunning('3.0', 1)
             .done(function(ms, syncData) {

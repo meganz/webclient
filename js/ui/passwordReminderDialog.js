@@ -767,7 +767,7 @@
             unixtime() - self.passwordReminderAttribute.lastLogin > SHOW_AFTER_LASTLOGIN*/
         ) {
             if (
-                is_fm() &&
+                page !== 'start' && is_fm() &&
                 !pfid/* &&
                 (
                     !self.passwordReminderAttribute.lastSkipped ||

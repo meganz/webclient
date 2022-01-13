@@ -7,10 +7,11 @@
  * @param {Object} n The ufs-like node.
  * @param {String} [dialog] dialog identifier or force rebuild constant.
  * @param {String} [stype] what to sort.
- * @param {Number} [sDeepIndex] Internal use
+ * @param {Object} [sSubMap] Internal use
  * @returns {MegaPromise}
  */
-MegaData.prototype.buildtree = function(n, dialog, stype, sDeepIndex) {
+// eslint-disable-next-line complexity
+MegaData.prototype.buildtree = function(n, dialog, stype, sSubMap) {
     'use strict'; /* jshint -W074, -W073 */
 
     if (!n) {
@@ -44,6 +45,7 @@ MegaData.prototype.buildtree = function(n, dialog, stype, sDeepIndex) {
     };
     var labelhash = [];
     var cvtree = {};
+    var firstRun = sSubMap === undefined;
 
     /*
      * XXX: Initially this function was designed to render new nodes only,
@@ -63,8 +65,10 @@ MegaData.prototype.buildtree = function(n, dialog, stype, sDeepIndex) {
         _tf = M.filterTreePanel[stype + '-label'];
     }
 
-    if (!sDeepIndex) {
-        sDeepIndex = 0;
+    if (firstRun) {
+
+        sSubMap = 0;
+        firstRun = true;
 
         if (d) {
             console.time('buildtree');
@@ -72,7 +76,7 @@ MegaData.prototype.buildtree = function(n, dialog, stype, sDeepIndex) {
     }
 
     /* eslint-disable local-rules/jquery-replacements */
-    if (n.h === M.RootID && !sDeepIndex) {
+    if (n.h === M.RootID && !sSubMap) {
         var wrapperClass = '.js-myfile-tree-panel';
 
         if (folderlink) {
@@ -394,16 +398,18 @@ MegaData.prototype.buildtree = function(n, dialog, stype, sDeepIndex) {
                     if (node) {
                         node.classList.add('tree-item-on-search-hidden');
                     }
-
-                    // TODO: calculate the actual deepest folder and base this on it.
-                    buildnode = sDeepIndex < 6;
                 }
                 else {
-                    buildnode = false;
                     $(document.getElementById(_a + curItemHandle))
                         .parents('li').removeClass('tree-item-on-search-hidden').each(expand)
                         .parents('ul').addClass('opened');
                 }
+
+                if (firstRun) {
+                    sSubMap = this.getSearchedTreeHandles(curItemHandle, _ts_l);
+                }
+
+                buildnode = sSubMap[curItemHandle];
             }
 
             if (_tf && _tf[folders[idx].lbl]) {
@@ -411,7 +417,7 @@ MegaData.prototype.buildtree = function(n, dialog, stype, sDeepIndex) {
             }
             // need to add function for hide parent folder for color
             if (buildnode) {
-                M.buildtree(folders[idx], dialog, stype, sDeepIndex + 1);
+                M.buildtree(folders[idx], dialog, stype, sSubMap);
             }
         }// END of for folders loop
 
@@ -427,7 +433,7 @@ MegaData.prototype.buildtree = function(n, dialog, stype, sDeepIndex) {
         console.groupEnd();
     }
 
-    if (!sDeepIndex) {
+    if (firstRun) {
         if (d) {
             console.timeEnd('buildtree');
         }
@@ -436,6 +442,53 @@ MegaData.prototype.buildtree = function(n, dialog, stype, sDeepIndex) {
             mBroadcaster.sendMessage('treesearch', _ts_l, stype);
         }
     }
+};
+
+/**
+ * getSearchedTreeHandles
+ *
+ * Search tree of given handle and return object of subfolders that has name contains search terms,
+ * Value of the result is shown how deep the subfolder is located from given parent node(handle).
+ * this will return empty object if search result is empty.
+ *
+ * @param {String} [h] Parent node handle to starts search.
+ * @param {String} [term] Search term.
+ * @param {Number} [deepness] Internal use
+ * @returns {Object}
+ */
+
+MegaData.prototype.getSearchedTreeHandles = function(h, term, deepness, res) {
+
+    "use strict";
+
+    if (!deepness) {
+        deepness = 1;
+    }
+
+    res = res || Object.create(null);
+
+    if (!M.tree[h]) {
+        return res;
+    }
+
+    if (deepness === 1) {
+        term = term.toLowerCase();
+    }
+
+    const fHandles = Object.keys(M.tree[h]);
+
+    for (let i = fHandles.length; i--;) {
+
+        this.getSearchedTreeHandles(fHandles[i], term, deepness + 1, res);
+
+        if (res[fHandles[i]] || M.tree[h][fHandles[i]].name.toLowerCase().includes(term)) {
+
+            res[h] = deepness;
+            res[fHandles[i]] = deepness + 1;
+        }
+    }
+
+    return res;
 };
 
 MegaData.prototype.buildtree.FORCE_REBUILD = 34675890009;

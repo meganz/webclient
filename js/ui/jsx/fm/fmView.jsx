@@ -256,8 +256,8 @@ export default class FMView extends MegaRenderMixin {
                 newState.isLoading = true;
                 this.setState(newState);
 
-                dbfetch.geta(Object.keys(M.c.shares || {}), new MegaPromise())
-                    .done(() => {
+                dbfetch.geta(Object.keys(M.c.shares || {}))
+                    .always(() => {
                         this.finishedLoading(newState);
                     });
                 return;

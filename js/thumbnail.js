@@ -131,8 +131,9 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
         return {thumbnail, preview};
     };
 
+    let typeGuess;
+    const ext = fileext(file && file.name || n.name);
     return (async() => {
-        const ext = fileext(file && file.name || n.name);
         const exifFromImage = !!exifImageRotation.fromImage;
 
         // @todo move all this to a reusable helper across upload/download
@@ -151,7 +152,7 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
                 imagedata = await Streamer.getThumbnail(file).catch(nop) || imagedata;
             }
         }
-        else if (isRawImage && !exifFromImage) {
+        else if (isRawImage && exifFromImage) {
             // We don't need to rotate images ourselves, so we will decode it into a worker.
             if (d) {
                 debug('Leaving %s image decoding to worker...', isRawImage);
@@ -169,6 +170,11 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
             source = await webgl.getRotatedImageData(source);
         }
 
+        typeGuess = source.type || (await webgl.identify(source)).type || 'unknown';
+        if (d) {
+            debug(`Source guessed to be ${typeGuess}...`, [source]);
+        }
+
         const res = store(await webgl.worker('scissor', {source, createPreview, createThumbnail}));
 
         if (d) {
@@ -184,10 +190,11 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
         sendToPreview(node);
         mBroadcaster.sendMessage('fa:error', id, ex, false, 2);
 
-        if (!window.pfid && canStoreAttr) {
+        if (!window.pfid && canStoreAttr && String(typeGuess).startsWith('image/')) {
             eventlog(99665, JSON.stringify([
-                1,
+                2,
                 ext,
+                typeGuess,
                 String(ex && ex.message || ex).split('\n')[0].substr(0, 64),
                 fa.includes(':8*') && String(MediaAttribute.getCodecStrings(n)) || 'na'
             ]));

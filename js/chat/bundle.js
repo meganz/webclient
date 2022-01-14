@@ -15459,23 +15459,36 @@ var meetings_button = __webpack_require__(193);
 
 
 class ModeSwitch extends mixins.wl {
-  constructor(props) {
-    super(props);
+  constructor() {
+    super(...arguments);
     this.containerRef = external_React_default().createRef();
     this.state = {
       expanded: false
     };
 
-    this.toggleEvents = () => this.state.expanded ? $(document).rebind("mousedown." + ModeSwitch.NAMESPACE, ev => !this.containerRef.current.contains(ev.target) && this.doToggle()).rebind("keydown." + ModeSwitch.NAMESPACE, _ref => {
+    this.handleMousedown = _ref => {
+      var _this$containerRef;
+
+      let {
+        target
+      } = _ref;
+      return (_this$containerRef = this.containerRef) != null && _this$containerRef.current.contains(target) ? null : this.doClose();
+    };
+
+    this.handleKeydown = _ref2 => {
       let {
         keyCode
-      } = _ref;
-      return keyCode && keyCode === 27 && this.doToggle();
-    }) : $(document).unbind("." + ModeSwitch.NAMESPACE);
+      } = _ref2;
+      return keyCode && keyCode === 27 && this.doClose();
+    };
+
+    this.doClose = () => this.setState({
+      expanded: false
+    });
 
     this.doToggle = () => this.setState(state => ({
       expanded: !state.expanded
-    }), () => this.toggleEvents());
+    }));
 
     this.getModeIcon = mode => {
       switch (mode) {
@@ -15504,11 +15517,11 @@ class ModeSwitch extends mixins.wl {
       }));
     };
 
-    this.Option = _ref2 => {
+    this.Option = _ref3 => {
       let {
         label,
         mode
-      } = _ref2;
+      } = _ref3;
       return external_React_default().createElement("div", {
         className: "\n                    " + ModeSwitch.BASE_CLASS + "-option\n                    " + (mode === this.props.mode ? 'active' : '') + "\n                ",
         onClick: () => {
@@ -15521,16 +15534,30 @@ class ModeSwitch extends mixins.wl {
     };
   }
 
+  componentWillUnmount() {
+    super.componentWillUnmount();
+    document.removeEventListener('mousedown', this.handleMousedown);
+    document.removeEventListener('keydown', this.handleKeydown);
+  }
+
+  componentDidMount() {
+    super.componentDidMount();
+    document.addEventListener('mousedown', this.handleMousedown);
+    document.addEventListener('keydown', this.handleKeydown);
+  }
+
   render() {
     const {
       Toggle,
-      Option
+      Option,
+      containerRef,
+      state
     } = this;
     return external_React_default().createElement("div", {
-      ref: this.containerRef,
+      ref: containerRef,
       className: ModeSwitch.BASE_CLASS
     }, external_React_default().createElement(Toggle, null), external_React_default().createElement("div", {
-      className: "\n                        " + ModeSwitch.BASE_CLASS + "-menu\n                        " + (this.state.expanded ? 'expanded' : '') + "\n                    "
+      className: "\n                        " + ModeSwitch.BASE_CLASS + "-menu\n                        " + (state.expanded ? 'expanded' : '') + "\n                    "
     }, external_React_default().createElement(Option, {
       label: l.main_view,
       mode: Call.MODE.SPEAKER

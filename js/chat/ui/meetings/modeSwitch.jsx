@@ -9,26 +9,17 @@ export default class ModeSwitch extends MegaRenderMixin {
 
     containerRef = React.createRef();
 
-    constructor(props) {
-        super(props);
-    }
-
     state = {
         expanded: false
     };
 
-    toggleEvents = () =>
-        this.state.expanded ?
-            $(document)
-                .rebind(`mousedown.${ModeSwitch.NAMESPACE}`, ev =>
-                    !this.containerRef.current.contains(ev.target) && this.doToggle()
-                )
-                .rebind(`keydown.${ModeSwitch.NAMESPACE}`, ({ keyCode }) =>
-                    keyCode && keyCode === 27 /* ESC */ && this.doToggle()
-                ) :
-            $(document).unbind(`.${ModeSwitch.NAMESPACE}`);
+    handleMousedown = ({ target }) => this.containerRef?.current.contains(target) ? null : this.doClose();
 
-    doToggle = () => this.setState(state => ({ expanded: !state.expanded }), () => this.toggleEvents());
+    handleKeydown = ({ keyCode }) => keyCode && keyCode === 27 /* ESC */ && this.doClose();
+
+    doClose = () => this.setState({ expanded: false });
+
+    doToggle = () => this.setState(state => ({ expanded: !state.expanded }));
 
     getModeIcon = mode => {
         switch (mode) {
@@ -76,18 +67,29 @@ export default class ModeSwitch extends MegaRenderMixin {
         );
     };
 
-    render() {
-        const { Toggle, Option } = this;
+    componentWillUnmount() {
+        super.componentWillUnmount();
+        document.removeEventListener('mousedown', this.handleMousedown);
+        document.removeEventListener('keydown', this.handleKeydown);
+    }
 
+    componentDidMount() {
+        super.componentDidMount();
+        document.addEventListener('mousedown', this.handleMousedown);
+        document.addEventListener('keydown', this.handleKeydown);
+    }
+
+    render() {
+        const { Toggle, Option, containerRef, state } = this;
         return (
             <div
-                ref={this.containerRef}
+                ref={containerRef}
                 className={ModeSwitch.BASE_CLASS}>
                 <Toggle />
                 <div
                     className={`
                         ${ModeSwitch.BASE_CLASS}-menu
-                        ${this.state.expanded ? 'expanded' : ''}
+                        ${state.expanded ? 'expanded' : ''}
                     `}>
                     <Option label={l.main_view /* `Main view` */} mode={Call.MODE.SPEAKER} />
                     <Option label={l.thumbnail_view /* `Thumbnail view` */} mode={Call.MODE.THUMBNAIL} />

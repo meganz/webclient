@@ -493,6 +493,8 @@ function init_page() {
             init();
         }
 
+        mega.ui.theme.setWithUA();
+
         return;
     }
     is_chatlink = false;
@@ -1899,8 +1901,7 @@ function init_page() {
 
         // Set System default theme or any previously selected
         if (!is_mobile) {
-            var theme = u_attr && u_attr['^!webtheme'] !== undefined ? u_attr['^!webtheme'] : 0;
-            mega.ui.theme.set(theme);
+            mega.ui.theme.setWithUA();
         }
 
         if (!id && fminitialized) {

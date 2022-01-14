@@ -1041,10 +1041,14 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders, target) 
 
     if (u.length > 999 && !ignoreWarning && !localStorage[flag]) {
         var showMEGAsyncDialog = function(button, syncData) {
+            const tag = `addUpload.${makeUUID()}`;
+
             $('.download-button.download').safeHTML(button);
             $('.megasync-upload-overlay').removeClass('hidden');
+
             var $chk = $('.megasync-upload-overlay .checkdiv');
             var hideMEGAsyncDialog = function() {
+                delay.cancel(tag);
                 $('.megasync-upload-overlay').addClass('hidden');
                 $(document).off('keyup.megasync-upload');
                 $('.download-button.continue, .fm-dialog-close').off('click');
@@ -1084,7 +1088,7 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders, target) 
                 }
             });
 
-            delay('msDialog.timer', () => {
+            delay(tag, () => {
                 if (!elementIsVisible(document.querySelector('.megasync-upload-overlay'))) {
                     onclick();
                 }

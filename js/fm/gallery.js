@@ -10,6 +10,7 @@ class MegaGallery {
         this.contentRowTemplateNode = document.getElementById('gallery-cr-template');
         this.blockTemplateNode = document.getElementById('gallery-dbv-template');
         this.updNode = {};
+        this.shouldProcessScroll = true;
     }
 
     get onpage() {
@@ -56,6 +57,35 @@ class MegaGallery {
         }
     }
 
+    findMiddleImage() {
+        const $blockViews = $(".MegaDynamicList .data-block-view", this.galleryBlock);
+        const contentOffset = this.dynamicList.$content.offset();
+        const listContainerHeight = this.dynamicList.$listContainer.height();
+
+        let $middleBlock = null;
+        let minDistance = 1e6;
+
+        const scrollTop = this.dynamicList.getScrollTop();
+
+        for (const v of $blockViews) {
+            const $v = $(v);
+
+            if ($v.offset().left < contentOffset.left + 5) {
+                const {blockSize, blockTop} = this.getBlockTop($v.attr('id'));
+                const middle = blockTop + blockSize / 2 - scrollTop;
+                const distance = Math.abs(listContainerHeight / 2 - middle);
+
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    $middleBlock = $v;
+                }
+            }
+
+        }
+
+        return $middleBlock;
+    }
+
     setZoom(type) {
 
         const min = 1;
@@ -66,10 +96,6 @@ class MegaGallery {
             console.error('MegaGallery: None supporting zoom level provided.');
 
             return;
-        }
-
-        if (this.dynamicList) {
-            this.throttledOnScroll();
         }
 
         if (this.mode !== 'a') {
@@ -1154,6 +1180,11 @@ class MegaGallery {
         });
 
         $('.gallery-view-zoom-control > button', this.galleryBlock).rebind('click.galleryZoom', e => {
+            e.stopPropagation();
+
+            if (!this.$middleBlock) {
+                this.$middleBlock = this.findMiddleImage();
+            }
 
             if (e.currentTarget.classList.contains('disabled')) {
                 return false;
@@ -1166,7 +1197,16 @@ class MegaGallery {
             }
 
             this.dynamicList.itemRenderChanged(false, true);
-            this.dynamicList.scrollToYPosition(this.scrollPosCache[this.mode].s * this.dynamicList.$content.height());
+
+            if (this.$middleBlock) {
+                const listContainerHeight = this.dynamicList.$listContainer.height();
+                const {blockSize, blockTop} = this.getBlockTop(this.$middleBlock.attr('id'));
+                this.shouldProcessScroll = false;
+                this.dynamicList.scrollToYPosition(blockTop - (listContainerHeight - blockSize) / 2);
+            }
+
+            return false;
+
         });
 
         if (!this.beforePageChangeListener) {
@@ -1383,6 +1423,33 @@ class MegaGallery {
         return elm;
     }
 
+    getBlockTop(id) {
+        const keys = Object.keys(this.activeModeList).sort((a, b) => b - a);
+        let height = 0;
+        let blockSize = 0;
+        for (const key of keys) {
+            const group = this.getGroupById(key);
+            const index = group.n.indexOf(id);
+            if (index === -1) {
+                height += this.getGroupHeight(key);
+            }
+            else {
+                const maxItems = {1: 3, 2: 5, 3: 10, 4: 15};
+                const maxItemsInRow = maxItems[this.zoom];
+                blockSize = this.dynamicList.$content.width() / maxItemsInRow;
+                height += Math.floor(index / maxItemsInRow) * blockSize;
+                return {
+                    blockSize: blockSize,
+                    blockTop: height
+                };
+            }
+        }
+        return {
+            blockSize: blockSize,
+            blockTop: height
+        };
+    }
+
     getGroupHeight(id) {
 
         const wrapWidth = Math.max(Math.min(this.dynamicList.$content.width(), 820), 620);
@@ -1569,6 +1636,14 @@ class MegaGallery {
     throttledOnScroll() {
 
         delay('gallery.onScroll', () => {
+
+            if (!this.shouldProcessScroll) {
+                this.shouldProcessScroll = true;
+                return;
+            }
+
+            this.$middleBlock = null;
+
             if (this.dynamicList) {
 
                 const actualScrollPos = this.dynamicList.getScrollTop();

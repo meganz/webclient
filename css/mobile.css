@@ -14685,6 +14685,7 @@ body.landscape .upload-overlay .mobile.filetype-img {
     display: flex;
     flex-direction: column;
     align-items: center;
+    width: 100%;
 }
 .download.icon-error {
     float: left;
@@ -14729,6 +14730,9 @@ body.landscape .upload-overlay .mobile.filetype-img {
 }
 .download .links-block {
     padding: 16px;
+    max-width: 460px;
+    margin: 0 auto;
+    width: 100%;
 }
 .decrypt-page {
     height: calc(100% - 116px);

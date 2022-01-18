@@ -362,7 +362,7 @@ var mobile = {
 
         'use strict';
 
-        var $otherPages = $('#fmholder > div');
+        var $otherPages = $('#fmholder > div:not(.top-menu-popup)');
         var $cloudDrive = $('.mobile.file-manager-block');
 
         // If logged in

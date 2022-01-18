@@ -20620,7 +20620,7 @@ class JoinCallNotification extends mixins.wl {
         className: "in-call-notif yellow join"
       }, external_React_default().createElement("i", {
         className: "sprite-fm-mono icon-phone"
-      }), "There is an active call in this room, but your browser does not support calls.");
+      }), l.active_call_not_supported);
     }
 
     return external_React_default().createElement("div", {

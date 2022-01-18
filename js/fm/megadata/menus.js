@@ -247,6 +247,11 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
                     }
                 }
             }
+
+            // If the selected folder contains any versioning show clear version
+            if (selNode.tvf && M.getNodeRights(selNode.h) > 1) {
+                items['.clearprevious-versions'] = 1;
+            }
         }
         else {
             if ((selNode.tvf > 0) && !folderlink) {

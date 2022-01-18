@@ -22626,8 +22626,8 @@ class searchField_SearchField extends mixins.wl {
     }, external_React_default().createElement("i", {
       className: "sprite-fm-mono icon-preview-reveal search-icon-find"
     }), external_React_default().createElement("input", {
-      type: "text",
-      autoComplete: "disabled",
+      type: "search",
+      autoComplete: "off",
       placeholder: l[102],
       ref: searchField_SearchField.inputRef,
       value: value,
@@ -22662,6 +22662,8 @@ searchField_SearchField.select = () => {
 searchField_SearchField.focus = () => searchField_SearchField.inputRef && searchField_SearchField.inputRef.current && searchField_SearchField.inputRef.current.focus();
 
 searchField_SearchField.hasValue = () => searchField_SearchField.inputRef && searchField_SearchField.inputRef.current && !!searchField_SearchField.inputRef.current.value.length;
+
+searchField_SearchField.isVisible = () => searchField_SearchField.inputRef && searchField_SearchField.inputRef.current && elementIsVisible(searchField_SearchField.inputRef.current);
 ;// CONCATENATED MODULE: ./js/chat/ui/searchPanel/searchPanel.jsx
 
 
@@ -22756,17 +22758,21 @@ class SearchPanel extends mixins.wl {
     };
 
     this.handleChange = ev => {
-      const value = ev.target.value;
-      const searching = value.length > 0;
-      this.doDestroy();
-      this.setState({
-        value,
-        searching,
-        status: undefined,
-        isFirstQuery: true,
-        results: []
-      }, () => searching && delay('chat-search', () => this.doSearch(value, false), 1600));
-      this.wrapperRef.scrollToY(0);
+      if (searchField_SearchField.isVisible()) {
+        const {
+          value
+        } = ev.target;
+        const searching = value.length > 0;
+        this.doDestroy();
+        this.setState({
+          value,
+          searching,
+          status: undefined,
+          isFirstQuery: true,
+          results: []
+        }, () => searching && delay('chat-search', () => this.doSearch(value, false), 1600));
+        this.wrapperRef.scrollToY(0);
+      }
     };
 
     this.handleToggle = () => {

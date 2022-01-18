@@ -54,7 +54,7 @@ export default class SearchPanel extends MegaRenderMixin {
         }
         document.removeEventListener(EVENTS.RESULT_OPEN, this.toggleMinimize);
         document.removeEventListener(EVENTS.KEYDOWN, this.handleKeyDown);
-    }
+    };
 
     bindEvents = () => {
         // Pause on page change
@@ -63,7 +63,7 @@ export default class SearchPanel extends MegaRenderMixin {
         // Clicked on search result
         document.addEventListener(EVENTS.RESULT_OPEN, this.toggleMinimize);
         document.addEventListener(EVENTS.KEYDOWN, this.handleKeyDown);
-    }
+    };
 
     toggleMinimize = () => {
         this.doToggle(ACTIONS.PAUSE);
@@ -106,30 +106,32 @@ export default class SearchPanel extends MegaRenderMixin {
             // Clear the text on the first `ESC` press; minimize on the second
             return SearchField.hasValue() ? this.handleReset() : this.toggleMinimize();
         }
-    }
+    };
 
     handleChange = ev => {
-        const value = ev.target.value;
-        const searching = value.length > 0;
+        if (SearchField.isVisible()) {
+            const { value } = ev.target;
+            const searching = value.length > 0;
 
-        this.doDestroy();
-        this.setState({
-            value,
-            searching,
-            // Only contacts are retrieved when the query is less than 2 characters; given that the operation is
-            // synchronous and results might be returned quickly, we don't want to show the `IN_PROGRESS` status,
-            // because `pause search` will not be available yet. Additionally, searching `CONTACTS AND CHATS`
-            // does not perform decryption in any form and the `IN_PROGRESS` status is needed only when retrieving
-            // `MESSAGES`. Hence, we do status reset to `undefined`.
-            status: undefined,
-            isFirstQuery: true,
-            results: []
-        }, () =>
-            searching && delay('chat-search', () => this.doSearch(value, false), 1600)
-        );
+            this.doDestroy();
+            this.setState({
+                value,
+                searching,
+                // Only contacts are retrieved when the query is less than 2 characters; given that the operation is
+                // synchronous and results might be returned quickly, we don't want to show the `IN_PROGRESS` status,
+                // because `pause search` will not be available yet. Additionally, searching `CONTACTS AND CHATS`
+                // does not perform decryption in any form and the `IN_PROGRESS` status is needed only when retrieving
+                // `MESSAGES`. Hence, we do status reset to `undefined`.
+                status: undefined,
+                isFirstQuery: true,
+                results: []
+            }, () =>
+                searching && delay('chat-search', () => this.doSearch(value, false), 1600)
+            );
 
-        this.wrapperRef.scrollToY(0);
-    }
+            this.wrapperRef.scrollToY(0);
+        }
+    };
 
     handleToggle = () => {
         const inProgress = this.state.status === STATUS.IN_PROGRESS;

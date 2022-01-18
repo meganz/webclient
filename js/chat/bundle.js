@@ -8039,7 +8039,7 @@ class ContactProfile extends mixins.wl {
           className: "profile-credentials"
         }, external_React_default().createElement("span", {
           className: "credentials-head"
-        }, "Authenticity Credentials"), external_React_default().createElement("div", {
+        }, l[6872]), external_React_default().createElement("div", {
           className: "credentials-fingerprints"
         }, ContactsPanel.getUserFingerprint(handle)), external_React_default().createElement("button", {
           className: "\n                            mega-button\n                            small\n                            " + (IS_VERIFIED ? '' : 'positive') + "\n                        ",

@@ -71,6 +71,7 @@ export default class Join extends MegaRenderMixin {
             sessionStorage.guestForced = true;
             location.reload();
         };
+        const msgFragments = l.ephemeral_data_lost.split(/\[A]|\[\/A]/);
 
         return (
             <ModalDialogsUI.ModalDialog
@@ -85,7 +86,8 @@ export default class Join extends MegaRenderMixin {
                 ]}
                 onClose={onCancel}>
                 <p>
-                    {l.ephemeral_data_lost} <a href="#" onClick={() => loadSubPage('register')}>{l[1076]}</a>.
+                    {msgFragments[0]}<a href="#" onClick={
+                        () => loadSubPage('register')}>{msgFragments[1]}</a>{msgFragments[2]}
                 </p>
             </ModalDialogsUI.ModalDialog>
         );

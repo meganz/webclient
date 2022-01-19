@@ -20311,6 +20311,7 @@ class Join extends mixins.wl {
         ephemeralDialog: false
       });
 
+      const msgFragments = l.ephemeral_data_lost.split(/\[A]|\[\/A]/);
       return external_React_default().createElement(modalDialogs.Z.ModalDialog, {
         name: "end-ephemeral",
         dialogType: "message",
@@ -20332,10 +20333,10 @@ class Join extends mixins.wl {
           }
         }],
         onClose: onCancel
-      }, external_React_default().createElement("p", null, l.ephemeral_data_lost, " ", external_React_default().createElement("a", {
+      }, external_React_default().createElement("p", null, msgFragments[0], external_React_default().createElement("a", {
         href: "#",
         onClick: () => loadSubPage('register')
-      }, l[1076]), "."));
+      }, msgFragments[1]), msgFragments[2]));
     };
 
     this.Head = () => {

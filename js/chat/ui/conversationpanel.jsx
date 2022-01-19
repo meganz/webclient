@@ -42,7 +42,9 @@ export class JoinCallNotification extends MegaRenderMixin {
             return (
                 <div className="in-call-notif yellow join">
                     <i className="sprite-fm-mono icon-phone"/>
-                    There is an active call in this room, but your browser does not support calls.
+                    {/* There is an active call in this room, but your browser does not support calls. */
+                        l.active_call_not_supported
+                    }
                 </div>
             );
         }

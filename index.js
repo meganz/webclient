@@ -493,6 +493,8 @@ function init_page() {
             init();
         }
 
+        mega.ui.theme.setWithUA();
+
         return;
     }
     is_chatlink = false;
@@ -1899,8 +1901,7 @@ function init_page() {
 
         // Set System default theme or any previously selected
         if (!is_mobile) {
-            var theme = u_attr && u_attr['^!webtheme'] !== undefined ? u_attr['^!webtheme'] : 0;
-            mega.ui.theme.set(theme);
+            mega.ui.theme.setWithUA();
         }
 
         if (!id && fminitialized) {
@@ -2217,13 +2218,6 @@ function topbarUI(holderId) {
         }
         else if (this.classList.contains('logout')) {
             mLogout();
-        }
-        else if (this.classList.contains('feedback')) {
-            window.open(
-                'https://survey.mega.co.nz/index.php?r=survey/index&sid=271537&lang=en/c1',
-                '_blank',
-                'noopener,noreferrer'
-            );
         }
 
         var dropdown = document.getElementsByClassName('js-dropdown-account');

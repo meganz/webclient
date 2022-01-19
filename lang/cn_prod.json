@@ -4598,6 +4598,7 @@
     "achievement_meta_title": "\u6210\u5c31\u5956\u52b1 - MEGA",
     "achievement_not_working_note": "\u63d0\u793a",
     "achievm_invitefrddesc": "\u9080\u8bf7\u60a8\u7684\u597d\u53cb\u6216\u5de5\u4f5c\u4f19\u4f34\u52a0\u5165MEGA\u3002\u6bcf\u6709\u4e00\u4e2a\u53d7\u9080\u7528\u6237\u5b8c\u6210\u6ce8\u518c\u5e76\u5b89\u88c5MEGA\u684c\u9762App\u6216MEGA\u624b\u673aApp\u540e\uff0c\u60a8\u4f1a\u83b7\u5f975GB\u514d\u8d39\u5b58\u50a8\u7a7a\u95f4\uff0c\u6709\u6548\u671f\u4e3a365\u5929\u3002",
+    "active_call_not_supported": "There is an active call in this room, but your browser does not support calls.",
     "add": "\u6dfb\u52a0",
     "additional_quota": "\u989d\u5916",
     "additional_storage": "%1TB\u989d\u5916\u5b58\u50a8\u7a7a\u95f4",

@@ -142,7 +142,7 @@ function initMegasync() {
     $('.copy-install-guide-icon', $content)
         .rebind('click', function() {
             var $this = $(this);
-            if (copyToClipboard($('.install-guide', $this.closest('.install-guide-text')).text())) {
+            if (copyToClipboard($('.install-guide-copyable', $this.closest('.install-guide-text')).text())) {
                 $this.removeClass('active');
                 var $icon = $('.copy-line-icon', $this);
                 if (!$icon.hasClass('active')) {
@@ -212,7 +212,8 @@ function changeLinux(linuxsync, i) {
             .removeClass('disabled')
             .attr('data-link', syncurl);
 
-        $('.install-guide-text span.install-guide').text(linuxsync[i].help_text);
+        $('.install-guide-text span.install-guide').safeHTML(l.desktop_install_guide
+            .replace('%1', `<span class="install-guide-copyable">${escapeHTML(linuxsync[i].help_text)}</span>`));
 
         mBroadcaster.sendMessage('megasync-linux-distro-selected', syncurl);
         syncsel = i;

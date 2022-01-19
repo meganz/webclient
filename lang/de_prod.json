@@ -4598,6 +4598,7 @@
     "achievement_meta_title": "Bonusprogramm - MEGA",
     "achievement_not_working_note": "Achtung:",
     "achievm_invitefrddesc": "Laden Sie so viele Freunde und Kollegen ein, wie Sie m\u00f6chten. F\u00fcr jede Anmeldung unter einer eingeladenen Adresse erhalten Sie 5 GB kostenlosen Speicherplatz, g\u00fcltig f\u00fcr 365 Tage, sofern der neue Nutzer MEGAsync oder eine Mobil-App installiert und MEGA regelm\u00e4\u00dfig mit ihnen nutzt.",
+    "active_call_not_supported": "There is an active call in this room, but your browser does not support calls.",
     "add": "Hinzuf\u00fcgen",
     "additional_quota": "Zus\u00e4tzlich",
     "additional_storage": "%1\u00a0TB zus\u00e4tzlicher Speicherplatz",

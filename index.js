@@ -2219,13 +2219,6 @@ function topbarUI(holderId) {
         else if (this.classList.contains('logout')) {
             mLogout();
         }
-        else if (this.classList.contains('feedback')) {
-            window.open(
-                'https://survey.mega.co.nz/index.php?r=survey/index&sid=271537&lang=en/c1',
-                '_blank',
-                'noopener,noreferrer'
-            );
-        }
 
         var dropdown = document.getElementsByClassName('js-dropdown-account');
 

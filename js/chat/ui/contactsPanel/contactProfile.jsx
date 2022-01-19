@@ -107,7 +107,7 @@ export default class ContactProfile extends MegaRenderMixin {
             const IS_VERIFIED = ContactsPanel.isVerified(contact);
             return (
                 <div className="profile-credentials">
-                    <span className="credentials-head">Authenticity Credentials</span>
+                    <span className="credentials-head">{l[6872]}</span>
                     <div className="credentials-fingerprints">
                         {ContactsPanel.getUserFingerprint(handle)}
                     </div>

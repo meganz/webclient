@@ -8039,7 +8039,7 @@ class ContactProfile extends mixins.wl {
           className: "profile-credentials"
         }, external_React_default().createElement("span", {
           className: "credentials-head"
-        }, "Authenticity Credentials"), external_React_default().createElement("div", {
+        }, l[6872]), external_React_default().createElement("div", {
           className: "credentials-fingerprints"
         }, ContactsPanel.getUserFingerprint(handle)), external_React_default().createElement("button", {
           className: "\n                            mega-button\n                            small\n                            " + (IS_VERIFIED ? '' : 'positive') + "\n                        ",
@@ -20620,7 +20620,7 @@ class JoinCallNotification extends mixins.wl {
         className: "in-call-notif yellow join"
       }, external_React_default().createElement("i", {
         className: "sprite-fm-mono icon-phone"
-      }), "There is an active call in this room, but your browser does not support calls.");
+      }), l.active_call_not_supported);
     }
 
     return external_React_default().createElement("div", {

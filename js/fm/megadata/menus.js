@@ -526,13 +526,20 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
 
         if (M.currentdirid !== 'shares' && M.currentdirid !== 'out-shares') {
             // Enable upload item menu for clould-drive, don't show it for rubbish and rest of crew
-            if (M.getNodeRights(M.currentCustomView.nodeID || M.currentdirid) && (M.currentrootid !== M.RubbishID)) {
+
+            const nodeRights = M.getNodeRights(M.currentCustomView.nodeID || M.currentdirid);
+
+            if (nodeRights && (M.currentrootid !== M.RubbishID)) {
                 if (M.currentrootid === 'contacts') {
                     $(menuCMI).filter('.addcontact-item').removeClass('hidden');
                     ignoreGrideExtras = true;
                 }
                 else {
-                    $(menuCMI).filter('.fileupload-item,.newfolder-item,.newfile-item').removeClass('hidden');
+                    $(menuCMI).filter('.fileupload-item,.newfolder-item').removeClass('hidden');
+
+                    if (nodeRights > 1) {
+                        $(menuCMI).filter('.newfile-item').removeClass('hidden');
+                    }
 
                     if (is_chrome_firefox & 2 || 'webkitdirectory' in document.createElement('input')) {
                         $(menuCMI).filter('.folderupload-item').removeClass('hidden');

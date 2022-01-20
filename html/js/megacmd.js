@@ -2,7 +2,7 @@ var linuxClients;
 var cmdsel = false;
 var platformsel = '64';
 var linuxnameindex = {};
-var linuxurl = 'https://mega.nz/linux/MEGAsync/';
+var linuxurl = 'https://mega.nz/linux/repo/';
 var windowsurl = {
     window_x64: 'https://mega.nz/MEGAcmdSetup64.exe',
     window_x32: 'https://mega.nz/MEGAcmdSetup32.exe'

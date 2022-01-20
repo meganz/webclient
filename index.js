@@ -2161,19 +2161,11 @@ function topbarUI(holderId) {
     }
 
     if (u_type === 3 && u_attr && u_attr.fullname && (element = topbar.querySelector('.name'))) {
-        element.textContent = u_attr.fullname;
-        if (u_attr.fullname.length > 16) {
-            // If the user full name is too long, shrink and add the simpletip to show the full name
-            $(element).addClass('simpletip').attr('data-simpletip', u_attr.fullname);
-        }
+        $(element).text(u_attr.fullname).attr('data-simpletip', u_attr.fullname);
     }
 
     if (u_type && u_attr && u_attr.email && (element = topbar.querySelector('.email'))) {
-        element.textContent = u_attr.email;
-        if (u_attr.email.length > 19) {
-            // If the user email is too long, shrink and add the simpletip to show the full email
-            $(element).addClass('simpletip').attr('data-simpletip', u_attr.email);
-        }
+        $(element).text(u_attr.email).attr('data-simpletip', u_attr.email);
     }
 
     if (holderId === 'fmholder') {
@@ -2195,16 +2187,33 @@ function topbarUI(holderId) {
             });
         }
 
-        let container = this.parentNode;
+        const container = this.parentNode;
         if (container.classList.contains("show")) {
             container.classList.remove("show");
         }
         else {
-            var $accountAvatar = $('.js-account-avatar', topbar);
+            const $accountAvatar = $('.js-account-avatar', topbar);
             if (!$accountAvatar.hasClass('rendered')) {
                 $accountAvatar.addClass('rendered').safeHTML(useravatar.contact(u_handle));
             }
             container.classList.add("show");
+
+            const accountName = topbar.querySelector('span.name');
+            const accountEmail = topbar.querySelector('span.email');
+            // If the user full name is too long, shrink and add the simpletip to show the full name
+            if (accountName.scrollWidth > accountName.offsetWidth) {
+                accountName.classList.add('simpletip');
+            }
+            else {
+                accountName.classList.remove('simpletip');
+            }
+            // If the user email is too long, shrink and add the simpletip to show the full email
+            if (accountEmail.scrollWidth > accountEmail.offsetWidth) {
+                accountEmail.classList.add('simpletip');
+            }
+            else {
+                accountEmail.classList.remove('simpletip');
+            }
         }
     });
 

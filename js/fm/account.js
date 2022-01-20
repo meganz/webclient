@@ -1278,13 +1278,9 @@ accountUI.account = {
                         callback: function (res) {
                             if (res === u_handle) {
                                 $('.user-name').text(u_attr.name);
-                                $('.name', '.account-dialog').text(u_attr.fullname);
+                                $('.name', '.account-dialog').text(u_attr.fullname)
+                                    .attr('data-simpletip', u_attr.fullname);
                                 $('.top-menu-logged .name', '.top-menu-popup').text(u_attr.name);
-
-                                if (u_attr.fullname.length > 16) {
-                                    $('.name', '.account-dialog').addClass('simpletip')
-                                        .attr('data-simpletip', u_attr.fullname);
-                                }
                                 showToast('settings', l[7698]);
                                 accountUI.account.profiles.bindEvents();
                                 // update megadrop username for existing megadrop

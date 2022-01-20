@@ -34,7 +34,9 @@ export default class ReceivedRequests extends MegaRenderMixin {
             headerContainerClassName="contacts-table requests-table contacts-table-head"
             containerClassName="contacts-table requests-table contacts-table-results"
             listAdapterColumns={[
-                ColumnContactRequestsEmail,
+                [ColumnContactRequestsEmail, {
+                    currView: "ipc"
+                }],
                 [ColumnContactRequestsTs, {
                     label: l[19505]
                 }],

@@ -1147,7 +1147,8 @@ li.active .call-duration i {
     display: none;
 }
 
-.contacts-table .box-avatar {
+.contacts-table .box-avatar,
+.contacts-table .sprite-fm-uni.icon-send-requests {
     position: relative;
     display: flex;
     align-items: center;

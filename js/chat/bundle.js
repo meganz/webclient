@@ -7593,13 +7593,16 @@ class ContactList extends mixins.wl {
 
 class ColumnContactRequestsEmail extends mixins.wl {
   render() {
-    let {
-      nodeAdapter
+    const {
+      nodeAdapter,
+      currView
     } = this.props;
     let {
       node
     } = nodeAdapter.props;
-    return external_React_default().createElement("td", null, external_React_default().createElement("span", {
+    return external_React_default().createElement("td", null, currView && currView === 'opc' ? external_React_default().createElement("span", null, external_React_default().createElement("i", {
+      className: "sprite-fm-uni icon-send-requests"
+    })) : external_React_default().createElement("span", {
       dangerouslySetInnerHTML: {
         __html: useravatar.contact(node.m, 'box-avatar')
       }
@@ -7733,7 +7736,9 @@ class ReceivedRequests extends mixins.wl {
         megaListItemHeight: 59,
         headerContainerClassName: "contacts-table requests-table contacts-table-head",
         containerClassName: "contacts-table requests-table contacts-table-results",
-        listAdapterColumns: [ColumnContactRequestsEmail, [ColumnContactRequestsTs, {
+        listAdapterColumns: [[ColumnContactRequestsEmail, {
+          currView: "ipc"
+        }], [ColumnContactRequestsTs, {
           label: l[19505]
         }], [ColumnContactRequestsRcvdBtns, {
           onReject: handle => {
@@ -7862,7 +7867,9 @@ class SentRequests extends mixins.wl {
         megaListItemHeight: 59,
         headerContainerClassName: "contacts-table requests-table contacts-table-head",
         containerClassName: "contacts-table requests-table contacts-table-results",
-        listAdapterColumns: [ColumnContactRequestsEmail, ColumnContactRequestsRts, [ColumnContactRequestsSentBtns, {
+        listAdapterColumns: [[ColumnContactRequestsEmail, {
+          currView: "opc"
+        }], ColumnContactRequestsRts, [ColumnContactRequestsSentBtns, {
           onReject: email => {
             M.cancelPendingContactRequest(email);
           },

@@ -198,6 +198,10 @@
     background: var(--surface-grey-3);
     border-color: var(--stroke-grey-2);
 }
+.dashboard .account.data-table tr:hover td::before {
+    background: var(--surface-grey-1);
+    border-color: var(--stroke-grey-4);
+}
 .data-table tr.active td::before,
 .data-table tr.active td:last-child::before,
 .data-table tr.active td:first-child::before {

@@ -344,8 +344,9 @@ class Stream extends MegaRenderMixin {
                     stream={this.getStreamSource()}
                     onLoadedData={onLoadedData}
                 />
-                <Button
-                    className={`
+                <div className={`${Local.NAMESPACE}-self-overlay`}>
+                    <Button
+                        className={`
                         mega-button
                         theme-light-forced
                         action
@@ -353,10 +354,11 @@ class Stream extends MegaRenderMixin {
                         local-stream-options-control
                         ${options ? 'active' : ''}
                     `}
-                    icon="sprite-fm-mono icon-options"
-                    onClick={() => this.handleOptionsToggle()}
-                />
-                {options && this.renderOptionsDialog()}
+                        icon="sprite-fm-mono icon-options"
+                        onClick={() => this.handleOptionsToggle()}
+                    />
+                    {options && this.renderOptionsDialog()}
+                </div>
             </>
         );
     };

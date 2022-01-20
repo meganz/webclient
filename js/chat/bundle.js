@@ -16696,11 +16696,13 @@ class Stream extends mixins.wl {
         className: call.isSharingScreen() ? '' : 'local-stream-mirrored',
         stream: this.getStreamSource(),
         onLoadedData: onLoadedData
-      }), external_React_default().createElement(meetings_button.Z, {
+      }), external_React_default().createElement("div", {
+        className: local_Local.NAMESPACE + "-self-overlay"
+      }, external_React_default().createElement(meetings_button.Z, {
         className: "\n                        mega-button\n                        theme-light-forced\n                        action\n                        small\n                        local-stream-options-control\n                        " + (options ? 'active' : '') + "\n                    ",
         icon: "sprite-fm-mono icon-options",
         onClick: () => this.handleOptionsToggle()
-      }), options && this.renderOptionsDialog());
+      }), options && this.renderOptionsDialog()));
     };
   }
 

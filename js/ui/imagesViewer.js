@@ -346,11 +346,11 @@ var slideshowid;
             range: 'min',
             step: 0.01,
             change: function(e, ui) {
-                $('.ui-slider-handle .mv-zoom-slider', this).text(`${ui.value}%`);
+                $('.ui-slider-handle .mv-zoom-slider', this).text(formatPercentage(ui.value / 100));
                 wrapper.dataset.perc = ui.value;
             },
             slide: function(e, ui) {
-                $('.ui-slider-handle .mv-zoom-slider', this).text(`${ui.value}%`);
+                $('.ui-slider-handle .mv-zoom-slider', this).text(formatPercentage(ui.value / 100));
                 slideshow_zoom(container, false, ui.value);
             },
             create: () => {

@@ -1031,6 +1031,10 @@ mega.ui.sendSignupLinkDialog = function(accountData) {
     topmenuUI();
 };
 
+mega.ui.theme = {
+    setWithUA: nop
+};
+
 mega.loadReport = {};
 var previews = {};
 var preqs = Object.create(null); // FIXME: mobile needs to use preqs[] to prevent dupe requests sent to API!

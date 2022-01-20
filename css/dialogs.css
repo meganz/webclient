@@ -4534,6 +4534,9 @@ body.de .mega-dialog.new-group-chat {
     .mega-dialog.payment-address-dialog .states {
         margin-bottom: 20px;
     }
+    .mega-dialog.payment-address-dialog .states .mega-input-dropdown .dropdown-scroll {
+        max-height: 152px;
+    }
 
 /* end payment-address-dialog */
 

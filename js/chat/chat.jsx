@@ -2395,11 +2395,12 @@ Chat.prototype.openChatAndSendFilesDialog = function(user_handle) {
  * Wrapper around Chat.openChat and ChatRoom.attachNodes as a single helper function
  * @param {Array|String} targets Where to send the nodes
  * @param {Array} nodes The list of nodes to attach into the room(s)
+ * @param {boolean|undefined} noOpen If the chatroom shouldn't be opened after nodes are attached
  * @returns {MegaPromise}
  * @see Chat.openChat
  * @see ChatRoom.attachNodes
  */
-Chat.prototype.openChatAndAttachNodes = function(targets, nodes) {
+Chat.prototype.openChatAndAttachNodes = function(targets, nodes, noOpen) {
     'use strict';
     var self = this;
 
@@ -2480,25 +2481,26 @@ Chat.prototype.openChatAndAttachNodes = function(targets, nodes) {
                 for (var i = result.length; i--;) {
                     if (result[i] instanceof ChatRoom) {
                         room = result[i];
-                        break;
+                        showToast('send-chat', nodes.length > 1 ? l[17767] : l[17766]);
+                        if (noOpen) {
+                            resolve();
+                        }
+                        else {
+                            var roomUrl = room.getRoomUrl().replace("fm/", "");
+                            M.openFolder(roomUrl).always(resolve);
+                        }
+                        if (d) {
+                            console.groupEnd();
+                        }
+                        return;
                     }
-                }
-
-                if (room) {
-                    showToast('send-chat', nodes.length > 1 ? l[17767] : l[17766]);
-                    var roomUrl = room.getRoomUrl().replace("fm/", "");
-                    M.openFolder(roomUrl).always(resolve);
-                }
-                else {
-                    if (d) {
-                        self.logger.warn('openChatAndAttachNodes failed in whole...', result);
-                    }
-                    reject(result);
                 }
 
                 if (d) {
+                    self.logger.warn('openChatAndAttachNodes failed in whole...', result);
                     console.groupEnd();
                 }
+                reject(result);
             });
         };
 

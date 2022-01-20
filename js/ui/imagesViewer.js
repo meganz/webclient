@@ -863,7 +863,7 @@ var slideshowid;
                         return false;
                     }
                 }
-                else if ((e.keyCode === 8 || e.key === 'Backspace') && !isDownloadPage) {
+                else if ((e.keyCode === 8 || e.key === 'Backspace') && !isDownloadPage && !$.copyDialog) {
                     history.back();
                     return false;
                 }
@@ -907,6 +907,17 @@ var slideshowid;
                     contextMenu.open(optionsMenu);
                 }
                 return false;
+            });
+
+            $('.v-btn.send-to-chat', $overlay).rebind('click.media-viewer', () => {
+                $(document).fullScreen(false);
+                const $wrapper = $('.media-viewer-container', 'body');
+                const video = $('video', $wrapper).get(0);
+                if (video && !video.paused && !video.ended) {
+                    video.pause();
+                }
+                $.noOpenChatFromPreview = true;
+                openCopyDialog('conversations');
             });
 
             // Close context menu

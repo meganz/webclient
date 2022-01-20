@@ -2188,7 +2188,7 @@ Chat.prototype.openChatAndSendFilesDialog = function (user_handle) {
   }).catch(this.logger.error.bind(this.logger));
 };
 
-Chat.prototype.openChatAndAttachNodes = function (targets, nodes) {
+Chat.prototype.openChatAndAttachNodes = function (targets, nodes, noOpen) {
   'use strict';
 
   var self = this;
@@ -2271,25 +2271,29 @@ Chat.prototype.openChatAndAttachNodes = function (targets, nodes) {
         for (var i = result.length; i--;) {
           if (result[i] instanceof ChatRoom) {
             room = result[i];
-            break;
-          }
-        }
+            showToast('send-chat', nodes.length > 1 ? l[17767] : l[17766]);
 
-        if (room) {
-          showToast('send-chat', nodes.length > 1 ? l[17767] : l[17766]);
-          var roomUrl = room.getRoomUrl().replace("fm/", "");
-          M.openFolder(roomUrl).always(resolve);
-        } else {
-          if (d) {
-            self.logger.warn('openChatAndAttachNodes failed in whole...', result);
-          }
+            if (noOpen) {
+              resolve();
+            } else {
+              var roomUrl = room.getRoomUrl().replace("fm/", "");
+              M.openFolder(roomUrl).always(resolve);
+            }
 
-          reject(result);
+            if (d) {
+              console.groupEnd();
+            }
+
+            return;
+          }
         }
 
         if (d) {
+          self.logger.warn('openChatAndAttachNodes failed in whole...', result);
           console.groupEnd();
         }
+
+        reject(result);
       });
     };
 

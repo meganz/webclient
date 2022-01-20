@@ -1819,7 +1819,13 @@
             }
             else if (section === 'conversations') {
                 if (window.megaChatIsReady) {
-                    megaChat.openChatAndAttachNodes(chats, selectedNodes).dump();
+                    if ($.noOpenChatFromPreview) {
+                        delete $.noOpenChatFromPreview;
+                        megaChat.openChatAndAttachNodes(chats, selectedNodes, true).dump();
+                    }
+                    else {
+                        megaChat.openChatAndAttachNodes(chats, selectedNodes).dump();
+                    }
                 }
                 else if (d) {
                     console.error('MEGAchat is not ready');

@@ -27,6 +27,10 @@ export default class SearchField extends MegaRenderMixin {
         SearchField.inputRef && SearchField.inputRef.current && !!SearchField.inputRef.current.value.length
     );
 
+    static isVisible = () => (
+        SearchField.inputRef && SearchField.inputRef.current && elementIsVisible(SearchField.inputRef.current)
+    );
+
     state = {
         hovered: false
     };
@@ -102,8 +106,8 @@ export default class SearchField extends MegaRenderMixin {
                 <i className={`${BASE_ICON_CLASS} icon-preview-reveal search-icon-find`} />
 
                 <input
-                    type="text"
-                    autoComplete="disabled"
+                    type="search"
+                    autoComplete="off"
                     placeholder={l[102]}
                     ref={SearchField.inputRef}
                     value={value}

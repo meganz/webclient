@@ -337,7 +337,7 @@ BusinessRegister.prototype.initPage = function(preSetNb, preSetName, preSetTel, 
 
         if (localPricesMode) {
 
-            priceText = formatCurrency(userFare, mySelf.planInfo.l.lc);
+            priceText = formatCurrency(userFare, mySelf.planInfo.l.lc, 'narrowSymbol');
             currncyAbbrv = mySelf.planInfo.l.lc;
 
             $euroPriceBl.removeClass('hidden');

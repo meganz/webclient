@@ -734,7 +734,7 @@ pro.proplan = {
                 $planButton.first().text(l[23776].replace('%1', planName));
             }
 
-            $price.text(formatCurrency(basePrice, baseCurrency));
+            $price.text(formatCurrency(basePrice, baseCurrency, 'narrowSymbol'));
 
             // Get storage
             storageValue = storageSizeRounded + ' ' + storageFormatted.unit;
@@ -1150,7 +1150,7 @@ pro.proplan = {
 
             $businessCard.addClass('local-currency');
             $('.plan-price .price', $businessCard).text(
-                formatCurrency(this.businessPlanData.bd.us.lp, this.businessPlanData.l.lc));
+                formatCurrency(this.businessPlanData.bd.us.lp, this.businessPlanData.l.lc, 'narrowSymbol'));
             $('.pricing-page.plan-currency', $businessCard).text(this.businessPlanData.l.lc);
             $('.pricing-page.euro-price', $businessCard).text(formatCurrency(pricePerUser));
         }

@@ -37,9 +37,25 @@
      * @param {string} fileHandle - the id of the selected file or folder
      * @return {undefined}
      */
-    MegaData.prototype.renderPathBreadcrumbs = function(fileHandle) {
-        const scope = document.querySelector('.fm-right-files-block .fm-right-header .fm-breadcrumbs-wrapper');
-        const items = this.getPath(this.currentdirid);
+    MegaData.prototype.renderPathBreadcrumbs = function(fileHandle, isInfoBlock = false) {
+        let scope;
+
+        if (isInfoBlock) {
+            scope = document.querySelector('.properties-breadcrumb .fm-breadcrumbs-wrapper');
+        }
+        else {
+            scope = document.querySelector('.fm-right-files-block .fm-right-header .fm-breadcrumbs-wrapper');
+        }
+        let items = this.getPath(this.currentdirid);
+
+        // items can be empty if we search for a file
+        // (since currentdirid will be == search instead of the actual directory id
+        // so we get the path from the file handle passed in
+        if (items.length === 0 && isInfoBlock && fileHandle) {
+            items = this.getPath(fileHandle);
+            // remove first element which is the target element
+            items.shift();
+        }
 
         const dictionary = handle => {
             let name = '';
@@ -134,7 +150,8 @@
             breadcrumbClickHandler.call(this, id);
         });
 
-        if (!is_mobile && fileHandle) {
+        // if on info dialog we do not want to open the file versioning dialog
+        if (!is_mobile && fileHandle && !isInfoBlock) {
             fileversioning.fileVersioningDialog(fileHandle);
         }
     };
@@ -284,6 +301,15 @@
         $('.breadcrumb-dropdown-link', scope)
             .rebind('click.breadcrumb-dropdown', () => {
                 dropdown.classList.toggle('active');
+
+                if (dropdown.classList.contains('active')) {
+                    if (dropdown.classList.contains('ps-container')) {
+                        Ps.update(dropdown);
+                    }
+                    else {
+                        Ps.initialize(dropdown);
+                    }
+                }
             });
 
         $('.crumb-drop-link, .fm-breadcrumbs', scope).rebind('click.breadcrumb', function(e) {
@@ -313,6 +339,11 @@
         let currentPathLength = items.length === 3 ? 12 : 0;
         const maxPathLength = getMaxPathLength(14, container);
         let extraItems = [];
+        let isInfoBlock = false;
+
+        if (container.classList.contains('info')) {
+            isInfoBlock = true;
+        }
 
         for (let i = 0; i < items.length; i++) {
 
@@ -327,7 +358,9 @@
                 let item;
                 // if we won't have space, add it to the dropdown, but always render the current folder,
                 // and root if there are no extraItems
-                if ((!isLastItem && !isRoot || isRoot && extraItems.length > 0) && currentPathLength > maxPathLength) {
+                // for info block we show max 2 items in the in-view breadcrumb
+                if ((!isLastItem && !isRoot || isRoot && extraItems.length > 0) &&
+                    (currentPathLength > maxPathLength && !isInfoBlock) || (isInfoBlock && i > 1)) {
                     extraItems.push({
                         name,
                         type: typeClass,

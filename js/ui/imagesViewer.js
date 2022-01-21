@@ -1605,6 +1605,10 @@ var slideshowid;
                 $imgWrap.attr('data-image', id);
                 $img.attr('src', src1).addClass('active');
 
+                if (previews[id].brokenEye) {
+                    $img.addClass('broken-eye');
+                }
+
                 slideshow_imgPosition($overlay);
                 $(window).rebind('resize.imgResize', function() {
                     slideshow_imgPosition($overlay);
@@ -1613,8 +1617,16 @@ var slideshowid;
             else if (src1 !== noThumbURI) {
                 $img.attr('src', src1).addClass('active');
 
+                if ($img.hasClass('broken-eye')) {
+                    $img.addClass('vo-hidden').removeClass('broken-eye');
+                }
+
                 // adjust zoom percent label
-                slideshow_zoomSlider($img.width() / origImgWidth * 100 * devicePixelRatio);
+                onIdle(() => {
+                    slideshow_imgPosition($overlay);
+                    $img.removeClass('vo-hidden');
+                });
+                // slideshow_zoomSlider($img.width() / origImgWidth * 100 * devicePixelRatio);
             }
 
             // Apply exit orientation
@@ -1629,6 +1641,7 @@ var slideshowid;
     function previewimg(id, uint8arr, type) {
         var blob;
         var n = M.getNodeByHandle(id);
+        var brokenEye = false;
 
         if (uint8arr === null) {
             if (d) {
@@ -1642,6 +1655,7 @@ var slideshowid;
             }
             uint8arr = u8;
             type = 'image/svg+xml';
+            brokenEye = true;
         }
 
         type = typeof type === 'string' && type || 'image/jpeg';
@@ -1679,7 +1693,8 @@ var slideshowid;
             time: Date.now(),
             src: myURL.createObjectURL(blob),
             buffer: uint8arr.buffer || uint8arr,
-            full: n.s === blob.size
+            full: n.s === blob.size,
+            brokenEye: brokenEye
         });
 
         if (n.hash) {

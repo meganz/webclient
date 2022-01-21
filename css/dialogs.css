@@ -6103,7 +6103,7 @@ body.de .mega-dialog.new-group-chat {
     .mega-dialog.limited-bandwidth-dialog:not(.exceeded) .step1-block,
     .mega-dialog.limited-bandwidth-dialog.exceeded:not(.pro) .step1-block,
     .mega-dialog.limited-bandwidth-dialog.exceeded .dialog.header-before-icon.exceeded,
-    .mega-dialog.limited-bandwidth-dialog.exceeded:not(.pro) button.close,
+    .mega-dialog.limited-bandwidth-dialog.exceeded button.close,
     .mega-dialog.limited-bandwidth-dialog.pro.exceeded .dialog.pro-exceeded-bl,
     .mega-dialog.limited-bandwidth-dialog.slider .dialog.pro-exceeded-slider {
         display: block;

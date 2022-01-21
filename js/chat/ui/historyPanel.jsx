@@ -64,6 +64,7 @@ export default class HistoryPanel extends MegaRenderMixin {
             if (self.isComponentEventuallyVisible()) {
                 $('.js-messages-scroll-area', self.findDOMNode()).trigger('forceResize', [true]);
             }
+            self.refreshUI();
         }));
     }
     componentDidMount() {
@@ -242,6 +243,11 @@ export default class HistoryPanel extends MegaRenderMixin {
             room.renderContactTree();
             room.megaChat.refreshConversations();
             room.trigger('RefreshUI');
+            if (room.scrolledToBottom) {
+                delay('hp:reinit-scroll', () => {
+                    this.messagesListScrollable.reinitialise(true, true);
+                }, 30);
+            }
         }
     }
     @utils.SoonFcWrap(50)
@@ -439,7 +445,7 @@ export default class HistoryPanel extends MegaRenderMixin {
         }
 
         self.setState({'editing': false});
-
+        self.refreshUI();
         Soon(function() {
             $('.chat-textarea-block:visible textarea').focus();
         }, 300);
@@ -699,7 +705,6 @@ export default class HistoryPanel extends MegaRenderMixin {
                             editing={self.state.editing === v.messageId || self.state.editing === v.pendingMessageId}
                             onEditStarted={((v, $domElement) => {
                                 self.editDomElement = $domElement;
-                                self.props.chatRoom.scrolledToBottom = false;
                                 self.setState({'editing': v.messageId});
                                 self.forceUpdate();
                             }).bind(this, v)}
@@ -709,6 +714,12 @@ export default class HistoryPanel extends MegaRenderMixin {
                                 if (this.props.onDeleteClicked) {
                                     this.props.onDeleteClicked(msg);
                                 }
+                            }}
+                            onResized={() => {
+                                this.handleWindowResize();
+                            }}
+                            onEmojiBarChange={() => {
+                                this.handleWindowResize();
                             }}
                         />
                     );

@@ -2118,6 +2118,10 @@ img.blog-new-logos {
     color: var(--text-color-medium);
     display: block;
 }
+.properties-small-gray.path {
+    padding-top: 8px;
+    padding-inline-start: 16px;
+}
 .shared .propreties-dark-txt.contact-list {
     -webkit-padding-end: 25px;
     padding-inline-end: 25px;
@@ -2149,16 +2153,39 @@ img.blog-new-logos {
     word-break: break-all;
     word-wrap: break-word;
 }
+.properties-name-block .propreties-dark-txt {
+    font: var(--text-body1-bold);
+}
 .propreties-dark-txt a,
 .propreties-dark-txt a:active,
 .propreties-dark-txt a:visited {
     color: var(--text-color-info);
 }
+.properties-name-container {
+    display: flex;
+}
 .properties-name-block {
     -webkit-padding-end: 39px;
     padding-inline-end: 39px;
+    padding-inline-start: 11px;
     position: relative;
     display: inline-block;
+}
+.properties-breadcrumb {
+    box-sizing: border-box;
+    height: 60px;
+    width: 360px;
+    border: 2px solid var(--stroke-grey-2);
+    border-radius: 12px;
+    margin-left: -14px;
+    margin-bottom: 16px;
+    background-color: var(--surface-grey-1);
+}
+.properties-breadcrumb .breadcrumb-dropdown {
+    max-height: 177px;
+}
+.properties-breadcrumb .breadcrumb-dropdown .ps-scrollbar-y-rail {
+    margin: 8px 0;
 }
 .properties-name-block .file-settings-icon {
     right: 0;
@@ -5078,6 +5105,14 @@ tr:not(.taken-down) .grid-status-icon:not(.read-only):not(.read-and-write) {
     font-size: 0;
     white-space: nowrap;
 }
+.properties-breadcrumb .fm-breadcrumbs-block.info {
+    height: 24px;
+}
+.properties-breadcrumb .fm-breadcrumbs-wrapper.info {
+    -webkit-padding-start: 10px;
+    padding-inline-start: 10px;
+    margin-top: unset;
+}
 .fm-breadcrumbs-wrapper {
     display: flex;
     align-items: center;
@@ -5103,6 +5138,13 @@ tr:not(.taken-down) .grid-status-icon:not(.read-only):not(.read-and-write) {
 }
 .fm-breadcrumbs.root {
     flex-shrink: 0;
+}
+.properties-breadcrumb .fm-breadcrumbs:last-of-type {
+    flex-shrink: 0;
+    max-width: 70%;
+}
+.properties-breadcrumb .fm-breadcrumbs-wrapper a {
+    min-width: 44px;
 }
 .fm-breadcrumbs:last-of-type {
     flex-shrink: 0;
@@ -5135,7 +5177,9 @@ tr:not(.taken-down) .grid-status-icon:not(.read-only):not(.read-and-write) {
     padding: 0 4px;
     background-color: var(--stroke-main);
 }
-
+.properties-breadcrumb .crumb-overflow-link {
+    background-color: unset;
+}
 .crumb-overflow-link .breadcrumb-dropdown-link {
     border-radius: 12px;
     height: 24px;
@@ -5249,6 +5293,9 @@ tr:not(.taken-down) .grid-status-icon:not(.read-only):not(.read-and-write) {
 .breadcrumb-dropdown a span {
     margin-left: 8px;
     white-space: nowrap;
+    max-width: 300px;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .contact-requests td, .sent-requests-grid td {

@@ -106,6 +106,21 @@ class Stream extends MegaRenderMixin {
             },
             stop: (event, ui) => {
                 this.DRAGGABLE.POSITION = ui.position;
+                const {clientWidth, clientHeight} = document.body;
+                const {helper} = ui;
+                const {left, top} = this.DRAGGABLE.POSITION;
+                if (left < clientWidth / 2) {
+                    helper.css('left', `${left / clientWidth * 100}%`).css('right', 'unset');
+                }
+                else {
+                    helper.css('left', 'unset').css('right', `${clientWidth - left - helper.width()}px`);
+                }
+                if (top < clientHeight / 2) {
+                    helper.css('top', `${top / clientHeight * 100}%`).css('bottom', 'unset');
+                }
+                else {
+                    helper.css('top', 'unset').css('bottom', `${clientHeight - top - helper.height()}px`);
+                }
             }
         }
     };

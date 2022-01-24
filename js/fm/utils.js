@@ -2572,3 +2572,38 @@ MegaUtils.prototype.checkFolderDrop = function(event) {
 
     return false;
 };
+
+/**
+ * Check the date entered, as day, month and year, is valid
+ * @param {Number} day Day value of the date to validate
+ * @param {Number} month Month value of the date to validate
+ * @param {Number} year Year value of the date to validate
+ * @returns {Number} 0 on success, else the number represent why date is not valid.
+ */
+MegaUtils.prototype.validateDate = function(day, month, year) {
+
+    'use strict';
+
+    // Check value is null or empty or 0
+    if (!day || !month || !year) {
+        return 1;
+    }
+
+    // Check value over common range limits
+    if (day > 31 || month > 12) {
+        return 2;
+    }
+
+    const tDate = new Date();
+
+    tDate.setFullYear(year, month - 1, day);
+
+    // If entered day is not exact as processed date, day value is not exist on entered month of the year,
+    // i.e. not exist on Calandar
+    if (tDate.getDate() !== day || tDate.getMonth() + 1 !== month || tDate.getFullYear() !== year) {
+        return 3;
+    }
+
+    // it is valid
+    return 0;
+};

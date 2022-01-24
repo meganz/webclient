@@ -1146,9 +1146,8 @@ accountUI.account = {
                             }
                             else {
                                 $parent.removeClass('error msg');
+                                $parent.css('margin-bottom', '');
                             }
-
-                            $parent.css('margin-bottom', '');
                         }
                     }
 
@@ -1193,8 +1192,8 @@ accountUI.account = {
                     else {
                         this.value++;
                     }
-                    $this.removeClass('errored').trigger('change');
                     $parent.removeClass('error');
+                    $this.removeClass('errored').trigger('change');
                     self.zerofill(this);
                 }
 
@@ -1208,8 +1207,8 @@ accountUI.account = {
                     else {
                         this.value--;
                     }
-                    $this.removeClass('errored').trigger('change');
                     $parent.removeClass('error');
+                    $this.removeClass('errored').trigger('change');
                     self.zerofill(this);
                 }
             });
@@ -1244,15 +1243,35 @@ accountUI.account = {
                     return false;
                 }
 
+                const $bd = $('.bdate', $birthdayBlock);
+                const $bm = $('.bmonth', $birthdayBlock);
+                const $by = $('.byear', $birthdayBlock);
+
+                const bd = parseInt($bd.val());
+                const bm = parseInt($bm.val());
+                const by = parseInt($by.val());
+
+                if (M.validateDate(bd, bm, by) !== 0) {
+
+                    const $parent = $bd.parent().addClass('error msg');
+                    var $msg = $('.message-container', $parent).text(l[20960]);
+                    $parent.css('margin-bottom', `${$msg.outerHeight() + 20}px`);
+                    $saveBlock.addClass('closed');
+
+                    return false;
+                }
+
+                if ($('.bdate', $birthdayBlock).val())
+
                 $('.fm-account-avatar').safeHTML(useravatar.contact(u_handle, '', 'div', false));
                 $('.fm-avatar').safeHTML(useravatar.contact(u_handle));
 
                 var checklist = {
                     firstname: String($('#account-firstname', $personalInfoBlock).val() || '').trim(),
                     lastname: String($('#account-lastname', $personalInfoBlock).val() || '').trim(),
-                    birthday: String($('.bdate', $birthdayBlock).val() || ''),
-                    birthmonth: String($('.bmonth', $birthdayBlock).val() || ''),
-                    birthyear: String($('.byear', $birthdayBlock).val() || ''),
+                    birthday: String(bd || ''),
+                    birthmonth: String(bm || ''),
+                    birthyear: String(by || ''),
                     country: String(
                         $('#account-country .option[data-state="active"]', $personalInfoBlock).attr('data-value') || ''
                     )

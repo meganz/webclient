@@ -4073,6 +4073,8 @@ else if (!browserUpdate) {
                 }
             }
             else if (jsl[i].j == 0) pages[jsl[i].n] = jsl[i].text;
+
+            jsl[i].text = ' ';
         }
         if (window.URL)
         {

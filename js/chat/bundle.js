@@ -9815,7 +9815,8 @@ class AbstractGenericMessage extends mixin.y {
       contact: contact,
       className: "message",
       label: M.getNameByHandle(contact.u),
-      chatRoom: this.props.message.chatRoom
+      chatRoom: this.props.message.chatRoom,
+      dropdownDisabled: !!this.props.dialog
     }) : null;
   }
 

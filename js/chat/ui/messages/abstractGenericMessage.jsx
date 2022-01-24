@@ -39,6 +39,7 @@ export default class AbstractGenericMessage extends ConversationMessageMixin {
                     className="message"
                     label={M.getNameByHandle(contact.u)}
                     chatRoom={this.props.message.chatRoom}
+                    dropdownDisabled={!!this.props.dialog}
                 /> :
                 null
         );

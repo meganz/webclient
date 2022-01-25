@@ -2509,10 +2509,9 @@ MessagesBuff.prototype.getRenderableSummary = function(lastMessage) {
                 renderableSummary = l[19285] + " " + renderableSummary;
             }
             else {
-                var name = M.getNameByHandle(author.u);
-                name = ellipsis(name, undefined, 11);
+                var name = megaChat.plugins.emoticonsFilter.processHtmlMessage(escapeHTML(M.getNameByHandle(author.u)));
                 if (name) {
-                    renderableSummary = escapeHTML(name) + ": " + renderableSummary;
+                    renderableSummary = `${name}: ${renderableSummary}`;
                 }
             }
         }

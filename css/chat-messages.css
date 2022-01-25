@@ -11,6 +11,14 @@
     overflow: hidden;
     border-bottom: 1px solid var(--divider-color);
 }
+.chat-topic-block .emoji {
+    width: 18px;
+    height: 18px;
+    margin: 0 2px;
+}
+.chat-topic-block .emoji:first-child {
+    margin-left: 0;
+}
 .chat-topic-block.in-call {
     margin-right: 255px;
     border-right: 1px solid var(--divider-color);
@@ -252,6 +260,10 @@
     font: var(--text-body2);
     color: var(--text-color-medium);
 }
+.message .call-info-content .emoji {
+    width: 14px;
+    height: 14px;
+}
 .message .call-info-content .bold {
     font-family: var(--text-font-family-semibold);
 }
@@ -328,6 +340,10 @@
     vertical-align: top;
     color: var(--text-color-high);
 }
+.message.user-card-name .emoji {
+    width: 18px;
+    height: 18px;
+}
 .message.date-divider {
     font: var(--text-h3);
     color: var(--text-color-info);
@@ -373,6 +389,10 @@
     padding: 0 70px 0 0;
     box-sizing: border-box;
     max-width: 100%;
+}
+.message.data-title .emoji {
+    width: 18px;
+    height: 18px;
 }
 .message.data-title .file-name {
     color: var(--text-color-high);

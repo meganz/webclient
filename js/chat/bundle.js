@@ -2561,7 +2561,7 @@ Chat.prototype.highlight = (text, matches, dontEscape) => {
 
     regexes = regexes.join('|');
     text = text.replace(new RegExp(regexes, 'g'), word => "<strong>" + word + "</strong>");
-    text = text.replace(/\@\@\!\d+\!\@\@/, match => {
+    text = text.replace(/\@\@\!\d+\!\@\@/g, match => {
       return tags[parseInt(match.replace("@@!", "").replace("!@@"), 10)];
     });
   }
@@ -6346,7 +6346,7 @@ class ContactItem extends _mixins1__._p {
       noContextMenu: this.props.noContextMenu,
       contact: contact,
       className: "light",
-      label: username,
+      label: react0().createElement(_ui_utils_jsx2__.EmojiFormattedContent, null, username),
       chatRoom: this.props.chatRoom
     })));
   }
@@ -6680,11 +6680,11 @@ class ContactPickerWidget extends _mixins1__.wl {
         for (var i2 = 0; i2 < sel2.length; i2++) {
           var v2 = sel2[i2];
           contactsSelected.push(react0().createElement(ContactItem, {
-            noContextMenu: true,
-            contact: M.u[v2],
-            onClick: onContactSelectDoneCb,
+            key: v2,
             chatRoom: self.props.chatRoom || false,
-            key: v2
+            contact: M.u[v2],
+            noContextMenu: true,
+            onClick: onContactSelectDoneCb
           }));
         }
 
@@ -9785,6 +9785,7 @@ var mixin = __webpack_require__(416);
 
 
 
+
 class AbstractGenericMessage extends mixin.y {
   constructor(props) {
     super(props);
@@ -9814,7 +9815,7 @@ class AbstractGenericMessage extends mixin.y {
     return contact ? external_React_default().createElement(ui_contacts.ContactButton, {
       contact: contact,
       className: "message",
-      label: M.getNameByHandle(contact.u),
+      label: external_React_default().createElement(utils.EmojiFormattedContent, null, M.getNameByHandle(contact.u)),
       chatRoom: this.props.message.chatRoom,
       dropdownDisabled: !!this.props.dialog
     }) : null;
@@ -9867,6 +9868,7 @@ var messages_utils = __webpack_require__(504);
 
 
 
+
 const MESSAGE_TYPE = {
   OUTGOING: 'outgoing-call',
   INCOMING: 'incoming-call',
@@ -9894,7 +9896,7 @@ class Local extends AbstractGenericMessage {
 
     this._roomIsGroup = () => this.props.message.chatRoom.type === 'group' || this.props.message.chatRoom.type === 'public';
 
-    this._getParticipantNames = message => message.meta && message.meta.participants && !!message.meta.participants.length && message.meta.participants.map(handle => "[[" + escapeHTML(M.getNameByHandle(handle)) + "]]");
+    this._getParticipantNames = message => message.meta && message.meta.participants && !!message.meta.participants.length && message.meta.participants.map(handle => "[[" + megaChat.plugins.emoticonsFilter.processHtmlMessage(escapeHTML(M.getNameByHandle(handle))) + "]]");
 
     this._getExtraInfo = message => {
       const {
@@ -10100,7 +10102,7 @@ class Local extends AbstractGenericMessage {
     return message.showInitiatorAvatar && !grouped ? external_React_default().createElement(ui_contacts.ContactButton, {
       contact: contact,
       className: "message",
-      label: message.authorContact ? M.getNameByHandle(message.authorContact.u) : '',
+      label: external_React_default().createElement(utils.EmojiFormattedContent, null, message.authorContact ? M.getNameByHandle(message.authorContact.u) : ''),
       chatRoom: message.chatRoom
     }) : M.getNameByHandle(contact.u);
   }
@@ -10131,6 +10133,7 @@ class Local extends AbstractGenericMessage {
 
 }
 ;// CONCATENATED MODULE: ./js/chat/ui/messages/types/contact.jsx
+
 
 
 
@@ -10175,7 +10178,7 @@ class Contact extends AbstractGenericMessage {
 
   _getContactCard(message, contact, contactEmail) {
     const HAS_RELATIONSHIP = M.u[contact.u].c === 1;
-    let name = M.getNameByHandle(contact.u);
+    let name = external_React_default().createElement(utils.EmojiFormattedContent, null, M.getNameByHandle(contact.u));
     const {
       chatRoom
     } = this.props;
@@ -10267,7 +10270,7 @@ class Contact extends AbstractGenericMessage {
         className: "message shared-info"
       }, external_React_default().createElement("div", {
         className: "message data-title"
-      }, M.getNameByHandle(contact.u)), M.u[contact.u] ? external_React_default().createElement(ui_contacts.ContactVerified, {
+      }, external_React_default().createElement(utils.EmojiFormattedContent, null, M.getNameByHandle(contact.u))), M.u[contact.u] ? external_React_default().createElement(ui_contacts.ContactVerified, {
         className: "right-align",
         contact: M.u[contact.u]
       }) : null, external_React_default().createElement("div", {
@@ -12074,6 +12077,8 @@ class GifPanel extends mixins.wl {
 
 var _dec, _dec2, _class, _class2, _temp;
 
+
+
 var typingArea_React = __webpack_require__(363);
 
 var typingArea_ReactDOM = __webpack_require__(533);
@@ -12859,9 +12864,10 @@ let TypingArea = (_dec = (0,mixins.M9)(60), _dec2 = (0,mixins.M9)(54, true), (_c
     })), typingArea_React.createElement("hr", null), typingArea_React.createElement("div", {
       className: "chat-textarea-scroll textarea-scroll jScrollPaneContainer",
       style: textareaScrollBlockStyles
-    }, typingArea_React.createElement("textarea", {
+    }, typingArea_React.createElement("div", {
+      className: "messages-textarea-placeholder"
+    }, self.state.typedMessage ? null : typingArea_React.createElement(utils.EmojiFormattedContent, null, placeholder)), typingArea_React.createElement("textarea", {
       className: "\n                            messages-textarea\n                            " + (disabledTextarea ? 'disabled' : '') + "\n                        ",
-      placeholder: placeholder,
       onKeyUp: self.onTypeAreaKeyUp.bind(self),
       onKeyDown: self.onTypeAreaKeyDown.bind(self),
       onBlur: self.onTypeAreaBlur.bind(self),
@@ -13734,7 +13740,7 @@ class SharedFileItem extends mixins.wl {
       className: "txt"
     }, node.name), sharedFilesAccordionPanel_React.createElement("span", {
       className: "txt small"
-    }, name), sharedFilesAccordionPanel_React.createElement("span", {
+    }, sharedFilesAccordionPanel_React.createElement(utils.EmojiFormattedContent, null, name)), sharedFilesAccordionPanel_React.createElement("span", {
       className: "txt small grey"
     }, timestamp)));
   }
@@ -15589,6 +15595,7 @@ ModeSwitch.BASE_CLASS = 'mode';
 
 
 
+
 class StreamHead extends mixins.wl {
   constructor(props) {
     super(props);
@@ -15656,7 +15663,7 @@ class StreamHead extends mixins.wl {
 
         for (const [handle, role] of Object.entries(members)) {
           if (role === ChatRoom.MembersSet.PRIVILEGE_STATE.FULL) {
-            moderators.push(escapeHTML(M.getNameByHandle(handle)));
+            moderators.push(megaChat.plugins.emoticonsFilter.processHtmlMessage(escapeHTML(M.getNameByHandle(handle))));
           }
         }
 
@@ -15775,7 +15782,7 @@ class StreamHead extends mixins.wl {
         dialog: !dialog,
         banner: false
       })
-    }, external_React_default().createElement("span", null, chatRoom.getRoomTitle()), chatRoom.isMeeting && external_React_default().createElement("i", {
+    }, external_React_default().createElement(utils.EmojiFormattedContent, null, chatRoom.getRoomTitle()), chatRoom.isMeeting && external_React_default().createElement("i", {
       className: "\n                                        sprite-fm-mono\n                                        " + (dialog ? 'icon-arrow-up' : 'icon-arrow-down') + "\n                                    "
     }))), external_React_default().createElement("div", {
       className: NAMESPACE + "-controls"
@@ -15807,6 +15814,7 @@ StreamHead.EVENTS = {
   CLICK_DIALOG: 'click'
 };
 ;// CONCATENATED MODULE: ./js/chat/ui/meetings/streamNodeMenu.jsx
+
 
 
 
@@ -15914,7 +15922,7 @@ class StreamNodeMenu extends mixins.wl {
         className: "\n                        " + NAMESPACE + "\n                        theme-dark-forced\n                    "
       }, external_React_default().createElement("div", {
         className: NAMESPACE + "-toggle"
-      }, external_React_default().createElement("span", null, M.getNameByHandle(userHandle)), external_React_default().createElement("i", {
+      }, external_React_default().createElement(utils.EmojiFormattedContent, null, M.getNameByHandle(userHandle)), external_React_default().createElement("i", {
         className: "sprite-fm-mono icon-side-menu"
       })), external_React_default().createElement("div", {
         className: NAMESPACE + "-content"
@@ -17682,6 +17690,8 @@ var alterParticipants_ContactsUI = __webpack_require__(13);
 
 var alterParticipants_ConversationMessageMixin = (__webpack_require__(416).y);
 
+
+
 class AltPartsConvMessage extends alterParticipants_ConversationMessageMixin {
   _ensureNameIsLoaded(h) {
     var self = this;
@@ -17764,14 +17774,14 @@ class AltPartsConvMessage extends alterParticipants_ConversationMessageMixin {
       }, avatar, alterParticipants_React.createElement("div", {
         className: "message content-area small-info-txt"
       }, alterParticipants_React.createElement(alterParticipants_ContactsUI.ContactButton, {
-        contact: otherContact,
         className: "message",
-        label: otherDisplayName,
-        chatRoom: self.props.chatRoom
+        contact: otherContact,
+        chatRoom: self.props.chatRoom,
+        label: alterParticipants_React.createElement(utils.EmojiFormattedContent, null, otherDisplayName)
       }), datetime, alterParticipants_React.createElement("div", {
         className: "message text-block",
         dangerouslySetInnerHTML: {
-          __html: text
+          __html: megaChat.plugins.emoticonsFilter.processHtmlMessage(text)
         }
       }))));
     });
@@ -17805,14 +17815,14 @@ class AltPartsConvMessage extends alterParticipants_ConversationMessageMixin {
       }, avatar, alterParticipants_React.createElement("div", {
         className: "message content-area small-info-txt"
       }, alterParticipants_React.createElement(alterParticipants_ContactsUI.ContactButton, {
-        contact: otherContact,
         className: "message",
-        label: otherDisplayName,
-        chatRoom: self.props.chatRoom
+        chatRoom: self.props.chatRoom,
+        contact: otherContact,
+        label: alterParticipants_React.createElement(utils.EmojiFormattedContent, null, otherDisplayName)
       }), datetime, alterParticipants_React.createElement("div", {
         className: "message text-block",
         dangerouslySetInnerHTML: {
-          __html: text
+          __html: megaChat.plugins.emoticonsFilter.processHtmlMessage(text)
         }
       }))));
     });
@@ -17828,6 +17838,8 @@ var truncated_React = __webpack_require__(363);
 var truncated_ContactsUI = __webpack_require__(13);
 
 var truncated_ConversationMessageMixin = (__webpack_require__(416).y);
+
+
 
 class TruncatedMessage extends truncated_ConversationMessageMixin {
   render() {
@@ -17875,7 +17887,7 @@ class TruncatedMessage extends truncated_ConversationMessageMixin {
     }, truncated_React.createElement(truncated_ContactsUI.ContactButton, {
       contact: contact,
       className: "message",
-      label: displayName,
+      label: truncated_React.createElement(utils.EmojiFormattedContent, null, displayName),
       chatRoom: chatRoom
     }), datetime, truncated_React.createElement("div", {
       className: "message text-block"
@@ -17891,6 +17903,8 @@ var privilegeChange_React = __webpack_require__(363);
 var privilegeChange_ContactsUI = __webpack_require__(13);
 
 var privilegeChange_ConversationMessageMixin = (__webpack_require__(416).y);
+
+
 
 class PrivilegeChange extends privilegeChange_ConversationMessageMixin {
   haveMoreContactListeners() {
@@ -17956,14 +17970,14 @@ class PrivilegeChange extends privilegeChange_ConversationMessageMixin {
     }, avatar, privilegeChange_React.createElement("div", {
       className: "message content-area small-info-txt"
     }, privilegeChange_React.createElement(privilegeChange_ContactsUI.ContactButton, {
-      contact: otherContact,
       className: "message",
-      label: otherDisplayName,
-      chatRoom: self.props.chatRoom
+      chatRoom: self.props.chatRoom,
+      contact: otherContact,
+      label: privilegeChange_React.createElement(utils.EmojiFormattedContent, null, otherDisplayName)
     }), datetime, privilegeChange_React.createElement("div", {
       className: "message text-block",
       dangerouslySetInnerHTML: {
-        __html: text
+        __html: megaChat.plugins.emoticonsFilter.processHtmlMessage(text)
       }
     }))));
     return privilegeChange_React.createElement("div", null, messages);
@@ -17978,6 +17992,8 @@ var topicChange_React = __webpack_require__(363);
 var topicChange_ContactsUI = __webpack_require__(13);
 
 var topicChange_ConversationMessageMixin = (__webpack_require__(416).y);
+
+
 
 class TopicChange extends topicChange_ConversationMessageMixin {
   render() {
@@ -18023,10 +18039,10 @@ class TopicChange extends topicChange_ConversationMessageMixin {
     }, avatar, topicChange_React.createElement("div", {
       className: "message content-area small-info-txt"
     }, topicChange_React.createElement(topicChange_ContactsUI.ContactButton, {
-      contact: contact,
       className: "message",
-      label: displayName,
-      chatRoom: chatRoom
+      chatRoom: chatRoom,
+      contact: contact,
+      label: topicChange_React.createElement(utils.EmojiFormattedContent, null, displayName)
     }), datetime, topicChange_React.createElement("div", {
       className: "message text-block",
       dangerouslySetInnerHTML: {
@@ -18040,6 +18056,8 @@ class TopicChange extends topicChange_ConversationMessageMixin {
 
 
 ;// CONCATENATED MODULE: ./js/chat/ui/messages/closeOpenMode.jsx
+
+
 var closeOpenMode_React = __webpack_require__(363);
 
 var closeOpenMode_ContactsUI = __webpack_require__(13);
@@ -18092,7 +18110,7 @@ class CloseOpenModeMessage extends closeOpenMode_ConversationMessageMixin {
       className: "message content-area small-info-txt"
     }, closeOpenMode_React.createElement("div", {
       className: "message user-card-name"
-    }, displayName), datetime, closeOpenMode_React.createElement("div", {
+    }, closeOpenMode_React.createElement(utils.EmojiFormattedContent, null, displayName)), datetime, closeOpenMode_React.createElement("div", {
       className: "message text-block"
     }, l[20569])));
   }
@@ -18101,6 +18119,8 @@ class CloseOpenModeMessage extends closeOpenMode_ConversationMessageMixin {
 
 
 ;// CONCATENATED MODULE: ./js/chat/ui/messages/chatHandle.jsx
+
+
 var chatHandle_React = __webpack_require__(363);
 
 var chatHandle_ReactDOM = __webpack_require__(533);
@@ -18159,7 +18179,7 @@ class ChatHandleMessage extends chatHandle_ConversationMessageMixin {
       className: "message content-area small-info-txt"
     }, chatHandle_React.createElement("div", {
       className: "message user-card-name"
-    }, displayName), datetime, chatHandle_React.createElement("div", {
+    }, chatHandle_React.createElement(utils.EmojiFormattedContent, null, displayName)), datetime, chatHandle_React.createElement("div", {
       className: "message text-block"
     }, message.meta.handleUpdate === 1 ? l[20570] : l[20571])));
   }
@@ -18168,6 +18188,7 @@ class ChatHandleMessage extends chatHandle_ConversationMessageMixin {
 
 
 ;// CONCATENATED MODULE: ./js/chat/ui/messages/retentionChange.jsx
+
 
 
 
@@ -18189,7 +18210,7 @@ class RetentionChange extends mixin.y {
     }, external_React_default().createElement(ui_contacts.ContactButton, {
       contact: contact,
       className: "message",
-      label: contact ? generateAvatarMeta(contact.u).fullName : contact
+      label: external_React_default().createElement(utils.EmojiFormattedContent, null, generateAvatarMeta(contact.u).fullName)
     }), external_React_default().createElement("div", {
       className: "message date-time simpletip",
       "data-simpletip": time2date(this.getTimestamp())
@@ -18941,6 +18962,7 @@ class Collapse extends mixins.wl {
 
 
 
+
 class Participant extends mixins.wl {
   constructor(props) {
     super(props);
@@ -18983,7 +19005,7 @@ class Participant extends mixins.wl {
       contact: M.u[handle]
     }), external_React_default().createElement("div", {
       className: "name"
-    }, external_React_default().createElement("span", null, name, " \xA0"), handle === u_handle && external_React_default().createElement("span", null, l.me), chatRoom.isMeeting && Call.isModerator(chatRoom, handle) && external_React_default().createElement("span", null, external_React_default().createElement("i", {
+    }, external_React_default().createElement(utils.EmojiFormattedContent, null, name), handle === u_handle && external_React_default().createElement("span", null, l.me), chatRoom.isMeeting && Call.isModerator(chatRoom, handle) && external_React_default().createElement("span", null, external_React_default().createElement("i", {
       className: this.baseIconClass + " icon-admin"
     }))), external_React_default().createElement("div", {
       className: "status"
@@ -19654,9 +19676,10 @@ End.NAMESPACE = 'end-dialog';
 
 
 
+
 class Ephemeral extends mixins.wl {
-  constructor(props) {
-    super(props);
+  constructor() {
+    super(...arguments);
     this.buttons = [{
       key: 'ok',
       label: 'Ok',
@@ -19675,7 +19698,7 @@ class Ephemeral extends mixins.wl {
       name: Ephemeral.NAMESPACE,
       dialogType: "message",
       icon: "sprite-fm-uni icon-info",
-      title: l.ephemeral_title ? l.ephemeral_title.replace('%1', ephemeralName) : ephemeralName + " is using an ephemeral session.",
+      title: external_React_default().createElement(utils.EmojiFormattedContent, null, ephemeralName),
       noCloseOnClickOutside: true,
       buttons: this.buttons,
       onClose: onClose
@@ -20348,7 +20371,7 @@ class Join extends mixins.wl {
         className: Join.NAMESPACE + "-logo"
       }, external_React_default().createElement("i", {
         className: "\n                            sprite-fm-illustration-wide\n                            " + (document.body.classList.contains('theme-dark') ? 'mega-logo-dark' : 'img-mega-logo-light') + "\n                        "
-      })), external_React_default().createElement("h1", null, l.you_have_invitation.replace('%1', (_this$props$chatRoom = this.props.chatRoom) == null ? void 0 : _this$props$chatRoom.topic)), isEphemeral() && external_React_default().createElement("div", {
+      })), external_React_default().createElement("h1", null, external_React_default().createElement(utils.EmojiFormattedContent, null, l.you_have_invitation.replace('%1', (_this$props$chatRoom = this.props.chatRoom) == null ? void 0 : _this$props$chatRoom.topic))), isEphemeral() && external_React_default().createElement("div", {
         className: "ephemeral-info"
       }, external_React_default().createElement("i", {
         className: "sprite-fm-uni icon-warning"
@@ -20431,7 +20454,7 @@ class Join extends mixins.wl {
         onClick: () => this.setState({
           preview: !preview
         })
-      }, chatRoom.topic, external_React_default().createElement(meetings_button.Z, {
+      }, external_React_default().createElement(utils.EmojiFormattedContent, null, chatRoom.topic), external_React_default().createElement(meetings_button.Z, {
         icon: "icon-minimise"
       }, external_React_default().createElement("span", null, "Toggle"))), preview && external_React_default().createElement("div", {
         className: "chat-body"
@@ -22900,6 +22923,7 @@ var contactsPanel = __webpack_require__(651);
 
 
 
+
 class Start extends mixins.wl {
   constructor(props) {
     super(props);
@@ -23015,7 +23039,7 @@ class Start extends mixins.wl {
       className: NAMESPACE + "-title"
     }, editing ? external_React_default().createElement(this.Input, null) : external_React_default().createElement("h2", {
       onClick: this.toggleEdit
-    }, topic), external_React_default().createElement(meetings_button.Z, {
+    }, external_React_default().createElement(utils.EmojiFormattedContent, null, topic)), external_React_default().createElement(meetings_button.Z, {
       className: "\n                                mega-button\n                                action\n                                small\n                                " + CLASS_NAMES.EDIT + "\n                                " + (editing ? 'editing' : '') + "\n                            ",
       icon: "icon-rename",
       simpletip: {
@@ -24492,13 +24516,15 @@ __webpack_require__.r(__webpack_exports__);
 __webpack_require__.d(__webpack_exports__, {
 "default": () => (Incoming)
 });
-var _extends5__ = __webpack_require__(462);
+var _extends6__ = __webpack_require__(462);
 var react0__ = __webpack_require__(363);
 var react0 = __webpack_require__.n(react0__);
 var _mixins1__ = __webpack_require__(503);
 var _contacts_jsx2__ = __webpack_require__(13);
 var _ui_modalDialogs_jsx3__ = __webpack_require__(904);
 var _button_jsx4__ = __webpack_require__(193);
+var _ui_utils_jsx5__ = __webpack_require__(79);
+
 
 
 
@@ -24548,7 +24574,7 @@ class Incoming extends _mixins1__.wl {
       };
       const isPrivateRoom = chatRoom.type === 'private';
       const rejectLabel = isPrivateRoom ? l[20981] : l[82];
-      return react0().createElement(_ui_modalDialogs_jsx3__.Z.ModalDialog, (0,_extends5__.Z)({}, this.state, {
+      return react0().createElement(_ui_modalDialogs_jsx3__.Z.ModalDialog, (0,_extends6__.Z)({}, this.state, {
         name: NAMESPACE,
         className: NAMESPACE,
         noCloseOnClickOutside: true,
@@ -24561,7 +24587,7 @@ class Incoming extends _mixins1__.wl {
         contact: M.u[callerId]
       })), react0().createElement("div", {
         className: NAMESPACE + "-info"
-      }, react0().createElement("h1", null, chatRoom.getRoomTitle()), react0().createElement("span", null, isPrivateRoom ? l[17878] : l[19995])), react0().createElement("div", {
+      }, react0().createElement("h1", null, react0().createElement(_ui_utils_jsx5__.EmojiFormattedContent, null, chatRoom.getRoomTitle())), react0().createElement("span", null, isPrivateRoom ? l[17878] : l[19995])), react0().createElement("div", {
         className: NAMESPACE + "-controls"
       }, react0().createElement(_button_jsx4__.Z, {
         className: "mega-button large round negative",

@@ -2805,7 +2805,7 @@ Chat.prototype.highlight = (text, matches, dontEscape) => {
 
         // add back the HTML tags
         // eslint-disable-next-line optimize-regex/optimize-regex,no-useless-escape
-        text = text.replace(/\@\@\!\d+\!\@\@/, match => {
+        text = text.replace(/\@\@\!\d+\!\@\@/g, match => {
             return tags[parseInt(match.replace("@@!", "").replace("!@@"), 10)];
         });
     }

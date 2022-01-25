@@ -1,3 +1,5 @@
+import { EmojiFormattedContent } from '../../../ui/utils';
+
 var React = require("react");
 var ContactsUI = require('./../contacts.jsx');
 var ConversationMessageMixin = require('./mixin.jsx').ConversationMessageMixin;
@@ -44,7 +46,9 @@ class CloseOpenModeMessage extends ConversationMessageMixin {
                 {avatar}
 
                 <div className="message content-area small-info-txt">
-                    <div className="message user-card-name">{displayName}</div>
+                    <div className="message user-card-name">
+                        <EmojiFormattedContent>{displayName}</EmojiFormattedContent>
+                    </div>
                     {datetime}
 
                     <div className="message text-block">

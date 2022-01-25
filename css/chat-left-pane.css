@@ -1011,6 +1011,11 @@ li.active .call-duration i {
     color: var(--text-color-high);
 }
 
+.contacts-table .contact-item-user .emoji {
+    width: 18px;
+    height: 18px;
+}
+
 .contacts-table .contact-item-email {
     font: var(--text-body2);
     color: var(--text-color-low);

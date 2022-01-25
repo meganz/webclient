@@ -1413,6 +1413,10 @@
   margin: 0;
   cursor: pointer;
 }
+.start-meeting-title h2 .emoji.big {
+  width: 24px;
+  height: 24px;
+}
 .start-meeting-title button {
   margin: 3px 0 0 7px;
 }

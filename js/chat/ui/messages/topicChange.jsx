@@ -1,6 +1,7 @@
 var React = require("react");
 var ContactsUI = require('./../contacts.jsx');
 var ConversationMessageMixin = require('./mixin.jsx').ConversationMessageMixin;
+import { EmojiFormattedContent } from '../../../ui/utils.jsx';
 
 class TopicChange extends ConversationMessageMixin {
     render() {
@@ -57,17 +58,16 @@ class TopicChange extends ConversationMessageMixin {
 
                 <div className="message content-area small-info-txt">
                     <ContactsUI.ContactButton
-                        contact={contact}
                         className="message"
-                        label={displayName}
                         chatRoom={chatRoom}
+                        contact={contact}
+                        label={<EmojiFormattedContent>{displayName}</EmojiFormattedContent>}
                     />
                     {datetime}
-
-                    <div className="message text-block" dangerouslySetInnerHTML={{__html:text}}></div>
+                    <div className="message text-block" dangerouslySetInnerHTML={{ __html: text }} />
                 </div>
             </div>
-        )
+        );
 
 
         return <div>{messages}</div>;

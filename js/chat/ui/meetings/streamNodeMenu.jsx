@@ -2,6 +2,7 @@ import React from 'react';
 import { MegaRenderMixin } from '../../mixins';
 import Button from './button.jsx';
 import Call from './call.jsx';
+import { EmojiFormattedContent } from '../../../ui/utils.jsx';
 
 export default class StreamNodeMenu extends MegaRenderMixin {
     static NAMESPACE = 'node-menu';
@@ -111,7 +112,7 @@ export default class StreamNodeMenu extends MegaRenderMixin {
                         theme-dark-forced
                     `}>
                     <div className={`${NAMESPACE}-toggle`}>
-                        <span>{M.getNameByHandle(userHandle)}</span>
+                        <EmojiFormattedContent>{M.getNameByHandle(userHandle)}</EmojiFormattedContent>
                         <i className="sprite-fm-mono icon-side-menu"/>
                     </div>
                     <div className={`${NAMESPACE}-content`}>

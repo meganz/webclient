@@ -613,7 +613,10 @@
                 contactElem += contactStatus + '">';
                 contactElem += '<i class="encrypted-icon sprite-fm-uni icon-ekr"></i>';
                 contactElem += '<span class="nw-contact-status"></span>';
-                contactElem += '<span class="nw-contact-name">' + escapeHTML(name) + '</span>';
+                contactElem +=
+                    '<span class="nw-contact-name">' +
+                        megaChat.plugins.emoticonsFilter.processHtmlMessage(escapeHTML(name))
+                    + '</span>';
                 contactElem += '<span class="nw-contact-email">' + escapeHTML(email) + '</span>';
                 contactElem = '<li id="cpy-dlg-chat-itm-' + handle + '">' + contactElem + '</li>';
                 return contactElem;

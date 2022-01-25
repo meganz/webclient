@@ -1,7 +1,7 @@
 import React from 'react';
 import {ContactAwareComponent} from '../mixins';
 import {MegaRenderMixin} from '../mixins';
-import utils from '../../ui/utils.jsx';
+import utils, { EmojiFormattedContent } from '../../ui/utils.jsx';
 import { PerfectScrollbar } from '../../ui/perfectScrollbar.jsx';
 import { Button } from '../../ui/buttons.jsx';
 import { Dropdown, DropdownItem } from '../../ui/dropdowns.jsx';
@@ -862,7 +862,9 @@ export class ContactItem extends ContactAwareComponent {
                     noContextMenu={this.props.noContextMenu}
                     contact={contact}
                     className="light"
-                    label={username}
+                    label={
+                        <EmojiFormattedContent>{username}</EmojiFormattedContent>
+                    }
                     chatRoom={this.props.chatRoom} />
             </div>
         </div>;
@@ -1217,11 +1219,12 @@ export class ContactPickerWidget extends MegaRenderMixin {
                     var v2 = sel2[i2];
                     contactsSelected.push(
                         <ContactItem
-                            noContextMenu={true}
-                            contact={M.u[v2]}
-                            onClick={onContactSelectDoneCb}
+                            key={v2}
                             chatRoom={self.props.chatRoom || false}
-                            key={v2} />
+                            contact={M.u[v2]}
+                            noContextMenu={true}
+                            onClick={onContactSelectDoneCb}
+                        />
                     );
                 }
 

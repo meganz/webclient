@@ -3,6 +3,7 @@ import AbstractGenericMessage from '../abstractGenericMessage.jsx';
 import { Avatar, ContactFingerprint, ContactPresence, ContactVerified } from '../../contacts.jsx';
 import { Dropdown, DropdownItem } from '../../../../ui/dropdowns.jsx';
 import { Button } from '../../../../ui/buttons.jsx';
+import { EmojiFormattedContent } from '../../../../ui/utils.jsx';
 
 export default class Contact extends AbstractGenericMessage {
     constructor(props) {
@@ -65,7 +66,7 @@ export default class Contact extends AbstractGenericMessage {
 
     _getContactCard(message, contact, contactEmail) {
         const HAS_RELATIONSHIP = M.u[contact.u].c === 1;
-        let name = M.getNameByHandle(contact.u);
+        let name = <EmojiFormattedContent>{M.getNameByHandle(contact.u)}</EmojiFormattedContent>;
         const { chatRoom } = this.props;
         const isAnonView = chatRoom.isAnonymous();
         if (megaChat.FORCE_EMAIL_LOADING) {
@@ -172,7 +173,9 @@ export default class Contact extends AbstractGenericMessage {
                 ...contacts,
                 <div key={contact.u}>
                     {!isAnonView ? <div className="message shared-info">
-                        <div className="message data-title">{M.getNameByHandle(contact.u)}</div>
+                        <div className="message data-title">
+                            <EmojiFormattedContent>{M.getNameByHandle(contact.u)}</EmojiFormattedContent>
+                        </div>
                         {M.u[contact.u] ?
                             <ContactVerified className="right-align" contact={M.u[contact.u]}/> :
                             null}

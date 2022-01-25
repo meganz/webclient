@@ -2,6 +2,7 @@ import React from 'react';
 import AbstractGenericMessage from '../abstractGenericMessage.jsx';
 import { getMessageString } from '../utils.jsx';
 import { Avatar, ContactButton } from '../../contacts.jsx';
+import { EmojiFormattedContent } from '../../../../ui/utils';
 
 const MESSAGE_TYPE = {
     OUTGOING: 'outgoing-call',
@@ -40,9 +41,10 @@ export default class Local extends AbstractGenericMessage {
 
     _getParticipantNames = message => (
         message.meta && message.meta.participants && !!message.meta.participants.length &&
-        message.meta.participants.map(handle =>
-            `[[${escapeHTML(M.getNameByHandle(handle))}]]`
-        )
+        message.meta.participants
+            .map(handle =>
+                `[[${megaChat.plugins.emoticonsFilter.processHtmlMessage(escapeHTML(M.getNameByHandle(handle)))}]]`
+            )
     );
 
     _getExtraInfo = message => {
@@ -278,7 +280,11 @@ export default class Local extends AbstractGenericMessage {
                 <ContactButton
                     contact={contact}
                     className="message"
-                    label={message.authorContact ? M.getNameByHandle(message.authorContact.u) : ''}
+                    label={
+                        <EmojiFormattedContent>
+                            {message.authorContact ? M.getNameByHandle(message.authorContact.u) : ''}
+                        </EmojiFormattedContent>
+                    }
                     chatRoom={message.chatRoom}
                 /> :
                 M.getNameByHandle(contact.u)

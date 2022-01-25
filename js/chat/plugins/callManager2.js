@@ -692,8 +692,10 @@
                     otherContactsName.push(message.chatRoom.topic);
                 }
             }
+            otherContactsName = otherContactsName.map(name =>
+                megaChat.plugins.emoticonsFilter.processHtmlMessage(name)
+            );
         }
-
 
         if (message.chatRoom.type === "private") {
             tmpMsg = CallManager2._getMultStrTxtCntsForMsgPriv(

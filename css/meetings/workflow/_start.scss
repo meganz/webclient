@@ -39,6 +39,11 @@
             white-space: nowrap;
             margin: 0;
             cursor: pointer;
+
+            .emoji.big {
+                width: 24px;
+                height: 24px;
+            }
         }
 
         button {

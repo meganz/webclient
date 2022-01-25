@@ -1,6 +1,7 @@
 import  React from 'react';
 import { ConversationMessageMixin } from './mixin.jsx';
 import { ContactButton, Avatar } from '../contacts.jsx';
+import { EmojiFormattedContent } from '../../../ui/utils.jsx';
 
 export class RetentionChange extends ConversationMessageMixin {
     render() {
@@ -14,7 +15,8 @@ export class RetentionChange extends ConversationMessageMixin {
                     <ContactButton
                         contact={contact}
                         className="message"
-                        label={contact ? generateAvatarMeta(contact.u).fullName : contact} />
+                        label={<EmojiFormattedContent>{generateAvatarMeta(contact.u).fullName}</EmojiFormattedContent>}
+                    />
                     <div className="message date-time simpletip" data-simpletip={time2date(this.getTimestamp())}>
                         {this.getTimestampAsString()}
                     </div>

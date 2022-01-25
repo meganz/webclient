@@ -3,6 +3,7 @@ import { MegaRenderMixin } from '../../../mixins';
 import { Avatar } from '../../contacts.jsx';
 import ModalDialogsUI from '../../../../ui/modalDialogs.jsx';
 import Button from '../button.jsx';
+import { EmojiFormattedContent } from '../../../../ui/utils.jsx';
 
 export default class Incoming extends MegaRenderMixin {
     static NAMESPACE = 'incoming-dialog';
@@ -49,7 +50,9 @@ export default class Incoming extends MegaRenderMixin {
                             <Avatar contact={M.u[callerId]} />
                         </div>
                         <div className={`${NAMESPACE}-info`}>
-                            <h1>{chatRoom.getRoomTitle()}</h1>
+                            <h1>
+                                <EmojiFormattedContent>{chatRoom.getRoomTitle()}</EmojiFormattedContent>
+                            </h1>
                             <span>
                                 {isPrivateRoom ? l[17878] /* `Incoming call` */ : l[19995] /* `Incoming group call` */}
                             </span>

@@ -1459,6 +1459,7 @@
   margin: 40px auto 0;
   width: 195px;
   height: 65px;
+  --width: 195px;
 }
 .join-meeting-head h1 {
   margin: 24px 0 0 0;
@@ -1656,7 +1657,7 @@ body.theme-dark .join-meeting .card-preview .preview {
   background: #333;
 }
 body.theme-dark .preview-meeting {
-  background: #222;
+  background: #000;
 }
 .preview-meeting video {
   display: none;

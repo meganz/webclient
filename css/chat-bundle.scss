@@ -5,7 +5,8 @@
 @import 'meetings/_streamHead.scss';
 @import 'meetings/_streamNode.scss';
 @import 'meetings/_local.scss';
-@import 'meetings/streamExtendedControls';
+@import 'meetings/_streamExtendedControls.scss';
+@import 'meetings/_micObserver.scss';
 
 // Workflow components
 @import 'meetings/workflow/_start.scss';

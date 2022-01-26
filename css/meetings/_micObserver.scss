@@ -1,0 +1,15 @@
+.meetings-signal-issue {
+    position: absolute;
+    right: 1px;
+    bottom: -4px;
+    border-radius: 200px;
+
+    i {
+        --icon-size: 24px;
+        --mask-color: var(--secondary-orange);
+    }
+}
+
+.meetings-signal-container {
+    position: relative;
+}

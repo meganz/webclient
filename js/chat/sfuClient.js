@@ -350,7 +350,7 @@ function compressedSdpToString(sdp) {
 }
 
 ;// CONCATENATED MODULE: ../shared/commitId.ts
-const COMMIT_ID = 'd45358926e';
+const COMMIT_ID = 'b391d53d8a';
 /* harmony default export */ const commitId = (COMMIT_ID);
 
 ;// CONCATENATED MODULE: ./client.ts
@@ -422,8 +422,9 @@ class SfuClient {
         this._svcDriver = new SvcDriver(this);
         this._speakerDetector = new SpeakerDetector(this);
         this._statsRecorder = new StatsRecorder(this);
+        this.micMuteMonitor = new MicMuteMonitor(this);
     }
-    get noMicInputSignalled() { return this._noMicInputSignalled; }
+    get micInputSeen() { return this.micMuteMonitor.micInputSeen; }
     static platformHasSupport() {
         return window.RTCRtpSender &&
             !!RTCRtpSender.prototype.createEncodedStreams;
@@ -512,7 +513,7 @@ class SfuClient {
     _fire(evName, ...args) {
         let method = this.app[evName];
         if (!method) {
-            console.warn("Unhandled event:" + evName);
+            console.warn(`Unhandled event: ${evName}(${args.join(",")})`);
             return;
         }
         console.log("fire [" + evName + "]");
@@ -632,7 +633,7 @@ class SfuClient {
             this.isGroup = isGroup;
         }
         delete this.termCode;
-        delete this._noMicInputSignalled;
+        this.micMuteMonitor.reinit();
         this._setConnState(ConnState.kConnecting);
         this._fire("onConnecting");
         this.reinit();
@@ -927,10 +928,11 @@ class SfuClient {
             if (self._speakerState === SpeakerState.kActive) {
                 if (!self._muteAudio && self._audioTrack) {
                     promises.push(self.outASpeakerTrack.sendTrack(self._audioTrack));
-                    this.startMicMutedWarnTimer();
+                    this.micMuteMonitor.restart();
                 }
                 else {
                     promises.push(self.outASpeakerTrack.sendTrack(null));
+                    this.micMuteMonitor.stop();
                 }
             }
             else {
@@ -1359,6 +1361,9 @@ class SfuClient {
     isSharingScreen() {
         return this._onHold ? this._onHold.isSharingScreen : this._isSharingScreen;
     }
+    isCurrentlySendingScreenHiRes() {
+        return this._screenTrack && this.outVSpeakerTrack.sentTrack === this._screenTrack;
+    }
     sendSpeakRequest(cid) {
         let cmd = { a: "SPEAK_RQ" };
         if (cid) {
@@ -1542,26 +1547,6 @@ class SfuClient {
             peer._fire("onPeerModerator", msg.mod);
         }
     }
-    startMicMutedWarnTimer() {
-        if (this.micMutedWarnTimer) {
-            return;
-        }
-        let timer = this.micMutedWarnTimer = setTimeout(() => {
-            if (this.micMutedWarnTimer === timer) {
-                delete this.micMutedWarnTimer;
-                this._noMicInputSignalled = true;
-                this._fire('onNoMicInput');
-            }
-        }, SfuClient.kMicMutedWarnTimeout);
-        console.debug("Started mic muted warning timer");
-    }
-    stopMicMutedWarnTimer() {
-        if (!this.micMutedWarnTimer) {
-            return;
-        }
-        clearTimeout(this.micMutedWarnTimer);
-        delete this.micMutedWarnTimer;
-    }
     enableStats() {
         if (this.statTimer) {
             return;
@@ -1601,11 +1586,7 @@ class SfuClient {
         let stats = await sender.getStats();
         for (let item of stats.values()) {
             if (item.type === "media-source") {
-                let level = this.micAudioLevel = item.audioLevel;
-                this.tsMicAudioLevel = Date.now();
-                if (this.micMutedWarnTimer && level > SfuClient.kMicMutedDetectThreshold) {
-                    this.stopMicMutedWarnTimer();
-                }
+                this.micMuteMonitor.onLevel(this.micAudioLevel = item.audioLevel);
                 return;
             }
         }
@@ -1615,7 +1596,7 @@ class SfuClient {
             console.warn("pollStats called while not in kJoined state");
             return;
         }
-        let flags = this._screenTrack ? StatsFlags.kSendingScreen : 0;
+        let flags = this.isCurrentlySendingScreenHiRes() ? StatsFlags.kSendingScreen : 0;
         let stats = this.rtcStats = { pl: 0, jtr: 1000000, f: flags };
         this.hasConnStats = false;
         let promises = [this.pollTxVideoStats(), this.pollMicAudioLevel()];
@@ -1780,8 +1761,6 @@ SfuClient.kSpeakerVolThreshold = 0.001;
 SfuClient.kWorkerUrl = '/worker.sfuClient.bundle.js';
 SfuClient.kStatServerUrl = "https://stats.sfu.mega.co.nz";
 SfuClient.kSpeakerChangeMinInterval = 4000;
-SfuClient.kMicMutedDetectThreshold = 0.0001;
-SfuClient.kMicMutedWarnTimeout = 16000;
 SfuClient.SpeakerState = SpeakerState;
 SfuClient.ConnState = ConnState;
 SfuClient.TermCode = termCodes;
@@ -1861,13 +1840,14 @@ class Slot {
     }
     async pollRxStats() {
         let client = this.client;
-        let connStats = client.rtcStats;
+        let commonStats = client.rtcStats;
         let ctx = this.rxStatCtx;
         let rtpParsed;
         let stats = await this.xponder.receiver.getStats();
         let parseConnStats = !client.hasConnStats;
         for (let stat of stats.values()) {
             if (stat.type === "inbound-rtp") {
+                rtpParsed = true;
                 if (!ctx.prev) {
                     ctx.prev = stat;
                 }
@@ -1876,27 +1856,34 @@ class Slot {
                     ctx.prev = stat;
                     let period = (stat.timestamp - prev.timestamp) / 1000;
                     let plostPerSecond = (stat.packetsLost - prev.packetsLost) / period;
-                    connStats.pl += plostPerSecond;
-                    if (!this.isVideo && (stat.jitter != null)) {
-                        let jtr = Math.round(stat.jitter * 1000);
-                        if (connStats.jtr > jtr) {
-                            connStats.jtr = jtr;
+                    commonStats.pl += plostPerSecond;
+                    if (!this.isVideo) {
+                        if (stat.jitter != null) {
+                            let jtr = Math.round(stat.jitter * 1000);
+                            if (commonStats.jtr > jtr) {
+                                commonStats.jtr = jtr;
+                            }
                         }
                     }
-                    let cbs = this.rxStatsCallbacks;
-                    if (cbs.size) {
-                        // more detailed stats for app
-                        let info = {
-                            plost: plostPerSecond,
-                            nacktx: (stat.nackCount - prev.nackCount) / period,
-                            kbps: ((stat.bytesReceived - prev.bytesReceived) / 128) / period,
-                            keyfps: (stat.keyFramesDecoded - prev.keyFramesDecoded) / period
-                        };
-                        for (let cb of cbs.values()) { // may get unassigned while getting stats
-                            cb(this, info, stat);
+                    else { // video stats
+                        if (commonStats.mrxw == null || commonStats.mrxw < stat.frameWidth) {
+                            commonStats.mrxw = stat.frameWidth;
+                            commonStats.mrxfps = stat.framesPerSecond;
+                        }
+                        let cbs = this.rxStatsCallbacks;
+                        if (cbs.size) {
+                            // more detailed stats for app
+                            let info = {
+                                plost: plostPerSecond,
+                                nacktx: (stat.nackCount - prev.nackCount) / period,
+                                kbps: ((stat.bytesReceived - prev.bytesReceived) / 128) / period,
+                                keyfps: (stat.keyFramesDecoded - prev.keyFramesDecoded) / period
+                            };
+                            for (let cb of cbs.values()) { // may get unassigned while getting stats
+                                cb(this, info, stat);
+                            }
                         }
                     }
-                    rtpParsed = true;
                 }
                 if (!parseConnStats) {
                     return;
@@ -2410,7 +2397,7 @@ class Peer {
     _fire(evName, ...args) {
         let method = this.handler[evName];
         if (!method) {
-            console.warn("Peer: Unhandled event:" + evName);
+            console.warn(`Peer: Unhandled event: ${evName}(${args.join(",")})`);
             return;
         }
         console.log("fire [" + evName + "]");
@@ -2594,6 +2581,58 @@ SvcDriver.layersByQuality = [
     [2, 2, 2, 2]
 ];
 SvcDriver.kMaxQualityIndex = 6;
+class MicMuteMonitor {
+    constructor(client) {
+        this.micLevelAvg = 0;
+        this.client = client;
+    }
+    delTimer() {
+        if (this.timer) {
+            clearTimeout(this.timer);
+            delete this.timer;
+        }
+    }
+    reinit() {
+        this.delTimer();
+        delete this.micInputSeen;
+    }
+    stop() {
+        this.delTimer();
+    }
+    restart() {
+        this.micLevelAvg = 0.001;
+        this.muteIndicatorActive = false;
+        this.delTimer();
+        this.timer = setTimeout(() => {
+            if (!this.micInputSeen) {
+                this.client._fire("onNoMicInput");
+            }
+            delete this.timer;
+        }, MicMuteMonitor.kWarningTimeoutMs);
+        console.log("Started mic muted monitor");
+    }
+    onLevel(level) {
+        let avg = this.micLevelAvg = (level + this.micLevelAvg * 2) / 3;
+        if (this.muteIndicatorActive) {
+            if (Math.max(level, avg) > MicMuteMonitor.kMicMutedDetectThreshold) {
+                delete this.muteIndicatorActive;
+                this.micInputSeen = true;
+                if (this.timer) {
+                    this.delTimer();
+                }
+                this.client._fire("onMicSignalDetected", true);
+            }
+        }
+        else {
+            if (avg < MicMuteMonitor.kMicMutedDetectThreshold) {
+                this.muteIndicatorActive = true;
+                this.client._fire("onMicSignalDetected", false);
+            }
+        }
+    }
+}
+MicMuteMonitor.kMicMutedDetectThreshold = 0.00001;
+MicMuteMonitor.kWarningTimeoutMs = 16000;
 class SpeakerDetector {
     constructor(client) {
         this.peers = new Set();
@@ -2729,7 +2768,7 @@ class StatsRecorder {
             samples: arrs,
             trsn: termReason,
         };
-        if (this.client.noMicInputSignalled) {
+        if (!this.client.micInputSeen) {
             data.nomic = 1;
         }
         if (this.client.isGroup) {

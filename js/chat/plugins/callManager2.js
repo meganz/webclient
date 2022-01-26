@@ -322,6 +322,12 @@
         onJoined() {
             this.chatRoom.trigger('onCallIJoined');
         }
+        onNoMicInput() {
+            this.chatRoom.trigger('onNoMicInput');
+        }
+        onMicSignalDetected(signal) {
+            this.chatRoom.trigger('onMicSignalDetected', signal);
+        }
         registerPlayer(player) {
             var peer = this.peers[player.peer.cid];
             assert(peer, 'registerPlayer: peer not found.');

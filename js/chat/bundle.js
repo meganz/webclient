@@ -15,8 +15,8 @@ var external_React_default = __webpack_require__.n(external_React_);
 // EXTERNAL MODULE: external "ReactDOM"
 var external_ReactDOM_ = __webpack_require__(533);
 var external_ReactDOM_default = __webpack_require__.n(external_ReactDOM_);
-// EXTERNAL MODULE: ./js/chat/ui/conversations.jsx + 73 modules
-var conversations = __webpack_require__(230);
+// EXTERNAL MODULE: ./js/chat/ui/conversations.jsx + 74 modules
+var conversations = __webpack_require__(78);
 ;// CONCATENATED MODULE: ./js/chat/chatRouting.jsx
 class ChatRouting {
   constructor(megaChatInstance) {
@@ -5518,7 +5518,7 @@ var _mixins1__ = __webpack_require__(503);
 var _ui_utils_jsx2__ = __webpack_require__(79);
 var _ui_perfectScrollbar_jsx3__ = __webpack_require__(285);
 var _ui_buttons_jsx4__ = __webpack_require__(204);
-var _ui_dropdowns_jsx5__ = __webpack_require__(78);
+var _ui_dropdowns_jsx5__ = __webpack_require__(261);
 var _contactsPanel_contactsPanel_jsx6__ = __webpack_require__(651);
 
 
@@ -7219,7 +7219,7 @@ ColumnContactLastInteraction.id = "interaction";
 ColumnContactLastInteraction.label = l[5904];
 ColumnContactLastInteraction.megatype = "interaction";
 // EXTERNAL MODULE: ./js/ui/dropdowns.jsx
-var dropdowns = __webpack_require__(78);
+var dropdowns = __webpack_require__(261);
 ;// CONCATENATED MODULE: ./js/chat/ui/contactsPanel/contextMenu.jsx
 
 
@@ -8453,7 +8453,7 @@ ContactsPanel.getUserFingerprint = handle => {
 
 /***/ }),
 
-/***/ 230:
+/***/ 78:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -8474,7 +8474,7 @@ var mixins = __webpack_require__(503);
 // EXTERNAL MODULE: ./js/ui/buttons.jsx
 var ui_buttons = __webpack_require__(204);
 // EXTERNAL MODULE: ./js/ui/dropdowns.jsx
-var dropdowns = __webpack_require__(78);
+var dropdowns = __webpack_require__(261);
 // EXTERNAL MODULE: external "React"
 var external_React_ = __webpack_require__(363);
 var external_React_default = __webpack_require__.n(external_React_);
@@ -9488,7 +9488,7 @@ class Accordion extends mixins.wl {
 
 
 
-var DropdownsUI = __webpack_require__(78);
+var DropdownsUI = __webpack_require__(261);
 
 var ContactsUI = __webpack_require__(13);
 
@@ -16340,15 +16340,73 @@ class StreamExtendedControls extends mixins.wl {
   }
 
 }
+;// CONCATENATED MODULE: ./js/chat/ui/meetings/micObserver.jsx
+
+
+
+const withMicObserver = Component => class extends mixins.wl {
+  constructor() {
+    super(...arguments);
+    this.namespace = "SO-" + Component.NAMESPACE;
+    this.signalObserver = "onMicSignalDetected." + this.namespace;
+    this.inputObserver = "onNoMicInput." + this.namespace;
+    this.state = {
+      signal: true
+    };
+
+    this.unbindObservers = () => [this.signalObserver, this.inputObserver].map(observer => this.props.chatRoom.unbind(observer));
+
+    this.bindObservers = () => this.props.chatRoom.rebind(this.signalObserver, _ref => {
+      let {
+        data: signal
+      } = _ref;
+      return this.setState({
+        signal
+      });
+    }).rebind(this.inputObserver, () => this.setState({
+      signal: false
+    }));
+
+    this.renderSignalWarning = () => external_React_default().createElement("div", {
+      className: "\n                    " + this.namespace + "\n                    meetings-signal-issue\n                    simpletip\n                ",
+      "data-simpletip": "Check your system settings to unmute your mic and adjust its level",
+      "data-simpletipposition": "top",
+      "data-simpletipoffset": "5",
+      "data-simpletip-class": "theme-dark-forced"
+    }, external_React_default().createElement("i", {
+      className: "sprite-fm-mono icon-exclamation-filled"
+    }));
+  }
+
+  componentWillUnmount() {
+    super.componentWillUnmount();
+    this.unbindObservers();
+  }
+
+  componentDidMount() {
+    super.componentDidMount();
+    this.bindObservers();
+  }
+
+  render() {
+    return external_React_default().createElement(Component, (0,esm_extends.Z)({}, this.props, {
+      signal: this.state.signal,
+      renderSignalWarning: this.renderSignalWarning
+    }));
+  }
+
+};
 ;// CONCATENATED MODULE: ./js/chat/ui/meetings/streamControls.jsx
 
 
 
 
 
+
+
 class StreamControls extends mixins.wl {
-  constructor(props) {
-    super(props);
+  constructor() {
+    super(...arguments);
 
     this.renderDebug = () => {
       const SIMPLETIP = {
@@ -16389,7 +16447,7 @@ class StreamControls extends mixins.wl {
       className: 'theme-dark-forced'
     };
     return external_React_default().createElement("div", {
-      className: "stream-controls"
+      className: StreamControls.NAMESPACE
     }, d ? this.renderDebug() : '', external_React_default().createElement("ul", null, external_React_default().createElement("li", null, external_React_default().createElement(meetings_button.Z, {
       simpletip: { ...SIMPLETIP,
         label: audioLabel
@@ -16397,7 +16455,7 @@ class StreamControls extends mixins.wl {
       className: "\n                                mega-button\n                                theme-light-forced\n                                round\n                                large\n                                " + (avFlags & SfuClient.Av.Audio ? '' : 'inactive') + "\n                            ",
       icon: "" + (avFlags & SfuClient.Av.Audio ? 'icon-audio-filled' : 'icon-audio-off'),
       onClick: this.props.onAudioClick
-    }, external_React_default().createElement("span", null, audioLabel))), external_React_default().createElement("li", null, external_React_default().createElement(meetings_button.Z, {
+    }, external_React_default().createElement("span", null, audioLabel)), this.props.signal ? null : this.props.renderSignalWarning()), external_React_default().createElement("li", null, external_React_default().createElement(meetings_button.Z, {
       simpletip: { ...SIMPLETIP,
         label: videoLabel
       },
@@ -16419,7 +16477,11 @@ class StreamControls extends mixins.wl {
   }
 
 }
+
+StreamControls.NAMESPACE = 'stream-controls';
+const streamControls = (withMicObserver(StreamControls));
 ;// CONCATENATED MODULE: ./js/chat/ui/meetings/local.jsx
+
 
 
 
@@ -16807,7 +16869,7 @@ class Stream extends mixins.wl {
         } = _ref2;
         return minimized && target.classList.contains(NAMESPACE + "-overlay") && onCallExpand();
       }
-    }, IS_MINI_MODE && this.renderMiniMode(), !IS_MINI_MODE && this.renderSelfView(), minimized && external_React_default().createElement(Minimized, (0,esm_extends.Z)({}, this.props, {
+    }, IS_MINI_MODE && this.renderMiniMode(), !IS_MINI_MODE && this.renderSelfView(), minimized && external_React_default().createElement(__Minimized, (0,esm_extends.Z)({}, this.props, {
       onOptionsToggle: this.handleOptionsToggle
     })));
   }
@@ -16851,6 +16913,8 @@ class Minimized extends mixins.wl {
     } = this.state;
     const {
       call,
+      signal,
+      renderSignalWarning,
       onCallExpand,
       onCallEnd,
       onAudioClick,
@@ -16862,7 +16926,8 @@ class Minimized extends mixins.wl {
     const videoLabel = this.isActive(SfuClient.Av.Camera) ? l[22894] : l[22893];
     const SIMPLETIP_PROPS = {
       position: 'top',
-      offset: 5
+      offset: 5,
+      className: 'theme-dark-forced'
     };
     return external_React_default().createElement((external_React_default()).Fragment, null, external_React_default().createElement("div", {
       className: local_Local.NAMESPACE + "-overlay"
@@ -16878,17 +16943,19 @@ class Minimized extends mixins.wl {
       }
     }), external_React_default().createElement("div", {
       className: local_Local.NAMESPACE + "-controls"
+    }, external_React_default().createElement("div", {
+      className: "meetings-signal-container"
     }, external_React_default().createElement(meetings_button.Z, {
       simpletip: { ...SIMPLETIP_PROPS,
         label: audioLabel
       },
-      className: "\n                                mega-button\n                                theme-light-forced\n                                round\n                                large\n                                " + (this.isActive(SfuClient.Av.Audio) ? '' : 'inactive') + "\n                            ",
+      className: "\n                                    mega-button\n                                    theme-light-forced\n                                    round\n                                    large\n                                    " + (this.isActive(SfuClient.Av.Audio) ? '' : 'inactive') + "\n                                ",
       icon: "" + (this.isActive(SfuClient.Av.Audio) ? 'icon-audio-filled' : 'icon-audio-off'),
       onClick: ev => {
         ev.stopPropagation();
         onAudioClick();
       }
-    }, external_React_default().createElement("span", null, audioLabel)), external_React_default().createElement(meetings_button.Z, {
+    }, external_React_default().createElement("span", null, audioLabel)), signal ? null : renderSignalWarning()), external_React_default().createElement(meetings_button.Z, {
       simpletip: { ...SIMPLETIP_PROPS,
         label: videoLabel
       },
@@ -16922,7 +16989,10 @@ class Minimized extends mixins.wl {
 
 }
 
+Minimized.NAMESPACE = 'local-stream-minimized';
 Minimized.UNREAD_EVENT = 'onUnreadCountUpdate.localStreamNotifications';
+
+const __Minimized = withMicObserver(Minimized);
 ;// CONCATENATED MODULE: ./js/chat/ui/meetings/participantsNotice.jsx
 
 
@@ -17398,13 +17468,14 @@ class stream_Stream extends mixins.wl {
       link: link,
       onCallMinimize: onCallMinimize,
       onModeChange: onModeChange
-    }), isOnHold ? this.renderOnHold() : this.renderStreamContainer(), external_React_default().createElement(StreamControls, {
+    }), isOnHold ? this.renderOnHold() : this.renderStreamContainer(), external_React_default().createElement(streamControls, {
       call: call,
+      streams: streams,
+      chatRoom: chatRoom,
       onAudioClick: onAudioClick,
       onVideoClick: onVideoClick,
       onScreenSharingClick: onScreenSharingClick,
       onCallEnd: onCallEnd,
-      streams: streams,
       onStreamToggle: onStreamToggle,
       onHoldClick: onHoldClick
     }), external_React_default().createElement(SidebarControls, {
@@ -17962,9 +18033,7 @@ class PrivilegeChange extends privilegeChange_ConversationMessageMixin {
       newPrivilegeText = l[8873];
     }
 
-    let text = l[8915]
-        .replace("%1", '<strong className="dark-grey-txt">' + htmlentities(newPrivilegeText) + '</strong>')
-        .replace("%2", '<strong className="dark-grey-txt">' + htmlentities(displayName) + '</strong>');
+    var text = l[8915].replace("%1", '<strong className="dark-grey-txt">' + htmlentities(newPrivilegeText) + '</strong>').replace("%2", '<strong className="dark-grey-txt">' + htmlentities(displayName) + '</strong>');
     messages.push(privilegeChange_React.createElement("div", {
       className: "message body",
       "data-id": "id" + message.messageId,
@@ -25860,7 +25929,7 @@ class Button extends _chat_mixins1__.wl {
 
 /***/ }),
 
-/***/ 78:
+/***/ 261:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -26301,7 +26370,7 @@ var utils = __webpack_require__(79);
 
 
 
-var DropdownsUI = __webpack_require__(78);
+var DropdownsUI = __webpack_require__(261);
 
 var PerfectScrollbar = (__webpack_require__(285).F);
 
@@ -30138,7 +30207,7 @@ function _extends() {
 /************************************************************************/
 /******/ 	// The module cache
 /******/ 	var __webpack_module_cache__ = {};
-/******/
+/******/ 	
 /******/ 	// The require function
 /******/ 	function __webpack_require__(moduleId) {
 /******/ 		// Check if module is in cache
@@ -30152,16 +30221,16 @@ function _extends() {
 /******/ 			// no module.loaded needed
 /******/ 			exports: {}
 /******/ 		};
-/******/
+/******/ 	
 /******/ 		// Execute the module function
 /******/ 		__webpack_modules__[moduleId](module, module.exports, __webpack_require__);
-/******/
+/******/ 	
 /******/ 		// Return the exports of the module
 /******/ 		return module.exports;
 /******/ 	}
-/******/
+/******/ 	
 /************************************************************************/
-/******/
+/******/ 	
 /******/ 	(() => {
 /******/ 		// getDefaultExport function for compatibility with non-harmony modules
 /******/ 		__webpack_require__.n = (module) => {
@@ -30172,8 +30241,8 @@ function _extends() {
 /******/ 			return getter;
 /******/ 		};
 /******/ 	})();
-/******/
-/******/
+/******/ 	
+/******/ 	
 /******/ 	(() => {
 /******/ 		// define getter functions for harmony exports
 /******/ 		__webpack_require__.d = (exports, definition) => {
@@ -30184,13 +30253,13 @@ function _extends() {
 /******/ 			}
 /******/ 		};
 /******/ 	})();
-/******/
-/******/
+/******/ 	
+/******/ 	
 /******/ 	(() => {
 /******/ 		__webpack_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
 /******/ 	})();
-/******/
-/******/
+/******/ 	
+/******/ 	
 /******/ 	(() => {
 /******/ 		// define __esModule on exports
 /******/ 		__webpack_require__.r = (exports) => {
@@ -30200,14 +30269,14 @@ function _extends() {
 /******/ 			Object.defineProperty(exports, '__esModule', { value: true });
 /******/ 		};
 /******/ 	})();
-/******/
+/******/ 	
 /************************************************************************/
-/******/
+/******/ 	
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	__webpack_require__(662);
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __webpack_require__(230);
-/******/
+/******/ 	var __webpack_exports__ = __webpack_require__(78);
+/******/ 	
 /******/ })()
 ;

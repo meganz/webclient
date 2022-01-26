@@ -2,12 +2,11 @@ import React from 'react';
 import { MegaRenderMixin } from '../../mixins';
 import Button from './button.jsx';
 import { STREAM_ACTIONS } from './stream.jsx';
-import StreamExtendedControls from "./streamExtendedControls";
+import StreamExtendedControls from './streamExtendedControls.jsx';
+import { withMicObserver } from './micObserver.jsx';
 
-export default class StreamControls extends MegaRenderMixin {
-    constructor(props) {
-        super(props);
-    }
+class StreamControls extends MegaRenderMixin {
+    static NAMESPACE = 'stream-controls';
 
     renderDebug = () => {
         const SIMPLETIP = { position: 'top', offset: 5, className: 'theme-dark-forced' };
@@ -43,7 +42,7 @@ export default class StreamControls extends MegaRenderMixin {
         // -------------------------------------------------------------------------
 
         return (
-            <div className="stream-controls">
+            <div className={StreamControls.NAMESPACE}>
                 {d ? this.renderDebug() : ''}
                 <ul>
                     <li>
@@ -60,6 +59,7 @@ export default class StreamControls extends MegaRenderMixin {
                             onClick={this.props.onAudioClick}>
                             <span>{audioLabel}</span>
                         </Button>
+                        {this.props.signal ? null : this.props.renderSignalWarning()}
                     </li>
                     <li>
                         <Button
@@ -99,3 +99,5 @@ export default class StreamControls extends MegaRenderMixin {
         );
     }
 }
+
+export default withMicObserver(StreamControls);

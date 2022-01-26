@@ -334,8 +334,11 @@ sms.phoneInput = {
             var countryCallingCode = $selectedOption.attr('data-country-call-code');
             var phoneNum = $phoneInput.val();
 
-            // Strip hyphens, spaces and format for sending e.g. +642123456789
-            var formattedPhoneNumber = '+' + countryCallingCode + phoneNum.replace(/-|\s/g, '');
+            // Strip hyphens and whitespace, remove trunk code.
+            // e.g. NZ 021-1234567 => 2112345567
+            phoneNum = M.stripPhoneNumber(countryCallingCode, phoneNum);
+
+            const formattedPhoneNumber = `+${countryCallingCode}${phoneNum}`;
 
             // Prepare request
             var apiRequest = { a: 'smss', n: formattedPhoneNumber };

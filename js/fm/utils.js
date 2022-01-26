@@ -2502,6 +2502,63 @@ MegaUtils.prototype.getCountryCallCode = function(isoCountryCode) {
 };
 
 /**
+ * Gets the trunk (national dialling) code from the given number and country code.
+ * If the country doesn't have trunk codes or wasn't included in the number, returns an empty string.
+ *
+ * @param {string} countryCallCode Country intl. calling code
+ * @param {string} phoneNumber Phone number in question
+ * @returns {string} Trunk code or empty string if not found
+ */
+MegaUtils.prototype.getNumberTrunkCode = function(countryCallCode, phoneNumber) {
+    'use strict';
+
+    if (!this._countryTrunkCodes) {
+        this._countryTrunkCodes = new RegionsCollection().countryTrunkCodes;
+    }
+
+    let trunkCodes;
+    if (this._countryTrunkCodes.hasOwnProperty(countryCallCode)) {
+        trunkCodes = this._countryTrunkCodes[countryCallCode];
+        if (typeof trunkCodes === 'function') {
+            trunkCodes = trunkCodes(phoneNumber);
+        }
+    }
+
+    for (let trunkCode in trunkCodes) {
+        trunkCode = trunkCodes[trunkCode];
+        if (trunkCode && phoneNumber.startsWith(trunkCode)) {
+            return trunkCode;
+        }
+    }
+
+    return ''; // No trunk code is common
+};
+
+/**
+ * Formats the given phone number to make it suitable to prepend a country call code.
+ * Strips hyphens and whitespace, removes the trunk code.
+ * e.g. NZ 021-1234567 => 2112345567
+ *
+ * @param {string} countryCallCode Country int. calling code
+ * @param {string} phoneNumber Phone number to format
+ * @returns {string} Formatted phone number
+ */
+MegaUtils.prototype.stripPhoneNumber = function(countryCallCode, phoneNumber) {
+    'use strict';
+
+    // Strip hyphens, whitespace
+    phoneNumber = phoneNumber.replace(/-|\s/g, '');
+
+    // Remove the trunk code (prefix for dialling nationally) from the given phone number.
+    const trunkCode = M.getNumberTrunkCode(countryCallCode, phoneNumber);
+    if (trunkCode && phoneNumber.startsWith(trunkCode)) {
+        phoneNumber = phoneNumber.substr(trunkCode.length);
+    }
+
+    return phoneNumber;
+};
+
+/**
  * Check user trying to upload folder by drag and drop.
  * @param {Event} event
  * @returns {Boolean}

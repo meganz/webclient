@@ -65,11 +65,11 @@ class PrivilegeChange extends ConversationMessageMixin {
 
         var text = l[8915]
             .replace(
-                "%s1",
+                "%1",
                 '<strong className="dark-grey-txt">' + htmlentities(newPrivilegeText) + '</strong>'
             )
             .replace(
-                "%s2",
+                "%2",
                 '<strong className="dark-grey-txt">' + htmlentities(displayName) + '</strong>'
             );
 

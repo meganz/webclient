@@ -10874,9 +10874,6 @@ Thank You dialog
     .mobile.filetype-img {
         width: 72px;
     }
-    .downloading .mobile.filetype-img, .uploading .mobile.filetype-img, .wrong-file .mobile.filetype-img {
-        width: 48px;
-    }
     .mobile.filesize, .mobile.download-speed, .mobile.upload-speed, .mobile.download-percents, .mobile.upload-percents {
         margin: 3px 0 0 0;
         font-size: 14px;

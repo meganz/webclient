@@ -322,8 +322,11 @@ mobile.sms.phoneInput = {
             var countryCallCode = $countryCallCodeInput.attr('data-country-call-code');
             var phoneNumber = $phoneInput.val();
 
-            // Clean number of hyphens and spaces then format the number for sending e.g. +6421123456789
-            var formattedPhoneNumber = '+' + countryCallCode + phoneNumber.replace(/-|\s/g, '');
+            // Strip hyphens and whitespace, remove trunk code.
+            // e.g. NZ 021-1234567 => 2112345567
+            phoneNumber = M.stripPhoneNumber(countryCallCode, phoneNumber);
+
+            const formattedPhoneNumber = `+${countryCallCode}${phoneNumber}`;
 
             // Prepare the request
             var request = { a: 'smss', n: formattedPhoneNumber };

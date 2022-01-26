@@ -1456,7 +1456,7 @@ MegaData.prototype.revertRubbishNodes = function(handles) {
             var n = M.getNodeByHandle(h);
             var t = n.rr;
 
-            if (n.p !== M.RubbishID) {
+            if (M.getNodeRoot(h) !== M.RubbishID) {
                 continue;
             }
 

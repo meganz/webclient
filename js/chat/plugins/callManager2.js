@@ -391,8 +391,8 @@
                 await this.sfuApp.sfuClient.putOnHold();
             }
         }
-        hangUp() {
-            this.sfuApp.destroy();
+        hangUp(reason) {
+            this.sfuApp.destroy(reason);
         }
     }
 
@@ -472,7 +472,7 @@
                 }
 
                 if (chatRoom.activeCall && chatRoom.activeCall.callId === data.callId) {
-                    chatRoom.activeCall.hangUp();
+                    chatRoom.activeCall.hangUp(data.reason);
                     chatRoom.activeCall = null;
                 }
 
@@ -494,14 +494,22 @@
 
             chatRoom.rebind('onRoomDisconnected.callManager', function() {
                 if (this.activeCall) {
-                    chatRoom.trigger('onCallEnd', {'callId': chatRoom.activeCall.callId, removeActive: true});
+                    chatRoom.trigger('onCallEnd', {
+                        'callId': chatRoom.activeCall.callId,
+                        removeActive: true,
+                        reason: SfuClient.TermCode.kChatDisconn
+                    });
                 }
 
                 // clear active calls on chatd disconnect.
                 let callIds = Object.keys(chatRoom.activeCallIds);
                 for (let i = 0; i < callIds.length; i++) {
                     if (this.activeCallIds[callIds[i]]) {
-                        chatRoom.trigger('onCallEnd', {'callId': callIds[i], removeActive: true});
+                        chatRoom.trigger('onCallEnd', {
+                            'callId': callIds[i],
+                            removeActive: true,
+                            reason: SfuClient.TermCode.kChatDisconn
+                        });
                     }
                 }
 
@@ -509,7 +517,7 @@
             });
             chatRoom.rebind('onStateChange.callManager', function(e, oldState, newState) {
                 if (newState === ChatRoom.STATE.LEFT && chatRoom.activeCall) {
-                    chatRoom.activeCall.hangUp();
+                    chatRoom.activeCall.hangUp(SfuClient.TermCode.kLeavingRoom);
                 }
             });
 

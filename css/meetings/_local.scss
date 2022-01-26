@@ -188,16 +188,16 @@
             .local-stream-controls {
                 display: flex;
                 align-items: center;
-                justify-content: center;
+                justify-content: space-evenly;
                 position: absolute;
                 left: 50%;
                 bottom: 20px;
                 transform: translate(-50%);
-                width: 100%;
+                width: 85%;
                 text-align: center;
 
                 button {
-                    margin: 0 24px 0 0 ;
+                    /* [...] */
 
                     &:last-child {
                         margin-right: 0
@@ -215,12 +215,16 @@
                 }
 
                 .button-group {
-                    margin-right: 24px;
+                    /* [...] */
 
                     .active-indicator {
                         top: -1px;
                         right: 2px;
                     }
+                }
+
+                .meetings-signal-issue {
+                    right: -10px;
                 }
             }
         }

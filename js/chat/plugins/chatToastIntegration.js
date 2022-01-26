@@ -59,6 +59,15 @@ class ChatToastIntegration {
                             ChatToastIntegration.DEFAULT_OPTS
                         );
                     })
+                    .rebind('onNoMicInput.cTI', () => {
+                        if (megaRoom.activeCall) {
+                            window.toaster.alerts.high(
+                                'Your mic is not working',
+                                'sprite-fm-mono icon-audio-off',
+                                ChatToastIntegration.DEFAULT_OPTS
+                            );
+                        }
+                    })
                     .rebind('onCallEnd.cTI', () => megaRoom.unbind('onMembersUpdated.cTI'));
             });
     }

@@ -182,7 +182,9 @@
     // proxy SFUClient events to the call.
     [
         'onLocalMediaChange',
-        'onLocalMediaError'
+        'onLocalMediaError',
+        'onNoMicInput',
+        'onMicSignalDetected'
     ].forEach((k) => {
         SfuApp.prototype[k] = function() {
             return this.callManagerCall[k].apply(this.callManagerCall, arguments);

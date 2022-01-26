@@ -487,11 +487,12 @@ export default class Stream extends MegaRenderMixin {
 
                         <StreamControls
                             call={call}
+                            streams={streams}
+                            chatRoom={chatRoom}
                             onAudioClick={onAudioClick}
                             onVideoClick={onVideoClick}
                             onScreenSharingClick={onScreenSharingClick}
                             onCallEnd={onCallEnd}
-                            streams={streams}
                             onStreamToggle={onStreamToggle}
                             onHoldClick={onHoldClick}
                         />

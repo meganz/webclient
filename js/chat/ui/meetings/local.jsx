@@ -4,7 +4,8 @@ import utils from '../../../ui/utils.jsx';
 import Button from './button.jsx';
 import Call from './call.jsx';
 import StreamNode from './streamNode.jsx';
-import StreamExtendedControls from "./streamExtendedControls";
+import StreamExtendedControls from './streamExtendedControls.jsx';
+import { withMicObserver } from './micObserver';
 
 export default class Local extends MegaRenderMixin {
     collapseListener = null;
@@ -453,7 +454,7 @@ class Stream extends MegaRenderMixin {
                     // user's video/screen sharing stream.
                     this.renderSelfView()
                 }
-                {minimized && <Minimized {...this.props} onOptionsToggle={this.handleOptionsToggle} />}
+                {minimized && <__Minimized {...this.props} onOptionsToggle={this.handleOptionsToggle} />}
             </div>
         );
     }
@@ -462,6 +463,7 @@ class Stream extends MegaRenderMixin {
 // --
 
 class Minimized extends MegaRenderMixin {
+    static NAMESPACE = 'local-stream-minimized';
     static UNREAD_EVENT = 'onUnreadCountUpdate.localStreamNotifications';
 
     state = {
@@ -497,12 +499,12 @@ class Minimized extends MegaRenderMixin {
 
     render() {
         const { unread } = this.state;
-        const { call, onCallExpand, onCallEnd, onAudioClick, onVideoClick,
+        const { call, signal, renderSignalWarning, onCallExpand, onCallEnd, onAudioClick, onVideoClick,
                 onScreenSharingClick, onHoldClick } = this.props;
         const audioLabel = this.isActive(SfuClient.Av.Audio) ? l[16214] /* `Mute` */ : l[16708] /* `Mute` */;
         const videoLabel =
             this.isActive(SfuClient.Av.Camera) ? l[22894] /* `Disable video` */ : l[22893] /* `Enable video` */;
-        const SIMPLETIP_PROPS = { position: 'top', offset: 5 };
+        const SIMPLETIP_PROPS = { position: 'top', offset: 5, className: 'theme-dark-forced' };
 
         return (
             <>
@@ -518,22 +520,25 @@ class Minimized extends MegaRenderMixin {
                     />
 
                     <div className={`${Local.NAMESPACE}-controls`}>
-                        <Button
-                            simpletip={{ ...SIMPLETIP_PROPS, label: audioLabel }}
-                            className={`
-                                mega-button
-                                theme-light-forced
-                                round
-                                large
-                                ${this.isActive(SfuClient.Av.Audio) ? '' : 'inactive'}
-                            `}
-                            icon={`${this.isActive(SfuClient.Av.Audio) ? 'icon-audio-filled' : 'icon-audio-off'}`}
-                            onClick={ev => {
-                                ev.stopPropagation();
-                                onAudioClick();
-                            }}>
-                            <span>{audioLabel}</span>
-                        </Button>
+                        <div className="meetings-signal-container">
+                            <Button
+                                simpletip={{ ...SIMPLETIP_PROPS, label: audioLabel }}
+                                className={`
+                                    mega-button
+                                    theme-light-forced
+                                    round
+                                    large
+                                    ${this.isActive(SfuClient.Av.Audio) ? '' : 'inactive'}
+                                `}
+                                icon={`${this.isActive(SfuClient.Av.Audio) ? 'icon-audio-filled' : 'icon-audio-off'}`}
+                                onClick={ev => {
+                                    ev.stopPropagation();
+                                    onAudioClick();
+                                }}>
+                                <span>{audioLabel}</span>
+                            </Button>
+                            {signal ? null : renderSignalWarning()}
+                        </div>
                         <Button
                             simpletip={{ ...SIMPLETIP_PROPS, label: videoLabel }}
                             className={`
@@ -583,3 +588,4 @@ class Minimized extends MegaRenderMixin {
         );
     }
 }
+const __Minimized = withMicObserver(Minimized);

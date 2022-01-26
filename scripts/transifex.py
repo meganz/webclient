@@ -196,7 +196,6 @@ def prepare_translation_string(resource, lang):
                             "content_encoding": "text",
                             "file_type": "default",
                             "mode": "default",
-                            "pseudo": False,
                         },
                         "relationships": {
                             "language": {
@@ -433,6 +432,8 @@ def merge_language(main, branch):
     sys.stdout.flush()
     for code, strings in branch.items():
         for key, data in strings.items():
+            if data['string'] == '' and code != 'en':
+                data['string'] = branch['en'][key]['string']
             main[code][key] = data
     print("Completed.")
 

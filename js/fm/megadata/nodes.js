@@ -3543,7 +3543,7 @@ lazy(MegaData.prototype, 'nodeShare', () => {
     let lock = false;
     let inflight = new Map();
     const tick = Promise.resolve();
-    const debug = d > 1 ? console.debug.bind(console, '[mdNodeShare]') : nop;
+    const debug = d > 0 ? console.debug.bind(console, '[mdNodeShare]') : nop;
 
     const setNodeShare = tryCatch((h, s, ignoreDB) => {
         const n = M.d[h];
@@ -3597,7 +3597,13 @@ lazy(MegaData.prototype, 'nodeShare', () => {
         if (this.d[h]) {
             return setNodeShare(h, s, ignoreDB);
         }
-        inflight.set(h, [h, s, ignoreDB]);
+
+        if (inflight.has(h)) {
+            inflight.get(h).push([h, s, ignoreDB]);
+        }
+        else {
+            inflight.set(h, [[h, s, ignoreDB]]);
+        }
 
         // wait for concurrent calls within the same tick.
         await tick;
@@ -3619,7 +3625,7 @@ lazy(MegaData.prototype, 'nodeShare', () => {
 
             await dbfetch.acquire([...q.keys()]);
 
-            q = [...q.values()];
+            q = [...q.values()].flat();
             for (let i = q.length; i--;) {
                 setNodeShare(...q[i]);
             }

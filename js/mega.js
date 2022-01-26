@@ -2306,7 +2306,7 @@ function dbfetchfm() {
             if (promises.length) {
                 // handle all outbound shares through a single promise.
                 // if an ENOENT happens, this won't halt the process...
-                promises = [MegaPromise.allDone(promises)];
+                promises = [Promise.allSettled(promises)];
             }
 
             for (var j = 0, it = Object.keys(tables); j < it.length; ++j) {

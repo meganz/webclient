@@ -715,7 +715,7 @@ var megasync = (function() {
         CMS.get('sync', function(err, content) {
             linuxClients = content.object;
             console.log(linuxClients);
-            var linux = 'https://mega.nz/linux/MEGAsync/';
+            var linux = 'https://mega.nz/linux/repo/';
             linuxClients.forEach(function(val) {
                 ['64', '64n', '64d', '64m', '64t', '32', '32n', '32d', '32m', '32t'].forEach(function(platform) {
                     if (val[platform]) {

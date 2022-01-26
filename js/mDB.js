@@ -126,6 +126,13 @@ Object.defineProperty(FMDB, 'perspex', {value: '.' + FMDB.version + FMDB.capabil
 // initialise cross-tab access arbitration identity
 FMDB.prototype.identity = Date.now() + Math.random().toString(26);
 
+/** @property fmdb.memoize */
+lazy(FMDB.prototype, 'memoize', () => {
+    'use strict';
+    // leave cloud nodes in memory?..
+    return !!localStorage.$lcnim;
+});
+
 // set up and check fm DB for user u
 // calls result(sn) if found and sn present
 // wipes DB an calls result(false) otherwise
@@ -161,7 +168,7 @@ FMDB.prototype.init = function fmdb_init(result, wipe) {
                 }
 
                 fmdb.db = null;
-                eventlog(99724, '$init:' + error, true);
+                fmdb.evento(`$init:${error}`);
             }
 
             result(sn);
@@ -314,6 +321,21 @@ FMDB.prototype.init = function fmdb_init(result, wipe) {
     else {
         console.error('fmdb.db is already set...');
     }
+};
+
+// send failure event
+FMDB.prototype.evento = function(message) {
+    'use strict';
+    const eid = 99724;
+    const once = !eventlog.sent || eventlog.sent[eid] > 0;
+
+    eventlog(eid, String(message).split('\n')[0].substr(0, 240), once);
+
+    queueMicrotask(() => {
+        if (eventlog.sent) {
+            eventlog.sent[eid] = 1;
+        }
+    });
 };
 
 // drop database
@@ -506,6 +528,69 @@ FMDB.prototype.serialize = function(table, row) {
     return row;
 };
 
+FMDB.prototype.getError = function(ex) {
+    'use strict';
+    const error = ex && ex.inner || ex || !1;
+    const message = `~${error.name || ''}: ${error.message || ex && ex.message || ex}`;
+    return {error, message};
+};
+
+FMDB.prototype._transactionErrorHandled = function(ch, ex) {
+    'use strict';
+    const tag = '$fmdb$fail$state';
+    const state = sessionStorage[tag] | 0;
+    const {error, message} = this.getError(ex);
+
+    let res = false;
+    let eventMsg = `$wptr:${message.substr(0, 99)}`;
+
+    if (this.inflight) {
+        if (d) {
+            console.assert(this.inflight instanceof Error);
+        }
+        if (this.inflight instanceof Error) {
+            eventMsg += ` >> ${this.inflight}`;
+        }
+        this.inflight = false;
+    }
+    this.evento(eventMsg);
+
+    if (mega.is.loading && (error.name === 'TimeoutError' || error.name === 'AbortError')) {
+        if (d) {
+            this.logger.info("Transaction %s, retrying...", error.name, ex);
+        }
+
+        res = true;
+        sessionStorage[tag] = 1 + state;
+
+        switch (state) {
+            case 0:
+                if (!this.crashed) {
+                    this.state = -1;
+                    this.writing = 0;
+                    this.writepending(ch);
+                    break;
+                }
+            /* fallthrough */
+            case 1:
+                if (!mega.nobp) {
+                    localStorage.$lcnim = 1;
+                    fm_forcerefresh(true);
+                    break;
+                }
+            /* fallthrough */
+            case 2:
+                fm_fullreload(null, 'DB-crash');
+                break;
+            default:
+                res = false; // let the DB crash.
+                break;
+        }
+    }
+
+    return res;
+};
+
 // FIXME: auto-retry smaller transactions? (need stats about transaction failures)
 // ch - channel to operate on
 FMDB.prototype.writepending = function fmdb_writepending(ch) {
@@ -594,13 +679,11 @@ FMDB.prototype.writepending = function fmdb_writepending(ch) {
                 fmdb.writing = 0;
                 fmdb.writepending(ch);
             }
-            else {
+            else if (!fmdb._transactionErrorHandled(ch, ex)) {
                 // FIXME: retry instead? need statistics.
                 fmdb.logger.error("Transaction failed, marking DB as crashed", ex);
                 fmdb.state = -1;
                 fmdb.invalidate();
-
-                eventlog(99724, '$wptr:' + ex, true);
             }
         });
     }
@@ -648,7 +731,7 @@ FMDB.prototype.writepending = function fmdb_writepending(ch) {
                         fmdb.state = -1;
                         fmdb.invalidate();
 
-                        eventlog(99724, '$wpsn:' + e, true);
+                        fmdb.evento(`$wpsn:${e}`);
                     });
                 }
                 else {
@@ -781,11 +864,16 @@ FMDB.prototype.writepending = function fmdb_writepending(ch) {
             }
 
             if (op === 'bulkPut') {
-                for (let x = data.length; x--;) {
-                    fmdb.serialize(table, data[x]);
+                if (!data[0].d || fmdb._raw(data[0])) {
+                    for (let x = data.length; x--;) {
+                        fmdb.serialize(table, data[x]);
+                    }
+                }
+                else if (d) {
+                    fmdb.logger.debug('No data serialization was needed, retrying?', data);
                 }
             }
-            else {
+            else if (!(data[0] instanceof ArrayBuffer)) {
                 for (let j = data.length; j--;) {
                     data[j] = fmdb.toStore(data[j]);
                 }
@@ -860,6 +948,14 @@ FMDB.prototype.writepending = function fmdb_writepending(ch) {
             fmdb.logger.error('Unexpected error in bulk operation...', ex);
         }
 
+        if (fmdb.state > 0 && !fmdb.crashed) {
+            if (d) {
+                fmdb.logger.info('We are transactional, attempting to retry...');
+            }
+            fmdb.inflight = ex;
+            return;
+        }
+
         fmdb.state = -1;
         fmdb.inflight = false;
 
@@ -876,7 +972,7 @@ FMDB.prototype.writepending = function fmdb_writepending(ch) {
             fmdb.logger.warn('Marked DB as crashed...', ex.name);
         }
 
-        eventlog(99724, String(ex), true);
+        fmdb.evento(ex);
     }
 };
 

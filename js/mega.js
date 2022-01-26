@@ -23,10 +23,53 @@ Object.defineProperties(window, {
     BACKPRESSURE_WORKER_LIMIT: {
         value: 8192
     },
+    // Maximum number of bytes that can be retained in internal buffers before applying backpressure.
+    BACKPRESSURE_HIGHWATERMARK: {
+        value: 0x2000000
+    },
     // Time to wait (in seconds) when applying backpressure
     BACKPRESSURE_WAIT_TIME: {
         value: 420 / 1000
     }
+});
+
+/** @property mega.shouldApplyNetworkBackPressure */
+lazy(mega, 'shouldApplyNetworkBackPressure', () => {
+    'use strict';
+
+    if (mega.flags.nobp || parseInt(localStorage.nobp)) {
+        if (d) {
+            console.info('Disabling network back-pressure.', mega.flags.nobp);
+        }
+        Object.defineProperty(mega, 'nobp', {value: true});
+        return () => false;
+    }
+
+    return (aContentLength) => {
+        const nobp = BACKPRESSURE_HIGHWATERMARK > aContentLength;
+
+        if (mega.nobp !== false) {
+            mega.nobp = nobp;
+        }
+
+        return !nobp;
+    };
+});
+
+/** @property mega.is */
+lazy(mega, 'is', () => {
+    'use strict';
+    const obj = {
+        /**
+         * @name loading
+         * @memberOf mega.is
+         */
+        get loading() {
+            return !!(mega.state & window.MEGAFLAG_LOADINGCLOUD);
+        }
+    };
+
+    return Object.freeze(Object.setPrototypeOf(obj, null));
 });
 
 // Set up the MegaLogger's root logger
@@ -1980,7 +2023,7 @@ function worker_procmsg(ev) {
             }
 
             const ok = fmdb && !fmdb.crashed;
-            const emplace = mega.leaveNodesInMemory || !ok || fminitialized || M.isInRoot(ev.data, true);
+            const emplace = mega.nobp || !ok || fminitialized || fmdb && fmdb.memoize || M.isInRoot(ev.data, true);
 
             if (ok) {
                 fmdb.add('f', {

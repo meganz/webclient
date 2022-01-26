@@ -497,17 +497,13 @@ async function chunkedfetch(xhr, uri, body) {
         signal = controller.signal;
     }
     const evt = {loaded: 0};
-    const highWaterMark = 0x2000000;
+    const highWaterMark = BACKPRESSURE_HIGHWATERMARK;
     const response = await fetch(uri, {method: body ? 'POST' : 'GET', body, signal});
 
     xhr.status = response.status;
     xhr.totalBytes = response.headers.get('Original-Content-Length') | 0;
 
-    if (xhr.q && xhr.q.c === 4 && mega.leaveNodesInMemory === undefined) {
-        mega.leaveNodesInMemory = highWaterMark > xhr.totalBytes;
-    }
-
-    if (typeof WritableStream !== 'undefined' && xhr.totalBytes > highWaterMark && !localStorage.nfbp) {
+    if (typeof WritableStream !== 'undefined' && mega.shouldApplyNetworkBackPressure(xhr.totalBytes)) {
         const queueingStrategy =
             typeof ByteLengthQueuingStrategy !== 'undefined'
             && 'highWaterMark' in ByteLengthQueuingStrategy.prototype

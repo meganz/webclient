@@ -17962,7 +17962,9 @@ class PrivilegeChange extends privilegeChange_ConversationMessageMixin {
       newPrivilegeText = l[8873];
     }
 
-    var text = l[8915].replace("%s1", '<strong className="dark-grey-txt">' + htmlentities(newPrivilegeText) + '</strong>').replace("%s2", '<strong className="dark-grey-txt">' + htmlentities(displayName) + '</strong>');
+    let text = l[8915]
+        .replace("%1", '<strong className="dark-grey-txt">' + htmlentities(newPrivilegeText) + '</strong>')
+        .replace("%2", '<strong className="dark-grey-txt">' + htmlentities(displayName) + '</strong>');
     messages.push(privilegeChange_React.createElement("div", {
       className: "message body",
       "data-id": "id" + message.messageId,
@@ -30136,7 +30138,7 @@ function _extends() {
 /************************************************************************/
 /******/ 	// The module cache
 /******/ 	var __webpack_module_cache__ = {};
-/******/ 	
+/******/
 /******/ 	// The require function
 /******/ 	function __webpack_require__(moduleId) {
 /******/ 		// Check if module is in cache
@@ -30150,16 +30152,16 @@ function _extends() {
 /******/ 			// no module.loaded needed
 /******/ 			exports: {}
 /******/ 		};
-/******/ 	
+/******/
 /******/ 		// Execute the module function
 /******/ 		__webpack_modules__[moduleId](module, module.exports, __webpack_require__);
-/******/ 	
+/******/
 /******/ 		// Return the exports of the module
 /******/ 		return module.exports;
 /******/ 	}
-/******/ 	
+/******/
 /************************************************************************/
-/******/ 	
+/******/
 /******/ 	(() => {
 /******/ 		// getDefaultExport function for compatibility with non-harmony modules
 /******/ 		__webpack_require__.n = (module) => {
@@ -30170,8 +30172,8 @@ function _extends() {
 /******/ 			return getter;
 /******/ 		};
 /******/ 	})();
-/******/ 	
-/******/ 	
+/******/
+/******/
 /******/ 	(() => {
 /******/ 		// define getter functions for harmony exports
 /******/ 		__webpack_require__.d = (exports, definition) => {
@@ -30182,13 +30184,13 @@ function _extends() {
 /******/ 			}
 /******/ 		};
 /******/ 	})();
-/******/ 	
-/******/ 	
+/******/
+/******/
 /******/ 	(() => {
 /******/ 		__webpack_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
 /******/ 	})();
-/******/ 	
-/******/ 	
+/******/
+/******/
 /******/ 	(() => {
 /******/ 		// define __esModule on exports
 /******/ 		__webpack_require__.r = (exports) => {
@@ -30198,14 +30200,14 @@ function _extends() {
 /******/ 			Object.defineProperty(exports, '__esModule', { value: true });
 /******/ 		};
 /******/ 	})();
-/******/ 	
+/******/
 /************************************************************************/
-/******/ 	
+/******/
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	__webpack_require__(662);
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
 /******/ 	var __webpack_exports__ = __webpack_require__(230);
-/******/ 	
+/******/
 /******/ })()
 ;

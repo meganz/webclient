@@ -945,7 +945,7 @@ function accountUI() {
         loadSubPage('fm/account/history');
     }
     else if (fminitialized && u_type && page === 'fm/account/security/backup-key') {
-        loadSubPage('backup');
+        loadSubPage('keybackup');
     }
     else {
         loadSubPage('fm/account');

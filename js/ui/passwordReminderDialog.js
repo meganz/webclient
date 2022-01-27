@@ -389,7 +389,7 @@
 
         delete $.dialog;
 
-        loadSubPage('/backup');
+        loadSubPage('keybackup');
     };
 
     PasswordReminderDialog.prototype.onChangePassClicked = function(element, evt) {

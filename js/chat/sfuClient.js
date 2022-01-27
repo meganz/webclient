@@ -350,7 +350,7 @@ function compressedSdpToString(sdp) {
 }
 
 ;// CONCATENATED MODULE: ../shared/commitId.ts
-const COMMIT_ID = 'b391d53d8a';
+const COMMIT_ID = '11ebeec672';
 /* harmony default export */ const commitId = (COMMIT_ID);
 
 ;// CONCATENATED MODULE: ./client.ts
@@ -2600,34 +2600,38 @@ class MicMuteMonitor {
         this.delTimer();
     }
     restart() {
-        this.micLevelAvg = 0.001;
+        this.micLevelAvg = 0.0;
         this.muteIndicatorActive = false;
         this.delTimer();
         this.timer = setTimeout(() => {
-            if (!this.micInputSeen) {
-                this.client._fire("onNoMicInput");
-            }
             delete this.timer;
+            this.fireWarning();
         }, MicMuteMonitor.kWarningTimeoutMs);
         console.log("Started mic muted monitor");
     }
+    fireWarning() {
+        this.muteIndicatorActive = true;
+        if (this.micInputSeen) {
+            this.client._fire("onMicSignalDetected", false);
+        }
+        else {
+            this.client._fire("onNoMicInput");
+        }
+    }
     onLevel(level) {
-        let avg = this.micLevelAvg = (level + this.micLevelAvg * 2) / 3;
-        if (this.muteIndicatorActive) {
-            if (Math.max(level, avg) > MicMuteMonitor.kMicMutedDetectThreshold) {
+        let avg = this.micLevelAvg = (level > this.micLevelAvg) ? level : (level + this.micLevelAvg) / 2;
+        if (avg >= MicMuteMonitor.kMicMutedDetectThreshold) {
+            this.micInputSeen = true;
+            if (this.timer) {
+                this.delTimer();
+            }
+            else if (this.muteIndicatorActive) {
                 delete this.muteIndicatorActive;
-                this.micInputSeen = true;
-                if (this.timer) {
-                    this.delTimer();
-                }
                 this.client._fire("onMicSignalDetected", true);
             }
         }
-        else {
-            if (avg < MicMuteMonitor.kMicMutedDetectThreshold) {
-                this.muteIndicatorActive = true;
-                this.client._fire("onMicSignalDetected", false);
-            }
+        else if (!this.muteIndicatorActive && !this.timer) { // avg is below threshold
+            this.fireWarning();
         }
     }
 }

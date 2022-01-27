@@ -277,7 +277,7 @@ function eventlog(id, msg, once) {
         }
 
         if (msg) {
-            req.m = String(msg);
+            req.m = String(msg).replace(/[\t\n\v\f\r\u200E\u200F\u202E]+/g, ' ');
 
             if (req.m.length > 666) {
                 if (d) {

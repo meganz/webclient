@@ -284,6 +284,10 @@ body.tl .dropdown.body.popup.contacts-search {
     max-width: -moz-calc(100% - 2px);
     max-width: calc(100% - 2px);
 }
+.horizontal-contacts-list .selected-contact-block .user-card-name.light .emoji {
+    width: 14px;
+    height: 14px;
+}
 .selected-contact-block .remove-contact-bttn {
     position: absolute;
     z-index: 10;

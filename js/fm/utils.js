@@ -2502,6 +2502,63 @@ MegaUtils.prototype.getCountryCallCode = function(isoCountryCode) {
 };
 
 /**
+ * Gets the trunk (national dialling) code from the given number and country code.
+ * If the country doesn't have trunk codes or wasn't included in the number, returns an empty string.
+ *
+ * @param {string} countryCallCode Country intl. calling code
+ * @param {string} phoneNumber Phone number in question
+ * @returns {string} Trunk code or empty string if not found
+ */
+MegaUtils.prototype.getNumberTrunkCode = function(countryCallCode, phoneNumber) {
+    'use strict';
+
+    if (!this._countryTrunkCodes) {
+        this._countryTrunkCodes = new RegionsCollection().countryTrunkCodes;
+    }
+
+    let trunkCodes;
+    if (this._countryTrunkCodes.hasOwnProperty(countryCallCode)) {
+        trunkCodes = this._countryTrunkCodes[countryCallCode];
+        if (typeof trunkCodes === 'function') {
+            trunkCodes = trunkCodes(phoneNumber);
+        }
+    }
+
+    for (let trunkCode in trunkCodes) {
+        trunkCode = trunkCodes[trunkCode];
+        if (trunkCode && phoneNumber.startsWith(trunkCode)) {
+            return trunkCode;
+        }
+    }
+
+    return ''; // No trunk code is common
+};
+
+/**
+ * Formats the given phone number to make it suitable to prepend a country call code.
+ * Strips hyphens and whitespace, removes the trunk code.
+ * e.g. NZ 021-1234567 => 2112345567
+ *
+ * @param {string} countryCallCode Country int. calling code
+ * @param {string} phoneNumber Phone number to format
+ * @returns {string} Formatted phone number
+ */
+MegaUtils.prototype.stripPhoneNumber = function(countryCallCode, phoneNumber) {
+    'use strict';
+
+    // Strip hyphens, whitespace
+    phoneNumber = phoneNumber.replace(/-|\s/g, '');
+
+    // Remove the trunk code (prefix for dialling nationally) from the given phone number.
+    const trunkCode = M.getNumberTrunkCode(countryCallCode, phoneNumber);
+    if (trunkCode && phoneNumber.startsWith(trunkCode)) {
+        phoneNumber = phoneNumber.substr(trunkCode.length);
+    }
+
+    return phoneNumber;
+};
+
+/**
  * Check user trying to upload folder by drag and drop.
  * @param {Event} event
  * @returns {Boolean}
@@ -2571,4 +2628,39 @@ MegaUtils.prototype.checkFolderDrop = function(event) {
     // }
 
     return false;
+};
+
+/**
+ * Check the date entered, as day, month and year, is valid
+ * @param {Number} day Day value of the date to validate
+ * @param {Number} month Month value of the date to validate
+ * @param {Number} year Year value of the date to validate
+ * @returns {Number} 0 on success, else the number represent why date is not valid.
+ */
+MegaUtils.prototype.validateDate = function(day, month, year) {
+
+    'use strict';
+
+    // Check value is null or empty or 0
+    if (!day || !month || !year) {
+        return 1;
+    }
+
+    // Check value over common range limits
+    if (day > 31 || month > 12) {
+        return 2;
+    }
+
+    const tDate = new Date();
+
+    tDate.setFullYear(year, month - 1, day);
+
+    // If entered day is not exact as processed date, day value is not exist on entered month of the year,
+    // i.e. not exist on Calandar
+    if (tDate.getDate() !== day || tDate.getMonth() + 1 !== month || tDate.getFullYear() !== year) {
+        return 3;
+    }
+
+    // it is valid
+    return 0;
 };

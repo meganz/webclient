@@ -1,6 +1,7 @@
 import React from 'react';
 import { ConversationMessageMixin } from './mixin.jsx';
 import { Avatar, ContactButton } from '../contacts.jsx';
+import { EmojiFormattedContent } from '../../../ui/utils.jsx';
 
 export default class AbstractGenericMessage extends ConversationMessageMixin {
     constructor(props) {
@@ -37,8 +38,9 @@ export default class AbstractGenericMessage extends ConversationMessageMixin {
                 <ContactButton
                     contact={contact}
                     className="message"
-                    label={M.getNameByHandle(contact.u)}
+                    label={<EmojiFormattedContent>{M.getNameByHandle(contact.u)}</EmojiFormattedContent>}
                     chatRoom={this.props.message.chatRoom}
+                    dropdownDisabled={!!this.props.dialog}
                 /> :
                 null
         );

@@ -4,6 +4,7 @@ import { Avatar } from '../contacts.jsx';
 import { PerfectScrollbar } from '../../../ui/perfectScrollbar.jsx';
 import Collapse from './collapse.jsx';
 import Call from './call.jsx';
+import { EmojiFormattedContent } from '../../../ui/utils.jsx';
 
 class Participant extends MegaRenderMixin {
     baseIconClass = 'sprite-fm-mono';
@@ -42,7 +43,7 @@ class Participant extends MegaRenderMixin {
             <>
                 <Avatar contact={M.u[handle]} />
                 <div className="name">
-                    <span>{name} &nbsp;</span>
+                    <EmojiFormattedContent>{name}</EmojiFormattedContent>
                     {handle === u_handle && <span>{l.me}</span>}
                     {chatRoom.isMeeting && Call.isModerator(chatRoom, handle) && (
                         <span>

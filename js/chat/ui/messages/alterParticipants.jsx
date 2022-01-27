@@ -1,6 +1,7 @@
 var React = require("react");
 var ContactsUI = require('./../contacts.jsx');
 var ConversationMessageMixin = require('./mixin.jsx').ConversationMessageMixin;
+import { EmojiFormattedContent } from '../../../ui/utils.jsx';
 
 class AltPartsConvMessage extends ConversationMessageMixin {
     _ensureNameIsLoaded(h) {
@@ -92,11 +93,19 @@ class AltPartsConvMessage extends ConversationMessageMixin {
                     {avatar}
 
                     <div className="message content-area small-info-txt">
-                        <ContactsUI.ContactButton contact={otherContact} className="message" label={otherDisplayName}
-                            chatRoom={self.props.chatRoom}/>
+                        <ContactsUI.ContactButton
+                            className="message"
+                            contact={otherContact}
+                            chatRoom={self.props.chatRoom}
+                            label={<EmojiFormattedContent>{otherDisplayName}</EmojiFormattedContent>}
+                        />
                         {datetime}
-
-                        <div className="message text-block" dangerouslySetInnerHTML={{__html:text}}></div>
+                        <div
+                            className="message text-block"
+                            dangerouslySetInnerHTML={{
+                                __html: megaChat.plugins.emoticonsFilter.processHtmlMessage(text)
+                            }}
+                        />
                     </div>
                 </div>
             );
@@ -132,14 +141,22 @@ class AltPartsConvMessage extends ConversationMessageMixin {
                     {avatar}
 
                     <div className="message content-area small-info-txt">
-                        <ContactsUI.ContactButton contact={otherContact} className="message" label={otherDisplayName}
-                            chatRoom={self.props.chatRoom} />
+                        <ContactsUI.ContactButton
+                            className="message"
+                            chatRoom={self.props.chatRoom}
+                            contact={otherContact}
+                            label={<EmojiFormattedContent>{otherDisplayName}</EmojiFormattedContent>}
+                        />
                         {datetime}
-
-                        <div className="message text-block" dangerouslySetInnerHTML={{__html:text}}></div>
+                        <div
+                            className="message text-block"
+                            dangerouslySetInnerHTML={{
+                                __html: megaChat.plugins.emoticonsFilter.processHtmlMessage(text)
+                            }}
+                        />
                     </div>
                 </div>
-            )
+            );
         });
 
         return <div>{messages}</div>;

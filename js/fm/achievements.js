@@ -363,7 +363,7 @@ mega.achievem.bindStorageDataToView = function bindStorageDataToView($viewContex
             if (idx !== ach.ACH_INVITE) {
                 $cell.addClass('achieved');
 
-                $('.expires-txt', $cell).safeHTML('%n', locFmt, data.rwd.left, l[16290]);
+                $('.expires-txt', $cell).safeHTML(locFmt.replace('%1', data.rwd.left).replace('%2', l[16290]));
                 if (!$('.expires-txt', $cell).hasClass('error')) {
                     $('.expires-txt', $cell).addClass('info');
                 }

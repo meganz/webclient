@@ -70,7 +70,7 @@ Message._getTextContentsForDialogType = function(message) {
         }
 
         if (message.dialogType === "privilegeChange" && message.meta) {
-            textMessage = textMessage.replace("%s2", contactName);
+            textMessage = textMessage.replace("%2", contactName);
             var newPrivilegeText = "";
             if (message.meta.privilege === 3) {
                 newPrivilegeText = l[8875];
@@ -89,7 +89,7 @@ Message._getTextContentsForDialogType = function(message) {
             };
 
             contactName = htmlentities(M.getNameByHandle(contact.u));
-            textMessage = textMessage.replace("%s1", newPrivilegeText);
+            textMessage = textMessage.replace("%1", newPrivilegeText);
         }
         else if (message.dialogType === "alterParticipants" && message.meta) {
             var otherContact;
@@ -2509,10 +2509,9 @@ MessagesBuff.prototype.getRenderableSummary = function(lastMessage) {
                 renderableSummary = l[19285] + " " + renderableSummary;
             }
             else {
-                var name = M.getNameByHandle(author.u);
-                name = ellipsis(name, undefined, 11);
+                var name = megaChat.plugins.emoticonsFilter.processHtmlMessage(escapeHTML(M.getNameByHandle(author.u)));
                 if (name) {
-                    renderableSummary = escapeHTML(name) + ": " + renderableSummary;
+                    renderableSummary = `${name}: ${renderableSummary}`;
                 }
             }
         }

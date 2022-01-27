@@ -4,7 +4,7 @@ function BusinessRegister() {
     this.cacheTimeout = 9e5; // 15 min - default threshold to update payment gateway list
     this.planPrice = 9.99; // initial value
     this.minUsers = 3; // minimum number of users
-    this.maxUsers = 100; // maximum number of users
+    this.maxUsers = 300; // maximum number of users
     this.isLoggedIn = false;
     this.hasAppleOrGooglePay = false;
     if (mega) {
@@ -505,7 +505,7 @@ BusinessRegister.prototype.initPage = function(preSetNb, preSetName, preSetTel, 
                 passed = false;
             }
             else if (nbUsersTrimmed && nbUsersTrimmed > mySelf.maxUsers) {
-                nbUsersMegaInput.showError(l[20425]);
+                nbUsersMegaInput.showError(l[20425].replace('%1', mySelf.maxUsers));
                 $nbUsersInput.focus();
                 passed = false;
             }

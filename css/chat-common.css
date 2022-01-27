@@ -702,6 +702,10 @@ table.arc-chat-messages-block {
 .chat-shared-block .chat-shared-info .small {
     font: var(--text-body2);
 }
+.chat-shared-block .chat-shared-info .small .emoji {
+    width: 14px;
+    height: 14px;
+}
 .chat-shared-block .chat-shared-info .grey {
     color: var(--text-color-low);
 }

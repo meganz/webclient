@@ -99,6 +99,7 @@
  *
  * MegaInputs extensions:
  *  - TEXT: text input - megaInputs-underlinedText.js
+ *  - CURRENCY: text/number input for localised currencies - megaInputs-currencyField.js
  */
 
 (function($, scope) {

@@ -122,6 +122,11 @@
 
         M.safeShowDialog('properties', function() {
             $.propertiesDialog = 'properties';
+            // on idle so we can call renderPathBreadcrumbs only once the info dialog is rendered.
+            onIdle(() => {
+                // we pass the filehandle, so it is available if we search on files on search
+                M.renderPathBreadcrumbs(n.h, true);
+            });
             return $dialog;
         });
 
@@ -320,9 +325,21 @@
             : '<div class="properties-float-bl"><div class="properties-small-gray t10">' + p.t10 + '</div>'
             + '<div class="propreties-dark-txt t11">' + p.t11 + '</div></div></div>';
 
-        var html = '<div class="properties-small-gray">' + p.t1 + '</div>'
+        var html = '<div class="properties-name-container"><div class="properties-small-gray">' + p.t1 + '</div>'
             + '<div class="properties-name-block"><div class="propreties-dark-txt">' + p.t2 + '</div>'
-            + ' <span class="file-settings-icon"><i class="sprite-fm-mono icon-options"></i></span></div>'
+            + '</div></div>'
+            + '<div class="properties-breadcrumb"><div class="properties-small-gray path">Path:</div>'
+            + '<div class="fm-breadcrumbs-wrapper info">'
+            +                    '<div class="crumb-overflow-link dropdown">'
+            +                       '<a class="breadcrumb-dropdown-link">'
+            +                            '<i class="menu-icon sprite-fm-mono icon-options icon24"></i>'
+            +                        '</a>'
+            +                        '<i class="sprite-fm-mono icon-arrow-right icon16"></i>'
+            +                    '</div>'
+            +                    '<div class="fm-breadcrumbs-block info"></div>'
+            +                    '<div class="breadcrumb-dropdown"></div>'
+            +                '</div>'
+            + '</div>'
             + '<div class="properties-items"><div class="properties-float-bl"><span class="properties-small-gray">'
             + p.t3 + '</span>'
             + '<span class="propreties-dark-txt">' + p.t4 + '</span></div>'

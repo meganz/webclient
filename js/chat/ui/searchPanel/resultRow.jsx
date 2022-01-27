@@ -75,7 +75,7 @@ class MessageRow extends MegaRenderMixin {
                 <div className="message-result-avatar">
                     {isGroup ?
                         <div className="chat-topic-icon">
-                            <i className="sprite-fm-uni icon-chat-group" />
+                            <i className="sprite-fm-uni icon-chat-group"/>
                         </div> :
                         <Avatar contact={M.u[contact]}/>}
                 </div>
@@ -130,20 +130,22 @@ class ChatRow extends MegaRenderMixin {
                 className={SEARCH_ROW_CLASS}
                 onClick={() => openResult(room)}>
                 <div className="chat-topic-icon">
-                    <i className="sprite-fm-uni icon-chat-group" />
+                    <i className="sprite-fm-uni icon-chat-group"/>
                 </div>
                 <div className={USER_CARD_CLASS}>
                     <div className="graphic">
-                        <span dangerouslySetInnerHTML={{
-                            __html: megaChat.highlight(
-                                megaChat.plugins.emoticonsFilter.processHtmlMessage(htmlentities(room.topic)),
-                                matches,
-                                true
-                            )
-                        }}/>
+                        <span
+                            dangerouslySetInnerHTML={{
+                                __html: megaChat.highlight(
+                                    megaChat.plugins.emoticonsFilter.processHtmlMessage(htmlentities(room.topic)),
+                                    matches,
+                                    true
+                                )
+                            }}
+                        />
                     </div>
                 </div>
-                <div className="clear" />
+                <div className="clear"/>
             </div>
         );
     }
@@ -175,7 +177,7 @@ class MemberRow extends MegaRenderMixin {
                                 matches,
                                 true
                             )
-                        }} /> :
+                        }}/> :
                         <>
                             <span dangerouslySetInnerHTML={{
                                 __html: megaChat.highlight(
@@ -186,7 +188,7 @@ class MemberRow extends MegaRenderMixin {
                                     true
                                 )
                             }}/>
-                            <ContactPresence contact={contact} />
+                            <ContactPresence contact={contact}/>
                         </>
                     }
                 </div>
@@ -199,11 +201,11 @@ class MemberRow extends MegaRenderMixin {
                             <span>
                                 <EmojiFormattedContent>{room.topic || room.getRoomTitle()}</EmojiFormattedContent>
                             </span>
-                            <MembersAmount room={room} />
+                            <MembersAmount room={room}/>
                         </> :
                         <>
                             <EmojiFormattedContent>{nicknames.getNickname(data)}</EmojiFormattedContent>
-                            <LastActivity contact={contact} showLastGreen={true} />
+                            <LastActivity contact={contact} showLastGreen={true}/>
                         </>
                     }
                 </div>
@@ -216,7 +218,7 @@ class MemberRow extends MegaRenderMixin {
                 onClick={() => openResult(room ? room : contact.h)}>
                 {isGroup ?
                     <div className="chat-topic-icon">
-                        <i className="sprite-fm-uni icon-chat-group" />
+                        <i className="sprite-fm-uni icon-chat-group"/>
                     </div> :
                     <Avatar contact={contact}/>}
                 <div className={USER_CARD_CLASS}>
@@ -231,7 +233,7 @@ class MemberRow extends MegaRenderMixin {
 const NilRow = ({ onSearchMessages, isFirstQuery }) => (
     <div className={`${SEARCH_ROW_CLASS} nil`}>
         <div className="nil-container">
-            <i className="sprite-fm-mono icon-preview-reveal" />
+            <i className="sprite-fm-mono icon-preview-reveal"/>
             <span>{LABEL.NO_RESULTS}</span>
             {isFirstQuery && (
                 <div
@@ -264,20 +266,20 @@ export default class ResultRow extends MegaRenderMixin {
                         data={result.data}
                         index={result.index}
                         matches={result.matches}
-                        room={result.room} />
+                        room={result.room}/>
                 );
             case TYPE.CHAT:
-                return <ChatRow room={result.room} matches={result.matches} />;
+                return <ChatRow room={result.room} matches={result.matches}/>;
             case TYPE.MEMBER:
                 return (
                     <MemberRow
                         data={result.data}
                         matches={result.matches}
                         room={result.room}
-                        contact={M.u[result.data]} />
+                        contact={M.u[result.data]}/>
                 );
             case TYPE.NIL:
-                return <NilRow onSearchMessages={onSearchMessages} isFirstQuery={isFirstQuery} />;
+                return <NilRow onSearchMessages={onSearchMessages} isFirstQuery={isFirstQuery}/>;
             default:
                 return (
                     <div className={SEARCH_ROW_CLASS}>

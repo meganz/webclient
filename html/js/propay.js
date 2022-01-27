@@ -321,6 +321,7 @@ pro.propay = {
             if (currentPlan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL] === parseInt(pro.propay.planNum)) {
 
                 // Get the price and number of months duration
+                var numOfMonths = currentPlan[pro.UTQA_RES_INDEX_MONTHS];
                 var price = currentPlan[pro.UTQA_RES_INDEX_PRICE];
                 var currency = 'EUR';
                 var discountedPriceY = '';
@@ -330,11 +331,16 @@ pro.propay = {
                 if (currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE]) {
                     price = currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE];
                     currency = currentPlan[pro.UTQA_RES_INDEX_LOCALPRICECURRENCY];
-                    if (discountInfo) {
-                        discountSaveY = discountInfo.lyps || '';
-                        discountSaveM = discountInfo.lmps || '';
-                        discountedPriceY = discountInfo.lyp || '';
-                        discountedPriceM = discountInfo.lmp || '';
+                    if (discountInfo && discountInfo.pd) {
+                        const discountPerc = 1 - (discountInfo.pd / 100).toFixed(2);
+                        if (numOfMonths === 12) {
+                            discountedPriceY = (price * discountPerc).toFixed(2);
+                            discountSaveY = (price - discountedPriceY).toFixed(2);
+                        }
+                        else if (numOfMonths === 1) {
+                            discountedPriceM = (price * discountPerc).toFixed(2);
+                            discountSaveM = (price - discountedPriceM).toFixed(2);
+                        }
                     }
                 }
                 else if (discountInfo && (discountInfo.emp || discountInfo.eyp)) {
@@ -343,14 +349,13 @@ pro.propay = {
                     discountSaveY = discountedPriceY ? (price - discountedPriceY).toFixed(2) : '';
                     discountSaveM = discountedPriceM ? (price - discountedPriceM).toFixed(2) : '';
                 }
-                var numOfMonths = currentPlan[pro.UTQA_RES_INDEX_MONTHS];
-                var monthsWording = l[922];     // 1 month
 
                 if (discountInfo && discountInfo.m !== 0 && discountInfo.m !== numOfMonths) {
                     continue;
                 }
 
                 // Change wording depending on number of months
+                var monthsWording = l[922];     // 1 month
                 if (numOfMonths === 12) {
                     monthsWording = l[923];     // 1 year
                 }
@@ -396,7 +401,6 @@ pro.propay = {
                     }
                 }
                 else if (numOfMonths === 1 && discountedPriceM) {
-
                     const savedAmount = formatCurrency(discountSaveM, currency);
                     const $saveContainer = $('.save-money', $durationOption).removeClass('hidden');
 
@@ -614,15 +618,22 @@ pro.propay = {
             let newPriceText = oldPriceText;
             const oldEuroText = $euroPrice.text();
             let newEuroText = oldEuroText;
+            let localDiscountPrice = '';
+
+            if (currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE]) {
+                const discountPerc = 1 - (discountInfo.pd / 100).toFixed(2);
+                localDiscountPrice = (currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE] * discountPerc).toFixed(2);
+                localDiscountPrice = formatCurrency(localDiscountPrice, localCurrency);
+            }
 
             if (numOfMonths === 1) {
                 const euroFormatted = discountInfo.emp ? formatCurrency(discountInfo.emp) : '';
-                newPriceText = discountInfo.lmp || euroFormatted || oldPriceText;
+                newPriceText = localDiscountPrice || euroFormatted || oldPriceText;
                 newEuroText = euroFormatted || oldEuroText;
             }
             else {
                 const euroFormatted = discountInfo.eyp ? formatCurrency(discountInfo.eyp) : '';
-                newPriceText = discountInfo.lyp || euroFormatted || oldPriceText;
+                newPriceText = localDiscountPrice || euroFormatted || oldPriceText;
                 newEuroText = euroFormatted || oldEuroText;
             }
 
@@ -767,7 +778,7 @@ pro.propay = {
 
         // Update depending on recurring or one off payment
         $('button.purchase span', $step2).text(subscribeOrPurchase);
-        $('.payment-instructions', $step2).safeHTML(subscribeOrPurchaseInstruction);
+        $(is_mobile ? '.payment-info' : '.payment-instructions', $step2).safeHTML(subscribeOrPurchaseInstruction);
         $('.choose-renewal .duration-text', $step2).text(autoRenewMonthOrYearQuestion);
         $('.charge-information', $step2).text(chargeInfoDuration);
         $('.payment-buy-now span', $paymentDialog).text(subscribeOrPurchase);

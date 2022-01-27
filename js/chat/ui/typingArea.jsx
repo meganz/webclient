@@ -1,4 +1,6 @@
 // libs
+import { EmojiFormattedContent } from '../../ui/utils';
+
 var React = require("react");
 var ReactDOM = require("react-dom");
 import { MegaRenderMixin, SoonFcWrap } from './../mixins';
@@ -902,12 +904,14 @@ export class TypingArea extends MegaRenderMixin {
                 <div
                     className="chat-textarea-scroll textarea-scroll jScrollPaneContainer"
                     style={textareaScrollBlockStyles}>
+                    <div className="messages-textarea-placeholder">
+                        {self.state.typedMessage ? null : <EmojiFormattedContent>{placeholder}</EmojiFormattedContent>}
+                    </div>
                     <textarea
                         className={`
                             ${messageTextAreaClasses}
                             ${disabledTextarea ? 'disabled' : ''}
                         `}
-                        placeholder={placeholder}
                         onKeyUp={self.onTypeAreaKeyUp.bind(self)}
                         onKeyDown={self.onTypeAreaKeyDown.bind(self)}
                         onBlur={self.onTypeAreaBlur.bind(self)}

@@ -122,7 +122,7 @@
     SfuApp.prototype.onDisconnect = function(termCode, willReconnect) {
         if (!willReconnect) {
             this.room.trigger('onCallEnd', { callId: this.callId, chatId: this.room.chatId, showCallFeedback: true });
-            if (this.sfuClient.termCode === 1) {
+            if (termCode === SfuClient.TermCode.kTooManyParticipants) {
                 msgDialog('warningb', '', l[20200]);
             }
             this.room.sfuApp = null;
@@ -173,19 +173,18 @@
         return asmCrypto.AES_ECB.decrypt(base64urldecode(key), userSharedKey, false).buffer;
     };
 
-    SfuApp.prototype.destroy = function() {
+    SfuApp.prototype.destroy = function(reason) {
         this.isDestroyed = true;
-        if (this.sfuClient.conn) {
-            this.sfuClient.disconnect();
-        }
+        this.sfuClient.disconnect(reason);
         delete window.sfuClient;
-
     };
 
     // proxy SFUClient events to the call.
     [
         'onLocalMediaChange',
-        'onLocalMediaError'
+        'onLocalMediaError',
+        'onNoMicInput',
+        'onMicSignalDetected'
     ].forEach((k) => {
         SfuApp.prototype[k] = function() {
             return this.callManagerCall[k].apply(this.callManagerCall, arguments);

@@ -114,6 +114,18 @@
 .chat-textarea .popup-button.left:hover i {
     --mask-color: var(--icon-active);
 }
+.chat-textarea .messages-textarea-placeholder {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+    width: 100%;
+    font: var(--text-body1);
+    color: var(--text-color-medium);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
 .chat-textarea-scroll textarea, .chat-textarea-scroll textarea + div, .message.textarea-scroll textarea,  .message.textarea-block textarea + div {
     font: var(--text-body1);
     width: calc(100% - 14px);

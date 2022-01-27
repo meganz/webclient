@@ -196,7 +196,6 @@ def prepare_translation_string(resource, lang):
                             "content_encoding": "text",
                             "file_type": "default",
                             "mode": "default",
-                            "pseudo": False,
                         },
                         "relationships": {
                             "language": {
@@ -433,6 +432,8 @@ def merge_language(main, branch):
     sys.stdout.flush()
     for code, strings in branch.items():
         for key, data in strings.items():
+            if data['string'] == '' and code != 'en':
+                data['string'] = branch['en'][key]['string']
             main[code][key] = data
     print("Completed.")
 
@@ -612,6 +613,64 @@ def lock_resource(branch_resource_name, keys):
             if content["links"]["next"] != None:
                 url = content["links"]["next"]
 
+def pruning():
+    url = os.getenv('TRANSIFEX_BOT_URL')
+    token = os.getenv('TRANSIFEX_BOT_TOKEN')
+    prod = PROJECT_ID + ':r:' + RESOURCE
+    if url and token:
+        i = 30
+        while i > 0:
+            request = Request(url + '?o=prune&pid=55&token=' + token)
+            try:
+                response = urlopen(request)
+            except HTTPError as ex:
+                content = ex.read().decode('utf8')
+                print('Error: ' + content)
+                return False
+            content = response.read().decode('utf8')
+            if content == '':
+                print('Empty response from the Transifex bot')
+                return False
+            else:
+                try:
+                    content = json.loads(content)
+                    if 'ok' in content:
+                        if content['ok']:
+                            if 'status' in content and content['status'] == 'pending':
+                                if i % 5 == 0:
+                                    print('Processing.....')
+                                time.sleep(10)
+                            i = i - 1
+                        elif 'error' in content:
+                            print('Error: ' + content['error'])
+                            return False
+                        else:
+                            print('Unknown error')
+                            return False
+                    elif prod in content and 'ok' in content[prod]:
+                        if content[prod]['ok']:
+                            if content[prod]['pruned'] > 0:
+                                print('Removed ' + content[prod]['pruned'] + ' unused strings')
+                                print('Backup located in server directory ' + content[prod]['backup'])
+                            else:
+                                print('Nothing to remove')
+                            return True
+                        elif 'error' in content[prod]:
+                            print('Error: ' + content[prod]['error'])
+                            return False
+                        else:
+                            print('Unknown error when pruning prod')
+                            return False
+                    else:
+                        print('Error: Unexpected result')
+                        return False
+                except:
+                    print('Error: ' + content)
+                    return False
+        print('Error: Pruning timed out')
+    else:
+        print('Invalid environment variables')
+
 def main():
     print("--- Transifex Language Management ---")
     languages = ""
@@ -624,7 +683,10 @@ def main():
     parser.add_argument("-l", "--language", nargs=1, help="Select several languages to fetch in comma separated value. (Use Webclient's language code)")
     parser.add_argument("-u", "--update", nargs="?", help="Parse new strings in a JSON file and update branch resource file", type=str, const="update")
     parser.add_argument("-fp", "--filepath", nargs="?", help="Custom file path for updating resource file", type=str)
+    parser.add_argument("-c", "--clean", nargs="?", help="Activate pruning", const=True)
     args = parser.parse_args()
+    if args.clean:
+        pruning()
     if args.production:
         is_prod = args.production
     elif args.language != None and len(args.language) > 0:

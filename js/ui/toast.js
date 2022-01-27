@@ -18,13 +18,28 @@ window.toastRack = (() => {
      */
     function createRack(parentElement, addTo = 'bottom') {
 
+        const existRack = parentElement.querySelector('.toast-rack');
+        const validPos = new Set(['top', 'bottom', 'start', 'end']);
+
+        if (existRack) {
+
+            if (addTo && validPos.has(addTo) && existRack.addTo !== addTo) {
+
+                existRack.classList.remove(existRack.addTo);
+                existRack.classList.add(addTo);
+                existRack.addTo = addTo;
+            }
+
+            return existRack;
+        }
+
         const rack = document.createElement('section');
         rack.className = 'toast-rack';
         rack.cleanupTimer = 'toast-rack:' + makeUUID();
         rack.expiry = Infinity;
 
         // set direction
-        if (addTo && ['top', 'bottom', 'start', 'end'].includes(addTo)) {
+        if (addTo && validPos.has(addTo)) {
             rack.classList.add(addTo);
             rack.addTo = addTo;
         }
@@ -708,6 +723,26 @@ window.toastRack = (() => {
         return results;
     }
 
+    function testRack(rack, parentElementClass, addTo) {
+
+        // Seems like rack is not visible one. lets try get visible one instead from another fmholder
+        if (rack.offsetParent === null) {
+
+            const pElms = document.getElementsByClassName(parentElementClass);
+
+            for (let i = pElms.length; i--;) {
+
+                if (pElms[i].offsetParent) {
+
+                    rack = createRack(pElms[i], addTo);
+                    break;
+                }
+            }
+        }
+
+        return rack;
+    }
+
     /**
      * Create the toast rack (container), attach it to the DOM and return methods to control it.
      *
@@ -716,9 +751,9 @@ window.toastRack = (() => {
      * @param {string} addTo - position the new notifications should appear in (top/bottom/start/end). RTL aware.
      * @returns {object} control methods for the new toast rack
      */
-    return (parentElement, addTo) => {
+    return (parentElement, parentElementClass, addTo) => {
         // Create a new rack, or connect to an existing one
-        const rack = createRack(parentElement, addTo);
+        let rack = createRack(parentElement, addTo);
 
         return {
             /**
@@ -730,7 +765,12 @@ window.toastRack = (() => {
              * @returns {string} the ID of the new toast slot
              * @see show
              */
-            show: async options => show(rack, options),
+            show: async options => {
+
+                rack = testRack(rack, parentElementClass);
+
+                return show(rack, options);
+            },
 
             /**
              * Hide a toast.
@@ -796,11 +836,16 @@ window.toastRack = (() => {
              * @param {object} [overrideOptions] - an options object to override the defaults @see show
              * @returns {string} the ID of the new toast slot
              */
-            neutral: async (content, icon, overrideOptions) => show(rack, Object.assign({
-                content,
-                icons: [icon],
-                hasClose: true
-            }, overrideOptions)),
+            neutral: async(content, icon, overrideOptions) => {
+
+                rack = testRack(rack, parentElementClass);
+
+                return show(rack, Object.assign({
+                    content,
+                    icons: [icon],
+                    hasClose: true
+                }, overrideOptions));
+            },
 
             /**
              * Show a high priority toast.
@@ -812,12 +857,17 @@ window.toastRack = (() => {
              * @param {object} [overrideOptions] - an options object to override the defaults @see show
              * @returns {string} the ID of the new toast slot
              */
-            high: async (content, icon, overrideOptions) => show(rack, Object.assign({
-                classes: ['high'],
-                content,
-                icons: [icon],
-                hasClose: true
-            }, overrideOptions)),
+            high: async(content, icon, overrideOptions) => {
+
+                rack = testRack(rack, parentElementClass);
+
+                return show(rack, Object.assign({
+                    classes: ['high'],
+                    content,
+                    icons: [icon],
+                    hasClose: true
+                }, overrideOptions));
+            },
 
             /**
              * Show a medium priority toast.
@@ -829,12 +879,17 @@ window.toastRack = (() => {
              * @param {object} [overrideOptions] - an options object to override the defaults @see show
              * @returns {string} the ID of the new toast slot
              */
-            medium: async (content, icon, overrideOptions) => show(rack, Object.assign({
-                classes: ['medium'],
-                content,
-                icons: [icon],
-                hasClose: true
-            }, overrideOptions)),
+            medium: async(content, icon, overrideOptions) => {
+
+                rack = testRack(rack, parentElementClass);
+
+                return show(rack, Object.assign({
+                    classes: ['medium'],
+                    content,
+                    icons: [icon],
+                    hasClose: true
+                }, overrideOptions));
+            },
 
             /**
              * Show a low priority toast.
@@ -846,12 +901,17 @@ window.toastRack = (() => {
              * @param {object} [overrideOptions] - an options object to override the defaults @see show
              * @returns {string} the ID of the new toast slot
              */
-            low: async (content, icon, overrideOptions) => show(rack, Object.assign({
-                classes: ['low'],
-                content,
-                icons: [icon],
-                hasClose: true
-            }, overrideOptions)),
+            low: async(content, icon, overrideOptions) => {
+
+                rack = testRack(rack, parentElementClass);
+
+                return show(rack, Object.assign({
+                    classes: ['low'],
+                    content,
+                    icons: [icon],
+                    hasClose: true
+                }, overrideOptions));
+            },
 
             /**
              * Updates the severity of a toast.
@@ -992,10 +1052,14 @@ lazy(window, 'toaster', () => {
         const mainToaster = document.createElement('section');
         mainToaster.className = 'global-toast-container';
         document.body.appendChild(mainToaster);
-        return window.toastRack(mainToaster, 'top');
+        return window.toastRack(mainToaster, 'global-toast-container', 'top');
     });
 
-    lazy(toaster, 'alerts', () => window.toastRack(document.querySelector('.alert-toast-container'), 'top'));
+    lazy(toaster, 'alerts', () => window.toastRack(
+        document.querySelector('.alert-toast-container'),
+        'alert-toast-container',
+        'top'
+    ));
 
     return toaster;
 });

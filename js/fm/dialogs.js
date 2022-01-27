@@ -613,7 +613,10 @@
                 contactElem += contactStatus + '">';
                 contactElem += '<i class="encrypted-icon sprite-fm-uni icon-ekr"></i>';
                 contactElem += '<span class="nw-contact-status"></span>';
-                contactElem += '<span class="nw-contact-name">' + escapeHTML(name) + '</span>';
+                contactElem +=
+                    '<span class="nw-contact-name">' +
+                        megaChat.plugins.emoticonsFilter.processHtmlMessage(escapeHTML(name))
+                    + '</span>';
                 contactElem += '<span class="nw-contact-email">' + escapeHTML(email) + '</span>';
                 contactElem = '<li id="cpy-dlg-chat-itm-' + handle + '">' + contactElem + '</li>';
                 return contactElem;
@@ -1819,7 +1822,13 @@
             }
             else if (section === 'conversations') {
                 if (window.megaChatIsReady) {
-                    megaChat.openChatAndAttachNodes(chats, selectedNodes).dump();
+                    if ($.noOpenChatFromPreview) {
+                        delete $.noOpenChatFromPreview;
+                        megaChat.openChatAndAttachNodes(chats, selectedNodes, true).dump();
+                    }
+                    else {
+                        megaChat.openChatAndAttachNodes(chats, selectedNodes).dump();
+                    }
                 }
                 else if (d) {
                     console.error('MEGAchat is not ready');

@@ -313,12 +313,18 @@ body.de .mega-dialog.new-group-chat {
     position: relative;
     transition: max-width 200ms ease-in-out;
 }
+.mega-dialog .properties-breadcrumb .fm-breadcrumbs-wrapper.info {
+    max-width: 100%;
+}
 .mega-dialog .active-search + .fm-breadcrumbs-wrapper {
     max-width: calc(100% - 302px);
 }
 .mega-dialog .fm-breadcrumbs-wrapper a {
     color: var(--text-color-medium);
     text-decoration: none;
+}
+.mega-dialog .properties-breadcrumb .fm-breadcrumbs-wrapper a {
+    color: var(--text-color-high);
 }
 .mega-dialog.add-from-cloud .fm-header-buttons {
     background: transparent;
@@ -404,6 +410,9 @@ body.de .mega-dialog.new-group-chat {
 .mega-dialog .fm-breadcrumbs-wrapper .fm-breadcrumbs:first-child {
     flex-shrink: 0;
 }
+.mega-dialog .properties-breadcrumb .fm-breadcrumbs-wrapper.info .fm-breadcrumbs:not(.cloud-drive):first-child {
+    flex-shrink: unset;
+}
 /* .mega-dialog.add-from-cloud */
 .mega-dialog .fm-breadcrumbs-wrapper .right-arrow-bg.recycle-item {
     background-position: 8px -8036px;
@@ -427,6 +436,13 @@ body.de .mega-dialog.new-group-chat {
 .mega-dialog .breadcrumb-dropdown a:active {
     text-decoration: none;
     color: unset;
+}
+.mega-dialog .properties-breadcrumb .breadcrumb-dropdown a,
+.mega-dialog .properties-breadcrumb .breadcrumb-dropdown a:active {
+    color: var(--stroke-main-inverted);
+}
+.mega-dialog .properties-breadcrumb .breadcrumb-dropdown.ps-active-y a {
+    margin-right: 4px;
 }
 .fm-dialog-table.grid-table-header th.grid-first-th i {
     float: none;
@@ -4534,6 +4550,9 @@ body.de .mega-dialog.new-group-chat {
     .mega-dialog.payment-address-dialog .states {
         margin-bottom: 20px;
     }
+    .mega-dialog.payment-address-dialog .states .mega-input-dropdown .dropdown-scroll {
+        max-height: 152px;
+    }
 
 /* end payment-address-dialog */
 
@@ -6100,7 +6119,7 @@ body.de .mega-dialog.new-group-chat {
     .mega-dialog.limited-bandwidth-dialog:not(.exceeded) .step1-block,
     .mega-dialog.limited-bandwidth-dialog.exceeded:not(.pro) .step1-block,
     .mega-dialog.limited-bandwidth-dialog.exceeded .dialog.header-before-icon.exceeded,
-    .mega-dialog.limited-bandwidth-dialog.exceeded:not(.pro) button.close,
+    .mega-dialog.limited-bandwidth-dialog.exceeded button.close,
     .mega-dialog.limited-bandwidth-dialog.pro.exceeded .dialog.pro-exceeded-bl,
     .mega-dialog.limited-bandwidth-dialog.slider .dialog.pro-exceeded-slider {
         display: block;

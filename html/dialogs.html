@@ -537,7 +537,7 @@
                         </button>
                     </li>
                     <li>
-                        <button class="v-btn simpletip send-to-chat hidden" aria-label="[$17764]" data-simpletip="[$17764]" data-simpletipoffset="2">
+                        <button class="v-btn simpletip send-to-chat" aria-label="[$17764]" data-simpletip="[$17764]" data-simpletipoffset="2">
                             <i class="sprite-fm-mono icon-send-to-chat"></i>
                         </button>
                     </li>
@@ -2177,12 +2177,24 @@
             </div>
             <div class="properties-txt-wrapper">
                 <div class="properties-txt-pad">
+                    <div class="properties-name-container">
                     <div class="properties-small-gray">[$86]</div>
                     <div class="properties-name-block">
                         <div class="propreties-dark-txt">Filename.ext</div>
-                        <span class="file-settings-icon">
-                            <i class="sprite-fm-mono icon-options"></i>
-                        </span>
+                    </div>
+                    </div>
+                    <div class="properties-breadcrumb">
+                        <div class="properties-small-gray">Path:</div>
+                        <div class="fm-breadcrumbs-wrapper info">
+                            <div class="crumb-overflow-link dropdown">
+                                <a class="breadcrumb-dropdown-link">
+                                    <i class="menu-icon sprite-fm-mono icon-options icon24"></i>
+                                </a>
+                                <i class="sprite-fm-mono icon-arrow-right icon16"></i>
+                            </div>
+                            <div class="fm-breadcrumbs-block"></div>
+                            <div class="breadcrumb-dropdown"></div>
+                        </div>
                     </div>
                     <div class="properties-float-bl">
                         <span class="properties-small-gray">[$87]</span>
@@ -6136,7 +6148,7 @@
                     [$22743]
                 </div>
                 <div class="generate-url page-names">
-                    <span data-page="start" class="active">[$22744]</span>
+                    <span data-page="start" class="active">[$ref_link_start_page]</span>
                     <span data-page="business">[$19530]</span>
                     <span data-page="mobile">[$955]</span>
                     <span data-page="sync">[$956]</span>
@@ -6235,7 +6247,7 @@
                         <div class="affiliate-redeem header">
                             [$23297]
                         </div>
-                        <input class="underlinedText redeem-amount" type="number" name="affiliate-redemption-amount" id="affiliate-redemption-amount" value="" step="any" data-prefix="&euro;">
+                        <input class="currencyField redeem-amount" type="number" name="affiliate-redemption-amount" id="affiliate-redemption-amount" step="any" data-prefix="&euro;">
                         <div class="affiliate-redeem commission-wrap">
                             <div class="affiliate-redeem available-comission">
                                 [$23299]

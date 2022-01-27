@@ -92,16 +92,6 @@ img.emoji,
 .result-table-row img.emoji.big {
     margin-top: 0px;
 }
-/* overrides the class above on chat topic name*/
-.chat-topic-block .chat-topic-text img.emoji,
-.chat-topic-block .chat-topic-text img.emoji.big {
-    width: 18px;
-    height: 18px;
-    margin: 0 2px;
-}
-.chat-topic-block .chat-topic-text img.emoji:first-child {
-    margin-left: 0;
-}
 
 .fm-picker-dialog img.emoji.big {
     margin-top: 2px;

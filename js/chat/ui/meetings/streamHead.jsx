@@ -3,6 +3,7 @@ import { MegaRenderMixin } from '../../mixins';
 import ModalDialogsUI from '../../../ui/modalDialogs.jsx';
 import Button from './button.jsx';
 import ModeSwitch from './modeSwitch.jsx';
+import { EmojiFormattedContent } from '../../../ui/utils.jsx';
 
 export default class StreamHead extends MegaRenderMixin {
     delayProcID = null;
@@ -121,7 +122,9 @@ export default class StreamHead extends MegaRenderMixin {
             const moderators = [];
             for (const [handle, role] of Object.entries(members)) {
                 if (role === ChatRoom.MembersSet.PRIVILEGE_STATE.FULL) {
-                    moderators.push(escapeHTML(M.getNameByHandle(handle)));
+                    moderators.push(
+                        megaChat.plugins.emoticonsFilter.processHtmlMessage(escapeHTML(M.getNameByHandle(handle)))
+                    );
                 }
             }
 
@@ -232,7 +235,7 @@ export default class StreamHead extends MegaRenderMixin {
                                 ${chatRoom.isMeeting ? 'has-meeting-link' : ''}
                             `}
                             onClick={() => chatRoom.isMeeting && this.setState({ dialog: !dialog, banner: false })}>
-                            <span>{chatRoom.getRoomTitle()}</span>
+                            <EmojiFormattedContent>{chatRoom.getRoomTitle()}</EmojiFormattedContent>
                             {chatRoom.isMeeting && (
                                 <i
                                     className={`

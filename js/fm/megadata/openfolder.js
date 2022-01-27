@@ -509,7 +509,7 @@
         promise.then((h) => {
             if (d) {
                 console.warn('openFolder completed for %s, currentdir=%s', maph(id), maph(M.currentdirid));
-                console.assert(id.endsWith(h));
+                console.assert(String(id).endsWith(h));
             }
             delay(`mega:openfolder!${id}`, () => {
                 if (M.currentdirid !== id) {

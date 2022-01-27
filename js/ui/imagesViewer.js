@@ -346,11 +346,11 @@ var slideshowid;
             range: 'min',
             step: 0.01,
             change: function(e, ui) {
-                $('.ui-slider-handle .mv-zoom-slider', this).text(`${ui.value}%`);
+                $('.ui-slider-handle .mv-zoom-slider', this).text(formatPercentage(ui.value / 100));
                 wrapper.dataset.perc = ui.value;
             },
             slide: function(e, ui) {
-                $('.ui-slider-handle .mv-zoom-slider', this).text(`${ui.value}%`);
+                $('.ui-slider-handle .mv-zoom-slider', this).text(formatPercentage(ui.value / 100));
                 slideshow_zoom(container, false, ui.value);
             },
             create: () => {
@@ -863,7 +863,7 @@ var slideshowid;
                         return false;
                     }
                 }
-                else if ((e.keyCode === 8 || e.key === 'Backspace') && !isDownloadPage) {
+                else if ((e.keyCode === 8 || e.key === 'Backspace') && !isDownloadPage && !$.copyDialog) {
                     history.back();
                     return false;
                 }
@@ -907,6 +907,17 @@ var slideshowid;
                     contextMenu.open(optionsMenu);
                 }
                 return false;
+            });
+
+            $('.v-btn.send-to-chat', $overlay).rebind('click.media-viewer', () => {
+                $(document).fullScreen(false);
+                const $wrapper = $('.media-viewer-container', 'body');
+                const video = $('video', $wrapper).get(0);
+                if (video && !video.paused && !video.ended) {
+                    video.pause();
+                }
+                $.noOpenChatFromPreview = true;
+                openCopyDialog('conversations');
             });
 
             // Close context menu
@@ -1594,6 +1605,10 @@ var slideshowid;
                 $imgWrap.attr('data-image', id);
                 $img.attr('src', src1).addClass('active');
 
+                if (previews[id].brokenEye) {
+                    $img.addClass('broken-eye');
+                }
+
                 slideshow_imgPosition($overlay);
                 $(window).rebind('resize.imgResize', function() {
                     slideshow_imgPosition($overlay);
@@ -1602,8 +1617,16 @@ var slideshowid;
             else if (src1 !== noThumbURI) {
                 $img.attr('src', src1).addClass('active');
 
+                if ($img.hasClass('broken-eye')) {
+                    $img.addClass('vo-hidden').removeClass('broken-eye');
+                }
+
                 // adjust zoom percent label
-                slideshow_zoomSlider($img.width() / origImgWidth * 100 * devicePixelRatio);
+                onIdle(() => {
+                    slideshow_imgPosition($overlay);
+                    $img.removeClass('vo-hidden');
+                });
+                // slideshow_zoomSlider($img.width() / origImgWidth * 100 * devicePixelRatio);
             }
 
             // Apply exit orientation
@@ -1618,6 +1641,7 @@ var slideshowid;
     function previewimg(id, uint8arr, type) {
         var blob;
         var n = M.getNodeByHandle(id);
+        var brokenEye = false;
 
         if (uint8arr === null) {
             if (d) {
@@ -1631,6 +1655,7 @@ var slideshowid;
             }
             uint8arr = u8;
             type = 'image/svg+xml';
+            brokenEye = true;
         }
 
         type = typeof type === 'string' && type || 'image/jpeg';
@@ -1668,7 +1693,8 @@ var slideshowid;
             time: Date.now(),
             src: myURL.createObjectURL(blob),
             buffer: uint8arr.buffer || uint8arr,
-            full: n.s === blob.size
+            full: n.s === blob.size,
+            brokenEye: brokenEye
         });
 
         if (n.hash) {

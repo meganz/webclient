@@ -3,6 +3,7 @@ import { MegaRenderMixin } from '../../../mixins';
 import ModalDialogsUI from '../../../../ui/modalDialogs.jsx';
 import Button from '../button.jsx';
 import Preview from './preview.jsx';
+import { EmojiFormattedContent } from '../../../../ui/utils';
 
 export class Start extends MegaRenderMixin {
     static NAMESPACE = 'start-meeting';
@@ -114,7 +115,12 @@ export class Start extends MegaRenderMixin {
                 </div>
                 <div className="fm-dialog-body">
                     <div className={`${NAMESPACE}-title`}>
-                        {editing ? <this.Input /> : <h2 onClick={this.toggleEdit}>{topic}</h2>}
+                        {editing ?
+                            <this.Input /> :
+                            <h2 onClick={this.toggleEdit}>
+                                <EmojiFormattedContent>{topic}</EmojiFormattedContent>
+                            </h2>
+                        }
                         <Button
                             className={`
                                 mega-button

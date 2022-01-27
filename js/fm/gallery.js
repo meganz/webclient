@@ -1833,7 +1833,7 @@ class MegaMediaTypeGallery extends MegaGallery {
 
     dbAction() {
 
-        if (fmdb) {
+        if (fmdb && fmdb.crashed !== 666) {
 
             const sharesTree = M.getTreeHandles('shares');
             const rubTree = M.getTreeHandles(M.RubbishID);

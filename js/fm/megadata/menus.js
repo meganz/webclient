@@ -109,7 +109,7 @@ MegaData.prototype.menuItems = function menuItems() {
         if (n) {
             nodes.splice(i, 1);
 
-            if (n.rr && n.p === M.RubbishID) {
+            if (n.rr && M.getNodeRoot(n.h) === M.RubbishID) {
                 rrnodes.push(n.rr);
             }
             // else we can delete .rr and api_setattr
@@ -372,7 +372,8 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
         for (var j = $.selected.length; j--;) {
             n = M.getNodeByHandle($.selected[j]);
 
-            if (M.d[n.rr] && n.p === M.RubbishID && M.getNodeRoot(n.rr) !== M.RubbishID && M.getNodeRights(n.rr) > 1) {
+            if (M.d[n.rr] && M.getNodeRoot(n.h) === M.RubbishID
+                && M.getNodeRoot(n.rr) !== M.RubbishID && M.getNodeRights(n.rr) > 1) {
                 items['.revert-item'] = 1;
             }
             else if (items['.revert-item']) {

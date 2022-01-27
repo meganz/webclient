@@ -10874,9 +10874,6 @@ Thank You dialog
     .mobile.filetype-img {
         width: 72px;
     }
-    .downloading .mobile.filetype-img, .uploading .mobile.filetype-img, .wrong-file .mobile.filetype-img {
-        width: 48px;
-    }
     .mobile.filesize, .mobile.download-speed, .mobile.upload-speed, .mobile.download-percents, .mobile.upload-percents {
         margin: 3px 0 0 0;
         font-size: 14px;
@@ -13353,7 +13350,7 @@ p a.blog-new-read-more {
     background-color: white;
 }
 .affiliate-distrib-page .mobile.top-hr-pad {
-    padding-top: 130px;
+    padding-top: 65px;
 }
 .mobile.fm-affiliate.tab-button {
     display: inline-block;
@@ -13685,6 +13682,13 @@ p a.blog-new-read-more {
     text-transform: uppercase;
     position: absolute;
     left: 12px;
+}
+.mobile.affiliate.redeem-body.step2 .clean-megainputs .mega-input {
+    padding: 0;
+    height: auto;
+}
+.mobile.affiliate.redeem-body.step2 .clean-megainputs .mega-input::before {
+    display: none;
 }
 .mobile.affiliate.comission {
     font-size: 14px;
@@ -14685,6 +14689,7 @@ body.landscape .upload-overlay .mobile.filetype-img {
     display: flex;
     flex-direction: column;
     align-items: center;
+    width: 100%;
 }
 .download.icon-error {
     float: left;
@@ -14729,6 +14734,9 @@ body.landscape .upload-overlay .mobile.filetype-img {
 }
 .download .links-block {
     padding: 16px;
+    max-width: 460px;
+    margin: 0 auto;
+    width: 100%;
 }
 .decrypt-page {
     height: calc(100% - 116px);

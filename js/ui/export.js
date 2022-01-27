@@ -1994,6 +1994,11 @@ var exportExpiry = {
             fm_showoverlay();
             $linksDialog.removeClass('hidden');
 
+            // Reset the checkbox of export link decryption key separately when open the get link dialog
+            if (typeof $keysCheckbox !== 'undefined' && $keysCheckbox.prop('checked')) {
+                $keysCheckbox.trigger('click');
+            }
+
             // Init Scrolling
             Ps.initialize($scroll[0]);
             $scroll.scrollTop(0);

@@ -1,6 +1,7 @@
 var React = require("react");
 var ContactsUI = require('./../contacts.jsx');
 var ConversationMessageMixin = require('./mixin.jsx').ConversationMessageMixin;
+import { EmojiFormattedContent } from '../../../ui/utils.jsx';
 
 class PrivilegeChange extends ConversationMessageMixin {
     haveMoreContactListeners() {
@@ -64,27 +65,34 @@ class PrivilegeChange extends ConversationMessageMixin {
 
         var text = l[8915]
             .replace(
-                "%s1",
+                "%1",
                 '<strong className="dark-grey-txt">' + htmlentities(newPrivilegeText) + '</strong>'
             )
             .replace(
-                "%s2",
+                "%2",
                 '<strong className="dark-grey-txt">' + htmlentities(displayName) + '</strong>'
             );
 
         messages.push(
             <div className="message body" data-id={"id" + message.messageId} key={message.messageId}>
                 {avatar}
-
                 <div className="message content-area small-info-txt">
-                    <ContactsUI.ContactButton contact={otherContact} className="message" label={otherDisplayName}
-                        chatRoom={self.props.chatRoom} />
+                    <ContactsUI.ContactButton
+                        className="message"
+                        chatRoom={self.props.chatRoom}
+                        contact={otherContact}
+                        label={<EmojiFormattedContent>{otherDisplayName}</EmojiFormattedContent>}
+                    />
                     {datetime}
-
-                    <div className="message text-block" dangerouslySetInnerHTML={{__html:text}}></div>
+                    <div
+                        className="message text-block"
+                        dangerouslySetInnerHTML={{
+                            __html: megaChat.plugins.emoticonsFilter.processHtmlMessage(text)
+                        }}
+                    />
                 </div>
             </div>
-        )
+        );
 
 
         return <div>{messages}</div>;

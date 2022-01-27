@@ -1260,15 +1260,9 @@ var addressDialog = {
         var monthsWording;
 
         if (!is_mobile) {
+            // Hide the warning message when the registerb dialog gets open each time.
             $('.error-message', this.$dialog).addClass('hidden');
 
-            var $contentSection = $('section.content', this.$dialog);
-            if ($contentSection.is('.ps-container')) {
-                Ps.update($contentSection[0]);
-            }
-            else {
-                Ps.initialize($contentSection[0]);
-            }
             const $paymentIcons = $('.payment-icons', this.$dialog);
             const specialLogos = ['stripeAE', 'stripeJC', 'stripeUP', 'stripeDD'];
             const gate = this.businessPlan && this.businessPlan.usedGateName || pro.propay.proPaymentMethod;
@@ -1355,6 +1349,24 @@ var addressDialog = {
         this.cityMegaInput = new mega.ui.MegaInputs($('.city', this.$dialog));
         this.postCodeMegaInput = new mega.ui.MegaInputs($('.postcode', this.$dialog));
         this.taxCodeMegaInput = new mega.ui.MegaInputs($('.taxcode', this.$dialog));
+
+        const resizeDlgScrollBar = function($targetDialog) {
+            const $contentSection = $('section.content', $targetDialog);
+            if ($contentSection.is('.ps-container')) {
+                Ps.update($contentSection[0]);
+            }
+            else {
+                Ps.initialize($contentSection[0]);
+            }
+        };
+
+        if (!is_mobile) {
+            // Keep the ps scrollbar block code after remove the hidden class from the dialog
+            // so that it shows the scrollbar initially
+            resizeDlgScrollBar(this.$dialog);
+
+            $(window).rebind('resize.billAddressDlg', resizeDlgScrollBar.bind(null, this.$dialog));
+        }
     },
 
     /**

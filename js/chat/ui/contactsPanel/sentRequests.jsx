@@ -37,7 +37,9 @@ export default class SentRequests extends MegaRenderMixin {
             headerContainerClassName="contacts-table requests-table contacts-table-head"
             containerClassName="contacts-table requests-table contacts-table-results"
             listAdapterColumns={[
-                ColumnContactRequestsEmail,
+                [ColumnContactRequestsEmail, {
+                    currView: "opc"
+                }],
                 ColumnContactRequestsRts,
                 [ColumnContactRequestsSentBtns, {
                     onReject: (email) => {

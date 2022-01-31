@@ -188,7 +188,7 @@ class ConversationMessageMixin extends ContactAwareComponent {
     };
 
     emojiSelected(e, slug, meta) {
-        const { chatRoom, message } = this.props;
+        const { chatRoom, message, onEmojiBarChange } = this.props;
 
         if (chatRoom.isReadOnly()) {
             return false;
@@ -202,6 +202,13 @@ class ConversationMessageMixin extends ContactAwareComponent {
 
         // Remove reaction
         if (emoji && message.reacts.getReaction(u_handle, emoji.u)) {
+            if (
+                onEmojiBarChange
+                && Object.keys(reactions).length === 1
+                && Object.keys(reactions[emoji.u]).length === 1
+            ) {
+                onEmojiBarChange(false);
+            }
             return chatRoom.messagesBuff.userDelReaction(message.messageId, slug, meta);
         }
 
@@ -220,6 +227,9 @@ class ConversationMessageMixin extends ContactAwareComponent {
             return (
                 msgDialog('info', '', l[24206].replace('%1', REACTIONS_LIMIT.TOTAL))
             );
+        }
+        else if (onEmojiBarChange && Object.keys(reactions).length === 0) {
+            onEmojiBarChange(true);
         }
 
         // Add new reaction

@@ -262,6 +262,7 @@ export default class Text extends AbstractGenericMessage {
                         }
                         return true;
                     }}
+                    onResized={this.props.onResized ? this.props.onResized : false}
                 />
             );
         }

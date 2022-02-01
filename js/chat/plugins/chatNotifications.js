@@ -318,6 +318,11 @@ var ChatNotifications = function(megaChat, options) {
             ReactDOM.render(dialog, dialogContainer);
 
             callManager.on('onRingingStopped' + evtId, removeNotif);
+            room.on(`onCallEnd${evtId}`, () => {
+                n.setUnread(false);
+                megaChat.updateSectionUnreadCount();
+                room.off(`onCallEnd${evtId}`);
+            });
         })
         .rebind('onOutgoingCallRinging', (e, megaRoom, callId, userId, callManager) => {
 

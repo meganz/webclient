@@ -621,12 +621,11 @@ function u_exportkey(action) {
     if (action === true) {
         M.saveAs(key, M.getSafeName(l[20830]) + '.txt');
     }
+    else if (page === 'keybackup') {
+        copyToClipboard(key, l[8836], 'recoveryKey');
+    }
     else {
-        if (page === 'backup') {
-            copyToClipboard(key, l[8836], 'recoveryKey');
-        } else {
-            copyToClipboard(key, typeof action === 'string' && action);
-        }
+        copyToClipboard(key, typeof action === 'string' && action);
     }
 
     mBroadcaster.sendMessage('keyexported');

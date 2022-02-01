@@ -991,8 +991,8 @@ mBroadcaster.once('boot_done', function populate_l() {
     l[1915] = l[1915].replace('[A]',
         '<a class="red" href="https://chrome.google.com/webstore/detail/mega/bigefpfhnfcobdlfbedofhhaibnlghod" target="_blank" rel="noopener noreferrer">')
         .replace('[/A]', '</a>');
-    l[1936] = l[1936].replace('[A]', '<a href="/backup" class="clickurl">').replace('[/A]', '</a>');
-    l[1942] = l[1942].replace('[A]', '<a href="/backup" class="clickurl">').replace('[/A]', '</a>');
+    l[1936] = l[1936].replace('[A]', '<a href="/keybackup" class="clickurl">').replace('[/A]', '</a>');
+    l[1942] = l[1942].replace('[A]', '<a href="/keybackup" class="clickurl">').replace('[/A]', '</a>');
     l[1943] = l[1943].replace('[A]', '<a href="mailto:support@mega.nz">').replace('[/A]', '</a>');
     l[1948] = l[1948].replace('[A]', '<a href="mailto:support@mega.nz">').replace('[/A]', '</a>');
     l[1957] = l[1957].replace('[A]', '<a href="/recovery" class="clickurl">').replace('[/A]', '</a>');
@@ -1215,7 +1215,7 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[/A]', '</a>');
     l[20013] = l[20013].replace('[Br]', '<br><br>');
     l[20015] = l[20015].replace('[A]', '<a target="_blank" class="red" rel="noopener noreferrer" href="https://mega.nz'
-        + '/backup">')
+        + '/keybackup">')
         .replace('[/A]', '</a>');
     l[20016] = l[20016].replace('[A]', '<a target="_blank" class="red" rel="noopener noreferrer" href="https://mega.nz'
         + '/blog/mega-adds-two-factor-authentication" >')

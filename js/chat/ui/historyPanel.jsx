@@ -209,6 +209,7 @@ export default class HistoryPanel extends MegaRenderMixin {
 
             if ($sidebar.hasClass('chat-opened') && scrollBlockHeight !== $messages.outerHeight()) {
                 $messages.css('height', scrollBlockHeight);
+                self.refreshUI(true);
             }
 
             return;
@@ -222,7 +223,7 @@ export default class HistoryPanel extends MegaRenderMixin {
             ($('.call-block', self.$container).outerHeight() || 0) -
             (
                 is_chatlink ? $('.join-chat-block', self.$container).outerHeight() :
-                    $('.chat-textarea-block', self.$container).outerHeight()
+                    $('.messages-block .chat-textarea-block', self.$container).outerHeight()
             )
         );
 

@@ -59,7 +59,7 @@ body.rtl .feature-page * {
     background-color: rgba(240, 240, 240, 0.22);
     background-image:
         radial-gradient(at top left, #FEF1EA 15%, rgba(255, 255, 255, 0) 35%, transparent),
-        radial-gradient(closest-corner circle at 110%, #F5E9FF 5%, rgba(255, 255, 255, 0) 100%, transparent),
+        radial-gradient(closest-corner circle at 110%, #F5E9FF 5%, rgba(255, 255, 255, 0) 100%),
         radial-gradient(at bottom right, #E6EEFF 0%, rgba(255, 255, 255, 0) 30%);
     padding-bottom: 70px;
     padding-top: 100px;

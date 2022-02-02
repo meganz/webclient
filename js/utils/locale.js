@@ -707,6 +707,7 @@ function daysSince1Jan2000() {
  * @param {String} [currency] Currency to use in currency formatting. Default: 'EUR'
  * @param {String} [display] display type of currency format, supporting types are below:
  *                  'symbol' - use a localized currency symbol but with country code such as "NZ$",
+ *                  'narrowSymbol' - use a localized currency symbol without country code such as "$" for "NZ$",
  *                  'code' - use the ISO currency code such as "NZD",
  *                  'name' - use a localized currency name such as "dollar"
  *                  'number' - just number with correct decimal
@@ -722,10 +723,16 @@ function formatCurrency(value, currency, display, noDecimals) {
     display = display || 'symbol';
 
     var displayNumber = false;
+    var narrowSymbol = false;
 
     if (display === 'number') {
         display = 'code';
         displayNumber = true;
+    }
+
+    if (display === 'narrowSymbol') {
+        display = 'symbol';
+        narrowSymbol = currency !== 'EUR'; // Euro cannot have country
     }
 
     const cnl = getCountryAndLocales();
@@ -738,21 +745,34 @@ function formatCurrency(value, currency, display, noDecimals) {
     }
 
     var options = {'style': 'currency', 'currency': currency, currencyDisplay: display};
+
     if (noDecimals) {
-        options = {'style': 'currency', 'currency': currency, currencyDisplay: display, maximumFractionDigits: 0,
-                   minimumFractionDigits: 0};
+        options.maximumFractionDigits = 0;
+        options.minimumFractionDigits = 0;
     }
 
     var result = value.toLocaleString(locales, options);
 
+    // For Safari that 'symbol' result same as 'code', using fallback locale without country code to avoid the bug.
+    if (display === 'symbol' && result.indexOf(currency.toUpperCase()) !== -1) {
+
+        // Romanian with Euro Symbol currency display is currently buggy on all browsers, so doing this to polyfill it
+        if (locales.startsWith('ro')) {
+            result = value.toLocaleString('fr', options);
+        }
+        else {
+            result = value.toLocaleString(locale, options);
+        }
+    }
+
+    // Polyfill for narrow symbol format as lacking support on Safari and old browers
+    if (narrowSymbol) {
+        result = result.replace(/([A-Z]{2})/, '');
+    }
+
     // If this is number only, remove currency code
     if (displayNumber) {
         result = result.replace(currency, '').trim();
-    }
-
-    // Romanian with Euro Symbol currency display is currently buggy on all browsers, so doing this to polyfill it
-    if (locales.startsWith('ro') && currency === 'EUR' && display === 'symbol') {
-        result = result.replace('EUR', '\u20ac');
     }
 
     if (locale === 'fr' && display === 'symbol') {

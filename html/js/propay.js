@@ -562,7 +562,7 @@ pro.propay = {
             $step2.addClass('local-currency');
             $currncyAbbrev.text(localCurrency);
             $euroPrice.text(euroPrice);
-            localPrice = formatCurrency(currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE], localCurrency);
+            localPrice = formatCurrency(currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE], localCurrency, 'narrowSymbol');
             $('.local-currency-tip', $step2).removeClass('hidden');
         }
         else {

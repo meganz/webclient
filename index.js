@@ -2522,7 +2522,7 @@ function topmenuUI() {
             document.body.classList.remove('business-user');
         }
 
-        if (!mega.flags.ach || Object(window.u_attr).b) {
+        if (u_type && (!mega.flags.ach || Object(window.u_attr).b)) {
             // Hide Achievements menu item for an non-achievement account and business account
             $menuAchievementsItem.addClass('hidden');
         }

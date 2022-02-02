@@ -270,25 +270,8 @@ class MegaGallery {
 
     removeFromYearGroup(h, ts) {
 
-        const updateList = this.dynamicList && this.mode === 'y';
         const sts = `${ts}`;
         let removeGroup = false;
-
-        const _getLatestMts = () => {
-
-            const mts = Object.keys(this.groups.m);
-            const range = calculateCalendar('y', ts);
-            let latest = 0;
-
-            for (let i = 0; i < mts.length; i++) {
-
-                if (range.start < mts[i] && range.end > mts[i]) {
-                    latest = Math.max(mts[i], latest);
-                }
-            }
-
-            return latest;
-        };
 
         // This is existing year in view, nice.
         if (this.groups.y[ts]) {
@@ -297,16 +280,10 @@ class MegaGallery {
                 removeGroup = true;
             }
             else if (h === this.groups.y[ts].n[0]) {
+                this.groups.y[ts].n[0] = this.findYearCover(ts);
 
-                const latestMts = _getLatestMts();
-
-                this.groups.y[ts].n[0] = this.groups.m[latestMts].n.sort((a, b) => this.nodes[b] - this.nodes[a])[0];
-
-                if (updateList) {
-
-                    delete this.renderCache[`y${ts}`];
-                    this.throttledListChange(sts);
-                }
+                delete this.renderCache[`y${ts}`];
+                this.throttledListChange(sts);
             }
         }
         else {
@@ -321,17 +298,9 @@ class MegaGallery {
                     break;
                 }
                 else if (h === this.groups.y[yearGroups[i]].n[1]) {
-
-                    const latestMts = _getLatestMts();
-
-                    this.groups.y[yearGroups[i]].n[1] =
-                        this.groups.m[latestMts].n.sort((a, b) => this.nodes[b] - this.nodes[a])[0];
-
-                    if (updateList) {
-
-                        delete this.renderCache[`y${yearGroups[i]}`];
-                        this.throttledListChange(yearGroups[i]);
-                    }
+                    this.groups.y[yearGroups[i]].n[1] = this.findYearCover(ts);
+                    delete this.renderCache[`y${yearGroups[i]}`];
+                    this.throttledListChange(yearGroups[i]);
                 }
             }
         }
@@ -342,11 +311,63 @@ class MegaGallery {
             this.splitYearGroup();
             delete this.groups.y[ts];
             this.mergeYearGroup();
+            this.resetAndRender();
+        }
+    }
 
-            if (M.currentdirid === this.id && this.mode === 'y') {
-                this.resetAndRender();
+    findYearCover(ts) {
+        const keys = Object.keys(this.groups.a);
+        const {start, end} = calculateCalendar('y', ts);
+        let m = 0;
+        let s = "";
+        for (const k of keys) {
+            const f = parseFloat(k);
+            const n = Math.round(f);
+            if (start <= n && n <= end && f > m) {
+                m = f;
+                s = k;
             }
         }
+
+        if (this.groups.a[s] && this.groups.a[s].n.length > 0) {
+            return this.groups.a[s].n[0];
+        }
+
+        return null;
+
+    }
+
+    rebuildDayGroup(ts) {
+        delete this.groups.d[ts];
+        delete this.groups.d[ts - 0.5];
+        delete this.renderCache[`d${ts}`];
+        delete this.renderCache[`d${ts - 0.5}`];
+
+        const {start, end} = calculateCalendar('d', ts);
+        const keys = Object.keys(this.nodes);
+        for (const h of keys) {
+            const n = M.d[h];
+            const timestamp = n.mtime || n.ts;
+            if (start <= timestamp && timestamp <= end) {
+                const res = this.getGroup(n);
+                this.setDayGroup(res[3], n.h);
+            }
+        }
+    }
+
+    rebuildMonthGroup(ts) {
+        delete this.groups.m[ts];
+        const {start, end} = calculateCalendar('m', ts);
+        const keys = Object.keys(this.nodes);
+        for (const h of keys) {
+            const n = M.d[h];
+            const timestamp = n.mtime || n.ts;
+            if (start <= timestamp && timestamp <= end) {
+                const res = this.getGroup(n);
+                this.setMonthGroup(ts, res[3]);
+            }
+        }
+        this.filterOneMonthGroup(ts);
     }
 
     setMonthGroup(key, dayTs) {
@@ -356,6 +377,17 @@ class MegaGallery {
         this.groups.m[key].c++;
         this.groups.m[key].dts[dayTs] = 1;
         this.groups.m[key].ldts = Math.max(this.groups.m[key].ldts, dayTs);
+    }
+
+    filterOneMonthGroup(ts) {
+        const dayKeys = Object.keys(this.groups.m[ts].dts);
+
+        dayKeys.sort((a, b) => {
+            return this.groups.d[b].c - this.groups.d[a].c;
+        });
+
+        this.groups.m[ts].n = dayKeys.slice(0, 4).map(k => this.groups.d[k].n[0]);
+        this.groups.m[ts].dts = {};
     }
 
     filterMonthGroup() {
@@ -394,7 +426,7 @@ class MegaGallery {
         const monthKeys = Object.keys(this.groups.m).sort((a, b) => b - a);
         let triEvenCount = 0;
 
-        for (let i = monthKeys.length; i--;) {
+        for (let i = 0; i < monthKeys.length; i++) {
 
             const max = i % 3 === 2 ? 4 : 3;
 
@@ -489,10 +521,9 @@ class MegaGallery {
     // Therefore, day group has to be processed before execute this function.
     removeFromMonthGroup(h, ts, dts) {
 
-        const group = this.groups.m[ts];
+        let group = this.groups.m[ts];
         const compareGroup = clone(group);
         const sts = `${ts}`;
-        const updateList = this.dynamicList && this.mode === 'm';
 
         const _setExtraNode = dts => {
 
@@ -511,12 +542,8 @@ class MegaGallery {
             delete this.groups.m[ts];
 
             this.updateMonthMaxAndOrder();
-
-            if (updateList) {
-
-                delete this.renderCache[`m${ts}`];
-                this.dynamicList.remove(sts, this.onpage);
-            }
+            delete this.renderCache[`m${ts}`];
+            this.dynamicList.remove(sts, this.onpage);
         }
         // The node is extra node for single day month block, lets remove extra node or update it.
         else if (group.extn === h) {
@@ -524,36 +551,22 @@ class MegaGallery {
             if (!_setExtraNode(dts)) {
                 delete group.extn;
             }
-
-            if (updateList) {
-
-                delete this.renderCache[`m${ts}`];
-                this.throttledListChange(sts);
-            }
+            delete this.renderCache[`m${ts}`];
+            this.throttledListChange(sts);
         }
         else {
 
-            if (this.groups.d[dts]) {
+            this.rebuildMonthGroup(ts);
+            this.updateMonthMaxAndOrder();
 
-                group.n.splice(this.groups.m[ts].n.indexOf(h), 1, this.groups.d[dts].n[0]);
+            group = this.groups.m[ts];
 
-                // Check now it is only one day in month
-                if (group.n.length === 1) {
-                    _setExtraNode(dts);
-                }
-            }
-            else {
-                group.n.splice(this.groups.m[ts].n.indexOf(h), 1);
-
-                // This is only one day month
-                if (group.n.length === 1) {
-                    _setExtraNode(calculateCalendar('d', this.nodes[group.n[0]]).start);
-                }
+            if (group.n.length === 1) {
+                _setExtraNode(calculateCalendar('d', this.nodes[group.n[0]]).start);
             }
 
-            if (updateList && (group.extn !== compareGroup.extn ||
-                !compareGroup.n.every(h => group.n.includes(h)))) {
-
+            if (group.extn !== compareGroup.extn ||
+                !compareGroup.n.every(h => group.n.includes(h))) {
                 delete this.renderCache[`m${ts}`];
                 this.throttledListChange(sts);
             }
@@ -649,112 +662,12 @@ class MegaGallery {
     }
 
     removeFromDayGroup(h, ts) {
-
         const sts1 = `${ts}`;
         const sts2 = `${ts - 0.5}`;
-        let dayGroup1 = this.groups.d[ts];
-        const dayGroup2 = this.groups.d[ts - 0.5];
-        const isDayPage = this.dynamicList && this.mode === 'd';
 
-        if (!dayGroup1) {
-            return false;
-        }
-
-        // If the day block has more than 5 items, no layout update bit just potential node list update.
-        if (dayGroup1.c > 5) {
-
-            dayGroup1.c--;
-            dayGroup2.mc--;
-
-            let delFrom2 = false;
-            let containIndex = dayGroup1.n.indexOf(h);
-
-            // deleted node is not in group 1 lets try group 2.
-            if (containIndex < 0) {
-                containIndex = dayGroup2.n.indexOf(h);
-                delFrom2 = true;
-            }
-
-            // If deleted item is not exist on node list, no action requried but update count,
-            // but if it is, need to find another node fill up the list
-            if (containIndex > -1) {
-
-                (delFrom2 ? dayGroup2 : dayGroup1).n.splice(containIndex, 1);
-
-                const sorted = Object.keys(this.nodes).sort((a, b) => {
-
-                    if (this.nodes[a] === this.nodes[b]) {
-                        return 0;
-                    }
-
-                    return this.nodes[a] > this.nodes[b] ? -1 : 1;
-                });
-
-                const index = sorted.indexOf(dayGroup1.n[0]);
-
-                dayGroup1.n = sorted.splice(index, 2);
-                dayGroup2.n = sorted.splice(index, 3);
-
-                if (isDayPage) {
-
-                    delete this.renderCache[`d${ts}`];
-                    this.throttledListChange(sts1);
-
-                    delete this.renderCache[`d${ts - 0.5}`];
-                    this.throttledListChange(sts2);
-                }
-            }
-            else if (isDayPage) {
-
-                delete this.renderCache[`d${ts - 0.5}`];
-                this.throttledListChange(sts2);
-            }
-        }
-        else {
-
-            const nodeGroup = dayGroup1.c === 5 ? [...dayGroup1.n, ...dayGroup2.n] : dayGroup1.n;
-            const containIndex = nodeGroup.indexOf(h);
-
-            if (containIndex > -1) {
-                nodeGroup.splice(containIndex, 1);
-            }
-            else {
-                nodeGroup.pop();
-            }
-
-            dayGroup1.c--;
-            dayGroup1.n = nodeGroup;
-
-            if (dayGroup1.c === 0) {
-
-                delete this.groups.d[ts];
-                dayGroup1 = false;
-            }
-
-            // Delete group 2 as it is not required in this case
-            delete this.groups.d[ts - 0.5];
-
-            if (isDayPage) {
-
-                if (dayGroup1.c === 4) {
-
-                    delete this.renderCache[`d${ts - 0.5}`];
-                    delete this.renderCache[`d${ts}`];
-
-                    this.dynamicList.remove(sts2, this.onpage);
-                    this.throttledListChange(sts1);
-                }
-                else if (dayGroup1) {
-                    delete this.renderCache[`d${ts}`];
-                    this.throttledListChange(sts1);
-                }
-                else {
-
-                    delete this.renderCache[`d${ts}`];
-                    this.dynamicList.remove(sts1, this.onpage);
-                }
-            }
-        }
+        this.rebuildDayGroup(ts);
+        this.throttledListChange(sts1);
+        this.throttledListChange(sts2);
     }
 
     // lets Chunk block by 60 to optimise performance of dom rendering
@@ -1720,17 +1633,15 @@ class MegaTargetGallery extends MegaGallery {
             subs = subs.concat(Object.keys(M.c[handles[i]]));
         }
 
-        subs.sort(this.sortByMtime.bind(this));
+        subs = subs.filter(h => {
+            const n = M.d[h];
+            return !n.t && !this.nodes[n.h] && !n.fv && is_photo(n);
+        }).sort(this.sortByMtime.bind(this));
 
-        for (let j = 0; j < subs.length; j++) {
-
-            const n = M.d[subs[j]];
-
-            if (!n.t && !this.nodes[n.h] && !n.fv && is_photo(n)) {
-
-                this.nodes[n.h] = this.setGroup(n)[0];
-                M.v.push(M.d[n.h]);
-            }
+        for (const h of subs) {
+            const n = M.d[h];
+            this.nodes[n.h] = this.setGroup(n)[0];
+            M.v.push(M.d[n.h]);
         }
 
         this.mergeYearGroup();

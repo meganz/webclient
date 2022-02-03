@@ -1479,9 +1479,9 @@ export class ConversationPanel extends MegaRenderMixin {
                             })
                         }
                         didMount={this.toggleExpandedFlag}
-                        willUnmount={mode =>
+                        willUnmount={minimised =>
                             this.setState({ callMinimized: false }, () =>
-                                mode === Call.MODE.MINI ? null : this.toggleExpandedFlag()
+                                minimised ? null : this.toggleExpandedFlag()
                             )
                         }
                         onDeleteMessage={this.handleDeleteDialog}

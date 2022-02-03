@@ -130,7 +130,8 @@ FMDB.prototype.identity = Date.now() + Math.random().toString(26);
 lazy(FMDB.prototype, 'memoize', () => {
     'use strict';
     // leave cloud nodes in memory?..
-    return !!localStorage.$lcnim;
+    // return !!localStorage.$lcnim;
+    return true;
 });
 
 // set up and check fm DB for user u
@@ -326,10 +327,15 @@ FMDB.prototype.init = function fmdb_init(result, wipe) {
 // send failure event
 FMDB.prototype.evento = function(message) {
     'use strict';
+    message = String(message).split('\n')[0].substr(0, 380);
+    if (message.includes('not allow mutations')) {
+        // Ignore spammy Firefox in PBM.
+        return;
+    }
     const eid = 99724;
     const once = !eventlog.sent || eventlog.sent[eid] > 0;
 
-    eventlog(eid, String(message).split('\n')[0].substr(0, 240), once);
+    eventlog(eid, message, once);
 
     queueMicrotask(() => {
         if (eventlog.sent) {
@@ -574,7 +580,8 @@ FMDB.prototype._transactionErrorHandled = function(ch, ex) {
             /* fallthrough */
             case 1:
                 if (!mega.nobp) {
-                    localStorage.$lcnim = 1;
+                    // localStorage.$lcnim = 1;
+                    localStorage.nobp = 1;
                     fm_forcerefresh(true);
                     break;
                 }

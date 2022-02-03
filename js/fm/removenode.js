@@ -19,13 +19,6 @@ function removeUInode(h, parent) {
         }
     }
 
-    if (M.currentCustomView.type === 'gallery') {
-        mega.gallery.checkEveryGalleryDelete(h);
-    }
-    else {
-        mega.gallery.nodeUpdated = true;
-    }
-
     // Update M.v it's used for at least preview slideshow
     for (var k = M.v.length; k--;) {
         var v = M.v[k].ch || M.v[k].h;
@@ -40,6 +33,13 @@ function removeUInode(h, parent) {
             M.v.splice(k, 1);
             break;
         }
+    }
+
+    if (M.currentCustomView.type === 'gallery') {
+        mega.gallery.checkEveryGalleryDelete(h);
+    }
+    else {
+        mega.gallery.nodeUpdated = true;
     }
 
     var hasItems = !!M.v.length;

@@ -414,7 +414,7 @@ mobile.account = {
         $page.find('.account-recovery-key-block').off('tap').on('tap', function() {
 
             // Load the Backup page
-            loadSubPage('backup');
+            loadSubPage('keybackup');
             return false;
         });
     },

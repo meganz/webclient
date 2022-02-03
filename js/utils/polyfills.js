@@ -222,6 +222,7 @@ if (typeof window.queueMicrotask !== "function") {
         const reduce = Array.prototype.reduce;
         const concat = Array.prototype.concat.bind([]);
         Object.defineProperty(Array.prototype, 'flat', {
+            configurable: !!window.is_karma,
             value: function flat(depth = 1) {
                 return depth < 2 ? depth ? concat(...this) : this
                     : reduce.call(this, (a, o) =>

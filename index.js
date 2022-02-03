@@ -1319,7 +1319,12 @@ function init_page() {
         parsepage(pages['dev']);
         dev_init('doc');
     }
-    else if (page == 'backup' && !u_type) {
+    else if (page === 'backup') {
+        // Redirect to the new url when access the old /backup path.
+        loadSubPage('keybackup');
+        return false;
+    }
+    else if (page === 'keybackup' && !u_type) {
         if (is_mobile) {
             login_next = page;
             loadSubPage('login');
@@ -1331,13 +1336,13 @@ function init_page() {
             init_login();
         }
     }
-    else if (page == 'backup') {
+    else if (page === 'keybackup') {
         if (is_mobile) {
             mobile.initDOM();
             mobile.backup.init();
         }
         else {
-            parsepage(pages['backup']);
+            parsepage(pages.keybackup);
             init_backup();
         }
     }
@@ -2517,7 +2522,7 @@ function topmenuUI() {
             document.body.classList.remove('business-user');
         }
 
-        if (!mega.flags.ach || Object(window.u_attr).b) {
+        if (u_type && (!mega.flags.ach || Object(window.u_attr).b)) {
             // Hide Achievements menu item for an non-achievement account and business account
             $menuAchievementsItem.addClass('hidden');
         }
@@ -2824,7 +2829,7 @@ function topmenuUI() {
                 var subpage;
                 /*  TODO: Add bird when its done */
                 var subPages = [
-                    'about', 'account', 'backup', 'blog', 'cmd', 'contact',
+                    'about', 'account', 'keybackup', 'blog', 'cmd', 'contact',
                     'copyright', 'corporate', 'credits', 'desktop', 'doc', 'extensions',
                     'login', 'mega', 'nzippmember', 'nziphotographer', 'privacy', 'mobileapp',
                     'mobile', 'register', 'resellers', 'sdk', 'sitemap', 'sourcecode',
@@ -2848,7 +2853,7 @@ function topmenuUI() {
                 if (is_mobile && className.indexOf('fm') > -1) {
                     mobile.loadCloudDrivePage();
                 }
-                else if (!is_mobile && subpage === 'backup') {
+                else if (!is_mobile && subpage === 'keybackup') {
                     M.showRecoveryKeyDialog(2);
                 }
                 else if (subpage) {

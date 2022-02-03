@@ -76,7 +76,7 @@
         // Inform that current session can be used to backup master key
         else if (u_type) {
             msgDialog('warninga', l[135], l[1945].replace('[X]', u_attr.email), false, function() {
-                loadSubPage('backup');
+                loadSubPage('keybackup');
             });
         }
     };

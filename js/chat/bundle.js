@@ -13137,7 +13137,8 @@ class Text extends AbstractGenericMessage {
           }
 
           return true;
-        }
+        },
+        onResized: this.props.onResized ? this.props.onResized : false
       });
     } else {
       if (message.updated > 0 && !message.metaType) {
@@ -18367,6 +18368,8 @@ let HistoryPanel = (historyPanel_dec = utils["default"].SoonFcWrap(50), historyP
       if (self.isComponentEventuallyVisible()) {
         $('.js-messages-scroll-area', self.findDOMNode()).trigger('forceResize', [true]);
       }
+
+      self.refreshUI();
     }));
   }
 
@@ -18504,12 +18507,13 @@ let HistoryPanel = (historyPanel_dec = utils["default"].SoonFcWrap(50), historyP
 
       if ($sidebar.hasClass('chat-opened') && scrollBlockHeight !== $messages.outerHeight()) {
         $messages.css('height', scrollBlockHeight);
+        self.refreshUI(true);
       }
 
       return;
     }
 
-    var scrollBlockHeight = $('.chat-content-block', self.$container).outerHeight() - ($('.chat-topic-block', self.$container).outerHeight() || 0) - ($('.call-block', self.$container).outerHeight() || 0) - (is_chatlink ? $('.join-chat-block', self.$container).outerHeight() : $('.chat-textarea-block', self.$container).outerHeight());
+    var scrollBlockHeight = $('.chat-content-block', self.$container).outerHeight() - ($('.chat-topic-block', self.$container).outerHeight() || 0) - ($('.call-block', self.$container).outerHeight() || 0) - (is_chatlink ? $('.join-chat-block', self.$container).outerHeight() : $('.messages-block .chat-textarea-block', self.$container).outerHeight());
 
     if (scrollBlockHeight !== self.$messages.outerHeight()) {
       self.$messages.css('height', scrollBlockHeight);
@@ -18526,6 +18530,12 @@ let HistoryPanel = (historyPanel_dec = utils["default"].SoonFcWrap(50), historyP
       room.renderContactTree();
       room.megaChat.refreshConversations();
       room.trigger('RefreshUI');
+
+      if (room.scrolledToBottom) {
+        delay('hp:reinit-scroll', () => {
+          this.messagesListScrollable.reinitialise(true, true);
+        }, 30);
+      }
     }
   }
 
@@ -18683,6 +18693,7 @@ let HistoryPanel = (historyPanel_dec = utils["default"].SoonFcWrap(50), historyP
     self.setState({
       'editing': false
     });
+    self.refreshUI();
     Soon(function () {
       $('.chat-textarea-block:visible textarea').focus();
     }, 300);
@@ -18904,7 +18915,6 @@ let HistoryPanel = (historyPanel_dec = utils["default"].SoonFcWrap(50), historyP
             editing: self.state.editing === v.messageId || self.state.editing === v.pendingMessageId,
             onEditStarted: ((v, $domElement) => {
               self.editDomElement = $domElement;
-              self.props.chatRoom.scrolledToBottom = false;
               self.setState({
                 'editing': v.messageId
               });
@@ -18916,6 +18926,12 @@ let HistoryPanel = (historyPanel_dec = utils["default"].SoonFcWrap(50), historyP
               if (this.props.onDeleteClicked) {
                 this.props.onDeleteClicked(msg);
               }
+            },
+            onResized: () => {
+              this.handleWindowResize();
+            },
+            onEmojiBarChange: () => {
+              this.handleWindowResize();
             }
           }));
         }
@@ -24900,7 +24916,8 @@ class ConversationMessageMixin extends _mixins1__._p {
   emojiSelected(e, slug, meta) {
     const {
       chatRoom,
-      message
+      message,
+      onEmojiBarChange
     } = this.props;
 
     if (chatRoom.isReadOnly()) {
@@ -24921,6 +24938,10 @@ class ConversationMessageMixin extends _mixins1__._p {
     const emoji = megaChat._emojiData.emojisSlug[slug] || meta;
 
     if (emoji && message.reacts.getReaction(u_handle, emoji.u)) {
+      if (onEmojiBarChange && Object.keys(reactions).length === 1 && Object.keys(reactions[emoji.u]).length === 1) {
+        onEmojiBarChange(false);
+      }
+
       return chatRoom.messagesBuff.userDelReaction(message.messageId, slug, meta);
     }
 
@@ -24934,6 +24955,8 @@ class ConversationMessageMixin extends _mixins1__._p {
 
     if (Object.keys(reactions).length >= REACTIONS_LIMIT.TOTAL) {
       return msgDialog('info', '', l[24206].replace('%1', REACTIONS_LIMIT.TOTAL));
+    } else if (onEmojiBarChange && Object.keys(reactions).length === 0) {
+      onEmojiBarChange(true);
     }
 
     return addReaction();

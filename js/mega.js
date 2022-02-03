@@ -17,7 +17,7 @@ Object.defineProperties(window, {
     },
     // How many nodes can be awaiting in memory before applying back-pressure.
     BACKPRESSURE_FMDB_LIMIT: {
-        value: 72696
+        value: parseInt(localStorage.fmdbpl) || 290784
     },
     // How many nodes can be awaiting decryption (per worker) before applying back-pressure.
     BACKPRESSURE_WORKER_LIMIT: {
@@ -450,7 +450,7 @@ function sc_packet(a) {
 
     // check if this packet needs nodes to be present,
     // unless `fromapi` where nodes are placed in memory already as received.
-    // if (!loadfm.fromapi)
+    if (!loadfm.fromapi || fmdb && !fmdb.memoize)
     {
         const inflight = $.len(scfetches);
 

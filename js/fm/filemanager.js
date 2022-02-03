@@ -1744,6 +1744,67 @@ FileManager.prototype.initContextUI = function() {
 
         if ($.selected && $.selected.length > 0) {
 
+            const fselected = M.getNodeByHandle($.selected[0]);
+
+            if ($.selected && $.selected.length === 1 && fselected.t && fselected.tvf) {
+
+                const sfWithVf = Object.create(null);
+
+                sfWithVf[$.selected[0]] = fselected.tvf;
+
+                const _getChildFolderWithVerion = function _(h) {
+
+                    if (!M.tree[h]) {
+                        return;
+                    }
+
+                    const fHandles = Object.keys(M.tree[h]);
+
+                    for (let i = fHandles.length; i--;) {
+
+                        if (M.tree[h][fHandles[i]].tvf) {
+
+                            sfWithVf[fHandles[i]] = M.tree[h][fHandles[i]].tvf;
+                            sfWithVf[h] -= M.tree[h][fHandles[i]].tvf;
+                            _(fHandles[i]);
+                        }
+
+                        if (!sfWithVf[h]) {
+
+                            delete sfWithVf[h];
+                            break;
+                        }
+                    }
+                };
+
+                msgDialog('remove', l[1003], l.clear_prev_version_folder, l[1007], async(e) => {
+
+                    if (e) {
+
+                        _getChildFolderWithVerion($.selected[0]);
+
+                        const fh = Object.keys(sfWithVf);
+                        await dbfetch.geta(fh);
+
+                        for (let i = fh.length; i--;) {
+
+                            const cfh = Object.keys(M.c[fh[i]]);
+
+                            for (let j = cfh.length; j--;) {
+
+                                const cfn = M.getNodeByHandle(cfh[j]);
+
+                                if (!cfn.t && cfn.tvf) {
+                                    fileversioning.clearPreviousVersions(cfh[j]);
+                                }
+                            }
+                        }
+                    }
+                });
+
+                return;
+            }
+
             const fvNode = [];
 
             for (let i = $.selected.length; i--;) {

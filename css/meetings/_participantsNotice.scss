@@ -1,5 +1,7 @@
 .participants-notice {
-    width: 460px;
+    min-width: 460px;
+    max-width: 600px;
+    width: fit-content;
     margin: 0 auto;
     backdrop-filter: blur(10px);
 

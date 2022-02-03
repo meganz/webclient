@@ -3,7 +3,7 @@ function init_backup() {
 
     if (!window.u_k) {
         login_txt = l[1298];
-        login_next = 'backup';
+        login_next = 'keybackup';
         loadSubPage('login');
         return false;
     }

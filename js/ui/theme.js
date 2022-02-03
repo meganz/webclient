@@ -26,6 +26,17 @@
      * @return {undefined}
      */
     const listener = function(e) {
+        if (
+            !(
+                (page.substr(0, 2) === 'P!' && page.length > 2)
+                || page.substr(0, 5) === 'chat/'
+                || is_chatlink
+                || (is_fm() && page.substr(0, 5) !== 'start')
+                || (page === 'download' && !is_mobile)
+            )
+        ) {
+            return;
+        }
         if (e.matches) {
             setBodyClass('dark');
         }

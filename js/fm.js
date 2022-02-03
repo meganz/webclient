@@ -2737,6 +2737,7 @@ function closeDialog(ev) {
         delete $.saveToDialogCb;
         delete $.saveToDialogNode;
         delete $.saveToDialog;
+        delete $.chatAttachmentShare;
 
         if ($.saveToDialogPromise) {
             if (typeof $.saveToDialogPromise === 'function') {

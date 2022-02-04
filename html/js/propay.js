@@ -843,6 +843,14 @@ pro.propay = {
           + ' .payment-method:not(.template)', 'body').remove();
         $('.loading-placeholder-text', 'body').addClass('hidden');
 
+        const svgicons = {
+            visa: 'icon-visa-border',
+            mastercard: 'icon-mastercard',
+            'unionpay': 'icon-union-pay',
+            'american express': 'icon-amex',
+            jcb: 'icon-jcb',
+        };
+
         // Loop through gateway providers (change to use list from API soon)
         for (var i = 0, length = gatewayOptions.length; i < length; i++) {
 
@@ -878,7 +886,24 @@ pro.propay = {
             $('input', $gateway).attr('name', gatewayName);
             $('input', $gateway).attr('id', gatewayName);
             $('input', $gateway).val(gatewayName);
-            $('.provider-icon', $gateway).addClass(gatewayName);
+
+            const iconkeys = Object.keys(svgicons);
+            let iconkey;
+
+            for (let i = iconkeys.length; i--;) {
+                if (displayName.toLowerCase().includes(iconkeys[i])) {
+                    iconkey = iconkeys[i];
+                    break;
+                }
+            }
+
+            if (iconkey) {
+                $('.provider-icon', $gateway).addClass('svgicon')
+                    .safeHTML(`<i class="sprite-fm-uni ${svgicons[iconkey]}"></i>`);
+            }
+            else {
+                $('.provider-icon', $gateway).addClass(gatewayName);
+            }
             $('.provider-name', $gateway).text(displayName).prop('title', displayName);
 
             // Build the html

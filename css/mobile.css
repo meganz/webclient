@@ -3642,6 +3642,15 @@ div.checkboxOn {
     background-size: 32px;
     margin: 0 0 4px;
 }
+.mobile.membership-step2 .provider-icon.svgicon {
+    height: 32px;
+    width: 32px;
+    margin: 0 0 4px;
+}
+.mobile.membership-step2 .provider-icon.svgicon i {
+    --icon-size: 32px;
+    position: static;
+}
 .mobile.membership-step2 .charge-information-container {
     margin-bottom: 6px;
 }

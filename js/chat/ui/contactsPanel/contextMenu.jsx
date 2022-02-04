@@ -45,36 +45,39 @@ export default class ContextMenu extends MegaRenderMixin {
             return (
                 <>
                     {withProfile &&
-                        <div className="dropdown-avatar rounded" onClick={(e) => {
-                            e.stopPropagation();
-                            loadSubPage('fm/chat/contacts/' + contact.h);
-                        }}>
+                        <div
+                            className="dropdown-avatar rounded"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                loadSubPage(`fm/chat/contacts/${contact.h}`);
+                            }}>
                             <Avatar
                                 contact={contact}
                                 className="avatar-wrapper context-avatar"
                             />
                             <div className="dropdown-profile">
-                                <span><EmojiFormattedContent>{M.getNameByHandle(contact.u)}
-                                </EmojiFormattedContent></span>
-                                <ContactPresence contact={contact} />
+                                <span>
+                                    <EmojiFormattedContent>{M.getNameByHandle(contact.u)}</EmojiFormattedContent>
+                                </span>
+                                <ContactPresence contact={contact}/>
                             </div>
                         </div>
                     }
                     <DropdownItem
                         icon="sprite-fm-mono icon-chat"
-                        label={l[8632]}
+                        label={l[8632] /* `Start new chat` */}
                         onClick={() =>
                             this.close(() => {
                                 if (selected && selected.length) {
                                     return megaChat.createAndShowGroupRoomFor(selected, '', true, false);
                                 }
-                                return loadSubPage('fm/chat/p/' + contact.u);
+                                return loadSubPage(`fm/chat/p/${contact.u}`);
                             })
                         }
                     />
                     <DropdownItem
                         icon="sprite-fm-mono icon-send-files"
-                        label={l[6834]}
+                        label={l[6834] /* `Send files` */}
                         onClick={() =>
                             this.close(() =>
                                 megaChat.openChatAndSendFilesDialog(contact.u)
@@ -83,7 +86,7 @@ export default class ContextMenu extends MegaRenderMixin {
                     />
                     <DropdownItem
                         icon="sprite-fm-mono icon-folder-outgoing-share"
-                        label={l[5631]}
+                        label={l[5631] /* `Share folder` */}
                         onClick={() =>
                             this.close(() =>
                                 openCopyShareDialog(contact.u)
@@ -94,13 +97,13 @@ export default class ContextMenu extends MegaRenderMixin {
                         submenu={true}
                         icon="sprite-fm-mono icon-phone"
                         className="sprite-fm-mono-before icon-arrow-right-before"
-                        label={l[19125]}
+                        label={l[19125] /* `Start call...` */}
                     />
                     <div className="dropdown body submenu">
                         <DropdownItem
                             icon="sprite-fm-mono icon-phone"
-                            disabled={!megaChat.hasSupportForCalls}
-                            label={l[5896]}
+                            disabled={!navigator.onLine || !megaChat.hasSupportForCalls}
+                            label={l[5896] /* `Start Audio Call` */}
                             onClick={() =>
                                 this.close(() =>
                                     megaChat.createAndShowPrivateRoom(contact.u)
@@ -113,8 +116,8 @@ export default class ContextMenu extends MegaRenderMixin {
                         />
                         <DropdownItem
                             icon="sprite-fm-mono icon-video-call-filled"
-                            disabled={!megaChat.hasSupportForCalls}
-                            label={l[5897]}
+                            disabled={!navigator.onLine || !megaChat.hasSupportForCalls}
+                            label={l[5897] /* `Start Video Call` */}
                             onClick={() =>
                                 this.close(() =>
                                     megaChat.createAndShowPrivateRoom(contact.u)
@@ -130,9 +133,9 @@ export default class ContextMenu extends MegaRenderMixin {
                     {withProfile &&
                         <DropdownItem
                             icon="sprite-fm-mono icon-my-account"
-                            label={l[5868]}
+                            label={l[5868] /* `View profile` */}
                             onClick={() =>
-                                loadSubPage('fm/chat/contacts/' + contact.u)
+                                loadSubPage(`fm/chat/contacts/${contact.u}`)
                             }
                         />
                     }
@@ -146,15 +149,15 @@ export default class ContextMenu extends MegaRenderMixin {
                         submenu={true}
                         icon="sprite-fm-mono icon-key"
                         className="sprite-fm-mono-before icon-arrow-right-before"
-                        label={l[6872]}
+                        label={l[6872] /* `Authenticity Credentials` */}
                     />
                     <div className="dropdown body white-context-menu submenu">
                         {ContactsPanel.isVerified(contact) ?
                             <DropdownItem
-                                label={l[742]}
+                                label={l[742] /* `Reset` */}
                                 onClick={() => this.close(() => ContactsPanel.resetCredentials(contact))} /> :
                             <DropdownItem
-                                label={l[1960]}
+                                label={l[1960] /* `Verify` */}
                                 onClick={() => this.close(() => ContactsPanel.verifyCredentials(contact))} />
                         }
                     </div>
@@ -164,7 +167,7 @@ export default class ContextMenu extends MegaRenderMixin {
                     <hr />
                     <DropdownItem
                         icon="sprite-fm-mono icon-disable"
-                        label={l[1001]}
+                        label={l[1001] /* `Remove contact` */}
                         disabled={!!contact.b}
                         className=""
                         onClick={() =>
@@ -181,7 +184,7 @@ export default class ContextMenu extends MegaRenderMixin {
             <>
                 <DropdownItem
                     icon="sprite-fm-mono icon-disabled-filled"
-                    label={l[71]}
+                    label={l[71] /* `Add contact` */}
                     onClick={() => this.handleAddContact(contact.u)}
                 />
                 <DropdownItem

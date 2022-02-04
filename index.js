@@ -1179,6 +1179,8 @@ function init_page() {
         return false;
     }
     else if (is_mobile && page === 'fm/account') {
+
+
         parsepage(pages['mobile']);
         mobile.account.init();
         return false;

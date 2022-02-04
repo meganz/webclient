@@ -36,6 +36,7 @@ mobile.recovery.changePassword = {
         this.initPasswordFieldsChangeEvent();
         mobile.initPasswordEstimatorLibrary(this.$screen);
         mobile.initPasswordStrengthCheck(this.$screen);
+        mobile.initPasswordVisibleToggle(this.$screen);
 
         // Show the screen
         this.$screen.removeClass('hidden');

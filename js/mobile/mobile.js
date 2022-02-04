@@ -547,6 +547,34 @@ var mobile = {
         });
     },
 
+    initPasswordVisibleToggle: $page => {
+
+        'use strict';
+
+        const $parent = $('input[type="password"]', $page).parent();
+
+        if ($('i.pass-visible', $parent).length === 0) {
+
+            $('input[type="password"]', $page).parent()
+                .safeAppend('<i class="sprite-fm-mono icon-eye-reveal pass-visible"></i>');
+        }
+
+        $('.pass-visible', $page).rebind('click.togglePassV', function() {
+
+            if (this.classList.contains('icon-eye-reveal')) {
+
+                $('input[type="password"]', this.parentNode).attr('type', 'text');
+                this.classList.remove('icon-eye-reveal');
+                this.classList.add('icon-eye-hidden');
+            }
+            else {
+                $('input[type="text"]', this.parentNode).attr('type', 'password');
+                this.classList.add('icon-eye-reveal');
+                this.classList.remove('icon-eye-hidden');
+            }
+        });
+    },
+
     /**
      * Make back button works as closing overlay.
      * @param {Object} $overlay target overlay

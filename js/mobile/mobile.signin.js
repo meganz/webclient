@@ -38,6 +38,7 @@ mobile.signin = {
         mobile.initTabs('login');
         mobile.initCheckbox('remember-me');
         mobile.initHeaderMegaIcon();
+        mobile.initPasswordVisibleToggle(this.$screen);
     },
 
     /**

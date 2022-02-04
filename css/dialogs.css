@@ -1830,7 +1830,7 @@ body.de .mega-dialog.new-group-chat {
     }
     .mega-dialog.set-password-dialog .strength {
         position: absolute;
-        right: 0;
+        right: 30px;
         top: 24px;
         height: 24px;
         color: white;
@@ -7272,13 +7272,15 @@ body.de .mega-dialog.new-group-chat {
         margin: 0;
         padding: 0;
         border: 0;
-        width: 100%;
+        width: calc(100% - 24px);
         font-size: 14px;
         line-height: 18px;
         vertical-align: top;
         background: var(--surface-grey-1);
-        -webkit-text-security: disc;
         color: var(--text-color-high);
+    }
+    .mega-dialog.pass-reminder .dialog.big-input-bg i {
+        --icon-size: 18px;
     }
     .mega-dialog.pass-reminder.wrong .dialog.big-input-bg {
         border: 1px solid var(--stroke-error);

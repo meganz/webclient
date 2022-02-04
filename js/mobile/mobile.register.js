@@ -37,6 +37,7 @@ mobile.register = {
         mobile.initMobileAppButton();
         mobile.initPasswordEstimatorLibrary(this.$screen);
         mobile.initPasswordStrengthCheck(this.$screen);
+        mobile.initPasswordVisibleToggle(this.$screen);
 
         // Activate register button when fields are complete
         this.initKeyupEvents();

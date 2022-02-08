@@ -1684,6 +1684,9 @@ body.theme-dark .join-meeting .card-preview .preview {
 body.theme-dark .preview-meeting {
   background: #000;
 }
+body.theme-dark .start-meeting-preview .preview-meeting {
+  background: #222;
+}
 .preview-meeting video {
   display: none;
   width: 100%;

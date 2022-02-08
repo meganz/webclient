@@ -520,7 +520,7 @@ BusinessRegister.prototype.initPage = function(preSetNb, preSetName, preSetTel, 
 
     // event handler for change on inputs
     $('.bus-reg-info-block input', $pageContainer).rebind(
-        'change.suba',
+        'input.suba',
         function nbOfUsersChangeEventHandler() {
             var $me = $(this);
             var valid = false;

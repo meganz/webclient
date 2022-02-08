@@ -3135,6 +3135,10 @@ function loadSubPage(tpage, event) {
 
     tpage = getCleanSitePath(tpage);
 
+    if ('rad' in mega) {
+        mega.rad.log('NAV', [page, tpage, !!event]);
+    }
+
     if (typeof dlPageCleanup === 'function' && tpage[0] !== '!') {
         dlPageCleanup();
     }
@@ -3293,6 +3297,10 @@ window.addEventListener('popstate', function(event) {
 
 window.onbeforeunload = function () {
     'use strict';
+
+    if ('rad' in mega) {
+        mega.rad.flush();
+    }
 
     if (window.dlmanager && (dlmanager.isDownloading || ulmanager.isUploading)) {
         return $.memIOSaveAttempt ? null : l[377];

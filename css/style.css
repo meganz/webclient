@@ -54,8 +54,11 @@ body * {
     left: calc(50% - 8px);
     top: 0;
 }
+.block-loading-spinner,
 .wait-cursor .fm-breadcrumbs:first-child:not(.public-links) .loading {
     display: block;
+    font-size: 0 !important;
+    background-position: 100% 0;
     animation: rotate 0.8s infinite linear;
     animation-timing-function: steps(8, end);
 }

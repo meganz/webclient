@@ -1140,6 +1140,11 @@ MegaUtils.prototype.logout = function megaUtilsLogout() {
         mega.config.flush().always(finishLogout);
         var promises = [];
 
+        if ('rad' in mega) {
+            mega.rad.log('\ud83d\udd1a', 'Logging out...');
+            promises.push(new Promise((resolve) => setTimeout(() => mega.rad.flush().finally(resolve), 280)));
+        }
+
         if (fmdb && fmconfig.dbDropOnLogout) {
             promises.push(fmdb.drop());
         }
@@ -1950,6 +1955,51 @@ MegaUtils.prototype.toArrayBuffer = promisify(function(resolve, reject, data) {
         resolve(this.mTextEncoder.encode('' + data).buffer);
     }
 });
+
+/**
+ * Retrieves or creates a readable stream for the provided input data
+ * @param {*} data some arbitrary data
+ * @returns {Promise<ReadableStream<Uint8Array>|ReadableStream<any>>}
+ */
+MegaUtils.prototype.getReadableStream = async function(data) {
+    'use strict';
+
+    if (data instanceof Blob) {
+        return data.stream();
+    }
+
+    return new Response(data).body;
+};
+
+/**
+ * Compress data using the Compression Streams API
+ * The Compression Streams API provides a JavaScript API for compressing
+ * and decompressing streams of data using the gzip or deflate formats.
+ * @param {ArrayBuffer|Blob} data some arbitrary data
+ * @param {String} [format] optional, default to gzip
+ * @returns {Promise<ArrayBuffer>}
+ */
+MegaUtils.prototype.compress = async function(data, format) {
+    'use strict';
+    const cs = new CompressionStream(format || 'gzip');
+    const stream = (await this.getReadableStream(data)).pipeThrough(cs);
+    return new Response(stream).arrayBuffer();
+};
+
+/**
+ * Decompress data using the Compression Streams API
+ * The Compression Streams API provides a JavaScript API for compressing
+ * and decompressing streams of data using the gzip or deflate formats.
+ * @param {ArrayBuffer|Blob} data some arbitrary data
+ * @param {String} [format] optional, default to gzip
+ * @returns {Promise<ArrayBuffer>}
+ */
+MegaUtils.prototype.decompress = async function(data, format) {
+    'use strict';
+    const ds = new DecompressionStream(format || 'gzip');
+    const stream = (await this.getReadableStream(data)).pipeThrough(ds);
+    return new Response(stream).arrayBuffer();
+};
 
 /**
  * Save files locally

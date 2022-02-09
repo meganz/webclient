@@ -31,7 +31,7 @@ export const LABEL = {
 
     DECRYPTING_RESULTS: l[23543],
     PAUSE_SEARCH: l[23544],
-    SEARCH_PAUSED: 'Search paused',
+    SEARCH_PAUSED: l[23549],
     SEARCH_COMPLETE: l[23546]
 };
 

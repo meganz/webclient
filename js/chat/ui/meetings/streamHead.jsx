@@ -130,7 +130,7 @@ export default class StreamHead extends MegaRenderMixin {
 
             return (
                 moderators.length > 1 ?
-                    `<span>Moderators:</span> ${moderators.join(', ')}` :
+                    `<span>${l.meeting_moderators.replace('%s', '</span> ' + moderators.join(', '))}` /* Moderators: */:
                     `<span>${l[8875] /* `Moderator` */}:</span> ${moderators[0]}`
             );
         }

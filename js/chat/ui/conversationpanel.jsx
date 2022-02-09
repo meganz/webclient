@@ -159,7 +159,8 @@ export class ConversationRightArea extends MegaRenderMixin {
                     }
                 }}>
                 <i className="small-icon colorized horizontal-red-handset"></i>
-                <span>{room.type === "group" || room.type === "public" ? "Leave call" : l[5884]}</span>
+                    <span>{room.type === "group" || room.type === "public"
+                        ? l[5883] /* Leave call */ : l[5884] /* End call */}</span>
             </div>;
         }
         var isReadOnlyElement = null;
@@ -1521,7 +1522,8 @@ export class ConversationPanel extends MegaRenderMixin {
                                         msgDialog(
                                             'warninga',
                                             l[135],
-                                            "Failed to create E++ account. Please try again later.",
+                                            /* Failed to create E++ account. Please try again later. */
+                                            l.eplusplus_create_failed,
                                             escapeHTML(api_strerror(ex) || ex)
                                         );
                                     }, 1234);

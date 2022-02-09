@@ -510,7 +510,7 @@ class Minimized extends MegaRenderMixin {
             <>
                 <div className={`${Local.NAMESPACE}-overlay`}>
                     <Button
-                        simpletip={{ ...SIMPLETIP_PROPS, label: 'Expand' }}
+                        simpletip={{ ...SIMPLETIP_PROPS, label: l.expand_mini_call /* Expand */ }}
                         className="mega-button theme-light-forced action small expand"
                         icon="sprite-fm-mono icon-fullscreen-enter"
                         onClick={ev => {

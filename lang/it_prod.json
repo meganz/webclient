@@ -2913,7 +2913,7 @@
     "20012": "L'utilizzo di un gestore delle password \u00e8 raccomandato",
     "20013": "Una password resistente ed unica \u00e8 pi\u00f9 facile da dimenticare. Se la dimentichi, perderai accesso ai tuoi dati archiviati su MEGA.[Br]Ecco perch\u00e9 MEGA raccomanda l'utilizzo di un gestore delle password, come:",
     "20014": "Nel caso in cui tu perda la tua password, avere accesso alla tua Chiave di Recupero ti permette di resettare la tua password. Ti raccomandiamo di stamparla, di archiviarla su una chiavetta USB o di salvarla sul tuo gestore delle password.",
-    "20015": "",
+    "20015": "Quando effettui l'accesso puoi effettuare una copia della tua Chiave di Recupero qui: [A]https://mega.nz/keybackup[/A]",
     "20016": "",
     "20017": "Criptazione punto finale",
     "20018": "MEGA non cripta il dispositivo client dell'utente. MEGA raccomanda l'utilizzo di una passphrase resistente e una criptazione dell'intero disco a livello del dispositivo che adesso \u00e8 attiva di default sui nuovi dispositivi Android e iOS.",

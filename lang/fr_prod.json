@@ -2913,7 +2913,7 @@
     "20012": "Il est recommand\u00e9 d\u2019utiliser un g\u00e9n\u00e9rateur de mots de passe",
     "20013": "Un mot de passe robuste et unique est plus difficile \u00e0 m\u00e9moriser. Cependant, si vous l\u2019oubliez, vous perdrez l\u2019acc\u00e8s \u00e0 vos donn\u00e9es sur MEGA.[Br]C\u2019est pourquoi MEGA recommande l\u2019utilisation d\u2019un gestionnaire de mots de passe tel que\u00a0:",
     "20014": "Au cas o\u00f9 vous perdriez votre mot de passe, votre Cl\u00e9 de r\u00e9cup\u00e9ration vous permettrait de le r\u00e9initialiser. Nous vous recommandons d\u2019imprimer votre Cl\u00e9 de r\u00e9cup\u00e9ration, de l\u2019enregistrer sur une cl\u00e9 USB ou dans votre gestionnaire de mots de passe.",
-    "20015": "",
+    "20015": "Si vous \u00eates connect\u00e9, vous pouvez sauvegarder votre Cl\u00e9 de r\u00e9cup\u00e9ration ici\u00a0: [A]https://mega.nz/keybackup[/A]",
     "20016": "Nous vous recommandons d\u2019activer l\u2019authentification \u00e0 deux facteurs pour ajouter une couche suppl\u00e9mentaire de s\u00e9curit\u00e9. Apprenez-en davantage ici\u00a0: [A]https://mega.nz/blog_48[/A] (page en anglais). [Br]MEGA recommande d\u2019utiliser l\u2019une des applis d\u2019authentification suivantes\u00a0:",
     "20017": "Chiffrement de l\u2019extr\u00e9mit\u00e9",
     "20018": "MEGA ne chiffre pas l\u2019appareil client de l\u2019utilisateur. MEGA recommande d\u2019utiliser une phrase de passe robuste de verrouillage de l\u2019\u00e9cran et le chiffrement du disque entier au niveau de l\u2019appareil. Cette option est maintenant activ\u00e9e par d\u00e9faut sur les nouveaux appareils Android et iOS.",

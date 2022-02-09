@@ -11,21 +11,13 @@ import {ColumnFavIcon} from "../../../ui/jsx/fm/nodes/columns/columnFavIcon.jsx"
 import {ColumnSharedFolderName} from "../../../ui/jsx/fm/nodes/columns/columnSharedFolderName.jsx";
 import {ColumnSharedFolderAccess} from "../../../ui/jsx/fm/nodes/columns/columnSharedFolderAccess.jsx";
 import {ColumnSharedFolderButtons} from "../../../ui/jsx/fm/nodes/columns/columnSharedFolderButtons.jsx";
-import Nil from "./nil";
+import Nil from "./nil.jsx";
 
 export default class ContactProfile extends MegaRenderMixin {
-    constructor(props) {
-        super(props);
-        this.state = {
-            'selected': [],
-            'loading': true
-        };
-
-        this.onSelected = this.onSelected.bind(this);
-        this.onExpand = this.onExpand.bind(this);
-        this.onAttachClicked = this.onAttachClicked.bind(this);
-        this.handleContextMenu = this.handleContextMenu.bind(this);
-    }
+    state = {
+        selected: [],
+        loading: true
+    };
 
     componentWillMount() {
         if (super.componentWillMount) {
@@ -33,7 +25,6 @@ export default class ContactProfile extends MegaRenderMixin {
         }
 
         const { handle } = this.props;
-
         if (handle) {
             const contact = M.u[handle];
             if (contact) {
@@ -49,18 +40,18 @@ export default class ContactProfile extends MegaRenderMixin {
             }
         }
     }
+
     componentWillUnmount() {
         super.componentWillUnmount();
-
         if (this._listener) {
             const {handle} = this.props;
             const contact = M.u[handle];
             contact.removeChangeListener(this._listener);
         }
     }
+
     componentDidMount() {
         super.componentDidMount();
-
         dbfetch.geta(Object.keys(M.c.shares || {}), new MegaPromise())
             .finally(() => {
                 if (this.isMounted()) {
@@ -69,26 +60,22 @@ export default class ContactProfile extends MegaRenderMixin {
             });
     }
 
-    onSelected(handle) {
-        this.setState({'selected': handle});
-    }
-    onAttachClicked() {
-        if (this.state.selected[0]) {
-            this.onExpand(this.state.selected[0]);
+    onAttachClicked = () => {
+        const { selected } = this.state.selected;
+        if (selected[0]) {
+            this.onExpand(selected[0]);
         }
-    }
-    onExpand(handle) {
-        loadSubPage("fm/" + handle);
-    }
+    };
+
+    onExpand = handle => loadSubPage(`fm/${handle}`);
+
     Breadcrumb = () => {
         const { handle } = this.props;
         return (
             <div className="profile-breadcrumb">
                 <ul>
                     <li>
-                        <a onClick={() => loadSubPage('fm/chat/contacts')}>
-                            {ContactsPanel.LABEL.CONTACTS}
-                        </a>
+                        <a onClick={() => loadSubPage('fm/chat/contacts')}>{ContactsPanel.LABEL.CONTACTS}</a>
                         <i className="sprite-fm-mono icon-arrow-right" />
                     </li>
                     <li>
@@ -126,7 +113,7 @@ export default class ContactProfile extends MegaRenderMixin {
         return null;
     };
 
-    handleContextMenu(e, handle) {
+    handleContextMenu = (e, handle) => {
         e.persist();
         e.preventDefault();
         e.stopPropagation(); // do not treat it as a regular click on the file
@@ -135,12 +122,13 @@ export default class ContactProfile extends MegaRenderMixin {
         $.selected = [handle];
 
         M.contextMenuUI(e, 1);
-    }
+    };
+
     getSharedFoldersView() {
         return this.state.loading ? null : <FMView
             currentlyViewedEntry={this.props.handle}
             // folderSelectNotAllowed={this.props.folderSelectNotAllowed}
-            onSelected={this.onSelected}
+            onSelected={handle => this.setState({ selected: handle })}
             onHighlighted={nop}
             searchValue={this.state.searchValue}
             onExpand={this.onExpand}
@@ -164,14 +152,16 @@ export default class ContactProfile extends MegaRenderMixin {
             ]}
         />;
     }
+
     render() {
         const { handle } = this.props;
-
         if (handle) {
             const contact = M.u[handle];
+
             if (!contact || contact.c !== 1) {
                 return <Nil title="Contact not found" />;
             }
+
             const HAS_RELATIONSHIP = ContactsPanel.hasRelationship(contact);
 
             return (
@@ -195,13 +185,13 @@ export default class ContactProfile extends MegaRenderMixin {
                                     <Button
                                         className="mega-button round simpletip"
                                         icon="sprite-fm-mono icon-chat-filled"
-                                        attrs={{ 'data-simpletip': l[8632] }}
-                                        onClick={() => loadSubPage('fm/chat/p/' + handle)}
+                                        attrs={{ 'data-simpletip': l[8632] /* `Start new chat` */ }}
+                                        onClick={() => loadSubPage(`fm/chat/p/${handle}`)}
                                     />
                                     <Button
                                         className="mega-button round simpletip"
                                         icon="sprite-fm-mono icon-share-filled"
-                                        attrs={{ 'data-simpletip': l[5631] }}
+                                        attrs={{ 'data-simpletip': l[5631] /* `Share folder` */ }}
                                         onClick={() => {
                                             if (M.isInvalidUserStatus()) {
                                                 return;
@@ -212,8 +202,8 @@ export default class ContactProfile extends MegaRenderMixin {
                                     <Button
                                         className="mega-button round simpletip"
                                         icon="sprite-fm-mono icon-video-call-filled"
-                                        disabled={!megaChat.hasSupportForCalls}
-                                        attrs={{ 'data-simpletip': l[5897] }}
+                                        disabled={!navigator.onLine || !megaChat.hasSupportForCalls}
+                                        attrs={{ 'data-simpletip': l[5897] /* `Start Video Call` */ }}
                                         onClick={() => {
                                             if (M.isInvalidUserStatus()) {
                                                 return;
@@ -240,14 +230,11 @@ export default class ContactProfile extends MegaRenderMixin {
                                 </div>
                             }
                         </div>
-                        <div className="profile-shared-folders">
-                            {this.getSharedFoldersView()}
-                        </div>
+                        <div className="profile-shared-folders">{this.getSharedFoldersView()}</div>
                     </div>
                 </div>
             );
         }
-
         return null;
     }
 }

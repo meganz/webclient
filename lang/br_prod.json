@@ -2913,7 +2913,7 @@
     "20012": "Recomendamos que voc\u00ea use um gerenciador de senhas",
     "20013": "Uma senha forte e \u00fanica \u00e9 dif\u00edcil de lembrar. No entanto, se voc\u00ea a esquecer, perder\u00e1 o acesso aos seus dados no MEGA.[Br] \u00c9 por isso que o MEGA recomenda o uso de um gerenciador de senhas, como:",
     "20014": "Se voc\u00ea perder a sua senha, voc\u00ea pode reset\u00e1-la usando a sua chave de recupera\u00e7\u00e3o. Recomendamos que voc\u00ea a imprima, salve em um USB ou no seu gerenciador de senhas.",
-    "20015": "",
+    "20015": "Se voc\u00ea estiver logado, voc\u00ea pode fazer o backup da sua chave de recupera\u00e7\u00e3o aqui: [A]https://mega.nz/keybackup[/A]",
     "20016": "",
     "20017": "Criptografia de extremos",
     "20018": "O MEGA n\u00e3o criptografa o dispositivo cliente do usu\u00e1rio. Recomendamos que voc\u00ea use no seu dispositivo uma senha forte e criptografia de disco completa (FDE), ativada de forma predefinida nos novos dispositivos com Android ou iOS.",

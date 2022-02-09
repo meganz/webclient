@@ -2913,7 +2913,7 @@
     "20012": "Passwortmanagement",
     "20013": "Ein starkes und accountspezifisches Passwort ist schnell vergessen. Im Falle von echter Ende-zu-Ende-Verschl\u00fcsselung ist dies fatal: Ihre Daten werden unzug\u00e4nglich.[Br]MEGA empfiehlt daher die Nutzung eines Passwort-Managers, z.B.:",
     "20014": "Sie k\u00f6nnen Ihr Passwort unter Zuhilfenahme Ihres Rettungsschl\u00fcssels ohne Datenverlust \u00e4ndern. Drucken Sie ihn aus, speichern Sie ihn auf einem USB-Stick oder  in Ihrem Passwortmanager.",
-    "20015": "",
+    "20015": "Wenn Sie eingeloggt sind, k\u00f6nnen Sie Ihren Rettungschl\u00fcssel unter dem folgenden Link exportieren: [A]https://mega.nz/keybackup[/A]",
     "20016": "",
     "20017": "Endger\u00e4teverschl\u00fcsselung",
     "20018": "MEGA verschl\u00fcsselt die Daten auf dem Endger\u00e4t des Benutzers nicht! Wir empfehlen daher die Aktivierung von System-Vollverschl\u00fcsselung mit einem starken Passwort (Standard bei iOS/Android, optional bei Windows, macOS und Linux).",

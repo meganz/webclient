@@ -313,8 +313,8 @@ button.small i.folder-with-loupe {
 
 .download .block-view-file-type {
     margin: 0;
-    left: auto;
-    top: auto;
+    left: 50%;
+    top: 50%;
 }
 .download .file-type-wrapper {
     width: calc(100% - 16px);

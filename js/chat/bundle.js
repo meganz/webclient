@@ -7270,7 +7270,7 @@ class ContextMenu extends mixins.wl {
         className: "dropdown-avatar rounded",
         onClick: e => {
           e.stopPropagation();
-          loadSubPage('fm/chat/contacts/' + contact.h);
+          loadSubPage("fm/chat/contacts/" + contact.h);
         }
       }, external_React_default().createElement(contacts.Avatar, {
         contact: contact,
@@ -7287,7 +7287,7 @@ class ContextMenu extends mixins.wl {
             return megaChat.createAndShowGroupRoomFor(selected, '', true, false);
           }
 
-          return loadSubPage('fm/chat/p/' + contact.u);
+          return loadSubPage("fm/chat/p/" + contact.u);
         })
       }), external_React_default().createElement(dropdowns.DropdownItem, {
         icon: "sprite-fm-mono icon-send-files",
@@ -7306,7 +7306,7 @@ class ContextMenu extends mixins.wl {
         className: "dropdown body submenu"
       }, external_React_default().createElement(dropdowns.DropdownItem, {
         icon: "sprite-fm-mono icon-phone",
-        disabled: !megaChat.hasSupportForCalls,
+        disabled: !navigator.onLine || !megaChat.hasSupportForCalls,
         label: l[5896],
         onClick: () => this.close(() => megaChat.createAndShowPrivateRoom(contact.u).then(room => {
           room.setActive();
@@ -7314,7 +7314,7 @@ class ContextMenu extends mixins.wl {
         }))
       }), external_React_default().createElement(dropdowns.DropdownItem, {
         icon: "sprite-fm-mono icon-video-call-filled",
-        disabled: !megaChat.hasSupportForCalls,
+        disabled: !navigator.onLine || !megaChat.hasSupportForCalls,
         label: l[5897],
         onClick: () => this.close(() => megaChat.createAndShowPrivateRoom(contact.u).then(room => {
           room.setActive();
@@ -7323,7 +7323,7 @@ class ContextMenu extends mixins.wl {
       })), external_React_default().createElement("hr", null), withProfile && external_React_default().createElement(dropdowns.DropdownItem, {
         icon: "sprite-fm-mono icon-my-account",
         label: l[5868],
-        onClick: () => loadSubPage('fm/chat/contacts/' + contact.u)
+        onClick: () => loadSubPage("fm/chat/contacts/" + contact.u)
       }), external_React_default().createElement(dropdowns.DropdownItem, {
         icon: "sprite-fm-mono icon-rename",
         label: contact.nickname === '' ? l.set_nickname_label : l.edit_nickname_label,
@@ -8022,8 +8022,24 @@ ColumnSharedFolderButtons.megatype = "grid-url-header-nw";
 
 
 class ContactProfile extends mixins.wl {
-  constructor(props) {
-    super(props);
+  constructor() {
+    super(...arguments);
+    this.state = {
+      selected: [],
+      loading: true
+    };
+
+    this.onAttachClicked = () => {
+      const {
+        selected
+      } = this.state.selected;
+
+      if (selected[0]) {
+        this.onExpand(selected[0]);
+      }
+    };
+
+    this.onExpand = handle => loadSubPage("fm/" + handle);
 
     this.Breadcrumb = () => {
       const {
@@ -8061,14 +8077,15 @@ class ContactProfile extends mixins.wl {
       return null;
     };
 
-    this.state = {
-      'selected': [],
-      'loading': true
+    this.handleContextMenu = (e, handle) => {
+      e.persist();
+      e.preventDefault();
+      e.stopPropagation();
+      e.delegateTarget = e.target.tagName === "TR" ? e.target : $(e.target).parents('tr')[0];
+      e.currentTarget = $(e.delegateTarget);
+      $.selected = [handle];
+      M.contextMenuUI(e, 1);
     };
-    this.onSelected = this.onSelected.bind(this);
-    this.onExpand = this.onExpand.bind(this);
-    this.onAttachClicked = this.onAttachClicked.bind(this);
-    this.handleContextMenu = this.handleContextMenu.bind(this);
   }
 
   componentWillMount() {
@@ -8119,36 +8136,12 @@ class ContactProfile extends mixins.wl {
     });
   }
 
-  onSelected(handle) {
-    this.setState({
-      'selected': handle
-    });
-  }
-
-  onAttachClicked() {
-    if (this.state.selected[0]) {
-      this.onExpand(this.state.selected[0]);
-    }
-  }
-
-  onExpand(handle) {
-    loadSubPage("fm/" + handle);
-  }
-
-  handleContextMenu(e, handle) {
-    e.persist();
-    e.preventDefault();
-    e.stopPropagation();
-    e.delegateTarget = e.target.tagName === "TR" ? e.target : $(e.target).parents('tr')[0];
-    e.currentTarget = $(e.delegateTarget);
-    $.selected = [handle];
-    M.contextMenuUI(e, 1);
-  }
-
   getSharedFoldersView() {
     return this.state.loading ? null : external_React_default().createElement(fmView.Z, {
       currentlyViewedEntry: this.props.handle,
-      onSelected: this.onSelected,
+      onSelected: handle => this.setState({
+        selected: handle
+      }),
       onHighlighted: nop,
       searchValue: this.state.searchValue,
       onExpand: this.onExpand,
@@ -8201,7 +8194,7 @@ class ContactProfile extends mixins.wl {
         attrs: {
           'data-simpletip': l[8632]
         },
-        onClick: () => loadSubPage('fm/chat/p/' + handle)
+        onClick: () => loadSubPage("fm/chat/p/" + handle)
       }), external_React_default().createElement(buttons.Button, {
         className: "mega-button round simpletip",
         icon: "sprite-fm-mono icon-share-filled",
@@ -8218,7 +8211,7 @@ class ContactProfile extends mixins.wl {
       }), external_React_default().createElement(buttons.Button, {
         className: "mega-button round simpletip",
         icon: "sprite-fm-mono icon-video-call-filled",
-        disabled: !megaChat.hasSupportForCalls,
+        disabled: !navigator.onLine || !megaChat.hasSupportForCalls,
         attrs: {
           'data-simpletip': l[5897]
         },

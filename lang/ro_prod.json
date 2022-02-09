@@ -2913,7 +2913,7 @@
     "20012": "Folosirea unui manager de parole este recomandat\u0103",
     "20013": "O parol\u0103 puternic\u0103, unic\u0103 este greu de \u021binut minte. Cu toate acestea, dac\u0103 o ui\u021bi, vei pierde accesul la datele tale MEGA.[Br]Acesta este motivul pentru care MEGA recomand\u0103 folosirea unui manager de parole, cum ar fi:",
     "20014": "\u00cen cazul \u00een care \u00ee\u021bi pierzi parola, accesul la cheia de recuperare \u00ee\u021bi permite s\u0103 resetezi parola. \u00ce\u021bi recomand\u0103m s\u0103 o printezi, s\u0103 o stochezi pe o cheie USB sau s\u0103 o salvezi \u00een managerul de parole.",
-    "20015": "",
+    "20015": "C\u00e2nd e\u0219ti autentificat(\u0103), po\u021bi face un backup al cheii de recuperare aici: [A]https://mega.nz/keybackup[/A]",
     "20016": "",
     "20017": "Criptare pe dispozitivele finale",
     "20018": "MEGA nu cripteaz\u0103 dispozitivul client al utilizatorului. MEGA recomand\u0103 folosirea unei expresii puternice de acces \u0219i a cript\u0103rii complete a discului la nivelul dispozitivului, op\u021biune care este acum activat\u0103 \u00een mod implicit pe noile dispozitive Android \u0219i iOS.",

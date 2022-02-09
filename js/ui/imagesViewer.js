@@ -701,6 +701,7 @@ var slideshowid;
         var $dlBut = $('.v-btn.download', $overlay);
         var $prevNextButtons = $('.gallery-btn', $content);
         var $document = $(document);
+        const $sendToChat = $('.v-btn.send-to-chat', $overlay);
 
         if (d) {
             console.log('slideshow', id, close, slideshowid);
@@ -909,7 +910,10 @@ var slideshowid;
                 return false;
             });
 
-            $('.v-btn.send-to-chat', $overlay).rebind('click.media-viewer', () => {
+            if (u_type === 3 && megaChatIsReady) {
+                $sendToChat.removeClass('hidden');
+            }
+            $sendToChat.rebind('click.media-viewer', () => {
                 $(document).fullScreen(false);
                 const $wrapper = $('.media-viewer-container', 'body');
                 const video = $('video', $wrapper).get(0);

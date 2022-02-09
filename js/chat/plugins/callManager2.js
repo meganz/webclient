@@ -703,7 +703,7 @@
                 if (!otherContactsName || otherContactsName.length === 0) {
                     // this should never happen, but in case it does... e.g. a room where I'm the only one left, but had
                     // a call recorded with no participants passed in the meta
-                    otherContactsName.push(message.chatRoom.topic);
+                    otherContactsName.push(escapeHTML(message.chatRoom.topic));
                 }
             }
             otherContactsName = otherContactsName.map(name =>

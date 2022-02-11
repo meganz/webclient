@@ -1079,6 +1079,13 @@ li.active .call-duration i {
 
 .contacts-table-head {
     border-bottom: 1px solid var(--stroke-grey-2);
+    margin: 0 24px;
+    max-width: calc(100% - 48px);
+}
+.contacts-list .content-container .grid-scrolling-table {
+    margin: 0 24px;
+    min-width: calc(100% - 48px);
+    max-width: calc(100% - 48px);
 }
 
 .contacts-table-head tr {
@@ -1193,7 +1200,6 @@ li.active .call-duration i {
     display: flex;
     flex-direction: column;
     height: 100%;
-    padding: 0 24px;
 }
 
 .contacts-list {

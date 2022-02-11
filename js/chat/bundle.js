@@ -312,7 +312,7 @@ __webpack_require__(778);
 __webpack_require__(336);
 
 
-const EMOJI_DATASET_VERSION = 3;
+const EMOJI_DATASET_VERSION = 4;
 const CHAT_ONHISTDECR_RECNT = "onHistoryDecrypted.recent";
 const LOAD_ORIGINALS = {
   'image/gif': 25e6,
@@ -2002,7 +2002,7 @@ Chat.prototype.getEmojiDataSet = function (name) {
   } else if (self._emojiDataLoading[name]) {
     return self._emojiDataLoading[name];
   } else if (name === "categories") {
-    self._emojiData[name] = ["symbols", "activity", "objects", "nature", "food", "people", "travel", "flags"];
+    self._emojiData[name] = ["people", "nature", "food", "activity", "travel", "objects", "symbols", "flags"];
     return MegaPromise.resolve(self._emojiData[name]);
   } else {
     var promise = new MegaPromise();

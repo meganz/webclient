@@ -6715,7 +6715,7 @@ class ContactPickerWidget extends _mixins1__.wl {
               onSelectDoneCb(e);
             }
           }
-        }, this.props.multipleSelectedButtonLabel ? this.props.multipleSelectedButtonLabel : l[8890]));
+        }, react0().createElement("span", null, this.props.multipleSelectedButtonLabel ? this.props.multipleSelectedButtonLabel : l[8890])));
       }
     }
 

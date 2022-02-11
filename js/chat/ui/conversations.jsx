@@ -888,6 +888,7 @@ class ConversationsApp extends MegaRenderMixin {
             startGroupChatDialogShown: false,
             startMeetingDialog: false
         };
+        this.handleWindowResize = this.handleWindowResize.bind(this);
 
         this._cacheRouting();
 
@@ -1017,6 +1018,7 @@ class ConversationsApp extends MegaRenderMixin {
                 }, 75);
                 megaChat.$leftPane.width(value);
                 $('.fm-tree-panel', megaChat.$leftPane).width(value);
+                self.onResizeDoUpdate();
             }
         });
 
@@ -1114,7 +1116,8 @@ class ConversationsApp extends MegaRenderMixin {
             if (megaChat.$leftPane && megaChat.$leftPane.hasClass('resizable-pane-active')) {
                 return;
             }
-            const newMargin = ($('.fm-left-panel').width() + $('.nw-fm-left-icons-panel').width()) + "px";
+            const lhpWidth = this.state.leftPaneWidth || $('.fm-left-panel').width();
+            const newMargin = `${lhpWidth + $('.nw-fm-left-icons-panel').width()}px`;
             $('.fm-right-files-block, .fm-right-account-block')
                 .filter(':visible')
                 .css({

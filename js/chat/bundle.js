@@ -13469,6 +13469,7 @@ class GenericConversationMessage extends mixin.y {
 
   _addToCloudDrive(v, openSendToChat) {
     $.selected = [v.h];
+    $.chatAttachmentShare = true;
     openSaveToDialog(v, function (node, target) {
       if (Array.isArray(target)) {
         M.myChatFilesFolder.get(true).then(function (myChatFolder) {

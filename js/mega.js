@@ -1668,6 +1668,7 @@ scparser.$finalize = function() {
 
             sccount = 0;
             scinflight = false;
+            queueMicrotask(resumesc);
         });
     }
     else {

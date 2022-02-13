@@ -1104,8 +1104,9 @@ FileManager.prototype.initFileManagerUI = function() {
  *
  * @param container
  * @param aUpdate
+ * @param {Boolean} [refresh] are we re-attaching the container?
  */
-FileManager.prototype.initShortcutsAndSelection = function (container, aUpdate) {
+FileManager.prototype.initShortcutsAndSelection = function(container, aUpdate, refresh) {
     'use strict';
 
     if (!window.fmShortcuts) {
@@ -1117,7 +1118,7 @@ FileManager.prototype.initShortcutsAndSelection = function (container, aUpdate) 
             window.selectionManager.destroy();
         }
 
-        if (M.previousdirid !== M.currentdirid) {
+        if (M.previousdirid !== M.currentdirid && !refresh) {
             // do not retain selected nodes unless re-rendering the same view
             $.selected = [];
         }
@@ -1135,7 +1136,7 @@ FileManager.prototype.initShortcutsAndSelection = function (container, aUpdate) 
                     $.selected = selected_list;
                 }
             }
-        );
+        ).reinitialize();
     }
 };
 

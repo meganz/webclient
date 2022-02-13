@@ -472,9 +472,9 @@
                 deleteScrollPanel('.file-block-scrolling', 'jsp');
                 deleteScrollPanel('.shared-blocks-scrolling', 'jsp');
                 deleteScrollPanel('.out-shared-blocks-scrolling', 'jsp');
-
-                initOpcGridScrolling();
-                initIpcGridScrolling();
+                // @todo deprecate/remove the left behind html/code since we moved opc/ipc to chat
+                // initOpcGridScrolling();
+                // initIpcGridScrolling();
 
                 $('.grid-table:not(.arc-chat-messages-block) tr').remove();
                 $('.file-block-scrolling a').remove();
@@ -609,8 +609,7 @@
                     }
                     else {
                         this.container = container;
-                        M.initShortcutsAndSelection(container);
-
+                        M.initShortcutsAndSelection(container, false, true);
                         if (this.logger) {
                             this.logger.debug('rebindLayout completed.', [container]);
                         }

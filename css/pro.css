@@ -1033,8 +1033,9 @@ body:not(.mobile) .plan.pro3:not(.current) .pricing-page.plan-button:hover {
 }
 .business-slider-values div.perc-50 {
     display: flex;
+    flex: 0 0 auto;
     justify-content: space-between;
-    width: calc(50% + 28px);
+    width: calc(50% + 20px);
 }
 .business-slider-values div.perc-50:first-child {
     display: inline-block;
@@ -1092,7 +1093,7 @@ body:not(.mobile) .plan.pro3:not(.current) .pricing-page.plan-button:hover {
     padding: 0 30px 34px;
 }
 .business-calculator .business-slider-values div {
-    text-align: justify;
+    text-align: start;
 }
 .business-calculator .business-slider.ui-slider .ui-slider-range {
     background: var(--text-color-white-high);
@@ -1125,6 +1126,18 @@ body:not(.mobile) .plan.pro3:not(.current) .pricing-page.plan-button:hover {
     font-family: var(--text-font-family-montserrat-regular);
     font-size: 36px;
     line-height: 44px;
+}
+
+/* Multilanguage fixes */
+.ar .business-calculator .ui-slider-handle span {
+    font-size: 16px;
+}
+.ar .business-calculator .business-slider-values div,
+.vi .business-calculator .business-slider-values div {
+    font-size: 15px;
+}
+.es .business-calculator .business-slider-values div {
+    font-size: 14px;
 }
 
 /* Business quotes */

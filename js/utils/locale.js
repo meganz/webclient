@@ -774,15 +774,23 @@ function formatCurrency(value, currency, display, noDecimals) {
 /**
  * Function to return percentage structure as it is difference on some locale.
  * @param {Number} value Value to format
+ * @param {Boolean} twoDecimals If the number should be displayed with 2 decimals
  * @returns {String} Formateed percentage value with curreny locales
  */
-function formatPercentage(value) {
+function formatPercentage(value, twoDecimals) {
 
     'use strict';
 
-    var locales = getCountryAndLocales().locales;
+    twoDecimals = twoDecimals || false;
+    const locales = getCountryAndLocales().locales;
+    const options = {'style': 'percent'};
 
-    return value.toLocaleString(locales, {'style': 'percent'});
+    if (twoDecimals) {
+        options.maximumFractionDigits = 2;
+        options.minimumFractionDigits = 2;
+    }
+
+    return value.toLocaleString(locales, options);
 }
 
 /**

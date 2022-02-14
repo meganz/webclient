@@ -2578,7 +2578,7 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
         $invoiceTopTitle.find('#invoice-date').text(time2date(invoiceDetail.ts, 1));
         $invoiceTopTitle.find('#invoice-number').text(invoiceDetail.n);
         $invoiceTopTitle.find('.invoice-vat').text(invoiceDetail.mega.taxnum[1]);
-        $invoiceTopTitle.find('.inv-vat-label').text(invoiceDetail.mega.taxnum[0] + ':');
+        $('.inv-vat-label', $invoiceTopTitle).text(l.taxname_label.replace('%TAXNAME', invoiceDetail.mega.taxnum[0]));
 
         // billed-to details
         $invoiceDetailContainer.find('.billed-name').text(invoiceDetail.u.cname);
@@ -2595,7 +2595,8 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
         $invoiceDetailContainer.find('.billed-vat').addClass('hidden');
         if (invoiceDetail.u.taxnum) {
             $invoiceDetailContainer.find('.billed-vat')
-                .text(invoiceDetail.u.taxnum[0] + ': ' + invoiceDetail.u.taxnum[1]).removeClass('hidden');
+                .text(l.taxname_label.replace('%TAXNAME', invoiceDetail.u.taxnum[0])
+                    + ' ' + invoiceDetail.u.taxnum[1]).removeClass('hidden');
         }
 
         // invoice items
@@ -2683,8 +2684,8 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
         if (invoiceDetail.u.taxnum) {
             let taxText = '';
             if (oldInvoice || taxExcluded) {
-                taxText = `${(invoiceDetail.taxname || invoiceDetail.u.taxnum[0])}: `
-                    + `${Number(invoiceDetail.taxrate).toFixed(2)}%`;
+                taxText = l.taxname_label.replace('%TAXNAME', invoiceDetail.taxname || invoiceDetail.u.taxnum[0])
+                    + ` ${formatPercentage(Number(invoiceDetail.taxrate) / 100, true)}`;
             }
             else {
                 taxText = l.tax_on_invoice.replace('%1', invoiceDetail.taxname || invoiceDetail.u.taxnum[0])
@@ -2726,7 +2727,8 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
                         myPage = myPage.replace('{1InvoiceTitle}', escapeHTML($invoiceTopTitle.find('.inv-title.invv').text()));
                         myPage = myPage.replace('{1InvoiceNB}', escapeHTML(invoiceDetail.n));
                         myPage = myPage.replace('{2VATNB}', escapeHTML(invoiceDetail.mega.taxnum[1]));
-                        myPage = myPage.replace('{2VATTXT}', escapeHTML(invoiceDetail.mega.taxnum[0]));
+                        myPage = myPage.replace('{2VATTXT}', escapeHTML(
+                            l.taxname_label.replace('%TAXNAME', invoiceDetail.mega.taxnum[0])));
                         myPage = myPage.replace('{3CompanyName}', escapeHTML(invoiceDetail.u.cname));
                         myPage = myPage.replace('{4CompanyEmail}', escapeHTML(invoiceDetail.u.e));
                         myPage = myPage.replace('{5CompanyAddress}', escapeHTML(validAddressSentFromApi.join(', ')));
@@ -2734,7 +2736,8 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
                             escapeHTML(invoiceDetail.u.addr[invoiceDetail.u.addr.length - 1]));
                         var cVat = '---';
                         if (invoiceDetail.u.taxnum && invoiceDetail.u.taxnum[1]) {
-                            cVat = invoiceDetail.u.taxnum[0] + ': ' + invoiceDetail.u.taxnum[1];
+                            cVat = l.taxname_label.replace('%TAXNAME', invoiceDetail.u.taxnum[0])
+                                + ' ' + invoiceDetail.u.taxnum[1];
                         }
                         myPage = myPage.replace('{7CompanyVat}', escapeHTML(cVat));
                         var itemDate = '---';

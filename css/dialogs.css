@@ -1174,6 +1174,9 @@ body.de .mega-dialog.new-group-chat {
 .fm-versioning .data-table {
     padding: 0;
 }
+.fm-versioning .data-table:last-child {
+    margin-bottom: 12px;
+}
 .fm-versioning.top-column {
     display: flex;
     align-items: center;

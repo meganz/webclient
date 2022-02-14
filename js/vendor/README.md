@@ -157,7 +157,7 @@ Unless otherwise noted, they were released under a [MIT License].
 > **This is a fork**, [Compare the changes](https://github.com/mozilla/pdf.js/compare/master...meganz:master)
 
 ---
-[codemirror.js]: Text editor in JavaScript Ver. 5.49.2
+[codemirror.js]: Text editor in JavaScript Ver. 5.65.1
 
 > This is released under [MIT License](https://github.com/codemirror/CodeMirror/blob/master/LICENSE).
 > **This is a fork**, [See the changes](https://github.com/codemirror/CodeMirror/compare/master...meganz:master)

@@ -450,7 +450,7 @@ function sc_packet(a) {
 
     // check if this packet needs nodes to be present,
     // unless `fromapi` where nodes are placed in memory already as received.
-    if (!loadfm.fromapi || fmdb && !fmdb.memoize)
+    if (window.fmdb && (!loadfm.fromapi || !fmdb.memoize))
     {
         const inflight = $.len(scfetches);
 

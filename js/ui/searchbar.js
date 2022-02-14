@@ -27,15 +27,18 @@
             }
             else if (val.length >= 2 || !asciionly(val)) {
                 M.fmSearchNodes(val).then(function() {
-                    // get topbars again for switching between static and fm pages
-                    $topbar = $('#startholder .js-topbar, #fmholder .js-topbar');
+                    loadSubPage(`fm/search/${val}`);
+                    onIdle(() => {
+                        // get topbars again for switching between static and fm pages
+                        $topbar = $('#startholder .js-topbar, #fmholder .js-topbar');
 
-                    $('.js-filesearcher', $topbar).val(val);
-                    $('#main-search-fake-form .js-filesearcher', $topbar).trigger('focus');
-                    $('.js-btnclearSearch', $topbar).removeClass('hidden');
+                        $('.js-filesearcher', $topbar).val(val);
+                        $('#main-search-fake-form .js-filesearcher', $topbar).trigger('focus');
+                        $('.js-btnclearSearch', $topbar).removeClass('hidden');
 
-                    // fix a redirect from a bottompage with an 'old' class on it
-                    $('body').removeClass('old');
+                        // fix a redirect from a bottompage with an 'old' class on it
+                        $('body').removeClass('old');
+                    });
                 });
             }
 

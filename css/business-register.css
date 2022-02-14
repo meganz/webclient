@@ -9,7 +9,7 @@
 }
 
 .bus-reg-body {
-    min-width: 790px;
+    min-width: 880px;
     max-width: 940px;
     margin:0 auto;
     padding-top: 124px;
@@ -24,11 +24,13 @@
     font-size: 40px;
     line-height: 48px;
     text-align: start;
-	color: var(--text-color-high);
+    color: var(--text-color-high);
+    margin-left: 10px;
 }
 
 .bus-reg-info-block {
     width: 400px;
+    margin-left: 10px;
 }
 
 .bus-reg-subheader {
@@ -201,7 +203,7 @@
     font-size: 0;
 }
 .bus-reg-plan .bus-user-price-val {
-    height: 34px;
+    height: 36px;
     margin-top: 13px;
     margin-left: 18px;
     display: inline-block;
@@ -219,6 +221,7 @@
     color: var(--text-color-high);
     position: absolute;
     margin-top: 19px;
+    margin-right: 10px;
 }
 .bus-reg-plan .bus-user-price-euro {
     text-align: center;
@@ -276,6 +279,9 @@
     color: var(--text-color-high);
     padding-left: 16px;
     padding-right: 16px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
 }
 .bus-reg-plan .bus-total-col {
     display: inline-block;
@@ -416,7 +422,7 @@
     margin:0 auto 48px auto;
 }
 
-@media only screen and (max-width: 790px) {
+@media only screen and (max-width: 880px) {
     .bus-reg-body {
         width: 90%;
         min-width: 0;

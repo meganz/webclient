@@ -2213,7 +2213,7 @@ if (typeof sjcl !== 'undefined') {
 
     Share.prototype.removeFromPermissionQueue = function(handle) {
         // Remove the permission change belongs to the specific contact since got removed already
-        if ($.changedPermissions[handle]) {
+        if ($.changedPermissions && $.changedPermissions[handle]) {
             delete $.changedPermissions[handle];
         }
     };
@@ -2305,6 +2305,36 @@ if (typeof sjcl !== 'undefined') {
         }
 
         return MegaPromise.allDone(promises);
+    };
+
+    /**
+     * Removes any shares (including pending) from the selected node.
+     *
+     * @returns {MegaPromise} promise to remove contacts from share
+     */
+    Share.prototype.removeSharesFromSelected = function() {
+        'use strict';
+        $.removedContactsFromShare = {};
+        const nodeHandle = String($.selected[0]);
+        let userHandles = M.getNodeShareUsers(nodeHandle, 'EXP');
+
+        if (M.ps[nodeHandle]) {
+            const pendingShares = Object(M.ps[nodeHandle]);
+            userHandles = [...userHandles, ...Object.keys(pendingShares)];
+        }
+
+        for (let i = 0; i < userHandles.length; i++) {
+            const userHandle = userHandles[i];
+            const userEmailOrHandle = Object(M.opc[userHandle]).m || userHandle;
+
+            $.removedContactsFromShare[userHandle] = {
+                'selectedNodeHandle': nodeHandle,
+                'userEmailOrHandle': userEmailOrHandle,
+                'userHandle': userHandle
+            };
+        }
+
+        return this.removeContactFromShare();
     };
 
     // export

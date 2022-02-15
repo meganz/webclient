@@ -1513,6 +1513,13 @@ FileManager.prototype.initContextUI = function() {
         M.openSharingDialog();
     });
 
+    $(`${c}.removeshare-item`).rebind('click', () => {
+        loadingDialog.show();
+        new mega.Share().removeSharesFromSelected().always(() => {
+            loadingDialog.hide();
+        });
+    });
+
     // Move Dialog
     $(c + '.advanced-item, ' + c + '.move-item').rebind('click', openMoveDialog);
 
@@ -1668,8 +1675,7 @@ FileManager.prototype.initContextUI = function() {
         }
     });
 
-
-    $(c + '.removeshare-item').rebind('click', function() {
+    $(`${c}.leaveshare-item`).rebind('click', () => {
         if (M.isInvalidUserStatus()) {
             return;
         }

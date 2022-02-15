@@ -1889,9 +1889,15 @@ function renderContactRowContent(userEmail, type, id, av, userName, permClass) {
         presence = M.onlineStatusClass(M.d[id].presence === 'unavailable' ? 1 : M.d[id].presence)[1];
     }
 
-    userName += type === '1' ? ' (' + l[8885] + ')' : '';
-    permClass = type === '1' ? 'owner' : permClass;
-    var ownerClass = type === '1' ? ' owner' : '';
+    let ownerClass = '';
+    if (type === '1') {
+        userName += ` (${l[8885]})`;
+        permClass = 'owner';
+        ownerClass = ' owner';
+    }
+    else if (type === '2') {
+        userName = l.contact_request_pending.replace('%1', userName);
+    }
 
     html =  `<div class="share-dialog-access-node${ownerClass}" id="${id}">
                 <div class="access-node-info-block">
@@ -1958,7 +1964,7 @@ function fillShareDialogWithContent() {
             var name  = M.getNameByHandle(handle) || user.m;
             var share = M.getNodeShare(node, handle) || Object(pendingShares[handle]);
 
-            generateShareDialogRow(name, user.m, share.r | 0, handle);
+            generateShareDialogRow(name, user.m, share.r | 0, handle, handle in pendingShares);
             seen[user.m] = 1;
         }
     });
@@ -1969,13 +1975,17 @@ function fillShareDialogWithContent() {
         var newContactEmail = $.addContactsToShare[newContact].u;
 
         if (!seen[newContactEmail]) {
+            let pendingContact;
             if (newContact.startsWith('#new_')) {
                 newContactName = $.addContactsToShare[newContact].u;
+                pendingContact = true;
             }
             else {
                 newContactName  = M.getNameByHandle(newContact) || newContactEmail;
+                pendingContact = !!M.findOutgoingPendingContactIdByEmail(newContactEmail);
             }
-            generateShareDialogRow(newContactName, newContactEmail, $.addContactsToShare[newContact].r, newContact);
+            const shareRights = $.addContactsToShare[newContact].r;
+            generateShareDialogRow(newContactName, newContactEmail, shareRights, newContact, pendingContact);
             seen[newContactEmail] = 1;
         }
     }
@@ -1987,9 +1997,10 @@ function fillShareDialogWithContent() {
  * @param {String} email
  * @param {Number} shareRights
  * @param {String} userHandle Optional
+ * @param {boolean} isPending if true, shows text 'contact request pending'
  */
-function generateShareDialogRow(displayNameOrEmail, email, shareRights, userHandle) {
-
+function generateShareDialogRow(displayNameOrEmail, email, shareRights, userHandle, isPending) {
+    'use strict';
     var rowId = '',
         html = '',
         av =  useravatar.contact(email, 'access-node-avatar'),
@@ -2022,7 +2033,7 @@ function generateShareDialogRow(displayNameOrEmail, email, shareRights, userHand
         html = renderContactRowContent(email, '1', rowId, av, displayNameOrEmail, perm);
     }
     else {
-        html = renderContactRowContent(email, '', rowId, av, displayNameOrEmail, perm);
+        html = renderContactRowContent(email, isPending ? '2' : '', rowId, av, displayNameOrEmail, perm);
     }
 
     $('.share-dialog .share-dialog-access-list').safeAppend(html);
@@ -2547,28 +2558,8 @@ function initShareDialog() {
 
     $('.remove-share', $dialog).rebind('click', function() {
         if (!$(this).is('.disabled')) {
-            $.removedContactsFromShare = {};
-            var nodeHandle = String($.selected[0]);
-            var userHandles = M.getNodeShareUsers(nodeHandle, 'EXP');
-
-            if (M.ps[nodeHandle]) {
-                var pendingShares = Object(M.ps[nodeHandle]);
-                userHandles = userHandles.concat(Object.keys(pendingShares));
-            }
-
-            userHandles.forEach(function(userHandle) {
-                var userEmailOrHandle = Object(M.opc[userHandle]).m || userHandle;
-
-                $.removedContactsFromShare[userHandle] = {
-                    'selectedNodeHandle': nodeHandle,
-                    'userEmailOrHandle': userEmailOrHandle,
-                    'userHandle': userHandle
-                };
-            });
-
-            var share = new mega.Share();
             loadingDialog.show();
-            share.removeContactFromShare().always(function() {
+            new mega.Share().removeSharesFromSelected().always(() => {
                 loadingDialog.hide();
                 closeDialog();
             });

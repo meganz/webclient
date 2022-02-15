@@ -349,6 +349,14 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
         delete items['.clearprevious-versions'];
     }
 
+    if (selNode.t && !folderlink && M.currentrootid !== M.RubbishID &&
+        M.currentrootid !== 'out-shares' && M.currentrootid !== 'shares' &&
+        M.currentrootid !== 'public-links' && M.currentdirid !== 'recents' &&
+        $.selected.length === 1 &&
+        (M.currentCustomView.type !== 'gallery' || selNode.h !== M.currentCustomView.nodeID)) {
+        items['.open-gallery'] = 1;
+    }
+
     if ((sourceRoot === M.RootID) && !folderlink) {
         items['.move-item'] = 1;
         items['.getlink-item'] = 1;

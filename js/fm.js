@@ -3416,6 +3416,12 @@ function fm_resize_handler(force) {
         });
     }
 
+    if (M.currentrootid === 'discovery') {
+        const $galleryTabsBl = $('.gallery-tabs-bl', 'body');
+        const pos = $('.gallery-tab-lnk-y', $galleryTabsBl).position();
+        $('.gallery-section-title', $galleryTabsBl).css('max-width', pos.left - 10);
+    }
+
     if (d) {
         console.timeEnd('fm_resize_handler');
     }

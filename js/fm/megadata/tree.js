@@ -1268,6 +1268,7 @@ MegaData.prototype.onTreeUIOpen = function(id, event, ignoreScroll) {
     "use strict";
 
     id = String(id);
+    const cv = M.isCustomView(id);
     var id_r = this.getNodeRoot(id);
     var id_s = id.split('/')[0];
     var $e;
@@ -1281,11 +1282,8 @@ MegaData.prototype.onTreeUIOpen = function(id, event, ignoreScroll) {
     if (id_r === 'shares') {
         this.onSectionUIOpen('shared-with-me');
     }
-    else if (id_r === 'out-shares') {
-        this.onSectionUIOpen('out-shares');
-    }
-    else if (id_r === 'public-links') {
-        this.onSectionUIOpen('public-links');
+    else if (cv) {
+        this.onSectionUIOpen(id_r || id_s);
     }
     else if (this.InboxID && id_r === this.InboxID) {
         this.onSectionUIOpen('inbox');
@@ -1369,17 +1367,19 @@ MegaData.prototype.onTreeUIOpen = function(id, event, ignoreScroll) {
         $.hideContextMenu(event);
     }
 
-    if (id_r === 'out-shares') {
-        $e = $('#treea_os_' + id.split('/')[1]);
-    }
-    else if (id_r === 'public-links') {
-        $e = $('#treea_pl_' + id.split('/')[1]);
+    $('.fm-tree-panel .nw-fm-tree-item').removeClass('selected on-gallery');
+
+    if (cv) {
+        $e = $(`#treea_${cv.prefixTree}${id.split('/')[1]}`);
+
+        if (id.startsWith('discovery')) {
+            $e.addClass('on-gallery');
+        }
     }
     else {
         $e = $('#treea_' + id_s);
     }
 
-    $('.fm-tree-panel .nw-fm-tree-item').removeClass('selected');
     $e.addClass('selected');
 
     if (!ignoreScroll) {

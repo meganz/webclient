@@ -506,21 +506,19 @@ function newContactDialog(ipcId, close) {
     $('.contact-request-button', $d).rebind('click', function() {
         var $self = $(this);
         var $reqRow = $('tr#ipc_' + ipcId);
-
-        if ($self.is('.accept')) {
-            if (M.acceptPendingContactRequest(ipcId) === 0) {
+        const finish = (res) => {
+            if (res === 0) {
                 $reqRow.remove();
             }
+        };
+        if ($self.is('.accept')) {
+            M.acceptPendingContactRequest(ipcId).always(finish);
         }
         else if ($self.is('.delete')) {
-            if (M.denyPendingContactRequest(ipcId) === 0) {
-                $reqRow.remove();
-            }
+            M.denyPendingContactRequest(ipcId).always(finish);
         }
         else if ($self.is('.ignore')) {
-            if (M.ignorePendingContactRequest(ipcId) === 0) {
-                $reqRow.remove();
-            }
+            M.ignorePendingContactRequest(ipcId).always(finish);
         }
 
         newContactDialog(ipcId, 1);

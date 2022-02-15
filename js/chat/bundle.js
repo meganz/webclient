@@ -8301,11 +8301,15 @@ class ContactsPanel extends mixins.wl {
       let receivedKeys = Object.keys(received);
 
       if (received && receivedKeys.length) {
+        const promises = [];
+
         for (let i = 0; i < receivedKeys.length; i++) {
-          M.acceptPendingContactRequest(receivedKeys[i]);
+          promises.push(M.acceptPendingContactRequest(receivedKeys[i]));
         }
 
-        delay('updateIpcRequests', updateIpcRequests);
+        MegaPromise.allDone(promises).always(() => {
+          delay('updateIpcRequests', updateIpcRequests);
+        });
       }
     };
 

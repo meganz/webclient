@@ -17,6 +17,11 @@ MegaData.prototype.renderMain = function(aUpdate) {
         }
         this.megaRender = new MegaRender(this.viewmode);
     }
+    else if (!this.megaRender) {
+
+        console.timeEnd('renderMain');
+        return;
+    }
 
     if (this.previousdirid === "recents" && this.recentsRender) {
         this.recentsRender.cleanup();

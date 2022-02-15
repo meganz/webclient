@@ -138,13 +138,15 @@ function removeUInode(h, parent) {
         case 'photos':
         case 'images':
         case 'videos':
+        case `discovery/${M.currentCustomView.nodeID}`:
             if (!hasItems) {
 
                 __markEmptied();
                 $('.files-grid-view').addClass('hidden');
                 $('.grid-table.fm tr').remove();
 
-                $(`.fm-empty-${M.currentdirid}`).removeClass('hidden');
+                $(`.fm-empty-${M.currentdirid.startsWith('discovery/') ? 'discovery' : M.currentdirid}`)
+                    .removeClass('hidden');
             }
             break;
         default:

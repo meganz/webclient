@@ -75,6 +75,9 @@
 .nw-fm-tree-item.selected .colour-label-ind {
     box-shadow: 0 0 0 1px var(--stroke-main);
 }
+.nw-fm-tree-item.linked.on-gallery .colour-label-ind {
+    right: 52px;
+}
 .nw-fm-tree-item.label {
     -webkit-padding-end: 46px;
     padding-inline-end: 46px;

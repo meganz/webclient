@@ -268,7 +268,7 @@ MegaData.prototype.getPath = function(id) {
         }
     }
 
-    // Get path for Out-shares and Public links.
+    // Get path for Out-shares, Public links, and Discovery.
     // This also cut off all path from invalid out-share and public-link path and return []
     if (cv && result.length > 1) {
 
@@ -279,8 +279,12 @@ MegaData.prototype.getPath = function(id) {
                 result[i + 1] = 'public-links';
                 break;
             }
-            else if (outShareTree[result[i]]) {
+            else if (cv.type === 'out-shares' && outShareTree[result[i]]) {
                 result[i + 1] = 'out-shares';
+                break;
+            }
+            else if (cv.type === 'gallery' && cv.nodeID === result[i]) {
+                result[i + 1] = 'discovery';
                 break;
             }
             result.pop();
@@ -308,11 +312,19 @@ MegaData.prototype.isCustomView = function(pathOrID) {
     var result = Object.create(null);
     result.original = pathOrID;
 
+    // Basic gallery view
     if (pathOrID === 'photos' || pathOrID === 'images' || pathOrID === 'videos') {
         result.type = 'gallery';
         result.nodeID = pathOrID;
         result.prefixTree = '';
         result.prefixPath = '';
+    }
+    // Media discovery view
+    else if (pathOrID.startsWith('discovery')) {
+        result.type = 'gallery';
+        result.nodeID = pathOrID.replace('discovery/', '');
+        result.prefixTree = '';
+        result.prefixPath = 'discovery/';
     }
     // This is a out-share id from tree
     else if (pathOrID.substr(0, 3) === 'os_') {

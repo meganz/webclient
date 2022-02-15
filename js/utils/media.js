@@ -109,7 +109,7 @@ function is_photo(n, ext) {
 
     ext = ext || fileext(n && n.name || n, true, true);
 
-    return (ext !== 'PSD' && is_image3(n, ext)) || is_video(n);
+    return (ext !== 'PSD' && is_image3(n, ext)) || is_video(n) === 1;
 }
 
 is_image.def = {

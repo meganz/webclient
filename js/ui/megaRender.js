@@ -568,7 +568,10 @@
                     $('.contact-share-notification').addClass('hidden');
                 }
                 else if (M.currentCustomView.type === 'gallery') {
-                    $(`.fm-empty-${M.currentdirid}`).removeClass('hidden');
+
+                    const pagetype = M.currentdirid === M.currentCustomView.nodeID ? M.currentdirid : 'discovery';
+
+                    $(`.fm-empty-${pagetype}`).removeClass('hidden');
                     $('.gallery-view').addClass('hidden');
                 }
                 else if (this.logger) {

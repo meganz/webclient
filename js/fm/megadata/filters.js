@@ -65,10 +65,6 @@ MegaData.prototype.filterByParent = function(id) {
             }
         }
     }
-    // Just clean up M.v for gallery, and let it handled by gallery code
-    else if (M.isCustomView(id).type === 'gallery') {
-        this.v = [];
-    }
     // We should have a parent's childs into M.c, no need to traverse the whole M.d
     else if (id === 'public-links' || id === 'out-shares' || this.c[id]) {
         var list;

@@ -601,10 +601,10 @@ export class ConversationRightArea extends MegaRenderMixin {
                                         className={`
                                             link-button
                                             light
-                                            red
                                             ${room.type !== "private" && !is_chatlink &&
                                             room.membersSetFromApi.members.hasOwnProperty(u_handle) &&
-                                            room.membersSetFromApi.members[u_handle] !== -1 ? '' : 'disabled'}
+                                            room.membersSetFromApi.members[u_handle] !== -1 &&
+                                            !room.activeCall ? '' : 'disabled'}
                                         `}
                                         onClick={(e) => {
                                             if ($(e.target).closest('.disabled').length > 0) {

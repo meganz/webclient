@@ -21165,7 +21165,7 @@ class ConversationRightArea extends mixins.wl {
     }, external_React_default().createElement("i", {
       className: "\n                                            sprite-fm-mono\n                                            " + (room.isArchived() ? 'icon-unarchive' : 'icon-archive') + "\n                                        "
     }), external_React_default().createElement("span", null, room.isArchived() ? l[19065] : l[16689])), room.type !== "private" ? external_React_default().createElement("div", {
-      className: "\n                                            link-button\n                                            light\n                                            red\n                                            " + (room.type !== "private" && !is_chatlink && room.membersSetFromApi.members.hasOwnProperty(u_handle) && room.membersSetFromApi.members[u_handle] !== -1 ? '' : 'disabled') + "\n                                        ",
+      className: "\n                                            link-button\n                                            light\n                                            " + (room.type !== "private" && !is_chatlink && room.membersSetFromApi.members.hasOwnProperty(u_handle) && room.membersSetFromApi.members[u_handle] !== -1 && !room.activeCall ? '' : 'disabled') + "\n                                        ",
       onClick: e => {
         if ($(e.target).closest('.disabled').length > 0) {
           return false;

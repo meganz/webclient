@@ -575,17 +575,19 @@ Chat.prototype.init = promisify(function (resolve, reject) {
     return true;
   }).then(resolve).catch(reject);
   const bpcListener = mBroadcaster.addListener("beforepagechange", page => {
-    if (page.indexOf("chat") === -1) {
-      if (megaChat.routingSection) {
-        var _this$$conversationsA;
+    if (page.includes('chat') && page !== 'securechat') {
+      return;
+    }
 
-        if (String(M.currentdirid).substr(0, 4) === "chat") {
-          delete M.currentdirid;
-        }
+    if (megaChat.routingSection) {
+      var _this$$conversationsA;
 
-        megaChat.routingParams = megaChat.routingSection = megaChat.routingSubSection = null;
-        (_this$$conversationsA = this.$conversationsAppInstance) == null ? void 0 : _this$$conversationsA.forceUpdate();
+      if (String(M.currentdirid).substr(0, 4) === "chat") {
+        delete M.currentdirid;
       }
+
+      megaChat.routingParams = megaChat.routingSection = megaChat.routingSubSection = null;
+      (_this$$conversationsA = this.$conversationsAppInstance) == null ? void 0 : _this$$conversationsA.forceUpdate();
     }
   });
   this.mbListeners.push(bpcListener);
@@ -8038,7 +8040,10 @@ ColumnSharedFolderButtons.sortable = true;
 ColumnSharedFolderButtons.id = "grid-url-header-nw";
 ColumnSharedFolderButtons.label = "";
 ColumnSharedFolderButtons.megatype = "grid-url-header-nw";
+// EXTERNAL MODULE: ./js/chat/ui/link.jsx
+var ui_link = __webpack_require__(941);
 ;// CONCATENATED MODULE: ./js/chat/ui/contactsPanel/contactProfile.jsx
+
 
 
 
@@ -8079,8 +8084,8 @@ class ContactProfile extends mixins.wl {
       } = this.props;
       return external_React_default().createElement("div", {
         className: "profile-breadcrumb"
-      }, external_React_default().createElement("ul", null, external_React_default().createElement("li", null, external_React_default().createElement("a", {
-        onClick: () => loadSubPage('fm/chat/contacts')
+      }, external_React_default().createElement("ul", null, external_React_default().createElement("li", null, external_React_default().createElement(ui_link.Z, {
+        to: "/fm/chat/contacts"
       }, ContactsPanel.LABEL.CONTACTS), external_React_default().createElement("i", {
         className: "sprite-fm-mono icon-arrow-right"
       })), external_React_default().createElement("li", null, external_React_default().createElement(utils.EmojiFormattedContent, null, M.getNameByHandle(handle)))));
@@ -19648,7 +19653,10 @@ class nil_Nil extends mixins.wl {
   }
 
 }
+// EXTERNAL MODULE: ./js/chat/ui/link.jsx
+var ui_link = __webpack_require__(941);
 ;// CONCATENATED MODULE: ./js/chat/ui/meetings/workflow/invite/invite.jsx
+
 
 
 
@@ -19936,15 +19944,12 @@ class Invite extends mixins.wl {
       className: "mega-button large positive",
       onClick: () => link && copyToClipboard(link, 'Done!'),
       disabled: !link
-    }, !link ? l[7006] : l[1394]), external_React_default().createElement("a", {
-      href: "#",
+    }, !link ? l[7006] : l[1394]), external_React_default().createElement(ui_link.Z, {
       className: "view-link-control",
-      onClick: e => {
-        this.setState({
-          field: !field
-        });
-        e.preventDefault();
-      }
+      field: field,
+      onClick: () => this.setState({
+        field: !field
+      })
     }, field ? l.collapse_meeting_link : l.expand_meeting_link, external_React_default().createElement("i", {
       className: `sprite-fm-mono ${field ? 'icon-arrow-up' : 'icon-arrow-down'}`
     })), field && link && external_React_default().createElement("div", {
@@ -19974,6 +19979,7 @@ class Invite extends mixins.wl {
 }
 Invite.NAMESPACE = 'invite-meeting';
 ;// CONCATENATED MODULE: ./js/chat/ui/meetings/workflow/end.jsx
+
 
 
 
@@ -20015,8 +20021,7 @@ class End extends mixins.wl {
       buttons: this.buttons,
       noCloseOnClickOutside: true,
       onClose: this.props.onClose
-    }), external_React_default().createElement((external_React_default()).Fragment, null, "If you want to keep this call open with full function, please assign a new moderator. \xA0", external_React_default().createElement("a", {
-      href: "#",
+    }), external_React_default().createElement((external_React_default()).Fragment, null, "If you want to keep this call open with full function, please assign a new moderator. \xA0", external_React_default().createElement(ui_link.Z, {
       onClick: this.toggleContacts
     }, "Assign new moderator"), contacts && null));
   }
@@ -20656,6 +20661,7 @@ MeetingsCallEndedDialog.dialogName = 'meetings-ended-dialog';
 
 
 
+
 class Join extends mixins.wl {
   constructor(props) {
     super(props);
@@ -20722,8 +20728,8 @@ class Join extends mixins.wl {
           }
         }],
         onClose: onCancel
-      }, external_React_default().createElement("p", null, msgFragments[0], external_React_default().createElement("a", {
-        href: "#",
+      }, external_React_default().createElement("p", null, msgFragments[0], external_React_default().createElement(ui_link.Z, {
+        to: "/register",
         onClick: () => loadSubPage('register')
       }, msgFragments[1]), msgFragments[2]));
     };
@@ -20768,15 +20774,12 @@ class Join extends mixins.wl {
           onClick: () => loadSubPage('register')
         }, l[5582]), external_React_default().createElement("span", null, l[5585], external_React_default().createElement("a", {
           href: "#",
-          onClick: ev => {
-            ev.preventDefault();
-            mega.ui.showLoginRequiredDialog({
-              minUserType: 3,
-              skipInitialDialog: 1
-            }).done(() => this.setState({
-              view: Join.VIEW.ACCOUNT
-            }));
-          }
+          onClick: () => mega.ui.showLoginRequiredDialog({
+            minUserType: 3,
+            skipInitialDialog: 1
+          }).done(() => this.setState({
+            view: Join.VIEW.ACCOUNT
+          }))
         }, l[171])));
       }
 
@@ -20844,8 +20847,8 @@ class Join extends mixins.wl {
         className: "card"
       }, external_React_default().createElement("div", {
         className: "card-body"
-      }, children, external_React_default().createElement("div", null, external_React_default().createElement("a", {
-        href: "/securechat"
+      }, children, external_React_default().createElement("div", null, external_React_default().createElement(ui_link.Z, {
+        to: "/securechat"
       }, l.how_meetings_work))), external_React_default().createElement("div", {
         className: "card-preview"
       }, external_React_default().createElement(Preview, {
@@ -20940,8 +20943,8 @@ class Join extends mixins.wl {
       className: "sprite-fm-uni icon-error"
     }), external_React_default().createElement("div", {
       className: "unsupported-info"
-    }, external_React_default().createElement("h3", null, "Your browser can't support MEGA meeting"), external_React_default().createElement("h3", null, "You can join meeting via the following approaches:"), external_React_default().createElement("ul", null, external_React_default().createElement("li", null, "Open the link via Chrome version XXX"), external_React_default().createElement("li", null, "Join via Mobile apps ", external_React_default().createElement("a", {
-      href: "#"
+    }, external_React_default().createElement("h3", null, "Your browser can't support MEGA meeting"), external_React_default().createElement("h3", null, "You can join meeting via the following approaches:"), external_React_default().createElement("ul", null, external_React_default().createElement("li", null, "Open the link via Chrome version XXX"), external_React_default().createElement("li", null, "Join via Mobile apps ", external_React_default().createElement(ui_link.Z, {
+      to: "/mobile"
     }, "Download Mobile App")))));
 
     this.View = view => {
@@ -23368,6 +23371,7 @@ var contactsPanel = __webpack_require__(651);
 
 
 
+
 class Start extends mixins.wl {
   constructor(props) {
     super(props);
@@ -23500,9 +23504,8 @@ class Start extends mixins.wl {
     }, external_React_default().createElement("span", null, l[1342]))), external_React_default().createElement(meetings_button.Z, {
       className: "mega-button positive large start-meeting-button",
       onClick: this.startMeeting
-    }, external_React_default().createElement("span", null, l[7315])), external_React_default().createElement("a", {
-      href: "/securechat",
-      className: "clickurl"
+    }, external_React_default().createElement("span", null, l[7315])), external_React_default().createElement(ui_link.Z, {
+      to: "/securechat"
     }, l.how_meetings_work)));
   }
 
@@ -24862,6 +24865,68 @@ const conversations = ({
   ArchivedConversationsList,
   ConversationsApp: ConversationsApp
 });
+
+/***/ }),
+
+/***/ 941:
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.d(__webpack_exports__, {
+"Z": () => (Link)
+});
+var react0__ = __webpack_require__(363);
+var react0 = __webpack_require__.n(react0__);
+var _mixins1__ = __webpack_require__(503);
+
+
+class Link extends _mixins1__.wl {
+  constructor(props) {
+    super(props);
+    this.IS_CLICK_URL = undefined;
+    this.IS_CLICK_URL = this.props.to && this.props.to.startsWith('/');
+  }
+
+  componentDidMount() {
+    super.componentDidMount();
+
+    if (this.IS_CLICK_URL) {
+      clickURLs();
+    }
+  }
+
+  render() {
+    const {
+      className,
+      to,
+      target,
+      children,
+      onClick
+    } = this.props;
+
+    if (this.IS_CLICK_URL) {
+      return react0().createElement("a", {
+        className: "\n                        clickurl\n                        " + (className || '') + "\n                    ",
+        href: to,
+        target: target
+      }, children);
+    }
+
+    return react0().createElement("a", {
+      className: className,
+      href: "#",
+      onClick: ev => {
+        if (onClick) {
+          ev.preventDefault();
+          return onClick(ev);
+        }
+
+        return null;
+      }
+    }, children);
+  }
+
+}
 
 /***/ }),
 

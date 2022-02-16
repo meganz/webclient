@@ -357,20 +357,21 @@ Chat.prototype.init = promisify(function(resolve, reject) {
     const bpcListener = mBroadcaster.addListener("beforepagechange", (page) => {
         // Reduce flickering when coming back to chat + ensure the ContactsPanel's components are properly destroyed
 
-        if (page.indexOf("chat") === -1) {
-            // target page is not chat
-            if (megaChat.routingSection) {
-                if (String(M.currentdirid).substr(0, 4) === "chat") {
-                    // We always want to hide the chat, when the user is not really in chat, so
-                    // we need to reset M.currentdirid, so that on next M.openFolder, it would go and
-                    // reinitialize/reroute the chat. This would solve potential issues with bugs in the type of
-                    // Chat -> Static page -> Chat
-                    delete M.currentdirid;
-                }
-                megaChat.routingParams = megaChat.routingSection = megaChat.routingSubSection = null;
-                // update immediately, otherwise the ConversationsApp may become invisible and no unmounts would be done
-                this.$conversationsAppInstance?.forceUpdate();
+        if (page.includes('chat') && page !== 'securechat') {
+            return;
+        }
+
+        if (megaChat.routingSection) {
+            if (String(M.currentdirid).substr(0, 4) === "chat") {
+                // We always want to hide the chat, when the user is not really in chat, so
+                // we need to reset M.currentdirid, so that on next M.openFolder, it would go and
+                // reinitialize/reroute the chat. This would solve potential issues with bugs in the type of
+                // Chat -> Static page -> Chat
+                delete M.currentdirid;
             }
+            megaChat.routingParams = megaChat.routingSection = megaChat.routingSubSection = null;
+            // update immediately, otherwise the ConversationsApp may become invisible and no unmounts would be done
+            this.$conversationsAppInstance?.forceUpdate();
         }
     });
     this.mbListeners.push(bpcListener);

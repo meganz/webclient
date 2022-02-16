@@ -6,6 +6,7 @@ import Button from '../button.jsx';
 import Preview from './preview.jsx';
 import HistoryPanel from "../../historyPanel.jsx";
 import MeetingsCallEndedDialog from '../meetingsCallEndedDialog.jsx';
+import Link from '../../link.jsx';
 
 export default class Join extends MegaRenderMixin {
     static NAMESPACE = 'join-meeting';
@@ -86,8 +87,11 @@ export default class Join extends MegaRenderMixin {
                 ]}
                 onClose={onCancel}>
                 <p>
-                    {msgFragments[0]}<a href="#" onClick={
-                        () => loadSubPage('register')}>{msgFragments[1]}</a>{msgFragments[2]}
+                    {msgFragments[0]}
+                    <Link to="/register" onClick={() => loadSubPage('register')}>
+                        {msgFragments[1]}
+                    </Link>
+                    {msgFragments[2]}
                 </p>
             </ModalDialogsUI.ModalDialog>
         );
@@ -150,12 +154,13 @@ export default class Join extends MegaRenderMixin {
                         {l[5585] /* `Already have an account?` */}
                         <a
                             href="#"
-                            onClick={ev => {
-                                ev.preventDefault();
+                            onClick={() =>
                                 mega.ui.showLoginRequiredDialog({ minUserType: 3, skipInitialDialog: 1 })
-                                    .done(() => this.setState({ view: Join.VIEW.ACCOUNT }));
-                            }}>
-                            {l[171]}
+                                    .done(() =>
+                                        this.setState({ view: Join.VIEW.ACCOUNT })
+                                    )
+                            }>
+                            {l[171] /* `Login` */}
                         </a>
                     </span>
                 </$$CONTAINER>
@@ -242,7 +247,7 @@ export default class Join extends MegaRenderMixin {
             <div className="card-body">
                 {children}
                 <div>
-                    <a href="/securechat">{l.how_meetings_work}</a>
+                    <Link to="/securechat">{l.how_meetings_work /* `Learn more about MEGA Meetings` */}</Link>
                 </div>
             </div>
             <div className="card-preview">
@@ -334,7 +339,7 @@ export default class Join extends MegaRenderMixin {
                 <h3>You can join meeting via the following approaches:</h3>
                 <ul>
                     <li>Open the link via Chrome version XXX</li>
-                    <li>Join via Mobile apps <a href="#">Download Mobile App</a></li>
+                    <li>Join via Mobile apps <Link to="/mobile">Download Mobile App</Link></li>
                 </ul>
             </div>
         </div>;

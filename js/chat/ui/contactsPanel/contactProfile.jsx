@@ -11,7 +11,8 @@ import {ColumnFavIcon} from "../../../ui/jsx/fm/nodes/columns/columnFavIcon.jsx"
 import {ColumnSharedFolderName} from "../../../ui/jsx/fm/nodes/columns/columnSharedFolderName.jsx";
 import {ColumnSharedFolderAccess} from "../../../ui/jsx/fm/nodes/columns/columnSharedFolderAccess.jsx";
 import {ColumnSharedFolderButtons} from "../../../ui/jsx/fm/nodes/columns/columnSharedFolderButtons.jsx";
-import Nil from "./nil.jsx";
+import Nil from './nil.jsx';
+import Link from '../link.jsx';
 
 export default class ContactProfile extends MegaRenderMixin {
     state = {
@@ -75,7 +76,7 @@ export default class ContactProfile extends MegaRenderMixin {
             <div className="profile-breadcrumb">
                 <ul>
                     <li>
-                        <a onClick={() => loadSubPage('fm/chat/contacts')}>{ContactsPanel.LABEL.CONTACTS}</a>
+                        <Link to="/fm/chat/contacts">{ContactsPanel.LABEL.CONTACTS}</Link>
                         <i className="sprite-fm-mono icon-arrow-right" />
                     </li>
                     <li>

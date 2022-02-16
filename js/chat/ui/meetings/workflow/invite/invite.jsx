@@ -7,6 +7,7 @@ import { PerfectScrollbar } from '../../../../../ui/perfectScrollbar.jsx';
 import Search from './search.jsx';
 import Footer from './footer.jsx';
 import Nil from './nil.jsx';
+import Link from '../../../link.jsx';
 
 export const HAS_CONTACTS = () => {
     const keys = M.u.keys();
@@ -274,16 +275,13 @@ export default class Invite extends MegaRenderMixin {
                                     disabled={!link}>
                                     {!link ? l[7006] /* `Loading...` */ : l[1394] /* `Copy link` */}
                                 </Button>
-                                <a
-                                    href="#"
+                                <Link
                                     className="view-link-control"
-                                    onClick={(e) => {
-                                        this.setState({ field: !field });
-                                        e.preventDefault();
-                                    }}>
+                                    field={field}
+                                    onClick={() => this.setState({ field: !field })}>
                                     {field ? l.collapse_meeting_link : l.expand_meeting_link}
                                     <i className={`sprite-fm-mono ${field ? 'icon-arrow-up' : 'icon-arrow-down'}`} />
-                                </a>
+                                </Link>
                                 {field && link && (
                                     <div className="chat-link-input">
                                         <i className="sprite-fm-mono icon-link"/>

@@ -12,15 +12,10 @@ export default class GenericGrid extends GenericNodePropsComponent {
         let image = null;
         let src = null;
         let isThumbClass = "";
-        if ((is_image(node) || is_video(node)) && node.fa) {
-            src = thumbnails[node.h];
+        if (node.fa && (is_image2(node) || is_video(node))) {
+            src = thumbnails.get(node.fa);
             if (!src) {
-                node.imgId = "chat_" + node[keyProp];
                 this.props.requestThumbnailCb(node);
-
-                if (!node.seen) {
-                    node.seen = 1; // HACK
-                }
                 src = window.noThumbURI || '';
             }
 

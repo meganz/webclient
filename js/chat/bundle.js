@@ -603,7 +603,7 @@ Chat.prototype._syncDnd = function () {
 
       if (dnd && dnd < unixtime()) {
         if (this.logger) {
-          this.logger.debug("Chat.prototype._syncDnd chatId=" + chatId);
+          this.logger.debug(`Chat.prototype._syncDnd chatId=${chatId}`);
         }
 
         pushNotificationSettings.disableDnd(chatId);
@@ -1630,13 +1630,13 @@ Chat.prototype._enqueueImageLoad = function (n) {
       load = !cached;
     }
 
-    if (this._imageLoadCache[n.h]) {
-      this._imageLoadCache[n.h].push(n.ch);
+    if (this._imageLoadCache[n.fa]) {
+      this._imageLoadCache[n.fa].push(n.ch);
     } else {
-      this._imageLoadCache[n.h] = [n.ch];
+      this._imageLoadCache[n.fa] = [n.ch];
 
       if (load) {
-        this._imagesToBeLoaded[n.h] = n;
+        this._imagesToBeLoaded[n.fa] = n;
         dedup = false;
       }
     }
@@ -1649,7 +1649,7 @@ Chat.prototype._enqueueImageLoad = function (n) {
   }
 
   if (cached) {
-    this._doneLoadingImage(n.h);
+    this._doneLoadingImage(n.fa);
   }
 };
 
@@ -1679,7 +1679,7 @@ Chat.prototype._doLoadImages = function () {
     var mime = filemime(node);
 
     if (node.s < LOAD_ORIGINALS[mime]) {
-      originals[node.h] = node;
+      originals[node.fa] = node;
       delete imagesToBeLoaded[k];
     }
   }
@@ -1700,8 +1700,8 @@ Chat.prototype._doLoadImages = function () {
         console.debug('Failed to load original image on chat.', n.h, n, ex);
       }
 
-      imagesToBeLoaded[n.h] = originals[n.h];
-      delete originals[n.h];
+      imagesToBeLoaded[n.fa] = originals[n.fa];
+      delete originals[n.fa];
       delay('ChatRoom[' + self.roomId + ']:origFallback' + type, function () {
         api_getfileattr(imagesToBeLoaded, type, onSuccess, onError);
       });
@@ -1713,13 +1713,13 @@ Chat.prototype._doLoadImages = function () {
       if (typeof handler === 'function') {
         handler(data, buffer => {
           if (buffer) {
-            chatImageParser(n.h, buffer);
+            chatImageParser(n.fa, buffer);
           } else {
             origFallback(EFAILED);
           }
         });
       } else {
-        chatImageParser(n.h, data);
+        chatImageParser(n.fa, data);
       }
     }).catch(origFallback);
   };
@@ -2435,7 +2435,7 @@ Chat.prototype.removeMessagesByRetentionTime = function (chatId) {
   if (this.chats.length > 0) {
     if (chatId) {
       if (this.logger) {
-        this.logger.debug("Chat.prototype.removeMessagesByRetentionTime chatId=" + chatId);
+        this.logger.debug(`Chat.prototype.removeMessagesByRetentionTime chatId=${chatId}`);
       }
 
       var room = this.getChatById(chatId);
@@ -2454,7 +2454,7 @@ Chat.prototype.removeMessagesByRetentionTime = function (chatId) {
 
       if (chatRoom.retentionTime > 0 && chatRoom.state === ChatRoom.STATE.READY) {
         if (this.logger) {
-          this.logger.debug("Chat.prototype.removeMessagesByRetentionTime roomId=" + chatRoom.roomId);
+          this.logger.debug(`Chat.prototype.removeMessagesByRetentionTime roomId=${chatRoom.roomId}`);
         }
 
         chatRoom.removeMessagesByRetentionTime();
@@ -2560,7 +2560,7 @@ Chat.prototype.highlight = (text, matches, dontEscape) => {
     }
 
     regexes = regexes.join('|');
-    text = text.replace(new RegExp(regexes, 'g'), word => "<strong>" + word + "</strong>");
+    text = text.replace(new RegExp(regexes, 'g'), word => `<strong>${word}</strong>`);
     text = text.replace(/\@\@\!\d+\!\@\@/g, match => {
       return tags[parseInt(match.replace("@@!", "").replace("!@@"), 10)];
     });
@@ -3184,16 +3184,16 @@ ChatRoom.prototype.getRetentionLabel = function (retentionTime) {
       return l[7070];
 
     case RETENTION_FORMAT.MONTHS:
-      return months + " " + (months === 1 ? l[913] : l[6788]);
+      return `${months} ${months === 1 ? l[913] : l[6788]}`;
 
     case RETENTION_FORMAT.WEEKS:
-      return days / 7 + " " + (days / 7 === 1 ? l[16292] : l[16293]);
+      return `${days / 7} ${days / 7 === 1 ? l[16292] : l[16293]}`;
 
     case RETENTION_FORMAT.DAYS:
-      return days + " " + (days === 1 ? l[930] : l[16290]);
+      return `${days} ${days === 1 ? l[930] : l[16290]}`;
 
     case RETENTION_FORMAT.HOURS:
-      return secondsToHours(retentionTime) + " " + (secondsToHours(retentionTime) === 1 ? l[7133] : l[7132]);
+      return `${secondsToHours(retentionTime)} ${secondsToHours(retentionTime) === 1 ? l[7133] : l[7132]}`;
   }
 };
 
@@ -5772,7 +5772,7 @@ class ContactButton extends _mixins1__._p {
                 ephemeral_title: title,
                 ephemeral_info: info
               } = l;
-              return msgDialog('info', '', title ? title.replace('%1', name) : name + " is using an ephemeral session.", info);
+              return msgDialog('info', '', title ? title.replace('%1', name) : `${name} is using an ephemeral session.`, info);
             });
           }
         }
@@ -5821,7 +5821,7 @@ class ContactButton extends _mixins1__._p {
     }
 
     if (label) {
-      classes = "user-card-name " + classes;
+      classes = `user-card-name ${classes}`;
       icon = "";
       dropdownPosition = "left bottom";
       vertOffset = 25;
@@ -5832,7 +5832,7 @@ class ContactButton extends _mixins1__._p {
       label = react0().createElement("em", {
         className: "contact-name-loading"
       });
-      classes = "contact-button-loading " + classes;
+      classes = `contact-button-loading ${classes}`;
     }
 
     return this.props.noContextMenu ? react0().createElement("div", {
@@ -5879,7 +5879,10 @@ class ContactVerified extends _mixins1__.wl {
 
       if (verifyState.method >= authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON) {
         return react0().createElement("div", {
-          className: "\n                            user-card-verified\n                            " + (this.props.className || '') + "\n                        "
+          className: `
+                            user-card-verified
+                            ${this.props.className || ''}
+                        `
         }, react0().createElement("i", {
           className: "sprite-fm-mono icon-check"
         }));
@@ -5911,7 +5914,7 @@ class ContactPresence extends _mixins1__.wl {
 
     const pres = megaChat.userPresenceToCssClass(contact.presence);
     return react0().createElement("div", {
-      className: "user-card-presence " + pres + " " + className
+      className: `user-card-presence ${pres} ${className}`
     });
   }
 
@@ -6005,7 +6008,7 @@ class ContactFingerprint extends _mixins1__.wl {
 
     if (infoBlocks.length > 0) {
       fingerprintCode = react0().createElement("div", {
-        className: "dropdown-fingerprint " + (this.props.className || '')
+        className: `dropdown-fingerprint ${this.props.className || ''}`
       }, react0().createElement("div", {
         className: "contact-fingerprint-title"
       }, react0().createElement("span", null, l[6872])), react0().createElement("div", {
@@ -6738,7 +6741,12 @@ class ContactPickerWidget extends _mixins1__.wl {
           key: key,
           className: "button-wrapper"
         }, react0().createElement(_ui_buttons_jsx4__.Button, {
-          className: "\n                                        " + (className || '') + "\n                                        " + (key === 'newChatLink' ? 'branded-blue' : '') + "\n                                        mega-button\n                                        round\n                                    ",
+          className: `
+                                        ${className || ''}
+                                        ${key === 'newChatLink' ? 'branded-blue' : ''}
+                                        mega-button
+                                        round
+                                    `,
           icon: icon,
           onClick: e => {
             closeDropdowns();
@@ -6891,7 +6899,10 @@ class ContactPickerWidget extends _mixins1__.wl {
           }
         }
       }, react0().createElement("span", null, l[101])), react0().createElement("div", {
-        className: "\n                        " + (this.state.publicLink ? '' : 'loading') + "\n                        empty-share-public\n                    "
+        className: `
+                        ${this.state.publicLink ? '' : 'loading'}
+                        empty-share-public
+                    `
       }, react0().createElement("i", {
         className: "sprite-fm-mono icon-link-circle"
       }), react0().createElement("span", {
@@ -6906,9 +6917,15 @@ class ContactPickerWidget extends _mixins1__.wl {
     const searchPlaceholderMsg = totalContactsNum === 1 ? l[23749] : l[23750].replace('[X]', totalContactsNum);
     return react0().createElement("div", {
       ref: this.containerRef,
-      className: "\n                    " + (this.props.className || '') + "\n                    " + extraClasses + "\n                "
+      className: `
+                    ${this.props.className || ''}
+                    ${extraClasses}
+                `
     }, topButtons, multipleContacts, !this.props.readOnly && haveContacts && react0().createElement((react0().Fragment), null, react0().createElement("div", {
-      className: "\n                                contacts-search-header\n                                " + this.props.headerClasses + "\n                            "
+      className: `
+                                contacts-search-header
+                                ${this.props.headerClasses}
+                            `
     }, react0().createElement("i", {
       className: "sprite-fm-mono icon-preview-reveal"
     }), react0().createElement("input", {
@@ -6921,7 +6938,10 @@ class ContactPickerWidget extends _mixins1__.wl {
       onChange: this.onSearchChange,
       value: this.state.searchValue
     }), react0().createElement("div", {
-      className: "\n                                    search-result-clear\n                                    " + (this.state.searchValue && this.state.searchValue.length > 0 ? '' : 'hidden') + "\n                                ",
+      className: `
+                                    search-result-clear
+                                    ${this.state.searchValue && this.state.searchValue.length > 0 ? '' : 'hidden'}
+                                `,
       onClick: () => {
         this.setState({
           searchValue: ''
@@ -7034,10 +7054,14 @@ class Navigation extends mixins.wl {
           onClick: () => {
             let page = key.toLowerCase().split("_")[0];
             page = page === 'contacts' ? '' : page;
-            loadSubPage("fm/chat/contacts/" + page);
+            loadSubPage(`fm/chat/contacts/${page}`);
           }
         }, external_React_default().createElement(buttons.Button, {
-          className: "\n                                                mega-button\n                                                action\n                                                " + activeClass + "\n                                            "
+          className: `
+                                                mega-button
+                                                action
+                                                ${activeClass}
+                                            `
         }, external_React_default().createElement("span", null, LABEL[key]), receivedRequestsCount > 0 && VIEW[key] === VIEW.RECEIVED_REQUESTS && external_React_default().createElement("div", {
           className: "notifications-count"
         }, receivedRequestsCount > 9 ? '9+' : receivedRequestsCount)));
@@ -7183,7 +7207,12 @@ class ColumnContactLastInteraction extends genericNodePropsComponent.L {
         time: undefined
       };
       return external_React_default().createElement("i", {
-        className: "\n                    sprite-fm-mono\n                    " + (parseInt(type, 10) === 0 ? 'icon-cloud' : '') + "\n                    " + (parseInt(type, 10) === 1 ? 'icon-chat' : '') + "\n                    " + (!time ? 'icon-minimise' : '') + "\n                "
+        className: `
+                    sprite-fm-mono
+                    ${parseInt(type, 10) === 0 ? 'icon-cloud' : ''}
+                    ${parseInt(type, 10) === 1 ? 'icon-chat' : ''}
+                    ${!time ? 'icon-minimise' : ''}
+                `
       });
     };
 
@@ -7270,7 +7299,7 @@ class ContextMenu extends mixins.wl {
         className: "dropdown-avatar rounded",
         onClick: e => {
           e.stopPropagation();
-          loadSubPage("fm/chat/contacts/" + contact.h);
+          loadSubPage(`fm/chat/contacts/${contact.h}`);
         }
       }, external_React_default().createElement(contacts.Avatar, {
         contact: contact,
@@ -7287,7 +7316,7 @@ class ContextMenu extends mixins.wl {
             return megaChat.createAndShowGroupRoomFor(selected, '', true, false);
           }
 
-          return loadSubPage("fm/chat/p/" + contact.u);
+          return loadSubPage(`fm/chat/p/${contact.u}`);
         })
       }), external_React_default().createElement(dropdowns.DropdownItem, {
         icon: "sprite-fm-mono icon-send-files",
@@ -7323,7 +7352,7 @@ class ContextMenu extends mixins.wl {
       })), external_React_default().createElement("hr", null), withProfile && external_React_default().createElement(dropdowns.DropdownItem, {
         icon: "sprite-fm-mono icon-my-account",
         label: l[5868],
-        onClick: () => loadSubPage("fm/chat/contacts/" + contact.u)
+        onClick: () => loadSubPage(`fm/chat/contacts/${contact.u}`)
       }), external_React_default().createElement(dropdowns.DropdownItem, {
         icon: "sprite-fm-mono icon-rename",
         label: contact.nickname === '' ? l.set_nickname_label : l.edit_nickname_label,
@@ -7754,7 +7783,10 @@ class ReceivedRequests extends mixins.wl {
         keyProp: "p",
         nodeAdapterProps: {
           'className': node => {
-            return "\n                        " + (node.dts || node.s && node.s === 3 ? 'deleted' : '') + "\n                        " + (node.s && node.s === 1 ? 'ignored' : '') + "\n                    ";
+            return `
+                        ${node.dts || node.s && node.s === 3 ? 'deleted' : ''}
+                        ${node.s && node.s === 1 ? 'ignored' : ''}
+                    `;
           }
         },
         NilComponent: () => {
@@ -8039,7 +8071,7 @@ class ContactProfile extends mixins.wl {
       }
     };
 
-    this.onExpand = handle => loadSubPage("fm/" + handle);
+    this.onExpand = handle => loadSubPage(`fm/${handle}`);
 
     this.Breadcrumb = () => {
       const {
@@ -8069,7 +8101,11 @@ class ContactProfile extends mixins.wl {
         }, l[6872]), external_React_default().createElement("div", {
           className: "credentials-fingerprints"
         }, ContactsPanel.getUserFingerprint(handle)), external_React_default().createElement("button", {
-          className: "\n                            mega-button\n                            small\n                            " + (IS_VERIFIED ? '' : 'positive') + "\n                        ",
+          className: `
+                            mega-button
+                            small
+                            ${IS_VERIFIED ? '' : 'positive'}
+                        `,
           onClick: () => ContactsPanel[IS_VERIFIED ? 'resetCredentials' : 'verifyCredentials'](contact)
         }, IS_VERIFIED ? l[742] : l[7692]));
       }
@@ -8153,7 +8189,7 @@ class ContactProfile extends mixins.wl {
       containerClassName: "grid-table shared-with-me",
       onContextMenu: (ev, handle) => this.handleContextMenu(ev, handle),
       listAdapterColumns: [columnFavIcon.l, [ColumnSharedFolderName, {
-        'label': "" + l.shared_folders_from.replace('%NAME', M.getNameByHandle(this.props.handle))
+        'label': `${l.shared_folders_from.replace('%NAME', M.getNameByHandle(this.props.handle))}`
       }], ColumnSharedFolderAccess, ColumnSharedFolderButtons]
     });
   }
@@ -8194,7 +8230,7 @@ class ContactProfile extends mixins.wl {
         attrs: {
           'data-simpletip': l[8632]
         },
-        onClick: () => loadSubPage("fm/chat/p/" + handle)
+        onClick: () => loadSubPage(`fm/chat/p/${handle}`)
       }), external_React_default().createElement(buttons.Button, {
         className: "mega-button round simpletip",
         icon: "sprite-fm-mono icon-share-filled",
@@ -8717,7 +8753,7 @@ class Breadcrumbs extends mixins.wl {
               key: nodeId,
               onClick: e => this.onBreadcrumbNodeClick(e, nodeId)
             }, external_React_default().createElement("span", {
-              className: "right-arrow-bg simpletip",
+              className: `right-arrow-bg simpletip`,
               "data-simpletip": nodeName
             }, external_React_default().createElement("span", null, nodeName)), k !== 0 && external_React_default().createElement("i", {
               className: "next-arrow sprite-fm-mono icon-arrow-right icon16"
@@ -8738,7 +8774,7 @@ class Breadcrumbs extends mixins.wl {
     }
 
     return external_React_default().createElement("div", {
-      className: "fm-breadcrumbs-wrapper " + (className || "")
+      className: `fm-breadcrumbs-wrapper ${className || ""}`
     }, external_React_default().createElement("div", {
       className: "fm-breadcrumbs-block"
     }, breadcrumbDropdownContents.length ? external_React_default().createElement((external_React_default()).Fragment, null, external_React_default().createElement("div", {
@@ -8908,7 +8944,7 @@ class CloudBrowserDialog extends mixins.wl {
   render() {
     var self = this;
     const viewMode = mega.config.get('cbvm') | 0;
-    const classes = "add-from-cloud " + self.props.className + " dialog-template-tool ";
+    const classes = `add-from-cloud ${self.props.className} dialog-template-tool `;
     let folderIsHighlighted = false;
     let share = false;
     let isSearch = this.state.currentlyViewedEntry === 'search';
@@ -8952,7 +8988,7 @@ class CloudBrowserDialog extends mixins.wl {
       const {
         highlighted
       } = this.state;
-      const className = "" + (share && share.down ? 'disabled' : '');
+      const className = `${share && share.down ? 'disabled' : ''}`;
       const highlightedNode = highlighted && highlighted.length && highlighted[0];
       const allowAttachFolders = this.props.allowAttachFolders && !isIncomingShare;
       buttons.push({
@@ -9029,10 +9065,16 @@ class CloudBrowserDialog extends mixins.wl {
     }, external_React_default().createElement("div", {
       className: "fm-dialog-tabs"
     }, external_React_default().createElement("div", {
-      className: "\n                                    fm-dialog-tab cloud\n                                    " + (self.state.selectedTab === 'clouddrive' ? 'active' : '') + "\n                                ",
+      className: `
+                                    fm-dialog-tab cloud
+                                    ${self.state.selectedTab === 'clouddrive' ? 'active' : ''}
+                                `,
       onClick: () => self.handleTabChange('clouddrive')
     }, l[164]), external_React_default().createElement("div", {
-      className: "\n                                    fm-dialog-tab incoming\n                                    " + (self.state.selectedTab === 'shares' ? 'active' : '') + "\n                                ",
+      className: `
+                                    fm-dialog-tab incoming
+                                    ${self.state.selectedTab === 'shares' ? 'active' : ''}
+                                `,
       onClick: () => self.handleTabChange('shares')
     }, l[5542]), external_React_default().createElement("div", {
       className: "clear"
@@ -9081,7 +9123,9 @@ class CloudBrowserDialog extends mixins.wl {
       fmConfigSortEnabled: true,
       fmConfigSortId: "cbd"
     }), isSearch && breadcrumbPath.length > 0 && external_React_default().createElement("div", {
-      className: "\n                            fm-breadcrumbs-wrapper add-from-cloud breadcrumbs-bottom\n                        "
+      className: `
+                            fm-breadcrumbs-wrapper add-from-cloud breadcrumbs-bottom
+                        `
     }, external_React_default().createElement("div", {
       className: "fm-breadcrumbs-block"
     }, external_React_default().createElement(Breadcrumbs, {
@@ -9344,7 +9388,10 @@ class HistoryRetentionDialog extends external_React_.Component {
       className: "mega-button",
       onClick: this.props.onClose
     }, external_React_default().createElement("span", null, HistoryRetentionDialog.labels.copy.cancel)), external_React_default().createElement("button", {
-      className: "\n                                mega-button positive\n                                " + (hasInput ? '' : 'disabled') + "\n                            ",
+      className: `
+                                mega-button positive
+                                ${hasInput ? '' : 'disabled'}
+                            `,
       onClick: e => hasInput ? this.handleOnClick(e) : false
     }, external_React_default().createElement("span", null, HistoryRetentionDialog.labels.copy.done)))));
   }
@@ -9720,17 +9767,19 @@ class ParticipantsListInner extends mixins.wl {
           }));
         }
 
+        const baseClassName = 'sprite-fm-mono';
+
         switch (room.members[contactHash]) {
           case FULL:
-            dropdownIconClasses = "sprite-fm-mono icon-admin";
+            dropdownIconClasses = `${baseClassName} icon-admin`;
             break;
 
           case OPERATOR:
-            dropdownIconClasses = "sprite-fm-mono icon-chat-filled";
+            dropdownIconClasses = `${baseClassName} icon-chat-filled`;
             break;
 
           case READONLY:
-            dropdownIconClasses = "sprite-fm-mono icon-read-only";
+            dropdownIconClasses = `${baseClassName} icon-read-only`;
             break;
 
           default:
@@ -9830,7 +9879,7 @@ class AbstractGenericMessage extends mixin.y {
     }
 
     return external_React_default().createElement("div", {
-      className: "right-aligned-msg-buttons " + (cnt && cnt > 1 ? "total-" + cnt : '')
+      className: `right-aligned-msg-buttons ${cnt && cnt > 1 ? `total-${cnt}` : ''}`
     }, buttons);
   }
 
@@ -9848,7 +9897,13 @@ class AbstractGenericMessage extends mixin.y {
 
     return external_React_default().createElement("div", {
       "data-id": message.messageId,
-      className: "\n                    " + (this.getClassNames ? this.getClassNames() : grouped ? 'grouped' : '') + "\n                    " + additionalClasses + "\n                    " + message.messageId + "\n                    message\n                    body\n                "
+      className: `
+                    ${this.getClassNames ? this.getClassNames() : grouped ? 'grouped' : ''}
+                    ${additionalClasses}
+                    ${message.messageId}
+                    message
+                    body
+                `
     }, this.getAvatar && this.getAvatar(), external_React_default().createElement("div", {
       className: "message content-area"
     }, this.getName && this.getName(), this.getMessageTimestamp ? this.getMessageTimestamp() : grouped ? null : external_React_default().createElement("div", {
@@ -9893,7 +9948,7 @@ class Local extends AbstractGenericMessage {
 
     this._roomIsGroup = () => this.props.message.chatRoom.type === 'group' || this.props.message.chatRoom.type === 'public';
 
-    this._getParticipantNames = message => message.meta && message.meta.participants && !!message.meta.participants.length && message.meta.participants.map(handle => "[[" + megaChat.plugins.emoticonsFilter.processHtmlMessage(escapeHTML(M.getNameByHandle(handle))) + "]]");
+    this._getParticipantNames = message => message.meta && message.meta.participants && !!message.meta.participants.length && message.meta.participants.map(handle => `[[${megaChat.plugins.emoticonsFilter.processHtmlMessage(escapeHTML(M.getNameByHandle(handle)))}]]`);
 
     this._getExtraInfo = message => {
       const {
@@ -9909,7 +9964,7 @@ class Local extends AbstractGenericMessage {
       let messageExtraInfo = [HAS_PARTICIPANTS ? mega.utils.trans.listToString(participantNames, l[20234]) : ''];
 
       if (ENDED) {
-        messageExtraInfo = [...messageExtraInfo, HAS_PARTICIPANTS ? '. ' : '', HAS_DURATION ? l[7208].replace('[X]', "[[" + secToDuration(meta.duration) + "]]") : ''];
+        messageExtraInfo = [...messageExtraInfo, HAS_PARTICIPANTS ? '. ' : '', HAS_DURATION ? l[7208].replace('[X]', `[[${secToDuration(meta.duration)}]]`) : ''];
       }
 
       return messageExtraInfo && messageExtraInfo.reduce((acc, cur) => (acc + cur).replace(/\[\[/g, '<span class="bold">').replace(/]]/g, '</span>'));
@@ -9973,9 +10028,9 @@ class Local extends AbstractGenericMessage {
 
   _getIcon(message) {
     const MESSAGE_ICONS = {
-      [MESSAGE_TYPE.STARTED]: "<i class=\"call-info-icon sprite-fm-mono icon-phone\">&nbsp;</i>",
-      [MESSAGE_TYPE.ENDED]: "<i class=\"call-info-icon sprite-fm-theme icon-handset-ended\">&nbsp;</i>",
-      DEFAULT: "<i class=\"call-info-icon " + message.cssClass + "\">&nbsp;</i>"
+      [MESSAGE_TYPE.STARTED]: `<i class="${"call-info-icon"} sprite-fm-mono icon-phone">&nbsp;</i>`,
+      [MESSAGE_TYPE.ENDED]: `<i class="${"call-info-icon"} sprite-fm-theme icon-handset-ended">&nbsp;</i>`,
+      DEFAULT: `<i class="${"call-info-icon"} ${message.cssClass}">&nbsp;</i>`
     };
     return MESSAGE_ICONS[message.type] || MESSAGE_ICONS.DEFAULT;
   }
@@ -9990,14 +10045,20 @@ class Local extends AbstractGenericMessage {
     let messageText = (0,messages_utils.l)(message.type, IS_GROUP);
 
     if (!messageText) {
-      return console.error("Message with type: " + message.type + " -- no text string defined. Message: " + message);
+      return console.error(`Message with type: ${message.type} -- no text string defined. Message: ${message}`);
     }
 
     messageText = CallManager2._getMltiStrTxtCntsForMsg(message, messageText.splice ? messageText : [messageText], true);
     message.textContents = String(messageText).replace("[[", "<span class=\"bold\">").replace("]]", "</span>");
 
     if (IS_GROUP) {
-      messageText = "\n                " + this._getIcon(message) + "\n                <div class=\"call-info-content\">\n                    <span class=\"call-info-message bold\">" + messageText + "</span>\n                    " + this._getExtraInfo(message) + "\n                </div>\n            ";
+      messageText = `
+                ${this._getIcon(message)}
+                <div class="call-info-content">
+                    <span class="call-info-message bold">${messageText}</span>
+                    ${this._getExtraInfo(message)}
+                </div>
+            `;
     }
 
     return messageText;
@@ -10008,7 +10069,7 @@ class Local extends AbstractGenericMessage {
       message
     } = this.props;
 
-    if (this._roomIsGroup() && message.type === MESSAGE_TYPE.STARTED && message.messageId === MESSAGE_TYPE.STARTED + "-" + message.chatRoom.getActiveCallMessageId()) {
+    if (this._roomIsGroup() && message.type === MESSAGE_TYPE.STARTED && message.messageId === `${MESSAGE_TYPE.STARTED}-${message.chatRoom.getActiveCallMessageId()}`) {
       const unique = message.chatRoom.uniqueCallParts ? Object.keys(message.chatRoom.uniqueCallParts) : [];
       return unique.map(handle => external_React_default().createElement(ui_contacts.Avatar, {
         key: handle,
@@ -10036,7 +10097,7 @@ class Local extends AbstractGenericMessage {
           className: button.classes,
           onClick: e => button.callback(e.target)
         }, button.icon && external_React_default().createElement("div", null, external_React_default().createElement("i", {
-          className: "small-icon " + button.icon
+          className: `small-icon ${button.icon}`
         })), external_React_default().createElement("span", null, button.text));
       }), external_React_default().createElement("div", {
         className: "clear"
@@ -10057,7 +10118,7 @@ class Local extends AbstractGenericMessage {
     const $$ICON = external_React_default().createElement("div", {
       className: "feedback call-status-block"
     }, external_React_default().createElement("i", {
-      className: "sprite-fm-mono " + message.cssClass
+      className: `sprite-fm-mono ${message.cssClass}`
     }));
     return message.showInitiatorAvatar ? grouped ? null : $$AVATAR : $$ICON;
   }
@@ -10069,7 +10130,7 @@ class Local extends AbstractGenericMessage {
     let debugMsg = "";
 
     if (d && callId) {
-      debugMsg = ": callId: " + callId;
+      debugMsg = `: callId: ${callId}`;
     }
 
     return external_React_default().createElement("div", {
@@ -10157,7 +10218,7 @@ class Contact extends AbstractGenericMessage {
     };
 
     this._getContactAvatar = (contact, className) => external_React_default().createElement(ui_contacts.Avatar, {
-      className: "avatar-wrapper " + className,
+      className: `avatar-wrapper ${className}`,
       contact: M.u[contact.u],
       chatRoom: this.props.chatRoom
     });
@@ -10242,7 +10303,7 @@ class Contact extends AbstractGenericMessage {
     const isAnonView = chatRoom.isAnonymous();
 
     if (!attachmentMeta) {
-      return console.error("Message w/ type: " + message.type + " -- no attachment meta defined. Message: " + message);
+      return console.error(`Message w/ type: ${message.type} -- no attachment meta defined. Message: ${message}`);
     }
 
     let contacts = [];
@@ -10354,7 +10415,7 @@ class Attachment extends AbstractGenericMessage {
           key: "previewButton"
         }, external_React_default().createElement(dropdowns.DropdownItem, {
           label: previewLabel,
-          icon: "sprite-fm-mono " + previewIcon,
+          icon: `sprite-fm-mono ${previewIcon}`,
           onClick: e => this.props.onPreviewStart(v, e)
         }));
       }
@@ -10526,7 +10587,7 @@ class Attachment extends AbstractGenericMessage {
 
         preview = src ? external_React_default().createElement("div", {
           id: v.ch,
-          className: "shared-link thumb " + thumbClass
+          className: `shared-link thumb ${thumbClass}`
         }, thumbOverlay, dropdown, external_React_default().createElement("img", {
           alt: "",
           className: "thumbnail-placeholder " + v.h,
@@ -10648,7 +10709,7 @@ class AudioPlayer extends (external_React_default()).Component {
           newLeft = rightEdge;
         }
 
-        sliderPin.style.left = newLeft + "px";
+        sliderPin.style.left = `${newLeft}px`;
         const pinPosition = newLeft / slider.getBoundingClientRect().width;
         const newTime = Math.ceil(self.props.playtime * pinPosition);
         const newCurrentTime = secondsToTimeShort(newTime);
@@ -10704,7 +10765,7 @@ class AudioPlayer extends (external_React_default()).Component {
         }
       }
     }, external_React_default().createElement("i", {
-      className: "sprite-fm-mono " + btnClass
+      className: `sprite-fm-mono ${btnClass}`
     }));
 
     if (loading) {
@@ -10723,12 +10784,12 @@ class AudioPlayer extends (external_React_default()).Component {
     }, external_React_default().createElement("div", {
       className: "slider__progress",
       style: {
-        width: progressWidth + "%"
+        width: `${progressWidth}%`
       }
     }), external_React_default().createElement("div", {
       className: "slider__progress__pin",
       style: {
-        left: progressWidth + "%"
+        left: `${progressWidth}%`
       },
       ref: sliderPin => {
         this.sliderPin = sliderPin;
@@ -10886,7 +10947,7 @@ class VoiceClip extends AbstractGenericMessage {
         h: voiceClip.h,
         mime: voiceClip.mime,
         playtime: voiceClip.playtime,
-        audioId: "vm" + message.messageId
+        audioId: `vm${message.messageId}`
       }));
     }
   }
@@ -11102,7 +11163,7 @@ function GeoLocation(props) {
 
   const handleOnclick = (lat, lng) => {
     const openGmaps = () => {
-      window.open("https://www.google.com/maps/search/?api=1&query=" + lat + "," + lng, '_blank', 'noopener,noreferrer');
+      window.open(`https://www.google.com/maps/search/?api=1&query=${lat},${lng}`, '_blank', 'noopener,noreferrer');
     };
 
     if (GeoLocationLinks.gmapsConfirmation === -1 || GeoLocationLinks.gmapsConfirmation === false) {
@@ -11642,7 +11703,10 @@ class Result extends mixins.wl {
       onClick
     } = this.props;
     return external_React_default().createElement("div", {
-      className: "\n                    " + NODE_CONTAINER_CLASS + "\n                    " + (onClick ? 'clickable' : '') + "\n                ",
+      className: `
+                    ${NODE_CONTAINER_CLASS}
+                    ${onClick ? 'clickable' : ''}
+                `,
       style: {
         height: parseInt(image.height)
       }
@@ -11650,7 +11714,7 @@ class Result extends mixins.wl {
       ref: this.resultRef,
       className: NODE_CLASS,
       style: {
-        backgroundImage: HAS_INTERSECTION_OBSERVER ? '' : "url(" + image.url + ")"
+        backgroundImage: HAS_INTERSECTION_OBSERVER ? '' : `url(${image.url})`
       },
       "data-url": image.url,
       onClick: onClick
@@ -11700,7 +11764,7 @@ class ResultContainer extends mixins.wl {
             const target = entry.target;
 
             if ((_target$classList = target.classList) != null && _target$classList.contains(NODE_CLASS)) {
-              target.style.backgroundImage = entry.isIntersecting ? "url(" + target.dataset.url + ")" : null;
+              target.style.backgroundImage = entry.isIntersecting ? `url(${target.dataset.url})` : null;
             }
 
             if (entry.isIntersecting && (_target$classList2 = target.classList) != null && _target$classList2.contains(RESULTS_END_CLASS)) {
@@ -11789,7 +11853,7 @@ class ResultContainer extends mixins.wl {
           title
         } = _ref2;
         return external_React_default().createElement(Result, {
-          key: slug + "--" + index,
+          key: `${slug}--${index}`,
           image: fixed_width_downsampled,
           title: title,
           onClick: () => onClick(results[index]),
@@ -11805,7 +11869,7 @@ class ResultContainer extends mixins.wl {
       }, external_React_default().createElement("img", {
         className: "emoji",
         alt: "\\ud83d\\ude10",
-        src: staticpath + "/images/mega/twemojis/2_v2/72x72/1f610.png"
+        src: `${staticpath}/images/mega/twemojis/2_v2/72x72/1f610.png`
       }), external_React_default().createElement("strong", null, LABELS.END_OF_RESULTS)));
     }
 
@@ -11866,13 +11930,13 @@ class GifPanel extends mixins.wl {
 
     this.getFormattedPath = path => {
       const PATH = path + (path.indexOf('?') === -1 ? '?' : '&');
-      const LIMIT = "limit=" + API.LIMIT;
-      return API.HOSTNAME + API.ENDPOINT + "/" + (PATH + LIMIT);
+      const LIMIT = `limit=${API.LIMIT}`;
+      return `${API.HOSTNAME + API.ENDPOINT}/${PATH + LIMIT}`;
     };
 
     this.clickedOutsideComponent = ev => {
       const $target = ev && $(ev.target);
-      return $target.parents(".gif-panel-wrapper").length === 0 && ['.small-icon.tiny-reset', '.small-icon.gif'].every(outsideElement => !$target.is(outsideElement));
+      return $target.parents(`.${GIF_PANEL_CLASS}`).length === 0 && ['.small-icon.tiny-reset', '.small-icon.gif'].every(outsideElement => !$target.is(outsideElement));
     };
 
     this.bindEvents = () => {
@@ -11946,7 +12010,7 @@ class GifPanel extends mixins.wl {
         this.setState(state => ({
           offset: state.offset + API.OFFSET
         }), () => {
-          this.doFetch(searching ? "search?q=" + escape(value) + "&offset=" + this.state.offset : "trending?offset=" + this.state.offset);
+          this.doFetch(searching ? `search?q=${escape(value)}&offset=${this.state.offset}` : `trending?offset=${this.state.offset}`);
         });
       }
     };
@@ -11981,7 +12045,7 @@ class GifPanel extends mixins.wl {
         results: searching ? [] : state.results
       }), () => {
         this.resultContainerRef.scrollToY(0);
-        this.delayProcID = searching ? delay('gif-search', () => this.doFetch("search?q=" + escape(value)), 1600) : null;
+        this.delayProcID = searching ? delay('gif-search', () => this.doFetch(`search?q=${escape(value)}`), 1600) : null;
       });
     };
 
@@ -12104,7 +12168,7 @@ let TypingArea = (_dec = (0,mixins.M9)(60), _dec2 = (0,mixins.M9)(54, true), (_c
       return;
     }
 
-    slug = slug[0] === ':' || slug.substr(-1) === ':' ? slug : ":" + slug + ":";
+    slug = slug[0] === ':' || slug.substr(-1) === ':' ? slug : `:${slug}:`;
     const textarea = $('.messages-textarea', this.$container)[0];
     const cursorPosition = this.getCursorPosition(textarea);
     this.setState({
@@ -12728,7 +12792,7 @@ let TypingArea = (_dec = (0,mixins.M9)(60), _dec2 = (0,mixins.M9)(54, true), (_c
     if (self.props.showButtons === true) {
       buttons = [typingArea_React.createElement(ui_buttons.Button, {
         key: "save",
-        className: "mega-button right positive",
+        className: `${"mega-button right"} positive`,
         label: l[776],
         onClick: self.onSaveClicked.bind(self)
       }), typingArea_React.createElement(ui_buttons.Button, {
@@ -12843,7 +12907,11 @@ let TypingArea = (_dec = (0,mixins.M9)(60), _dec2 = (0,mixins.M9)(54, true), (_c
     }), typingArea_React.createElement("div", {
       className: "chat-textarea " + self.props.className
     }, emojiAutocomplete, self.props.children, self.props.editing ? null : typingArea_React.createElement(ui_buttons.Button, {
-      className: "\n                            popup-button\n                            gif-button\n                            " + (this.state.gifPanelActive ? 'active' : '') + "\n                        ",
+      className: `
+                            popup-button
+                            gif-button
+                            ${this.state.gifPanelActive ? 'active' : ''}
+                        `,
       icon: "small-icon gif",
       disabled: this.props.disabled,
       onClick: () => this.setState(state => ({
@@ -12864,7 +12932,10 @@ let TypingArea = (_dec = (0,mixins.M9)(60), _dec2 = (0,mixins.M9)(54, true), (_c
     }, typingArea_React.createElement("div", {
       className: "messages-textarea-placeholder"
     }, self.state.typedMessage ? null : typingArea_React.createElement(utils.EmojiFormattedContent, null, placeholder)), typingArea_React.createElement("textarea", {
-      className: "\n                            messages-textarea\n                            " + (disabledTextarea ? 'disabled' : '') + "\n                        ",
+      className: `
+                            ${"messages-textarea"}
+                            ${disabledTextarea ? 'disabled' : ''}
+                        `,
       onKeyUp: self.onTypeAreaKeyUp.bind(self),
       onKeyDown: self.onTypeAreaKeyDown.bind(self),
       onBlur: self.onTypeAreaBlur.bind(self),
@@ -12912,7 +12983,10 @@ class Text extends AbstractGenericMessage {
       grouped
     } = this.props;
     const REQUIRES_CONFIRMATION = this.isRichPreview(message) && message.meta.requiresConfirmation && !isBeingEdited() && (message.source === Message.SOURCE.SENT || message.confirmed === true);
-    return "\n            " + (REQUIRES_CONFIRMATION ? 'preview-requires-confirmation-container' : '') + "\n            " + (grouped ? 'grouped' : '') + "\n        ";
+    return `
+            ${REQUIRES_CONFIRMATION ? 'preview-requires-confirmation-container' : ''}
+            ${grouped ? 'grouped' : ''}
+        `;
   }
 
   getMessageActionButtons() {
@@ -13139,7 +13213,7 @@ class Text extends AbstractGenericMessage {
       });
     } else {
       if (message.updated > 0 && !message.metaType) {
-        textMessage = textMessage + " <em class=\"edited\">" + l[8887] + "</em>";
+        textMessage = `${textMessage} <em class="edited">${l[8887]}</em>`;
       }
 
       if (this.props.initTextScrolling) {
@@ -13421,7 +13495,11 @@ class GenericConversationMessage extends mixin.y {
     if (M.getNodeRights(h) > 1) {
       var isFav = M.isFavourite(h);
       arr.push(external_React_default().createElement(dropdowns.DropdownItem, {
-        icon: "\n                        sprite-fm-mono\n                        context\n                        " + (isFav ? 'icon-favourite-removed' : 'icon-favourite') + "\n                    ",
+        icon: `
+                        sprite-fm-mono
+                        context
+                        ${isFav ? 'icon-favourite-removed' : 'icon-favourite'}
+                    `,
         label: isFav ? l[5872] : l[5871],
         isFav: isFav,
         key: "fav",
@@ -13579,7 +13657,7 @@ class GenericConversationMessage extends mixin.y {
         megaChat.trigger('onPostBeforeRenderMessage', evtObj);
 
         if (event.isPropagationStopped()) {
-          this.logger.warn("Event propagation stopped receiving (rendering) of message: " + message);
+          this.logger.warn(`Event propagation stopped receiving (rendering) of message: ${message}`);
           return false;
         }
 
@@ -13724,7 +13802,7 @@ class SharedFileItem extends mixins.wl {
       onClick: () => this.props.isPreviewable ? M.viewMediaFile(node) : M.addDownload([node]),
       onDoubleClick: () => M.addDownload([node])
     }, sharedFilesAccordionPanel_React.createElement("div", {
-      className: "icon-or-thumb " + (thumbnails[node.h] ? "thumb" : "")
+      className: `icon-or-thumb ${thumbnails.has(node.fa) ? "thumb" : ""}`
     }, sharedFilesAccordionPanel_React.createElement("div", {
       className: "medium-file-icon " + icon
     }), sharedFilesAccordionPanel_React.createElement("div", {
@@ -13732,7 +13810,7 @@ class SharedFileItem extends mixins.wl {
       id: this.props.imgId
     }, sharedFilesAccordionPanel_React.createElement("img", {
       alt: "",
-      src: thumbnails[node.h] || ""
+      src: thumbnails.get(node.fa) || ""
     }))), sharedFilesAccordionPanel_React.createElement("div", {
       className: "chat-shared-info"
     }, sharedFilesAccordionPanel_React.createElement("span", {
@@ -13750,19 +13828,19 @@ let SharedFilesAccordionPanel = (sharedFilesAccordionPanel_dec = utils["default"
   eventuallyRenderThumbnails() {
     if (this.allShownNodes) {
       var pending = [];
-      var nodes = this.allShownNodes;
-      var handles = Object.keys(nodes);
+      const nodes = new Map(this.allShownNodes);
 
-      var render = function (h) {
-        if (thumbnails[h]) {
-          var batch = nodes[h];
+      const render = n => {
+        if (thumbnails.has(n.fa)) {
+          const src = thumbnails.get(n.fa);
+          const batch = [...nodes.get(n.fa)];
 
           for (var i = batch.length; i--;) {
-            var n = batch[i];
-            var img = document.getElementById('sharedFiles!' + n.ch);
+            const n = batch[i];
+            let img = document.getElementById(`sharedFiles!${n.ch}`);
 
             if (img && (img = img.querySelector('img'))) {
-              img.src = thumbnails[h];
+              img.src = src;
 
               if (img = Object(img.parentNode).parentNode) {
                 img.classList.add('thumb');
@@ -13774,15 +13852,13 @@ let SharedFilesAccordionPanel = (sharedFilesAccordionPanel_dec = utils["default"
         }
       };
 
-      for (var i = handles.length; i--;) {
-        var h = handles[i];
-
-        if (!render(h)) {
-          pending.push(nodes[h][0]);
+      for (const [, [n]] of nodes) {
+        if (!render(n)) {
+          pending.push(n);
         }
       }
 
-      this.allShownNodes = {};
+      this.allShownNodes.clear();
 
       if (pending.length) {
         fm_thumbnails('standalone', pending, render);
@@ -13791,7 +13867,7 @@ let SharedFilesAccordionPanel = (sharedFilesAccordionPanel_dec = utils["default"
   }
 
   componentWillMount() {
-    this.allShownNodes = {};
+    this.allShownNodes = new MapSet();
   }
 
   componentWillUnmount() {
@@ -13920,13 +13996,7 @@ let SharedFilesAccordionPanel = (sharedFilesAccordionPanel_dec = utils["default"
             }));
 
             if (showThumbnail) {
-              if (self.allShownNodes[node.h]) {
-                if (self.allShownNodes[node.h].indexOf(node) < 0) {
-                  self.allShownNodes[node.h].push(node);
-                }
-              } else {
-                self.allShownNodes[node.h] = [node];
-              }
+              self.allShownNodes.set(node.fa, node);
             }
           });
         }
@@ -14214,7 +14284,12 @@ class ChatlinkDialog extends mixins.wl {
     }, external_React_default().createElement("span", null, l[148]));
     return external_React_default().createElement(modalDialogs.Z.ModalDialog, (0,esm_extends.Z)({}, this.state, {
       title: chatRoom.iAmOperator() && !chatRoom.topic ? l[9080] : '',
-      className: "\n                    chat-rename-dialog\n                    export-chat-links-dialog\n                    group-chat-link\n                    " + (chatRoom.topic ? '' : 'requires-topic') + "\n                ",
+      className: `
+                    chat-rename-dialog
+                    export-chat-links-dialog
+                    group-chat-link
+                    ${chatRoom.topic ? '' : 'requires-topic'}
+                `,
       onClose: this.onClose,
       dialogName: "chat-link-dialog",
       dialogType: chatRoom.iAmOperator() && !chatRoom.topic ? 'main' : 'graphic',
@@ -14267,16 +14342,30 @@ class ChatlinkDialog extends mixins.wl {
       className: "footer-container"
     }, chatRoom.iAmOperator() && chatRoom.publicLink && external_React_default().createElement("button", {
       key: "deleteLink",
-      className: "\n                                    mega-button\n                                    links-button\n                                    " + (this.loading && this.loading.state() === 'pending' ? 'disabled' : '') + "\n                                ",
+      className: `
+                                    mega-button
+                                    links-button
+                                    ${this.loading && this.loading.state() === 'pending' ? 'disabled' : ''}
+                                `,
       onClick: () => {
         chatRoom.updatePublicHandle(1);
         this.onClose();
       }
     }, external_React_default().createElement("span", null, l[20487])), chatRoom.topic ? chatRoom.publicLink ? external_React_default().createElement("button", {
-      className: "\n                                        mega-button\n                                        positive\n                                        copy-to-clipboard\n                                        " + (this.loading && this.loading.state() === 'pending' ? 'disabled' : '') + "\n                                    "
+      className: `
+                                        mega-button
+                                        positive
+                                        copy-to-clipboard
+                                        ${this.loading && this.loading.state() === 'pending' ? 'disabled' : ''}
+                                    `
     }, external_React_default().createElement("span", null, l[63])) : closeButton : chatRoom.iAmOperator() ? external_React_default().createElement("button", {
       key: "setTopic",
-      className: "\n                                        mega-button\n                                        positive\n                                        links-button\n                                        " + (newTopic && $.trim(newTopic) ? '' : 'disabled') + "\n                                    ",
+      className: `
+                                        mega-button
+                                        positive
+                                        links-button
+                                        ${newTopic && $.trim(newTopic) ? '' : 'disabled'}
+                                    `,
       onClick: () => chatRoom.iAmOperator() && chatRoom.setRoomTitle(newTopic)
     }, external_React_default().createElement("span", null, l[20615])) : closeButton)));
   }
@@ -15142,15 +15231,24 @@ class ConversationAVPanel extends mixins.wl {
       }, chatRoom.getCallParticipants().length)), external_React_default().createElement("div", {
         className: "call-header-column"
       }, external_React_default().createElement("i", {
-        className: "\n                                call-switch-view\n                                sprite-fm-mono\n                                " + (IS_GRID ? 'icon-speaker-view' : 'icon-thumbnail-view') + "\n                                " + (EXCEEDS_MAX_PARTICIPANTS || this.haveScreenSharingPeer() ? 'disabled' : '') + "\n                            ",
+        className: `
+                                call-switch-view
+                                sprite-fm-mono
+                                ${IS_GRID ? 'icon-speaker-view' : 'icon-thumbnail-view'}
+                                ${EXCEEDS_MAX_PARTICIPANTS || this.haveScreenSharingPeer() ? 'disabled' : ''}
+                            `,
         onClick: () => EXCEEDS_MAX_PARTICIPANTS || self.setState({
           selectedStreamSid: false,
           viewMode: IS_GRID ? VIEW_MODES.CAROUSEL : VIEW_MODES.GRID
         })
       }), external_React_default().createElement("div", {
-        className: "call-av-counter " + (videoSendersMaxed ? 'limit-reached' : '')
+        className: `call-av-counter ${videoSendersMaxed ? 'limit-reached' : ''}`
       }, videoSessionCount, " / ", RtcModule.kMaxCallVideoSenders), external_React_default().createElement("i", {
-        className: "\n                                sprite-fm-mono\n                                icon-video-call-filled\n                                " + (videoSendersMaxed.video ? 'warn' : '') + "\n                            "
+        className: `
+                                sprite-fm-mono
+                                icon-video-call-filled
+                                ${videoSendersMaxed.video ? 'warn' : ''}
+                            `
       }), external_React_default().createElement("div", {
         className: "call-header-duration",
         "data-room-id": chatRoom.chatId
@@ -15392,7 +15490,11 @@ class ConversationAVPanel extends mixins.wl {
       className: "button call right",
       onClick: this.fullScreenModeToggle.bind(this)
     }, external_React_default().createElement("i", {
-      className: "\n                            sprite-fm-mono\n                            " + (this.state.fullScreenModeEnabled ? 'icon-fullscreen-leave' : 'icon-fullscreen-enter') + "\n                            simpletip\n                        ",
+      className: `
+                            sprite-fm-mono
+                            ${this.state.fullScreenModeEnabled ? 'icon-fullscreen-leave' : 'icon-fullscreen-enter'}
+                            simpletip
+                        `,
       "data-simpletip-class": "in-call theme-light-forced",
       "data-simpletip": this.state.fullScreenModeEnabled ? l[22895] : l[17803]
     }))));
@@ -15525,10 +15627,10 @@ class ModeSwitch extends mixins.wl {
         mode
       } = this.props;
       return external_React_default().createElement("div", {
-        className: ModeSwitch.BASE_CLASS + "-toggle",
+        className: `${ModeSwitch.BASE_CLASS}-toggle`,
         onClick: this.doToggle
       }, external_React_default().createElement(meetings_button.Z, null, external_React_default().createElement("i", {
-        className: "sprite-fm-mono " + this.getModeIcon(mode)
+        className: `sprite-fm-mono ${this.getModeIcon(mode)}`
       }), mode === Call.MODE.THUMBNAIL && external_React_default().createElement("div", null, l.thumbnail_view), mode === Call.MODE.SPEAKER && external_React_default().createElement("div", null, l.main_view)), external_React_default().createElement("i", {
         className: "sprite-fm-mono icon-arrow-down"
       }));
@@ -15540,13 +15642,16 @@ class ModeSwitch extends mixins.wl {
         mode
       } = _ref3;
       return external_React_default().createElement("div", {
-        className: "\n                    " + ModeSwitch.BASE_CLASS + "-option\n                    " + (mode === this.props.mode ? 'active' : '') + "\n                ",
+        className: `
+                    ${ModeSwitch.BASE_CLASS}-option
+                    ${mode === this.props.mode ? 'active' : ''}
+                `,
         onClick: () => {
           this.doToggle();
           this.props.onModeChange(mode);
         }
       }, external_React_default().createElement(meetings_button.Z, null, external_React_default().createElement("i", {
-        className: "sprite-fm-mono " + this.getModeIcon(mode)
+        className: `sprite-fm-mono ${this.getModeIcon(mode)}`
       }), external_React_default().createElement("div", null, label)));
     };
   }
@@ -15574,7 +15679,10 @@ class ModeSwitch extends mixins.wl {
       ref: containerRef,
       className: ModeSwitch.BASE_CLASS
     }, external_React_default().createElement(Toggle, null), external_React_default().createElement("div", {
-      className: "\n                        " + ModeSwitch.BASE_CLASS + "-menu\n                        " + (state.expanded ? 'expanded' : '') + "\n                    "
+      className: `
+                        ${ModeSwitch.BASE_CLASS}-menu
+                        ${state.expanded ? 'expanded' : ''}
+                    `
     }, external_React_default().createElement(Option, {
       label: l.main_view,
       mode: Call.MODE.SPEAKER
@@ -15666,7 +15774,7 @@ class StreamHead extends mixins.wl {
           }
         }
 
-        return moderators.length > 1 ? "<span>" + l.meeting_moderators.replace('%s', '</span> ' + moderators.join(', ')) : "<span>" + l[8875] + ":</span> " + moderators[0];
+        return moderators.length > 1 ? `<span>${l.meeting_moderators.replace('%s', '</span> ' + moderators.join(', '))}` : `<span>${l[8875]}:</span> ${moderators[0]}`;
       }
     };
 
@@ -15708,7 +15816,7 @@ class StreamHead extends mixins.wl {
         onClick: () => {
           if (copyToClipboard(link)) {
             this.toggleBanner(() => {
-              this.delayProcID = delay(StreamHead.NAMESPACE + "-banner", this.toggleBanner, 10000);
+              this.delayProcID = delay(`${StreamHead.NAMESPACE}-banner`, this.toggleBanner, 10000);
             });
           }
         }
@@ -15766,25 +15874,34 @@ class StreamHead extends mixins.wl {
     };
     return external_React_default().createElement("div", {
       ref: this.headRef,
-      className: "\n                    " + NAMESPACE + "\n                    " + (dialog ? 'active' : '') + "\n                "
+      className: `
+                    ${NAMESPACE}
+                    ${dialog ? 'active' : ''}
+                `
     }, dialog && external_React_default().createElement(this.Dialog, null), external_React_default().createElement("div", {
-      className: NAMESPACE + "-content theme-dark-forced"
+      className: `${NAMESPACE}-content theme-dark-forced`
     }, external_React_default().createElement("div", {
-      className: NAMESPACE + "-info"
+      className: `${NAMESPACE}-info`
     }, external_React_default().createElement("div", {
       ref: this.durationRef,
       className: "stream-duration"
     }, this.durationString), external_React_default().createElement("div", {
       ref: this.topicRef,
-      className: "\n                                stream-topic\n                                " + (chatRoom.isMeeting ? 'has-meeting-link' : '') + "\n                            ",
+      className: `
+                                stream-topic
+                                ${chatRoom.isMeeting ? 'has-meeting-link' : ''}
+                            `,
       onClick: () => chatRoom.isMeeting && this.setState({
         dialog: !dialog,
         banner: false
       })
     }, external_React_default().createElement(utils.EmojiFormattedContent, null, chatRoom.getRoomTitle()), chatRoom.isMeeting && external_React_default().createElement("i", {
-      className: "\n                                        sprite-fm-mono\n                                        " + (dialog ? 'icon-arrow-up' : 'icon-arrow-down') + "\n                                    "
+      className: `
+                                        sprite-fm-mono
+                                        ${dialog ? 'icon-arrow-up' : 'icon-arrow-down'}
+                                    `
     }))), external_React_default().createElement("div", {
-      className: NAMESPACE + "-controls"
+      className: `${NAMESPACE}-controls`
     }, external_React_default().createElement(ModeSwitch, {
       mode: mode,
       onModeChange: onModeChange
@@ -15800,7 +15917,7 @@ class StreamHead extends mixins.wl {
       simpletip: { ...SIMPLETIP,
         label: this.fullscreen ? l[22895] : l[17803]
       },
-      icon: "" + (this.fullscreen ? 'icon-fullscreen-leave' : 'icon-fullscreen-enter'),
+      icon: `${this.fullscreen ? 'icon-fullscreen-leave' : 'icon-fullscreen-enter'}`,
       onClick: this.toggleFullscreen
     }, external_React_default().createElement("span", null, this.fullscreen ? l[22895] : l[17803])))));
   }
@@ -15839,7 +15956,7 @@ class StreamNodeMenu extends mixins.wl {
           icon: "sprite-fm-mono icon-chat-filled",
           onClick: () => {
             onCallMinimize();
-            loadSubPage("fm/chat/p/" + userHandle);
+            loadSubPage(`fm/chat/p/${userHandle}`);
           }
         }, external_React_default().createElement("span", null, l[7997]));
       }
@@ -15918,13 +16035,16 @@ class StreamNodeMenu extends mixins.wl {
 
     if (userHandle !== u_handle) {
       return external_React_default().createElement("div", {
-        className: "\n                        " + NAMESPACE + "\n                        theme-dark-forced\n                    "
+        className: `
+                        ${NAMESPACE}
+                        theme-dark-forced
+                    `
       }, external_React_default().createElement("div", {
-        className: NAMESPACE + "-toggle"
+        className: `${NAMESPACE}-toggle`
       }, external_React_default().createElement(utils.EmojiFormattedContent, null, M.getNameByHandle(userHandle)), external_React_default().createElement("i", {
         className: "sprite-fm-mono icon-side-menu"
       })), external_React_default().createElement("div", {
-        className: NAMESPACE + "-content"
+        className: `${NAMESPACE}-content`
       }, external_React_default().createElement("ul", null, [this.Contact, this.Pin, this.Privilege].map((button, index) => external_React_default().createElement("li", {
         key: index
       }, button())))));
@@ -15966,7 +16086,7 @@ let StreamNode = (streamNode_dec = (0,mixins.M9)(30, true), streamNode_dec2 = (0
 
       return external_React_default().createElement("div", {
         className: "video-debug-mode",
-        id: "video-debug-mode-" + stream.clientId
+        id: `video-debug-mode-${stream.clientId}`
       }, stream.clientId, ": ", (_stream$call$sfuApp$r = stream.call.sfuApp.rxStats[stream.clientId]) == null ? void 0 : _stream$call$sfuApp$r.text);
     };
 
@@ -16031,7 +16151,7 @@ let StreamNode = (streamNode_dec = (0,mixins.M9)(30, true), streamNode_dec2 = (0
         "data-simpletipoffset": "5",
         "data-simpletip": label
       }, external_React_default().createElement("i", {
-        className: "sprite-fm-mono " + icon
+        className: `sprite-fm-mono ${icon}`
       }));
     };
 
@@ -16222,7 +16342,13 @@ let StreamNode = (streamNode_dec = (0,mixins.M9)(30, true), streamNode_dec2 = (0
     } = this.props;
     return external_React_default().createElement("div", {
       ref: this.nodeRef,
-      className: "\n                    stream-node\n                    " + (onClick ? 'clickable' : '') + "\n                    " + (className ? className : '') + "\n                    " + (this.state.loading !== StreamNode.LOADING_STATE.LOADED ? 'loading' : '') + "\n                    " + (simpleTip ? 'simpletip' : '') + "\n                ",
+      className: `
+                    stream-node
+                    ${onClick ? 'clickable' : ''}
+                    ${className ? className : ''}
+                    ${this.state.loading !== StreamNode.LOADING_STATE.LOADED ? 'loading' : ''}
+                    ${simpleTip ? 'simpletip' : ''}
+                `,
       "data-simpletip": simpleTip == null ? void 0 : simpleTip.label,
       "data-simpletipposition": simpleTip == null ? void 0 : simpleTip.position,
       "data-simpletipoffset": simpleTip == null ? void 0 : simpleTip.offset,
@@ -16276,7 +16402,13 @@ class SidebarControls extends mixins.wl {
     return external_React_default().createElement("div", {
       className: "sidebar-controls"
     }, external_React_default().createElement("ul", null, external_React_default().createElement("li", null, external_React_default().createElement(meetings_button.Z, {
-      className: "\n                                mega-button\n                                theme-dark-forced\n                                round\n                                large\n                                " + (sidebar && view === Call.VIEW.CHAT ? 'selected' : '') + "\n                            ",
+      className: `
+                                mega-button
+                                theme-dark-forced
+                                round
+                                large
+                                ${sidebar && view === Call.VIEW.CHAT ? 'selected' : ''}
+                            `,
       simpletip: { ...SIMPLETIP,
         label: l.chats
       },
@@ -16285,7 +16417,13 @@ class SidebarControls extends mixins.wl {
     }, external_React_default().createElement("span", null, l.chats)), notifications > 0 && external_React_default().createElement("span", {
       className: "notifications-count"
     }, notifications)), external_React_default().createElement("li", null, external_React_default().createElement(meetings_button.Z, {
-      className: "\n                                mega-button\n                                theme-dark-forced\n                                round\n                                large\n                                " + (sidebar && view === Call.VIEW.PARTICIPANTS ? 'selected' : '') + "\n                            ",
+      className: `
+                                mega-button
+                                theme-dark-forced
+                                round
+                                large
+                                ${sidebar && view === Call.VIEW.PARTICIPANTS ? 'selected' : ''}
+                            `,
       simpletip: { ...SIMPLETIP,
         label: l[16217]
       },
@@ -16324,15 +16462,29 @@ class StreamExtendedControls extends mixins.wl {
       simpletip: { ...SIMPLETIP,
         label: screenSharingLabel
       },
-      className: "\n                        mega-button\n                        theme-light-forced\n                        round\n                        large\n                        " + (this.isActive(SfuClient.Av.Screen) ? 'active' : '') + "\n                    ",
-      icon: "\n                        " + (this.isActive(SfuClient.Av.Screen) ? 'icon-end-screenshare' : 'icon-screen-share') + "\n                    ",
+      className: `
+                        mega-button
+                        theme-light-forced
+                        round
+                        large
+                        ${this.isActive(SfuClient.Av.Screen) ? 'active' : ''}
+                    `,
+      icon: `
+                        ${this.isActive(SfuClient.Av.Screen) ? 'icon-end-screenshare' : 'icon-screen-share'}
+                    `,
       onClick: this.props.onScreenSharingClick
     }, external_React_default().createElement("span", null, screenSharingLabel)), external_React_default().createElement(meetings_button.Z, {
       simpletip: { ...SIMPLETIP,
         label: callHoldLabel,
         position: 'left'
       },
-      className: "\n                        mega-button\n                        theme-light-forced\n                        round\n                        large\n                        " + (this.isActive(SfuClient.Av.onHold) ? 'active' : '') + "\n                    ",
+      className: `
+                        mega-button
+                        theme-light-forced
+                        round
+                        large
+                        ${this.isActive(SfuClient.Av.onHold) ? 'active' : ''}
+                    `,
       icon: this.isActive(SfuClient.Av.onHold) ? 'icon-play' : 'icon-pause',
       onClick: this.props.onHoldClick
     }, external_React_default().createElement("span", null, callHoldLabel)));
@@ -16346,9 +16498,9 @@ class StreamExtendedControls extends mixins.wl {
 const withMicObserver = Component => class extends mixins.wl {
   constructor() {
     super(...arguments);
-    this.namespace = "SO-" + Component.NAMESPACE;
-    this.signalObserver = "onMicSignalDetected." + this.namespace;
-    this.inputObserver = "onNoMicInput." + this.namespace;
+    this.namespace = `SO-${Component.NAMESPACE}`;
+    this.signalObserver = `onMicSignalDetected.${this.namespace}`;
+    this.inputObserver = `onNoMicInput.${this.namespace}`;
     this.state = {
       signal: true
     };
@@ -16367,7 +16519,11 @@ const withMicObserver = Component => class extends mixins.wl {
     }));
 
     this.renderSignalWarning = () => external_React_default().createElement("div", {
-      className: "\n                    " + this.namespace + "\n                    meetings-signal-issue\n                    simpletip\n                ",
+      className: `
+                    ${this.namespace}
+                    meetings-signal-issue
+                    simpletip
+                `,
       "data-simpletip": l.chat_mic_off_tooltip,
       "data-simpletipposition": "top",
       "data-simpletipoffset": "5",
@@ -16451,15 +16607,27 @@ class StreamControls extends mixins.wl {
       simpletip: { ...SIMPLETIP,
         label: audioLabel
       },
-      className: "\n                                mega-button\n                                theme-light-forced\n                                round\n                                large\n                                " + (avFlags & SfuClient.Av.Audio ? '' : 'inactive') + "\n                            ",
-      icon: "" + (avFlags & SfuClient.Av.Audio ? 'icon-audio-filled' : 'icon-audio-off'),
+      className: `
+                                mega-button
+                                theme-light-forced
+                                round
+                                large
+                                ${avFlags & SfuClient.Av.Audio ? '' : 'inactive'}
+                            `,
+      icon: `${avFlags & SfuClient.Av.Audio ? 'icon-audio-filled' : 'icon-audio-off'}`,
       onClick: this.props.onAudioClick
     }, external_React_default().createElement("span", null, audioLabel)), this.props.signal ? null : this.props.renderSignalWarning()), external_React_default().createElement("li", null, external_React_default().createElement(meetings_button.Z, {
       simpletip: { ...SIMPLETIP,
         label: videoLabel
       },
-      className: "\n                                mega-button\n                                theme-light-forced\n                                round\n                                large\n                                " + (avFlags & SfuClient.Av.Camera ? '' : 'inactive') + "\n                            ",
-      icon: "" + (avFlags & SfuClient.Av.Camera ? 'icon-video-call-filled' : 'icon-video-off'),
+      className: `
+                                mega-button
+                                theme-light-forced
+                                round
+                                large
+                                ${avFlags & SfuClient.Av.Camera ? '' : 'inactive'}
+                            `,
+      icon: `${avFlags & SfuClient.Av.Camera ? 'icon-video-call-filled' : 'icon-video-off'}`,
       onClick: this.props.onVideoClick
     }, external_React_default().createElement("span", null, videoLabel))), external_React_default().createElement("li", null, external_React_default().createElement(StreamExtendedControls, {
       call: this.props.call,
@@ -16503,14 +16671,14 @@ class local_Local extends mixins.wl {
     };
 
     this.getRatio = (width, height) => {
-      return width / this.gcd(width, height) + ":" + height / this.gcd(width, height);
+      return `${width / this.gcd(width, height)}:${height / this.gcd(width, height)}`;
     };
 
     this.getRatioClass = () => {
       const {
         ratio
       } = this.state;
-      return ratio ? "ratio-" + ratio.replace(':', '-') : '';
+      return ratio ? `ratio-${ratio.replace(':', '-')}` : '';
     };
 
     this.toggleCollapsedMode = () => {
@@ -16606,15 +16774,15 @@ class Stream extends mixins.wl {
           } = this.DRAGGABLE.POSITION;
 
           if (left < clientWidth / 2) {
-            helper.css('left', left / clientWidth * 100 + "%").css('right', 'unset');
+            helper.css('left', `${left / clientWidth * 100}%`).css('right', 'unset');
           } else {
-            helper.css('left', 'unset').css('right', clientWidth - left - helper.width() + "px");
+            helper.css('left', 'unset').css('right', `${clientWidth - left - helper.width()}px`);
           }
 
           if (top < clientHeight / 2) {
-            helper.css('top', top / clientHeight * 100 + "%").css('bottom', 'unset');
+            helper.css('top', `${top / clientHeight * 100}%`).css('bottom', 'unset');
           } else {
-            helper.css('top', 'unset').css('bottom', clientHeight - top - helper.height() + "px");
+            helper.css('top', 'unset').css('bottom', `${clientHeight - top - helper.height()}px`);
           }
         }
       }
@@ -16731,14 +16899,22 @@ class Stream extends mixins.wl {
         POSITION
       } = this.DRAGGABLE;
       return external_React_default().createElement("div", {
-        className: "\n                     " + local_Local.NAMESPACE + "-options\n                     " + (POSITION.left < 200 ? 'options-top' : '') + "\n                     " + (POSITION.left < 200 && POSITION.top < 100 ? 'options-bottom' : '') + "\n                     theme-dark-forced\n                 "
+        className: `
+                     ${local_Local.NAMESPACE}-options
+                     ${POSITION.left < 200 ? 'options-top' : ''}
+                     ${POSITION.left < 200 && POSITION.top < 100 ? 'options-bottom' : ''}
+                     theme-dark-forced
+                 `
       }, external_React_default().createElement("ul", null, external_React_default().createElement("li", null, external_React_default().createElement(meetings_button.Z, {
         icon: "sprite-fm-mono icon-download-standard",
         onClick: () => this.setState({
           options: false
         }, () => toggleCollapsedMode())
       }, external_React_default().createElement("div", null, l.collapse_self_video))), external_React_default().createElement("li", null, external_React_default().createElement(meetings_button.Z, {
-        icon: "\n                                sprite-fm-mono\n                                " + (IS_SPEAKER_VIEW ? 'icon-thumbnail-view' : 'icon-speaker-view') + "\n                            ",
+        icon: `
+                                sprite-fm-mono
+                                ${IS_SPEAKER_VIEW ? 'icon-thumbnail-view' : 'icon-speaker-view'}
+                            `,
         onClick: () => this.setState({
           options: false
         }, () => {
@@ -16801,9 +16977,16 @@ class Stream extends mixins.wl {
         stream: this.getStreamSource(),
         onLoadedData: onLoadedData
       }), external_React_default().createElement("div", {
-        className: local_Local.NAMESPACE + "-self-overlay"
+        className: `${local_Local.NAMESPACE}-self-overlay`
       }, external_React_default().createElement(meetings_button.Z, {
-        className: "\n                        mega-button\n                        theme-light-forced\n                        action\n                        small\n                        local-stream-options-control\n                        " + (options ? 'active' : '') + "\n                    ",
+        className: `
+                        mega-button
+                        theme-light-forced
+                        action
+                        small
+                        local-stream-options-control
+                        ${options ? 'active' : ''}
+                    `,
         icon: "sprite-fm-mono icon-options",
         onClick: () => this.handleOptionsToggle()
       }), options && this.renderOptionsDialog()));
@@ -16852,7 +17035,12 @@ class Stream extends mixins.wl {
     if (collapsed) {
       return external_React_default().createElement("div", {
         ref: this.containerRef,
-        className: "\n                        " + NAMESPACE + "\n                        collapsed\n                        theme-dark-forced\n                        " + (sidebar && !minimized ? POSITION_MODIFIER : '') + "\n                    ",
+        className: `
+                        ${NAMESPACE}
+                        collapsed
+                        theme-dark-forced
+                        ${sidebar && !minimized ? POSITION_MODIFIER : ''}
+                    `,
         onClick: toggleCollapsedMode
       }, external_React_default().createElement("i", {
         className: "sprite-fm-mono icon-arrow-up"
@@ -16861,12 +17049,19 @@ class Stream extends mixins.wl {
 
     return external_React_default().createElement("div", {
       ref: this.containerRef,
-      className: "\n                    " + NAMESPACE + "\n                    " + (StreamNode.isStreaming(this.getStreamSource()) ? ratioClass : '') + "\n                    " + (IS_MINI_MODE ? 'mini' : '') + "\n                    " + (minimized ? 'minimized' : '') + "\n                    " + (this.state.options ? 'active' : '') + "\n                    " + (sidebar && !minimized ? POSITION_MODIFIER : '') + "\n                ",
+      className: `
+                    ${NAMESPACE}
+                    ${StreamNode.isStreaming(this.getStreamSource()) ? ratioClass : ''}
+                    ${IS_MINI_MODE ? 'mini' : ''}
+                    ${minimized ? 'minimized' : ''}
+                    ${this.state.options ? 'active' : ''}
+                    ${sidebar && !minimized ? POSITION_MODIFIER : ''}
+                `,
       onClick: _ref2 => {
         let {
           target
         } = _ref2;
-        return minimized && target.classList.contains(NAMESPACE + "-overlay") && onCallExpand();
+        return minimized && target.classList.contains(`${NAMESPACE}-overlay`) && onCallExpand();
       }
     }, IS_MINI_MODE && this.renderMiniMode(), !IS_MINI_MODE && this.renderSelfView(), minimized && external_React_default().createElement(__Minimized, (0,esm_extends.Z)({}, this.props, {
       onOptionsToggle: this.handleOptionsToggle
@@ -16929,7 +17124,7 @@ class Minimized extends mixins.wl {
       className: 'theme-dark-forced'
     };
     return external_React_default().createElement((external_React_default()).Fragment, null, external_React_default().createElement("div", {
-      className: local_Local.NAMESPACE + "-overlay"
+      className: `${local_Local.NAMESPACE}-overlay`
     }, external_React_default().createElement(meetings_button.Z, {
       simpletip: { ...SIMPLETIP_PROPS,
         label: l.expand_mini_call
@@ -16941,15 +17136,21 @@ class Minimized extends mixins.wl {
         onCallExpand();
       }
     }), external_React_default().createElement("div", {
-      className: local_Local.NAMESPACE + "-controls"
+      className: `${local_Local.NAMESPACE}-controls`
     }, external_React_default().createElement("div", {
       className: "meetings-signal-container"
     }, external_React_default().createElement(meetings_button.Z, {
       simpletip: { ...SIMPLETIP_PROPS,
         label: audioLabel
       },
-      className: "\n                                    mega-button\n                                    theme-light-forced\n                                    round\n                                    large\n                                    " + (this.isActive(SfuClient.Av.Audio) ? '' : 'inactive') + "\n                                ",
-      icon: "" + (this.isActive(SfuClient.Av.Audio) ? 'icon-audio-filled' : 'icon-audio-off'),
+      className: `
+                                    mega-button
+                                    theme-light-forced
+                                    round
+                                    large
+                                    ${this.isActive(SfuClient.Av.Audio) ? '' : 'inactive'}
+                                `,
+      icon: `${this.isActive(SfuClient.Av.Audio) ? 'icon-audio-filled' : 'icon-audio-off'}`,
       onClick: ev => {
         ev.stopPropagation();
         onAudioClick();
@@ -16958,8 +17159,16 @@ class Minimized extends mixins.wl {
       simpletip: { ...SIMPLETIP_PROPS,
         label: videoLabel
       },
-      className: "\n                                mega-button\n                                theme-light-forced\n                                round\n                                large\n                                " + (this.isActive(SfuClient.Av.Camera) ? '' : 'inactive') + "\n                            ",
-      icon: "\n                                " + (this.isActive(SfuClient.Av.Camera) ? 'icon-video-call-filled' : 'icon-video-off') + "\n                            ",
+      className: `
+                                mega-button
+                                theme-light-forced
+                                round
+                                large
+                                ${this.isActive(SfuClient.Av.Camera) ? '' : 'inactive'}
+                            `,
+      icon: `
+                                ${this.isActive(SfuClient.Av.Camera) ? 'icon-video-call-filled' : 'icon-video-off'}
+                            `,
       onClick: ev => {
         ev.stopPropagation();
         onVideoClick();
@@ -16979,7 +17188,7 @@ class Minimized extends mixins.wl {
         onCallEnd();
       }
     }, external_React_default().createElement("span", null, l[5884])))), unread ? external_React_default().createElement("div", {
-      className: local_Local.NAMESPACE + "-notifications"
+      className: `${local_Local.NAMESPACE}-notifications`
     }, external_React_default().createElement(meetings_button.Z, {
       className: "mega-button round large chat-control",
       icon: "icon-chat-filled"
@@ -17003,9 +17212,13 @@ class ParticipantsNotice extends mixins.wl {
     super(props);
 
     this.renderUserAlone = () => external_React_default().createElement("div", {
-      className: "\n                " + ParticipantsNotice.NAMESPACE + "\n                theme-dark-forced\n                user-alone\n            "
+      className: `
+                ${ParticipantsNotice.NAMESPACE}
+                theme-dark-forced
+                user-alone
+            `
     }, external_React_default().createElement("div", {
-      className: ParticipantsNotice.NAMESPACE + "-heading"
+      className: `${ParticipantsNotice.NAMESPACE}-heading`
     }, external_React_default().createElement("h1", null, l.only_one_here)));
 
     this.renderUserWaiting = () => {
@@ -17014,11 +17227,15 @@ class ParticipantsNotice extends mixins.wl {
         onInviteToggle
       } = this.props;
       return external_React_default().createElement("div", {
-        className: "\n                    " + ParticipantsNotice.NAMESPACE + "\n                    " + (chatRoom.isMeeting ? '' : 'user-alone') + "\n                    theme-dark-forced\n                "
+        className: `
+                    ${ParticipantsNotice.NAMESPACE}
+                    ${chatRoom.isMeeting ? '' : 'user-alone'}
+                    theme-dark-forced
+                `
       }, external_React_default().createElement("div", {
-        className: ParticipantsNotice.NAMESPACE + "-heading"
+        className: `${ParticipantsNotice.NAMESPACE}-heading`
       }, external_React_default().createElement("h1", null, l.waiting_for_others)), chatRoom.isMeeting && external_React_default().createElement("div", {
-        className: ParticipantsNotice.NAMESPACE + "-content"
+        className: `${ParticipantsNotice.NAMESPACE}-content`
       }, external_React_default().createElement("h3", null, l.copy_and_share), external_React_default().createElement("div", {
         className: "mega-input with-icon box-style"
       }, external_React_default().createElement("i", {
@@ -17117,7 +17334,7 @@ class stream_Stream extends mixins.wl {
 
     this.handleMouseOut = () => {
       if (this.state.hovered) {
-        this.delayProcID = delay("stream-hover", () => {
+        this.delayProcID = delay(`${NAMESPACE}-hover`, () => {
           if (this.isMounted()) {
             this.setState({
               hovered: false
@@ -17135,7 +17352,7 @@ class stream_Stream extends mixins.wl {
 
       if (call.isPublic) {
         chatRoom.updatePublicHandle(undefined, () => this.setState({
-          link: chatRoom.publicLink ? getBaseUrl() + "/" + chatRoom.publicLink : l[20660]
+          link: chatRoom.publicLink ? `${getBaseUrl()}/${chatRoom.publicLink}` : l[20660]
         }));
       }
 
@@ -17223,10 +17440,10 @@ class stream_Stream extends mixins.wl {
           return _this.scaleNodes(4);
         }
 
-        let cache = viewMode + ":" + targetWidth + ":" + targetHeight + ":" + nodeRefsLength + ":" + rows + ":" + streamCountInUI + ":" + columns;
+        let cache = `${viewMode}:${targetWidth}:${targetHeight}:${nodeRefsLength}:${rows}:${streamCountInUI}:${columns}`;
 
         for (let i = 0; i < nodeRefsLength; i++) {
-          cache += nodeRefs[i].cacheKey + ":";
+          cache += `${nodeRefs[i].cacheKey}:`;
         }
 
         if (_this.lastRescaledCache === cache) {
@@ -17239,12 +17456,12 @@ class stream_Stream extends mixins.wl {
           const node = nodeRefs[i];
 
           if (node && node.ref) {
-            node.ref.style.width = targetWidth + "px";
-            node.ref.style.height = targetHeight + "px";
+            node.ref.style.width = `${targetWidth}px`;
+            node.ref.style.height = `${targetHeight}px`;
           }
         }
 
-        container.style.width = targetWidth * columns + "px";
+        container.style.width = `${targetWidth * columns}px`;
       }
     };
 
@@ -17280,7 +17497,7 @@ class stream_Stream extends mixins.wl {
                 e.stopPropagation();
                 onThumbnailDoubleClick(streamNode);
               },
-              key: mode + "_" + stream.clientId + "_" + cacheKey,
+              key: `${mode}_${stream.clientId}_${cacheKey}`,
               stream: stream,
               didMount: ref => {
                 this.nodeRefs.push({
@@ -17310,7 +17527,10 @@ class stream_Stream extends mixins.wl {
         }, this.chunks.map((chunk, i) => {
           return external_React_default().createElement("div", {
             key: i,
-            className: "\n                                        carousel-page\n                                        " + (i === page ? 'active' : '') + "\n                                    "
+            className: `
+                                        carousel-page
+                                        ${i === page ? 'active' : ''}
+                                    `
           }, chunk.map(stream => external_React_default().createElement(StreamNode, {
             key: stream.clientId,
             stream: stream,
@@ -17377,7 +17597,10 @@ class stream_Stream extends mixins.wl {
 
       const streamContainer = content => external_React_default().createElement("div", {
         ref: this.containerRef,
-        className: "\n                    stream-container\n                    " + (streams.length === 0 ? 'with-notice' : '') + "\n                "
+        className: `
+                    ${NAMESPACE}-container
+                    ${streams.length === 0 ? 'with-notice' : ''}
+                `
       }, content);
 
       if (streams.length === 0) {
@@ -17456,7 +17679,11 @@ class stream_Stream extends mixins.wl {
     } = this.props;
     return external_React_default().createElement("div", {
       ref: this.wrapperRef,
-      className: "\n                    stream\n                    " + (sidebar ? '' : 'full') + "\n                    " + (hovered ? 'hovered' : '') + "\n                ",
+      className: `
+                    ${NAMESPACE}
+                    ${sidebar ? '' : 'full'}
+                    ${hovered ? 'hovered' : ''}
+                `,
       onMouseMove: this.handleMouseMove,
       onMouseOut: this.handleMouseOut
     }, minimized ? null : external_React_default().createElement((external_React_default()).Fragment, null, external_React_default().createElement(StreamHead, {
@@ -18379,7 +18606,7 @@ let HistoryPanel = (historyPanel_dec = utils["default"].SoonFcWrap(50), historyP
     } = this.props;
     window.addEventListener('resize', this.handleWindowResize);
     window.addEventListener('keydown', this.handleKeyDown);
-    this.$container = $(".conversation-panel[data-room-id=\"" + chatRoom.chatId + "\"]");
+    this.$container = $(`.conversation-panel[data-room-id="${chatRoom.chatId}"]`);
     this.eventuallyInit();
     chatRoom.trigger('onHistoryPanelComponentDidMount');
 
@@ -18937,7 +19164,7 @@ let HistoryPanel = (historyPanel_dec = utils["default"].SoonFcWrap(50), historyP
     }
 
     return external_React_default().createElement((external_React_default()).Fragment, null, external_React_default().createElement("div", {
-      className: "messages scroll-area " + (this.props.className ? this.props.className : '')
+      className: `messages scroll-area ${this.props.className ? this.props.className : ''}`
     }, external_React_default().createElement("div", {
       className: "dropdown body dropdown-arrow down-arrow tooltip not-sent-notification-manual hidden"
     }, external_React_default().createElement("i", {
@@ -18990,7 +19217,10 @@ let HistoryPanel = (historyPanel_dec = utils["default"].SoonFcWrap(50), historyP
       style: {
         top: "50%"
       },
-      className: "\n                                                        loading-spinner js-messages-loading light manual-management\n                                                        " + (this.loadingShown ? '' : 'hidden') + "\n                                                    "
+      className: `
+                                                        loading-spinner js-messages-loading light manual-management
+                                                        ${this.loadingShown ? '' : 'hidden'}
+                                                    `
     }, external_React_default().createElement("div", {
       className: "main-loader",
       style: {
@@ -19031,7 +19261,10 @@ class Collapse extends mixins.wl {
         expanded: !state.expanded
       }))
     }, external_React_default().createElement("i", {
-      className: "\n                                sprite-fm-mono\n                                " + (expanded ? 'icon-arrow-down' : 'icon-arrow-up') + "\n                            "
+      className: `
+                                sprite-fm-mono
+                                ${expanded ? 'icon-arrow-down' : 'icon-arrow-up'}
+                            `
     }), external_React_default().createElement("h5", null, heading), badge !== undefined && badge > 0 && external_React_default().createElement("span", {
       className: "participants-count"
     }, badge)), expanded && children);
@@ -19091,13 +19324,19 @@ class Participant extends mixins.wl {
     }), external_React_default().createElement("div", {
       className: "name"
     }, external_React_default().createElement(utils.EmojiFormattedContent, null, name), handle === u_handle && external_React_default().createElement("span", null, l.me), chatRoom.isMeeting && Call.isModerator(chatRoom, handle) && external_React_default().createElement("span", null, external_React_default().createElement("i", {
-      className: this.baseIconClass + " icon-admin"
+      className: `${this.baseIconClass} icon-admin`
     }))), external_React_default().createElement("div", {
       className: "status"
     }, external_React_default().createElement("i", {
-      className: "\n                            " + this.baseIconClass + "\n                            " + (this.audioMuted() ? 'icon-audio-off inactive' : 'icon-audio-filled') + "\n                         "
+      className: `
+                            ${this.baseIconClass}
+                            ${this.audioMuted() ? 'icon-audio-off inactive' : 'icon-audio-filled'}
+                         `
     }), external_React_default().createElement("i", {
-      className: "\n                            " + this.baseIconClass + "\n                            " + (this.videoMuted() ? 'icon-video-off inactive' : 'icon-video-call-filled') + "\n                        "
+      className: `
+                            ${this.baseIconClass}
+                            ${this.videoMuted() ? 'icon-video-off inactive' : 'icon-video-call-filled'}
+                        `
     })));
   }
 
@@ -19121,7 +19360,10 @@ class Participants extends mixins.wl {
       heading: l[16217],
       badge: streams.length + 1
     }), external_React_default().createElement("div", {
-      className: "\n                            participants-list\n                            " + (guest ? 'guest' : '') + "\n                        "
+      className: `
+                            participants-list
+                            ${guest ? 'guest' : ''}
+                        `
     }, external_React_default().createElement(perfectScrollbar.F, {
       options: {
         'suppressScrollX': true
@@ -19132,7 +19374,7 @@ class Participants extends mixins.wl {
       handle: u_handle,
       name: M.getNameByHandle(u_handle)
     })), streams.map((stream, i) => external_React_default().createElement("li", {
-      key: stream.clientId + "_" + i
+      key: `${stream.clientId}_${i}`
     }, external_React_default().createElement(Participant, {
       chatRoom: chatRoom,
       stream: stream,
@@ -19227,7 +19469,10 @@ class Sidebar extends mixins.wl {
         className: 'theme-dark-forced'
       };
       return external_React_default().createElement("div", {
-        className: "\n                    sidebar-streams-container\n                    " + (guest ? 'guest' : '') + "\n                "
+        className: `
+                    sidebar-streams-container
+                    ${guest ? 'guest' : ''}
+                `
       }, external_React_default().createElement(perfectScrollbar.F, {
         options: {
           'suppressScrollX': true
@@ -19244,7 +19489,10 @@ class Sidebar extends mixins.wl {
         simpleTip: { ...SIMPLE_TIP,
           label: l[8885]
         },
-        className: "\n                                    " + (call.isSharingScreen() ? '' : 'local-stream-mirrored') + "\n                                    " + (forcedLocal ? 'active' : '') + "\n                                ",
+        className: `
+                                    ${call.isSharingScreen() ? '' : 'local-stream-mirrored'}
+                                    ${forcedLocal ? 'active' : ''}
+                                `,
         onClick: () => {
           mBroadcaster.sendMessage('meetings:collapse');
           onSpeakerChange(localStream);
@@ -19306,7 +19554,10 @@ class Sidebar extends mixins.wl {
       onGuestClose
     } = this.props;
     return external_React_default().createElement("div", {
-      className: "\n                    sidebar\n                    " + (view === Call.VIEW.CHAT ? 'chat-opened' : 'theme-dark-forced') + "\n                "
+      className: `
+                    sidebar
+                    ${view === Call.VIEW.CHAT ? 'chat-opened' : 'theme-dark-forced'}
+                `
     }, this.renderHead(), view === Call.VIEW.PARTICIPANTS && mode === Call.MODE.SPEAKER && this.renderSpeakerMode(), view === Call.VIEW.CHAT && this.renderChatView(), view === Call.VIEW.PARTICIPANTS && mode === Call.MODE.THUMBNAIL && this.renderParticipantsView(), guest && view !== Call.VIEW.CHAT && external_React_default().createElement(Guest, {
       onGuestClose: onGuestClose
     }));
@@ -19329,7 +19580,7 @@ class Search extends mixins.wl {
       onChange
     } = this.props;
     return external_React_default().createElement("div", {
-      className: Invite.NAMESPACE + "-field"
+      className: `${Invite.NAMESPACE}-field`
     }, external_React_default().createElement("i", {
       className: "sprite-fm-mono icon-preview-reveal"
     }), external_React_default().createElement("input", {
@@ -19369,7 +19620,11 @@ class Footer extends mixins.wl {
       className: "mega-button",
       onClick: onClose
     }, l[82]), external_React_default().createElement(meetings_button.Z, {
-      className: "\n                            mega-button\n                            positive\n                            " + (selected.length > 0 ? '' : 'disabled') + "\n                        ",
+      className: `
+                            mega-button
+                            positive
+                            ${selected.length > 0 ? '' : 'disabled'}
+                        `,
       onClick: onAdd
     }, l.add)));
   }
@@ -19386,7 +19641,7 @@ class nil_Nil extends mixins.wl {
 
   render() {
     return external_React_default().createElement("div", {
-      className: Invite.NAMESPACE + "-nil"
+      className: `${Invite.NAMESPACE}-nil`
     }, external_React_default().createElement("div", {
       className: "fm-empty-contacts-bg"
     }), external_React_default().createElement("h2", null, HAS_CONTACTS() ? l[8674] : l[784]));
@@ -19535,7 +19790,11 @@ class Invite extends mixins.wl {
           key: userHandle,
           contact: M.u[userHandle],
           chatRoom: false,
-          className: "\n                        contacts-search\n                        short\n                        " + (selected.includes(userHandle) ? 'selected' : '') + "\n                    ",
+          className: `
+                        contacts-search
+                        short
+                        ${selected.includes(userHandle) ? 'selected' : ''}
+                    `,
           noContextButton: true,
           noContextMenu: true,
           selectable: true,
@@ -19565,7 +19824,11 @@ class Invite extends mixins.wl {
             key: userHandle,
             contact: contact,
             chatRoom: false,
-            className: "\n                            contacts-search\n                            short\n                            " + (selected.includes(userHandle) ? 'selected' : '') + "\n                        ",
+            className: `
+                            contacts-search
+                            short
+                            ${selected.includes(userHandle) ? 'selected' : ''}
+                        `,
             noContextButton: true,
             noContextMenu: true,
             selectable: true,
@@ -19609,7 +19872,7 @@ class Invite extends mixins.wl {
 
     this.renderLoading = () => {
       return external_React_default().createElement("div", {
-        className: Invite.NAMESPACE + "-loading"
+        className: `${Invite.NAMESPACE}-loading`
       }, external_React_default().createElement("h2", null, "Loading"));
     };
 
@@ -19622,7 +19885,7 @@ class Invite extends mixins.wl {
         chatRoom.updatePublicHandle(undefined, () => {
           if (this.isMounted()) {
             this.setState({
-              link: chatRoom.publicLink ? getBaseUrl() + "/" + chatRoom.publicLink : l[20660]
+              link: chatRoom.publicLink ? `${getBaseUrl()}/${chatRoom.publicLink}` : l[20660]
             });
           }
         });
@@ -19659,11 +19922,14 @@ class Invite extends mixins.wl {
     const IS_MEETING = chatRoom && chatRoom.isMeeting;
     return external_React_default().createElement(modalDialogs.Z.ModalDialog, (0,esm_extends.Z)({}, this.state, {
       name: NAMESPACE,
-      className: "\n                    " + NAMESPACE + "\n                    dialog-template-tool\n                ",
+      className: `
+                    ${NAMESPACE}
+                    dialog-template-tool
+                `,
       hideOverlay: true,
       onClose: onClose
     }), external_React_default().createElement("div", {
-      className: NAMESPACE + "-head"
+      className: `${NAMESPACE}-head`
     }, external_React_default().createElement("h2", null, IS_MEETING ? l.invite_participants : l[8726]), IS_MEETING && external_React_default().createElement((external_React_default()).Fragment, null, external_React_default().createElement("p", null, l.copy_and_share), external_React_default().createElement("div", {
       className: "link-input-container"
     }, external_React_default().createElement(meetings_button.Z, {
@@ -19680,7 +19946,7 @@ class Invite extends mixins.wl {
         e.preventDefault();
       }
     }, field ? l.collapse_meeting_link : l.expand_meeting_link, external_React_default().createElement("i", {
-      className: "sprite-fm-mono " + (field ? 'icon-arrow-up' : 'icon-arrow-down')
+      className: `sprite-fm-mono ${field ? 'icon-arrow-up' : 'icon-arrow-down'}`
     })), field && link && external_React_default().createElement("div", {
       className: "chat-link-input"
     }, external_React_default().createElement("i", {
@@ -19697,7 +19963,7 @@ class Invite extends mixins.wl {
     })), external_React_default().createElement("div", {
       className: "fm-dialog-body"
     }, external_React_default().createElement("div", {
-      className: NAMESPACE + "-contacts"
+      className: `${NAMESPACE}-contacts`
     }, loading ? this.renderLoading() : this.renderContent())), external_React_default().createElement(Footer, {
       selected: selected,
       onAdd: this.handleAdd,
@@ -20016,7 +20282,7 @@ class Call extends mixins.wl {
       onInviteToggle: this.handleInviteToggle
     };
     return external_React_default().createElement("div", {
-      className: "meetings-call " + (minimized ? 'minimized' : '')
+      className: `meetings-call ${minimized ? 'minimized' : ''}`
     }, external_React_default().createElement(stream_Stream, (0,esm_extends.Z)({}, STREAM_PROPS, {
       sfuApp: sfuApp,
       minimized: minimized,
@@ -20109,7 +20375,7 @@ class Loading extends mixins.wl {
 
       if (chatRoom && chatRoom.sfuApp) {
         return external_React_default().createElement("div", {
-          className: Loading.NAMESPACE + "-debug"
+          className: `${Loading.NAMESPACE}-debug`
         }, external_React_default().createElement("div", null, "callId: ", chatRoom.sfuApp.callId), external_React_default().createElement("div", null, "roomId: ", chatRoom.sfuApp.room.roomId), external_React_default().createElement("div", null, "isMeeting: ", chatRoom.sfuApp.room.isMeeting ? 'true' : 'false'));
       }
     };
@@ -20138,7 +20404,7 @@ class Loading extends mixins.wl {
     return external_React_default().createElement("div", {
       className: Loading.NAMESPACE
     }, external_React_default().createElement("div", {
-      className: Loading.NAMESPACE + "-content"
+      className: `${Loading.NAMESPACE}-content`
     }, external_React_default().createElement("span", null, external_React_default().createElement("i", {
       className: "sprite-fm-mono icon-video-call-filled"
     })), external_React_default().createElement("h3", null, title || l.starting), external_React_default().createElement("div", {
@@ -20259,28 +20525,43 @@ class Preview extends mixins.wl {
       className: 'theme-dark-forced'
     };
     return external_React_default().createElement("div", {
-      className: "\n                    " + NAMESPACE + "\n                    local-stream-mirrored\n                "
+      className: `
+                    ${NAMESPACE}
+                    local-stream-mirrored
+                `
     }, video && external_React_default().createElement("div", {
-      className: NAMESPACE + "-video-overlay"
+      className: `${NAMESPACE}-video-overlay`
     }), external_React_default().createElement("video", {
       className: video ? 'streaming' : '',
       muted: true,
       autoPlay: true,
       ref: this.videoRef
     }), !video && this.renderAvatar(), external_React_default().createElement("div", {
-      className: NAMESPACE + "-controls"
+      className: `${NAMESPACE}-controls`
     }, external_React_default().createElement(meetings_button.Z, {
       simpletip: { ...SIMPLETIP_PROPS,
         label: audio ? l[16214] : l[16708]
       },
-      className: "\n                            mega-button\n                            round\n                            large\n                            theme-light-forced\n                            " + (audio ? '' : 'inactive') + "\n                        ",
+      className: `
+                            mega-button
+                            round
+                            large
+                            theme-light-forced
+                            ${audio ? '' : 'inactive'}
+                        `,
       icon: audio ? 'icon-audio-filled' : 'icon-audio-off',
       onClick: () => this.toggleStream(Preview.STREAMS.AUDIO)
     }, external_React_default().createElement("span", null, audio ? l[16214] : l[16708])), external_React_default().createElement(meetings_button.Z, {
       simpletip: { ...SIMPLETIP_PROPS,
         label: video ? l[22894] : l[22893]
       },
-      className: "\n                            mega-button\n                            round\n                            large\n                            theme-light-forced\n                            " + (video ? '' : 'inactive') + "\n                        ",
+      className: `
+                            mega-button
+                            round
+                            large
+                            theme-light-forced
+                            ${video ? '' : 'inactive'}
+                        `,
       icon: video ? 'icon-video-call-filled' : 'icon-video-off',
       onClick: () => this.toggleStream(Preview.STREAMS.VIDEO)
     }, external_React_default().createElement("span", null, video ? l[22894] : l[22893]))));
@@ -20451,11 +20732,14 @@ class Join extends mixins.wl {
       var _this$props$chatRoom;
 
       return external_React_default().createElement("div", {
-        className: Join.NAMESPACE + "-head"
+        className: `${Join.NAMESPACE}-head`
       }, external_React_default().createElement("div", {
-        className: Join.NAMESPACE + "-logo"
+        className: `${Join.NAMESPACE}-logo`
       }, external_React_default().createElement("i", {
-        className: "\n                            sprite-fm-illustration-wide\n                            " + (document.body.classList.contains('theme-dark') ? 'mega-logo-dark' : 'img-mega-logo-light') + "\n                        "
+        className: `
+                            sprite-fm-illustration-wide
+                            ${document.body.classList.contains('theme-dark') ? 'mega-logo-dark' : 'img-mega-logo-light'}
+                        `
       })), external_React_default().createElement("h1", null, external_React_default().createElement(utils.EmojiFormattedContent, null, l.you_have_invitation.replace('%1', (_this$props$chatRoom = this.props.chatRoom) == null ? void 0 : _this$props$chatRoom.topic))), isEphemeral() && external_React_default().createElement("div", {
         className: "ephemeral-info"
       }, external_React_default().createElement("i", {
@@ -20469,7 +20753,7 @@ class Join extends mixins.wl {
           children
         } = _ref2;
         return external_React_default().createElement((external_React_default()).Fragment, null, external_React_default().createElement("div", {
-          className: Join.NAMESPACE + "-content"
+          className: `${Join.NAMESPACE}-content`
         }, children), this.Chat());
       };
 
@@ -20531,7 +20815,10 @@ class Join extends mixins.wl {
         preview
       } = this.state;
       return external_React_default().createElement("div", {
-        className: "\n                    " + Join.NAMESPACE + "-chat\n                    " + (preview ? 'expanded' : '') + "\n                "
+        className: `
+                    ${Join.NAMESPACE}-chat
+                    ${preview ? 'expanded' : ''}
+                `
       }, external_React_default().createElement("div", {
         className: "chat-content"
       }, external_React_default().createElement("div", {
@@ -20577,7 +20864,11 @@ class Join extends mixins.wl {
         children
       } = _ref4;
       return external_React_default().createElement("div", {
-        className: "\n                    mega-input\n                    title-ontop\n                    " + ((_this$state$name = this.state[name]) != null && _this$state$name.length ? 'valued' : '') + "\n                "
+        className: `
+                    mega-input
+                    title-ontop
+                    ${(_this$state$name = this.state[name]) != null && _this$state$name.length ? 'valued' : ''}
+                `
       }, external_React_default().createElement("div", {
         className: "mega-input-title"
       }, children, external_React_default().createElement("span", {
@@ -20601,7 +20892,13 @@ class Join extends mixins.wl {
     }, l[1096]), external_React_default().createElement(this.Field, {
       name: "lastName"
     }, l[1097])), external_React_default().createElement(meetings_button.Z, {
-      className: "\n                    mega-button\n                    positive\n                    large\n                    " + (this.state.firstName.length && this.state.lastName.length ? '' : 'disabled') + "\n                    " + (this.state.joining && " loading disabled") + "\n                ",
+      className: `
+                    mega-button
+                    positive
+                    large
+                    ${this.state.firstName.length && this.state.lastName.length ? '' : 'disabled'}
+                    ${this.state.joining && " loading disabled"}
+                `,
       onClick: () => {
         if (this.state.joining) {
           return;
@@ -20626,7 +20923,7 @@ class Join extends mixins.wl {
     }, l.join_chat_button));
 
     this.Account = () => external_React_default().createElement(this.Card, null, external_React_default().createElement("h4", null, l.join_meeting), external_React_default().createElement(meetings_button.Z, {
-      className: "mega-button positive large " + (this.state.joining && " loading disabled"),
+      className: `mega-button positive large ${this.state.joining && " loading disabled"}`,
       onClick: () => {
         if (!this.state.joining) {
           this.setState({
@@ -20912,7 +21209,11 @@ class ConversationRightArea extends mixins.wl {
       dontShowTruncateButton = true;
     }
 
-    const renameButtonClass = "\n            link-button\n            light\n            " + (Call.isGuest() || room.isReadOnly() || !room.iAmOperator() ? 'disabled' : '') + "\n        ";
+    const renameButtonClass = `
+            link-button
+            light
+            ${Call.isGuest() || room.isReadOnly() || !room.iAmOperator() ? 'disabled' : ''}
+        `;
     let participantsList = null;
 
     if (room.type === "group" || room.type === "public") {
@@ -20955,12 +21256,22 @@ class ConversationRightArea extends mixins.wl {
     const pushSettingsBtn = !is_chatlink && room.membersSetFromApi.members.hasOwnProperty(u_handle) && external_React_default().createElement("div", {
       className: "push-settings"
     }, AVseperator, external_React_default().createElement(ui_buttons.Button, {
-      className: "\n                        link-button\n                        light\n                        push-settings-button\n                        " + (Call.isGuest() ? 'disabled' : '') + "\n                    ",
-      icon: "\n                        sprite-fm-mono\n                        " + pushSettingsIcon + "\n                    ",
+      className: `
+                        link-button
+                        light
+                        push-settings-button
+                        ${Call.isGuest() ? 'disabled' : ''}
+                    `,
+      icon: `
+                        sprite-fm-mono
+                        ${pushSettingsIcon}
+                    `,
       label: l[16709],
       secondLabel: (() => {
         if (pushSettingsValue !== null && pushSettingsValue !== undefined) {
-          return pushSettingsValue === 0 ? PushSettingsDialog.options[Infinity] : l[23539].replace('%s', "<strong>\n                                        " + escapeHTML(unixtimeToTimeString(pushSettingsValue)) + "\n                                    </strong>");
+          return pushSettingsValue === 0 ? PushSettingsDialog.options[Infinity] : l[23539].replace('%s', `<strong>
+                                        ${escapeHTML(unixtimeToTimeString(pushSettingsValue))}
+                                    </strong>`);
         }
       })(),
       secondLabelClass: "label--green",
@@ -21030,7 +21341,10 @@ class ConversationRightArea extends mixins.wl {
       isVisible: self.props.chatRoom.isCurrentlyActive,
       chatRoom: self.props.chatRoom
     }, external_React_default().createElement("div", {
-      className: "\n                        chat-right-pad\n                        " + (room.haveActiveCall() ? 'in-call' : '') + "\n                    "
+      className: `
+                        chat-right-pad
+                        ${room.haveActiveCall() ? 'in-call' : ''}
+                    `
     }, external_React_default().createElement(Accordion, {
       chatRoom: room,
       onToggle: SoonFc(20, function () {
@@ -21074,7 +21388,11 @@ class ConversationRightArea extends mixins.wl {
     }, external_React_default().createElement("i", {
       className: "sprite-fm-mono icon-rename"
     }), external_React_default().createElement("span", null, l[9080])) : null, room.type === "public" ? external_React_default().createElement("div", {
-      className: "\n                                                link-button\n                                                light\n                                                " + (Call.isGuest() ? 'disabled' : '') + "\n                                            ",
+      className: `
+                                                link-button
+                                                light
+                                                ${Call.isGuest() ? 'disabled' : ''}
+                                            `,
       onClick: e => {
         if ($(e.target).closest('.disabled').length > 0) {
           return false;
@@ -21122,7 +21440,11 @@ class ConversationRightArea extends mixins.wl {
         self.props.onAttachFromComputerClicked();
       }
     }))), pushSettingsBtn, endCallButton, external_React_default().createElement("div", {
-      className: "\n                                    link-button\n                                    light\n                                    " + (dontShowTruncateButton || !room.members.hasOwnProperty(u_handle) ? 'disabled' : '') + "\n                                ",
+      className: `
+                                    link-button
+                                    light
+                                    ${dontShowTruncateButton || !room.members.hasOwnProperty(u_handle) ? 'disabled' : ''}
+                                `,
       onClick: e => {
         if ($(e.target).closest('.disabled').length > 0) {
           return false;
@@ -21148,7 +21470,11 @@ class ConversationRightArea extends mixins.wl {
     }, external_React_default().createElement("i", {
       className: "sprite-fm-mono icon-key"
     }), external_React_default().createElement("span", null, l[20623])), external_React_default().createElement("p", null, external_React_default().createElement("span", null, l[20454]))) : null, AVseperator, external_React_default().createElement("div", {
-      className: "\n                                        link-button\n                                        light\n                                        " + ((room.members.hasOwnProperty(u_handle) || room.state === ChatRoom.STATE.LEFT) && !is_chatlink ? '' : 'disabled') + "\n                                    ",
+      className: `
+                                        link-button
+                                        light
+                                        ${(room.members.hasOwnProperty(u_handle) || room.state === ChatRoom.STATE.LEFT) && !is_chatlink ? '' : 'disabled'}
+                                    `,
       onClick: e => {
         if ($(e.target).closest('.disabled').length > 0) {
           return false;
@@ -21163,9 +21489,16 @@ class ConversationRightArea extends mixins.wl {
         }
       }
     }, external_React_default().createElement("i", {
-      className: "\n                                            sprite-fm-mono\n                                            " + (room.isArchived() ? 'icon-unarchive' : 'icon-archive') + "\n                                        "
+      className: `
+                                            sprite-fm-mono
+                                            ${room.isArchived() ? 'icon-unarchive' : 'icon-archive'}
+                                        `
     }), external_React_default().createElement("span", null, room.isArchived() ? l[19065] : l[16689])), room.type !== "private" ? external_React_default().createElement("div", {
-      className: "\n                                            link-button\n                                            light\n                                            " + (room.type !== "private" && !is_chatlink && room.membersSetFromApi.members.hasOwnProperty(u_handle) && room.membersSetFromApi.members[u_handle] !== -1 && !room.activeCall ? '' : 'disabled') + "\n                                        ",
+      className: `
+                                            link-button
+                                            light
+                                            ${room.type !== "private" && !is_chatlink && room.membersSetFromApi.members.hasOwnProperty(u_handle) && room.membersSetFromApi.members[u_handle] !== -1 && !room.activeCall ? '' : 'disabled'}
+                                        `,
       onClick: e => {
         if ($(e.target).closest('.disabled').length > 0) {
           return false;
@@ -22142,7 +22475,11 @@ let ConversationPanel = (conversationpanel_dec = utils["default"].SoonFcWrap(360
     }, external_React_default().createElement("i", {
       className: "small-icon conversations"
     }), l[8882])), external_React_default().createElement("div", {
-      className: "\n                            chat-topic-block\n                            " + topicBlockClass + "\n                            " + (room.haveActiveCall() ? 'in-call' : '') + "\n                        "
+      className: `
+                            chat-topic-block
+                            ${topicBlockClass}
+                            ${room.haveActiveCall() ? 'in-call' : ''}
+                        `
     }, external_React_default().createElement("div", {
       className: "chat-topic-buttons"
     }, external_React_default().createElement(ui_buttons.Button, {
@@ -22151,11 +22488,19 @@ let ConversationPanel = (conversationpanel_dec = utils["default"].SoonFcWrap(360
       icon: "sprite-fm-mono icon-info-filled",
       onClick: () => room.megaChat.toggleUIFlag('convPanelCollapse')
     }), external_React_default().createElement(ui_buttons.Button, {
-      className: "\n                                    button\n                                    right\n                                    " + (startCallDisabled ? 'disabled' : '') + "\n                                ",
+      className: `
+                                    button
+                                    right
+                                    ${startCallDisabled ? 'disabled' : ''}
+                                `,
       icon: "sprite-fm-mono icon-video-call-filled",
       onClick: () => !startCallDisabled && room.startVideoCall()
     }), external_React_default().createElement(ui_buttons.Button, {
-      className: "\n                                    button\n                                    right\n                                    " + (startCallDisabled ? 'disabled' : '') + "\n                                ",
+      className: `
+                                    button
+                                    right
+                                    ${startCallDisabled ? 'disabled' : ''}
+                                `,
       icon: "sprite-fm-mono icon-phone",
       onClick: () => !startCallDisabled && room.startAudioCall()
     })), topicInfo), external_React_default().createElement("div", {
@@ -22266,7 +22611,10 @@ class ConversationPanels extends mixins.wl {
       }, external_React_default().createElement("div", {
         className: "chat-right-pad"
       }, contactsList, contactsListOffline))), external_React_default().createElement("div", {
-        className: "\n                            fm-empty-section\n                            " + (hasContacts ? 'empty-messages' : 'empty-conversations') + "\n                        "
+        className: `
+                            fm-empty-section
+                            ${hasContacts ? 'empty-messages' : 'empty-conversations'}
+                        `
       }, external_React_default().createElement("div", {
         className: "fm-empty-pad"
       }, external_React_default().createElement("i", {
@@ -22310,7 +22658,7 @@ class ResultTable extends mixins.wl {
       heading
     } = this.props;
     return external_React_default().createElement("div", {
-      className: "result-table " + (heading ? '' : 'nil')
+      className: `result-table ${heading ? '' : 'nil'}`
     }, heading ? external_React_default().createElement("div", {
       className: "result-table-heading"
     }, heading) : null, this.props.children);
@@ -22325,8 +22673,8 @@ class ResultTable extends mixins.wl {
 
 
 
-const SEARCH_ROW_CLASS = "result-table-row";
-const USER_CARD_CLASS = "user-card";
+const SEARCH_ROW_CLASS = `result-table-row`;
+const USER_CARD_CLASS = `user-card`;
 
 const roomIsGroup = room => room && room.type === 'group' || room.type === 'public';
 
@@ -22368,7 +22716,7 @@ class MessageRow extends mixins.wl {
     const contact = room.getParticipantsExceptMe();
     const summary = data.renderableSummary || room.messagesBuff.getRenderableSummary(data);
     return external_React_default().createElement("div", {
-      className: "result-table-row message",
+      className: `${SEARCH_ROW_CLASS} message`,
       onClick: () => openResult(room, data.messageId, index)
     }, external_React_default().createElement("div", {
       className: "message-result-avatar"
@@ -22499,7 +22847,7 @@ const NilRow = _ref => {
     isFirstQuery
   } = _ref;
   return external_React_default().createElement("div", {
-    className: "result-table-row nil"
+    className: `${SEARCH_ROW_CLASS} nil`
   }, external_React_default().createElement("div", {
     className: "nil-container"
   }, external_React_default().createElement("i", {
@@ -22700,17 +23048,17 @@ class searchField_SearchField extends mixins.wl {
       switch (this.props.status) {
         case STATUS.IN_PROGRESS:
           return external_React_default().createElement("div", {
-            className: "search-field-status searching info"
+            className: `${SEARCH_STATUS_CLASS} searching info`
           }, LABEL.DECRYPTING_RESULTS);
 
         case STATUS.PAUSED:
           return external_React_default().createElement("div", {
-            className: "search-field-status paused info"
+            className: `${SEARCH_STATUS_CLASS} paused info`
           }, LABEL.SEARCH_PAUSED);
 
         case STATUS.COMPLETED:
           return external_React_default().createElement("div", {
-            className: "search-field-status complete success"
+            className: `${SEARCH_STATUS_CLASS} complete success`
           }, LABEL.SEARCH_COMPLETE);
 
         default:
@@ -22734,12 +23082,12 @@ class searchField_SearchField extends mixins.wl {
             className: "progress-controls",
             onClick: onToggle
           }, external_React_default().createElement("i", {
-            className: "sprite-fm-mono icon-pause"
+            className: `${BASE_ICON_CLASS} icon-pause`
           }));
 
         case STATUS.PAUSED:
           return external_React_default().createElement("i", {
-            className: "sprite-fm-mono icon-resume",
+            className: `${BASE_ICON_CLASS} icon-resume`,
             onClick: onToggle,
             onMouseOver: handleHover,
             onMouseOut: handleHover
@@ -22770,7 +23118,7 @@ class searchField_SearchField extends mixins.wl {
     return external_React_default().createElement("div", {
       className: "search-field"
     }, external_React_default().createElement("i", {
-      className: "sprite-fm-mono icon-preview-reveal search-icon-find"
+      className: `${BASE_ICON_CLASS} icon-preview-reveal search-icon-find`
     }), external_React_default().createElement("input", {
       type: "search",
       autoComplete: "off",
@@ -22787,7 +23135,11 @@ class searchField_SearchField extends mixins.wl {
         onChange(ev);
       }
     }), searching && external_React_default().createElement("i", {
-      className: "\n                            sprite-fm-mono\n                            icon-close-component\n                            search-icon-reset\n                        ",
+      className: `
+                            ${BASE_ICON_CLASS}
+                            icon-close-component
+                            search-icon-reset
+                        `,
       onClick: onReset
     }), searching && status && external_React_default().createElement((external_React_default()).Fragment, null, this.renderStatusControls(), this.renderStatusBanner()));
   }
@@ -22829,7 +23181,7 @@ const ACTIONS = {
   PAUSE: 'pause',
   RESUME: 'resume'
 };
-const SEARCH_PANEL_CLASS = "search-panel";
+const SEARCH_PANEL_CLASS = `search-panel`;
 class SearchPanel extends mixins.wl {
   constructor(props) {
     super(props);
@@ -22976,7 +23328,10 @@ class SearchPanel extends mixins.wl {
       results
     } = this.state;
     return external_React_default().createElement("div", {
-      className: "\n                    search-panel\n                    " + (searching ? 'expanded' : '') + "\n                "
+      className: `
+                    ${SEARCH_PANEL_CLASS}
+                    ${searching ? 'expanded' : ''}
+                `
     }, external_React_default().createElement(searchField_SearchField, {
       value: value,
       searching: searching,
@@ -23048,11 +23403,11 @@ class Start extends mixins.wl {
       previousTopic: undefined
     }));
 
-    this.bindEvents = () => $(document).rebind("mousedown." + Start.NAMESPACE, ev => {
+    this.bindEvents = () => $(document).rebind(`mousedown.${Start.NAMESPACE}`, ev => {
       if (this.state.editing && !ev.target.classList.contains(Start.CLASS_NAMES.EDIT) && !ev.target.classList.contains(Start.CLASS_NAMES.INPUT)) {
         this.toggleEdit();
       }
-    }).rebind("keyup." + Start.NAMESPACE, _ref => {
+    }).rebind(`keyup.${Start.NAMESPACE}`, _ref => {
       let {
         keyCode
       } = _ref;
@@ -23101,7 +23456,7 @@ class Start extends mixins.wl {
 
   componentWillUnmount() {
     super.componentWillUnmount();
-    $(document).unbind("." + Start.NAMESPACE);
+    $(document).unbind(`.${Start.NAMESPACE}`);
   }
 
   render() {
@@ -23119,17 +23474,23 @@ class Start extends mixins.wl {
       stopKeyPropagation: editing,
       onClose: () => this.props.onClose()
     }), external_React_default().createElement("div", {
-      className: NAMESPACE + "-preview"
+      className: `${NAMESPACE}-preview`
     }, external_React_default().createElement(Preview, {
       onToggle: this.onStreamToggle
     })), external_React_default().createElement("div", {
       className: "fm-dialog-body"
     }, external_React_default().createElement("div", {
-      className: NAMESPACE + "-title"
+      className: `${NAMESPACE}-title`
     }, editing ? external_React_default().createElement(this.Input, null) : external_React_default().createElement("h2", {
       onClick: this.toggleEdit
     }, external_React_default().createElement(utils.EmojiFormattedContent, null, topic)), external_React_default().createElement(meetings_button.Z, {
-      className: "\n                                mega-button\n                                action\n                                small\n                                " + CLASS_NAMES.EDIT + "\n                                " + (editing ? 'editing' : '') + "\n                            ",
+      className: `
+                                mega-button
+                                action
+                                small
+                                ${CLASS_NAMES.EDIT}
+                                ${editing ? 'editing' : ''}
+                            `,
       icon: "icon-rename",
       simpletip: {
         label: l[1342],
@@ -23598,8 +23959,19 @@ class ConversationsHead extends mixins.wl {
       className: "contacts-toggle"
     }, conversations_React.createElement(ui_buttons.Button, {
       receivedRequestCount: receivedRequestsCount,
-      className: "\n                                    mega-button\n                                    round\n                                    branded-blue\n                                    contacts-toggle-button\n                                    " + (contactsActive ? 'active' : '') + "\n                                    " + (receivedRequestsCount > 0 ? 'requests' : '') + "\n                                ",
-      icon: "\n                                    sprite-fm-mono\n                                    icon-contacts\n                                    " + (CONTACTS_ACTIVE ? '' : 'active') + "\n                                ",
+      className: `
+                                    mega-button
+                                    round
+                                    branded-blue
+                                    contacts-toggle-button
+                                    ${contactsActive ? 'active' : ''}
+                                    ${receivedRequestsCount > 0 ? 'requests' : ''}
+                                `,
+      icon: `
+                                    sprite-fm-mono
+                                    icon-contacts
+                                    ${CONTACTS_ACTIVE ? '' : 'active'}
+                                `,
       onClick: () => loadSubPage(CONTACTS_ACTIVE ? ROUTES.CHAT : ROUTES.CONTACTS)
     }, !!receivedRequestsCount && conversations_React.createElement("div", {
       className: "notifications-count"
@@ -23958,14 +24330,14 @@ class ArchivedConversationsList extends mixins.wl {
     }, conversations_React.createElement("div", {
       className: "is-chat name"
     }, l[86], conversations_React.createElement("i", {
-      className: nameOrderClass ? "sprite-fm-mono icon-arrow-" + nameOrderClass : ''
+      className: nameOrderClass ? `sprite-fm-mono icon-arrow-${nameOrderClass}` : ''
     }))), conversations_React.createElement("th", {
       width: "330",
       onClick: self.onSortTimeClicked
     }, conversations_React.createElement("div", {
       className: "is-chat arrow interaction " + timerOrderClass
     }, l[5904], conversations_React.createElement("i", {
-      className: timerOrderClass ? "sprite-fm-mono icon-arrow-" + timerOrderClass : ''
+      className: timerOrderClass ? `sprite-fm-mono icon-arrow-${timerOrderClass}` : ''
     })))))), conversations_React.createElement("div", {
       className: "grid-scrolling-table archive-chat-list"
     }, conversations_React.createElement("div", {
@@ -24411,7 +24783,7 @@ let ConversationsApp = (conversations_dec3 = utils["default"].SoonFcWrap(80), (c
 
     let meetingsCallEndedDialog = this.createMeetingEndDlgIfNeeded();
     const rightPane = conversations_React.createElement("div", {
-      className: "fm-right-files-block in-chat " + (is_chatlink ? " chatlink" : ""),
+      className: `fm-right-files-block in-chat ${is_chatlink ? " chatlink" : ""}`,
       style: rightPaneStyles
     }, loadingOrEmpty, !isLoading && megaChat.routingSection === "archived" && conversations_React.createElement(ArchivedConversationsList, {
       key: "archivedchats"
@@ -24440,7 +24812,12 @@ let ConversationsApp = (conversations_dec3 = utils["default"].SoonFcWrap(80), (c
       key: "conversationsApp",
       className: "conversationsApp"
     }, startGroupChatDialog, startMeetingDialog, conversations_React.createElement("div", {
-      className: "\n                        fm-left-panel\n                        chat-lp-body\n                        " + (is_chatlink && 'hidden' || '') + "\n                        " + (megaChat._joinDialogIsShown && 'hidden' || '') + "\n                    ",
+      className: `
+                        fm-left-panel
+                        chat-lp-body
+                        ${is_chatlink && 'hidden' || ''}
+                        ${megaChat._joinDialogIsShown && 'hidden' || ''}
+                    `,
       style: leftPanelStyles
     }, conversations_React.createElement("div", {
       className: "left-pane-drag-handle"
@@ -24457,7 +24834,11 @@ let ConversationsApp = (conversations_dec3 = utils["default"].SoonFcWrap(80), (c
         megaChat.$chatTreePanePs = ref;
       }
     }, megaChat.chats.length > 0 && conversations_React.createElement("div", {
-      className: "\n                                    content-panel\n                                    conversations\n                                    active\n                                "
+      className: `
+                                    content-panel
+                                    conversations
+                                    active
+                                `
     }, conversations_React.createElement("span", {
       className: "heading"
     }, l.contacts_and_groups), conversations_React.createElement(ConversationsList, {
@@ -24505,12 +24886,12 @@ class Group extends _mixins1__.wl {
       expanded: false
     };
 
-    this.toggleEvents = () => this.state.expanded ? $(document).rebind("mousedown." + Group.NAMESPACE, ev => !this.containerRef.current.contains(ev.target) && this.doToggle()).rebind("keydown." + Group.NAMESPACE, _ref => {
+    this.toggleEvents = () => this.state.expanded ? $(document).rebind(`mousedown.${Group.NAMESPACE}`, ev => !this.containerRef.current.contains(ev.target) && this.doToggle()).rebind(`keydown.${Group.NAMESPACE}`, _ref => {
       let {
         keyCode
       } = _ref;
       return keyCode && keyCode === 27 && this.doToggle();
-    }) : $(document).unbind("." + Group.NAMESPACE);
+    }) : $(document).unbind(`.${Group.NAMESPACE}`);
 
     this.doToggle = () => this.setState(state => ({
       expanded: !state.expanded
@@ -24530,18 +24911,25 @@ class Group extends _mixins1__.wl {
         ref: this.containerRef,
         className: Group.BASE_CLASS
       }, react0().createElement("div", {
-        className: "\n                            " + Group.BASE_CLASS + "-menu\n                            " + (this.state.expanded ? 'expanded' : '') + "\n                        ",
+        className: `
+                            ${Group.BASE_CLASS}-menu
+                            ${this.state.expanded ? 'expanded' : ''}
+                        `,
         onClick: this.doToggle
       }, children.map((item, index) => react0().createElement("div", {
         key: index,
-        className: Group.BASE_CLASS + "-item"
+        className: `${Group.BASE_CLASS}-item`
       }, item))), react0().createElement("button", {
         className: "mega-button theme-light-forced round large",
         onClick: this.doToggle
       }, active && react0().createElement("div", {
         className: "active-indicator"
       }), react0().createElement("i", {
-        className: "\n                                sprite-fm-mono\n                                " + (screenSharing ? 'icon-end-screenshare' : '') + "\n                                " + (!onHold && !screenSharing && 'icon-options') + "\n                            "
+        className: `
+                                sprite-fm-mono
+                                ${screenSharing ? 'icon-end-screenshare' : ''}
+                                ${!onHold && !screenSharing && 'icon-options'}
+                            `
       })));
     }
 
@@ -24578,7 +24966,10 @@ class Button extends _mixins1__.wl {
     } = this.props;
     return react0().createElement("button", {
       ref: this.buttonRef,
-      className: "\n                    " + (className ? className : '') + "\n                    " + (simpletip ? 'simpletip' : '') + "\n                ",
+      className: `
+                    ${className ? className : ''}
+                    ${simpletip ? 'simpletip' : ''}
+                `,
       style: style,
       "data-simpletip": simpletip == null ? void 0 : simpletip.label,
       "data-simpletipposition": simpletip == null ? void 0 : simpletip.position,
@@ -24586,7 +24977,7 @@ class Button extends _mixins1__.wl {
       "data-simpletip-class": simpletip == null ? void 0 : simpletip.className,
       onClick: onClick
     }, icon && react0().createElement("i", {
-      className: "sprite-fm-mono " + icon
+      className: `sprite-fm-mono ${icon}`
     }), children);
   }
 
@@ -24671,13 +25062,13 @@ class Incoming extends _mixins1__.wl {
       }), react0().createElement("div", {
         className: "fm-dialog-body"
       }, react0().createElement("div", {
-        className: NAMESPACE + "-avatar"
+        className: `${NAMESPACE}-avatar`
       }, react0().createElement(_contacts_jsx2__.Avatar, {
         contact: M.u[callerId]
       })), react0().createElement("div", {
-        className: NAMESPACE + "-info"
+        className: `${NAMESPACE}-info`
       }, react0().createElement("h1", null, react0().createElement(_ui_utils_jsx5__.EmojiFormattedContent, null, chatRoom.getRoomTitle())), react0().createElement("span", null, isPrivateRoom ? l[17878] : l[19995])), react0().createElement("div", {
-        className: NAMESPACE + "-controls"
+        className: `${NAMESPACE}-controls`
       }, react0().createElement(_button_jsx4__.Z, {
         className: "mega-button large round negative",
         icon: "icon-end-call",
@@ -24693,7 +25084,12 @@ class Incoming extends _mixins1__.wl {
         },
         onClick: onAnswer
       }, react0().createElement("span", null, l[7205])), react0().createElement(_button_jsx4__.Z, {
-        className: "\n                                    mega-button\n                                    large round\n                                    video\n                                    " + (video ? '' : 'negative') + "\n                                ",
+        className: `
+                                    mega-button
+                                    large round
+                                    video
+                                    ${video ? '' : 'negative'}
+                                `,
         icon: video ? 'icon-video-call-filled' : 'icon-video-off',
         simpletip: { ...SIMPLETIP_PROPS,
           label: video ? l[22894] : l[22893]
@@ -25014,7 +25410,7 @@ class ConversationMessageMixin extends _mixins1__._p {
 
       var slug = emojiData && emojiData.n || "";
       var tipText;
-      slug = slug ? ":" + slug + ":" : utf;
+      slug = slug ? `:${slug}:` : utf;
 
       if (Object.keys(reaction).length === 1 && reaction[u_handle]) {
         tipText = (l[24068] || "You (click to remove) [G]reacted with %s[/G]").replace("%s", slug);
@@ -25026,7 +25422,13 @@ class ConversationMessageMixin extends _mixins1__._p {
       return react0().createElement("div", {
         key: slug,
         onClick: ((e, slug, meta) => () => this.emojiSelected(e, slug, meta))(null, slug, emojiData),
-        className: "\n                            reactions-bar__reaction\n                            simpletip\n                            " + (currentUserReacted ? 'user-reacted' : '') + "\n                            " + (notFoundEmoji ? 'emoji-loading-error' : '') + "\n                            " + isReadOnlyClass + "\n                        ",
+        className: `
+                            reactions-bar__reaction
+                            simpletip
+                            ${currentUserReacted ? 'user-reacted' : ''}
+                            ${notFoundEmoji ? 'emoji-loading-error' : ''}
+                            ${isReadOnlyClass}
+                        `,
         "data-simpletip": tipText,
         "data-simpletipoffset": "3",
         "data-simpletipposition": "top"
@@ -25042,7 +25444,7 @@ class ConversationMessageMixin extends _mixins1__._p {
           e.target.replaceWith(textNode);
           textNode.parentNode.classList.add('emoji-loading-error');
         },
-        title: !notFoundEmoji ? ":" + emojiData.n + ":" : utf,
+        title: !notFoundEmoji ? `:${emojiData.n}:` : utf,
         onLoad: e => {
           e.target.classList.remove('emoji-loading');
         },
@@ -25088,8 +25490,8 @@ class ConversationMessageMixin extends _mixins1__._p {
     } = this.props;
     return message instanceof Message && message.isSentOrReceived() && !chatRoom.isReadOnly() ? react0().createElement(_ui_buttons_jsx2__.Button, {
       className: "popup-button reactions-button tiny-button simpletip",
-      icon: "sprite-fm-theme reactions-icon icon-emoji-reactions",
-      iconHovered: "sprite-fm-theme reactions-icon icon-emoji-reactions-active",
+      icon: `${"sprite-fm-theme reactions-icon"} icon-emoji-reactions`,
+      iconHovered: `${"sprite-fm-theme reactions-icon"} icon-emoji-reactions-active`,
       disabled: false,
       key: "add-reaction-button",
       attrs: {
@@ -25266,7 +25668,11 @@ class ToggleCheckbox extends mixins.wl {
 
   render() {
     return external_React_default().createElement("div", {
-      className: "\n                    mega-switch\n                    " + this.props.className + "\n                    " + (this.state.value ? 'toggle-on' : '') + "\n                ",
+      className: `
+                    mega-switch
+                    ${this.props.className}
+                    ${this.state.value ? 'toggle-on' : ''}
+                `,
       role: "switch",
       "aria-checked": !!this.state.value,
       onClick: this.onToggle
@@ -25564,9 +25970,18 @@ class StartGroupChatWizard extends mixins.wl {
       }
 
       chatInfoElements = React.createElement(React.Fragment, null, React.createElement("div", {
-        className: "\n                            contacts-search-header left-aligned top-pad\n                            " + (failedToEnableChatlink ? 'failed' : '') + "\n                        "
+        className: `
+                            contacts-search-header left-aligned top-pad
+                            ${failedToEnableChatlink ? 'failed' : ''}
+                        `
       }, React.createElement("div", {
-        className: "\n                                mega-input\n                                with-icon\n                                box-style\n                                " + (((_this$state$groupName = this.state.groupName) == null ? void 0 : _this$state$groupName.length) > 0 ? 'valued' : '') + "\n                                " + (failedToEnableChatlink ? 'error msg' : '') + "\n                            ",
+        className: `
+                                mega-input
+                                with-icon
+                                box-style
+                                ${((_this$state$groupName = this.state.groupName) == null ? void 0 : _this$state$groupName.length) > 0 ? 'valued' : ''}
+                                ${failedToEnableChatlink ? 'error msg' : ''}
+                            `,
         ref: this.inputContainerRef
       }, React.createElement("i", {
         className: "sprite-fm-mono icon-channel-new"
@@ -25609,7 +26024,11 @@ class StartGroupChatWizard extends mixins.wl {
       }, this.state.keyRotation ? l[20631] : l[20576]), React.createElement("div", {
         className: "group-chat-dialog description"
       }, l[20484]), React.createElement("div", {
-        className: "\n                                    group-chat-dialog checkbox\n                                    " + (this.state.keyRotation ? 'disabled' : '') + "\n                                    " + (failedToEnableChatlink ? 'failed' : '') + "\n                                ",
+        className: `
+                                    group-chat-dialog checkbox
+                                    ${this.state.keyRotation ? 'disabled' : ''}
+                                    ${failedToEnableChatlink ? 'failed' : ''}
+                                `,
         onClick: () => {
           delay('chatWizard-createChatLink', () => {
             this.setState(state => ({
@@ -25619,7 +26038,7 @@ class StartGroupChatWizard extends mixins.wl {
           }, 100);
         }
       }, React.createElement("div", {
-        className: "checkdiv " + checkboxClassName
+        className: `checkdiv ${checkboxClassName}`
       }, React.createElement("input", {
         type: "checkbox",
         name: "group-encryption",
@@ -25735,7 +26154,7 @@ let _buttonGroups = {};
 class Button extends _chat_mixins1__.wl {
   constructor(props) {
     super(props);
-    this.buttonClass = ".button";
+    this.buttonClass = `.button`;
     this.state = {
       focused: false,
       hovered: false,
@@ -25916,7 +26335,12 @@ class Button extends _chat_mixins1__.wl {
     const isMegaButton = className && className.indexOf('mega-button') > -1;
     const TagName = isMegaButton ? 'button' : 'div';
     return react0().createElement(TagName, (0,_extends2__.Z)({
-      className: "\n                    button\n                    " + (className ? className : '') + "\n                    " + (disabled ? 'disabled' : '') + "\n                    " + (this.state.focused ? 'active active-dropdown' : '') + "\n                ",
+      className: `
+                    button
+                    ${className ? className : ''}
+                    ${disabled ? 'disabled' : ''}
+                    ${this.state.focused ? 'active active-dropdown' : ''}
+                `,
       style: style,
       onClick: this.onClick,
       onMouseEnter: () => iconHovered && this.setState({
@@ -25935,7 +26359,11 @@ class Button extends _chat_mixins1__.wl {
         __html: this.props.secondLabel
       }
     }), toggle && react0().createElement("div", {
-      className: "\n                            mega-switch\n                            " + (toggle.className ? toggle.className : '') + "\n                            " + (toggle.enabled ? 'toggle-on' : '') + "\n                        ",
+      className: `
+                            mega-switch
+                            ${toggle.className ? toggle.className : ''}
+                            ${toggle.enabled ? 'toggle-on' : ''}
+                        `,
       role: "switch",
       "aria-checked": !!toggle.enabled,
       onClick: ev => {
@@ -26361,7 +26789,12 @@ class DropdownItem extends _chat_mixins1__.wl {
       submenu
     } = this.props;
     return React.createElement("div", {
-      className: "\n                    dropdown-item\n                    " + (className ? className : '') + "\n                    " + (submenu ? 'contains-submenu' : '') + "\n                    " + (disabled ? 'disabled' : '') + "\n                ",
+      className: `
+                    dropdown-item
+                    ${className ? className : ''}
+                    ${submenu ? 'contains-submenu' : ''}
+                    ${disabled ? 'disabled' : ''}
+                `,
       onClick: disabled ? undefined : ev => this.onClick(ev),
       onMouseOver: this.onMouseOver
     }, icon && React.createElement("i", {
@@ -26771,7 +27204,10 @@ class DropdownEmojiSelector extends _chat_mixins0__.wl {
     self.customCategoriesOrder.forEach(categoryName => {
       categoryButtons.push(React.createElement("div", {
         visiblecategories: this.state.visibleCategories,
-        className: "\n                        button square-button emoji\n                        " + (activeCategoryName === categoryName ? 'active' : '') + "\n                    ",
+        className: `
+                        button square-button emoji
+                        ${activeCategoryName === categoryName ? 'active' : ''}
+                    `,
         key: categoryIcons[categoryName],
         onClick: e => {
           var _this$emojiSearchFiel;
@@ -26791,7 +27227,7 @@ class DropdownEmojiSelector extends _chat_mixins0__.wl {
           (_this$emojiSearchFiel = this.emojiSearchField) == null ? void 0 : _this$emojiSearchFiel.current.focus();
         }
       }, React.createElement("i", {
-        className: "sprite-fm-mono " + categoryIcons[categoryName]
+        className: `sprite-fm-mono ${categoryIcons[categoryName]}`
       })));
     });
     return React.createElement(React.Fragment, null, React.createElement("div", {
@@ -27007,7 +27443,8 @@ let MegaList2 = (_dec = (0,mixins.M9)(30, true), (_class = class MegaList2 exten
       }
     };
     this.onPsUserScroll = this.onPsUserScroll.bind(this);
-    this.thumbsThatRequireLoading = [];
+    this.thumbsLoadingHandlers = new MapSet();
+    this.thumbsThatRequireLoading = new MapSet();
     this.requestThumbnailCb = this.requestThumbnailCb.bind(this);
   }
 
@@ -27125,6 +27562,14 @@ let MegaList2 = (_dec = (0,mixins.M9)(30, true), (_class = class MegaList2 exten
       var visibleL = calculated.visibleLastItemNum;
       calculated.visibleLastItemNum = Math.min(this.props.entries.length, ((visibleL - visibleL % perPage) / perPage + 1 + this.options.batchPages) * perPage);
     }
+
+    Object.defineProperty(M, 'rmItemsInView', {
+      get: () => {
+        const c = this.ps && this._calculated || !1;
+        return c.itemsPerPage + c.itemsPerRow | 0;
+      },
+      configurable: true
+    });
   }
 
   _contentUpdated() {
@@ -27234,9 +27679,8 @@ let MegaList2 = (_dec = (0,mixins.M9)(30, true), (_class = class MegaList2 exten
       this._recalculate();
     }
 
-    if (this.thumbsThatRequireLoading.length > 0) {
-      fm_thumbnails('standalone', this.thumbsThatRequireLoading);
-      this.thumbsThatRequireLoading = [];
+    if (this.thumbsThatRequireLoading.size) {
+      delay('chat:mega-list2:thumb-loader', () => this.enqueueThumbnailRetrieval(), 20);
     }
 
     if (this._firstRender && this.ps) {
@@ -27245,20 +27689,77 @@ let MegaList2 = (_dec = (0,mixins.M9)(30, true), (_class = class MegaList2 exten
     }
   }
 
+  enqueueThumbnailRetrieval() {
+    const loaders = new Map(this.thumbsLoadingHandlers);
+    const nodes = new Map(this.thumbsThatRequireLoading);
+    const pending = [];
+
+    const defaultCallback = (n, src, id) => {
+      let img = document.getElementById(id || `chat_${n.h}`);
+
+      if (img && (img = img.querySelector('img'))) {
+        var _img$parentNode$paren;
+
+        img.src = src;
+        (_img$parentNode$paren = img.parentNode.parentNode) == null ? void 0 : _img$parentNode$paren.classList.add('thumb');
+      }
+    };
+
+    const setSource = n => {
+      if (thumbnails.has(n.fa)) {
+        const src = thumbnails.get(n.fa);
+        const batch = [...nodes.get(n.fa)];
+
+        for (var i = batch.length; i--;) {
+          const n = batch[i];
+          const handlers = [...loaders.get(n.h)];
+
+          for (let i = handlers.length; i--;) {
+            let callback = handlers[i];
+
+            if (typeof callback !== 'function') {
+              callback = defaultCallback;
+            }
+
+            tryCatch(() => {
+              const id = callback(n, src);
+
+              if (id) {
+                defaultCallback(n, src, id);
+              }
+            })();
+          }
+        }
+
+        return true;
+      }
+    };
+
+    for (const [, [n]] of nodes) {
+      if (!setSource(n)) {
+        pending.push(n);
+      }
+    }
+
+    if (pending.length) {
+      fm_thumbnails('standalone', pending, setSource);
+    }
+
+    this.thumbsLoadingHandlers.clear();
+    this.thumbsThatRequireLoading.clear();
+  }
+
   requestThumbnailCb(node, immediate, callback) {
-    if (thumbnails[node.h]) {
-      return;
-    }
+    if (node && node.fa) {
+      if (typeof immediate === 'function') {
+        callback = immediate;
+        immediate = 0;
+      }
 
-    if (!node.imgId) {
-      node.imgId = "chat_" + node.h;
-    }
-
-    this.thumbsThatRequireLoading.push(node);
-
-    if (immediate) {
-      fm_thumbnails('standalone', this.thumbsThatRequireLoading, callback);
-      this.thumbsThatRequireLoading = [];
+      node.seen = node.seen || -7;
+      this.thumbsLoadingHandlers.set(node.h, callback);
+      this.thumbsThatRequireLoading.set(node.fa, node);
+      delay('chat:mega-list2:thumb-loader', () => this.enqueueThumbnailRetrieval(), immediate || 480);
     }
   }
 
@@ -27267,7 +27768,6 @@ let MegaList2 = (_dec = (0,mixins.M9)(30, true), (_class = class MegaList2 exten
       this._recalculate();
     }
 
-    this.thumbsThatRequireLoading = [];
     let {
       listAdapter,
       listAdapterOpts,
@@ -27349,17 +27849,11 @@ class GenericGrid extends genericNodePropsComponent.L {
     let src = null;
     let isThumbClass = "";
 
-    if ((is_image(node) || is_video(node)) && node.fa) {
-      src = thumbnails[node.h];
+    if (node.fa && (is_image2(node) || is_video(node))) {
+      src = thumbnails.get(node.fa);
 
       if (!src) {
-        node.imgId = "chat_" + node[keyProp];
         this.props.requestThumbnailCb(node);
-
-        if (!node.seen) {
-          node.seen = 1;
-        }
-
         src = window.noThumbURI || '';
       }
 
@@ -27445,11 +27939,11 @@ class GenericTableHeader extends mixins.wl {
 
         if (sortBy[0] === col.id) {
           const ordClass = sortBy[1] === "desc" ? "icon-arrow-down" : "icon-arrow-up";
-          classes = classes + " " + ordClass;
+          classes = `${classes} ${ordClass}`;
         }
 
         sortable = external_React_default().createElement("i", {
-          className: "sprite-fm-mono " + col.id + " " + classes
+          className: `sprite-fm-mono ${col.id} ${classes}`
         });
       }
 
@@ -27627,19 +28121,10 @@ class ColumnNodeName extends genericNodePropsComponent.L {
     this.state = {
       src: null
     };
-
-    this.setAttributes = () => {
-      const {
-        node
-      } = this.props;
-      node.imgId = "preview_" + node.h;
-      node.seen = node.seen || 1;
-    };
   }
 
   componentDidMount() {
     super.componentDidMount();
-    this.setAttributes();
   }
 
   render() {
@@ -27647,37 +28132,43 @@ class ColumnNodeName extends genericNodePropsComponent.L {
       nodeAdapter
     } = this.props;
     const {
-      src
-    } = this.state;
-    const {
       node,
       requestThumbnailCb
     } = nodeAdapter.props;
+    const src = this.state.src || thumbnails.get(node.fa);
     return external_React_default().createElement("td", {
       megatype: ColumnNodeName.megatype
-    }, is_image(node) || is_video(node) ? external_React_default().createElement(tooltips.Z.Tooltip, {
+    }, src || is_image2(node) || is_video(node) ? external_React_default().createElement(tooltips.Z.Tooltip, {
       withArrow: true,
       className: "tooltip-handler-container",
       onShown: () => {
         if (!src) {
-          requestThumbnailCb(node, true, handle => this.setState({
-            src: thumbnails[handle]
-          }));
+          requestThumbnailCb(node, true, (n, src) => {
+            this.setState({
+              src
+            });
+            return `preview_${n.h}`;
+          });
         }
       }
     }, external_React_default().createElement(tooltips.Z.Handler, {
-      className: "transfer-filetype-icon " + fileIcon(node)
+      className: `transfer-filetype-icon ${fileIcon(node)}`
     }), external_React_default().createElement(tooltips.Z.Contents, {
       className: "img-preview"
     }, external_React_default().createElement("div", {
       className: "dropdown img-wrapper img-block",
-      id: "preview_" + node.h
+      id: `preview_${node.h}`
     }, external_React_default().createElement("img", {
       alt: "",
-      className: "thumbnail-placeholder " + node.h,
-      src: node.fa ? src || staticpath + "/images/mega/ajax-loader-tiny.gif" : window.noThumbURI
+      className: `thumbnail-placeholder ${node.h}`,
+      src: node.fa || src ? src || `${staticpath}/images/mega/ajax-loader-tiny.gif` : window.noThumbURI
     })))) : external_React_default().createElement("span", {
-      className: "\n                            transfer-filetype-icon\n                            " + (nodeAdapter.nodeProps.isFolder ? 'folder' : '') + "\n                            " + nodeAdapter.nodeProps.icon + "\n                            " + (node.su ? 'inbound-share' : '') + "\n                        "
+      className: `
+                            transfer-filetype-icon
+                            ${nodeAdapter.nodeProps.isFolder ? 'folder' : ''}
+                            ${nodeAdapter.nodeProps.icon}
+                            ${node.su ? 'inbound-share' : ''}
+                        `
     }), external_React_default().createElement("span", {
       className: "tranfer-filetype-txt"
     }, nodeAdapter.nodeProps.title));
@@ -29008,15 +29499,15 @@ class ModalDialog extends _chat_mixins1__.wl {
     }.bind(this));
 
     if (self.props.className) {
-      classes += " " + self.props.className;
+      classes += ` ${self.props.className}`;
     }
 
     if (self.props.dialogType) {
-      classes += " dialog-template-" + self.props.dialogType;
+      classes += ` dialog-template-${self.props.dialogType}`;
     }
 
     if (self.props.dialogName) {
-      classes += " " + self.props.dialogName;
+      classes += ` ${self.props.dialogName}`;
     }
 
     if (self.props.showSelectedNum && self.props.selectedNum) {
@@ -29074,11 +29565,11 @@ class ModalDialog extends _chat_mixins1__.wl {
     }, React.createElement("i", {
       className: "sprite-fm-mono icon-dialog-close"
     })), self.props.title ? self.props.dialogType === "message" ? React.createElement("header", null, self.props.icon ? React.createElement("i", {
-      className: "graphic " + self.props.icon
+      className: `graphic ${self.props.icon}`
     }) : self.props.iconElement, React.createElement("div", null, React.createElement("h3", {
       id: self.props.dialogName ? self.props.dialogName + "-title" : null
     }, self.props.title, selectedNumEle), self.props.subtitle ? React.createElement("p", null, self.props.subtitle) : null, otherElements)) : React.createElement("header", null, self.props.icon ? React.createElement("i", {
-      className: "graphic " + self.props.icon
+      className: `graphic ${self.props.icon}`
     }) : self.props.iconElement, React.createElement("h2", {
       id: self.props.dialogName ? self.props.dialogName + "-title" : null
     }, self.props.title, selectedNumEle), self.props.subtitle ? React.createElement("p", null, self.props.subtitle) : null) : null, self.props.dialogType !== "message" ? otherElements : null, buttons || extraFooterElements ? footer : null));
@@ -29261,7 +29752,7 @@ class ConfirmDialog extends _chat_mixins1__.wl {
       return null;
     }
 
-    var classes = "delete-message" + (self.props.name ? " " + self.props.name : "") + (self.props.className ? " " + self.props.className : "");
+    var classes = "delete-message" + (self.props.name ? ` ${self.props.name}` : "") + (self.props.className ? ` ${self.props.className}` : "");
     var dontShowCheckbox = null;
 
     if (self.props.dontShowAgainCheckbox) {

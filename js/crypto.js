@@ -2083,19 +2083,33 @@ function api_storefileattr(id, type, key, data, ctx, ph) {
     api_req(req, ctx, pfid ? 1 : 0);
 }
 
-function api_getfileattr(fa, type, procfa, errfa) {
-    var r, n, t;
+async function api_getfileattr(fa, type, procfa, errfa) {
+    'use strict';
+    let r;
+    const p = Object.create(null);
+    const h = Object.create(null);
+    const k = Object.create(null);
+    const plain = Object.create(null);
+    let cache = nop;
 
-    var p = {};
-    var h = {};
-    var k = {};
-    var plain = {};
+    type |= 0;
+    if (type in fa_handler.lru) {
+        const lru = await fa_handler.lru[type];
+        if (!lru.error) {
+            const found = await lru.find(Object.keys(fa)).catch(dump) || false;
+            const send = (h) => lru.get(h).then(ab => procfa({cached: 1}, h, ab));
+            for (let i = found.length; i--;) {
+                send(found[i]);
+                fa[found[i]] = null;
+            }
+            cache = (h, buf) => lru.set(h, buf);
+        }
+    }
 
-    var re = new RegExp('(\\d+):' + type + '\\*([a-zA-Z0-9-_]+)');
-
-    for (n in fa) {
+    const re = new RegExp(`(\\d+):${type}\\*([\\w-]+)`);
+    for (const n in fa) {
         if (fa[n] && (r = re.exec(fa[n].fa))) {
-            t = base64urldecode(r[2]);
+            const t = base64urldecode(r[2]);
             if (t.length === 8) {
                 if (!h[t]) {
                     h[t] = n;
@@ -2108,22 +2122,31 @@ function api_getfileattr(fa, type, procfa, errfa) {
                 else {
                     p[r[1]] += t;
                 }
-                plain[r[1]] = !!fa[n].plaintext
+                plain[r[1]] = !!fa[n].plaintext;
             }
         }
-        else if (errfa) {
-            errfa(n);
+        else if (fa[n] !== null && typeof errfa === 'function') {
+            queueMicrotask(errfa.bind(null, n));
         }
     }
 
-    for (n in p) {
-        var ctx = {
+    // eslint-disable-next-line guard-for-in
+    for (const n in p) {
+        const ctx = {
             callback: api_fareq,
             type: type,
             p: p[n],
             h: h,
             k: k,
-            procfa: procfa,
+            procfa: (ctx, h, buf) => {
+                if (!buf || !buf.byteLength) {
+                    buf = 0xDEAD;
+                }
+                else {
+                    cache(h, buf);
+                }
+                return procfa(ctx, h, buf);
+            },
             errfa: errfa,
             startTime: Date.now(),
             plaintext: plain[n]
@@ -2136,6 +2159,15 @@ function api_getfileattr(fa, type, procfa, errfa) {
         }, ctx);
     }
 }
+
+// @todo refactor whole fa-handler from scratch!
+lazy(fa_handler, 'lru', () => {
+    'use strict';
+    const lru = Object.create(null);
+    lazy(lru, 0, () => LRUMegaDexie.create('fa-handler.0', 1e4));
+    lazy(lru, 1, () => LRUMegaDexie.create('fa-handler.1', 1e3));
+    return lru;
+});
 
 function fa_handler(xhr, ctx) {
     var logger = d > 1 && MegaLogger.getLogger('crypt');

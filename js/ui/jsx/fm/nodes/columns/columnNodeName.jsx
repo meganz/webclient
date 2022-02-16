@@ -12,31 +12,27 @@ export class ColumnNodeName extends GenericNodePropsComponent {
         src: null
     };
 
-    setAttributes = () => {
-        const { node } = this.props;
-        node.imgId = `preview_${node.h}`;
-        node.seen = node.seen || 1;
-    };
-
     componentDidMount() {
         super.componentDidMount();
-        this.setAttributes();
     }
 
     render() {
         const { nodeAdapter } = this.props;
-        const { src } = this.state;
         const { node, requestThumbnailCb } = nodeAdapter.props;
+        const src = this.state.src || thumbnails.get(node.fa);
 
         return (
             <td megatype={ColumnNodeName.megatype}>
-                {is_image(node) || is_video(node) ?
+                {src || is_image2(node) || is_video(node) ?
                     <Tooltips.Tooltip
                         withArrow={true}
                         className="tooltip-handler-container"
                         onShown={() => {
                             if (!src) {
-                                requestThumbnailCb(node, true, handle => this.setState({ src: thumbnails[handle] }));
+                                requestThumbnailCb(node, true, (n, src) => {
+                                    this.setState({src});
+                                    return `preview_${n.h}`;
+                                });
                             }
                         }}>
                         <Tooltips.Handler className={`transfer-filetype-icon ${fileIcon(node)}`}/>
@@ -48,7 +44,7 @@ export class ColumnNodeName extends GenericNodePropsComponent {
                                     alt=""
                                     className={`thumbnail-placeholder ${node.h}`}
                                     src={
-                                        node.fa ?
+                                        node.fa || src ?
                                             // Render the downloaded node thumbnail or loading an indication during
                                             // the actual download; see `requestThumbnailCb`, `fm_thumbnails`
                                             src || `${staticpath}/images/mega/ajax-loader-tiny.gif` :

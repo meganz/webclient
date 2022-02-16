@@ -31,7 +31,8 @@ export class MegaList2 extends MegaRenderMixin {
 
         this.onPsUserScroll = this.onPsUserScroll.bind(this);
 
-        this.thumbsThatRequireLoading = [];
+        this.thumbsLoadingHandlers = new MapSet();
+        this.thumbsThatRequireLoading = new MapSet();
         this.requestThumbnailCb = this.requestThumbnailCb.bind(this);
     }
     specShouldComponentUpdate(nextProps) {
@@ -175,6 +176,14 @@ export class MegaList2 extends MegaRenderMixin {
                 ((visibleL - visibleL % perPage) / perPage + 1 + this.options.batchPages) * perPage
             );
         }
+
+        Object.defineProperty(M, 'rmItemsInView', {
+            get: () => {
+                const c = this.ps && this._calculated || !1;
+                return c.itemsPerPage + c.itemsPerRow | 0;
+            },
+            configurable: true
+        });
     }
     _contentUpdated() {
         this._calculated = false;
@@ -293,9 +302,8 @@ export class MegaList2 extends MegaRenderMixin {
             this._recalculate();
         }
 
-        if (this.thumbsThatRequireLoading.length > 0) {
-            fm_thumbnails('standalone', this.thumbsThatRequireLoading);
-            this.thumbsThatRequireLoading = [];
+        if (this.thumbsThatRequireLoading.size) {
+            delay('chat:mega-list2:thumb-loader', () => this.enqueueThumbnailRetrieval(), 20);
         }
 
         if (this._firstRender && this.ps) {
@@ -304,24 +312,80 @@ export class MegaList2 extends MegaRenderMixin {
         }
     }
 
+    enqueueThumbnailRetrieval() {
+        const loaders = new Map(this.thumbsLoadingHandlers);
+        const nodes = new Map(this.thumbsThatRequireLoading);
+
+        const pending = [];
+        const defaultCallback = (n, src, id) => {
+            let img = document.getElementById(id || `chat_${n.h}`);
+            if (img && (img = img.querySelector('img'))) {
+                img.src = src;
+                img.parentNode.parentNode?.classList.add('thumb');
+            }
+        };
+
+        const setSource = (n) => {
+            if (thumbnails.has(n.fa)) {
+                const src = thumbnails.get(n.fa);
+                const batch = [...nodes.get(n.fa)];
+
+                for (var i = batch.length; i--;) {
+                    const n = batch[i];
+                    const handlers = [...loaders.get(n.h)];
+
+                    for (let i = handlers.length; i--;) {
+                        let callback = handlers[i];
+
+                        if (typeof callback !== 'function') {
+                            callback = defaultCallback;
+                        }
+
+                        tryCatch(() => {
+                            const id = callback(n, src);
+                            if (id) {
+                                defaultCallback(n, src, id);
+                            }
+                        })();
+                    }
+                }
+
+                return true;
+            }
+        };
+
+        for (const [, [n]] of nodes) {
+            if (!setSource(n)) {
+                pending.push(n);
+            }
+        }
+
+        if (pending.length) {
+            fm_thumbnails('standalone', pending, setSource);
+        }
+
+        this.thumbsLoadingHandlers.clear();
+        this.thumbsThatRequireLoading.clear();
+    }
+
     requestThumbnailCb(node, immediate, callback) {
-        if (thumbnails[node.h]) {
-            return;
-        }
-        if (!node.imgId) {
-            node.imgId = "chat_" + node.h;
-        }
-        this.thumbsThatRequireLoading.push(node);
-        if (immediate) {
-            fm_thumbnails('standalone', this.thumbsThatRequireLoading, callback);
-            this.thumbsThatRequireLoading = [];
+        if (node && node.fa) {
+            if (typeof immediate === 'function') {
+                callback = immediate;
+                immediate = 0;
+            }
+
+            node.seen = node.seen || -7;
+            this.thumbsLoadingHandlers.set(node.h, callback);
+            this.thumbsThatRequireLoading.set(node.fa, node);
+
+            delay('chat:mega-list2:thumb-loader', () => this.enqueueThumbnailRetrieval(), immediate || 480);
         }
     }
     render() {
         if (this.isMounted() && !this._calculated) {
             this._recalculate();
         }
-        this.thumbsThatRequireLoading = [];
 
         let {
             listAdapter,

@@ -41,8 +41,7 @@ MegaData.prototype.renderMain = function(aUpdate) {
         if (!aUpdate) {
             M.addContactUI();
             if (this.viewmode) {
-                fa_duplicates = Object.create(null);
-                fa_reqcnt = 0;
+                thumbnails.cleanup();
             }
         }
         this.rmSetupUI(aUpdate, aUpdate ? !!$.dbOpenHandle : false);
@@ -59,7 +58,7 @@ MegaData.prototype.renderMain = function(aUpdate) {
             get() {
                 const l = Object(M.megaRender).megaList;
                 const c = l && l._calculated || false;
-                return c.itemsPerPage + c.itemsPerRow * 2 | 0;
+                return c.itemsPerPage + c.itemsPerRow | 0;
             },
             configurable: true
         });
@@ -334,11 +333,9 @@ MegaData.prototype.hideEmptyGrids = function hideEmptyGrids() {
  * throttling, so that we won't update the UI components too often.
  *
  */
-MegaData.prototype.rmSetupUIDelayed = function() {
+MegaData.prototype.rmSetupUIDelayed = function(ms) {
     'use strict';
-    delay('rmSetupUI', function() {
-        M.rmSetupUI(false, true);
-    }, 75);
+    delay('rmSetupUI', () => this.rmSetupUI(false, true), Math.max(ms | 0, 75));
 };
 
 

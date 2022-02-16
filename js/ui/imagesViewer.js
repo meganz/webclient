@@ -1178,14 +1178,12 @@ var slideshowid;
             delete pfails[n.h];
         }
 
-        var treq = Object.create(null);
         preqs[n.h] = 1;
-        treq[n.h] = {fa: n.fa, k: n.k};
         var maxSize = ua.details.engine === 'Trident' ? 12 : 50;
         var loadOriginal = n.s < maxSize * 1048576 && is_image(n) === 1;
         var loadPreview = !loadOriginal || !slideshowplay && n.s > 1048576;
         var onPreviewError = loadOriginal ? previewimg.bind(window, n.h, null) : eot;
-        var getPreview = api_getfileattr.bind(window, treq, 1, preview, onPreviewError);
+        var getPreview = api_getfileattr.bind(window, {[n.h]: n}, 1, preview, onPreviewError);
 
         if (d) {
             console.debug('slideshow.fetchsrc(%s), preview=%s original=%s', id, loadPreview, loadOriginal, n, n.h);

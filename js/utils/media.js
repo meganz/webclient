@@ -540,8 +540,6 @@ mBroadcaster.once('startMega', function() {
 
 // ---------------------------------------------------------------------------------------------------------------
 
-var _getImageCache = Object.create(null);
-
 /**
  * Retrieve file attribute image
  * @param {MegaNode} node The node to get associated image with
@@ -551,39 +549,43 @@ var _getImageCache = Object.create(null);
  */
 function getImage(node, type, raw) {
     'use strict';
-    var entry = Object(node).h + '!' + (type |= 0) + '.' + (raw |= 0);
+    const entry = `${Object(node).h}!${type |= 0}.${raw |= 0}`;
 
-    if (!type && thumbnails[node.h] && !raw) {
-        return Promise.resolve(thumbnails[node.h]);
+    if (!type && thumbnails.has(node.fa) && !raw) {
+        return Promise.resolve(thumbnails.get(node.fa));
     }
 
-    if (_getImageCache[entry]) {
-        if (_getImageCache[entry] instanceof Promise) {
-            return _getImageCache[entry];
-        }
-        return Promise.resolve(_getImageCache[entry]);
+    if (getImage.cache.has(entry)) {
+        const value = getImage.cache.get(entry);
+        return value instanceof Promise ? value : Promise.resolve(value);
     }
 
-    _getImageCache[entry] = new Promise(function(resolve, reject) {
-        var done = function(a, b, data) {
-            if (data !== 0xDEAD) {
-                _getImageCache[entry] = raw ? data : mObjectURL([data.buffer || data], 'image/jpeg');
-                resolve(_getImageCache[entry]);
+    const promise = new Promise((resolve, reject) => {
+        const onload = (a, b, data) => {
+            if (data === 0xDEAD) {
+                getImage.cache.delete(entry);
+                reject(node);
             }
             else {
-                _getImageCache[entry] = null;
-                reject();
+                const value = raw ? data : mObjectURL([data.buffer || data], 'image/jpeg');
+
+                getImage.cache.set(entry, value);
+                resolve(value);
             }
         };
-        api_getfileattr([node], type, done, function(ex) {
-            onIdle(function() {
-                reject(ex);
-            });
-        });
+
+        api_getfileattr({[node.fa]: node}, type, onload, reject).catch(dump);
     });
 
-    return _getImageCache[entry];
+    getImage.cache.set(entry, promise);
+    return promise;
 }
+
+/** @property getImage.cache */
+lazy(getImage, 'cache', () => {
+    'use strict';
+    return new LRUMap(23, (uri) => typeof uri === 'string' && URL.revokeObjectURL(uri));
+});
 
 /**
  * Store file attribute image

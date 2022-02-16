@@ -1473,15 +1473,7 @@ class MegaGallery {
                 }
                 else if (previews[nid]) {
 
-                    let buffer;
-
-                    if (previews[nid].buffer.byteLength) {
-                        buffer = previews[nid].buffer;
-                    }
-                    else {
-                        buffer = await M.toArrayBuffer(previews[nid].blob);
-                    }
-
+                    const buffer = await M.toArrayBuffer(previews[nid].blob);
                     this._createThumb(nid, buffer);
                 }
                 else if (String(n.fa).includes(':1*')) {

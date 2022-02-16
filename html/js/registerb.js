@@ -165,9 +165,9 @@ BusinessRegister.prototype.initPage = function(preSetNb, preSetName, preSetTel, 
             Stripe2: 'sprite-fm-theme icon-stripe',
             stripeVI: 'sprite-fm-uni icon-visa-border',
             stripeMC: 'sprite-fm-uni icon-mastercard-border',
-            stripeAE: 'provider-icon stripeAE',
-            stripeJC: 'provider-icon stripeJC',
-            stripeUP: 'provider-icon stripeUP',
+            stripeAE: 'sprite-fm-uni icon-amex',
+            stripeJC: 'sprite-fm-uni icon-jcb',
+            stripeUP: 'sprite-fm-uni icon-union-pay',
             stripeDD: 'provider-icon stripeDD'
         };
 

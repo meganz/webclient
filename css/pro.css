@@ -7,6 +7,17 @@
     vertical-align: top;
     width: 20px;
 }
+.provider-icon.svgicon {
+    background-image: none;
+    position: relative;
+}
+.provider-icon i {
+    --icon-size: 24px;
+    display: inline-block;
+    position: absolute;
+    top: -2px;
+    left: -2px;
+}
 .provider-icon.astropay {
     background-position: 0 0;
 }

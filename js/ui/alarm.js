@@ -281,13 +281,30 @@ var alarm = {
             var gatewayName = (extraData) ? extraData.gwname : gatewayInfo.name;
             var gatewayDisplayName = (extraData) ? extraData.label : gatewayInfo.displayName;
 
+            const svgicons = {
+                visa: 'icon-visa-border',
+                mastercard: 'icon-mastercard',
+                'unionpay': 'icon-union-pay',
+                'american express': 'icon-amex',
+                jcb: 'icon-jcb',
+            };
+
             // Display
             $dialog.find('.header-pro-plan').text(proPlanName);
             $dialog.find('.purchased-date').text(purchasedDate);
             $dialog.find('.expired-date').text(expiryDate);
             $dialog.find('.pro-plan').text(proPlanName);
             $dialog.find('.plan-duration').text(planMonths + ' ' + planMonthsPluralisation);
-            $dialog.find('.provider-icon').addClass(gatewayName);
+
+            const iconkey = Object.keys(svgicons).find(gw => gatewayInfo.displayName.toLowerCase().includes(gw));
+
+            if (iconkey) {
+                $('.provider-icon', $gateway).addClass('svgicon')
+                    .safeHTML(`<i class="sprite-fm-uni ${svgicons[iconkey]}"></i>`);
+            }
+            else {
+                $('.provider-icon', $dialog).addClass(gatewayName);
+            }
             $dialog.find('.gateway-name').text(gatewayDisplayName);
             $('.plan-icon', $dialog).removeClass('pro1 pro2 pro3 pro4').addClass('pro' + proNum);
 

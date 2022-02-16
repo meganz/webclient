@@ -1264,14 +1264,19 @@ var addressDialog = {
             $('.error-message', this.$dialog).addClass('hidden');
 
             const $paymentIcons = $('.payment-icons', this.$dialog);
-            const specialLogos = ['stripeAE', 'stripeJC', 'stripeUP', 'stripeDD'];
+            const specialLogos = {
+                'stripeAE': 'icon-amex',
+                'stripeJC': 'icon-jcb',
+                'stripeUP': 'icon-union-pay',
+                'stripeDD': 'icon-discover'
+            };
             const gate = this.businessPlan && this.businessPlan.usedGateName || pro.propay.proPaymentMethod;
-            if (specialLogos.includes(gate)) {
+            if (specialLogos[gate]) {
 
                 $('i', $paymentIcons).addClass('hidden');
                 $('.payment-provider-icon', $paymentIcons)
-                    .removeClass('hidden stripeAE stripeJC stripeUP stripeDD')
-                    .addClass(gate);
+                    .removeClass('hidden icon-amex icon-jcb icon-union-pay icon-discover')
+                    .addClass(specialLogos[gate]);
             }
             else {
                 $('i', $paymentIcons).removeClass('hidden');

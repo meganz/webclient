@@ -4441,24 +4441,10 @@ body.de .mega-dialog.new-group-chat {
         position: absolute;
     }
     .mega-dialog.payment-address-dialog .payment-provider-icon {
-        width: 48px;
-        height: 48px;
         float: right;
         display: inline-block;
         margin-right: 5px;
-        background-size: 48px;
-    }
-    .mega-dialog.payment-address-dialog .payment-provider-icon.stripeAE {
-        background-image: url("../images/mega/Amex.svg");
-    }
-    .mega-dialog.payment-address-dialog .payment-provider-icon.stripeJC {
-        background-image: url("../images/mega/JCB.svg");
-    }
-    .mega-dialog.payment-address-dialog .payment-provider-icon.stripeUP {
-        background-image: url("../images/mega/UnionPay.svg");
-    }
-    .mega-dialog.payment-address-dialog .payment-provider-icon.stripeDD {
-        background-image: url("../images/mega/Discover.svg");
+        --icon-size: 48px;
     }
     .mega-dialog.payment-address-dialog .payment-cc-icon.visa {
         right: 0;

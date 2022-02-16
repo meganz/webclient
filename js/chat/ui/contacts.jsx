@@ -1255,11 +1255,9 @@ export class ContactPickerWidget extends MegaRenderMixin {
                                 onSelectDoneCb(e);
                             }
                         }}>
-                        {
-                            this.props.multipleSelectedButtonLabel ?
-                                this.props.multipleSelectedButtonLabel
-                                : l[8890]
-                        }
+                        <span>
+                            {this.props.multipleSelectedButtonLabel ? this.props.multipleSelectedButtonLabel : l[8890]}
+                        </span>
                     </button>
                 </footer>;
             }

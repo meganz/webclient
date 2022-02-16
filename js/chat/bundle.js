@@ -8168,7 +8168,7 @@ class ContactProfile extends mixins.wl {
 
       if (!contact || contact.c !== 1) {
         return external_React_default().createElement(Nil, {
-          title: "Contact not found"
+          title: l.contact_not_found
         });
       }
 
@@ -15666,7 +15666,7 @@ class StreamHead extends mixins.wl {
           }
         }
 
-        return moderators.length > 1 ? "<span>Moderators:</span> " + moderators.join(', ') : "<span>" + l[8875] + ":</span> " + moderators[0];
+        return moderators.length > 1 ? "<span>" + l.meeting_moderators.replace('%s', '</span> ' + moderators.join(', ')) : "<span>" + l[8875] + ":</span> " + moderators[0];
       }
     };
 
@@ -16368,7 +16368,7 @@ const withMicObserver = Component => class extends mixins.wl {
 
     this.renderSignalWarning = () => external_React_default().createElement("div", {
       className: "\n                    " + this.namespace + "\n                    meetings-signal-issue\n                    simpletip\n                ",
-      "data-simpletip": "Check your system settings to unmute your mic and adjust its level",
+      "data-simpletip": l.chat_mic_off_tooltip,
       "data-simpletipposition": "top",
       "data-simpletipoffset": "5",
       "data-simpletip-class": "theme-dark-forced"
@@ -16932,7 +16932,7 @@ class Minimized extends mixins.wl {
       className: local_Local.NAMESPACE + "-overlay"
     }, external_React_default().createElement(meetings_button.Z, {
       simpletip: { ...SIMPLETIP_PROPS,
-        label: 'Expand'
+        label: l.expand_mini_call
       },
       className: "mega-button theme-light-forced action small expand",
       icon: "sprite-fm-mono icon-fullscreen-enter",
@@ -20428,11 +20428,11 @@ class Join extends mixins.wl {
         noCloseOnClickOutside: true,
         buttons: [{
           key: 'cancel',
-          label: 'Cancel',
+          label: l[82],
           onClick: onCancel
         }, {
           key: 'continue',
-          label: 'Continue',
+          label: l[507],
           className: 'positive',
           onClick: () => {
             u_logout(true);
@@ -20493,7 +20493,7 @@ class Join extends mixins.wl {
               view: Join.VIEW.ACCOUNT
             }));
           }
-        }, "Login")));
+        }, l[171])));
       }
 
       return external_React_default().createElement($$CONTAINER, null, external_React_default().createElement(meetings_button.Z, {
@@ -20541,7 +20541,7 @@ class Join extends mixins.wl {
         })
       }, external_React_default().createElement(utils.EmojiFormattedContent, null, chatRoom.topic), external_React_default().createElement(meetings_button.Z, {
         icon: "icon-minimise"
-      }, external_React_default().createElement("span", null, "Toggle"))), preview && external_React_default().createElement("div", {
+      })), preview && external_React_default().createElement("div", {
         className: "chat-body"
       }, external_React_default().createElement(HistoryPanel, {
         chatRoom: chatRoom,
@@ -20886,7 +20886,7 @@ class ConversationRightArea extends mixins.wl {
         }
       }, external_React_default().createElement("i", {
         className: "small-icon colorized horizontal-red-handset"
-      }), external_React_default().createElement("span", null, room.type === "group" || room.type === "public" ? "Leave call" : l[5884]));
+      }), external_React_default().createElement("span", null, room.type === "group" || room.type === "public" ? l[5883] : l[5884]));
     }
 
     var isReadOnlyElement = null;
@@ -22010,7 +22010,7 @@ let ConversationPanel = (conversationpanel_dec = utils["default"].SoonFcWrap(360
           }
 
           setTimeout(() => {
-            msgDialog('warninga', l[135], "Failed to create E++ account. Please try again later.", escapeHTML(api_strerror(ex) || ex));
+            msgDialog('warninga', l[135], l.eplusplus_create_failed, escapeHTML(api_strerror(ex) || ex));
           }, 1234);
           eventlog(99745, JSON.stringify([1, String(ex).split('\n')[0]]));
         });
@@ -22585,7 +22585,7 @@ const LABEL = {
   SEARCH_MESSAGES_INLINE: l[23548],
   DECRYPTING_RESULTS: l[23543],
   PAUSE_SEARCH: l[23544],
-  SEARCH_PAUSED: 'Search paused',
+  SEARCH_PAUSED: l[23549],
   SEARCH_COMPLETE: l[23546]
 };
 class resultContainer_ResultContainer extends mixins.wl {

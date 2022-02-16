@@ -81,8 +81,8 @@ export default class Join extends MegaRenderMixin {
                 title={l.ephemeral_data_lost_title}
                 noCloseOnClickOutside={true}
                 buttons={[
-                    { key: 'cancel', label: 'Cancel', onClick: onCancel },
-                    { key: 'continue', label: 'Continue', className: 'positive', onClick: onConfirm }
+                    { key: 'cancel', label: l[82] /* Cancel */, onClick: onCancel },
+                    { key: 'continue', label: l[507] /* Continue */, className: 'positive', onClick: onConfirm }
                 ]}
                 onClose={onCancel}>
                 <p>
@@ -155,7 +155,7 @@ export default class Join extends MegaRenderMixin {
                                 mega.ui.showLoginRequiredDialog({ minUserType: 3, skipInitialDialog: 1 })
                                     .done(() => this.setState({ view: Join.VIEW.ACCOUNT }));
                             }}>
-                            Login
+                            {l[171]}
                         </a>
                     </span>
                 </$$CONTAINER>
@@ -222,9 +222,7 @@ export default class Join extends MegaRenderMixin {
                         className="chat-content-head"
                         onClick={() => this.setState({ preview: !preview })}>
                         <EmojiFormattedContent>{chatRoom.topic}</EmojiFormattedContent>
-                        <Button icon="icon-minimise">
-                            <span>Toggle</span>
-                        </Button>
+                        <Button icon="icon-minimise" />
                     </div>
                     {preview && (
                         <div className="chat-body">

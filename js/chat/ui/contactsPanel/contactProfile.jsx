@@ -159,7 +159,7 @@ export default class ContactProfile extends MegaRenderMixin {
             const contact = M.u[handle];
 
             if (!contact || contact.c !== 1) {
-                return <Nil title="Contact not found" />;
+                return <Nil title={l.contact_not_found /* Contact not found */} />;
             }
 
             const HAS_RELATIONSHIP = ContactsPanel.hasRelationship(contact);

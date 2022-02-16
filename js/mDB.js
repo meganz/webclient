@@ -2186,6 +2186,14 @@ class MegaDexie extends Dexie {
         Object.defineProperty(this, '__ident_0', {value: `megadexie.${this.__dbUniqueID}-${++mIncID}`});
     }
 
+    get [Symbol.toStringTag]() {
+        return 'MegaDexie';
+    }
+
+    toString() {
+        return String(this._uname || this.name || this.__ident_0);
+    }
+
     put(table, data) {
         const {promise} = mega;
 
@@ -2218,22 +2226,33 @@ class MegaDexie extends Dexie {
                 queue[i] = data;
             }
 
-            this[table].bulkPut(queue)
-                .then(release)
-                .catch((ex) => {
-                    let res = 0;
-                    let failure = new MEGAException(ex.inner || ex, this, ex.name);
+            const bulkPut = () => this[table].bulkPut(queue).then(release);
 
-                    if (this.onerror) {
-                        res = this.onerror(ex);
-                        if (res) {
-                            failure = null;
+            bulkPut().catch(async(ex) => {
+                let res = 0;
+                let failure = new MEGAException(ex.inner || ex, this, ex.name);
+
+                if (failure.name === 'DatabaseClosedError') {
+                    // eslint-disable-next-line local-rules/open
+                    res = await this.open().then(bulkPut).catch(echo);
+                    if (!res) {
+                        if (d) {
+                            console.debug('DB closed unexpectedly and re-opened...', this);
                         }
+                        return;
                     }
+                }
 
-                    this.error = ex;
-                    release(res, failure);
-                });
+                if (this.onerror) {
+                    res = this.onerror(ex);
+                    if (res) {
+                        failure = null;
+                    }
+                }
+
+                this.error = ex;
+                return release(res, failure);
+            });
         }, 60);
 
         return promise;
@@ -2464,6 +2483,24 @@ lazy(MegaDexie, '__knownDBNames', function() {
     return db.table('k');
 });
 
+/**
+ * @name getDatabaseNames
+ * @memberOf MegaDexie
+ */
+lazy(MegaDexie, 'getDatabaseNames', () => {
+    'use strict';
+    if (typeof Object(window.indexedDB).databases === 'function') {
+        return async() => {
+            const dbs = await indexedDB.databases();
+            return dbs.map(obj => obj.name);
+        };
+    }
+    return async() => {
+        const dbs = await MegaDexie.__knownDBNames.toArray();
+        return dbs.map(obj => obj.v);
+    };
+});
+
 // @private
 MegaDexie.__dbConnections = [];
 
@@ -2658,8 +2695,8 @@ Object.defineProperties(LRUMegaDexie, {
                 eventlog(99748, message.split('\n')[0].substr(0, 96), true);
             }
 
-            // @todo gracefully de-activate running DBs
-            LRUMegaDexie.drop();
+            // drop all LRU-based databases.
+            LRUMegaDexie.drop().catch(dump);
         }
     },
     hookErrorHandlers: {
@@ -2679,13 +2716,10 @@ Object.defineProperties(LRUMegaDexie, {
         }
     },
     drop: {
-        value: () => {
+        value: async() => {
             'use strict';
-            indexedDB.databases()
-                .then(a => Promise.all(
-                    a.map(o => o.name).filter(n => n.startsWith('lru_')).map(n => Dexie.delete(n))
-                ))
-                .dump();
+            const dbs = await MegaDexie.getDatabaseNames();
+            return Promise.all(dbs.filter(n => n.startsWith('lru_')).map(n => Dexie.delete(n)));
         }
     },
     size: {

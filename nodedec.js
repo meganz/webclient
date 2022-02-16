@@ -843,6 +843,10 @@ class MegaNode {
     valueOf() {
         return this.s || 0;
     }
+
+    get [Symbol.toStringTag]() {
+        return 'MegaNode';
+    }
 }
 
 Object.setPrototypeOf(MegaNode.prototype, null);

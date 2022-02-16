@@ -664,6 +664,7 @@ if (!browserUpdate) try
         cmsStaticPath = 'https://smoketest.static.mega.nz/cms/';
         defaultStaticPath = staticpath;
         d = 1;
+        sessionStorage.rad = 1;
         is_litesite = !!localStorage.testIO;
     }
 
@@ -1577,6 +1578,7 @@ function mObjectURL(data, type)
                         console.log(buildVersion);
                         console.log(browserdetails(ua).prod + u_handle);
                     }
+                    mBroadcaster.sendMessage('crossTab:setup', this.master);
                     cb(this.master);
                     cb = null;
                 }
@@ -4198,6 +4200,7 @@ else if (!browserUpdate) {
                 if (Array.isArray(result) && typeof result[0] === 'object') {
                     // Cache flags object
                     mega.apiMiscFlags = result[0];
+                    mBroadcaster.sendMessage('global-mega-flags');
                 }
                 else {
                     if (d) {
@@ -4210,6 +4213,7 @@ else if (!browserUpdate) {
                                 M.req('gmf').always(function(result) {
                                     if (typeof result === 'object') {
                                         mega.apiMiscFlags = result;
+                                        mBroadcaster.sendMessage('global-mega-flags');
                                     }
                                     else if (d) {
                                         console.error('Giving up retrieving API flags...');

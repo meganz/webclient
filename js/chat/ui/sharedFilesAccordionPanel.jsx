@@ -19,10 +19,10 @@ class SharedFileItem extends MegaRenderMixin {
                 key={message.messageId + "_" + node.h}
                 onClick={() => this.props.isPreviewable ? M.viewMediaFile(node) : M.addDownload([node])}
                 onDoubleClick={() => M.addDownload([node])}>
-                <div className={"icon-or-thumb " + (thumbnails[node.h] ? "thumb" : "")}>
+                <div className={`icon-or-thumb ${thumbnails.has(node.fa) ? "thumb" : ""}`}>
                     <div className={"medium-file-icon " + icon}></div>
                     <div className="img-wrapper" id={this.props.imgId}>
-                        <img alt="" src={thumbnails[node.h] || ""}/>
+                        <img alt="" src={thumbnails.get(node.fa) || ""}/>
                     </div>
                 </div>
                 <div className="chat-shared-info">
@@ -42,18 +42,18 @@ class SharedFilesAccordionPanel extends MegaRenderMixin {
     eventuallyRenderThumbnails() {
         if (this.allShownNodes) {
             var pending = [];
-            var nodes = this.allShownNodes;
-            var handles = Object.keys(nodes);
-            var render = function(h) {
-                if (thumbnails[h]) {
-                    var batch = nodes[h];
+            const nodes = new Map(this.allShownNodes);
+            const render = (n) => {
+                if (thumbnails.has(n.fa)) {
+                    const src = thumbnails.get(n.fa);
+                    const batch = [...nodes.get(n.fa)];
 
                     for (var i = batch.length; i--;) {
-                        var n = batch[i];
-                        var img = document.getElementById('sharedFiles!' + n.ch);
+                        const n = batch[i];
+                        let img = document.getElementById(`sharedFiles!${n.ch}`);
 
                         if (img && (img = img.querySelector('img'))) {
-                            img.src = thumbnails[h];
+                            img.src = src;
 
                             if ((img = Object(img.parentNode).parentNode)) {
                                 img.classList.add('thumb');
@@ -65,14 +65,13 @@ class SharedFilesAccordionPanel extends MegaRenderMixin {
                 }
             };
 
-            for (var i = handles.length; i--;) {
-                var h = handles[i];
-
-                if (!render(h)) {
-                    pending.push(nodes[h][0])
+            for (const [, [n]] of nodes) {
+                if (!render(n)) {
+                    pending.push(n);
                 }
             }
-            this.allShownNodes = {};
+
+            this.allShownNodes.clear();
 
             if (pending.length) {
                 fm_thumbnails('standalone', pending, render);
@@ -80,7 +79,7 @@ class SharedFilesAccordionPanel extends MegaRenderMixin {
         }
     }
     componentWillMount() {
-        this.allShownNodes = {};
+        this.allShownNodes = new MapSet();
     }
     componentWillUnmount() {
         super.componentWillUnmount();
@@ -194,14 +193,7 @@ class SharedFilesAccordionPanel extends MegaRenderMixin {
                         );
 
                         if (showThumbnail) {
-                            if (self.allShownNodes[node.h]) {
-                                if (self.allShownNodes[node.h].indexOf(node) < 0) {
-                                    self.allShownNodes[node.h].push(node);
-                                }
-                            }
-                            else {
-                                self.allShownNodes[node.h] = [node];
-                            }
+                            self.allShownNodes.set(node.fa, node);
                         }
                     });
                 }

@@ -377,7 +377,7 @@ LinkInfoHelper.prototype.getInfo = function() {
             if (self.info['fa']) {
                 // load thumbnail
                 api_getfileattr(
-                    [{fa: self.info['fa'], k: key}],
+                    {[self.info.fa]: {fa: self.info.fa, k: key}},
                     0,
                     function(a, b, data) {
                         if (data !== 0xDEAD) {

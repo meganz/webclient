@@ -391,6 +391,7 @@ ul, li {
     width: 60px;
     margin: 0 auto;
     position: relative;
+    border-radius: 6px;
 }
 .create-new-folder-overlay .filetype-img {
     display: block;

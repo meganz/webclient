@@ -764,6 +764,42 @@
         },
 
         /**
+         * Expunges a DOM node stored in the `nodeMap`.
+         *
+         * @param {String} aHandle The ufs-node's handle
+         * @param {Boolean} [aRemove] Remove it from the DOM as well?
+         */
+        revokeDOMNode: function(aHandle, aRemove) {
+            if (this.nodeMap[aHandle]) {
+                const node = this.nodeMap[aHandle];
+                delete this.nodeMap[aHandle];
+
+                if (aRemove) {
+                    node.remove();
+                }
+                return node;
+            }
+        },
+
+        /**
+         * Check whether a DOM node is visible.
+         * nb: not necessarily in the view-port, but MegaList should handle that.
+         *
+         * @param {String} aHandle The ufs-node's handle
+         * @returns {Boolean} whether it is
+         */
+        isDOMNodeVisible: function(aHandle) {
+            const node = this.nodeMap[aHandle];
+            const res = !!(node && node.parentNode);
+
+            if (d > 1) {
+                console.assert(!this.megaList || res === this.megaList.isRendered(aHandle));
+            }
+
+            return res;
+        },
+
+        /**
          * Checks if a DOM node for that `aHandle` is created and cached in MegaRender.
          *
          * @param aHandle
@@ -1459,11 +1495,14 @@
                         var megaListOptions = {
                             'itemRenderFunction': M.megaListRenderNode,
                             'preserveOrderInDOM': true,
-                            'extraRows': 4,
+                            'extraRows': 1,
                             'batchPages': 0,
                             'appendOnly': false,
-                            'onContentUpdated': function () {
-                                M.rmSetupUI(false, true);
+                            'onContentUpdated': function() {
+                                if (M.viewmode) {
+                                    delay('thumbnails', fm_thumbnails, 2);
+                                }
+                                M.rmSetupUIDelayed(911);
                             },
                             'perfectScrollOptions': {
                                 'handlers': ['click-rail', 'drag-scrollbar', 'wheel', 'touch'],
@@ -1478,6 +1517,7 @@
                             megaListContainer = this.container;
                         }
                         else {
+                            megaListOptions.extraRows = 4;
                             megaListOptions.itemWidth = false;
                             megaListOptions.itemHeight = 32;
                             megaListOptions.appendTo = 'tbody';

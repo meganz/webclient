@@ -1717,14 +1717,14 @@ Chat.prototype._enqueueImageLoad = function(n) {
 
         // Only load the image once if its node is posted around several rooms
 
-        if (this._imageLoadCache[n.h]) {
-            this._imageLoadCache[n.h].push(n.ch);
+        if (this._imageLoadCache[n.fa]) {
+            this._imageLoadCache[n.fa].push(n.ch);
         }
         else {
-            this._imageLoadCache[n.h] = [n.ch];
+            this._imageLoadCache[n.fa] = [n.ch];
 
             if (load) {
-                this._imagesToBeLoaded[n.h] = n;
+                this._imagesToBeLoaded[n.fa] = n;
                 dedup = false;
             }
         }
@@ -1738,7 +1738,7 @@ Chat.prototype._enqueueImageLoad = function(n) {
     }
 
     if (cached) {
-        this._doneLoadingImage(n.h);
+        this._doneLoadingImage(n.fa);
     }
 };
 
@@ -1774,7 +1774,7 @@ Chat.prototype._doLoadImages = function() {
         // Load png & webp originals to preserve their transparency, if any
         var mime = filemime(node);
         if (node.s < LOAD_ORIGINALS[mime]) {
-            originals[node.h] = node;
+            originals[node.fa] = node;
             delete imagesToBeLoaded[k];
         }
     }
@@ -1794,8 +1794,8 @@ Chat.prototype._doLoadImages = function() {
                 console.debug('Failed to load original image on chat.', n.h, n, ex);
             }
 
-            imagesToBeLoaded[n.h] = originals[n.h];
-            delete originals[n.h];
+            imagesToBeLoaded[n.fa] = originals[n.fa];
+            delete originals[n.fa];
 
             delay('ChatRoom[' + self.roomId + ']:origFallback' + type, function() {
                 api_getfileattr(imagesToBeLoaded, type, onSuccess, onError);
@@ -1808,7 +1808,7 @@ Chat.prototype._doLoadImages = function() {
             if (typeof handler === 'function') {
                 handler(data, (buffer) => {
                     if (buffer) {
-                        chatImageParser(n.h, buffer);
+                        chatImageParser(n.fa, buffer);
                     }
                     else {
                         origFallback(EFAILED);
@@ -1816,7 +1816,7 @@ Chat.prototype._doLoadImages = function() {
                 });
             }
             else {
-                chatImageParser(n.h, data);
+                chatImageParser(n.fa, data);
             }
         }).catch(origFallback);
     };

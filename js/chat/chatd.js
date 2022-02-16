@@ -237,6 +237,7 @@ Chatd.prototype._proxyEventsToRooms = function() {
         'onMessagesHistoryRequest',
         'onBroadcast',
         'onRoomDisconnected',
+        'onRoomConnected',
         'onMembersUpdated',
         'onMessageConfirm',
         'onMessageUpdated',

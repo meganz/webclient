@@ -10,16 +10,18 @@
 }
 .gallery-tabs-bl {
     display: flex;
+    position: relative;
     justify-content: center;
     height: 32px;
     box-sizing: content-box;
     flex-shrink: 0;
     border-bottom: 1px solid var(--surface-main);
+    min-width: 700px;
 }
 .rtl .gallery-tabs-bl {
     direction: rtl;
 }
-.fm-right-files-block.emptied .gallery-tabs-bl button {
+.fm-right-files-block.emptied .gallery-tabs-bl button:not(.gallery-close-discovery) {
     display: none;
 }
 .gallery-section-title {
@@ -28,6 +30,9 @@
     font: var(--text-body1);
     color: var(--text-color-high);
     line-height: 26px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
 }
 .rtl .gallery-section-title {
     left: auto;

@@ -251,22 +251,31 @@ mobile.uploadOverlay = {
                     }
                 }
 
-                fm_thumbnails('standalone', nodeList, function(h) {
-                    self.logger.debug('Thumbnail for %s may be ready...', h, nodeMap[h], thumbnails[h]);
+                fm_thumbnails('standalone', nodeList, (n) => {
+                    const {h, fa} = n;
 
-                    if (thumbnails[h] && nodeMap[h]) {
-                        var img = overlay.querySelector('#' + nodeMap[h] + ' img');
+                    if (d) {
+                        self.logger.debug('Thumbnail for %s may be ready...', h, nodeMap[h], thumbnails.has(fa));
+                    }
+
+                    if (thumbnails.has(fa) && nodeMap[h]) {
+                        const src = thumbnails.get(fa);
+                        let img = overlay.querySelector(`#${nodeMap[h]} img`);
+
                         if (img) {
-                            img.src = thumbnails[h];
+                            img.src = src;
                             // img.parentNode.classList.add('thumb');
                         }
-                        else if (d) {
-                            self.logger.warn('No DOM node for #%s', nodeMap[h]);
+
+                        if ((img = overlay.querySelector('.filetype-img'))
+                            && Object(img.nextElementSibling).textContent === n.name) {
+
+                            img.src = src;
                         }
                     }
                 });
             }
-        }, 4e3);
+        }, 900);
     },
 
     /**

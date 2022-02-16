@@ -513,6 +513,10 @@
             return l[236]; // Import
         }
 
+        if ($.chatAttachmentShare && section !== 'conversations') {
+            return l[776]; // Save
+        }
+
         if ($.copyToShare || section === 'shared-with-me') {
             return l[1344]; // Share
         }
@@ -551,6 +555,10 @@
     var getDialogTitle = function() {
         if ($.mcImport) {
             return l[236]; // Import
+        }
+
+        if ($.chatAttachmentShare && section !== 'conversations') {
+            return l[776]; // Save
         }
 
         if ($.copyToShare) {
@@ -991,6 +999,11 @@
             $('header h2', $dialog).text(l[16533]);
         }
         else {
+            $permissionSelect.addClass('hidden');
+            $('header h2', $dialog).text(getDialogTitle());
+        }
+
+        if ($.chatAttachmentShare && section !== 'conversations') {
             $permissionSelect.addClass('hidden');
             $('header h2', $dialog).text(getDialogTitle());
         }

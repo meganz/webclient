@@ -1513,6 +1513,13 @@ FileManager.prototype.initContextUI = function() {
         M.openSharingDialog();
     });
 
+    $(`${c}.removeshare-item`).rebind('click', () => {
+        loadingDialog.show();
+        new mega.Share().removeSharesFromSelected().always(() => {
+            loadingDialog.hide();
+        });
+    });
+
     // Move Dialog
     $(c + '.advanced-item, ' + c + '.move-item').rebind('click', openMoveDialog);
 
@@ -1668,8 +1675,7 @@ FileManager.prototype.initContextUI = function() {
         }
     });
 
-
-    $(c + '.removeshare-item').rebind('click', function() {
+    $(`${c}.leaveshare-item`).rebind('click', () => {
         if (M.isInvalidUserStatus()) {
             return;
         }
@@ -1963,6 +1969,11 @@ FileManager.prototype.initContextUI = function() {
         }
         $('.js-lpbtn').removeClass('active');
         M.openFolder(target);
+    });
+
+    $(`${c}.open-gallery`).rebind('click', () => {
+        var target = $.selected[0];
+        M.openFolder(`discovery/${target}`);
     });
 
     $(c + '.open-cloud-item').rebind('click', function() {
@@ -4032,24 +4043,30 @@ FileManager.prototype.onSectionUIOpen = function(id) {
         case 'photos':
         case 'images':
         case 'videos':
+        case 'discovery':
             tmpId = 'gallery';
             break;
         default:
             tmpId = id;
     }
 
-    let tempId = String(tmpId).replace(/[^\w-]/g, '');
+    let fmLeftIconName = String(tmpId).replace(/[^\w-]/g, '');
+
+    if (id === 'discovery') {
+        fmLeftIconName = 'cloud-drive';
+    }
+
     let fmLeftIcons = document.getElementsByClassName('nw-fm-left-icon');
 
-    if (fmLeftIcons[tempId] && !fmLeftIcons[tempId].classList.contains('active')) {
-        fmLeftIcons[tempId].classList.add('active');
+    if (fmLeftIcons[fmLeftIconName] && !fmLeftIcons[fmLeftIconName].classList.contains('active')) {
+        fmLeftIcons[fmLeftIconName].classList.add('active');
     }
 
     let contentPanels = document.getElementsByClassName('content-panel');
 
     for (let i = contentPanels.length; i--;) {
 
-        if (contentPanels[i].classList.contains(tempId)) {
+        if (contentPanels[i].classList.contains(fmLeftIconName)) {
 
             if (!contentPanels[i].classList.contains('active')) {
                 contentPanels[i].classList.add('active');
@@ -4254,7 +4271,7 @@ FileManager.prototype.onSectionUIOpen = function(id) {
 
     if ((id === 'cloud-drive' && !folderlink) || id === 'shared-with-me' || id === 'out-shares' ||
         id === 'public-links' || id === 'inbox' || id === 'rubbish-bin' || id === 'recents' ||
-        id === "photos" || id === "images" || id === "videos") {
+        id === "photos" || id === "images" || id === "videos" || id === 'discovery') {
         M.initLeftPanel();
     }
     else if (id === 'cloud-drive' || id === 'dashboard' || id === 'account') {
@@ -4385,13 +4402,14 @@ FileManager.prototype.initLeftPanel = function() {
     'use strict';
 
     const isGallery = M.currentCustomView.type === 'gallery';
+    const isDiscovery = isGallery && M.currentCustomView.prefixPath === 'discovery/';
     let elements = document.getElementsByClassName('js-lpbtn');
 
     for (var i = elements.length; i--;) {
         elements[i].classList.remove('active');
     }
 
-    elements = document.getElementsByClassName(isGallery ? 'js-lp-gallery' : 'js-lp-myfiles');
+    elements = document.getElementsByClassName(isGallery && !isDiscovery ? 'js-lp-gallery' : 'js-lp-myfiles');
 
     for (var j = elements.length; j--;) {
         elements[j].classList.remove('hidden');

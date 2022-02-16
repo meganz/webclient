@@ -944,19 +944,27 @@ MegaData.prototype.reinvitePendingContactRequest = function(target) {
 // ToDo, update M.ipc so we can have info about ipc status for view received requests
 MegaData.prototype.ipcRequestHandler = function(id, action) {
     if (d) console.debug('ipcRequestHandler');
-    var proceed = this.checkIpcRequestPrerequisites(id);
+    return new MegaPromise((resolve, reject) => {
+        var proceed = this.checkIpcRequestPrerequisites(id);
 
-    if (proceed === 0) {
-        api_req({'a': 'upca', 'p': id, 'aa': action, i: requesti}, {
-            callback: function(resp) {
-                proceed = resp;
-            }
-        });
-    }
-
-    this.ipcRequestMessageHandler(proceed);
-
-    return proceed;
+        if (proceed === 0) {
+            api_req({'a': 'upca', 'p': id, 'aa': action, i: requesti}, {
+                callback: function(res) {
+                    if (res === 0) {
+                        resolve(res);
+                    }
+                    else {
+                        M.ipcRequestMessageHandler(res);
+                        reject(res);
+                    }
+                }
+            });
+        }
+        else {
+            this.ipcRequestMessageHandler(proceed);
+            reject(proceed);
+        }
+    });
 };
 
 MegaData.prototype.ipcRequestMessageHandler = function(errorCode) {

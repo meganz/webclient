@@ -233,9 +233,28 @@
     z-index: 98;
     top: 4px;
 }
-.rtl .nw-fm-tree-item.linked .file-status-ico {
+.nw-fm-tree-item .gallery-status-icon {
+    display: none;
+    --mask-color: var(--secondary-blue);
+    position: absolute;
+    right: 4px;
+    z-index: 98;
+    top: 4px;
+    --icon-size: 24px;
+}
+.nw-fm-tree-item.on-gallery .gallery-status-icon {
+    display: inline;
+}
+.nw-fm-tree-item.linked.on-gallery .gallery-status-icon {
+    right: 26px;
+}
+.rtl .nw-fm-tree-item.linked .file-status-ico,
+.rtl .nw-fm-tree-item.on-gallery .gallery-status-icon {
     right: auto;
     left: 4px;
+}
+.rtl .nw-fm-tree-item.linked.on-gallery .gallery-status-icon {
+    left: 26px;
 }
 .nw-fm-tree-item .sprite-fm-mono.icon-takedown {
     display: inline;

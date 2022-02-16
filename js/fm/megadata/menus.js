@@ -206,7 +206,7 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
     const sourceRoot = M.getSelectedSourceRoot(isSearch);
 
     if (selNode && selNode.su && !M.d[selNode.p]) {
-        items['.removeshare-item'] = 1;
+        items['.leaveshare-item'] = 1;
     }
     else if (M.getNodeRights($.selected[0]) > 1) {
         items['.move-item'] = 1;
@@ -221,6 +221,10 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
 
             if (sourceRoot === M.RootID && !folderlink) {
                 items['.sh4r1ng-item'] = 1;
+
+                if (M.getNodeShareUsers(selNode, 'EXP').length || M.ps[selNode]) {
+                    items['.removeshare-item'] = 1;
+                }
             }
 
             if ((sourceRoot === M.RootID || sourceRoot === M.InboxID)
@@ -343,6 +347,14 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
         delete items['.embedcode-item'];
         delete items['.properties-versions'];
         delete items['.clearprevious-versions'];
+    }
+
+    if (selNode.t && !folderlink && M.currentrootid !== M.RubbishID &&
+        M.currentrootid !== 'out-shares' && M.currentrootid !== 'shares' &&
+        M.currentrootid !== 'public-links' && M.currentdirid !== 'recents' &&
+        $.selected.length === 1 &&
+        (M.currentCustomView.type !== 'gallery' || selNode.h !== M.currentCustomView.nodeID)) {
+        items['.open-gallery'] = 1;
     }
 
     if ((sourceRoot === M.RootID) && !folderlink) {
@@ -837,6 +849,9 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
                         if (items['.getlink-item']) {
                             onIdle(() => M.setContextMenuGetLinkText());
                         }
+                        if (items['.sh4r1ng-item']) {
+                            onIdle(() => M.setContextMenuShareText());
+                        }
 
                         if (items['.play-item']) {
                             var $playItem = $menuCMI.filter('.play-item');
@@ -918,6 +933,24 @@ MegaData.prototype.setContextMenuGetLinkText = function() {
     var $contextMenu = $('.dropdown.body');
     $contextMenu.find('.getlink-item span').text(getLinkText);
     $contextMenu.find('.removelink-item span').text(removeLinkText);
+};
+
+/**
+ * Sets the text in the context menu for the sharing option.
+ * If the folder is shared or has pending shares then the text will be set to 'Manage share',
+ * else the text will be set to 'Share folder'.
+ */
+MegaData.prototype.setContextMenuShareText = function() {
+    'use strict';
+
+    const selectedNode = M.d[$.selected[0]] || false;
+
+    // If the node has shares or pending shares, set to 'Manage share', else, 'Share folder'
+    const getLinkText = selectedNode && M.getNodeShareUsers(selectedNode, 'EXP').length || M.ps[selectedNode]
+        ? l.manage_share
+        : l[5631];
+
+    $('.sh4r1ng-item span', '.dropdown.body').text(getLinkText);
 };
 
 /**

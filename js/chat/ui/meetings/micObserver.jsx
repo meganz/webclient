@@ -26,7 +26,9 @@ export const withMicObserver = Component =>
                     meetings-signal-issue
                     simpletip
                 `}
-                data-simpletip="Check your system settings to unmute your mic and adjust its level"
+                data-simpletip={
+                    l.chat_mic_off_tooltip /* Check your system settings to unmute your mic and adjust its level */
+                }
                 data-simpletipposition="top"
                 data-simpletipoffset="5"
                 data-simpletip-class="theme-dark-forced">

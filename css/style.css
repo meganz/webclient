@@ -54,8 +54,11 @@ body * {
     left: calc(50% - 8px);
     top: 0;
 }
+.block-loading-spinner,
 .wait-cursor .fm-breadcrumbs:first-child:not(.public-links) .loading {
     display: block;
+    font-size: 0 !important;
+    background-position: 100% 0;
     animation: rotate 0.8s infinite linear;
     animation-timing-function: steps(8, end);
 }
@@ -2649,6 +2652,14 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     -webkit-padding-end: 48px;
     padding-inline-end: 48px;
 }
+.nw-fm-tree-item.on-gallery {
+    -webkit-padding-end: 30px;
+    padding-inline-end: 30px;
+}
+.nw-fm-tree-item.on-gallery.labeled {
+    -webkit-padding-end: 50px;
+    padding-inline-end: 50px;
+}
 .nw-fm-tree-item .data-item-icon {
     top: 2px;
     right: 12px;
@@ -2662,6 +2673,14 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 .nw-fm-tree-item.undecryptable.labeled {
     -webkit-padding-end: 50px;
     padding-inline-end: 50px;
+}
+.nw-fm-tree-item.linked.on-gallery {
+    -webkit-padding-end: 50px;
+    padding-inline-end: 50px;
+}
+.nw-fm-tree-item.linked.on-gallery.labeled {
+    -webkit-padding-end: 60px;
+    padding-inline-end: 60px;
 }
 .nw-fm-tree-item:hover, .nw-fm-tree-item.hovered {
     background-color: rgba(217,0,7,0.2);
@@ -6540,7 +6559,7 @@ table {
 .startvideo-item .context-menu-icon {
     background-position: -5px -2004px;
 }
-.removeshare-item .context-menu-icon {
+.leaveshare-item .context-menu-icon {
     background-position: -1px -10038px;
 }
 .properties-item .context-menu-icon {

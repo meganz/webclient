@@ -65,6 +65,10 @@
             <i class="sprite-fm-mono icon-folder-open"></i>
             <span>[$865]</span>
         </a>
+        <a class="dropdown-item open-gallery">
+            <i class="sprite-fm-mono icon-photo-discovery"></i>
+            <span>[$gallery_media_discovery]</span>
+        </a>
         <a class="dropdown-item open-cloud-item">
             <i class="sprite-fm-mono icon-search-cloud"></i>
             <span>[$23704]</span>
@@ -168,7 +172,11 @@
         </a>
         <a class="dropdown-item sh4r1ng-item">
             <i class="sprite-fm-mono icon-folder-outgoing-share"></i>
-            <span>[$60]</span>
+            <span>[$5631]</span> <!--Share folder-->
+        </a>
+        <a class="dropdown-item removeshare-item">
+            <i class="sprite-fm-mono icon-folder-remove-share"></i>
+            <span>[$remove_share]</span>
         </a>
         <a class="dropdown-item shared-folder-item">
             <i class="sprite-fm-mono icon-share"></i>
@@ -369,7 +377,7 @@
             <i class="sprite-fm-mono icon-bin"></i>
             <span>[$83]</span>
         </a>
-        <a class="dropdown-item removeshare-item">
+        <a class="dropdown-item leaveshare-item">
             <i class="sprite-fm-mono icon-logout"></i>
             <span>[$5866]</span>
         </a>
@@ -1013,6 +1021,12 @@
                 <button class="gallery-tab-lnk gallery-tab-lnk-m months" data-folder="m">[$gallery_months]</button>
                 <button class="gallery-tab-lnk gallery-tab-lnk-d days" data-folder="d">[$gallery_days]</button>
                 <button class="gallery-tab-lnk gallery-tab-lnk-a all" data-folder="a">[$gallery_all]</button>
+                <button class="mega-button action gallery-close-discovery">
+                    <div>
+                        <i class="sprite-fm-mono icon-dialog-close"></i>
+                    </div>
+                    <span>[$gallery_exit_discovery]</span>
+                </button>
                 <div class="clear"></div>
             </div>
 
@@ -1421,6 +1435,20 @@
                         <div class="fm-empty-options-item">
                             <i class="sprite-fm-mono icon-pc"></i>
                             [$gallery_get_start_instruction_3]
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="fm-empty-section fm-empty-discovery hidden">
+                <div class="fm-empty-pad">
+                    <i class="section-icon sprite-fm-theme icon-gallery-photos"></i>
+                    <div class="fm-empty-cloud-txt">[$gallery_media_discovery]</div>
+                    <div class="fm-empty-description">[$gallery_get_start]</div>
+                    <div class="fm-empty-options">
+                        <div class="fm-empty-options-item">
+                            <i class="sprite-fm-mono icon-camera-uploads"></i>
+                            [$gallery_get_start_instruction_4]
                         </div>
                     </div>
                 </div>
@@ -2436,7 +2464,7 @@
                     <button class="mega-button simpletip small action js-statusbarbtn download" data-simpletipoffset="2" data-simpletip="[$58]" data-simpletipposition="top">
                         <div><i class="sprite-fm-mono icon-download-small"></i></div>
                     </button>
-                    <button class="mega-button simpletip small action js-statusbarbtn hidden share" data-simpletipoffset="2" data-simpletip="[$60]" data-simpletipposition="top">
+                    <button class="mega-button simpletip small action js-statusbarbtn hidden share" data-simpletipoffset="2" data-simpletip="[$5631]" data-simpletipposition="top">
                         <div><i class="sprite-fm-mono icon-folder-outgoing-share"></i></div>
                     </button>
                     <button class="mega-button simpletip small action js-statusbarbtn sendto" data-simpletipoffset="2" data-simpletip="[$17764]" data-simpletipposition="top">
@@ -4728,6 +4756,7 @@
             <span class="nw-fm-tree-arrow"></span>
             <span class="nw-fm-tree-folder"></span>
             <span class="file-status-ico"></span>
+            <span class="gallery-status-icon sprite-fm-mono icon-photos"></span>
             <span class="colour-label-ind hidden"></span>
         </span>
         <ul></ul>

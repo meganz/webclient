@@ -236,6 +236,10 @@
     z-index: 10;
     display: block;
 }
+.rtl .gallery-view.gallery-type-a .gallery-view-zoom-control {
+    right: auto;
+    left: 20px;
+}
 .gallery-view-zoom-control .btn-icon {
     width: 24px;
     height: 24px;
@@ -584,4 +588,18 @@
     align-items: stretch;
     grid-gap: 20px;
     grid-template-columns: calc(50% - 10px) calc(50% - 10px);
+}
+.mega-button.action.gallery-close-discovery {
+    position: absolute;
+    right: 36px;
+    top: 12px;
+    -webkit-padding-end: 8px;
+    padding-inline-end: 8px;
+}
+.rtl .gallery-close-discovery {
+    right: auto;
+    left: 36px;
+}
+.gallery-close-discovery i {
+    --mask-color: var(--secondary-red);
 }

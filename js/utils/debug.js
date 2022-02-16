@@ -100,6 +100,29 @@ function dcTracer(ctr) {
     }
 }
 
+function tryCatch(func, onerror) {
+    'use strict';
+    const sml = Symbol('__tryCatcher__');
+
+    func[sml] = function __tryCatcher() {
+        // eslint-disable-next-line local-rules/hints
+        try {
+            return func.apply(this, arguments);
+        }
+        catch (ex) {
+            if (onerror !== false) {
+                console.error(ex);
+            }
+
+            if (typeof onerror === 'function') {
+                onIdle(onerror.bind(null, ex));
+            }
+        }
+    };
+    func[sml][Symbol('__function__')] = func;
+    return func[sml];
+}
+
 lazy(self, 'runKarmaTests', () => {
     'use strict';
     let currentFile = -1;
@@ -285,8 +308,8 @@ mBroadcaster.once('startMega', async() => {
         setInterval(function() {
             var now = Date.now();
             var known = [
-                '1:setUserAvatar', '1:previewimg', '1:procfa', '2:procfa', '3:addScript', '1:MediaElementWrapper',
-                '2:chatImageParser', '2:initall', '3:initall', '2:MEGAWorkerController'
+                '1:setUserAvatar', '1:previewimg', '1:onload', '2:onload', '3:procfa', '3:addScript',
+                '1:MediaElementWrapper', '2:chatImageParser', '2:initall', '3:initall', '2:MEGAWorkerController'
             ];
             // ^ think twice before whitelisting anything new here...
 
@@ -317,4 +340,304 @@ mBroadcaster.once('startMega', async() => {
     }
 
     console.groupEnd();
+});
+
+mBroadcaster.once('boot_done', function radSetup() {
+    'use strict';
+
+    const exclude = is_mobile || is_karma || is_litesite || is_iframed || localStorage.norad || !is_livesite;
+    if (exclude && !sessionStorage.rad) {
+        return;
+    }
+
+    if (typeof mega.flags !== 'object') {
+        mBroadcaster.once('global-mega-flags', radSetup);
+        return;
+    }
+
+    const rad = parseInt(sessionStorage.rad || mega.flags.rad);
+
+    if (!rad) {
+        if (rad === 0) {
+            delete localStorage.d;
+            delete localStorage.minLogLevel;
+        }
+        return;
+    }
+
+    localStorage.d = d |= 1;
+    localStorage.minLogLevel |= 0;
+
+    let idb, pfx;
+    let indent = 0;
+    const buffer = new Set();
+    const jsonp = tryCatch((...o) => JSON.stringify(...o), false);
+
+    const toStringTag = (v) => v && (v[Symbol.toStringTag] || v.name);
+    const toPropertyName = (v) => toStringTag(v) || v && toStringTag(v.constructor) || v;
+    const toPropertyValue = (name, v) => {
+        if (name === 'Event') {
+            return `{${v.type},${toPropertyName(v.target)}}`;
+        }
+        const num = Number('byteLength' in v ? v.byteLength : 'length' in v ? v.length : 'size' in v ? v.size : NaN);
+        return num >= 0 ? num : Object(v).toString();
+    };
+
+    const stringify = (value) => {
+        const type = typeof value;
+
+        if (type !== 'string') {
+            if (value && type === 'object') {
+                const name = toPropertyName(value);
+
+                if (name === 'Array') {
+                    if (value.length > 8) {
+                        value = [...value];
+                        value.splice(8, Infinity, '\u2026');
+                    }
+                    value = `Array[${value.map(stringify).join(';')}]`;
+                }
+                else if (name === 'Object') {
+                    let max = 4;
+                    const srz = [];
+                    for (const p in value) {
+                        if (!--max) {
+                            srz.push('\u2026');
+                            break;
+                        }
+                        const v = value[p];
+                        const t = typeof v;
+                        srz.push(`${p}:${t === 'object' && toPropertyName(v) || (t === 'function' ? v.name : v)}`);
+                    }
+                    value = `Object{${srz.join(';')}}`;
+                }
+                else {
+                    value = `${name}(${toPropertyValue(name, value)})`;
+                }
+            }
+            else if (type === 'function') {
+                value = `${type}(${value.name})`;
+            }
+            else {
+                value = value === undefined ? 'undefined' : `${type}(${value})`;
+            }
+        }
+
+        return value;
+    };
+
+    const argp = (args = [], name = null) => {
+        args = [...args];
+        const type = typeof args[0];
+
+        if (type === 'string') {
+            args.unshift(
+                args.shift().replace(/%[Ocdfios]/g, (m) => {
+                    if (m === '%s') {
+                        return String(args.shift());
+                    }
+                    else if (m === '%o' || m === '%O') {
+                        return jsonp(args.shift());
+                    }
+                    else if (m === '%f') {
+                        return parseFloat(args.shift()).toFixed(6);
+                    }
+                    else if (m === '%c') {
+                        args.shift();
+                        return '';
+                    }
+
+                    return parseInt(args.shift());
+                })
+            );
+        }
+        else if (type === 'object') {
+            args[0] = jsonp(args[0]) || args[0];
+        }
+
+        for (let i = args.length; i--;) {
+            args[i] = stringify(args[i]);
+        }
+
+        if (name) {
+            name = name.toUpperCase();
+            if (indent) {
+                args.unshift(name);
+                if (pfx) {
+                    args.unshift(`[${pfx}]`);
+                }
+            }
+            else {
+                if (pfx) {
+                    args.unshift(`[${pfx}]`);
+                }
+                args.unshift(name.padStart(9));
+            }
+        }
+        else if (pfx) {
+            args.unshift(`[${pfx}]`);
+        }
+        args = args.join(' ');
+
+        if (indent > 0) {
+            const ps = Array(indent + 1).join('\u00B7');
+            args = args.split('\n').map(ln => `${ps.padStart(9)} ${ln}`).join('\n');
+        }
+
+        return args.replace(/[\w-]{31,}/g, "\u2026");
+    };
+
+    const flush = async() => {
+        const db = idb || (idb = await flush.db);
+        if (buffer.size) {
+            const bump = [...buffer];
+            buffer.clear();
+            await db.set(`${Date.now().toString(36)}.${bump.length}`, flush.tx.encode(`${bump.join('\n')}\n`));
+        }
+        return db;
+    };
+    lazy(flush, 'tx', () => new TextEncoder());
+    lazy(flush, 'db', () => LRUMegaDexie.create('rad.log', 9e3));
+
+    const log = (name, args) => {
+        if (typeof args === 'string') {
+            args = [args];
+        }
+        buffer.add(argp(args, name));
+
+        if (buffer.size > 400) {
+            flush().catch(dump);
+        }
+    };
+
+    const handlers = {
+        table(name, args) {
+            log(name, [jsonp(args[0], null, 4)]);
+        },
+        group(name, args) {
+            ++indent;
+            log(name, args);
+        },
+        groupEnd() {
+            --indent;
+        },
+        assert(name, args) {
+            if (!args[0]) {
+                if (args.length < 2) {
+                    args = [0, `${new Error('Failed assertion.').stack}`];
+                }
+                log(name, args.slice(1));
+            }
+        }
+    };
+
+    'debug,error,info,log,warn,table,group,groupEnd,assert'
+        .split(',')
+        .map(tryCatch((fn) => {
+            const gConsoleMethod = console[fn];
+            const mConsoleWrapper = handlers[fn] || log;
+
+            console[fn] = tryCatch((...args) => {
+                mConsoleWrapper(fn, args);
+                return gConsoleMethod.apply(console, args);
+            }, false);
+        }));
+
+    log('----');
+    log('MEGA', `Starting RAD Session, ${new Date().toISOString()}`);
+
+    mBroadcaster.once('crossTab:setup', (master) => {
+        if (!master) {
+            pfx = (Math.random() * Date.now() >>> 5).toString(36);
+
+            const buf = [...buffer];
+            buffer.clear();
+
+            for (let i = 0; i < buf.length; ++i) {
+                const p = buf[i].split(/^(\s+\w+)/);
+                p.splice(2, 0, ` [${pfx}]`);
+                buffer.add(p.join(''));
+            }
+        }
+    });
+
+    window.addEventListener('error', (ev) => {
+        let error = ev.error || ev.message || !1;
+
+        if (error.stack) {
+            error = `${error}${String(error.stack).replace(ev.message, '')}`;
+        }
+
+        log('UNCAUGHT', `Exception, ${error}`);
+        flush().catch(dump);
+    });
+
+    window.addEventListener("unhandledrejection", (ev) => {
+        log('UNCAUGHT', `Promise Rejection, ${ev.reason}`);
+        flush().catch(dump);
+    });
+
+    setTimeout(function setup() {
+        M.onFileManagerReady(flush);
+        console.info('%cretroactive-logging enabled.', 'font: 18px LatoWebBold');
+
+        const exporter = async(ev) => {
+            const cn = 'block-loading-spinner';
+            const cl = ev.target.classList;
+            if (!cl.contains(cn)) {
+                cl.add(cn);
+                await mega.rad.export().catch(dump);
+                cl.remove(cn);
+            }
+        };
+
+        for (const elm of document.querySelectorAll('.top-mega-version')) {
+            if (!elm.nextElementSibling || elm.nextElementSibling.nodeName === 'BUTTON') {
+                elm.after(parseHTML('<div class="block-null-spinner sprite-fm-theme">\u33D2&#127917;</div>'));
+                elm.nextElementSibling.addEventListener('click', exporter);
+            }
+        }
+
+        if (!window.u_sid) {
+            mBroadcaster.once('login2', () => M.onFileManagerReady(setup));
+        }
+
+    }, 7e3);
+
+    /** @property mega.rad */
+    lazy(mega, 'rad', () => {
+        const rad = Object.getOwnPropertyDescriptors({
+            log,
+            flush,
+            drop: async() => {
+                const db = await flush();
+                return db.delete();
+            },
+            export: async(save = true, compress = true) => {
+                const chunks = [];
+                const filename = `rad-${new Date().toISOString().replace(/\D/g, '')}.log`;
+                console.info(`RAD Export to "${filename}"`);
+
+                const db = await flush();
+                if (db instanceof LRUMegaDexie) {
+                    await db.data.orderBy('ts').each(({data}) => chunks.push(data));
+
+                    for (let i = chunks.length; i--;) {
+                        chunks[i] = await db.decrypt(chunks[i]);
+                    }
+                }
+                else {
+                    chunks.push(...[...db.values()]);
+                }
+
+                const blob = new Blob(chunks);
+                const data = compress && await M.compress(blob).catch(nop);
+
+                const args = [data || blob, data ? `${filename}.gz` : filename];
+                return save ? M.saveAs(...args) : args;
+            }
+        });
+
+        return Object.freeze(Object.setPrototypeOf(Object.defineProperties(rad, rad), null));
+    });
 });

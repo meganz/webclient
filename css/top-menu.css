@@ -244,9 +244,13 @@
     flex-shrink: 0;
 }
 
+.block-null-spinner,
 .top-mega-version {
+    background-position: -1000px;
     font: var(--text-body1-bold);
     color: var(--text-color-low);
+    cursor: pointer;
+    white-space: nowrap;
 }
 
 /* Side menu Account data block (logged in) */

@@ -3,6 +3,7 @@ class MegaGallery {
     constructor(id) {
 
         this.id = id || M.currentdirid;
+        this.isDiscovery = !!id;
         this.groups = {y: {}, m: {}, d: {}, a: {}};
         this.renderCache = {};
         this.scrollPosCache = {y: 0, m: 0, d: 0, a: 0};
@@ -10,7 +11,9 @@ class MegaGallery {
         this.contentRowTemplateNode = document.getElementById('gallery-cr-template');
         this.blockTemplateNode = document.getElementById('gallery-dbv-template');
         this.updNode = {};
+        this.type = ['photo', 'images', 'videos'].includes(id) ? 'basic' : 'discovery';
         this.shouldProcessScroll = true;
+        this.inPreview = false;
     }
 
     get onpage() {
@@ -918,8 +921,14 @@ class MegaGallery {
 
     initDynamicList() {
 
+        this.slideShowCloseLister = mBroadcaster.addListener('slideshow:close', () => {
+            delay('galleryCloseSlideShow', () => {
+                this.inPreview = false;
+            });
+        });
+
         $('.fm-right-files-block').removeClass('emptied');
-        $(`.fm-empty-${this.id}`).addClass('hidden');
+        $(`.fm-empty-${this.isDiscovery ? 'discovery' : this.id}`).addClass('hidden');
         this.galleryBlock.classList.remove('hidden');
 
         if (this.mode === 'a') {
@@ -1036,6 +1045,8 @@ class MegaGallery {
                 if (is_video(n)) {
                     $.autoplay = h;
                 }
+
+                this.inPreview = true;
                 slideshow(h, false);
             }
             else {
@@ -1078,18 +1089,18 @@ class MegaGallery {
             }
         });
 
-        $('.gallery-tab-lnk').rebind('click', function() {
+        $('.gallery-tab-lnk').rebind('click', e => {
 
-            if (mega.gallery[M.currentdirid].mode === this.attributes['data-folder'].value) {
+            if (this.mode === e.currentTarget.attributes['data-folder'].value) {
 
-                mega.gallery[M.currentdirid].dynamicList.scrollToYPosition(0);
-                mega.gallery[M.currentdirid].throttledOnScroll();
+                this.dynamicList.scrollToYPosition(0);
+                this.throttledOnScroll();
 
                 return false;
             }
 
-            mega.gallery[M.currentdirid].setMode(this.attributes['data-folder'].value, 1);
-            mega.gallery[M.currentdirid].render();
+            this.setMode(e.currentTarget.attributes['data-folder'].value, 1);
+            this.render();
         });
 
         $('.gallery-view-zoom-control > button', this.galleryBlock).rebind('click.galleryZoom', e => {
@@ -1140,11 +1151,21 @@ class MegaGallery {
                     this.revokeThumbs();
                     mBroadcaster.removeListener(this.beforePageChangeListener);
                     delete this.beforePageChangeListener;
+
+                    // Clear discovery
+                    if (this.isDiscovery) {
+                        delete mega.gallery.discovery;
+                    }
                 }
 
                 if (this.workerBranch) {
                     webgl.worker.detach(this.workerBranch);
                     delete this.workerBranch;
+                }
+
+                $(window).unbind('keyup.exitDiscovery');
+                if (this.slideShowCloseLister) {
+                    mBroadcaster.removeListener(this.slideShowCloseLister);
                 }
             });
         }
@@ -1157,6 +1178,18 @@ class MegaGallery {
                 this.render();
             }
         });
+
+        if (this.isDiscovery) {
+            $('.gallery-close-discovery').rebind('click.exitDiscovery', () => {
+                M.openFolder(this.id);
+            });
+
+            $(window).rebind('keyup.exitDiscovery', e => {
+                if (e.keyCode === 27 && !this.inPreview) { // ESC key pressed
+                    M.openFolder(this.id);
+                }
+            });
+        }
     }
 
     sortByMtime(ah, bh) {
@@ -1440,15 +1473,7 @@ class MegaGallery {
                 }
                 else if (previews[nid]) {
 
-                    let buffer;
-
-                    if (previews[nid].buffer.byteLength) {
-                        buffer = previews[nid].buffer;
-                    }
-                    else {
-                        buffer = await M.toArrayBuffer(previews[nid].blob);
-                    }
-
+                    const buffer = await M.toArrayBuffer(previews[nid].blob);
                     this._createThumb(nid, buffer);
                 }
                 else if (String(n.fa).includes(':1*')) {
@@ -1654,15 +1679,15 @@ class MegaTargetGallery extends MegaGallery {
 
         if (!n.t && is_photo(n)) {
 
-            const cameraTree = M.getTreeHandles(M.CameraId).includes(n.p);
+            const cameraTree = M.getTreeHandles(this.isDiscovery ? this.id : M.CameraId).includes(n.p);
 
             // If it is target Camera folder and it is not in gallery view now add the node to gallery.
             if (cameraTree && !this.nodes[n.h]) {
-                mega.gallery.photos.addNodeToGroups(n);
+                this.addNodeToGroups(n);
             }
             // If it is not target Camera folder but it is in gallery view now remove the node from gallery view.
             else if (!cameraTree && this.nodes[n.h]) {
-                mega.gallery.photos.removeNodeFromGroups(n);
+                this.removeNodeFromGroups(n);
             }
             // Lets check this is name update
             else if (this.onpage && this.renderCache && this.nodes[n.h]) {
@@ -1803,7 +1828,17 @@ mega.gallery.checkEveryGalleryUpdate = n => {
             return galleryUI();
         }
     }
-    else if (n.t && M.c[n.h]) {
+
+    // If there is discovery under gallery it means user is on discovery page.
+    // And if user move/delete the folder, let's just reset gallery.
+    if (mega.gallery.discovery && mega.gallery.discovery.id === n.h) {
+
+        mega.gallery.nodeUpdated = true;
+
+        return galleryUI(n.h);
+    }
+
+    if (n.t && M.c[n.h]) {
 
         const childHandles = Object.keys(M.c[n.h]);
 
@@ -1814,6 +1849,9 @@ mega.gallery.checkEveryGalleryUpdate = n => {
         return;
     }
 
+    if (mega.gallery.discovery) {
+        mega.gallery.discovery.checkGalleryUpdate(n);
+    }
     if (mega.gallery.photos) {
         mega.gallery.photos.checkGalleryUpdate(n);
     }
@@ -1829,6 +1867,9 @@ mega.gallery.checkEveryGalleryDelete = h => {
 
     'use strict';
 
+    if (mega.gallery.discovery) {
+        mega.gallery.discovery.removeNodeByHandle(h);
+    }
     if (mega.gallery.photos) {
         mega.gallery.photos.removeNodeByHandle(h);
     }
@@ -1853,11 +1894,12 @@ mega.gallery.resetAll = () => {
     delete mega.gallery.photos;
     delete mega.gallery.images;
     delete mega.gallery.videos;
+    delete mega.gallery.discovery;
 
     mega.gallery.nodeUpdated = false;
 };
 
-async function galleryUI() {
+async function galleryUI(id) {
 
     'use strict';
 
@@ -1867,14 +1909,39 @@ async function galleryUI() {
         mega.gallery.resetAll();
     }
 
-    const title = l[`gallery_${M.currentdirid}`];
+    let title = l[`gallery_${M.currentdirid}`];
+    let icon = M.currentdirid;
+    let gallery = mega.gallery[M.currentdirid];
+
+    const $closeDiscovery = $('.gallery-close-discovery').addClass('hidden');
+
+    // This is media discovery
+    if (id) {
+
+        if (!M.getNodeByHandle(id) || M.getNodeRoot(id) === M.RubbishID) {
+
+            M.openFolder(M.RootID);
+
+            return loadingDialog.hide('MegaGallery');
+        }
+
+        title = M.d[id].name;
+        icon = 'photos';
+        gallery = mega.gallery.discovery;
+
+        $closeDiscovery.removeClass('hidden');
+    }
 
     $('.gallery-tabs-bl .gallery-section-title')
-        .safeHTML(`<i class="sprite-fm-mono icon-${M.currentdirid}"></i>${title}`);
+        .safeHTML(`<i class="sprite-fm-mono icon-${icon}"></i>${title}`);
 
-    if (!mega.gallery[M.currentdirid]) {
 
-        if (M.currentdirid === 'photos') {
+    if (!gallery) {
+
+        if (id !== undefined) {
+            gallery = mega.gallery.discovery = new MegaTargetGallery(id);
+        }
+        else if (M.currentdirid === 'photos') {
 
             mega.gallery.cufh = await M.getCameraUploads().catch(nop);
 
@@ -1897,35 +1964,34 @@ async function galleryUI() {
                 return;
             }
 
-            mega.gallery.photos = new MegaTargetGallery();
+            gallery = mega.gallery.photos = new MegaTargetGallery();
         }
         else if (M.currentdirid === 'images' || M.currentdirid === 'videos'){
-            mega.gallery[M.currentdirid] = new MegaMediaTypeGallery();
+            gallery = mega.gallery[M.currentdirid] = new MegaMediaTypeGallery();
         }
     }
 
-    const gallery = mega.gallery[M.currentdirid];
+    onIdle(async() => {
 
-    await gallery.setView().catch((ex) => {
-        console.error(ex);
-    });
+        await gallery.setView().catch((ex) => {
+            console.error(ex);
+        });
 
-    if (mega.gallery.modeBeforeReset && mega.gallery.modeBeforeReset[M.currentdirid]) {
+        if (mega.gallery.modeBeforeReset && mega.gallery.modeBeforeReset[M.currentdirid]) {
 
-        gallery.mode = mega.gallery.modeBeforeReset[M.currentdirid];
-        mega.gallery.modeBeforeReset[M.currentdirid] = null;
-    }
+            gallery.mode = mega.gallery.modeBeforeReset[M.currentdirid];
+            mega.gallery.modeBeforeReset[M.currentdirid] = null;
+        }
 
-    gallery.setMode(gallery.mode || 'a', 2);
-    gallery.render();
-    gallery.bindEvents();
+        gallery.setMode(gallery.mode || 'a', 2);
+        gallery.render();
+        gallery.bindEvents();
 
-    M.viewmode = 1;
+        M.viewmode = 1;
 
-    $.selectddUIgrid = '.gallery-view';
-    $.selectddUIitem = 'a';
+        $.selectddUIgrid = '.gallery-view';
+        $.selectddUIitem = 'a';
 
-    onIdle(() => {
         loadingDialog.hide('MegaGallery');
     });
 }

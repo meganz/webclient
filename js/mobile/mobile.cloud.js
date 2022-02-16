@@ -70,7 +70,7 @@ mobile.cloud = {
 
         // Set viewmode to show thumbnails and render thumbnails after everything else because it can take longer
         M.viewmode = 1;
-        fm_thumbnails();
+        this.initThumbnailRequester();
     },
 
     /**
@@ -102,7 +102,21 @@ mobile.cloud = {
 
         // Set viewmode to show thumbnails and render thumbnails after everything else because it can take longer
         M.viewmode = 1;
-        fm_thumbnails();
+        this.initThumbnailRequester();
+    },
+
+    /**
+     * Initialize on-demand thumbnail retrieval(s).
+     */
+    initThumbnailRequester: function() {
+        'use strict';
+        const $scrollBlock = $('.fm-scrolling', '.mobile.file-manager-block');
+
+        $scrollBlock.rebind('touchmove.thumber wheel.thumber', () => {
+            delay('thumbnails', fm_thumbnails, 450);
+        });
+
+        onIdle(fm_thumbnails);
     },
 
     /**

@@ -12,7 +12,7 @@ require("./ui/meetings/workflow/incoming.jsx");
 
 import ChatRouting from "./chatRouting.jsx";
 
-const EMOJI_DATASET_VERSION = 3;
+const EMOJI_DATASET_VERSION = 4;
 const CHAT_ONHISTDECR_RECNT = "onHistoryDecrypted.recent";
 
 const LOAD_ORIGINALS = {
@@ -357,20 +357,21 @@ Chat.prototype.init = promisify(function(resolve, reject) {
     const bpcListener = mBroadcaster.addListener("beforepagechange", (page) => {
         // Reduce flickering when coming back to chat + ensure the ContactsPanel's components are properly destroyed
 
-        if (page.indexOf("chat") === -1) {
-            // target page is not chat
-            if (megaChat.routingSection) {
-                if (String(M.currentdirid).substr(0, 4) === "chat") {
-                    // We always want to hide the chat, when the user is not really in chat, so
-                    // we need to reset M.currentdirid, so that on next M.openFolder, it would go and
-                    // reinitialize/reroute the chat. This would solve potential issues with bugs in the type of
-                    // Chat -> Static page -> Chat
-                    delete M.currentdirid;
-                }
-                megaChat.routingParams = megaChat.routingSection = megaChat.routingSubSection = null;
-                // update immediately, otherwise the ConversationsApp may become invisible and no unmounts would be done
-                this.$conversationsAppInstance?.forceUpdate();
+        if (page.includes('chat') && page !== 'securechat') {
+            return;
+        }
+
+        if (megaChat.routingSection) {
+            if (String(M.currentdirid).substr(0, 4) === "chat") {
+                // We always want to hide the chat, when the user is not really in chat, so
+                // we need to reset M.currentdirid, so that on next M.openFolder, it would go and
+                // reinitialize/reroute the chat. This would solve potential issues with bugs in the type of
+                // Chat -> Static page -> Chat
+                delete M.currentdirid;
             }
+            megaChat.routingParams = megaChat.routingSection = megaChat.routingSubSection = null;
+            // update immediately, otherwise the ConversationsApp may become invisible and no unmounts would be done
+            this.$conversationsAppInstance?.forceUpdate();
         }
     });
     this.mbListeners.push(bpcListener);
@@ -1717,14 +1718,14 @@ Chat.prototype._enqueueImageLoad = function(n) {
 
         // Only load the image once if its node is posted around several rooms
 
-        if (this._imageLoadCache[n.h]) {
-            this._imageLoadCache[n.h].push(n.ch);
+        if (this._imageLoadCache[n.fa]) {
+            this._imageLoadCache[n.fa].push(n.ch);
         }
         else {
-            this._imageLoadCache[n.h] = [n.ch];
+            this._imageLoadCache[n.fa] = [n.ch];
 
             if (load) {
-                this._imagesToBeLoaded[n.h] = n;
+                this._imagesToBeLoaded[n.fa] = n;
                 dedup = false;
             }
         }
@@ -1738,7 +1739,7 @@ Chat.prototype._enqueueImageLoad = function(n) {
     }
 
     if (cached) {
-        this._doneLoadingImage(n.h);
+        this._doneLoadingImage(n.fa);
     }
 };
 
@@ -1774,7 +1775,7 @@ Chat.prototype._doLoadImages = function() {
         // Load png & webp originals to preserve their transparency, if any
         var mime = filemime(node);
         if (node.s < LOAD_ORIGINALS[mime]) {
-            originals[node.h] = node;
+            originals[node.fa] = node;
             delete imagesToBeLoaded[k];
         }
     }
@@ -1794,8 +1795,8 @@ Chat.prototype._doLoadImages = function() {
                 console.debug('Failed to load original image on chat.', n.h, n, ex);
             }
 
-            imagesToBeLoaded[n.h] = originals[n.h];
-            delete originals[n.h];
+            imagesToBeLoaded[n.fa] = originals[n.fa];
+            delete originals[n.fa];
 
             delay('ChatRoom[' + self.roomId + ']:origFallback' + type, function() {
                 api_getfileattr(imagesToBeLoaded, type, onSuccess, onError);
@@ -1808,7 +1809,7 @@ Chat.prototype._doLoadImages = function() {
             if (typeof handler === 'function') {
                 handler(data, (buffer) => {
                     if (buffer) {
-                        chatImageParser(n.h, buffer);
+                        chatImageParser(n.fa, buffer);
                     }
                     else {
                         origFallback(EFAILED);
@@ -1816,7 +1817,7 @@ Chat.prototype._doLoadImages = function() {
                 });
             }
             else {
-                chatImageParser(n.h, data);
+                chatImageParser(n.fa, data);
             }
         }).catch(origFallback);
     };
@@ -2149,7 +2150,7 @@ Chat.prototype.getEmojiDataSet = function(name) {
     }
     else if (name === "categories") {
         // reduce the XHRs by one, by simply moving the categories_v2.json to be embedded inline here:
-        self._emojiData[name] = ["symbols","activity","objects","nature","food","people","travel","flags"];
+        self._emojiData[name] = ["people", "nature", "food", "activity", "travel", "objects", "symbols", "flags"];
         // note, when updating categories_vX.json, please update this ^^ manually.
 
         return MegaPromise.resolve(self._emojiData[name]);

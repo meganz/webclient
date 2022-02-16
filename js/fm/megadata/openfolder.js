@@ -96,7 +96,7 @@
                 console.time('time for rendering');
             }
 
-            if (id === 'transfers') {
+            if (id === 'transfers' || this.currentCustomView.type === 'gallery') {
                 this.v = [];
             }
             else if ($.ofShowNoFolders) {
@@ -429,8 +429,17 @@
         else if (id && id.substr(0, 7) === 'search/') {
             this.search = true;
         }
+        else if (id && id.substr(0, 10) === 'discovery/') {
+            fetchdbnodes = true;
+            id = cv.nodeID;
+            M.onFileManagerReady(() => {
+                galleryUI(cv.nodeID || '');
+            });
+        }
         else if (cv.type === 'gallery') {
-            M.onFileManagerReady(galleryUI);
+            M.onFileManagerReady(() => {
+                galleryUI();
+            });
         }
         else if (id && (id.substr(0, 11) === 'out-shares/' || id.substr(0, 13) === 'public-links/')) {
             fetchdbnodes = true;
@@ -477,6 +486,9 @@
             // Check this is valid custom view page. If not head to it's root page.
             if (cv && !M.getPath(cv.original).length) {
                 cv = M.isCustomView(cv.type);
+                if (!cv) {
+                    id = M.RootID;
+                }
             }
             else if (M.getPath(id).pop() === 'shares') {
                 fetchshares = true;

@@ -3,6 +3,7 @@ import { MegaRenderMixin } from '../../../mixins';
 import ModalDialogsUI from '../../../../ui/modalDialogs.jsx';
 import Button from '../button.jsx';
 import Preview from './preview.jsx';
+import Link from '../../link.jsx';
 import { EmojiFormattedContent } from '../../../../ui/utils';
 
 export class Start extends MegaRenderMixin {
@@ -140,9 +141,7 @@ export class Start extends MegaRenderMixin {
                         onClick={this.startMeeting}>
                         <span>{l[7315] /* `Start` */}</span>
                     </Button>
-                    <a href="/securechat" className="clickurl">
-                        {l.how_meetings_work /* `Learn more about MEGA Meetings` */}
-                    </a>
+                    <Link to="/securechat">{l.how_meetings_work /* `Learn more about MEGA Meetings` */}</Link>
                 </div>
             </ModalDialogsUI.ModalDialog>
         );

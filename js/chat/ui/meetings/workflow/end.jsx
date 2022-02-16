@@ -1,6 +1,7 @@
 import React from 'react';
 import { MegaRenderMixin } from '../../../mixins';
 import ModalDialogsUI from '../../../../ui/modalDialogs';
+import Link from '../../link.jsx';
 
 export default class End extends MegaRenderMixin {
     static NAMESPACE = 'end-dialog';
@@ -37,11 +38,7 @@ export default class End extends MegaRenderMixin {
                 onClose={this.props.onClose}>
                 <>
                     If you want to keep this call open with full function, please assign a new moderator. &nbsp;
-                    <a
-                        href="#"
-                        onClick={this.toggleContacts}>
-                        Assign new moderator
-                    </a>
+                    <Link onClick={this.toggleContacts}>Assign new moderator</Link>
                     {contacts && null}
                 </>
             </ModalDialogsUI.ModalDialog>

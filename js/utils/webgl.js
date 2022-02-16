@@ -1506,6 +1506,7 @@ class MEGAWorker extends Array {
         Object.defineProperty(this, 'hello', {value: hello});
         Object.defineProperty(this, 'maxWkJobs', {value: jpw});
         Object.defineProperty(this, 'running', {value: new Map()});
+        Object.defineProperty(this, '__ident_0', {value: `mWorker.${makeUUID()}`});
 
         Object.defineProperty(this, 'wkErrorHandler', {
             value: (ev) => {
@@ -1533,10 +1534,17 @@ class MEGAWorker extends Array {
                 this.dispatch(data);
             }
         });
+
+        Object.defineProperty(this, 'wkCompletedJobs', {writable: true, value: 0});
+        Object.defineProperty(this, 'wkDisposalThreshold', {writable: true, value: 0});
     }
 
     get [Symbol.toStringTag]() {
         return 'MEGAWorker';
+    }
+
+    get busy() {
+        return this.running.size || this.pending.length;
     }
 
     kill(error, payloads, freeze) {
@@ -1556,6 +1564,7 @@ class MEGAWorker extends Array {
             const worker = this[i];
             worker.jobs = NaN;
             worker.onerror = worker.onmessage = null;
+            this.wkCompletedJobs += worker.wkc;
             worker.terminate();
         }
         this.length = 0;
@@ -1578,6 +1587,17 @@ class MEGAWorker extends Array {
         return this.push(worker) - 1;
     }
 
+    dispose() {
+        delay(this.__ident_0, () => {
+            if (this.length > 2 && !this.busy) {
+                if (d) {
+                    dump('Terminating worker pool...', this);
+                }
+                this.kill();
+            }
+        }, -Math.log(Math.random()) * ++this.wkDisposalThreshold);
+    }
+
     dispatch({token, result, error}) {
         if (this.running.has(token)) {
             const {worker, resolve, reject} = this.running.get(token);
@@ -1590,6 +1610,10 @@ class MEGAWorker extends Array {
                 if (this.post(worker, this.pending.pop())) {
                     break;
                 }
+            }
+
+            if (!this.running.size) {
+                this.dispose();
             }
 
             if (!error && (self.d || self.is_karma)) {

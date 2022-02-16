@@ -328,19 +328,52 @@ class LRUMap extends Map {
         }
     }
     set(key, value) {
-        if (this.size === this.capacity) {
-            for (const [k, v] of this) {
-                if (this.notifier) {
-                    queueMicrotask(() => this.notifier(v, k));
-                }
-                super.delete(k);
-                break;
+        if (this.notifier && super.has(key)) {
+            this.notifier(super.get(key), key, this, true);
+        }
+        if (super.size === this.capacity) {
+            const [[k, v]] = this;
+            if (this.notifier) {
+                this.notifier(v, k, this, false);
             }
+            super.delete(k);
         }
         super.set(key, value);
     }
     get [Symbol.toStringTag]() {
         return 'LRUMap';
+    }
+}
+
+class MapSet extends LRUMap {
+    get [Symbol.toStringTag]() {
+        return 'MapSet';
+    }
+
+    set(key, value) {
+        if (!super.has(key)) {
+            super.set(key, new Set());
+        }
+        const set = super.get(key);
+
+        set.add(value);
+        return set.size;
+    }
+
+    find(key, callback) {
+        if (super.has(key)) {
+            const set = super.get(key);
+
+            for (const value of set) {
+                if (callback(value)) {
+                    return value;
+                }
+            }
+        }
+    }
+
+    size(value) {
+        return (super.get(value) || !1).size | 0;
     }
 }
 

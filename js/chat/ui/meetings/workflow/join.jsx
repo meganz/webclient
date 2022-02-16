@@ -6,6 +6,7 @@ import Button from '../button.jsx';
 import Preview from './preview.jsx';
 import HistoryPanel from "../../historyPanel.jsx";
 import MeetingsCallEndedDialog from '../meetingsCallEndedDialog.jsx';
+import Link from '../../link.jsx';
 
 export default class Join extends MegaRenderMixin {
     static NAMESPACE = 'join-meeting';
@@ -81,13 +82,16 @@ export default class Join extends MegaRenderMixin {
                 title={l.ephemeral_data_lost_title}
                 noCloseOnClickOutside={true}
                 buttons={[
-                    { key: 'cancel', label: 'Cancel', onClick: onCancel },
-                    { key: 'continue', label: 'Continue', className: 'positive', onClick: onConfirm }
+                    { key: 'cancel', label: l[82] /* Cancel */, onClick: onCancel },
+                    { key: 'continue', label: l[507] /* Continue */, className: 'positive', onClick: onConfirm }
                 ]}
                 onClose={onCancel}>
                 <p>
-                    {msgFragments[0]}<a href="#" onClick={
-                        () => loadSubPage('register')}>{msgFragments[1]}</a>{msgFragments[2]}
+                    {msgFragments[0]}
+                    <Link to="/register" onClick={() => loadSubPage('register')}>
+                        {msgFragments[1]}
+                    </Link>
+                    {msgFragments[2]}
                 </p>
             </ModalDialogsUI.ModalDialog>
         );
@@ -150,12 +154,13 @@ export default class Join extends MegaRenderMixin {
                         {l[5585] /* `Already have an account?` */}
                         <a
                             href="#"
-                            onClick={ev => {
-                                ev.preventDefault();
+                            onClick={() =>
                                 mega.ui.showLoginRequiredDialog({ minUserType: 3, skipInitialDialog: 1 })
-                                    .done(() => this.setState({ view: Join.VIEW.ACCOUNT }));
-                            }}>
-                            Login
+                                    .done(() =>
+                                        this.setState({ view: Join.VIEW.ACCOUNT })
+                                    )
+                            }>
+                            {l[171] /* `Login` */}
                         </a>
                     </span>
                 </$$CONTAINER>
@@ -222,9 +227,7 @@ export default class Join extends MegaRenderMixin {
                         className="chat-content-head"
                         onClick={() => this.setState({ preview: !preview })}>
                         <EmojiFormattedContent>{chatRoom.topic}</EmojiFormattedContent>
-                        <Button icon="icon-minimise">
-                            <span>Toggle</span>
-                        </Button>
+                        <Button icon="icon-minimise" />
                     </div>
                     {preview && (
                         <div className="chat-body">
@@ -244,7 +247,7 @@ export default class Join extends MegaRenderMixin {
             <div className="card-body">
                 {children}
                 <div>
-                    <a href="/securechat">{l.how_meetings_work}</a>
+                    <Link to="/securechat">{l.how_meetings_work /* `Learn more about MEGA Meetings` */}</Link>
                 </div>
             </div>
             <div className="card-preview">
@@ -336,7 +339,7 @@ export default class Join extends MegaRenderMixin {
                 <h3>You can join meeting via the following approaches:</h3>
                 <ul>
                     <li>Open the link via Chrome version XXX</li>
-                    <li>Join via Mobile apps <a href="#">Download Mobile App</a></li>
+                    <li>Join via Mobile apps <Link to="/mobile">Download Mobile App</Link></li>
                 </ul>
             </div>
         </div>;

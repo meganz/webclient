@@ -20,7 +20,10 @@ var BABEL_LOADER_OPTIONS = {
     presets: [
         ['@babel/preset-env',  {
             "loose": true,
-            "exclude": ["@babel/plugin-transform-typeof-symbol"]
+            "exclude": [
+                "@babel/plugin-transform-typeof-symbol",
+                "@babel/plugin-transform-template-literals"
+            ]
         }],
         '@babel/preset-react'
     ],

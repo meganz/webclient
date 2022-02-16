@@ -64,8 +64,8 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
     const n = M.getNodeByHandle(node);
     const fa = String(n && n.fa);
     const ph = Object(storedattr[id]).$ph;
-    const createThumbnail = !fa.includes(':0*');
-    const createPreview = !fa.includes(':1*') || onPreviewRetry;
+    const createThumbnail = !fa.includes(':0*') || $.funkyThumbRegen;
+    const createPreview = !fa.includes(':1*') || onPreviewRetry || $.funkyThumbRegen;
     const canStoreAttr = !n || !n.u || n.u === u_handle && n.f !== u_handle;
 
     if (!createThumbnail && !createPreview) {
@@ -124,7 +124,7 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
         }
 
         if (node) {
-            delete th_requested[node];
+            thumbnails.decouple(node);
         }
         sendToPreview(node, preview);
 
@@ -344,6 +344,226 @@ async function exifImageRotation(source, orientation) {
             : mObjectURL([source], source.type || 'image/jpeg');
     });
 }
+
+// ----------------------------------------------------------------------------------
+
+/**
+ * Creates a new thumbnails' manager.
+ * @param {Number} capacity for LRU
+ * @param {String} [dbname] optional database name
+ * @returns {LRUMap}
+ */
+class ThumbManager extends LRUMap {
+    constructor(capacity, dbname) {
+        super(capacity || 200, (value, key, store, rep) => store.remove(key, value, rep));
+
+        Object.defineProperty(this, 'evict', {value: []});
+        Object.defineProperty(this, 'debug', {value: self.d > 4});
+
+        Object.defineProperty(this, 'loaded', {value: 0, writable: true});
+        Object.defineProperty(this, 'pending', {value: Object.create(null)});
+
+        Object.defineProperty(this, 'requested', {value: new Map()});
+        Object.defineProperty(this, 'duplicates', {value: new MapSet(this.capacity << 2, d && nop)});
+
+        Object.defineProperty(this, '__ident_0', {value: `thumb-manager.${makeUUID()}`});
+
+        if (dbname) {
+            this.loading = LRUMegaDexie.create(dbname, this.capacity << 4)
+                .then(db => {
+                    if (db instanceof LRUMegaDexie) {
+                        Object.defineProperty(this, 'db', {value: db, writable: true});
+
+                        this.db.add = (h, data) => {
+                            webgl.readAsArrayBuffer(data)
+                                .then(buf => this.db.set(h, buf))
+                                .catch((ex) => {
+                                    if (d) {
+                                        console.assert(this.db.error, `Unexpected error... ${ex}`, ex);
+                                    }
+                                    this.db = false;
+                                });
+                        };
+                    }
+                })
+                .catch(dump)
+                .finally(() => {
+                    delete this.loading;
+                });
+        }
+    }
+
+    get [Symbol.toStringTag]() {
+        return 'ThumbManager';
+    }
+
+    revoke(h, url, stay) {
+
+        if (this.debug) {
+            console.warn(`Revoking thumbnail ${h}, ${url}`);
+        }
+        this.delete(h);
+
+        if (!stay) {
+            this.decouple(h);
+        }
+        URL.revokeObjectURL(url);
+    }
+
+    dispose(single) {
+        let threshold = single ? 0 : this.capacity / 10 | 1;
+
+        if (this.debug) {
+            console.group('thumbnails:lru');
+        }
+
+        for (let i = this.evict.length; i--;) {
+            this.revoke(...this.evict[i]);
+        }
+        this.evict.length = 0;
+
+        while (--threshold > 0) {
+            const [[k, v]] = this;
+            this.revoke(k, v);
+        }
+
+        if (this.debug) {
+            console.groupEnd();
+        }
+
+        delay.cancel(this.__ident_0);
+    }
+
+    remove(...args) {
+        this.evict.push(args);
+        return args[2] ? this.dispose(true) : delay(this.__ident_0, () => this.dispose(), 400);
+    }
+
+    cleanup() {
+        this.loaded = 0;
+        this.duplicates.clear();
+    }
+
+    decouple(key) {
+        const fa = (M.getNodeByHandle(key) || key).fa || key;
+
+        this.each(fa, (n) => {
+            n.seen = null;
+
+            if (M.megaRender) {
+                M.megaRender.revokeDOMNode(n.h);
+            }
+        });
+
+        this.duplicates.delete(fa);
+        this.requested.delete(fa);
+    }
+
+    each(fa, cb) {
+        if (this.duplicates.size(fa)) {
+            const hs = [...this.duplicates.get(fa)];
+
+            for (let i = hs.length; i--;) {
+                const n = M.getNodeByHandle(hs[i]);
+
+                if (n && cb(n)) {
+                    return true;
+                }
+            }
+        }
+    }
+
+    queued(n, type) {
+        let res = false;
+
+        const rv = this.requested.get(n.fa) | 0;
+        if (!super.has(n.fa) && !rv || rv !== type + 1 && rv < 2) {
+
+            if (!this.pending[n.fa]) {
+                this.pending[n.fa] = [];
+            }
+
+            res = true;
+            this.requested.set(n.fa, 1 + type);
+        }
+
+        this.duplicates.set(n.fa, n.h);
+        return res;
+    }
+
+    add(key, value, each) {
+        if (d) {
+            console.assert(super.get(key) !== value);
+        }
+        super.set(key, value);
+
+        if (this.pending[key]) {
+            for (let i = this.pending[key].length; i--;) {
+                queueMicrotask(this.pending[key][i]);
+            }
+            delete this.pending[key];
+        }
+
+        if (each) {
+            this.each(key, each);
+        }
+    }
+
+    async query(handles, each, loadend) {
+        if (this.loading) {
+            await this.loading;
+        }
+
+        if (this.db && handles.length) {
+            const found = await this.db.find(handles);
+            const send = (h) => this.db.get(h).then(ab => loadend(h, ab));
+
+            for (let i = 0; i < found.length; ++i) {
+                const h = found[i];
+                const n = M.getNodeByHandle(h);
+
+                if (each(n, h)) {
+                    send(h);
+                }
+            }
+        }
+    }
+}
+
+Object.defineProperties(ThumbManager, {
+    rebuildThumbnails: {
+        value: async(nodes) => {
+            'use strict';
+            let max = 1e9;
+            const gen = (h) => {
+                const n = M.getNodeByHandle(h);
+
+                if (n.t || n.u !== u_handle || (max -= n.s) < 0) {
+                    return Promise.reject('Access denied.');
+                }
+
+                return M.gfsfetch(h, 0, -1).then(res => setImage(n, res));
+            };
+            const fmt = (res) => {
+                const output = {};
+                for (let i = res.length; i--;) {
+                    output[nodes[i]] = {name: M.getNameByHandle(nodes[i]), ...res[i]};
+                }
+                return output;
+            };
+
+            nodes = [...nodes];
+            $.funkyThumbRegen = 1;
+
+            const res = await Promise.allSettled(nodes.map(gen)).then(fmt).catch(dump);
+            console.table(res);
+
+            delete $.funkyThumbRegen;
+        }
+    }
+});
+
+// ----------------------------------------------------------------------------------
 
 function dataURLToAB(dataURL) {
     if (dataURL.indexOf(';base64,') == -1) {

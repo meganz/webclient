@@ -1098,7 +1098,7 @@ FMDB.prototype.stripnode = Object.freeze({
         }
 
         // Remove other garbage
-        if (f.seen) {
+        if ('seen' in f) {
             t.seen = f.seen;
             delete f.seen; // inserted by the dynlist
         }
@@ -2180,6 +2180,82 @@ class MegaDexie extends Dexie {
         if (d > 2) {
             MegaDexie.__dbConnections.push(this);
         }
+
+        this.onerror = null;
+        Object.defineProperty(this, '__bulkPutQueue', {value: Object.create(null)});
+        Object.defineProperty(this, '__ident_0', {value: `megadexie.${this.__dbUniqueID}-${++mIncID}`});
+    }
+
+    get [Symbol.toStringTag]() {
+        return 'MegaDexie';
+    }
+
+    toString() {
+        return String(this._uname || this.name || this.__ident_0);
+    }
+
+    put(table, data) {
+        const {promise} = mega;
+
+        if (!this.__bulkPutQueue[table]) {
+            this.__bulkPutQueue[table] = [];
+        }
+
+        // @todo deduplicate? benchmark!
+        this.__bulkPutQueue[table].push([promise, data]);
+
+        delay(this.__ident_0 + table, () => {
+            const queue = this.__bulkPutQueue[table];
+            delete this.__bulkPutQueue[table];
+
+            const promises = [];
+            const release = (res, error) => {
+                let meth = 'resolve';
+                if (error) {
+                    res = error;
+                    meth = 'reject';
+                }
+                for (let i = promises.length; i--;) {
+                    promises[i][meth](res);
+                }
+            };
+
+            for (let i = queue.length; i--;) {
+                const [promise, data] = queue[i];
+                promises.push(promise);
+                queue[i] = data;
+            }
+
+            const bulkPut = () => this[table].bulkPut(queue).then(release);
+
+            bulkPut().catch(async(ex) => {
+                let res = 0;
+                let failure = new MEGAException(ex.inner || ex, this, ex.name);
+
+                if (failure.name === 'DatabaseClosedError') {
+                    // eslint-disable-next-line local-rules/open
+                    res = await this.open().then(bulkPut).catch(echo);
+                    if (!res) {
+                        if (d) {
+                            console.debug('DB closed unexpectedly and re-opened...', this);
+                        }
+                        return;
+                    }
+                }
+
+                if (this.onerror) {
+                    res = this.onerror(ex);
+                    if (res) {
+                        failure = null;
+                    }
+                }
+
+                this.error = ex;
+                return release(res, failure);
+            });
+        }, 60);
+
+        return promise;
     }
 }
 
@@ -2407,6 +2483,24 @@ lazy(MegaDexie, '__knownDBNames', function() {
     return db.table('k');
 });
 
+/**
+ * @name getDatabaseNames
+ * @memberOf MegaDexie
+ */
+lazy(MegaDexie, 'getDatabaseNames', () => {
+    'use strict';
+    if (typeof Object(window.indexedDB).databases === 'function') {
+        return async() => {
+            const dbs = await indexedDB.databases();
+            return dbs.map(obj => obj.name);
+        };
+    }
+    return async() => {
+        const dbs = await MegaDexie.__knownDBNames.toArray();
+        return dbs.map(obj => obj.v);
+    };
+});
+
 // @private
 MegaDexie.__dbConnections = [];
 
@@ -2422,6 +2516,239 @@ MegaDexie.create = function(name, binary) {
     binary = binary && SharedLocalKVStorage.DB_MODE.BINARY;
     return new SharedLocalKVStorage.Utils.DexieStorage('mdcdb:' + name, binary);
 };
+
+// --------------------------------------------------------------------------
+
+class LRUMegaDexie extends MegaDexie {
+    constructor(name, options = 4e3) {
+        super('LRUMMDB', name, 'lru_', true, {
+            lru: '&k',
+            data: '&h, ts'
+        });
+
+        this.options = typeof options === 'number' ? {limit: options} : options;
+
+        if (LRUMegaDexie.wSet) {
+            this._uname = name;
+            LRUMegaDexie.wSet.add(this);
+        }
+
+        LRUMegaDexie.hookErrorHandlers(this);
+    }
+
+    get [Symbol.toStringTag]() {
+        return 'LRUMegaDexie';
+    }
+
+    async setup(options = false, key = null) {
+
+        if (key) {
+            const algo = {
+                ...key.algorithm,
+                tagLength: 32,
+                iv: options.iv || new Uint32Array(u_k_aes._key[0].slice(4, 7))
+            };
+            const view = new DataView(algo.iv.buffer);
+            let ctr = Math.random() * 0x1000000 >>> 0;
+
+            Object.defineProperties(this, {
+                encrypt: {
+                    value: async(data) => {
+                        view.setUint32(0, ++ctr, true);
+                        const encrypted = new Uint8Array(data.byteLength + 8);
+                        const payload = new DataView(encrypted.buffer, 0, 4);
+                        payload.setUint32(0, ctr, true);
+                        algo.additionalData = payload;
+                        encrypted.set(new Uint8Array(await crypto.subtle.encrypt(algo, key, data)), 4);
+                        return encrypted.buffer;
+                    }
+                },
+                decrypt: {
+                    value: async(data) => {
+                        const payload = new DataView(data, 0, 4);
+                        const ctr = payload.getUint32(0, true);
+                        view.setUint32(0, ctr, true);
+                        algo.additionalData = payload;
+                        return crypto.subtle.decrypt(algo, key, new DataView(data, 4));
+                    }
+                }
+            });
+        }
+
+        return this.update(options);
+    }
+
+    async update(options) {
+        this.options = Object.assign({}, (await this.lru.get('options') || {}).value, this.options, options);
+
+        delete this.options.iv;
+        const promises = [this.lru.put({k: 'options', value: Object.setPrototypeOf(this.options, null)})];
+
+        for (const k in this.options) {
+            promises.push(this.lru.put({k, value: this.options[k]}));
+        }
+
+        this.drain();
+        await Promise.all(promises);
+        return this;
+    }
+
+    async find(h) {
+        return this.data.exists(h);
+    }
+
+    async has(h) {
+        return !!await this.find(h);
+    }
+
+    async get(h) {
+        // @todo FIXME improve Collection.modify() to NOT retrieve WHOLE rows
+        // const coll = this.data.where('h').equals(h);
+        // const {data} = await coll.first() || false;
+        // return data && (await Promise.all([coll.modify({ts: Date.now()}), this.decrypt(data)]))[1];
+
+        const {data} = await this.data.get(h) || false;
+        if (data) {
+            this.put('data', {h, data, ts: Date.now()}).catch(dump);
+            return this.decrypt(data);
+        }
+    }
+
+    async set(h, data) {
+        data = await this.encrypt(data);
+        delay(this.name, () => this.drain(), 2e3);
+        return this.put('data', {h, data, ts: Date.now()});
+    }
+
+    drain() {
+        this.data.count()
+            .then(count => count > this.options.limit && this.data.orderBy('ts').limit(count / 10 | 1).primaryKeys())
+            .then(keys => keys && this.data.bulkDelete(keys))
+            .catch(dump);
+    }
+
+    encrypt(data) {
+        return data;
+    }
+
+    decrypt(data) {
+        return data;
+    }
+}
+
+/** @property LRUMegaDexie.create */
+lazy(LRUMegaDexie, 'create', () => {
+    'use strict';
+    const parity = lazy(Object.create(null), 'key', () => {
+        return crypto.subtle.importKey(
+            "raw",
+            new Uint32Array(u_k_aes._key[0].slice(0, 4)),
+            {name: "AES-GCM"},
+            false,
+            ["encrypt", "decrypt"]
+        );
+    });
+
+    const extend = (obj) => {
+        if (obj instanceof LRUMap) {
+            Object.defineProperties(obj, {
+                find: {
+                    value: function(keys) {
+                        const res = [];
+                        for (let i = keys.length; i--;) {
+                            if (this.has(keys[i])) {
+                                res.push(keys[i]);
+                            }
+                        }
+                        return res;
+                    }
+                }
+            });
+        }
+
+        return obj;
+    };
+
+    return async(name, options) => {
+        const db = await new LRUMegaDexie(name, options).setup(options, await parity.key).catch(dump);
+        if (d && !db) {
+            console.warn('LRU cannot be backed by DB, using memory-only instead...', name);
+        }
+        return extend(db || new LRUMap(Math.max(256, (options && options.limit || options) >> 3)));
+    };
+});
+
+Object.defineProperties(LRUMegaDexie, {
+    wSet: {
+        value: self.d > 0 && new IWeakSet()
+    },
+    errorHandler: {
+        value: (ev) => {
+            'use strict';
+            const message = String(((ev.target || ev).error || ev.inner || ev).message || ev);
+
+            if (d) {
+                console.error(`LRUMegaDexie error (${ev.type || ev.name})`, message, [ev]);
+            }
+
+            if (ev.type !== 'close' && !message.includes('closing')) {
+                eventlog(99748, message.split('\n')[0].substr(0, 96), true);
+            }
+
+            // drop all LRU-based databases.
+            LRUMegaDexie.drop().catch(dump);
+        }
+    },
+    hookErrorHandlers: {
+        value: (lru) => {
+            'use strict';
+            if (!lru.idbdb) {
+                return lru.on('ready', () => LRUMegaDexie.hookErrorHandlers(lru));
+            }
+            const {onabort, onerror} = lru.idbdb;
+
+            lru.idbdb.onabort = lru.idbdb.onerror = (ev) => {
+                LRUMegaDexie.errorHandler(ev);
+                return ev.type === 'abort' ? onabort && onabort(ev) : onerror && onerror(ev);
+            };
+
+            lru.on('close', lru.onerror = LRUMegaDexie.errorHandler);
+        }
+    },
+    drop: {
+        value: async() => {
+            'use strict';
+            const dbs = await MegaDexie.getDatabaseNames();
+            return Promise.all(dbs.filter(n => n.startsWith('lru_')).map(n => Dexie.delete(n)));
+        }
+    },
+    size: {
+        get() {
+            'use strict';
+            const {promise} = mega;
+
+            let name;
+            const seen = {total: 0};
+            const store = (row) => {
+                const {byteLength} = row.data;
+                seen[name] += byteLength;
+                seen.total += byteLength;
+            };
+
+            (async(obj) => {
+                for (const db of obj) {
+                    name = `${db.name} (${db._uname})`;
+                    seen[name] = 0;
+                    await db.data.each(store);
+                }
+                console.table(seen);
+                promise.resolve(seen.total);
+            })(LRUMegaDexie.wSet);
+
+            return promise;
+        }
+    }
+});
 
 // --------------------------------------------------------------------------
 // --------------------------------------------------------------------------

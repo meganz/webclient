@@ -129,3 +129,6 @@
     margin-inline-end: 8px;
     vertical-align: middle;
 }
+.contacts-content .fm-empty-contacts {
+    margin-top: 10px;
+}

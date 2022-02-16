@@ -4,7 +4,7 @@
  *
  * By David Fahlander, david.fahlander@gmail.com
  *
- * Version 3.2.0.meganz, 2022-01-04T18:14:52.305Z
+ * Version 3.2.0.meganz, 2022-01-18T12:19:53.273Z
  *
  * https://dexie.org
  *
@@ -1349,6 +1349,30 @@ class Table {
             return this.core.get({ trans, key: keyOrCrit })
                 .then(res => this.hook.reading.fire(res));
         }).then(cb);
+    }
+    getKey(keyOrCrit, cb) {
+        if (keyOrCrit && keyOrCrit.constructor === Object)
+            return this.where(keyOrCrit).first(cb);
+        return this._trans('readonly', (trans) => {
+            return this.core.get({ trans, key: keyOrCrit, method: 'getKey' })
+                .then(res => this.hook.reading.fire(res));
+        }).then(cb);
+    }
+    getKeys(keys) {
+        return this._trans('readonly', trans => {
+            return this.core.getMany({
+                keys,
+                trans,
+                method: 'getKey'
+            }).then(result => result.map(res => this.hook.reading.fire(res)).filter(Boolean));
+        });
+    }
+    exists(keys) {
+        const a = isArray(keys);
+        if (!a || keys.length == 1) {
+            return this.getKey(a ? keys[0] : keys).then(res => res ? a ? [res] : res : false);
+        }
+        return this.getKeys(keys);
     }
     where(indexOrCrit) {
         if (typeof indexOrCrit === 'string')
@@ -3063,7 +3087,7 @@ function createDBCore(db, IdbKeyRange, tmpTrans) {
             name: tableName,
             schema: tableSchema,
             mutate,
-            getMany({ trans, keys }) {
+            getMany({ trans, keys, method = 'get' }) {
                 return new Promise((resolve, reject) => {
                     resolve = wrap(resolve);
                     const store = trans.objectStore(tableName);
@@ -3083,7 +3107,7 @@ function createDBCore(db, IdbKeyRange, tmpTrans) {
                     for (let i = 0; i < length; ++i) {
                         const key = keys[i];
                         if (key != null) {
-                            req = store.get(keys[i]);
+                            req = store[method](keys[i]);
                             req._pos = i;
                             req.onsuccess = successHandler;
                             req.onerror = errorHandler;
@@ -3094,11 +3118,11 @@ function createDBCore(db, IdbKeyRange, tmpTrans) {
                         resolve(result);
                 });
             },
-            get({ trans, key }) {
+            get({ trans, key, method = 'get' }) {
                 return new Promise((resolve, reject) => {
                     resolve = wrap(resolve);
                     const store = trans.objectStore(tableName);
-                    const req = store.get(key);
+                    const req = store[method](key);
                     req.onsuccess = event => resolve(event.target.result);
                     req.onerror = eventRejectHandler(reject);
                 });

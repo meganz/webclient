@@ -328,7 +328,7 @@
         var html = '<div class="properties-name-container"><div class="properties-small-gray">' + p.t1 + '</div>'
             + '<div class="properties-name-block"><div class="propreties-dark-txt">' + p.t2 + '</div>'
             + '</div></div>'
-            + '<div class="properties-breadcrumb"><div class="properties-small-gray path">Path:</div>'
+            + `<div class="properties-breadcrumb"><div class="properties-small-gray path">${l.path_lbl}</div>`
             + '<div class="fm-breadcrumbs-wrapper info">'
             +                    '<div class="crumb-overflow-link dropdown">'
             +                       '<a class="breadcrumb-dropdown-link">'

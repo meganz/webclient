@@ -1049,16 +1049,16 @@
                 this.options.renderAdapter._itemsRepositioned();
             }
 
-            var self = this;
-            delay('megalist:content-updated:' + this.listId, function() {
-                self._isUserScroll = false;
-                self.scrollUpdate();
-                self._isUserScroll = true;
+            const tick = 192;
+            delay(`megalist:content-updated:${this.listId}`, () => {
+                this._isUserScroll = false;
+                this.scrollUpdate();
+                this._isUserScroll = true;
 
-                if (self.options.onContentUpdated) {
-                    delay('megalist:content-updated:feedback:' + self.listId, self.options.onContentUpdated, 650);
+                if (this.options.onContentUpdated) {
+                    delay(`megalist:content-updated:feedback:${this.listId}`, this.options.onContentUpdated, tick << 1);
                 }
-            }, 300);
+            }, tick);
         }
     };
 

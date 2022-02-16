@@ -593,9 +593,6 @@ var notify = {
         notify.setHeightForNotifications();
         notify.initPopupScrolling();
 
-        // reset accepted list once rendered
-        notify.acceptedContactRequests = [];
-
         // Add click handlers for various notifications
         notify.initFullContactClickHandler();
         notify.initShareClickHandler();
@@ -662,13 +659,8 @@ var notify = {
                 msgDialog('info', '', l[20427]);
             }
         });
-
-        $('.nt-contact-request', this.$popup).rebind('click.notif', function(e) {
-            if (!$(e.target).hasClass('notifications-button') && $(this).attr('data-uhandle')) {
-                loadSubPage(`fm/chat/contacts/${$(this).attr('data-uhandle')}`);
-                notify.closePopup();
-            }
-        });
+        clickURLs();
+        $('a.clickurl', this.$popup).rebind('click.notif', () => notify.closePopup());
     },
 
     /**
@@ -772,18 +764,20 @@ var notify = {
             var pendingContactId = $this.attr('data-pending-contact-id');
 
             // Send the User Pending Contact Action (upca) API 2.0 request to accept the request
-            M.acceptPendingContactRequest(pendingContactId);
+            M.acceptPendingContactRequest(pendingContactId).done(() => {
+                // Update IPC indicator
+                delay('updateIpcRequests', updateIpcRequests, 1000);
+            }).fail(() => {
+                notify.acceptedContactRequests.splice(notify.acceptedContactRequests.indexOf(pendingContactId), 1);
+            });
 
             // Show the Accepted icon and text
             $this.closest('.notification-item').addClass('accepted');
+            notify.acceptedContactRequests.push(pendingContactId);
 
             // Mark all notifications as seen and close the popup
             // (because they clicked on a notification within the popup)
             notify.closePopup();
-            notify.acceptedContactRequests.push(pendingContactId);
-
-            // Update IPC indicator
-            delay('updateIpcRequests', updateIpcRequests, 1000);
         });
     },
 
@@ -911,7 +905,7 @@ var notify = {
 
         var pendingContactId = notification.data.p;
         var mostRecentNotification = true;
-        let isNotAccepted = true;
+        let isAccepted = false;
         var className = '';
         var title = '';
 
@@ -925,10 +919,10 @@ var notify = {
         }
 
         if (notify.acceptedContactRequests.includes(pendingContactId)) {
-            isNotAccepted = false;
+            isAccepted = true;
         }
         // If this is the most recent contact request from this user
-        if (mostRecentNotification && isNotAccepted) {
+        if (mostRecentNotification && !isAccepted) {
 
             // If this IPC notification also exists in the state
             if (typeof M.ipc[pendingContactId] === 'object') {
@@ -962,8 +956,12 @@ var notify = {
         $notificationHtml.addClass(className);
         if (notification.data && notification.data.m) {
             const user = M.getUserByEmail(notification.data.m);
-            if (user && user.h) {
-                $notificationHtml.attr('data-uhandle', user.h);
+            if (user && user.c === 1 && user.h) {
+                $notificationHtml.addClass('clickurl').attr('href', `/fm/chat/contacts/${user.h}`);
+            }
+            else if (isAccepted) {
+                // In-flight request so user.h is unknown. Send to contacts on click
+                $notificationHtml.addClass('clickurl').attr('href', `/fm/chat/contacts`);
             }
         }
         $notificationHtml.find('.notification-info').text(title);

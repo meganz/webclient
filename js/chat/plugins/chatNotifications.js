@@ -175,19 +175,9 @@ var ChatNotifications = function(megaChat, options) {
                 .rebind('onChatIsFocused.chatNotifications', function() {
                     onIdle(resetChatNotificationCounters);
                 })
-                .rebind('CallTerminated.chatNotifications', function(e, origEvent, room) {
+                .rebind('CallTerminated.chatNotifications', ev => {
+                    const room = ev.data;
                     self.notifications.resetCounterGroup(room.chatId, "incoming-voice-video-call");
-                    var contact = M.u[room.getParticipantsExceptMe()[0]];
-                    var icon = false;
-                    var title;
-                    if (contact && contact.u) {
-                        var avatarMeta = generateAvatarMeta(contact.u);
-                        icon = avatarMeta.avatarUrl;
-                        title = avatarMeta.fullName;
-                    }
-                    else {
-                        title = room.getRoomTitle();
-                    }
 
                     if (!pushNotificationSettings.isAllowedForChatId(room.chatId)) {
                         return;
@@ -200,9 +190,9 @@ var ChatNotifications = function(megaChat, options) {
                             'group': room.chatId,
                             'incrementCounter': false,
                             'anfFlag': 'chat_enabled',
-                            'icon': icon,
+                            'icon': false,
                             'params': {
-                                'from': title
+                                'from': room.getRoomTitle()
                             }
                         },
                         !mega.active

@@ -497,22 +497,27 @@
                 self.onCallState(data, chatRoom);
                 chatRoom.callParticipantsUpdated();
             });
-
             chatRoom.rebind('onRoomDisconnected.callManager', function() {
+                // Keep the current call active if online, but chatd is disconnected
+                if (navigator.onLine) {
+                    return;
+                }
+
                 if (this.activeCall) {
+                    chatRoom.trigger('CallTerminated', chatRoom);
                     chatRoom.trigger('onCallEnd', {
-                        'callId': chatRoom.activeCall.callId,
+                        callId: chatRoom.activeCall.callId,
                         removeActive: true,
                         reason: SfuClient.TermCode.kChatDisconn
                     });
                 }
 
-                // clear active calls on chatd disconnect.
-                let callIds = Object.keys(chatRoom.activeCallIds);
+                // Clear active calls on chatd disconnect.
+                const callIds = Object.keys(chatRoom.activeCallIds);
                 for (let i = 0; i < callIds.length; i++) {
                     if (this.activeCallIds[callIds[i]]) {
                         chatRoom.trigger('onCallEnd', {
-                            'callId': callIds[i],
+                            callId: callIds[i],
                             removeActive: true,
                             reason: SfuClient.TermCode.kChatDisconn
                         });

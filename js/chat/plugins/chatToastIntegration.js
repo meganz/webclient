@@ -38,9 +38,14 @@ class ChatToastIntegration {
                         );
                     })
                     .rebind('onCallIJoined.cTI', () => {
+                        const initialPriv = megaRoom.members[u_handle];
                         megaRoom.rebind('onMembersUpdated.cTI', ({ data }) => {
                             const { userId, priv } = data;
-                            if (userId === u_handle && priv === ChatRoom.MembersSet.PRIVILEGE_STATE.FULL) {
+                            if (
+                                userId === u_handle &&
+                                priv === ChatRoom.MembersSet.PRIVILEGE_STATE.FULL &&
+                                initialPriv !== ChatRoom.MembersSet.PRIVILEGE_STATE.FULL
+                            ) {
                                 window.toaster.alerts.low(
                                     l.chosen_moderator /* `You were chosen to be the moderator of this call` */,
                                     'sprite-fm-mono icon-chat-filled',
@@ -69,7 +74,9 @@ class ChatToastIntegration {
                             );
                         }
                     })
-                    .rebind('onCallEnd.cTI', () => megaRoom.unbind('onMembersUpdated.cTI'));
+                    .rebind('onCallEnd.cTI', () => megaRoom.unbind('onMembersUpdated.cTI'))
+                    .rebind('onRoomDisconnected.cTI', () => megaRoom.activeCall && this.eventHandlerOffline())
+                    .rebind('onRoomConnected', () => megaRoom.activeCall && this.eventHandlerOnline());
             });
     }
     eventHandlerOffline() {

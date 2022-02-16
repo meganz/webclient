@@ -54,6 +54,8 @@ export default class SearchPanel extends MegaRenderMixin {
         }
         document.removeEventListener(EVENTS.RESULT_OPEN, this.toggleMinimize);
         document.removeEventListener(EVENTS.KEYDOWN, this.handleKeyDown);
+        megaChat.plugins.chatdIntegration.chatd.off('onClose.search');
+        megaChat.plugins.chatdIntegration.chatd.off('onOpen.search');
     };
 
     bindEvents = () => {
@@ -63,6 +65,12 @@ export default class SearchPanel extends MegaRenderMixin {
         // Clicked on search result
         document.addEventListener(EVENTS.RESULT_OPEN, this.toggleMinimize);
         document.addEventListener(EVENTS.KEYDOWN, this.handleKeyDown);
+        megaChat.plugins.chatdIntegration.chatd.rebind(
+            'onClose.search', () => this.state.searching && this.doToggle(ACTIONS.PAUSE)
+        );
+        megaChat.plugins.chatdIntegration.chatd.rebind(
+            'onOpen.search', () => this.state.searching && this.doToggle(ACTIONS.RESUME)
+        );
     };
 
     toggleMinimize = () => {

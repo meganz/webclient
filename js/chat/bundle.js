@@ -22850,12 +22850,16 @@ class SearchPanel extends mixins.wl {
 
       document.removeEventListener(EVENTS.RESULT_OPEN, this.toggleMinimize);
       document.removeEventListener(EVENTS.KEYDOWN, this.handleKeyDown);
+      megaChat.plugins.chatdIntegration.chatd.off('onClose.search');
+      megaChat.plugins.chatdIntegration.chatd.off('onOpen.search');
     };
 
     this.bindEvents = () => {
       this.pageChangeListener = mBroadcaster.addListener('pagechange', () => this.doToggle(ACTIONS.PAUSE));
       document.addEventListener(EVENTS.RESULT_OPEN, this.toggleMinimize);
       document.addEventListener(EVENTS.KEYDOWN, this.handleKeyDown);
+      megaChat.plugins.chatdIntegration.chatd.rebind('onClose.search', () => this.state.searching && this.doToggle(ACTIONS.PAUSE));
+      megaChat.plugins.chatdIntegration.chatd.rebind('onOpen.search', () => this.state.searching && this.doToggle(ACTIONS.RESUME));
     };
 
     this.toggleMinimize = () => {

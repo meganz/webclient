@@ -252,6 +252,7 @@
                 "es/no-optional-chaining": "off",
                 "no-negated-condition": "off",
                 "react/prop-types": "off",
+                "react/no-danger": "error",
                 "react/no-find-dom-node": "off",
                 "react/no-is-mounted": "off",
                 "react/jsx-indent": ["error", 4],

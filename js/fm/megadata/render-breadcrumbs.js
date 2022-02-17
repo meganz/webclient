@@ -376,8 +376,7 @@
                         `<a class="fm-breadcrumbs ${escapeHTML(typeClass)} ${isRoot ? 'root' : ''} ui-droppable"
                             data-id="${item}" id="pathbc-${item}">
                             <span
-                                class="right-arrow-bg simpletip"
-                                data-simpletip="${name}">
+                                class="right-arrow-bg simpletip simpletip-tc">
                                 ${isRoot ?
                                     `<span class="not-loading">
                                         ${name}

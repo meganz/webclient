@@ -994,6 +994,10 @@ var notify = {
             className = 'nt-contact-accepted';
             title = l.notification_contact_accepted; // Accepted your contact request
 
+            if (u_attr.b && !u_attr.b.m && u_attr.b.mu && u_attr.b.mu[0] === userHandle) {
+                title = l.admin_sub_contacts; // your admin and you are now contacts.
+            }
+
             // Add a data attribute for the click handler
             $notificationHtml.attr('data-contact-handle', userHandle);
             $notificationHtml.addClass('clickable');

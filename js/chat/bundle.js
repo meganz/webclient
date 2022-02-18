@@ -24365,6 +24365,7 @@ let ConversationsApp = (conversations_dec3 = utils["default"].SoonFcWrap(80), (c
       startGroupChatDialogShown: false,
       startMeetingDialog: false
     };
+    this.handleWindowResize = this.handleWindowResize.bind(this);
 
     this._cacheRouting();
 
@@ -24469,6 +24470,7 @@ let ConversationsApp = (conversations_dec3 = utils["default"].SoonFcWrap(80), (c
         }, 75);
         megaChat.$leftPane.width(value);
         $('.fm-tree-panel', megaChat.$leftPane).width(value);
+        self.onResizeDoUpdate();
       }
     });
 
@@ -24557,7 +24559,8 @@ let ConversationsApp = (conversations_dec3 = utils["default"].SoonFcWrap(80), (c
         return;
       }
 
-      const newMargin = $('.fm-left-panel').width() + $('.nw-fm-left-icons-panel').width() + "px";
+      const lhpWidth = this.state.leftPaneWidth || $('.fm-left-panel').width();
+      const newMargin = `${lhpWidth + $('.nw-fm-left-icons-panel').width()}px`;
       $('.fm-right-files-block, .fm-right-account-block').filter(':visible').css({
         'margin-inline-start': newMargin,
         '-webkit-margin-start:': newMargin
@@ -24906,7 +24909,10 @@ class Link extends _mixins1__.wl {
 
     if (this.IS_CLICK_URL) {
       return react0().createElement("a", {
-        className: "\n                        clickurl\n                        " + (className || '') + "\n                    ",
+        className: `
+                        clickurl
+                        ${className || ''}
+                    `,
         href: to,
         target: target
       }, children);

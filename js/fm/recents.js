@@ -255,9 +255,7 @@ RecentsRender.prototype._getItemHeight = function(id) {
 
 RecentsRender.prototype._onNodeInjected = function() {
     'use strict';
-    delay('recentsThumbnails', function() {
-        fm_thumbnails();
-    }, 75);
+    delay('thumbnails', fm_thumbnails, 200);
 };
 
 /**
@@ -1091,8 +1089,14 @@ RecentsRender.prototype.thottledResize = function() {
  */
 RecentsRender.prototype.onScroll = function() {
     'use strict';
-    $.hideContextMenu();
-    notify.closePopup();
+    delay('recents:on-scroll', () => {
+        delay('thumbnails', fm_thumbnails, 260);
+
+        onIdle(() => {
+            $.hideContextMenu();
+            notify.closePopup();
+        });
+    }, 190);
 };
 
 /**
@@ -1141,8 +1145,6 @@ RecentsRender.prototype.nodeChanged = function(handle) {
             var i;
             // Get the new node state.
             var currentNode = M.d[handle];
-            currentNode.recent = true;
-            delete currentNode.ar;
 
             // Update the internal list.
             for (i = 0; i < action.length; i++) {

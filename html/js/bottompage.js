@@ -57,6 +57,10 @@ var bottompage = {
         }
 
         if (!is_mobile) {
+
+            // Init floating top menu
+            bottompage.initFloatingTop();
+
             bottompage.initNavButtons($content);
         }
         else {
@@ -76,9 +80,6 @@ var bottompage = {
             // cookie-dialog not available, replace links with text nodes.
             document.querySelectorAll('a.cookies-settings').forEach(e => e.replaceWith(e.textContent));
         }
-
-        // Init floating top menu
-        bottompage.initFloatingTop();
 
         // Init scroll button
         bottompage.initBackToScroll();
@@ -560,13 +561,13 @@ var bottompage = {
     // Init floating  top bar, product pages menu or help center navigation bar
     initFloatingTop: function() {
 
-        var $fmHolder = $('.fmholder', 'body');
-        var $topHeader;
-        var $productPagesMenu = $('.pages-menu.body', $fmHolder);
+        const $fmHolder = $('.fmholder', 'body.bottom-pages');
+        const $topHeader = $('.bottom-page .top-head, .pages-menu-wrap .pages-menu.body', $fmHolder);
+        const $productPagesMenu = $('.pages-menu.body', $fmHolder);
 
         // Resize top menu / produc pages menu or help center navigation bar
         // Required to avoid "jumpng" effect when we change "position" property
-        var topResize = function() {
+        const topResize = function() {
 
             if ($topHeader.hasClass('floating')) {
                 if ($topHeader.parent().outerWidth() === 0 && $topHeader.parent().length > 1) {
@@ -579,22 +580,6 @@ var bottompage = {
             else {
                 $topHeader.css('width',  '');
             }
-        }
-
-        if (page === 'download') {
-
-            // Select download bar as it contains top header and product page menu
-            $topHeader = $('.download.download-page', $fmHolder);
-        }
-        else if (page === 'security/bug-bounty') {
-            $topHeader = $('.bottom-page.scroll-block.corporate .top-head, ' +
-                '.pages-menu-wrap .pages-menu.body', $fmHolder);
-        }
-        else {
-
-            // Select Top header, product page menu and help page navigation bar
-            $topHeader = $('.bottom-page .top-head, .old .top-head, '
-                + '.pages-menu-wrap .pages-menu.body, .support-section-header', $fmHolder);
         }
 
         if (!$topHeader.length) {
@@ -610,9 +595,9 @@ var bottompage = {
         });
 
         // Select bottom pages scrolling block or window for mobile
-        $(window).add('.bottom-pages .fmholder').rebind('scroll.topmenu', function() {
+        $fmHolder.rebind('scroll.topmenu', () => {
 
-            var topPos = $(this).scrollTop();
+            const topPos = $fmHolder.scrollTop();
 
             if (topPos > 400) {
 

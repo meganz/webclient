@@ -20,7 +20,8 @@ class CloudBrowserDialog extends MegaRenderMixin {
             'highlighted': [],
             'currentlyViewedEntry': M.RootID,
             'selectedTab': 'clouddrive',
-            'searchValue': ''
+            'searchValue': '',
+            'searchText': '',
         };
 
         this.onAttachClicked = this.onAttachClicked.bind(this);
@@ -62,6 +63,7 @@ class CloudBrowserDialog extends MegaRenderMixin {
 
         self.setState({
             'searchValue': '',
+            'searchText': '',
             'currentlyViewedEntry': M.RootID
         });
     }
@@ -71,25 +73,43 @@ class CloudBrowserDialog extends MegaRenderMixin {
             selectedTab,
             currentlyViewedEntry: selectedTab === 'shares' ? 'shares' : M.RootID,
             searchValue: '',
+            searchText: '',
             isLoading: false
         });
     }
     onSearchChange(e) {
         var searchValue = e.target.value;
-        var newState = {
-            'searchValue': searchValue,
+        const newState = {
+            searchText: searchValue
         };
         if (searchValue && searchValue.length >= 3) {
-            newState['currentlyViewedEntry'] = 'search';
+            this.setState(newState);
+            delay('cbd:search-proc', this.searchProc.bind(this), 500);
+            return;
         }
-        else if (this.state.currentlyViewedEntry === 'search') {
-            if (!searchValue || searchValue.length < 3) {
-                newState['currentlyViewedEntry'] = M.RootID;
-            }
+        if (this.state.currentlyViewedEntry === 'search' && (!searchValue || searchValue.length < 3)) {
+            newState.currentlyViewedEntry = M.RootID;
+            newState.searchValue = undefined;
         }
 
         this.setState(newState);
         this.clearSelectionAndHighlight();
+    }
+    searchProc() {
+        const { searchText } = this.state;
+        const newState = {
+            nodeLoading: true,
+        };
+        if (searchText && searchText.length >= 3) {
+            this.setState(newState);
+            M.fmSearchNodes(searchText).then(() => {
+                newState.nodeLoading = false;
+                newState.searchValue = searchText;
+                newState.currentlyViewedEntry = 'search';
+                this.setState(newState);
+                this.clearSelectionAndHighlight();
+            });
+        }
     }
 
     onSelected(nodes) {
@@ -126,7 +146,8 @@ class CloudBrowserDialog extends MegaRenderMixin {
                 selectedTab: nodeRoot === 'shares' || nodeRoot === "contacts" ? 'shares' : 'clouddrive',
                 currentlyViewedEntry: nodeId,
                 selected: [],
-                searchValue: ''
+                searchValue: '',
+                searchText: '',
             });
         }
     }
@@ -134,6 +155,7 @@ class CloudBrowserDialog extends MegaRenderMixin {
         this.setState({
             'currentlyViewedEntry': nodeId,
             'searchValue': '',
+            'searchText': '',
             'selected': [],
             'highlighted': [],
         });
@@ -212,7 +234,7 @@ class CloudBrowserDialog extends MegaRenderMixin {
 
                         this.setState({ currentlyViewedEntry: highlightedNode });
                         this.clearSelectionAndHighlight();
-                        this.setState({ selected: [], searchValue: '', highlighted: [] });
+                        this.setState({ selected: [], searchValue: '', searchText: '', highlighted: [] });
                     }
                 },
                 allowAttachFolders ? {
@@ -255,7 +277,7 @@ class CloudBrowserDialog extends MegaRenderMixin {
         }
 
         var clearSearchBtn = null;
-        if (self.state.searchValue.length >= 3) {
+        if (self.state.searchText.length >= 3) {
             clearSearchBtn = (
                 <i
                     className="sprite-fm-mono icon-close-component"
@@ -315,7 +337,7 @@ class CloudBrowserDialog extends MegaRenderMixin {
                                             self.onSearchIconClick(e);
                                         }}>
                                     </i>
-                                    <input type="search" placeholder={l[102]}  value={self.state.searchValue}
+                                    <input type="search" placeholder={l[102]} value={self.state.searchText}
                                         onChange={self.onSearchChange} />
                                     {clearSearchBtn}
                                 </div>
@@ -335,6 +357,7 @@ class CloudBrowserDialog extends MegaRenderMixin {
                         </div>
 
                         <FMView
+                            nodeLoading={this.state.nodeLoading}
                             sortFoldersFirst={true}
                             currentlyViewedEntry={this.state.currentlyViewedEntry}
                             folderSelectNotAllowed={this.props.folderSelectNotAllowed}

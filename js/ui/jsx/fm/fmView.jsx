@@ -407,7 +407,7 @@ export default class FMView extends MegaRenderMixin {
                 $.hideContextMenu(ev);
             }}>
             <BrowserEntries
-                isLoading={this.state.isLoading}
+                isLoading={this.state.isLoading || this.props.nodeLoading}
                 currentlyViewedEntry={this.props.currentlyViewedEntry}
                 entries={this.state.entries || []}
                 onExpand={(node) => {

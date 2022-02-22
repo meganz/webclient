@@ -5712,6 +5712,7 @@ class ContactButton extends _mixins1__._p {
         key: "send-files-item",
         icon: "sprite-fm-mono icon-send-files",
         label: l[6834],
+        disabled: mega.paywall,
         onClick: () => {
           megaChat.openChatAndSendFilesDialog(contact.u);
         }
@@ -10462,6 +10463,7 @@ class Attachment extends AbstractGenericMessage {
         }, external_React_default().createElement(dropdowns.DropdownItem, {
           label: previewLabel,
           icon: `sprite-fm-mono ${previewIcon}`,
+          disabled: mega.paywall,
           onClick: e => this.props.onPreviewStart(v, e)
         }));
       }
@@ -10517,6 +10519,7 @@ class Attachment extends AbstractGenericMessage {
               downloadButton = external_React_default().createElement(dropdowns.DropdownItem, {
                 icon: "sprite-fm-mono icon-download-small",
                 label: l[1187],
+                disabled: mega.paywall,
                 onClick: () => this.props.onDownloadStart(v)
               });
 
@@ -10538,6 +10541,7 @@ class Attachment extends AbstractGenericMessage {
                 icon: "sprite-fm-mono icon-send-to-chat",
                 label: l[17764],
                 key: "sendToChat",
+                disabled: mega.paywall,
                 onClick: () => {
                   $.selected = [v.h];
                   openCopyDialog('conversations');
@@ -10572,14 +10576,17 @@ class Attachment extends AbstractGenericMessage {
         }, previewButton, previewButton && external_React_default().createElement("hr", null), external_React_default().createElement(dropdowns.DropdownItem, {
           icon: "sprite-fm-mono icon-download-small",
           label: l[1187],
+          disabled: mega.paywall,
           onClick: () => this.props.onDownloadStart(v)
         }), this._isUserRegistered() && external_React_default().createElement((external_React_default()).Fragment, null, external_React_default().createElement(dropdowns.DropdownItem, {
           icon: "sprite-fm-mono icon-cloud",
           label: l[1988],
+          disabled: mega.paywall,
           onClick: () => this.props.onAddToCloudDrive(v, false)
         }), external_React_default().createElement(dropdowns.DropdownItem, {
           icon: "sprite-fm-mono icon-send-to-chat",
           label: l[17764],
+          disabled: mega.paywall,
           onClick: () => this.props.onAddToCloudDrive(v, true)
         }))));
       }
@@ -13543,6 +13550,7 @@ class GenericConversationMessage extends mixin.y {
         label: isFav ? l[5872] : l[5871],
         isFav: isFav,
         key: "fav",
+        disabled: mega.paywall,
         onClick: e => {
           self._favourite(h);
 
@@ -13569,6 +13577,7 @@ class GenericConversationMessage extends mixin.y {
       icon: "sprite-fm-mono icon-link",
       key: "getLinkButton",
       label: getManageLinkText,
+      disabled: mega.paywall,
       onClick: self._getLink.bind(self, h)
     }));
 
@@ -13577,6 +13586,7 @@ class GenericConversationMessage extends mixin.y {
         icon: "sprite-fm-mono context icon-link-remove",
         key: "removeLinkButton",
         label: l[6821],
+        disabled: mega.paywall,
         onClick: self._removeLink.bind(self, h)
       }));
       return true;
@@ -18015,11 +18025,13 @@ class ComposedTextArea extends mixins.wl {
       className: "link-button",
       icon: "sprite-fm-mono icon-cloud",
       label: l[19794] ? l[19794] : "My Cloud Drive",
+      disabled: mega.paywall,
       onClick: () => room.trigger('openAttachCloudDialog')
     }), external_React_default().createElement(dropdowns.DropdownItem, {
       className: "link-button",
       icon: "sprite-fm-mono icon-session-history",
       label: l[19795] ? l[19795] : "My computer",
+      disabled: mega.paywall,
       onClick: () => room.uploadFromComputer()
     }), !is_eplusplus && !is_chatlink && external_React_default().createElement((external_React_default()).Fragment, null, external_React_default().createElement("hr", null), external_React_default().createElement(dropdowns.DropdownItem, {
       className: "link-button",
@@ -21471,6 +21483,7 @@ class ConversationRightArea extends mixins.wl {
       className: "link-button",
       icon: "sprite-fm-mono icon-cloud-drive",
       label: l[19794] ? l[19794] : "My Cloud Drive",
+      disabled: mega.paywall,
       onClick: () => {
         self.props.onAttachFromCloudClicked();
       }
@@ -21478,6 +21491,7 @@ class ConversationRightArea extends mixins.wl {
       className: "link-button",
       icon: "sprite-fm-mono icon-session-history",
       label: l[19795] ? l[19795] : "My computer",
+      disabled: mega.paywall,
       onClick: () => {
         self.props.onAttachFromComputerClicked();
       }
@@ -24119,28 +24133,24 @@ class ConversationsList extends mixins.wl {
         }
       }
 
-      if (mega.paywall) {
-        chatRoom.privateReadOnlyChat = true;
-      } else {
-        if (chatRoom.type === "private") {
-          contact = chatRoom.getParticipantsExceptMe()[0];
+      if (chatRoom.type === "private") {
+        contact = chatRoom.getParticipantsExceptMe()[0];
 
-          if (!contact) {
-            return;
-          }
+        if (!contact) {
+          return;
+        }
 
-          contact = M.u[contact];
+        contact = M.u[contact];
 
-          if (contact) {
-            if (!chatRoom.privateReadOnlyChat && !contact.c) {
-              Soon(function () {
-                chatRoom.privateReadOnlyChat = true;
-              });
-            } else if (chatRoom.privateReadOnlyChat && contact.c) {
-              Soon(function () {
-                chatRoom.privateReadOnlyChat = false;
-              });
-            }
+        if (contact) {
+          if (!chatRoom.privateReadOnlyChat && !contact.c) {
+            Soon(() => {
+              chatRoom.privateReadOnlyChat = true;
+            });
+          } else if (chatRoom.privateReadOnlyChat && contact.c) {
+            Soon(() => {
+              chatRoom.privateReadOnlyChat = false;
+            });
           }
         }
       }

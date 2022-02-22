@@ -95,12 +95,14 @@ export default class ComposedTextArea extends MegaRenderMixin {
                                 className="link-button"
                                 icon="sprite-fm-mono icon-cloud"
                                 label={l[19794] ? l[19794] : "My Cloud Drive"}
+                                disabled={mega.paywall}
                                 onClick={() => room.trigger('openAttachCloudDialog')}
                             />
                             <DropdownItem
                                 className="link-button"
                                 icon="sprite-fm-mono icon-session-history"
                                 label={l[19795] ? l[19795] : "My computer"}
+                                disabled={mega.paywall}
                                 onClick={() => room.uploadFromComputer()}
                             />
                             {!is_eplusplus && !is_chatlink &&

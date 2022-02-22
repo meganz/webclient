@@ -26790,7 +26790,8 @@ class DropdownContactsSelector extends _chat_mixins1__.wl {
       positionMy: this.props.positionMy,
       positionAt: this.props.positionAt,
       arrowHeight: this.props.arrowHeight,
-      vertOffset: this.props.vertOffset
+      vertOffset: this.props.vertOffset,
+      noArrow: true
     }, React.createElement(_chat_ui_contacts_jsx2__.ContactPickerWidget, {
       onClose: this.props.closeDropdown,
       active: this.props.active,

@@ -290,7 +290,7 @@
         var cv = M.isCustomView(id);
 
         document.documentElement.classList.remove('wait-cursor');
-        $('.fm-right-account-block, .fm-right-block.dashboard').addClass('hidden');
+        $('.fm-right-account-block, .fm-right-block.dashboard, .gallery-tabs-bl').addClass('hidden');
         $('.fm-files-view-icon').removeClass('hidden');
 
         if (d) {

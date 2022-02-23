@@ -6715,10 +6715,12 @@ class ContactPickerWidget extends _mixins1__.wl {
 
       if (self.props.selectFooter) {
         selectFooter = react0().createElement("footer", null, react0().createElement("button", {
-          className: "mega-button left",
+          className: "mega-button",
           onClick: onAddContact.bind(self)
-        }, react0().createElement("span", null, l[71])), react0().createElement("button", {
-          className: "mega-button right " + (!selectedContacts ? "disabled" : ""),
+        }, react0().createElement("span", null, l[71])), react0().createElement("div", {
+          className: "footer-spacing"
+        }), react0().createElement("button", {
+          className: `mega-button ${selectedContacts ? '' : 'disabled'}`,
           onClick: function (e) {
             if (self.state.selected.length > 0) {
               onSelectDoneCb(e);

@@ -350,7 +350,7 @@ function compressedSdpToString(sdp) {
 }
 
 ;// CONCATENATED MODULE: ../shared/commitId.ts
-const COMMIT_ID = '11ebeec672';
+const COMMIT_ID = 'bef3ef8e20';
 /* harmony default export */ const commitId = (COMMIT_ID);
 
 ;// CONCATENATED MODULE: ./client.ts
@@ -705,7 +705,11 @@ class SfuClient {
         }
         termCode = this.termCode = (termCode != null) ? termCode : termCodes.kUserHangup;
         if (this.conn) {
-            if (this.conn.readyState === WebSocket.OPEN) {
+            // there seems to be a quirk in Chrome (v96-98) - if the browser is set to offline from
+            // developers tools, and something (like the BYE command) is sent and then the websocket
+            // is closed, the onClose event doesn't fire, like the browser refuses to close the socket
+            // until the packet is sent. If no send is attempted, the close() properly triggers onClose
+            if (this.conn.readyState === WebSocket.OPEN && navigator.onLine) {
                 try {
                     this.send({ a: "BYE", rsn: termCode });
                 }
@@ -807,7 +811,8 @@ class SfuClient {
         // first, determine which tracks we need
         let screen = self._isSharingScreen;
         let camera = !self._muteCamera;
-        let audio = (this._speakerState > SpeakerState.kNoSpeaker) ? !self._muteAudio : false;
+        // get audio track when active speaker, even if muted. This will spedd up unmuting
+        let audio = (this._speakerState > SpeakerState.kNoSpeaker) ? true : false;
         // then, check what we have and what needs to change
         var camChange = camera != (!!self._cameraTrack);
         var screenChange = screen != (!!self._screenTrack);
@@ -870,7 +875,7 @@ class SfuClient {
             }));
         }
         if (gettingScreen) {
-            promises.push(navigator.mediaDevices.getDisplayMedia()
+            promises.push(navigator.mediaDevices.getDisplayMedia(SfuClient.kScreenCaptureOptions)
                 .then(function (stream) {
                 let strack = self._screenTrack = stream.getVideoTracks()[0];
                 assert(strack);
@@ -958,7 +963,9 @@ class SfuClient {
             }
             promises.push(self.outVSpeakerTrack.sendTrack(this._sendHires ? hiresTrack : null));
             promises.push(self.outVThumbTrack.sendTrack(this._sendVthumb ? vthumbTrack : null));
+            let tsStart = Date.now();
             await Promise.all(promises);
+            console.log("sendTrack changes took", Date.now() - tsStart, "ms");
         }
         finally {
             self._updateAvailAndSentAv();
@@ -1143,9 +1150,13 @@ class SfuClient {
             return Promise.resolve();
         }
         await this._updateSentTracks(() => this._isSharingScreen = enable);
-        if (this._isSharingScreen === enable) {
-            this._fire("onScreenshare", this._isSharingScreen);
+        if (this._isSharingScreen !== enable) { // failed to enable/disable or something interfered
+            return;
         }
+        if (this.isSharingScreen()) {
+            this._svcDriver.initTx("scr");
+        }
+        this._fire("onScreenshare", this._isSharingScreen);
     }
     onScreenSharingStoppedByUser() {
         console.warn("Screen sharing stopped by user");
@@ -1361,7 +1372,7 @@ class SfuClient {
     isSharingScreen() {
         return this._onHold ? this._onHold.isSharingScreen : this._isSharingScreen;
     }
-    isCurrentlySendingScreenHiRes() {
+    isSendingScreenHiRes() {
         return this._screenTrack && this.outVSpeakerTrack.sentTrack === this._screenTrack;
     }
     sendSpeakRequest(cid) {
@@ -1562,21 +1573,23 @@ class SfuClient {
         delete this.statTimer;
     }
     async pollTxVideoStats() {
-        let tag;
+        let isHiRes;
         let sender = this.outVSpeakerTrack.xponder.sender;
         if (sender.track) {
-            tag = "hires";
+            isHiRes = true;
         }
         else {
             sender = this.outVThumbTrack.xponder.sender;
-            tag = "vthumb";
+            isHiRes = false;
         }
         if (!sender.track) {
-            this.app.onTxStat(null);
+            if (this.app.onVideoTxStat) {
+                this.app.onVideoTxStat(null);
+            }
             return;
         }
         let stats = await sender.getStats();
-        this.parseTxVideoStats(stats, tag);
+        this.parseTxVideoStats(stats, isHiRes);
     }
     async pollMicAudioLevel() {
         let sender = this.outASpeakerTrack.xponder.sender;
@@ -1596,8 +1609,7 @@ class SfuClient {
             console.warn("pollStats called while not in kJoined state");
             return;
         }
-        let flags = this.isCurrentlySendingScreenHiRes() ? StatsFlags.kSendingScreen : 0;
-        let stats = this.rtcStats = { pl: 0, jtr: 1000000, f: flags };
+        let stats = this.rtcStats = { pl: 0, jtr: 1000000 };
         this.hasConnStats = false;
         let promises = [this.pollTxVideoStats(), this.pollMicAudioLevel()];
         for (let rxTrack of this.inVideoTracks.values()) {
@@ -1623,14 +1635,14 @@ class SfuClient {
         }
         this.addNonRtcStats();
         if (this.rtcStats.jtr === 1000000) {
-            this.rtcStats.jtr = 0;
+            this.rtcStats.jtr = -1;
         }
         this._statsRecorder.onStats(this.rtcStats);
         this._svcDriver.onStats();
     }
     addNonRtcStats() {
         let stats = this.rtcStats;
-        stats.q = this._svcDriver.currSvcQuality | (this.outVSpeakerTrack.sentLayers << 8);
+        stats.q = this._svcDriver.currRxQuality | (this._svcDriver.currTxQuality << 8);
         stats.av = this._sentAv;
         let nrxa = 0;
         let nrxl = 0;
@@ -1657,12 +1669,19 @@ class SfuClient {
         stats.nrxl = nrxl;
         stats.nrxa = nrxa;
     }
-    parseTxVideoStats(stats, tag) {
+    parseTxVideoStats(stats, isHiRes) {
         let getConnTotals = !this.hasConnStats;
-        let connStats = this.rtcStats;
+        let rtcStats = this.rtcStats;
         for (let stat of stats.values()) {
             let type = stat.type;
             if (type === "outbound-rtp") {
+                let tag;
+                if (isHiRes) {
+                    tag = (this.outVSpeakerTrack.sentTrack === this._screenTrack) ? "hi-scr" : "hi-cam";
+                }
+                else {
+                    tag = "vthumb";
+                }
                 let ctx = this.statCtx[tag];
                 if (!ctx) {
                     ctx = this.statCtx[tag] = {};
@@ -1674,16 +1693,21 @@ class SfuClient {
                     let prev = ctx.prev;
                     ctx.prev = stat;
                     let period = (stat.timestamp - prev.timestamp) / 1000;
-                    connStats.vtxfps = stat.framesPerSecond;
-                    connStats.vtxw = stat.frameWidth;
-                    connStats.vtxh = stat.frameHeight;
-                    if (this.app.onTxStat) {
+                    rtcStats._vtxIsHiRes = isHiRes;
+                    if (isNaN((rtcStats._vtxKbps = ((stat.bytesSent - prev.bytesSent) / 128) / period))) {
+                        rtcStats._vtxKbps = 0;
+                    }
+                    rtcStats.vtxfps = stat.framesPerSecond;
+                    rtcStats.vtxw = stat.frameWidth;
+                    rtcStats.vtxh = stat.frameHeight;
+                    //  console.log("tag:", tag, "nacks:", stat.nackCount, "pli:", stat.pliCount, "fir", stat.firCount, "vtxh:", rtcStats.vtxh);
+                    if (this.app.onVideoTxStat) {
                         let info = {
-                            fps: connStats.vtxfps,
-                            kbps: ((stat.bytesSent - prev.bytesSent) / 128) / period,
+                            fps: rtcStats.vtxfps,
+                            kbps: rtcStats._vtxKbps,
                             keyfps: (stat.keyFramesEncoded - prev.keyFramesEncoded) / period
                         };
-                        this.app.onTxStat(tag, info, stat);
+                        this.app.onVideoTxStat(isHiRes, info, stat);
                     }
                 }
                 if (!getConnTotals) {
@@ -1726,9 +1750,6 @@ class SfuClient {
             }
         }
     }
-    msgSfuStats(msg) {
-        this.app.onSfuStats(msg.s);
-    }
     mungeSdpForSvc(media) {
         let ssrcs = media.ssrcs;
         let vidSsrc1 = ssrcs[0];
@@ -1753,6 +1774,7 @@ SfuClient.kMaxActiveSpeakers = 20;
 SfuClient.kMaxInputVideoTracks = 20;
 SfuClient.kSpatialLayerCount = 3;
 SfuClient.kVideoCaptureOptions = { width: 960, height: 540 };
+SfuClient.kScreenCaptureOptions = { video: { height: 2000 } };
 SfuClient.kVthumbWidth = 160;
 SfuClient.kRotateKeyUseDelay = 100;
 SfuClient.kPeerReconnNoKeyRotationPeriod = 1000;
@@ -1782,7 +1804,6 @@ SfuClient.msgHandlerMap = {
     "SPEAK_OFF": SfuClient.prototype.msgSpeakOff,
     "KEY": SfuClient.prototype.msgKey,
     "MOD": SfuClient.prototype.msgMod,
-    "STAT": SfuClient.prototype.msgSfuStats,
 };
 class Slot {
     constructor(client, xponder, generateIv) {
@@ -1934,14 +1955,15 @@ class VideoSlot extends Slot {
         }
         return sender.setParameters(params);
     }
-    setTxSvcLayerCount(count) {
+    /*
+    setTxSvcLayerCount(count: number) {
         this.sentLayers = count;
         let sender = this.xponder.sender;
         if (!sender) {
             console.warn(`setTxSvcLayerCount: Currently not sending track, will only record value`);
             return Promise.resolve();
         }
-        let params = sender.getParameters();
+        let params: any = sender.getParameters();
         let encs = params.encodings;
         if (!encs || encs.length < 2) {
             console.warn("setTxSvcLayerCount: There is no SVC enabled for this sender");
@@ -1953,6 +1975,7 @@ class VideoSlot extends Slot {
         console.warn(`setTxSvcLayerCount: Enabling only first ${count} layers`);
         return sender.setParameters(params);
     }
+    */
     _detachAllPlayers() {
         if (!this.players.size) {
             return;
@@ -2486,7 +2509,8 @@ class SvcDriver {
     constructor(client) {
         this.client = client;
         this.lowestRttSeen = 10000; // force recalculation on first stat sample
-        this.currSvcQuality = SvcDriver.kMaxQualityIndex;
+        this.currRxQuality = SvcDriver.kMaxRxQualityIndex - 1; // start a little lower
+        this.currTxQuality = SvcDriver.kDefaultTxQuality;
     }
     async onStats() {
         let stats = this.client.rtcStats;
@@ -2498,8 +2522,8 @@ class SvcDriver {
         if (plost == null) {
             plost = 0;
         }
-        else if (plost > 2) { // we shouldn't care so much about the magnitude of loss bursts, only about their occurrence
-            plost = 2;
+        else if (plost > SvcDriver.kPlostCap) { // we shouldn't care so much about the magnitude of loss bursts, only about their occurrence
+            plost = SvcDriver.kPlostCap;
         }
         if (this.maRtt == null) {
             this.maRtt = rtt;
@@ -2521,66 +2545,122 @@ class SvcDriver {
         if (tsNow - this.tsLastSwitch < SvcDriver.kMinTimeBetweenSwitches) {
             return; // too early
         }
-        if (this.currSvcQuality > 0 && (rtt > this.rttUpper || plost > SvcDriver.kPlostUpper)) {
-            this.switchRxSvcQuality(-1);
+        if (rtt > this.rttUpper || plost > SvcDriver.kPlostUpper) { // rtt or packet loss increased above thresholds
+            this.switchRxQuality(-1);
         }
-        else if (this.currSvcQuality < SvcDriver.kMaxQualityIndex && rtt < this.rttLower && plost < SvcDriver.kPlostLower) {
-            this.switchRxSvcQuality(+1);
+        else if (rtt < this.rttLower && plost < SvcDriver.kPlostLower) {
+            this.switchRxQuality(+1);
         }
-        this.checkAdaptTxSvcQuality(stats);
-    }
-    checkAdaptTxSvcQuality(stats) {
-        let hiresTrack = this.client.outVSpeakerTrack;
-        let sentLayers = hiresTrack.sentLayers;
-        let allowedLayers = SvcDriver.layersByQuality[this.currSvcQuality][3] + 1; // +1 for layer index to count
-        if (allowedLayers < sentLayers) { // we have decreased rx quality, decrease tx quality as well
-            hiresTrack.setTxSvcLayerCount(allowedLayers);
-            this.tsLastSwitch = Date.now();
-        }
-        else if (allowedLayers > sentLayers) { // we have increased rx quality, increase tx as well, but only if not overloaded
-            if (stats.vtxfps >= 12) {
-                hiresTrack.setTxSvcLayerCount(sentLayers + 1); // don't set to allowedLayers - it may be several steps
-                this.tsLastSwitch = Date.now();
+        if (stats._vtxIsHiRes && this.client.isSendingScreenHiRes()) { // adapt tx quality
+            let maTxKbps = this.maTxKbps = (this.maTxKbps == null)
+                ? stats._vtxKbps
+                : (this.maTxKbps * 3 + stats._vtxKbps) / 4;
+            let currTxQ = SvcDriver.TxQuality[this.currTxQuality];
+            if (maTxKbps < currTxQ.minKbps) {
+                this.switchTxQuality(-1, "scr");
             }
-        }
-        else if (stats.vtxfps < 5) { // too low fps
-            if (sentLayers > 1 && (Date.now() - hiresTrack.tsStart >= SvcDriver.kMinTimeBetweenSwitches)) {
-                console.warn(`Apparent local CPU/bandwidth starvation (fps=${stats.vtxfps}), disabling highest SVC resolution`);
-                this.tsLastSwitch = Date.now();
-                hiresTrack.setTxSvcLayerCount(sentLayers - 1);
+            else if (maTxKbps >= currTxQ.maxKbps) {
+                this.switchTxQuality(+1, "scr");
             }
         }
     }
-    switchRxSvcQuality(delta) {
-        let newQ = this.currSvcQuality + delta;
-        let info = SvcDriver.layersByQuality[newQ];
-        if (!info) {
-            return false; // out of range
+    switchRxQuality(delta) {
+        let newQ = this.currRxQuality + delta;
+        if (newQ > SvcDriver.kMaxRxQualityIndex) {
+            newQ = SvcDriver.kMaxRxQualityIndex;
         }
+        else if (newQ < 0) {
+            newQ = 0;
+        }
+        if (newQ === this.currRxQuality) {
+            return false;
+        }
+        let params = SvcDriver.RxQuality[newQ];
+        assert(params);
         this.tsLastSwitch = Date.now();
-        console.warn("Switching rx SVC quality from", this.currSvcQuality, "to", newQ);
-        this.currSvcQuality = newQ;
-        this.client.requestSvcLayers(info[0], info[1], info[2]);
+        console.warn(`Switching rx SVC quality from ${this.currRxQuality} to ${newQ}: ${JSON.stringify(params)}`);
+        this.currRxQuality = newQ;
+        this.client.requestSvcLayers(params[0], params[1], params[2]);
         return true;
     }
+    switchTxQuality(delta, mode) {
+        let newQ = this.currTxQuality + delta;
+        if (newQ < 0) {
+            newQ = 0;
+        }
+        else if (newQ > SvcDriver.kMaxTxQualityIndex) {
+            newQ = SvcDriver.kMaxTxQualityIndex;
+        }
+        if (newQ === this.currTxQuality) {
+            return false;
+        }
+        return this.setTxQuality(newQ, mode);
+    }
+    setTxQuality(newQ, mode) {
+        let track = this.client.outVSpeakerTrack.sentTrack;
+        if (!track) {
+            return false;
+        }
+        let info = SvcDriver.TxQuality[newQ];
+        assert(info);
+        this.tsLastSwitch = Date.now();
+        let params = info[mode];
+        console.warn(`Switching TX quality from ${this.currTxQuality} to ${newQ}: ${JSON.stringify(params)}`);
+        this.currTxQuality = newQ;
+        track.applyConstraints(params);
+        return true;
+    }
+    initTx(mode) {
+        return this.setTxQuality(this.currTxQuality, mode);
+    }
 }
-SvcDriver.kPlostUpper = 1;
-SvcDriver.kPlostLower = 0.1;
+SvcDriver.kPlostUpper = 8;
+SvcDriver.kPlostLower = 6;
+SvcDriver.kPlostCap = 10;
 SvcDriver.kRttLowerHeadroom = 30;
 SvcDriver.kRttUpperHeadroom = 250;
+SvcDriver.kTxFpsStarvationThreshold = 0.4;
 SvcDriver.kMinTimeBetweenSwitches = 6000;
 SvcDriver.kInitialGraceTime = 5000;
-SvcDriver.layersByQuality = [
-    // rx spatial, rx temporal, rx screen-temporal, tx spatial
-    [0, 0, 0, 0],
-    [0, 1, 0, 0],
-    [0, 2, 0, 1],
-    [1, 1, 0, 1],
-    [1, 2, 1, 1],
-    [2, 1, 1, 2],
-    [2, 2, 2, 2]
+// (427)x240 - sends only one spatial layer, i.e. receiver can't get lower resolution than 240
+// (640)x360 - 2 spatial layers: receiver can get x180 or x360
+// (852)x480 - 2 spatial layers: 240 and 480
+// (960)x540 - 3 spatial layers: 136, 270 and 540. This is the camera capture resolution
+// anything above x540 is only for screen sharing, where there are no spatial layers
+// (1028)x578 - screen sharing
+// Array(spatial, temporal, screen-temporal)
+SvcDriver.RxQuality = [
+    [0, 0, 0],
+    [0, 1, 0],
+    [0, 2, 0],
+    [1, 1, 1],
+    [1, 2, 1],
+    [2, 1, 2],
+    [2, 2, 2],
 ];
-SvcDriver.kMaxQualityIndex = 6;
+SvcDriver.kMaxRxQualityIndex = SvcDriver.RxQuality.length - 1;
+// minKbps, maxKbps, scr: constraints for applyConstraints() on sent screen track
+// x540 needs at least 400 kbps
+// x720 needs at least 500 kbps
+// x1024 needs at least 900 kbps
+// x1620 needs at least 1800 kbps
+SvcDriver.TxQuality = [
+    { minKbps: 0, maxKbps: 160, scr: { height: 240, frameRate: 4 } },
+    { minKbps: 140, maxKbps: 260, scr: { height: 360, frameRate: 4 } },
+    { minKbps: 240, maxKbps: 380, scr: { height: 480, frameRate: 4 } },
+    { minKbps: 400, maxKbps: 550, scr: { height: 540, frameRate: 4 } },
+    { minKbps: 500, maxKbps: 700, scr: { height: 720, frameRate: 4 } },
+    { minKbps: 600, maxKbps: 800, scr: { height: 720, frameRate: 8 } },
+    { minKbps: 700, maxKbps: 1000, scr: { height: 720, frameRate: 16 } },
+    { minKbps: 900, maxKbps: 1600, scr: { height: 1080, frameRate: 4 } },
+    { minKbps: 1500, maxKbps: 1700, scr: { height: 1080, frameRate: 8 } },
+    { minKbps: 1600, maxKbps: 1900, scr: { height: 1080, frameRate: 16 } },
+    { minKbps: 1800, maxKbps: 2200, scr: { height: 1650, frameRate: 4 } },
+    { minKbps: 2100, maxKbps: 2500, scr: { height: 1650, frameRate: 8 } },
+    { minKbps: 2400, maxKbps: 2800, scr: { height: 1650, frameRate: 16 } },
+];
+SvcDriver.kDefaultTxQuality = 4;
+SvcDriver.kMaxTxQualityIndex = SvcDriver.TxQuality.length - 1;
 class MicMuteMonitor {
     constructor(client) {
         this.micLevelAvg = 0;
@@ -2737,10 +2817,15 @@ class StatsRecorder {
         let len = tarr.length;
         tarr.push(Date.now() - this.tsStart);
         for (let id in sample) {
+            if (id.startsWith('_')) {
+                continue;
+            }
             let arr = arrays[id];
             if (!arr) {
-                arr = arrays[id] = [];
-                StatsRecorder.extendArray(arr, len);
+                arr = arrays[id] = new Array(len);
+                for (let i = 0; i < len; i++) {
+                    arr[i] = -1;
+                }
             }
             arr.push(sample[id]);
         }
@@ -2753,7 +2838,13 @@ class StatsRecorder {
                 continue;
             }
             let arr = arrs[id];
-            StatsRecorder.extendArray(arr, len);
+            if (arr.length < len) {
+                let oldLen = arr.length;
+                arr.length = oldLen;
+                for (let i = oldLen; i < len; i++) {
+                    arr[i] = -1;
+                }
+            }
             arrs[id] = StatsRecorder.compressArray(arr);
         }
         let duration = Date.now() - this.tsStart;
@@ -2808,12 +2899,6 @@ class StatsRecorder {
         let numRpt = len - lastIdx;
         result.push((numRpt < 2) ? lastVal : [lastVal, numRpt]);
         return result;
-    }
-    static extendArray(arr, len) {
-        let num = len - arr.length;
-        while (num-- > 0) {
-            arr.push(-1);
-        }
     }
 }
 ;

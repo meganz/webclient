@@ -6,12 +6,12 @@
 /* Main pane */
 .download.main-pad {
     width: 100%;
-    max-width: 896px;
+    max-width: 80%;
     position: relative;
     text-align: start;
-    box-shadow: var(--dialog-shadow-thin);
     border-radius: 12px;
-    margin: 40px auto;
+    margin: 40px auto 0;
+    height: calc(100% - 40px);
 }
 .global-error .download.main-pad {
     display: none;
@@ -112,7 +112,12 @@ button.small i.folder-with-loupe {
 }
 .download.info-block {
     position: relative;
-    padding-top: 8px;
+    padding-top: 4px;
+    display: flex;
+    flex-direction: column;
+}
+.download.download-page:not(.image, .txtfile, .video) .download.info-block {
+    height: 100%;
 }
 .download.transfer-buttons {
     white-space: nowrap;
@@ -317,17 +322,18 @@ button.small i.folder-with-loupe {
     top: 50%;
 }
 .download .file-type-wrapper {
-    width: calc(100% - 16px);
-    height: 544px;
+    width: calc(100% - 8px);
+    height: 261px;
     background-color: var(--surface-grey-6);
-    border-radius: 2px;
+    border-radius: 8px;
     position: relative;
     overflow: hidden;
     display: flex;
     align-items: center;
     justify-content: center;
     margin: auto;
-    margin-bottom: 8px;
+    margin-bottom: 4px;
+    flex-grow: 1;
 }
 .download .thumb .file-type-wrapper {
     display: none;
@@ -437,7 +443,7 @@ button.megasync-slider.prev {
 .download.thumb-block {
     display: none;
     width: calc(100% - 16px);
-    height: 544px;
+    height: 261px;
     background-color: black;
     border-radius: 6px;
     position: relative;
@@ -526,9 +532,10 @@ button.megasync-slider.prev {
 }
 .download.video-block {
     display: none;
+    flex-grow: 1;
 }
 .video .download.video-block {
-    border: 8px solid transparent;
+    border: 4px solid transparent;
     border-radius: 12px;
     display: block;
     position: relative;
@@ -536,7 +543,7 @@ button.megasync-slider.prev {
     text-align: center;
 }
 :not(.video-theatre-mode).video .download.video-block {
-    height: 544px;
+    height: 261px;
 }
 .video .download.video-block video {
     width: 100%;
@@ -632,11 +639,12 @@ button.megasync-slider.prev {
 }
 .video-theatre-mode .download.info-block,
 .video-theatre-mode .download.over-transfer-quota {
-    max-width: 840px;
+    max-width: 80%;
     box-sizing: border-box;
     margin: 16px auto;
     position: relative;
     border-radius: 12px;
+    width: 100%;
 }
 .video-theatre-mode .download.info-block .progress-container {
     background-color: none;
@@ -759,8 +767,7 @@ body:not(.pro-user) .download.over-transfer-quota .overquoata-error {
     height: calc(100% - 62px);
     position: absolute;
     margin-top: 60px;
-    background-color: var(--surface-grey-1);
-    border: 1px solid var(--surface-grey-1);
+    background-color: var(--surface-main);
     border-width: 1px 0 1px 0;
     left: 0;
     right: 0;
@@ -819,10 +826,15 @@ body:not(.pro-user) .download.over-transfer-quota .overquoata-error {
 }
 
 .download.transfer-wrapper {
-    border: 1px solid var(--stroke-grey-2);
+    border: 1px solid var(--stroke-grey-4);
     border-radius: 12px;
     box-sizing: border-box;
-    background-color: var(--surface-main);
+    background-color: var(--surface-grey-1);
+    box-shadow: var(--dialog-shadow-thin);
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    height: calc(100% - 118px);
 }
 
 .download.info-block .file-details-wrapper {
@@ -854,7 +866,7 @@ body:not(.pro-user) .download.over-transfer-quota .overquoata-error {
 .download.info-block .file-size-block {
     display: flex;
     white-space: nowrap;
-    padding: 0 64px 0 16px;
+    padding: 0 16px;
     color: var(--surface-main-inverted);
     opacity: 0.7;
     margin-top: 6px;
@@ -868,15 +880,11 @@ body:not(.pro-user) .download.over-transfer-quota .overquoata-error {
 .download.info-block .file-details-wrapper .links-container {
     display: flex;
     align-items: center;
+    gap: 4px;
 }
 .download.info-block .file-details-wrapper .links-container button span {
     white-space: nowrap;
 }
-.download.info-block .file-details-wrapper .links-container > * {
-    -webkit-margin-start: 4px;
-    margin-inline-start: 4px;
-}
-
 
 /* File size block */
 .download.info-txt.small-txt .dark {
@@ -903,6 +911,7 @@ body:not(.pro-user) .download.over-transfer-quota .overquoata-error {
         display: flex;
         flex-direction: column;
         justify-content: center;
+        gap: 16px;
     }
 }
 
@@ -1110,12 +1119,13 @@ body:not(.pro-user) .download.over-transfer-quota .overquoata-error {
     padding-top: 0;
 }
 .txtfile .download.textviewer-block {
-    border: 8px solid transparent;
-    border-radius: 12px;
+    border: 4px solid transparent;
+    border-radius: 8px;
     display: block;
-    height: 544px;
+    height: 261px;
     position: relative;
     overflow: hidden;
+    flex-grow: 1;
 }
 .txtfile .download.textviewer-block .CodeMirror-cursors {
     visibility: hidden;
@@ -1129,16 +1139,18 @@ body:not(.pro-user) .download.over-transfer-quota .overquoata-error {
 /* Image Block dl page */
 .download.image-block {
     display: none;
+    flex-grow: 1;
 }
 .image .download.image-block {
-    height: 544px;
+    height: 261px;
     display: block;
-    width: calc(100% - 16px);
+    width: calc(100% - 8px);
     background-color: var(--surface-grey-6);
     border-radius: 6px 6px 0 0;
     overflow: hidden;
     margin: auto;
-    margin-top: 8px;
+    margin-top: 4px;
+    flex-grow: 1;
 }
 .image .download.info-block .file-type-wrapper {
     display: none;

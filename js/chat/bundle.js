@@ -8819,7 +8819,8 @@ class CloudBrowserDialog extends mixins.wl {
       'highlighted': [],
       'currentlyViewedEntry': M.RootID,
       'selectedTab': 'clouddrive',
-      'searchValue': ''
+      'searchValue': '',
+      'searchText': ''
     };
     this.onAttachClicked = this.onAttachClicked.bind(this);
     this.onClearSearchIconClick = this.onClearSearchIconClick.bind(this);
@@ -8860,6 +8861,7 @@ class CloudBrowserDialog extends mixins.wl {
     var self = this;
     self.setState({
       'searchValue': '',
+      'searchText': '',
       'currentlyViewedEntry': M.RootID
     });
   }
@@ -8869,26 +8871,50 @@ class CloudBrowserDialog extends mixins.wl {
       selectedTab,
       currentlyViewedEntry: selectedTab === 'shares' ? 'shares' : M.RootID,
       searchValue: '',
+      searchText: '',
       isLoading: false
     });
   }
 
   onSearchChange(e) {
     var searchValue = e.target.value;
-    var newState = {
-      'searchValue': searchValue
+    const newState = {
+      searchText: searchValue
     };
 
     if (searchValue && searchValue.length >= 3) {
-      newState['currentlyViewedEntry'] = 'search';
-    } else if (this.state.currentlyViewedEntry === 'search') {
-      if (!searchValue || searchValue.length < 3) {
-        newState['currentlyViewedEntry'] = M.RootID;
-      }
+      this.setState(newState);
+      delay('cbd:search-proc', this.searchProc.bind(this), 500);
+      return;
+    }
+
+    if (this.state.currentlyViewedEntry === 'search' && (!searchValue || searchValue.length < 3)) {
+      newState.currentlyViewedEntry = M.RootID;
+      newState.searchValue = undefined;
     }
 
     this.setState(newState);
     this.clearSelectionAndHighlight();
+  }
+
+  searchProc() {
+    const {
+      searchText
+    } = this.state;
+    const newState = {
+      nodeLoading: true
+    };
+
+    if (searchText && searchText.length >= 3) {
+      this.setState(newState);
+      M.fmSearchNodes(searchText).then(() => {
+        newState.nodeLoading = false;
+        newState.searchValue = searchText;
+        newState.currentlyViewedEntry = 'search';
+        this.setState(newState);
+        this.clearSelectionAndHighlight();
+      });
+    }
   }
 
   onSelected(nodes) {
@@ -8932,7 +8958,8 @@ class CloudBrowserDialog extends mixins.wl {
         selectedTab: nodeRoot === 'shares' || nodeRoot === "contacts" ? 'shares' : 'clouddrive',
         currentlyViewedEntry: nodeId,
         selected: [],
-        searchValue: ''
+        searchValue: '',
+        searchText: ''
       });
     }
   }
@@ -8941,6 +8968,7 @@ class CloudBrowserDialog extends mixins.wl {
     this.setState({
       'currentlyViewedEntry': nodeId,
       'searchValue': '',
+      'searchText': '',
       'selected': [],
       'highlighted': []
     });
@@ -9010,6 +9038,7 @@ class CloudBrowserDialog extends mixins.wl {
           this.setState({
             selected: [],
             searchValue: '',
+            searchText: '',
             highlighted: []
           });
         }
@@ -9044,7 +9073,7 @@ class CloudBrowserDialog extends mixins.wl {
 
     var clearSearchBtn = null;
 
-    if (self.state.searchValue.length >= 3) {
+    if (self.state.searchText.length >= 3) {
       clearSearchBtn = external_React_default().createElement("i", {
         className: "sprite-fm-mono icon-close-component",
         onClick: () => {
@@ -9100,7 +9129,7 @@ class CloudBrowserDialog extends mixins.wl {
     }), external_React_default().createElement("input", {
       type: "search",
       placeholder: l[102],
-      value: self.state.searchValue,
+      value: self.state.searchText,
       onChange: self.onSearchChange
     }), clearSearchBtn), external_React_default().createElement("div", {
       className: "clear"
@@ -9113,6 +9142,7 @@ class CloudBrowserDialog extends mixins.wl {
       highlighted: this.state.highlighted,
       currentlyViewedEntry: this.state.currentlyViewedEntry
     })), external_React_default().createElement(fmView.Z, {
+      nodeLoading: this.state.nodeLoading,
       sortFoldersFirst: true,
       currentlyViewedEntry: this.state.currentlyViewedEntry,
       folderSelectNotAllowed: this.props.folderSelectNotAllowed,
@@ -24365,6 +24395,7 @@ let ConversationsApp = (conversations_dec3 = utils["default"].SoonFcWrap(80), (c
       startGroupChatDialogShown: false,
       startMeetingDialog: false
     };
+    this.handleWindowResize = this.handleWindowResize.bind(this);
 
     this._cacheRouting();
 
@@ -24469,6 +24500,7 @@ let ConversationsApp = (conversations_dec3 = utils["default"].SoonFcWrap(80), (c
         }, 75);
         megaChat.$leftPane.width(value);
         $('.fm-tree-panel', megaChat.$leftPane).width(value);
+        self.onResizeDoUpdate();
       }
     });
 
@@ -24557,7 +24589,8 @@ let ConversationsApp = (conversations_dec3 = utils["default"].SoonFcWrap(80), (c
         return;
       }
 
-      const newMargin = $('.fm-left-panel').width() + $('.nw-fm-left-icons-panel').width() + "px";
+      const lhpWidth = this.state.leftPaneWidth || $('.fm-left-panel').width();
+      const newMargin = `${lhpWidth + $('.nw-fm-left-icons-panel').width()}px`;
       $('.fm-right-files-block, .fm-right-account-block').filter(':visible').css({
         'margin-inline-start': newMargin,
         '-webkit-margin-start:': newMargin
@@ -24906,7 +24939,10 @@ class Link extends _mixins1__.wl {
 
     if (this.IS_CLICK_URL) {
       return react0().createElement("a", {
-        className: "\n                        clickurl\n                        " + (className || '') + "\n                    ",
+        className: `
+                        clickurl
+                        ${className || ''}
+                    `,
         href: to,
         target: target
       }, children);
@@ -29048,7 +29084,7 @@ class FMView extends mixins.wl {
         $.hideContextMenu(ev);
       }
     }, external_React_default().createElement(BrowserEntries, {
-      isLoading: this.state.isLoading,
+      isLoading: this.state.isLoading || this.props.nodeLoading,
       currentlyViewedEntry: this.props.currentlyViewedEntry,
       entries: this.state.entries || [],
       onExpand: node => {

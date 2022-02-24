@@ -3888,7 +3888,7 @@ function fm_thumbnails(mode, nodeList, callback)
 
     // check if the node is rendered within/near the view-port.
     const isVisible = (n) => {
-        return pwd === M.currentdirid && (mode === 'standalone' || exclude || isVisible.dom(n));
+        return pwd === M.currentdirid && (mode === 'standalone' || isVisible.dom(n));
     };
     isVisible.dom = M.megaRender
         ? (n) => n.seen && M.megaRender.isDOMNodeVisible(n.h)

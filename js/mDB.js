@@ -2651,9 +2651,21 @@ lazy(LRUMegaDexie, 'create', () => {
 
     const extend = (obj) => {
         if (obj instanceof LRUMap) {
+            const {get, set} = obj;
+
             Object.defineProperties(obj, {
+                get: {
+                    value: async function(...args) {
+                        return get.apply(this, args);
+                    }
+                },
+                set: {
+                    value: async function(...args) {
+                        return set.apply(this, args);
+                    }
+                },
                 find: {
-                    value: function(keys) {
+                    value: async function(keys) {
                         const res = [];
                         for (let i = keys.length; i--;) {
                             if (this.has(keys[i])) {

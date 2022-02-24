@@ -22,6 +22,8 @@
      * 2) To set the content of the tooltip, pass an attribute w/ the text named `data-simpletip`
      * Example:
      * ```<a href="#" class="simpletip" data-simpletip="Hello world!">Mouse over me</a>```
+     * or setting optional classname `simpletip-tc` on the element without data attribute to simply using text contents
+     * ```<a href="#" class="simpletip simpletip-tc">Mouse over me</a>```
      *
      * Optionally, you can control:
      * A) The wrapper in which the tooltip should try to fit in (and position on top/bottom, depending on whether there
@@ -157,7 +159,7 @@
             return false;
         }
 
-        var contents = $this.attr('data-simpletip');
+        var contents = $this.hasClass('simpletip-tc') ? $this.text() : $this.attr('data-simpletip');
         if (contents) {
             const $node = $template.clone();
             const $textContainer = $('span', $node);

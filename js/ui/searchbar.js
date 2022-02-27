@@ -27,7 +27,9 @@
             }
             else if (val.length >= 2 || !asciionly(val)) {
                 M.fmSearchNodes(val).then(function() {
-                    loadSubPage(`fm/search/${val}`);
+                    if (!pfid) {
+                        loadSubPage(`fm/search/${val}`);
+                    }
                     onIdle(() => {
                         // get topbars again for switching between static and fm pages
                         $topbar = $('#startholder .js-topbar, #fmholder .js-topbar');
@@ -121,23 +123,20 @@
         const $mainSearch = $('.searcher-wrapper .js-topbar-searcher', $topbar);
 
         // Show the correct search bar
-        if (page.startsWith('fm') && (page.includes('/account') ||  // logged in pages, not file manager
-                page.includes('/dashboard') ||
-                page.includes('/transfers') ||
-                page.includes('/user-management') ||
-                page.includes('/refer') ||
-                page.includes('/chat')) ||                          // chat
-            page.startsWith('chat/') ||                             // chat link pages
-            !page.startsWith('fm') && u_type                        // static (logged in)
-        ) {
-            $miniSearch.removeClass('hidden');
-            $mainSearch.addClass('hidden');
+        if (u_type !== false || pfid) {
+            const rex = /\/(?:account|dashboard|user-management|refer)/;
+
+            if (M.chat || !is_fm() || rex.test(page)) {
+                $miniSearch.removeClass('hidden');
+                $mainSearch.addClass('hidden');
+            }
+            else {
+                $miniSearch.addClass('hidden');
+                $mainSearch.removeClass('hidden');
+            }
         }
-        else if (page.startsWith('fm') && u_type !== false) {       // file manager excl. logged out public folders
-            $miniSearch.addClass('hidden');
-            $mainSearch.removeClass('hidden');
-        }
-        else {                                                      // static (logged out), other pages
+        else {
+            // static (logged out), other pages
             $miniSearch.addClass('hidden');
             $mainSearch.addClass('hidden');
         }

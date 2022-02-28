@@ -989,7 +989,8 @@ FileManager.prototype.initFileManagerUI = function() {
 
                     // special case handling for the chat, re-render current conversation
                     if (tab.root === 'chat' && String(M.currentdirid).substr(0, 5) === 'chat/' &&
-                        !M.currentdirid.startsWith('chat/contacts')) {
+                        !M.currentdirid.startsWith('chat/contacts') &&
+                        !M.currentdirid.startsWith('chat/archived')) {
                         targetFolder = M.currentdirid;
                     }
                 }

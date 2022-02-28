@@ -404,14 +404,15 @@ var megasync = (function() {
 
         if (!megasyncUrl) {
             megasyncUrl = switchMegasyncUrlToHttpWhenPossible();
-            if (megasyncUrl === ShttpMegasyncUrl) {
-                // not supported any more.
-                const errMsg = 'Browser doesn\'t support Mega Desktop integration';
-                if (typeof reject === 'function') {
-                    reject(errMsg);
-                }
-                return MegaPromise.reject(errMsg);
+        }
+
+        if (megasyncUrl === ShttpMegasyncUrl) {
+            // not supported any more.
+            const errMsg = 'Browser doesn\'t support Mega Desktop integration';
+            if (typeof reject === 'function') {
+                reject(errMsg);
             }
+            return MegaPromise.reject(errMsg);
         }
 
         var promise = M.xhr({

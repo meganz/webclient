@@ -59,12 +59,6 @@
 .meetings-call .stream .stream-controls ul li button {
   cursor: pointer;
 }
-.meetings-call .stream .stream-controls ul li button.inactive {
-  /* [...] */
-}
-.meetings-call .stream .stream-controls ul li button.inactive i {
-  --mask-color: #ff6560;
-}
 .meetings-call .stream .stream-controls ul li button.end-call {
   color: var(--text-color-high);
 }
@@ -1765,12 +1759,6 @@ body.theme-dark .start-meeting-preview .preview-meeting {
 .preview-meeting-controls button:first-child {
   margin-right: 32px;
 }
-.preview-meeting-controls button.inactive {
-  /* [...] */
-}
-.preview-meeting-controls button.inactive i {
-  --mask-color: #ff6560;
-}
 .preview-meeting-controls button i {
   margin: 0 auto;
   --icon-size: 32px;
@@ -2041,5 +2029,3 @@ body.theme-dark .start-meeting-preview .preview-meeting {
     left: 400px;
   }
 }
-
-/*# sourceMappingURL=chat-bundle.css.map */

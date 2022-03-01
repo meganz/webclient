@@ -86,14 +86,6 @@
 
             &:first-child { margin-right: 32px; }
 
-            &.inactive {
-                /* [...] */
-
-                i {
-                    --mask-color: #ff6560;
-                }
-            }
-
             i {
                 margin: 0 auto;
                 --icon-size: 32px;

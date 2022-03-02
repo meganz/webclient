@@ -16868,6 +16868,7 @@ class Stream extends mixins.wl {
       EXPAND: ['slideshow:close', 'textEditor:close']
     };
     this.LISTENERS = [];
+    this.PREV_STATE = {};
     this.state = {
       options: false
     };
@@ -16900,12 +16901,23 @@ class Stream extends mixins.wl {
     this.bindEvents = () => {
       for (let i = this.EVENTS.MINIMIZE.length; i--;) {
         const event = this.EVENTS.MINIMIZE[i];
-        this.LISTENERS[event] = mBroadcaster.addListener(event, () => this.props.onCallMinimize());
+        this.LISTENERS[event] = mBroadcaster.addListener(event, () => {
+          this.PREV_STATE.minimised = this.props.minimized;
+          return this.props.onCallMinimize();
+        });
       }
 
       for (let i = this.EVENTS.EXPAND.length; i--;) {
         const event = this.EVENTS.EXPAND[i];
-        this.LISTENERS[event] = mBroadcaster.addListener(event, () => this.props.view === Call.VIEW.CHAT && this.props.onCallExpand());
+        this.LISTENERS[event] = mBroadcaster.addListener(event, () => {
+          if (this.PREV_STATE.minimised) {
+            delete this.PREV_STATE.minimised;
+            return;
+          }
+
+          delete this.PREV_STATE.minimised;
+          return this.props.view === Call.VIEW.CHAT && this.props.onCallExpand();
+        });
       }
 
       document.addEventListener('click', this.handleOptionsClose);
@@ -22392,19 +22404,31 @@ let ConversationPanel = (conversationpanel_dec = utils["default"].SoonFcWrap(360
       streams: room.sfuApp.callManagerCall.peers,
       call: room.sfuApp.callManagerCall,
       minimized: this.state.callMinimized,
-      onCallMinimize: () => this.setState({
-        callMinimized: true
-      }, () => {
-        this.toggleExpandedFlag();
-        this.safeForceUpdate();
-      }),
-      onCallExpand: () => this.setState({
-        callMinimized: false
-      }, () => {
-        loadSubPage('fm/chat');
-        room.show();
-        this.toggleExpandedFlag();
-      }),
+      onCallMinimize: () => {
+        if (this.state.callMinimized === true) {
+          return false;
+        }
+
+        this.setState({
+          callMinimized: true
+        }, () => {
+          this.toggleExpandedFlag();
+          this.safeForceUpdate();
+        });
+      },
+      onCallExpand: () => {
+        if (this.state.callMinimized === false) {
+          return false;
+        }
+
+        this.setState({
+          callMinimized: false
+        }, () => {
+          loadSubPage('fm/chat');
+          room.show();
+          this.toggleExpandedFlag();
+        });
+      },
       didMount: this.toggleExpandedFlag,
       willUnmount: minimised => this.setState({
         callMinimized: false

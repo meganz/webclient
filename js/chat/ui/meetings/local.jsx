@@ -141,6 +141,8 @@ class Stream extends MegaRenderMixin {
 
     LISTENERS = [];
 
+    PREV_STATE = {};
+
     constructor(props) {
         super(props);
     }
@@ -180,16 +182,24 @@ class Stream extends MegaRenderMixin {
         // Minimize the call UI on `Preview`, `Contacts`, `Text Editor`, etc
         for (let i = this.EVENTS.MINIMIZE.length; i--;) {
             const event = this.EVENTS.MINIMIZE[i];
-            this.LISTENERS[event] = mBroadcaster.addListener(event, () => this.props.onCallMinimize());
+            this.LISTENERS[event] = mBroadcaster.addListener(event, () => {
+                this.PREV_STATE.minimised = this.props.minimized;
+                return this.props.onCallMinimize();
+            });
         }
 
         // Expand back the call UI after closing `Preview`, `Text Editor`, etc --
         // assuming they have been opened from within the sidebar chat.
         for (let i = this.EVENTS.EXPAND.length; i--;) {
             const event = this.EVENTS.EXPAND[i];
-            this.LISTENERS[event] = mBroadcaster.addListener(event, () =>
-                this.props.view === Call.VIEW.CHAT && this.props.onCallExpand()
-            );
+            this.LISTENERS[event] = mBroadcaster.addListener(event, () => {
+                if (this.PREV_STATE.minimised) {
+                    delete this.PREV_STATE.minimised;
+                    return;
+                }
+                delete this.PREV_STATE.minimised;
+                return this.props.view === Call.VIEW.CHAT && this.props.onCallExpand();
+            });
         }
 
         // Close the options menu on click outside the `Local` component

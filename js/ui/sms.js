@@ -184,6 +184,10 @@ sms.phoneInput = {
         var $countryList = $('.js-country-list');
         var $countryItemTemplate = $('.option.template', $countryList);
 
+        if ($('.dropdown-scroll .option', $countryList).length > 1) {
+            return;
+        }
+
         var countryOptions = '';
 
         // Build list of countries

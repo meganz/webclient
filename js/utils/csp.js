@@ -291,7 +291,7 @@ lazy(self, 'csp', () => {
 
                     onIdle(() => {
                         scroll.scrollTop = 0;
-                        Ps[scroll.classList.contains('ps-container') ? 'update' : 'initialize'](scroll);
+                        Ps[scroll.classList.contains('ps') ? 'update' : 'initialize'](scroll);
                     });
                 }
 

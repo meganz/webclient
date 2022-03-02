@@ -551,7 +551,7 @@ class SelectionManager2_DOM extends SelectionManager2Base {
                 var $target = $(e.target);
 
                 if ($target.parent().is('.file-block-scrolling:not(.hidden)') &&
-                    !$target.is('.ps-scrollbar-x-rail') && !$target.is('.ps-scrollbar-y-rail')) {
+                    !$target.is('.ps__scrollbar-x-rail') && !$target.is('.ps__scrollbar-y-rail')) {
                     this.clear_selection();
                 }
             });
@@ -798,7 +798,7 @@ class SelectionManager2_DOM extends SelectionManager2Base {
         }
         else {
             var scrollBarYClass = (M.viewmode === 1) ?
-                '.file-block-scrolling.ps-active-y' : '.grid-scrolling-table.ps-active-y';
+                '.file-block-scrolling.ps--active-y' : '.grid-scrolling-table.ps--active-y';
             var scrollBarY = document.querySelector(scrollBarYClass);
             if (scrollBarY && (scrollBarY.scrollHeight - scrollBarY.scrollTop - scrollBarY.clientHeight) < 37) {
                 scrollBarY.scrollTop = scrollBarY.scrollHeight - scrollBarY.clientHeight;

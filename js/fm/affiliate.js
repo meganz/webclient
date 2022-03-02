@@ -49,7 +49,7 @@ function affiliateUI() {
     // Init Referral content scrolling
     var $scrollBlock = $('.scroll-block', affiliateUI.$body);
 
-    if ($scrollBlock.is('.ps-container')) {
+    if ($scrollBlock.is('.ps')) {
         Ps.update($scrollBlock[0]);
     }
     else {
@@ -175,7 +175,7 @@ affiliateUI.guideDialog = {
         if (num === 3) {
             var $scrollBlock = $('.affiliate-guide-content.slide3', this.$secondStepBlock);
 
-            if ($scrollBlock.is('.ps-container')) {
+            if ($scrollBlock.is('.ps')) {
                 Ps.update($scrollBlock[0]);
             }
             else {
@@ -1006,7 +1006,7 @@ affiliateUI.redemptionDialog = {
 
         var $cellContent = $('.cell-content', $currentStep);
 
-        if ($currentStep.is('.scrollable') && !$cellContent.hasClass('ps-container')) {
+        if ($currentStep.is('.scrollable') && !$cellContent.hasClass('ps')) {
             Ps.initialize($cellContent[0]);
             $('input', $currentStep).off('focus.jsp');
         }
@@ -1773,7 +1773,7 @@ affiliateUI.redemptionHistory = {
 
         var $scrollElement = $('.redeem-scroll', this.$block);
 
-        if ($scrollElement.hasClass('ps-container')) {
+        if ($scrollElement.hasClass('ps')) {
             Ps.update($scrollElement[0]);
         }
         else {

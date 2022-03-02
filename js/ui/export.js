@@ -329,7 +329,7 @@ var exportPassword = {
                 // Hide tooltip if content is scrolled
                 $scrollBlock.rebind('scroll.hidePassTip', function() {
 
-                    if ($(this).is('.ps-active-y')) {
+                    if ($(this).is('.ps--active-y')) {
                         hidePasswordTip();
                     }
                 });
@@ -1654,7 +1654,7 @@ var exportExpiry = {
             // Hide tooltip if content is scrolled
             $scrollBlock.rebind('scroll.hideExpiryTip', function() {
 
-                if ($(this).is('.ps-active-y')) {
+                if ($(this).is('.ps--active-y')) {
 
                     hideExpiryTip();
                 }
@@ -1763,7 +1763,7 @@ var exportExpiry = {
         }
 
         // Delete old Export links scrolling
-        if ($scroll.is('.ps-container')) {
+        if ($scroll.is('.ps')) {
             Ps.destroy($scroll[0]);
         }
 
@@ -2155,7 +2155,7 @@ var exportExpiry = {
                     $selectedLink.remove();
 
                     // Update Export links scrolling
-                    if ($scroll.is('.ps-container')) {
+                    if ($scroll.is('.ps')) {
                         Ps.update($scroll[0]);
                     }
 

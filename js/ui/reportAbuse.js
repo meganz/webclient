@@ -711,7 +711,7 @@ class ReportAbuse {
     initReportAbuseScroll() {
         const scrollBlock = document.getElementsByClassName('js-reportabuse-scroll-panel').item(0);
         if (scrollBlock) {
-            if (scrollBlock.classList.contains('ps-container')) {
+            if (scrollBlock.classList.contains('ps')) {
                 Ps.update(scrollBlock);
             }
             else {

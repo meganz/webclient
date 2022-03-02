@@ -1071,7 +1071,7 @@
     background: var(--surface-grey-2);
 }
 
-.gif-panel .gif-panel-header + .ps-container {
+.gif-panel .gif-panel-header + .ps {
     max-height: calc(100% - 47px);
 }
 

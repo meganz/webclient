@@ -456,6 +456,11 @@ mBroadcaster.once('startMega', function() {
     inherits(MegaPromise, window.Promise || {});
 
     window.MegaPromise = MegaPromise;
+    window.LRUMegaDexie = {
+        create() {
+            return {error: -1};
+        }
+    };
 });
 
 function MegaLogger(n, o) {

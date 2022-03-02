@@ -989,7 +989,8 @@ FileManager.prototype.initFileManagerUI = function() {
 
                     // special case handling for the chat, re-render current conversation
                     if (tab.root === 'chat' && String(M.currentdirid).substr(0, 5) === 'chat/' &&
-                        !M.currentdirid.startsWith('chat/contacts')) {
+                        !M.currentdirid.startsWith('chat/contacts') &&
+                        !M.currentdirid.startsWith('chat/archived')) {
                         targetFolder = M.currentdirid;
                     }
                 }
@@ -2903,7 +2904,7 @@ FileManager.prototype.addTransferPanelUI = function() {
             $('.nw-fm-left-icon.transfers').addClass('active');
             $('#fmholder').addClass('transfer-panel-opened');
             var domScrollingTable = M.getTransferElements().domScrollingTable;
-            if (!domScrollingTable.classList.contains('ps-container')) {
+            if (!domScrollingTable.classList.contains('ps')) {
                 Ps.initialize(domScrollingTable, {suppressScrollX: true});
             }
             fm_tfsupdate(); // this will call $.transferHeader();
@@ -3847,7 +3848,7 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
     if (this.currentdirid && this.currentdirid.substr(0, 8) !== 'contacts') {
         $ddUIgrid.selectable({
             filter: $.selectddUIitem,
-            cancel: '.ps-scrollbar-y-rail, .ps-scrollbar-x-rail',
+            cancel: '.ps__scrollbar-y-rail, .ps__scrollbar-x-rail',
             start: function (e, u) {
                 $.hideContextMenu(e);
                 $.hideTopMenu();

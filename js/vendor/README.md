@@ -85,6 +85,12 @@ Unless otherwise noted, they were released under a [MIT License].
 > **This is a fork**, [Compare the changes](https://github.com/IonDen/ion.sound/compare/master...meganz:master)
 
 ---
+[perfect-scrollbar.js]: JavaScript plugin for scrollbar v0.8.1
+
+> This is released under [MIT License](https://github.com/mdbootstrap/perfect-scrollbar/blob/master/LICENSE).
+> **This is a fork**, [Compare the changes](https://github.com/mdbootstrap/perfect-scrollbar/compare/master...meganz:master)
+
+---
 [jquery.js]: jQuery JavaScript Library.
 
 ---

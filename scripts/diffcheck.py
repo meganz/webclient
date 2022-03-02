@@ -254,7 +254,7 @@ def reduce_stylelint(file_line_mapping, **extra):
         # But we still want the output in the same fashion.
         output = ex.output
         # unless no output given, e.g. stderr used for something unexpected.
-        if not output and ex.returncode is 1:
+        if not output and ex.returncode == 1:
             return '*** StyleLint: {} ***'.format(ex), 0
     except OSError as ex:
         if ex.errno == 2:

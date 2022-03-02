@@ -52,24 +52,24 @@ function initTextareaScrolling($textarea, textareaMaxHeight, resizeEvent) {
         // Textarea wrapper scrolling init
         if (textareaCloneHeight > textareaMaxHeight) {
 
-            if ($textareaScrollBlock.is('.ps-container')) {
+            if ($textareaScrollBlock.is('.ps')) {
                 Ps.update($textareaScrollBlock[0]);
             }
             else {
                 Ps.initialize($textareaScrollBlock[0]);
             }
         }
-        else if ($textareaScrollBlock.is('.ps-container')){
+        else if ($textareaScrollBlock.is('.ps')){
             Ps.destroy($textareaScrollBlock[0]);
             $textareaScrollBlock.scrollTop(0);
         }
 
         // Scrolling according cursor position
         if (viewRatio > textareaLineHeight || viewRatio < viewLimitTop) {
-            if (textareaCloneSpanHeight > 0 && $textareaScrollBlock.is('.ps-container')) {
+            if (textareaCloneSpanHeight > 0 && $textareaScrollBlock.is('.ps')) {
                 $textareaScrollBlock.scrollTop(textareaCloneSpanHeight - textareaLineHeight);
             }
-            else if ($textareaScrollBlock.is('.ps-container')) {
+            else if ($textareaScrollBlock.is('.ps')) {
                 $textareaScrollBlock.scrollTop(0);
             }
         }
@@ -901,7 +901,7 @@ function initTreeScroll() {
         return false;
     }
 
-    if (scrollBlock.classList.contains('ps-container')) {
+    if (scrollBlock.classList.contains('ps')) {
         Ps.update(scrollBlock);
     }
     else {

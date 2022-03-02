@@ -8,8 +8,8 @@
 .section.conversations .fm-right-files-block {
     height: 100%;
 }
-.js-messages-scroll-area.ps-in-scrolling,
-.js-messages-scroll-area.ps-in-scrolling:hover {
+.js-messages-scroll-area.ps--in-scrolling,
+.js-messages-scroll-area.ps--in-scrolling:hover {
     pointer-events: initial;
 }
 .conversation-panels, .conversation-panel {
@@ -1163,7 +1163,7 @@ button.fm-empty-button {
     background-size: auto 248px;
     background-position: -14px -38px;
 }
-.chat-contacts-list .ps-active-y .right-chat-contact-card {
+.chat-contacts-list .ps--active-y .right-chat-contact-card {
     width: 220px !important;
 }
 

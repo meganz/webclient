@@ -44,15 +44,26 @@ function accountUI() {
     else {
         $('.settings-button.slide-in-out.plan', $settingsMenu).removeClass('hidden');
     }
-    M.accountData(accountUI.renderAccountPage, 1);
+    M.accountData((account) => {
 
-    // Init account content scrolling
-    if (accountUI.$contentBlock.is('.ps-container')) {
-        Ps.update(accountUI.$contentBlock[0]);
-    }
-    else {
-        Ps.initialize(accountUI.$contentBlock[0]);
-    }
+        accountUI.renderAccountPage(account);
+
+        // Init account content scrolling
+        // Scrolling init/update became faster than promise based operations in "renderAccountPage"
+        // instead or refactoring "accounts" page to return a promise in "rendering" a non noticeable
+        // heuristic 300ms delay has been added. I believe this delay simulate the slowness which allowed
+        // the previous logic to work.
+        delay('settings:scrollbarinit', () => {
+            if (accountUI.$contentBlock.is('.ps')) {
+                Ps.update(accountUI.$contentBlock[0]);
+            }
+            else {
+                Ps.initialize(accountUI.$contentBlock[0]);
+            }
+        }, 300);
+    }, 1);
+
+    
 }
 
 accountUI.renderAccountPage = function(account) {

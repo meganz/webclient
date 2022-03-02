@@ -1360,6 +1360,7 @@ MegaUtils.prototype.fmSearchNodes = function(searchTerm) {
                 M.currentdirid = 'search/' + searchTerm;
                 M.renderMain();
                 M.onSectionUIOpen('cloud-drive');
+                $('.fm-right-header .fm-breadcrumbs-wrapper').addClass('hidden');
                 onIdle(resolve);
                 // mBroadcaster.sendMessage('!sitesearch', searchTerm, 'folder-link', M.v.length);
             }

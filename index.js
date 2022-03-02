@@ -238,7 +238,7 @@ function topMenuScroll($scrollBlock) {
         return false;
     }
 
-    if ($scrollBlock.is('.ps-container')) {
+    if ($scrollBlock.is('.ps')) {
         Ps.update($scrollBlock[0]);
     }
     else {
@@ -2795,7 +2795,6 @@ function topmenuUI() {
         // eslint-disable-next-line complexity -- @todo refactor
         .rebind('click.menuitem tap.menuitem', function(ev) {
             var $this = $(this);
-            var $scrollBlock = $('.top-menu-scroll', $topMenu);
             var className = $this.attr('class') || '';
 
             if (className.indexOf('submenu-item') > -1) {
@@ -2809,7 +2808,7 @@ function topmenuUI() {
                 if (!is_mobile) {
 
                     delay('sideMenuScroll', function() {
-                        topMenuScroll($scrollBlock);
+                        topMenuScroll($('.top-menu-scroll', $topMenu));
                     }, 200);
                 }
             }

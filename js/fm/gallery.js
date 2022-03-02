@@ -1925,7 +1925,7 @@ async function galleryUI(id) {
             return loadingDialog.hide('MegaGallery');
         }
 
-        title = M.d[id].name;
+        title = escapeHTML(M.d[id].name);
         icon = 'photos';
         gallery = mega.gallery.discovery;
 

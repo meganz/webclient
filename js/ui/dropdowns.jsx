@@ -308,6 +308,7 @@ export class DropdownContactsSelector extends MegaRenderMixin {
             positionAt={this.props.positionAt}
             arrowHeight={this.props.arrowHeight}
             vertOffset={this.props.vertOffset}
+            noArrow={true}
         >
             <ContactPickerWidget
                 onClose={this.props.closeDropdown}

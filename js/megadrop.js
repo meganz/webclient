@@ -1232,7 +1232,7 @@ mega.megadrop = (function() {
                         .addClass('icon-arrow-down');
                 }
 
-                if ($accountSection.length && $accountSection.is('.ps-container')) {
+                if ($accountSection.length && $accountSection.is('.ps')) {
                     Ps.update($accountSection[0]);
                     $accountSection.scrollTop(
                         $accountSection.scrollTop() + $row.offset().top

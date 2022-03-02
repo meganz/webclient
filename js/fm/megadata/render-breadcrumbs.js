@@ -304,7 +304,7 @@
                 dropdown.classList.toggle('active');
 
                 if (dropdown.classList.contains('active')) {
-                    if (dropdown.classList.contains('ps-container')) {
+                    if (dropdown.classList.contains('ps')) {
                         Ps.update(dropdown);
                     }
                     else {

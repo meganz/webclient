@@ -233,7 +233,7 @@
                 my: my,
                 at: at,
                 collision: 'flipfit',
-                within: $this.parents(wrapper ? `${wrapper} body` : '.ps-container, body').first(),
+                within: $this.parents(wrapper ? `${wrapper} body` : '.ps, body').first(),
                 using: function(obj, info) {
 
                     /*

@@ -441,7 +441,7 @@ body.de .mega-dialog.new-group-chat {
 .mega-dialog .properties-breadcrumb .breadcrumb-dropdown a:active {
     color: var(--stroke-main-inverted);
 }
-.mega-dialog .properties-breadcrumb .breadcrumb-dropdown.ps-active-y a {
+.mega-dialog .properties-breadcrumb .breadcrumb-dropdown.ps--active-y a {
     margin-right: 4px;
 }
 .fm-dialog-table.grid-table-header th.grid-first-th i {
@@ -2114,7 +2114,7 @@ body.de .mega-dialog.new-group-chat {
         white-space: nowrap;
         margin-top: 8px;
     }
-    .mega-dialog.export-links-dialog .links-scroll.ps-active-y .item {
+    .mega-dialog.export-links-dialog .links-scroll.ps--active-y .item {
         margin: 6px 0;
     }
     .mega-dialog.export-links-dialog .item:first-child {
@@ -8011,11 +8011,11 @@ body.de .mega-dialog.new-group-chat {
         max-height: 400px;
         position: relative;
     }
-    .mega-dialog.affiliate-redeem .cells .cell-content.ps-active-y {
+    .mega-dialog.affiliate-redeem .cells .cell-content.ps--active-y {
         border: 1px solid var(--stroke-grey-2);
         border-radius: 12px;
     }
-    .mega-dialog.affiliate-redeem .cells .ps-container .header {
+    .mega-dialog.affiliate-redeem .cells .ps .header {
         padding: 20px 0 24px;
     }
     .mega-dialog.affiliate-redeem .cells.step3 {

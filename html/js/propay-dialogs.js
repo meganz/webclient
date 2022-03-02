@@ -1357,7 +1357,7 @@ var addressDialog = {
 
         const resizeDlgScrollBar = function($targetDialog) {
             const $contentSection = $('section.content', $targetDialog);
-            if ($contentSection.is('.ps-container')) {
+            if ($contentSection.is('.ps')) {
                 Ps.update($contentSection[0]);
             }
             else {
@@ -1899,7 +1899,7 @@ var addressDialog = {
             $errorMessage.removeClass(is_mobile ? 'v-hidden' : 'hidden');
 
             // Scroll down to the error message automatically if on large scaled displays
-            const $contentSection = $('section.content.ps-container', this.$dialog);
+            const $contentSection = $('section.content.ps', this.$dialog);
             if ($contentSection.length > 0) {
                 const scrollBottom = $contentSection.get(0).scrollHeight - $contentSection.get(0).clientHeight;
                 if (scrollBottom > 0) {

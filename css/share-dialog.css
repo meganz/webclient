@@ -361,7 +361,7 @@
     max-width: calc(100% - 10px);
 }
 
-.mega-dialog.share-add-dialog .horizontal-contacts-list div.ps-container > .ps-scrollbar-x-rail > .ps-scrollbar-x {
+.mega-dialog.share-add-dialog .horizontal-contacts-list div.ps > .ps__scrollbar-x-rail > .ps__scrollbar-x {
     background: var(--surface-mid-grey);
     border-radius: 2px;
     height: 4px;
@@ -369,7 +369,7 @@
     opacity: 1;
 }
 
-.mega-dialog.share-add-dialog .horizontal-contacts-list div.ps-container > .ps-scrollbar-x-rail > .ps-scrollbar-x::before {
+.mega-dialog.share-add-dialog .horizontal-contacts-list div.ps > .ps__scrollbar-x-rail > .ps__scrollbar-x::before {
     bottom: 0;
     content: "";
     cursor: pointer;

@@ -1850,7 +1850,7 @@ var dlmanager = {
 
                 // Initialise scrolling
                 if (!is_touch()) {
-                    if ($scrollBlock.is('.ps-container')) {
+                    if ($scrollBlock.is('.ps')) {
                         Ps.update($scrollBlock[0]);
                     }
                     else {

@@ -509,7 +509,7 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
         });
 
         // disable scrolling
-        var $psContainer = $(e.currentTarget).closest('.ps-container');
+        var $psContainer = $(e.currentTarget).closest('.ps');
         if ($psContainer.length) {
             Ps.disable($psContainer[0]);
             $.disabledContianer = $psContainer;

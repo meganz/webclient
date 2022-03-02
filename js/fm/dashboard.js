@@ -754,7 +754,7 @@ function initDashboardScroll() {
         return false;
     }
 
-    if ($scrollBlock.is('.ps-container')) {
+    if ($scrollBlock.is('.ps')) {
         Ps.update($scrollBlock[0]);
     }
     else {

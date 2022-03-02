@@ -370,7 +370,7 @@
     position: relative;
     z-index: 1;
 }
-.mega-input-dropdown .ps-container .ps-scrollbar-y {
+.mega-input-dropdown .ps .ps__scrollbar-y {
     right: 1px;
     width: 6px;
 }
@@ -390,7 +390,7 @@
     text-align: start;
     transition: var(--transition-bg-color), var(--transition-color);
 }
-.mega-input-dropdown .ps-active-y .option {
+.mega-input-dropdown .ps--active-y .option {
     margin-right: 14px;
 }
 

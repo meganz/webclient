@@ -26,7 +26,6 @@ function bindDropdownEvents($select, saveOption, contentBlock) {
         var $dropdown = $('.mega-input-dropdown', $this);
         var $hiddenInput = $('.hidden-input', $this);
         var $target = $(e.target);
-        var $scrollBlock = $('.dropdown-scroll', $this);
 
         var closeDropdown = function() {
             $this.removeClass('active');
@@ -58,19 +57,7 @@ function bindDropdownEvents($select, saveOption, contentBlock) {
             $activeDropdownItem.addClass('active');
             $dropdown.removeClass('hidden');
 
-            // Dropdown scrolling initialization
-            if ($scrollBlock.length) {
-                if ($scrollBlock.is('.ps-container')) {
-                    $scrollBlock.scrollTop(0);
-                    Ps.destroy($scrollBlock[0]);
-                }
-
-                Ps.initialize($scrollBlock[0]);
-
-                if ($activeDropdownItem.length) {
-                    $scrollBlock.scrollTop($activeDropdownItem.position().top);
-                }
-            }
+            
 
             $hiddenInput.trigger('focus');
 
@@ -110,6 +97,21 @@ function bindDropdownEvents($select, saveOption, contentBlock) {
                     closeDropdown();
                 }
             });
+            var $scrollBlock = $('.dropdown-scroll', $this);
+
+            // Dropdown scrolling initialization
+            if ($scrollBlock.length) {
+                if ($scrollBlock.is('.ps')) {
+                    $scrollBlock.scrollTop(0);
+                    Ps.destroy($scrollBlock[0]);
+                }
+
+                Ps.initialize($scrollBlock[0]);
+
+                if ($activeDropdownItem.length) {
+                    $scrollBlock.scrollTop($activeDropdownItem.position().top);
+                }
+            }
 
             $hiddenInput.trigger('focus');
         }

@@ -1,7 +1,7 @@
 var React = require("react");
 var ContactsUI = require('./../contacts.jsx');
 var ConversationMessageMixin = require('./mixin.jsx').ConversationMessageMixin;
-import { EmojiFormattedContent } from '../../../ui/utils.jsx';
+import { Emoji, ParsedHTML } from '../../../ui/utils.jsx';
 
 class TopicChange extends ConversationMessageMixin {
     render() {
@@ -33,24 +33,7 @@ class TopicChange extends ConversationMessageMixin {
         var avatar = <ContactsUI.Avatar contact={contact}
             chatRoom={chatRoom}
             className="message avatar-wrapper small-rounded-avatar"/>;
-
-        var topic = message.meta.topic;
-
-        var formattedTopic = this._formattedTopic;
-        if (this._oldTopic !== topic) {
-            this._oldTopic = topic;
-            formattedTopic = megaChat.plugins.emoticonsFilter.processHtmlMessage(htmlentities(topic));
-            this._formattedTopic = formattedTopic;
-        }
-
-        var text = l[9081]
-            .replace(
-                "%s",
-                '<strong className="dark-grey-txt">"' +
-                    formattedTopic +
-                '"</strong>'
-            );
-
+        const topic = megaChat.html(message.meta.topic);
 
         messages.push(
             <div className="message body" data-id={"id" + message.messageId} key={message.messageId}>
@@ -61,10 +44,12 @@ class TopicChange extends ConversationMessageMixin {
                         className="message"
                         chatRoom={chatRoom}
                         contact={contact}
-                        label={<EmojiFormattedContent>{displayName}</EmojiFormattedContent>}
+                        label={<Emoji>{displayName}</Emoji>}
                     />
                     {datetime}
-                    <div className="message text-block" dangerouslySetInnerHTML={{ __html: text }} />
+                    <div className="message text-block">
+                        <ParsedHTML>{l[9081].replace('%s', `<strong>"${topic}"</strong>`)}</ParsedHTML>
+                    </div>
                 </div>
             </div>
         );

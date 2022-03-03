@@ -1,7 +1,7 @@
 var React = require("react");
 var ContactsUI = require('./../contacts.jsx');
 var ConversationMessageMixin = require('./mixin.jsx').ConversationMessageMixin;
-import { EmojiFormattedContent } from '../../../ui/utils.jsx';
+import { Emoji } from '../../../ui/utils.jsx';
 
 class TruncatedMessage extends ConversationMessageMixin {
     render() {
@@ -48,7 +48,7 @@ class TruncatedMessage extends ConversationMessageMixin {
                     <ContactsUI.ContactButton
                         contact={contact}
                         className="message"
-                        label={<EmojiFormattedContent>{displayName}</EmojiFormattedContent>}
+                        label={<Emoji>{displayName}</Emoji>}
                         chatRoom={chatRoom} />
                     {datetime}
 

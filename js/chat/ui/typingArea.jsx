@@ -1,5 +1,5 @@
 // libs
-import { EmojiFormattedContent } from '../../ui/utils';
+import { Emoji } from '../../ui/utils';
 
 var React = require("react");
 var ReactDOM = require("react-dom");
@@ -905,7 +905,7 @@ export class TypingArea extends MegaRenderMixin {
                     className="chat-textarea-scroll textarea-scroll jScrollPaneContainer"
                     style={textareaScrollBlockStyles}>
                     <div className="messages-textarea-placeholder">
-                        {self.state.typedMessage ? null : <EmojiFormattedContent>{placeholder}</EmojiFormattedContent>}
+                        {self.state.typedMessage ? null : <Emoji>{placeholder}</Emoji>}
                     </div>
                     <textarea
                         className={`

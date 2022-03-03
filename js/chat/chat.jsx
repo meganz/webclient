@@ -2815,6 +2815,23 @@ Chat.prototype.highlight = (text, matches, dontEscape) => {
 };
 
 /**
+ * html
+ * @description Parses passed content through `EmoticonsFilter`; returns escaped content w/ Emoji formatting.
+ * @param {string} content The content to be escaped and processed by `EmoticonsFilter`
+ * @returns {string|void} The escaped/processed content
+ * @see EmoticonsFilter.processHtmlMessage
+ * @see Emoji
+ * @see ParsedHTML
+ */
+
+Chat.prototype.html = function(content) {
+    if (content) {
+        return this.plugins.emoticonsFilter.processHtmlMessage(escapeHTML(content));
+    }
+    return null;
+};
+
+/**
  * Should be used only when keys are expected to had changed after room's protocol handlers were initialized (e.g.
  * after E++ account creation)
  */

@@ -1,5 +1,5 @@
 import React from 'react';
-import utils from '../../../../../ui/utils.jsx';
+import { Emoji } from '../../../../../ui/utils.jsx';
 import { ConversationMessageMixin } from '../../mixin.jsx';
 import { MetaRichpreviewLoading } from './metaRichPreviewLoading.jsx';
 import {ContactVerified, ContactPresence, Avatar} from "../../../contacts.jsx";
@@ -119,9 +119,9 @@ class MetaRichpreviewMegaLinks extends ConversationMessageMixin {
                     <div className="message richpreview inner-wrapper">
                         <div className="message richpreview data-title">
                             <span className="message richpreview title">
-                                <utils.EmojiFormattedContent>
+                                <Emoji>
                                     {megaLinkInfo.info.name || megaLinkInfo.info.topic || ""}
-                                </utils.EmojiFormattedContent>
+                                </Emoji>
                             </span>
                         </div>
                         <div className="message richpreview desc">{desc}</div>

@@ -4,7 +4,7 @@ import ModalDialogsUI from '../../../../ui/modalDialogs.jsx';
 import Button from '../button.jsx';
 import Preview from './preview.jsx';
 import Link from '../../link.jsx';
-import { EmojiFormattedContent } from '../../../../ui/utils';
+import { Emoji } from '../../../../ui/utils';
 
 export class Start extends MegaRenderMixin {
     static NAMESPACE = 'start-meeting';
@@ -119,7 +119,7 @@ export class Start extends MegaRenderMixin {
                         {editing ?
                             <this.Input /> :
                             <h2 onClick={this.toggleEdit}>
-                                <EmojiFormattedContent>{topic}</EmojiFormattedContent>
+                                <Emoji>{topic}</Emoji>
                             </h2>
                         }
                         <Button

@@ -1,11 +1,10 @@
-import { EmojiFormattedContent } from '../../../ui/utils';
-
 var React = require("react");
 var ReactDOM = require("react-dom");
 var utils = require('./../../../ui/utils.jsx');
 var ContactsUI = require('./../contacts.jsx');
 var ConversationMessageMixin = require('./mixin.jsx').ConversationMessageMixin;
 var getMessageString = require('./utils.jsx').getMessageString;
+import { Emoji } from '../../../ui/utils';
 
 class ChatHandleMessage extends ConversationMessageMixin {
     render() {
@@ -52,7 +51,7 @@ class ChatHandleMessage extends ConversationMessageMixin {
 
                 <div className="message content-area small-info-txt">
                     <div className="message user-card-name">
-                        <EmojiFormattedContent>{displayName}</EmojiFormattedContent>
+                        <Emoji>{displayName}</Emoji>
                     </div>
                     {datetime}
 

@@ -603,6 +603,8 @@ class SelectionManager2_DOM extends SelectionManager2Base {
         }
 
         this.eventHandlers.onSelectedUpdated(this.selected_list);
+
+        return this;
     }
     clear_last_selected() {
         super.clear_last_selected();

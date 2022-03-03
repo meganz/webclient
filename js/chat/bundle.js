@@ -13145,6 +13145,22 @@ class Text extends AbstractGenericMessage {
       returnedButtons.push(messageActionButtons);
     }
 
+    if (message.messageHtml.includes('<pre class="rtf-multi">') && message.messageHtml.includes('</pre>')) {
+      returnedButtons.push(external_React_default().createElement(ui_buttons.Button, {
+        key: "copy-msg",
+        className: "tiny-button simpletip",
+        icon: "sprite-fm-mono icon-copy",
+        attrs: {
+          'data-simpletip': l.copy_txt_block_tip,
+          'data-simpletipoffset': '3',
+          'data-simpletipposition': 'top'
+        },
+        onClick: () => {
+          copyToClipboard(message.textContents.replace(/```/g, ''), l.copy_txt_block_toast);
+        }
+      }));
+    }
+
     if (parentButtons) {
       returnedButtons.push(parentButtons);
     }

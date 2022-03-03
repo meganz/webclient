@@ -3,7 +3,7 @@ import { MegaRenderMixin } from '../../mixins';
 import ModalDialogsUI from '../../../ui/modalDialogs.jsx';
 import Button from './button.jsx';
 import ModeSwitch from './modeSwitch.jsx';
-import { EmojiFormattedContent } from '../../../ui/utils.jsx';
+import { Emoji } from '../../../ui/utils.jsx';
 
 export default class StreamHead extends MegaRenderMixin {
     delayProcID = null;
@@ -122,16 +122,14 @@ export default class StreamHead extends MegaRenderMixin {
             const moderators = [];
             for (const [handle, role] of Object.entries(members)) {
                 if (role === ChatRoom.MembersSet.PRIVILEGE_STATE.FULL) {
-                    moderators.push(
-                        megaChat.plugins.emoticonsFilter.processHtmlMessage(escapeHTML(M.getNameByHandle(handle)))
-                    );
+                    moderators.push(M.getNameByHandle(handle));
                 }
             }
 
             return (
                 moderators.length > 1 ?
-                    `<span>${l.meeting_moderators.replace('%s', '</span> ' + moderators.join(', '))}` /* Moderators: */:
-                    `<span>${l[8875] /* `Moderator` */}:</span> ${moderators[0]}`
+                    l.meeting_moderators.replace('%s', moderators.join(', ')) :
+                    `${l[8875] /* `Moderator` */}: ${moderators[0]}`
             );
         }
     };
@@ -155,7 +153,7 @@ export default class StreamHead extends MegaRenderMixin {
                 hideOverlay={true}>
                 <section className="content">
                     <div className="content-block">
-                        <div className="info" dangerouslySetInnerHTML={{ __html: this.getModerators()}} />
+                        <Emoji className="info">{this.getModerators()}</Emoji>
                         <div className="info">{l.copy_and_share /* `Copy this link to send your invite` */}</div>
                         <div className="link-input-container">
                             <div className="mega-input with-icon box-style">
@@ -235,7 +233,7 @@ export default class StreamHead extends MegaRenderMixin {
                                 ${chatRoom.isMeeting ? 'has-meeting-link' : ''}
                             `}
                             onClick={() => chatRoom.isMeeting && this.setState({ dialog: !dialog, banner: false })}>
-                            <EmojiFormattedContent>{chatRoom.getRoomTitle()}</EmojiFormattedContent>
+                            <Emoji>{chatRoom.getRoomTitle()}</Emoji>
                             {chatRoom.isMeeting && (
                                 <i
                                     className={`

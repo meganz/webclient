@@ -7,7 +7,7 @@ import { MetaRichpreviewMegaLinks } from './partials/metaRichpreviewMegaLinks.js
 import { TypingArea } from '../../typingArea.jsx';
 import { Dropdown, DropdownItem } from '../../../../ui/dropdowns.jsx';
 import { Button } from '../../../../ui/buttons.jsx';
-import utils from '../../../../ui/utils.jsx';
+import utils, { ParsedHTML } from '../../../../ui/utils.jsx';
 
 export default class Text extends AbstractGenericMessage {
 
@@ -273,12 +273,16 @@ export default class Text extends AbstractGenericMessage {
             if (this.props.initTextScrolling) {
                 messageDisplayBlock =
                     <utils.JScrollPane className="message text-block scroll">
-                        <div className="message text-scroll" dangerouslySetInnerHTML={{ __html: textMessage }} />
+                        <div className="message text-scroll">
+                            <ParsedHTML>{textMessage}</ParsedHTML>
+                        </div>
                     </utils.JScrollPane>;
             }
             else {
                 messageDisplayBlock =
-                    <div className="message text-block" dangerouslySetInnerHTML={{ __html: textMessage }} />;
+                    <div className="message text-block">
+                        <ParsedHTML>{textMessage}</ParsedHTML>
+                    </div>;
             }
         }
 

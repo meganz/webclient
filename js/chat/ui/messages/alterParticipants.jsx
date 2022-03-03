@@ -1,7 +1,7 @@
 var React = require("react");
 var ContactsUI = require('./../contacts.jsx');
 var ConversationMessageMixin = require('./mixin.jsx').ConversationMessageMixin;
-import { EmojiFormattedContent } from '../../../ui/utils.jsx';
+import { Emoji, ParsedHTML } from '../../../ui/utils.jsx';
 
 class AltPartsConvMessage extends ConversationMessageMixin {
     _ensureNameIsLoaded(h) {
@@ -84,7 +84,7 @@ class AltPartsConvMessage extends ConversationMessageMixin {
                 l[23756] :
                 l[8907].replace(
                     "%s",
-                    '<strong className="dark-grey-txt">' + htmlentities(displayName) + '</strong>'
+                    `<strong>${megaChat.html(displayName)}</strong>`
                 );
 
             self._ensureNameIsLoaded(otherContact.u);
@@ -97,15 +97,12 @@ class AltPartsConvMessage extends ConversationMessageMixin {
                             className="message"
                             contact={otherContact}
                             chatRoom={self.props.chatRoom}
-                            label={<EmojiFormattedContent>{otherDisplayName}</EmojiFormattedContent>}
+                            label={<Emoji>{otherDisplayName}</Emoji>}
                         />
                         {datetime}
-                        <div
-                            className="message text-block"
-                            dangerouslySetInnerHTML={{
-                                __html: megaChat.plugins.emoticonsFilter.processHtmlMessage(text)
-                            }}
-                        />
+                        <div className="message text-block">
+                            <ParsedHTML>{text}</ParsedHTML>
+                        </div>
                     </div>
                 </div>
             );
@@ -132,7 +129,7 @@ class AltPartsConvMessage extends ConversationMessageMixin {
             else {
                 text = l[8906].replace(
                     "%s",
-                    '<strong className="dark-grey-txt">' + htmlentities(displayName) + '</strong>'
+                    `<strong>${megaChat.html(displayName)}</strong>`
                 );
             }
 
@@ -145,15 +142,12 @@ class AltPartsConvMessage extends ConversationMessageMixin {
                             className="message"
                             chatRoom={self.props.chatRoom}
                             contact={otherContact}
-                            label={<EmojiFormattedContent>{otherDisplayName}</EmojiFormattedContent>}
+                            label={<Emoji>{otherDisplayName}</Emoji>}
                         />
                         {datetime}
-                        <div
-                            className="message text-block"
-                            dangerouslySetInnerHTML={{
-                                __html: megaChat.plugins.emoticonsFilter.processHtmlMessage(text)
-                            }}
-                        />
+                        <div className="message text-block">
+                            <ParsedHTML>{text}</ParsedHTML>
+                        </div>
                     </div>
                 </div>
             );

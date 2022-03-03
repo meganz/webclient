@@ -2,7 +2,7 @@ import React from 'react';
 import { TYPE, LABEL } from './resultContainer.jsx';
 import { Avatar, ContactPresence, LastActivity, MembersAmount } from '../contacts.jsx';
 import { MegaRenderMixin } from '../../mixins';
-import { EmojiFormattedContent } from '../../../ui/utils.jsx';
+import { Emoji, ParsedHTML } from '../../../ui/utils.jsx';
 import { ContactAwareName } from '../contacts.jsx';
 import { EVENTS } from './searchPanel.jsx';
 
@@ -82,24 +82,15 @@ class MessageRow extends MegaRenderMixin {
                 <div className="user-card">
                     <span className="title">
                         <ContactAwareName contact={M.u[contact]}>
-                            <EmojiFormattedContent>
-                                {room.getRoomTitle()}
-                            </EmojiFormattedContent>
+                            <Emoji>{room.getRoomTitle()}</Emoji>
                         </ContactAwareName>
                     </span>
                     {isGroup ? null : <ContactPresence contact={M.u[contact]}/>}
                     <div className="clear"/>
                     <div className="message-result-info">
-                        <div
-                            className="summary"
-                            dangerouslySetInnerHTML={{
-                                __html: megaChat.highlight(
-                                    summary,
-                                    matches,
-                                    true /* already escaped by `getRenderableSummary` */
-                                )
-                            }}
-                        />
+                        <div className="summary">
+                            <ParsedHTML content={megaChat.highlight(summary, matches, true)} />
+                        </div>
                         <div className="result-separator">
                             <i className="sprite-fm-mono icon-dot"/>
                         </div>
@@ -124,6 +115,7 @@ class ChatRow extends MegaRenderMixin {
 
     render() {
         const { room, matches } = this.props;
+        const result = megaChat.highlight(megaChat.html(room.topic), matches, true);
 
         return (
             <div
@@ -134,15 +126,7 @@ class ChatRow extends MegaRenderMixin {
                 </div>
                 <div className={USER_CARD_CLASS}>
                     <div className="graphic">
-                        <span
-                            dangerouslySetInnerHTML={{
-                                __html: megaChat.highlight(
-                                    megaChat.plugins.emoticonsFilter.processHtmlMessage(htmlentities(room.topic)),
-                                    matches,
-                                    true
-                                )
-                            }}
-                        />
+                        <ParsedHTML>{result}</ParsedHTML>
                     </div>
                 </div>
                 <div className="clear"/>
@@ -169,25 +153,13 @@ class MemberRow extends MegaRenderMixin {
                 // `Graphic` result of member type -- the last activity status is shown as graphic icon
                 <div className="graphic">
                     {isGroup ?
-                        <span dangerouslySetInnerHTML={{
-                            __html: megaChat.highlight(
-                                megaChat.plugins.emoticonsFilter.processHtmlMessage(
-                                    htmlentities(room.topic || room.getRoomTitle())
-                                ),
-                                matches,
-                                true
-                            )
-                        }}/> :
+                        <ParsedHTML>
+                            {megaChat.highlight(megaChat.html(room.topic || room.getRoomTitle()), matches, true)}
+                        </ParsedHTML> :
                         <>
-                            <span dangerouslySetInnerHTML={{
-                                __html: megaChat.highlight(
-                                    megaChat.plugins.emoticonsFilter.processHtmlMessage(
-                                        htmlentities(nicknames.getNickname(data))
-                                    ),
-                                    matches,
-                                    true
-                                )
-                            }}/>
+                            <ParsedHTML>
+                                {megaChat.highlight(megaChat.html(nicknames.getNickname(data)), matches, true)}
+                            </ParsedHTML>
                             <ContactPresence contact={contact}/>
                         </>
                     }
@@ -199,12 +171,12 @@ class MemberRow extends MegaRenderMixin {
                     {isGroup ?
                         <>
                             <span>
-                                <EmojiFormattedContent>{room.topic || room.getRoomTitle()}</EmojiFormattedContent>
+                                <Emoji>{room.topic || room.getRoomTitle()}</Emoji>
                             </span>
                             <MembersAmount room={room}/>
                         </> :
                         <>
-                            <EmojiFormattedContent>{nicknames.getNickname(data)}</EmojiFormattedContent>
+                            <Emoji>{nicknames.getNickname(data)}</Emoji>
                             <LastActivity contact={contact} showLastGreen={true}/>
                         </>
                     }
@@ -238,11 +210,11 @@ const NilRow = ({ onSearchMessages, isFirstQuery }) => (
             {isFirstQuery && (
                 <div
                     className="search-messages"
-                    onClick={onSearchMessages}
-                    dangerouslySetInnerHTML={{
-                        /* `Click <a>here</a> to search for messages.` */
-                        __html: LABEL.SEARCH_MESSAGES_INLINE.replace('[A]', '<a>').replace('[/A]', '</a>')
-                    }}>
+                    onClick={onSearchMessages}>
+                    <ParsedHTML
+                        tag="div"
+                        content={LABEL.SEARCH_MESSAGES_INLINE.replace('[A]', '<a>').replace('[/A]', '</a>')}
+                    />
                 </div>
             )}
         </div>

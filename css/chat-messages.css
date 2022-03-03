@@ -248,7 +248,8 @@
 .in-call .message .call-info-avatars {
     margin: 10px 0 0 0;
 }
-.message .call-info-container {
+.message .call-info-container,
+.message .call-info-container .info-wrapper {
     min-width: 151px;
     display: flex;
     align-items: center;

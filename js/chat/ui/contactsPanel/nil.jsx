@@ -1,6 +1,7 @@
 import React from 'react';
 import { Button } from '../../../ui/buttons.jsx';
 import { MegaRenderMixin } from '../../mixins';
+import { ParsedHTML } from '../../../ui/utils';
 
 export default class Nil extends MegaRenderMixin {
     constructor(props) {
@@ -29,7 +30,7 @@ export default class Nil extends MegaRenderMixin {
                     </Button>
                     <div className="empty-share-public">
                         <i className="sprite-fm-mono icon-link-circle" />
-                        <span dangerouslySetInnerHTML={{ __html: l[19111] }} />
+                        <ParsedHTML>{l[19111]}</ParsedHTML>
                     </div>
                 </div>
             </div>

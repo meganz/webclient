@@ -2,7 +2,7 @@ import React from 'react';
 import { MegaRenderMixin } from '../../mixins';
 import { DropdownItem } from '../../../ui/dropdowns.jsx';
 import { Avatar, ContactPresence } from '../contacts.jsx';
-import { EmojiFormattedContent } from '../../../ui/utils.jsx';
+import { Emoji } from '../../../ui/utils.jsx';
 import ContactsPanel from './contactsPanel.jsx';
 
 export default class ContextMenu extends MegaRenderMixin {
@@ -57,7 +57,7 @@ export default class ContextMenu extends MegaRenderMixin {
                             />
                             <div className="dropdown-profile">
                                 <span>
-                                    <EmojiFormattedContent>{M.getNameByHandle(contact.u)}</EmojiFormattedContent>
+                                    <Emoji>{M.getNameByHandle(contact.u)}</Emoji>
                                 </span>
                                 <ContactPresence contact={contact}/>
                             </div>

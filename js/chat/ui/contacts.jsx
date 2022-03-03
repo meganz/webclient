@@ -1,7 +1,7 @@
 import React from 'react';
 import {ContactAwareComponent} from '../mixins';
 import {MegaRenderMixin} from '../mixins';
-import utils, { EmojiFormattedContent } from '../../ui/utils.jsx';
+import utils, { Emoji, ParsedHTML } from '../../ui/utils.jsx';
 import { PerfectScrollbar } from '../../ui/perfectScrollbar.jsx';
 import { Button } from '../../ui/buttons.jsx';
 import { Dropdown, DropdownItem } from '../../ui/dropdowns.jsx';
@@ -78,7 +78,7 @@ export class ContactButton extends ContactAwareComponent {
 
         var moreDropdowns = [];
 
-        var username = <utils.EmojiFormattedContent>{M.getNameByHandle(contact.u)}</utils.EmojiFormattedContent>;
+        var username = <Emoji>{M.getNameByHandle(contact.u)}</Emoji>;
 
         var onContactClicked = function() {
             if (contact.c === 2) {
@@ -696,7 +696,7 @@ export class ContactCard extends ContactAwareComponent {
             username += " (" + escapeHTML(l[8885]) + ")";
         }
 
-        var escapedUsername = <utils.EmojiFormattedContent>{username}</utils.EmojiFormattedContent>;
+        var escapedUsername = <Emoji>{username}</Emoji>;
         var dropdowns = this.props.dropdowns ? this.props.dropdowns : [];
         var noContextMenu = this.props.noContextMenu ? this.props.noContextMenu : "";
         var noContextButton = this.props.noContextButton ? this.props.noContextButton : "";
@@ -728,13 +728,8 @@ export class ContactCard extends ContactAwareComponent {
                 }
 
                 if (matches.length > 0) {
-                    escapedUsername = <span dangerouslySetInnerHTML={{
-                        __html: megaChat.highlight(
-                            megaChat.plugins.emoticonsFilter.processHtmlMessage(escapeHTML(username)),
-                            matches,
-                            true
-                        )
-                    }}></span>;
+                    escapedUsername =
+                        <ParsedHTML>{megaChat.highlight(megaChat.html(username), matches, true)}</ParsedHTML>;
                 }
             }
             if (emailTooltips) {
@@ -862,9 +857,7 @@ export class ContactItem extends ContactAwareComponent {
                     noContextMenu={this.props.noContextMenu}
                     contact={contact}
                     className="light"
-                    label={
-                        <EmojiFormattedContent>{username}</EmojiFormattedContent>
-                    }
+                    label={<Emoji>{username}</Emoji>}
                     chatRoom={this.props.chatRoom} />
             </div>
         </div>;
@@ -1440,7 +1433,7 @@ export class ContactPickerWidget extends MegaRenderMixin {
                         empty-share-public
                     `}>
                     <i className="sprite-fm-mono icon-link-circle" />
-                    <span dangerouslySetInnerHTML={{ __html: l[19111] }} />
+                    <ParsedHTML>{l[19111]}</ParsedHTML>
                 </div>
             </div>;
 

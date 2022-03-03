@@ -1,5 +1,5 @@
 import React from 'react';
-import utils from './../../ui/utils.jsx';
+import utils, { Emoji, ParsedHTML } from './../../ui/utils.jsx';
 import {MegaRenderMixin, timing} from './../mixins';
 import {Button} from './../../ui/buttons.jsx';
 import ModalDialogsUI from './../../ui/modalDialogs.jsx';
@@ -52,14 +52,14 @@ export class JoinCallNotification extends MegaRenderMixin {
         return (
             <div className="in-call-notif neutral join">
                 <i className="sprite-fm-mono icon-phone"/>
-                <span
-                    onClick={() => chatRoom.joinCall()}
-                    dangerouslySetInnerHTML={{
-                        __html: escapeHTML(l[20460] || 'There is an active group call. [A]Join[/A]')
+                <div
+                    onClick={() => chatRoom.joinCall()}>
+                    <ParsedHTML>
+                        {(l[20460] || 'There is an active group call. [A]Join[/A]')
                             .replace('[A]', '<button class="mega-button positive joinActiveCall small">')
-                            .replace('[/A]', '</button>')
-                    }}
-                />
+                            .replace('[/A]', '</button>')}
+                    </ParsedHTML>
+                </div>
             </div>
         );
     }
@@ -280,9 +280,7 @@ export class ConversationRightArea extends MegaRenderMixin {
                                 // `Muted until %s`
                                 l[23539].replace(
                                     '%s',
-                                    `<strong>
-                                        ${escapeHTML(unixtimeToTimeString(pushSettingsValue))}
-                                    </strong>`
+                                    unixtimeToTimeString(pushSettingsValue)
                                 );
                         }
                     })()}
@@ -978,9 +976,9 @@ export class ConversationPanel extends MegaRenderMixin {
                         <div className="chatlink-contents">
                             <div className="huge-icon group-chat" />
                             <h3>
-                                <utils.EmojiFormattedContent>
+                                <Emoji>
                                     {room.topic ? room.getRoomTitle() : " "}
-                                </utils.EmojiFormattedContent>
+                                </Emoji>
                             </h3>
                             <h5>{usersCount ? l[20233].replace("%s", usersCount) : " "}</h5>
                             <p>{l[20595]}</p>
@@ -1418,9 +1416,7 @@ export class ConversationPanel extends MegaRenderMixin {
                 </div>
                 <div className="chat-topic-text">
                     <span className="txt">
-                        <utils.EmojiFormattedContent>{
-                            self.props.chatRoom.getRoomTitle()
-                        }</utils.EmojiFormattedContent>
+                        <Emoji>{self.props.chatRoom.getRoomTitle()}</Emoji>
                     </span>
                     <span className="txt small">
                         <MembersAmount room={self.props.chatRoom} />
@@ -1868,8 +1864,8 @@ export class ConversationPanels extends MegaRenderMixin {
                         `}>
                         <div className="fm-empty-pad">
                             <i className="section-icon sprite-fm-mono icon-chat-filled"/>
-                            <div className="fm-empty-cloud-txt small"
-                                dangerouslySetInnerHTML={{__html: emptyMessage}}>
+                            <div className="fm-empty-cloud-txt small">
+                                <ParsedHTML>{emptyMessage}</ParsedHTML>
                             </div>
                             {button}
                         </div>

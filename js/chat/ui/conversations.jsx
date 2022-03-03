@@ -1,7 +1,7 @@
 // libs
 import { hot } from 'react-hot-loader/root';
 var React = require("react");
-import utils from './../../ui/utils.jsx';
+import utils, { Emoji, ParsedHTML } from './../../ui/utils.jsx';
 var PerfectScrollbar = require('./../../ui/perfectScrollbar.jsx').PerfectScrollbar;
 import {MegaRenderMixin, timing} from './../mixins';
 import {Button} from './../../ui/buttons.jsx';
@@ -182,8 +182,12 @@ class ConversationsListItem extends MegaRenderMixin {
                 lastMsgDivClasses += " call";
                 classString += " call-exists";
             }
-            lastMessageDiv = <div className={lastMsgDivClasses} dangerouslySetInnerHTML={{__html:renderableSummary}}>
-                    </div>;
+            lastMessageDiv =
+                <div className={lastMsgDivClasses}>
+                    <ParsedHTML>
+                        {renderableSummary}
+                    </ParsedHTML>
+                </div>;
             const voiceClipType = Message.MANAGEMENT_MESSAGE_TYPES.VOICE_CLIP;
 
             if (
@@ -245,7 +249,7 @@ class ConversationsListItem extends MegaRenderMixin {
             nameClassString += " privateChat";
         }
 
-        var roomTitle = <utils.EmojiFormattedContent>{chatRoom.getRoomTitle()}</utils.EmojiFormattedContent>;
+        var roomTitle = <Emoji>{chatRoom.getRoomTitle()}</Emoji>;
         if (chatRoom.type === "private") {
             roomTitle = <ContactAwareName contact={this.props.contact}>{roomTitle}</ContactAwareName>;
         }
@@ -363,8 +367,10 @@ class ArchConversationsListItem extends MegaRenderMixin {
             );
             lastMessage.renderableSummary = renderableSummary;
 
-            lastMessageDiv = <div className={lastMsgDivClasses} dangerouslySetInnerHTML={{__html:renderableSummary}}>
-                    </div>;
+            lastMessageDiv =
+                <div className={lastMsgDivClasses}>
+                    <ParsedHTML>{renderableSummary}</ParsedHTML>
+                </div>;
 
             lastMessageDatetimeDiv = <div className="date-time">{getTimeMarker(lastMessage.delay, true)}</div>;
         }
@@ -410,7 +416,7 @@ class ArchConversationsListItem extends MegaRenderMixin {
                 <td className="">
                     <div className="fm-chat-user-info todo-star">
                         <div className={nameClassString}>
-                            <utils.EmojiFormattedContent>{chatRoom.getRoomTitle()}</utils.EmojiFormattedContent>
+                            <Emoji>{chatRoom.getRoomTitle()}</Emoji>
                             {chatRoom.type === "group" ? <i className="sprite-fm-uni icon-ekr-key"/> : undefined}
                         </div>
                         <div className="last-message-info">
@@ -1271,11 +1277,11 @@ class ConversationsApp extends MegaRenderMixin {
                     <div className="fm-empty-messages-bg"></div>
                     <div className="fm-empty-cloud-txt">{l[6870]}</div>
                     <div className="fm-not-logged-text">
-                        <div className="fm-not-logged-description" dangerouslySetInnerHTML={{
-                            __html: l[8762]
-                                .replace("[S]", "<span className='red'>")
-                                .replace("[/S]", "</span>")
-                        }}></div>
+                        <div className="fm-not-logged-description">
+                            <ParsedHTML>
+                                {l[8762].replace("[S]", "<span className='red'>").replace("[/S]", "</span>")}
+                            </ParsedHTML>
+                        </div>
                         <div className="fm-not-logged-button create-account">
                             {l[968]}
                         </div>

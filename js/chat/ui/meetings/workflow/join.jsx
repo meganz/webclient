@@ -1,7 +1,7 @@
 import React from 'react';
 import { MegaRenderMixin } from '../../../mixins';
 import ModalDialogsUI from '../../../../ui/modalDialogs.jsx';
-import utils, { EmojiFormattedContent } from '../../../../ui/utils.jsx';
+import utils, { Emoji, ParsedHTML } from '../../../../ui/utils.jsx';
 import Button from '../button.jsx';
 import Preview from './preview.jsx';
 import HistoryPanel from "../../historyPanel.jsx";
@@ -109,9 +109,7 @@ export default class Join extends MegaRenderMixin {
                     />
                 </div>
                 <h1>
-                    <EmojiFormattedContent>
-                        {l.you_have_invitation.replace('%1', this.props.chatRoom?.topic)}
-                    </EmojiFormattedContent>
+                    <Emoji>{l.you_have_invitation.replace('%1', this.props.chatRoom?.topic)}</Emoji>
                 </h1>
                 {isEphemeral() && (
                     <div className="ephemeral-info">
@@ -194,8 +192,7 @@ export default class Join extends MegaRenderMixin {
                     {l[171] /* `Login` */}
                 </Button>
                 <p>
-                    <span
-                        dangerouslySetInnerHTML={{ __html: l[20635] /* `Don't have an account? Create one now` */ }}
+                    <ParsedHTML
                         onClick={e => {
                             e.preventDefault();
                             megaChat.loginOrRegisterBeforeJoining(
@@ -205,8 +202,9 @@ export default class Join extends MegaRenderMixin {
                                 undefined,
                                 () => this.setState({ view: Join.VIEW.ACCOUNT })
                             );
-                        }}
-                    />
+                        }}>
+                        {l[20635] /* `Don't have an account? Create one now` */}
+                    </ParsedHTML>
                 </p>
             </$$CONTAINER>
         );
@@ -226,7 +224,7 @@ export default class Join extends MegaRenderMixin {
                     <div
                         className="chat-content-head"
                         onClick={() => this.setState({ preview: !preview })}>
-                        <EmojiFormattedContent>{chatRoom.topic}</EmojiFormattedContent>
+                        <Emoji>{chatRoom.topic}</Emoji>
                         <Button icon="icon-minimise" />
                     </div>
                     {preview && (

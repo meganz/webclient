@@ -1,7 +1,7 @@
 import React from 'react';
 import { MegaRenderMixin } from '../../../mixins';
 import ModalDialogsUI from '../../../../ui/modalDialogs';
-import { EmojiFormattedContent } from '../../../../ui/utils';
+import { Emoji } from '../../../../ui/utils';
 
 export default class Ephemeral extends MegaRenderMixin {
     static NAMESPACE = 'ephemeral-dialog';
@@ -21,7 +21,7 @@ export default class Ephemeral extends MegaRenderMixin {
                 dialogType="message"
                 icon="sprite-fm-uni icon-info"
                 title={
-                    <EmojiFormattedContent>{ephemeralName}</EmojiFormattedContent>
+                    <Emoji>{ephemeralName}</Emoji>
                 }
                 noCloseOnClickOutside={true}
                 buttons={this.buttons}

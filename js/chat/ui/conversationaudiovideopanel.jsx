@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import {MegaRenderMixin} from './../mixins';
 import {Avatar} from './../ui/contacts.jsx';
-import utils from './../../ui/utils.jsx';
+import { Emoji } from './../../ui/utils.jsx';
 
 import { DropdownItem, Dropdown } from './../../ui/dropdowns.jsx';
 import { Button } from './../../ui/buttons.jsx';
@@ -908,9 +908,9 @@ class ConversationAVPanel extends MegaRenderMixin {
                 <div className="call-header">
                     <div className="call-header-column">
                         <div className="call-topic">
-                            <utils.EmojiFormattedContent>
+                            <Emoji>
                                 {ellipsis(chatRoom.getRoomTitle(), 'end', 70)}
-                            </utils.EmojiFormattedContent>
+                            </Emoji>
                         </div>
                         <div className="call-participants-count">
                             {chatRoom.getCallParticipants().length}

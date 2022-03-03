@@ -1,5 +1,6 @@
 import React from "react";
 import {MegaRenderMixin} from "../../../../../chat/mixins";
+import { ParsedHTML } from '../../../../utils';
 
 export class ColumnContactRequestsEmail extends MegaRenderMixin {
     static sortable = true;
@@ -18,11 +19,8 @@ export class ColumnContactRequestsEmail extends MegaRenderMixin {
                     </i>
                 </span>
                 :
-                <span
-                    dangerouslySetInnerHTML={{
-                        __html: useravatar.contact(node.m, 'box-avatar')
-                    }}
-                />}
+                <ParsedHTML>{useravatar.contact(node.m, 'box-avatar')}</ParsedHTML>
+            }
             <div className="contact-item">
                 <div className="contact-item-user">{node.m}</div>
             </div>

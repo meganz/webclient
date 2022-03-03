@@ -3,7 +3,7 @@ import {MegaRenderMixin} from '../../mixins';
 import {Avatar, ContactPresence} from '../contacts.jsx';
 import {Button} from '../../../ui/buttons.jsx';
 import {Dropdown} from '../../../ui/dropdowns.jsx';
-import { EmojiFormattedContent } from '../../../ui/utils.jsx';
+import { Emoji } from '../../../ui/utils.jsx';
 import ContactsPanel from './contactsPanel.jsx';
 import ContextMenu from './contextMenu.jsx';
 import FMView from "../../../ui/jsx/fm/fmView.jsx";
@@ -80,7 +80,7 @@ export default class ContactProfile extends MegaRenderMixin {
                         <i className="sprite-fm-mono icon-arrow-right" />
                     </li>
                     <li>
-                        <EmojiFormattedContent>{M.getNameByHandle(handle)}</EmojiFormattedContent>
+                        <Emoji>{M.getNameByHandle(handle)}</Emoji>
                     </li>
                 </ul>
             </div>
@@ -175,7 +175,7 @@ export default class ContactProfile extends MegaRenderMixin {
 
                             <div className="profile-info">
                                 <h2>
-                                    <EmojiFormattedContent>{M.getNameByHandle(handle)}</EmojiFormattedContent>
+                                    <Emoji>{M.getNameByHandle(handle)}</Emoji>
                                     <ContactPresence contact={contact} />
                                 </h2>
                                 <span>{contact.m}</span>

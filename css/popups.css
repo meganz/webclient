@@ -229,7 +229,7 @@ body.tl .dropdown.body.popup.contacts-search {
 }
 .horizontal-contacts-list div.ps > .ps__scrollbar-x-rail > .ps__scrollbar-x {
     height: 6px;
-    bottom: 0;
+    bottom: 1px;
 }
 .selected-contact-block {
     min-height: 78px;

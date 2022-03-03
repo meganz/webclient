@@ -370,10 +370,6 @@
     position: relative;
     z-index: 1;
 }
-.mega-input-dropdown .ps .ps__scrollbar-y {
-    right: 1px;
-    width: 6px;
-}
 .mega-input-dropdown .option {
     --mask-color: var(--icon-rest);
     align-items: center;

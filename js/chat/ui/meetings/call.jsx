@@ -344,6 +344,7 @@ export default class Call extends MegaRenderMixin {
             view,
             chatRoom,
             parent,
+            isOnHold: sfuApp.sfuClient.isOnHold(),
             onSpeakerChange: this.handleSpeakerChange,
             onInviteToggle: this.handleInviteToggle
         };
@@ -358,7 +359,6 @@ export default class Call extends MegaRenderMixin {
                     {...STREAM_PROPS}
                     sfuApp={sfuApp}
                     minimized={minimized}
-                    isOnHold={sfuApp.sfuClient.isOnHold()}
                     ephemeralAccounts={ephemeralAccounts}
                     onCallMinimize={this.handleCallMinimize}
                     onCallExpand={this.handleCallExpand}

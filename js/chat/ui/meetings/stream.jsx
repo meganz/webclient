@@ -152,8 +152,8 @@ export default class Stream extends MegaRenderMixin {
         const container = this.containerRef.current;
         this.lastRescaledCache = forced ? null : this.lastRescaledCache;
 
-        if (isOnHold || minimized || !container) {
-            // No streams rendered, e.g. "On hold mode" or in minimized state
+        if (minimized || !container) {
+            // No streams rendered, e.g. In minimized state
             return;
         }
 
@@ -234,6 +234,7 @@ export default class Stream extends MegaRenderMixin {
             forcedLocal,
             chatRoom,
             ephemeralAccounts,
+            isOnHold,
             onCallMinimize,
             onSpeakerChange,
             onThumbnailDoubleClick
@@ -260,6 +261,7 @@ export default class Stream extends MegaRenderMixin {
                             chatRoom={chatRoom}
                             menu={true}
                             ephemeralAccounts={ephemeralAccounts}
+                            isCallOnHold={isOnHold}
                             onCallMinimize={onCallMinimize}
                             onSpeakerChange={onSpeakerChange}
                             onDoubleClick={(e, streamNode) => {
@@ -310,6 +312,7 @@ export default class Stream extends MegaRenderMixin {
                                             chatRoom={chatRoom}
                                             menu={true}
                                             ephemeralAccounts={ephemeralAccounts}
+                                            isCallOnHold={isOnHold}
                                             onCallMinimize={onCallMinimize}
                                             onSpeakerChange={onSpeakerChange}
                                             didMount={ref => {
@@ -365,6 +368,7 @@ export default class Stream extends MegaRenderMixin {
                     chatRoom={chatRoom}
                     menu={true}
                     ephemeralAccounts={ephemeralAccounts}
+                    isCallOnHold={isOnHold}
                     onCallMinimize={onCallMinimize}
                 /> :
                 null
@@ -379,11 +383,13 @@ export default class Stream extends MegaRenderMixin {
      */
 
     renderOnHold = () =>
-        <div
-            className="stream-on-hold theme-light-forced"
-            onClick={this.props.onHoldClick}>
-            <i className="sprite-fm-mono icon-play" />
-            <span>{l[23459] /* `Resume call` */}</span>
+        <div className="on-hold-overlay">
+            <div
+                className="stream-on-hold theme-light-forced"
+                onClick={this.props.onHoldClick}>
+                <i className="sprite-fm-mono icon-play" />
+                <span>{l[23459] /* `Resume call` */}</span>
+            </div>
         </div>;
 
     /**
@@ -483,7 +489,8 @@ export default class Stream extends MegaRenderMixin {
                             onModeChange={onModeChange}
                         />
 
-                        {isOnHold ? this.renderOnHold() : this.renderStreamContainer()}
+                        {isOnHold ? this.renderOnHold() : null}
+                        {this.renderStreamContainer()}
 
                         <StreamControls
                             call={call}

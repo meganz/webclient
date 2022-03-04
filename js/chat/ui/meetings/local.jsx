@@ -255,7 +255,11 @@ class Stream extends MegaRenderMixin {
      * @returns {JSX.Element}
      */
 
-    renderOnHoldStreamNode = () => <StreamNode stream={{ ...this.props.call.getLocalStream(), source: null }} />;
+    renderOnHoldStreamNode = () =>
+        <StreamNode
+            stream={{ ...this.props.call.getLocalStream(), source: null }}
+            isCallOnHold={this.props.isOnHold}
+        />;
 
     renderOptionsDialog = () => {
         const {
@@ -528,6 +532,7 @@ class Minimized extends MegaRenderMixin {
                                     theme-light-forced
                                     round
                                     large
+                                    ${this.isActive(SfuClient.Av.onHold) ? 'disabled' : ''}
                                     ${this.isActive(SfuClient.Av.Audio) ? '' : 'inactive'}
                                 `}
                                 icon={`${this.isActive(SfuClient.Av.Audio) ? 'icon-audio-filled' : 'icon-audio-off'}`}
@@ -546,6 +551,7 @@ class Minimized extends MegaRenderMixin {
                                 theme-light-forced
                                 round
                                 large
+                                ${this.isActive(SfuClient.Av.onHold) ? 'disabled' : ''}
                                 ${this.isActive(SfuClient.Av.Camera) ? '' : 'inactive'}
                             `}
                             icon={`

@@ -47,7 +47,7 @@ export default class Sidebar extends MegaRenderMixin {
     };
 
     renderSpeakerMode = () => {
-        const { mode, call, streams, guest, chatRoom, forcedLocal, onSpeakerChange } = this.props;
+        const { mode, call, streams, guest, chatRoom, forcedLocal, isOnHold, onSpeakerChange } = this.props;
         const localStream = call.getLocalStream();
         const SIMPLE_TIP = {className: 'theme-dark-forced'};
         return (
@@ -67,6 +67,7 @@ export default class Sidebar extends MegaRenderMixin {
                                 chatRoom={chatRoom}
                                 stream={localStream}
                                 simpleTip={{...SIMPLE_TIP, label: l[8885]}}
+                                isCallOnHold={isOnHold}
                                 className={`
                                     ${call.isSharingScreen() ? '' : 'local-stream-mirrored'}
                                     ${forcedLocal ? 'active' : ''}
@@ -84,6 +85,7 @@ export default class Sidebar extends MegaRenderMixin {
                                         chatRoom={chatRoom}
                                         stream={stream}
                                         simpleTip={{...SIMPLE_TIP, label: M.getNameByHandle(stream.userHandle)}}
+                                        isCallOnHold={isOnHold}
                                         className={
                                             stream.isActive || stream.clientId === call.forcedActiveStream ?
                                                 'active' :

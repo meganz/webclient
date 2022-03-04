@@ -16112,6 +16112,7 @@ let StreamNode = (streamNode_dec = (0,mixins.M9)(30, true), streamNode_dec2 = (0
     this.renderContent = () => {
       const {
         stream,
+        isCallOnHold,
         onDoubleClick,
         onLoadedData
       } = this.props;
@@ -16119,7 +16120,7 @@ let StreamNode = (streamNode_dec = (0,mixins.M9)(30, true), streamNode_dec2 = (0
         loading
       } = this.state;
 
-      if (StreamNode.isStreaming(stream)) {
+      if (StreamNode.isStreaming(stream) && !isCallOnHold) {
         return external_React_default().createElement((external_React_default()).Fragment, null, loading !== StreamNode.LOADING_STATE.LOADED && external_React_default().createElement("i", {
           className: "sprite-fm-theme icon-loading-spinner loading-icon"
         }), external_React_default().createElement("video", {
@@ -16486,6 +16487,7 @@ class StreamExtendedControls extends mixins.wl {
                         theme-light-forced
                         round
                         large
+                        ${this.isActive(SfuClient.Av.onHold) ? 'disabled' : ''}
                         ${this.isActive(SfuClient.Av.Screen) ? 'active' : ''}
                     `,
       icon: `
@@ -16631,6 +16633,7 @@ class StreamControls extends mixins.wl {
                                 theme-light-forced
                                 round
                                 large
+                                ${avFlags & SfuClient.Av.onHold ? 'disabled' : ''}
                                 ${avFlags & SfuClient.Av.Audio ? '' : 'inactive'}
                             `,
       icon: `${avFlags & SfuClient.Av.Audio ? 'icon-audio-filled' : 'icon-audio-off'}`,
@@ -16644,6 +16647,7 @@ class StreamControls extends mixins.wl {
                                 theme-light-forced
                                 round
                                 large
+                                ${avFlags & SfuClient.Av.onHold ? 'disabled' : ''}
                                 ${avFlags & SfuClient.Av.Camera ? '' : 'inactive'}
                             `,
       icon: `${avFlags & SfuClient.Av.Camera ? 'icon-video-call-filled' : 'icon-video-off'}`,
@@ -16900,7 +16904,8 @@ class Stream extends mixins.wl {
     this.renderOnHoldStreamNode = () => external_React_default().createElement(StreamNode, {
       stream: { ...this.props.call.getLocalStream(),
         source: null
-      }
+      },
+      isCallOnHold: this.props.isOnHold
     });
 
     this.renderOptionsDialog = () => {
@@ -17167,6 +17172,7 @@ class Minimized extends mixins.wl {
                                     theme-light-forced
                                     round
                                     large
+                                    ${this.isActive(SfuClient.Av.onHold) ? 'disabled' : ''}
                                     ${this.isActive(SfuClient.Av.Audio) ? '' : 'inactive'}
                                 `,
       icon: `${this.isActive(SfuClient.Av.Audio) ? 'icon-audio-filled' : 'icon-audio-off'}`,
@@ -17183,6 +17189,7 @@ class Minimized extends mixins.wl {
                                 theme-light-forced
                                 round
                                 large
+                                ${this.isActive(SfuClient.Av.onHold) ? 'disabled' : ''}
                                 ${this.isActive(SfuClient.Av.Camera) ? '' : 'inactive'}
                             `,
       icon: `
@@ -17421,7 +17428,7 @@ class stream_Stream extends mixins.wl {
       const container = _this.containerRef.current;
       _this.lastRescaledCache = forced ? null : _this.lastRescaledCache;
 
-      if (isOnHold || minimized || !container) {
+      if (minimized || !container) {
         return;
       }
 
@@ -17492,6 +17499,7 @@ class stream_Stream extends mixins.wl {
         forcedLocal,
         chatRoom,
         ephemeralAccounts,
+        isOnHold,
         onCallMinimize,
         onSpeakerChange,
         onThumbnailDoubleClick
@@ -17509,6 +17517,7 @@ class stream_Stream extends mixins.wl {
               chatRoom: chatRoom,
               menu: true,
               ephemeralAccounts: ephemeralAccounts,
+              isCallOnHold: isOnHold,
               onCallMinimize: onCallMinimize,
               onSpeakerChange: onSpeakerChange,
               onDoubleClick: (e, streamNode) => {
@@ -17556,6 +17565,7 @@ class stream_Stream extends mixins.wl {
             chatRoom: chatRoom,
             menu: true,
             ephemeralAccounts: ephemeralAccounts,
+            isCallOnHold: isOnHold,
             onCallMinimize: onCallMinimize,
             onSpeakerChange: onSpeakerChange,
             didMount: ref => {
@@ -17594,16 +17604,19 @@ class stream_Stream extends mixins.wl {
         chatRoom: chatRoom,
         menu: true,
         ephemeralAccounts: ephemeralAccounts,
+        isCallOnHold: isOnHold,
         onCallMinimize: onCallMinimize
       }) : null;
     };
 
     this.renderOnHold = () => external_React_default().createElement("div", {
+      className: "on-hold-overlay"
+    }, external_React_default().createElement("div", {
       className: "stream-on-hold theme-light-forced",
       onClick: this.props.onHoldClick
     }, external_React_default().createElement("i", {
       className: "sprite-fm-mono icon-play"
-    }), external_React_default().createElement("span", null, l[23459]));
+    }), external_React_default().createElement("span", null, l[23459])));
 
     this.renderStreamContainer = () => {
       const {
@@ -17713,7 +17726,7 @@ class stream_Stream extends mixins.wl {
       link: link,
       onCallMinimize: onCallMinimize,
       onModeChange: onModeChange
-    }), isOnHold ? this.renderOnHold() : this.renderStreamContainer(), external_React_default().createElement(streamControls, {
+    }), isOnHold ? this.renderOnHold() : null, this.renderStreamContainer(), external_React_default().createElement(streamControls, {
       call: call,
       streams: streams,
       chatRoom: chatRoom,
@@ -19446,6 +19459,7 @@ class Sidebar extends mixins.wl {
         guest,
         chatRoom,
         forcedLocal,
+        isOnHold,
         onSpeakerChange
       } = this.props;
       const localStream = call.getLocalStream();
@@ -19473,6 +19487,7 @@ class Sidebar extends mixins.wl {
         simpleTip: { ...SIMPLE_TIP,
           label: l[8885]
         },
+        isCallOnHold: isOnHold,
         className: `
                                     ${call.isSharingScreen() ? '' : 'local-stream-mirrored'}
                                     ${forcedLocal ? 'active' : ''}
@@ -19490,6 +19505,7 @@ class Sidebar extends mixins.wl {
           simpleTip: { ...SIMPLE_TIP,
             label: M.getNameByHandle(stream.userHandle)
           },
+          isCallOnHold: isOnHold,
           className: stream.isActive || stream.clientId === call.forcedActiveStream ? 'active' : '',
           onClick: onSpeakerChange
         });
@@ -20262,6 +20278,7 @@ class Call extends mixins.wl {
       view,
       chatRoom,
       parent,
+      isOnHold: sfuApp.sfuClient.isOnHold(),
       onSpeakerChange: this.handleSpeakerChange,
       onInviteToggle: this.handleInviteToggle
     };
@@ -20270,7 +20287,6 @@ class Call extends mixins.wl {
     }, external_React_default().createElement(stream_Stream, (0,esm_extends.Z)({}, STREAM_PROPS, {
       sfuApp: sfuApp,
       minimized: minimized,
-      isOnHold: sfuApp.sfuClient.isOnHold(),
       ephemeralAccounts: ephemeralAccounts,
       onCallMinimize: this.handleCallMinimize,
       onCallExpand: this.handleCallExpand,

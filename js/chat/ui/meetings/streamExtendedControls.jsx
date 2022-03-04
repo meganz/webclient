@@ -23,6 +23,7 @@ export default class StreamExtendedControls extends MegaRenderMixin {
                         theme-light-forced
                         round
                         large
+                        ${this.isActive(SfuClient.Av.onHold) ? 'disabled' : ''}
                         ${this.isActive(SfuClient.Av.Screen) ? 'active' : ''}
                     `}
                     icon={`

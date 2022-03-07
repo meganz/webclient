@@ -1145,7 +1145,7 @@ body.de .mega-dialog.new-group-chat {
     width: 100%;
     height: 100%;
     background: var(--surface-grey-1);
-    z-index: 1100;
+    z-index: 799;
 }
 .rtl .fm-versioning.overlay {
     direction: rtl;
@@ -1355,7 +1355,8 @@ body.de .mega-dialog.new-group-chat {
     background: var(--surface-mid-grey);
 }
 .fm-versioning.buttons .download-file,
-.fm-versioning.buttons .revert-file {
+.fm-versioning.buttons .revert-file,
+.fm-versioning.buttons .preview-file {
     -webkit-margin-end: 8px;
     margin-inline-end: 8px;
 }

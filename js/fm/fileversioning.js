@@ -352,6 +352,13 @@ var versiondialogid;
                             id="vdl_${v.h}">
                             <i class="sprite-fm-mono icon-download-small"></i>
                         </div>`;
+                    var viewBtnHtml =
+                        `<div class="mega-button small action preview-file simpletip"
+                            data-simpletip="${l.version_preview}"
+                            aria-label="${l.version_preview}"
+                            id="vdl_${v.h}">
+                            <i class="sprite-fm-mono icon-file-edit"></i>
+                        </div>`;
                     var revertBtnHtml =
                         `<div class="mega-button small action revert-file simpletip"
                             data-simpletip="${l[16475]}"
@@ -419,6 +426,7 @@ var versiondialogid;
                                     ${/* Buttons */''}
                                     <div class="fm-versioning buttons">
                                         ${downBtnHtml}
+                                        ${viewBtnHtml}
                                         ${revertBtnHtml}
                                         ${deleteBtnHtml}
                                     </div>
@@ -565,6 +573,10 @@ var versiondialogid;
                 fileversioning.closeFileVersioningDialog(window.versiondialogid);
             });
 
+            $('.pad .top-column button.js-preview', '.fm-versioning').rebind('click.version', () => {
+                fileversioning.previewFile(current_sel_version);
+            });
+
             fileversioning.getAllVersions(fh).done(
                 function(versions) {
                     var vh = fillVersionList(versions);
@@ -659,10 +671,21 @@ var versiondialogid;
                                 });
                             }
                         });
+                    $('.buttons .preview-file', '.fm-versioning').rebind('click.version', function() {
+                        fileversioning.previewFile($(this).prop('id').substring(4));
+                    });
                     refreshHeader(fh);
                     pd.removeClass('hidden');
                     // Init scrolling
                     fileversioning.initFileVersioningScrolling();
+                    if (
+                        !is_video(M.d[window.versiondialogid])
+                        && !is_image2(M.d[window.versiondialogid])
+                        && !is_text(M.d[window.versiondialogid])
+                    ) {
+                        $('.pad .top-column button.js-preview', '.fm-versioning').addClass('hidden');
+                        $('.action.preview-file', '.fm-versioning').addClass('hidden');
+                    }
                 });
             $(window).rebind('resize.fileversioning', SoonFc(function() {
                 fileversioning.initFileVersioningScrolling();
@@ -708,7 +731,46 @@ var versiondialogid;
                     }
                 }
             }
-        }
+        },
+
+        /**
+         * Open the text editor for the given version handle
+         *
+         * @param {string} previewHandle Node handle of the version to preview
+         * @returns {none} none (ESLint requires)
+         */
+        previewFile: function(previewHandle) {
+            loadingDialog.show('common', l[23130]);
+            const versionHandle = window.versiondialogid;
+            const reopen = () => {
+                fileversioning.fileVersioningDialog(versionHandle);
+                $(`#v_${previewHandle}`).trigger('click');
+            };
+            if (is_text(M.d[previewHandle])) {
+                fileversioning.closeFileVersioningDialog(versionHandle);
+                mBroadcaster.once('text-editor:close', () => {
+                    onIdle(reopen);
+                });
+                mega.fileTextEditor
+                    .getFile(previewHandle)
+                    .done((data) => {
+                        loadingDialog.hide();
+                        mega.textEditorUI.setupEditor(M.d[previewHandle].name, data, previewHandle, true);
+                    })
+                    .fail(loadingDialog.hide);
+            }
+            else if (is_video(M.d[previewHandle]) || is_image2(M.d[previewHandle])) {
+                fileversioning.getAllVersions(versionHandle).done((res) => {
+                    fileversioning.closeFileVersioningDialog(versionHandle);
+                    if (is_video(M.d[previewHandle])) {
+                        $.autoplay = previewHandle;
+                    }
+                    mBroadcaster.once('slideshow:close', reopen);
+                    slideshow(previewHandle, 0, false, res);
+                    loadingDialog.hide();
+                });
+            }
+        },
     };
     ns.dvState = null;
     Object.defineProperty(global, 'fileversioning', {value: ns});

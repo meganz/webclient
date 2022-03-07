@@ -480,6 +480,7 @@ mega.textEditorUI = new function TextEditorUI() {
             window.textEditorVisible = false;
             mBroadcaster.sendMessage('textEditor:close');
         }
+        mBroadcaster.sendMessage('text-editor:close');
     };
 
     /**

@@ -14,6 +14,7 @@ import { Avatar, ContactAwareName } from "./contacts.jsx";
 var StartGroupChatWizard = require('./startGroupChatWizard.jsx').StartGroupChatWizard;
 import {Start as StartMeetingDialog} from "./meetings/workflow/start.jsx";
 import MeetingsCallEndedDialog from "./meetings/meetingsCallEndedDialog.jsx";
+import Nil from './contactsPanel/nil.jsx';
 
 var getRoomName = function(chatRoom) {
     return chatRoom.getRoomTitle();
@@ -844,41 +845,55 @@ class ArchivedConversationsList extends MegaRenderMixin {
         return (
             <div className="chat-content-block archived-chats">
                 <div className="files-grid-view archived-chat-view">
-                    <table className="grid-table-header" width="100%" cellSpacing="0" cellPadding="0" border="0">
-                        <tbody>
-                            <tr>
-                                <th className="calculated-width" onClick={self.onSortNameClicked}>
-                                    <div className="is-chat name">
-                                        {l[86]}
-                                        <i
-                                            className={
-                                                nameOrderClass ? `sprite-fm-mono icon-arrow-${nameOrderClass}` : ''
-                                            }
-                                        />
-                                    </div>
-                                </th>
-                                <th width="330" onClick={self.onSortTimeClicked}>
-                                    <div className={"is-chat arrow interaction " + timerOrderClass}>
-                                        {l[5904]}
-                                        <i
-                                            className={
-                                                timerOrderClass ? `sprite-fm-mono icon-arrow-${timerOrderClass}` : ''
-                                            }
-                                        />
-                                    </div>
-                                </th>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <div className="grid-scrolling-table archive-chat-list">
-                        <div className="grid-wrapper">
-                            <table className="grid-table arc-chat-messages-block table-hover">
+                    {currConvsList && currConvsList.length ?
+                        <div>
+                            <table
+                                className="grid-table-header"
+                                width="100%"
+                                cellSpacing="0"
+                                cellPadding="0"
+                                border="0">
                                 <tbody>
-                                    {currConvsList}
+                                    <tr>
+                                        <th className="calculated-width" onClick={self.onSortNameClicked}>
+                                            <div className="is-chat name">
+                                                {l[86] /* `Name` */}
+                                                <i
+                                                    className={
+                                                        nameOrderClass ?
+                                                            `sprite-fm-mono icon-arrow-${nameOrderClass}` :
+                                                            ''
+                                                    }
+                                                />
+                                            </div>
+                                        </th>
+                                        <th width="330" onClick={self.onSortTimeClicked}>
+                                            <div className={`is-chat arrow interaction ${timerOrderClass}`}>
+                                                {l[5904] /* `Last interaction` */}
+                                                <i
+                                                    className={
+                                                        timerOrderClass ?
+                                                            `sprite-fm-mono icon-arrow-${timerOrderClass}` :
+                                                            ''
+                                                    }
+                                                />
+                                            </div>
+                                        </th>
+                                    </tr>
                                 </tbody>
                             </table>
-                        </div>
-                    </div>
+                            <div className="grid-scrolling-table archive-chat-list">
+                                <div className="grid-wrapper">
+                                    <table className="grid-table arc-chat-messages-block table-hover">
+                                        <tbody>
+                                            {currConvsList}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div> :
+                        <Nil title={l.archived_nil /* `No archived chats` */} />
+                    }
                 </div>
                 {confirmUnarchiveDialog}
             </div>

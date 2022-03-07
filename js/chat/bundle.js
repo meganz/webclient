@@ -5529,7 +5529,7 @@ var _ui_utils_jsx2__ = __webpack_require__(79);
 var _ui_perfectScrollbar_jsx3__ = __webpack_require__(285);
 var _ui_buttons_jsx4__ = __webpack_require__(204);
 var _ui_dropdowns_jsx5__ = __webpack_require__(261);
-var _contactsPanel_contactsPanel_jsx6__ = __webpack_require__(651);
+var _contactsPanel_contactsPanel_jsx6__ = __webpack_require__(105);
 
 
 
@@ -6985,7 +6985,7 @@ ContactPickerWidget.defaultProps = {
 
 /***/ }),
 
-/***/ 651:
+/***/ 105:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -7082,52 +7082,14 @@ class Navigation extends mixins.wl {
   }
 
 }
-// EXTERNAL MODULE: ./js/ui/utils.jsx
-var utils = __webpack_require__(79);
-;// CONCATENATED MODULE: ./js/chat/ui/contactsPanel/nil.jsx
-
-
-
-
-class Nil extends mixins.wl {
-  constructor(props) {
-    super(props);
-  }
-
-  componentDidMount() {
-    super.componentDidMount();
-    setContactLink();
-  }
-
-  render() {
-    const {
-      title
-    } = this.props;
-    return external_React_default().createElement("div", {
-      className: "fm-empty-section fm-empty-contacts"
-    }, external_React_default().createElement("div", {
-      className: "fm-empty-pad"
-    }, external_React_default().createElement("i", {
-      className: "section-icon sprite-fm-mono icon-contacts"
-    }), external_React_default().createElement("div", {
-      className: "fm-empty-cloud-txt"
-    }, title), external_React_default().createElement("div", {
-      className: "fm-empty-description"
-    }, l[19115]), external_React_default().createElement(buttons.Button, {
-      className: "mega-button positive large fm-empty-button",
-      onClick: () => contactAddDialog()
-    }, external_React_default().createElement("span", null, l[71])), external_React_default().createElement("div", {
-      className: "empty-share-public"
-    }, external_React_default().createElement("i", {
-      className: "sprite-fm-mono icon-link-circle"
-    }), external_React_default().createElement(utils.ParsedHTML, null, l[19111]))));
-  }
-
-}
+// EXTERNAL MODULE: ./js/chat/ui/contactsPanel/nil.jsx
+var nil = __webpack_require__(479);
 // EXTERNAL MODULE: ./js/ui/jsx/fm/fmView.jsx + 9 modules
 var fmView = __webpack_require__(61);
 // EXTERNAL MODULE: ./js/chat/ui/contacts.jsx
 var contacts = __webpack_require__(13);
+// EXTERNAL MODULE: ./js/ui/utils.jsx
+var utils = __webpack_require__(79);
 // EXTERNAL MODULE: ./js/ui/jsx/fm/nodes/genericNodePropsComponent.jsx + 1 modules
 var genericNodePropsComponent = __webpack_require__(297);
 ;// CONCATENATED MODULE: ./js/ui/jsx/fm/nodes/columns/columnContactName.jsx
@@ -7606,13 +7568,13 @@ class ContactList extends mixins.wl {
         initialSortBy: ['status', 'asc'],
         fmConfigSortEnabled: true,
         fmConfigSortId: "contacts",
-        NilComponent: external_React_default().createElement(Nil, {
+        NilComponent: external_React_default().createElement(nil.Z, {
           title: l[5737]
         })
       }));
     }
 
-    return external_React_default().createElement(Nil, {
+    return external_React_default().createElement(nil.Z, {
       title: l[5737]
     });
   }
@@ -7788,7 +7750,7 @@ class ReceivedRequests extends mixins.wl {
           }
         },
         NilComponent: () => {
-          return external_React_default().createElement(Nil, {
+          return external_React_default().createElement(nil.Z, {
             title: l[6196]
           });
         },
@@ -7908,7 +7870,7 @@ class SentRequests extends mixins.wl {
           }
         }]],
         NilComponent: () => {
-          return external_React_default().createElement(Nil, {
+          return external_React_default().createElement(nil.Z, {
             title: l[6196]
           });
         },
@@ -8204,7 +8166,7 @@ class ContactProfile extends mixins.wl {
       const contact = M.u[handle];
 
       if (!contact || contact.c !== 1) {
-        return external_React_default().createElement(Nil, {
+        return external_React_default().createElement(nil.Z, {
           title: l.contact_not_found
         });
       }
@@ -8484,6 +8446,60 @@ ContactsPanel.getUserFingerprint = handle => {
   });
   return $$FINGERPRINT;
 };
+
+/***/ }),
+
+/***/ 479:
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.d(__webpack_exports__, {
+"Z": () => (Nil)
+});
+var react0__ = __webpack_require__(363);
+var react0 = __webpack_require__.n(react0__);
+var _ui_buttons_jsx1__ = __webpack_require__(204);
+var _mixins2__ = __webpack_require__(503);
+var _ui_utils3__ = __webpack_require__(79);
+
+
+
+
+class Nil extends _mixins2__.wl {
+  constructor(props) {
+    super(props);
+  }
+
+  componentDidMount() {
+    super.componentDidMount();
+    setContactLink();
+  }
+
+  render() {
+    const {
+      title
+    } = this.props;
+    return react0().createElement("div", {
+      className: "fm-empty-section fm-empty-contacts"
+    }, react0().createElement("div", {
+      className: "fm-empty-pad"
+    }, react0().createElement("i", {
+      className: "section-icon sprite-fm-mono icon-contacts"
+    }), react0().createElement("div", {
+      className: "fm-empty-cloud-txt"
+    }, title), react0().createElement("div", {
+      className: "fm-empty-description"
+    }, l[19115]), react0().createElement(_ui_buttons_jsx1__.Button, {
+      className: "mega-button positive large fm-empty-button",
+      onClick: () => contactAddDialog()
+    }, react0().createElement("span", null, l[71])), react0().createElement("div", {
+      className: "empty-share-public"
+    }, react0().createElement("i", {
+      className: "sprite-fm-mono icon-link-circle"
+    }), react0().createElement(_ui_utils3__.ParsedHTML, null, l[19111]))));
+  }
+
+}
 
 /***/ }),
 
@@ -23335,8 +23351,8 @@ class SearchPanel extends mixins.wl {
   }
 
 }
-// EXTERNAL MODULE: ./js/chat/ui/contactsPanel/contactsPanel.jsx + 19 modules
-var contactsPanel = __webpack_require__(651);
+// EXTERNAL MODULE: ./js/chat/ui/contactsPanel/contactsPanel.jsx + 18 modules
+var contactsPanel = __webpack_require__(105);
 ;// CONCATENATED MODULE: ./js/chat/ui/meetings/workflow/start.jsx
 
 
@@ -23493,6 +23509,8 @@ Start.STREAMS = {
   AUDIO: 1,
   VIDEO: 2
 };
+// EXTERNAL MODULE: ./js/chat/ui/contactsPanel/nil.jsx
+var nil = __webpack_require__(479);
 ;// CONCATENATED MODULE: ./js/chat/ui/conversations.jsx
 
 
@@ -23517,6 +23535,7 @@ var conversations_PerfectScrollbar = (__webpack_require__(285).F);
 
 
 var StartGroupChatWizard = (__webpack_require__(797).C);
+
 
 
 
@@ -24289,7 +24308,7 @@ class ArchivedConversationsList extends mixins.wl {
       className: "chat-content-block archived-chats"
     }, conversations_React.createElement("div", {
       className: "files-grid-view archived-chat-view"
-    }, conversations_React.createElement("table", {
+    }, currConvsList.length ? conversations_React.createElement("div", null, conversations_React.createElement("table", {
       className: "grid-table-header",
       width: "100%",
       cellSpacing: "0",
@@ -24306,7 +24325,7 @@ class ArchivedConversationsList extends mixins.wl {
       width: "330",
       onClick: self.onSortTimeClicked
     }, conversations_React.createElement("div", {
-      className: "is-chat arrow interaction " + timerOrderClass
+      className: `is-chat arrow interaction ${timerOrderClass}`
     }, l[5904], conversations_React.createElement("i", {
       className: timerOrderClass ? `sprite-fm-mono icon-arrow-${timerOrderClass}` : ''
     })))))), conversations_React.createElement("div", {
@@ -24315,7 +24334,9 @@ class ArchivedConversationsList extends mixins.wl {
       className: "grid-wrapper"
     }, conversations_React.createElement("table", {
       className: "grid-table arc-chat-messages-block table-hover"
-    }, conversations_React.createElement("tbody", null, currConvsList))))), confirmUnarchiveDialog);
+    }, conversations_React.createElement("tbody", null, currConvsList))))) : conversations_React.createElement(nil.Z, {
+      title: l.archived_nil
+    })), confirmUnarchiveDialog);
   }
 
 }

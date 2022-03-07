@@ -1238,11 +1238,11 @@ export class ContactPickerWidget extends MegaRenderMixin {
             if (self.props.selectFooter) {
 
                 selectFooter = <footer>
-                    <button className="mega-button left" onClick={onAddContact.bind(self)}>
+                    <button className="mega-button" onClick={onAddContact.bind(self)}>
                         <span>{l[71]}</span>
                     </button>
-
-                    <button className={"mega-button right " + (!selectedContacts ? "disabled" : "")}
+                    <div className="footer-spacing"></div>
+                    <button className={`mega-button ${selectedContacts ? '' : 'disabled'}`}
                         onClick = {function(e) {
                             if (self.state.selected.length > 0) {
                                 onSelectDoneCb(e);

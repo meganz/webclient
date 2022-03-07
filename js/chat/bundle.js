@@ -20232,7 +20232,7 @@ class Call extends mixins.wl {
     super.componentWillUnmount();
 
     if (this.props.willUnmount) {
-      this.props.willUnmount(this.state.mode);
+      this.props.willUnmount(this.props.minimized);
     }
 
     if (this.ephemeralAddListener) {
@@ -22314,9 +22314,9 @@ let ConversationPanel = (conversationpanel_dec = utils["default"].SoonFcWrap(360
         this.toggleExpandedFlag();
       }),
       didMount: this.toggleExpandedFlag,
-      willUnmount: mode => this.setState({
+      willUnmount: minimised => this.setState({
         callMinimized: false
-      }, () => mode === Call.MODE.MINI ? null : this.toggleExpandedFlag()),
+      }, () => minimised ? null : this.toggleExpandedFlag()),
       onDeleteMessage: this.handleDeleteDialog,
       parent: this
     }), megaChat.initialPubChatHandle && room.publicChatHandle === megaChat.initialPubChatHandle && !room.activeCall && room.isMeeting && !room.activeCall && room.activeCallIds.length > 0 && external_React_default().createElement(Join, {

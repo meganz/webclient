@@ -315,7 +315,7 @@ export default class Call extends MegaRenderMixin {
     componentWillUnmount() {
         super.componentWillUnmount();
         if (this.props.willUnmount) {
-            this.props.willUnmount(this.state.mode);
+            this.props.willUnmount(this.props.minimized);
         }
         if (this.ephemeralAddListener) {
             mBroadcaster.removeListener(this.ephemeralAddListener);

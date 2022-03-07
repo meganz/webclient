@@ -130,8 +130,7 @@ FMDB.prototype.identity = Date.now() + Math.random().toString(26);
 lazy(FMDB.prototype, 'memoize', () => {
     'use strict';
     // leave cloud nodes in memory?..
-    // return !!localStorage.$lcnim;
-    return true;
+    return parseInt(localStorage.cnize) !== 0;
 });
 
 // set up and check fm DB for user u
@@ -580,7 +579,6 @@ FMDB.prototype._transactionErrorHandled = function(ch, ex) {
             /* fallthrough */
             case 1:
                 if (!mega.nobp) {
-                    // localStorage.$lcnim = 1;
                     localStorage.nobp = 1;
                     fm_forcerefresh(true);
                     break;

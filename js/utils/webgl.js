@@ -977,7 +977,7 @@ class MEGACanvasElement extends MEGAImageElement {
         const defType = MEGAImageElement.PREVIEW_TYPE;
         const defQuality = MEGAImageElement.PREVIEW_QUALITY;
         const {
-            crop = 'guess',
+            crop = 'none',
             type = defType,
             maxWidth = defSize,
             maxHeight = defSize,

@@ -4566,11 +4566,11 @@ const __WEBPACK_DEFAULT_EXPORT__ = ({
 "use strict";
 __webpack_require__.d(__webpack_exports__, {
 "LY": () => (timing),
-"Os": () => (schedule),
 "M9": () => (SoonFcWrap),
+"Os": () => (schedule),
+"_p": () => (ContactAwareComponent),
 "py": () => (rAFWrap),
-"wl": () => (MegaRenderMixin),
-"_p": () => (ContactAwareComponent)
+"wl": () => (MegaRenderMixin)
 });
 
 var _applyDecoratedDescriptor2__ = __webpack_require__(229);
@@ -5507,19 +5507,19 @@ ContactAwareComponent.unavailableNames = Object.create(null);
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 __webpack_require__.d(__webpack_exports__, {
-"MAX_FREQUENTS": () => (MAX_FREQUENTS),
-"ContactsListItem": () => (ContactsListItem),
-"ContactButton": () => (ContactButton),
-"ContactVerified": () => (ContactVerified),
-"ContactPresence": () => (ContactPresence),
-"LastActivity": () => (LastActivity),
-"ContactAwareName": () => (ContactAwareName),
-"MembersAmount": () => (MembersAmount),
-"ContactFingerprint": () => (ContactFingerprint),
 "Avatar": () => (Avatar),
+"ContactAwareName": () => (ContactAwareName),
+"ContactButton": () => (ContactButton),
 "ContactCard": () => (ContactCard),
+"ContactFingerprint": () => (ContactFingerprint),
 "ContactItem": () => (ContactItem),
-"ContactPickerWidget": () => (ContactPickerWidget)
+"ContactPickerWidget": () => (ContactPickerWidget),
+"ContactPresence": () => (ContactPresence),
+"ContactVerified": () => (ContactVerified),
+"ContactsListItem": () => (ContactsListItem),
+"LastActivity": () => (LastActivity),
+"MAX_FREQUENTS": () => (MAX_FREQUENTS),
+"MembersAmount": () => (MembersAmount)
 });
 var _extends7__ = __webpack_require__(462);
 var react0__ = __webpack_require__(363);
@@ -24340,9 +24340,9 @@ class ArchivedConversationsList extends mixins.wl {
 
     return conversations_React.createElement("div", {
       className: "chat-content-block archived-chats"
-    }, conversations_React.createElement("div", {
+    }, conversations_React.createElement(conversations_React.Fragment, null, currConvsList.length ? conversations_React.createElement("div", {
       className: "files-grid-view archived-chat-view"
-    }, currConvsList.length ? conversations_React.createElement("div", null, conversations_React.createElement("table", {
+    }, conversations_React.createElement("table", {
       className: "grid-table-header",
       width: "100%",
       cellSpacing: "0",

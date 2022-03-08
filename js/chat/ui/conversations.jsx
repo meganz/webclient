@@ -844,9 +844,9 @@ class ArchivedConversationsList extends MegaRenderMixin {
 
         return (
             <div className="chat-content-block archived-chats">
-                <div className="files-grid-view archived-chat-view">
+                <>
                     {currConvsList && currConvsList.length ?
-                        <div>
+                        <div className="files-grid-view archived-chat-view">
                             <table
                                 className="grid-table-header"
                                 width="100%"
@@ -894,7 +894,7 @@ class ArchivedConversationsList extends MegaRenderMixin {
                         </div> :
                         <Nil title={l.archived_nil /* `No archived chats` */} />
                     }
-                </div>
+                </>
                 {confirmUnarchiveDialog}
             </div>
         );

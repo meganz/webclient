@@ -17669,7 +17669,7 @@ class stream_Stream extends mixins.wl {
   }
 
   specShouldComponentUpdate(nextProps) {
-    if (nextProps.minimized !== this.props.minimized) {
+    if (nextProps.minimized !== this.props.minimized || nextProps.mode !== this.props.mode) {
       return true;
     }
 
@@ -20139,6 +20139,37 @@ class Call extends mixins.wl {
       });
     };
 
+    this.bindMiniEvents = () => {
+      const {
+        chatRoom
+      } = this.props;
+      ['onCallPeerLeft.mini', 'onCallPeerJoined.mini'].forEach(event => {
+        chatRoom.rebind(event, () => {
+          const {
+            minimized,
+            streams,
+            call
+          } = this.props;
+
+          if (minimized) {
+            this.setState({
+              mode: streams.length === 0 ? Call.MODE.THUMBNAIL : Call.MODE.MINI
+            }, () => {
+              call.setViewMode(this.state.mode);
+            });
+          }
+        });
+      });
+    };
+
+    this.unbindMiniEvents = () => {
+      const {
+        chatRoom
+      } = this.props;
+      chatRoom.off('onCallPeerLeft.mini');
+      chatRoom.off('onCallPeerJoined.mini');
+    };
+
     this.handleStreamToggle = action => {
       const {
         streams
@@ -20254,6 +20285,8 @@ class Call extends mixins.wl {
     if (this.ephemeralAddListener) {
       mBroadcaster.removeListener(this.ephemeralAddListener);
     }
+
+    this.unbindMiniEvents();
   }
 
   componentDidMount() {
@@ -20264,6 +20297,7 @@ class Call extends mixins.wl {
     }
 
     this.ephemeralAddListener = mBroadcaster.addListener('meetings:ephemeralAdd', handle => this.handleEphemeralAdd(handle));
+    this.bindMiniEvents();
   }
 
   render() {

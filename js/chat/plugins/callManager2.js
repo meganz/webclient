@@ -315,8 +315,11 @@
             // this.sfuApp.sfuClient.peers.get(peer.cid).requestThumbnailVideo();
         }
         onPeerLeft(peer) {
-            this.chatRoom.trigger('onCallPeerLeft', peer.userId);
             this.peers.remove(peer.cid);
+            if (this.activeStream && this.activeStream === peer.cid) {
+                this.activeStream = null;
+            }
+            this.chatRoom.trigger('onCallPeerLeft', peer.userId);
             this.left = true;
         }
         onJoined() {

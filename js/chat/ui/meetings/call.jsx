@@ -151,6 +151,26 @@ export default class Call extends MegaRenderMixin {
         });
     };
 
+    bindMiniEvents = () => {
+        const { chatRoom } = this.props;
+        ['onCallPeerLeft.mini', 'onCallPeerJoined.mini'].forEach(event => {
+            chatRoom.rebind(event, () => {
+                const { minimized, streams, call } = this.props;
+                if (minimized) {
+                    this.setState({mode: streams.length === 0 ? Call.MODE.THUMBNAIL : Call.MODE.MINI}, () => {
+                        call.setViewMode(this.state.mode);
+                    });
+                }
+            });
+        });
+    };
+
+    unbindMiniEvents = () => {
+        const { chatRoom } = this.props;
+        chatRoom.off('onCallPeerLeft.mini');
+        chatRoom.off('onCallPeerJoined.mini');
+    };
+
     /**
      * handleStreamToggle
      * @description Temporary debug method used to add or remove fake streams.
@@ -320,6 +340,7 @@ export default class Call extends MegaRenderMixin {
         if (this.ephemeralAddListener) {
             mBroadcaster.removeListener(this.ephemeralAddListener);
         }
+        this.unbindMiniEvents();
     }
 
     componentDidMount() {
@@ -330,6 +351,7 @@ export default class Call extends MegaRenderMixin {
         this.ephemeralAddListener = mBroadcaster.addListener('meetings:ephemeralAdd', handle =>
             this.handleEphemeralAdd(handle)
         );
+        this.bindMiniEvents();
     }
 
     render() {

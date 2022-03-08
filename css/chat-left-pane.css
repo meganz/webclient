@@ -1169,6 +1169,9 @@ li.active .call-duration i {
     width: 32px;
     height: 32px;
     margin: 2px 8px 0 8px;
+}
+
+.contacts-table .box-avatar {
     border-radius: 4px;
 }
 

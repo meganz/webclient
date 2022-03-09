@@ -1094,6 +1094,9 @@ export class ContactPickerWidget extends MegaRenderMixin {
                 key={v.u}
             />
         );
+        if (typeof this.props.onEventuallyUpdated === 'function') {
+            this.props.onEventuallyUpdated();
+        }
         return true;
     }
     render() {

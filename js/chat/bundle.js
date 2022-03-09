@@ -6575,6 +6575,11 @@ class ContactPickerWidget extends _mixins1__.wl {
       emailTooltips: self.props.emailTooltips,
       key: v.u
     }));
+
+    if (typeof this.props.onEventuallyUpdated === 'function') {
+      this.props.onEventuallyUpdated();
+    }
+
     return true;
   }
 
@@ -26791,6 +26796,11 @@ class DropdownContactsSelector extends _chat_mixins1__.wl {
       noArrow: true
     }, React.createElement(_chat_ui_contacts_jsx2__.ContactPickerWidget, {
       onClose: this.props.closeDropdown,
+      onEventuallyUpdated: () => {
+        var _self$dropdownRef;
+
+        (_self$dropdownRef = self.dropdownRef) == null ? void 0 : _self$dropdownRef.doRerender();
+      },
       active: this.props.active,
       className: "popup contacts-search tooltip-blur small-footer",
       contacts: M.u,

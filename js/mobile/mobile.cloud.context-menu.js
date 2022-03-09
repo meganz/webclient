@@ -144,7 +144,9 @@ mobile.cloud.contextMenu = {
         }
 
         if (pfid) {
-            $('.context-menu-item.link-button, .context-menu-item.delete-button').addClass('hidden');
+            $('.context-menu-item.link-button,' +
+                '.context-menu-item.delete-button,' +
+                '.context-menu-item.rename-button').addClass('hidden');
         }
     },
 

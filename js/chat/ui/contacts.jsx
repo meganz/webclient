@@ -193,7 +193,11 @@ export class ContactButton extends ContactAwareComponent {
 
             moreDropdowns.push(
                 <DropdownItem
-                    key="send-files-item" icon="sprite-fm-mono icon-send-files" label={l[6834]} onClick={() => {
+                    key="send-files-item"
+                    icon="sprite-fm-mono icon-send-files"
+                    label={l[6834]}
+                    disabled={mega.paywall}
+                    onClick={() => {
                         megaChat.openChatAndSendFilesDialog(contact.u);
                     }} />
             );

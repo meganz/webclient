@@ -57,6 +57,7 @@ export default class Attachment extends AbstractGenericMessage {
                         <DropdownItem
                             label={previewLabel}
                             icon={`sprite-fm-mono ${previewIcon}`}
+                            disabled={mega.paywall}
                             onClick={e => this.props.onPreviewStart(v, e)}
                         />
                     </span>;
@@ -118,6 +119,7 @@ export default class Attachment extends AbstractGenericMessage {
                                 downloadButton = <DropdownItem
                                     icon="sprite-fm-mono icon-download-small"
                                     label={l[1187] /* `Download` */}
+                                    disabled={mega.paywall}
                                     onClick={() => this.props.onDownloadStart(v)} />;
 
                                 if (M.getNodeRoot(v.h) !== M.RubbishID) {
@@ -143,6 +145,7 @@ export default class Attachment extends AbstractGenericMessage {
                                         icon="sprite-fm-mono icon-send-to-chat"
                                         label={l[17764] /* `Send to chat` */}
                                         key="sendToChat"
+                                        disabled={mega.paywall}
                                         onClick={() => {
                                             $.selected = [v.h];
                                             openCopyDialog('conversations');
@@ -203,6 +206,7 @@ export default class Attachment extends AbstractGenericMessage {
                         <DropdownItem
                             icon="sprite-fm-mono icon-download-small"
                             label={l[1187] /* `Download` */}
+                            disabled={mega.paywall}
                             onClick={() => this.props.onDownloadStart(v)}
                         />
                         {this._isUserRegistered() &&
@@ -210,11 +214,13 @@ export default class Attachment extends AbstractGenericMessage {
                                 <DropdownItem
                                     icon="sprite-fm-mono icon-cloud"
                                     label={l[1988] /* `Save file` */}
+                                    disabled={mega.paywall}
                                     onClick={() => this.props.onAddToCloudDrive(v, false)}
                                 />
                                 <DropdownItem
                                     icon="sprite-fm-mono icon-send-to-chat"
                                     label={l[17764] /* `Send to chat` */}
+                                    disabled={mega.paywall}
                                     onClick={() => this.props.onAddToCloudDrive(v, true)}
                                 />
                             </>

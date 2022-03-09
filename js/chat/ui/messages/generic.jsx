@@ -198,6 +198,7 @@ export default class GenericConversationMessage extends ConversationMessageMixin
                     label={isFav ? l[5872] : l[5871]}
                     isFav={isFav}
                     key="fav"
+                    disabled={mega.paywall}
                     onClick={(e) => {
                         self._favourite(h);
                         e.stopPropagation();
@@ -227,6 +228,7 @@ export default class GenericConversationMessage extends ConversationMessageMixin
                 icon="sprite-fm-mono icon-link"
                 key="getLinkButton"
                 label={getManageLinkText}
+                disabled={mega.paywall}
                 onClick={self._getLink.bind(self, h)}
             />);
 
@@ -236,6 +238,7 @@ export default class GenericConversationMessage extends ConversationMessageMixin
                     icon="sprite-fm-mono context icon-link-remove"
                     key="removeLinkButton"
                     label={l[6821]}
+                    disabled={mega.paywall}
                     onClick={self._removeLink.bind(self, h)}
                 />
             );

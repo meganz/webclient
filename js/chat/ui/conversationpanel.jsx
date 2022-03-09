@@ -496,6 +496,7 @@ export class ConversationRightArea extends MegaRenderMixin {
                                         className="link-button"
                                         icon="sprite-fm-mono icon-cloud-drive"
                                         label={l[19794] ? l[19794] : "My Cloud Drive"}
+                                        disabled={mega.paywall}
                                         onClick={() => {
                                             self.props.onAttachFromCloudClicked();
                                         }} />
@@ -503,6 +504,7 @@ export class ConversationRightArea extends MegaRenderMixin {
                                         className="link-button"
                                         icon="sprite-fm-mono icon-session-history"
                                         label={l[19795] ? l[19795] : "My computer"}
+                                        disabled={mega.paywall}
                                         onClick={() => {
                                             self.props.onAttachFromComputerClicked();
                                         }} />

@@ -90,7 +90,7 @@ function FMDB(plainname, schema, channelmap) {
 
     // console logging
     this.logger = MegaLogger.getLogger('FMDB');
-    this.logger.options.printDate = false;
+    this.logger.options.printDate = 'rad' in mega;
     this.logger.options.levelColors = {
         'ERROR': '#fe000b',
         'DEBUG': '#005aff',
@@ -1442,10 +1442,11 @@ FMDB.prototype.getbykey = async function fmdb_getbykey(table, index, anyof, wher
     }
 
     const ch = this.channelmap[table] || 0;
+    const writing = this.writing || this.head[ch] !== this.tail[ch];
     const debug = d && (x => (m, ...a) => this.logger.warn(`[${x}] ${m}`, ...a))(Math.random().toString(28).slice(-7));
 
-    if (debug /* && (fminitialized || d > 1)*/) {
-        debug("Fetching table %s...", table, options || where || anyof && anyof.flat());
+    if (debug) {
+        debug(`Fetching table ${table}...${writing ? '\u26a1' : ''}`, options || where || anyof && anyof.flat());
     }
 
     let i = 0;
@@ -1657,7 +1658,7 @@ FMDB.prototype.getbykey = async function fmdb_getbykey(table, index, anyof, wher
                     else {
                         // a returned record was overwritten and still matches
                         // our where clause
-                        r[i] = this.clone(matches[f]);
+                        r[i] = this.clone(matches[f], writing);
                         matches[f] = undefined;
                     }
                 }
@@ -1666,7 +1667,7 @@ FMDB.prototype.getbykey = async function fmdb_getbykey(table, index, anyof, wher
             // now add newly written records
             for (t in matches) {
                 if (matches[t]) {
-                    r.push(this.clone(matches[t]));
+                    r.push(this.clone(matches[t], writing));
                 }
             }
         }
@@ -1736,13 +1737,16 @@ FMDB.prototype.getchunk = async function(table, options, onchunk) {
 };
 
 // simple/fast/non-recursive object cloning
-FMDB.prototype.clone = function fmdb_clone(o) {
+FMDB.prototype.clone = function fmdb_clone(o, copy) {
     'use strict';
 
-    // In Firefox, Object.assign() is ~63% faster than for..in, ~21% in Chrome
-    // return Object.assign({}, o);
+    o = {...o};
 
-    return ({...o});
+    if (copy && o.d && o.d.byteLength) {
+        o.d = o.d.slice(0);
+    }
+
+    return o;
 };
 
 /**

@@ -63,7 +63,7 @@ function accountUI() {
         }, 300);
     }, 1);
 
-    
+
 }
 
 accountUI.renderAccountPage = function(account) {
@@ -1258,11 +1258,17 @@ accountUI.account = {
                 const $bm = $('.bmonth', $birthdayBlock);
                 const $by = $('.byear', $birthdayBlock);
 
-                const bd = parseInt($bd.val());
-                const bm = parseInt($bm.val());
-                const by = parseInt($by.val());
+                const bd = $bd.val();
+                const bm = $bm.val();
+                const by = $by.val();
 
-                if (M.validateDate(bd, bm, by) !== 0) {
+                // Check whether the birthday info gets changed
+                const bd_old = u_attr.birthday || '';
+                const bm_old = u_attr.birthmonth || '';
+                const by_old = u_attr.birthyear || '';
+                const birthdayChanged = bd_old !== bd || bm_old !== bm || by_old !== by;
+
+                if (birthdayChanged && M.validateDate(parseInt(bd), parseInt(bm), parseInt(by)) !== 0) {
 
                     const $parent = $bd.parent().addClass('error msg');
                     var $msg = $('.message-container', $parent).text(l[20960]);

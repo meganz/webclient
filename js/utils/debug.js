@@ -497,7 +497,7 @@ mBroadcaster.once('boot_done', function radSetup() {
         return db;
     };
     lazy(flush, 'tx', () => new TextEncoder());
-    lazy(flush, 'db', () => LRUMegaDexie.create('rad.log', 9e3));
+    lazy(flush, 'db', () => LRUMegaDexie.create('rad.log', {limit: 9e3, pfx: '$rad'}));
 
     const log = (name, args) => {
         if (typeof args === 'string') {

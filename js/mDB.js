@@ -2250,7 +2250,7 @@ class MegaDexie extends Dexie {
 
                 this.error = ex;
                 return release(res, failure);
-            });
+            }).catch(dump);
         }, 60);
 
         return promise;
@@ -2519,12 +2519,14 @@ MegaDexie.create = function(name, binary) {
 
 class LRUMegaDexie extends MegaDexie {
     constructor(name, options = 4e3) {
-        super('LRUMMDB', name, 'lru_', true, {
+        options = typeof options === 'number' ? {limit: options} : options;
+
+        super('LRUMMDB', name, options.pfx || 'lru_', true, {
             lru: '&k',
             data: '&h, ts'
         });
 
-        this.options = typeof options === 'number' ? {limit: options} : options;
+        this.options = options;
 
         if (LRUMegaDexie.wSet) {
             this._uname = name;
@@ -2695,14 +2697,14 @@ Object.defineProperties(LRUMegaDexie, {
     errorHandler: {
         value: (ev) => {
             'use strict';
-            const message = String(((ev.target || ev).error || ev.inner || ev).message || ev);
+            const message = String(((ev.target || ev).error || ev.inner || ev).message || ev.type || ev);
 
             if (d) {
                 console.error(`LRUMegaDexie error (${ev.type || ev.name})`, message, [ev]);
             }
 
-            if (ev.type !== 'close' && !message.includes('closing')) {
-                eventlog(99748, message.split('\n')[0].substr(0, 96), true);
+            if (ev.type !== 'close' && !/\s(?:clos[ei]|delet[ei])/.test(message)) {
+                eventlog(99748, message.split('\n')[0].substr(0, 300), true);
             }
 
             // drop all LRU-based databases.

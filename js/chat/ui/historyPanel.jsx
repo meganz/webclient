@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import {MegaRenderMixin, SoonFcWrap} from "../mixins";
-import utils from "../../ui/utils.jsx";
+import utils, { ParsedHTML } from "../../ui/utils.jsx";
 import {AltPartsConvMessage} from "./messages/alterParticipants.jsx";
 import {TruncatedMessage} from "./messages/truncated.jsx";
 import {PrivilegeChange} from "./messages/privilegeChange.jsx";
@@ -497,36 +497,32 @@ export default class HistoryPanel extends MegaRenderMixin {
 
             if (mb.joined === true && !self.scrollPullHistoryRetrieval && mb.haveMoreHistory() === false) {
                 var headerText = l[8002];
-
-                if (contactName) {
-                    headerText = headerText.replace("%s", "<span>" + megaChat.plugins.emoticonsFilter
-                        .processHtmlMessage(htmlentities(contactName)) + "</span>");
-                }
-                else {
-                    headerText = megaChat.plugins.emoticonsFilter.processHtmlMessage(htmlentities(room.getRoomTitle()));
-                }
+                headerText =
+                    contactName ?
+                        headerText.replace('%s', `<span>${megaChat.html(contactName)}</span>`) :
+                        megaChat.html(room.getRoomTitle());
 
                 messagesList.push(
                     <div className="messages notification" key="initialMsg">
-                        <div className="header" dangerouslySetInnerHTML={{__html: headerText}}>
+                        <div className="header">
+                            <ParsedHTML
+                                tag="div"
+                                content={headerText}
+                            />
                         </div>
                         <div className="info">
                             {l[8080]}
                             <p>
                                 <i className="sprite-fm-mono icon-lock" />
-                                <span dangerouslySetInnerHTML={{
-                                    __html: l[8540]
-                                        .replace("[S]", "<strong>")
-                                        .replace("[/S]", "</strong>")
-                                }} />
+                                <ParsedHTML>
+                                    {l[8540].replace("[S]", "<strong>").replace("[/S]", "</strong>")}
+                                </ParsedHTML>
                             </p>
                             <p>
                                 <i className="sprite-fm-mono icon-accept" />
-                                <span dangerouslySetInnerHTML={{
-                                    __html: l[8539]
-                                        .replace("[S]", "<strong>")
-                                        .replace("[/S]", "</strong>")
-                                }} />
+                                <ParsedHTML>
+                                    {l[8539].replace("[S]", "<strong>").replace("[/S]", "</strong>")}
+                                </ParsedHTML>
                             </p>
                         </div>
                     </div>

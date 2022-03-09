@@ -413,7 +413,16 @@ body.tl .dropdown.body.popup.contacts-search {
     padding-bottom: 12px;
 }
 .add-participant-selector footer {
-    padding: 24px 48px;
+    padding: 24px;
+}
+.add-participant-selector footer .mega-button span {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    display: block;
+    white-space: nowrap;
+}
+.add-participant-selector footer .footer-spacing {
+    flex: 1 0 8px;
 }
 /* End of Search contacts popup */
 

@@ -53,6 +53,7 @@ class StreamControls extends MegaRenderMixin {
                                 theme-light-forced
                                 round
                                 large
+                                ${avFlags & SfuClient.Av.onHold ? 'disabled' : ''}
                                 ${avFlags & SfuClient.Av.Audio ? '' : 'inactive'}
                             `}
                             icon={`${avFlags & SfuClient.Av.Audio ? 'icon-audio-filled' : 'icon-audio-off'}`}
@@ -69,6 +70,7 @@ class StreamControls extends MegaRenderMixin {
                                 theme-light-forced
                                 round
                                 large
+                                ${avFlags & SfuClient.Av.onHold ? 'disabled' : ''}
                                 ${avFlags & SfuClient.Av.Camera ? '' : 'inactive'}
                             `}
                             icon={`${avFlags & SfuClient.Av.Camera ? 'icon-video-call-filled' : 'icon-video-off'}`}

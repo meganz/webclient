@@ -9,6 +9,7 @@
     width: 50px;
     height: 120px;
     transition: opacity 500ms ease-in-out, right 500ms ease-in-out;
+    z-index: 11;
 
     ul {
         list-style: none;

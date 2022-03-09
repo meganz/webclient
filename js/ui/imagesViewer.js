@@ -19,6 +19,7 @@ var slideshowid;
     var fitToWindow = Object.create(null);
     var _pdfSeen = false;
     var optionsMenu;
+    var preselection;
 
     function slideshow_handle(raw) {
         var result;
@@ -57,9 +58,20 @@ var slideshowid;
             };
         }
 
+        if (preselection) {
+            index = function(i) {
+                return preselection[i].h;
+            };
+            filter = () => {
+                // This should already filtered at this point
+                return true;
+            };
+        }
+
+        const sArr = preselection ? preselection : M.v;
         // Loop through available items and extract images
-        for (var i = 0, m = M.v.length; i < m; i++) {
-            if (filter(M.v[i])) {
+        for (var i = 0, m = sArr.length; i < m; i++) {
+            if (filter(sArr[i])) {
                 // is currently previewed item
                 if (index(i) === slideshowid) {
                     ci = i;
@@ -684,7 +696,8 @@ var slideshowid;
     }
 
     // Viewer Init
-    function slideshow(id, close, hideCounter) {
+    // eslint-disable-next-line complexity
+    function slideshow(id, close, hideCounter, filteredNodeArr) {
         if (!close && M.isInvalidUserStatus()) {
             return;
         }
@@ -715,6 +728,7 @@ var slideshowid;
             slideshowid = false;
             _hideCounter = false;
             slideshowplay = false;
+            preselection = undefined;
             $overlay.removeClass('video video-theatre-mode mouse-idle slideshow fullscreen')
                 .addClass('hidden');
             $playVideoButton.addClass('hidden');
@@ -936,6 +950,9 @@ var slideshowid;
 
             // Remove Icon
             slideshow_remove(n, $overlay);
+            if (filteredNodeArr && Array.isArray(filteredNodeArr)) {
+                preselection = filteredNodeArr;
+            }
 
             // Previous/Next viewer buttons
             var steps = slideshowsteps();

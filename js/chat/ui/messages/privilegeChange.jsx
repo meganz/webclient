@@ -1,7 +1,7 @@
 var React = require("react");
 var ContactsUI = require('./../contacts.jsx');
 var ConversationMessageMixin = require('./mixin.jsx').ConversationMessageMixin;
-import { EmojiFormattedContent } from '../../../ui/utils.jsx';
+import { Emoji, ParsedHTML } from '../../../ui/utils.jsx';
 
 class PrivilegeChange extends ConversationMessageMixin {
     haveMoreContactListeners() {
@@ -64,13 +64,10 @@ class PrivilegeChange extends ConversationMessageMixin {
         }
 
         var text = l[8915]
-            .replace(
-                "%1",
-                '<strong className="dark-grey-txt">' + htmlentities(newPrivilegeText) + '</strong>'
-            )
+            .replace("%1", `<strong>${newPrivilegeText}</strong>`)
             .replace(
                 "%2",
-                '<strong className="dark-grey-txt">' + htmlentities(displayName) + '</strong>'
+                `<strong>${megaChat.html(displayName)}</strong>`
             );
 
         messages.push(
@@ -81,15 +78,12 @@ class PrivilegeChange extends ConversationMessageMixin {
                         className="message"
                         chatRoom={self.props.chatRoom}
                         contact={otherContact}
-                        label={<EmojiFormattedContent>{otherDisplayName}</EmojiFormattedContent>}
+                        label={<Emoji>{otherDisplayName}</Emoji>}
                     />
                     {datetime}
-                    <div
-                        className="message text-block"
-                        dangerouslySetInnerHTML={{
-                            __html: megaChat.plugins.emoticonsFilter.processHtmlMessage(text)
-                        }}
-                    />
+                    <div className="message text-block">
+                        <ParsedHTML>{text}</ParsedHTML>
+                    </div>
                 </div>
             </div>
         );

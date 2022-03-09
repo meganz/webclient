@@ -315,8 +315,11 @@
             // this.sfuApp.sfuClient.peers.get(peer.cid).requestThumbnailVideo();
         }
         onPeerLeft(peer) {
-            this.chatRoom.trigger('onCallPeerLeft', peer.userId);
             this.peers.remove(peer.cid);
+            if (this.activeStream && this.activeStream === peer.cid) {
+                this.activeStream = null;
+            }
+            this.chatRoom.trigger('onCallPeerLeft', peer.userId);
             this.left = true;
         }
         onJoined() {
@@ -688,7 +691,7 @@
         if (message.chatRoom) {
             (participants || message.chatRoom.getParticipantsExceptMe()).forEach(function(handle) {
                 if (handle !== u_handle) {
-                    var name = htmlentities(M.getNameByHandle(handle));
+                    var name = M.getNameByHandle(handle);
                     if (name) {
                         otherContactsName.push(name);
                     }
@@ -698,7 +701,7 @@
                 if (participants) {
                     message.chatRoom.getParticipantsExceptMe().forEach(function(handle) {
                         if (handle !== u_handle) {
-                            var name = htmlentities(M.getNameByHandle(handle));
+                            var name = M.getNameByHandle(handle);
                             if (name) {
                                 otherContactsName.push(name);
                             }
@@ -708,12 +711,10 @@
                 if (!otherContactsName || otherContactsName.length === 0) {
                     // this should never happen, but in case it does... e.g. a room where I'm the only one left, but had
                     // a call recorded with no participants passed in the meta
-                    otherContactsName.push(escapeHTML(message.chatRoom.topic));
+                    otherContactsName.push(message.chatRoom.topic);
                 }
             }
-            otherContactsName = otherContactsName.map(name =>
-                megaChat.plugins.emoticonsFilter.processHtmlMessage(name)
-            );
+            otherContactsName = otherContactsName.map(name => megaChat.html(name));
         }
 
         if (message.chatRoom.type === "private") {

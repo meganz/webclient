@@ -42,6 +42,7 @@
   width: 100%;
   text-align: center;
   transition: opacity 500ms ease-in-out, bottom 500ms ease-in-out;
+  z-index: 11;
 }
 .meetings-call .stream .stream-controls ul {
   display: block;
@@ -102,6 +103,7 @@
   width: 50px;
   height: 120px;
   transition: opacity 500ms ease-in-out, right 500ms ease-in-out;
+  z-index: 11;
 }
 .meetings-call .stream .sidebar-controls ul {
   list-style: none;
@@ -257,6 +259,15 @@
   font: var(--text-h3);
   color: var(--secondary-white);
 }
+.meetings-call .stream .on-hold-overlay {
+  z-index: 10;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  background: rgba(0, 0, 0, 0.7);
+  top: 0;
+  left: 0;
+}
 .meetings-call .carousel {
   width: 100%;
   height: 100%;
@@ -370,7 +381,7 @@
   height: 100%;
   box-sizing: border-box;
   background: var(--surface-main);
-  z-index: 1;
+  z-index: 12;
 }
 .meetings-call .sidebar .collapse {
   height: 100%;
@@ -797,7 +808,7 @@
   height: 64px;
   background: var(--surface-black-bar);
   transition: opacity 500ms ease-in-out, top 500ms ease-in-out;
-  z-index: 1;
+  z-index: 11;
 }
 .stream-head-content {
   position: absolute;
@@ -1096,7 +1107,7 @@
   border-radius: 24px;
   background: var(--surface-black);
   cursor: pointer;
-  z-index: 1;
+  z-index: 11;
 }
 .local-stream.ratio-4-3 {
   width: 190px;
@@ -2030,3 +2041,5 @@ body.theme-dark .start-meeting-preview .preview-meeting {
     left: 400px;
   }
 }
+
+/*# sourceMappingURL=chat-bundle.css.map */

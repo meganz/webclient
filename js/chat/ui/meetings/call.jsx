@@ -151,6 +151,26 @@ export default class Call extends MegaRenderMixin {
         });
     };
 
+    bindMiniEvents = () => {
+        const { chatRoom } = this.props;
+        ['onCallPeerLeft.mini', 'onCallPeerJoined.mini'].forEach(event => {
+            chatRoom.rebind(event, () => {
+                const { minimized, streams, call } = this.props;
+                if (minimized) {
+                    this.setState({mode: streams.length === 0 ? Call.MODE.THUMBNAIL : Call.MODE.MINI}, () => {
+                        call.setViewMode(this.state.mode);
+                    });
+                }
+            });
+        });
+    };
+
+    unbindMiniEvents = () => {
+        const { chatRoom } = this.props;
+        chatRoom.off('onCallPeerLeft.mini');
+        chatRoom.off('onCallPeerJoined.mini');
+    };
+
     /**
      * handleStreamToggle
      * @description Temporary debug method used to add or remove fake streams.
@@ -315,11 +335,12 @@ export default class Call extends MegaRenderMixin {
     componentWillUnmount() {
         super.componentWillUnmount();
         if (this.props.willUnmount) {
-            this.props.willUnmount(this.state.mode);
+            this.props.willUnmount(this.props.minimized);
         }
         if (this.ephemeralAddListener) {
             mBroadcaster.removeListener(this.ephemeralAddListener);
         }
+        this.unbindMiniEvents();
     }
 
     componentDidMount() {
@@ -330,6 +351,7 @@ export default class Call extends MegaRenderMixin {
         this.ephemeralAddListener = mBroadcaster.addListener('meetings:ephemeralAdd', handle =>
             this.handleEphemeralAdd(handle)
         );
+        this.bindMiniEvents();
     }
 
     render() {
@@ -344,6 +366,7 @@ export default class Call extends MegaRenderMixin {
             view,
             chatRoom,
             parent,
+            isOnHold: sfuApp.sfuClient.isOnHold(),
             onSpeakerChange: this.handleSpeakerChange,
             onInviteToggle: this.handleInviteToggle
         };
@@ -358,7 +381,6 @@ export default class Call extends MegaRenderMixin {
                     {...STREAM_PROPS}
                     sfuApp={sfuApp}
                     minimized={minimized}
-                    isOnHold={sfuApp.sfuClient.isOnHold()}
                     ephemeralAccounts={ephemeralAccounts}
                     onCallMinimize={this.handleCallMinimize}
                     onCallExpand={this.handleCallExpand}

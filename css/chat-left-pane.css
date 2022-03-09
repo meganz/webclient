@@ -887,7 +887,7 @@ li.active .call-duration i {
     position: absolute;
     top: 16px;
     width: 100%;
-    z-index: 130;
+    z-index: 120;
 }
 
 .contacts-panel .back-to-landing {
@@ -1169,6 +1169,9 @@ li.active .call-duration i {
     width: 32px;
     height: 32px;
     margin: 2px 8px 0 8px;
+}
+
+.contacts-table .box-avatar {
     border-radius: 4px;
 }
 

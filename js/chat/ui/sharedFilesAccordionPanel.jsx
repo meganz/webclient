@@ -1,7 +1,7 @@
 var React = require("react");
 var ReactDOM = require("react-dom");
 import {MegaRenderMixin} from "../mixins";
-import utils, { EmojiFormattedContent } from './../../ui/utils.jsx';
+import utils, { Emoji } from './../../ui/utils.jsx';
 
 class SharedFileItem extends MegaRenderMixin {
     render() {
@@ -28,7 +28,7 @@ class SharedFileItem extends MegaRenderMixin {
                 <div className="chat-shared-info">
                     <span className="txt">{node.name}</span>
                     <span className="txt small">
-                        <EmojiFormattedContent>{name}</EmojiFormattedContent>
+                        <Emoji>{name}</Emoji>
                     </span>
                     <span className="txt small grey">{timestamp}</span>
                 </div>

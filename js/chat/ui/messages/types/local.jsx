@@ -2,7 +2,7 @@ import React from 'react';
 import AbstractGenericMessage from '../abstractGenericMessage.jsx';
 import { getMessageString } from '../utils.jsx';
 import { Avatar, ContactButton } from '../../contacts.jsx';
-import { EmojiFormattedContent } from '../../../../ui/utils';
+import { Emoji, ParsedHTML } from '../../../../ui/utils';
 
 const MESSAGE_TYPE = {
     OUTGOING: 'outgoing-call',
@@ -42,9 +42,7 @@ export default class Local extends AbstractGenericMessage {
     _getParticipantNames = message => (
         message.meta && message.meta.participants && !!message.meta.participants.length &&
         message.meta.participants
-            .map(handle =>
-                `[[${megaChat.plugins.emoticonsFilter.processHtmlMessage(escapeHTML(M.getNameByHandle(handle)))}]]`
-            )
+            .map(handle => `[[${megaChat.html(M.getNameByHandle(handle))}]]`)
     );
 
     _getExtraInfo = message => {
@@ -281,9 +279,7 @@ export default class Local extends AbstractGenericMessage {
                     contact={contact}
                     className="message"
                     label={
-                        <EmojiFormattedContent>
-                            {message.authorContact ? M.getNameByHandle(message.authorContact.u) : ''}
-                        </EmojiFormattedContent>
+                        <Emoji>{message.authorContact ? M.getNameByHandle(message.authorContact.u) : ''}</Emoji>
                     }
                     chatRoom={message.chatRoom}
                 /> :
@@ -298,9 +294,9 @@ export default class Local extends AbstractGenericMessage {
                 <div className="message text-block">
                     <div className="message call-inner-block">
                         <div className="call-info">
-                            <div
-                                className="call-info-container"
-                                dangerouslySetInnerHTML={{ __html: this._getText() }} />
+                            <div className="call-info-container">
+                                <ParsedHTML className="info-wrapper">{this._getText()}</ParsedHTML>
+                            </div>
                             <div className="call-info-avatars">
                                 {this._getAvatarsListing()}
                                 <div className="clear" />

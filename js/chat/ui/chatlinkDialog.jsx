@@ -1,7 +1,7 @@
 import React from 'react';
 import { MegaRenderMixin } from '../mixins';
 import ModalDialogsUI from './../../ui/modalDialogs.jsx';
-import utils from './../../ui/utils.jsx';
+import { Emoji } from './../../ui/utils.jsx';
 
 export class ChatlinkDialog extends MegaRenderMixin {
     static defaultProps = {
@@ -138,7 +138,7 @@ export class ChatlinkDialog extends MegaRenderMixin {
                         <header>
                             <i className="sprite-fm-uni icon-chat-group"/>
                             <h2 id="chat-link-dialog-title">
-                                <utils.EmojiFormattedContent>{chatRoom.topic}</utils.EmojiFormattedContent>
+                                <Emoji>{chatRoom.topic}</Emoji>
                             </h2>
                         </header>
                         <section className="content">

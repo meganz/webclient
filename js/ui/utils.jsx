@@ -254,48 +254,62 @@ class RenderTo extends React.Component {
 };
 
 
-export class EmojiFormattedContent extends React.Component {
-    _eventuallyUpdateInternalState(props) {
-        if (!props) {
-            props = this.props;
+export const Emoji = ({ children }) => {
+    return <ParsedHTML content={megaChat.html(children)} />;
+};
+
+export class ParsedHTML extends React.Component {
+    ref = React.createRef();
+
+    updateInternalState = () => {
+        const { children, content } = this.props;
+        const ref = this.ref && this.ref.current;
+
+        if (!children && !content) {
+            return console.warn('Emoji: No content passed.');
         }
 
-        assert(
-            typeof(props.children) === "string",
-            "EmojiFormattedContent received a non-string (got: " + typeof(props.children) + ") as props.children"
+        if (ref) {
+            if (ref.childNodes.length) {
+                while (ref.firstChild) {
+                    ref.removeChild(ref.firstChild);
+                }
+            }
+            ref.appendChild(parseHTML(children || content));
+        }
+    };
+
+    shouldComponentUpdate(nextProps) {
+        return (
+            nextProps && (nextProps.children !== this.props.children || nextProps.content !== this.props.content)
         );
-
-        var str = props.children;
-        if (this._content !== str) {
-            this._content = str;
-            this._formattedContent = megaChat.plugins.emoticonsFilter.processHtmlMessage(htmlentities(str));
-        }
     }
-    shouldComponentUpdate(nextProps, nextState) {
-        if (!this._isMounted) {
-            this._eventuallyUpdateInternalState();
-            return true;
-        }
 
-        if (nextProps && nextProps.children !== this.props.children) {
-            this._eventuallyUpdateInternalState(nextProps);
-            return true;
-        }
-        else {
-            return false;
-        }
+    componentDidUpdate() {
+        this.updateInternalState();
     }
+
+    componentDidMount() {
+        this.updateInternalState();
+    }
+
     render() {
-        this._eventuallyUpdateInternalState();
+        const { className, onClick, tag } = this.props;
+        const Tag = tag || 'span';
 
-        return <span dangerouslySetInnerHTML={{__html: this._formattedContent}}></span>;
+        return (
+            <Tag
+                ref={this.ref}
+                className={className}
+                onClick={onClick}
+            />
+        );
     }
 }
 
 export default {
     JScrollPane,
     RenderTo,
-    EmojiFormattedContent,
     schedule,
     SoonFcWrap
 };

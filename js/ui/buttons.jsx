@@ -210,11 +210,7 @@ export class Button extends MegaRenderMixin {
                     </div>
                 )}
                 {label && <span>{label}</span>}
-                {secondLabel && (
-                    <span
-                        className={secondLabelClass ? secondLabelClass : ''}
-                        dangerouslySetInnerHTML={{ __html: this.props.secondLabel }} />
-                )}
+                {secondLabel && <span className={secondLabelClass ? secondLabelClass : ''}>{secondLabel}</span>}
                 {toggle && (
                     <div
                         className={`

@@ -636,8 +636,8 @@ describe("webgl.js test", function() {
 
         image = await ctx.loadImage(res);
         chai.expect(image).to.be.instanceOf(Image);
-        chai.expect(image.width).to.eql(~~(height * MEGAImageElement.ASPECT_RATIO_16_9));
-        chai.expect(image.height).to.eql(height);
+        chai.expect(image.width).to.eql(MEGAImageElement.PREVIEW_SIZE);
+        chai.expect(image.height).to.eql(height - (MEGAImageElement.PREVIEW_SIZE >> 5));
     });
 
     doWebGLAndCanvasTest('can work with corrupted image data', async(ctx) => {
@@ -748,8 +748,8 @@ describe("webgl.js test", function() {
         chai.expect(pi).to.be.instanceOf(Image);
         chai.expect(ti).to.be.instanceOf(Image);
 
-        chai.expect(pi.width).to.eql(1008);
-        chai.expect(pi.height).to.eql(567);
+        chai.expect(pi.width).to.eql(MEGAImageElement.PREVIEW_SIZE);
+        chai.expect(pi.height).to.eql(471);
         chai.expect(ti.width).to.eql(MEGAImageElement.THUMBNAIL_SIZE);
         chai.expect(ti.height).to.eql(MEGAImageElement.THUMBNAIL_SIZE);
     });

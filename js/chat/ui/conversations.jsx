@@ -1,7 +1,7 @@
 // libs
 import { hot } from 'react-hot-loader/root';
 var React = require("react");
-import utils from './../../ui/utils.jsx';
+import utils, { Emoji, ParsedHTML } from './../../ui/utils.jsx';
 var PerfectScrollbar = require('./../../ui/perfectScrollbar.jsx').PerfectScrollbar;
 import {MegaRenderMixin, timing} from './../mixins';
 import {Button} from './../../ui/buttons.jsx';
@@ -14,6 +14,7 @@ import { Avatar, ContactAwareName } from "./contacts.jsx";
 var StartGroupChatWizard = require('./startGroupChatWizard.jsx').StartGroupChatWizard;
 import {Start as StartMeetingDialog} from "./meetings/workflow/start.jsx";
 import MeetingsCallEndedDialog from "./meetings/meetingsCallEndedDialog.jsx";
+import Nil from './contactsPanel/nil.jsx';
 
 var getRoomName = function(chatRoom) {
     return chatRoom.getRoomTitle();
@@ -182,8 +183,12 @@ class ConversationsListItem extends MegaRenderMixin {
                 lastMsgDivClasses += " call";
                 classString += " call-exists";
             }
-            lastMessageDiv = <div className={lastMsgDivClasses} dangerouslySetInnerHTML={{__html:renderableSummary}}>
-                    </div>;
+            lastMessageDiv =
+                <div className={lastMsgDivClasses}>
+                    <ParsedHTML>
+                        {renderableSummary}
+                    </ParsedHTML>
+                </div>;
             const voiceClipType = Message.MANAGEMENT_MESSAGE_TYPES.VOICE_CLIP;
 
             if (
@@ -245,7 +250,7 @@ class ConversationsListItem extends MegaRenderMixin {
             nameClassString += " privateChat";
         }
 
-        var roomTitle = <utils.EmojiFormattedContent>{chatRoom.getRoomTitle()}</utils.EmojiFormattedContent>;
+        var roomTitle = <Emoji>{chatRoom.getRoomTitle()}</Emoji>;
         if (chatRoom.type === "private") {
             roomTitle = <ContactAwareName contact={this.props.contact}>{roomTitle}</ContactAwareName>;
         }
@@ -363,8 +368,10 @@ class ArchConversationsListItem extends MegaRenderMixin {
             );
             lastMessage.renderableSummary = renderableSummary;
 
-            lastMessageDiv = <div className={lastMsgDivClasses} dangerouslySetInnerHTML={{__html:renderableSummary}}>
-                    </div>;
+            lastMessageDiv =
+                <div className={lastMsgDivClasses}>
+                    <ParsedHTML>{renderableSummary}</ParsedHTML>
+                </div>;
 
             lastMessageDatetimeDiv = <div className="date-time">{getTimeMarker(lastMessage.delay, true)}</div>;
         }
@@ -410,7 +417,7 @@ class ArchConversationsListItem extends MegaRenderMixin {
                 <td className="">
                     <div className="fm-chat-user-info todo-star">
                         <div className={nameClassString}>
-                            <utils.EmojiFormattedContent>{chatRoom.getRoomTitle()}</utils.EmojiFormattedContent>
+                            <Emoji>{chatRoom.getRoomTitle()}</Emoji>
                             {chatRoom.type === "group" ? <i className="sprite-fm-uni icon-ekr-key"/> : undefined}
                         </div>
                         <div className="last-message-info">
@@ -623,31 +630,25 @@ class ConversationsList extends MegaRenderMixin {
                 }
             }
 
-            // Checking if this a business user with expired status
-            if (mega.paywall) {
-                chatRoom.privateReadOnlyChat = true;
-            }
-            else {
-                if (chatRoom.type === "private") {
-                    contact = chatRoom.getParticipantsExceptMe()[0];
-                    if (!contact) {
-                        return;
-                    }
-                    contact = M.u[contact];
+            if (chatRoom.type === "private") {
+                contact = chatRoom.getParticipantsExceptMe()[0];
+                if (!contact) {
+                    return;
+                }
+                contact = M.u[contact];
 
-                    if (contact) {
-                        if (!chatRoom.privateReadOnlyChat && !contact.c) {
-                            // a non-contact conversation, e.g. contact removed - mark as read only
-                            Soon(function() {
-                                chatRoom.privateReadOnlyChat = true;
-                            });
-                        }
-                        else if (chatRoom.privateReadOnlyChat && contact.c) {
-                            // a non-contact conversation, e.g. contact removed - mark as read only
-                            Soon(function() {
-                                chatRoom.privateReadOnlyChat = false;
-                            });
-                        }
+                if (contact) {
+                    if (!chatRoom.privateReadOnlyChat && !contact.c) {
+                        // a non-contact conversation, e.g. contact removed - mark as read only
+                        Soon(() => {
+                            chatRoom.privateReadOnlyChat = true;
+                        });
+                    }
+                    else if (chatRoom.privateReadOnlyChat && contact.c) {
+                        // a non-contact conversation, e.g. contact removed - mark as read only
+                        Soon(() => {
+                            chatRoom.privateReadOnlyChat = false;
+                        });
                     }
                 }
             }
@@ -837,43 +838,57 @@ class ArchivedConversationsList extends MegaRenderMixin {
 
         return (
             <div className="chat-content-block archived-chats">
-                <div className="files-grid-view archived-chat-view">
-                    <table className="grid-table-header" width="100%" cellSpacing="0" cellPadding="0" border="0">
-                        <tbody>
-                            <tr>
-                                <th className="calculated-width" onClick={self.onSortNameClicked}>
-                                    <div className="is-chat name">
-                                        {l[86]}
-                                        <i
-                                            className={
-                                                nameOrderClass ? `sprite-fm-mono icon-arrow-${nameOrderClass}` : ''
-                                            }
-                                        />
-                                    </div>
-                                </th>
-                                <th width="330" onClick={self.onSortTimeClicked}>
-                                    <div className={"is-chat arrow interaction " + timerOrderClass}>
-                                        {l[5904]}
-                                        <i
-                                            className={
-                                                timerOrderClass ? `sprite-fm-mono icon-arrow-${timerOrderClass}` : ''
-                                            }
-                                        />
-                                    </div>
-                                </th>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <div className="grid-scrolling-table archive-chat-list">
-                        <div className="grid-wrapper">
-                            <table className="grid-table arc-chat-messages-block table-hover">
+                <>
+                    {currConvsList && currConvsList.length ?
+                        <div className="files-grid-view archived-chat-view">
+                            <table
+                                className="grid-table-header"
+                                width="100%"
+                                cellSpacing="0"
+                                cellPadding="0"
+                                border="0">
                                 <tbody>
-                                    {currConvsList}
+                                    <tr>
+                                        <th className="calculated-width" onClick={self.onSortNameClicked}>
+                                            <div className="is-chat name">
+                                                {l[86] /* `Name` */}
+                                                <i
+                                                    className={
+                                                        nameOrderClass ?
+                                                            `sprite-fm-mono icon-arrow-${nameOrderClass}` :
+                                                            ''
+                                                    }
+                                                />
+                                            </div>
+                                        </th>
+                                        <th width="330" onClick={self.onSortTimeClicked}>
+                                            <div className={`is-chat arrow interaction ${timerOrderClass}`}>
+                                                {l[5904] /* `Last interaction` */}
+                                                <i
+                                                    className={
+                                                        timerOrderClass ?
+                                                            `sprite-fm-mono icon-arrow-${timerOrderClass}` :
+                                                            ''
+                                                    }
+                                                />
+                                            </div>
+                                        </th>
+                                    </tr>
                                 </tbody>
                             </table>
-                        </div>
-                    </div>
-                </div>
+                            <div className="grid-scrolling-table archive-chat-list">
+                                <div className="grid-wrapper">
+                                    <table className="grid-table arc-chat-messages-block table-hover">
+                                        <tbody>
+                                            {currConvsList}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div> :
+                        <Nil title={l.archived_nil /* `No archived chats` */} />
+                    }
+                </>
                 {confirmUnarchiveDialog}
             </div>
         );
@@ -1271,11 +1286,11 @@ class ConversationsApp extends MegaRenderMixin {
                     <div className="fm-empty-messages-bg"></div>
                     <div className="fm-empty-cloud-txt">{l[6870]}</div>
                     <div className="fm-not-logged-text">
-                        <div className="fm-not-logged-description" dangerouslySetInnerHTML={{
-                            __html: l[8762]
-                                .replace("[S]", "<span className='red'>")
-                                .replace("[/S]", "</span>")
-                        }}></div>
+                        <div className="fm-not-logged-description">
+                            <ParsedHTML>
+                                {l[8762].replace("[S]", "<span className='red'>").replace("[/S]", "</span>")}
+                            </ParsedHTML>
+                        </div>
                         <div className="fm-not-logged-button create-account">
                             {l[968]}
                         </div>

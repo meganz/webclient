@@ -187,10 +187,10 @@ export default class StreamNode extends MegaRenderMixin {
     };
 
     renderContent = () => {
-        const { stream, onDoubleClick, onLoadedData } = this.props;
+        const { stream, isCallOnHold, onDoubleClick, onLoadedData } = this.props;
         const { loading } = this.state;
 
-        if (StreamNode.isStreaming(stream)) {
+        if (StreamNode.isStreaming(stream) && !isCallOnHold) {
             return (
                 <>
                     {loading !== StreamNode.LOADING_STATE.LOADED && (

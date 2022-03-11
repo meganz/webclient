@@ -93,7 +93,7 @@ export default class AbstractGenericMessage extends ConversationMessageMixin {
                         this.renderMessageActionButtons(this.getMessageActionButtons())
                     )}
                     {this.getContents && this.getContents()}
-                    {this.getEmojisImages()}
+                    {hideActionButtons ? null : this.getEmojisImages()}
                 </div>
             </div>
         );

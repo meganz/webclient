@@ -52,14 +52,11 @@ export class JoinCallNotification extends MegaRenderMixin {
         return (
             <div className="in-call-notif neutral join">
                 <i className="sprite-fm-mono icon-phone"/>
-                <div
-                    onClick={() => chatRoom.joinCall()}>
-                    <ParsedHTML>
-                        {(l[20460] || 'There is an active group call. [A]Join[/A]')
-                            .replace('[A]', '<button class="mega-button positive joinActiveCall small">')
-                            .replace('[/A]', '</button>')}
-                    </ParsedHTML>
-                </div>
+                <ParsedHTML onClick={() => chatRoom.joinCall()}>
+                    {(l[20460] || 'There is an active group call. [A]Join[/A]')
+                        .replace('[A]', '<button class="mega-button positive joinActiveCall small">')
+                        .replace('[/A]', '</button>')}
+                </ParsedHTML>
             </div>
         );
     }

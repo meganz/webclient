@@ -21134,9 +21134,9 @@ class JoinCallNotification extends mixins.wl {
       className: "in-call-notif neutral join"
     }, external_React_default().createElement("i", {
       className: "sprite-fm-mono icon-phone"
-    }), external_React_default().createElement("div", {
+    }), external_React_default().createElement(utils.ParsedHTML, {
       onClick: () => chatRoom.joinCall()
-    }, external_React_default().createElement(utils.ParsedHTML, null, (l[20460] || 'There is an active group call. [A]Join[/A]').replace('[A]', '<button class="mega-button positive joinActiveCall small">').replace('[/A]', '</button>'))));
+    }, (l[20460] || 'There is an active group call. [A]Join[/A]').replace('[A]', '<button class="mega-button positive joinActiveCall small">').replace('[/A]', '</button>')));
   }
 
 }

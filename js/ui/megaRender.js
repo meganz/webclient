@@ -1597,14 +1597,10 @@
                         if (container.classList.contains("hidden")) {
                             this.removeClasses(container, ["hidden"]);
                         }
-                        if (container.parentNode.classList.contains("hidden")) {
-                            this.removeClasses(container.parentNode, ["hidden"]);
-                        }
-                        if (container.parentNode.parentNode.classList.contains("hidden")) {
-                            this.removeClasses(container.parentNode.parentNode, ["hidden"]);
-                        }
-                        if (container.parentNode.parentNode.parentNode.classList.contains("hidden")) {
-                            this.removeClasses(container.parentNode.parentNode, ["hidden"]);
+
+                        container = container.parentNode.closest('.fm');
+                        if (container && container.classList.contains("hidden")) {
+                            this.removeClasses(container, ["hidden"]);
                         }
 
                         this.megaList.batchReplace(aNodeList.map(String));

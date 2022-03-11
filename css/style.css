@@ -2218,6 +2218,7 @@ img.blog-new-logos {
     position: absolute;
     z-index: 100;
     padding: 8px 0;
+    display: none;
 }
 .properties-context-arrow {
     background-image: url(../images/mega/dialog-sprite.png);

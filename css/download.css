@@ -7,6 +7,7 @@
 .download.main-pad {
     width: 100%;
     max-width: 80%;
+    overflow: hidden;
     position: relative;
     text-align: start;
     border-radius: 12px;

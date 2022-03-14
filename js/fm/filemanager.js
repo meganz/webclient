@@ -3940,9 +3940,24 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
 
     });
 
-    $ddUIitem.rebind('dblclick', function(e) {
-        var h = $(e.currentTarget).attr('id');
-        var n = M.d[h] || {};
+    // Open folder/file in filemanager
+    let tappedItemId = '';
+    $ddUIitem.rebind('dblclick.openTarget touchend.tabletOpenTarget', (e) => {
+
+        let h = $(e.currentTarget).attr('id');
+        const n = M.getNodeByHandle(h);
+
+        // Emulate dblclick on tablet devices
+        if (e.type === 'touchend' && tappedItemId !== h) {
+
+            tappedItemId = h;
+            delay('ddUIitem:touchend.tot', () => {
+                tappedItemId = '';
+            }, 600);
+
+            return false;
+        }
+
         if (n.t) {
             if (e.ctrlKey) {
                 $.ofShowNoFolders = true;

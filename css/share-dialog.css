@@ -362,21 +362,9 @@
 }
 
 .mega-dialog.share-add-dialog .horizontal-contacts-list div.ps > .ps__scrollbar-x-rail > .ps__scrollbar-x {
-    background: var(--surface-mid-grey);
     border-radius: 2px;
     height: 4px;
-    margin-bottom: 1px;
-    opacity: 1;
-}
-
-.mega-dialog.share-add-dialog .horizontal-contacts-list div.ps > .ps__scrollbar-x-rail > .ps__scrollbar-x::before {
-    bottom: 0;
-    content: "";
-    cursor: pointer;
-    left: 0;
-    position: absolute;
-    right: 0;
-    top: -8px;
+    bottom: 2px;
 }
 
 .mega-dialog.share-add-dialog .contacts-search-header {

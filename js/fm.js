@@ -3370,6 +3370,9 @@ function fm_resize_handler(force) {
             && $dashboardContent.width() < 915) {
             $dashboardContent.addClass('low-width');
         }
+
+        // Init dashboard content scrolling
+        initDashboardScroll();
     }
     else if (!M.chat) {
         // Resize the search breadcrumbs

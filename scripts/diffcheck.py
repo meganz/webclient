@@ -800,7 +800,10 @@ def main(base, target, norules, branch, jscpd):
     warnings = count - total_errors
     if count:
         logging.info('Output of reduced results ...')
-        print('\n\n'.join(results).rstrip().encode("utf-8"))
+        if sys.version_info[0] == 2:
+            print('\n\n'.join(results).rstrip().encode("utf-8"))
+        else:
+            print('\n\n'.join(results).rstrip())
 
     if jscpd and copypaste_detector(file_line_mapping):
         total_errors += 1

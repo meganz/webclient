@@ -245,8 +245,8 @@ export default class StreamNode extends MegaRenderMixin {
     };
 
     renderStatus = () => {
-        const { mode, chatRoom } = this.props;
-        const { audioMuted, hasSlowNetwork, isOnHold, userHandle } = this.props.stream;
+        const { mode, stream, chatRoom } = this.props;
+        const { audioMuted, hasSlowNetwork, isOnHold, userHandle } = stream;
         const $$CONTAINER = ({ children }) => <div className="stream-node-status theme-dark-forced">{children}</div>;
         const onHoldLabel = l[23542].replace('%s', M.getNameByHandle(userHandle)); /* `%s has put the call on hold` */
 
@@ -274,10 +274,12 @@ export default class StreamNode extends MegaRenderMixin {
     render() {
         const {
             stream,
+            mode,
+            minimized,
             chatRoom,
             menu,
             className,
-            simpleTip,
+            simpletip,
             ephemeralAccounts,
             onClick,
             onCallMinimize,
@@ -292,12 +294,12 @@ export default class StreamNode extends MegaRenderMixin {
                     ${onClick ? 'clickable' : ''}
                     ${className ? className : ''}
                     ${this.state.loading !== StreamNode.LOADING_STATE.LOADED ? 'loading' : ''}
-                    ${simpleTip ? 'simpletip' : ''}
+                    ${simpletip ? 'simpletip' : ''}
                 `}
-                data-simpletip={simpleTip?.label}
-                data-simpletipposition={simpleTip?.position}
-                data-simpletipoffset={simpleTip?.offset}
-                data-simpletip-class={simpleTip?.className}
+                data-simpletip={simpletip?.label}
+                data-simpletipposition={simpletip?.position}
+                data-simpletipoffset={simpletip?.offset}
+                data-simpletip-class={simpletip?.className}
                 onClick={() => onClick && onClick(stream)}>
                 {stream && (
                     <>
@@ -314,7 +316,7 @@ export default class StreamNode extends MegaRenderMixin {
                         <div className="stream-node-content">
                             {SfuApp.VIDEO_DEBUG_MODE ? this.renderVideoDebugMode() : ''}
                             {this.renderContent()}
-                            {this.renderStatus()}
+                            {mode === Call.MODE.MINI || minimized ? null : this.renderStatus()}
                         </div>
                     </>
                 )}

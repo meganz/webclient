@@ -16211,6 +16211,7 @@ let StreamNode = (streamNode_dec = (0,mixins.M9)(30, true), streamNode_dec2 = (0
     this.renderStatus = () => {
       const {
         mode,
+        stream,
         chatRoom
       } = this.props;
       const {
@@ -16218,7 +16219,7 @@ let StreamNode = (streamNode_dec = (0,mixins.M9)(30, true), streamNode_dec2 = (0
         hasSlowNetwork,
         isOnHold,
         userHandle
-      } = this.props.stream;
+      } = stream;
 
       const $$CONTAINER = _ref => {
         let {
@@ -16384,10 +16385,12 @@ let StreamNode = (streamNode_dec = (0,mixins.M9)(30, true), streamNode_dec2 = (0
   render() {
     const {
       stream,
+      mode,
+      minimized,
       chatRoom,
       menu,
       className,
-      simpleTip,
+      simpletip,
       ephemeralAccounts,
       onClick,
       onCallMinimize,
@@ -16400,12 +16403,12 @@ let StreamNode = (streamNode_dec = (0,mixins.M9)(30, true), streamNode_dec2 = (0
                     ${onClick ? 'clickable' : ''}
                     ${className ? className : ''}
                     ${this.state.loading !== StreamNode.LOADING_STATE.LOADED ? 'loading' : ''}
-                    ${simpleTip ? 'simpletip' : ''}
+                    ${simpletip ? 'simpletip' : ''}
                 `,
-      "data-simpletip": simpleTip == null ? void 0 : simpleTip.label,
-      "data-simpletipposition": simpleTip == null ? void 0 : simpleTip.position,
-      "data-simpletipoffset": simpleTip == null ? void 0 : simpleTip.offset,
-      "data-simpletip-class": simpleTip == null ? void 0 : simpleTip.className,
+      "data-simpletip": simpletip == null ? void 0 : simpletip.label,
+      "data-simpletipposition": simpletip == null ? void 0 : simpletip.position,
+      "data-simpletipoffset": simpletip == null ? void 0 : simpletip.offset,
+      "data-simpletip-class": simpletip == null ? void 0 : simpletip.className,
       onClick: () => onClick && onClick(stream)
     }, stream && external_React_default().createElement((external_React_default()).Fragment, null, menu && external_React_default().createElement(StreamNodeMenu, {
       privilege: chatRoom && chatRoom.members[stream.userHandle],
@@ -16416,7 +16419,7 @@ let StreamNode = (streamNode_dec = (0,mixins.M9)(30, true), streamNode_dec2 = (0
       onSpeakerChange: onSpeakerChange
     }), external_React_default().createElement("div", {
       className: "stream-node-content"
-    }, SfuApp.VIDEO_DEBUG_MODE ? this.renderVideoDebugMode() : '', this.renderContent(), this.renderStatus())));
+    }, SfuApp.VIDEO_DEBUG_MODE ? this.renderVideoDebugMode() : '', this.renderContent(), mode === Call.MODE.MINI || minimized ? null : this.renderStatus())));
   }
 
 }, streamNode_class2.LOADING_STATE = {
@@ -16999,6 +17002,7 @@ class Stream extends mixins.wl {
     this.renderMiniMode = () => {
       const {
         call,
+        mode,
         isOnHold,
         forcedLocal,
         onLoadedData
@@ -17010,6 +17014,7 @@ class Stream extends mixins.wl {
 
       return external_React_default().createElement(StreamNode, {
         className: forcedLocal && !call.isSharingScreen() ? 'local-stream-mirrored' : '',
+        mode: mode,
         stream: this.getStreamSource(),
         onLoadedData: onLoadedData
       });
@@ -17019,6 +17024,7 @@ class Stream extends mixins.wl {
       const {
         call,
         isOnHold,
+        minimized,
         onLoadedData
       } = this.props;
       const {
@@ -17031,6 +17037,7 @@ class Stream extends mixins.wl {
 
       return external_React_default().createElement((external_React_default()).Fragment, null, external_React_default().createElement(StreamNode, {
         className: call.isSharingScreen() ? '' : 'local-stream-mirrored',
+        minimized: minimized,
         stream: this.getStreamSource(),
         onLoadedData: onLoadedData
       }), external_React_default().createElement("div", {
@@ -19519,7 +19526,7 @@ class Sidebar extends mixins.wl {
         mode: mode,
         chatRoom: chatRoom,
         stream: localStream,
-        simpleTip: { ...SIMPLE_TIP,
+        simpletip: { ...SIMPLE_TIP,
           label: l[8885]
         },
         isCallOnHold: isOnHold,
@@ -19537,7 +19544,7 @@ class Sidebar extends mixins.wl {
           mode: mode,
           chatRoom: chatRoom,
           stream: stream,
-          simpleTip: { ...SIMPLE_TIP,
+          simpletip: { ...SIMPLE_TIP,
             label: M.getNameByHandle(stream.userHandle)
           },
           isCallOnHold: isOnHold,

@@ -246,13 +246,22 @@
 
 .block-null-spinner,
 .top-mega-version {
-    background-position: -1000px;
     font: var(--text-body1-bold);
     color: var(--text-color-low);
     cursor: pointer;
-    white-space: nowrap;
 }
 
+.block-null-spinner {
+    flex: 0 0 auto;
+    -webkit-margin-end: 6px;
+    margin-inline-end: 6px;
+    white-space: nowrap;
+}
+.block-null-spinner.block-loading-spinner {
+    margin: 0 6px;
+    -webkit-margin-end: 12px;
+    margin-inline-end: 12px;
+}
 /* Side menu Account data block (logged in) */
 
 .top-menu-account-info {

@@ -585,15 +585,15 @@ mBroadcaster.once('boot_done', function radSetup() {
             const cn = 'block-loading-spinner';
             const cl = ev.target.classList;
             if (!cl.contains(cn)) {
-                cl.add(cn);
+                cl.add(cn, 'sprite-fm-theme');
                 await mega.rad.export().catch(dump);
-                cl.remove(cn);
+                cl.remove(cn, 'sprite-fm-theme');
             }
         };
 
         for (const elm of document.querySelectorAll('.top-mega-version')) {
             if (!elm.nextElementSibling || elm.nextElementSibling.nodeName === 'BUTTON') {
-                elm.after(parseHTML('<div class="block-null-spinner sprite-fm-theme">\u33D2&#127917;</div>'));
+                elm.after(parseHTML('<div class="block-null-spinner icon-loading-spinner">\u33D2&#127917;</div>'));
                 elm.nextElementSibling.addEventListener('click', exporter);
             }
         }

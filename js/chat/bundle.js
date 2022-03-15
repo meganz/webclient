@@ -21523,24 +21523,19 @@ class ConversationRightArea extends mixins.wl {
       onClick: () => {
         self.props.onAttachFromComputerClicked();
       }
-    }))), pushSettingsBtn, endCallButton, external_React_default().createElement("div", {
-      className: `
-                                    link-button
-                                    light
-                                    ${dontShowTruncateButton || !room.members.hasOwnProperty(u_handle) ? 'disabled' : ''}
-                                `,
-      onClick: e => {
-        if ($(e.target).closest('.disabled').length > 0) {
-          return false;
-        }
-
+    }))), pushSettingsBtn, endCallButton, external_React_default().createElement(ui_buttons.Button, {
+      className: "link-button light clear-history-button",
+      disabled: dontShowTruncateButton || !room.members.hasOwnProperty(u_handle),
+      onClick: () => {
         if (self.props.onTruncateClicked) {
           self.props.onTruncateClicked();
         }
       }
     }, external_React_default().createElement("i", {
       className: "sprite-fm-mono icon-remove"
-    }), external_React_default().createElement("span", null, l[8871])), retentionHistoryBtn, room.iAmOperator() && room.type === "public" ? external_React_default().createElement("div", {
+    }), external_React_default().createElement("span", {
+      className: "accordion-clear-history-text"
+    }, l[8871])), retentionHistoryBtn, room.iAmOperator() && room.type === "public" ? external_React_default().createElement("div", {
       className: "chat-enable-key-rotation-paragraph"
     }, AVseperator, external_React_default().createElement("div", {
       className: "link-button light " + (Object.keys(room.members).length > MAX_USERS_CHAT_PRIVATE ? " disabled" : ""),

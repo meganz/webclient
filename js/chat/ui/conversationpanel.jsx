@@ -52,14 +52,11 @@ export class JoinCallNotification extends MegaRenderMixin {
         return (
             <div className="in-call-notif neutral join">
                 <i className="sprite-fm-mono icon-phone"/>
-                <div
-                    onClick={() => chatRoom.joinCall()}>
-                    <ParsedHTML>
-                        {(l[20460] || 'There is an active group call. [A]Join[/A]')
-                            .replace('[A]', '<button class="mega-button positive joinActiveCall small">')
-                            .replace('[/A]', '</button>')}
-                    </ParsedHTML>
-                </div>
+                <ParsedHTML onClick={() => chatRoom.joinCall()}>
+                    {(l[20460] || 'There is an active group call. [A]Join[/A]')
+                        .replace('[A]', '<button class="mega-button positive joinActiveCall small">')
+                        .replace('[/A]', '</button>')}
+                </ParsedHTML>
             </div>
         );
     }
@@ -514,24 +511,17 @@ export class ConversationRightArea extends MegaRenderMixin {
                             {pushSettingsBtn}
                             {endCallButton}
 
-                            <div
-                                className={`
-                                    link-button
-                                    light
-                                    ${dontShowTruncateButton || !room.members.hasOwnProperty(u_handle) ?
-                                    'disabled' : ''}
-                                `}
-                                onClick={e => {
-                                    if ($(e.target).closest('.disabled').length > 0) {
-                                        return false;
-                                    }
+                            <Button
+                                className="link-button light clear-history-button"
+                                disabled={dontShowTruncateButton || !room.members.hasOwnProperty(u_handle)}
+                                onClick={() => {
                                     if (self.props.onTruncateClicked) {
                                         self.props.onTruncateClicked();
                                     }
                                 }}>
                                 <i className="sprite-fm-mono icon-remove" />
-                                <span>{l[8871] /* `Clear Chat History` */}</span>
-                            </div>
+                                <span className="accordion-clear-history-text">{l[8871] /* Clear Chat History */}</span>
+                            </Button>
 
                                 {retentionHistoryBtn}
 

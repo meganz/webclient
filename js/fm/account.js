@@ -63,7 +63,7 @@ function accountUI() {
         }, 300);
     }, 1);
 
-    
+
 }
 
 accountUI.renderAccountPage = function(account) {
@@ -1258,11 +1258,17 @@ accountUI.account = {
                 const $bm = $('.bmonth', $birthdayBlock);
                 const $by = $('.byear', $birthdayBlock);
 
-                const bd = parseInt($bd.val());
-                const bm = parseInt($bm.val());
-                const by = parseInt($by.val());
+                const bd = $bd.val();
+                const bm = $bm.val();
+                const by = $by.val();
 
-                if (M.validateDate(bd, bm, by) !== 0) {
+                // Check whether the birthday info gets changed
+                const bd_old = u_attr.birthday || '';
+                const bm_old = u_attr.birthmonth || '';
+                const by_old = u_attr.birthyear || '';
+                const birthdayChanged = bd_old !== bd || bm_old !== bm || by_old !== by;
+
+                if (birthdayChanged && M.validateDate(parseInt(bd), parseInt(bm), parseInt(by)) !== 0) {
 
                     const $parent = $bd.parent().addClass('error msg');
                     var $msg = $('.message-container', $parent).text(l[20960]);
@@ -2290,17 +2296,17 @@ accountUI.plan = {
                     }
 
                     // Set payment method
-                    var paymentMethodId = purchaseTransaction[4];
-                    var paymentMethod = pro.getPaymentGatewayName(paymentMethodId).displayName;
+                    const paymentMethodId = purchaseTransaction[4];
+                    const paymentMethod = pro.getPaymentGatewayName(paymentMethodId).displayName;
 
                     // Set Date/Time, Item (plan purchased), Amount, Payment Method
-                    var dateTime = time2date(purchaseTransaction[1]);
-                    var price = purchaseTransaction[2];
-                    var proNum = purchaseTransaction[5];
-                    var planIcon;
-                    var numOfMonths = purchaseTransaction[6];
-                    var monthWording = (numOfMonths === 1) ? l[931] : 'months';  // Todo: l[6788] when generated
-                    var item = pro.getProPlanName(proNum) + ' (' + numOfMonths + ' ' + monthWording + ')';
+                    const dateTime = time2date(purchaseTransaction[1]);
+                    const price = purchaseTransaction[2];
+                    const proNum = purchaseTransaction[5];
+                    let planIcon;
+                    const numOfMonths = purchaseTransaction[6];
+                    const monthWording = numOfMonths === 1 ? l[931] : l[6788];
+                    const item = `${pro.getProPlanName(proNum)} (${numOfMonths} ${monthWording})`;
 
                     if (proNum === 4) {
                         planIcon = 'lite';
@@ -3030,7 +3036,12 @@ accountUI.fileManagement = {
 
                 var value = account.ssrs ? account.ssrs : (u_attr.p ? 90 : 30);
 
-                $('#rad14_opt', accountUI.$contentBlock).val(value);
+                var rad14_optString = mega.icu.format(l.clear_rub_bin_days, value);
+                var rad14_optArray = rad14_optString.split(/\[A]|\[\/A]/);
+
+                $('#rad14_opt', accountUI.$contentBlock).val(rad14_optArray[1]);
+                $('#rad14_opt_txt_1', accountUI.$contentBlock).text(rad14_optArray[0]);
+                $('#rad14_opt_txt_2', accountUI.$contentBlock).text(rad14_optArray[2]);
 
                 if (!value) {
                     $rubschedOptions.addClass('hidden');
@@ -3111,6 +3122,11 @@ accountUI.fileManagement = {
                     var minVal = 7;
                     maxVal = u_attr.p ? Math.pow(2, 53) : 30;
                     curVal = Math.min(Math.max(curVal, minVal), maxVal);
+                    var rad14_optString = mega.icu.format(l.clear_rub_bin_days, curVal);
+                    var rad14_optArray = rad14_optString.split(/\[A]|\[\/A]/);
+                    curVal = rad14_optArray[1];
+                    $('#rad14_opt_txt_1', accountUI.$contentBlock).text(rad14_optArray[0]);
+                    $('#rad14_opt_txt_2', accountUI.$contentBlock).text(rad14_optArray[2]);
                 }
 
                 if (this.id === 'rad15_opt') { // For size option
@@ -3510,7 +3526,12 @@ accountUI.contactAndChat = {
                 }
 
                 // Auto-away input box
-                $('input#autoaway', $sectionContainerChat).val(autoawaytimeout / 60);
+                var autoAwayString = mega.icu.format(l[20206], autoawaytimeout / 60);
+                var autoAwayArray = autoAwayString.split(/\[A]|\[\/A]/);
+
+                $('#autoaway_txt_1', $sectionContainerChat).text(autoAwayArray[0]);
+                $('input#autoaway', $sectionContainerChat).val(autoAwayArray[1]);
+                $('#autoaway_txt_2', $sectionContainerChat).text(autoAwayArray[2]);
 
                 // Always editable for user comfort -
                 accountUI.controls.enableElement($('input#autoaway', $sectionContainerChat));

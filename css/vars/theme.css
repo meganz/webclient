@@ -138,9 +138,11 @@ body {
         --transition-border: border 200ms ease-in-out;
         --transition-color: color 200ms ease-in-out;
         --transition-bg-color: background-color 200ms ease-in-out;
+        --transition-height: height 200ms ease-in-out;
         --transition-opacity: opacity 200ms ease-in-out;
         --transition-padding: padding 200ms ease-in-out;
         --transition-shadow: box-shadow 200ms ease-in-out;
+        --transition-width: width 200ms ease-in-out;
 }
 
 

@@ -3188,22 +3188,23 @@ ChatRoom.prototype.getRetentionLabel = function (retentionTime) {
   retentionTime = retentionTime || this.retentionTime;
   const days = secondsToDays(retentionTime);
   const months = Math.floor(days / 30);
+  const hours = secondsToHours(retentionTime);
 
   switch (this.getRetentionFormat(retentionTime)) {
     case RETENTION_FORMAT.DISABLED:
       return l[7070];
 
     case RETENTION_FORMAT.MONTHS:
-      return `${months} ${months === 1 ? l[913] : l[6788]}`;
+      return mega.icu.format(l.months_chat_history_plural, months);
 
     case RETENTION_FORMAT.WEEKS:
-      return `${days / 7} ${days / 7 === 1 ? l[16292] : l[16293]}`;
+      return mega.icu.format(l.weeks_chat_history_plural, days / 7);
 
     case RETENTION_FORMAT.DAYS:
-      return `${days} ${days === 1 ? l[930] : l[16290]}`;
+      return mega.icu.format(l.days_chat_history_plural, days);
 
     case RETENTION_FORMAT.HOURS:
-      return `${secondsToHours(retentionTime)} ${secondsToHours(retentionTime) === 1 ? l[7133] : l[7132]}`;
+      return mega.icu.format(l.hours_chat_history_plural, hours);
   }
 };
 
@@ -6924,7 +6925,7 @@ class ContactPickerWidget extends _mixins1__.wl {
     }
 
     const totalContactsNum = contacts.length + frequentContacts.length;
-    const searchPlaceholderMsg = totalContactsNum === 1 ? l[23749] : l[23750].replace('[X]', totalContactsNum);
+    const searchPlaceholderMsg = mega.icu.format(l.search_contact_placeholder, totalContactsNum);
     return react0().createElement("div", {
       ref: this.containerRef,
       className: `
@@ -9227,7 +9228,7 @@ class HistoryRetentionDialog extends external_React_.Component {
     super(...arguments);
     this.inputRef = external_React_default().createRef();
     this.state = {
-      selectedTimeFormat: HistoryRetentionDialog.labels.timeFormats.plural.hours,
+      selectedTimeFormat: HistoryRetentionDialog.labels.timeFormats.labelPlural.hours,
       prevTimeRange: undefined,
       timeRange: undefined
     };
@@ -9274,28 +9275,28 @@ class HistoryRetentionDialog extends external_React_.Component {
       } = HistoryRetentionDialog.labels;
 
       switch (true) {
-        case selectedTimeFormat === timeFormats.plural[l[7132]]:
+        case selectedTimeFormat === timeFormats.labelPlural[l[7132]]:
           return LIMIT.HOURS;
 
-        case selectedTimeFormat === timeFormats.plural[l[16290]]:
+        case selectedTimeFormat === timeFormats.labelPlural[l[16290]]:
           return LIMIT.DAYS;
 
-        case selectedTimeFormat === timeFormats.plural[l[16293]]:
+        case selectedTimeFormat === timeFormats.labelPlural[l[16293]]:
           return LIMIT.WEEKS;
 
-        case selectedTimeFormat === timeFormats.plural[l[6788]]:
+        case selectedTimeFormat === timeFormats.labelPlural[l[6788]]:
           return LIMIT.MONTHS;
       }
     };
 
-    this.getParsedLabel = (label, timeRange) => {
-      timeRange = parseInt(timeRange, 10);
+    this.getParsedLabel = (label, timeRange, radioBut) => {
+      timeRange = !timeRange ? this.getDefaultValue(label) : parseInt(timeRange, 10);
 
-      if (timeRange !== 1) {
-        return HistoryRetentionDialog.labels.timeFormats.plural[label];
+      if (radioBut === true) {
+        return HistoryRetentionDialog.labels.timeFormats.labelPlural[label];
       }
 
-      return HistoryRetentionDialog.labels.timeFormats.singular[label];
+      return mega.icu.format(HistoryRetentionDialog.labels.timeFormats.inputs[label], timeRange);
     };
 
     this.handleOnChange = e => {
@@ -9354,7 +9355,7 @@ class HistoryRetentionDialog extends external_React_.Component {
         selectedTimeFormat
       } = this.state;
       const time = HistoryRetentionDialog.timeFrame[selectedTimeFormat] * Number(this.state.timeRange);
-      const IS_HOURS = selectedTimeFormat === HistoryRetentionDialog.labels.timeFormats.plural[l[7132]];
+      const IS_HOURS = selectedTimeFormat === HistoryRetentionDialog.labels.timeFormats.labelPlural[l[7132]];
       chatRoom.setRetention(IS_HOURS ? hoursToSeconds(time) : daysToSeconds(time), IS_HOURS);
       onClose();
     };
@@ -9374,10 +9375,10 @@ class HistoryRetentionDialog extends external_React_.Component {
     };
 
     this.renderCustomRadioButton = () => {
-      return Object.values(HistoryRetentionDialog.labels.timeFormats.plural).map(label => {
+      return Object.values(HistoryRetentionDialog.labels.timeFormats.labelPlural).map(label => {
         return external_React_default().createElement(CustomRadioButton, {
           checked: this.state.selectedTimeFormat === label,
-          label: this.getParsedLabel(label, this.state.timeRange),
+          label: this.getParsedLabel(label, this.state.timeRange, true),
           name: "time-selector",
           value: label,
           onChange: this.handleOnChange,
@@ -9421,7 +9422,7 @@ class HistoryRetentionDialog extends external_React_.Component {
       className: "form-section"
     }, external_React_default().createElement("span", {
       className: "form-section-placeholder"
-    }, this.getParsedLabel(selectedTimeFormat, this.state.timeRange)), external_React_default().createElement("input", {
+    }, this.getParsedLabel(selectedTimeFormat, this.state.timeRange).split(" ")[1]), external_React_default().createElement("input", {
       type: "number",
       min: "0",
       step: "1",
@@ -9453,17 +9454,17 @@ class HistoryRetentionDialog extends external_React_.Component {
 HistoryRetentionDialog.keydown = 'keydown.historyRetentionDialog';
 HistoryRetentionDialog.labels = {
   timeFormats: {
-    plural: {
+    labelPlural: {
       [l[7132]]: l[7132],
       [l[16290]]: l[16290],
       [l[16293]]: l[16293],
       [l[6788]]: l[6788]
     },
-    singular: {
-      [l[7132]]: l[7133],
-      [l[16290]]: l[930],
-      [l[16293]]: l[16292],
-      [l[6788]]: l[913]
+    inputs: {
+      [l[7132]]: l.hours_chat_history_plural,
+      [l[16290]]: l.days_chat_history_plural,
+      [l[16293]]: l.weeks_chat_history_plural,
+      [l[6788]]: l.months_chat_history_plural
     }
   },
   copy: {
@@ -9962,7 +9963,7 @@ class AbstractGenericMessage extends mixin.y {
     }, this.getName && this.getName(), this.getMessageTimestamp ? this.getMessageTimestamp() : grouped ? null : external_React_default().createElement("div", {
       className: "message date-time simpletip",
       "data-simpletip": time2date(this.getTimestamp())
-    }, this.getTimestampAsString()), !hideActionButtons && this.getMessageActionButtons && this.renderMessageActionButtons(this.getMessageActionButtons()), this.getContents && this.getContents(), this.getEmojisImages()));
+    }, this.getTimestampAsString()), !hideActionButtons && this.getMessageActionButtons && this.renderMessageActionButtons(this.getMessageActionButtons()), this.getContents && this.getContents(), hideActionButtons ? null : this.getEmojisImages()));
   }
 
 }
@@ -13145,6 +13146,22 @@ class Text extends AbstractGenericMessage {
       returnedButtons.push(messageActionButtons);
     }
 
+    if (message.messageHtml.includes('<pre class="rtf-multi">') && message.messageHtml.includes('</pre>')) {
+      returnedButtons.push(external_React_default().createElement(ui_buttons.Button, {
+        key: "copy-msg",
+        className: "tiny-button simpletip",
+        icon: "sprite-fm-mono icon-copy",
+        attrs: {
+          'data-simpletip': l.copy_txt_block_tip,
+          'data-simpletipoffset': '3',
+          'data-simpletipposition': 'top'
+        },
+        onClick: () => {
+          copyToClipboard(message.textContents.replace(/```/g, ''), l.copy_txt_block_toast);
+        }
+      }));
+    }
+
     if (parentButtons) {
       returnedButtons.push(parentButtons);
     }
@@ -16211,6 +16228,7 @@ let StreamNode = (streamNode_dec = (0,mixins.M9)(30, true), streamNode_dec2 = (0
     this.renderStatus = () => {
       const {
         mode,
+        stream,
         chatRoom
       } = this.props;
       const {
@@ -16218,7 +16236,7 @@ let StreamNode = (streamNode_dec = (0,mixins.M9)(30, true), streamNode_dec2 = (0
         hasSlowNetwork,
         isOnHold,
         userHandle
-      } = this.props.stream;
+      } = stream;
 
       const $$CONTAINER = _ref => {
         let {
@@ -16384,10 +16402,12 @@ let StreamNode = (streamNode_dec = (0,mixins.M9)(30, true), streamNode_dec2 = (0
   render() {
     const {
       stream,
+      mode,
+      minimized,
       chatRoom,
       menu,
       className,
-      simpleTip,
+      simpletip,
       ephemeralAccounts,
       onClick,
       onCallMinimize,
@@ -16400,12 +16420,12 @@ let StreamNode = (streamNode_dec = (0,mixins.M9)(30, true), streamNode_dec2 = (0
                     ${onClick ? 'clickable' : ''}
                     ${className ? className : ''}
                     ${this.state.loading !== StreamNode.LOADING_STATE.LOADED ? 'loading' : ''}
-                    ${simpleTip ? 'simpletip' : ''}
+                    ${simpletip ? 'simpletip' : ''}
                 `,
-      "data-simpletip": simpleTip == null ? void 0 : simpleTip.label,
-      "data-simpletipposition": simpleTip == null ? void 0 : simpleTip.position,
-      "data-simpletipoffset": simpleTip == null ? void 0 : simpleTip.offset,
-      "data-simpletip-class": simpleTip == null ? void 0 : simpleTip.className,
+      "data-simpletip": simpletip == null ? void 0 : simpletip.label,
+      "data-simpletipposition": simpletip == null ? void 0 : simpletip.position,
+      "data-simpletipoffset": simpletip == null ? void 0 : simpletip.offset,
+      "data-simpletip-class": simpletip == null ? void 0 : simpletip.className,
       onClick: () => onClick && onClick(stream)
     }, stream && external_React_default().createElement((external_React_default()).Fragment, null, menu && external_React_default().createElement(StreamNodeMenu, {
       privilege: chatRoom && chatRoom.members[stream.userHandle],
@@ -16416,7 +16436,7 @@ let StreamNode = (streamNode_dec = (0,mixins.M9)(30, true), streamNode_dec2 = (0
       onSpeakerChange: onSpeakerChange
     }), external_React_default().createElement("div", {
       className: "stream-node-content"
-    }, SfuApp.VIDEO_DEBUG_MODE ? this.renderVideoDebugMode() : '', this.renderContent(), this.renderStatus())));
+    }, SfuApp.VIDEO_DEBUG_MODE ? this.renderVideoDebugMode() : '', this.renderContent(), mode === Call.MODE.MINI || minimized ? null : this.renderStatus())));
   }
 
 }, streamNode_class2.LOADING_STATE = {
@@ -16999,6 +17019,7 @@ class Stream extends mixins.wl {
     this.renderMiniMode = () => {
       const {
         call,
+        mode,
         isOnHold,
         forcedLocal,
         onLoadedData
@@ -17010,6 +17031,7 @@ class Stream extends mixins.wl {
 
       return external_React_default().createElement(StreamNode, {
         className: forcedLocal && !call.isSharingScreen() ? 'local-stream-mirrored' : '',
+        mode: mode,
         stream: this.getStreamSource(),
         onLoadedData: onLoadedData
       });
@@ -17019,6 +17041,7 @@ class Stream extends mixins.wl {
       const {
         call,
         isOnHold,
+        minimized,
         onLoadedData
       } = this.props;
       const {
@@ -17031,6 +17054,7 @@ class Stream extends mixins.wl {
 
       return external_React_default().createElement((external_React_default()).Fragment, null, external_React_default().createElement(StreamNode, {
         className: call.isSharingScreen() ? '' : 'local-stream-mirrored',
+        minimized: minimized,
         stream: this.getStreamSource(),
         onLoadedData: onLoadedData
       }), external_React_default().createElement("div", {
@@ -19519,7 +19543,7 @@ class Sidebar extends mixins.wl {
         mode: mode,
         chatRoom: chatRoom,
         stream: localStream,
-        simpleTip: { ...SIMPLE_TIP,
+        simpletip: { ...SIMPLE_TIP,
           label: l[8885]
         },
         isCallOnHold: isOnHold,
@@ -19537,7 +19561,7 @@ class Sidebar extends mixins.wl {
           mode: mode,
           chatRoom: chatRoom,
           stream: stream,
-          simpleTip: { ...SIMPLE_TIP,
+          simpletip: { ...SIMPLE_TIP,
             label: M.getNameByHandle(stream.userHandle)
           },
           isCallOnHold: isOnHold,
@@ -21134,9 +21158,9 @@ class JoinCallNotification extends mixins.wl {
       className: "in-call-notif neutral join"
     }, external_React_default().createElement("i", {
       className: "sprite-fm-mono icon-phone"
-    }), external_React_default().createElement("div", {
+    }), external_React_default().createElement(utils.ParsedHTML, {
       onClick: () => chatRoom.joinCall()
-    }, external_React_default().createElement(utils.ParsedHTML, null, (l[20460] || 'There is an active group call. [A]Join[/A]').replace('[A]', '<button class="mega-button positive joinActiveCall small">').replace('[/A]', '</button>'))));
+    }, (l[20460] || 'There is an active group call. [A]Join[/A]').replace('[A]', '<button class="mega-button positive joinActiveCall small">').replace('[/A]', '</button>')));
   }
 
 }
@@ -21500,24 +21524,19 @@ class ConversationRightArea extends mixins.wl {
       onClick: () => {
         self.props.onAttachFromComputerClicked();
       }
-    }))), pushSettingsBtn, endCallButton, external_React_default().createElement("div", {
-      className: `
-                                    link-button
-                                    light
-                                    ${dontShowTruncateButton || !room.members.hasOwnProperty(u_handle) ? 'disabled' : ''}
-                                `,
-      onClick: e => {
-        if ($(e.target).closest('.disabled').length > 0) {
-          return false;
-        }
-
+    }))), pushSettingsBtn, endCallButton, external_React_default().createElement(ui_buttons.Button, {
+      className: "link-button light clear-history-button",
+      disabled: dontShowTruncateButton || !room.members.hasOwnProperty(u_handle),
+      onClick: () => {
         if (self.props.onTruncateClicked) {
           self.props.onTruncateClicked();
         }
       }
     }, external_React_default().createElement("i", {
       className: "sprite-fm-mono icon-remove"
-    }), external_React_default().createElement("span", null, l[8871])), retentionHistoryBtn, room.iAmOperator() && room.type === "public" ? external_React_default().createElement("div", {
+    }), external_React_default().createElement("span", {
+      className: "accordion-clear-history-text"
+    }, l[8871])), retentionHistoryBtn, room.iAmOperator() && room.type === "public" ? external_React_default().createElement("div", {
       className: "chat-enable-key-rotation-paragraph"
     }, AVseperator, external_React_default().createElement("div", {
       className: "link-button light " + (Object.keys(room.members).length > MAX_USERS_CHAT_PRIVATE ? " disabled" : ""),

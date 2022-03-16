@@ -346,13 +346,10 @@
             }
         };
 
-        var setTitle = function() {
-            $('header h2', $dialog)
-                .text(
-                    items.length < 2
-                        ? l[19338]
-                        : escapeHTML(l[19339]).replace('[X]', items.length)
-                );
+        let title = mega.icu.format(l[19339], items.length);
+        const setTitle = function() {
+            title = mega.icu.format(l[19339], items.length);
+            $('header h2', $dialog).text(title);
         };
 
         if ($.saveToDialogNode) {
@@ -438,7 +435,7 @@
                     }
                 }
 
-                var pluralText = items.length > 2 ? l[23250].replace('[X]', items.length - 1) : l[23249];
+                const pluralText = mega.icu.format(l.items_other_count, items.length - 1);
                 $div.safeAppend(
                     '<div class="item-row" data-node="@@">' +
                     '    <div class="transfer-filetype-icon file @@"></div>' +
@@ -567,9 +564,7 @@
 
         if ($.copyToUpload) {
             var len = $.copyToUpload[0].length;
-            return len < 2
-                ? l[19338]
-                : escapeHTML(l[19339]).replace('[X]', len);
+            return mega.icu.format(l[19339], len);
         }
 
         if ($.saveToDialog) {

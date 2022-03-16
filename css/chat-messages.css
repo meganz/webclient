@@ -1056,18 +1056,23 @@ body.theme-dark .message .audio-player {
     justify-content: center;
     background: var(--surface-grey-3);
 }
-.message.content-area > .right-aligned-msg-buttons.total-2 > .reactions-button {
+.message.content-area > .right-aligned-msg-buttons.total-2 > .reactions-button,
+.message.content-area > .right-aligned-msg-buttons.total-3 > .reactions-button {
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
     margin-left: -2px;
 }
-.message.content-area > .right-aligned-msg-buttons.total-2 > .tiny-button:not(.reactions-button) {
+.message.content-area > .right-aligned-msg-buttons.total-2 > .tiny-button:not(.reactions-button),
+.message.content-area > .right-aligned-msg-buttons.total-3 > .tiny-button:not(.reactions-button) {
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
     border-left: transparent;
 }
 .message.content-area > .right-aligned-msg-buttons.total-2 > .tiny-button {
     box-shadow: 0 0 0 0 rgba(0, 0, 0, 0.15);
+}
+.message.content-area > .right-aligned-msg-buttons.total-3 > .tiny-button.copy-txt-block {
+    border-radius: 0;
 }
 .right-aligned-msg-buttons.total-1 .reactions-button,
 .right-aligned-msg-buttons.total-1 .reactions-button::before,
@@ -1084,6 +1089,9 @@ body.theme-dark .message .audio-player {
 .right-aligned-msg-buttons i {
     --icon-size: 24px;
     --mask-color: var(--icon-rest);
+}
+.right-aligned-msg-buttons i.icon-copy {
+    --icon-size: 16px;
 }
 
 

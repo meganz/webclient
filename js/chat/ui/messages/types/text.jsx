@@ -149,6 +149,27 @@ export default class Text extends AbstractGenericMessage {
         if (messageActionButtons) {
             returnedButtons.push(messageActionButtons);
         }
+        if (message.messageHtml.includes('<pre class="rtf-multi">') && message.messageHtml.includes('</pre>')) {
+            returnedButtons.push(
+                <Button
+                    key="copy-msg"
+                    className="tiny-button simpletip copy-txt-block"
+                    icon="sprite-fm-mono icon-copy"
+                    attrs={{
+                        'data-simpletip': l.copy_txt_block_tip, /* Copy text block to clipboard. */
+                        'data-simpletipoffset': '3',
+                        'data-simpletipposition': 'top'
+                    }}
+                    onClick={() => {
+                        copyToClipboard(
+                            // Grab text from all blocks
+                            message.textContents.replace(/```/g, ''),
+                            l.copy_txt_block_toast /* Text block copied to clipboard */
+                        );
+                    }}
+                />
+            );
+        }
         if (parentButtons) {
             returnedButtons.push(parentButtons);
         }

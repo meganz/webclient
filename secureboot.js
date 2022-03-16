@@ -2848,7 +2848,6 @@ else if (!browserUpdate) {
     // Sprites
     jsl.push({f:'css/sprites/fm-uni@uni.css', n: 'fm_uni_css', j:2, w:30, c:1, d:1, cache:1});
     jsl.push({f:'css/sprites/fm-mono@mono.css', n: 'fm_mono_css', j:2, w:30, c:1, d:1, cache:1});
-    jsl.push({f:'css/theme-sprite.css', n: 'theme_sprite_css', j:2, w:30, c:1, d:1, cache:1});
     jsl.push({f:'css/sprites/fm-theme@dark.css', n: 'fm_dark_css', j:2, w:30, c:1, d:1, cache:1});
     jsl.push({f:'css/sprites/fm-theme@light.css', n: 'fm_light_css', j:2, w:30, c:1, d:1, cache:1});
     jsl.push({f:'css/sprites/fm-illustrations.css', n: 'fm_illustration_css', j:2, w:30, c:1, d:1, cache:1});
@@ -3178,7 +3177,6 @@ else if (!browserUpdate) {
         // Sprites
         jsl.push({f:'css/sprites/fm-uni@uni.css', n: 'fm_uni_css', j:2, w:30, c:1, d:1, cache:1});
         jsl.push({f:'css/sprites/fm-mono@mono.css', n: 'fm_mono_css', j:2, w:30, c:1, d:1, cache:1});
-        jsl.push({f:'css/theme-sprite.css', n: 'theme_sprite_css', j:2, w:30, c:1, d:1, cache:1});
         jsl.push({f:'css/sprites/fm-theme@light.css', n: 'fm_light_css', j:2, w:30, c:1, d:1, cache:1});
         jsl.push({f:'css/sprites/fm-illustrations.css', n: 'fm_illustration_css', j:2, w:30, c:1, d:1, cache:1});
 

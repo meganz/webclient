@@ -21,6 +21,7 @@
     display: none;
 }
 .download.download-page.video-theatre-mode.video .download.main-pad {
+    border-radius: 0;
     width: 100%;
     max-width: 100%;
     margin: 0;

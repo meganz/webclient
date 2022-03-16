@@ -24,6 +24,15 @@ var affiliateprogram = {
 
         this.$contentBlock = $('.bottom-page.affiliate-page');
 
+        // give a default value of 10 to load the string correctly
+        let usersString = mega.icu.format(l[22762], 10);
+        usersString = usersString.replace('[S1]', '<span class="dropdown-lnk" data-type="number">')
+            .replace('[/S1]', '</span>')
+            .replace('[S2]%1[/S2]', '<span class="dropdown-lnk" data-type="plan">PRO I</span>')
+            .replace('[S3]%2[/S3]', `<span class="dropdown-lnk" data-type="time">${l[16292]}</span>`)
+            .replace('[S4]*[/S4]', '<div class="ref-asterisk">*</div>');
+        $(".affitiate.calc-header", this.$contentBlock).safeHTML(usersString);
+
         this.initFaqEvents();
         this.initCalcDropdowns();
         this.fillNumberDropdown(100);
@@ -147,14 +156,14 @@ var affiliateprogram = {
                 }
 
                 self[type] = newvalue;
+                let usersString = mega.icu.format(l[22762], self.number);
+                usersString = usersString.replace('[S1]', '<span class="dropdown-lnk" data-type="number">')
+                    .replace('[/S1]', '</span>')
+                    .replace('[S2]%1[/S2]', '<span class="dropdown-lnk" data-type="plan">PRO I</span>')
+                    .replace('[S3]%2[/S3]', `<span class="dropdown-lnk" data-type="time">${l[16292]}</span>`)
+                    .replace('[S4]*[/S4]', '<div class="ref-asterisk">*</div>');
+                $wrapper.safeHTML(usersString);
 
-                if (self.number === 1) {
-                    $wrapper.safeHTML(l[23048]);
-                }
-                else {
-                    $wrapper.safeHTML(l[22762]);
-                    $('[data-type="number"]', $wrapper).text(self.number);
-                }
 
                 $('[data-type="plan"]', $wrapper).text(pro.getProPlanName(self.plan));
                 $('[data-type="time"]', $wrapper).text(_getLocaleTime());

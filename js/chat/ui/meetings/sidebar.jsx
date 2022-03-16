@@ -66,7 +66,7 @@ export default class Sidebar extends MegaRenderMixin {
                                 mode={mode}
                                 chatRoom={chatRoom}
                                 stream={localStream}
-                                simpleTip={{...SIMPLE_TIP, label: l[8885]}}
+                                simpletip={{...SIMPLE_TIP, label: l[8885]}}
                                 isCallOnHold={isOnHold}
                                 className={`
                                     ${call.isSharingScreen() ? '' : 'local-stream-mirrored'}
@@ -84,7 +84,7 @@ export default class Sidebar extends MegaRenderMixin {
                                         mode={mode}
                                         chatRoom={chatRoom}
                                         stream={stream}
-                                        simpleTip={{...SIMPLE_TIP, label: M.getNameByHandle(stream.userHandle)}}
+                                        simpletip={{...SIMPLE_TIP, label: M.getNameByHandle(stream.userHandle)}}
                                         isCallOnHold={isOnHold}
                                         className={
                                             stream.isActive || stream.clientId === call.forcedActiveStream ?

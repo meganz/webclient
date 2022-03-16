@@ -1848,9 +1848,21 @@ var exportExpiry = {
                     return value;
                 };
 
+                time = getValue('input', $time) ? getValue('input', $time) : 0;
+                const timeString = mega.icu.format(l.start_video_at_embed, time);
+                const timeArray = timeString.split(/\[A]|\[\/A]/);
+
+                $('#embed_start_at_txt_1', $embedTab).text(timeArray[0]);
+                $('#embed_start_at_txt_2', $time).text(timeArray[2]);
+
                 if (!$time.hasClass('disabled')) {
                     time = getValue('input', $time);
                     optionAdded = true;
+                    const timeStringD = mega.icu.format(l.start_video_at_embed, time);
+                    const timeArrayD = timeStringD.split(/\[A]|\[\/A]/);
+
+                    $('#embed_start_at_txt_1', $embedTab).text(timeArrayD[0]);
+                    $('#embed_start_at_txt_2', $time).text(timeArrayD[2]);
                 }
 
                 if (!$vres.hasClass('disabled')) {
@@ -2079,11 +2091,11 @@ var exportExpiry = {
                 // If the button copies Keys only
                 if (mode) {
                     linksNum = $item ? 1 : $links.length - pwProtectedNum;
-                    toastTxt = linksNum > 1 ? l[23663].replace('%d', linksNum) : l[23664];
+                    toastTxt = mega.icu.format(l.toast_copy_key, linksNum);
                 }
                 else {
                     linksNum = $item ? 1 : $links.length;
-                    toastTxt = linksNum > 1 ? l[7655].replace('%d', linksNum) : l[7654];
+                    toastTxt = mega.icu.format(l.toast_copy_link, linksNum);
                 }
 
                 // Set toast notification and data to copy

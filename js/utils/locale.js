@@ -346,24 +346,13 @@ function time2last(timestamp, skipSeconds) {
     else if (sec < 59) {
         return l[873].replace('[X]', Math.ceil(sec));
     }
-    else if (sec < 90) {
-        return l[874];
-    }
     else if (sec < 3540) {
-        return l[875].replace('[X]', Math.ceil(sec / 60));
-    }
-    else if (sec < 4500) {
-        return l[876];
+        return mega.icu.format(l.minute_last_count, Math.ceil(sec / 60));
     }
     else if (sec < 82000) {
-        return l[877].replace('[X]', Math.ceil(sec / 3600));
+        return mega.icu.format(l.hour_last_count, Math.ceil(sec / 3600));
     }
-    else if (sec < 110000) {
-        return l[878];
-    }
-    else {
-        return l[879].replace('[X]', Math.ceil(sec / 86400));
-    }
+    return mega.icu.format(l.day_last_count, Math.ceil(sec / 86400));
 }
 
 /*
@@ -1272,9 +1261,6 @@ mBroadcaster.once('boot_done', function populate_l() {
             .replace('$1', '0 MB').replace('$2', '0');
     }
 
-    l[20206] = l[20206].replace('[S1]', '<span>').replace('[/S1]', '</span>')
-        .replace('[S2]', '<span>').replace('[/S2]', '</span>')
-        .replace('%1', '<span class="account-counter-number  short"><input type="text" id="autoaway"></span>');
     l[20223] = l[20223].replace('%1', '24');  // 24 hours
 
     // Keep the word 'a' with the previous word by using non breaking space (TR76417)
@@ -1347,9 +1333,6 @@ mBroadcaster.once('boot_done', function populate_l() {
     l[22732] = l[22732].replace('[B]', '<strong>').replace('[/B]', '</strong>');
     l[22734] = l[22734].replace('[A]', '<a href="/terms" class="clickurl">').replace('[/A]', '</a>');
     l[22736] = l[22736].replace('[B]', '<strong>').replace('[/B]', '</strong>');
-    l[22762] = l[22762].replace('[S1]%1[/S1]', '<span class="dropdown-lnk" data-type="number">10</span>')
-        .replace('[S2]%2[/S2]', '<span class="dropdown-lnk" data-type="plan">PRO I</span>')
-        .replace('[S3]%3[/S3]', '<span class="dropdown-lnk" data-type="time">' + l[16292] + '</span>');
     l[22764] = l[22764].replace('[S]', '<span class="calc-price-week">').replace('[/S]', '</span>').replace('%1', '');
     l['22771.a'] = l[22771].replace('[B]', '').replace('[/B]', '');
     l[22771] = l[22771].replace('[B]', '<strong>').replace('[/B]', '</strong>');
@@ -1372,9 +1355,6 @@ mBroadcaster.once('boot_done', function populate_l() {
     l[22898] = l[22898].replace('[A]', '<a class="clickurl" href="/mobile">').replace('[/A]', '</a>')
         .replace('[BR]', '<br>');
     l[22900] = l[22900].replace('[A]', '<a class="reg-success-change-email-btn">').replace('[/A]', '</a>');
-    l[23048] = l[23048].replace('[S1]1[/S1]', '<span class="dropdown-lnk" data-type="number">1</span>')
-        .replace('[S2]%2[/S2]', '<span class="dropdown-lnk" data-type="plan"></span>')
-        .replace('[S3]%3[/S3]', '<span class="dropdown-lnk" data-type="time"></span>');
     l['23062.k'] = l[23062].replace('[%s]', l[7049]);
     l[23066] = l[23066].replace('[A]', '<a class="clickurl" href="/security" '
         + 'target="_blank" rel="noopener noreferrer">').replace('[/A]', '</a>');
@@ -1480,8 +1460,6 @@ mBroadcaster.once('boot_done', function populate_l() {
     l.achievem_storagetitle = escapeHTML(l.achievem_storagetitle)
         .replace('[S]', '<span>')
         .replace('[/S]', '</span>');
-    l.bsn_calc_min_users = escapeHTML(l.bsn_calc_min_users)
-        .replace('[BR]', '<br>');
     l.bsn_calc_min_storage = escapeHTML(l.bsn_calc_min_storage)
         .replace('[BR]', '<br>');
     l.bsn_calc_min_transfer = escapeHTML(l.bsn_calc_min_transfer)

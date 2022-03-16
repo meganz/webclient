@@ -1301,15 +1301,15 @@ function secToDuration(s, sep) {
         var transString = false;
         if (i === 0) {
             // hour
-            transString = v !== "1" ? l[19049].replace("%d", v) : l[19048];
+            transString = mega.icu.format(l.hour_count, parseInt(v));
         }
         else if (i === 1) {
             // minute
-            transString = v !== "1" ? l[5837].replace("[X]", v) : l[5838];
+            transString = mega.icu.format(l.minute_count, parseInt(v));
         }
         else if (i === 2) {
             // second
-            transString = v !== "1" ? l[19046].replace("%d", v) : l[19047];
+            transString = mega.icu.format(l.second_count, parseInt(v));
         }
         else {
             throw new Error("this should never happen.");
@@ -2682,7 +2682,11 @@ function registerLinuxDownloadButton($links) {
 function odqPaywallDialogTexts(user_attr, accountData) {
     'use strict';
 
-    var dialogText = l[23525];
+    var totalFiles = (accountData.stats[M.RootID] ? accountData.stats[M.RootID].files : 0) +
+        (accountData.stats[M.RubbishID] ? accountData.stats[M.RubbishID].files : 0) +
+        (accountData.stats[M.InboxID] ? accountData.stats[M.InboxID].files : 0);
+
+    var dialogText = mega.icu.format(l[23525], totalFiles);
     var dlgFooterText = l[23524];
     var fmBannerText = l[23534];
 
@@ -2693,18 +2697,25 @@ function odqPaywallDialogTexts(user_attr, accountData) {
             var remainDays = Math.floor((deadline - currDate) / 864e5);
             var remainHours = Math.floor((deadline - currDate) / 36e5);
 
+            const sanitiseString = (string) => {
+                return escapeHTML(string)
+                    .replace(/\[S]/g, '<span>')
+                    .replace(/\[\/S]/g, '</span>')
+                    .replace(/\[A]/g, '<a href="/pro" class="clickurl">')
+                    .replace(/\[\/A]/g, '</a>');
+            };
             if (remainDays > 0) {
-                dlgFooterText = remainDays > 1 ? l[23521].replace('%1', remainDays) : l[23522];
-                fmBannerText = remainDays > 1 ? l[23532].replace('%1', remainDays) : l[23533];
+                dlgFooterText = sanitiseString(mega.icu.format(l.dialog_exceed_storage_quota, remainDays));
+                fmBannerText = sanitiseString(mega.icu.format(l.fm_banner_exceed_storage_quota, remainDays));
             }
             else if (remainDays === 0 && remainHours > 0) {
-                dlgFooterText = l[23523].replace('%1', remainHours);
+                dlgFooterText = sanitiseString(mega.icu.format(l.dialog_exceed_storage_quota_hours, remainHours));
             }
         }
         if (user_attr.uspw.wts && user_attr.uspw.wts.length) {
-            dialogText = l[23520];
+            dialogText = mega.icu.format(l[23520], totalFiles);
             if (user_attr.uspw.wts.length === 1) {
-                dialogText = l[23530];
+                dialogText = mega.icu.format(l[23530], totalFiles);
                 dialogText = dialogText.replace('%2', time2date(user_attr.uspw.wts[0], 1));
             }
             if (user_attr.uspw.wts.length === 2) {
@@ -2731,19 +2742,9 @@ function odqPaywallDialogTexts(user_attr, accountData) {
     }
 
     var filesText = l[23253]; // 0 files
-    var totalFiles = (accountData.stats[M.RootID] ? accountData.stats[M.RootID].files : 0) +
-        (accountData.stats[M.RubbishID] ? accountData.stats[M.RubbishID].files : 0) +
-        (accountData.stats[M.InboxID] ? accountData.stats[M.InboxID].files : 0);
-    if (totalFiles === 1) {
-        filesText = l[835];
-    }
-    else if (totalFiles > 1) {
-        filesText = l[833].replace('[X]', totalFiles);
-    }
 
     dialogText = dialogText.replace('%1', user_attr.email || ' ');
-    dialogText = dialogText.replace('%6', bytesToSize(accountData.space_used))
-        .replace('%5', filesText);
+    dialogText = dialogText.replace('%6', bytesToSize(accountData.space_used));
 
     // In here, it's guaranteed that we have pro.membershipPlans,
     // but we will check for error free logic in case of changes

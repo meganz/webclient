@@ -359,8 +359,8 @@ pro.propay = {
                 if (numOfMonths === 12) {
                     monthsWording = l[923];     // 1 year
                 }
-                else if (numOfMonths > 1) {
-                    monthsWording = l[6803].replace('%1', numOfMonths);     // x months
+                else {
+                    monthsWording = mega.icu.format(l[922], numOfMonths);  // x months
                 }
 
                 // Build select option
@@ -1489,14 +1489,13 @@ pro.propay = {
      */
     getNumOfMonthsWording: function(numOfMonths) {
 
-        var monthsWording = l[922];     // 1 month
-
+        let monthsWording;
         // Change wording depending on number of months
         if (numOfMonths === 12) {
             monthsWording = l[923];     // 1 year
         }
-        else if (numOfMonths > 1) {
-            monthsWording = l[6803].replace('%1', numOfMonths);     // x months
+        else {
+            monthsWording = mega.icu.format(l[922], numOfMonths); // 1 month
         }
 
         return monthsWording;

@@ -1128,12 +1128,7 @@ var notify = {
             itemsNumber = 1;
         }
 
-        if (itemsNumber > 1) {
-            title = l[8913].replace('[X]', itemsNumber);// Removed [X] items from a share
-        }
-        else {
-            title = l[8910];// Removed item from shared folder
-        }
+        title = mega.icu.format(l[8913], itemsNumber);
 
         // Populate other template information
         $notificationHtml.addClass('nt-revocation-of-incoming');
@@ -1258,41 +1253,21 @@ var notify = {
         }
 
         // Get wording for the number of files and folders added
-        if ((folderCount > 1) && (fileCount > 1)) {
-            notificationText = l[828].replace('[X1]', folderCount).replace('[X2]', fileCount);  // [X1] folders and [X2] files
-        }
-        else if ((folderCount > 1) && (fileCount == 1)) {
-            notificationText = l[829].replace('[X]', folderCount);  // [X] folders and 1 file
-        }
-        else if ((folderCount == 1) && (fileCount > 1)) {
-            notificationText = l[830].replace('[X]', fileCount);    // 1 folder and [X] files
-        }
-        else if ((folderCount == 1) && (fileCount == 1)) {
-            notificationText = l[831];                              // 1 folder and 1 file
-        }
-        else if (folderCount > 1) {
-            notificationText = l[832].replace('[X]', folderCount);  // [X] folders
-        }
-        else if (fileCount > 1) {
-            notificationText = l[833].replace('[X]', fileCount);    // [X] files
-        }
-        else if (folderCount == 1) {
-            notificationText = l[834];  // 1 folder
-        }
-        else if (fileCount == 1) {
-            notificationText = l[835];  // 1 file
-        }
+        const folderText = mega.icu.format(l.folder_count, folderCount);
+        const fileText = mega.icu.format(l.file_count, fileCount);
 
         // Set wording of the title
-        if (email) {
-            title = l[836].replace('[X]', email);
-            title = title.replace('[DATA]', notificationText);  // [X] added [DATA]
+        if (folderCount >= 1 && fileCount >= 1) {
+            title = email ? mega.icu.format(l.user_item_added_count, folderCount + fileCount).replace('[X]', email) :
+                mega.icu.format(l.item_added_count, folderCount + fileCount);
         }
-        else if ((fileCount + folderCount) > 1) {
-            title = l[837].replace('[X]', notificationText);    // [X] have been added
+        else if (folderCount > 0) {
+            title = email ? l[836].replace('[X]', email).replace('[DATA]', folderText) :
+                mega.icu.format(l.folder_added_count, folderCount);
         }
-        else {
-            title = l[838].replace('[X]', notificationText);    // [X] has been added
+        else if (fileCount > 0) {
+            title = email ? l[836].replace('[X]', email).replace('[DATA]', fileText) :
+                mega.icu.format(l.file_added_count, fileCount);
         }
 
         // Populate other template information
@@ -1362,11 +1337,8 @@ var notify = {
             if (days === 0) {
                 title = l[25041];
             }
-            else if (days === 1) {
-                title = l[8596];
-            }
             else {
-                title = l[8597].replace('%1', days);
+                title = mega.icu.format(l[8597], days);
             }
 
             // Populate other template information

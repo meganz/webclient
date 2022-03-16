@@ -627,22 +627,18 @@ Message.prototype.getManagementMessageSummaryText = function() {
     var messageIsVoiceClip = (this.textContents.substr(1, 1) === Message.MANAGEMENT_MESSAGE_TYPES.VOICE_CLIP);
 
     if (messageHasAttachment || messageIsVoiceClip) {
-        var nodes = JSON.parse(this.textContents.substr(2, this.textContents.length));
+        const nodes = JSON.parse(this.textContents.substr(2, this.textContents.length));
         if (nodes.length === 1) {
             return l[8894].replace("%s", nodes[0].name);
         }
-        else {
-            return l[8895].replace("%s", nodes.length);
-        }
+        return mega.icu.format(l[8895], nodes.length);
     }
     else if (this.textContents.substr(1, 1) === Message.MANAGEMENT_MESSAGE_TYPES.CONTACT) {
         var nodes = JSON.parse(this.textContents.substr(2, this.textContents.length));
         if (nodes.length === 1) {
             return l[8896].replace("%s", nodes[0].name);
         }
-        else {
-            return l[8897].replace("%s", nodes.length);
-        }
+        return mega.icu.format(l[8897], nodes.length);
     }
     else if (this.textContents.substr(1, 1) === Message.MANAGEMENT_MESSAGE_TYPES.CONTAINS_META) {
         var metaType = this.textContents.substr(2, 1);

@@ -592,14 +592,9 @@ var redeem = {
         var proPlanName;
 
         if (vd.businessmonths) {
-            if (vd.businessmonths === 1) {
-                proPlanName = l[23492];
-            }
-            else if (vd.businessmonths === 12) {
+            proPlanName = mega.icu.format(l.month_business_voucher, vd.businessmonths);
+            if (vd.businessmonths === 12) {
                 proPlanName = l[23491];
-            }
-            else {
-                proPlanName = l[23493].replace('%n', vd.businessmonths);
             }
 
             $voucherIcon.removeClass('pro1 pro2 pro3 pro4').addClass('business');
@@ -700,16 +695,8 @@ var redeem = {
                 $('.voucher-logo', $dlg).addClass('business-v');
                 $('.plan-icon', $dlg).removeClass('pro1 pro2 pro3 pro4').addClass('business');
 
-                var titleText;
-                if (mega.voucher.businessmonths === 1) {
-                    titleText = l[23492];
-                }
-                else if (mega.voucher.businessmonths === 12) {
-                    titleText = l[23491];
-                }
-                else {
-                    titleText = l[23493].replace('%n', mega.voucher.businessmonths);
-                }
+                const titleText = mega.voucher.businessmonths === 12 ? l[23491]
+                    : mega.icu.format(l.month_business_voucher, mega.voucher.businessmonths);
                 $dlgTitle.text(titleText);
                 descText = l.redeem_bus_acc;
 

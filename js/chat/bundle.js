@@ -3188,22 +3188,23 @@ ChatRoom.prototype.getRetentionLabel = function (retentionTime) {
   retentionTime = retentionTime || this.retentionTime;
   const days = secondsToDays(retentionTime);
   const months = Math.floor(days / 30);
+  const hours = secondsToHours(retentionTime);
 
   switch (this.getRetentionFormat(retentionTime)) {
     case RETENTION_FORMAT.DISABLED:
       return l[7070];
 
     case RETENTION_FORMAT.MONTHS:
-      return `${months} ${months === 1 ? l[913] : l[6788]}`;
+      return mega.icu.format(l.months_chat_history_plural, months);
 
     case RETENTION_FORMAT.WEEKS:
-      return `${days / 7} ${days / 7 === 1 ? l[16292] : l[16293]}`;
+      return mega.icu.format(l.weeks_chat_history_plural, days / 7);
 
     case RETENTION_FORMAT.DAYS:
-      return `${days} ${days === 1 ? l[930] : l[16290]}`;
+      return mega.icu.format(l.days_chat_history_plural, days);
 
     case RETENTION_FORMAT.HOURS:
-      return `${secondsToHours(retentionTime)} ${secondsToHours(retentionTime) === 1 ? l[7133] : l[7132]}`;
+      return mega.icu.format(l.hours_chat_history_plural, hours);
   }
 };
 
@@ -6924,7 +6925,7 @@ class ContactPickerWidget extends _mixins1__.wl {
     }
 
     const totalContactsNum = contacts.length + frequentContacts.length;
-    const searchPlaceholderMsg = totalContactsNum === 1 ? l[23749] : l[23750].replace('[X]', totalContactsNum);
+    const searchPlaceholderMsg = mega.icu.format(l.search_contact_placeholder, totalContactsNum);
     return react0().createElement("div", {
       ref: this.containerRef,
       className: `
@@ -9227,7 +9228,7 @@ class HistoryRetentionDialog extends external_React_.Component {
     super(...arguments);
     this.inputRef = external_React_default().createRef();
     this.state = {
-      selectedTimeFormat: HistoryRetentionDialog.labels.timeFormats.plural.hours,
+      selectedTimeFormat: HistoryRetentionDialog.labels.timeFormats.labelPlural.hours,
       prevTimeRange: undefined,
       timeRange: undefined
     };
@@ -9274,28 +9275,28 @@ class HistoryRetentionDialog extends external_React_.Component {
       } = HistoryRetentionDialog.labels;
 
       switch (true) {
-        case selectedTimeFormat === timeFormats.plural[l[7132]]:
+        case selectedTimeFormat === timeFormats.labelPlural[l[7132]]:
           return LIMIT.HOURS;
 
-        case selectedTimeFormat === timeFormats.plural[l[16290]]:
+        case selectedTimeFormat === timeFormats.labelPlural[l[16290]]:
           return LIMIT.DAYS;
 
-        case selectedTimeFormat === timeFormats.plural[l[16293]]:
+        case selectedTimeFormat === timeFormats.labelPlural[l[16293]]:
           return LIMIT.WEEKS;
 
-        case selectedTimeFormat === timeFormats.plural[l[6788]]:
+        case selectedTimeFormat === timeFormats.labelPlural[l[6788]]:
           return LIMIT.MONTHS;
       }
     };
 
-    this.getParsedLabel = (label, timeRange) => {
-      timeRange = parseInt(timeRange, 10);
+    this.getParsedLabel = (label, timeRange, radioBut) => {
+      timeRange = !timeRange ? this.getDefaultValue(label) : parseInt(timeRange, 10);
 
-      if (timeRange !== 1) {
-        return HistoryRetentionDialog.labels.timeFormats.plural[label];
+      if (radioBut === true) {
+        return HistoryRetentionDialog.labels.timeFormats.labelPlural[label];
       }
 
-      return HistoryRetentionDialog.labels.timeFormats.singular[label];
+      return mega.icu.format(HistoryRetentionDialog.labels.timeFormats.inputs[label], timeRange);
     };
 
     this.handleOnChange = e => {
@@ -9354,7 +9355,7 @@ class HistoryRetentionDialog extends external_React_.Component {
         selectedTimeFormat
       } = this.state;
       const time = HistoryRetentionDialog.timeFrame[selectedTimeFormat] * Number(this.state.timeRange);
-      const IS_HOURS = selectedTimeFormat === HistoryRetentionDialog.labels.timeFormats.plural[l[7132]];
+      const IS_HOURS = selectedTimeFormat === HistoryRetentionDialog.labels.timeFormats.labelPlural[l[7132]];
       chatRoom.setRetention(IS_HOURS ? hoursToSeconds(time) : daysToSeconds(time), IS_HOURS);
       onClose();
     };
@@ -9374,10 +9375,10 @@ class HistoryRetentionDialog extends external_React_.Component {
     };
 
     this.renderCustomRadioButton = () => {
-      return Object.values(HistoryRetentionDialog.labels.timeFormats.plural).map(label => {
+      return Object.values(HistoryRetentionDialog.labels.timeFormats.labelPlural).map(label => {
         return external_React_default().createElement(CustomRadioButton, {
           checked: this.state.selectedTimeFormat === label,
-          label: this.getParsedLabel(label, this.state.timeRange),
+          label: this.getParsedLabel(label, this.state.timeRange, true),
           name: "time-selector",
           value: label,
           onChange: this.handleOnChange,
@@ -9421,7 +9422,7 @@ class HistoryRetentionDialog extends external_React_.Component {
       className: "form-section"
     }, external_React_default().createElement("span", {
       className: "form-section-placeholder"
-    }, this.getParsedLabel(selectedTimeFormat, this.state.timeRange)), external_React_default().createElement("input", {
+    }, this.getParsedLabel(selectedTimeFormat, this.state.timeRange).split(" ")[1]), external_React_default().createElement("input", {
       type: "number",
       min: "0",
       step: "1",
@@ -9453,17 +9454,17 @@ class HistoryRetentionDialog extends external_React_.Component {
 HistoryRetentionDialog.keydown = 'keydown.historyRetentionDialog';
 HistoryRetentionDialog.labels = {
   timeFormats: {
-    plural: {
+    labelPlural: {
       [l[7132]]: l[7132],
       [l[16290]]: l[16290],
       [l[16293]]: l[16293],
       [l[6788]]: l[6788]
     },
-    singular: {
-      [l[7132]]: l[7133],
-      [l[16290]]: l[930],
-      [l[16293]]: l[16292],
-      [l[6788]]: l[913]
+    inputs: {
+      [l[7132]]: l.hours_chat_history_plural,
+      [l[16290]]: l.days_chat_history_plural,
+      [l[16293]]: l.weeks_chat_history_plural,
+      [l[6788]]: l.months_chat_history_plural
     }
   },
   copy: {

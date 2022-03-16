@@ -391,7 +391,7 @@ function initAddDialogMultiInputPlugin() {
                 }
 
                 if (itemNum > 1) {
-                    $addButtonSpan.text(l[19113].replace('%1', itemNum));
+                    $addButtonSpan.text(mega.icu.format(l[19113], itemNum));
                     $addButton.removeClass('hidden');
                 }
                 else if (itemNum === 1) {
@@ -420,7 +420,7 @@ function initAddDialogMultiInputPlugin() {
             else {
                 var $multiInput = $scope.find('.multiple-input');
 
-                $addButtonSpan.text(l[19113].replace('%1', itemNum))
+                $addButtonSpan.text(mega.icu.format(l[19113], itemNum));
                 $addButton.removeClass('hidden');
             }
         },
@@ -444,7 +444,7 @@ function initAddDialogMultiInputPlugin() {
                 $addButton.removeClass('hidden');
             }
             else {
-                $addButtonSpan.text(l[19113].replace('%1', itemNum));
+                $addButtonSpan.text(mega.icu.format(l[19113], itemNum));
                 $addButton.removeClass('hidden');
             }
         }

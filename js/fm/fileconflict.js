@@ -479,7 +479,7 @@
                     $('.file-name', $a1).text(this.findNewName(file.name, target));
                     $('.file-name', $a2).text(name);
                     $('.file-name', $a3).text(name);
-                    $('.file-size', $a2).text(l[22113].replace('{0}', dupsNB - 1));
+                    $('.file-size', $a2).text(mega.icu.format(l[22113], dupsNB - 1));
                     $('.file-date', $a1).text('');
                     $('.file-date', $a2).text('');
 

@@ -230,7 +230,7 @@
             p.t8 = p.t9 ? l[22143] : '';
             p.t12 = ' second';
             p.t13 = l[22144];
-            p.t14 = (svfilecnt === 1) ? l[17152] : l[17151].replace("[X]", svfilecnt);
+            p.t14 = mega.icu.format(l.version_count, svfilecnt);
             p.t15 = l[22145];
             p.t16 = bytesToSize(size);
             p.t17 = ' second';
@@ -251,7 +251,7 @@
                     }
                     else {
                         p.t8 = l[5611];
-                        p.t9 = users.length === 1 ? l[990] : l[989].replace("[X]", users.length);
+                        p.t9 = mega.icu.format(l.contact_count, users.length);
                         p.t11 = n.ts ? htmlentities(time2date(n.ts)) : '';
                         p.t10 = p.t11 ? l[6084] : '';
                         $('.properties-elements-counter span').text(typeof n.r === "number" ? '' : users.length);
@@ -298,7 +298,7 @@
             p.t9 = l[1025];
             p.t12 = '';
             p.t13 = l[22144];
-            p.t14 = (svfilecnt === 1) ? l[17152] : l[17151].replace("[X]", svfilecnt);
+            p.t14 = mega.icu.format(l.version_count, svfilecnt);
             p.t15 = l[22148];
             p.t16 = bytesToSize(size);
             p.t17 = '';

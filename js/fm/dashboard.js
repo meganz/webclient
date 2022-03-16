@@ -204,11 +204,11 @@ function dashboardUI(updProcess) {
                     $('.suba-status', $businessLeft).addClass('pending').removeClass('disabled active')
                         .text(l[19609]);
                     if (u_attr.b.sts && u_attr.b.sts[0] && u_attr.b.sts[0].s === -1) {
-                        var expiryDate = new Date(u_attr.b.sts[0].ts * 1000);
-                        var currentTime = new Date();
-                        var remainingDays = Math.floor((expiryDate - currentTime) / 864e5);
+                        const expiryDate = new Date(u_attr.b.sts[0].ts * 1000);
+                        const currentTime = new Date();
+                        let remainingDays = Math.floor((expiryDate - currentTime) / 864e5);
                         remainingDays = remainingDays < 0 ? 0 : remainingDays;
-                        var daysLeft = l[16284].replace('%1', remainingDays);
+                        const daysLeft = mega.icu.format(l[16284], remainingDays);
                         $('.suba-days-left', $businessLeft).removeClass('hidden').text(daysLeft);
                         $('.suba-pay-bill', $businessLeft).removeClass('hidden');
                     }
@@ -440,19 +440,7 @@ function dashboardUI(updProcess) {
 
             var ffNumText = function(value, type) {
                 var counter = value || 0;
-                var numTextOutput = "";
-
-                if (counter === 0) {
-                    numTextOutput = type === 'file' ? l[23259] : l[23258];
-                }
-                else if (counter === 1) {
-                    numTextOutput = type === 'file' ? l[23257] : l[23256];
-                }
-                else {
-                    numTextOutput = (type === 'file' ? l[23261] : l[23260]).replace('[X]', counter);
-                }
-
-                return numTextOutput;
+                return mega.icu.format(type === 'file' ? l.file_count : l.folder_count, counter);
             };
 
             const rubbishSize = account.stats[M.RubbishID].bytes;
@@ -671,16 +659,12 @@ dashboardUI.updateChatWidget = function() {
     });
 };
 dashboardUI.updateCloudDataWidget = function() {
-    var file0 = l[23253];
-    var file1 = 835;
-    var files = 833;
-    var folder0 = l[23254];
-    var folder1 = 834;
-    var folders = 832;
-    var data = M.getDashboardData();
-    var locale = [files, folders, files, folders, folders, folders];
-    var map = ['files', 'folders', 'rubbish', 'ishares', 'oshares', 'links', 'versions'];
-    var intl = typeof Intl !== 'undefined' && Intl.NumberFormat && new Intl.NumberFormat();
+    const files = l.file_count;
+    const folders = l.folder_count;
+    const data = M.getDashboardData();
+    const locale = [files, folders, files, folders, folders, folders];
+    const map = ['files', 'folders', 'rubbish', 'ishares', 'oshares', 'links', 'versions'];
+    const intl = typeof Intl !== 'undefined' && Intl.NumberFormat && new Intl.NumberFormat();
 
     $('.data-item .links-s').rebind('click', function() {
         loadSubPage('fm/public-links');
@@ -708,26 +692,21 @@ dashboardUI.updateCloudDataWidget = function() {
 
     $('.data-item:not(.used-storage-info)', '.account.data-table.data')
         .each(function(idx, elm) {
-            var props = data[map[idx]];
-            var str = l[locale[idx]];
-            var cnt = props.cnt;
-            if (cnt === 1) {
-                str = l[(locale[idx] === files) ? file1 : folder1];
-            }
-            else if (intl) {
-                cnt = intl.format(props.cnt || 0);
-                if (cnt === "0") {
-                    str = locale[idx] === files ? file0 : folder0;
-                }
+            const props = data[map[idx]];
+            let {cnt, xfiles, size} = props;
+            if (intl) {
+                cnt = intl.format(cnt || 0);
             }
 
-            if (props.xfiles > 1) {
-                str += ', ' + String(l[833]).replace('[X]', props.xfiles);
+            let str = idx < 6 ? mega.icu.format(locale[idx], parseInt(cnt)) : cnt;
+
+            if (xfiles > 1) {
+                str += `, ${mega.icu.format(files, parseInt(xfiles))}`;
             }
 
-            elm.children[1].textContent = idx < 6 ? String(str).replace('[X]', cnt) : cnt;
-            if (props.cnt > 0) {
-                elm.children[2].textContent = bytesToSize(props.size);
+            elm.children[1].textContent = str;
+            if (cnt > 0) {
+                elm.children[2].textContent = bytesToSize(size);
                 $(elm).removeClass('empty');
                 $('.account.data-item .versioning-settings').show();
             }

@@ -1079,7 +1079,7 @@ function fm_tfsupdate() {
     }
 
     overlay.querySelector('.folders-files-text')
-        .textContent = String(l[23182]).replace('%d', M.pendingTransfers).replace('%s', bytesToSize(speed, 1));
+        .textContent = String(mega.icu.format(l[23182], M.pendingTransfers).replace('%s', bytesToSize(speed, 1)));
 }
 
 function removeUInode(nodeHandle, parentHandle) {

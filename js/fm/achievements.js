@@ -364,6 +364,14 @@ mega.achievem.bindStorageDataToView = function bindStorageDataToView($viewContex
                 $cell.addClass('achieved');
 
                 $('.expires-txt', $cell).safeHTML(locFmt.replace('%1', data.rwd.left).replace('%2', l[16290]));
+                if (data.rwd.expiry.unit === "d"){
+                    locFmt = mega.icu.format(l.ach_expires_days, data.rwd.left)
+                        .replace('[S]', '<span>').replace('[/S]', '</span>');
+                    $('.expires-txt', $cell).safeHTML(locFmt);
+                }
+                else {
+                    $('.expires-txt', $cell).safeHTML(locFmt.replace('%1', data.rwd.left).replace('%2', l[16290]));
+                }
                 if (!$('.expires-txt', $cell).hasClass('error')) {
                     $('.expires-txt', $cell).addClass('info');
                 }

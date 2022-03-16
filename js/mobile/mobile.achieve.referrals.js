@@ -98,9 +98,9 @@ mobile.achieve.referrals = {
             }
 
             // If not expired set text to 'x days left', if less than 2 weeks remain show as red text
-            var daysRemaining = Math.round(timeDifference / 86400);
-            var daysRemainingWording = l[16284].replace('%1', daysRemaining);
-            var daysRemainingClass = daysRemaining <= 14 ? 'expiring-soon' : '';
+            const daysRemaining = Math.round(timeDifference / 86400);
+            const daysRemainingWording = mega.icu.format(l[16284], daysRemaining);
+            const daysRemainingClass = daysRemaining <= 14 ? 'expiring-soon' : '';
 
             // Get the email and avatar
             var email = rewardedBonus.m[0];

@@ -465,6 +465,10 @@
 .arc-chat-messages-block .user-card-name.conversation-name i {
     margin: 0 8px;
 }
+.arc-chat-messages-block .user-card-name.conversation-name i.icon-ekr-key {
+    margin: auto 8px;
+    --icon-size: 16px;
+}
 .arc-chat-messages-block .archived-on {
     position: absolute;
     top: 50%;

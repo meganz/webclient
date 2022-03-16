@@ -192,7 +192,12 @@ body:not(.mobile) .about.top-info a:hover {
     max-width: 145px;
 }
 .about-numbers .bottom-page.horizontal-centered-bl.wide {
-    max-width: 1146px;
+    max-width: 100%;
+    width: auto;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding: 0;
 }
 .about.img-wrap {
     line-height: 0;
@@ -867,8 +872,10 @@ Timeline
     padding-left: 48px;
     padding-right: 48px;
 }
-.about .bottom-page .vision-col-4 {
-    width: 25%;
+.about .bottom-page .about.numbers-wrap {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    flex-grow: 1;
 }
 .about .bottom-page.jobs-life-container {
     width: 100%;
@@ -2335,7 +2342,7 @@ body:not(.mobile) .about.white-button:hover {
 
 @media only screen and (max-width: 715px) {
     .about .bottom-page .vision-col-4 {
-        width: 50%;
+        width: auto;
     }
 }
 

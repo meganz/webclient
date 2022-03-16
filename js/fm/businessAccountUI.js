@@ -1157,19 +1157,7 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
 
         var ffNumText = function(value, type) {
             var counter = value || 0;
-            var numTextOutput = "";
-
-            if (counter === 0) {
-                numTextOutput = type === 'file' ? l[23259] : l[23258];
-            }
-            else if (counter === 1) {
-                numTextOutput = type === 'file' ? l[23257] : l[23256];
-            }
-            else {
-                numTextOutput = (type === 'file' ? l[23261] : l[23260]).replace('[X]', counter);
-            }
-
-            return numTextOutput;
+            return mega.icu.format(type === 'file' ? l.file_count : l.folder_count, counter);
         };
 
         var cloudDriveFolderNumText = ffNumText(rootInfo[2], 'folder');

@@ -214,11 +214,9 @@ var versiondialogid;
             if (data.versions.cnt === 0) {
                 $deleteButton.addClass('disabled');
             }
-            var verionInfo = l[17582]
-                    .replace('[X1]',
-                    '<span class="versioning-text total-file-versions">' + data.versions.cnt + '</span>')
-                    .replace('[X2]',
-                    '<span class="versioning-text total-versions-size">' + bytesToSize(data.versions.size) + '</span>');
+            const verionInfo = mega.icu.format(l.version_file_summary, data.versions.cnt)
+                .replace('[X]',
+                         `<span class="versioning-text total-versions-size">${bytesToSize(data.versions.size)}</span>`);
 
             $('.versioning-body-text.versioning-info-message').safeHTML(verionInfo);
         },

@@ -1356,13 +1356,7 @@
                     }
 
                     var shareContactInfo = aTemplate.querySelector('.shared-contact-info');
-                    shareContactInfo.textContent = escapeHTML(l[989]).replace('[X]', aProperties.userNames.length);
-                    if (aProperties.userNames.length === 1) {
-                        shareContactInfo.textContent = escapeHTML(l[990]);
-                    }
-                    else {
-                        shareContactInfo.textContent = escapeHTML(l[989]).replace('[X]', aProperties.userNames.length);
-                    }
+                    shareContactInfo.textContent = mega.icu.format(l.contact_count, aProperties.userNames.length);
                     shareContactInfo.classList += ' simpletip';
                     shareContactInfo.dataset.simpletip = aProperties.userNames.join(",[BR]");
                 }
@@ -1377,16 +1371,10 @@
                         var sharedUserWrapper = aTemplate.querySelector('.fm-chat-users-wrapper');
                         sharedUserWrapper.classList += ' simpletip';
                         sharedUserWrapper.dataset.simpletip = aProperties.userNames.join(",[BR]");
+                        aTemplate.querySelector('.fm-chat-users-other').textContent = mega.icu
+                            .format(l.users_share_other_count, otherCount);
                     }
                     aTemplate.querySelector('.fm-chat-users').textContent = userNames.join(', ');
-
-                    if (otherCount === 1) {
-                        aTemplate.querySelector('.fm-chat-users-other').textContent = l[20652];
-                    }
-                    else if (otherCount > 1) {
-                        aTemplate.querySelector('.fm-chat-users-other').textContent = l[20653]
-                            .replace('$1', otherCount);
-                    }
                     aTemplate.querySelector('.shared-folder-info').textContent = aProperties.shareInfo;
                     aTemplate.querySelector('.shared-folder-size').textContent = aProperties.folderSize;
                     aTemplate.querySelector('.last-shared-time').textContent = aProperties.lastSharedAt;

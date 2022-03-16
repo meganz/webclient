@@ -336,37 +336,18 @@ fmremove.sync = function(selectedNodes, skipDelWarning) {
         var dlgMessage = '';
         var toastMessage = '';
 
-        if ((filecnt === 1) && (!foldercnt)) {
-            dlgMessage = l[13749];// 1 file
-            toastMessage = l[13757];
+        if (filecnt > 0 && !foldercnt) {
+            dlgMessage = mega.icu.format(l[13750], filecnt);
+            toastMessage = mega.icu.format(l[13758], filecnt);
         }
-        else if ((filecnt > 1) && (!foldercnt)) {
-            dlgMessage = l[13750].replace('%1', filecnt);
-            toastMessage = l[13758].replace('%1', filecnt);
+        else if (!filecnt && foldercnt > 0) {
+            dlgMessage = mega.icu.format(l[13752], foldercnt);
+            toastMessage = mega.icu.format(l[13760], foldercnt);
         }
-        else if ((!filecnt) && (foldercnt === 1)) {
-            dlgMessage = l[13751];// 1 folder
-            toastMessage = l[13759];
-        }
-        else if ((!filecnt) && (foldercnt > 1)) {
-            dlgMessage = l[13752].replace('%1', foldercnt);
-            toastMessage = l[13760].replace('%1', foldercnt);
-        }
-        else if ((filecnt === 1) && (foldercnt === 1)) {
-            dlgMessage = l[13753];// 1 file 1 folder
-            toastMessage = l[13761];
-        }
-        else if ((filecnt === 1) && (foldercnt > 1)) {
-            dlgMessage = l[13754].replace('%1', foldercnt);
-            toastMessage = l[13762].replace('%1', foldercnt);
-        }
-        else if ((filecnt > 1) && (foldercnt === 1)) {
-            dlgMessage = l[13755].replace('%1', filecnt);
-            toastMessage = l[13763].replace('%1', filecnt);
-        }
-        else if ((filecnt > 1) && (foldercnt > 1)) {
-            dlgMessage = l[13756].replace('%1', filecnt).replace('%2', foldercnt);
-            toastMessage = l[13764].replace('%1', filecnt).replace('%2', foldercnt);
+        else if (filecnt && foldercnt) {
+            const itemscnt = filecnt + foldercnt;
+            dlgMessage = mega.icu.format(l[13754], itemscnt);
+            toastMessage = mega.icu.format(l[13762], itemscnt);
         }
 
         msgDialog('clear-bin:' + l[83], l[1003], dlgMessage, l[1007], function(e) {
@@ -396,7 +377,15 @@ fmremove.sync = function(selectedNodes, skipDelWarning) {
         }
         else {
             title = l[1003];
-            message = l[1004].replace('[X]', fm_contains(filecnt, foldercnt));
+            if (filecnt > 0 && foldercnt === 0) {
+                message = mega.icu.format(l.move_rubbish_files, filecnt);
+            }
+            else if (filecnt === 0 && foldercnt > 0) {
+                message = mega.icu.format(l.move_rubbish_folders, foldercnt);
+            }
+            else {
+                message = mega.icu.format(l.move_rubbish_items, filecnt + foldercnt);
+            }
 
             msgDialog('confirmation', title, message, false, function(e) {
                     if (e) {
@@ -421,7 +410,15 @@ fmremove.sync = function(selectedNodes, skipDelWarning) {
         }
         else {
             title = l[1003];
-            message = escapeHTML(l[1004]).replace('[X]', fm_contains(filecnt, foldercnt));
+            if (filecnt > 0 && foldercnt === 0) {
+                message = mega.icu.format(l.move_rubbish_files, filecnt);
+            }
+            else if (filecnt === 0 && foldercnt > 0) {
+                message = mega.icu.format(l.move_rubbish_folders, foldercnt);
+            }
+            else {
+                message = mega.icu.format(l.move_rubbish_items, filecnt + foldercnt);
+            }
 
             msgDialog('remove', title, message, l[1952] + ' ' + l[7410], function(yes) {
                 if (yes) {
@@ -445,39 +442,20 @@ function fm_contains(filecnt, foldercnt, lineBreak) {
     "use strict";
 
     var containstxt = l[782];
+    var folderText = mega.icu.format(l.folder_count, foldercnt);
+    var fileText = mega.icu.format(l.file_count, filecnt);
 
-    if ((foldercnt > 1) && (filecnt > 1) && lineBreak) {
-        containstxt = l[832].replace('[X]', foldercnt) + '<br>' + l[833].replace('[X]', filecnt);
+    if (foldercnt >= 1 && filecnt >= 1 && lineBreak) {
+        containstxt = `${folderText}<br>${fileText}`;
     }
-    else if ((foldercnt > 1) && (filecnt > 1)) {
-        containstxt = l[828].replace('[X1]', foldercnt).replace('[X2]', filecnt);
+    else if (foldercnt >= 1 && filecnt >= 1) {
+        containstxt = l.file_and_folder_count.replace('[X1]', folderText).replace('[X2]', fileText);
     }
-    else if ((foldercnt > 1) && (filecnt === 1) && lineBreak) {
-        containstxt = l[832].replace('[X]', foldercnt) + '<br>' + l[835];
+    else if (foldercnt > 0) {
+        containstxt = folderText;
     }
-    else if ((foldercnt > 1) && (filecnt === 1)) {
-        containstxt = l[829].replace('[X]', foldercnt);
-    }
-    else if ((foldercnt === 1) && (filecnt > 1) && lineBreak) {
-        containstxt = l[834] + '<br>' + l[833].replace('[X]', filecnt);
-    }
-    else if ((foldercnt === 1) && (filecnt > 1)) {
-        containstxt = l[830].replace('[X]', filecnt);
-    }
-    else if ((foldercnt === 1) && (filecnt === 1)) {
-        containstxt = l[831];
-    }
-    else if (foldercnt > 1) {
-        containstxt = l[832].replace('[X]', foldercnt);
-    }
-    else if (filecnt > 1) {
-        containstxt = l[833].replace('[X]', filecnt);
-    }
-    else if (foldercnt === 1) {
-        containstxt = l[834];
-    }
-    else if (filecnt === 1) {
-        containstxt = l[835];
+    else if (filecnt > 0) {
+        containstxt = fileText;
     }
 
     return containstxt;

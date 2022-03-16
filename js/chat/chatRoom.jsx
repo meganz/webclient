@@ -635,6 +635,7 @@ ChatRoom.prototype.getRetentionLabel = function(retentionTime) {
     retentionTime = retentionTime || this.retentionTime;
     const days = secondsToDays(retentionTime);
     const months = Math.floor(days / 30);
+    const hours = secondsToHours(retentionTime);
 
     switch (this.getRetentionFormat(retentionTime)) {
         case RETENTION_FORMAT.DISABLED:
@@ -642,16 +643,16 @@ ChatRoom.prototype.getRetentionLabel = function(retentionTime) {
             return l[7070];
         case RETENTION_FORMAT.MONTHS:
             // `month` || `months`
-            return `${months} ${months === 1 ? l[913] : l[6788]}`;
+            return mega.icu.format(l.months_chat_history_plural, months);
         case RETENTION_FORMAT.WEEKS:
             // `week` || `weeks`
-            return `${days / 7} ${days / 7 === 1 ? l[16292] : l[16293]}`;
+            return mega.icu.format(l.weeks_chat_history_plural, days / 7);
         case RETENTION_FORMAT.DAYS:
             // `day` || `days`
-            return `${days} ${days === 1 ? l[930] : l[16290]}`;
+            return mega.icu.format(l.days_chat_history_plural, days);
         case RETENTION_FORMAT.HOURS:
             // `hour` || `hours`
-            return `${secondsToHours(retentionTime)} ${secondsToHours(retentionTime) === 1 ? l[7133] : l[7132]}`;
+            return mega.icu.format(l.hours_chat_history_plural, hours);
     }
 };
 

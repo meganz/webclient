@@ -14,7 +14,7 @@ export class HistoryRetentionDialog extends Component {
     inputRef = React.createRef();
 
     state = {
-        selectedTimeFormat: HistoryRetentionDialog.labels.timeFormats.plural.hours,
+        selectedTimeFormat: HistoryRetentionDialog.labels.timeFormats.labelPlural.hours,
         prevTimeRange: undefined,
         timeRange: undefined
     }
@@ -23,7 +23,7 @@ export class HistoryRetentionDialog extends Component {
 
     static labels = {
         timeFormats: {
-            plural: {
+            labelPlural: {
                 // hours
                 [l[7132]]: l[7132],
                 // days
@@ -33,15 +33,15 @@ export class HistoryRetentionDialog extends Component {
                 // months
                 [l[6788]]: l[6788]
             },
-            singular: {
+            inputs: {
                 // hour
-                [l[7132]]: l[7133],
+                [l[7132]]: l.hours_chat_history_plural,
                 // day
-                [l[16290]]: l[930],
+                [l[16290]]: l.days_chat_history_plural,
                 // week
-                [l[16293]]: l[16292],
+                [l[16293]]: l.weeks_chat_history_plural,
                 // month
-                [l[6788]]: l[913]
+                [l[6788]]: l.months_chat_history_plural
             }
         },
         copy: {
@@ -100,23 +100,23 @@ export class HistoryRetentionDialog extends Component {
     getDefaultValue = selectedTimeFormat => {
         const { timeFormats } = HistoryRetentionDialog.labels;
         switch (true) {
-            case selectedTimeFormat === timeFormats.plural[l[7132]]:
+            case selectedTimeFormat === timeFormats.labelPlural[l[7132]]:
                 return LIMIT.HOURS;
-            case selectedTimeFormat === timeFormats.plural[l[16290]]:
+            case selectedTimeFormat === timeFormats.labelPlural[l[16290]]:
                 return LIMIT.DAYS;
-            case selectedTimeFormat === timeFormats.plural[l[16293]]:
+            case selectedTimeFormat === timeFormats.labelPlural[l[16293]]:
                 return LIMIT.WEEKS;
-            case selectedTimeFormat === timeFormats.plural[l[6788]]:
+            case selectedTimeFormat === timeFormats.labelPlural[l[6788]]:
                 return LIMIT.MONTHS;
         }
     };
 
-    getParsedLabel = (label, timeRange) => {
-        timeRange = parseInt(timeRange, 10);
-        if (timeRange !== 1) {
-            return HistoryRetentionDialog.labels.timeFormats.plural[label];
+    getParsedLabel = (label, timeRange, radioBut) => {
+        timeRange = !timeRange ? this.getDefaultValue(label) : parseInt(timeRange, 10);
+        if (radioBut === true) {
+            return HistoryRetentionDialog.labels.timeFormats.labelPlural[label];
         }
-        return HistoryRetentionDialog.labels.timeFormats.singular[label];
+        return mega.icu.format(HistoryRetentionDialog.labels.timeFormats.inputs[label], timeRange);
     };
 
     handleOnChange = e => {
@@ -168,7 +168,7 @@ export class HistoryRetentionDialog extends Component {
         const { chatRoom, onClose } = this.props;
         const { selectedTimeFormat } = this.state;
         const time = HistoryRetentionDialog.timeFrame[selectedTimeFormat] * Number(this.state.timeRange);
-        const IS_HOURS = selectedTimeFormat === HistoryRetentionDialog.labels.timeFormats.plural[l[7132]];
+        const IS_HOURS = selectedTimeFormat === HistoryRetentionDialog.labels.timeFormats.labelPlural[l[7132]];
 
         // TODO: remove IS_HOURS, temp re: testing
         chatRoom.setRetention(IS_HOURS ? hoursToSeconds(time) : daysToSeconds(time), IS_HOURS);
@@ -189,11 +189,11 @@ export class HistoryRetentionDialog extends Component {
     };
 
     renderCustomRadioButton = () => {
-        return Object.values(HistoryRetentionDialog.labels.timeFormats.plural).map(label => {
+        return Object.values(HistoryRetentionDialog.labels.timeFormats.labelPlural).map(label => {
             return (
                 <CustomRadioButton
                     checked={this.state.selectedTimeFormat === label}
-                    label={this.getParsedLabel(label, this.state.timeRange)}
+                    label={this.getParsedLabel(label, this.state.timeRange, true)}
                     name="time-selector"
                     value={label}
                     onChange={this.handleOnChange}
@@ -237,7 +237,7 @@ export class HistoryRetentionDialog extends Component {
                     <div className="content-block form">
                         <div className="form-section">
                             <span className="form-section-placeholder">
-                                {this.getParsedLabel(selectedTimeFormat, this.state.timeRange)}
+                                {this.getParsedLabel(selectedTimeFormat, this.state.timeRange).split(" ")[1]}
                             </span>
                             <input
                                 type="number"

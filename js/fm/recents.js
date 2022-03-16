@@ -872,10 +872,10 @@ RecentsRender.prototype._renderMedia = function($newRow, action, actionId) {
     var $title = $newRow.find(".file-name");
     var $titleString;
 
-    var makeTitle = function() {
+    const makeTitle = function() {
 
-        var numOfFiles = images + videos + pdfs;
-        var titleString = numOfFiles === 1 ? l[835] : l[7470].replace('%d', numOfFiles);
+        const numOfFiles = images + videos + pdfs;
+        const titleString = mega.icu.format(l.file_count, numOfFiles);
 
         return '<span class="title number-of-files">' + titleString + '</span>';
     };

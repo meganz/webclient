@@ -318,7 +318,8 @@ RepayPage.prototype.initPage = function() {
             let nbUsersText = mega.icu.format(l.users_unit, nbOfUsers);
             if (res.nbdu) {
                 const activeUsers = nbOfUsers - res.nbdu;
-                nbUsersText += ` ${mega.icu.format(l.users_detail, res.nbdu).replace('%1', activeUsers)}`;
+                const inactiveUsersString = mega.icu.format(l.inactive_users_detail, res.nbdu);
+                nbUsersText += ` ${mega.icu.format(l.users_detail, activeUsers).replace('[X]', inactiveUsersString)}`;
                 $('.repay-nb-users-info', $leftSection).removeClass('hidden');
             }
             $('#repay-business-nb-users', $leftSection).text(nbUsersText);

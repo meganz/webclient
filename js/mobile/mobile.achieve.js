@@ -136,7 +136,7 @@ mobile.achieve = {
 
                     // Set text to 'x days left'
                     var daysRemaining = Math.round(timeDifference / 86400);
-                    daysRemainingWording = l[16284].replace('%1', daysRemaining);
+                    daysRemainingWording = mega.icu.format(l[16284], daysRemaining);
 
                     // Remove the greyed out CSS class
                     storageCssClass = '';

@@ -144,11 +144,11 @@ mobile.cloud = {
                 var numOfFiles = node.tf;
 
                 // Translate the text for 1 file/folder or x files/folders
-                var foldersWording = numOfFolders === 1 ? l[834] : l[832].replace('[X]', numOfFolders);
-                var filesWording = numOfFiles === 1 ? l[835] : l[833].replace('[X]', numOfFiles);
+                const foldersWording = mega.icu.format(l.folder_count, numOfFolders);
+                const filesWording = mega.icu.format(l.file_count, numOfFiles);
 
                 // Find the existing node and update the number of folders and files
-                $('#' + nodeHandle + ' .num-files').text(foldersWording + ', ' + filesWording);
+                $(`#${nodeHandle} .num-files`).text(`${foldersWording}, ${filesWording}`);
             }
         }
     },
@@ -498,8 +498,8 @@ mobile.cloud = {
         }
 
         // Change pluralisation e.g. 1 folder or x folders and 1 file or x files
-        var folderWording = numOfFolders === 1 ? l[834] : l[832].replace('[X]', numOfFolders);
-        var fileWording = numOfFiles === 1 ? l[835] : l[833].replace('[X]', numOfFiles);
+        const folderWording = mega.icu.format(l.folder_count, numOfFolders);
+        const fileWording = mega.icu.format(l.file_count, numOfFiles);
 
         // Update with the count of folders and files inside
         $infoBar.text(folderWording + ', ' + fileWording);
@@ -519,8 +519,8 @@ mobile.cloud = {
         var numOfFiles = node.tf;
 
         // Translate the text for 1 file/folder or x files/folders
-        var foldersWording = numOfFolders === 1 ? l[834] : l[832].replace('[X]', numOfFolders);
-        var filesWording = numOfFiles === 1 ? l[835] : l[833].replace('[X]', numOfFiles);
+        const foldersWording = mega.icu.format(l.folder_count, numOfFolders);
+        const filesWording = mega.icu.format(l.file_count, numOfFiles);
 
         // Clone the template
         var $template = $templateSelector.clone().removeClass('template');

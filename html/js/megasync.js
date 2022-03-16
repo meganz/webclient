@@ -652,44 +652,11 @@ var megasync = (function() {
                     var toastTxt = '';
                     var folderP = 0;
                     if (response.fo) {
-                        if (response.fo > 1) {
-                            folderP = 2;
+                        toastTxt = `${mega.icu.format(l.folder_trans_manager, response.fo)}
+                         \u00A0${l.total_files_trans_manager.replace('%1', response.fi)}`;
                         }
                         else {
-                            folderP = 1;
-                        }
-                    }
-                    if (response.fi > 1) {
-                        if (folderP === 2) {
-                            toastTxt = l[17879];
-                            toastTxt = toastTxt.replace('%nbFo', response.fo);
-                            toastTxt = toastTxt.replace('%nbFi', response.fi);
-                        }
-                        else if (folderP === 1) {
-                            toastTxt = l[17880];
-                            toastTxt = toastTxt.replace('%nbFo', 1);
-                            toastTxt = toastTxt.replace('%nbFi', response.fi);
-                        }
-                        else {
-                            toastTxt = l[17883];
-                            toastTxt = toastTxt.replace('%nbFi', response.fi);
-                        }
-                    }
-                    else {
-                        if (folderP === 2) {
-                            toastTxt = l[17881];
-                            toastTxt = toastTxt.replace('%nbFo', response.fo);
-                            toastTxt = toastTxt.replace('%nbFi', response.fi);
-                        }
-                        else if (folderP === 1) {
-                            toastTxt = l[17882];
-                            toastTxt = toastTxt.replace('%nbFo', 1);
-                            toastTxt = toastTxt.replace('%nbFi', response.fi);
-                        }
-                        else {
-                            toastTxt = l[17884];
-                            toastTxt = toastTxt.replace('%nbFi', response.fi);
-                        }
+                        toastTxt = mega.icu.format(l[17883], response.fi);
                     }
 
                     showToast('megasync-transfer upload', toastTxt, l[865], l[823],

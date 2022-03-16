@@ -1448,7 +1448,7 @@ export class ContactPickerWidget extends MegaRenderMixin {
         }
 
         const totalContactsNum = contacts.length + frequentContacts.length;
-        const searchPlaceholderMsg = totalContactsNum === 1 ? l[23749] : l[23750].replace('[X]', totalContactsNum);
+        const searchPlaceholderMsg = mega.icu.format(l.search_contact_placeholder, totalContactsNum);
         return (
             <div
                 ref={this.containerRef}

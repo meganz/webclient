@@ -2506,7 +2506,7 @@ FileManager.prototype.initUIKeyEvents = function() {
         }
         else if ((e.keyCode === 46) && (selPanel.length > 0)
             && !$.dialog && M.getNodeRights(M.currentdirid) > 1) {
-            msgDialog('confirmation', l[1003], l[17092].replace('%1', s.length), false, function(e) {
+            msgDialog('confirmation', l[1003], mega.icu.format(l[17092], s.length), false, (e) => {
 
                 // we should encapsule the click handler
                 // to call a function rather than use this hacking

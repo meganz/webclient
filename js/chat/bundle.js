@@ -13149,7 +13149,7 @@ class Text extends AbstractGenericMessage {
     if (message.messageHtml.includes('<pre class="rtf-multi">') && message.messageHtml.includes('</pre>')) {
       returnedButtons.push(external_React_default().createElement(ui_buttons.Button, {
         key: "copy-msg",
-        className: "tiny-button simpletip",
+        className: "tiny-button simpletip copy-txt-block",
         icon: "sprite-fm-mono icon-copy",
         attrs: {
           'data-simpletip': l.copy_txt_block_tip,
@@ -17892,19 +17892,23 @@ class WhosTyping extends mixins.wl {
   }
 
   stoppedTyping(u_h) {
-    var self = this;
+    if (this.isMounted()) {
+      const {
+        currentlyTyping
+      } = this.state;
 
-    if (self.state.currentlyTyping[u_h]) {
-      var newState = clone(self.state.currentlyTyping);
+      if (currentlyTyping[u_h]) {
+        const newState = clone(currentlyTyping);
 
-      if (newState[u_h]) {
-        clearTimeout(newState[u_h][1]);
+        if (newState[u_h]) {
+          clearTimeout(newState[u_h][1]);
+        }
+
+        delete newState[u_h];
+        this.setState({
+          currentlyTyping: newState
+        });
       }
-
-      delete newState[u_h];
-      self.setState({
-        currentlyTyping: newState
-      });
     }
   }
 

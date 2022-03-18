@@ -155,7 +155,7 @@
                 showToast('clipboard', notificationText);
             }
             var star = '';
-            if (n.fav && !folderlink) {
+            if (n.fav && !folderlink && M.getNodeRoot(n.h) !== M.RubbishID) {
                 star = ' sprite-fm-mono icon-favourite-filled';
             }
             $dialog.find('.file-status-icon').attr('class', 'file-status-icon ' + star);
@@ -278,7 +278,9 @@
                 }
             }
             if (filecnt && versioningFlag) {
-                p.t14 = '<a id = "previousversions" >' + p.t14 + '</a>';
+                if (M.currentdirid !== M.RubbishID) {
+                    p.t14 = '<a id="previousversions">' + p.t14 + '</a>';
+                }
             }
         }
         else {
@@ -374,8 +376,10 @@
 
         if ((filecnt === 1) && (foldercnt === 0)) {
             $('#previousversions').rebind('click', function(ev) {
-                fileversioning.fileVersioningDialog(n.h);
-                closeDialog();
+                if (M.currentdirid !== M.RubbishID) {
+                    fileversioning.fileVersioningDialog(n.h);
+                    closeDialog();
+                }
             });
         }
 

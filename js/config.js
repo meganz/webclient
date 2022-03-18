@@ -510,6 +510,11 @@
                     M.columnsWidth.cloud[colPref].viewed = prefs[colPref] > 0;
                 }
             }
+
+            if (M.currentrootid === M.RubbishID) {
+                M.columnsWidth.cloud.fav.disabled = true;
+                M.columnsWidth.cloud.fav.viewed = false;
+            }
         }
     };
 

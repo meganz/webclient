@@ -183,7 +183,7 @@ MegaData.prototype.checkSendToChat = function(isSearch, sourceRoot) {
             let n = M.d[$.selected[i]];
             let nRoot = isSearch ? (n.u === u_handle && M.getNodeRoot($.selected[i])) : sourceRoot;
 
-            if (!n || (n.t && nRoot !== M.RootID)) {
+            if (!n || n.t && nRoot !== M.RootID || nRoot === M.RubbishID) {
                 return false;
             }
         }
@@ -386,6 +386,14 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
     else if (sourceRoot === M.RubbishID && !folderlink) {
         items['.move-item'] = 1;
 
+        delete items['.move-item'];
+        delete items['.copy-item'];
+        delete items['.rename-item'];
+        delete items['.add-star-item'];
+        delete items['.colour-label-items'];
+        delete items['.properties-versions'];
+        delete items['.clearprevious-versions'];
+
         for (var j = $.selected.length; j--;) {
             n = M.getNodeByHandle($.selected[j]);
 
@@ -583,6 +591,10 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
                 $('.files-menu.context .dropdown-item.sort-grid-item.s-fm').removeClass('hidden');
                 if (folderlink) {
                     $('.files-menu.context .dropdown-item.sort-grid-item.s-fm.sort-label').addClass('hidden');
+                    $('.files-menu.context .dropdown-item.sort-grid-item.s-fm.sort-fav').addClass('hidden');
+                }
+
+                if (M.currentdirid === M.RubbishID) {
                     $('.files-menu.context .dropdown-item.sort-grid-item.s-fm.sort-fav').addClass('hidden');
                 }
             }

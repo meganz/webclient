@@ -1150,8 +1150,9 @@
                 var tmp;
                 var title = [];
                 let elm;
+                const root = M.getNodeRoot(aNode && aNode.h || false);
 
-                if (aNode.fav && !folderlink) {
+                if (aNode.fav && !folderlink && root !== M.RubbishID) {
                     elm = aTemplate.querySelector(this.viewmode ? '.file-status-icon' : '.grid-status-icon');
                     elm.classList.add('icon-favourite-filled');
                     elm.classList.remove('icon-dot');

@@ -217,7 +217,8 @@ var slideshowid;
         var $favButton = $('.context-menu .favourite', $overlay);
         var root = M.getNodeRoot(n && n.h || false);
 
-        if (!n || !n.p || (root === 'shares' && M.getNodeRights(n.p) < 2) || folderlink ||
+        if (!n || !n.p || root === 'shares' && M.getNodeRights(n.p) < 2 ||
+            folderlink || root === M.RubbishID ||
             (M.getNodeByHandle(n.h) && !M.getNodeByHandle(n.h).u && M.getNodeRights(n.p) < 2)) {
 
             $favButton.addClass('hidden');
@@ -253,9 +254,28 @@ var slideshowid;
         }
     }
 
+    function slideshow_bin(n, $overlay) {
+        const $infoButton = $('.v-btn.info', $overlay);
+        const $optionButton = $('.v-btn.options', $overlay);
+        const $sendToChat = $('.v-btn.send-to-chat', $overlay);
+        const root = M.getNodeRoot(n && n.h || false);
+
+        if (root === M.RubbishID) {
+            $infoButton.removeClass('hidden');
+            $optionButton.addClass('hidden');
+            $sendToChat.addClass('hidden');
+        }
+        else {
+            $infoButton.addClass('hidden');
+            $optionButton.removeClass('hidden');
+        }
+
+    }
+
     function slideshow_remove(n, $overlay) {
 
         var $removeButton = $('.context-menu .remove', $overlay);
+        const $removeButtonV = $('.v-btn.remove', $overlay);
         var $divider = $removeButton.closest('li').prev('.divider');
         var root = M.getNodeRoot(n && n.h || false);
 
@@ -263,14 +283,22 @@ var slideshowid;
             (M.getNodeByHandle(n.h) && !M.getNodeByHandle(n.h).u && M.getNodeRights(n.p) < 2) || M.chat) {
 
             $removeButton.addClass('hidden');
+            $removeButtonV.addClass('hidden');
             $divider.addClass('hidden');
         }
         else {
             $removeButton.removeClass('hidden');
+
+            if (root === M.RubbishID) {
+                $removeButtonV.removeClass('hidden');
+            }
+            else {
+                $removeButtonV.addClass('hidden');
+            }
+
             $divider.removeClass('hidden');
 
-            $removeButton.rebind('click.mediaviewer', function() {
-
+            const removeFunc = () => {
                 if (M.isInvalidUserStatus()) {
                     history.back();
                     return false;
@@ -283,8 +311,13 @@ var slideshowid;
 
                 fmremove();
                 return false;
-            });
+            };
+
+            $removeButton.rebind('click.mediaviewer', removeFunc);
+            $removeButtonV.rebind('click.mediaviewer', removeFunc);
         }
+
+
     }
 
     function slideshow_node(id, $overlay) {
@@ -915,7 +948,7 @@ var slideshowid;
             });
 
             // Properties icon
-            $('.context-menu .info', $overlay).rebind('click.media-viewer', function() {
+            $('.context-menu .info, .v-btn.info', $overlay).rebind('click.media-viewer', () => {
                 $document.fullScreen(false);
                 propertiesDialog();
                 return false;
@@ -939,7 +972,7 @@ var slideshowid;
                 return false;
             });
 
-            if (u_type === 3 && megaChatIsReady) {
+            if (u_type === 3 && megaChatIsReady && M.currentrootid !== M.RubbishID) {
                 $sendToChat.removeClass('hidden');
             }
             $sendToChat.rebind('click.media-viewer', () => {
@@ -968,6 +1001,9 @@ var slideshowid;
             if (filteredNodeArr && Array.isArray(filteredNodeArr)) {
                 preselection = filteredNodeArr;
             }
+
+            // Icons for rubbish bin
+            slideshow_bin(n, $overlay);
 
             // Previous/Next viewer buttons
             var steps = slideshowsteps();

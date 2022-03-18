@@ -3310,6 +3310,11 @@ FileManager.prototype.addGridUI = function(refresh) {
                     }
                 }
             }
+
+            if (M.currentrootid === M.RubbishID) {
+                M.columnsWidth.cloud.fav.disabled = true;
+                M.columnsWidth.cloud.fav.viewed = false;
+            }
         }
 
         if (M && M.columnsWidth && M.columnsWidth.cloud) {

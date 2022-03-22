@@ -22,7 +22,7 @@ mobile.account.changePassword = {
         }
 
         // Cache the selector for the page
-        this.$page = $('.mobile.my-account-change-password-page');
+        this.$page = $('#startholder .mobile.my-account-change-password-page');
 
         // Initialise page functionality
         this.initUpdateButton();
@@ -32,6 +32,7 @@ mobile.account.changePassword = {
         mobile.initPasswordEstimatorLibrary(this.$page);
         mobile.initPasswordStrengthCheck(this.$page);
         mobile.initBackButton(this.$page, 'fm/account/');
+        mobile.initPasswordVisibleToggle(this.$page);
 
         // Initialise the top menu
         topmenuUI();

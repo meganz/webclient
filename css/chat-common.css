@@ -489,12 +489,14 @@
     float: none;
     width: auto;
     color: var(--text-color-medium);
+    white-space: nowrap;
 }
 .arc-chat-messages-block .conversations-separator {
     margin: 1px 5px 0 5px;
 }
 .arc-chat-messages-block .date-time {
     color: var(--text-color-medium);
+    white-space: nowrap;
 }
 .arc-chat-messages-block .conversation-message .emoji {
     width: 14px;

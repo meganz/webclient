@@ -23872,53 +23872,81 @@ let ConversationsListItem = (conversations_dec = utils["default"].SoonFcWrap(40,
 }, ((0,applyDecoratedDescriptor.Z)(conversations_class.prototype, "eventuallyScrollTo", [conversations_dec], Object.getOwnPropertyDescriptor(conversations_class.prototype, "eventuallyScrollTo"), conversations_class.prototype), (0,applyDecoratedDescriptor.Z)(conversations_class.prototype, "render", [conversations_dec2], Object.getOwnPropertyDescriptor(conversations_class.prototype, "render"), conversations_class.prototype)), conversations_class));
 
 class ArchConversationsListItem extends mixins.wl {
+  componentWillMount() {
+    const {
+      chatRoom
+    } = this.props;
+    this.chatRoomChangeListener = SoonFc(200 + Math.random() * 400 | 0, () => {
+      this.safeForceUpdate();
+    });
+    chatRoom.addChangeListener(this.chatRoomChangeListener);
+  }
+
+  componentWillUnmount() {
+    super.componentWillUnmount();
+    const {
+      chatRoom
+    } = this.props;
+    chatRoom.removeChangeListener(this.chatRoomChangeListener);
+  }
+
   render() {
-    var classString = "arc-chat-list ui-droppable ui-draggable ui-draggable-handle";
-    this.props.chatRoom.megaChat;
-    var chatRoom = this.props.chatRoom;
+    const {
+      chatRoom,
+      onConversationSelected,
+      onConversationClicked,
+      onUnarchiveClicked
+    } = this.props;
+    let classString = 'arc-chat-list ui-droppable ui-draggable ui-draggable-handle';
 
     if (!chatRoom || !chatRoom.chatId) {
       return null;
     }
 
-    var roomId = chatRoom.chatId;
+    const roomId = chatRoom.chatId;
 
     if (chatRoom.archivedSelected === true) {
-      classString += " ui-selected";
+      classString += ' ui-selected';
     }
 
-    var nameClassString = "user-card-name conversation-name";
-    var contactId;
-    var id;
+    let nameClassString = 'user-card-name conversation-name';
+    let contactId;
+    let id;
 
-    if (chatRoom.type === "private") {
-      var contact = M.u[chatRoom.getParticipantsExceptMe()[0]];
+    if (chatRoom.type === 'private') {
+      const contact = M.u[chatRoom.getParticipantsExceptMe()[0]];
 
       if (!contact) {
         return null;
       }
 
-      id = 'conversation_' + htmlentities(contact.u);
-      chatRoom.megaChat.userPresenceToCssClass(contact.presence);
-    } else if (chatRoom.type === "group") {
+      if (!this.fetchingNonContact && !chatRoom.getRoomTitle()) {
+        this.fetchingNonContact = true;
+        MegaPromise.allDone([M.syncUsersFullname(contact.h, undefined, new MegaPromise(nop)), M.syncContactEmail(contact.h, new MegaPromise(nop))]).always(() => {
+          this.safeForceUpdate();
+        });
+      }
+
+      id = `conversation_${escapeHTML(contact.u)}`;
+    } else if (chatRoom.type === 'group') {
       contactId = roomId;
-      id = 'conversation_' + contactId;
+      id = `conversation_${contactId}`;
       classString += ' groupchat';
-    } else if (chatRoom.type === "public") {
+    } else if (chatRoom.type === 'public') {
       contactId = roomId;
-      id = 'conversation_' + contactId;
+      id = `conversation_${contactId}`;
       classString += ' groupchat public';
     } else {
-      return "unknown room type: " + chatRoom.roomId;
+      return `Unknown room type: ${chatRoom.roomId}`;
     }
 
-    var lastMessageDiv = null;
-    var lastMessageDatetimeDiv = null;
-    var emptyMessage = null;
-    var lastMessage = chatRoom.messagesBuff.getLatestTextMessage();
+    let lastMessageDiv;
+    let lastMessageDatetimeDiv = null;
+    let emptyMessage = null;
+    const lastMessage = chatRoom.messagesBuff.getLatestTextMessage();
 
     if (lastMessage) {
-      var renderableSummary = lastMessage.renderableSummary || chatRoom.messagesBuff.getRenderableSummary(lastMessage);
+      const renderableSummary = lastMessage.renderableSummary || chatRoom.messagesBuff.getRenderableSummary(lastMessage);
       lastMessage.renderableSummary = renderableSummary;
       lastMessageDiv = conversations_React.createElement("div", {
         className: "conversation-message"
@@ -23933,8 +23961,8 @@ class ArchConversationsListItem extends mixins.wl {
       }, emptyMessage));
     }
 
-    if (chatRoom.type !== "public") {
-      nameClassString += " privateChat";
+    if (chatRoom.type !== 'public') {
+      nameClassString += ' privateChat';
     }
 
     return conversations_React.createElement("tr", {
@@ -23942,17 +23970,15 @@ class ArchConversationsListItem extends mixins.wl {
       id: id,
       "data-room-id": roomId,
       "data-jid": contactId,
-      onClick: this.props.onConversationSelected.bind(this),
-      onDoubleClick: this.props.onConversationClicked.bind(this)
-    }, conversations_React.createElement("td", {
-      className: ""
-    }, conversations_React.createElement("div", {
+      onClick: onConversationSelected,
+      onDoubleClick: onConversationClicked
+    }, conversations_React.createElement("td", null, conversations_React.createElement("div", {
       className: "fm-chat-user-info todo-star"
     }, conversations_React.createElement("div", {
       className: nameClassString
-    }, conversations_React.createElement(utils.Emoji, null, chatRoom.getRoomTitle()), chatRoom.type === "group" ? conversations_React.createElement("i", {
+    }, conversations_React.createElement(utils.Emoji, null, chatRoom.getRoomTitle()), (chatRoom.type === 'group' || chatRoom.type === 'private') && conversations_React.createElement("i", {
       className: "sprite-fm-uni icon-ekr-key"
-    }) : undefined), conversations_React.createElement("div", {
+    })), conversations_React.createElement("div", {
       className: "last-message-info"
     }, lastMessageDiv, emptyMessage ? null : conversations_React.createElement("div", {
       className: "conversations-separator"
@@ -23971,7 +23997,7 @@ class ArchConversationsListItem extends mixins.wl {
     })), conversations_React.createElement(ui_buttons.Button, {
       className: "mega-button action unarchive-chat right",
       icon: "sprite-fm-mono icon-rewind",
-      onClick: this.props.onUnarchiveConversationClicked.bind(this)
+      onClick: onUnarchiveClicked
     }, conversations_React.createElement("span", null, l[19065]))));
   }
 
@@ -24343,7 +24369,7 @@ class ArchivedConversationsList extends mixins.wl {
         onConversationSelected: e => {
           self.conversationSelected(chatRoom, e);
         },
-        onUnarchiveConversationClicked: e => {
+        onUnarchiveClicked: e => {
           self.unarchiveConversationClicked(chatRoom, e);
         }
       }));

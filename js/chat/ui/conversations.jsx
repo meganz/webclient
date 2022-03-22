@@ -304,106 +304,105 @@ class ConversationsListItem extends MegaRenderMixin {
 };
 
 class ArchConversationsListItem extends MegaRenderMixin {
+    componentWillMount() {
+        const { chatRoom } = this.props;
+        this.chatRoomChangeListener = SoonFc(200 + Math.random() * 400 | 0, () => {
+            this.safeForceUpdate();
+        });
+        chatRoom.addChangeListener(this.chatRoomChangeListener);
+    }
+    componentWillUnmount() {
+        super.componentWillUnmount();
+        const { chatRoom } = this.props;
+        chatRoom.removeChangeListener(this.chatRoomChangeListener);
+    }
     render() {
-        var classString = "arc-chat-list ui-droppable ui-draggable ui-draggable-handle";
+        const { chatRoom, onConversationSelected, onConversationClicked, onUnarchiveClicked } = this.props;
+        let classString = 'arc-chat-list ui-droppable ui-draggable ui-draggable-handle';
 
-        var megaChat = this.props.chatRoom.megaChat;
-
-        var chatRoom = this.props.chatRoom;
         if (!chatRoom || !chatRoom.chatId) {
             return null;
         }
 
-        var roomId = chatRoom.chatId;
+        const roomId = chatRoom.chatId;
 
         // selected
         if (chatRoom.archivedSelected === true) {
-            classString += " ui-selected";
+            classString += ' ui-selected';
         }
 
-        var nameClassString = "user-card-name conversation-name";
+        let nameClassString = 'user-card-name conversation-name';
+        let contactId;
+        let id;
 
-        var contactId;
-        var presenceClass;
-        var id;
-
-        if (chatRoom.type === "private") {
-            var contact = M.u[chatRoom.getParticipantsExceptMe()[0]];
-
-
+        if (chatRoom.type === 'private') {
+            const contact = M.u[chatRoom.getParticipantsExceptMe()[0]];
             if (!contact) {
                 return null;
             }
-            id = 'conversation_' + htmlentities(contact.u);
-
-            presenceClass = chatRoom.megaChat.userPresenceToCssClass(
-                contact.presence
-            );
+            if (!this.fetchingNonContact && !chatRoom.getRoomTitle()) {
+                this.fetchingNonContact = true;
+                MegaPromise.allDone([
+                    M.syncUsersFullname(contact.h, undefined, new MegaPromise(nop)),
+                    M.syncContactEmail(contact.h, new MegaPromise(nop))
+                ]).always(() => {
+                    this.safeForceUpdate();
+                });
+            }
+            id = `conversation_${escapeHTML(contact.u)}`;
         }
-        else if (chatRoom.type === "group") {
+        else if (chatRoom.type === 'group') {
             contactId = roomId;
-            id = 'conversation_' + contactId;
-            presenceClass = 'group';
+            id = `conversation_${contactId}`;
             classString += ' groupchat';
         }
-        else if (chatRoom.type === "public") {
+        else if (chatRoom.type === 'public') {
             contactId = roomId;
-            id = 'conversation_' + contactId;
-            presenceClass = 'group';
+            id = `conversation_${contactId}`;
             classString += ' groupchat public';
         }
         else {
-            return "unknown room type: " + chatRoom.roomId;
+            return `Unknown room type: ${chatRoom.roomId}`;
         }
 
-
-        var lastMessageDiv = null;
-        var lastMessageDatetimeDiv = null;
-        var emptyMessage = null;
-        var lastMsgDivClasses = "conversation-message";
-        var lastMessage = chatRoom.messagesBuff.getLatestTextMessage();
+        let lastMessageDiv;
+        let lastMessageDatetimeDiv = null;
+        let emptyMessage = null;
+        const lastMessage = chatRoom.messagesBuff.getLatestTextMessage();
         if (lastMessage) {
-            var renderableSummary = lastMessage.renderableSummary || chatRoom.messagesBuff.getRenderableSummary(
+            const renderableSummary = lastMessage.renderableSummary || chatRoom.messagesBuff.getRenderableSummary(
                 lastMessage
             );
             lastMessage.renderableSummary = renderableSummary;
 
             lastMessageDiv =
-                <div className={lastMsgDivClasses}>
+                <div className="conversation-message">
                     <ParsedHTML>{renderableSummary}</ParsedHTML>
                 </div>;
 
             lastMessageDatetimeDiv = <div className="date-time">{getTimeMarker(lastMessage.delay, true)}</div>;
         }
         else {
-
             /**
              * Show "Loading" until:
              * 1. I'd fetched chats from the API.
              * 2. I'm retrieving history at the moment.
              * 3. I'd connected to chatd and joined the room.
               */
-
-            emptyMessage = (
-                (
-                    chatRoom.messagesBuff.messagesHistoryIsLoading() ||
-                    this.loadingShown ||
-                    chatRoom.messagesBuff.joined === false
-                    ) ? (
-                        l[7006]
-                    ) :
-                    l[8000]
-            );
+            emptyMessage = chatRoom.messagesBuff.messagesHistoryIsLoading()
+                || this.loadingShown
+                || chatRoom.messagesBuff.joined === false
+                ? l[7006] /* Loading */ : l[8000] /* No conversation history */;
 
             lastMessageDiv =
                 <div>
-                    <div className={lastMsgDivClasses}>
+                    <div className="conversation-message">
                         {emptyMessage}
                     </div>
                 </div>;
         }
-        if (chatRoom.type !== "public") {
-            nameClassString += " privateChat";
+        if (chatRoom.type !== 'public') {
+            nameClassString += ' privateChat';
         }
 
         return (
@@ -412,13 +411,14 @@ class ArchConversationsListItem extends MegaRenderMixin {
                 id={id}
                 data-room-id={roomId}
                 data-jid={contactId}
-                onClick={this.props.onConversationSelected.bind(this)}
-                onDoubleClick={this.props.onConversationClicked.bind(this)}>
-                <td className="">
+                onClick={onConversationSelected}
+                onDoubleClick={onConversationClicked}>
+                <td>
                     <div className="fm-chat-user-info todo-star">
                         <div className={nameClassString}>
                             <Emoji>{chatRoom.getRoomTitle()}</Emoji>
-                            {chatRoom.type === "group" ? <i className="sprite-fm-uni icon-ekr-key"/> : undefined}
+                            {(chatRoom.type === 'group' || chatRoom.type === 'private')
+                                && <i className="sprite-fm-uni icon-ekr-key"/>}
                         </div>
                         <div className="last-message-info">
                             {lastMessageDiv}
@@ -440,7 +440,7 @@ class ArchConversationsListItem extends MegaRenderMixin {
                     <Button
                         className="mega-button action unarchive-chat right"
                         icon="sprite-fm-mono icon-rewind"
-                        onClick={this.props.onUnarchiveConversationClicked.bind(this)}>
+                        onClick={onUnarchiveClicked}>
                         <span>{l[19065] /* `Unarchive` */}</span>
                     </Button>
                 </td>
@@ -808,7 +808,7 @@ class ArchivedConversationsList extends MegaRenderMixin {
                     onConversationSelected={(e) => {
                         self.conversationSelected(chatRoom, e);
                 }}
-                    onUnarchiveConversationClicked={(e) => {
+                    onUnarchiveClicked={(e) => {
                         self.unarchiveConversationClicked(chatRoom, e);
                 }}/>
             );

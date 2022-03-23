@@ -717,6 +717,7 @@ function contactAddDialog(close, dontWarnBusiness) {
 
     $d.find('.hidden-textarea-info span').rebind('click', function() {
         $d.addClass('private');
+        $('.add-user-textarea textarea', $d).focus();
     });
 
     function focusOnInput() {

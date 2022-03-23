@@ -522,9 +522,6 @@ function dashboardUI(updProcess) {
             M.showRecoveryKeyDialog(2);
         });
     });
-
-    // Init dashboard content scrolling
-    initDashboardScroll();
 }
 dashboardUI.renderReferralWidget = function() {
     "use strict";

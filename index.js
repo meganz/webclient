@@ -2758,6 +2758,9 @@ function topmenuUI() {
             loadSubPage('registerb');
         }
         else {
+            if (folderlink) {
+                eventlog(99750);
+            }
             loadSubPage('business');
         }
     });

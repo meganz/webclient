@@ -443,10 +443,22 @@
 .rtl .data-table.medium-list tr td:first-child::before {
     right: 0;
 }
+.table-user-management .data-table.medium-list tr td:first-child::before {
+    left: 4px;
+}
+.table-user-management .rtl .data-table.medium-list tr td:first-child::before {
+    right: 4px;
+}
 
 .data-table.medium-list tr td:last-child::before {
     right: 0;
 }
 .rtl .data-table.medium-list tr td:last-child::before {
     left: 0;
+}
+.table-user-management .data-table.medium-list tr td:last-child::before {
+    right: 4px;
+}
+.table-user-management .rtl .data-table.medium-list tr td:last-child::before {
+    left: 4px;
 }

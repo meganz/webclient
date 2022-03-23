@@ -150,6 +150,7 @@ body {
 
 /* light theme */
 .theme-light,
+.theme-light .custom-alpha,
 html .theme-light-forced {
 
     /* secondary colors */
@@ -167,7 +168,7 @@ html .theme-light-forced {
         --surface-grey-1: #fafafa;
         --surface-grey-2: #eee;
         --surface-grey-3: var(--surface-grey-1);
-        --surface-grey-4: var(--surface-grey-2);
+        --surface-grey-4: rgba(238, 238, 238, var(--surface-alpha, 1));
         --surface-grey-5: var(--surface-main);
         --surface-grey-6: var(--surface-grey-2);
         --surface-light-grey: /* not present in this theme */;
@@ -368,6 +369,7 @@ html .theme-light-forced {
 
 /* dark theme */
 .theme-dark,
+.theme-dark .custom-alpha,
 html .theme-dark-forced {
 
     /* secondary colors */
@@ -385,7 +387,7 @@ html .theme-dark-forced {
         --surface-grey-1: #222;
         --surface-grey-2: #444;
         --surface-grey-3: var(--surface-grey-2);
-        --surface-grey-4: var(--surface-grey-1);
+        --surface-grey-4: rgba(34, 34, 34, var(--surface-alpha, 1));
         --surface-grey-5: var(--surface-grey-2);
         --surface-grey-6: var(--surface-black);
         --surface-light-grey: linear-gradient(180deg, rgba(230, 230, 230, 1) 0%, rgba(204, 204, 204, 1) 100%);

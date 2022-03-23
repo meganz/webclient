@@ -367,18 +367,21 @@ BusinessAccount.prototype.getQuotaUsageReport = function (forceUpdate, fromToDat
             // the second case, left wing of saved data
             else if (fromToDate.fromDate < oldestStoredDate && fromToDate.toDate <= newestStoredDate) {
                 // we need to get data from "fromDate" to "oldestStoredDate-1"
-                var upperDate = new Date(oldestStoredDate.substr(0, 4), oldestStoredDate.substr(4, 2),
-                    oldestStoredDate.substr(6, 2));
+                const upperDate = new Date(
+                    parseInt(oldestStoredDate.substr(0, 4)),
+                    parseInt(oldestStoredDate.substr(4, 2)) - 1,
+                    parseInt(oldestStoredDate.substr(6, 2))
+                );
                 upperDate.setDate(upperDate.getDate() - 1);
 
                 request.fd = fromToDate.fromDate;
 
-                var upperDateStr = String(upperDate.getMonth());
+                let upperDateStr = String(upperDate.getMonth() + 1);
                 if (upperDateStr.length < 2) {
                     upperDateStr = '0' + upperDateStr;
                 }
                 upperDateStr = upperDate.getFullYear() + upperDateStr;
-                var tempDay = String(upperDate.getDate());
+                let tempDay = String(upperDate.getDate());
                 if (tempDay.length < 2) {
                     tempDay = '0' + tempDay;
                 }
@@ -389,18 +392,21 @@ BusinessAccount.prototype.getQuotaUsageReport = function (forceUpdate, fromToDat
             // the third case, right wing of saved data
             else if (fromToDate.fromDate >= oldestStoredDate && fromToDate.toDate > newestStoredDate) {
                 // we need to get data from "newestStoredDate+1" to "toDate"
-                var lowerDate = new Date(newestStoredDate.substr(0, 4), newestStoredDate.substr(4, 2),
-                    newestStoredDate.substr(6, 2));
+                const lowerDate = new Date(
+                    parseInt(newestStoredDate.substr(0, 4)),
+                    parseInt(newestStoredDate.substr(4, 2)) - 1,
+                    parseInt(newestStoredDate.substr(6, 2))
+                );
                 lowerDate.setDate(lowerDate.getDate() + 1);
 
                 request.td = fromToDate.toDate;
 
-                var lowerDateStr = String(lowerDate.getMonth());
+                let lowerDateStr = String(lowerDate.getMonth() + 1);
                 if (lowerDateStr.length < 2) {
                     lowerDateStr = '0' + lowerDateStr;
                 }
                 lowerDateStr = lowerDate.getFullYear() + lowerDateStr;
-                var tempDay2 = String(lowerDate.getDate());
+                let tempDay2 = String(lowerDate.getDate());
                 if (tempDay2.length < 2) {
                     tempDay2 = '0' + tempDay2;
                 }

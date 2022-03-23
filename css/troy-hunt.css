@@ -84,7 +84,7 @@ Landing page
 
 .thunt-landing.top-header {
     display: table-cell;
-    font-family: 'Montserrat', Arial, sans-serif;
+    font-family: var(--text-font-family-second-regular);
     font-size: 30px;
     font-weight: 700;
     letter-spacing: 0;
@@ -109,7 +109,7 @@ Landing page
 
 .thunt-landing.landing-choice-body .choice-question {
     color: #333;
-    font-family: 'montserrat_light', Arial, sans-serif;
+    font-family: var(--text-font-family-second-light);
     font-size: 30px;
     line-height: 50px;
 }
@@ -216,7 +216,7 @@ General individual page
 }
 
 .thunt-content.top-header {
-    font-family: 'Montserrat', Arial, sans-serif;
+    font-family: var(--text-font-family-second-regular);
     font-size: 30px;
     font-weight: 700;
     letter-spacing: 0;
@@ -244,7 +244,7 @@ General individual page
 }
 
 .thunt-content.whois-mega .whois-mega-title {
-    font-family: 'Montserrat', Arial, sans-serif;
+    font-family: var(--text-font-family-second-regular);
     font-size: 30px;
     font-weight: 300;
     line-height: 45px;
@@ -364,7 +364,7 @@ General individual page
 
 .thunt-content.feature-card .feature-card-title {
     color: #373737;
-    font-family: 'Montserrat', Arial, sans-serif;
+    font-family: var(--text-font-family-second-regular);
     font-size: 30px;
     line-height: 40px;
 }

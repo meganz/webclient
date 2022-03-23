@@ -216,12 +216,12 @@ NZIPP Landing page
 .nzipp-landing.top-header {
     font-size: 36px;
     line-height: 44px;
-    font-family: 'montserrat', Arial;
+    font-family: var(--text-font-family-second-regular);
 }
 .nzipp-landing.top-subheader {
     font-size: 28px;
     line-height: 42px;
-    font-family: 'montserrat', Arial;
+    font-family: var(--text-font-family-second-regular);
     padding: 20px 0;
 }
 .nzipp-landing.top-details {
@@ -264,7 +264,7 @@ body:not(.mobile) .nzipp.campaign-button.landing:hover {
     font-size: 36px;
     line-height: 44px;
     padding: 62px 0;
-    font-family: 'montserrat', Arial;
+    font-family: var(--text-font-family-second-regular);
     text-align: left;
 }
 .nzipp-interview.form-content {
@@ -448,7 +448,7 @@ Adaptive
     .nzipp-landing.top-header {
         font-size: 24px;
         line-height: 36px;
-        font-family: 'montserrat_light', Arial;
+        font-family: var(--text-font-family-second-light);
     }
     .nzipp-landing.top-subheader {
         font-size: 20px;
@@ -487,7 +487,7 @@ Adaptive
     .nzipp-interview.top-header {
         font-size: 24px;
         line-height: 36px;
-        font-family: 'montserrat_light', Arial;
+        font-family: var(--text-font-family-second-light);
         padding: 30px 0;
     }
     .nzipp-interview.form-content {

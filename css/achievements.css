@@ -20,18 +20,18 @@ body.rtl .achievement-page * {
     margin: 0;
 }
 .achievement-page h1 {
-    font-family: 'montserrat_bold', 'montserrat', arial, sans-serif;
+    font-family: var(--text-font-family-second-bold);
     font-size: 40px;
     line-height: 63px;
 }
 .achievement-page h2 {
     color: #373737;
-    font-family: var(--text-font-family-montserrat-bold);
+    font-family: var(--text-font-family-second-bold);
     font-size: 36px;
     line-height: 48px;
 }
 .achievement-page h2.light {
-    font-family: var(--text-font-family-montserrat-light);
+    font-family: var(--text-font-family-second-light);
 }
 
 @media only screen and (max-width: 624px) {

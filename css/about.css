@@ -108,7 +108,7 @@ body:not(.mobile) .about.main-menu.item:hover span {
     line-height: 58px;
     padding: 4px 0 24px;
     color: var(--text-color-high);
-    font-family: "montserrat_bold", montserrat, Arial, sans-serif;
+    font-family: var(--text-font-family-second-bold);
 }
 .about .bottom-page.jobs-dream-container {
     display: table;
@@ -158,14 +158,12 @@ body:not(.mobile) .about.top-info a:hover {
     box-sizing: border-box;
 }
 .about.numbers-info .num {
-    /*font-size: 33px;*/
     line-height: 44px;
     color: #FFFFFF;
-    /*font-family: 'montserrat', 'source_sans_proregular', Arial;*/
     display: block;
     padding-bottom: 8px;
     font-size: 54px;
-    font-family: "montserrat_bold", "montserrat_semibold", "source_sans_prosemibold", Arial, sans-serif;
+    font-family: var(--text-font-family-second-bold);
 }
 .about.numbers-info .lang .num {
     padding-top: 8px;
@@ -173,7 +171,7 @@ body:not(.mobile) .about.top-info a:hover {
 }
 .about.numbers-info .num span, .en .about.numbers-info .num {
     font-size: 54px;
-    font-family: 'montserrat_bold', 'montserrat_semibold', 'source_sans_prosemibold', Arial;
+    font-family: var(--text-font-family-second-bold);
     display: block;
 }
 .about.numbers-info .num span {
@@ -373,7 +371,7 @@ Timeline
     grid-row: 1;
 }
 .about.vision-title {
-    font-family: var(--text-font-family-montserrat-bold);
+    font-family: var(--text-font-family-second-bold);
     font-size: 48px;
     color: var(--stroke-grey-1);
     text-align: center;
@@ -384,7 +382,7 @@ Timeline
     user-select: none !important;
 }
 .about.promise-title {
-    font-family: var(--text-font-family-montserrat-bold);
+    font-family: var(--text-font-family-second-bold);
     font-size: 48px;
     color: rgb(29 29 29);
     text-align: center;
@@ -394,7 +392,7 @@ Timeline
     position: relative;
 }
 .about.vision-desc {
-    font-family: var(--text-font-family-montserrat-regular);
+    font-family: var(--text-font-family-second-regular);
     font-size: 48px;
     color: #FAFAFA;
     text-align: center;
@@ -409,7 +407,7 @@ Timeline
     user-select: none !important;
 }
 .about.promise-desc {
-    font-family: var(--text-font-family-montserrat-bold);
+    font-family: var(--text-font-family-second-bold);
     font-size: 64px;
     color: #FAFAFA;
     line-height: 78px;
@@ -431,7 +429,7 @@ Timeline
     background-color: #F6F6F6;
 }
 .about.mega-story-title {
-    font-family: var(--text-font-family-montserrat-bold);
+    font-family: var(--text-font-family-second-bold);
     font-size: 36px;
     color: #1D1D1D;
     padding-bottom: 250px;
@@ -457,7 +455,7 @@ Timeline
     content: attr(pop-lang);
     color: rgb(250 250 250);
     mix-blend-mode: difference;
-    font-family: var(--text-font-family-montserrat-bold);
+    font-family: var(--text-font-family-second-bold);
     font-size: 48px;
     text-align: center;
     padding-top: 6vh;
@@ -467,7 +465,7 @@ Timeline
     position: relative;
 }
 .about.vision-desc > span {
-    font-family: var(--text-font-family-montserrat-bold);
+    font-family: var(--text-font-family-second-bold);
 }
 .about.office1 {
     width: 100%;
@@ -648,7 +646,7 @@ Timeline
 }
 .about .location-title {
     color: var(--text-color-high);
-    font-family: "montserrat_bold", montserrat, Arial, sans-serif;
+    font-family: var(--text-font-family-second-bold);
     font-size: 48px;
     line-height: 58px;
     padding-bottom: 100px;
@@ -705,14 +703,14 @@ Timeline
 }
 .about.jobs.sub-header {
     color: var(--text-color-high);
-    font-family: "montserrat_bold", montserrat, Arial, sans-serif;
+    font-family: var(--text-font-family-second-bold);
     font-size: 48px;
     line-height: 58px;
     grid-column: 1/ span 3;
 }
 .about.jobs.sub-header2 {
     color: var(--text-color-high);
-    font-family: "montserrat_bold", montserrat, Arial, sans-serif;
+    font-family: var(--text-font-family-second-bold);
     font-size: 48px;
     line-height: 58px;
     grid-column: 1 / span 3;
@@ -725,7 +723,7 @@ Timeline
 }
 .about.sub-header {
     color: var(--text-color-high);
-    font-family: "montserrat_bold", montserrat, Arial, sans-serif;
+    font-family: var(--text-font-family-second-bold);
     font-size: 48px;
     line-height: 58px;
     grid-column: 1 / span 3;
@@ -740,7 +738,7 @@ Timeline
 }
 .about.jobs.sub-header3 {
     color: var(--text-color-high);
-    font-family: "montserrat_bold", montserrat, Arial, sans-serif;
+    font-family: var(--text-font-family-second-bold);
     font-size: 48px;
     line-height: 58px;
     grid-column: 1 / span 3;
@@ -837,7 +835,7 @@ Timeline
     line-height: 24px;
     color: #BF1515;
     text-align: left;
-    font-family: "montserrat_bold", montserrat, sans-serif;
+    font-family: var(--text-font-family-second-bold);
     float: right;
     padding-bottom: 52px;
 }
@@ -929,7 +927,7 @@ Timeline
     grid-column: 9 / span 4;
 }
 .about-mission-header {
-    font-family: var(--text-font-family-montserrat-bold);
+    font-family: var(--text-font-family-second-bold);
     padding: 4px 0 46px;
     font-size: 48px;
     line-height: 50px;
@@ -1131,7 +1129,7 @@ body:not(.mobile) .about.white-button:hover {
     background-position: center -1164px;
 }
 .about.use-header {
-    font-family: 'montserrat_bold', 'montserrat_semibold', 'source_sans_probold', Arial;
+    font-family: var(--text-font-family-second-bold);
     font-size: 16px;
     line-height: 20px;
     color: #373737;

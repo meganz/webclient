@@ -2980,9 +2980,11 @@ else if (!browserUpdate) {
     if (lang === 'ar' || lang === 'fa') {
         jsl.push({f:'css/lang_ar.css', n: 'lang_arabic_css', j: 2, w: 30, c: 1, d: 1, m: 1});
     }
-
-    if (lang === 'th') {
+    else if (lang === 'th') {
         jsl.push({f:'css/lang_th.css', n: 'lang_thai_css', j: 2, w: 30, c: 1, d: 1, m: 1});
+    }
+    else if (lang === 'vi') {
+        jsl.push({f:'css/lang_vi.css', n: 'lang_viet_css', j: 2, w: 30, c: 1, d: 1, m: 1});
     }
 
     // Load files common to all mobile pages

@@ -63,14 +63,16 @@ class WhosTyping extends MegaRenderMixin {
         chatRoom.off("onParticipantTyping.whosTyping");
     }
     stoppedTyping(u_h) {
-        var self = this;
-        if (self.state.currentlyTyping[u_h]) {
-            var newState = clone(self.state.currentlyTyping);
-            if (newState[u_h]) {
-                clearTimeout(newState[u_h][1]);
+        if (this.isMounted()) {
+            const { currentlyTyping } = this.state;
+            if (currentlyTyping[u_h]) {
+                const newState = clone(currentlyTyping);
+                if (newState[u_h]) {
+                    clearTimeout(newState[u_h][1]);
+                }
+                delete newState[u_h];
+                this.setState({ currentlyTyping: newState });
             }
-            delete newState[u_h];
-            self.setState({currentlyTyping: newState});
         }
     }
     render() {

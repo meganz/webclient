@@ -380,10 +380,7 @@
                     }
                     var subPage = id.replace('/', '').split('user-management')[1];
                     if (subPage && subPage.length > 2) {
-                        if (subPage === 'overview') {
-                            usersM.viewBusinessAccountOverview();
-                        }
-                        else if (subPage === 'account') {
+                        if (subPage === 'account') {
                             usersM.viewBusinessAccountPage();
                         }
                         else if (subPage === 'invoices') {
@@ -395,6 +392,9 @@
                         }
                         else if (subPage.length === 11) {
                             usersM.viewSubAccountInfoUI(subPage);
+                        }
+                        else {
+                            usersM.viewSubAccountListUI();
                         }
                     }
                     else {

@@ -14,7 +14,6 @@
         "custom-property-empty-line-before": null,
         "declaration-empty-line-before": null,
         "selector-class-pattern": null,
-
         "no-irregular-whitespace": true,
         "no-missing-end-of-source-newline": true,
         "max-empty-lines": 2,
@@ -41,7 +40,8 @@
                     "css-appearance",
                     "css-gradients",
                     "css-masks",
-                    "multicolumn"
+                    "multicolumn",
+                    "css-sticky"
                 ],
                 "severity": "warning"
             }
@@ -110,6 +110,12 @@
             "legacy",
             {
                 "severity": "warning"
+            }
+        ],
+        "value-no-vendor-prefix": [
+            true,
+            {
+                "ignoreValues": ["sticky"]
             }
         ]
     }

@@ -159,7 +159,7 @@ mega.textEditorUI = new function TextEditorUI() {
                 scrollbarStyle: "overlay",
                 autofocus: true,
                 lineWrapping: true,
-                readOnly: $viewerContainer ? 'nocursor' : false
+                readOnly: typeof $viewerContainer !== 'undefined'
             });
         }
 
@@ -528,8 +528,14 @@ mega.textEditorUI = new function TextEditorUI() {
                 // Without parentheses && will be applied first,
                 // I want JS to start from left and go in with first match
                 // eslint-disable-next-line no-extra-parens
-                if (isReadonly || folderlink || (M.currentrootid === 'shares' && M.getNodeRights(handle) < 1)) {
-                    editor.options.readOnly = 'nocursor';
+                if (isReadonly || folderlink || (M.currentrootid === 'shares' && M.getNodeRights(handle) < 1) ||
+                    M.currentrootid === M.RubbishID) {
+                    editor.options.readOnly = true;
+
+                    if (is_mobile) {
+                        editor.options.readOnly = 'nocursor';
+                    }
+
                     $('header .file-btn', $editorContainer).addClass('disabled');
                     $('.save-btn', $editorContainer).addClass('hidden');
                 }

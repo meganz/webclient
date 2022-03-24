@@ -42,9 +42,9 @@ function BusinessAccountUI() {
         }
 
         var $businessAccountContianer = $('.files-grid-view.user-management-view');
+        $businessAccountContianer.removeClass('main-page');
         $('.user-management-list-table', $businessAccountContianer).addClass('hidden');
         $('.user-management-subaccount-view-container', $businessAccountContianer).addClass('hidden');
-        $('.user-management-overview-container', $businessAccountContianer).addClass('hidden');
         $('.user-management-landing-page.user-management-view', $businessAccountContianer).addClass('hidden');
         var $accountContainer = $('.user-management-account-settings', $businessAccountContianer).addClass('hidden');
         $('.invoice', $accountContainer).addClass('hidden');
@@ -82,10 +82,6 @@ function BusinessAccountUI() {
 
 
         // header events handlers
-        $('.fm-right-header-user-management .user-management-main-page-buttons .ba-overview').off('click.subuser')
-            .on('click.subuser', function overviewHeaderButtonHandler() {
-                mySelf.viewBusinessAccountOverview();
-            });
         $('.fm-right-header-user-management .user-management-main-page-buttons .add-sub-user').off('click.subuser')
             .on('click.subuser', function addSubUserHeaderButtonHandler() {
                 mySelf.showAddSubUserDialog();
@@ -94,9 +90,6 @@ function BusinessAccountUI() {
             .on('click.subuser', function addSubUserHeaderButtonHandler() {
                 mySelf.viewBusinessAccountPage();
             });
-        $('.js-lpbtn[data-link="addnewsubuser"').rebind('click.subuser', function addSubUserHeaderButtonHandler() {
-            mySelf.showAddSubUserDialog();
-        });
         return true;
     };
 
@@ -202,6 +195,34 @@ function initBusinessAccountScroll($scrollBlock) {
 }
 
 /**
+ * Function to format start and end dates
+ *
+ * @param   {Date}    leadingDate                           The start date of the required month
+ * @returns {Object} {{fromDate: string, toDate: string}}   The format of start date and end date in YYYYMMDD
+ */
+function getReportDates(leadingDate) {
+    "use strict";
+
+    const today = leadingDate || new Date();
+    const todayMonth = today.getUTCMonth() + 1;
+    let currMonth = String(todayMonth);
+    if (currMonth.length < 2) {
+        currMonth = `0${currMonth}`;
+    }
+    const currYear = String(today.getUTCFullYear());
+
+    const startDate = `${currYear}${currMonth}01`;
+
+    const endDate = getLastDayofTheMonth(today);
+    if (!endDate) {
+        return;
+    }
+    const endDateStr = String(endDate.getUTCFullYear()) + currMonth + String(endDate.getDate());
+
+    return { fromDate: startDate, toDate: endDateStr };
+}
+
+/**
  * Decodes fields in a user object into the correct values.
  *
  * @param {object} encodedUser the user object from the API
@@ -271,7 +292,7 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
         $subAccountsView = $('.fm-blocks-view.user-management-view', $contentBlock);
     }
     $contentBlock.removeClass('hidden');
-    $subAccountsView.removeClass('hidden');
+    $subAccountsView.removeClass('hidden').addClass('main-page');
     $emptyBlock.addClass('hidden');
 
     if (!quickWay) {
@@ -295,6 +316,35 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
     }
 
     currSubAccounts = mySelf.sortSubusers(currSubAccounts);
+
+    // Populate the correct number of each type of users into the user analysis table
+    const populateUserAnalysisUI = function() {
+        let numberOfSubs = 0;
+        let activeSubs = 0;
+        let pendingSubs = 0;
+        let disabledSubs = 0;
+
+        for (const sub in currSubAccounts) {
+            numberOfSubs++;
+            if (sub === u_handle) {
+                activeSubs++;
+            }
+            else if (M.suba[sub] && M.suba[sub].s === 0) {
+                activeSubs++;
+            }
+            else if (M.suba[sub] && M.suba[sub].s === 10) {
+                pendingSubs++;
+            }
+            else {
+                disabledSubs++;
+            }
+        }
+
+        $('.user-segments-container.all-subs .user-segment-number', $subAccountsView).text(numberOfSubs);
+        $('.user-segments-container.active-subs .user-segment-number', $subAccountsView).text(activeSubs);
+        $('.user-segments-container.pending-subs .user-segment-number', $subAccountsView).text(pendingSubs);
+        $('.user-segments-container.disabled-subs .user-segment-number', $subAccountsView).text(disabledSubs);
+    };
 
     var unhideUsersListSection = function () {
         const $listTable = $('.user-management-list-table', $subAccountsView);
@@ -532,7 +582,6 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
             return;
         }
 
-        var numberOfSubs = 0;
         var totalStorage = 0;
         var totalBandwidth = 0;
 
@@ -549,7 +598,6 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
         }
 
         for (var sub in subUsersData) {
-            numberOfSubs++;
             var subStorage = subUsersData[sub].ts || 0;
             var subBandwidth = subUsersData[sub].dl || 0;
 
@@ -575,8 +623,6 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
         var totalStorageFormatted = numOfBytes(totalStorage, 2);
         var totalBandwidthFormatted = numOfBytes(totalBandwidth, 2);
 
-        $('.info-block.nb-sub-users .number', '.user-management-overview-bar').text(numberOfSubs);
-
         $('.info-block.storage-sub-users .number', '.user-management-overview-bar').text(totalStorageFormatted.size);
         $('.info-block.storage-sub-users .title2', '.user-management-overview-bar').text(totalStorageFormatted.unit);
 
@@ -587,17 +633,12 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
 
         $('.user-management-overview-bar').removeClass('hidden');
 
-        // handler for clicking on overview bar at the bottom
-        $('.user-management-overview-bar').off('click.suba').on('click.suba', function overviewBarClickHandler() {
-            mySelf.viewBusinessAccountOverview();
-        });
-
         loadingDialog.phide();
     };
 
     var reDraw = this.isRedrawNeeded(currSubAccounts, this.business.previousSubList);
-
     if (reDraw) {
+        populateUserAnalysisUI();
         fillSubUsersTable(currSubAccounts, this);
         // storing current drawn sub-users to prevent not needed redraw
         this.business.previousSubList = JSON.parse(JSON.stringify(currSubAccounts));
@@ -1221,77 +1262,43 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
     initBusinessAccountScroll($subAccountContainer);
 };
 
-
-/** show business account overview page
- * */
-BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
+/**
+ * Show the storage and transfer analytic graphs on the admin user's dashboard page
+ */
+BusinessAccountUI.prototype.viewAdminDashboardAnalysisUI = function() {
     "use strict";
 
-    if (!this.initUItoRender()) {
-        return;
-    }
-    var mySelf = this;
-    this.URLchanger('overview');
+    const mySelf = this;
+    const $businessDashboard = $('.fm-right-block.dashboard .business-dashboard');
+    const $nbPriceContainer = $('.overall-next-bill-wrapper', $businessDashboard);
+    const $storageAnalysisPie = $('.storage-analysis-pie-container', $businessDashboard);
+    const $stgeTrfAnalysisContainer = $('.data-analysis-container', $businessDashboard);
+    const $stgeAnalysisContainer = $('.storage-analysis-container', $stgeTrfAnalysisContainer);
+    const $trfAnalysisContainer = $('.transfer-analysis-container', $stgeTrfAnalysisContainer);
 
-    var $businessAccountContainer = $('.files-grid-view.user-management-view');
-    var $overviewContainer = $('.user-management-overview-container', $businessAccountContainer);
-
-    // header
-    var $overviewHeader = $('.fm-right-header-user-management .user-management-breadcrumb.overview');
-    $overviewHeader.removeClass('hidden');
-    var $overviewHeaderBtns = $('.fm-right-header-user-management .user-management-overview-buttons');
-    $overviewHeaderBtns.removeClass('hidden');
-    $('.user-management-title', $overviewHeader).rebind('click.subuser',
-        function overviewHeaderClickHandler() {
-            mySelf.viewSubAccountListUI();
-        }
-    );
-
-    // private function to populate the dashboard
-    /* eslint-disable-next-line complexity */
-    var populateDashboard = function (st, quotas) {
+    // Private function to populate the pie chart and data into the storage usage dashboard
+    const populateStoragePieAndData = function(st, quotas) {
         if (!quotas) {
             return;
         }
-        var todayStats = quotas[Object.keys(quotas)[0]];
 
-        var numberOfSubs = todayStats.tu || 0;
-        var activeSubs = 0;
-        var pendingSubs = 0;
-        var disabledSubs = 0;
-        var totalStorage = todayStats.ts || 0;
-        var totalBandwidth = todayStats.tdl || 0;
-        var inshareTotal = 0;
-        var rootTotal = 0;
-        var rubbishTotal = 0;
-        var outshareTotal = 0;
+        const todayStats = quotas[Object.keys(quotas)[0]];
+        let totalStorage = todayStats.ts || 0;
+        let inshareTotal = 0;
+        let rootTotal = 0;
+        let rubbishTotal = 0;
+        let outshareTotal = 0;
 
-        var emptyArray = [0, 0, 0, 0, 0];
-        var currRoot;
-        var currInhare;
-        var currInhareEx;
-        var currOutshare;
-        var currRubbish;
+        const emptyArray = [0, 0, 0, 0, 0];
+        let currRoot;
+        let currInhare;
+        let currInhareEx;
+        let currRubbish;
 
-
-        for (var sub in todayStats.u) {
-            if (sub === u_handle) {
-                activeSubs++;
-            }
-            else if (M.suba[sub] && M.suba[sub].s === 0) {
-                activeSubs++;
-            }
-            else if (M.suba[sub] && M.suba[sub].s === 10) {
-                pendingSubs++;
-            }
-            else {
-                disabledSubs++;
-            }
-
+        for (const sub in todayStats.u) {
             currRoot = todayStats.u[sub]["2"] || emptyArray;
             currInhare = todayStats.u[sub]["isi"] || emptyArray;
             currInhareEx = todayStats.u[sub]["ise"] || emptyArray;
-            currOutshare = todayStats.u[sub]["ose"] || emptyArray;
             currRubbish = todayStats.u[sub]["4"] || emptyArray;
 
             rootTotal += currRoot[0];
@@ -1302,74 +1309,65 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
 
         totalStorage = rootTotal + rubbishTotal + outshareTotal + inshareTotal;
 
-        var totalStorageFormatted = numOfBytes(totalStorage, 2);
-        var totalBandwidthFormatted = numOfBytes(totalBandwidth, 2);
-        var rootTotalFormatted = numOfBytes(rootTotal, 2);
-        var rubbishTotalFormatted = numOfBytes(rubbishTotal, 2);
-        var inshareTotalFormatted = numOfBytes(inshareTotal, 2);
-        var outshareTotalFormatted = numOfBytes(outshareTotal, 2);
+        const totalStorageFormatted = numOfBytes(totalStorage, 2);
+        const rootTotalFormatted = numOfBytes(rootTotal, 2);
+        const rubbishTotalFormatted = numOfBytes(rubbishTotal, 2);
+        const inshareTotalFormatted = numOfBytes(inshareTotal, 2);
+        const outshareTotalFormatted = numOfBytes(outshareTotal, 2);
 
-        var rootPrecentage = rootTotal / totalStorage;
-        rootPrecentage = Math.round(Number.parseFloat(rootPrecentage * 100).toFixed(2));
-        var insharePrecentage = inshareTotal / totalStorage;
-        insharePrecentage = Math.round(Number.parseFloat(insharePrecentage * 100).toFixed(2));
-        var rubbishPrecentage = rubbishTotal / totalStorage;
-        rubbishPrecentage = Math.round(Number.parseFloat(rubbishPrecentage * 100).toFixed(2));
-        var outsharePrecentage = outshareTotal / totalStorage;
-        outsharePrecentage = Math.round(Number.parseFloat(outsharePrecentage * 100).toFixed(2));
+        let rootPercentage = rootTotal / totalStorage;
+        rootPercentage = Math.round(Number.parseFloat(rootPercentage * 100).toFixed(2));
+        let insharePercentage = inshareTotal / totalStorage;
+        insharePercentage = Math.round(Number.parseFloat(insharePercentage * 100).toFixed(2));
+        let rubbishPercentage = rubbishTotal / totalStorage;
+        rubbishPercentage = Math.round(Number.parseFloat(rubbishPercentage * 100).toFixed(2));
+        let outsharePercentage = outshareTotal / totalStorage;
+        outsharePercentage = Math.round(Number.parseFloat(outsharePercentage * 100).toFixed(2));
 
-        var digitClassMap = ["one-digit", "two-digits", "three-digits"];
-        var cloudNodeDigitClass = digitClassMap[String(rootPrecentage).length - 1];
-        var inshareNodeDigitClass = digitClassMap[String(insharePrecentage).length - 1];
-        var rubbishNodeDigitClass = digitClassMap[String(rubbishPrecentage).length - 1];
-        var inboxNodeDigitClass = digitClassMap[String(outsharePrecentage).length - 1];
+        const digitClassMap = ["one-digit", "two-digits", "three-digits"];
+        const cloudNodeDigitClass = digitClassMap[String(rootPercentage).length - 1];
+        const inshareNodeDigitClass = digitClassMap[String(insharePercentage).length - 1];
+        const rubbishNodeDigitClass = digitClassMap[String(rubbishPercentage).length - 1];
+        const inboxNodeDigitClass = digitClassMap[String(outsharePercentage).length - 1];
 
-        $overviewContainer.find('.user-segments-container.all-subs .user-segment-number').text(numberOfSubs);
-        $overviewContainer.find('.user-segments-container.active-subs .user-segment-number').text(activeSubs);
-        $overviewContainer.find('.user-segments-container.pending-subs .user-segment-number').text(pendingSubs);
-        $overviewContainer.find('.user-segments-container.disabled-subs .user-segment-number').text(disabledSubs);
-
-        $overviewContainer.find('.storage-summary .total-storage-number')
+        $('.storage-summary .total-storage-number', $storageAnalysisPie)
             .text(totalStorageFormatted.size + ' ' + totalStorageFormatted.unit);
 
-        $overviewContainer.find('.storage-division-container.cloud-node .storage-division-num')
+        $('.storage-division-container.cloud-node .storage-division-num', $storageAnalysisPie)
             .text(rootTotalFormatted.size + ' ' + rootTotalFormatted.unit);
-        $overviewContainer.find('.storage-division-container.cloud-node .storage-division-per')
-            .text(rootPrecentage + '%').addClass(cloudNodeDigitClass);
-        $overviewContainer.find('.storage-division-container.inshare-node .storage-division-num')
-            .text(inshareTotalFormatted.size + ' ' + inshareTotalFormatted.unit);
-        $overviewContainer.find('.storage-division-container.inshare-node .storage-division-per')
-            .text(insharePrecentage + '%').addClass(inshareNodeDigitClass);
-        $overviewContainer.find('.storage-division-container.rubbish-node .storage-division-num')
-            .text(rubbishTotalFormatted.size + ' ' + rubbishTotalFormatted.unit);
-        $overviewContainer.find('.storage-division-container.rubbish-node .storage-division-per')
-            .text(rubbishPrecentage + '%').addClass(rubbishNodeDigitClass);
-        $overviewContainer.find('.storage-division-container.inbox-node .storage-division-num')
+        $('.storage-division-container.cloud-node .storage-division-per', $storageAnalysisPie)
+            .text(`${rootPercentage}%`).addClass(cloudNodeDigitClass);
+        $('.storage-division-container.inbox-node .storage-division-num', $storageAnalysisPie)
             .text(outshareTotalFormatted.size + ' ' + outshareTotalFormatted.unit);
-        $overviewContainer.find('.storage-division-container.inbox-node .storage-division-per')
-            .text(outsharePrecentage + '%').addClass(inboxNodeDigitClass);
+        $('.storage-division-container.inbox-node .storage-division-per', $storageAnalysisPie)
+            .text(`${outsharePercentage}%`).addClass(inboxNodeDigitClass);
+        $('.storage-division-container.inshare-node .storage-division-num', $storageAnalysisPie)
+            .text(inshareTotalFormatted.size + ' ' + inshareTotalFormatted.unit);
+        $('.storage-division-container.inshare-node .storage-division-per', $storageAnalysisPie)
+            .text(`${insharePercentage}%`).addClass(inshareNodeDigitClass);
+        $('.storage-division-container.rubbish-node .storage-division-num', $storageAnalysisPie)
+            .text(rubbishTotalFormatted.size + ' ' + rubbishTotalFormatted.unit);
+        $('.storage-division-container.rubbish-node .storage-division-per', $storageAnalysisPie)
+            .text(`${rubbishPercentage}%`).addClass(rubbishNodeDigitClass);
 
-        $overviewContainer.find('.transfer-analysis-summary .total-transfer-number')
-            .text(totalBandwidthFormatted.size + ' ' + totalBandwidthFormatted.unit);
+        // Show the storage pie chart and data analysis panel
+        $storageAnalysisPie.removeClass('hidden');
 
-        $businessAccountContainer.removeClass('hidden'); // BA container
-        $overviewContainer.removeClass('hidden');
-
-        var $chartContainer = $('#pie-chart-contianer');
+        // Draw the storage pie chart analytics graph
+        const $chartContainer = $('#pie-chart-content', $storageAnalysisPie);
         $chartContainer.empty();
         $chartContainer.safeHTML('<canvas id="usage-pie-chart"></canvas>');
-        var $pieChart = $('#usage-pie-chart', $chartContainer);
+        const $pieChart = $('#usage-pie-chart', $chartContainer);
 
         M.require('charts_js').done(function usagePieChartDataPopulate() {
-
-            var tooltipLabeling = function (tooltipItem, data) {
-                var label = data.labels[tooltipItem.index] || '';
-                var perc = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
+            const tooltipLabeling = function(tooltipItem, data) {
+                let label = data.labels[tooltipItem.index] || '';
+                const perc = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
 
                 if (label) {
                     label += ': ';
                 }
-                var sizeInfo = numOfBytes(perc);
+                const sizeInfo = numOfBytes(perc);
                 label += sizeInfo.size + ' ' + sizeInfo.unit;
                 return label;
             };
@@ -1387,7 +1385,7 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
                 style.getPropertyValue('--label-purple-hover').trim(),
                 style.getPropertyValue('--label-green-hover').trim()
             ];
-            var usagePieChart = new Chart($pieChart, {
+            const usagePieChart = new Chart($pieChart, {
                 type: 'doughnut',
                 data: {
                     datasets: [{
@@ -1406,6 +1404,7 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
                     ]
                 },
                 options: {
+                    maintainAspectRatio: false,
                     legend: {
                         display: false
                     },
@@ -1419,17 +1418,14 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
                         arc: {
                             borderWidth: 0
                         }
-                    },
-                    onResize: () => {
-                        initBusinessAccountScroll($overviewContainer);
                     }
                 }
             });
 
-            var $customCharLegend = $('.storage-analysis-container .storage-division-container', $overviewContainer)
-                .off('click.subuser').on('click.subuser', function chartLegendClickHandler(e) {
-                    var $me = $(this);
-                    var ix = 0;
+            const $customChartLegend = $('.storage-pie-data-container .storage-division-container', $storageAnalysisPie)
+                .rebind('click.subuser', function chartLegendClickHandler(e) {
+                    const $me = $(this);
+                    let ix = 0;
                     if ($me.hasClass('inbox-node')) {
                         ix = 1;
                     }
@@ -1447,155 +1443,210 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
                         $me.addClass('disabled');
                     }
 
-                    var item = usagePieChart.legend.legendItems[ix];
+                    const item = usagePieChart.legend.legendItems[ix];
                     usagePieChart.legend.options.onClick.call(usagePieChart.legend, e, item);
                 });
-            $customCharLegend.removeClass('disabled');
-
-            initBusinessAccountScroll($overviewContainer);
+            $customChartLegend.removeClass('disabled');
         });
     };
 
-    // private function to format start and end dates
-    var getReportDates = function (leadingDate) {
-        var today = leadingDate || new Date();
+    // Private function to determine the scale unit of the bar chart
+    const setBarChartScaleUnit = function(res, isTransferData) {
+        const propertyName = isTransferData ? 'tdl' : 'ts';
+        let dataDivider = 1;
 
-        var todayMonth = today.getUTCMonth() + 1;
-        var currMonth = String(todayMonth);
-        if (currMonth.length < 2) {
-            currMonth = '0' + currMonth;
+        // Determine the scale
+        const scaleKB = 1024;
+        const scaleMB = 1024 * scaleKB;
+        const scaleGB = 1024 * scaleMB;
+        const scaleTB = 1024 * scaleGB;
+        let is_KB = false;
+        let is_MB = false;
+        let is_GB = false;
+        let is_TB = false;
+
+        for (const dailyData in res) {
+            const consume = res[dailyData][propertyName] || 0;
+            if (consume > scaleTB) {
+                is_TB = true;
+                break;
+            }
+            else if (consume > scaleGB) {
+                is_GB = true;
+            }
+            else if (consume > scaleMB) {
+                is_MB = true;
+            }
+            else if (consume > scaleKB) {
+                is_KB = true;
+            }
         }
-        var currYear = String(today.getUTCFullYear());
-
-        var startDate = currYear + currMonth + '01';
-
-        var endDate = getLastDayofTheMonth(today);
-        if (!endDate) {
-            return;
+        const $barChartUnit = isTransferData ? $('#trf-bar-chart-unit', $stgeTrfAnalysisContainer)
+            : $('#stge-bar-chart-unit', $stgeTrfAnalysisContainer);
+        if (is_TB) {
+            dataDivider = scaleTB;
+            $barChartUnit.text(l.data_size_unit_tb);
         }
-        var endDateStr = String(endDate.getUTCFullYear()) + currMonth + String(endDate.getDate());
-        return { fromDate: startDate, toDate: endDateStr };
+        else if (is_GB) {
+            dataDivider = scaleGB;
+            $barChartUnit.text(l[20031]);
+        }
+        else if (is_MB) {
+            dataDivider = scaleMB;
+            $barChartUnit.text(l[20032]);
+        }
+        else if (is_KB) {
+            dataDivider = scaleKB;
+            $barChartUnit.text(l[20033]);
+        }
+        else {
+            dataDivider = 1;
+            $barChartUnit.text(l[20034]);
+        }
+
+        return dataDivider;
     };
 
-    // private function to populate the reporting bar chart
-    var populateBarChart = function (st, res, targetDate) {
-        /* eslint-disable-next-line complexity */
-        M.require('charts_js').done(function () {
-            var $charContainer = $("#chartcontainer");
-            $charContainer.empty();
-            $charContainer.safeHTML('<canvas id="usage-bar-chart" class="daily-transfer-flow-container"></canvas>');
-            var chartCanvas = $("#usage-bar-chart");
+    // Private function to populate the transfer and storage analytics bar chart and data
+    const populateBarChart = function(success, res, isTrfGraph, targetDate) {
+        M.require('charts_js').done(() => {
+            const chartContainerID = isTrfGraph ? '#trf-bar-chart-container' : '#stge-bar-chart-container';
+            const $chartContainer = $(chartContainerID, $stgeTrfAnalysisContainer);
+
+            $chartContainer.empty();
+            $chartContainer.safeHTML(
+                isTrfGraph ?
+                    '<canvas id="trf-bar-chart" class="daily-transfer-flow-container"></canvas>' :
+                    '<canvas id="stge-bar-chart" class="daily-storage-flow-container"></canvas>'
+            );
+
+            const $chartCanvas = $(isTrfGraph ? '#trf-bar-chart' : '#stge-bar-chart', $chartContainer);
+            const style = getComputedStyle(document.body);
 
             var availableLabels = Object.keys(res);
             availableLabels.sort();
 
-            var chartData = [];
+            if (!isTrfGraph) {
+                const lastDay = availableLabels[availableLabels.length - 1];
+                if (res[lastDay] && res[lastDay].dts !== undefined) {
+                    // Use the daily storage value instead of the current storage value for today
+                    res[lastDay].ts = res[lastDay].dts;
+                }
+            }
+
+            // Build bars data and total storage data
+            var chartBaseData = [];
+            var chartExtraData = [];
+            var chartDatasets = [];
             var chartLabels = [];
-            var divider = 1;
-            var totalMonthTransfer = 0;
-            var randVal;
+            var chartTooltips = {};
+            const divider = setBarChartScaleUnit(res, isTrfGraph);
+            const isTBGraph = divider === 1024 * 1024 * 1024 * 1024;
 
-            // if statement only for testing, can be removed after deploy.
-            if (d && localStorage.bTest) {
-                availableLabels = [];
-                for (var h2 = 0; h2 < 30; h2++) {
-                    randVal = Math.random() * 100;
-                    chartData.push(randVal);
-                    availableLabels.push(h2 + 1);
-                    chartLabels.push(h2 + 1);
-                    totalMonthTransfer += randVal;
+            const tooltipBarLabeling = function(tooltipItem, data) {
+                const storageValue = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
+                const storageInfo = numOfBytes(storageValue * divider);
+                const dataLabel = data.datasets[tooltipItem.datasetIndex].label;
+                let labellingMsg = `${storageInfo.size} ${storageInfo.unit}`;
+
+                if (dataLabel !== '') {
+                    labellingMsg = dataLabel === 'base' ? l.base_quota_v : l.extra_quota;
+                    labellingMsg = labellingMsg.replace('[X]', `${storageInfo.size} ${storageInfo.unit}`);
                 }
+
+                return labellingMsg;
+            };
+
+            const tooltipBarTitling = function(tooltipItem) {
+                const storageDate = new Date(targetDate.getFullYear(), targetDate.getMonth(), 1);
+                storageDate.setDate(tooltipItem[0].xLabel || 0);
+                return acc_time2date(storageDate.getTime() / 1000, true);
+            };
+
+            targetDate  = targetDate || new Date();
+            const daysOfThisMonth = new Date(targetDate.getFullYear(), targetDate.getMonth() + 1, 0).getDate();
+            for (let d = 0; d < daysOfThisMonth; d++) {
+                chartBaseData.push(0);
+                chartExtraData.push(0);
+                chartLabels.push(d + 1);
             }
-            // building bars data + total transfer
+
+            if (isTrfGraph) {
+                for (let t = 0; t < availableLabels.length; t++) {
+                    const index = parseInt(availableLabels[t].substr(6, 2), 10);
+                    const dayConsume = res[availableLabels[t]].tdl || 0;
+                    chartBaseData[index - 1] = dayConsume / divider;
+                }
+
+                chartDatasets = [{
+                    label: '',
+                    data: chartBaseData,
+                    backgroundColor: style.getPropertyValue('--label-blue-hover').trim(),
+                    hoverBackgroundColor: style.getPropertyValue('--label-blue-hover').trim(),
+                    hoverBorderColor: style.getPropertyValue('--label-blue').trim(),
+                    borderWidth: 0,
+                    hoverBorderWidth: 2
+                }];
+
+                chartTooltips = {
+                    callbacks: {
+                        label: tooltipBarLabeling,
+                        title: tooltipBarTitling
+                    },
+                    displayColors: false
+                };
+            }
             else {
-                // let determine the scale.
-                var scaleKB = 1024;
-                var scaleMB = 1024 * scaleKB;
-                var scaleGB = 1024 * scaleMB;
-                var is_KB = false;
-                var is_MB = false;
-                var is_GB = false;
-                for (var ss = 0; ss < availableLabels.length; ss++) {
-                    var consume = res[availableLabels[ss]].tdl || 0;
-                    if (consume > scaleGB) {
-                        is_GB = true;
-                        break;
+                for (let s = 0; s < availableLabels.length; s++) {
+                    const index = parseInt(availableLabels[s].substr(6, 2), 10);
+                    const dayConsume = res[availableLabels[s]].ts || 0;
+                    if (isTBGraph & dayConsume > 3 * divider) {
+                        chartBaseData[index - 1] = 3;
+                        chartExtraData[index - 1] = dayConsume / divider - 3;
                     }
-                    else if (consume > scaleMB) {
-                        is_MB = true;
+                    else {
+                        chartBaseData[index - 1] = dayConsume / divider;
                     }
-                    else if (consume > scaleKB) {
-                        is_KB = true;
-                    }
-                }
-                if (is_GB) {
-                    divider = scaleGB;
-                    $businessAccountContainer.find('#barchart-unit').text(l[20031]);
-                }
-                else if (is_MB) {
-                    divider = scaleMB;
-                    $businessAccountContainer.find('#barchart-unit').text(l[20032]);
-                }
-                else if (is_KB) {
-                    divider = scaleKB;
-                    $businessAccountContainer.find('#barchart-unit').text(l[20033]);
-                }
-                else {
-                    divider = 1;
-                    $businessAccountContainer.find('#barchart-unit').text(l[20034]);
                 }
 
-                var lastDayOfThisMonth = getLastDayofTheMonth(targetDate || new Date())
-                    .getDate();
-                for (var v = 0; v < lastDayOfThisMonth; v++) {
-                    chartData.push(0);
-                    chartLabels.push(v + 1);
-                }
-                for (var h = 0; h < availableLabels.length; h++) {
-                    var index = parseInt(availableLabels[h].substr(6, 2), 10);
-                    var dayConsume = res[availableLabels[h]].tdl || 0;
-                    // chartData.push(res[availableLabels[h]].tdl / divider);
-                    chartData[index - 1] = dayConsume / divider;
-                    totalMonthTransfer += dayConsume;
+                chartDatasets = [{
+                    label: 'base',
+                    data: chartBaseData,
+                    backgroundColor: style.getPropertyValue('--label-blue-hover').trim(),
+                    hoverBackgroundColor: style.getPropertyValue('--label-blue-hover').trim(),
+                    hoverBorderColor: style.getPropertyValue('--label-blue').trim(),
+                    borderWidth: 0,
+                    hoverBorderWidth: 2
+                }, {
+                    label: 'extra',
+                    data: chartExtraData,
+                    backgroundColor: style.getPropertyValue('--label-yellow-hover').trim(),
+                    hoverBackgroundColor: style.getPropertyValue('--label-yellow-hover').trim(),
+                    hoverBorderColor: style.getPropertyValue('--label-yellow').trim(),
+                    borderWidth: 0,
+                    hoverBorderWidth: 2
+                }];
 
-                    // keeping the day number only
-                    // availableLabels[h] = availableLabels[h].substr(6, 2);
-                }
+                chartTooltips = {
+                    mode: 'label',
+                    callbacks: {
+                        label: tooltipBarLabeling,
+                        title: tooltipBarTitling
+                    },
+                    displayColors: true
+                };
             }
 
-            var allTransferFormatted = numOfBytes(totalMonthTransfer, 2);
-            $overviewContainer.find('.transfer-analysis-container .transfer-analysis-summary .total-transfer-number')
-                .text(allTransferFormatted.size + ' ' + allTransferFormatted.unit);
-
-            var tooltipBarLabeling = function (tooltipItem, data) {
-                var perc = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
-
-                var sizeInfo = numOfBytes(perc * divider);
-                var label = sizeInfo.size + ' ' + sizeInfo.unit;
-                return label;
-            };
-            var tooltipBartiteling = function () {
-                return '';
-            };
-
-            const style = getComputedStyle(document.body);
-            var myChart = new Chart(chartCanvas, {
+            const theBarChart = new Chart($chartCanvas, {
                 type: 'bar',
                 data: {
-                    labels: chartLabels, // availableLabels,
-                    datasets: [{
-                        label: '',
-                        data: chartData,
-                        backgroundColor: style.getPropertyValue('--label-blue-hover').trim(),
-                        hoverBackgroundColor: style.getPropertyValue('--label-blue-hover').trim(),
-                        hoverBorderColor: style.getPropertyValue('--label-blue').trim(),
-                        borderWidth: 0,
-                        hoverBorderWidth: 2
-                    }]
+                    labels: chartLabels,
+                    datasets: chartDatasets,
                 },
                 options: {
                     scales: {
                         yAxes: [{
+                            stacked: true,
                             ticks: {
                                 beginAtZero: true,
                                 fontColor: style.getPropertyValue('--text-color-medium').trim(),
@@ -1611,8 +1662,12 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
                             }
                         }],
                         xAxes: [{
+                            stacked: true,
                             ticks: {
-                                fontColor: style.getPropertyValue('--text-color-medium').trim()
+                                fontColor: style.getPropertyValue('--text-color-medium').trim(),
+                                autoSkip: true,
+                                maxTicksLimit: 4,
+                                maxRotation: 0
                             },
                             gridLines: {
                                 display: false
@@ -1622,13 +1677,7 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
                     legend: {
                         display: false
                     },
-                    tooltips: {
-                        callbacks: {
-                            label: tooltipBarLabeling,
-                            title: tooltipBartiteling
-                        },
-                        displayColors: false
-                    },
+                    tooltips: chartTooltips,
                     layout: {
                         padding: {
                             left: 24,
@@ -1640,47 +1689,105 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
                 }
             });
         });
-
-        initBusinessAccountScroll($overviewContainer);
     };
 
-    // getting quotas
-    var quotasPromise = this.business.getQuotaUsage();
-    quotasPromise.done(populateDashboard);
+    // Private function to populate the next billing information on the admin user dashboard
+    const populateNextBillInfo = function() {
+        if (!M.account || !M.account.b) {
+            return false;
+        }
+        const billData = M.account.b;
 
-    var initialBarReport = getReportDates();
-    var reportPromise = this.business.getQuotaUsageReport(false, initialBarReport);
-    reportPromise.done(populateBarChart);
+        $('.next-bill-value.local .value', $nbPriceContainer)
+            .text(formatCurrency(billData.price_local.amount, billData.price_local.name, 'number'));
+        $('.next-bill-value.local .currency', $nbPriceContainer).text(billData.price_local.name);
 
-    var populateMonthDropDownList = function () {
-        var monthNames = [l[408], l[409], l[410], l[411], l[412], l[413], l[414], l[415], l[416],
-        l[417], l[418], l[419]];
+        if (billData.price_local.name === 'EUR') {
+            $('.next-bill-value.euro', $nbPriceContainer).addClass('hidden');
+        }
+        else {
+            $('.next-bill-value.euro', $nbPriceContainer).removeClass('hidden')
+                .text(formatCurrency(billData.price_eur.amount));
+        }
+    };
 
-        var adminCreationDate = new Date(u_attr['since'] * 1000);
+    // Private function to fill last/next bill storage/transfer data into the analytics container
+    const fillStgeTrfBillInfo = function(isTrfField) {
+        if (!M.account || !M.account.b) {
+            return false;
+        }
+        const billData = M.account.b;
 
-        var nowDate = new Date();
-        var monthLimit = 12; // 1 year back max
+        const $targetContainer = isTrfField ? $trfAnalysisContainer : $stgeAnalysisContainer;
+        const $lbRow = $('.one-column', $targetContainer).removeClass('hidden');
+        const $nbRow = $('.two-column', $targetContainer);
+        const $billDiff = $('.next-bill-ratio', $nbRow).addClass('hidden').removeClass('up down');
+        const $billDiffArrow = $('.sprite-fm-mono', $billDiff).removeClass('icon-up icon-down');
 
-        var $container = $('.data-analysis-container', '.user-management-view');
-        var $monthDropdown = $('.chart-month-selector', $container);
-        var $dropdownScroll = $('.dropdown-scroll', $monthDropdown);
-        var $dropdownLabel = $('> span', $monthDropdown);
+        var noLastBillItem;
+        var lastBillItem;
+        var nextBillItem;
+        if (isTrfField) {
+            noLastBillItem = typeof billData.lbxfer === 'undefined';
+            lastBillItem = noLastBillItem ? 0 : billData.lbxfer;
+            nextBillItem = billData.nbxfer;
+        }
+        else {
+            noLastBillItem = typeof billData.lbstrg === 'undefined';
+            lastBillItem = noLastBillItem ? 0 : billData.lbstrg;
+            nextBillItem = billData.nbstrg;
+        }
 
+        $('.usage-value', $nbRow).text(l[5816].replace('[X]', nextBillItem));
+
+        if (noLastBillItem) {
+            $lbRow.addClass('hidden');
+        }
+        else {
+            $('.usage-value', $lbRow).text(l[5816].replace('[X]', lastBillItem));
+
+            const valDiff = nextBillItem - lastBillItem;
+            if (lastBillItem !== 0 && valDiff !== 0) {
+                const valDiffSize = Math.abs(valDiff);
+                const valDiffPerc = formatPercentage(valDiffSize / lastBillItem);
+
+                $billDiff.addClass(valDiff > 0 ? 'up' : 'down').removeClass('hidden');
+                $billDiffArrow.addClass(valDiff > 0 ? 'icon-up' : 'icon-down');
+                $('.ratio-value', $billDiff).text(valDiffSize);
+                $('.diff-perc span', $billDiff).text(
+                    l.bsn_last_renew_diff_ratio.replace('[X]', `(${valDiffPerc})`)
+                );
+            }
+        }
+    };
+
+    // Private function to populate the month dropdown list into the storage and transfer analytics chart
+    const populateMonthDropDownList = function($targetContainer) {
+        const monthNames = [
+            l[408], l[409], l[410], l[411], l[412], l[413], l[414], l[415], l[416], l[417], l[418], l[419]
+        ];
+        const adminCreationDate = new Date(u_attr.since * 1000);
+        const nowDate = new Date();
+        const monthLimit = 12; // 1 year back max
+
+        const $monthDropdown = $('.chart-month-selector', $targetContainer);
+        const $dropdownScroll = $('.dropdown-scroll', $monthDropdown);
+        const $dropdownLabel = $('> span', $monthDropdown);
         $dropdownScroll.empty();
         $dropdownLabel.text('');
 
-        for (var a = 0; a < monthLimit; a++) {
-            var label = monthNames[nowDate.getUTCMonth()] + ' ' + nowDate.getUTCFullYear();
+        for (var m = 0; m < monthLimit; m++) {
+            const label = `${monthNames[nowDate.getUTCMonth()]} ${nowDate.getUTCFullYear()}`;
             var itemNode;
 
             itemNode = mCreateElement('div', {
                 'class': 'option',
-                'data-state': a === 0 ? 'active' : '',
+                'data-state': m === 0 ? 'active' : '',
                 'data-value': nowDate.getTime()
             }, $dropdownScroll[0]);
             mCreateElement('span', undefined, itemNode).textContent = label;
 
-            if (a === 0) {
+            if (m === 0) {
                 $dropdownLabel.text(label);
             }
 
@@ -1691,22 +1798,57 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
             }
         }
 
-        $('.option', $monthDropdown).rebind('click.subuser', function transferChartSelectChange() {
-            var $this = $(this);
-            var selectedDate = new Date(Number.parseFloat($this.attr('data-value')));
-            var report = getReportDates(selectedDate);
 
-            var reportPromise2 = mySelf.business.getQuotaUsageReport(false, report);
-            reportPromise2.done(function fillBarChart(st, res) {
-                populateBarChart(st, res, selectedDate);
+        $('.option', $monthDropdown).rebind('click.subuser', function() {
+            const $this = $(this);
+            const $activeMonthDropdown = $this.closest('.chart-month-selector.active');
+            const selectedDate = new Date(Number.parseFloat($this.attr('data-value')));
+            const newReportDates = getReportDates(selectedDate);
+
+            const barReportPromise = mySelf.business.getQuotaUsageReport(false, newReportDates);
+            barReportPromise.done((st, res) => {
+                populateBarChart(st, res, $activeMonthDropdown.hasClass('transfer'), selectedDate);
             });
         });
-
         bindDropdownEvents($monthDropdown);
     };
 
-    populateMonthDropDownList();
+    const quotasPromise = this.business.getQuotaUsage();
+    quotasPromise.done(populateStoragePieAndData);
 
+    // Display storage and transfer analytics graphs
+    $stgeTrfAnalysisContainer.removeClass('hidden');
+    const initialBarReportDates = getReportDates();
+
+    // Prepare and populate data into the transfer bar chart
+    const stgeTrfBarReportPromise = this.business.getQuotaUsageReport(false, initialBarReportDates);
+    stgeTrfBarReportPromise.done((st, res) => {
+        // Populate the transfer analytics bar chart
+        populateBarChart(st, res, true);
+        // Populate the storage analytics bar chart
+        populateBarChart(st, res, false);
+    });
+
+    if (typeof M.account.b.v === 'undefined' || M.account.b.v === 0) {
+        // Populate the next billing info into the overall usage section
+        populateNextBillInfo();
+
+        // Fill the last/next bill transfer data into the analytics section
+        fillStgeTrfBillInfo(true);
+        // Fill the last/next bill storage data into the analytics section
+        fillStgeTrfBillInfo(false);
+    }
+    else {
+        // If a business voucher user, hide all next billing info
+        $nbPriceContainer.addClass('hidden');
+        $('.lb-nb-info', $stgeTrfAnalysisContainer).addClass('hidden');
+        $('.forecast-remarks', $stgeTrfAnalysisContainer).addClass('hidden');
+    }
+
+    // Populate the month dropdown list for the transfer analytics graph
+    populateMonthDropDownList($trfAnalysisContainer);
+    // Populate the month dropdown list for the storage analytics graph
+    populateMonthDropDownList($stgeAnalysisContainer);
 };
 
 BusinessAccountUI.prototype.initBusinessAccountHeader = function ($accountContainer) {

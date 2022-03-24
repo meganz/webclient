@@ -2476,6 +2476,21 @@ ul, li {
     font-family: 'LatoWeb';
     display: block;
 }
+.mobile.signin-input,
+.mobile.password-input {
+    --icon-size: 24px;
+}
+.mobile.signin-input.password input,
+.mobile.signin-input.password-confirm input,
+.mobile.password-input input {
+    width: calc(100% - 33px);
+    display: inline-block;
+    vertical-align: top;
+}
+.mobile.signin-input .warning-icon,
+.mobile.password-input .warning-icon {
+    display: inline-block;
+}
 .mobile.default-input input {
     color: #333;
 }
@@ -2618,7 +2633,10 @@ body.de .mobile.verify-number .vn-input-wrapper .verify-number-code input::place
 .signin-register-block .tab-block.register .signin-input.password {
     position: relative;
 }
-.signin-register-block .estimator-loading-icon, .recover-account-page .estimator-loading-icon, .bus-pw-confirm-block .estimator-loading-icon {
+.signin-register-block .estimator-loading-icon,
+.recover-account-page .estimator-loading-icon,
+.bus-pw-confirm-block .estimator-loading-icon,
+.password-reminder-overlay .estimator-loading-icon {
     background: rgba(0, 0, 0, 0) url("../images/mega/ajax-loader-gray.gif") no-repeat scroll 0 0 / 16px 16px;
     display: none;
     height: 16px;
@@ -2628,8 +2646,11 @@ body.de .mobile.verify-number .vn-input-wrapper .verify-number-code input::place
     width: 16px;
     z-index: 1;
 }
-.signin-register-block .estimator-loading-icon.loading, .recover-account-page .estimator-loading-icon.loading, .mobile.create-new-folder-dialog .red-button.confirm-ok-button, .bus-pw-confirm-block .estimator-loading-icon.loading {
-    display: block;
+.signin-register-block .estimator-loading-icon.loading,
+.recover-account-page .estimator-loading-icon.loading,
+.mobile.create-new-folder-dialog .red-button.confirm-ok-button,
+.bus-pw-confirm-block .estimator-loading-icon.loading {
+    display: inline-block;
 }
 /* Prevent Chrome displaying the default checkbox */
 input[type='checkbox'] {
@@ -11956,7 +11977,6 @@ code, c {
     margin-left: 0;
     margin-right: 0;
 }
-
 .mobile.password-reminder-overlay .export-button {
     margin-top: 30px;
 }
@@ -14784,6 +14804,9 @@ body.landscape .upload-overlay .mobile.filetype-img {
 .error-page p b {
     color: black;
     font-weight: bolder;
+}
+.decrypt-page .content-block .signin-input.password {
+    margin: 0;
 }
 
 @media only screen and (orientation: landscape) and (max-width: 321px), only screen and (orientation: portrait) and (max-height: 569px) {

@@ -6771,6 +6771,9 @@ table {
 .rtl .widgets.content-block {
     direction: rtl;
 }
+.ar.business-user .widgets.content-block {
+    min-width: 750px;
+}
 .widgets.content-block .data-table tr:nth-child(2) td {
     border-width: 1px 0 0 0;
 }
@@ -6995,7 +6998,7 @@ table {
 }
 .account.referral-value.local {
     font: var(--text-h1);
-    color: var(--text-color-success);
+    color: var(--secondary-green);
     display: inline-block;
 }
 .account.referral-value.euro {
@@ -12990,9 +12993,6 @@ body.megaChatDisabled .nw-contact-name button.start-chat-button {
 .user-management-main-page-buttons .ba-account i {
     --mask-color: var(--secondary-orange);
 }
-.user-management-main-page-buttons .ba-overview i {
-    --mask-color: var(--secondary-blue);
-}
 
 /* Business account content blocks */
 
@@ -13002,14 +13002,13 @@ body.megaChatDisabled .nw-contact-name button.start-chat-button {
 }
 
 .user-management-overview-bar {
-    height: 64px;
+    height: 46px;
     width: 100%;
     position: absolute;
     bottom: 0;
     background: var(--surface-grey-2);
     border-left: 2px solid var(--stroke-main);
     z-index: 19;
-    cursor: pointer;
     text-align: center;
     display: flex;
     justify-content: center;
@@ -13031,6 +13030,8 @@ body.megaChatDisabled .nw-contact-name button.start-chat-button {
 }
 .user-management-overview-bar-data .info-block:first-child {
     padding-left: 0;
+    -webkit-padding-end: 112px;
+    padding-inline-end: 112px;
 }
 .user-management-overview-bar-data .info-block:last-child {
     padding-right: 0;
@@ -13146,9 +13147,6 @@ body.megaChatDisabled .nw-contact-name button.start-chat-button {
     display: flex;
     min-height: 48px;
     padding: 8px 24px;
-    background: var(--surface-main);
-}
-.user-management-breadcrumb.overview {
     background: var(--surface-main);
 }
 .user-management-breadcrumb i {
@@ -13496,13 +13494,9 @@ body.megaChatDisabled .nw-contact-name button.start-chat-button {
 }
 .business-dashboard .user-management-storage,
 .business-dashboard .user-management-transfer {
+    flex-grow: 1;
     -webkit-padding-end: 48px;
     padding-inline-end: 48px;
-}
-.business-dashboard .user-management-button {
-    margin-left: -4px;
-    min-width: 20%;
-    text-align: end;
 }
 .user-management-storage {
     -webkit-padding-end: 120px;
@@ -13513,7 +13507,6 @@ body.megaChatDisabled .nw-contact-name button.start-chat-button {
     display: flex;
     justify-content: center;
     padding: 0 0 24px;
-    width: 50%;
 }
 
 .user-management-storage .img,
@@ -13544,31 +13537,43 @@ body.megaChatDisabled .nw-contact-name button.start-chat-button {
     vertical-align: top;
 }
 
-.user-management-view-data .user-management-view-overall-usage .view-info .storage-transfer-text,
-.business-dashboard .view-info .storage-transfer-text {
+.user-management-view-data .user-management-view-overall-usage .view-info .storage-transfer-text {
    font: var(--text-body1);
    color: var(--text-color-high);
    margin-bottom: 8px;
 }
 
 .business-dashboard .view-info .storage-transfer-text {
-    display: inline-block;
-    margin-right: 37px;
-    width: 80px;
+    font: var(--text-body1);
+    color: var(--text-color-medium);
 }
+
 .business-dashboard .view-info .storage-transfer-current {
-    display: inline-block;
     font: var(--text-h3-bold);
     color: var(--text-color-high);
 }
 
 .business-dashboard .view-info .storage-transfer-data-details {
     display: flex;
+    margin-top: 8px;
+}
+
+.business-dashboard .admin .view-info .storage-transfer-data-details {
+    margin-top: 16px;
+    gap: 20px;
 }
 
 .business-dashboard .view-info .storage-transfer-data-details-base {
-    margin-right: 40px;
     width: 80px;
+}
+
+.business-dashboard .view-info .storage-transfer-data-base-head,
+.business-dashboard .view-info .storage-transfer-data-base-ext {
+    color: var(--text-color-medium);
+}
+
+.business-dashboard .view-info .storage-transfer-data-base-ext {
+    white-space: nowrap;
 }
 
 .user-management-view-data .user-management-view-overall-usage .view-info .storage-transfer-data {
@@ -13585,6 +13590,13 @@ body.megaChatDisabled .nw-contact-name button.start-chat-button {
 .business-dashboard .user-management-transfer .img {
     width: 60px;
     height: 60px;
+}
+
+.business-dashboard .admin .user-management-storage .img,
+.business-dashboard .admin .user-management-transfer .img {
+    width: 48px;
+    height: 48px;
+    align-self: start;
 }
 
 .subaccount-view-used-data {
@@ -13698,9 +13710,8 @@ body.megaChatDisabled .nw-contact-name button.start-chat-button {
 .user-analysis-container {
     box-sizing: border-box;
     position: relative;
-    max-width: 1400px;
-    margin: 24px auto 24px auto;
-    width: calc(100% - 48px);
+    margin: 20px 24px;
+    width: calc(100% - 40px);
 }
 
 .user-management-view .view-title,
@@ -13719,7 +13730,12 @@ body.megaChatDisabled .nw-contact-name button.start-chat-button {
     padding-bottom: 16px;
 }
 
-.user-management-overview-container .view-title {
+.user-management-overview-container .view-title,
+.business-dashboard-container .storage-analysis-pie-container .view-title,
+.business-dashboard-container .storage-analysis-container .view-title,
+.business-dashboard-container .transfer-analysis-container .view-title,
+.user-management-view .user-analysis-container .view-title,
+.user-management-view .table-user-management .view-title {
     padding: 24px 24px 16px;
 }
 
@@ -13727,7 +13743,7 @@ body.megaChatDisabled .nw-contact-name button.start-chat-button {
     margin-bottom: 32px;
 }
 
-.business-dashboard .view-title::after {
+.business-dashboard .overall-usage-container .view-title::after {
     content: '';
     position: absolute;
     width: calc(100% + 48px);
@@ -13738,14 +13754,12 @@ body.megaChatDisabled .nw-contact-name button.start-chat-button {
     bottom: 0;
     left: 0;
 }
-.business-dashboard .data-container .view-title::after {
-    display: none;
-}
 
 .user-analysis-summary-data {
     display: flex;
     flex-direction: row;
     border-top: 1px solid var(--stroke-grey-2);
+    margin-bottom: 8px;
 }
 
 .user-segments-container {
@@ -13754,7 +13768,6 @@ body.megaChatDisabled .nw-contact-name button.start-chat-button {
 }
 
 .user-segments-container:first-child {
-    background: var(--button-fill-positive);
     border-bottom-left-radius: 12px;
 }
 
@@ -13768,15 +13781,15 @@ body.megaChatDisabled .nw-contact-name button.start-chat-button {
     text-align: center;
     margin-top: 12px;
     font: var(--text-body1);
-    color: var(--text-color-high);
+    color: var(--text-color-medium);
 }
 
 .user-segment-number {
     width: 100%;
     text-align: center;
-    margin: 4px 0 24px;
-    font: var(--text-data);
-    color: var(--text-color-high);
+    margin: 4px 0;
+    font: var(--text-h0);
+    color: var(--text-color-medium);
 }
 
 .user-management-overview-container b {
@@ -13784,11 +13797,11 @@ body.megaChatDisabled .nw-contact-name button.start-chat-button {
 }
 
 .user-segments-container:first-child .user-segment-title {
-    color: var(--text-color-white-high);
+    color: var(--secondary-green);
 }
 
 .user-segments-container:first-child .user-segment-number {
-    color: var(--text-color-white-high);
+    color: var(--secondary-green);
 }
 
 .data-analysis-container {
@@ -13796,29 +13809,38 @@ body.megaChatDisabled .nw-contact-name button.start-chat-button {
     display: flex;
     height: auto;
     max-width: 1400px;
-    margin: 0 auto 24px;
+    margin: 0 auto;
     position: relative;
-    width: calc(100% - 48px);
+    width: 100%;
 }
 
-.storage-analysis-container {
+.business-dashboard .storage-analysis-pie-container {
     box-sizing: border-box;
-    -webkit-margin-end: 12px;
-    margin-inline-end: 12px;
-    position: relative;
-    width: calc(40% - 12px);
 }
 
-.storage-analysis-container .storage-big-chart {
+.storage-analysis-pie-container .storage-big-chart {
     position: relative;
     width: 160px;
     height: 160px;
     margin: 24px auto;
 }
 
-.storage-analysis-container .storage-big-chart2 {
+.storage-analysis-pie-container .storage-big-chart-wrapper {
     position: relative;
-    margin: 24px auto 36px auto;
+    margin: 24px auto 16px;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.storage-analysis-pie-container .storage-big-chart-wrapper .storage-pie-chart-container {
+    flex-grow: 1;
+    width: 40%;
+}
+
+.storage-analysis-pie-container .storage-big-chart-wrapper .storage-pie-data-container {
+    flex-grow: 2;
+    width: 60%;
+    margin: auto 0;
 }
 
 .user-management-overview-container .storage-big-chart .pie {
@@ -13888,22 +13910,23 @@ body.megaChatDisabled .nw-contact-name button.start-chat-button {
 .user-management-overview-container .storage-big-chart .pie:nth-of-type(4) .pie-internal {
     background-color: rgba(88,103,195,100);
 }
-.user-management-overview-container .storage-summary {
+.business-dashboard-container .storage-summary {
     align-items: center;
-    background: var(--surface-grey-1);
+    background: var(--surface-grey-4);
     color: var(--text-color-high);
     display: flex;
     padding: 18px 0;
+    --surface-alpha: 0.4;
 }
 
-.user-management-overview-container .storage-summary .total-storage-title {
+.business-dashboard-container .storage-summary .total-storage-title {
     -webkit-margin-start: 24px;
     margin-inline-start: 24px;
     color: var(--text-color-medium);
 }
 
-.user-management-overview-container .storage-summary .total-storage-number {
-    font: var(--text-h1);
+.business-dashboard-container .storage-summary .total-storage-number {
+    font: var(--text-h3);
     -webkit-margin-start: 16px;
     margin-inline-start: 16px;
 }
@@ -13985,37 +14008,84 @@ body.megaChatDisabled .nw-contact-name button.start-chat-button {
     background-color: var(--label-green);
 }
 
-.transfer-analysis-container {
-    width: calc(60% - 14px);
+.storage-analysis-container {
+    width: calc(50% - 4px);
     box-sizing: border-box;
-    -webkit-margin-start: 12px;
-    margin-inline-start: 12px;
+    --webkit-margin-end: 4px;
+    margin-inline-end: 4px;
 }
 
-.transfer-analysis-summary {
-    align-items: center;
-    background: var(--surface-grey-1);
+.transfer-analysis-container {
+    width: calc(50% - 4px);
+    box-sizing: border-box;
+    -webkit-margin-start: 4px;
+    margin-inline-start: 4px;
+}
+
+/* Dashboard - Analysis Summary Begin */
+.analysis-summary-container {
+    background-color: var(--surface-grey-4);
+    padding: 12px 24px 0;
+    --surface-alpha: 0.4;
+}
+.analysis-summary-container > div {
+    flex-grow: 1;
+    padding: 8px 0;
+}
+.analysis-summary-container .two-column {
     display: flex;
-    padding: 18px 0;
-    position: relative;
-    width: 100%;
+    justify-content: space-between;
+    gap: 24px;
+    min-height: 48px;
 }
-
-.transfer-analysis-summary .total-transfer-title {
-    -webkit-margin-start: 24px;
-    margin-inline-start: 24px;
-    position: relative;
+.analysis-summary-container .two-column > div:not(.hidden) {
+    width: 100%;
+    display: flex;
+    padding-bottom: 8px;
+}
+.analysis-summary-container .transfer-usage {
     font: var(--text-body1);
     color: var(--text-color-medium);
+    display: flex;
+    align-items: baseline;
+}
+.analysis-summary-container .transfer-usage span.label {
+    width: 120px;
+}
+.analysis-summary-container .transfer-usage span.usage-value {
+    font: var(--text-h3);
+    color: var(--text-color-high);
+    display: inline-block;
+    -webkit-margin-start: 8px;
+    margin-inline-start: 8px;
+    position: relative;
+    white-space: nowrap;
+}
+.nl .analysis-summary-container .transfer-usage span.usage-value {
+    -webkit-margin-start: 24px;
+    margin-inline-start: 24px;
+}
+.analysis-summary-container .next-bill-ratio {
+    font: var(--text-body1);
+    color: var(--text-color-medium);
+    gap: 4px;
+}
+.analysis-summary-container .next-bill-ratio div {
+    display: flex;
+}
+.analysis-summary-container .next-bill-ratio .ratio-value {
+    white-space: nowrap;
+}
+.analysis-summary-container .next-bill-ratio.up i,
+.analysis-summary-container .next-bill-ratio.up span.ratio-value {
+    color: var(--label-green);
+}
+.analysis-summary-container .next-bill-ratio.down i,
+.analysis-summary-container .next-bill-ratio.down span.ratio-value {
+    color: var(--label-red);
 }
 
-.transfer-analysis-summary .total-transfer-number {
-    -webkit-margin-start: 16px;
-    margin-inline-start: 16px;
-    position: relative;
-    font: var(--text-h1);
-    color: var(--text-color-high);
-}
+/* Dashboard - Analysis Summary End */
 
 .user-management-overview-container .bond-color {
     color: rgba(0, 191, 165, 100);
@@ -14023,11 +14093,11 @@ body.megaChatDisabled .nw-contact-name button.start-chat-button {
 
 
 @media only screen and (max-width: 1200px) {
-    .user-management-overview-container .data-analysis-container {
+    .business-dashboard .data-analysis-container {
         flex-wrap: wrap;
     }
 
-    .user-management-overview-container .storage-analysis-container {
+    .user-management-overview-container .storage-analysis-pie-container {
         -webkit-margin-end: 0;
         margin-inline-end: 0;
         width: 100%;
@@ -14041,29 +14111,44 @@ body.megaChatDisabled .nw-contact-name button.start-chat-button {
     }
 }
 
-.daily-transfer-container {
+.business-dashboard .data-analysis-container .daily-transfer-container,
+.business-dashboard .data-analysis-container .daily-storage-container {
     align-items: center;
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
 }
-.daily-transfer-container .mega-input {
-    -webkit-margin-end: 24px;
-    margin-inline-end: 24px;
-}
-.daily-transfer-container .chart-container {
+.business-dashboard .data-analysis-container .chart-month-container {
+    align-items: center;
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: space-between;
     width: 100%;
 }
-.daily-transfer-container > span {
-    font: var(--text-body2);
-    color: var(--text-color-low);
-    position: relative;
-    margin: 0 24px 24px;
-}
-.daily-transfer-container .daily-transfer-title {
+.business-dashboard .data-analysis-container .daily-title {
     padding: 32px 24px;
     font: var(--text-body1);
     color: var(--text-color-medium);
+}
+.business-dashboard .data-analysis-container .mega-input {
+    -webkit-margin-end: 24px;
+    margin-inline-end: 24px;
+}
+.business-dashboard .data-analysis-container .chart-container {
+    width: 100%;
+}
+.business-dashboard .daily-transfer-container > span,
+.business-dashboard .daily-storage-container > span {
+    font: var(--text-body2);
+    color: var(--text-color-medium);
+    position: relative;
+    margin: 0 24px 24px;
+}
+.business-dashboard .data-analysis-container .analysis-remarks-container {
+    margin: 0 24px 16px;
+    font: var(--text-body2);
+    color: var(--text-color-low);
+    position: relative;
 }
 
 .user-management-grid-table a {
@@ -14680,6 +14765,10 @@ body.megaChatDisabled .nw-contact-name button.start-chat-button {
     border-top: 1px solid var(--stroke-grey-2);
 }
 
+.user-management-view.main-page {
+    border-top: none;
+}
+
 .user-management-view .icon-wrapper i {
     --icon-size: 24px;
     --mask-color: var(--text-color-rest);
@@ -14696,13 +14785,17 @@ body.megaChatDisabled .nw-contact-name button.start-chat-button {
     box-sizing: border-box;
     position: relative;
     height: 100%;
-    padding: 0 0 64px;
+    padding: 0 0 48px;
     width: 100%;
 }
 .user-management-view .table-user-management {
+    border-top: 2px solid var(--stroke-grey-2);
     display: flex;
     flex-direction: column;
-    height: 100%;
+    height: calc(100% - 216px);
+}
+.user-management-view .table-user-management .view-title {
+    padding-left: 48px;
 }
 .user-management-view .table-user-management table {
     border: none;
@@ -14717,7 +14810,7 @@ body.megaChatDisabled .nw-contact-name button.start-chat-button {
 }
 .user-management-view .table-user-management .user-management-scroll {
     position: relative;
-    height: calc(100% - 35px);
+    height: calc(100% - 105px);
 }
 .user-management-view .table-user-management .data-table tr .name .fm-user-management-user {
     display: flex;
@@ -15221,7 +15314,7 @@ body.megaChatDisabled .nw-contact-name button.start-chat-button {
 
 .business-dashboard .overall-usage-container {
     margin-bottom: 12px;
-    padding: 24px;
+    padding: 24px 24px 0;
     box-sizing: border-box;
     align-items: center;
 }
@@ -15229,19 +15322,84 @@ body.megaChatDisabled .nw-contact-name button.start-chat-button {
 .business-dashboard .overall-usage-container .data {
     align-items: center;
     display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    padding: 48px 0 24px;
+    flex-wrap: nowrap;
+    padding: 48px 0;
+}
+.business-dashboard .overall-usage-container.admin .data {
+    gap: 48px;
 }
 .low-width .business-dashboard .overall-usage-container .data {
     justify-content: center;
-    padding: 24px 0  0;
+    padding: 24px 0;
+}
+.ru .low-width .business-dashboard .overall-usage-container .data {
+    flex-direction: column;
 }
 
-.business-dashboard .overall-usage-container button {
-    flex-grow: 0;
-    flex-shrink: 0;
+/* Business dashboard - Overall usage next bill block Begin */
+
+.business-dashboard .overall-usage-container .overall-next-bill-wrapper {
+    border-radius: 0 0 12px 12px;
+    height: auto;
+    margin: 0 -24px;
+    background: var(--surface-grey-4);
+    display: none;
+    --surface-alpha: 0.4;
 }
+
+.business-dashboard .overall-usage-container.admin .overall-next-bill-wrapper {
+    display: block;
+}
+
+.business-dashboard .overall-usage-container .overall-next-bill-container {
+    padding: 16px 24px;
+}
+
+.business-dashboard .overall-usage-container .overall-next-bill-container .title {
+    font: var(--text-body1);
+    font-family: var(--text-font-family-semibold);
+}
+.business-dashboard .overall-usage-container .overall-next-bill-container span.asterisk {
+    font: var(--text-h2);
+    margin-left: -4px;
+}
+.business-dashboard .overall-usage-container .next-bill-value.local {
+    color: var(--secondary-green);
+    font: var(--text-h2);
+    display: inline-block;
+}
+.business-dashboard .referrals.widget .account.referral-value.euro,
+.business-dashboard .overall-usage-container .next-bill-value.euro {
+    font: var(--text-body1);
+    color: var(--text-color-medium);
+    border: 1px solid var(--stroke-grey-2);
+    border-radius: 12px;
+    background-color: var(--surface-main);
+    padding: 0 6px;
+    display: inline-block;
+    vertical-align: text-bottom;
+}
+.business-dashboard .overall-usage-container .next-bill-message {
+    color: var(--text-color-medium);
+    font: var(--text-body2);
+    margin-top: 12px;
+}
+.business-dashboard .overall-usage-container .next-bill-message > div {
+    margin-left: 8px;
+}
+.rtl .business-dashboard .overall-usage-container .next-bill-message > div {
+    margin-right: 8px;
+}
+.business-dashboard .overall-usage-container .next-bill-message .first-message::before {
+    content: "*";
+    position: absolute;
+    left: 24px;
+}
+.rtl .business-dashboard .overall-usage-container .next-bill-message .first-message::before {
+    right: 24px;
+}
+
+/* Business dashboard - Overall usage next bill block End */
 
 .business-dashboard .subaccount-view-used-data {
     padding: 24px;

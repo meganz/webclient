@@ -709,9 +709,6 @@
             <section class="js-lp-usermanagement lp-usermanagement-header">
                 <div class="lp-header">
                     <span>[$18677]</span>
-                    <button class="mega-button round positive js-lpbtn" data-link="addnewsubuser">
-                        <div><i class="sprite-fm-mono icon-add icon-white"></i></div>
-                    </button>
                 </div>
             </section>
             <!-- My User Management Section End -->
@@ -1198,14 +1195,6 @@
                 <div class="user-management-main-page-buttons hidden">
                     <a class="fm-files-view-icon-user-management block-view hidden" title="Thumbnail view"></a>
                     <a class="fm-files-view-icon-user-management listing-view active hidden" title="List view"></a>
-                    <button class="mega-button action ba-overview">
-                        <div>
-                            <i class="sprite-fm-mono icon-overview"></i>
-                        </div>
-                        <!-- Overview -->
-                        <span>[$983]</span>
-                    </button>
-
                     <button class="mega-button action ba-account">
                         <div>
                             <i class="sprite-fm-mono icon-accounts"></i>
@@ -1229,14 +1218,6 @@
                     </div>
                     <i class="sprite-fm-mono icon-arrow-right"></i>
                     <div class="user-management-subuser-name">Jay Pierce</div>
-                </div>
-
-                <div class="user-management-breadcrumb overview hidden">
-                    <div class="user-management-title">
-                        [$24538]
-                    </div>
-                    <i class="sprite-fm-mono icon-arrow-right"></i>
-                    <div class="user-management-subuser-name">[$983]</div>
                 </div>
 
                 <div class="user-management-breadcrumb account hidden">
@@ -1587,7 +1568,29 @@
                 </div>
 
                 <div class="user-management-list-table hidden">
+                    <div class="user-analysis-container section-container">
+                        <div class="view-title">[$19189]</div>
+                        <div class="user-analysis-summary-data">
+                            <div class="user-segments-container active-subs">
+                                <div class="user-segment-title">[$bsn_active_u_num]</div>
+                                <div class="user-segment-number"> </div>
+                            </div>
+                            <div class="user-segments-container pending-subs">
+                                <div class="user-segment-title">[$19221]</div>
+                                <div class="user-segment-number"> </div>
+                            </div>
+                            <div class="user-segments-container disabled-subs">
+                                <div class="user-segment-title">[$19086]</div>
+                                <div class="user-segment-number"> </div>
+                            </div>
+                            <div class="user-segments-container all-subs">
+                                <div class="user-segment-title">[$bsn_total_u]</div>
+                                <div class="user-segment-number"> </div>
+                            </div>
+                        </div>
+                    </div>
                     <div class="table-user-management">
+                        <div class="view-title">[$bsn_compare_users]</div>
                         <table class="grid-table-user-management-header data-table medium-list">
                             <tr>
                                 <th class="name">
@@ -1652,15 +1655,8 @@
                     </div>
                     <div class="user-management-overview-bar hidden">
                         <div class="user-management-overview-bar-data">
-                            <div class="info-block nb-sub-users">
-                                <div class="title">[$19087]</div>
-                                <div class="value">
-                                    <div class="number"></div>
-                                </div>
-                            </div>
-
                             <div class="info-block storage-sub-users">
-                                <div class="title">[$19088]</div>
+                                <div class="title">[$bsn_curr_stge_usage]</div>
                                 <div class="value">
                                     <div class="number"></div>
                                     <div class="title2"></div>
@@ -1880,97 +1876,6 @@
                 </div>
 
 
-                <div class="user-management-overview-container scroll-block hidden">
-                    <div class="user-analysis-container section-container">
-                        <div class="view-title">[$19189]</div>
-                        <div class="user-analysis-summary-data">
-                            <div class="user-segments-container active-subs">
-                                <div class="user-segment-title">[$19085]:</div>
-                                <div class="user-segment-number"> </div>
-                            </div>
-                            <div class="user-segments-container all-subs">
-                                <div class="user-segment-title">[$19190]:</div>
-                                <div class="user-segment-number"> </div>
-                            </div>
-                            <div class="user-segments-container pending-subs">
-                                <div class="user-segment-title">[$19221]</div>
-                                <div class="user-segment-number"> </div>
-                            </div>
-                            <div class="user-segments-container disabled-subs">
-                                <div class="user-segment-title">[$19086]:</div>
-                                <div class="user-segment-number"> </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="data-analysis-container">
-                        <div class="storage-analysis-container section-container">
-                            <div class="view-title">[$19222]</div>
-                            <div class="storage-summary">
-                                <span class="total-storage-title">[$18082]:</span>
-                                <span class="total-storage-number"> </span>
-                            </div>
-
-                            <div class="storage-big-chart2">
-                                <div id="pie-chart-contianer">
-                                    <canvas id="usage-pie-chart" class="storage-big-chart"></canvas>
-                                </div>
-                            </div>
-
-                            <div class="storage-division-container cloud-node">
-                                <div class="storage-division-per cloud-drive-color"> </div>
-                                <div class="storage-division-name">[$164]</div>
-                                <div class="storage-division-num"> </div>
-                            </div>
-
-                            <div class="storage-division-container inbox-node">
-                                <div class="storage-division-per inbox-color"> </div>
-                                <div class="storage-division-name">[$19187]</div>
-                                <div class="storage-division-num"> </div>
-                            </div>
-
-                            <div class="storage-division-container inshare-node">
-                                <div class="storage-division-per incoming-color">11%</div>
-                                <div class="storage-division-name">[$16770]</div>
-                                <div class="storage-division-num">356 GB</div>
-                            </div>
-
-                            <div class="storage-division-container rubbish-node">
-                                <div class="storage-division-per rubbish-color"> </div>
-                                <div class="storage-division-name">[$167]</div>
-                                <div class="storage-division-num"> </div>
-                            </div>
-                        </div>
-
-                        <div class="transfer-analysis-container section-container">
-                            <div class="view-title">[$19224]</div>
-                            <div class="transfer-analysis-summary">
-                                <div class="total-transfer-title">[$19225]:</div>
-                                <div class="total-transfer-number"> </div>
-                            </div>
-                            <div class="daily-transfer-container">
-                                <div class="daily-transfer-title">[$19226]:</div>
-
-                                <div class="mega-input dropdown-input text-style inline chart-month-selector" id="chart-month-selector">
-                                    <div class="mega-input-title"></div>
-                                    <span>[$996]</span>
-                                    <i class="sprite-fm-mono icon-dropdown"></i>
-                                    <div class="mega-input-dropdown hidden">
-                                        <div class="dropdown-scroll"></div>
-                                    </div>
-                                </div>
-
-                                <div class="chart-container" id="chartcontainer">
-                                    <canvas id="usage-bar-chart" class="daily-transfer-flow-container"></canvas>
-                                </div>
-
-                                <span>[$20936]</span>
-                                <span id="barchart-unit"> </span>
-                            </div>
-
-                        </div>
-                    </div>
-                </div>
                 <div class="user-management-account-settings hidden">
                     <div class="settings-menu-bar">
                         <div class="settings-menu-item selected suba-setting-profile">[$984]</div>
@@ -3858,7 +3763,7 @@
                             <span class="message"></span>
                         </div>
                         <div class="overall-usage-container section-container">
-                            <div class="view-title">[$16118]</div>
+                            <div class="view-title">[$18076]</div>
                             <div class="data">
                                 <div class="user-management-storage">
                                     <div class="img">
@@ -3873,13 +3778,12 @@
                                                 <div class="storage-transfer-data">0 B</div>
                                             </div>
                                             <div class="storage-transfer-data-details-ext hidden">
-                                                <div class="storage-transfer-data-base-ext">[$additional_quota]</div>
+                                                <div class="storage-transfer-data-base-ext">[$bsn_curr_addl]</div>
                                                 <div class="storage-transfer-data">0 B</div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-
                                 <div class="user-management-transfer">
                                     <div class="img">
                                         <i class="sprite-fm-uni icon-transfer-quota"></i>
@@ -3893,51 +3797,162 @@
                                                 <div class="storage-transfer-data">0 B</div>
                                             </div>
                                             <div class="storage-transfer-data-details-ext hidden">
-                                                <div class="storage-transfer-data-base-ext">[$additional_quota]</div>
+                                                <div class="storage-transfer-data-base-ext">[$bsn_curr_addl_trf]</div>
                                                 <div class="storage-transfer-data">0 B</div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="user-management-button">
-                                    <button class="mega-button large positive go-to-usermanagement-btn">
-                                        <span>[$18677]</span>
-                                    </button>
+                            </div>
+                            <div class="overall-next-bill-wrapper custom-alpha">
+                                <div class="overall-next-bill-container">
+                                    <div class="title">[$bsn_nb]</div>
+                                    <div class="next-bill-value local">
+                                        <span class="value">0.00</span>
+                                        <span class="currency">NZD</span>
+                                    </div>
+                                    <span class="asterisk">*</span>
+                                    <div class="next-bill-value euro">&euro;0.00</div>
+                                    <div class="next-bill-message">
+                                        <div class="first-message">
+                                            <span>[$bsn_nb_msg]</span>
+                                        </div>
+                                        <div class="second-message">
+                                            <span>[$18770]</span>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="account widget body referrals hidden">
-                            <div class="account widget content">
-                                <div class="account widget title">
-                                    <i class="sprite-fm-uni icon-referral"></i>
-                                    <span>[$22682]</span>
-                                </div>
-                                <div class="account widget text">
-                                    [$22712]
-                                </div>
-                                <div class="account referral-blocks">
-                                    <div class="account referral-block">
-                                        <div class="account referral-title">[$22692]</div>
-                                        <div class="account referral-value total local">
-                                            <span class="value"></span>
-                                            <span class="currency"></span>
-                                        </div><span class="asterisk euro">*</span>
-                                        <div class="account referral-value total euro"></div>
+                        <div class="data-analysis-container hidden">
+                            <div class="storage-analysis-container section-container">
+                                <div class="view-title">[$bsn_stge_anal]</div>
+                                <div class="analysis-summary-container lb-nb-info custom-alpha">
+                                    <div class="one-column">
+                                        <div class="transfer-usage">
+                                            <span class="label">[$bsn_lbstge] </span><span class="usage-value"></span>
+                                        </div>
                                     </div>
-                                    <div class="account referral-block">
-                                        <div class="account referral-title">[$22694]</div>
-                                        <div class="account referral-value available local">
-                                            <span class="value"></span>
-                                            <span class="currency"></span>
-                                        </div><span class="asterisk euro">*</span>
-                                        <div class="account referral-value available euro"></div>
+                                    <div class="two-column">
+                                        <div class="transfer-usage">
+                                            <span class="label">[$bsn_nbstge]* </span><span class="usage-value"></span>
+                                        </div>
+                                        <div class="next-bill-ratio down hidden">
+                                            <div class="diff-value">
+                                                <i class="sprite-fm-mono icon-down"></i><span class="ratio-value"></span>
+                                            </div>
+                                            <div class="diff-perc">
+                                                <span>[$bsn_last_renew_diff_ratio]</span>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <button class="mega-button large referral-program">
-                                        <span>[$22682]</span>
-                                    </button>
                                 </div>
-                                <div class="disclaimer euro">*[$24963]</div>
+                                <div class="daily-storage-container">
+                                    <div class="chart-month-container">
+                                        <div class="daily-title">[$bsn_dly_stge]**</div>
+                                        <div class="mega-input dropdown-input text-style inline chart-month-selector storage">
+                                            <div class="mega-input-title"></div>
+                                            <span>[$996]</span>
+                                            <i class="sprite-fm-mono icon-dropdown"></i>
+                                            <div class="mega-input-dropdown hidden">
+                                                <div class="dropdown-scroll"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="chart-container" id="stge-bar-chart-container">
+                                        <canvas id="stge-bar-chart" class="daily-storage-flow-container"></canvas>
+                                    </div>
+                                    <span>[$20936]</span>
+                                    <span id="stge-bar-chart-unit"></span>
+                                    <div class="analysis-remarks-container">
+                                        <div class="forecast-remarks">* <span>[$bsn_stge_fcst_msg]</span></div>
+                                        <div class="daily-value-remarks">** <span>[$bsn_stge_calc_msg]</span></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="transfer-analysis-container section-container">
+                                <div class="view-title">[$19224]</div>
+                                <div class="analysis-summary-container lb-nb-info custom-alpha">
+                                    <div class="one-column">
+                                        <div class="transfer-usage">
+                                            <span class="label">[$bsn_lbtrf] </span><span class="usage-value"></span>
+                                        </div>
+                                    </div>
+                                    <div class="two-column">
+                                        <div class="transfer-usage">
+                                            <span class="label">[$bsn_nbtrf]* </span><span class="usage-value"></span>
+                                        </div>
+                                        <div class="next-bill-ratio up hidden">
+                                            <div class="diff-value">
+                                                <i class="sprite-fm-mono icon-up"></i><span class="ratio-value"></span>
+                                            </div>
+                                            <div class="diff-perc">
+                                                <span>[$bsn_last_renew_diff_ratio]</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="daily-transfer-container">
+                                    <div class="chart-month-container">
+                                        <div class="daily-title">[$19226]**</div>
+                                        <div class="mega-input dropdown-input text-style inline chart-month-selector transfer">
+                                            <div class="mega-input-title"></div>
+                                            <span>[$996]</span>
+                                            <i class="sprite-fm-mono icon-dropdown"></i>
+                                            <div class="mega-input-dropdown hidden">
+                                                <div class="dropdown-scroll"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="chart-container" id="trf-bar-chart-container">
+                                        <canvas id="trf-bar-chart" class="daily-transfer-flow-container"></canvas>
+                                    </div>
+                                    <span>[$20936]</span>
+                                    <span id="trf-bar-chart-unit"></span>
+                                    <div class="analysis-remarks-container">
+                                        <div class="forecast-remarks">* <span>[$bsn_trf_fcst_msg]</span></div>
+                                        <div class="daily-value-remarks">** <span>[$bsn_trf_calc_msg]</span></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="storage-analysis-pie-container section-container hidden">
+                            <div class="view-title">[$19222]</div>
+                            <div class="storage-summary custom-alpha">
+                                <span class="total-storage-title">[$bsn_curr_stge_usage]:</span>
+                                <span class="total-storage-number"> </span>
+                            </div>
+
+                            <div class="storage-big-chart-wrapper">
+                                <div class="storage-pie-chart-container">
+                                    <div id="pie-chart-content">
+                                        <canvas id="usage-pie-chart" class="storage-big-chart"></canvas>
+                                    </div>
+                                </div>
+                                <div class="storage-pie-data-container">
+                                    <div class="storage-division-container cloud-node">
+                                        <div class="storage-division-per cloud-drive-color"> </div>
+                                        <div class="storage-division-name">[$164]</div>
+                                        <div class="storage-division-num"> </div>
+                                    </div>
+                                    <div class="storage-division-container inbox-node">
+                                        <div class="storage-division-per inbox-color"> </div>
+                                        <div class="storage-division-name">[$19187]</div>
+                                        <div class="storage-division-num"> </div>
+                                    </div>
+                                    <div class="storage-division-container inshare-node">
+                                        <div class="storage-division-per incoming-color">11%</div>
+                                        <div class="storage-division-name">[$16770]</div>
+                                        <div class="storage-division-num">356 GB</div>
+                                    </div>
+                                    <div class="storage-division-container rubbish-node">
+                                        <div class="storage-division-per rubbish-color"> </div>
+                                        <div class="storage-division-name">[$167]</div>
+                                        <div class="storage-division-num"> </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
@@ -4044,6 +4059,40 @@
                                         <td class="ff-occupy"> </td>
                                     </tr>
                                 </table>
+                            </div>
+                        </div>
+
+                        <div class="account widget body referrals hidden">
+                            <div class="account widget content">
+                                <div class="account widget title">
+                                    <i class="sprite-fm-uni icon-referral"></i>
+                                    <span>[$referral_prog_title]</span>
+                                </div>
+                                <div class="account widget text">
+                                    [$22712]
+                                </div>
+                                <div class="account referral-blocks">
+                                    <div class="account referral-block">
+                                        <div class="account referral-title">[$22692]</div>
+                                        <div class="account referral-value total local">
+                                            <span class="value"></span>
+                                            <span class="currency"></span>
+                                        </div><span class="asterisk euro">*</span>
+                                        <div class="account referral-value total euro"></div>
+                                    </div>
+                                    <div class="account referral-block">
+                                        <div class="account referral-title">[$22694]</div>
+                                        <div class="account referral-value available local">
+                                            <span class="value"></span>
+                                            <span class="currency"></span>
+                                        </div><span class="asterisk euro">*</span>
+                                        <div class="account referral-value available euro"></div>
+                                    </div>
+                                    <button class="mega-button large referral-program">
+                                        <span>[$22682]</span>
+                                    </button>
+                                </div>
+                                <div class="disclaimer euro">*[$24963]</div>
                             </div>
                         </div>
                     </div>

@@ -249,6 +249,26 @@
             self.passwordReminderAttribute.dontShowAgain === 1
         );
 
+        $('.pass-visible', this.dialog).rebind('click.togglePassV', function() {
+
+            if (this.classList.contains('icon-eye-reveal')) {
+
+                self.passwordField.type = 'text';
+                if (self.passwordField.style.webkitTextSecurity) {
+                    self.passwordField.style.webkitTextSecurity = 'none';
+                }
+                this.classList.remove('icon-eye-reveal');
+                this.classList.add('icon-eye-hidden');
+            }
+            else {
+                self.passwordField.type = 'password';
+                if (self.passwordField.style.webkitTextSecurity) {
+                    self.passwordField.style.webkitTextSecurity = 'disc';
+                }
+                this.classList.add('icon-eye-reveal');
+                this.classList.remove('icon-eye-hidden');
+            }
+        });
     };
 
     /**
@@ -566,11 +586,13 @@
         assert(this.dialog, 'this.dialog not found');
         this.passwordField = this.dialog.querySelector('input#test-pass');
         $(this.passwordField).rebind('focus.hack', function() {
-            if (ua.details.browser === "Chrome") {
-                $(this).attr('style', '-webkit-text-security: disc;');
-            }
-            else {
-                $(this).attr('type', 'password');
+            if (this.type === 'password') {
+                if (ua.details.browser === "Chrome") {
+                    $(this).attr('style', '-webkit-text-security: disc;');
+                }
+                else {
+                    $(this).attr('type', 'password');
+                }
             }
             $(this).removeAttr('readonly');
             $(this).attr('autocomplete', 'section-off' + rand_range(1, 123244) + ' off disabled nope no none');
@@ -597,6 +619,10 @@
         this.resetUI();
 
         this.bindEvents();
+
+        if (is_mobile) {
+            mobile.initPasswordVisibleToggle($(this.dialog));
+        }
     };
 
     PasswordReminderDialog.prototype.show = function() {
@@ -637,6 +663,9 @@
             this.exportButton.classList.remove('red-button');
             this.exportButton.classList.add('green-button');
         }
+
+        $('i.pass-visible', this.dialog).removeClass('icon-eye-hidden').addClass('icon-eye-reveal');
+        $('#test-pass').attr({'style': '', 'type': 'password', 'readonly': true});
     };
 
     PasswordReminderDialog.prototype.hide = function() {

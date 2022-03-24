@@ -127,6 +127,7 @@ var slideshowid;
         var valid = true;
         var h = slideshow_handle();
         var step = dir === 'next' ? 'forward' : 'backward';
+        $.videoAutoFullScreen = $(document).fullScreen();
 
         $.each(dl_queue || [], function(id, file) {
             if (file.id === h && file.preview) {
@@ -139,8 +140,14 @@ var slideshowid;
         }
         var steps = slideshowsteps();
         if (steps[step].length > 0) {
+            const newShownHandle = steps[step][0];
+            if ($.videoAutoFullScreen && is_video(M.getNodeByHandle(newShownHandle))) {
+                // Autoplay the next/prev video if it's in full screen mode
+                $.autoplay = newShownHandle;
+            }
+
             mBroadcaster.sendMessage('slideshow:' + dir, steps);
-            slideshow(steps[step][0]);
+            slideshow(newShownHandle);
         }
     }
 
@@ -210,7 +217,8 @@ var slideshowid;
         var $favButton = $('.context-menu .favourite', $overlay);
         var root = M.getNodeRoot(n && n.h || false);
 
-        if (!n || !n.p || (root === 'shares' && M.getNodeRights(n.p) < 2) || folderlink ||
+        if (!n || !n.p || root === 'shares' && M.getNodeRights(n.p) < 2 ||
+            folderlink || root === M.RubbishID ||
             (M.getNodeByHandle(n.h) && !M.getNodeByHandle(n.h).u && M.getNodeRights(n.p) < 2)) {
 
             $favButton.addClass('hidden');
@@ -246,9 +254,28 @@ var slideshowid;
         }
     }
 
+    function slideshow_bin(n, $overlay) {
+        const $infoButton = $('.v-btn.info', $overlay);
+        const $optionButton = $('.v-btn.options', $overlay);
+        const $sendToChat = $('.v-btn.send-to-chat', $overlay);
+        const root = M.getNodeRoot(n && n.h || false);
+
+        if (root === M.RubbishID) {
+            $infoButton.removeClass('hidden');
+            $optionButton.addClass('hidden');
+            $sendToChat.addClass('hidden');
+        }
+        else {
+            $infoButton.addClass('hidden');
+            $optionButton.removeClass('hidden');
+        }
+
+    }
+
     function slideshow_remove(n, $overlay) {
 
         var $removeButton = $('.context-menu .remove', $overlay);
+        const $removeButtonV = $('.v-btn.remove', $overlay);
         var $divider = $removeButton.closest('li').prev('.divider');
         var root = M.getNodeRoot(n && n.h || false);
 
@@ -256,14 +283,22 @@ var slideshowid;
             (M.getNodeByHandle(n.h) && !M.getNodeByHandle(n.h).u && M.getNodeRights(n.p) < 2) || M.chat) {
 
             $removeButton.addClass('hidden');
+            $removeButtonV.addClass('hidden');
             $divider.addClass('hidden');
         }
         else {
             $removeButton.removeClass('hidden');
+
+            if (root === M.RubbishID) {
+                $removeButtonV.removeClass('hidden');
+            }
+            else {
+                $removeButtonV.addClass('hidden');
+            }
+
             $divider.removeClass('hidden');
 
-            $removeButton.rebind('click.mediaviewer', function() {
-
+            const removeFunc = () => {
                 if (M.isInvalidUserStatus()) {
                     history.back();
                     return false;
@@ -276,8 +311,13 @@ var slideshowid;
 
                 fmremove();
                 return false;
-            });
+            };
+
+            $removeButton.rebind('click.mediaviewer', removeFunc);
+            $removeButtonV.rebind('click.mediaviewer', removeFunc);
         }
+
+
     }
 
     function slideshow_node(id, $overlay) {
@@ -726,6 +766,7 @@ var slideshowid;
             zoom_mode = false;
             switchedSides = false;
             slideshowid = false;
+            $.videoAutoFullScreen = false;
             _hideCounter = false;
             slideshowplay = false;
             preselection = undefined;
@@ -818,17 +859,24 @@ var slideshowid;
         $('.video-progress-bar', $videoControls).removeAttr('title');
         $('.video-timing', $videoControls).text('');
 
-        // Init full screen icon
-
-        if (fullScreenManager && fullScreenManager.state) {
+        // Init full screen icon and related data attributes
+        if ($document.fullScreen()) {
             $('.v-btn.fullscreen i', $imageControls)
                 .addClass('icon-fullscreen-leave')
                 .removeClass('icon-fullscreen-enter');
+
+            $content.attr('data-fullscreen', 'true');
+            $('.v-btn.fs', $videoControls).addClass('cancel-fullscreen').removeClass('go-fullscreen');
+            $('.v-btn.fs i', $videoControls).addClass('icon-fullscreen-leave').removeClass('icon-fullscreen-enter');
         }
         else {
             $('.v-btn.fullscreen i', $imageControls)
                 .removeClass('icon-fullscreen-leave')
                 .addClass('icon-fullscreen-enter');
+
+            $content.attr('data-fullscreen', 'false');
+            $('.v-btn.fs', $videoControls).removeClass('cancel-fullscreen').addClass('go-fullscreen');
+            $('.v-btn.fs i', $videoControls).removeClass('icon-fullscreen-leave').addClass('icon-fullscreen-enter');
         }
 
         // Turn off pick and pan mode
@@ -900,7 +948,7 @@ var slideshowid;
             });
 
             // Properties icon
-            $('.context-menu .info', $overlay).rebind('click.media-viewer', function() {
+            $('.context-menu .info, .v-btn.info', $overlay).rebind('click.media-viewer', () => {
                 $document.fullScreen(false);
                 propertiesDialog();
                 return false;
@@ -924,7 +972,7 @@ var slideshowid;
                 return false;
             });
 
-            if (u_type === 3 && megaChatIsReady) {
+            if (u_type === 3 && megaChatIsReady && M.currentrootid !== M.RubbishID) {
                 $sendToChat.removeClass('hidden');
             }
             $sendToChat.rebind('click.media-viewer', () => {
@@ -953,6 +1001,9 @@ var slideshowid;
             if (filteredNodeArr && Array.isArray(filteredNodeArr)) {
                 preselection = filteredNodeArr;
             }
+
+            // Icons for rubbish bin
+            slideshow_bin(n, $overlay);
 
             // Previous/Next viewer buttons
             var steps = slideshowsteps();

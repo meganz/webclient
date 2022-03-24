@@ -25,12 +25,6 @@
             button {
                 cursor: pointer;
 
-                &.inactive {
-                    /* [...] */
-
-                    i { --mask-color: #ff6560; }
-                }
-
                 &.end-call {
                     color: var(--text-color-high);
 

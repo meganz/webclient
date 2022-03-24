@@ -475,6 +475,16 @@
 .mega-input.fix-msg.error .message-container {
     color: var(--banner-text-error);
 }
+.mega-input .pass-visible {
+    opacity: 0.7;
+    transition: opacity 200ms;
+    right: 4px;
+    z-index: 12;
+    cursor: pointer;
+}
+.mega-input .pass-visible:hover {
+    opacity: 1;
+}
 /* Password strength Checker - Bar */
 .mega-input .account-pass-lines {
     background: var(--surface-mid-grey);

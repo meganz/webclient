@@ -1108,6 +1108,14 @@ var ulmanager = {
         }
         else if (M.h[uq.hash]) {
             n = mNode || M.d[M.h[uq.hash].first];
+
+            if (!identical && n && uq.size !== n.s) {
+                if (d) {
+                    ulmanager.logger.warn('fingerprint clash!', n.h, [n], File);
+                }
+                eventlog(99749, JSON.stringify([1, parseInt(uq.size), parseInt(n.s)]));
+                return ulmanager.ulStart(File);
+            }
             // identical = n;
         }
         if (!n) {

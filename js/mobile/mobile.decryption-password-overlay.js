@@ -22,6 +22,9 @@ mobile.decryptionPasswordOverlay = {
 
         // Show the overlay
         this.$overlay.removeClass('hidden');
+
+        // Initialise password visibilty toggle
+        mobile.initPasswordVisibleToggle(this.$overlay);
     },
 
     /**

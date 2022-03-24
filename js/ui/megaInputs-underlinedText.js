@@ -272,6 +272,26 @@ mega.ui.MegaInputs.prototype.underlinedText._withIconOrPrefix = function() {
     var $input = this.$input;
     var $wrapper = this.$wrapper;
 
+    if (this.type === 'password') {
+
+        $wrapper.safeAppend('<i class="sprite-fm-mono icon-eye-reveal pass-visible"></i>');
+
+        $('.pass-visible', $wrapper).rebind('click.togglePassV', function() {
+
+            if (this.classList.contains('icon-eye-reveal')) {
+
+                $input.attr('type', 'text');
+                this.classList.remove('icon-eye-reveal');
+                this.classList.add('icon-eye-hidden');
+            }
+            else {
+                $input.attr('type', 'password');
+                this.classList.add('icon-eye-reveal');
+                this.classList.remove('icon-eye-hidden');
+            }
+        });
+    }
+
     if ($input.data('icon')) {
         $wrapper.addClass('with-icon');
         $wrapper.safePrepend(`<i class="${($input.data('icon') || '')}"></i>`);

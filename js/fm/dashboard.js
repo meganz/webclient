@@ -36,19 +36,10 @@ function dashboardUI(updProcess) {
 
     if (u_attr && u_attr.b) {
         $('.fm-right-block.dashboard .non-business-dashboard').addClass('hidden');
-        $('.fm-right-block.dashboard .business-dashboard').removeClass('hidden');
+        const $bsnDashboard = $('.fm-right-block.dashboard .business-dashboard').removeClass('hidden');
         if (u_attr.b.m && u_attr.b.s !== -1) {
-            $('.business-dashboard .go-to-usermanagement-btn').removeClass('hidden');
-
-            // event handler for clicking on user-management button in dashboard.
-            $('.business-dashboard .go-to-usermanagement-btn').off('click').on('click',
-                function userManagementBtnClickHandler() {
-                    M.openFolder('user-management', true);
-                }
-            );
-        }
-        else {
-            $('.business-dashboard .go-to-usermanagement-btn').addClass('hidden');
+            $('.overall-usage-container', $bsnDashboard).addClass('admin');
+            $('.subaccount-view-used-data .view-title span', $bsnDashboard).text(l.bsn_pers_usage);
         }
         if (u_attr.b.s !== 1 || !u_attr.b.m) {
             $('.left-pane.small-txt.plan-date-info', '.dashboard').addClass('hidden');
@@ -119,6 +110,12 @@ function dashboardUI(updProcess) {
         if (u_attr.firstname) {
             const $welcome = $('.dashboard .welcome-message-banner').removeClass('hidden');
             $('.message', $welcome).text(l[24930].replace('$1', u_attr.firstname));
+        }
+
+        // Render the storage and transfer analytics graphs on the admin user's dashboard page
+        if (u_attr.b && u_attr.b.m && u_attr.b.s !== -1) {
+            const business = new BusinessAccountUI();
+            business.viewAdminDashboardAnalysisUI();
         }
 
         // Show balance
@@ -522,9 +519,6 @@ function dashboardUI(updProcess) {
             M.showRecoveryKeyDialog(2);
         });
     });
-
-    // Init dashboard content scrolling
-    initDashboardScroll();
 }
 dashboardUI.renderReferralWidget = function() {
     "use strict";

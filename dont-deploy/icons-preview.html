@@ -57,9 +57,8 @@
     <script>
         window.theme = "light";
         switchTheme = (newTheme) => {
-            document.body.classList.remove('dark');
-            document.body.classList.remove('light');
-            document.body.classList.add(newTheme);
+            document.body.classList.remove('dark', 'light', 'theme-dark', 'theme-light');
+            document.body.classList.add(`theme-${newTheme}`, newTheme);
             window.theme = newTheme;
 
             // swap css
@@ -353,11 +352,13 @@
         ".sprite-fm-mono.icon-weak-signal",
         ".sprite-fm-mono.icon-windows",
         ".sprite-fm-mono.icon-zip-circle",
+        ".sprite-fm-theme.icon-bucket",
         ".sprite-fm-theme.icon-emoji-active",
         ".sprite-fm-theme.icon-emoji-reactions-active",
         ".sprite-fm-theme.icon-emoji-reactions",
         ".sprite-fm-theme.icon-emoji",
         ".sprite-fm-theme.icon-empty-state-bucket-upload",
+        ".sprite-fm-theme.icon-empty-state-favourite",
         ".sprite-fm-theme.icon-empty-state-groups",
         ".sprite-fm-theme.icon-empty-state-keys",
         ".sprite-fm-theme.icon-empty-state-policy",
@@ -687,7 +688,7 @@
         };
     </script>
 </head>
-<body class="light">
+<body class="theme-light light">
 <div id="topbar">
     <input type="search" placeholder="Search..." oninput="doSearch(this.value);"/>
     <select onchange="switchTheme(this.value)" id="themeSwitcherSelect">

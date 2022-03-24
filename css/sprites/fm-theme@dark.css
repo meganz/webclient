@@ -8,6 +8,10 @@
     width: var(--icon-size, 16px);
     height: var(--icon-size, 16px);
 }
+.theme-dark .sprite-fm-theme.icon-bucket, .theme-dark .sprite-fm-theme-before.icon-bucket-before::before, .theme-dark .sprite-fm-theme-after.icon-bucket-after::after,
+.theme-dark-forced .sprite-fm-theme.icon-bucket, .theme-dark-forced .sprite-fm-theme-before.icon-bucket-before::before, .theme-dark-forced .sprite-fm-theme-after.icon-bucket-after::after {
+   background-image: url("../../images/sprites/fm-theme@dark.svg#icon-bucket");
+}
 .theme-dark .sprite-fm-theme.icon-emoji, .theme-dark .sprite-fm-theme-before.icon-emoji-before::before, .theme-dark .sprite-fm-theme-after.icon-emoji-after::after,
 .theme-dark-forced .sprite-fm-theme.icon-emoji, .theme-dark-forced .sprite-fm-theme-before.icon-emoji-before::before, .theme-dark-forced .sprite-fm-theme-after.icon-emoji-after::after {
    background-image: url("../../images/sprites/fm-theme@dark.svg#icon-emoji");
@@ -27,6 +31,10 @@
 .theme-dark .sprite-fm-theme.icon-empty-state-bucket-upload, .theme-dark .sprite-fm-theme-before.icon-empty-state-bucket-upload-before::before, .theme-dark .sprite-fm-theme-after.icon-empty-state-bucket-upload-after::after,
 .theme-dark-forced .sprite-fm-theme.icon-empty-state-bucket-upload, .theme-dark-forced .sprite-fm-theme-before.icon-empty-state-bucket-upload-before::before, .theme-dark-forced .sprite-fm-theme-after.icon-empty-state-bucket-upload-after::after {
    background-image: url("../../images/sprites/fm-theme@dark.svg#icon-empty-state-bucket-upload");
+}
+.theme-dark .sprite-fm-theme.icon-empty-state-favourite, .theme-dark .sprite-fm-theme-before.icon-empty-state-favourite-before::before, .theme-dark .sprite-fm-theme-after.icon-empty-state-favourite-after::after,
+.theme-dark-forced .sprite-fm-theme.icon-empty-state-favourite, .theme-dark-forced .sprite-fm-theme-before.icon-empty-state-favourite-before::before, .theme-dark-forced .sprite-fm-theme-after.icon-empty-state-favourite-after::after {
+   background-image: url("../../images/sprites/fm-theme@dark.svg#icon-empty-state-favourite");
 }
 .theme-dark .sprite-fm-theme.icon-empty-state-groups, .theme-dark .sprite-fm-theme-before.icon-empty-state-groups-before::before, .theme-dark .sprite-fm-theme-after.icon-empty-state-groups-after::after,
 .theme-dark-forced .sprite-fm-theme.icon-empty-state-groups, .theme-dark-forced .sprite-fm-theme-before.icon-empty-state-groups-before::before, .theme-dark-forced .sprite-fm-theme-after.icon-empty-state-groups-after::after {

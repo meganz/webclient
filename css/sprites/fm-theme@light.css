@@ -8,6 +8,10 @@
     width: var(--icon-size, 16px);
     height: var(--icon-size, 16px);
 }
+.theme-light .sprite-fm-theme.icon-bucket, .theme-light .sprite-fm-theme-before.icon-bucket-before::before, .theme-light .sprite-fm-theme-after.icon-bucket-after::after,
+.theme-light-forced .sprite-fm-theme.icon-bucket, .theme-light-forced .sprite-fm-theme-before.icon-bucket-before::before, .theme-light-forced .sprite-fm-theme-after.icon-bucket-after::after {
+   background-image: url("../../images/sprites/fm-theme@light.svg#icon-bucket");
+}
 .theme-light .sprite-fm-theme.icon-emoji, .theme-light .sprite-fm-theme-before.icon-emoji-before::before, .theme-light .sprite-fm-theme-after.icon-emoji-after::after,
 .theme-light-forced .sprite-fm-theme.icon-emoji, .theme-light-forced .sprite-fm-theme-before.icon-emoji-before::before, .theme-light-forced .sprite-fm-theme-after.icon-emoji-after::after {
    background-image: url("../../images/sprites/fm-theme@light.svg#icon-emoji");
@@ -27,6 +31,10 @@
 .theme-light .sprite-fm-theme.icon-empty-state-bucket-upload, .theme-light .sprite-fm-theme-before.icon-empty-state-bucket-upload-before::before, .theme-light .sprite-fm-theme-after.icon-empty-state-bucket-upload-after::after,
 .theme-light-forced .sprite-fm-theme.icon-empty-state-bucket-upload, .theme-light-forced .sprite-fm-theme-before.icon-empty-state-bucket-upload-before::before, .theme-light-forced .sprite-fm-theme-after.icon-empty-state-bucket-upload-after::after {
    background-image: url("../../images/sprites/fm-theme@light.svg#icon-empty-state-bucket-upload");
+}
+.theme-light .sprite-fm-theme.icon-empty-state-favourite, .theme-light .sprite-fm-theme-before.icon-empty-state-favourite-before::before, .theme-light .sprite-fm-theme-after.icon-empty-state-favourite-after::after,
+.theme-light-forced .sprite-fm-theme.icon-empty-state-favourite, .theme-light-forced .sprite-fm-theme-before.icon-empty-state-favourite-before::before, .theme-light-forced .sprite-fm-theme-after.icon-empty-state-favourite-after::after {
+   background-image: url("../../images/sprites/fm-theme@light.svg#icon-empty-state-favourite");
 }
 .theme-light .sprite-fm-theme.icon-empty-state-groups, .theme-light .sprite-fm-theme-before.icon-empty-state-groups-before::before, .theme-light .sprite-fm-theme-after.icon-empty-state-groups-after::after,
 .theme-light-forced .sprite-fm-theme.icon-empty-state-groups, .theme-light-forced .sprite-fm-theme-before.icon-empty-state-groups-before::before, .theme-light-forced .sprite-fm-theme-after.icon-empty-state-groups-after::after {

@@ -4255,7 +4255,7 @@ ChatRoom.prototype.startVideoCall = ChatRoom._fnRequireParticipantKeys(function 
   return this.startCall(true, true);
 });
 ChatRoom.prototype.startCall = ChatRoom._fnRequireParticipantKeys(function (audio, video) {
-  if (!megaChat.hasSupportForCalls) {
+  if (!megaChat.hasSupportForCalls || this.meetingsLoading) {
     return;
   }
 

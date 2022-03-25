@@ -87,7 +87,7 @@
 }
 
 .account.top-header {
-    font-family: 'montserrat', 'LatoWeb', 'source_sans_proregular', Arial;
+    font-family: var(--text-font-family-second-regular);
     font-size: 28px;
     line-height: 44px;
     color: #333;
@@ -108,7 +108,7 @@
     width: 112%;
 }
 .account.text-header {
-    font-family: 'montserrat', 'LatoWeb', 'source_sans_proregular', Arial;
+    font-family: var(--text-font-family-second-regular);
     font-size: 18px;
     line-height: 30px;
     color: black;
@@ -541,7 +541,7 @@ button.loading .loader {
     color: #666666;
     padding-top: 30px;
     padding-bottom: 30px;
-    font-family: 'montserrat', 'LatoWeb', 'source_sans_proregular', Arial;
+    font-family: var(--text-font-family-second-regular);
 }
 .sign .bottom-page.big-icon.top-pad {
     margin: 9px auto 16px auto;

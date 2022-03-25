@@ -27,7 +27,7 @@
     transform: translate(-50%, -50%);
     font: var(--text-h0-bb-bold);
     color: var(--text-color-black-high);
-    font-family: var(--text-font-family-montserrat-light);
+    font-family: var(--text-font-family-second-light);
 }
 
 .corporate .bottom-page.full-block.active .bug-txt .title {
@@ -69,7 +69,7 @@
 }
 
 .corporate-content .new-bottom-pages h2 {
-    font-family: 'Montserrat', sans-serif;
+    font-family: var(--text-font-family-second-regular);
     padding-bottom: 18px;
     font-size: 36px;
     line-height: 50px;
@@ -80,7 +80,7 @@
     font-size: 54px;
     line-height: 66px;
     color: #00C0A6;
-    font-family: "montserrat_bold", "montserrat_semibold", "source_sans_prosemibold", Arial;
+    font-family: var(--text-font-family-second-bold);
     display: block;
 }
 

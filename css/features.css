@@ -66,7 +66,7 @@ body.rtl .feature-page * {
 }
 
 .feature-page h1 {
-    font-family: 'montserrat_bold', 'montserrat', arial, sans-serif;
+    font-family: var(--text-font-family-second-bold);
     font-size: 22px;
     line-height: 27px;
 }
@@ -79,24 +79,24 @@ body.rtl .feature-page * {
 
 .feature-page h2 {
     color: #373737;
-    font-family: var(--text-font-family-montserrat-bold);
+    font-family: var(--text-font-family-second-bold);
     font-size: 32px;
     line-height: 48px;
 }
 .feature-page h2.light {
-    font-family: var(--text-font-family-montserrat-light);
+    font-family: var(--text-font-family-second-light);
 }
 
 .feature-page.objectstorage .header-block h2 {
     font-size: 42px;
     line-height: 52px;
-    font-family: "montserrat_bold", montserrat, arial, sans-serif;
+    font-family: var(--text-font-family-second-bold);
     font-weight: 800;
 }
 
 .feature-page h3 {
     color: #373737;
-    font-family: "montserrat_light", arial, sans-serif;
+    font-family: var(--text-font-family-second-light);
     font-size: 24px;
     line-height: 30px;
 }
@@ -966,7 +966,7 @@ body.rtl .feature-page * {
 
     .feature-page.objectstorage .content-two-column h2 {
         color: #FAFAFA;
-        font-family: "montserrat_bold", sans-serif;
+        font-family: var(--text-font-family-second-bold);
         font-size: 36px;
         font-weight: 900;
         letter-spacing: 0;
@@ -1046,7 +1046,7 @@ body.rtl .feature-page * {
 
     .feature-page .content-two-column .subtitle {
         color: #373737;
-        font-family: 'montserrat', sans-serif;
+        font-family: var(--text-font-family-second-regular);
         font-size: 22px;
         font-weight: 700;
         margin-bottom: 15px;
@@ -1751,13 +1751,13 @@ body.rtl .feature-page * {
     }
 
     .feature-page .business-footer h2 {
-        font-family: var(--text-font-family-montserrat-light);
+        font-family: var(--text-font-family-second-light);
         line-height: 50px;
         margin-bottom: 30px;
     }
 
     .feature-page .business-footer p {
-        font-family: 'montserrat_light', arial, sans-serif;
+        font-family: var(--text-font-family-second-light);
         font-size: 16px;
         line-height: 24px;
     }

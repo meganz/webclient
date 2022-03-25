@@ -3114,7 +3114,7 @@ div.checkboxOn {
     margin-top: 48px;
 }
 .data-protection h1, .terms-of-service h1, .terms-general h1, .privacy-policy h1, .takedown-guidance h1, .contact-us h1, .resellers-page h1, .privacy-company h1 {
-    font-family: 'montserrat_semibold', sans-serif;
+    font-family: var(--text-font-family-second-semibold);
     font-size: 32px;
     color: #262F3B;
     line-height: 40px;
@@ -7818,7 +7818,7 @@ textarea.mobile.support-text-field {
     display: none;
 }
 .mobile .improved-recovery-steps h3.main-italic-header, .mobile .improved-recovery-steps h2 {
-    font-family: 'montserrat', 'LatoWeb', 'source_sans_proregular', Arial;
+    font-family: var(--text-font-family-second-regular);
     font-size: 16px;
     color: #495057;
     padding: 0 0;
@@ -9455,7 +9455,7 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll, .mob
     white-space: normal;
 }
 .mobile.voucher-redeem-dialog .title-text {
-    font-family: 'montserrat_light';
+    font-family: var(--text-font-family-second-light);
     font-size: 20px;
     line-height: 30px;
 }

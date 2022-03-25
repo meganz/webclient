@@ -172,7 +172,7 @@ i.medium-icon.business-sprite {
     white-space: nowrap;
 }
 .business-price.montserat {
-    font-family: var(--text-font-family-montserrat-regular);
+    font-family: var(--text-font-family-second-regular);
 }
 .business-price .business-icon {
     display: inline-block;
@@ -506,7 +506,7 @@ i.medium-icon.business-sprite {
     font-size: 21px;
     line-height: 32px;
     color: #333;
-    font-family: montserrat_light, montserrat, Arial, sans-serif;
+    font-family: var(--text-font-family-second-light);
     padding: 34px 0 24px 0;
 }
 .bottom-page.business-header span {
@@ -635,7 +635,7 @@ div.bottom-page.slider-controls {
     padding: 0 0 12px;
     position: relative;
     z-index: 1;
-    font-family: montserrat_light, montserrat, Arial, sans-serif;
+    font-family: var(--text-font-family-second-light);
 }
 .business-txt-block {
     max-width: 360px;
@@ -774,7 +774,7 @@ div.bottom-page.slider-controls {
     color: #333333;
     padding: 4px 0 72px 0;
     position: relative;
-    font-family: montserrat_light, montserrat, Arial, sans-serif;
+    font-family: var(--text-font-family-second-light);
 }
 .ru .business-mid-header.special-lang {
     letter-spacing: -0.15px;

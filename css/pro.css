@@ -410,7 +410,7 @@ i.pricing-sprite,
     padding-bottom: 34px;
 }
 .pricing-page.top-header {
-    font-family: 'montserrat_light', 'montserrat', Arial;
+    font-family: var(--text-font-family-second-light);
     font-size: 46px;
     line-height: 63px;
     color: #373737;
@@ -569,7 +569,7 @@ i.pricing-sprite,
 .pricing-page.old-plan-price {
     height: 27px;
     color: #666666;
-    font-family: var(--text-font-family-montserrat-regular);
+    font-family: var(--text-font-family-second-regular);
     font-size: 22px;
     letter-spacing: 0;
     line-height: 27px;
@@ -586,7 +586,7 @@ i.pricing-sprite,
 }
 .pricing-page.plan-price.discounted .price,
 .pricing-page.plan-price.discounted .asterisk {
-    font-family: var(--text-font-family-montserrat-regular);
+    font-family: var(--text-font-family-second-regular);
     color: #28C969;
     font-size: 32px;
     font-weight: 600;
@@ -602,7 +602,7 @@ i.pricing-sprite,
     font-size: 28px;
     line-height: 34px;
     color: var(--text-color-high);
-    font-family: var(--text-font-family-montserrat-light);
+    font-family: var(--text-font-family-second-light);
 }
 .pricing-page.plan-info {
     font-size: 16px;
@@ -616,7 +616,7 @@ i.pricing-sprite,
 }
 .pricing-page.plan-price {
     color: var(--text-color-high);
-    font-family: var(--text-font-family-montserrat-light);
+    font-family: var(--text-font-family-second-light);
     font-size: 36px;
     line-height: 45px;
     padding: 0 15px 4px;
@@ -1022,7 +1022,7 @@ body:not(.mobile) .plan.pro3:not(.current) .pricing-page.plan-button:hover {
     color: var(--text-color-medium);
     display: flex;
     font: var(--text-h3);
-    font-family: var(--text-font-family-montserrat-regular);
+    font-family: var(--text-font-family-second-regular);
     justify-content: space-between;
     padding: 0 0 26px;
     text-align: justify;
@@ -1070,7 +1070,7 @@ body:not(.mobile) .plan.pro3:not(.current) .pricing-page.plan-button:hover {
     color: var(--secondary-green);
     display: inline-block;
     font: var(--text-h2);
-    font-family: var(--text-font-family-montserrat-regular);
+    font-family: var(--text-font-family-second-regular);
     font-size: 26px;
     left: 50%;
     position: absolute;
@@ -1123,7 +1123,7 @@ body:not(.mobile) .plan.pro3:not(.current) .pricing-page.plan-button:hover {
 }
 .business-calculator .footer span {
     display: block;
-    font-family: var(--text-font-family-montserrat-regular);
+    font-family: var(--text-font-family-second-regular);
     font-size: 36px;
     line-height: 44px;
 }
@@ -1162,7 +1162,7 @@ body:not(.mobile) .plan.pro3:not(.current) .pricing-page.plan-button:hover {
 .business-quote .title {
     color: var(--text-color-high);
     font: var(--text-h2);
-    font-family: var(--text-font-family-montserrat-regular);
+    font-family: var(--text-font-family-second-regular);
     padding: 50px 0 20px;
 }
 .business-quote .name {
@@ -1574,7 +1574,7 @@ body:not(.mobile) .pricing-page.slider-dot:hover {
     font-size: 26px;
     line-height: 32px;
     color: #373737;
-    font-family: 'montserrat', Arial;
+    font-family: var(--text-font-family-second-regular);
     min-height: 64px;
     margin: 24px auto 0 auto;
     padding: 0 28px;
@@ -1629,7 +1629,7 @@ body:not(.mobile) .pricing-page.slider-dot:hover {
     line-height: 24px;
     color: #FFF;
     padding: 30px 0 0 0;
-    font-family: 'montserrat_light', 'montserrat', Arial;
+    font-family: var(--text-font-family-second-light);
 }
 .pricing-button.mega-button {
     margin: 80px 0 -10px 0;

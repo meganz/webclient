@@ -12,7 +12,7 @@
     overflow: hidden;
 }
 .startpage.top-header {
-    font-family: 'montserrat_light', 'montserrat', Arial;
+    font-family: var(--text-font-family-second-light);
     font-size: 40px;
     line-height: 63px;
     color: #373737;
@@ -533,7 +533,7 @@
     line-height: 20px;
     padding: 0 10px;
     color: #FF333A;
-    font-family: 'montserrat', 'open_sans', sans-serif;
+    font-family: var(--text-font-family-second-regular);
 }
 .startpage.medium-icon.declaration {
     background-position: -201px -2088px;
@@ -814,7 +814,7 @@
 .startpage.software-header {
     position: relative;
     margin-left: 54px;
-    font-family: 'montserrat_light', 'montserrat', Arial;
+    font-family: var(--text-font-family-second-light);
     font-size: 30px;
     line-height: 38px;
     color: #373737;
@@ -855,7 +855,7 @@
     color: #666666;
     display: block;
     padding: 2px 0 20px 0;
-    font-family: 'montserrat_light', 'montserrat', Arial;
+    font-family: var(--text-font-family-second-light);
 }
 .startpage.software-txt a, .startpage.software-txt a:visited {
     display: inline-block;
@@ -1107,7 +1107,7 @@ div.startpage.software-img.soft-slide[data-slide="2"] {
     display: block;
 }
 .startpage.features-content .head {
-    font-family: 'montserrat', Arial;
+    font-family: var(--text-font-family-second-regular);
     font-size: 24px;
     line-height: 30px;
     color: black;
@@ -1467,7 +1467,7 @@ div.startpage.software-img.soft-slide[data-slide="2"] {
     }
     .expanded .startpage.software-header, .expanded .startpage.software-header:first-child {
         margin-left: 0;
-        font-family: 'montserrat', Arial;
+        font-family: var(--text-font-family-second-regular);
         border-top: 0;
         border-bottom: 3px solid #00C0A6;
         color: #373737;

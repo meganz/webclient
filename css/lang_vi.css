@@ -1,0 +1,54 @@
+/* Vietnamese  */
+@font-face {
+    font-family: "lexend_deca";
+    src: url("../fonts/international-text/LexendDeca-Regular.eot");
+    src:
+        url("../fonts/international-text/LexendDeca-Regular.eot?#iefix") format("embedded-opentype"),
+        url("../fonts/international-text/LexendDeca-Regular.woff2") format("woff2"),
+        url("../fonts/international-text/LexendDeca-Regular.woff") format("woff"),
+        url("../fonts/international-text/LexendDeca-Regular.ttf") format("truetype");
+    font-style: normal;
+}
+
+@font-face {
+    font-family: "lexend_deca_bold";
+    src: url("../fonts/international-text/LexendDeca-Bold.eot");
+    src:
+        url("../fonts/international-text/LexendDeca-Bold.eot?#iefix") format("embedded-opentype"),
+        url("../fonts/international-text/LexendDeca-Bold.woff2") format("woff2"),
+        url("../fonts/international-text/LexendDeca-Bold.woff") format("woff"),
+        url("../fonts/international-text/LexendDeca-Bold.ttf") format("truetype");
+    font-style: normal;
+}
+
+@font-face {
+    font-family: "lexend_deca_semibold";
+    src: url("../fonts/international-text/LexendDeca-SemiBold.eot");
+    src:
+        url("../fonts/international-text/LexendDeca-SemiBold.eot?#iefix") format("embedded-opentype"),
+        url("../fonts/international-text/LexendDeca-SemiBold.woff2") format("woff2"),
+        url("../fonts/international-text/LexendDeca-SemiBold.woff") format("woff"),
+        url("../fonts/international-text/LexendDeca-SemiBold.ttf") format("truetype");
+    font-style: normal;
+}
+
+@font-face {
+    font-family: "lexend_deca_light";
+    src: url("../fonts/international-text/LexendDeca-Light.eot");
+    src:
+        url("../fonts/international-text/LexendDeca-Light.eot?#iefix") format("embedded-opentype"),
+        url("../fonts/international-text/LexendDeca-Light.woff2") format("woff2"),
+        url("../fonts/international-text/LexendDeca-Light.woff") format("woff"),
+        url("../fonts/international-text/LexendDeca-Light.ttf") format("truetype");
+    font-style: normal;
+}
+
+body.vi {
+
+    --text-font-family-second-regular: "lexend_deca", sans-serif;
+    --text-font-family-second-bold: "lexend_deca_bold", sans-serif;
+    --text-font-family-second-semibold: "lexend_deca_semibold", sans-serif;
+    --text-font-family-second-light: "lexend_deca_light", sans-serif;
+
+    --text-h2-montserrat-bold: 20px/30px var(--text-font-family-second-bold);
+}

@@ -46,7 +46,7 @@
         else {
             scope = document.querySelector('.fm-right-files-block .fm-right-header .fm-breadcrumbs-wrapper');
         }
-        let items = this.getPath(this.currentdirid);
+        let items = this.getPath(fileHandle || this.currentdirid);
 
         // items can be empty if we search for a file
         // (since currentdirid will be == search instead of the actual directory id

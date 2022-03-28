@@ -4183,21 +4183,15 @@ FileManager.prototype.onSectionUIOpen = function(id) {
     }
 
     if (
-        (id !== 'cloud-drive') &&
-        (id !== 'rubbish-bin') &&
-        (id !== 'inbox') &&
-        (
-            (id !== 'shared-with-me') &&
-            (M.currentdirid !== 'shares')
-        ) &&
-        (
-            (id !== 'out-shares') &&
-            (M.currentdirid !== 'out-shares')
-        ) &&
-        (
-            (id !== 'public-links') &&
-            (M.currentdirid !== 'public-links')
-        )
+        id !== 'cloud-drive' &&
+        id !== 'rubbish-bin' &&
+        id !== 'inbox' &&
+        id !== 'shared-with-me' &&
+        !String(M.currentdirid).includes('shares') &&
+        id !== 'out-shares' &&
+        !String(M.currentdirid).includes('out-shares') &&
+        id !== 'public-links' &&
+        !String(M.currentdirid).includes('public-links')
     ) {
         $('.files-grid-view.fm').addClass('hidden');
         $('.fm-blocks-view.fm').addClass('hidden');

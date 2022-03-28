@@ -10,9 +10,8 @@
  * @param {Object} [sSubMap] Internal use
  * @returns {MegaPromise}
  */
-// eslint-disable-next-line complexity
 MegaData.prototype.buildtree = function(n, dialog, stype, sSubMap) {
-    'use strict'; /* jshint -W074, -W073 */
+    'use strict';
 
     if (!n) {
         console.error('Invalid node passed to M.buildtree');
@@ -417,6 +416,11 @@ MegaData.prototype.buildtree = function(n, dialog, stype, sSubMap) {
             }
             // need to add function for hide parent folder for color
             if (buildnode) {
+
+                if (!_ts_l) {
+                    sSubMap++;
+                }
+
                 M.buildtree(folders[idx], dialog, stype, sSubMap);
             }
         }// END of for folders loop
@@ -454,11 +458,10 @@ MegaData.prototype.buildtree = function(n, dialog, stype, sSubMap) {
  * @param {String} [h] Parent node handle to starts search.
  * @param {String} [term] Search term.
  * @param {Number} [deepness] Internal use
+ * @param {*} [res] internal
  * @returns {Object}
  */
-
 MegaData.prototype.getSearchedTreeHandles = function(h, term, deepness, res) {
-
     "use strict";
 
     if (!deepness) {

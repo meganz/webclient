@@ -463,8 +463,8 @@
             if (!id) {
                 id = this.RootID;
             }
-            else if (fmdb && (!this.d[id] || (this.d[id].t && !this.c[id]))) {
-                fetchdbnodes = true;
+            else if (!this.d[id] || this.d[id].t && !this.c[id]) {
+                fetchdbnodes = !!window.fmdb;
             }
         }
 
@@ -494,7 +494,7 @@
             else if (M.getPath(id).pop() === 'shares') {
                 fetchshares = true;
             }
-            else if (!M.d[id] && fetchdbnodes) {
+            else if (!M.d[id] && (pfid || fetchdbnodes)) {
                 id = M.RootID;
             }
 

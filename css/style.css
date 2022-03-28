@@ -7765,7 +7765,7 @@ button.loading span i {
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
     box-sizing: border-box;
-    color: #333;
+    color: var(--text-color-high);
     display: block;
     width: 100%;
     min-height: 36px;

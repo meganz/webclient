@@ -451,7 +451,8 @@
                 id = n.p;
             }
 
-            if (M.currentCustomView) {
+            if (M.currentCustomView &&
+                !(M.currentCustomView.prefixPath === 'discovery/' && id === M.RootID)) {
                 id = M.currentCustomView.prefixPath + id;
             }
 

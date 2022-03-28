@@ -290,7 +290,6 @@
         var cv = M.isCustomView(id);
 
         document.documentElement.classList.remove('wait-cursor');
-        $('.fm-right-account-block, .fm-right-block.dashboard, .gallery-tabs-bl').addClass('hidden');
         $('.fm-files-view-icon').removeClass('hidden');
 
         if (d) {
@@ -310,6 +309,8 @@
             // Do nothing if same path is chosen
             return MegaPromise.resolve(EEXIST);
         }
+
+        $('.fm-right-account-block, .fm-right-block.dashboard, .gallery-tabs-bl').addClass('hidden');
 
         this.chat = false;
         this.search = false;

@@ -34,6 +34,14 @@ mobile.slideshow = {
     init: function(nodeHandle) {
         'use strict';
 
+        const n = M.getNodeByHandle(nodeHandle);
+        if (!n) {
+            if (d) {
+                console.warn('mobile.slideshow.init(%s) Node not found...', nodeHandle);
+            }
+            return;
+        }
+
         // Cache selector
         mobile.slideshow.$overlay = $('.mobile.slideshow-image-previewer');
 
@@ -275,7 +283,9 @@ mobile.slideshow = {
         mobile.slideshow.$overlay.removeClass('hidden');
 
         // Update preview state.
-        sessionStorage.setItem('previewNode', nodeHandle);
+        if (page !== 'download') {
+            sessionStorage.setItem('previewNode', nodeHandle);
+        }
 
         if (is_video(node)) {
             var videoHtmlTemplate = $('.mobile-video-template');

@@ -1172,8 +1172,4 @@ function dlPageCleanup() {
         $(container).appendTo(wrapper);
         delete window.mediaConIsDl;
     }
-
-    if (is_mobile && sessionStorage.previewNode) {
-        delete sessionStorage.previewNode;
-    }
 }

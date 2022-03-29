@@ -3373,8 +3373,8 @@ mBroadcaster.once('boot_done', function() {
 mBroadcaster.once('mega:openfolder', function() {
     'use strict';
 
-    if (sessionStorage && sessionStorage.previewNode) {
-        var previewNode = sessionStorage.previewNode;
+    const {previewNode} = sessionStorage;
+    if (previewNode) {
         sessionStorage.removeItem('previewNode');
         slideshow(previewNode);
     }

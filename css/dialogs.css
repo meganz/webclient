@@ -6829,9 +6829,6 @@ body.de .mega-dialog.new-group-chat {
     .theme-dark .mega-dialog.achievements-list-dialog .content-block {
         background: var(--surface-grey-2);
     }
-    .mega-dialog.achievements-list-dialog .content-block .jspPane {
-        padding: 0 48px !important;
-    }
     .mega-dialog.achievements-list-dialog .account.top-header.small {
         text-align: center;
         padding: 40px 40px 0 40px;
@@ -6840,7 +6837,8 @@ body.de .mega-dialog.new-group-chat {
         border-bottom: 1px solid var(--stroke-grey-2);
     }
     .mega-dialog.achievements-list-dialog .achievements-scroll {
-        max-height: 562px;
+        padding: 0 48px;
+        max-height: 550px;
         overflow: hidden;
     }
     .mega-dialog.achievements-list-dialog .achievement-banner {
@@ -6903,7 +6901,6 @@ body.de .mega-dialog.new-group-chat {
         margin-top: 40px;
         display: flex;
         flex-wrap: wrap;
-        padding-bottom: 40px;
     }
     .mega-dialog.achievements-list-dialog .achievements-cell {
         width: calc((100% - 48px) / 3);
@@ -6929,8 +6926,6 @@ body.de .mega-dialog.new-group-chat {
         height: 128px;
         margin: 12px auto 12px;
         display: flex;
-        align-items: center;
-        justify-content: center;
         flex-grow: 0;
         flex-shrink: 0;
     }
@@ -6939,6 +6934,7 @@ body.de .mega-dialog.new-group-chat {
         width: 100%;
     }
     .mega-dialog.achievements-list-dialog .achievements-cell .image-container .achievement-icon {
+        margin: auto;
         width: 100%;
         --width: 100%;
     }

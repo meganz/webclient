@@ -286,21 +286,14 @@ mega.achievem.achievementsListDialog = function achievementsListDialog(onDialogC
         $dialog.removeClass('hidden');
 
         // Init scroll
-        var $contentBlock = $('.achievements-list', $dialog);
         var $scrollBlock = $('.achievements-scroll', $dialog);
-        var bodyHeight = $('body').height();
 
-        if ($dialog.outerHeight() > bodyHeight) {
-            $scrollBlock.css('max-height', bodyHeight - 60);
-            $scrollBlock.jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5});
-            $scrollBlock.data('jsp').scrollTo(0, 0);
-        }
-        else if ($contentBlock.outerHeight() > 666) {
-            $scrollBlock.jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5});
-            $scrollBlock.data('jsp').scrollTo(0, 0);
+        if ($scrollBlock.is('.ps')) {
+            $scrollBlock.scrollTop(0);
+            Ps.update($scrollBlock[0]);
         }
         else {
-            deleteScrollPanel($scrollBlock, 'jsp');
+            Ps.initialize($scrollBlock[0]);
         }
 
         return $dialog;

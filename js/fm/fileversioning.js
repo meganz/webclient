@@ -550,8 +550,7 @@ var versiondialogid;
                     };
                     if (!$(this).hasClass('disabled')) {
 
-                        const msg = current_sel_version.length > 1 ?
-                            l[13750].replace('%1', current_sel_version.length) : l[13749];
+                        const msg = mega.icu.format(l[13750], current_sel_version.length);
 
                         msgDialog('remove', l[1003], msg, l[1007], e => {
                             if (e) {

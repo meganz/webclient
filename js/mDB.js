@@ -563,6 +563,10 @@ FMDB.prototype._transactionErrorHandled = function(ch, ex) {
     if (mega.is.loading && (error.name === 'TimeoutError' || error.name === 'AbortError')) {
         if (d) {
             this.logger.info("Transaction %s, retrying...", error.name, ex);
+
+            if (mega.loadReport) {
+                this.logger.info('loadReport', JSON.stringify(mega.loadReport));
+            }
         }
 
         res = true;
@@ -570,21 +574,27 @@ FMDB.prototype._transactionErrorHandled = function(ch, ex) {
 
         switch (state) {
             case 0:
+            case 1:
+            case 2:
                 if (!this.crashed) {
                     this.state = -1;
                     this.writing = 0;
                     this.writepending(ch);
+
+                    if (mega.loadReport && mega.loadReport.invisibleTime > 0) {
+                        sessionStorage[tag]--;
+                    }
                     break;
                 }
             /* fallthrough */
-            case 1:
+            case 3:
                 if (!mega.nobp) {
                     localStorage.nobp = 1;
                     fm_forcerefresh(true);
                     break;
                 }
             /* fallthrough */
-            case 2:
+            case 4:
                 fm_fullreload(null, 'DB-crash');
                 break;
             default:

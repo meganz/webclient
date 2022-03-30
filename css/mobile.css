@@ -10130,7 +10130,7 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll, .mob
 }
 .mobile.top-hr-pad {
     margin-top: 66px;
-    max-height: calc(100vh - 66px);
+    max-height: calc(100% - 66px);
     vertical-align: top;
     overflow: scroll;
 }
@@ -13448,7 +13448,7 @@ p a.blog-new-read-more {
 /* Affiliate redemption history */
 .affiliate-history-page .mobile.top-hr-pad {
     margin-top: 106px;
-    max-height: calc(100vh - 106px);
+    max-height: calc(100% - 106px);
 }
 .mobile.affiliate-history-dropdown {
     font-size: 0;

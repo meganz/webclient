@@ -90,17 +90,19 @@ body {
 
         /* font family */
 
-            --text-font-family: 'LatoWeb', sans-serif;
-            --text-font-family-bold: 'LatoWebBold', sans-serif;
-            --text-font-family-semibold: 'LatoWebSemibold', sans-serif;
-            --text-font-family-black: 'LatoWebBlack', sans-serif;
-            --text-font-family-light: 'LatoWebLight', sans-serif;
-            --text-font-family-code: 'source_code_proregular', monospace;
+            --text-font-family: "LatoWeb", sans-serif;
+            --text-font-family-bold: "LatoWebBold", sans-serif;
+            --text-font-family-semibold: "LatoWebSemibold", sans-serif;
+            --text-font-family-black: "LatoWebBlack", sans-serif;
+            --text-font-family-light: "LatoWebLight", sans-serif;
+            --text-font-family-code: "source_code_proregular", monospace;
 
         /* font family : ONLY FOR PRODUCT PAGES */
-            --text-font-family-montserrat-bold: 'montserrat_bold', 'montserrat', arial, sans-serif;
-            --text-font-family-montserrat-light: 'montserrat_light', arial, sans-serif;
-            --text-font-family-montserrat-regular: 'montserrat', arial, sans-serif;
+
+            --text-font-family-second-bold: "montserrat_bold", "montserrat", arial, sans-serif;
+            --text-font-family-second-light: "montserrat_light", arial, sans-serif;
+            --text-font-family-second-regular: "montserrat", arial, sans-serif;
+            --text-font-family-second-semibold: "montserrat_semibold", arial, sans-serif;
 
         /* font */
 
@@ -125,12 +127,12 @@ body {
             --text-h0-bb-bold: bold 36px/54px var(--text-font-family-semibold);
 
         /* body2, caption and data are currently never bold */
+
             --text-code1: 12px/24px var(--text-font-family-code);
 
         /* font : ONLY FOR PRODUCT PAGES */
-            --text-h1-montserrat-bold: 24px/36px var(--text-font-family-montserrat-bold);
-            --text-h2-montserrat-bold: 20px/30px var(--text-font-family-montserrat-bold);
-            --text-body1-montserrat-light: 20px/30px var(--text-font-family-montserrat-light);
+
+            --text-h2-montserrat-bold: 20px/30px var(--text-font-family-second-bold);
 
     /* transitions */
 

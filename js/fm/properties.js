@@ -122,11 +122,21 @@
 
         M.safeShowDialog('properties', function() {
             $.propertiesDialog = 'properties';
-            // on idle so we can call renderPathBreadcrumbs only once the info dialog is rendered.
-            onIdle(() => {
-                // we pass the filehandle, so it is available if we search on files on search
-                M.renderPathBreadcrumbs(n.h, true);
-            });
+
+            // If it is download page or
+            // node is not owned by current user on chat
+            // (possible old shared file and no longer exist on cloud-drive, or shared by other user in the chat room),
+            // don't display path
+            if (page === 'download' || (M.chat && n.u !== u_handle)) {
+                $('.properties-breadcrumb', $dialog).addClass('hidden');
+            }
+            else {
+                // on idle so we can call renderPathBreadcrumbs only once the info dialog is rendered.
+                onIdle(() => {
+                    // we pass the filehandle, so it is available if we search on files on search
+                    M.renderPathBreadcrumbs(n.h, true);
+                });
+            }
             return $dialog;
         });
 

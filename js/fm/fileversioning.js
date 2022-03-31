@@ -382,7 +382,7 @@ var versiondialogid;
                             id="vde_${v.h}">
                             <i class="sprite-fm-mono icon-bin"></i>
                         </div>`;
-                    if (nodeData && (nodeData.r < 2)) {// if the user does not have full access of the shared folder.
+                    if ((nodeData && nodeData.r < 2) || !M.d[fh].tvf) {// if the user does not have full access of the shared folder.
                         deleteBtnHtml =
                             `<div class="mega-button small action delete-file disabled nonclickable"
                                 data-simpletip="${l[1730]}"
@@ -482,35 +482,37 @@ var versiondialogid;
             }
 
             var refreshHeader = function(fileHandle) {
+
+                const headerSelect = '.fm-versioning .pad .top-column';
+                const $rvtBtn = $('button.js-revert', headerSelect);
+                const $delBtn = $('button.js-delete', headerSelect);
+                const $clrBtn = $('button.js-clear-previous', headerSelect);
+
                 if (current_sel_version.length > 1
                     || current_sel_version[0] === fileversioning.getTopNodeSync(fileHandle)
                     || (nodeData && nodeData.r < 2) || fileversioning.dvState === 1) {
 
-                    $('.fm-versioning .pad .top-column button.js-revert')
-                        .addClass("disabled nonclickable");
+                    $rvtBtn.addClass("disabled nonclickable");
                 }
                 else {
-                    $('.fm-versioning .pad .top-column button.js-revert')
-                        .removeClass("disabled nonclickable");
+                    $rvtBtn.removeClass("disabled nonclickable");
                 }
                 if (nodeData && (nodeData.r < 2)) {
-                    $('.fm-versioning .pad .top-column button.js-delete')
-                        .addClass("disabled nonclickable");
-                    $('.fm-versioning .pad .top-column button.js-clear-previous')
-                        .addClass("disabled nonclickable");
+                    $delBtn.addClass("disabled nonclickable");
+                    $clrBtn.addClass("disabled nonclickable");
                 }
                 else {
-                    $('.fm-versioning .pad .top-column button.js-delete')
-                        .removeClass("disabled nonclickable");
-                    $('.fm-versioning .pad .top-column button.js-clear-previous')
-                        .removeClass("disabled nonclickable");
-                    if (M.d[fh].tvf) {
-                        $('.fm-versioning .pad .top-column button.js-clear-previous')
-                            .removeClass("disabled nonclickable");
+                    if (!M.d[fh].tvf || current_sel_version.length === M.d[fh].tvf + 1) {
+                        $delBtn.addClass("disabled nonclickable");
                     }
                     else {
-                        $('.fm-versioning .pad .top-column button.js-clear-previous')
-                            .addClass("disabled nonclickable");
+                        $delBtn.removeClass("disabled nonclickable");
+                    }
+                    if (M.d[fh].tvf) {
+                        $clrBtn.removeClass("disabled nonclickable");
+                    }
+                    else {
+                        $clrBtn.addClass("disabled nonclickable");
                     }
                 }
 
@@ -548,8 +550,7 @@ var versiondialogid;
                     };
                     if (!$(this).hasClass('disabled')) {
 
-                        const msg = current_sel_version.length > 1 ?
-                            l[13750].replace('%1', current_sel_version.length) : l[13749];
+                        const msg = mega.icu.format(l[13750], current_sel_version.length);
 
                         msgDialog('remove', l[1003], msg, l[1007], e => {
                             if (e) {

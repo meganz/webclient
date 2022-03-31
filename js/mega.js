@@ -1785,8 +1785,11 @@ function fm_forcerefresh(light) {
         localStorage.force = 1;
     }
 
-    if (fmdb && !fmdb.crashed) {
-        execsc = function() {}; // stop further SC processing
+    if (fmdb) {
+        // stop further SC processing
+        window.execsc = nop;
+
+        // bring DB to a defined state
         fmdb.invalidate().finally(() => location.reload());
     }
     else {
@@ -1834,6 +1837,9 @@ function fm_fullreload(q, logMsg) {
     }
 
     if (fmdb) {
+        // stop further SC processing
+        window.execsc = nop;
+
         // bring DB to a defined state
         fmdb.invalidate().finally(done);
     }

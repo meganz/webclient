@@ -594,7 +594,7 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
                     $('.files-menu.context .dropdown-item.sort-grid-item.s-fm.sort-fav').addClass('hidden');
                 }
 
-                if (M.currentdirid === M.RubbishID) {
+                if (M.currentrootid === M.RubbishID) {
                     $('.files-menu.context .dropdown-item.sort-grid-item.s-fm.sort-fav').addClass('hidden');
                 }
             }

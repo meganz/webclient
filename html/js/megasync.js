@@ -56,7 +56,7 @@ var megasync = (function() {
             return ShttpMegasyncUrl;
         }
         else if (ua.details.browser === 'Chrome') {
-            if (ua.details.version.substr(0, 2) >= '30') {
+            if (parseInt(ua.details.version) >= 30) {
                 return httpMegasyncUrl;
             }
             else {
@@ -64,7 +64,7 @@ var megasync = (function() {
             }
         }
         else if (ua.details.browser === 'Firefox') {
-            if (ua.details.version.substr(0, 2) >= '55') {
+            if (parseInt(ua.details.version) >= 55) {
                 return httpMegasyncUrl;
             }
             else {
@@ -72,7 +72,7 @@ var megasync = (function() {
             }
         }
         else if (ua.details.browser === 'Opera') {
-            if (ua.details.version.substr(0, 2) >= '28') {
+            if (parseInt(ua.details.version) >= 28) {
                 return httpMegasyncUrl;
             }
             else {

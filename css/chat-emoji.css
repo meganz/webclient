@@ -113,6 +113,19 @@ img.emoji.big {
     width: 12px;
     height: 12px;
 }
+.chat-right-area img.emoji.big,
+.chat-topic-block .chat-topic-text img.emoji.big,
+.chat-topic-block .user-card-data img.emoji.big {
+    width: 20px;
+    height: 20px;
+    margin: 0;
+}
+.messages-block .message.body .user-card-name .emoji.big,
+.messages-textarea-placeholder .emoji {
+    width: 16px;
+    height: 16px;
+    margin-top: 0;
+}
 
 
 /** new hover/active styles for the emoji dropdown **/

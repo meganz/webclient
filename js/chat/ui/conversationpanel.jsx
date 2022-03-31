@@ -1457,19 +1457,22 @@ export class ConversationPanel extends MegaRenderMixin {
                         streams={room.sfuApp.callManagerCall.peers}
                         call={room.sfuApp.callManagerCall}
                         minimized={this.state.callMinimized}
-                        onCallMinimize={() =>
-                            this.setState({ callMinimized: true }, () => {
-                                this.toggleExpandedFlag();
-                                this.safeForceUpdate();
-                            })
-                        }
-                        onCallExpand={() =>
-                            this.setState({ callMinimized: false }, () => {
-                                loadSubPage('fm/chat');
-                                room.show();
-                                this.toggleExpandedFlag();
-                            })
-                        }
+                        onCallMinimize={() => {
+                            return this.state.callMinimized ?
+                                null :
+                                this.setState({ callMinimized: true }, () => {
+                                    this.toggleExpandedFlag();
+                                    this.safeForceUpdate();
+                                });
+                        }}
+                        onCallExpand={() => {
+                            return this.state.callMinimized &&
+                                this.setState({ callMinimized: false }, () => {
+                                    loadSubPage('fm/chat');
+                                    room.show();
+                                    this.toggleExpandedFlag();
+                                });
+                        }}
                         didMount={this.toggleExpandedFlag}
                         willUnmount={minimised =>
                             this.setState({ callMinimized: false }, () =>

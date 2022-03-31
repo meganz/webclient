@@ -46,14 +46,9 @@
         else {
             scope = document.querySelector('.fm-right-files-block .fm-right-header .fm-breadcrumbs-wrapper');
         }
-        let items = this.getPath(this.currentdirid);
+        let items = this.getPath(fileHandle || this.currentdirid);
 
-        // items can be empty if we search for a file
-        // (since currentdirid will be == search instead of the actual directory id
-        // so we get the path from the file handle passed in
-        // if this is custom view, should not rely on currentdirid for getting path
-        if ((items.length === 0 || M.currentCustomView) && isInfoBlock && fileHandle) {
-            items = this.getPath(fileHandle);
+        if (isInfoBlock && fileHandle) {
             // remove first element which is the target element
             items.shift();
         }
@@ -451,7 +446,8 @@
                 id = n.p;
             }
 
-            if (M.currentCustomView) {
+            if (M.currentCustomView &&
+                !(M.currentCustomView.prefixPath === 'discovery/' && id === M.RootID)) {
                 id = M.currentCustomView.prefixPath + id;
             }
 

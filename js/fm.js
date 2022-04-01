@@ -1415,6 +1415,10 @@ function msgDialog(type, title, msg, submsg, callback, checkboxSetting) {
     $dialog.parent().addClass('msg-dialog-container');
     $('#msgDialog aside').addClass('hidden');
 
+    if (checkboxSetting === 1) {
+        $dialog.addClass('with-close-btn');
+    }
+
     if (type === 'clear-bin') {
         $('#msgDialog').addClass('warning');
         $('#msgDialog footer .footer-container')
@@ -1507,12 +1511,12 @@ function msgDialog(type, title, msg, submsg, callback, checkboxSetting) {
             });
         }
         else {
-            $('#msgDialog footer .footer-container')
-                .safeHTML(
-                    `<button class="mega-button confirm">
-                        <span>@@</span>
-                    </button>`, l[81]
-                );
+            $('#msgDialog footer .footer-container').safeHTML(
+                `<button class="mega-button confirm ${checkboxSetting === 1 ? 'positive' : ''}">
+                    <span>@@</span>
+                </button>`,
+                l[81]
+            );
 
             // eslint-disable-next-line sonarjs/no-identical-functions
             $('#msgDialog .mega-button.confirm').rebind('click', function() {
@@ -1586,6 +1590,7 @@ function msgDialog(type, title, msg, submsg, callback, checkboxSetting) {
             $('#msgDialog').addClass('confirmation');
         }
 
+        checkboxSetting = checkboxSetting === 1 ? null : checkboxSetting;
         if (checkboxSetting) {
             $('#msgDialog .checkbox-block .checkdiv,' +
                 '#msgDialog .checkbox-block input')

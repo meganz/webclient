@@ -14,6 +14,7 @@ import { Avatar, ContactAwareName } from "./contacts.jsx";
 var StartGroupChatWizard = require('./startGroupChatWizard.jsx').StartGroupChatWizard;
 import {Start as StartMeetingDialog} from "./meetings/workflow/start.jsx";
 import MeetingsCallEndedDialog from "./meetings/meetingsCallEndedDialog.jsx";
+import { inProgressAlert } from './meetings/call.jsx';
 import Nil from './contactsPanel/nil.jsx';
 
 var getRoomName = function(chatRoom) {
@@ -911,11 +912,11 @@ class ConversationsApp extends MegaRenderMixin {
     }
     startMeeting() {
         if (megaChat.hasSupportForCalls) {
-            this.setState({ startMeetingDialog: true });
+            return inProgressAlert()
+                .then(() => this.setState({ startMeetingDialog: true }))
+                .catch(() => d && console.warn('Already in a call.'));
         }
-        else {
-            showToast('warning', l[7211]);
-        }
+        return showToast('warning', l[7211] /* `Your browser does not have the required audio/video capabilities` */);
     }
     _cacheRouting() {
         this.routingSection = this.props.megaChat.routingSection;
@@ -1179,14 +1180,7 @@ class ConversationsApp extends MegaRenderMixin {
                     className: 'new-meeting',
                     title: l.new_meeting,
                     icon: 'sprite-fm-mono icon-video-call-filled',
-                    onClick: () => {
-                        if (megaChat.hasSupportForCalls) {
-                            this.setState({ startMeetingDialog: true });
-                        }
-                        else {
-                            showToast('warning', l[7211]);
-                        }
-                    }
+                    onClick: () => this.startMeeting()
                 },
                 {
                     key: 'newChatLink',

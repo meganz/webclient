@@ -9,7 +9,8 @@ export default class Incoming extends MegaRenderMixin {
     static NAMESPACE = 'incoming-dialog';
 
     state = {
-        video: false
+        video: false,
+        hoveredSwitch: true
     };
 
     constructor(props) {
@@ -27,14 +28,73 @@ export default class Incoming extends MegaRenderMixin {
         $.dialog = this._old$dialog;
     }
 
+    renderSwitchControls = () => {
+        const className = `mega-button large round switch ${this.state.hoveredSwitch ? 'hovered' : ''}`;
+        const toggleHover = () => this.setState(state => ({ hoveredSwitch: !state.hoveredSwitch }));
+
+        return (
+            <div className="switch-button">
+                <div
+                    className="switch-button-container simpletip"
+                    data-simpletip={l.end_and_answer /* `End & Answer` */}
+                    data-simpletipposition="top"
+                    onMouseEnter={toggleHover}
+                    onMouseLeave={toggleHover}
+                    onClick={ev => {
+                        ev.stopPropagation();
+                        this.props.onSwitch();
+                    }}>
+                    <Button className={`${className} negative`} icon="icon-end-call"/>
+                    <Button className={`${className} positive`} icon="icon-phone"/>
+                </div>
+            </div>
+        );
+    };
+
+    renderAnswerControls = () => {
+        const { video } = this.state;
+        const { onAnswer, onToggleVideo } = this.props;
+
+        return (
+            <>
+                <Button
+                    className="mega-button positive answer"
+                    icon="icon-phone"
+                    simpletip={{ position: 'top', label: l[7205] /* `Answer` */ }}
+                    onClick={onAnswer}>
+                    <span>{l[7205] /* `Answer` */}</span>
+                </Button>
+                <Button
+                    className={`
+                        mega-button
+                        large
+                        round
+                        video
+                        ${video ? '' : 'negative'}
+                    `}
+                    icon={video ? 'icon-video-call-filled' : 'icon-video-off'}
+                    simpletip={{
+                        position: 'top',
+                        label: video ?
+                            l[22894] /* `Disable video` */ :
+                            l[22893] /* `Enable video` */
+                    }}
+                    onClick={() => this.setState({ video: !video }, () => onToggleVideo(video))}>
+                    <span>
+                        {video ? l[22894] /* `Disable video` */ : l[22893] /* `Enable video` */}
+                    </span>
+                </Button>
+            </>
+        );
+    };
+
     render() {
         const { chatRoom } = this.props;
 
         if (chatRoom) {
-            const { callerId, onClose, onReject, onAnswer, onToggleVideo } = this.props;
-            const { video } = this.state;
+            const { callerId, onClose, onReject } = this.props;
             const { NAMESPACE } = Incoming;
-            const SIMPLETIP_PROPS = { position: 'top' };
+            const CALL_IN_PROGRESS = window.sfuClient;
             const isPrivateRoom = chatRoom.type === 'private';
             const rejectLabel = isPrivateRoom ? l[20981] /* `Reject` */ : l[82] /* `Cancel` */;
 
@@ -57,40 +117,19 @@ export default class Incoming extends MegaRenderMixin {
                                 {isPrivateRoom ? l[17878] /* `Incoming call` */ : l[19995] /* `Incoming group call` */}
                             </span>
                         </div>
-                        <div className={`${NAMESPACE}-controls`}>
+                        <div
+                            className={`
+                                ${NAMESPACE}-controls
+                                ${CALL_IN_PROGRESS ? 'call-in-progress' : ''}
+                            `}>
                             <Button
                                 className="mega-button large round negative"
                                 icon="icon-end-call"
-                                simpletip={{ ...SIMPLETIP_PROPS, label: rejectLabel }}
+                                simpletip={{ position: 'top', label: rejectLabel }}
                                 onClick={onReject}>
                                 <span>{rejectLabel}</span>
                             </Button>
-                            <Button
-                                className="mega-button positive answer"
-                                icon="icon-phone"
-                                simpletip={{ ...SIMPLETIP_PROPS, label: l[7205] /* `Answer` */ }}
-                                onClick={onAnswer}>
-                                <span>{l[7205] /* `Answer` */}</span>
-                            </Button>
-                            <Button
-                                className={`
-                                    mega-button
-                                    large round
-                                    video
-                                    ${video ? '' : 'negative'}
-                                `}
-                                icon={video ? 'icon-video-call-filled' : 'icon-video-off'}
-                                simpletip={{
-                                    ...SIMPLETIP_PROPS,
-                                    label: video ? l[22894] /* `Disable video` */ : l[22893] /* `Enable video` */
-                                }}
-                                onClick={() =>
-                                    this.setState({ video: !video }, () =>
-                                        onToggleVideo(video)
-                                    )
-                                }>
-                                <span>{video ? l[22894] /* `Disable video` */ : l[22893] /* `Enable video` */}</span>
-                            </Button>
+                            {CALL_IN_PROGRESS ? this.renderSwitchControls() : this.renderAnswerControls()}
                         </div>
                     </div>
                 </ModalDialogsUI.ModalDialog>

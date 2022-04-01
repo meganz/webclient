@@ -3306,6 +3306,11 @@ window.onbeforeunload = function () {
         mega.rad.flush();
     }
 
+    if (megaChatIsReady && megaChat.activeCall) {
+        ion.sound.play('alert_info_message');
+        return false;
+    }
+
     if (window.dlmanager && (dlmanager.isDownloading || ulmanager.isUploading)) {
         return $.memIOSaveAttempt ? null : l[377];
     }

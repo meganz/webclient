@@ -7,10 +7,55 @@ import End from './workflow/end.jsx';
 import Ephemeral from './workflow/ephemeral.jsx';
 
 export const EXPANDED_FLAG = 'in-call';
+export const inProgressAlert = () => {
+    return new Promise((resolve, reject) => {
+        if (megaChat.haveAnyActiveCall()) {
+            if (window.sfuClient) {
+                // Active call w/  the current client
+                msgDialog('warningb', null, l.call_in_progress, l.finish_call, null, 1);
+                return reject();
+            }
+            // Active call on another client
+            return (
+                msgDialog(
+                    `warningb:!^${l[82]}!${l.join_anyway}`,
+                    null,
+                    l.call_in_progress,
+                    l.multiple_calls,
+                    join => {
+                        if (join) {
+                            return resolve();
+                        }
+                        return reject();
+                    },
+                    1
+                )
+            );
+        }
+        resolve();
+    });
+};
+
+// --
 
 export default class Call extends MegaRenderMixin {
 
     ephemeralAddListener = null;
+
+    /**
+     * TYPE
+     * @description Describes the available call types.
+     * @type {{VIDEO: number, AUDIO: number}}
+     * @enum {number}
+     * @property {number} AUDIO
+     * @property {number} VIDEO
+     * @readonly
+     */
+
+    static TYPE = {
+        AUDIO: 1,
+        VIDEO: 2
+    };
 
     /**
      * MODE

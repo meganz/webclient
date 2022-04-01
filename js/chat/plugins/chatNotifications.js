@@ -231,9 +231,9 @@ var ChatNotifications = function(megaChat, options) {
             var n = self.notifications.notify(
                 'incoming-voice-video-call',
                 {
-                    'sound': 'incoming_voice_video_call',
+                    'sound': window.sfuClient ? null : 'incoming_voice_video_call',
                     'soundLoop': true,
-                    'alwaysPlaySound': true,
+                    'alwaysPlaySound': !window.sfuClient,
                     'group': room.chatId,
                     'incrementCounter': true,
                     'anfFlag': 'chat_enabled',
@@ -268,38 +268,40 @@ var ChatNotifications = function(megaChat, options) {
 
             let videoEnabled = false;
 
-            const dialogContainer = document.createElement("div");
+            const dialogContainer = document.createElement('div');
+            const triggerRingingStopped = () => {
+                room.ringingCalls.clear();
+                megaChat.plugins.callManager2.trigger('onRingingStopped', {
+                    callId: callId,
+                    chatRoom: room
+                });
+            };
             const dialog = React.createElement(ChatCallIncomingDialog, {
                 key: room.chatId,
                 chatRoom: room,
-                onClose: () => {
-                    room.ringingCalls.clear();
-                    megaChat.plugins.callManager2.trigger("onRingingStopped", {
-                        callId: callId,
-                        chatRoom: room
-                    });
-                },
+                onClose: () => triggerRingingStopped(),
                 callerId: room.ringingCalls[callId],
                 onAnswer: () => {
                     room.activateWindow();
                     room.show();
-                    room.ringingCalls.clear();
                     room.joinCall(true, videoEnabled);
-                    megaChat.plugins.callManager2.trigger("onRingingStopped", {
-                        callId: callId,
-                        chatRoom: room
-                    });
+                    triggerRingingStopped();
                 },
-                onToggleVideo: (newVal) => {
+                onToggleVideo: newVal => {
                     videoEnabled = !newVal;
                 },
                 onReject: () => {
-                    room.ringingCalls.clear();
                     room.rejectCall();
-                    megaChat.plugins.callManager2.trigger("onRingingStopped", {
-                        callId: callId,
-                        chatRoom: room
-                    });
+                    triggerRingingStopped();
+                },
+                onSwitch: () => {
+                    if (window.sfuClient) {
+                        window.sfuClient.app.destroy();
+                    }
+                    room.activateWindow();
+                    room.show();
+                    room.joinCall(true, videoEnabled);
+                    triggerRingingStopped();
                 }
             });
 

@@ -1958,9 +1958,6 @@ ChatRoom.prototype.joinCall = ChatRoom._fnRequireParticipantKeys(function(audio,
     if (this.meetingsLoading) {
         return;
     }
-    if (window.sfuClient) {
-        window.sfuClient.app.destroy();
-    }
 
     this.meetingsLoading = l.joining /* `Joining` */;
 
@@ -2217,7 +2214,7 @@ ChatRoom.prototype.truncate = function() {
 ChatRoom.prototype.getActiveCalls = function() {
     return this.activeCallIds.map((parts, id) => {
         return parts.indexOf(u_handle) > -1 ? id : undefined;
-    }).length > 0;
+    });
 };
 
 

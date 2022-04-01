@@ -13,6 +13,7 @@ import {ColumnSharedFolderAccess} from "../../../ui/jsx/fm/nodes/columns/columnS
 import {ColumnSharedFolderButtons} from "../../../ui/jsx/fm/nodes/columns/columnSharedFolderButtons.jsx";
 import Nil from './nil.jsx';
 import Link from '../link.jsx';
+import { inProgressAlert } from '../meetings/call.jsx';
 
 export default class ContactProfile extends MegaRenderMixin {
     state = {
@@ -209,11 +210,15 @@ export default class ContactProfile extends MegaRenderMixin {
                                             if (M.isInvalidUserStatus()) {
                                                 return;
                                             }
-                                            megaChat.createAndShowPrivateRoom(handle)
-                                                .then(room => {
-                                                    room.setActive();
-                                                    room.startVideoCall();
-                                                });
+                                            return inProgressAlert()
+                                                .then(() =>
+                                                    megaChat.createAndShowPrivateRoom(handle)
+                                                        .then(room => {
+                                                            room.setActive();
+                                                            room.startVideoCall();
+                                                        })
+                                                )
+                                                .catch(() => d && console.warn('Already in a call.'));
                                         }}
                                     />
                                     <Button

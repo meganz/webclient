@@ -152,6 +152,35 @@ export default class Call extends MegaRenderMixin {
     customIsEventuallyVisible = () => true;
 
     /**
+     * bindLocalEvents
+     * @description Binds event handlers related to the `Local` component. `onCallPeerLeft`/`onCallPeerJoined` set the
+     * call mode depending on the number of participants; `onCallEnd` unmounts `Local` when
+     * the current room is not active and the in-call UI is minimized.
+     * @see Local
+     * @see MODE
+     */
+
+    bindLocalEvents = () => {
+        const { chatRoom } = this.props;
+        ['onCallPeerLeft.local', 'onCallPeerJoined.local'].forEach(event => {
+            chatRoom.rebind(event, () => {
+                const { minimized, streams, call } = this.props;
+                if (minimized) {
+                    this.setState({ mode: streams.length === 0 ? Call.MODE.THUMBNAIL : Call.MODE.MINI }, () => {
+                        call.setViewMode(this.state.mode);
+                    });
+                }
+            });
+        });
+        chatRoom.rebind('onCallEnd.local', () => this.props.minimized && this.props.onCallEnd());
+    };
+
+    unbindLocalEvents = () =>
+        ['onCallPeerLeft.local', 'onCallPeerJoined.local', 'onCallEnd.local'].map(event =>
+            this.props.chatRoom.off(event)
+        );
+
+    /**
      * handleCallMinimize
      * @description Handles the minimize behavior for the call UI. Stores the current state, so it's restored after
      * expanding back the call UI.
@@ -194,26 +223,6 @@ export default class Call extends MegaRenderMixin {
                 resolve();
             });
         });
-    };
-
-    bindMiniEvents = () => {
-        const { chatRoom } = this.props;
-        ['onCallPeerLeft.mini', 'onCallPeerJoined.mini'].forEach(event => {
-            chatRoom.rebind(event, () => {
-                const { minimized, streams, call } = this.props;
-                if (minimized) {
-                    this.setState({mode: streams.length === 0 ? Call.MODE.THUMBNAIL : Call.MODE.MINI}, () => {
-                        call.setViewMode(this.state.mode);
-                    });
-                }
-            });
-        });
-    };
-
-    unbindMiniEvents = () => {
-        const { chatRoom } = this.props;
-        chatRoom.off('onCallPeerLeft.mini');
-        chatRoom.off('onCallPeerJoined.mini');
     };
 
     /**
@@ -346,20 +355,12 @@ export default class Call extends MegaRenderMixin {
 
     /**
      * handleCallEnd
-     * @description Handles the call end behavior. The `End` dialog is shown if the current user ending the call is
-     * the only moderator (not integrated currently).
-     * @see End
+     * @description Handles the call end behavior
+     * @see SfuApp
      * @returns {void}
      */
 
-    handleCallEnd = () => {
-        const { chatRoom } = this.props;
-        const localStream = document.querySelector('.local-stream');
-        if (localStream && !chatRoom.isCurrentlyActive) {
-            localStream.classList.add('hidden');
-        }
-        chatRoom.sfuApp?.destroy();
-    };
+    handleCallEnd = () => this.props.chatRoom?.sfuApp?.destroy();
 
     /**
      * handleEphemeralAdd
@@ -385,7 +386,7 @@ export default class Call extends MegaRenderMixin {
         if (this.ephemeralAddListener) {
             mBroadcaster.removeListener(this.ephemeralAddListener);
         }
-        this.unbindMiniEvents();
+        this.unbindLocalEvents();
     }
 
     componentDidMount() {
@@ -396,7 +397,7 @@ export default class Call extends MegaRenderMixin {
         this.ephemeralAddListener = mBroadcaster.addListener('meetings:ephemeralAdd', handle =>
             this.handleEphemeralAdd(handle)
         );
-        this.bindMiniEvents();
+        this.bindLocalEvents();
     }
 
     render() {

@@ -13918,6 +13918,7 @@ let ConversationPanel = (conversationpanel_dec = utils["default"].SoonFcWrap(360
       willUnmount: minimised => this.setState({
         callMinimized: false
       }, () => minimised ? null : this.toggleExpandedFlag()),
+      onCallEnd: () => this.safeForceUpdate(),
       onDeleteMessage: this.handleDeleteDialog,
       parent: this
     }), megaChat.initialPubChatHandle && room.publicChatHandle === megaChat.initialPubChatHandle && !room.activeCall && room.isMeeting && !room.activeCall && room.activeCallIds.length > 0 && external_React_default().createElement(Join, {
@@ -21538,6 +21539,32 @@ class Call extends mixins.wl {
 
     this.customIsEventuallyVisible = () => true;
 
+    this.bindLocalEvents = () => {
+      const {
+        chatRoom
+      } = this.props;
+      ['onCallPeerLeft.local', 'onCallPeerJoined.local'].forEach(event => {
+        chatRoom.rebind(event, () => {
+          const {
+            minimized,
+            streams,
+            call
+          } = this.props;
+
+          if (minimized) {
+            this.setState({
+              mode: streams.length === 0 ? Call.MODE.THUMBNAIL : Call.MODE.MINI
+            }, () => {
+              call.setViewMode(this.state.mode);
+            });
+          }
+        });
+      });
+      chatRoom.rebind('onCallEnd.local', () => this.props.minimized && this.props.onCallEnd());
+    };
+
+    this.unbindLocalEvents = () => ['onCallPeerLeft.local', 'onCallPeerJoined.local', 'onCallEnd.local'].map(event => this.props.chatRoom.off(event));
+
     this.handleCallMinimize = () => {
       const {
         call,
@@ -21571,37 +21598,6 @@ class Call extends mixins.wl {
           resolve();
         });
       });
-    };
-
-    this.bindMiniEvents = () => {
-      const {
-        chatRoom
-      } = this.props;
-      ['onCallPeerLeft.mini', 'onCallPeerJoined.mini'].forEach(event => {
-        chatRoom.rebind(event, () => {
-          const {
-            minimized,
-            streams,
-            call
-          } = this.props;
-
-          if (minimized) {
-            this.setState({
-              mode: streams.length === 0 ? Call.MODE.THUMBNAIL : Call.MODE.MINI
-            }, () => {
-              call.setViewMode(this.state.mode);
-            });
-          }
-        });
-      });
-    };
-
-    this.unbindMiniEvents = () => {
-      const {
-        chatRoom
-      } = this.props;
-      chatRoom.off('onCallPeerLeft.mini');
-      chatRoom.off('onCallPeerJoined.mini');
     };
 
     this.handleStreamToggle = action => {
@@ -21686,18 +21682,9 @@ class Call extends mixins.wl {
     };
 
     this.handleCallEnd = () => {
-      var _chatRoom$sfuApp;
+      var _this$props$chatRoom, _this$props$chatRoom$;
 
-      const {
-        chatRoom
-      } = this.props;
-      const localStream = document.querySelector('.local-stream');
-
-      if (localStream && !chatRoom.isCurrentlyActive) {
-        localStream.classList.add('hidden');
-      }
-
-      (_chatRoom$sfuApp = chatRoom.sfuApp) == null ? void 0 : _chatRoom$sfuApp.destroy();
+      return (_this$props$chatRoom = this.props.chatRoom) == null ? void 0 : (_this$props$chatRoom$ = _this$props$chatRoom.sfuApp) == null ? void 0 : _this$props$chatRoom$.destroy();
     };
 
     this.handleEphemeralAdd = handle => handle && this.setState(state => ({
@@ -21720,7 +21707,7 @@ class Call extends mixins.wl {
       mBroadcaster.removeListener(this.ephemeralAddListener);
     }
 
-    this.unbindMiniEvents();
+    this.unbindLocalEvents();
   }
 
   componentDidMount() {
@@ -21731,7 +21718,7 @@ class Call extends mixins.wl {
     }
 
     this.ephemeralAddListener = mBroadcaster.addListener('meetings:ephemeralAdd', handle => this.handleEphemeralAdd(handle));
-    this.bindMiniEvents();
+    this.bindLocalEvents();
   }
 
   render() {

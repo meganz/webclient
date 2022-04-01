@@ -1490,6 +1490,7 @@ export class ConversationPanel extends MegaRenderMixin {
                                 minimised ? null : this.toggleExpandedFlag()
                             )
                         }
+                        onCallEnd={() => this.safeForceUpdate()}
                         onDeleteMessage={this.handleDeleteDialog}
                         parent={this}
                     />

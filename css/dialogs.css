@@ -4375,7 +4375,13 @@ body.de .mega-dialog.new-group-chat {
         top: -15px;
         width: 96px;
     }
-    .rtl .mega-dialog.payment-address-dialog .payment-icons {
+    .mega-dialog.payment-address-dialog .payment-icons .provider-icon {
+        margin: 14px;
+        position: absolute;
+        right: -5px;
+    }
+    .rtl .mega-dialog.payment-address-dialog .payment-icons,
+    .rtl .mega-dialog.payment-address-dialog .payment-icons .provider-icon {
         left: -5px;
         right: auto;
     }

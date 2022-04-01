@@ -1825,6 +1825,39 @@ body.theme-dark .start-meeting-preview .preview-meeting {
 .incoming-dialog-controls {
   margin: 24px 0 0;
 }
+.incoming-dialog-controls.call-in-progress {
+  display: flex;
+  justify-content: space-between;
+  margin-left: 15px;
+  margin-right: 15px;
+}
+.incoming-dialog-controls.call-in-progress .switch-button {
+  /* [...] */
+}
+.incoming-dialog-controls.call-in-progress .switch-button-container {
+  overflow: hidden;
+  position: relative;
+  width: 70px;
+  height: 70px;
+  margin: 0 auto;
+}
+.incoming-dialog-controls.call-in-progress .switch-button-container .switch {
+  position: absolute;
+  left: 0;
+}
+.incoming-dialog-controls.call-in-progress .switch-button-container .switch.negative {
+  /* [...] */
+}
+.incoming-dialog-controls.call-in-progress .switch-button-container .switch.negative.hovered {
+  background: var(--red-hover);
+}
+.incoming-dialog-controls.call-in-progress .switch-button-container .switch.positive {
+  top: 20px;
+  left: 20px;
+}
+.incoming-dialog-controls.call-in-progress .switch-button-container .switch.positive.hovered {
+  background: var(--green-hover);
+}
 .incoming-dialog-controls button {
   display: inline-flex;
   margin: 0 16px 0 0;

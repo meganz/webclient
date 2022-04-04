@@ -59,17 +59,11 @@ var securityPractice = {
             var $input = $('#security-page-backup-key');
             if ($input.attr('type') === 'password') {
                 $input.attr('type', 'text');
-                $('.show-hide-recovery-key-button').find('span:first-of-type')
-                    .fadeToggle("fast", "linear", function() {
-                        $('.show-hide-recovery-key-button').find('span:last-of-type').fadeToggle("fast", "linear");
-                    });
+                $('span', '.show-hide-recovery-key-button').text(l[20029]);
             }
             else {
                 $input.attr('type', 'password');
-                $('.show-hide-recovery-key-button').find('span:last-of-type')
-                    .fadeToggle("fast", "linear", function() {
-                        $('.show-hide-recovery-key-button').find('span:first-of-type').fadeToggle("fast", "linear");
-                    });
+                $('span', '.show-hide-recovery-key-button').text(l[20001]);
             }
         });
 

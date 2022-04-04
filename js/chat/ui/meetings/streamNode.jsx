@@ -172,18 +172,18 @@ export default class StreamNode extends MegaRenderMixin {
     renderVideoDebugMode = () => {
         const { stream } = this.props;
 
-        if (!(stream instanceof CallManager2.Peer) || stream.isFake || !stream.call.sfuApp.rxStats) {
-            // Local or fake
+        if (stream.isFake) {
             return null;
         }
 
-        return (
+        return stream instanceof CallManager2.Peer ?
             <div
-                className="video-debug-mode"
-                id={`video-debug-mode-${stream.clientId}`}>
-                {stream.clientId}: {stream.call.sfuApp.rxStats[stream.clientId]?.text}
-            </div>
-        );
+                className="remote-video-rtc-stats"
+                id={`rtc-stats-${stream.clientId}`} /> :
+            <div
+                className="local-video-rtc-stats"
+                id="rtc-stats-local"
+                title={window.sfuClient && new URL(window.sfuClient.url).host} />;
     };
 
     renderContent = () => {

@@ -1018,11 +1018,22 @@
   -webkit-animation: rotate 1s infinite linear;
   animation: rotate 1s infinite linear;
 }
-.stream-node-content .video-debug-mode {
+.stream-node-content .remote-video-rtc-stats {
   position: absolute;
-  color: red;
-  padding: 8px;
-  text-shadow: 1px 1px 2px black;
+  color: #0f0;
+  padding-left: 4px;
+  padding-top: 0;
+  text-shadow: 0 0 4px black;
+  z-index: 20;
+}
+.stream-node-content .local-video-rtc-stats {
+  position: absolute;
+  color: #0f0;
+  padding-right: 10px;
+  right: 0;
+  text-shadow: 0 0 4px black;
+  z-index: 20;
+  font-size: 6pt;
 }
 .stream-node-content video {
   width: 100%;
@@ -1372,15 +1383,27 @@
 .local-stream-controls .button-group-menu .button-group-item {
   margin: 0 0 10px 0;
 }
-.stream-controls .button-group .active-indicator,
-.local-stream-controls .button-group .active-indicator {
+.stream-controls .button-group .info-indicator,
+.local-stream-controls .button-group .info-indicator {
   position: absolute;
   top: -1px;
   right: 2px;
   width: 12px;
   height: 12px;
   border-radius: 200px;
+}
+.stream-controls .button-group .info-indicator.active,
+.local-stream-controls .button-group .info-indicator.active {
   background: #88FF5B;
+}
+.stream-controls .button-group .info-indicator.warn,
+.local-stream-controls .button-group .info-indicator.warn {
+  background: var(--surface-black);
+}
+.stream-controls .button-group .info-indicator.warn div,
+.local-stream-controls .button-group .info-indicator.warn div {
+  --icon-size: 24px;
+  --mask-color: var(--secondary-orange);
 }
 
 .meetings-signal-issue {

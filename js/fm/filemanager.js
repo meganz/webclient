@@ -3243,6 +3243,9 @@ FileManager.prototype.addIconUI = function(aQuiet, refresh) {
         $.selectddUIgrid = '.contact-details-view .file-block-scrolling';
         $.selectddUIitem = 'a';
     }
+    else if (M.currentCustomView.type === 'gallery') {
+        $.selectddUIgrid = '.gallery-view';
+    }
     else {
         $.selectddUIgrid = '.file-block-scrolling';
         $.selectddUIitem = 'a';
@@ -3680,6 +3683,9 @@ FileManager.prototype.addGridUI = function(refresh) {
     }
     else if (String(this.currentdirid).length === 11 && this.currentrootid === 'contacts') {
         $.selectddUIgrid = '.files-grid-view.contact-details-view .grid-scrolling-table';
+    }
+    else if (M.currentCustomView.type === 'gallery') {
+        $.selectddUIgrid = '.gallery-view';
     }
     else {
         $.selectddUIgrid = '.files-grid-view.fm .grid-scrolling-table';

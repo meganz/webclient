@@ -4563,11 +4563,11 @@ const __WEBPACK_DEFAULT_EXPORT__ = ({
 "use strict";
 __webpack_require__.d(__webpack_exports__, {
 "LY": () => (timing),
-"M9": () => (SoonFcWrap),
 "Os": () => (schedule),
-"_p": () => (ContactAwareComponent),
+"M9": () => (SoonFcWrap),
 "py": () => (rAFWrap),
-"wl": () => (MegaRenderMixin)
+"wl": () => (MegaRenderMixin),
+"_p": () => (ContactAwareComponent)
 });
 
 var _applyDecoratedDescriptor2__ = __webpack_require__(229);
@@ -5775,19 +5775,19 @@ class ComposedTextArea extends mixins.wl {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 __webpack_require__.d(__webpack_exports__, {
-"Avatar": () => (Avatar),
-"ContactAwareName": () => (ContactAwareName),
-"ContactButton": () => (ContactButton),
-"ContactCard": () => (ContactCard),
-"ContactFingerprint": () => (ContactFingerprint),
-"ContactItem": () => (ContactItem),
-"ContactPickerWidget": () => (ContactPickerWidget),
-"ContactPresence": () => (ContactPresence),
-"ContactVerified": () => (ContactVerified),
-"ContactsListItem": () => (ContactsListItem),
-"LastActivity": () => (LastActivity),
 "MAX_FREQUENTS": () => (MAX_FREQUENTS),
-"MembersAmount": () => (MembersAmount)
+"ContactsListItem": () => (ContactsListItem),
+"ContactButton": () => (ContactButton),
+"ContactVerified": () => (ContactVerified),
+"ContactPresence": () => (ContactPresence),
+"LastActivity": () => (LastActivity),
+"ContactAwareName": () => (ContactAwareName),
+"MembersAmount": () => (MembersAmount),
+"ContactFingerprint": () => (ContactFingerprint),
+"Avatar": () => (Avatar),
+"ContactCard": () => (ContactCard),
+"ContactItem": () => (ContactItem),
+"ContactPickerWidget": () => (ContactPickerWidget)
 });
 var _extends7__ = __webpack_require__(462);
 var react0__ = __webpack_require__(363);
@@ -18323,8 +18323,8 @@ var _mixins1__ = __webpack_require__(503);
 
 
 class Group extends _mixins1__.wl {
-  constructor(props) {
-    super(props);
+  constructor() {
+    super(...arguments);
     this.containerRef = react0().createRef();
     this.state = {
       expanded: false
@@ -18345,6 +18345,7 @@ class Group extends _mixins1__.wl {
   render() {
     const {
       active,
+      warn,
       onHold,
       screenSharing,
       children
@@ -18367,8 +18368,16 @@ class Group extends _mixins1__.wl {
         className: "mega-button theme-light-forced round large",
         onClick: this.doToggle
       }, active && react0().createElement("div", {
-        className: "active-indicator"
-      }), react0().createElement("i", {
+        className: "info-indicator active"
+      }), warn && react0().createElement("div", {
+        className: "info-indicator warn simpletip",
+        "data-simpletip": "Screen sharing a window or browser tab may be cropped.",
+        "data-simpletipposition": "top",
+        "data-simpletipoffset": "5",
+        "data-simpletip-class": "theme-dark-forced"
+      }, react0().createElement("div", {
+        className: "sprite-fm-mono icon-exclamation-filled"
+      })), react0().createElement("i", {
         className: `
                                 sprite-fm-mono
                                 ${screenSharing ? 'icon-end-screenshare' : ''}
@@ -18960,20 +18969,22 @@ let StreamNode = (_dec = (0,mixins.M9)(30, true), _dec2 = (0,mixins.py)(), _dec3
     this.videoRef = external_React_default().createRef();
 
     this.renderVideoDebugMode = () => {
-      var _stream$call$sfuApp$r;
-
       const {
         stream
       } = this.props;
 
-      if (!(stream instanceof CallManager2.Peer) || stream.isFake || !stream.call.sfuApp.rxStats) {
+      if (stream.isFake) {
         return null;
       }
 
-      return external_React_default().createElement("div", {
-        className: "video-debug-mode",
-        id: `video-debug-mode-${stream.clientId}`
-      }, stream.clientId, ": ", (_stream$call$sfuApp$r = stream.call.sfuApp.rxStats[stream.clientId]) == null ? void 0 : _stream$call$sfuApp$r.text);
+      return stream instanceof CallManager2.Peer ? external_React_default().createElement("div", {
+        className: "remote-video-rtc-stats",
+        id: `rtc-stats-${stream.clientId}`
+      }) : external_React_default().createElement("div", {
+        className: "local-video-rtc-stats",
+        id: "rtc-stats-local",
+        title: window.sfuClient && new URL(window.sfuClient.url).host
+      });
     };
 
     this.renderContent = () => {
@@ -19339,6 +19350,10 @@ class StreamExtendedControls extends mixins.wl {
   }
 
   render() {
+    const {
+      onScreenSharingClick,
+      onHoldClick
+    } = this.props;
     const SIMPLETIP = {
       position: 'top',
       offset: 8,
@@ -19363,7 +19378,7 @@ class StreamExtendedControls extends mixins.wl {
       icon: `
                         ${this.isActive(SfuClient.Av.Screen) ? 'icon-end-screenshare' : 'icon-screen-share'}
                     `,
-      onClick: this.props.onScreenSharingClick
+      onClick: onScreenSharingClick
     }, external_React_default().createElement("span", null, screenSharingLabel)), external_React_default().createElement(meetings_button.Z, {
       simpletip: { ...SIMPLETIP,
         label: callHoldLabel,
@@ -19377,7 +19392,7 @@ class StreamExtendedControls extends mixins.wl {
                         ${this.isActive(SfuClient.Av.onHold) ? 'active' : ''}
                     `,
       icon: this.isActive(SfuClient.Av.onHold) ? 'icon-play' : 'icon-pause',
-      onClick: this.props.onHoldClick
+      onClick: onHoldClick
     }, external_React_default().createElement("span", null, callHoldLabel)));
   }
 

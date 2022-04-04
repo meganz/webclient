@@ -17,14 +17,24 @@
             }
         }
 
-        .active-indicator {
+        .info-indicator {
             position: absolute;
             top: -1px;
             right: 2px;
             width: 12px;
             height: 12px;
             border-radius: 200px;
-            background: #88FF5B;
+
+            &.active { background: #88FF5B; }
+
+            &.warn {
+                background: var(--surface-black);
+
+                div {
+                    --icon-size: 24px;
+                    --mask-color: var(--secondary-orange);
+                }
+            }
         }
     }
 }

@@ -2,18 +2,14 @@ import React from 'react';
 import { MegaRenderMixin } from '../../mixins';
 
 class Group extends MegaRenderMixin {
-    static NAMESPACE = 'buttonGroup'
-    static BASE_CLASS = 'button-group'
+    static NAMESPACE = 'buttonGroup';
+    static BASE_CLASS = 'button-group';
 
     containerRef = React.createRef();
 
     state = {
         expanded: false
     };
-
-    constructor(props) {
-        super(props);
-    }
 
     //  TODO: Look into abstracting `doToggle` and `toggleEvents` with `ModeSwitch`
 
@@ -31,7 +27,7 @@ class Group extends MegaRenderMixin {
     doToggle = () => this.setState(state => ({ expanded: !state.expanded }), () => this.toggleEvents());
 
     render() {
-        const { active, onHold, screenSharing, children } = this.props;
+        const { active, warn, onHold, screenSharing, children } = this.props;
 
         if (children && children.length) {
             return (
@@ -55,7 +51,17 @@ class Group extends MegaRenderMixin {
                     <button
                         className="mega-button theme-light-forced round large"
                         onClick={this.doToggle}>
-                        {active && <div className="active-indicator" />}
+                        {active && <div className="info-indicator active" />}
+                        {warn && (
+                            <div
+                                className="info-indicator warn simpletip"
+                                data-simpletip="Screen sharing a window or browser tab may be cropped."
+                                data-simpletipposition="top"
+                                data-simpletipoffset="5"
+                                data-simpletip-class="theme-dark-forced">
+                                <div className="sprite-fm-mono icon-exclamation-filled" />
+                            </div>
+                        )}
                         <i
                             className={`
                                 sprite-fm-mono

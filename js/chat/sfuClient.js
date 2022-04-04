@@ -15,15 +15,17 @@ var TermCode;
     //====
     TermCode[TermCode["kRtcDisconn"] = 64] = "kRtcDisconn";
     TermCode[TermCode["kSigDisconn"] = 65] = "kSigDisconn";
-    TermCode[TermCode["kSvrShuttingDown"] = 66] = "kSvrShuttingDown";
+    TermCode[TermCode["kSfuShuttingDown"] = 66] = "kSfuShuttingDown";
     TermCode[TermCode["kChatDisconn"] = 67] = "kChatDisconn";
+    TermCode[TermCode["kNoMediaPath"] = 68] = "kNoMediaPath";
     //====
     TermCode[TermCode["kErrSignaling"] = 128] = "kErrSignaling";
     TermCode[TermCode["kErrNoCall"] = 129] = "kErrNoCall";
     TermCode[TermCode["kErrAuth"] = 130] = "kErrAuth";
     TermCode[TermCode["kErrApiTimeout"] = 131] = "kErrApiTimeout";
     TermCode[TermCode["kErrSdp"] = 132] = "kErrSdp";
-    TermCode[TermCode["kErrGeneral"] = 191] = "kErrGeneral";
+    TermCode[TermCode["kErrClientGeneral"] = 190] = "kErrClientGeneral";
+    TermCode[TermCode["kErrSfuGeneral"] = 191] = "kErrSfuGeneral";
 })(TermCode || (TermCode = {}));
 ;
 /* harmony default export */ const termCodes = (TermCode);
@@ -350,7 +352,7 @@ function compressedSdpToString(sdp) {
 }
 
 ;// CONCATENATED MODULE: ../shared/commitId.ts
-const COMMIT_ID = 'bef3ef8e20';
+const COMMIT_ID = 'a89c1c645e';
 /* harmony default export */ const commitId = (COMMIT_ID);
 
 ;// CONCATENATED MODULE: ./client.ts
@@ -373,14 +375,18 @@ var SpeakerState;
 var ConnState;
 (function (ConnState) {
     ConnState[ConnState["kDisconnected"] = 0] = "kDisconnected";
-    ConnState[ConnState["kConnecting"] = 1] = "kConnecting";
-    ConnState[ConnState["kJoining"] = 2] = "kJoining";
-    ConnState[ConnState["kJoined"] = 3] = "kJoined";
+    ConnState[ConnState["kDisconnectedRetrying"] = 1] = "kDisconnectedRetrying";
+    ConnState[ConnState["kConnecting"] = 2] = "kConnecting";
+    ConnState[ConnState["kJoining"] = 3] = "kJoining";
+    ConnState[ConnState["kJoined"] = 4] = "kJoined";
 })(ConnState || (ConnState = {}));
-var StatsFlags;
-(function (StatsFlags) {
-    StatsFlags[StatsFlags["kSendingScreen"] = 1] = "kSendingScreen";
-})(StatsFlags || (StatsFlags = {}));
+var ScreenShareType;
+(function (ScreenShareType) {
+    ScreenShareType[ScreenShareType["kInvalid"] = 0] = "kInvalid";
+    ScreenShareType[ScreenShareType["kWholeScreen"] = 1] = "kWholeScreen";
+    ScreenShareType[ScreenShareType["kWindow"] = 2] = "kWindow";
+    ScreenShareType[ScreenShareType["kBrowserTab"] = 3] = "kBrowserTab";
+})(ScreenShareType || (ScreenShareType = {}));
 class SfuClient {
     constructor(userId, app, callKey, options, url) {
         this.peers = new Map();
@@ -395,6 +401,8 @@ class SfuClient {
         this._audioTrack = null;
         this._availAv = 0;
         this._sentAv = 0;
+        this._joinRetries = 0;
+        this._forcedDisconnect = false;
         this._tsCallJoin = 0;
         this._tsCallStart = 0;
         this.joinToffs = 0;
@@ -457,47 +465,58 @@ class SfuClient {
     isJoining() {
         return this._connState < ConnState.kJoined;
     }
+    get connState() {
+        return this._connState;
+    }
     shouldReconnect() {
-        let termCode = this.termCode;
+        if (this._forcedDisconnect) {
+            return false;
+        }
+        return SfuClient.isTermCodeRetriable(this.termCode);
+    }
+    static isTermCodeRetriable(termCode) {
         return termCode === termCodes.kRtcDisconn ||
-            termCode === termCodes.kSigDisconn ||
-            termCode === termCodes.kSvrShuttingDown;
+            termCode === termCodes.kSigDisconn; // || termCode === TermCode.kSfuShuttingDown;
+        // TODO: handle SFU shutdown gracefully and reconnect
     }
     async onWsClose(event) {
-        delete this.conn;
-        if (this.statTimer) {
-            clearTimeout(this.statTimer);
+        if (event && event.target !== this.conn) {
+            console.warn("onWsClose: ignoring stale event for a previous websocket instance");
+            return;
         }
-        let prevState = this._connState;
-        this._setConnState(ConnState.kDisconnected);
-        this.disableStats();
+        console.warn("SfuClient: Signaling connection closed");
+        delete this.conn;
         if (this.termCode == null) {
             this.termCode = termCodes.kSigDisconn;
         }
+        if (this.statTimer) {
+            clearTimeout(this.statTimer);
+        }
+        let shouldReconnect = this.shouldReconnect();
+        let prevState = this._connState;
+        this._setConnState(shouldReconnect ? ConnState.kDisconnectedRetrying : ConnState.kDisconnected);
+        this.disableStats();
         if (prevState == ConnState.kJoined) {
             this._statsRecorder.submit(this.termCode);
         }
         this._closeMediaConnection();
-        let shouldReconnect = this.shouldReconnect();
+        this._destroyAllPeers(this.termCode);
         this._fire("onDisconnect", this.termCode, shouldReconnect);
         if (shouldReconnect) {
-            if (!this._joinRetries) {
-                this._joinRetries = 1;
-            }
-            else {
-                if (++this._joinRetries > 2) {
-                    let delay = Math.min(20, this._joinRetries * this._joinRetries);
-                    console.warn("Reconnecting in %d seconds....", delay);
-                    await msDelay(Math.min(delay, 20) * 1000);
-                }
-            }
-            this.connect();
+            this.scheduleReconnect();
             return;
         }
         this._stopLocalTracks();
-        if (this._disconnectPromise) {
-            this._disconnectPromise.resolve();
-            delete this._disconnectPromise;
+    }
+    async scheduleReconnect() {
+        let delay = this._joinRetries++ * 500;
+        if (delay > 2000) {
+            delay = 2000;
+        }
+        console.warn("Reconnecting in", delay, "ms....");
+        await msDelay(delay);
+        if (!this._forcedDisconnect) {
+            this.connect();
         }
     }
     _closeMediaConnection() {
@@ -505,8 +524,10 @@ class SfuClient {
             this.rtcConn.close();
             delete this.rtcConn;
         }
+    }
+    _destroyAllPeers(reason) {
         for (let peer of this.peers.values()) {
-            peer.destroy();
+            peer.destroy(reason);
         }
         this.peers.clear();
     }
@@ -631,6 +652,12 @@ class SfuClient {
             assert(callId);
             this.callId = callId;
             this.isGroup = isGroup;
+            this._joinRetries = 0;
+            this._forcedDisconnect = false;
+        }
+        else {
+            // this is reconnect - cancel it if user explicitly requested disconnect
+            assert(!this._forcedDisconnect);
         }
         delete this.termCode;
         this.micMuteMonitor.reinit();
@@ -681,8 +708,7 @@ class SfuClient {
         pc.onconnectionstatechange = (ev) => {
             console.log("onConnState:", pc.connectionState);
             if (pc.connectionState === "failed") {
-                console.warn("WebRTC connection failed, forcing full reconnect of client");
-                this.reconnect(termCodes.kRtcDisconn);
+                this.handleRtcDisconnect();
             }
         };
         let ws = this.conn = new WebSocket(this.url, "svc");
@@ -693,39 +719,58 @@ class SfuClient {
     hasConnection() {
         return this.conn != null;
     }
+    async handleRtcDisconnect() {
+        let statsRec = this._statsRecorder;
+        if (statsRec && statsRec.arrays.t.length === 0 && statsRec.tsStart && (Date.now() - statsRec.tsStart > 6000)) {
+            console.warn("WebRTC connection failed, looks like no UDP connectivity");
+            this.disconnect(termCodes.kNoMediaPath);
+        }
+        else {
+            console.warn("WebRTC connection failed, forcing full reconnect of client");
+            this.disconnect(termCodes.kRtcDisconn, true);
+        }
+    }
     _stopLocalTracks() {
         this._stopAndDelLocalTrack("_audioTrack");
         this._stopAndDelLocalTrack("_cameraTrack");
         this._stopAndDelLocalTrack("_screenTrack");
     }
-    disconnect(termCode) {
+    /**
+    * @param _supportRetry This is for internal use and must not be specified by the application
+    * @returns false if we were already disconnected and no onDisconnect event was fired, true oherwise
+    */
+    disconnect(termCode, _supportRetry) {
+        if (!_supportRetry) {
+            this._forcedDisconnect = true;
+        }
         if (this._connState === ConnState.kDisconnected) {
-            console.log("disconnect: Already disconnected");
-            return Promise.resolve();
+            return false;
         }
         termCode = this.termCode = (termCode != null) ? termCode : termCodes.kUserHangup;
-        if (this.conn) {
-            // there seems to be a quirk in Chrome (v96-98) - if the browser is set to offline from
-            // developers tools, and something (like the BYE command) is sent and then the websocket
-            // is closed, the onClose event doesn't fire, like the browser refuses to close the socket
-            // until the packet is sent. If no send is attempted, the close() properly triggers onClose
-            if (this.conn.readyState === WebSocket.OPEN && navigator.onLine) {
-                try {
-                    this.send({ a: "BYE", rsn: termCode });
-                }
-                catch (ex) { }
+        if (!this.conn) { // should be in kDisconnectedRetrying state - abort retrying
+            this._stopLocalTracks();
+            return false;
+        }
+        if (this.conn.readyState === WebSocket.OPEN) {
+            try {
+                this.send({ a: "BYE", rsn: termCode });
             }
-            let promise = this._disconnectPromise = createPromiseWithResolveMethods();
-            this.conn.close();
-            return promise;
+            catch (ex) { }
         }
-        else {
-            return Promise.resolve();
-        }
+        // In some cases when there is no network but that is not detected by browser,
+        // conn.close() doesn't fire onclose until all queued data (i.e. the BYE command)
+        // has been sent (which would happen when we are back online), so we do it manually and synchronously
+        this.conn.onclose = null;
+        this.conn.close();
+        this.onWsClose();
+        return true;
     }
-    async reconnect(termCode) {
-        await this.disconnect(termCode);
-        this.connect();
+    modEndCall(anon) {
+        let cmd = { a: "MOD_ENDCALL" };
+        if (anon) {
+            cmd.anon = 1;
+        }
+        this.send(cmd);
     }
     async createAllTransceivers() {
         /* uplink track map:
@@ -863,9 +908,6 @@ class SfuClient {
                 let vtrack = self._cameraTrack = stream.getVideoTracks()[0];
                 if (!vtrack) {
                     return Promise.reject("Error getting camera video track");
-                }
-                if (!self.actualCaptureWidth) {
-                    self.actualCaptureWidth = vtrack.getSettings().width;
                 }
             })
                 .catch(function (err) {
@@ -1015,16 +1057,22 @@ class SfuClient {
     get sentAv() {
         return this._sentAv;
     }
+    get rxQuality() {
+        return this._svcDriver ? this._svcDriver.currRxQuality : -1;
+    }
+    get txQuality() {
+        return this._svcDriver ? this._svcDriver.currTxQuality : -1;
+    }
     sentTracksString() {
         let result = "";
         if (this.outASpeakerTrack.outTrack) {
-            result += "a";
+            result += "A";
         }
         if (this.outVSpeakerTrack.outTrack) {
-            result += "h";
+            result += "H";
         }
         if (this.outVThumbTrack.outTrack) {
-            result += "l";
+            result += "L";
         }
         return result;
     }
@@ -1073,7 +1121,7 @@ class SfuClient {
             this._onHold.muteCamera = mute;
             return;
         }
-        if (this._connState === ConnState.kDisconnected) {
+        if (this._connState === ConnState.kDisconnected || this._connState === ConnState.kDisconnectedRetrying) {
             this._muteCamera = mute;
             return;
         }
@@ -1088,7 +1136,7 @@ class SfuClient {
             this._onHold.muteAudio = mute;
             return;
         }
-        if (this._connState === ConnState.kDisconnected) {
+        if (this._connState === ConnState.kDisconnected || this._connState === ConnState.kDisconnectedRetrying) {
             this._muteAudio = mute;
             return;
         }
@@ -1136,6 +1184,9 @@ class SfuClient {
             // reflect the actual state of the sent tracks, so that the actual delta is seen correctly
             this._availAv = Av.onHold;
         });
+        if (this._isSharingScreen) {
+            this._svcDriver.initTx("scr");
+        }
     }
     isOnHold() {
         return this._onHold != null;
@@ -1153,10 +1204,33 @@ class SfuClient {
         if (this._isSharingScreen !== enable) { // failed to enable/disable or something interfered
             return;
         }
-        if (this.isSharingScreen()) {
+        if (this._isSharingScreen) {
             this._svcDriver.initTx("scr");
+            this._fire("onScreenshare", true, this.screenShareType());
         }
-        this._fire("onScreenshare", this._isSharingScreen);
+        else {
+            this._fire("onScreenshare", false);
+        }
+    }
+    screenShareType() {
+        let ssTrack = this._screenTrack;
+        if (!ssTrack) {
+            return ScreenShareType.kInvalid;
+        }
+        let label = ssTrack.label;
+        if (label.startsWith("screen:")) {
+            return ScreenShareType.kWholeScreen;
+        }
+        else if (label.startsWith("window:")) {
+            return ScreenShareType.kWindow;
+        }
+        else if (label.startsWith("web-contents-media-stream")) {
+            return ScreenShareType.kBrowserTab;
+        }
+        else {
+            console.warn("Could not determine screensharing type from track label", label);
+            return ScreenShareType.kInvalid;
+        }
     }
     onScreenSharingStoppedByUser() {
         console.warn("Screen sharing stopped by user");
@@ -1184,18 +1258,20 @@ class SfuClient {
         }
     }
     processMessage(msg) {
-        if (msg.a !== "STAT") {
-            console.log("rx:\n", JSON.stringify(msg, logReplacerFunc));
-        }
         if (msg.err != null) {
-            let strError = termCodes[msg.err];
-            let logMsg = "Server closed connection with error ";
-            logMsg += strError ? strError : `(${msg.err})`;
-            if (msg.msg) {
-                logMsg += ": " + msg.msg;
+            if (msg.err !== termCodes.kUserHangup) {
+                let strError = termCodes[msg.err];
+                let logMsg = "Server closed connection with error ";
+                logMsg += strError ? strError : `(${msg.err})`;
+                if (msg.msg) {
+                    logMsg += ": " + msg.msg;
+                }
+                console.warn(logMsg);
             }
-            console.warn(logMsg);
-            this.disconnect(msg.err);
+            else {
+                console.warn(`Call was ended by moderator ${msg.by || "<anonymous>"}`);
+            }
+            this.disconnect(msg.err, true); // may be retriable, i.e. kSvrShuttingDown
             return;
         }
         if (msg.warn != null) {
@@ -1292,7 +1368,17 @@ class SfuClient {
         setTimeout(() => this.processInputQueue(), 0);
     }
     setThumbVtrackResScale() {
-        let scale = (this.actualCaptureWidth || SfuClient.kVideoCaptureOptions.width) / SfuClient.kVthumbWidth;
+        let height;
+        if (this._isSharingScreen) {
+            height = SfuClient.kScreenCaptureOptions.video.height.max;
+        }
+        else {
+            if (!this._cameraTrack || !(height = this._cameraTrack.getSettings().height)) {
+                height = SfuClient.kVideoCaptureOptions.height;
+            }
+        }
+        assert(height);
+        let scale = height / SfuClient.kVthumbHeight;
         this.outVThumbTrack.setEncoderParams((params) => {
             params.scaleResolutionDownBy = scale;
             params.maxBitrate = 100 * 1024;
@@ -1329,7 +1415,8 @@ class SfuClient {
             return;
         }
         this._lastPeerJoinLeave = { userId: peer.userId, ts: Date.now() };
-        peer.destroy(); // removes peer from peer list, destroys players, fires onPeerLeft
+        // removes peer from peer list, destroys players, fires onPeerLeft
+        peer.destroy(msg.rsn !== null ? msg.rsn : termCodes.kSigDisconn);
         this.rotateKey();
     }
     handleIncomingVideoTracks(tracks, isHiRes) {
@@ -1634,8 +1721,11 @@ class SfuClient {
             return;
         }
         this.addNonRtcStats();
-        if (this.rtcStats.jtr === 1000000) {
-            this.rtcStats.jtr = -1;
+        if (stats.jtr === 1000000) {
+            stats.jtr = -1;
+        }
+        if (stats.pl != null) {
+            stats.pl = Math.round(stats.pl * 10) / 10; // truncate to single decimal
         }
         this._statsRecorder.onStats(this.rtcStats);
         this._svcDriver.onStats();
@@ -1774,8 +1864,8 @@ SfuClient.kMaxActiveSpeakers = 20;
 SfuClient.kMaxInputVideoTracks = 20;
 SfuClient.kSpatialLayerCount = 3;
 SfuClient.kVideoCaptureOptions = { width: 960, height: 540 };
-SfuClient.kScreenCaptureOptions = { video: { height: 2000 } };
-SfuClient.kVthumbWidth = 160;
+SfuClient.kScreenCaptureOptions = { video: { height: { max: 1440 } } };
+SfuClient.kVthumbHeight = 90;
 SfuClient.kRotateKeyUseDelay = 100;
 SfuClient.kPeerReconnNoKeyRotationPeriod = 1000;
 SfuClient.kAudioMonTickPeriod = 200;
@@ -1786,6 +1876,7 @@ SfuClient.kSpeakerChangeMinInterval = 4000;
 SfuClient.SpeakerState = SpeakerState;
 SfuClient.ConnState = ConnState;
 SfuClient.TermCode = termCodes;
+SfuClient.ScreenShareType = ScreenShareType;
 SfuClient.Av = Av;
 SfuClient.msgHandlerMap = {
     "AV": SfuClient.prototype.msgAv,
@@ -2214,7 +2305,7 @@ class Peer {
             }
         }
     }
-    destroy() {
+    destroy(reason) {
         this.isLeaving = true;
         this.delSpeakReq();
         this.client._removePeer(this);
@@ -2231,7 +2322,7 @@ class Peer {
             playerStop(this.audioPlayer);
             delete this.audioPlayer;
         }
-        this._fire("onPeerLeft");
+        this._fire("onPeerLeft", reason);
     }
     get hasThumbnailVideo() { return this.vThumbPlayer != null; }
     get hasHiresVideo() { return this.hiResPlayer != null; }
@@ -2542,6 +2633,17 @@ class SvcDriver {
             this.tsLastSwitch = tsNow - SvcDriver.kMinTimeBetweenSwitches;
             return;
         }
+        let maTxKbps;
+        let adaptScrnTx = stats._vtxIsHiRes && this.client.isSendingScreenHiRes();
+        if (adaptScrnTx) { // calculate tx average kbps
+            if (this.maTxKbps == null) {
+                maTxKbps = this.maTxKbps = stats._vtxKbps;
+            }
+            else {
+                maTxKbps = this.maTxKbps = (this.maTxKbps * 5 + stats._vtxKbps) / 6;
+            }
+            // console.log("maTxKbps:", maTxKbps, "mom:", stats._vtxKbps);
+        }
         if (tsNow - this.tsLastSwitch < SvcDriver.kMinTimeBetweenSwitches) {
             return; // too early
         }
@@ -2551,16 +2653,36 @@ class SvcDriver {
         else if (rtt < this.rttLower && plost < SvcDriver.kPlostLower) {
             this.switchRxQuality(+1);
         }
-        if (stats._vtxIsHiRes && this.client.isSendingScreenHiRes()) { // adapt tx quality
-            let maTxKbps = this.maTxKbps = (this.maTxKbps == null)
-                ? stats._vtxKbps
-                : (this.maTxKbps * 3 + stats._vtxKbps) / 4;
+        let txQs = SvcDriver.TxQuality;
+        if (adaptScrnTx) {
             let currTxQ = SvcDriver.TxQuality[this.currTxQuality];
             if (maTxKbps < currTxQ.minKbps) {
-                this.switchTxQuality(-1, "scr");
+                let q = this.currTxQuality;
+                while (maTxKbps < txQs[q].minKbps) {
+                    q--;
+                    if (q < 0) {
+                        q = 0;
+                        break;
+                    }
+                }
+                let delta = q - this.currTxQuality;
+                if (delta < 0) {
+                    this.switchTxQuality(delta, "scr");
+                }
             }
-            else if (maTxKbps >= currTxQ.maxKbps) {
-                this.switchTxQuality(+1, "scr");
+            else {
+                let q = this.currTxQuality;
+                while (maTxKbps > txQs[q].maxKbps) {
+                    q++;
+                    if (q >= txQs.length) {
+                        q--;
+                        break;
+                    }
+                }
+                let delta = q - this.currTxQuality;
+                if (delta > 0) {
+                    this.switchTxQuality(delta, "scr");
+                }
             }
         }
     }
@@ -2605,23 +2727,34 @@ class SvcDriver {
         assert(info);
         this.tsLastSwitch = Date.now();
         let params = info[mode];
-        console.warn(`Switching TX quality from ${this.currTxQuality} to ${newQ}: ${JSON.stringify(params)}`);
+        let ar = this.client.screenAspectRatio;
+        if (!ar) {
+            let res = track.getSettings();
+            if (res.width && res.height) {
+                ar = this.client.screenAspectRatio = res.width / res.height;
+                console.warn(`Screen capture res: ${res.width}x${res.height} (aspect ratio: ${ar})`);
+            }
+            else {
+                ar = 1.78;
+                console.warn("setTxQuality: Could not obtain screen track's resolution, assuming AR of", ar);
+            }
+        }
+        params.width = Math.round(params.height * ar);
+        console.warn(`Switching TX quality from ${this.currTxQuality} to ${newQ}: ${JSON.stringify(params)} (aspect ratio: ${this.client.screenAspectRatio?.toString().substr(0, 6)})`);
         this.currTxQuality = newQ;
         track.applyConstraints(params);
         return true;
     }
     initTx(mode) {
-        return this.setTxQuality(this.currTxQuality, mode);
+        setTimeout(() => { this.setTxQuality(this.currTxQuality, mode); }, 100);
     }
 }
-SvcDriver.kPlostUpper = 8;
-SvcDriver.kPlostLower = 6;
+SvcDriver.kPlostUpper = 20;
+SvcDriver.kPlostLower = 14;
 SvcDriver.kPlostCap = 10;
 SvcDriver.kRttLowerHeadroom = 30;
 SvcDriver.kRttUpperHeadroom = 250;
-SvcDriver.kTxFpsStarvationThreshold = 0.4;
 SvcDriver.kMinTimeBetweenSwitches = 6000;
-SvcDriver.kInitialGraceTime = 5000;
 // (427)x240 - sends only one spatial layer, i.e. receiver can't get lower resolution than 240
 // (640)x360 - 2 spatial layers: receiver can get x180 or x360
 // (852)x480 - 2 spatial layers: 240 and 480
@@ -2645,21 +2778,18 @@ SvcDriver.kMaxRxQualityIndex = SvcDriver.RxQuality.length - 1;
 // x1024 needs at least 900 kbps
 // x1620 needs at least 1800 kbps
 SvcDriver.TxQuality = [
-    { minKbps: 0, maxKbps: 160, scr: { height: 240, frameRate: 4 } },
-    { minKbps: 140, maxKbps: 260, scr: { height: 360, frameRate: 4 } },
-    { minKbps: 240, maxKbps: 380, scr: { height: 480, frameRate: 4 } },
+    { minKbps: 0, maxKbps: 380, scr: { height: 480, frameRate: 4 } },
     { minKbps: 400, maxKbps: 550, scr: { height: 540, frameRate: 4 } },
     { minKbps: 500, maxKbps: 700, scr: { height: 720, frameRate: 4 } },
     { minKbps: 600, maxKbps: 800, scr: { height: 720, frameRate: 8 } },
     { minKbps: 700, maxKbps: 1000, scr: { height: 720, frameRate: 16 } },
-    { minKbps: 900, maxKbps: 1600, scr: { height: 1080, frameRate: 4 } },
-    { minKbps: 1500, maxKbps: 1700, scr: { height: 1080, frameRate: 8 } },
-    { minKbps: 1600, maxKbps: 1900, scr: { height: 1080, frameRate: 16 } },
-    { minKbps: 1800, maxKbps: 2200, scr: { height: 1650, frameRate: 4 } },
-    { minKbps: 2100, maxKbps: 2500, scr: { height: 1650, frameRate: 8 } },
-    { minKbps: 2400, maxKbps: 2800, scr: { height: 1650, frameRate: 16 } },
+    { minKbps: 900, maxKbps: 1200, scr: { height: 1080, frameRate: 4 } },
+    { minKbps: 1100, maxKbps: 1400, scr: { height: 1080, frameRate: 8 } },
+    { minKbps: 1250, maxKbps: 1600, scr: { height: 1080, frameRate: 16 } },
+    { minKbps: 1450, maxKbps: 1800, scr: { height: 1440, frameRate: 8 } },
+    { minKbps: 1600, maxKbps: 2300, scr: { height: 1440, frameRate: 16 } },
 ];
-SvcDriver.kDefaultTxQuality = 4;
+SvcDriver.kDefaultTxQuality = 2;
 SvcDriver.kMaxTxQualityIndex = SvcDriver.TxQuality.length - 1;
 class MicMuteMonitor {
     constructor(client) {
@@ -2831,6 +2961,10 @@ class StatsRecorder {
         }
     }
     submit(termReason) {
+        if (!this.tsStart) {
+            console.warn("StatsRecorder.submit: was not started (tsStart is not set)");
+            return;
+        }
         let arrs = this.arrays;
         let len = arrs.t.length;
         for (let id in arrs) {

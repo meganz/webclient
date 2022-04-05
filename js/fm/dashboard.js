@@ -690,16 +690,17 @@ dashboardUI.updateCloudDataWidget = function() {
             let {cnt, xfiles, size} = props;
             if (intl) {
                 cnt = intl.format(cnt || 0);
+                xfiles = intl.format(xfiles || 0);
             }
 
-            let str = idx < 6 ? mega.icu.format(locale[idx], parseInt(cnt)) : cnt;
+            let str = idx < 6 ? mega.icu.format(locale[idx], cnt) : cnt;
 
-            if (xfiles > 1) {
-                str += `, ${mega.icu.format(files, parseInt(xfiles))}`;
+            if (props.xfiles > 1) {
+                str += `, ${mega.icu.format(files, xfiles)}`;
             }
 
             elm.children[1].textContent = str;
-            if (cnt > 0) {
+            if (props.cnt > 0) {
                 elm.children[2].textContent = bytesToSize(size);
                 $(elm).removeClass('empty');
                 $('.account.data-item .versioning-settings').show();

@@ -1242,10 +1242,10 @@ mobile.affiliate = {
 
         $('input', $clone).attr({
             id: hashedKey,
-            placeholder: '%1',
-            title: '%2',
-            minlength: parseInt(item.mnl),
-            maxlength: parseInt(item.mxl)
+            placeholder: '%0',
+            title: '%1',
+            minlength: parseInt(item.mnl) || '',
+            maxlength: parseInt(item.mxl) || ''
         });
 
         $target.safeAppend('%n', $clone.prop('outerHTML'), item.example || '', item.name || '');

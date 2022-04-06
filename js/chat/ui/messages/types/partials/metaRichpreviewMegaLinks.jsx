@@ -152,6 +152,15 @@ class MetaRichpreviewMegaLinks extends ConversationMessageMixin {
                 }
                 onClick={function(url, megaLinkInfo) {
                     if (megaLinkInfo.hadLoaded()) {
+                        if (window.sfuClient && megaLinkInfo.is_chatlink) {
+                            return msgDialog(
+                                'confirmation',
+                                undefined,
+                                l.call_in_progress,
+                                l.multiple_calls,
+                                e => e && window.open(url, '_blank', 'noopener,noreferrer')
+                            );
+                        }
                         window.open(url, '_blank', 'noopener,noreferrer');
                     }
                 }.bind(this, megaLinkInfo.getLink(), megaLinkInfo)}>

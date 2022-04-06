@@ -8,6 +8,7 @@ export default class StreamExtendedControls extends MegaRenderMixin {
     };
 
     render() {
+        const { onScreenSharingClick, onHoldClick } = this.props;
         const SIMPLETIP = { position: 'top', offset: 8, className: 'theme-dark-forced' };
         const screenSharingLabel = this.isActive(SfuClient.Av.Screen)
             ? l[22890] /* `End screen sharing` */ : l[22889] /* `Start screen sharing` */;
@@ -29,7 +30,7 @@ export default class StreamExtendedControls extends MegaRenderMixin {
                     icon={`
                         ${this.isActive(SfuClient.Av.Screen) ? 'icon-end-screenshare' : 'icon-screen-share'}
                     `}
-                    onClick={this.props.onScreenSharingClick}>
+                    onClick={onScreenSharingClick}>
                     <span>{screenSharingLabel}</span>
                 </Button>
                 <Button
@@ -42,7 +43,7 @@ export default class StreamExtendedControls extends MegaRenderMixin {
                         ${this.isActive(SfuClient.Av.onHold) ? 'active' : ''}
                     `}
                     icon={this.isActive(SfuClient.Av.onHold) ? 'icon-play' : 'icon-pause'}
-                    onClick={this.props.onHoldClick}>
+                    onClick={onHoldClick}>
                     <span>{callHoldLabel}</span>
                 </Button>
             </Button.Group>

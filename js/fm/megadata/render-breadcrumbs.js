@@ -48,7 +48,7 @@
         }
         let items = this.getPath(fileHandle || this.currentdirid);
 
-        if (isInfoBlock && fileHandle) {
+        if (items.length > 1 && isInfoBlock) {
             // remove first element which is the target element
             items.shift();
         }
@@ -336,6 +336,7 @@
         const maxPathLength = getMaxPathLength(14, container);
         let extraItems = [];
         let isInfoBlock = false;
+        let lastPos = 0;
 
         if (container.classList.contains('info')) {
             isInfoBlock = true;
@@ -349,7 +350,7 @@
             // Don't include the contact name (can be removed later if you want it back)
             if (name !== '') {
 
-                const isLastItem = i === 0;
+                const isLastItem = i === lastPos;
                 const isRoot = i === items.length - 1;
                 let item;
                 // if we won't have space, add it to the dropdown, but always render the current folder,
@@ -387,6 +388,10 @@
                     }
                 }
                 currentPathLength += name.length;
+            }
+            // if items in front have empty name, treat next item as last item.
+            else if (lastPos === i) {
+                lastPos++;
             }
         }
 

@@ -482,7 +482,7 @@
 
                 if (chatRoom.activeCall && chatRoom.activeCall.callId === data.callId) {
                     chatRoom.activeCall.hangUp(data.reason);
-                    chatRoom.activeCall = null;
+                    megaChat.activeCall = chatRoom.activeCall = null;
                 }
 
                 if (chatRoom.ringingCalls.exists(data.callId)) {

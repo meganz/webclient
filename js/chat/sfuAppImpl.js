@@ -64,8 +64,7 @@
         this.room.meetingsLoading = l.joining;
     };
 
-    SfuApp.VIDEO_DEBUG_MODE = !!(d && typeof localStorage.videoDebugMode !== 'undefined');
-
+    SfuApp.VIDEO_DEBUG_MODE = d;
 
     SfuApp.prototype.onServerError = function(errCode) {
         console.error('onServerError!!!', errCode);
@@ -195,7 +194,6 @@
 
     [
         'onSfuStats',
-        'onScreenshare',
         'onConnecting',
         'onConnected',
         'onSpeak',
@@ -237,28 +235,40 @@
 
     if (SfuApp.VIDEO_DEBUG_MODE) {
         SfuGui.prototype.onRxStats = function(track, info, raw) {
-            const app = track.client.app;
-            app.rxStats = app.rxStats || {};
-            if (info.keyfps) {
-                info.keyfps = Math.round(info.keyfps * 100) / 100;
+            if (!window.sfuClient) {
+                return;
             }
-            if (info.kbps) {
-                info.kbps = Math.round(info.kbps * 100) / 100;
+            const elem = document.getElementById(`rtc-stats-${track.cid}`);
+            if (!elem) {
+                return;
             }
-            info.per = Math.round(info.per * 1000) / 1000;
-            let text = track.cid + ": ";
-            text += raw.frameWidth
-                ? (raw.frameWidth + "x" + (this.player.isHiRes ? raw.frameHeight : "") + " ")
-                : "";
-            text += "kfs:" + info.keyfps + ", fps:" + (raw.framesPerSecond || 0) + ", kbps:" + Math.round(info.kbps);
-            info.text = text;
-
-            app.rxStats[track.cid] = info;
-
-            const elem = document.getElementById("video-debug-mode-" + track.cid);
-            if (elem) {
-                elem.innerText = text;
+            let text = `${track.cid}: `;
+            if (raw.frameWidth) {
+                text += `${raw.frameWidth}x${raw.frameHeight} `;
             }
+            text += `${raw.framesPerSecond || 0}fps ${Math.round(info.keyfps)}kfs ${Math.round(info.kbps)
+                }kbps rtt: ${sfuClient.rtcStats.rtt}, pl: ${Math.round(info.plost)}, rxq: ${sfuClient.rxQuality}`;
+            elem.innerText = text;
+        };
+        SfuApp.prototype.onVideoTxStat = function(isHiRes, info, raw) {
+            if (!window.sfuClient) {
+                return;
+            }
+            const elem = document.getElementById("rtc-stats-local");
+            if (!elem) {
+                return;
+            }
+            let text;
+            if (isHiRes == null) {
+                text = "";
+            } else {
+                text = `${raw.frameWidth}x${raw.frameHeight}:${sfuClient.sentTracksString()} ${Math.round(info.kbps)
+                    }kbps ${info.fps || 0}fps ${Math.round(info.keyfps)}kfs`;
+                if (sfuClient.isSendingScreenHiRes()) {
+                    text += ` txq: ${sfuClient.txQuality}`;
+                }
+            }
+            elem.innerText = text;
         };
     }
 

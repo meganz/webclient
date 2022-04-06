@@ -4,6 +4,7 @@ import { DropdownItem } from '../../../ui/dropdowns.jsx';
 import { Avatar, ContactPresence } from '../contacts.jsx';
 import { Emoji } from '../../../ui/utils.jsx';
 import ContactsPanel from './contactsPanel.jsx';
+import { inProgressAlert } from '../meetings/call.jsx';
 
 export default class ContextMenu extends MegaRenderMixin {
     EVENT_CLOSE = new Event('closeDropdowns');
@@ -105,13 +106,17 @@ export default class ContextMenu extends MegaRenderMixin {
                             disabled={!navigator.onLine || !megaChat.hasSupportForCalls}
                             label={l[5896] /* `Start Audio Call` */}
                             onClick={() =>
-                                this.close(() =>
-                                    megaChat.createAndShowPrivateRoom(contact.u)
-                                        .then(room => {
-                                            room.setActive();
-                                            room.startAudioCall();
-                                        })
-                                )
+                                inProgressAlert()
+                                    .then(() =>
+                                        this.close(() =>
+                                            megaChat.createAndShowPrivateRoom(contact.u)
+                                                .then(room => {
+                                                    room.setActive();
+                                                    room.startAudioCall();
+                                                })
+                                        )
+                                    )
+                                    .catch(() => d && console.warn('Already in a call.'))
                             }
                         />
                         <DropdownItem
@@ -119,13 +124,17 @@ export default class ContextMenu extends MegaRenderMixin {
                             disabled={!navigator.onLine || !megaChat.hasSupportForCalls}
                             label={l[5897] /* `Start Video Call` */}
                             onClick={() =>
-                                this.close(() =>
-                                    megaChat.createAndShowPrivateRoom(contact.u)
-                                        .then(room => {
-                                            room.setActive();
-                                            room.startVideoCall();
-                                        })
-                                )
+                                inProgressAlert()
+                                    .then(() =>
+                                        this.close(() =>
+                                            megaChat.createAndShowPrivateRoom(contact.u)
+                                                .then(room => {
+                                                    room.setActive();
+                                                    room.startVideoCall();
+                                                })
+                                        )
+                                    )
+                                    .catch(() => d && console.warn('Already in a call.'))
                             }
                         />
                     </div>

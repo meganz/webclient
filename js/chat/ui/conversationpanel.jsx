@@ -17,11 +17,11 @@ import { IncSharesAccordionPanel } from './incomingSharesAccordionPanel.jsx';
 import { ChatlinkDialog } from './../ui/chatlinkDialog.jsx';
 import { ConversationAVPanel } from './conversationaudiovideopanel.jsx';
 import PushSettingsDialog from './pushSettingsDialog.jsx';
-import Call, { EXPANDED_FLAG } from './meetings/call.jsx';
+import Call, { EXPANDED_FLAG, inProgressAlert } from './meetings/call.jsx';
 import HistoryPanel from "./historyPanel.jsx";
 import ComposedTextArea from "./composedTextArea.jsx";
 import Loading from "./meetings/workflow/loading.jsx";
-import Join from "./meetings/workflow/join";
+import Join from "./meetings/workflow/join.jsx";
 
 const ENABLE_GROUP_CALLING_FLAG = true;
 const MAX_USERS_CHAT_PRIVATE = 100;
@@ -34,7 +34,7 @@ export class JoinCallNotification extends MegaRenderMixin {
     render() {
         const { chatRoom } = this.props;
 
-        if (chatRoom.activeCall || window.sfuClient) {
+        if (chatRoom.activeCall) {
             return null;
         }
 
@@ -52,7 +52,12 @@ export class JoinCallNotification extends MegaRenderMixin {
         return (
             <div className="in-call-notif neutral join">
                 <i className="sprite-fm-mono icon-phone"/>
-                <ParsedHTML onClick={() => chatRoom.joinCall()}>
+                <ParsedHTML
+                    onClick={() =>
+                        inProgressAlert()
+                            .then(() => chatRoom.joinCall())
+                            .catch((ex) => d && console.warn('Already in a call.', ex))
+                    }>
                     {(l[20460] || 'There is an active group call. [A]Join[/A]')
                         .replace('[A]', '<button class="mega-button positive joinActiveCall small">')
                         .replace('[/A]', '</button>')}
@@ -90,7 +95,7 @@ export class ConversationRightArea extends MegaRenderMixin {
     }
     render() {
         const self = this;
-        const { chatRoom: room } = self.props;
+        const { chatRoom: room, onStartCall } = self.props;
 
         if (!room || !room.roomId) {
             // destroyed
@@ -103,7 +108,7 @@ export class ConversationRightArea extends MegaRenderMixin {
         }
         self._wasAppendedEvenOnce = true;
 
-        var startCallDisabled =  isStartCallDisabled(room);
+        var startCallDisabled = isStartCallDisabled(room);
         var startCallButtonClass = startCallDisabled ? " disabled" : "";
         var startAudioCallButton;
         var startVideoCallButton;
@@ -127,25 +132,21 @@ export class ConversationRightArea extends MegaRenderMixin {
 
         if (startAudioCallButton !== null) {
             startAudioCallButton =
-                <div className={"link-button light" + startCallButtonClass} onClick={() => {
-                    if (!startCallDisabled) {
-                        room.startAudioCall();
-                    }
-                }}>
+                <div
+                    className={`link-button light ${startCallButtonClass}`}
+                    onClick={() => onStartCall(Call.TYPE.AUDIO)}>
                     <i className="sprite-fm-mono icon-phone" />
-                    <span>{l[5896]}</span>
-            </div>;
+                    <span>{l[5896] /* `Start Audio Call` */}</span>
+                </div>;
         }
         if (startVideoCallButton !== null) {
             startVideoCallButton =
-                <div className={"link-button light" + startCallButtonClass} onClick={() => {
-                    if (!startCallDisabled) {
-                        room.startVideoCall();
-                    }
-                }}>
-                    <i className="sprite-fm-mono icon-video-call-filled" />
-                    <span>{l[5897]}</span>
-            </div>;
+                <div
+                    className={`link-button light ${startCallButtonClass}`}
+                    onClick={() => onStartCall(Call.TYPE.VIDEO)}>
+                    <i className="sprite-fm-mono icon-video-call-filled"/>
+                    <span>{l[5897] /* `Start Video Call` */}</span>
+                </div>;
         }
         var AVseperator = <div className="chat-button-separator" />;
         if (endCallButton !== null) {
@@ -705,6 +706,16 @@ export class ConversationPanel extends MegaRenderMixin {
     };
 
     toggleExpandedFlag = () => document.body.classList[Call.isExpanded() ? 'remove' : 'add'](EXPANDED_FLAG);
+
+    startCall = type => {
+        const { chatRoom } = this.props;
+
+        if (isStartCallDisabled(chatRoom)) {
+            return false;
+        }
+
+        return type === Call.TYPE.AUDIO ? chatRoom.startAudioCall() : chatRoom.startVideoCall();
+    };
 
     componentDidMount() {
         super.componentDidMount();
@@ -1479,6 +1490,7 @@ export class ConversationPanel extends MegaRenderMixin {
                                 minimised ? null : this.toggleExpandedFlag()
                             )
                         }
+                        onCallEnd={() => this.safeForceUpdate()}
                         onDeleteMessage={this.handleDeleteDialog}
                         parent={this}
                     />
@@ -1561,6 +1573,11 @@ export class ConversationPanel extends MegaRenderMixin {
                         members={this.props.chatRoom.membersSetFromApi}
                         messagesBuff={room.messagesBuff}
                         pushSettingsValue={pushNotificationSettings.getDnd(this.props.chatRoom.chatId)}
+                        onStartCall={() =>
+                            inProgressAlert()
+                                .then(this.startCall)
+                                .catch(() => d && console.warn('Already in a call.'))
+                        }
                         onAttachFromComputerClicked={function() {
                             self.props.chatRoom.uploadFromComputer();
                         }}
@@ -1697,7 +1714,14 @@ export class ConversationPanel extends MegaRenderMixin {
                                     ${startCallDisabled ? 'disabled' : ''}
                                 `}
                                 icon="sprite-fm-mono icon-video-call-filled"
-                                onClick={() => !startCallDisabled && room.startVideoCall()} />
+                                onClick={() =>
+                                    startCallDisabled ?
+                                        false :
+                                        inProgressAlert()
+                                            .then(() => this.startCall(Call.TYPE.VIDEO))
+                                            .catch(() => d && console.warn('Already in a call.'))
+                                }
+                            />
                             <Button
                                 className={`
                                     button
@@ -1705,7 +1729,14 @@ export class ConversationPanel extends MegaRenderMixin {
                                     ${startCallDisabled ? 'disabled' : ''}
                                 `}
                                 icon="sprite-fm-mono icon-phone"
-                                onClick={() => !startCallDisabled && room.startAudioCall()} />
+                                onClick={() =>
+                                    startCallDisabled ?
+                                        false :
+                                        inProgressAlert()
+                                            .then(() => this.startCall(Call.TYPE.AUDIO))
+                                            .catch(() => d && console.warn('Already in a call.'))
+                                }
+                            />
                         </div>
                         {topicInfo}
                     </div>
@@ -1885,7 +1916,7 @@ function isStartCallDisabled(room) {
     if (!megaChat.hasSupportForCalls) {
         return true;
     }
-    return !room.isOnlineForCalls() || room.isReadOnly() || !room.chatId || room.activeCall || window.sfuClient ||
+    return !room.isOnlineForCalls() || room.isReadOnly() || !room.chatId || room.activeCall ||
         (
             (room.type === "group" || room.type === "public")
             && !ENABLE_GROUP_CALLING_FLAG

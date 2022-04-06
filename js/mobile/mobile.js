@@ -582,7 +582,7 @@ var mobile = {
     initOverlayPopstateHandler: function($overlay) {
         'use strict';
 
-        pushHistoryState(page);
+        pushHistoryState();
 
         var $closeBtn = $overlay.find('.close-button, .cancel, .fm-dialog-close');
 

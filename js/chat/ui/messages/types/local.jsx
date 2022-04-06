@@ -215,6 +215,9 @@ export default class Local extends AbstractGenericMessage {
 
     getAvatar() {
         const { message, grouped } = this.props;
+        if (message.type === MESSAGE_TYPE.FEEDBACK) {
+            return null;
+        }
         const $$AVATAR =
             <Avatar
                 contact={message.authorContact}

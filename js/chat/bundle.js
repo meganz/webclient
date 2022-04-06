@@ -22321,6 +22321,11 @@ class Local extends AbstractGenericMessage {
       message,
       grouped
     } = this.props;
+
+    if (message.type === MESSAGE_TYPE.FEEDBACK) {
+      return null;
+    }
+
     const $$AVATAR = external_React_default().createElement(ui_contacts.Avatar, {
       contact: message.authorContact,
       className: "message avatar-wrapper small-rounded-avatar",

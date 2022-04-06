@@ -4563,11 +4563,11 @@ const __WEBPACK_DEFAULT_EXPORT__ = ({
 "use strict";
 __webpack_require__.d(__webpack_exports__, {
 "LY": () => (timing),
-"Os": () => (schedule),
 "M9": () => (SoonFcWrap),
+"Os": () => (schedule),
+"_p": () => (ContactAwareComponent),
 "py": () => (rAFWrap),
-"wl": () => (MegaRenderMixin),
-"_p": () => (ContactAwareComponent)
+"wl": () => (MegaRenderMixin)
 });
 
 var _applyDecoratedDescriptor2__ = __webpack_require__(229);
@@ -5775,19 +5775,19 @@ class ComposedTextArea extends mixins.wl {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 __webpack_require__.d(__webpack_exports__, {
-"MAX_FREQUENTS": () => (MAX_FREQUENTS),
-"ContactsListItem": () => (ContactsListItem),
-"ContactButton": () => (ContactButton),
-"ContactVerified": () => (ContactVerified),
-"ContactPresence": () => (ContactPresence),
-"LastActivity": () => (LastActivity),
-"ContactAwareName": () => (ContactAwareName),
-"MembersAmount": () => (MembersAmount),
-"ContactFingerprint": () => (ContactFingerprint),
 "Avatar": () => (Avatar),
+"ContactAwareName": () => (ContactAwareName),
+"ContactButton": () => (ContactButton),
 "ContactCard": () => (ContactCard),
+"ContactFingerprint": () => (ContactFingerprint),
 "ContactItem": () => (ContactItem),
-"ContactPickerWidget": () => (ContactPickerWidget)
+"ContactPickerWidget": () => (ContactPickerWidget),
+"ContactPresence": () => (ContactPresence),
+"ContactVerified": () => (ContactVerified),
+"ContactsListItem": () => (ContactsListItem),
+"LastActivity": () => (LastActivity),
+"MAX_FREQUENTS": () => (MAX_FREQUENTS),
+"MembersAmount": () => (MembersAmount)
 });
 var _extends7__ = __webpack_require__(462);
 var react0__ = __webpack_require__(363);
@@ -13970,7 +13970,7 @@ let ConversationPanel = (conversationpanel_dec = utils["default"].SoonFcWrap(360
       members: this.props.chatRoom.membersSetFromApi,
       messagesBuff: room.messagesBuff,
       pushSettingsValue: pushNotificationSettings.getDnd(this.props.chatRoom.chatId),
-      onStartCall: () => (0,call.xt)().then(this.startCall).catch(() => d && console.warn('Already in a call.')),
+      onStartCall: mode => (0,call.xt)().then(() => this.startCall(mode)).catch(() => d && console.warn('Already in a call.')),
       onAttachFromComputerClicked: function () {
         self.props.chatRoom.uploadFromComputer();
       },

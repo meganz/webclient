@@ -1573,9 +1573,9 @@ export class ConversationPanel extends MegaRenderMixin {
                         members={this.props.chatRoom.membersSetFromApi}
                         messagesBuff={room.messagesBuff}
                         pushSettingsValue={pushNotificationSettings.getDnd(this.props.chatRoom.chatId)}
-                        onStartCall={() =>
+                        onStartCall={(mode) =>
                             inProgressAlert()
-                                .then(this.startCall)
+                                .then(() => this.startCall(mode))
                                 .catch(() => d && console.warn('Already in a call.'))
                         }
                         onAttachFromComputerClicked={function() {

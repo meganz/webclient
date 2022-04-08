@@ -5,8 +5,8 @@ import {Button} from './../../ui/buttons.jsx';
 import ModalDialogsUI from './../../ui/modalDialogs.jsx';
 import CloudBrowserModalDialog from './../../ui/cloudBrowserModalDialog.jsx';
 import { HistoryRetentionDialog } from './../../ui/historyRetentionDialog.jsx';
-import { Dropdown, DropdownItem, DropdownContactsSelector } from './../../ui/dropdowns.jsx';
-import { ContactCard, MembersAmount } from './../ui/contacts.jsx';
+import { Dropdown, DropdownItem } from './../../ui/dropdowns.jsx';
+import { ContactCard, ContactPickerDialog, MembersAmount } from './../ui/contacts.jsx';
 import { PerfectScrollbar } from './../../ui/perfectScrollbar.jsx';
 import { Accordion } from './../../ui/accordion.jsx';
 import { AccordionPanel } from './../../ui/accordion.jsx';
@@ -71,6 +71,12 @@ export class ConversationRightArea extends MegaRenderMixin {
     static defaultProps = {
         'requiresUpdateOnResize': true
     }
+
+    constructor(props) {
+        super(props);
+        this.state = { contactPickerDialog: false };
+    }
+
     customIsEventuallyVisible() {
         return this.props.chatRoom.isCurrentlyActive;
     }
@@ -226,24 +232,10 @@ export class ConversationRightArea extends MegaRenderMixin {
                         !self.allContactsInChat(excludedParticipants)
                     )
                 }
+                onClick={() => {
+                    this.setState({ contactPickerDialog: true });
+                }}
             >
-                <DropdownContactsSelector
-                    contacts={this.props.contacts}
-                    chatRoom={room}
-                    exclude={
-                        excludedParticipants
-                    }
-                    multiple={true}
-                    className="popup add-participant-selector"
-                    singleSelectedButtonLabel={l[8869]}
-                    multipleSelectedButtonLabel={l[8869]}
-                    nothingSelectedButtonLabel={l[8870]}
-                    onSelectDone={this.props.onAddParticipantSelected.bind(this)}
-                    positionMy="center top"
-                    positionAt="left bottom"
-                    arrowHeight={-32}
-                    selectFooter={true}
-                />
             </Button>
         );
 
@@ -637,6 +629,23 @@ export class ConversationRightArea extends MegaRenderMixin {
                     </Accordion>
                 </div>
             </PerfectScrollbar>
+            {this.state.contactPickerDialog && <ContactPickerDialog
+                exclude={excludedParticipants}
+                megaChat={room.megaChat}
+                multiple={true}
+                className={'popup add-participant-selector'}
+                singleSelectedButtonLabel={l[8869]}
+                multipleSelectedButtonLabel={l[8869]}
+                nothingSelectedButtonLabel={l[8870]}
+                onSelectDone={(selected) => {
+                    this.props.onAddParticipantSelected(selected);
+                    this.setState({contactPickerDialog: false});
+                }}
+                onClose={() => {
+                    this.setState({contactPickerDialog: false});
+                }}
+                selectFooter={true}
+            />}
         </div>;
     }
 }

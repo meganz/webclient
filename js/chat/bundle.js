@@ -5816,6 +5816,7 @@ __webpack_require__.d(__webpack_exports__, {
 "ContactCard": () => (ContactCard),
 "ContactFingerprint": () => (ContactFingerprint),
 "ContactItem": () => (ContactItem),
+"ContactPickerDialog": () => (ContactPickerDialog),
 "ContactPickerWidget": () => (ContactPickerWidget),
 "ContactPresence": () => (ContactPresence),
 "ContactVerified": () => (ContactVerified),
@@ -5824,7 +5825,7 @@ __webpack_require__.d(__webpack_exports__, {
 "MAX_FREQUENTS": () => (MAX_FREQUENTS),
 "MembersAmount": () => (MembersAmount)
 });
-var _extends7__ = __webpack_require__(462);
+var _extends8__ = __webpack_require__(462);
 var react0__ = __webpack_require__(363);
 var react0 = __webpack_require__.n(react0__);
 var _mixins1__ = __webpack_require__(503);
@@ -5833,6 +5834,8 @@ var _ui_perfectScrollbar_jsx3__ = __webpack_require__(285);
 var _ui_buttons_jsx4__ = __webpack_require__(204);
 var _ui_dropdowns_jsx5__ = __webpack_require__(78);
 var _contactsPanel_contactsPanel_jsx6__ = __webpack_require__(105);
+var _ui_modalDialogs7__ = __webpack_require__(904);
+
 
 
 
@@ -6393,7 +6396,7 @@ class Avatar extends _mixins1__._p {
     }
 
     if (avatarMeta.type === "image") {
-      displayedAvatar = react0().createElement("div", (0,_extends7__.Z)({
+      displayedAvatar = react0().createElement("div", (0,_extends8__.Z)({
         className: classes,
         style: this.props.style
       }, extraProps, {
@@ -6413,7 +6416,7 @@ class Avatar extends _mixins1__._p {
         classes += " default-bg";
       }
 
-      displayedAvatar = react0().createElement("div", (0,_extends7__.Z)({
+      displayedAvatar = react0().createElement("div", (0,_extends8__.Z)({
         className: classes,
         style: this.props.style
       }, extraProps, {
@@ -7291,6 +7294,47 @@ ContactPickerWidget.defaultProps = {
   newNoContact: false,
   emailTooltips: false
 };
+class ContactPickerDialog extends _mixins1__.wl {
+  render() {
+    const {
+      active,
+      allowEmpty,
+      className,
+      exclude,
+      megaChat,
+      multiple,
+      multipleSelectedButtonLabel,
+      name,
+      nothingSelectedButtonLabel,
+      selectFooter,
+      showTopButtons,
+      singleSelectedButtonLabel,
+      onClose,
+      onSelectDone
+    } = this.props;
+    return react0().createElement(_ui_modalDialogs7__.Z.ModalDialog, {
+      name: name,
+      className: `${className} contact-picker-dialog contacts-search`,
+      onClose: onClose
+    }, react0().createElement(ContactPickerWidget, {
+      active: active,
+      allowEmpty: allowEmpty,
+      className: 'popup contacts-search small-footer',
+      contacts: M.u,
+      exclude: exclude,
+      megaChat: megaChat,
+      multiple: multiple,
+      multipleSelectedButtonLabel: multipleSelectedButtonLabel,
+      nothingSelectedButtonLabel: nothingSelectedButtonLabel,
+      selectFooter: selectFooter,
+      showTopButtons: showTopButtons,
+      singleSelectedButtonLabel: singleSelectedButtonLabel,
+      onClose: onClose,
+      onSelectDone: onSelectDone
+    }));
+  }
+
+}
 
 /***/ }),
 
@@ -12694,6 +12738,13 @@ class JoinCallNotification extends mixins.wl {
 
 }
 class ConversationRightArea extends mixins.wl {
+  constructor(props) {
+    super(props);
+    this.state = {
+      contactPickerDialog: false
+    };
+  }
+
   customIsEventuallyVisible() {
     return this.props.chatRoom.isCurrentlyActive;
   }
@@ -12838,22 +12889,13 @@ class ConversationRightArea extends mixins.wl {
       className: "link-button light",
       icon: "sprite-fm-mono icon-add-small",
       label: l[8007],
-      disabled: call.ZP.isGuest() || !(!room.isReadOnly() && room.iAmOperator() && !self.allContactsInChat(excludedParticipants))
-    }, external_React_default().createElement(dropdowns.DropdownContactsSelector, {
-      contacts: this.props.contacts,
-      chatRoom: room,
-      exclude: excludedParticipants,
-      multiple: true,
-      className: "popup add-participant-selector",
-      singleSelectedButtonLabel: l[8869],
-      multipleSelectedButtonLabel: l[8869],
-      nothingSelectedButtonLabel: l[8870],
-      onSelectDone: this.props.onAddParticipantSelected.bind(this),
-      positionMy: "center top",
-      positionAt: "left bottom",
-      arrowHeight: -32,
-      selectFooter: true
-    }));
+      disabled: call.ZP.isGuest() || !(!room.isReadOnly() && room.iAmOperator() && !self.allContactsInChat(excludedParticipants)),
+      onClick: () => {
+        this.setState({
+          contactPickerDialog: true
+        });
+      }
+    });
     const {
       pushSettingsValue,
       onPushSettingsToggled,
@@ -13130,7 +13172,27 @@ class ConversationRightArea extends mixins.wl {
       key: "incomingShares",
       title: l[5542],
       chatRoom: room
-    }) : null))));
+    }) : null))), this.state.contactPickerDialog && external_React_default().createElement(ui_contacts.ContactPickerDialog, {
+      exclude: excludedParticipants,
+      megaChat: room.megaChat,
+      multiple: true,
+      className: 'popup add-participant-selector',
+      singleSelectedButtonLabel: l[8869],
+      multipleSelectedButtonLabel: l[8869],
+      nothingSelectedButtonLabel: l[8870],
+      onSelectDone: selected => {
+        this.props.onAddParticipantSelected(selected);
+        this.setState({
+          contactPickerDialog: false
+        });
+      },
+      onClose: () => {
+        this.setState({
+          contactPickerDialog: false
+        });
+      },
+      selectFooter: true
+    }));
   }
 
 }

@@ -914,6 +914,13 @@ Object.defineProperty(mega, 'user', {
     }
 });
 
+Object.defineProperty(mega, 'ipcc', {
+    get: function() {
+        'use strict';
+        return typeof u_attr === 'object' && u_attr.ipcc || window.ipcc || false;
+    }
+});
+
 Object.defineProperty(mega, 'BID', {
     get: function() {
         'use strict';
@@ -3926,7 +3933,10 @@ else if (!browserUpdate) {
             pageLoadTime = now - pageLoadTime;
 
             tryCatch(function() {
-                mega.ipcc = (String(document.cookie).match(/geoip\s*=\s*([A-Z]{2})/) || [])[1];
+                /* @property window.ipcc */
+                Object.defineProperty(window, 'ipcc', {
+                    value: (String(document.cookie).match(/geoip\s*=\s*([A-Z]{2})/) || [])[1]
+                });
             })();
         });
 

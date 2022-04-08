@@ -49,16 +49,26 @@ MegaData.prototype.openSharingDialog = function() {
         $.changedPermissions = {};// GLOBAL VARIABLE, changed permissions shared dialog
         $.removedContactsFromShare = {};// GLOBAL VARIABLE, removed contacts from a share
         $.shareDialog = 'share';
-        var selectedNode = String($.selected[0]);
+
+        // @todo refactor!
+        // eslint-disable-next-line no-use-before-define
+        fillShareDlg($.selected[0]).catch(dump);
 
         // Show the share dialog
-        $dialog.removeClass('hidden');
+        return $dialog.removeClass('hidden');
+    };
 
-        var shares = M.d[selectedNode].shares;
+    const fillShareDlg = async(h) => {
+        if (!M.d[h]) {
+            await dbfetch.get(h);
+        }
+        const {shares, name, td, tf} = M.getNodeByHandle(h);
+        assert(name);
+
         var shareKeys = Object.keys(shares || {});
 
         // This is shared folder, not just folder link
-        if (shares && !(shares.EXP && shareKeys.length === 1) || M.ps[selectedNode]) {
+        if (shares && !(shares.EXP && shareKeys.length === 1) || M.ps[h]) {
             $('.share-dialog-folder-icon', $dialog).removeClass('icon-folder-24').addClass('icon-folder-outgoing-24');
             $('.remove-share', $dialog).removeClass('disabled');
         }
@@ -69,7 +79,7 @@ MegaData.prototype.openSharingDialog = function() {
 
         // Fill the shared folder's name
         const $folderName = $('.share-dialog-folder-name', $dialog)
-            .text(M.d[selectedNode].name)
+            .text(name)
             .removeClass('simpletip')
             .removeAttr('data-simpletip')
             .removeAttr('data-simpletipposition');
@@ -77,15 +87,12 @@ MegaData.prototype.openSharingDialog = function() {
         if ($folderName.get(0).offsetWidth < $folderName.get(0).scrollWidth) {
             $folderName
                 .addClass('simpletip')
-                .attr('data-simpletip', M.d[selectedNode].name)
+                .attr('data-simpletip', name)
                 .attr('data-simpletipposition', 'top');
         }
 
         // Fill the shared folder's info
-        var foldercnt = M.d[selectedNode].td;
-        var filecnt = M.d[selectedNode].tf;
-        var folderContainsInfo = fm_contains(filecnt, foldercnt, false);
-        $('.share-dialog-folder-info', $dialog).text(folderContainsInfo);
+        $('.share-dialog-folder-info', $dialog).text(fm_contains(tf, td, false));
 
         // Render the content of access list in share dialog
         renderShareDialogAccessList();

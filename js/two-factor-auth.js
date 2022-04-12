@@ -351,20 +351,15 @@ twofactor.account = {
 
                 // The Two-Factor has already been disabled
                 if (response === ENOENT) {
-                    msgDialog('warninga',
-                        'Two-Factor Authentication is already disabled',
-                        'Return to the My Account page to enable.',
-                        function() {
-                            // Refresh the account 2FA status
-                            twofactor.account.init();
-                        }
-                    );
+                    msgDialog('warninga', '', l.two_fa_already_off_title, l.two_fa_already_off_text, () => {
+                        // Refresh the account 2FA status
+                        twofactor.account.init();
+                    });
                 }
                 else if (response < 0) {
 
                     // If there was an error, show a message that the code was incorrect
-                    msgDialog('warninga', 'Two-Factor Authentication could not be disabled',
-                                          'Check that the PIN is correct.');
+                    msgDialog('warninga', '', l.two_fa_cannot_disable_title, l.two_fa_cannot_disable_text);
                 }
                 else {
                     // Refresh the account 2FA status to show it's deactivated

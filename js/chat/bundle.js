@@ -4169,6 +4169,33 @@ ChatRoom._fnRequireParticipantKeys = function (fn, scope) {
   };
 };
 
+ChatRoom.prototype.showMissingUnifiedKeyDialog = function () {
+  return msgDialog(`warningb:!^${l[82]}!${l[23433]}`, null, l[200], "An error occurred while trying to join this call. Reloading MEGAchat may fix the problem. If the problem persists, please contact support@mega.nz", reload => reload ? M.reload() : null, 1);
+};
+
+ChatRoom.prototype.unifiedKeyAssert = function () {
+  const {
+    chatMode,
+    unifiedKey
+  } = this.protocolHandler;
+
+  if (chatMode !== strongvelope.CHAT_MODE.PUBLIC) {
+    return true;
+  }
+
+  if (!unifiedKey || unifiedKey && unifiedKey.length !== 16 || !this.ck || this.ck && this.ck.length !== 32) {
+    console.error('Error instantiating a call -- missing `unifiedKey`/malformed `ck` for public chat.');
+    const {
+      master,
+      slaves
+    } = mBroadcaster.crossTab;
+    eventlog(99751, JSON.stringify([1, buildVersion.version || 'dev', String(this.chatId).length | 0, this.type | 0, this.isMeeting | 0, typeof unifiedKey, String(unifiedKey || '').length | 0, typeof this.ck, String(this.ck).length | 0, !!master | 0, Object(slaves).length | 0]));
+    return false;
+  }
+
+  return true;
+};
+
 ChatRoom.prototype.joinCall = ChatRoom._fnRequireParticipantKeys(function (audio, video, callId) {
   if (this.activeCallIds.length === 0) {
     return;
@@ -4180,6 +4207,10 @@ ChatRoom.prototype.joinCall = ChatRoom._fnRequireParticipantKeys(function (audio
 
   if (this.meetingsLoading) {
     return;
+  }
+
+  if (!this.unifiedKeyAssert()) {
+    return this.showMissingUnifiedKeyDialog();
   }
 
   this.meetingsLoading = l.joining;
@@ -4258,6 +4289,10 @@ ChatRoom.prototype.startCall = ChatRoom._fnRequireParticipantKeys(function (audi
   if (this.activeCallIds.length > 0) {
     this.joinCall(this.activeCallIds.keys()[0]);
     return;
+  }
+
+  if (!this.unifiedKeyAssert()) {
+    return this.showMissingUnifiedKeyDialog();
   }
 
   this.meetingsLoading = l.starting;

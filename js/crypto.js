@@ -59,7 +59,7 @@ var xxtea = (function() {
     return Object.freeze(ns);
 }());
 
-var use_ssl = !window.is_extension | 0;
+var use_ssl = window.is_extension && !window.is_iframed ? 0 : 1;
 var have_ab = typeof ArrayBuffer !== 'undefined' && typeof DataView !== 'undefined';
 
 // general errors

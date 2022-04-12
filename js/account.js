@@ -113,8 +113,8 @@ function u_checklogin3a(res, ctx) {
         }
 
         // IP geolocation debuggging
-        if (d && localStorage.ipcc) {
-            u_attr.ipcc = localStorage.ipcc;
+        if (d && sessionStorage.ipcc) {
+            u_attr.ipcc = sessionStorage.ipcc;
         }
 
         u_storage.handle = u_handle = u_attr.u;

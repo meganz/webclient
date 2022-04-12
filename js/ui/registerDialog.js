@@ -478,6 +478,9 @@
 
             // Verify the new email address is in valid format
             if (!isValidEmail(newEmail)) {
+                // Hide the loading spinner
+                loadingDialog.hide();
+
                 $('input', $dialog).parent().addClass('error');
                 $('input', $dialog).focus();
                 return false;

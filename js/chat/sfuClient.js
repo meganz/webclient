@@ -352,7 +352,7 @@ function compressedSdpToString(sdp) {
 }
 
 ;// CONCATENATED MODULE: ../shared/commitId.ts
-const COMMIT_ID = 'a89c1c645e';
+const COMMIT_ID = 'f2f6a505bb';
 /* harmony default export */ const commitId = (COMMIT_ID);
 
 ;// CONCATENATED MODULE: ./client.ts
@@ -2740,7 +2740,8 @@ class SvcDriver {
             }
         }
         params.width = Math.round(params.height * ar);
-        console.warn(`Switching TX quality from ${this.currTxQuality} to ${newQ}: ${JSON.stringify(params)} (aspect ratio: ${this.client.screenAspectRatio?.toString().substr(0, 6)})`);
+        console.warn(`Switching TX quality from ${this.currTxQuality} to ${newQ}: %o`,
+                     params, String(this.client.screenAspectRatio).substr(0, 6));
         this.currTxQuality = newQ;
         track.applyConstraints(params);
         return true;

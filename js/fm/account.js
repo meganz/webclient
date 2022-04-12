@@ -1141,6 +1141,13 @@ accountUI.account = {
 
                     if ($this.is('.byear, .bmonth, .bdate')) {
                         if (this.value > max || this.value < min) {
+
+                            if ($this.is('.byear') && this.value > max && this.value === u_attr.birthyear) {
+                                // To omit the case that users already set invalid year value
+                                // before implied the restrictions
+                                return true;
+                            }
+
                             $this.addClass('errored');
                             $parent.addClass('error msg');
                             var $msg = $('.message-container', $parent).text(errorMsg);

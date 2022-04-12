@@ -950,6 +950,8 @@ FileManager.prototype.initFileManagerUI = function() {
         }
 
         if (this.classList.contains('account') || this.classList.contains('dashboard')) {
+            $.hideTopMenu();
+
             if (u_type === 0) {
                 if (this.classList.contains('account')) {
                     ephemeralDialog(l[7687]);

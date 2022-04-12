@@ -511,6 +511,7 @@ mBroadcaster.addListener('fm:initialized', () => {
             let my = 'center top';
             let at = 'center bottom+6';
             let arrowAt = 'top';
+            let hadHidden = false;
 
             switch (this.map.targetElmPosition) {
                 case 'top':
@@ -541,6 +542,12 @@ mBroadcaster.addListener('fm:initialized', () => {
 
             // $.position bug escaping
             this.$dialog.removeAttr('style');
+
+            // As hidden eleemnt cannot calculate collision with viewport edge, remove hidden temporarily
+            if (this.$dialog.hasClass('hidden')) {
+                this.$dialog.removeClass('hidden');
+                hadHidden = true;
+            }
 
             this.$dialog.position({
                 my: my,
@@ -574,6 +581,11 @@ mBroadcaster.addListener('fm:initialized', () => {
             }
             else {
                 $('#obDialog-arrow', this.$dialog).addClass('hidden').removeClass('top bottom left right');
+            }
+
+            // If it was temporary bug fixing hidden removal, add hidden back
+            if (hadHidden) {
+                this.$dialog.addClass('hidden');
             }
         }
 

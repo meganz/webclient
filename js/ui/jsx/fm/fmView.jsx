@@ -240,7 +240,9 @@ export default class FMView extends MegaRenderMixin {
         }
     }
     componentDidUpdate(prevProps) {
-        if (prevProps.currentlyViewedEntry !== this.props.currentlyViewedEntry) {
+        const { currentlyViewedEntry: currEntry, searchValue: currSearch } = this.props;
+        const { currentlyViewedEntry: prevEntry, searchValue: prevSearch } = prevProps;
+        if (prevEntry !== currEntry || currSearch !== prevSearch) {
             let newState = {
                 'selected': [],
                 'highlighted': []
@@ -251,7 +253,7 @@ export default class FMView extends MegaRenderMixin {
                 this.addOrUpdRawListener();
             }
 
-            var handle = this.props.currentlyViewedEntry;
+            const handle = currEntry;
             if (handle === 'shares') {
                 newState.isLoading = true;
                 this.setState(newState);

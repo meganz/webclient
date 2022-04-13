@@ -680,6 +680,9 @@
                         <button class="btn-galleries js-lpbtn videos js-fm-tab" data-link="videos">
                             <i class="sprite-fm-mono icon-videos"></i>[$gallery_videos]
                         </button>
+                        <button class="btn-galleries js-lpbtn favourites js-fm-tab" data-link="favourites">
+                            <i class="sprite-fm-mono icon-favourite-filled"></i>[$gallery_favourites]
+                        </button>
                     </div>
                 </div>
             </section>
@@ -1418,6 +1421,13 @@
                             [$gallery_get_start_instruction_3]
                         </div>
                     </div>
+                </div>
+            </div>
+
+            <div class="fm-empty-section fm-empty-favourites hidden">
+                <div class="fm-empty-pad">
+                    <i class="section-icon sprite-fm-theme icon-empty-state-favourite"></i>
+                    <div class="fm-empty-cloud-txt">[$gallery_favourites_empty]</div>
                 </div>
             </div>
 
@@ -2356,6 +2366,7 @@
                                 <div class="video-thumb-details">
                                     <span>00:00</span>
                                 </div>
+                                <span class="data-block-fav-icon sprite-fm-mono icon-favourite-filled"></span>
                             </span>
                         </a>
                     </div>

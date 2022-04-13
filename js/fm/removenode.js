@@ -138,6 +138,7 @@ function removeUInode(h, parent) {
         case 'photos':
         case 'images':
         case 'videos':
+        case 'favourites':
         case `discovery/${M.currentCustomView.nodeID}`:
             if (!hasItems) {
 

@@ -233,6 +233,7 @@ MegaData.prototype.getPath = function(id) {
             || (id === 'photos')
             || (id === 'images')
             || (id === 'videos')
+            || (id === 'favourites')
         ) {
             result.push(id);
         }
@@ -313,7 +314,7 @@ MegaData.prototype.isCustomView = function(pathOrID) {
     result.original = pathOrID;
 
     // Basic gallery view
-    if (pathOrID === 'photos' || pathOrID === 'images' || pathOrID === 'videos') {
+    if (pathOrID === 'photos' || pathOrID === 'images' || pathOrID === 'videos' || pathOrID === 'favourites') {
         result.type = 'gallery';
         result.nodeID = pathOrID;
         result.prefixTree = '';

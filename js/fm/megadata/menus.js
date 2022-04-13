@@ -342,7 +342,9 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
         delete items['.copy-item'];
         delete items['.rename-item'];
         delete items['.remove-item'];
-        delete items['.add-star-item'];
+        if (M.currentdirid !== 'favourites') {
+            delete items['.add-star-item'];
+        }
         delete items['.colour-label-items'];
         delete items['.embedcode-item'];
         delete items['.properties-versions'];

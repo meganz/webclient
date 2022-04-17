@@ -5141,7 +5141,7 @@
     "troy_zero_knowledge_desc": "Con la criptazione end-to-end controllata dall'utente, puoi assicurarti che MEGA \u00e8 un luogo privato per archiviare i tuoi dati importanti. MEGA non ha accesso alla tua password o ai tuoi dati. Utilizzare una password unica e resistente ti assicura che i tuoi dati siano protetti dall'essere hackerati e ti d\u00e0 piena confidenza che le tue informazioni rimangano tue. Il nostro team di supporto \u00e8 disponibile 24 ore su 24, tutti i giorni della settimana, con priorit\u00e0 nel supporto degli utenti Pro.",
     "troy_zero_knowledge_desc2": "Con la criptazione end-to-end controllata dall'utente puoi assicurarti del fatto che MEGA \u00e8 un anello molto sicuro della tua catena di sicurezza. Aumenta la tua produttivit\u00e0 con feature specifiche per i business, incluse la gestione degli utenti e i link protetti da password. Il nostro team di supporto \u00e8 disponibile tutti i giorni a tutte le ore, con supporto prioritario per i clienti Business.",
     "two_fa_already_off_text": "You have either disabled it on a different device, such as your phone, or on another tab you have open. Reload your page to see updated settings.",
-    "two_fa_already_off_title": "2FA is already disabled",
+    "two_fa_already_off_title": "2FA already disabled",
     "two_fa_cannot_disable_text": "Code is incorrect. To disable, please check your code and try again.",
     "two_fa_cannot_disable_title": "2FA could not be disabled",
     "user_file_added_count": "{count, plural, one {[X] ha aggiunto # file} other {[X] ha aggiunto # file}}",

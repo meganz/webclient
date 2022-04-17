@@ -5141,7 +5141,7 @@
     "troy_zero_knowledge_desc": "Dank der benutzergesteuerten Ende-zu-Ende-Verschl\u00fcsselung k\u00f6nnen Sie sich darauf verlassen, dass Ihre bei MEGA gespeicherten Daten sicher gesch\u00fctzt sind. MEGA hat keinerlei Zugriff auf Ihr Passwort oder Ihre Daten. Durch die Verwendung eines starken und einmaligen Passworts stellen Sie sicher, dass Ihre Daten vor Hackerangriffen gesch\u00fctzt sind und niemals von Au\u00dfenstehenden eingesehen werden k\u00f6nnen. Unser Supportteam ist rund um die Uhr an jedem Tag der Woche erreichbar, mit bevorzugtem Support f\u00fcr Pro-Benutzer.",
     "troy_zero_knowledge_desc2": "Dank der benutzergesteuerten Ende-zu-Ende-Verschl\u00fcsselung ist MEGA ein starkes Glied in Ihrer Sicherheitskette. Erstellen Sie sichere Dateifreigaben und arbeiten Sie unkompliziert mit Ihrem Team zusammen. Unternehmensorientierte Funktionen wie Benutzerverwaltung und passwortgesch\u00fctzte Links steigern Ihre Produktivit\u00e4t. Unser Supportteam steht Ihnen jeden Tag der Woche rund um die Uhr zur Verf\u00fcgung, und als MEGA-Business-Kunde erhalten Sie bevorzugten Support. ",
     "two_fa_already_off_text": "You have either disabled it on a different device, such as your phone, or on another tab you have open. Reload your page to see updated settings.",
-    "two_fa_already_off_title": "2FA is already disabled",
+    "two_fa_already_off_title": "2FA already disabled",
     "two_fa_cannot_disable_text": "Code is incorrect. To disable, please check your code and try again.",
     "two_fa_cannot_disable_title": "2FA could not be disabled",
     "user_file_added_count": "{count, plural, one {[X] hat # Datei hinzugef\u00fcgt} other {[X] hat # Dateien hinzugef\u00fcgt}}",

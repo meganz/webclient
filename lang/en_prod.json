@@ -5141,7 +5141,7 @@
     "troy_zero_knowledge_desc": "With user controlled end-to-end encryption you can be confident MEGA is a private place to store your important data. MEGA does not have access to your password or your data. Using a strong and unique password will ensure that your data is protected from being hacked and gives you total confidence that your information will remain just that: yours. Our support team is available around the clock, every day of the week, with priority support for Pro users.",
     "troy_zero_knowledge_desc2": "With user controlled end-to-end encryption you can be confident MEGA is a very strong link in your security chain. Securely share files and collaborate with your team. Be more productive with business-specific features, including user management and password protected links. Our support team is available every day of the week, around the clock, with priority support for MEGA for Business customers. ",
     "two_fa_already_off_text": "You have either disabled it on a different device, such as your phone, or on another tab you have open. Reload your page to see updated settings.",
-    "two_fa_already_off_title": "2FA is already disabled",
+    "two_fa_already_off_title": "2FA already disabled",
     "two_fa_cannot_disable_text": "Code is incorrect. To disable, please check your code and try again.",
     "two_fa_cannot_disable_title": "2FA could not be disabled",
     "user_file_added_count": "{count, plural, one {[X] added # file} other {[X] added # files}}",

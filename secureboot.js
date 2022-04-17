@@ -754,7 +754,7 @@ var mega = {
     /** An object with flags detailing which features are enabled on the API
      *  XXX: This is now meant to be a legacy private property, use `mega.flags` instead.
      */
-    apiMiscFlags: {},
+    apiMiscFlags: null,
 
     /** Get browser brancd internal ID */
     getBrowserBrandID: function() {

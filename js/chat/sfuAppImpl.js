@@ -173,6 +173,9 @@
     };
 
     SfuApp.prototype.destroy = function(reason) {
+        if (this.isDestroyed) {
+            return;
+        }
         this.isDestroyed = true;
         this.sfuClient.disconnect(reason);
         delete window.sfuClient;

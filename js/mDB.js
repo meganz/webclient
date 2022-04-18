@@ -1668,7 +1668,7 @@ FMDB.prototype.getbykey = async function fmdb_getbykey(table, index, anyof, wher
                     else {
                         // a returned record was overwritten and still matches
                         // our where clause
-                        r[i] = this.clone(matches[f], writing);
+                        r[i] = this.clone(matches[f]);
                         matches[f] = undefined;
                     }
                 }
@@ -1677,7 +1677,7 @@ FMDB.prototype.getbykey = async function fmdb_getbykey(table, index, anyof, wher
             // now add newly written records
             for (t in matches) {
                 if (matches[t]) {
-                    r.push(this.clone(matches[t], writing));
+                    r.push(this.clone(matches[t]));
                 }
             }
         }
@@ -1747,13 +1747,20 @@ FMDB.prototype.getchunk = async function(table, options, onchunk) {
 };
 
 // simple/fast/non-recursive object cloning
-FMDB.prototype.clone = function fmdb_clone(o, copy) {
+FMDB.prototype.clone = function fmdb_clone(o) {
     'use strict';
 
     o = {...o};
 
-    if (copy && o.d && o.d.byteLength) {
-        o.d = o.d.slice(0);
+    if (!o.d || 'byteLength' in o.d) {
+
+        for (const k in o) {
+
+            if (o[k] && o[k].byteLength) {
+
+                o[k] = o[k].slice(0);
+            }
+        }
     }
 
     return o;

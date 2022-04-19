@@ -43,8 +43,7 @@ class Participant extends MegaRenderMixin {
             <>
                 <Avatar contact={M.u[handle]} />
                 <div className="name">
-                    <Emoji>{name}</Emoji>
-                    {handle === u_handle && <span>{l.me}</span>}
+                    <Emoji>{handle === u_handle ? `${name} ${l.me}` : name}</Emoji>
                     {chatRoom.isMeeting && Call.isModerator(chatRoom, handle) && (
                         <span>
                             <i className={`${this.baseIconClass} icon-admin`} />

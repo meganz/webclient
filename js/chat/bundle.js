@@ -20803,7 +20803,7 @@ class Participant extends mixins.wl {
       contact: M.u[handle]
     }), external_React_default().createElement("div", {
       className: "name"
-    }, external_React_default().createElement(utils.Emoji, null, name), handle === u_handle && external_React_default().createElement("span", null, l.me), chatRoom.isMeeting && Call.isModerator(chatRoom, handle) && external_React_default().createElement("span", null, external_React_default().createElement("i", {
+    }, external_React_default().createElement(utils.Emoji, null, handle === u_handle ? `${name} ${l.me}` : name), chatRoom.isMeeting && Call.isModerator(chatRoom, handle) && external_React_default().createElement("span", null, external_React_default().createElement("i", {
       className: `${this.baseIconClass} icon-admin`
     }))), external_React_default().createElement("div", {
       className: "status"

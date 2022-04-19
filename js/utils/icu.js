@@ -78,7 +78,7 @@ lazy(mega, 'icu', () => {
          * @returns {Boolean}       True if ICU/Plural
          */
         format: (msg, count) => {
-            if (d && dstringids) {
+            if (d && window.dstringids) {
                 return msg;
             }
             if (!mega.icu.isICUPlural(msg)) {

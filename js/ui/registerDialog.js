@@ -417,7 +417,9 @@
             $('.reg-success-icon-chat', $dialog).addClass('hidden');
             $('.reg-success-icon', $dialog).removeClass('hidden');
         }
-        $('.reg-resend-email-txt', $dialog).text(accountData.email);
+
+        const $resendEmailTxt = $('.reg-resend-email-txt', $dialog);
+        $resendEmailTxt.text(accountData.email).attr('data-simpletip', accountData.email);
 
         $changeEmailLink.rebind('click', function(event) {
             event.preventDefault();
@@ -538,6 +540,13 @@
         $('.content-block', $dialog).removeClass('dialog-bottom');
         $('footer', $dialog).removeClass('hidden');
         $dialog.addClass('special').show();
+
+        if ($resendEmailTxt[0].scrollWidth > $resendEmailTxt[0].offsetWidth) {
+            $resendEmailTxt.addClass('simpletip').attr("data-simpletip-class", "no-max-width");
+        }
+        else {
+            $resendEmailTxt.removeClass('simpletip').removeAttr('data-simpletip-class');
+        }
     }
 
     // export

@@ -49,11 +49,11 @@ mega.textEditorUI = new function TextEditorUI() {
     };
 
 
-    var selectedItemOpen = function() {
+    var selectedItemOpen = function(selected) {
 
         var openFile = function() {
             loadingDialog.show('common', l[23130]);
-            var nodeHandle = $.selected && $.selected[0];
+            var nodeHandle = ($.selected && $.selected[0]) || (selected && selected[0]);
             if (!nodeHandle) {
                 loadingDialog.hide();
                 return;

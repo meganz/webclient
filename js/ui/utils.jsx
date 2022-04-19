@@ -266,7 +266,7 @@ export class ParsedHTML extends React.Component {
         const ref = this.ref && this.ref.current;
 
         if (!children && !content) {
-            return console.warn('Emoji: No content passed.');
+            return d > 1 && console.warn('Emoji: No content passed.');
         }
 
         if (ref) {

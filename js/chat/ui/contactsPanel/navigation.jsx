@@ -4,34 +4,9 @@ import ContactsPanel from './contactsPanel.jsx';
 import { Button } from '../../../ui/buttons.jsx';
 
 export default class Navigation extends MegaRenderMixin {
-    requestReceivedListener = null;
-
-    state = {
-        receivedRequestsCount: 0
-    }
-
-    constructor(props) {
-        super(props);
-        this.state.receivedRequestsCount = Object.keys(M.ipc).length;
-    }
-
-    componentWillUnmount() {
-        super.componentWillUnmount();
-        if (this.requestReceivedListener) {
-            mBroadcaster.removeListener(this.requestReceivedListener);
-        }
-    }
-
-    componentDidMount() {
-        super.componentDidMount();
-        this.requestReceivedListener = mBroadcaster.addListener('fmViewUpdate:ipc', () =>
-            this.setState({ receivedRequestsCount: Object.keys(M.ipc).length })
-        );
-    }
-
     render() {
         const { view } = this.props;
-        const { receivedRequestsCount } = this.state;
+        const { receivedRequestsCount } = this.props;
         const { VIEW, LABEL } = ContactsPanel;
 
         return (

@@ -87,9 +87,12 @@ export default class ContactsPanel extends MegaRenderMixin {
 
     constructor(props) {
         super(props);
+        this.state.receivedRequestsCount = Object.keys(M.ipc).length;
     }
 
-    getReceivedRequestsCount = () => this.props.received && Object.keys(this.props.received).length;
+    state = {
+        receivedRequestsCount: 0
+    };
 
     handleToggle = ({ keyCode }) => {
         if (keyCode === 27 /* ESC */) {
@@ -136,24 +139,30 @@ export default class ContactsPanel extends MegaRenderMixin {
 
     componentWillUnmount() {
         super.componentWillUnmount();
-        mBroadcaster.removeListener(this.requestReceivedListener);
         document.documentElement.removeEventListener(ContactsPanel.EVENTS.KEYDOWN, this.handleToggle);
+        if (this.requestReceivedListener) {
+            mBroadcaster.removeListener(this.requestReceivedListener);
+        }
     }
 
     componentDidMount() {
         super.componentDidMount();
         document.documentElement.addEventListener(ContactsPanel.EVENTS.KEYDOWN, this.handleToggle);
+        this.requestReceivedListener = mBroadcaster.addListener('fmViewUpdate:ipc', () =>
+            this.setState({ receivedRequestsCount: Object.keys(M.ipc).length })
+        );
     }
 
     render() {
-        const receivedRequestsCount = this.getReceivedRequestsCount();
-        const { view } = this;
+        const { view, state } = this;
+        const { receivedRequestsCount } = state;
 
         return (
             <div className="contacts-panel">
                 <Navigation
                     view={view}
                     contacts={this.props.contacts}
+                    receivedRequestsCount={receivedRequestsCount}
                 />
 
                 {view !== ContactsPanel.VIEW.PROFILE && (

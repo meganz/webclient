@@ -356,8 +356,7 @@ mega.achievem.bindStorageDataToView = function bindStorageDataToView($viewContex
             if (idx !== ach.ACH_INVITE) {
                 $cell.addClass('achieved');
 
-                $('.expires-txt', $cell).safeHTML(locFmt.replace('%1', data.rwd.left).replace('%2', l[16290]));
-                if (data.rwd.expiry.unit === "d"){
+                if (data.rwd.expiry.unit === "d" && data.rwd.left > 0){
                     locFmt = mega.icu.format(l.ach_expires_days, data.rwd.left)
                         .replace('[S]', '<span>').replace('[/S]', '</span>');
                     $('.expires-txt', $cell).safeHTML(locFmt);

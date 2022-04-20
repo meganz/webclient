@@ -1634,7 +1634,7 @@ var addressDialog = {
      */
     prefillInfo: function(billingInfo) {
 
-        var prefillMultipleInputs = (inputs, value) => {
+        const prefillMultipleInputs = (inputs, value) => {
             if (Array.isArray(inputs)) {
                 inputs.forEach(($megaInput) => {
                     $megaInput.$input.val(value).trigger('change');
@@ -1646,48 +1646,64 @@ var addressDialog = {
         };
 
         'use strict';
-        var $firstNameInput = this.firstNameMegaInput;
-        if (billingInfo && billingInfo.hasOwnProperty('firstname')) {
-            prefillMultipleInputs($firstNameInput, billingInfo.firstname);
-        } else if (this.businessPlan && this.userInfo && this.userInfo.hasOwnProperty("fname")) {
-            prefillMultipleInputs($firstNameInput, this.userInfo.fname);
-        } else if (u_attr && u_attr.hasOwnProperty('firstname')) {
-            prefillMultipleInputs($firstNameInput, u_attr.firstname);
-        } else {
-            prefillMultipleInputs($firstNameInput, '');
-        }
 
-        var $lastNameInput = this.lastNameMegaInput;
-        if (billingInfo && billingInfo.hasOwnProperty('lastname')) {
-            prefillMultipleInputs($lastNameInput, billingInfo.lastname);
-        } else if (this.businessPlan && this.userInfo && this.userInfo.hasOwnProperty("lname")) {
-            prefillMultipleInputs($lastNameInput, this.userInfo.lname);
-        } else if (u_attr && u_attr.hasOwnProperty('lastname')) {
-            prefillMultipleInputs($lastNameInput, u_attr.lastname);
-        } else {
-            prefillMultipleInputs($lastNameInput, '');
-        }
+        const getBillingProp = (propName, encoded) => {
+            return encoded ? from8(billingInfo[propName]) : billingInfo[propName];
+        };
+
+        const fillInputFromAttr = ($input, businessAttrName, Atrrname) => {
+            if (this.businessPlan && this.userInfo && this.userInfo.hasOwnProperty(businessAttrName)) {
+                prefillMultipleInputs($input, this.userInfo[businessAttrName]);
+            }
+            else if (u_attr && u_attr.hasOwnProperty(Atrrname)) {
+                prefillMultipleInputs($input, u_attr[Atrrname]);
+            }
+            else {
+                prefillMultipleInputs($input, '');
+            }
+        };
+
+        let noFname = true;
+        let noLname = true;
 
         if (billingInfo) {
+            const encodedVer = billingInfo.hasOwnProperty('version');
+
+            if (billingInfo.hasOwnProperty('firstname')) {
+                prefillMultipleInputs(this.firstNameMegaInput, getBillingProp('firstname', encodedVer));
+                noFname = false;
+            }
+
+            if (billingInfo.hasOwnProperty('lastname')) {
+                prefillMultipleInputs(this.lastNameMegaInput, getBillingProp('lastname', encodedVer));
+                noLname = false;
+            }
+
             if (billingInfo.hasOwnProperty('address1')) {
-                prefillMultipleInputs(this.addressMegaInput, billingInfo.address1);
+                prefillMultipleInputs(this.addressMegaInput, getBillingProp('address1', encodedVer));
             }
 
             if (billingInfo.hasOwnProperty('address2')) {
-                prefillMultipleInputs(this.address2MegaInput, billingInfo.address2);
+                prefillMultipleInputs(this.address2MegaInput, getBillingProp('address2', encodedVer));
             }
 
             if (billingInfo.hasOwnProperty('city')) {
-                prefillMultipleInputs(this.cityMegaInput, billingInfo.city);
+                prefillMultipleInputs(this.cityMegaInput, getBillingProp('city', encodedVer));
             }
 
             if (billingInfo.hasOwnProperty('postcode')) {
-                prefillMultipleInputs(this.postCodeMegaInput, billingInfo.postcode);
+                prefillMultipleInputs(this.postCodeMegaInput, getBillingProp('postcode', encodedVer));
             }
 
             if (billingInfo.hasOwnProperty('taxCode')) {
-                prefillMultipleInputs(this.taxCodeMegaInput, billingInfo.taxCode);
+                prefillMultipleInputs(this.taxCodeMegaInput, getBillingProp('taxCode', encodedVer));
             }
+        }
+        if (noFname) {
+            fillInputFromAttr(this.firstNameMegaInput, 'fname', 'firstname');
+        }
+        if (noLname) {
+            fillInputFromAttr(this.lastNameMegaInput, 'lname', 'lastname');
         }
     },
 
@@ -1835,38 +1851,38 @@ var addressDialog = {
      */
     validateAndPay: function() {
 
-        var inputSelector = function(input) {
+        const inputSelector = function(input) {
             return Array.isArray(input) ? input[1] : input;
         };
         // Selectors for form text fields
-        var fields = ['first-name', 'last-name', 'address1', 'address2', 'city', 'postcode'];
-        var fieldValues = {};
+        const fields = ['first-name', 'last-name', 'address1', 'address2', 'city', 'postcode'];
+        const fieldValues = Object.create(null);
 
         // Get the values from the inputs
-        for (var i = 0; i < fields.length; i++) {
+        for (let i = 0; i < fields.length; i++) {
 
             // Get the form field value
-            var fieldName = fields[i];
-            var fieldValue = $('.' + fieldName, this.$dialog).val();
+            const fieldName = fields[i];
+            const fieldValue = $(`.${fieldName}`, this.$dialog).val();
 
             // Trim the text
             fieldValues[fieldName] = $.trim(fieldValue);
         }
 
         // Get the values from the dropdowns
-        var $stateSelect = $('.states', this.$dialog);
-        var $countrySelect = $('.countries', this.$dialog);
-        var state = $('.option[data-state="active"]', $stateSelect).attr('data-value');
-        var country = $('.option[data-state="active"]', $countrySelect).attr('data-value');
-        var taxCode = inputSelector(this.taxCodeMegaInput).$input.val();
+        const $stateSelect = $('.states', this.$dialog);
+        const $countrySelect = $('.countries', this.$dialog);
+        const state = $('.option[data-state="active"]', $stateSelect).attr('data-value');
+        const country = $('.option[data-state="active"]', $countrySelect).attr('data-value');
+        const taxCode = inputSelector(this.taxCodeMegaInput).$input.val();
 
         // Selectors for error handling
-        var $errorMessage = $('.error-message', this.$dialog);
-        var $errorMessageContainers = $('.message-container', this.$dialog);
-        var $allInputs = $('.mega-input', this.$dialog);
+        const $errorMessage = $('.error-message', this.$dialog);
+        const $errorMessageContainers = $('.message-container', this.$dialog);
+        const $allInputs = $('.mega-input', this.$dialog);
 
         // Reset state of past error messages
-        var stateNotSet = false;
+        let stateNotSet = false;
         $errorMessage.addClass(is_mobile ? 'v-hidden' : 'hidden');
         $errorMessageContainers.addClass('hidden');
         $allInputs.removeClass('error');
@@ -1911,23 +1927,24 @@ var addressDialog = {
 
         // If remember billing address, save as user attribute for future usage.
         if (this.$rememberDetailsCheckbox.hasClass("checkboxOn")) {
-            var saveAttribute = function(name, value) {
+            const saveAttribute = function(name, value) {
                 if (value) {
                     mega.attr.setArrayAttribute('billinginfo', name, value, false, true);
                 }
             };
-            saveAttribute('firstname', fieldValues['first-name']);
-            saveAttribute('lastname', fieldValues['last-name']);
-            saveAttribute('address1', fieldValues['address1']);
-            saveAttribute('address2', fieldValues['address2']);
-            saveAttribute('postcode', fieldValues['postcode']);
-            saveAttribute('city', fieldValues['city']);
+            saveAttribute('firstname', to8(fieldValues['first-name']));
+            saveAttribute('lastname', to8(fieldValues['last-name']));
+            saveAttribute('address1', to8(fieldValues.address1));
+            saveAttribute('address2', to8(fieldValues.address2));
+            saveAttribute('postcode', to8(fieldValues.postcode));
+            saveAttribute('city', to8(fieldValues.city));
             saveAttribute('country', country);
             saveAttribute('state', state);
-            saveAttribute('taxCode', taxCode);
+            saveAttribute('taxCode', to8(taxCode));
+            saveAttribute('version', '2');
         } else {
             // Forget Attribute.
-            var removeAttribute = function(name) {
+            const removeAttribute = function(name) {
                 mega.attr.setArrayAttribute('billinginfo', name, '', false, true);
             };
             removeAttribute('firstname');
@@ -1939,6 +1956,7 @@ var addressDialog = {
             removeAttribute('country');
             removeAttribute('state');
             removeAttribute('taxCode');
+            removeAttribute('version');
         }
 
 

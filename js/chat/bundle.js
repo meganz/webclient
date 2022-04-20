@@ -7350,7 +7350,8 @@ class Navigation extends mixins.wl {
                                                 mega-button
                                                 action
                                                 ${activeClass}
-                                            `
+                                            `,
+          receivedRequestsCount: receivedRequestsCount
         }, external_React_default().createElement("span", null, LABEL[key]), receivedRequestsCount > 0 && VIEW[key] === VIEW.RECEIVED_REQUESTS && external_React_default().createElement("div", {
           className: "notifications-count"
         }, receivedRequestsCount > 9 ? '9+' : receivedRequestsCount)));

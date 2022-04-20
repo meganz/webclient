@@ -33,7 +33,8 @@ export default class Navigation extends MegaRenderMixin {
                                                 mega-button
                                                 action
                                                 ${activeClass}
-                                            `}>
+                                            `}
+                                            receivedRequestsCount={receivedRequestsCount}>
                                             <span>{LABEL[key]}</span>
                                             {receivedRequestsCount > 0 && VIEW[key] === VIEW.RECEIVED_REQUESTS && (
                                                 <div className="notifications-count">

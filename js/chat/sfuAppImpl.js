@@ -173,6 +173,9 @@
     };
 
     SfuApp.prototype.destroy = function(reason) {
+        if (this.isDestroyed) {
+            return;
+        }
         this.isDestroyed = true;
         this.sfuClient.disconnect(reason);
         delete window.sfuClient;
@@ -250,7 +253,7 @@
                 }kbps rtt: ${sfuClient.rtcStats.rtt}, pl: ${Math.round(info.plost)}, rxq: ${sfuClient.rxQuality}`;
             elem.innerText = text;
         };
-        SfuApp.prototype.onVideoTxStat = function(isHiRes, info, raw) {
+        SfuApp.prototype.onVideoTxStat = function(isHiRes, stats, raw) {
             if (!window.sfuClient) {
                 return;
             }
@@ -258,15 +261,13 @@
             if (!elem) {
                 return;
             }
-            let text;
-            if (isHiRes == null) {
-                text = "";
-            } else {
-                text = `${raw.frameWidth}x${raw.frameHeight}:${sfuClient.sentTracksString()} ${Math.round(info.kbps)
-                    }kbps ${info.fps || 0}fps ${Math.round(info.keyfps)}kfs`;
-                if (sfuClient.isSendingScreenHiRes()) {
-                    text += ` txq: ${sfuClient.txQuality}`;
-                }
+            let text = (isHiRes === null)
+                ? "" // onVideoTxStat(null) is called when there is no output video track
+                : `${stats.vtxw}x${stats.vtxh}:${sfuClient.sentTracksString()} ${Math.round(stats._vtxkbps)
+                    }kbps\n${stats.vtxfps || 0}fps ${Math.round(stats._vtxkfps)}kfs rtt: ${stats.rtt} dly: ${stats.vtxdly}`;
+
+            if (sfuClient.isSendingScreenHiRes()) {
+                text += `\ntxq: ${sfuClient.txQuality}`;
             }
             elem.innerText = text;
         };

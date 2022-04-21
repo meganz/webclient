@@ -1190,6 +1190,7 @@ li.active .call-duration i {
 }
 
 .contacts-content {
+    height: 100%;
     flex-grow: 1;
     overflow: hidden;
 }

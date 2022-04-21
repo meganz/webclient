@@ -1,3 +1,5 @@
+/** @file automatically generated, do not edit it. */
+/* eslint-disable max-len, indent */
 /******/ (() => { // webpackBootstrap
 /******/ 	"use strict";
 var __webpack_exports__ = {};
@@ -352,7 +354,7 @@ function compressedSdpToString(sdp) {
 }
 
 ;// CONCATENATED MODULE: ../shared/commitId.ts
-const COMMIT_ID = 'f2f6a505bb';
+const COMMIT_ID = '595f38299d';
 /* harmony default export */ const commitId = (COMMIT_ID);
 
 ;// CONCATENATED MODULE: ./client.ts
@@ -803,7 +805,7 @@ class SfuClient {
         console.log("ws opened");
         this._setConnState(ConnState.kJoining);
         this._fire("onConnected");
-        this._sendVthumb = true;
+        // this._sendVthumb = true;
         await this._updateSentTracks();
         let pc = this.rtcConn;
         let offer = await pc.createOffer();
@@ -932,10 +934,8 @@ class SfuClient {
                 return Promise.reject(err);
             }));
         }
-        try {
-            await Promise.allSettled(promises);
-        }
-        catch (ex) {
+        await Promise.allSettled(promises);
+        if (errAv) {
             self._fire("onLocalMediaError", errAv);
         }
         return true;
@@ -968,6 +968,7 @@ class SfuClient {
     async _doUpdateSentTracks() {
         var self = this;
         let oldAv = this.availAv;
+        const wasSendingHiRes = this.outVSpeakerTrack.isSendingTrack();
         try {
             await self._doGetLocalTracks();
             let promises = [];
@@ -1008,6 +1009,10 @@ class SfuClient {
             let tsStart = Date.now();
             await Promise.all(promises);
             console.log("sendTrack changes took", Date.now() - tsStart, "ms");
+            // hook the svc driver init here, so that it is always executed
+            if (this.outVSpeakerTrack.isSendingTrack() && !wasSendingHiRes) {
+                this._svcDriver.initTx();
+            }
         }
         finally {
             self._updateAvailAndSentAv();
@@ -1184,9 +1189,6 @@ class SfuClient {
             // reflect the actual state of the sent tracks, so that the actual delta is seen correctly
             this._availAv = Av.onHold;
         });
-        if (this._isSharingScreen) {
-            this._svcDriver.initTx("scr");
-        }
     }
     isOnHold() {
         return this._onHold != null;
@@ -1205,7 +1207,6 @@ class SfuClient {
             return;
         }
         if (this._isSharingScreen) {
-            this._svcDriver.initTx("scr");
             this._fire("onScreenshare", true, this.screenShareType());
         }
         else {
@@ -1712,7 +1713,7 @@ class SfuClient {
             promises.push(rxTrack.pollRxStats());
         }
         if (promises.length) {
-            await Promise.all(promises);
+            await Promise.allSettled(promises);
         }
         if (!this.hasConnStats) {
             await this.getConnStatsFromPeerConn();
@@ -1762,6 +1763,7 @@ class SfuClient {
     parseTxVideoStats(stats, isHiRes) {
         let getConnTotals = !this.hasConnStats;
         let rtcStats = this.rtcStats;
+        let txStat;
         for (let stat of stats.values()) {
             let type = stat.type;
             if (type === "outbound-rtp") {
@@ -1784,29 +1786,36 @@ class SfuClient {
                     ctx.prev = stat;
                     let period = (stat.timestamp - prev.timestamp) / 1000;
                     rtcStats._vtxIsHiRes = isHiRes;
-                    if (isNaN((rtcStats._vtxKbps = ((stat.bytesSent - prev.bytesSent) / 128) / period))) {
-                        rtcStats._vtxKbps = 0;
+                    if (isNaN((rtcStats._vtxkbps = ((stat.bytesSent - prev.bytesSent) / 128) / period))) {
+                        rtcStats._vtxkbps = 0;
                     }
                     rtcStats.vtxfps = stat.framesPerSecond;
                     rtcStats.vtxw = stat.frameWidth;
                     rtcStats.vtxh = stat.frameHeight;
+                    rtcStats._vtxkfps = (stat.keyFramesEncoded - prev.keyFramesEncoded) / period;
+                    const pktSent = stat.packetsSent - prev.packetsSent;
+                    rtcStats.vtxdly = pktSent
+                        ? Math.round((stat.totalPacketSendDelay - prev.totalPacketSendDelay) * 1000 / pktSent)
+                        : -1;
+                    txStat = stat;
                     //  console.log("tag:", tag, "nacks:", stat.nackCount, "pli:", stat.pliCount, "fir", stat.firCount, "vtxh:", rtcStats.vtxh);
-                    if (this.app.onVideoTxStat) {
-                        let info = {
-                            fps: rtcStats.vtxfps,
-                            kbps: rtcStats._vtxKbps,
-                            keyfps: (stat.keyFramesEncoded - prev.keyFramesEncoded) / period
-                        };
-                        this.app.onVideoTxStat(isHiRes, info, stat);
-                    }
                 }
                 if (!getConnTotals) {
-                    return;
+                    break;
                 }
             }
             else if (getConnTotals && type === "candidate-pair" && stat.nominated) {
                 this.parseConnStats(stat);
                 getConnTotals = false;
+            }
+        }
+        if (this.app.onVideoTxStat) {
+            if (txStat) {
+                // we may not have conn totals yet, so do the callback after returning
+                this.app.onVideoTxStat(isHiRes, rtcStats, txStat);
+            }
+            else {
+                this.app.onVideoTxStat(null);
             }
         }
     }
@@ -1815,8 +1824,14 @@ class SfuClient {
         s.rtt = stat.currentRoundTripTime * 1000;
         let txBwe = stat.availableOutgoingBitrate;
         if (txBwe != null) {
-            s.txBwe = Math.round(txBwe / 128);
+            s.txBwe = Math.round(txBwe / 1024);
         }
+        /* this is actually not available on Chrome
+        let rxBwe = stat.availableIncomingBitrate;
+        if (rxBwe) {
+            s.rxBwe = Math.round(rxBwe / 1024);
+        }
+        */
         let ctx = this.statCtx;
         this.hasConnStats = true;
         if (!ctx.prevTx) {
@@ -1863,7 +1878,7 @@ SfuClient.debugSdp = localStorage.debugSdp ? 1 : 0;
 SfuClient.kMaxActiveSpeakers = 20;
 SfuClient.kMaxInputVideoTracks = 20;
 SfuClient.kSpatialLayerCount = 3;
-SfuClient.kVideoCaptureOptions = { width: 960, height: 540 };
+SfuClient.kVideoCaptureOptions = { height: 540 };
 SfuClient.kScreenCaptureOptions = { video: { height: { max: 1440 } } };
 SfuClient.kVthumbHeight = 90;
 SfuClient.kRotateKeyUseDelay = 100;
@@ -2636,13 +2651,14 @@ class SvcDriver {
         let maTxKbps;
         let adaptScrnTx = stats._vtxIsHiRes && this.client.isSendingScreenHiRes();
         if (adaptScrnTx) { // calculate tx average kbps
+            const txBwidth = (stats.txBwe > 0) ? stats.txBwe : stats._vtxkbps;
             if (this.maTxKbps == null) {
-                maTxKbps = this.maTxKbps = stats._vtxKbps;
+                maTxKbps = this.maTxKbps = txBwidth;
             }
             else {
-                maTxKbps = this.maTxKbps = (this.maTxKbps * 5 + stats._vtxKbps) / 6;
+                maTxKbps = this.maTxKbps = (this.maTxKbps * 5 + txBwidth) / 6;
             }
-            // console.log("maTxKbps:", maTxKbps, "mom:", stats._vtxKbps);
+            // console.log("scrshare: maTxKbps:", maTxKbps, "mom:", txBwidth);
         }
         if (tsNow - this.tsLastSwitch < SvcDriver.kMinTimeBetweenSwitches) {
             return; // too early
@@ -2670,7 +2686,11 @@ class SvcDriver {
                     this.switchTxQuality(delta, "scr");
                 }
             }
-            else {
+            else if (stats.vtxdly > 2500) {
+                console.warn(`scrnshare: Tx delay ${stats.vtxdly} ms too large, decreasing quality...`);
+                this.switchTxQuality(-1, "scr");
+            }
+            else if (stats.vtxdly > 0 && stats.vtxdly < 1400) {
                 let q = this.currTxQuality;
                 while (maTxKbps > txQs[q].maxKbps) {
                     q++;
@@ -2700,7 +2720,7 @@ class SvcDriver {
         let params = SvcDriver.RxQuality[newQ];
         assert(params);
         this.tsLastSwitch = Date.now();
-        console.warn(`Switching rx SVC quality from ${this.currRxQuality} to ${newQ}: ${JSON.stringify(params)}`);
+        console.warn(`Switching rx SVC quality from ${this.currRxQuality} to ${newQ}: %o`, params);
         this.currRxQuality = newQ;
         this.client.requestSvcLayers(params[0], params[1], params[2]);
         return true;
@@ -2732,7 +2752,7 @@ class SvcDriver {
             let res = track.getSettings();
             if (res.width && res.height) {
                 ar = this.client.screenAspectRatio = res.width / res.height;
-                console.warn(`Screen capture res: ${res.width}x${res.height} (aspect ratio: ${ar})`);
+                console.warn(`Screen capture res: ${res.width}x${res.height} (aspect ratio: ${Math.round(ar * 1000) / 1000})`);
             }
             else {
                 ar = 1.78;
@@ -2740,14 +2760,16 @@ class SvcDriver {
             }
         }
         params.width = Math.round(params.height * ar);
-        console.warn(`Switching TX quality from ${this.currTxQuality} to ${newQ}: %o`,
-                     params, String(this.client.screenAspectRatio).substr(0, 6));
+        console.warn(`Switching TX quality from ${this.currTxQuality} to ${newQ}: %o (AR: ${this.client.screenAspectRatio ? this.client.screenAspectRatio.toFixed(3) : "unknown"})`, params);
         this.currTxQuality = newQ;
         track.applyConstraints(params);
         return true;
     }
-    initTx(mode) {
-        setTimeout(() => { this.setTxQuality(this.currTxQuality, mode); }, 100);
+    initTx() {
+        if (this.client.isSendingScreenHiRes()) {
+            // need small delay to have the track started
+            setTimeout(this.setTxQuality.bind(this, this.currTxQuality, "scr"), 100);
+        }
     }
 }
 SvcDriver.kPlostUpper = 20;
@@ -2774,21 +2796,14 @@ SvcDriver.RxQuality = [
 ];
 SvcDriver.kMaxRxQualityIndex = SvcDriver.RxQuality.length - 1;
 // minKbps, maxKbps, scr: constraints for applyConstraints() on sent screen track
-// x540 needs at least 400 kbps
-// x720 needs at least 500 kbps
-// x1024 needs at least 900 kbps
-// x1620 needs at least 1800 kbps
 SvcDriver.TxQuality = [
-    { minKbps: 0, maxKbps: 380, scr: { height: 480, frameRate: 4 } },
-    { minKbps: 400, maxKbps: 550, scr: { height: 540, frameRate: 4 } },
-    { minKbps: 500, maxKbps: 700, scr: { height: 720, frameRate: 4 } },
-    { minKbps: 600, maxKbps: 800, scr: { height: 720, frameRate: 8 } },
-    { minKbps: 700, maxKbps: 1000, scr: { height: 720, frameRate: 16 } },
-    { minKbps: 900, maxKbps: 1200, scr: { height: 1080, frameRate: 4 } },
-    { minKbps: 1100, maxKbps: 1400, scr: { height: 1080, frameRate: 8 } },
-    { minKbps: 1250, maxKbps: 1600, scr: { height: 1080, frameRate: 16 } },
-    { minKbps: 1450, maxKbps: 1800, scr: { height: 1440, frameRate: 8 } },
-    { minKbps: 1600, maxKbps: 2300, scr: { height: 1440, frameRate: 16 } },
+    { minKbps: 0, maxKbps: 300, scr: { height: 540, frameRate: 4 } },
+    { minKbps: 280, maxKbps: 700, scr: { height: 720, frameRate: 4 } },
+    { minKbps: 680, maxKbps: 1000, scr: { height: 840, frameRate: 4 } },
+    { minKbps: 900, maxKbps: 1600, scr: { height: 1080, frameRate: 4 } },
+    { minKbps: 1500, maxKbps: 1800, scr: { height: 1080, frameRate: 8 } },
+    { minKbps: 1700, maxKbps: 2000, scr: { height: 1200, frameRate: 8 } },
+    { minKbps: 1900, maxKbps: 4000, scr: { height: 1440, frameRate: 8 } } // 6
 ];
 SvcDriver.kDefaultTxQuality = 2;
 SvcDriver.kMaxTxQualityIndex = SvcDriver.TxQuality.length - 1;

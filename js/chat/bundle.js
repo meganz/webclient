@@ -7317,37 +7317,13 @@ var buttons = __webpack_require__(204);
 
 
 class Navigation extends mixins.wl {
-  constructor(props) {
-    super(props);
-    this.requestReceivedListener = null;
-    this.state = {
-      receivedRequestsCount: 0
-    };
-    this.state.receivedRequestsCount = Object.keys(M.ipc).length;
-  }
-
-  componentWillUnmount() {
-    super.componentWillUnmount();
-
-    if (this.requestReceivedListener) {
-      mBroadcaster.removeListener(this.requestReceivedListener);
-    }
-  }
-
-  componentDidMount() {
-    super.componentDidMount();
-    this.requestReceivedListener = mBroadcaster.addListener('fmViewUpdate:ipc', () => this.setState({
-      receivedRequestsCount: Object.keys(M.ipc).length
-    }));
-  }
-
   render() {
     const {
       view
     } = this.props;
     const {
       receivedRequestsCount
-    } = this.state;
+    } = this.props;
     const {
       VIEW,
       LABEL
@@ -7374,7 +7350,8 @@ class Navigation extends mixins.wl {
                                                 mega-button
                                                 action
                                                 ${activeClass}
-                                            `
+                                            `,
+          receivedRequestsCount: receivedRequestsCount
         }, external_React_default().createElement("span", null, LABEL[key]), receivedRequestsCount > 0 && VIEW[key] === VIEW.RECEIVED_REQUESTS && external_React_default().createElement("div", {
           className: "notifications-count"
         }, receivedRequestsCount > 9 ? '9+' : receivedRequestsCount)));
@@ -8589,8 +8566,9 @@ class ContactsPanel extends mixins.wl {
   constructor(props) {
     super(props);
     this.requestReceivedListener = null;
-
-    this.getReceivedRequestsCount = () => this.props.received && Object.keys(this.props.received).length;
+    this.state = {
+      receivedRequestsCount: 0
+    };
 
     this.handleToggle = _ref => {
       let {
@@ -8657,29 +8635,41 @@ class ContactsPanel extends mixins.wl {
           });
       }
     };
+
+    this.state.receivedRequestsCount = Object.keys(M.ipc).length;
   }
 
   componentWillUnmount() {
     super.componentWillUnmount();
-    mBroadcaster.removeListener(this.requestReceivedListener);
     document.documentElement.removeEventListener(ContactsPanel.EVENTS.KEYDOWN, this.handleToggle);
+
+    if (this.requestReceivedListener) {
+      mBroadcaster.removeListener(this.requestReceivedListener);
+    }
   }
 
   componentDidMount() {
     super.componentDidMount();
     document.documentElement.addEventListener(ContactsPanel.EVENTS.KEYDOWN, this.handleToggle);
+    this.requestReceivedListener = mBroadcaster.addListener('fmViewUpdate:ipc', () => this.setState({
+      receivedRequestsCount: Object.keys(M.ipc).length
+    }));
   }
 
   render() {
-    const receivedRequestsCount = this.getReceivedRequestsCount();
     const {
-      view
+      view,
+      state
     } = this;
+    const {
+      receivedRequestsCount
+    } = state;
     return external_React_default().createElement("div", {
       className: "contacts-panel"
     }, external_React_default().createElement(Navigation, {
       view: view,
-      contacts: this.props.contacts
+      contacts: this.props.contacts,
+      receivedRequestsCount: receivedRequestsCount
     }), view !== ContactsPanel.VIEW.PROFILE && external_React_default().createElement("div", {
       className: "contacts-actions"
     }, view === ContactsPanel.VIEW.RECEIVED_REQUESTS && receivedRequestsCount > 1 && external_React_default().createElement("button", {
@@ -20803,7 +20793,7 @@ class Participant extends mixins.wl {
       contact: M.u[handle]
     }), external_React_default().createElement("div", {
       className: "name"
-    }, external_React_default().createElement(utils.Emoji, null, name), handle === u_handle && external_React_default().createElement("span", null, l.me), chatRoom.isMeeting && Call.isModerator(chatRoom, handle) && external_React_default().createElement("span", null, external_React_default().createElement("i", {
+    }, external_React_default().createElement(utils.Emoji, null, handle === u_handle ? `${name} ${l.me}` : name), chatRoom.isMeeting && Call.isModerator(chatRoom, handle) && external_React_default().createElement("span", null, external_React_default().createElement("i", {
       className: `${this.baseIconClass} icon-admin`
     }))), external_React_default().createElement("div", {
       className: "status"
@@ -31072,7 +31062,7 @@ class ParsedHTML extends React.Component {
       const ref = this.ref && this.ref.current;
 
       if (!children && !content) {
-        return console.warn('Emoji: No content passed.');
+        return d > 1 && console.warn('Emoji: No content passed.');
       }
 
       if (ref) {

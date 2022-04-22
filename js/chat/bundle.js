@@ -5907,7 +5907,7 @@ class ContactButton extends _mixins1__._p {
     var contact = self.props.contact;
     var dropdowns = self.props.dropdowns ? self.props.dropdowns : [];
     var moreDropdowns = [];
-    var username = react0().createElement(_ui_utils_jsx2__.Emoji, null, M.getNameByHandle(contact.u));
+    const username = react0().createElement(_ui_utils_jsx2__.OFlowEmoji, null, M.getNameByHandle(contact.u));
 
     var onContactClicked = function () {
       if (contact.c === 2) {
@@ -6488,7 +6488,7 @@ class ContactCard extends _mixins1__._p {
       username += " (" + escapeHTML(l[8885]) + ")";
     }
 
-    var escapedUsername = react0().createElement(_ui_utils_jsx2__.Emoji, null, username);
+    var escapedUsername = react0().createElement(_ui_utils_jsx2__.OFlowEmoji, null, username);
     var dropdowns = this.props.dropdowns ? this.props.dropdowns : [];
     var noContextMenu = this.props.noContextMenu ? this.props.noContextMenu : "";
     var noContextButton = this.props.noContextButton ? this.props.noContextButton : "";
@@ -7428,11 +7428,18 @@ var genericNodePropsComponent = __webpack_require__(297);
 
 
 class ColumnContactName extends genericNodePropsComponent.L {
+  constructor() {
+    super(...arguments);
+    this.Mail = (0,utils.withOverflowObserver)(() => external_React_default().createElement("span", {
+      className: "contact-item-email"
+    }, this.props.nodeAdapter.props.node.m));
+  }
+
   render() {
-    let {
+    const {
       nodeAdapter
     } = this.props;
-    let {
+    const {
       node
     } = nodeAdapter.props;
     return external_React_default().createElement("td", null, external_React_default().createElement(contacts.Avatar, {
@@ -7442,9 +7449,7 @@ class ColumnContactName extends genericNodePropsComponent.L {
       className: "contact-item"
     }, external_React_default().createElement("div", {
       className: "contact-item-user"
-    }, external_React_default().createElement(utils.Emoji, null, nodeAdapter.nodeProps.title)), external_React_default().createElement("div", {
-      className: "contact-item-email"
-    }, node.m)), external_React_default().createElement("div", {
+    }, external_React_default().createElement(utils.OFlowEmoji, null, nodeAdapter.nodeProps.title)), external_React_default().createElement(this.Mail, null)), external_React_default().createElement("div", {
       className: "clear"
     }));
   }
@@ -14411,7 +14416,7 @@ class MessageRow extends mixins.wl {
       className: "title"
     }, external_React_default().createElement(ui_contacts.ContactAwareName, {
       contact: M.u[contact]
-    }, external_React_default().createElement(utils.Emoji, null, room.getRoomTitle()))), isGroup ? null : external_React_default().createElement(ui_contacts.ContactPresence, {
+    }, external_React_default().createElement(utils.OFlowEmoji, null, room.getRoomTitle()))), isGroup ? null : external_React_default().createElement(ui_contacts.ContactPresence, {
       contact: M.u[contact]
     }), external_React_default().createElement("div", {
       className: "clear"
@@ -14419,7 +14424,7 @@ class MessageRow extends mixins.wl {
       className: "message-result-info"
     }, external_React_default().createElement("div", {
       className: "summary"
-    }, external_React_default().createElement(utils.ParsedHTML, {
+    }, external_React_default().createElement(utils.OFlowParsedHTML, {
       content: megaChat.highlight(summary, matches, true)
     })), external_React_default().createElement("div", {
       className: "result-separator"
@@ -14454,7 +14459,7 @@ class ChatRow extends mixins.wl {
       className: USER_CARD_CLASS
     }, external_React_default().createElement("div", {
       className: "graphic"
-    }, external_React_default().createElement(utils.ParsedHTML, null, result))), external_React_default().createElement("div", {
+    }, external_React_default().createElement(utils.OFlowParsedHTML, null, result))), external_React_default().createElement("div", {
       className: "clear"
     }));
   }
@@ -14478,14 +14483,14 @@ class MemberRow extends mixins.wl {
     const userCard = {
       graphic: external_React_default().createElement("div", {
         className: "graphic"
-      }, isGroup ? external_React_default().createElement(utils.ParsedHTML, null, megaChat.highlight(megaChat.html(room.topic || room.getRoomTitle()), matches, true)) : external_React_default().createElement((external_React_default()).Fragment, null, external_React_default().createElement(utils.ParsedHTML, null, megaChat.highlight(megaChat.html(nicknames.getNickname(data)), matches, true)), external_React_default().createElement(ui_contacts.ContactPresence, {
+      }, isGroup ? external_React_default().createElement(utils.OFlowParsedHTML, null, megaChat.highlight(megaChat.html(room.topic || room.getRoomTitle()), matches, true)) : external_React_default().createElement((external_React_default()).Fragment, null, external_React_default().createElement(utils.OFlowParsedHTML, null, megaChat.highlight(megaChat.html(nicknames.getNickname(data)), matches, true)), external_React_default().createElement(ui_contacts.ContactPresence, {
         contact: contact
       }))),
       textual: external_React_default().createElement("div", {
         className: "textual"
-      }, isGroup ? external_React_default().createElement((external_React_default()).Fragment, null, external_React_default().createElement("span", null, external_React_default().createElement(utils.Emoji, null, room.topic || room.getRoomTitle())), external_React_default().createElement(ui_contacts.MembersAmount, {
+      }, isGroup ? external_React_default().createElement((external_React_default()).Fragment, null, external_React_default().createElement("span", null, external_React_default().createElement(utils.OFlowEmoji, null, room.topic || room.getRoomTitle())), external_React_default().createElement(ui_contacts.MembersAmount, {
         room: room
-      })) : external_React_default().createElement((external_React_default()).Fragment, null, external_React_default().createElement(utils.Emoji, null, nicknames.getNickname(data)), external_React_default().createElement(ui_contacts.LastActivity, {
+      })) : external_React_default().createElement((external_React_default()).Fragment, null, external_React_default().createElement(utils.OFlowEmoji, null, nicknames.getNickname(data)), external_React_default().createElement(ui_contacts.LastActivity, {
         contact: contact,
         showLastGreen: true
       })))
@@ -14513,6 +14518,7 @@ const NilRow = _ref => {
     onSearchMessages,
     isFirstQuery
   } = _ref;
+  const label = LABEL.SEARCH_MESSAGES_INLINE.replace('[A]', '<a>').replace('[/A]', '</a>');
   return external_React_default().createElement("div", {
     className: `${SEARCH_ROW_CLASS} nil`
   }, external_React_default().createElement("div", {
@@ -14522,9 +14528,9 @@ const NilRow = _ref => {
   }), external_React_default().createElement("span", null, LABEL.NO_RESULTS), isFirstQuery && external_React_default().createElement("div", {
     className: "search-messages",
     onClick: onSearchMessages
-  }, external_React_default().createElement(utils.ParsedHTML, {
+  }, external_React_default().createElement(utils.OFlowParsedHTML, {
     tag: "div",
-    content: LABEL.SEARCH_MESSAGES_INLINE.replace('[A]', '<a>').replace('[/A]', '</a>')
+    content: label
   }))));
 };
 
@@ -15419,7 +15425,7 @@ let ConversationsListItem = (conversations_dec = utils["default"].SoonFcWrap(40,
       nameClassString += " privateChat";
     }
 
-    var roomTitle = conversations_React.createElement(utils.Emoji, null, chatRoom.getRoomTitle());
+    var roomTitle = conversations_React.createElement(utils.OFlowEmoji, null, chatRoom.getRoomTitle());
 
     if (chatRoom.type === "private") {
       roomTitle = conversations_React.createElement(ui_contacts.ContactAwareName, {
@@ -30900,8 +30906,11 @@ const __WEBPACK_DEFAULT_EXPORT__ = ({
 __webpack_require__.r(__webpack_exports__);
 __webpack_require__.d(__webpack_exports__, {
 "Emoji": () => (Emoji),
+"OFlowEmoji": () => (OFlowEmoji),
+"OFlowParsedHTML": () => (OFlowParsedHTML),
 "ParsedHTML": () => (ParsedHTML),
-"default": () => (__WEBPACK_DEFAULT_EXPORT__)
+"default": () => (__WEBPACK_DEFAULT_EXPORT__),
+"withOverflowObserver": () => (withOverflowObserver)
 });
 var _chat_mixins0__ = __webpack_require__(503);
 var React = __webpack_require__(363);
@@ -31112,6 +31121,48 @@ class RenderTo extends React.Component {
 
 }
 
+const withOverflowObserver = Component => class extends _chat_mixins0__._p {
+  constructor() {
+    super(...arguments);
+    this.displayName = 'OverflowObserver';
+    this.ref = React.createRef();
+    this.state = {
+      overflowed: false
+    };
+
+    this.handleMouseEnter = () => {
+      const element = this.ref && this.ref.current;
+
+      if (element) {
+        this.setState({
+          overflowed: element.scrollWidth > element.offsetWidth
+        });
+      }
+    };
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    return nextState.overflowed !== this.state.overflowed || nextProps.children !== this.props.children || nextProps.content !== this.props.content;
+  }
+
+  render() {
+    const {
+      simpletip
+    } = this.props;
+    return React.createElement("div", {
+      ref: this.ref,
+      className: `
+                        overflow-observer
+                        ${this.state.overflowed ? 'simpletip simpletip-tc' : ''}
+                    `,
+      "data-simpletipposition": (simpletip == null ? void 0 : simpletip.position) || 'top',
+      "data-simpletipoffset": simpletip == null ? void 0 : simpletip.offset,
+      "data-simpletip-class": simpletip == null ? void 0 : simpletip.className,
+      onMouseEnter: this.handleMouseEnter
+    }, React.createElement(Component, this.props));
+  }
+
+};
 const Emoji = _ref => {
   let {
     children
@@ -31174,11 +31225,15 @@ class ParsedHTML extends React.Component {
   }
 
 }
+const OFlowEmoji = withOverflowObserver(Emoji);
+const OFlowParsedHTML = withOverflowObserver(ParsedHTML);
 const __WEBPACK_DEFAULT_EXPORT__ = ({
   JScrollPane,
   RenderTo,
   schedule: _chat_mixins0__.Os,
-  SoonFcWrap: _chat_mixins0__.M9
+  SoonFcWrap: _chat_mixins0__.M9,
+  OFlowEmoji,
+  OFlowParsedHTML
 });
 
 /***/ }),

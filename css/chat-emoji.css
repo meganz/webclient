@@ -90,7 +90,7 @@ img.emoji,
 }
 .result-table-row img.emoji,
 .result-table-row img.emoji.big {
-    margin-top: 0px;
+    margin-top: -3px;
 }
 
 .fm-picker-dialog img.emoji.big {

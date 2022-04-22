@@ -2,7 +2,7 @@ import React from 'react';
 import { TYPE, LABEL } from './resultContainer.jsx';
 import { Avatar, ContactPresence, LastActivity, MembersAmount } from '../contacts.jsx';
 import { MegaRenderMixin } from '../../mixins';
-import { Emoji, ParsedHTML } from '../../../ui/utils.jsx';
+import { OFlowEmoji, OFlowParsedHTML } from '../../../ui/utils.jsx';
 import { ContactAwareName } from '../contacts.jsx';
 import { EVENTS } from './searchPanel.jsx';
 
@@ -82,14 +82,14 @@ class MessageRow extends MegaRenderMixin {
                 <div className="user-card">
                     <span className="title">
                         <ContactAwareName contact={M.u[contact]}>
-                            <Emoji>{room.getRoomTitle()}</Emoji>
+                            <OFlowEmoji>{room.getRoomTitle()}</OFlowEmoji>
                         </ContactAwareName>
                     </span>
                     {isGroup ? null : <ContactPresence contact={M.u[contact]}/>}
                     <div className="clear"/>
                     <div className="message-result-info">
                         <div className="summary">
-                            <ParsedHTML content={megaChat.highlight(summary, matches, true)} />
+                            <OFlowParsedHTML content={megaChat.highlight(summary, matches, true)} />
                         </div>
                         <div className="result-separator">
                             <i className="sprite-fm-mono icon-dot"/>
@@ -126,7 +126,7 @@ class ChatRow extends MegaRenderMixin {
                 </div>
                 <div className={USER_CARD_CLASS}>
                     <div className="graphic">
-                        <ParsedHTML>{result}</ParsedHTML>
+                        <OFlowParsedHTML>{result}</OFlowParsedHTML>
                     </div>
                 </div>
                 <div className="clear"/>
@@ -153,13 +153,13 @@ class MemberRow extends MegaRenderMixin {
                 // `Graphic` result of member type -- the last activity status is shown as graphic icon
                 <div className="graphic">
                     {isGroup ?
-                        <ParsedHTML>
+                        <OFlowParsedHTML>
                             {megaChat.highlight(megaChat.html(room.topic || room.getRoomTitle()), matches, true)}
-                        </ParsedHTML> :
+                        </OFlowParsedHTML> :
                         <>
-                            <ParsedHTML>
+                            <OFlowParsedHTML>
                                 {megaChat.highlight(megaChat.html(nicknames.getNickname(data)), matches, true)}
-                            </ParsedHTML>
+                            </OFlowParsedHTML>
                             <ContactPresence contact={contact}/>
                         </>
                     }
@@ -171,12 +171,12 @@ class MemberRow extends MegaRenderMixin {
                     {isGroup ?
                         <>
                             <span>
-                                <Emoji>{room.topic || room.getRoomTitle()}</Emoji>
+                                <OFlowEmoji>{room.topic || room.getRoomTitle()}</OFlowEmoji>
                             </span>
                             <MembersAmount room={room}/>
                         </> :
                         <>
-                            <Emoji>{nicknames.getNickname(data)}</Emoji>
+                            <OFlowEmoji>{nicknames.getNickname(data)}</OFlowEmoji>
                             <LastActivity contact={contact} showLastGreen={true}/>
                         </>
                     }
@@ -202,24 +202,27 @@ class MemberRow extends MegaRenderMixin {
     }
 }
 
-const NilRow = ({ onSearchMessages, isFirstQuery }) => (
-    <div className={`${SEARCH_ROW_CLASS} nil`}>
-        <div className="nil-container">
-            <i className="sprite-fm-mono icon-preview-reveal"/>
-            <span>{LABEL.NO_RESULTS}</span>
-            {isFirstQuery && (
-                <div
-                    className="search-messages"
-                    onClick={onSearchMessages}>
-                    <ParsedHTML
-                        tag="div"
-                        content={LABEL.SEARCH_MESSAGES_INLINE.replace('[A]', '<a>').replace('[/A]', '</a>')}
-                    />
-                </div>
-            )}
+const NilRow = ({ onSearchMessages, isFirstQuery }) => {
+    const label = LABEL.SEARCH_MESSAGES_INLINE.replace('[A]', '<a>').replace('[/A]', '</a>');
+    return (
+        <div className={`${SEARCH_ROW_CLASS} nil`}>
+            <div className="nil-container">
+                <i className="sprite-fm-mono icon-preview-reveal"/>
+                <span>{LABEL.NO_RESULTS}</span>
+                {isFirstQuery && (
+                    <div
+                        className="search-messages"
+                        onClick={onSearchMessages}>
+                        <OFlowParsedHTML
+                            tag="div"
+                            content={label}
+                        />
+                    </div>
+                )}
+            </div>
         </div>
-    </div>
-);
+    );
+};
 
 // ---------------------------------------------------------------------------------------------------------------------
 

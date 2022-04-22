@@ -1202,3 +1202,9 @@ button.fm-empty-button {
 .chat-links-preview {
     overflow: hidden;
 }
+.conversationsApp .overflow-observer,
+.dropdown.body .overflow-observer {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}

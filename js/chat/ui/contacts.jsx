@@ -1,7 +1,7 @@
 import React from 'react';
 import {ContactAwareComponent} from '../mixins';
 import {MegaRenderMixin} from '../mixins';
-import utils, { Emoji, ParsedHTML } from '../../ui/utils.jsx';
+import utils, { Emoji, ParsedHTML, OFlowEmoji } from '../../ui/utils.jsx';
 import { PerfectScrollbar } from '../../ui/perfectScrollbar.jsx';
 import { Button } from '../../ui/buttons.jsx';
 import { Dropdown, DropdownItem } from '../../ui/dropdowns.jsx';
@@ -79,7 +79,7 @@ export class ContactButton extends ContactAwareComponent {
 
         var moreDropdowns = [];
 
-        var username = <Emoji>{M.getNameByHandle(contact.u)}</Emoji>;
+        const username = <OFlowEmoji>{M.getNameByHandle(contact.u)}</OFlowEmoji>;
 
         var onContactClicked = function() {
             if (contact.c === 2) {
@@ -701,7 +701,7 @@ export class ContactCard extends ContactAwareComponent {
             username += " (" + escapeHTML(l[8885]) + ")";
         }
 
-        var escapedUsername = <Emoji>{username}</Emoji>;
+        var escapedUsername = <OFlowEmoji>{username}</OFlowEmoji>;
         var dropdowns = this.props.dropdowns ? this.props.dropdowns : [];
         var noContextMenu = this.props.noContextMenu ? this.props.noContextMenu : "";
         var noContextButton = this.props.noContextButton ? this.props.noContextButton : "";

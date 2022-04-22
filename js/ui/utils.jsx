@@ -1,7 +1,7 @@
 var React = require("react");
 var ReactDOM = require("react-dom");
 
-import {MegaRenderMixin, schedule, SoonFcWrap} from "../chat/mixins";
+import { ContactAwareComponent, MegaRenderMixin, schedule, SoonFcWrap } from "../chat/mixins";
 
 /**
  * jScrollPane helper
@@ -253,6 +253,48 @@ class RenderTo extends React.Component {
     }
 };
 
+export const withOverflowObserver = Component =>
+    class extends ContactAwareComponent {
+        displayName = 'OverflowObserver';
+        ref = React.createRef();
+
+        state = {
+            overflowed: false
+        };
+
+        handleMouseEnter = () => {
+            const element = this.ref && this.ref.current;
+            if (element) {
+                this.setState({ overflowed: element.scrollWidth > element.offsetWidth });
+            }
+        };
+
+        shouldComponentUpdate(nextProps, nextState) {
+            return (
+                nextState.overflowed !== this.state.overflowed ||
+                (nextProps.children !== this.props.children || nextProps.content !== this.props.content)
+            );
+        }
+
+        render() {
+            const { simpletip } = this.props;
+
+            return (
+                <div
+                    ref={this.ref}
+                    className={`
+                        overflow-observer
+                        ${this.state.overflowed ? 'simpletip simpletip-tc' : ''}
+                    `}
+                    data-simpletipposition={simpletip?.position || 'top'}
+                    data-simpletipoffset={simpletip?.offset}
+                    data-simpletip-class={simpletip?.className}
+                    onMouseEnter={this.handleMouseEnter}>
+                    <Component {...this.props} />
+                </div>
+            );
+        }
+    };
 
 export const Emoji = ({ children }) => {
     return <ParsedHTML content={megaChat.html(children)} />;
@@ -307,9 +349,14 @@ export class ParsedHTML extends React.Component {
     }
 }
 
+export const OFlowEmoji = withOverflowObserver(Emoji);
+export const OFlowParsedHTML = withOverflowObserver(ParsedHTML);
+
 export default {
     JScrollPane,
     RenderTo,
     schedule,
-    SoonFcWrap
+    SoonFcWrap,
+    OFlowEmoji,
+    OFlowParsedHTML,
 };

@@ -79,15 +79,18 @@ class MetaRichprevConfirmation extends ConversationMessageMixin {
                         <div className="message richpreview desc">
                             {l[18680]}
                         </div>
-                        <div className="buttons-block">
-                            <button className="mega-button right positive" onClick={function() {
+                    </div>
+                    <div className={"buttons-block"}>
+                        <button
+                            className={"mega-button right positive"}
+                            onClick={() => {
                                 self.doAllow();
-                            }}>
-                                <span>{l[18681]}</span>
-                            </button>
-                            {notNowButton}
-                            {neverButton}
-                        </div>
+                            }}
+                        >
+                            <span>{l[18681]}</span>
+                        </button>
+                        {notNowButton}
+                        {neverButton}
                     </div>
                 </div>
                 <div className="clear"></div>

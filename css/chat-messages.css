@@ -688,8 +688,6 @@
 }
 
 .message.richpreview.img-wrapper, .message.richpreview.inner-wrapper {
-    display: table-cell;
-    vertical-align: middle;
     padding: 0 16px;
 }
 .confirmation .message.richpreview.img-wrapper {
@@ -698,6 +696,11 @@
 .message.richpreview.img-wrapper {
     width: 112px;
     padding: 0;
+    float: left;
+}
+.message.richpreview.inner-wrapper {
+    float: right;
+    width: calc(100% - 166px);
 }
 .message.richpreview.url {
     text-decoration: none;
@@ -760,7 +763,6 @@
 }
 .message.richpreview.confirmation .buttons-block {
     padding: 10px 0 8px 0;
-    margin: 0 -12px 0 0;
     float: right;
 }
 .message.richpreview.confirmation .buttons-block > * {
@@ -770,6 +772,7 @@
 }
 .message.richpreview.confirmation .buttons-block span {
     line-height: 34px;
+    white-space: nowrap;
 }
 .richpreview.icon.block-view-file-type {
     float: left;

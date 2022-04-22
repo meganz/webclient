@@ -23449,14 +23449,14 @@ class MetaRichprevConfirmation extends metaRichpreviewConfirmation_ConversationM
       className: "message richpreview title"
     }, l[18679])), metaRichpreviewConfirmation_React.createElement("div", {
       className: "message richpreview desc"
-    }, l[18680]), metaRichpreviewConfirmation_React.createElement("div", {
+    }, l[18680])), metaRichpreviewConfirmation_React.createElement("div", {
       className: "buttons-block"
     }, metaRichpreviewConfirmation_React.createElement("button", {
       className: "mega-button right positive",
-      onClick: function () {
+      onClick: () => {
         self.doAllow();
       }
-    }, metaRichpreviewConfirmation_React.createElement("span", null, l[18681])), notNowButton, neverButton))), metaRichpreviewConfirmation_React.createElement("div", {
+    }, metaRichpreviewConfirmation_React.createElement("span", null, l[18681])), notNowButton, neverButton)), metaRichpreviewConfirmation_React.createElement("div", {
       className: "clear"
     })));
   }

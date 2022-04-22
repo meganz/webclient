@@ -29308,7 +29308,16 @@ class FMView extends mixins.wl {
   }
 
   componentDidUpdate(prevProps) {
-    if (prevProps.currentlyViewedEntry !== this.props.currentlyViewedEntry) {
+    const {
+      currentlyViewedEntry: currEntry,
+      searchValue: currSearch
+    } = this.props;
+    const {
+      currentlyViewedEntry: prevEntry,
+      searchValue: prevSearch
+    } = prevProps;
+
+    if (prevEntry !== currEntry || currSearch !== prevSearch) {
       var _this$dataSource3;
 
       let newState = {
@@ -29320,7 +29329,7 @@ class FMView extends mixins.wl {
         this.addOrUpdRawListener();
       }
 
-      var handle = this.props.currentlyViewedEntry;
+      const handle = currEntry;
 
       if (handle === 'shares') {
         newState.isLoading = true;

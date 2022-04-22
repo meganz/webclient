@@ -6,6 +6,7 @@ import { PerfectScrollbar } from '../../ui/perfectScrollbar.jsx';
 import { Button } from '../../ui/buttons.jsx';
 import { Dropdown, DropdownItem } from '../../ui/dropdowns.jsx';
 import ContactsPanel from './contactsPanel/contactsPanel.jsx';
+import ModalDialogs from "../../ui/modalDialogs";
 
 export const MAX_FREQUENTS = 3;
 const EMPTY_ARR = [];
@@ -1509,5 +1510,47 @@ export class ContactPickerWidget extends MegaRenderMixin {
                 )}
             </div>
         );
+    }
+}
+export class ContactPickerDialog extends MegaRenderMixin {
+    render() {
+        const {
+            active,
+            allowEmpty,
+            className,
+            exclude,
+            megaChat,
+            multiple,
+            multipleSelectedButtonLabel,
+            name,
+            nothingSelectedButtonLabel,
+            selectFooter,
+            showTopButtons,
+            singleSelectedButtonLabel,
+            onClose,
+            onSelectDone,
+        } = this.props;
+        return <ModalDialogs.ModalDialog
+            name={name}
+            className={`${className} contact-picker-dialog contacts-search`}
+            onClose={onClose}
+        >
+            <ContactPickerWidget
+                active={active}
+                allowEmpty={allowEmpty}
+                className={'popup contacts-search small-footer'}
+                contacts={M.u}
+                exclude={exclude}
+                megaChat={megaChat}
+                multiple={multiple}
+                multipleSelectedButtonLabel={multipleSelectedButtonLabel}
+                nothingSelectedButtonLabel={nothingSelectedButtonLabel}
+                selectFooter={selectFooter}
+                showTopButtons={showTopButtons}
+                singleSelectedButtonLabel={singleSelectedButtonLabel}
+                onClose={onClose}
+                onSelectDone={onSelectDone}
+            />
+        </ModalDialogs.ModalDialog>;
     }
 }

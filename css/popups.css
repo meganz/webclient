@@ -20,6 +20,10 @@ body.tl .dropdown.body.popup.contacts-search {
     right: 12px;
     left: auto !important;
 }
+.popup.contact-picker-dialog {
+    right: auto;
+    width: 420px;
+}
 .popup.add-participant-selector .dropdown-white-arrow {
     top: -55px;
     margin-left: 50px;
@@ -412,7 +416,15 @@ body.tl .dropdown.body.popup.contacts-search {
     padding-top: 24px;
     padding-bottom: 12px;
 }
+.contact-picker-dialog.add-participant-selector .horizontal-contacts-list {
+    box-sizing: unset;
+}
 .add-participant-selector footer {
+    padding: 24px;
+}
+.contact-picker-dialog footer {
+    display: flex;
+    justify-content: space-between;
     padding: 24px;
 }
 .add-participant-selector footer .mega-button span {

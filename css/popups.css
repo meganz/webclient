@@ -533,3 +533,6 @@ body.tl .dropdown.body.popup.contacts-search {
 .dark-direct-tooltip.simpletip-tooltip.large-width {
     max-width: 320px;
 }
+.dark-direct-tooltip.simpletip-tooltip.no-max-width {
+    max-width: none;
+}

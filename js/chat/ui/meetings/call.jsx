@@ -7,21 +7,32 @@ import End from './workflow/end.jsx';
 import Ephemeral from './workflow/ephemeral.jsx';
 
 export const EXPANDED_FLAG = 'in-call';
-export const inProgressAlert = () => {
+export const inProgressAlert = (isJoin) => {
     return new Promise((resolve, reject) => {
         if (megaChat.haveAnyActiveCall()) {
             if (window.sfuClient) {
                 // Active call w/  the current client
-                msgDialog('warningb', null, l.call_in_progress, l.finish_call, null, 1);
+                const { chatRoom } = megaChat.activeCall;
+                const peers = chatRoom
+                    ? chatRoom.getParticipantsExceptMe(chatRoom.getCallParticipants()).map(h => M.getNameByHandle(h))
+                    : [];
+                let body = isJoin ? l.cancel_to_join : l.cancel_to_start;
+                if (peers.length) {
+                    body = mega.utils.trans.listToString(
+                        peers,
+                        isJoin ? l.cancel_with_to_join : l.cancel_with_to_start
+                    );
+                }
+                msgDialog('warningb', null, l.call_in_progress, body, null, 1);
                 return reject();
             }
             // Active call on another client
             return (
                 msgDialog(
-                    `warningb:!^${l[82]}!${l.join_anyway}`,
+                    `warningb:!^${l[2005]}!${isJoin ? l.join_call_anyway : l.start_call_anyway}`,
                     null,
-                    l.call_in_progress,
-                    l.multiple_calls,
+                    isJoin ? l.join_multiple_calls_title : l.start_multiple_calls_title,
+                    isJoin ? l.join_multiple_calls_text : l.start_multiple_calls_text,
                     join => {
                         if (join) {
                             return resolve();

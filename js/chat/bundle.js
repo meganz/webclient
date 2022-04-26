@@ -12737,7 +12737,7 @@ class JoinCallNotification extends mixins.wl {
     }, external_React_default().createElement("i", {
       className: "sprite-fm-mono icon-phone"
     }), external_React_default().createElement(utils.ParsedHTML, {
-      onClick: () => (0,call.xt)().then(() => chatRoom.joinCall()).catch(ex => d && console.warn('Already in a call.', ex))
+      onClick: () => (0,call.xt)(true).then(() => chatRoom.joinCall()).catch(ex => d && console.warn('Already in a call.', ex))
     }, (l[20460] || 'There is an active group call. [A]Join[/A]').replace('[A]', '<button class="mega-button positive joinActiveCall small">').replace('[/A]', '</button>')));
   }
 
@@ -21609,15 +21609,25 @@ Ephemeral.NAMESPACE = 'ephemeral-dialog';
 
 
 const EXPANDED_FLAG = 'in-call';
-const inProgressAlert = () => {
+const inProgressAlert = isJoin => {
   return new Promise((resolve, reject) => {
     if (megaChat.haveAnyActiveCall()) {
       if (window.sfuClient) {
-        msgDialog('warningb', null, l.call_in_progress, l.finish_call, null, 1);
+        const {
+          chatRoom
+        } = megaChat.activeCall;
+        const peers = chatRoom ? chatRoom.getParticipantsExceptMe(chatRoom.getCallParticipants()).map(h => M.getNameByHandle(h)) : [];
+        let body = isJoin ? l.cancel_to_join : l.cancel_to_start;
+
+        if (peers.length) {
+          body = mega.utils.trans.listToString(peers, isJoin ? l.cancel_with_to_join : l.cancel_with_to_start);
+        }
+
+        msgDialog('warningb', null, l.call_in_progress, body, null, 1);
         return reject();
       }
 
-      return msgDialog(`warningb:!^${l[82]}!${l.join_anyway}`, null, l.call_in_progress, l.multiple_calls, join => {
+      return msgDialog(`warningb:!^${l[2005]}!${isJoin ? l.join_call_anyway : l.start_call_anyway}`, null, isJoin ? l.join_multiple_calls_title : l.start_multiple_calls_title, isJoin ? l.join_multiple_calls_text : l.start_multiple_calls_text, join => {
         if (join) {
           return resolve();
         }
@@ -23671,7 +23681,12 @@ class MetaRichpreviewMegaLinks extends mixin.y {
         onClick: function (url, megaLinkInfo) {
           if (megaLinkInfo.hadLoaded()) {
             if (window.sfuClient && megaLinkInfo.is_chatlink) {
-              return msgDialog('confirmation', undefined, l.call_in_progress, l.multiple_calls, e => e && window.open(url, '_blank', 'noopener,noreferrer'));
+              const {
+                chatRoom: room
+              } = megaChat.activeCall;
+              const peers = room ? room.getParticipantsExceptMe(room.getCallParticipants()).map(h => M.getNameByHandle(h)) : [];
+              const body = peers.length ? mega.utils.trans.listToString(peers, l.cancel_with_to_join) : l.cancel_to_join;
+              return msgDialog('confirmation', undefined, l.call_in_progress, body, e => e && window.open(url, '_blank', 'noopener,noreferrer'));
             }
 
             window.open(url, '_blank', 'noopener,noreferrer');

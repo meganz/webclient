@@ -251,8 +251,15 @@
                 "complexity": [2, 28],
                 "es/no-optional-chaining": "off",
                 "no-negated-condition": "off",
-                "react/jsx-closing-bracket-location": 1,
-                "react/jsx-curly-brace-presence": [1, { "props": "always", "children": "always" }],
+                "react/jsx-closing-bracket-location": [1, { "nonEmpty": "after-props" }],
+                "react/jsx-curly-brace-presence": [
+                    1,
+                    {
+                        "props": "never",
+                        "children": "never",
+                        "propElementValues": "always"
+                    }
+                ],
                 "react/jsx-indent": ["error", 4],
                 "react/jsx-no-bind": [2, { "allowArrowFunctions": true }],
                 "react/jsx-no-useless-fragment": 1,

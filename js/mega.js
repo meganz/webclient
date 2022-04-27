@@ -3868,7 +3868,7 @@ lazy(fm_thumbnails, 'exclude', () => {
     'use strict';
     const res = {
         recents: 5,
-        photos: 7, images: 7, videos: 7
+        photos: 7, images: 7, videos: 7, favourites: 7
     };
     return Object.setPrototypeOf(res, null);
 });
